@@ -14,6 +14,7 @@ use crate::components::vocab::{Here, Shortcut, Switch};
 use crate::geometry::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
 use crate::space::{CardAccent, FrameVars, SpaceLook, derive, gradient};
+use crate::geometry::measure::client_rect;
 use dioxus::prelude::*;
 use edit::Nudge;
 use parts::{Checks, GrainRow, Presets, Stops};
@@ -206,8 +207,7 @@ fn Field(
                 let look = look_down.clone();
                 let Some(mounted) = element() else { return };
                 spawn(async move {
-                    let Ok(measured) = mounted.get_client_rect().await else { return };
-                    let rect = super::hover_strip::rect(measured);
+                    let Some(rect) = client_rect(&mounted).await else { return };
                     bounds.set(Some(rect));
                     let index = handle_under(&look, rect, at).unwrap_or(current);
                     picker.pick(dot_index(index));

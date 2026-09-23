@@ -218,35 +218,3 @@ pub(crate) fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{RosterState, RowPitch};
-    use crate::components::vocab::Emphasis;
-    use crate::geometry::units::Px;
-    use crate::motion::anim::Anim;
-    use crate::motion::presence::{Exit, Presence};
-
-    #[test]
-    fn every_exit_settles_its_own_animation_and_unread_rows_the_heavy_one() {
-        const CASES: &[(Exit, Emphasis, Anim)] = &[
-            (Exit::Fold, Emphasis::Plain, Anim::Fold),
-            (Exit::Fold, Emphasis::Strong, Anim::FoldHeavy),
-            (Exit::Curl, Emphasis::Plain, Anim::Curl),
-            (Exit::Curl, Emphasis::Strong, Anim::CurlHeavy),
-            (Exit::Crumple, Emphasis::Plain, Anim::Crumple),
-            (Exit::Crumple, Emphasis::Strong, Anim::CrumpleHeavy),
-            (Exit::TabOut, Emphasis::Plain, Anim::TabOut),
-            (Exit::TabOut, Emphasis::Strong, Anim::TabOut),
-        ];
-        for &(exit, emphasis, want) in CASES {
-            let rested = RosterState::first_show(&["a", "b"], RowPitch(Px(40.0))).rest();
-            let (left, anim) = rested.leave(&"b", exit, emphasis);
-            assert_eq!(anim, want, "{exit:?} {emphasis:?}");
-            assert_eq!(
-                left.entries()[1].presence,
-                Presence::Leaving(exit),
-                "{exit:?} {emphasis:?}"
-            );
-        }
-    }
-}

@@ -8,6 +8,7 @@ pub mod harness;
 mod headless;
 mod host;
 pub mod launch;
+mod measure;
 mod net;
 mod scheme;
 pub mod snapshot;

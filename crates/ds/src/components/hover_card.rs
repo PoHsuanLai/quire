@@ -8,7 +8,7 @@
 //! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving.
 
 use crate::components::popover::{
-    Float, Stacking, from_pixels, position_style, use_entrance, use_float,
+    Float, Stacking, position_style, use_entrance, use_float,
 };
 use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
 use crate::motion::anim::Anim;
@@ -18,6 +18,7 @@ use crate::overlay::stack::LayerStack;
 use crate::time::{FRAME_SLACK, sleep};
 use crate::tokens::ZLayer;
 use dioxus::core::provide_root_context;
+use crate::geometry::measure::client_rect;
 use dioxus::prelude::*;
 use std::collections::BTreeMap;
 
@@ -48,9 +49,9 @@ impl Anchors {
     fn record(self, key: HoverKey, element: MountedRef) {
         spawn(async move {
             sleep(FRAME_SLACK).await;
-            if let Ok(rect) = element.0.get_client_rect().await {
+            if let Some(rect) = client_rect(&element.0).await {
                 let mut book = self.0;
-                book.with_mut(|book| book.insert(key, from_pixels(rect)));
+                book.with_mut(|book| book.insert(key, rect));
             }
         });
     }

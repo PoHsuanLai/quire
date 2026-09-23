@@ -175,9 +175,13 @@ fn leave_names_the_animation_to_settle() {
         (Exit::Fold, Emphasis::Plain, Anim::Fold),
         (Exit::Fold, Emphasis::Strong, Anim::FoldHeavy),
         (Exit::Curl, Emphasis::Plain, Anim::Curl),
-        (Exit::Curl, Emphasis::Strong, Anim::Curl),
+        // Wave 2 integration: every row exit has its heavy variant for an unread row.
+        (Exit::Curl, Emphasis::Strong, Anim::CurlHeavy),
         (Exit::Crumple, Emphasis::Plain, Anim::Crumple),
-        (Exit::Crumple, Emphasis::Strong, Anim::Crumple),
+        (Exit::Crumple, Emphasis::Strong, Anim::CrumpleHeavy),
+        // A Today entry's exit has no heavy variant.
+        (Exit::TabOut, Emphasis::Plain, Anim::TabOut),
+        (Exit::TabOut, Emphasis::Strong, Anim::TabOut),
     ];
     for (exit, emphasis, want) in cases {
         let (state, anim) = at_rest(&["a", "b"]).leave(&"a", exit, emphasis);
