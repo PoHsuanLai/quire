@@ -1,0 +1,482 @@
+//! Table-driven coverage of every `ds::lint::Rule`: one passing and one failing case each, on
+//! the `cssparser` token stream (never a substring search — CONVENTIONS "Substrings are not
+//! tokens"). `mailo_cases` ports the case tables from
+//! `mail-app/src/ui/style/mod.rs`'s `every_var_is_declared`, `no_colour_outside_the_palette`,
+//! `current_color_is_only_a_stroke_or_fill_value` and `a_class_with_no_rule_is_named`.
+
+use ds::lint::{LintConfig, Offence, Profile, Rule, markup, stylesheet};
+
+fn lint(css: &str, profile: Profile) -> Vec<Offence> {
+    stylesheet(
+        css,
+        &LintConfig {
+            profile,
+            own_vars: Vec::new(),
+        },
+    )
+}
+
+fn has(offences: &[Offence], rule: Rule) -> bool {
+    offences.iter().any(|offence| offence.rule == rule)
+}
+
+struct Case {
+    name: &'static str,
+    css: &'static str,
+    profile: Profile,
+    rule: Rule,
+    /// Whether `rule` is expected to fire somewhere in `css`.
+    expect: bool,
+}
+
+/// One passing and one failing case per [`Rule`], in [`Rule::ALL`]'s order.
+const CASES: &[Case] = &[
+    // HexColour
+    Case {
+        name: "hex colour: literal fails",
+        css: ".chip { color: #fff; }",
+        profile: Profile::Standard,
+        rule: Rule::HexColour,
+        expect: true,
+    },
+    Case {
+        name: "hex colour: token passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::HexColour,
+        expect: false,
+    },
+    // ColourFunction
+    Case {
+        name: "colour function: rgb() fails",
+        css: ".chip { background: rgb(1, 2, 3); }",
+        profile: Profile::Standard,
+        rule: Rule::ColourFunction,
+        expect: true,
+    },
+    Case {
+        name: "colour function: token passes",
+        css: ".chip { background: var(--surface); }",
+        profile: Profile::Standard,
+        rule: Rule::ColourFunction,
+        expect: false,
+    },
+    // NamedColour
+    Case {
+        name: "named colour: red fails",
+        css: ".chip { color: red; }",
+        profile: Profile::Standard,
+        rule: Rule::NamedColour,
+        expect: true,
+    },
+    Case {
+        name: "named colour: token passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::NamedColour,
+        expect: false,
+    },
+    // CurrentColourOutsideStrokeFill
+    Case {
+        name: "currentColor on color: fails",
+        css: ".label { color: currentColor; }",
+        profile: Profile::Standard,
+        rule: Rule::CurrentColourOutsideStrokeFill,
+        expect: true,
+    },
+    Case {
+        name: "currentColor on stroke alone: passes",
+        css: ".ic { stroke: currentColor; }",
+        profile: Profile::Standard,
+        rule: Rule::CurrentColourOutsideStrokeFill,
+        expect: false,
+    },
+    // RawDuration
+    Case {
+        name: "raw duration: 200ms fails",
+        css: ".chip { transition: color 200ms; }",
+        profile: Profile::Standard,
+        rule: Rule::RawDuration,
+        expect: true,
+    },
+    Case {
+        name: "raw duration: token passes",
+        css: ".chip { transition: color var(--t-quick); }",
+        profile: Profile::Standard,
+        rule: Rule::RawDuration,
+        expect: false,
+    },
+    // RawEasing
+    Case {
+        name: "raw easing: ease-in-out fails",
+        css: ".chip { transition-timing-function: ease-in-out; }",
+        profile: Profile::Standard,
+        rule: Rule::RawEasing,
+        expect: true,
+    },
+    Case {
+        name: "raw easing: token passes",
+        css: ".chip { transition-timing-function: var(--e-in-out); }",
+        profile: Profile::Standard,
+        rule: Rule::RawEasing,
+        expect: false,
+    },
+    // Keyframes
+    Case {
+        name: "keyframes: @keyframes fails",
+        css: "@keyframes wiggle { from { opacity: 0; } to { opacity: 1; } }",
+        profile: Profile::Standard,
+        rule: Rule::Keyframes,
+        expect: true,
+    },
+    Case {
+        name: "keyframes: none passes",
+        css: ".chip { animation-name: gulp; }",
+        profile: Profile::Standard,
+        rule: Rule::Keyframes,
+        expect: false,
+    },
+    // UnknownAnimation
+    Case {
+        name: "unknown animation: made-up name fails",
+        css: ".chip { animation-name: sparkle-explosion; }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: true,
+    },
+    Case {
+        name: "unknown animation: a real Anim passes",
+        css: ".chip { animation-name: gulp; }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: false,
+    },
+    // FontFamily
+    Case {
+        name: "font-family: literal fails",
+        css: ".chip { font-family: Arial, sans-serif; }",
+        profile: Profile::Standard,
+        rule: Rule::FontFamily,
+        expect: true,
+    },
+    Case {
+        name: "font-family: absent passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::FontFamily,
+        expect: false,
+    },
+    // RawFontSize (Strict only)
+    Case {
+        name: "raw font-size: literal fails under Strict",
+        css: ".chip { font-size: 14px; }",
+        profile: Profile::Strict,
+        rule: Rule::RawFontSize,
+        expect: true,
+    },
+    Case {
+        name: "raw font-size: token passes under Strict",
+        css: ".chip { font-size: var(--fs-body); }",
+        profile: Profile::Strict,
+        rule: Rule::RawFontSize,
+        expect: false,
+    },
+    // RawRadius (Strict only)
+    Case {
+        name: "raw radius: literal fails under Strict",
+        css: ".chip { border-radius: 8px; }",
+        profile: Profile::Strict,
+        rule: Rule::RawRadius,
+        expect: true,
+    },
+    Case {
+        name: "raw radius: token passes under Strict",
+        css: ".chip { border-radius: var(--r-chip); }",
+        profile: Profile::Strict,
+        rule: Rule::RawRadius,
+        expect: false,
+    },
+    // RawZIndex (Strict only)
+    Case {
+        name: "raw z-index: literal fails under Strict",
+        css: ".chip { z-index: 5; }",
+        profile: Profile::Strict,
+        rule: Rule::RawZIndex,
+        expect: true,
+    },
+    Case {
+        name: "raw z-index: token passes under Strict",
+        css: ".chip { z-index: var(--z-menu); }",
+        profile: Profile::Strict,
+        rule: Rule::RawZIndex,
+        expect: false,
+    },
+    // RootSelector
+    Case {
+        name: "root selector: :root fails",
+        css: ":root { color: red; }",
+        profile: Profile::Standard,
+        rule: Rule::RootSelector,
+        expect: true,
+    },
+    Case {
+        name: "root selector: a class passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::RootSelector,
+        expect: false,
+    },
+    // DsInternals
+    Case {
+        name: "ds internals: .ds- class fails",
+        css: ".ds-icon { color: red; }",
+        profile: Profile::Standard,
+        rule: Rule::DsInternals,
+        expect: true,
+    },
+    Case {
+        name: "ds internals: a consumer class passes",
+        css: ".icon { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::DsInternals,
+        expect: false,
+    },
+    // UndeclaredVar
+    Case {
+        name: "undeclared var: a typo fails",
+        css: ".chip { color: var(--totally-not-real); }",
+        profile: Profile::Standard,
+        rule: Rule::UndeclaredVar,
+        expect: true,
+    },
+    Case {
+        name: "undeclared var: a real token passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::UndeclaredVar,
+        expect: false,
+    },
+    // Important
+    Case {
+        name: "important: !important fails",
+        css: ".chip { color: var(--ink) !important; }",
+        profile: Profile::Standard,
+        rule: Rule::Important,
+        expect: true,
+    },
+    Case {
+        name: "important: absent passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::Important,
+        expect: false,
+    },
+    // BlitzUnsupported
+    Case {
+        name: "blitz unsupported: backdrop-filter fails",
+        css: ".chip { backdrop-filter: blur(10px); }",
+        profile: Profile::Standard,
+        rule: Rule::BlitzUnsupported,
+        expect: true,
+    },
+    Case {
+        name: "blitz unsupported: absent passes",
+        css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::BlitzUnsupported,
+        expect: false,
+    },
+    // UnprefixedAttributeSelector
+    Case {
+        name: "unprefixed attribute: [data-open] fails",
+        css: "[data-open] { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::UnprefixedAttributeSelector,
+        expect: true,
+    },
+    Case {
+        name: "unprefixed attribute: [*|data-open] passes",
+        css: "[*|data-open] { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::UnprefixedAttributeSelector,
+        expect: false,
+    },
+    // FocusPseudoClass
+    Case {
+        name: "focus pseudo-class: :focus-visible fails",
+        css: ".btn:focus-visible { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::FocusPseudoClass,
+        expect: true,
+    },
+    Case {
+        name: "focus pseudo-class: :focus passes",
+        css: ".btn:focus { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::FocusPseudoClass,
+        expect: false,
+    },
+    // SvgPaintInCss
+    Case {
+        name: "svg paint in css: svg descendant fails",
+        css: ".icon svg { stroke: red; }",
+        profile: Profile::Standard,
+        rule: Rule::SvgPaintInCss,
+        expect: true,
+    },
+    Case {
+        name: "svg paint in css: a non-svg selector passes",
+        css: ".ic { stroke: currentColor; }",
+        profile: Profile::Standard,
+        rule: Rule::SvgPaintInCss,
+        expect: false,
+    },
+];
+
+#[test]
+fn every_rule_case_matches() {
+    let mut failures = Vec::new();
+    for case in CASES {
+        let got = has(&lint(case.css, case.profile), case.rule);
+        if got != case.expect {
+            failures.push(format!(
+                "{}: expected {rule:?} to {verb} in `{css}`, but it did{not}",
+                case.name,
+                rule = case.rule,
+                verb = if case.expect { "fire" } else { "stay quiet" },
+                css = case.css,
+                not = if got { "" } else { " not" },
+            ));
+        }
+    }
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// `CASES` covers every `Rule`, with both a passing and a failing case — not just the ones a
+/// contributor remembered to hand-pick.
+#[test]
+fn every_rule_variant_is_covered() {
+    let mut missing = Vec::new();
+    for rule in Rule::ALL {
+        let has_pass = CASES.iter().any(|case| case.rule == rule && case.expect);
+        let has_fail = CASES.iter().any(|case| case.rule == rule && !case.expect);
+        if !has_pass {
+            missing.push(format!("{rule:?} has no passing case"));
+        }
+        if !has_fail {
+            missing.push(format!("{rule:?} has no failing case"));
+        }
+    }
+    assert!(missing.is_empty(), "{}", missing.join("\n"));
+}
+
+mod mailo_cases {
+    use super::*;
+
+    /// Ported from `mail-app/src/ui/style/mod.rs`'s identically named test: `currentColor` is
+    /// the whole value of `stroke`/`fill`, or it is a colour outside the palette.
+    #[test]
+    fn current_color_is_only_a_stroke_or_fill_value() {
+        const CASES: &[(&str, &str, &[&str])] = &[
+            (".label", "color: currentColor", &[".label: currentColor"]),
+            (".ic", "stroke: currentColor", &[]),
+            (".ic", "fill: currentColor", &[]),
+            (
+                ".presets button",
+                "background: currentColor",
+                &[".presets button: currentColor"],
+            ),
+            (".ic", "stroke-width: currentColor", &[".ic: currentColor"]),
+            (".ic", "stroke: currentColor extra", &[".ic: currentColor"]),
+        ];
+        let mut failures = Vec::new();
+        for &(selector, body, expect) in CASES {
+            let css = format!("{selector} {{ {body} }}");
+            let got: Vec<String> = lint(&css, Profile::Standard)
+                .into_iter()
+                .filter(|offence| offence.rule == Rule::CurrentColourOutsideStrokeFill)
+                .map(|offence| offence.text)
+                .collect();
+            let expect: Vec<String> = expect.iter().map(|s| (*s).to_owned()).collect();
+            if got != expect {
+                failures.push(format!(
+                    "{selector} {{ {body} }}: got {got:?}, want {expect:?}"
+                ));
+            }
+        }
+        assert!(failures.is_empty(), "{}", failures.join("\n"));
+    }
+
+    /// Ported from `every_var_is_declared`: a misspelt token resolves to nothing at the CSS
+    /// layer and is never an error there, so the lint is the one place that catches it.
+    #[test]
+    fn every_var_is_declared() {
+        let clean = lint(
+            ".row { color: var(--ink); background: var(--surface); transition: color var(--t-quick) var(--e-out); }",
+            Profile::Standard,
+        );
+        assert!(
+            !has(&clean, Rule::UndeclaredVar),
+            "real tokens flagged as undeclared: {clean:?}"
+        );
+
+        let typo = lint(".row { color: var(--line-sfot); }", Profile::Standard);
+        let missing: Vec<&str> = typo
+            .iter()
+            .filter(|offence| offence.rule == Rule::UndeclaredVar)
+            .map(|offence| offence.text.as_str())
+            .collect();
+        assert_eq!(missing, vec![".row: --line-sfot"], "{typo:?}");
+    }
+
+    /// Ported from `no_colour_outside_the_palette`: every raw colour shape the lint promises to
+    /// catch — hex, a colour function, a named colour, a system colour — is actually caught.
+    #[test]
+    fn no_colour_outside_the_palette() {
+        const RAW_COLOURS: &[&str] = &[
+            ".a { color: #ABCDEF; }",
+            ".a { color: #fff; }",
+            ".a { background: rgba(0, 0, 0, .5); }",
+            ".a { background: hsl(200deg 50% 50%); }",
+            ".a { color: white; }",
+            ".a { color: CanvasText; }",
+        ];
+        for css in RAW_COLOURS {
+            let offences = lint(css, Profile::Standard);
+            let flagged = offences.iter().any(|offence| {
+                matches!(
+                    offence.rule,
+                    Rule::HexColour | Rule::ColourFunction | Rule::NamedColour
+                )
+            });
+            assert!(flagged, "{css} was not flagged: {offences:?}");
+        }
+        let clean = lint(
+            ".a { color: var(--ink); background: var(--surface); }",
+            Profile::Standard,
+        );
+        assert!(
+            !clean.iter().any(|offence| matches!(
+                offence.rule,
+                Rule::HexColour | Rule::ColourFunction | Rule::NamedColour
+            )),
+            "{clean:?}"
+        );
+    }
+
+    /// Ported from `a_class_with_no_rule_is_named`: the failure names the missing class, not
+    /// merely "some markup was unstyled".
+    #[test]
+    fn a_class_with_no_rule_is_named() {
+        let offences = markup(
+            "<div class=\"zz-missing\"></div>",
+            "",
+            &LintConfig::default(),
+        );
+        assert_eq!(
+            offences.iter().map(|o| o.text.as_str()).collect::<Vec<_>>(),
+            vec!["<div>: class not defined by any rule: zz-missing"],
+            "{offences:?}"
+        );
+    }
+}
