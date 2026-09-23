@@ -1,0 +1,62 @@
+/* The gallery's own layout. Every colour, size, radius, shadow and duration is a quire token;
+   the only raw numbers are lengths (gaps, paddings, widths) that place the specimens. Linted
+   with ds::lint Strict in tests/lint.rs. */
+
+.g-app{position:relative;display:flex;flex-direction:column;gap:12px;padding:12px 14px 40px;min-height:100%}
+.g-toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px;color:var(--f-ink)}
+.g-tool{display:flex;flex-direction:column;gap:4px}
+.g-tool-name{font-family:var(--font-data);font-size:var(--fs-caption);letter-spacing:.08em;text-transform:uppercase;color:var(--f-ink-soft)}
+.g-anchor{display:inline-flex}
+.g-pages{display:flex;flex-wrap:wrap}
+.g-card{position:relative;display:flex;flex-direction:column;gap:22px;padding:20px 22px 28px;background:var(--surface);color:var(--ink);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
+.g-lede{max-width:760px;font-size:var(--fs-body);color:var(--ink-soft)}
+.g-section{display:flex;flex-direction:column;gap:10px}
+.g-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
+.g-row-top{align-items:flex-start}
+.g-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.g-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.g-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.g-grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.g-grid8{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+.g-note{font-size:var(--fs-small);color:var(--ink-soft);max-width:760px}
+.g-name{font-size:var(--fs-small);font-weight:600;color:var(--ink)}
+.g-code{font-family:var(--font-data);font-size:var(--fs-caption);color:var(--ink-faint);overflow-wrap:anywhere}
+.g-pass{color:var(--ok)}
+.g-fail{color:var(--danger)}
+
+/* Specimens. */
+.g-swatch{height:34px;border-radius:var(--r-small);box-shadow:inset 0 0 0 1px var(--line)}
+.g-chip-swatch{width:26px;height:26px;border-radius:var(--r-pill);flex:none;box-shadow:inset 0 0 0 1px var(--line)}
+.g-space-bar{height:10px;background:var(--accent);border-radius:var(--r-micro)}
+.g-radius{width:84px;height:56px;background:var(--accent-soft);border:1px solid var(--accent)}
+.g-shadow{width:110px;height:64px;background:var(--raise);border-radius:var(--r-card)}
+.g-type-line{display:flex;align-items:baseline;gap:14px;min-width:0}
+.g-type-name{width:190px;flex:none}
+.g-sample{width:56px;height:56px;border-radius:var(--r-btn);background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700}
+.g-lab{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.g-lab-cell{display:flex;align-items:center;gap:12px;padding:10px;border-radius:var(--r-panel);background:var(--surface-2)}
+.g-table{display:grid;gap:4px 14px;align-items:baseline}
+.g-cols5{grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr))}
+.g-cols6{grid-template-columns:minmax(0,1.4fr) minmax(0,1.2fr) repeat(4,minmax(0,1fr))}
+.g-head{font-family:var(--font-data);font-size:var(--fs-caption);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint)}
+
+/* Stages: a positioned box so the absolutely placed specimens (toast, pills, ghost) land inside
+   it rather than on the page. */
+.g-stage{position:relative;min-height:120px;border-radius:var(--r-panel);background:var(--surface-2);overflow:hidden}
+.g-stage-tall{min-height:200px}
+.g-stage-pad{padding:14px}
+.g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-soft);padding:4px 0}
+.g-side{display:flex;flex-direction:column;gap:2px;width:232px;padding:10px;border-radius:var(--r-panel);background:var(--f-solid);color:var(--f-ink)}
+
+/* Materials: a wallpaper under each chrome panel. The image is a generated PNG (wallpaper.rs). */
+.g-wall{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r-panel);background-size:cover;background-position:center}
+.g-panel{display:flex;flex-direction:column;gap:6px;padding:12px 14px;min-height:92px}
+.g-panel-row{flex-direction:row;align-items:center;gap:12px}
+.g-panel-bar{flex-direction:row;align-items:center;min-height:32px;padding:4px 12px}
+.g-panel-dock{flex-direction:row;align-items:center;justify-content:center;min-height:58px}
+.g-floors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px}
+
+/* The matrix: one cell per scheme and accent. */
+.g-matrix{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.g-cell{display:flex;flex-direction:column;gap:8px;padding:12px;min-height:120px}
