@@ -5,10 +5,10 @@ use super::{Section, Specimen};
 use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
-    Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleMode, Button, ButtonVariant, DelayToken,
-    Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd, Key,
-    LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut, Switch,
-    Tooltip, TooltipKind, UndoToken, sleep, use_env, use_hover_hub, use_toast_hub,
+    Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, ButtonVariant,
+    DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
+    Key, LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
+    Switch, Tooltip, TooltipKind, UndoToken, sleep, use_env, use_hover_hub, use_toast_hub,
 };
 
 /// The hover targets, one per card kind.
@@ -97,7 +97,7 @@ pub fn Bubble() -> Element {
         }
     };
     let actions = vec![
-        BubbleAction {
+        BubbleAction::Button(BubbleButton {
             label: rsx! { b { "B" } },
             title: "Bold".to_string(),
             pressed: Some(bold()),
@@ -107,13 +107,14 @@ pub fn Bubble() -> Element {
                     Switch::Off => Switch::On,
                 })
             }),
-        },
-        BubbleAction {
+        }),
+        BubbleAction::Separator,
+        BubbleAction::Button(BubbleButton {
             label: rsx! { Glyph { icon: Icon::Link, size: IconSize::Compact } },
             title: "Link".to_string(),
             pressed: None,
             onclick: EventHandler::new(move |()| open(Switch::On)),
-        },
+        }),
     ];
     rsx! {
         Section { title: "SelectionBubble", note: "The composer supplies the selection's rect; the bubble sits 8 px above it and never flips.",
@@ -225,9 +226,7 @@ fn Countdown(showcase: Showcase) -> Element {
         div { class: "g-stage-pad",
             Button { variant: ButtonVariant::Mini, label: "Send", onclick: start }
         }
-        // Not posed: its mount timer would land on the same poll as the posed menu's
-        // measurement and trip a Blitz borrow (see the Gaps page); a snapshot shows the stage.
-        if run() > 0 {
+        if run() > 0 || showcase == Showcase::Posed {
             SendPill {
                 key: "{run}",
                 text: match phase() { SendPhase::Counting => "Sending…", SendPhase::Done => "Sent" },

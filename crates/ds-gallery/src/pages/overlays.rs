@@ -46,11 +46,10 @@ const POSED_AT: Point = Point {
 #[component]
 pub fn OverlaysPage() -> Element {
     let showcase = use_context::<Signal<Axes>>().peek().showcase;
-    // A posed snapshot opens nothing that floats: on master a float's two rect probes wake on
-    // the same poll and the second is run inside Blitz's render borrow, which panics
-    // ("RefCell already borrowed"; fixed on the wave 2 integration branch by a host
-    // measurer). Once that lands, pose `Some(Opened::Menu(MenuKind::Rich))` here.
-    let mut opened = use_signal(|| None::<Opened>);
+    let mut opened = use_signal(|| match showcase {
+        Showcase::Posed => Some(Opened::Menu(MenuKind::Rich)),
+        Showcase::Live => None,
+    });
     let mut anchor = use_signal(|| None::<MountedRef>);
     let toasts = use_toast_hub();
     use_hook(move || {

@@ -15,6 +15,7 @@ pub mod type_ramp;
 
 use crate::axes::Axes;
 use dioxus::prelude::*;
+use ds::tokens::Alpha;
 use ds::{
     Accent, Appearance, BlurState, Ds, HeaderKind, Inject, Material, Scheme, SectionHeader,
     SpaceLook, Theme,
@@ -84,6 +85,7 @@ pub fn Scope(
         let axes = axes.read();
         (axes.motion, axes.look.clone())
     };
+    let tint = use_context::<Signal<Alpha>>();
     let theme = match scheme {
         Scheme::Light => Theme::Light,
         Scheme::Dark => Theme::Dark,
@@ -95,6 +97,7 @@ pub fn Scope(
             material,
             blur,
             stylesheet: Inject::Host,
+            tint_alpha: Some(tint()),
             {children}
         }
     }

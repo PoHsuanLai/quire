@@ -291,6 +291,7 @@ fn Marks() -> Element {
         initial,
         colour: Colour::Solid(Hex([0x1a, 0x73, 0xe8])),
         provider,
+        address: Some(format!("{initial}@example.org").to_lowercase()),
     };
     rsx! {
         Section { title: "ProviderMark and AccountTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed).",

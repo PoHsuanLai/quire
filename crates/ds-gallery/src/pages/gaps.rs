@@ -97,7 +97,7 @@ const LIMITS: [(&str, &str, &str); 16] = [
 
 /// What the gallery could not show with quire as it is: each a component that cannot express a
 /// documented state, a missing token, or a contract the code breaks.
-const DS_GAPS: [&str; 15] = [
+const DS_GAPS: [&str; 14] = [
     "No spacing tokens: design/01-LAYOUT.md section 2 names the scale, but every padding and gap is a raw length.",
     "Surface overrides only the material and the scheme. A specimen in another accent or blur state needs a nested Ds (the Matrix and Materials pages).",
     "The root marks the back frame layer with the class \"back\", but the stylesheet hides .ds-layer[*|data-layer=back]: the class is unstyled and both layers stay opaque, so the Space switch never cross-fades.",
@@ -108,9 +108,8 @@ const DS_GAPS: [&str; 15] = [
     "No token or component for a wallpaper, a stage or a specimen grid: the gallery's own layout CSS covers them.",
     "TextInput is 176 px tall on Blitz: the input takes the 300 x 150 replaced-element default and text_input.css sets no height (Controls page).",
     "Every Ds renders a ToastHost; the hidden toast is an empty pill whose translateY(160%) does not clear the root, so a small dark pill shows at the bottom of every nested root (Tokens, Materials, Matrix).",
-    "The toast's pull tab paints as an empty pale pill in the snapshot: its Undo glyph and label are not visible (Overlays page).",
+    "The toast's pull tab and the send pill's Undo paint as empty pills: their labels are not visible (Overlays page).",
     "A place SidebarItem without a count centres its icon and label instead of starting them at the left (Lists page).",
-    "On master a float's two rect probes wake on the same poll and the second runs inside Blitz's render borrow: RefCell already borrowed. The wave 2 integration branch fixes it with a host measurer; until then the posed snapshot opens no menu.",
     "The Space editor's colour field and its handles are blank in a snapshot (Space page), and its preset swatches render as 140 px discs.",
     "The LinkPill enters with --t-move --e-spring; the design says --t-quick --e-out and no Anim has that recipe (link_pill.css TODO).",
 ];

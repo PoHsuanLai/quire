@@ -351,8 +351,8 @@ fn Tiles() -> Element {
         Section { title: "Tiles, strip and drag ghost",
             div { class: "g-row",
                 AccountTile { account: AccountFace::All, pressed: Switch::On, unread: 7, onclick: |_| {} }
-                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: Provider::Fastmail }, pressed: Switch::On, unread: 0, onclick: |_| {} }
-                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: Provider::Fastmail }, pressed: Switch::Off, unread: 4, onclick: |_| {} }
+                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: Provider::Fastmail, address: None }, pressed: Switch::On, unread: 0, onclick: |_| {} }
+                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: Provider::Fastmail, address: None }, pressed: Switch::Off, unread: 4, onclick: |_| {} }
             }
             p { class: "g-note", "The hover strip shows on row hover in the list above. The drag ghost is fixed to the window: it follows the pointer while a row is dragged; here it is pinned near the top right." }
             div { class: "g-row",

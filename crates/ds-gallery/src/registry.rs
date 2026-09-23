@@ -96,7 +96,7 @@ pub const REGISTRY: [Entry; 11] = [
         page: Page::MotionLab,
         title: "Motion lab",
         lede: "Fire each animation on a sample. Beside it, the CSS duration token at the current level and the Rust settle() that times the state after it.",
-        height: 2300,
+        height: 2050,
         body: pages::motion_lab::MotionLabPage,
     },
 ];

@@ -40,6 +40,7 @@ pub fn SpacePage() -> Element {
                 look: look.clone(),
                 scheme,
                 active_dot: DotIndex(0),
+                name: Some(preset.label()),
                 onchange: move |next| axes.with_mut(|axes| axes.look = next),
             }
         }

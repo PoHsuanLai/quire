@@ -13,8 +13,8 @@ use ds::{Ds, HeaderKind, SectionHeader};
 pub fn App() -> Element {
     let axes = use_signal(starting);
     use_context_provider(|| axes);
-    // `Ds` reads `appearance.material_tint_alpha` from this context; the materials page moves it.
-    use_context_provider(|| Signal::new(axes.peek().tint_alpha));
+    // `appearance.material_tint_alpha`, which the materials page moves; every root is given it.
+    let tint = use_context_provider(|| Signal::new(axes.peek().tint_alpha));
     let now = axes();
     rsx! {
         Ds {
@@ -22,6 +22,7 @@ pub fn App() -> Element {
             look: now.look.clone(),
             material: now.material,
             blur: now.blur,
+            tint_alpha: Some(tint()),
             style { {style::CSS} }
             div { class: "g-app",
                 Toolbar {}
