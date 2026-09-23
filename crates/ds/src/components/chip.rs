@@ -41,7 +41,7 @@ impl ChipVariant {
     /// `data-hue`, on a Label chip only.
     fn hue(&self) -> Option<&'static str> {
         match self {
-            ChipVariant::Label(hue) => Some(hue_slug(*hue)),
+            ChipVariant::Label(hue) => Some(hue.slug()),
             _ => None,
         }
     }
@@ -56,20 +56,9 @@ impl ChipVariant {
     }
 }
 
-/// The `data-hue` word. `LabelHue::slug` says the same; it is the tokens wave's to fill, and a
-/// chip must render before that lands, so the five words are spelled here too.
-fn hue_slug(hue: LabelHue) -> &'static str {
-    match hue {
-        LabelHue::Red => "red",
-        LabelHue::Amber => "amber",
-        LabelHue::Green => "green",
-        LabelHue::Blue => "blue",
-        LabelHue::Violet => "violet",
-    }
-}
-
-/// A small label. `pulse` plays `chip-land` or `chip-in` again; the Person chip's 1200 ms
-/// flash has no `Anim` and no prop, so it is not drawn (reported against the frozen props).
+/// A small label. `pulse` plays `chip-land` or `chip-in` again, or, on a Person chip,
+/// `Anim::ChipFlash`: the 1200 ms `--accent-soft` ring a mentioned person gets
+/// (design/04-COMPONENTS.md section 10, `S:2119`).
 #[component]
 pub fn Chip(
     variant: ChipVariant,

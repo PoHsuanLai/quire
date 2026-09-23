@@ -3,7 +3,7 @@
    ring is the global one, on `.ds-slider` (spike S12). The thumb follows the pointer 1:1: nothing
    here transitions `left`.
    TODO(O-5): the track's 4px height and `--line` unfilled colour are the doc's candidate.
-   TODO(O-3): `--handle-ring` (the handle's `#fff` border) is not in the token table yet.
+   The thumb's border is `--handle-ring` (O-3, proposed).
    TODO(O-3): the live scale 1.15 (`S:257`) has no scalar token.
    The thumb's fill, the hover state and disabled (O-1) are not specified. */
 

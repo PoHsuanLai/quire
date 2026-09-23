@@ -96,6 +96,7 @@ fn handle_rule(
             "keyframes" => {
                 offences.push(Offence {
                     rule: Rule::Keyframes,
+                    selector: render(prelude),
                     line: first.line,
                     column: first.column,
                     text: render(prelude),

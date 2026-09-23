@@ -2,11 +2,19 @@
 //! rules 1 and 2). It tokenizes with `cssparser`, never with substrings (CONVENTIONS
 //! "Substrings are not tokens").
 //!
-//! ```ignore
-//! #[test]
-//! fn our_css_is_clean() {
-//!     ds::lint::assert_clean(OUR_CSS, &ds::lint::LintConfig::default());
-//! }
+//! A consumer's test, with one reviewed exception:
+//!
+//! ```
+//! use ds::lint::{Exception, LintConfig, Rule, assert_clean};
+//!
+//! const OUR_CSS: &str = ".row { color: var(--ink); }\n.fade { mask-image: linear-gradient(#000, transparent); }";
+//! const EXCEPTIONS: &[Exception] = &[Exception {
+//!     rule: Rule::HexColour,
+//!     selector: ".fade",
+//!     reason: "a mask's alpha, never painted",
+//! }];
+//!
+//! assert_clean(OUR_CSS, &LintConfig { exceptions: EXCEPTIONS, ..LintConfig::default() });
 //! ```
 
 pub mod assert;
@@ -26,5 +34,5 @@ mod walk;
 
 pub use assert::assert_clean;
 pub use markup::markup;
-pub use rule::{LintConfig, Offence, Profile, Rule};
+pub use rule::{Exception, LintConfig, Offence, Profile, Rule};
 pub use stylesheet::stylesheet;

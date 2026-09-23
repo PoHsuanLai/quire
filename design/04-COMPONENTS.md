@@ -100,6 +100,11 @@ Motion states set by `use_roster` / `use_motion_timer` (not props):
 `data-presence="entering"|"present"|"leaving"|"healing"` and, for leaving rows,
 `data-exit="fold"|"curl"|"crumple"`. These replace S's `.entering`, `.going`, `.healing` classes.
 
+Root attributes set by `Ds` (not props; consumers never select on them, the lint's
+`DsInternals`): `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`,
+`data-modality="keyboard"|"pointer"` (spike S12) and `data-hover="warm"|"cold"`, which the
+`HoverHub` stamps while cards and fly labels are warm (O-11, section 17).
+
 ### Global rules every component inherits
 
 Focus ring (verbatim, `S:55`; same `C:190`):
@@ -914,10 +919,10 @@ Clip (verbatim, `S:543-544`):
 | hover | not specified (chips are not interactive; the Person chip's remove button: not specified) |
 | focus-visible | global ring on the remove button |
 | entering | Person: `chip-in --t-move --e-spring` on mount. Accent/Label landing after a drop or label pick: `chip-land --t-big --e-spring` (C `.is-landing`, `C:402`) |
-| flash | Person: `0 0 0 3px var(--accent-soft)` for 1200 ms (`S:2119`), the `--accent-ring` token |
+| flash | Person: `0 0 0 3px var(--accent-soft)` for 1200 ms (`S:2119`): `pulse` with `Anim::ChipFlash`, the `chip-flash` keyframe (chip-in's last frame plus the ring) over `--t-flash` |
 | leaving | none (removed at once) |
 
-**Motion.** `chip-in`, `chip-land` (05-MOTION). Flash duration 1200 ms is a Rust timer.
+**Motion.** `chip-in`, `chip-land`, `chip-flash` (05-MOTION; `chip-flash` and `--t-flash` 1200 ms are quire's, wave 1 amendment, proposed). The flash plays through the pulse class, so it needs no Rust timer.
 
 **Behaviour.** Remove button removes the recipient; Backspace in an empty recipient input removes
 the last chip (`S:2266`).
@@ -1149,10 +1154,11 @@ account tiles. Shell: dock badges, bar indicators.
 
 (The zero case renders the element with empty text, `S:1247` `(n || "")`, so layout does not shift.)
 
-**Props.** `#[component] pub fn Count(value: u32, #[props(default)] place: CountPlace /* Item | Tile */, pulse: PulseKey) -> Element`
-The component fires its own bump when `value` changes between renders, except during a Space
-switch (`S:1262`: counts bump only when `dir` is falsy). The consumer passes
-`Motion::Quiet` for that render (O-8).
+**Props.** `#[component] pub fn Count(value: u32, #[props(default)] place: CountPlace /* Item | Tile */) -> Element`
+The component fires its own bump when `value` changes between renders (it keeps the last value
+it drew; no `PulseKey` prop, wave 1 amendment), except during a Space switch (`S:1262`: counts
+bump only when `dir` is falsy). For that render the consumer gives the count a new `key`, so it
+mounts at rest (O-8).
 
 **Geometry.**
 
@@ -2942,7 +2948,7 @@ suggestion.
 | O-5 | Slider track | Height and unfilled colour not specified (native range). | Candidate: 4 px, `--line` unfilled, `--accent` filled. |
 | O-6 | Chip enum | S uses Person, Token, Status and Clip shapes; the plan's enum has Accent, Label, Neutral. | Add the four as variants (§10). |
 | O-7 | Person hue | `hsl()` from the hash is a colour function the lint bans in consumer CSS. | Rust converts to hex and emits `--av-bg`. |
-| O-8 | Count bump on Space switch | S suppresses bumps when the Space changes (`S:1262`). | A `Motion::Quiet` render hint from the consumer. |
+| O-8 | Count bump on Space switch | S suppresses bumps when the Space changes (`S:1262`). | The consumer keys the count by Space, so a switch mounts it at rest (wave 1: replaces the `Motion::Quiet` render hint, which no type carries). |
 | O-9 | Infinite loops | Spinner, SyncHalo and `dest` loop; loops keep Blitz animating and the shell never idles. | Breathe off by default on shell surfaces; Spin only while busy; `dest` only while hovered. |
 | O-10 | Strip `!important` | `.strip button:active{ transform:scale(.88) !important }` beats the `forwards` fill; lint bans `!important`. | Settled state without animation after `settle(pop-in)` (§17). |
 | O-11 | Warm hover attribute | S puts `.warm` on `.win`. | `HoverHub` stamps `data-hover="warm|cold"` on `.ds`. |

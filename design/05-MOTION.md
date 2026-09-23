@@ -174,6 +174,7 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | (boat-return) | 900ms | CSS, C only, orphaned | boat | C:536 |
 | (spin) | 1.1s linear | CSS, C only | busy halo | C:291 |
 | (send ring) | 5s linear | JS-set transition | undo-send countdown ring | S:2339 |
+| `--t-flash` | 1200ms linear | CSS (quire's `chip-flash` keyframe, wave 1 amendment, proposed) | mentioned person chip's ring (04-COMPONENTS §10) | S:2119 |
 | `--e-shake` | `cubic-bezier(.36,.07,.19,.97)` | easing | `shake-x`, C `shake` | S:590, C:546 |
 | `--e-linear` | `linear` | easing | spin, send ring | C:291, S:2339 |
 | HoverOpen | 450ms | Rust-only | hover intent | S:1704 |
@@ -744,7 +745,7 @@ proposed here; the rest are the plan's.
 | Composer park: reader re-renders | `setTimeout(…, 380)` (0 when silent) while `park` runs 420 ms | `settle(Park)` = 454 ms (S cut it 40 ms short) | S:1993 |
 | Draft autosave | debounce `setTimeout(save, 700)` | *AutosaveDebounce* 700 ms | S:1979 |
 | Focus To field after the page opens | `setTimeout(focus, 60)` | *FocusAfterMount* 60 ms, or focus on mount if the host allows | S:1967 |
-| Mentioned person chip flash | `setTimeout(remove .flash, 1200)` | *FlashHold* 1200 ms | S:2119 |
+| Mentioned person chip flash | `setTimeout(remove .flash, 1200)` | `Anim::ChipFlash` over `--t-flash` 1200 ms (a pulse; *FlashHold* stays for a consumer that times it) | S:2119 |
 | Selection bubble placement | `requestAnimationFrame(showBubble)` on `selectionchange` | next frame | S:2160 |
 | C sync busy | `setTimeout(…, 1200)` | not specified (demo) | C:2093 |
 | C status line clears | `setTimeout(…, 3400)`; `.status` has no CSS | not specified (A8 #3) | C:1644 |

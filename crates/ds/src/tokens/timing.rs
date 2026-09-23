@@ -2,7 +2,7 @@
 //!
 //! The four base durations and `--t-ambient` follow the level; the named durations are
 //! literals that change only under `Reduced` (60 ms). Durations the prototypes wrote without a
-//! name (park, nudge, C's shake, sail, boat-return, spin, the send ring) are named here so an
+//! name (park, nudge, C's shake, sail, boat-return, spin, the send ring, the chip flash) are named here so an
 //! [`crate::Anim`] can point at them.
 //!
 //! `Reduced` is 60 ms for every token, the named ones included (design/05-MOTION.md section 3.2,
@@ -59,11 +59,15 @@ pub enum DurationToken {
     Spin,
     /// `--t-send-ring` 5 s: the undo-send countdown ring, linear.
     SendRing,
+    /// `--t-flash` 1200 ms: a mentioned person chip's ring, held (design/04-COMPONENTS.md
+    /// section 10, design/06-INTERACTIONS.md section 2.5, `S:2119`; proposed). 60 ms under
+    /// Reduced like every token here (FINDINGS: whether a hold should be exempt is open).
+    Flash,
 }
 
 impl DurationToken {
     /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 22] = [
+    pub const ALL: [DurationToken; 23] = [
         DurationToken::Tap,
         DurationToken::Quick,
         DurationToken::Move,
@@ -86,6 +90,7 @@ impl DurationToken {
         DurationToken::BoatReturn,
         DurationToken::Spin,
         DurationToken::SendRing,
+        DurationToken::Flash,
     ];
 
     /// The custom property: `--t-tap`, `--t-big-heavy`, …
@@ -113,6 +118,7 @@ impl DurationToken {
             DurationToken::BoatReturn => "--t-boat-return",
             DurationToken::Spin => "--t-spin",
             DurationToken::SendRing => "--t-send-ring",
+            DurationToken::Flash => "--t-flash",
         })
     }
 
@@ -154,6 +160,7 @@ impl DurationToken {
             (DurationToken::BoatReturn, _) => 900,
             (DurationToken::Spin, _) => 1100,
             (DurationToken::SendRing, _) => 5000,
+            (DurationToken::Flash, _) => 1200,
         }
     }
 }

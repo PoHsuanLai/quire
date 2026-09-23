@@ -11,6 +11,7 @@ use super::rule::{Offence, Profile, Rule};
 use super::text::render;
 use super::tokenize::Located;
 use super::walk::Decl;
+use crate::tokens::Family;
 
 /// Colour functions: `rgb()`, `rgba()`, `hsl()`, `hwb()`, `oklch()`, `color-mix()`, ...
 pub(super) const COLOUR_FUNCTIONS: &[&str] = &[
@@ -67,7 +68,7 @@ pub fn offences(
     let is_custom_property = property.starts_with("--");
     let stroke_or_fill = property == "stroke" || property == "fill";
 
-    if property == "font-family" {
+    if property == "font-family" && !is_face_reference(&decl.value) {
         push(
             &mut out,
             Rule::FontFamily,
@@ -90,7 +91,7 @@ pub fn offences(
     }
 
     let strict = profile == Profile::Strict;
-    if strict {
+    if strict && !is_custom_property {
         raw_geometry(selector, &property, decl, &mut out);
     }
 
@@ -222,6 +223,23 @@ fn unknown_animation(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
     }
 }
 
+/// Whether a `font-family` value is one of the face tokens (`var(--font-ui)`) or `inherit`:
+/// the value the rule asks for, so it is not an offence.
+fn is_face_reference(value: &[Located]) -> bool {
+    let significant: Vec<&str> = value
+        .iter()
+        .map(|token| token.text.as_str())
+        .filter(|text| !kind::is_trivial(text))
+        .collect();
+    match significant[..] {
+        ["inherit"] => true,
+        ["var(", name, ")"] => [Family::Display, Family::Ui, Family::Data]
+            .iter()
+            .any(|family| family.var().as_str() == name),
+        _ => false,
+    }
+}
+
 fn raw_geometry(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offence>) {
     let rule = if property == "z-index" {
         Rule::RawZIndex
@@ -233,6 +251,10 @@ fn raw_geometry(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offen
         return;
     };
     for token in &decl.value {
+        // A square corner is no radius at all; there is nothing for a token to name.
+        if rule == Rule::RawRadius && token.text == "0" {
+            continue;
+        }
         let raw = kind::is_number(&token.text)
             || kind::is_percentage(&token.text)
             || kind::dimension_unit(&token.text).is_some();
@@ -250,6 +272,7 @@ fn push(out: &mut Vec<Offence>, rule: Rule, at: &Located, selector: &str, excerp
     };
     out.push(Offence {
         rule,
+        selector: selector.to_owned(),
         line: at.line,
         column: at.column,
         text,

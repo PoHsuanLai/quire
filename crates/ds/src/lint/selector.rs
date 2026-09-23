@@ -5,10 +5,11 @@
 
 use super::kind;
 use super::rule::{Offence, Rule};
+use super::text::render;
 use super::tokenize::Located;
 
-/// The six attributes a `.ds` root carries that a consumer must never select on
-/// (design/22-SETTINGS.md, CONVENTIONS §11).
+/// The seven attributes a `.ds` root carries that a consumer must never select on
+/// (design/22-SETTINGS.md, CONVENTIONS §11, design/04-COMPONENTS.md "Shared vocabulary").
 const INTERNAL_ATTRS: &[&str] = &[
     "data-theme",
     "data-accent",
@@ -16,6 +17,7 @@ const INTERNAL_ATTRS: &[&str] = &[
     "data-material",
     "data-blur",
     "data-modality",
+    "data-hover",
 ];
 
 /// SVG element types whose paint never reaches a stylesheet rule (FINDINGS spike S6).
@@ -30,6 +32,10 @@ pub fn offences(prelude: &[Located]) -> Vec<Offence> {
     ds_internals(prelude, &mut out);
     unprefixed_attribute(prelude, &mut out);
     focus_pseudo(prelude, &mut out);
+    let selector = render(kind::trim_trivia(prelude));
+    for offence in &mut out {
+        offence.selector.clone_from(&selector);
+    }
     out
 }
 
@@ -57,6 +63,7 @@ fn root_selector(prelude: &[Located], out: &mut Vec<Offence>) {
             {
                 out.push(Offence {
                     rule: Rule::RootSelector,
+                    selector: String::new(),
                     line: token.line,
                     column: token.column,
                     text: ":root".to_owned(),
@@ -69,6 +76,7 @@ fn root_selector(prelude: &[Located], out: &mut Vec<Offence>) {
         if is_html_or_body && !preceded_by_dot(prelude, index) {
             out.push(Offence {
                 rule: Rule::RootSelector,
+                selector: String::new(),
                 line: token.line,
                 column: token.column,
                 text: token.text.clone(),
@@ -85,6 +93,7 @@ fn ds_internals(prelude: &[Located], out: &mut Vec<Offence>) {
                 if lower == "ds" || lower.starts_with("ds-") {
                     out.push(Offence {
                         rule: Rule::DsInternals,
+                        selector: String::new(),
                         line: token.line,
                         column: token.column,
                         text: format!(".{}", class.text),
@@ -98,6 +107,7 @@ fn ds_internals(prelude: &[Located], out: &mut Vec<Offence>) {
             if INTERNAL_ATTRS.contains(&lower.as_str()) {
                 out.push(Offence {
                     rule: Rule::DsInternals,
+                    selector: String::new(),
                     line: token.line,
                     column: token.column,
                     text: format!("[{}]", name.text),
@@ -122,6 +132,7 @@ fn unprefixed_attribute(prelude: &[Located], out: &mut Vec<Offence>) {
         if lower.starts_with("data-") || lower.starts_with("aria-") {
             out.push(Offence {
                 rule: Rule::UnprefixedAttributeSelector,
+                selector: String::new(),
                 line: token.line,
                 column: token.column,
                 text: format!("[{}]", name.text),
@@ -152,6 +163,7 @@ fn focus_pseudo(prelude: &[Located], out: &mut Vec<Offence>) {
             if lower == "focus-visible" || lower == "focus-within" {
                 out.push(Offence {
                     rule: Rule::FocusPseudoClass,
+                    selector: String::new(),
                     line: token.line,
                     column: token.column,
                     text: format!(":{}", next.text),

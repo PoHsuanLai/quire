@@ -199,30 +199,28 @@ fn the_solid_tints_hold_text_over_black_and_white() {
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
-/// Where section 17.2's proposed translucent tints fall below 4.5:1 for the card's ink over a
-/// pure black or pure white backdrop. The contrast gates assume an opaque ground, and how they
-/// hold over blur is design/03-COLOR.md open decision 11; this table records the shortfall so a
-/// change to a tint shows up here, in either direction.
-const TRANSLUCENT_SHORT: &[(Material, Scheme, &str)] = &[
-    (Material::Bar, Scheme::Dark, "white"),
-    (Material::Dock, Scheme::Dark, "white"),
-    (Material::Widget, Scheme::Light, "black"),
-    (Material::Widget, Scheme::Dark, "white"),
-];
-
+/// Section 17.2's translucent tints at the key's default hold the card's ink at 4.5:1 over a
+/// pure black and a pure white backdrop, the two worst a blur can show. The contrast gates
+/// assume an opaque ground; how they hold over blur is design/03-COLOR.md open decision 11, so
+/// this is the floor, measured on what `recipe` paints. Four alphas were raised to meet it in
+/// wave 1 (the dark bar and dock .66, the widget .54 light and .65 dark).
 #[test]
-fn the_translucent_tints_hold_text_except_where_recorded() {
-    let mut short = Vec::new();
+fn the_translucent_tints_hold_text_over_black_and_white() {
+    let mut failures = Vec::new();
     for material in Material::ALL.into_iter().filter(|m| *m != Material::Window) {
         for scheme in Scheme::ALL {
             let ink = colour(ColourToken::Ink, scheme);
             let tint = recipe(material, scheme, DEFAULT_TINT_ALPHA).tint;
             for (name, backdrop) in [("black", BLACK), ("white", WHITE)] {
-                if measured(&ink, &over(&tint, backdrop)) < 4.5 {
-                    short.push((material, scheme, name));
+                let ground = over(&tint, backdrop);
+                let got = measured(&ink, &ground);
+                if got < 4.5 {
+                    failures.push(format!(
+                        "{material:?} {scheme:?} over {name}: {ink} on {ground} is {got:.2}"
+                    ));
                 }
             }
         }
     }
-    assert_eq!(short, TRANSLUCENT_SHORT);
+    assert!(failures.is_empty(), "{failures:#?}");
 }

@@ -77,6 +77,11 @@ impl FrameVars {
             .collect()
     }
 
+    /// The variable names the attribute writes, in order.
+    pub(crate) fn names(&self) -> Vec<&'static str> {
+        self.pairs().into_iter().map(|(name, _)| name).collect()
+    }
+
     /// Every variable with its value, in the order the attribute writes them.
     fn pairs(&self) -> Vec<(&'static str, &str)> {
         let mut pairs = vec![

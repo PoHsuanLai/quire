@@ -126,7 +126,7 @@ mod tests {
                 "@keyframes {name} has no Anim"
             );
         }
-        assert_eq!(names.len(), 38);
+        assert_eq!(names.len(), 39);
     }
 
     #[test]

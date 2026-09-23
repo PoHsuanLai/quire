@@ -28,3 +28,16 @@ lint = ["dep:cssparser"]
 # `@font-face` rules with the faces as base64 `data:` URIs (`fonts::font_face_css`), for a
 # consumer still on the webview. Blitz consumers register `fonts::FACES` instead.
 webview-fonts = []
+
+# The linter's own tests need the linter.
+[[test]]
+name = "lint_rules"
+required-features = ["lint"]
+
+[[test]]
+name = "lint_exceptions"
+required-features = ["lint"]
+
+[[test]]
+name = "self_lint"
+required-features = ["lint"]

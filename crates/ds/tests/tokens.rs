@@ -244,8 +244,11 @@ fn every_table_name_is_declared_on_the_root() {
 
 /// Custom properties an element sets on itself inline, per instance, which no stylesheet block
 /// could declare: the spark angle, the heal distance and index, the stagger indices
-/// (design/05-MOTION.md section 5, rows 3, 10, 11 and 15).
-const PER_ELEMENT: &[&str] = &["--a", "--dy", "--d", "--i", "--j"];
+/// (design/05-MOTION.md section 5, rows 3, 10, 11 and 15), a `Fraction`'s `--f` and the
+/// avatar's computed colours (design/04-COMPONENTS.md "Shared vocabulary" and section 11).
+const PER_ELEMENT: &[&str] = &[
+    "--a", "--dy", "--d", "--i", "--j", "--f", "--av-bg", "--av-fg",
+];
 
 #[test]
 fn every_var_the_stylesheet_reads_is_declared() {

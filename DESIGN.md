@@ -22,17 +22,17 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `space/look.rs` | 03-COLOR §18; 21-SPACES §1 | `SpaceLook`, `Grain`, `CardAccent` |
 | `space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | replaces mailo `ui/paint.rs` `push_palette`/`grain_opacity` |
 | `space/presets.rs` | 03-COLOR §7; 21-SPACES §4 | the eight presets as data; `default_look` |
-| `material/{material,blur,recipe}.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region") |
+| `material/{material,blur,recipe}.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
 
 ## `ds`: tokens and stylesheet
 
 | Module | Implements |
 | --- | --- |
-| `tokens/colour.rs` | 03-COLOR §3, §10-12 (paper tokens, washes, `--foreign-ground`) |
+| `tokens/colour.rs` | 03-COLOR §3, §10-12 (paper tokens, washes, `--foreign-ground`); 04-COMPONENTS O-3 (`--danger-ink`, `--mark-ground`, `--handle-ring`) |
 | `tokens/accent_table.rs` | 03-COLOR §5 and open decision 6 (6 accents x 4 props) |
 | `tokens/label_hue.rs` | 03-COLOR §15; 07-LOOKS §6.2 (`--c-*`) |
 | `tokens/hex.rs`, `tokens/name.rs` | the value and name types every table uses |
-| `tokens/timing.rs`, `tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 |
+| `tokens/timing.rs`, `tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (23 `DurationToken`s, `--t-flash` the wave 1 amendment; 13 `DelayToken`s) |
 | `tokens/easing.rs`, `tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `tokens/shape.rs` | 01-LAYOUT §10 |
 | `tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
@@ -41,30 +41,30 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `css/tokens_css.rs`, `accents_css.rs`, `materials_css.rs` | the plan's token model and cascade order |
 | `css/motion_css.rs`, `css/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `css/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
-| `css/reset.css`, `utilities.css`, `stylesheet.rs` | 02-TYPE §3 (base text on `.ds`); 04-COMPONENTS "Truncation" (`.ds-truncate`) |
+| `css/reset.css`, `utilities.css`, `stylesheet.rs` | 02-TYPE §3 (base text on `.ds`); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
 | `fonts.rs`, `build.rs` | 02-TYPE §2 (faces as bytes; `webview-fonts` keeps the base64 path) |
 
 ## `ds`: motion, geometry, overlays, root
 
 | Module | Implements |
 | --- | --- |
-| `motion/anim.rs` | 05-MOTION §4 (39 variants), §5 (the recipe per assignment) |
+| `motion/anim.rs` | 05-MOTION §4, §5 (the recipe per assignment): 42 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy` and quire's `ChipFlash` (04-COMPONENTS §10) |
 | `motion/settle.rs`, `time.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
 | `motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
-| `motion/pulse.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` |
+| `motion/pulse.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
 | `motion/presence.rs`, `roster.rs`, `use_roster.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states |
 | `motion/hover_intent.rs` | 06-INTERACTIONS §3 |
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 (incl. §4.4 `PopoverRequest`) |
 | `geometry/measure.rs` | spike S9 (two-phase `use_rect`) |
 | `overlay/host.rs`, `stack.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
-| `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover`) |
+| `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
 | `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 |
-| `root/ds.rs`, `root/surface.rs`, `root/env.rs` | 03-COLOR §17.1 (root attributes); spike S12 (`data-modality`) |
+| `root/ds.rs`, `root/surface.rs`, `root/env.rs` | 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
 | `text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (moved with tests; stroke as attributes) |
 | `icon/geometry_shell.rs` | 08-ICONS §1.6 |
-| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules |
+| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 22 `Rule`s: the stylesheet rules, plus `UnstyledClass` and `RawMarkup` for markup; `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
 

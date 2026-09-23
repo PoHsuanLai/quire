@@ -43,12 +43,17 @@ fn swatches(scheme: Scheme) -> Vec<String> {
         .into_iter()
         .map(|accent| {
             format!(
-                "--swatch-{}:{};",
-                accent.slug(),
+                "{}:{};",
+                swatch_var(accent),
                 quad(accent, scheme).accent.css()
             )
         })
         .collect()
+}
+
+/// `--swatch-<accent>`: that accent's own `--accent`, whatever the root selects.
+pub(crate) fn swatch_var(accent: Accent) -> String {
+    format!("--swatch-{}", accent.slug())
 }
 
 fn selector(accent: Accent, scheme: Scheme) -> String {

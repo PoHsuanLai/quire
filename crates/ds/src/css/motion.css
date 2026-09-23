@@ -1,8 +1,9 @@
 /* The canonical keyframes, verbatim from design/05-MOTION.md section 4 (S's text where S and C
-   both define a name). Three departures, each required by section 9:
+   both define a name). Four departures, three required by section 9 and one added by quire:
    - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
-   - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`.
+   - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`;
+   - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -82,6 +83,11 @@
 
 /* 4.3.14 chip-in */
 @keyframes chip-in{ 0%{ transform:scale(.6); opacity:0; } 70%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:none; } }
+
+/* chip-flash (quire's, not the catalogue's): the mentioned person chip holds `chip-in`'s last
+   frame with the `--accent-soft` ring for `--t-flash` (design/04-COMPONENTS.md section 10,
+   `S:2119` `.pchip.flash`; the prototype's class-and-timeout becomes one keyframe). */
+@keyframes chip-flash{ 0%,100%{ transform:none; box-shadow:0 0 0 3px var(--accent-soft); } }
 
 /* 4.3.15 menu-pop */
 @keyframes menu-pop{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }

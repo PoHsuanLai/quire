@@ -5,7 +5,7 @@
 //! description"; `#[component] fn Avatar` owns that name in both namespaces, so the description
 //! is [`AvatarFace`].
 
-use crate::tokens::{Alpha, Colour, Hex};
+use crate::tokens::{Colour, Hex};
 use dioxus::prelude::*;
 
 /// An avatar's size, in logical pixels (`data-size`).
@@ -70,21 +70,6 @@ fn hsl_to_hex(hue: f64, saturation: f64, lightness: f64) -> Hex {
         (value * 255.0).round().clamp(0.0, 255.0) as u8
     };
     Hex([channel(0.0), channel(8.0), channel(4.0)])
-}
-
-/// A colour as inline CSS text: `#rrggbb`, or `rgba(...)` at an alpha.
-fn colour_css(colour: Colour) -> String {
-    match colour {
-        Colour::Solid(hex) => hex_css(hex),
-        Colour::Alpha(Hex([r, g, b]), Alpha(alpha)) => {
-            format!("rgba({r},{g},{b},{})", f64::from(alpha.min(1000)) / 1000.0)
-        }
-    }
-}
-
-/// `#rrggbb`, lower-case.
-fn hex_css(Hex([r, g, b]): Hex) -> String {
-    format!("#{r:02x}{g:02x}{b:02x}")
 }
 
 /// Where an avatar's colours come from.
@@ -157,8 +142,8 @@ impl AvatarTone {
         let (ground, letter) = match self {
             AvatarTone::Ink => ("var(--ink)".to_string(), "var(--paper)"),
             AvatarTone::Stack => ("var(--ink-soft)".to_string(), "var(--paper)"),
-            AvatarTone::Account(colour) => (colour_css(colour), "#fff"),
-            AvatarTone::Person(hue) => (hex_css(hue.hex()), "#fff"),
+            AvatarTone::Account(colour) => (colour.css(), "#fff"),
+            AvatarTone::Person(hue) => (hue.hex().css(), "#fff"),
         };
         format!("--av-bg:{ground};--av-fg:{letter}")
     }
@@ -199,7 +184,7 @@ pub fn Avatar(
 
 #[cfg(test)]
 mod tests {
-    use super::{PersonHue, hex_css};
+    use super::PersonHue;
 
     #[test]
     fn the_person_hash_matches_the_prototype() {
@@ -214,7 +199,7 @@ mod tests {
         // hsl(0, 38%, 42%) = rgb(148.4, 66.4, 66.4); hsl(120, ...) and hsl(240, ...) rotate it.
         const CASES: &[(u16, &str)] = &[(0, "#944242"), (120, "#429442"), (240, "#424294")];
         for (hue, want) in CASES {
-            assert_eq!(hex_css(PersonHue(*hue).hex()), *want, "hue {hue}");
+            assert_eq!(PersonHue(*hue).hex().css(), *want, "hue {hue}");
         }
     }
 }

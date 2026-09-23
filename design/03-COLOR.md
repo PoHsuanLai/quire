@@ -529,18 +529,22 @@ starting point (2026-09-23), to be tuned in the gallery. Every value here is **p
 values, section 4); `highlight` = `inset 0 1px 0 rgba(255,255,255,.6)` light /
 `rgba(255,255,255,.05)` dark (the `--shadow-1` inset, section 9). Tint solid = the same tint
 at alpha .94 or above. Text on every material must pass the `material-legible-over-black-and-white`
-test (`P:369`).
+test (`P:369`). Wave 1 measured the translucent tints against it (the card's `--ink` at 4.5:1 over
+pure black and pure white, `crates/ds/tests/legibility.rs`) and raised the four that fell short
+by the smallest .02 steps that pass: dark Bar .58 to .66 (was 3.63:1 over white), dark Dock .50
+to .66 (2.81:1), light Widget .50 to .54 (4.04:1 over black), dark Widget .45 to .65 (2.43:1).
+They stay proposed.
 
 | Material | Tint light | Tint dark | Edge | Shadow | Radius | Blur | Nearest precedent in `S` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Window | `--f-grad` + `.ds-layer` + `.ds-grain` | same | none | none | 0 (the card inside keeps 12/12/12/4) | none | `.win` (`S:77-87`) |
-| Bar | `rgba(248,249,246,.70)` | `rgba(21,24,20,.58)` | `inset 0 -0.5px 0 hairline` | none | 0 | behind | frame zone (section 4) |
-| Dock | `rgba(248,249,246,.55)` | `rgba(21,24,20,.50)` | `inset 0 0 0 .5px rgba(255,255,255,.55)` + highlight | `0 10px 30px -10px rgba(0,0,0,.35)` | 22 | behind | pinned tiles radius 12 (`S:109`) |
+| Bar | `rgba(248,249,246,.70)` | `rgba(21,24,20,.66)` (was .58) | `inset 0 -0.5px 0 hairline` | none | 0 | behind | frame zone (section 4) |
+| Dock | `rgba(248,249,246,.55)` | `rgba(21,24,20,.66)` (was .50) | `inset 0 0 0 .5px rgba(255,255,255,.55)` + highlight | `0 10px 30px -10px rgba(0,0,0,.35)` | 22 | behind | pinned tiles radius 12 (`S:109`) |
 | Popover | `rgba(255,255,255,.78)` | `rgba(42,47,40,.78)` | hairline + highlight | `--shadow-pop` = `0 18px 40px -16px rgba(0,0,0,.45)` | `--r-panel` 14 | behind | `.fmenu` (`S:665-666`) |
 | Sheet | `rgba(248,249,246,.82)` | `rgba(21,24,20,.78)` | hairline + highlight | `--shadow-sheet` = `0 24px 50px -18px rgba(0,0,0,.55)` light / `0 30px 60px -20px rgba(0,0,0,.7)` dark | 18 | behind | `.peek` (`S:221-224`) |
 | Toast | `rgba(248,249,246,.80)` | `rgba(21,24,20,.74)` | hairline + highlight | `--shadow-pop` | 16 | behind | `.toast` is inverse ink/paper in mail (`S:360-362`); the shell banner is a material, see open decision 12 |
 | Osd | `rgba(248,249,246,.72)` | `rgba(21,24,20,.66)` | hairline + highlight | `--shadow-pop` | 18 | behind | none |
-| Widget | `rgba(248,249,246,.50)` + grain | `rgba(21,24,20,.45)` + grain | hairline + highlight | soft: `0 6px 16px -6px rgba(26,30,26,.30)` (`--shadow-2` drop) | 20 | behind | `.editor` / `.note` (`S:246`, `S:283`) |
+| Widget | `rgba(248,249,246,.54)` (was .50) + grain | `rgba(21,24,20,.65)` (was .45) + grain | hairline + highlight | soft: `0 6px 16px -6px rgba(26,30,26,.30)` (`--shadow-2` drop) | 20 | behind | `.editor` / `.note` (`S:246`, `S:283`) |
 
 Tinted shell chrome (bar, dock, launcher, control center) additionally carries the workspace's
 `--f-*` frame tokens over the material (section 18 and `21-SPACES.md`): the material gives the
