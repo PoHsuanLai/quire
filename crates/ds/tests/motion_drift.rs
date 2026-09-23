@@ -238,11 +238,27 @@ fn the_settle_table() {
             "{anim:?} {level:?}"
         );
     }
-    for anim in Anim::ALL {
+    // Every anim settles to 94 ms under Reduced, except a hold (`DurationToken::kind`):
+    // `ChipFlash` times `--t-flash`, which keeps its Standard 1200 ms so the mentioned-person
+    // ring is still visible under Reduced (wave 2's timing tweak; FINDINGS.md "W1 integration"
+    // left this as an open question, resolved here).
+    for anim in Anim::ALL
+        .into_iter()
+        .filter(|anim| *anim != Anim::ChipFlash)
+    {
         assert_eq!(
             settle(anim, MotionLevel::Reduced, StaggerIndex::default()),
             Duration::from_millis(94),
             "{anim:?} Reduced"
         );
     }
+    assert_eq!(
+        settle(
+            Anim::ChipFlash,
+            MotionLevel::Reduced,
+            StaggerIndex::default()
+        ),
+        Duration::from_millis(1234),
+        "ChipFlash Reduced (a hold, unaffected by Reduced)"
+    );
 }

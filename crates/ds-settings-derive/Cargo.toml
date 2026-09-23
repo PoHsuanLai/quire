@@ -1,0 +1,20 @@
+[package]
+name = "ds-settings-derive"
+description = "#[derive(SettingsSchema)]: emits KeySpec/Schema from a settings struct or an enum's variant words (design/22-SETTINGS.md section 9)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { workspace = true }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }
+
+[lints]
+workspace = true

@@ -3,6 +3,7 @@ resolver = "3"
 members = [
   "crates/ds",
   "crates/ds-settings",
+  "crates/ds-settings-derive",
   "crates/ds-native",
   "crates/ds-gallery",
 ]
@@ -17,9 +18,22 @@ repository = "https://github.com/PoHsuanLai/quire"
 publish = false
 
 [workspace.dependencies]
-ds          = { path = "crates/ds" }
-ds-settings = { path = "crates/ds-settings" }
-ds-native   = { path = "crates/ds-native" }
+ds                 = { path = "crates/ds" }
+ds-settings        = { path = "crates/ds-settings" }
+ds-settings-derive = { path = "crates/ds-settings-derive" }
+ds-native          = { path = "crates/ds-native" }
+
+# ---- BEGIN PROPOSED FOR PINNED BLOCK (not yet in quire/docs/workspace-deps.toml; the settings
+# schema derive, design/22-SETTINGS.md section 9, is the first consumer. Report to the
+# integrator: these three should move into the pinned block verbatim on the next toolchain-bump
+# wave, the same way F1 promoted `toml`/`dioxus-ssr`/`peniko` in wave 0.) ----
+# The proc-macro crate parses `#[settings(...)]` attributes with `syn`'s full grammar (struct
+# and enum items, field attributes) and re-emits tokens with `quote`; `proc-macro2` is the
+# token-stream type both share with the compiler's own `TokenStream`.
+syn = { version = "2", features = ["full", "extra-traits"] }
+quote = "1"
+proc-macro2 = "1"
+# ---- END PROPOSED FOR PINNED BLOCK ----
 
 # ---- BEGIN PINNED BLOCK (source of truth: quire/docs/workspace-deps.toml) ----
 # Copied verbatim into [workspace.dependencies] of quire, shell-host and sill. Bumped only by a

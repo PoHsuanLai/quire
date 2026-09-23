@@ -84,11 +84,15 @@ pub enum ColourToken {
     /// `--handle-ring`: the slider thumb's border (design/04-COMPONENTS.md section 5 and O-3;
     /// proposed: a quarter-strength ink ring in either scheme).
     HandleRing,
+    /// `--on-hue`: the letter on a computed hue ground — the avatar's person and account
+    /// tones (design/04-COMPONENTS.md O-3's `#fff`/`#FFFFFF` list, "fav text"; proposed:
+    /// white in either scheme, since the hue itself is always mid-toned enough for it).
+    OnHue,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 25] = [
+    pub const ALL: [ColourToken; 26] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -114,6 +118,7 @@ impl ColourToken {
         ColourToken::DangerInk,
         ColourToken::MarkGround,
         ColourToken::HandleRing,
+        ColourToken::OnHue,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -144,6 +149,7 @@ impl ColourToken {
             ColourToken::DangerInk => "--danger-ink",
             ColourToken::MarkGround => "--mark-ground",
             ColourToken::HandleRing => "--handle-ring",
+            ColourToken::OnHue => "--on-hue",
         })
     }
 
@@ -195,6 +201,8 @@ impl ColourToken {
             ColourToken::MarkGround => (WHITE, WHITE),
             // Proposed (O-3): black at .25 on light, white at .25 on dark.
             ColourToken::HandleRing => (alpha(0x000000, 250), alpha(0xFFFFFF, 250)),
+            // `#fff`/`#FFFFFF` on the avatar's person and account tones in both schemes (O-3).
+            ColourToken::OnHue => (WHITE, WHITE),
             ColourToken::Accent
             | ColourToken::AccentInk
             | ColourToken::AccentSoft
