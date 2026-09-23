@@ -16,6 +16,14 @@ pub mod rule;
 pub mod stylesheet;
 pub mod tokenize;
 
+mod colours;
+mod declaration;
+mod kind;
+mod registry;
+mod selector;
+mod text;
+mod walk;
+
 pub use assert::assert_clean;
 pub use markup::markup;
 pub use rule::{LintConfig, Offence, Profile, Rule};
