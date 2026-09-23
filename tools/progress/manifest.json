@@ -1,9 +1,40 @@
 {
-  "updated": "2026-09-24, spike wave in progress",
+  "updated": "2026-09-24, Milestone 0 render spike passed",
   "entries": [
     {
+      "id": "m0-render",
+      "date": "2026-09-24 \u00b7 Milestone 0, items a, b, c, f, g",
+      "title": "Blitz renders into a layer-shell bar with compositor blur, and the dock hover animates with zero idle frames",
+      "status": "proven",
+      "lede": "The go/no-go item for the whole program passed with no fallback. A Dioxus document draws into a top-anchored layer surface through one shared GPU renderer; the bar reserves its 32 px, the compositor blurs what is behind it, a hover sweep across twelve dock icons renders every frame in about a millisecond, and five seconds of idle produce no frames at all. Two surfaces in one process cost 2 MB more than one. Run in a nested virtual KWin because the session was locked.",
+      "notes": [
+        "Dock sweep: 69 frames for 70 callbacks, 0.92 ms median, 1.25 ms p95 against a 16.7 ms budget; idle: 0 frames, 0 commits.",
+        "Blur: pixel variance inside the bar dropped from 3306 to 0.56.",
+        "Fractional scale 1.5 and 1.7 map buffer to screen pixel for pixel; a 2-logical-px checker measures 3 px at 1.5.",
+        "NVIDIA on Vulkan works; the AMD iGPU and the GL backend do not present on this machine."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/a.png",
+          "caption": "item a: the 32 px bar (top) above a maximized checkerboard window"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b_blur0.png",
+          "caption": "item b: translucent bar without blur"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b.png",
+          "caption": "item b: the same bar with compositor blur behind it"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/f_1.7.png",
+          "caption": "item f: fractional scale 1.7, buffer 1919x54 for 1129x32 logical"
+        }
+      ]
+    },
+    {
       "id": "m0-widget-headless",
-      "date": "2026-09-24 · Milestone 0, item d",
+      "date": "2026-09-24 \u00b7 Milestone 0, item d",
       "title": "A custom-painted widget draws into its own GPU texture inside a Blitz document",
       "status": "proven",
       "lede": "The path the terminal, video player and PDF viewer will use: a Rust widget owns a wgpu texture, renders into it each frame, and Blitz composites it as an image. Redraw requests stop after the widget says it is idle. The headless render-to-PNG path and its snapshot test (the CI gate for every surface) also work.",
@@ -12,14 +43,26 @@
         "Snapshot tolerance: at most 2 per channel and 0.1 % of pixels; a deliberate colour change was rejected at 8.2 %."
       ],
       "images": [
-        {"path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t0.0.png", "upscale": 3, "caption": "widget texture at t = 0 s (rotating triangle, 240x180 shown 3x)"},
-        {"path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t0.5.png", "upscale": 3, "caption": "t = 0.5 s"},
-        {"path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t1.0.png", "upscale": 3, "caption": "t = 1.0 s; after 2 s the widget stops asking for frames"}
+        {
+          "path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t0.0.png",
+          "upscale": 3,
+          "caption": "widget texture at t = 0 s (rotating triangle, 240x180 shown 3x)"
+        },
+        {
+          "path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t0.5.png",
+          "upscale": 3,
+          "caption": "t = 0.5 s"
+        },
+        {
+          "path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t1.0.png",
+          "upscale": 3,
+          "caption": "t = 1.0 s; after 2 s the widget stops asking for frames"
+        }
       ]
     },
     {
       "id": "m0-protocols",
-      "date": "2026-09-24 · Milestone 0, items b, e, f",
+      "date": "2026-09-24 \u00b7 Milestone 0, items b, e, f",
       "title": "Blur, fractional scale and popups work against KWin from a bare client",
       "status": "proven",
       "lede": "Hand-written Wayland protocol handlers (the ones smithay-client-toolkit 0.20 lacks): the compositor advertises blur and honours a region; fractional scale reports this display's real 1.7; an xdg_popup child of a layer surface positions itself with the compositor's own constraint adjustment, and a nested submenu positions relative to it.",
@@ -32,7 +75,7 @@
     },
     {
       "id": "m0-nested",
-      "date": "2026-09-24 · dev harness",
+      "date": "2026-09-24 \u00b7 dev harness",
       "title": "cosmic-comp runs nested inside the KDE session with every protocol we need",
       "status": "proven",
       "lede": "One script starts a nested COSMIC compositor as a window, records its socket, and lists its globals. It advertises layer-shell v5, background blur, fractional scale, viewporter, COSMIC toplevel and workspace protocols, and text-input v3. ghostty runs inside it; stopping it leaves the host untouched.",
@@ -41,13 +84,19 @@
         "Frosted glass is set through com.system76.CosmicTheme.{Dark,Light}/v2/frosted; 1.8.0 reads only v2."
       ],
       "images": [
-        {"path": "/home/pohsuanlai/shell-host-wt/harness/scripts/dev/out/host.png", "caption": "the nested compositor as a window on the KDE desktop"},
-        {"path": "/home/pohsuanlai/shell-host-wt/harness/scripts/dev/out/nested-ghostty.png", "caption": "ghostty running inside the nested compositor"}
+        {
+          "path": "/home/pohsuanlai/shell-host-wt/harness/scripts/dev/out/host.png",
+          "caption": "the nested compositor as a window on the KDE desktop"
+        },
+        {
+          "path": "/home/pohsuanlai/shell-host-wt/harness/scripts/dev/out/nested-ghostty.png",
+          "caption": "ghostty running inside the nested compositor"
+        }
       ]
     },
     {
       "id": "w0-probes",
-      "date": "2026-09-24 · quire wave 0",
+      "date": "2026-09-24 \u00b7 quire wave 0",
       "title": "Sixteen Blitz CSS probes settle what the design system may use",
       "status": "proven",
       "lede": "Each probe renders a tiny document headlessly and checks pixels. Transitions, keyframes, custom properties, animation restart, SVG currentColor, fonts, color-mix and timers all work. Attribute selectors only match with a namespace prefix, focus-visible is always false, ellipsis clips instead of fading, and no backend does backdrop-filter. The design system's CSS emitter and lint now encode these.",
@@ -55,24 +104,51 @@
         "Fallbacks adopted: [*|data-x] selectors, a data-modality attribute for focus rings, mask-image fades for truncation, compositor blur only."
       ],
       "images": [
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s02-ds-cascade-attr.png", "caption": "S2: [data-theme] selector never matches on Blitz"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s02-ds-cascade-nswild.png", "caption": "S2: [*|data-theme] matches (the fix)"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s03-keyframes-t000.png", "caption": "S3: keyframes with var(), t = 0"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s03-keyframes-t030.png", "caption": "S3: same document at t = 0.3 s"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s06-svg-currentcolor.png", "caption": "S6: inline SVG stroke follows color via attributes"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s11-font-registered.png", "caption": "S11: a bundled TTF registered on the font context"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s13-ellipsis-and-fade.png", "caption": "S13: ellipsis clips (top); mask fade works (bottom)"},
-        {"path": "/home/pohsuanlai/quire-wt/spike/spike/out/s16-filter-hybrid.png", "caption": "S16: hybrid backend applies blur() but not saturate()"}
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s02-ds-cascade-attr.png",
+          "caption": "S2: [data-theme] selector never matches on Blitz"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s02-ds-cascade-nswild.png",
+          "caption": "S2: [*|data-theme] matches (the fix)"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s03-keyframes-t000.png",
+          "caption": "S3: keyframes with var(), t = 0"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s03-keyframes-t030.png",
+          "caption": "S3: same document at t = 0.3 s"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s06-svg-currentcolor.png",
+          "caption": "S6: inline SVG stroke follows color via attributes"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s11-font-registered.png",
+          "caption": "S11: a bundled TTF registered on the font context"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s13-ellipsis-and-fade.png",
+          "caption": "S13: ellipsis clips (top); mask fade works (bottom)"
+        },
+        {
+          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s16-filter-hybrid.png",
+          "caption": "S16: hybrid backend applies blur() but not saturate()"
+        }
       ]
     },
     {
       "id": "icons-smoke",
-      "date": "2026-09-24 · icon pipeline",
+      "date": "2026-09-24 \u00b7 icon pipeline",
       "title": "Local image generation runs: FLUX.2 Klein 4B on the 5070 Ti in 22 seconds",
       "status": "proven",
       "lede": "ComfyUI in a uv venv with a 2.6 GB quantised FLUX.2 Klein (Apache-2.0). The smoke prompt asked for a single flat object; the model returned a photograph, which is what the style brief and the squircle post-processing will correct. Qwen-Image-2512 waits for 13 GB of free VRAM.",
       "images": [
-        {"path": "/home/pohsuanlai/comfy/out/smoke-flux2-klein-4b.png", "caption": "smoke render: 'a paper envelope', 512 px, 4 steps"}
+        {
+          "path": "/home/pohsuanlai/comfy/out/smoke-flux2-klein-4b.png",
+          "caption": "smoke render: 'a paper envelope', 512 px, 4 steps"
+        }
       ]
     }
   ]
