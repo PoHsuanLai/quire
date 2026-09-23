@@ -1,7 +1,7 @@
 //! Motion scalars per level: overshoot, squish, lift, tilt, stagger
 //! (design/05-MOTION.md sections 3.1-3.2).
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
+use super::hex::thousandths;
 use super::name::VarName;
 use crate::appearance::MotionLevel;
 use std::time::Duration;
@@ -46,18 +46,46 @@ impl ScalarToken {
 
     /// The custom property: `--overshoot`, …
     pub fn var(self) -> VarName {
-        todo!()
+        VarName(match self {
+            ScalarToken::Overshoot => "--overshoot",
+            ScalarToken::Squish => "--squish",
+            ScalarToken::Lift => "--lift",
+            ScalarToken::Tilt => "--tilt",
+            ScalarToken::Stagger => "--stagger",
+        })
     }
 
-    /// The value at `level`.
+    /// The value at `level` (Post, design/05-MOTION.md sections 3.1-3.2). Reduced is neutral;
+    /// its `--lift` of 0px is proposed (open decision 2).
     pub fn value(self, level: MotionLevel) -> ScalarValue {
-        todo!()
+        use MotionLevel::{Calm, Extra, Reduced, Standard};
+        match (self, level) {
+            (ScalarToken::Overshoot, Standard) => ScalarValue::Factor(1040),
+            (ScalarToken::Overshoot, Extra) => ScalarValue::Factor(1140),
+            (ScalarToken::Overshoot, Calm | Reduced) => ScalarValue::Factor(1000),
+            (ScalarToken::Squish, Standard) => ScalarValue::Factor(955),
+            (ScalarToken::Squish, Extra) => ScalarValue::Factor(860),
+            (ScalarToken::Squish, Calm | Reduced) => ScalarValue::Factor(1000),
+            (ScalarToken::Lift, Calm | Standard | Extra) => ScalarValue::Length(-2000),
+            (ScalarToken::Lift, Reduced) => ScalarValue::Length(0),
+            (ScalarToken::Tilt, Standard) => ScalarValue::Angle(2200),
+            (ScalarToken::Tilt, Extra) => ScalarValue::Angle(5000),
+            (ScalarToken::Tilt, Calm | Reduced) => ScalarValue::Angle(0),
+            (ScalarToken::Stagger, Standard) => ScalarValue::Time(Duration::from_millis(26)),
+            (ScalarToken::Stagger, Extra) => ScalarValue::Time(Duration::from_millis(34)),
+            (ScalarToken::Stagger, Calm | Reduced) => ScalarValue::Time(Duration::ZERO),
+        }
     }
 }
 
 impl ScalarValue {
     /// The CSS text: `1.04`, `-2px`, `2.2deg`, `26ms`.
     pub fn css(self) -> String {
-        todo!()
+        match self {
+            ScalarValue::Factor(factor) => thousandths(i64::from(factor)),
+            ScalarValue::Length(length) => format!("{}px", thousandths(i64::from(length))),
+            ScalarValue::Angle(angle) => format!("{}deg", thousandths(i64::from(angle))),
+            ScalarValue::Time(time) => format!("{}ms", time.as_millis()),
+        }
     }
 }

@@ -4,7 +4,9 @@
 //! literals that change only under `Reduced` (60 ms). Durations the prototypes wrote without a
 //! name (park, nudge, C's shake, sail, boat-return, spin, the send ring) are named here so an
 //! [`crate::Anim`] can point at them.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
+//!
+//! `Reduced` is 60 ms for every token, the named ones included (design/05-MOTION.md section 3.2,
+//! "named durations (3.4) ... 60ms each"); `--t-big-heavy` is `--t-big` x 1.15 at each level.
 
 use super::name::VarName;
 use crate::appearance::MotionLevel;
@@ -31,6 +33,8 @@ pub enum DurationToken {
     Curl,
     /// `--t-curl-heavy` = 560 x 1.15 = 644 ms: an unread snooze (proposed, 05-MOTION open decision 3).
     CurlHeavy,
+    /// `--t-crumple-heavy` = `--t-big` x 1.15: an unread row's trash (freeze amendment, wave 1).
+    CrumpleHeavy,
     /// `--t-send` 620 ms: compose-send.
     Send,
     /// `--t-float` 900 ms: the zZ floater, the destination pulse period.
@@ -59,7 +63,7 @@ pub enum DurationToken {
 
 impl DurationToken {
     /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 21] = [
+    pub const ALL: [DurationToken; 22] = [
         DurationToken::Tap,
         DurationToken::Quick,
         DurationToken::Move,
@@ -69,6 +73,7 @@ impl DurationToken {
         DurationToken::Spark,
         DurationToken::Curl,
         DurationToken::CurlHeavy,
+        DurationToken::CrumpleHeavy,
         DurationToken::Send,
         DurationToken::Float,
         DurationToken::HcOut,
@@ -85,11 +90,70 @@ impl DurationToken {
 
     /// The custom property: `--t-tap`, `--t-big-heavy`, …
     pub fn var(self) -> VarName {
-        todo!()
+        VarName(match self {
+            DurationToken::Tap => "--t-tap",
+            DurationToken::Quick => "--t-quick",
+            DurationToken::Move => "--t-move",
+            DurationToken::Big => "--t-big",
+            DurationToken::Ambient => "--t-ambient",
+            DurationToken::BigHeavy => "--t-big-heavy",
+            DurationToken::Spark => "--t-spark",
+            DurationToken::Curl => "--t-curl",
+            DurationToken::CurlHeavy => "--t-curl-heavy",
+            DurationToken::CrumpleHeavy => "--t-crumple-heavy",
+            DurationToken::Send => "--t-send",
+            DurationToken::Float => "--t-float",
+            DurationToken::HcOut => "--t-hc-out",
+            DurationToken::Scene => "--t-scene",
+            DurationToken::Shake => "--t-shake",
+            DurationToken::Park => "--t-park",
+            DurationToken::Nudge => "--t-nudge",
+            DurationToken::ShakeLong => "--t-shake-long",
+            DurationToken::Sail => "--t-sail",
+            DurationToken::BoatReturn => "--t-boat-return",
+            DurationToken::Spin => "--t-spin",
+            DurationToken::SendRing => "--t-send-ring",
+        })
     }
 
     /// How long it lasts at `level`.
     pub fn duration(self, level: MotionLevel) -> Duration {
-        todo!()
+        Duration::from_millis(self.millis(level))
+    }
+
+    /// The table, in milliseconds.
+    fn millis(self, level: MotionLevel) -> u64 {
+        const REDUCED: u64 = 60;
+        match (self, level) {
+            (_, MotionLevel::Reduced) => REDUCED,
+            (DurationToken::Big, MotionLevel::Calm) => 300,
+            (DurationToken::Big, MotionLevel::Extra) => 560,
+            // `calc(var(--t-big) * 1.15)`, rounded as section 3.4 lists it: Calm 345,
+            // Standard 483, Extra 644. Crumple runs at `--t-big`, so its heavy form is the same.
+            (DurationToken::BigHeavy | DurationToken::CrumpleHeavy, level) => {
+                (DurationToken::Big.millis(level) * 115).div_ceil(100)
+            }
+            (DurationToken::Tap, _) => 90,
+            (DurationToken::Quick, _) => 170,
+            (DurationToken::Move, _) => 250,
+            (DurationToken::Big, _) => 420,
+            (DurationToken::Ambient, _) => 5000,
+            (DurationToken::Spark, _) => 520,
+            (DurationToken::Curl, _) => 560,
+            // Proposed: 560 x 1.15 (design/05-MOTION.md open decision 3).
+            (DurationToken::CurlHeavy, _) => 644,
+            (DurationToken::Send, _) => 620,
+            (DurationToken::Float, _) => 900,
+            (DurationToken::HcOut, _) => 120,
+            (DurationToken::Scene, _) => 380,
+            (DurationToken::Shake, _) => 420,
+            (DurationToken::Park, _) => 420,
+            (DurationToken::Nudge, _) => 520,
+            (DurationToken::ShakeLong, _) => 560,
+            (DurationToken::Sail, _) => 1150,
+            (DurationToken::BoatReturn, _) => 900,
+            (DurationToken::Spin, _) => 1100,
+            (DurationToken::SendRing, _) => 5000,
+        }
     }
 }

@@ -1,1 +1,140 @@
-/* motion.css: filled in wave 1 (tokens). */
+/* The canonical keyframes, verbatim from design/05-MOTION.md section 4 (S's text where S and C
+   both define a name). Three departures, each required by section 9:
+   - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
+   - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
+   - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`.
+   ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
+
+/* 4.2.1 rise */
+@keyframes rise{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
+
+/* 4.2.2 star-pop */
+@keyframes star-pop{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
+
+/* 4.2.3 spark */
+@keyframes spark{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
+
+/* 4.2.4 pop-in */
+@keyframes pop-in{ 0%{ transform:scale(.55); opacity:0; } 68%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:scale(1); opacity:1; } }
+
+/* 4.2.5 fold */
+@keyframes fold{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
+
+/* 4.2.6 curl */
+@keyframes curl{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
+
+/* 4.2.7 floatup */
+@keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
+
+/* 4.2.8 gulp */
+@keyframes gulp{ 0%{ transform:scale(1,1); } 34%{ transform:scale(1.07,.84); } 62%{ transform:scale(.97,1.07); } 100%{ transform:scale(1,1); } }
+
+/* 4.2.9 seal-pop */
+@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); } 60%{ transform:translateY(-50%) scale(1.5); } 100%{ transform:translateY(-50%) scale(1); } }
+
+/* 4.2.10 compose-rise */
+@keyframes compose-rise{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
+
+/* 4.2.11 compose-send */
+@keyframes compose-send{ 0%{ transform:none; opacity:1; } 35%{ transform:translate(0,4px) scale(.97,.94); opacity:1; } 100%{ transform:translate(-40px,-120px) scale(.06) rotate(-8deg); opacity:0; } }
+
+/* 4.2.12 peek-in */
+@keyframes peek-in{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
+
+/* 4.3.1 slide-r */
+@keyframes slide-r{ from{ transform:translateX(26px); opacity:0; } to{ transform:none; opacity:1; } }
+
+/* 4.3.2 slide-l */
+@keyframes slide-l{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
+
+/* 4.3.3 fade */
+@keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
+
+/* 4.3.4 heal */
+@keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
+
+/* 4.3.5 bump */
+@keyframes bump{ 0%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-3px) scale(1.25); } 100%{ transform:none; } }
+
+/* 4.3.6 tab-in */
+@keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
+
+/* 4.3.7 tab-out */
+@keyframes tab-out{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
+
+/* 4.3.8 hc-in */
+@keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
+
+/* 4.3.9 hc-out */
+@keyframes hc-out{ to{ opacity:0; transform:translateY(2px); } }
+
+/* 4.3.10 dest */
+@keyframes dest{ from{ box-shadow:0 0 0 1.5px var(--accent) inset; } to{ box-shadow:0 0 0 3px var(--accent-ring) inset; } }
+
+/* 4.3.11 page-in */
+@keyframes page-in{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
+
+/* 4.3.12 park */
+@keyframes park{ to{ opacity:0; transform:translateX(-60%) scale(.35); } }
+
+/* 4.3.13 shake-x */
+@keyframes shake-x{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
+
+/* 4.3.14 chip-in */
+@keyframes chip-in{ 0%{ transform:scale(.6); opacity:0; } 70%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:none; } }
+
+/* 4.3.15 menu-pop */
+@keyframes menu-pop{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
+
+/* 4.4.1 breathe */
+@keyframes breathe{ 0%,100%{ opacity:0; transform:scale(.85); } 50%{ opacity:.45; transform:scale(1.06); } }
+
+/* 4.4.2 spin */
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* 4.4.3 row-in */
+@keyframes row-in{
+  0%{ transform:translateY(-14px) scale(.94); opacity:0; }
+  58%{ transform:translateY(3px) scale(var(--overshoot)); opacity:1; }
+  100%{ transform:translateY(0) scale(1); opacity:1; }
+}
+
+/* 4.4.5 chip-land */
+@keyframes chip-land{ 0%{ transform:scale(0) rotate(-12deg); } 62%{ transform:scale(1.22) rotate(4deg); } 100%{ transform:scale(1) rotate(0); } }
+
+/* 4.4.6 sail */
+@keyframes sail{
+  0%{ transform:translate(0,0) rotate(0) scale(1); opacity:0; }
+  12%{ opacity:1; }
+  45%{ transform:translate(-90px,-70px) rotate(-7deg) scale(1.05); }
+  100%{ transform:translate(-210px,-190px) rotate(-14deg) scale(.4); opacity:0; }
+}
+
+/* 4.4.7 boat-return */
+@keyframes boat-return{
+  0%{ transform:translate(-150px,-140px) scale(.5) rotate(-10deg); opacity:0; }
+  25%{ opacity:1; }
+  100%{ transform:translate(0,0) scale(1) rotate(6deg); opacity:0; }
+}
+
+/* 4.4.8 nudge */
+@keyframes nudge{ 0%,100%{ transform:translateX(-50%) translateY(0); } 40%{ transform:translateX(-50%) translateY(-6px); } 70%{ transform:translateX(-50%) translateY(1px); } }
+
+/* 4.4.9 shake */
+@keyframes shake{ 0%,100%{ transform:translateX(-50%); } 20%{ transform:translateX(calc(-50% - 7px)); } 40%{ transform:translateX(calc(-50% + 6px)); } 60%{ transform:translateX(calc(-50% - 4px)); } 80%{ transform:translateX(calc(-50% + 2px)); } }
+
+/* 4.4.10 crumple */
+@keyframes crumple{
+  0%{ transform:scale(1) rotate(0) skewX(0); opacity:1; }
+  40%{ transform:scale(.88) rotate(-4deg) skewX(-6deg); }
+  100%{ transform:scale(.12) rotate(16deg) skewX(10deg) translateY(16px); opacity:0; }
+}
+
+/* 4.4.11 menu-in */
+@keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
+  100%{ opacity:1; transform:scale(1) translateY(0); } }
+
+/* 4.4.13 cmdk-in */
+@keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
+  62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
+  100%{ opacity:1; transform:scale(1) translateY(0); } }

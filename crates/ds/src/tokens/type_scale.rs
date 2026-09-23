@@ -2,7 +2,6 @@
 //!
 //! The plan names the ends, `--fs-micro` 9.5 and `--fs-display` 26; the steps between are named
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use super::name::VarName;
 
@@ -20,12 +19,20 @@ pub enum Family {
 impl Family {
     /// The custom property: `--font-display`, …
     pub fn var(self) -> VarName {
-        todo!()
+        VarName(match self {
+            Family::Display => "--font-display",
+            Family::Ui => "--font-ui",
+            Family::Data => "--font-data",
+        })
     }
 
     /// The `font-family` stack, face first, then its fallbacks.
     pub fn stack(self) -> &'static str {
-        todo!()
+        match self {
+            Family::Display => "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif",
+            Family::Ui => "\"Karla\",\"Segoe UI\",system-ui,sans-serif",
+            Family::Data => "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace",
+        }
     }
 }
 
@@ -107,11 +114,57 @@ impl FontSize {
 
     /// The custom property: `--fs-micro`, …
     pub fn var(self) -> VarName {
-        todo!()
+        VarName(match self {
+            FontSize::Pico => "--fs-pico",
+            FontSize::Nano => "--fs-nano",
+            FontSize::Micro => "--fs-micro",
+            FontSize::Caption => "--fs-caption",
+            FontSize::Note => "--fs-note",
+            FontSize::Eyebrow => "--fs-eyebrow",
+            FontSize::Help => "--fs-help",
+            FontSize::Small => "--fs-small",
+            FontSize::Meta => "--fs-meta",
+            FontSize::Control => "--fs-control",
+            FontSize::Body => "--fs-body",
+            FontSize::Reading => "--fs-reading",
+            FontSize::Compose => "--fs-compose",
+            FontSize::Base => "--fs-base",
+            FontSize::Subhead => "--fs-subhead",
+            FontSize::Title => "--fs-title",
+            FontSize::Heading3 => "--fs-heading-3",
+            FontSize::Subject => "--fs-subject",
+            FontSize::Heading => "--fs-heading",
+            FontSize::Amount => "--fs-amount",
+            FontSize::Day => "--fs-day",
+            FontSize::Display => "--fs-display",
+        })
     }
 
     /// The size in CSS: `9.5px`.
     pub fn css(self) -> &'static str {
-        todo!()
+        match self {
+            FontSize::Pico => "7.5px",
+            FontSize::Nano => "9px",
+            FontSize::Micro => "9.5px",
+            FontSize::Caption => "10px",
+            FontSize::Note => "10.5px",
+            FontSize::Eyebrow => "11px",
+            FontSize::Help => "11.5px",
+            FontSize::Small => "12px",
+            FontSize::Meta => "12.5px",
+            FontSize::Control => "13px",
+            FontSize::Body => "13.5px",
+            FontSize::Reading => "14px",
+            FontSize::Compose => "14.5px",
+            FontSize::Base => "15px",
+            FontSize::Subhead => "15.5px",
+            FontSize::Title => "16px",
+            FontSize::Heading3 => "16.5px",
+            FontSize::Subject => "20px",
+            FontSize::Heading => "21px",
+            FontSize::Amount => "22px",
+            FontSize::Day => "24px",
+            FontSize::Display => "26px",
+        }
     }
 }
