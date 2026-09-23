@@ -316,3 +316,47 @@ but the design must not depend on it, because the CPU fallback as pinned does no
 - Headless offscreen rendering through vello_hybrid works: `wgpu_context::BufferRenderer`,
   `vello_hybrid::Renderer::render` to its texture view, then `copy_texture_to_buffer`. See
   `harness::shot_hybrid`. That gives `ds_native::snapshot` a GPU path as well as the CPU one.
+
+## Wave 0 freeze: where the plan and the design docs disagreed (2026-09-24)
+
+The design doc won each time. Recorded by the freeze agent; kept here so wave 1 fillers do
+not re-litigate them.
+
+- F1 Dependencies: `toml`, `dioxus-ssr` (dev) and, from the shell-host spike, `peniko` and
+  blitz-paint's `custom-widget` feature were missing from the pinned block; promoted into
+  `docs/workspace-deps.toml` and every workspace copy.
+- F2 Settings file: `quire/appearance.toml` (design/22-SETTINGS.md §2), not the plan's
+  appearance.json; mailo's json is imported once and left in place.
+- F3 Lenient read: `ds_settings::lenient(text)` lays each key over the struct's default and
+  keeps it only if it deserialises; the doc's per-field `deserialize_with` fallback would turn
+  a bad key into the type's zero, not the key's default.
+- F4 Motion types: `Motion` is the preference (five values, default System); `MotionLevel` is
+  the resolved four (Calm, Standard, Extra, Reduced).
+- F5 Accents: the docs never name six accents; frozen as Postmark plus the five Candy hues;
+  "exactly four" means four properties per accent.
+- F6 CardAccent: `{Postmark, SpaceHue}` per design/22-SETTINGS.md, default Postmark.
+- F7 `blur_region()` dropped from ds; the host owns region geometry (design/03-COLOR.md §17.1).
+- F8 `Avatar` the component vs the data type: the data type is `AvatarFace`.
+- F9 `HoverTarget(key, …)`: dioxus reserves `key`; the prop is `hover_key`.
+- F10 Peek: `PeekMode{Center, Full}` per design/04-COMPONENTS.md; mailo keeps `Side`.
+- F11 Placement is a struct `{side, align, flip}`.
+- F12 Chip variants follow design/04-COMPONENTS.md §10 (no Clip variant; O-6 stays open).
+- F13 Token names the docs only bracket were filled in and marked proposed: intermediate z
+  layers and type steps, eight radii, eight shadows, durations park/nudge/shake-long/sail/
+  boat-return/spin/send-ring/curl-heavy, `--e-in-out`, `--danger-ink`, `--mark-ground`.
+- F14 Fonts: mailo ships WOFF2; the wave 1 subset script must produce TTFs for fontique;
+  `every_face_is_woff2` pins today's state and flips then.
+- F15 Material keys for banners, control center and launcher live in sill's settings, not
+  `AppearanceSettings` (design/22-SETTINGS.md §4.3).
+- F16 Lint keeps both `SvgPaintInCss` and `CurrentColourOutsideStrokeFill`.
+- F17 Two `Px` types: `ds::Px(f32)` for layout, `ds_settings::Px(u16)` for stored keys.
+- F18 One unclamped `Fraction`; components clamp.
+- F19 `Roster::leave` takes `(key, exit, emphasis)` so an unread row can exit heavier.
+- F20 Material tint alpha is a settings key, so `recipe()` takes it as a parameter and the
+  static stylesheet does not bake it in.
+- F21 Components in no wave's file list (command_pill, account_tile, provider_mark,
+  link_pill, selection_bubble, send_pill, space_editor, edge_strip, drag_ghost, sync_halo):
+  assigned in wave 2.
+- Signatures the freeze believes wrong, reported not changed: `SystemPrefs{scheme: Scheme}`
+  cannot express the portal's "no preference" (mapped to Light for now); the plan's lint
+  rule list lacked the three Blitz rules the spike forced (now added).

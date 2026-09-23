@@ -30,7 +30,7 @@ ds-native   = { path = "crates/ds-native" }
 # Blitz: git main, pinned by rev (crates.io dioxus-native 0.8 alpha does not build with
 # blitz 0.3.0-beta.2). The in-tree dioxus-native-dom targets dioxus 0.7.x.
 blitz-dom = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042", default-features = false, features = ["svg", "system-fonts", "custom-widget", "accessibility"] }
-blitz-paint = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042" }
+blitz-paint = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042", features = ["custom-widget"] }
 blitz-traits = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042" }
 dioxus-native-dom = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042", default-features = false, features = ["svg", "system-fonts", "accessibility"] }
 
@@ -70,6 +70,11 @@ cssparser = "0.37"
 notify = "8.2"
 zbus = { version = "5.19", default-features = false, features = ["tokio"] }
 dirs = "6"
+toml = "1"
+# SSR renders for component goldens and markup lint (dev-dependency in consumers).
+dioxus-ssr = "0.7"
+# Named directly for image paints in custom widgets (blitz re-exports nothing).
+peniko = "0.6"
 
 # Shell-only (COSMIC).
 cosmic-client-toolkit = { git = "https://github.com/pop-os/cosmic-protocols", rev = "c0cff4db14c37ed954983158e4055aa94c7741d9" }
@@ -87,14 +92,6 @@ clap = { version = "4", features = ["derive"] }
 latchkey = { git = "https://github.com/PoHsuanLai/mailo", rev = "e8344176ffcc0455c585dafd722c05c911ddc5c4" }
 # ---- END PINNED BLOCK ----
 
-# ---- Proposed for docs/workspace-deps.toml (w0-freeze; FINDINGS.md F1) ----
-# Outside the pinned block on purpose: the freeze needs these and may not edit the block. The
-# reviewer either promotes them into docs/workspace-deps.toml (and every repo's copy) or rejects
-# them with the code that needs them. toml 1.1.6 is already in Cargo.lock (stylo build).
-# TOML settings files, design/22-SETTINGS.md section 2 (ds-settings file.rs).
-toml = "1"
-# SSR for the moved icon tests and the per-component SSR goldens (dev-dependency only).
-dioxus-ssr = "0.7"
 
 [workspace.lints.rust]
 unsafe_code = "deny"
