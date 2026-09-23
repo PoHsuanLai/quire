@@ -44,8 +44,83 @@ pub enum MarkStyle {
     Image(ImageSource),
 }
 
-/// A provider mark.
+impl Provider {
+    /// The letter the mark shows (`S:1130-1136`).
+    fn letter(self) -> char {
+        match self {
+            Provider::Google => 'G',
+            Provider::Microsoft => 'M',
+            Provider::Fastmail => 'F',
+            Provider::ICloud => 'i',
+            Provider::Yahoo => 'Y',
+            Provider::Imap => '@',
+        }
+    }
+
+    /// The provider's identity colour: data, not a theme colour, so it enters through the
+    /// inline `--pc` (design/04-COMPONENTS.md section 28 Blitz notes, O-3).
+    fn colour(self) -> &'static str {
+        match self {
+            Provider::Google => "#1A73E8",
+            Provider::Microsoft => "#0F6CBD",
+            Provider::Fastmail => "#2A5DB0",
+            Provider::ICloud => "#3A82F7",
+            Provider::Yahoo => "#6001D2",
+            Provider::Imap => "#5D6660",
+        }
+    }
+
+    /// The name in the mark's `title`.
+    pub(crate) fn name(self) -> &'static str {
+        match self {
+            Provider::Google => "Google",
+            Provider::Microsoft => "Microsoft 365",
+            Provider::Fastmail => "Fastmail",
+            Provider::ICloud => "iCloud",
+            Provider::Yahoo => "Yahoo",
+            Provider::Imap => "IMAP",
+        }
+    }
+}
+
+impl MarkSize {
+    /// The `data-size` word.
+    fn slug(self) -> &'static str {
+        match self {
+            MarkSize::Tile => "tile",
+            MarkSize::Row => "row",
+            MarkSize::Inline => "inline",
+        }
+    }
+}
+
+/// A provider mark. Static: no hover, focus or motion.
 #[component]
 pub fn ProviderMark(provider: Provider, size: MarkSize, style: MarkStyle) -> Element {
-    todo!()
+    let title = provider.name();
+    match style {
+        MarkStyle::Letter => {
+            let colour = provider.colour();
+            let letter = provider.letter();
+            rsx! {
+                span {
+                    class: "ds-provider",
+                    "data-size": size.slug(),
+                    "data-kind": "letter",
+                    style: "--pc:{colour}",
+                    title: "{title}",
+                    "{letter}"
+                }
+            }
+        }
+        MarkStyle::Image(ImageSource(src)) => rsx! {
+            span {
+                class: "ds-provider",
+                "data-size": size.slug(),
+                "data-kind": "image",
+                title: "{title}",
+                img { alt: "", src }
+            }
+        },
+    }
 }

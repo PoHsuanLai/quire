@@ -1,1 +1,7 @@
-/* sync_halo.css: filled in with the component (design/04-COMPONENTS.md). */
+/* SyncHalo (design/04-COMPONENTS.md section 35): `C:278-292`. The ring and its two loops are
+   the Spinner's (section 15); this file places the ring box and the avatar inside it, which is
+   round and display 800 13 (`--fs-control`). Not interactive: hover, focus and disabled are not
+   specified. TODO(O-9, O-25): both kinds loop, so the surface never idles while one shows. */
+
+.ds-account-ring{ position:relative; width:30px; height:30px; flex:none; }
+.ds-account-ring .ds-avatar{ position:absolute; inset:0; border-radius:var(--r-pill); font-size:var(--fs-control); }

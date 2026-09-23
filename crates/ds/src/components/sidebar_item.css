@@ -1,1 +1,48 @@
-/* sidebar_item.css: filled in with the component (design/04-COMPONENTS.md). */
+/* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
+   drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span
+   (O-22's fallback for `::before`). The current-item shadow is `--shadow-current` (O-3); `dest`
+   ends on the precomputed `--accent-ring` (no `color-mix`) and loops only while the preview
+   holds (O-9). `--f-hover` in S is a bug (A8 #1): the destination ground is `--f-pill-hover`.
+   The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
+   leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
+   The drop target `[data-drop=target]` has no prop on SidebarItem yet (reported); its rule is
+   here for when it does. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
+   not specified here. Disabled: not specified (O-1). */
+
+.ds-sidebar-item{
+  display:flex; align-items:center; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
+  background:transparent; padding:6px 8px; border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
+  color:var(--f-ink-soft); position:relative;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-sidebar-item:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+.ds-sidebar-item:active{ transform:scale(var(--squish)); }
+.ds-sidebar-item[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
+.ds-sidebar-item-text{ min-width:0; }
+.ds-sidebar-item-text[*|data-emphasis=plain]{ font-weight:500; }
+
+/* The seal (`S:345-346`): Place items only. */
+.ds-sidebar-item-seal{
+  position:absolute; left:-7px; top:50%; width:5px; height:5px; border-radius:var(--r-pill); background:var(--f-ink);
+  transform:translateY(-50%) scale(0); animation:seal-pop var(--t-big) var(--e-spring) forwards;
+}
+
+/* Today's close button (`S:140-143`). */
+.ds-sidebar-item-close{
+  margin-left:auto; opacity:0; border:0; background:none; cursor:pointer; padding:0; color:var(--f-ink-faint); line-height:0;
+  transition:opacity var(--t-quick) var(--e-out);
+}
+.ds-sidebar-item:hover .ds-sidebar-item-close{ opacity:1; }
+
+/* Destination preview (`S:447-448`). */
+.ds-sidebar-item[*|data-preview=destination]{
+  background:var(--f-pill-hover); color:var(--f-ink); box-shadow:0 0 0 1.5px var(--accent) inset;
+  animation:dest var(--t-float) var(--e-out) infinite alternate;
+}
+
+/* Drop target (`C:320-323`). */
+.ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+
+/* Today presence (`S:350-351`). */
+.ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
+.ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:tab-out var(--t-move) var(--e-exit) forwards; overflow:hidden; }

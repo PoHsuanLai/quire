@@ -1,1 +1,18 @@
-/* edge_strip.css: filled in with the component (design/04-COMPONENTS.md). */
+/* EdgeStrip (design/04-COMPONENTS.md section 33): `S:85`, `S:91`, `S:451-454`. The strip is
+   rendered only while the sidebar is hidden, so it needs no display toggle. The sidebar
+   container is `nav.ds-side[data-side=shown|hidden|peek]`; the window grid change belongs to
+   the host's layout. The peek panel renders in place, not through OverlayHost, because it is
+   the sidebar itself.
+   TODO(O-3): the side peek's own shadow `0 20px 40px -16px rgba(0,0,0,.45)` has no token; it
+   takes `--shadow-pop` (`0 18px 40px -16px`, the same alpha).
+   Not specified: 05-MOTION section 5 row 28 plays `slide-r` at `--t-move` here, while the one
+   `Anim::SlideR` recipe is `--t-big` (row 1); the recipe wins so CSS and `settle()` agree. */
+
+.ds-edge{ position:absolute; left:0; top:0; bottom:0; width:10px; z-index:var(--z-edge); }
+
+.ds-side[*|data-side=hidden]{ visibility:hidden; }
+.ds-side[*|data-side=peek]{
+  visibility:visible; position:absolute; left:8px; top:8px; bottom:8px; width:226px; z-index:var(--z-side-peek);
+  background:var(--f-solid); border-radius:var(--r-panel); box-shadow:var(--shadow-pop);
+  animation:slide-r var(--t-big) var(--e-spring);
+}

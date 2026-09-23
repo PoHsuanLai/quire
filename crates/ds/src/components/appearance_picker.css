@@ -1,1 +1,8 @@
-/* appearance_picker.css: filled in with the component (design/04-COMPONENTS.md). */
+/* AppearancePicker (design/04-COMPONENTS.md section 26, derived): rows stacked 14 apart (the
+   Space editor's stack gap, `S:247`), each a Field SectionHeader over its control. The swatches
+   are Space dots (space_editor.css) five apart, as in the sidebar foot (`S:845`), painted with
+   `--swatch-*`. No states of its own. TODO(O-16): the overall width is the host surface's. */
+
+.ds-appearance{ display:grid; gap:14px; }
+.ds-appearance-row{ min-width:0; }
+.ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:5px; }
