@@ -1,9 +1,14 @@
 //! Running a quire app on Blitz: the document, the font registration, the input modality
 //! (`ds::HostModality`), a `data:` net provider for mask and background images (spike S7/S8),
 //! and a redraw when a timer or an image lands.
-#![allow(unused_variables, dead_code)] // Freeze stubs: remove with the last todo!().
+//!
+//! The window is blitz's portable `dioxus-native` shell (winit), so an app runs the same on any
+//! OS; `crate::host` wraps the app to supply what quire needs on top of it.
 
+use crate::fonts::font_context;
+use crate::host::{Host, HostProps};
 use dioxus::prelude::*;
+use dioxus_native::{LogicalSize, WindowAttributes};
 
 /// How the window starts.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -18,5 +23,16 @@ pub struct AppConfig {
 
 /// Run `app` until its window closes.
 pub fn launch(app: fn() -> Element, config: AppConfig) {
-    todo!()
+    let window = WindowAttributes::default()
+        .with_title(config.title)
+        .with_surface_size(LogicalSize::new(config.width, config.height));
+    let native = dioxus_native::Config::new()
+        .with_window_attributes(window)
+        .with_font_ctx(font_context());
+    dioxus_native::launch_cfg_with_props(
+        Host,
+        HostProps::new(app),
+        Vec::new(),
+        vec![Box::new(native)],
+    );
 }
