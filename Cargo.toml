@@ -87,6 +87,15 @@ clap = { version = "4", features = ["derive"] }
 latchkey = { git = "https://github.com/PoHsuanLai/mailo", rev = "e8344176ffcc0455c585dafd722c05c911ddc5c4" }
 # ---- END PINNED BLOCK ----
 
+# ---- Proposed for docs/workspace-deps.toml (w0-freeze; FINDINGS.md F1) ----
+# Outside the pinned block on purpose: the freeze needs these and may not edit the block. The
+# reviewer either promotes them into docs/workspace-deps.toml (and every repo's copy) or rejects
+# them with the code that needs them. toml 1.1.6 is already in Cargo.lock (stylo build).
+# TOML settings files, design/22-SETTINGS.md section 2 (ds-settings file.rs).
+toml = "1"
+# SSR for the moved icon tests and the per-component SSR goldens (dev-dependency only).
+dioxus-ssr = "0.7"
+
 [workspace.lints.rust]
 unsafe_code = "deny"
 missing_debug_implementations = "warn"
