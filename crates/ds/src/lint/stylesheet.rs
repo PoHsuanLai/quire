@@ -9,13 +9,18 @@ use super::selector;
 use super::tokenize;
 use super::walk;
 
-/// Every offence in `css` under `config`.
+/// Every offence in `css` under `config` that none of `config.exceptions` covers.
 ///
 /// `config.own_vars` names custom properties (`--` included) the consumer declares itself,
 /// beyond the design system's own token table; a property the stylesheet declares on some
 /// selector (`.foo { --local: 4px; ... }`) is always allowed too, whether or not it is listed
 /// there, since the declaration is right there to review.
 pub fn stylesheet(css: &str, config: &LintConfig) -> Vec<Offence> {
+    config.partition(every_offence(css, config)).0
+}
+
+/// Every offence in `css`, exceptions not applied: what [`super::assert_clean`] partitions.
+pub(super) fn every_offence(css: &str, config: &LintConfig) -> Vec<Offence> {
     // Whitespace and comment tokens stay in: [`walk`] needs them to tell `.a.b` apart from
     // `.a .b`, and [`super::text::render`] needs them to reproduce a selector's own text.
     let tokens = tokenize::tokens(css);
@@ -25,10 +30,7 @@ pub fn stylesheet(css: &str, config: &LintConfig) -> Vec<Offence> {
         offences.extend(selector::offences(&rule.selector_tokens));
     }
 
-    let mut known_vars: HashSet<String> = registry::DECLARED_VARS
-        .iter()
-        .map(|name| (*name).to_owned())
-        .collect();
+    let mut known_vars: HashSet<String> = registry::declared_vars().clone();
     known_vars.extend(config.own_vars.iter().cloned());
     for rule in &rules {
         for decl in &rule.declarations {

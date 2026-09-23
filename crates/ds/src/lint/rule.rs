@@ -47,11 +47,17 @@ pub enum Rule {
     /// A CSS `stroke` or `fill`: on Blitz SVG paint works only as attributes (spike S6), which
     /// `Glyph` writes.
     SvgPaintInCss,
+    /// Markup: a class on a rendered element that no rule in scope styles (coherence rule 2).
+    UnstyledClass,
+    /// Markup: an element quire draws for you, written by hand: an `<svg>` that is not a
+    /// `Glyph` (`.ds-ic`), a `<button>`, `<input>`, `<select>` or `<textarea>` outside a quire
+    /// component (coherence rule 2).
+    RawMarkup,
 }
 
 impl Rule {
     /// Every rule, in declaration order.
-    pub const ALL: [Rule; 20] = [
+    pub const ALL: [Rule; 22] = [
         Rule::HexColour,
         Rule::ColourFunction,
         Rule::NamedColour,
@@ -72,6 +78,8 @@ impl Rule {
         Rule::UnprefixedAttributeSelector,
         Rule::FocusPseudoClass,
         Rule::SvgPaintInCss,
+        Rule::UnstyledClass,
+        Rule::RawMarkup,
     ];
 }
 
@@ -85,6 +93,28 @@ pub enum Profile {
     Strict,
 }
 
+/// One offence a consumer has decided to live with, and why: every offence of `rule` whose
+/// selector is exactly `selector` is suppressed. The reason is for the reviewer; `assert_clean`
+/// prints how many offences each exception swallowed, so a stale one is visible.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Exception {
+    /// The rule it silences.
+    pub rule: Rule,
+    /// The selector it silences it on, as the offence reports it: a stylesheet rule's selector
+    /// text (`.ds-truncate`), an at-rule's prelude (`@keyframes spin`), or a markup element as
+    /// `tag.class.class` (`span.ds-avatar`). Compared whole, never as a prefix.
+    pub selector: &'static str,
+    /// Why this one is allowed.
+    pub reason: &'static str,
+}
+
+impl Exception {
+    /// Whether this exception silences `offence`.
+    pub fn covers(&self, offence: &Offence) -> bool {
+        self.rule == offence.rule && self.selector == offence.selector
+    }
+}
+
 /// A lint run's settings.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct LintConfig {
@@ -92,6 +122,20 @@ pub struct LintConfig {
     pub profile: Profile,
     /// Custom properties the consumer declares itself, beyond quire's own.
     pub own_vars: Vec<String>,
+    /// Offences to suppress, each with its reason.
+    pub exceptions: &'static [Exception],
+}
+
+impl LintConfig {
+    /// Splits `offences` into those no exception covers and those one does.
+    pub fn partition(&self, offences: Vec<Offence>) -> (Vec<Offence>, Vec<Offence>) {
+        offences.into_iter().partition(|offence| {
+            !self
+                .exceptions
+                .iter()
+                .any(|exception| exception.covers(offence))
+        })
+    }
 }
 
 /// One violation, located so a failure names it.
@@ -99,6 +143,9 @@ pub struct LintConfig {
 pub struct Offence {
     /// What was broken.
     pub rule: Rule,
+    /// Where: the selector of the rule it sits in, an at-rule's prelude, or for markup the
+    /// element as `tag.class.class`. What an [`Exception`] matches.
+    pub selector: String,
     /// 1-based line in the input.
     pub line: u32,
     /// 1-based column in the input.

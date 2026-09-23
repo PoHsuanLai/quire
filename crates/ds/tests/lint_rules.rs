@@ -11,7 +11,7 @@ fn lint(css: &str, profile: Profile) -> Vec<Offence> {
         css,
         &LintConfig {
             profile,
-            own_vars: Vec::new(),
+            ..LintConfig::default()
         },
     )
 }
@@ -72,6 +72,13 @@ const CASES: &[Case] = &[
     Case {
         name: "named colour: token passes",
         css: ".chip { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::NamedColour,
+        expect: false,
+    },
+    Case {
+        name: "named colour: transparent passes",
+        css: ".chip { background: transparent; }",
         profile: Profile::Standard,
         rule: Rule::NamedColour,
         expect: false,
@@ -166,6 +173,20 @@ const CASES: &[Case] = &[
         rule: Rule::FontFamily,
         expect: false,
     },
+    Case {
+        name: "font-family: a face token passes",
+        css: ".chip { font-family: var(--font-data); }",
+        profile: Profile::Standard,
+        rule: Rule::FontFamily,
+        expect: false,
+    },
+    Case {
+        name: "font-family: a token with a literal fallback fails",
+        css: ".chip { font-family: var(--font-data), monospace; }",
+        profile: Profile::Standard,
+        rule: Rule::FontFamily,
+        expect: true,
+    },
     // RawFontSize (Strict only)
     Case {
         name: "raw font-size: literal fails under Strict",
@@ -192,6 +213,20 @@ const CASES: &[Case] = &[
     Case {
         name: "raw radius: token passes under Strict",
         css: ".chip { border-radius: var(--r-chip); }",
+        profile: Profile::Strict,
+        rule: Rule::RawRadius,
+        expect: false,
+    },
+    Case {
+        name: "raw radius: a square corner passes under Strict",
+        css: ".chip { border-radius: var(--r-pill) var(--r-pill) 0 0; }",
+        profile: Profile::Strict,
+        rule: Rule::RawRadius,
+        expect: false,
+    },
+    Case {
+        name: "raw radius: a custom property named -radius is not a radius",
+        css: ".chip { --m-radius: 22px; }",
         profile: Profile::Strict,
         rule: Rule::RawRadius,
         expect: false,
@@ -237,6 +272,20 @@ const CASES: &[Case] = &[
     Case {
         name: "ds internals: a consumer class passes",
         css: ".icon { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::DsInternals,
+        expect: false,
+    },
+    Case {
+        name: "ds internals: the root's warm-hover attribute fails",
+        css: ".card[*|data-hover=warm] .fly { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::DsInternals,
+        expect: true,
+    },
+    Case {
+        name: "ds internals: a hover target's own key passes",
+        css: ".card[*|data-hover-key] { color: var(--ink); }",
         profile: Profile::Standard,
         rule: Rule::DsInternals,
         expect: false,
@@ -333,6 +382,68 @@ const CASES: &[Case] = &[
     },
 ];
 
+/// A markup case: rendered `html` against the stylesheet `css`.
+struct MarkupCase {
+    name: &'static str,
+    html: &'static str,
+    css: &'static str,
+    rule: Rule,
+    expect: bool,
+}
+
+/// One passing and one failing case per markup-only [`Rule`].
+const MARKUP_CASES: &[MarkupCase] = &[
+    MarkupCase {
+        name: "unstyled class: a class no rule names fails",
+        html: "<span class=\"ds-chip zz-missing\">x</span>",
+        css: ".ds-chip{}",
+        rule: Rule::UnstyledClass,
+        expect: true,
+    },
+    MarkupCase {
+        name: "unstyled class: every class styled passes",
+        html: "<span class=\"ds-chip\">x</span>",
+        css: ".ds-chip{}",
+        rule: Rule::UnstyledClass,
+        expect: false,
+    },
+    MarkupCase {
+        name: "raw markup: a hand-written svg fails",
+        html: "<svg viewBox=\"0 0 24 24\"><path d=\"M0 0\"></path></svg>",
+        css: "",
+        rule: Rule::RawMarkup,
+        expect: true,
+    },
+    MarkupCase {
+        name: "raw markup: a hand-written button fails",
+        html: "<button type=\"button\" class=\"send\">Send</button>",
+        css: ".send{}",
+        rule: Rule::RawMarkup,
+        expect: true,
+    },
+    MarkupCase {
+        name: "raw markup: a bare input fails",
+        html: "<input type=\"text\"/>",
+        css: "",
+        rule: Rule::RawMarkup,
+        expect: true,
+    },
+    MarkupCase {
+        name: "raw markup: a Glyph passes",
+        html: "<svg class=\"ds-ic\" viewBox=\"0 0 24 24\"></svg>",
+        css: ".ds-ic{}",
+        rule: Rule::RawMarkup,
+        expect: false,
+    },
+    MarkupCase {
+        name: "raw markup: a quire button passes",
+        html: "<button type=\"button\" class=\"ds-button\" data-variant=\"primary\">Send</button>",
+        css: ".ds-button{}",
+        rule: Rule::RawMarkup,
+        expect: false,
+    },
+];
+
 #[test]
 fn every_rule_case_matches() {
     let mut failures = Vec::new();
@@ -349,22 +460,40 @@ fn every_rule_case_matches() {
             ));
         }
     }
+    for case in MARKUP_CASES {
+        let got = has(
+            &markup(case.html, case.css, &LintConfig::default()),
+            case.rule,
+        );
+        if got != case.expect {
+            failures.push(format!(
+                "{}: expected {:?} to {} in `{}`",
+                case.name,
+                case.rule,
+                if case.expect { "fire" } else { "stay quiet" },
+                case.html
+            ));
+        }
+    }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// `CASES` covers every `Rule`, with both a passing and a failing case — not just the ones a
-/// contributor remembered to hand-pick.
+/// `CASES` and `MARKUP_CASES` cover every `Rule`, with both a passing and a failing case — not
+/// just the ones a contributor remembered to hand-pick.
 #[test]
 fn every_rule_variant_is_covered() {
+    let cases = CASES
+        .iter()
+        .map(|case| (case.rule, case.expect))
+        .chain(MARKUP_CASES.iter().map(|case| (case.rule, case.expect)));
+    let seen: Vec<(Rule, bool)> = cases.collect();
     let mut missing = Vec::new();
     for rule in Rule::ALL {
-        let has_pass = CASES.iter().any(|case| case.rule == rule && case.expect);
-        let has_fail = CASES.iter().any(|case| case.rule == rule && !case.expect);
-        if !has_pass {
-            missing.push(format!("{rule:?} has no passing case"));
-        }
-        if !has_fail {
+        if !seen.contains(&(rule, true)) {
             missing.push(format!("{rule:?} has no failing case"));
+        }
+        if !seen.contains(&(rule, false)) {
+            missing.push(format!("{rule:?} has no passing case"));
         }
     }
     assert!(missing.is_empty(), "{}", missing.join("\n"));
@@ -474,8 +603,14 @@ mod mailo_cases {
             &LintConfig::default(),
         );
         assert_eq!(
-            offences.iter().map(|o| o.text.as_str()).collect::<Vec<_>>(),
-            vec!["<div>: class not defined by any rule: zz-missing"],
+            offences
+                .iter()
+                .map(|o| (o.rule, o.text.as_str()))
+                .collect::<Vec<_>>(),
+            vec![(
+                Rule::UnstyledClass,
+                "<div>: class not defined by any rule: zz-missing"
+            )],
             "{offences:?}"
         );
     }

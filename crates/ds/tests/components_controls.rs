@@ -16,7 +16,7 @@ use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::components::vocab::{Key, PulseKey, Shortcut, StaggerIndex};
-use ds::{Anim, Glyph, Icon, IconSize};
+use ds::{Anim, Count, CountPlace, Glyph, Icon, IconSize};
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -58,9 +58,49 @@ fn every_control_matches_its_golden() {
 }
 
 #[test]
-#[ignore = "needs use_drag and Anim::class from the w1-motion branch"]
 fn motion_driven_controls_match_their_goldens() {
     check_all(MOTION_CASES);
+}
+
+/// A count shown at 4, then at `steps` in turn, rendered after the last one.
+fn count_after(place: CountPlace, steps: &[u32]) -> String {
+    #[derive(Props, Clone, PartialEq)]
+    struct At {
+        place: CountPlace,
+    }
+    fn counted(props: At) -> Element {
+        let value = use_context_provider(|| Signal::new(4u32));
+        rsx! { Count { value: value(), place: props.place } }
+    }
+    let mut dom = VirtualDom::new_with_props(counted, At { place });
+    dom.rebuild_in_place();
+    for &next in steps {
+        dom.in_scope(ScopeId::APP, || consume_context::<Signal<u32>>().set(next));
+        dom.process_events();
+        dom.render_immediate_to_vec();
+    }
+    dioxus_ssr::render(&dom)
+}
+
+#[test]
+fn a_count_bumps_on_change() {
+    // Mounted at 4 it is at rest (the `item` golden); each change fires the other alias; a
+    // render at the same value leaves the alias playing, not restarted.
+    const CASES: &[(&str, CountPlace, &[u32])] = &[
+        ("controls/count/item.html", CountPlace::Item, &[]),
+        ("controls/count/bump-a.html", CountPlace::Item, &[5]),
+        ("controls/count/bump-a.html", CountPlace::Item, &[5, 5]),
+        ("controls/count/bump-b.html", CountPlace::Tile, &[5, 6]),
+    ];
+    let failures: Vec<String> = CASES
+        .iter()
+        .filter_map(|(golden, place, steps)| {
+            golden::check(golden, &count_after(*place, steps))
+                .err()
+                .map(|why| format!("after {steps:?}: {why}"))
+        })
+        .collect();
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
 #[test]

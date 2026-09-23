@@ -1,10 +1,11 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 41 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
+//! 42 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
 //! S's `fade` replaces `fade-in`), plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
-//! CSS ends).
+//! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
+//! integration amendment).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -32,6 +33,9 @@ pub enum Anim {
     ChipLand,
     /// `chip-in`: a person chip.
     ChipIn,
+    /// `chip-flash`: a mentioned person chip's ring, held for `--t-flash` (design/04-COMPONENTS.md
+    /// section 10, design/06-INTERACTIONS.md section 2.5; wave 1 amendment).
+    ChipFlash,
     /// `fold`: archive.
     Fold,
     /// `fold` at `--t-big-heavy`: an unread row's archive.
@@ -138,7 +142,7 @@ pub struct Recipe {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 41] = [
+    pub const ALL: [Anim; 42] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -148,6 +152,7 @@ impl Anim {
         Anim::Spark,
         Anim::ChipLand,
         Anim::ChipIn,
+        Anim::ChipFlash,
         Anim::Fold,
         Anim::FoldHeavy,
         Anim::Crumple,
@@ -257,6 +262,14 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
+            // `S:2119`: the flash is a hold, so it runs linear and leaves nothing behind.
+            Anim::ChipFlash => recipe(
+                "chip-flash",
+                DurationToken::Flash,
+                EasingToken::Linear,
+                Fill::None,
+                Iteration::Once,
+            ),
             // `S:327`.
             Anim::Fold => recipe(
                 "fold",
@@ -273,7 +286,6 @@ impl Anim {
                 Fill::Forwards,
                 Iteration::Once,
             ),
-            // `C:714`.
             // `C:714`, at t-big x 1.15 as `S:329` weights an unread fold.
             Anim::CrumpleHeavy => recipe(
                 "crumple",
@@ -282,6 +294,7 @@ impl Anim {
                 Fill::Forwards,
                 Iteration::Once,
             ),
+            // `C:714`.
             Anim::Crumple => recipe(
                 "crumple",
                 DurationToken::Big,
@@ -289,7 +302,6 @@ impl Anim {
                 Fill::Forwards,
                 Iteration::Once,
             ),
-            // `S:328`.
             // `S:328` at 560 x 1.15 (design/05-MOTION.md open decision 3, proposed).
             Anim::CurlHeavy => recipe(
                 "curl",
@@ -298,6 +310,7 @@ impl Anim {
                 Fill::Forwards,
                 Iteration::Once,
             ),
+            // `S:328`.
             Anim::Curl => recipe(
                 "curl",
                 DurationToken::Curl,
@@ -528,6 +541,7 @@ impl Anim {
             Anim::Spark => "a-spark",
             Anim::ChipLand => "a-chip-land",
             Anim::ChipIn => "a-chip-in",
+            Anim::ChipFlash => "a-chip-flash",
             Anim::Fold => "a-fold",
             Anim::FoldHeavy => "a-fold-heavy",
             Anim::Crumple => "a-crumple",

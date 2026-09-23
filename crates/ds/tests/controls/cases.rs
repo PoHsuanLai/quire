@@ -317,17 +317,17 @@ pub const CASES: &[Case] = &[
     Case {
         component: "count",
         state: "item",
-        make: || rsx! { Count { value: 4, pulse: PulseKey::rest(Anim::Bump) } },
+        make: || rsx! { Count { value: 4 } },
     },
     Case {
         component: "count",
         state: "tile",
-        make: || rsx! { Count { value: 12, place: CountPlace::Tile, pulse: PulseKey::rest(Anim::Bump) } },
+        make: || rsx! { Count { value: 12, place: CountPlace::Tile } },
     },
     Case {
         component: "count",
         state: "zero",
-        make: || rsx! { Count { value: 0, pulse: PulseKey::rest(Anim::Bump) } },
+        make: || rsx! { Count { value: 0 } },
     },
     // Spinner: both kinds.
     Case {
@@ -342,9 +342,8 @@ pub const CASES: &[Case] = &[
     },
 ];
 
-/// Cases that call into the motion wave's `use_drag` and `Anim::class`, still `todo!()` on
-/// this branch. Their goldens were blessed against those two bodies filled as their docs say
-/// (idle tracker; `a-<keyframes>`); run them once wave 1's motion branch is merged.
+/// Cases driven by the motion module: the slider's drag tracker and the pulse classes. The
+/// count's bump needs a second render, so it is `components_controls::a_count_bumps_on_change`.
 pub const MOTION_CASES: &[Case] = &[
     Case {
         component: "slider",
@@ -372,18 +371,13 @@ pub const MOTION_CASES: &[Case] = &[
         make: || rsx! { Slider { label: "Brightness", value: Fraction(500), availability: Availability::Disabled, onchange: |_| {} } },
     },
     Case {
-        component: "count",
-        state: "bump-a",
-        make: || rsx! { Count { value: 5, pulse: PulseKey::rest(Anim::Bump).fired() } },
-    },
-    Case {
-        component: "count",
-        state: "bump-b",
-        make: || rsx! { Count { value: 6, place: CountPlace::Tile, pulse: PulseKey::rest(Anim::Bump).fired().fired() } },
-    },
-    Case {
         component: "chip",
         state: "landing",
         make: || rsx! { Chip { variant: ChipVariant::Label(LabelHue::Amber), text: "rust", pulse: PulseKey::rest(Anim::ChipLand).fired() } },
+    },
+    Case {
+        component: "chip",
+        state: "person-flash",
+        make: || rsx! { Chip { variant: ChipVariant::Person(DANA), text: "Dana Okafor", pulse: PulseKey::rest(Anim::ChipFlash).fired() } },
     },
 ];

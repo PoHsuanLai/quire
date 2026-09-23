@@ -3,8 +3,9 @@
 //!
 //! The paint rules come last: a root or [`crate::Surface`] with a material paints the solid tint
 //! unless it says `data-blur=on`, which is the safe default of [`crate::BlurState`]. The
-//! material's edge and drop are painted as one `box-shadow` built here from the recipe, since a
-//! `var(--m-edge),var(--m-shadow)` list would be invalid whenever either is `none`.
+//! material's edge and drop are painted as one `box-shadow` naming only the layers that are not
+//! `none` (a `var(--m-edge),var(--m-shadow)` list would be invalid whenever either is), so the
+//! colours stay in the `--m-*` declarations.
 
 use super::emit::{attr_selector, declaration, presence_selector, property, rule};
 use crate::appearance::Scheme;
@@ -15,6 +16,15 @@ use crate::tokens::{Hex, VarName};
 /// The variable a root writes inline with `appearance.material_tint_alpha` as a fraction
 /// (`.8` at the default). Absent, every tint is section 17.2's own.
 pub(crate) const TINT_ALPHA: VarName = VarName("--m-tint-alpha");
+
+/// The five variables every material block declares, in the order it writes them.
+pub(crate) const MATERIAL_VARS: [VarName; 5] = [
+    VarName("--m-tint"),
+    VarName("--m-tint-solid"),
+    VarName("--m-edge"),
+    VarName("--m-shadow"),
+    VarName("--m-radius"),
+];
 
 /// The material recipes. The tint alpha over blur is a settings key
 /// (`appearance.material_tint_alpha`), so the stylesheet reads it from a variable the root
@@ -66,9 +76,12 @@ fn declarations(material: Material, scheme: Scheme) -> Vec<String> {
         ),
         None => recipe.tint.clone(),
     };
-    let painted = [recipe.edge.as_str(), recipe.shadow.as_str()]
+    let [tint_var, solid_var, edge_var, shadow_var, radius_var] = MATERIAL_VARS;
+    // The layers that paint, by reference, so the colours stay in the `--m-*` declarations.
+    let painted = [(edge_var, &recipe.edge), (shadow_var, &recipe.shadow)]
         .into_iter()
-        .filter(|layer| *layer != "none")
+        .filter(|(_, value)| value.as_str() != "none")
+        .map(|(var, _)| var.reference())
         .collect::<Vec<_>>();
     let painted = if painted.is_empty() {
         "none".to_owned()
@@ -76,12 +89,12 @@ fn declarations(material: Material, scheme: Scheme) -> Vec<String> {
         painted.join(",")
     };
     vec![
-        declaration(VarName("--m-tint"), &tint),
-        declaration(VarName("--m-tint-solid"), &recipe.tint_solid),
-        declaration(VarName("--m-edge"), &recipe.edge),
-        declaration(VarName("--m-shadow"), &recipe.shadow),
-        declaration(VarName("--m-radius"), &recipe.radius),
-        property("border-radius", "var(--m-radius)"),
+        declaration(tint_var, &tint),
+        declaration(solid_var, &recipe.tint_solid),
+        declaration(edge_var, &recipe.edge),
+        declaration(shadow_var, &recipe.shadow),
+        declaration(radius_var, &recipe.radius),
+        property("border-radius", &radius_var.reference()),
         property("box-shadow", &painted),
     ]
 }
@@ -95,9 +108,11 @@ mod tests {
         let css = materials_css();
         const WANT: &[&str] = &[
             ".ds[*|data-material=bar]{--m-tint:rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8));--m-tint-solid:rgba(248,249,246,.94);",
-            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:rgba(21,24,20,calc(.45*var(--m-tint-alpha,.8)/.8));",
+            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:rgba(21,24,20,calc(.65*var(--m-tint-alpha,.8)/.8));",
             ".ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;border-radius:var(--m-radius);box-shadow:none;}",
             ".ds[*|data-material][*|data-blur=off]{background:var(--m-tint-solid);}",
+            "--m-radius:0;border-radius:var(--m-radius);box-shadow:var(--m-edge);}",
+            "--m-radius:22px;border-radius:var(--m-radius);box-shadow:var(--m-edge),var(--m-shadow);}",
             ".ds[*|data-material][*|data-blur=on]{background:var(--m-tint);}",
         ];
         for want in WANT {

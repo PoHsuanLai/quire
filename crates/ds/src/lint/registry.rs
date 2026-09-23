@@ -1,250 +1,148 @@
-//! Two closed vocabularies the linter checks a stylesheet against, mirrored from the frozen
-//! token and motion enums' own doc comments rather than called through their `var()`/`class()`
-//! methods.
-//!
-//! Wave 1's tokens and motion crates fill in those methods in their own worktrees; at lint time
-//! `ColourToken::var()` and friends may still be `todo!()`. Calling them here would make every
-//! lint test that exercises a declared token panic on whichever agent merges last, which is
-//! exactly backwards for a coherence check meant to run standalone. The custom-property names
-//! and keyframe names are part of the frozen enums' documented shape already (each variant's
-//! doc comment names its `--*` property or its CSS keyframe name), so this list is a transcript
-//! of that frozen text, not a guess. `tests/self_lint.rs` (linting `ds::stylesheet()` against
-//! itself, `#[ignore]`d until `w1-tokens` merges) is the check that this transcript has not
-//! drifted from the real tables once tokens and motion are in.
+//! The two closed vocabularies the linter checks a stylesheet against, derived from the token
+//! and motion tables themselves: every custom property the tables emit, and every keyframes
+//! name an [`Anim`] plays. Nothing here is a hand list, so a token added to a table is known to
+//! the lint the moment it exists (the tests below check it against the generated stylesheet).
 
-/// Every custom property the design system's own token tables declare, `--` included.
-///
-/// Source: the doc comment on every variant of `ColourToken`, `DurationToken`, `EasingToken`,
-/// `Radius`, `Shadow`, `Family`, `FontSize`, `ZLayer`, `ScalarToken`, `DelayToken::Fly`,
-/// `LabelHue` x `HueMember`, `FrameVars`'s fields, and `MaterialRecipe`'s fields.
-pub const DECLARED_VARS: &[&str] = &[
-    // ColourToken (crate::tokens::colour)
-    "--paper",
-    "--surface",
-    "--surface-2",
-    "--raise",
-    "--ink",
-    "--ink-soft",
-    "--ink-faint",
-    "--line",
-    "--line-soft",
-    "--accent",
-    "--accent-ink",
-    "--accent-soft",
-    "--seal",
-    "--ok",
-    "--warn",
-    "--danger",
-    "--scrim",
-    "--foreign-ground",
-    "--ok-wash",
-    "--warn-wash",
-    "--danger-wash",
-    "--accent-ring",
-    "--danger-ink",
-    "--mark-ground",
-    // DurationToken (crate::tokens::timing)
-    "--t-tap",
-    "--t-quick",
-    "--t-move",
-    "--t-big",
-    "--t-ambient",
-    "--t-big-heavy",
-    "--t-spark",
-    "--t-curl",
-    "--t-curl-heavy",
-    "--t-send",
-    "--t-float",
-    "--t-hc-out",
-    "--t-scene",
-    "--t-shake",
-    "--t-park",
-    "--t-nudge",
-    "--t-shake-long",
-    "--t-sail",
-    "--t-boat-return",
-    "--t-spin",
-    "--t-send-ring",
-    // EasingToken (crate::tokens::easing)
-    "--e-out",
-    "--e-spring",
-    "--e-exit",
-    "--e-shake",
-    "--e-linear",
-    "--e-in-out",
-    // Radius (crate::tokens::shape)
-    "--r-panel",
-    "--r-card",
-    "--r-btn",
-    "--r-chip",
-    "--r-pill",
-    "--r-field",
-    "--r-menu",
-    "--r-item",
-    "--r-tile",
-    "--r-window",
-    "--r-menu-item",
-    "--r-bubble-button",
-    "--r-small",
-    "--r-kbd",
-    "--r-tiny",
-    "--r-micro",
-    "--r-media",
-    // Shadow (crate::tokens::elevation)
-    "--shadow-1",
-    "--shadow-2",
-    "--shadow-pop",
-    "--shadow-sheet",
-    "--shadow-drag",
-    "--shadow-bubble",
-    "--shadow-current",
-    "--shadow-pill-inset",
-    "--shadow-window",
-    "--shadow-card",
-    "--shadow-handle",
-    "--shadow-mark",
-    "--shadow-mark-tile",
-    // Family, FontSize (crate::tokens::type_scale)
-    "--font-display",
-    "--font-ui",
-    "--font-data",
-    "--fs-pico",
-    "--fs-nano",
-    "--fs-micro",
-    "--fs-caption",
-    "--fs-note",
-    "--fs-eyebrow",
-    "--fs-help",
-    "--fs-small",
-    "--fs-meta",
-    "--fs-control",
-    "--fs-body",
-    "--fs-reading",
-    "--fs-compose",
-    "--fs-base",
-    "--fs-subhead",
-    "--fs-title",
-    "--fs-heading-3",
-    "--fs-subject",
-    "--fs-heading",
-    "--fs-amount",
-    "--fs-day",
-    "--fs-display",
-    // ZLayer (crate::tokens::layer)
-    "--z-scene",
-    "--z-grain",
-    "--z-raise",
-    "--z-link-pill",
-    "--z-toast",
-    "--z-send-pill",
-    "--z-scrim",
-    "--z-peek",
-    "--z-focus-page",
-    "--z-edge",
-    "--z-side-peek",
-    "--z-palette",
-    "--z-card",
-    "--z-menu",
-    "--z-bubble",
-    "--z-drag",
-    // ScalarToken (crate::tokens::scalar)
-    "--overshoot",
-    "--squish",
-    "--lift",
-    "--tilt",
-    "--stagger",
-    // DelayToken::var() (crate::tokens::delay): only the delays the stylesheet also reads.
-    "--d-fly",
-    "--d-heal-step",
-    // LabelHue x HueMember (crate::tokens::label_hue): base, `-deep`, `-soft` per hue.
-    "--c-red",
-    "--c-red-deep",
-    "--c-red-soft",
-    "--c-amber",
-    "--c-amber-deep",
-    "--c-amber-soft",
-    "--c-green",
-    "--c-green-deep",
-    "--c-green-soft",
-    "--c-blue",
-    "--c-blue-deep",
-    "--c-blue-soft",
-    "--c-violet",
-    "--c-violet-deep",
-    "--c-violet-soft",
-    // FrameVars (crate::space::frame_vars): the `--f-*` variables a `.ds` root carries inline.
-    "--f-ink",
-    "--f-ink-soft",
-    "--f-ink-faint",
-    "--f-pill",
-    "--f-pill-hover",
-    "--f-line",
-    "--f-solid",
-    "--f-grad",
-    "--f-grain",
-    // MaterialRecipe (crate::material::recipe): the `--m-*` a material paints.
-    "--m-tint",
-    "--m-tint-solid",
-    "--m-edge",
-    "--m-shadow",
-    "--m-radius",
-];
+use std::collections::HashSet;
+use std::sync::LazyLock;
 
-/// Every `@keyframes` name [`crate::motion::Anim`] declares, plus each name's `X--b` restart
-/// alias (design/05-MOTION.md section 9 rule 2, spike S5).
-///
-/// Source: the doc comment on every `Anim` variant, which names its keyframes in backticks.
-/// `FoldHeavy` shares `fold`'s keyframes at a longer duration (`Anim` doc comment), so it is
-/// not a second name here.
-pub const ANIM_NAMES: &[&str] = &[
-    "seal-pop",
-    "gulp",
-    "pop-in",
-    "row-in",
-    "rise",
-    "star-pop",
-    "spark",
-    "chip-land",
-    "chip-in",
-    "fold",
-    "crumple",
-    "curl",
-    "heal",
-    "bump",
-    "tab-in",
-    "tab-out",
-    "slide-r",
-    "slide-l",
-    "menu-in",
-    "menu-pop",
-    "cmdk-in",
-    "peek-in",
-    "fade",
-    "hc-in",
-    "hc-out",
-    "page-in",
-    "park",
-    "shake-x",
-    "nudge",
-    "shake",
-    "compose-rise",
-    "compose-send",
-    "floatup",
-    "sail",
-    "boat-return",
-    "dest",
-    "breathe",
-    "spin",
-];
+use crate::appearance::{Accent, Scheme};
+use crate::css::accents_css::swatch_var;
+use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
+use crate::motion::Anim;
+use crate::space::{CardAccent, FrameVars, SpaceLook};
+use crate::tokens::{
+    ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
+    Radius, ScalarToken, Shadow, VarName, ZLayer,
+};
 
-/// Whether `name` (an `animation-name` value, without the `--b` suffix considered separately)
-/// is a keyframes name the design system exports.
+/// Every custom property the design system declares, `--` included: the token table's
+/// (colours, label hues, durations, the CSS delays, easings, scalars, radii, shadows, faces,
+/// sizes, layers), the accent swatches, the frame's `--f-*` a root writes inline, and the
+/// material's `--m-*` with the tint-alpha key.
+pub fn declared_vars() -> &'static HashSet<String> {
+    static VARS: LazyLock<HashSet<String>> = LazyLock::new(collect);
+    &VARS
+}
+
+fn collect() -> HashSet<String> {
+    let tables: Vec<VarName> = ColourToken::ALL
+        .map(ColourToken::var)
+        .into_iter()
+        .chain(DurationToken::ALL.map(DurationToken::var))
+        .chain(DelayToken::ALL.into_iter().filter_map(DelayToken::var))
+        .chain(EasingToken::ALL.map(EasingToken::var))
+        .chain(ScalarToken::ALL.map(ScalarToken::var))
+        .chain(Radius::ALL.map(Radius::var))
+        .chain(Shadow::ALL.map(Shadow::var))
+        .chain(FontSize::ALL.map(FontSize::var))
+        .chain(ZLayer::ALL.map(ZLayer::var))
+        .chain([Family::Display, Family::Ui, Family::Data].map(Family::var))
+        .chain(MATERIAL_VARS)
+        .chain([TINT_ALPHA])
+        .collect();
+    let hues = LabelHue::ALL
+        .into_iter()
+        .flat_map(|hue| HueMember::ALL.map(|member| hue.var(member)));
+    let swatches = Accent::ALL.into_iter().map(swatch_var);
+    // Ask the frame for its names rather than restating them; a Space that lends its hue
+    // writes the most.
+    let look = SpaceLook {
+        card_accent: CardAccent::SpaceHue,
+        ..SpaceLook::default()
+    };
+    let frame = FrameVars::of(&look, Scheme::Light)
+        .names()
+        .into_iter()
+        .map(str::to_owned);
+    tables
+        .into_iter()
+        .map(|name| name.as_str().to_owned())
+        .chain(hues)
+        .chain(swatches)
+        .chain(frame)
+        .collect()
+}
+
+/// Whether `name` (an `animation-name` value, its `X--b` restart alias included) is a
+/// keyframes name some [`Anim`] plays (design/05-MOTION.md section 9 rule 2, spike S5).
 pub fn is_known_anim(name: &str) -> bool {
     if name.eq_ignore_ascii_case("none") {
         return true;
     }
     let base = name.strip_suffix("--b").unwrap_or(name);
-    ANIM_NAMES
+    Anim::ALL
         .iter()
-        .any(|known| known.eq_ignore_ascii_case(base))
+        .any(|anim| anim.recipe().keyframes.eq_ignore_ascii_case(base))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{declared_vars, is_known_anim};
+    use crate::lint::{tokenize, walk};
+
+    /// Every custom property the generated stylesheet declares on a `.ds` root block (the token,
+    /// accent and material sections), asked of the stylesheet itself.
+    fn root_declarations() -> Vec<String> {
+        let (rules, _) = walk::walk(&tokenize::tokens(crate::stylesheet()));
+        rules
+            .into_iter()
+            .filter(|rule| {
+                rule.selector
+                    .strip_prefix(".ds")
+                    .is_some_and(|rest| rest.is_empty() || rest.starts_with('['))
+            })
+            .flat_map(|rule| rule.declarations)
+            .map(|decl| decl.property.text)
+            .filter(|name| name.starts_with("--"))
+            .collect()
+    }
+
+    #[test]
+    fn every_root_declaration_is_registered() {
+        let missing: Vec<String> = root_declarations()
+            .into_iter()
+            .filter(|name| !declared_vars().contains(name))
+            .collect();
+        assert!(
+            missing.is_empty(),
+            "declared but not registered: {missing:?}"
+        );
+    }
+
+    #[test]
+    fn the_tables_reach_the_registry() {
+        const CASES: &[&str] = &[
+            "--paper",
+            "--handle-ring",
+            "--t-flash",
+            "--d-heal",
+            "--d-fly",
+            "--c-violet-soft",
+            "--swatch-postmark",
+            "--f-grad",
+            "--m-tint",
+            "--m-tint-alpha",
+            "--font-data",
+        ];
+        for name in CASES {
+            assert!(declared_vars().contains(*name), "{name}");
+        }
+        assert!(!declared_vars().contains("--d-heal-step"));
+    }
+
+    #[test]
+    fn an_anim_and_its_alias_are_known() {
+        const CASES: &[(&str, bool)] = &[
+            ("gulp", true),
+            ("gulp--b", true),
+            ("chip-flash", true),
+            ("none", true),
+            ("wobble", false),
+            ("gulp--c", false),
+        ];
+        for (name, want) in CASES {
+            assert_eq!(is_known_anim(name), *want, "{name}");
+        }
+    }
 }

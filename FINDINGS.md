@@ -374,3 +374,54 @@ not re-litigate them.
 - Contracts consumers must follow: the root or `Surface` always writes `data-theme` (a nested
   `.ds` without one resets to light); `--m-tint-alpha` is written inline by the root from the
   settings key (default .8); `--d-heal` is the heal step; `--swatch-<accent>` feeds the picker.
+
+## W1 integration (2026-09-24)
+
+The five wave-1 branches merged; the amendments the fillers reported are applied. Recorded here:
+what changed beyond the brief's list, and what the tests had missed.
+
+- Material legibility: the four short translucent tints are raised in .02 steps to the first
+  value that holds the card's ink at 4.5:1 over pure black and white: dark Bar .58 to .66, dark
+  Dock .50 to .66, light Widget .50 to .54, dark Widget .45 to .65 (design/03-COLOR.md §17.2,
+  still proposed). `tests/legibility.rs` is now a gate over every material, not a pin of the
+  shortfall.
+- `--t-flash` (1200 ms) follows the Reduced rule like every duration token (05-MOTION §3.2:
+  60 ms), so under Reduced the mentioned-person ring shows for 60 ms. A hold is not motion;
+  whether holds should be exempt is an open design question. `DelayToken::FlashHold` stays for a
+  consumer that times the flash in Rust.
+- The Person chip's `animation:chip-in` rule would have outranked the pulse class (equal
+  specificity, components come after motion in the cascade), so the flash would never have
+  played. The entry is now `.ds-chip[*|data-variant=person]:not(.a-chip-flash)`.
+- `Count` keeps its last value in a plain cell rather than a `use_memo`/`use_pulse` signal pair:
+  the bump is decided during render, and writing a signal there schedules a second render. The
+  O-8 suppression across a Space switch is now "key the count by Space" (design/04 §14, O-8);
+  the doc's `Motion::Quiet` hint had no type behind it.
+- `Offence` gained `selector` (what an `Exception` matches); `lint::stylesheet` and
+  `lint::markup` return only what no exception covers; `assert_clean` prints per-exception
+  counts. `data-hover` joined the root attributes the lint calls `DsInternals`.
+- The lint registry was a hand list and had drifted: it listed `--d-heal-step` (the table emits
+  `--d-heal`) and lacked `--t-crumple-heavy`, every `--swatch-*`, `--m-tint-alpha`,
+  `--handle-ring` and `--t-flash`; `ANIM_NAMES` was complete but would not have learnt `chip-flash`. Both are now
+  derived from the tables, with a test that every custom property a `.ds` block declares is
+  registered. Why the tests missed it: `self_lint` was ignored and no test compared the list with
+  the stylesheet.
+- Lint false positives the self-lint found once it ran, each fixed in the lint with a case in
+  `tests/lint_rules.rs`: `font-family: var(--font-ui)` fired `FontFamily` (the passing case only
+  tested an absent font-family); `transparent` fired `NamedColour`; a custom property named
+  `--m-radius` fired `RawRadius` (its name ends in `-radius`) and so did a square corner `0`.
+- Materials paint `box-shadow:var(--m-edge),var(--m-shadow)` (only the layers that are not
+  `none`) instead of repeating the literals, so the colours live only in the `--m-*` tokens.
+- Two stale golden checks: `tests/tokens.rs` did not know the component-inline `--f`, `--av-bg`,
+  `--av-fg` (it ran before any component CSS existed), and the stylesheet golden predated the
+  component sheets. Its re-bless differs from master in the component sections and in exactly
+  the amendments above (tokens, materials, `chip-flash`, `.ds-ic`).
+- `lint_rules` and `self_lint` now declare `required-features = ["lint"]`: ORCHESTRATION's plain
+  `cargo test --workspace` could not compile them. The `ds::lint` doc example runs instead of
+  being ignored.
+- New gate: every control golden's markup lints clean against `ds::stylesheet()`
+  (`tests/self_lint.rs`), with one exception: the avatar's computed colours and its `#fff`
+  letter are inline hexes (O-7, O-3). A consumer rendering `Avatar` hits the same offence and
+  needs the same exception until the letter gets a token and the hue a non-hex channel.
+- Contract gap, not fixed: `Ds` does not yet write `--m-tint-alpha` inline (the W1 tokens note
+  says the root does); the stylesheet's `var(--m-tint-alpha,.8)` fallback keeps the default
+  correct, but `appearance.material_tint_alpha` has no effect until a later wave passes it.

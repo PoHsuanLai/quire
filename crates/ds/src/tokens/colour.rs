@@ -81,11 +81,14 @@ pub enum ColourToken {
     DangerInk,
     /// `--mark-ground`: the white chip under a provider mark (O-3).
     MarkGround,
+    /// `--handle-ring`: the slider thumb's border (design/04-COMPONENTS.md section 5 and O-3;
+    /// proposed: a quarter-strength ink ring in either scheme).
+    HandleRing,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 24] = [
+    pub const ALL: [ColourToken; 25] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -110,6 +113,7 @@ impl ColourToken {
         ColourToken::AccentRing,
         ColourToken::DangerInk,
         ColourToken::MarkGround,
+        ColourToken::HandleRing,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -139,6 +143,7 @@ impl ColourToken {
             ColourToken::AccentRing => "--accent-ring",
             ColourToken::DangerInk => "--danger-ink",
             ColourToken::MarkGround => "--mark-ground",
+            ColourToken::HandleRing => "--handle-ring",
         })
     }
 
@@ -188,6 +193,8 @@ impl ColourToken {
             // `S:552`).
             ColourToken::DangerInk => (WHITE, WHITE),
             ColourToken::MarkGround => (WHITE, WHITE),
+            // Proposed (O-3): black at .25 on light, white at .25 on dark.
+            ColourToken::HandleRing => (alpha(0x000000, 250), alpha(0xFFFFFF, 250)),
             ColourToken::Accent
             | ColourToken::AccentInk
             | ColourToken::AccentSoft

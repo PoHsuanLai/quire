@@ -6,15 +6,13 @@
 //! practice `ds::stylesheet()` and the consumer's own component CSS concatenated, the same way
 //! a consumer's own compiled stylesheet already is (mirroring how `mail-app`'s
 //! `a_class_with_no_rule_is_named` test passed its whole `STYLE` constant, tokens and
-//! components together, to `unstyled_classes`). `markup` does not read `crate::css::stylesheet`
-//! itself: at wave 1, before the tokens crate lands its bodies, that function is `todo!()`, and
-//! a lint helper that panics whenever it is asked to check markup would defeat the point of a
-//! coherence check every consumer runs standalone.
+//! components together, to `unstyled_classes`). `markup` does not add `crate::stylesheet()`
+//! itself, so a page that forgets to inject quire's sheet is caught too.
 //!
-//! There is no `Rule` variant for "this class has no rule" or "this `<svg>` did not come from
-//! `Glyph`" (the frozen `Rule` enum has one for every *stylesheet* shape, not for a markup
-//! shape); both are reported as [`Rule::DsInternals`] with the real finding spelled out in the
-//! offence's `text`, and CONVENTIONS' "stop and report" applies — see the worktree's report.
+//! A class no rule styles is [`Rule::UnstyledClass`]; an element quire draws for you written by
+//! hand (an `<svg>` that is not a `Glyph`, a form control with no `ds-` class) is
+//! [`Rule::RawMarkup`]; inline colours and durations are the stylesheet rules. Each offence's
+//! selector is the element as `tag.class.class`, which is what an [`super::Exception`] names.
 
 use std::collections::HashSet;
 
@@ -24,8 +22,17 @@ use super::kind;
 use super::rule::{LintConfig, Offence, Rule};
 use super::tokenize::{self, Located};
 
-/// Every offence in `html`, given the consumer's own stylesheet.
+/// Form controls quire's components render; one without a `ds-` class was written by hand.
+const CONTROLS: &[&str] = &["button", "input", "select", "textarea"];
+
+/// Every offence in `html`, given the consumer's own stylesheet, that none of
+/// `config.exceptions` covers.
 pub fn markup(html: &str, consumer_css: &str, config: &LintConfig) -> Vec<Offence> {
+    config.partition(every_offence(html, consumer_css)).0
+}
+
+/// Every offence in `html`, exceptions not applied.
+fn every_offence(html: &str, consumer_css: &str) -> Vec<Offence> {
     let defined = defined_classes(consumer_css);
     let mut offences = Vec::new();
     let mut cursor = 0usize;
@@ -35,45 +42,39 @@ pub fn markup(html: &str, consumer_css: &str, config: &LintConfig) -> Vec<Offenc
         };
         let tag = &html[start..end];
         let (line, column) = line_col_at(html, start);
-        check_tag(tag, line, column, &defined, config, &mut offences);
+        check_tag(tag, line, column, &defined, &mut offences);
         cursor = end;
     }
     offences
 }
 
-fn check_tag(
-    tag: &str,
-    line: u32,
-    column: u32,
-    defined: &HashSet<String>,
-    _config: &LintConfig,
-    out: &mut Vec<Offence>,
-) {
+fn check_tag(tag: &str, line: u32, column: u32, defined: &HashSet<String>, out: &mut Vec<Offence>) {
     let name = tag_name(tag);
-    if let Some((class_value, _)) = attr_value(tag, "class") {
-        for class in class_value.split_whitespace() {
-            if !defined.contains(class) {
-                out.push(Offence {
-                    rule: Rule::DsInternals,
-                    line,
-                    column,
-                    text: format!("<{name}>: class not defined by any rule: {class}"),
-                });
-            }
-        }
+    let classes: Vec<&str> = attr_value(tag, "class")
+        .map(|(value, _)| value.split_whitespace().collect())
+        .unwrap_or_default();
+    let selector: String = std::iter::once(name.to_ascii_lowercase())
+        .chain(classes.iter().map(|class| format!(".{class}")))
+        .collect();
+    let mut push = |rule: Rule, line: u32, column: u32, text: String| {
+        out.push(Offence {
+            rule,
+            selector: selector.clone(),
+            line,
+            column,
+            text,
+        });
+    };
+    for class in classes.iter().filter(|class| !defined.contains(**class)) {
+        push(
+            Rule::UnstyledClass,
+            line,
+            column,
+            format!("<{name}>: class not defined by any rule: {class}"),
+        );
     }
-    if name.eq_ignore_ascii_case("svg") {
-        let is_icon = attr_value(tag, "class")
-            .is_some_and(|(value, _)| value.split_whitespace().any(|class| class == "ds-ic"));
-        if !is_icon {
-            out.push(Offence {
-                rule: Rule::DsInternals,
-                line,
-                column,
-                text: "raw <svg>, not .ds-ic: use Glyph instead of writing SVG markup directly"
-                    .to_owned(),
-            });
-        }
+    if let Some(what) = raw_element(name, &classes) {
+        push(Rule::RawMarkup, line, column, format!("<{name}>: {what}"));
     }
     if let Some((style_value, value_offset)) = attr_value(tag, "style") {
         let (local_line, local_column) = line_col_at(tag, value_offset);
@@ -82,11 +83,28 @@ fn check_tag(
         } else {
             (line + local_line - 1, local_column)
         };
-        style_offences(style_value, style_line, style_column, out);
+        for (rule, line, column, text) in style_offences(style_value, style_line, style_column) {
+            push(rule, line, column, text);
+        }
     }
 }
 
-fn style_offences(value: &str, base_line: u32, base_column: u32, out: &mut Vec<Offence>) {
+/// Why `name` with `classes` is hand-written markup quire should have drawn, if it is.
+fn raw_element(name: &str, classes: &[&str]) -> Option<&'static str> {
+    if name.eq_ignore_ascii_case("svg") {
+        return (!classes.contains(&"ds-ic"))
+            .then_some("raw svg, not .ds-ic: use Glyph instead of writing SVG markup directly");
+    }
+    let control = CONTROLS
+        .iter()
+        .any(|control| name.eq_ignore_ascii_case(control));
+    let from_quire = classes.iter().any(|class| class.starts_with("ds-"));
+    (control && !from_quire).then_some("a raw form control: use the quire component that draws it")
+}
+
+/// Inline colours and durations in a `style` attribute, as `(rule, line, column, text)`.
+fn style_offences(value: &str, base_line: u32, base_column: u32) -> Vec<(Rule, u32, u32, String)> {
+    let mut out = Vec::new();
     let tokens: Vec<Located> = tokenize::tokens(value)
         .into_iter()
         .filter(|token| !kind::is_trivial(&token.text))
@@ -112,14 +130,10 @@ fn style_offences(value: &str, base_line: u32, base_column: u32, out: &mut Vec<O
             })
         };
         if let Some(rule) = rule {
-            out.push(Offence {
-                rule,
-                line,
-                column,
-                text: format!("style=\"...\": {}", token.text),
-            });
+            out.push((rule, line, column, format!("style=\"...\": {}", token.text)));
         }
     }
+    out
 }
 
 /// Every class a `.` selector in `css` names, anywhere (as generous as mailo's own

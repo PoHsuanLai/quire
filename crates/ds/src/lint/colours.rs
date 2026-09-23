@@ -5,8 +5,9 @@
 //! longer identifier: a class like `.red-dot` tokenizes as `Delim('.')` + `Ident("red-dot")`,
 //! and `"red-dot"` is not in this list).
 
-/// CSS Color Module Level 4's extended colour keywords, `transparent`, and the CSS system
-/// colour keywords. Lower-case; callers compare case-insensitively.
+/// CSS Color Module Level 4's extended colour keywords and the CSS system colour keywords.
+/// Lower-case; callers compare case-insensitively. `transparent` is not here: it is the absence
+/// of paint, not a colour the palette could own, and the component sheets clear grounds with it.
 pub const NAMED_COLOURS: &[&str] = &[
     "aliceblue",
     "antiquewhite",
@@ -156,7 +157,6 @@ pub const NAMED_COLOURS: &[&str] = &[
     "whitesmoke",
     "yellow",
     "yellowgreen",
-    "transparent",
     // CSS system colours (https://drafts.csswg.org/css-color-4/#css-system-colors).
     "canvas",
     "canvastext",

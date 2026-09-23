@@ -1,5 +1,7 @@
 //! Each material's tint, edge, shadow and radius per scheme: the `--m-*` tokens
-//! (design/03-COLOR.md section 17.2, every value proposed, tuned in the gallery).
+//! (design/03-COLOR.md section 17.2, every value proposed, tuned in the gallery). Four
+//! translucent alphas were raised in the smallest .02 steps that hold the card's ink at 4.5:1
+//! over a pure black or white backdrop (`tests/legibility.rs`).
 //!
 //! The tint alpha over blur is a settings key (`appearance.material_tint_alpha`, default 80),
 //! so the recipe takes it rather than hard-coding `.80`. Section 17.2 gives each material its
@@ -70,9 +72,11 @@ pub(crate) fn tint(material: Material, scheme: Scheme) -> Option<(Hex, Alpha)> {
     let (hex, alpha) = match material {
         Material::Window => return None,
         Material::Bar if light => (SURFACE, 700),
-        Material::Bar => (PAPER_DARK, 580),
+        // Raised from .58 so the dark ink holds 4.5:1 over a white backdrop (wave 1).
+        Material::Bar => (PAPER_DARK, 660),
         Material::Dock if light => (SURFACE, 550),
-        Material::Dock => (PAPER_DARK, 500),
+        // Raised from .50, as the dark bar (wave 1).
+        Material::Dock => (PAPER_DARK, 660),
         Material::Popover if light => (WHITE, 780),
         Material::Popover => (RAISE_DARK, 780),
         Material::Sheet if light => (SURFACE, 820),
@@ -82,8 +86,9 @@ pub(crate) fn tint(material: Material, scheme: Scheme) -> Option<(Hex, Alpha)> {
         Material::Osd if light => (SURFACE, 720),
         Material::Osd => (PAPER_DARK, 660),
         // The widget adds grain over its tint; the grain is the component's, not the recipe's.
-        Material::Widget if light => (SURFACE, 500),
-        Material::Widget => (PAPER_DARK, 450),
+        // Raised from .50 (light, over black) and .45 (dark, over white) for 4.5:1 (wave 1).
+        Material::Widget if light => (SURFACE, 540),
+        Material::Widget => (PAPER_DARK, 650),
     };
     Some((hex, Alpha(alpha)))
 }
@@ -149,14 +154,14 @@ mod tests {
         #[rustfmt::skip]
         const CASES: &[(Material, Scheme, &str, &str, &str)] = &[
             (Material::Bar, Scheme::Light, "rgba(248,249,246,.7)", "rgba(248,249,246,.94)", "0"),
-            (Material::Bar, Scheme::Dark, "rgba(21,24,20,.58)", "rgba(21,24,20,.94)", "0"),
+            (Material::Bar, Scheme::Dark, "rgba(21,24,20,.66)", "rgba(21,24,20,.94)", "0"),
             (Material::Dock, Scheme::Light, "rgba(248,249,246,.55)", "rgba(248,249,246,.94)", "22px"),
             (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "14px"),
             (Material::Popover, Scheme::Dark, "rgba(42,47,40,.78)", "rgba(42,47,40,.94)", "14px"),
             (Material::Sheet, Scheme::Light, "rgba(248,249,246,.82)", "rgba(248,249,246,.94)", "18px"),
             (Material::Toast, Scheme::Dark, "rgba(21,24,20,.74)", "rgba(21,24,20,.94)", "16px"),
             (Material::Osd, Scheme::Light, "rgba(248,249,246,.72)", "rgba(248,249,246,.94)", "18px"),
-            (Material::Widget, Scheme::Dark, "rgba(21,24,20,.45)", "rgba(21,24,20,.94)", "20px"),
+            (Material::Widget, Scheme::Dark, "rgba(21,24,20,.65)", "rgba(21,24,20,.94)", "20px"),
             (Material::Window, Scheme::Light, "var(--f-grad)", "var(--f-grad)", "0"),
         ];
         for &(material, scheme, tint, solid, radius) in CASES {
