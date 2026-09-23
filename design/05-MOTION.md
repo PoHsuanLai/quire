@@ -295,7 +295,7 @@ Source S:393. `Anim::ComposeSend`. Live in S (`.cpage.sending`, S:572) and C (`.
 
 #### 4.2.12 `peek-in`
 
-Source S:226. `Anim::PeekIn`. Live in S (peek, command menu) and C (centre/full peek). C:1052-1053 is gentler: `0%{ opacity:0; transform:scale(.97) translateY(10px); } 100%{ opacity:1; transform:scale(1) translateY(0); }`. S wins.
+Source S:226. `Anim::PeekIn`. Live in S (peek, command menu) and C (centre/full peek); C's full peek plays it at `--t-move --e-out` as `Anim::PeekFullIn` (section 5 row 64, W2 integration). C:1052-1053 is gentler: `0%{ opacity:0; transform:scale(.97) translateY(10px); } 100%{ opacity:1; transform:scale(1) translateY(0); }`. S wins.
 
 ```css
 @keyframes peek-in{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
@@ -321,7 +321,7 @@ Source S:105. `Anim::SlideL`. Live: Space switch backward (S:103).
 
 #### 4.3.3 `fade`
 
-Source S:227. `Anim::Fade`. Live: scrim (S:222), command-menu backdrop (S:231). C has no `fade`; it has `fade-in` to .16 (section 4.3).
+Source S:227. `Anim::Fade`. Live: scrim (S:222), command-menu backdrop (S:231, at `--t-quick` as `Anim::PaletteFade`, W2 integration). C has no `fade`; it has `fade-in` to .16 (section 4.3).
 
 ```css
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
@@ -353,7 +353,7 @@ Source S:352. `Anim::TabIn`. Live: Today entry opens (S:350). Animates `max-heig
 
 #### 4.3.7 `tab-out`
 
-Source S:353. `Anim::TabOut`. Live: Today entry closes (S:351). Animates `max-height` and `padding-block`; see section 9.
+Source S:353. `Anim::TabOut`. Live: Today entry closes (S:351), `Presence::Leaving(Exit::TabOut)` (W2 integration). Animates `max-height` and `padding-block`; see section 9.
 
 ```css
 @keyframes tab-out{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
@@ -361,7 +361,7 @@ Source S:353. `Anim::TabOut`. Live: Today entry closes (S:351). Animates `max-he
 
 #### 4.3.8 `hc-in`
 
-Source S:403. `Anim::HcIn`. Live: hover card (S:401), link pill (S:433).
+Source S:403. `Anim::HcIn`. Live: hover card (S:401), link pill (S:433, at `--t-quick --e-out` as `Anim::LinkPillIn`, W2 integration).
 
 ```css
 @keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
@@ -417,7 +417,7 @@ Source S:598. `Anim::ChipIn`. Live: person chip (S:593).
 
 #### 4.3.15 `menu-pop`
 
-Source S:667. `Anim::MenuPop`. Live: every floating menu (S:666), selection bubble (S:684).
+Source S:667. `Anim::MenuPop`. Live: every floating menu (S:666), selection bubble (S:684, at `--t-quick` as `Anim::BubblePop`, W2 integration).
 
 ```css
 @keyframes menu-pop{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
@@ -946,7 +946,9 @@ Source C:739-743. Look-scoped: Riso's archive exit (C:738).
    `--e-out`, `--lift` 0px, HealStep 0, hover-intent delays unchanged (they measure intent, not
    motion).
 3. **Unread snooze runs faster than read snooze** (section 8). Proposed: `--t-curl-heavy` =
-   560 x 1.15 = 644 ms, so the unread rule means what principle 6 says.
+   560 x 1.15 = 644 ms, so the unread rule means what principle 6 says. Implemented (FINDINGS "W2
+   integration", heavy exits): the roster settles `CurlHeavy` and `CrumpleHeavy` for an unread
+   row and the row stylesheet plays them; the 644 ms value stays proposed.
 4. **Loops.** `dest` (S:447), `breathe`/`spin` (C:288-291) and the dock's critical bounce
    (section 10) contradict "nothing loops". Proposed: keep `dest` (it lasts only while the
    pointer is on the button), keep `spin` only while a sync runs (mailo already says so), drop

@@ -425,3 +425,75 @@ what changed beyond the brief's list, and what the tests had missed.
 - Contract gap, not fixed: `Ds` does not yet write `--m-tint-alpha` inline (the W1 tokens note
   says the root does); the stylesheet's `var(--m-tint-alpha,.8)` fallback keeps the default
   correct, but `appearance.material_tint_alpha` has no effect until a later wave passes it.
+
+## W2 integration (2026-09-24)
+
+The four wave-2 branches merged; the amendments the fillers reported are applied. What changed,
+and what the tests had missed.
+
+- Merged tree: the stylesheet golden already matched `ds::stylesheet()` (the schema branch
+  re-blessed last), so its re-bless on the merged tree was empty. Eleven list and overlay goldens
+  differed, every one only by `--av-fg:#fff` becoming `--av-fg:var(--on-hue)` (the schema
+  branch's `--on-hue`, rendered by components the other two branches blessed before it existed).
+- Spinner: `.ds-spinner[data-kind=spin]` set `transform:scale(1)`, and `spin` is
+  `to{ transform:rotate(360deg) }`. The two lists differ in function, so they interpolate as
+  matrices, and both are the identity: the ring never turned. The spinning ring now has
+  `transform:none`, which interpolates as `rotate(0)` to `rotate(360deg)`.
+  `ds-native/tests/snapshot.rs::the_spinner_turns` renders it 275 ms apart and fails on the old
+  rule. Why the tests missed it: the only moving snapshot showed the *breathing* ring, whose
+  motion is opacity.
+- Four `Anim`s for section 5 rows that play a catalogue keyframe at their own recipe:
+  `PaletteFade` (`fade --t-quick --e-out`, row 7), `LinkPillIn` (`hc-in --t-quick --e-out`, row
+  26), `BubblePop` (`menu-pop --t-quick --e-spring`, row 37), `PeekFullIn` (`peek-in --t-move
+  --e-out`, row 64). The palette wrap, link pill, bubble and Full peek had borrowed a
+  neighbour's recipe to satisfy `motion_drift`; they now play their own, the bubble and Full
+  peek settle on theirs, and the settle table pins all four. No duration token was missing. The
+  recipe table moved to `motion/recipe.rs` so `anim.rs` stays under 400 lines.
+- Heavy exits: `exit_anim` gave only `Fold` a heavy variant, so an unread snooze or trash
+  settled light while `Anim::{CurlHeavy, CrumpleHeavy}` went unused, and `list_row.css`
+  followed the roster. Both now play the heavy variant of every row exit. `motion_machines`
+  pinned the old mapping (a test that encoded the gap); it now pins the heavy one, and
+  `components_lists::the_row_stylesheet_plays_what_the_roster_settles` reads the rule each
+  leaving row matches and compares it with the recipe `RosterState::leave` returns, so the two
+  cannot drift again. 05-MOTION open decision 3 is implemented; its 644 ms stays proposed.
+- `Exit::TabOut`: a Today entry leaves as `Presence::Leaving(Exit::TabOut)`, and the roster
+  settles `Anim::TabOut` for it (no heavy variant). `Exit::slug` is public and replaced the row's
+  private copy.
+- `TextInput{focus: Focus::OnMount}` (default `Manual`) calls `set_focus` from `onmounted` and
+  writes `autofocus` for a webview; `SearchField` passes it through. The palette input and the
+  bubble's link field use it (06-INTERACTIONS section 17). The harness case types one key with
+  no click and sees it land only in the `OnMount` field.
+- `DropState{Idle, Target, Source}` on `ListRow` and `SidebarItem` writes `data-drop=target` or
+  `data-drag=source`. `drag_ghost.css` described a `.35` source rule that no stylesheet had;
+  it is in `list_row.css` and `sidebar_item.css` now, with the section 34 drop-target look on
+  rows as well as sidebar items. Why it was missed: no golden rendered a dragged source.
+- `BubbleAction` is an enum, `Button(BubbleButton)` or `Separator`, so `ds-bubble-sep` renders.
+  `AccountFace::One` gained `address: Option<String>`, which is the tile's `aria-label` when
+  given (section 27); the face is no longer `Copy`. `SpaceEditor` gained `name` (the title reads
+  "{name} Space") and `on_active_dot: Option<EventHandler<ActiveDot>>` (`ActiveDot` is
+  `DotIndex`), reported by every pick, add, remove and preset through one `Picker` rather than a
+  signal and prop threaded to each part; a harness case clicks the second stop and sees it
+  reported. `SideState::slug` is public, tested against the edge strip's selectors. These are
+  breaking for any caller built against the wave-2 signatures (`BubbleAction`, `AccountFace`).
+- `Ds{tint_alpha: Option<Alpha>}` replaces the root `Signal<Alpha>` context the overlays branch
+  introduced; `ds_settings::Environment::tint_alpha` turns `appearance.material_tint_alpha`
+  (percent) into thousandths, with a compiled example of the wiring on that method. This closes
+  the W1 integration "contract gap": the settings key now reaches the root.
+- Rect reads could panic on dioxus-native with "RefCell already borrowed". dioxus-core polls a
+  task inside `render_immediate` when it woke in the same turn as a dirty scope, and
+  dioxus-native-dom's writer holds the document mutably there; its `get_client_rect` borrows
+  the document mutably too. The hover-card harness case hit it every run (the card's own rect
+  read wakes as the hub's 450 ms timer dirties the card). The same `poll` path drives a real
+  window (blitz-shell `window.rs`), so this was not a harness artefact. ds now reads every rect
+  through `geometry::measure::client_rect`, which asks the host's `HostMeasure` first; ds-native
+  provides one (in `Host` and in the headless document) that reads through
+  `NodeHandle::try_doc` and answers `Measured::Busy`, and the reader waits a frame. Worth
+  reporting upstream: `get_client_rect` needs only a shared borrow.
+- The four plan harness cases run un-ignored. Their selectors were already the real class
+  names; the row case advanced 900 ms, past the heal as well as the fold (454 + 284 ms at
+  Standard), and now looks at 500 ms. The only `#[ignore]` left is the live portal test.
+- `FrameVars::names` is used only by the lint registry, so `cargo test -p ds-native` (which
+  builds `ds` without `lint`) warned; it is compiled only with the feature.
+- 04-COMPONENTS: the prop signatures of the amended components are updated in place. No open
+  decision is settled outright; O-15 is marked partly settled (focus on mount exists; Peek and
+  Sheet still neither move nor trap focus).
