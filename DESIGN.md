@@ -48,15 +48,15 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 
 | Module | Implements |
 | --- | --- |
-| `motion/anim.rs` | 05-MOTION §4, §5 (the recipe per assignment): 42 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy` and quire's `ChipFlash` (04-COMPONENTS §10) |
+| `motion/anim.rs`, `motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 46 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
 | `motion/settle.rs`, `time.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
 | `motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
 | `motion/pulse.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
-| `motion/presence.rs`, `roster.rs`, `use_roster.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states |
+| `motion/presence.rs`, `roster.rs`, `use_roster.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Exit::{Fold, Curl, Crumple, TabOut}`; an unread (`Emphasis::Strong`) row plays each row exit's heavy variant |
 | `motion/hover_intent.rs` | 06-INTERACTIONS §3 |
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 (incl. §4.4 `PopoverRequest`) |
-| `geometry/measure.rs` | spike S9 (two-phase `use_rect`) |
+| `geometry/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds; FINDINGS "W2 integration") |
 | `overlay/host.rs`, `stack.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
 | `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 |
@@ -78,6 +78,18 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 `provider_mark` §28, `link_pill` §29, `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35.
 
+`space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
+`SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),
+`space_editor/field.rs` (the hue x chroma plane, built once per scheme, and the mapping
+between a dot and its place on it, O-19), `space_editor/png.rs` (the PNG encoder it uses) and `space_editor/parts.rs` (stops, grain, presets, contrast checks).
+
+Props added at the wave 2 integration (FINDINGS "W2 integration"): `TextInput` and
+`SearchField` `focus: Focus{OnMount, Manual}`; `ListRow` and `SidebarItem` `drop:
+DropState{Idle, Target, Source}` (`vocab.rs`, §34); `BubbleAction::{Button(BubbleButton),
+Separator}`; `AccountFace::One{address}`; `SpaceEditor` `name` and `on_active_dot:
+EventHandler<ActiveDot>`; `SideState::slug`; `Ds` `tint_alpha: Option<Alpha>`, fed by
+`ds_settings::Environment::tint_alpha`.
+
 ## Other crates
 
 | Crate / module | Implements |
@@ -85,8 +97,8 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `ds-settings/src/{file,dirs}.rs` | 22-SETTINGS §2 (TOML, atomic write, one-time mailo JSON import); moved from mailo `appearance.rs` with its tests |
 | `ds-settings/src/{settings,units,lenient}.rs` | 22-SETTINGS §3.1-3.3, §4 (`AppearanceFile`, `AppearanceSettings`, `IconsSettings`, the unit newtypes, lenient read) |
 | `ds-settings/src/watch.rs` | 22-SETTINGS §2 "Live reload", §6.3 |
-| `ds-settings/src/{portal,environment,dbus}.rs` | the plan's `ds-settings` design (portal, `use_environment`, `org.quire.Appearance1` stub) |
-| `ds-native` | the plan's `ds-native` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality) |
+| `ds-settings/src/{portal,environment,dbus}.rs` | the plan's `ds-settings` design (portal, `use_environment`, `org.quire.Appearance1` stub); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
+| `ds-native` | the plan's `ds-native` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `measure.rs` is the `HostMeasure` the host root and the harness provide |
 | `ds-gallery` | the plan's gallery (axes, pages, `--snapshot`) |
 
 The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`, `Settings`,

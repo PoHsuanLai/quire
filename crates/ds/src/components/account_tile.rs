@@ -11,7 +11,7 @@ use crate::tokens::{Colour, Hex};
 use dioxus::prelude::*;
 
 /// Whose tile.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AccountFace {
     /// Every account: the inbox glyph.
     All,
@@ -23,6 +23,9 @@ pub enum AccountFace {
         colour: Colour,
         /// Its provider's mark.
         provider: Provider,
+        /// Its address, which names the tile to assistive technology (`S:1236`); without one
+        /// the tile is named by its letter and provider.
+        address: Option<String>,
     },
 }
 
@@ -91,14 +94,20 @@ fn encode(channel: f64) -> f64 {
     }
 }
 
-/// The tile's `aria-label`. The face carries no address, so a single account is named by its
-/// letter and provider. TODO(O-16 / section 27): the doc labels the tile with the account's
-/// address (`S:1236`), which `AccountFace` does not hold.
-fn label(account: AccountFace) -> String {
+/// The tile's `aria-label`: the account's address (`S:1236`), or, when the consumer gave none,
+/// its letter and provider.
+fn label(account: &AccountFace) -> String {
     match account {
         AccountFace::All => "All accounts".to_string(),
         AccountFace::One {
-            initial, provider, ..
+            address: Some(address),
+            ..
+        } => address.clone(),
+        AccountFace::One {
+            initial,
+            provider,
+            address: None,
+            ..
         } => format!("{initial}, {} account", provider.name()),
     }
 }
@@ -112,6 +121,7 @@ pub fn AccountTile(
     unread: u32,
     onclick: EventHandler<()>,
 ) -> Element {
+    let label = label(&account);
     let face = match account {
         AccountFace::All => rsx! {
             span { class: "ds-avatar", "data-size": "28", "data-tone": "all",
@@ -122,6 +132,7 @@ pub fn AccountTile(
             initial,
             colour,
             provider,
+            ..
         } => rsx! {
             Avatar {
                 initial,
@@ -137,7 +148,7 @@ pub fn AccountTile(
             class: "ds-icon-button ds-account-tile",
             "data-variant": "pin",
             "aria-pressed": pressed.aria(),
-            "aria-label": label(account),
+            "aria-label": label,
             onclick: move |_| onclick.call(()),
             {face}
             Count { value: unread, place: CountPlace::Tile }

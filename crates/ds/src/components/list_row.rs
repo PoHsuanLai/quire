@@ -1,10 +1,12 @@
 //! ListRow: one item in a list, the thread row (design/04-COMPONENTS.md section 16).
 
-use crate::components::vocab::{Emphasis, PulseKey, PulsePhase, Selection, StaggerIndex, Switch};
+use crate::components::vocab::{
+    DropState, Emphasis, PulseKey, PulsePhase, Selection, StaggerIndex, Switch,
+};
 use crate::icon::Icon;
 use crate::icon::Shape;
 use crate::motion::anim::Anim;
-use crate::motion::presence::{Exit, Presence};
+use crate::motion::presence::Presence;
 use dioxus::html::geometry::{ClientPoint, ElementPoint, PagePoint, ScreenPoint};
 use dioxus::html::input_data::{MouseButton, MouseButtonSet};
 use dioxus::html::{
@@ -24,15 +26,6 @@ fn emphasis_slug(emphasis: Emphasis) -> &'static str {
     }
 }
 
-/// The `data-exit` word.
-fn exit_slug(exit: Exit) -> &'static str {
-    match exit {
-        Exit::Fold => "fold",
-        Exit::Curl => "curl",
-        Exit::Crumple => "crumple",
-    }
-}
-
 /// The row's inline custom properties: the stagger `--i` always, and while healing the
 /// distance `--dy` and the heal index `--d`.
 fn row_style(index: StaggerIndex, presence: Presence) -> String {
@@ -46,7 +39,7 @@ fn row_style(index: StaggerIndex, presence: Presence) -> String {
 /// `data-exit`, on a leaving row only.
 fn exit(presence: Presence) -> Option<&'static str> {
     match presence {
-        Presence::Leaving(exit) => Some(exit_slug(exit)),
+        Presence::Leaving(exit) => Some(exit.slug()),
         Presence::Entering | Presence::Present | Presence::Healing { .. } => None,
     }
 }
@@ -142,6 +135,8 @@ fn star_button(state: Switch, onchange: EventHandler<Switch>, pulse: PulseKey) -
 /// (an unread fold is the heavy one, as the roster settles it); a healing row slides up from
 /// `dy`, delayed by `d` heal steps. `star_pulse` is a `use_pulse(Anim::StarPop)` key, fired on
 /// every toggle. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
+/// `drop` is the row's part in a drag: `Source` while it is the thread being dragged (dimmed),
+/// `Target` while something dragged over it would land on it.
 #[component]
 pub fn ListRow(
     selection: Selection,
@@ -158,6 +153,7 @@ pub fn ListRow(
     star_pulse: PulseKey,
     strip: Option<Element>,
     onclick: EventHandler<MouseData>,
+    #[props(default)] drop: DropState,
 ) -> Element {
     rsx! {
         li {
@@ -167,6 +163,8 @@ pub fn ListRow(
             "data-emphasis": emphasis_slug(emphasis),
             "data-presence": presence.slug(),
             "data-exit": exit(presence),
+            "data-drop": drop.drop_attr(),
+            "data-drag": drop.drag_attr(),
             style: row_style(index, presence),
             onclick: move |event| onclick.call(snapshot(&event.data())),
             div { class: "ds-row-dot",
@@ -295,6 +293,7 @@ mod tests {
             (Presence::Leaving(Exit::Fold), Some("fold")),
             (Presence::Leaving(Exit::Curl), Some("curl")),
             (Presence::Leaving(Exit::Crumple), Some("crumple")),
+            (Presence::Leaving(Exit::TabOut), Some("tab-out")),
             (Presence::Entering, None),
             (Presence::Present, None),
         ];

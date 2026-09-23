@@ -3,7 +3,7 @@
 
 use crate::components::avatar::{AvatarFace, face};
 use crate::components::count::{Count, CountPlace};
-use crate::components::vocab::{Here, PulseKey};
+use crate::components::vocab::{DropState, Here, PulseKey};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::motion::presence::Presence;
@@ -77,8 +77,12 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// Place and Pinned are buttons; Today is a `div[role=button]` because it holds its own close
 /// button (a button cannot contain a button). A current Place wears the seal, a real span
 /// rather than `::before` (O-22's fallback). `presence` animates a Today entry in (`tab-in`) and
-/// out (`tab-out`; the consumer drops it at `settle(Anim::TabOut)`); the other kinds do not move.
-/// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something.
+/// out (`Presence::Leaving(Exit::TabOut)` plays `tab-out`; the consumer drops it at
+/// `settle(Anim::TabOut)`, which is what `RosterState::leave` returns for that exit); the other
+/// kinds do not move.
+/// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something. `drop` is
+/// the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
+/// `Source` while the item itself is dragged.
 #[component]
 pub fn SidebarItem(
     kind: ItemKind,
@@ -90,6 +94,7 @@ pub fn SidebarItem(
     pulse: PulseKey,
     onclick: EventHandler<()>,
     onclose: Option<EventHandler<()>>,
+    #[props(default)] drop: DropState,
 ) -> Element {
     let (class, alias) = pulse_attrs(pulse);
     let slug = kind.slug();
@@ -105,6 +110,8 @@ pub fn SidebarItem(
                 "aria-current": current,
                 "data-preview": preview,
                 "data-pulse": alias,
+                "data-drop": drop.drop_attr(),
+                "data-drag": drop.drag_attr(),
                 onclick: move |_| onclick.call(()),
                 if here == Here::Current {
                     span { class: "ds-sidebar-item-seal" }
@@ -122,6 +129,8 @@ pub fn SidebarItem(
                 "aria-current": current,
                 "data-preview": preview,
                 "data-pulse": alias,
+                "data-drop": drop.drop_attr(),
+                "data-drag": drop.drag_attr(),
                 onclick: move |_| onclick.call(()),
                 {face(avatar)}
                 span { class: "ds-sidebar-item-text ds-truncate", "data-emphasis": "plain", "{label}" }
@@ -138,6 +147,8 @@ pub fn SidebarItem(
                 "data-presence": presence.slug(),
                 "data-preview": preview,
                 "data-pulse": alias,
+                "data-drop": drop.drop_attr(),
+                "data-drag": drop.drag_attr(),
                 onclick: move |_| onclick.call(()),
                 onkeydown: move |event| {
                     if matches!(event.key(), Key::Enter) || event.key() == Key::Character(" ".into()) {

@@ -4,9 +4,9 @@ use dioxus::prelude::*;
 use ds::components::vocab::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip,
-    ChipVariant, Colour, Count, CountPlace, HeaderKind, Hex, Icon, IconButton, IconButtonVariant,
-    InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
-    SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
+    ChipVariant, Colour, Count, CountPlace, Focus, HeaderKind, Hex, Icon, IconButton,
+    IconButtonVariant, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader,
+    SegSize, SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
 
 /// One component in one state.
@@ -171,6 +171,11 @@ pub const CASES: &[Case] = &[
         component: "text_input",
         state: "disabled",
         make: || rsx! { TextInput { variant: InputVariant::Boxed, label: "Name", value: "Dana", availability: Availability::Disabled, oninput: |_| {} } },
+    },
+    Case {
+        component: "text_input",
+        state: "focus-on-mount",
+        make: || rsx! { TextInput { variant: InputVariant::Inline, label: "Link", value: "", placeholder: "Paste a link", focus: Focus::OnMount, oninput: |_| {} } },
     },
     // SearchField: empty, and typed with tokens.
     Case {

@@ -6,9 +6,9 @@
 //!
 //! The root also writes `--m-tint-alpha` inline: the materials' tint over blur scales by the
 //! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
-//! 80; FINDINGS "W1 tokens"). `Ds` has no prop for it, so a host that reads the key provides it
-//! as a root context, `Signal<ds::Alpha>` (thousandths: 800 is .8); without one the root writes
-//! the key's default.
+//! 80; FINDINGS "W1 tokens"). A host passes the key as the `tint_alpha` prop (thousandths: 800
+//! is .8), which `ds_settings::Environment::tint_alpha` converts from the settings file; without
+//! one the root writes the key's default.
 
 use super::env::{Env, HostModality, InputModality, use_env_provider};
 use crate::appearance::{Appearance, SystemPrefs, resolve};
@@ -42,6 +42,7 @@ pub fn Ds(
     material: Material,
     #[props(default)] blur: BlurState,
     #[props(default)] stylesheet: Inject,
+    #[props(default)] tint_alpha: Option<Alpha>,
     children: Element,
 ) -> Element {
     let resolved = resolve(appearance, look.theme, system);
@@ -60,8 +61,7 @@ pub fn Ds(
     use_overlays_provider();
     let frame = FrameVars::of(&look, resolved.scheme);
     let layers = use_frame_layers(&frame.gradient);
-    let tint = use_hook(try_consume_context::<Signal<Alpha>>);
-    let tint = tint.map_or(DEFAULT_TINT_ALPHA, |alpha| alpha());
+    let tint = tint_alpha.unwrap_or(DEFAULT_TINT_ALPHA);
     let style = format!("{}--m-tint-alpha:{};", frame.style_attr(), tint.css());
     let hover = match hover.warmth() {
         HoverWarmth::Warm => "warm",

@@ -203,13 +203,17 @@ impl<K: Clone + PartialEq> RosterState<K> {
     }
 }
 
-/// The animation an exit plays: an unread (`Emphasis::Strong`) row folds at `--t-big-heavy`
-/// (design/05-MOTION.md section 8). Curl and crumple have no heavy variant.
-fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
+/// The animation an exit plays: an unread (`Emphasis::Strong`) row plays the heavy variant of
+/// every row exit, 15 % slower (design/05-MOTION.md principle 6, section 8). A Today entry's
+/// `tab-out` has no heavy variant.
+pub(crate) fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
     match (exit, emphasis) {
         (Exit::Fold, Emphasis::Strong) => Anim::FoldHeavy,
         (Exit::Fold, Emphasis::Plain) => Anim::Fold,
-        (Exit::Curl, _) => Anim::Curl,
-        (Exit::Crumple, _) => Anim::Crumple,
+        (Exit::Curl, Emphasis::Strong) => Anim::CurlHeavy,
+        (Exit::Curl, Emphasis::Plain) => Anim::Curl,
+        (Exit::Crumple, Emphasis::Strong) => Anim::CrumpleHeavy,
+        (Exit::Crumple, Emphasis::Plain) => Anim::Crumple,
+        (Exit::TabOut, _) => Anim::TabOut,
     }
 }

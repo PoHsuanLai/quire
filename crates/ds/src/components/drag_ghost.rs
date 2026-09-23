@@ -1,6 +1,7 @@
 //! DragGhost, DropLine and Grip: moving a thing by dragging, driven by `use_drag`
 //! (design/04-COMPONENTS.md section 34).
 
+use crate::geometry::measure::client_rect;
 use crate::geometry::{Point, Rect};
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -56,8 +57,8 @@ pub fn Grip(label: String, onclick: EventHandler<Rect>) -> Element {
             onclick: move |_| {
                 if let Some(mounted) = element() {
                     spawn(async move {
-                        if let Ok(measured) = mounted.get_client_rect().await {
-                            onclick.call(super::hover_strip::rect(measured));
+                        if let Some(measured) = client_rect(&mounted).await {
+                            onclick.call(measured);
                         }
                     });
                 }

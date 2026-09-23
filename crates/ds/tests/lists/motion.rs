@@ -90,6 +90,53 @@ fn a_roster_renders_each_moment_of_an_exit() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
+/// The row stylesheet and the roster agree on every exit: the rule a leaving row of each
+/// emphasis matches plays exactly the animation `RosterState::leave` settles (wave 2
+/// integration: the heavy curl and crumple were missing from both).
+#[test]
+fn the_row_stylesheet_plays_what_the_roster_settles() {
+    const CASES: &[(Exit, Emphasis)] = &[
+        (Exit::Fold, Emphasis::Plain),
+        (Exit::Fold, Emphasis::Strong),
+        (Exit::Curl, Emphasis::Plain),
+        (Exit::Curl, Emphasis::Strong),
+        (Exit::Crumple, Emphasis::Plain),
+        (Exit::Crumple, Emphasis::Strong),
+    ];
+    let css = include_str!("../../src/components/list_row.css");
+    let mut failures = Vec::new();
+    for &(exit, emphasis) in CASES {
+        let (_, anim) = RosterState::first_show(&KEYS, PITCH)
+            .rest()
+            .leave(&"a", exit, emphasis);
+        let recipe = anim.recipe();
+        let want = format!(
+            "animation:{} {} {} forwards;",
+            recipe.keyframes,
+            recipe.duration.var().reference(),
+            recipe.easing.var().reference()
+        );
+        let strong = match emphasis {
+            Emphasis::Strong => "[*|data-emphasis=strong]",
+            Emphasis::Plain => "",
+        };
+        let selector = format!(
+            ".ds-row[*|data-presence=leaving][*|data-exit={}]{strong}{{",
+            exit.slug()
+        );
+        let rule = css
+            .lines()
+            .find(|line| line.starts_with(&selector))
+            .map(|line| line[selector.len()..].trim().to_owned());
+        if rule.as_deref().map(|r| r.starts_with(&want)) != Some(true) {
+            failures.push(format!(
+                "{exit:?} {emphasis:?}: {rule:?}, roster settles {want}"
+            ));
+        }
+    }
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
 #[test]
 fn a_healing_row_starts_one_pitch_down_by_heal_step() {
     let (leaving, _) =

@@ -3,7 +3,7 @@
 
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::components::vocab::{Here, Key, PulseKey, Shortcut, Switch};
+use ds::components::vocab::{DropState, Here, Key, PulseKey, Shortcut, Switch};
 use ds::{
     Accent, Appearance, AppearancePicker, CardAccent, DotIndex, FrameVars, Grain, Motion, PRESETS,
     ReducedMotion, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
@@ -63,6 +63,24 @@ fn item(
 }
 
 const INBOX: ItemKind = ItemKind::Place { icon: Icon::Inbox };
+
+/// The Inbox place playing `drop` in a drag.
+fn dropped_item(drop: DropState) -> Element {
+    rsx! {
+        SidebarItem {
+            kind: INBOX,
+            label: "Inbox",
+            here: Here::Elsewhere,
+            count: None,
+            presence: Presence::Present,
+            preview: None,
+            pulse: GULP(),
+            onclick: |_| {},
+            onclose: None,
+            drop,
+        }
+    }
+}
 const GULP: fn() -> PulseKey = || PulseKey::rest(Anim::Gulp);
 
 fn mark(provider: Provider, size: MarkSize) -> Element {
@@ -121,12 +139,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "account_tile",
         state: "one-pressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: Provider::Google }, pressed: Switch::On, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: Provider::Google, address: Some("poh@acme.example".to_string()) }, pressed: Switch::On, unread: 2, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
         state: "one-unpressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: Provider::Fastmail }, pressed: Switch::Off, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: Provider::Fastmail, address: None }, pressed: Switch::Off, unread: 2, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
@@ -270,11 +288,21 @@ pub const CASES: &[Case] = &[
             item(
                 ItemKind::Today { avatar: DANA },
                 Here::Elsewhere,
-                Presence::Leaving(Exit::Fold),
+                Presence::Leaving(Exit::TabOut),
                 None,
                 GULP(),
             )
         },
+    },
+    Case {
+        component: "sidebar_item",
+        state: "drop-target",
+        make: || dropped_item(DropState::Target),
+    },
+    Case {
+        component: "sidebar_item",
+        state: "drag-source",
+        make: || dropped_item(DropState::Source),
     },
     // AppearancePicker.
     Case {
@@ -337,6 +365,11 @@ pub const CASES: &[Case] = &[
                 0,
             )
         },
+    },
+    Case {
+        component: "space_editor",
+        state: "named",
+        make: || rsx! { SpaceEditor { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(0), name: "Work".to_string(), onchange: |_| {}, on_active_dot: |_| {} } },
     },
     // SpaceDot.
     Case {

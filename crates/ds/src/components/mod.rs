@@ -67,22 +67,22 @@ pub use scrim::Scrim;
 pub use search_field::SearchField;
 pub use section_header::{HeaderKind, SectionHeader};
 pub use segmented::{SegSize, SegmentedControl};
-pub use selection_bubble::{BubbleAction, BubbleMode, SelectionBubble};
+pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble};
 pub use send_pill::{SendPhase, SendPill};
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, Preview, SidebarItem};
 pub use slider::Slider;
-pub use space_editor::{DotIndex, SpaceDot, SpaceEditor};
+pub use space_editor::{ActiveDot, DotIndex, SpaceDot, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
-pub use text_input::{InputVariant, TextInput};
+pub use text_input::{Focus, InputVariant, TextInput};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Tooltip, TooltipKind};
 pub use vocab::{
-    Availability, Check, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection, Shortcut,
-    StaggerIndex, Switch,
+    Availability, Check, DropState, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection,
+    Shortcut, StaggerIndex, Switch,
 };
 
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.

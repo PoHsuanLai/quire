@@ -2,9 +2,10 @@
 //! (design/04-COMPONENTS.md section 5).
 
 use crate::components::vocab::{Availability, Fraction};
-use crate::geometry::units::{Point, Px, Rect, Size};
+use crate::geometry::measure::client_rect;
+use crate::geometry::units::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
-use dioxus::html::geometry::{ClientPoint, PixelsRect};
+use dioxus::html::geometry::ClientPoint;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -73,20 +74,6 @@ fn point(at: ClientPoint) -> Point {
     }
 }
 
-/// A measured client rect as a layout rect.
-fn rect(measured: PixelsRect) -> Rect {
-    Rect {
-        origin: Point {
-            x: Px(measured.origin.x as f32),
-            y: Px(measured.origin.y as f32),
-        },
-        size: Size {
-            width: Px(measured.size.width as f32),
-            height: Px(measured.size.height as f32),
-        },
-    }
-}
-
 /// A value in a range.
 ///
 /// The `DragTracker` owns the gesture: pointer down jumps the value to the pointer and marks
@@ -135,8 +122,7 @@ pub fn Slider(
                     spawn(async move {
                         // Focus is best-effort: a renderer without it still slides.
                         let _ = mounted.set_focus(true).await;
-                        if let Ok(measured) = mounted.get_client_rect().await {
-                            let measured = rect(measured);
+                        if let Some(measured) = client_rect(&mounted).await {
                             track.set(Some(measured));
                             onchange.call(fraction_at(measured, at.x));
                         }
@@ -172,6 +158,7 @@ pub fn Slider(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::geometry::units::Size;
 
     fn track(left: f32, width: f32) -> Rect {
         Rect {

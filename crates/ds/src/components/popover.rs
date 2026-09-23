@@ -8,6 +8,7 @@
 //! one Escape or one outside click closes the topmost layer only (design/06-INTERACTIONS.md
 //! sections 5 and 18).
 
+use crate::geometry::measure::client_rect;
 use crate::geometry::{Anchor, MountedRef, Placement, Point, Px, Rect, RectProbe, Size, place};
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
@@ -17,7 +18,6 @@ use crate::overlay::stack::{Dismissal, LayerId, LayerStack};
 use crate::time::{FRAME_SLACK, sleep};
 use crate::tokens::ZLayer;
 use dioxus::core::{current_scope_id, queue_effect};
-use dioxus::html::geometry::PixelsRect;
 use dioxus::prelude::*;
 
 /// Which surface a popover draws.
@@ -197,9 +197,9 @@ impl Float {
         asked.set(Some(element.clone()));
         spawn(async move {
             sleep(FRAME_SLACK).await;
-            if let Ok(rect) = element.0.get_client_rect().await {
+            if let Some(rect) = client_rect(&element.0).await {
                 let mut slot = slot;
-                slot.set(Some(from_pixels(rect)));
+                slot.set(Some(rect));
             }
         });
     }
@@ -278,20 +278,6 @@ pub(crate) fn position_style(at: Point) -> String {
 fn px(length: Px) -> String {
     let rounded = (length.0 * 10.0).round() / 10.0;
     format!("{rounded}")
-}
-
-/// A renderer rect in logical pixels.
-pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
-    Rect {
-        origin: Point {
-            x: Px(rect.origin.x as f32),
-            y: Px(rect.origin.y as f32),
-        },
-        size: Size {
-            width: Px(rect.size.width as f32),
-            height: Px(rect.size.height as f32),
-        },
-    }
 }
 
 /// Close on Escape when this surface is the topmost layer that takes it; stop the key there so

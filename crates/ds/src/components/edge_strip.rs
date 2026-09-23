@@ -15,6 +15,17 @@ pub enum SideState {
     Peek,
 }
 
+impl SideState {
+    /// The `data-side` value the consumer writes on its `.ds-side` container.
+    pub fn slug(self) -> &'static str {
+        match self {
+            SideState::Shown => "shown",
+            SideState::Hidden => "hidden",
+            SideState::Peek => "peek",
+        }
+    }
+}
+
 /// The reveal edge. Render it only while the sidebar is hidden; the pointer entering it asks
 /// for the peek (design/06-INTERACTIONS.md section 7).
 #[component]
@@ -25,5 +36,20 @@ pub fn EdgeStrip(onenter: EventHandler<()>) -> Element {
             "aria-hidden": "true",
             onpointerenter: move |_| onenter.call(()),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SideState;
+
+    #[test]
+    fn every_state_the_stylesheet_moves_has_its_slug() {
+        let css = include_str!("edge_strip.css");
+        for state in [SideState::Hidden, SideState::Peek] {
+            let selector = format!(".ds-side[*|data-side={}]", state.slug());
+            assert!(css.contains(&selector), "{state:?}: no {selector}");
+        }
+        assert_eq!(SideState::Shown.slug(), "shown");
     }
 }
