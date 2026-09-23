@@ -25,7 +25,7 @@ abs_cargo="${sep}[^[:space:]]*(\\.cargo/bin/cargo|/usr/bin/cargo|/usr/local/bin/
 rustc_direct="${sep}rustc[[:space:]]"
 toolchain="${sep}cargo[[:space:]]+\\+"
 override="${sep}(CARGO_BUILD_JOBS|RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|AGENT_MEM_MAX|AGENT_SHIM_REAL_CARGO)="
-routed="${sep}(cargo|limit4g|rustup)([[:space:]]|\$)"
+routed="${sep}(cargo|limit4g|limit16g|rustup)([[:space:]]|\$)"
 
 [[ "$cmd" =~ $abs_cargo ]]    && deny "cargo called by absolute path"
 [[ "$cmd" =~ $rustc_direct ]] && deny "rustc called directly"
