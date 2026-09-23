@@ -483,7 +483,9 @@ fn Field(focus: Focus) -> Element {
 
 #[test]
 fn a_field_focused_on_mount_takes_typing_without_a_click() {
-    const CASES: &[(fn() -> Element, &str)] = &[(FocusApp, "[a]"), (ManualApp, "[]")];
+    /// An app, and what its field shows after one key.
+    type Case = (fn() -> Element, &'static str);
+    const CASES: &[Case] = &[(FocusApp, "[a]"), (ManualApp, "[]")];
     for &(app, want) in CASES {
         let mut harness = Harness::new(app, VIEW);
         harness.advance(ms(100));

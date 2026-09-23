@@ -2,10 +2,10 @@
 //! (design/04-COMPONENTS.md section 5).
 
 use crate::components::vocab::{Availability, Fraction};
+use crate::geometry::measure::client_rect;
 use crate::geometry::units::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
 use dioxus::html::geometry::ClientPoint;
-use crate::geometry::measure::client_rect;
 use dioxus::prelude::*;
 use std::rc::Rc;
 

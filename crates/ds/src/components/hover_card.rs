@@ -7,9 +7,8 @@
 //! plays its own `hc-in`; the card places itself against that target by kind, with no flip
 //! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving.
 
-use crate::components::popover::{
-    Float, Stacking, position_style, use_entrance, use_float,
-};
+use crate::components::popover::{Float, Stacking, position_style, use_entrance, use_float};
+use crate::geometry::measure::client_rect;
 use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::HoverEvent;
@@ -18,7 +17,6 @@ use crate::overlay::stack::LayerStack;
 use crate::time::{FRAME_SLACK, sleep};
 use crate::tokens::ZLayer;
 use dioxus::core::provide_root_context;
-use crate::geometry::measure::client_rect;
 use dioxus::prelude::*;
 use std::collections::BTreeMap;
 

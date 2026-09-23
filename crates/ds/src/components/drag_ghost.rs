@@ -1,8 +1,8 @@
 //! DragGhost, DropLine and Grip: moving a thing by dragging, driven by `use_drag`
 //! (design/04-COMPONENTS.md section 34).
 
-use crate::geometry::{Point, Rect};
 use crate::geometry::measure::client_rect;
+use crate::geometry::{Point, Rect};
 use dioxus::prelude::*;
 use std::rc::Rc;
 

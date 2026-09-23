@@ -8,6 +8,7 @@
 //! one Escape or one outside click closes the topmost layer only (design/06-INTERACTIONS.md
 //! sections 5 and 18).
 
+use crate::geometry::measure::client_rect;
 use crate::geometry::{Anchor, MountedRef, Placement, Point, Px, Rect, RectProbe, Size, place};
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
@@ -17,7 +18,6 @@ use crate::overlay::stack::{Dismissal, LayerId, LayerStack};
 use crate::time::{FRAME_SLACK, sleep};
 use crate::tokens::ZLayer;
 use dioxus::core::{current_scope_id, queue_effect};
-use crate::geometry::measure::client_rect;
 use dioxus::prelude::*;
 
 /// Which surface a popover draws.

@@ -3,9 +3,9 @@
 
 use crate::components::vocab::{Here, StaggerIndex};
 use crate::geometry::Rect;
+use crate::geometry::measure::client_rect;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use crate::geometry::measure::client_rect;
 use dioxus::prelude::*;
 use std::rc::Rc;
 

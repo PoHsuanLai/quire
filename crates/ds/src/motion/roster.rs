@@ -217,4 +217,3 @@ pub(crate) fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
         (Exit::TabOut, _) => Anim::TabOut,
     }
 }
-
