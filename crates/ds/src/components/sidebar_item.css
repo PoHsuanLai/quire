@@ -5,8 +5,8 @@
    holds (O-9). `--f-hover` in S is a bug (A8 #1): the destination ground is `--f-pill-hover`.
    The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
-   The drop target `[data-drop=target]` has no prop on SidebarItem yet (reported); its rule is
-   here for when it does. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
+   `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
+   `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
    not specified here. Disabled: not specified (O-1). */
 
 .ds-sidebar-item{
@@ -42,6 +42,7 @@
 
 /* Drop target (`C:320-323`). */
 .ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+.ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }

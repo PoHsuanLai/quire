@@ -1,8 +1,8 @@
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
    `.ds-truncate`. No enter or exit animation; `--tilt` is 0 under Calm. The dragged source is
-   `[data-drag=source]` at .35 and a hovered drop target `[data-drop=target]` (on rows and sidebar
-   items; the drop target's own rule is SidebarItem's). */
+   `[data-drag=source]` at .35 and a hovered drop target `[data-drop=target]`, both written from
+   `DropState` by ListRow and SidebarItem, whose stylesheets carry the rules. */
 
 .ds-drag-ghost{
   position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:9px 11px;

@@ -81,8 +81,8 @@ pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Tooltip, TooltipKind};
 pub use vocab::{
-    Availability, Check, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection, Shortcut,
-    StaggerIndex, Switch,
+    Availability, Check, DropState, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection,
+    Shortcut, StaggerIndex, Switch,
 };
 
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.

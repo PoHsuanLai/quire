@@ -566,8 +566,8 @@ html,body{margin:0;padding:0;background:transparent}
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
    `.ds-truncate`. No enter or exit animation; `--tilt` is 0 under Calm. The dragged source is
-   `[data-drag=source]` at .35 and a hovered drop target `[data-drop=target]` (on rows and sidebar
-   items; the drop target's own rule is SidebarItem's). */
+   `[data-drag=source]` at .35 and a hovered drop target `[data-drop=target]`, both written from
+   `DropState` by ListRow and SidebarItem, whose stylesheets carry the rules. */
 
 .ds-drag-ghost{
   position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:9px 11px;
@@ -759,7 +759,9 @@ html,body{margin:0;padding:0;background:transparent}
    (spike S6), so this file colours it with `color`.
    Not specified: the row's active state, disabled. The undo restore (`rise --t-big
    --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
-   The snooze floater "zZ" is the consumer's, through OverlayHost. */
+   The snooze floater "zZ" is the consumer's, through OverlayHost. `drop: DropState` writes the
+   dragged source `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]`
+   (section 34's drop-target look, `C:320-323`). */
 
 .ds-row{
   --i:0; --d:0;
@@ -789,6 +791,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-presence=leaving][*|data-exit=curl][*|data-emphasis=strong]{ animation:curl var(--t-curl-heavy) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=crumple]{ animation:crumple var(--t-big) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=crumple][*|data-emphasis=strong]{ animation:crumple var(--t-crumple-heavy) var(--e-exit) forwards; }
+
+/* Drag (section 34). */
+.ds-row[*|data-drag=source]{ opacity:.35; }
+.ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 
 /* Healing (`S:330`). */
 .ds-row[*|data-presence=healing]{
@@ -1051,8 +1057,8 @@ html,body{margin:0;padding:0;background:transparent}
    holds (O-9). `--f-hover` in S is a bug (A8 #1): the destination ground is `--f-pill-hover`.
    The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
-   The drop target `[data-drop=target]` has no prop on SidebarItem yet (reported); its rule is
-   here for when it does. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
+   `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
+   `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
    not specified here. Disabled: not specified (O-1). */
 
 .ds-sidebar-item{
@@ -1088,6 +1094,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Drop target (`C:320-323`). */
 .ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+.ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }

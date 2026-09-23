@@ -3,7 +3,7 @@
 
 use crate::cases::Case;
 use dioxus::prelude::*;
-use ds::components::vocab::{Emphasis, PulseKey, Selection, StaggerIndex, Switch};
+use ds::components::vocab::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
 use ds::{
     ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, HoverStrip, Icon, ListPresence, ListRow,
     MarkSize, MarkStyle, Presence, Provider, ProviderMark, Px, StripAction,
@@ -43,6 +43,40 @@ pub fn row(
     pulse: PulseKey,
     index: usize,
 ) -> Element {
+    row_in_drag(
+        presence,
+        emphasis,
+        selection,
+        star,
+        pulse,
+        index,
+        DropState::Idle,
+    )
+}
+
+/// A present read row playing `drop` in a drag.
+fn dragged_row(drop: DropState) -> Element {
+    row_in_drag(
+        Presence::Present,
+        Emphasis::Plain,
+        Selection::Unselected,
+        Switch::Off,
+        PulseKey::rest(Anim::StarPop),
+        3,
+        drop,
+    )
+}
+
+/// [`row`], playing `drop` in a drag.
+fn row_in_drag(
+    presence: Presence,
+    emphasis: Emphasis,
+    selection: Selection,
+    star: Switch,
+    pulse: PulseKey,
+    index: usize,
+    drop: DropState,
+) -> Element {
     rsx! {
         ListRow {
             selection,
@@ -62,6 +96,7 @@ pub fn row(
             star_pulse: pulse,
             strip: rsx! { HoverStrip { actions: strip_actions() } },
             onclick: |_| {},
+            drop,
         }
     }
 }
@@ -206,6 +241,16 @@ pub const ROW_CASES: &[Case] = &[
         component: "list_row",
         state: "leaving-crumple-unread",
         make: || plain_row(Presence::Leaving(Exit::Crumple), Emphasis::Strong),
+    },
+    Case {
+        component: "list_row",
+        state: "drag-source",
+        make: || dragged_row(DropState::Source),
+    },
+    Case {
+        component: "list_row",
+        state: "drop-target",
+        make: || dragged_row(DropState::Target),
     },
     Case {
         component: "list_row",

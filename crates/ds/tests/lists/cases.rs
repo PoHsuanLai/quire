@@ -3,7 +3,7 @@
 
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::components::vocab::{Here, Key, PulseKey, Shortcut, Switch};
+use ds::components::vocab::{DropState, Here, Key, PulseKey, Shortcut, Switch};
 use ds::{
     Accent, Appearance, AppearancePicker, CardAccent, DotIndex, FrameVars, Grain, Motion, PRESETS,
     ReducedMotion, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
@@ -63,6 +63,24 @@ fn item(
 }
 
 const INBOX: ItemKind = ItemKind::Place { icon: Icon::Inbox };
+
+/// The Inbox place playing `drop` in a drag.
+fn dropped_item(drop: DropState) -> Element {
+    rsx! {
+        SidebarItem {
+            kind: INBOX,
+            label: "Inbox",
+            here: Here::Elsewhere,
+            count: None,
+            presence: Presence::Present,
+            preview: None,
+            pulse: GULP(),
+            onclick: |_| {},
+            onclose: None,
+            drop,
+        }
+    }
+}
 const GULP: fn() -> PulseKey = || PulseKey::rest(Anim::Gulp);
 
 fn mark(provider: Provider, size: MarkSize) -> Element {
@@ -275,6 +293,16 @@ pub const CASES: &[Case] = &[
                 GULP(),
             )
         },
+    },
+    Case {
+        component: "sidebar_item",
+        state: "drop-target",
+        make: || dropped_item(DropState::Target),
+    },
+    Case {
+        component: "sidebar_item",
+        state: "drag-source",
+        make: || dropped_item(DropState::Source),
     },
     // AppearancePicker.
     Case {

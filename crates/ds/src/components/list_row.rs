@@ -1,10 +1,12 @@
 //! ListRow: one item in a list, the thread row (design/04-COMPONENTS.md section 16).
 
-use crate::components::vocab::{Emphasis, PulseKey, PulsePhase, Selection, StaggerIndex, Switch};
+use crate::components::vocab::{
+    DropState, Emphasis, PulseKey, PulsePhase, Selection, StaggerIndex, Switch,
+};
 use crate::icon::Icon;
 use crate::icon::Shape;
 use crate::motion::anim::Anim;
-use crate::motion::presence::{Exit, Presence};
+use crate::motion::presence::Presence;
 use dioxus::html::geometry::{ClientPoint, ElementPoint, PagePoint, ScreenPoint};
 use dioxus::html::input_data::{MouseButton, MouseButtonSet};
 use dioxus::html::{
@@ -133,6 +135,8 @@ fn star_button(state: Switch, onchange: EventHandler<Switch>, pulse: PulseKey) -
 /// (an unread fold is the heavy one, as the roster settles it); a healing row slides up from
 /// `dy`, delayed by `d` heal steps. `star_pulse` is a `use_pulse(Anim::StarPop)` key, fired on
 /// every toggle. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
+/// `drop` is the row's part in a drag: `Source` while it is the thread being dragged (dimmed),
+/// `Target` while something dragged over it would land on it.
 #[component]
 pub fn ListRow(
     selection: Selection,
@@ -149,6 +153,7 @@ pub fn ListRow(
     star_pulse: PulseKey,
     strip: Option<Element>,
     onclick: EventHandler<MouseData>,
+    #[props(default)] drop: DropState,
 ) -> Element {
     rsx! {
         li {
@@ -158,6 +163,8 @@ pub fn ListRow(
             "data-emphasis": emphasis_slug(emphasis),
             "data-presence": presence.slug(),
             "data-exit": exit(presence),
+            "data-drop": drop.drop_attr(),
+            "data-drag": drop.drag_attr(),
             style: row_style(index, presence),
             onclick: move |event| onclick.call(snapshot(&event.data())),
             div { class: "ds-row-dot",

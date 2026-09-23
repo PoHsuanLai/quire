@@ -10,7 +10,9 @@
    (spike S6), so this file colours it with `color`.
    Not specified: the row's active state, disabled. The undo restore (`rise --t-big
    --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
-   The snooze floater "zZ" is the consumer's, through OverlayHost. */
+   The snooze floater "zZ" is the consumer's, through OverlayHost. `drop: DropState` writes the
+   dragged source `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]`
+   (section 34's drop-target look, `C:320-323`). */
 
 .ds-row{
   --i:0; --d:0;
@@ -40,6 +42,10 @@
 .ds-row[*|data-presence=leaving][*|data-exit=curl][*|data-emphasis=strong]{ animation:curl var(--t-curl-heavy) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=crumple]{ animation:crumple var(--t-big) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=crumple][*|data-emphasis=strong]{ animation:crumple var(--t-crumple-heavy) var(--e-exit) forwards; }
+
+/* Drag (section 34). */
+.ds-row[*|data-drag=source]{ opacity:.35; }
+.ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 
 /* Healing (`S:330`). */
 .ds-row[*|data-presence=healing]{
