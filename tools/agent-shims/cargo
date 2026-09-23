@@ -26,10 +26,15 @@ jobs="${CARGO_BUILD_JOBS:-2}"
 
 sub="${1:-}"
 case "$sub" in
-  fmt|tree|metadata|deny|--version|-V|--list|help|-h|--help|version|search|owner|login|logout|yank|read-manifest|locate-project|pkgid|verify-project|"")
+  fmt|tree|metadata|deny|new|init|add|remove|rm|update|generate-lockfile|clean|fetch|vendor|--version|-V|--list|help|-h|--help|version|search|owner|login|logout|yank|read-manifest|locate-project|pkgid|verify-project|"")
     exec "$real_cargo" "$@"
     ;;
 esac
+
+# Share compiled dependencies across every worktree once sccache is installed.
+if [[ -z "${RUSTC_WRAPPER:-}" ]] && command -v sccache >/dev/null 2>&1; then
+  export RUSTC_WRAPPER=sccache
+fi
 
 run_capped() {
   local j="$1"; shift
