@@ -360,3 +360,17 @@ not re-litigate them.
 - Signatures the freeze believes wrong, reported not changed: `SystemPrefs{scheme: Scheme}`
   cannot express the portal's "no preference" (mapped to Light for now); the plan's lint
   rule list lacked the three Blitz rules the spike forced (now added).
+
+## W1 tokens (2026-09-24)
+
+- Four translucent material tints fail the 4.5:1 ink legibility floor over an extreme ground:
+  Bar dark over white 3.63, Dock dark over white 2.81, Widget light over black 4.04, Widget dark
+  over white 2.43. `tests/legibility.rs::TRANSLUCENT_SHORT` pins them; retune the alphas in the
+  gallery pass (03-COLOR open decision 11). The solid fallbacks all pass.
+- Google's Bricolage Grotesque file names its family "Bricolage Grotesque 96pt ExtraBold";
+  fontique registers by that name, so `--font-display` never matched. `scripts/subset-fonts.sh`
+  rewrites name IDs 1 and 16 to the family the stylesheet uses. Why the tests missed it: no test
+  rendered text with the face until the spike.
+- Contracts consumers must follow: the root or `Surface` always writes `data-theme` (a nested
+  `.ds` without one resets to light); `--m-tint-alpha` is written inline by the root from the
+  settings key (default .8); `--d-heal` is the heal step; `--swatch-<accent>` feeds the picker.
