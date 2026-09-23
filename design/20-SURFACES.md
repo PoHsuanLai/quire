@@ -287,6 +287,8 @@ paper (Post surface tokens). Only mail's frame shows the Space colour (21-SPACES
 
 ### 2.5 Terminal
 
+Open decision (2026-09-24): the terminal core is undecided until the app-suite milestone; candidates `alacritty_terminal`, `wezterm-term` (Rust), libghostty (Zig, C ABI). ghostty is the daily terminal until then; cosmic-term is not part of this program.
+
 | Field | Value | St |
 | --- | --- | --- |
 | Components | terminal grid as custom `Widget` (alacritty_terminal), `Tabs`, `Menu{Context}` | S |

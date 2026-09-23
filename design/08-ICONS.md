@@ -293,7 +293,7 @@ Settled route: LOCAL FIRST (PLAN "Icons", "Route").
 
 | Order | Model | Size | Why | Licence |
 | --- | --- | --- | --- | --- |
-| 1 | Qwen-Image 2.0 | 7B | generation and reference edit in one model | Apache-2.0 |
+| 1 | Qwen-Image-2512 (the design's "Qwen-Image 2.0" does not exist under that name; Qwen-Image-2.1 is non-commercial and excluded) | 20B (every release); needs ~13 GB VRAM even at Q2_K | generation and reference edit in one model | Apache-2.0 |
 | 2 | FLUX.2 Klein | 4B, ~13 GB VRAM, 4-step | fast iterations | FLUX.2 Klein licence (record exact terms, section 5) |
 | 3 | HiDream-O1-Image | | only if 1 or 2 disappoints | MIT |
 
@@ -438,7 +438,7 @@ Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):
 | Lucide | ISC | notice file `assets/icons/LICENSE-lucide.txt` (moves from mailo), version/commit of the geometry |
 | Tabler Icons | MIT | notice file `assets/icons/LICENSE-tabler.txt`, list of imported glyph names, version |
 | Our glyphs | our licence | author, date |
-| Qwen-Image 2.0 weights | Apache-2.0 | model card URL, weights sha256, date |
+| Qwen-Image-2512 weights | Apache-2.0 | model card URL, weights sha256, date |
 | FLUX.2 Klein 4B weights | FLUX.2 Klein licence | exact licence text and whether outputs may be used commercially; verify before shipping |
 | HiDream-O1-Image weights | MIT | as above, if used |
 | LoRA | derived from our approved outputs | base model + its licence |
@@ -468,6 +468,7 @@ A third-party tile passes 1 and 3 (plate vs its icon's mean edge colour) only.
 
 ## 7. Open decisions
 
+- 2026-09-24 setup finding: FLUX.2 Klein 4B (Q4_K_M GGUF, 2.6 GB, Apache-2.0, ungated) runs on this machine in 22 s at 512 px with 8 GB VRAM free; Qwen-Image-2512 needs ~13 GB free and waits for the GPU; the smoke render is photographic, so the style brief must ask for a flat illustrated object, not a photo. Setup and workflow: `~/comfy/README.md`.
 1. App-id namespace for our apps (placeholder `<ns>.Mail`). Needs a domain or
    `io.github.<user>.*`.
 2. Do our app icons get a dark variant (dimmer plate, like macOS 26 tinted/dark icons)? Proposed: no.
