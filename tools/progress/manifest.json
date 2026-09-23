@@ -1,6 +1,57 @@
 {
-  "updated": "2026-09-24, Milestone 0 render spike passed",
+  "updated": "2026-09-24, design system built; host complete; gallery review in progress",
   "entries": [
+    {
+      "id": "gallery-first-look",
+      "date": "2026-09-24 \u00b7 quire wave 3",
+      "title": "The design system exists: every component on review pages, in both themes and six accents",
+      "status": "running",
+      "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 250 tests), and the gallery renders them through the real Blitz pipeline. These are its first contact sheets, before the bug pass: the gallery already caught text inputs at replaced-element size, an empty toast pill on every root, and eleven more; fixes are running and the sheets will be regenerated.",
+      "notes": [
+        "What is right already: Post paper and ink, Bricolage headings, mono eyebrows, the Rich menu, materials over a wallpaper with blur on and off, legibility floors live.",
+        "Known in these sheets: oversized text inputs, empty toast and undo labels, one overlapping header row."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/controls-light-postmark.png",
+          "caption": "Controls page, light, Postmark accent"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/overlays-dark-postmark.png",
+          "caption": "Overlays page, dark: the Rich menu, link pills, the send pill, the undo toast"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/materials-dark-postmark.png",
+          "caption": "Materials page, dark: eight materials over a wallpaper, blur on and off"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/lists-light-postmark.png",
+          "caption": "Lists page, light: rows, strip, sidebar, tiles, the appearance picker"
+        }
+      ]
+    },
+    {
+      "id": "h2-host",
+      "date": "2026-09-24 \u00b7 shell-host H2",
+      "title": "The real host passes the Milestone 0 acceptance: one process, many surfaces, no idle frames",
+      "status": "proven",
+      "lede": "The spike is retired. The production host (calloop loop, one GPU device, shared renderer, layer surfaces, popups, input, IME, clipboard, blur, fractional scale) runs the same five acceptance items on its demos in a nested KWin and passes them all; 162 tests; the same numbers as the spike within noise.",
+      "notes": [
+        "Dock hover sweep: 73 frames for 73 callbacks, 0.89 ms median; five seconds idle: zero frames, zero commits, zero main-thread wakeups.",
+        "Two driver facts recorded: wgpu ties an instance to one Wayland display; NVIDIA 615.71 crashes on a surface query after a probe instance is dropped, so probe instances are kept alive.",
+        "Waiting on your unlocked screen: the same run on the live session and inside nested cosmic-comp."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/a.png",
+          "caption": "demo_bar on the real host: the 32 px bar above a maximized checkerboard"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b.png",
+          "caption": "demo_bar with compositor blur behind the bar"
+        }
+      ]
+    },
     {
       "id": "m0-render",
       "date": "2026-09-24 \u00b7 Milestone 0, items a, b, c, f, g",
