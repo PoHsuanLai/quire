@@ -135,3 +135,35 @@ impl Default for AppearanceFile {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{AppearanceFile, AppearanceSettings, IconsSettings};
+    use serde::Serialize;
+    use serde::de::DeserializeOwned;
+
+    /// `CONVENTIONS.md#3-serde`: "every persisted type has a round-trip test." Raw
+    /// `toml::to_string`/`from_str`, not through [`crate::file`] or [`crate::lenient`], so this
+    /// exercises the struct's own `Serialize`/`Deserialize` in isolation.
+    fn round_trips<T: Serialize + DeserializeOwned + PartialEq + std::fmt::Debug + Default>() {
+        let default = T::default();
+        let text = toml::to_string(&default).unwrap_or_else(|e| panic!("{e}"));
+        let back: T = toml::from_str(&text).unwrap_or_else(|e| panic!("{text}: {e}"));
+        assert_eq!(back, default, "{text}");
+    }
+
+    #[test]
+    fn appearance_settings_round_trips() {
+        round_trips::<AppearanceSettings>();
+    }
+
+    #[test]
+    fn icons_settings_round_trips() {
+        round_trips::<IconsSettings>();
+    }
+
+    #[test]
+    fn appearance_file_round_trips() {
+        round_trips::<AppearanceFile>();
+    }
+}

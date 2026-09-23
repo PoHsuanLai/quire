@@ -5,6 +5,7 @@
 //! `ds` stays effect-free; everything here touches the disk or the bus.
 
 pub mod dbus;
+pub mod diff;
 pub mod dirs;
 pub mod environment;
 pub mod error;
@@ -15,6 +16,7 @@ pub mod settings;
 pub mod units;
 pub mod watch;
 
+pub use diff::{SettingsChange, apply};
 pub use dirs::{AppName, cache_dir, config_dir, state_dir};
 pub use environment::{Environment, use_environment};
 pub use error::SettingsError;
@@ -29,6 +31,3 @@ pub use settings::{
 };
 pub use units::{Count, Fraction, Ms, Percent, Px, Scalar, Units};
 pub use watch::{AppearanceWatch, DEBOUNCE, watch};
-
-use serde_json as _;
-use zbus as _;
