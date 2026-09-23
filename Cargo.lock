@@ -1306,9 +1306,12 @@ name = "ds-gallery"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "dioxus-ssr",
  "ds",
  "ds-native",
  "ds-settings",
+ "image",
+ "thiserror 2.0.20",
 ]
 
 [[package]]
