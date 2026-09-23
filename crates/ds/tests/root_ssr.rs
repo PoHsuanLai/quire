@@ -176,7 +176,11 @@ fn the_root_stamps_exactly_its_attributes() {
     for case in cases {
         let look = case.setup.look.clone();
         let markup = render(case.setup);
-        let style = FrameVars::of(&look, case.scheme).style_attr();
+        // The frame variables, then the tint alpha the root writes at the settings default.
+        let style = format!(
+            "{}--m-tint-alpha:.8;",
+            FrameVars::of(&look, case.scheme).style_attr()
+        );
         let want = expected(&[
             ("class", "ds".to_owned()),
             ("data-theme", case.theme.to_owned()),

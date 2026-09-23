@@ -1,1 +1,15 @@
-/* link_pill.css: filled in with the component (design/04-COMPONENTS.md). */
+/* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
+   reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
+   `--danger-ink` for S's `#fff`) when the text lies. Blitz has no ellipsis: the path gives way
+   first and the registered domain never shrinks (O-30).
+   TODO: S enters with `hc-in` at `--t-quick --e-out` (`S:433`); no `Anim` has that recipe, so
+   it takes `HcIn`'s `--t-move --e-spring` until one is added. */
+
+.ds-link-pill{ position:absolute; left:12px; bottom:12px; z-index:var(--z-link-pill); max-width:calc(100% - 24px); display:flex; align-items:center; gap:7px;
+  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:5px 11px 5px 9px; font-family:var(--font-data); font-size:var(--fs-eyebrow);
+  white-space:nowrap; overflow:hidden; box-shadow:var(--shadow-2); animation:hc-in var(--t-move) var(--e-spring); pointer-events:none; }
+.ds-link-pill b{ color:var(--paper); flex:none; }
+.ds-link-pill-dim{ opacity:.6; flex:none; }
+.ds-link-pill-dim[*|data-part=path]{ flex:0 1 auto; min-width:0; overflow:hidden; }
+.ds-link-pill[*|data-truth=lying]{ background:var(--danger); color:var(--danger-ink); }
+.ds-link-pill[*|data-truth=lying] b{ color:var(--danger-ink); }
