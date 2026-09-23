@@ -1,0 +1,817 @@
+# 22 Settings
+
+Status: this whole document is **proposed** (it did not exist before the user's decision of
+2026-09-24) except where a row's Status column says otherwise. `design/<file>.md#<anchor>` is
+the citation convention of `README.md#3-citation-convention`.
+
+## 1. What this governs
+
+Every runtime-tunable number and closed-set choice for the desktop shell: the design-system
+appearance (`quire`), the shell (`sill`, its bar/dock/launcher/menus/notifications/spaces), and
+the gesture daemon (`palmrest`). The rule, per the user's decision of 2026-09-24 recorded in
+`README.md#4-canonical-source`: **no value any design doc marks "proposed" is hard-coded**; it
+ships as the default *and* is read from a settings key listed in section 3. A **settled** value
+becomes a key only where a doc treats it as a user-facing preference — natural scrolling,
+magnification on/off, autohide, gesture-to-action mapping, theme/accent/look/motion-level — the
+same pattern the docs' own `10.6`/`11.6`/`12.6`/`13.6` Configuration tables already use (settled
+defaults sitting next to proposed ones in one table). Everything else settled — component
+markup, colour tokens, motion keyframes, layout grids — is **not** a key: it stays in `ds`'s
+fixed token tables and is out of scope here.
+
+Three further scoping rules, applied consistently across section 3, because "every proposed
+value" in these docs literally includes hundreds of component visual gaps that are not
+preferences:
+
+1. **Design tokens are not settings.** A Material's tint colour, edge, shadow, radius and blur
+   recipe (`03-COLOR.md#17-2-starting-values-proposed`) is `ds` token data, tunable in the
+   gallery, not per-user. The one exception the docs make settings-worthy is *which* Material
+   enum variant a surface uses when a doc explicitly frames that as an open choice (e.g.
+   notification banner: `Toast` vs an inverse-ink alternative) — that choice is a key; the
+   Material's own recipe is not.
+2. **Component gaps are not settings.** `04-COMPONENTS.md` marks dozens of hover/disabled/
+   error states "not specified" with no candidate value at all (see its Open decisions O-1..
+   O-29). Those are review gaps for review/build, not tunable defaults, and are excluded; see
+   the "could not find a default" list in the handback report.
+3. **Per-workspace instance data is not a global default.** `21-SPACES.md#10-storage-settled-path-proposed-schema`'s
+   `$XDG_CONFIG_HOME/quire/spaces.json` stores each workspace's chosen `SpaceLook` (its dots,
+   grain, theme, accent) — that is saved *state*, like `dock.json`'s pinned items, not a
+   settings default. The *defaults* applied when a workspace has none (preset table, fallback
+   grain, fallback accent) are keys in the `spaces` domain below.
+
+## 2. Storage
+
+One TOML file per owning program, replacing the plan's `appearance.json` (PLAN "Design:
+`<ds>`") and the docs' scattered `~/.config/quire/scroll.json` / `~/.config/sill/settings.json`
+/ `~/.config/palmrest/config.toml` mentions (`11-BEHAVIOUR-scroll.md#11-6-configuration`,
+`10-BEHAVIOUR-dock.md#10-6-configuration`, `12-BEHAVIOUR-gestures.md#12-6-configuration`): this
+doc is the authority on where each key actually lives, and supersedes those inline paths.
+
+| File | Owner | Domains |
+| --- | --- | --- |
+| `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
+| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces` |
+| `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
+
+Rules, all three files:
+
+- **Atomic write**: temp file + `rename` (same mechanism as `ds-settings`'s `appearance.json`
+  writer, PLAN "Design: `<ds>`": "atomic write").
+- **`version = 1`** top-level field. A future incompatible change bumps it and ships a
+  migrator; today nothing reads it but its absence.
+- **Unknown keys preserved**: a round-trip through a newer binary must not drop a key an older
+  or newer version wrote (mirrors `CONVENTIONS.md#3-serde` "never `deny_unknown_fields` on a
+  persisted type"; `#[serde(flatten)]` extra: `Table` catches the rest per struct).
+- **Unknown *values* fall back to the field's default**, lenient, matching mailo's `Appearance`
+  loader (PLAN "moves verbatim from mailo... `appearance.rs` load/save/dirs"): a bad enum
+  string or an out-of-range number logs once and uses `Default::default()` for that field only,
+  never fails the whole file.
+- **Live reload**: a `notify` watch on the containing directory (not the file — editors and our
+  own atomic writer both replace the inode via rename), **30 ms debounce**
+  (`12-BEHAVIOUR-gestures.md#12-6-configuration`'s own daemon does the same for its config; PLAN
+  "Design: `<ds>`" `ds-settings`: "`notify` directory watch (rename replaces inode; debounce
+  30 ms)"). A change is diffed (section 4's `apply`) and applied without restart; no surface
+  animates from a settings change (it just repaints with new values on its next frame).
+
+**Mailo migration**: `appearance.rs`'s old `~/.config/mailo/appearance.json` (or wherever mailo
+currently writes it) is read **once**, on first run of the new `ds-settings` loader if
+`appearance.toml` does not yet exist, mapped field-for-field into `Appearance`, and written out
+as `appearance.toml`; the json file is left in place (not deleted), so a downgrade is
+non-destructive. This is the "adopt old json" step in PLAN "mailo consumption. Phase A".
+
+## 3. The key catalogue
+
+Types used below (see section 4 for the full list): `Px(u16)` logical pixels, `Ms(u16)`
+milliseconds, `Percent(u8)` 0..100, `Fraction(u16)` per-mille (1000 = 1.0; used for ratios,
+gains and constants like `c = 0.55` -> `550`), `Count(u16)` a plain quantity, `Scalar(f32)` a
+dimensionless physics constant that does not fit the above (momentum model exponents), `Units`
+a signed raw touchpad/report unit (device space, not px). Every enum is named; **no key is a
+`bool`** (`CONVENTIONS.md#11-quire-addenda-2026-09-24`).
+
+Status column values: **proposed** = doc marks the value proposed, this is the "make it a key"
+case; **settled (preference)** = doc marks it settled but it is a user-facing choice, so it is
+still a key per section 1; **settled default, range proposed** = the doc's own phrasing, kept
+verbatim. **advanced** in the last column (used in section 5) means file-only, no Settings UI
+control in v1.
+
+### 3.1 `appearance` (quire/appearance.toml)
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `07-LOOKS.md#2-the-look-model` | settled (preference) |
+| `appearance.look` | `Look::{Post,Riso,Tide,Candy}` | `Post` | Riso/Tide/Candy reachable, not default | `07-LOOKS.md#11-desktop-default` | settled (preference) |
+| `appearance.warmth` | `Warmth::{Cool,Neutral,Warm,Paper}` (Candy only) | `Neutral` | applies only when `look = Candy` | `07-LOOKS.md#7-warmth-candy-only` | settled (preference) |
+| `appearance.accent` | `Accent` (6 variants) | `Postmark` | other 5 not named in any doc (03-COLOR open decision 6) — **could not find full default set**, see handback | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
+| `appearance.motion_level` | `MotionLevel::{System,Calm,Standard,Extra,Reduced}` | `System` | `System` follows the portal's `prefers-reduced-motion` | `07-LOOKS.md#11-desktop-default` ("Motion levels ... apply on top of whichever look is active | proposed") | proposed |
+| `appearance.material_tint_alpha` | `Percent` | `80` | | `21-SPACES.md#3-where-the-tokens-apply` ("`--m-tint` = ... alpha .80 (proposed)") | proposed |
+| `notifications.banner_material` | `Material::{Toast,Inverse}` | `Toast` | `Inverse` = mail's ink-on-paper toast | `03-COLOR.md#open-decisions` item 10; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 7 | proposed — **flagged for review** |
+| `control_center.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
+| `launcher.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
+
+`notifications.banner_material` is stored under `appearance` (it names a `ds::Material`
+variant, appearance's vocabulary) but is *read* by `sill`'s notifications surface; see section
+7 for the cross-file read this implies.
+
+### 3.2 `motion` (quire/appearance.toml — level selector only)
+
+Per-`MotionLevel` durations, easings and scalars (`--t-*`, `--e-*`, `--overshoot`, `--squish`,
+`--lift`, `--tilt`, `--stagger`) are `ds` token-table data (PLAN "Design: `<ds>`" token model),
+generated by `ds::stylesheet()`, not settings — including the ones `05-MOTION.md#10-shell-motion`
+and `#12-open-decisions` mark "proposed" for *which curve* a level uses (e.g. Reduced's
+`--e-spring` = `--e-out`, `05-MOTION.md#10-shell-motion`). Rule 1 in section 1 applies: only the
+level itself is user-tunable.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `motion.level` | alias of `appearance.motion_level` (3.1); kept as a separate dotted path so `ds-settings` and Settings UI code can address it without the whole `Appearance` struct | `System` | | `07-LOOKS.md#11-desktop-default` | proposed |
+
+### 3.3 `icons` (quire/appearance.toml)
+
+The app-icon *generation* pipeline (`08-ICONS.md#3-generation-pipeline`) is a build-time tool
+(`quire-icons`), not a runtime setting, and is out of scope. These are the runtime,
+per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICONS.md#4-third-party-app-icons`).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `icons.plate_inset_percent` | `Percent` | `72` | | `08-ICONS.md#41-plate-mask-rule-settled-rule-proposed-numbers` | proposed |
+| `icons.symbolic_fallback_glyph_percent` | `Percent` | `56` | | `08-ICONS.md#24-object-placement-proposed`; `08-ICONS.md#43-symbolic-fallback-proposed` | proposed |
+| `icons.squircle_detect_iou` | `Fraction` | `900` (0.90) | | `08-ICONS.md#42-icons-that-are-already-squircles-or-rounded-squares-proposed` | proposed |
+| `icons.plate_glyph_colour_policy` | `PlateGlyphPolicy::{Auto,ForceWhite,ForceInk}` | `Auto` (WCAG-driven per family: red/blue/violet -> white, amber/green -> ink) | | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` | proposed — **flagged for review** |
+| `icons.dark_mode_variant` | `IconDarkVariant::{SameAsLight,Adaptive}` | `SameAsLight` | matches freedesktop convention | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` (Open decision 2) | proposed |
+
+### 3.4 `bar` (sill/settings.toml)
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `bar.height_px` | `Px` | `32` | alt 24-28 (macOS 24pt) | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `01-LAYOUT.md#13-shell-surface-layout`; Open decisions in both | proposed — **flagged for review** |
+| `bar.title_hit_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.title_padding_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.open_title_pill_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.status_icon_box_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `20-SURFACES.md#1-1-bar-spec-tier-1` (`IconSize::Bar`) | proposed |
+| `bar.status_glyph_px` | `Px` | `16` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.status_gap_px` | `Px` | `4` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.glyph_size_policy` | `BarGlyphSize::{StatusIcon16,IconSizeBar22}` | `StatusIcon16` | alt = use the full `IconSize::Bar` box | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 8 | proposed |
+
+### 3.5 `dock` (sill/settings.toml)
+
+Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
+`10-BEHAVIOUR-dock.md#10-6-configuration`).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `dock.magnification` | `Magnification::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
+| `dock.tile_size_px` | `Px` | `48` | `32..80` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
+| `dock.magnified_size_px` | `Px` | `96` | `tile_size..128` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
+| `dock.influence_radius_px` | `Px` | `96` | alt `144` | `10-BEHAVIOUR-dock.md#10-3-3-magnification`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 1 | proposed — **flagged for review** |
+| `dock.tile_gap_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
+| `dock.progress_style` | `ProgressStyle::{Ring,Bar}` | `Ring` | alt `Bar` (macOS draws a bar under the icon) | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 2 | proposed |
+| `dock.autohide` | `AutoHide::{Off,On}` | `Off` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
+| `dock.autohide_delay_ms` | `Ms` | `200` | `0..1000` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
+| `dock.autohide_slide_ms` | `Ms` | `500` | `0..1500` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
+| `dock.autohide_trigger_strip_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-11-auto-hide` | proposed |
+| `dock.position` | `DockPosition::{Bottom,Left,Right}` | `Bottom` | Left/Right deferred | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled; deferred |
+| `dock.indicators` | `Indicators::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
+| `dock.bounce` | `Bounce::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
+| `dock.launch_animation` | `LaunchAnim::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
+| `dock.click_active_app` | `ActiveClick::{Cycle,Nothing}` | `Cycle` | `Nothing` = macOS | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (plan) |
+| `dock.trash` | `TrashTile::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
+| `dock.pill_radius_px` | `Px` | `22` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
+| `dock.edge_clamp_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
+| `dock.overflow_min_tile_px` | `Px` | `24` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
+| `dock.running_dot_diameter_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.badge_size_px` | `Px` | `18` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.badge_radius_px` | `Px` | `9` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.progress_ring_diameter_px` | `Px` | `20` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.progress_ring_stroke_px` | `Px` | `3` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.separator_height_px` | `Px` | `36` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.magnify_enter_ms` | `Ms` | `120` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | proposed |
+| `dock.magnify_leave_ms` | `Ms` | `200` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | settled (~200ms), easing proposed |
+| `dock.hover_label_offset_px` | `Px` | `7` | | `10-BEHAVIOUR-dock.md#10-3-4-hover-label` | proposed |
+| `dock.hover_label_warm_ms` | `Ms` | `400` | | `10-BEHAVIOUR-dock.md#10-3-4-hover-label` | proposed |
+| `dock.bounce_period_ms` | `Ms` | `500` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
+| `dock.bounce_launch_cap_ms` | `Ms` | `10000` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
+| `dock.hold_to_menu_ms` | `Ms` | `600` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
+| `dock.hold_to_menu_move_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
+| `dock.remove_threshold_px` | `Px` | `64` | | `10-BEHAVIOUR-dock.md#10-3-8-drag-inside-drag-out-drops`; `06-INTERACTIONS.md#20-desktop-interactions-settled` | proposed |
+| `dock.spring_load_ms` | `Ms` | `500` | | `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.1) | proposed |
+| `dock.minimize_debounce_ms` | `Ms` | `100` | | `10-BEHAVIOUR-dock.md#10-3-10-minimize-target` | proposed |
+| `dock.context_menu_order` | `DockMenuOrder::{WindowsFirst,AppleOrder}` | `WindowsFirst` | plan order: windows, desktop actions, Keep in Dock, Quit | `10-BEHAVIOUR-dock.md#10-3-7-context-menu`; `06-INTERACTIONS.md#20-desktop-interactions-settled` | proposed |
+| `dock.modifier_clicks` | `DockModifierClicks::{AppleMapping,Off}` | `AppleMapping` | Ctrl-click Show in Files, Alt-click switch+hide, Ctrl+Alt-click hide others | `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.1) | proposed |
+
+### 3.6 `launcher` (sill/settings.toml)
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `launcher.top_bar_gap_px` | `Px` | `24` | from `max(bar_h + 24, ...)` | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
+| `launcher.top_centre_bias_px` | `Px` | `230` | from `round(0.4 x output_h - 230)` | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
+| `launcher.top_vertical_fraction` | `Fraction` | `400` (0.4) | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
+| `launcher.input_row_height_px` | `Px` | `56` | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | settled font, height proposed |
+| `launcher.result_row_height_px` | `Px` | `44` | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
+| `launcher.open_latency_budget_ms` | `Ms` | `100` (p95) | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like`; `05-MOTION.md#10-shell-motion` | settled (plan), not a preference but kept visible for `dev/accept-launcher.sh` tuning |
+
+### 3.7 `scroll` (sill/settings.toml)
+
+`scroll.speed`, `scroll.lock_*` and the gain constants are **not** duplicated here: they are
+palmrest's `feel` module and live under `gestures` (3.10) in `palmrest/gestures.toml`, which
+`shell-host` reads read-only (`11-BEHAVIOUR-scroll.md#11-7-integration`).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `scroll.natural` | `NaturalScroll::{Natural,Traditional}` | `Natural` | | `11-BEHAVIOUR-scroll.md#11-6-configuration` (R16) | settled (preference) |
+| `scroll.momentum` | `Momentum::{On,Off}` | `On` | | `11-BEHAVIOUR-scroll.md#11-6-configuration` | proposed |
+| `scroll.momentum_model` | `MomentumModel::{MacMouseFix,Ios}` | `MacMouseFix` | alt `Ios` (`r=.998`, ~1000px glide, "feels closer" per the doc's own note) — the fully worked formula and every acceptance-test number in `11.5.1`/`11.8` assume `MacMouseFix`, so it is the sensible default | `11-BEHAVIOUR-scroll.md#11-9-open-decisions` item 1 | proposed — **flagged for review** |
+| `scroll.momentum_a` | `Scalar` | `30.0` | Mac Mouse Fix drag constant | `11-BEHAVIOUR-scroll.md#11-5-1-momentum-mac-mouse-fix-drag` | proposed (gallery-only) |
+| `scroll.momentum_b` | `Scalar` | `0.7` | Mac Mouse Fix drag exponent | `11-BEHAVIOUR-scroll.md#11-5-1-momentum-mac-mouse-fix-drag` | proposed (gallery-only) |
+| `scroll.momentum_stop_px_s` | `Scalar` | `1.0` | | `11-BEHAVIOUR-scroll.md#11-6-configuration` (gallery-only list) | proposed (gallery-only) |
+| `scroll.momentum_start_px_s` | `Scalar` | `100.0` | flick must exceed this to enter Momentum | `11-BEHAVIOUR-scroll.md#11-4-state-machine` | proposed (gallery-only) |
+| `scroll.momentum_cap_px_s` | `Scalar` | `12000.0` | | `11-BEHAVIOUR-scroll.md#11-5-2-release-velocity` | proposed (gallery-only) |
+| `scroll.velocity_window_ms` | `Ms` | `80` | | `11-BEHAVIOUR-scroll.md#11-5-2-release-velocity` | proposed (gallery-only) |
+| `scroll.velocity_held_still_ms` | `Ms` | `50` | | `11-BEHAVIOUR-scroll.md#11-5-2-release-velocity` | proposed (gallery-only) |
+| `scroll.rubber_band` | `RubberBand::{Bounded,Linear,Off}` | `Bounded` | Linear proposed as the configurable alternative | `11-BEHAVIOUR-scroll.md#11-6-configuration`; `11-BEHAVIOUR-scroll.md#11-9-open-decisions` item 2 | proposed — **flagged for review** |
+| `scroll.rubber_band_c` | `Fraction` | `550` (0.55) | iOS bounded-formula constant | `11-BEHAVIOUR-scroll.md#11-3-7-rubber-band`; `11-BEHAVIOUR-scroll.md#11-5-3-rubber-band` | proposed — **flagged for review** |
+| `scroll.rubber_band_linear_divisor` | `Scalar` | `20.0` | `Linear` model: `s(O) = O / 20` | `11-BEHAVIOUR-scroll.md#11-5-3-rubber-band` | proposed (config alternative) |
+| `scroll.rubber_band_edge_min_px` | `Px` | `10` | | `11-BEHAVIOUR-scroll.md#11-5-3-rubber-band` | proposed |
+| `scroll.rubber_band_snap_rate` | `Scalar` | `12.5` | | `11-BEHAVIOUR-scroll.md#11-5-3-rubber-band` | proposed (gallery-only) |
+| `scroll.rubber_band_snap_gain` | `Scalar` | `0.31` | | `11-BEHAVIOUR-scroll.md#11-5-3-rubber-band` | proposed (gallery-only) |
+| `scroll.wheel_detent_px` | `Px` | `60` | `20..200`; alt Blitz/Chromium Linux ~53 | `11-BEHAVIOUR-scroll.md#11-6-configuration`; `11-BEHAVIOUR-scroll.md#11-9-open-decisions` item 5 | proposed — **flagged for review** (task shorthand "notch_px") |
+| `scroll.wheel_burst_window_ms` | `Ms` | `300` | events this close keep the previous detent-burst target | `11-BEHAVIOUR-scroll.md#11-3-11-wheel-mice-and-programmatic-scrolls` | proposed |
+| `scroll.momentum_boost_threshold_px_s` | `Scalar` | `350.0` | a same-direction flick during Momentum above this speed boosts `v0` | `11-BEHAVIOUR-scroll.md#11-4-state-machine` | proposed |
+| `scroll.double_scroll_grace_ms` | `Ms` | `150` | | `11-BEHAVIOUR-scroll.md#11-3-14-double-scroll-suppression` | proposed |
+
+### 3.8 `scrollbar` (sill/settings.toml)
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `scroll.scrollbars` | `ScrollbarVisibility::{WhenScrolling,Always}` | `WhenScrolling` | | `11-BEHAVIOUR-scroll.md#11-6-configuration` | proposed |
+| `scrollbar.track_thickness_px` | `Px` | `12` | hover `16` | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.track_thickness_hover_px` | `Px` | `16` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.thumb_thickness_px` | `Px` | `8` | hover `12` | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.thumb_thickness_hover_px` | `Px` | `12` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.thumb_min_length_px` | `Px` | `18` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.hide_delay_ms` | `Ms` | `500` | Blitz uses 200 | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.fade_duration_ms` | `Ms` | `240` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.expand_zone_px` | `Px` | `16` | pointer proximity to the track edge | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.expand_duration_ms` | `Ms` | `240` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.legacy_track_width_px` | `Px` | `15` | used when `scroll.scrollbars = Always` | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.other_axis_offset_px` | `Px` | `12` | vertical track stops short when horizontal is visible | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+| `scrollbar.track_click_mode` | `TrackClick::{PageTowardClick,JumpToClick}` | `PageTowardClick` | macOS default is "jump to next page" | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
+
+### 3.9 `gestures` (palmrest/gestures.toml)
+
+Base table carried verbatim from `12-BEHAVIOUR-gestures.md#12-6-configuration`, plus values
+found elsewhere in the file that are not yet in that table.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `scroll.speed` | `Count` | `22` | `0..63` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled (Python) |
+| `scroll.lock_threshold` | `Units` | `40` | `10..200` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `scroll.lock_ratio` | `Fraction` | `1500` (1.5) | `1000..4000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `scroll.lock_timeout_ms` | `Ms` | `250` | `0..2000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `scroll.velocity_gain_max` | `Fraction` | `2000` (2.0) | `1000..4000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `scroll.repeat_gain_max` | `Fraction` | `2300` (2.3) | `1000..4000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `scroll.detent_px` | `Px` | `60` | `20..200` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed (mirrors `scroll.wheel_detent_px`, see 7) |
+| `swipe.threshold` | `Units` | `200` | `50..1000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `swipe.vertical_max` | `Units` | `150` | `20..1000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `swipe.cooldown_ms` | `Ms` | `500` | `0..2000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `swipe.workspace_mode` | `WorkspaceMode::{Trigger,Live}` | `Trigger` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
+| `swipe.repeat` | `SwipeRepeat::{AfterCooldown,OncePerGesture}` | `AfterCooldown` | | `12-BEHAVIOUR-gestures.md#12-6-configuration`; `12-BEHAVIOUR-gestures.md#12-9-open-decisions` item 1 | settled (Python) |
+| `tap.max_ms` | `Ms` | `200` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
+| `tap.gap_ms` | `Ms` | `350` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
+| `tap.max_move_units` | `Units` | `40` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
+| `tap.centroid_max_units` | `Units` | `300` | second tap must land within this of the first | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G6) | proposed |
+| `foreign_output` | `ForeignOutput::{Touchpad,Wheel,Off}` | `Touchpad` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
+| `gestures.g4_foreign_mode` | `G4Mode::{InjectAndScroll,Native}` | `InjectAndScroll` | `Native` = scroll-only, let the browser run its own overscroll nav | `12-BEHAVIOUR-gestures.md#12-9-open-decisions` item 2 | proposed — **flagged for review** (task shorthand "one-finger swipe Inject vs Native") |
+| `gestures.g4_travel_units` | `Units` | `300` | | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
+| `gestures.g4_max_duration_ms` | `Ms` | `400` | | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
+| `gestures.g4_axis_ratio` | `Fraction` | `2000` (2.0) | `|x| >= 2|y|` | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
+| `gestures.g4_settle_ms` | `Ms` | `50` | last motion before lift | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
+| `gestures.host_swipe_D_units` | `Units` | `1000` | `~38mm`; on our own surfaces | `12-BEHAVIOUR-gestures.md#12-3-6-one-finger-swipe-on-our-surfaces-host-decided` | proposed |
+| `gestures.live_workspace_D_units` | `Units` | `1000` | alt `400` (R10 touchpad px) | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.live_workspace_overshoot_scale` | `Fraction` | `250` (0.25) | `p' = bound + 0.25(p-bound)` | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.live_workspace_overshoot_cap` | `Fraction` | `125` (0.125) | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.live_workspace_velocity_window_ms` | `Ms` | `80` | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.live_workspace_commit_velocity` | `Fraction` | `1500` (1.5 pages/s) | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.live_workspace_finish_min_ms` | `Ms` | `100` | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.live_workspace_finish_max_ms` | `Ms` | `400` | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
+| `gestures.gesture_action_map` | `Map<Gesture, Action>` | Apple mapping shipped (see `12-BEHAVIOUR-gestures.md#12-6-configuration` table) | every `Gesture` variant remappable | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled (preference) |
+| `gestures.contact_nibble_policy` | `ContactNibblePolicy::{PythonParity,KernelOnly}` | `PythonParity` | treats report nibble 1-2 as contact (current) vs only 3-4 ("down") | `12-BEHAVIOUR-gestures.md#12-9-open-decisions` item 3 | proposed |
+
+### 3.10 `palm_rejection` (palmrest/gestures.toml)
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `rejection` | `Rejection::{On,Off}` | `On` | `Off` disables P1-P3 and P5 for Python bit-exact comparison | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
+| `palm_rejection.light_touch_size_max` | `Units` | `8` | P1 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.side_band_x_min` | `Units` (signed) | `-900` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.side_band_x_max` | `Units` (signed) | `1060` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.rear_band_percent` | `Percent` | `15` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.resting_move_floor_units` | `Units` | `30` | P2, within `resting_window_ms` | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.resting_window_ms` | `Ms` | `150` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.large_contact_major_units` | `Units` | `64` | P3 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.click_guard_ms` | `Ms` | `200` | P4 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.mouse_moving_threshold_counts_s` | `Count` | `200` | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.mouse_moving_window_ms` | `Ms` | `100` | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+| `palm_rejection.mouse_moving_lock_multiplier` | `Fraction` | `2000` (2.0x, 40->80) | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+
+### 3.11 `menus` (sill/settings.toml; also carries `switcher.*`, `sound.*` per `13.6`'s own grouping)
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `menus.submenu_delay_ms` | `Ms` | `200` | `0..1000` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
+| `menus.item_height_px` | `Px` | `24` | alt `30` (design's Slim padding 6/8) | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 1 | proposed — **flagged for review** |
+| `menus.max_width_px` | `Px` | `420` | min 220 settled | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
+| `menus.separator_margin_px` | `Px` | `4` | | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
+| `menus.section_header_height_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | settled style, height proposed |
+| `menus.submenu_triangle_timeout_ms` | `Ms` | `300` | | `13-BEHAVIOUR-menus-windows.md#13-3-4-submenus` | proposed |
+| `menus.pick_feedback` | `PickFeedback::{None,BlinkOnce}` | `None` | alt `BlinkOnce` (macOS blinks the chosen item once before closing) | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 3 | proposed |
+| `menus.first_mouse_window_ms` | `Ms` | `100` | activation-vs-click window on an inactive window's first click | `13-BEHAVIOUR-menus-windows.md#13-3-8-focus-and-raise-rules`; `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.4) | proposed |
+| `switcher.show_delay_ms` | `Ms` | `150` | `0..500` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
+| `switcher.quick_tap_ms` | `Ms` | `100` | chord+modifier release within this = no UI | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
+| `switcher.icon_size_px` | `Px` | `96` | alt macOS ~128 | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 6 | proposed |
+| `switcher.cell_size_px` | `Px` | `112` | | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
+| `switcher.cell_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
+| `switcher.overflow_min_icon_px` | `Px` | `48` | | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
+| `sound.theme` | `SoundTheme(String)` | `"freedesktop"` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
+| `sound.ui_sounds` | `UiSounds::{On,Off}` | `On` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
+| `sound.volume_feedback` | `VolumeFeedback::{On,Off}` | `On` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
+| `sound.event_screenshot` | `SoundName(String)` | `"screen-capture"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+| `sound.event_trash_empty` | `SoundName(String)` | `"trash-empty"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+| `sound.event_volume_step` | `SoundName(String)` | `"audio-volume-change"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+| `sound.event_dock_remove` | `SoundName(String)` | `"item-deleted"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+| `sound.event_notification` | `SoundName(String)` | `"message-new-instant"` | app hint wins if present | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+| `sound.event_critical_alert` | `SoundName(String)` | `"dialog-warning"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+| `sound.event_invalid_key` | `SoundName(String)` | `"bell"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
+
+### 3.12 `notifications` (sill/settings.toml)
+
+`notifications.banner_material` is in 3.1 (it is `Appearance` vocabulary, read from
+`appearance.toml`); everything else lives here.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `notifications.dnd` | `Dnd::{On,Off}` | `Off` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
+| `notifications.banner_style` | `BannerStyle::{Banner,Alert,None}` per app | `Banner` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | settled (preference), R8 |
+| `notifications.position_right_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8) |
+| `notifications.position_top_gap_px` | `Px` | `8` | on top of `bar.height_px` | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8) |
+| `notifications.banner_width_px` | `Px` | `360` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.banner_min_height_px` | `Px` | `64` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.banner_padding_px` | `Px` | `12` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.icon_px` | `Px` | `32` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.banner_hold_ms` | `Ms` | `5200` | fixed ~5s; app `expire_timeout` ignored except 0 | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications`; `05-MOTION.md#10-shell-motion` | settled (R8), preference-adjacent |
+| `notifications.banner_entry_direction` | `BannerEntry::{FromRight,FromBelow}` | `FromRight` | | `05-MOTION.md#12-open-decisions` item 7 | proposed |
+| `notifications.hover_min_remaining_ms` | `Ms` | `1500` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8), number proposed |
+| `notifications.close_button_px` | `Px` | `18` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.swipe_dismiss_px` | `Px` | `80` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.swipe_dismiss_velocity_px_s` | `Scalar` | `600.0` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.swipe_damping` | `Fraction` | `250` (0.25) | leftward drag damping | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.stack_max` | `Count` | `3` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.stack_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.group_offset_px` | `Px` | `4` | stacked-layer indicator | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+
+### 3.13 `control_center` (sill/settings.toml)
+
+Module list against the Claude Doc spec (rev 31): `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions`
+item 4 — **could not find a single sourced default**; the plan-derived order below is used
+until that comparison happens (see handback report).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `control_center.width_px` | `Px` | `320` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
+| `control_center.grid_columns` | `Count` | `2` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
+| `control_center.grid_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
+| `control_center.grid_padding_px` | `Px` | `12` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
+| `control_center.modules` | `Vec<ControlCenterModule>` | `[Wifi, Bluetooth, Focus, Display, Sound, NowPlaying, Appearance, Battery]` | plan's service list; Claude Doc spec (rev 31) may differ | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed, partial |
+
+### 3.14 `spaces` (sill/settings.toml)
+
+Defaults applied when a workspace has no stored `SpaceLook` in `spaces.json` (section 1 rule
+3). Preset table itself (`21-SPACES.md#4-presets-and-defaults-per-workspace-index`) is fixed
+data, not a key.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `spaces.material_tint_alpha` | `Percent` | `80` | alias of `appearance.material_tint_alpha` (3.1) kept in this domain's table for discoverability | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
+| `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
+| `spaces.default_card_accent` | `CardAccent::{Postmark,SpaceHue}` | `Postmark` | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
+| `spaces.overlay_tint` | `OverlayTint::{Off,On}` | `Off` | applies uniformly to notifications, OSD, power menu, lock, polkit (doc answers them as one "no") | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
+| `spaces.mail_frame_policy` | `MailSpacePolicy::{Own,Workspace,OwnFallbackWorkspace}` | `OwnFallbackWorkspace` | poles are `Own` / `Workspace`; doc's actual proposal is the fallback hybrid | `21-SPACES.md#11-open-decisions` item 1 | proposed — **flagged for review** ("mail-spaces policy Own vs Workspace") |
+| `spaces.wallpaper_follows_space` | `WallpaperPolicy::{Independent,PerWorkspace}` | `Independent` | | `21-SPACES.md#8-wallpaper-proposed` | proposed |
+| `spaces.dock_look_source` | `DockLookSource::{OwnOutput,FocusedWindow}` | `OwnOutput` | multi-output only | `21-SPACES.md#11-open-decisions` item 5 | proposed |
+| `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | proposed |
+
+## 4. Rust shape
+
+Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module
+(bar/dock/launcher/scroll/scrollbar/menus/notifications/control_center/spaces); `gestures`/
+`palm_rejection` live in `palmrest`'s own crate but follow the identical shape so the three
+loaders share one macro/derive story.
+
+Shared newtypes (beyond the four the catalogue names, added per `CONVENTIONS.md#0-design-style`
+"newtype every identifier and every unit"):
+
+```rust
+pub struct Px(pub u16);
+pub struct Ms(pub u16);
+pub struct Percent(pub u8);           // 0..=100, clamped on construction
+pub struct Fraction(pub u16);         // permille: 1000 = 1.0; not clamped (gains exceed 1.0)
+pub struct Count(pub u16);
+pub struct Scalar(pub f32);           // dimensionless physics constant, no natural unit above
+pub struct Units(pub i32);            // raw touchpad/report units, signed
+```
+
+Every domain is one small struct, one field per key, `#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]`,
+`#[serde(default)]` on every field (`CONVENTIONS.md#3-serde`: "every field added after the
+first release carries `#[serde(default)]`, unless no safe default exists" — every field here
+has one, by construction, since the whole point is a shipped default). Enums use
+`#[serde(rename_all = "snake_case")]` and a lenient `Deserialize` that falls back to
+`Default::default()` on an unknown variant rather than erroring (section 2's "lenient" rule),
+via a small `#[serde(deserialize_with = "lenient")]` helper rather than hand-rolled `Visitor`
+impls per field.
+
+### 4.1 `DockSettings` (full)
+
+```rust
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct DockSettings {
+    pub magnification: Magnification,
+    pub tile_size_px: Px,
+    pub magnified_size_px: Px,
+    pub influence_radius_px: Px,
+    pub tile_gap_px: Px,
+    pub progress_style: ProgressStyle,
+    pub autohide: AutoHide,
+    pub autohide_delay_ms: Ms,
+    pub autohide_slide_ms: Ms,
+    pub autohide_trigger_strip_px: Px,
+    pub position: DockPosition,
+    pub indicators: Indicators,
+    pub bounce: Bounce,
+    pub launch_animation: LaunchAnim,
+    pub click_active_app: ActiveClick,
+    pub trash: TrashTile,
+    pub pill_radius_px: Px,
+    pub edge_clamp_px: Px,
+    pub overflow_min_tile_px: Px,
+    pub running_dot_diameter_px: Px,
+    pub badge_size_px: Px,
+    pub badge_radius_px: Px,
+    pub progress_ring_diameter_px: Px,
+    pub progress_ring_stroke_px: Px,
+    pub separator_height_px: Px,
+    pub magnify_enter_ms: Ms,
+    pub magnify_leave_ms: Ms,
+    pub hover_label_offset_px: Px,
+    pub hover_label_warm_ms: Ms,
+    pub bounce_period_ms: Ms,
+    pub bounce_launch_cap_ms: Ms,
+    pub hold_to_menu_ms: Ms,
+    pub hold_to_menu_move_px: Px,
+    pub remove_threshold_px: Px,
+    pub spring_load_ms: Ms,
+    pub minimize_debounce_ms: Ms,
+    pub context_menu_order: DockMenuOrder,
+    pub modifier_clicks: DockModifierClicks,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Magnification { #[default] On, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AutoHide { #[default] Off, On }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DockPosition { #[default] Bottom, Left, Right }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Indicators { #[default] On, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Bounce { #[default] On, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LaunchAnim { #[default] On, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ActiveClick { #[default] Cycle, Nothing }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TrashTile { #[default] On, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DockMenuOrder { #[default] WindowsFirst, AppleOrder }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DockModifierClicks { #[default] AppleMapping, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProgressStyle { #[default] Ring, Bar }
+
+impl Default for DockSettings {
+    fn default() -> Self {
+        Self {
+            magnification: Magnification::On,
+            tile_size_px: Px(48),
+            magnified_size_px: Px(96),
+            influence_radius_px: Px(96),
+            tile_gap_px: Px(4),
+            progress_style: ProgressStyle::Ring,
+            autohide: AutoHide::Off,
+            autohide_delay_ms: Ms(200),
+            autohide_slide_ms: Ms(500),
+            autohide_trigger_strip_px: Px(4),
+            position: DockPosition::Bottom,
+            indicators: Indicators::On,
+            bounce: Bounce::On,
+            launch_animation: LaunchAnim::On,
+            click_active_app: ActiveClick::Cycle,
+            trash: TrashTile::On,
+            pill_radius_px: Px(22),
+            edge_clamp_px: Px(8),
+            overflow_min_tile_px: Px(24),
+            running_dot_diameter_px: Px(4),
+            badge_size_px: Px(18),
+            badge_radius_px: Px(9),
+            progress_ring_diameter_px: Px(20),
+            progress_ring_stroke_px: Px(3),
+            separator_height_px: Px(36),
+            magnify_enter_ms: Ms(120),
+            magnify_leave_ms: Ms(200),
+            hover_label_offset_px: Px(7),
+            hover_label_warm_ms: Ms(400),
+            bounce_period_ms: Ms(500),
+            bounce_launch_cap_ms: Ms(10_000),
+            hold_to_menu_ms: Ms(600),
+            hold_to_menu_move_px: Px(8),
+            remove_threshold_px: Px(64),
+            spring_load_ms: Ms(500),
+            minimize_debounce_ms: Ms(100),
+            context_menu_order: DockMenuOrder::WindowsFirst,
+            modifier_clicks: DockModifierClicks::AppleMapping,
+        }
+    }
+}
+```
+
+### 4.2 `ScrollSettings` (full; `ScrollbarSettings` is its sibling, same shape, omitted for space)
+
+```rust
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ScrollSettings {
+    pub natural: NaturalScroll,
+    pub momentum: Momentum,
+    pub momentum_model: MomentumModel,
+    pub momentum_a: Scalar,
+    pub momentum_b: Scalar,
+    pub momentum_stop_px_s: Scalar,
+    pub momentum_start_px_s: Scalar,
+    pub momentum_cap_px_s: Scalar,
+    pub velocity_window_ms: Ms,
+    pub velocity_held_still_ms: Ms,
+    pub rubber_band: RubberBand,
+    pub rubber_band_c: Fraction,
+    pub rubber_band_linear_divisor: Scalar,
+    pub rubber_band_edge_min_px: Px,
+    pub rubber_band_snap_rate: Scalar,
+    pub rubber_band_snap_gain: Scalar,
+    pub wheel_detent_px: Px,
+    pub wheel_burst_window_ms: Ms,
+    pub momentum_boost_threshold_px_s: Scalar,
+    pub double_scroll_grace_ms: Ms,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NaturalScroll { #[default] Natural, Traditional }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Momentum { #[default] On, Off }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MomentumModel { #[default] MacMouseFix, Ios }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RubberBand { #[default] Bounded, Linear, Off }
+
+impl Default for ScrollSettings {
+    fn default() -> Self {
+        Self {
+            natural: NaturalScroll::Natural,
+            momentum: Momentum::On,
+            momentum_model: MomentumModel::MacMouseFix,
+            momentum_a: Scalar(30.0),
+            momentum_b: Scalar(0.7),
+            momentum_stop_px_s: Scalar(1.0),
+            momentum_start_px_s: Scalar(100.0),
+            momentum_cap_px_s: Scalar(12_000.0),
+            velocity_window_ms: Ms(80),
+            velocity_held_still_ms: Ms(50),
+            rubber_band: RubberBand::Bounded,
+            rubber_band_c: Fraction(550),
+            rubber_band_linear_divisor: Scalar(20.0),
+            rubber_band_edge_min_px: Px(10),
+            rubber_band_snap_rate: Scalar(12.5),
+            rubber_band_snap_gain: Scalar(0.31),
+            wheel_detent_px: Px(60),
+            wheel_burst_window_ms: Ms(300),
+            momentum_boost_threshold_px_s: Scalar(350.0),
+            double_scroll_grace_ms: Ms(150),
+        }
+    }
+}
+```
+
+### 4.3 The rest, by name
+
+`AppearanceSettings` (theme, look, warmth, accent, motion_level, material_tint_alpha),
+`IconsSettings`, `BarSettings`, `LauncherSettings`, `GesturesSettings` (palmrest crate:
+`scroll_speed`/`lock_*`/`swipe_*`/`tap_*`/`foreign_output`/`g4_*`/`live_workspace_*`/
+`gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` and
+`sound_*` as nested structs `SwitcherSettings`, `SoundSettings` per `CONVENTIONS.md#0-design-style`
+"if half a struct's methods never touch half its fields, it is two types" — switcher and sound
+are genuinely separate concerns, nested rather than flattened), `NotificationsSettings`,
+`ControlCenterSettings`, `SpacesSettings`.
+
+### 4.4 The root, the watch and the diff
+
+```rust
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct AppearanceFile {          // quire/appearance.toml
+    pub version: u16,                // = 1
+    pub appearance: AppearanceSettings,
+    pub icons: IconsSettings,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ShellFile {               // sill/settings.toml
+    pub version: u16,
+    pub bar: BarSettings,
+    pub dock: DockSettings,
+    pub launcher: LauncherSettings,
+    pub scroll: ScrollSettings,
+    pub scrollbar: ScrollbarSettings,
+    pub menus: MenusSettings,
+    pub notifications: NotificationsSettings,
+    pub control_center: ControlCenterSettings,
+    pub spaces: SpacesSettings,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GesturesFile {            // palmrest/gestures.toml
+    pub version: u16,
+    pub gestures: GesturesSettings,
+    pub palm_rejection: PalmRejectionSettings,
+}
+
+/// Composes all three files; `ds-settings`, `sill-settings` and `palmrest` each own one
+/// field's I/O, but a surface that needs more than one file's values (the dock reading
+/// `spaces` for tint, `sill` reading `appearance.banner_material`) takes `&Settings`.
+pub struct Settings {
+    pub appearance: AppearanceFile,
+    pub shell: ShellFile,
+    pub gestures: GesturesFile,
+}
+
+/// One `notify` watch per file (three directory watches, 30 ms debounce each); yields the
+/// whole owning file's parsed tree on every settled change, never a partial struct.
+pub struct SettingsWatch { /* ... */ }
+impl SettingsWatch {
+    pub fn appearance(&self) -> impl Stream<Item = AppearanceFile>;
+    pub fn shell(&self) -> impl Stream<Item = ShellFile>;
+    pub fn gestures(&self) -> impl Stream<Item = GesturesFile>;
+}
+
+/// One variant per domain, so a surface subscribes to only the domains it draws.
+/// Pure: no I/O, no clock (`CONVENTIONS.md#6-time` — this is comparison, not a timed effect).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SettingsChange {
+    Appearance, Icons, Bar, Dock, Launcher, Scroll, Scrollbar, Menus, Notifications,
+    ControlCenter, Spaces, Gestures, PalmRejection,
+}
+
+pub fn apply(old: &Settings, new: &Settings) -> Vec<SettingsChange> {
+    let mut out = Vec::new();
+    if old.appearance.appearance != new.appearance.appearance { out.push(SettingsChange::Appearance); }
+    if old.appearance.icons != new.appearance.icons { out.push(SettingsChange::Icons); }
+    if old.shell.bar != new.shell.bar { out.push(SettingsChange::Bar); }
+    if old.shell.dock != new.shell.dock { out.push(SettingsChange::Dock); }
+    if old.shell.launcher != new.shell.launcher { out.push(SettingsChange::Launcher); }
+    if old.shell.scroll != new.shell.scroll { out.push(SettingsChange::Scroll); }
+    if old.shell.scrollbar != new.shell.scrollbar { out.push(SettingsChange::Scrollbar); }
+    if old.shell.menus != new.shell.menus { out.push(SettingsChange::Menus); }
+    if old.shell.notifications != new.shell.notifications { out.push(SettingsChange::Notifications); }
+    if old.shell.control_center != new.shell.control_center { out.push(SettingsChange::ControlCenter); }
+    if old.shell.spaces != new.shell.spaces { out.push(SettingsChange::Spaces); }
+    if old.gestures.gestures != new.gestures.gestures { out.push(SettingsChange::Gestures); }
+    if old.gestures.palm_rejection != new.gestures.palm_rejection { out.push(SettingsChange::PalmRejection); }
+    out
+}
+```
+
+`apply` is deliberately whole-struct `PartialEq`, not per-field: a domain is small enough
+(largest is `dock` at 35 fields) that "one field changed" and "recompute the domain" cost the
+same, and per-field diffing would need a second hand-written table per domain that section 6's
+"every key appears in the Rust schema" test would have to check twice.
+
+## 5. Settings UI mapping
+
+All proposed (this whole page taxonomy did not exist before 2026-09-24). "Advanced" = file
+only in v1, no widget; a later wave may promote one if the user asks.
+
+| Settings app page | Keys shown |
+| --- | --- |
+| **Appearance** | `appearance.theme`, `appearance.look`, `appearance.warmth` (only when look=Candy), `appearance.accent`, `appearance.motion_level` |
+| **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.position`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
+| **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
+| **Keyboard / Shortcuts** | none of this doc's keys are keyboard shortcuts (those are COSMIC `system_actions`/`custom` shortcut files, PLAN "Design: `<shell>`"); this page is out of `22-SETTINGS`'s scope |
+| **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app), `sound.ui_sounds`, `sound.volume_feedback` |
+| **Spaces** | `spaces.mail_frame_policy`, `spaces.wallpaper_follows_space`; the per-workspace dots/grain/theme/accent editor writes `spaces.json` (state), not these defaults |
+| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*`, `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source` |
+
+## 6. Acceptance
+
+1. **Round-trip test per domain**: `Domain::default()` -> `toml::to_string` -> `toml::from_str`
+   -> `assert_eq!` back to `Domain::default()`, for every domain struct in section 4 (13 tests,
+   one per domain; `CONVENTIONS.md#3-serde` "every persisted type has a round-trip test").
+2. **Lenient-parse table**: one test per type family feeding a bad value and asserting the
+   field falls back to default, file otherwise intact —
+
+   | Bad input | Field | Expected |
+   | --- | --- | --- |
+   | unknown enum string (`"bounceyy"`) | `dock.bounce` | falls back to `Bounce::On`, sibling fields keep their parsed values |
+   | out-of-range `Percent` (`255`) | `icons.plate_inset_percent` | clamped to `100` at construction (the newtype's constructor, not serde) |
+   | negative where `Px` (`u16`) expected | any `Px` field | parse error on that field only -> default |
+   | missing table entirely (`[dock]` absent) | whole `DockSettings` | `#[serde(default)]` on the struct produces `DockSettings::default()` |
+   | unknown top-level key (`[dock].puppy = true`) | n/a | preserved verbatim on next write (round-trip through a generic `toml::Value` side channel, or `#[serde(flatten)] extra: toml::Table`) |
+3. **Watch-fires-on-rename**: a tempdir test writes `settings.toml`, starts `SettingsWatch`,
+   then does the same atomic temp+rename the real writer does (not an in-place write), and
+   asserts exactly one `ShellFile` is yielded within the 30 ms debounce + a slack margin — same
+   pattern PLAN "Design: `<ds>`" already names for `ds-settings`: "round-trip, watch-fires-on-rename
+   tempdir, portal mapping tables".
+4. **Diff-yields-only-changed-domains**: property test — construct two `Settings` differing in
+   exactly one domain (proptest over `SettingsChange`'s variants), assert `apply` returns a
+   `Vec` of length 1 containing that variant; construct two identical `Settings`, assert `apply`
+   returns empty.
+5. **Every key in this doc appears in the Rust schema**: a test that parses this file's section
+   3 tables (the dotted key column) and asserts, for each one, that the corresponding
+   `Domain::default()` struct has a field of that name reachable by splitting on `.` and
+   stripping the domain prefix — catches a key added here and forgotten in code, or a Rust
+   field with no doc entry, in either direction. (`gestures.gesture_action_map`,
+   `control_center.modules`, `sound.event_*` and the `appearance.*`-owned-but-notifications-read
+   `notifications.banner_material` need an explicit allow-list in the test for the handful of
+   keys whose dotted prefix does not match their owning Rust struct's module path 1:1 — noted
+   inline in the test, not silently skipped.)
+
+## 7. Open decisions
+
+1. **Whether palmrest and sill share one file.** This doc keeps them separate
+   (`palmrest/gestures.toml` vs `sill/settings.toml`) because `palmrest` is a separate daemon
+   that must start and apply its own config before `sill` or any compositor exists
+   (`12-BEHAVIOUR-gestures.md#12-3-12-daemon-architecture`), and because `12.6`'s own doc text
+   already assumes a `palmrest/config.toml`. A merged file would need `palmrest` to depend on
+   `sill`'s schema or vice versa, which `CONVENTIONS.md#11-quire-addenda-2026-09-24`'s boundary
+   rules (`sill-launcher`/`sill-ipc` must not reach several crates) argue against generalizing.
+   Kept separate; revisit only if the two are shown to drift out of sync in practice.
+2. **`appearance.accent`'s other five variants are unnamed** (`03-COLOR.md#open-decisions` item
+   6) — no doc gives a set of 6 accent names beyond `Postmark`. Cannot default what is not
+   named; `ds`'s token table needs this filled in before `AppearancePicker` can render six
+   swatches.
+3. **`control_center.modules`'s order is plan-derived, not compared against the Claude Doc spec
+   (rev 31)** (`13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 4) — the default above
+   ships but is explicitly provisional.
+4. **Whether `notifications.banner_material`'s read crosses from `appearance.toml` into `sill`'s
+   process cleanly** — today `ds-settings::use_environment` is the only cross-file read path
+   named in the plan (PLAN "Design: `<ds>`"); this doc assumes `sill` calls it for one field of
+   `Appearance`, which is untested until `sill`'s `W1`/`M1` waves land.
+5. **`icons.plate_glyph_colour_policy`'s `Auto` computation** (per-family WCAG lookup) has no
+   named alternative besides forcing white/ink — the docs never propose a third option, so
+   `PlateGlyphPolicy` may be over-built as an enum where a single fixed table would do; kept as
+   an enum per the "no bool, enums for closed sets" rule, not because a real alternative exists
+   yet.
+6. **Bar height's macOS alternative range (24-28) is not a single number** — `bar.height_px`'s
+   Range/Alt column names a range, not a variant; whichever wins per
+   `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 2 and
+   `01-LAYOUT.md#open-decisions` item 1 replaces the default, it does not become an enum (unlike
+   the other flagged items, this one is a genuine tunable number, not a closed choice).
+
+## 8. Sources
+
+- `README.md#3-citation-convention`, `README.md#4-canonical-source` (the 2026-09-24 decision
+  this whole document exists to satisfy), `README.md#5-proposing-a-change`.
+- `CHECKLIST.md#14-settings`.
+- `CONVENTIONS.md#0-design-style` (pure functions, make illegal states unrepresentable, no
+  bool), `CONVENTIONS.md#3-serde` (default, lenient, round-trip, never `deny_unknown_fields`),
+  `CONVENTIONS.md#11-quire-addenda-2026-09-24` (no bool in a settings key; "every value the
+  design docs mark proposed is read from a settings key... never hard-coded").
+- PLAN `~/.claude/plans/vast-toasting-peach.md` "Design: `<ds>` design-system repo" (`ds-settings`
+  I/O: `appearance.json` atomic write, `notify` watch, 30 ms debounce, settings portal), "Design:
+  `<shell>` repo" (`sill-services`, `dock.json`, `frecency.json`, `Services` context pattern),
+  "Cross-repo order", "Verification".
+- Every `#N.M Configuration` section this doc draws its base tables from:
+  `10-BEHAVIOUR-dock.md#10-6-configuration`, `11-BEHAVIOUR-scroll.md#11-6-configuration`,
+  `12-BEHAVIOUR-gestures.md#12-6-configuration`, `13-BEHAVIOUR-menus-windows.md#13-6-configuration`.
+- Every doc cited by section, individually, in section 3's Source column.
