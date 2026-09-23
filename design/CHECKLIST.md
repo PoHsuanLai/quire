@@ -122,3 +122,7 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 - PLAN "Execution model" (coherence rules 1-4, gates), "Verification", "Cross-repo order"
   (coherence gate), "Design: `<ds>`" (lint rules, components, motion API).
 - mailo memory rule "design port means the whole look".
+
+## 14. Settings
+
+- [ ] Every proposed value the change touches is read from a settings key listed in `22-SETTINGS.md`, with that doc's default; no proposed number is hard-coded.

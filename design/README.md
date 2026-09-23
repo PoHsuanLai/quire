@@ -58,7 +58,9 @@ numbers are stable, so `## 6. Acceptance` in 08 is `design/08-ICONS.md#6-accepta
   clash. A value found in a prototype but missing here is added to the doc first, then
   built.
 - Every value is marked settled (decided with the user, or copied from a cited source) or
-  proposed (open until the user signs it off). An unmarked number is a doc bug.
+  proposed. Decision of 2026-09-24: **every proposed value is the shipped default and is a
+  settings key** (see `22-SETTINGS.md`), so the user tunes it once things are in place instead
+  of guessing. An unmarked number is a doc bug.
 
 ## 5. Proposing a change
 
