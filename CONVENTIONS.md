@@ -411,3 +411,26 @@ thing you are testing.** If the test has to restate it, the restatement is what 
 When one can, it is not testing that line. Ask it of every new assertion that uses `>`, `<`,
 `is_empty`, `is_some`, `contains` or `!` — those are where a condition wide enough to be
 accidentally satisfied hides.
+
+## 11. quire addenda (2026-09-24)
+
+These apply to quire, shell-host, sill and every bundled app, on top of §0-§10.
+
+- Small structs; functional style where it fits; data separate from logic; type-driven:
+  newtypes and enums carry meaning, traits only at real seams (§0 already says this; it is
+  restated because the user restated it).
+- No `bool` anywhere in a public signature or a settings key: two-state enums with named
+  variants (`Magnification::{On, Off}`, `Availability::{Enabled, Disabled}`).
+- No long files or long functions: one concept per file, split near 400 lines (§8); a function
+  that needs a comment to separate its phases is two functions.
+- No `unsafe` outside the single allowed module per repo (shell-host's raw window handle),
+  each block with a SAFETY comment; `unsafe_code = "deny"` at the workspace.
+- Dependencies are settled first: the pinned block in `docs/workspace-deps.toml` is copied
+  verbatim into every workspace; a new dependency is a change to that file, reviewed, then
+  copied, never added to one crate alone.
+- Design system rules: every class is prefixed `ds-`; variants in `data-variant`/`data-size`,
+  state in `aria-*`; consumers never style `.ds-*` or `[data-theme|accent|motion|material]`;
+  every colour, duration, easing, keyframe and font comes from the token table; a missing
+  component or token is added to quire first (stop and report), never patched locally.
+- Every value the design docs mark "proposed" is read from a settings key
+  (`design/22-SETTINGS.md`) with that default; never hard-coded.
