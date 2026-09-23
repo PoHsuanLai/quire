@@ -5,12 +5,27 @@
 //! name (park, nudge, C's shake, sail, boat-return, spin, the send ring, the chip flash) are named here so an
 //! [`crate::Anim`] can point at them.
 //!
-//! `Reduced` is 60 ms for every token, the named ones included (design/05-MOTION.md section 3.2,
-//! "named durations (3.4) ... 60ms each"); `--t-big-heavy` is `--t-big` x 1.15 at each level.
+//! `Reduced` is 60 ms for every token of [`DurationKind::Motion`], the named ones included
+//! (design/05-MOTION.md section 3.2, "named durations (3.4) ... 60ms each"); a
+//! [`DurationKind::Hold`] token keeps its Standard value instead (wave 1 amendment: a held
+//! state, not something that moves, so shortening it to 60 ms would make it unreadable rather
+//! than calmer). `--t-big-heavy` is `--t-big` x 1.15 at each level.
 
 use super::name::VarName;
 use crate::appearance::MotionLevel;
 use std::time::Duration;
+
+/// Whether Reduced motion shortens a [`DurationToken`] to 60 ms, or the token times a held
+/// state a person must still be able to register regardless of motion level. Data on the
+/// token (`DurationToken::kind`) rather than a special case in its duration table, so a new
+/// hold is one match arm, not a second code path.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum DurationKind {
+    /// Shortened to 60 ms under Reduced, like every other transition.
+    Motion,
+    /// Keeps its Standard value under Reduced.
+    Hold,
+}
 
 /// One duration token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -60,8 +75,9 @@ pub enum DurationToken {
     /// `--t-send-ring` 5 s: the undo-send countdown ring, linear.
     SendRing,
     /// `--t-flash` 1200 ms: a mentioned person chip's ring, held (design/04-COMPONENTS.md
-    /// section 10, design/06-INTERACTIONS.md section 2.5, `S:2119`; proposed). 60 ms under
-    /// Reduced like every token here (FINDINGS: whether a hold should be exempt is open).
+    /// section 10, design/06-INTERACTIONS.md section 2.5, `S:2119`; proposed).
+    /// [`DurationKind::Hold`]: keeps 1200 ms under Reduced instead of shortening to 60 ms, so
+    /// the ring is still visible (FINDINGS.md "W1 integration" left this open; resolved here).
     Flash,
 }
 
@@ -127,11 +143,25 @@ impl DurationToken {
         Duration::from_millis(self.millis(level))
     }
 
+    /// Whether Reduced shortens this token to 60 ms like every other transition, or the token
+    /// is a held state a person must still be able to register and so keeps its Standard value
+    /// (wave 1 amendment, FINDINGS.md "W1 integration": "whether holds should be exempt is an
+    /// open design question" — resolved here by making it data on the token rather than a
+    /// special case in [`Self::millis`]).
+    pub fn kind(self) -> DurationKind {
+        match self {
+            DurationToken::Flash => DurationKind::Hold,
+            _ => DurationKind::Motion,
+        }
+    }
+
     /// The table, in milliseconds.
     fn millis(self, level: MotionLevel) -> u64 {
         const REDUCED: u64 = 60;
+        if level == MotionLevel::Reduced && self.kind() == DurationKind::Motion {
+            return REDUCED;
+        }
         match (self, level) {
-            (_, MotionLevel::Reduced) => REDUCED,
             (DurationToken::Big, MotionLevel::Calm) => 300,
             (DurationToken::Big, MotionLevel::Extra) => 560,
             // `calc(var(--t-big) * 1.15)`, rounded as section 3.4 lists it: Calm 345,

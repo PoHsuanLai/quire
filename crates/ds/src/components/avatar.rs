@@ -136,14 +136,15 @@ impl AvatarTone {
     }
 
     /// The inline `--av-bg` and `--av-fg`. Token tones name their tokens; the account colour
-    /// and the person hash are hexes computed here (O-7). The white letter on a coloured disc
-    /// is the prototype's `#fff` (`S:116`, `S:1238`); TODO(O-3): it has no token yet.
+    /// and the person hash are hexes computed here (O-7, still open: the ground itself is
+    /// per-address or per-account, so it cannot be a fixed token). The letter on a coloured
+    /// disc is `--on-hue` (`S:116`, `S:1238`; O-3, resolved).
     fn style(self) -> String {
         let (ground, letter) = match self {
             AvatarTone::Ink => ("var(--ink)".to_string(), "var(--paper)"),
             AvatarTone::Stack => ("var(--ink-soft)".to_string(), "var(--paper)"),
-            AvatarTone::Account(colour) => (colour.css(), "#fff"),
-            AvatarTone::Person(hue) => (hue.hex().css(), "#fff"),
+            AvatarTone::Account(colour) => (colour.css(), "var(--on-hue)"),
+            AvatarTone::Person(hue) => (hue.hex().css(), "var(--on-hue)"),
         };
         format!("--av-bg:{ground};--av-fg:{letter}")
     }

@@ -82,13 +82,16 @@ fn every_exception_still_suppresses_something() {
     assert!(stale.is_empty(), "exceptions that match nothing: {stale:?}");
 }
 
-/// What quire's own components write inline that a consumer may not: the avatar's colour is
-/// computed per address or account and written as a hex (design/04-COMPONENTS.md O-7), and its
-/// white letter has no token yet (O-3).
+/// What quire's own components write inline that a consumer may not: the avatar's ground
+/// colour is computed per address or account and written as a hex (design/04-COMPONENTS.md
+/// O-7 — still open; the ground itself cannot be a fixed token, only its letter could). The
+/// letter itself is `--on-hue` now (O-3, resolved; wave 2's schema brief), so this exception no
+/// longer covers `#fff` — only the computed ground remains.
 const MARKUP_EXCEPTIONS: &[Exception] = &[Exception {
     rule: Rule::HexColour,
     selector: "span.ds-avatar",
-    reason: "the person hue and account colour are computed per face (O-7); the letter is #fff (O-3)",
+    reason: "the person hue and account colour are computed per face (O-7, open); the letter \
+             is `--on-hue` now, not a literal (O-3, resolved)",
 }];
 
 /// Coherence rule 2 on quire's own output: every control golden, rendered markup, uses only
