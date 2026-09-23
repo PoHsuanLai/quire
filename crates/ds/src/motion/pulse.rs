@@ -1,7 +1,6 @@
 //! Restarting a keyframe without a reflow: the A/B alias swap (design/05-MOTION.md section 9
 //! rule 2). The stylesheet emits every keyframe as `X` and `X--b`; firing toggles
 //! `data-pulse` so the animation name changes and the engine restarts it.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use crate::components::vocab::PulseKey;
 use crate::motion::anim::Anim;
@@ -16,21 +15,25 @@ pub struct Pulse {
 impl Pulse {
     /// Play the animation again from its first frame. Call from an event handler.
     pub fn fire(&self) {
-        todo!()
+        let fired = self.key.peek().fired();
+        let mut key = self.key;
+        key.set(fired);
     }
 
     /// What to pass to the component that renders it.
     pub fn key(&self) -> PulseKey {
-        todo!()
+        (self.key)()
     }
 
     /// The class and `data-pulse` value to render (`a-gulp`, `a`|`b`), or `None` at rest.
     pub fn attrs(&self) -> Option<(String, &'static str)> {
-        todo!()
+        self.key().attrs()
     }
 }
 
 /// A pulse of `anim`, at rest until fired.
 pub fn use_pulse(anim: Anim) -> Pulse {
-    todo!()
+    Pulse {
+        key: use_signal(|| PulseKey::rest(anim)),
+    }
 }
