@@ -29,6 +29,11 @@ lint = ["dep:cssparser"]
 # consumer still on the webview. Blitz consumers register `fonts::FACES` instead.
 webview-fonts = []
 
+# root_ssr's frame-layer case lints an SSR render, so it needs the linter too.
+[[test]]
+name = "root_ssr"
+required-features = ["lint"]
+
 # The linter's own tests need the linter.
 [[test]]
 name = "lint_rules"

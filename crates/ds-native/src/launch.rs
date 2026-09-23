@@ -23,6 +23,9 @@ pub struct AppConfig {
 
 /// Run `app` until its window closes.
 pub fn launch(app: fn() -> Element, config: AppConfig) {
+    // Held until this call returns, which does not happen until the window closes — i.e., for
+    // the process's life. See `crate::runtime` for why a host thread must enter Tokio at all.
+    let _runtime = crate::runtime::enter();
     let window = WindowAttributes::default()
         .with_title(config.title)
         .with_surface_size(LogicalSize::new(config.width, config.height));

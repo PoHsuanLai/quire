@@ -1,5 +1,10 @@
 //! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG, and
 //! a harness for event-driven tests. The only quire crate that names the blitz crates.
+//!
+//! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
+//! forbids it to `ds`): `launch` and `Harness` each enter a process-wide runtime (`crate::
+//! runtime`) so `ds_settings::use_environment` can spawn its portal and file-watch tasks without
+//! panicking.
 
 mod data_url;
 pub mod error;
@@ -10,6 +15,7 @@ mod host;
 pub mod launch;
 mod measure;
 mod net;
+mod runtime;
 mod scheme;
 pub mod snapshot;
 mod wake;
