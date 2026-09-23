@@ -1,7 +1,7 @@
 //! The editor's rows below the field: the stop chips, the grain, the presets and the measured
 //! contrast checks (design/04-COMPONENTS.md section 32).
 
-use super::{DotIndex, dot_index, edit};
+use super::{DotIndex, Picker, dot_index, edit};
 use crate::appearance::Scheme;
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::chip::{Chip, ChipVariant};
@@ -18,12 +18,10 @@ use dioxus::prelude::*;
 pub(super) fn Stops(
     look: SpaceLook,
     scheme: Scheme,
-    active_dot: DotIndex,
     current: usize,
-    picked: Signal<Option<(DotIndex, DotIndex)>>,
+    picker: Picker,
     onchange: EventHandler<SpaceLook>,
 ) -> Element {
-    let mut picked = picked;
     let palette = derive(&look.dots, scheme);
     let removable = look.dots.len() > 1;
     let room = look.dots.len() < edit::MAX_DOTS;
@@ -35,7 +33,7 @@ pub(super) fn Stops(
                     key: "{index}",
                     class: "ds-stop",
                     "aria-pressed": if index == current { "true" } else { "false" },
-                    onclick: move |_| picked.set(Some((active_dot, dot_index(index)))),
+                    onclick: move |_| picker.pick(dot_index(index)),
                     i {
                         class: "ds-stop-disc",
                         style: "background:{palette.picked.get(index).cloned().unwrap_or_default()}",
@@ -50,7 +48,7 @@ pub(super) fn Stops(
                                 let look = look.clone();
                                 move |event: Event<MouseData>| {
                                     event.stop_propagation();
-                                    picked.set(Some((active_dot, DotIndex(0))));
+                                    picker.pick(DotIndex(0));
                                     onchange.call(edit::removed(&look, index));
                                 }
                             },
@@ -66,7 +64,7 @@ pub(super) fn Stops(
                     icon: Icon::Plus,
                     onclick: move |_| {
                         let next = edit::added(&look_add);
-                        picked.set(Some((active_dot, dot_index(next.dots.len() - 1))));
+                        picker.pick(dot_index(next.dots.len() - 1));
                         onchange.call(next);
                     },
                 }
@@ -100,11 +98,9 @@ pub(super) fn GrainRow(look: SpaceLook, onchange: EventHandler<SpaceLook>) -> El
 pub(super) fn Presets(
     look: SpaceLook,
     scheme: Scheme,
-    picked: Signal<Option<(DotIndex, DotIndex)>>,
-    active_dot: DotIndex,
+    picker: Picker,
     onchange: EventHandler<SpaceLook>,
 ) -> Element {
-    let mut picked = picked;
     rsx! {
         div {
             SectionHeader { kind: HeaderKind::Field, text: "Presets" }
@@ -119,7 +115,7 @@ pub(super) fn Presets(
                         onclick: {
                             let look = look.clone();
                             move |_| {
-                                picked.set(Some((active_dot, DotIndex(0))));
+                                picker.pick(DotIndex(0));
                                 onchange.call(edit::preset(&look, index));
                             }
                         },

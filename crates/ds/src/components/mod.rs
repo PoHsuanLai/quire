@@ -72,7 +72,7 @@ pub use send_pill::{SendPhase, SendPill};
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, Preview, SidebarItem};
 pub use slider::Slider;
-pub use space_editor::{DotIndex, SpaceDot, SpaceEditor};
+pub use space_editor::{ActiveDot, DotIndex, SpaceDot, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;

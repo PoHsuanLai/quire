@@ -43,14 +43,12 @@ impl PartialEq for HostProps {
 
 /// A case inside a `Ds` that inlines no stylesheet, with a host tint alpha when given.
 fn host(props: HostProps) -> Element {
-    if let Some(alpha) = props.tint {
-        use_context_provider(|| Signal::new(alpha));
-    }
     rsx! {
         Ds {
             appearance: Appearance::default(),
             material: Material::Popover,
             stylesheet: Inject::Host,
+            tint_alpha: props.tint,
             {(props.make)()}
         }
     }

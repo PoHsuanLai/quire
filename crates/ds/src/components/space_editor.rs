@@ -39,6 +39,30 @@ fn active(prop: DotIndex, picked: Option<(DotIndex, DotIndex)>, dots: usize) -> 
     usize::from(chosen.0).min(dots.saturating_sub(1))
 }
 
+/// The dot the editor made active, as `on_active_dot` reports it: a handle or stop was picked,
+/// a colour was added or removed, or a preset was applied.
+pub type ActiveDot = DotIndex;
+
+/// Picking a dot inside the editor: remembers the pick against the `active_dot` prop it was made
+/// under, and reports it to the consumer.
+#[derive(Clone, Copy, PartialEq)]
+struct Picker {
+    picked: Signal<Option<(DotIndex, DotIndex)>>,
+    prop: DotIndex,
+    report: Option<EventHandler<ActiveDot>>,
+}
+
+impl Picker {
+    /// Make `index` the dot being edited.
+    fn pick(self, index: DotIndex) {
+        let mut picked = self.picked;
+        picked.set(Some((self.prop, index)));
+        if let Some(report) = self.report {
+            report.call(index);
+        }
+    }
+}
+
 /// The dot at `index`, as a `DotIndex`.
 fn dot_index(index: usize) -> DotIndex {
     DotIndex(u8::try_from(index).unwrap_or(u8::MAX))
@@ -86,16 +110,28 @@ fn percent(share: f64) -> String {
 ///
 /// Controlled: every edit is emitted as a whole new [`SpaceLook`] through `onchange`, and the
 /// consumer passes it back. `active_dot` seeds which dot the handles and keys move; picking a
-/// handle or a stop inside the editor moves it until the consumer passes a different one.
-/// TODO(section 32): the title names no Space, because the props carry no name.
+/// handle or a stop inside the editor moves it until the consumer passes a different one, and
+/// reports it through `on_active_dot` so the consumer can pass it back. `name` titles the panel
+/// "{name} Space" (section 32 markup); without one it reads "Space".
 #[component]
 pub fn SpaceEditor(
     look: SpaceLook,
     scheme: Scheme,
     active_dot: DotIndex,
     onchange: EventHandler<SpaceLook>,
+    #[props(default)] name: Option<String>,
+    #[props(default)] on_active_dot: Option<EventHandler<ActiveDot>>,
 ) -> Element {
     let picked = use_signal(|| None::<(DotIndex, DotIndex)>);
+    let picker = Picker {
+        picked,
+        prop: active_dot,
+        report: on_active_dot,
+    };
+    let title = match name {
+        Some(name) => format!("{name} Space"),
+        None => "Space".to_string(),
+    };
     let dots = look.dots.len();
     let current = active(active_dot, picked(), dots);
     let palette = derive(&look.dots, scheme);
@@ -104,12 +140,12 @@ pub fn SpaceEditor(
         aside { class: "ds-space-editor", "aria-label": "Space editor",
             h3 { class: "ds-space-editor-title",
                 span { class: "ds-space-swatch", style: "background:{swatch}" }
-                "Space"
+                "{title}"
             }
             div {
                 SectionHeader { kind: HeaderKind::Field, text: "Colour", value: "drag a dot".to_string() }
-                Field { look: look.clone(), scheme, active_dot, current, picked, onchange }
-                Stops { look: look.clone(), scheme, active_dot, current, picked, onchange }
+                Field { look: look.clone(), scheme, current, picker, onchange }
+                Stops { look: look.clone(), scheme, current, picker, onchange }
             }
             GrainRow { look: look.clone(), onchange }
             div {
@@ -139,7 +175,7 @@ pub fn SpaceEditor(
                     },
                 }
             }
-            Presets { look: look.clone(), scheme, picked, active_dot, onchange }
+            Presets { look: look.clone(), scheme, picker, onchange }
             Checks { look, scheme }
         }
     }
@@ -150,15 +186,13 @@ pub fn SpaceEditor(
 fn Field(
     look: SpaceLook,
     scheme: Scheme,
-    active_dot: DotIndex,
     current: usize,
-    picked: Signal<Option<(DotIndex, DotIndex)>>,
+    picker: Picker,
     onchange: EventHandler<SpaceLook>,
 ) -> Element {
     let drag = use_drag::<usize>(NO_THRESHOLD);
     let mut element = use_signal(|| None::<Rc<MountedData>>);
     let mut bounds = use_signal(|| None::<Rect>);
-    let mut picked = picked;
     let palette = derive(&look.dots, scheme);
     let plane = field::plane(scheme);
     let look_down = look.clone();
@@ -176,7 +210,7 @@ fn Field(
                     let rect = super::hover_strip::rect(measured);
                     bounds.set(Some(rect));
                     let index = handle_under(&look, rect, at).unwrap_or(current);
-                    picked.set(Some((active_dot, dot_index(index))));
+                    picker.pick(dot_index(index));
                     drag.down(index, at);
                     let (x, y) = fractions(rect, at);
                     onchange.call(edit::moved(&look, index, field::dot_at(x, y)));
@@ -209,7 +243,7 @@ fn Field(
                     onkey: {
                         let look = look.clone();
                         move |nudge: Nudge| {
-                            picked.set(Some((active_dot, dot_index(index))));
+                            picker.pick(dot_index(index));
                             onchange.call(edit::nudged(&look, index, nudge));
                         }
                     },
