@@ -1,5 +1,4 @@
 //! The gallery's pages.
-#![allow(dead_code)] // Freeze stubs: the pages are drawn once main is filled.
 
 /// One gallery page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

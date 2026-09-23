@@ -13,6 +13,11 @@ ds = { workspace = true, features = ["lint"] }
 ds-settings = { workspace = true }
 ds-native = { workspace = true }
 dioxus = { workspace = true }
+image = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+dioxus-ssr = { workspace = true }
 
 [lints]
 workspace = true

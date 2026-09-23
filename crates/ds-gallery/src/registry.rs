@@ -1,0 +1,144 @@
+//! Every page: its title, what it shows, how tall a snapshot of it is, and the component that
+//! draws it. One entry per [`Page`] variant (tested).
+
+use crate::page::Page;
+use crate::pages;
+use dioxus::prelude::*;
+
+/// One page of the gallery.
+#[derive(Debug, Clone, Copy)]
+pub struct Entry {
+    /// Which page.
+    pub page: Page,
+    /// Its tab label.
+    pub title: &'static str,
+    /// One sentence under the title: what a reviewer checks here.
+    pub lede: &'static str,
+    /// How tall its snapshot is, in logical pixels.
+    pub height: u32,
+    /// The page's body.
+    pub body: fn() -> Element,
+}
+
+/// The pages, in the gallery's order.
+pub const REGISTRY: [Entry; 11] = [
+    Entry {
+        page: Page::Tokens,
+        title: "Tokens",
+        lede: "Every colour token with its hex in both schemes, the accents, the label hues, the spacing scale, radii, shadows and z layers.",
+        height: 2300,
+        body: pages::tokens::TokensPage,
+    },
+    Entry {
+        page: Page::Type,
+        title: "Type",
+        lede: "The three faces and the size ramp: every --fs step drawn at its size, with its role.",
+        height: 1500,
+        body: pages::type_ramp::TypePage,
+    },
+    Entry {
+        page: Page::Controls,
+        title: "Controls",
+        lede: "Every control in every state it can express: variants, pressed, expanded, disabled, empty and filled. Press Tab to see the keyboard focus ring.",
+        height: 1900,
+        body: pages::controls::ControlsPage,
+    },
+    Entry {
+        page: Page::Lists,
+        title: "Lists",
+        lede: "A live AnimatedList: add rows, remove them with each exit and watch the rows below heal, then undo. Sidebar items, tiles, the hover strip and the appearance picker.",
+        height: 1500,
+        body: pages::lists::ListsPage,
+    },
+    Entry {
+        page: Page::Overlays,
+        title: "Overlays",
+        lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
+        height: 1200,
+        body: pages::overlays::OverlaysPage,
+    },
+    Entry {
+        page: Page::Materials,
+        title: "Materials",
+        lede: "The eight materials as chrome over a wallpaper, blur on and off, with the ink's four legibility floors measured live at the tint alpha below.",
+        height: 1700,
+        body: pages::materials::MaterialsPage,
+    },
+    Entry {
+        page: Page::Motion,
+        title: "Motion",
+        lede: "Every duration, delay, easing and scalar token at each motion level, and every animation's recipe with its settle time.",
+        height: 2600,
+        body: pages::motion::MotionPage,
+    },
+    Entry {
+        page: Page::Space,
+        title: "Space",
+        lede: "The Space editor bound to the gallery's own Space: the frame tokens it derives, printed, and the eight presets as Space dots.",
+        height: 1900,
+        body: pages::space::SpacePage,
+    },
+    Entry {
+        page: Page::Gaps,
+        title: "Gaps",
+        lede: "What Blitz cannot do and what quire draws instead (spike S1-S16), and what the design names that quire does not draw yet.",
+        height: 2250,
+        body: pages::gaps::GapsPage,
+    },
+    Entry {
+        page: Page::Matrix,
+        title: "Matrix",
+        lede: "One component in a Surface cell for each scheme and accent: pick the component.",
+        height: 900,
+        body: pages::matrix::MatrixPage,
+    },
+    Entry {
+        page: Page::MotionLab,
+        title: "Motion lab",
+        lede: "Fire each animation on a sample. Beside it, the CSS duration token at the current level and the Rust settle() that times the state after it.",
+        height: 2050,
+        body: pages::motion_lab::MotionLabPage,
+    },
+];
+
+/// The entry for `page`.
+pub fn entry(page: Page) -> &'static Entry {
+    REGISTRY
+        .iter()
+        .find(|entry| entry.page == page)
+        .unwrap_or(&REGISTRY[0])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::REGISTRY;
+    use crate::page::Page;
+
+    #[test]
+    fn every_page_has_exactly_one_entry_in_the_page_order() {
+        assert_eq!(REGISTRY.len(), Page::ALL.len());
+        for (entry, page) in REGISTRY.iter().zip(Page::ALL) {
+            assert_eq!(entry.page, page, "{} is out of order", entry.title);
+        }
+        for page in Page::ALL {
+            let count = REGISTRY.iter().filter(|entry| entry.page == page).count();
+            assert_eq!(count, 1, "{page:?}");
+        }
+    }
+
+    #[test]
+    fn every_entry_says_what_it_shows() {
+        for entry in REGISTRY {
+            assert!(
+                !entry.title.is_empty() && !entry.lede.is_empty(),
+                "{:?}",
+                entry.page
+            );
+            assert!(
+                entry.height >= 600,
+                "{:?} is too short to snapshot",
+                entry.page
+            );
+        }
+    }
+}
