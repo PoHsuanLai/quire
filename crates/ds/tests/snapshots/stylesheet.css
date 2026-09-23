@@ -751,11 +751,11 @@ html,body{margin:0;padding:0;background:transparent}
    crumple (`C:714`) and arrival (`C:373`). Attribute selectors carry `*|` (spike S2).
    Motion state is the roster's: `data-presence=entering|present|leaving|healing` with
    `data-exit=fold|curl|crumple`. An entering row rises (staggered by `--i`) when its list is
-   first shown and plays `row-in` when it arrives into a list at rest. An unread leaving fold is
-   `--t-big-heavy`; curl and crumple keep their own durations because `Roster` settles them at
-   those (`motion/roster.rs` has no heavy curl or crumple). A healing row slides from `--dy`,
-   delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate filter (05-MOTION rule 4).
-   Name, subject and snippet truncate with `.ds-truncate`. The star's fill is an SVG attribute
+   first shown and plays `row-in` when it arrives into a list at rest. An unread leaving row
+   plays the heavy variant of its exit (`--t-big-heavy`, `--t-curl-heavy`, `--t-crumple-heavy`),
+   the one `Roster::leave` settles. `tab-out` is a Today entry's exit, not a row's. A healing
+   row slides from `--dy`, delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate
+   filter (05-MOTION rule 4). Name, subject and snippet truncate with `.ds-truncate`. The star's fill is an SVG attribute
    (spike S6), so this file colours it with `color`.
    Not specified: the row's active state, disabled. The undo restore (`rise --t-big
    --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
@@ -786,7 +786,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-presence=leaving][*|data-exit=fold]{ animation:fold var(--t-big) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=fold][*|data-emphasis=strong]{ animation:fold var(--t-big-heavy) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=curl]{ animation:curl var(--t-curl) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=curl][*|data-emphasis=strong]{ animation:curl var(--t-curl-heavy) var(--e-exit) forwards; }
 .ds-row[*|data-presence=leaving][*|data-exit=crumple]{ animation:crumple var(--t-big) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=crumple][*|data-emphasis=strong]{ animation:crumple var(--t-crumple-heavy) var(--e-exit) forwards; }
 
 /* Healing (`S:330`). */
 .ds-row[*|data-presence=healing]{

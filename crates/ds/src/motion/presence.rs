@@ -13,6 +13,20 @@ pub enum Exit {
     Curl,
     /// Trash, delete: `crumple`.
     Crumple,
+    /// A Today entry closing: `tab-out` (wave 2 integration amendment).
+    TabOut,
+}
+
+impl Exit {
+    /// The `data-exit` value.
+    pub fn slug(self) -> &'static str {
+        match self {
+            Exit::Fold => "fold",
+            Exit::Curl => "curl",
+            Exit::Crumple => "crumple",
+            Exit::TabOut => "tab-out",
+        }
+    }
 }
 
 /// An item's motion state: `data-presence`.

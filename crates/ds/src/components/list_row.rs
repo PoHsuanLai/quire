@@ -24,15 +24,6 @@ fn emphasis_slug(emphasis: Emphasis) -> &'static str {
     }
 }
 
-/// The `data-exit` word.
-fn exit_slug(exit: Exit) -> &'static str {
-    match exit {
-        Exit::Fold => "fold",
-        Exit::Curl => "curl",
-        Exit::Crumple => "crumple",
-    }
-}
-
 /// The row's inline custom properties: the stagger `--i` always, and while healing the
 /// distance `--dy` and the heal index `--d`.
 fn row_style(index: StaggerIndex, presence: Presence) -> String {
@@ -46,7 +37,7 @@ fn row_style(index: StaggerIndex, presence: Presence) -> String {
 /// `data-exit`, on a leaving row only.
 fn exit(presence: Presence) -> Option<&'static str> {
     match presence {
-        Presence::Leaving(exit) => Some(exit_slug(exit)),
+        Presence::Leaving(exit) => Some(exit.slug()),
         Presence::Entering | Presence::Present | Presence::Healing { .. } => None,
     }
 }
@@ -295,6 +286,7 @@ mod tests {
             (Presence::Leaving(Exit::Fold), Some("fold")),
             (Presence::Leaving(Exit::Curl), Some("curl")),
             (Presence::Leaving(Exit::Crumple), Some("crumple")),
+            (Presence::Leaving(Exit::TabOut), Some("tab-out")),
             (Presence::Entering, None),
             (Presence::Present, None),
         ];

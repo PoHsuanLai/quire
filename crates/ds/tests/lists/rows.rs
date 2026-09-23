@@ -194,8 +194,18 @@ pub const ROW_CASES: &[Case] = &[
     },
     Case {
         component: "list_row",
+        state: "leaving-curl-unread",
+        make: || plain_row(Presence::Leaving(Exit::Curl), Emphasis::Strong),
+    },
+    Case {
+        component: "list_row",
         state: "leaving-crumple",
         make: || plain_row(Presence::Leaving(Exit::Crumple), Emphasis::Plain),
+    },
+    Case {
+        component: "list_row",
+        state: "leaving-crumple-unread",
+        make: || plain_row(Presence::Leaving(Exit::Crumple), Emphasis::Strong),
     },
     Case {
         component: "list_row",

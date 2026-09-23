@@ -77,7 +77,9 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// Place and Pinned are buttons; Today is a `div[role=button]` because it holds its own close
 /// button (a button cannot contain a button). A current Place wears the seal, a real span
 /// rather than `::before` (O-22's fallback). `presence` animates a Today entry in (`tab-in`) and
-/// out (`tab-out`; the consumer drops it at `settle(Anim::TabOut)`); the other kinds do not move.
+/// out (`Presence::Leaving(Exit::TabOut)` plays `tab-out`; the consumer drops it at
+/// `settle(Anim::TabOut)`, which is what `RosterState::leave` returns for that exit); the other
+/// kinds do not move.
 /// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something.
 #[component]
 pub fn SidebarItem(

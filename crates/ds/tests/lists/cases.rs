@@ -270,7 +270,7 @@ pub const CASES: &[Case] = &[
             item(
                 ItemKind::Today { avatar: DANA },
                 Here::Elsewhere,
-                Presence::Leaving(Exit::Fold),
+                Presence::Leaving(Exit::TabOut),
                 None,
                 GULP(),
             )
