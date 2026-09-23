@@ -1,1 +1,43 @@
-/* icon_button.css: filled in with the component (design/04-COMPONENTS.md). */
+/* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
+   The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
+   The glyph is sized by `Glyph` itself; no rule here sizes or strokes an icon (spike S6).
+   TODO(O-1): disabled has no visual; `aria-disabled` only drops the handler. */
+
+.ds-icon-button{ font:inherit; }
+
+/* Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
+.ds-icon-button[*|data-variant=tool]{
+  display:inline-grid; place-items:center; width:28px; height:26px; border:1px solid transparent; border-radius:var(--r-btn);
+  background:transparent; color:var(--ink-faint); cursor:pointer;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-icon-button[*|data-variant=tool]:hover{ color:var(--ink); background:var(--surface); }
+.ds-icon-button[*|data-variant=tool]:active{ transform:scale(var(--squish)); }
+.ds-icon-button[*|data-variant=tool][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); border-color:var(--line); }
+
+/* Foot: `S:151-153`. Active: not specified. */
+.ds-icon-button[*|data-variant=foot]{
+  width:24px; height:24px; border-radius:var(--r-menu-item); border:0; background:transparent; cursor:pointer;
+  display:grid; place-items:center; color:var(--f-ink-soft);
+}
+.ds-icon-button[*|data-variant=foot]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+
+/* Strip: the button half of `S:312-323`; the reveal and `pop-in` belong to HoverStrip (section 17).
+   TODO(O-3, O-10): `.88` has no scalar token; `!important` is dropped (HoverStrip settles pop-in). */
+.ds-icon-button[*|data-variant=strip]{
+  position:relative; width:26px; height:26px; border:0; border-radius:var(--r-pill); background:transparent; cursor:pointer;
+  display:grid; place-items:center; color:var(--ink-soft);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-icon-button[*|data-variant=strip]:hover{ background:var(--accent-soft); color:var(--ink); }
+.ds-icon-button[*|data-variant=strip]:active{ transform:scale(.88); }
+
+/* Pin: `S:108-114`, `S:118`; the current-item shadow is `--shadow-current` (O-3). */
+.ds-icon-button[*|data-variant=pin]{
+  aspect-ratio:1; border:0; border-radius:var(--r-tile); cursor:pointer; background:var(--f-pill-hover);
+  display:grid; place-items:center; position:relative; color:var(--f-ink);
+  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-icon-button[*|data-variant=pin]:hover{ background:var(--f-pill); }
+.ds-icon-button[*|data-variant=pin]:active{ transform:scale(var(--squish)); }
+.ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }

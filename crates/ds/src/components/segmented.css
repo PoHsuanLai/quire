@@ -1,1 +1,19 @@
-/* segmented.css: filled in with the component (design/04-COMPONENTS.md). */
+/* SegmentedControl (design/04-COMPONENTS.md section 3): Regular is S's `.seg` (`S:265-268`),
+   Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
+   Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
+   The pressed fill jumps between segments; there is no sliding thumb.
+   TODO(O-1): disabled is not specified. */
+
+.ds-segmented{ display:inline-flex; gap:2px; border:1px solid var(--line); border-radius:var(--r-pill); }
+.ds-segmented[*|data-size=regular]{ padding:3px; background:var(--surface-2); }
+.ds-segmented[*|data-size=small]{ padding:2px; background:var(--surface); }
+
+.ds-segment{
+  font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:pointer; color:var(--ink-soft);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-segmented[*|data-size=regular] .ds-segment{ padding:5px 11px; font-size:var(--fs-small); }
+.ds-segmented[*|data-size=small] .ds-segment{ padding:3px 10px; font-size:var(--fs-help); }
+.ds-segment:hover{ color:var(--ink); }
+.ds-segment:active{ transform:scale(var(--squish)); }
+.ds-segment[*|aria-pressed=true]{ background:var(--ink); color:var(--paper); }

@@ -1,1 +1,41 @@
-/* chip.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
+   washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate.
+   `chip-land` plays through the pulse classes (`a-chip-land`), not from here.
+   The Person chip's flash (`0 0 0 3px var(--accent-soft)`, 1200 ms, `S:2119`) has no prop yet. */
+
+.ds-chip{ font-family:var(--font-data); white-space:nowrap; }
+
+/* Accent: `S:198-199`. Label shares its shape (`C:941-944`). */
+.ds-chip[*|data-variant=accent],
+.ds-chip[*|data-variant=label]{
+  font-size:var(--fs-micro); padding:1.5px 7px; border-radius:var(--r-chip);
+  background:var(--accent-soft); color:var(--ink);
+}
+.ds-chip[*|data-variant=label][*|data-hue=red]{    background:var(--c-red-soft);    color:var(--c-red-deep); }
+.ds-chip[*|data-variant=label][*|data-hue=amber]{  background:var(--c-amber-soft);  color:var(--c-amber-deep); }
+.ds-chip[*|data-variant=label][*|data-hue=green]{  background:var(--c-green-soft);  color:var(--c-green-deep); }
+.ds-chip[*|data-variant=label][*|data-hue=blue]{   background:var(--c-blue-soft);   color:var(--c-blue-deep); }
+.ds-chip[*|data-variant=label][*|data-hue=violet]{ background:var(--c-violet-soft); color:var(--c-violet-deep); }
+
+/* Neutral: C's `.tag` (`C:615-616`). */
+.ds-chip[*|data-variant=neutral]{
+  font-size:var(--fs-micro); padding:2px 7px; border-radius:var(--r-pill);
+  background:var(--surface-2); border:1px solid var(--line); color:var(--ink-faint);
+}
+
+/* Token: `S:798`. */
+.ds-chip[*|data-variant=token]{ font-size:var(--fs-note); padding:2px 8px; border-radius:var(--r-pill); background:var(--accent-soft); color:var(--ink); }
+
+/* Status: `S:276-278`. */
+.ds-chip[*|data-variant=status]{ font-size:var(--fs-micro); padding:1px 7px; border-radius:var(--r-pill); }
+.ds-chip[*|data-variant=status][*|data-status=ok]{ background:var(--ok-wash); color:var(--ok); }
+.ds-chip[*|data-variant=status][*|data-status=bad]{ background:var(--danger-wash); color:var(--danger); }
+
+/* Person: `S:592-598`, entering with `chip-in` on mount. The avatar is an 18 Avatar. */
+.ds-chip[*|data-variant=person]{
+  display:inline-flex; align-items:center; gap:6px; padding:2px 8px 2px 3px; border-radius:var(--r-pill);
+  background:var(--surface); border:1px solid var(--line);
+  font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
+  animation:chip-in var(--t-move) var(--e-spring);
+}
+.ds-chip-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }

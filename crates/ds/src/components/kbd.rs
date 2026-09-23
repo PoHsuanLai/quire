@@ -13,8 +13,22 @@ pub enum KbdSize {
     Small,
 }
 
-/// A shortcut as key caps.
+impl KbdSize {
+    /// The `data-size` word.
+    fn slug(self) -> &'static str {
+        match self {
+            KbdSize::Regular => "regular",
+            KbdSize::Small => "small",
+        }
+    }
+}
+
+/// A shortcut as key caps, one per key and nothing between them (O-2: glyphs, no separator).
 #[component]
 pub fn Kbd(shortcut: Shortcut, #[props(default)] size: KbdSize) -> Element {
-    todo!()
+    rsx! {
+        for key in shortcut.0 {
+            kbd { class: "ds-kbd", "data-size": size.slug(), "{key.glyph()}" }
+        }
+    }
 }

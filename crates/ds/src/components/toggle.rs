@@ -12,5 +12,20 @@ pub fn Toggle(
     #[props(default)] availability: Availability,
     onchange: EventHandler<Switch>,
 ) -> Element {
-    todo!()
+    rsx! {
+        button {
+            r#type: "button",
+            class: "ds-toggle",
+            role: "switch",
+            "aria-checked": value.aria(),
+            "aria-label": "{label}",
+            "aria-disabled": availability.aria_disabled(),
+            onclick: move |_| {
+                if availability == Availability::Enabled {
+                    onchange.call(value.flipped());
+                }
+            },
+            span { class: "ds-toggle-knob" }
+        }
+    }
 }

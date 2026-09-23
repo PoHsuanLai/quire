@@ -2,7 +2,6 @@
 //!
 //! No `bool` props: every two-state prop is one of these enums, so a call site reads
 //! `Availability::Disabled`, never `true`.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use crate::motion::anim::Anim;
 use serde::{Deserialize, Serialize};
@@ -88,7 +87,7 @@ impl StaggerIndex {
 
     /// The index for position `n`, saturating at [`Self::CAP`].
     pub fn new(n: usize) -> Self {
-        todo!()
+        StaggerIndex(u8::try_from(n).map_or(Self::CAP, |n| n.min(Self::CAP)))
     }
 
     /// The index, 0 to [`Self::CAP`].
@@ -138,12 +137,21 @@ impl PulseKey {
 
     /// The same animation with the other alias playing: what `Pulse::fire` stores.
     pub fn fired(self) -> Self {
-        todo!()
+        let phase = match self.phase {
+            PulsePhase::Rest | PulsePhase::B => PulsePhase::A,
+            PulsePhase::A => PulsePhase::B,
+        };
+        PulseKey { phase, ..self }
     }
 
     /// The class and `data-pulse` value to render, or `None` while at rest.
     pub fn attrs(self) -> Option<(String, &'static str)> {
-        todo!()
+        let alias = match self.phase {
+            PulsePhase::Rest => return None,
+            PulsePhase::A => "a",
+            PulsePhase::B => "b",
+        };
+        Some((self.anim.class().to_string(), alias))
     }
 }
 
@@ -188,6 +196,94 @@ pub struct Shortcut(pub Vec<Key>);
 impl Shortcut {
     /// The glyph text: `⌃T`.
     pub fn glyphs(&self) -> String {
-        todo!()
+        self.0.iter().map(|key| key.glyph()).collect()
+    }
+}
+
+impl Key {
+    /// The text one key cap shows. Only `⌃ ⇧ ⌥ ⌘`, upper-case characters and `↵` are the
+    /// doc's; the rest are not specified in design/04-COMPONENTS.md (O-2 names only the
+    /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace and the arrows need sign-off.
+    pub(crate) fn glyph(self) -> String {
+        match self {
+            Key::Ctrl => "⌃".to_string(),
+            Key::Shift => "⇧".to_string(),
+            Key::Alt => "⌥".to_string(),
+            Key::Super => "⌘".to_string(),
+            Key::Char(c) => c.to_uppercase().collect(),
+            Key::Space => "Space".to_string(),
+            Key::Enter => "↵".to_string(),
+            Key::Escape => "Esc".to_string(),
+            Key::Tab => "⇥".to_string(),
+            Key::Backspace => "⌫".to_string(),
+            Key::Up => "↑".to_string(),
+            Key::Down => "↓".to_string(),
+            Key::Left => "←".to_string(),
+            Key::Right => "→".to_string(),
+        }
+    }
+}
+
+impl Availability {
+    /// `aria-disabled`: present only when disabled.
+    pub(crate) fn aria_disabled(self) -> Option<&'static str> {
+        match self {
+            Availability::Enabled => None,
+            Availability::Disabled => Some("true"),
+        }
+    }
+}
+
+impl Switch {
+    /// The `aria-pressed` / `aria-checked` word.
+    pub(crate) fn aria(self) -> &'static str {
+        match self {
+            Switch::On => "true",
+            Switch::Off => "false",
+        }
+    }
+
+    /// The other state.
+    pub(crate) fn flipped(self) -> Self {
+        match self {
+            Switch::On => Switch::Off,
+            Switch::Off => Switch::On,
+        }
+    }
+}
+
+impl Selection {
+    /// The `aria-selected` word.
+    pub(crate) fn aria(self) -> &'static str {
+        match self {
+            Selection::Selected => "true",
+            Selection::Unselected => "false",
+        }
+    }
+
+    /// `Selected` when `a == b`.
+    pub(crate) fn of<T: PartialEq>(a: &T, b: &T) -> Self {
+        if a == b {
+            Selection::Selected
+        } else {
+            Selection::Unselected
+        }
+    }
+}
+
+impl Fraction {
+    /// All of it.
+    pub(crate) const ONE: Fraction = Fraction(1000);
+
+    /// The value a component draws: clamped to 0..=1000 (FINDINGS F18).
+    pub(crate) fn clamped(self) -> Self {
+        Fraction(self.0.min(Self::ONE.0))
+    }
+
+    /// The clamped value as a CSS number for `--f`: `0.35`, `0`, `1`.
+    pub(crate) fn css(self) -> String {
+        let permille = self.clamped().0;
+        let text = format!("{}.{:03}", permille / 1000, permille % 1000);
+        text.trim_end_matches('0').trim_end_matches('.').to_string()
     }
 }

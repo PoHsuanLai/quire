@@ -15,7 +15,35 @@ pub enum HeaderKind {
     Menu,
 }
 
-/// A group's name.
+impl HeaderKind {
+    /// The `data-kind` word.
+    fn slug(self) -> &'static str {
+        match self {
+            HeaderKind::Frame => "frame",
+            HeaderKind::Group => "group",
+            HeaderKind::Field => "field",
+            HeaderKind::Menu => "menu",
+        }
+    }
+
+    /// Whether a trailing rule follows the text: Frame and Group draw one.
+    fn rule(self) -> Rule {
+        match self {
+            HeaderKind::Frame | HeaderKind::Group => Rule::Drawn,
+            HeaderKind::Field | HeaderKind::Menu => Rule::None,
+        }
+    }
+}
+
+/// Whether a header draws its trailing rule.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Rule {
+    Drawn,
+    None,
+}
+
+/// A group's name. The visual order is text, value, rule, action (S puts the rule between the
+/// text and the Frame's action button, `S:120-125`).
 #[component]
 pub fn SectionHeader(
     kind: HeaderKind,
@@ -23,5 +51,25 @@ pub fn SectionHeader(
     #[props(default)] value: Option<String>,
     #[props(default)] action: Option<(String, EventHandler<()>)>,
 ) -> Element {
-    todo!()
+    // The rule is a real span, not `::after`: pseudo-elements are unverified in Blitz (O-22's
+    // fallback, `ds-section-header-rule`).
+    rsx! {
+        div { class: "ds-section-header", "data-kind": kind.slug(),
+            span { "{text}" }
+            if let Some(value) = value {
+                span { class: "ds-section-header-value", "{value}" }
+            }
+            if kind.rule() == Rule::Drawn {
+                span { class: "ds-section-header-rule" }
+            }
+            if let Some((label, onclick)) = action {
+                button {
+                    r#type: "button",
+                    class: "ds-section-header-action",
+                    onclick: move |_| onclick.call(()),
+                    "{label}"
+                }
+            }
+        }
+    }
 }

@@ -1,1 +1,14 @@
-/* spinner.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Spinner (design/04-COMPONENTS.md section 15): C's sync halo (`C:284-292`), a ring at
+   `inset:-4px` around a positioned parent. Attribute selectors carry `*|` (spike S2).
+   `ease-in-out` and `1.1s` are the tokens `--e-in-out` and `--t-spin` (O-3).
+   TODO(O-9): standalone size not specified; both kinds loop, so Blitz never idles while one shows. */
+
+.ds-spinner{
+  position:absolute; inset:-4px; border-radius:var(--r-pill); border:2px solid var(--accent);
+  opacity:0; transform:scale(.85);
+}
+.ds-spinner[*|data-kind=breathe]{ animation:breathe var(--t-ambient) var(--e-in-out) infinite; }
+.ds-spinner[*|data-kind=spin]{
+  opacity:.9; transform:scale(1); border-style:dashed;
+  animation:spin var(--t-spin) var(--e-linear) infinite;
+}

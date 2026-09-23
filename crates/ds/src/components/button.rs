@@ -3,6 +3,7 @@
 
 use crate::components::vocab::{Availability, Switch};
 use crate::icon::Icon;
+use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 
 /// Which button.
@@ -20,6 +21,25 @@ pub enum ButtonVariant {
     Danger,
 }
 
+impl ButtonVariant {
+    /// The `data-variant` word.
+    fn slug(self) -> &'static str {
+        match self {
+            ButtonVariant::Primary => "primary",
+            ButtonVariant::Secondary => "secondary",
+            ButtonVariant::Mini => "mini",
+            ButtonVariant::Quiet => "quiet",
+            ButtonVariant::Danger => "danger",
+        }
+    }
+
+    /// The icon size: 14 for every variant that the doc sizes. TODO(O-3): the Quiet icon is
+    /// "not specified" in design/04-COMPONENTS.md section 1; it takes the same 14.
+    fn icon_size(self) -> IconSize {
+        IconSize::Compact
+    }
+}
+
 /// A labelled action.
 #[component]
 pub fn Button(
@@ -30,5 +50,23 @@ pub fn Button(
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
 ) -> Element {
-    todo!()
+    let pressed = pressed.map(|state| state.aria());
+    rsx! {
+        button {
+            r#type: "button",
+            class: "ds-button",
+            "data-variant": variant.slug(),
+            "aria-pressed": pressed,
+            "aria-disabled": availability.aria_disabled(),
+            onclick: move |_| {
+                if availability == Availability::Enabled {
+                    onclick.call(());
+                }
+            },
+            if let Some(icon) = icon {
+                Glyph { icon, size: variant.icon_size() }
+            }
+            span { "{label}" }
+        }
+    }
 }

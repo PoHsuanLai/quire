@@ -1,1 +1,23 @@
-/* toggle.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Toggle (design/04-COMPONENTS.md section 4, derived): the `.seg` track, the pressed Mini's
+   accent fill, the Space dot's spring. Attribute selectors carry `*|` (spike S2); the focus
+   ring is the global one, on the track (spike S12).
+   TODO(O-4): the knob and track sizes are the doc's candidate (knob 18, track 36 x 24 with
+   3px padding), not signed off. The knob's travel is a fixed 12px (36 - 2 x 3 - 18), since a
+   transition against the track's own width is not guaranteed in Blitz.
+   TODO(O-1): disabled is not specified; hover is not specified. */
+
+.ds-toggle{
+  display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:3px;
+  border:1px solid var(--line); border-radius:var(--r-pill); background:var(--surface-2); cursor:pointer;
+  transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+}
+.ds-toggle-knob{
+  display:block; flex:none; width:18px; height:18px;
+  border-radius:var(--r-pill); background:var(--raise); box-shadow:var(--shadow-1);
+  transition:transform var(--t-move) var(--e-spring);
+}
+.ds-toggle[*|aria-checked=true]{ background:var(--accent); border-color:transparent; }
+.ds-toggle[*|aria-checked=true] .ds-toggle-knob{ transform:translateX(12px); }
+.ds-toggle:active .ds-toggle-knob{ transform:scale(var(--squish)); }
+/* The doc's active rule alone would snap an On knob back to the left while pressed. */
+.ds-toggle[*|aria-checked=true]:active .ds-toggle-knob{ transform:translateX(12px) scale(var(--squish)); }

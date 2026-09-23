@@ -1,1 +1,22 @@
-/* section_header.css: filled in with the component (design/04-COMPONENTS.md). */
+/* SectionHeader (design/04-COMPONENTS.md section 13): Frame `S:120-125`, Group `C:1026-1032`,
+   Field `S:250-251`, Menu `S:668`. The rule is a real span (O-22's fallback for `::after`).
+   Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state. */
+
+.ds-section-header{ display:flex; align-items:center; font-family:var(--font-data); text-transform:uppercase; color:var(--ink-faint); }
+.ds-section-header[*|data-kind=frame]{ gap:6px; padding:14px 6px 5px; font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
+.ds-section-header[*|data-kind=group]{ gap:8px; padding:12px 6px 6px; font-size:var(--fs-caption); letter-spacing:.12em; }
+.ds-section-header[*|data-kind=field]{ margin-bottom:6px; font-size:var(--fs-caption); letter-spacing:.14em; }
+.ds-section-header[*|data-kind=menu]{ padding:7px 8px 3px; font-size:var(--fs-micro); letter-spacing:.14em; }
+
+.ds-section-header-rule{ flex:1; height:1px; }
+.ds-section-header[*|data-kind=frame] .ds-section-header-rule{ background:var(--f-line); }
+.ds-section-header[*|data-kind=group] .ds-section-header-rule{ background:var(--line-soft); }
+
+.ds-section-header-value{ font-variant-numeric:tabular-nums; }
+.ds-section-header[*|data-kind=field] .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
+
+.ds-section-header-action{
+  border:0; background:none; cursor:pointer; font:inherit; letter-spacing:.08em;
+  color:var(--f-ink-faint); padding:0 2px; text-transform:none;
+}
+.ds-section-header-action:hover{ color:var(--f-ink); }
