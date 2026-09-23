@@ -1,0 +1,58 @@
+[package]
+name = "blitz-probe"
+version = "0.0.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+description = "Throwaway W0 spike: renders small probe documents headlessly to answer FINDINGS.md S1-S16."
+
+# Its own workspace, so the quire workspace never builds it.
+[workspace]
+
+[workspace.dependencies]
+# ---- lines copied from quire/docs/workspace-deps.toml (pinned block) ----
+blitz-dom = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042", default-features = false, features = ["svg", "system-fonts", "custom-widget", "accessibility"] }
+blitz-paint = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042" }
+blitz-traits = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042" }
+dioxus-native-dom = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042", default-features = false, features = ["svg", "system-fonts", "accessibility"] }
+dioxus = { version = "0.7", default-features = false, features = ["macro", "html", "hooks", "signals"] }
+anyrender = "0.13"
+anyrender_vello_hybrid = "0.10"
+anyrender_vello_cpu = { version = "0.17", features = ["multithreading"] }
+vello_hybrid = "0.1"
+wgpu = "29"
+wgpu_context = "0.9"
+parley = { version = "0.11.1", default-features = false, features = ["std"] }
+image = { version = "0.25.6", default-features = false, features = ["png", "jpeg"] }
+keyboard-types = "0.7"
+futures-timer = "3"
+# ---- end copied lines ----
+
+[features]
+# anyrender_vello_cpu drops every `filter:` unless this is on; the pinned block leaves it off.
+cpu-filters = ["anyrender_vello_cpu/filters"]
+
+[dependencies]
+blitz-dom = { workspace = true }
+blitz-paint = { workspace = true }
+blitz-traits = { workspace = true }
+dioxus-native-dom = { workspace = true }
+dioxus = { workspace = true }
+anyrender = { workspace = true }
+anyrender_vello_hybrid = { workspace = true }
+anyrender_vello_cpu = { workspace = true }
+vello_hybrid = { workspace = true }
+wgpu = { workspace = true }
+wgpu_context = { workspace = true }
+parley = { workspace = true }
+image = { workspace = true }
+keyboard-types = { workspace = true }
+futures-timer = { workspace = true }
+# Probe-only helpers (already in blitz's lockfile at the pinned rev).
+data-url = "0.3"
+base64 = "0.22"
+pollster = "0.4"
+atomic_refcell = "0.1"
+rustc-hash = "2"
+peniko = "0.6"
+kurbo = "0.13"
