@@ -15,8 +15,15 @@ pub enum SideState {
     Peek,
 }
 
-/// The reveal edge.
+/// The reveal edge. Render it only while the sidebar is hidden; the pointer entering it asks
+/// for the peek (design/06-INTERACTIONS.md section 7).
 #[component]
 pub fn EdgeStrip(onenter: EventHandler<()>) -> Element {
-    todo!()
+    rsx! {
+        div {
+            class: "ds-edge",
+            "aria-hidden": "true",
+            onpointerenter: move |_| onenter.call(()),
+        }
+    }
 }

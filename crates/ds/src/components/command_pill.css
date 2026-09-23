@@ -1,1 +1,17 @@
-/* command_pill.css: filled in with the component (design/04-COMPONENTS.md). */
+/* CommandPill (design/04-COMPONENTS.md section 8): `S:92-100`. The inset highlight is
+   `--shadow-pill-inset` (O-3); the label truncates with `.ds-truncate` (no ellipsis on Blitz).
+   The colour change on hover is instant, as in S. Disabled, entering, leaving: not specified. */
+
+.ds-command-pill{
+  display:flex; align-items:center; gap:8px; width:100%; border:0; cursor:pointer; text-align:left;
+  padding:8px 10px; border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
+  font:inherit; font-size:var(--fs-control); box-shadow:var(--shadow-pill-inset);
+  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-command-pill:hover{ color:var(--f-ink); }
+.ds-command-pill:active{ transform:scale(var(--squish)); }
+.ds-command-pill-label{ min-width:0; }
+.ds-command-pill-keys{
+  margin-left:auto; white-space:nowrap; flex:none;
+  font-family:var(--font-data); font-size:var(--fs-caption); color:var(--f-ink-faint);
+}

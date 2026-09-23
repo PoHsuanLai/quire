@@ -1,1 +1,14 @@
-/* account_tile.css: filled in with the component (design/04-COMPONENTS.md). */
+/* AccountTile (design/04-COMPONENTS.md section 27): `S:107-118`, `S:356-357`, `S:548-551`. The
+   tile is IconButton's Pin variant (box, hover, press and pressed are icon_button.css); this
+   file sizes its avatar and draws the All tile. `.ds-account-tiles` is the four-column group a
+   consumer wraps the tiles in (`S:107`).
+   O-26: an unpressed tile's avatar colour arrives already desaturated from Rust (chroma x .55,
+   no `filter`); opacity .85 stays here. The avatar's hover turn is `--t-quick --e-spring`.
+   TODO(O-3): `rotate(-6deg) scale(1.08)` have no tokens. */
+
+.ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:12px; }
+
+.ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-spring); }
+.ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }
+.ds-account-tile .ds-avatar[*|data-tone=all]{ background:transparent; color:var(--f-ink); }
+.ds-account-tile[*|aria-pressed=false] .ds-avatar[*|data-tone=account]{ opacity:.85; }

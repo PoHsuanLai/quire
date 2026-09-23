@@ -1,1 +1,81 @@
-/* list_row.css: filled in with the component (design/04-COMPONENTS.md). */
+/* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`, `S:326-333`, C's
+   crumple (`C:714`) and arrival (`C:373`). Attribute selectors carry `*|` (spike S2).
+   Motion state is the roster's: `data-presence=entering|present|leaving|healing` with
+   `data-exit=fold|curl|crumple`. An entering row rises (staggered by `--i`) when its list is
+   first shown and plays `row-in` when it arrives into a list at rest. An unread leaving fold is
+   `--t-big-heavy`; curl and crumple keep their own durations because `Roster` settles them at
+   those (`motion/roster.rs` has no heavy curl or crumple). A healing row slides from `--dy`,
+   delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate filter (05-MOTION rule 4).
+   Name, subject and snippet truncate with `.ds-truncate`. The star's fill is an SVG attribute
+   (spike S6), so this file colours it with `color`.
+   Not specified: the row's active state, disabled. The undo restore (`rise --t-big
+   --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
+   The snooze floater "zZ" is the consumer's, through OverlayHost. */
+
+.ds-row{
+  --i:0; --d:0;
+  position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:10px; align-items:start;
+  padding:10px 11px; margin-bottom:5px; border-radius:var(--r-card); background:var(--surface);
+  border:1px solid transparent; cursor:pointer; user-select:none; list-style:none;
+  transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out),
+             background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+  animation:none;
+}
+.ds-row:hover{ transform:translateY(var(--lift)); box-shadow:var(--shadow-2); border-color:var(--line); }
+.ds-row[*|aria-selected=true]{ background:var(--raise); border-color:var(--accent); box-shadow:var(--shadow-1); }
+
+/* Entering: first show (`S:294`) or an arrival (`C:373`). */
+.ds-list[*|data-presence=entering] .ds-row[*|data-presence=entering]{
+  animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+.ds-list[*|data-presence=present] .ds-row[*|data-presence=entering]{
+  animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+
+/* Leaving (`S:326-329`, `C:714`). */
+.ds-row[*|data-presence=leaving]{ pointer-events:none; }
+.ds-row[*|data-presence=leaving][*|data-exit=fold]{ animation:fold var(--t-big) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=fold][*|data-emphasis=strong]{ animation:fold var(--t-big-heavy) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=curl]{ animation:curl var(--t-curl) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=crumple]{ animation:crumple var(--t-big) var(--e-exit) forwards; }
+
+/* Healing (`S:330`). */
+.ds-row[*|data-presence=healing]{
+  animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal));
+}
+
+/* Dot (`S:185-187`, `S:295-296`). */
+.ds-row-dot{ padding-top:6px; }
+.ds-dot{
+  display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent);
+  transition:transform var(--t-quick) var(--e-spring), opacity var(--t-quick) var(--e-out);
+}
+.ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
+
+/* Text (`S:189-197`). */
+.ds-row-main{ min-width:0; }
+.ds-row-from{ display:flex; align-items:baseline; gap:7px; min-width:0; }
+.ds-row-name{ font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
+.ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
+.ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint); }
+.ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
+.ds-row[*|data-emphasis=strong] .ds-row-sub{ font-weight:600; }
+.ds-row-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }
+.ds-row-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+.ds-row-time{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.ds-row-tags{ display:flex; gap:4px; align-items:center; }
+
+/* Star and sparks (`S:299-307`). */
+.ds-star{
+  position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
+  cursor:pointer; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
+  transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-row:hover .ds-star, .ds-star[*|aria-pressed=true]{ opacity:1; }
+.ds-star[*|aria-pressed=true]{ color:var(--warn); }
+.ds-star-glyph{ display:grid; place-items:center; }
+.ds-sparks{ position:absolute; inset:0; pointer-events:none; }
+.ds-sparks i{
+  position:absolute; left:50%; top:50%; width:3px; height:3px; border-radius:var(--r-pill);
+  background:var(--warn); opacity:0;
+}

@@ -1,1 +1,23 @@
-/* provider_mark.css: filled in with the component (design/04-COMPONENTS.md). */
+/* ProviderMark (design/04-COMPONENTS.md section 28): `S:552-560`. The white chip is
+   `--mark-ground` and the provider's identity colour arrives inline as `--pc` (O-3); the rings
+   are `--shadow-mark` and `--shadow-mark-tile`. Attribute selectors carry `*|` (spike S2).
+   `object-fit:contain` on the favicon is unverified on Blitz; the app pre-sizes the image if it
+   is not honoured. Static: no hover, focus or motion. */
+
+.ds-provider{
+  --pc:var(--ink);
+  display:inline-grid; place-items:center; width:13px; height:13px; box-sizing:border-box;
+  border-radius:var(--r-tiny); background:var(--mark-ground); color:var(--pc);
+  font-family:var(--font-display); font-weight:800; font-size:var(--fs-nano); line-height:1;
+  box-shadow:var(--shadow-mark); flex:none;
+}
+.ds-provider[*|data-size=tile]{
+  position:absolute; right:7px; bottom:7px; width:14px; height:14px;
+  font-size:var(--fs-micro); border-radius:var(--r-kbd); box-shadow:var(--shadow-mark-tile);
+}
+.ds-provider[*|data-size=row]{
+  width:11px; height:11px; font-size:var(--fs-pico); border-radius:var(--r-micro);
+  margin-right:4px; vertical-align:-1px; box-shadow:0 0 0 1px var(--line);
+}
+.ds-provider[*|data-kind=image]{ padding:1.5px; }
+.ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }

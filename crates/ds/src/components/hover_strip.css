@@ -1,1 +1,35 @@
-/* hover_strip.css: filled in with the component (design/04-COMPONENTS.md). */
+/* HoverStrip (design/04-COMPONENTS.md section 17): `S:312-323`, `S:441-446`. The buttons are
+   IconButton's Strip variant (their box, hover and `:active` scale are icon_button.css); this
+   file reveals the strip on row hover, pops the buttons in staggered by `--j`, and places each
+   button's Fly label (section 18's Fly, scoped to the strip as S scopes it).
+   O-10 without `!important`: `pop-in` plays with `backwards` fill instead of `forwards`. Its last
+   frame is the shown state the rule below already declares, so once it ends nothing holds the
+   transform and the `:active` scale applies.
+   The Fly waits `--d-fly` before it appears and not at all while hover is warm
+   (`.ds[data-hover=warm]`, O-11); `calc(var(--d-fly) * 0)` is a zero delay made of the token.
+   TODO(O-24): C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12);
+   keyboard reveal is not specified for Blitz. */
+
+.ds-strip{
+  --j:0;
+  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:3px; padding:3px;
+  border-radius:var(--r-pill); background:var(--raise); border:1px solid var(--line); box-shadow:var(--shadow-2);
+  opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out);
+}
+.ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }
+
+.ds-strip .ds-icon-button{ transform:scale(.7); opacity:0; }
+.ds-row:hover .ds-strip .ds-icon-button{
+  transform:none; opacity:1;
+  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger));
+}
+.ds-row:hover .ds-strip .ds-icon-button:active{ transform:scale(.88); }
+
+.ds-strip .ds-fly{
+  position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
+  background:var(--ink); color:var(--paper); font-family:var(--font-data); font-size:var(--fs-caption);
+  padding:3px 7px; border-radius:var(--r-small); opacity:0; pointer-events:none;
+  transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
+}
+.ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
+.ds[*|data-hover=warm] .ds-strip .ds-icon-button:hover .ds-fly{ transition-delay:calc(var(--d-fly) * 0); }

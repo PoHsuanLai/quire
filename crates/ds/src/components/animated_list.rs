@@ -4,8 +4,28 @@
 use crate::motion::presence::ListPresence;
 use dioxus::prelude::*;
 
+/// The list's `data-presence` word.
+fn presence_slug(presence: ListPresence) -> &'static str {
+    match presence {
+        ListPresence::Entering => "entering",
+        ListPresence::Present => "present",
+    }
+}
+
 /// A list of rows whose entrance plays only when first shown.
+///
+/// The rows are the consumer's `ListRow`s, one per `use_roster` entry, keyed by the roster key
+/// so a leaving row keeps its node until it settles. While `presence` is `Entering` an entering
+/// row rises staggered; once it is `Present` an entering row is an arrival and plays `row-in`.
 #[component]
 pub fn AnimatedList(label: String, presence: ListPresence, children: Element) -> Element {
-    todo!()
+    rsx! {
+        ul {
+            class: "ds-list",
+            role: "listbox",
+            "aria-label": "{label}",
+            "data-presence": presence_slug(presence),
+            {children}
+        }
+    }
 }
