@@ -1,5 +1,9 @@
-//! With the `webview-fonts` feature, turns the vendored fonts into `@font-face` rules for a
-//! consumer still on the webview. Moved from mailo's `mail-app/build.rs`.
+//! Two generated inputs, both written to `$OUT_DIR`:
+//!
+//! - `grain.uri`, always: the frame's 128 px grain tile as a `data:image/png;base64,…` URI,
+//!   which `ds::css::GRAIN_PNG` includes (see [`grain`]).
+//! - `fonts.css`, only with the `webview-fonts` feature: the vendored fonts as `@font-face`
+//!   rules for a consumer still on the webview. Moved from mailo's `mail-app/build.rs`.
 //!
 //! The faces ship inside the binary as `data:` URIs. Three other routes were rejected:
 //! - a network font makes the window phone a font host on every launch, the same leak as a
@@ -44,9 +48,18 @@ const FACES: &[(&str, &str, &str, &str)] = &[
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
-    if env::var_os("CARGO_FEATURE_WEBVIEW_FONTS").is_none() {
-        return;
+    let out = PathBuf::from(env::var_os("OUT_DIR").unwrap_or_default());
+    let uri = format!("data:image/png;base64,{}", base64(&grain::png()));
+    if let Err(why) = fs::write(out.join("grain.uri"), uri) {
+        panic!("writing grain.uri: {why}");
     }
+    if env::var_os("CARGO_FEATURE_WEBVIEW_FONTS").is_some() {
+        fonts_css(&out);
+    }
+}
+
+/// `$OUT_DIR/fonts.css`: every face in both subsets as a base64 `@font-face`.
+fn fonts_css(out: &std::path::Path) {
     let dir =
         PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap_or_default()).join("assets/fonts");
     println!("cargo:rerun-if-changed={}", dir.display());
@@ -67,7 +80,7 @@ fn main() {
             ));
         }
     }
-    let out = PathBuf::from(env::var_os("OUT_DIR").unwrap_or_default()).join("fonts.css");
+    let out = out.join("fonts.css");
     if let Err(why) = fs::write(&out, css) {
         panic!("writing {}: {why}", out.display());
     }
@@ -91,4 +104,108 @@ fn base64(bytes: &[u8]) -> String {
         }
     }
     out
+}
+
+/// The grain tile (design/03-COLOR.md section 8): the prototype's Park-Miller generator, seed 7,
+/// one draw per pixel over 128 x 128, as a PNG.
+///
+/// The prototype draws an opaque grey `v = floor(rnd x 255)` and blends it with `overlay`,
+/// which Blitz cannot do. This tile is the "alpha noise" the plan names instead (open decision
+/// 2, proposed mapping): a grey below the middle becomes black at alpha `255 - 2v`, one above
+/// becomes white at alpha `2v - 255`. Painted normally, that is exactly `overlay` of the same grey
+/// wherever the frame is darker than the middle in the black half, and wherever it is lighter in
+/// the white half; the element's opacity (`--f-grain`) then sets the strength as before.
+mod grain {
+    const SIZE: u32 = 128;
+    const MODULUS: u64 = 2_147_483_647;
+    const MULTIPLIER: u64 = 16_807;
+    const SEED: u64 = 7;
+
+    /// The prototype's greys, in raster order, computed the way its JavaScript does.
+    fn greys() -> Vec<u8> {
+        let mut seed = SEED;
+        (0..SIZE * SIZE)
+            .map(|_| {
+                seed = seed * MULTIPLIER % MODULUS;
+                let rnd = seed as f64 / MODULUS as f64;
+                // `Math.floor(rnd * 255)`: rnd is below 1, so this is 0..=254.
+                (rnd * 255.0).floor() as u8
+            })
+            .collect()
+    }
+
+    /// Grey-and-alpha pixels, two bytes each.
+    fn pixel(grey: u8) -> [u8; 2] {
+        let twice = i16::from(grey) * 2;
+        if twice < 255 {
+            [0, (255 - twice) as u8]
+        } else {
+            [255, (twice - 255) as u8]
+        }
+    }
+
+    /// The tile as a PNG: 8-bit grey with alpha, no filtering, stored (uncompressed) deflate.
+    pub fn png() -> Vec<u8> {
+        let greys = greys();
+        let mut raw = Vec::with_capacity((SIZE * (SIZE * 2 + 1)) as usize);
+        for row in greys.chunks(SIZE as usize) {
+            raw.push(0); // filter type None
+            raw.extend(row.iter().flat_map(|&grey| pixel(grey)));
+        }
+        let mut header = Vec::with_capacity(13);
+        header.extend(SIZE.to_be_bytes());
+        header.extend(SIZE.to_be_bytes());
+        header.extend([8, 4, 0, 0, 0]); // depth 8, grey + alpha, deflate, no filter, no interlace
+        let mut png = b"\x89PNG\r\n\x1a\n".to_vec();
+        chunk(&mut png, b"IHDR", &header);
+        chunk(&mut png, b"IDAT", &zlib_stored(&raw));
+        chunk(&mut png, b"IEND", &[]);
+        png
+    }
+
+    fn chunk(png: &mut Vec<u8>, kind: &[u8; 4], data: &[u8]) {
+        png.extend(u32::try_from(data.len()).unwrap_or(u32::MAX).to_be_bytes());
+        let start = png.len();
+        png.extend(kind);
+        png.extend(data);
+        let crc = crc32(&png[start..]);
+        png.extend(crc.to_be_bytes());
+    }
+
+    /// A zlib stream of stored deflate blocks (RFC 1950, RFC 1951 section 3.2.4).
+    fn zlib_stored(data: &[u8]) -> Vec<u8> {
+        let mut out = vec![0x78, 0x01];
+        let blocks = data.chunks(65_535).collect::<Vec<_>>();
+        for (index, block) in blocks.iter().enumerate() {
+            let last = u8::from(index + 1 == blocks.len());
+            let len = u16::try_from(block.len()).unwrap_or(u16::MAX);
+            out.push(last);
+            out.extend(len.to_le_bytes());
+            out.extend((!len).to_le_bytes());
+            out.extend(*block);
+        }
+        out.extend(adler32(data).to_be_bytes());
+        out
+    }
+
+    fn adler32(data: &[u8]) -> u32 {
+        let (a, b) = data.iter().fold((1u32, 0u32), |(a, b), &byte| {
+            let a = (a + u32::from(byte)) % 65_521;
+            (a, (b + a) % 65_521)
+        });
+        (b << 16) | a
+    }
+
+    /// CRC-32 as PNG uses it (ISO 3309, reflected, polynomial 0xEDB88320).
+    fn crc32(data: &[u8]) -> u32 {
+        !data.iter().fold(!0u32, |crc, &byte| {
+            (0..8).fold(crc ^ u32::from(byte), |crc, _| {
+                if crc & 1 == 1 {
+                    (crc >> 1) ^ 0xEDB8_8320
+                } else {
+                    crc >> 1
+                }
+            })
+        })
+    }
 }

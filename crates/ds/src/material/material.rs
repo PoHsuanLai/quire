@@ -1,5 +1,4 @@
 //! The eight materials (design/03-COLOR.md sections 17.1 and 17.3).
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use super::blur::Blur;
 use serde::{Deserialize, Serialize};
@@ -41,11 +40,30 @@ impl Material {
 
     /// The `data-material` value.
     pub fn slug(self) -> &'static str {
-        todo!()
+        match self {
+            Material::Window => "window",
+            Material::Bar => "bar",
+            Material::Dock => "dock",
+            Material::Popover => "popover",
+            Material::Sheet => "sheet",
+            Material::Toast => "toast",
+            Material::Osd => "osd",
+            Material::Widget => "widget",
+        }
     }
 
-    /// Whether the surface asks the compositor to blur behind it.
+    /// Whether the surface asks the compositor to blur behind it (design/03-COLOR.md section
+    /// 17.2's Blur column: the window paints its own gradient, everything else is "behind").
     pub fn blur(self) -> Blur {
-        todo!()
+        match self {
+            Material::Window => Blur::None,
+            Material::Bar
+            | Material::Dock
+            | Material::Popover
+            | Material::Sheet
+            | Material::Toast
+            | Material::Osd
+            | Material::Widget => Blur::Behind,
+        }
     }
 }

@@ -3,7 +3,6 @@
 //!
 //! These measure intent or reading time, not motion, so they do not scale with the level
 //! (design/05-MOTION.md open decision 2, proposed: hover-intent delays unchanged under Reduced).
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use super::name::VarName;
 use crate::appearance::MotionLevel;
@@ -60,11 +59,44 @@ impl DelayToken {
 
     /// The custom property, for the delays the stylesheet also reads (`--d-fly`, the heal step).
     pub fn var(self) -> Option<VarName> {
-        todo!()
+        match self {
+            DelayToken::Fly => Some(VarName("--d-fly")),
+            DelayToken::HealStep => Some(VarName("--d-heal")),
+            DelayToken::HoverOpen
+            | DelayToken::HoverClose
+            | DelayToken::HoverWarm
+            | DelayToken::ToastHold
+            | DelayToken::SentHold
+            | DelayToken::ReadReflow
+            | DelayToken::SendCountdown
+            | DelayToken::SendTick
+            | DelayToken::AutosaveDebounce
+            | DelayToken::FocusAfterMount
+            | DelayToken::FlashHold => None,
+        }
     }
 
     /// How long it lasts at `level`.
+    ///
+    /// The one delay that follows the level is the heal step, which is a stagger: 0 under
+    /// `Reduced` (proposed, design/05-MOTION.md open decision 2), so every Reduced settle is
+    /// the 94 ms section 7.1 names.
     pub fn delay(self, level: MotionLevel) -> Duration {
-        todo!()
+        Duration::from_millis(match self {
+            DelayToken::Fly => 350,
+            DelayToken::HoverOpen => 450,
+            DelayToken::HoverClose => 150,
+            DelayToken::HoverWarm => 400,
+            DelayToken::ToastHold => 5200,
+            DelayToken::HealStep if level == MotionLevel::Reduced => 0,
+            DelayToken::HealStep => 18,
+            DelayToken::SentHold => 1600,
+            DelayToken::ReadReflow => 260,
+            DelayToken::SendCountdown => 5000,
+            DelayToken::SendTick => 1000,
+            DelayToken::AutosaveDebounce => 700,
+            DelayToken::FocusAfterMount => 60,
+            DelayToken::FlashHold => 1200,
+        })
     }
 }

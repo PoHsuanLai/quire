@@ -1,9 +1,9 @@
 //! The eight preset Spaces and the default look for a workspace that has none
 //! (design/03-COLOR.md section 7, design/21-SPACES.md section 4).
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use super::look::SpaceLook;
 use super::palette::Dot;
+use crate::appearance::Theme;
 
 /// One preset: its dots, and the grain it ships with when the prototype names one.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -64,5 +64,37 @@ pub fn default_look(
     default_grain: super::look::Grain,
     default_accent: super::look::CardAccent,
 ) -> SpaceLook {
-    todo!()
+    let preset = PRESETS[index % PRESETS.len()];
+    SpaceLook {
+        dots: preset.dots.to_vec(),
+        grain: preset.grain.map_or(default_grain, super::look::Grain),
+        theme: Theme::System,
+        card_accent: default_accent,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{PRESETS, default_look};
+    use crate::appearance::Theme;
+    use crate::space::look::{CardAccent, Grain};
+
+    #[test]
+    fn a_workspace_takes_its_preset_by_index() {
+        const CASES: &[(usize, usize, u8)] = &[
+            (0, 0, 35),
+            (1, 1, 55),
+            (2, 2, 40),
+            (7, 7, 40),
+            (8, 0, 35),
+            (10, 2, 40),
+        ];
+        for &(index, preset, grain) in CASES {
+            let look = default_look(index, Grain(40), CardAccent::SpaceHue);
+            assert_eq!(look.dots, PRESETS[preset].dots, "workspace {index}");
+            assert_eq!(look.grain, Grain(grain), "workspace {index}");
+            assert_eq!(look.theme, Theme::System, "workspace {index}");
+            assert_eq!(look.card_accent, CardAccent::SpaceHue, "workspace {index}");
+        }
+    }
 }

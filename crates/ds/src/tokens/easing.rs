@@ -1,6 +1,6 @@
 //! Easing curves per motion level (design/05-MOTION.md sections 3.1-3.4).
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
+use super::hex::thousandths;
 use super::name::VarName;
 use crate::appearance::MotionLevel;
 
@@ -48,18 +48,49 @@ impl EasingToken {
 
     /// The custom property: `--e-out`, …
     pub fn var(self) -> VarName {
-        todo!()
+        VarName(match self {
+            EasingToken::Out => "--e-out",
+            EasingToken::Spring => "--e-spring",
+            EasingToken::Exit => "--e-exit",
+            EasingToken::Shake => "--e-shake",
+            EasingToken::Linear => "--e-linear",
+            EasingToken::InOut => "--e-in-out",
+        })
     }
 
     /// The curve at `level`.
+    ///
+    /// Only the spring follows the level (section 3.2): Calm uses `--e-out`, Extra
+    /// `(.34,2.0,.5,1)`, and Reduced `--e-out` as Calm does (proposed, open decision 2).
     pub fn easing(self, level: MotionLevel) -> Easing {
-        todo!()
+        const OUT: CubicBezier = CubicBezier([220, 900, 300, 1000]);
+        Easing::Cubic(match (self, level) {
+            (EasingToken::Out, _) => OUT,
+            (EasingToken::Spring, MotionLevel::Calm | MotionLevel::Reduced) => OUT,
+            (EasingToken::Spring, MotionLevel::Standard) => CubicBezier([340, 1420, 520, 1000]),
+            (EasingToken::Spring, MotionLevel::Extra) => CubicBezier([340, 2000, 500, 1000]),
+            (EasingToken::Exit, _) => CubicBezier([550, 0, 750, 200]),
+            (EasingToken::Shake, _) => CubicBezier([360, 70, 190, 970]),
+            (EasingToken::Linear, _) => return Easing::Linear,
+            // CSS's `ease-in-out`, the halo's curve (`C:288`).
+            (EasingToken::InOut, _) => CubicBezier([420, 0, 580, 1000]),
+        })
     }
 }
 
 impl Easing {
     /// The CSS text: `linear` or `cubic-bezier(.34,1.42,.52,1)`.
     pub fn css(self) -> String {
-        todo!()
+        match self {
+            Easing::Linear => "linear".to_owned(),
+            Easing::Cubic(CubicBezier(points)) => {
+                let points = points
+                    .iter()
+                    .map(|&point| thousandths(i64::from(point)))
+                    .collect::<Vec<_>>()
+                    .join(",");
+                format!("cubic-bezier({points})")
+            }
+        }
     }
 }

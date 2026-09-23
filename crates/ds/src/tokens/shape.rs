@@ -1,6 +1,7 @@
 //! Radii (design/01-LAYOUT.md section 10). The first nine are the plan's names; the rest name
 //! the literals design/04-COMPONENTS.md O-3 says the table must absorb.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
+//!
+//! The names between the plan's are proposed (FINDINGS F13); the values are `S`'s.
 
 use super::name::VarName;
 
@@ -67,11 +68,47 @@ impl Radius {
 
     /// The custom property: `--r-panel`, …
     pub fn var(self) -> VarName {
-        todo!()
+        VarName(match self {
+            Radius::Panel => "--r-panel",
+            Radius::Card => "--r-card",
+            Radius::Btn => "--r-btn",
+            Radius::Chip => "--r-chip",
+            Radius::Pill => "--r-pill",
+            Radius::Field => "--r-field",
+            Radius::Menu => "--r-menu",
+            Radius::Item => "--r-item",
+            Radius::Tile => "--r-tile",
+            Radius::Window => "--r-window",
+            Radius::MenuItem => "--r-menu-item",
+            Radius::BubbleButton => "--r-bubble-button",
+            Radius::Small => "--r-small",
+            Radius::Kbd => "--r-kbd",
+            Radius::Tiny => "--r-tiny",
+            Radius::Micro => "--r-micro",
+            Radius::Media => "--r-media",
+        })
     }
 
     /// The CSS value: `14px`, `12px 12px 12px 4px`.
     pub fn css(self) -> &'static str {
-        todo!()
+        match self {
+            Radius::Panel => "14px",
+            Radius::Card => "12px 12px 12px 4px",
+            Radius::Btn => "9px",
+            Radius::Chip => "6px 6px 6px 2px",
+            Radius::Pill => "999px",
+            Radius::Field => "10px",
+            Radius::Menu => "12px",
+            Radius::Item => "9px",
+            Radius::Tile => "12px",
+            Radius::Window => "18px",
+            Radius::MenuItem => "8px",
+            Radius::BubbleButton => "7px",
+            Radius::Small => "6px",
+            Radius::Kbd => "5px",
+            Radius::Tiny => "4px",
+            Radius::Micro => "3px",
+            Radius::Media => "10px 10px 10px 3px",
+        }
     }
 }
