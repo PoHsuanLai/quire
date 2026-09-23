@@ -1,0 +1,33 @@
+[package]
+name = "consumer"
+description = "Minimal consumer of quire, outside the quire workspace: proves the four coherence rules from CONSUMING.md."
+version = "0.0.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.91"
+publish = false
+
+# Its own workspace: quire's root Cargo.toml does not (and must not) list this package in
+# `members`, so this manifest marks itself a workspace root or cargo treats it as an orphaned
+# member of the quire workspace it happens to sit under (mirrors `spike/blitz-probe/Cargo.toml`).
+[workspace]
+
+[dependencies]
+# quire, by path: this is what a consumer's own Cargo.toml looks like today, before quire has
+# a published version (CONSUMING.md "Adding quire").
+ds = { path = "../../crates/ds", features = ["lint"] }
+ds-settings = { path = "../../crates/ds-settings" }
+ds-native = { path = "../../crates/ds-native" }
+
+# ---- lines copied from quire/docs/workspace-deps.toml (pinned block, CONVENTIONS.md §11) ----
+# ds's own dependency tree (dioxus-native, blitz-*, anyrender, ...) resolves against quire's own
+# workspace (crates/ds/Cargo.toml has no [workspace] of its own, so it joins whichever ancestor
+# has one: quire's root, not this one) — this package only needs to name what it writes rsx!
+# and cargo test against itself.
+dioxus = { version = "0.7", default-features = false, features = ["macro", "html", "hooks", "signals"] }
+
+[dev-dependencies]
+dioxus-ssr = "0.7"
+
+[lints.rust]
+unsafe_code = "deny"
