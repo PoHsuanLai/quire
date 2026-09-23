@@ -482,8 +482,8 @@ and what the tests had missed.
 - Rect reads could panic on dioxus-native with "RefCell already borrowed". dioxus-core polls a
   task inside `render_immediate` when it woke in the same turn as a dirty scope, and
   dioxus-native-dom's writer holds the document mutably there; its `get_client_rect` borrows
-  the document mutably too. The hover-card harness case hit it every run (the card's own rect
-  read wakes as the hub's 450 ms timer dirties the card). The same `poll` path drives a real
+  the document mutably too. The hover-card harness case hit it on both runs before the fix (the
+  backtrace is the card's `RectProbe` read, polled from `render_immediate`). The same `poll` path drives a real
   window (blitz-shell `window.rs`), so this was not a harness artefact. ds now reads every rect
   through `geometry::measure::client_rect`, which asks the host's `HostMeasure` first; ds-native
   provides one (in `Host` and in the headless document) that reads through
