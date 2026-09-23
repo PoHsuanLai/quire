@@ -29,6 +29,11 @@ pub struct Harness {
     doc: Headless,
     /// Animation time: the sum of every `advance`.
     clock: Duration,
+    /// Keeps a Tokio runtime entered on this thread for as long as the harness lives, so a
+    /// component under test that calls `ds_settings::use_environment` does not panic; see
+    /// `crate::runtime`. Never read, only held: it does its work by staying alive and being
+    /// dropped with the harness.
+    _runtime: tokio::runtime::EnterGuard<'static>,
 }
 
 impl std::fmt::Debug for Harness {
@@ -43,10 +48,15 @@ impl std::fmt::Debug for Harness {
 impl Harness {
     /// Build `app` at `viewport` and render its first frame.
     pub fn new(app: fn() -> Element, viewport: Viewport) -> Self {
+        // Entered before `Headless::new`, whose `initial_build` runs `app`'s first render and
+        // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
+        // would run.
+        let runtime = crate::runtime::enter();
         let mut harness = Harness {
             viewport,
             doc: Headless::new(app, viewport),
             clock: Duration::ZERO,
+            _runtime: runtime,
         };
         harness.frame();
         harness

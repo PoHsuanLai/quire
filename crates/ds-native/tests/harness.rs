@@ -17,6 +17,7 @@ use ds::{
     DotIndex, Focus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput, Theme,
 };
 use ds_native::{Harness, Viewport};
+use ds_settings::{AppName, use_environment};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -542,5 +543,37 @@ fn the_space_editor_reports_the_dot_picked_inside_it() {
             .attr(".ds-stop:nth-child(2)", "aria-pressed")
             .as_deref(),
         Some("true")
+    );
+}
+
+// ---- Runtime -----------------------------------------------------------------------------
+
+#[allow(non_snake_case)]
+fn EnvironmentApp() -> Element {
+    // `ds_settings::use_environment` spawns the portal watch (zbus's `tokio` feature) and the
+    // file-watch debounce with `tokio::spawn`, which panics ("there is no reactor running")
+    // unless a runtime is entered on this thread. `Harness` enters one before this component's
+    // first render (`ds_native::runtime`), so this must not panic.
+    let env = use_environment(AppName("consumer-test"));
+    let now = env();
+    rsx! {
+        Root {
+            p { class: "probe-theme", "{now.settings.appearance.theme:?}" }
+        }
+    }
+}
+
+#[test]
+fn use_environment_does_not_panic_under_the_harness() {
+    let mut harness = Harness::new(EnvironmentApp, VIEW);
+    // The portal round-trip and the initial file load both run async; give them a turn to
+    // settle before reading the probe. Whether the portal answered or was absent, and whatever
+    // theme the settings resolved to, both are fine — a value landing at all is the proof this
+    // rendered past the first frame instead of panicking.
+    harness.advance(ms(200));
+    assert!(
+        harness.text_of(".probe-theme").is_some(),
+        "the environment-reading component rendered past its first frame: {}",
+        harness.html()
     );
 }

@@ -497,3 +497,46 @@ and what the tests had missed.
 - 04-COMPONENTS: the prop signatures of the amended components are updated in place. No open
   decision is settled outright; O-15 is marked partly settled (focus on mount exists; Peek and
   Sheet still neither move nor trap focus).
+
+## Fix wave: the two gaps CONSUMING.md §9 named, closed (2026-09-24)
+
+Both gaps were `examples/consumer` findings the W3 adoption wave reported but did not fix
+(CONSUMING.md §9 documented one as an open bug with a reviewed `Exception`, the other as a
+workaround in §3). This wave fixes both, with tests, and removes the workaround text.
+
+- **S2, frame layers**: `FrameLayers::render` (`crates/ds/src/root/ds.rs`) wrote the hidden
+  frame layer's class as `"ds-layer back"`, a second CSS class; `crates/ds/src/css/
+  utilities.css`'s `.ds-layer[*|data-layer=back]{opacity:0}` is an attribute selector (the `*|`
+  namespace prefix S2 forces on every attribute selector in a Blitz consumer's CSS, this one
+  included). The class was never `back`-only-in-name matched by that rule, so the hidden layer
+  never got `opacity:0` and a Space switch's cross-fade (design/21-SPACES.md section 5) had
+  nothing to fade from. Fixed by writing `data-layer="back"` on the hidden layer and no
+  `data-layer` at all on the front one, matching how every other root attribute
+  (`data-theme`, …) is written and how the lint's `DsInternals` rule already expects a
+  `.ds`-scoped attribute rather than a bespoke class. Tests: `crates/ds/tests/root_ssr.rs::
+  the_hidden_frame_layer_carries_the_back_attribute` (the attribute lands, the old class form is
+  gone) and `::a_window_roots_markup_lints_clean_of_unstyled_classes` (`ds::lint::markup` over a
+  `Material::Window` root reports no `Rule::UnstyledClass`, run under the `lint` feature).
+  `examples/consumer/tests/coherence.rs`'s `KNOWN_GAPS` `Exception` is removed, and
+  CONSUMING.md §9 now records the gap as fixed rather than open.
+- **Runtime, `use_environment` under Blitz**: `ds_settings::use_environment` spawns two tasks
+  with `tokio::spawn` (the portal watch, over zbus's `tokio` feature, and the file-watch
+  debounce in `ds_settings::watch`), which panics ("there is no reactor running") unless a
+  runtime is entered on the calling thread. `ds_native::launch` and `ds_native::Harness` never
+  entered one, so CONSUMING.md §3 documented this as a real gap with a one-shot,
+  synchronous-load workaround. Neither `ds` nor `ds-settings` may depend on a renderer or
+  windowing stack (`scripts/check-boundary.sh`), so neither can own a host thread to enter a
+  runtime on; `ds-native` is quire's one host crate, so it now owns a process-wide, lazily built
+  Tokio runtime (multi-thread, two worker threads — `crates/ds-native/src/runtime.rs`).
+  `ds_native::launch` enters it and holds the guard for the rest of its call (which blocks until
+  the window closes, i.e. for the process's life); `ds_native::Harness` enters it in
+  `Harness::new`, before the app's first render, and holds the guard as a struct field, for the
+  harness's own life. `scripts/check-boundary.sh` still forbids `tokio` to `ds`; it has no rule
+  for `ds-native`, which is exactly the "ds-native may reach tokio" shape this fix needed.
+  Test: `crates/ds-native/tests/harness.rs::use_environment_does_not_panic_under_the_harness`
+  renders a `Ds` root whose component calls `use_environment(AppName("consumer-test"))` and
+  asserts it renders past its first frame instead of panicking (the portal may be absent or
+  answer; both are fine, matching CONSUMING.md's own wording for this case).
+  `examples/consumer::App` was switched from a one-shot `ds_settings::load` to
+  `use_environment`, and CONSUMING.md §3 no longer tells a Blitz consumer to enter their own
+  runtime or fall back to a synchronous load.
