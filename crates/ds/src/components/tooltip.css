@@ -1,1 +1,16 @@
-/* tooltip.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Tooltip (design/04-COMPONENTS.md section 18). Fly `S:442-446`: a dark label above its
+   target, shown on hover after `--d-fly`, at once while the hover hub is warm (O-11: `HoverHub`
+   stamps `data-hover` on `.ds`); it leaves at once. Card `S:426-427`: the small hover card for
+   a value, over the hover card's surface, entering with `hc-in` and leaving with `hc-out`. */
+
+.ds-fly-target{ position:relative; display:inline-flex; }
+.ds-fly{ position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
+  background:var(--ink); color:var(--paper); font-family:var(--font-data); font-size:var(--fs-caption); padding:3px 7px; border-radius:var(--r-small); opacity:0;
+  pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring); }
+.ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
+.ds[*|data-hover=warm] .ds-fly-target:hover .ds-fly{ transition-delay:initial; }
+
+.ds-popover.ds-tip{ width:auto; max-width:260px; padding:6px 10px; font-size:var(--fs-small); border-radius:var(--r-item);
+  animation:hc-in var(--t-move) var(--e-spring); }
+.ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
+.ds-tip-sub{ margin-top:1px; font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); }

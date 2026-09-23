@@ -1,1 +1,6 @@
-/* scrim.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the overlay, dims
+   with `--scrim` and fades in; a click closes. Hover is not specified; the focus ring is the
+   global one (it is a button). */
+
+.ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:pointer; pointer-events:auto;
+  animation:fade var(--t-move) var(--e-out); }

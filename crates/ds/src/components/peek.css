@@ -1,1 +1,12 @@
-/* peek.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
+   its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
+   TODO: the tools row's layout is not specified in design/04-COMPONENTS.md; it right-aligns
+   the close tool.
+   TODO: C enters Full with `peek-in` at `--t-move --e-out` (`C:1050`); no `Anim` has that
+   recipe, so Full shares Center's `PeekIn`. */
+
+.ds-peek{ position:absolute; inset:36px 12% 36px 12%; background:var(--surface-2); border-radius:var(--r-panel);
+  box-shadow:var(--shadow-sheet); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto;
+  animation:peek-in var(--t-big) var(--e-spring); }
+.ds-peek[*|data-mode=full]{ inset:0; }
+.ds-peek-tools{ display:flex; justify-content:flex-end; padding:8px 10px 0; }

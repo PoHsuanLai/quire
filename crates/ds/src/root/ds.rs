@@ -1,20 +1,26 @@
 //! The root: `div.ds` carrying `data-theme`, `data-accent`, `data-motion`, `data-material`,
 //! `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
 //! inline; then the stylesheet (when inlined), the frame layers and grain on a Window, the
-//! children, and the overlay host. It provides `Env`, `HoverHub`, `ToastHub`, `LayerStack` and
-//! `Overlays` as context.
+//! children, the overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`,
+//! `LayerStack` and `Overlays` as context.
 //!
-//! `ToastHost` (components/toast.rs) is not rendered here yet: it is a wave 2 stub, and
-//! rendering it would panic every root. It joins after `OverlayHost` when it is filled.
+//! The root also writes `--m-tint-alpha` inline: the materials' tint over blur scales by the
+//! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
+//! 80; FINDINGS "W1 tokens"). `Ds` has no prop for it, so a host that reads the key provides it
+//! as a root context, `Signal<ds::Alpha>` (thousandths: 800 is .8); without one the root writes
+//! the key's default.
 
 use super::env::{Env, HostModality, InputModality, use_env_provider};
 use crate::appearance::{Appearance, SystemPrefs, resolve};
+use crate::components::toast::ToastHost;
+use crate::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::material::{BlurState, Material};
 use crate::overlay::host::{OverlayHost, use_overlays_provider};
 use crate::overlay::hover_hub::{HoverWarmth, use_hover_hub_provider};
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
 use crate::space::{FrameVars, SpaceLook};
+use crate::tokens::hex::Alpha;
 use dioxus::prelude::*;
 
 /// How the stylesheet reaches the document.
@@ -54,6 +60,9 @@ pub fn Ds(
     use_overlays_provider();
     let frame = FrameVars::of(&look, resolved.scheme);
     let layers = use_frame_layers(&frame.gradient);
+    let tint = use_hook(try_consume_context::<Signal<Alpha>>);
+    let tint = tint.map_or(DEFAULT_TINT_ALPHA, |alpha| alpha());
+    let style = format!("{}--m-tint-alpha:{};", frame.style_attr(), tint.css());
     let hover = match hover.warmth() {
         HoverWarmth::Warm => "warm",
         HoverWarmth::Cold => "cold",
@@ -68,7 +77,7 @@ pub fn Ds(
             "data-blur": blur.slug(),
             "data-modality": modality.slug(),
             "data-hover": hover,
-            style: frame.style_attr(),
+            style,
             if stylesheet == Inject::Inline {
                 style { {crate::css::stylesheet()} }
             }
@@ -80,6 +89,7 @@ pub fn Ds(
             }
             {children}
             OverlayHost {}
+            ToastHost {}
         }
     }
 }

@@ -1,1 +1,7 @@
-/* sheet.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
+   centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
+   TODO(O-14): the size is the candidate, not signed off. TODO(O-15): focus is not moved. */
+
+.ds-sheet{ position:absolute; top:36px; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - 72px); overflow-y:auto;
+  background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
+  animation:peek-in var(--t-big) var(--e-spring); }

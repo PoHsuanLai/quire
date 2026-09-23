@@ -1,8 +1,124 @@
 //! HoverCard: a preview that opens after the pointer rests, never marks read, never fetches
 //! (design/04-COMPONENTS.md section 22, design/06-INTERACTIONS.md section 3).
+//!
+//! A `HoverTarget` feeds the `HoverHub` (450 ms to open, 0 when warm; 150 ms to close; warm for
+//! 400 ms after) and records its rect when the pointer comes over it. The consumer renders a
+//! `HoverCard` for `hub.open().or(hub.leaving())`, keyed by the hover key so a replacement
+//! plays its own `hc-in`; the card places itself against that target by kind, with no flip
+//! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving.
 
-use crate::overlay::hover_hub::{HoverKey, HoverKind};
+use crate::components::popover::{
+    Float, Stacking, from_pixels, position_style, use_entrance, use_float,
+};
+use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
+use crate::motion::anim::Anim;
+use crate::motion::hover_intent::HoverEvent;
+use crate::overlay::hover_hub::{HoverKey, HoverKind, use_hover_hub};
+use crate::overlay::stack::LayerStack;
+use crate::time::{FRAME_SLACK, sleep};
+use crate::tokens::ZLayer;
+use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
+use std::collections::BTreeMap;
+
+/// Where each hover target was when the pointer last came over it, shared by every target
+/// and card under the root.
+#[derive(Clone, Copy)]
+pub(crate) struct Anchors(Signal<BTreeMap<HoverKey, Rect>>);
+
+/// The shared anchor book, created at the root on first use.
+pub(crate) fn use_anchors() -> Anchors {
+    use_hook(|| {
+        try_consume_context::<Anchors>().unwrap_or_else(|| {
+            provide_root_context(Anchors(Signal::new_in_scope(
+                BTreeMap::new(),
+                ScopeId::ROOT,
+            )))
+        })
+    })
+}
+
+impl Anchors {
+    /// The target `key`'s last rect.
+    pub(crate) fn of(&self, key: &HoverKey) -> Option<Rect> {
+        self.0.read().get(key).copied()
+    }
+
+    /// Read `element`'s rect after layout and file it under `key`.
+    fn record(self, key: HoverKey, element: MountedRef) {
+        spawn(async move {
+            sleep(FRAME_SLACK).await;
+            if let Ok(rect) = element.0.get_client_rect().await {
+                let mut book = self.0;
+                book.with_mut(|book| book.insert(key, from_pixels(rect)));
+            }
+        });
+    }
+}
+
+/// The `data-kind` word.
+fn kind_slug(kind: HoverKind) -> &'static str {
+    match kind {
+        HoverKind::Thread => "thread",
+        HoverKind::Sender => "sender",
+        HoverKind::Account => "account",
+        HoverKind::Side => "side",
+    }
+}
+
+/// Where a card of `kind` goes against its target (`S:1715-1726`): a thread card 10 right of
+/// the row and 4 above its top; account and side cards 10 right and 6 above; the rest 6 below
+/// the target's left edge. Never flipped: a card that would overflow slides along the edge.
+fn card_placement(kind: HoverKind, target: Rect) -> (Rect, Placement, Px) {
+    let raised = |by: f32| Rect {
+        origin: Point {
+            y: target.origin.y - Px(by),
+            ..target.origin
+        },
+        ..target
+    };
+    match kind {
+        HoverKind::Thread => (
+            raised(4.0),
+            Placement::new(Side::Right, Align::Start).no_flip(),
+            Px(10.0),
+        ),
+        HoverKind::Account | HoverKind::Side => (
+            raised(6.0),
+            Placement::new(Side::Right, Align::Start).no_flip(),
+            Px(10.0),
+        ),
+        HoverKind::Sender => (
+            target,
+            Placement::new(Side::Bottom, Align::Start).no_flip(),
+            Px(6.0),
+        ),
+    }
+}
+
+/// A hover-driven card's floating registration, its `left`/`top`, and its `data-presence`: the
+/// card for the hub's open key (or the one playing `hc-out`), placed as `kind` against that
+/// key's target.
+pub(crate) fn use_card(kind: HoverKind) -> (Float, String, &'static str) {
+    let hub = use_hover_hub();
+    let float = use_float(ZLayer::Card, Stacking::Passive);
+    let anchors = use_anchors();
+    let entrance = use_entrance(Anim::HcIn);
+    let open = hub.open();
+    let leaving = hub.leaving();
+    let presence = match (&open, &leaving) {
+        (None, Some(_)) => "leaving",
+        _ => entrance.slug(),
+    };
+    let target = open
+        .or(leaving)
+        .and_then(|(key, _)| anchors.of(&key))
+        .map(|rect| card_placement(kind, rect));
+    let at = target.map_or(Point::default(), |(rect, want, gap)| {
+        float.origin(Some(rect), want, gap)
+    });
+    (float, position_style(at), presence)
+}
 
 /// Wraps whatever a card hooks: feeds the hover hub.
 ///
@@ -10,11 +126,103 @@ use dioxus::prelude::*;
 /// rejects a prop of that name, so it is `hover_key` (FINDINGS.md).
 #[component]
 pub fn HoverTarget(hover_key: HoverKey, kind: HoverKind, children: Element) -> Element {
-    todo!()
+    let hub = use_hover_hub();
+    let anchors = use_anchors();
+    let stack = try_use_context::<Signal<LayerStack>>();
+    let mut element = use_signal(|| None::<MountedRef>);
+    let key = hover_key.clone();
+    rsx! {
+        span {
+            class: "ds-hover-target",
+            "data-hover-key": "{hover_key.0}",
+            "data-kind": kind_slug(kind),
+            onmounted: move |event| element.set(Some(MountedRef(event.data()))),
+            // The innermost target wins (`S:1787-1788`): it handles the pointer and stops it.
+            onmouseover: move |event| {
+                event.stop_propagation();
+                // No card while a peek, the palette or a menu is open (`S:1790`).
+                if stack.is_some_and(|stack| stack.peek().top().is_some()) {
+                    hub.feed(HoverEvent::OverSuppressed);
+                    return;
+                }
+                if let Some(mounted) = element.peek().clone() {
+                    anchors.record(key.clone(), mounted);
+                }
+                hub.feed(HoverEvent::Over((key.clone(), kind)));
+            },
+            onmouseleave: move |_| hub.feed(HoverEvent::Out),
+            // A click removes the card at once, not warm (`S:1809`).
+            onpointerdown: move |_| hub.feed(HoverEvent::ClickInList),
+            {children}
+        }
+    }
 }
 
 /// The card, rendered by the consumer for the hub's open key.
 #[component]
 pub fn HoverCard(kind: HoverKind, children: Element) -> Element {
-    todo!()
+    let hub = use_hover_hub();
+    let (float, style, presence) = use_card(kind);
+    let probe = float.surface();
+    float.show(
+        rsx! {
+            div {
+                class: "ds-popover ds-hovercard",
+                "data-elevation": "pop",
+                "data-layer": "card",
+                "data-kind": kind_slug(kind),
+                "data-presence": presence,
+                style,
+                onmounted: move |event| probe.on_mounted(event),
+                onmouseenter: move |_| hub.feed(HoverEvent::EnterCard),
+                onmouseleave: move |_| hub.feed(HoverEvent::LeaveCard),
+                {children}
+            }
+        },
+        EventHandler::new(|()| {}),
+    );
+    rsx! {}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::card_placement;
+    use crate::geometry::{Point, Px, Rect, Size, place};
+    use crate::overlay::hover_hub::HoverKind;
+
+    fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
+        Rect {
+            origin: Point { x: Px(x), y: Px(y) },
+            size: Size {
+                width: Px(w),
+                height: Px(h),
+            },
+        }
+    }
+
+    #[test]
+    fn each_kind_sits_where_the_prototype_put_it() {
+        let window = rect(0.0, 0.0, 1200.0, 800.0);
+        let card = Size {
+            width: Px(300.0),
+            height: Px(140.0),
+        };
+        // (kind, target, want x, want y), section 3 "Positioning".
+        #[rustfmt::skip]
+        let cases = [
+            (HoverKind::Thread, rect(260.0, 100.0, 520.0, 64.0), 790.0, 96.0),
+            (HoverKind::Side, rect(12.0, 300.0, 180.0, 30.0), 202.0, 294.0),
+            (HoverKind::Account, rect(12.0, 20.0, 40.0, 40.0), 62.0, 14.0),
+            (HoverKind::Sender, rect(400.0, 200.0, 90.0, 18.0), 400.0, 224.0),
+            // No flip: a sender card at the bottom slides up inside the 8 px margin.
+            (HoverKind::Sender, rect(400.0, 760.0, 90.0, 18.0), 400.0, 652.0),
+            // A thread card at the right edge slides left rather than flipping.
+            (HoverKind::Thread, rect(700.0, 100.0, 450.0, 64.0), 892.0, 96.0),
+        ];
+        for (kind, target, x, y) in cases {
+            let (anchor, want, gap) = card_placement(kind, target);
+            let at = place(anchor, card, window, want, gap).origin;
+            assert_eq!((at.x, at.y), (Px(x), Px(y)), "{kind:?} at {target:?}");
+        }
+    }
 }
