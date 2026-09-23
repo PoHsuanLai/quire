@@ -34,16 +34,22 @@ esac
 # Share compiled dependencies across every worktree once sccache is installed.
 if [[ -z "${RUSTC_WRAPPER:-}" ]] && command -v sccache >/dev/null 2>&1; then
   export RUSTC_WRAPPER=sccache
+  # Start the server here, outside the lock and outside any capped scope, so it neither
+  # inherits the lock descriptor nor counts against one build's memory cap.
+  sccache --start-server >/dev/null 2>&1 || true
 fi
 
 run_capped() {
   local j="$1"; shift
   local unit="agent-cargo-$$-$RANDOM"
   # Hard cap only; MemoryHigh would throttle instead of kill and hide the overrun.
+  # `9>&-`: the build must not inherit the lock descriptor. The sccache server started by
+  # the first compile daemonizes and outlives the build; holding fd 9 it keeps the lock taken
+  # after the build ends, and every later build waits on a lock nobody is using.
   CARGO_BUILD_JOBS="$j" systemd-run --user --scope --quiet --collect \
     --unit="$unit" \
     -p MemoryMax="$mem_max" -p MemorySwapMax=0 \
-    -- "$real_cargo" "$@"
+    -- "$real_cargo" "$@" 9>&-
 }
 
 wait_note() {

@@ -1,0 +1,18 @@
+[package]
+name = "ds-gallery"
+description = "Gallery of every quire component across theme, accent, motion and material."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds = { workspace = true, features = ["lint"] }
+ds-settings = { workspace = true }
+ds-native = { workspace = true }
+dioxus = { workspace = true }
+
+[lints]
+workspace = true

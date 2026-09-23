@@ -1,0 +1,23 @@
+[package]
+name = "ds-settings"
+description = "Appearance settings I/O: appearance.json, directory watch, settings portal."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds = { workspace = true }
+dioxus = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+notify = { workspace = true }
+zbus = { workspace = true }
+tokio = { workspace = true }
+dirs = { workspace = true }
+
+[lints]
+workspace = true
