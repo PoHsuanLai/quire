@@ -2,6 +2,7 @@
 
 use crate::components::vocab::{Availability, Switch};
 use crate::icon::Icon;
+use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 
 /// Which icon button.
@@ -17,6 +18,29 @@ pub enum IconButtonVariant {
     Pin,
 }
 
+impl IconButtonVariant {
+    /// The `data-variant` word.
+    fn slug(self) -> &'static str {
+        match self {
+            IconButtonVariant::Tool => "tool",
+            IconButtonVariant::Foot => "foot",
+            IconButtonVariant::Strip => "strip",
+            IconButtonVariant::Pin => "pin",
+        }
+    }
+
+    /// The glyph size from the section's geometry table: Tool and Foot 16, Strip 14. The Pin's
+    /// content is the account tile's (section 27); a bare glyph on a Pin takes the base 16.
+    fn icon_size(self) -> IconSize {
+        match self {
+            IconButtonVariant::Tool | IconButtonVariant::Foot | IconButtonVariant::Pin => {
+                IconSize::Base
+            }
+            IconButtonVariant::Strip => IconSize::Compact,
+        }
+    }
+}
+
 /// An icon-only action.
 #[component]
 pub fn IconButton(
@@ -29,5 +53,24 @@ pub fn IconButton(
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
 ) -> Element {
-    todo!()
+    let pressed = pressed.map(|state| state.aria());
+    let expanded = expanded.map(|state| state.aria());
+    rsx! {
+        button {
+            r#type: "button",
+            class: "ds-icon-button",
+            "data-variant": variant.slug(),
+            "aria-label": "{label}",
+            title: tooltip,
+            "aria-pressed": pressed,
+            "aria-expanded": expanded,
+            "aria-disabled": availability.aria_disabled(),
+            onclick: move |_| {
+                if availability == Availability::Enabled {
+                    onclick.call(());
+                }
+            },
+            Glyph { icon, size: variant.icon_size() }
+        }
+    }
 }

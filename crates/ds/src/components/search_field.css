@@ -1,1 +1,9 @@
-/* search_field.css: filled in with the component (design/04-COMPONENTS.md). */
+/* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
+   (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
+   Hover and disabled are not specified. */
+
+.ds-search{ display:flex; align-items:center; gap:9px; padding:12px 14px; border-bottom:1px solid var(--line-soft); color:var(--ink-faint); }
+.ds-search .ds-field{ flex:1; }
+.ds-search .ds-input{ font-size:var(--fs-title); border:0; outline:none; background:transparent; color:var(--ink); width:100%; padding:0; }
+.ds-search .ds-input-placeholder{ font-size:var(--fs-title); padding:0; }
+.ds-search-tokens{ display:flex; gap:5px; flex-wrap:wrap; padding:0 14px 8px; }

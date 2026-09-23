@@ -71,7 +71,8 @@ fn child(shape: &Shape) -> Element {
     }
 }
 
-/// `icon`, drawn as an `svg` of class `ds-ic` at `size`, stroked in `currentColor`.
+/// `icon`, drawn as an `svg` of class `ds-ic` at `size` (its `width`, `height` and
+/// `data-size`), stroked in `currentColor` through attributes, never CSS (spike S6).
 #[component]
 pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
     let px = size.px();
@@ -79,6 +80,10 @@ pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
         svg {
             class: "ds-ic",
             "data-size": "{px}",
+            // Presentation attributes: Blitz and browsers map an `svg`'s width and height to
+            // the CSS properties, so the size needs no stylesheet rule (design/08-ICONS.md 1.4).
+            width: "{px}",
+            height: "{px}",
             view_box: "0 0 24 24",
             // SVG elements do not carry the HTML `aria_hidden` attribute.
             "aria-hidden": "true",

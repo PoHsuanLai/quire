@@ -1,1 +1,9 @@
-/* count.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Count (design/04-COMPONENTS.md section 14): `S:136`, `S:117`, `S:341-342`, tabular from C
+   (`C:308-311`). Empty at zero. The bump is the pulse class `a-bump` with its `data-pulse`
+   alias swap (the motion stylesheet's); this file only makes the count transformable while it
+   plays. Attribute selectors carry `*|` (spike S2). */
+
+.ds-count{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
+.ds-count[*|data-place=item]{ margin-left:auto; font-size:var(--fs-note); color:var(--f-ink-faint); }
+.ds-count[*|data-place=tile]{ position:absolute; top:4px; right:5px; font-size:var(--fs-nano); color:var(--f-ink-soft); }
+.ds-count.a-bump{ display:inline-block; }

@@ -1,1 +1,8 @@
-/* kbd.css: filled in with the component (design/04-COMPONENTS.md). */
+/* Kbd (design/04-COMPONENTS.md section 9): `S:67-68`; Small is the hint row's 9.5 (`S:662`).
+   Static: no hover, active, focus or motion. Attribute selectors carry `*|` (spike S2). */
+
+.ds-kbd{
+  font-family:var(--font-data); font-size:var(--fs-note); border:1px solid var(--line); border-bottom-width:2px;
+  border-radius:var(--r-kbd); padding:1px 5px; color:var(--ink-soft); background:var(--surface-2);
+}
+.ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }

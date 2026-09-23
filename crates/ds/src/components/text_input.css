@@ -1,1 +1,28 @@
-/* text_input.css: filled in with the component (design/04-COMPONENTS.md). */
+/* TextInput (design/04-COMPONENTS.md section 6): Boxed is `.inp`, Inline is `.inp.inline` with
+   `.pinput` folded in (`S:599-600`, `S:781-786`). Attribute selectors carry `*|` (spike S2).
+   `.ds-field` wraps the input so the placeholder can be a span over it: Blitz draws no
+   `placeholder` and has no `::placeholder` (O-23's fallback).
+   TODO(O-1): disabled is not specified; hover is not specified. */
+
+.ds-field{ position:relative; display:inline-flex; }
+.ds-field[*|data-variant=inline]{ flex:1; min-width:120px; }
+
+.ds-input{ font:inherit; font-size:var(--fs-body); color:var(--ink); outline:none; }
+.ds-input[*|data-variant=boxed]{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:7px 10px;
+  transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
+}
+/* Any focus, not only keyboard focus: the plan's accent ring. */
+.ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+.ds-input[*|data-variant=inline]{ border:1px solid transparent; background:transparent; padding:3px 2px; min-width:120px; flex:1; box-shadow:none; }
+.ds-input[*|data-variant=inline]:focus{ border-color:transparent; box-shadow:none; }
+/* The global keyboard ring must not double the field's own focus (or the Inline container's). */
+.ds[*|data-modality=keyboard] .ds-input:focus{ outline:none; }
+
+/* The placeholder sits where the input's text starts: its border plus its padding. */
+.ds-input-placeholder{
+  position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
+  font:inherit; font-size:var(--fs-body); color:var(--ink-faint);
+}
+.ds-field[*|data-variant=boxed] .ds-input-placeholder{ padding:8px 11px; }
+.ds-field[*|data-variant=inline] .ds-input-placeholder{ padding:4px 3px; }
