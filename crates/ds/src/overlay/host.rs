@@ -1,5 +1,4 @@
 //! The overlay registry and the host that renders it at the end of `.ds`.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
@@ -16,23 +15,55 @@ pub struct Overlays {
 
 impl Overlays {
     /// Show `content` on `layer`, replacing whatever `id` showed before.
+    ///
+    /// Call from a handler or an effect, not from render: the registry is a signal the host
+    /// reads.
     pub fn show(&self, id: OverlayId, layer: ZLayer, content: Element) {
-        todo!()
+        let mut entries = self.entries;
+        entries.with_mut(|entries| {
+            entries.retain(|(shown, _, _)| *shown != id);
+            let at =
+                entries.partition_point(|(_, shown, _)| stack_order(*shown) <= stack_order(layer));
+            entries.insert(at, (id, layer, content));
+        });
     }
 
     /// Stop showing `id`.
     pub fn hide(&self, id: OverlayId) {
-        todo!()
+        let mut entries = self.entries;
+        entries.with_mut(|entries| entries.retain(|(shown, _, _)| *shown != id));
     }
+}
+
+/// A layer's place in the window's stacking order (design/01-LAYOUT.md section 12), lowest
+/// first: its position in [`ZLayer::ALL`].
+fn stack_order(layer: ZLayer) -> usize {
+    ZLayer::ALL
+        .iter()
+        .position(|&l| l == layer)
+        .unwrap_or(ZLayer::ALL.len())
+}
+
+/// A new, empty registry, owned by the calling scope (`Ds`).
+pub(crate) fn use_overlays_provider() -> Overlays {
+    use_context_provider(|| Overlays {
+        entries: Signal::new(Vec::new()),
+    })
 }
 
 /// The enclosing `Ds`'s overlay registry.
 pub fn use_overlays() -> Overlays {
-    todo!()
+    use_context::<Overlays>()
 }
 
 /// Renders every registered overlay, lowest layer first. `Ds` places it last in `.ds`.
 #[component]
 pub fn OverlayHost() -> Element {
-    todo!()
+    let overlays = use_overlays();
+    let entries = overlays.entries.read();
+    rsx! {
+        for (id , _ , content) in entries.iter() {
+            Fragment { key: "{id.0}", {content.clone()} }
+        }
+    }
 }

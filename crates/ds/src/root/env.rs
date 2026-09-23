@@ -1,6 +1,5 @@
 //! What every component under a `Ds` can read: the resolved appearance, the material and the
 //! blur state of the scope it is in.
-#![allow(unused_variables)] // Freeze stubs: remove with the last todo!().
 
 use crate::appearance::{Resolved, Scheme};
 use crate::material::{BlurState, Material};
@@ -52,5 +51,21 @@ pub struct Env {
 
 /// The enclosing scope. Panics outside a `Ds`: every quire component is drawn inside one.
 pub fn use_env() -> Env {
-    todo!()
+    use_env_signal()()
+}
+
+/// The enclosing scope as the signal `Ds` and `Surface` provide, for hooks that read the
+/// motion level when a timer starts rather than when they were created.
+pub(crate) fn use_env_signal() -> Signal<Env> {
+    use_context::<Signal<Env>>()
+}
+
+/// Provide `env` to the subtree, updating the provided value when it changes. Nothing here
+/// reads the signal, so the write does not re-render the caller.
+pub(crate) fn use_env_provider(env: Env) -> Signal<Env> {
+    let mut provided = use_context_provider(|| Signal::new(env));
+    if *provided.peek() != env {
+        provided.set(env);
+    }
+    provided
 }
