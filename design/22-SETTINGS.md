@@ -766,6 +766,104 @@ only in v1, no widget; a later wave may promote one if the user asks.
    keys whose dotted prefix does not match their owning Rust struct's module path 1:1 — noted
    inline in the test, not silently skipped.)
 
+## 9. Registration: the schema is data (settled 2026-09-24)
+
+A program does not register its settings with a Settings app at runtime. It ships a **schema
+file**, generated from its own settings structs, and the Settings app renders pages from every
+schema it finds. Types drive the widgets; the struct stays the single source of truth; nothing
+links the Settings app.
+
+### 9.1 The derive
+
+Every domain struct in section 4 gains `#[derive(SettingsSchema)]` (a proc-macro in a new crate
+`ds-settings-derive`, re-exported by `ds-settings`). Field attributes carry what the type cannot:
+
+```rust
+#[derive(Default, Serialize, Deserialize, SettingsSchema)]
+#[settings(file = "sill/settings.toml", domain = "dock", page = Page::Dock)]
+pub struct DockSettings {
+    #[settings(label = "Magnification", help = "Icons grow as the pointer nears them.", section = "Magnification")]
+    pub magnification: Magnification,                       // enum -> segmented control
+    #[settings(label = "Magnified size", range = "48..=128", unit = "px", section = "Magnification", advanced)]
+    pub magnified_px: Px,                                   // bounded newtype -> slider
+    #[settings(label = "Hover label delay", range = "0..=1000", unit = "ms", advanced)]
+    pub hover_label_delay_ms: Ms,
+    ...
+}
+```
+
+The derive emits, at build time, `KeySpec` values for every field:
+
+```rust
+pub struct KeySpec {
+    pub path: KeyPath,            // "dock.magnified_px"
+    pub kind: KeyKind,            // Enum{variants}, Bounded{min,max,unit}, Text, Colour, Shortcut, List(Box<KeyKind>)
+    pub default: toml::Value,
+    pub label: Label, pub help: Help,
+    pub page: Page, pub section: Section,
+    pub exposure: Exposure,       // Basic | Advanced (file-only)
+}
+pub struct Schema { pub app: AppId, pub file: FilePath, pub keys: Vec<KeySpec> }
+```
+
+Widget by kind, fixed: a two-variant enum is a `Toggle`; three to five variants a
+`SegmentedControl`; more a `Menu`; `Bounded` a `Slider` with its unit; `Text` a `TextInput`;
+`Colour` the `AppearancePicker`'s swatch row; `Shortcut` a key-capture field; `List` a rows
+editor. All from `04-COMPONENTS.md`; the Settings app has no widgets of its own.
+
+### 9.2 Where the schema lives
+
+The derive's build step writes `target/.../<app-id>.settings.toml` and the package installs it
+to `$XDG_DATA_DIRS/quire/settings/<app-id>.settings.toml`, next to the `.desktop` file, the way
+GSettings ships schemas. The file is TOML, one `[[key]]` table per `KeySpec`, plus `app`,
+`file` and `version`. Developers run `cargo run -p <app> -- --write-schema <dir>` for a local
+install. A schema without a program (a stale file) is skipped with a warning.
+
+### 9.3 What the Settings app does
+
+1. Discover every `*.settings.toml` under `$XDG_DATA_DIRS/quire/settings/` (and
+   `$XDG_DATA_HOME`), parse, group keys by `page` then `section`, render with the widget table
+   above; pages come from a fixed `Page` enum (Appearance, Dock, Mouse and Gestures, Keyboard
+   and Shortcuts, Notifications, Spaces, Accounts, Apps, plus one page per third-party app
+   id). "Advanced" keys render under a disclosure at the end of their section.
+2. Read the current value from the key's `file` through the shared lenient loader; write with
+   the atomic writer; the owning program's directory watch applies it live (section 2).
+   The Settings app never talks to the program.
+3. Deep links: the launcher's Settings provider reads the same schemas, so the query "dark
+   mode" resolves to `appearance.theme` on the Appearance page, and "bluetooth" to the live
+   module below; no hand-kept table.
+
+### 9.4 Live modules (the one dynamic path)
+
+Runtime state that is not a file (Wi-Fi networks, Bluetooth devices, audio devices, accounts)
+is served by its shell service over D-Bus: `org.quire.SettingsModule1` with `Describe() ->
+schema JSON` (the same `KeySpec` shape, with `kind = Live{action}`) plus `Get`/`Set`/`Changed`.
+The Settings app renders these modules in the same pages, with the same widgets; the only
+difference is that `Set` calls the service instead of writing a file. mailo, calendar and
+contacts register their account pages this way (`20-SURFACES.md`).
+
+### 9.5 Rules
+
+- A settings key exists only if a `KeySpec` describes it: a struct field without the derive is
+  a bug, caught by the test in 9.6.
+- Schema `version` follows the file `version` (section 2); a key removed from a struct stays
+  in the schema for one version, marked `deprecated`, so the Settings app can offer to clean it.
+- No program renders its own settings UI for keys the schema covers (mailo's appearance
+  picker becomes the `AppearancePicker` component bound to `quire/appearance.toml`); an app
+  may still embed the Settings app's rendering of its own schema in-app via the shared
+  `SettingsPage` component (04, proposed).
+- Every "proposed" value in this doc is Basic or Advanced per section 5; nothing is file-only
+  without also being in the schema.
+
+### 9.6 Acceptance
+
+- `every_key_in_catalogue_has_a_spec`: the section 3 tables parsed from this file match the
+  union of all schemas emitted by the workspace, path for path.
+- `schema_round_trip`: derive -> TOML -> parse -> equals the derive output.
+- `widget_for_kind_is_total`: every `KeyKind` maps to exactly one component.
+- `deep_link_resolves`: "dark mode", "magnification", "natural scrolling" each resolve to one
+  key through the schemas alone.
+
 ## 7. Open decisions
 
 1. **Whether palmrest and sill share one file.** This doc keeps them separate
