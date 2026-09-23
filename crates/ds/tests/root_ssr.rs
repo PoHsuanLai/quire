@@ -4,6 +4,7 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
+use ds::lint::{LintConfig, Rule, markup};
 use ds::{
     Accent, Appearance, BlurState, Ds, FrameVars, HostModality, Inject, InputModality, Material,
     Motion, ReducedMotion, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
@@ -218,16 +219,54 @@ fn only_a_window_draws_the_frame_layers_and_grain() {
         material: Material::Window,
         ..Setup::default()
     });
-    for class in [
-        "class=\"ds-layer\"",
-        "class=\"ds-layer back\"",
-        "class=\"ds-grain\"",
-    ] {
-        assert_eq!(window.matches(class).count(), 1, "{class} in {window}");
-    }
+    // Both layers share the one class; only the hidden one also carries `data-layer="back"`
+    // (checked in `the_hidden_frame_layer_carries_the_back_attribute` below).
+    assert_eq!(window.matches("class=\"ds-layer\"").count(), 2, "{window}");
+    assert_eq!(window.matches("class=\"ds-grain\"").count(), 1, "{window}");
     let popover = render(Setup::default());
     assert!(!popover.contains("ds-layer"), "no layers on a popover");
     assert!(!popover.contains("ds-grain"), "no grain on a popover");
+}
+
+/// FINDINGS "`Ds`'s own `Material::Window` frame layers do not match their own stylesheet
+/// rule": `FrameLayers::render` used to write the hidden layer as `class="ds-layer back"`,
+/// which `utilities.css`'s `.ds-layer[*|data-layer=back]{opacity:0}` never matches (an
+/// attribute selector, not a class). The fix writes `data-layer="back"` instead, so exactly one
+/// of the two layers carries it, and the other carries no `data-layer` at all.
+#[test]
+fn the_hidden_frame_layer_carries_the_back_attribute() {
+    let window = render(Setup {
+        material: Material::Window,
+        ..Setup::default()
+    });
+    assert_eq!(
+        window.matches("data-layer=\"back\"").count(),
+        1,
+        "exactly one hidden layer in {window}"
+    );
+    assert!(
+        !window.contains("ds-layer back"),
+        "the old, never-matched class form must be gone: {window}"
+    );
+}
+
+/// The same gap, proven through the coherence tool a consumer would actually run
+/// (`CONSUMING.md` section 5 rule 2): a `Material::Window` root's markup lints clean, with no
+/// `Rule::UnstyledClass` on the frame layers. Before the fix, `div.ds-layer.back` tripped it,
+/// because no rule in `ds::stylesheet()` styles a class named `back`.
+#[test]
+fn a_window_roots_markup_lints_clean_of_unstyled_classes() {
+    let rendered = render(Setup {
+        material: Material::Window,
+        stylesheet: Inject::Inline,
+        ..Setup::default()
+    });
+    let offences = markup(&rendered, ds::stylesheet(), &LintConfig::default());
+    let unstyled: Vec<_> = offences
+        .iter()
+        .filter(|offence| offence.rule == Rule::UnstyledClass)
+        .collect();
+    assert!(unstyled.is_empty(), "{unstyled:#?}");
 }
 
 #[test]

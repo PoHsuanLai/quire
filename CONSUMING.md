@@ -130,46 +130,34 @@ fn App() -> Element {
 }
 ```
 
-**The gap `examples/consumer` had to route around, and you should know about before you hit
-it.** `use_environment` needs an **entered Tokio runtime**, in both halves, not only the
-obviously networked one:
+**`use_environment` needs an entered Tokio runtime, in both halves, not only the obviously
+networked one** — and on Blitz, `ds_native::launch` and `ds_native::Harness` provide it, so
+there is nothing for you to do:
 
 - the desktop-portal half (`SystemPrefsWatch`, `ds-settings/src/portal.rs`) goes over D-Bus
   through `zbus`'s `tokio` feature and calls `tokio::spawn` directly (`portal.rs`'s
   `linux::spawn_watch`);
-- the **file-watch half is not exempt either**: `ds_settings::watch` (`ds-settings/src/
-  watch.rs`) calls `tokio::spawn` directly too, to debounce and coalesce `notify` events
+- the file-watch half is not exempt either: `ds_settings::watch` (`ds-settings/src/watch.rs`)
+  calls `tokio::spawn` directly too, to debounce and coalesce `notify` events
   (`tokio::time::timeout(DEBOUNCE, ...)` inside that spawned task), so it needs a runtime just
   as much as the portal does — only the plain, one-shot `ds_settings::load`/`load_or_import`
   (a synchronous `std::fs::read`) needs none.
 
-`ds_native::launch` and `ds_native::Harness` (the whole of `ds-native`) never enter a runtime —
-`ds-native` has no `tokio` dependency at all, by design (`ORCHESTRATION.md`'s boundary rule keeps
-`ds` and `ds-settings` renderer-free, but nothing in the plan gives a Blitz *host* a runtime
-either). Call `use_environment`, or `ds_settings::watch` on its own, from a `ds_native::launch`ed
-app today and the first render that awaits either panics ("there is no reactor running").
+Neither `ds` nor `ds-settings` may depend on a renderer or a windowing stack
+(`scripts/check-boundary.sh`), so neither can own a *host thread* to enter a runtime on — only a
+host crate can, and `ds-native` is quire's one host crate. `ds-native` owns a process-wide,
+lazily built Tokio runtime (multi-thread, two workers; `crates/ds-native/src/runtime.rs`):
+`ds_native::launch` enters it and holds the guard for the rest of the call, i.e. for the
+process's life, and `ds_native::Harness` enters it in `Harness::new` and holds the guard as a
+field, for the harness's own life. Call `use_environment` (or `ds_settings::watch` on its own)
+from anything launched with `ds_native::launch`, or rendered inside a `ds_native::Harness`, and
+it works — `examples/consumer::App` does exactly this
+(`examples/consumer/src/lib.rs::App`), and `crates/ds-native/tests/harness.rs::
+use_environment_does_not_panic_under_the_harness` is the regression test.
 
-Until `ds-native` or its host enters a runtime (a real gap — report it rather than silently
-building a workaround into your app, per `ORCHESTRATION.md` "any missing... is added to quire
-first, never patched locally" applied to this integration seam), a Blitz consumer has two
-options:
-
-1. **File settings only, loaded once, no live reload at all**: call `ds_settings::load_or_import`
-   (or `ds_settings::load`, once the file exists) synchronously — `ds_native::launch` takes a
-   bare `fn() -> Element` with no captures, so there is nowhere in `main` to hand the result to
-   your root component; read it inside the component's own first render instead, the same way
-   `ds_settings::environment::load_initial` does inside `use_environment` itself
-   (`examples/consumer/src/lib.rs::appearance` is this, worked). You lose both "the file changed
-   on disk" and "dark mode just changed system-wide" following; nothing else in quire needs
-   Tokio.
-2. **Enter your own Tokio runtime** before calling `ds_native::launch` (`tokio::runtime::Builder
-   ::new_multi_thread().enable_all().build()?`, then `.enter()` and keep the guard alive for the
-   process's life) if you need either live-reload path. Untested by this wave, since it needs
-   nothing from `ds`/`ds-settings`/`ds-native` to try — report back what you find.
-
-A consumer still on a Dioxus desktop **webview** (mailo Phase A) is not affected: `dioxus-desktop`
-already runs inside its own Tokio runtime, so `use_environment` and `ds_settings::watch` both
-work as documented there.
+A consumer still on a Dioxus desktop **webview** (mailo Phase A) is not affected either way:
+`dioxus-desktop` already runs inside its own Tokio runtime, so `use_environment` and
+`ds_settings::watch` both work as documented there.
 
 ### `use_env` — reading the resolved scope
 
@@ -507,7 +495,7 @@ what `ds::use_pulse` does), `futures-timer` sleeps from render or a handler (S10
 and every quire timer uses), registering a bundled font through a shared `FontContext` (S11), and
 `color-mix()` (S14, though quire precomputes washes instead, for determinism).
 
-## 9. One gap `examples/consumer` found and quire fixed during this same wave, and one still open
+## 9. Two gaps `examples/consumer` found, both now fixed in quire
 
 Neither is a Blitz limit (section 8's table); both are in quire's own implementation, found
 while wiring up a real, tested consumer app.
@@ -531,19 +519,22 @@ workaround — if you hit a `RefCell already borrowed` panic under `Harness` tod
 bug, not this one; open one with the same reproduction shape (`Harness::new`, one `click()` that
 opens a floating component) and cite this section.
 
-**`Ds`'s own `Material::Window` frame layers do not match their own stylesheet rule — open,
-not fixed.**
-`crates/ds/src/root/ds.rs::FrameLayers::render` writes the hidden layer's class as
+**`Ds`'s own `Material::Window` frame layers did not match their own stylesheet rule — fixed.**
+`crates/ds/src/root/ds.rs::FrameLayers::render` used to write the hidden layer's class as
 `"ds-layer back"` — `back` as a second CSS class. `crates/ds/src/css/utilities.css` styles it as
-`.ds-layer[*|data-layer=back]{opacity:0}` — an attribute, not a class. The two never match, so
-the hidden layer keeps `.ds-layer`'s base (no `opacity` set, i.e. fully visible) instead of
-starting hidden, which means a Space switch's cross-fade (design/21-SPACES.md section 5) has
-nothing to fade *from* zero — both layers are opaque throughout. Any consumer's own
-`ds::lint::markup` test over a `Material::Window` root catches this as `Rule::UnstyledClass` on
-`div.ds-layer.back`; `examples/consumer/tests/coherence.rs` documents it as a reviewed
-`Exception` with this same explanation rather than silently loosening the test. The one-line fix
-(not made here) is for `FrameLayers::render` to write `"data-layer": (slot != self.front)
-.then_some("back")` instead of appending the word to `class`.
+`.ds-layer[*|data-layer=back]{opacity:0}` — an attribute, not a class. The two never matched, so
+the hidden layer kept `.ds-layer`'s base (no `opacity` set, i.e. fully visible) instead of
+starting hidden, which meant a Space switch's cross-fade (design/21-SPACES.md section 5) had
+nothing to fade *from* zero — both layers were opaque throughout. Any consumer's own
+`ds::lint::markup` test over a `Material::Window` root caught this as `Rule::UnstyledClass` on
+`div.ds-layer.back`; `examples/consumer/tests/coherence.rs` used to document it as a reviewed
+`Exception` with this same explanation, until the fix. `FrameLayers::render` now writes
+`"data-layer": (slot != self.front).then_some("back")` instead of appending the word to `class`,
+so the front layer carries no `data-layer` at all and the hidden one carries
+`data-layer="back"`, which the stylesheet rule matches — `crates/ds/tests/root_ssr.rs::
+the_hidden_frame_layer_carries_the_back_attribute` and `::
+a_window_roots_markup_lints_clean_of_unstyled_classes` are the regression tests, and the
+`Exception` in `examples/consumer/tests/coherence.rs` is gone.
 
 ## 10. Comparing your surface against the reference
 
