@@ -8,8 +8,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, Appearance, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu,
-    MenuEntry, MenuKind, Point, Px, TextInput, Tile, Trail, use_motion_timer, use_toasts,
+    Anim, Appearance, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry,
+    MenuKind, TextInput, Tile, Trail, use_motion_timer, use_rect, use_toasts,
 };
 
 /// This example's own stylesheet, quire tokens only (`tests/coherence.rs::our_stylesheet_lints_clean`).
@@ -47,8 +47,7 @@ fn appearance() -> Appearance {
         .unwrap_or_default()
 }
 
-/// What picking an "Actions" menu entry does. Kept off the `Send` path entirely — see `Page`'s
-/// doc comment for why.
+/// What picking a "More" menu entry does.
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Action {
     Duplicate,
@@ -77,24 +76,17 @@ fn entries() -> Vec<MenuEntry<Action>> {
 }
 
 /// A subject field, a `Send` button whose "Sent" confirmation is timed by
-/// `ds::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`.
-///
-/// `Send` never opens the menu: `ds::components::popover::use_float` (what every floating quire
-/// component — `Menu`, `Popover`, `HoverCard`, `CommandPalette` — is built on) measures its own
-/// mounted surface through `ds::geometry::measure::use_rect`, and that rect read re-enters a
-/// document borrow `dioxus-native-dom`'s own task-wakeup pass already holds when driven by
-/// `ds_native::Harness` (`RefCell already borrowed`, `dioxus-native-dom/src/events.rs:161`,
-/// reported in this wave's report — not something `examples/consumer` can fix, since it crosses
-/// `ds::geometry`, `ds::components::popover` and the pinned `dioxus-native-dom` rev, none of
-/// them this crate's own). `tests/coherence.rs`'s motion test exercises `Send` alone, so it
-/// proves rule 4 without tripping the open bug; `Duplicate`/`Discard` still exist so this page
-/// genuinely uses `Menu`, exactly as `CONSUMING.md`'s catalogue shows it, and the SSR-based
-/// markup-lint tests still cover its markup (SSR never fires `onmounted`, so they do not hit
-/// the bug either).
+/// `ds::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`
+/// anchored to itself through `ds::use_rect` — the pattern `CONSUMING.md`'s "Component
+/// catalogue" Overlays example shows, and, until wave 2 integration's `ds::HostMeasure`/
+/// `Measured::Busy` fix, one that panicked under `ds_native::Harness`
+/// (`CONSUMING.md` §9 records what was found and that it is now fixed; this page no longer
+/// needs to route around it).
 #[component]
 fn Page() -> Element {
     let mut subject = use_signal(String::new);
     let mut menu_open = use_signal(|| false);
+    let anchor = use_rect();
     let toasts = use_toasts();
     let badge = use_motion_timer(Anim::Fade);
     let mut sent = use_signal(|| false);
@@ -118,10 +110,13 @@ fn Page() -> Element {
                         badge.start(EventHandler::new(move |()| sent.set(false)));
                     },
                 }
-                Button {
-                    variant: ButtonVariant::Secondary,
-                    label: "More".to_owned(),
-                    onclick: move |_| menu_open.set(true),
+                span {
+                    onmounted: move |event| anchor.on_mounted(event),
+                    Button {
+                        variant: ButtonVariant::Secondary,
+                        label: "More".to_owned(),
+                        onclick: move |_| menu_open.set(true),
+                    }
                 }
             }
             span {
@@ -129,10 +124,10 @@ fn Page() -> Element {
                 "data-shown": if sent() { "shown" } else { "hidden" },
                 "Sent"
             }
-            if menu_open() {
+            if let (true, Some(at)) = (menu_open(), anchor.anchor()) {
                 Menu {
                     kind: MenuKind::Rich,
-                    anchor: Anchor::Point(Point { x: Px(16.0), y: Px(64.0) }),
+                    anchor: at,
                     entries: entries(),
                     onpick: move |action: Action| {
                         menu_open.set(false);

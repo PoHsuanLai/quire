@@ -115,10 +115,6 @@ fn no_raw_form_control_or_svg_is_rendered() {
 /// crate. Proof: it is still showing one frame short of `settle()`'s own duration, and it is
 /// gone once that duration has fully elapsed on [`Harness`]'s clock — the same clock every
 /// `ds-native` test in quire itself advances, never this crate's own timer.
-///
-/// Clicks `Send` alone, never `More` (which opens a `Menu`): `Page`'s doc comment has the
-/// reason — opening any floating quire component under `Harness` hits an open upstream bug,
-/// unrelated to motion timing, which this test is not about.
 #[test]
 fn the_sent_badge_times_out_on_ds_motions_own_clock() {
     let mut harness = Harness::new(App, VIEW);
@@ -154,5 +150,36 @@ fn the_sent_badge_times_out_on_ds_motions_own_clock() {
         shown(&harness).as_deref(),
         Some("hidden"),
         "did not hide once settle() finished"
+    );
+}
+
+// ---- Bonus: the anchored `Menu` opens and closes under `Harness`. ------------------------
+
+/// Not one of the four coherence rules, but worth pinning: `Page`'s "More" button anchors its
+/// `Menu` through `ds::use_rect` (`onmounted` + a rect read one frame later), and driving that
+/// through `ds_native::Harness` used to panic with `RefCell already borrowed`
+/// (`CONSUMING.md` §9) until wave 2 integration's `ds::HostMeasure` fix landed. This is the
+/// regression test for that fix, from this crate's own (unrelated) reason to open a menu.
+#[test]
+fn the_menu_opens_and_closes_under_harness() {
+    let mut harness = Harness::new(App, VIEW);
+    let more = harness
+        .centre(".ds-button[*|data-variant=secondary]")
+        .unwrap_or_else(|| panic!("More is not on screen:\n{}", harness.html()));
+    harness.click(more);
+    assert!(
+        harness.count(".ds-menu-item") > 0,
+        "the menu did not open:\n{}",
+        harness.html()
+    );
+
+    let item = harness
+        .centre(".ds-menu-item")
+        .unwrap_or_else(|| panic!("no menu item on screen:\n{}", harness.html()));
+    harness.click(item);
+    assert_eq!(
+        harness.count(".ds-menu-item"),
+        0,
+        "the menu did not close after picking an entry"
     );
 }

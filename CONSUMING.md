@@ -89,6 +89,7 @@ fn App() -> Element {
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
+| `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 
 You almost never write more than one `Ds` per window: it is the root, not a per-panel wrapper —
 use `Surface` (section 3) for a nested material or scheme.
@@ -395,6 +396,25 @@ Every component's exact props are its own `#[component] pub fn` signature in
 `crates/ds/src/components/<name>.rs` — read that, not this table, before wiring one up; this doc
 only orients you to which family a component is in and where its design spec lives.
 
+A few props worth knowing about before you read the signatures, added in wave 2 integration:
+
+- `TextInput` takes `#[props(default)] focus: Focus` — `Focus::OnMount` focuses it as soon as it
+  mounts (the command palette's input, a bubble's link field); the default, `Focus::Manual`, is
+  what every other field wants.
+- `ListRow` and `SidebarItem` take `#[props(default)] drop: DropState` (`Idle`, `Target`,
+  `Source`) — drag-and-drop visual state (design/04-COMPONENTS.md §34); leave it `Idle` unless
+  you are wiring up drag and drop for that row.
+- `SpaceEditor` takes two more optional props: `name: Option<String>` (the Space's own name
+  field, drawn inside the editor rather than beside it) and
+  `on_active_dot: Option<EventHandler<ActiveDot>>` (fires when the person's focus moves to a
+  different dot, separately from `onchange`, which fires on an actual edit).
+- `AccountFace::One` gained an `address: Option<String>` field — an `AccountTile`'s
+  accessible name falls back to its letter and provider without one; pass the account's address
+  when you have it.
+- `SelectionBubble`'s `BubbleAction` is now `{Button(BubbleButton), Separator}` rather than a
+  bare list of buttons — insert `BubbleAction::Separator` between groups instead of styling a
+  gap yourself.
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
@@ -487,35 +507,32 @@ what `ds::use_pulse` does), `futures-timer` sleeps from render or a handler (S10
 and every quire timer uses), registering a bundled font through a shared `FontContext` (S11), and
 `color-mix()` (S14, though quire precomputes washes instead, for determinism).
 
-## 9. Two gaps `examples/consumer` found, not worked around in quire itself
+## 9. One gap `examples/consumer` found and quire fixed during this same wave, and one still open
 
-Neither of these is a Blitz limit (section 8's table); both are in quire's own wave 1/2
-implementation, found while wiring up a real, tested consumer app, and reported rather than
-patched here — `crates/` is not this doc's or `examples/consumer`'s to change
-(`ORCHESTRATION.md`: "stop and report" a wrong or missing signature).
+Neither is a Blitz limit (section 8's table); both are in quire's own implementation, found
+while wiring up a real, tested consumer app.
 
 **Opening a floating component (`Menu`, `Popover`, `HoverCard`, `CommandPalette`) and then
-driving it through `ds_native::Harness` panics.** `ds::components::popover::use_float` — what
-every floating component is built on — mounts two `ds::geometry::measure::use_rect` probes on
-every open, unconditionally, regardless of the `Anchor` you pass. Each spawns a task that reads
-`get_client_rect()` one frame later. On a real Blitz document driven by `Harness::click`
-(`pointer_move`, `pointer_down`, `pointer_up` in quick succession, each ending in a `frame()`),
-that task's resolution can land inside `dioxus-native-dom`'s own event-dispatch pass, which is
-already holding the document's `RefCell` — `thread '...' panicked ... RefCell already borrowed`,
-at `dioxus-native-dom/src/events.rs:161`. Reproduced with nothing but `Harness::new`, one
-`harness.click()` on a button that sets `menu_open` true, and a `Menu` with `Anchor::Point` (so
-it is not specific to `Anchor::Mounted`). `examples/consumer/src/lib.rs::Page`'s doc comment has
-the full reproduction; its own tests route around it by never clicking through to open a `Menu`
-in a `Harness` test (the SSR-based coherence tests still exercise `Menu`'s markup, since SSR
-never fires `onmounted` and cannot hit this). If you need to test a floating component's
-*interaction* (not just render it), you will hit this today — it blocks the exact `ds-native`
-Harness cases `FINDINGS.md`/the plan's W2 native brief names ("a menu opens on click and closes
-on Escape"), which is very likely why `crates/ds-native/tests/harness.rs`'s own four overlay
-cases are still `#[ignore = "needs w2-overlays / w2-lists merged"]` even though both waves are
-merged on `master` — worth checking whether that ignore reason is stale or is quietly covering
-this exact panic.
+driving it through `ds_native::Harness` used to panic — fixed, not worked around, credit where
+it is due.** `ds::components::popover::use_float` — what every floating component is built on —
+mounts rect-measuring probes on every open. Reading a mounted element's rect one frame later,
+through a task the render spawns, could land inside `dioxus-native-dom`'s own event-dispatch
+pass while it already held the document's `RefCell`: `thread '...' panicked ... RefCell already
+borrowed`, at `dioxus-native-dom/src/events.rs:161`. `examples/consumer` hit this first (one
+`harness.click()` on a button that opens a `Menu`, nothing more), and quire's own wave 2
+integration root-caused and fixed it in the same session: `ds::geometry::measure` (and every
+component built on it) now reads through a `HostMeasure`/`Measured` seam
+(`crates/ds/src/geometry/measure.rs`, `crates/ds-native/src/measure.rs`) that answers `Busy`
+rather than reading a document mid-render, so the reader waits a frame instead of re-entering
+the borrow. `examples/consumer/tests/coherence.rs::the_menu_opens_and_closes_under_harness` is
+the regression test, and `Page`'s own "More" button is back to anchoring through
+`ds::use_rect`/`Anchor::Mounted` (the realistic pattern) rather than a fixed `Anchor::Point`
+workaround — if you hit a `RefCell already borrowed` panic under `Harness` today, it is a new
+bug, not this one; open one with the same reproduction shape (`Harness::new`, one `click()` that
+opens a floating component) and cite this section.
 
-**`Ds`'s own `Material::Window` frame layers do not match their own stylesheet rule.**
+**`Ds`'s own `Material::Window` frame layers do not match their own stylesheet rule — open,
+not fixed.**
 `crates/ds/src/root/ds.rs::FrameLayers::render` writes the hidden layer's class as
 `"ds-layer back"` — `back` as a second CSS class. `crates/ds/src/css/utilities.css` styles it as
 `.ds-layer[*|data-layer=back]{opacity:0}` — an attribute, not a class. The two never match, so
