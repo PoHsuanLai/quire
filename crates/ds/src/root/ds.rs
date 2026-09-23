@@ -82,8 +82,13 @@ pub fn Ds(
                 style { {crate::css::stylesheet()} }
             }
             if material == Material::Window {
-                for (slot , class , gradient) in layers {
-                    div { key: "{slot}", class, style: "--f-grad:{gradient}" }
+                for (slot , data_layer , gradient) in layers {
+                    div {
+                        key: "{slot}",
+                        class: "ds-layer",
+                        "data-layer": data_layer,
+                        style: "--f-grad:{gradient}",
+                    }
                 }
                 div { class: "ds-grain" }
             }
@@ -135,25 +140,31 @@ impl FrameLayers {
         }
     }
 
-    /// Each layer's key, class and gradient, in a fixed order so the nodes persist.
-    fn render(&self) -> [(&'static str, &'static str, String); 2] {
-        let class = |slot| {
+    /// Each layer's key, `data-layer` attribute and gradient, in a fixed order so the nodes
+    /// persist. The hidden layer carries `data-layer="back"` (the attribute form the
+    /// stylesheet's `.ds-layer[*|data-layer=back]{opacity:0}` rule matches, per FINDINGS
+    /// "`Ds`'s own `Material::Window` frame layers do not match their own stylesheet rule");
+    /// the front layer carries no `data-layer` at all, so it hits the lint's `DsInternals`
+    /// attribute set the same way `data-theme` etc. do, rather than a class the stylesheet
+    /// never targets.
+    fn render(&self) -> [(&'static str, Option<&'static str>, String); 2] {
+        let data_layer = |slot| {
             if slot == self.front {
-                "ds-layer"
+                None
             } else {
-                "ds-layer back"
+                Some("back")
             }
         };
         [
-            ("a", class(Front::A), self.a.clone()),
-            ("b", class(Front::B), self.b.clone()),
+            ("a", data_layer(Front::A), self.a.clone()),
+            ("b", data_layer(Front::B), self.b.clone()),
         ]
     }
 }
 
 /// The frame layers for this render. Kept outside any signal: `Ds` re-renders whenever its
 /// look changes, and nothing else reads them.
-fn use_frame_layers(gradient: &str) -> [(&'static str, &'static str, String); 2] {
+fn use_frame_layers(gradient: &str) -> [(&'static str, Option<&'static str>, String); 2] {
     let mut layers = use_hook(|| {
         CopyValue::new(FrameLayers {
             a: gradient.to_owned(),

@@ -8,43 +8,35 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry,
-    MenuKind, TextInput, Tile, Trail, use_motion_timer, use_rect, use_toasts,
+    Anim, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry, MenuKind,
+    TextInput, Tile, Trail, use_motion_timer, use_rect, use_toasts,
 };
+use ds_settings::{AppName, use_environment};
 
 /// This example's own stylesheet, quire tokens only (`tests/coherence.rs::our_stylesheet_lints_clean`).
 pub const STYLE: &str = include_str!("style.css");
 
 /// The example's one page, wrapped in the root every quire surface draws inside.
 ///
-/// Reads `appearance()` rather than `ds_settings::use_environment` (`../../CONSUMING.md`
-/// "Reading appearance" has the reason: `use_environment`'s live watches, portal and file
-/// alike, need an entered Tokio runtime, which neither `ds_native::launch` nor
-/// `ds_native::Harness` provides — a real gap, not worked around here). `ds_native::launch`
-/// takes a plain `fn() -> Element` with no captures, so there is nowhere to hand `App` a
-/// pre-loaded value from `main`; it loads its own settings synchronously instead, the same
-/// pattern `ds_settings::environment::load_initial` uses inside `use_environment` itself.
+/// Reads its settings through `ds_settings::use_environment` (`../../CONSUMING.md` "Reading
+/// appearance"), live file and portal watches included. This used to need an entered Tokio
+/// runtime that neither `ds_native::launch` nor `ds_native::Harness` provided (a real gap,
+/// documented rather than worked around); both now enter one for the whole of their own life
+/// (`ds-native`'s `crate::runtime`), so this app no longer has to fall back to a one-shot,
+/// synchronous load.
 #[component]
 pub fn App() -> Element {
+    let env = use_environment(AppName("consumer"));
+    let now = env();
     rsx! {
         Ds {
-            appearance: appearance(),
+            appearance: now.settings.appearance.appearance(),
+            system: now.system,
             material: Material::Window,
             style { {STYLE} }
             Page {}
         }
     }
-}
-
-/// `quire/appearance.toml`-style settings for this example's own config directory
-/// (`$XDG_CONFIG_HOME/consumer`), read once per render with no live reload
-/// (`ds_settings::load`, a synchronous `std::fs::read` — no Tokio runtime needed). A missing or
-/// unreadable file is `Appearance::default()`, never an error: first run looks like every run
-/// after it until someone saves a preference.
-fn appearance() -> Appearance {
-    ds_settings::config_dir(ds_settings::AppName("consumer"))
-        .map(|dir| ds_settings::load(&dir).appearance.appearance())
-        .unwrap_or_default()
 }
 
 /// What picking a "More" menu entry does.

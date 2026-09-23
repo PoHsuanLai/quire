@@ -25,9 +25,14 @@ image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
 thiserror = { workspace = true }
+tokio = { workspace = true }
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+# The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
+ds-settings = { workspace = true }
 
 [[example]]
 name = "window"

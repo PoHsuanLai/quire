@@ -15,7 +15,7 @@
 //!    never an ad-hoc sleep.
 
 use consumer::{App, STYLE};
-use ds::lint::{Exception, LintConfig, Profile, Rule, assert_clean, markup};
+use ds::lint::{LintConfig, Profile, Rule, assert_clean, markup};
 use ds::{Anim, MotionLevel, StaggerIndex, settle};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -25,22 +25,6 @@ const VIEW: Viewport = Viewport {
     height: 360,
     scale_percent: 100,
 };
-
-/// A gap in quire itself, not this crate: `Ds`'s `Material::Window` frame layers
-/// (`crates/ds/src/root/ds.rs::FrameLayers::render`) render the hidden layer as
-/// `class="ds-layer back"`, a second CSS class, while `crates/ds/src/css/utilities.css` styles
-/// it as `.ds-layer[*|data-layer=back]`, an attribute. The class and the selector never match,
-/// so the hidden layer never gets `opacity:0` and the Space-switch cross-fade is silently
-/// broken; a markup-lint test is what caught it, which is exactly why every consumer runs one
-/// (reported in this wave's report, not fixed here: `root/ds.rs` is outside this crate's
-/// ownership). Kept as one exception with its own reason, matching how quire's own
-/// `self_lint.rs` documents its avatar exception, rather than silently narrowing the test.
-const KNOWN_GAPS: &[Exception] = &[Exception {
-    rule: Rule::UnstyledClass,
-    selector: "div.ds-layer.back",
-    reason: "Ds's own frame layers write class=\"ds-layer back\" but utilities.css styles \
-             [*|data-layer=back]; a quire bug, not this app's markup (see the wave report)",
-}];
 
 /// An SSR render of [`App`]'s first frame, the input every markup-lint test shares.
 fn render() -> String {
@@ -55,10 +39,7 @@ fn consumer_css() -> String {
 }
 
 fn markup_config() -> LintConfig {
-    LintConfig {
-        exceptions: KNOWN_GAPS,
-        ..LintConfig::default()
-    }
+    LintConfig::default()
 }
 
 // ---- Rule 1: no stylesheet outside quire may contain a literal colour, duration, easing, ----
