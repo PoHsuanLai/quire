@@ -70,3 +70,52 @@ fn set(tree: &mut toml::Table, path: &[String], value: toml::Value) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::lenient;
+    use crate::settings::AppearanceFile;
+    use crate::units::Percent;
+    use ds::{Motion, Theme};
+
+    #[test]
+    fn text_that_is_not_toml_at_all_is_the_default() {
+        const CASES: &[&str] = &["", "not toml [[[ = =", "\u{0}\u{1}garbage"];
+        for text in CASES {
+            assert_eq!(
+                lenient::<AppearanceFile>(text),
+                AppearanceFile::default(),
+                "{text:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn an_unknown_enum_word_falls_back_to_that_fields_default_and_keeps_its_siblings() {
+        let file: AppearanceFile =
+            lenient("[appearance]\ntheme = \"sepia\"\nmotion_level = \"calm\"\n");
+        assert_eq!(
+            file.appearance.theme,
+            Theme::default(),
+            "bad field defaults"
+        );
+        assert_eq!(
+            file.appearance.motion_level,
+            Motion::Calm,
+            "sibling field is kept"
+        );
+    }
+
+    #[test]
+    fn an_out_of_range_percent_is_clamped_not_defaulted() {
+        let file: AppearanceFile = lenient("[icons]\nplate_inset_percent = 255\n");
+        assert_eq!(file.icons.plate_inset_percent, Percent(100));
+    }
+
+    #[test]
+    fn a_missing_table_is_that_tables_defaults() {
+        let file: AppearanceFile = lenient("[appearance]\ntheme = \"dark\"\n");
+        assert_eq!(file.appearance.theme, Theme::Dark);
+        assert_eq!(file.icons, crate::settings::IconsSettings::default());
+    }
+}
