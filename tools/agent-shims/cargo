@@ -49,20 +49,31 @@ run_capped() {
   CARGO_BUILD_JOBS="$j" systemd-run --user --scope --quiet --collect \
     --unit="$unit" \
     -p MemoryMax="$mem_max" -p MemorySwapMax=0 \
-    -- "$real_cargo" "$@" 9>&-
+    -- "$real_cargo" "$@" 9>&- 10>&- 11>&- 12>&-
 }
 
 wait_note() {
-  local holder
-  holder="$(cat "$holder_file" 2>/dev/null || echo "unknown")"
-  echo "agent-shim: waiting for the build lock (held by: $holder)" >&2
+  local holders
+  holders="$(cat "$lock_dir"/agent-build.holder.* 2>/dev/null | tr '\n' ';')"
+  echo "agent-shim: waiting for a build slot (held by: ${holders:-unknown})" >&2
 }
 
-exec 9>"$lock_file"
-if ! flock -n 9; then
+# Build slots: at most AGENT_BUILD_SLOTS compilations run at once (each capped at 4 GB).
+slots="${AGENT_BUILD_SLOTS:-2}"
+slot=""
+acquire_slot() {
+  local i
+  for ((i = 0; i < slots; i++)); do
+    eval "exec $((9 + i))>\"$lock_file.$i\""
+    if flock -n $((9 + i)); then slot=$i; return 0; fi
+  done
+  return 1
+}
+if ! acquire_slot; then
   wait_note
-  while ! flock -w 30 9; do wait_note; done
+  while ! acquire_slot; do sleep 3; wait_note; done
 fi
+holder_file="$holder_file.$slot"
 echo "pid $$ in $(pwd): cargo $*" >"$holder_file"
 
 run_capped "$jobs" "$@"
