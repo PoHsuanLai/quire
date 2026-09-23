@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Run any command inside a transient cgroup capped at 4 GB (no swap).
+# A hard cap only: MemoryHigh is deliberately not set, because it throttles a process
+# to a crawl instead of killing it, which hides the problem instead of surfacing it.
+# Usage: limit4g <command> [args...]
+set -u
+if [[ $# -eq 0 ]]; then
+  echo "usage: limit4g <command> [args...]" >&2
+  exit 64
+fi
+exec systemd-run --user --scope --quiet --collect \
+  --unit="agent-limit-$$-$RANDOM" \
+  -p MemoryMax="${AGENT_MEM_MAX:-4G}" -p MemorySwapMax=0 \
+  -- "$@"

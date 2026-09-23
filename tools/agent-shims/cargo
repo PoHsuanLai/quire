@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# cargo shim for implementation agents.
+#
+# Two rules, enforced here so no brief has to ask for them:
+#   1. Only one compilation runs at a time on this machine (a global flock).
+#   2. Every compilation runs inside a transient cgroup capped at 4 GB.
+#
+# Cheap, read-only subcommands skip the lock. Everything else queues.
+# If the capped build is OOM-killed, retry once with a single job, then fail loudly.
+set -u
+
+real_cargo="${AGENT_SHIM_REAL_CARGO:-$HOME/.cargo/bin/cargo}"
+if [[ ! -x "$real_cargo" ]]; then
+  real_cargo="$(PATH="${PATH//$HOME\/.local\/bin\/agent-shims:/}" command -v cargo || true)"
+fi
+if [[ -z "$real_cargo" || ! -x "$real_cargo" ]]; then
+  echo "agent-shim: no real cargo found" >&2
+  exit 127
+fi
+
+lock_dir="${XDG_RUNTIME_DIR:-/tmp}"
+lock_file="$lock_dir/agent-build.lock"
+holder_file="$lock_dir/agent-build.holder"
+mem_max="${AGENT_MEM_MAX:-4G}"
+jobs="${CARGO_BUILD_JOBS:-2}"
+
+sub="${1:-}"
+case "$sub" in
+  fmt|tree|metadata|deny|--version|-V|--list|help|-h|--help|version|search|owner|login|logout|yank|read-manifest|locate-project|pkgid|verify-project|"")
+    exec "$real_cargo" "$@"
+    ;;
+esac
+
+run_capped() {
+  local j="$1"; shift
+  local unit="agent-cargo-$$-$RANDOM"
+  # Hard cap only; MemoryHigh would throttle instead of kill and hide the overrun.
+  CARGO_BUILD_JOBS="$j" systemd-run --user --scope --quiet --collect \
+    --unit="$unit" \
+    -p MemoryMax="$mem_max" -p MemorySwapMax=0 \
+    -- "$real_cargo" "$@"
+}
+
+wait_note() {
+  local holder
+  holder="$(cat "$holder_file" 2>/dev/null || echo "unknown")"
+  echo "agent-shim: waiting for the build lock (held by: $holder)" >&2
+}
+
+exec 9>"$lock_file"
+if ! flock -n 9; then
+  wait_note
+  while ! flock -w 30 9; do wait_note; done
+fi
+echo "pid $$ in $(pwd): cargo $*" >"$holder_file"
+
+run_capped "$jobs" "$@"
+status=$?
+if [[ $status -eq 137 || $status -eq 143 ]] && [[ "$jobs" != "1" ]]; then
+  echo "agent-shim: build was killed at the $mem_max cap; retrying with CARGO_BUILD_JOBS=1" >&2
+  run_capped 1 "$@"
+  status=$?
+fi
+if [[ $status -eq 137 ]]; then
+  echo "agent-shim: build exceeded the $mem_max memory cap even with one job. Report this; do not work around it." >&2
+fi
+: >"$holder_file"
+exit $status
