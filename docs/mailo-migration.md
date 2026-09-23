@@ -396,14 +396,13 @@ checking first whether `ds_native::launch` is meant to grow a context-injection 
 - `crates/mail-app/tests/native_harness.rs` (or equivalent) exists and covers at minimum: a menu
   opens on click and closes on Escape, a hover card appears after its delay and not before, a
   toast hides after its hold, a list row leaving heals the rows below it — the same four cases
-  this repository's own `crates/ds-native/tests/harness.rs` names for `ds-native` itself,
-  because `CONSUMING.md` section 9 records that those four are still `#[ignore]`d there; if they
-  are still ignored when Phase B starts, mailo's own equivalents are what proves the components
-  work in a real app regardless, and the `#[ignore]` reason upstream needs re-checking against
-  this repository's report of a reproducible `Harness` panic on any `Menu`/`Popover` open
-  (`CONSUMING.md` section 9's first gap) — do not write a Phase B test that opens a `Menu` and
-  then calls `Harness::advance`/a second `Harness::click` until that is confirmed fixed or
-  worked around the way `examples/consumer/src/lib.rs::Page`'s doc comment does.
+  this repository's own `crates/ds-native/tests/harness.rs` names for `ds-native` itself, now
+  un-ignored and passing there (`CONSUMING.md` section 9: a floating component opened under
+  `Harness` used to panic with a reentrant document borrow, root-caused and fixed within this
+  same wave via `ds::geometry::measure`'s `HostMeasure`/`Measured` seam — `examples/consumer/
+  tests/coherence.rs::the_menu_opens_and_closes_under_harness` is the regression test). Mailo's
+  own equivalents can open a `Menu`/`Popover` and drive it through `Harness::click`/`advance`
+  freely; there is no longer a known reason to avoid it.
 
 ### 6.4 Verify
 
