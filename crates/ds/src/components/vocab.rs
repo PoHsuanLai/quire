@@ -46,6 +46,20 @@ pub enum Here {
     Elsewhere,
 }
 
+/// Where an item stands in a drag (design/04-COMPONENTS.md section 34): the place under the
+/// pointer that would take the drop writes `data-drop="target"`, the thing being dragged
+/// `data-drag="source"`, and every other item neither.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum DropState {
+    /// Not part of the drag.
+    #[default]
+    Idle,
+    /// Under the pointer and accepting: lit and grown.
+    Target,
+    /// Being dragged: dimmed to .35 while its ghost follows the pointer.
+    Source,
+}
+
 /// A toggle's state: `aria-pressed` on buttons, `aria-checked` on a Toggle.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Switch {
@@ -230,6 +244,24 @@ impl Availability {
         match self {
             Availability::Enabled => None,
             Availability::Disabled => Some("true"),
+        }
+    }
+}
+
+impl DropState {
+    /// The `data-drop` value: `target`, or nothing.
+    pub fn drop_attr(self) -> Option<&'static str> {
+        match self {
+            DropState::Target => Some("target"),
+            DropState::Idle | DropState::Source => None,
+        }
+    }
+
+    /// The `data-drag` value: `source`, or nothing.
+    pub fn drag_attr(self) -> Option<&'static str> {
+        match self {
+            DropState::Source => Some("source"),
+            DropState::Idle | DropState::Target => None,
         }
     }
 }

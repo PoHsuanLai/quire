@@ -1,11 +1,10 @@
 /* SelectionBubble (design/04-COMPONENTS.md section 30), verbatim `S:683-691`, over the
    `.ds-popover` Bubble surface: formatting buttons, or the link field. Italic's Georgia face is
    not one of the three families (02-TYPE decides); the consumer's label draws it.
-   TODO: `BubbleAction` carries no group boundary, so `ds-bubble-sep` is styled but not drawn.
-   TODO: S enters with `menu-pop` at `--t-quick` (`S:684`); no `Anim` has that recipe, so it
-   takes `MenuPop`'s `--t-move` until one is added. */
+   `BubbleAction::Separator` draws `ds-bubble-sep` between groups. It enters with `menu-pop` at
+   `--t-quick` (`S:684`, `Anim::BubblePop`). */
 
-.ds-popover.ds-bubble{ display:flex; align-items:center; gap:1px; padding:3px; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-popover.ds-bubble{ display:flex; align-items:center; gap:1px; padding:3px; animation:menu-pop var(--t-quick) var(--e-spring); }
 .ds-bubble-button{ border:0; background:transparent; cursor:pointer; height:28px; min-width:28px; padding:0 7px; border-radius:var(--r-bubble-button);
   color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:4px; }
 .ds-bubble-button:hover{ background:var(--surface-2); color:var(--ink); }

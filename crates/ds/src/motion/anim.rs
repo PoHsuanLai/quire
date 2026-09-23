@@ -1,16 +1,18 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 42 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
+//! 46 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
 //! S's `fade` replaces `fade-in`), plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
-//! integration amendment).
+//! integration amendment), plus four assignment rows that play a catalogue keyframe at another
+//! recipe (wave 2 integration amendment, section 5 rows 7, 26, 37 and 64): `PaletteFade`,
+//! `LinkPillIn`, `BubblePop` and `PeekFullIn`.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
 
-use crate::tokens::{DurationToken, EasingToken};
+pub use super::recipe::{Fill, Iteration, Recipe};
 
 /// One animation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -62,16 +64,24 @@ pub enum Anim {
     SlideL,
     /// `menu-in`: C's trigger-anchored menus.
     MenuIn,
-    /// `menu-pop`: every floating menu, the selection bubble.
+    /// `menu-pop`: every floating menu.
     MenuPop,
+    /// `menu-pop` at `--t-quick`: the selection bubble (section 5 row 37).
+    BubblePop,
     /// `cmdk-in`: C's command menu.
     CmdkIn,
     /// `peek-in`: peek and the command menu.
     PeekIn,
-    /// `fade`: scrim and backdrop.
+    /// `peek-in` at `--t-move --e-out`: the reader entering Full peek (section 5 row 64, C).
+    PeekFullIn,
+    /// `fade`: the scrim.
     Fade,
-    /// `hc-in`: hover card, link pill.
+    /// `fade` at `--t-quick`: the command palette's backdrop (section 5 row 7).
+    PaletteFade,
+    /// `hc-in`: hover card, tooltip.
     HcIn,
+    /// `hc-in` at `--t-quick --e-out`: the link pill (section 5 row 26).
+    LinkPillIn,
     /// `hc-out`: hover card leaving.
     HcOut,
     /// `page-in`: composer page, inline reply.
@@ -102,47 +112,9 @@ pub enum Anim {
     Spin,
 }
 
-/// `animation-fill-mode`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Fill {
-    /// `none`.
-    None,
-    /// `forwards`: exits hold their last frame until the roster drops the node.
-    Forwards,
-    /// `backwards`: staggered entrances hold their first frame through the delay.
-    Backwards,
-}
-
-/// `animation-iteration-count` and direction.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Iteration {
-    /// Once.
-    Once,
-    /// `infinite`.
-    Infinite,
-    /// `infinite alternate`.
-    InfiniteAlternate,
-}
-
-/// The canonical declaration of one animation: what the stylesheet writes and what
-/// [`crate::settle`] times.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Recipe {
-    /// The `@keyframes` name.
-    pub keyframes: &'static str,
-    /// The duration token.
-    pub duration: DurationToken,
-    /// The easing token.
-    pub easing: EasingToken,
-    /// The fill mode.
-    pub fill: Fill,
-    /// The iteration.
-    pub iteration: Iteration,
-}
-
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 42] = [
+    pub const ALL: [Anim; 46] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -167,10 +139,14 @@ impl Anim {
         Anim::SlideL,
         Anim::MenuIn,
         Anim::MenuPop,
+        Anim::BubblePop,
         Anim::CmdkIn,
         Anim::PeekIn,
+        Anim::PeekFullIn,
         Anim::Fade,
+        Anim::PaletteFade,
         Anim::HcIn,
+        Anim::LinkPillIn,
         Anim::HcOut,
         Anim::PageIn,
         Anim::Park,
@@ -186,348 +162,6 @@ impl Anim {
         Anim::Breathe,
         Anim::Spin,
     ];
-
-    /// The canonical declaration.
-    pub fn recipe(self) -> Recipe {
-        match self {
-            // `S:346`.
-            Anim::SealPop => recipe(
-                "seal-pop",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:339`.
-            Anim::Gulp => recipe(
-                "gulp",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:319`.
-            Anim::PopIn => recipe(
-                "pop-in",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:373`.
-            Anim::RowIn => recipe(
-                "row-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::Backwards,
-                Iteration::Once,
-            ),
-            // `S:294`.
-            Anim::Rise => recipe(
-                "rise",
-                DurationToken::Move,
-                EasingToken::Out,
-                Fill::Backwards,
-                Iteration::Once,
-            ),
-            // `S:304`.
-            Anim::StarPop => recipe(
-                "star-pop",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:307`.
-            Anim::Spark => recipe(
-                "spark",
-                DurationToken::Spark,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:402`.
-            Anim::ChipLand => recipe(
-                "chip-land",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:593`.
-            Anim::ChipIn => recipe(
-                "chip-in",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:2119`: the flash is a hold, so it runs linear and leaves nothing behind.
-            Anim::ChipFlash => recipe(
-                "chip-flash",
-                DurationToken::Flash,
-                EasingToken::Linear,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:327`.
-            Anim::Fold => recipe(
-                "fold",
-                DurationToken::Big,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:329`.
-            Anim::FoldHeavy => recipe(
-                "fold",
-                DurationToken::BigHeavy,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:714`, at t-big x 1.15 as `S:329` weights an unread fold.
-            Anim::CrumpleHeavy => recipe(
-                "crumple",
-                DurationToken::CrumpleHeavy,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:714`.
-            Anim::Crumple => recipe(
-                "crumple",
-                DurationToken::Big,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:328` at 560 x 1.15 (design/05-MOTION.md open decision 3, proposed).
-            Anim::CurlHeavy => recipe(
-                "curl",
-                DurationToken::CurlHeavy,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:328`.
-            Anim::Curl => recipe(
-                "curl",
-                DurationToken::Curl,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:330`.
-            Anim::Heal => recipe(
-                "heal",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::Backwards,
-                Iteration::Once,
-            ),
-            // `S:341`.
-            Anim::Bump => recipe(
-                "bump",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:350`.
-            Anim::TabIn => recipe(
-                "tab-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:351`.
-            Anim::TabOut => recipe(
-                "tab-out",
-                DurationToken::Move,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:102`.
-            Anim::SlideR => recipe(
-                "slide-r",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:103`.
-            Anim::SlideL => recipe(
-                "slide-l",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `C:1007`.
-            Anim::MenuIn => recipe(
-                "menu-in",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:666`.
-            Anim::MenuPop => recipe(
-                "menu-pop",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `C:1064`.
-            Anim::CmdkIn => recipe(
-                "cmdk-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:225`.
-            Anim::PeekIn => recipe(
-                "peek-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:222`.
-            Anim::Fade => recipe(
-                "fade",
-                DurationToken::Move,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:401`.
-            Anim::HcIn => recipe(
-                "hc-in",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:402`.
-            Anim::HcOut => recipe(
-                "hc-out",
-                DurationToken::HcOut,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:568`.
-            Anim::PageIn => recipe(
-                "page-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:570`.
-            Anim::Park => recipe(
-                "park",
-                DurationToken::Park,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:590`.
-            Anim::ShakeX => recipe(
-                "shake-x",
-                DurationToken::Shake,
-                EasingToken::Shake,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `C:545`.
-            Anim::Nudge => recipe(
-                "nudge",
-                DurationToken::Nudge,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `C:546`.
-            Anim::Shake => recipe(
-                "shake",
-                DurationToken::ShakeLong,
-                EasingToken::Shake,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `C:506`.
-            Anim::ComposeRise => recipe(
-                "compose-rise",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:572`.
-            Anim::ComposeSend => recipe(
-                "compose-send",
-                DurationToken::Send,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:335`.
-            Anim::Floatup => recipe(
-                "floatup",
-                DurationToken::Float,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:535`.
-            Anim::Sail => recipe(
-                "sail",
-                DurationToken::Sail,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:536`.
-            Anim::BoatReturn => recipe(
-                "boat-return",
-                DurationToken::BoatReturn,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:447`.
-            Anim::Dest => recipe(
-                "dest",
-                DurationToken::Float,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::InfiniteAlternate,
-            ),
-            // `C:288`.
-            Anim::Breathe => recipe(
-                "breathe",
-                DurationToken::Ambient,
-                EasingToken::InOut,
-                Fill::None,
-                Iteration::Infinite,
-            ),
-            // `C:291`.
-            Anim::Spin => recipe(
-                "spin",
-                DurationToken::Spin,
-                EasingToken::Linear,
-                Fill::None,
-                Iteration::Infinite,
-            ),
-        }
-    }
 
     /// The utility class a pulse renders: `a-gulp`.
     pub fn class(self) -> &'static str {
@@ -556,10 +190,14 @@ impl Anim {
             Anim::SlideL => "a-slide-l",
             Anim::MenuIn => "a-menu-in",
             Anim::MenuPop => "a-menu-pop",
+            Anim::BubblePop => "a-bubble-pop",
             Anim::CmdkIn => "a-cmdk-in",
             Anim::PeekIn => "a-peek-in",
+            Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",
+            Anim::PaletteFade => "a-palette-fade",
             Anim::HcIn => "a-hc-in",
+            Anim::LinkPillIn => "a-link-pill-in",
             Anim::HcOut => "a-hc-out",
             Anim::PageIn => "a-page-in",
             Anim::Park => "a-park",
@@ -575,22 +213,5 @@ impl Anim {
             Anim::Breathe => "a-breathe",
             Anim::Spin => "a-spin",
         }
-    }
-}
-
-/// One assignment row as a [`Recipe`].
-const fn recipe(
-    keyframes: &'static str,
-    duration: DurationToken,
-    easing: EasingToken,
-    fill: Fill,
-    iteration: Iteration,
-) -> Recipe {
-    Recipe {
-        keyframes,
-        duration,
-        easing,
-        fill,
-        iteration,
     }
 }

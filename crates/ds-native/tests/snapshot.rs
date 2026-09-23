@@ -59,6 +59,34 @@ fn a_button_root_at_two_motion_moments() {
     assert_ne!(frames[0], frames[1], "nothing moved between 0 and 250 ms");
 }
 
+#[allow(non_snake_case)]
+fn SpinApp() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "position:relative; width:40px; height:40px; margin:20px",
+                Spinner { kind: SpinnerKind::Spin }
+            }
+        }
+    }
+}
+
+#[test]
+fn the_spinner_turns() {
+    // A quarter of `--t-spin` apart: the dashed ring has turned 90 degrees, so its dashes sit
+    // elsewhere. With a base `transform:scale(1)` the keyframe interpolated between two identity
+    // matrices and the ring never moved (the wave 2 ds-native finding).
+    let moments = [Duration::from_millis(100), Duration::from_millis(375)];
+    let frames = snapshot_at(SpinApp, VIEW, &moments).expect("renders");
+    for (frame, moment) in frames.iter().zip(moments) {
+        keep(frame, &format!("spin-t{:03}", moment.as_millis()));
+        assert!(colours(frame) > 2, "the frame at {moment:?} is blank");
+    }
+    assert!(
+        frames[0] != frames[1],
+        "the spinner did not turn between the two moments"
+    );
+}
+
 /// A green square as an SVG, the shape quire's icon masks and grain arrive in.
 const GREEN_SVG: &str = "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><rect width='10' height='10' fill='rgb(0,160,0)'/></svg>";
 

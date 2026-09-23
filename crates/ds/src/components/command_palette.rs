@@ -10,6 +10,7 @@ use crate::components::menu::{Line, MenuKind, Nav, Step, moved, render_lines, va
 use crate::components::menu_entry::{MenuEntry, fuzzy};
 use crate::components::popover::{Dismiss, Stacking, use_entrance, use_float};
 use crate::components::search_field::SearchField;
+use crate::components::text_input::Focus;
 use crate::motion::anim::Anim;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
@@ -152,6 +153,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                         tokens,
                         oninput,
                         onkey,
+                        focus: Focus::OnMount,
                     }
                     div {
                         class: "ds-menu",

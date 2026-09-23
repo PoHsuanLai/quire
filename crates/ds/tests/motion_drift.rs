@@ -230,6 +230,12 @@ fn the_settle_table() {
         (Anim::CrumpleHeavy, MotionLevel::Calm, 379),
         (Anim::CurlHeavy, MotionLevel::Standard, 678),
         (Anim::CurlHeavy, MotionLevel::Extra, 678),
+        // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
+        // 37 and 64).
+        (Anim::PaletteFade, MotionLevel::Standard, 204),
+        (Anim::LinkPillIn, MotionLevel::Standard, 204),
+        (Anim::BubblePop, MotionLevel::Standard, 204),
+        (Anim::PeekFullIn, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

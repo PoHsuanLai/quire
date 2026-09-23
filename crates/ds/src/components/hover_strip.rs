@@ -2,10 +2,10 @@
 //! result through a Fly tooltip (design/04-COMPONENTS.md section 17).
 
 use crate::components::vocab::{Here, StaggerIndex};
-use crate::geometry::{Point, Px, Rect, Size};
+use crate::geometry::Rect;
+use crate::geometry::measure::client_rect;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use dioxus::html::geometry::PixelsRect;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -28,20 +28,6 @@ pub struct StripAction {
     pub onhover: Option<EventHandler<Here>>,
     /// Pressed; the button's rect anchors the snooze and label menus.
     pub onclick: EventHandler<Rect>,
-}
-
-/// A measured client rect as a layout rect.
-pub(crate) fn rect(measured: PixelsRect) -> Rect {
-    Rect {
-        origin: Point {
-            x: Px(measured.origin.x as f32),
-            y: Px(measured.origin.y as f32),
-        },
-        size: Size {
-            width: Px(measured.size.width as f32),
-            height: Px(measured.size.height as f32),
-        },
-    }
 }
 
 /// A row's action strip. It shows while its row is hovered; the buttons pop in staggered by
@@ -98,8 +84,8 @@ fn StripButton(action: StripAction, j: StaggerIndex) -> Element {
                 }
                 if let Some(mounted) = element() {
                     spawn(async move {
-                        if let Ok(measured) = mounted.get_client_rect().await {
-                            onclick.call(rect(measured));
+                        if let Some(measured) = client_rect(&mounted).await {
+                            onclick.call(measured);
                         }
                     });
                 }

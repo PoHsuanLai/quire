@@ -7,9 +7,8 @@
 //! plays its own `hc-in`; the card places itself against that target by kind, with no flip
 //! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving.
 
-use crate::components::popover::{
-    Float, Stacking, from_pixels, position_style, use_entrance, use_float,
-};
+use crate::components::popover::{Float, Stacking, position_style, use_entrance, use_float};
+use crate::geometry::measure::client_rect;
 use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::HoverEvent;
@@ -48,9 +47,9 @@ impl Anchors {
     fn record(self, key: HoverKey, element: MountedRef) {
         spawn(async move {
             sleep(FRAME_SLACK).await;
-            if let Ok(rect) = element.0.get_client_rect().await {
+            if let Some(rect) = client_rect(&element.0).await {
                 let mut book = self.0;
-                book.with_mut(|book| book.insert(key, from_pixels(rect)));
+                book.with_mut(|book| book.insert(key, rect));
             }
         });
     }

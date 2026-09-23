@@ -632,7 +632,8 @@ Mapping: `.inp` -> `[data-variant=boxed]`; `.inp.inline` and `.pinput` -> `[data
 #[component] pub fn TextInput(variant: InputVariant /* Boxed | Inline */, label: String,
     value: String, #[props(default)] placeholder: String,
     #[props(default)] availability: Availability,
-    oninput: EventHandler<String>, #[props(default)] onkey: EventHandler<KeyboardData>) -> Element
+    oninput: EventHandler<String>, #[props(default)] onkey: EventHandler<KeyboardData>,
+    #[props(default)] focus: Focus /* OnMount | Manual (default); W2 integration, 06 §17 */) -> Element
 ```
 
 **Geometry.**
@@ -703,7 +704,8 @@ Mapping: `.cmdk-in` -> `.ds-search`; `.cmdk .tokens` -> `.ds-search-tokens`.
 
 ```rust
 #[component] pub fn SearchField(label: String, value: String, placeholder: String,
-    tokens: Vec<String>, oninput: EventHandler<String>, onkey: EventHandler<KeyboardData>) -> Element
+    tokens: Vec<String>, oninput: EventHandler<String>, onkey: EventHandler<KeyboardData>,
+    #[props(default)] focus: Focus /* passed to the field; the palette uses OnMount */) -> Element
 ```
 
 **Geometry.** Row: flex, gap 9, padding 12px 14px, bottom border 1px `--line-soft`, icon and
@@ -1273,6 +1275,7 @@ The hover-card hooks (`data-hc` on row, name, time) become `HoverTarget` wrapper
     star: Option<(Switch, EventHandler<Switch>)>, star_pulse: PulseKey,
     strip: Option<Element>,                    // HoverStrip
     onclick: EventHandler<MouseData>,          // consumer reads shift for peek
+    #[props(default)] drop: DropState,         // Idle | Target (data-drop) | Source (data-drag), §34
 ) -> Element
 ```
 
@@ -1586,7 +1589,8 @@ hovered). Mapping: `.item` -> `.ds-sidebar-item`; `.item.pinned` -> `[data-kind=
 #[component] pub fn SidebarItem(kind: ItemKind /* Place{icon} | Pinned{avatar} | Today{avatar} */,
     label: String, here: Here, count: Option<u32>,
     presence: Presence, preview: Option<Preview /* Destination */>, pulse: PulseKey,
-    onclick: EventHandler<()>, onclose: Option<EventHandler<()>>) -> Element
+    onclick: EventHandler<()>, onclose: Option<EventHandler<()>>,
+    #[props(default)] drop: DropState /* Idle | Target | Source, §34 */) -> Element
 ```
 
 **Geometry.**
@@ -2324,7 +2328,7 @@ The tile is also a HoverTarget (account card, §22).
 **Props.**
 
 ```rust
-#[component] pub fn AccountTile(account: AccountFace /* All | One{initial, colour, provider} */,
+#[component] pub fn AccountTile(account: AccountFace /* All | One{initial, colour, provider, address: Option<String>} */,
     pressed: Switch, unread: u32, onclick: EventHandler<()>) -> Element
 ```
 
@@ -2501,7 +2505,8 @@ non-empty text selection in the composer. Mail: composer title and body. Shell: 
 ```rust
 #[component] pub fn SelectionBubble(anchor: Rect /* selection rect */, mode: BubbleMode /* Actions(Vec<BubbleAction>) | Link */,
     onlink: EventHandler<String>, onclose: EventHandler<()>) -> Element
-pub struct BubbleAction { label: Element, title: String, pressed: Option<Switch>, onclick: EventHandler<()> }
+pub enum BubbleAction { Button(BubbleButton), Separator /* ds-bubble-sep */ }
+pub struct BubbleButton { label: Element, title: String, pressed: Option<Switch>, onclick: EventHandler<()> }
 ```
 
 **Geometry.** Flex, gap 1, padding 3, radius 10, `--raise`, 1px `--line`, Bubble shadow
@@ -2664,7 +2669,8 @@ window (`S:866-904`). Shell: Settings > Spaces and the bar's workspace menu (pla
 
 ```rust
 #[component] pub fn SpaceEditor(look: SpaceLook, scheme: Scheme, active_dot: DotIndex,
-    onchange: EventHandler<SpaceLook>) -> Element
+    onchange: EventHandler<SpaceLook>, #[props(default)] name: Option<String> /* "{name} Space" */,
+    #[props(default)] on_active_dot: Option<EventHandler<ActiveDot /* = DotIndex */>>) -> Element
 #[component] pub fn SpaceDot(name: String, frame: FrameVars, here: Here, shortcut: Shortcut, onclick: EventHandler<()>) -> Element
 ```
 
@@ -2955,7 +2961,7 @@ suggestion.
 | O-12 | Menu separator | Not in S; derived from the bubble separator. | Candidate: 1 px `--line-soft`, margin 4px 0. |
 | O-13 | Menu item hover | S has none (keyboard only); C Dropdown uses `--surface-2`. | Pointer move over an item moves the selection (`--accent-soft`), so hover and keyboard look the same in Rich/Slim/Context; Dropdown keeps C. |
 | O-14 | Sheet size | Derived from Peek; no size given. | Candidate: width `min(560px, 88%)`, height by content, max = Peek Center inset. |
-| O-15 | Modal focus | Peek and Sheet do not move or trap focus in S. | Focus first focusable on open, restore on close, Tab trapped. |
+| O-15 | Modal focus | Peek and Sheet do not move or trap focus in S. | Focus first focusable on open, restore on close, Tab trapped. Partly settled (FINDINGS "W2 integration", focus on mount): `TextInput{focus: Focus::OnMount}` exists and the palette input and bubble link field use it; Peek and Sheet still neither move nor trap focus. |
 | O-16 | AppearancePicker contents | Whether Look and Warmth (C) are part of it; width. | Theme, Accent, Motion only (the plan's `Appearance`); width set by the host surface. |
 | O-17 | Accent count | Plan: "Accent(6)" in the gallery and a moved test named "exactly-four-accent". | 03-COLOR decides; the picker renders the table. |
 | O-18 | S vs C contradictions | Resolved "S wins" in each section; listed here so nobody re-opens them silently: strip buttons 26 vs 28, gap 3 vs 4, icons 14 vs 15; star inset 6/7 vs 8/8, icon 14 vs 15; icon stroke 2 vs 1.7/1.8; toast hidden 160% vs 140%, hint opacity .7 vs .72; seg padding 5/11 12px vs 6/13 12.5px; Primary padding 14 vs 15; palette 540 vs 420, top 11% vs 14%, input 16 vs 14.5, list 360 vs 252, enter `peek-in` vs `cmdk-in`; peek inset `36px 12%` vs `34px 10%`, `peek-in` .95/12px vs .97/10px; scrim `--scrim` vs ink .16; row dot top 6 vs 5; stagger cap none (S, first show only; ds caps 12) vs 8; sidebar item radius 9 on the frame vs `--r-chip` on the card, seal -7 in `--f-ink` vs -10 in `--seal`; toast click-to-undo |dx| < 3 vs dx == 0; send ring 20 vs 22. | S wins, as written in each section. |

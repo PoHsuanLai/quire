@@ -31,8 +31,8 @@ pub use css::stylesheet;
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
 pub use geometry::{
-    Align, Anchor, Flip, MountedRef, Placed, Placement, Point, PopoverRequest, Px, Rect, RectProbe,
-    Side, Size, place, use_rect,
+    Align, Anchor, Flip, HostMeasure, Measured, MountedRef, Placed, Placement, Point,
+    PopoverRequest, Px, Rect, RectProbe, Side, Size, place, use_rect,
 };
 pub use icon::render::{Glyph, IconSize};
 pub use icon::{Icon, Shape};

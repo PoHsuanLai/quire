@@ -2,9 +2,9 @@
 //!
 //! The four overlay and list cases are the plan's (a menu opens on click and closes on Escape; a
 //! hover card appears after 450 ms and not before; a toast hides after 5200 ms; a row leaves and
-//! the rows below heal). They are written against the frozen component APIs and stay ignored
-//! until the wave-2 overlay and list components are merged. The control cases, and the same
-//! timings driven through the hubs the root already provides, run now.
+//! the rows below heal), beside the control cases, the same timings driven through the hubs the
+//! root provides, and the wave 2 integration props (a field focused on mount takes typing; the
+//! Space editor reports the dot picked inside it).
 
 use dioxus::prelude::*;
 use ds::{
@@ -12,6 +12,9 @@ use ds::{
     HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Key, ListPresence, ListRow, Material,
     Menu, MenuEntry, MenuKind, Point, PulseKey, Px, RowPitch, Selection, Switch, Toggle, Trail,
     use_hover_hub, use_roster, use_toast_hub, use_toasts,
+};
+use ds::{
+    DotIndex, Focus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput, Theme,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -283,7 +286,6 @@ fn MenuDemo() -> Element {
 }
 
 #[test]
-#[ignore = "needs w2-overlays / w2-lists merged"]
 fn a_menu_opens_on_click_and_closes_on_escape() {
     let mut harness = Harness::new(MenuApp, VIEW);
     assert_eq!(harness.count(".ds-menu"), 0);
@@ -317,7 +319,6 @@ fn HoverCardDemo() -> Element {
 }
 
 #[test]
-#[ignore = "needs w2-overlays / w2-lists merged"]
 fn a_hover_card_appears_after_450_ms_and_not_before() {
     let mut harness = Harness::new(HoverCardApp, VIEW);
     harness.pointer_move(centre(&harness, ".ds-hover-target"));
@@ -347,7 +348,6 @@ fn ToastDemo() -> Element {
 }
 
 #[test]
-#[ignore = "needs w2-overlays / w2-lists merged"]
 fn a_toast_hides_after_5200_ms() {
     let mut harness = Harness::new(ToastApp, VIEW);
     let shown = |harness: &Harness| harness.attr(".ds-toast", "data-shown");
@@ -407,7 +407,6 @@ fn ListDemo() -> Element {
 }
 
 #[test]
-#[ignore = "needs w2-overlays / w2-lists merged"]
 fn a_row_leaves_and_the_rows_below_heal() {
     let mut harness = Harness::new(ListApp, VIEW);
     // Let the first-show entrance settle.
@@ -428,8 +427,9 @@ fn a_row_leaves_and_the_rows_below_heal() {
         "dropped before its exit played"
     );
 
-    // The exit settles: the row is gone and the rows below slide up into its place.
-    harness.advance(ms(900));
+    // The fold settles at 454 ms (Standard, `settle(Anim::Fold)`): the row is gone and the rows
+    // below slide up into its place, healing for another 284 ms and more.
+    harness.advance(ms(500));
     assert_eq!(harness.count(".ds-row"), 2, "{}", harness.html());
     assert_eq!(presence(&harness, 1).as_deref(), Some("healing"));
     assert_eq!(presence(&harness, 2).as_deref(), Some("healing"));
@@ -443,5 +443,104 @@ fn a_row_leaves_and_the_rows_below_heal() {
             .map(|rect| rect.origin.y),
         first_top,
         "the row below did not take the removed row's place"
+    );
+}
+
+// ---- Wave 2 integration props ------------------------------------------------------------
+
+#[allow(non_snake_case)]
+fn FocusApp() -> Element {
+    rsx! {
+        Root {
+            Field { focus: Focus::OnMount }
+        }
+    }
+}
+
+#[allow(non_snake_case)]
+fn ManualApp() -> Element {
+    rsx! {
+        Root {
+            Field { focus: Focus::Manual }
+        }
+    }
+}
+
+#[component]
+fn Field(focus: Focus) -> Element {
+    let mut text = use_signal(String::new);
+    rsx! {
+        TextInput {
+            variant: InputVariant::Boxed,
+            label: "Link",
+            value: text(),
+            focus,
+            oninput: move |next| text.set(next),
+        }
+        p { class: "probe-text", "[{text}]" }
+    }
+}
+
+#[test]
+fn a_field_focused_on_mount_takes_typing_without_a_click() {
+    /// An app, and what its field shows after one key.
+    type Case = (fn() -> Element, &'static str);
+    const CASES: &[Case] = &[(FocusApp, "[a]"), (ManualApp, "[]")];
+    for &(app, want) in CASES {
+        let mut harness = Harness::new(app, VIEW);
+        harness.advance(ms(100));
+        assert_eq!(harness.text_of(".probe-text").as_deref(), Some("[]"));
+        harness.key(Key::Char('a'));
+        assert_eq!(
+            harness.text_of(".probe-text").as_deref(),
+            Some(want),
+            "{}",
+            harness.html()
+        );
+    }
+}
+
+#[allow(non_snake_case)]
+fn EditorApp() -> Element {
+    let mut active = use_signal(|| DotIndex(0));
+    let mut look = use_signal(|| SpaceLook {
+        dots: PRESETS[0].dots.to_vec(),
+        grain: Grain(35),
+        theme: Theme::System,
+        card_accent: ds::CardAccent::SpaceHue,
+    });
+    rsx! {
+        Root {
+            SpaceEditor {
+                look: look(),
+                scheme: Scheme::Light,
+                active_dot: active(),
+                name: "Work".to_string(),
+                onchange: move |next| look.set(next),
+                on_active_dot: move |dot| active.set(dot),
+            }
+            p { class: "probe-dot", "{active().0}" }
+        }
+    }
+}
+
+#[test]
+fn the_space_editor_reports_the_dot_picked_inside_it() {
+    let mut harness = Harness::new(
+        EditorApp,
+        Viewport {
+            height: 900,
+            ..VIEW
+        },
+    );
+    assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("0"));
+    assert!(harness.count(".ds-stop") > 1, "{}", harness.html());
+    harness.click(centre(&harness, ".ds-stop:nth-child(2)"));
+    assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("1"));
+    assert_eq!(
+        harness
+            .attr(".ds-stop:nth-child(2)", "aria-pressed")
+            .as_deref(),
+        Some("true")
     );
 }

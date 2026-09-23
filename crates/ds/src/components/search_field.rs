@@ -2,12 +2,13 @@
 //! tokens under it (design/04-COMPONENTS.md section 7).
 
 use crate::components::chip::{Chip, ChipVariant};
-use crate::components::text_input::{InputVariant, TextInput};
+use crate::components::text_input::{Focus, InputVariant, TextInput};
 use crate::icon::Icon;
 use crate::icon::render::Glyph;
 use dioxus::prelude::*;
 
-/// The command menu's and the launcher's search row.
+/// The command menu's and the launcher's search row. `focus` is the field's
+/// ([`Focus::OnMount`] in the command palette).
 #[component]
 pub fn SearchField(
     label: String,
@@ -16,6 +17,7 @@ pub fn SearchField(
     tokens: Vec<String>,
     oninput: EventHandler<String>,
     onkey: EventHandler<KeyboardData>,
+    #[props(default)] focus: Focus,
 ) -> Element {
     // The icon keeps the base 16: S's `.cmdk-in` does not size it (C draws 18).
     // The tokens row is drawn only when there are tokens; the doc does not say whether an
@@ -30,6 +32,7 @@ pub fn SearchField(
                 placeholder,
                 oninput,
                 onkey,
+                focus,
             }
         }
         if !tokens.is_empty() {

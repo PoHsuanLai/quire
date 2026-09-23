@@ -6,6 +6,7 @@ pub mod drag;
 pub mod hover_intent;
 pub mod presence;
 pub mod pulse;
+pub mod recipe;
 pub mod roster;
 pub mod settle;
 pub mod timer;

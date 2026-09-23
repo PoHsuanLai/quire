@@ -6,11 +6,11 @@ use dioxus::prelude::*;
 use ds::components::vocab::{Check, Fraction, Key, Shortcut, Switch};
 use ds::{Align, Button, ButtonVariant};
 use ds::{
-    Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleMode,
-    CommandPalette, Dismiss, Elevation, Filter, Glyph, HoverCard, HoverEvent, HoverKey, HoverKind,
-    HoverTarget, Icon, LinkPill, LinkTarget, Menu, MenuEntry, MenuKind, Peek, PeekMode, PersonHue,
-    Placement, Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill, Sheet, Side,
-    Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
+    Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
+    BubbleMode, CommandPalette, Dismiss, Elevation, Filter, Glyph, HoverCard, HoverEvent, HoverKey,
+    HoverKind, HoverTarget, Icon, LinkPill, LinkTarget, Menu, MenuEntry, MenuKind, Peek, PeekMode,
+    PersonHue, Placement, Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill,
+    Sheet, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
 };
 use std::time::Duration;
 
@@ -198,25 +198,26 @@ fn Pushed(undo: Option<UndoToken>) -> Element {
 
 fn bubble_actions() -> Vec<BubbleAction> {
     vec![
-        BubbleAction {
+        BubbleAction::Button(BubbleButton {
             label: rsx! { b { "B" } },
             title: "Bold (Ctrl B)".to_string(),
             pressed: Some(Switch::On),
             onclick: EventHandler::new(|()| {}),
-        },
-        BubbleAction {
+        }),
+        BubbleAction::Button(BubbleButton {
             label: rsx! { i { "i" } },
             title: "Italic (Ctrl I)".to_string(),
             pressed: Some(Switch::Off),
             onclick: EventHandler::new(|()| {}),
-        },
-        BubbleAction {
+        }),
+        BubbleAction::Button(BubbleButton {
             label: rsx! { "</>" },
             title: "Inline code (Ctrl E)".to_string(),
             pressed: None,
             onclick: EventHandler::new(|()| {}),
-        },
-        BubbleAction {
+        }),
+        BubbleAction::Separator,
+        BubbleAction::Button(BubbleButton {
             label: rsx! {
                 Glyph { icon: Icon::Link, size: ds::IconSize::Small }
                 "Link"
@@ -224,7 +225,7 @@ fn bubble_actions() -> Vec<BubbleAction> {
             title: "Link (Ctrl K)".to_string(),
             pressed: None,
             onclick: EventHandler::new(|()| {}),
-        },
+        }),
     ]
 }
 

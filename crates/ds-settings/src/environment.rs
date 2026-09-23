@@ -18,6 +18,35 @@ pub struct Environment {
     pub system: SystemPrefs,
 }
 
+impl Environment {
+    /// `appearance.material_tint_alpha` as the root's `tint_alpha` (a percent in thousandths:
+    /// 80 is 800). A consumer wires the environment into its root like this:
+    ///
+    /// ```no_run
+    /// use dioxus::prelude::*;
+    /// use ds::{Ds, Material};
+    /// use ds_settings::{AppName, use_environment};
+    ///
+    /// #[component]
+    /// fn Root(children: Element) -> Element {
+    ///     let env = use_environment(AppName::MAILO);
+    ///     let now = env();
+    ///     rsx! {
+    ///         Ds {
+    ///             appearance: now.settings.appearance.appearance(),
+    ///             system: now.system,
+    ///             tint_alpha: Some(now.tint_alpha()),
+    ///             material: Material::Window,
+    ///             {children}
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    pub fn tint_alpha(&self) -> ds::Alpha {
+        ds::Alpha(u16::from(self.settings.appearance.material_tint_alpha.0.min(100)) * 10)
+    }
+}
+
 /// mailo's legacy settings file name, inside its own config directory.
 const LEGACY_FILE_NAME: &str = "appearance.json";
 
@@ -94,5 +123,26 @@ async fn watch_files(mut env: Signal<Environment>, mut files: AppearanceWatch) {
 async fn watch_portal(mut env: Signal<Environment>, mut portal: SystemPrefsWatch) {
     while let Some(system) = portal.changed().await {
         env.with_mut(|e| e.system = system);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Environment;
+    use crate::units::Percent;
+
+    #[test]
+    fn the_tint_key_becomes_the_roots_thousandths() {
+        const CASES: &[(u8, u16)] = &[(80, 800), (64, 640), (100, 1000), (0, 0)];
+        for &(percent, want) in CASES {
+            let mut env = Environment::default();
+            env.settings.appearance.material_tint_alpha = Percent(percent);
+            assert_eq!(env.tint_alpha(), ds::Alpha(want), "{percent}%");
+        }
+        assert_eq!(
+            Environment::default().tint_alpha(),
+            ds::Alpha(800),
+            "the key's default is the root's default"
+        );
     }
 }
