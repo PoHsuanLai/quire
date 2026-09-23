@@ -1,10 +1,18 @@
 //! Rendering a component headless to pixels (vello CPU), for the gallery's contact sheet and
 //! review artefacts. PNGs are review material, never a CI gate: the rasteriser changes with
 //! Blitz revisions.
-#![allow(unused_variables, dead_code)] // Freeze stubs: remove with the last todo!().
+//!
+//! A snapshot sees CSS time only: the document is resolved at each moment, but no wall-clock
+//! timer runs. Drive timers with [`crate::Harness`].
 
 use crate::error::NativeError;
+use crate::harness::Harness;
 use dioxus::prelude::*;
+use std::time::Duration;
+
+/// The moment [`snapshot`] renders at: long after every entrance has settled (the longest
+/// motion token is well under a second), so the picture is the component at rest.
+const AT_REST: Duration = Duration::from_secs(10);
 
 /// The size and scale a snapshot renders at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -19,5 +27,23 @@ pub struct Viewport {
 
 /// Render `app` once, after its fonts and images have landed, to an RGBA image.
 pub fn snapshot(app: fn() -> Element, viewport: Viewport) -> Result<image::RgbaImage, NativeError> {
-    todo!()
+    let mut frames = snapshot_at(app, viewport, &[AT_REST])?;
+    frames
+        .pop()
+        .ok_or_else(|| NativeError::Renderer("no frame rendered".into()))
+}
+
+/// Render `app` at each of `moments` of animation time (measured from its first frame, in
+/// order), after its fonts and images have landed: one image per moment, for pictures of a
+/// motion part-way through.
+pub fn snapshot_at(
+    app: fn() -> Element,
+    viewport: Viewport,
+    moments: &[Duration],
+) -> Result<Vec<image::RgbaImage>, NativeError> {
+    let mut harness = Harness::new(app, viewport);
+    moments
+        .iter()
+        .map(|&moment| harness.render_at(moment))
+        .collect()
 }

@@ -1,22 +1,41 @@
 //! Driving a quire app in a test the way a user would: pointer, keys, and time, against a real
 //! Blitz document (no window). Timers run on the harness's clock, so a test advances 450 ms and
 //! sees the hover card open, not before.
-#![allow(unused_variables, dead_code)] // Freeze stubs: remove with the last todo!().
+//!
+//! Time. quire's timers are `futures-timer` sleeps and its hover intent reads `Instant::now()`,
+//! both on the wall clock, so a harness cannot fake time: [`Harness::advance`] really lets it
+//! pass. It does not spin: it sleeps on a condition variable that the document's waker signals,
+//! so it wakes exactly when a timer fires (or a resource lands), runs the renders that queued,
+//! resolves the document at the matching animation time, and sleeps again until the deadline.
+//! Animation time (`resolve(t)`) is the harness's own clock: the sum of every `advance`, so a
+//! frame's CSS time never depends on how slow the machine running the test is.
 
+use crate::error::NativeError;
+use crate::headless::Headless;
 use crate::snapshot::Viewport;
+use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
+use blitz_traits::events::{
+    BlitzKeyEvent, BlitzPointerEvent, BlitzPointerId, KeyState, MouseEventButton,
+    MouseEventButtons, PointerCoords, UiEvent,
+};
 use dioxus::prelude::*;
-use ds::{Key, Point};
-use std::time::Duration;
+use ds::{InputModality, Key, Point, Px, Rect, Size};
+use keyboard_types::{Code, Key as DomKey, Location, Modifiers};
+use std::time::{Duration, Instant};
 
 /// A headless document under test.
 pub struct Harness {
     viewport: Viewport,
+    doc: Headless,
+    /// Animation time: the sum of every `advance`.
+    clock: Duration,
 }
 
 impl std::fmt::Debug for Harness {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Harness")
             .field("viewport", &self.viewport)
+            .field("clock", &self.clock)
             .finish_non_exhaustive()
     }
 }
@@ -24,36 +43,248 @@ impl std::fmt::Debug for Harness {
 impl Harness {
     /// Build `app` at `viewport` and render its first frame.
     pub fn new(app: fn() -> Element, viewport: Viewport) -> Self {
-        todo!()
+        let mut harness = Harness {
+            viewport,
+            doc: Headless::new(app, viewport),
+            clock: Duration::ZERO,
+        };
+        harness.frame();
+        harness
     }
 
     /// Move the pointer to `at`.
     pub fn pointer_move(&mut self, at: Point) {
-        todo!()
+        self.send(UiEvent::PointerMove(pointer(at, MouseEventButtons::None)));
     }
 
-    /// Press and release the primary button at `at`.
+    /// Press the primary button at `at`. A pointer press makes the modality `pointer`.
+    pub fn pointer_down(&mut self, at: Point) {
+        self.doc.set_modality(InputModality::Pointer);
+        self.send(UiEvent::PointerDown(pointer(
+            at,
+            MouseEventButtons::Primary,
+        )));
+    }
+
+    /// Release the primary button at `at`.
+    pub fn pointer_up(&mut self, at: Point) {
+        self.send(UiEvent::PointerUp(pointer(at, MouseEventButtons::None)));
+    }
+
+    /// Press and release the primary button at `at`, after moving there: the order a host
+    /// synthesises, so hover intent arms before the press.
     pub fn click(&mut self, at: Point) {
-        todo!()
+        self.pointer_move(at);
+        self.pointer_down(at);
+        self.pointer_up(at);
     }
 
-    /// Press and release `key` with the focus where it is.
+    /// Press and release `key` with the focus where it is. A key makes the modality `keyboard`.
     pub fn key(&mut self, key: Key) {
-        todo!()
+        self.doc.set_modality(InputModality::Keyboard);
+        let (key, code) = keyboard(key);
+        for state in [KeyState::Pressed, KeyState::Released] {
+            let event = BlitzKeyEvent {
+                key: key.clone(),
+                code,
+                modifiers: Modifiers::empty(),
+                location: Location::Standard,
+                is_auto_repeating: false,
+                is_composing: false,
+                state,
+                text: None,
+            };
+            self.send(match state {
+                KeyState::Pressed => UiEvent::KeyDown(event),
+                KeyState::Released => UiEvent::KeyUp(event),
+            });
+        }
     }
 
-    /// Let `time` pass: fire due timers and render.
+    /// Let `time` pass: fire due timers and render. It takes `time` of wall-clock time; see the
+    /// module documentation for why.
     pub fn advance(&mut self, time: Duration) {
-        todo!()
+        let started = Instant::now();
+        let deadline = started + time;
+        loop {
+            let seen = self.doc.wakeup().generation();
+            let elapsed = started.elapsed().min(time);
+            self.doc.frame(self.clock + elapsed);
+            let now = Instant::now();
+            if now >= deadline {
+                break;
+            }
+            self.doc.wakeup().wait_past(seen, deadline - now);
+        }
+        self.clock += time;
+        self.frame();
     }
 
     /// The document as HTML, for assertions.
     pub fn html(&self) -> String {
-        todo!()
+        self.with_doc(|doc| doc.root_element().outer_html())
     }
 
     /// The border-box rect of the first element matching `selector`, if any.
     pub fn rect(&self, selector: &str) -> Option<ds::Rect> {
-        todo!()
+        self.with_doc(|doc| {
+            let found = doc.get_client_bounding_rect(first(doc, selector)?)?;
+            Some(Rect {
+                origin: Point {
+                    x: Px(found.x as f32),
+                    y: Px(found.y as f32),
+                },
+                size: Size {
+                    width: Px(found.width as f32),
+                    height: Px(found.height as f32),
+                },
+            })
+        })
+    }
+
+    /// The text inside the first element matching `selector`, if any.
+    pub fn text_of(&self, selector: &str) -> Option<String> {
+        self.with_doc(|doc| Some(doc.get_node(first(doc, selector)?)?.text_content()))
+    }
+
+    /// Attribute `name` of the first element matching `selector`, if both exist.
+    pub fn attr(&self, selector: &str, name: &str) -> Option<String> {
+        self.with_doc(|doc| {
+            let node = doc.get_node(first(doc, selector)?)?;
+            node.attr(LocalName::from(name)).map(str::to_owned)
+        })
+    }
+
+    /// Whether the first element matching `selector` carries `class` as a whole class token.
+    pub fn has_class(&self, selector: &str, class: &str) -> bool {
+        self.attr(selector, "class")
+            .is_some_and(|classes| classes.split_ascii_whitespace().any(|token| token == class))
+    }
+
+    /// How many elements match `selector`.
+    pub fn count(&self, selector: &str) -> usize {
+        self.with_doc(|doc| {
+            doc.query_selector_all(selector)
+                .map_or(0, |found| found.len())
+        })
+    }
+
+    /// The centre of the first element matching `selector`: where a test clicks it.
+    pub fn centre(&self, selector: &str) -> Option<Point> {
+        self.rect(selector).map(|rect| Point {
+            x: Px(rect.origin.x.0 + rect.size.width.0 / 2.0),
+            y: Px(rect.origin.y.0 + rect.size.height.0 / 2.0),
+        })
+    }
+
+    /// Paint the document as it is now, at the harness's animation time.
+    pub fn render(&mut self) -> Result<image::RgbaImage, NativeError> {
+        self.doc.paint()
+    }
+
+    /// Resolve at `at` and paint: a snapshot at one motion moment.
+    pub(crate) fn render_at(&mut self, at: Duration) -> Result<image::RgbaImage, NativeError> {
+        self.clock = at;
+        self.frame();
+        self.doc.paint()
+    }
+
+    /// Hand `event` to the document and bring it up to date.
+    fn send(&mut self, event: UiEvent) {
+        self.doc.doc.handle_ui_event(event);
+        self.frame();
+    }
+
+    fn frame(&mut self) {
+        self.doc.frame(self.clock);
+    }
+
+    fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
+        read(&self.doc.doc.inner())
+    }
+}
+
+/// The first element matching `selector`; an unparseable selector matches nothing.
+fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
+    doc.query_selector(selector).ok().flatten()
+}
+
+/// A primary-mouse pointer event at `at`.
+fn pointer(at: Point, buttons: MouseEventButtons) -> BlitzPointerEvent {
+    let (x, y) = (at.x.0, at.y.0);
+    BlitzPointerEvent {
+        id: BlitzPointerId::Mouse,
+        is_primary: true,
+        coords: PointerCoords {
+            page_x: x,
+            page_y: y,
+            screen_x: x,
+            screen_y: y,
+            client_x: x,
+            client_y: y,
+        },
+        button: MouseEventButton::Main,
+        buttons,
+        mods: Modifiers::empty(),
+        details: Default::default(),
+        element: Default::default(),
+        active_pointers: Default::default(),
+    }
+}
+
+/// The DOM key and physical code for a quire key.
+fn keyboard(key: Key) -> (DomKey, Code) {
+    match key {
+        Key::Ctrl => (DomKey::Control, Code::ControlLeft),
+        Key::Shift => (DomKey::Shift, Code::ShiftLeft),
+        Key::Alt => (DomKey::Alt, Code::AltLeft),
+        Key::Super => (DomKey::Meta, Code::MetaLeft),
+        Key::Char(c) => (DomKey::Character(c.to_string()), letter(c)),
+        Key::Space => (DomKey::Character(" ".into()), Code::Space),
+        Key::Enter => (DomKey::Enter, Code::Enter),
+        Key::Escape => (DomKey::Escape, Code::Escape),
+        Key::Tab => (DomKey::Tab, Code::Tab),
+        Key::Backspace => (DomKey::Backspace, Code::Backspace),
+        Key::Up => (DomKey::ArrowUp, Code::ArrowUp),
+        Key::Down => (DomKey::ArrowDown, Code::ArrowDown),
+        Key::Left => (DomKey::ArrowLeft, Code::ArrowLeft),
+        Key::Right => (DomKey::ArrowRight, Code::ArrowRight),
+    }
+}
+
+/// The physical key a US layout types `c` with, where it is a letter or a digit.
+fn letter(c: char) -> Code {
+    format!("Key{}", c.to_ascii_uppercase())
+        .parse()
+        .or_else(|_| format!("Digit{c}").parse())
+        .unwrap_or(Code::Unidentified)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{keyboard, letter};
+    use ds::Key;
+    use keyboard_types::Code;
+
+    const LETTERS: &[(char, Code)] = &[
+        ('a', Code::KeyA),
+        ('Z', Code::KeyZ),
+        ('7', Code::Digit7),
+        ('/', Code::Unidentified),
+    ];
+
+    #[test]
+    fn letters_map_to_their_physical_key() {
+        for &(c, code) in LETTERS {
+            assert_eq!(letter(c), code, "{c:?}");
+        }
+    }
+
+    #[test]
+    fn escape_is_the_named_key() {
+        assert_eq!(
+            keyboard(Key::Escape),
+            (keyboard_types::Key::Escape, Code::Escape)
+        );
     }
 }

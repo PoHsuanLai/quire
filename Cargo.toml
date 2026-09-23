@@ -95,6 +95,15 @@ clap = { version = "4", features = ["derive"] }
 latchkey = { git = "https://github.com/PoHsuanLai/mailo", rev = "e8344176ffcc0455c585dafd722c05c911ddc5c4" }
 # ---- END PINNED BLOCK ----
 
+# ---- Proposed for docs/workspace-deps.toml (w2-native) ----
+# Outside the pinned block on purpose: ds-native's portable window (`ds_native::launch`) runs
+# blitz's in-tree dioxus-native (winit + blitz-shell) at the pinned rev. The reviewer either
+# promotes it into docs/workspace-deps.toml (and every repo's copy) or rejects it with launch.
+# No default features: no hot-reload devserver, no blitz-net/reqwest, no clipboard or file
+# dialog; ds-native installs its own data:/file: net provider on the document.
+dioxus-native = { git = "https://github.com/DioxusLabs/blitz", rev = "e99fbdbd1d03b9f0aa1622c3f810d95daac92042", default-features = false, features = ["vello-hybrid", "svg", "system-fonts", "accessibility"] }
+# ---- END PROPOSED ----
+
 
 [workspace.lints.rust]
 unsafe_code = "deny"

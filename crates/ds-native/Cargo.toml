@@ -15,13 +15,19 @@ blitz-dom = { workspace = true }
 blitz-paint = { workspace = true }
 blitz-traits = { workspace = true }
 dioxus-native-dom = { workspace = true }
+dioxus-native = { workspace = true }
 anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
 anyrender_vello_cpu = { workspace = true }
 parley = { workspace = true }
 wgpu = { workspace = true }
 image = { workspace = true }
+keyboard-types = { workspace = true }
+peniko = { workspace = true }
 thiserror = { workspace = true }
 
 [lints]
 workspace = true
+
+[[example]]
+name = "window"
