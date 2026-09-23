@@ -3,7 +3,7 @@
 //!
 //! Through the overlay host with its own scrim: the scrim, the close tool, or Escape (when the
 //! peek is the topmost layer) closes it, at once. Center plays `peek-in` over `--t-big
-//! --e-spring`; Full covers the card.
+//! --e-spring`; Full covers the card and plays it over `--t-move --e-out` (`Anim::PeekFullIn`).
 
 use crate::appearance::PeekMode;
 use crate::components::icon_button::{IconButton, IconButtonVariant};
@@ -22,6 +22,14 @@ fn mode_slug(mode: PeekMode) -> &'static str {
     }
 }
 
+/// The entrance each mode plays (design/05-MOTION.md section 5 rows 6 and 64).
+fn entrance(mode: PeekMode) -> Anim {
+    match mode {
+        PeekMode::Center => Anim::PeekIn,
+        PeekMode::Full => Anim::PeekFullIn,
+    }
+}
+
 /// A reader floating over the card.
 #[component]
 pub fn Peek(
@@ -31,7 +39,7 @@ pub fn Peek(
     children: Element,
 ) -> Element {
     let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
-    let presence = use_entrance(Anim::PeekIn);
+    let presence = use_entrance(entrance(mode));
     // Both close controls say "Close peek" (`S:1579`); the dialog is labelled by its thread.
     let close = "Close peek".to_string();
     float.show(

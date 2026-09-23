@@ -23,6 +23,16 @@ impl InputVariant {
     }
 }
 
+/// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Focus {
+    /// As soon as it is mounted: the palette's input, the bubble's link field.
+    OnMount,
+    /// Only when the user or the consumer puts it there.
+    #[default]
+    Manual,
+}
+
 /// A key event copied out of its `Rc`, so it can be handed on by value: `KeyboardData` is not
 /// `Clone`, and the `serialize` feature that offers a copy is not in the pinned set.
 struct KeySnapshot {
@@ -107,7 +117,19 @@ fn placeholder_shown<'a>(value: &str, placeholder: &'a str) -> Option<&'a str> {
     (value.is_empty() && !placeholder.is_empty()).then_some(placeholder)
 }
 
-/// A single-line text field.
+/// Take focus now if the field asks for it on mount. Focus is best-effort: a renderer without
+/// it still shows the field, and the user can click into it.
+fn focus_on_mount(focus: Focus, event: &MountedEvent) {
+    if focus == Focus::OnMount {
+        let mounted = event.data();
+        spawn(async move {
+            let _ = mounted.set_focus(true).await;
+        });
+    }
+}
+
+/// A single-line text field. `focus: Focus::OnMount` puts the caret in it when it mounts (and
+/// writes `autofocus` for a webview).
 #[component]
 pub fn TextInput(
     variant: InputVariant,
@@ -117,6 +139,7 @@ pub fn TextInput(
     #[props(default)] availability: Availability,
     oninput: EventHandler<String>,
     #[props(default)] onkey: EventHandler<KeyboardData>,
+    #[props(default)] focus: Focus,
 ) -> Element {
     let shown = placeholder_shown(&value, &placeholder).map(str::to_string);
     let aria_placeholder = (!placeholder.is_empty()).then_some(placeholder.clone());
@@ -130,7 +153,9 @@ pub fn TextInput(
                 "aria-placeholder": aria_placeholder,
                 "aria-disabled": availability.aria_disabled(),
                 autocomplete: "off",
+                autofocus: (focus == Focus::OnMount).then_some("true"),
                 value: "{value}",
+                onmounted: move |event| focus_on_mount(focus, &event),
                 oninput: move |event| {
                     if availability == Availability::Enabled {
                         oninput.call(event.value());

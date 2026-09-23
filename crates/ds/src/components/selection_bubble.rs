@@ -7,7 +7,7 @@
 use crate::components::popover::{
     Dismiss, Stacking, escape_closes, position_style, use_entrance, use_float,
 };
-use crate::components::text_input::{InputVariant, TextInput};
+use crate::components::text_input::{Focus, InputVariant, TextInput};
 use crate::components::vocab::Switch;
 use crate::geometry::{Align, Placement, Px, Rect, Side};
 use crate::motion::anim::Anim;
@@ -16,7 +16,7 @@ use dioxus::prelude::*;
 
 /// One bubble button.
 #[derive(Debug, Clone, PartialEq)]
-pub struct BubbleAction {
+pub struct BubbleButton {
     /// Its face: `B`, `i`, a glyph.
     pub label: Element,
     /// Its title, with the shortcut.
@@ -25,6 +25,15 @@ pub struct BubbleAction {
     pub pressed: Option<Switch>,
     /// Pressed.
     pub onclick: EventHandler<()>,
+}
+
+/// One entry in the formatting row: a button, or the rule between two groups (`S:689`).
+#[derive(Debug, Clone, PartialEq)]
+pub enum BubbleAction {
+    /// A formatting button.
+    Button(BubbleButton),
+    /// A 1 x 18 rule between groups: `ds-bubble-sep`.
+    Separator,
 }
 
 /// What the bubble shows.
@@ -36,6 +45,28 @@ pub enum BubbleMode {
     Link,
 }
 
+/// One entry of the formatting row.
+fn bubble_entry(index: usize, action: BubbleAction) -> Element {
+    match action {
+        BubbleAction::Button(button) => rsx! {
+            button {
+                key: "{index}",
+                r#type: "button",
+                class: "ds-bubble-button",
+                title: "{button.title}",
+                "aria-pressed": button.pressed.map(Switch::aria),
+                // The selection survives a click on the bubble (`S:2135`).
+                onmousedown: move |event| event.prevent_default(),
+                onclick: move |_| button.onclick.call(()),
+                {button.label}
+            }
+        },
+        BubbleAction::Separator => rsx! {
+            span { key: "{index}", class: "ds-bubble-sep", role: "separator" }
+        },
+    }
+}
+
 /// The toolbar over a selection.
 #[component]
 pub fn SelectionBubble(
@@ -45,24 +76,14 @@ pub fn SelectionBubble(
     onclose: EventHandler<()>,
 ) -> Element {
     let float = use_float(ZLayer::Bubble, Stacking::Layer(Dismiss::EscOnly));
-    let presence = use_entrance(Anim::MenuPop);
+    let presence = use_entrance(Anim::BubblePop);
     let mut link = use_signal(String::new);
     let want = Placement::new(Side::Top, Align::Center).no_flip();
     let at = float.origin(Some(anchor), want, Px(8.0));
     let body = match mode {
         BubbleMode::Actions(actions) => rsx! {
             for (index , action) in actions.into_iter().enumerate() {
-                button {
-                    key: "{index}",
-                    r#type: "button",
-                    class: "ds-bubble-button",
-                    title: "{action.title}",
-                    "aria-pressed": action.pressed.map(Switch::aria),
-                    // The selection survives a click on the bubble (`S:2135`).
-                    onmousedown: move |event| event.prevent_default(),
-                    onclick: move |_| action.onclick.call(()),
-                    {action.label}
-                }
+                {bubble_entry(index, action)}
             }
         },
         BubbleMode::Link => rsx! {
@@ -71,6 +92,7 @@ pub fn SelectionBubble(
                 label: "Link",
                 value: link(),
                 placeholder: "Paste a link, then Enter",
+                focus: Focus::OnMount,
                 oninput: move |text| link.set(text),
                 onkey: move |key: KeyboardData| {
                     if key.key() == Key::Enter {

@@ -310,14 +310,22 @@ html,body{margin:0;padding:0;background:transparent}
 .a-menu-in[*|data-pulse=b]{animation:menu-in--b var(--t-move) var(--e-spring);}
 .a-menu-pop[*|data-pulse=a]{animation:menu-pop var(--t-move) var(--e-spring);}
 .a-menu-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-move) var(--e-spring);}
+.a-bubble-pop[*|data-pulse=a]{animation:menu-pop var(--t-quick) var(--e-spring);}
+.a-bubble-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-quick) var(--e-spring);}
 .a-cmdk-in[*|data-pulse=a]{animation:cmdk-in var(--t-big) var(--e-spring);}
 .a-cmdk-in[*|data-pulse=b]{animation:cmdk-in--b var(--t-big) var(--e-spring);}
 .a-peek-in[*|data-pulse=a]{animation:peek-in var(--t-big) var(--e-spring);}
 .a-peek-in[*|data-pulse=b]{animation:peek-in--b var(--t-big) var(--e-spring);}
+.a-peek-full-in[*|data-pulse=a]{animation:peek-in var(--t-move) var(--e-out);}
+.a-peek-full-in[*|data-pulse=b]{animation:peek-in--b var(--t-move) var(--e-out);}
 .a-fade[*|data-pulse=a]{animation:fade var(--t-move) var(--e-out);}
 .a-fade[*|data-pulse=b]{animation:fade--b var(--t-move) var(--e-out);}
+.a-palette-fade[*|data-pulse=a]{animation:fade var(--t-quick) var(--e-out);}
+.a-palette-fade[*|data-pulse=b]{animation:fade--b var(--t-quick) var(--e-out);}
 .a-hc-in[*|data-pulse=a]{animation:hc-in var(--t-move) var(--e-spring);}
 .a-hc-in[*|data-pulse=b]{animation:hc-in--b var(--t-move) var(--e-spring);}
+.a-link-pill-in[*|data-pulse=a]{animation:hc-in var(--t-quick) var(--e-out);}
+.a-link-pill-in[*|data-pulse=b]{animation:hc-in--b var(--t-quick) var(--e-out);}
 .a-hc-out[*|data-pulse=a]{animation:hc-out var(--t-hc-out) var(--e-out) forwards;}
 .a-hc-out[*|data-pulse=b]{animation:hc-out--b var(--t-hc-out) var(--e-out) forwards;}
 .a-page-in[*|data-pulse=a]{animation:page-in var(--t-big) var(--e-spring);}
@@ -518,12 +526,11 @@ html,body{margin:0;padding:0;background:transparent}
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel springing in with
    `peek-in`, a SearchField over an embedded Rich menu (menu.css). `.cmdk-list` and `.cmdk-g`
-   are superseded and not ported.
-   TODO: S fades the wrap in over `--t-quick` (`S:231`); no `Anim` has that recipe, so it takes
-   `Fade`'s `--t-move` until one is added. */
+   are superseded and not ported. The wrap fades in over `--t-quick` (`S:231`,
+   `Anim::PaletteFade`). */
 
 .ds-palette-wrap{ position:absolute; inset:0; display:grid; place-items:start center; padding-top:11%;
-  background:var(--scrim); pointer-events:auto; animation:fade var(--t-move) var(--e-out); }
+  background:var(--scrim); pointer-events:auto; animation:fade var(--t-quick) var(--e-out); }
 .ds-palette{ width:min(540px, 88%); background:var(--raise); color:var(--ink); border:1px solid var(--line);
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
   animation:peek-in var(--t-big) var(--e-spring); }
@@ -728,13 +735,12 @@ html,body{margin:0;padding:0;background:transparent}
 /* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
    reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
    `--danger-ink` for S's `#fff`) when the text lies. Blitz has no ellipsis: the path gives way
-   first and the registered domain never shrinks (O-30).
-   TODO: S enters with `hc-in` at `--t-quick --e-out` (`S:433`); no `Anim` has that recipe, so
-   it takes `HcIn`'s `--t-move --e-spring` until one is added. */
+   first and the registered domain never shrinks (O-30). It enters with `hc-in` at `--t-quick
+   --e-out` (`S:433`, `Anim::LinkPillIn`). */
 
 .ds-link-pill{ position:absolute; left:12px; bottom:12px; z-index:var(--z-link-pill); max-width:calc(100% - 24px); display:flex; align-items:center; gap:7px;
   background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:5px 11px 5px 9px; font-family:var(--font-data); font-size:var(--fs-eyebrow);
-  white-space:nowrap; overflow:hidden; box-shadow:var(--shadow-2); animation:hc-in var(--t-move) var(--e-spring); pointer-events:none; }
+  white-space:nowrap; overflow:hidden; box-shadow:var(--shadow-2); animation:hc-in var(--t-quick) var(--e-out); pointer-events:none; }
 .ds-link-pill b{ color:var(--paper); flex:none; }
 .ds-link-pill-dim{ opacity:.6; flex:none; }
 .ds-link-pill-dim[*|data-part=path]{ flex:0 1 auto; min-width:0; overflow:hidden; }
@@ -886,13 +892,12 @@ html,body{margin:0;padding:0;background:transparent}
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
    TODO: the tools row's layout is not specified in design/04-COMPONENTS.md; it right-aligns
    the close tool.
-   TODO: C enters Full with `peek-in` at `--t-move --e-out` (`C:1050`); no `Anim` has that
-   recipe, so Full shares Center's `PeekIn`. */
+   Full enters with `peek-in` at `--t-move --e-out` (`C:1050`, `Anim::PeekFullIn`). */
 
 .ds-peek{ position:absolute; inset:36px 12% 36px 12%; background:var(--surface-2); border-radius:var(--r-panel);
   box-shadow:var(--shadow-sheet); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
-.ds-peek[*|data-mode=full]{ inset:0; }
+.ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
 .ds-peek-tools{ display:flex; justify-content:flex-end; padding:8px 10px 0; }
 /* -- popover -- */
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
@@ -1005,11 +1010,10 @@ html,body{margin:0;padding:0;background:transparent}
 /* SelectionBubble (design/04-COMPONENTS.md section 30), verbatim `S:683-691`, over the
    `.ds-popover` Bubble surface: formatting buttons, or the link field. Italic's Georgia face is
    not one of the three families (02-TYPE decides); the consumer's label draws it.
-   TODO: `BubbleAction` carries no group boundary, so `ds-bubble-sep` is styled but not drawn.
-   TODO: S enters with `menu-pop` at `--t-quick` (`S:684`); no `Anim` has that recipe, so it
-   takes `MenuPop`'s `--t-move` until one is added. */
+   `BubbleAction::Separator` draws `ds-bubble-sep` between groups. It enters with `menu-pop` at
+   `--t-quick` (`S:684`, `Anim::BubblePop`). */
 
-.ds-popover.ds-bubble{ display:flex; align-items:center; gap:1px; padding:3px; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-popover.ds-bubble{ display:flex; align-items:center; gap:1px; padding:3px; animation:menu-pop var(--t-quick) var(--e-spring); }
 .ds-bubble-button{ border:0; background:transparent; cursor:pointer; height:28px; min-width:28px; padding:0 7px; border-radius:var(--r-bubble-button);
   color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:4px; }
 .ds-bubble-button:hover{ background:var(--surface-2); color:var(--ink); }
