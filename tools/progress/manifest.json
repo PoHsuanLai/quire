@@ -1,32 +1,36 @@
 {
-  "updated": "2026-09-24, design system built; host complete; gallery review in progress",
+  "updated": "2026-09-24, design system built and gallery-reviewed; host complete; polish and sill freeze running",
   "entries": [
     {
       "id": "gallery-first-look",
       "date": "2026-09-24 \u00b7 quire wave 3",
       "title": "The design system exists: every component on review pages, in both themes and six accents",
-      "status": "running",
-      "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 250 tests), and the gallery renders them through the real Blitz pipeline. These are its first contact sheets, before the bug pass: the gallery already caught text inputs at replaced-element size, an empty toast pill on every root, and eleven more; fixes are running and the sheets will be regenerated.",
+      "status": "proven",
+      "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 280 tests), and the gallery renders them through the real Blitz pipeline. Its first run caught thirteen defects (text inputs at replaced-element size, an empty toast pill on every root, invisible undo labels, a class collision between the text field and the Space editor's colour field); all are fixed and these are the regenerated sheets. A polish pass (reset specificity, spacing tokens in every sheet, the stretched dot field) is running.",
       "notes": [
-        "What is right already: Post paper and ink, Bricolage headings, mono eyebrows, the Rich menu, materials over a wallpaper with blur on and off, legibility floors live.",
-        "Known in these sheets: oversized text inputs, empty toast and undo labels, one overlapping header row."
+        "Two root causes behind most of the list: one shared class name between two components, and a reset rule that outranked every single-class component rule.",
+        "Still visible here: the colour field's dots stretch into ellipses, the Danger button looks like Mini, one section header's action sits against its label; the polish pass owns all three."
       ],
       "images": [
         {
           "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/controls-light-postmark.png",
-          "caption": "Controls page, light, Postmark accent"
+          "caption": "Controls page, light, Postmark: buttons, icon buttons, command pill, segments, tabs, toggles, sliders, inputs at one line"
         },
         {
           "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/overlays-dark-postmark.png",
-          "caption": "Overlays page, dark: the Rich menu, link pills, the send pill, the undo toast"
+          "caption": "Overlays page, dark: the Rich menu, link pills honest and lying, the send pill counting down, the undo toast with its pull tab"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/lists-light-postmark.png",
+          "caption": "Lists page, light: rows with unread dots and chips, sidebar items on the Space's frame colour with the seal, tiles"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/space-light-postmark.png",
+          "caption": "Space page: the editor with its hue x chroma field, stops, grain, presets, the four legibility gates measured live, and the frame tokens it derives"
         },
         {
           "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/materials-dark-postmark.png",
           "caption": "Materials page, dark: eight materials over a wallpaper, blur on and off"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/lists-light-postmark.png",
-          "caption": "Lists page, light: rows, strip, sidebar, tiles, the appearance picker"
         }
       ]
     },
