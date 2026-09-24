@@ -7,10 +7,11 @@ use ds::components::vocab::{Check, Fraction, Key, Shortcut, Switch};
 use ds::{Align, Button, ButtonVariant};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
-    BubbleMode, CommandPalette, Dismiss, Elevation, Filter, Glyph, HoverCard, HoverEvent, HoverKey,
-    HoverKind, HoverTarget, Icon, LinkPill, LinkTarget, Menu, MenuEntry, MenuKind, Peek, PeekMode,
-    PersonHue, Placement, Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill,
-    Sheet, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
+    BubbleMode, CommandPalette, Dismiss, Elevation, Filter, FlagTone, Glyph, HoverCard,
+    HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverStat, HoverTarget, Icon,
+    KeyHint, LinkPill, LinkTarget, Menu, MenuEntry, MenuKind, Peek, PeekMode, PersonHue, Placement,
+    Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill, Sheet, Side, Size, Tile,
+    Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
 };
 use std::time::Duration;
 
@@ -188,6 +189,87 @@ fn SenderCard(kind: HoverKind) -> Element {
     }
 }
 
+/// A sender card composed from parts, open: the same card [`SenderCard`] writes by hand.
+#[component]
+fn PartsCard(parts: Vec<HoverCardPart>) -> Element {
+    let hub = use_hover_hub();
+    let key = HoverKey("sender:3".to_string());
+    use_hook({
+        let key = key.clone();
+        move || hub.feed(HoverEvent::Over((key, HoverKind::Sender)))
+    });
+    let open = hub.open().or(hub.leaving());
+    rsx! {
+        HoverTarget { hover_key: key, kind: HoverKind::Sender, "Dana Okafor" }
+        if let Some((open, _)) = open {
+            HoverCard { key: "{open.0}", kind: HoverKind::Sender, parts: parts.clone() }
+        }
+    }
+}
+
+fn person() -> HoverCardPart {
+    HoverCardPart::Person {
+        initial: 'D',
+        tone: AvatarTone::Ink,
+        title: "Dana Okafor".to_string(),
+        sub: Some("dana@example.com".to_string()),
+    }
+}
+
+fn stats() -> HoverCardPart {
+    HoverCardPart::Stats(vec![
+        HoverStat {
+            value: "14".to_string(),
+            label: "threads".to_string(),
+        },
+        HoverStat {
+            value: "Mon".to_string(),
+            label: "last wrote".to_string(),
+        },
+    ])
+}
+
+fn flag(tone: FlagTone) -> HoverCardPart {
+    HoverCardPart::Flag {
+        tone,
+        icon: Icon::OctagonAlert,
+        text: "Not the address Dana usually writes from.".to_string(),
+    }
+}
+
+fn foot() -> HoverCardPart {
+    HoverCardPart::Foot {
+        text: "stays unread while you look".to_string(),
+        keys: Some(KeyHint {
+            shortcut: Shortcut(vec![Key::Space]),
+            label: "peek".to_string(),
+        }),
+    }
+}
+
+fn actions() -> HoverCardPart {
+    HoverCardPart::Actions(vec![rsx! {
+        Button { variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
+    }])
+}
+
+fn messages() -> HoverCardPart {
+    HoverCardPart::Messages(vec![
+        HoverMessage {
+            initial: 'D',
+            tone: AvatarTone::Person(PersonHue(212)),
+            name: "Dana".to_string(),
+            text: "The UIDL list is stable across reconnects now.".to_string(),
+        },
+        HoverMessage {
+            initial: 'M',
+            tone: AvatarTone::Ink,
+            name: "Me".to_string(),
+            text: "Great, merging.".to_string(),
+        },
+    ])
+}
+
 /// The toast after an operation pushed it.
 #[component]
 fn Pushed(undo: Option<UndoToken>) -> Element {
@@ -322,6 +404,68 @@ pub const CASES: &[Case] = &[
         component: "hover_card",
         state: "side-open",
         make: || rsx! { SenderCard { kind: HoverKind::Side } },
+        wait: INTENT,
+    },
+    // HoverCard parts: each block alone, and the sender card composed from parts (its golden
+    // equals `sender-open`, the same card written by hand).
+    Case {
+        component: "hover_card",
+        state: "part-title",
+        make: || rsx! { PartsCard { parts: vec![HoverCardPart::Title("Re: UIDL stability".to_string())] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-sub",
+        make: || rsx! { PartsCard { parts: vec![HoverCardPart::Sub("3 messages · Mon".to_string())] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-person",
+        make: || rsx! { PartsCard { parts: vec![person()] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-stats",
+        make: || rsx! { PartsCard { parts: vec![stats()] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-flag-danger",
+        make: || rsx! { PartsCard { parts: vec![flag(FlagTone::Danger)] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-flag-info",
+        make: || rsx! { PartsCard { parts: vec![flag(FlagTone::Info)] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-messages",
+        make: || rsx! { PartsCard { parts: vec![messages()] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-foot",
+        make: || rsx! { PartsCard { parts: vec![foot()] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-actions",
+        make: || rsx! { PartsCard { parts: vec![actions()] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "sender-parts",
+        make: || rsx! { PartsCard { parts: vec![person(), stats(), flag(FlagTone::Danger), foot(), actions()] } },
         wait: INTENT,
     },
     // Tooltip: the fly label, and the card closed and open.

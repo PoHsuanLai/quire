@@ -6,7 +6,7 @@
 use ds::tokens::{DelayToken, HueMember};
 use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
-    ScalarToken, Scheme, Shadow, SpaceLook, ZLayer, quad, stylesheet,
+    ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, quad, stylesheet,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -229,6 +229,7 @@ fn every_table_name_is_declared_on_the_root() {
         .chain(EasingToken::ALL.map(|t| t.var()))
         .chain(ScalarToken::ALL.map(|t| t.var()))
         .chain(Radius::ALL.map(|t| t.var()))
+        .chain(SpacingToken::ALL.map(|t| t.var()))
         .chain(Shadow::ALL.map(|t| t.var()))
         .chain(FontSize::ALL.map(|t| t.var()))
         .chain(ZLayer::ALL.map(|t| t.var()))
@@ -289,4 +290,29 @@ fn every_var_the_stylesheet_reads_is_declared() {
     missing.sort();
     missing.dedup();
     assert!(missing.is_empty(), "read but never declared: {missing:?}");
+}
+
+/// The spacing scale is design/01-LAYOUT.md section 2's common steps, verbatim, each emitted on
+/// `.ds` as its own pixel value and nowhere else (it follows neither scheme nor motion).
+#[test]
+fn the_spacing_scale_is_the_layout_docs() {
+    const STEPS: [u16; 18] = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 22, 26, 36,
+    ];
+    assert_eq!(SpacingToken::ALL.map(SpacingToken::px), STEPS);
+    let light = token_block();
+    for step in STEPS {
+        let name = format!("--s-{step}");
+        assert_eq!(light.get(&name), Some(&format!("{step}px")), "{name}");
+    }
+    for selector in [
+        ".ds[*|data-theme=dark]",
+        ".ds[*|data-motion=calm]",
+        ".ds[*|data-motion=reduced]",
+    ] {
+        assert!(
+            !block(selector).keys().any(|name| name.starts_with("--s-")),
+            "{selector} overrides a spacing step"
+        );
+    }
 }

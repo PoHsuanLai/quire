@@ -240,6 +240,17 @@ fn is_face_reference(value: &[Located]) -> bool {
     }
 }
 
+/// Whether `property` spaces things out: `margin`, `padding` and their sides and logical
+/// forms, and the three gaps.
+fn is_spacing_property(property: &str) -> bool {
+    ["margin", "padding"].iter().any(|base| {
+        property == *base
+            || property
+                .strip_prefix(base)
+                .is_some_and(|rest| rest.starts_with('-'))
+    }) || matches!(property, "gap" | "row-gap" | "column-gap")
+}
+
 fn raw_geometry(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offence>) {
     let rule = if property == "z-index" {
         Rule::RawZIndex
@@ -247,6 +258,9 @@ fn raw_geometry(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offen
         Rule::RawFontSize
     } else if property == "border-radius" || property.ends_with("-radius") {
         Rule::RawRadius
+    } else if is_spacing_property(property) {
+        raw_spacing(selector, decl, out);
+        return;
     } else {
         return;
     };
@@ -260,6 +274,16 @@ fn raw_geometry(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offen
             || kind::dimension_unit(&token.text).is_some();
         if raw {
             push(out, rule, token, selector, &token.text);
+        }
+    }
+}
+
+/// A literal length in pixels is the offence; `0`, `auto`, a percentage, an `em` and a
+/// `var(--s-*)` are not (the scale is in pixels, so only a pixel literal bypasses it).
+fn raw_spacing(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
+    for token in &decl.value {
+        if kind::dimension_unit(&token.text).is_some_and(|unit| unit.eq_ignore_ascii_case("px")) {
+            push(out, Rule::RawSpacing, token, selector, &token.text);
         }
     }
 }

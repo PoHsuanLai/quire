@@ -26,6 +26,7 @@ pub mod tokenize;
 
 mod colours;
 mod declaration;
+mod inline_style;
 mod kind;
 mod registry;
 mod selector;

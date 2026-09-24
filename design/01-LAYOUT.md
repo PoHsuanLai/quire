@@ -25,6 +25,15 @@ and margin in `S`'s app surfaces is one of these values:
 
 `P:955-956`, derived from the `S` rules cited in the sections below.
 
+**Settled (Gallery fixes B, 2026-09-24).** The common steps are tokens: `ds::SpacingToken`
+(`crates/ds/src/tokens/spacing.rs`) emits `--s-1`, `--s-2`, … `--s-12`, `--s-14`, `--s-16`,
+`--s-18`, `--s-22`, `--s-26`, `--s-36` on `.ds`, each named by its own pixel value, the same in
+both schemes and at every motion level. The lint's Strict profile has `Rule::RawSpacing`: a
+literal `px` in `margin`, `padding` (and their sides and logical forms) or a `gap` is an
+offence in consumer CSS. The odd values stay with their one component each. quire's own
+component sheets still write the literal pixels the sections of 04-COMPONENTS quote; moving
+them to the tokens is a follow-up (FINDINGS "Gallery fixes B").
+
 Measures: reading and writing text is capped at `66ch` (`S:462`, `S:608`, `S:728`); focus-mode
 composer at `70ch` (`S:574`).
 
