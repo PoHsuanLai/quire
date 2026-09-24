@@ -3,13 +3,13 @@
 //! stops (`crate::task`, sill FINDINGS Q45).
 
 use super::presence::Exit;
-use super::roster::{RosterEntry, RosterState, RowPitch};
+use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 use super::settle::settle;
 use crate::components::vocab::{Emphasis, StaggerIndex};
 use crate::root::env::{Env, use_env_signal};
 use crate::task::{Gone, spawn_in, try_get, try_set};
 use crate::time::sleep;
-use dioxus::core::current_scope_id;
+use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use std::time::Instant;
 
@@ -20,6 +20,14 @@ pub struct Roster<K: 'static> {
     env: Signal<Env>,
     scope: ScopeId,
     rest_at: Signal<Option<Instant>>,
+    exits: Signal<Vec<ExitTimer<K>>>,
+}
+
+/// The settle timer of one leaving row, kept so a stay (or a second leave) can cancel it.
+#[derive(Debug, Clone, PartialEq)]
+struct ExitTimer<K> {
+    key: K,
+    task: Task,
 }
 
 impl<K: 'static> Clone for Roster<K> {
@@ -46,14 +54,55 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         let (next, anim) = try_get(self.state)?.leave(&key, exit, emphasis);
         try_set(self.state, next)?;
         let length = settle(anim, self.level()?, StaggerIndex::default());
+        self.cancel_exit(&key)?;
         let roster = *self;
-        spawn_in(self.scope, async move {
+        let settling = key.clone();
+        let task = spawn_in(self.scope, async move {
             sleep(length).await;
-            if roster.update(|state| state.settled(&key)).is_ok() {
+            let _ = roster.forget_exit(&settling);
+            if roster.update(|state| state.settled(&settling)).is_ok() {
                 roster.schedule_rest();
             }
         });
+        let mut exits = try_get(self.exits)?;
+        exits.push(ExitTimer { key, task });
+        try_set(self.exits, exits)
+    }
+
+    /// Take `key`'s exit back while it plays: the row is present again where it was, its
+    /// settle timer is cancelled, and so nothing below it heals (an undo before the row was
+    /// dropped). The consumer lists the key again in the same handler, so the next reconcile
+    /// keeps the row. A row that is not leaving is unchanged; a key the roster no longer holds
+    /// is [`StayError::UnknownKey`] (its exit settled: list it again and it enters).
+    pub fn stay(&self, key: K) -> Result<Stayed, StayError> {
+        let (next, stayed) = try_get(self.state)
+            .map_err(|Gone| StayError::Unmounted)?
+            .stay(&key);
+        try_set(self.state, next).map_err(|Gone| StayError::Unmounted)?;
+        if stayed == Ok(Stayed::Restored) {
+            self.cancel_exit(&key)
+                .map_err(|Gone| StayError::Unmounted)?;
+        }
+        stayed
+    }
+
+    /// Cancel `key`'s pending exit timer, if it has one.
+    fn cancel_exit(&self, key: &K) -> Result<(), Gone> {
+        if let Some(timer) = self.forget_exit(key)? {
+            timer.task.cancel();
+        }
         Ok(())
+    }
+
+    /// Drop `key`'s exit timer from the list, handing it back.
+    fn forget_exit(&self, key: &K) -> Result<Option<ExitTimer<K>>, Gone> {
+        let mut exits = try_get(self.exits)?;
+        let Some(at) = exits.iter().position(|timer| &timer.key == key) else {
+            return Ok(None);
+        };
+        let timer = exits.remove(at);
+        try_set(self.exits, exits)?;
+        Ok(Some(timer))
     }
 
     fn update(&self, step: impl FnOnce(RosterState<K>) -> RosterState<K>) -> Result<(), Gone> {
@@ -104,12 +153,14 @@ pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, pitch: RowPitch)
     let env = use_env_signal();
     let scope = use_hook(current_scope_id);
     let rest_at = use_signal(|| None);
+    let exits = use_signal(Vec::new);
     let state = use_signal(|| RosterState::first_show(&keys, pitch));
     let roster = Roster {
         state,
         env,
         scope,
         rest_at,
+        exits,
     };
     let mut seen = use_hook(|| {
         roster.schedule_rest();
