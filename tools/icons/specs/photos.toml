@@ -1,6 +1,8 @@
-# Photos: a paper frame with its window pressed in; a hill and an off-centre sun raised inside.
+# Photos: a frame with its window pressed in, a hill raised inside and an off-centre sun (the
+# spot; a centred circle over a hill reads as a person).
 name = "photos"
-ground = { start = "red", end = "amber" }
+dialect = "monochrome"
+tint = "clay"
 grain = 20
 
 [[layer]]
@@ -8,29 +10,24 @@ kind = "rect"
 at = [4, 5]
 size = [16, 14]
 corners = [2.5, 2.5, 2.5, 1]
-fill = "paper"
-opacity = 0.92
-relief = "raised"
+fill = "symbol"
 
 [[layer]]
 kind = "rect"
 at = [6, 7]
 size = [12, 10]
 corners = [1.2, 1.2, 1.2, 1.2]
-fill = "ink"
-opacity = 0.08
+fill = "detail"
 relief = "recessed"
 
 [[layer]]
 kind = "polygon"
 points = [[7, 16.2], [10.8, 11.8], [13.6, 14.6], [15.2, 13.2], [17, 16.2]]
 round = 0.6
-fill = "paper"
-relief = "raised"
+fill = "symbol"
 
 [[layer]]
 kind = "circle"
 centre = [15, 9.8]
 radius = 1.6
-fill = "paper"
-relief = "raised"
+fill = "spot"

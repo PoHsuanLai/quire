@@ -138,6 +138,8 @@ per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICO
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
+| `icons.style` | `IconStyle::{Colour,Muted,Monochrome}` | `Colour` (each app in the dialect its icon was designed in) | `Muted` lowers the chroma cap; `Monochrome` draws every icon in one hue, tone on tone, and desaturates and re-tints third-party icons inside our plates to the same hue | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25` | proposed (round four; implementation beyond the key waits for the user's dialect pick) |
+| `icons.monochrome_tint` | `MonochromeTint::{Space,Accent,Neutral}` | `Space` (the accent `ds::space::derive` gives the workspace's Space, so the icons follow the frame) | `Accent` = the card accent; `Neutral` = no hue; read only when `icons.style` is `Monochrome` | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25`; `03-COLOR.md#5-card-accent` | proposed |
 | `icons.plate_inset_percent` | `Percent` | `72` | | `08-ICONS.md#41-plate-mask-rule-settled-rule-proposed-numbers` | proposed |
 | `icons.symbolic_fallback_glyph_percent` | `Percent` | `56` | | `08-ICONS.md#24-object-placement-proposed`; `08-ICONS.md#43-symbolic-fallback-proposed` | proposed |
 | `icons.squircle_detect_iou` | `Fraction` | `900` (0.90) | | `08-ICONS.md#42-icons-that-are-already-squircles-or-rounded-squares-proposed` | proposed |
@@ -754,13 +756,13 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.look`, `appearance.warmth` (only when look=Candy), `appearance.accent`, `appearance.motion_level` |
+| **Appearance** | `appearance.theme`, `appearance.look`, `appearance.warmth` (only when look=Candy), `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.position`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | none of this doc's keys are keyboard shortcuts (those are COSMIC `system_actions`/`custom` shortcut files, PLAN "Design: `<shell>`"); this page is out of `22-SETTINGS`'s scope |
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app), `sound.ui_sounds`, `sound.volume_feedback` |
 | **Spaces** | `spaces.mail_frame_policy`, `spaces.wallpaper_follows_space`; the per-workspace dots/grain/theme/accent editor writes `spaces.json` (state), not these defaults |
-| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*`, `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source` |
+| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source` |
 
 ## 6. Acceptance
 
