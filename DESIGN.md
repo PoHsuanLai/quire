@@ -39,7 +39,8 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `tokens/layer.rs` | 01-LAYOUT §12 |
-| `css/tokens_css.rs`, `accents_css.rs`, `materials_css.rs` | the plan's token model and cascade order |
+| `css/tokens_css.rs`, `accents_css.rs`, `materials_css.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
+| `css/ground_css.rs` | 03-COLOR §4 (the frame inks); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
 | `css/motion_css.rs`, `css/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `css/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
 | `css/reset.css`, `utilities.css`, `stylesheet.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
@@ -49,7 +50,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 
 | Module | Implements |
 | --- | --- |
-| `motion/anim.rs`, `motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 46 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
+| `motion/anim.rs`, `motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 47 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10) and `MenuOut` (13 §13.3.2's close fade), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
 | `motion/settle.rs`, `time.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
 | `motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
 | `motion/pulse.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
@@ -57,16 +58,18 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `motion/hover_intent.rs` | 06-INTERACTIONS §3 |
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 (incl. §4.4 `PopoverRequest`) |
-| `geometry/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds; FINDINGS "W2 integration") |
+| `geometry/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds; FINDINGS "W2 integration"); with none, the read's poll is guarded so a held document is `Busy`, not a panic (FINDINGS "Bar gaps") |
 | `overlay/host.rs`, `stack.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
 | `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
-| `root/ds.rs`, `root/surface.rs`, `root/env.rs` | `Surface` overrides material and, optionally, scheme, accent and blur; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
+| `root/ds.rs`, `root/surface.rs`, `root/env.rs` | `Surface` overrides material and, optionally, scheme, accent, blur and ground; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
+| `root/chrome.rs` | 21-SPACES §3, §5; 03-COLOR §17.1: `RootChrome::{Painted, Transparent}` (a Popover, Sheet or Toast root hosts cards and paints nothing), `FrameTint::{Opaque, Tinted, None}` (the window's loose layers; the bar, dock, popover panel, OSD and widget's `.ds-frame` group at the tint alpha), `Ground::{Paper, Frame}` (the bar and dock draw on the frame); each derived from the material with an override prop (FINDINGS "Bar gaps") |
 | `text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (moved with tests; stroke as attributes) |
 | `icon/geometry_shell.rs` | 08-ICONS §1.6 |
 | `icon/external.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`, `IconUrl` (`data:`/`file:` only) |
-| `error.rs` | CONVENTIONS §5: `DsError`, the crate's one error enum (a refused icon URL) |
+| `icon/classify.rs` | 08-ICONS §1.5 step 2: `classify(png) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
+| `error.rs` | CONVENTIONS §5: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
 | `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 23 `Rule`s: the stylesheet rules (`RawSpacing` the Strict-profile spacing rule), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
@@ -82,7 +85,7 @@ fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s s
 `popover` §21, `hover_card` §22, `toast` §23, `scrim`, `sheet` and
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `account_tile` §27,
 `provider_mark` §28, `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
-`press` (`Press`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
+`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps", "Bar gaps"), `icon_button`'s `Status` variant and `StatusMetrics` (13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35.
 
 `space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
@@ -106,7 +109,7 @@ EventHandler<ActiveDot>`; `SideState::slug`; `Ds` `tint_alpha: Option<Alpha>`, f
 | `ds-settings/src/{settings,units,lenient}.rs` | 22-SETTINGS §3.1-3.3, §4 (`AppearanceFile`, `AppearanceSettings`, `IconsSettings`, the unit newtypes, lenient read) |
 | `ds-settings/src/watch.rs` | 22-SETTINGS §2 "Live reload", §6.3 |
 | `ds-settings/src/{portal,environment,dbus}.rs` | the plan's `ds-settings` design (portal, `use_environment`, `org.quire.Appearance1` stub); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
-| `ds-native` | the plan's `ds-native` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `measure.rs` is the `HostMeasure` the host root and the harness provide |
+| `ds-native` | the plan's `ds-native` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `measure.rs` is the `HostMeasure` the host root and the harness provide, exported as `ds_native::measure::{MEASURE, provide}` for any other Blitz host; `Harness::render_over(Backdrop::Clear)` paints a document's own coverage |
 | `ds-gallery` | the plan's gallery (axes, pages, `--snapshot`) |
 
 The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`, `Settings`,

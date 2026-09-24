@@ -44,9 +44,9 @@ behaviour and numbers.
 | Title / status item hit height | 24, vertically centred | proposed |
 | Title padding | 0 / 10 px; app name ui 13/700, other titles ui 13/500 | proposed (R5 13 pt, A2 menu items 13) |
 | Open-title highlight | pill 24 high, `--r-item`, `--f-pill`, shown while its menu is open; no transition | proposed |
-| Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8 |
+| Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed values (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8. Mechanism settled (bar gaps): ds `IconButton{Status}` reads `--bar-status-box`/`--bar-status-glyph`, written by `ds::StatusMetrics` from the three settings keys |
 | Disabled | opacity .35 | R2 (H) |
-| Material / tint | `Material::Bar` over compositor blur, `--f-*` tokens of the workspace SpaceLook, cross-fade 380 ms | settled (plan Spaces) |
+| Material / tint | `Material::Bar` over compositor blur, `--f-*` tokens of the workspace SpaceLook, cross-fade 380 ms | settled (plan Spaces); drawn by `Ds` (bar gaps: `data-frame="tinted"`, the gradient at the bar's tint alpha, `data-ground="frame"`) |
 
 ### 13.3.2 Menu tracking (bar menus; the same machine drives every ds `Menu`)
 
@@ -54,13 +54,13 @@ behaviour and numbers.
 | --- | --- | --- |
 | Open | on **press** of a bar title or status item | R3 (L) |
 | Release on the originating title | menu stays open (click mode) | R3 |
-| Press-drag-release | while the button is held, items highlight under the pointer; release on an enabled item picks it; release on a separator, header, disabled item or outside after the pointer entered the menu closes without picking | R3 (L) |
+| Press-drag-release | while the button is held, items highlight under the pointer; release on an enabled item picks it; release on a separator, header, disabled item or outside after the pointer entered the menu closes without picking | R3 (L); settled in ds `Menu` (bar gaps: a release after a press that began outside picks; `on_hover` and `on_release` report to an external tracker) |
 | Click toggles | in click mode, a press on the open menu's title closes it | R3 |
-| Hover switch | while any bar menu is open, the pointer entering another bar title or status item opens that menu and closes the current one in the **same frame**, 0 ms delay, no open or close animation | settled delay (R3), animation proposed |
+| Hover switch | while any bar menu is open, the pointer entering another bar title or status item opens that menu and closes the current one in the **same frame**, 0 ms delay, no open or close animation | settled delay (R3); no animation settled in ds `Menu` (`entrance: MenuEntrance::Instant`; the owner removing a menu is immediate) |
 | Outside press | closes (xdg_popup `popup_done`); the press is not delivered to the other client | proposed (compositor grab semantics) |
-| Pick | the menu closes, then the action runs (A6 "Click .it closes then picks") | settled (design) |
+| Pick | the menu closes, then the action runs (A6 "Click .it closes then picks") | settled (design); ds `Menu` calls `onpick` then `onclose` in the same handler, so both land before the next frame (bar gaps, sill Q11) |
 | First open animation | `menu-pop --t-move --e-spring` (A5: y -4, s .97, fade -> 0) | settled for ds menus (A5) |
-| Close animation | `fade` over `--t-quick` with `--e-exit` | proposed (R3 "fade on close") |
+| Close animation | `fade` over `--t-quick` with `--e-exit` | settled for Escape and outside click (bar gaps: `Anim::MenuOut`, `data-presence="leaving"`, `onclose` after it settles) |
 | Highlight | selected item background `--accent-soft` (A3), no transition, follows the pointer and the keyboard | settled (design colour), timing proposed |
 | Keyboard | Up/Down move with **wrap** (A6); Left/Right switch to the adjacent bar menu or close/open a submenu; Enter, Space or Tab pick; Esc closes one level; typing filters (A6) | settled (A6) |
 | Position (bar menus) | design `placeFloat`: `x = title.left - 8`, `y = title.bottom + 6`; flip and clamp 8 px from output edges; status menus right-aligned to `item.right + 8` | settled (A6) |
@@ -81,6 +81,7 @@ behaviour and numbers.
 | Checkmark | 14 px accent check in the 22 px column (A4 "checked = 14 accent check") | settled |
 | Separator | 1 px `--line-soft`, 4 px margin above and below (9 px row) | proposed |
 | Section header | data 9.5, .14em, upper (A4 `.g`), 22 px row, not selectable | settled style, height proposed |
+| Status line | an item's row (padding 6 / 8), title ui 13 / 600 `--ink`, detail 11.5 `--ink-faint`, no eyebrow, not selectable, skipped by keys | settled (bar gaps: `MenuEntry::Info`), sizes proposed |
 | Disabled item | opacity .35, not selectable, skipped by arrow keys | R2 (H); settled in ds `Menu` (`MenuEntry::Item { availability }`, tray gaps Q7) |
 | Rich menus | `Menu{Rich}` keeps the design's 34 px tile rows (A4 `.fmenu .it`) | settled |
 

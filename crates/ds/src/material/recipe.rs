@@ -20,7 +20,7 @@ pub(crate) const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
 
 /// The solid fallback's alpha when blur is unavailable (section 17.1, settled: "alpha at least
 /// 0.94"). The key does not move it: it is the floor that keeps text legible on any backdrop.
-const SOLID_ALPHA: Alpha = Alpha(940);
+pub(crate) const SOLID_ALPHA: Alpha = Alpha(940);
 
 /// The five `--m-*` values one material paints in one scheme, as CSS values.
 #[derive(Debug, Clone, PartialEq, Eq)]

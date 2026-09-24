@@ -8,8 +8,9 @@ use super::rule::{Offence, Rule};
 use super::text::render;
 use super::tokenize::Located;
 
-/// The seven attributes a `.ds` root carries that a consumer must never select on
-/// (design/22-SETTINGS.md, CONVENTIONS §11, design/04-COMPONENTS.md "Shared vocabulary").
+/// The ten attributes a `.ds` root carries that a consumer must never select on
+/// (design/22-SETTINGS.md, CONVENTIONS §11, design/04-COMPONENTS.md "Shared vocabulary"): the
+/// scope's, and the root chrome's `data-chrome`, `data-frame` and `data-ground` (bar gaps).
 const INTERNAL_ATTRS: &[&str] = &[
     "data-theme",
     "data-accent",
@@ -18,6 +19,9 @@ const INTERNAL_ATTRS: &[&str] = &[
     "data-blur",
     "data-modality",
     "data-hover",
+    "data-chrome",
+    "data-frame",
+    "data-ground",
 ];
 
 /// SVG element types whose paint never reaches a stylesheet rule (FINDINGS spike S6).

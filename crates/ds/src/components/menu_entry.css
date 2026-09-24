@@ -46,3 +46,9 @@
 .ds-menu-chevron .ds-ic{ color:var(--ink-faint); }
 .ds-menu-item[*|aria-expanded=true]{ background:var(--accent-soft); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
+
+/* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no hover,
+   no selection and the arrow keys pass it. */
+.ds-menu-info{ display:flex; flex-direction:column; padding:var(--s-6) var(--s-8); cursor:default; }
+.ds-menu-info-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); }
+.ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }

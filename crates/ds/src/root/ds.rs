@@ -1,8 +1,16 @@
 //! The root: `div.ds` carrying `data-theme`, `data-accent`, `data-motion`, `data-material`,
 //! `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
-//! inline; then the stylesheet (when inlined), the frame layers and grain on a Window, the
-//! children, the overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`,
-//! `LayerStack` and `Overlays` as context.
+//! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
+//! overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`, `LayerStack`
+//! and `Overlays` as context.
+//!
+//! What the root paints follows its material (`chrome.rs`): a Window draws the Space gradient
+//! opaque with its A/B layers and grain; the bar, the dock, a popover panel, the OSD and a
+//! widget draw the same layers and grain as one group at the material's tint alpha
+//! (`data-frame="tinted"`, design/21-SPACES.md sections 3 and 5); a Popover, Sheet or Toast root
+//! paints nothing on its own box (`data-chrome="transparent"`) and its cards paint the material;
+//! the bar and the dock stamp `data-ground="frame"` so the components on them take the `--f-*`
+//! inks.
 //!
 //! The root also writes `--m-tint-alpha` inline: the materials' tint over blur scales by the
 //! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
@@ -10,6 +18,7 @@
 //! is .8), which `ds_settings::Environment::tint_alpha` converts from the settings file; without
 //! one the root writes the key's default.
 
+use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
@@ -43,8 +52,14 @@ pub fn Ds(
     #[props(default)] blur: BlurState,
     #[props(default)] stylesheet: Inject,
     #[props(default)] tint_alpha: Option<Alpha>,
+    #[props(default)] chrome: Option<RootChrome>,
+    #[props(default)] ground: Option<Ground>,
+    #[props(default)] frame: Option<FrameTint>,
     children: Element,
 ) -> Element {
+    let chrome = chrome.unwrap_or(RootChrome::of(material));
+    let frame_tint = frame.unwrap_or(FrameTint::of(material, chrome));
+    let ground = ground.unwrap_or(Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
     let host = use_hook(try_consume_context::<HostModality>);
     let modality = host.map_or(InputModality::default(), |HostModality(current)| current());
@@ -77,25 +92,39 @@ pub fn Ds(
             "data-blur": blur.slug(),
             "data-modality": modality.slug(),
             "data-hover": hover,
+            "data-chrome": chrome.attribute(),
+            "data-frame": frame_tint.attribute(),
+            "data-ground": ground.attribute(),
             style,
             if stylesheet == Inject::Inline {
                 style { {crate::css::stylesheet()} }
             }
-            if material == Material::Window {
-                for (slot , data_layer , gradient) in layers {
-                    div {
-                        key: "{slot}",
-                        class: "ds-layer",
-                        "data-layer": data_layer,
-                        style: "--f-grad:{gradient}",
-                    }
-                }
-                div { class: "ds-grain" }
+            match frame_tint {
+                FrameTint::Opaque => frame_layers(layers),
+                FrameTint::Tinted => rsx! {
+                    div { class: "ds-frame", {frame_layers(layers)} }
+                },
+                FrameTint::None => rsx! {},
             }
             {children}
             OverlayHost {}
             ToastHost {}
         }
+    }
+}
+
+/// The two gradient layers and the grain over them.
+fn frame_layers(layers: [(&'static str, Option<&'static str>, String); 2]) -> Element {
+    rsx! {
+        for (slot , data_layer , gradient) in layers {
+            div {
+                key: "{slot}",
+                class: "ds-layer",
+                "data-layer": data_layer,
+                style: "--f-grad:{gradient}",
+            }
+        }
+        div { class: "ds-grain" }
     }
 }
 

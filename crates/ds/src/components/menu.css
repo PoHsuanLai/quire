@@ -22,3 +22,9 @@
 /* A submenu (design/13 section 13.3.4): beside its parent row, opened with no animation (only
    the first menu of a session pops). */
 .ds-popover.ds-menu[*|data-depth]{ animation:none; }
+
+/* A bar menu opens at once (design/13 section 13.3.2), and a menu closed by Escape or an outside
+   click fades out before it goes (`menu-out`, `--t-quick --e-exit`), taking no pointer while it
+   does. */
+.ds-popover.ds-menu[*|data-entrance=instant]{ animation:none; }
+.ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }

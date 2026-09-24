@@ -13,7 +13,7 @@ pub mod harness;
 mod headless;
 mod host;
 pub mod launch;
-mod measure;
+pub mod measure;
 mod net;
 mod runtime;
 mod scheme;
@@ -23,6 +23,7 @@ mod wake;
 pub use error::NativeError;
 pub use fonts::{font_context, register_fonts};
 pub use harness::Harness;
+pub use headless::Backdrop;
 pub use launch::{AppConfig, launch};
 pub use snapshot::{Viewport, snapshot, snapshot_at};
 

@@ -63,7 +63,7 @@ fn marked<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Line<'a, T>> {
                 MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
                     fuzzy(query, title).map(|hit| hit.marks).unwrap_or_default()
                 }
-                MenuEntry::Header(_) | MenuEntry::Separator => Vec::new(),
+                MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => Vec::new(),
             },
         })
         .collect()
@@ -146,6 +146,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                     }
                 }),
                 onmounted: EventHandler::new(|(_, _): (usize, MountedEvent)| {}),
+                onrelease: None,
             },
         )
     };

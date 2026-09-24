@@ -1,7 +1,9 @@
 //! Press: what a Button or IconButton hands its `onclick`: which pointer button activated it,
-//! and the modifiers held (sill FINDINGS F32, quire gap Q8). A tray icon's right-click has to
-//! reach the app as a secondary press, and its middle click as a middle one.
+//! the modifiers held and where it happened (sill FINDINGS F32, quire gaps Q8 and bar gaps). A
+//! tray icon's right-click has to reach the app as a secondary press, its middle click as a
+//! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 
+use crate::geometry::{Point, Px};
 use dioxus::core::SuperFrom;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
@@ -17,21 +19,40 @@ pub enum PointerButton {
     Middle,
 }
 
-/// One activation of a control.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// One activation of a control. `PartialEq` without `Eq`: the point is fractional pixels.
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Press {
     /// Which button.
     pub button: PointerButton,
     /// The modifiers held when it happened.
     pub modifiers: Modifiers,
+    /// Where, in the surface's own coordinates (the event's client point: on a shell surface,
+    /// surface-local logical pixels). A keyboard activation reports the point its event
+    /// carries, which on Blitz is the origin.
+    pub at: Point,
 }
 
 impl Press {
-    /// A primary press with no modifiers: what a keyboard activation or a test reports.
+    /// A primary press with no modifiers at the origin: what a keyboard activation or a test
+    /// reports.
     pub fn primary() -> Self {
         Press {
             button: PointerButton::Primary,
             modifiers: Modifiers::empty(),
+            at: Point::default(),
+        }
+    }
+
+    /// The press a mouse event describes, as `button`.
+    pub(crate) fn of(event: &MouseEvent, button: PointerButton) -> Self {
+        let at = event.client_coordinates();
+        Press {
+            button,
+            modifiers: event.modifiers(),
+            at: Point {
+                x: Px(at.x as f32),
+                y: Px(at.y as f32),
+            },
         }
     }
 }
@@ -65,29 +86,20 @@ impl PressListeners {
     /// A `click`: primary, or whatever button the event names.
     pub(crate) fn click(&self, event: &MouseEvent) {
         if let Some(button) = button_of(event.trigger_button()) {
-            self.press.call(Press {
-                button,
-                modifiers: event.modifiers(),
-            });
+            self.press.call(Press::of(event, button));
         }
     }
 
     /// A `contextmenu`: a secondary press. The page's own menu is the app's to open.
     pub(crate) fn context_menu(&self, event: &MouseEvent) {
         event.prevent_default();
-        self.press.call(Press {
-            button: PointerButton::Secondary,
-            modifiers: event.modifiers(),
-        });
+        self.press.call(Press::of(event, PointerButton::Secondary));
     }
 
     /// A `mouseup`: only the middle button counts (the primary one arrives as `click`).
     pub(crate) fn mouse_up(&self, event: &MouseEvent) {
         if event.trigger_button() == Some(MouseButton::Auxiliary) {
-            self.press.call(Press {
-                button: PointerButton::Middle,
-                modifiers: event.modifiers(),
-            });
+            self.press.call(Press::of(event, PointerButton::Middle));
         }
     }
 }

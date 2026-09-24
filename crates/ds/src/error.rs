@@ -19,4 +19,10 @@ pub enum DsError {
         /// The path as given.
         path: PathBuf,
     },
+    /// An external icon's bytes are not a PNG the classifier can read.
+    #[error("an icon's bytes are not a readable PNG: {reason}")]
+    IconDecode {
+        /// What the decoder said.
+        reason: String,
+    },
 }

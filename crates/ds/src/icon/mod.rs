@@ -16,6 +16,7 @@
 //! No serde: an icon is never stored, and a derive would make it a persisted schema
 //! (`CONVENTIONS.md` section 3).
 
+pub mod classify;
 pub mod external;
 mod geometry;
 mod geometry_shell;
@@ -24,6 +25,7 @@ pub mod shape;
 #[cfg(test)]
 mod tests;
 
+pub use classify::{ChromaLimit, IconKind, classify, classify_with};
 pub use external::{ExternalIcon, IconSource, IconUrl};
 use geometry::*;
 pub use shape::Shape;
@@ -106,6 +108,8 @@ pub enum Icon {
     WifiHigh,
     /// Lucide `wifi-off`.
     WifiOff,
+    /// Lucide `ethernet-port`: a wired network.
+    Ethernet,
     /// Lucide `battery`.
     Battery,
     /// Lucide `battery-low`.
@@ -240,6 +244,7 @@ impl Icon {
         Icon::WifiLow,
         Icon::WifiHigh,
         Icon::WifiOff,
+        Icon::Ethernet,
         Icon::Battery,
         Icon::BatteryLow,
         Icon::BatteryMedium,
@@ -324,6 +329,7 @@ impl Icon {
         Icon::WifiLow,
         Icon::WifiHigh,
         Icon::WifiOff,
+        Icon::Ethernet,
         Icon::Battery,
         Icon::BatteryLow,
         Icon::BatteryMedium,
