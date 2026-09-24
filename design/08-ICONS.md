@@ -295,6 +295,36 @@ For the bar, tray and any place that shows the app in one colour:
   freedesktop symbolic convention, so GTK/Qt recolour it too).
 - Inside quire it is never loaded from disk: the shell uses the `Icon` variant directly.
 
+### 2.8 The language: abstract, paper and ink (proposed, round two, 2026-09-24)
+
+Round one (docs/icons-bakeoff.md) produced 3D clay objects in front of a plate. The user's
+verdict: "too realistic, I want it to be more abstract, and try to make it speak our design
+language." What the language says, applied to an app icon:
+
+| Principle (00, 07) | On the plate |
+| --- | --- |
+| Paper and ink (07 3, Post) | The object is paper cut-outs laid on the plate: Post `--surface` `#F8F9F6` as paper, Post `--ink` `#1A1E1A` as ink. |
+| One weight (00 3, C:1121) | Every line is one stroke: 2 units of the 24 glyph grid laid over the plate, round caps and joins. No hairlines, no second weight. |
+| Colour is a claim (00 3) | Four colours besides the plate: the family's `deep` and `soft` (or `base` on paper), paper, ink. No other hue. |
+| The cuteness is in the corner radius (C:1162) | Paper shapes take Post's card corner, `12 12 12 4` read as `3 3 3 1` (or `2.5 2.5 2.5 1`) grid units, so the small bottom-left corner recurs across the set. |
+| Grain (03 8) | The plate carries the frame's grain tile (Park-Miller seed 7, overlay, `grain / 100 x 0.20`) from 48 px up; cut-outs sit above it, like content over the frame. |
+| No illustration (C:968) | No lighting, no perspective, no gloss, no scene. One idea per icon, two to four shapes. |
+
+Cut-outs may carry a lift: Post `--shadow-1`'s drop (`0 1px 2px`) read in the grid at the 48 px
+dock size, 0.5 unit down and 1 unit soft, ink at alpha .16 (alpha proposed). The plate itself
+keeps 2.3-2.5 unchanged (gradient, highlight, rim, baked shadow).
+
+Two routes produce icons in this language; the user picks (docs/icons-bakeoff.md, round two):
+
+- **Procedural** (`tools/icons abstract`): an icon is a TOML spec in `tools/icons/specs/`: the
+  family, the grain and a list of layers from a five-shape vocabulary: `rect` (per-corner radii),
+  `circle`, `chevron`, `bar` (a round-capped stroke), `fold` (a turned-down corner) plus a
+  general `polygon` (rounded by `round`). Each layer has an optional `fill` and `stroke` from
+  `base | deep | soft | paper | ink` and `lift = "flat" | "lifted"`. Every export size is drawn
+  natively from the shapes (analytic anti-aliasing of signed distances), not downscaled, so
+  16 px edges stay crisp. Deterministic; no model.
+- **Generated** (3.3's round-two brief): the same language asked of the models, then 3.7.
+
 ## 3. Generation pipeline
 
 Settled route: LOCAL FIRST (PLAN "Icons", "Route").
@@ -317,33 +347,51 @@ Settled route: LOCAL FIRST (PLAN "Icons", "Route").
 | 2 | FLUX.2 Klein | 4B, ~13 GB VRAM, 4-step | fast iterations | FLUX.2 Klein licence (record exact terms, section 5) |
 | 3 | HiDream-O1-Image | | only if 1 or 2 disappoints | MIT |
 
-### 3.3 Style brief (settled rules, proposed text)
+### 3.3 Style brief (settled rules, proposed text; rewritten in round two)
 
 Written once, used verbatim for every icon; only `{subject}` and `{palette}` change.
 Never say "iOS", "macOS", "Apple", "app icon" or "icon" in the prompt (settled).
 
-Positive prompt (proposed):
+Round one's brief (a 3D clay object under studio light, `tools/icongen/icongen/brief.py`
+`BRIEF`, style `3d`) is kept only to reproduce round one. The brief below replaces it (2.8).
+
+Positive prompt (proposed, `FLAT_BRIEF`, style `flat`):
 
 ```
-A single {subject}, one object only, centred, seen from a slight three-quarter front angle,
-filling most of the frame with even space around it. Clean, simple, friendly shapes with
-softly rounded edges, smooth matte and lightly glossy materials, no fine texture.
-Soft diffuse studio light from the top left, one gentle contact shadow under the object.
-Colours: {palette}, with white and warm off-white accents.
-Plain flat light grey background, no floor line, no horizon.
-No text, no letters, no numbers, no logo, no frame, no border, no badge, no rounded square
-behind the object, no outline stroke, no people, no hands.
+A flat abstract geometric emblem: {subject}. Built from a few simple paper cut-out layers with
+crisp clean edges, like shapes cut from coloured card and laid flat on top of each other. Only
+four flat colours: {palette}, paper white, and near-black ink. Thick uniform lines with round
+caps and rounded joins, one line weight everywhere. Completely flat solid fills, no lighting,
+no shading, no gradients, no shadows, no highlights, no gloss, no texture, no depth, no
+perspective, straight-on front view. Centred, compact, with generous empty space around it.
+Plain flat solid mid grey background. No text, no letters, no numbers, no logo, no frame, no
+border, no rounded square behind it, no people, no hands.
 ```
 
-`{palette}` per family (proposed): red "tomato red and deep brick red"; amber "warm amber
-and honey"; green "fresh leaf green and deep forest green"; blue "bright cobalt blue and
-deep ultramarine"; violet "soft violet and deep indigo-violet". The object's palette
-contrasts with its plate: the object uses the plate family's soft and white, or a
-neighbouring family (proposed; decided per icon at review).
+The ground is mid grey, not light grey: paper white and ink both key cleanly against it (round
+one's light ground ate white rims, 3.7).
 
-Negative prompt (models that take one; proposed): `text, watermark, signature, frame,
-border, rounded square, app tile, background pattern, photograph, realistic skin, busy
-detail, multiple objects, cropped object`.
+`{palette}` is the plate family's own two tones in words and hex (the object shares its plate's
+family; round one's neighbouring-family palette is dropped): red "tomato red (#E8483C) and deep
+brick red (#B7352B)"; amber "warm amber (#F0A81E) and deep ochre brown (#8E5A05)"; green "leaf
+green (#28B24A) and deep forest green (#1A7A33)"; blue "cobalt blue (#2B7CFF) and deep
+ultramarine (#0B5FE0)"; violet "soft violet (#8B5CF0) and deep indigo-violet (#6B3FCC)".
+
+`{subject}` describes an arrangement of shapes, not an object: Mail "a paper white rectangle
+with a folded triangular flap across its top, like a closed envelope reduced to two shapes";
+Files "two paper folder shapes with rounded tabs, offset one behind the other"; Terminal "a
+prompt chevron and a cursor block: an ink right-pointing chevron like a greater-than sign, then
+a solid paper white bar, side by side on one line"; Notes "a square paper sheet with one lifted,
+folded-over corner and three short lines"; Photos "a circle sun above a gentle hill shape inside
+a rounded frame".
+
+Style-trigger variant (style `flat-trigger`): the same brief prefixed with "Flat vector
+illustration, minimalist, Swiss graphic design style."
+
+Negative prompt (models that take one; proposed): `3D render, realistic, photo, glossy,
+shading, bevel, depth of field, gradient, shadow, perspective, texture, text, letters,
+watermark, frame, border, rounded square, app tile, busy detail, multiple objects, cropped`.
+FLUX.2 Klein (distilled, cfg 1) takes no negative prompt; it applies to Qwen-Image only.
 
 Fixed parameters per model are recorded in the recipe (3.8), not in prose.
 

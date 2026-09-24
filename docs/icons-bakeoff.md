@@ -130,3 +130,115 @@ problems as much as model ones.
   on a flat ground) for Qwen-Image-Edit; and a Klein reference pass with a weaker reference
   (the hero at lower resolution or as the second of two references).
 - Speed LoRAs (Qwen Lightning 4/8-step): not used, so the Qwen timings are the plain model's.
+
+## Round two: abstract, in our language (2026-09-24)
+
+The user on round one: "too realistic, I want it to be more abstract, and try to make it speak
+our design language." Two directions were built side by side; **the user picks**. The language
+as it applies to an app icon is written down in design/08-ICONS.md 2.8 (paper cut-outs, one
+stroke weight with round caps, four colours, Post's `12 12 12 4` corner, the frame grain), and
+08 3.3's brief is rewritten for it.
+
+### Sheets (`tools/progress/shots/icons/`)
+
+| Sheet | Direction | What it shows |
+| --- | --- | --- |
+| `abstract-plated.png` | B, procedural | the five specs, each at 512, 48, 32 and 16 px 1:1, on the light (`#F1F3EE`) and dark (`#1D211B`) ground; every size drawn natively from the shapes |
+| `qwen2-plated.png` | A, generated | Qwen-Image-2512, round-two brief, 5 subjects x 4 seeds, plated by `tools/icons` (256 px tile of the master, 16/32/48 strip on both grounds under each) |
+| `klein2-plated.png` | A, generated | FLUX.2 Klein 4B, same brief and layout |
+| `klein2-trigger-plated.png` | A, variation | Klein with the flat-illustration trigger in front of the brief, 4 seeds |
+| `qwen2-trigger-plated.png` | A, variation | Qwen with the trigger, seeds 11 and 22 only (time) |
+
+Rebuild: B is `target/release/icons abstract --spec tools/icons/specs/*.toml --out-dir <dir>
+--sheet <png>` (about 3 s for all five, every export size and the sheet). A is
+`uv run icongen bakeoff --model <m> --style flat|flat-trigger --out ~/comfy/out/round2/<m>`
+then `tools/icons/bakeoff.sh <name> <raw> <plated> <sheets>`. Renders stay in
+`~/comfy/out/round2/`, not in git.
+
+### What ran
+
+- Brief: 08 3.3's round-two text, verbatim in `tools/icongen/icongen/brief.py` (`FLAT_BRIEF`,
+  `FLAT_NEGATIVE`, `FLAT_TRIGGER`, `FLAT_WORDS`). The object now uses its own plate family's
+  two tones (words and hex) plus paper white and ink; the ground is mid grey so white and ink
+  both key. Klein ignores the negative prompt (distilled, cfg 1); Qwen gets it.
+- Terminal wording: first "a prompt chevron and a cursor block, side by side, inside a rounded
+  dark rectangle"; Klein drew down-pointing double chevrons and a hand cursor. Rewritten to "a
+  prompt chevron and a cursor block: an ink right-pointing chevron like a greater-than sign,
+  then a solid paper white bar, side by side on one line" and re-run; the sheets show only the
+  rewritten wording.
+- Settings as round one (Klein Q4_K_M, 4 steps; Qwen-Image-2512 Q3_K_M, 20 steps, cfg 2.5),
+  1024 px, seeds 11 22 33 44. Timings on the free card: Klein 3.0 s warm (8.0 s cold), peak
+  11.1 GB; Qwen 67-78 s (median 70), peak 15.0 GB. 24 Klein + 20 Qwen + 10 Qwen trigger renders.
+- Plating unchanged from round one (`tools/icons plate`): the key handled the mid-grey ground
+  cleanly for every render; no white-rim losses this time.
+- B: `tools/icons abstract` plus five specs in `tools/icons/specs/`, written by hand (mail: a
+  deep-blue flap on a paper rectangle; files: a soft back folder and a paper front folder with
+  an ink label bar; terminal: an ink chevron and a paper cursor block on the bare plate; notes:
+  a paper sheet with a turned-down corner and two ink lines; photos: a paper frame with a deep
+  hill and a base-red circle).
+
+### Comparison (the agent's reading)
+
+**Readability at 16/32/48.**
+- *Procedural*: all five read at 48 and 32; at 16 mail, terminal and photos are still clear,
+  files and notes read as "a paper thing with a line" (the label bar and the fold survive, the
+  back folder is a tint). Edges stay crisp at 16 because each size is drawn from the shapes, not
+  downscaled. It is also the smallest object on the plate (about 67 % against the generated
+  sets' 72 % fit), which costs a little at 16 and buys the "generous negative space".
+- *Qwen*: mail, files and terminal read at every size; its terminal is the first model terminal
+  that is a terminal (a big `>` and a bar, all four seeds). Notes fails: every seed is an
+  all-green sheet on the green plate, no paper and no lines, so at 16 it is a green square.
+  Photos reads at 48, blurs to a red frame at 16.
+- *Klein*: mail and photos read at every size; photos at 16 reads as a person (a circle over
+  a hump), a real misreading risk. Files is two brown slabs (no tabs in three seeds), terminal
+  has a violet chevron on a violet plate (two seeds drew a diamond), notes is a white square
+  with a green corner that at 16 is only a white square.
+
+**Coherence across the five.**
+- *Procedural*: coherent by construction: one stroke, one corner family, one lift, the same
+  four colours and the same scale in every icon. Nothing varies that was not written down.
+- *Klein*: a consistent sticker style (black outline on every shape), but that outline is a
+  second weight next to our 2-unit stroke and is not in the language. Seeds vary a lot in what
+  they draw.
+- *Qwen*: the least coherent of the three this round: mail and terminal are flat, files is
+  classic folder clip art, and several seeds reintroduce depth the brief forbade (extruded
+  envelope edges, bevelled chevrons, offset drop shadows on notes, grey ground left inside the
+  photo frames).
+
+**How much each speaks the language.**
+- *Procedural*: the most: paper is Post `--surface`, ink is Post `--ink`, the stroke is the
+  glyph stroke with round caps, the corners are the card's, the grain is the frame's tile, and
+  colour appears only as the plate family. It looks like the shell's own glyphs grown up.
+- *Generated*: both moved decisively away from round one (no clay, no studio light), and Klein's
+  mail and photos are close in spirit. But neither keeps the rules the language is made of:
+  outlines at their own weight, hues outside the four, square caps and sharp corners, and
+  (Qwen) creeping 3D. The flat-illustration trigger changed little on Klein (cleaner mail folds,
+  slightly better chevrons, no gain on files or notes). On Qwen it fixed notes (both seeds now
+  draw a white paper sheet with a turned corner instead of a green one) but kept the offset
+  drop shadows and the grey ground inside the photo frames.
+
+**Effort per new icon.**
+- *Procedural*: writing a 20-40 line TOML spec and looking at the sheet; about 10-20 minutes by
+  hand per icon, a few seconds to render, fully reproducible, reviewable as text in a diff.
+  The cost is taste: someone has to design each icon's arrangement, and the vocabulary (five
+  shapes plus polygon) limits how illustrative an icon can get; that limit is the language's
+  own ("nothing here is an illustration").
+- *Generated*: 20 renders per subject (1 min on Klein, 25 min on Qwen), then a human picks
+  one and usually still wants a colour or shape fixed, which cannot be done by editing the
+  result; the next icon may not match the last (08 3.6's reference pass over-copied in round
+  one). A LoRA (08 3.9) could lock the style, at the cost of a training run and ~8 approved icons
+  first.
+
+**Summary for the choice.** The procedural route is the only one that follows the language
+rule for rule, is coherent without effort, and keeps its 16 px exports crisp; its limit is that
+each icon is designed by hand from a small vocabulary. The generated route now produces flat
+icons, and Klein's mail and photos are usable ideas, but neither model holds the stroke, corner
+and colour rules, and each set would need a picking pass plus fixes. A plausible middle: use
+the models as sketchpads for arrangements, then write the chosen arrangement as a spec.
+
+### Not run
+
+- HiDream-O1-Image, a Klein LoRA, and a second reference pass: out of scope for this round.
+- Qwen with the trigger on seeds 33 and 44 (time: 70 s per render).
+- A per-size hinting pass for the procedural 16 px (snapping strokes to whole pixels); the
+  analytic anti-aliasing is used as is.
