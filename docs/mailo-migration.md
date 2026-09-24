@@ -71,6 +71,23 @@ is deleted, not ported.
 - **The runtime.** `ds_native::launch` and `ds_native::Harness` each enter a process-wide
   Tokio runtime for their whole life, so `ds_settings::use_environment` works under both with
   nothing entered by mailo. `CONSUMING.md#3-reading-appearance`.
+- **The window frame paints (mailo gaps, 2026-09-24).** A `Material::Window` root stamps
+  `data-frame="opaque"` and is its own stacking context, so its two gradient layers and grain
+  paint over its own background: a `look` change cross-fades over `--t-scene` and the Space's
+  grain shows. Before, both painted beneath the root and a switch was an instant swap. Nothing to
+  change in mailo; a pixel test that assumed a flat window ground now sees the grain (give it
+  `Grain(0)`). FINDINGS `#mailo-gaps-2026-09-24` item 1.
+- **Status inks.** `--ok-ink`, `--warn-ink` and `--danger-ink` are the text on `--ok`, `--warn`
+  and `--danger`, each at least 4.5:1 in both schemes (dark `--danger-ink` is now `#1A0B08`,
+  mailo's own value). Use them instead of a white or a hex of your own.
+- **Person colours.** `ds::person_hue(address) -> ds::PersonHue` is design/03's person hash
+  (`h = (h x 31 + code) mod 360`, `hsl(h, 38%, 42%)`): paint it with
+  `AvatarTone::Person(hue)`, or take `hue.colour()` where a component wants a `Colour`. The eight
+  stored-colour swatches are `ds::PersonSwatch` (`--c-person-1..8`, mailo's `AVATAR` order;
+  `PersonSwatch::nth(i)` wraps, `.colour()`/`.var()`). mailo deletes `space::AVATAR` and
+  `compose/items.rs::hue`. `CONSUMING.md#person-colours`.
+- **Action glyphs.** `Icon::Printer` and `Icon::FolderInput` (Lucide `printer`, `folder-input`,
+  `Icon::ACTIONS`).
 - **A Blitz click caveat.** A `Button` whose parent holds only inline content is not hit on
   Blitz (the parent is); every quire container is a flex row, so wrap a lone button in one.
   `CONSUMING.md#8-what-blitz-cannot-do-and-what-to-use-instead`; FINDINGS
@@ -133,7 +150,7 @@ pub struct Space {
     pub dots: Vec<Dot>,              // MOVES — ds::SpaceLook::dots (ds::Dot, moved earlier, same shape)
     pub grain: u8,                   // MOVES — ds::SpaceLook::grain (ds::Grain, a newtype over the same u8)
     pub theme: Theme,                // MOVES — ds::SpaceLook::theme (ds::Theme, same three variants)
-    pub motion: Motion,              // STAYS — see the gap below; SpaceLook has no motion field
+    pub motion: Motion,              // STAYS — motion is global in quire (design/21 section 1); see below
     pub card_accent: CardAccent,     // MOVES — ds::SpaceLook::card_accent (ds::CardAccent; mailo's
                                       //   `Hint` is ds's `SpaceHue`, `Postmark` is unchanged — rename
                                       //   the variant at every call site, `CardAccent::Hint` no longer exists)
@@ -143,24 +160,22 @@ pub struct Space {
 }
 ```
 
-**A real gap, not a rename: `ds::SpaceLook` has no `motion` field**
-(`crates/ds/src/space/look.rs`) — only `dots`, `grain`, `theme`, `card_accent`. mailo's
-per-Space `motion: Motion` (Calm/Standard/Extra, independent of the window's own appearance
-motion) has nowhere to go in quire's API. `ds::resolve(appearance, look_theme, system)` takes a
-`Theme` from the Space (the `look_theme` parameter) but has no matching parameter for a
-per-Space motion override — the resolved `MotionLevel` comes from `Appearance.motion` and
-`SystemPrefs` alone. **Do not work around this** (`ORCHESTRATION.md`: a missing capability is
-added to quire first, stop and report): keep `Space::motion` in mailo's own struct exactly as it
-is today, thread it into `Ds`'s `appearance.motion` field yourself at the call site (mailo
-already resolves "this Space's effective Appearance" somewhere — do the override there, not
-inside quire), and report this gap back (it is also recorded in this repository's
-`CONSUMING.md` section 9 is reserved for gaps `examples/consumer` hit; this is the mailo-side
-counterpart, found by this brief's author while reading `space.rs`, not by running mailo's own
-code — confirm it still reproduces before reporting further).
+**Not a gap: `ds::SpaceLook` has no `motion` field, by design.** design/21-SPACES.md section 1
+keeps motion global: a Space is a look (`dots`, `grain`, `theme`, `card_accent`), and how much
+the window moves is part of the `Appearance` (`ds::Appearance.motion`, resolved with
+`SystemPrefs` into the root's `data-motion`), not of any Space. quire will not grow a per-Space
+motion field. mailo's per-Space `motion: Motion` (Calm/Standard/Extra) is therefore mailo's own
+preference and stays in mailo's `Space` struct exactly as it is. If mailo wants the window's
+motion to follow the Space, it passes that Space's motion into the root itself: where it builds
+the `ds::Appearance` it hands to `Ds`, it sets `appearance.motion` from the current Space's
+motion (`Calm -> ds::Motion::Calm`, `Standard -> Standard`, `Extra -> Extra`) instead of the
+stored appearance's. Everything under the root then follows through `use_env`/`data-motion`.
+A Space switch that changes the motion re-renders the root with the new level; the cross-fade
+itself runs at the level the root had when it started. (FINDINGS "mailo gaps", item 6.)
 
 `crates/mail-app/src/view.rs` lines 149-389 (`Theme`, `Motion` — wait, **not** `Motion`: mailo's
-own three-variant `Motion` has no `System` option and stays for `Space::motion` per the gap
-above; only `Theme`, `Marks`, `Appearance`, `Peek` actually move) map onto `ds` types one for
+own three-variant `Motion` has no `System` option and stays for `Space::motion` per the
+paragraph above; only `Theme`, `Marks`, `Appearance`, `Peek` actually move) map onto `ds` types one for
 one, with two differences to fix at every call site, not paper over:
 
 - `ds::Motion` has five variants (`System`, `Calm`, `Standard`, `Extra`, `Reduced`) where
@@ -191,14 +206,19 @@ reads `dir/appearance.toml` if it exists, else reads `legacy_json` (mailo's
 field any more (section 3 above), the import gives every migrated user `Accent::Postmark`,
 which is correct — there is nothing to carry over.
 
-`ds_settings::environment::load_initial` (private, but its logic is what `use_environment`
-calls) is mailo-aware by construction: `AppName::MAILO` is a named constant
-(`crates/ds-settings/src/dirs.rs`) specifically so mailo's own migration does not need a special
-case — `ds_settings::use_environment(AppName::MAILO)` imports mailo's JSON on first run and
-watches `appearance.toml` from then on. Phase A wires this in directly (mailo is still on the
-webview, where `use_environment`'s Tokio requirement is already satisfied by `dioxus-desktop`);
-Phase B does **not** need to change this call at all, only the window it runs inside of, since
-`ds_native::launch` enters its own runtime (`CONSUMING.md` section 3).
+`ds_settings::use_environment(app)` imports the same file for **every** app, mailo included:
+on its first load, when the app's own `appearance.toml` does not exist yet, it calls
+`load_or_import(<app's config dir>, <mailo's config dir>/appearance.json)`. For
+`AppName::MAILO` both are `~/.config/mailo/`, so `use_environment(AppName::MAILO)` imports
+mailo's JSON on first run and watches `appearance.toml` from then on (the private
+`environment::initial_from` is the one code path; its test,
+`every_app_mailo_included_imports_mailos_json_once`, covers mailo and a shell app). Until the
+2026-09-24 mailo gaps wave mailo itself was skipped, so a mailo that called `use_environment`
+without importing first started from the defaults; `mail-app/src/appearance.rs`'s own
+`load_or_import` call on startup is now redundant and can go. Phase A wires `use_environment`
+in directly (mailo is still on the webview, where its Tokio requirement is already satisfied by
+`dioxus-desktop`); Phase B does **not** need to change this call at all, only the window it runs
+inside of, since `ds_native::launch` enters its own runtime (`CONSUMING.md` section 3).
 
 `Space`'s own file (`spaces.json`, `crates/mail-app/src/space.rs`'s `FILE_NAME`) is **not**
 `ds-settings`'s concern — it stays exactly as it is, a mailo-owned JSON file, since `Space` is
@@ -264,8 +284,10 @@ do not re-port their logic, only delete mailo's copy and fix the call sites that
   preview in a `Surface` override (`theme`, `accent`, `blur`) instead of changing `Ds`'s own `look` until the drag
   ends. Decide and record which in this file's own follow-up notes; this brief does not resolve
   it.
-- `crates/mail-app/src/ui/launch.rs` — delete `KEEP_FOCUS`'s injection into `with_custom_head`
-  (the constant itself stays **for now**, per the phase boundary below), delete
+- `crates/mail-app/src/ui/launch.rs` — **keep** `KEEP_FOCUS` and its injection into
+  `with_custom_head` through all of Phase A (the webview still needs it to hold the keyboard;
+  section 5.3 asks that it still works, and 5.4's grep expects its injection site); it is
+  removed in Phase B, where `ds_native::focus` takes over (section 6.1). Delete
   `appearance_head` (calls the deleted `paint.rs::appearance_script`), wrap the launched root in
   `Ds` (`material: Material::Window`, `stylesheet: Inject::Inline` or `Host` — Phase A can use
   either; `Host` plus mailo's own `with_custom_head` avoids a second `<style>` tag if that
@@ -337,8 +359,8 @@ states for every quire consumer.
 - No `onanimationend` handler remains anywhere under `mail-app/src/ui/` (section 5.1's list
   names every current site) — coherence rule 4, and `grep -rn onanimationend crates/mail-app/
   src` in the verify step below is the exact check.
-- `KEEP_FOCUS` and the `MAILO_PROBE`/debug-head machinery in `launch.rs` still exist and still
-  work (Phase A is still a webview; `CONSUMING.md`'s "webview does not poll futures spawned from
+- `KEEP_FOCUS` (constant and injection) and the `MAILO_PROBE`/debug-head machinery in
+  `launch.rs` still exist and still work (Phase A is still a webview; `CONSUMING.md`'s "webview does not poll futures spawned from
   render" is why these survive to Phase B, not before).
 - Mailo's own existing test suite (`cargo test --workspace` in mailo) passes with no test
   deleted to make it pass, only tests updated where section 5.1 names a rewrite that changes
@@ -383,8 +405,9 @@ could not poll a future spawned from render or measure a mounted element synchro
 
 - `crates/mail-app/src/ui/launch.rs` — `dioxus::LaunchBuilder::desktop()` replaced by
   `ds_native::launch(App, ds_native::AppConfig { title: "mailo".to_owned(), width: 1200, height:
-  800 })`; `with_custom_head`, `KEEP_FOCUS`, `NOTHING_MOUNTED`'s head-injection path, and the
-  `MAILO_PROBE`/`probe()` debug-head machinery all deleted — `ds_native::Harness` is the
+  800 })`; `with_custom_head`, `KEEP_FOCUS` (kept through Phase A; here `ds_native::focus`,
+  which `launch` provides, takes over holding and placing the focus), `NOTHING_MOUNTED`'s
+  head-injection path, and the `MAILO_PROBE`/`probe()` debug-head machinery all deleted — `ds_native::Harness` is the
   verification tool the probe existed to approximate (`CONSUMING.md`'s own citation of
   `ORCHESTRATION.md`'s "run it the way its user would" is exactly why the probe existed; a real
   headless harness is strictly better once it exists, which it now does).
@@ -425,10 +448,9 @@ checking first whether `ds_native::launch` is meant to grow a context-injection 
   section 6.1's `app.rs` bullet decides must survive with a named, documented reason (Blitz's
   `dioxus_native` line has no `document::eval` in the sense the webview did — an `eval` call
   that survives Phase B is a bug unless it is calling something that still exists).
-- `KEEP_FOCUS` (`launch.rs`) is gone; whatever focus-holding behaviour it existed for either has
-  a native replacement (`ds::HostModality`/`InputModality` tracks keyboard-vs-pointer already;
-  actual focus placement is a separate question this brief does not resolve) or is a documented,
-  reported gap.
+- `KEEP_FOCUS` (`launch.rs`) is gone: `ds_native::focus` holds and places the keyboard focus on
+  Blitz (`ds::HostModality`/`InputModality` tracks keyboard-vs-pointer); anything it does not
+  cover is a documented, reported gap.
 - `use_roster`/`use_pulse` drive every list enter/exit and pulse animation Phase A left on
   `ds::use_motion_timer` alone where a roster fits better (Phase A's job was "no more
   `onanimationend`"; Phase B's is "the right quire primitive for each case", which was not

@@ -19,7 +19,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
+    PersonSwatch, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
 };
 
 /// Every custom property the design system declares, `--` included: the token table's
@@ -58,6 +58,7 @@ fn collect() -> HashSet<String> {
         .into_iter()
         .flat_map(|hue| HueMember::ALL.map(|member| hue.var(member)));
     let swatches = Accent::ALL.into_iter().map(swatch_var);
+    let people = PersonSwatch::ALL.into_iter().map(PersonSwatch::var);
     // Ask the frame for its names rather than restating them; a Space that lends its hue
     // writes the most.
     let look = SpaceLook {
@@ -73,6 +74,7 @@ fn collect() -> HashSet<String> {
         .map(|name| name.as_str().to_owned())
         .chain(hues)
         .chain(swatches)
+        .chain(people)
         .chain(frame)
         .collect()
 }

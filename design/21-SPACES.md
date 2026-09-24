@@ -29,6 +29,12 @@ impl FrameVars { pub fn of(look: &SpaceLook, scheme: Scheme) -> Self; pub fn sty
 | `theme` | this Space's appearance: System / Light / Dark (S editor "Appearance" segment) | enum |
 | `card_accent` | Postmark blue, or the Space's hue (S editor "Accent" segment) | enum |
 
+**Motion is not part of a Space (settled, 2026-09-24).** A `SpaceLook` has no motion field: how
+much a surface moves is global, the `Appearance`'s `motion` resolved with the system's
+preferences into the root's `data-motion`. A consumer that wants motion per Space (mailo's
+`Space::motion`) keeps it in its own Space type and passes it into the root's
+`appearance.motion` itself.
+
 An empty `dots` list reads as the neutral dot `{hue 250, chroma .06}` (palette.rs:31-35,
 121-125), the same grey as preset 8.
 
@@ -126,7 +132,11 @@ The layer A/B model from S (Appendix A6 "Space switch"; S:1180-1187):
 
 1. Each tinted surface has two background layers, `.ds-layer` (front) and `.ds-layer.back`
    (settled for every tinted root, bar gaps: on shell chrome they sit in `.ds-frame`, whose own
-   background is the current gradient, so the group is opaque inside through the fade).
+   background is the current gradient, so the group is opaque inside through the fade). The
+   window's root (`data-frame=opaque`) holds them directly, with the grain, and is its own
+   stacking context so they paint over its background, which is the current gradient too
+   (settled, mailo gaps 2026-09-24; before, they painted beneath it and the switch was an
+   instant swap). Neither layer takes the pointer.
 2. On switch, the hidden layer gets the new gradient and opacity 1; the front goes to
    opacity 0; the roles swap. Transition `opacity --t-scene (380 ms) --e-out`.
 3. Grain opacity transitions over the same 380 ms (proposed).

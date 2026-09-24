@@ -20,6 +20,7 @@ pub mod classify;
 pub mod external;
 pub mod family;
 mod geometry;
+mod geometry_actions;
 mod geometry_shell;
 pub mod plate;
 pub mod render;
@@ -199,6 +200,10 @@ pub enum Icon {
     Gauge,
     /// Tabler `brightness-half`, used only if Lucide `sun` reads wrong at 22 px.
     Brightness,
+    /// Lucide `printer`: mailo's print action.
+    Printer,
+    /// Lucide `folder-input`: mailo's move-to-folder action.
+    FolderInput,
 }
 
 impl Icon {
@@ -293,7 +298,10 @@ impl Icon {
         Icon::Brightness,
     ];
 
-    /// Every glyph: the mailo set, then the shell set.
+    /// Glyphs for a consumer's actions beyond the two sets (Lucide, `geometry_actions`).
+    pub const ACTIONS: &[Icon] = &[Icon::Printer, Icon::FolderInput];
+
+    /// Every glyph: the mailo set, the shell set, then the actions.
     pub const ALL: &[Icon] = &[
         Icon::Inbox,
         Icon::Star,
@@ -376,6 +384,8 @@ impl Icon {
         Icon::Sparkles,
         Icon::Gauge,
         Icon::Brightness,
+        Icon::Printer,
+        Icon::FolderInput,
     ];
 
     /// The children of this glyph, in the design's order.
@@ -414,6 +424,8 @@ impl Icon {
             Icon::Settings => SETTINGS,
             Icon::PanelLeft => PANEL_LEFT,
             Icon::Plus => PLUS,
+            Icon::Printer => geometry_actions::PRINTER,
+            Icon::FolderInput => geometry_actions::FOLDER_INPUT,
             shell => geometry_shell::shapes(shell),
         }
     }

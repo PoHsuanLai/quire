@@ -175,6 +175,17 @@ pub const CASES: &[Case] = &[
         state: "glyph",
         make: || rsx! { IconView { source: Icon::Bell.into(), size: IconSize::Bar } },
     },
+    // The action glyphs (FINDINGS "mailo gaps"): Lucide printer and folder-input.
+    Case {
+        component: "icon_view",
+        state: "printer",
+        make: || rsx! { IconView { source: Icon::Printer.into() } },
+    },
+    Case {
+        component: "icon_view",
+        state: "folder-input",
+        make: || rsx! { IconView { source: Icon::FolderInput.into() } },
+    },
     Case {
         component: "icon_view",
         state: "symbolic",

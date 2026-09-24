@@ -218,6 +218,19 @@ fn the_token_block_holds_the_rust_table() {
     }
 }
 
+/// The eight person swatches are declared once, on the light block, and the dark block does not
+/// redeclare them: identity is data, not theme (design/03-COLOR.md section 13).
+#[test]
+fn the_person_swatches_are_declared_in_both_schemes_alike() {
+    let light = token_block();
+    let dark = block(".ds[*|data-theme=dark]");
+    for swatch in ds::PersonSwatch::ALL {
+        let name = swatch.var();
+        assert_eq!(light.get(&name), Some(&swatch.hex().css()), "{name}");
+        assert_eq!(dark.get(&name), None, "{name} is redeclared in dark");
+    }
+}
+
 #[test]
 fn every_table_name_is_declared_on_the_root() {
     let light = token_block();
