@@ -1,7 +1,12 @@
 /* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
    (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);
    the tab follows the pointer with its transition off while `data-drag=live`, and fills with
-   the accent while `data-armed=armed`. Tab hover is not specified. */
+   the accent while `data-armed=armed`. Tab hover is not specified.
+   Nothing is laid out while the hub is empty: `ToastHost` renders no toast then, and a rising
+   toast mounts hidden, so its first frame is below the edge and the spring runs from there
+   (gallery fix A: the hidden pill showed at the bottom of every root). The tab's rule names the
+   toast: the reset's `.ds button{font:inherit;color:inherit}` outranks a lone class, which left
+   the tab's label in the toast's own `--paper` on the tab's `--paper` (gallery fix A). */
 
 .ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
   display:flex; align-items:center; gap:2px; background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
@@ -10,7 +15,7 @@
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
 .ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 6px 0 10px; }
-.ds-toast-tab{ display:flex; align-items:center; gap:6px; cursor:grab; background:var(--paper); color:var(--ink); border:0;
+.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:6px; cursor:grab; background:var(--paper); color:var(--ink); border:0;
   border-radius:var(--r-pill); padding:5px 12px 5px 9px; font-size:var(--fs-small); font-weight:700; touch-action:none;
   transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }
 .ds-toast-tab:active{ cursor:grabbing; }

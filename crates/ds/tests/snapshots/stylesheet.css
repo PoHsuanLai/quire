@@ -755,7 +755,9 @@ html,body{margin:0;padding:0;background:transparent}
    plays the heavy variant of its exit (`--t-big-heavy`, `--t-curl-heavy`, `--t-crumple-heavy`),
    the one `Roster::leave` settles. `tab-out` is a Today entry's exit, not a row's. A healing
    row slides from `--dy`, delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate
-   filter (05-MOTION rule 4). Name, subject and snippet truncate with `.ds-truncate`. The star's fill is an SVG attribute
+   filter (05-MOTION rule 4). Subject and snippet truncate with `.ds-truncate`; the name only
+   when `ListRow` finds it longer than its column's character budget (`NameFit`), since a fade
+   on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The star's fill is an SVG attribute
    (spike S6), so this file colours it with `color`.
    Not specified: the row's active state, disabled. The undo restore (`rise --t-big
    --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
@@ -812,7 +814,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Text (`S:189-197`). */
 .ds-row-main{ min-width:0; }
 .ds-row-from{ display:flex; align-items:baseline; gap:7px; min-width:0; }
-.ds-row-name{ font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
+.ds-row-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
 .ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
 .ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint); }
 .ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
@@ -823,7 +825,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row-tags{ display:flex; gap:4px; align-items:center; }
 
 /* Star and sparks (`S:299-307`). */
-.ds-star{
+.ds-row .ds-star{
   position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
   cursor:pointer; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
   transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
@@ -964,36 +966,43 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
-   Hover and disabled are not specified. */
+   Its rules name the variant so they outrank TextInput's own (and the reset's font). The field
+   stays one line: TextInput's `em` height follows the 16 px here. Hover and disabled are not
+   specified. */
 
 .ds-search{ display:flex; align-items:center; gap:9px; padding:12px 14px; border-bottom:1px solid var(--line-soft); color:var(--ink-faint); }
-.ds-search .ds-field{ flex:1; }
-.ds-search .ds-input{ font-size:var(--fs-title); border:0; outline:none; background:transparent; color:var(--ink); width:100%; padding:0; }
-.ds-search .ds-input-placeholder{ font-size:var(--fs-title); padding:0; }
+.ds-search .ds-input-wrap{ flex:1; }
+.ds-search .ds-input[*|data-variant=inline]{ font-size:var(--fs-title); border:0; outline:none; background:transparent; color:var(--ink); width:100%; padding:0; height:1.55em; }
+.ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-title); padding:0; }
 .ds-search-tokens{ display:flex; gap:5px; flex-wrap:wrap; padding:0 14px 8px; }
 /* -- section_header -- */
 /* SectionHeader (design/04-COMPONENTS.md section 13): Frame `S:120-125`, Group `C:1026-1032`,
    Field `S:250-251`, Menu `S:668`. The rule is a real span (O-22's fallback for `::after`).
-   Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state. */
+   Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state.
+   A header heads its group: it is a full-width row of its own, spanning every column when its
+   container is a grid (gallery fix A: four headers in a grid read as one run-on row). The
+   eyebrow never wraps; the rule takes the free space. The action's rule names the header: the
+   reset's `.ds button{font:inherit;color:inherit}` outranks a lone class. */
 
-.ds-section-header{ display:flex; align-items:center; font-family:var(--font-data); text-transform:uppercase; color:var(--ink-faint); }
+.ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); text-transform:uppercase; color:var(--ink-faint); }
 .ds-section-header[*|data-kind=frame]{ gap:6px; padding:14px 6px 5px; font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
 .ds-section-header[*|data-kind=group]{ gap:8px; padding:12px 6px 6px; font-size:var(--fs-caption); letter-spacing:.12em; }
 .ds-section-header[*|data-kind=field]{ margin-bottom:6px; font-size:var(--fs-caption); letter-spacing:.14em; }
 .ds-section-header[*|data-kind=menu]{ padding:7px 8px 3px; font-size:var(--fs-micro); letter-spacing:.14em; }
 
-.ds-section-header-rule{ flex:1; height:1px; }
+.ds-section-header-text{ white-space:nowrap; }
+.ds-section-header-rule{ flex:1; min-width:0; height:1px; }
 .ds-section-header[*|data-kind=frame] .ds-section-header-rule{ background:var(--f-line); }
 .ds-section-header[*|data-kind=group] .ds-section-header-rule{ background:var(--line-soft); }
 
 .ds-section-header-value{ font-variant-numeric:tabular-nums; }
 .ds-section-header[*|data-kind=field] .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
 
-.ds-section-header-action{
+.ds-section-header .ds-section-header-action{
   border:0; background:none; cursor:pointer; font:inherit; letter-spacing:.08em;
   color:var(--f-ink-faint); padding:0 2px; text-transform:none;
 }
-.ds-section-header-action:hover{ color:var(--f-ink); }
+.ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }
 /* -- segmented -- */
 /* SegmentedControl (design/04-COMPONENTS.md section 3): Regular is S's `.seg` (`S:265-268`),
    Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
@@ -1033,14 +1042,16 @@ html,body{margin:0;padding:0;background:transparent}
    bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
    Undo hover is not specified. C's retry states (`nudge`, `shake`, a Fix button) have no phase
-   in `SendPhase` and are not drawn. */
+   in `SendPhase` and are not drawn. The Undo rule names the pill: the reset's
+   `.ds button{font:inherit;color:inherit}` outranks a lone class, which painted Undo's label in
+   the pill's `--paper` on its own `--paper` (gallery fix A). */
 
 .ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:10px;
   background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:6px 6px 6px 12px; font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
   transition:transform var(--t-big) var(--e-spring); white-space:nowrap; }
 .ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-send-ring{ display:block; flex:none; }
-.ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:4px 12px; font-size:var(--fs-small); font-weight:700; }
+.ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:4px 12px; font-size:var(--fs-small); font-weight:700; }
 /* -- sheet -- */
 /* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
    centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
@@ -1059,10 +1070,16 @@ html,body{margin:0;padding:0;background:transparent}
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
    `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
    `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
-   not specified here. Disabled: not specified (O-1). */
+   not specified here. Disabled: not specified (O-1).
+   The label is the flexible part: it starts at the left and takes the free space, so the count
+   and the close button sit at the end and an item without them does not centre (gallery fix A:
+   Blitz's user-agent `button{justify-content:center}` centred an item with no count). The fade
+   of a truncating label then falls on its empty end unless the text really reaches it. The
+   button forms of the base and close rules add the element: the reset's
+   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
 
-.ds-sidebar-item{
-  display:flex; align-items:center; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
+.ds-sidebar-item, button.ds-sidebar-item{
+  display:flex; align-items:center; justify-content:flex-start; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
   background:transparent; padding:6px 8px; border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
   color:var(--f-ink-soft); position:relative;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
@@ -1070,7 +1087,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-sidebar-item:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
 .ds-sidebar-item:active{ transform:scale(var(--squish)); }
 .ds-sidebar-item[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
-.ds-sidebar-item-text{ min-width:0; }
+.ds-sidebar-item-text{ flex:1 1 0; min-width:0; }
 .ds-sidebar-item-text[*|data-emphasis=plain]{ font-weight:500; }
 
 /* The seal (`S:345-346`): Place items only. */
@@ -1080,7 +1097,7 @@ html,body{margin:0;padding:0;background:transparent}
 }
 
 /* Today's close button (`S:140-143`). */
-.ds-sidebar-item-close{
+.ds-sidebar-item .ds-sidebar-item-close{
   margin-left:auto; opacity:0; border:0; background:none; cursor:pointer; padding:0; color:var(--f-ink-faint); line-height:0;
   transition:opacity var(--t-quick) var(--e-out);
 }
@@ -1128,7 +1145,12 @@ html,body{margin:0;padding:0;background:transparent}
    O-28: the panel is static, not sticky. O-29: the preset hover scale gets the Space dot's
    transform transition. The handle's white border is `--mark-ground` and its shadow
    `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
-   The Space dot is also the AppearancePicker's accent swatch (section 26). */
+   The Space dot is also the AppearancePicker's accent swatch (section 26).
+   `.ds-field` is this editor's colour field only (TextInput's wrapper was also `.ds-field`, and
+   its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
+   22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
+   in a wide panel drew 140 px discs. The stop's remove button names the stop: the reset's
+   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
 
 .ds-space-editor{
   border:1px solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
@@ -1138,7 +1160,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-swatch{ width:14px; height:14px; border-radius:var(--r-pill); flex:none; }
 
 .ds-field{
-  position:relative; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
+  position:relative; display:block; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
   border:1px solid var(--line);
 }
 .ds-field-plane{ position:absolute; inset:0; background-size:100% 100%; background-repeat:no-repeat; }
@@ -1156,11 +1178,11 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
 .ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
-.ds-stop-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }
+.ds-stop .ds-stop-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }
 
-.ds-presets{ display:grid; grid-template-columns:repeat(8, minmax(0,1fr)); gap:6px; }
+.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:6px; }
 .ds-preset{
-  aspect-ratio:1; border-radius:var(--r-pill); border:1px solid var(--line); cursor:pointer; padding:0;
+  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:1px solid var(--line); cursor:pointer; padding:0;
   transition:transform var(--t-quick) var(--e-spring);
 }
 .ds-preset:hover{ transform:scale(1.1); }
@@ -1226,21 +1248,34 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- text_input -- */
 /* TextInput (design/04-COMPONENTS.md section 6): Boxed is `.inp`, Inline is `.inp.inline` with
    `.pinput` folded in (`S:599-600`, `S:781-786`). Attribute selectors carry `*|` (spike S2).
-   `.ds-field` wraps the input so the placeholder can be a span over it: Blitz draws no
-   `placeholder` and has no `::placeholder` (O-23's fallback).
+   `.ds-input-wrap` wraps the input so the placeholder can be a span over it: Blitz draws no
+   `placeholder` and has no `::placeholder` (O-23's fallback). (It was `.ds-field`, which is the
+   Space editor's colour field: the two sheets styled each other's element, gallery fix A.)
+   One line: Blitz gives an `input` no intrinsic size, so it took the replaced-element default of
+   300 x 150. The height is the line (`1.55em`, the base line height the field inherits in S) plus
+   the padding and the 1 px border, in `em` so a consumer's font size (the search row's 16, the
+   bubble's 12.5) keeps it one line; the width fills the wrapper, whose width is the consumer's.
+   Font and colour are on `.ds-input-wrap input`: the reset's `.ds input{font:inherit;color:inherit}`
+   outranks a lone class, and this ties it and comes later, while a container's
+   `.ds-bubble .ds-input` still outranks it.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
-.ds-field{ position:relative; display:inline-flex; }
-.ds-field[*|data-variant=inline]{ flex:1; min-width:120px; }
+.ds-input-wrap{ position:relative; display:flex; min-width:0; }
+.ds-input-wrap[*|data-variant=inline]{ flex:1; min-width:120px; }
 
-.ds-input{ font:inherit; font-size:var(--fs-body); color:var(--ink); outline:none; }
+.ds-input{ width:100%; min-width:0; outline:none; }
+.ds-input-wrap input{ font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=boxed]{
+  height:calc(1.55em + 16px);
   background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:7px 10px;
   transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
 .ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
-.ds-input[*|data-variant=inline]{ border:1px solid transparent; background:transparent; padding:3px 2px; min-width:120px; flex:1; box-shadow:none; }
+.ds-input[*|data-variant=inline]{
+  height:calc(1.55em + 8px);
+  border:1px solid transparent; background:transparent; padding:3px 2px; box-shadow:none;
+}
 .ds-input[*|data-variant=inline]:focus{ border-color:transparent; box-shadow:none; }
 /* The global keyboard ring must not double the field's own focus (or the Inline container's). */
 .ds[*|data-modality=keyboard] .ds-input:focus{ outline:none; }
@@ -1248,15 +1283,20 @@ html,body{margin:0;padding:0;background:transparent}
 /* The placeholder sits where the input's text starts: its border plus its padding. */
 .ds-input-placeholder{
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
-  font:inherit; font-size:var(--fs-body); color:var(--ink-faint);
+  font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink-faint);
 }
-.ds-field[*|data-variant=boxed] .ds-input-placeholder{ padding:8px 11px; }
-.ds-field[*|data-variant=inline] .ds-input-placeholder{ padding:4px 3px; }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:8px 11px; }
+.ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:4px 3px; }
 /* -- toast -- */
 /* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
    (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);
    the tab follows the pointer with its transition off while `data-drag=live`, and fills with
-   the accent while `data-armed=armed`. Tab hover is not specified. */
+   the accent while `data-armed=armed`. Tab hover is not specified.
+   Nothing is laid out while the hub is empty: `ToastHost` renders no toast then, and a rising
+   toast mounts hidden, so its first frame is below the edge and the spring runs from there
+   (gallery fix A: the hidden pill showed at the bottom of every root). The tab's rule names the
+   toast: the reset's `.ds button{font:inherit;color:inherit}` outranks a lone class, which left
+   the tab's label in the toast's own `--paper` on the tab's `--paper` (gallery fix A). */
 
 .ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
   display:flex; align-items:center; gap:2px; background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
@@ -1265,7 +1305,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
 .ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 6px 0 10px; }
-.ds-toast-tab{ display:flex; align-items:center; gap:6px; cursor:grab; background:var(--paper); color:var(--ink); border:0;
+.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:6px; cursor:grab; background:var(--paper); color:var(--ink); border:0;
   border-radius:var(--r-pill); padding:5px 12px 5px 9px; font-size:var(--fs-small); font-weight:700; touch-action:none;
   transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }
 .ds-toast-tab:active{ cursor:grabbing; }

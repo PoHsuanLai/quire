@@ -6,7 +6,9 @@
    plays the heavy variant of its exit (`--t-big-heavy`, `--t-curl-heavy`, `--t-crumple-heavy`),
    the one `Roster::leave` settles. `tab-out` is a Today entry's exit, not a row's. A healing
    row slides from `--dy`, delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate
-   filter (05-MOTION rule 4). Name, subject and snippet truncate with `.ds-truncate`. The star's fill is an SVG attribute
+   filter (05-MOTION rule 4). Subject and snippet truncate with `.ds-truncate`; the name only
+   when `ListRow` finds it longer than its column's character budget (`NameFit`), since a fade
+   on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The star's fill is an SVG attribute
    (spike S6), so this file colours it with `color`.
    Not specified: the row's active state, disabled. The undo restore (`rise --t-big
    --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
@@ -63,7 +65,7 @@
 /* Text (`S:189-197`). */
 .ds-row-main{ min-width:0; }
 .ds-row-from{ display:flex; align-items:baseline; gap:7px; min-width:0; }
-.ds-row-name{ font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
+.ds-row-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
 .ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
 .ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint); }
 .ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
@@ -74,7 +76,7 @@
 .ds-row-tags{ display:flex; gap:4px; align-items:center; }
 
 /* Star and sparks (`S:299-307`). */
-.ds-star{
+.ds-row .ds-star{
   position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
   cursor:pointer; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
   transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
