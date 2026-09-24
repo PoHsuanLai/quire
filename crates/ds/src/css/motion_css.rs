@@ -126,7 +126,36 @@ mod tests {
                 "@keyframes {name} has no Anim"
             );
         }
-        assert_eq!(names.len(), 41);
+        assert_eq!(names.len(), 45);
+    }
+
+    #[test]
+    fn every_contact_keyframe_follows_the_motion_level() {
+        // Calm and Reduced set `--overshoot` to 1, which flattens a keyframe only if it reads
+        // it (mailo gaps 3): the springs that answer a touch or a change all do. The painted
+        // shapes at each level are measured in ds-native's `contact_motion` test.
+        let bodies = keyframes(MOTION);
+        for anim in [
+            Anim::PopIn,
+            Anim::RowIn,
+            Anim::ComposeRise,
+            Anim::ChipIn,
+            Anim::CmdkIn,
+            Anim::Gulp,
+            Anim::Bump,
+            Anim::SealPop,
+        ] {
+            let name = anim.recipe().keyframes;
+            let body = bodies
+                .iter()
+                .find(|(found, _)| *found == name)
+                .map(|(_, body)| *body)
+                .unwrap_or_default();
+            assert!(
+                body.contains("var(--overshoot)"),
+                "{anim:?}: @keyframes {name} ignores the motion level"
+            );
+        }
     }
 
     #[test]

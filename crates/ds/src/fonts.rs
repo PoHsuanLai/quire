@@ -1,4 +1,4 @@
-//! The three faces, shipped inside the binary as bytes (design/02-TYPE.md section 2).
+//! The four faces, shipped inside the binary as bytes (design/02-TYPE.md section 2).
 //!
 //! On Blitz the bytes are registered with the renderer's font context once (`ds-native`'s
 //! `register_fonts`); nothing about fonts is in the stylesheet. The `webview-fonts` feature
@@ -151,6 +151,38 @@ pub static FACES: &[Face] = &[
         Subset::LatinExt,
         "space-mono-normal-700-latin-ext.ttf"
     ),
+    face!(
+        Family::Serif,
+        FaceStyle::Normal,
+        400,
+        700,
+        Subset::Latin,
+        "noto-serif-normal-400-700-latin.ttf"
+    ),
+    face!(
+        Family::Serif,
+        FaceStyle::Normal,
+        400,
+        700,
+        Subset::LatinExt,
+        "noto-serif-normal-400-700-latin-ext.ttf"
+    ),
+    face!(
+        Family::Serif,
+        FaceStyle::Italic,
+        400,
+        700,
+        Subset::Latin,
+        "noto-serif-italic-400-700-latin.ttf"
+    ),
+    face!(
+        Family::Serif,
+        FaceStyle::Italic,
+        400,
+        700,
+        Subset::LatinExt,
+        "noto-serif-italic-400-700-latin-ext.ttf"
+    ),
 ];
 
 /// `@font-face` rules with the faces as base64 `data:` URIs, for a consumer still on the
@@ -189,7 +221,7 @@ mod tests {
             );
             assert!(twins.contains(&Subset::Latin) && twins.contains(&Subset::LatinExt));
         }
-        for family in [Family::Display, Family::Ui, Family::Data] {
+        for family in Family::ALL {
             assert!(
                 FACES
                     .iter()

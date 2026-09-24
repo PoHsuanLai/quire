@@ -1,4 +1,4 @@
-//! The mailo gaps 2 states, as data: the golden each renders to and how to make it.
+//! The mailo gaps 2 and 3 states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
 use ds::components::vocab::Switch;
@@ -11,6 +11,7 @@ use ds::{
     Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Here, ItemKind, PersonHue, Presence,
     PulseKey, SidebarItem, TodayTrailing,
 };
+use ds::{Avatar, AvatarMuting};
 use ds::{
     CardAccent, DotIndex, MeasuredIn, Motion, MotionChoice, PRESETS, Scheme, SpaceEditor,
     SpaceLook, Theme,
@@ -155,5 +156,19 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "lists/space_editor/rename-unnamed.html",
         make: || rsx! { SpaceEditor { look: look(2, Theme::Light), scheme: Scheme::Light, active_dot: DotIndex(0), onchange: |_| {}, on_rename: EventHandler::new(|_: String| {}) } },
+    },
+    // mailo gaps 3. Avatar: an account's colour muted (chroma .55, hue and lightness kept),
+    // and a person's; a muted ink avatar is greyscale already and keeps its colours.
+    Case {
+        golden: "controls/avatar/account-28-muted.html",
+        make: || rsx! { Avatar { initial: 'P', size: AvatarSize::Size28, tone: AvatarTone::Account(VIOLET), muting: AvatarMuting::Muted } },
+    },
+    Case {
+        golden: "controls/avatar/person-18-muted.html",
+        make: || rsx! { Avatar { initial: 'D', size: AvatarSize::Size18, tone: AvatarTone::Person(PersonHue(212)), muting: AvatarMuting::Muted } },
+    },
+    Case {
+        golden: "controls/avatar/ink-28-muted.html",
+        make: || rsx! { Avatar { initial: 'A', size: AvatarSize::Size28, tone: AvatarTone::Ink, muting: AvatarMuting::Muted } },
     },
 ];

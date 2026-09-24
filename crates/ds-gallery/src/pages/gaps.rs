@@ -66,7 +66,7 @@ const LIMITS: [(&str, &str, &str); 16] = [
     (
         "S11",
         "Registered TTFs are picked by font-family.",
-        "ds-native registers the three faces once (the Type page).",
+        "ds-native registers the four faces once (the Type page).",
     ),
     (
         "S12",

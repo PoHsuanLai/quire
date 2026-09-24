@@ -103,9 +103,24 @@ pub enum Profile {
     Strict,
 }
 
+/// What [`crate::lint::assert_clean`] does with an exception that suppressed nothing.
+///
+/// A stale exception is a lint failure: the offence it excused has gone (or its selector was
+/// mistyped), and left in place it would silently excuse the next offence on that selector.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Stale {
+    /// Panic, naming each stale exception.
+    #[default]
+    Fail,
+    /// Print each stale exception to stderr and pass: for a consumer mid-migration that keeps
+    /// exceptions for code another branch is about to land.
+    Report,
+}
+
 /// One offence a consumer has decided to live with, and why: every offence of `rule` whose
 /// selector is exactly `selector` is suppressed. The reason is for the reviewer; `assert_clean`
-/// prints how many offences each exception swallowed, so a stale one is visible.
+/// prints how many offences each exception swallowed, and fails on one that swallowed none
+/// ([`Stale`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Exception {
     /// The rule it silences.
@@ -134,6 +149,10 @@ pub struct LintConfig {
     pub own_vars: Vec<String>,
     /// Offences to suppress, each with its reason.
     pub exceptions: &'static [Exception],
+    /// What `assert_clean` does with an exception that suppressed nothing; [`Stale::Fail`] by
+    /// default (mailo gaps 3). `stylesheet` and `markup` return offences and never judge
+    /// exceptions.
+    pub stale: Stale,
 }
 
 impl LintConfig {

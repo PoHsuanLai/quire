@@ -122,6 +122,25 @@ impl<K: Clone + PartialEq> RosterState<K> {
         )
     }
 
+    /// Take `key`'s exit back: a leaving row is present again, in place, with nothing below it
+    /// healing (an undo during the exit, before the row was dropped). A row that is not leaving
+    /// is left as it is; a key the roster does not hold is [`StayError::UnknownKey`], because
+    /// a row already dropped cannot stay: the consumer lists it again and it enters.
+    ///
+    /// Only [`Self::settled`] starts a heal, so a stay before it leaves the rows below as they
+    /// were; the hook cancels the exit's settle timer so it never runs for the stayed row.
+    pub fn stay(self, key: &K) -> (Self, Result<Stayed, StayError>) {
+        let Some(at) = self.entries.iter().position(|entry| &entry.key == key) else {
+            return (self, Err(StayError::UnknownKey));
+        };
+        if !matches!(self.entries[at].presence, Presence::Leaving(_)) {
+            return (self, Ok(Stayed::Unchanged));
+        }
+        let RosterState { mut entries, pitch } = self;
+        entries[at].presence = Presence::Present;
+        (RosterState { entries, pitch }, Ok(Stayed::Restored))
+    }
+
     /// `key`'s exit has settled: drop it and start the rows below healing.
     ///
     /// Every row below it that is not itself leaving starts `heal` from one pitch down; the
@@ -201,6 +220,24 @@ impl<K: Clone + PartialEq> RosterState<K> {
             )
             .collect()
     }
+}
+
+/// What a [`RosterState::stay`] did.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Stayed {
+    /// The row was leaving and is present again.
+    Restored,
+    /// The row was not leaving (entering, present or healing); nothing changed.
+    Unchanged,
+}
+
+/// Why a stay could not happen.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum StayError {
+    /// The roster holds no row with that key: never listed, or already dropped after its exit.
+    UnknownKey,
+    /// The roster's owner is gone (the list unmounted); only the hook reports this.
+    Unmounted,
 }
 
 /// The animation an exit plays: an unread (`Emphasis::Strong`) row plays the heavy variant of

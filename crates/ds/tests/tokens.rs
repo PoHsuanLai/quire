@@ -246,7 +246,7 @@ fn every_table_name_is_declared_on_the_root() {
         .chain(Shadow::ALL.map(|t| t.var()))
         .chain(FontSize::ALL.map(|t| t.var()))
         .chain(ZLayer::ALL.map(|t| t.var()))
-        .chain([Family::Display, Family::Ui, Family::Data].map(|t| t.var()));
+        .chain(Family::ALL.map(|t| t.var()));
     for name in names {
         assert!(
             light.contains_key(name.as_str()),
@@ -260,7 +260,8 @@ fn every_table_name_is_declared_on_the_root() {
 /// could declare: the spark angle, the heal distance and index, the stagger indices
 /// (design/05-MOTION.md section 5, rows 3, 10, 11 and 15), a `Fraction`'s `--f` and the
 /// avatar's computed colours (design/04-COMPONENTS.md "Shared vocabulary" and section 11), and
-/// an external icon's size (`IconView`, design/08-ICONS.md section 1.5).
+/// an external icon's size (`IconView`, design/08-ICONS.md section 1.5), and a Space dot's
+/// stops (`SpaceDot`, the editor's presets, handles, discs and swatch; mailo gaps 3).
 const PER_ELEMENT: &[&str] = &[
     "--a",
     "--dy",
@@ -271,6 +272,9 @@ const PER_ELEMENT: &[&str] = &[
     "--av-bg",
     "--av-fg",
     "--ic-size",
+    "--dot-c1",
+    "--dot-c2",
+    "--dot-c3",
 ];
 
 #[test]

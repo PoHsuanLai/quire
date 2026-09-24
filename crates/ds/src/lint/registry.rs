@@ -19,7 +19,8 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
+    OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
+    ZLayer,
 };
 
 /// Every custom property the design system declares, `--` included: the token table's
@@ -45,7 +46,8 @@ fn collect() -> HashSet<String> {
         .chain(Shadow::ALL.map(Shadow::var))
         .chain(FontSize::ALL.map(FontSize::var))
         .chain(ZLayer::ALL.map(ZLayer::var))
-        .chain([Family::Display, Family::Ui, Family::Data].map(Family::var))
+        .chain(OpacityToken::ALL.map(OpacityToken::var))
+        .chain(Family::ALL.map(Family::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
         .chain([StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])

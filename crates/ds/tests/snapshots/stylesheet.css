@@ -19,11 +19,11 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);color-scheme:dark;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;}
 .ds[*|data-motion=extra]{--t-big:560ms;--t-big-heavy:644ms;--t-crumple-heavy:644ms;--e-spring:cubic-bezier(.34,2,.5,1);--overshoot:1.14;--squish:.86;--tilt:5deg;--stagger:34ms;}
-.ds[*|data-motion=reduced]{--t-tap:60ms;--t-quick:60ms;--t-move:60ms;--t-big:60ms;--t-ambient:60ms;--t-big-heavy:60ms;--t-spark:60ms;--t-curl:60ms;--t-curl-heavy:60ms;--t-crumple-heavy:60ms;--t-send:60ms;--t-float:60ms;--t-hc-out:60ms;--t-scene:60ms;--t-shake:60ms;--t-park:60ms;--t-nudge:60ms;--t-shake-long:60ms;--t-sail:60ms;--t-boat-return:60ms;--t-spin:60ms;--t-send-ring:60ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;}
+.ds[*|data-motion=reduced]{--t-tap:60ms;--t-quick:60ms;--t-move:60ms;--t-big:60ms;--t-ambient:60ms;--t-big-heavy:60ms;--t-spark:60ms;--t-curl:60ms;--t-curl-heavy:60ms;--t-crumple-heavy:60ms;--t-send:60ms;--t-float:60ms;--t-hc-out:60ms;--t-scene:60ms;--t-shake:60ms;--t-park:60ms;--t-nudge:60ms;--t-shake-long:60ms;--t-sail:60ms;--t-boat-return:60ms;--t-spin:60ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;}
 /* == accents == */
 .ds{--swatch-postmark:#23508f;--swatch-red:#b7352b;--swatch-amber:#8e5a05;--swatch-green:#1a7a33;--swatch-blue:#0b5fe0;--swatch-violet:#6b3fcc;}
 .ds[*|data-theme=dark]{--swatch-postmark:#7fa6e6;--swatch-red:#ff8a80;--swatch-amber:#f0b84a;--swatch-green:#6edb86;--swatch-blue:#6fb0ff;--swatch-violet:#b69bff;}
@@ -101,9 +101,10 @@ html,body{margin:0;padding:0;background:transparent}
    both define a name). Four departures, three required by section 9 and one added by quire:
    - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
-   - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`;
+   - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
-     so are `menu-out` (bar gaps) and `cmdk-rise` (mailo gaps 2), below.
+     so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -127,11 +128,22 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.2.7 floatup */
 @keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
 
+/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level (mailo gaps 3): each
+   departure from rest is the catalogue's value times min(1, (--overshoot - 1) x 25), which is 1
+   at Standard (1.04) and Extra (1.14, whose spring curve already overshoots more) and 0 at Calm
+   and Reduced (1). So Calm flattens them, as it flattens pop-in's `scale(var(--overshoot))`,
+   and Standard is the catalogue's text: 34% of gulp is still scale(1.07,.84). */
+
 /* 4.2.8 gulp */
-@keyframes gulp{ 0%{ transform:scale(1,1); } 34%{ transform:scale(1.07,.84); } 62%{ transform:scale(.97,1.07); } 100%{ transform:scale(1,1); } }
+@keyframes gulp{ 0%{ transform:scale(1,1); }
+  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
+  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:scale(1,1); } }
 
 /* 4.2.9 seal-pop */
-@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); } 60%{ transform:translateY(-50%) scale(1.5); } 100%{ transform:translateY(-50%) scale(1); } }
+@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); }
+  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:translateY(-50%) scale(1); } }
 
 /* 4.2.10 compose-rise */
 @keyframes compose-rise{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
@@ -155,7 +167,9 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
 
 /* 4.3.5 bump */
-@keyframes bump{ 0%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-3px) scale(1.25); } 100%{ transform:none; } }
+@keyframes bump{ 0%{ transform:translateY(0) scale(1); }
+  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:none; } }
 
 /* 4.3.6 tab-in */
 @keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
@@ -254,6 +268,25 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
+
+/* pill-up (quire's, mailo gaps 3): a pill centred by `translateX(-50%)` (a toast, a send pill a
+   consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
+   `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
+   also carries them back down, and keep it. */
+@keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
+
+/* ring-drain (quire's, mailo gaps 3): the undo-send ring's dash drains, linear, over
+   `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
+   dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
+@keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
+
+/* 4.4.12 fade-in (C's, mailo gaps 3): an ink veil fades to its resting `--veil` (.16), the
+   opacity the veil itself rests at, so nothing snaps when the animation ends. */
+@keyframes fade-in{ from{ opacity:0; } to{ opacity:var(--veil); } }
+
+/* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
+   legible; `breathe` is the sync halo's and fades to nothing. */
+@keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -261,8 +294,13 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes fold--b{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
 @keyframes curl--b{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
 @keyframes floatup--b{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
-@keyframes gulp--b{ 0%{ transform:scale(1,1); } 34%{ transform:scale(1.07,.84); } 62%{ transform:scale(.97,1.07); } 100%{ transform:scale(1,1); } }
-@keyframes seal-pop--b{ 0%{ transform:translateY(-50%) scale(0); } 60%{ transform:translateY(-50%) scale(1.5); } 100%{ transform:translateY(-50%) scale(1); } }
+@keyframes gulp--b{ 0%{ transform:scale(1,1); }
+  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
+  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:scale(1,1); } }
+@keyframes seal-pop--b{ 0%{ transform:translateY(-50%) scale(0); }
+  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:translateY(-50%) scale(1); } }
 @keyframes compose-rise--b{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
 @keyframes compose-send--b{ 0%{ transform:none; opacity:1; } 35%{ transform:translate(0,4px) scale(.97,.94); opacity:1; } 100%{ transform:translate(-40px,-120px) scale(.06) rotate(-8deg); opacity:0; } }
 @keyframes peek-in--b{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
@@ -270,7 +308,9 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes fade--b{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes heal--b{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
-@keyframes bump--b{ 0%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-3px) scale(1.25); } 100%{ transform:none; } }
+@keyframes bump--b{ 0%{ transform:translateY(0) scale(1); }
+  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:none; } }
 @keyframes tab-in--b{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
 @keyframes tab-out--b{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
 @keyframes hc-in--b{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
@@ -317,6 +357,10 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes cmdk-in--b{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
+@keyframes pill-up--b{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
+@keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
+@keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
+@keyframes busy--b{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -413,6 +457,14 @@ html,body{margin:0;padding:0;background:transparent}
 .a-breathe[*|data-pulse=b]{animation:breathe--b var(--t-ambient) var(--e-in-out) infinite;}
 .a-spin[*|data-pulse=a]{animation:spin var(--t-spin) var(--e-linear) infinite;}
 .a-spin[*|data-pulse=b]{animation:spin--b var(--t-spin) var(--e-linear) infinite;}
+.a-pill-up[*|data-pulse=a]{animation:pill-up var(--t-big) var(--e-spring);}
+.a-pill-up[*|data-pulse=b]{animation:pill-up--b var(--t-big) var(--e-spring);}
+.a-ring-drain[*|data-pulse=a]{animation:ring-drain var(--t-send-ring) var(--e-linear) forwards;}
+.a-ring-drain[*|data-pulse=b]{animation:ring-drain--b var(--t-send-ring) var(--e-linear) forwards;}
+.a-fade-in[*|data-pulse=a]{animation:fade-in var(--t-move) var(--e-out);}
+.a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
+.a-busy[*|data-pulse=a]{animation:busy var(--t-ambient) var(--e-in-out) infinite;}
+.a-busy[*|data-pulse=b]{animation:busy--b var(--t-ambient) var(--e-in-out) infinite;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -1467,6 +1519,17 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-editor-title .ds-input-wrap{ flex:1; }
 .ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
 .ds-checks-heading{ font-family:var(--font-data); font-size:var(--fs-micro); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+
+/* mailo gaps 3. A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
+   `data-stops` counting them) and are painted here, never inline: the same 135deg gradient
+   `space::gradient` writes for the frame, flat for one stop, 0/100 % for two, 0/50/100 % for
+   three. A handle and a stop disc are one picked colour. */
+.ds-space-dot[*|data-stops="1"], .ds-preset[*|data-stops="1"], .ds-space-swatch[*|data-stops="1"]{ background:var(--dot-c1); }
+.ds-space-dot[*|data-stops="2"], .ds-preset[*|data-stops="2"], .ds-space-swatch[*|data-stops="2"]{
+  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 100%); }
+.ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
+  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
+.ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15): C's sync halo (`C:284-292`), a ring at
    `inset:-4px` around a positioned parent. Attribute selectors carry `*|` (spike S2).
