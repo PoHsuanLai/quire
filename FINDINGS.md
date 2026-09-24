@@ -799,3 +799,79 @@ already asked for).
   Overlays example and the Gallery fixes B props), §8 (the click caveat), §9 and §10 (the gallery
   exists) were brought up to date, and `docs/mailo-migration.md` gained "The quire APIs this
   brief assumes" with the anchors the mailo session should read.
+## Tray gaps (2026-09-24)
+
+sill's tray work (sill FINDINGS F29-F34) reported three gaps against quire, Q6-Q8. All three are
+closed on branch `tray-gaps`; sill adopts the APIs in its next wave. Headless proofs are in
+`crates/ds-native/tests/tray_gaps.rs`.
+
+- **Q6 External icons.** `ds::IconSource::{Glyph(Icon), Symbolic(ExternalIcon), Image(ExternalIcon)}`
+  with `ExternalIcon { url: IconUrl, size: IconSize }` (`crates/ds/src/icon/external.rs`) and
+  `ds::IconView { source, size }` (`components/icon_view.rs`). `IconUrl` is parsed once: `data:`
+  and `file:` only (anything else is `DsError::IconScheme`, the crate's first error enum,
+  `crates/ds/src/error.rs`), with `"`, `\` and control characters percent-encoded so the URL
+  cannot leave its quoted CSS string; `IconUrl::png(&bytes)` does the base64 (sill can drop its
+  hand-rolled encoder), `IconUrl::svg` percent-encodes as spike S7 did, `IconUrl::file` takes an
+  absolute path. A symbolic icon is `span.ds-ext-icon[data-kind=symbolic]` with an inline
+  `mask-image:url(...)` over `background-color:currentColor`; an image is `[data-kind=image]`
+  with the URL as `background-image`. The size is the inline `--ic-size`. An external icon is
+  drawn at its own `size` (the size its caller resolved it for); a glyph still takes the slot's
+  size. Blitz facts probed here: a PNG (not only an SVG) works as `mask-image`, its alpha is what
+  masks, and `mask-size`/`background-size:100% 100%` stretch it; the pixel proof renders a 16 x
+  16 one-bit PNG mask at 18 px inside an element coloured `--ink` (its opaque middle matches an
+  `--ink` swatch, its transparent ring matches the ground) and an opaque red RGB PNG in the same
+  host (it stays red). `self_lint` carries one exception for `currentColor` in the symbolic rule
+  (the rule allows it only in `stroke`/`fill`; here it is the Glyph's stroke by another path), and
+  `--ic-size` joins the inline variables. `IconButton { icon }` is `#[props(into)] IconSource`, so
+  `icon: Icon::Star` compiles; `Button { icon }` is `Option<IconSource>`, and two `SuperFrom`
+  impls with a local marker keep `icon: Icon::Send` and `icon: Some(Icon::Archive)` compiling
+  (plain `From` is not possible: `Option` is foreign).
+- **Q7 Submenus and disabled items.** `MenuEntry::Item` gained `availability: Availability`, and
+  `MenuEntry::Submenu { title, tile, availability, children }` is a new variant (a parent row
+  picks nothing, so it carries no value or check). A disabled row has `aria-disabled="true"`,
+  opacity .35 (design/13 §13.3.3; the brief said "faint colour", the doc says .35 opacity, and
+  the doc won), no click, and Up/Down skip it (`menu_lines::moved_live`; the palette clamps the
+  same way). A parent row shows the 12 px chevron and `aria-haspopup`/`aria-expanded`. Every
+  panel (the menu and each submenu) owns one `MenuTrack<()>` for its own children, so submenus
+  nest to any depth with the one machine: a pointer move over a row is `Move(at, Item {..})` (the
+  200 ms rest, the safe triangle and its 300 ms timeout are the machine's), a move inside the
+  submenu is reported to the parent as `Move(at, Menu)` so the parent's highlight and triangle
+  hold, the landed submenu's near edge is `SubPlaced`, and Left/Escape are `Key(Left)`. The
+  machine gained two events for the keyboard, which it had no way to express: `Select(path)`
+  (Up/Down moved the highlight: another item's submenu closes, nothing opens) and
+  `Expand(path)` (Right, Enter or a click: open now), and a constructor `MenuTrack::open(timing,
+  key)` for a menu that is already open when its tracker exists (click mode). A submenu is placed
+  through `place()` against the parent panel's width at the parent row's top less the panel
+  padding (5, or 6 for Dropdown), `Side::Right`, gap 2 (the doc says gap 2, not an overlap), so
+  it flips left at the edge. It floats on the menu layer without joining the layer stack (the
+  menu takes Escape and the outside click; the submenu closes with it), opens with no entrance
+  (`[data-depth]`), and takes the focus only when the keyboard opened it. `Menu` gained
+  `timing: MenuTiming` (the caller reads `menus.submenu_delay_ms` into it) and `expanded:
+  Option<usize>` (open a choice's submenu on mount; the posed gallery uses it). One overlay-host
+  change was needed: `Overlays::show` now replaces an entry in place, so a menu that re-renders
+  keeps its place under its submenu (it used to move to the end of its layer and cover the
+  submenu with its outside-click catcher). `menu.rs` split into `menu_lines` (pure lists and
+  navigation), `menu_keys` (the keyboard as one table), `menu_rows` (drawing), `menu_tracker`
+  (the machine's effects) and `menu_panel` (what the menu and `SubMenu` share); the fuzzy matcher
+  moved to `menu_match`. SSR goldens cover the closed states; the open submenu needs layout, so
+  it is proved headless: a rest opens it after the delay and not at 120 ms, beside the menu 2 px
+  off and 5 px above the row; Left closes it; Right opens it at once and focuses it, where Down
+  and Enter pick a child; Escape in it closes one level; Down skips a disabled row and a click on
+  it picks nothing.
+- **Q8 Pointer buttons and ids.** `Button` and `IconButton` take `id: Option<String>` (written as
+  `id`; absent, the markup is unchanged) and their `onclick` is `EventHandler<ds::Press>`,
+  `Press { button: PointerButton::{Primary, Secondary, Middle}, modifiers }`. Blitz sends a
+  right-click as `contextmenu` and never as `click`, and the middle button as `mouseup` only
+  (blitz-dom `handle_pointerup`), so the controls listen to all three: `click` (a keyboard
+  activation has no trigger button and reports `Primary`), `contextmenu` (default prevented,
+  `Secondary`) and `mouseup` with the auxiliary button (`Middle`). A closure `move |_| …`
+  compiles as before; an `EventHandler<()>` value converts through a `SuperFrom` impl (sill's
+  `TrayButtonView` passes its own `onclick: EventHandler<()>` straight through, which keeps
+  working); a closure written `move |()| …` does not, and cannot be made to (a blanket impl over
+  closures would break coherence), so quire's one such site (Peek's close) became `|_|`. The
+  harness gained `Harness::press(at, PointerButton)`. Not included: the pointer position, which
+  the brief's `Press` does not carry (SNI's `x, y` are screen coordinates a client cannot know
+  anyway).
+- Left for sill: choosing `Symbolic` or `Image` per item (design/08 §1.5 steps 2-3, the chroma
+  test and `--warn` for `NeedsAttention`), and sizing its tray popup to leave room for a submenu,
+  which is drawn in the same document as its menu.

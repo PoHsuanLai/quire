@@ -1,0 +1,9 @@
+/* IconView (design/08-ICONS.md section 1.5): an external icon in any icon slot. The size and the
+   URL arrive inline (`--ic-size`, and `mask-image` or `background-image`), so this sheet only
+   says how each kind paints. Symbolic: the icon's alpha masks a square of the text colour, the
+   same recolouring a Glyph's `currentColor` stroke gets, so hover and `--f-ink*` reach it
+   (spike S7). Image: the bitmap as it is, stretched to the square (spike S8). */
+
+.ds-ext-icon{ display:inline-block; flex:none; width:var(--ic-size); height:var(--ic-size); vertical-align:middle; }
+.ds-ext-icon[*|data-kind=symbolic]{ background-color:currentColor; mask-size:100% 100%; mask-repeat:no-repeat; mask-position:center; }
+.ds-ext-icon[*|data-kind=image]{ background-size:100% 100%; background-repeat:no-repeat; background-position:center; }

@@ -727,6 +727,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=pin]:hover{ background:var(--f-pill); }
 .ds-icon-button[*|data-variant=pin]:active{ transform:scale(var(--squish)); }
 .ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
+/* -- icon_view -- */
+/* IconView (design/08-ICONS.md section 1.5): an external icon in any icon slot. The size and the
+   URL arrive inline (`--ic-size`, and `mask-image` or `background-image`), so this sheet only
+   says how each kind paints. Symbolic: the icon's alpha masks a square of the text colour, the
+   same recolouring a Glyph's `currentColor` stroke gets, so hover and `--f-ink*` reach it
+   (spike S7). Image: the bitmap as it is, stretched to the square (spike S8). */
+
+.ds-ext-icon{ display:inline-block; flex:none; width:var(--ic-size); height:var(--ic-size); vertical-align:middle; }
+.ds-ext-icon[*|data-kind=symbolic]{ background-color:currentColor; mask-size:100% 100%; mask-repeat:no-repeat; mask-position:center; }
+.ds-ext-icon[*|data-kind=image]{ background-size:100% 100%; background-repeat:no-repeat; background-position:center; }
 /* -- kbd -- */
 /* Kbd (design/04-COMPONENTS.md section 9): `S:67-68`; Small is the hint row's 9.5 (`S:662`).
    Static: no hover, active, focus or motion. Attribute selectors carry `*|` (spike S2). */
@@ -864,11 +874,15 @@ html,body{margin:0;padding:0;background:transparent}
 /* TODO(O-12): the separator is derived from the bubble's; its 4px margin is the candidate. */
 .ds-menu-separator{ height:1px; margin:var(--s-4) 0; background:var(--line-soft); }
 .ds-menu mark{ background:transparent; color:var(--accent); font-weight:800; }
+
+/* A submenu (design/13 section 13.3.4): beside its parent row, opened with no animation (only
+   the first menu of a session pops). */
+.ds-popover.ds-menu[*|data-depth]{ animation:none; }
 /* -- menu_entry -- */
 /* Menu items (design/04-COMPONENTS.md section 20): the Rich grid `S:667-673`, Slim `S:678-680`,
    checked `S:787-788`, Dropdown `C:1011-1023`. A pointer over a Rich, Slim or Context item
    moves the selection (O-13), so hover and keyboard look alike there; the Dropdown keeps C's
-   hover. TODO(O-1): no disabled item. */
+   hover. Disabled items and submenu parents: design/13-BEHAVIOUR-menus-windows.md 13.3.3-13.3.4. */
 
 .ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:pointer; }
 .ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
@@ -902,6 +916,17 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true] > .ds-ic{ opacity:1; color:var(--accent); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-title{ font-size:inherit; font-weight:inherit; }
 .ds-menu[*|data-kind=dropdown] .ds-menu-trail{ margin-left:auto; }
+
+/* Disabled (design/13 section 13.3.3): opacity .35, not selectable, no hover. */
+.ds-menu-item[*|aria-disabled=true]{ opacity:.35; cursor:default; }
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-soft); }
+
+/* A submenu parent: the 12 px chevron ends the row in the trail's place (design/13 section
+   13.3.3); while its submenu is open it keeps the selected look. */
+.ds-menu-chevron{ display:inline-flex; align-items:center; margin-left:auto; }
+.ds-menu-chevron .ds-ic{ color:var(--ink-faint); }
+.ds-menu-item[*|aria-expanded=true]{ background:var(--accent-soft); }
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.

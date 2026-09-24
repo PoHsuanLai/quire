@@ -18,3 +18,7 @@
 /* TODO(O-12): the separator is derived from the bubble's; its 4px margin is the candidate. */
 .ds-menu-separator{ height:1px; margin:var(--s-4) 0; background:var(--line-soft); }
 .ds-menu mark{ background:transparent; color:var(--accent); font-weight:800; }
+
+/* A submenu (design/13 section 13.3.4): beside its parent row, opened with no animation (only
+   the first menu of a session pops). */
+.ds-popover.ds-menu[*|data-depth]{ animation:none; }

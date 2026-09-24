@@ -351,7 +351,7 @@ rsx! {
         variant: ButtonVariant::Primary,
         label: "Send".to_owned(),
         icon: Some(ds::Icon::Send),
-        onclick: move |()| send(),
+        onclick: move |_| send(),
     }
 }
 ```
@@ -466,6 +466,57 @@ And in Gallery fixes B (FINDINGS "Gallery fixes B"):
   undoes that toast; a later push replaces it. The handler belongs to the scope that made it,
   so that scope must outlive the toast. `last_undo()` still reports the last undo.
 - `Surface` takes `accent` and `blur` beside `theme` (section 4).
+
+And in the tray gaps (FINDINGS "Tray gaps", sill Q6-Q8):
+
+- **External icons.** An icon slot takes `ds::IconSource`: `Glyph(Icon)`, `Symbolic(ExternalIcon)`
+  or `Image(ExternalIcon)`. `ExternalIcon { url: IconUrl, size: IconSize }` is a `data:` or
+  `file:` URL and the square size it is drawn at. Build the URL with `IconUrl::png(&bytes)` (a
+  tray pixmap you have PNG-encoded; quire does the base64), `IconUrl::svg(&document)`,
+  `IconUrl::file(&absolute_path)` (an icon theme lookup), or `IconUrl::parse(url)`, which refuses
+  any other scheme (`DsError::IconScheme`). `Symbolic` paints the icon's alpha in the text colour
+  (`mask-image` over `currentColor`), so it follows `--ink`, hover, pressed and `--f-ink*` exactly
+  like a glyph; `Image` shows the bitmap as it is. Which to use is design/08-ICONS.md §1.5's rule
+  (freedesktop `*-symbolic`, or a pixmap whose opaque pixels all have OKLCH chroma < 0.04, is
+  symbolic; anything coloured is an image) and is the caller's decision. `IconButton { icon }`
+  and `Button { icon }` take an `IconSource`, and an `Icon` (or `Option<Icon>` for `Button`)
+  still converts, so existing call sites are unchanged. `ds::IconView { source, size }` draws one
+  anywhere else. The URL loads through the document's net provider (ds-native and shell-host's
+  `LocalNet` answer `data:` and `file:`), one frame late.
+
+  ```rust
+  let icon = ds::IconSource::Symbolic(ds::ExternalIcon {
+      url: ds::IconUrl::file(&theme_path)?,
+      size: ds::IconSize::Base,
+  });
+  rsx! { IconButton { variant: IconButtonVariant::Tool, icon, label: title, onclick } }
+  ```
+- **Pointer buttons and ids.** `Button` and `IconButton` take `id: Option<String>`, written as
+  the element's `id` (a popup anchors to `tray-3` with no wrapper span). Their `onclick` is
+  `EventHandler<ds::Press>`, `Press { button: PointerButton::{Primary, Secondary, Middle},
+  modifiers }`: a right-click (which Blitz and browsers deliver as `contextmenu`, never as a
+  click; its default is prevented) arrives as `Secondary`, the middle button as `Middle`, and
+  Enter or Space on the focused control as `Primary`. A closure written `move |_| ...` compiles
+  unchanged and ignores the button; so does an `EventHandler<()>` you already hold (passed
+  straight through). A closure written `move |()| ...` does not: write `move |_|`.
+
+  ```rust
+  onclick: move |press: Press| match press.button {
+      PointerButton::Secondary => open_menu(),
+      PointerButton::Primary | PointerButton::Middle => activate(),
+  },
+  ```
+- **Menu submenus and disabled items.** `MenuEntry::Item` gained `availability: Availability`;
+  a disabled item is drawn at .35 opacity with `aria-disabled="true"`, skipped by Up and Down,
+  and a click on it does nothing. `MenuEntry::Submenu { title, tile, availability, children }`
+  is a row with a chevron that opens `children` beside the menu on a 200 ms rest, or at once on
+  Right, Enter or a click; Left or Escape closes one level, and a picked child's value reaches
+  the menu's `onpick` (the whole menu closes first). Submenus nest to any depth. The timing is
+  the `timing: MenuTiming` prop (default 200 ms delay, 300 ms safe-triangle timeout; read
+  `menus.submenu_delay_ms` into it), driven by the same `MenuTrack` machine as the bar's menus.
+  `expanded: Option<usize>` opens a choice's submenu as the menu mounts (choices count items and
+  parents, not headers or rules). A submenu is placed in the same document as its menu, so on a
+  shell surface whose popup is sized to the menu, the popup must leave room for it.
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

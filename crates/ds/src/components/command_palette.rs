@@ -4,13 +4,18 @@
 //! the panel. Keys come from the search field (design/06-INTERACTIONS.md section 2.3): Up and
 //! Down move the selection CLAMPED, Enter closes and then runs the selection, Escape closes the
 //! topmost layer only. Ranking and grouping are the consumer's (section 11); the palette marks
-//! the query in each title with the same fuzzy matcher.
+//! the query in each title with the same fuzzy matcher. The palette lists what it is given
+//! flat: a submenu parent is drawn with its chevron but runs nothing, and a disabled item is
+//! drawn and skipped as in a menu.
 
-use crate::components::menu::{Line, MenuKind, Nav, Step, moved, render_lines, values};
+use crate::components::menu::MenuKind;
 use crate::components::menu_entry::{MenuEntry, fuzzy};
+use crate::components::menu_lines::{Act, Choice, Line, Nav, Step, choices, liveness, moved_live};
+use crate::components::menu_rows::{Drawn, render_lines};
 use crate::components::popover::{Dismiss, Stacking, use_entrance, use_float};
 use crate::components::search_field::SearchField;
 use crate::components::text_input::Focus;
+use crate::components::vocab::Availability;
 use crate::motion::anim::Anim;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
@@ -55,7 +60,7 @@ fn marked<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Line<'a, T>> {
         .map(|entry| Line {
             entry,
             marks: match entry {
-                MenuEntry::Item { title, .. } => {
+                MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
                     fuzzy(query, title).map(|hit| hit.marks).unwrap_or_default()
                 }
                 MenuEntry::Header(_) | MenuEntry::Separator => Vec::new(),
@@ -84,7 +89,8 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let mut selected = use_signal(|| (query.clone(), 0usize));
     let entries = headed(&groups);
     let shown = marked(&entries, &query);
-    let picks = values(&shown);
+    let picks = choices(&shown);
+    let live = liveness(&picks);
     let count = picks.len();
     let current = match &*selected.read() {
         (made, index) if *made == query => (*index).min(count.saturating_sub(1)),
@@ -93,7 +99,11 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let run = {
         let picks = picks.clone();
         move |index: usize| {
-            if let Some(value) = picks.get(index) {
+            if let Some(Choice {
+                act: Act::Pick(value),
+                availability: Availability::Enabled,
+            }) = picks.get(index)
+            {
                 onclose.call(());
                 onpick.call(value.clone());
             }
@@ -101,10 +111,12 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     };
     let onkey = {
         let run = run.clone();
+        let live = live.clone();
         let event_query = query.clone();
         move |event: KeyboardData| match palette_key(&event.key()) {
             Some(PaletteKey::Move(step)) => {
-                selected.set((event_query.clone(), moved(Nav::Clamp, current, count, step)));
+                let next = moved_live(Nav::Clamp, current, &live, step);
+                selected.set((event_query.clone(), next));
             }
             Some(PaletteKey::Run) => run(current),
             Some(PaletteKey::Close) if float.takes_escape() => onclose.call(()),
@@ -119,16 +131,22 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
         render_lines(
             &shown,
             MenuKind::Rich.row(),
-            current,
-            EventHandler::new(run),
-            EventHandler::new({
-                let query = query.clone();
-                move |index: usize| {
-                    if selected.peek().1 != index {
-                        selected.set((query.clone(), index));
+            Drawn {
+                selected: current,
+                open: None,
+                onpick: EventHandler::new(run),
+                onpoint: EventHandler::new({
+                    let query = query.clone();
+                    let live = live.clone();
+                    move |(index, _): (usize, crate::geometry::Point)| {
+                        let enabled = live.get(index) == Some(&Availability::Enabled);
+                        if enabled && selected.peek().1 != index {
+                            selected.set((query.clone(), index));
+                        }
                     }
-                }
-            }),
+                }),
+                onmounted: EventHandler::new(|(_, _): (usize, MountedEvent)| {}),
+            },
         )
     };
     float.show(
@@ -174,7 +192,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
 #[cfg(test)]
 mod tests {
     use super::{PaletteKey, palette_key};
-    use crate::components::menu::Step;
+    use crate::components::menu_lines::Step;
     use dioxus::prelude::Key;
 
     #[test]

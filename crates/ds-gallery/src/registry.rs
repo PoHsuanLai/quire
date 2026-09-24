@@ -40,7 +40,7 @@ pub const REGISTRY: [Entry; 11] = [
         page: Page::Controls,
         title: "Controls",
         lede: "Every control in every state it can express: variants, pressed, expanded, disabled, empty and filled. Press Tab to see the keyboard focus ring.",
-        height: 1900,
+        height: 2070,
         body: pages::controls::ControlsPage,
     },
     Entry {

@@ -21,6 +21,15 @@ impl<K: Clone + PartialEq> MenuTrack<K> {
         }
     }
 
+    /// A tracker already tracking `menu` in click mode: a menu that is open by the time the
+    /// tracker exists (a ds `Menu` mounts open), so the opening press is over.
+    pub fn open(timing: MenuTiming, menu: K) -> Self {
+        MenuTrack {
+            timing,
+            phase: opened(menu, Held::Released),
+        }
+    }
+
     /// The open menu's key, if one is open.
     pub fn open_menu(&self) -> Option<&K> {
         match &self.phase {
@@ -100,7 +109,57 @@ fn tracking<K: Clone + PartialEq>(
         }
         MenuTrackEvent::Tick => ticked(session, now, timing),
         MenuTrackEvent::Key(key) => keyed(session, key),
+        MenuTrackEvent::Select(path) => selected(session, path),
+        MenuTrackEvent::Expand(path) => expanded(session, path),
     }
+}
+
+/// The keyboard moved the highlight to `path`: another item's submenu closes and a pending
+/// one is dropped; the highlight follows.
+fn selected<K>(session: Session<K>, path: ItemPath) -> (MenuPhase<K>, Effects<K>) {
+    let mut effects = Vec::new();
+    let sub = match session.sub {
+        Submenu::Open { item, guard } if item == path => Submenu::Open { item, guard },
+        other => close_sub(other, &mut effects),
+    };
+    if session.hot.as_ref() != Some(&path) {
+        effects.insert(0, MenuTrackEffect::Highlight(Some(path.clone())));
+    }
+    keep(
+        Session {
+            hot: Some(path),
+            sub,
+            ..session
+        },
+        effects,
+    )
+}
+
+/// Open `path`'s submenu now, closing another item's first; the highlight moves to it.
+fn expanded<K>(session: Session<K>, path: ItemPath) -> (MenuPhase<K>, Effects<K>) {
+    let mut effects = Vec::new();
+    if session.hot.as_ref() != Some(&path) {
+        effects.push(MenuTrackEffect::Highlight(Some(path.clone())));
+    }
+    let sub = match session.sub {
+        Submenu::Open { item, guard } if item == path => Submenu::Open { item, guard },
+        other => {
+            let _ = close_sub(other, &mut effects);
+            effects.push(MenuTrackEffect::OpenSub(path.clone()));
+            Submenu::Open {
+                item: path.clone(),
+                guard: None,
+            }
+        }
+    };
+    keep(
+        Session {
+            hot: Some(path),
+            sub,
+            ..session
+        },
+        effects,
+    )
 }
 
 /// The button came up over `target`.

@@ -5,7 +5,7 @@
 mod edit;
 mod field;
 mod parts;
-mod png;
+pub(crate) mod png;
 
 use crate::appearance::{Scheme, Theme};
 use crate::components::section_header::{HeaderKind, SectionHeader};

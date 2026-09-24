@@ -7,7 +7,7 @@
 //! `ORCHESTRATION.md` against `App`'s own output, the way a real consumer's tests would.
 
 use dioxus::prelude::*;
-use ds::{
+use ds::{Availability, 
     Anchor, Anim, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry,
     MenuKind, MountedRef, TextInput, Tile, Trail, use_motion_timer, use_toasts,
 };
@@ -49,6 +49,7 @@ enum Action {
 fn entries() -> Vec<MenuEntry<Action>> {
     vec![
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: Action::Duplicate,
             title: "Duplicate".to_owned(),
             detail: None,
@@ -57,6 +58,7 @@ fn entries() -> Vec<MenuEntry<Action>> {
             check: None,
         },
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: Action::Discard,
             title: "Discard".to_owned(),
             detail: None,

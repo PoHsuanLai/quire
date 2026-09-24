@@ -15,8 +15,8 @@ use ds::lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet
 
 /// Custom properties a component writes inline per element, which no stylesheet block declares:
 /// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the
-/// heal distance (design/05-MOTION.md section 5).
-const INLINE_VARS: &[&str] = &["--av-bg", "--av-fg", "--f", "--a", "--dy"];
+/// heal distance (design/05-MOTION.md section 5), and an external icon's size (`IconView`).
+const INLINE_VARS: &[&str] = &["--av-bg", "--av-fg", "--f", "--a", "--dy", "--ic-size"];
 
 const EXCEPTIONS: &[Exception] = &[
     Exception {
@@ -28,6 +28,12 @@ const EXCEPTIONS: &[Exception] = &[
         rule: Rule::HexColour,
         selector: ".ds-truncate",
         reason: "the end fade's mask is alpha only; its #000 is never painted (spike S13)",
+    },
+    Exception {
+        rule: Rule::CurrentColourOutsideStrokeFill,
+        selector: ".ds-ext-icon[*|data-kind=symbolic]",
+        reason: "a symbolic icon is its mask over the text colour, the Glyph's currentColor \
+                 stroke by other means (design/08-ICONS.md section 1.5, spike S7)",
     },
     Exception {
         rule: Rule::RawFontSize,

@@ -16,6 +16,7 @@
 //! No serde: an icon is never stored, and a derive would make it a persisted schema
 //! (`CONVENTIONS.md` section 3).
 
+pub mod external;
 mod geometry;
 mod geometry_shell;
 pub mod render;
@@ -23,6 +24,7 @@ pub mod shape;
 #[cfg(test)]
 mod tests;
 
+pub use external::{ExternalIcon, IconSource, IconUrl};
 use geometry::*;
 pub use shape::Shape;
 

@@ -81,7 +81,7 @@ behaviour and numbers.
 | Checkmark | 14 px accent check in the 22 px column (A4 "checked = 14 accent check") | settled |
 | Separator | 1 px `--line-soft`, 4 px margin above and below (9 px row) | proposed |
 | Section header | data 9.5, .14em, upper (A4 `.g`), 22 px row, not selectable | settled style, height proposed |
-| Disabled item | opacity .35, not selectable, skipped by arrow keys | R2 (H) |
+| Disabled item | opacity .35, not selectable, skipped by arrow keys | R2 (H); settled in ds `Menu` (`MenuEntry::Item { availability }`, tray gaps Q7) |
 | Rich menus | `Menu{Rich}` keeps the design's 34 px tile rows (A4 `.fmenu .it`) | settled |
 
 ### 13.3.4 Submenus
@@ -89,12 +89,12 @@ behaviour and numbers.
 | Value | Number | Status | Basis |
 | --- | --- | --- | --- |
 | Open delay (pointer rests on a submenu item) | 200 ms | proposed (R5 UNKNOWN) |
-| Open immediately | Right arrow, Enter, or click on the item | proposed |
-| Placement | right of the parent menu, first item aligned with the parent item (`y = item.top - 5`), gap 2; flips left when it would cross the output edge - 8 | proposed |
+| Open immediately | Right arrow, Enter, or click on the item | settled (ds `Menu`, tray gaps Q7; `MenuTrackEvent::Expand`) |
+| Placement | right of the parent menu, first item aligned with the parent item (`y = item.top - 5`, the panel padding: 6 for Dropdown), gap 2; flips left when it would cross the output edge - 8 | settled for ds `Menu` (through `place()`, tray gaps Q7) |
 | Safe triangle | while a submenu is open and the pointer moves inside the triangle formed by the previous pointer sample and the submenu's near-edge top and bottom corners (inflated 4 px), the parent's selection does not change | R4 (H) |
 | Triangle timeout | if the pointer stays inside the triangle without motion for 300 ms, the item under the pointer is selected (and its submenu, if any, follows the 200 ms rule) | proposed |
-| Close | leaving the triangle onto another parent item closes the submenu immediately; Left arrow or Esc closes one level | proposed |
-| Animation | submenus open with no animation (only the first menu of a tracking session pops) | proposed (R3) |
+| Close | leaving the triangle onto another parent item closes the submenu immediately; Left arrow or Esc closes one level | settled (ds `Menu`, tray gaps Q7) |
+| Animation | submenus open with no animation (only the first menu of a tracking session pops) | settled for ds `Menu` (`[data-depth]` has no entrance) |
 
 ### 13.3.5 App switcher (Cmd+Tab)
 

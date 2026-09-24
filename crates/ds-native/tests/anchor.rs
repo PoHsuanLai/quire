@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Button, ButtonVariant, Ds, Material, Menu, MenuEntry, MenuKind, MountedRef,
-    Rect, Switch, Trail,
+    Anchor, Appearance, Availability, Button, ButtonVariant, Ds, Material, Menu, MenuEntry,
+    MenuKind, MountedRef, Rect, Switch, Trail,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -39,6 +39,7 @@ fn Anchored() -> Element {
         .into_iter()
         .zip(0u8..)
         .map(|(title, value)| MenuEntry::Item {
+            availability: Availability::Enabled,
             value,
             title: title.into(),
             detail: None,
