@@ -1,6 +1,6 @@
 /* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
    reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
-   `--danger-ink` for S's `#fff`) when the text lies. Blitz has no ellipsis: the path gives way
+   `--danger-ink`: S's `#fff` in light, a dark ink in dark) when the text lies. Blitz has no ellipsis: the path gives way
    first and the registered domain never shrinks (O-30). It enters with `hc-in` at `--t-quick
    --e-out` (`S:433`, `Anim::LinkPillIn`). */
 

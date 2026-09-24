@@ -1369,3 +1369,79 @@ page puts each piece beside the macOS number it targets.
 - Goldens re-blessed: `tests/snapshots/stylesheet.css` (the materials, shapes, tuned tokens and
   component sheets). Control and overlay goldens did not change (the markup is the same; the
   new props default to absent).
+
+## mailo gaps (2026-09-24)
+
+mailo's first migration wave (Phase A) reported seven gaps against quire v0.1.1. Branch
+`mailo-gaps`. Proofs: `crates/ds-native/tests/window_frame.rs` (pixels),
+`crates/ds/tests/legibility.rs`, `tokens.rs`, `lint_rules.rs`, the `icon_view/printer` and
+`icon_view/folder-input` goldens, `ds-settings`'s `environment` tests.
+
+1. **The window root painted its frame layers beneath itself (visible bug).** Cause: a
+   `Material::Window` root was not a stacking context, so `.ds-layer` (`--z-scene`, -2) and
+   `.ds-grain` (`--z-grain`, -1) joined the document's stacking context and painted *under* the
+   root's own `background: var(--m-tint-solid)`, which for a window is the current `--f-grad`.
+   The window showed only that background: a Space switch was an instant swap and the grain was
+   invisible. The tinted chrome roots never had this (bar gaps gave them `position:relative`
+   and `--z-raise`). Fix: `FrameTint::Opaque` now stamps `data-frame="opaque"` and
+   `.ds[data-material][data-frame=opaque]{position:relative;z-index:var(--z-raise)}` makes the
+   root its own stacking context. Its background stays the current gradient, under both layers,
+   as `.ds-frame`'s does on shell chrome, so the window stays opaque through the fade (a
+   transparent background would show the desktop through the half-faded pair). `.ds-layer`
+   gains `pointer-events:none`: once the layers sit inside the root's context Blitz hit them
+   before the content (the harness's hover-card test caught it). Pixel numbers (320 x 200,
+   light, presets 0 and 3): with a test override painting the layers red, the corner is
+   `[255,0,0]` against `[226,234,254]` plain (before the fix: `[226,234,254]` both ways);
+   grain 100 against grain 0 moves the luminance of 1270 of 1600 pixels in the top-left 40 x
+   40 by 2 or more, at most 47 (before: 0 of 1600); a switch from preset 0 to 3 sampled when the
+   `--e-out` curve reaches a quarter is `[238,230,241]`, between `[225,234,254]` before and
+   `[254,226,225]` after (before the fix the mid sample was already `[254,226,225]`). The
+   tinted chrome's tests (`bar_frame.rs`, `macos_polish.rs`) are unchanged and green.
+   `gallery_fixes.rs`'s empty-root test now gives its look `Grain(0)`: it asks for a flat
+   ground, and the default look's grain 35 is now visible. Every gallery sheet was regenerated
+   (window roots show their grain; the tokens page has the new tokens).
+2. **Glyphs.** `Icon::Printer` and `Icon::FolderInput`, Lucide 1.47.0 `printer` and
+   `folder-input` as published, stroke by attribute, in `icon/geometry_actions.rs` and a third
+   list `Icon::ACTIONS` (`Icon::ALL` is the mailo set, the shell set, then the actions; the
+   mailo set stays locked to `icons.js`). design/08-ICONS.md is not in this wave's files: its
+   owner may list them.
+3. **`use_environment(AppName::MAILO)` did not import `appearance.json`.** `load_initial`
+   imported mailo's JSON only for non-mailo apps and loaded mailo's own TOML directly. Decided:
+   every app, mailo included, imports mailo's legacy `appearance.json` once, the first time its
+   own `appearance.toml` does not exist (for mailo the two are in the same directory). One code
+   path, `environment::initial_from(dir, mailo_dir)`; test
+   `every_app_mailo_included_imports_mailos_json_once`. docs/mailo-migration.md section 4 and
+   CONSUMING.md section 3 say so.
+4. **Contrast.** Dark `--danger-ink` was white on `#E0705A`, 3.17:1; it is now `#1A0B08`
+   (6.06:1; light stays white, 6.03:1). The legibility test checks every `X` / `X-ink` pair in
+   both schemes, which needed the pairs to exist: `--ok-ink` (white / `#0B1A12`, 5.21 / 7.15)
+   and `--warn-ink` (`#140D03` both, 4.78 / 8.27; white on light `--warn` is 4.03) are new
+   `ColourToken`s. design/03 section 3 has the table, settled.
+5. **Person colours outside `Avatar`.** `ds::person_hue(name) -> PersonHue` (the existing
+   `PersonHue::of`, design/03 section 13's hash), with `PersonHue::hex()` now public and
+   `PersonHue::colour()`; `ds::PersonSwatch`, the eight stored-colour swatches as
+   `--c-person-1..8` in mailo's `AVATAR` order, declared once (the same in both schemes) and
+   known to the lint. design/03 open decision 15 is settled. CONSUMING.md "Person colours".
+6. **`SpaceLook` has no motion: not a gap.** design/21 keeps motion global (the
+   `Appearance`), and now says so in section 1. No API change: a consumer that wants motion per
+   Space passes its Space's motion into the root's `appearance.motion`. docs/mailo-migration.md
+   section 3 says this instead of calling it a gap.
+7. **`KEEP_FOCUS`.** The brief's section 5.1 said to delete its injection while 5.3 and 5.4
+   expected it to work. Fixed: keep the constant and its injection through Phase A; Phase B
+   removes it, where `ds_native::focus` (provided by `launch`) takes over (sections 5.1, 5.3,
+   6.1, 6.3).
+
+What mailo changes:
+
+- Nothing for item 1; a mailo pixel test that assumed a flat window ground sets `Grain(0)`.
+- Delete `space::AVATAR` and `ui/compose/items.rs::hue`: stored account colours come from
+  `ds::PersonSwatch::nth(i)` (`.colour()` for `AvatarTone::Account`, or its `var()` in CSS), a
+  person with no stored colour from `ds::person_hue(address)` (`AvatarTone::Person`). Note the
+  compose recipients currently index `AVATAR` by a byte hash; switching to `person_hue` changes
+  their colours to the design's hash.
+- Use `Icon::Printer` / `Icon::FolderInput` where mailo kept its own print and move glyphs.
+- Text on `--danger`/`--ok`/`--warn` uses `--danger-ink`/`--ok-ink`/`--warn-ink`, not white.
+- `appearance.rs`'s startup `load_or_import` is redundant once the window calls
+  `use_environment(AppName::MAILO)`; it may stay (it is idempotent) or go.
+- Keep `Space::motion` and feed it into the `Ds` root's `appearance.motion`; keep `KEEP_FOCUS`
+  until Phase B.

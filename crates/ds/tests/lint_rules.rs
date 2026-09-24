@@ -707,3 +707,18 @@ mod mailo_cases {
         );
     }
 }
+
+/// The person swatches and the status inks are declared tokens: a consumer's own CSS may paint
+/// with them at the strict profile (FINDINGS "mailo gaps", items 4 and 5).
+#[test]
+fn the_person_swatches_and_status_inks_lint_clean() {
+    let css = ".pin { background: var(--c-person-3); color: var(--on-hue); }\
+               .saved { background: var(--ok); color: var(--ok-ink); }\
+               .dirty { background: var(--warn); color: var(--warn-ink); }";
+    let offences = lint(css, Profile::Strict);
+    assert!(offences.is_empty(), "{offences:#?}");
+    assert!(
+        !lint(".pin { background: var(--c-person-9); }", Profile::Strict).is_empty(),
+        "an undeclared swatch is an offence"
+    );
+}

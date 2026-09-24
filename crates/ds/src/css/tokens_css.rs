@@ -11,7 +11,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
+    PersonSwatch, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
 };
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
@@ -98,7 +98,12 @@ fn fixed_tokens() -> Vec<String> {
         .chain(DOCK_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
         .map(|token| token.declaration());
+    // Identity is data, not theme: the person swatches are the same in both schemes.
+    let people = PersonSwatch::ALL
+        .into_iter()
+        .map(|swatch| format!("{}:{};", swatch.var(), swatch.hex().css()));
     radii
+        .chain(people)
         .chain(spacing)
         .chain(families)
         .chain(sizes)

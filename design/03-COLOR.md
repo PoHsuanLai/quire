@@ -76,6 +76,16 @@ The card uses the Post palette; `S`'s light and dark values are the canonical se
 | `--danger` | `#B03A2A` | `#E0705A` | spoof flag, lying link |
 | `--scrim` | `rgba(0,0,0,.22)` | same (not redefined) | behind peek and command menu |
 
+**Status inks (settled, 2026-09-24).** Each status colour has an ink for text on it, as
+`--accent-ink` is for `--accent`, and every `X` / `X-ink` pair clears 4.5:1 in both schemes
+(`crates/ds/tests/legibility.rs::every_ink_on_its_colour_is_legible_in_both_schemes`):
+
+| Token | Light | Dark | Ratio light / dark |
+| --- | --- | --- | --- |
+| `--ok-ink` | `#FFFFFF` | `#0B1A12` | 5.21 / 7.15 |
+| `--warn-ink` | `#140D03` | `#140D03` | 4.78 / 8.27 (white on light `--warn` is 4.03) |
+| `--danger-ink` | `#FFFFFF` (`S:436`'s `#fff`) | `#1A0B08` (mailo's) | 6.03 / 6.06 (white on dark `--danger` is 3.17) |
+
 The card always takes the Post tokens of the Space's own theme, not the page's: the script writes
 them onto `#card` and `#win` and sets `color-scheme` to match (`S:1196-1205`).
 
@@ -393,6 +403,13 @@ People, accounts and providers get a fixed colour each; these are data, not them
 
 The design system bans `filter`; `saturate()` becomes opacity (`P:75`, `P:421`).
 
+**As tokens (settled, 2026-09-24).** The person hash is `ds::person_hue(address) -> PersonHue`
+(painted by `AvatarTone::Person`, or `PersonHue::colour()`). The eight stored-colour swatches a
+consumer hands out in order are `--c-person-1..8` (`ds::PersonSwatch`), mailo's `AVATAR` order:
+`#5B4FC4`, `#2F7F6E`, `#B0662E`, `#3C8A5B`, `#7A4A9E`, `#C0782E`, `#2E7F8C`, `#6D7A3A` (the
+accounts and pins above). They are data, declared once and the same in both schemes. A
+consumer keeps no hex constants for people.
+
 ## 14. Usage map
 
 Which token paints which element. Frame rows use `--f-*`; everything else is inside the card.
@@ -682,8 +699,9 @@ index (`S:1027`, `S:1086`, `S:1669`).
     is not specified.
 14. **Destination token bug.** `S:447` uses the undefined `--f-hover`; the plan says to read
     `--f-pill-hover` (`P:1487`). Section 14.1 follows the plan.
-15. **Identity colour source.** Account and pin colours are sample data; how real accounts get a
-    colour (stored, or the person hash) is not specified.
+15. **Identity colour source.** Settled (2026-09-24): a stored colour is one of the eight
+    `--c-person-*` swatches, handed out in order; a person with none takes the person hash
+    (section 13).
 
 ## Sources
 

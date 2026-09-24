@@ -5,7 +5,8 @@
 //! and `Overlays` as context.
 //!
 //! What the root paints follows its material (`chrome.rs`): a Window draws the Space gradient
-//! opaque with its A/B layers and grain; the bar, the dock, a popover panel, the OSD and a
+//! opaque with its A/B layers and grain (`data-frame="opaque"`, its own stacking context so the
+//! layers paint over its background); the bar, the dock, a popover panel, the OSD and a
 //! widget draw the same layers and grain as one group at the material's tint alpha
 //! (`data-frame="tinted"`, design/21-SPACES.md sections 3 and 5); a Popover, Sheet or Toast root
 //! paints nothing on its own box (`data-chrome="transparent"`) and its cards paint the material;
