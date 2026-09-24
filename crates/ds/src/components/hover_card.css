@@ -7,6 +7,8 @@
 
 .ds-hover-target{ display:inline; }
 .ds-hover-target[*|data-kind=thread]{ display:block; }
+/* A target drawn as a `div` or as the list's own `li` (mailo gaps 2, `data-as`) is a block. */
+.ds-hover-target[*|data-as=div], .ds-hover-target[*|data-as=li]{ display:block; }
 
 .ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
   animation:hc-in var(--t-move) var(--e-spring); }
@@ -33,3 +35,9 @@
 .ds-hovercard-flag[*|data-tone=info] .ds-ic{ color:var(--accent); }
 .ds-hovercard-actions{ margin-top:var(--s-10); display:flex; gap:var(--s-6); flex-wrap:wrap; }
 .ds-hovercard-live{ display:inline-block; width:6px; height:6px; border-radius:var(--r-pill); background:var(--ok); }
+
+/* A tip (mailo gaps 2, design/06 section 3 `time`): the Card tooltip's size (tooltip.css
+   `.ds-tip`) on the hover card's surface, one line, placed below its target like a sender card
+   and opened on the same hub timing. */
+.ds-popover.ds-hovercard[*|data-kind=tip]{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip);
+  border-radius:var(--r-item); white-space:nowrap; }

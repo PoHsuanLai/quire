@@ -9,8 +9,10 @@
 //! is a list of [`HoverCardPart`]s (the section's blocks as data), then any children.
 
 mod parts;
+mod target;
 
 pub use parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint};
+pub use target::{HoverTarget, TargetElement};
 
 use crate::components::popover::{Float, Stacking, position_style, use_entrance, use_float};
 use crate::geometry::measure::client_rect;
@@ -18,7 +20,6 @@ use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::HoverEvent;
 use crate::overlay::hover_hub::{HoverKey, HoverKind, use_hover_hub};
-use crate::overlay::stack::LayerStack;
 use crate::time::{FRAME_SLACK, sleep};
 use crate::tokens::ZLayer;
 use dioxus::core::provide_root_context;
@@ -67,12 +68,13 @@ fn kind_slug(kind: HoverKind) -> &'static str {
         HoverKind::Sender => "sender",
         HoverKind::Account => "account",
         HoverKind::Side => "side",
+        HoverKind::Tip => "tip",
     }
 }
 
 /// Where a card of `kind` goes against its target (`S:1715-1726`): a thread card 10 right of
-/// the row and 4 above its top; account and side cards 10 right and 6 above; the rest 6 below
-/// the target's left edge. Never flipped: a card that would overflow slides along the edge.
+/// the row and 4 above its top; account and side cards 10 right and 6 above; the rest (a
+/// sender card, a time tip) 6 below the target's left edge. Never flipped: a card that would overflow slides along the edge.
 fn card_placement(kind: HoverKind, target: Rect) -> (Rect, Placement, Px) {
     let raised = |by: f32| Rect {
         origin: Point {
@@ -92,7 +94,7 @@ fn card_placement(kind: HoverKind, target: Rect) -> (Rect, Placement, Px) {
             Placement::new(Side::Right, Align::Start).no_flip(),
             Px(10.0),
         ),
-        HoverKind::Sender => (
+        HoverKind::Sender | HoverKind::Tip => (
             target,
             Placement::new(Side::Bottom, Align::Start).no_flip(),
             Px(6.0),
@@ -122,44 +124,6 @@ pub(crate) fn use_card(kind: HoverKind) -> (Float, String, &'static str) {
         float.origin(Some(rect), want, gap)
     });
     (float, position_style(at), presence)
-}
-
-/// Wraps whatever a card hooks: feeds the hover hub.
-///
-/// The component doc names the first prop `key`; dioxus reserves `key` for list identity and
-/// rejects a prop of that name, so it is `hover_key` (FINDINGS.md).
-#[component]
-pub fn HoverTarget(hover_key: HoverKey, kind: HoverKind, children: Element) -> Element {
-    let hub = use_hover_hub();
-    let anchors = use_anchors();
-    let stack = try_use_context::<Signal<LayerStack>>();
-    let mut element = use_signal(|| None::<MountedRef>);
-    let key = hover_key.clone();
-    rsx! {
-        span {
-            class: "ds-hover-target",
-            "data-hover-key": "{hover_key.0}",
-            "data-kind": kind_slug(kind),
-            onmounted: move |event| element.set(Some(MountedRef(event.data()))),
-            // The innermost target wins (`S:1787-1788`): it handles the pointer and stops it.
-            onmouseover: move |event| {
-                event.stop_propagation();
-                // No card while a peek, the palette or a menu is open (`S:1790`).
-                if stack.is_some_and(|stack| stack.peek().top().is_some()) {
-                    hub.feed(HoverEvent::OverSuppressed);
-                    return;
-                }
-                if let Some(mounted) = element.peek().clone() {
-                    anchors.record(key.clone(), mounted);
-                }
-                hub.feed(HoverEvent::Over((key.clone(), kind)));
-            },
-            onmouseleave: move |_| hub.feed(HoverEvent::Out),
-            // A click removes the card at once, not warm (`S:1809`).
-            onpointerdown: move |_| hub.feed(HoverEvent::ClickInList),
-            {children}
-        }
-    }
 }
 
 /// The card, rendered by the consumer for the hub's open key: `parts` in order, then

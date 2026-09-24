@@ -866,6 +866,8 @@ per row:
 | `Menu` | `on_active: Option<EventHandler<Option<usize>>>` | Under `Auto`, every change of the highlight (the first one included). Under `Controlled`, a request: Up or Down in the menu, or the pointer coming over another choice; set your cursor from it or not. |
 | `Menu` | `onquery: Option<EventHandler<String>>` | With `filter: Filter::Typing`, the typed text on every change (Backspace included), for an entry that names it ("Create label “…”"): rebuild `entries` from it. |
 | `Menu` | trailing action | Through `MenuEntry::Row(MenuRow { trailing: Some(RowAction { .. }), .. })`, as in the palette: the menu stays open and nothing is picked. |
+| `HoverTarget` | `as_: TargetElement` | The element the target is drawn as: `Span` (default, as before), `Div` or `Li` (a list's own item, which a `span` cannot hold). Same handlers, same hub: the card opens, places and closes exactly as for a span. `display:contents` is not offered: the card is placed against the target's rect, and such an element has none. A `ListRow` is already an `li`: hook its thread card through the row's `onpointerenter`/`onpointerleave` instead. |
+| `HoverKind` | `Tip` | A value's small tip (a row's time): `HoverCard { kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }` is one line, auto width up to 260, 12 px (the Card tooltip's size), placed 6 below the target's left edge like a sender card, on the hub's timing (450 ms, 0 when warm, 150 ms to close). A `match` over `HoverKind` needs an arm for it. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

@@ -1487,10 +1487,13 @@ What mailo changes:
 
 mailo's second migration wave moves its rows, strip, command panel, menus and hover cards onto
 quire and reported what they could not express. Branch `mailo-gaps-2a`. Every change is
-additive: a prop defaulting to the old behaviour, a new variant or a new type; the existing
-goldens did not change. Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_overlays.rs`
-(Harness), the goldens added under `tests/snapshots/lists/` and `tests/snapshots/overlays/`
-(`crates/ds/tests/lists/mailo.rs`, `overlays/mailo.rs`), unit tests beside each new module.
+additive: a prop defaulting to the old behaviour, a new variant or a new type; no existing
+component golden changed (the stylesheet golden gained the new rules and lost two comment
+lines). Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_palette.rs`, `mailo_menu.rs`,
+`mailo_hover.rs` (Harness), the goldens added under `tests/snapshots/lists/` and
+`tests/snapshots/overlays/` (`crates/ds/tests/lists/mailo.rs`, `overlays/mailo.rs`), unit
+tests beside each new module. Each proof was checked by removing the change it proves and
+watching it fail (the strip's and the row action's stops).
 
 1. **Rows and the strip** (`ListRow`, `HoverStrip`).
    - `subject` and `snippet` are `ds::Text` (`text_runs.rs`): `Plain(String)` or `Runs(Vec<Run>)`,
@@ -1589,3 +1592,39 @@ goldens did not change. Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_
    - `menu.rs` passed 300 lines: `MenuKind` and `MenuEntrance` moved to `menu_kind.rs`
      (re-exported from `menu`, unchanged).
    - Gallery: Overlays page, "Menu driven by a field".
+
+4. **Hover cards** (`HoverTarget`, `HoverKind`).
+   - `HoverTarget { as_: TargetElement::{Span, Div, Li} }` rather than hooks the caller
+     spreads: the handlers (`mouseover` with the innermost-wins stop, `mouseleave`,
+     `pointerdown`, the mounted element the anchor book measures) stay quire's, in one `Hooks`
+     value shared by the three `rsx!` branches, so the intent machine cannot be half-wired by a
+     caller that forgets one. `Contents` is left out: a `display:contents` wrapper has no box,
+     so `Anchors::record` would read an empty rect and the card would open at the origin. A
+     `div` or `li` target carries `data-as` and is `display:block` (a type selector would trip
+     the consumer-only `DsInternals` exemption, which keys on a selector starting `.ds`). The
+     span's markup is unchanged. `HoverTarget` moved to `hover_card/target.rs`. Proof
+     (`mailo_hover.rs`): three `li` targets in a `ul`; the second opens its side card after the
+     wait (none at 400 ms), 10 right of the item and 6 above it, and moving to the third while
+     warm switches the card within 60 ms.
+   - `HoverKind::Tip`: design/06 section 3's `time` kind. It uses the hub's intent timing (450
+     ms, 0 warm, 150 ms close, 400 ms warm window), the same as every card and as the Card
+     tooltip (which already goes through the hub), not a timing of its own: the tooltip has no
+     other. Placed like `Sender` (below, 6); drawn by `.ds-hovercard[data-kind=tip]` at the
+     Card tooltip's size (auto width to 260, `--s-6`/`--s-10` padding, `--fs-shell-tip`,
+     `--r-item`) on one line (`nowrap`). Adding a variant breaks a `match` over `HoverKind` with
+     no wildcard (none in this repo, sill or mailo). The `Tooltip { Card }` markup is unchanged
+     (it still files its target as `Sender`). Proof: a time's tip opens under its left edge,
+     at most 260 wide and one line tall.
+   - Gallery: Overlays page, "Hover cards and tooltips" gains a time tip and two `li` targets.
+
+What mailo changes:
+
+- Rows: `ListRow { subject: Text::Runs(..), snippet, on_sender, on_time, onpointerenter,
+  onpointerleave, onpointerdown, aria_label, strip: HoverStrip { shown, titles:
+  Titles::FromLabel, expanded } }`; drop the strip's own `stop_propagation`.
+- The command panel: `entrance: PaletteEntrance::Opaque`; recent searches as
+  `MenuEntry::Row(MenuRow { trailing: Some(RowAction { .. }), .. })`.
+- The composer's menus: `active: Cursor::Controlled(..)`, `on_active`; the label menu's create
+  row from `onquery`.
+- Hover: sidebar entries as `HoverTarget { as_: TargetElement::Li }`, the time's tip as
+  `HoverKind::Tip`.
