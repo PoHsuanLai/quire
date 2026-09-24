@@ -9,11 +9,12 @@ use ds::{
     Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, ButtonVariant,
     DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
     Key, LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
-    Switch, Tooltip, TooltipKind, UndoToken, sleep, use_env, use_hover_hub, use_toast_hub,
+    Switch, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_env, use_hover_hub,
+    use_toast_hub,
 };
 
 /// The hover targets, one per card kind.
-const TARGETS: [(HoverKind, &str, &str); 4] = [
+const TARGETS: [(HoverKind, &str, &str); 5] = [
     (
         HoverKind::Thread,
         "thread:88",
@@ -26,7 +27,11 @@ const TARGETS: [(HoverKind, &str, &str); 4] = [
         "Work account (account card)",
     ),
     (HoverKind::Side, "side:2", "Pinned: Mei Chen (side card)"),
+    (HoverKind::Tip, "time:88", "09:41 (time tip)"),
 ];
+
+/// Pinned people drawn as list items that are hover targets themselves (mailo gaps 2).
+const PINNED: [(&str, &str); 2] = [("side:4", "Sam Lindqvist"), ("side:5", "Priya Raman")];
 
 /// Hover targets for every card kind, and both tooltip kinds.
 #[component]
@@ -36,11 +41,18 @@ pub fn Cards() -> Element {
     rsx! {
         Section {
             title: "Hover cards and tooltips",
-            note: "Rest the pointer on a target: 450 ms to open, 150 ms to close, then warm for 400 ms so the next opens at once.",
+            note: "Rest the pointer on a target: 450 ms to open, 150 ms to close, then warm for 400 ms so the next opens at once. The time tip is HoverKind::Tip; the pinned people below are li targets (TargetElement::Li).",
             div { class: "g-row",
                 for (kind , key , text) in TARGETS {
                     HoverTarget { hover_key: HoverKey(key.to_string()), kind,
                         Button { variant: ButtonVariant::Quiet, label: text, onclick: |_| {} }
+                    }
+                }
+            }
+            ul { class: "g-list g-stage-pad",
+                for (key , name) in PINNED {
+                    HoverTarget { key: "{key}", hover_key: HoverKey(key.to_string()), kind: HoverKind::Side, as_: TargetElement::Li,
+                        Button { variant: ButtonVariant::Quiet, label: format!("Pinned: {name} (li target)"), onclick: |_| {} }
                     }
                 }
             }
@@ -52,7 +64,9 @@ pub fn Cards() -> Element {
                     Button { variant: ButtonVariant::Mini, label: "Card tooltip", onclick: |_| {} }
                 }
             }
-            if let Some((key, kind)) = open {
+            if let Some((key, HoverKind::Tip)) = open.clone() {
+                HoverCard { key: "{key.0}", kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }
+            } else if let Some((key, kind)) = open {
                 HoverCard { key: "{key.0}", kind,
                     div { class: "ds-hovercard-person",
                         Avatar { initial: 'D', size: AvatarSize::Size34, tone: AvatarTone::Ink }

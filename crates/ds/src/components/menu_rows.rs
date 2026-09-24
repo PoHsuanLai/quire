@@ -1,9 +1,8 @@
 //! Drawing a panel's lines: headers, status lines, rules and choice rows, each row wired to report a click,
 //! a pointer move and its mount by its choice number (`menu_lines`).
 
-use crate::components::menu_entry::{
-    Branch, ItemView, MenuEntry, Row, RowEvents, Trail, info, item,
-};
+use crate::components::menu_entry::{MenuEntry, Trail};
+use crate::components::menu_item::{Branch, ItemView, Row, RowEvents, Words, info, item};
 use crate::components::menu_lines::Line;
 use crate::components::press::Press;
 use crate::components::section_header::{HeaderKind, SectionHeader};
@@ -15,8 +14,8 @@ use dioxus::prelude::*;
 /// and what a click, a pointer move and a mount on choice `i` report.
 #[derive(Clone, Copy)]
 pub(crate) struct Drawn {
-    /// The selected choice.
-    pub selected: usize,
+    /// The highlighted choice; none under a caller's cursor that names none.
+    pub selected: Option<usize>,
     /// The choice whose submenu is open.
     pub open: Option<usize>,
     /// A click on a live choice.
@@ -60,15 +59,31 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                     ..
                 } => (
                     ItemView {
-                        title,
-                        detail: detail.as_deref(),
+                        title: Words::Str(title),
+                        detail: detail.as_deref().map(Words::Str),
                         tile: tile.as_ref(),
                         trail,
                         check: *check,
                         marks: &line.marks,
-                        selection: Selection::of(&index, &drawn.selected),
+                        selection: Selection::of(&Some(index), &drawn.selected),
                         availability: *availability,
                         branch: Branch::Leaf,
+                        trailing: None,
+                    },
+                    index,
+                ),
+                MenuEntry::Row(row) => (
+                    ItemView {
+                        title: Words::Text(&row.title),
+                        detail: row.detail.as_ref().map(Words::Text),
+                        tile: row.tile.as_ref(),
+                        trail: &row.trail,
+                        check: row.check,
+                        marks: &line.marks,
+                        selection: Selection::of(&Some(index), &drawn.selected),
+                        availability: row.availability,
+                        branch: Branch::Leaf,
+                        trailing: row.trailing.as_ref(),
                     },
                     index,
                 ),
@@ -79,19 +94,20 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                     ..
                 } => (
                     ItemView {
-                        title,
+                        title: Words::Str(title),
                         detail: None,
                         tile: tile.as_ref(),
                         trail: &Trail::None,
                         check: None,
                         marks: &line.marks,
-                        selection: Selection::of(&index, &drawn.selected),
+                        selection: Selection::of(&Some(index), &drawn.selected),
                         availability: *availability,
                         branch: Branch::Parent(if drawn.open == Some(index) {
                             Switch::On
                         } else {
                             Switch::Off
                         }),
+                        trailing: None,
                     },
                     index,
                 ),

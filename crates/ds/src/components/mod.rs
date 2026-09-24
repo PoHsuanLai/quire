@@ -21,13 +21,17 @@ pub mod link_pill;
 pub mod list_row;
 pub mod menu;
 pub mod menu_bar_item;
+pub mod menu_cursor;
 pub mod menu_entry;
+pub(crate) mod menu_item;
 pub(crate) mod menu_keys;
+pub(crate) mod menu_kind;
 pub(crate) mod menu_lines;
 pub(crate) mod menu_match;
 pub(crate) mod menu_panel;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_tracker;
+pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
@@ -36,6 +40,10 @@ pub mod peek;
 pub mod popover;
 pub mod press;
 pub mod provider_mark;
+pub mod row_action;
+pub(crate) mod row_click;
+pub mod row_hooks;
+pub(crate) mod row_star;
 pub mod scrim;
 pub mod search_field;
 pub mod section_header;
@@ -51,6 +59,7 @@ pub mod spinner;
 pub mod sync_halo;
 pub mod tabs;
 pub mod text_input;
+pub mod text_runs;
 pub mod toast;
 pub mod toggle;
 pub mod tooltip;
@@ -71,8 +80,9 @@ pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use hover_card::{
     FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
+    TargetElement,
 };
-pub use hover_strip::{ActionId, HoverStrip, StripAction};
+pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
@@ -80,13 +90,16 @@ pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
 pub use menu_bar_item::MenuBarItem;
-pub use menu_entry::{MenuEntry, Tile, Trail};
+pub use menu_cursor::Cursor;
+pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_lines::Filter;
 pub use palette_shown::Retain;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
+pub use row_action::RowAction;
+pub use row_hooks::PartHooks;
 pub use scrim::Scrim;
 pub use search_field::SearchField;
 pub use section_header::{HeaderKind, SectionHeader};
@@ -102,6 +115,7 @@ pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
 pub use text_input::{Focus, InputVariant, TextInput, TextInputKind};
+pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
@@ -152,6 +166,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("sync_halo", include_str!("sync_halo.css")),
     ("tabs", include_str!("tabs.css")),
     ("text_input", include_str!("text_input.css")),
+    ("text_runs", include_str!("text_runs.css")),
     ("toast", include_str!("toast.css")),
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),

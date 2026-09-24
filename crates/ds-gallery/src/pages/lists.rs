@@ -95,6 +95,7 @@ const PITCH: RowPitch = RowPitch(Px(79.0));
 pub fn ListsPage() -> Element {
     rsx! {
         LiveList {}
+        super::lists_search::SearchRows {}
         Sidebar {}
         Tiles {}
         Picker {}

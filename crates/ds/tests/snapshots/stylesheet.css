@@ -102,7 +102,8 @@ html,body{margin:0;padding:0;background:transparent}
    - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
    - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`;
-   - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer.
+   - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
+     so are `menu-out` (bar gaps) and `cmdk-rise` (mailo gaps 2), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -243,6 +244,12 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 
+/* cmdk-rise (quire's, mailo gaps 2): cmdk-in's scale and lift with no fade, so a command panel is
+   opaque on its first frame; only its geometry springs. */
+@keyframes cmdk-rise{ 0%{ transform:scale(.93) translateY(-12px); }
+  62%{ transform:scale(var(--overshoot)) translateY(2px); }
+  100%{ transform:scale(1) translateY(0); } }
+
 /* 4.4.13 cmdk-in */
 @keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
@@ -304,6 +311,9 @@ html,body{margin:0;padding:0;background:transparent}
 }
 @keyframes menu-in--b{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
+@keyframes cmdk-rise--b{ 0%{ transform:scale(.93) translateY(-12px); }
+  62%{ transform:scale(var(--overshoot)) translateY(2px); }
+  100%{ transform:scale(1) translateY(0); } }
 @keyframes cmdk-in--b{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
@@ -361,6 +371,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-bubble-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-quick) var(--e-spring);}
 .a-cmdk-in[*|data-pulse=a]{animation:cmdk-in var(--t-big) var(--e-spring);}
 .a-cmdk-in[*|data-pulse=b]{animation:cmdk-in--b var(--t-big) var(--e-spring);}
+.a-cmdk-rise[*|data-pulse=a]{animation:cmdk-rise var(--t-big) var(--e-spring);}
+.a-cmdk-rise[*|data-pulse=b]{animation:cmdk-rise--b var(--t-big) var(--e-spring);}
 .a-peek-in[*|data-pulse=a]{animation:peek-in var(--t-big) var(--e-spring);}
 .a-peek-in[*|data-pulse=b]{animation:peek-in--b var(--t-big) var(--e-spring);}
 .a-peek-full-in[*|data-pulse=a]{animation:peek-in var(--t-move) var(--e-out);}
@@ -630,6 +642,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
 .ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
 .ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
+/* An opaque entrance (mailo gaps 2): `cmdk-rise` springs the card's scale and lift with no fade,
+   so its first frame is already opaque; over a window its scrim does not fade either, since the
+   wrap's opacity would hold the card at its own. */
+.ds-palette[*|data-entrance=cmdk-rise]{ animation:cmdk-rise var(--t-big) var(--e-spring); }
+.ds-palette[*|data-entrance=cmdk-rise][*|data-pulse=b]{ animation-name:cmdk-rise--b; }
+.ds-palette-wrap[*|data-entrance=cmdk-rise]{ animation:none; }
 /* -- command_pill -- */
 /* CommandPill (design/04-COMPONENTS.md section 8): `S:92-100`. The inset highlight is
    `--shadow-pill-inset` (O-3); the label truncates with `.ds-truncate` (no ellipsis on Blitz).
@@ -719,6 +737,8 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-hover-target{ display:inline; }
 .ds-hover-target[*|data-kind=thread]{ display:block; }
+/* A target drawn as a `div` or as the list's own `li` (mailo gaps 2, `data-as`) is a block. */
+.ds-hover-target[*|data-as=div], .ds-hover-target[*|data-as=li]{ display:block; }
 
 .ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
   animation:hc-in var(--t-move) var(--e-spring); }
@@ -745,6 +765,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-hovercard-flag[*|data-tone=info] .ds-ic{ color:var(--accent); }
 .ds-hovercard-actions{ margin-top:var(--s-10); display:flex; gap:var(--s-6); flex-wrap:wrap; }
 .ds-hovercard-live{ display:inline-block; width:6px; height:6px; border-radius:var(--r-pill); background:var(--ok); }
+
+/* A tip (mailo gaps 2, design/06 section 3 `time`): the Card tooltip's size (tooltip.css
+   `.ds-tip`) on the hover card's surface, one line, placed below its target like a sender card
+   and opened on the same hub timing. */
+.ds-popover.ds-hovercard[*|data-kind=tip]{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip);
+  border-radius:var(--r-item); white-space:nowrap; }
 /* -- hover_strip -- */
 /* HoverStrip (design/04-COMPONENTS.md section 17): `S:312-323`, `S:441-446`. The buttons are
    IconButton's Strip variant (their box, hover and `:active` scale are icon_button.css); this
@@ -755,8 +781,8 @@ html,body{margin:0;padding:0;background:transparent}
    transform and the `:active` scale applies.
    The Fly waits `--d-fly` before it appears and not at all while hover is warm
    (`.ds[data-hover=warm]`, O-11); `calc(var(--d-fly) * 0)` is a zero delay made of the token.
-   TODO(O-24): C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12);
-   keyboard reveal is not specified for Blitz. */
+   O-24: C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12); the
+   caller reveals it instead through `shown` (`data-shown`, below). */
 
 .ds-strip{
   --j:0;
@@ -781,6 +807,19 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-strip .ds-icon-button:hover .ds-fly{ transition-delay:calc(var(--d-fly) * 0); }
+
+/* Caller-driven (mailo gaps 2): `data-shown=visible` shows the strip with no pointer on its row
+   (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
+   S12, so the caller says so), the buttons popping in as on hover; `data-shown=hidden` keeps it
+   down under the pointer. */
+.ds-strip[*|data-shown=visible]{ opacity:1; pointer-events:auto; }
+.ds-strip[*|data-shown=visible] .ds-icon-button{
+  transform:none; opacity:1;
+  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger));
+}
+.ds-strip[*|data-shown=visible] .ds-icon-button:active{ transform:scale(.88); }
+.ds-row:hover .ds-strip[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
+.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-icon-button{ transform:scale(.7); opacity:0; animation:none; }
 /* -- icon_button -- */
 /* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -1079,6 +1118,17 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-info{ display:flex; flex-direction:column; padding:var(--s-6) var(--s-8); cursor:default; }
 .ds-menu-info-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); }
 .ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+/* A row's trailing action (mailo gaps 2): a fourth column holding a Strip icon button (26 round,
+   `--ink-soft`, the accent-soft hover), at 22 in the shell's text menus so the row keeps its
+   height. The button hears its own click; the row neither picks nor takes the selection. */
+.ds-menu-item[*|data-trailing=action]{ grid-template-columns:34px 1fr auto auto; }
+.ds-menu[*|data-kind=slim] .ds-menu-item[*|data-trailing=action],
+.ds-menu[*|data-kind=context] .ds-menu-item[*|data-trailing=action]{ grid-template-columns:22px 1fr auto auto; }
+.ds-menu-action{ display:inline-flex; align-items:center; }
+.ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
+.ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
+.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
@@ -1516,6 +1566,15 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
+/* -- text_runs -- */
+/* Text runs (mailo gaps 2): a caller's search hit is `mark.ds-mark`, a soft accent ground under
+   the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
+   `data-tone=strong|faint`. Inside a menu the menu's own `mark` rule wins (accent ink, no
+   ground), so a caller's marks there look like the fuzzy matcher's. */
+
+.ds-mark{ background:var(--accent-soft); color:inherit; border-radius:var(--r-micro); padding:0 var(--s-1); }
+.ds-run[*|data-tone=strong]{ font-weight:700; color:var(--ink); }
+.ds-run[*|data-tone=faint]{ color:var(--ink-faint); }
 /* -- toast -- */
 /* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
    (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);

@@ -43,11 +43,11 @@ pub(crate) fn marked<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Lin
         .iter()
         .map(|entry| Line {
             entry,
-            marks: match entry {
-                MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
-                    fuzzy(query, title).map(|hit| hit.marks).unwrap_or_default()
-                }
-                MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => Vec::new(),
+            marks: match (entry.takes_marks(), entry.match_title()) {
+                (true, Some(title)) => fuzzy(query, &title)
+                    .map(|hit| hit.marks)
+                    .unwrap_or_default(),
+                (_, _) => Vec::new(),
             },
         })
         .collect()
@@ -59,7 +59,12 @@ pub(crate) fn choice_lines<T>(entries: &[MenuEntry<T>]) -> Vec<usize> {
     entries
         .iter()
         .enumerate()
-        .filter(|(_, entry)| matches!(entry, MenuEntry::Item { .. } | MenuEntry::Submenu { .. }))
+        .filter(|(_, entry)| {
+            matches!(
+                entry,
+                MenuEntry::Item { .. } | MenuEntry::Row(_) | MenuEntry::Submenu { .. }
+            )
+        })
         .map(|(line, _)| line)
         .collect()
 }
