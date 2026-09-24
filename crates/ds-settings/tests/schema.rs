@@ -172,7 +172,7 @@ fn both_domains_resolve_to_quire_appearance_toml() {
 #[test]
 fn icons_keys_are_all_advanced() {
     let icons = IconsSettings::schema();
-    assert_eq!(icons.key.len(), 5);
+    assert_eq!(icons.key.len(), 6);
     for key in &icons.key {
         assert_eq!(
             key.exposure,
