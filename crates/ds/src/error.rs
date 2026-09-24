@@ -25,4 +25,11 @@ pub enum DsError {
         /// What the decoder said.
         reason: String,
     },
+    /// A `ChromaLimit` was built from a value outside `icons.symbolic_chroma_max`'s range
+    /// (design/22-SETTINGS.md section 3.3: `0.0..=0.2`).
+    #[error("a chroma limit must be 0.0..=0.2, not {value}")]
+    ChromaLimitRange {
+        /// The value as given, formatted (no floats in a type that derives `Eq`).
+        value: String,
+    },
 }

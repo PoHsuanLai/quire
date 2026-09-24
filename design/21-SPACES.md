@@ -72,12 +72,14 @@ Port notes (settled finding, fix in quire): palette.rs:177 hard-codes the card s
 | Launcher panel chrome (field row, group headers) | yes | Space gradient | `--f-ink*` |
 | Launcher result list | no | `--raise` | Post ink |
 | Control center chrome | yes | Space gradient | `--f-ink*`; controls inside on `--f-pill` |
-| Notifications, OSD, power menu, lock, polkit | no (proposed) | their Material over Post tokens | Post ink |
+| OSD | yes (settled 2026-09-24) | Space gradient at material tint alpha over blur | `--f-ink*` |
+| Notifications, power menu, lock, polkit | no (proposed) | their Material over Post tokens | Post ink |
 | Apps | no (paper) | Post tokens | Post ink |
 | Mail window frame | yes (opt-in, §9) | Space gradient + grain | `--f-ink*` |
 
-Settled: bar, dock, launcher and control center (PLAN "UX decisions settled", and this
-doc's brief). The "no" rows for notifications and OSD are proposed.
+Settled: bar, dock, launcher, control center and OSD (PLAN "UX decisions settled", this doc's
+brief, and the OSD call below). The "no" row for notifications, power menu, lock and polkit
+stays proposed.
 
 Material and blur (settled mechanism, proposed alpha): `Material::{Bar,Dock,Popover}` paint
 `--m-tint` = the Space gradient at alpha .80 (proposed) when `data-blur=on`, and
@@ -88,11 +90,15 @@ Settled implementation (bar gaps, sill Q9): a `Ds` root in Bar, Dock, Osd or Wid
 Popover root that is itself a panel (`chrome: Painted`, the launcher), stamps
 `data-frame="tinted"` and draws §5's two layers and the grain as one `.ds-frame` group at
 the material's own tint alpha from 03-COLOR §17.2 scaled by `appearance.material_tint_alpha`
-(`--m-frame-alpha`: the bar .70 light, .66 dark at the default) with blur, and at .94 without.
-The OSD row below is "no (proposed)", but the implementation tints it as the brief asked: the
-user's call. Over a pure black or white backdrop six material/scheme pairs fall short of 4.5 at
-these alphas (FINDINGS "Bar gaps" lists the .02 raises that clear them); without blur all
-clear.
+(`--m-frame-alpha`: the bar .70 light, .68 dark at the default) with blur, and at .94 without.
+This row used to read "no (proposed)" for OSD; the implementation tinted it as the bar-gaps
+brief asked (coherence across chrome wins), and that is now the settled call — confirmed in the
+goldens (`crates/ds/tests/snapshots/root/chrome/osd.html`) and the Materials gallery sheet,
+where every tinted material including the OSD specimen shows the gradient. Over a pure black or
+white backdrop, at wave 1's alphas, six material/scheme pairs fell short of 4.5; settled
+(2026-09-24), the smallest further .02 raises close all six (03-COLOR §17.2 lists them;
+`crates/ds/tests/legibility.rs`'s `the_tinted_chrome_holds_its_ink_over_blur` now holds for
+every pair, with and without blur).
 
 ## 4. Presets and defaults per workspace index
 

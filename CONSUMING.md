@@ -596,7 +596,12 @@ And in the bar gaps (FINDINGS "Bar gaps", sill Q9-Q13, G7):
   (`IconKind::{Symbolic, Image}`) is design/08-ICONS.md §1.5 step 2: symbolic when every pixel
   with at least half coverage has OKLCH chroma below 0.04; `classify_with(&png,
   ChromaLimit(n))` takes another threshold in thousandths. Pick `IconSource::Symbolic` or
-  `Image` from it; `NeedsAttention` still recolours through the parent's colour (`--warn`).
+  `Image` from it; `NeedsAttention` still recolours through the parent's colour (`--warn`). The
+  0.04 default is `ChromaLimit::default()`; a settings value (design/22-SETTINGS.md §3.3
+  `icons.symbolic_chroma_max`, plain chroma, not thousandths) goes through
+  `ChromaLimit::try_from(value)`, which refuses anything outside `0.0..=0.2`
+  (`DsError::ChromaLimitRange`). No caller reads the key yet — that is on the settings-owning
+  side (FINDINGS "Tune wave").
 - **New glyph**: `Icon::Ethernet` (Lucide `ethernet-port`) for a wired network.
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
