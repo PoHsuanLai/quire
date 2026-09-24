@@ -612,6 +612,10 @@ settings key (`ds::MaterialStack`, `Ds { stack }`), with the default below behin
 | Inner edge | `--m-edge` | `inset 0 0 0 .5px rgba(0,0,0,.08)` (the dock's `rgba(255,255,255,.55)`) | `rgba(255,255,255,.09)` | none (the `--f-line` values) |
 | Bar | `--m-hairline`, `--m-edge` | `0 .5px 0 rgba(0,0,0,.14)` under `inset 0 -.5px 0 rgba(0,0,0,.08)` | `0 .5px 0 rgba(0,0,0,.60)` | the hairline keys |
 
+**Pixel snapping (2026-09-25).** The .5 px widths in this table are `var(--hairline)` and the
+1 px highlight `var(--hair)` in the generated sheet (01-LAYOUT §2.1): identical at 1x and 2x, one
+device pixel at 1.25, 1.5 and 1.75, where .5 px would be a 0.6-0.9 device pixel smear.
+
 Why the tint carries the boost: Blitz neither blurs nor saturates what is behind a surface
 (FINDINGS S15, S16), so macOS's vibrancy cannot be reproduced; brightening and saturating the
 tint itself is the part that can. A tinted root (bar, dock, popover panel, OSD, widget) paints the

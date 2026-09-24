@@ -4,7 +4,7 @@
    stays one line: TextInput's `em` height follows the 16 px here. Hover and disabled are not
    specified. */
 
-.ds-search{ display:flex; align-items:center; gap:var(--s-9); padding:var(--s-12) var(--s-14); border-bottom:1px solid var(--line-soft); color:var(--ink-faint); }
+.ds-search{ display:flex; align-items:center; gap:var(--s-9); padding:var(--s-12) var(--s-14); border-bottom:var(--hair) solid var(--line-soft); color:var(--ink-faint); }
 .ds-search .ds-input-wrap{ flex:1; }
 .ds-search .ds-input[*|data-variant=inline]{ font-size:var(--fs-title); border:0; outline:none; background:transparent; color:var(--ink); width:100%; padding:0; height:1.55em; }
 .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-title); padding:0; }

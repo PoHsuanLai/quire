@@ -289,6 +289,51 @@ const CASES: &[Case] = &[
         rule: Rule::RawSpacing,
         expect: false,
     },
+    // RawHairline (Strict only)
+    Case {
+        name: "raw hairline: a 1px border fails under strict",
+        css: ".card { border: 1px solid var(--line); }",
+        profile: Profile::Strict,
+        rule: Rule::RawHairline,
+        expect: true,
+    },
+    Case {
+        name: "raw hairline: a 1px border side fails under strict",
+        css: ".card { border-bottom: 1px solid var(--line-soft); }",
+        profile: Profile::Strict,
+        rule: Rule::RawHairline,
+        expect: true,
+    },
+    Case {
+        name: "raw hairline: a half-pixel outline width fails under strict",
+        css: ".card { outline-width: .5px; }",
+        profile: Profile::Strict,
+        rule: Rule::RawHairline,
+        expect: true,
+    },
+    Case {
+        name: "raw hairline: a 1px-wide separator box fails under strict",
+        css: ".sep { position: absolute; width: 1px; background-color: var(--f-line); }",
+        profile: Profile::Strict,
+        rule: Rule::RawHairline,
+        expect: true,
+    },
+    Case {
+        name: "raw hairline: the tokens, a 2px border and a radius pass",
+        css: ".card { border: var(--hair) solid var(--line); outline: var(--focus-ring) solid \
+              var(--accent); border-bottom-width: 2px; border-radius: 1px; min-width: 12px; } \
+              .sep { height: var(--hair); }",
+        profile: Profile::Strict,
+        rule: Rule::RawHairline,
+        expect: false,
+    },
+    Case {
+        name: "raw hairline: standard allows a 1px border",
+        css: ".card { border: 1px solid var(--line); }",
+        profile: Profile::Standard,
+        rule: Rule::RawHairline,
+        expect: false,
+    },
     // RootSelector
     Case {
         name: "root selector: :root fails",
@@ -568,6 +613,26 @@ fn every_rule_case_matches() {
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// A hairline offence says which token to use.
+#[test]
+fn a_raw_hairline_points_at_its_token() {
+    let texts: Vec<String> = lint(
+        ".card { border: 1px solid var(--line); box-shadow: none; } .edge { outline: .5px solid var(--line); }",
+        Profile::Strict,
+    )
+    .into_iter()
+    .filter(|offence| offence.rule == Rule::RawHairline)
+    .map(|offence| offence.text)
+    .collect();
+    assert_eq!(
+        texts,
+        [
+            ".card: border: 1px (use var(--hair))",
+            ".edge: outline: .5px (use var(--hairline))",
+        ]
+    );
 }
 
 /// `CASES` and `MARKUP_CASES` cover every `Rule`, with both a passing and a failing case — not

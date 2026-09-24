@@ -19,7 +19,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    PersonSwatch, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
+    PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
 };
 
 /// Every custom property the design system declares, `--` included: the token table's
@@ -79,13 +79,14 @@ fn collect() -> HashSet<String> {
         .collect()
 }
 
-/// The tuned tokens (the shell type scale, the dock's geometry, the plate's shares) and the
-/// inputs a consumer writes for them.
+/// The tuned tokens (the shell type scale, the dock's geometry, the plate's shares, the pixel
+/// tokens) and the inputs written for them.
 fn tuned_vars() -> impl Iterator<Item = VarName> {
     SHELL_TOKENS
         .into_iter()
         .chain(DOCK_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
+        .chain(PixelToken::ALL.map(PixelToken::tuned))
         .flat_map(|token| [token.token, token.input])
 }
 

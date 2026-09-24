@@ -15,7 +15,7 @@
 .ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:.14em; }
 
 .ds-section-header-text{ white-space:nowrap; }
-.ds-section-header-rule{ flex:1; min-width:0; height:1px; }
+.ds-section-header-rule{ flex:1; min-width:0; height:var(--hair); }
 .ds-section-header[*|data-kind=frame] .ds-section-header-rule{ background:var(--f-line); }
 .ds-section-header[*|data-kind=group] .ds-section-header-rule{ background:var(--line-soft); }
 

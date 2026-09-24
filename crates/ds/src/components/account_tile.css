@@ -20,7 +20,7 @@
 .ds-icon-button.ds-account-tile[*|data-face=add]{ background:transparent; }
 .ds-icon-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
 .ds-account-tile .ds-avatar[*|data-tone=add]{
-  box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:1px dashed var(--f-ink-faint);
+  box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
   transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
 }
 .ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }

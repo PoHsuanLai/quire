@@ -1,6 +1,7 @@
 //! The token table: every colour, duration, delay, easing, scalar, radius, spacing step,
-//! shadow, type size and layer, as Rust data. The stylesheet is generated from it (`crate::css`), so CSS and the
-//! Rust timers cannot drift (design/05-MOTION.md section 7.1).
+//! shadow, type size, layer and device-pixel line width, as Rust data. The stylesheet is
+//! generated from it (`crate::css`), so CSS and the Rust timers cannot drift
+//! (design/05-MOTION.md section 7.1).
 
 pub mod accent_table;
 pub mod colour;
@@ -13,6 +14,7 @@ pub mod label_hue;
 pub mod layer;
 pub mod name;
 pub mod person;
+pub mod pixel;
 pub mod scalar;
 pub mod shape;
 pub mod shell;
@@ -32,6 +34,7 @@ pub use label_hue::{HueMember, LabelHue};
 pub use layer::ZLayer;
 pub use name::VarName;
 pub use person::PersonSwatch;
+pub use pixel::PixelToken;
 pub use scalar::{ScalarToken, ScalarValue};
 pub use shape::{Corner, Radius};
 pub use shell::{BarType, FontWeight, LauncherType, MenuType, ShellMetrics};
