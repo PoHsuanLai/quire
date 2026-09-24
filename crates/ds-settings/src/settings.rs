@@ -158,6 +158,17 @@ pub struct IconsSettings {
         advanced
     )]
     pub squircle_detect_iou: Fraction,
+    /// `icons.symbolic_chroma_max` (proposed 0.04): a tray or app icon with less colour than
+    /// this is drawn as a symbolic mask in the ink colour (design/08-ICONS.md section 1.5).
+    #[settings(
+        label = "Symbolic icon colour limit",
+        help = "An icon with less colour than this is drawn as a symbolic mask in the ink \
+                colour (stored per-mille: 40 is 0.04).",
+        section = "Icons",
+        range = "0..=200",
+        advanced
+    )]
+    pub symbolic_chroma_max: Fraction,
     /// `icons.plate_glyph_colour_policy`.
     #[settings(
         label = "Plate glyph colour",
@@ -186,6 +197,7 @@ impl Default for IconsSettings {
             plate_inset_percent: Percent(72),
             symbolic_fallback_glyph_percent: Percent(56),
             squircle_detect_iou: Fraction(900),
+            symbolic_chroma_max: Fraction(40),
             plate_glyph_colour_policy: PlateGlyphPolicy::Auto,
             dark_mode_variant: IconDarkVariant::SameAsLight,
             extra: toml::Table::new(),
