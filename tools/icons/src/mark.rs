@@ -1,11 +1,16 @@
-//! The abstract vocabulary (design/08-ICONS.md 2.8): a handful of shapes in the 24-unit glyph
-//! grid, each a signed distance (negative inside) so every edge is anti-aliased analytically at
-//! any size and every stroke has round caps and joins by construction.
+//! The abstract vocabulary (design/08-ICONS.md 2.8): a handful of filled shapes in the 24-unit
+//! glyph grid, each a signed distance (negative inside) so every edge is anti-aliased
+//! analytically at any size. Nothing is outlined: a chevron or a bar is a filled, round-ended
+//! band, and form comes from the emboss (emblem.rs), not from strokes.
 
 use serde::Deserialize;
 
-/// The one stroke weight: 2 units of the 24 grid, as every Lucide glyph (08 1.2).
-pub const STROKE: f32 = 2.0;
+/// The default width of a chevron or bar band: 2 units of the 24 grid, the glyph weight (08 1.2).
+pub const BAND: f32 = 2.0;
+
+fn band() -> f32 {
+    BAND
+}
 
 /// A point in the 24-unit grid laid over the plate (0,0 top-left, 24,24 bottom-right).
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
@@ -34,8 +39,7 @@ pub enum Heading {
     Down,
 }
 
-/// One shape of the vocabulary. Closed shapes (rect, circle, fold, polygon) take a fill and an
-/// outline; open ones (chevron, bar) are strokes only.
+/// One shape of the vocabulary; every shape is a filled area.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 pub enum Shape {
@@ -49,16 +53,20 @@ pub enum Shape {
         centre: Pt,
         radius: f32,
     },
-    /// A `>` (or `v`) of two strokes meeting at `tip`, arms `reach` long on each axis.
+    /// A `>` (or `v`) of two round-ended bands meeting at `tip`, arms `reach` long on each axis.
     Chevron {
         tip: Pt,
         reach: f32,
         heading: Heading,
+        #[serde(default = "band")]
+        width: f32,
     },
-    /// A straight stroke with round caps.
+    /// A straight band with round ends.
     Bar {
         from: Pt,
         to: Pt,
+        #[serde(default = "band")]
+        width: f32,
     },
     /// The turned-down triangle of a folded corner: the right angle sits at `corner` of the
     /// square of side `size` whose opposite corner is `at`.
@@ -73,24 +81,6 @@ pub enum Shape {
         #[serde(default)]
         round: f32,
     },
-}
-
-/// Which strokes and fills a shape is drawn with.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Outline {
-    /// Open shapes: the distance is to the centre line, drawn at [`STROKE`].
-    Line,
-    /// Closed shapes: the distance is to the boundary, negative inside.
-    Area,
-}
-
-impl Shape {
-    pub fn outline(&self) -> Outline {
-        match self {
-            Shape::Chevron { .. } | Shape::Bar { .. } => Outline::Line,
-            _ => Outline::Area,
-        }
-    }
 }
 
 fn sub(a: Pt, b: Pt) -> Pt {
@@ -157,8 +147,7 @@ fn fold_points(at: Pt, size: f32, corner: Corner) -> [Pt; 3] {
     }
 }
 
-/// The shape's distance at `p` (grid units): signed for areas, unsigned to the centre line for
-/// lines.
+/// The shape's signed distance at `p` in grid units, negative inside.
 pub fn distance(shape: &Shape, p: Pt) -> f32 {
     match shape {
         Shape::Rect { at, size, corners } => rect(p, *at, *size, *corners),
@@ -167,6 +156,7 @@ pub fn distance(shape: &Shape, p: Pt) -> f32 {
             tip,
             reach,
             heading,
+            width,
         } => {
             let (a, b) = match heading {
                 Heading::Right => (
@@ -178,9 +168,9 @@ pub fn distance(shape: &Shape, p: Pt) -> f32 {
                     Pt(tip.0 + reach, tip.1 - reach),
                 ),
             };
-            segment(p, a, *tip).min(segment(p, *tip, b))
+            segment(p, a, *tip).min(segment(p, *tip, b)) - width / 2.0
         }
-        Shape::Bar { from, to } => segment(p, *from, *to),
+        Shape::Bar { from, to, width } => segment(p, *from, *to) - width / 2.0,
         Shape::Fold { at, size, corner } => polygon(p, &fold_points(*at, *size, *corner)),
         Shape::Polygon { points, round } => polygon(p, points) - round,
     }
@@ -229,18 +219,24 @@ mod tests {
     }
 
     #[test]
-    fn chevron_is_a_line() {
+    fn chevron_is_a_filled_band() {
         let c = Shape::Chevron {
             tip: Pt(12.0, 12.0),
             reach: 4.0,
             heading: Heading::Right,
+            width: BAND,
         };
-        assert_eq!(c.outline(), Outline::Line);
-        assert!(distance(&c, Pt(12.0, 12.0)) < 1e-6, "tip on the line");
-        assert!(distance(&c, Pt(8.0, 8.0)) < 1e-6, "arm end on the line");
         assert!(
-            (distance(&c, Pt(14.0, 12.0)) - 2.0).abs() < 1e-3,
-            "2 past the tip"
+            (distance(&c, Pt(12.0, 12.0)) + 1.0).abs() < 1e-6,
+            "tip is 1 inside"
+        );
+        assert!(
+            (distance(&c, Pt(8.0, 8.0)) + 1.0).abs() < 1e-6,
+            "arm end is 1 inside"
+        );
+        assert!(
+            (distance(&c, Pt(14.0, 12.0)) - 1.0).abs() < 1e-3,
+            "edge 1 past the tip"
         );
     }
 }

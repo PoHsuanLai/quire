@@ -63,6 +63,20 @@ pub fn oklab(rgb: [f32; 3]) -> Oklab {
     }
 }
 
+/// The sRGB-encoded 0..=1 triple of an OKLab colour (clamped to the gamut).
+pub fn srgb(c: Oklab) -> [f32; 3] {
+    let l = c.l + 0.396_337_78 * c.a + 0.215_803_76 * c.b;
+    let m = c.l - 0.105_561_346 * c.a - 0.063_854_17 * c.b;
+    let s = c.l - 0.089_484_18 * c.a - 1.291_485_5 * c.b;
+    let [l, m, s] = [l, m, s].map(|v| v * v * v);
+    [
+        4.076_741_7 * l - 3.307_711_6 * m + 0.230_969_94 * s,
+        -1.268_438 * l + 2.609_757_4 * m - 0.341_319_38 * s,
+        -0.004_196_086_3 * l - 0.703_418_6 * m + 1.707_614_7 * s,
+    ]
+    .map(linear_to_srgb)
+}
+
 /// ΔE_OK: Euclidean distance in OKLab.
 pub fn delta_e(p: Oklab, q: Oklab) -> f32 {
     ((p.l - q.l).powi(2) + (p.a - q.a).powi(2) + (p.b - q.b).powi(2)).sqrt()
@@ -86,6 +100,17 @@ mod tests {
             assert!(
                 got.a.abs() < 1e-3 && got.b.abs() < 1e-3,
                 "{name}: grey has chroma"
+            );
+        }
+    }
+
+    #[test]
+    fn oklab_round_trips() {
+        for rgb in [[0.8, 0.3, 0.1], [0.1, 0.5, 0.9], [0.5, 0.5, 0.5]] {
+            let back = srgb(oklab(rgb));
+            assert!(
+                back.iter().zip(rgb).all(|(b, c)| (b - c).abs() < 1e-3),
+                "{rgb:?} {back:?}"
             );
         }
     }

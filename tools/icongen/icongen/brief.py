@@ -113,11 +113,13 @@ FLAT_WORDS = {
     "photos": "a circle sun above a gentle hill shape inside a rounded frame",
 }
 
-STYLES = ("3d", "flat", "flat-trigger")
+STYLES = ("3d", "flat", "flat-trigger", "emboss", "emboss-tile")
 
 
 def prompt(s: Subject, style: str) -> str:
     """The positive prompt of one subject in one style; round one's brief is style "3d"."""
+    if style.startswith("emboss"):
+        return emboss_prompt(s.slug, style)
     if style == "3d":
         return s.prompt()
     body = FLAT_BRIEF.format(subject=FLAT_WORDS[s.slug], palette=FLAT_PALETTE[s.plate])
@@ -125,6 +127,8 @@ def prompt(s: Subject, style: str) -> str:
 
 
 def negative(style: str) -> str:
+    if style.startswith("emboss"):
+        return EMBOSS_NEGATIVE
     return NEGATIVE if style == "3d" else FLAT_NEGATIVE
 
 
@@ -143,3 +147,65 @@ def variation_prompt(target: Subject) -> str:
         f"{target.words} instead. Colours: {PALETTE[target.palette]}, with white and warm "
         f"off-white accents. One object only, centred. No text, no letters, no frame."
     )
+
+
+# Round three (2026-09-24): the user's reference asks for a symbol crafted into the plate, not
+# drawn on it: shallow embossing, soft internal geometry, no outlines or strokes, a plate with
+# thickness whose bevel catches light in a few narrow spots, matte diffusion, and a soft two-hue
+# gradient ground whose pair of hues differs per app. Two ways to ask for it:
+#   emboss       the model draws the symbol pressed into a full-bleed gradient surface; the
+#                whole render becomes the plate's face (tools/icons tile --mode ground)
+#   emboss-tile  the model draws the whole tile on a plain ground; tools/icons keys it and
+#                re-masks it with our squircle (tools/icons tile --mode tile)
+EMBOSS_SYMBOL = (
+    "A single abstract geometric symbol: {subject}. The symbol is crafted into the surface, not "
+    "drawn on it: shallow embossed, slightly raised filled shapes in a pale tint of the surface "
+    "colour, with a subtle light edge on top and a soft darker edge below, soft internal "
+    "geometry. No outlines, no stroke, no edge lines, no borders around the shapes. Matte, "
+    "smooth diffuse light, gentle, no sharp highlights, no glow. Straight-on front view, "
+    "centred, the symbol spans about half the width with generous empty space around it. No "
+    "text, no letters, no numbers, no logo, no people."
+)
+
+EMBOSS_GROUND = (
+    " The whole image is one smooth matte surface, edge to edge, with a soft two-colour gradient "
+    "from {start} at the top left to {end} at the bottom right. No tile, no frame, no border, "
+    "no vignette."
+)
+
+EMBOSS_TILE = (
+    " The symbol is crafted into a single rounded square tile with a subtly beveled edge "
+    "catching light in narrow spots: a thin highlight arc along the top edge and a small soft "
+    "point of light near one corner. The tile face has a soft two-colour gradient from {start} "
+    "at the top left to {end} at the bottom right. The tile is centred, straight on, filling "
+    "most of the frame, on a plain flat mid grey background. No shadow under the tile, no glow."
+)
+
+EMBOSS_NEGATIVE = (
+    "frosted glass, glossy, outline, stroke, text, realistic, photo, 3D render, glow, letters, "
+    "watermark, border lines, drop shadow, busy detail, multiple objects"
+)
+
+# Per-app ground pair (tools/icons/specs/*.toml use the same pairs).
+EMBOSS_PAIR = {
+    "mail": ("cobalt blue", "soft violet"),
+    "files": ("warm amber yellow", "leaf green"),
+    "terminal": ("deep violet", "warm amber yellow"),
+    "notes": ("leaf green", "cobalt blue"),
+    "photos": ("coral red", "warm amber yellow"),
+}
+
+EMBOSS_WORDS = {
+    "mail": "a closed envelope reduced to a rounded rectangle with a V-shaped flap pressed into it",
+    "files": "two rounded folder shapes with small tabs, one offset behind the other",
+    "terminal": "a right-pointing chevron like a greater-than sign followed by a short "
+    "horizontal cursor bar, side by side",
+    "notes": "a rounded square sheet with one folded-down corner and two short raised bars",
+    "photos": "a rounded frame holding a wide low hill across its bottom and a small sun circle "
+    "in its upper right corner, off to the side",
+}
+
+def emboss_prompt(slug: str, style: str) -> str:
+    start, end = EMBOSS_PAIR[slug]
+    tail = EMBOSS_GROUND if style == "emboss" else EMBOSS_TILE
+    return EMBOSS_SYMBOL.format(subject=EMBOSS_WORDS[slug]) + tail.format(start=start, end=end)

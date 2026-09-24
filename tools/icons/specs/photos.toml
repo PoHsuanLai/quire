@@ -1,7 +1,7 @@
-# Photos: a circle inside a rounded paper frame, over a hill in the plate's deep tone.
+# Photos: a paper frame with its window pressed in; a hill and an off-centre sun raised inside.
 name = "photos"
-family = "red"
-grain = 30
+ground = { start = "red", end = "amber" }
+grain = 20
 
 [[layer]]
 kind = "rect"
@@ -9,16 +9,28 @@ at = [4, 5]
 size = [16, 14]
 corners = [2.5, 2.5, 2.5, 1]
 fill = "paper"
-lift = "lifted"
+opacity = 0.92
+relief = "raised"
+
+[[layer]]
+kind = "rect"
+at = [6, 7]
+size = [12, 10]
+corners = [1.2, 1.2, 1.2, 1.2]
+fill = "ink"
+opacity = 0.08
+relief = "recessed"
 
 [[layer]]
 kind = "polygon"
-points = [[6.8, 16.8], [10.8, 11.6], [13.6, 14.6], [15.2, 13], [17.2, 16.8]]
+points = [[7, 16.2], [10.8, 11.8], [13.6, 14.6], [15.2, 13.2], [17, 16.2]]
 round = 0.6
-fill = "deep"
+fill = "paper"
+relief = "raised"
 
 [[layer]]
 kind = "circle"
-centre = [15, 9.2]
-radius = 2
-fill = "base"
+centre = [15, 9.8]
+radius = 1.6
+fill = "paper"
+relief = "raised"

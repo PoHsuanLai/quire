@@ -1,35 +1,31 @@
-# Files: two offset paper tabs, the back one tinted, the front one paper with an ink label.
+# Files: two folders, the back one a translucent tint, the front one paper with a label groove.
 name = "files"
-family = "amber"
-grain = 30
+ground = { start = "amber", end = "green" }
+grain = 20
 
 [[layer]]
 kind = "rect"
-at = [7.5, 4.5]
-size = [12.5, 11.5]
+at = [7.5, 5]
+size = [12, 10.5]
 corners = [2, 2, 2.5, 1]
-fill = "soft"
-lift = "lifted"
-
-# Front folder: its tab, then its body over the tab's foot.
-[[layer]]
-kind = "rect"
-at = [4, 7.5]
-size = [7, 4]
-corners = [1.5, 1.5, 0, 0]
 fill = "paper"
-lift = "lifted"
+opacity = 0.55
+relief = "raised"
 
+# The front folder as one outline, tab and body together (points inset by `round`).
 [[layer]]
-kind = "rect"
-at = [4, 9.5]
-size = [14.5, 10]
-corners = [0, 2.5, 2.5, 1]
+kind = "polygon"
+points = [[5.7, 18.3], [5.7, 9.2], [9.5, 9.2], [11, 11.2], [17.3, 11.2], [17.3, 18.3]]
+round = 1.2
 fill = "paper"
-lift = "lifted"
+opacity = 0.92
+relief = "raised"
 
 [[layer]]
 kind = "bar"
-from = [7.5, 15.5]
-to = [12.5, 15.5]
-stroke = "ink"
+from = [8.5, 15.2]
+to = [13.5, 15.2]
+width = 1.4
+fill = "ink"
+opacity = 0.10
+relief = "recessed"

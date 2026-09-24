@@ -242,3 +242,92 @@ the models as sketchpads for arrangements, then write the chosen arrangement as 
 - Qwen with the trigger on seeds 33 and 44 (time: 70 s per render).
 - A per-size hinting pass for the procedural 16 px (snapping strokes to whole pixels); the
   analytic anti-aliasing is used as is.
+
+## Round three: pressed into the plate (2026-09-24)
+
+The user sent a reference and asked for its details, not its look: no frosted glass, colours
+free per app, but the symbol crafted into the plate (shallow emboss, soft internal geometry, no
+borders, outlines or strokes), a plate with thickness whose bevel catches light in a few narrow
+spots, matte diffusion, and a soft two-hue gradient ground per app. The rules are
+design/08-ICONS.md 2.9; they replace 2.8's one-stroke rule for app icons only (the glyph set
+keeps Lucide's stroke). Again two directions; **the user picks**.
+
+### Sheets (`tools/progress/shots/icons/`)
+
+| Sheet | Direction | What it shows |
+| --- | --- | --- |
+| `round3-procedural.png` | procedural | the five specs at 512, 48, 32 and 16 px 1:1, light and dark ground; every size drawn natively |
+| `round3-klein-ground.png` | generated, face | Klein draws the embossed symbol on a full-bleed two-hue surface; `tools/icons face --mode ground` takes it as the plate face and adds our bevel. 5 subjects x 4 seeds, 256 tile plus 16/32/48 on both grounds |
+| `round3-klein-ground-picks.png` | generated, face | one pick per subject at 512, 48, 32, 16 on both grounds (mail s33, files s22, terminal s11, notes s33, photos s11) |
+| `round3-klein-tile.png` | generated, whole tile | Klein draws the whole bevelled tile on mid grey; `face --mode tile` keys it and re-masks it with our squircle, keeping its own bevel |
+| `round3-klein-tile-picks.png` | generated, whole tile | one pick per subject (mail s22, files s44, terminal s22, notes s22, photos s33) |
+| `round3-qwen-ground.png` | generated, face | Qwen-Image-2512 on the two best Klein subjects, mail and terminal, 4 seeds, face mode |
+
+Rebuild: `target/release/icons abstract --spec tools/icons/specs/*.toml --out-dir <d> --sheet
+<png>`; `uv run icongen bakeoff --model klein --style emboss|emboss-tile --out <raw>`, then
+`tools/icons/round3.sh <sheet> <raw> <plated> ground|tile <sheet-dir>` and `icons strips` for the
+picks. Renders in `~/comfy/out/round3/`, not in git.
+
+### What ran
+
+- Procedural: the vocabulary lost its strokes (chevron and bar are filled round-ended bands);
+  each layer is `raised`, `recessed` or `flush` with a fill and an opacity; the plate gained a
+  per-icon two-hue ground in OKLCh, matte diffusion and a bevel finish (top arc, bottom shade,
+  one specular point). At 16 and 32 px the emboss and bevel details are dropped and recessed
+  fills are strengthened. The five specs were rewritten for it.
+- Klein 4B: 20 face renders, 20 tile renders, 3.0 s each warm, peak about 10 GB. Photos was
+  first worded "a circle above a gentle rounded hill, inside a rounded frame" and every seed in
+  both modes read as a person (a head over shoulders); it was reworded (the sun small and off
+  to the upper right) and re-run, and the sheets show only the new wording.
+- Qwen-Image-2512 Q3_K_M: mail and terminal only, face mode, 4 seeds each, 70-87 s per render,
+  peak 15.1 GB.
+
+### Comparison (the agent's reading)
+
+**Readability at 16/32/48.**
+- *Procedural*: all five read at 48 and 32 and hold their silhouettes at 16 (the flat fallback
+  keeps the V of the flap and the notes lines visible). Highest contrast of the three: the
+  symbol is near-white paper on a saturated but softened ground.
+- *Klein, face mode*: mail, terminal and photos read at 48 and 32; at 16 they blur to a pale
+  blob on a pastel plate. Files and notes are weak at every small size: pale grey symbol on a
+  ground Klein washed to near-grey in the middle. Klein's grounds come out pastel and patchy,
+  not the two clear hues asked for.
+- *Klein, tile mode*: bigger symbols, so mail and files read better at 32, but the key fails
+  where the tile's own face is pale grey against the mid-grey ground: holes in notes s11/s44
+  and terminal s33, black specks at 16. Only usable after picking.
+- *Qwen*: the most "crafted into" of all (symbol in the plate's own colour, tone on tone), which
+  is exactly what makes it the weakest at 16 and 32; its bevels are chiselled rather than soft
+  and one terminal seed drew a dark outline.
+
+**Coherence.**
+- *Procedural*: coherent by construction, the same relief, bevel, light and scale everywhere;
+  only the ground pair and the shapes change.
+- *Klein, face mode*: surprisingly coherent: the same clay-matte material, light and emboss depth
+  across all five and across seeds. The symbol size and the ground saturation vary.
+- *Klein, tile mode*: the tile's own proportions, bevel and colour blocks vary per seed, so the
+  set looks less like one family once re-masked.
+- *Qwen*: two subjects only; within them consistent.
+
+**How close to the reference details.**
+- Emboss without outlines: Klein face mode is the most convincing soft emboss; the procedural
+  one is cleaner but more graphic (a light top edge and a shade band on a flat fill, no real
+  curvature); Qwen is embossed but chiselled.
+- Plate thickness and narrow bevel light: procedural and face mode get our bevel (thin arc, one
+  soft point); tile mode keeps Klein's own, which is softer and wider.
+- Two-hue ground: procedural gives the clearest two hues; Klein's are pastel and uneven.
+
+**Effort per new icon.** Unchanged from round two: a spec (10-20 minutes by hand, seconds to
+render) versus 20 renders and a picking pass per subject (1 minute on Klein, 25 on Qwen), with
+face mode needing no keying and tile mode needing a key that fails on pale tiles.
+
+**Summary for the choice.** Procedural is the most legible and the only one guaranteed
+coherent; Klein face mode comes closest to the reference's soft clay emboss and is itself
+consistent, at the cost of 16/32 legibility and weak grounds. A workable hybrid: Klein face
+renders as the material study, the procedural renderer's ground pairs and bevel as the plate,
+or the procedural route with a deeper relief pass if the user prefers the clay look.
+
+### Not run
+
+- Qwen on files, notes and photos, and Qwen in tile mode (time: 70 s per render).
+- Compositing a keyed Klein symbol onto our own procedural two-hue plate (the soft emboss has
+  no hard edge for the key to stop at; face mode was used instead).

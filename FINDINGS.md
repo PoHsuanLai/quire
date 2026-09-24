@@ -1312,6 +1312,23 @@ Branch `icon-round2`; write-up `docs/icons-bakeoff.md` "Round two"; the language
 - **A circle over a hill in a rounded frame reads as a person at 16 px** (Klein photos). Keep
   the sun off-centre, as the procedural photos spec does.
 
+## Icon round three: pressed into the plate (2026-09-24)
+
+Branch `icon-round2`; write-up `docs/icons-bakeoff.md` "Round three"; rules 08-ICONS 2.9.
+
+- **Klein 4B does soft embossing well when it draws the whole surface.** Asked for a symbol
+  pressed into a full-bleed two-hue surface, all 20 renders came out as one consistent clay-matte
+  family; used whole as the plate face (centre crop, our squircle and bevel) they need no keying.
+  Its gradients are pastel and patchy, though, and the pale symbols are weak at 16/32 px.
+- **A model-drawn tile keys badly when its face is pale.** The region-grow key stops at edges;
+  a soft bevel on a pale tile against mid grey has none, so holes appear. Face mode avoids it.
+- **"A circle above a hill in a rounded frame" is a person**, now in both rounds. Put the sun
+  small and off to the upper right.
+- **Two distant hues need OKLCh, not OKLab.** Violet to amber mixed in OKLab passes through a
+  muddy mauve; mixing hue along the shorter arc passes through rose.
+- **The emboss is noise below 48 px.** The procedural renderer drops it at 16 and 32 and
+  strengthens recessed fills so the details survive.
+
 ## macOS polish (2026-09-24)
 
 The user compared the shell with macOS and found it flat; the brief was to add the layers macOS
