@@ -1,19 +1,23 @@
-# Terminal: an ink prompt chevron and a paper cursor block, straight on the plate.
+# Terminal: a prompt chevron and a cursor block, pressed up out of a violet-to-amber plate.
 name = "terminal"
-family = "violet"
-grain = 30
+ground = { start = "#6B3FCC", end = "amber" }
+grain = 20
 
 [[layer]]
 kind = "chevron"
-tip = [11, 12]
+tip = [10.5, 12]
 reach = 4
 heading = "right"
-stroke = "ink"
+width = 2.4
+fill = "paper"
+opacity = 0.92
+relief = "raised"
 
 [[layer]]
 kind = "rect"
-at = [13.5, 8.5]
-size = [4.5, 7.5]
-corners = [1, 1, 1, 1]
+at = [13.2, 13.8]
+size = [5.2, 2.4]
+corners = [1.2, 1.2, 1.2, 1.2]
 fill = "paper"
-lift = "lifted"
+opacity = 0.92
+relief = "raised"

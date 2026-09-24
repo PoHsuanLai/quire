@@ -325,6 +325,35 @@ Two routes produce icons in this language; the user picks (docs/icons-bakeoff.md
   16 px edges stay crisp. Deterministic; no model.
 - **Generated** (3.3's round-two brief): the same language asked of the models, then 3.7.
 
+### 2.9 Round three: pressed into the plate (proposed, 2026-09-24; replaces 2.8's stroke rule for app icons)
+
+The user's reference for round three (no frosted glass; colours may differ per app) asks for a
+symbol crafted into the plate rather than drawn on it. For **app icons only**, these rules replace
+2.8's "one weight" and "four colours" rows and 2.3's single-family gradient; the small glyph set
+(section 1) keeps Lucide's 2 px stroke unchanged.
+
+| Rule | Value (proposed) |
+| --- | --- |
+| No outlines | No borders, outlines, strokes or edge separation anywhere in the symbol. Chevrons and bars are filled round-ended bands (default width 2 grid units), not strokes. |
+| Emboss | Form comes from shallow relief. A `raised` layer has a light inner edge on top (white, alpha .55) and a soft darker inner edge below (ink, .20), both reaching 0.45 grid units in with 0.8 units of softness, plus a faint seat under it (ink, .14); a `recessed` layer the reverse; `flush` has none. Everything is clipped to the shape, so nothing draws outside it but the seat. |
+| Part of the plate | The symbol is paper at 0.92 opacity (the ground tints it); details pressed into it are ink at 0.08-0.10, `recessed`. No drop shadow floats it off the plate. |
+| Two-hue ground | Each app has its own pair `ground = { start, end }` (a Candy family's base or a hex), 135deg across the plate, mixed in OKLCh along the shorter hue arc so distant hues meet through a saturated middle, softened to 78 % chroma and lifted 0.03 in lightness. |
+| Matte diffusion | A gentle light from above: the face is 0.05 L lighter at the top than the middle and as much darker at the bottom. The frame grain (03 8) stays, at 20. No glossy highlight. |
+| Plate thickness | The bevel catches light in narrow spots only: a thin highlight arc along the top edge (white, .55, strongest in the middle, fading to nothing at the sides), a soft shade band along the bottom edge (.14), and one small soft specular point near the top-left corner (.28, radius 1.1 x plate/48 px). The 2.5 drop shadow stays for exported hicolor files; no glow. |
+| Small sizes | At 16 and 32 px the emboss, the grain, the specular point and the soft bevel are dropped; the flat silhouettes stay, and recessed details get 2.5x their fill opacity so they still show. |
+
+Pairs used for the first five (proposed): Mail blue to violet, Files amber to green, Terminal
+violet `#6B3FCC` to amber, Notes green to blue, Photos red to amber.
+
+Routes, both implemented:
+- **Procedural**: `tools/icons abstract` renders these rules from the specs in
+  `tools/icons/specs/` (fields: `ground`, `grain`, and per layer `kind`, `fill` = `paper | ink |
+  start | end | <colour>`, `opacity`, `relief` = `raised | recessed | flush`).
+- **Generated**: 3.3's round-three brief, then `tools/icons face`: `--mode ground` takes the
+  model's full-bleed embossed surface as the plate face (centre 78 % crop) and adds our bevel;
+  `--mode tile` keys a model-drawn tile off its ground and re-masks it with our squircle, keeping
+  the model's own bevel.
+
 ## 3. Generation pipeline
 
 Settled route: LOCAL FIRST (PLAN "Icons", "Route").
@@ -394,6 +423,38 @@ watermark, frame, border, rounded square, app tile, busy detail, multiple object
 FLUX.2 Klein (distilled, cfg 1) takes no negative prompt; it applies to Qwen-Image only.
 
 Fixed parameters per model are recorded in the recipe (3.8), not in prose.
+
+Round three (2.9; `tools/icongen/icongen/brief.py` `EMBOSS_*`, styles `emboss` and
+`emboss-tile`):
+
+```
+A single abstract geometric symbol: {subject}. The symbol is crafted into the surface, not drawn
+on it: shallow embossed, slightly raised filled shapes in a pale tint of the surface colour, with
+a subtle light edge on top and a soft darker edge below, soft internal geometry. No outlines, no
+stroke, no edge lines, no borders around the shapes. Matte, smooth diffuse light, gentle, no
+sharp highlights, no glow. Straight-on front view, centred, the symbol spans about half the width
+with generous empty space around it. No text, no letters, no numbers, no logo, no people.
+```
+
+followed by, for `emboss` (the model draws the plate's face): "The whole image is one smooth
+matte surface, edge to edge, with a soft two-colour gradient from {start} at the top left to
+{end} at the bottom right. No tile, no frame, no border, no vignette."; or for `emboss-tile`
+(the model draws the whole tile): "The symbol is crafted into a single rounded square tile with a
+subtly beveled edge catching light in narrow spots: a thin highlight arc along the top edge and a
+small soft point of light near one corner. The tile face has a soft two-colour gradient from
+{start} at the top left to {end} at the bottom right. The tile is centred, straight on, filling
+most of the frame, on a plain flat mid grey background. No shadow under the tile, no glow."
+
+Negative: `frosted glass, glossy, outline, stroke, text, realistic, photo, 3D render, glow,
+letters, watermark, border lines, drop shadow, busy detail, multiple objects`.
+
+Round-three subjects: Mail "a closed envelope reduced to a rounded rectangle with a V-shaped flap
+pressed into it"; Files "two rounded folder shapes with small tabs, one offset behind the other";
+Terminal "a right-pointing chevron like a greater-than sign followed by a short horizontal cursor
+bar, side by side"; Notes "a rounded square sheet with one folded-down corner and two short
+raised bars"; Photos "a rounded frame holding a wide low hill across its bottom and a small sun
+circle in its upper right corner, off to the side" (a centred circle over a hill reads as a
+person).
 
 ### 3.4 Bake-off protocol (settled)
 

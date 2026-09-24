@@ -15,7 +15,10 @@ uv run icongen dump-workflows --out workflows                              # gra
 ```
 
 - `--style`: `3d` is round one's brief (kept to reproduce it), `flat` round two's abstract
-  paper-and-ink brief, `flat-trigger` the same with a flat-illustration style word in front.
+  paper-and-ink brief, `flat-trigger` the same with a flat-illustration style word in front,
+  `emboss` round three's symbol pressed into a full-bleed two-hue surface (plate it with
+  `tools/icons face --mode ground`), `emboss-tile` the same drawn as a whole bevelled tile
+  (`--mode tile`); `tools/icons/round3.sh` does both and builds the sheet.
 - `icongen/brief.py`: the style briefs, the negative prompt, the five subjects with their plate
   and object palettes, the seeds, the reference-pass prompt.
 - `icongen/graphs.py`: one pure builder per model and mode (Klein text-to-image and

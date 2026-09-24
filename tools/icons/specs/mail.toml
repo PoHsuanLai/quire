@@ -1,22 +1,25 @@
-# Mail: a folded paper flap over a paper rectangle (design/08-ICONS.md 2.8).
+# Mail: a paper envelope pressed up out of a blue-to-violet plate, its flap a groove pressed in.
 # Coordinates are the 24-unit glyph grid laid over the plate; the safe area is 2.4..21.6.
+# design/08-ICONS.md 2.8-2.9: filled shapes only, no strokes; form comes from the emboss.
 name = "mail"
-family = "blue"
-grain = 30
+ground = { start = "blue", end = "violet" }
+grain = 20
 
-# The envelope: paper with Post's card corner (3, 3, 3, 1 in this grid).
 [[layer]]
 kind = "rect"
-at = [4, 6]
-size = [16, 12.5]
+at = [4.5, 6.5]
+size = [15, 11]
 corners = [2.5, 2.5, 2.5, 1]
 fill = "paper"
-lift = "lifted"
+opacity = 0.92
+relief = "raised"
 
-# The flap: a cut-out triangle in the plate's deep tone, laid on the paper.
 [[layer]]
-kind = "polygon"
-points = [[5.1, 6.9], [18.9, 6.9], [12, 13]]
-round = 0.9
-fill = "deep"
-lift = "lifted"
+kind = "chevron"
+tip = [12, 12.2]
+reach = 5.2
+heading = "down"
+width = 1.3
+fill = "ink"
+opacity = 0.10
+relief = "recessed"
