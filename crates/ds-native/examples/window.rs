@@ -11,14 +11,18 @@ use ds::{
     Anchor, Appearance, Availability, Button, ButtonVariant, Ds, Material, Menu, MenuEntry,
     MenuKind, Point, Px, Switch, Trail, use_toast_hub,
 };
-use ds_native::{AppConfig, launch};
+use ds_native::{AppConfig, AppId, launch};
 use std::time::Duration;
 
 /// How long the window stays up on its own.
 const LIFETIME: Duration = Duration::from_secs(3);
 
 fn main() {
-    launch(App, AppConfig::new("quire: ds-native window", 480, 320));
+    launch(
+        App,
+        AppConfig::new("quire: ds-native window", 480, 320)
+            .with_app_id(AppId("dev.quire.Window".to_owned())),
+    );
 }
 
 #[allow(non_snake_case)]
