@@ -852,6 +852,8 @@ says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the wh
 | `TextInput` | `onfocus`, `onblur` | `EventHandler<()>` (no-op) | the caret arrived or left: a click or Tab, and the focus seam (`Focus::OnMount`, `Focus::Controlled`), which on Blitz moves the caret with no event, so the field calls `onfocus` itself |
 | `TextInput` | `kind` | `TextInputKind` (`Text`) | `Password` writes `type="password"` and `data-kind="password"`; Blitz draws a password's characters as typed, so the field's text is transparent and one dot per character is laid over it |
 | `Slider` | (none) | | already the range input: `value: Fraction` in thousandths, keys and drag; map your 0-100 to `Fraction(n * 10)` |
+| `AccountTile` | `mark` | `MarkStyle` (`Letter`) | how the provider is drawn on the tile: pass your provider-marks setting, `MarkStyle::Image(ImageSource(data_uri))` for the favicon you hold |
+| `AddAccountTile` | (new component) | `label: String` ("Add account"), `title: Option<String>`, `onclick: EventHandler<()>` | the tile after the accounts: the Pin plate with no ground at rest, a plus in a dashed `--f-ink-faint` ring; never pressed, no count |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
