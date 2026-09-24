@@ -1567,3 +1567,25 @@ goldens did not change. Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_
      `remove:2` after `select:0` and nothing else; with the click and move stops removed the log
      is `select:0,select:1,remove:2,close,pick:2`.
    - Gallery: Overlays page, "Command panel: opaque entrance, runs, trailing actions".
+
+3. **Menus** (`Menu`).
+   - `active: Cursor::{Auto, Controlled(Option<usize>)}` (`menu_cursor.rs`, pure, with its
+     table tests). The menu machine calls its highlight the tracker's selection; `Cursor` is the
+     prop's name for whose it is. Under `Controlled` the drawn highlight is the caller's
+     (clamped; `None` draws none, a new state: `Drawn::selected` became an `Option`), Up and Down
+     become `on_active(Some(next))` requests (from an end when nothing is highlighted), the
+     pointer over another choice asks the same, and Enter picks the caller's choice. It also
+     does not take the keyboard as it opens: a field that drives the cursor must keep it, which
+     is the whole case (the composer's `/` and `@`). A submenu's panel keeps its own cursor.
+     Under `Auto`, `on_active` hears each change after the render that made it. Proof
+     (`mailo_menu.rs`): Down, Down, Up in the field move the highlight Dana, Priya, Sam while the
+     field keeps the focus; the pointer over the last row logs `active:Some(3)` and the highlight
+     stays where the page left it.
+   - `onquery: Option<EventHandler<String>>`: the typed filter's text on every change. Proof: an
+     own-cursor menu logs `active:Some(0),active:Some(1),query:m,active:Some(0),query:me,query:m`
+     for Down, `m`, `e`, Backspace (the filter resets the highlight to the first match).
+   - The trailing action is the palette's `MenuRow::trailing`. Proof: the second person's ×
+     logs `remove:1`; the menu is still open and nothing was picked.
+   - `menu.rs` passed 300 lines: `MenuKind` and `MenuEntrance` moved to `menu_kind.rs`
+     (re-exported from `menu`, unchanged).
+   - Gallery: Overlays page, "Menu driven by a field".

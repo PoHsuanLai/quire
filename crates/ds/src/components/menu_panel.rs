@@ -3,11 +3,12 @@
 //! section 13.3.4). `Menu` is the root panel; [`SubMenu`] is every panel below it.
 
 use crate::components::menu::MenuKind;
+use crate::components::menu_cursor::{Cursor, highlighted, seed};
 use crate::components::menu_entry::MenuEntry;
 use crate::components::menu_item::client_point;
 use crate::components::menu_keys::{Child, Decision, Level, decide};
 use crate::components::menu_lines::{
-    Act, Choice, Filter, Line, choices, key_act, lines, liveness, settled,
+    Act, Choice, Filter, KeyAct, Line, choices, key_act, lines, liveness,
 };
 use crate::components::menu_rows::{Drawn, render_lines};
 use crate::components::menu_tracker::{Tracker, Via, target, use_tracker};
@@ -39,12 +40,21 @@ pub(crate) struct Panel<T: 'static> {
     pub onitem: Option<EventHandler<Option<usize>>>,
     /// The root panel hears a button released over a choice (press-drag-release).
     pub onrelease: Option<EventHandler<(usize, Press)>>,
+    /// Whose highlight the panel shows: a submenu's is always its own.
+    pub cursor: Cursor,
+    /// Under a caller's cursor, where a key asked the highlight to go.
+    pub on_active: Option<EventHandler<Option<usize>>>,
 }
 
 impl<T: Clone + PartialEq + 'static> Panel<T> {
-    /// The selection, settled onto an enabled choice.
-    pub(crate) fn current(&self) -> usize {
-        settled(self.tracker.selected(), &liveness(&self.choices))
+    /// The highlighted choice: the panel's own selection settled onto an enabled choice, or
+    /// the caller's; `None` when the caller highlights nothing or there is no choice.
+    pub(crate) fn current(&self) -> Option<usize> {
+        highlighted(
+            self.cursor,
+            self.tracker.selected(),
+            &liveness(&self.choices),
+        )
     }
 
     /// Whether this panel's own submenu is open.
@@ -66,7 +76,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
             shown,
             kind.row(),
             Drawn {
-                selected: Some(self.current()),
+                selected: self.current(),
                 open: tracker.open().map(|open| open.choice),
                 onpick: EventHandler::new(move |index: usize| match choices.get(index) {
                     Some(Choice {
@@ -120,13 +130,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         let Some(act) = key_act(&event.key(), event.modifiers(), filter) else {
             return Decision::Nothing;
         };
-        let decision = decide(
-            &act,
-            self.current(),
-            &self.choices,
-            self.child(),
-            self.level,
-        );
+        let decision = self.decision(&act);
         let own = matches!(
             decision,
             Decision::Select(_) | Decision::Pick(_) | Decision::Expand(_) | Decision::CloseSub
@@ -136,13 +140,39 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
             event.stop_propagation();
         }
         match &decision {
-            Decision::Select(index) => self.tracker.select(*index),
+            Decision::Select(index) => self.select(*index),
             Decision::Pick(value) => self.onpick.call(value.clone()),
             Decision::Expand(index) => self.tracker.expand(*index, Via::Keyboard),
             Decision::CloseSub => self.tracker.close_sub(),
             Decision::Back | Decision::CloseMenu | Decision::Query | Decision::Nothing => {}
         }
         decision
+    }
+
+    /// What `act` means from the highlighted choice. With nothing highlighted a move starts
+    /// from an end and a pick or an open does nothing.
+    fn decision(&self, act: &KeyAct) -> Decision<T> {
+        let (child, level) = (self.child(), self.level);
+        match (self.current(), seed(act, self.choices.len())) {
+            (Some(at), _) | (None, Some(at)) => decide(act, at, &self.choices, child, level),
+            (None, None) => match act {
+                KeyAct::Pick | KeyAct::Open => Decision::Nothing,
+                KeyAct::Move(_)
+                | KeyAct::Back
+                | KeyAct::Close
+                | KeyAct::Type(_)
+                | KeyAct::Erase => decide(act, 0, &self.choices, child, level),
+            },
+        }
+    }
+
+    /// Move the highlight to `index`: the panel's own moves, the caller's is asked for.
+    fn select(&self, index: usize) {
+        match (self.cursor, self.on_active) {
+            (Cursor::Auto, _) => self.tracker.select(index),
+            (Cursor::Controlled(_), Some(on_active)) => on_active.call(Some(index)),
+            (Cursor::Controlled(_), None) => {}
+        }
     }
 
     /// The open submenu, if any: its own panel, placed beside this one.
@@ -208,6 +238,8 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
         onhover: Some(onhover),
         onitem: None,
         onrelease: None,
+        cursor: Cursor::Auto,
+        on_active: None,
     };
     let want = Placement::new(Side::Right, Align::Start);
     let at = float.origin(Some(anchor), want, SUB_GAP);

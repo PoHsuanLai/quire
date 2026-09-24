@@ -1,10 +1,12 @@
 //! The mailo gaps 2 overlay cases: the command panel's opaque entrance, palette rows whose title
-//! and detail are runs with a trailing remove, and the same rows in a menu.
+//! and detail are runs with a trailing remove, the same rows in a menu, and a menu whose
+//! highlight a field beside it drives.
 
 use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
-    CommandPalette, Icon, MenuEntry, MenuRow, PaletteEntrance, RowAction, Run, RunTone, Text, Tile,
+    Anchor, CommandPalette, Cursor, Icon, Menu, MenuEntry, MenuKind, MenuRow, PaletteEntrance,
+    Point, Px, RowAction, Run, RunTone, Text, Tile,
 };
 use std::time::Duration;
 
@@ -64,4 +66,30 @@ pub const MAILO_CASES: &[Case] = &[
         make: || rsx! { CommandPalette { label: "Search and commands", placeholder: "Search mail, people, actions", query: "in", tokens: Vec::new(), groups: groups(), empty: "Nothing matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {} } },
         wait: NOW,
     },
+    Case {
+        component: "menu",
+        state: "cursor-controlled",
+        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {}, active: Cursor::Controlled(Some(2)) } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "cursor-none",
+        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {}, active: Cursor::Controlled(None) } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "slim-trailing",
+        make: || rsx! { Menu { kind: MenuKind::Slim, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
 ];
+
+/// Where the menus open.
+fn at() -> Anchor {
+    Anchor::Point(Point {
+        x: Px(20.0),
+        y: Px(20.0),
+    })
+}

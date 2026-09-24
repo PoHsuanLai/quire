@@ -123,6 +123,7 @@ pub fn OverlaysPage() -> Element {
         Pills { showcase }
         super::launcher::EmbeddedPalette {}
         super::overlays_mailo::RecentPalette {}
+        super::overlays_mailo::FieldMenu {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,
