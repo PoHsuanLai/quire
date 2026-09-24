@@ -79,7 +79,9 @@
 .ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
 
 /* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The
-   name is a span drawn as the field (no input: nothing is typed here), cut at its end. */
-.ds-input-wrap[*|data-kind=file]{ align-items:center; gap:var(--s-6); }
-.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:pointer; flex:1 1 0; }
+   name is a span drawn as the field (no input: nothing is typed here), cut at its end. The wrap
+   takes its container's width: a span has no 300 px intrinsic width as an input has, so without
+   it the name collapsed to its padding on Blitz. */
+.ds-input-wrap[*|data-kind=file]{ align-items:center; gap:var(--s-6); width:100%; }
+.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:pointer; flex:1 1 0; width:auto; }
 .ds-input-wrap[*|data-kind=file] .ds-input-placeholder{ right:auto; }

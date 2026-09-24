@@ -2100,6 +2100,17 @@ one row per prop.
      the parent's colour at .45. Proof: `a_bare_field_is_one_line_of_its_parents_text` (in a
      24 px / 1.25 title the field is exactly 30 px tall; a boxed one beside it keeps its own
      13.5 x 1.55 + 16).
+     **Blitz limit, seen in a render:** blitz-dom's text editor takes only the font size, line
+     height and colour from the field's computed style (`create_text_editor` inserts exactly
+     those three into the parley styles), so on Blitz a bare field's value is drawn in the
+     default family at the default weight, not the title's display face at 700; the placeholder,
+     a plain span, does take the face. Size, line and colour match. This is blitz-dom's, not
+     fixable in quire's CSS; a webview inherits the whole face.
+   - **Seen in a render, fixed:** the file name, a span with `flex:1 1 0`, collapsed to its
+     padding on Blitz (an input has a 300 px intrinsic width, a span none); the wrap now takes
+     its container's width. The frame button stretched in a column was centred by Blitz's
+     user-agent `button{justify-content:center}`; it now starts at its left edge, as a sidebar
+     item does.
 4. **SpaceEditor.** `motion_levels: MotionLevels::{All, Contact}` as a prop of the editor, not
    a field of `MotionChoice`: `MotionChoice` is a struct literal in mailo, and a new field would
    have broken it. `Contact` offers Calm, Standard and Extra; a `level` outside them (System,
