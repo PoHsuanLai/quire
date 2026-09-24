@@ -127,8 +127,13 @@ proposed).
   the caller's: it sets the colour of the icon's parent.
 - Settled (bar gaps): step 2's test is `ds::icon::classify(png_bytes) -> Result<IconKind::{Symbolic,
   Image}, DsError>`: symbolic when every pixel with alpha >= 128 has OKLCH chroma below the
-  threshold (0.04, still proposed; `classify_with(png, ChromaLimit(thousandths))` takes another,
-  and 22-SETTINGS has no key for it yet). The caller maps `IconKind` to `IconSource`.
+  threshold (0.04, still proposed; `classify_with(png, ChromaLimit(thousandths))` takes another).
+  The settings key is `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3, settled
+  2026-09-24: default 0.04, range 0.0..=0.2, Advanced). `ChromaLimit` gains a `Default` (the same
+  0.04) and `TryFrom<f32>`, which takes the key's plain chroma value and refuses anything outside
+  the range (`DsError::ChromaLimitRange`); `sill` still needs to register the key in its own
+  settings crate and pass the parsed value into `classify_with` (FINDINGS "Tune wave"). The
+  caller maps `IconKind` to `IconSource`.
 
 ### 1.6 Initial shell glyph list
 

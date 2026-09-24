@@ -524,27 +524,39 @@ pub enum BlurState { Available, Unavailable }  // data-blur=on|off -> --m-tint v
 ### 17.2 Starting values (proposed)
 
 The plan file names the tokens; the values below are the design-system planning agent's
-starting point (2026-09-23), to be tuned in the gallery. Every value here is **proposed**.
-`hairline` = 0.5 px `rgba(0,0,0,.08)` light / `rgba(255,255,255,.09)` dark (the `--f-line`
-values, section 4); `highlight` = `inset 0 1px 0 rgba(255,255,255,.6)` light /
-`rgba(255,255,255,.05)` dark (the `--shadow-1` inset, section 9). Tint solid = the same tint
-at alpha .94 or above. Text on every material must pass the `material-legible-over-black-and-white`
-test (`P:369`). Wave 1 measured the translucent tints against it (the card's `--ink` at 4.5:1 over
-pure black and pure white, `crates/ds/tests/legibility.rs`) and raised the four that fell short
-by the smallest .02 steps that pass: dark Bar .58 to .66 (was 3.63:1 over white), dark Dock .50
-to .66 (2.81:1), light Widget .50 to .54 (4.04:1 over black), dark Widget .45 to .65 (2.43:1).
-They stay proposed.
+starting point (2026-09-23), to be tuned in the gallery. Every value here is **proposed**,
+except the six tint alphas marked **settled (2026-09-24)** below, which the user fixed as the
+sensible-default legibility floor over blur (FINDINGS "Bar gaps" and the tune wave). `hairline`
+= 0.5 px `rgba(0,0,0,.08)` light / `rgba(255,255,255,.09)` dark (the `--f-line` values, section
+4); `highlight` = `inset 0 1px 0 rgba(255,255,255,.6)` light / `rgba(255,255,255,.05)` dark (the
+`--shadow-1` inset, section 9). Tint solid = the same tint at alpha .94 or above. Text on every
+material must pass the `material-legible-over-black-and-white` test (`P:369`). Wave 1 measured
+the translucent tints against it (the card's `--ink` at 4.5:1 over pure black and pure white,
+`crates/ds/tests/legibility.rs`) and raised the four that fell short over an *opaque* ground by
+the smallest .02 steps that pass: dark Bar .58 to .66 (was 3.63:1 over white), dark Dock .50 to
+.66 (2.81:1), light Widget .50 to .54 (4.04:1 over black), dark Widget .45 to .65 (2.43:1).
+
+Open decision 11 asked how those gates hold over *compositor blur*, where the tint is the whole
+background rather than a wash over an opaque surface. Measured at wave 1's alphas
+(`crates/ds/tests/legibility.rs`), six material/scheme pairs fell short over a pure black or
+white backdrop, worst the light Widget at 3.91:1 over black. Settled (2026-09-24), the smallest
+further .02 raises that clear 4.5:1 over blur for every pair: dark Bar .66 to .68, light Dock
+.55 to .59, dark Dock .66 to .68, dark Osd .66 to .68, light Widget .54 to .60, dark Widget .65
+to .67 (Bar light, Popover and Osd light already cleared it). This is a sensible default the
+user asked to be tunable later, not a final measurement; `crates/ds/tests/legibility.rs`'s
+`the_tinted_chrome_holds_its_ink_over_blur` pins the floor so a retune that drops back below 4.5
+fails it.
 
 | Material | Tint light | Tint dark | Edge | Shadow | Radius | Blur | Nearest precedent in `S` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Window | `--f-grad` + `.ds-layer` + `.ds-grain` | same | none | none | 0 (the card inside keeps 12/12/12/4) | none | `.win` (`S:77-87`) |
-| Bar | `rgba(248,249,246,.70)` | `rgba(21,24,20,.66)` (was .58) | `inset 0 -0.5px 0 hairline` | none | 0 | behind | frame zone (section 4) |
-| Dock | `rgba(248,249,246,.55)` | `rgba(21,24,20,.66)` (was .50) | `inset 0 0 0 .5px rgba(255,255,255,.55)` + highlight | `0 10px 30px -10px rgba(0,0,0,.35)` | 22 | behind | pinned tiles radius 12 (`S:109`) |
+| Bar | `rgba(248,249,246,.70)` | `rgba(21,24,20,.68)` (settled 2026-09-24; .58 to .66 wave 1, to .68 over blur) | `inset 0 -0.5px 0 hairline` | none | 0 | behind | frame zone (section 4) |
+| Dock | `rgba(248,249,246,.59)` (settled 2026-09-24; was .55) | `rgba(21,24,20,.68)` (settled 2026-09-24; .50 to .66 wave 1, to .68 over blur) | `inset 0 0 0 .5px rgba(255,255,255,.55)` + highlight | `0 10px 30px -10px rgba(0,0,0,.35)` | 22 | behind | pinned tiles radius 12 (`S:109`) |
 | Popover | `rgba(255,255,255,.78)` | `rgba(42,47,40,.78)` | hairline + highlight | `--shadow-pop` = `0 18px 40px -16px rgba(0,0,0,.45)` | `--r-panel` 14 | behind | `.fmenu` (`S:665-666`) |
 | Sheet | `rgba(248,249,246,.82)` | `rgba(21,24,20,.78)` | hairline + highlight | `--shadow-sheet` = `0 24px 50px -18px rgba(0,0,0,.55)` light / `0 30px 60px -20px rgba(0,0,0,.7)` dark | 18 | behind | `.peek` (`S:221-224`) |
 | Toast | `rgba(248,249,246,.80)` | `rgba(21,24,20,.74)` | hairline + highlight | `--shadow-pop` | 16 | behind | `.toast` is inverse ink/paper in mail (`S:360-362`); the shell banner is a material, see open decision 12 |
-| Osd | `rgba(248,249,246,.72)` | `rgba(21,24,20,.66)` | hairline + highlight | `--shadow-pop` | 18 | behind | none |
-| Widget | `rgba(248,249,246,.54)` (was .50) + grain | `rgba(21,24,20,.65)` (was .45) + grain | hairline + highlight | soft: `0 6px 16px -6px rgba(26,30,26,.30)` (`--shadow-2` drop) | 20 | behind | `.editor` / `.note` (`S:246`, `S:283`) |
+| Osd | `rgba(248,249,246,.72)` | `rgba(21,24,20,.68)` (settled 2026-09-24; was .66) | hairline + highlight | `--shadow-pop` | 18 | behind | none |
+| Widget | `rgba(248,249,246,.60)` (settled 2026-09-24; .50 to .54 wave 1, to .60 over blur) + grain | `rgba(21,24,20,.67)` (settled 2026-09-24; .45 to .65 wave 1, to .67 over blur) + grain | hairline + highlight | soft: `0 6px 16px -6px rgba(26,30,26,.30)` (`--shadow-2` drop) | 20 | behind | `.editor` / `.note` (`S:246`, `S:283`) |
 
 Tinted shell chrome (bar, dock, launcher, control center) additionally carries the workspace's
 `--f-*` frame tokens over the material (section 18 and `21-SPACES.md`): the material gives the
@@ -625,8 +637,12 @@ index (`S:1027`, `S:1086`, `S:1669`).
     or mail's inverse ink-on-paper toast is open.
 11. **Frame over blur.** The frame tokens were designed over an opaque gradient; over compositor
     blur, whether the bar and dock paint the Space gradient as their tint, a single stop, or
-    `--f-solid` at some alpha is not specified. The contrast gates in section 6 assume an opaque
-    ground; how they hold over a blurred wallpaper is not specified.
+    `--f-solid` at some alpha is not specified (bar gaps' `FrameTint::Tinted`, `21-SPACES.md`
+    section 3, answers this with the tint alpha; whether that reading is final is still open).
+    The contrast gates in section 6 assume an opaque ground; how they hold over a blurred
+    wallpaper is now specified for the tinted chrome materials — settled (2026-09-24), section
+    17.2's six raised alphas clear 4.5:1 over both a pure black and a pure white backdrop, as a
+    sensible default the user can retune later.
 12. **Default preset per workspace index** (for example workspace i takes preset i mod 8) is not
     specified; `S` only shows presets 0 and 1 as the first two Spaces.
 13. **Which theme wins** when a workspace SpaceLook says `light` and the system scheme is dark:
