@@ -7,8 +7,8 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Anchor, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Cursor, Focus, Icon,
-    InputVariant, Material, Menu, MenuEntry, MenuKind, MenuRow, MountedRef, PaletteEntrance,
-    Radius, RowAction, Run, RunTone, Surface, Text, TextInput, Tile,
+    InputVariant, Material, Menu, MenuEntry, MenuKind, MenuRow, PaletteEntrance, Radius, RowAction,
+    Run, RunTone, Surface, Text, TextInput, Tile, use_rect,
 };
 
 /// The recent searches a panel starts with.
@@ -92,7 +92,9 @@ pub fn FieldMenu() -> Element {
     let showcase = use_context::<Signal<Axes>>().peek().showcase;
     let mut open = use_signal(|| showcase == Showcase::Posed);
     let mut at = use_signal(|| 1usize);
-    let mut field = use_signal(|| None::<MountedRef>);
+    // Posed, the menu opens at the field's measured rect (a snapshot is taken before an
+    // element anchor is measured); live, it anchors to the element itself.
+    let field = use_rect();
     let mut people = use_signal(|| PEOPLE.to_vec());
     let rows: Vec<MenuEntry<u8>> = (0u8..)
         .zip(people())
@@ -110,12 +112,16 @@ pub fn FieldMenu() -> Element {
         })
         .collect();
     let last = rows.len().saturating_sub(1);
+    let anchor = match showcase {
+        Showcase::Posed => field.rect().map(Anchor::Rect),
+        Showcase::Live => field.anchor(),
+    };
     rsx! {
         Section {
             title: "Menu driven by a field",
             note: "Cursor::Controlled: the field keeps the keyboard and its Up and Down move the highlight; the pointer only asks, through on_active. Each person's forget button acts without picking.",
             div { class: "g-row",
-                div { onmounted: move |event| field.set(Some(MountedRef(event.data()))),
+                div { onmounted: move |event| field.on_mounted(event),
                     TextInput {
                         variant: InputVariant::Boxed,
                         label: "To",
@@ -132,10 +138,12 @@ pub fn FieldMenu() -> Element {
                 }
                 Button { variant: ButtonVariant::Secondary, label: "Open the people menu", onclick: move |_| open.set(true) }
             }
-            if let (true, Some(mounted)) = (open(), field()) {
+            // Room under the field for the menu, inside the page.
+            div { style: "height:230px" }
+            if let (true, Some(anchor)) = (open(), anchor) {
                 Menu::<u8> {
                     kind: MenuKind::Rich,
-                    anchor: Anchor::Mounted(mounted),
+                    anchor,
                     entries: rows,
                     onpick: move |_| open.set(false),
                     onclose: move |()| open.set(false),

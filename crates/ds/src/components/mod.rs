@@ -49,6 +49,7 @@ pub mod search_field;
 pub mod section_header;
 pub mod segmented;
 pub mod selection_bubble;
+pub mod send_mood;
 pub mod send_pill;
 pub mod sheet;
 pub mod sidebar_item;
@@ -65,7 +66,7 @@ pub mod tooltip;
 pub mod vocab;
 pub mod workspace_pills;
 
-pub use account_tile::{AccountFace, AccountTile};
+pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use animated_list::AnimatedList;
 pub use appearance_picker::AppearancePicker;
 pub use avatar::{Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue};
@@ -104,22 +105,23 @@ pub use search_field::SearchField;
 pub use section_header::{HeaderKind, SectionHeader};
 pub use segmented::{SegSize, SegmentedControl};
 pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble};
-pub use send_pill::{SendPhase, SendPill};
+pub use send_mood::SendMood;
+pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use sheet::Sheet;
-pub use sidebar_item::{ItemKind, Preview, SidebarItem};
+pub use sidebar_item::{ItemKind, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
-pub use space_editor::{ActiveDot, DotIndex, SpaceDot, SpaceEditor};
+pub use space_editor::{ActiveDot, DotIndex, MeasuredIn, MotionChoice, SpaceDot, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
-pub use text_input::{Focus, InputVariant, TextInput};
+pub use text_input::{Focus, InputVariant, TextInput, TextInputKind};
 pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
 pub use vocab::{
-    Availability, Check, DropState, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection,
-    Shortcut, StaggerIndex, Switch,
+    Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
+    Selection, Shortcut, StaggerIndex, Switch,
 };
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 

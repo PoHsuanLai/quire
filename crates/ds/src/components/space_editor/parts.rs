@@ -93,7 +93,7 @@ pub(super) fn GrainRow(look: SpaceLook, onchange: EventHandler<SpaceLook>) -> El
     }
 }
 
-/// The eight presets, each painted with its own gradient in this scheme.
+/// The eight presets, each painted with its own gradient in this scheme and named for itself.
 #[component]
 pub(super) fn Presets(
     look: SpaceLook,
@@ -110,7 +110,8 @@ pub(super) fn Presets(
                         key: "{index}",
                         r#type: "button",
                         class: "ds-preset",
-                        "aria-label": "Preset {index + 1}",
+                        "aria-label": preset.name,
+                        title: preset.name,
                         style: "background:{gradient(&derive(preset.dots, scheme))}",
                         onclick: {
                             let look = look.clone();
@@ -126,9 +127,21 @@ pub(super) fn Presets(
     }
 }
 
-/// The four measured pairs and the capping note (design/03-COLOR.md section 6).
+/// The four measured pairs and the capping note under "Measured, this Space, this theme"
+/// (design/03-COLOR.md section 6).
 #[component]
 pub(super) fn Checks(look: SpaceLook, scheme: Scheme) -> Element {
+    rsx! {
+        div {
+            SectionHeader { kind: HeaderKind::Field, text: "Measured, this Space, this theme" }
+            CheckRows { look, scheme }
+        }
+    }
+}
+
+/// The four measured pairs in `scheme` and its capping note.
+#[component]
+pub(super) fn CheckRows(look: SpaceLook, scheme: Scheme) -> Element {
     let checks = readout(&look, scheme);
     let note = match derive(&look.dots, scheme).capped {
         Capping::Uncapped => "No capping needed: every stop passes at the chroma you chose.",
@@ -137,24 +150,21 @@ pub(super) fn Checks(look: SpaceLook, scheme: Scheme) -> Element {
         }
     };
     rsx! {
-        div {
-            SectionHeader { kind: HeaderKind::Field, text: "Measured, this Space, this theme" }
-            div { class: "ds-checks",
-                for check in checks {
-                    div { class: "ds-check",
-                        span { "{check.label}" }
-                        span { class: "ds-check-value", "{check.measured:.2}" }
-                        Chip {
-                            variant: ChipVariant::Status(check.verdict()),
-                            text: match check.verdict() {
-                                Verdict::Pass => format!("≥ {}", check.need),
-                                Verdict::Fail => format!("< {}", check.need),
-                            },
-                        }
+        div { class: "ds-checks",
+            for check in checks {
+                div { class: "ds-check",
+                    span { "{check.label}" }
+                    span { class: "ds-check-value", "{check.measured:.2}" }
+                    Chip {
+                        variant: ChipVariant::Status(check.verdict()),
+                        text: match check.verdict() {
+                            Verdict::Pass => format!("≥ {}", check.need),
+                            Verdict::Fail => format!("< {}", check.need),
+                        },
                     }
                 }
             }
-            p { class: "ds-capnote", "{note}" }
         }
+        p { class: "ds-capnote", "{note}" }
     }
 }

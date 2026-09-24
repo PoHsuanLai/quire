@@ -139,23 +139,43 @@ pub(crate) fn text(text: &Text) -> Element {
     }
 }
 
-/// One run in its tone.
+/// One run in its tone. The spaces at either end of a marked or toned run are drawn outside its
+/// element: Blitz drops the whitespace at the end of an inline box, so `Re: ` in a faint span
+/// before a mark would draw as `Re:UIDL` (seen in the gallery, mailo gaps 2).
 fn run(run: &Run) -> Element {
-    let body = run.text.clone();
-    match (run.tone, run.tone.slug()) {
+    let (lead, core, trail) = edges(&run.text);
+    let core = core.to_owned();
+    let body = match (run.tone, run.tone.slug()) {
+        (RunTone::Plain, _) => return rsx! { "{run.text}" },
         (RunTone::Mark, _) => rsx! {
-            mark { class: "ds-mark", "{body}" }
+            mark { class: "ds-mark", "{core}" }
         },
-        (_, Some(tone)) => rsx! {
-            span { class: "ds-run", "data-tone": tone, "{body}" }
+        (RunTone::Strong | RunTone::Faint, tone) => rsx! {
+            span { class: "ds-run", "data-tone": tone, "{core}" }
         },
-        (_, None) => rsx! { "{body}" },
+    };
+    let (lead, trail) = (lead.to_owned(), trail.to_owned());
+    rsx! {
+        if !lead.is_empty() {
+            "{lead}"
+        }
+        {body}
+        if !trail.is_empty() {
+            "{trail}"
+        }
     }
+}
+
+/// `text` as its leading whitespace, the rest up to its trailing whitespace, and that.
+fn edges(text: &str) -> (&str, &str, &str) {
+    let start = text.len() - text.trim_start().len();
+    let end = text.trim_end().len().max(start);
+    (&text[..start], &text[start..end], &text[end..])
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Run, RunTone, Text};
+    use super::{Run, RunTone, Text, edges};
 
     #[test]
     fn the_plain_text_drops_the_tones() {
@@ -173,6 +193,21 @@ mod tests {
         ];
         for (text, want) in cases {
             assert_eq!(text.plain_text(), want, "{text:?}");
+        }
+    }
+
+    #[test]
+    fn a_runs_edge_spaces_are_split_off() {
+        const CASES: &[(&str, (&str, &str, &str))] = &[
+            ("Re: ", ("", "Re:", " ")),
+            (" UIDL", (" ", "UIDL", "")),
+            ("  a b  ", ("  ", "a b", "  ")),
+            ("UIDL", ("", "UIDL", "")),
+            ("   ", ("   ", "", "")),
+            ("", ("", "", "")),
+        ];
+        for (text, want) in CASES {
+            assert_eq!(edges(text), *want, "{text:?}");
         }
     }
 }

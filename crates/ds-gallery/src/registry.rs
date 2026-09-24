@@ -54,7 +54,7 @@ pub const REGISTRY: [Entry; 12] = [
         page: Page::Overlays,
         title: "Overlays",
         lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
-        height: 2760,
+        height: 3450,
         body: pages::overlays::OverlaysPage,
     },
     Entry {

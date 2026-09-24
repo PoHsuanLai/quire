@@ -5,7 +5,7 @@
 use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::components::vocab::{Emphasis, PulseKey, Selection, StaggerIndex, Switch};
+use ds::components::vocab::{Emphasis, Expanded, PulseKey, Selection, StaggerIndex};
 use ds::{ActionId, Anim, HoverStrip, ListRow, Presence, Run, RunTone, Shown, Text, Titles};
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
@@ -53,8 +53,8 @@ fn caller_strip(shown: Shown) -> Element {
             shown,
             titles: Titles::FromLabel,
             expanded: vec![
-                (ActionId("snooze".to_string()), Switch::Off),
-                (ActionId("label".to_string()), Switch::On),
+                (ActionId("snooze".to_string()), Expanded::Closed),
+                (ActionId("label".to_string()), Expanded::Open),
             ],
         }
     }

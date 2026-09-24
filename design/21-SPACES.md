@@ -110,16 +110,21 @@ every pair, with and without blur).
 
 The 8 presets (settled, S; Appendix A3):
 
-| # | dots `[{hue, chroma}]` | Name in S |
-| --- | --- | --- |
-| 1 | `[{268,.72},{318,.55}]` | Work (grain 35) |
-| 2 | `[{152,.62},{62,.55},{28,.5}]` | Home (grain 55) |
-| 3 | `[{220,.7}]` | |
-| 4 | `[{20,.66},{55,.6}]` | |
-| 5 | `[{190,.6},{240,.55}]` | |
-| 6 | `[{340,.6},{290,.5}]` | |
-| 7 | `[{95,.5}]` | |
-| 8 | `[{250,.06}]` (neutral) | |
+| # | dots `[{hue, chroma}]` | Name (`Preset::name`, settled) | Sample Space in S |
+| --- | --- | --- | --- |
+| 1 | `[{268,.72},{318,.55}]` | Dusk | Work (grain 35) |
+| 2 | `[{152,.62},{62,.55},{28,.5}]` | Orchard | Home (grain 55) |
+| 3 | `[{220,.7}]` | Harbour | |
+| 4 | `[{20,.66},{55,.6}]` | Ember | |
+| 5 | `[{190,.6},{240,.55}]` | Lagoon | |
+| 6 | `[{340,.6},{290,.5}]` | Heather | |
+| 7 | `[{95,.5}]` | Moss | |
+| 8 | `[{250,.06}]` (neutral) | Stone | |
+
+The names are mailo's (`space/presets.rs::PRESET_NAMES`, settled with the mailo gaps 2 wave);
+the editor's preset buttons are named by them. Work and Home are the Spaces S made from the
+first two, not the presets' names. mailo's six further presets (the retired accent hues:
+Postmark, Graphite, Pine, Indigo, Oxblood, Vermilion) are not in quire's eight.
 
 Default `SpaceLook` for a workspace with no stored look (proposed):
 - `dots = PRESETS[index % 8]`, index = the workspace's 0-based position on its output.

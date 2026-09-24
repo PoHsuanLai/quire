@@ -460,6 +460,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }
 .ds-account-tile .ds-avatar[*|data-tone=all]{ background:transparent; color:var(--f-ink); }
 .ds-account-tile[*|aria-pressed=false] .ds-avatar[*|data-tone=account]{ opacity:.85; }
+
+/* The Add account tile (`data-face=add`, mailo's `.acct-add`): no plate at rest (the rule names
+   the Pin as well, to outrank its ground, which comes later in the cascade), the Pin's pill
+   on hover; where an avatar would be, a dashed ring in `--f-ink-faint` around a plus, both
+   going to `--f-ink` under the pointer. */
+.ds-icon-button.ds-account-tile[*|data-face=add]{ background:transparent; }
+.ds-icon-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
+.ds-account-tile .ds-avatar[*|data-tone=add]{
+  box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
+  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
+}
+.ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }
 /* -- animated_list -- */
 /* AnimatedList (design/04-COMPONENTS.md section 16 markup): the `ul` the rows live in. Its
    `data-presence` only selects which entrance an entering row plays (list_row.css); the list
@@ -1267,9 +1279,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* SendPill (design/04-COMPONENTS.md section 31), verbatim `S:706-715`: a dark pill at the
    bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
-   Undo hover is not specified. C's retry states (`nudge`, `shake`, a Fix button) have no phase
-   in `SendPhase` and are not drawn. The Undo rule names the pill, as S's
-   `.sendpill button` does. */
+   Undo hover is not specified. The Undo rule names the pill, as S's `.sendpill button` does.
+   C's outbox states (mailo gaps 2): a failed mood plays `nudge` or `shake` once through the
+   pulse classes (`a-nudge`, `a-shake`, the motion sheet's), both keyframes baking in the
+   pill's `translateX(-50%)`; `data-mood=fatal` turns the pill `--danger` with its ink. A
+   spinning ring (`data-ring=spin`) turns the whole ring at the Spinner's `spin` (the arc is an
+   attribute, S6). The refusal is a second, lighter line under the text, and may wrap. C's Fix
+   button is the consumer's `PillAction`, not drawn here. */
 
 .ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:var(--s-10);
   background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-6) var(--s-6) var(--s-6) var(--s-12); font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
@@ -1277,6 +1293,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-send-ring{ display:block; flex:none; }
 .ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }
+
+.ds-send-pill[*|data-mood=fatal]{ background:var(--danger); color:var(--danger-ink); }
+.ds-send-ring[*|data-ring=spin]{ animation:spin var(--t-spin) var(--e-linear) infinite; }
+.ds-send-pill-text{ display:flex; flex-direction:column; gap:var(--s-2); }
+.ds-send-pill-why{ font-weight:500; opacity:.8; white-space:normal; max-width:280px; }
+.ds-send-pill[*|data-mood=fatal] .ds-send-pill-undo{ background:var(--danger-ink); color:var(--danger); }
 /* -- sheet -- */
 /* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
    centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
@@ -1326,6 +1348,16 @@ html,body{margin:0;padding:0;background:transparent}
   transition:opacity var(--t-quick) var(--e-out);
 }
 .ds-sidebar-item:hover .ds-sidebar-item-close{ opacity:1; }
+
+/* A scheduled Today row's trailing time and cancel (mailo's `.today-item.later .when`, its `.x`):
+   the time in data type at `--f-ink-faint`, never wrapping; the cancel is drawn as the close
+   is, but always shown, since cancelling is the row's one action. */
+.ds-sidebar-item-time{ flex:none; font-family:var(--font-data); font-size:var(--fs-note); color:var(--f-ink-faint); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.ds-sidebar-item .ds-sidebar-item-cancel{
+  flex:none; border:0; background:none; cursor:pointer; padding:0; color:var(--f-ink-faint); line-height:0;
+  transition:color var(--t-quick) var(--e-out);
+}
+.ds-sidebar-item .ds-sidebar-item-cancel:hover{ color:var(--f-ink); }
 
 /* Destination preview (`S:447-448`). */
 .ds-sidebar-item[*|data-preview=destination]{
@@ -1427,6 +1459,14 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
+
+/* mailo gaps 2. The title as a name field (`on_rename`): the inline TextInput takes the title's
+   display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
+   scheme's rows under a heading in the data face, upper case, as the field headers are. */
+.ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
+.ds-space-editor-title .ds-input-wrap{ flex:1; }
+.ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
+.ds-checks-heading{ font-family:var(--font-data); font-size:var(--fs-micro); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15): C's sync halo (`C:284-292`), a ring at
    `inset:-4px` around a positioned parent. Attribute selectors carry `*|` (spike S2).
@@ -1514,6 +1554,18 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--s-8) var(--s-11); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }
+
+/* A password (`data-kind=password`): Blitz draws a password field's characters as typed, so the
+   field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
+   per character over it, where the placeholder would sit. The caret follows the hidden text, so
+   it can sit a little off the last dot; the secret itself never paints. */
+.ds-input[*|data-kind=password]{ color:transparent; caret-color:var(--ink); }
+.ds-input-mask{
+  position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
+  font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink); letter-spacing:.1em;
+}
+.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); }
+.ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 /* -- text_runs -- */
 /* Text runs (mailo gaps 2): a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with

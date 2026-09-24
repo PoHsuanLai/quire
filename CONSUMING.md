@@ -882,7 +882,34 @@ A person or account colour never needs a hex constant of yours:
 - **Glyphs.** `Icon::Printer`, `Icon::FolderInput` (Lucide `printer`, `folder-input`), listed in
   `Icon::ACTIONS`.
 
-### mailo gaps 2 (lists and overlays)
+### The mailo gaps 2 (2026-09-25): controls and tiles
+
+Every row is additive: leave the prop out and the markup is what it was, except where a row
+says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the why of each.
+
+| Component | Prop or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Button` | `title` | `Option<String>` (`None`) | the hover hint, written as `title` |
+| `Button` | `aria_label` | `Option<String>` (`None`) | names the button for assistive technology in place of its visible label (a `+`, an `All`) |
+| `Button` | `expanded` | `Option<Expanded>` (`None`) | `Expanded::{Open, Closed}` as `aria-expanded`, for a button that opens a menu or panel; `IconButton` already had `tooltip`, `label` and `expanded: Option<Switch>` and is unchanged |
+| `TextInput` | `onfocus`, `onblur` | `EventHandler<()>` (no-op) | the caret arrived or left: a click or Tab, and the focus seam (`Focus::OnMount`, `Focus::Controlled`), which on Blitz moves the caret with no event, so the field calls `onfocus` itself |
+| `TextInput` | `kind` | `TextInputKind` (`Text`) | `Password` writes `type="password"` and `data-kind="password"`; Blitz draws a password's characters as typed, so the field's text is transparent and one dot per character is laid over it |
+| `Slider` | (none) | | already the range input: `value: Fraction` in thousandths, keys and drag; map your 0-100 to `Fraction(n * 10)` |
+| `AccountTile` | `mark` | `MarkStyle` (`Letter`) | how the provider is drawn on the tile: pass your provider-marks setting, `MarkStyle::Image(ImageSource(data_uri))` for the favicon you hold |
+| `AddAccountTile` | (new component) | `label: String` ("Add account"), `title: Option<String>`, `onclick: EventHandler<()>` | the tile after the accounts: the Pin plate with no ground at rest, a plus in a dashed `--f-ink-faint` ring; never pressed, no count |
+| `SendPill` | `mood` | `SendMood` (`Calm`) | `Nudge`, `Shake`, `Fatal`: the one-shot `nudge` or `shake` (design/05 4.4.8-9) plays each time the mood changes to one of them, never on mount, and settles at `ds::settle`; the pill stays up; `Fatal` also paints it `--danger`/`--danger-ink`; `data-mood` is written for each. Pass `Calm` for a render to play the same mood again |
+| `SendPill` | `action` | `PillAction` (`Undo`) | the button's word while counting: `Undo`, `Cancel` (a held send), or `Nothing` (no button); `onundo` hears either word |
+| `SendPill` | `ring` | `SendRing` (`Drain`) | `Spin`: a 20/37 arc turning at the Spinner's `spin` while the send waits on the outbox, `progress` ignored |
+| `SendPill` | `refusal` | `Option<String>` (`None`) | a second, lighter line under the text: why a take-back was refused, or "No recipients" |
+| `SidebarItem` | `trailing` | `Option<TodayTrailing>` (`None`) | a scheduled Today row's `time` (data type, `--f-ink-faint`) and a cancel button named by `cancel`, calling `on_cancel` without opening the row; Today only |
+| `SidebarItem` | (markup changed) | | a Today item's close button is now named `Close {label}`, not `Close`: an assertion or selector on `aria-label="Close"` needs the row's label |
+| `SpaceEditor` | `on_rename` | `Option<EventHandler<String>>` (`None`) | the title becomes an inline `TextInput` ("Space name", placeholder "Name this Space") holding `name`; each keystroke is reported |
+| `SpaceEditor` | `motion` | `Option<MotionChoice>` (`None`) | a Motion row after Appearance: a `SegmentedControl` over `ds::Motion` (System, Calm, Standard, Extra, Reduced), `MotionChoice { level, on_motion }`; feed the pick to your root's `appearance.motion` |
+| `SpaceEditor` | `measured` | `MeasuredIn` (`ThisScheme`) | `EachScheme`: the contrast readout under "Measured, this Space", once per scheme the Space's theme shows (Light and Dark for System), each under its own small-caps heading |
+| `SpaceEditor` | (markup changed) | | each preset button is named (`aria-label` and `title`) by `Preset::name` (Dusk, Orchard, Harbour, Ember, Lagoon, Heather, Moss, Stone), not "Preset n" |
+| `Preset` | `name` | `&'static str` | the preset's name, design/21 section 4 order; a new public field, so a struct literal of `Preset` needs it |
+
+### The mailo gaps 2 (2026-09-25): lists and overlays
 
 Every row below is additive: a prop that defaults to what the component did before, or a new
 variant. FINDINGS "mailo gaps 2 (lists and overlays)" has the reasons and the proofs. One prop
@@ -899,7 +926,7 @@ per row:
 | `ListRow` | `aria_label: Option<String>` | The row's accessible name ("Open Re: UIDL stability"); absent, its contents name it as before. |
 | `HoverStrip` | `shown: Option<Shown>` | `Some(Shown::Visible)` shows the strip on a keyboard-selected or focused row (Blitz never matches `:focus-within`); `Some(Shown::Hidden)` keeps it down under the pointer; `None` is the hover reveal. |
 | `HoverStrip` | `titles: Titles` | `Titles::FromLabel` writes each button's label as its `title`; `Titles::Omitted` (default) writes none, as before. |
-| `HoverStrip` | `expanded: Vec<(ActionId, Switch)>` | The buttons that open a menu, and whether it is open: `aria-haspopup="menu"`, `aria-expanded`. |
+| `HoverStrip` | `expanded: Vec<(ActionId, Expanded)>` | The buttons that open a menu, and whether it is open: `aria-haspopup="menu"`, `aria-expanded`. |
 | `HoverStrip` | (behaviour) | A strip button's click stops at the button: it never opens the row. |
 | `Text`, `Run`, `RunTone` | new types | `Text::{Plain(String), Runs(Vec<Run>)}`, `Run { text, tone: RunTone::{Plain, Mark, Strong, Faint} }`, `Text::plain_text()`. You compute the runs; quire never parses markup out of a string. |
 | `CommandPalette` | `entrance: PaletteEntrance::Opaque` | The card springs with `cmdk-rise` (`cmdk-in`'s scale and lift, no fade): opaque on its first frame. Over a window the scrim then appears at once too (a fading wrap would hold the card at its own opacity). `PeekIn` and `CmdkIn` are unchanged and still start at opacity 0. |
@@ -911,6 +938,7 @@ per row:
 | `Menu` | trailing action | Through `MenuEntry::Row(MenuRow { trailing: Some(RowAction { .. }), .. })`, as in the palette: the menu stays open and nothing is picked. |
 | `HoverTarget` | `as_: TargetElement` | The element the target is drawn as: `Span` (default, as before), `Div` or `Li` (a list's own item, which a `span` cannot hold). Same handlers, same hub: the card opens, places and closes exactly as for a span. `display:contents` is not offered: the card is placed against the target's rect, and such an element has none. A `ListRow` is already an `li`: hook its thread card through the row's `onpointerenter`/`onpointerleave` instead. |
 | `HoverKind` | `Tip` | A value's small tip (a row's time): `HoverCard { kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }` is one line, auto width up to 260, 12 px (the Card tooltip's size), placed 6 below the target's left edge like a sender card, on the hub's timing (450 ms, 0 when warm, 150 ms to close). A `match` over `HoverKind` needs an arm for it. |
+
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
