@@ -1259,3 +1259,35 @@ What sill changes (read-only here; `crates/sill-surfaces/src/surfaces/launcher/p
   The session's reset on opening then comes from the palette's `oninput("")` and
   `on_select(0)`, or stays the session's own. Keep the query and selection with
   `Retain::Query`.
+## Icon bake-off (2026-09-24)
+
+design/08-ICONS.md 3.4 run once on the local GPU, branch `icon-bakeoff`. Full write-up and
+the agent's assessment: `docs/icons-bakeoff.md`; sheets: `tools/progress/shots/icons/`;
+weight licences: `docs/licensing-references.md`. The user picks the model.
+
+- **Both candidates run on the 16 GB card at 1024 px.** FLUX.2 Klein 4B (Q4_K_M GGUF): 3-4 s
+  per warm render, peak 12.0 GB on the card. Qwen-Image-2512 (Q3_K_M GGUF, NVFP4 text
+  encoder): 70-90 s warm, peak 14.7 GB, so it cannot share the card with any other job.
+  Qwen-Image-Edit-2511 Q3_K_M (reference edits): ~120 s warm, 489 s cold.
+- **FLUX.2 Klein 4B is Apache-2.0, not a separate "Klein licence".** 08 3.2 and 5 expect
+  special terms; the 4B repo's card says Apache-2.0. The 9B Klein and FLUX.2 dev are
+  `flux-non-commercial-license` and must stay out.
+- **Terminal is the weak subject for both models**: neither drew a prompt caret under "no
+  letters"; both drew a checkmark or a mouse pointer on a screen. The subject phrasing (or 08
+  2.7's glyph route) needs another round whichever model wins.
+- **Reference-conditioned edits over-copy the hero's shape** (08 3.6). Klein's reference latent
+  turned "files" into a blue envelope; Qwen-Image-Edit at the settings used turned "notes"
+  and "terminal" into envelopes and patterned every background. Both passes keep the hero's
+  material and light. The plain brief already gives a consistent set, so 08 3.6's premise
+  (the rest of the set must be edits of the hero) is worth re-deciding.
+- **08 3.7's key (ΔE_OK 0.03 from one corner colour) does not survive real renders**: the
+  ground has a vignette and a lit floor band, and white objects sit within 0.1 of it. The
+  post-process grows the ground from the border under a chroma gate and a per-step ΔE limit,
+  keeps the floor shadow as a matte, and drops specks (`tools/icons/src/key.rs`). White-rimmed
+  objects still lose slivers; a segmentation model may be needed after all.
+- **08 2.5's shadow does not fit 08 2.2's margin at 1024.** Scaled by plate/48 it is offset
+  103 px with 275 px blur against a 100 px margin, so the master's shadow is clipped at the
+  canvas edge. 08 2.5 needs a cap or a different scale.
+- **Every ComfyUI run in this session was killed twice by harness restarts**, not by memory:
+  a server started as a background task of the agent dies with it. Start it with `setsid` so
+  it survives, and stop it by its `agent-limit16-*` scope as the README says.
