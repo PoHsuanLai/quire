@@ -430,6 +430,22 @@ data, not a key.
 | `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | proposed |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
 
+### 3.15 `display` (sill/settings.toml)
+
+All Advanced (§5). The display service reads the EDID, classifies the panel's gamut, and drives DDC/CI.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `display.scale` | `ScalePolicy::{Auto,Manual}` | `Auto` | `Auto` derives the scale from the EDID's physical size aiming at `density_target_ppi` (1.5 on a 27" 4K panel); `Manual` uses `scale_overrides` | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.scale_overrides` | `Text` | `""` | `<identity> = <scale>` pairs separated by `;`. A `Vec` of text is not derivable in the settings macro yet (quire gap: ds-settings-derive list types) | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.density_target_ppi` | `Count` | `109` | `72..=220`; 109 pt/inch is the target that makes text the size it is on a Mac | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.brightness_keys_target` | `BrightnessTarget::{PointerOutput,AllOutputs}` | `PointerOutput` | in practice the active window's output; DDC/CI | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.hardware_volume` | `HardwareVolume::{Off,WhenMonitorIsOutput}` | `WhenMonitorIsOutput` | DDC/CI volume when the monitor is the audio output | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.night_warmth` | `NightWarmth::{Off,Hardware}` | `Off` | warmth through the monitor's own DDC/CI controls | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.night_warmth_strength` | `Percent` | `50` | `0..=100` | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.font_rendering` | `FontRendering::{Auto,Off}` | `Auto` | `Auto` sets hinting and subpixel positioning from the output's ppi | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+| `display.color_management` | `ColorManagement::{Auto,Off}` | `Auto` | stored only: cosmic-comp 1.8.0 has no `wp_color_manager_v1`, so the palette fits sRGB there; KWin 6.7.5 offers parametric Display P3 | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
+
 ## 4. Rust shape
 
 Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module
