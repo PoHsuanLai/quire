@@ -150,6 +150,15 @@ concern (section 6 has the full "what mailo keeps" list).
 | an undo while a row's exit is still playing (the list's archive, trash, snooze) | `roster.stay(key)` | mailo gaps 3: restores the row in place and cancels its settle, so the rows below never heal; list the key again in the same handler. After the exit has settled, list the key again and it enters |
 | `LintConfig { profile, own_vars, exceptions }` written out whole (`ui/style/mod.rs:815`) | add `..LintConfig::default()` (or `stale: Stale::Fail`) | mailo gaps 3: `LintConfig` gained `stale`; `assert_clean` now fails on a stale exception itself, so mailo's own stale check beside it is redundant (it may stay) |
 | the `button.ds-space-dot` markup exception (`ui/style/exceptions.rs:433`) | none | mailo gaps 3: `SpaceDot` writes `--dot-c*`, not an inline `background`; the exception is stale, delete it |
+| a local-folders account's tile (`AccountFace` with no provider) | `AccountFace::One { provider: Provider::Local, .. }` | mailo gaps 4: the neutral folder mark; no invented `Imap` |
+| raw `button`s in `--f-ink-soft` on the frame (the sidebar foot's words, frame dropdowns) | `Button { variant: ButtonVariant::Frame, .. }` | mailo gaps 4: the sidebar item's hover and pressed chrome |
+| a dropdown value with a caret (`… ▾` buttons: From, Sends, a label picker's trigger) | `Button { trailing: Some(Trailing::Caret), expanded, .. }` | mailo gaps 4; the caret is a 12 px chevron, not a text `▾` |
+| the bubble's `b`/`i`/`u`/`s` faces (`.bubble .serif` and friends) | `BubbleButton { label: rsx! { FaceMark { face: ButtonFace::Bold, label: "Bold" } }, .. }`, or `Button { face: ButtonFace::Bold, label: "Bold", .. }` | mailo gaps 4: italic is `--font-serif`; the label names the button |
+| `Field { kind: FieldKind::Secret }` (`ui/field.rs`) | `TextInput { kind: TextInputKind::Secret, oninput, onchange }` | mailo gaps 4: no `value` in the markup, as mailo's own; clear it by remounting with a new `key`. Use `Password` only where the value may be in the markup |
+| a file field (a raw `input type=file` or a path field with its own button) | `TextInput { kind: TextInputKind::File, value: chosen_name, on_pick }` | mailo gaps 4: `on_pick` opens mailo's own chooser (a portal on the webview, a sheet on Blitz) |
+| a raw `textarea` (signature, notes, rule body) | `TextInput { kind: TextInputKind::Multiline { rows: Rows(n), grow: Grow::ToContent }, .. }` | mailo gaps 4 |
+| a raw `input` styled as its row (property rows, titles, `.ed-name`) | `TextInput { variant: FieldFace::Bare, .. }` | mailo gaps 4: inherits the parent's face; only the caret and selection are quire's |
+| the Space editor's three-level Motion `Seg` | `SpaceEditor { motion, motion_levels: MotionLevels::Contact }` | mailo gaps 4: Calm, Standard, Extra; mailo's `Motion` maps one to one |
 
 Everything under `ui/icon/` (the glyph set) maps to `ds::Glyph`/`ds::Icon` — `08-ICONS.md` and
 `DESIGN.md`'s icon row have the geometry; mailo's own `ui/icon` module is deleted, not ported

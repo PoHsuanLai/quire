@@ -2021,3 +2021,107 @@ What mailo changes (docs/mailo-migration.md section 2 has each row):
 - An undo during a row's exit calls `roster.stay(key)` and lists the key again.
 - The `LintConfig` at `ui/style/mod.rs:815` gains `..LintConfig::default()`; the SpaceDot markup
   exception goes.
+
+## mailo gaps 4 (controls) (2026-09-25)
+
+mailo, on v0.1.5 with 31 raw controls left, reported what still keeps them its own. Branch
+`mailo-gaps-4b`. Every change is additive: a prop that defaults to the old markup, or a new
+variant (a `match` over `Provider`, `ButtonVariant`, `InputVariant` or `TextInputKind` needs the
+new arm). No existing golden changed except `stylesheet.css`, which grew by the new rules.
+Proofs: `crates/ds/tests/mailo_gaps4_ssr.rs` (goldens beside each component's, so the controls'
+and lists' class scans cover them), `crates/ds-native/tests/mailo_fields.rs` and
+`motion_levels.rs`, and `crates/ds/tests/snippet_forms.rs`. CONSUMING.md "The mailo gaps 4" has
+one row per prop.
+
+1. **A local-folders account.** `Provider::Local` rather than a new `AccountFace` variant or an
+   `Option<Provider>`: every `AccountFace::One { initial, colour, provider, address }` literal
+   keeps compiling, and a local account is drawn wherever a provider is (tiles, rows' via,
+   inline). Its mark is the `folder` glyph (10, 8 or 9 px by the mark's size) stroked in IMAP's
+   neutral `#5D6660` on the same white chip, `data-kind="local"`, titled "Local folders"; not a
+   letter, since there is no provider to abbreviate. It has no favicon, so `MarkStyle::Image` is
+   ignored for it. Unnamed tiles read "L, Local folders account". Goldens `one-local`,
+   `local-row`, `local-image-ignored`.
+2. **Button.** `ButtonVariant::Frame` is the sidebar item's chrome for a word (6px 8px,
+   `--r-item`, 13.5 / 600, `--f-ink-soft`; `--f-pill-hover` hover; `--f-pill` held, and with
+   `--shadow-current` when `aria-pressed`). `trailing: Option<Trailing::{Caret, Glyph(Icon)}>`
+   puts a glyph after the label in `span.ds-button-trail` (the caret is a 12 px chevron at .7).
+   `face: ButtonFace::{Label, Bold, Italic, Underline, Strike}` draws the bubble's marks as
+   `span.ds-button-face[data-face]` holding `B`, `i`, `U`, `S`, aria-hidden, and the button is
+   then named by `label` through `aria-label` (an explicit `aria_label` wins). The italic is
+   `--font-serif` (S's Georgia, which design/02 left open and mailo gaps 3 shipped). An enum
+   rather than a `Mark(Element)` slot: a slot would let the consumer put raw `b`/`i` markup back.
+   Because `BubbleButton`'s `label` is already an `Element` (and a new field would break its
+   literals), the same face is exported alone as `FaceMark { face, label }` for the bubble.
+   Blitz paints `text-decoration` underline and line-through (blitz-paint's `text.rs` draws both
+   from the computed style), so the U and S faces need no drawn rule. Goldens `frame`,
+   `frame-pressed`, `quiet-caret`, `mini-trailing-glyph`, `face-*`.
+3. **TextInput.** The component was split to stay short: `text_input_focus.rs` (`Focus` and the
+   request bookkeeping), `text_input_kind.rs` (`TextInputKind`, `Rows`, `Grow`, the mask) and
+   `text_input_parts.rs` (the line, the textarea and the file shapes).
+   - **Secret.** `TextInputKind::Secret`, not a change to `Password`: `Password` writes its
+     `value` (the wave-2 goldens `password-empty`/`password-filled` and mailo gaps 2's docs say
+     so) and changing it would have broken both. A secret keeps what is typed in a signal of its
+     own, draws one dot per character from it, and never writes a `value` attribute: on Blitz the
+     text lives only in blitz-dom's editor (an absent `value` is never set, so the editor is never
+     reset), on a webview in the DOM's own password field. `oninput` hears each change and
+     `onchange` the commit. Its `value` prop is ignored; to clear it, remount under a new `key`.
+     Proof: the `secret-value-unwritten` golden (given `hunter2`, the markup has no `value`), and
+     `a_secret_is_typed_and_heard_but_never_written_into_the_markup` (typing `abc` is heard as
+     `a,ab,abc`, the input has no `value` attribute before or after, the mask is three dots, the
+     field's markup never contains `abc`, and Enter commits `abc`).
+   - **`onchange`.** blitz-dom dispatches no `change` event at all (its text input generates only
+     `input`, selection and an implicit submit), so the field makes its own: Enter in a one-line
+     field, or blur of any field, calls `onchange` with the value (a secret's own). It is the
+     same on the webview, since the native `change` is not listened to.
+   - **File.** Blitz has no file picker. blitz-dom has a `file-input` feature (off in quire's
+     pinned features); even on, it only draws a "Browse" button and a label, and the files come
+     from the shell's drop events. So the field is a read-only `span.ds-input[data-kind=file]`
+     (`role=textbox`, `aria-readonly`) holding the caller's `value`, and a Tool `IconButton`
+     (folder, titled "Choose…", named "{label}: Choose…" so two file fields are told apart); a
+     click on either calls `on_pick: EventHandler<()>`, and the host opens its own chooser (an
+     XDG portal, a sheet) and passes the name back. Proof:
+     `the_choose_button_and_the_name_both_ask_the_host_to_pick` (two clicks, two picks, and the
+     answered name replaces the placeholder).
+   - **Multiline.** What Blitz does with a `textarea`, read from blitz-dom at the pinned rev:
+     it is a multiline text editor (`create_text_editor(.., true)`); its text comes from the
+     `value` attribute, not its children (the same path as an input, so the controlled field
+     works unchanged); its intrinsic height is `rows` x line height (2 rows when absent) and
+     its width `cols` x 0.6 em or 300 px; Enter inserts a newline (a one-line field submits);
+     accessibility role `MultilineTextInput`. So the field writes `rows` and `height:auto` and
+     lets Blitz size it. `Grow::ToContent` raises `rows` to the value's hard line count; a soft
+     wrap cannot be counted before layout, so a long wrapped line scrolls inside the field instead
+     of growing it. Proof: `a_growing_field_gains_a_row_per_line_and_a_fixed_one_does_not`
+     (typing four lines into two rows: `rows="4"` and 2 x 13.5 x 1.55 px taller; the fixed one
+     keeps `rows="2"` and its height), the `multiline-*` goldens, and the `Grow::rows` table.
+   - **Bare.** `InputVariant::Bare`, with `FieldFace` as a type alias for `InputVariant`, not a
+     second `face` prop beside `variant`: two props would let `variant: Boxed, face: Bare`
+     disagree. It inherits font, size, weight, tracking, line height and colour, has no box, and
+     styles only the caret (`--accent`) and the selection (`--accent-soft`); its placeholder is
+     the parent's colour at .45. Proof: `a_bare_field_is_one_line_of_its_parents_text` (in a
+     24 px / 1.25 title the field is exactly 30 px tall; a boxed one beside it keeps its own
+     13.5 x 1.55 + 16).
+4. **SpaceEditor.** `motion_levels: MotionLevels::{All, Contact}` as a prop of the editor, not
+   a field of `MotionChoice`: `MotionChoice` is a struct literal in mailo, and a new field would
+   have broken it. `Contact` offers Calm, Standard and Extra; a `level` outside them (System,
+   Reduced) presses no segment. Proof: the `motion-contact` golden and
+   `the_contact_row_offers_three_levels_and_reports_a_pick`.
+5. **CONSUMING's `snippet` row** said `Some(string)` no longer infers but not what does. It now
+   lists every accepted form (a `&str`, a formatted literal, a `String`, a `Text`, an
+   `Option<Text>`/`Some(text)`/`None`) and the rejected ones (`Some(string)`, `Some("literal")`,
+   a `&String`, an `Option<String>`), each checked: `snippet_forms.rs` compiles and renders every
+   accepted form, and each rejected one was confirmed not to compile.
+
+Not done: no gallery specimen for `motion_levels` (the brief named none; the Space page's editor
+keeps the default). The frame button's hover and pressed grounds are not pixel-tested, only
+golden-tested, as the sidebar item's same rules already are.
+
+What mailo changes (docs/mailo-migration.md section 2 has each row):
+
+- A local account's tile passes `Provider::Local`.
+- Frame words become `Button { variant: ButtonVariant::Frame }`; `… ▾` triggers
+  `Button { trailing: Trailing::Caret, expanded }`; the bubble's faces `FaceMark` (or
+  `Button { face }`).
+- `Field { kind: Secret }` becomes `TextInput { kind: TextInputKind::Secret }`, a file field
+  `TextInputKind::File` with `on_pick`, a `textarea` `TextInputKind::Multiline`, and an input
+  styled as its row `FieldFace::Bare`.
+- The Space editor's Motion row passes `motion_levels: MotionLevels::Contact`.
