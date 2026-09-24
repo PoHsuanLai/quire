@@ -219,6 +219,21 @@ impl Float {
         place(anchor, content, bounds, want, gap).origin
     }
 
+    /// Where the surface sits in client coordinates, once the bounds and its own size are
+    /// measured: `origin`'s placement offset by the bounds' corner. `None` before that.
+    pub(crate) fn placed(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Option<Rect> {
+        let bounds = self.bounds.rect()?;
+        let size = self.surface.rect()?.size;
+        let at = self.origin(anchor, want, gap);
+        Some(Rect {
+            origin: Point {
+                x: bounds.origin.x + at.x,
+                y: bounds.origin.y + at.y,
+            },
+            size,
+        })
+    }
+
     /// Whether Escape closes this surface now: it is the topmost layer and takes Escape.
     pub(crate) fn takes_escape(&self) -> bool {
         self.stack

@@ -7,6 +7,7 @@
 pub mod appearance;
 pub mod components;
 pub mod css;
+pub mod error;
 pub mod fonts;
 pub mod geometry;
 pub mod icon;
@@ -27,6 +28,7 @@ pub use appearance::{
 };
 pub use components::*;
 pub use css::stylesheet;
+pub use error::DsError;
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
@@ -35,7 +37,7 @@ pub use geometry::{
     PopoverRequest, Px, Rect, RectProbe, Side, Size, place, use_rect,
 };
 pub use icon::render::{Glyph, IconSize};
-pub use icon::{Icon, Shape};
+pub use icon::{ExternalIcon, Icon, IconSource, IconUrl, Shape};
 pub use material::{Blur, BlurState, Material, MaterialRecipe, recipe};
 pub use motion::{
     Anim, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent, IntentEffect,

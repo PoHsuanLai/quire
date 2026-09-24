@@ -14,13 +14,22 @@ pub struct Overlays {
 }
 
 impl Overlays {
-    /// Show `content` on `layer`, replacing whatever `id` showed before.
+    /// Show `content` on `layer`, replacing whatever `id` showed before in its place: a
+    /// surface keeps its stacking among its layer while it re-renders, and a surface shown
+    /// later on the same layer (a submenu over its menu) stays above it.
     ///
     /// Call from a handler or an effect, not from render: the registry is a signal the host
     /// reads.
     pub fn show(&self, id: OverlayId, layer: ZLayer, content: Element) {
         let mut entries = self.entries;
         entries.with_mut(|entries| {
+            if let Some(entry) = entries
+                .iter_mut()
+                .find(|(shown, at, _)| *shown == id && *at == layer)
+            {
+                entry.2 = content;
+                return;
+            }
             entries.retain(|(shown, _, _)| *shown != id);
             let at =
                 entries.partition_point(|(_, shown, _)| stack_order(*shown) <= stack_order(layer));

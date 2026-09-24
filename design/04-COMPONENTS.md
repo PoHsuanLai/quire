@@ -186,16 +186,24 @@ Mapping: `.btn` -> `[data-variant=primary]`; `.btn.ghost` (C) -> `[data-variant=
 #[component] pub fn Button(
     variant: ButtonVariant,            // Primary | Secondary | Mini | Quiet | Danger
     label: String,
-    #[props(default)] icon: Option<Icon>,
+    #[props(default)] icon: Option<IconSource>,  // Glyph | Symbolic | Image; Icon converts
     #[props(default)] pressed: Option<Switch>,   // Some only for toggle buttons (Mini)
     #[props(default)] availability: Availability,
-    onclick: EventHandler<()>,
+    onclick: EventHandler<Press>,      // Press { button: Primary | Secondary | Middle, modifiers }
+    #[props(default)] id: Option<String>,        // -> id, for a popup anchored by element id
     #[props(default)] mounted: Option<EventHandler<MountedEvent>>, // the element, for Anchor::Mounted
 ) -> Element
 ```
 
 `mounted` is settled (Gallery fixes B): a menu or popover anchors to the button itself through
 `Anchor::Mounted(MountedRef(event.data()))`, with no wrapper to measure; it writes no attribute.
+
+Settled (tray gaps, sill Q6 and Q8): `icon` is an `IconSource` (08-ICONS §1.5: a glyph, a
+symbolic external icon painted in the text colour, or an external image as it is); `id` is
+written as the element's `id`; `onclick` reports which button pressed. A right-click arrives as
+`contextmenu` (its default prevented) and is reported as `Secondary`, the middle button's
+`mouseup` as `Middle`, a click or a keyboard activation as `Primary`. A closure `move |_| …` and
+an `EventHandler<()>` still convert.
 
 **Geometry.**
 
@@ -313,15 +321,20 @@ Mapping: `.tool` -> `[data-variant=tool]`; `.foot-btn` -> `[data-variant=foot]`;
 ```rust
 #[component] pub fn IconButton(
     variant: IconButtonVariant,        // Tool | Foot | Strip | Pin
-    icon: Icon, label: String,         // label -> aria-label (required)
+    #[props(into)] icon: IconSource, label: String, // Icon converts; label -> aria-label (required)
     #[props(default)] tooltip: Option<String>,   // -> title; Strip uses Tooltip::Fly instead
     #[props(default)] pressed: Option<Switch>,   // Pin
     #[props(default)] expanded: Option<Switch>,  // Tool that owns a Menu
     #[props(default)] availability: Availability,
-    onclick: EventHandler<()>,
+    onclick: EventHandler<Press>,      // settled: as Button's
+    #[props(default)] id: Option<String>,        // settled: as Button's
     #[props(default)] mounted: Option<EventHandler<MountedEvent>>, // settled: as Button's
 ) -> Element
 ```
+
+An external icon (a tray item's pixmap or theme icon) is `IconSource::Symbolic` or
+`IconSource::Image` and draws at its own `ExternalIcon::size` (settled, tray gaps Q6); a glyph
+takes the variant's size below.
 
 **Geometry.**
 
@@ -1740,9 +1753,13 @@ Mapping: `.fmenu` -> `.ds-menu[data-kind=rich]`; `.fmenu.slim` -> `[data-kind=sl
     entries: Vec<MenuEntry<T>>,
     #[props(default)] filter: Filter,     // Typing | None
     onpick: EventHandler<T>, onclose: EventHandler<()>,
+    #[props(default)] timing: MenuTiming, // submenu delay and triangle timeout (13 §13.3.4)
+    #[props(default)] expanded: Option<usize>, // a choice whose submenu opens on mount
 ) -> Element
 pub enum MenuEntry<T> {
-    Item { value: T, title: String, detail: Option<String>, tile: Option<Tile>, trail: Trail, check: Option<Check> },
+    Item { value: T, title: String, detail: Option<String>, tile: Option<Tile>, trail: Trail,
+           check: Option<Check>, availability: Availability },
+    Submenu { title: String, tile: Option<Tile>, availability: Availability, children: Vec<MenuEntry<T>> },
     Header(String),
     Separator,
 }
@@ -1823,7 +1840,9 @@ horizontal): 1px high, full width, `--line-soft`; vertical margin not specified 
 | item selected (keyboard) | `--accent-soft` bg | not specified |
 | item checked | title `--ink`; trail shows check 14 `--accent` | `--ink`, 600, check icon visible `--accent` |
 | item focus-visible | not used (focus stays in the input that opened the menu) | global ring |
-| item disabled | not specified (O-1) | not specified |
+| item disabled | settled (13 §13.3.3): opacity .35, `aria-disabled="true"`, not selectable, skipped by Up/Down, a click does nothing | same, no hover |
+| submenu parent | settled (13 §13.3.3-13.3.4): 12 px chevron in the trail, `aria-haspopup`, `aria-expanded`; open keeps the selected look | same, `--surface-2` |
+| submenu | settled (13 §13.3.4): a panel of the same kind right of the menu (flips left), top at the parent row's top less the padding, gap 2, no entrance; `data-depth` | same |
 | match highlight | `mark`: `--accent`, 800, no background | n/a |
 | entering | `menu-pop --t-move --e-spring` | `menu-in --t-move --e-spring`, origin 88% 0 |
 | leaving | removed at once (`S:2052`) | removed at once (`C:1744`) |

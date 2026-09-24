@@ -14,13 +14,21 @@ pub mod edge_strip;
 pub mod hover_card;
 pub mod hover_strip;
 pub mod icon_button;
+pub mod icon_view;
 pub mod kbd;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
 pub mod menu_entry;
+pub(crate) mod menu_keys;
+pub(crate) mod menu_lines;
+pub(crate) mod menu_match;
+pub(crate) mod menu_panel;
+pub(crate) mod menu_rows;
+pub(crate) mod menu_tracker;
 pub mod peek;
 pub mod popover;
+pub mod press;
 pub mod provider_mark;
 pub mod scrim;
 pub mod search_field;
@@ -57,13 +65,16 @@ pub use hover_card::{
 };
 pub use hover_strip::{ActionId, HoverStrip, StripAction};
 pub use icon_button::{IconButton, IconButtonVariant};
+pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
-pub use menu::{Filter, Menu, MenuKind};
+pub use menu::{Menu, MenuKind};
 pub use menu_entry::{MenuEntry, Tile, Trail};
+pub use menu_lines::Filter;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
+pub use press::{PointerButton, Press};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
 pub use scrim::Scrim;
 pub use search_field::SearchField;
@@ -103,6 +114,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("hover_card", include_str!("hover_card.css")),
     ("hover_strip", include_str!("hover_strip.css")),
     ("icon_button", include_str!("icon_button.css")),
+    ("icon_view", include_str!("icon_view.css")),
     ("kbd", include_str!("kbd.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),

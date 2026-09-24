@@ -1,12 +1,16 @@
 //! MenuEntry: what a Menu or CommandPalette lists (design/04-COMPONENTS.md section 20).
 //! The data, and how one item draws (shared by `Menu` and `CommandPalette`), with the fuzzy
-//! matcher that marks a title (design/06-INTERACTIONS.md section 11.2).
+//! matcher that marks a title (design/06-INTERACTIONS.md section 11.2). Disabled items and
+//! submenus follow design/13-BEHAVIOUR-menus-windows.md sections 13.3.3 and 13.3.4.
 
 use crate::components::avatar::{AvatarFace, face};
-use crate::components::vocab::{Check, Selection, Shortcut};
+use crate::components::vocab::{Availability, Check, Selection, Shortcut, Switch};
+use crate::geometry::{Point, Px};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+
+pub(crate) use crate::components::menu_match::{fuzzy, marked};
 
 /// The tile at an item's start.
 #[derive(Debug, Clone, PartialEq)]
@@ -48,6 +52,22 @@ pub enum MenuEntry<T> {
         trail: Trail,
         /// Its check mark, for a menu of toggles.
         check: Option<Check>,
+        /// Whether it can be picked. A disabled item is drawn at .35 opacity, skipped by the
+        /// arrow keys and ignores the pointer (design/13 section 13.3.3).
+        availability: Availability,
+    },
+    /// An item that opens a submenu of `children` beside it (design/13 section 13.3.4): on a
+    /// 200 ms rest, or at once on Right, Enter or a click. It shows a chevron where an item
+    /// shows its trail, and picks nothing itself.
+    Submenu {
+        /// Its name.
+        title: String,
+        /// Its tile.
+        tile: Option<Tile>,
+        /// Whether it opens. A disabled one is drawn and skipped as a disabled item is.
+        availability: Availability,
+        /// What the submenu lists; a picked child's value reaches the menu's `onpick`.
+        children: Vec<MenuEntry<T>>,
     },
     /// A group title.
     Header(String),
@@ -63,6 +83,15 @@ pub(crate) enum Row {
     Tiled,
     /// A check column, the title, a trail.
     Checked,
+}
+
+/// Whether a row opens a submenu, and whether that submenu is open (`aria-expanded`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Branch {
+    /// It picks a value.
+    Leaf,
+    /// It opens a submenu, open or not.
+    Parent(Switch),
 }
 
 /// One item as a menu draws it: its words, which characters of the title matched the query,
@@ -82,15 +111,21 @@ pub(crate) struct ItemView<'a> {
     pub marks: &'a [usize],
     /// Whether this is the selected item.
     pub selection: Selection,
+    /// Whether it can be picked.
+    pub availability: Availability,
+    /// Whether it opens a submenu.
+    pub branch: Branch,
 }
 
-/// An item row. `onpick` runs on click; `onpoint` when the pointer moves over it, so hover and
-/// keyboard select alike (O-13).
+/// An item row. `onpick` runs on a click of a live row (a parent opens its submenu); `onpoint`
+/// with the pointer's client position when it moves over any row, disabled ones too, so hover
+/// and keyboard select alike (O-13) and the menu tracker sees where the pointer is.
 pub(crate) fn item(
     view: ItemView<'_>,
     row: Row,
     onpick: EventHandler<()>,
-    onpoint: EventHandler<()>,
+    onpoint: EventHandler<Point>,
+    onmounted: EventHandler<MountedEvent>,
 ) -> Element {
     let checked = view.check.map(|check| match check {
         Check::Checked => "true",
@@ -98,7 +133,15 @@ pub(crate) fn item(
     });
     let title = marked(view.title, view.marks);
     let detail = view.detail.map(str::to_string);
-    let trail = trail(view.trail, view.check, row);
+    let (popup, expanded) = match view.branch {
+        Branch::Leaf => (None, None),
+        Branch::Parent(open) => (Some("true"), Some(open.aria())),
+    };
+    let trail = match view.branch {
+        Branch::Leaf => trail(view.trail, view.check, row),
+        Branch::Parent(_) => chevron(),
+    };
+    let live = view.availability == Availability::Enabled;
     let tile = match row {
         Row::Tiled => Some(tile(view.tile)),
         Row::Checked => None,
@@ -109,9 +152,20 @@ pub(crate) fn item(
             role: "option",
             "aria-selected": view.selection.aria(),
             "aria-checked": checked,
+            "aria-disabled": view.availability.aria_disabled(),
+            "aria-haspopup": popup,
+            "aria-expanded": expanded,
             onmousedown: move |event| event.prevent_default(),
-            onmousemove: move |_| onpoint.call(()),
-            onclick: move |_| onpick.call(()),
+            onmousemove: move |event| {
+                event.stop_propagation();
+                onpoint.call(client_point(&event));
+            },
+            onclick: move |_| {
+                if live {
+                    onpick.call(());
+                }
+            },
+            onmounted: move |event| onmounted.call(event),
             if row == Row::Checked {
                 Glyph { icon: Icon::Check }
             }
@@ -123,6 +177,24 @@ pub(crate) fn item(
                 }
             }
             {trail}
+        }
+    }
+}
+
+/// Where a mouse event happened, in the client coordinates every quire rect is read in.
+pub(crate) fn client_point(event: &MouseEvent) -> Point {
+    let at = event.client_coordinates();
+    Point {
+        x: Px(at.x as f32),
+        y: Px(at.y as f32),
+    }
+}
+
+/// A parent row's trail: the 12 px chevron (design/13 section 13.3.3).
+fn chevron() -> Element {
+    rsx! {
+        span { class: "ds-menu-trail ds-menu-chevron",
+            Glyph { icon: Icon::ChevronRight, size: IconSize::Tiny }
         }
     }
 }
@@ -163,164 +235,5 @@ fn trail(trail: &Trail, check: Option<Check>, row: Row) -> Element {
     };
     rsx! {
         span { class: "ds-menu-trail", "{text}" }
-    }
-}
-
-/// `text` with the characters at `marks` wrapped in `mark` runs.
-pub(crate) fn marked(text: &str, marks: &[usize]) -> Element {
-    let runs = runs(text, marks);
-    rsx! {
-        for (index , (run , hit)) in runs.into_iter().enumerate() {
-            if hit == Hit::Marked {
-                mark { key: "{index}", "{run}" }
-            } else {
-                Fragment { key: "{index}", "{run}" }
-            }
-        }
-    }
-}
-
-/// Whether a run of a title matched the query.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Hit {
-    Marked,
-    Plain,
-}
-
-/// `text` split into maximal runs of marked and unmarked characters.
-fn runs(text: &str, marks: &[usize]) -> Vec<(String, Hit)> {
-    let mut out: Vec<(String, Hit)> = Vec::new();
-    for (index, c) in text.chars().enumerate() {
-        let hit = if marks.contains(&index) {
-            Hit::Marked
-        } else {
-            Hit::Plain
-        };
-        match out.last_mut() {
-            Some((run, last)) if *last == hit => run.push(c),
-            _ => out.push((c.to_string(), hit)),
-        }
-    }
-    out
-}
-
-/// A fuzzy match: its score and the matched characters of the text, by char index.
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) struct Match {
-    /// Higher is better.
-    pub score: f32,
-    /// The matched characters.
-    pub marks: Vec<usize>,
-}
-
-/// The command menu's fuzzy score (design/06-INTERACTIONS.md section 11.2), case-insensitive:
-/// a substring scores 100 plus 40 at a word start (20 elsewhere) less half its position; else
-/// every query character in order scores `2 + 2 x run` plus 6 at a word start, less .3 per
-/// character of spread. `None` when the query is not a subsequence of the text.
-pub(crate) fn fuzzy(query: &str, text: &str) -> Option<Match> {
-    let q: Vec<char> = query.chars().map(lower).collect();
-    let t: Vec<char> = text.chars().map(lower).collect();
-    if q.is_empty() {
-        return Some(Match {
-            score: 0.0,
-            marks: Vec::new(),
-        });
-    }
-    if let Some(at) = t.windows(q.len()).position(|window| window == q.as_slice()) {
-        let bonus = if word_start(&t, at) { 40.0 } else { 20.0 };
-        return Some(Match {
-            score: 100.0 + bonus - 0.5 * at as f32,
-            marks: (at..at + q.len()).collect(),
-        });
-    }
-    subsequence(&q, &t)
-}
-
-/// Every query character in order, scored by runs and word starts.
-fn subsequence(q: &[char], t: &[char]) -> Option<Match> {
-    let (mut next, mut run, mut score) = (0usize, 0u32, 0.0f32);
-    let mut marks = Vec::new();
-    for (index, c) in t.iter().enumerate() {
-        if q.get(next) == Some(c) {
-            run += 1;
-            let start = if word_start(t, index) { 6.0 } else { 0.0 };
-            score += 2.0 + 2.0 * run as f32 + start;
-            marks.push(index);
-            next += 1;
-        } else {
-            run = 0;
-        }
-    }
-    if next < q.len() {
-        return None;
-    }
-    let spread = match (marks.first(), marks.last()) {
-        (Some(first), Some(last)) => (last - first) as f32,
-        _ => 0.0,
-    };
-    Some(Match {
-        score: score - 0.3 * spread,
-        marks,
-    })
-}
-
-/// One character lower-cased to one character, so indices stay aligned with the text.
-fn lower(c: char) -> char {
-    c.to_lowercase().next().unwrap_or(c)
-}
-
-/// Index 0, or after whitespace or one of `- _ . / @`.
-fn word_start(t: &[char], index: usize) -> bool {
-    index == 0
-        || t.get(index - 1)
-            .is_some_and(|c| c.is_whitespace() || matches!(c, '-' | '_' | '.' | '/' | '@'))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Hit, fuzzy, runs};
-
-    /// A match's score and marks, or no match.
-    type Want = Option<(f32, &'static [usize])>;
-
-    #[test]
-    fn the_fuzzy_score_follows_the_prototype() {
-        // (query, text, score, marks)
-        #[rustfmt::skip]
-        let cases: &[(&str, &str, Want)] = &[
-            ("", "Tomorrow", Some((0.0, &[]))),
-            ("tom", "Tomorrow", Some((140.0, &[0, 1, 2]))),
-            ("row", "Tomorrow", Some((117.5, &[5, 6, 7]))),
-            ("week", "Next week", Some((137.5, &[5, 6, 7, 8]))),
-            // t(0, start) 2+2+6, m(2) 2+2, w(7) 2+2: 18, less .3 x 7.
-            ("tmw", "Tomorrow", Some((15.9, &[0, 2, 7]))),
-            ("zz", "Tomorrow", None),
-            ("TOM", "tomorrow", Some((140.0, &[0, 1, 2]))),
-        ];
-        for (query, text, want) in cases {
-            let got = fuzzy(query, text).map(|m| (m.score, m.marks));
-            let want = want.map(|(score, marks)| (score, marks.to_vec()));
-            match (&got, &want) {
-                (Some((a, am)), Some((b, bm))) => {
-                    assert!(
-                        (a - b).abs() < 1e-3 && am == bm,
-                        "{query} in {text}: {got:?}"
-                    );
-                }
-                (None, None) => {}
-                _ => panic!("{query} in {text}: {got:?}, want {want:?}"),
-            }
-        }
-    }
-
-    #[test]
-    fn marks_split_a_title_into_runs() {
-        assert_eq!(
-            runs("Re: UIDL", &[4, 5, 6, 7]),
-            vec![
-                ("Re: ".to_string(), Hit::Plain),
-                ("UIDL".to_string(), Hit::Marked)
-            ]
-        );
     }
 }

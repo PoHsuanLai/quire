@@ -19,7 +19,7 @@ use blitz_traits::events::{
     MouseEventButtons, PointerCoords, UiEvent,
 };
 use dioxus::prelude::*;
-use ds::{InputModality, Key, Point, Px, Rect, Size};
+use ds::{InputModality, Key, Point, PointerButton, Px, Rect, Size};
 use keyboard_types::{Code, Key as DomKey, Location, Modifiers};
 use std::time::{Duration, Instant};
 
@@ -64,21 +64,46 @@ impl Harness {
 
     /// Move the pointer to `at`.
     pub fn pointer_move(&mut self, at: Point) {
-        self.send(UiEvent::PointerMove(pointer(at, MouseEventButtons::None)));
+        self.send(UiEvent::PointerMove(pointer(
+            at,
+            MouseEventButton::Main,
+            MouseEventButtons::None,
+        )));
     }
 
     /// Press the primary button at `at`. A pointer press makes the modality `pointer`.
     pub fn pointer_down(&mut self, at: Point) {
-        self.doc.set_modality(InputModality::Pointer);
-        self.send(UiEvent::PointerDown(pointer(
-            at,
-            MouseEventButtons::Primary,
-        )));
+        self.button_down(at, PointerButton::Primary);
     }
 
     /// Release the primary button at `at`.
     pub fn pointer_up(&mut self, at: Point) {
-        self.send(UiEvent::PointerUp(pointer(at, MouseEventButtons::None)));
+        self.button_up(at, PointerButton::Primary);
+    }
+
+    /// Press `button` at `at`. A pointer press makes the modality `pointer`.
+    pub fn button_down(&mut self, at: Point, button: PointerButton) {
+        self.doc.set_modality(InputModality::Pointer);
+        let (which, held) = blitz_button(button);
+        self.send(UiEvent::PointerDown(pointer(at, which, held)));
+    }
+
+    /// Release `button` at `at`.
+    pub fn button_up(&mut self, at: Point, button: PointerButton) {
+        let (which, _) = blitz_button(button);
+        self.send(UiEvent::PointerUp(pointer(
+            at,
+            which,
+            MouseEventButtons::None,
+        )));
+    }
+
+    /// Press and release `button` at `at`, after moving there: a right-click is
+    /// `press(at, PointerButton::Secondary)`, which Blitz delivers as `contextmenu`.
+    pub fn press(&mut self, at: Point, button: PointerButton) {
+        self.pointer_move(at);
+        self.button_down(at, button);
+        self.button_up(at, button);
     }
 
     /// Press and release the primary button at `at`, after moving there: the order a host
@@ -219,8 +244,17 @@ fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
     doc.query_selector(selector).ok().flatten()
 }
 
-/// A primary-mouse pointer event at `at`.
-fn pointer(at: Point, buttons: MouseEventButtons) -> BlitzPointerEvent {
+/// The Blitz button, and the held-buttons set while it is down, for a quire pointer button.
+fn blitz_button(button: PointerButton) -> (MouseEventButton, MouseEventButtons) {
+    match button {
+        PointerButton::Primary => (MouseEventButton::Main, MouseEventButtons::Primary),
+        PointerButton::Secondary => (MouseEventButton::Secondary, MouseEventButtons::Secondary),
+        PointerButton::Middle => (MouseEventButton::Auxiliary, MouseEventButtons::Auxiliary),
+    }
+}
+
+/// A mouse pointer event at `at`, for `button`, with `buttons` held.
+fn pointer(at: Point, button: MouseEventButton, buttons: MouseEventButtons) -> BlitzPointerEvent {
     let (x, y) = (at.x.0, at.y.0);
     BlitzPointerEvent {
         id: BlitzPointerId::Mouse,
@@ -233,7 +267,7 @@ fn pointer(at: Point, buttons: MouseEventButtons) -> BlitzPointerEvent {
             client_x: x,
             client_y: y,
         },
-        button: MouseEventButton::Main,
+        button,
         buttons,
         mods: Modifiers::empty(),
         details: Default::default(),
