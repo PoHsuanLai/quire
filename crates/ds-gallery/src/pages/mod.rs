@@ -8,6 +8,7 @@ pub mod fields;
 pub mod gaps;
 pub mod launcher;
 pub mod lists;
+pub mod lists_mailo4;
 pub mod lists_search;
 pub mod materials;
 pub mod matrix;
