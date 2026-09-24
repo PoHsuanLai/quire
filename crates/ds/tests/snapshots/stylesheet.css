@@ -1464,6 +1464,18 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--s-8) var(--s-11); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }
+
+/* A password (`data-kind=password`): Blitz draws a password field's characters as typed, so the
+   field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
+   per character over it, where the placeholder would sit. The caret follows the hidden text, so
+   it can sit a little off the last dot; the secret itself never paints. */
+.ds-input[*|data-kind=password]{ color:transparent; caret-color:var(--ink); }
+.ds-input-mask{
+  position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
+  font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink); letter-spacing:.1em;
+}
+.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); }
+.ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 /* -- toast -- */
 /* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
    (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);

@@ -2,16 +2,17 @@
 
 use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
+use super::fields::Fields;
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
     AccountFace, AccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape, AvatarSize,
-    AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count, Fraction,
-    HeaderKind, Hex, Icon, IconButton, IconButtonVariant, InputVariant, Kbd, KbdSize, Key,
-    LabelHue, MarkSize, MarkStyle, PersonHue, Provider, ProviderMark, SearchField, SectionHeader,
-    SegSize, SegmentedControl, Shortcut, Slider, Spinner, SpinnerKind, Switch, SyncHalo, SyncState,
-    Tabs, TextInput, Toggle, Verdict, use_pulse,
+    AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count, Expanded,
+    Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, Kbd, KbdSize, Key, LabelHue,
+    MarkSize, MarkStyle, PersonHue, Provider, ProviderMark, SectionHeader, SegSize,
+    SegmentedControl, Shortcut, Slider, Spinner, SpinnerKind, Switch, SyncHalo, SyncState, Tabs,
+    Toggle, Verdict, use_pulse,
 };
 
 const BUTTONS: [(ButtonVariant, &str); 5] = [
@@ -76,7 +77,7 @@ pub fn ControlsPage() -> Element {
 #[component]
 fn Buttons() -> Element {
     rsx! {
-        Section { title: "Button", note: "Five variants, each at rest, pressed off and on, and disabled; with and without an icon.",
+        Section { title: "Button", note: "Five variants, each at rest, pressed off and on, and disabled; with and without an icon. Named: a hover title and an assistive name over a terse label, and a trigger open and closed (aria-expanded).",
             for (variant , name) in BUTTONS {
                 div { class: "g-row",
                     span { class: "g-name g-type-name", "{name}" }
@@ -85,6 +86,12 @@ fn Buttons() -> Element {
                     }
                     Button { variant, label: "With icon", icon: Some(Icon::Archive), onclick: |_| {} }
                 }
+            }
+            div { class: "g-row",
+                span { class: "g-name g-type-name", "Named" }
+                Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", onclick: |_| {} }
+                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Expanded::Open, onclick: |_| {} }
+                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Expanded::Closed, onclick: |_| {} }
             }
         }
         Section { title: "IconButton", note: "Four variants; rest, pressed on, expanded, disabled.",
@@ -188,44 +195,6 @@ fn Choosers() -> Element {
                 SectionHeader { kind: HeaderKind::Group, text: "Group", value: Some("12".to_string()) }
                 SectionHeader { kind: HeaderKind::Field, text: "Field", value: Some("Light".to_string()) }
                 SectionHeader { kind: HeaderKind::Menu, text: "Menu", action: Some(("Clear".to_string(), EventHandler::new(|()| {}))) }
-            }
-        }
-    }
-}
-
-#[component]
-fn Fields() -> Element {
-    let mut text = use_signal(String::new);
-    let mut search = use_signal(|| "invoice".to_string());
-    rsx! {
-        Section { title: "TextInput and SearchField", note: "Boxed and inline; empty with a placeholder, filled, disabled. Type in the live ones.",
-            div { class: "g-grid3",
-                for variant in [InputVariant::Boxed, InputVariant::Inline] {
-                    Specimen { name: "live",
-                        TextInput { variant, label: "Live", value: text(), placeholder: "Type here", oninput: move |next| text.set(next) }
-                    }
-                    Specimen { name: "filled",
-                        TextInput { variant, label: "Filled", value: "pohsuan@example.org", oninput: |_| {} }
-                    }
-                    Specimen { name: "disabled",
-                        TextInput { variant, label: "Disabled", value: "", placeholder: "Not now", availability: Availability::Disabled, oninput: |_| {} }
-                    }
-                }
-            }
-            div { class: "g-grid2",
-                Specimen { name: "search with tokens",
-                    SearchField {
-                        label: "Search",
-                        value: search(),
-                        placeholder: "Search mail",
-                        tokens: vec!["from:dana".to_string(), "has:attachment".to_string()],
-                        oninput: move |next| search.set(next),
-                        onkey: |_| {},
-                    }
-                }
-                Specimen { name: "search, empty",
-                    SearchField { label: "Search", value: "", placeholder: "Search mail", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} }
-                }
             }
         }
     }

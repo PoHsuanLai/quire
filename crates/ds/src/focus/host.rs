@@ -42,6 +42,21 @@ pub(crate) fn focus_soon(element: Rc<MountedData>) {
     });
 }
 
+/// As [`focus_soon`], then `told` once a host's write has moved the focus.
+///
+/// A host's write (`HostFocus`, Blitz's `set_focus_to`) dispatches no `focus` event, so a field
+/// whose caller listens for focus would never hear that the seam put the caret in it. Without a
+/// host the renderer's own `set_focus` fires the element's real `focus` event, which the field
+/// already forwards, so `told` is not called and the caller hears it once.
+pub(crate) fn focus_soon_told(element: Rc<MountedData>, told: EventHandler<()>) {
+    let hosted = try_consume_context::<HostFocus>().is_some();
+    spawn(async move {
+        if focus_element(&element).await == Focused::Done && hosted {
+            told.call(());
+        }
+    });
+}
+
 /// Move the focus to `element`, waiting out a busy document for up to `BUSY_ATTEMPTS` frames.
 pub(crate) async fn focus_element(element: &MountedData) -> Focused {
     let host = try_consume_context::<HostFocus>();
