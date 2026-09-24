@@ -40,7 +40,8 @@ impl ButtonVariant {
     }
 }
 
-/// A labelled action.
+/// A labelled action. `mounted` hands over the element once it is in the document, so a
+/// floating component can anchor to it (`Anchor::Mounted`).
 #[component]
 pub fn Button(
     variant: ButtonVariant,
@@ -49,6 +50,7 @@ pub fn Button(
     #[props(default)] pressed: Option<Switch>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
+    #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
 ) -> Element {
     let pressed = pressed.map(|state| state.aria());
     rsx! {
@@ -61,6 +63,13 @@ pub fn Button(
             onclick: move |_| {
                 if availability == Availability::Enabled {
                     onclick.call(());
+                }
+            },
+            // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
+            // attribute: the markup is the same with or without a handler.
+            onmounted: move |event| {
+                if let Some(mounted) = mounted {
+                    mounted.call(event);
                 }
             },
             if let Some(icon) = icon {

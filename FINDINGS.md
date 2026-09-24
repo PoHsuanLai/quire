@@ -540,3 +540,62 @@ workaround in §3). This wave fixes both, with tests, and removes the workaround
   `examples/consumer::App` was switched from a one-shot `ds_settings::load` to
   `use_environment`, and CONSUMING.md §3 no longer tells a Blitz consumer to enter their own
   runtime or fall back to a synchronous load.
+## Gallery fixes B (2026-09-24)
+
+The API gaps the gallery and `examples/consumer` exposed, closed on branch `fix-gallery-b`.
+
+- Markup lint: a `style` attribute is now checked declaration by declaration
+  (`lint/inline_style.rs`). A custom property (`--*`) written inline on an element carrying
+  `ds` or a `ds-*` class is quire's computed value handed to its own stylesheet (the `--f-*`
+  frame and `--f-grad`, `--av-bg`, `--pc`) and is not an offence; a literal colour in a
+  non-custom property stays one on any element, and a custom property on a consumer's element
+  stays one. An `<svg>` is quire's when it is `.ds-ic` or carries `data-ds-svg`; the SendPill's
+  ring now writes `data-ds-svg="ring"` (a one-attribute change to `send_pill.rs`, whose three
+  goldens re-blessed by exactly that attribute).
+- Exceptions removed: seven of the gallery's thirteen (`div.ds` HexColour and ColourFunction,
+  `div.ds-layer` and `div.ds-layer.back` HexColour, `span.ds-avatar`, `span.ds-provider`,
+  `svg.ds-send-ring`) and `self_lint`'s avatar markup exception. Six remain, each still
+  suppressing something (the gallery gained `every_exception_still_suppresses_something`): the
+  back layer's unstyled class (the `root/ds.rs` bug, fixed on the sibling branch, which will make
+  that exception stale and fail the new test until it is removed), and five Space-editor/SpaceDot
+  elements that paint a literal gradient or colour into `background` rather than a custom
+  property. The consumer's one exception is the same back-layer class; nothing to remove there.
+- `Surface` takes `accent: Option<Accent>` and `blur: Option<BlurState>` beside `theme`; each
+  `None` inherits. The `Env` its children read carries the overrides (`tests/surface.rs`, four
+  goldens under `snapshots/root/surface/`).
+- Spacing tokens: `SpacingToken` (`--s-1` … `--s-36`, the eighteen common steps of 01-LAYOUT §2,
+  each named by its pixel value), emitted on `.ds` only and registered in the lint registry from
+  the table. `Rule::RawSpacing` (Strict profile) flags a literal `px` in `margin`, `padding`,
+  their sides and logical forms, and the three gaps; `0`, `auto`, `%`, `em` and `var()` pass.
+  quire's own component sheets still use the literal pixels 04-COMPONENTS quotes from `S`, so
+  `self_lint` sets `RawSpacing` aside; converting them to `--s-*` is a follow-up. The gallery's
+  `gallery.css` has 43 raw spacings, three of them (20, 28, 40) off the scale; its strict lint
+  test sets the rule aside too, also a follow-up. `examples/consumer/src/style.css` had three,
+  all on the scale, and now reads `--s-12`, `--s-16`, `--s-8`, so the example passes Strict in
+  full as CONSUMING.md tells a consumer to.
+- `HoverCard{parts: Vec<HoverCardPart>}`: `Title`, `Sub`, `Person{initial, tone, title, sub}`,
+  `Stats(Vec<HoverStat>)`, `Flag{tone: FlagTone, icon, text}`, `Messages(Vec<HoverMessage>)`,
+  `Foot{text, keys: Option<KeyHint>}`, `Actions(Vec<Element>)`, drawn in order before children.
+  The flag takes its glyph because the icon catalogue has no info glyph. A golden per part, and
+  a sender card from parts is byte-identical to the hand-written `sender-open` golden (tested).
+- `ToastHub::push_undoable(text, token, on_undo: EventHandler<UndoToken>)`: the undo calls the
+  handler of the push on screen; a later push replaces it. `last_undo()` stays. The handler
+  belongs to the scope that created it, so it must outlive the toast (documented).
+- Bug found by the new toast unit test, fixed: `ToastHub::stop_hold` ran
+  `if let Some(t) = *self.hold.peek() { … self.hold.set(None) }`; the peek's read guard lives
+  through the `if let` body, so the `set` panicked "already borrowed" whenever a hold was
+  running: every undo or hide, and every second push, within 5.2 s of a push. Why no test caught
+  it: no test pushed and then undid or re-pushed inside a render context that surfaced the panic.
+- `Button` and `IconButton` take `mounted: Option<EventHandler<MountedEvent>>` (no attribute;
+  goldens unchanged). `crates/ds-native/tests/anchor.rs` anchors a Slim menu to a button's
+  handle through `Anchor::Mounted` and finds it 6 below and 8 left of the button. Two harness
+  observations while writing it, neither fixed here: the overlay bounds are the `.ds` box, which
+  is as tall as its content, so in a content-high root a menu under a button flips and clamps to
+  the top (the test adds a spacer); and with nothing but the menu's `if` placeholder after the
+  Button in its component, the harness's click never reached the button, while any element
+  after it makes the click land (the test has a caption after the button). The second looks like
+  a hit-testing issue in the harness or dioxus-native; worth a minimal reproduction.
+- Not changed, for whoever merges: the gallery's Gaps page (`pages/gaps.rs`) still lists the
+  spacing, Surface, HoverCard, toast, avatar and Button gaps this branch closes;
+  `examples/consumer` still anchors its menu through a wrapper span and could pass `mounted`;
+  CONSUMING.md §4 and §5 describe `Surface` and `RawMarkup` as they were.

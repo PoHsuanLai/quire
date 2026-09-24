@@ -190,8 +190,12 @@ Mapping: `.btn` -> `[data-variant=primary]`; `.btn.ghost` (C) -> `[data-variant=
     #[props(default)] pressed: Option<Switch>,   // Some only for toggle buttons (Mini)
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
+    #[props(default)] mounted: Option<EventHandler<MountedEvent>>, // the element, for Anchor::Mounted
 ) -> Element
 ```
+
+`mounted` is settled (Gallery fixes B): a menu or popover anchors to the button itself through
+`Anchor::Mounted(MountedRef(event.data()))`, with no wrapper to measure; it writes no attribute.
 
 **Geometry.**
 
@@ -315,6 +319,7 @@ Mapping: `.tool` -> `[data-variant=tool]`; `.foot-btn` -> `[data-variant=foot]`;
     #[props(default)] expanded: Option<Switch>,  // Tool that owns a Menu
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
+    #[props(default)] mounted: Option<EventHandler<MountedEvent>>, // settled: as Button's
 ) -> Element
 ```
 
@@ -1927,9 +1932,26 @@ and items. Shell: dock window previews (planned).
 
 ```rust
 #[component] pub fn HoverTarget(key: HoverKey, kind: HoverKind, children: Element) -> Element
-#[component] pub fn HoverCard(kind: HoverKind /* Thread | Sender | Account | Side */, children: Element) -> Element
+#[component] pub fn HoverCard(
+    kind: HoverKind,                       // Thread | Sender | Account | Side
+    #[props(default)] parts: Vec<HoverCardPart>,   // drawn in order, before children
+    children: Element,
+) -> Element
+pub enum HoverCardPart {
+    Title(String), Sub(String),
+    Person { initial: char, tone: AvatarTone, title: String, sub: Option<String> },   // avatar 34
+    Stats(Vec<HoverStat>),                 // HoverStat { value, label }
+    Flag { tone: FlagTone /* Danger | Info */, icon: Icon, text: String },
+    Messages(Vec<HoverMessage>),           // HoverMessage { initial, tone, name, text }, avatar 22
+    Foot { text: String, keys: Option<KeyHint> },   // KeyHint { shortcut, label }
+    Actions(Vec<Element>),                 // Mini buttons
+}
 // HoverHub (context) owns Idle -> Pending -> Open -> Closing -> Warm; consumers render the card for the open key.
 ```
+
+The parts are settled (Gallery fixes B): each draws exactly the block in the markup above, so
+a consumer never writes `ds-hovercard-*` by hand (a sender card from parts is byte-identical to
+the hand-written golden). The flag takes its glyph because the catalogue has no info glyph.
 
 **Geometry.**
 
@@ -2033,6 +2055,8 @@ operation (`S:1548-1553`). Shell: notifications (planned; the pull tab is mail's
 
 ```rust
 pub fn use_toasts() -> ToastHub     // push(text, undo: Option<UndoToken>); one visible at a time
+// push_undoable(text, undo: UndoToken, on_undo: EventHandler<UndoToken>): the undo calls on_undo
+// (settled, Gallery fixes B); last_undo() stays for a consumer that watches instead.
 #[component] pub fn ToastHost() -> Element   // rendered by Ds; reads ToastHub
 ```
 
@@ -2953,7 +2977,7 @@ suggestion.
 | O-4 | Toggle size | Knob and track sizes are not in any prototype. | Candidate: knob 18, track 36 x 24 incl. 3 px padding. Needs sign-off. |
 | O-5 | Slider track | Height and unfilled colour not specified (native range). | Candidate: 4 px, `--line` unfilled, `--accent` filled. |
 | O-6 | Chip enum | S uses Person, Token, Status and Clip shapes; the plan's enum has Accent, Label, Neutral. | Add the four as variants (§10). |
-| O-7 | Person hue | `hsl()` from the hash is a colour function the lint bans in consumer CSS. | Rust converts to hex and emits `--av-bg`. |
+| O-7 | Person hue | `hsl()` from the hash is a colour function the lint bans in consumer CSS. | Rust converts to hex and emits `--av-bg`. Settled for consumers (Gallery fixes B): the markup lint allows a custom property written inline on a `ds`/`ds-*` element, so a rendered `Avatar` needs no exception. |
 | O-8 | Count bump on Space switch | S suppresses bumps when the Space changes (`S:1262`). | The consumer keys the count by Space, so a switch mounts it at rest (wave 1: replaces the `Motion::Quiet` render hint, which no type carries). |
 | O-9 | Infinite loops | Spinner, SyncHalo and `dest` loop; loops keep Blitz animating and the shell never idles. | Breathe off by default on shell surfaces; Spin only while busy; `dest` only while hovered. |
 | O-10 | Strip `!important` | `.strip button:active{ transform:scale(.88) !important }` beats the `forwards` fill; lint bans `!important`. | Settled state without animation after `settle(pop-in)` (§17). |
@@ -2966,7 +2990,7 @@ suggestion.
 | O-17 | Accent count | Plan: "Accent(6)" in the gallery and a moved test named "exactly-four-accent". | 03-COLOR decides; the picker renders the table. |
 | O-18 | S vs C contradictions | Resolved "S wins" in each section; listed here so nobody re-opens them silently: strip buttons 26 vs 28, gap 3 vs 4, icons 14 vs 15; star inset 6/7 vs 8/8, icon 14 vs 15; icon stroke 2 vs 1.7/1.8; toast hidden 160% vs 140%, hint opacity .7 vs .72; seg padding 5/11 12px vs 6/13 12.5px; Primary padding 14 vs 15; palette 540 vs 420, top 11% vs 14%, input 16 vs 14.5, list 360 vs 252, enter `peek-in` vs `cmdk-in`; peek inset `36px 12%` vs `34px 10%`, `peek-in` .95/12px vs .97/10px; scrim `--scrim` vs ink .16; row dot top 6 vs 5; stagger cap none (S, first show only; ds caps 12) vs 8; sidebar item radius 9 on the frame vs `--r-chip` on the card, seal -7 in `--f-ink` vs -10 in `--seal`; toast click-to-undo |dx| < 3 vs dx == 0; send ring 20 vs 22. | S wins, as written in each section. |
 | O-19 | Field plane | No canvas in Blitz. | PNG per scheme generated in Rust (static per scheme), handles as divs. |
-| O-20 | Send ring animation | SVG `stroke-dashoffset` transition likely does not run in Blitz. | Rust drives `Fraction` per frame; fallback a custom Widget. |
+| O-20 | Send ring animation | SVG `stroke-dashoffset` transition likely does not run in Blitz. | Rust drives `Fraction` per frame; fallback a custom Widget. The ring carries `data-ds-svg="ring"`, so the markup lint knows it is quire's own vector (Gallery fixes B). |
 | O-21 | Selection source | The bubble needs a selection rect and mark states that only the composer's Rust model has. | ds owns surface + placement; mailo owns selection. |
 | O-22 | Pseudo-elements | Seal `::before`, header rule and tab underline `::after`. | Spike confirms; fallback real spans. |
 | O-23 | `::placeholder` | Not confirmed in Blitz. | Spike; fallback overlay span. |

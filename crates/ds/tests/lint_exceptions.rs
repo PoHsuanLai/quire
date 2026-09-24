@@ -38,18 +38,18 @@ fn an_exception_suppresses_exactly_its_rule_and_selector() {
 fn a_markup_exception_names_the_element() {
     const INLINE: &[Exception] = &[Exception {
         rule: Rule::HexColour,
-        selector: "span.ds-avatar",
-        reason: "the person hue is computed per address (O-7)",
+        selector: "span.ds-space-swatch",
+        reason: "the editor's swatch paints its picked colour inline",
     }];
-    let html = "<span class=\"ds-avatar\" style=\"--av-bg:#944242\">D</span>";
-    let bare = markup(html, ".ds-avatar{}", &LintConfig::default());
+    let html = "<span class=\"ds-space-swatch\" style=\"background:#944242\"></span>";
+    let bare = markup(html, ".ds-space-swatch{}", &LintConfig::default());
     assert_eq!(bare.len(), 1, "{bare:?}");
-    assert_eq!(bare[0].selector, "span.ds-avatar");
+    assert_eq!(bare[0].selector, "span.ds-space-swatch");
     let config = LintConfig {
         exceptions: INLINE,
         ..LintConfig::default()
     };
-    assert!(markup(html, ".ds-avatar{}", &config).is_empty());
+    assert!(markup(html, ".ds-space-swatch{}", &config).is_empty());
 }
 
 #[test]

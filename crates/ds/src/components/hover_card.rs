@@ -5,7 +5,12 @@
 //! 400 ms after) and records its rect when the pointer comes over it. The consumer renders a
 //! `HoverCard` for `hub.open().or(hub.leaving())`, keyed by the hover key so a replacement
 //! plays its own `hc-in`; the card places itself against that target by kind, with no flip
-//! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving.
+//! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving. Its content
+//! is a list of [`HoverCardPart`]s (the section's blocks as data), then any children.
+
+mod parts;
+
+pub use parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint};
 
 use crate::components::popover::{Float, Stacking, position_style, use_entrance, use_float};
 use crate::geometry::measure::client_rect;
@@ -157,9 +162,14 @@ pub fn HoverTarget(hover_key: HoverKey, kind: HoverKind, children: Element) -> E
     }
 }
 
-/// The card, rendered by the consumer for the hub's open key.
+/// The card, rendered by the consumer for the hub's open key: `parts` in order, then
+/// `children` for anything the parts do not draw.
 #[component]
-pub fn HoverCard(kind: HoverKind, children: Element) -> Element {
+pub fn HoverCard(
+    kind: HoverKind,
+    #[props(default)] parts: Vec<HoverCardPart>,
+    children: Element,
+) -> Element {
     let hub = use_hover_hub();
     let (float, style, presence) = use_card(kind);
     let probe = float.surface();
@@ -175,6 +185,9 @@ pub fn HoverCard(kind: HoverKind, children: Element) -> Element {
                 onmounted: move |event| probe.on_mounted(event),
                 onmouseenter: move |_| hub.feed(HoverEvent::EnterCard),
                 onmouseleave: move |_| hub.feed(HoverEvent::LeaveCard),
+                for block in parts {
+                    {parts::part(block)}
+                }
                 {children}
             }
         },

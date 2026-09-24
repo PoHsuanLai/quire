@@ -11,73 +11,35 @@ use ds_native::{Viewport, snapshot_at};
 use std::time::Duration;
 
 /// Offences in quire's own markup: every one is drawn by a quire component, not by the
-/// gallery, and each is a gap reported to quire (the Gaps page lists them). `markup` has no
-/// way to tell a component's inline style from a consumer's.
+/// gallery, and each is a gap reported to quire (the Gaps page lists them). The computed
+/// custom properties quire writes inline on its own elements (the `--f-*` frame, `--f-grad`,
+/// `--av-bg`, `--pc`) and the SendPill's marked ring are not offences; what is left paints a
+/// literal colour straight into a non-custom property, or is a class nothing styles.
 const EXCEPTIONS: &[Exception] = &[
     Exception {
         rule: Rule::HexColour,
-        selector: "div.ds",
-        reason: "Ds writes the Space's --f-* frame variables inline as hexes",
-    },
-    Exception {
-        rule: Rule::ColourFunction,
-        selector: "div.ds",
-        reason: "Ds writes --f-pill and --f-line inline as rgba()",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "div.ds-layer",
-        reason: "Ds writes the frame gradient inline on its front layer",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "div.ds-layer.back",
-        reason: "Ds writes the frame gradient inline on its back layer",
-    },
-    Exception {
-        rule: Rule::UnstyledClass,
-        selector: "div.ds-layer.back",
-        reason: "Ds marks the back frame layer with a class the stylesheet never styles; it hides [*|data-layer=back]",
-    },
-    Exception {
-        rule: Rule::HexColour,
         selector: "button.ds-space-dot",
-        reason: "SpaceDot paints its Space's gradient inline",
+        reason: "SpaceDot paints its Space's gradient inline as background, not a custom property",
     },
     Exception {
         rule: Rule::HexColour,
         selector: "button.ds-preset",
-        reason: "the Space editor's preset buttons paint their gradients inline",
+        reason: "the Space editor's preset buttons paint their gradients inline as background",
     },
     Exception {
         rule: Rule::HexColour,
         selector: "div.ds-handle",
-        reason: "the Space editor's dot handles are filled with their picked colour inline",
+        reason: "the Space editor's dot handles are filled with their picked colour inline as background",
     },
     Exception {
         rule: Rule::HexColour,
         selector: "i.ds-stop-disc",
-        reason: "the Space editor's stop discs are their stop colours inline",
+        reason: "the Space editor's stop discs are their stop colours inline as background",
     },
     Exception {
         rule: Rule::HexColour,
         selector: "span.ds-space-swatch",
-        reason: "the Space editor's swatch is its picked colour inline",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "span.ds-avatar",
-        reason: "the avatar writes its computed hue and account colour inline (O-7)",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "span.ds-provider",
-        reason: "the provider mark writes its brand letter colour inline (--pc)",
-    },
-    Exception {
-        rule: Rule::RawMarkup,
-        selector: "svg.ds-send-ring",
-        reason: "SendPill draws its countdown ring as its own svg, not a Glyph (O-20)",
+        reason: "the Space editor's swatch is its picked colour inline as background",
     },
 ];
 
@@ -119,6 +81,25 @@ fn every_page_renders_quire_markup_only() {
     failures.sort();
     failures.dedup();
     assert!(failures.is_empty(), "{failures:#?}");
+}
+
+#[test]
+fn every_exception_still_suppresses_something() {
+    let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
+    let bare = LintConfig {
+        profile: Profile::Standard,
+        ..LintConfig::default()
+    };
+    let offences: Vec<_> = Page::ALL
+        .into_iter()
+        .flat_map(|page| markup(&rendered(page), &css, &bare))
+        .collect();
+    let stale: Vec<&str> = EXCEPTIONS
+        .iter()
+        .filter(|exception| !offences.iter().any(|offence| exception.covers(offence)))
+        .map(|exception| exception.selector)
+        .collect();
+    assert!(stale.is_empty(), "exceptions that match nothing: {stale:?}");
 }
 
 #[test]

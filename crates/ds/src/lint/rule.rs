@@ -27,6 +27,9 @@ pub enum Rule {
     RawRadius,
     /// A raw `z-index`: layers are `--z-*`.
     RawZIndex,
+    /// A literal `px` in a `margin`, `padding` or `gap`: steps are `--s-*` (design/01-LAYOUT.md
+    /// section 2).
+    RawSpacing,
     /// A `:root` selector.
     RootSelector,
     /// A selector that styles quire's own `.ds-*` classes or `[data-theme|accent|motion|material]`.
@@ -57,7 +60,7 @@ pub enum Rule {
 
 impl Rule {
     /// Every rule, in declaration order.
-    pub const ALL: [Rule; 22] = [
+    pub const ALL: [Rule; 23] = [
         Rule::HexColour,
         Rule::ColourFunction,
         Rule::NamedColour,
@@ -70,6 +73,7 @@ impl Rule {
         Rule::RawFontSize,
         Rule::RawRadius,
         Rule::RawZIndex,
+        Rule::RawSpacing,
         Rule::RootSelector,
         Rule::DsInternals,
         Rule::UndeclaredVar,
@@ -86,7 +90,8 @@ impl Rule {
 /// How strict a run is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Profile {
-    /// Every rule except the raw-geometry ones (`RawFontSize`, `RawRadius`, `RawZIndex`).
+    /// Every rule except the raw-geometry ones (`RawFontSize`, `RawRadius`, `RawZIndex`,
+    /// `RawSpacing`).
     #[default]
     Standard,
     /// Every rule.

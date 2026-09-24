@@ -35,6 +35,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `tokens/timing.rs`, `tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (23 `DurationToken`s, `--t-flash` the wave 1 amendment; 13 `DelayToken`s) |
 | `tokens/easing.rs`, `tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `tokens/shape.rs` | 01-LAYOUT §10 |
+| `tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps as `--s-1` … `--s-36`, emitted on `.ds`) |
 | `tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `tokens/layer.rs` | 01-LAYOUT §12 |
@@ -59,12 +60,12 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `geometry/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds; FINDINGS "W2 integration") |
 | `overlay/host.rs`, `stack.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
-| `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 |
-| `root/ds.rs`, `root/surface.rs`, `root/env.rs` | 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
+| `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
+| `root/ds.rs`, `root/surface.rs`, `root/env.rs` | `Surface` overrides material and, optionally, scheme, accent and blur; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
 | `text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (moved with tests; stroke as attributes) |
 | `icon/geometry_shell.rs` | 08-ICONS §1.6 |
-| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 22 `Rule`s: the stylesheet rules, plus `UnstyledClass` and `RawMarkup` for markup; `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
+| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 23 `Rule`s: the stylesheet rules (`RawSpacing` the Strict-profile spacing rule), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
 

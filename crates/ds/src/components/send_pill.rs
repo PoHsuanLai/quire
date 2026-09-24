@@ -94,8 +94,10 @@ pub fn SendPill(
             role: "status",
             style: "--f:{progress.css()}",
             // The circles carry no classes: CSS does not reach inside an SVG on Blitz (S6).
+            // `data-ds-svg` tells the markup lint this vector is quire's own, not raw SVG.
             svg {
                 class: "ds-send-ring",
+                "data-ds-svg": "ring",
                 view_box: "0 0 24 24",
                 width: "20",
                 height: "20",

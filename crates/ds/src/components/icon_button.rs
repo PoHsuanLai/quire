@@ -41,7 +41,8 @@ impl IconButtonVariant {
     }
 }
 
-/// An icon-only action.
+/// An icon-only action. `mounted` hands over the element once it is in the document, so a
+/// floating component can anchor to it (`Anchor::Mounted`).
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,
@@ -52,6 +53,7 @@ pub fn IconButton(
     #[props(default)] expanded: Option<Switch>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
+    #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
 ) -> Element {
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(|state| state.aria());
@@ -68,6 +70,13 @@ pub fn IconButton(
             onclick: move |_| {
                 if availability == Availability::Enabled {
                     onclick.call(());
+                }
+            },
+            // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
+            // attribute: the markup is the same with or without a handler.
+            onmounted: move |event| {
+                if let Some(mounted) = mounted {
+                    mounted.call(event);
                 }
             },
             Glyph { icon, size: variant.icon_size() }

@@ -59,7 +59,7 @@ pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
     AccentQuad, Alpha, Colour, ColourToken, CubicBezier, DelayToken, DurationKind, DurationToken,
     Easing, EasingToken, Family, FontSize, Hex, HueMember, LabelHue, Radius, ScalarToken,
-    ScalarValue, Shadow, VarName, ZLayer, quad,
+    ScalarValue, Shadow, SpacingToken, VarName, ZLayer, quad,
 };
 
 use futures_timer as _;
