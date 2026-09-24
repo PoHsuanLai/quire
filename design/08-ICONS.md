@@ -98,6 +98,20 @@ Consumers pick a variant; no consumer writes an icon `width` in CSS (lint `RawFo
 `BlitzUnsupported` do not cover this, so `lint::markup` rejects an `.ds-ic` with an inline size;
 proposed).
 
+#### 1.4.1 Stroke at a fractional scale (settled 2026-09-25)
+
+At a whole scale the stroke is the design's 2 in the 24 grid. At 1.25, 1.5 and 1.75 `Glyph`
+reads the root's scale and rounds the stroke's width in device pixels to the nearest *even*
+count (halves up, never below one), writing it back in grid units (`icon/stroke.rs`): a 16 px
+glyph draws 2 device pixels at all three (`stroke-width` 2.4, 2, 1.7143), a 24 px one 2, 4, 4.
+Even, because Lucide draws on whole grid lines: an even stroke centred on a grid line that falls
+on a device pixel boundary has both edges on boundaries; an odd one sits half a pixel off. At
+16 px and 1.5 one grid unit is exactly one device pixel, so every whole-coordinate stroke is
+crisp; at 1.25 and 1.75 only the grid lines that land on device boundaries are (grid 0, 6, 12,
+18, 24 at 16 px), and diagonals and curves are antialiased as they always are. The glyph's box
+and a plate's rect are placed on the device grid by the layout snap (01-LAYOUT §2.1); a plate's
+rim and highlight are `--hair`.
+
 ### 1.5 Colour
 
 - Settled: stroke is `currentColor`; the glyph takes the text colour of its parent. The

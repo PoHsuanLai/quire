@@ -1465,3 +1465,100 @@ What mailo changes:
   `use_environment(AppName::MAILO)`; it may stay (it is idempotent) or go.
 - Keep `Space::motion` and feed it into the `Ds` root's `appearance.motion`; keep `KEEP_FOCUS`
   until Phase B.
+
+## Pixel snapping (2026-09-25)
+
+The user's 27 inch 4K panel runs at 1.5 (Apple's 109 points per inch); other panels land at 1.25
+or 1.75. macOS renders a fractional scale at 2x and downsamples; Blitz renders at the true scale,
+so the design system snaps. Branch `pixel-snap`. Proofs: `crates/ds-native/tests/pixel_snap.rs`
+(rows read from the PNG at 125, 150, 175 and 200), `crates/ds/tests/pixel_root.rs` (the root's
+writes), unit tests in `tokens/pixel.rs`, `icon/stroke.rs`, `geometry/scale.rs` and
+`ds-native/src/snap.rs`, lint cases in `tests/lint_rules.rs`.
+
+**What Blitz does (blitz e99fbdbd, taffy 4863877, stylo 0.21), read in the source and measured:**
+
+- Layout runs in logical (CSS) pixels: the stylist's device takes the viewport as
+  `window_size / scale` (`resolve_layout` reads `au_viewport_size()`), and `resolve_layout` ends
+  with `taffy::round_layout`, which rounds every box's location, size, border and padding to
+  whole **logical** pixels (cumulative, `(v + .5).floor()`). There is no option to round
+  geometry to device pixels in taffy, blitz-dom, blitz-paint, anyrender or vello_cpu 0.1
+  (blitz-paint snaps only a text decoration's thickness, and hints glyphs); paint multiplies
+  the rounded layout by the scale (`blitz-paint/src/render.rs`, `layout.border * scale`) and
+  rasterises with antialiasing.
+- stylo does snap a border (and outline) width to device pixels (`snap_as_border_width`: floor,
+  never below one device pixel): `border: 1px` at 1.5 computes to 40 app units, 0.667 logical px,
+  one device pixel. taffy then rounds that back up to 1 logical pixel, 1.5 device pixels.
+- `box-shadow` spreads and offsets are painted from the computed style, unrounded, relative to
+  the (logically rounded) box.
+- Measured before the fix, a black line on white, ink per device row (255 is full):
+
+  | Scale | `height:1px` at y 10 | at y 11 | `border:1px` top at y 20 | at y 21 | `height:.6667px` |
+  | --- | --- | --- | --- | --- | --- |
+  | 1.25 | 128, 191 | 64, 255 | 255, 64 | 191, 128 | 128, 191 (rounded up to 1 px) |
+  | 1.5 | 255, 128 | 128, 255 | 255, 128 | 128, 255 | 255, 128 (the same) |
+  | 1.75 | 128, 255, 64 | 191, 255 | 255, 191 | 64, 255, 128 | 128, 255, 64 |
+  | 2 | 255, 255 | 255, 255 | 255, 255 | 255, 255 | 255, 255 (2 device rows) |
+
+  So no CSS value alone can make a crisp line at a fractional scale: widths below a logical
+  pixel are rounded up to one, and positions sit on half device pixels at 1.5 whenever the
+  logical coordinate is odd.
+
+**What is snapped, and how:**
+
+- **Positions and widths: `ds_native::snap_to_device(&mut BaseDocument)`** (`src/snap.rs`),
+  after every resolve. It redoes taffy's cumulative rounding from each node's unrounded layout on
+  the device grid (so neighbours still abut exactly), rounds border widths on their own to whole
+  device pixels (never below one, whatever phase the edge lands on), then re-derives what Blitz
+  computed from the old rounding: each node's transform (percent translations read the size) and
+  scrollable overflow, and rounds a pure translation to whole device pixels. It reaches the
+  layout through blitz-dom's public `Node::{unrounded_layout, final_layout_mut, set_transform,
+  transform_mut, scrollable_overflow_mut, layout_children}`; no new dependency. Hit testing and
+  rect reads use the same final layout, so they agree with the picture. At a whole scale it does
+  nothing, so every 1x and 2x picture is unchanged. `Harness` and `snapshot` run it each frame.
+- **Widths: the pixel tokens** (`ds::PixelToken`, `tokens/pixel.rs`): `--hair` (1 px lines),
+  `--hairline` (.5 px), `--px` (one device pixel), `--ring` (3 px), `--focus-ring` (2.5 px),
+  `--dpr`. Tuned tokens: `.ds` declares `--hair:var(--scale-hair,1px)` and the root writes
+  `--scale-hair` inline, so nested `.ds` scopes keep the root's value. `Ds { scale: Option<Scale> }`
+  (120ths, shell-host's unit) sets them; ds-native provides `ds::HostScale` from the viewport
+  (headless) or the window's scale factor (`launch`). At 1x the root writes nothing and the
+  generated sheet's defaults are the old values, so 1x markup and pixels are unchanged.
+- Converted to the tokens: every 1 px border in quire's component sheets (button, chip, palette,
+  drag ghost, hover card foot, hover strip, icon button, kbd, list row, menu tile, popover,
+  search field, segmented, space editor, tabs, text input, toggle), the menu separator, the
+  section header rule, the selection bubble separator, the provider mark's ring, the text input's
+  focus ring and the `dest`/`chip-flash` rings (`--ring`), the keyboard focus outline
+  (`--focus-ring`), the material stack's outer hairline, inner edge and top highlight and the
+  bar's hairlines (`--hairline`, `--hair`), the plate's rim and highlight, and the `--shadow-1`,
+  `-2`, `-current`, `-pill-inset`, `-card`, `-handle`, `-mark` hairlines. The gallery's own sheet
+  too. Golden `tests/snapshots/stylesheet.css` re-blessed; the diff is exactly those values.
+- **Glyphs**: at a fractional scale `Glyph` writes a stroke width that is an even number of
+  device pixels (`icon/stroke.rs`, design/08 §1.4.1); a 16 px glyph is 2 device pixels at
+  1.25, 1.5 and 1.75.
+- **Measured after**: the rule, a `--hair` card's top and left edges, a literal `border:1px`
+  card's (stylo's floor plus the snap), and a Slim menu's separators are one full device row at
+  1.25, 1.5 and 1.75 with the ground on both sides, and two full rows at 2; a 16 px plus glyph's
+  bar is two full rows at the three fractional scales. With the snap switched off the same test
+  fails at 1.25 (rule `64, 255`, separator `191, 128`, glyph bar `191, 255, 64`).
+- **Lint**: `Rule::RawHairline` (Strict) flags a literal `1px`/`.5px` `border*`/`outline*` width
+  and a box whose whole `width`/`height` is `1px`, naming the token. Known downstream offence:
+  sill's `.sill-dock-separator{width:1px}` (it becomes `var(--hair)`); sill's Strict dock lint
+  will fail on it until then.
+
+**What is not snapped:**
+
+- `ds_native::launch`'s window (the portable winit path): blitz-shell calls `resolve` and paints
+  in the same redraw with no hook between, so positions stay Blitz's logical rounding there; the
+  tokens still apply. shell-host resolves its own documents and must call
+  `ds_native::snap_to_device` after each `resolve` (shell-host is not changed on this branch).
+- A literal `height:1px`/`width:1px` box in a consumer sheet: snapped to whole device pixels, but
+  1.5 device pixels rounds to one or two rows by phase; the lint points at `--hair`.
+- Transforms that are not a pure translation (a menu's `menu-pop` scale part-way through, a
+  hover's `translateY(-1px) scale(1.015)`) keep their fractional positions while they run.
+- Text: parley positions glyph runs inside the snapped content box; baselines are not moved.
+- A glyph's diagonals and curves, and at 1.25/1.75 its grid lines that do not fall on a device
+  boundary (only every sixth grid line does at 16 px); a 24 px glyph's grid lines at odd
+  coordinates at 1.5. Symbolic external icons (a PNG/SVG mask) are resampled as before.
+- `--shadow-mark-tile` (1.5 px) and the sidebar's 1.5 px inset ring, box-shadow offsets and
+  blurs: not lines, left as designed.
+- Scroll offsets are fractional and applied at paint; a scrolled list's rows move by whatever
+  the offset is.
