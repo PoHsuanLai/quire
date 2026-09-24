@@ -116,7 +116,7 @@ fn Panel(selection: Selection, give_back: GiveBack) -> Element {
                         note(format!("rect:{}", show(rect)));
                         row.set(Some(rect));
                     },
-                    onkey: move |event: KeyboardData| {
+                    onkey: move |event: KeyboardEvent| {
                         if event.key() == dioxus::prelude::Key::Tab {
                             note("key:Tab".to_string());
                             actions.set(true);

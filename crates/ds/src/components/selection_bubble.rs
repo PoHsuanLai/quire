@@ -94,7 +94,7 @@ pub fn SelectionBubble(
                 placeholder: "Paste a link, then Enter",
                 focus: Focus::OnMount,
                 oninput: move |text| link.set(text),
-                onkey: move |key: KeyboardData| {
+                onkey: move |key: KeyboardEvent| {
                     if key.key() == Key::Enter {
                         let url = link.peek().trim().to_string();
                         if !url.is_empty() {

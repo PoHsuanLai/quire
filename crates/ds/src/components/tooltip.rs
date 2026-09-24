@@ -32,7 +32,8 @@ pub enum Shown {
 }
 
 impl Shown {
-    fn slug(self) -> &'static str {
+    /// The `data-shown` word.
+    pub(crate) fn slug(self) -> &'static str {
         match self {
             Shown::Visible => "visible",
             Shown::Hidden => "hidden",
