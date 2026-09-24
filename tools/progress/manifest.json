@@ -1,11 +1,33 @@
 {
- "updated": "2026-09-25, icon round three sheets up for the user's pick; pixel snapping and the host's background-layer fix running",
+ "updated": "2026-09-25, quire v0.1.4 (pixel snapping); icon round four sheets up for the dialect pick",
  "entries": [
+  {
+   "id": "icons-round4",
+   "date": "2026-09-25 · icon round four",
+   "title": "Round four: one muted palette, no gradients, four dialects to mix across the set",
+   "status": "running",
+   "lede": "The direction after round three: fewer gradients, less vibrant colour, and not every icon from the same recipe. Every icon keeps one skeleton (the squircle, the same light, a thin top bevel arc, bottom shade, drop shadow, emboss depth and grain) and one OKLCh palette capped at chroma 0.07 with six named hues (slate, teal, sage, ochre, clay, plum); plates are one colour with at most a faint tonal shift. Four dialects: Monochrome tone-on-tone (plate and symbol share a hue and differ in lightness), Graphite (near-black plate, light symbol), Paper (quire's paper plate, ink symbol, one spot of colour at most), and Solid (one flat muted colour, white symbol). Mail, files and photos also get their round-three Klein pick re-tinted into Monochrome, keeping Klein's emboss. A second sheet shows the whole set in Monochrome tinted by a Space, and two settings keys (icons.style: Colour, Muted, Monochrome; icons.monochrome_tint: Space, Accent, Neutral) are registered for it. No model ran this round.",
+   "notes": [
+    "Recommendation (three dialects across five apps): mail = Monochrome slate, Klein variant; files = Solid ochre, procedural (the Klein files is blotchy); terminal = Graphite; notes = Paper with the ochre spot on the fold; photos = Monochrome clay, Klein variant.",
+    "Weak spots: Monochrome and Solid are the least distinct pair; a Paper plate nearly disappears at 16 px on the light ground, so the ink symbol has to carry it.",
+    "cargo deny's advisory check fails on RUSTSEC-2026-0192 (ttf-parser unmaintained) through the Blitz stack, on master too; licences pass. Recorded, not silenced."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round4-dialects.png",
+     "caption": "five apps × four dialects, plus the Klein pick re-tinted to Monochrome for mail, files and photos; 512 with the 16/32/48 strip on light and dark"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round4-monochrome-space.png",
+     "caption": "the set in Monochrome tinted by the Work (268) and Home (152) Space presets, through ds's palette derivation"
+    }
+   ]
+  },
   {
    "id": "icons-round3",
    "date": "2026-09-25 · icon round three",
-   "title": "Round three presses the symbol into a two-hue bevelled plate; the procedural set reads at every size",
-   "status": "running",
+   "title": "Round three pressed the symbol into a two-hue bevelled plate; the user picked procedural for terminal and notes, Klein's face for mail, files and photos",
+   "status": "proven",
    "lede": "After round two the user gave a reference direction: symbols embossed into the plate with no outlines or strokes, a matte finish, the plate's bevel catching light in a few crisp narrow spots, a soft two-hue gradient ground per app, no frosted glass, no text. The procedural renderer now draws filled layers raised, recessed or flush with an inner light edge and a soft shade, mixes each app's two-hue ground in OKLCh, and finishes the plate with a narrow top highlight arc, a bottom shade and one specular point; the emboss drops out at 16 and 32 px so the small sizes stay flat. FLUX.2 Klein rendered the same brief two ways: the embossed symbol on a surface that becomes the plate face, and the whole tile re-masked with our squircle. Qwen ran mail and terminal only. The pick is the user's; the agent's reading is that the procedural set is best at every size, Klein's face mode has the most convincing clay emboss but blurs at 16 and washes files and notes to pastel, and a hybrid (Klein's face as the material study on the procedural plate) is open.",
    "notes": [
     "design/08 §2.9 records the embossed rules for app icons only; small symbolic glyphs keep Lucide's one stroke. docs/icons-bakeoff.md 'Round three' has the full comparison.",
