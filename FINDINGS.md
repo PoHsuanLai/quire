@@ -875,3 +875,89 @@ closed on branch `tray-gaps`; sill adopts the APIs in its next wave. Headless pr
 - Left for sill: choosing `Symbolic` or `Image` per item (design/08 §1.5 steps 2-3, the chroma
   test and `--warn` for `NeedsAttention`), and sizing its tray popup to leave room for a submenu,
   which is drawn in the same document as its menu.
+## Bar gaps (2026-09-24)
+
+sill's bar (sill FINDINGS "M1 bar-ui", F44-F53) reported Q9-Q13, G7 and the Q12 status-item
+gap against quire. Closed on branch `bar-gaps`; headless proofs in
+`crates/ds-native/tests/bar_frame.rs` and `bar_menu.rs`, SSR goldens under
+`crates/ds/tests/snapshots/root/chrome/`, `controls/icon_button/status*.html` and
+`overlays/menu/bar-status-lines.html`.
+
+- **Q10 HostMeasure.** `ds-native`'s measurer is public: `ds_native::measure::MEASURE` and
+  `ds_native::measure::provide()` (a hook that provides it). Without a measurer, `ds`'s read
+  no longer panics: dioxus-native-dom's `get_client_rect` borrows its document on the first
+  poll, not on the call, so the guard wraps the poll (`geometry/measure.rs`'s `Guarded`): a
+  panic there ends the read as `Measured::Busy` and the caller waits a frame. `ds` cannot name
+  Blitz's `NodeHandle`, so `try_borrow` is not reachable from it; the guard is the closest
+  equivalent, and the default panic hook still prints the collision, which is why hosts should
+  provide the measurer. Unit test with a held `RefCell`; harness test of `provide()`.
+- **Q9 Frame layers on chrome.** `root/chrome.rs` holds three rules, each with an override prop
+  on `Ds`: `RootChrome::of(material)`, `FrameTint::of(material, chrome)`, `Ground::of(material)`.
+  A Bar, Dock, painted Popover, Osd or Widget root stamps `data-frame="tinted"` and draws the
+  window's two layers and grain inside one `.ds-frame` whose opacity is `--m-frame-alpha` (each
+  material's own tint alpha scaled by the settings key, the same arithmetic as `--m-tint`) with
+  blur and .94 without. The group's own background is the current gradient, so inside it stays
+  opaque through a cross-fade and only the group's alpha lets the blur through. Sheet and Toast
+  keep their flat tint (design/21 §3's "no" rows); OSD takes the gradient as the brief asked,
+  where design/21 §3 had proposed "no" (recorded there, the user's call). Two Blitz facts: the
+  tinted root must be a stacking context (`position:relative; z-index:var(--z-raise)`), or the
+  frame's negative z-index paints under whatever is behind the root (the gallery's wallpaper
+  hid it entirely on the first sheet); and the root's inset edge (the bar's hairline) is then
+  under the frame, so `.ds-frame::after` draws `--m-edge` again. Proofs: the bar's corner at
+  rest is the first stop at .70 over white (blur on) and at .94 (off), within 3 of 255, and not
+  the old surface tint; a look change (preset 1 to 4) sampled when `--e-out` reaches .25 is
+  between the two Spaces per channel and 5+ from each. The symmetric layer fade over the new
+  gradient weighs the old Space (1-p)^2, so it is not a linear mix: at half the easing it is
+  already 75 % new (the window's frame does the same).
+- **Legibility of the tinted chrome.** Without blur (.94) the ink each ground draws in holds 4.5
+  on every stop of every preset over black and white (`tests/legibility.rs`). Over blur, at
+  the flat tints' alphas, 50 pairs fall short over a pure black or white backdrop, worst the
+  light widget (paper ink, 3.91 over black), the light dock (4.11) and the dark bar (4.36 over
+  white). The smallest .02 raises that clear them all: Bar dark .66 to .68, Dock light .55 to
+  .59 and dark .66 to .68, Osd dark .66 to .68, Widget light .54 to .60 and dark .65 to .67
+  (Bar light, Popover and Osd light already clear). Not applied: the alphas are design/03
+  §17.2's proposed values and over-blur legibility is its open decision 11; a test pins today's
+  shortfall so a retune has to update this note. `--f-ink` on `--f-pill-hover` and on
+  `--f-pill` over every stop clears 4.5 for all presets in both schemes.
+- **Q13 Popup roots.** A Popover, Sheet or Toast root stamps `data-chrome="transparent"`: no
+  background, no box-shadow; its `.ds-popover` (every menu) and `.ds-sheet` cards paint
+  `--m-tint-solid` (`--m-tint` with blur), a transparent border and `--m-box` (the material's
+  edge and drop, a new variable every material block declares). Proof over the harness's new
+  `Backdrop::Clear`: inside a Popover root's rounded corner and far from the card, alpha 0; the
+  card's middle alpha > 200; the same root with `chrome: Painted` covers its corner.
+- **Q11 Menu control.** `on_hover`, `on_release`, `entrance: MenuEntrance`, the `MenuOut` exit
+  fade on Escape and outside click, `onpick` before `onclose`. Blitz sends a `click` to the
+  release target even when the press began elsewhere, so a press-drag-release onto an item would
+  pick twice; the menu picks once (`Closing::Picked`). A drag counts as one when the pointer came
+  in and no press began inside the menu; a release over a disabled item, a header or padding
+  then closes through the fade. `Anim::MenuOut` is quire's own keyframe (`menu-out`, 170 ms
+  `--e-exit` at Standard; the catalogue is now 47 variants and 40 keyframes). Proofs: hover
+  reports `0, 2, none`; a drag from an opener onto Quit logs `hover:2,release:Primary,pick:3,
+  close`; a disabled release logs no pick and closes after the fade; Escape and an outside
+  click leave the menu `leaving` with no `close` until `settle(MenuOut)`; an instant menu is
+  `present` on its first frame, an animated one `entering`. Submenu panels do not take a
+  press-drag-release (bar menus have none); the root panel does.
+- **Q12 Status items and the frame ground.** `IconButtonVariant::Status` (box
+  `--bar-status-box`, glyph `--bar-status-glyph`, defaults 22 and 16, `--f-ink-soft`, hover
+  `--f-pill-hover`, pressed/open `--f-pill`) and `ds::StatusMetrics` to write the properties.
+  The glyph is sized in the sheet, not by its attributes: Blitz lets a CSS width override an
+  `svg`'s presentation width and scales the drawing (proof: the wifi glyph inks 20/24 of 24 and
+  of 16 px). `data-ground="frame"` (`css/ground_css.rs`) redirects the paper inks and fills to
+  the frame's and gives `.ds-overlay` the paper values back per scheme; proof: a `var(--ink)`
+  swatch on the bar is `--f-ink`, one inside a popover opened from it is the paper ink.
+- **Small items.** `Icon::Ethernet` (Lucide `ethernet-port`, lucide-static 1.47.0); `WifiOff`
+  and `BatteryCharging` already existed. `MenuEntry::Info { title, detail }`. `Press.at`
+  (`Point`, client coordinates; `Press` lost `Eq`). `ds::icon::classify` / `classify_with`
+  (`IconKind`, `ChromaLimit`, `DsError::IconDecode`), OKLab by Ottosson's published matrices,
+  opaque meaning alpha >= 128; `ds` now depends on the pinned `image` (png) for decoding. No
+  settings key names the 0.04 threshold yet: design/22 should gain one (for example
+  `icons.symbolic_chroma_max`), then sill passes it to `classify_with`.
+- Gallery: Controls has "Status items on the frame" (both metrics policies, blur on and off,
+  rest, open, pressed, disabled, with a Quiet app name, a Count and the clock on the frame);
+  Materials' Bar specimen uses status items and every tinted material shows the gradient; the
+  Overlays sheet poses a bar status menu with two status lines. The gallery root and its
+  `Scope`s pass `chrome: Painted` (a specimen root is the panel) and the Tokens, Gaps and Matrix
+  scopes `frame: Some(FrameTint::None)` so their Popover backdrops stay flat.
+- Left: G7 (`PopupSize::FitContent`) is shell-host's, not quire's; the materials page's floor
+  chips still measure the flat tint recipe, not the gradient over blur (the numbers above are
+  that measurement); disabled status items have no visual (04-COMPONENTS O-1).

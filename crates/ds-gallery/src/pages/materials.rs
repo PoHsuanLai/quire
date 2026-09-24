@@ -9,20 +9,27 @@ use dioxus::prelude::*;
 use ds::tokens::Alpha;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BlurState, Button, ButtonVariant, Chip, ChipVariant, Fraction,
-    Glyph, Icon, IconButton, IconButtonVariant, IconSize, Material, Slider, Surface, use_env,
+    Glyph, Icon, IconButton, IconButtonVariant, IconSize, Material, Slider, StatusMetrics, Surface,
+    use_env,
 };
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
     match material {
         Material::Window => "App windows: the Space gradient, its layers and grain",
-        Material::Bar => "The menu bar",
-        Material::Dock => "The dock pill",
-        Material::Popover => "Menus and popups off the bar and dock; the launcher panel",
+        Material::Bar => {
+            "The menu bar: the Space gradient at the bar's tint (data-frame=tinted), status items and text on the frame ground"
+        }
+        Material::Dock => {
+            "The dock pill: the Space gradient at the dock's tint, on the frame ground"
+        }
+        Material::Popover => {
+            "Menus and popups off the bar and dock; as a panel root (the launcher), the Space gradient at its tint"
+        }
         Material::Sheet => "Control center, notification center, power menu",
         Material::Toast => "Notification banners",
-        Material::Osd => "Volume and brightness",
-        Material::Widget => "Desktop widgets, the quick note",
+        Material::Osd => "Volume and brightness: the Space gradient at its tint",
+        Material::Widget => "Desktop widgets, the quick note: the Space gradient at its tint",
     }
 }
 
@@ -34,7 +41,7 @@ pub fn MaterialsPage() -> Element {
     rsx! {
         Section {
             title: "Tint alpha",
-            note: "appearance.material_tint_alpha scales every translucent tint (the default 80 is design/03-COLOR.md section 17.2 as written). The floors below follow it; the solid fallback never moves.",
+            note: "appearance.material_tint_alpha scales every translucent tint (the default 80 is design/03-COLOR.md section 17.2 as written). The bar, dock, popover panel, OSD and widget draw the Space gradient at that alpha, cross-fading on a Space switch (design/21-SPACES.md sections 3 and 5). The floors below follow it and measure the flat tint a Surface or a floating card paints; the gradient's own gates are ds's legibility tests. The solid fallback never moves.",
             div { class: "g-row",
                 div { class: "g-col", style: "width:320px",
                     Slider {
@@ -106,12 +113,13 @@ fn Panel(material: Material) -> Element {
     };
     match material {
         Material::Bar => rsx! {
-            div { class: "g-panel g-panel-bar g-row",
+            div { class: "g-panel g-panel-bar g-row", style: StatusMetrics::default().style_attr(),
                 Glyph { icon: Icon::Grid, size: IconSize::Bar }
                 span { class: "g-name", "Files" }
                 span { class: "g-code", "{state}" }
-                Glyph { icon: Icon::Wifi, size: IconSize::Bar }
-                Glyph { icon: Icon::BatteryFull, size: IconSize::Bar }
+                span { class: "g-spacer" }
+                IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryFull, label: "Battery", expanded: Some(ds::Switch::On), onclick: |_| {} }
                 span { class: "ds-tabular", "09:41" }
             }
         },

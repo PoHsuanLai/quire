@@ -3,7 +3,7 @@
 //! design/13-BEHAVIOUR-menus-windows.md section 13.3).
 //!
 //! A *choice* is a line the selection can rest on: an item or a submenu parent, enabled or
-//! not. Choices are numbered in order; the selection, a click and the menu tracker's item path
+//! not. A header, a status line and a rule are not choices. Choices are numbered in order; the selection, a click and the menu tracker's item path
 //! all name a choice by that number. Up and Down skip disabled choices.
 
 use crate::components::menu_entry::{MenuEntry, fuzzy};
@@ -167,7 +167,7 @@ pub(crate) fn lines<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Line
 fn title_of<T>(entry: &MenuEntry<T>) -> Option<&str> {
     match entry {
         MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => Some(title),
-        MenuEntry::Header(_) | MenuEntry::Separator => None,
+        MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => None,
     }
 }
 
@@ -210,7 +210,7 @@ pub(crate) fn choices<T: Clone>(lines: &[Line<'_, T>]) -> Vec<Choice<T>> {
                 act: Act::Open(children.clone()),
                 availability: *availability,
             }),
-            MenuEntry::Header(_) | MenuEntry::Separator => None,
+            MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => None,
         })
         .collect()
 }

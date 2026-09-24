@@ -11,7 +11,7 @@
 //! frame's CSS time never depends on how slow the machine running the test is.
 
 use crate::error::NativeError;
-use crate::headless::Headless;
+use crate::headless::{Backdrop, Headless};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
 use blitz_traits::events::{
@@ -212,16 +212,23 @@ impl Harness {
         })
     }
 
-    /// Paint the document as it is now, at the harness's animation time.
+    /// Paint the document as it is now, at the harness's animation time, over the scheme's
+    /// ground.
     pub fn render(&mut self) -> Result<image::RgbaImage, NativeError> {
-        self.doc.paint()
+        self.doc.paint(Backdrop::Scheme)
+    }
+
+    /// Paint the document as it is now over `backdrop`: [`Backdrop::Clear`] shows what a shell
+    /// surface would, where every pixel the document leaves unpainted has alpha 0.
+    pub fn render_over(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, NativeError> {
+        self.doc.paint(backdrop)
     }
 
     /// Resolve at `at` and paint: a snapshot at one motion moment.
     pub(crate) fn render_at(&mut self, at: Duration) -> Result<image::RgbaImage, NativeError> {
         self.clock = at;
         self.frame();
-        self.doc.paint()
+        self.doc.paint(Backdrop::Scheme)
     }
 
     /// Hand `event` to the document and bring it up to date.

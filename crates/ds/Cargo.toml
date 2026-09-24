@@ -14,6 +14,8 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 futures-timer = { workspace = true }
+# Decoding a status icon's PNG to decide symbolic or image (design/08-ICONS.md section 1.5).
+image = { workspace = true }
 cssparser = { workspace = true, optional = true }
 
 [lints]

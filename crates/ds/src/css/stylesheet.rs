@@ -2,7 +2,8 @@
 
 use super::{
     GRAIN_PNG, RESET, UTILITIES, accents_css::accents_css, emit::property, emit::rule,
-    materials_css::materials_css, motion_css::motion_css, tokens_css::tokens_css,
+    ground_css::ground_css, materials_css::materials_css, motion_css::motion_css,
+    tokens_css::tokens_css,
 };
 use crate::components::CSS;
 use std::sync::LazyLock;
@@ -13,7 +14,7 @@ pub fn stylesheet() -> &'static str {
     SHEET.as_str()
 }
 
-/// Reset, tokens (with the level blocks), accents, materials, keyframes with their aliases and
+/// Reset, tokens (with the level blocks), accents, materials, the frame ground, keyframes with their aliases and
 /// pulse classes, utilities with the grain tile, then every component in its fixed order.
 fn build() -> String {
     let grain = rule(
@@ -23,11 +24,12 @@ fn build() -> String {
             &format!("url(\"{GRAIN_PNG}\")"),
         )],
     );
-    let sections: [(&str, String); 7] = [
+    let sections: [(&str, String); 8] = [
         ("reset", RESET.trim_end().to_owned()),
         ("tokens", tokens_css()),
         ("accents", accents_css()),
         ("materials", materials_css()),
+        ("ground", ground_css()),
         ("motion", motion_css()),
         ("utilities", format!("{}\n{grain}", UTILITIES.trim_end())),
         ("components", components()),

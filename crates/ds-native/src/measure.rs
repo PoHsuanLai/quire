@@ -7,13 +7,26 @@
 //! already borrowed" (wave 2 integration: the hover card's anchor read, 450 ms after the pointer
 //! came to rest). Reading through `NodeHandle::try_doc` turns that into `Measured::Busy`, and
 //! quire's reader waits a frame.
+//!
+//! Any host that runs a Blitz document provides it: `launch` and the harness do, and a host
+//! that is not `ds_native::launch` (shell-host's surfaces, sill's bar and its popups) calls
+//! [`provide`] at the top of its root component (sill FINDINGS Q10).
 
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;
 use ds::{HostMeasure, Measured, Point, Px, Rect, Size};
 
-/// The measurer `Host` and `Headless` provide as root context.
-pub(crate) const MEASURE: HostMeasure = HostMeasure(measure);
+/// The Blitz rect read, as the `ds::HostMeasure` a root provides as context. `launch` and the
+/// harness provide it already; another host provides it with [`provide`] or
+/// `use_context_provider(|| ds_native::measure::MEASURE)`.
+pub const MEASURE: HostMeasure = HostMeasure(measure);
+
+/// Provide [`MEASURE`] to the calling component's subtree. Call it at the top of a root that
+/// `ds_native::launch` did not start (a shell-host surface's component, a popup's document),
+/// before any quire component reads a rect.
+pub fn provide() -> HostMeasure {
+    use_context_provider(|| MEASURE)
+}
 
 /// `element`'s border box, if the document is free and the element is a Blitz node.
 fn measure(element: &MountedData) -> Measured {

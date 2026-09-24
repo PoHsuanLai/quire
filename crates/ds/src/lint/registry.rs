@@ -7,6 +7,7 @@ use std::collections::HashSet;
 use std::sync::LazyLock;
 
 use crate::appearance::{Accent, Scheme};
+use crate::components::StatusMetrics;
 use crate::css::accents_css::swatch_var;
 use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
 use crate::motion::Anim;
@@ -19,7 +20,8 @@ use crate::tokens::{
 /// Every custom property the design system declares, `--` included: the token table's
 /// (colours, label hues, durations, the CSS delays, easings, scalars, radii, spacing steps,
 /// shadows, faces, sizes, layers), the accent swatches, the frame's `--f-*` a root writes inline, and the
-/// material's `--m-*` with the tint-alpha key.
+/// material's `--m-*` with the tint-alpha key, and the bar status item's two properties a
+/// consumer sets from its settings.
 pub fn declared_vars() -> &'static HashSet<String> {
     static VARS: LazyLock<HashSet<String>> = LazyLock::new(collect);
     &VARS
@@ -41,6 +43,7 @@ fn collect() -> HashSet<String> {
         .chain([Family::Display, Family::Ui, Family::Data].map(Family::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
+        .chain([StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])
         .collect();
     let hues = LabelHue::ALL
         .into_iter()

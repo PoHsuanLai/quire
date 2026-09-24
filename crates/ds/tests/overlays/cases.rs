@@ -9,9 +9,9 @@ use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
     BubbleMode, CommandPalette, Dismiss, Elevation, Filter, FlagTone, Glyph, HoverCard,
     HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverStat, HoverTarget, Icon,
-    KeyHint, LinkPill, LinkTarget, Menu, MenuEntry, MenuKind, Peek, PeekMode, PersonHue, Placement,
-    Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill, Sheet, Side, Size, Tile,
-    Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
+    KeyHint, LinkPill, LinkTarget, Menu, MenuEntrance, MenuEntry, MenuKind, Peek, PeekMode,
+    PersonHue, Placement, Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill,
+    Sheet, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
 };
 use std::time::Duration;
 
@@ -62,6 +62,22 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         trail: Trail::None,
         check: None,
     }
+}
+
+/// A bar status menu (bar gaps): two status lines, a rule, one item.
+fn status_lines() -> Vec<MenuEntry<u8>> {
+    vec![
+        MenuEntry::Info {
+            title: "Wired: connected".to_string(),
+            detail: Some("192.168.1.4".to_string()),
+        },
+        MenuEntry::Info {
+            title: "Battery 82%".to_string(),
+            detail: None,
+        },
+        MenuEntry::Separator,
+        item(1, "Network settings…"),
+    ]
 }
 
 /// The snooze menu: a header, three timed items with tiles and trails, a rule, one more.
@@ -409,6 +425,12 @@ pub const CASES: &[Case] = &[
         component: "menu",
         state: "dropdown-disabled-and-submenu",
         make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: nested(), onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "bar-status-lines",
+        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: status_lines(), entrance: MenuEntrance::Instant, onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     // Popover: one per elevation and dismissal.

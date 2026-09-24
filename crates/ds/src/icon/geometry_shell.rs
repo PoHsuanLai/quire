@@ -16,6 +16,7 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::WifiLow => WIFI_LOW,
         Icon::WifiHigh => WIFI_HIGH,
         Icon::WifiOff => WIFI_OFF,
+        Icon::Ethernet => ETHERNET,
         Icon::Battery => BATTERY,
         Icon::BatteryLow => BATTERY_LOW,
         Icon::BatteryMedium => BATTERY_MEDIUM,
@@ -93,6 +94,16 @@ const WIFI_OFF: &[Shape] = &[
     Shape::Path("M2 8.82a15 15 0 0 1 4.177-2.643"),
     Shape::Path("M22 8.82a15 15 0 0 0-11.288-3.764"),
     Shape::Path("m2 2 20 20"),
+];
+
+const ETHERNET: &[Shape] = &[
+    Shape::Path("M10 8v1"),
+    Shape::Path("M14 8v1"),
+    Shape::Path("M18 8v1"),
+    Shape::Path(
+        "M19 17a2 2 0 00-1.765 1.059l-.47.882A2 2 0 0115 20H9a2 2 0 01-1.765-1.059l-.47-.882A2 2 0 005 17H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v9a2 2 0 01-2 2z",
+    ),
+    Shape::Path("M6 8v1"),
 ];
 
 /// Lucide `battery`.

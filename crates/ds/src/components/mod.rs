@@ -64,12 +64,12 @@ pub use hover_card::{
     FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
 };
 pub use hover_strip::{ActionId, HoverStrip, StripAction};
-pub use icon_button::{IconButton, IconButtonVariant};
+pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
-pub use menu::{Menu, MenuKind};
+pub use menu::{Menu, MenuEntrance, MenuKind};
 pub use menu_entry::{MenuEntry, Tile, Trail};
 pub use menu_lines::Filter;
 pub use peek::Peek;

@@ -92,6 +92,9 @@ fn App() -> Element {
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
+| `chrome` | `Option<RootChrome>` | `None`: `RootChrome::of(material)` | `Painted` or `Transparent`: whether the root box paints its material. A Popover, Sheet or Toast root is transparent by default (it hosts floating cards, which paint the material themselves); pass `Painted` for a root that *is* the panel (the launcher) — section 6, "bar gaps" |
+| `ground` | `Option<Ground>` | `None`: `Ground::of(material)` | `Paper` or `Frame`: which inks the content takes; Bar and Dock default to `Frame` |
+| `frame` | `Option<FrameTint>` | `None`: `FrameTint::of(material, chrome)` | `Opaque` (the window's frame), `Tinted` (the Space gradient at the tint alpha: bar, dock, a painted popover, OSD, widget) or `None` (the material's flat tint) |
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 
 You almost never write more than one `Ds` per window: it is the root, not a per-panel wrapper —
@@ -197,6 +200,7 @@ rsx! {
 | `theme` | `Option<Scheme>` | `None` | force a scheme; `None` inherits the enclosing scope's |
 | `accent` | `Option<Accent>` | `None` | force an accent; `None` inherits |
 | `blur` | `Option<BlurState>` | `None` | force the blur state (`Unavailable` paints the solid tint); `None` inherits |
+| `on` | `Option<Ground>` | `None` | the ground its content is drawn on; `None` is the material's (`Frame` for Bar and Dock, paper otherwise), so a paper panel inside a bar root is paper again |
 
 Each `None` inherits, so the common case is the material alone (`crates/ds/tests/surface.rs`
 has a golden per override; FINDINGS "Gallery fixes B").
@@ -517,6 +521,83 @@ And in the tray gaps (FINDINGS "Tray gaps", sill Q6-Q8):
   `expanded: Option<usize>` opens a choice's submenu as the menu mounts (choices count items and
   parents, not headers or rules). A submenu is placed in the same document as its menu, so on a
   shell surface whose popup is sized to the menu, the popup must leave room for it.
+
+And in the bar gaps (FINDINGS "Bar gaps", sill Q9-Q13, G7):
+
+- **A Blitz host that is not `ds_native::launch`** (shell-host's surfaces, a popup's document)
+  calls `ds_native::measure::provide()` at the top of its root component, before any quire
+  component reads a rect; `ds_native::measure::MEASURE` is the same value for
+  `use_context_provider`. Drop your own copy of the twelve-line measurer. Without one, a rect
+  read no longer panics: `ds::use_rect` and every anchor treat a held document as busy and try
+  again next frame (the default panic hook still prints the collision, so provide it).
+
+  ```rust
+  #[component]
+  fn BarRoot() -> Element {
+      ds_native::measure::provide();
+      rsx! { Ds { appearance, material: Material::Bar, look, /* … */ } }
+  }
+  ```
+- **Chrome materials draw the Space.** A `Ds` in `Bar`, `Dock`, `Osd`, `Widget` (and a
+  `Popover` root passed `chrome: Some(RootChrome::Painted)`) draws the Space gradient, its A/B
+  layers and grain as one `.ds-frame` group at the material's tint alpha
+  (`--m-frame-alpha`, scaled by `appearance.material_tint_alpha`) with `data-blur=on`, and at
+  the solid floor .94 without blur; a `look` change cross-fades it over `--t-scene`. Pass the
+  workspace's `SpaceLook` as `look` and paint nothing yourself: delete any tint layer of your
+  own. The root becomes a stacking context (`position:relative`, `z-index:var(--z-raise)`).
+- **Popup roots are transparent.** A `Popover`, `Sheet` or `Toast` root paints no tint and no
+  shadow on its own box (`data-chrome="transparent"`); the `.ds-popover`/`.ds-menu` and
+  `.ds-sheet` cards inside paint the material's tint (`--m-tint` over blur, `--m-tint-solid`
+  without), edge and drop (`--m-box`). A popup document keeps `Material::Popover` and its
+  spare room is alpha 0 (`crates/ds-native/tests/bar_frame.rs` proves it over
+  `Harness::render_over(Backdrop::Clear)`).
+- **The frame ground.** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
+  Some(Ground::Frame) }`) `--ink`, `--ink-soft`, `--ink-faint` are the Space's `--f-ink*`,
+  `--surface` is `--f-pill-hover`, `--surface-2` and `--raise` are `--f-pill`, `--line*` is
+  `--f-line`: `Button`, `IconButton`, `Chip`, `Count`, a menu's trigger and your text all draw in
+  the frame inks with no variant of their own. Overlays opened from it (menus, popovers,
+  tooltips) are paper again.
+- **Status items.** `IconButton { variant: IconButtonVariant::Status, .. }` is a square of
+  `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
+  `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
+  `pressed` or `expanded` is `On`. Write the two properties on any element around your items
+  with `ds::StatusMetrics`, filled from your settings:
+
+  ```rust
+  let metrics = StatusMetrics {
+      box_size: Px(f32::from(bar.status_icon_box_px.0)),
+      glyph: Px(f32::from(match bar.glyph_size_policy {
+          BarGlyphSize::StatusIcon16 => bar.status_glyph_px.0,
+          BarGlyphSize::IconSizeBar22 => bar.status_icon_box_px.0, // the glyph fills the box
+      })),
+  };
+  rsx! { div { class: "status", style: metrics.style_attr(), /* IconButton { Status } … */ } }
+  ```
+  (`style_attr()` is `--bar-status-box:22px;--bar-status-glyph:16px;` at the defaults; custom
+  properties with lengths on your own element pass the markup lint.) An external icon in a
+  status item is sized by the property too, whatever its `ExternalIcon::size`.
+- **Menu control.** `Menu` gained `on_hover: Option<EventHandler<Option<usize>>>` (the choice
+  under the pointer, numbered as `expanded` counts; `None` once it is over none),
+  `on_release: Option<EventHandler<Press>>` (every button released over the menu),
+  `entrance: MenuEntrance::{Animated, Instant}` (a bar menu and a hover switch pass `Instant`)
+  and plays `Anim::MenuOut` (`--t-quick --e-exit`, `data-presence="leaving"`) before `onclose`
+  when Escape or an outside click closes it. A pick calls `onpick`, then `onclose`, once. A
+  release over an enabled item after a press that began outside the menu picks it
+  (press-drag-release); over a disabled item, a header or the padding it closes picking
+  nothing. The owner removing the menu (a hover switch) is immediate, no fade.
+- **Status lines.** `MenuEntry::Info { title, detail: Option<String> }` is a row at an item's
+  weight without the header's eyebrow, never a choice: keys, hover and picks pass it by. Use it
+  for a network's address or a battery's time left, instead of headers.
+- **`Press { button, modifiers, at }`**: `at` is the surface-local point (the event's client
+  point); a keyboard activation reports the origin. `Press` is `PartialEq` only now. Hand
+  `at.x`, `at.y` (converted to screen coordinates if you know the surface's origin) to SNI's
+  `Activate` and `ContextMenu`.
+- **Symbolic or image.** `ds::icon::classify(&png_bytes) -> Result<IconKind, DsError>`
+  (`IconKind::{Symbolic, Image}`) is design/08-ICONS.md §1.5 step 2: symbolic when every pixel
+  with at least half coverage has OKLCH chroma below 0.04; `classify_with(&png,
+  ChromaLimit(n))` takes another threshold in thousandths. Pick `IconSource::Symbolic` or
+  `Image` from it; `NeedsAttention` still recolours through the parent's colour (`--warn`).
+- **New glyph**: `Icon::Ethernet` (Lucide `ethernet-port`) for a wired network.
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

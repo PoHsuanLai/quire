@@ -386,6 +386,19 @@ fn escape_in_a_keyboard_submenu_closes_one_level() {
     // The menu takes the focus back a frame later.
     harness.advance(ms(80));
     harness.key(Key::Escape);
+    // It fades out first (`Anim::MenuOut`, bar gaps), then closes.
+    assert_eq!(
+        harness.attr(".ds-menu", "data-presence").as_deref(),
+        Some("leaving"),
+        "a second Escape starts the menu's exit"
+    );
+    harness.advance(
+        ds::settle(
+            ds::Anim::MenuOut,
+            ds::MotionLevel::Standard,
+            ds::StaggerIndex::default(),
+        ) + ms(40),
+    );
     assert_eq!(
         harness.count(".ds-menu"),
         0,

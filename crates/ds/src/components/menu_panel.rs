@@ -11,6 +11,7 @@ use crate::components::menu_lines::{
 use crate::components::menu_rows::{Drawn, render_lines};
 use crate::components::menu_tracker::{Tracker, Via, target, use_tracker};
 use crate::components::popover::{Stacking, layer_slug, position_style, use_float};
+use crate::components::press::Press;
 use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
 use crate::overlay::menu_track::{MenuTarget, MenuTiming};
 use crate::tokens::ZLayer;
@@ -33,6 +34,10 @@ pub(crate) struct Panel<T: 'static> {
     /// A submenu tells its parent where the pointer is, so the parent's safe triangle and
     /// highlight hold while the pointer is inside the submenu.
     pub onhover: Option<EventHandler<Point>>,
+    /// The root panel reports which choice the pointer is over, `None` once it is over none.
+    pub onitem: Option<EventHandler<Option<usize>>>,
+    /// The root panel hears a button released over a choice (press-drag-release).
+    pub onrelease: Option<EventHandler<(usize, Press)>>,
 }
 
 impl<T: Clone + PartialEq + 'static> Panel<T> {
@@ -55,7 +60,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         let tracker = self.tracker;
         let choices = self.choices.clone();
         let pointed = self.choices.clone();
-        let (onpick, onhover) = (self.onpick, self.onhover);
+        let (onpick, onhover, onitem) = (self.onpick, self.onhover, self.onitem);
         render_lines(
             shown,
             kind.row(),
@@ -79,10 +84,14 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                     if let Some(onhover) = onhover {
                         onhover.call(at);
                     }
+                    if let Some(onitem) = onitem {
+                        onitem.call(Some(index));
+                    }
                 }),
                 onmounted: EventHandler::new(move |(index, event): (usize, MountedEvent)| {
                     tracker.row_mounted(index, MountedRef(event.data()));
                 }),
+                onrelease: self.onrelease,
             },
         )
     }
@@ -93,6 +102,14 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         self.tracker.point(at, MenuTarget::Menu);
         if let Some(onhover) = self.onhover {
             onhover.call(at);
+        }
+        self.left_items();
+    }
+
+    /// The pointer is over no choice of this panel.
+    pub(crate) fn left_items(&self) {
+        if let Some(onitem) = self.onitem {
+            onitem.call(None);
         }
     }
 
@@ -188,6 +205,8 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
         level: Level::Sub,
         onpick,
         onhover: Some(onhover),
+        onitem: None,
+        onrelease: None,
     };
     let want = Placement::new(Side::Right, Align::Start);
     let at = float.origin(Some(anchor), want, SUB_GAP);
