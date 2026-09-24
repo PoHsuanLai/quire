@@ -6,6 +6,7 @@ members = [
   "crates/ds-settings-derive",
   "crates/ds-native",
   "crates/ds-gallery",
+  "tools/icons",
 ]
 
 [workspace.package]
