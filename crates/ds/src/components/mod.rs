@@ -5,6 +5,7 @@ pub mod animated_list;
 pub mod appearance_picker;
 pub mod avatar;
 pub mod button;
+pub mod button_face;
 pub mod chip;
 pub mod command_palette;
 pub mod command_pill;
@@ -64,6 +65,9 @@ pub mod spinner;
 pub mod sync_halo;
 pub mod tabs;
 pub mod text_input;
+pub mod text_input_focus;
+pub mod text_input_kind;
+pub(crate) mod text_input_parts;
 pub mod text_runs;
 pub mod toast;
 pub mod toggle;
@@ -78,6 +82,7 @@ pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
 pub use button::{Button, ButtonVariant};
+pub use button_face::{ButtonFace, FaceMark, Trailing};
 pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;
@@ -119,11 +124,13 @@ pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
-pub use space_editor::{ActiveDot, DotIndex, MeasuredIn, MotionChoice, SpaceDot, SpaceEditor};
+pub use space_editor::{
+    ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
+};
 pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
-pub use text_input::{Focus, InputVariant, TextInput, TextInputKind};
+pub use text_input::{FieldFace, Focus, Grow, InputVariant, Rows, TextInput, TextInputKind};
 pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;

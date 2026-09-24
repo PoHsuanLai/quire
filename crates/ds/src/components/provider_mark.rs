@@ -1,6 +1,9 @@
 //! ProviderMark: a letter in the provider's colour on a white chip, never the provider's logo,
-//! or the favicon the app supplies (design/04-COMPONENTS.md section 28).
+//! or the favicon the app supplies (design/04-COMPONENTS.md section 28). A local-folders
+//! account, which has no provider, shows a neutral folder instead of a letter.
 
+use crate::icon::Icon;
+use crate::icon::render::{Glyph, IconPx, IconSize};
 use dioxus::prelude::*;
 
 /// A mail provider.
@@ -18,6 +21,9 @@ pub enum Provider {
     Yahoo,
     /// `@` #5D6660.
     Imap,
+    /// No provider: mail kept in local folders (mailo gaps 4). Not a brand, so no letter: a
+    /// folder glyph in the neutral IMAP grey, and no favicon even under `MarkStyle::Image`.
+    Local,
 }
 
 /// Where a mark sits.
@@ -53,7 +59,7 @@ impl Provider {
             Provider::Fastmail => 'F',
             Provider::ICloud => 'i',
             Provider::Yahoo => 'Y',
-            Provider::Imap => '@',
+            Provider::Imap | Provider::Local => '@',
         }
     }
 
@@ -66,7 +72,7 @@ impl Provider {
             Provider::Fastmail => "#2A5DB0",
             Provider::ICloud => "#3A82F7",
             Provider::Yahoo => "#6001D2",
-            Provider::Imap => "#5D6660",
+            Provider::Imap | Provider::Local => "#5D6660",
         }
     }
 
@@ -79,6 +85,7 @@ impl Provider {
             Provider::ICloud => "iCloud",
             Provider::Yahoo => "Yahoo",
             Provider::Imap => "IMAP",
+            Provider::Local => "Local folders",
         }
     }
 }
@@ -92,11 +99,40 @@ impl MarkSize {
             MarkSize::Inline => "inline",
         }
     }
+
+    /// The folder glyph inside a local mark: the chip less its padding (14, 11, 13 → 10, 8, 9).
+    fn glyph(self) -> IconSize {
+        match self {
+            MarkSize::Tile => IconSize::Px(IconPx(10)),
+            MarkSize::Row => IconSize::Px(IconPx(8)),
+            MarkSize::Inline => IconSize::Px(IconPx(9)),
+        }
+    }
+}
+
+/// A local account's mark: the folder in the neutral grey, whatever `style` asks for, since
+/// there is no provider whose favicon an app could hold.
+fn local_mark(size: MarkSize) -> Element {
+    let colour = Provider::Local.colour();
+    let title = Provider::Local.name();
+    rsx! {
+        span {
+            class: "ds-provider",
+            "data-size": size.slug(),
+            "data-kind": "local",
+            style: "--pc:{colour}",
+            title: "{title}",
+            Glyph { icon: Icon::Folder, size: size.glyph() }
+        }
+    }
 }
 
 /// A provider mark. Static: no hover, focus or motion.
 #[component]
 pub fn ProviderMark(provider: Provider, size: MarkSize, style: MarkStyle) -> Element {
+    if provider == Provider::Local {
+        return local_mark(size);
+    }
     let title = provider.name();
     match style {
         MarkStyle::Letter => {

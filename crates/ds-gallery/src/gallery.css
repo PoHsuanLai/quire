@@ -49,6 +49,8 @@
 .g-stage-tall{min-height:200px}
 .g-stage-pad{padding:var(--s-14)}
 .g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--line-soft);padding:var(--s-4) 0}
+/* A title a bare field edits in place (mailo gaps 4). */
+.g-bare-title{display:flex;font-size:var(--fs-title);color:var(--ink)}
 .g-side{display:flex;flex-direction:column;gap:var(--s-2);width:232px;padding:var(--s-10);border-radius:var(--r-panel);background:var(--f-solid);color:var(--f-ink)}
 
 /* Materials: a wallpaper under each chrome panel. The image is a generated PNG (wallpaper.rs). */
