@@ -1329,6 +1329,27 @@ Branch `icon-round2`; write-up `docs/icons-bakeoff.md` "Round three"; rules 08-I
 - **The emboss is noise below 48 px.** The procedural renderer drops it at 16 and 32 and
   strengthens recessed fills so the details survive.
 
+## Icon round four: dialects (2026-09-25)
+
+Branch `icon-round4`; write-up `docs/icons-bakeoff.md` "Round four"; rules 08-ICONS 2.10; keys
+`icons.style` and `icons.monochrome_tint` in design/22 3.3.
+
+- **A chroma cap of 0.07 in OKLCh is enough to make a mixed set read as one palette.** Round
+  three ran to 0.15-0.20; at 0.07 the procedural plates and the retinted Klein clay sit in the
+  same family of tones.
+- **A model's face can be brought into a dialect without re-rendering.** Fitting a lightness
+  plane to the border as the ground and keeping only the relief above it keeps Klein's emboss and
+  drops its colour and its uneven gradient; the gain has to be adaptive (a percentile of the
+  relief mapped to the symbol lightness), since each render's symbol sits a different amount
+  above its ground.
+- **Retinting amplifies ground mottling.** Where the model's ground is blotchy (Klein files s22)
+  the gain that lifts a pale symbol lifts the blotches too; a small dead zone helps, a cleaner
+  render helps more.
+- **The Space tint comes free from `ds`.** The accent `ds::space::derive` returns for a Space is
+  already at a muted chroma (0.045 + 0.035 x dot chroma), so its hue and chroma drop straight into
+  the Monochrome dialect and match the frame.
+- **A paper plate nearly vanishes at 16 px on a light ground**; the ink symbol has to carry it.
+
 ## macOS polish (2026-09-24)
 
 The user compared the shell with macOS and found it flat; the brief was to add the layers macOS

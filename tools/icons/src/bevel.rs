@@ -4,15 +4,14 @@
 
 use image::{Rgba, Rgba32FImage};
 
-use crate::{Ground, Plane, PlateGrid, Template, compose::over, oklab, plate::superellipse, srgb};
+use crate::{Oklab, Plane, PlateGrid, Shift, Template, compose::over, plate::superellipse, srgb};
 
-/// The face's matte diffusion: the top of the plate is this much lighter than the middle and the
-/// bottom this much darker (a gentle light from above, never a hot spot).
-const DIFFUSION: f32 = 0.05;
-/// The ground is soft: its hues keep this share of their Candy chroma and are lifted this much
-/// in lightness, so a two-hue face reads as matte colour, not as a saturated sticker.
-const GROUND_CHROMA: f32 = 0.78;
-const GROUND_LIFT: f32 = 0.03;
+/// The face's matte diffusion: the top of the plate is this much lighter (OKLab L) than the
+/// middle and the bottom this much darker (a gentle light from above, never a hot spot).
+const DIFFUSION: f32 = 0.03;
+/// The only gradient left (08 2.10): an almost invisible tonal shift within the plate's one hue,
+/// this much lighter at the top-left corner and as much darker at the bottom-right.
+const TONAL_SHIFT: f32 = 0.012;
 /// Bevel highlight and shade, and the specular point (alphas, proposed).
 const ARC_ALPHA: f32 = 0.55;
 const SHADE_ALPHA: f32 = 0.14;
@@ -28,38 +27,26 @@ pub enum Bevel {
     Theirs,
 }
 
-/// OKLCh mix of two colours along the shorter hue arc, so two distant hues meet through a
-/// saturated middle (violet to amber passes through rose, not through grey).
-fn mix_lch(p: crate::Oklab, q: crate::Oklab, t: f32) -> crate::Oklab {
-    let (cp, cq) = (p.a.hypot(p.b), q.a.hypot(q.b));
-    let (hp, hq) = (p.b.atan2(p.a), q.b.atan2(q.a));
-    let tau = std::f32::consts::TAU;
-    let dh = (hq - hp + tau * 1.5).rem_euclid(tau) - tau / 2.0;
-    let (c, h) = (cp + (cq - cp) * t, hp + dh * t);
-    crate::Oklab {
-        l: p.l + (q.l - p.l) * t,
-        a: c * h.cos(),
-        b: c * h.sin(),
-    }
-}
-
-/// The two-hue ground over the whole canvas, 135deg across the plate, mixed in OKLCh, with the
-/// matte diffusion applied. Opaque; [`finish`] masks it.
-pub fn ground_face(grid: PlateGrid, ground: Ground) -> Rgba32FImage {
-    let (a, b) = (oklab(ground.start.0.unit()), oklab(ground.end.0.unit()));
+/// The plate's face over the whole canvas: one colour, the tonal shift across the plate at
+/// 135deg and the matte diffusion from above. Opaque; [`finish`] masks it.
+pub fn plate_face(grid: PlateGrid, colour: Oklab, shift: Shift) -> Rgba32FImage {
     let side = grid.side as f32;
+    let tonal = match shift {
+        Shift::Tonal => TONAL_SHIFT,
+        Shift::Flat => 0.0,
+    };
     Rgba32FImage::from_fn(grid.canvas, grid.canvas, |x, y| {
         let (u, v) = (
             x as f32 + 0.5 - grid.origin as f32,
             y as f32 + 0.5 - grid.origin as f32,
         );
         let t = ((u + v) / (2.0 * side)).clamp(0.0, 1.0);
-        let mut c = mix_lch(a, b, t);
-        c.l += GROUND_LIFT + DIFFUSION * (1.0 - 2.0 * (v / side).clamp(0.0, 1.0));
-        c.a *= GROUND_CHROMA;
-        c.b *= GROUND_CHROMA;
-        let [r, g, bl] = srgb(c);
-        Rgba([r, g, bl, 1.0])
+        let lift = tonal * (1.0 - 2.0 * t) + DIFFUSION * (1.0 - 2.0 * (v / side).clamp(0.0, 1.0));
+        let [r, g, b] = srgb(Oklab {
+            l: colour.l + lift,
+            ..colour
+        });
+        Rgba([r, g, b, 1.0])
     })
 }
 
@@ -136,62 +123,60 @@ pub fn finish(grid: PlateGrid, face: &Rgba32FImage, t: &Template, bevel: Bevel) 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Colour, Srgb8};
+    use crate::oklab;
 
-    fn ground() -> Ground {
-        Ground {
-            start: Colour(Srgb8::hex(0x8B5CF0)),
-            end: Colour(Srgb8::hex(0xF0A81E)),
-        }
+    const SLATE: Oklab = Oklab {
+        l: 0.62,
+        a: -0.015,
+        b: -0.05,
+    };
+
+    fn l_at(img: &Rgba32FImage, x: u32, y: u32) -> f32 {
+        oklab([0, 1, 2].map(|i| img.get_pixel(x, y).0[i])).l
     }
 
     #[test]
-    fn face_runs_start_to_end_and_is_lighter_on_top() {
+    fn face_is_one_colour_with_an_almost_invisible_shift() {
         let g = PlateGrid::for_canvas(256, &Template::default());
-        let face = ground_face(g, ground());
-        let tl = face.get_pixel(g.origin + 2, g.origin + 2).0;
-        let br = face
-            .get_pixel(g.origin + g.side - 3, g.origin + g.side - 3)
-            .0;
-        assert!(tl[2] > tl[1], "violet at the top-left: {tl:?}");
-        assert!(
-            br[0] > br[2] && br[1] > br[2],
-            "amber at the bottom-right: {br:?}"
+        let face = plate_face(g, SLATE, Shift::Tonal);
+        let (tl, br) = (
+            l_at(&face, g.origin + 2, g.origin + 2),
+            l_at(&face, g.origin + g.side - 3, g.origin + g.side - 3),
         );
-        let mid = |x: u32, y: u32| oklab([0, 1, 2].map(|i| face.get_pixel(x, y).0[i])).l;
-        // Along one anti-diagonal the hue mix is constant, so only the diffusion differs.
-        let (x0, y0) = (g.origin + g.side * 3 / 4, g.origin + g.side / 4);
-        let (x1, y1) = (g.origin + g.side / 4, g.origin + g.side * 3 / 4);
+        assert!(tl > br, "lighter top-left");
         assert!(
-            mid(x0, y0) > mid(x1, y1),
-            "top lighter than bottom on the same mix"
+            tl - br < 2.0 * (TONAL_SHIFT + DIFFUSION) + 0.01,
+            "but only a shift: {tl} {br}"
         );
+        let mid = face.get_pixel(128, 128).0;
+        let hue = |p: [f32; 4]| {
+            let o = oklab([p[0], p[1], p[2]]);
+            o.b.atan2(o.a)
+        };
+        assert!((hue(mid) - hue(face.get_pixel(g.origin + 2, g.origin + 2).0)).abs() < 0.05);
     }
 
     #[test]
     fn finish_lights_the_top_edge_and_shades_the_bottom() {
         let t = Template::default();
         let g = PlateGrid::for_canvas(512, &t);
-        let face = ground_face(g, ground());
+        let face = plate_face(g, SLATE, Shift::Tonal);
         let flat = finish(g, &face, &t, Bevel::Ours);
-        let at = |x: u32, y: u32| oklab([0, 1, 2].map(|i| flat.get_pixel(x, y).0[i])).l;
-        let face_l = |x: u32, y: u32| oklab([0, 1, 2].map(|i| face.get_pixel(x, y).0[i])).l;
         let cx = g.origin + g.side / 2;
         assert!(
-            at(cx, g.origin + 2) > face_l(cx, g.origin + 2) + 0.02,
-            "arc on top"
+            l_at(&flat, cx, g.origin + 2) > l_at(&face, cx, g.origin + 2) + 0.02,
+            "arc"
         );
         let bottom = g.origin + g.side - 3;
         assert!(
-            at(cx, bottom) < face_l(cx, bottom) - 0.01,
-            "shade at the bottom"
+            l_at(&flat, cx, bottom) < l_at(&face, cx, bottom) - 0.01,
+            "shade"
         );
         assert_eq!(flat.get_pixel(0, 0).0[3], 0.0, "outside the squircle");
         let theirs = finish(g, &face, &t, Bevel::Theirs);
-        let l = oklab([0, 1, 2].map(|i| theirs.get_pixel(cx, g.origin + 2).0[i])).l;
         assert!(
-            l <= face_l(cx, g.origin + 2),
-            "no arc when the tile brings its own"
+            l_at(&theirs, cx, g.origin + 2) <= l_at(&face, cx, g.origin + 2),
+            "no arc"
         );
     }
 }
