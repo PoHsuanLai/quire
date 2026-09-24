@@ -1,11 +1,38 @@
 {
- "updated": "2026-09-25, quire v0.1.4 (pixel snapping); icon round four sheets up for the dialect pick",
+ "updated": "2026-09-25, icon round five colourways up for the pick; mailo wave 2 merged, wave 3 running",
  "entries": [
+  {
+   "id": "icons-round5",
+   "date": "2026-09-25 · icon round five",
+   "title": "Round five: eight muted colourways per app, and how far the colour can be pushed",
+   "status": "running",
+   "lede": "The user asked for more colours. The palette grew to eight hues 45 degrees apart (clay, ochre, sage, jade, teal, slate, plum, rose), still capped at the round-four chroma, and each app is shown in its recommended dialect across all eight. A second sheet shows three hues at three chroma levels so the saturation ceiling can be judged; a third is the swatch board with every colour's OKLCh values printed, so a pick can be named. No model ran: the mail and photos rows are the round-three Klein picks re-tinted.",
+   "notes": [
+    "Legibility: every hue at every level scores 3.0 to 4.1 against the dock pill on both Space frames in light and dark; the plate's mid lightness does that work, so hue never decides it.",
+    "Space frames: on Work (hue 268) slate and its neighbours teal and plum sit well, ochre and clay clash mildly; on Home (152) sage and jade sit well, plum and rose clash. At the lowest chroma the clash is faint because the frames are nearly grey; at the highest they vibrate.",
+    "Bolder levels: at chroma 0.15 ochre, jade and teal leave sRGB and the candy look returns; 0.11 keeps every hue in gamut and is the step to take if the set should be louder.",
+    "Recommendation, one hue per app: mail slate, files ochre, terminal jade (monochrome), notes a clay spot, photos rose. Five apps, five parts of the wheel."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round5-colourways.png",
+     "caption": "each app in its dialect across the eight hues at chroma 0.07; 512 with the 16/32/48 strip on light and dark"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round5-bolder.png",
+     "caption": "clay, sage and slate at chroma 0.07, 0.11 and 0.15"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round5-palette.png",
+     "caption": "the eight hues at three chroma levels on light and dark, each labelled with L, C, H and hex; CLIP marks colours outside sRGB"
+    }
+   ]
+  },
   {
    "id": "icons-round4",
    "date": "2026-09-25 · icon round four",
    "title": "Round four: one muted palette, no gradients, four dialects to mix across the set",
-   "status": "running",
+   "status": "proven",
    "lede": "The direction after round three: fewer gradients, less vibrant colour, and not every icon from the same recipe. Every icon keeps one skeleton (the squircle, the same light, a thin top bevel arc, bottom shade, drop shadow, emboss depth and grain) and one OKLCh palette capped at chroma 0.07 with six named hues (slate, teal, sage, ochre, clay, plum); plates are one colour with at most a faint tonal shift. Four dialects: Monochrome tone-on-tone (plate and symbol share a hue and differ in lightness), Graphite (near-black plate, light symbol), Paper (quire's paper plate, ink symbol, one spot of colour at most), and Solid (one flat muted colour, white symbol). Mail, files and photos also get their round-three Klein pick re-tinted into Monochrome, keeping Klein's emboss. A second sheet shows the whole set in Monochrome tinted by a Space, and two settings keys (icons.style: Colour, Muted, Monochrome; icons.monochrome_tint: Space, Accent, Neutral) are registered for it. No model ran this round.",
    "notes": [
     "Recommendation (three dialects across five apps): mail = Monochrome slate, Klein variant; files = Solid ochre, procedural (the Klein files is blotchy); terminal = Graphite; notes = Paper with the ochre spot on the fold; photos = Monochrome clay, Klein variant.",
