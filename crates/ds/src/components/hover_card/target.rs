@@ -7,11 +7,10 @@
 //! as. A wrapper with no box of its own (`display:contents`) is not offered: the card is placed
 //! against the target's measured rect, and such an element has none.
 
-use super::{Anchors, kind_slug, use_anchors};
+use super::intent::{HoverAnchor, HoverDriver, use_hover_intent};
+use super::kind_slug;
 use crate::geometry::MountedRef;
-use crate::motion::hover_intent::HoverEvent;
-use crate::overlay::hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub};
-use crate::overlay::stack::LayerStack;
+use crate::overlay::hover_hub::{HoverKey, HoverKind};
 use dioxus::prelude::*;
 
 /// The element a hover target is drawn as.
@@ -29,9 +28,7 @@ pub enum TargetElement {
 /// One target's handlers, shared by whichever element draws it.
 #[derive(Clone)]
 struct Hooks {
-    hub: HoverHub,
-    anchors: Anchors,
-    stack: Option<Signal<LayerStack>>,
+    driver: HoverDriver,
     element: Signal<Option<MountedRef>>,
     key: HoverKey,
     kind: HoverKind,
@@ -48,26 +45,22 @@ impl Hooks {
     /// the pointer and stops it.
     fn over(&self, event: MouseEvent) {
         event.stop_propagation();
-        // No card while a peek, the palette or a menu is open (`S:1790`).
-        if self.stack.is_some_and(|stack| stack.peek().top().is_some()) {
-            self.hub.feed(HoverEvent::OverSuppressed);
-            return;
-        }
-        if let Some(mounted) = self.element.peek().clone() {
-            self.anchors.record(self.key.clone(), mounted);
-        }
-        self.hub
-            .feed(HoverEvent::Over((self.key.clone(), self.kind)));
+        let anchor = self
+            .element
+            .peek()
+            .clone()
+            .map_or(HoverAnchor::Unplaced, HoverAnchor::Element);
+        self.driver.over(self.key.clone(), self.kind, anchor);
     }
 
     /// The pointer left the target.
     fn out(&self) {
-        self.hub.feed(HoverEvent::Out);
+        self.driver.out();
     }
 
     /// A click removes the card at once, not warm (`S:1809`).
     fn down(&self) {
-        self.hub.feed(HoverEvent::ClickInList);
+        self.driver.press();
     }
 }
 
@@ -83,9 +76,7 @@ pub fn HoverTarget(
     children: Element,
 ) -> Element {
     let hooks = Hooks {
-        hub: use_hover_hub(),
-        anchors: use_anchors(),
-        stack: try_use_context::<Signal<LayerStack>>(),
+        driver: use_hover_intent(),
         element: use_signal(|| None::<MountedRef>),
         key: hover_key.clone(),
         kind,

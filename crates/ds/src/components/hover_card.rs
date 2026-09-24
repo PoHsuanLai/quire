@@ -8,12 +8,15 @@
 //! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving. Its content
 //! is a list of [`HoverCardPart`]s (the section's blocks as data), then any children.
 
+mod intent;
 mod parts;
 mod target;
 
+pub use intent::{HoverAnchor, HoverDriver, use_hover_intent};
 pub use parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint};
 pub use target::{HoverTarget, TargetElement};
 
+use crate::components::flow::Flow;
 use crate::components::popover::{Float, Stacking, position_style, use_entrance, use_float};
 use crate::geometry::measure::client_rect;
 use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
@@ -47,6 +50,23 @@ impl Anchors {
     /// The target `key`'s last rect.
     pub(crate) fn of(&self, key: &HoverKey) -> Option<Rect> {
         self.0.read().get(key).copied()
+    }
+
+    /// File `anchor` under `key`: a rect at once, an element once measured, and nothing (the
+    /// key's old rect dropped) for an unplaced anchor.
+    pub(crate) fn file(self, key: HoverKey, anchor: HoverAnchor) {
+        let mut book = self.0;
+        match anchor {
+            HoverAnchor::Rect(rect) => {
+                book.with_mut(|book| book.insert(key, rect));
+            }
+            HoverAnchor::Element(element) => self.record(key, element),
+            HoverAnchor::Unplaced => {
+                if book.peek().contains_key(&key) {
+                    book.with_mut(|book| book.remove(&key));
+                }
+            }
+        }
     }
 
     /// Read `element`'s rect after layout and file it under `key`.
@@ -128,36 +148,50 @@ pub(crate) fn use_card(kind: HoverKind) -> (Float, String, &'static str) {
 
 /// The card, rendered by the consumer for the hub's open key: `parts` in order, then
 /// `children` for anything the parts do not draw.
+///
+/// `flow` is where it is drawn: [`Flow::Floating`] (the default) in the overlay, placed against
+/// its key's anchor; [`Flow::Inline`] where the caller renders it, static in the caller's
+/// container, with the same markup, entrance and card hooks (mailo gaps 4: a card whose key has
+/// no layout to place against, in a test or a server render, is asserted where it stands).
 #[component]
 pub fn HoverCard(
     kind: HoverKind,
     #[props(default)] parts: Vec<HoverCardPart>,
+    #[props(default)] flow: Flow,
     children: Element,
 ) -> Element {
     let hub = use_hover_hub();
     let (float, style, presence) = use_card(kind);
     let probe = float.surface();
-    float.show(
-        rsx! {
-            div {
-                class: "ds-popover ds-hovercard",
-                "data-elevation": "pop",
-                "data-layer": "card",
-                "data-kind": kind_slug(kind),
-                "data-presence": presence,
-                style,
-                onmounted: move |event| probe.on_mounted(event),
-                onmouseenter: move |_| hub.feed(HoverEvent::EnterCard),
-                onmouseleave: move |_| hub.feed(HoverEvent::LeaveCard),
-                for block in parts {
-                    {parts::part(block)}
-                }
-                {children}
+    let style = match flow {
+        Flow::Floating => Some(style),
+        Flow::Inline => None,
+    };
+    let card = rsx! {
+        div {
+            class: "ds-popover ds-hovercard",
+            "data-elevation": "pop",
+            "data-layer": "card",
+            "data-kind": kind_slug(kind),
+            "data-flow": flow.attr(),
+            "data-presence": presence,
+            style,
+            onmounted: move |event| probe.on_mounted(event),
+            onmouseenter: move |_| hub.feed(HoverEvent::EnterCard),
+            onmouseleave: move |_| hub.feed(HoverEvent::LeaveCard),
+            for block in parts {
+                {parts::part(block)}
             }
-        },
-        EventHandler::new(|()| {}),
-    );
-    rsx! {}
+            {children}
+        }
+    };
+    match flow {
+        Flow::Floating => {
+            float.show(card, EventHandler::new(|()| {}));
+            rsx! {}
+        }
+        Flow::Inline => card,
+    }
 }
 
 #[cfg(test)]

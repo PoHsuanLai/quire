@@ -17,6 +17,7 @@ pub mod motion_lab;
 pub mod outbox;
 pub mod overlays;
 pub mod overlays_mailo;
+pub mod overlays_mailo4;
 pub mod pills;
 pub mod polish;
 pub mod scheduled;
