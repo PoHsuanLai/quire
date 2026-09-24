@@ -3,8 +3,10 @@
 
 pub mod measure;
 pub mod placement;
+pub mod scale;
 pub mod units;
 
 pub use measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect};
 pub use placement::{Align, Flip, Placed, Placement, PopoverRequest, Side, place};
+pub use scale::{Grid, Scale};
 pub use units::{Point, Px, Rect, Size};

@@ -180,18 +180,18 @@ pub(crate) fn layers(material: Material, scheme: Scheme) -> Layers {
         alpha: LayerAlpha::Fixed(Alpha(alpha)),
     };
     let card = |ambient: Layer, edge: Layer| Layers {
-        hairline: Some(outer("0 0 0 .5px")),
+        hairline: Some(outer("0 0 0 var(--hairline)")),
         contact: Some(shadow("0 1px 2px", BLACK, if light { 100 } else { 300 })),
         ambient: Some(ambient),
         edge: vec![edge],
         highlight: Some(Layer {
             side: Side::Inner,
-            geometry: "0 1px 0",
+            geometry: "0 var(--hair) 0",
             colour: WHITE,
             alpha: LayerAlpha::Input(highlight_input, Alpha(highlight_alpha)),
         }),
     };
-    let hairline_edge = inset("0 0 0 .5px", inner, inner_alpha);
+    let hairline_edge = inset("0 0 0 var(--hairline)", inner, inner_alpha);
     let pop = |light_alpha, dark_alpha| {
         shadow(
             "0 12px 40px -12px",
@@ -208,15 +208,15 @@ pub(crate) fn layers(material: Material, scheme: Scheme) -> Layers {
             highlight: None,
         },
         Material::Bar => Layers {
-            hairline: Some(outer("0 .5px 0")),
+            hairline: Some(outer("0 var(--hairline) 0")),
             contact: None,
             ambient: None,
-            edge: vec![inset("0 -.5px 0", inner, inner_alpha)],
+            edge: vec![inset("0 calc(-1 * var(--hairline)) 0", inner, inner_alpha)],
             highlight: None,
         },
         Material::Dock => card(
             shadow("0 10px 30px -10px", BLACK, if light { 350 } else { 500 }),
-            inset("0 0 0 .5px", WHITE, 550),
+            inset("0 0 0 var(--hairline)", WHITE, 550),
         ),
         Material::Popover | Material::Toast | Material::Osd => card(pop(280, 550), hairline_edge),
         Material::Sheet => card(
@@ -316,12 +316,21 @@ mod tests {
     fn every_card_stacks_hairline_highlight_edge_and_two_shadows() {
         let light = recipe(Material::Popover, Scheme::Light, DEFAULT_TINT_ALPHA);
         let dark = recipe(Material::Popover, Scheme::Dark, DEFAULT_TINT_ALPHA);
-        assert_eq!(light.edge, "inset 0 0 0 .5px rgba(0,0,0,.08)");
-        assert_eq!(dark.edge, "inset 0 0 0 .5px rgba(255,255,255,.09)");
-        assert_eq!(light.highlight, "inset 0 1px 0 rgba(255,255,255,.3)");
-        assert_eq!(dark.highlight, "inset 0 1px 0 rgba(255,255,255,.12)");
-        assert_eq!(light.hairline, "0 0 0 .5px rgba(0,0,0,.14)");
-        assert_eq!(dark.hairline, "0 0 0 .5px rgba(0,0,0,.6)");
+        assert_eq!(light.edge, "inset 0 0 0 var(--hairline) rgba(0,0,0,.08)");
+        assert_eq!(
+            dark.edge,
+            "inset 0 0 0 var(--hairline) rgba(255,255,255,.09)"
+        );
+        assert_eq!(
+            light.highlight,
+            "inset 0 var(--hair) 0 rgba(255,255,255,.3)"
+        );
+        assert_eq!(
+            dark.highlight,
+            "inset 0 var(--hair) 0 rgba(255,255,255,.12)"
+        );
+        assert_eq!(light.hairline, "0 0 0 var(--hairline) rgba(0,0,0,.14)");
+        assert_eq!(dark.hairline, "0 0 0 var(--hairline) rgba(0,0,0,.6)");
         assert_eq!(light.shadow_contact, "0 1px 2px rgba(0,0,0,.1)");
         assert_eq!(light.shadow, "0 12px 40px -12px rgba(0,0,0,.28)");
         for material in [
@@ -345,8 +354,11 @@ mod tests {
             }
         }
         let bar = recipe(Material::Bar, Scheme::Light, DEFAULT_TINT_ALPHA);
-        assert_eq!(bar.edge, "inset 0 -.5px 0 rgba(0,0,0,.08)");
-        assert_eq!(bar.hairline, "0 .5px 0 rgba(0,0,0,.14)");
+        assert_eq!(
+            bar.edge,
+            "inset 0 calc(-1 * var(--hairline)) 0 rgba(0,0,0,.08)"
+        );
+        assert_eq!(bar.hairline, "0 var(--hairline) 0 rgba(0,0,0,.14)");
         assert_eq!(
             (bar.shadow.as_str(), bar.highlight.as_str()),
             ("none", "none")

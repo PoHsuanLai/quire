@@ -4,7 +4,7 @@
    The pressed fill jumps between segments; there is no sliding thumb.
    TODO(O-1): disabled is not specified. */
 
-.ds-segmented{ display:inline-flex; gap:var(--s-2); border:1px solid var(--line); border-radius:var(--r-pill); }
+.ds-segmented{ display:inline-flex; gap:var(--s-2); border:var(--hair) solid var(--line); border-radius:var(--r-pill); }
 .ds-segmented[*|data-size=regular]{ padding:var(--s-3); background:var(--surface-2); }
 .ds-segmented[*|data-size=small]{ padding:var(--s-2); background:var(--surface); }
 

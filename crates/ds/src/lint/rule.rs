@@ -30,6 +30,10 @@ pub enum Rule {
     /// A literal `px` in a `margin`, `padding` or `gap`: steps are `--s-*` (design/01-LAYOUT.md
     /// section 2).
     RawSpacing,
+    /// A literal hairline (`1px`, `.5px`) as a border or outline width, or as a box's whole
+    /// `width`/`height`: at a fractional scale it blurs across two device pixels. Lines are
+    /// `var(--hair)` and `var(--hairline)` (design/01-LAYOUT.md section 2.1).
+    RawHairline,
     /// A `:root` selector.
     RootSelector,
     /// A selector that styles quire's own `.ds-*` classes or `[data-theme|accent|motion|material]`.
@@ -60,7 +64,7 @@ pub enum Rule {
 
 impl Rule {
     /// Every rule, in declaration order.
-    pub const ALL: [Rule; 23] = [
+    pub const ALL: [Rule; 24] = [
         Rule::HexColour,
         Rule::ColourFunction,
         Rule::NamedColour,
@@ -74,6 +78,7 @@ impl Rule {
         Rule::RawRadius,
         Rule::RawZIndex,
         Rule::RawSpacing,
+        Rule::RawHairline,
         Rule::RootSelector,
         Rule::DsInternals,
         Rule::UndeclaredVar,
@@ -91,7 +96,7 @@ impl Rule {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Profile {
     /// Every rule except the raw-geometry ones (`RawFontSize`, `RawRadius`, `RawZIndex`,
-    /// `RawSpacing`).
+    /// `RawSpacing`, `RawHairline`).
     #[default]
     Standard,
     /// Every rule.

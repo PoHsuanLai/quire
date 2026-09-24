@@ -17,14 +17,14 @@
 .ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=boxed]{
   height:calc(1.55em + 16px);
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:var(--s-7) var(--s-10);
+  background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--r-field); padding:var(--s-7) var(--s-10);
   transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
-.ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+.ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent); box-shadow:0 0 0 var(--ring) var(--accent-soft); }
 .ds-input[*|data-variant=inline]{
   height:calc(1.55em + 8px);
-  border:1px solid transparent; background:transparent; padding:var(--s-3) var(--s-2); box-shadow:none;
+  border:var(--hair) solid transparent; background:transparent; padding:var(--s-3) var(--s-2); box-shadow:none;
 }
 .ds-input[*|data-variant=inline]:focus{ border-color:transparent; box-shadow:none; }
 /* The global keyboard ring must not double the field's own focus (or the Inline container's). */
