@@ -5,9 +5,13 @@ use super::look::SpaceLook;
 use super::palette::Dot;
 use crate::appearance::Theme;
 
-/// One preset: its dots, and the grain it ships with when the prototype names one.
+/// One preset: its name, its dots, and the grain it ships with when the prototype names one.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Preset {
+    /// What the editor calls it, its presets' accessible names: mailo's names, in
+    /// design/21-SPACES.md section 4's order. (S's sample Spaces Work and Home are Spaces made
+    /// from the first two, not the presets' names.)
+    pub name: &'static str,
     /// One to three dots.
     pub dots: &'static [Dot],
     /// The grain the prototype gives it (Work 35, Home 55), or `None` for the settings default
@@ -23,34 +27,42 @@ const fn dot(hue: f32, chroma: f32) -> Dot {
 /// Home (settled, `S:1118-1119`).
 pub const PRESETS: [Preset; 8] = [
     Preset {
+        name: "Dusk",
         dots: &[dot(268.0, 0.72), dot(318.0, 0.55)],
         grain: Some(35),
     },
     Preset {
+        name: "Orchard",
         dots: &[dot(152.0, 0.62), dot(62.0, 0.55), dot(28.0, 0.5)],
         grain: Some(55),
     },
     Preset {
+        name: "Harbour",
         dots: &[dot(220.0, 0.7)],
         grain: None,
     },
     Preset {
+        name: "Ember",
         dots: &[dot(20.0, 0.66), dot(55.0, 0.6)],
         grain: None,
     },
     Preset {
+        name: "Lagoon",
         dots: &[dot(190.0, 0.6), dot(240.0, 0.55)],
         grain: None,
     },
     Preset {
+        name: "Heather",
         dots: &[dot(340.0, 0.6), dot(290.0, 0.5)],
         grain: None,
     },
     Preset {
+        name: "Moss",
         dots: &[dot(95.0, 0.5)],
         grain: None,
     },
     Preset {
+        name: "Stone",
         dots: &[dot(250.0, 0.06)],
         grain: None,
     },
@@ -78,6 +90,17 @@ mod tests {
     use super::{PRESETS, default_look};
     use crate::appearance::Theme;
     use crate::space::look::{CardAccent, Grain};
+
+    #[test]
+    fn the_presets_are_named_in_the_design_order() {
+        let names: Vec<&str> = PRESETS.iter().map(|preset| preset.name).collect();
+        assert_eq!(
+            names,
+            [
+                "Dusk", "Orchard", "Harbour", "Ember", "Lagoon", "Heather", "Moss", "Stone"
+            ]
+        );
+    }
 
     #[test]
     fn a_workspace_takes_its_preset_by_index() {

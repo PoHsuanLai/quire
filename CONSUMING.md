@@ -903,6 +903,11 @@ says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the wh
 | `SendPill` | `refusal` | `Option<String>` (`None`) | a second, lighter line under the text: why a take-back was refused, or "No recipients" |
 | `SidebarItem` | `trailing` | `Option<TodayTrailing>` (`None`) | a scheduled Today row's `time` (data type, `--f-ink-faint`) and a cancel button named by `cancel`, calling `on_cancel` without opening the row; Today only |
 | `SidebarItem` | (markup changed) | | a Today item's close button is now named `Close {label}`, not `Close`: an assertion or selector on `aria-label="Close"` needs the row's label |
+| `SpaceEditor` | `on_rename` | `Option<EventHandler<String>>` (`None`) | the title becomes an inline `TextInput` ("Space name", placeholder "Name this Space") holding `name`; each keystroke is reported |
+| `SpaceEditor` | `motion` | `Option<MotionChoice>` (`None`) | a Motion row after Appearance: a `SegmentedControl` over `ds::Motion` (System, Calm, Standard, Extra, Reduced), `MotionChoice { level, on_motion }`; feed the pick to your root's `appearance.motion` |
+| `SpaceEditor` | `measured` | `MeasuredIn` (`ThisScheme`) | `EachScheme`: the contrast readout under "Measured, this Space", once per scheme the Space's theme shows (Light and Dark for System), each under its own small-caps heading |
+| `SpaceEditor` | (markup changed) | | each preset button is named (`aria-label` and `title`) by `Preset::name` (Dusk, Orchard, Harbour, Ember, Lagoon, Heather, Moss, Stone), not "Preset n" |
+| `Preset` | `name` | `&'static str` | the preset's name, design/21 section 4 order; a new public field, so a struct literal of `Preset` needs it |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

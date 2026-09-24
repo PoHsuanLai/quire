@@ -1409,6 +1409,14 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
+
+/* mailo gaps 2. The title as a name field (`on_rename`): the inline TextInput takes the title's
+   display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
+   scheme's rows under a heading in the data face, upper case, as the field headers are. */
+.ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
+.ds-space-editor-title .ds-input-wrap{ flex:1; }
+.ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
+.ds-checks-heading{ font-family:var(--font-data); font-size:var(--fs-micro); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15): C's sync halo (`C:284-292`), a ring at
    `inset:-4px` around a positioned parent. Attribute selectors carry `*|` (spike S2).
