@@ -2,9 +2,10 @@
    both define a name). Four departures, three required by section 9 and one added by quire:
    - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
-   - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`;
+   - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
-     so are `menu-out` (bar gaps) and `cmdk-rise` (mailo gaps 2), below.
+     so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -155,3 +156,22 @@
 @keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
+
+/* pill-up (quire's, mailo gaps 3): a pill centred by `translateX(-50%)` (a toast, a send pill a
+   consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
+   `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
+   also carries them back down, and keep it. */
+@keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
+
+/* ring-drain (quire's, mailo gaps 3): the undo-send ring's dash drains, linear, over
+   `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
+   dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
+@keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
+
+/* 4.4.12 fade-in (C's, mailo gaps 3): an ink veil fades to its resting `--veil` (.16), the
+   opacity the veil itself rests at, so nothing snaps when the animation ends. */
+@keyframes fade-in{ from{ opacity:0; } to{ opacity:var(--veil); } }
+
+/* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
+   legible; `breathe` is the sync halo's and fades to nothing. */
+@keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }

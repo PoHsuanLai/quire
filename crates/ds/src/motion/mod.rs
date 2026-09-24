@@ -8,6 +8,7 @@ pub mod hover_intent;
 pub mod presence;
 pub mod pulse;
 pub mod recipe;
+mod recipe_own;
 pub mod roster;
 mod roster_rest;
 pub mod settle;

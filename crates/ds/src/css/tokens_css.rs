@@ -11,7 +11,8 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
+    OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
+    ZLayer,
 };
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
@@ -91,6 +92,9 @@ fn fixed_tokens() -> Vec<String> {
     let layers = ZLayer::ALL
         .into_iter()
         .map(|layer| declaration(layer.var(), &layer.z().to_string()));
+    let opacities = OpacityToken::ALL
+        .into_iter()
+        .map(|opacity| declaration(opacity.var(), &opacity.css()));
     // The tuned tokens: the shell type scale and the dock's geometry, each read from the input
     // a consumer writes (`ShellMetrics`, `DockMetrics`) with its settings key's default behind,
     // and the pixel tokens, from the scale the root writes with the 1x value behind.
@@ -110,6 +114,7 @@ fn fixed_tokens() -> Vec<String> {
         .chain(families)
         .chain(sizes)
         .chain(layers)
+        .chain(opacities)
         .chain(tuned)
         .collect()
 }

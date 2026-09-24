@@ -71,9 +71,9 @@ pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
-    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, PersonSwatch,
-    PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken, Tuned,
-    VarName, ZLayer, quad,
+    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, OpacityToken,
+    PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken,
+    Tuned, VarName, ZLayer, quad,
 };
 
 use futures_timer as _;
