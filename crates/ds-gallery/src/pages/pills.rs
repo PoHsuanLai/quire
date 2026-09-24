@@ -37,7 +37,11 @@ const PINNED: [(&str, &str); 2] = [("side:4", "Sam Lindqvist"), ("side:5", "Priy
 #[component]
 pub fn Cards() -> Element {
     let hub = use_hover_hub();
-    let open = hub.open().or(hub.leaving());
+    // A hook-keyed card is drawn by its own section (`overlays_mailo4`).
+    let open = hub
+        .open()
+        .or(hub.leaving())
+        .filter(|(key, _)| !key.0.starts_with(super::overlays_mailo4::HOOK_KEYED));
     rsx! {
         Section {
             title: "Hover cards and tooltips",

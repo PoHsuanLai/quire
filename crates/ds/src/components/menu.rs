@@ -10,50 +10,26 @@
 
 pub use crate::components::menu_kind::{MenuEntrance, MenuKind};
 
+use crate::components::flow::Flow;
+use crate::components::menu_active::{asks, follow_active};
 use crate::components::menu_cursor::Cursor;
 use crate::components::menu_entry::MenuEntry;
 use crate::components::menu_keys::{Decision, Level};
 use crate::components::menu_lines::{Act, Choice, Filter, KeyAct, choices, key_act, lines};
 use crate::components::menu_panel::Panel;
-use crate::components::menu_tracker::{Via, use_tracker};
-use crate::components::popover::{
-    Dismiss, Stacking, escape_closes, position_style, use_entrance, use_float,
-};
+use crate::components::menu_pick::{Closing, Gesture, PickDismiss, kept_focus, picker};
+use crate::components::menu_surface::{Surface, stacking};
+use crate::components::menu_tracker::{Tracker, Via, use_tracker};
+use crate::components::popover::{escape_closes, use_entrance, use_float};
 use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::vocab::Availability;
-use crate::geometry::{Anchor, MountedRef, Point};
+use crate::geometry::{Anchor, MountedRef};
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
 use crate::motion::timer::use_motion_timer;
 use crate::overlay::menu_track::MenuTiming;
 use crate::tokens::ZLayer;
-use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-
-/// Where a pointer gesture over an open menu is: a press-drag-release onto an item picks it
-/// (design/13 section 13.3.2), which is a release arriving after the pointer came in with no
-/// press of its own inside the menu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Gesture {
-    /// The pointer has not been over the menu.
-    Outside,
-    /// The pointer came in; no press started inside the menu.
-    Entered,
-    /// A press started inside the menu: its release is a click, not a drag's end.
-    Pressed,
-}
-
-/// Whether the menu is closing, and how.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Closing {
-    /// Open.
-    No,
-    /// Something was picked and `onclose` has run: nothing else picks (Blitz follows a
-    /// press-drag-release with a click on the same item).
-    Picked,
-    /// Playing `menu-out`; `onclose` runs when it settles.
-    Fading,
-}
 
 /// A floating list of choices. `timing` is the submenu delay and safe-triangle timeout, read
 /// by the caller from `menus.submenu_delay_ms` and `menus.submenu_triangle_timeout_ms`
@@ -61,11 +37,13 @@ enum Closing {
 /// that choice's submenu as the menu mounts (a restored menu, a posed picture); choices are
 /// numbered over items and submenu parents, headers, status lines and rules not counted.
 ///
-/// A pick calls `onpick`, then `onclose`. Escape and an outside click play the exit fade
-/// (`Anim::MenuOut`) and then call `onclose`. `on_hover` hears which choice the pointer is over
-/// (`None` once it is over none), `on_release` every button released over a choice; a release
-/// over an enabled choice after a press that began outside the menu (press-drag-release) picks
-/// it. `entrance` is [`MenuEntrance::Instant`] for a bar menu.
+/// A pick calls `onpick`, then `onclose`; with `dismiss: PickDismiss::Stay` it calls `onpick`
+/// only and the menu stays open, its cursor on the row (a toggle checklist). Escape and an
+/// outside click play the exit fade (`Anim::MenuOut`) and then call `onclose`. `on_hover`
+/// hears which choice the pointer is over (`None` once it is over none), `on_release` every
+/// button released over a choice; a release over an enabled choice after a press that began
+/// outside the menu (press-drag-release) picks it. `entrance` is [`MenuEntrance::Instant`] for
+/// a bar menu.
 ///
 /// `active` says whose highlight it shows. [`Cursor::Auto`] is the menu's own, and `on_active`
 /// hears every change of it. [`Cursor::Controlled`] is a field's beside the menu (the
@@ -73,6 +51,13 @@ enum Closing {
 /// and Up, Down and the pointer only ask for a move through `on_active`; the field's own keys
 /// pick with the value it knows. `onquery` hears the typed filter's text on every change
 /// ([`Filter::Typing`]), for an entry that names it ("Create label '…'").
+///
+/// `flow: Flow::Inline` draws the same rows where the caller renders the menu (mailo gaps 4: a
+/// sender card's actions): no overlay, no surface, no entrance, no layer on the stack (so no
+/// Escape or outside press of its own, and no press-drag-release), and no focus taken; its
+/// keys are handled when the focus is inside it, and a caller that keeps the focus elsewhere
+/// drives it with [`Cursor::Controlled`]. The flow is fixed for the menu's life: key the menu
+/// by it to switch.
 #[component]
 pub fn Menu<T: Clone + PartialEq + 'static>(
     kind: MenuKind,
@@ -89,12 +74,14 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     #[props(default)] active: Cursor,
     #[props(default)] on_active: Option<EventHandler<Option<usize>>>,
     #[props(default)] onquery: Option<EventHandler<String>>,
+    #[props(default)] dismiss: PickDismiss,
+    #[props(default)] flow: Flow,
 ) -> Element {
-    let float = use_float(ZLayer::Menu, Stacking::Layer(Dismiss::EscAndOutside));
+    let float = use_float(ZLayer::Menu, stacking(flow));
     let presence = use_entrance(kind.entrance());
     let fade = use_motion_timer(Anim::MenuOut);
     let mut closing = use_signal(|| Closing::No);
-    let mut query = use_signal(String::new);
+    let query = use_signal(String::new);
     let tracker = use_tracker(timing, kind.pad());
     let mut gesture = use_hook(|| CopyValue::new(Gesture::Outside));
     let mut hovered = use_hook(|| CopyValue::new(None::<usize>));
@@ -114,14 +101,8 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         | MenuEntry::Info { .. }
         | MenuEntry::Separator => None,
     });
-    let at = float
-        .anchor_rect(&anchor)
-        .map(|rect| kind.placement(rect))
-        .map_or(Point::default(), |(rect, want, gap)| {
-            float.origin(Some(rect), want, gap)
-        });
     // Escape and an outside click fade the menu out, then close it (design/13 section 13.3.2).
-    let dismiss = EventHandler::new(move |()| {
+    let fade_out = EventHandler::new(move |()| {
         if *closing.peek() == Closing::No {
             closing.set(Closing::Fading);
             fade.start(onclose);
@@ -133,16 +114,15 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         tracker,
         choices,
         level: Level::Root,
-        onpick: EventHandler::new(move |value: T| {
-            if *closing.peek() == Closing::No {
-                closing.set(Closing::Picked);
-                onpick.call(value);
-                onclose.call(());
-            }
-        }),
+        onpick: kept_focus(
+            picker(dismiss, closing, onpick, onclose),
+            tracker,
+            (dismiss, flow, active),
+        ),
         onhover: None,
         onitem: Some(EventHandler::new(move |index: Option<usize>| {
-            if *gesture.peek() == Gesture::Outside {
+            // Inline rows are not a drag's destination: the gesture stays outside.
+            if flow == Flow::Floating && *gesture.peek() == Gesture::Outside {
                 gesture.set(Gesture::Entered);
             }
             if *hovered.peek() != index {
@@ -158,49 +138,12 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         on_active,
     };
     follow_active(active, panel.current(), reported, on_active);
-    let picker = panel.onpick;
-    panel.onrelease = Some(EventHandler::new(move |(index, press): (usize, Press)| {
-        if let Some(on_release) = on_release {
-            on_release.call(press);
-        }
-        if *gesture.peek() != Gesture::Entered {
-            return;
-        }
-        // Press-drag-release (design/13 section 13.3.2): an enabled item picks, a parent
-        // stays open for its submenu, a disabled item closes picking nothing.
-        match picks.get(index) {
-            Some(Choice {
-                act: Act::Pick(value),
-                availability: Availability::Enabled,
-            }) => picker.call(value.clone()),
-            Some(Choice {
-                act: Act::Open(_),
-                availability: Availability::Enabled,
-            }) => {}
-            _ => dismiss.call(()),
-        }
-    }));
+    panel.onrelease = Some(released(picks, panel.onpick, fade_out, gesture, on_release));
     let onkey = {
         let panel = panel.clone();
         move |event: KeyboardEvent| match panel.key(&event, filter) {
-            Decision::CloseMenu => escape_closes(float, &event, dismiss),
-            Decision::Query => {
-                let mut next = query.peek().clone();
-                match key_act(&event.key(), event.modifiers(), filter) {
-                    Some(KeyAct::Type(text)) => next.push_str(&text),
-                    Some(KeyAct::Erase) => {
-                        next.pop();
-                    }
-                    _ => {}
-                }
-                if *query.peek() != next {
-                    query.set(next.clone());
-                    if let Some(onquery) = onquery {
-                        onquery.call(next);
-                    }
-                }
-                tracker.reset(0);
-            }
+            Decision::CloseMenu => escape_closes(float, &event, fade_out),
+            Decision::Query => typed_query(&event, filter, query, onquery, tracker),
             _ => {}
         }
     };
@@ -215,82 +158,122 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let probe = float.surface();
     let hover = panel.clone();
     let leave = panel.clone();
-    let presence = match (closing(), entrance) {
-        (Closing::Fading, _) => "leaving",
-        (Closing::No | Closing::Picked, MenuEntrance::Instant) => Presence::Present.slug(),
-        (Closing::No | Closing::Picked, MenuEntrance::Animated) => presence.slug(),
+    let presence = match (closing(), entrance, flow) {
+        (Closing::Fading, _, _) => "leaving",
+        (_, MenuEntrance::Instant, _) | (_, _, Flow::Inline) => Presence::Present.slug(),
+        (Closing::No | Closing::Picked, MenuEntrance::Animated, Flow::Floating) => presence.slug(),
     };
     let instant = (entrance == MenuEntrance::Instant).then_some("instant");
-    float.show(
-        rsx! {
-            div {
-                class: "ds-popover ds-menu",
-                "data-elevation": "pop",
-                "data-layer": "menu",
-                "data-kind": kind.slug(),
-                "data-entrance": instant,
-                role: "listbox",
-                "aria-label": label,
-                "data-presence": presence,
-                tabindex: "-1",
-                style: position_style(at),
-                onmounted: move |event| {
-                    let element = event.data();
-                    tracker.panel_mounted(MountedRef(element.clone()));
-                    probe.on_mounted(event);
-                    // A field beside the menu that drives its cursor keeps the keyboard.
-                    if active.takes_focus() {
-                        crate::focus::host::focus_soon(element);
-                    }
-                },
-                onmousemove: move |event| hover.hovered(&event),
-                onmouseleave: move |_| leave.left_items(),
-                onmousedown: move |_| gesture.set(Gesture::Pressed),
-                onmouseup: move |event| {
-                    if let Some(on_release) = on_release {
-                        let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
-                        on_release.call(Press::of(&event, button));
-                    }
-                    // A drag that came in and let go over no choice closes, picking nothing
-                    // (design/13 section 13.3.2).
-                    if *gesture.peek() == Gesture::Entered {
-                        dismiss.call(());
-                    }
-                },
-                onkeydown: onkey,
-                {body}
-            }
-        },
-        dismiss,
-    );
-    rsx! {
-        {child}
-    }
-}
-
-/// Under a caller's cursor, the pointer over another choice asks for it.
-fn asks(active: Cursor, pointed: Option<usize>, on_active: Option<EventHandler<Option<usize>>>) {
-    if let (Cursor::Controlled(shown), Some(index), Some(on_active)) = (active, pointed, on_active)
-        && shown != Some(index)
-    {
-        on_active.call(Some(index));
-    }
-}
-
-/// Under the menu's own cursor, tell the caller after this render when the highlight moved.
-fn follow_active(
-    active: Cursor,
-    current: Option<usize>,
-    reported: CopyValue<Option<Option<usize>>>,
-    on_active: Option<EventHandler<Option<usize>>>,
-) {
-    let (Cursor::Auto, Some(on_active)) = (active, on_active) else {
-        return;
+    let surface = Surface::of(flow, float, &anchor, kind);
+    let menu = rsx! {
+        div {
+            class: surface.class,
+            "data-elevation": surface.elevation,
+            "data-layer": surface.layer,
+            "data-flow": flow.attr(),
+            "data-kind": kind.slug(),
+            "data-entrance": instant,
+            role: "listbox",
+            "aria-label": label,
+            "data-presence": presence,
+            tabindex: "-1",
+            style: surface.style,
+            onmounted: move |event| {
+                let element = event.data();
+                tracker.panel_mounted(MountedRef(element.clone()));
+                probe.on_mounted(event);
+                // A field beside the menu that drives its cursor keeps the keyboard, and an
+                // inline menu leaves it with its caller.
+                if active.takes_focus() && flow == Flow::Floating {
+                    crate::focus::host::focus_soon(element);
+                }
+            },
+            onmousemove: move |event| hover.hovered(&event),
+            onmouseleave: move |_| leave.left_items(),
+            onmousedown: move |_| gesture.set(Gesture::Pressed),
+            onmouseup: move |event| {
+                if let Some(on_release) = on_release {
+                    let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
+                    on_release.call(Press::of(&event, button));
+                }
+                // A drag that came in and let go over no choice closes, picking nothing
+                // (design/13 section 13.3.2).
+                if *gesture.peek() == Gesture::Entered {
+                    fade_out.call(());
+                }
+            },
+            onkeydown: onkey,
+            {body}
+        }
     };
-    let mut reported = reported;
-    if *reported.peek() == Some(current) {
-        return;
+    match flow {
+        Flow::Floating => {
+            float.show(menu, fade_out);
+            rsx! {
+                {child}
+            }
+        }
+        Flow::Inline => rsx! {
+            {menu}
+            {child}
+        },
     }
-    reported.set(Some(current));
-    queue_effect(move || on_active.call(current));
+}
+
+/// A button released over choice `index`: heard by `on_release`, and, after a press that began
+/// outside the menu (press-drag-release, design/13 section 13.3.2), an enabled item picks, a
+/// parent stays open for its submenu, and a disabled item closes picking nothing.
+fn released<T: Clone + 'static>(
+    picks: Vec<Choice<T>>,
+    pick: EventHandler<T>,
+    fade_out: EventHandler<()>,
+    gesture: CopyValue<Gesture>,
+    on_release: Option<EventHandler<Press>>,
+) -> EventHandler<(usize, Press)> {
+    EventHandler::new(move |(index, press): (usize, Press)| {
+        if let Some(on_release) = on_release {
+            on_release.call(press);
+        }
+        if *gesture.peek() != Gesture::Entered {
+            return;
+        }
+        match picks.get(index) {
+            Some(Choice {
+                act: Act::Pick(value),
+                availability: Availability::Enabled,
+            }) => pick.call(value.clone()),
+            Some(Choice {
+                act: Act::Open(_),
+                availability: Availability::Enabled,
+            }) => {}
+            _ => fade_out.call(()),
+        }
+    })
+}
+
+/// A key that types into or erases from the filter: the query changes, `onquery` hears it, and
+/// the highlight goes back to the first match.
+fn typed_query(
+    event: &KeyboardEvent,
+    filter: Filter,
+    query: Signal<String>,
+    onquery: Option<EventHandler<String>>,
+    tracker: Tracker,
+) {
+    let mut query = query;
+    let mut next = query.peek().clone();
+    match key_act(&event.key(), event.modifiers(), filter) {
+        Some(KeyAct::Type(text)) => next.push_str(&text),
+        Some(KeyAct::Erase) => {
+            next.pop();
+        }
+        _ => {}
+    }
+    if *query.peek() != next {
+        query.set(next.clone());
+        if let Some(onquery) = onquery {
+            onquery.call(next);
+        }
+    }
+    tracker.reset(0);
 }

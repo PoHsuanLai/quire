@@ -824,6 +824,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }
+/* Drawn in place (mailo gaps 4, `flow: Flow::Inline`): static in the caller's container, the
+   same card otherwise; the caller's box decides where it stands. */
+.ds-popover.ds-hovercard[*|data-flow=inline]{ position:static; }
 
 .ds-hovercard-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-reading); line-height:1.2; }
 .ds-hovercard-sub{ font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); margin-top:var(--s-2); }
@@ -1104,6 +1107,9 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
+/* Drawn inline in its caller's card (mailo gaps 4, `flow: Flow::Inline`): the same rows, with no
+   surface (no `.ds-popover`), no entrance and no padding of its own; the card's box sizes it. */
+.ds-menu[*|data-flow=inline]{ width:auto; max-height:none; overflow:visible; padding:0; animation:none; }
 
 .ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* A separator is a hairline with the shell scale's margin above and below (5, design/13
