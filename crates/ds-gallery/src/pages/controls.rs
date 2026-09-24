@@ -38,13 +38,14 @@ const BUTTON_STATES: [(&str, Option<Switch>, Availability); 4] = [
     ("disabled", None, Availability::Disabled),
 ];
 
-const PROVIDERS: [Provider; 6] = [
+const PROVIDERS: [Provider; 7] = [
     Provider::Google,
     Provider::Microsoft,
     Provider::Fastmail,
     Provider::ICloud,
     Provider::Yahoo,
     Provider::Imap,
+    Provider::Local,
 ];
 
 const AVATAR_SIZES: [AvatarSize; 8] = [
@@ -269,7 +270,7 @@ fn Marks() -> Element {
         address: Some(format!("{initial}@example.org").to_lowercase()),
     };
     rsx! {
-        Section { title: "ProviderMark and AccountTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), and the Add account tile after them.",
+        Section { title: "ProviderMark and AccountTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), a local-folders account (Provider::Local: the neutral folder), and the Add account tile after them.",
             for size in [MarkSize::Tile, MarkSize::Row, MarkSize::Inline] {
                 div { class: "g-row",
                     for provider in PROVIDERS {
@@ -282,6 +283,7 @@ fn Marks() -> Element {
                 AccountTile { account: one('P', Provider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(match pressed() { Switch::On => Switch::Off, Switch::Off => Switch::On }) }
                 AccountTile { account: one('W', Provider::Microsoft), pressed: Switch::Off, unread: 0, onclick: |_| {} }
                 AccountTile { account: one('G', Provider::Google), pressed: Switch::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
+                AccountTile { account: one('L', Provider::Local), pressed: Switch::On, unread: 1, onclick: |_| {} }
                 AddAccountTile { title: "Add account…", onclick: |_| {} }
             }
         }
