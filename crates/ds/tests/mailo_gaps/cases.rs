@@ -3,8 +3,9 @@
 use dioxus::prelude::*;
 use ds::components::vocab::Switch;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Expanded, Hex,
-    ImageSource, InputVariant, MarkStyle, Provider, TextInput, TextInputKind,
+    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Expanded, Fraction,
+    Hex, ImageSource, InputVariant, MarkStyle, PillAction, Provider, SendMood, SendPhase, SendPill,
+    SendRing, TextInput, TextInputKind,
 };
 
 /// An account colour.
@@ -57,5 +58,23 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "lists/account_tile/add-named.html",
         make: || rsx! { AddAccountTile { label: "Add an account to Work", onclick: |_| {} } },
+    },
+    // SendPill: Cancel for a held send, a spinning ring with no button, a nudge on mount (at
+    // rest: a mood plays only when it changes), and a fatal refusal on two lines.
+    Case {
+        golden: "overlays/send_pill/cancel.html",
+        make: || rsx! { SendPill { text: "Scheduled for 9:00", progress: Fraction(0), phase: SendPhase::Counting, action: PillAction::Cancel, onundo: |_| {} } },
+    },
+    Case {
+        golden: "overlays/send_pill/spin-nothing.html",
+        make: || rsx! { SendPill { text: "Sending…", progress: Fraction(0), phase: SendPhase::Counting, ring: SendRing::Spin, action: PillAction::Nothing, onundo: |_| {} } },
+    },
+    Case {
+        golden: "overlays/send_pill/nudge-mounted.html",
+        make: || rsx! { SendPill { text: "Not sent yet · will try again", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Nudge, action: PillAction::Nothing, onundo: |_| {} } },
+    },
+    Case {
+        golden: "overlays/send_pill/fatal-refused.html",
+        make: || rsx! { SendPill { text: "Not sent", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} } },
     },
 ];

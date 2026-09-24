@@ -854,6 +854,10 @@ says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the wh
 | `Slider` | (none) | | already the range input: `value: Fraction` in thousandths, keys and drag; map your 0-100 to `Fraction(n * 10)` |
 | `AccountTile` | `mark` | `MarkStyle` (`Letter`) | how the provider is drawn on the tile: pass your provider-marks setting, `MarkStyle::Image(ImageSource(data_uri))` for the favicon you hold |
 | `AddAccountTile` | (new component) | `label: String` ("Add account"), `title: Option<String>`, `onclick: EventHandler<()>` | the tile after the accounts: the Pin plate with no ground at rest, a plus in a dashed `--f-ink-faint` ring; never pressed, no count |
+| `SendPill` | `mood` | `SendMood` (`Calm`) | `Nudge`, `Shake`, `Fatal`: the one-shot `nudge` or `shake` (design/05 4.4.8-9) plays each time the mood changes to one of them, never on mount, and settles at `ds::settle`; the pill stays up; `Fatal` also paints it `--danger`/`--danger-ink`; `data-mood` is written for each. Pass `Calm` for a render to play the same mood again |
+| `SendPill` | `action` | `PillAction` (`Undo`) | the button's word while counting: `Undo`, `Cancel` (a held send), or `Nothing` (no button); `onundo` hears either word |
+| `SendPill` | `ring` | `SendRing` (`Drain`) | `Spin`: a 20/37 arc turning at the Spinner's `spin` while the send waits on the outbox, `progress` ignored |
+| `SendPill` | `refusal` | `Option<String>` (`None`) | a second, lighter line under the text: why a take-back was refused, or "No recipients" |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
