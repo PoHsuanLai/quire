@@ -3,6 +3,7 @@
 //! through a hidden element's `onmounted` handle and calls [`install`] there, before the app's
 //! first render.
 
+use crate::clipboard::HostClipboard;
 use crate::frames::FrameParser;
 use crate::net::DsNet;
 use crate::setup::Setup;
@@ -11,9 +12,10 @@ use dioxus_native_dom::NodeHandle;
 use std::sync::Arc;
 
 /// Put `setup`'s net policy on the document and on every frame it will build, waking the
-/// window's shell to paint when a resource lands.
-pub(crate) fn install(handle: &NodeHandle, setup: &Setup) {
+/// window's shell to paint when a resource lands, and reach the clipboard through the shell.
+pub(crate) fn install(handle: &NodeHandle, setup: &Setup, clipboard: &HostClipboard) {
     let mut doc = handle.doc_mut();
+    clipboard.set(Arc::clone(&doc.shell_provider));
     let shell = Arc::clone(&doc.shell_provider);
     let waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| shell.request_redraw());
     let fallback = Arc::clone(&doc.net_provider);
