@@ -18,6 +18,8 @@ mod golden;
 mod live;
 #[path = "lists/mailo.rs"]
 mod mailo;
+#[path = "lists/mailo4.rs"]
+mod mailo4;
 #[path = "lists/motion.rs"]
 mod motion;
 #[path = "lists/png.rs"]
@@ -37,6 +39,7 @@ use ds::{
     swatch, use_drag,
 };
 use mailo::MAILO_CASES;
+use mailo4::MAILO4_CASES;
 use rows::{ROW_CASES, Row};
 
 #[derive(Props, Clone)]
@@ -96,6 +99,7 @@ fn every_list_component_matches_its_golden() {
         .iter()
         .chain(ROW_CASES)
         .chain(MAILO_CASES)
+        .chain(MAILO4_CASES)
         .filter_map(|case| golden::check(&golden_name(case), &scrub(&render(case.make))).err())
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
@@ -161,7 +165,7 @@ const SHARED: &[&str] = &["ds-ic", "ds-truncate"];
 fn every_class_in_a_golden_is_styled_by_its_component() {
     let goldens = golden::all_in("lists");
     assert!(
-        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len(),
+        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len() + MAILO4_CASES.len(),
         "only {} goldens",
         goldens.len()
     );
@@ -278,7 +282,7 @@ fn every_list_golden_lints_clean() {
     };
     let goldens = golden::all_in("lists");
     assert!(
-        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len(),
+        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len() + MAILO4_CASES.len(),
         "only {} goldens",
         goldens.len()
     );

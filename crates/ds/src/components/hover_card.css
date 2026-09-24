@@ -15,6 +15,9 @@
 .ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }
+/* Drawn in place (mailo gaps 4, `flow: Flow::Inline`): static in the caller's container, the
+   same card otherwise; the caller's box decides where it stands. */
+.ds-popover.ds-hovercard[*|data-flow=inline]{ position:static; }
 
 .ds-hovercard-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-reading); line-height:1.2; }
 .ds-hovercard-sub{ font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); margin-top:var(--s-2); }

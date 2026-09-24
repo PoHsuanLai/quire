@@ -995,6 +995,24 @@ the reasons and the proofs.
 | `Rows`, `Grow`, `FieldFace` | new types | | Above |
 | `SpaceEditor` | `motion_levels` | `MotionLevels` (`All`) | `MotionLevels::Contact` offers Calm, Standard and Extra, a Space's own three (mailo's per-Space motion); a `level` outside them presses no segment. A prop, not a `MotionChoice` field, so your `MotionChoice { level, on_motion }` literal still compiles |
 
+### The mailo gaps 4 (2026-09-25): overlays and lists
+
+Every row is additive: a prop that defaults to what the component did before, a new type, or
+a new function. No existing golden changed. FINDINGS "mailo gaps 4 (overlays and lists)" has
+the reasons and the proofs.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `HoverStrip` | `on_press: Option<EventHandler<ActionId>>` | Hears which button was pressed inside the click, before any rect is read: an archive acts at once, and with no layout (a server render, a host that cannot measure) it still acts. The action's own `onclick: EventHandler<Rect>` still follows when the rect resolves, after `on_press`, for the menu it anchors. A strip prop, not a `StripAction` field, so every `StripAction { .. }` literal compiles as it is |
+| `use_hover_intent() -> HoverDriver` | new function and type | The `Ds`'s hover hub and the anchor book every card places against, for a caller that keys cards on its own pointer hooks (a `ListRow`'s `on_sender`, a pin, a Today item) rather than wrapping them in a `HoverTarget`. `driver.over(key, kind, anchor)` on entry, `driver.out()` on exit, `driver.press()` on a press in the list, `driver.hub()` for `open()`/`leaving()`; the 450 ms open, 0 when warm, 150 ms close and 400 ms warm window are the hub's, as for a target. Nothing opens while a peek, the palette or a menu is open |
+| `HoverAnchor` | new type | `Rect(Rect)`: a rect you already have (the pointer's point, your own measurement); `Element(MountedRef)`: measured a frame later; `Unplaced`: nothing to place against (no layout), the card opens at the overlay's top-left corner, or in place with `flow: Flow::Inline`. `Unplaced` drops any rect filed earlier for the key |
+| `HoverCard` | `flow: Flow` | `Flow::Floating` (default) as before. `Flow::Inline` draws the card where you render it, `position:static` in your container, with no `left`/`top` and `data-flow="inline"`: a test with no layout asserts its content where it stands, and a card that is part of a page can be one |
+| `Flow` | new type | `Flow::{Floating, Inline}`, shared by `HoverCard` and `Menu`: in the overlay, placed against the anchor, or in the caller's flow |
+| `Menu` | `dismiss: PickDismiss` | `PickDismiss::Close` (default): a pick calls `onpick`, then `onclose`, as before. `PickDismiss::Stay`: a pick calls `onpick` only, so a toggle checklist (Labels, page Properties) flips the row's `check` in your `entries` and stays open, the cursor on the row and, when the menu holds the keyboard, the focus on the menu (Enter picks the next one). Escape and an outside press still close it |
+| `Menu` | `flow: Flow` | `Flow::Inline` draws the same rows where you render the menu, inside your card: `div.ds-menu[data-flow=inline]` with no `.ds-popover` surface, no entrance, no overlay host, no outside-press catcher, no layer on the stack (Escape and outside presses are yours) and no focus taken; its keys work while the focus is inside it, or drive it with `active: Cursor::Controlled`. `anchor` is ignored. Fixed for the menu's life: key the menu by it to switch |
+| `SidebarItem` | `place: Option<PlaceId>` | `PlaceId(String)`, your name for the place (`inbox`, `label:7`), written as `data-place` so a drag can tell which place is under the pointer |
+| `SidebarItem` | `onpointerenter` / `onpointerleave` / `onpointermove` / `onpointerup: Option<EventHandler<PointerEvent>>` | The item's pointer, on every kind: set `drop: DropState::Target` on the place a dragged thread is over (lit `--accent-soft`, scaled 1.045, design/06 section 6.1) and apply the drop on the release. `drop` itself is not new |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire

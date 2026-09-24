@@ -14,6 +14,8 @@ mod css_scan;
 mod golden;
 #[path = "overlays/mailo.rs"]
 mod mailo;
+#[path = "overlays/mailo4.rs"]
+mod mailo4;
 
 use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
@@ -121,6 +123,7 @@ fn every_overlay_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .chain(mailo::MAILO_CASES)
+        .chain(mailo4::MAILO4_CASES)
         .filter_map(|case| {
             let dom = built(case.make, None, case.wait);
             golden::check(&golden_name(case), &inside_root(&dom)).err()
