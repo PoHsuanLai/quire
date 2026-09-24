@@ -39,6 +39,16 @@
 }
 .ds-sidebar-item:hover .ds-sidebar-item-close{ opacity:1; }
 
+/* A scheduled Today row's trailing time and cancel (mailo's `.today-item.later .when`, its `.x`):
+   the time in data type at `--f-ink-faint`, never wrapping; the cancel is drawn as the close
+   is, but always shown, since cancelling is the row's one action. */
+.ds-sidebar-item-time{ flex:none; font-family:var(--font-data); font-size:var(--fs-note); color:var(--f-ink-faint); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.ds-sidebar-item .ds-sidebar-item-cancel{
+  flex:none; border:0; background:none; cursor:pointer; padding:0; color:var(--f-ink-faint); line-height:0;
+  transition:color var(--t-quick) var(--e-out);
+}
+.ds-sidebar-item .ds-sidebar-item-cancel:hover{ color:var(--f-ink); }
+
 /* Destination preview (`S:447-448`). */
 .ds-sidebar-item[*|data-preview=destination]{
   background:var(--f-pill-hover); color:var(--f-ink); box-shadow:0 0 0 1.5px var(--accent) inset;
