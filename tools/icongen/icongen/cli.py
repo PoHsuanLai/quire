@@ -42,7 +42,8 @@ def cmd_bakeoff(args: argparse.Namespace) -> None:
         for seed in args.seeds:
             if (args.out / f"{s.slug}-s{seed}.png").exists():
                 continue  # resume: a finished render is kept
-            job = graphs.Job(s.prompt(), brief.NEGATIVE, seed, args.size, f"bakeoff-{args.model}-{s.slug}")
+            job = graphs.Job(brief.prompt(s, args.style), brief.negative(args.style), seed, args.size,
+                             f"bakeoff-{args.model}-{args.style}-{s.slug}")
             _render(args, args.model, job, f"{s.slug}-s{seed}")
 
 
@@ -84,6 +85,8 @@ def main() -> None:
     b.add_argument("--size", type=int, default=1024)
     b.add_argument("--seeds", type=int, nargs="+", default=list(brief.SEEDS))
     b.add_argument("--subjects", nargs="*")
+    b.add_argument("--style", choices=list(brief.STYLES), default="3d",
+                   help="3d = round one's brief; flat = round two; flat-trigger = flat plus a style word")
     b.set_defaults(func=cmd_bakeoff)
 
     v = sub.add_parser("vary", help="reference-conditioned pass: the hero as image 1, every other subject")

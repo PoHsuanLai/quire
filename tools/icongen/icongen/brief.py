@@ -65,6 +65,68 @@ SUBJECTS = (
 
 SEEDS = (11, 22, 33, 44)
 
+# Round two (2026-09-24): the user found round one "too realistic" and asked for something more
+# abstract that speaks the design language (design/00 section 3, design/07 section 3): paper and
+# ink, one weight, round caps, colour only where it means something. The object now lives in two
+# tones of its plate family plus paper white and ink, so it reads as a cut-out laid on the plate,
+# not a thing photographed in front of it. The ground is a neutral mid grey so paper white and
+# ink both key cleanly (round one's light grey ate white rims).
+FLAT_BRIEF = (
+    "A flat abstract geometric emblem: {subject}. Built from a few simple paper cut-out layers "
+    "with crisp clean edges, like shapes cut from coloured card and laid flat on top of each "
+    "other. Only four flat colours: {palette}, paper white, and near-black ink. Thick uniform "
+    "lines with round caps and rounded joins, one line weight everywhere. Completely flat solid "
+    "fills, no lighting, no shading, no gradients, no shadows, no highlights, no gloss, no "
+    "texture, no depth, no perspective, straight-on front view. Centred, compact, with generous "
+    "empty space around it. Plain flat solid mid grey background. No text, no letters, no "
+    "numbers, no logo, no frame, no border, no rounded square behind it, no people, no hands."
+)
+
+# The style-trigger variation: the same brief with a leading flat-illustration trigger, to see
+# whether either model has a stronger flat mode behind a style word.
+FLAT_TRIGGER = "Flat vector illustration, minimalist, Swiss graphic design style. "
+
+FLAT_NEGATIVE = (
+    "3D render, realistic, photo, glossy, shading, bevel, depth of field, gradient, shadow, "
+    "perspective, texture, text, letters, watermark, frame, border, rounded square, app tile, "
+    "busy detail, multiple objects, cropped"
+)
+
+# The family's two tones in words and hex (08 2.3 base and deep); models follow the words.
+FLAT_PALETTE = {
+    "red": "tomato red (#E8483C) and deep brick red (#B7352B)",
+    "amber": "warm amber (#F0A81E) and deep ochre brown (#8E5A05)",
+    "green": "leaf green (#28B24A) and deep forest green (#1A7A33)",
+    "blue": "cobalt blue (#2B7CFF) and deep ultramarine (#0B5FE0)",
+    "violet": "soft violet (#8B5CF0) and deep indigo-violet (#6B3FCC)",
+}
+
+# The same five subjects, described as arrangements of shapes rather than objects. Terminal is
+# "a prompt chevron and a cursor block" (round one's "prompt caret" drew checkmarks and pointers).
+FLAT_WORDS = {
+    "mail": "a paper white rectangle with a folded triangular flap across its top, like a closed "
+    "envelope reduced to two shapes",
+    "files": "two paper folder shapes with rounded tabs, offset one behind the other",
+    "terminal": "a prompt chevron and a cursor block: an ink right-pointing chevron like a greater-than "
+    "sign, then a solid paper white bar, side by side on one line",
+    "notes": "a square paper sheet with one lifted, folded-over corner and three short lines",
+    "photos": "a circle sun above a gentle hill shape inside a rounded frame",
+}
+
+STYLES = ("3d", "flat", "flat-trigger")
+
+
+def prompt(s: Subject, style: str) -> str:
+    """The positive prompt of one subject in one style; round one's brief is style "3d"."""
+    if style == "3d":
+        return s.prompt()
+    body = FLAT_BRIEF.format(subject=FLAT_WORDS[s.slug], palette=FLAT_PALETTE[s.plate])
+    return (FLAT_TRIGGER + body) if style == "flat-trigger" else body
+
+
+def negative(style: str) -> str:
+    return NEGATIVE if style == "3d" else FLAT_NEGATIVE
+
 
 def subject(slug: str) -> Subject:
     for s in SUBJECTS:
