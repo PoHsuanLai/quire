@@ -7,10 +7,16 @@
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
    `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
    `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
-   not specified here. Disabled: not specified (O-1). */
+   not specified here. Disabled: not specified (O-1).
+   The label is the flexible part: it starts at the left and takes the free space, so the count
+   and the close button sit at the end and an item without them does not centre (gallery fix A:
+   Blitz's user-agent `button{justify-content:center}` centred an item with no count). The fade
+   of a truncating label then falls on its empty end unless the text really reaches it. The
+   button forms of the base and close rules add the element: the reset's
+   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
 
-.ds-sidebar-item{
-  display:flex; align-items:center; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
+.ds-sidebar-item, button.ds-sidebar-item{
+  display:flex; align-items:center; justify-content:flex-start; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
   background:transparent; padding:6px 8px; border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
   color:var(--f-ink-soft); position:relative;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
@@ -18,7 +24,7 @@
 .ds-sidebar-item:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
 .ds-sidebar-item:active{ transform:scale(var(--squish)); }
 .ds-sidebar-item[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
-.ds-sidebar-item-text{ min-width:0; }
+.ds-sidebar-item-text{ flex:1 1 0; min-width:0; }
 .ds-sidebar-item-text[*|data-emphasis=plain]{ font-weight:500; }
 
 /* The seal (`S:345-346`): Place items only. */
@@ -28,7 +34,7 @@
 }
 
 /* Today's close button (`S:140-143`). */
-.ds-sidebar-item-close{
+.ds-sidebar-item .ds-sidebar-item-close{
   margin-left:auto; opacity:0; border:0; background:none; cursor:pointer; padding:0; color:var(--f-ink-faint); line-height:0;
   transition:opacity var(--t-quick) var(--e-out);
 }

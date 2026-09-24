@@ -144,7 +144,7 @@ pub fn TextInput(
     let shown = placeholder_shown(&value, &placeholder).map(str::to_string);
     let aria_placeholder = (!placeholder.is_empty()).then_some(placeholder.clone());
     rsx! {
-        span { class: "ds-field", "data-variant": variant.slug(),
+        span { class: "ds-input-wrap", "data-variant": variant.slug(),
             input {
                 class: "ds-input",
                 "data-variant": variant.slug(),

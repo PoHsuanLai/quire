@@ -289,6 +289,32 @@ pub const ROW_CASES: &[Case] = &[
             }
         },
     },
+    // Gallery fix A: a name longer than the column's 26-character budget fades; "bare" above
+    // is the one that fits and does not.
+    Case {
+        component: "list_row",
+        state: "name-overflowing",
+        make: || {
+            rsx! {
+                ListRow {
+                    selection: Selection::Unselected,
+                    emphasis: Emphasis::Plain,
+                    index: StaggerIndex::new(0),
+                    presence: Presence::Present,
+                    name: "Maximilian Alexander von Hohenberg-Wittelsbach",
+                    via: None,
+                    subject: "Notes from the sync review",
+                    snippet: None,
+                    time: "Tue",
+                    tags: rsx! {},
+                    star: None,
+                    star_pulse: PulseKey::rest(Anim::StarPop),
+                    strip: None,
+                    onclick: |_| {},
+                }
+            }
+        },
+    },
     // AnimatedList.
     Case {
         component: "animated_list",

@@ -7,6 +7,7 @@ use crate::icon::Icon;
 use crate::icon::Shape;
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
+use crate::text::clip_chars;
 use dioxus::html::geometry::{ClientPoint, ElementPoint, PagePoint, ScreenPoint};
 use dioxus::html::input_data::{MouseButton, MouseButtonSet};
 use dioxus::html::{
@@ -17,6 +18,44 @@ use dioxus::prelude::*;
 
 /// The six spark angles, 0 to 300 degrees in steps of 60 (`S:1285`).
 const SPARK_ANGLES: [u16; 6] = [0, 60, 120, 180, 240, 300];
+
+/// How many characters of a name the name column holds before it must fade: the column at
+/// the narrowest window S draws (980 px, design/01-LAYOUT.md section 1), which leaves the list
+/// column about 352 px and, after the list's padding, the row's padding and border, the dot
+/// column, the grid gaps, the tail (a data-10 time and a chip) and the via mark, about 196 px for
+/// the name; at ui 13.5 / 700 (design/02-TYPE.md) a Karla character averages about 7.4 px.
+/// A name within it is drawn whole; only a longer one gets `.ds-truncate`'s end fade, because
+/// CSS cannot ask Blitz whether text overflows (spike S13) and a fade on text that fits eats its
+/// last letters (gallery fix A).
+const NAME_BUDGET: usize = 26;
+
+/// Whether a name fits its column or runs past it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum NameFit {
+    /// Drawn whole, no fade.
+    Fitting,
+    /// Longer than the column: its end fades (`.ds-truncate`).
+    Overflowing,
+}
+
+impl NameFit {
+    /// Whether `name` fits in `budget` characters: what [`clip_chars`] would leave untouched.
+    fn of(name: &str, budget: usize) -> Self {
+        if clip_chars(name, budget) == name {
+            NameFit::Fitting
+        } else {
+            NameFit::Overflowing
+        }
+    }
+
+    /// The name span's class list.
+    fn class(self) -> &'static str {
+        match self {
+            NameFit::Fitting => "ds-row-name",
+            NameFit::Overflowing => "ds-row-name ds-truncate",
+        }
+    }
+}
 
 /// The `data-emphasis` word.
 fn emphasis_slug(emphasis: Emphasis) -> &'static str {
@@ -172,7 +211,7 @@ pub fn ListRow(
             }
             div { class: "ds-row-main",
                 div { class: "ds-row-from",
-                    span { class: "ds-row-name ds-truncate", "{name}" }
+                    span { class: NameFit::of(&name, NAME_BUDGET).class(), "{name}" }
                     if let Some(via) = via {
                         span { class: "ds-row-via", {via} }
                     }
@@ -265,7 +304,7 @@ impl HasMouseData for Pressed {
 
 #[cfg(test)]
 mod tests {
-    use super::{exit, row_style, sparks};
+    use super::{NAME_BUDGET, NameFit, exit, row_style, sparks};
     use crate::components::vocab::{PulseKey, StaggerIndex, Switch};
     use crate::geometry::Px;
     use crate::motion::anim::Anim;
@@ -285,6 +324,28 @@ mod tests {
             row_style(StaggerIndex::new(40), Presence::Present),
             "--i:12"
         );
+    }
+
+    #[test]
+    fn only_a_name_longer_than_its_column_fades() {
+        const CASES: &[(&str, NameFit)] = &[
+            ("", NameFit::Fitting),
+            ("Dana Okafor", NameFit::Fitting),
+            // Exactly the budget: 26 characters.
+            ("Abcdefghij Klmnopqrs Tuvwx", NameFit::Fitting),
+            ("Abcdefghij Klmnopqrs Tuvwxy", NameFit::Overflowing),
+            (
+                "Maximilian Alexander von Hohenberg-Wittelsbach",
+                NameFit::Overflowing,
+            ),
+            // Characters, not bytes: 21 characters in 24 bytes.
+            ("Léa Martin-Ørsted-Åsa", NameFit::Fitting),
+        ];
+        for (name, want) in CASES {
+            assert_eq!(NameFit::of(name, NAME_BUDGET), *want, "{name:?}");
+        }
+        assert_eq!(NameFit::Fitting.class(), "ds-row-name");
+        assert_eq!(NameFit::Overflowing.class(), "ds-row-name ds-truncate");
     }
 
     #[test]

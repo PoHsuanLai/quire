@@ -599,3 +599,74 @@ The API gaps the gallery and `examples/consumer` exposed, closed on branch `fix-
   spacing, Surface, HoverCard, toast, avatar and Button gaps this branch closes;
   `examples/consumer` still anchors its menu through a wrapper span and could pass `mounted`;
   CONSUMING.md §4 and §5 describe `Surface` and `RawMarkup` as they were.
+## Gallery fixes A (2026-09-24)
+
+The component bugs the gallery's contact sheets exposed, each with its cause, its fix and its
+proof. Headless proofs are in `crates/ds-native/tests/gallery_fixes.rs`; each fails on the
+pre-fix tree (checked by restoring the old sheets) and passes now.
+
+- Two root causes explain most of the list:
+  - **A class collision.** TextInput's placeholder wrapper was `.ds-field`, which is also the
+    Space editor's colour field. The field's `height:176px`, border and radius landed on every
+    TextInput wrapper, and TextInput's `display:inline-flex` landed on the colour field. That
+    collapsed the field to its 1 px border (plane and handles clipped to nothing). The wrapper is
+    now `.ds-input-wrap`; `.ds-field` is the editor's alone, as design/04 section 32 names it.
+  - **The reset outranks a lone class.** `.ds button,.ds input{font:inherit;color:inherit}` is
+    (0,1,1), so a component rule written as one class (0,1,0) loses its `color` and `font-*` on a
+    `button` or `input`. The toast's tab and the send pill's Undo took the pill's `--paper` on their
+    own `--paper` ground, which is why their labels were invisible. The sidebar item lost its 13.5 / 600 and
+    `--f-ink-soft`; the header action, the stop's remove button and the row's star lost their
+    colours; the input lost 13.5 px. Every rule in this branch's files that styles a button or input now
+    outranks the reset (a parent class, `button.` or `.ds-input-wrap input`). **Not fixed at the
+    source:** `css/reset.css` is outside this branch; writing it as `:where(.ds) button, …` (specificity 0,0,1)
+    would fix every component at once, including ones this branch does not own (for example
+    `selection_bubble`, `menu_entry` and `tabs`, if they style a button with one class). Recommended.
+- 1. TextInput was 176 px tall: the collision above, and Blitz gives an `input` the
+  300 x 150 replaced-element default because nothing sized it. The input is `width:100%` of its
+  wrapper, and its height is `calc(1.55em + 16px)` boxed and `calc(1.55em + 8px)` inline (the
+  13.5 px line at the inherited 1.55, plus padding and border). The height is in `em`, so SearchField's 16 px (and
+  the bubble's 12.5) stay one line. SearchField's rules now name the variant, so they outrank
+  TextInput's (its padding 0 had been losing). Proof: 36.9, 28.9 and 24.8 px, each within 2 px.
+- 2. The hidden toast was laid out in every root. `ToastHost` now draws nothing while the
+  hub is empty. A push mounts it `data-shown=hidden` for one frame (`FRAME_SLACK`), so the
+  spring rises from `translateY(160%)` (the harness's 5200 ms toast case now sees `hidden` on the
+  click's frame, `shown` 100 ms later, and nothing once it has sunk). A hide slides it back and drops it after `--t-big` plus
+  a frame. The stage machine is a pure `Stage::next` with a table test. Proofs: an SSR test
+  (no `.ds-toast` in an empty root; hidden on the first frame, shown after, gone after the hold
+  and the sink) and a pixel probe (the bottom of an empty root is one flat colour).
+  Many overlay goldens lost the trailing empty toast.
+- 3. The toast tab and SendPill Undo labels: the reset specificity above. Proof: the goldens
+  carry "Undo", and a pixel probe finds the label's ink on the tab and on Undo (0 pixels before).
+- 4. LinkPill: the stylesheet already played `hc-in --t-quick --e-out` (W2 integration); the
+  gallery's gap line is stale. The pill now reports `use_entrance(Anim::LinkPillIn)` as
+  `data-presence`. Unit tests pin its rule to the recipe, check that it differs from the hover
+  card's, and pin the doc's colours (ink/paper, lying `--danger`/`--danger-ink`).
+- 5. SectionHeader: the eyebrow is `.ds-section-header-text` (nowrap). The rule is already a real
+  span (O-22). The header is `width:100%; grid-column:1 / -1`, so in a grid it gets a row of its own.
+  Proof: four headers in a 4-column grid are each 400 px wide and stacked.
+- 6. SidebarItem: Blitz's user-agent `button{justify-content:center}` centred an item without a
+  count. The item now sets `justify-content:flex-start`, and the label is the flexible part
+  (`flex:1 1 0`), so a truncating label's fade falls on its empty end. Proof: the label starts
+  33 px in, with and without a count.
+- 7. ListRow: `NameFit::of(name, NAME_BUDGET)` uses `clip_chars`'s count. `.ds-truncate` goes on
+  the name only when it is `Overflowing`. design/02 gives no column budget. `NAME_BUDGET` = 26 is
+  derived and documented in the code: 980 px minimum window, about 196 px of name column, about
+  7.4 px per character at ui 13.5 / 700. A name that fits but is unusually wide is hard-clipped
+  (`overflow:hidden`) rather than faded. Proof: a table test and the `name-overflowing` golden
+  beside `bare`.
+- 8. SpaceEditor: the field was blank because of the collision (not a late image: the
+  harness's frame loop already goes round while a fetch lands, spike S7). `snapshot_at` did
+  jump straight to CSS time without letting wall-clock timers run, so once the toast rose on a
+  one-frame wait the gallery's posed toast never showed. It now lets 120 ms pass first
+  (`MOUNT_SETTLE`: late fetches and the `FRAME_SLACK` mount waits land); each moment's CSS time
+  is unchanged. Presets are 22 px discs (`repeat(8, 22px)`); `aspect-ratio:1` in a wide
+  panel made them 140 px. Proof: the field is 176 px tall, its dots cover more than 5 % of
+  it, its centre is not `--paper`, a handle sits on it, and a preset is 22 x 22.
+- Found, not fixed (another branch's file): `ToastHub::stop_hold` writes `hold` inside
+  `if let Some(running) = *self.hold.peek()`. In edition 2024 the peek guard lives through the
+  block, so `hide()` or `undo()` while the hold runs panics with `AlreadyBorrowed`. Any undo
+  from the pull tab hits it. The SSR sink test waits out the hold instead. Fix: copy the value
+  out first (`let running = *self.hold.peek(); if let Some(running) = running { … }`).
+- The gallery's "What quire does not draw yet" list (`ds-gallery/src/pages/gaps.rs`) still
+  names the TextInput, toast, tab, SidebarItem, Space editor and LinkPill items; it is outside
+  this branch and should drop them.

@@ -14,6 +14,13 @@ use std::time::Duration;
 /// motion token is well under a second), so the picture is the component at rest.
 const AT_REST: Duration = Duration::from_secs(10);
 
+/// The wall-clock time a snapshot lets pass before its first moment, so what a component
+/// starts on mount lands in the picture: a resource answered after the first resolve (an image
+/// lands one frame late, spike S7) and the one-frame waits quire starts on mount (`FRAME_SLACK`,
+/// 34 ms, after an effect's round: the toast and the send pill rise on it). Without it a posed
+/// toast was never drawn (gallery fix A).
+const MOUNT_SETTLE: Duration = Duration::from_millis(120);
+
 /// The size and scale a snapshot renders at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Viewport {
@@ -34,14 +41,16 @@ pub fn snapshot(app: fn() -> Element, viewport: Viewport) -> Result<image::RgbaI
 }
 
 /// Render `app` at each of `moments` of animation time (measured from its first frame, in
-/// order), after its fonts and images have landed: one image per moment, for pictures of a
-/// motion part-way through.
+/// order), after its fonts and images have landed and its mount-time waits have run: one image
+/// per moment, for pictures of a motion part-way through. Each moment's CSS time is exact; the
+/// settle only lets timers and fetches land first.
 pub fn snapshot_at(
     app: fn() -> Element,
     viewport: Viewport,
     moments: &[Duration],
 ) -> Result<Vec<image::RgbaImage>, NativeError> {
     let mut harness = Harness::new(app, viewport);
+    harness.advance(MOUNT_SETTLE);
     moments
         .iter()
         .map(|&moment| harness.render_at(moment))
