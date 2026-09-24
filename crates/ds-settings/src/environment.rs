@@ -5,6 +5,7 @@ use crate::appearance_file as file;
 use crate::dirs::{self, AppName};
 use crate::portal::{self, SystemPrefsWatch};
 use crate::settings::AppearanceFile;
+use crate::units::Percent;
 use crate::watch::{self, AppearanceWatch};
 use dioxus::prelude::*;
 use ds::SystemPrefs;
@@ -45,6 +46,22 @@ impl Environment {
     /// ```
     pub fn tint_alpha(&self) -> ds::Alpha {
         ds::Alpha(u16::from(self.settings.appearance.material_tint_alpha.0.min(100)) * 10)
+    }
+
+    /// The six `appearance.material_*` keys as the root's `stack` (`Ds { stack }`): highlight
+    /// and hairline alphas per scheme, shadow strength and vibrancy, each a percent in
+    /// thousandths like [`Environment::tint_alpha`].
+    pub fn material_stack(&self) -> ds::MaterialStack {
+        let a = &self.settings.appearance;
+        let alpha = |percent: Percent| ds::Alpha(u16::from(percent.0.min(100)) * 10);
+        ds::MaterialStack {
+            highlight_light: alpha(a.material_highlight_light),
+            highlight_dark: alpha(a.material_highlight_dark),
+            hairline_light: alpha(a.material_hairline_light),
+            hairline_dark: alpha(a.material_hairline_dark),
+            shadow_strength: alpha(a.material_shadow_strength),
+            vibrancy: alpha(a.material_vibrancy),
+        }
     }
 }
 
@@ -179,5 +196,11 @@ mod tests {
             ds::Alpha(800),
             "the key's default is the root's default"
         );
+    }
+
+    #[test]
+    fn the_default_material_keys_are_the_stacks_defaults() {
+        let env = Environment::default();
+        assert_eq!(env.material_stack(), ds::MaterialStack::default());
     }
 }

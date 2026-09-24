@@ -30,6 +30,12 @@ const APPEARANCE_SETTINGS_FIELDS: &[&str] = &[
     "accent",
     "motion_level",
     "material_tint_alpha",
+    "material_highlight_light",
+    "material_highlight_dark",
+    "material_hairline_light",
+    "material_hairline_dark",
+    "material_shadow_strength",
+    "material_vibrancy",
 ];
 
 /// The `Key` column of every data row in one `###`-level section of the doc, in file order.
