@@ -96,6 +96,7 @@ pub fn ListsPage() -> Element {
     rsx! {
         LiveList {}
         super::lists_search::SearchRows {}
+        super::lists_mailo4::StripPress {}
         Sidebar {}
         Tiles {}
         Picker {}
