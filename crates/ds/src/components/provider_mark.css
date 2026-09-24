@@ -19,5 +19,8 @@
   width:11px; height:11px; font-size:var(--fs-pico); border-radius:var(--r-micro);
   margin-right:var(--s-4); vertical-align:-1px; box-shadow:0 0 0 var(--hair) var(--line);
 }
+/* A local-folders account (mailo gaps 4): the folder glyph, stroked in `--pc` (the neutral grey)
+   through `currentColor`, centred on the same chip. */
+.ds-provider[*|data-kind=local] .ds-ic{ display:block; }
 .ds-provider[*|data-kind=image]{ padding:var(--s-1-5); }
 .ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }

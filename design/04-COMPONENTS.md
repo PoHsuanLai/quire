@@ -2501,12 +2501,17 @@ account setup (`S:1139-1141`). Three sizes. Mail: account tiles, row `via`, From
 ```rust
 #[component] pub fn ProviderMark(provider: Provider, size: MarkSize /* Tile | Row | Inline */,
     style: MarkStyle /* Letter | Image(ImageSource) */) -> Element
-pub enum Provider { Google, Microsoft, Fastmail, ICloud, Yahoo, Imap }
+pub enum Provider { Google, Microsoft, Fastmail, ICloud, Yahoo, Imap, Local }
 ```
 
 Letter and colour per provider (`S:1130-1136`): Google `G` #1A73E8; Microsoft 365 `M` #0F6CBD;
 Fastmail `F` #2A5DB0; iCloud `i` #3A82F7; Yahoo `Y` #6001D2; IMAP `@` #5D6660. Row `via` text:
 gmail, m365, fastmail, icloud, yahoo, imap.
+
+`Local` (mailo gaps 4, settled 2026-09-25): a local-folders account has no provider, so its mark
+is not a letter but the `folder` glyph (10 on a tile, 8 in a row, 9 inline) stroked in IMAP's
+neutral #5D6660 on the same chip, `data-kind="local"`, titled "Local folders". It has no favicon:
+`MarkStyle::Image` draws the same glyph.
 
 **Geometry.**
 
