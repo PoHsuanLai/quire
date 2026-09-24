@@ -132,6 +132,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
             "slider",
             "button",
             "chip",
+            "text_input",
         ],
         "drag" => &["drag_ghost"],
         other => return sheet(other).into_iter().collect(),

@@ -1645,8 +1645,8 @@ controls' and lists' class scans cover them) and one Harness test file per behav
    `a_spinning_ring_turns_and_a_draining_one_holds`: the ring's pixels 250 ms apart differ
    for Spin and are identical for Drain).
 4. **SidebarItem.** A Today item's close button is named `Close {label}` (it was `Close` on
-   every row, so a screen reader heard a column of identical buttons). This is the one change
-   to existing markup in this wave: the `today-entering`, `today-present` and `today-leaving`
+   every row, so a screen reader heard a column of identical buttons). This is the first of the
+   two changes to existing markup in this wave (the brief asked for both): the `today-entering`, `today-present` and `today-leaving`
    goldens were re-blessed and differ only in that attribute. `trailing: Option<TodayTrailing>`
    (`time`, `cancel` as the button's accessible name, `on_cancel`) draws a scheduled row's time
    and its cancel after the label; the cancel stops propagation, as the close does, so it does
@@ -1654,3 +1654,42 @@ controls' and lists' class scans cover them) and one Harness test file per behav
    (a slot would let a consumer put a raw button inside a `role=button` div). Proof:
    `today_trailing.rs` (cancel then label logs `cancel,open`; the close is `Close Q3 notes`) and
    the `today-scheduled` golden.
+5. **SpaceEditor.** `on_rename: Option<EventHandler<String>>` turns the title into an inline
+   `TextInput` holding `name` (the title's face and size, not the field's body size);
+   `motion: Option<MotionChoice { level, on_motion }>` adds a Motion row after Appearance;
+   `measured: MeasuredIn::{ThisScheme, EachScheme}` measures each scheme the Space's theme can
+   show, each under a small-caps heading (`schemes_of`: System both, Light or Dark its own).
+   Each defaults to the old markup. The Theme row stays the editor's own
+   `SegmentedControl<Theme>`, not `AppearancePicker`. `Preset` gains `name` (Dusk, Orchard,
+   Harbour, Ember, Lagoon, Heather, Moss, Stone: mailo's names in design/21's order, now in its
+   table), and each preset button is named by it: the second change to existing markup in this
+   wave (the five `space_editor` goldens differ only in the preset buttons' `aria-label`, now
+   the name, and a new `title`). The file was split to stay short: the field and its handles
+   are `space_editor/handles.rs`, `SpaceDot` is `space_editor/dot.rs`, the new rows
+   `space_editor/rows.rs`, and `Checks` became a header over `CheckRows` so each scheme reuses
+   the rows.
+   - **The Motion row is over `Motion`, not `MotionLevel`, as the brief named it.** `MotionLevel`
+     is the resolved level (`Calm`, `Standard`, `Extra`, `Reduced`: no `System`, no label); what
+     a person picks, and what a root takes (`Appearance { motion: Motion }`, and what mailo's
+     `Space::motion` feeds per the first mailo gaps item 6), is `Motion`, which has `System` and a
+     `label()`. A row over `MotionLevel` could not offer "follow the desktop".
+   - Not done: mailo's six extra presets (the retired accents) are not added to quire's
+     `PRESETS: [Preset; 8]`; design/21 names eight, and changing the array's length would break
+     every consumer that indexes it by workspace.
+   Proof: `space_editor_rows.rs` (typing `s` in the title makes the Space "Works"; picking
+   Reduced reports `reduced`; a System Space shows Light and Dark headings over eight checks),
+   the `rows-system`, `rows-dark` and `rename-unnamed` goldens, and
+   `presets::the_presets_are_named_in_the_design_order`.
+
+What mailo changes (docs/mailo-migration.md section 2 has the row for each):
+
+- Raw buttons with a title, an assistive name or an open state become `Button { title,
+  aria_label, expanded }`; `Field` becomes `TextInput { kind, onfocus, onblur }` (the typing
+  guard hangs off the two handlers) and its `Range` kind becomes `Slider`.
+- `AccountTiles` passes its provider-marks setting as `mark`, and its "+" is `AddAccountTile`.
+- `compose/pill.rs` maps `Mood`, `Offer` and `Ring::Spin` onto `SendMood`, `PillAction` and
+  `SendRing`, and `.sp-why` onto `refusal`; its own nudge and shake CSS goes.
+- `compose/later.rs`'s scheduled rows are `SidebarItem { trailing }`; a test that looked for a
+  Today close named "Close" looks for "Close {label}".
+- The Space editor's name, Motion and per-scheme readout are `on_rename`, `motion` and
+  `measured`; a test that found presets by "Preset n" finds them by name.

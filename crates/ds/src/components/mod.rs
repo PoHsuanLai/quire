@@ -97,7 +97,7 @@ pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
-pub use space_editor::{ActiveDot, DotIndex, SpaceDot, SpaceEditor};
+pub use space_editor::{ActiveDot, DotIndex, MeasuredIn, MotionChoice, SpaceDot, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
