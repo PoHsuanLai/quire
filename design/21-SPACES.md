@@ -84,6 +84,16 @@ Material and blur (settled mechanism, proposed alpha): `Material::{Bar,Dock,Popo
 `--m-tint-solid` (alpha ≥ .94, settled) when blur is unavailable. The contrast tests in §7
 run against both.
 
+Settled implementation (bar gaps, sill Q9): a `Ds` root in Bar, Dock, Osd or Widget, or a
+Popover root that is itself a panel (`chrome: Painted`, the launcher), stamps
+`data-frame="tinted"` and draws §5's two layers and the grain as one `.ds-frame` group at
+the material's own tint alpha from 03-COLOR §17.2 scaled by `appearance.material_tint_alpha`
+(`--m-frame-alpha`: the bar .70 light, .66 dark at the default) with blur, and at .94 without.
+The OSD row below is "no (proposed)", but the implementation tints it as the brief asked: the
+user's call. Over a pure black or white backdrop six material/scheme pairs fall short of 4.5 at
+these alphas (FINDINGS "Bar gaps" lists the .02 raises that clear them); without blur all
+clear.
+
 ## 4. Presets and defaults per workspace index
 
 The 8 presets (settled, S; Appendix A3):
@@ -108,7 +118,9 @@ Default `SpaceLook` for a workspace with no stored look (proposed):
 
 The layer A/B model from S (Appendix A6 "Space switch"; S:1180-1187):
 
-1. Each tinted surface has two background layers, `.ds-layer` (front) and `.ds-layer.back`.
+1. Each tinted surface has two background layers, `.ds-layer` (front) and `.ds-layer.back`
+   (settled for every tinted root, bar gaps: on shell chrome they sit in `.ds-frame`, whose own
+   background is the current gradient, so the group is opaque inside through the fade).
 2. On switch, the hidden layer gets the new gradient and opacity 1; the front goes to
    opacity 0; the roles swap. Transition `opacity --t-scene (380 ms) --e-out`.
 3. Grain opacity transitions over the same 380 ms (proposed).

@@ -4,6 +4,7 @@
 //! submenus follow design/13-BEHAVIOUR-menus-windows.md sections 13.3.3 and 13.3.4.
 
 use crate::components::avatar::{AvatarFace, face};
+use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::vocab::{Availability, Check, Selection, Shortcut, Switch};
 use crate::geometry::{Point, Px};
 use crate::icon::Icon;
@@ -71,6 +72,14 @@ pub enum MenuEntry<T> {
     },
     /// A group title.
     Header(String),
+    /// A status line (a network's address, a battery's time left): drawn at an item's weight
+    /// without the header's eyebrow, never a choice, so the keys and the pointer pass it by.
+    Info {
+        /// The line.
+        title: String,
+        /// A second, fainter line.
+        detail: Option<String>,
+    },
     /// A rule between groups.
     Separator,
 }
@@ -117,16 +126,30 @@ pub(crate) struct ItemView<'a> {
     pub branch: Branch,
 }
 
-/// An item row. `onpick` runs on a click of a live row (a parent opens its submenu); `onpoint`
-/// with the pointer's client position when it moves over any row, disabled ones too, so hover
-/// and keyboard select alike (O-13) and the menu tracker sees where the pointer is.
-pub(crate) fn item(
-    view: ItemView<'_>,
-    row: Row,
-    onpick: EventHandler<()>,
-    onpoint: EventHandler<Point>,
-    onmounted: EventHandler<MountedEvent>,
-) -> Element {
+/// What a row reports: a click of a live row (`pick`; a parent opens its submenu), the
+/// pointer's client position when it moves over any row, disabled ones too, so hover and
+/// keyboard select alike (O-13) and the menu tracker sees where the pointer is (`point`), its
+/// mount, and, where the menu listens for it, a button released over it (`release`).
+#[derive(Clone, Copy)]
+pub(crate) struct RowEvents {
+    /// A click of a live row.
+    pub pick: EventHandler<()>,
+    /// The pointer moved over the row.
+    pub point: EventHandler<Point>,
+    /// The row mounted.
+    pub mounted: EventHandler<MountedEvent>,
+    /// A button was released over the row.
+    pub release: Option<EventHandler<Press>>,
+}
+
+/// An item row, reporting through `events`.
+pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
+    let RowEvents {
+        pick: onpick,
+        point: onpoint,
+        mounted: onmounted,
+        release: onrelease,
+    } = events;
     let checked = view.check.map(|check| match check {
         Check::Checked => "true",
         Check::Unchecked => "false",
@@ -165,6 +188,13 @@ pub(crate) fn item(
                     onpick.call(());
                 }
             },
+            onmouseup: move |event| {
+                if let Some(onrelease) = onrelease {
+                    event.stop_propagation();
+                    let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
+                    onrelease.call(Press::of(&event, button));
+                }
+            },
             onmounted: move |event| onmounted.call(event),
             if row == Row::Checked {
                 Glyph { icon: Icon::Check }
@@ -177,6 +207,19 @@ pub(crate) fn item(
                 }
             }
             {trail}
+        }
+    }
+}
+
+/// A status line: a row of text at an item's weight, not a choice (design/13 section 13.3.3).
+pub(crate) fn info(title: &str, detail: Option<&str>) -> Element {
+    let detail = detail.map(str::to_string);
+    rsx! {
+        div { class: "ds-menu-info", role: "presentation",
+            b { class: "ds-menu-info-title", "{title}" }
+            if let Some(detail) = detail {
+                small { class: "ds-menu-info-detail", "{detail}" }
+            }
         }
     }
 }

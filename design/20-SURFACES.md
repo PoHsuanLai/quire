@@ -18,9 +18,9 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | --- | --- | --- |
 | Layer / role | layer-shell `Top`, one per output, anchor `TOP\|LEFT\|RIGHT`, `ExclusiveZone::Reserve(h)` | S |
 | Height | height token (value in 01-LAYOUT) | S |
-| Material | `Bar`, tinted by the workspace SpaceLook (`--f-*`) | S |
+| Material | `Bar`, tinted by the workspace SpaceLook (`--f-*`); `Ds` draws the gradient at the bar's tint and the frame ground (bar gaps) | S |
 | Content | left: app name, workspace indicator (drag reorder); right: tray, volume, network, battery, clock | S |
-| Components | `IconButton{Tool}` per status item, `Glyph` (`IconSize::Bar` 22, P), `Menu{Dropdown}` + `MenuEntry` for every menu, `Count`, `Tooltip{Fly}`, workspace dots as `SidebarItem`-style pills with seal | S / P |
+| Components | `IconButton{Status}` per status item (settled, bar gaps: box and glyph from `bar.status_*` through `StatusMetrics`), `MenuEntry::Info` for status lines, `Glyph` (`IconSize::Bar` 22, P), `Menu{Dropdown}` + `MenuEntry` for every menu, `Count`, `Tooltip{Fly}`, workspace dots as `SidebarItem`-style pills with seal | S / P |
 | Motion | menus `menu-pop` `--t-move` `--e-spring`; hover bg `--t-quick` `--e-out`; press `--squish` `--t-tap`; tint cross-fade `--t-scene` 380 ms (21-SPACES §5) | S |
 | Behaviours | 13-BEHAVIOUR-menus-windows (menu bar, menus: open delay, safe triangle), 06 (menus, Escape), 12 (workspace swipe updates indicator) | S |
 | Keyboard | `KeyboardMode::None`; a grabbing popup switches it to `OnDemand` until close | S |
@@ -33,7 +33,7 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Field | Value | St |
 | --- | --- | --- |
 | Layer / role | `Top`, anchor `BOTTOM`, height = base x max magnification + padding, `Reserve(base + margin)` | S |
-| Material | `Dock`, tinted by SpaceLook | S |
+| Material | `Dock`, tinted by SpaceLook; drawn by `Ds` like the bar (bar gaps) | S |
 | Components | app tiles (08-ICONS plate), running indicator dots, `Count` badge (LauncherEntry), progress ring, `Tooltip{Fly}` hover label, `Menu{Context}` (windows, desktop actions, Keep in Dock, Quit), `Popover` for folder stacks | S / P |
 | Motion | magnification: no easing while tracking, ~200 ms shrink on leave (10); launch bounce and attention bounce (10); badge change `bump`; label `hc-in`/`hc-out` P; menu `menu-pop` | S |
 | Behaviours | 10-BEHAVIOUR-dock (Plank parabola, 48 → up to 96, neighbours slide apart, click/right-click, stacks, drag-out, badges); auto-hide off by default (0.2 s delay, ~0.5 s slide when on) | S |

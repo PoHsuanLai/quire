@@ -1,13 +1,14 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 46 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
+//! 47 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
 //! S's `fade` replaces `fade-in`), plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
 //! integration amendment), plus four assignment rows that play a catalogue keyframe at another
 //! recipe (wave 2 integration amendment, section 5 rows 7, 26, 37 and 64): `PaletteFade`,
-//! `LinkPillIn`, `BubblePop` and `PeekFullIn`.
+//! `LinkPillIn`, `BubblePop` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
+//! closed by Escape or an outside click (bar gaps).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -66,6 +67,9 @@ pub enum Anim {
     MenuIn,
     /// `menu-pop`: every floating menu.
     MenuPop,
+    /// `menu-out`: a menu closed by Escape or an outside click fades before it goes
+    /// (design/13-BEHAVIOUR-menus-windows.md section 13.3.2, "fade on close"; bar gaps).
+    MenuOut,
     /// `menu-pop` at `--t-quick`: the selection bubble (section 5 row 37).
     BubblePop,
     /// `cmdk-in`: C's command menu.
@@ -114,7 +118,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 46] = [
+    pub const ALL: [Anim; 47] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -139,6 +143,7 @@ impl Anim {
         Anim::SlideL,
         Anim::MenuIn,
         Anim::MenuPop,
+        Anim::MenuOut,
         Anim::BubblePop,
         Anim::CmdkIn,
         Anim::PeekIn,
@@ -190,6 +195,7 @@ impl Anim {
             Anim::SlideL => "a-slide-l",
             Anim::MenuIn => "a-menu-in",
             Anim::MenuPop => "a-menu-pop",
+            Anim::MenuOut => "a-menu-out",
             Anim::BubblePop => "a-bubble-pop",
             Anim::CmdkIn => "a-cmdk-in",
             Anim::PeekIn => "a-peek-in",

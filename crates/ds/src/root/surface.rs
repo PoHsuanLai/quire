@@ -1,6 +1,7 @@
 //! A nested scope: a subtree drawn in another material, scheme, accent or blur state, under the
 //! same root. No stylesheet of its own.
 
+use super::chrome::Ground;
 use super::env::{Env, use_env, use_env_provider};
 use crate::appearance::{Accent, Resolved, Scheme};
 use crate::material::{BlurState, Material};
@@ -9,16 +10,20 @@ use dioxus::prelude::*;
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`
 /// stamping the scope's theme, accent, motion, material and blur, with no stylesheet and no
 /// frame variables (it inherits the root's). Each override left `None` inherits the enclosing
-/// scope's value, so a specimen in another accent or blur state needs no second `Ds`.
+/// scope's value, so a specimen in another accent or blur state needs no second `Ds`. `on` is
+/// the ground its content is drawn on: `None` takes the material's (`Ground::of`: the frame for
+/// Bar and Dock, paper otherwise), so a paper panel inside a bar root is paper again.
 #[component]
 pub fn Surface(
     material: Material,
     #[props(default)] theme: Option<Scheme>,
     #[props(default)] accent: Option<Accent>,
     #[props(default)] blur: Option<BlurState>,
+    #[props(default)] on: Option<Ground>,
     children: Element,
 ) -> Element {
     let env = scope(use_env(), material, theme, accent, blur);
+    let ground = on.unwrap_or(Ground::of(material));
     use_env_provider(env);
     rsx! {
         div {
@@ -28,6 +33,7 @@ pub fn Surface(
             "data-motion": env.resolved.motion.slug(),
             "data-material": env.material.slug(),
             "data-blur": env.blur.slug(),
+            "data-ground": ground.attribute(),
             {children}
         }
     }

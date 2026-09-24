@@ -224,3 +224,130 @@ fn the_translucent_tints_hold_text_over_black_and_white() {
     }
     assert!(failures.is_empty(), "{failures:#?}");
 }
+
+/// A fill as a screen shows it over `stop`: a hex fill is opaque, an `rgba()` one is mixed.
+fn fill_over(fill: &str, stop: &str) -> String {
+    if fill.starts_with('#') {
+        return fill.to_owned();
+    }
+    let ds::Hex(under) = ds::Hex::parse(stop).unwrap_or_else(|| panic!("{stop} is not hex"));
+    over(fill, under)
+}
+
+/// A status item and every control on the frame ground (bar gaps): the ink under the pointer,
+/// `--f-ink`, on the hover fill `--f-pill-hover`, and on the pressed or open fill `--f-pill`,
+/// each laid over every stop of the gradient, clears 4.5 in every preset and both schemes.
+#[test]
+fn frame_ink_holds_on_the_hover_and_pressed_fills() {
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL {
+        for (index, preset) in PRESETS.iter().enumerate() {
+            let look = SpaceLook {
+                dots: preset.dots.to_vec(),
+                ..SpaceLook::default()
+            };
+            let vars = FrameVars::of(&look, scheme);
+            for stop in derive(&look.dots, scheme).stops {
+                for (name, fill) in [
+                    ("--f-pill-hover", &vars.pill_hover),
+                    ("--f-pill", &vars.pill),
+                ] {
+                    let ground = fill_over(fill, &stop);
+                    let got = measured(&vars.ink, &ground);
+                    if got < 4.5 {
+                        failures.push(format!(
+                            "{scheme:?} preset {}: --f-ink {} on {name} over {stop} ({ground}) is {got:.2}",
+                            index + 1,
+                            vars.ink
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+
+/// The alpha of `material`'s tint over blur at the key's default, read off its recipe.
+fn tint_alpha(material: Material, scheme: Scheme) -> f64 {
+    let tint = recipe(material, scheme, DEFAULT_TINT_ALPHA).tint;
+    tint.trim_end_matches(')')
+        .rsplit(',')
+        .next()
+        .and_then(|alpha| alpha.parse().ok())
+        .unwrap_or_else(|| panic!("{tint} has no alpha"))
+}
+
+/// The ink each tinted chrome material draws in, over its own gradient.
+fn chrome_ink(material: Material, vars: &FrameVars, scheme: Scheme) -> String {
+    match ds::Ground::of(material) {
+        ds::Ground::Frame => vars.ink.clone(),
+        ds::Ground::Paper => colour(ColourToken::Ink, scheme),
+    }
+}
+
+/// The tinted chrome (bar gaps): the ink a material's ground draws in, on every stop of every
+/// preset's gradient laid at the material's alpha over black and over white, in both schemes;
+/// `solid` is the blur-off floor .94, the other the tint alpha over blur at the key's default.
+fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<String> {
+    let mut failures = Vec::new();
+    let tinted = [
+        Material::Bar,
+        Material::Dock,
+        Material::Popover,
+        Material::Osd,
+        Material::Widget,
+    ];
+    for material in tinted {
+        for scheme in Scheme::ALL {
+            let alpha = alpha_of(material, scheme);
+            for (index, preset) in PRESETS.iter().enumerate() {
+                let look = SpaceLook {
+                    dots: preset.dots.to_vec(),
+                    ..SpaceLook::default()
+                };
+                let vars = FrameVars::of(&look, scheme);
+                let ink = chrome_ink(material, &vars, scheme);
+                for stop in derive(&look.dots, scheme).stops {
+                    let ds::Hex([r, g, b]) = ds::Hex::parse(&stop).expect("hex stop");
+                    let tint = format!("rgba({r},{g},{b},{alpha})");
+                    for (name, backdrop) in [("black", BLACK), ("white", WHITE)] {
+                        let ground = over(&tint, backdrop);
+                        let got = measured(&ink, &ground);
+                        if got < 4.5 {
+                            failures.push(format!(
+                                "{material:?} {scheme:?} preset {} stop {stop} at {alpha} over {name}: {ink} on {ground} is {got:.2}",
+                                index + 1
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    failures
+}
+
+/// Without blur the tinted chrome is its gradient at the solid floor .94, and the ink its
+/// ground draws in holds 4.5 on every stop of every preset over black and over white. Over
+/// blur, at the tint alphas design/03-COLOR.md section 17.2 gives the flat tints, six pairs
+/// fall short over a pure black or white backdrop (worst: the light widget, 3.91 over black);
+/// FINDINGS "Bar gaps" lists the smallest .02 raises that would clear them, for the user.
+#[test]
+fn the_tinted_chrome_holds_its_ink_without_blur() {
+    let failures = tinted_chrome_failures(|_, _| 0.94);
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+
+/// The over-blur shortfall FINDINGS records is what this measures today: if a retune clears
+/// it, this fails and the finding (and design/21 section 7) should be updated with it.
+#[test]
+fn the_tinted_chrome_over_blur_shortfall_is_the_recorded_one() {
+    let failures = tinted_chrome_failures(tint_alpha);
+    let widget = failures
+        .iter()
+        .filter(|failure| failure.starts_with("Widget Light"))
+        .count();
+    assert_eq!(failures.len(), 50, "{failures:#?}");
+    assert_eq!(widget, 14, "{failures:#?}");
+}

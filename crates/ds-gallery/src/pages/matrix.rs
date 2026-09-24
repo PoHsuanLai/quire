@@ -52,7 +52,7 @@ pub fn MatrixPage() -> Element {
                     for accent in Accent::ALL {
                         div { class: "g-col",
                             span { class: "g-code", "{accent.label()}" }
-                            Scope { scheme, accent, material: Material::Popover,
+                            Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),
                                 Surface { material,
                                     div { class: "g-cell",
                                         Cell { subject: subject() }

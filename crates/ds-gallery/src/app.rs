@@ -6,7 +6,7 @@ use crate::registry;
 use crate::style;
 use crate::toolbar::Toolbar;
 use dioxus::prelude::*;
-use ds::{Ds, HeaderKind, SectionHeader};
+use ds::{Ds, Ground, HeaderKind, RootChrome, SectionHeader};
 
 /// The gallery, starting from the axes this thread was handed (`crate::axes::start_with`).
 #[allow(non_snake_case)] // A component: launch and snapshot name it like a type.
@@ -23,6 +23,10 @@ pub fn App() -> Element {
             material: now.material,
             blur: now.blur,
             tint_alpha: Some(tint()),
+            // The page is the specimen sheet whatever material the toolbar picks: its root always
+            // paints, and its components stay on paper.
+            chrome: Some(RootChrome::Painted),
+            ground: Some(Ground::Paper),
             style { {style::CSS} }
             div { class: "g-app",
                 Toolbar {}

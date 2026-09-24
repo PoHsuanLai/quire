@@ -102,7 +102,7 @@ fn AccentQuad(accent: Accent) -> Element {
         div { class: "g-col",
             span { class: "g-name", "{accent.label()}" }
             for scheme in Scheme::ALL {
-                Scope { scheme, accent, material: Material::Popover,
+                Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),
                     div { class: "g-cell",
                         div { class: "g-row",
                             for (name , hex) in quad_parts(accent, scheme) {

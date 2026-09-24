@@ -187,7 +187,7 @@ fn BlurOff() -> Element {
         Section { title: "S15: no backdrop blur", note: "Both panels sit over one-pixel stripes. With blur on the stripes show through the tint unblurred (the compositor blurs on the desktop, Blitz cannot); with blur off the solid tint hides them.",
             div { class: "g-wall g-grid2", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for blur in [BlurState::Available, BlurState::Unavailable] {
-                    Scope { scheme, accent, material: Material::Popover, blur,
+                    Scope { scheme, accent, material: Material::Popover, blur, frame: Some(ds::FrameTint::None),
                         div { class: "g-panel",
                             span { class: "g-name", "data-blur={blur.slug()}" }
                             span { "Popover tint over the wallpaper." }

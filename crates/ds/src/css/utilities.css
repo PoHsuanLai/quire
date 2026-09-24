@@ -18,3 +18,9 @@
 .ds-layer{position:absolute;inset:0;z-index:var(--z-scene);background:var(--f-grad);transition:opacity var(--t-scene) var(--e-out)}
 .ds-layer[*|data-layer=back]{opacity:0}
 .ds-grain{position:absolute;inset:0;z-index:var(--z-grain);pointer-events:none;opacity:var(--f-grain);background-size:128px 128px}
+/* Shell chrome's frame (`data-frame=tinted`, design/21-SPACES.md sections 3 and 5): the same two
+   layers and grain as the window's, grouped so the whole cross-fade sits at the material's tint
+   alpha (`--m-frame-alpha`; the solid floor without blur). Its own background is the current
+   gradient, under both layers, so the group stays opaque inside through a cross-fade and only
+   the group's alpha lets the blur through. */
+.ds-frame{position:absolute;inset:0;z-index:var(--z-scene);background:var(--f-grad);opacity:var(--m-frame-alpha);border-radius:inherit;overflow:hidden;pointer-events:none}
