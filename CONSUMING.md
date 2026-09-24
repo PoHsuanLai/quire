@@ -859,6 +859,9 @@ per row:
 | `HoverStrip` | `expanded: Vec<(ActionId, Switch)>` | The buttons that open a menu, and whether it is open: `aria-haspopup="menu"`, `aria-expanded`. |
 | `HoverStrip` | (behaviour) | A strip button's click stops at the button: it never opens the row. |
 | `Text`, `Run`, `RunTone` | new types | `Text::{Plain(String), Runs(Vec<Run>)}`, `Run { text, tone: RunTone::{Plain, Mark, Strong, Faint} }`, `Text::plain_text()`. You compute the runs; quire never parses markup out of a string. |
+| `CommandPalette` | `entrance: PaletteEntrance::Opaque` | The card springs with `cmdk-rise` (`cmdk-in`'s scale and lift, no fade): opaque on its first frame. Over a window the scrim then appears at once too (a fading wrap would hold the card at its own opacity). `PeekIn` and `CmdkIn` are unchanged and still start at opacity 0. |
+| `MenuEntry` | `Row(MenuRow<T>)` | A choice whose `title: Text` and `detail: Option<Text>` are your runs, with `trailing: Option<RowAction>`; otherwise an `Item` (`value`, `tile`, `trail`, `check`, `availability`). Build with `MenuRow::new(value, title)` and struct update, or `.into()` a `MenuEntry`. A plain `Text` title is still marked by the palette's query and a menu's filter; runs are drawn as given. A `match` over `MenuEntry` needs an arm for it. |
+| `RowAction` | new type | `RowAction { icon: Icon, label: String, on_press: EventHandler<Press> }`: a Strip `IconButton` (label as `aria-label` and `title`) at the row's end. Its click, press, release and pointer moves stop inside it: the row is not picked, its menu or palette stays open, and the selection does not move onto it. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 47 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
+//! 48 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
 //! S's `fade` replaces `fade-in`), plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
@@ -8,7 +8,8 @@
 //! integration amendment), plus four assignment rows that play a catalogue keyframe at another
 //! recipe (wave 2 integration amendment, section 5 rows 7, 26, 37 and 64): `PaletteFade`,
 //! `LinkPillIn`, `BubblePop` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
-//! closed by Escape or an outside click (bar gaps).
+//! closed by Escape or an outside click (bar gaps), plus `CmdkRise`, `cmdk-in` without its fade,
+//! for a command panel that must be opaque on its first frame (mailo gaps 2).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -74,6 +75,9 @@ pub enum Anim {
     BubblePop,
     /// `cmdk-in`: C's command menu.
     CmdkIn,
+    /// `cmdk-rise`: `cmdk-in`'s scale and lift with no fade, so the panel is opaque from its
+    /// first frame (mailo gaps 2: a command panel is never drawn invisible).
+    CmdkRise,
     /// `peek-in`: peek and the command menu.
     PeekIn,
     /// `peek-in` at `--t-move --e-out`: the reader entering Full peek (section 5 row 64, C).
@@ -118,7 +122,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 47] = [
+    pub const ALL: [Anim; 48] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -146,6 +150,7 @@ impl Anim {
         Anim::MenuOut,
         Anim::BubblePop,
         Anim::CmdkIn,
+        Anim::CmdkRise,
         Anim::PeekIn,
         Anim::PeekFullIn,
         Anim::Fade,
@@ -198,6 +203,7 @@ impl Anim {
             Anim::MenuOut => "a-menu-out",
             Anim::BubblePop => "a-bubble-pop",
             Anim::CmdkIn => "a-cmdk-in",
+            Anim::CmdkRise => "a-cmdk-rise",
             Anim::PeekIn => "a-peek-in",
             Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",

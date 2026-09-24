@@ -3,7 +3,8 @@
    - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
    - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`;
-   - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer.
+   - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
+     so are `menu-out` (bar gaps) and `cmdk-rise` (mailo gaps 2), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -143,6 +144,12 @@
 /* 4.4.11 menu-in */
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
+
+/* cmdk-rise (quire's, mailo gaps 2): cmdk-in's scale and lift with no fade, so a command panel is
+   opaque on its first frame; only its geometry springs. */
+@keyframes cmdk-rise{ 0%{ transform:scale(.93) translateY(-12px); }
+  62%{ transform:scale(var(--overshoot)) translateY(2px); }
+  100%{ transform:scale(1) translateY(0); } }
 
 /* 4.4.13 cmdk-in */
 @keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }

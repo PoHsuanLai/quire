@@ -149,26 +149,17 @@ pub(crate) fn lines<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Line
     let mut hits: Vec<(f32, Line<'a, T>)> = entries
         .iter()
         .filter_map(|entry| {
-            let hit = fuzzy(query, title_of(entry)?)?;
-            Some((
-                hit.score,
-                Line {
-                    entry,
-                    marks: hit.marks,
-                },
-            ))
+            let hit = fuzzy(query, &entry.match_title()?)?;
+            let marks = if entry.takes_marks() {
+                hit.marks
+            } else {
+                Vec::new()
+            };
+            Some((hit.score, Line { entry, marks }))
         })
         .collect();
     hits.sort_by(|a, b| b.0.total_cmp(&a.0));
     hits.into_iter().map(|(_, line)| line).collect()
-}
-
-/// A choice's title; `None` for a header or a rule.
-fn title_of<T>(entry: &MenuEntry<T>) -> Option<&str> {
-    match entry {
-        MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => Some(title),
-        MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => None,
-    }
 }
 
 /// What a choice does when it is picked.
@@ -201,6 +192,10 @@ pub(crate) fn choices<T: Clone>(lines: &[Line<'_, T>]) -> Vec<Choice<T>> {
             } => Some(Choice {
                 act: Act::Pick(value.clone()),
                 availability: *availability,
+            }),
+            MenuEntry::Row(row) => Some(Choice {
+                act: Act::Pick(row.value.clone()),
+                availability: row.availability,
             }),
             MenuEntry::Submenu {
                 children,

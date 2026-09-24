@@ -200,6 +200,7 @@ const OWN: &[&str] = &[
     "drag_ghost",
     "edge_strip",
     "space_editor",
+    "text_runs",
 ];
 
 #[test]

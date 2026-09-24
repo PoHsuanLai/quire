@@ -62,3 +62,14 @@
 .ds-menu-info{ display:flex; flex-direction:column; padding:var(--s-6) var(--s-8); cursor:default; }
 .ds-menu-info-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); }
 .ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+/* A row's trailing action (mailo gaps 2): a fourth column holding a Strip icon button (26 round,
+   `--ink-soft`, the accent-soft hover), at 22 in the shell's text menus so the row keeps its
+   height. The button hears its own click; the row neither picks nor takes the selection. */
+.ds-menu-item[*|data-trailing=action]{ grid-template-columns:34px 1fr auto auto; }
+.ds-menu[*|data-kind=slim] .ds-menu-item[*|data-trailing=action],
+.ds-menu[*|data-kind=context] .ds-menu-item[*|data-trailing=action]{ grid-template-columns:22px 1fr auto auto; }
+.ds-menu-action{ display:inline-flex; align-items:center; }
+.ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
+.ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
+.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }

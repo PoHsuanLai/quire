@@ -13,6 +13,7 @@ pub mod matrix;
 pub mod motion;
 pub mod motion_lab;
 pub mod overlays;
+pub mod overlays_mailo;
 pub mod pills;
 pub mod polish;
 pub mod space;
