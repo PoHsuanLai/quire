@@ -1,5 +1,6 @@
 //! One quire document with no window: the pieces `Harness` and `snapshot` share. It gets the
-//! shared font context, the `data:`/`file:` net provider, sequential styling (deterministic, and
+//! shared font context, the app's net policy, the HTML parser (so an `<iframe srcdoc>` is a
+//! real sub-document, as in the window), sequential styling (deterministic, and
 //! no rayon pool per test), the host's input modality, device scale, rect read and focus write as
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
@@ -14,7 +15,8 @@ use crate::snapshot::Viewport;
 use crate::wake::Wakeup;
 use anyrender::{PaintScene as _, render_to_buffer};
 use anyrender_vello_cpu::VelloCpuImageRenderer;
-use blitz_dom::{Document as _, DocumentConfig, DummyHtmlParserProvider, StyleThreading};
+use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
+use blitz_html::HtmlProvider;
 use blitz_paint::paint_scene;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, Viewport as BlitzViewport};
@@ -62,10 +64,7 @@ impl Headless {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
             net_provider: Some(DsNet::top(setup.net.clone(), None, Some(net_waker))),
-            html_parser_provider: Some(FrameParser::shared(
-                Arc::new(DummyHtmlParserProvider),
-                frame_net,
-            )),
+            html_parser_provider: Some(FrameParser::shared(Arc::new(HtmlProvider), frame_net)),
             style_threading: StyleThreading::Sequential,
             ..Default::default()
         };
