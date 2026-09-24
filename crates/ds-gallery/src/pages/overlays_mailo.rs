@@ -1,11 +1,14 @@
 //! Overlays, mailo gaps 2: a command panel that is opaque from its first frame, rows whose title
-//! and detail are the caller's runs with a trailing remove.
+//! and detail are the caller's runs with a trailing remove, and a people menu whose highlight
+//! the field beside it drives.
 
 use super::{Section, Specimen};
+use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    CommandPalette, CommandPaletteHost, Corner, Icon, Material, MenuEntry, MenuRow,
-    PaletteEntrance, Radius, RowAction, Run, RunTone, Surface, Text, Tile,
+    Anchor, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Cursor, Focus, Icon,
+    InputVariant, Material, Menu, MenuEntry, MenuKind, MenuRow, MountedRef, PaletteEntrance,
+    Radius, RowAction, Run, RunTone, Surface, Text, TextInput, Tile,
 };
 
 /// The recent searches a panel starts with.
@@ -72,6 +75,76 @@ pub fn RecentPalette() -> Element {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+/// The people a To field offers.
+const PEOPLE: [&str; 4] = ["Dana Okafor", "Sam Lindqvist", "Priya Raman", "Mei Chen"];
+
+/// A To field and the people menu under it: Up and Down in the field move the menu's
+/// highlight (`Cursor::Controlled`), the field keeps the keyboard, and each person has a
+/// forget button.
+#[component]
+pub fn FieldMenu() -> Element {
+    let showcase = use_context::<Signal<Axes>>().peek().showcase;
+    let mut open = use_signal(|| showcase == Showcase::Posed);
+    let mut at = use_signal(|| 1usize);
+    let mut field = use_signal(|| None::<MountedRef>);
+    let mut people = use_signal(|| PEOPLE.to_vec());
+    let rows: Vec<MenuEntry<u8>> = (0u8..)
+        .zip(people())
+        .map(|(value, name)| {
+            MenuEntry::Row(MenuRow {
+                trailing: Some(RowAction {
+                    icon: Icon::X,
+                    label: format!("Forget {name}"),
+                    on_press: EventHandler::new(move |_| {
+                        people.with_mut(|people| people.retain(|seen| *seen != name))
+                    }),
+                }),
+                ..MenuRow::new(value, name)
+            })
+        })
+        .collect();
+    let last = rows.len().saturating_sub(1);
+    rsx! {
+        Section {
+            title: "Menu driven by a field",
+            note: "Cursor::Controlled: the field keeps the keyboard and its Up and Down move the highlight; the pointer only asks, through on_active. Each person's forget button acts without picking.",
+            div { class: "g-row",
+                div { onmounted: move |event| field.set(Some(MountedRef(event.data()))),
+                    TextInput {
+                        variant: InputVariant::Boxed,
+                        label: "To",
+                        value: String::new(),
+                        placeholder: "Type a name, then Up and Down",
+                        oninput: move |_| {},
+                        focus: Focus::Manual,
+                        onkey: move |event: KeyboardEvent| match event.key() {
+                            Key::ArrowDown => at.set((at() + 1).min(last)),
+                            Key::ArrowUp => at.set(at().saturating_sub(1)),
+                            _ => {}
+                        },
+                    }
+                }
+                Button { variant: ButtonVariant::Secondary, label: "Open the people menu", onclick: move |_| open.set(true) }
+            }
+            if let (true, Some(mounted)) = (open(), field()) {
+                Menu::<u8> {
+                    kind: MenuKind::Rich,
+                    anchor: Anchor::Mounted(mounted),
+                    entries: rows,
+                    onpick: move |_| open.set(false),
+                    onclose: move |()| open.set(false),
+                    active: Cursor::Controlled(Some(at())),
+                    on_active: move |index: Option<usize>| {
+                        if let Some(index) = index {
+                            at.set(index);
+                        }
+                    },
                 }
             }
         }
