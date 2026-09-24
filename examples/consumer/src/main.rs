@@ -7,10 +7,6 @@
 fn main() {
     ds_native::launch(
         consumer::App,
-        ds_native::AppConfig {
-            title: "quire consumer example".to_owned(),
-            width: 480,
-            height: 360,
-        },
+        ds_native::AppConfig::new("quire consumer example", 480, 360),
     );
 }

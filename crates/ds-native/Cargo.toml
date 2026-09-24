@@ -14,8 +14,11 @@ dioxus = { workspace = true }
 blitz-dom = { workspace = true }
 blitz-paint = { workspace = true }
 blitz-traits = { workspace = true }
+blitz-html = { workspace = true }
 dioxus-native-dom = { workspace = true }
-dioxus-native = { workspace = true }
+# `html`: an `<iframe srcdoc>` in the window parses into a real sub-document (G4). `clipboard`:
+# copy and paste in every text field, and `ds_native::clipboard` (G5).
+dioxus-native = { workspace = true, features = ["html", "clipboard"] }
 anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
 anyrender_vello_cpu = { workspace = true }

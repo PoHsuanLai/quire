@@ -5,20 +5,77 @@
 //! The window is blitz's portable `dioxus-native` shell (winit), so an app runs the same on any
 //! OS; `crate::host` wraps the app to supply what quire needs on top of it.
 
+use crate::app_id::{AppId, with_app_id};
+use crate::contexts::RootContexts;
 use crate::fonts::font_context;
+use crate::frame_links::FrameLinks;
 use crate::host::{Host, HostProps};
+use crate::net_policy::NetPolicy;
+use crate::setup::Setup;
 use dioxus::prelude::*;
 use dioxus_native::{LogicalSize, WindowAttributes};
 
-/// How the window starts.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// How the window starts, and what its document is given: build it with [`AppConfig::new`] and
+/// the `with_*` methods.
+#[derive(Debug, Clone)]
 pub struct AppConfig {
     /// The window title.
-    pub title: String,
+    title: String,
     /// The initial width in logical pixels.
-    pub width: u32,
+    width: u32,
     /// The initial height in logical pixels.
-    pub height: u32,
+    height: u32,
+    /// The desktop application id, if the app has one.
+    app_id: Option<AppId>,
+    /// What the document is given beyond quire's own contexts.
+    setup: Setup,
+}
+
+impl AppConfig {
+    /// A `width` x `height` window (logical pixels) titled `title`, with no app contexts.
+    pub fn new(title: impl Into<String>, width: u32, height: u32) -> Self {
+        AppConfig {
+            title: title.into(),
+            width,
+            height,
+            app_id: None,
+            setup: Setup::default(),
+        }
+    }
+
+    /// The window's desktop application id (the Wayland `app_id`, the X11 `WM_CLASS`), so the
+    /// desktop matches it to the app's `.desktop` file for its icon and name.
+    pub fn with_app_id(mut self, id: AppId) -> Self {
+        self.app_id = Some(id);
+        self
+    }
+
+    /// Provide `value` at the root, read with `use_context::<T>()` anywhere in the app: the
+    /// window's equivalent of dioxus desktop's `LaunchBuilder::with_context`.
+    pub fn with_context<T: Clone + Send + Sync + 'static>(mut self, value: T) -> Self {
+        self.setup.contexts = self.setup.contexts.with(value);
+        self
+    }
+
+    /// Who answers the document's requests beyond `data:`, and its frames' (default
+    /// [`NetPolicy::Local`]).
+    pub fn with_net(mut self, policy: NetPolicy) -> Self {
+        self.setup.net = policy;
+        self
+    }
+
+    /// What a link clicked inside a frame does (default [`FrameLinks::Inert`]): a frame never
+    /// navigates, so the app opens the link itself or nothing happens.
+    pub fn with_frame_links(mut self, links: FrameLinks) -> Self {
+        self.setup.frame_links = links;
+        self
+    }
+
+    /// Provide every value in `contexts` at the root, after any already given.
+    pub fn with_contexts(mut self, contexts: RootContexts) -> Self {
+        self.setup.contexts = self.setup.contexts.and(contexts);
+        self
+    }
 }
 
 /// Run `app` until its window closes.
@@ -29,13 +86,18 @@ pub fn launch(app: fn() -> Element, config: AppConfig) {
     let window = WindowAttributes::default()
         .with_title(config.title)
         .with_surface_size(LogicalSize::new(config.width, config.height));
+    let window = match &config.app_id {
+        Some(id) => with_app_id(window, id),
+        None => window,
+    };
     let native = dioxus_native::Config::new()
         .with_window_attributes(window)
         .with_font_ctx(font_context());
+    let contexts = config.setup.contexts.for_launch();
     dioxus_native::launch_cfg_with_props(
         Host,
-        HostProps::new(app),
-        Vec::new(),
+        HostProps::new(app, config.setup),
+        contexts,
         vec![Box::new(native)],
     );
 }

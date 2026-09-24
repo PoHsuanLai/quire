@@ -32,7 +32,10 @@ pub use appearance::{
 pub use components::*;
 pub use css::stylesheet;
 pub use error::DsError;
-pub use focus::{FocusRequest, FocusTicket, Focused, HostFocus, use_focus_request};
+pub use focus::{
+    FocusRequest, FocusTicket, Focused, HostFocus, HostSelect, Select, focus_soon,
+    focus_soon_selecting, use_focus_request,
+};
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};

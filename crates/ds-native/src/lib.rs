@@ -7,31 +7,52 @@
 //! runtime`) so `ds_settings::use_environment` can spawn its portal and file-watch tasks without
 //! panicking.
 
+mod app_id;
+pub mod clipboard;
+mod contexts;
 mod data_url;
 pub mod error;
 pub mod focus;
 pub mod fonts;
+mod frame_links;
+mod frame_view;
+mod frames;
 pub mod harness;
+mod harness_config;
+mod harness_input;
 mod headless;
 mod host;
+mod install;
 pub mod launch;
 pub mod measure;
+mod memory_shell;
 mod net;
+mod net_policy;
+mod origin;
+mod route;
 mod runtime;
 mod scheme;
+mod setup;
 pub mod snap;
 #[cfg(test)]
 mod snap_tests;
 pub mod snapshot;
 mod wake;
 
+pub use app_id::AppId;
+pub use contexts::RootContexts;
 pub use error::NativeError;
 pub use fonts::{font_context, register_fonts};
+pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
+pub use frame_view::FrameView;
 pub use harness::Harness;
+pub use harness_config::HarnessConfig;
 pub use headless::Backdrop;
 pub use launch::{AppConfig, launch};
+pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
+pub use origin::{FrameId, RequestOrigin};
 pub use snap::snap_to_device;
-pub use snapshot::{Viewport, snapshot, snapshot_at};
+pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
 
 // The window renderer dioxus-native runs on; named here so the pinned versions stay the ones
 // the render stack resolves.

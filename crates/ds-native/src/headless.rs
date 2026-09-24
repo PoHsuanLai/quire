@@ -1,21 +1,28 @@
 //! One quire document with no window: the pieces `Harness` and `snapshot` share. It gets the
-//! shared font context, the `data:`/`file:` net provider, sequential styling (deterministic, and
+//! shared font context, the app's net policy, the HTML parser (so an `<iframe srcdoc>` is a
+//! real sub-document, as in the window), a shell whose clipboard is in memory, sequential styling (deterministic, and
 //! no rayon pool per test), the host's input modality, device scale, rect read and focus write as
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
+use crate::clipboard::HostClipboard;
 use crate::error::NativeError;
 use crate::fonts::font_context;
+use crate::frame_links::{LinkInbox, frame_links};
+use crate::frames::FrameParser;
+use crate::memory_shell::MemoryShell;
 use crate::net::DsNet;
 use crate::scheme;
+use crate::setup::Setup;
 use crate::snapshot::Viewport;
 use crate::wake::Wakeup;
 use anyrender::{PaintScene as _, render_to_buffer};
 use anyrender_vello_cpu::VelloCpuImageRenderer;
 use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
+use blitz_html::HtmlProvider;
 use blitz_paint::paint_scene;
 use blitz_traits::net::NetWaker;
-use blitz_traits::shell::{ColorScheme, Viewport as BlitzViewport};
+use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
 use ds::{HostModality, HostScale, InputModality, Scale};
@@ -46,22 +53,38 @@ pub(crate) struct Headless {
     wakeup: Arc<Wakeup>,
     viewport: Viewport,
     pub(crate) layout: Layout,
+    /// The document's shell, whose clipboard is in memory.
+    pub(crate) shell: Arc<MemoryShell>,
+    /// Links clicked in the document's frames, on their way to the app.
+    links: LinkInbox,
 }
 
 impl Headless {
-    /// Build `app` at `viewport` and run its first render (no layout yet).
-    pub(crate) fn new(app: fn() -> Element, viewport: Viewport) -> Self {
+    /// Build `app` at `viewport` with the app's `setup` and run its first render (no layout
+    /// yet).
+    pub(crate) fn new(app: fn() -> Element, viewport: Viewport, setup: &Setup) -> Self {
         let wakeup = Arc::new(Wakeup::default());
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
+        let shell = Arc::new(MemoryShell::default());
+        let (frame_nav, links) = frame_links(&setup.frame_links);
+        let frame_net = DsNet::frame(setup.net.clone(), Some(Arc::clone(&net_waker)));
         let config = DocumentConfig {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
-            net_provider: Some(DsNet::shared(None, Some(net_waker))),
+            net_provider: Some(DsNet::top(setup.net.clone(), None, Some(net_waker))),
+            html_parser_provider: Some(FrameParser::shared(
+                Arc::new(HtmlProvider),
+                frame_net,
+                frame_nav,
+            )),
+            shell_provider: Some(Arc::clone(&shell) as Arc<dyn ShellProvider>),
             style_threading: StyleThreading::Sequential,
             ..Default::default()
         };
-        let vdom = VirtualDom::new(app);
+        let mut vdom = VirtualDom::new(app);
+        // The app's own first, so a quire context of the same type (none today) would win.
+        setup.contexts.install(&mut vdom);
         let modality =
             vdom.in_runtime(|| Signal::new_in_scope(InputModality::default(), ScopeId::ROOT));
         vdom.provide_root_context(HostModality(modality));
@@ -71,6 +94,10 @@ impl Headless {
         vdom.provide_root_context(HostScale(scale));
         vdom.provide_root_context(crate::measure::MEASURE);
         vdom.provide_root_context(crate::focus::FOCUS);
+        vdom.provide_root_context(crate::focus::SELECT);
+        vdom.provide_root_context(HostClipboard::of(
+            Arc::clone(&shell) as Arc<dyn ShellProvider>
+        ));
         let mut doc = DioxusDocument::new(vdom, config);
         doc.initial_build();
         Headless {
@@ -79,6 +106,8 @@ impl Headless {
             wakeup,
             viewport,
             layout: Layout::Running,
+            shell,
+            links,
         }
     }
 
@@ -111,6 +140,7 @@ impl Headless {
     /// that landed during styling is applied on the next resolve, spike S7).
     pub(crate) fn frame(&mut self, at: Duration) {
         for _ in 0..MAX_ROUNDS {
+            self.links.drain();
             let rendered = self.flush();
             if self.layout == Layout::Held {
                 return;

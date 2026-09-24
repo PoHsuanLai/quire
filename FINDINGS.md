@@ -2228,3 +2228,132 @@ one row per change, docs/mailo-migration.md section 2 the row for each mailo sit
 Not done: nothing the brief asked for was left out. The strip's measured `onclick` still does
 nothing without layout, by design: a snooze or label menu needs the rect to anchor, and
 `on_press` is how the caller acts without it.
+
+## Native phase B (2026-09-25)
+
+mailo's Phase B plan (moving its window onto `ds_native::launch`) named the host gaps below,
+G1 and G3-G7 (G2, a rich-text editing surface, is out of this branch's scope). Branch
+`native-phase-b`, one commit per gap. The blitz rev is unchanged (`e99fbdbd`). Proofs are
+harness tests under `crates/ds-native/tests/native_*.rs`; the window path (`launch`, which no
+test drives) was run on Wayland with the `window` example: it opens, paints the app and closes.
+
+**Breaking:** `AppConfig` is a builder now, `AppConfig::new(title, width, height)`, not a struct
+literal (its new fields are private). The in-repo callers (the gallery, the `window` example,
+`examples/consumer`) and `docs/mailo-migration.md` are updated.
+
+1. **G1, contexts.** `AppConfig::with_context(value)`/`with_contexts(RootContexts)` go to
+   dioxus-native's context list, which `launch` used to pass as `Vec::new()`.
+   `HarnessConfig::with_context` carries the same values into `Headless`, through
+   `Harness::with_config`, `Harness::with_contexts` and `snapshot_with`. A value is `Clone +
+   Send + Sync`: dioxus-native wants `Send + Sync` factories (it builds the tree on the event
+   loop's thread), and each document gets its own clone. A later value of a type shadows an
+   earlier one. Proof: `native_contexts.rs`.
+2. **G3, network policy.** `NetPolicy::{Local (default, what launch did), Custom(Arc<dyn
+   AppNet>), Sealed}` on `AppConfig::with_net`/`HarnessConfig::with_net`. Where a request goes
+   is one pure table (`crates/ds-native/src/route.rs`, table-tested) of the asking document, the
+   scheme and the policy. `data:` is always served; `about:` never fetches. The app's own
+   document gets `file:` under `Local` and `Custom`. A frame never gets `file:` from ds-native:
+   under `Local` and `Sealed` a frame gets `data:` only. Under `Custom` every other request, a
+   frame's `file:` included, is put to `AppNet::decide(&NetRequest) -> NetDecision::{Allow,
+   Deny}`. A `NetRequest` carries `origin() -> RequestOrigin::{Top, Frame(FrameId)}`. An
+   admitted request goes to `AppNet::fetch(request, NetReply)`, which may answer from any thread.
+   - **How a frame is told apart.** Blitz builds a frame's document through the parent's HTML
+     parser, with a config that inherits the parent's net provider (`blitz-dom/src/iframe.rs`).
+     ds-native wraps the parser (`frames.rs`), so every frame document is born with the frame
+     provider. That covers a `srcdoc`, a `src` load, and a frame nested in a frame.
+   - **Found: the window's providers used to arrive too late.** The app's first render used to
+     run before `Host`'s hidden element mounted and installed the providers. A frame in that
+     first render would have been parsed with dioxus-native's providers. The app now renders one
+     frame after the host, once `install.rs` has run.
+   - **Found: an `<iframe src>` in the app's own markup is fetched by the app's document.**
+     blitz's `start_iframe_load` uses the parent's id and provider. So an app-authored `src=file:`
+     frame would load. This is the app's markup, not a sender's; mail uses `srcdoc`, and a frame
+     nested inside a mail body is sealed.
+   - Proof: `native_net.rs`. A frame's `file:` image is denied while the app's succeeds. A custom
+     handler sees the app document's request as `Top` and the frame's as `Frame(id)`, with the
+     id `Harness::frame` reports. `Allow` lands the image; `Deny` never reaches the frame.
+3. **G4, the HTML parser; html5ever.** ds-native enables dioxus-native's `html` feature for the
+   window and installs `blitz_html::HtmlProvider` (behind the frame wrapper) in `Headless`.
+   `blitz-html` joins the pinned block at the same rev. That is a new line, so shell-host and
+   sill copy it; neither uses it.
+   - **Versions.** At this rev, blitz-html pulls **html5ever 0.39.0**, **markup5ever 0.39.0**
+     and **xml5ever 0.39.0** (blitz's workspace pins all three to match stylo's `web_atoms`).
+     It does not pull `markup5ever_rcdom`.
+   - **quire's `deny.toml` needs no change.** It has no `[bans]` section, only licences, and
+     `cargo deny check licenses` passes.
+   - **mailo's `deny.toml` still holds.** Its ban is on `markup5ever_rcdom`, which is not pulled.
+     But its reasoning ("a second parser generation reading ammonia's 0.40 output is where
+     mutation-XSS lives") now applies to blitz-html's html5ever 0.39 itself. That needs a
+     narrowly scoped note in mailo's `deny.toml` and the `mail-mime` owner's sign-off, as mailo's
+     plan §4 says.
+   - **The security boundary stays ammonia**, upstream in `mail-mime`. Blitz only parses HTML
+     that is already sanitised, and it executes no scripts: there is no JS engine in ds-native's
+     graph (no `boa`, `v8`, `rquickjs`, `mozjs` or `blitz-vibey-script`).
+   - **The worst case of a parser differential** is markup resurrected inside the frame's own
+     document. There, G3 seals the network and G7 freezes navigation.
+   - **Harness access.** `Harness::frame(selector) -> Option<FrameView>` reads the frame's
+     document: `id`, `text`, `html`, `count`, `text_of`, `attr`, `width`, and `centre` (in the
+     app document's coordinates, for `click`).
+   - Proof: `native_frames.rs`. The frame's text renders and paints in its own colour, neither
+     document's queries see the other's nodes, and a `<script>` rewriting the body does nothing.
+4. **G5, clipboard.** dioxus-native's `clipboard` feature is on (blitz-shell over `arboard`
+   3.6.1), so Ctrl+C/X/V work in every text field of the window.
+   - **The app's API.** `ds_native::clipboard::{write_text, read_text}` reach the document's
+     shell through a `HostClipboard` context. They answer `ClipboardError::NoHost` (outside a
+     ds-native document) or `Unavailable`.
+   - **Found: blitz-shell panics on a session with no clipboard.** It unwraps
+     `arboard::Clipboard::new()`. The app's calls catch that as `Unavailable`. A field's own
+     Ctrl+C goes through blitz and would still panic there; that is upstream.
+   - **The harness keeps its clipboard in memory:** `Harness::clipboard_text`,
+     `set_clipboard_text`, and `selected_text(selector)` to read a field's selection.
+   - **Not done: other Blitz hosts.** shell-host's surfaces and sill do not use `launch`, so they
+     provide no `HostClipboard`, and the app calls answer `NoHost` there. A `provide` for them
+     would take their shell provider.
+   - Proof: `native_clipboard.rs`. Ctrl+A and Ctrl+C in one field, then Ctrl+V into a second;
+     the app's write and read reach the same clipboard.
+5. **G6, focus.** `ds::focus_soon` is public, beside `focus_soon_selecting(element, Select)`.
+   - **Select-all.** `ds::Select::{None, All}`. `FocusRequest::with_select_all()` makes
+     `TextInput { focus: Focus::Controlled(request) }` select the whole value each time the
+     request lands, including on mount. This touched TextInput's focus wiring
+     (`text_input_focus.rs`, two call sites) after mailo-gaps-4b merged.
+   - **The host seam.** The select is a host write, `ds::HostSelect`: `ds_native::focus::SELECT`,
+     provided by `launch`, `Headless` and `focus::provide()`. It runs after the focus write
+     lands.
+   - **Found: a field focused on mount has no editor yet.** Blitz builds a field's editor with
+     the document's first layout, so the seam answers `Busy` until then and retries a frame
+     later.
+   - **Without a host** (a webview), `Select::All` does nothing.
+   - Proof: `native_select.rs`. Select-all holds on mount and on a later request, and typing
+     replaces the value. There is no selection without select-all. `focus_soon` focuses an
+     app's own element.
+6. **G7, frame links.** Blitz's `IframeNavigationProvider` reloaded the frame with a clicked
+   link's target, which would fetch it through the app's document. Every frame document now gets
+   ds-native's navigation provider instead, through the same parser wrapper.
+   - **The API.** `FrameLinks::{Inert (default), Intercept(handler)}` on
+     `AppConfig::with_frame_links`/`HarnessConfig::with_frame_links`. With `Intercept`, the app
+     gets a `FrameLink { frame: FrameId, href }` with the resolved URL.
+   - **Delivery.** A click goes through a channel, so the handler runs with the document free:
+     the window's `Host` serves it from a task, and `Headless` drains it every frame. The frame
+     never navigates. Links in the app's own document are unchanged: dioxus-native opens
+     http(s) and mailto links in the browser.
+   - Proof: `native_frame_links.rs`. An intercepted click reaches the app with the frame's id,
+     and an inert one does nothing. In both cases the frame keeps its document and no request is
+     made. With Blitz's provider in place both tests fail.
+7. **`app_id`, done.** `AppConfig::with_app_id(AppId)` goes to winit as Wayland or X11 platform
+   attributes. The backend is chosen as winit's own event loop chooses it: Wayland when
+   `WAYLAND_DISPLAY` or `WAYLAND_SOCKET` is set. Off Linux it is ignored.
+
+The notes mailo listed, and what would close each:
+
+- **No tooltips for `title=` on the launch path.** Blitz draws no native tooltip.
+  - Closing it: a ds-native host that shows a quire `Tooltip` for a hovered element's `title`
+    after the hover delay. That is new overlay plumbing in the host, not a flag.
+  - Meanwhile, `IconButton { tooltip }` and `HoverTarget` show one where it matters.
+- **No scrollbars.** blitz-paint's `scrollbars` feature is off in the pinned block. Wheel
+  scrolling works; no bar is drawn.
+  - Closing it: turn on dioxus-native's `scrollbars` (and blitz-paint's for `Headless`) in
+    ds-native. That is one feature line, but the bar blitz draws is unstyled and quire has no
+    scrollbar token, so it wants a design decision first. Not done.
+- **No `app_id`.** Done (item 7).
+- **OS file drops.** blitz-shell ignores `WindowEvent::DragDropped`. That is upstream; mailo has
+  no drop site.
