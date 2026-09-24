@@ -128,11 +128,22 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.2.7 floatup */
 @keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
 
+/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level (mailo gaps 3): each
+   departure from rest is the catalogue's value times min(1, (--overshoot - 1) x 25), which is 1
+   at Standard (1.04) and Extra (1.14, whose spring curve already overshoots more) and 0 at Calm
+   and Reduced (1). So Calm flattens them, as it flattens pop-in's `scale(var(--overshoot))`,
+   and Standard is the catalogue's text: 34% of gulp is still scale(1.07,.84). */
+
 /* 4.2.8 gulp */
-@keyframes gulp{ 0%{ transform:scale(1,1); } 34%{ transform:scale(1.07,.84); } 62%{ transform:scale(.97,1.07); } 100%{ transform:scale(1,1); } }
+@keyframes gulp{ 0%{ transform:scale(1,1); }
+  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
+  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:scale(1,1); } }
 
 /* 4.2.9 seal-pop */
-@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); } 60%{ transform:translateY(-50%) scale(1.5); } 100%{ transform:translateY(-50%) scale(1); } }
+@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); }
+  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:translateY(-50%) scale(1); } }
 
 /* 4.2.10 compose-rise */
 @keyframes compose-rise{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
@@ -156,7 +167,9 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
 
 /* 4.3.5 bump */
-@keyframes bump{ 0%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-3px) scale(1.25); } 100%{ transform:none; } }
+@keyframes bump{ 0%{ transform:translateY(0) scale(1); }
+  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:none; } }
 
 /* 4.3.6 tab-in */
 @keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
@@ -281,8 +294,13 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes fold--b{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
 @keyframes curl--b{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
 @keyframes floatup--b{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
-@keyframes gulp--b{ 0%{ transform:scale(1,1); } 34%{ transform:scale(1.07,.84); } 62%{ transform:scale(.97,1.07); } 100%{ transform:scale(1,1); } }
-@keyframes seal-pop--b{ 0%{ transform:translateY(-50%) scale(0); } 60%{ transform:translateY(-50%) scale(1.5); } 100%{ transform:translateY(-50%) scale(1); } }
+@keyframes gulp--b{ 0%{ transform:scale(1,1); }
+  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
+  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:scale(1,1); } }
+@keyframes seal-pop--b{ 0%{ transform:translateY(-50%) scale(0); }
+  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:translateY(-50%) scale(1); } }
 @keyframes compose-rise--b{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
 @keyframes compose-send--b{ 0%{ transform:none; opacity:1; } 35%{ transform:translate(0,4px) scale(.97,.94); opacity:1; } 100%{ transform:translate(-40px,-120px) scale(.06) rotate(-8deg); opacity:0; } }
 @keyframes peek-in--b{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
@@ -290,7 +308,9 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes fade--b{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes heal--b{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
-@keyframes bump--b{ 0%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-3px) scale(1.25); } 100%{ transform:none; } }
+@keyframes bump--b{ 0%{ transform:translateY(0) scale(1); }
+  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:none; } }
 @keyframes tab-in--b{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
 @keyframes tab-out--b{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
 @keyframes hc-in--b{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
