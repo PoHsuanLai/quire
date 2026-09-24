@@ -7,7 +7,7 @@
 
 /* Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
 .ds-icon-button[*|data-variant=tool]{
-  display:inline-grid; place-items:center; width:28px; height:26px; border:1px solid transparent; border-radius:var(--r-btn);
+  display:inline-grid; place-items:center; width:28px; height:26px; border:var(--hair) solid transparent; border-radius:var(--r-btn);
   background:transparent; color:var(--ink-faint); cursor:pointer;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }

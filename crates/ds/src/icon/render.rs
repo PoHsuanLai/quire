@@ -6,6 +6,8 @@
 
 use super::Icon;
 use super::shape::Shape;
+use super::stroke::stroke_width;
+use crate::root::use_scale;
 use dioxus::prelude::*;
 
 /// How big a glyph is drawn. Consumers pick a size; none writes an icon `width` in CSS.
@@ -86,10 +88,12 @@ fn child(shape: &Shape) -> Element {
 }
 
 /// `icon`, drawn as an `svg` of class `ds-ic` at `size` (its `width`, `height` and
-/// `data-size`), stroked in `currentColor` through attributes, never CSS (spike S6).
+/// `data-size`), stroked in `currentColor` through attributes, never CSS (spike S6). At a
+/// fractional device scale the stroke is snapped to whole device pixels (`super::stroke`).
 #[component]
 pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
     let px = size.px();
+    let stroke = stroke_width(size, use_scale());
     rsx! {
         svg {
             class: "ds-ic",
@@ -102,7 +106,7 @@ pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
             // SVG elements do not carry the HTML `aria_hidden` attribute.
             "aria-hidden": "true",
             "stroke": "currentColor",
-            "stroke-width": "2",
+            "stroke-width": stroke,
             "stroke-linecap": "round",
             "stroke-linejoin": "round",
             "fill": "none",

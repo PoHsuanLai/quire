@@ -15,7 +15,7 @@
    S's `.stop .rm` does. */
 
 .ds-space-editor{
-  border:1px solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
+  border:var(--hair) solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
   padding:var(--s-14); display:grid; gap:var(--s-14); color:var(--ink);
 }
 .ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:var(--s-8); }
@@ -23,7 +23,7 @@
 
 .ds-field{
   position:relative; display:block; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
-  border:1px solid var(--line);
+  border:var(--hair) solid var(--line);
 }
 /* The colours stretch; the dots are a tiled cell of the ground with a round hole, 9 px as S's
    18 px canvas cell is at its half scale, so they stay round at any field width. */
@@ -37,7 +37,7 @@
 
 .ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
 .ds-stop{
-  display:inline-flex; align-items:center; gap:var(--s-5); border:1px solid var(--line); background:var(--surface-2);
+  display:inline-flex; align-items:center; gap:var(--s-5); border:var(--hair) solid var(--line); background:var(--surface-2);
   border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-size:var(--fs-caption);
   color:var(--ink-soft); cursor:pointer;
 }
@@ -47,7 +47,7 @@
 
 .ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 .ds-preset{
-  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:1px solid var(--line); cursor:pointer; padding:0;
+  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:pointer; padding:0;
   transition:transform var(--t-quick) var(--e-spring);
 }
 .ds-preset:hover{ transform:scale(1.1); }
