@@ -1,7 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 48 variants: the canonical keyframe set minus `part` and `fade-in` (neither has a variant;
-//! S's `fade` replaces `fade-in`), plus the three heavy exits an unread row plays 15 % slower
+//! 52 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -9,7 +8,10 @@
 //! recipe (wave 2 integration amendment, section 5 rows 7, 26, 37 and 64): `PaletteFade`,
 //! `LinkPillIn`, `BubblePop` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
 //! closed by Escape or an outside click (bar gaps), plus `CmdkRise`, `cmdk-in` without its fade,
-//! for a command panel that must be opaque on its first frame (mailo gaps 2).
+//! for a command panel that must be opaque on its first frame (mailo gaps 2), plus four for
+//! states the catalogue has no motion for (mailo gaps 3): `PillUp` (a centred pill's entrance),
+//! `RingDrain` (the send ring's countdown), `FadeIn` (C's veil, to `--veil`, where S's `fade`
+//! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -118,11 +120,22 @@ pub enum Anim {
     Breathe,
     /// `spin`: the busy sync halo, looping.
     Spin,
+    /// `pill-up`: a pill centred by `translateX(-50%)` (a consumer's toast, a send pill of its
+    /// own) springs up from below (mailo gaps 3).
+    PillUp,
+    /// `ring-drain`: a countdown ring's `stroke-dashoffset` drains over the send's grace
+    /// period, linear, where CSS reaches the ring (the webview; on Blitz the SendPill writes
+    /// the offset as an attribute, spike S6) (mailo gaps 3).
+    RingDrain,
+    /// `fade-in`: an ink veil fades in to `--veil` rather than to 1 (C:1055; mailo gaps 3).
+    FadeIn,
+    /// `busy`: a busy word pulses, never below .45, looping (mailo gaps 3).
+    Busy,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 48] = [
+    pub const ALL: [Anim; 52] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -171,6 +184,10 @@ impl Anim {
         Anim::Dest,
         Anim::Breathe,
         Anim::Spin,
+        Anim::PillUp,
+        Anim::RingDrain,
+        Anim::FadeIn,
+        Anim::Busy,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -224,6 +241,10 @@ impl Anim {
             Anim::Dest => "a-dest",
             Anim::Breathe => "a-breathe",
             Anim::Spin => "a-spin",
+            Anim::PillUp => "a-pill-up",
+            Anim::RingDrain => "a-ring-drain",
+            Anim::FadeIn => "a-fade-in",
+            Anim::Busy => "a-busy",
         }
     }
 }

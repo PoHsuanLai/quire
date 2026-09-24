@@ -236,6 +236,14 @@ fn the_settle_table() {
         (Anim::LinkPillIn, MotionLevel::Standard, 204),
         (Anim::BubblePop, MotionLevel::Standard, 204),
         (Anim::PeekFullIn, MotionLevel::Standard, 284),
+        // mailo gaps 3: the four keyframes the catalogue had no motion for.
+        (Anim::PillUp, MotionLevel::Standard, 454),
+        (Anim::PillUp, MotionLevel::Calm, 334),
+        (Anim::PillUp, MotionLevel::Extra, 594),
+        (Anim::RingDrain, MotionLevel::Standard, 5034),
+        (Anim::RingDrain, MotionLevel::Calm, 5034),
+        (Anim::FadeIn, MotionLevel::Standard, 284),
+        (Anim::Busy, MotionLevel::Standard, 5034),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(
@@ -250,7 +258,7 @@ fn the_settle_table() {
     // left this as an open question, resolved here).
     for anim in Anim::ALL
         .into_iter()
-        .filter(|anim| *anim != Anim::ChipFlash)
+        .filter(|anim| !matches!(anim, Anim::ChipFlash | Anim::RingDrain))
     {
         assert_eq!(
             settle(anim, MotionLevel::Reduced, StaggerIndex::default()),
@@ -266,5 +274,15 @@ fn the_settle_table() {
         ),
         Duration::from_millis(1234),
         "ChipFlash Reduced (a hold, unaffected by Reduced)"
+    );
+    // The send ring is the undo window: a hold too (mailo gaps 3).
+    assert_eq!(
+        settle(
+            Anim::RingDrain,
+            MotionLevel::Reduced,
+            StaggerIndex::default()
+        ),
+        Duration::from_millis(5034),
+        "RingDrain Reduced (a hold, unaffected by Reduced)"
     );
 }

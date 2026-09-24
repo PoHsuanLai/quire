@@ -72,7 +72,8 @@ pub enum DurationToken {
     BoatReturn,
     /// `--t-spin` 1100 ms: the busy halo, linear.
     Spin,
-    /// `--t-send-ring` 5 s: the undo-send countdown ring, linear.
+    /// `--t-send-ring` 5 s: the undo-send countdown ring, linear. [`DurationKind::Hold`]: the
+    /// ring shows how long a send can still be taken back, which Reduced must not shorten.
     SendRing,
     /// `--t-flash` 1200 ms: a mentioned person chip's ring, held (design/04-COMPONENTS.md
     /// section 10, design/06-INTERACTIONS.md section 2.5, `S:2119`; proposed).
@@ -150,7 +151,8 @@ impl DurationToken {
     /// special case in [`Self::millis`]).
     pub fn kind(self) -> DurationKind {
         match self {
-            DurationToken::Flash => DurationKind::Hold,
+            // The undo window is time a person has to act, not motion (mailo gaps 3).
+            DurationToken::Flash | DurationToken::SendRing => DurationKind::Hold,
             _ => DurationKind::Motion,
         }
     }
