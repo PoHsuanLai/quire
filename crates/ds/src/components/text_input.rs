@@ -1,7 +1,7 @@
 //! TextInput: the one field every text input uses (design/04-COMPONENTS.md section 6).
 
 use crate::components::vocab::Availability;
-use crate::focus::host::focus_soon;
+use crate::focus::host::focus_soon_told;
 use crate::focus::request::{FocusRequest, FocusTicket};
 use dioxus::prelude::*;
 
@@ -23,6 +23,49 @@ impl InputVariant {
         }
     }
 }
+
+/// What the field holds: plain text, or a secret drawn as dots.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum TextInputKind {
+    /// `type="text"`.
+    #[default]
+    Text,
+    /// `type="password"`. Blitz lays a password field out as text and draws its characters as
+    /// typed, so the field paints its text transparent and lays a row of dots over it, one per
+    /// character; a browser, which masks on its own, draws the same dots.
+    Password,
+}
+
+impl TextInputKind {
+    /// The `type` attribute.
+    fn input_type(self) -> &'static str {
+        match self {
+            TextInputKind::Text => "text",
+            TextInputKind::Password => "password",
+        }
+    }
+
+    /// `data-kind`: written only for a password, so a text field's markup is as it was.
+    fn data_kind(self) -> Option<&'static str> {
+        match self {
+            TextInputKind::Text => None,
+            TextInputKind::Password => Some("password"),
+        }
+    }
+
+    /// The dots drawn over a password's value; nothing for text or an empty value.
+    fn mask(self, value: &str) -> Option<String> {
+        match self {
+            TextInputKind::Password if !value.is_empty() => {
+                Some(value.chars().map(|_| MASK_DOT).collect())
+            }
+            TextInputKind::Text | TextInputKind::Password => None,
+        }
+    }
+}
+
+/// One masked character.
+const MASK_DOT: char = '\u{2022}';
 
 /// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
@@ -61,7 +104,7 @@ struct FieldFocus {
 impl FieldFocus {
     /// Keep the element, and take the focus if the field asks for it on mount. Focus goes
     /// through `focus_soon`, which waits out a document the renderer holds (sill Q43).
-    fn mounted(self, focus: Focus, event: &MountedEvent) {
+    fn mounted(self, focus: Focus, event: &MountedEvent, told: EventHandler<()>) {
         let mut element = self.element;
         let mut served = self.served;
         element.set(Some(event.data()));
@@ -69,12 +112,12 @@ impl FieldFocus {
             served.set(request.peek());
         }
         if focus.on_mount() {
-            focus_soon(event.data());
+            focus_soon_told(event.data(), told);
         }
     }
 
     /// Serve a request made since the last one, once the element is mounted.
-    fn follow(self, request: FocusRequest) {
+    fn follow(self, request: FocusRequest, told: EventHandler<()>) {
         let ticket = request.ticket();
         let mut served = self.served;
         let Some(element) = self.element.peek().clone() else {
@@ -82,7 +125,7 @@ impl FieldFocus {
         };
         if ticket != *served.peek() {
             served.set(ticket);
-            focus_soon(element);
+            focus_soon_told(element, told);
         }
     }
 }
@@ -91,6 +134,12 @@ impl FieldFocus {
 /// writes `autofocus` for a webview); `Focus::Controlled(request)` does too, and again at each
 /// `request.request()`. `onkey` hears each key as the event itself, so a caller that takes a
 /// key can `prevent_default` it (sill FINDINGS Q61).
+///
+/// `onfocus` and `onblur` hear the caret arrive and leave, so a caller can tell "the person is
+/// typing in a field" from "a key for the window". They fire for a click or Tab (the renderer's
+/// own events) and for the focus seam: when `Focus::OnMount` or `Focus::Controlled` puts the
+/// caret in the field through a host that dispatches no event (Blitz), the field calls `onfocus`
+/// itself. `kind` is `Text` or `Password`; a range is [`Slider`](crate::Slider).
 #[component]
 pub fn TextInput(
     variant: InputVariant,
@@ -101,14 +150,18 @@ pub fn TextInput(
     oninput: EventHandler<String>,
     #[props(default)] onkey: EventHandler<KeyboardEvent>,
     #[props(default)] focus: Focus,
+    #[props(default)] kind: TextInputKind,
+    #[props(default)] onfocus: EventHandler<()>,
+    #[props(default)] onblur: EventHandler<()>,
 ) -> Element {
     let field = FieldFocus {
         element: use_hook(|| CopyValue::new(None)),
         served: use_hook(|| CopyValue::new(FocusTicket::default())),
     };
     if let Focus::Controlled(request) = focus {
-        field.follow(request);
+        field.follow(request, onfocus);
     }
+    let mask = kind.mask(&value);
     let shown = placeholder_shown(&value, &placeholder).map(str::to_string);
     let aria_placeholder = (!placeholder.is_empty()).then_some(placeholder.clone());
     rsx! {
@@ -116,20 +169,26 @@ pub fn TextInput(
             input {
                 class: "ds-input",
                 "data-variant": variant.slug(),
-                r#type: "text",
+                r#type: kind.input_type(),
+                "data-kind": kind.data_kind(),
                 "aria-label": "{label}",
                 "aria-placeholder": aria_placeholder,
                 "aria-disabled": availability.aria_disabled(),
                 autocomplete: "off",
                 autofocus: focus.on_mount().then_some("true"),
                 value: "{value}",
-                onmounted: move |event| field.mounted(focus, &event),
+                onmounted: move |event| field.mounted(focus, &event, onfocus),
+                onfocus: move |_| onfocus.call(()),
+                onblur: move |_| onblur.call(()),
                 oninput: move |event| {
                     if availability == Availability::Enabled {
                         oninput.call(event.value());
                     }
                 },
                 onkeydown: move |event| onkey.call(event),
+            }
+            if let Some(dots) = mask {
+                span { class: "ds-input-mask", "aria-hidden": "true", "{dots}" }
             }
             if let Some(text) = shown {
                 span { class: "ds-input-placeholder", "aria-hidden": "true", "{text}" }

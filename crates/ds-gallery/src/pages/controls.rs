@@ -2,16 +2,17 @@
 
 use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
+use super::fields::Fields;
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    AccountFace, AccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape, AvatarSize,
-    AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count, Fraction,
-    HeaderKind, Hex, Icon, IconButton, IconButtonVariant, InputVariant, Kbd, KbdSize, Key,
-    LabelHue, MarkSize, MarkStyle, PersonHue, Provider, ProviderMark, SearchField, SectionHeader,
+    AccountFace, AccountTile, AddAccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape,
+    AvatarSize, AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count,
+    Expanded, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource, Kbd,
+    KbdSize, Key, LabelHue, MarkSize, MarkStyle, PersonHue, Provider, ProviderMark, SectionHeader,
     SegSize, SegmentedControl, Shortcut, Slider, Spinner, SpinnerKind, Switch, SyncHalo, SyncState,
-    Tabs, TextInput, Toggle, Verdict, use_pulse,
+    Tabs, Toggle, Verdict, use_pulse,
 };
 
 const BUTTONS: [(ButtonVariant, &str); 5] = [
@@ -76,7 +77,7 @@ pub fn ControlsPage() -> Element {
 #[component]
 fn Buttons() -> Element {
     rsx! {
-        Section { title: "Button", note: "Five variants, each at rest, pressed off and on, and disabled; with and without an icon.",
+        Section { title: "Button", note: "Five variants, each at rest, pressed off and on, and disabled; with and without an icon. Named: a hover title and an assistive name over a terse label, and a trigger open and closed (aria-expanded).",
             for (variant , name) in BUTTONS {
                 div { class: "g-row",
                     span { class: "g-name g-type-name", "{name}" }
@@ -85,6 +86,12 @@ fn Buttons() -> Element {
                     }
                     Button { variant, label: "With icon", icon: Some(Icon::Archive), onclick: |_| {} }
                 }
+            }
+            div { class: "g-row",
+                span { class: "g-name g-type-name", "Named" }
+                Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", onclick: |_| {} }
+                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Expanded::Open, onclick: |_| {} }
+                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Expanded::Closed, onclick: |_| {} }
             }
         }
         Section { title: "IconButton", note: "Four variants; rest, pressed on, expanded, disabled.",
@@ -194,44 +201,6 @@ fn Choosers() -> Element {
 }
 
 #[component]
-fn Fields() -> Element {
-    let mut text = use_signal(String::new);
-    let mut search = use_signal(|| "invoice".to_string());
-    rsx! {
-        Section { title: "TextInput and SearchField", note: "Boxed and inline; empty with a placeholder, filled, disabled. Type in the live ones.",
-            div { class: "g-grid3",
-                for variant in [InputVariant::Boxed, InputVariant::Inline] {
-                    Specimen { name: "live",
-                        TextInput { variant, label: "Live", value: text(), placeholder: "Type here", oninput: move |next| text.set(next) }
-                    }
-                    Specimen { name: "filled",
-                        TextInput { variant, label: "Filled", value: "pohsuan@example.org", oninput: |_| {} }
-                    }
-                    Specimen { name: "disabled",
-                        TextInput { variant, label: "Disabled", value: "", placeholder: "Not now", availability: Availability::Disabled, oninput: |_| {} }
-                    }
-                }
-            }
-            div { class: "g-grid2",
-                Specimen { name: "search with tokens",
-                    SearchField {
-                        label: "Search",
-                        value: search(),
-                        placeholder: "Search mail",
-                        tokens: vec!["from:dana".to_string(), "has:attachment".to_string()],
-                        oninput: move |next| search.set(next),
-                        onkey: |_| {},
-                    }
-                }
-                Specimen { name: "search, empty",
-                    SearchField { label: "Search", value: "", placeholder: "Search mail", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} }
-                }
-            }
-        }
-    }
-}
-
-#[component]
 fn Chips() -> Element {
     let flash = use_pulse(Anim::ChipFlash);
     let person = AvatarFace {
@@ -300,7 +269,7 @@ fn Marks() -> Element {
         address: Some(format!("{initial}@example.org").to_lowercase()),
     };
     rsx! {
-        Section { title: "ProviderMark and AccountTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed).",
+        Section { title: "ProviderMark and AccountTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), and the Add account tile after them.",
             for size in [MarkSize::Tile, MarkSize::Row, MarkSize::Inline] {
                 div { class: "g-row",
                     for provider in PROVIDERS {
@@ -312,7 +281,18 @@ fn Marks() -> Element {
                 AccountTile { account: AccountFace::All, pressed: Switch::On, unread: 12, onclick: |_| {} }
                 AccountTile { account: one('P', Provider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(match pressed() { Switch::On => Switch::Off, Switch::Off => Switch::On }) }
                 AccountTile { account: one('W', Provider::Microsoft), pressed: Switch::Off, unread: 0, onclick: |_| {} }
+                AccountTile { account: one('G', Provider::Google), pressed: Switch::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
+                AddAccountTile { title: "Add account…", onclick: |_| {} }
             }
         }
     }
+}
+
+/// A stand-in favicon, as an app would supply one: a data URI quire never fetches.
+fn favicon() -> ImageSource {
+    let svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='#1A73E8'/><circle cx='8' cy='8' r='3' fill='#FFFFFF'/></svg>";
+    ImageSource(format!(
+        "data:image/svg+xml;base64,{}",
+        crate::data_uri::base64(svg.as_bytes())
+    ))
 }

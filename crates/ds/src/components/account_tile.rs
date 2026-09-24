@@ -114,12 +114,16 @@ fn label(account: &AccountFace) -> String {
 
 /// An account tile: a Pin IconButton holding the account's avatar, its provider mark and its
 /// unread count. Pressed when it is the list's filter, or the Space's only account.
+///
+/// `mark` is how the provider is drawn, the letter or the favicon the app supplies: the caller's
+/// own "provider marks" setting, so every tile and row follows one choice.
 #[component]
 pub fn AccountTile(
     account: AccountFace,
     pressed: Switch,
     unread: u32,
     onclick: EventHandler<()>,
+    #[props(default = MarkStyle::Letter)] mark: MarkStyle,
 ) -> Element {
     let label = label(&account);
     let face = match account {
@@ -139,7 +143,7 @@ pub fn AccountTile(
                 size: AvatarSize::Size28,
                 tone: AvatarTone::Account(tile_colour(colour, pressed)),
             }
-            ProviderMark { provider, size: MarkSize::Tile, style: MarkStyle::Letter }
+            ProviderMark { provider, size: MarkSize::Tile, style: mark }
         },
     };
     rsx! {
@@ -152,6 +156,32 @@ pub fn AccountTile(
             onclick: move |_| onclick.call(()),
             {face}
             Count { value: unread, place: CountPlace::Tile }
+        }
+    }
+}
+
+/// The tile after the accounts that adds one: the same Pin plate, holding a plus in a dashed
+/// ring where an avatar would be, quiet until hovered. It is an action, not a filter, so it is
+/// never pressed and has no count. `label` names it to assistive technology; `title` is the
+/// hover hint ("Add account…").
+#[component]
+pub fn AddAccountTile(
+    #[props(default = "Add account".to_string())] label: String,
+    #[props(default)] title: Option<String>,
+    onclick: EventHandler<()>,
+) -> Element {
+    rsx! {
+        button {
+            r#type: "button",
+            class: "ds-icon-button ds-account-tile",
+            "data-variant": "pin",
+            "data-face": "add",
+            "aria-label": label,
+            title,
+            onclick: move |_| onclick.call(()),
+            span { class: "ds-avatar", "data-size": "28", "data-tone": "add",
+                Glyph { icon: Icon::Plus, size: IconSize::Compact }
+            }
         }
     }
 }

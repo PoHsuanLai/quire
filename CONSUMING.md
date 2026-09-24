@@ -882,6 +882,33 @@ A person or account colour never needs a hex constant of yours:
 - **Glyphs.** `Icon::Printer`, `Icon::FolderInput` (Lucide `printer`, `folder-input`), listed in
   `Icon::ACTIONS`.
 
+### The mailo gaps 2 (2026-09-25): controls and tiles
+
+Every row is additive: leave the prop out and the markup is what it was, except where a row
+says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the why of each.
+
+| Component | Prop or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Button` | `title` | `Option<String>` (`None`) | the hover hint, written as `title` |
+| `Button` | `aria_label` | `Option<String>` (`None`) | names the button for assistive technology in place of its visible label (a `+`, an `All`) |
+| `Button` | `expanded` | `Option<Expanded>` (`None`) | `Expanded::{Open, Closed}` as `aria-expanded`, for a button that opens a menu or panel; `IconButton` already had `tooltip`, `label` and `expanded: Option<Switch>` and is unchanged |
+| `TextInput` | `onfocus`, `onblur` | `EventHandler<()>` (no-op) | the caret arrived or left: a click or Tab, and the focus seam (`Focus::OnMount`, `Focus::Controlled`), which on Blitz moves the caret with no event, so the field calls `onfocus` itself |
+| `TextInput` | `kind` | `TextInputKind` (`Text`) | `Password` writes `type="password"` and `data-kind="password"`; Blitz draws a password's characters as typed, so the field's text is transparent and one dot per character is laid over it |
+| `Slider` | (none) | | already the range input: `value: Fraction` in thousandths, keys and drag; map your 0-100 to `Fraction(n * 10)` |
+| `AccountTile` | `mark` | `MarkStyle` (`Letter`) | how the provider is drawn on the tile: pass your provider-marks setting, `MarkStyle::Image(ImageSource(data_uri))` for the favicon you hold |
+| `AddAccountTile` | (new component) | `label: String` ("Add account"), `title: Option<String>`, `onclick: EventHandler<()>` | the tile after the accounts: the Pin plate with no ground at rest, a plus in a dashed `--f-ink-faint` ring; never pressed, no count |
+| `SendPill` | `mood` | `SendMood` (`Calm`) | `Nudge`, `Shake`, `Fatal`: the one-shot `nudge` or `shake` (design/05 4.4.8-9) plays each time the mood changes to one of them, never on mount, and settles at `ds::settle`; the pill stays up; `Fatal` also paints it `--danger`/`--danger-ink`; `data-mood` is written for each. Pass `Calm` for a render to play the same mood again |
+| `SendPill` | `action` | `PillAction` (`Undo`) | the button's word while counting: `Undo`, `Cancel` (a held send), or `Nothing` (no button); `onundo` hears either word |
+| `SendPill` | `ring` | `SendRing` (`Drain`) | `Spin`: a 20/37 arc turning at the Spinner's `spin` while the send waits on the outbox, `progress` ignored |
+| `SendPill` | `refusal` | `Option<String>` (`None`) | a second, lighter line under the text: why a take-back was refused, or "No recipients" |
+| `SidebarItem` | `trailing` | `Option<TodayTrailing>` (`None`) | a scheduled Today row's `time` (data type, `--f-ink-faint`) and a cancel button named by `cancel`, calling `on_cancel` without opening the row; Today only |
+| `SidebarItem` | (markup changed) | | a Today item's close button is now named `Close {label}`, not `Close`: an assertion or selector on `aria-label="Close"` needs the row's label |
+| `SpaceEditor` | `on_rename` | `Option<EventHandler<String>>` (`None`) | the title becomes an inline `TextInput` ("Space name", placeholder "Name this Space") holding `name`; each keystroke is reported |
+| `SpaceEditor` | `motion` | `Option<MotionChoice>` (`None`) | a Motion row after Appearance: a `SegmentedControl` over `ds::Motion` (System, Calm, Standard, Extra, Reduced), `MotionChoice { level, on_motion }`; feed the pick to your root's `appearance.motion` |
+| `SpaceEditor` | `measured` | `MeasuredIn` (`ThisScheme`) | `EachScheme`: the contrast readout under "Measured, this Space", once per scheme the Space's theme shows (Light and Dark for System), each under its own small-caps heading |
+| `SpaceEditor` | (markup changed) | | each preset button is named (`aria-label` and `title`) by `Preset::name` (Dusk, Orchard, Harbour, Ember, Lagoon, Heather, Moss, Stone), not "Preset n" |
+| `Preset` | `name` | `&'static str` | the preset's name, design/21 section 4 order; a new public field, so a struct literal of `Preset` needs it |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
