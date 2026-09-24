@@ -15,8 +15,8 @@ token was used.
 | `unet/flux-2-klein-4b-Q4_K_M.gguf` (2.60 GB) | `unsloth/FLUX.2-klein-4B-GGUF` | `black-forest-labs/FLUX.2-klein-4B` (2026-01-14) | Apache-2.0 | yes (Apache-2.0 places no restriction on outputs; the 4B card says "open weights available for commercial use") | `0b25d143c8469b342bc5af3bce92b783bf6b0636d285f7b2f75e38af63af9a15` |
 | `text_encoders/qwen_3_4b_fp4_flux2.safetensors` (3.85 GB) | `Comfy-Org/vae-text-encorder-for-flux-klein-4b` | Qwen3-4B, fp4 | Apache-2.0 | yes | `3eab03a77adb0ee5304a4e677d5c10ac22f9049c1d7c894adca4f8bb39206ca8` |
 | `vae/flux2-vae.safetensors` (336 MB) | same | FLUX.2 VAE | Apache-2.0 | yes | `868fe7b343cc8f3a19dbcfcafbc3d5f888802be3f89bd81b65b3621a066ce8f3` |
-| `unet/qwen-image-2512-Q3_K_M.gguf` (9.93 GB) | `unsloth/Qwen-Image-2512-GGUF` | `Qwen/Qwen-Image-2512` (2025-12-30) | Apache-2.0 | yes | QWEN_T2I_SHA |
-| `unet/qwen-image-edit-2511-Q3_K_M.gguf` (9.92 GB) | `unsloth/Qwen-Image-Edit-2511-GGUF` | `Qwen/Qwen-Image-Edit-2511` (2025-12-17) | Apache-2.0 | yes | QWEN_EDIT_SHA |
+| `unet/qwen-image-2512-Q3_K_M.gguf` (9.93 GB) | `unsloth/Qwen-Image-2512-GGUF` | `Qwen/Qwen-Image-2512` (2025-12-30) | Apache-2.0 | yes | `db9842e93007b61d2e2a1ed5da52cf468cd1bb0c655a77926effa5220c2f1011` |
+| `unet/qwen-image-edit-2511-Q3_K_M.gguf` (9.92 GB) | `unsloth/Qwen-Image-Edit-2511-GGUF` | `Qwen/Qwen-Image-Edit-2511` (2025-12-17) | Apache-2.0 | yes | `5631fd3a407880e1fb541dc47696628633c898565136c128d5a2741d4b84e9e9` |
 | `text_encoders/qwen_2.5_vl_7b_nvfp4.safetensors` (6.11 GB) | `Comfy-Org/Qwen-Image_ComfyUI` | Qwen2.5-VL-7B, NVFP4 | Apache-2.0 | yes | `c7bb24d331f5df991bab2ce76a15195b12652e86a69a79823183c6a047407463` |
 | `vae/qwen_image_vae.safetensors` (254 MB) | same | Qwen-Image VAE | Apache-2.0 | yes | `a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f` |
 

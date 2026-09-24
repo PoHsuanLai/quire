@@ -51,8 +51,8 @@ def cmd_vary(args: argparse.Namespace) -> None:
     ref = client.upload(args.url, args.hero)
     model = EDIT_MODEL[args.model]
     for s in brief.SUBJECTS:
-        if s.slug == args.hero_subject:
-            continue
+        if s.slug == args.hero_subject or (args.out / f"{s.slug}-ref.png").exists():
+            continue  # the hero itself, or a finished render (resume)
         job = graphs.Job(brief.variation_prompt(s), brief.NEGATIVE, args.seed, args.size,
                          f"vary-{args.model}-{s.slug}", reference=ref)
         _render(args, model, job, f"{s.slug}-ref")
