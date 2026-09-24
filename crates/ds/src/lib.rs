@@ -37,8 +37,8 @@ pub use focus::{FocusRequest, FocusTicket, Focused, HostFocus, use_focus_request
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
 pub use geometry::{
-    Align, Anchor, Flip, HostMeasure, Measured, MountedRef, Placed, Placement, Point,
-    PopoverRequest, Px, Rect, RectProbe, Side, Size, place, use_rect,
+    Align, Anchor, Flip, Grid, HostMeasure, Measured, MountedRef, Placed, Placement, Point,
+    PopoverRequest, Px, Rect, RectProbe, Scale, Side, Size, place, use_rect,
 };
 pub use icon::render::{Glyph, IconPx, IconSize};
 pub use icon::{
@@ -58,7 +58,8 @@ pub use overlay::{
     use_hover_hub, use_overlays, use_toast_hub,
 };
 pub use root::{
-    Ds, Env, FrameTint, Ground, HostModality, Inject, InputModality, RootChrome, Surface, use_env,
+    Ds, Env, FrameTint, Ground, HostModality, HostScale, Inject, InputModality, RootChrome,
+    Surface, use_env, use_scale,
 };
 pub use space::{
     Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
@@ -70,8 +71,9 @@ pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
-    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, PersonSwatch, Radius,
-    ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken, Tuned, VarName, ZLayer, quad,
+    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, PersonSwatch,
+    PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken, Tuned,
+    VarName, ZLayer, quad,
 };
 
 use futures_timer as _;

@@ -28,10 +28,10 @@
 .g-fail{color:var(--danger)}
 
 /* Specimens. */
-.g-swatch{height:34px;border-radius:var(--r-small);box-shadow:inset 0 0 0 1px var(--line)}
-.g-chip-swatch{width:26px;height:26px;border-radius:var(--r-pill);flex:none;box-shadow:inset 0 0 0 1px var(--line)}
+.g-swatch{height:34px;border-radius:var(--r-small);box-shadow:inset 0 0 0 var(--hair) var(--line)}
+.g-chip-swatch{width:26px;height:26px;border-radius:var(--r-pill);flex:none;box-shadow:inset 0 0 0 var(--hair) var(--line)}
 .g-space-bar{height:10px;background:var(--accent);border-radius:var(--r-micro)}
-.g-radius{width:84px;height:56px;background:var(--accent-soft);border:1px solid var(--accent)}
+.g-radius{width:84px;height:56px;background:var(--accent-soft);border:var(--hair) solid var(--accent)}
 .g-shadow{width:110px;height:64px;background:var(--raise);border-radius:var(--r-card)}
 .g-type-line{display:flex;align-items:baseline;gap:var(--s-14);min-width:0}
 .g-type-name{width:190px;flex:none}
@@ -48,7 +48,7 @@
 .g-stage{position:relative;min-height:120px;border-radius:var(--r-panel);background:var(--surface-2);overflow:hidden}
 .g-stage-tall{min-height:200px}
 .g-stage-pad{padding:var(--s-14)}
-.g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-soft);padding:var(--s-4) 0}
+.g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--line-soft);padding:var(--s-4) 0}
 .g-side{display:flex;flex-direction:column;gap:var(--s-2);width:232px;padding:var(--s-10);border-radius:var(--r-panel);background:var(--f-solid);color:var(--f-ink)}
 
 /* Materials: a wallpaper under each chrome panel. The image is a generated PNG (wallpaper.rs). */

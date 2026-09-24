@@ -37,6 +37,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `tokens/easing.rs`, `tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `tokens/shape.rs` | 01-LAYOUT §10 |
 | `tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
+| `tokens/pixel.rs`, `geometry/scale.rs`, `root/scale.rs`, `icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostScale`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_native::snap` |
 | `tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `tokens/layer.rs` | 01-LAYOUT §12 |
@@ -76,7 +77,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `icon/external.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`, `IconUrl` (`data:`/`file:` only) |
 | `icon/classify.rs` | 08-ICONS §1.5 step 2: `classify(png) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
 | `error.rs` | CONVENTIONS §5: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
-| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 23 `Rule`s: the stylesheet rules (`RawSpacing` the Strict-profile spacing rule), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
+| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
 

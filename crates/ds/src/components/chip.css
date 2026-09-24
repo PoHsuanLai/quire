@@ -21,7 +21,7 @@
 /* Neutral: C's `.tag` (`C:615-616`). */
 .ds-chip[*|data-variant=neutral]{
   font-size:var(--fs-micro); padding:var(--s-2) var(--s-7); border-radius:var(--r-pill);
-  background:var(--surface-2); border:1px solid var(--line); color:var(--ink-faint);
+  background:var(--surface-2); border:var(--hair) solid var(--line); color:var(--ink-faint);
 }
 
 /* Token: `S:798`. */
@@ -36,7 +36,7 @@
    steps aside while the flash plays, or this rule would outrank the pulse class. */
 .ds-chip[*|data-variant=person]{
   display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-8) var(--s-2) var(--s-3); border-radius:var(--r-pill);
-  background:var(--surface); border:1px solid var(--line);
+  background:var(--surface); border:var(--hair) solid var(--line);
   font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
 }
 .ds-chip[*|data-variant=person]:not(.a-chip-flash){ animation:chip-in var(--t-move) var(--e-spring); }

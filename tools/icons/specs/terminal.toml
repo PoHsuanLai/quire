@@ -1,6 +1,7 @@
-# Terminal: a prompt chevron and a cursor block, pressed up out of a violet-to-amber plate.
+# Terminal: a prompt chevron and a cursor block; the cursor is the spot.
 name = "terminal"
-ground = { start = "#6B3FCC", end = "amber" }
+dialect = "graphite"
+tint = "sage"
 grain = 20
 
 [[layer]]
@@ -9,15 +10,11 @@ tip = [10.5, 12]
 reach = 4
 heading = "right"
 width = 2.4
-fill = "paper"
-opacity = 0.92
-relief = "raised"
+fill = "symbol"
 
 [[layer]]
 kind = "rect"
 at = [13.2, 13.8]
 size = [5.2, 2.4]
 corners = [1.2, 1.2, 1.2, 1.2]
-fill = "paper"
-opacity = 0.92
-relief = "raised"
+fill = "spot"

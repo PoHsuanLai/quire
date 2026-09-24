@@ -185,15 +185,62 @@ pub enum IconDarkVariant {
     Adaptive,
 }
 
-/// `icons.*`: how the dock and launcher plate third-party icons (design/08-ICONS.md section 4).
+/// Which dialect our app icons are drawn in (`icons.style`, design/08-ICONS.md section 2.10).
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, crate::SettingsSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum IconStyle {
+    /// Each app in the dialect its icon was designed in.
+    #[default]
+    Colour,
+    /// The same icons with their colour held further down (a lower chroma cap).
+    Muted,
+    /// Every icon in one hue, tone on tone; third-party icons desaturated and re-tinted to match.
+    Monochrome,
+}
+
+/// Where a Monochrome icon takes its hue from (`icons.monochrome_tint`).
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, crate::SettingsSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum MonochromeTint {
+    /// The current workspace's Space: the accent `ds` derives from its first dot.
+    #[default]
+    Space,
+    /// The card accent the appearance settings pick.
+    Accent,
+    /// No hue: a neutral grey.
+    Neutral,
+}
+
+/// `icons.*`: how our app icons are drawn (`style`, `monochrome_tint`) and how the dock and
+/// launcher plate third-party icons (design/08-ICONS.md sections 2.10 and 4).
 ///
-/// All five keys are Advanced (design/22-SETTINGS.md section 5: not listed on any Basic page),
+/// `style` and `monochrome_tint` are Basic (the Appearance page shows them); the other keys are
+/// Advanced (design/22-SETTINGS.md section 5: not listed on any Basic page),
 /// on the Appearance page since they live in `appearance.toml` alongside the `appearance`
 /// domain.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
 #[serde(default)]
 #[settings(file = "quire/appearance.toml", domain = "icons", page = Page::Appearance)]
 pub struct IconsSettings {
+    /// `icons.style` (proposed Colour).
+    #[settings(
+        label = "App icon style",
+        help = "Colour draws each app icon as designed; Muted holds the colour down; \
+                Monochrome draws every icon in one hue.",
+        section = "Icons"
+    )]
+    pub style: IconStyle,
+    /// `icons.monochrome_tint` (proposed Space): only read when `style` is Monochrome.
+    #[settings(
+        label = "Monochrome tint",
+        help = "Where Monochrome icons take their hue: the Space, the accent, or none.",
+        section = "Icons"
+    )]
+    pub monochrome_tint: MonochromeTint,
     /// `icons.plate_inset_percent` (proposed 72).
     #[settings(
         label = "Plate inset",
@@ -260,6 +307,8 @@ pub struct IconsSettings {
 impl Default for IconsSettings {
     fn default() -> Self {
         IconsSettings {
+            style: IconStyle::Colour,
+            monochrome_tint: MonochromeTint::Space,
             plate_inset_percent: Percent(72),
             symbolic_fallback_glyph_percent: Percent(56),
             squircle_detect_iou: Fraction(900),

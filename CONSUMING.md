@@ -105,6 +105,42 @@ fn App() -> Element {
 | `radius` | `Option<Corner>` | `None`: the material's own corner | `Corner::Token(Radius::…)` or `Corner::Px(Px(n))`: overrides `--m-radius` inline, for a root whose corner is a setting (the dock's `dock.pill_radius_px`) |
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 | `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
+| `scale` | `Option<Scale>` | `None`: the host's `ds::HostScale`, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostScale` themselves; a host that is not `ds-native` passes `scale` |
+
+### Pixel snapping: `scale`, the pixel tokens and `snap_to_device` (2026-09-25)
+
+At 1.25, 1.5 or 1.75 a `1px` line covers a fractional number of device pixels and paints as one
+full row and one half row. Three pieces keep every line whole device pixels (design/01-LAYOUT.md
+§2.1; FINDINGS "Pixel snapping"):
+
+1. **The root knows the scale.** `Ds { scale: Some(Scale(180)) }` (or the `ds::HostScale`
+   ds-native provides) makes the root write the pixel tokens' inputs inline. With no scale, or
+   at `Scale::ONE`, it writes nothing and every token is its 1x value, so nothing changes.
+2. **Lines read the pixel tokens** (`ds::PixelToken`, on `.ds`):
+
+   | Token | 1x | 1.25 / 1.5 / 1.75 | 2x | Use it for |
+   | --- | --- | --- | --- | --- |
+   | `--hair` | `1px` | one device pixel | `1px` | every 1 px border, separator, rule, `0 0 0 1px` ring, 1 px inset highlight |
+   | `--hairline` | `.5px` | one device pixel | `.5px` | a half-pixel hairline (the material stack's) |
+   | `--px` | `1px` | one device pixel | `.5px` | exactly one device pixel, whatever the scale |
+   | `--ring` | `3px` | 3 px to whole device pixels | `3px` | a focus or flash ring's spread |
+   | `--focus-ring` | `2.5px` | 2.5 px down to whole device pixels | `2.5px` | the keyboard focus outline |
+   | `--dpr` | `1` | `1.25` / `1.5` / `1.75` | `2` | a `calc()` that needs the scale |
+
+   Write `border: var(--hair) solid var(--line)`, `height: var(--hair)`, never `1px`.
+   `Rule::RawHairline` (Strict, section 5) flags a literal `1px`/`.5px` border or outline width,
+   and a box whose whole `width`/`height` is `1px`, and names the token to use.
+3. **The layout is snapped to the device grid.** Blitz rounds every box to whole *logical*
+   pixels, so at 1.5 a box at y 11 starts at device y 16.5 whatever its width.
+   `ds_native::snap_to_device(&mut BaseDocument)` re-rounds the laid-out document on the device
+   grid (and rounds a pure translation to whole device pixels). `Harness` and `snapshot` run it
+   every frame. **A host that resolves its own documents (shell-host) calls it after every
+   `resolve` and before painting**; it does nothing at a whole scale. `ds_native::launch`'s
+   window cannot (blitz-shell resolves and paints in one call), so there the tokens apply but a
+   line may still sit half a device pixel off.
+
+Glyphs need nothing from you: under a root at a fractional scale `Glyph` writes a stroke width
+that is an even number of device pixels (design/08-ICONS.md §1.4.1).
 
 You almost never write more than one `Ds` per window: it is the root, not a per-panel wrapper —
 use `Surface` (section 4) for a nested material, scheme, accent or blur state.
@@ -257,6 +293,13 @@ percentage, an `em` and `var()` pass. The steps are `ds::SpacingToken`, emitted 
 `--s-22`, `--s-26`, `--s-36`, each named by its pixel value (design/01-LAYOUT.md §2). A length
 between steps takes the nearest one; quire's own sheets and the gallery's do (FINDINGS "Polish
 pass"). `examples/consumer/src/style.css` is Strict-clean.
+
+Strict also runs `Rule::RawHairline` (2026-09-25): a literal hairline (`1px`, `.5px`) as a
+`border*` or `outline*` width, or as a box's whole `width`/`height`, is an offence whose text
+names the token (`border: 1px (use var(--hair))`, `.5px` points at `var(--hairline)`). A 2 px
+border and a `border-radius: 1px` pass: stylo already floors a border width to whole device
+pixels, and only a line of one pixel or less goes blurry. sill's `.sill-dock-separator`
+(`width:1px`) is the one offence known downstream; it becomes `width: var(--hair)`.
 
 ### Rule 2 — no raw markup, only quire components
 
