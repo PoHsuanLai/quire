@@ -12,3 +12,15 @@
 .ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }
 .ds-account-tile .ds-avatar[*|data-tone=all]{ background:transparent; color:var(--f-ink); }
 .ds-account-tile[*|aria-pressed=false] .ds-avatar[*|data-tone=account]{ opacity:.85; }
+
+/* The Add account tile (`data-face=add`, mailo's `.acct-add`): no plate at rest (the rule names
+   the Pin as well, to outrank its ground, which comes later in the cascade), the Pin's pill
+   on hover; where an avatar would be, a dashed ring in `--f-ink-faint` around a plus, both
+   going to `--f-ink` under the pointer. */
+.ds-icon-button.ds-account-tile[*|data-face=add]{ background:transparent; }
+.ds-icon-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
+.ds-account-tile .ds-avatar[*|data-tone=add]{
+  box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:1px dashed var(--f-ink-faint);
+  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
+}
+.ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }

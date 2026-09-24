@@ -1518,3 +1518,15 @@ controls' and lists' class scans cover them) and one Harness test file per behav
      placeholder would sit. The caret follows the hidden text's advance, so it can sit a little
      off the last dot; the secret never paints. A browser masks natively, and its (transparent)
      dots sit under the same overlay.
+2. **AccountTile.** `mark: MarkStyle` (default `Letter`, so every current tile is as it was)
+   is handed to the tile's `ProviderMark`: mailo's provider-marks setting reaches the tiles.
+   The Add account face is its own component, `AddAccountTile { label, title, onclick }`,
+   rather than an `AccountFace::Add` variant: an add tile has no `pressed` and no `unread`, and a
+   variant would have made both required for it and broken every `match` on `AccountFace`.
+   design/04 section 27 does not draw it; mailo's `.acct-add` does (a dashed `--f-ink-faint`
+   ring around a plus, `--f-ink` on hover), and quire takes that, on a Pin with no ground at
+   rest. That rule has to name `.ds-icon-button.ds-account-tile`: `icon_button.css` comes after
+   `account_tile.css` in the cascade, so an equal-specificity rule lost to the Pin's ground.
+   Proof: `account_tiles.rs::the_add_tile_has_no_plate_at_rest` (the add tile's top edge is the
+   window ground, the account tile's is its plate; with the one-class selector it fails) and
+   `the_add_tile_presses_and_is_never_pressed`.

@@ -56,7 +56,7 @@ pub mod tooltip;
 pub mod vocab;
 pub mod workspace_pills;
 
-pub use account_tile::{AccountFace, AccountTile};
+pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use animated_list::AnimatedList;
 pub use appearance_picker::AppearancePicker;
 pub use avatar::{Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue};
