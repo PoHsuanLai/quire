@@ -125,6 +125,8 @@ pub fn OverlaysPage() -> Element {
         super::overlays_mailo::RecentPalette {}
         super::overlays_mailo::FieldMenu {}
         super::overlays_mailo4::HookKeyedCards {}
+        super::overlays_mailo4::LabelChecklist {}
+        super::overlays_mailo4::InlineActions {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,
