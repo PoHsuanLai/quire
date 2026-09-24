@@ -12,6 +12,7 @@
 
 use crate::contexts::RootContexts;
 use crate::error::NativeError;
+use crate::frame_view::FrameView;
 use crate::harness_config::HarnessConfig;
 use crate::harness_input::{blitz_button, keyboard, modifier, pointer};
 use crate::headless::{Backdrop, Headless, Layout};
@@ -83,14 +84,14 @@ impl Harness {
             clock: Duration::ZERO,
             _runtime: runtime,
         };
-        harness.frame();
+        harness.settle();
         harness
     }
 
     /// Lay the document out from now on, as the compositor maps its surface, and resolve it.
     pub fn map(&mut self) {
         self.doc.layout = Layout::Running;
-        self.frame();
+        self.settle();
     }
 
     /// Move the pointer to `at`.
@@ -195,7 +196,7 @@ impl Harness {
             self.doc.wakeup().wait_past(seen, deadline - now);
         }
         self.clock += time;
-        self.frame();
+        self.settle();
     }
 
     /// The document as HTML, for assertions.
@@ -277,26 +278,32 @@ impl Harness {
     /// Resolve at `at` and paint: a snapshot at one motion moment.
     pub(crate) fn render_at(&mut self, at: Duration) -> Result<image::RgbaImage, NativeError> {
         self.clock = at;
-        self.frame();
+        self.settle();
         self.doc.paint(Backdrop::Scheme)
     }
 
     /// Hand `event` to the document and bring it up to date.
     fn send(&mut self, event: UiEvent) {
         self.doc.doc.handle_ui_event(event);
-        self.frame();
+        self.settle();
     }
 
-    fn frame(&mut self) {
+    fn settle(&mut self) {
         self.doc.frame(self.clock);
     }
 
-    fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
+    /// The sub-document of the first `iframe` matching `selector`, once it has one: what a
+    /// frame shows, read without the app's document seeing into it.
+    pub fn frame(&self, selector: &str) -> Option<FrameView<'_>> {
+        FrameView::find(self, selector)
+    }
+
+    pub(crate) fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
         read(&self.doc.doc.inner())
     }
 }
 
 /// The first element matching `selector`; an unparseable selector matches nothing.
-fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
+pub(crate) fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
     doc.query_selector(selector).ok().flatten()
 }
