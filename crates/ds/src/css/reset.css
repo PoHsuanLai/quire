@@ -15,4 +15,4 @@ html,body{margin:0;padding:0;background:transparent}
 /* The focus ring (`S:55`) on keyboard focus only. Blitz never matches the visible-focus pseudo
    class, so ds-native stamps the input modality on the root and the ring keys on it (spike
    S12). */
-.ds[*|data-modality=keyboard] :focus{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
+.ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}

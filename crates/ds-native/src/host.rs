@@ -10,6 +10,10 @@
 //!   the same way (`crate::focus`).
 //! - Before each frame, the viewport's colour scheme (and the window's decorations) follow the
 //!   scheme the root `.ds` resolved.
+//! - The window's scale factor, as `ds::HostScale`, so `Ds` writes the pixel tokens for it and a
+//!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
+//!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
+//!   fractional scale a line may still start half-way through a device pixel here.
 //!
 //! The document is reached through a hidden element's `onmounted` handle: dioxus-native builds
 //! the document itself and hands the app nothing else that can see it.
@@ -24,7 +28,7 @@ use dioxus_native::winit::keyboard::{Key as WinitKey, NamedKey};
 use dioxus_native::winit::window::Theme;
 use dioxus_native::{use_window, use_window_event};
 use dioxus_native_dom::NodeHandle;
-use ds::{HostModality, InputModality};
+use ds::{HostModality, HostScale, InputModality, Scale};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -55,8 +59,17 @@ pub(crate) fn Host(props: HostProps) -> Element {
     use_context_provider(|| crate::focus::FOCUS);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let window = use_window();
+    let factor = window.scale_factor();
+    let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));
     let seen = Rc::clone(&document);
     use_window_event(move |event, _| {
+        if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
+            let HostScale(mut current) = scale;
+            let next = scale_of(*scale_factor);
+            if *current.peek() != next {
+                current.set(next);
+            }
+        }
         if let Some(next) = modality_after(event) {
             let HostModality(mut current) = modality;
             if *current.peek() != next {
@@ -83,6 +96,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
             },
         }
     }
+}
+
+/// A winit scale factor in 120ths, the unit `ds::Scale` shares with the Wayland protocol.
+fn scale_of(factor: f64) -> Scale {
+    Scale((factor * f64::from(Scale::DENOMINATOR)).round().max(1.0) as u32)
 }
 
 /// Serve `data:` and `file:` on the document, waking its shell to paint when one lands.

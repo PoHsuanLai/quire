@@ -81,12 +81,16 @@ impl Shadow {
     pub fn css(self, scheme: Scheme) -> &'static str {
         let dark = scheme == Scheme::Dark;
         match self {
-            Shadow::One if dark => "0 1px 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45)",
-            Shadow::One => "0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1)",
-            Shadow::Two if dark => {
-                "0 1px 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7)"
+            Shadow::One if dark => {
+                "0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45)"
             }
-            Shadow::Two => "0 1px 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3)",
+            Shadow::One => "0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1)",
+            Shadow::Two if dark => {
+                "0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7)"
+            }
+            Shadow::Two => {
+                "0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3)"
+            }
             // Hover card and floating menu (`S:400`, `S:666`); section 17.2 names it.
             Shadow::Pop => "0 18px 40px -16px rgba(0,0,0,.45)",
             // Peek (`S:224`) in light; the command menu's (`S:233`) deeper drop in dark.
@@ -95,16 +99,18 @@ impl Shadow {
             Shadow::Drag if dark => "0 22px 34px -14px rgba(0,0,0,.8)",
             Shadow::Drag => "0 18px 30px -12px rgba(26,30,26,.4)",
             Shadow::Bubble => "0 12px 28px -12px rgba(0,0,0,.45)",
-            Shadow::Current => "0 1px 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25)",
-            Shadow::PillInset => "0 1px 0 rgba(255,255,255,.35) inset",
+            Shadow::Current => {
+                "0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25)"
+            }
+            Shadow::PillInset => "0 var(--hair) 0 rgba(255,255,255,.35) inset",
             // An app window (the macOS polish pass, design/03-COLOR.md section 10, settled
             // 2026-09-24): a tight contact shadow under a wide, soft ambient one, where S's
             // `.win` had one mid drop (`S:82`, `0 18px 40px -22px rgba(0,0,0,.45)`).
             Shadow::Window if dark => "0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66)",
             Shadow::Window => "0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4)",
-            Shadow::Card => "0 0 0 1px rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45)",
-            Shadow::Handle => "0 0 0 1px rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35)",
-            Shadow::Mark => "0 0 0 1px rgba(0,0,0,.08)",
+            Shadow::Card => "0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45)",
+            Shadow::Handle => "0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35)",
+            Shadow::Mark => "0 0 0 var(--hair) rgba(0,0,0,.08)",
             Shadow::MarkTile => "0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2)",
         }
     }

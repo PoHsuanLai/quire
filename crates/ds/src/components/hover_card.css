@@ -20,7 +20,7 @@
 .ds-hovercard-msg{ display:grid; grid-template-columns:22px 1fr; gap:var(--s-8); align-items:start; }
 .ds-hovercard-msg b{ font-size:var(--fs-small); }
 .ds-hovercard-msg p{ font-size:var(--fs-small); color:var(--ink-soft); line-height:1.4; max-height:2.8em; overflow:hidden; }
-.ds-hovercard-foot{ margin-top:var(--s-10); padding-top:var(--s-8); border-top:1px solid var(--line-soft); display:flex; align-items:center; gap:var(--s-6);
+.ds-hovercard-foot{ margin-top:var(--s-10); padding-top:var(--s-8); border-top:var(--hair) solid var(--line-soft); display:flex; align-items:center; gap:var(--s-6);
   font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); }
 .ds-hovercard-keys{ margin-left:auto; }
 .ds-hovercard-person{ display:flex; gap:var(--s-10); align-items:center; }
