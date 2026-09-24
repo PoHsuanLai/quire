@@ -61,6 +61,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
+    use_context_provider(|| crate::focus::SELECT);
     let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let window = use_window();

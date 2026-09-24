@@ -8,6 +8,7 @@
 //! [`HostFocus`] answers [`Focused::Busy`] instead, and with no host the call is guarded
 //! (`crate::guarded`) so the collision is `Busy` too; the change is tried again a frame later.
 
+use crate::focus::select::{HostSelect, Select};
 use crate::geometry::measure::BUSY_ATTEMPTS;
 use crate::guarded::guarded_call;
 use crate::time::{FRAME_SLACK, sleep};
@@ -36,38 +37,70 @@ pub struct HostFocus(pub fn(&MountedData) -> Focused);
 /// document is busy. Best-effort: a renderer without focus still shows the element, and the
 /// person can click into it. Call it from a handler or a hook, never from inside a task that
 /// the renderer may be polling with its document held (it spawns, it does not focus).
-pub(crate) fn focus_soon(element: Rc<MountedData>) {
+///
+/// Public so an app focuses its own element (mailo's `.app` shell after a panel closes) with the
+/// same wait for a busy document quire's fields use.
+pub fn focus_soon(element: Rc<MountedData>) {
+    focus_soon_selecting(element, Select::None);
+}
+
+/// As [`focus_soon`], then do `select` with the element's text once the caret is in it:
+/// [`Select::All`] selects a field's whole value through the host's [`HostSelect`].
+pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
     spawn(async move {
-        let _ = focus_element(&element).await;
+        let _ = focus_selecting(&element, select).await;
     });
 }
 
-/// As [`focus_soon`], then `told` once a host's write has moved the focus.
+/// As [`focus_soon_selecting`], then `told` once a host's write has moved the focus.
 ///
 /// A host's write (`HostFocus`, Blitz's `set_focus_to`) dispatches no `focus` event, so a field
 /// whose caller listens for focus would never hear that the seam put the caret in it. Without a
 /// host the renderer's own `set_focus` fires the element's real `focus` event, which the field
 /// already forwards, so `told` is not called and the caller hears it once.
-pub(crate) fn focus_soon_told(element: Rc<MountedData>, told: EventHandler<()>) {
+pub(crate) fn focus_soon_told(element: Rc<MountedData>, select: Select, told: EventHandler<()>) {
     let hosted = try_consume_context::<HostFocus>().is_some();
     spawn(async move {
-        if focus_element(&element).await == Focused::Done && hosted {
+        if focus_selecting(&element, select).await == Focused::Done && hosted {
             told.call(());
         }
     });
 }
 
+/// Move the focus to `element`, then do `select` with its text; the focus's outcome.
+async fn focus_selecting(element: &MountedData, select: Select) -> Focused {
+    let focused = focus_element(element).await;
+    if focused == Focused::Done
+        && select == Select::All
+        && let Some(HostSelect(select_all)) = try_consume_context::<HostSelect>()
+    {
+        let _ = retry_busy(|| select_all(element)).await;
+    }
+    focused
+}
+
 /// Move the focus to `element`, waiting out a busy document for up to `BUSY_ATTEMPTS` frames.
 pub(crate) async fn focus_element(element: &MountedData) -> Focused {
-    let host = try_consume_context::<HostFocus>();
+    match try_consume_context::<HostFocus>() {
+        Some(HostFocus(focus)) => retry_busy(|| focus(element)).await,
+        None => {
+            for _ in 0..BUSY_ATTEMPTS {
+                match unhosted(element).await {
+                    Focused::Busy => sleep(FRAME_SLACK).await,
+                    tried => return tried,
+                }
+            }
+            Focused::Busy
+        }
+    }
+}
+
+/// Try a host write until the document is free, for up to `BUSY_ATTEMPTS` frames.
+async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
     for _ in 0..BUSY_ATTEMPTS {
-        let tried = match host {
-            Some(HostFocus(focus)) => focus(element),
-            None => unhosted(element).await,
-        };
-        match tried {
+        match write() {
             Focused::Busy => sleep(FRAME_SLACK).await,
-            Focused::Done | Focused::Unknown => return tried,
+            tried => return tried,
         }
     }
     Focused::Busy
