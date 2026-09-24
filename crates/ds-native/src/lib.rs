@@ -20,6 +20,8 @@ mod net;
 mod runtime;
 mod scheme;
 pub mod snap;
+#[cfg(test)]
+mod snap_tests;
 pub mod snapshot;
 mod wake;
 
