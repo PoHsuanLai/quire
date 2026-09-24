@@ -13,6 +13,7 @@ pub mod count;
 pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
+pub mod flow;
 pub mod hover_card;
 pub mod hover_strip;
 pub mod icon_button;
@@ -21,6 +22,7 @@ pub mod kbd;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
+pub(crate) mod menu_active;
 pub mod menu_bar_item;
 pub mod menu_cursor;
 pub mod menu_entry;
@@ -30,7 +32,9 @@ pub(crate) mod menu_kind;
 pub(crate) mod menu_lines;
 pub(crate) mod menu_match;
 pub(crate) mod menu_panel;
+pub mod menu_pick;
 pub(crate) mod menu_rows;
+pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
 pub(crate) mod muted;
 pub(crate) mod palette_host;
@@ -86,9 +90,10 @@ pub use count::{Count, CountPlace};
 pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
+pub use flow::Flow;
 pub use hover_card::{
-    FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
-    TargetElement,
+    FlagTone, HoverAnchor, HoverCard, HoverCardPart, HoverDriver, HoverMessage, HoverStat,
+    HoverTarget, KeyHint, TargetElement, use_hover_intent,
 };
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
@@ -101,6 +106,7 @@ pub use menu_bar_item::MenuBarItem;
 pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_lines::Filter;
+pub use menu_pick::PickDismiss;
 pub use palette_shown::Retain;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
@@ -116,7 +122,7 @@ pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubb
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use sheet::Sheet;
-pub use sidebar_item::{ItemKind, Preview, SidebarItem, TodayTrailing};
+pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
 pub use space_editor::{
     ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,

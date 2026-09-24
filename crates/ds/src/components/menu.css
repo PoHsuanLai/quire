@@ -13,6 +13,9 @@
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
+/* Drawn inline in its caller's card (mailo gaps 4, `flow: Flow::Inline`): the same rows, with no
+   surface (no `.ds-popover`), no entrance and no padding of its own; the card's box sizes it. */
+.ds-menu[*|data-flow=inline]{ width:auto; max-height:none; overflow:visible; padding:0; animation:none; }
 
 .ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* A separator is a hairline with the shell scale's margin above and below (5, design/13

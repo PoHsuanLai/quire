@@ -3,6 +3,7 @@
 
 use crate::components::avatar::{AvatarFace, face};
 use crate::components::count::{Count, CountPlace};
+use crate::components::row_hooks::relay;
 use crate::components::vocab::{DropState, Here, PulseKey};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -40,6 +41,12 @@ pub struct TodayTrailing {
     /// The person cancelled it. The row itself does not also open.
     pub on_cancel: EventHandler<()>,
 }
+
+/// Which place an item is, by the consumer's own name (`inbox`, `label:7`), written as
+/// `data-place` so a drag in progress can tell which place is under the pointer (mailo gaps 4:
+/// design/06-INTERACTIONS.md section 6.1 reads the drop target off the element).
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct PlaceId(pub String);
 
 /// A preview the item is showing.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -97,6 +104,13 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// `Source` while the item itself is dragged. A Today item's close button is named "Close
 /// {label}", so each row's close says whose it is; `trailing` puts a scheduled row's time and
 /// its cancel button after the label (Today only; other kinds ignore it).
+///
+/// A drag over the sidebar (mailo gaps 4, design/06 section 6.1) needs each place to say which
+/// it is and to hear the pointer: `place` is written as `data-place`, and `onpointerenter`,
+/// `onpointerleave`, `onpointermove` and `onpointerup` hand the item's pointer events to the
+/// caller, who sets `drop: DropState::Target` on the place under a dragged thread (lit with
+/// `--accent-soft` and grown to 1.045) and applies the drop on the release. The listeners are
+/// always attached and call nothing without a handler, so a server render's markup is unchanged.
 #[component]
 pub fn SidebarItem(
     kind: ItemKind,
@@ -110,8 +124,14 @@ pub fn SidebarItem(
     onclose: Option<EventHandler<()>>,
     #[props(default)] drop: DropState,
     #[props(default)] trailing: Option<TodayTrailing>,
+    #[props(default)] place: Option<PlaceId>,
+    #[props(default)] onpointerenter: Option<EventHandler<PointerEvent>>,
+    #[props(default)] onpointerleave: Option<EventHandler<PointerEvent>>,
+    #[props(default)] onpointermove: Option<EventHandler<PointerEvent>>,
+    #[props(default)] onpointerup: Option<EventHandler<PointerEvent>>,
 ) -> Element {
     let (class, alias) = pulse_attrs(pulse);
+    let place = place.map(|PlaceId(name)| name);
     let slug = kind.slug();
     let current = aria_current(here);
     let preview = preview.map(Preview::slug);
@@ -127,6 +147,11 @@ pub fn SidebarItem(
                 "data-pulse": alias,
                 "data-drop": drop.drop_attr(),
                 "data-drag": drop.drag_attr(),
+                "data-place": place,
+                onpointerenter: relay(onpointerenter),
+                onpointerleave: relay(onpointerleave),
+                onpointermove: relay(onpointermove),
+                onpointerup: relay(onpointerup),
                 onclick: move |_| onclick.call(()),
                 if here == Here::Current {
                     span { class: "ds-sidebar-item-seal" }
@@ -146,6 +171,11 @@ pub fn SidebarItem(
                 "data-pulse": alias,
                 "data-drop": drop.drop_attr(),
                 "data-drag": drop.drag_attr(),
+                "data-place": place,
+                onpointerenter: relay(onpointerenter),
+                onpointerleave: relay(onpointerleave),
+                onpointermove: relay(onpointermove),
+                onpointerup: relay(onpointerup),
                 onclick: move |_| onclick.call(()),
                 {face(avatar)}
                 span { class: "ds-sidebar-item-text ds-truncate", "data-emphasis": "plain", "{label}" }
@@ -164,6 +194,11 @@ pub fn SidebarItem(
                 "data-pulse": alias,
                 "data-drop": drop.drop_attr(),
                 "data-drag": drop.drag_attr(),
+                "data-place": place,
+                onpointerenter: relay(onpointerenter),
+                onpointerleave: relay(onpointerleave),
+                onpointermove: relay(onpointermove),
+                onpointerup: relay(onpointerup),
                 onclick: move |_| onclick.call(()),
                 onkeydown: move |event| {
                     if matches!(event.key(), Key::Enter) || event.key() == Key::Character(" ".into()) {
