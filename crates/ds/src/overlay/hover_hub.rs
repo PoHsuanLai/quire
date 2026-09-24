@@ -36,6 +36,9 @@ pub enum HoverKind {
     Account,
     /// A sidebar entry (pin, Today): the narrow side card, placed right of the target.
     Side,
+    /// A value's small tip (a row's time, design/06-INTERACTIONS.md section 3 `time`): one line,
+    /// tooltip-sized, placed below like a sender card, on the same intent timing as every card.
+    Tip,
 }
 
 /// Whether cards and fly labels open at once.

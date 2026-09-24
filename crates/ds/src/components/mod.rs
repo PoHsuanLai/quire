@@ -79,6 +79,7 @@ pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use hover_card::{
     FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
+    TargetElement,
 };
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
