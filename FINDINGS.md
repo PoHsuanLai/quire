@@ -1530,3 +1530,20 @@ controls' and lists' class scans cover them) and one Harness test file per behav
    Proof: `account_tiles.rs::the_add_tile_has_no_plate_at_rest` (the add tile's top edge is the
    window ground, the account tile's is its plate; with the one-class selector it fails) and
    `the_add_tile_presses_and_is_never_pressed`.
+3. **SendPill.** `mood: SendMood::{Calm, Nudge, Shake, Fatal}` (named `SendMood`, not `Mood`,
+   in the flat `ds::` namespace), `action: PillAction::{Undo, Cancel, Nothing}` (`Nothing`
+   because mailo's failed and in-flight faces offer no button), `ring: SendRing::{Drain, Spin}`
+   and `refusal: Option<String>`; each defaults to the old markup. A failed mood fires the pulse
+   machinery's A/B alias (`a-nudge`, `a-shake`; `Fatal` shakes as `Shake` does and turns
+   `--danger`) only when the mood *changes*, never on mount (the pill is still springing up, and
+   a keyframe on `transform` would fight that transition), and is put back at rest at
+   `settle(anim)` (554 / 594 ms Standard). The last mood lives in a plain value, as `Count`'s
+   last value does; only the settle timer writes a signal (the finished firing's round, only
+   ever forward, so a slower shake from an older firing cannot reopen a newer nudge). mailo's
+   own CSS looped each twice at its own durations; quire plays each once at design/05's, per
+   principle 7. The spin ring turns the whole `svg` at `--t-spin` (CSS cannot reach inside it on
+   Blitz, S6), with a 20/37 dash written as attributes. Proof: `send_pill_moods.rs`
+   (`a_nudge_plays_once_settles_and_the_pill_stays`: playing 100 ms before `settle(Nudge)`, at
+   rest 50 ms after, still `data-shown=shown`; `a_mood_that_returns_plays_again` on alias `b`;
+   `a_spinning_ring_turns_and_a_draining_one_holds`: the ring's pixels 250 ms apart differ
+   for Spin and are identical for Drain).

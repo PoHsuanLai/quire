@@ -130,7 +130,7 @@ concern (section 6 has the full "what mailo keeps" list).
 | `.prov`, `.prov.img`, `.prov.on-tile`, `.prov.in-row` (`provider/icon/chip.rs::ProvChip`) | `ProviderMark` (§28) | `ProvChip`'s two `ChipPlace` variants (`Tile`, `Row`) are `ProviderMark`'s own placement, not a mailo concern once moved |
 | `.plink` (`ui/compose/props.rs:49`) | `LinkPill` (§29) | the "To" recipient's linked-person pill |
 | `.pchip` (`ui/compose/props.rs:71`, attachment chip) | `Chip` (§10) | a plain neutral chip, not `LinkPill` — it names a file, not a person |
-| `.sp`, `.sp-text`, `.track`, the send ring (`ui/compose/pill.rs`) | `SendPill` / `SendPhase` (§31) | |
+| `.sp`, `.sp-text`, `.track`, the send ring (`ui/compose/pill.rs`) | `SendPill` / `SendPhase` (§31) | mailo gaps 2: `Mood::{Calm, Nudge, Shake, Fatal}` is `SendMood` (same variants), `Offer::{Undo, Cancel, Nothing}` is `PillAction`, `Ring::Spin` is `SendRing::Spin` (`Countdown`/`Full`/`Still` are `SendRing::Drain` at the progress you pass: running, 0, where it stopped), `.sp-why` is `refusal`. mailo's `nudge 900ms x2` and `shake-pill 420ms x2` become quire's single `nudge` 520 ms and `shake` 560 ms (errors shake once) |
 | `.p-menu` (`ui/compose/props.rs:142,221,349`) | `Menu` with `MenuKind::Dropdown` | the From/Sends/pin dropdowns |
 | `.c-pin` (`ui/compose/props.rs:300`) | `EdgeStrip` (§33) or stays — read the surrounding markup before choosing; not resolved by this brief |
 | the Space dots editor (`ui/space_editor/{hue,mod}.rs`) | `SpaceEditor` / `SpaceDot` (§32) | this is the one component whose whole job is a settled design, not a stylesheet: read `space_editor/mod.rs` fully before starting |

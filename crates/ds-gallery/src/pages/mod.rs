@@ -12,6 +12,7 @@ pub mod materials;
 pub mod matrix;
 pub mod motion;
 pub mod motion_lab;
+pub mod outbox;
 pub mod overlays;
 pub mod pills;
 pub mod polish;
