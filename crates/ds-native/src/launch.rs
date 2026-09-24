@@ -8,6 +8,7 @@
 use crate::contexts::RootContexts;
 use crate::fonts::font_context;
 use crate::host::{Host, HostProps};
+use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
 use dioxus::prelude::*;
 use dioxus_native::{LogicalSize, WindowAttributes};
@@ -41,6 +42,13 @@ impl AppConfig {
     /// window's equivalent of dioxus desktop's `LaunchBuilder::with_context`.
     pub fn with_context<T: Clone + Send + Sync + 'static>(mut self, value: T) -> Self {
         self.setup.contexts = self.setup.contexts.with(value);
+        self
+    }
+
+    /// Who answers the document's requests beyond `data:`, and its frames' (default
+    /// [`NetPolicy::Local`]).
+    pub fn with_net(mut self, policy: NetPolicy) -> Self {
+        self.setup.net = policy;
         self
     }
 
