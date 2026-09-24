@@ -163,7 +163,7 @@ impl Tracker {
             // renderer holds the document until it is (FINDINGS "W2 integration").
             spawn(async move {
                 sleep(FRAME_SLACK).await;
-                let _ = panel.0.set_focus(true).await;
+                let _ = crate::focus::host::focus_element(&panel.0).await;
             });
         }
     }

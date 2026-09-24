@@ -243,9 +243,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
                     tracker.panel_mounted(MountedRef(element.clone()));
                     probe.on_mounted(event);
                     if via == Via::Keyboard {
-                        spawn(async move {
-                            let _ = element.set_focus(true).await;
-                        });
+                        crate::focus::host::focus_soon(element);
                     }
                 },
                 onmousemove: move |event| hover.hovered(&event),

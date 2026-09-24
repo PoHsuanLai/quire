@@ -1,11 +1,14 @@
 //! The roster as a hook: [`RosterState`] in a signal, with the settle timers started for it.
+//! The timers belong to the hook's owner and drop with it; a timer that finds the roster gone
+//! stops (`crate::task`, sill FINDINGS Q45).
 
 use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch};
 use super::settle::settle;
 use crate::components::vocab::{Emphasis, StaggerIndex};
 use crate::root::env::{Env, use_env_signal};
-use crate::time::{sleep, spawn_in};
+use crate::task::{Gone, spawn_in, try_get, try_set};
+use crate::time::sleep;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use std::time::Instant;
@@ -36,54 +39,59 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
     /// Start `key`'s exit; it is dropped, and the rows below heal, when the exit settles. An
     /// unread (`Emphasis::Strong`) row exits at `--t-big-heavy`.
     pub fn leave(&self, key: K, exit: Exit, emphasis: Emphasis) {
-        let (next, anim) = self.state.peek().clone().leave(&key, exit, emphasis);
-        let mut state = self.state;
-        state.set(next);
-        let length = settle(anim, self.level(), StaggerIndex::default());
+        let _ = self.try_leave(key, exit, emphasis);
+    }
+
+    fn try_leave(&self, key: K, exit: Exit, emphasis: Emphasis) -> Result<(), Gone> {
+        let (next, anim) = try_get(self.state)?.leave(&key, exit, emphasis);
+        try_set(self.state, next)?;
+        let length = settle(anim, self.level()?, StaggerIndex::default());
         let roster = *self;
         spawn_in(self.scope, async move {
             sleep(length).await;
-            roster.update(|state| state.settled(&key));
-            roster.schedule_rest();
+            if roster.update(|state| state.settled(&key)).is_ok() {
+                roster.schedule_rest();
+            }
         });
+        Ok(())
     }
 
-    fn update(&self, step: impl FnOnce(RosterState<K>) -> RosterState<K>) {
-        let next = step(self.state.peek().clone());
-        let mut state = self.state;
-        state.set(next);
+    fn update(&self, step: impl FnOnce(RosterState<K>) -> RosterState<K>) -> Result<(), Gone> {
+        let next = step(try_get(self.state)?);
+        try_set(self.state, next)
     }
 
-    fn level(&self) -> crate::appearance::MotionLevel {
-        self.env.peek().resolved.motion
+    fn level(&self) -> Result<crate::appearance::MotionLevel, Gone> {
+        Ok(try_get(self.env)?.resolved.motion)
     }
 
     /// Mark the entering and healing rows present once the longest of their animations has
     /// settled. A later call that ends later supersedes an earlier one.
     fn schedule_rest(&self) {
-        let level = self.level();
-        let Some(length) = self
-            .state
-            .peek()
+        let _ = self.try_schedule_rest();
+    }
+
+    fn try_schedule_rest(&self) -> Result<(), Gone> {
+        let level = self.level()?;
+        let Some(length) = try_get(self.state)?
             .running()
             .into_iter()
             .map(|(anim, index)| settle(anim, level, index))
             .max()
         else {
-            return;
+            return Ok(());
         };
         let due = Instant::now() + length;
-        let due = self.rest_at.peek().map_or(due, |pending| pending.max(due));
-        let mut rest_at = self.rest_at;
-        rest_at.set(Some(due));
-        let roster = *self;
+        let due = try_get(self.rest_at)?.map_or(due, |pending| pending.max(due));
+        try_set(self.rest_at, Some(due))?;
+        let (roster, rest_at) = (*self, self.rest_at);
         spawn_in(self.scope, async move {
             sleep(due.saturating_duration_since(Instant::now())).await;
-            if *rest_at.peek() == Some(due) {
-                rest_at.set(None);
-                roster.update(RosterState::rest);
+            if try_get(rest_at) == Ok(Some(due)) && try_set(rest_at, None).is_ok() {
+                let _ = roster.update(RosterState::rest);
             }
         });
+        Ok(())
     }
 }
 
@@ -108,7 +116,7 @@ pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, pitch: RowPitch)
         CopyValue::new(keys.clone())
     });
     if *seen.peek() != keys {
-        roster.update(|state| state.reconcile(&keys));
+        let _ = roster.update(|state| state.reconcile(&keys));
         roster.schedule_rest();
         seen.set(keys);
     }

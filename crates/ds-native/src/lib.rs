@@ -8,6 +8,7 @@
 
 mod data_url;
 pub mod error;
+pub mod focus;
 pub mod fonts;
 pub mod harness;
 mod headless;
