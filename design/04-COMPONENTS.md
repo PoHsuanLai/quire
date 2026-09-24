@@ -205,6 +205,17 @@ written as the element's `id`; `onclick` reports which button pressed. A right-c
 `mouseup` as `Middle`, a click or a keyboard activation as `Primary`. A closure `move |_| …` and
 an `EventHandler<()>` still convert.
 
+Settled (mailo gaps 4, 2026-09-25): a sixth variant, `Frame` (`data-variant="frame"`), for
+words on the Space frame: the sidebar item's chrome (padding 6px 8px, `--r-item`, ui 13.5 / 600,
+`--f-ink-soft` on nothing; `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` held, and
+`--f-pill` with `--shadow-current` when `aria-pressed="true"`). `trailing: Option<Trailing>`
+(`Caret`: `chevron-down` 12 in `span.ds-button-trail` at .7; `Glyph(Icon)` at the variant's icon
+size) follows the label, for a dropdown showing its value. `face: ButtonFace` (`Label` default;
+`Bold`, `Italic`, `Underline`, `Strike`) draws the label as `span.ds-button-face[data-face]`
+holding `B`, `i` (in `--font-serif` italic, S's Georgia), `U` (underlined) or `S` (struck
+through), and names the button by `label` through `aria-label` unless `aria_label` is given;
+`FaceMark { face, label }` is the same span on its own, for a `BubbleButton`'s `label`.
+
 **Geometry.**
 
 | Variant | Padding | Radius | Gap | Font | Colours | Icon |
@@ -717,6 +728,30 @@ renderer holds (`ds::HostFocus`, Q43). Recipient inputs: Enter or `,` adds, Back
 **Blitz notes.** `::placeholder` must be verified in the spike; if unsupported, render the
 placeholder as an absolutely positioned span shown while the value is empty. `outline:none`
 is required so the global focus ring does not double the accent ring.
+
+**Settled (mailo gaps 4, 2026-09-25).**
+
+- `Bare` face (`InputVariant::Bare`, also named `FieldFace`): no border, padding, ground or radius;
+  font, size, weight, tracking, line height and colour inherited, so a title or a property row's
+  value is edited where it reads. The caret is `--accent`, the selection `--accent-soft`; the
+  placeholder is the parent's colour at .45.
+- `TextInputKind::Secret`: drawn as `Password`, but the component keeps the typed text in its own
+  state, emits it only through `oninput` and `onchange`, and never writes a `value` attribute (the
+  prop is ignored). `Password` still writes its `value`, unchanged since wave 2. mailo's secret
+  field is `Secret`.
+- `TextInputKind::File`: the chosen name in a read-only `span.ds-input[data-kind=file]` (a
+  `role=textbox`, `aria-readonly`) and a Tool `IconButton` (folder, titled "Choose…", named
+  "{label}: Choose…") after it, gap 6. Blitz has no file picker (blitz-dom's `file-input` feature
+  is off in quire's pin, and even on it only draws a Browse button), so a click on either calls
+  `on_pick` and the host opens its own chooser and hands the name back as `value`.
+- `TextInputKind::Multiline { rows: Rows(n), grow: Grow::{Fixed, ToContent} }`: a `textarea`
+  with `rows`, `height:auto`, no resize handle. blitz-dom makes a `textarea` a multiline text
+  editor, reads its text from the `value` attribute (not its children), sizes it at `rows` line
+  heights (2 when absent; `cols` at 0.6 em each, else 300 px) and inserts a newline on Enter.
+  `ToContent` raises `rows` to the value's hard line count; a soft wrap does not grow it.
+- `onchange: EventHandler<String>`: the value committed, on Enter in a one-line field or when the
+  caret leaves any field. Blitz dispatches no `change` event, so the field makes it on both
+  renderers.
 
 ### 7. SearchField
 
@@ -2501,12 +2536,17 @@ account setup (`S:1139-1141`). Three sizes. Mail: account tiles, row `via`, From
 ```rust
 #[component] pub fn ProviderMark(provider: Provider, size: MarkSize /* Tile | Row | Inline */,
     style: MarkStyle /* Letter | Image(ImageSource) */) -> Element
-pub enum Provider { Google, Microsoft, Fastmail, ICloud, Yahoo, Imap }
+pub enum Provider { Google, Microsoft, Fastmail, ICloud, Yahoo, Imap, Local }
 ```
 
 Letter and colour per provider (`S:1130-1136`): Google `G` #1A73E8; Microsoft 365 `M` #0F6CBD;
 Fastmail `F` #2A5DB0; iCloud `i` #3A82F7; Yahoo `Y` #6001D2; IMAP `@` #5D6660. Row `via` text:
 gmail, m365, fastmail, icloud, yahoo, imap.
+
+`Local` (mailo gaps 4, settled 2026-09-25): a local-folders account has no provider, so its mark
+is not a letter but the `folder` glyph (10 on a tile, 8 in a row, 9 inline) stroked in IMAP's
+neutral #5D6660 on the same chip, `data-kind="local"`, titled "Local folders". It has no favicon:
+`MarkStyle::Image` draws the same glyph.
 
 **Geometry.**
 

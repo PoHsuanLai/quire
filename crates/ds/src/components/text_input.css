@@ -42,10 +42,46 @@
    field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
    per character over it, where the placeholder would sit. The caret follows the hidden text, so
    it can sit a little off the last dot; the secret itself never paints. */
-.ds-input[*|data-kind=password]{ color:transparent; caret-color:var(--ink); }
+.ds-input[*|data-kind=password],
+.ds-input[*|data-kind=secret]{ color:transparent; caret-color:var(--ink); }
 .ds-input-mask{
   position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink); letter-spacing:.1em;
 }
 .ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
+
+/* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
+   markup, which never carries a `value`. */
+
+/* Bare (mailo gaps 4): the field takes the face of the text it edits. No box, border, padding or
+   ground; font, size, weight, tracking, line height and colour are inherited, so a title or a
+   property row's value is edited in place. Only the caret and the selection are the field's.
+   Blitz sizes a one-line input by its line height, so the height is left to it. */
+.ds-input-wrap[*|data-variant=bare]{ flex:1 1 auto; min-width:0; }
+.ds-input[*|data-variant=bare]{
+  height:auto; border:0; padding:0; margin:0; background:transparent; box-shadow:none; border-radius:0;
+  font:inherit; font-size:inherit; line-height:inherit; letter-spacing:inherit; color:inherit; caret-color:var(--accent);
+}
+.ds-input[*|data-variant=bare]::selection{ background:var(--accent-soft); }
+.ds-input-wrap[*|data-variant=bare] .ds-input-placeholder,
+.ds-input-wrap[*|data-variant=bare] .ds-input-mask{ padding:0; font-size:inherit; line-height:inherit; letter-spacing:inherit; }
+.ds-input-wrap[*|data-variant=bare] .ds-input-placeholder{ color:inherit; opacity:.45; }
+.ds-input[*|data-variant=bare][*|data-kind=password],
+.ds-input[*|data-variant=bare][*|data-kind=secret]{ color:transparent; }
+.ds-input-wrap[*|data-variant=bare] .ds-input-mask{ color:inherit; }
+
+/* Multiline (mailo gaps 4): a `textarea`. Blitz gives it `rows` line heights of content (two when
+   `rows` is absent) plus its padding, so the one-line height above is undone and the field's
+   `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
+   component's. */
+.ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; display:block; }
+.ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
+
+/* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The
+   name is a span drawn as the field (no input: nothing is typed here), cut at its end. The wrap
+   takes its container's width: a span has no 300 px intrinsic width as an input has, so without
+   it the name collapsed to its padding on Blitz. */
+.ds-input-wrap[*|data-kind=file]{ align-items:center; gap:var(--s-6); width:100%; }
+.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:pointer; flex:1 1 0; width:auto; }
+.ds-input-wrap[*|data-kind=file] .ds-input-placeholder{ right:auto; }

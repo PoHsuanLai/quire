@@ -19,7 +19,7 @@ pub use dot::SpaceDot;
 use handles::Field;
 use parts::{Checks, GrainRow, Presets, Stops};
 use rows::{EachScheme, MotionRow, Title};
-pub use rows::{MeasuredIn, MotionChoice};
+pub use rows::{MeasuredIn, MotionChoice, MotionLevels};
 
 /// Which of a Space's dots is being edited: 0, 1 or 2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
@@ -77,6 +77,8 @@ fn dot_index(index: usize) -> DotIndex {
 /// (the Space's own motion, which the consumer feeds to its root's `appearance.motion`);
 /// `measured: MeasuredIn::EachScheme` measures the contrast in each scheme the Space's theme
 /// can show, each under its own heading, where the default measures the scheme it is drawn in.
+/// `motion_levels` picks what the Motion row offers: every choice (the default), or
+/// `MotionLevels::Contact`'s Calm, Standard and Extra, a Space's own three.
 #[component]
 pub fn SpaceEditor(
     look: SpaceLook,
@@ -88,6 +90,7 @@ pub fn SpaceEditor(
     #[props(default)] on_rename: Option<EventHandler<String>>,
     #[props(default)] motion: Option<MotionChoice>,
     #[props(default)] measured: MeasuredIn,
+    #[props(default)] motion_levels: MotionLevels,
 ) -> Element {
     let picked = use_signal(|| None::<(DotIndex, DotIndex)>);
     let picker = Picker {
@@ -119,7 +122,7 @@ pub fn SpaceEditor(
                 }
             }
             if let Some(choice) = motion {
-                MotionRow { choice }
+                MotionRow { choice, levels: motion_levels }
             }
             div {
                 SectionHeader { kind: HeaderKind::Field, text: "Accent inside the card" }
