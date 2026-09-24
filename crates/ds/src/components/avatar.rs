@@ -5,6 +5,7 @@
 //! description"; `#[component] fn Avatar` owns that name in both namespaces, so the description
 //! is [`AvatarFace`].
 
+use crate::components::muted::muted;
 use crate::tokens::{Colour, Hex};
 use dioxus::prelude::*;
 
@@ -98,6 +99,19 @@ pub enum AvatarTone {
     Stack,
 }
 
+/// Whether an avatar's colour is at full strength or muted (mailo gaps 3): an account that is
+/// not the one in view keeps its hue at .55 of its chroma, so it is still that account but
+/// states nothing about the list (S's `saturate(.55)`, as an unpressed `AccountTile` shows it).
+/// The greyscale tones (`Ink`, `Stack`) are unchanged; the letter stays `--on-hue`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum AvatarMuting {
+    /// The colour as given.
+    #[default]
+    Plain,
+    /// The colour with its chroma at .55, lightness and hue kept.
+    Muted,
+}
+
 /// An avatar, as data: what a chip, a menu tile or a sidebar item embeds.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AvatarFace {
@@ -152,14 +166,32 @@ impl AvatarTone {
     /// and the person hash are hexes computed here (O-7, still open: the ground itself is
     /// per-address or per-account, so it cannot be a fixed token). The letter on a coloured
     /// disc is `--on-hue` (`S:116`, `S:1238`; O-3, resolved).
-    fn style(self) -> String {
+    fn style(self, muting: AvatarMuting) -> String {
         let (ground, letter) = match self {
             AvatarTone::Ink => ("var(--ink)".to_string(), "var(--paper)"),
             AvatarTone::Stack => ("var(--ink-soft)".to_string(), "var(--paper)"),
-            AvatarTone::Account(colour) => (colour.css(), "var(--on-hue)"),
-            AvatarTone::Person(hue) => (hue.hex().css(), "var(--on-hue)"),
+            AvatarTone::Account(colour) => (muting.apply(colour).css(), "var(--on-hue)"),
+            AvatarTone::Person(hue) => (muting.apply(hue.colour()).css(), "var(--on-hue)"),
         };
         format!("--av-bg:{ground};--av-fg:{letter}")
+    }
+}
+
+impl AvatarMuting {
+    /// `colour` at this strength.
+    pub fn apply(self, colour: Colour) -> Colour {
+        match self {
+            AvatarMuting::Plain => colour,
+            AvatarMuting::Muted => muted(colour),
+        }
+    }
+
+    /// `data-muting`, written only when muted so a plain avatar's markup is as it was.
+    fn slug(self) -> Option<&'static str> {
+        match self {
+            AvatarMuting::Plain => None,
+            AvatarMuting::Muted => Some("muted"),
+        }
     }
 }
 
@@ -175,13 +207,15 @@ pub(crate) fn face(face: AvatarFace) -> Element {
     }
 }
 
-/// A coloured disc with one letter.
+/// A coloured disc with one letter. `muting` mutes an account's or person's colour
+/// ([`AvatarMuting`]); it defaults to the colour as given.
 #[component]
 pub fn Avatar(
     initial: char,
     size: AvatarSize,
     tone: AvatarTone,
     #[props(default)] shape: AvatarShape,
+    #[props(default)] muting: AvatarMuting,
 ) -> Element {
     let px = size.px();
     rsx! {
@@ -190,7 +224,8 @@ pub fn Avatar(
             "data-size": "{px}",
             "data-shape": shape.slug(),
             "data-tone": tone.slug(),
-            style: tone.style(),
+            "data-muting": muting.slug(),
+            style: tone.style(muting),
             "{initial}"
         }
     }

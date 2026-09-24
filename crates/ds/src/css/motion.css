@@ -2,9 +2,10 @@
    both define a name). Four departures, three required by section 9 and one added by quire:
    - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
-   - `part` and `fade-in` are left out: no `Anim` plays them, and S's `fade` replaces `fade-in`;
+   - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
-     so are `menu-out` (bar gaps) and `cmdk-rise` (mailo gaps 2), below.
+     so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -28,11 +29,22 @@
 /* 4.2.7 floatup */
 @keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
 
+/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level (mailo gaps 3): each
+   departure from rest is the catalogue's value times min(1, (--overshoot - 1) x 25), which is 1
+   at Standard (1.04) and Extra (1.14, whose spring curve already overshoots more) and 0 at Calm
+   and Reduced (1). So Calm flattens them, as it flattens pop-in's `scale(var(--overshoot))`,
+   and Standard is the catalogue's text: 34% of gulp is still scale(1.07,.84). */
+
 /* 4.2.8 gulp */
-@keyframes gulp{ 0%{ transform:scale(1,1); } 34%{ transform:scale(1.07,.84); } 62%{ transform:scale(.97,1.07); } 100%{ transform:scale(1,1); } }
+@keyframes gulp{ 0%{ transform:scale(1,1); }
+  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
+  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:scale(1,1); } }
 
 /* 4.2.9 seal-pop */
-@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); } 60%{ transform:translateY(-50%) scale(1.5); } 100%{ transform:translateY(-50%) scale(1); } }
+@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); }
+  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:translateY(-50%) scale(1); } }
 
 /* 4.2.10 compose-rise */
 @keyframes compose-rise{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
@@ -56,7 +68,9 @@
 @keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
 
 /* 4.3.5 bump */
-@keyframes bump{ 0%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-3px) scale(1.25); } 100%{ transform:none; } }
+@keyframes bump{ 0%{ transform:translateY(0) scale(1); }
+  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
+  100%{ transform:none; } }
 
 /* 4.3.6 tab-in */
 @keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
@@ -155,3 +169,22 @@
 @keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
+
+/* pill-up (quire's, mailo gaps 3): a pill centred by `translateX(-50%)` (a toast, a send pill a
+   consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
+   `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
+   also carries them back down, and keep it. */
+@keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
+
+/* ring-drain (quire's, mailo gaps 3): the undo-send ring's dash drains, linear, over
+   `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
+   dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
+@keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
+
+/* 4.4.12 fade-in (C's, mailo gaps 3): an ink veil fades to its resting `--veil` (.16), the
+   opacity the veil itself rests at, so nothing snaps when the animation ends. */
+@keyframes fade-in{ from{ opacity:0; } to{ opacity:var(--veil); } }
+
+/* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
+   legible; `breathe` is the sync halo's and fades to nothing. */
+@keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }

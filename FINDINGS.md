@@ -1880,3 +1880,144 @@ What mailo changes:
 - Hover: sidebar entries as `HoverTarget { as_: TargetElement::Li }`, the time's tip as
   `HoverKind::Tip`.
 
+
+## mailo gaps 3 (motion, tokens, lint) (2026-09-25)
+
+mailo reported seven more gaps against quire. Branch `mailo-gaps-3`, one commit per item.
+Everything is additive or a bug fix; the exceptions are named below. CONSUMING.md "The mailo
+gaps 3" has one row per change, docs/mailo-migration.md section 2 the row for each mailo site.
+
+1. **An exit could not be taken back.** `RosterState::stay(key)` turns a `Leaving` row back to
+   `Present` in place and answers `Result<Stayed, StayError>`: `Stayed::Restored`, or
+   `Stayed::Unchanged` for a row that is entering, present or healing (a healing row keeps
+   healing: it is not leaving); `StayError::UnknownKey` for a key the roster no longer holds (its
+   exit settled; the consumer lists it again and it enters), never a panic. `Roster::stay` does
+   the same through the hook and cancels the row's settle timer: the heal of the rows below only
+   ever starts at that settle, so nothing below heals, and a row folded again after a stay
+   settles on its own new timer (the hook now keeps one `ExitTimer { key, task }` per leaving row,
+   and a second `leave` of the same key replaces the first timer). Proofs:
+   `motion_machines.rs::stay_takes_an_exit_back_in_place` (nine cases, including a late settle
+   after a stay changing nothing), `ds-native/tests/roster_stay.rs` (a fold stayed 200 ms in: the
+   row is `present` with no `data-exit`, and 1 s later all three rows are present, carry no
+   `--dy`, and sit where they sat; and a row folded, stayed and folded again drops only at its
+   second fold's settle, which fails with the cancellation removed).
+2. **The rest timer was spawned from the component body.** `use_roster` reconciled and spawned
+   its rest timer in the render. Reconciling stays in the render (the rows to draw must be right
+   in the render that lists them) and is pure; the timer is now queued with `queue_effect`, which
+   dioxus runs after the render on every renderer, and the effect spawns it as a task of the
+   roster's owner (`task::spawn_in`, sill FINDINGS Q45). A `RestQueue` flag queues the effect once
+   however many reconciles happen before it runs, and a pending rest due at or after the new one
+   is kept rather than joined by a second task (an earlier one is cancelled and replaced), so
+   there is never more than one rest task. The settle timer's own reschedule runs in a task and
+   spawns directly. Proofs: `motion/roster_rest/tests.rs` (after the first render nothing is
+   spawned, after its effect one timer; two reconciles in two renders before the effect spawn one
+   timer, which fails with the flag removed); the Harness list and launcher-crash tests, and the
+   roster hook test in `motion_machines.rs`, are unchanged and green.
+3. **Four keyframes.** `Anim::PillUp` (`pill-up`, `translate(-50%,160%)` to `translate(-50%,0)`,
+   `--t-big --e-spring`), `RingDrain` (`ring-drain`, `stroke-dashoffset` 0 to 57, the SendPill's
+   dash, `--t-send-ring` linear, forwards), `FadeIn` (`fade-in`, to `--veil`, `--t-move --e-out`)
+   and `Busy` (`busy`, 1 to .45 and back, `--t-ambient --e-in-out`, infinite), in `motion.css`
+   with their `--b` aliases, their recipes (the quire-added recipes now live in
+   `motion/recipe_own.rs`), their pulse classes and settle entries in the drift table. `Anim::ALL`
+   is 52. `CmdkRise` is mailo-gaps-2a's (`PaletteEntrance::Opaque`) and is reused, not added
+   again; note its shape is `cmdk-in`'s (.93, -12 px, overshoot), not mailo's gentler 8 px / .98.
+   - **`--t-send-ring` is now a hold.** The ring is the undo window, time a person has to act,
+     so Reduced no longer shortens it to 60 ms (the Reduced block loses `--t-send-ring:60ms`;
+     `settle(RingDrain, Reduced)` is 5034 ms, like `ChipFlash`'s hold).
+   - **`fade-in` stops at `--veil`, not at `--scrim`'s alpha.** `--scrim` is a colour, black at
+     .22, painted at full opacity and faded in by `fade`; C's veil (mailo's `.scrim`) is `--ink`
+     at opacity .16. The .16 is a new token, `OpacityToken::Veil` (`--veil`), declared on `.ds`
+     and known to the lint, so the keyframe and the element that rests there agree.
+   - **PillUp is not applied to `SendPill` and `Toast`.** Neither plays a translate keyframe: each
+     slides by a `transform` transition on `data-shown`, which also carries it back down when it
+     hides (`SendPill` at `SentHold`, a toast on dismissal). A keyframe entrance would replace only
+     the rise and lose nothing only if the exit were rewritten too; their goldens and Harness
+     tests are unchanged. PillUp is for a pill a consumer draws itself (mailo's list toast).
+4. **The contact keyframes kept their shape under Calm.** `gulp`, `bump` and `seal-pop` now scale
+   each departure from rest by `min(1, (var(--overshoot) - 1) * 25)`: 1 at Standard (1.04) and at
+   Extra (1.14, capped: Extra's `--e-spring` already overshoots harder, and an uncapped bump
+   would reach 1.875), 0 at Calm and Reduced. Standard's frames are the catalogue's exactly.
+   Blitz (stylo) resolves `calc()` with `min()` and `var()` inside a keyframe's `scale()` and
+   `translateY()`. Proofs: `ds-native/tests/contact_motion.rs` measures a 100 px ink square on the
+   painted frame at each keyframe's offset: Standard gulp 107 x 84, bump 125 x 125, seal-pop
+   150 x 150; Calm 100 x 100 for all three (before the change Calm painted 106 x 84, 124 x 124 and
+   150 x 150); Extra bump 125 x 125. `motion_css.rs::every_contact_keyframe_follows_the_motion_level`
+   asserts every spring that answers a contact (pop-in, row-in, compose-rise, chip-in, cmdk-in,
+   gulp, bump, seal-pop) reads `--overshoot`.
+5. **SpaceDot wrote a literal colour inline.** `SpaceDot` wrote `background:linear-gradient(…#hex…)`
+   in its `style`, which `lint::markup` flags as `HexColour` on any element; so did the Space
+   editor's presets, title swatch, handles and stop discs (the gallery excepted all five). Each now
+   writes its colours as custom properties, `--dot-c1`, `--dot-c2`, `--dot-c3`, with `data-stops`
+   counting a gradient's stops, and `space_editor.css` paints the same 135deg gradient
+   `space::gradient` writes (flat for one stop, 0/100 % for two, 0/50/100 % for three); a handle
+   and a disc are `background:var(--dot-c1)`. `FrameVars` gains `stops: Vec<String>` so the dot has
+   its stops (a new public field: a struct literal of `FrameVars` would need it; nothing
+   downstream builds one). Proofs: the gallery's `the_space_page_is_clean_under_strict` (the
+   whole Space page under `Profile::Strict`, no exception; the gallery's exception list is now
+   empty), `ds-native/tests/space_dot_paint.rs` (a two-stop and a three-stop dot, pixel for pixel
+   against a box painted with the old inline gradient: every pixel within 2), the re-blessed
+   `lists/space_editor/*` goldens (the diff is exactly the `style` attributes and `data-stops`).
+6. **A serif face and a muted avatar.** quire shipped no serif. `--font-serif` (`Family::Serif`;
+   `Family::ALL` replaces the three-element lists) is Noto Serif 2.015, OFL 1.1
+   (`assets/fonts/OFL-notoserif.txt`), cut from the variable files Fedora ships (weights 400-700,
+   upright and italic) into the same latin and latin-ext subsets as the others, as WOFF2 for the
+   webview and TTF for Blitz: 91 KB, 315 KB, 100 KB and 336 KB of TTF (latin-ext carries most of
+   the weight; the other faces' TTFs total 480 KB). The stack falls back to Georgia and Times New
+   Roman. `scripts/subset-fonts.sh` takes file names now, names the Noto family, and drops the
+   WOFF2 flavour itself (a current pyftsubset keeps the input's flavour, which wrote WOFF2 bytes
+   into a `.ttf`). Proofs: `fonts::tests` (both subsets per face, every face an sfnt),
+   ds-native's `every_family_resolves_after_registration` (Noto Serif registers), the lint cases
+   for `var(--font-serif)`.
+   - The muted avatar is a prop, `Avatar { muting: AvatarMuting::{Plain, Muted} }`, not an
+     `--avatar-muted` token: one grey token would paint every account not in view alike and drop
+     the one fact the colour states (which account), while the muted colour keeps the hue at .55
+     of its chroma, lightness kept (S's `saturate(.55)`, computed because Blitz paints no
+     `filter`; the arithmetic moved out of `AccountTile` into `components/muted.rs`, which
+     `AccountTile` still uses for an unpressed tile, unchanged). Greyscale tones are untouched.
+     Proof: `legibility.rs::a_muted_avatar_is_as_legible_as_a_plain_one`, over the eight swatches
+     and a person hue every 5 degrees, both schemes: the `--on-hue` letter on a muted disc is at
+     least 3.0 (lowest 3.22) and within .3 of the plain one, and the faintest muted disc stands off
+     `--paper`, `--surface` and `--raise` at least as far as the faintest plain one (light 2.70 /
+     3.05 / 3.22 against 2.68 / 3.02 / 3.19; dark 2.13 / 1.95 / 1.63 against 2.08 / 1.90 / 1.59).
+     Goldens `controls/avatar/{account-28,person-18,ink-28}-muted.html`.
+7. **Docs against source.**
+   - CONSUMING section 5 said `assert_clean` panics on a stale exception; it only printed the
+     counts. It now panics, naming each exception that suppressed nothing, unless the new
+     `LintConfig.stale` is `Stale::Report` (default `Stale::Fail`), which prints and passes. This
+     is the one change that can break a consumer's build: a `LintConfig` literal naming every
+     field needs `stale` (or `..LintConfig::default()`). `stylesheet` and `markup` are unchanged:
+     they return offences and never judge exceptions.
+   - `Rule::UnknownAnimation` read only `animation-name`. It now also parses the `animation`
+     shorthand (`lint/animation.rs`): split at top-level commas, each animation's name is its
+     first identifier that is not a shorthand keyword, with times, counts and functions skipped;
+     a name in a string or behind a `var()` is not judged. Cases in `lint_rules.rs` (a made-up
+     name first, after keywords, second in a list; quire's names, an alias, raw easing words,
+     `none`, a `var()`).
+   - **What these newly flag downstream, checked read-only before the change.** sill
+     (`/home/pohsuanlai/sill` at c1b8f6d): its four `assert_clean` calls
+     (`sill-surfaces/tests/{bar,dock,launcher,wallpaper}_lint.rs`) and its tray's `markup` test
+     pass no exceptions, so none can go stale; its six stylesheets (`sill-surfaces/src/style/
+     {bar,bar_popup,dock,dock_popup,launcher,wallpaper}.css`) contain no `animation` at all, so the
+     shorthand parse flags nothing. Every sill `LintConfig` is built with `..LintConfig::default()`
+     and compiles as it is. `examples/consumer`: no exceptions, no `animation` in `style.css`,
+     `..LintConfig::default()` throughout; nothing newly flagged. quire itself: no `assert_clean`
+     caller had a stale exception, and every shorthand in quire's and the gallery's sheets names a
+     known keyframe. mailo (not asked, read for the migration doc): `ui/style/mod.rs:815` builds a
+     `LintConfig` with all three fields and will not compile until it adds `stale` or
+     `..LintConfig::default()`; every name its `animation:` shorthands use is one quire plays after
+     this branch (the five it defined itself, `pill-up`, `ring-drain`, `fade-in`, `busy` and
+     `cmdk-rise`, are now quire's names), so the shorthand parse flags nothing there either; its
+     `button.ds-space-dot` markup exception becomes stale with item 5. Its own `@keyframes` of
+     those five names should be deleted when it adopts: under the same name its sheet's frames
+     would shadow quire's, and its `cmdk-rise` is not quire's shape.
+
+What mailo changes (docs/mailo-migration.md section 2 has each row):
+
+- Delete its `@keyframes pill-up`, `ring-drain`, `fade-in`, `busy` and `cmdk-rise` and their
+  `Keyframes` exceptions; the ring's `5s` becomes `var(--t-send-ring)`, the scrim's `.16`
+  `var(--veil)`.
+- `.bubble .serif` is `font-family: var(--font-serif)`; the muted account avatar is
+  `AccountTile`'s own or `Avatar { muting: AvatarMuting::Muted }`, and the `filter` exception goes.
+- An undo during a row's exit calls `roster.stay(key)` and lists the key again.
+- The `LintConfig` at `ui/style/mod.rs:815` gains `..LintConfig::default()`; the SpaceDot markup
+  exception goes.

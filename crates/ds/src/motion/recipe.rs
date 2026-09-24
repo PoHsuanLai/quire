@@ -6,6 +6,7 @@
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
 
 use super::anim::Anim;
+use super::recipe_own as own;
 use crate::tokens::{DurationToken, EasingToken};
 
 /// `animation-fill-mode`.
@@ -122,14 +123,7 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `S:2119`: the flash is a hold, so it runs linear and leaves nothing behind.
-            Anim::ChipFlash => recipe(
-                "chip-flash",
-                DurationToken::Flash,
-                EasingToken::Linear,
-                Fill::None,
-                Iteration::Once,
-            ),
+            Anim::ChipFlash => own::CHIP_FLASH,
             // `S:327`.
             Anim::Fold => recipe(
                 "fold",
@@ -242,14 +236,7 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // design/13 section 13.3.2: "fade over `--t-quick` with `--e-exit`".
-            Anim::MenuOut => recipe(
-                "menu-out",
-                DurationToken::Quick,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
+            Anim::MenuOut => own::MENU_OUT,
             // `S:684`.
             Anim::BubblePop => recipe(
                 "menu-pop",
@@ -266,14 +253,7 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `cmdk-in`'s row with its fade taken out (mailo gaps 2).
-            Anim::CmdkRise => recipe(
-                "cmdk-rise",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
+            Anim::CmdkRise => own::CMDK_RISE,
             // `S:225`.
             Anim::PeekIn => recipe(
                 "peek-in",
@@ -434,12 +414,16 @@ impl Anim {
                 Fill::None,
                 Iteration::Infinite,
             ),
+            Anim::PillUp => own::PILL_UP,
+            Anim::RingDrain => own::RING_DRAIN,
+            Anim::FadeIn => own::FADE_IN,
+            Anim::Busy => own::BUSY,
         }
     }
 }
 
 /// One assignment row as a [`Recipe`].
-const fn recipe(
+pub(super) const fn recipe(
     keyframes: &'static str,
     duration: DurationToken,
     easing: EasingToken,

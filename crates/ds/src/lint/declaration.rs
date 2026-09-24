@@ -3,10 +3,10 @@
 
 use std::collections::HashSet;
 
+use super::animation::{Naming, unknown_animation};
 use super::blitz;
 use super::colours;
 use super::kind;
-use super::registry;
 use super::rule::{Offence, Profile, Rule};
 use super::text::render;
 use super::tokenize::Located;
@@ -86,8 +86,8 @@ pub fn offences(
             &property,
         );
     }
-    if property == "animation-name" {
-        unknown_animation(selector, decl, &mut out);
+    if let Some(naming) = Naming::of(&property) {
+        unknown_animation(naming, selector, decl, &mut out);
     }
 
     let strict = profile == Profile::Strict;
@@ -210,20 +210,6 @@ fn undeclared_var(
     }
 }
 
-fn unknown_animation(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
-    for segment in decl.value.split(|t| t.text == ",") {
-        let Some(name) = kind::next_significant(segment, 0) else {
-            continue;
-        };
-        if !kind::is_ident(&name.text) {
-            continue;
-        }
-        if !registry::is_known_anim(&name.text) {
-            push(out, Rule::UnknownAnimation, name, selector, &name.text);
-        }
-    }
-}
-
 /// Whether a `font-family` value is one of the face tokens (`var(--font-ui)`) or `inherit`:
 /// the value the rule asks for, so it is not an offence.
 fn is_face_reference(value: &[Located]) -> bool {
@@ -234,7 +220,7 @@ fn is_face_reference(value: &[Located]) -> bool {
         .collect();
     match significant[..] {
         ["inherit"] => true,
-        ["var(", name, ")"] => [Family::Display, Family::Ui, Family::Data]
+        ["var(", name, ")"] => Family::ALL
             .iter()
             .any(|family| family.var().as_str() == name),
         _ => false,

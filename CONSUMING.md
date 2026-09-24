@@ -281,7 +281,11 @@ fn our_css_is_clean() {
 ```
 
 Every exception needs a `reason`, and `assert_clean` panics listing which exceptions suppressed
-zero offences, so a stale one cannot hide silently. Prefer `Profile::Strict` even though
+zero offences, so a stale one cannot hide silently (mailo gaps 3: before it, it only printed
+them). A consumer mid-migration that must keep an exception for code another branch is about to
+land sets `stale: Stale::Report` (`ds::lint::Stale`): the stale exception is printed and the
+test passes. `Stale::Fail` is the default. A `LintConfig` written with every field named needs
+the new `stale` field, or `..LintConfig::default()`. Prefer `Profile::Strict` even though
 `Profile::Standard` is the default: quire's own `self_lint` test runs Strict, and a raw
 `border-radius`/`font-size`/`z-index` your CSS writes is exactly the kind of drift the token
 table exists to prevent.
@@ -293,6 +297,12 @@ percentage, an `em` and `var()` pass. The steps are `ds::SpacingToken`, emitted 
 `--s-22`, `--s-26`, `--s-36`, each named by its pixel value (design/01-LAYOUT.md §2). A length
 between steps takes the nearest one; quire's own sheets and the gallery's do (FINDINGS "Polish
 pass"). `examples/consumer/src/style.css` is Strict-clean.
+
+`Rule::UnknownAnimation` reads the `animation` shorthand as well as `animation-name` (mailo gaps
+3): in each comma-separated animation the name is the first identifier that is not a keyword
+(an easing, `infinite`, a direction, a fill mode, a play state, a CSS-wide keyword), with times,
+counts and functions skipped. `animation: sparkle 1s` is an offence now; a name only a `var()`
+holds, or one written as a string, is not judged.
 
 Strict also runs `Rule::RawHairline` (2026-09-25): a literal hairline (`1px`, `.5px`) as a
 `border*` or `outline*` width, or as a box's whole `width`/`height`, is an offence whose text
@@ -939,6 +949,29 @@ per row:
 | `HoverTarget` | `as_: TargetElement` | The element the target is drawn as: `Span` (default, as before), `Div` or `Li` (a list's own item, which a `span` cannot hold). Same handlers, same hub: the card opens, places and closes exactly as for a span. `display:contents` is not offered: the card is placed against the target's rect, and such an element has none. A `ListRow` is already an `li`: hook its thread card through the row's `onpointerenter`/`onpointerleave` instead. |
 | `HoverKind` | `Tip` | A value's small tip (a row's time): `HoverCard { kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }` is one line, auto width up to 260, 12 px (the Card tooltip's size), placed 6 below the target's left edge like a sender card, on the hub's timing (450 ms, 0 when warm, 150 ms to close). A `match` over `HoverKind` needs an arm for it. |
 
+
+### The mailo gaps 3 (2026-09-25): motion, tokens, lint
+
+Additive unless a row says otherwise. FINDINGS "mailo gaps 3 (motion, tokens, lint)" has the
+reasons and the proofs.
+
+| Where | Prop, type or value | What it does |
+| --- | --- | --- |
+| `Roster` | `stay(key) -> Result<Stayed, StayError>` | Takes a leaving row's exit back before it settles (an undo): the row is present again in place, its settle timer is cancelled, nothing below heals. List the key again in the same handler. `Stayed::{Restored, Unchanged}` (a row that was not leaving is left alone); `StayError::UnknownKey` for a key the roster no longer holds (its exit settled: list it again and it enters), `StayError::Unmounted` when the list is gone |
+| `RosterState` | `stay(self, &key) -> (Self, Result<Stayed, StayError>)` | The pure transition, for a machine of your own |
+| `use_roster` | (behaviour) | Its rest timer is started by an effect after the render, never spawned from the component body (a spawn from render may never be polled on the webview); two reconciles before the effect run start one timer |
+| `Anim` | `PillUp` (`pill-up`, `--t-big --e-spring`) | A pill centred by `translateX(-50%)` springs up from below: `animation: pill-up var(--t-big) var(--e-spring)` on your own toast. quire's `SendPill` and `Toast` keep their `data-shown` transition (it also carries them back down) |
+| `Anim` | `RingDrain` (`ring-drain`, `--t-send-ring --e-linear forwards`) | A send ring's `stroke-dashoffset` from 0 to 57 (the SendPill's dash) over the undo window, where CSS reaches the ring (the webview). `--t-send-ring` is now a hold: Reduced keeps its 5 s |
+| `Anim` | `FadeIn` (`fade-in`, `--t-move --e-out`) | An ink veil fades to `--veil` (.16), where `fade` runs to 1 |
+| `Anim` | `Busy` (`busy`, `--t-ambient --e-in-out infinite`) | A busy word pulses between 1 and .45; `Breathe` (the sync halo's) fades to nothing |
+| `Anim` | `CmdkRise` | mailo-gaps-2a's, unchanged: the sheet rise with no fade. `Anim::ALL` is 52 long; a `match` over `Anim` needs the four new arms |
+| `--veil` | `OpacityToken::Veil` (.16) | The resting opacity of an ink veil laid over content. Not `--scrim`, which is a colour (black at .22) |
+| `gulp`, `bump`, `seal-pop` | (keyframes changed) | Their departure from rest scales by `--overshoot`, capped at Standard's: Calm and Reduced flatten them (as `pop-in`), Standard and Extra keep the catalogue's shape |
+| `SpaceDot`, `SpaceEditor` | (markup changed) | A Space dot, a preset, the title swatch, a handle and a stop disc write their colours as `--dot-c1`, `--dot-c2`, `--dot-c3` (with `data-stops` on the gradients) and the stylesheet paints them; no inline `background`. An exception for `button.ds-space-dot` (or the editor's `button.ds-preset`, `div.ds-handle`, `i.ds-stop-disc`, `span.ds-space-swatch`) is now stale: delete it. `FrameVars` gains `stops: Vec<String>` |
+| `--font-serif` | `Family::Serif`, `Family::ALL` | Noto Serif (400-700, upright and italic, OFL), for a message written in a serif and the control that offers it: `font-family: var(--font-serif)` lints clean |
+| `Avatar` | `muting: AvatarMuting` (`Plain`) | `Muted` keeps an account's or person's hue at .55 of its chroma, lightness kept (S's `saturate(.55)`, computed, since Blitz paints no `filter`): an account that is not the one in view. `AvatarMuting::apply(colour)` for your own use. Writes `data-muting="muted"` |
+| `LintConfig` | `stale: Stale` (`Fail`) | See section 5: a stale exception fails `assert_clean`; `Stale::Report` prints it instead |
+| `Rule::UnknownAnimation` | (reads the shorthand) | See section 5 |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

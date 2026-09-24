@@ -48,8 +48,8 @@ pub use material::{Blur, BlurState, Material, MaterialRecipe, MaterialStack, rec
 pub use motion::{
     Anim, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent, IntentEffect,
     IntentPhase, Iteration, ListPresence, MotionTimer, Presence, Pulse, Recipe, Roster,
-    RosterEntry, RosterState, RowPitch, TimerPhase, settle, use_drag, use_motion_timer, use_pulse,
-    use_roster,
+    RosterEntry, RosterState, RowPitch, StayError, Stayed, TimerPhase, settle, use_drag,
+    use_motion_timer, use_pulse, use_roster,
 };
 pub use overlay::{
     Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
@@ -71,9 +71,9 @@ pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
-    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, PersonSwatch,
-    PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken, Tuned,
-    VarName, ZLayer, quad,
+    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, OpacityToken,
+    PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken,
+    Tuned, VarName, ZLayer, quad,
 };
 
 use futures_timer as _;

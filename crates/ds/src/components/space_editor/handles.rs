@@ -8,6 +8,7 @@ use crate::components::vocab::Switch;
 use crate::geometry::measure::client_rect;
 use crate::geometry::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
+use crate::space::dot_paint::DotPaint;
 use crate::space::{SpaceLook, derive};
 use dioxus::prelude::*;
 use edit::Nudge;
@@ -149,7 +150,7 @@ fn Handle(
             "aria-label": "Colour {number}",
             "aria-valuetext": "{text}",
             "aria-pressed": on.aria(),
-            style: "left:{left};top:{top};background:{fill}",
+            style: "left:{left};top:{top};{DotPaint::solid(&fill).style_attr()}",
             onkeydown: move |event| {
                 if let Some(nudge) = Nudge::of(&event.key()) {
                     event.prevent_default();

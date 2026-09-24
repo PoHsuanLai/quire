@@ -32,7 +32,7 @@ pub const REGISTRY: [Entry; 12] = [
     Entry {
         page: Page::Type,
         title: "Type",
-        lede: "The three faces and the size ramp: every --fs step drawn at its size, with its role.",
+        lede: "The four faces and the size ramp: every --fs step drawn at its size, with its role.",
         height: 1500,
         body: pages::type_ramp::TypePage,
     },

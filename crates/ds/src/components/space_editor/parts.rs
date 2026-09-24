@@ -10,7 +10,8 @@ use crate::components::slider::Slider;
 use crate::components::vocab::Fraction;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use crate::space::{Capping, Grain, PRESETS, SpaceLook, Verdict, derive, gradient, readout};
+use crate::space::dot_paint::DotPaint;
+use crate::space::{Capping, Grain, PRESETS, SpaceLook, Verdict, derive, readout};
 use dioxus::prelude::*;
 
 /// The stop chips under the field and the "+ Colour" button.
@@ -36,7 +37,7 @@ pub(super) fn Stops(
                     onclick: move |_| picker.pick(dot_index(index)),
                     i {
                         class: "ds-stop-disc",
-                        style: "background:{palette.picked.get(index).cloned().unwrap_or_default()}",
+                        style: DotPaint::solid(&palette.picked.get(index).cloned().unwrap_or_default()).style_attr(),
                     }
                     "{dot.hue.round()}°"
                     if removable {
@@ -105,14 +106,15 @@ pub(super) fn Presets(
         div {
             SectionHeader { kind: HeaderKind::Field, text: "Presets" }
             div { class: "ds-presets",
-                for (index, preset) in PRESETS.iter().enumerate() {
+                for (index, paint) in PRESETS.iter().map(|preset| DotPaint::gradient(&derive(preset.dots, scheme).stops)).enumerate() {
                     button {
                         key: "{index}",
                         r#type: "button",
                         class: "ds-preset",
-                        "aria-label": preset.name,
-                        title: preset.name,
-                        style: "background:{gradient(&derive(preset.dots, scheme))}",
+                        "aria-label": PRESETS[index].name,
+                        title: PRESETS[index].name,
+                        "data-stops": paint.count(),
+                        style: paint.style_attr(),
                         onclick: {
                             let look = look.clone();
                             move |_| {

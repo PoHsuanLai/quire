@@ -177,7 +177,7 @@ fn a_handle_sits_where_its_dot_is() {
     let palette = derive(&preset_look(0, Grain(35)).dots, Scheme::Light);
     for picked in &palette.picked {
         assert!(
-            html.contains(&format!("background:{picked}")),
+            html.contains(&format!("--dot-c1:{picked};")),
             "no handle in {picked}"
         );
     }

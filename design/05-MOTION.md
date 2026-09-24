@@ -173,7 +173,7 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | (sail) | 1150ms | CSS, C only, orphaned | boat | C:535 |
 | (boat-return) | 900ms | CSS, C only, orphaned | boat | C:536 |
 | (spin) | 1.1s linear | CSS, C only | busy halo | C:291 |
-| (send ring) | 5s linear | JS-set transition | undo-send countdown ring | S:2339 |
+| (send ring) | 5s linear | JS-set transition; quire's `--t-send-ring`, a hold (Reduced keeps 5 s: it is the undo window, not motion; mailo gaps 3) | undo-send countdown ring | S:2339 |
 | `--t-flash` | 1200ms linear | CSS (quire's `chip-flash` keyframe, wave 1 amendment, proposed) | mentioned person chip's ring (04-COMPONENTS §10) | S:2119 |
 | `--e-shake` | `cubic-bezier(.36,.07,.19,.97)` | easing | `shake-x`, C `shake` | S:590, C:546 |
 | `--e-linear` | `linear` | easing | spin, send ring | C:291, S:2339 |
@@ -549,6 +549,26 @@ Source C:1066-1068. `Anim::CmdkIn`. C-only. Live: C command menu (C:1064). S use
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 ```
 
+
+### 4.5 Added by quire (mailo gaps 3)
+
+Settled for the port; the catalogue above is unchanged except where named.
+
+- `fade-in` (4.4.12) is played after all, as `Anim::FadeIn`, ending on `--veil` (.16, a new
+  opacity token) instead of a literal: C's ink veil rests at that opacity, so nothing snaps.
+  S's `fade` still serves the scrim that rests at 1.
+- `pill-up`: `from{ transform:translate(-50%,160%) } to{ transform:translate(-50%,0) }` at
+  `--t-big --e-spring`, the entrance of a pill centred by `translateX(-50%)` (mailo's toast and
+  send pill). quire's `SendPill` and `Toast` keep their `data-shown` transition, which also
+  carries them down.
+- `ring-drain`: `stroke-dashoffset` 0 to 57 at `--t-send-ring` linear, forwards, where CSS reaches
+  the ring (the webview; on Blitz the SendPill writes the offset as an attribute, spike S6).
+- `busy`: `0%,100%{ opacity:1 } 50%{ opacity:.45 }` at `--t-ambient --e-in-out`, infinite: a busy
+  word's pulse, which stays legible where `breathe` fades to nothing. A loop, like `breathe` and
+  `spin` (principle 7's listed exceptions); Reduced plays it once.
+- `gulp`, `bump` and `seal-pop` scale their departure from rest by
+  `min(1, (--overshoot - 1) x 25)`: 1 at Standard and Extra, 0 at Calm and Reduced. Calm (3.2:
+  "no overshoot") now flattens them as it flattens `pop-in`; Standard is the text above.
 
 ## 5. Assignments
 
