@@ -3,7 +3,7 @@
 use super::button_faces::ButtonFaces;
 use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
-use super::fields::Fields;
+use super::fields::{FieldKinds, Fields};
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
 use dioxus::prelude::*;
@@ -71,6 +71,7 @@ pub fn ControlsPage() -> Element {
         DockTiles {}
         Choosers {}
         Fields {}
+        FieldKinds {}
         Chips {}
         Faces {}
         Marks {}
