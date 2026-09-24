@@ -63,8 +63,7 @@ pub fn oklab(rgb: [f32; 3]) -> Oklab {
     }
 }
 
-/// The sRGB-encoded 0..=1 triple of an OKLab colour (clamped to the gamut).
-pub fn srgb(c: Oklab) -> [f32; 3] {
+fn linear_rgb(c: Oklab) -> [f32; 3] {
     let l = c.l + 0.396_337_78 * c.a + 0.215_803_76 * c.b;
     let m = c.l - 0.105_561_346 * c.a - 0.063_854_17 * c.b;
     let s = c.l - 0.089_484_18 * c.a - 1.291_485_5 * c.b;
@@ -74,7 +73,18 @@ pub fn srgb(c: Oklab) -> [f32; 3] {
         -1.268_438 * l + 2.609_757_4 * m - 0.341_319_38 * s,
         -0.004_196_086_3 * l - 0.703_418_6 * m + 1.707_614_7 * s,
     ]
-    .map(linear_to_srgb)
+}
+
+/// Whether an OKLab colour lies inside sRGB (so [`srgb`] does not clip it).
+pub fn in_srgb(c: Oklab) -> bool {
+    linear_rgb(c)
+        .iter()
+        .all(|v| (-1e-4..=1.0 + 1e-4).contains(v))
+}
+
+/// The sRGB-encoded 0..=1 triple of an OKLab colour (clamped to the gamut).
+pub fn srgb(c: Oklab) -> [f32; 3] {
+    linear_rgb(c).map(linear_to_srgb)
 }
 
 /// ΔE_OK: Euclidean distance in OKLab.
@@ -102,6 +112,17 @@ mod tests {
                 "{name}: grey has chroma"
             );
         }
+    }
+
+    #[test]
+    fn gamut_check() {
+        assert!(in_srgb(oklab([0.2, 0.5, 0.9])));
+        let wild = Oklab {
+            l: 0.62,
+            a: -0.3,
+            b: 0.0,
+        };
+        assert!(!in_srgb(wild));
     }
 
     #[test]
