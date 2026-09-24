@@ -1,0 +1,13 @@
+[project]
+name = "icongen"
+version = "0.1.0"
+description = "Drive ComfyUI's HTTP API for the app-icon pipeline (design/08-ICONS.md section 3)."
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+icongen = "icongen.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
