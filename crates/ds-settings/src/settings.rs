@@ -60,6 +60,66 @@ pub struct AppearanceSettings {
         advanced
     )]
     pub material_tint_alpha: Percent,
+    /// `appearance.material_highlight_light` (the macOS polish pass; percent, default 30).
+    #[settings(
+        label = "Highlight (light)",
+        help = "The top highlight's alpha on a light material.",
+        section = "Appearance",
+        range = "0..=100",
+        unit = "%",
+        advanced
+    )]
+    pub material_highlight_light: Percent,
+    /// `appearance.material_highlight_dark` (the macOS polish pass; percent, default 12).
+    #[settings(
+        label = "Highlight (dark)",
+        help = "The top highlight's alpha on a dark material.",
+        section = "Appearance",
+        range = "0..=100",
+        unit = "%",
+        advanced
+    )]
+    pub material_highlight_dark: Percent,
+    /// `appearance.material_hairline_light` (the macOS polish pass; percent, default 14).
+    #[settings(
+        label = "Hairline (light)",
+        help = "The outer hairline's alpha on a light material.",
+        section = "Appearance",
+        range = "0..=100",
+        unit = "%",
+        advanced
+    )]
+    pub material_hairline_light: Percent,
+    /// `appearance.material_hairline_dark` (the macOS polish pass; percent, default 60).
+    #[settings(
+        label = "Hairline (dark)",
+        help = "The outer hairline's alpha on a dark material.",
+        section = "Appearance",
+        range = "0..=100",
+        unit = "%",
+        advanced
+    )]
+    pub material_hairline_dark: Percent,
+    /// `appearance.material_shadow_strength` (the macOS polish pass; percent, default 100).
+    #[settings(
+        label = "Shadow strength",
+        help = "How strong a floating material's contact and ambient shadows are.",
+        section = "Appearance",
+        range = "0..=100",
+        unit = "%",
+        advanced
+    )]
+    pub material_shadow_strength: Percent,
+    /// `appearance.material_vibrancy` (the macOS polish pass; percent, default 100).
+    #[settings(
+        label = "Vibrancy",
+        help = "How much of the tint the vibrancy boost saturates.",
+        section = "Appearance",
+        range = "0..=100",
+        unit = "%",
+        advanced
+    )]
+    pub material_vibrancy: Percent,
     /// Keys this build does not know, kept for the next write.
     #[serde(flatten)]
     #[settings(skip)]
@@ -75,6 +135,12 @@ impl Default for AppearanceSettings {
             accent: Accent::Postmark,
             motion_level: Motion::System,
             material_tint_alpha: Percent(80),
+            material_highlight_light: Percent(30),
+            material_highlight_dark: Percent(12),
+            material_hairline_light: Percent(14),
+            material_hairline_dark: Percent(60),
+            material_shadow_strength: Percent(100),
+            material_vibrancy: Percent(100),
             extra: toml::Table::new(),
         }
     }

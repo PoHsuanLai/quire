@@ -103,6 +103,12 @@ control in v1.
 | `appearance.accent` | `Accent` (6 variants) | `Postmark` | other 5 not named in any doc (03-COLOR open decision 6) — **could not find full default set**, see handback | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | `MotionLevel::{System,Calm,Standard,Extra,Reduced}` | `System` | `System` follows the portal's `prefers-reduced-motion` | `07-LOOKS.md#11-desktop-default` ("Motion levels ... apply on top of whichever look is active | proposed") | proposed |
 | `appearance.material_tint_alpha` | `Percent` | `80` | | `21-SPACES.md#3-where-the-tokens-apply` ("`--m-tint` = ... alpha .80 (proposed)") | proposed |
+| `appearance.material_highlight_light` | `Percent` | `30` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_highlight_dark` | `Percent` | `12` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_hairline_light` | `Percent` | `14` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_hairline_dark` | `Percent` | `60` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_shadow_strength` | `Percent` | `100` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_vibrancy` | `Percent` | `100` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `notifications.banner_material` | `Material::{Toast,Inverse}` | `Toast` | `Inverse` = mail's ink-on-paper toast | `03-COLOR.md#open-decisions` item 10; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 7 | proposed — **flagged for review** |
 | `control_center.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
 | `launcher.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
@@ -159,6 +165,9 @@ that registration is not done yet (see FINDINGS "Tune wave").
 | `bar.status_glyph_px` | `Px` | `16` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
 | `bar.status_gap_px` | `Px` | `4` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
 | `bar.glyph_size_policy` | `BarGlyphSize::{StatusIcon16,IconSizeBar22}` | `StatusIcon16` | alt = use the full `IconSize::Bar` box | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 8 | proposed |
+| `bar.item_font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `bar.item_font_weight` | `Count` | `500` | `100..=900`; the app name is always bold | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `bar.item_radius_px` | `Px` | `4` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 
 ### 3.5 `dock` (sill/settings.toml)
 
@@ -171,7 +180,7 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.tile_size_px` | `Px` | `48` | `32..80` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
 | `dock.magnified_size_px` | `Px` | `96` | `tile_size..128` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
 | `dock.influence_radius_px` | `Px` | `96` | alt `144` | `10-BEHAVIOUR-dock.md#10-3-3-magnification`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 1 | proposed — **flagged for review** |
-| `dock.tile_gap_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
+| `dock.tile_gap_px` | `Px` | `8` | was 4 before the polish pass | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.progress_style` | `ProgressStyle::{Ring,Bar}` | `Ring` | alt `Bar` (macOS draws a bar under the icon) | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 2 | proposed |
 | `dock.autohide` | `AutoHide::{Off,On}` | `Off` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
 | `dock.autohide_delay_ms` | `Ms` | `200` | `0..1000` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
@@ -205,6 +214,9 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.minimize_debounce_ms` | `Ms` | `100` | | `10-BEHAVIOUR-dock.md#10-3-10-minimize-target` | proposed |
 | `dock.context_menu_order` | `DockMenuOrder::{WindowsFirst,AppleOrder}` | `WindowsFirst` | plan order: windows, desktop actions, Keep in Dock, Quit | `10-BEHAVIOUR-dock.md#10-3-7-context-menu`; `06-INTERACTIONS.md#20-desktop-interactions-settled` | proposed |
 | `dock.modifier_clicks` | `DockModifierClicks::{AppleMapping,Off}` | `AppleMapping` | Ctrl-click Show in Files, Alt-click switch+hide, Ctrl+Alt-click hide others | `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.1) | proposed |
+| `dock.pill_padding_px` | `Px` | `6` | `0..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `dock.running_dot_gap_px` | `Px` | `3` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `dock.floor` | `DockFloor::{Off,On}` | `Off` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 
 ### 3.6 `launcher` (sill/settings.toml)
 
@@ -216,6 +228,11 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `launcher.input_row_height_px` | `Px` | `56` | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | settled font, height proposed |
 | `launcher.result_row_height_px` | `Px` | `44` | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
 | `launcher.open_latency_budget_ms` | `Ms` | `100` (p95) | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like`; `05-MOTION.md#10-shell-motion` | settled (plan), not a preference but kept visible for `dev/accept-launcher.sh` tuning |
+| `launcher.field_font_px` | `Px` | `22` | `12..=40` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `launcher.field_font_weight` | `Count` | `500` | `100..=900` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `launcher.field_glyph_px` | `Px` | `20` | `12..=40` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `launcher.row_title_px` | `Px` | `14` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `launcher.row_detail_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 
 ### 3.7 `scroll` (sill/settings.toml)
 
@@ -326,13 +343,16 @@ found elsewhere in the file that are not yet in that table.
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `menus.submenu_delay_ms` | `Ms` | `200` | `0..1000` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
-| `menus.item_height_px` | `Px` | `24` | alt `30` (design's Slim padding 6/8) | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 1 | proposed — **flagged for review** |
+| `menus.item_height_px` | `Px` | `22` | was 24 before the polish pass; alt `30` (design's Slim padding 6/8) | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 1 | proposed — **flagged for review** |
 | `menus.max_width_px` | `Px` | `420` | min 220 settled | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
-| `menus.separator_margin_px` | `Px` | `4` | | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
+| `menus.separator_margin_px` | `Px` | `5` | was 4 before the polish pass | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
 | `menus.section_header_height_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | settled style, height proposed |
 | `menus.submenu_triangle_timeout_ms` | `Ms` | `300` | | `13-BEHAVIOUR-menus-windows.md#13-3-4-submenus` | proposed |
 | `menus.pick_feedback` | `PickFeedback::{None,BlinkOnce}` | `None` | alt `BlinkOnce` (macOS blinks the chosen item once before closing) | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 3 | proposed |
 | `menus.first_mouse_window_ms` | `Ms` | `100` | activation-vs-click window on an inactive window's first click | `13-BEHAVIOUR-menus-windows.md#13-3-8-focus-and-raise-rules`; `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.4) | proposed |
+| `menus.font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `menus.highlight_radius_px` | `Px` | `6` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `menus.tooltip_font_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `switcher.show_delay_ms` | `Ms` | `150` | `0..500` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `switcher.quick_tap_ms` | `Ms` | `100` | chord+modifier release within this = no UI | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
 | `switcher.icon_size_px` | `Px` | `96` | alt macOS ~128 | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 6 | proposed |
