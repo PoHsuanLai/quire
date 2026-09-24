@@ -55,7 +55,7 @@ pub fn SectionHeader(
     // fallback, `ds-section-header-rule`).
     rsx! {
         div { class: "ds-section-header", "data-kind": kind.slug(),
-            span { "{text}" }
+            span { class: "ds-section-header-text", "{text}" }
             if let Some(value) = value {
                 span { class: "ds-section-header-value", "{value}" }
             }

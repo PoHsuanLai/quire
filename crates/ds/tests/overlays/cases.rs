@@ -28,7 +28,7 @@ const NOW: Duration = Duration::ZERO;
 const INTENT: Duration = Duration::from_millis(520);
 /// Past every entrance's settle at Standard (`settle(PeekIn)` = 454 ms).
 const SETTLED: Duration = Duration::from_millis(520);
-/// Past the send pill's one-frame wait.
+/// Past the one-frame wait before the send pill and the toast rise.
 const FRAME: Duration = Duration::from_millis(80);
 
 const DANA: AvatarFace = AvatarFace {
@@ -498,13 +498,13 @@ pub const CASES: &[Case] = &[
         component: "toast",
         state: "shown",
         make: || rsx! { Pushed { undo: UndoToken(7) } },
-        wait: NOW,
+        wait: FRAME,
     },
     Case {
         component: "toast",
         state: "shown-no-undo",
         make: || rsx! { Pushed { undo: None } },
-        wait: NOW,
+        wait: FRAME,
     },
     // Scrim, Peek (both modes), Sheet.
     Case {

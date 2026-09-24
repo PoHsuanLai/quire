@@ -213,15 +213,65 @@ fn stack_top(dom: &VirtualDom, stack: Signal<LayerStack>, down: usize) -> u32 {
 }
 
 #[test]
-fn the_root_renders_the_toast_host_after_the_overlay_host() {
+fn an_empty_hub_lays_out_no_toast() {
+    // Gallery fix A: a hidden toast was laid out in every root, and its translateY(160%) did not
+    // clear a small root, so an empty pill showed at the bottom of each.
     fn empty() -> Element {
         rsx! { p { "inside" } }
     }
-    let html = inside_root(&built(empty, None, Duration::ZERO));
+    let html = inside_root(&built(empty, None, Duration::from_millis(80)));
+    assert!(html.contains("<p>inside</p>"), "{html}");
+    assert!(!html.contains("ds-toast"), "{html}");
+}
+
+#[test]
+fn the_root_renders_the_toast_host_after_the_overlay_host() {
+    #[component]
+    fn Pushed() -> Element {
+        let toasts = ds::use_toasts();
+        use_hook(move || toasts.push("Archived".to_string(), None));
+        rsx! {}
+    }
+    fn pushed() -> Element {
+        rsx! { p { "inside" } Pushed {} }
+    }
+    let html = inside_root(&built(pushed, None, Duration::from_millis(80)));
     let child = html.find("<p>inside</p>").expect("the children");
     let toast = html.find("class=\"ds-toast\"").expect("the toast host");
     assert!(child < toast, "{html}");
-    assert!(html.contains("data-shown=\"hidden\""), "{html}");
+    assert!(html.contains("data-shown=\"shown\""), "{html}");
+}
+
+#[test]
+fn a_toast_mounts_below_the_edge_and_is_dropped_after_it_sinks() {
+    #[component]
+    fn Pushed() -> Element {
+        let toasts = ds::use_toasts();
+        use_hook(move || toasts.push("Archived".to_string(), None));
+        rsx! {}
+    }
+    fn pushed() -> Element {
+        rsx! { Pushed {} }
+    }
+    // Its first frame is below the edge, so the spring rises from there.
+    let mut dom = built(pushed, None, Duration::ZERO);
+    run_for(&mut dom, Duration::from_millis(5));
+    dom.render_immediate(&mut NoOpMutations);
+    let first = inside_root(&dom);
+    assert!(first.contains("data-shown=\"hidden\""), "{first}");
+    run_for(&mut dom, Duration::from_millis(80));
+    let up = inside_root(&dom);
+    assert!(up.contains("data-shown=\"shown\""), "{up}");
+    // The hub hides it after its 5200 ms hold (ToastHold): it sinks, still drawn below the
+    // edge, then is gone once `--t-big` and a frame have passed (420 + 34 ms at Standard).
+    // (The hold, not `hide()`: `ToastHub::stop_hold` writes the hold signal while its own
+    // `if let` still borrows it, which panics; reported in FINDINGS "Gallery fixes A".)
+    run_for(&mut dom, Duration::from_millis(5200));
+    let sinking = inside_root(&dom);
+    assert!(sinking.contains("data-shown=\"hidden\""), "{sinking}");
+    run_for(&mut dom, Duration::from_millis(520));
+    let gone = inside_root(&dom);
+    assert!(!gone.contains("ds-toast"), "{gone}");
 }
 
 #[test]

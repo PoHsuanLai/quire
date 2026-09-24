@@ -353,12 +353,15 @@ fn a_toast_hides_after_5200_ms() {
     let mut harness = Harness::new(ToastApp, VIEW);
     let shown = |harness: &Harness| harness.attr(".ds-toast", "data-shown");
     harness.click(centre(&harness, ".ds-button"));
+    // It mounts below the edge for a frame, so the spring rises from there (gallery fix A).
+    assert_eq!(shown(&harness).as_deref(), Some("hidden"));
+    harness.advance(ms(100));
     assert_eq!(shown(&harness).as_deref(), Some("shown"));
     assert_eq!(
         harness.text_of(".ds-toast-text").as_deref(),
         Some("Archived")
     );
-    harness.advance(ms(5000));
+    harness.advance(ms(4900));
     assert_eq!(
         shown(&harness).as_deref(),
         Some("shown"),
@@ -366,6 +369,9 @@ fn a_toast_hides_after_5200_ms() {
     );
     harness.advance(ms(400));
     assert_eq!(shown(&harness).as_deref(), Some("hidden"));
+    // Sunk: after `--t-big` and a frame nothing is laid out.
+    harness.advance(ms(500));
+    assert_eq!(harness.count(".ds-toast"), 0);
 }
 
 #[allow(non_snake_case)]
