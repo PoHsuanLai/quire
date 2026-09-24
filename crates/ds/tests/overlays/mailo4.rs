@@ -1,19 +1,41 @@
 //! The mailo gaps 4 overlay cases: hover cards keyed on the caller's own hooks through
 //! `use_hover_intent`, drawn in place with no anchor or floating against a rect the caller
-//! already had.
+//! already had; a label checklist whose picks keep it open, and a menu's rows drawn inline in
+//! a sender card.
 
 use crate::cases::Case;
 use dioxus::prelude::*;
+use ds::components::vocab::Check;
 use ds::{
-    Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Point, Px, Rect, Size,
-    use_hover_intent,
+    Anchor, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
+    MenuEntry, MenuKind, MenuRow, PickDismiss, Point, Px, Rect, Size, Tile, use_hover_intent,
 };
 use std::time::Duration;
 
 /// Past the 450 ms hover intent.
 const INTENT: Duration = Duration::from_millis(520);
 
+const NOW: Duration = Duration::ZERO;
+
 pub const MAILO4_CASES: &[Case] = &[
+    Case {
+        component: "menu",
+        state: "stay-checklist",
+        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: at(), entries: labels(), onpick: |_: u8| {}, onclose: |_| {}, dismiss: PickDismiss::Stay } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "inline-rich",
+        make: || rsx! { div { Menu { kind: MenuKind::Rich, anchor: at(), entries: sender_actions(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline } } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "inline-checklist",
+        make: || rsx! { div { Menu { kind: MenuKind::Dropdown, anchor: at(), entries: labels(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline, dismiss: PickDismiss::Stay } } },
+        wait: NOW,
+    },
     Case {
         component: "hover_card",
         state: "hook-keyed-inline",
@@ -33,6 +55,46 @@ pub const MAILO4_CASES: &[Case] = &[
         wait: INTENT,
     },
 ];
+
+/// Where the floating menus open.
+fn at() -> Anchor {
+    Anchor::Point(Point {
+        x: Px(20.0),
+        y: Px(20.0),
+    })
+}
+
+/// A label checklist: two labels on, one off.
+fn labels() -> Vec<MenuEntry<u8>> {
+    [
+        ("Invoices", Check::Checked),
+        ("Travel", Check::Unchecked),
+        ("Family", Check::Checked),
+    ]
+    .into_iter()
+    .zip(0u8..)
+    .map(|((name, check), value)| {
+        MenuEntry::Row(MenuRow {
+            check: Some(check),
+            ..MenuRow::new(value, name)
+        })
+    })
+    .collect()
+}
+
+/// A sender card's actions.
+fn sender_actions() -> Vec<MenuEntry<u8>> {
+    vec![
+        MenuEntry::Row(MenuRow {
+            tile: Some(Tile::Icon(Icon::Pin)),
+            ..MenuRow::new(0, "Pin Dana")
+        }),
+        MenuEntry::Row(MenuRow {
+            tile: Some(Tile::Icon(Icon::Search)),
+            ..MenuRow::new(1, "Every thread from Dana")
+        }),
+    ]
+}
 
 /// Where a row's sender name was when the pointer came over it.
 fn name_rect() -> Rect {
@@ -57,7 +119,7 @@ fn HookKeyed(anchor: HoverAnchor, flow: Flow) -> Element {
     let hub = driver.hub();
     let open = hub.open().or(hub.leaving());
     rsx! {
-        div { class: "sender-slot",
+        div {
             if let Some((key, kind)) = open {
                 HoverCard {
                     key: "{key.0}",

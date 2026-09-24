@@ -1,11 +1,13 @@
 //! Overlays, mailo gaps 4: hover cards keyed on the caller's own pointer hooks, one floating
-//! beside the element it measured and one drawn in place with no anchor at all.
+//! beside the element it measured and one drawn in place with no anchor at all; a label
+//! checklist whose picks keep it open, and a menu's rows inline in a sender card.
 
 use super::Section;
 use dioxus::prelude::*;
+use ds::components::vocab::Check;
 use ds::{
-    Button, ButtonVariant, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind,
-    MountedRef, use_hover_intent,
+    Button, ButtonVariant, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon,
+    Menu, MenuEntry, MenuKind, MenuRow, MountedRef, PickDismiss, Tile, use_hover_intent, use_rect,
 };
 
 /// The prefix of this section's hover keys: the page's other card section skips them.
@@ -84,6 +86,104 @@ pub fn HookKeyedCards() -> Element {
             }
             div { class: "g-row g-stage-pad", {inline} }
             {floating}
+        }
+    }
+}
+
+/// The labels a thread can carry.
+const LABELS: [&str; 4] = ["Invoices", "Travel", "Family", "Receipts"];
+
+/// A label checklist: each pick toggles its check and the menu stays open.
+#[component]
+pub fn LabelChecklist() -> Element {
+    let mut open = use_signal(|| false);
+    let mut on = use_signal(|| {
+        [
+            Check::Checked,
+            Check::Unchecked,
+            Check::Unchecked,
+            Check::Checked,
+        ]
+    });
+    let trigger = use_rect();
+    let rows: Vec<MenuEntry<usize>> = LABELS
+        .into_iter()
+        .enumerate()
+        .map(|(value, name)| {
+            MenuEntry::Row(MenuRow {
+                check: Some(on()[value]),
+                ..MenuRow::new(value, name)
+            })
+        })
+        .collect();
+    rsx! {
+        Section {
+            title: "A checklist that stays open",
+            note: "dismiss: PickDismiss::Stay. A pick toggles its label and the menu stays, the cursor on the row; Escape or a press outside closes it.",
+            div { class: "g-row",
+                div { onmounted: move |event| trigger.on_mounted(event),
+                    Button { variant: ButtonVariant::Secondary, label: "Labels…", onclick: move |_| open.set(true) }
+                }
+            }
+            if let (true, Some(anchor)) = (open(), trigger.anchor()) {
+                Menu::<usize> {
+                    kind: MenuKind::Dropdown,
+                    anchor,
+                    entries: rows,
+                    onpick: move |value: usize| {
+                        on.with_mut(|on| {
+                            on[value] = match on[value] {
+                                Check::Checked => Check::Unchecked,
+                                Check::Unchecked => Check::Checked,
+                            }
+                        })
+                    },
+                    onclose: move |()| open.set(false),
+                    dismiss: PickDismiss::Stay,
+                }
+            }
+        }
+    }
+}
+
+/// A sender card's actions, drawn as a menu's rows inside the card.
+#[component]
+pub fn InlineActions() -> Element {
+    let mut said = use_signal(|| "nothing yet".to_string());
+    let actions: Vec<MenuEntry<&'static str>> = [
+        (Icon::Pin, "Pin Dana"),
+        (Icon::Search, "Every thread from Dana"),
+        (Icon::Copy, "Copy address"),
+    ]
+    .into_iter()
+    .map(|(icon, title)| {
+        MenuEntry::Row(MenuRow {
+            tile: Some(Tile::Icon(icon)),
+            ..MenuRow::new(title, title)
+        })
+    })
+    .collect();
+    rsx! {
+        Section {
+            title: "Menu rows inline in a card",
+            note: "flow: Flow::Inline draws the same rows in the caller's card: no overlay, no scrim, no layer on the stack, no focus taken.",
+            HoverCard {
+                kind: HoverKind::Sender,
+                flow: Flow::Inline,
+                parts: vec![
+                    HoverCardPart::Title("Dana Okafor".to_string()),
+                    HoverCardPart::Sub("dana@example.org".to_string()),
+                ],
+                Menu::<&'static str> {
+                    kind: MenuKind::Rich,
+                    anchor: ds::Anchor::Point(ds::Point::default()),
+                    entries: actions,
+                    onpick: move |title: &'static str| said.set(title.to_string()),
+                    onclose: |()| {},
+                    flow: Flow::Inline,
+                }
+            }
+            p { class: "g-note", "Picked: {said}" }
         }
     }
 }
