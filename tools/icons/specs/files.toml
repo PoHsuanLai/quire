@@ -1,6 +1,7 @@
-# Files: two folders, the back one a translucent tint, the front one paper with a label groove.
+# Files: a quieter folder behind, the front folder with a label groove.
 name = "files"
-ground = { start = "amber", end = "green" }
+dialect = "solid"
+tint = "ochre"
 grain = 20
 
 [[layer]]
@@ -8,24 +9,19 @@ kind = "rect"
 at = [7.5, 5]
 size = [12, 10.5]
 corners = [2, 2, 2.5, 1]
-fill = "paper"
-opacity = 0.55
-relief = "raised"
+fill = "secondary"
 
 # The front folder as one outline, tab and body together (points inset by `round`).
 [[layer]]
 kind = "polygon"
 points = [[5.7, 18.3], [5.7, 9.2], [9.5, 9.2], [11, 11.2], [17.3, 11.2], [17.3, 18.3]]
 round = 1.2
-fill = "paper"
-opacity = 0.92
-relief = "raised"
+fill = "symbol"
 
 [[layer]]
 kind = "bar"
 from = [8.5, 15.2]
 to = [13.5, 15.2]
 width = 1.4
-fill = "ink"
-opacity = 0.10
+fill = "detail"
 relief = "recessed"

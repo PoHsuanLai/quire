@@ -3,10 +3,13 @@
 use std::path::{Path, PathBuf};
 
 use clap::{Parser, Subcommand};
+mod round4;
+
 use icons::{
-    Bevel, Cell, EXPORT_SIZES, Family, IconsError, Plane, Shadow, Sheet, SheetStyle, Spec,
-    Template, alpha_bbox, build_sheet, compose, drop_shadow, emblem, export, finish, fit_object,
-    grain_tile, grid_for, key_background, parse_spec, size_strip, strip, strip_sheet,
+    Bevel, Cell, Dialect, EXPORT_SIZES, Family, IconsError, Look, Shadow, Sheet, SheetStyle, Spec,
+    Template, Tint, alpha_bbox, build_sheet, compose, drop_shadow, emblem, export, finish,
+    fit_object, grain_tile, grid_for, key_background, parse_spec, render_icon, retint, roles,
+    size_strip, strip, strip_sheet,
 };
 use image::imageops::{FilterType, resize};
 use image::{DynamicImage, Rgba32FImage};
@@ -44,6 +47,26 @@ enum Command {
         /// Also write a sheet: each icon at 512, 48, 32 and 16 px 1:1 on light and dark grounds.
         #[arg(long)]
         sheet: Option<PathBuf>,
+        /// Draw every spec in this dialect instead of its own (08 2.10).
+        #[arg(long)]
+        dialect: Option<Dialect>,
+    },
+    /// Round four's dialect sheet (08 2.10): every spec in all four dialects, plus the
+    /// retinted model face `<klein-dir>/<name>.png` / `.flat.png` where one exists.
+    Dialects {
+        #[arg(long, num_args = 1.., required = true)]
+        spec: Vec<PathBuf>,
+        #[arg(long)]
+        klein_dir: Option<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// The whole set in Monochrome tinted by the Work and Home presets' Space colours.
+    Space {
+        #[arg(long, num_args = 1.., required = true)]
+        spec: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
     },
     /// Plate a render that already contains the plate's face (08 2.9, round three):
     /// `ground` takes the whole full-bleed render as the face and adds our bevel; `tile` keys a
@@ -58,6 +81,12 @@ enum Command {
         out_dir: PathBuf,
         #[arg(long)]
         name: String,
+        /// Re-colour the face into this dialect (round four), keeping its relief.
+        #[arg(long)]
+        retint: Option<Dialect>,
+        /// The tint for `--retint`, from the muted palette.
+        #[arg(long, default_value = "slate")]
+        tint: String,
     },
     /// A strip sheet: each `<dir>/<name>.flat.png` at 512, 48, 32 and 16 px 1:1 on light and dark.
     Strips {
@@ -100,11 +129,11 @@ enum SheetKind {
     Plated,
 }
 
-fn load(path: &Path) -> Result<Rgba32FImage, IconsError> {
+pub(crate) fn load(path: &Path) -> Result<Rgba32FImage, IconsError> {
     Ok(image::open(path)?.to_rgba32f())
 }
 
-fn save(img: &Rgba32FImage, path: &Path) -> Result<(), IconsError> {
+pub(crate) fn save(img: &Rgba32FImage, path: &Path) -> Result<(), IconsError> {
     if let Some(dir) = path.parent() {
         std::fs::create_dir_all(dir)?;
     }
@@ -168,7 +197,13 @@ fn onto_plate(img: &Rgba32FImage, t: &Template) -> Rgba32FImage {
     })
 }
 
-fn face(input: &Path, mode: FaceMode, out_dir: &Path, name: &str) -> Result<(), IconsError> {
+fn face(
+    input: &Path,
+    mode: FaceMode,
+    out_dir: &Path,
+    name: &str,
+    recolour: Option<(Dialect, Tint)>,
+) -> Result<(), IconsError> {
     let t = Template::default();
     let raw = load(input)?;
     let (face, bevel) = match mode {
@@ -178,6 +213,10 @@ fn face(input: &Path, mode: FaceMode, out_dir: &Path, name: &str) -> Result<(), 
             let side = (raw.width().min(raw.height()) as f32 * GROUND_CROP) as u32;
             let (x0, y0) = ((raw.width() - side) / 2, (raw.height() - side) / 2);
             let crop = image::imageops::crop_imm(&raw, x0, y0, side, side).to_image();
+            let crop = match recolour {
+                Some((d, tint)) => retint(&crop, &roles(d, tint)),
+                None => crop,
+            };
             (onto_plate(&crop, &t), Bevel::Ours)
         }
         FaceMode::Tile => {
@@ -220,29 +259,29 @@ fn strips(dir: &Path, names: &[String], title: &str, out: &Path) -> Result<(), I
     save(&strip_sheet(title, &rows, &SheetStyle::default()), out)
 }
 
-/// One size of an abstract icon: the flat render, plus the baked shadow from 48 px (08 2.5).
-fn abstract_size(spec: &Spec, size: u32, t: &Template, tile: &Plane) -> Rgba32FImage {
-    let flat = emblem(spec, size, t, tile);
-    match size >= 48 {
-        true => drop_shadow(&flat, grid_for(size, t), t),
-        false => flat,
-    }
+fn load_specs(paths: &[PathBuf]) -> Result<Vec<Spec>, IconsError> {
+    paths
+        .iter()
+        .map(|p| parse_spec(&std::fs::read_to_string(p)?))
+        .collect()
 }
 
 fn abstract_icons(
     specs: &[PathBuf],
     out_dir: &Path,
     sheet: Option<&Path>,
+    dialect: Option<Dialect>,
 ) -> Result<(), IconsError> {
     let t = Template::default();
     let tile = grain_tile();
-    let specs = specs
-        .iter()
-        .map(|p| parse_spec(&std::fs::read_to_string(p)?))
-        .collect::<Result<Vec<_>, IconsError>>()?;
+    let specs = load_specs(specs)?;
+    let look = |s: &Spec| Look {
+        dialect: dialect.unwrap_or(s.dialect),
+        tint: s.tint,
+    };
     for spec in &specs {
         let name = &spec.name;
-        let flat = emblem(spec, 1024, &t, &tile);
+        let flat = emblem(spec, look(spec), 1024, &t, &tile);
         save(&flat, &out_dir.join(format!("{name}.flat.png")))?;
         save(
             &drop_shadow(&flat, grid_for(1024, &t), &t),
@@ -250,12 +289,12 @@ fn abstract_icons(
         )?;
         for size in EXPORT_SIZES {
             save(
-                &abstract_size(spec, size, &t, &tile),
+                &render_icon(spec, look(spec), size, &t, &tile),
                 &out_dir.join(format!("hicolor/{size}x{size}/apps/{name}.png")),
             )?;
             if size <= 256 {
                 save(
-                    &abstract_size(spec, size * 2, &t, &tile),
+                    &render_icon(spec, look(spec), size * 2, &t, &tile),
                     &out_dir.join(format!("hicolor/{size}x{size}@2/apps/{name}.png")),
                 )?;
             }
@@ -267,7 +306,9 @@ fn abstract_icons(
             .map(|s| {
                 (
                     s.name.to_uppercase(),
-                    strip(&[512, 48, 32, 16], |size| abstract_size(s, size, &t, &tile)),
+                    strip(&[512, 48, 32, 16], |size| {
+                        render_icon(s, look(s), size, &t, &tile)
+                    }),
                 )
             })
             .collect();
@@ -365,13 +406,25 @@ fn main() -> Result<(), IconsError> {
             spec,
             out_dir,
             sheet,
-        } => abstract_icons(&spec, &out_dir, sheet.as_deref()),
+            dialect,
+        } => abstract_icons(&spec, &out_dir, sheet.as_deref(), dialect),
+        Command::Dialects {
+            spec,
+            klein_dir,
+            out,
+        } => round4::dialects(&load_specs(&spec)?, klein_dir.as_deref(), &out),
+        Command::Space { spec, out } => round4::space(&load_specs(&spec)?, &out),
         Command::Face {
             input,
             mode,
             out_dir,
             name,
-        } => face(&input, mode, &out_dir, &name),
+            retint,
+            tint,
+        } => {
+            let recolour = retint.map(|d| tint.parse().map(|t| (d, t))).transpose()?;
+            face(&input, mode, &out_dir, &name, recolour)
+        }
         Command::Strips {
             dir,
             names,

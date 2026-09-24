@@ -331,3 +331,76 @@ or the procedural route with a deeper relief pass if the user prefers the clay l
 - Qwen on files, notes and photos, and Qwen in tile mode (time: 70 s per render).
 - Compositing a keyed Klein symbol onto our own procedural two-hue plate (the soft emboss has
   no hard edge for the key to stop at; face mode was used instead).
+
+## Round four: dialects in one muted palette (2026-09-25)
+
+The user on round three: fewer gradients, less vibrant colour, and not every icon from the same
+recipe; mix in other design languages, e.g. monochrome. Round three's picks stay the starting
+point (procedural terminal and notes; Klein face-mode mail, files and photos). The rules are
+design/08-ICONS.md 2.10: one shared skeleton (squircle, light, bevel arc, bottom shade, drop
+shadow, emboss depth, grain), one muted palette in OKLCh under a **chroma cap of 0.07**, no
+gradients beyond a ±0.012 L tonal shift, and four dialects: Monochrome, Graphite, Paper, Solid.
+**The user picks a dialect per app.**
+
+### Sheets (`tools/progress/shots/icons/`)
+
+| Sheet | What it shows |
+| --- | --- |
+| `round4-dialects.png` | rows mail, files, terminal, notes, photos; columns Monochrome, Graphite, Paper, Solid (procedural, every size drawn natively), and for mail, files and photos a fifth column "Klein monochrome": the round-three Klein face-mode pick (mail s33, files s22, photos s11) retinted into the Monochrome dialect. Each cell is the 512 px icon with its 16, 32 and 48 px at 1:1 on the light (`#F1F3EE`) and dark (`#1D211B`) ground underneath |
+| `round4-monochrome-space.png` | the whole set in Monochrome tinted by the Space, one row for Work (hue 268) and one for Home (152), the tint taken from `ds::space::derive`'s accent so it matches the frame |
+
+Rebuild: `target/release/icons face --input ~/comfy/out/round3/klein-ground/<pick>.png --mode
+ground --retint monochrome --tint <hue> --out-dir <klein-dir> --name <app>` for the three Klein
+picks, then `target/release/icons dialects --spec tools/icons/specs/*.toml --klein-dir
+<klein-dir> --out <png>` and `target/release/icons space --spec tools/icons/specs/*.toml --out
+<png>`. No model was run this round: the Klein variants are round three's renders, retinted.
+
+### What changed
+
+- `tools/icons`: the spec names a recommended `dialect` and a `tint` from the palette, and each
+  layer a role (`symbol`, `secondary`, `detail`, `spot`) instead of a colour; the plate is one
+  colour with the tonal shift (Solid: flat); `dialect.rs` holds the palette, the cap and the
+  role table; `retint.rs` brings a model face into a dialect (a lightness plane fitted to the
+  border is the ground, the relief above it is scaled to the dialect's symbol lightness, and
+  mottling under 0.02 L is quietened so the gain lifts the symbol, not the model's texture);
+  `board.rs` builds the cells and derives the Space tint through `ds`.
+- The five specs keep round three's shapes, recoloured by role. Recommended dialects in the
+  specs: mail Monochrome slate, files Solid ochre, terminal Graphite, notes Paper (ochre spot on
+  the fold), photos Monochrome clay.
+- `ds-settings`: `icons.style` (Colour | Muted | Monochrome, default Colour) and
+  `icons.monochrome_tint` (Space | Accent | Neutral, default Space), both Basic on the Appearance
+  page; design/22 3.3 and 5 carry the rows. In Monochrome, third-party icons inside our plates are
+  desaturated and re-tinted to the same hue. Only the keys and the sheets exist; the runtime
+  waits for the pick.
+
+### Reading (the agent's)
+
+- **Colour.** Every plate now sits at or under C 0.07 against round three's 0.15-0.20; next to
+  the Klein retints the procedural plates are the same family of tones, so a mixed set reads as
+  one palette. No icon carries a gradient you can see.
+- **Legibility.** All four dialects keep the symbol at least 0.26 L off its plate, and every
+  procedural cell reads at 32 and 48. At 16: Graphite and Solid are the clearest (light on dark or
+  on colour), Monochrome is close behind, Paper's white plate nearly disappears on the light
+  ground (the ink symbol carries it, the plate edge does not) but is the strongest on dark.
+- **Klein variants.** Mail and photos retint very well: the clay emboss survives, the colour is
+  now the palette's, and at 16/32 they read as well as the procedural Monochrome. Files is
+  weaker: Klein's ground under that pick is mottled, and the gain needed to lift its pale folder
+  also lifts the mottling (a cleaner seed or a re-render would fix it).
+- **Monochrome vs Solid** differ less than the other pairs (both a coloured plate with a light
+  symbol); the difference is tone-on-tone symbol and a tonal shift against a white symbol on a
+  flat plate. If the user wants Solid louder, it is the one dialect that could take a slightly
+  higher cap.
+- **Space tint.** Work and Home give a blue-violet and a green set that match the frames' hues;
+  the symbols stay legible at every size in both.
+
+### Per-app recommendation
+
+| App | Dialect | Why |
+| --- | --- | --- |
+| Mail | Monochrome, the Klein variant | the softest, most crafted emboss of the set, reads at 16 |
+| Files | Solid ochre (procedural) | the Klein files is mottled; Solid's white folder is the clearest at 16 |
+| Terminal | Graphite | a terminal is a dark surface; the light chevron reads at every size |
+| Notes | Paper, ochre spot | the one icon on paper, like a page; the spot marks the fold |
+| Photos | Monochrome clay, the Klein variant | as mail; the off-centre sun keeps it from reading as a person |
+
+That mixes three dialects plus Paper across five apps while keeping one palette and one skeleton.

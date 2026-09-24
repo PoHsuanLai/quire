@@ -1,8 +1,9 @@
-# Mail: a paper envelope pressed up out of a blue-to-violet plate, its flap a groove pressed in.
-# Coordinates are the 24-unit glyph grid laid over the plate; the safe area is 2.4..21.6.
-# design/08-ICONS.md 2.8-2.9: filled shapes only, no strokes; form comes from the emboss.
+# Mail: an envelope standing out of the plate, its flap a groove pressed into it.
+# Coordinates are the 24-unit glyph grid over the plate (safe area 2.4..21.6). Colours come
+# from the dialect's roles (design/08-ICONS.md 2.10); no strokes, form from the emboss.
 name = "mail"
-ground = { start = "blue", end = "violet" }
+dialect = "monochrome"
+tint = "slate"
 grain = 20
 
 [[layer]]
@@ -10,16 +11,13 @@ kind = "rect"
 at = [4.5, 6.5]
 size = [15, 11]
 corners = [2.5, 2.5, 2.5, 1]
-fill = "paper"
-opacity = 0.92
-relief = "raised"
+fill = "symbol"
 
 [[layer]]
 kind = "chevron"
 tip = [12, 12.2]
 reach = 5.2
 heading = "down"
-width = 1.3
-fill = "ink"
-opacity = 0.10
+width = 1.4
+fill = "detail"
 relief = "recessed"
