@@ -8,10 +8,10 @@ use super::emit::{attr_selector, declaration, rule};
 use crate::appearance::{MotionLevel, Scheme};
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    Radius, ScalarToken, Shadow, VarName, ZLayer,
+    Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
 };
 
-/// Colours, radii, shadows, type, z and Standard motion on `.ds`; the dark colours under
+/// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
 /// `.ds[data-theme=dark]`; the level overrides under `.ds[data-motion]`.
 pub fn tokens_css() -> String {
     let mut light = scheme_tokens(Scheme::Light);
@@ -71,11 +71,14 @@ fn colour_value(token: ColourToken, scheme: Scheme) -> String {
     }
 }
 
-/// Everything that is the same in both schemes and at every level: radii, type, z.
+/// Everything that is the same in both schemes and at every level: radii, spacing, type, z.
 fn fixed_tokens() -> Vec<String> {
     let radii = Radius::ALL
         .into_iter()
         .map(|radius| declaration(radius.var(), radius.css()));
+    let spacing = SpacingToken::ALL
+        .into_iter()
+        .map(|step| declaration(step.var(), &step.css()));
     let families = [Family::Display, Family::Ui, Family::Data]
         .into_iter()
         .map(|family| declaration(family.var(), family.stack()));
@@ -85,7 +88,12 @@ fn fixed_tokens() -> Vec<String> {
     let layers = ZLayer::ALL
         .into_iter()
         .map(|layer| declaration(layer.var(), &layer.z().to_string()));
-    radii.chain(families).chain(sizes).chain(layers).collect()
+    radii
+        .chain(spacing)
+        .chain(families)
+        .chain(sizes)
+        .chain(layers)
+        .collect()
 }
 
 /// Durations, the CSS delays, easings and scalars at `level`.

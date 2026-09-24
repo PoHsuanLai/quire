@@ -52,7 +52,9 @@ pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
-pub use hover_card::{HoverCard, HoverTarget};
+pub use hover_card::{
+    FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
+};
 pub use hover_strip::{ActionId, HoverStrip, StripAction};
 pub use icon_button::{IconButton, IconButtonVariant};
 pub use kbd::{Kbd, KbdSize};

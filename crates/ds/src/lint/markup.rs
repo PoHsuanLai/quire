@@ -10,14 +10,15 @@
 //! itself, so a page that forgets to inject quire's sheet is caught too.
 //!
 //! A class no rule styles is [`Rule::UnstyledClass`]; an element quire draws for you written by
-//! hand (an `<svg>` that is not a `Glyph`, a form control with no `ds-` class) is
-//! [`Rule::RawMarkup`]; inline colours and durations are the stylesheet rules. Each offence's
+//! hand (an `<svg>` that is neither a `Glyph` nor marked `data-ds-svg`, a form control with no
+//! `ds-` class) is [`Rule::RawMarkup`]; inline colours and durations are the stylesheet rules
+//! (`super::inline_style`), except in the custom properties a quire component computes and
+//! writes on its own element. Each offence's
 //! selector is the element as `tag.class.class`, which is what an [`super::Exception`] names.
 
 use std::collections::HashSet;
 
-use super::colours;
-use super::declaration::COLOUR_FUNCTIONS;
+use super::inline_style::{self, Owner};
 use super::kind;
 use super::rule::{LintConfig, Offence, Rule};
 use super::tokenize::{self, Located};
@@ -73,7 +74,8 @@ fn check_tag(tag: &str, line: u32, column: u32, defined: &HashSet<String>, out: 
             format!("<{name}>: class not defined by any rule: {class}"),
         );
     }
-    if let Some(what) = raw_element(name, &classes) {
+    let marked = attr_value(tag, "data-ds-svg").is_some();
+    if let Some(what) = raw_element(name, &classes, marked) {
         push(Rule::RawMarkup, line, column, format!("<{name}>: {what}"));
     }
     if let Some((style_value, value_offset)) = attr_value(tag, "style") {
@@ -83,16 +85,30 @@ fn check_tag(tag: &str, line: u32, column: u32, defined: &HashSet<String>, out: 
         } else {
             (line + local_line - 1, local_column)
         };
-        for (rule, line, column, text) in style_offences(style_value, style_line, style_column) {
+        let owner = if classes.iter().any(|class| is_quire_class(class)) {
+            Owner::Quire
+        } else {
+            Owner::Consumer
+        };
+        for (rule, line, column, text) in
+            inline_style::offences(style_value, owner, style_line, style_column)
+        {
             push(rule, line, column, text);
         }
     }
 }
 
-/// Why `name` with `classes` is hand-written markup quire should have drawn, if it is.
-fn raw_element(name: &str, classes: &[&str]) -> Option<&'static str> {
+/// Whether `class` is one quire's components write: the root's `ds` or any `ds-*`.
+fn is_quire_class(class: &str) -> bool {
+    class == "ds" || class.starts_with("ds-")
+}
+
+/// Why `name` with `classes` is hand-written markup quire should have drawn, if it is. An
+/// `<svg>` is quire's when it is a `Glyph` (`.ds-ic`) or carries the `data-ds-svg` marker a
+/// component that draws its own vector (the SendPill's ring) writes.
+fn raw_element(name: &str, classes: &[&str], marked: bool) -> Option<&'static str> {
     if name.eq_ignore_ascii_case("svg") {
-        return (!classes.contains(&"ds-ic"))
+        return (!classes.contains(&"ds-ic") && !marked)
             .then_some("raw svg, not .ds-ic: use Glyph instead of writing SVG markup directly");
     }
     let control = CONTROLS
@@ -100,40 +116,6 @@ fn raw_element(name: &str, classes: &[&str]) -> Option<&'static str> {
         .any(|control| name.eq_ignore_ascii_case(control));
     let from_quire = classes.iter().any(|class| class.starts_with("ds-"));
     (control && !from_quire).then_some("a raw form control: use the quire component that draws it")
-}
-
-/// Inline colours and durations in a `style` attribute, as `(rule, line, column, text)`.
-fn style_offences(value: &str, base_line: u32, base_column: u32) -> Vec<(Rule, u32, u32, String)> {
-    let mut out = Vec::new();
-    let tokens: Vec<Located> = tokenize::tokens(value)
-        .into_iter()
-        .filter(|token| !kind::is_trivial(&token.text))
-        .collect();
-    for token in &tokens {
-        let (line, column) = if token.line == 1 {
-            (base_line, base_column + token.column - 1)
-        } else {
-            (base_line + token.line - 1, token.column)
-        };
-        let rule = if kind::is_hash(&token.text) {
-            Some(Rule::HexColour)
-        } else if let Some(name) = kind::function_name(&token.text) {
-            COLOUR_FUNCTIONS
-                .contains(&name.to_ascii_lowercase().as_str())
-                .then_some(Rule::ColourFunction)
-        } else if kind::is_ident(&token.text) && !token.text.eq_ignore_ascii_case("currentcolor") {
-            colours::is_named_colour(&token.text).then_some(Rule::NamedColour)
-        } else {
-            kind::dimension_unit(&token.text).and_then(|unit| {
-                (unit.eq_ignore_ascii_case("ms") || unit.eq_ignore_ascii_case("s"))
-                    .then_some(Rule::RawDuration)
-            })
-        };
-        if let Some(rule) = rule {
-            out.push((rule, line, column, format!("style=\"...\": {}", token.text)));
-        }
-    }
-    out
 }
 
 /// Every class a `.` selector in `css` names, anywhere (as generous as mailo's own

@@ -9,14 +9,14 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: var(--s-12);
+  padding: var(--s-16);
   max-width: 360px;
 }
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--s-8);
 }
 
 /* The "Sent" confirmation: shown for exactly as long as ds::settle(Anim::Fade, ...) says,

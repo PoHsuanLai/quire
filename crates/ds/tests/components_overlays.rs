@@ -321,3 +321,14 @@ fn every_overlay_golden_lints_clean() {
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
+
+/// A sender card composed from `HoverCardPart`s draws exactly the markup section 22 writes by
+/// hand, so a consumer loses nothing by using the parts.
+#[test]
+fn the_parts_draw_the_hand_written_card() {
+    let read = |state: &str| {
+        std::fs::read_to_string(golden::path(&format!("overlays/hover_card/{state}.html")))
+            .expect("the golden exists")
+    };
+    assert_eq!(read("sender-parts"), read("sender-open"));
+}

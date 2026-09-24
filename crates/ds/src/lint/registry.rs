@@ -13,12 +13,12 @@ use crate::motion::Anim;
 use crate::space::{CardAccent, FrameVars, SpaceLook};
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    Radius, ScalarToken, Shadow, VarName, ZLayer,
+    Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
 };
 
 /// Every custom property the design system declares, `--` included: the token table's
-/// (colours, label hues, durations, the CSS delays, easings, scalars, radii, shadows, faces,
-/// sizes, layers), the accent swatches, the frame's `--f-*` a root writes inline, and the
+/// (colours, label hues, durations, the CSS delays, easings, scalars, radii, spacing steps,
+/// shadows, faces, sizes, layers), the accent swatches, the frame's `--f-*` a root writes inline, and the
 /// material's `--m-*` with the tint-alpha key.
 pub fn declared_vars() -> &'static HashSet<String> {
     static VARS: LazyLock<HashSet<String>> = LazyLock::new(collect);
@@ -34,6 +34,7 @@ fn collect() -> HashSet<String> {
         .chain(EasingToken::ALL.map(EasingToken::var))
         .chain(ScalarToken::ALL.map(ScalarToken::var))
         .chain(Radius::ALL.map(Radius::var))
+        .chain(SpacingToken::ALL.map(SpacingToken::var))
         .chain(Shadow::ALL.map(Shadow::var))
         .chain(FontSize::ALL.map(FontSize::var))
         .chain(ZLayer::ALL.map(ZLayer::var))
@@ -124,6 +125,8 @@ mod tests {
             "--m-tint",
             "--m-tint-alpha",
             "--font-data",
+            "--s-1",
+            "--s-36",
         ];
         for name in CASES {
             assert!(declared_vars().contains(*name), "{name}");
