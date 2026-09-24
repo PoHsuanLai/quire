@@ -86,6 +86,7 @@ impl Headless {
         vdom.provide_root_context(HostScale(scale));
         vdom.provide_root_context(crate::measure::MEASURE);
         vdom.provide_root_context(crate::focus::FOCUS);
+        vdom.provide_root_context(crate::focus::SELECT);
         vdom.provide_root_context(HostClipboard::of(
             Arc::clone(&shell) as Arc<dyn ShellProvider>
         ));

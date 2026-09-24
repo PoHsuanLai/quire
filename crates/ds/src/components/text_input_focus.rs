@@ -2,6 +2,7 @@
 
 use crate::focus::host::focus_soon_told;
 use crate::focus::request::{FocusRequest, FocusTicket};
+use crate::focus::select::Select;
 use dioxus::prelude::*;
 
 /// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
@@ -18,6 +19,14 @@ pub enum Focus {
 }
 
 impl Focus {
+    /// What the field does with its text when the focus lands: a controlled request's choice.
+    fn select(self) -> Select {
+        match self {
+            Focus::Controlled(request) => request.select(),
+            Focus::OnMount | Focus::Manual => Select::None,
+        }
+    }
+
     /// Whether the field takes the focus as it mounts.
     pub(crate) fn on_mount(self) -> bool {
         matches!(self, Focus::OnMount | Focus::Controlled(_))
@@ -50,7 +59,7 @@ impl FieldFocus {
             served.set(request.peek());
         }
         if focus.on_mount() {
-            focus_soon_told(event.data(), told);
+            focus_soon_told(event.data(), focus.select(), told);
         }
     }
 
@@ -63,7 +72,7 @@ impl FieldFocus {
         };
         if ticket != *served.peek() {
             served.set(ticket);
-            focus_soon_told(element, told);
+            focus_soon_told(element, request.select(), told);
         }
     }
 }
