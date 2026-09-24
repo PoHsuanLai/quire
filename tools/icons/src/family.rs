@@ -47,6 +47,18 @@ impl Family {
         }
     }
 
+    /// The family's soft tint (08 2.3; the paper family's is Post `--surface-2`).
+    pub const fn soft(self) -> Srgb8 {
+        Srgb8::hex(match self {
+            Family::Red => 0xFBE3E1,
+            Family::Amber => 0xFAEBD2,
+            Family::Green => 0xDCF1E1,
+            Family::Blue => 0xE2EBFF,
+            Family::Violet => 0xECE4FB,
+            Family::Paper => 0xF1F3EE,
+        })
+    }
+
     /// The lower-case name used on the command line.
     pub const fn name(self) -> &'static str {
         match self {

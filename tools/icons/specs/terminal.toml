@@ -1,0 +1,19 @@
+# Terminal: an ink prompt chevron and a paper cursor block, straight on the plate.
+name = "terminal"
+family = "violet"
+grain = 30
+
+[[layer]]
+kind = "chevron"
+tip = [11, 12]
+reach = 4
+heading = "right"
+stroke = "ink"
+
+[[layer]]
+kind = "rect"
+at = [13.5, 8.5]
+size = [4.5, 7.5]
+corners = [1, 1, 1, 1]
+fill = "paper"
+lift = "lifted"

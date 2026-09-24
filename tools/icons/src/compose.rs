@@ -39,6 +39,16 @@ fn unit(grid: PlateGrid) -> f32 {
 /// The shadowless icon (08 2.6 `flat`): gradient plate, the fitted object, the inner top
 /// highlight (sizes >= 24) and the inner rim, all clipped to the squircle.
 pub fn compose(grid: PlateGrid, stops: Stops, object: &Rgba32FImage, t: &Template) -> Rgba32FImage {
+    compose_on(grid, &gradient(grid, stops), object, t)
+}
+
+/// [`compose`] over a plate already painted (the abstract icons add grain to it first).
+pub fn compose_on(
+    grid: PlateGrid,
+    plate: &Rgba32FImage,
+    object: &Rgba32FImage,
+    t: &Template,
+) -> Rgba32FImage {
     let mask = plate_mask(grid, t);
     let s = unit(grid);
     let step = s.round() as i64;
@@ -56,8 +66,7 @@ pub fn compose(grid: PlateGrid, stops: Stops, object: &Rgba32FImage, t: &Templat
         let (x, y) = (i64::from(x), i64::from(y));
         mask.at(x, y) * (1.0 - inner.at(x, y))
     });
-    let plate = gradient(grid, stops);
-    let base = over_image(object, &plate);
+    let base = over_image(object, plate);
     let base = over_image(&tint(&rim, [0.0; 3], 0.08), &base);
     let base = match grid.canvas {
         c if c >= 24 => over_image(&tint(&highlight, [1.0; 3], 0.35), &base),

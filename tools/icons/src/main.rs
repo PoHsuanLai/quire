@@ -4,8 +4,9 @@ use std::path::{Path, PathBuf};
 
 use clap::{Parser, Subcommand};
 use icons::{
-    Cell, EXPORT_SIZES, Family, IconsError, Sheet, SheetStyle, Template, build_sheet, compose,
-    drop_shadow, export, fit_object, grid_for, key_background, size_strip,
+    Cell, EXPORT_SIZES, Family, IconsError, Plane, Sheet, SheetStyle, Spec, Template, build_sheet,
+    compose, drop_shadow, emblem, export, fit_object, grain_tile, grid_for, key_background,
+    parse_spec, size_strip, strip, strip_sheet,
 };
 use image::{DynamicImage, Rgba32FImage};
 
@@ -31,6 +32,17 @@ enum Command {
         /// Also write the hicolor size set (08 2.6) under this directory.
         #[arg(long)]
         export_dir: Option<PathBuf>,
+    },
+    /// Compose abstract icons from TOML specs (08 2.8): per spec, <name>.png (1024 master with
+    /// shadow), <name>.flat.png and the hicolor size set, each size rendered natively.
+    Abstract {
+        #[arg(long, num_args = 1.., required = true)]
+        spec: Vec<PathBuf>,
+        #[arg(long)]
+        out_dir: PathBuf,
+        /// Also write a sheet: each icon at 512, 48, 32 and 16 px 1:1 on light and dark grounds.
+        #[arg(long)]
+        sheet: Option<PathBuf>,
     },
     /// A contact sheet: rows x cols of `<dir>/<row>-<col><suffix>`.
     Sheet {
@@ -104,6 +116,69 @@ fn plate(
                 )?;
             }
         }
+    }
+    Ok(())
+}
+
+/// One size of an abstract icon: the flat render, plus the baked shadow from 48 px (08 2.5).
+fn abstract_size(spec: &Spec, size: u32, t: &Template, tile: &Plane) -> Rgba32FImage {
+    let flat = emblem(spec, size, t, tile);
+    match size >= 48 {
+        true => drop_shadow(&flat, grid_for(size, t), t),
+        false => flat,
+    }
+}
+
+fn abstract_icons(
+    specs: &[PathBuf],
+    out_dir: &Path,
+    sheet: Option<&Path>,
+) -> Result<(), IconsError> {
+    let t = Template::default();
+    let tile = grain_tile();
+    let specs = specs
+        .iter()
+        .map(|p| parse_spec(&std::fs::read_to_string(p)?))
+        .collect::<Result<Vec<_>, IconsError>>()?;
+    for spec in &specs {
+        let name = &spec.name;
+        let flat = emblem(spec, 1024, &t, &tile);
+        save(&flat, &out_dir.join(format!("{name}.flat.png")))?;
+        save(
+            &drop_shadow(&flat, grid_for(1024, &t), &t),
+            &out_dir.join(format!("{name}.png")),
+        )?;
+        for size in EXPORT_SIZES {
+            save(
+                &abstract_size(spec, size, &t, &tile),
+                &out_dir.join(format!("hicolor/{size}x{size}/apps/{name}.png")),
+            )?;
+            if size <= 256 {
+                save(
+                    &abstract_size(spec, size * 2, &t, &tile),
+                    &out_dir.join(format!("hicolor/{size}x{size}@2/apps/{name}.png")),
+                )?;
+            }
+        }
+    }
+    if let Some(out) = sheet {
+        let rows: Vec<(String, Rgba32FImage)> = specs
+            .iter()
+            .map(|s| {
+                (
+                    s.name.to_uppercase(),
+                    strip(&[512, 48, 32, 16], |size| abstract_size(s, size, &t, &tile)),
+                )
+            })
+            .collect();
+        save(
+            &strip_sheet(
+                "ABSTRACT - FROM TOKENS - 512 48 32 16 AT 1:1 ON LIGHT AND DARK",
+                &rows,
+                &SheetStyle::default(),
+            ),
+            out,
+        )?;
     }
     Ok(())
 }
@@ -186,6 +261,11 @@ fn main() -> Result<(), IconsError> {
             &name,
             export_dir.as_deref(),
         ),
+        Command::Abstract {
+            spec,
+            out_dir,
+            sheet,
+        } => abstract_icons(&spec, &out_dir, sheet.as_deref()),
         Command::Sheet {
             dir,
             rows,
