@@ -928,7 +928,7 @@ per row:
 | Component | Prop or type | What it does |
 | --- | --- | --- |
 | `ListRow` | `subject: Text` (`#[props(into)]`) | A `String`, `&str` or `format!` still works; `Text::Runs(vec![Run::new("UIDL", RunTone::Mark), ..])` draws a search hit as `mark.ds-mark` and a `Strong`/`Faint` run as `span.ds-run[data-tone]`. |
-| `ListRow` | `snippet: Option<Text>` | A string, `None` or a `Text`. `Some(string)` no longer infers: write the string itself, or `Some(string.into())` (an `Option<String>` you hold: `.map(Text::from)`). |
+| `ListRow` | `snippet: Option<Text>` | Accepted, each as `Some` unless it is an `Option`: a `&str` (a literal, or `"{formatted}"` in `rsx!`) or a `String` (both through quire's `SuperFrom`); a `Text` (`Plain` or `Runs`); an `Option<Text>`, `Some(text)` or `None`. Not accepted: `Some(string)` or `Some("literal")` (the `Some` hides the `String` from the conversion: write the string alone, or `Some(string.into())`), a `&String` (write `string.clone()` or `string.as_str()`), and an `Option<String>` you hold (write `.map(Text::from)`). `crates/ds/tests/snippet_forms.rs` compiles and renders every accepted form. |
 | `ListRow` | `on_sender: Option<PartHooks>` | `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>` each) on the name: the sender card. |
 | `ListRow` | `on_time: Option<PartHooks>` | The same on the time: the time tip (`HoverKind::Tip`, below). |
 | `ListRow` | `onpointerenter` / `onpointerleave: Option<EventHandler<PointerEvent>>` | The row itself: the thread card. |
