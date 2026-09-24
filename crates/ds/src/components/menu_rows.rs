@@ -1,8 +1,11 @@
-//! Drawing a panel's lines: headers, rules and choice rows, each row wired to report a click,
+//! Drawing a panel's lines: headers, status lines, rules and choice rows, each row wired to report a click,
 //! a pointer move and its mount by its choice number (`menu_lines`).
 
-use crate::components::menu_entry::{Branch, ItemView, MenuEntry, Row, Trail, item};
+use crate::components::menu_entry::{
+    Branch, ItemView, MenuEntry, Row, RowEvents, Trail, info, item,
+};
 use crate::components::menu_lines::Line;
+use crate::components::press::Press;
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::{Selection, Switch};
 use crate::geometry::Point;
@@ -22,6 +25,9 @@ pub(crate) struct Drawn {
     pub onpoint: EventHandler<(usize, Point)>,
     /// A choice's element mounted.
     pub onmounted: EventHandler<(usize, MountedEvent)>,
+    /// A button released over a choice, where the panel listens for it (a menu's root panel,
+    /// for press-drag-release).
+    pub onrelease: Option<EventHandler<(usize, Press)>>,
 }
 
 /// Draw `lines` as `row`s.
@@ -35,6 +41,9 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                     return rsx! {
                         SectionHeader { kind: HeaderKind::Menu, text: text.clone() }
                     };
+                }
+                MenuEntry::Info { title, detail } => {
+                    return info(title, detail.as_deref());
                 }
                 MenuEntry::Separator => {
                     return rsx! {
@@ -88,12 +97,18 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                 ),
             };
             index += 1;
+            let release = drawn
+                .onrelease
+                .map(|onrelease| EventHandler::new(move |press| onrelease.call((at, press))));
             item(
                 view,
                 row,
-                EventHandler::new(move |()| drawn.onpick.call(at)),
-                EventHandler::new(move |point| drawn.onpoint.call((at, point))),
-                EventHandler::new(move |event| drawn.onmounted.call((at, event))),
+                RowEvents {
+                    pick: EventHandler::new(move |()| drawn.onpick.call(at)),
+                    point: EventHandler::new(move |point| drawn.onpoint.call((at, point))),
+                    mounted: EventHandler::new(move |event| drawn.onmounted.call((at, event))),
+                    release,
+                },
             )
         })
         .collect();

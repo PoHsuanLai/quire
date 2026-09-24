@@ -242,6 +242,14 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
+            // design/13 section 13.3.2: "fade over `--t-quick` with `--e-exit`".
+            Anim::MenuOut => recipe(
+                "menu-out",
+                DurationToken::Quick,
+                EasingToken::Exit,
+                Fill::Forwards,
+                Iteration::Once,
+            ),
             // `S:684`.
             Anim::BubblePop => recipe(
                 "menu-pop",

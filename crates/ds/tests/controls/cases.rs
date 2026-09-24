@@ -135,6 +135,16 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "icon_button",
+        state: "status",
+        make: || rsx! { IconButton { variant: IconButtonVariant::Status, icon: Icon::Ethernet, label: "Wired network", id: "net".to_string(), onclick: |_| {} } },
+    },
+    Case {
+        component: "icon_button",
+        state: "status-open",
+        make: || rsx! { IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryCharging, label: "Battery", expanded: Switch::On, onclick: |_| {} } },
+    },
+    Case {
+        component: "icon_button",
         state: "disabled",
         make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
     },

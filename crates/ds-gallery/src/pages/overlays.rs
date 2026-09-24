@@ -7,9 +7,9 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant,
-    Check, CommandPalette, Elevation, Filter, Icon, Key, Menu, MenuEntry, MenuKind, MountedRef,
-    Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet, Shortcut, Side, Switch,
-    Tile, Trail, use_toast_hub,
+    Check, CommandPalette, Elevation, Filter, Icon, Key, Menu, MenuEntrance, MenuEntry, MenuKind,
+    MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet, Shortcut,
+    Side, Switch, Tile, Trail, use_toast_hub,
 };
 
 /// Everything the page can open, one at a time.
@@ -17,6 +17,7 @@ use ds::{
 enum Opened {
     Menu(MenuKind),
     Nested,
+    Status,
     Palette,
     Popover(Elevation),
     Peek(PeekMode),
@@ -46,6 +47,13 @@ const POSED_AT: Point = Point {
 /// Where a posed snapshot opens the submenu specimen: right of the Rich menu.
 const POSED_NESTED_AT: Point = Point {
     x: Px(400.0),
+    y: Px(330.0),
+};
+
+/// Where a posed snapshot opens the bar status menu: the Dropdown hangs left of this point,
+/// clear of the submenu specimen.
+const POSED_STATUS_AT: Point = Point {
+    x: Px(1230.0),
     y: Px(330.0),
 };
 
@@ -95,6 +103,7 @@ pub fn OverlaysPage() -> Element {
                     {button(Opened::Menu(kind), label)}
                 }
                 {button(Opened::Nested, "Submenus and disabled items")}
+                {button(Opened::Status, "Bar status menu (status lines, no entrance)")}
             }
         }
         Section { title: "Palette, popovers, peek, sheet, scrim",
@@ -121,6 +130,14 @@ pub fn OverlaysPage() -> Element {
                 onpick: move |_| {},
                 onclose: move |_| {},
             }
+            Menu::<u8> {
+                kind: MenuKind::Dropdown,
+                anchor: Anchor::Point(POSED_STATUS_AT),
+                entries: status(),
+                entrance: MenuEntrance::Instant,
+                onpick: move |_| {},
+                onclose: move |_| {},
+            }
         }
         match opened() {
             Some(Opened::Menu(kind)) => rsx! {
@@ -139,6 +156,16 @@ pub fn OverlaysPage() -> Element {
                     kind: MenuKind::Context,
                     anchor: at.clone(),
                     entries: nested(),
+                    onpick: move |_| {},
+                    onclose: close,
+                }
+            },
+            Some(Opened::Status) => rsx! {
+                Menu::<u8> {
+                    kind: MenuKind::Dropdown,
+                    anchor: at.clone(),
+                    entries: status(),
+                    entrance: MenuEntrance::Instant,
                     onpick: move |_| {},
                     onclose: close,
                 }
@@ -180,6 +207,32 @@ pub fn OverlaysPage() -> Element {
             None => rsx! {},
         }
     }
+}
+
+/// A bar status menu (bar gaps): status lines that are never choices, a rule, then the items.
+fn status() -> Vec<MenuEntry<u8>> {
+    let item = |value: u8, title: &str| MenuEntry::Item {
+        availability: Availability::Enabled,
+        value,
+        title: title.to_string(),
+        detail: None,
+        tile: None,
+        trail: Trail::None,
+        check: None,
+    };
+    vec![
+        MenuEntry::Info {
+            title: "Wired: connected".to_string(),
+            detail: Some("192.168.1.4 · 1 Gb/s".to_string()),
+        },
+        MenuEntry::Info {
+            title: "VPN: off".to_string(),
+            detail: None,
+        },
+        MenuEntry::Separator,
+        item(1, "Disconnect"),
+        item(2, "Network settings…"),
+    ]
 }
 
 /// A person's face for a menu tile.
@@ -347,7 +400,7 @@ fn Palette(onclose: EventHandler<()>) -> Element {
                 MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
                     title.to_lowercase().contains(&typed.to_lowercase())
                 }
-                MenuEntry::Header(_) | MenuEntry::Separator => true,
+                MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => true,
             })
             .collect()
     };

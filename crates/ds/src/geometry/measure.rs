@@ -8,13 +8,18 @@
 //! document mutably, and a task woken in the same turn as a dirty scope is polled inside
 //! `render_immediate` while the renderer already holds that borrow: the read panics ("RefCell
 //! already borrowed", wave 2 integration). A host that knows its document provides
-//! [`HostMeasure`], which answers [`Measured::Busy`] instead, and the read waits a frame.
+//! [`HostMeasure`], which answers [`Measured::Busy`] instead, and the read waits a frame. With
+//! no host measurer the read is guarded so the same collision is `Busy` too, never a panic.
 
 use super::units::{Point, Px, Rect, Size};
 use crate::time::{FRAME_SLACK, sleep};
 use dioxus::html::geometry::PixelsRect;
 use dioxus::prelude::*;
+use std::future::Future;
+use std::panic::AssertUnwindSafe;
+use std::pin::Pin;
 use std::rc::Rc;
+use std::task::{Context, Poll};
 
 /// One attempt at reading an element's rect through the host.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -27,8 +32,10 @@ pub enum Measured {
     Unknown,
 }
 
-/// The host's own rect read, provided as root context by `ds-native`; without one, reads use
-/// `MountedData::get_client_rect` (the webview answers it from JavaScript, with no borrow).
+/// The host's own rect read, provided as root context by `ds-native` (`ds_native::launch`, its
+/// harness, and `ds_native::measure::provide` for any other Blitz host); without one, reads use
+/// `MountedData::get_client_rect` (the webview answers it from JavaScript, with no borrow),
+/// guarded so a renderer that holds its document answers [`Measured::Busy`] instead of panicking.
 #[derive(Debug, Clone, Copy)]
 pub struct HostMeasure(pub fn(&MountedData) -> Measured);
 
@@ -38,17 +45,51 @@ const BUSY_ATTEMPTS: usize = 8;
 /// `element`'s rect now, through the host's [`HostMeasure`] when there is one. `None` when the
 /// renderer cannot measure it. Call it from a task, never from inside a handler or render.
 pub(crate) async fn client_rect(element: &MountedData) -> Option<Rect> {
-    let Some(HostMeasure(read)) = try_consume_context::<HostMeasure>() else {
-        return element.get_client_rect().await.ok().map(from_pixels);
-    };
+    let host = try_consume_context::<HostMeasure>();
     for _ in 0..BUSY_ATTEMPTS {
-        match read(element) {
+        let read = match host {
+            Some(HostMeasure(read)) => read(element),
+            None => unhosted(element).await,
+        };
+        match read {
             Measured::At(rect) => return Some(rect),
             Measured::Busy => sleep(FRAME_SLACK).await,
             Measured::Unknown => return None,
         }
     }
     None
+}
+
+/// A read with no host measurer. dioxus-native-dom's rect read borrows its document when the
+/// read is first polled, and panics ("RefCell already borrowed") when a task polled inside the
+/// renderer's own pass makes it (sill FINDINGS Q10: a shell-host root with no measurer). `ds`
+/// cannot name the Blitz node to `try_borrow` it, so the poll is guarded instead: a panic there
+/// left nothing half-written (the borrow failed before anything was read) and reads as
+/// [`Measured::Busy`], and the caller asks again next frame. The default panic hook still
+/// prints the message; a Blitz host provides `ds_native::measure::provide()` so the collision
+/// never happens.
+async fn unhosted(element: &MountedData) -> Measured {
+    match Guarded(Box::pin(element.get_client_rect())).await {
+        Some(Ok(rect)) => Measured::At(from_pixels(rect)),
+        Some(Err(_)) => Measured::Unknown,
+        None => Measured::Busy,
+    }
+}
+
+/// A future whose poll may panic, polled so that a panic ends it with `None`.
+struct Guarded<F: Future>(Pin<Box<F>>);
+
+impl<F: Future> Future for Guarded<F> {
+    type Output = Option<F::Output>;
+
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        let inner = self.0.as_mut();
+        match std::panic::catch_unwind(AssertUnwindSafe(move || inner.poll(cx))) {
+            Ok(Poll::Ready(value)) => Poll::Ready(Some(value)),
+            Ok(Poll::Pending) => Poll::Pending,
+            Err(_) => Poll::Ready(None),
+        }
+    }
 }
 
 /// A mounted element, kept so its rect can be read again when the surface moves.
@@ -148,5 +189,47 @@ pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
             width: Px(rect.size.width as f32),
             height: Px(rect.size.height as f32),
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Guarded;
+    use std::cell::RefCell;
+    use std::future::Future;
+    use std::pin::pin;
+    use std::task::{Context, Poll, Waker};
+
+    /// Poll `future` once with a waker that does nothing.
+    fn poll_once<F: Future>(future: F) -> Poll<F::Output> {
+        let mut context = Context::from_waker(Waker::noop());
+        pin!(future).poll(&mut context)
+    }
+
+    /// The Blitz read's failure, reduced: a read that borrows a document the renderer holds.
+    async fn read(document: &RefCell<u32>) -> u32 {
+        *document.borrow()
+    }
+
+    #[test]
+    fn a_read_of_a_held_document_is_busy_not_a_panic() {
+        let document = RefCell::new(7);
+        assert_eq!(
+            poll_once(Guarded(Box::pin(read(&document)))),
+            Poll::Ready(Some(7)),
+            "a free document reads"
+        );
+        let held = document.borrow_mut();
+        assert_eq!(
+            poll_once(Guarded(Box::pin(read(&document)))),
+            Poll::Ready(None),
+            "a held document is busy"
+        );
+        drop(held);
+        assert_eq!(
+            poll_once(Guarded(Box::pin(read(&document)))),
+            Poll::Ready(Some(7)),
+            "and reads again once it is free"
+        );
     }
 }

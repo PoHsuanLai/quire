@@ -37,7 +37,7 @@ pub use geometry::{
     PopoverRequest, Px, Rect, RectProbe, Side, Size, place, use_rect,
 };
 pub use icon::render::{Glyph, IconSize};
-pub use icon::{ExternalIcon, Icon, IconSource, IconUrl, Shape};
+pub use icon::{ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, Shape};
 pub use material::{Blur, BlurState, Material, MaterialRecipe, recipe};
 pub use motion::{
     Anim, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent, IntentEffect,
@@ -51,7 +51,9 @@ pub use overlay::{
     MenuTrackEvent, OverlayHost, OverlayId, Overlays, ToastHub, ToastState, UndoToken,
     use_hover_hub, use_overlays, use_toast_hub,
 };
-pub use root::{Ds, Env, HostModality, Inject, InputModality, Surface, use_env};
+pub use root::{
+    Ds, Env, FrameTint, Ground, HostModality, Inject, InputModality, RootChrome, Surface, use_env,
+};
 pub use space::{
     Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
     POST_LIGHT, PRESETS, Palette, Preset, SpaceDefaults, SpaceLook, SpaceStore, Verdict, Workspace,

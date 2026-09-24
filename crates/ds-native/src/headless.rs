@@ -103,14 +103,15 @@ impl Headless {
         }
     }
 
-    /// Paint the document as it was last resolved.
-    pub(crate) fn paint(&mut self) -> Result<image::RgbaImage, NativeError> {
+    /// Paint the document as it was last resolved, over `backdrop`.
+    pub(crate) fn paint(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, NativeError> {
         let (width, height) = physical(self.viewport);
         let scale = scale(self.viewport);
         let mut inner = self.doc.inner.borrow_mut();
-        let ground = match inner.viewport().color_scheme {
-            ColorScheme::Dark => Color::BLACK,
-            ColorScheme::Light => Color::WHITE,
+        let ground = match (backdrop, inner.viewport().color_scheme) {
+            (Backdrop::Clear, _) => Color::TRANSPARENT,
+            (Backdrop::Scheme, ColorScheme::Dark) => Color::BLACK,
+            (Backdrop::Scheme, ColorScheme::Light) => Color::WHITE,
         };
         let canvas = Rect::new(0.0, 0.0, f64::from(width), f64::from(height));
         let pixels = render_to_buffer::<VelloCpuImageRenderer, _>(
@@ -128,6 +129,17 @@ impl Headless {
             ))
         })
     }
+}
+
+/// What a headless picture is painted over.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Backdrop {
+    /// The scheme's own ground, white or black: what a window shows behind a document.
+    #[default]
+    Scheme,
+    /// Nothing: fully transparent, as a shell surface is where its document paints nothing, so
+    /// a picture's alpha is the document's own coverage.
+    Clear,
 }
 
 /// Device pixels per logical pixel.

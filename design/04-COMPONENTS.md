@@ -320,7 +320,7 @@ Mapping: `.tool` -> `[data-variant=tool]`; `.foot-btn` -> `[data-variant=foot]`;
 
 ```rust
 #[component] pub fn IconButton(
-    variant: IconButtonVariant,        // Tool | Foot | Strip | Pin
+    variant: IconButtonVariant,        // Tool | Foot | Strip | Pin | Status
     #[props(into)] icon: IconSource, label: String, // Icon converts; label -> aria-label (required)
     #[props(default)] tooltip: Option<String>,   // -> title; Strip uses Tooltip::Fly instead
     #[props(default)] pressed: Option<Switch>,   // Pin
@@ -344,6 +344,18 @@ takes the variant's size below.
 | Foot | 24 x 24 | 8px | `--f-ink-soft`, transparent | 16 | Space frame |
 | Strip | 26 x 26 (C 28) | 999px | `--ink-soft`, transparent | 14 (C 15) | strip pill (`--raise`) |
 | Pin | aspect-ratio 1, fills a 4-column grid cell, gap 6 | 12px | `--f-ink`, bg `--f-pill-hover` | content (§27) | Space frame |
+| Status | `--bar-status-box` square (default 22) | `--r-item` | `--f-ink-soft`, transparent; hover `--f-ink` on `--f-pill-hover`; pressed/expanded `--f-pill` | `--bar-status-glyph` (default 16), sized in CSS | Space frame (the bar) |
+
+Status is settled (bar gaps, sill Q12; 13 §13.3.1): a consumer writes the two properties with
+`ds::StatusMetrics` from `bar.status_icon_box_px`, `bar.status_glyph_px` and
+`bar.glyph_size_policy` (22-SETTINGS §3).
+
+**The frame ground** (settled, bar gaps): the sidebar item's pattern (§19, `--f-*` inks on the
+frame) is a scope, not a per-component variant. Under `data-ground="frame"` (a Bar or Dock root,
+or `Surface { on: Some(Ground::Frame) }`) the paper inks and fills are the frame's (`--ink*`
+→ `--f-ink*`, `--surface` → `--f-pill-hover`, `--surface-2`/`--raise` → `--f-pill`, `--line*` →
+`--f-line`), so every component on it draws in the frame inks; overlays opened from it are
+paper.
 
 **States.**
 
@@ -1755,12 +1767,19 @@ Mapping: `.fmenu` -> `.ds-menu[data-kind=rich]`; `.fmenu.slim` -> `[data-kind=sl
     onpick: EventHandler<T>, onclose: EventHandler<()>,
     #[props(default)] timing: MenuTiming, // submenu delay and triangle timeout (13 §13.3.4)
     #[props(default)] expanded: Option<usize>, // a choice whose submenu opens on mount
+    #[props(default)] on_hover: Option<EventHandler<Option<usize>>>, // settled (bar gaps): choice under the pointer
+    #[props(default)] on_release: Option<EventHandler<Press>>,        // settled: every release over the menu
+    #[props(default)] entrance: MenuEntrance,                        // settled: Animated | Instant (bar menus)
 ) -> Element
+// Settled (bar gaps, sill Q11): a pick calls `onpick`, then `onclose`, once; Escape and an
+// outside click play `menu-out` (`--t-quick --e-exit`, 13 §13.3.2) before `onclose`; a
+// release over an enabled item after a press that began outside picks it (press-drag-release).
 pub enum MenuEntry<T> {
     Item { value: T, title: String, detail: Option<String>, tile: Option<Tile>, trail: Trail,
            check: Option<Check>, availability: Availability },
     Submenu { title: String, tile: Option<Tile>, availability: Availability, children: Vec<MenuEntry<T>> },
     Header(String),
+    Info { title: String, detail: Option<String> }, // settled (bar gaps): a status line, never a choice
     Separator,
 }
 pub enum Tile { Icon(Icon), Text(String), Avatar(Avatar) }

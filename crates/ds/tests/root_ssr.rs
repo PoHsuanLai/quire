@@ -1,5 +1,5 @@
 //! The `Ds` root as markup: exactly the attributes it stamps, the stylesheet only when inlined,
-//! the frame layers only on a Window, and never the word "system" (design/03-COLOR.md section
+//! the frame layers on a Window and grouped on shell chrome, and never the word "system" (design/03-COLOR.md section
 //! 17.1, design/05-MOTION.md section 9 rule 11, spike S12).
 
 use dioxus::core::VirtualDom;
@@ -113,6 +113,8 @@ fn the_root_stamps_exactly_its_attributes() {
         blur: &'static str,
         modality: &'static str,
         scheme: Scheme,
+        /// The root chrome's attributes: `data-chrome`, `data-frame`, `data-ground`.
+        chrome: &'static [(&'static str, &'static str)],
     }
     let cases = [
         Case {
@@ -134,6 +136,7 @@ fn the_root_stamps_exactly_its_attributes() {
             blur: "on",
             modality: "pointer",
             scheme: Scheme::Dark,
+            chrome: &[("data-chrome", "transparent")],
         },
         Case {
             name: "an explicit light theme and calm motion win over the desktop",
@@ -154,6 +157,7 @@ fn the_root_stamps_exactly_its_attributes() {
             blur: "off",
             modality: "pointer",
             scheme: Scheme::Light,
+            chrome: &[("data-frame", "tinted"), ("data-ground", "frame")],
         },
         Case {
             name: "the Space's own dark theme answers a system app theme",
@@ -172,6 +176,7 @@ fn the_root_stamps_exactly_its_attributes() {
             blur: "off",
             modality: "keyboard",
             scheme: Scheme::Dark,
+            chrome: &[("data-chrome", "transparent")],
         },
     ];
     for case in cases {
@@ -182,7 +187,7 @@ fn the_root_stamps_exactly_its_attributes() {
             "{}--m-tint-alpha:.8;",
             FrameVars::of(&look, case.scheme).style_attr()
         );
-        let want = expected(&[
+        let mut want = expected(&[
             ("class", "ds".to_owned()),
             ("data-theme", case.theme.to_owned()),
             ("data-accent", case.accent.to_owned()),
@@ -193,6 +198,13 @@ fn the_root_stamps_exactly_its_attributes() {
             ("data-hover", "cold".to_owned()),
             ("style", style),
         ]);
+        want.extend(expected(
+            &case
+                .chrome
+                .iter()
+                .map(|(name, value)| (*name, (*value).to_owned()))
+                .collect::<Vec<_>>(),
+        ));
         assert_eq!(attributes_of(&markup, 0), want, "{}", case.name);
         assert!(
             !markup.to_lowercase().contains("system"),
@@ -211,6 +223,45 @@ fn the_stylesheet_is_inlined_only_when_asked() {
     assert_eq!(inline.matches("<style").count(), 1, "one <style>: {inline}");
     let host = render(Setup::default());
     assert!(!host.contains("<style"), "no <style> with Inject::Host");
+}
+
+/// Which materials draw the Space gradient's two layers and grain, and how: opaque and loose on
+/// a window, grouped in `.ds-frame` (at the tint alpha) on shell chrome, not at all on a sheet,
+/// a toast, or a transparent root (design/21-SPACES.md sections 3 and 5; bar gaps Q9, Q13).
+#[test]
+fn chrome_materials_draw_the_layers_in_a_tinted_frame() {
+    // (material, layers, grain, frame groups)
+    const CASES: &[(Material, usize, usize, usize)] = &[
+        (Material::Window, 2, 1, 0),
+        (Material::Bar, 2, 1, 1),
+        (Material::Dock, 2, 1, 1),
+        (Material::Popover, 0, 0, 0),
+        (Material::Sheet, 0, 0, 0),
+        (Material::Toast, 0, 0, 0),
+        (Material::Osd, 2, 1, 1),
+        (Material::Widget, 2, 1, 1),
+    ];
+    for &(material, layers, grain, frames) in CASES {
+        let root = render(Setup {
+            material,
+            ..Setup::default()
+        });
+        assert_eq!(
+            root.matches("class=\"ds-layer\"").count(),
+            layers,
+            "{material:?}: {root}"
+        );
+        assert_eq!(
+            root.matches("class=\"ds-grain\"").count(),
+            grain,
+            "{material:?}"
+        );
+        assert_eq!(
+            root.matches("class=\"ds-frame\"").count(),
+            frames,
+            "{material:?}"
+        );
+    }
 }
 
 #[test]

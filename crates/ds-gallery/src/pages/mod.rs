@@ -11,6 +11,7 @@ pub mod motion_lab;
 pub mod overlays;
 pub mod pills;
 pub mod space;
+pub mod status_items;
 pub mod tokens;
 pub mod type_ramp;
 
@@ -18,8 +19,8 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::tokens::Alpha;
 use ds::{
-    Accent, Appearance, BlurState, Ds, HeaderKind, Inject, Material, Scheme, SectionHeader,
-    SpaceLook, Theme,
+    Accent, Appearance, BlurState, Ds, FrameTint, HeaderKind, Inject, Material, RootChrome, Scheme,
+    SectionHeader, SpaceLook, Theme,
 };
 
 /// A titled group of specimens, with an optional note under the title.
@@ -79,6 +80,7 @@ pub fn Scope(
     accent: Accent,
     material: Material,
     #[props(default)] blur: BlurState,
+    #[props(default)] frame: Option<FrameTint>,
     children: Element,
 ) -> Element {
     let axes = use_context::<Signal<Axes>>();
@@ -99,6 +101,10 @@ pub fn Scope(
             blur,
             stylesheet: Inject::Host,
             tint_alpha: Some(tint()),
+            // A specimen's root is the panel itself, so it paints in every material (a Popover,
+            // Sheet or Toast root is transparent by default: it hosts floating cards).
+            chrome: Some(RootChrome::Painted),
+            frame,
             {children}
         }
     }

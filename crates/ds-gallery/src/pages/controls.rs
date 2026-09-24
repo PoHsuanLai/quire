@@ -1,6 +1,7 @@
 //! Controls: every control in every state its props can express.
 
 use super::external_icons::ExternalIcons;
+use super::status_items::StatusItems;
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
@@ -60,6 +61,7 @@ const AVATAR_SIZES: [AvatarSize; 8] = [
 pub fn ControlsPage() -> Element {
     rsx! {
         Buttons {}
+        StatusItems {}
         ExternalIcons {}
         Choosers {}
         Fields {}
