@@ -12,6 +12,13 @@ Citations below follow `design/README.md#3-citation-convention`:
 
 ## 1. Adding quire
 
+**zbus and your executor.** `ds-settings` builds zbus with its default `async-io` backend, which
+works under any executor, tokio included. Do not enable `zbus/tokio` in an app: Cargo unifies
+features, and with `tokio` on, zbus's blocking API panics on a thread that drives a tokio
+runtime ("Cannot start a runtime from within a runtime"; mailo's keyring and notifications hit
+this). A shell that runs zbus on tokio everywhere enables `ds-settings = { features = ["tokio"] }`
+deliberately.
+
 **Today: a path dependency.** quire has no published version yet, so every consumer depends on
 it by path, the way `examples/consumer/Cargo.toml` does:
 
