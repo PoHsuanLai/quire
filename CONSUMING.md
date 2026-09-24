@@ -428,7 +428,7 @@ rsx! {
         name: "Ada Lovelace".to_owned(),
         via: None,
         subject: "Re: the analytical engine".to_owned(),
-        snippet: Some("I have translated the memoir...".to_owned()),
+        snippet: "I have translated the memoir...".to_owned(),
         time: "2:14 PM".to_owned(),
         tags: rsx! {},
         star: None,
@@ -908,6 +908,37 @@ says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the wh
 | `SpaceEditor` | `measured` | `MeasuredIn` (`ThisScheme`) | `EachScheme`: the contrast readout under "Measured, this Space", once per scheme the Space's theme shows (Light and Dark for System), each under its own small-caps heading |
 | `SpaceEditor` | (markup changed) | | each preset button is named (`aria-label` and `title`) by `Preset::name` (Dusk, Orchard, Harbour, Ember, Lagoon, Heather, Moss, Stone), not "Preset n" |
 | `Preset` | `name` | `&'static str` | the preset's name, design/21 section 4 order; a new public field, so a struct literal of `Preset` needs it |
+
+### The mailo gaps 2 (2026-09-25): lists and overlays
+
+Every row below is additive: a prop that defaults to what the component did before, or a new
+variant. FINDINGS "mailo gaps 2 (lists and overlays)" has the reasons and the proofs. One prop
+per row:
+
+| Component | Prop or type | What it does |
+| --- | --- | --- |
+| `ListRow` | `subject: Text` (`#[props(into)]`) | A `String`, `&str` or `format!` still works; `Text::Runs(vec![Run::new("UIDL", RunTone::Mark), ..])` draws a search hit as `mark.ds-mark` and a `Strong`/`Faint` run as `span.ds-run[data-tone]`. |
+| `ListRow` | `snippet: Option<Text>` | A string, `None` or a `Text`. `Some(string)` no longer infers: write the string itself, or `Some(string.into())` (an `Option<String>` you hold: `.map(Text::from)`). |
+| `ListRow` | `on_sender: Option<PartHooks>` | `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>` each) on the name: the sender card. |
+| `ListRow` | `on_time: Option<PartHooks>` | The same on the time: the time tip (`HoverKind::Tip`, below). |
+| `ListRow` | `onpointerenter` / `onpointerleave: Option<EventHandler<PointerEvent>>` | The row itself: the thread card. |
+| `ListRow` | `onpointerdown: Option<EventHandler<PointerEvent>>` | A press on the row: a drag's start. A strip button's or the star's press still reaches it (only their clicks stop). |
+| `ListRow` | `aria_label: Option<String>` | The row's accessible name ("Open Re: UIDL stability"); absent, its contents name it as before. |
+| `HoverStrip` | `shown: Option<Shown>` | `Some(Shown::Visible)` shows the strip on a keyboard-selected or focused row (Blitz never matches `:focus-within`); `Some(Shown::Hidden)` keeps it down under the pointer; `None` is the hover reveal. |
+| `HoverStrip` | `titles: Titles` | `Titles::FromLabel` writes each button's label as its `title`; `Titles::Omitted` (default) writes none, as before. |
+| `HoverStrip` | `expanded: Vec<(ActionId, Expanded)>` | The buttons that open a menu, and whether it is open: `aria-haspopup="menu"`, `aria-expanded`. |
+| `HoverStrip` | (behaviour) | A strip button's click stops at the button: it never opens the row. |
+| `Text`, `Run`, `RunTone` | new types | `Text::{Plain(String), Runs(Vec<Run>)}`, `Run { text, tone: RunTone::{Plain, Mark, Strong, Faint} }`, `Text::plain_text()`. You compute the runs; quire never parses markup out of a string. |
+| `CommandPalette` | `entrance: PaletteEntrance::Opaque` | The card springs with `cmdk-rise` (`cmdk-in`'s scale and lift, no fade): opaque on its first frame. Over a window the scrim then appears at once too (a fading wrap would hold the card at its own opacity). `PeekIn` and `CmdkIn` are unchanged and still start at opacity 0. |
+| `MenuEntry` | `Row(MenuRow<T>)` | A choice whose `title: Text` and `detail: Option<Text>` are your runs, with `trailing: Option<RowAction>`; otherwise an `Item` (`value`, `tile`, `trail`, `check`, `availability`). Build with `MenuRow::new(value, title)` and struct update, or `.into()` a `MenuEntry`. A plain `Text` title is still marked by the palette's query and a menu's filter; runs are drawn as given. A `match` over `MenuEntry` needs an arm for it. |
+| `RowAction` | new type | `RowAction { icon: Icon, label: String, on_press: EventHandler<Press> }`: a Strip `IconButton` (label as `aria-label` and `title`) at the row's end. Its click, press, release and pointer moves stop inside it: the row is not picked, its menu or palette stays open, and the selection does not move onto it. |
+| `Menu` | `active: Cursor` | `Cursor::Auto` (default) is the menu's own highlight, as before. `Cursor::Controlled(Some(i))` shows choice `i` (numbered as `expanded` numbers them, clamped), `Controlled(None)` highlights nothing; the menu then does not take the keyboard as it opens, so the field beside it (the composer's `/`, `@`, a people input) keeps typing, and Enter in that field is the field's to handle with the value it knows. |
+| `Menu` | `on_active: Option<EventHandler<Option<usize>>>` | Under `Auto`, every change of the highlight (the first one included). Under `Controlled`, a request: Up or Down in the menu, or the pointer coming over another choice; set your cursor from it or not. |
+| `Menu` | `onquery: Option<EventHandler<String>>` | With `filter: Filter::Typing`, the typed text on every change (Backspace included), for an entry that names it ("Create label “…”"): rebuild `entries` from it. |
+| `Menu` | trailing action | Through `MenuEntry::Row(MenuRow { trailing: Some(RowAction { .. }), .. })`, as in the palette: the menu stays open and nothing is picked. |
+| `HoverTarget` | `as_: TargetElement` | The element the target is drawn as: `Span` (default, as before), `Div` or `Li` (a list's own item, which a `span` cannot hold). Same handlers, same hub: the card opens, places and closes exactly as for a span. `display:contents` is not offered: the card is placed against the target's rect, and such an element has none. A `ListRow` is already an `li`: hook its thread card through the row's `onpointerenter`/`onpointerleave` instead. |
+| `HoverKind` | `Tip` | A value's small tip (a row's time): `HoverCard { kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }` is one line, auto width up to 260, 12 px (the Card tooltip's size), placed 6 below the target's left edge like a sender card, on the hub's timing (450 ms, 0 when warm, 150 ms to close). A `match` over `HoverKind` needs an arm for it. |
+
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

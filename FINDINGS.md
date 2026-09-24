@@ -1714,3 +1714,154 @@ What mailo changes (docs/mailo-migration.md section 2 has the row for each):
   Today close named "Close" looks for "Close {label}".
 - The Space editor's name, Motion and per-scheme readout are `on_rename`, `motion` and
   `measured`; a test that found presets by "Preset n" finds them by name.
+
+## mailo gaps 2 (lists and overlays) (2026-09-25)
+
+mailo's second migration wave moves its rows, strip, command panel, menus and hover cards onto
+quire and reported what they could not express. Branch `mailo-gaps-2a`. Every change is
+additive: a prop defaulting to the old behaviour, a new variant or a new type; no existing
+component golden changed (the stylesheet golden gained the new rules and lost two comment
+lines). Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_palette.rs`, `mailo_menu.rs`,
+`mailo_hover.rs` (Harness), the goldens added under `tests/snapshots/lists/` and
+`tests/snapshots/overlays/` (`crates/ds/tests/lists/mailo.rs`, `overlays/mailo.rs`), unit
+tests beside each new module. Each proof was checked by removing the change it proves and
+watching it fail (the strip's and the row action's stops).
+
+1. **Rows and the strip** (`ListRow`, `HoverStrip`).
+   - `subject` and `snippet` are `ds::Text` (`text_runs.rs`): `Plain(String)` or `Runs(Vec<Run>)`,
+     `Run { text, tone: RunTone::{Plain, Mark, Strong, Faint} }`, drawn as `mark.ds-mark` (the
+     soft accent ground mailo's `.row mark.hit` had) and `span.ds-run[data-tone]`; a plain run
+     is a bare text node, so a plain `Text` renders the markup a `String` did (every existing
+     golden is byte-identical). `subject` is `#[props(into)]` and `Text: From<String>, From<&str>,
+     From<&String>`; `format!` in `rsx!` is a `String`. `snippet: Option<Text>` takes a string,
+     `None` or a `Text` through two `SuperFrom` impls under quire's own marker (as `Press` does
+     for `EventHandler<()>`). **Not** `Some(String)`: accepting both `Option<String>` and
+     `Option<Text>` would leave a bare `None` uninferable, and `None` is the commoner call
+     (every in-repo caller writes either a `String` or `None`). The one doc example that wrote
+     `Some("…".to_owned())` now writes the string. A `Display` value that is not a string no
+     longer converts for `subject` (none exists in this repo or mailo).
+   - Blitz drops the whitespace at the end of an inline element's box: a faint `Re: ` span
+     before a mark drew as `Re:UIDL` in the gallery (a bare text node keeps its space). A toned
+     or marked run's leading and trailing spaces are therefore drawn as text nodes outside its
+     element (`edges`, table-tested); the SSR shows `<span …>Re:</span> <mark …>`.
+   - `list_row.rs` passed 300 lines with the new props, so the star (`row_star.rs`) and the
+     click snapshot (`row_click.rs`) moved out, unchanged; the hooks are `row_hooks.rs`.
+   - `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>`, the event
+     itself, so the caller reads the point as mailo's `corner(&event)` does) on the name
+     (`on_sender`) and the time (`on_time`); `onpointerenter`, `onpointerleave` and
+     `onpointerdown` on the row. The brief named only the row's enter and press; the thread
+     card closes on the row's leave, so the leave is there too. Listeners are always attached
+     and call nothing without a handler: SSR writes no listener, so the markup is unchanged.
+     Proof: the pointer over the name, the subject, the time and away logs
+     `row-enter,sender-enter,sender-leave,time-enter,time-leave`; a press logs `row-down`. The
+     strip, when revealed, covers the time (absolute, right 8): the test's row has none.
+   - `aria_label: Option<String>` on the `li`.
+   - `HoverStrip { shown: Option<Shown> }` (the tooltip's `Shown`): `data-shown=visible` shows
+     the strip and pops its buttons exactly as `.ds-row:hover` does; `hidden` holds it down under
+     the pointer. This closes design/04 O-24 for Blitz, which never matches `:focus-within`
+     (S12): the caller reveals the strip on its keyboard row. Proof: a revealed strip takes a
+     press with the pointer never over the row; without the CSS the press lands on the row.
+   - A strip button's click calls `stop_propagation` (the star already did). This is the one
+     behaviour change for a current caller: a strip click used to open the row too. Proof: a
+     click on the revealed strip's button logs `archive` and not `open`; with the
+     `stop_propagation` removed both tests fail (`open` is logged). Only the click stops: a press
+     still reaches the row's `onpointerdown` (mailo dismisses its card there).
+   - `title` from the label: behind `titles: Titles::{Omitted, FromLabel}` (default `Omitted`),
+     not always on, because every existing row golden carries a strip and the brief keeps
+     current markup; mailo passes `FromLabel`. On the webview a `title` is a native tooltip beside
+     the Fly; on Blitz it draws nothing.
+   - `expanded` is a strip prop, `Vec<(ActionId, Expanded)>`, not a field of `StripAction`: a
+     new public field would break every `StripAction { .. }` literal. `Expanded::{Open, Closed}`
+     is the controls wave's (`Button { expanded }`), reused rather than a second type for the
+     same attribute; a listed button also gets `aria-haspopup="menu"`.
+   - Gallery: Lists page, "Search hits and a keyboard-shown strip".
+
+2. **The command panel** (`CommandPalette`, `MenuEntry`).
+   - Neither existing entrance gives an opaque first frame: `peek-in` and `cmdk-in` both start
+     at `opacity:0`, and over a window the wrap's `fade` starts at 0 too (mailo's test fails on
+     either). Reworking `cmdk-in` would change every current caller's entrance, so it is a new
+     variant, `PaletteEntrance::Opaque`, playing a new keyframe `cmdk-rise` (`Anim::CmdkRise`,
+     `--t-big --e-spring` like `cmdk-in`): `cmdk-in`'s three stops with the `opacity`
+     declarations removed, so only the scale and lift spring. With it, an overlay palette's wrap
+     carries `data-entrance=cmdk-rise` and does not fade (the wrap's opacity multiplies the
+     card's); the scrim appears at once. `Anim::ALL` grows to 48. Proof
+     (`mailo_palette.rs`): on the first frame the middle of the card differs from the bare page
+     in over half its pixels with `Opaque`, and in under 1 % with `CmdkIn`. The palette's
+     module passed 300 lines, so its host and entrance moved to `palette_host.rs`
+     (`CommandPaletteHost` and `PaletteEntrance` are still re-exported from `command_palette`).
+   - Runs in a row: `MenuEntry::Row(MenuRow<T>)`, a new variant rather than a new field of
+     `Item` (a field would break every `MenuEntry::Item { .. }` literal; a `String` title
+     cannot become `Text` in a literal). It is the one compile change of this wave: a `match`
+     over `MenuEntry` with no wildcard needs an arm (sill has two, `dock/menu_geometry.rs` and
+     `bar/content.rs`'s test; quire's gallery had one). `Submenu` and `Info` were added the same
+     way. A `Row` is a choice exactly as an `Item` is (picked, navigated, filtered on its plain
+     text); a plain title takes the query's marks, runs keep the caller's. `menu_entry.rs`
+     now holds only the data: an item's drawing moved to `menu_item.rs`, unchanged but for the
+     words (`Words::{Str, Text}`) and the action.
+   - `RowAction { icon, label, on_press: EventHandler<Press> }` on `MenuRow::trailing`: a Strip
+     `IconButton` in `span.ds-menu-action`, whose row gets `data-trailing=action` (a fourth grid
+     column; 22 px buttons in the text menus). The span stops the click (no pick), the
+     press and release (no press-drag-release pick, focus stays), and the pointer moves (the
+     selection does not follow the pointer onto the row). Proof: the second row's × logs
+     `remove:2` after `select:0` and nothing else; with the click and move stops removed the log
+     is `select:0,select:1,remove:2,close,pick:2`.
+   - Gallery: Overlays page, "Command panel: opaque entrance, runs, trailing actions".
+
+3. **Menus** (`Menu`).
+   - `active: Cursor::{Auto, Controlled(Option<usize>)}` (`menu_cursor.rs`, pure, with its
+     table tests). The menu machine calls its highlight the tracker's selection; `Cursor` is the
+     prop's name for whose it is. Under `Controlled` the drawn highlight is the caller's
+     (clamped; `None` draws none, a new state: `Drawn::selected` became an `Option`), Up and Down
+     become `on_active(Some(next))` requests (from an end when nothing is highlighted), the
+     pointer over another choice asks the same, and Enter picks the caller's choice. It also
+     does not take the keyboard as it opens: a field that drives the cursor must keep it, which
+     is the whole case (the composer's `/` and `@`). A submenu's panel keeps its own cursor.
+     Under `Auto`, `on_active` hears each change after the render that made it. Proof
+     (`mailo_menu.rs`): Down, Down, Up in the field move the highlight Dana, Priya, Sam while the
+     field keeps the focus; the pointer over the last row logs `active:Some(3)` and the highlight
+     stays where the page left it.
+   - `onquery: Option<EventHandler<String>>`: the typed filter's text on every change. Proof: an
+     own-cursor menu logs `active:Some(0),active:Some(1),query:m,active:Some(0),query:me,query:m`
+     for Down, `m`, `e`, Backspace (the filter resets the highlight to the first match).
+   - The trailing action is the palette's `MenuRow::trailing`. Proof: the second person's ×
+     logs `remove:1`; the menu is still open and nothing was picked.
+   - `menu.rs` passed 300 lines: `MenuKind` and `MenuEntrance` moved to `menu_kind.rs`
+     (re-exported from `menu`, unchanged).
+   - Gallery: Overlays page, "Menu driven by a field".
+
+4. **Hover cards** (`HoverTarget`, `HoverKind`).
+   - `HoverTarget { as_: TargetElement::{Span, Div, Li} }` rather than hooks the caller
+     spreads: the handlers (`mouseover` with the innermost-wins stop, `mouseleave`,
+     `pointerdown`, the mounted element the anchor book measures) stay quire's, in one `Hooks`
+     value shared by the three `rsx!` branches, so the intent machine cannot be half-wired by a
+     caller that forgets one. `Contents` is left out: a `display:contents` wrapper has no box,
+     so `Anchors::record` would read an empty rect and the card would open at the origin. A
+     `div` or `li` target carries `data-as` and is `display:block` (a type selector would trip
+     the consumer-only `DsInternals` exemption, which keys on a selector starting `.ds`). The
+     span's markup is unchanged. `HoverTarget` moved to `hover_card/target.rs`. Proof
+     (`mailo_hover.rs`): three `li` targets in a `ul`; the second opens its side card after the
+     wait (none at 400 ms), 10 right of the item and 6 above it, and moving to the third while
+     warm switches the card within 60 ms.
+   - `HoverKind::Tip`: design/06 section 3's `time` kind. It uses the hub's intent timing (450
+     ms, 0 warm, 150 ms close, 400 ms warm window), the same as every card and as the Card
+     tooltip (which already goes through the hub), not a timing of its own: the tooltip has no
+     other. Placed like `Sender` (below, 6); drawn by `.ds-hovercard[data-kind=tip]` at the
+     Card tooltip's size (auto width to 260, `--s-6`/`--s-10` padding, `--fs-shell-tip`,
+     `--r-item`) on one line (`nowrap`). Adding a variant breaks a `match` over `HoverKind` with
+     no wildcard (none in this repo, sill or mailo). The `Tooltip { Card }` markup is unchanged
+     (it still files its target as `Sender`). Proof: a time's tip opens under its left edge,
+     at most 260 wide and one line tall.
+   - Gallery: Overlays page, "Hover cards and tooltips" gains a time tip and two `li` targets.
+
+What mailo changes:
+
+- Rows: `ListRow { subject: Text::Runs(..), snippet, on_sender, on_time, onpointerenter,
+  onpointerleave, onpointerdown, aria_label, strip: HoverStrip { shown, titles:
+  Titles::FromLabel, expanded } }`; drop the strip's own `stop_propagation`.
+- The command panel: `entrance: PaletteEntrance::Opaque`; recent searches as
+  `MenuEntry::Row(MenuRow { trailing: Some(RowAction { .. }), .. })`.
+- The composer's menus: `active: Cursor::Controlled(..)`, `on_active`; the label menu's create
+  row from `onquery`.
+- Hover: sidebar entries as `HoverTarget { as_: TargetElement::Li }`, the time's tip as
+  `HoverKind::Tip`.
+

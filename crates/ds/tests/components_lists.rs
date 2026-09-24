@@ -16,6 +16,8 @@ mod css_scan;
 mod golden;
 #[path = "lists/live.rs"]
 mod live;
+#[path = "lists/mailo.rs"]
+mod mailo;
 #[path = "lists/motion.rs"]
 mod motion;
 #[path = "lists/png.rs"]
@@ -34,6 +36,7 @@ use ds::{
     Point, Px, Rect, RosterState, RowPitch, Scheme, Size, SpaceLook, Verdict, derive, readout,
     swatch, use_drag,
 };
+use mailo::MAILO_CASES;
 use rows::{ROW_CASES, Row};
 
 #[derive(Props, Clone)]
@@ -92,6 +95,7 @@ fn every_list_component_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .chain(ROW_CASES)
+        .chain(MAILO_CASES)
         .filter_map(|case| golden::check(&golden_name(case), &scrub(&render(case.make))).err())
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
@@ -108,6 +112,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
             "icon_button",
             "provider_mark",
             "chip",
+            "text_runs",
         ],
         "account_tile" => &[
             "account_tile",
@@ -156,7 +161,7 @@ const SHARED: &[&str] = &["ds-ic", "ds-truncate"];
 fn every_class_in_a_golden_is_styled_by_its_component() {
     let goldens = golden::all_in("lists");
     assert!(
-        goldens.len() >= CASES.len() + ROW_CASES.len(),
+        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len(),
         "only {} goldens",
         goldens.len()
     );
@@ -196,6 +201,7 @@ const OWN: &[&str] = &[
     "drag_ghost",
     "edge_strip",
     "space_editor",
+    "text_runs",
 ];
 
 #[test]
@@ -272,7 +278,7 @@ fn every_list_golden_lints_clean() {
     };
     let goldens = golden::all_in("lists");
     assert!(
-        goldens.len() >= CASES.len() + ROW_CASES.len(),
+        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len(),
         "only {} goldens",
         goldens.len()
     );

@@ -17,10 +17,13 @@ use crate::components::menu::MenuKind;
 use crate::components::menu_entry::MenuEntry;
 use crate::components::menu_lines::{Act, Choice, Nav, choices, liveness, moved_live};
 use crate::components::menu_rows::{Drawn, render_lines};
+pub use crate::components::palette_host::{CommandPaletteHost, PaletteEntrance};
 use crate::components::palette_lines::{PaletteKey, choice_lines, headed, marked, palette_key};
 use crate::components::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::palette_select::{PaletteSelection, use_palette_selection};
 use crate::components::palette_shown::{Change, Retain, Seen, Showing, use_showing};
+
+use crate::components::palette_host::{card_corner, hosted};
 use crate::components::popover::{Dismiss, Float, Stacking, use_float};
 use crate::components::search_field::SearchField;
 use crate::components::text_input::Focus;
@@ -28,56 +31,9 @@ use crate::components::tooltip::Shown;
 use crate::components::vocab::Availability;
 use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::geometry::{MountedRef, Point, Rect};
-use crate::motion::anim::Anim;
 use crate::tokens::{Corner, ZLayer};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-
-/// Where the palette draws.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum CommandPaletteHost {
-    /// Over the window, on the palette layer: a scrim, and the card 11 % down.
-    #[default]
-    Overlay,
-    /// In place, filling its container: no scrim, no layer of its own to draw on (a shell
-    /// surface that is the palette). Its card paints the enclosing material.
-    Surface,
-}
-
-impl CommandPaletteHost {
-    fn slug(self) -> &'static str {
-        match self {
-            CommandPaletteHost::Overlay => "overlay",
-            CommandPaletteHost::Surface => "surface",
-        }
-    }
-}
-
-/// How the palette's card enters.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum PaletteEntrance {
-    /// `peek-in`, S's palette.
-    #[default]
-    PeekIn,
-    /// `cmdk-in`, C's command menu.
-    CmdkIn,
-}
-
-impl PaletteEntrance {
-    fn anim(self) -> Anim {
-        match self {
-            PaletteEntrance::PeekIn => Anim::PeekIn,
-            PaletteEntrance::CmdkIn => Anim::CmdkIn,
-        }
-    }
-
-    fn slug(self) -> &'static str {
-        match self {
-            PaletteEntrance::PeekIn => "peek-in",
-            PaletteEntrance::CmdkIn => "cmdk-in",
-        }
-    }
-}
 
 /// Search and commands. `host` says where it draws and `entrance` how its card enters; `id`
 /// goes on the card (a shell's blur region names it). `focus` hands the field the keyboard
@@ -195,7 +151,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             &shown,
             MenuKind::Rich.row(),
             Drawn {
-                selected: current,
+                selected: Some(current),
                 open: None,
                 onpick: EventHandler::new(run),
                 onpoint: EventHandler::new({
@@ -254,7 +210,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             }
         }
     };
-    hosted(host, float, card, showing.shown, onclose)
+    hosted(host, entrance, float, card, showing.shown, onclose)
 }
 
 /// What a change of `shown` acts on.
@@ -287,45 +243,5 @@ fn follow_showing(showing: Showing, turn: Turn) {
             }
             turn.request.request();
         }),
-    }
-}
-
-/// The card's own corner: its radius, and a squircle's extent and shadow circle.
-fn card_corner(corner: Corner) -> String {
-    match corner {
-        Corner::Squircle(_) => corner.squircle_style(),
-        Corner::Token(_) | Corner::Px(_) => format!("border-radius:{};", corner.css()),
-    }
-}
-
-/// The card where `host` draws it: in place, or on the palette layer over its scrim, which
-/// closes the palette on a pointer down outside the card while it is the topmost layer.
-fn hosted(
-    host: CommandPaletteHost,
-    float: Float,
-    card: Element,
-    shown: Shown,
-    onclose: EventHandler<()>,
-) -> Element {
-    match host {
-        CommandPaletteHost::Surface => card,
-        CommandPaletteHost::Overlay => {
-            float.show(
-                rsx! {
-                    div {
-                        class: "ds-palette-wrap",
-                        "data-shown": shown.slug(),
-                        onpointerdown: move |_| {
-                            if float.is_top() {
-                                onclose.call(());
-                            }
-                        },
-                        {card}
-                    }
-                },
-                onclose,
-            );
-            rsx! {}
-        }
     }
 }

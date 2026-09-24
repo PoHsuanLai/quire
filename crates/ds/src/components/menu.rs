@@ -8,7 +8,10 @@
 //! beside it, driven by the menu-tracking machine (design/13-BEHAVIOUR-menus-windows.md section
 //! 13.3.4): `menu_panel` holds what the menu and its submenus share.
 
-use crate::components::menu_entry::{MenuEntry, Row};
+pub use crate::components::menu_kind::{MenuEntrance, MenuKind};
+
+use crate::components::menu_cursor::Cursor;
+use crate::components::menu_entry::MenuEntry;
 use crate::components::menu_keys::{Decision, Level};
 use crate::components::menu_lines::{Act, Choice, Filter, KeyAct, choices, key_act, lines};
 use crate::components::menu_panel::Panel;
@@ -18,96 +21,14 @@ use crate::components::popover::{
 };
 use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::vocab::Availability;
-use crate::geometry::{Align, Anchor, MountedRef, Placement, Point, Px, Rect, Side};
+use crate::geometry::{Anchor, MountedRef, Point};
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
 use crate::motion::timer::use_motion_timer;
 use crate::overlay::menu_track::MenuTiming;
 use crate::tokens::ZLayer;
+use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-
-/// Which menu shape.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum MenuKind {
-    /// 280 wide, 34 px tiles, title and help and shortcut.
-    Rich,
-    /// 220 wide, 22 px tiles.
-    Slim,
-    /// C's check-column menu, anchored under its button's right edge.
-    Dropdown,
-    /// Anchored at the pointer.
-    Context,
-}
-
-impl MenuKind {
-    /// The `data-kind` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            MenuKind::Rich => "rich",
-            MenuKind::Slim => "slim",
-            MenuKind::Dropdown => "dropdown",
-            MenuKind::Context => "context",
-        }
-    }
-
-    /// Where the menu goes against its anchor: S's floating menus at `left - 8`, 6 below
-    /// (`S:2060-2065`); C's dropdown under the trigger's right edge, 7 below; a context menu
-    /// at the pointer (design/06-INTERACTIONS.md section 4).
-    fn placement(self, anchor: Rect) -> (Rect, Placement, Px) {
-        match self {
-            MenuKind::Rich | MenuKind::Slim => (
-                Rect {
-                    origin: Point {
-                        x: anchor.origin.x - Px(8.0),
-                        ..anchor.origin
-                    },
-                    ..anchor
-                },
-                Placement::new(Side::Bottom, Align::Start),
-                Px(6.0),
-            ),
-            MenuKind::Dropdown => (anchor, Placement::new(Side::Bottom, Align::End), Px(7.0)),
-            MenuKind::Context => (anchor, Placement::new(Side::Bottom, Align::Start), Px(0.0)),
-        }
-    }
-
-    /// The entrance: `menu-in` for C's dropdown, `menu-pop` for the rest.
-    fn entrance(self) -> Anim {
-        match self {
-            MenuKind::Dropdown => Anim::MenuIn,
-            MenuKind::Rich | MenuKind::Slim | MenuKind::Context => Anim::MenuPop,
-        }
-    }
-
-    /// The panel's padding (design/04-COMPONENTS.md section 20): 6 for the Dropdown, 5 for the
-    /// rest. A submenu's top sits this far above its parent row.
-    pub(crate) fn pad(self) -> Px {
-        match self {
-            MenuKind::Dropdown => Px(6.0),
-            MenuKind::Rich | MenuKind::Slim | MenuKind::Context => Px(5.0),
-        }
-    }
-
-    /// The item layout.
-    pub(crate) fn row(self) -> Row {
-        match self {
-            MenuKind::Dropdown => Row::Checked,
-            MenuKind::Rich | MenuKind::Slim | MenuKind::Context => Row::Tiled,
-        }
-    }
-}
-
-/// How a menu appears: with its entrance (`menu-pop`, or `menu-in` for a Dropdown), or at once.
-/// A bar menu opens at once (design/13-BEHAVIOUR-menus-windows.md section 13.3.2: the menu bar
-/// has no open animation, and a hover switch shows the next menu in the same frame).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum MenuEntrance {
-    /// Play the kind's entrance.
-    #[default]
-    Animated,
-    /// Appear at rest, with no entrance.
-    Instant,
-}
 
 /// Where a pointer gesture over an open menu is: a press-drag-release onto an item picks it
 /// (design/13 section 13.3.2), which is a release arriving after the pointer came in with no
@@ -145,6 +66,13 @@ enum Closing {
 /// (`None` once it is over none), `on_release` every button released over a choice; a release
 /// over an enabled choice after a press that began outside the menu (press-drag-release) picks
 /// it. `entrance` is [`MenuEntrance::Instant`] for a bar menu.
+///
+/// `active` says whose highlight it shows. [`Cursor::Auto`] is the menu's own, and `on_active`
+/// hears every change of it. [`Cursor::Controlled`] is a field's beside the menu (the
+/// composer's `/` and `@` menus): the menu shows that choice, leaves the keyboard in the field,
+/// and Up, Down and the pointer only ask for a move through `on_active`; the field's own keys
+/// pick with the value it knows. `onquery` hears the typed filter's text on every change
+/// ([`Filter::Typing`]), for an entry that names it ("Create label '…'").
 #[component]
 pub fn Menu<T: Clone + PartialEq + 'static>(
     kind: MenuKind,
@@ -158,6 +86,9 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     #[props(default)] on_hover: Option<EventHandler<Option<usize>>>,
     #[props(default)] on_release: Option<EventHandler<Press>>,
     #[props(default)] entrance: MenuEntrance,
+    #[props(default)] active: Cursor,
+    #[props(default)] on_active: Option<EventHandler<Option<usize>>>,
+    #[props(default)] onquery: Option<EventHandler<String>>,
 ) -> Element {
     let float = use_float(ZLayer::Menu, Stacking::Layer(Dismiss::EscAndOutside));
     let presence = use_entrance(kind.entrance());
@@ -167,6 +98,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let tracker = use_tracker(timing, kind.pad());
     let mut gesture = use_hook(|| CopyValue::new(Gesture::Outside));
     let mut hovered = use_hook(|| CopyValue::new(None::<usize>));
+    let reported = use_hook(|| CopyValue::new(None::<Option<usize>>));
     use_effect(move || {
         if let Some(index) = expanded {
             tracker.expand(index, Via::Pointer);
@@ -177,6 +109,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let label = entries.iter().find_map(|entry| match entry {
         MenuEntry::Header(text) => Some(text.clone()),
         MenuEntry::Item { .. }
+        | MenuEntry::Row(_)
         | MenuEntry::Submenu { .. }
         | MenuEntry::Info { .. }
         | MenuEntry::Separator => None,
@@ -217,10 +150,14 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                 if let Some(on_hover) = on_hover {
                     on_hover.call(index);
                 }
+                asks(active, index, on_active);
             }
         })),
         onrelease: None,
+        cursor: active,
+        on_active,
     };
+    follow_active(active, panel.current(), reported, on_active);
     let picker = panel.onpick;
     panel.onrelease = Some(EventHandler::new(move |(index, press): (usize, Press)| {
         if let Some(on_release) = on_release {
@@ -248,14 +185,19 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         move |event: KeyboardEvent| match panel.key(&event, filter) {
             Decision::CloseMenu => escape_closes(float, &event, dismiss),
             Decision::Query => {
+                let mut next = query.peek().clone();
                 match key_act(&event.key(), event.modifiers(), filter) {
-                    Some(KeyAct::Type(text)) => query.with_mut(|query| query.push_str(&text)),
+                    Some(KeyAct::Type(text)) => next.push_str(&text),
                     Some(KeyAct::Erase) => {
-                        query.with_mut(|query| {
-                            query.pop();
-                        });
+                        next.pop();
                     }
                     _ => {}
+                }
+                if *query.peek() != next {
+                    query.set(next.clone());
+                    if let Some(onquery) = onquery {
+                        onquery.call(next);
+                    }
                 }
                 tracker.reset(0);
             }
@@ -296,7 +238,10 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                     let element = event.data();
                     tracker.panel_mounted(MountedRef(element.clone()));
                     probe.on_mounted(event);
-                    crate::focus::host::focus_soon(element);
+                    // A field beside the menu that drives its cursor keeps the keyboard.
+                    if active.takes_focus() {
+                        crate::focus::host::focus_soon(element);
+                    }
                 },
                 onmousemove: move |event| hover.hovered(&event),
                 onmouseleave: move |_| leave.left_items(),
@@ -321,4 +266,31 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     rsx! {
         {child}
     }
+}
+
+/// Under a caller's cursor, the pointer over another choice asks for it.
+fn asks(active: Cursor, pointed: Option<usize>, on_active: Option<EventHandler<Option<usize>>>) {
+    if let (Cursor::Controlled(shown), Some(index), Some(on_active)) = (active, pointed, on_active)
+        && shown != Some(index)
+    {
+        on_active.call(Some(index));
+    }
+}
+
+/// Under the menu's own cursor, tell the caller after this render when the highlight moved.
+fn follow_active(
+    active: Cursor,
+    current: Option<usize>,
+    reported: CopyValue<Option<Option<usize>>>,
+    on_active: Option<EventHandler<Option<usize>>>,
+) {
+    let (Cursor::Auto, Some(on_active)) = (active, on_active) else {
+        return;
+    };
+    let mut reported = reported;
+    if *reported.peek() == Some(current) {
+        return;
+    }
+    reported.set(Some(current));
+    queue_effect(move || on_active.call(current));
 }

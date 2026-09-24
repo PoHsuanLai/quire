@@ -266,6 +266,14 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
+            // `cmdk-in`'s row with its fade taken out (mailo gaps 2).
+            Anim::CmdkRise => recipe(
+                "cmdk-rise",
+                DurationToken::Big,
+                EasingToken::Spring,
+                Fill::None,
+                Iteration::Once,
+            ),
             // `S:225`.
             Anim::PeekIn => recipe(
                 "peek-in",
