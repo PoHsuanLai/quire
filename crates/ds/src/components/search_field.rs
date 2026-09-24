@@ -8,7 +8,7 @@ use crate::icon::render::Glyph;
 use dioxus::prelude::*;
 
 /// The command menu's and the launcher's search row. `focus` is the field's
-/// ([`Focus::OnMount`] in the command palette).
+/// ([`Focus::Controlled`] in the command palette); `onkey` hears each key as the event itself.
 #[component]
 pub fn SearchField(
     label: String,
@@ -16,7 +16,7 @@ pub fn SearchField(
     placeholder: String,
     tokens: Vec<String>,
     oninput: EventHandler<String>,
-    onkey: EventHandler<KeyboardData>,
+    onkey: EventHandler<KeyboardEvent>,
     #[props(default)] focus: Focus,
 ) -> Element {
     // The icon keeps the base 16: S's `.cmdk-in` does not size it (C draws 18).
