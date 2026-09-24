@@ -1,7 +1,8 @@
-//! Button: a labelled action in five variants (design/04-COMPONENTS.md section 1).
+//! Button: a labelled action in six variants (design/04-COMPONENTS.md section 1).
 //! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini; `title`,
-//! `aria-label` and `aria-expanded` only when the caller gives them.
+//! `aria-label` and `aria-expanded` only when the caller gives them (or a mark face names it).
 
+use crate::components::button_face::{ButtonFace, FaceMark, Trailing, trailing as trailing_mark};
 use crate::components::icon_view::IconView;
 use crate::components::press::{Press, PressListeners};
 use crate::components::vocab::{Availability, Expanded, Switch};
@@ -22,6 +23,11 @@ pub enum ButtonVariant {
     Quiet,
     /// As Mini at rest; red only on hover.
     Danger,
+    /// Words on the Space frame (mailo gaps 4): the sidebar item's chrome, `--f-ink-soft` on
+    /// nothing at rest, `--f-ink` on `--f-pill-hover` under the pointer, on `--f-pill` while
+    /// pressed or held down. A frame word's contrast is the frame's, which no surface token
+    /// guarantees, so the other variants' `--ink` family does not belong there.
+    Frame,
 }
 
 impl ButtonVariant {
@@ -33,6 +39,7 @@ impl ButtonVariant {
             ButtonVariant::Mini => "mini",
             ButtonVariant::Quiet => "quiet",
             ButtonVariant::Danger => "danger",
+            ButtonVariant::Frame => "frame",
         }
     }
 
@@ -53,6 +60,11 @@ impl ButtonVariant {
 /// its visible label, for a label that is a symbol or too terse to stand alone ("+" or "All").
 /// `expanded` says whether the menu or panel this button opens is showing (`aria-expanded`);
 /// leave it `None` on a button that opens nothing.
+///
+/// `trailing` puts a mark after the label: `Trailing::Caret` for a dropdown showing its value,
+/// or a glyph. `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
+/// and then names the button by `label` through `aria-label`, unless `aria_label` says
+/// otherwise.
 #[component]
 pub fn Button(
     variant: ButtonVariant,
@@ -66,7 +78,10 @@ pub fn Button(
     #[props(default)] title: Option<String>,
     #[props(default)] aria_label: Option<String>,
     #[props(default)] expanded: Option<Expanded>,
+    #[props(default)] trailing: Option<Trailing>,
+    #[props(default)] face: ButtonFace,
 ) -> Element {
+    let aria_label = aria_label.or_else(|| face.is_mark().then(|| label.clone()));
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(Expanded::aria);
     let listen = PressListeners::new(onclick);
@@ -107,7 +122,10 @@ pub fn Button(
             if let Some(icon) = icon {
                 IconView { source: icon, size: variant.icon_size() }
             }
-            span { "{label}" }
+            FaceMark { face, label }
+            if let Some(mark) = trailing {
+                {trailing_mark(mark, variant.icon_size())}
+            }
         }
     }
 }

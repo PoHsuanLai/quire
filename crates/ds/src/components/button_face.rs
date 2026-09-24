@@ -1,0 +1,104 @@
+//! What a `Button` shows besides its icon (mailo gaps 4): its face, a word or a mark drawn in
+//! its own style, and a trailing glyph after it.
+
+use crate::icon::Icon;
+use crate::icon::render::{Glyph, IconSize};
+use dioxus::prelude::*;
+
+/// How a button's label is drawn. Every face but `Label` draws a one-letter mark in the style
+/// it names (the selection bubble's B, I, U and S, design/04 section 30) and names the button
+/// to assistive technology by its `label` ("Bold") instead.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum ButtonFace {
+    /// The label itself, as words.
+    #[default]
+    Label,
+    /// `B` in bold.
+    Bold,
+    /// `i` in the serif italic (S's Georgia is `--font-serif`, design/02).
+    Italic,
+    /// `U` underlined.
+    Underline,
+    /// `S` struck through.
+    Strike,
+}
+
+impl ButtonFace {
+    /// The letter a mark face shows and its `data-face` word; `None` for `Label`.
+    fn mark(self) -> Option<(&'static str, &'static str)> {
+        match self {
+            ButtonFace::Label => None,
+            ButtonFace::Bold => Some(("B", "bold")),
+            ButtonFace::Italic => Some(("i", "italic")),
+            ButtonFace::Underline => Some(("U", "underline")),
+            ButtonFace::Strike => Some(("S", "strike")),
+        }
+    }
+
+    /// Whether the face shows a mark rather than the label's words: then the label becomes the
+    /// button's `aria-label`.
+    pub(crate) fn is_mark(self) -> bool {
+        self.mark().is_some()
+    }
+}
+
+/// A mark after the label: a dropdown's caret, or any glyph.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Trailing {
+    /// The dropdown caret: `chevron-down` at 12, in the label's colour.
+    Caret,
+    /// Another glyph, at the button's icon size.
+    Glyph(Icon),
+}
+
+impl Trailing {
+    /// The glyph and its size, given the button's own icon size.
+    fn glyph(self, icon_size: IconSize) -> (Icon, IconSize) {
+        match self {
+            Trailing::Caret => (Icon::ChevronDown, IconSize::Tiny),
+            Trailing::Glyph(icon) => (icon, icon_size),
+        }
+    }
+}
+
+/// The label drawn in `face`: a plain span of words, or the face's letter in its style. The
+/// mark is `aria-hidden`, since the button is named by its label. Usable on its own as a
+/// `BubbleButton`'s `label`, so the bubble's marks need no raw `b`, `i`, `u` or `s`.
+#[component]
+pub fn FaceMark(face: ButtonFace, label: String) -> Element {
+    match face.mark() {
+        None => rsx! { span { "{label}" } },
+        Some((letter, slug)) => rsx! {
+            span { class: "ds-button-face", "data-face": slug, "aria-hidden": "true", "{letter}" }
+        },
+    }
+}
+
+/// The trailing glyph, in its own span so the sheet can set it apart from the label.
+pub(crate) fn trailing(mark: Trailing, icon_size: IconSize) -> Element {
+    let (icon, size) = mark.glyph(icon_size);
+    rsx! {
+        span { class: "ds-button-trail",
+            Glyph { icon, size }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ButtonFace;
+
+    #[test]
+    fn only_the_label_face_draws_words() {
+        const CASES: &[(ButtonFace, bool)] = &[
+            (ButtonFace::Label, false),
+            (ButtonFace::Bold, true),
+            (ButtonFace::Italic, true),
+            (ButtonFace::Underline, true),
+            (ButtonFace::Strike, true),
+        ];
+        for &(face, mark) in CASES {
+            assert_eq!(face.is_mark(), mark, "{face:?}");
+        }
+    }
+}
