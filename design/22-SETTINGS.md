@@ -426,6 +426,7 @@ data, not a key.
 | `spaces.wallpaper_follows_space` | `WallpaperPolicy::{Independent,PerWorkspace}` | `Independent` | | `21-SPACES.md#8-wallpaper-proposed` | proposed |
 | `spaces.dock_look_source` | `DockLookSource::{OwnOutput,FocusedWindow}` | `OwnOutput` | multi-output only | `21-SPACES.md#11-open-decisions` item 5 | proposed |
 | `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | proposed |
+| `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
 
 ## 4. Rust shape
 
