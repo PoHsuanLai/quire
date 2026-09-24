@@ -3,6 +3,6 @@
    are Space dots (space_editor.css) five apart, as in the sidebar foot (`S:845`), painted with
    `--swatch-*`. No states of its own. TODO(O-16): the overall width is the host surface's. */
 
-.ds-appearance{ display:grid; gap:14px; }
+.ds-appearance{ display:grid; gap:var(--s-14); }
 .ds-appearance-row{ min-width:0; }
-.ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:5px; }
+.ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }

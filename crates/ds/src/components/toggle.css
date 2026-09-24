@@ -7,7 +7,7 @@
    TODO(O-1): disabled is not specified; hover is not specified. */
 
 .ds-toggle{
-  display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:3px;
+  display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:var(--s-3);
   border:1px solid var(--line); border-radius:var(--r-pill); background:var(--surface-2); cursor:pointer;
   transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }

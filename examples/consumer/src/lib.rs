@@ -8,8 +8,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry, MenuKind,
-    TextInput, Tile, Trail, use_motion_timer, use_rect, use_toasts,
+    Anchor, Anim, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry,
+    MenuKind, MountedRef, TextInput, Tile, Trail, use_motion_timer, use_toasts,
 };
 use ds_settings::{AppName, use_environment};
 
@@ -69,16 +69,14 @@ fn entries() -> Vec<MenuEntry<Action>> {
 
 /// A subject field, a `Send` button whose "Sent" confirmation is timed by
 /// `ds::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`
-/// anchored to itself through `ds::use_rect` — the pattern `CONSUMING.md`'s "Component
-/// catalogue" Overlays example shows, and, until wave 2 integration's `ds::HostMeasure`/
-/// `Measured::Busy` fix, one that panicked under `ds_native::Harness`
-/// (`CONSUMING.md` §9 records what was found and that it is now fixed; this page no longer
-/// needs to route around it).
+/// anchored to the button itself: `Button`'s `mounted` hands over its element and the menu
+/// takes it as `Anchor::Mounted`, measured when placing (`CONSUMING.md` §4, "Overlays"). No
+/// wrapper element is measured in its place.
 #[component]
 fn Page() -> Element {
     let mut subject = use_signal(String::new);
     let mut menu_open = use_signal(|| false);
-    let anchor = use_rect();
+    let mut more = use_signal(|| None::<MountedRef>);
     let toasts = use_toasts();
     let badge = use_motion_timer(Anim::Fade);
     let mut sent = use_signal(|| false);
@@ -102,13 +100,11 @@ fn Page() -> Element {
                         badge.start(EventHandler::new(move |()| sent.set(false)));
                     },
                 }
-                span {
-                    onmounted: move |event| anchor.on_mounted(event),
-                    Button {
-                        variant: ButtonVariant::Secondary,
-                        label: "More".to_owned(),
-                        onclick: move |_| menu_open.set(true),
-                    }
+                Button {
+                    variant: ButtonVariant::Secondary,
+                    label: "More".to_owned(),
+                    onclick: move |_| menu_open.set(true),
+                    mounted: move |event: MountedEvent| more.set(Some(MountedRef(event.data()))),
                 }
             }
             span {
@@ -116,10 +112,10 @@ fn Page() -> Element {
                 "data-shown": if sent() { "shown" } else { "hidden" },
                 "Sent"
             }
-            if let (true, Some(at)) = (menu_open(), anchor.anchor()) {
+            if let (true, Some(button)) = (menu_open(), more()) {
                 Menu {
                     kind: MenuKind::Rich,
-                    anchor: at,
+                    anchor: Anchor::Mounted(button),
                     entries: entries(),
                     onpick: move |action: Action| {
                         menu_open.set(false);

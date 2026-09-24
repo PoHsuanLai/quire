@@ -8,4 +8,4 @@
   box-shadow:var(--shadow-sheet); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
 .ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
-.ds-peek-tools{ display:flex; justify-content:flex-end; padding:8px 10px 0; }
+.ds-peek-tools{ display:flex; justify-content:flex-end; padding:var(--s-8) var(--s-10) 0; }

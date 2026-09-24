@@ -95,23 +95,23 @@ const LIMITS: [(&str, &str, &str); 16] = [
     ),
 ];
 
-/// What the gallery could not show with quire as it is: each a component that cannot express a
-/// documented state, a missing token, or a contract the code breaks.
-const DS_GAPS: [&str; 14] = [
-    "No spacing tokens: design/01-LAYOUT.md section 2 names the scale, but every padding and gap is a raw length.",
-    "Surface overrides only the material and the scheme. A specimen in another accent or blur state needs a nested Ds (the Matrix and Materials pages).",
-    "The root marks the back frame layer with the class \"back\", but the stylesheet hides .ds-layer[*|data-layer=back]: the class is unstyled and both layers stay opaque, so the Space switch never cross-fades.",
-    "HoverCard has no parts: its person header, stats, flag and foot are hand-written ds-hovercard-* markup.",
-    "ToastHub reports an undo only as last_undo(); a consumer restores by watching it in an effect.",
-    "The Avatar's computed hue and account colour are inline hexes (O-7), which a consumer's markup lint has to except.",
-    "Button has no mounted handle, so a menu anchored to a button measures a wrapper instead.",
-    "No token or component for a wallpaper, a stage or a specimen grid: the gallery's own layout CSS covers them.",
-    "TextInput is 176 px tall on Blitz: the input takes the 300 x 150 replaced-element default and text_input.css sets no height (Controls page).",
-    "Every Ds renders a ToastHost; the hidden toast is an empty pill whose translateY(160%) does not clear the root, so a small dark pill shows at the bottom of every nested root (Tokens, Materials, Matrix).",
-    "The toast's pull tab and the send pill's Undo paint as empty pills: their labels are not visible (Overlays page).",
-    "A place SidebarItem without a count centres its icon and label instead of starting them at the left (Lists page).",
-    "The Space editor's colour field and its handles are blank in a snapshot (Space page), and its preset swatches render as 140 px discs.",
-    "The LinkPill enters with --t-move --e-spring; the design says --t-quick --e-out and no Anim has that recipe (link_pill.css TODO).",
+/// What the gallery could not show with quire as it is, and is still open: each a component
+/// that cannot express a documented state, a missing token, or a contract the code breaks,
+/// with the FINDINGS.md section that owns it. The items the gallery fix branches and the
+/// polish pass closed are gone from this list; FINDINGS records each.
+const DS_GAPS: [(&str, &str); 3] = [
+    (
+        "No token or component for a wallpaper, a stage or a specimen grid: the gallery's own layout CSS covers them.",
+        "Polish pass",
+    ),
+    (
+        "An overlay's bounds are its .ds root's box, as tall as its content: in a content-high root a menu under a button flips and clamps to the top.",
+        "Gallery fixes B",
+    ),
+    (
+        "A click never reaches a Button whose parent holds only inline content (the Button alone, beside an if placeholder or inline text): blitz-dom hits the parent. A flex row or a block after it makes it land (ds-native tests/click.rs).",
+        "Polish pass",
+    ),
 ];
 
 /// The gaps page.
@@ -134,8 +134,8 @@ pub fn GapsPage() -> Element {
         Live {}
         Section { title: "What quire does not draw yet", note: "Found while building this gallery.",
             div { class: "g-col",
-                for gap in DS_GAPS {
-                    p { class: "g-note", "· {gap}" }
+                for (gap , owner) in DS_GAPS {
+                    p { class: "g-note", "· {gap} (FINDINGS: {owner})" }
                 }
             }
         }

@@ -60,7 +60,10 @@ and a motion level; stamps `data-theme`, `data-accent`, `data-motion`, `data-mat
 `data-blur`, `data-modality` and `data-hover` on its own `div.ds`; injects the stylesheet
 (unless you ask it not to); and provides the `Env`, `HoverHub`, `ToastHub`, `LayerStack` and
 `Overlays` contexts every component reads. It also renders `OverlayHost` and `ToastHost` after
-your children, so menus, popovers and toasts always have somewhere to mount.
+your children, so menus, popovers and toasts always have somewhere to mount. `ToastHost` lays
+out nothing while the hub is empty: a pushed toast mounts hidden for one frame and rises from
+there, and is dropped again once it has sunk (FINDINGS "Gallery fixes A"), so an idle root has
+no toast element in its markup or its picture.
 
 ```rust
 use ds::{Appearance, Ds, Material};
@@ -92,7 +95,7 @@ fn App() -> Element {
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 
 You almost never write more than one `Ds` per window: it is the root, not a per-panel wrapper —
-use `Surface` (section 3) for a nested material or scheme.
+use `Surface` (section 4) for a nested material, scheme, accent or blur state.
 
 **Only one `Ds` prop most consumers get wrong first:** `appearance: Appearance::default()` is
 fine for a first cut, but it means "System theme, Postmark accent, System motion" every time,
@@ -167,25 +170,36 @@ Inside any component under a `Ds`, `ds::use_env() -> Env` gives you what that sc
 level for their own timers (section 6); you will rarely need it directly unless you are building
 your own component.
 
-## 4. `Surface` — a nested material or scheme
+## 4. `Surface` — a nested material, scheme, accent or blur state
 
-A subtree in a different `Material`, or forced to a scheme other than the root's (a popover over
-a dark card, an always-light preview pane) is a `Surface`, not a second `Ds`: no stylesheet, no
-frame layers, just a nested `div.ds` that re-stamps `data-theme`/`data-accent`/`data-motion`/
-`data-material`/`data-blur` and updates the `Env` every component under it reads.
+A subtree in a different `Material`, or forced to a scheme, accent or blur state other than the
+root's (a popover over a dark card, an always-light preview pane, a specimen in another accent)
+is a `Surface`, not a second `Ds`: no stylesheet, no frame layers, just a nested `div.ds` that
+re-stamps `data-theme`/`data-accent`/`data-motion`/`data-material`/`data-blur` and updates the
+`Env` every component under it reads.
 
 ```rust
-use ds::{Material, Scheme, Surface};
+use ds::{Accent, BlurState, Material, Scheme, Surface};
 
 rsx! {
     Surface { material: Material::Popover, theme: Some(Scheme::Dark),
         YourPopoverContent {}
     }
+    Surface { material: Material::Widget, accent: Some(Accent::Green), blur: Some(BlurState::Unavailable),
+        YourSpecimen {}
+    }
 }
 ```
 
-Leave `theme` as `None` (its default) to inherit the enclosing scope's scheme and only change the
-material.
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `material` | `Material` | required | the material this subtree paints |
+| `theme` | `Option<Scheme>` | `None` | force a scheme; `None` inherits the enclosing scope's |
+| `accent` | `Option<Accent>` | `None` | force an accent; `None` inherits |
+| `blur` | `Option<BlurState>` | `None` | force the blur state (`Unavailable` paints the solid tint); `None` inherits |
+
+Each `None` inherits, so the common case is the material alone (`crates/ds/tests/surface.rs`
+has a golden per override; FINDINGS "Gallery fixes B").
 
 ## 5. The four coherence rules
 
@@ -221,6 +235,14 @@ zero offences, so a stale one cannot hide silently. Prefer `Profile::Strict` eve
 `border-radius`/`font-size`/`z-index` your CSS writes is exactly the kind of drift the token
 table exists to prevent.
 
+Strict also runs `Rule::RawSpacing`: a literal `px` in `margin`, `padding` (their sides and
+logical forms included) or `gap`/`row-gap`/`column-gap` is an offence; `0`, `auto`, a
+percentage, an `em` and `var()` pass. The steps are `ds::SpacingToken`, emitted on `.ds` as
+`--s-1`, `--s-1-5`, `--s-2` … `--s-12`, `--s-13`, `--s-14`, `--s-15`, `--s-16`, `--s-18`,
+`--s-22`, `--s-26`, `--s-36`, each named by its pixel value (design/01-LAYOUT.md §2). A length
+between steps takes the nearest one; quire's own sheets and the gallery's do (FINDINGS "Polish
+pass"). `examples/consumer/src/style.css` is Strict-clean.
+
 ### Rule 2 — no raw markup, only quire components
 
 Two tests, both against an SSR render of a real page (never a hand-built HTML string — the
@@ -253,11 +275,22 @@ fn no_raw_button_is_rendered() {
 }
 ```
 
-`markup` flags two different things and both tests above catch both, but name them separately
-because they read differently in a failing CI log: `Rule::UnstyledClass` (a class nothing in
-scope styles — usually a typo or a stylesheet you forgot to concatenate) and `Rule::RawMarkup` (a
-hand-written `<button>`/`<input>`/`<select>`/`<textarea>` with no `ds-` class, or an `<svg>` that
-is not `Glyph`'s `.ds-ic`).
+`markup` flags three different things and the tests above catch all of them, but name them
+separately because they read differently in a failing CI log: `Rule::UnstyledClass` (a class
+nothing in scope styles — usually a typo or a stylesheet you forgot to concatenate),
+`Rule::RawMarkup` (a hand-written `<button>`/`<input>`/`<select>`/`<textarea>` with no `ds-`
+class, or an `<svg>` that is neither `Glyph`'s `.ds-ic` nor marked `data-ds-svg`, the attribute
+a quire component that draws its own vector writes, as the SendPill's ring does), and the
+inline-style rules below.
+
+Every `style` attribute is checked declaration by declaration (`ds::lint`'s `inline_style`): a
+literal colour (`Rule::HexColour`, `Rule::ColourFunction`, `Rule::NamedColour`) or a raw
+duration (`Rule::RawDuration`) is an offence. The one allowance is a custom property (`--*`) on
+an element carrying `ds` or a `ds-*` class: that is quire handing a value it computes per
+instance to its own stylesheet (the Space's `--f-*` frame and `--f-grad`, an avatar's `--av-bg`,
+a provider mark's `--pc`), so quire's own markup lints clean with no exception. The same
+literal in a non-custom property (`background:#fff`) is an offence on any element, and a custom
+property on your own element is one too: put your values in your stylesheet as tokens.
 `examples/consumer/tests/coherence.rs::no_raw_form_control_or_svg_is_rendered` filters to
 `Rule::RawMarkup` alone, so its name says exactly what regressing it means: someone wrote a bare
 `button`/`input`/`svg` where a quire component belongs. Filtering the same call two different
@@ -351,11 +384,30 @@ rsx! {
 ### Overlays
 
 ```rust
-use ds::{use_toasts};
+use ds::{Anchor, Button, ButtonVariant, Menu, MenuKind, MountedRef, Switch, UndoToken, use_toasts};
 
 let toasts = use_toasts();
-toasts.push("Archived".to_owned(), None);   // ToastHost is already rendered by Ds — nothing else to mount
+toasts.push("Sent".to_owned(), None);   // ToastHost is already rendered by Ds — nothing else to mount
+// With an undo: the handler of the toast on screen runs when the person undoes it.
+toasts.push_undoable("Archived".to_owned(), UndoToken(7), EventHandler::new(move |token| restore(token)));
+
+// A menu anchored to the button that opens it: the button hands over its own element.
+let mut open = use_signal(|| Switch::Off);
+let mut more = use_signal(|| None::<MountedRef>);
+rsx! {
+    Button {
+        variant: ButtonVariant::Secondary,
+        label: "More".to_owned(),
+        onclick: move |_| open.set(Switch::On),
+        mounted: move |event: MountedEvent| more.set(Some(MountedRef(event.data()))),
+    }
+    if let (Switch::On, Some(button)) = (open(), more()) {
+        Menu { kind: MenuKind::Rich, anchor: Anchor::Mounted(button), entries, onpick, onclose: move |()| open.set(Switch::Off) }
+    }
+}
 ```
+
+`examples/consumer/src/lib.rs::Page` is this pattern, whole.
 
 ### Frame
 
@@ -402,6 +454,18 @@ A few props worth knowing about before you read the signatures, added in wave 2 
 - `SelectionBubble`'s `BubbleAction` is now `{Button(BubbleButton), Separator}` rather than a
   bare list of buttons — insert `BubbleAction::Separator` between groups instead of styling a
   gap yourself.
+
+And in Gallery fixes B (FINDINGS "Gallery fixes B"):
+
+- `Button` and `IconButton` take `mounted: Option<EventHandler<MountedEvent>>`: the element
+  itself, for `Anchor::Mounted` (the Overlays example above). It writes no attribute.
+- `HoverCard` takes `parts: Vec<HoverCardPart>` (`Title`, `Sub`, `Person`, `Stats`, `Flag`,
+  `Messages`, `Foot`, `Actions`), drawn in order before its children: no hand-written
+  `ds-hovercard-*` markup.
+- `ToastHub::push_undoable(text, token, on_undo)` calls `on_undo` with the token when the person
+  undoes that toast; a later push replaces it. The handler belongs to the scope that made it,
+  so that scope must outlive the toast. `last_undo()` still reports the last undo.
+- `Surface` takes `accent` and `blur` beside `theme` (section 4).
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
@@ -484,7 +548,8 @@ authority; this table is a pointer. `ds::lint::Rule::BlitzUnsupported`
 | CSS `stroke`/`fill` reaching `<svg>` children | S6 | `ds::Glyph` (renders `.ds-ic` with `stroke="currentColor"` as an attribute, not a rule); `Rule::SvgPaintInCss` |
 | `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::clip_chars` for a real character-count ellipsis |
 | `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_native::launch` track modality for you; `Rule::FocusPseudoClass` |
-| `onmounted` + `get_client_rect()` inside the handler itself (returns 0×0) | S9 | `ds::use_rect()` — measures one frame later, never inside the handler |
+| `onmounted` + `get_client_rect()` inside the handler itself (returns 0×0) | S9 | `ds::use_rect()` — measures one frame later, never inside the handler; to anchor an overlay, `Anchor::Mounted` does this for you |
+| a click on a `Button`/`IconButton` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-native/tests/click.rs`, FINDINGS "Polish pass") |
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_native::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::clip_chars` covers the line-clamp case |
 
@@ -513,9 +578,9 @@ component built on it) now reads through a `HostMeasure`/`Measured` seam
 (`crates/ds/src/geometry/measure.rs`, `crates/ds-native/src/measure.rs`) that answers `Busy`
 rather than reading a document mid-render, so the reader waits a frame instead of re-entering
 the borrow. `examples/consumer/tests/coherence.rs::the_menu_opens_and_closes_under_harness` is
-the regression test, and `Page`'s own "More" button is back to anchoring through
-`ds::use_rect`/`Anchor::Mounted` (the realistic pattern) rather than a fixed `Anchor::Point`
-workaround — if you hit a `RefCell already borrowed` panic under `Harness` today, it is a new
+the regression test, and `Page`'s own "More" button anchors its menu to itself (`Button`'s
+`mounted` handle as `Anchor::Mounted`, section 6, the realistic pattern) rather than a fixed
+`Anchor::Point` workaround — if you hit a `RefCell already borrowed` panic under `Harness` today, it is a new
 bug, not this one; open one with the same reproduction shape (`Harness::new`, one `click()` that
 opens a floating component) and cite this section.
 
@@ -538,10 +603,10 @@ a_window_roots_markup_lints_clean_of_unstyled_classes` are the regression tests,
 
 ## 10. Comparing your surface against the reference
 
-`ds-gallery` (`crates/ds-gallery`) is quire's own contact sheet: every component across
-Theme x Accent(6) x MotionLevel(4) x Material(8) x Blur x Space preset(8), plus a tokens page, a
-matrix page and a motion lab. As of this writing `ds-gallery`'s `main` is still a `todo!()` (a
-parallel wave is filling it in) — once it lands, the intended usage is:
+`ds-gallery` (`crates/ds-gallery`) is quire's own contact sheet: every component across its
+pages (tokens, type, controls, lists, overlays, materials, motion, space, gaps, matrix,
+motion-lab), with a toolbar for theme, accent, motion, material, blur and Space preset. Its
+"Gaps" page lists what quire does not draw yet, each with the FINDINGS section that owns it.
 
 ```bash
 cargo run -p ds-gallery                              # opens the gallery interactively

@@ -3,6 +3,6 @@
 
 .ds-kbd{
   font-family:var(--font-data); font-size:var(--fs-note); border:1px solid var(--line); border-bottom-width:2px;
-  border-radius:var(--r-kbd); padding:1px 5px; color:var(--ink-soft); background:var(--surface-2);
+  border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }

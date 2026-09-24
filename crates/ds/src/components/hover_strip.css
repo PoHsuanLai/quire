@@ -12,7 +12,7 @@
 
 .ds-strip{
   --j:0;
-  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:3px; padding:3px;
+  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:var(--s-3); padding:var(--s-3);
   border-radius:var(--r-pill); background:var(--raise); border:1px solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out);
 }
@@ -28,7 +28,7 @@
 .ds-strip .ds-fly{
   position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
   background:var(--ink); color:var(--paper); font-family:var(--font-data); font-size:var(--fs-caption);
-  padding:3px 7px; border-radius:var(--r-small); opacity:0; pointer-events:none;
+  padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0; pointer-events:none;
   transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
 }
 .ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }

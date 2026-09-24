@@ -4,10 +4,10 @@
    `BubbleAction::Separator` draws `ds-bubble-sep` between groups. It enters with `menu-pop` at
    `--t-quick` (`S:684`, `Anim::BubblePop`). */
 
-.ds-popover.ds-bubble{ display:flex; align-items:center; gap:1px; padding:3px; animation:menu-pop var(--t-quick) var(--e-spring); }
-.ds-bubble-button{ border:0; background:transparent; cursor:pointer; height:28px; min-width:28px; padding:0 7px; border-radius:var(--r-bubble-button);
-  color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+.ds-popover.ds-bubble{ display:flex; align-items:center; gap:var(--s-1); padding:var(--s-3); animation:menu-pop var(--t-quick) var(--e-spring); }
+.ds-bubble-button{ border:0; background:transparent; cursor:pointer; height:28px; min-width:28px; padding:0 var(--s-7); border-radius:var(--r-bubble-button);
+  color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
 .ds-bubble-button:hover{ background:var(--surface-2); color:var(--ink); }
 .ds-bubble-button[*|aria-pressed=true]{ color:var(--accent); }
-.ds-bubble-sep{ width:1px; height:18px; background:var(--line-soft); margin:0 3px; }
-.ds-bubble .ds-input{ border:0; outline:none; background:transparent; font-size:var(--fs-meta); width:220px; padding:0 8px; color:var(--ink); }
+.ds-bubble-sep{ width:1px; height:18px; background:var(--line-soft); margin:0 var(--s-3); }
+.ds-bubble .ds-input{ border:0; outline:none; background:transparent; font-size:var(--fs-meta); width:220px; padding:0 var(--s-8); color:var(--ink); }
