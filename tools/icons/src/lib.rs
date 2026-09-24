@@ -3,8 +3,10 @@
 //! Every function here is pure: images in, images out. Only `main.rs` reads and writes files.
 
 mod bevel;
+mod board;
 mod color;
 mod compose;
+mod dialect;
 mod emblem;
 mod error;
 mod export;
@@ -16,14 +18,17 @@ mod key;
 mod mark;
 mod plane;
 mod plate;
+mod retint;
 mod sheet;
 mod spec;
 mod template;
 
-pub use bevel::{Bevel, finish, ground_face};
+pub use bevel::{Bevel, finish, plate_face};
+pub use board::{face_cell, look_cell, render_icon, space_tint};
 pub use color::{Oklab, Srgb8, delta_e, linear_to_srgb, oklab, srgb, srgb_to_linear};
 pub use compose::{Shadow, compose, compose_on, drop_shadow, over};
-pub use emblem::{EMBOSS_FROM, emblem, emblem_object};
+pub use dialect::{CHROMA_CAP, Dialect, Lch, PALETTE, Roles, Shift, Tint, roles};
+pub use emblem::{EMBOSS_FROM, Look, emblem, emblem_object};
 pub use error::IconsError;
 pub use export::{EXPORT_SIZES, Export, export, grid_for};
 pub use family::{Family, Stops};
@@ -34,6 +39,7 @@ pub use key::{Key, key_background};
 pub use mark::{BAND, Corner, Corners, Heading, Pt, Shape, distance};
 pub use plane::Plane;
 pub use plate::{PlateGrid, gradient, plate_mask};
+pub use retint::retint;
 pub use sheet::{Cell, Sheet, SheetStyle, build_sheet, size_strip, strip, strip_sheet};
-pub use spec::{Colour, Grain, Ground, Layer, Opacity, Paint, Relief, Spec, paint, parse_spec};
+pub use spec::{Grain, Layer, Relief, Role, Spec, parse_spec};
 pub use template::{Fraction, Template};
