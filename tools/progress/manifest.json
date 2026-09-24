@@ -1,6 +1,32 @@
 {
-  "updated": "2026-09-24, design system reviewed and handed to mailo; host complete; sill M1 bar wave running",
+  "updated": "2026-09-24, sill M1 bar proven; M2/M3 wallpaper and dock wave starting",
   "entries": [
+    {
+      "id": "m1-bar",
+      "date": "2026-09-24 \u00b7 sill Milestone 1",
+      "title": "The bar runs as a real shell surface on cosmic-comp: workspaces, status items, menus, zero idle frames",
+      "status": "proven",
+      "lede": "The first shell surface built on the design system. The sill daemon starts, takes its single-instance lock, spawns the services (UPower, NetworkManager, PipeWire, the status-notifier tray, the COSMIC toplevel and workspace protocols on their own connection) and puts one bar per output on the nested compositor. The bar reserves its 32 px, sits idle at zero frames, and its clock and status menus are the design system's Menu opened as real popups. Every stylesheet and render passes the coherence lint, so it is the same menu mailo will get.",
+      "notes": [
+        "Acceptance on nested cosmic-comp and on KWin: exclusive zone 32 px; five seconds idle adds 0 frames and 0 commits; the clock menu opens and dismisses; the popup is transparent around its card.",
+        "What the live bar shows here: the focused app, workspace pills (drag to reorder), tray icons (stand-in glyphs until the design system can draw an app's own icon, which is being added), volume, Wi-Fi, the clock in the local zone.",
+        "Below the daemon's bar in the second shot is the demo bar with fake services and its clock menu open."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic.png",
+          "caption": "the daemon's bar on nested cosmic-comp, live services"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic-menu.png",
+          "caption": "the demo bar under it with the clock menu open"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar.png",
+          "caption": "the bar on KWin at scale 1.5 with the Home Space tint"
+        }
+      ]
+    },
     {
       "id": "m0-cosmic",
       "date": "2026-09-24 \u00b7 Milestone 0 on cosmic-comp",
