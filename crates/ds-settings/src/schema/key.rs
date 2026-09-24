@@ -75,6 +75,8 @@ pub enum Deprecated {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Widget {
+    /// A read-only label: the one value a one-variant enum can hold.
+    Readout,
     Toggle,
     SegmentedControl,
     Menu,
@@ -88,14 +90,17 @@ pub enum Widget {
 /// A key's shape: what values it can hold, and so which widget draws it.
 ///
 /// Inferred from the field's own type by the derive (`crates/ds-settings-derive/src/shape.rs`):
-/// a two-variant enum is [`KeyKind::Toggle`], three to five [`KeyKind::Segmented`], more
-/// [`KeyKind::Menu`]; a newtype with `range` is [`KeyKind::Bounded`]; `String` is
-/// [`KeyKind::Text`]; `Hex` is [`KeyKind::Colour`]; `Vec<_>` is [`KeyKind::List`].
+/// a one-variant enum is [`KeyKind::Fixed`], a two-variant enum [`KeyKind::Toggle`], three to five [`KeyKind::Segmented`], more
+/// [`KeyKind::Menu`]; a newtype with `range` is [`KeyKind::Bounded`]; `String`, `PathBuf`,
+/// `Cow<str>` or a field marked `#[settings(text)]` is [`KeyKind::Text`]; `Hex` is [`KeyKind::Colour`]; `Vec<_>` is [`KeyKind::List`].
 /// [`KeyKind::Shortcut`] has no field-type rule yet (no settings key is a key binding today); a
 /// live D-Bus module (section 9.4) constructs it directly.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", content = "v", rename_all = "snake_case")]
 pub enum KeyKind {
+    /// A one-variant enum: the key exists and has its one value, with room for a second
+    /// variant later (`control_center.material`'s `Sheet` for v1).
+    Fixed { variant: String },
     /// A two-variant enum: on/off, natural/traditional, ....
     Toggle { variants: [String; 2] },
     /// A three-to-five-variant enum.
@@ -124,6 +129,7 @@ impl KeyKind {
     /// error here until it picks one).
     pub fn widget(&self) -> Widget {
         match self {
+            KeyKind::Fixed { .. } => Widget::Readout,
             KeyKind::Toggle { .. } => Widget::Toggle,
             KeyKind::Segmented { .. } => Widget::SegmentedControl,
             KeyKind::Menu { .. } => Widget::Menu,
@@ -150,18 +156,18 @@ pub struct KeySpec {
     pub deprecated: Deprecated,
 }
 
-/// Every variant count from 2 up, mapped to the [`KeyKind`] it picks (section 9.1: "a two-
-/// variant enum -> Toggle; 3..=5 variants -> Segmented; more -> Menu").
+/// Every variant count from 1 up, mapped to the [`KeyKind`] it picks (section 9.1: "a two-
+/// variant enum -> Toggle; 3..=5 variants -> Segmented; more -> Menu"; one variant is a
+/// read-only [`KeyKind::Fixed`]).
 ///
 /// Pure: takes the words, returns the kind. The derive's `kind_of::<T>()` (`crate::schema`)
 /// is the only caller that reaches for `SchemaVariants` to get them.
-pub fn kind_from_variants(words: Vec<String>) -> KeyKind {
+pub fn kind_from_variants(mut words: Vec<String>) -> KeyKind {
     match words.len() {
-        0 | 1 => panic!(
-            "SchemaVariants: a settings enum needs at least two variants to pick a widget, got \
-             {} ({words:?})",
-            words.len()
-        ),
+        0 => panic!("SchemaVariants: a settings enum needs at least one variant, got none"),
+        1 => KeyKind::Fixed {
+            variant: words.remove(0),
+        },
         2 => {
             let [a, b]: [String; 2] = words
                 .try_into()
@@ -206,13 +212,30 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "at least two variants")]
-    fn one_variant_panics() {
-        kind_from_variants(vec!["only".to_owned()]);
+    fn one_variant_is_fixed() {
+        assert_eq!(
+            kind_from_variants(vec!["only".to_owned()]),
+            KeyKind::Fixed {
+                variant: "only".to_owned()
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "at least one variant")]
+    fn no_variant_panics() {
+        kind_from_variants(Vec::new());
     }
 
     #[test]
     fn every_kind_maps_to_exactly_one_widget() {
+        assert_eq!(
+            KeyKind::Fixed {
+                variant: "a".to_owned()
+            }
+            .widget(),
+            Widget::Readout
+        );
         assert_eq!(
             KeyKind::Toggle {
                 variants: ["a".to_owned(), "b".to_owned()]

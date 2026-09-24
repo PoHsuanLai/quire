@@ -202,25 +202,32 @@ Played from the freedesktop sound theme (`sound.theme`, default `freedesktop`) b
 
 Pure; `now` is an argument; effects are returned.
 
+Menu tracking: **settled** (implemented in quire `crates/ds/src/overlay/menu_track.rs`,
+2026-09-24, sill gap Q1; the table below is its test list). The shipped shape differs from the
+first sketch in names only: generic over the caller's menu key, timings carried in the machine.
+
 ```rust
 // quire: crates/ds/src/overlay/menu_track.rs  (drives bar menus and every ds Menu)
 pub enum Held { Held, Released }
 pub enum Entered { Entered, NotYet }
-pub enum MenuTrack {
-    Closed,
-    Tracking { menu: MenuId, held: Held, entered: Entered, hot: Option<ItemPath>, sub: Sub },
-}
-pub enum Sub {
+pub struct MenuTrack<K> { pub timing: MenuTiming, pub phase: MenuPhase<K> } // timing from menus.*
+pub enum MenuPhase<K> { Closed, Tracking(Session<K>) }
+pub struct Session<K> { menu: K, held: Held, entered: Entered, hot: Option<ItemPath>,
+                        sub: Submenu, pointer: Point, under: MenuTarget<K> }
+pub enum Submenu {
     None,
     Pending { item: ItemPath, since: Instant },                    // 200 ms
-    Open    { item: ItemPath, guard: Option<Guard> },
+    Open    { item: ItemPath, guard: Option<SafeTriangle> },
 }
-pub struct Guard { from: Point, top: Point, bottom: Point, still_since: Instant } // safe triangle
-pub enum MenuIn { PressTitle(MenuId), Release(Target), Move(Point, Target), Key(MenuKey),
-                  OutsidePress, Tick }
-pub enum MenuOut { Open(MenuId, Anim), Switch(MenuId), Close(Anim), OpenSub(ItemPath),
-                   CloseSub, Highlight(Option<ItemPath>), Pick(ItemPath), RequestTick(Instant) }
-pub fn step(m: MenuTrack, ev: MenuIn, now: Instant) -> (MenuTrack, Vec<MenuOut>);
+pub struct SafeTriangle { from: Point, top: Point, bottom: Point, still_since: Instant }
+pub enum MenuTrackEvent<K> { PressTitle(K), Release(MenuTarget<K>), Move(Point, MenuTarget<K>),
+                             Key(MenuKey), OutsidePress, SubPlaced { top: Point, bottom: Point }, Tick }
+pub enum MenuTrackEffect<K> { Open(K, MenuAnim), Switch(K), Close(MenuAnim), OpenSub(ItemPath),
+                              CloseSub, Highlight(Option<ItemPath>), Pick(ItemPath),
+                              Adjacent(MenuDirection), RequestTick(Instant) }
+impl<K: Clone + PartialEq> MenuTrack<K> {
+    pub fn step(self, ev: MenuTrackEvent<K>, now: Instant) -> (Self, Vec<MenuTrackEffect<K>>);
+}
 ```
 
 | From | Event | To | Effects |
@@ -295,7 +302,7 @@ Banner duration is not a setting (R8: not user-changeable since Big Sur).
 
 | Concern | Owner |
 | --- | --- |
-| Menu tracking machine, safe triangle, `Menu` component | quire `overlay/menu_track.rs`, `components/menu.rs` |
+| Menu tracking machine, safe triangle, `Menu` component | quire `overlay/menu_track.rs` (settled, shipped), `components/menu.rs` |
 | Popup surfaces, reposition, grabs | shell-host `popup` (`PopupConfig`, `xdg_positioner`, `xdg_popup.reposition`) |
 | Bar, switcher, notifications, control center, launcher surfaces | sill `surfaces/{bar,switcher,notifications,control_center,launcher}` |
 | Notification server | sill-services (pattern: cosmic-notifications `subscriptions/notifications.rs`) |

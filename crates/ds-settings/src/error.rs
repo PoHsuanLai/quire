@@ -17,6 +17,9 @@ pub enum SettingsError {
     /// The value could not be written as TOML.
     #[error("encoding settings as TOML: {0}")]
     Encode(#[from] toml::ser::Error),
+    /// The value could not be written as JSON.
+    #[error("encoding settings as JSON: {0}")]
+    EncodeJson(#[from] serde_json::Error),
     /// The directory watch could not be started.
     #[error("watching settings: {0}")]
     Watch(#[from] notify::Error),

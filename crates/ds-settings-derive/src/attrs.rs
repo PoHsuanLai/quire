@@ -18,8 +18,24 @@ pub(crate) struct ContainerAttrs {
     pub page: syn::Expr,
 }
 
+/// What a field's attributes say about its kind, ahead of its type.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum KindHint {
+    /// `range = "a..=b"`: a bounded number from `min` to `max`.
+    Bounded {
+        /// The low end.
+        min: i64,
+        /// The high end.
+        max: i64,
+    },
+    /// `text`: free text whatever the type (a `SoundTheme(String)` newtype).
+    Text,
+    /// Neither: the type decides (`crate::shape`).
+    Infer,
+}
+
 /// `#[settings(label = "...", help = "...", section = "...", range = "a..=b", unit = "...",
-/// advanced)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
+/// advanced, text)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
 /// `#[serde(flatten)] extra: toml::Table` catch-all is the only field this workspace's structs
 /// use it for today).
 #[derive(Debug)]
@@ -31,9 +47,10 @@ pub(crate) enum FieldAttrs {
         label: String,
         help: String,
         section: String,
-        range: Option<(i64, i64)>,
         unit: Option<String>,
         advanced: bool,
+        /// `text`, `range` (with its ends) or neither.
+        hint: KindHint,
     },
 }
 
@@ -90,6 +107,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
     let mut unit = None;
     let mut advanced = false;
     let mut skip = false;
+    let mut text = false;
     let mut found = false;
     for attr in settings_attrs(attrs) {
         found = true;
@@ -109,10 +127,12 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
                 advanced = true;
             } else if meta.path.is_ident("skip") {
                 skip = true;
+            } else if meta.path.is_ident("text") {
+                text = true;
             } else {
                 return Err(meta.error(
                     "unknown #[settings(...)] attribute on a field; expected `label`, `help`, \
-                     `section`, `range`, `unit`, `advanced` or `skip`",
+                     `section`, `range`, `unit`, `advanced`, `text` or `skip`",
                 ));
             }
             Ok(())
@@ -130,13 +150,25 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
              9.5: a key exists only if a KeySpec describes it)",
         ));
     }
+    let hint = match (range, text) {
+        (Some(_), true) => {
+            return Err(syn::Error::new(
+                span,
+                "#[settings(...)]: `text` and `range` cannot both be given; a key is either \
+                 free text or a bounded number",
+            ));
+        }
+        (Some((min, max)), false) => KindHint::Bounded { min, max },
+        (None, true) => KindHint::Text,
+        (None, false) => KindHint::Infer,
+    };
     Ok(FieldAttrs::Key {
         label: label.ok_or_else(|| missing(span, "label"))?,
         help,
         section,
-        range,
         unit,
         advanced,
+        hint,
     })
 }
 
@@ -173,7 +205,7 @@ fn missing(span: Span, key: &str) -> syn::Error {
 
 #[cfg(test)]
 mod tests {
-    use super::{FieldAttrs, container_attrs, field_attrs, parse_range};
+    use super::{FieldAttrs, KindHint, container_attrs, field_attrs, parse_range};
     use proc_macro2::Span;
     use syn::spanned::Spanned;
 
@@ -252,7 +284,7 @@ mod tests {
         let parsed = field_attrs(attrs[0].span(), &attrs).unwrap();
         let FieldAttrs::Key {
             label,
-            range,
+            hint,
             unit,
             section,
             advanced,
@@ -262,10 +294,40 @@ mod tests {
             panic!("expected FieldAttrs::Key");
         };
         assert_eq!(label, "Magnified size");
-        assert_eq!(range, Some((48, 128)));
+        assert_eq!(hint, KindHint::Bounded { min: 48, max: 128 });
         assert_eq!(unit.as_deref(), Some("px"));
         assert_eq!(section, "Magnification");
         assert!(advanced);
+    }
+
+    #[test]
+    fn the_hint_follows_text_and_range() {
+        const CASES: &[(&str, KindHint)] = &[
+            ("#[settings(label = \"L\", text)]", KindHint::Text),
+            (
+                "#[settings(label = \"L\", range = \"0..=9\")]",
+                KindHint::Bounded { min: 0, max: 9 },
+            ),
+            ("#[settings(label = \"L\")]", KindHint::Infer),
+        ];
+        for (attr, want) in CASES {
+            let source = format!("struct S {{ {attr} f: u8 }}");
+            let attrs = first_field_attrs(&source);
+            let parsed = field_attrs(attrs[0].span(), &attrs).unwrap();
+            let FieldAttrs::Key { hint, .. } = parsed else {
+                panic!("{attr}: expected FieldAttrs::Key");
+            };
+            assert_eq!(hint, *want, "{attr}");
+        }
+    }
+
+    #[test]
+    fn text_and_range_together_are_an_error() {
+        let attrs = first_field_attrs(
+            "struct S { #[settings(label = \"L\", text, range = \"0..=9\")] f: u8 }",
+        );
+        let err = field_attrs(attrs[0].span(), &attrs).unwrap_err();
+        assert!(err.to_string().contains("`text` and `range`"), "{err}");
     }
 
     #[test]

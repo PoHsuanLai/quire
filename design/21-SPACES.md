@@ -178,10 +178,14 @@ repaint on every switch and would compete with the tint as the Space's colour cl
   running app learns the workspace's look through `ds-settings` (`use_environment`), keyed by
   the workspace its toplevel is on.
 
-## 10. Storage (settled path, proposed schema)
+## 10. Storage (settled path and schema)
 
 `$XDG_CONFIG_HOME/quire/spaces.json`, atomic write (the `ds-settings` writer), watched with
-`notify` (rename replaces inode; debounce 30 ms).
+`notify` (rename replaces inode; debounce 30 ms). **Settled** (2026-09-24, sill gap Q3):
+`ds::SpaceStore` is this schema (`crates/ds/src/space/store.rs`), and `ds_settings::SPACES`
+reads, writes and watches it through the generic settings file API
+(`crates/ds-settings/src/spaces.rs`). A `null` in `by_index` means "no look stored at this
+position".
 
 ```json
 {
@@ -194,7 +198,7 @@ repaint on every switch and would compete with the tint as the Space's colour cl
 }
 ```
 
-Lookup (proposed): `by_id[workspace id]` if the compositor gives a stable id
+Lookup (settled; `SpaceStore::look_for_workspace`): `by_id[workspace id]` if the compositor gives a stable id
 (ext-workspace `id` event), else `by_index[position]`, else the §4 default. Writes go to
 `by_id` when an id exists and always also to `by_index`, so a restart that renumbers ids
 still finds a look.
