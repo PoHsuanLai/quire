@@ -7,6 +7,7 @@
 //! runtime`) so `ds_settings::use_environment` can spawn its portal and file-watch tasks without
 //! panicking.
 
+pub mod clipboard;
 mod contexts;
 mod data_url;
 pub mod error;
@@ -22,6 +23,7 @@ mod host;
 mod install;
 pub mod launch;
 pub mod measure;
+mod memory_shell;
 mod net;
 mod net_policy;
 mod origin;

@@ -292,6 +292,28 @@ impl Harness {
         self.doc.frame(self.clock);
     }
 
+    /// What was last copied (Ctrl+C in a field, `ds_native::clipboard::write_text`): the
+    /// harness's clipboard is in memory, never the desktop's.
+    pub fn clipboard_text(&self) -> Option<String> {
+        self.doc.shell.text()
+    }
+
+    /// Put `text` on the harness's clipboard, as another app's copy would.
+    pub fn set_clipboard_text(&mut self, text: &str) {
+        self.doc.shell.put(text.to_owned());
+    }
+
+    /// The text selected in the first text field matching `selector`, if it has a selection.
+    pub fn selected_text(&self, selector: &str) -> Option<String> {
+        self.with_doc(|doc| {
+            let input = doc
+                .get_node(first(doc, selector)?)?
+                .element_data()?
+                .text_input_data()?;
+            input.editor.selected_text().map(str::to_owned)
+        })
+    }
+
     /// The sub-document of the first `iframe` matching `selector`, once it has one: what a
     /// frame shows, read without the app's document seeing into it.
     pub fn frame(&self, selector: &str) -> Option<FrameView<'_>> {

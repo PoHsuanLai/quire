@@ -19,6 +19,7 @@
 //! The document is reached through a hidden element's `onmounted` handle: dioxus-native builds
 //! the document itself and hands the app nothing else that can see it.
 
+use crate::clipboard::HostClipboard;
 use crate::install::install;
 use crate::scheme;
 use crate::setup::Setup;
@@ -60,6 +61,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
+    let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let window = use_window();
     let factor = window.scale_factor();
@@ -99,7 +101,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             style: "display:none",
             onmounted: move |mounted| {
                 if let Some(handle) = mounted.data().downcast::<NodeHandle>() {
-                    install(handle, &setup);
+                    install(handle, &setup, &clipboard);
                     document.replace(Some(handle.clone()));
                     installed.set(Installed::Done);
                 }
