@@ -20,7 +20,7 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Height | height token (value in 01-LAYOUT) | S |
 | Material | `Bar`, tinted by the workspace SpaceLook (`--f-*`); `Ds` draws the gradient at the bar's tint and the frame ground (bar gaps) | S |
 | Content | left: app name, workspace indicator (drag reorder); right: tray, volume, network, battery, clock | S |
-| Components | `IconButton{Status}` per status item (settled, bar gaps: box and glyph from `bar.status_*` through `StatusMetrics`), `MenuEntry::Info` for status lines, `Glyph` (`IconSize::Bar` 22, P), `Menu{Dropdown}` + `MenuEntry` for every menu, `Count`, `Tooltip{Fly}`, workspace dots as `SidebarItem`-style pills with seal | S / P |
+| Components | `IconButton{Status}` per status item (settled, bar gaps: box and glyph from `bar.status_*` through `StatusMetrics`), `MenuBarItem` around the app name, titles and clock (the 4 px hover and open pill, 13/500 text; settled 2026-09-24), `WorkspacePills` for the workspace indicator (one segmented group on the frame; settled 2026-09-24), `MenuEntry::Info` for status lines, `Glyph` (`IconSize::Bar` 22, P), `Menu{Dropdown}` + `MenuEntry` for every menu (22 px rows, 13 px text), `Count`, `Tooltip{Fly}` (12 px) | S / P |
 | Motion | menus `menu-pop` `--t-move` `--e-spring`; hover bg `--t-quick` `--e-out`; press `--squish` `--t-tap`; tint cross-fade `--t-scene` 380 ms (21-SPACES §5) | S |
 | Behaviours | 13-BEHAVIOUR-menus-windows (menu bar, menus: open delay, safe triangle), 06 (menus, Escape), 12 (workspace swipe updates indicator) | S |
 | Keyboard | `KeyboardMode::None`; a grabbing popup switches it to `OnDemand` until close | S |
@@ -34,7 +34,7 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | --- | --- | --- |
 | Layer / role | `Top`, anchor `BOTTOM`, height = base x max magnification + padding, `Reserve(base + margin)` | S |
 | Material | `Dock`, tinted by SpaceLook; drawn by `Ds` like the bar (bar gaps) | S |
-| Components | app tiles (08-ICONS plate), running indicator dots, `Count` badge (LauncherEntry), progress ring, `Tooltip{Fly}` hover label, `Menu{Context}` (windows, desktop actions, Keep in Dock, Quit), `Popover` for folder stacks | S / P |
+| Components | app tiles (08-ICONS plate; `IconView { plate }` as the placeholder), `RunningDot`, optional `DockFloor`, `Count` badge (LauncherEntry), progress ring, `Tooltip{Fly}` hover label, `Menu{Context}` (windows, desktop actions, Keep in Dock, Quit), `Popover` for folder stacks; geometry from `DockMetrics` (48 tiles, 8 gaps, 6 padding; settled 2026-09-24) and the pill a `Corner::Squircle` | S / P |
 | Motion | magnification: no easing while tracking, ~200 ms shrink on leave (10); launch bounce and attention bounce (10); badge change `bump`; label `hc-in`/`hc-out` P; menu `menu-pop` | S |
 | Behaviours | 10-BEHAVIOUR-dock (Plank parabola, 48 → up to 96, neighbours slide apart, click/right-click, stacks, drag-out, badges); auto-hide off by default (0.2 s delay, ~0.5 s slide when on) | S |
 | Keyboard | `None` | S |
@@ -47,7 +47,7 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | --- | --- | --- |
 | Layer / role | two surfaces kept warm: catcher (`Overlay`, anchor all, painted once, never animated) + panel (`Overlay`, centred, ~680 x 460) | S |
 | Material | panel `Popover` with SpaceLook tint on its chrome, result list on `--raise` | P |
-| Components | `CommandPalette<T>`, `SearchField`, `ListRow`, `Kbd`, `SectionHeader` (groups), `Menu{Rich}` for actions (Ctrl+K / Alt+K), `Chip{Accent}` operator tokens | S |
+| Components | `CommandPalette<T>` (`host: Surface`, sized to its content, the shell scale's 22 px field, `corner: Squircle(14)`; settled 2026-09-24), `SearchField`, `ListRow`, `Kbd`, `SectionHeader` (groups), `Menu{Rich}` for actions (Ctrl+K / Alt+K), `Chip{Accent}` operator tokens | S |
 | Motion | panel `peek-in` `--t-big` `--e-spring` (S uses peek-in for the command menu; C `cmdk-in`); rows `rise` stagger on first show only, cap 12; close `fade` `--t-quick` P | S / P |
 | Behaviours | 06 (command menu search, up/down clamped, Enter, Esc, Tab cycles providers), 13 (Spotlight-style launcher appearance); open p95 < 100 ms | S |
 | Keyboard | panel `Exclusive`; closes on Esc, `Focus::Lost`, catcher click, `launcher toggle` | S |

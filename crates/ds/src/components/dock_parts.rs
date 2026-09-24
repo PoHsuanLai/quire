@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 
-/// The running dot: a `--dock-dot` (4 px) circle centred under its tile, `--dock-dot-gap`
-/// (3 px) below the tile's bottom edge, in the dock's ink; it fades in over `--t-quick`. Place
+/// The running dot: a `--dock-dot` (4 px) circle centred under its tile, its centre
+/// `--dock-dot-gap` (3 px) below the tile's bottom edge (so it sits inside the 6 px padding), in the dock's ink; it fades in over `--t-quick`. Place
 /// it inside the tile's box (a positioned element), and leave it out when the app has no
 /// window.
 #[component]

@@ -25,11 +25,13 @@ pub enum Page {
     Matrix,
     /// Fire each animation; the Rust `settle` beside the CSS declaration.
     MotionLab,
+    /// The shell chrome beside the macOS numbers it targets.
+    Polish,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 11] = [
+    pub const ALL: [Page; 12] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -41,6 +43,7 @@ impl Page {
         Page::Gaps,
         Page::Matrix,
         Page::MotionLab,
+        Page::Polish,
     ];
 
     /// The `--page` word.
@@ -57,6 +60,7 @@ impl Page {
             Page::Gaps => "gaps",
             Page::Matrix => "matrix",
             Page::MotionLab => "motion-lab",
+            Page::Polish => "polish",
         }
     }
 }

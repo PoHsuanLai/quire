@@ -375,3 +375,51 @@ fn the_launcher_card_is_as_tall_as_its_content() {
     let field = rect(&harness, ".ds-search");
     assert!(field.size.height.0 >= 56.0, "{field:?}");
 }
+
+// ---- A popover fades before it goes ----------------------------------------------------------
+
+#[allow(non_snake_case)]
+fn Pop() -> Element {
+    let mut open = use_signal(|| true);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "padding:40px",
+                span { id: "state", if open() { "open" } else { "closed" } }
+            }
+            if open() {
+                ds::Popover {
+                    anchor: ds::Anchor::Point(ds::Point { x: Px(60.0), y: Px(60.0) }),
+                    placement: ds::Placement { side: ds::Side::Bottom, align: ds::Align::Start, flip: ds::Flip::Allowed },
+                    gap: Px(4.0),
+                    onclose: move |()| open.set(false),
+                    button { id: "inside", "Inside" }
+                }
+            }
+        }
+    }
+}
+
+/// A click outside a popover marks it leaving at once and closes it only after the `menu-out` fade.
+#[test]
+fn a_popover_fades_out_before_it_closes() {
+    let mut harness = Harness::new(Pop, VIEW);
+    harness.advance(ms(300));
+    assert_eq!(harness.count("#inside"), 1);
+    harness.pointer_down(ds::Point {
+        x: Px(500.0),
+        y: Px(20.0),
+    });
+    harness.pointer_up(ds::Point {
+        x: Px(500.0),
+        y: Px(20.0),
+    });
+    harness.advance(ms(16));
+    assert_eq!(
+        harness.attr(".ds-popover", "data-presence").as_deref(),
+        Some("leaving")
+    );
+    assert_eq!(harness.text_of("#state").as_deref(), Some("open"));
+    harness.advance(ms(400));
+    assert_eq!(harness.text_of("#state").as_deref(), Some("closed"));
+    assert_eq!(harness.count(".ds-popover"), 0);
+}
