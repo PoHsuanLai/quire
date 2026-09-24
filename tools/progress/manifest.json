@@ -1,333 +1,379 @@
 {
-  "updated": "2026-09-25, polish pass merged (quire v0.1.1); icon round two and the shell's adoption running",
-  "entries": [
+ "updated": "2026-09-25, quire v0.1.3; the shell's polish adoption merged; icon round two awaits the user's pick",
+ "entries": [
+  {
+   "id": "polish-adoption",
+   "date": "2026-09-25 · sill adopts the polish pass",
+   "title": "The bar, dock and launcher take the polish pass on the nested compositor, over a real wallpaper",
+   "status": "proven",
+   "lede": "Every shell surface now writes the shell type scale and the material stack from the settings around its root. The bar's app name and clock sit in menu-bar pills and the workspaces form one segmented group; text menus are 22 px rows with a hairline separator and a rounded highlight. The dock pill is a squircle with quire's dock metrics, every tile on a paper plate, running dots on the baseline through a bounce. The launcher's card is a squircle sized to its content, its measured rect drives the panel's input and blur and the catcher's hole, and the surface grew room for the card's shadow. Fourteen new settings keys, three moved defaults, and a generated test wallpaper behind every acceptance run.",
+   "notes": [
+    "Acceptance: dock 6/6 (window maximises to 1260 of 1360; hover sweep 39 frames for 38 callbacks; idle 0 frames in 5 s; squircle corner probe tells inside from outside), bar 8/8 (idle 0 commits), launcher 6/6 in release: warm open min 64, p50 68, max 100 ms; first open 153 ms. The same build failed the 100 ms gate at load average 18 and passed at 8.",
+    "Gaps recorded as Q66 to Q70: design/22 rows (added in quire v0.1.3), material keys read from `extra` until ds-settings had fields (v0.1.3 has them; the switch is in progress), pill radius 22 vs the brief's 18 (same curve at 60 px, shadow radius differs), popup side room 24 px cuts a 28 px menu shadow, MagnifyParams design defaults."
+   ],
+   "images": [
     {
-      "id": "polish-and-icons",
-      "date": "2026-09-25 \u00b7 quire polish pass and icon bake-off",
-      "title": "The design system gains the layers macOS stacks, and the first app icons came out too realistic",
-      "status": "running",
-      "lede": "After comparing the shell with macOS, the design system gained a material stack (a vibrancy boost baked into the tint, a 1 px inner highlight, a hairline, a contact shadow and an ambient one), continuous-curvature squircle corners, a shell type scale (13 px bar items, 22 px menu rows, a 22 px launcher field), menu-bar hover pills, dock metrics with running dots and placeholder plates, and a launcher card that fits its content. The gallery's Polish page prints each rendering beside the macOS number it targets. The shell adopts it next. The icon bake-off ran on both local models and produced clean, readable icons, but they are photoreal objects on plates; the verdict was 'too realistic', so round two goes abstract in the paper-and-ink language, with a procedural alternative built from the tokens.",
-      "notes": [
-        "Polish values are all configurable (design/22 keys per item); the docs mark each as settled with its macOS reference and confidence.",
-        "Bake-off numbers: FLUX.2 Klein 4B renders in 3 to 4 s warm at 12 GB; Qwen-Image-2512 in 70 to 90 s at 14.7 GB (cannot share the GPU). Qwen gave the cleaner raw set; both failed the terminal subject."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/polish-dark-postmark.png",
-          "caption": "the Polish page, dark: menu bar and text menu, the material stack off and on, squircle corners, the dock pill with plates, the launcher, the window shadow"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/qwen-plated.png",
-          "caption": "round one, Qwen-Image-2512: five subjects, four seeds, plated, with 16/32/48 px exports; rejected as too realistic"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/klein-plated.png",
-          "caption": "round one, FLUX.2 Klein 4B: the same brief"
-        }
-      ]
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/polish-bar-cosmic.png",
+     "caption": "the bar: bold app name, one workspace group, status glyphs, the clock"
     },
     {
-      "id": "m4-launcher",
-      "date": "2026-09-24 \u00b7 sill Milestone 4",
-      "title": "The launcher opens in about 60 ms with apps, windows, settings and a calculator, on the same menu as everything else",
-      "status": "proven",
-      "lede": "The first delivery gate of the program. Two warm surfaces (a transparent catcher and the panel) are toggled through one shared link, so opening never spawns anything. The search core runs every provider on its own thread, stamps results by generation and drops stale ones; queries reach their first results in microseconds. Providers: applications (with desktop actions), open windows, system commands gated on what logind allows, a calculator on fend, and settings keys from the installed schemas plus COSMIC's own pages. The panel is the design system's command palette, keyboard-first, with Ctrl+K opening a row's actions as the same menu the bar and dock use.",
-      "notes": [
-        "Acceptance on nested cosmic-comp (release build): warm open 52 to 80 ms, p50 57 (the budget is 100); first open 106 ms; both surfaces exist hidden from startup; a second toggle hides, a catcher click closes; 5 s idle after hide adds 0 frames on both surfaces.",
-        "Both crashes are fixed at the source (motion tasks are owned by their scope; focus goes through a host seam) and the launcher's workarounds are gone: the palette fills its panel with no dim box, rows show the app's own icon, the selection follows the pointer, and the actions menu hangs from the selected row. A 20-toggle stress at 150 ms spacing leaves the daemon healthy.",
-        "Not yet: IME verified live (needs your unlocked session and fcitx5: dev/ime-probe.sh prints the commands), the launcher on the output under the pointer, and system commands (logged, not run, until a session control exists).",
-        "Latency re-measurement pending a quiet machine: with a 28-core job running, warm opens read about 117 ms p50 versus 57 ms earlier."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/launcher-cosmic.png",
-          "caption": "typing 'fi': top hit, applications, windows, settings"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/launcher-cosmic-actions.png",
-          "caption": "Ctrl+K on Firefox: its desktop actions as a menu"
-        }
-      ]
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/polish-bar-cosmic-menu.png",
+     "caption": "the clock's menu open: the pill highlight, 22 px rows, hairline separator"
     },
     {
-      "id": "m3-dock",
-      "date": "2026-09-24 \u00b7 sill Milestones 2 and 3",
-      "title": "The dock launches, magnifies, badges and quits real apps on cosmic-comp",
-      "status": "proven",
-      "lede": "The second shell surface, on the same design system as the bar. Behind it the application index (353 desktop entries on this machine, icons resolved through the theme chain), launching through transient systemd scopes or D-Bus activation with an activation token, a pins file, and LauncherEntry badges from the session bus. The dock reserves its height, magnifies tiles at the compositor's own frame rate while the pointer is over it and goes back to zero frames when it leaves, launches a pinned app on click, shows a badge within a frame of the signal, and opens the design system's context menu on a right click.",
-      "notes": [
-        "Acceptance on nested cosmic-comp: reserve 72 px; a one-second hover sweep renders 52 frames for 52 callbacks then 0 frames over 5 s idle; COSMIC Terminal launched in its own scope with its running dot 0.5 s later; a count badge turned red 131 ms after the emitter sent it; a right-click opened the menu with the window, Remove from Dock and Quit.",
-        "After the adoption pass the pill is the Dock material's own Space-gradient tint with its radius and shadow, and the hover label stays hidden while a menu is open. Still open in the design system: a radius override for the pill setting, icon sizes above 22 px, and a caller-driven tooltip.",
-        "Not yet built: Open at Login, drag ghost, file drops, minimize targets, sounds; auto-hide is wired but not exercised."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic.png",
-          "caption": "the dock at rest under the bar, two tiles (COSMIC Terminal pinned, Trash)"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic-magnified.png",
-          "caption": "pointer over the terminal tile: magnified, neighbour pushed aside"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic-menu.png",
-          "caption": "after a click launched the terminal: running dot, and the right-click menu"
-        }
-      ]
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/polish-dock-cosmic-magnified.png",
+     "caption": "the dock magnified: squircle pill, paper plates, the separator"
     },
     {
-      "id": "m1-bar",
-      "date": "2026-09-24 \u00b7 sill Milestone 1",
-      "title": "The bar runs as a real shell surface on cosmic-comp: workspaces, status items, menus, zero idle frames",
-      "status": "proven",
-      "lede": "The first shell surface built on the design system. The sill daemon starts, takes its single-instance lock, spawns the services (UPower, NetworkManager, PipeWire, the status-notifier tray, the COSMIC toplevel and workspace protocols on their own connection) and puts one bar per output on the nested compositor. The bar reserves its 32 px, sits idle at zero frames, and its clock and status menus are the design system's Menu opened as real popups. Every stylesheet and render passes the coherence lint, so it is the same menu mailo will get.",
-      "notes": [
-        "Updated after the design-system adoption pass: the bar is the Space gradient with grain, status items sit on the frame inks, the tray shows each app's own icon (coloured ones as images, the rest recoloured to the ink), and the popup is transparent around its card. The launcher panel in the first shot is the M4 work in progress on the same compositor.",
-        "Acceptance on nested cosmic-comp and on KWin: exclusive zone 32 px; five seconds idle adds 0 frames and 0 commits; the clock menu opens and dismisses; the popup is transparent around its card.",
-        "What the live bar shows here: the focused app, workspace pills (drag to reorder), tray icons (stand-in glyphs until the design system can draw an app's own icon, which is being added), volume, Wi-Fi, the clock in the local zone.",
-        "Below the daemon's bar in the second shot is the demo bar with fake services and its clock menu open."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic.png",
-          "caption": "the daemon's bar on nested cosmic-comp after adoption: Space gradient, real tray icons"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic-menu.png",
-          "caption": "the clock menu as a transparent popup"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar.png",
-          "caption": "the bar on KWin at scale 1.5 (first version, Home Space tint)"
-        }
-      ]
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/polish-dock-cosmic-menu.png",
+     "caption": "a dock tile's context menu with a window, the running dot on the baseline"
     },
     {
-      "id": "m0-cosmic",
-      "date": "2026-09-24 \u00b7 Milestone 0 on cosmic-comp",
-      "title": "The host passes four of the five acceptance items on the real compositor; compositor blur makes the bar vanish",
-      "status": "running",
-      "lede": "Nested cosmic-comp 1.8.0 turns out to run with the screen off once GL vblank sync is disabled, so the deferred run happened today. The bar reserves its 32 px, fractional scale maps pixel for pixel, two surfaces share one device, and the dock hover sweep renders every frame with zero idle frames. Blur is the exception: with a blur region requested, cosmic-comp stops drawing the bar at all (one run captured a blank frame), while the same client passes on KWin. The acceptance check now also requires the checkerboard to stay visible so a blank frame can never read as a perfect blur. An investigation is running.",
-      "notes": [
-        "Dock sweep on cosmic: 2059 frames for 2059 callbacks, 0.27 ms median, 0.39 ms p95; five seconds idle: 0 frames, 0 commits, 0 main-thread wakeups.",
-        "Two surfaces on one device: the second costs 1.4 MB.",
-        "Blur: the bar is composited with blur off and disappears with blur on; the cause (our buffer/region or a cosmic-comp bug on the nested GL path) is being isolated with a plain shm client and the AMD adapter."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/cosmic/a.png",
-          "caption": "cosmic-comp: the 32 px bar above the maximized checkerboard (item a)"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/cosmic/b.png",
-          "caption": "cosmic-comp with a blur region requested: the bar is gone (item b, open)"
-        }
-      ]
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/polish-launcher-cosmic.png",
+     "caption": "the launcher: a content-sized squircle card with contact and ambient shadows"
     },
     {
-      "id": "gallery-first-look",
-      "date": "2026-09-24 \u00b7 quire wave 3",
-      "title": "The design system exists: every component on review pages, in both themes and six accents",
-      "status": "proven",
-      "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 310 tests), and the gallery renders them through the real Blitz pipeline. Its first run caught thirteen defects (text inputs at replaced-element size, an empty toast pill on every root, invisible undo labels, a class collision between the text field and the Space editor's colour field); all are fixed, then a polish pass scoped the reset with :where, moved every spacing in every sheet onto the spacing tokens, and made the colour field's dots round. These are the sheets after both passes. The migration brief has gone to the mailo session.",
-      "notes": [
-        "Two root causes behind most of the list: one shared class name between two components, and a reset rule that outranked every single-class component rule.",
-        "Open: a Blitz hit-testing bug (a lone inline-flex button beside only inline content receives no click; reproduction test written for an upstream report) and overlay bounds that follow the content height."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/controls-light-postmark.png",
-          "caption": "Controls page, light, Postmark: buttons, icon buttons, command pill, segments, tabs, toggles, sliders, inputs at one line"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/overlays-dark-postmark.png",
-          "caption": "Overlays page, dark: the Rich menu, link pills honest and lying, the send pill counting down, the undo toast with its pull tab"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/lists-light-postmark.png",
-          "caption": "Lists page, light: rows with unread dots and chips, sidebar items on the Space's frame colour with the seal, tiles"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/space-light-postmark.png",
-          "caption": "Space page: the editor with its hue x chroma field, stops, grain, presets, the four legibility gates measured live, and the frame tokens it derives"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/materials-dark-postmark.png",
-          "caption": "Materials page, dark: eight materials over a wallpaper, blur on and off"
-        }
-      ]
-    },
-    {
-      "id": "h2-host",
-      "date": "2026-09-24 \u00b7 shell-host H2",
-      "title": "The real host passes the Milestone 0 acceptance: one process, many surfaces, no idle frames",
-      "status": "proven",
-      "lede": "The spike is retired. The production host (calloop loop, one GPU device, shared renderer, layer surfaces, popups, input, IME, clipboard, blur, fractional scale) runs the same five acceptance items on its demos in a nested KWin and passes them all; 162 tests; the same numbers as the spike within noise.",
-      "notes": [
-        "Dock hover sweep: 73 frames for 73 callbacks, 0.89 ms median; five seconds idle: zero frames, zero commits, zero main-thread wakeups.",
-        "Two driver facts recorded: wgpu ties an instance to one Wayland display; NVIDIA 615.71 crashes on a surface query after a probe instance is dropped, so probe instances are kept alive.",
-        "Waiting on your unlocked screen: the same run on the live session and inside nested cosmic-comp."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/a.png",
-          "caption": "demo_bar on the real host: the 32 px bar above a maximized checkerboard"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b.png",
-          "caption": "demo_bar with compositor blur behind the bar"
-        }
-      ]
-    },
-    {
-      "id": "m0-render",
-      "date": "2026-09-24 \u00b7 Milestone 0, items a, b, c, f, g",
-      "title": "Blitz renders into a layer-shell bar with compositor blur, and the dock hover animates with zero idle frames",
-      "status": "proven",
-      "lede": "The go/no-go item for the whole program passed with no fallback. A Dioxus document draws into a top-anchored layer surface through one shared GPU renderer; the bar reserves its 32 px, the compositor blurs what is behind it, a hover sweep across twelve dock icons renders every frame in about a millisecond, and five seconds of idle produce no frames at all. Two surfaces in one process cost 2 MB more than one. Run in a nested virtual KWin because the session was locked.",
-      "notes": [
-        "Dock sweep: 69 frames for 70 callbacks, 0.92 ms median, 1.25 ms p95 against a 16.7 ms budget; idle: 0 frames, 0 commits.",
-        "Blur: pixel variance inside the bar dropped from 3306 to 0.56.",
-        "Fractional scale 1.5 and 1.7 map buffer to screen pixel for pixel; a 2-logical-px checker measures 3 px at 1.5.",
-        "NVIDIA on Vulkan works; the AMD iGPU and the GL backend do not present on this machine."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/a.png",
-          "caption": "item a: the 32 px bar (top) above a maximized checkerboard window"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b_blur0.png",
-          "caption": "item b: translucent bar without blur"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b.png",
-          "caption": "item b: the same bar with compositor blur behind it"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/f_1.7.png",
-          "caption": "item f: fractional scale 1.7, buffer 1919x54 for 1129x32 logical"
-        }
-      ]
-    },
-    {
-      "id": "m0-widget-headless",
-      "date": "2026-09-24 \u00b7 Milestone 0, item d",
-      "title": "A custom-painted widget draws into its own GPU texture inside a Blitz document",
-      "status": "proven",
-      "lede": "The path the terminal, video player and PDF viewer will use: a Rust widget owns a wgpu texture, renders into it each frame, and Blitz composites it as an image. Redraw requests stop after the widget says it is idle. The headless render-to-PNG path and its snapshot test (the CI gate for every surface) also work.",
-      "notes": [
-        "Rendered on the RTX 5070 Ti through Vulkan, offscreen; the CPU path leaves the widget transparent by design.",
-        "Snapshot tolerance: at most 2 per channel and 0.1 % of pixels; a deliberate colour change was rejected at 8.2 %."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/0.png",
-          "upscale": 3,
-          "caption": "widget texture at t = 0 s (rotating triangle, 240x180 shown 3x)"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/1.png",
-          "upscale": 3,
-          "caption": "t = 0.5 s"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/2.png",
-          "upscale": 3,
-          "caption": "t = 1.0 s; after 2 s the widget stops asking for frames"
-        }
-      ]
-    },
-    {
-      "id": "m0-protocols",
-      "date": "2026-09-24 \u00b7 Milestone 0, items b, e, f",
-      "title": "Blur, fractional scale and popups work against KWin from a bare client",
-      "status": "proven",
-      "lede": "Hand-written Wayland protocol handlers (the ones smithay-client-toolkit 0.20 lacks): the compositor advertises blur and honours a region; fractional scale reports this display's real 1.7; an xdg_popup child of a layer surface positions itself with the compositor's own constraint adjustment, and a nested submenu positions relative to it.",
-      "notes": [
-        "Popup 1 configured at (0,28) 180x110 after KWin slid it on-screen; popup 2 at (164,13) 160x90.",
-        "24 tests: rounded-strip regions against a raster oracle, positioner tables, scale rounding.",
-        "No screenshot: the capture tool returned transparent images from that run; fixed for the next spike."
-      ],
-      "images": []
-    },
-    {
-      "id": "m0-nested",
-      "date": "2026-09-24 \u00b7 dev harness",
-      "title": "cosmic-comp runs nested inside the KDE session with every protocol we need",
-      "status": "proven",
-      "lede": "One script starts a nested COSMIC compositor as a window, records its socket, and lists its globals. It advertises layer-shell v5, background blur, fractional scale, viewporter, COSMIC toplevel and workspace protocols, and text-input v3. ghostty runs inside it; stopping it leaves the host untouched.",
-      "notes": [
-        "Works on the NVIDIA path directly; the AMD fallback was not needed.",
-        "Frosted glass is set through com.system76.CosmicTheme.{Dark,Light}/v2/frosted; 1.8.0 reads only v2."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-nested/0.png",
-          "caption": "the nested compositor as a window on the KDE desktop"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-nested/1.jpeg",
-          "caption": "ghostty running inside the nested compositor"
-        }
-      ]
-    },
-    {
-      "id": "w0-probes",
-      "date": "2026-09-24 \u00b7 quire wave 0",
-      "title": "Sixteen Blitz CSS probes settle what the design system may use",
-      "status": "proven",
-      "lede": "Each probe renders a tiny document headlessly and checks pixels. Transitions, keyframes, custom properties, animation restart, SVG currentColor, fonts, color-mix and timers all work. Attribute selectors only match with a namespace prefix, focus-visible is always false, ellipsis clips instead of fading, and no backend does backdrop-filter. The design system's CSS emitter and lint now encode these.",
-      "notes": [
-        "Fallbacks adopted: [*|data-x] selectors, a data-modality attribute for focus rings, mask-image fades for truncation, compositor blur only."
-      ],
-      "images": [
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/0.jpeg",
-          "caption": "S2: [data-theme] selector never matches on Blitz"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/1.jpeg",
-          "caption": "S2: [*|data-theme] matches (the fix)"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/2.jpeg",
-          "caption": "S3: keyframes with var(), t = 0"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/3.jpeg",
-          "caption": "S3: same document at t = 0.3 s"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/4.jpeg",
-          "caption": "S6: inline SVG stroke follows color via attributes"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/5.jpeg",
-          "caption": "S11: a bundled TTF registered on the font context"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/6.jpeg",
-          "caption": "S13: ellipsis clips (top); mask fade works (bottom)"
-        },
-        {
-          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/7.jpeg",
-          "caption": "S16: hybrid backend applies blur() but not saturate()"
-        }
-      ]
-    },
-    {
-      "id": "icons-smoke",
-      "date": "2026-09-24 \u00b7 icon pipeline",
-      "title": "Local image generation runs: FLUX.2 Klein 4B on the 5070 Ti in 22 seconds",
-      "status": "proven",
-      "lede": "ComfyUI in a uv venv with a 2.6 GB quantised FLUX.2 Klein (Apache-2.0). The smoke prompt asked for a single flat object; the model returned a photograph, which is what the style brief and the squircle post-processing will correct. Qwen-Image-2512 waits for 13 GB of free VRAM.",
-      "images": [
-        {
-          "path": "/home/pohsuanlai/comfy/out/smoke-flux2-klein-4b.png",
-          "caption": "smoke render: 'a paper envelope', 512 px, 4 steps"
-        }
-      ]
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/polish-launcher-cosmic-actions.png",
+     "caption": "the launcher's actions menu hanging from the selected row"
     }
-  ]
+   ]
+  },
+  {
+   "id": "polish-and-icons",
+   "date": "2026-09-25 · quire polish pass and icon bake-off",
+   "title": "The design system gains the layers macOS stacks; icon round two is abstract, and the procedural set speaks the language",
+   "status": "proven",
+   "lede": "After comparing the shell with macOS, the design system gained a material stack (a vibrancy boost baked into the tint, a 1 px inner highlight, a hairline, a contact shadow and an ambient one), continuous-curvature squircle corners, a shell type scale (13 px bar items, 22 px menu rows, a 22 px launcher field), menu-bar hover pills, dock metrics with running dots and placeholder plates, and a launcher card that fits its content. The gallery's Polish page prints each rendering beside the macOS number it targets. The icon bake-off ran on both local models and produced clean, readable icons, but they are photoreal objects on plates; the verdict was 'too realistic', so round two goes abstract in the paper-and-ink language, with a procedural alternative built from the tokens. Round two ran: both models with a flat paper-cut-out brief, and a procedural set drawn from the tokens (one stroke weight, Post corners, the frame grain, four colours on the plate). The procedural set is coherent by construction and reads at every size; the generated sets moved away from clay renders but keep a second line weight (Klein) or bevels and drop shadows (Qwen). The pick is the user's.",
+   "notes": [
+    "Polish values are all configurable (design/22 keys per item); the docs mark each as settled with its macOS reference and confidence.",
+    "Bake-off numbers: FLUX.2 Klein 4B renders in 3 to 4 s warm at 12 GB; Qwen-Image-2512 in 70 to 90 s at 14.7 GB (cannot share the GPU). Qwen gave the cleaner raw set; both failed the terminal subject.",
+    "Round two: Klein 3.0 s per render at 11.1 GB peak, Qwen 67 to 78 s at 15.0 GB. Procedural: a 20 to 40 line spec per icon, seconds to render, every export size drawn rather than downscaled. Full comparison in docs/icons-bakeoff.md 'Round two'."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/polish-dark-postmark.png",
+     "caption": "the Polish page, dark: menu bar and text menu, the material stack off and on, squircle corners, the dock pill with plates, the launcher, the window shadow"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/abstract-plated.png",
+     "caption": "round two, procedural: mail, files, terminal, notes, photos from tools/icons specs, at 512, 48, 32 and 16 px on light and dark"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/klein2-plated.png",
+     "caption": "round two, FLUX.2 Klein 4B with the flat paper-cut-out brief: four seeds per subject"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/qwen2-plated.png",
+     "caption": "round two, Qwen-Image-2512, the same brief"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/qwen-plated.png",
+     "caption": "round one, Qwen-Image-2512, for comparison: rejected as too realistic"
+    }
+   ]
+  },
+  {
+   "id": "m4-launcher",
+   "date": "2026-09-24 · sill Milestone 4",
+   "title": "The launcher opens in about 60 ms with apps, windows, settings and a calculator, on the same menu as everything else",
+   "status": "proven",
+   "lede": "The first delivery gate of the program. Two warm surfaces (a transparent catcher and the panel) are toggled through one shared link, so opening never spawns anything. The search core runs every provider on its own thread, stamps results by generation and drops stale ones; queries reach their first results in microseconds. Providers: applications (with desktop actions), open windows, system commands gated on what logind allows, a calculator on fend, and settings keys from the installed schemas plus COSMIC's own pages. The panel is the design system's command palette, keyboard-first, with Ctrl+K opening a row's actions as the same menu the bar and dock use.",
+   "notes": [
+    "Acceptance on nested cosmic-comp (release build): warm open 52 to 80 ms, p50 57 (the budget is 100); first open 106 ms; both surfaces exist hidden from startup; a second toggle hides, a catcher click closes; 5 s idle after hide adds 0 frames on both surfaces.",
+    "Both crashes are fixed at the source (motion tasks are owned by their scope; focus goes through a host seam) and the launcher's workarounds are gone: the palette fills its panel with no dim box, rows show the app's own icon, the selection follows the pointer, and the actions menu hangs from the selected row. A 20-toggle stress at 150 ms spacing leaves the daemon healthy.",
+    "Not yet: IME verified live (needs your unlocked session and fcitx5: dev/ime-probe.sh prints the commands), the launcher on the output under the pointer, and system commands (logged, not run, until a session control exists).",
+    "Latency re-measurement pending a quiet machine: with a 28-core job running, warm opens read about 117 ms p50 versus 57 ms earlier."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/launcher-cosmic.png",
+     "caption": "typing 'fi': top hit, applications, windows, settings"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/launcher-cosmic-actions.png",
+     "caption": "Ctrl+K on Firefox: its desktop actions as a menu"
+    }
+   ]
+  },
+  {
+   "id": "m3-dock",
+   "date": "2026-09-24 · sill Milestones 2 and 3",
+   "title": "The dock launches, magnifies, badges and quits real apps on cosmic-comp",
+   "status": "proven",
+   "lede": "The second shell surface, on the same design system as the bar. Behind it the application index (353 desktop entries on this machine, icons resolved through the theme chain), launching through transient systemd scopes or D-Bus activation with an activation token, a pins file, and LauncherEntry badges from the session bus. The dock reserves its height, magnifies tiles at the compositor's own frame rate while the pointer is over it and goes back to zero frames when it leaves, launches a pinned app on click, shows a badge within a frame of the signal, and opens the design system's context menu on a right click.",
+   "notes": [
+    "Acceptance on nested cosmic-comp: reserve 72 px; a one-second hover sweep renders 52 frames for 52 callbacks then 0 frames over 5 s idle; COSMIC Terminal launched in its own scope with its running dot 0.5 s later; a count badge turned red 131 ms after the emitter sent it; a right-click opened the menu with the window, Remove from Dock and Quit.",
+    "After the adoption pass the pill is the Dock material's own Space-gradient tint with its radius and shadow, and the hover label stays hidden while a menu is open. Still open in the design system: a radius override for the pill setting, icon sizes above 22 px, and a caller-driven tooltip.",
+    "Not yet built: Open at Login, drag ghost, file drops, minimize targets, sounds; auto-hide is wired but not exercised."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic.png",
+     "caption": "the dock at rest under the bar, two tiles (COSMIC Terminal pinned, Trash)"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic-magnified.png",
+     "caption": "pointer over the terminal tile: magnified, neighbour pushed aside"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic-menu.png",
+     "caption": "after a click launched the terminal: running dot, and the right-click menu"
+    }
+   ]
+  },
+  {
+   "id": "m1-bar",
+   "date": "2026-09-24 · sill Milestone 1",
+   "title": "The bar runs as a real shell surface on cosmic-comp: workspaces, status items, menus, zero idle frames",
+   "status": "proven",
+   "lede": "The first shell surface built on the design system. The sill daemon starts, takes its single-instance lock, spawns the services (UPower, NetworkManager, PipeWire, the status-notifier tray, the COSMIC toplevel and workspace protocols on their own connection) and puts one bar per output on the nested compositor. The bar reserves its 32 px, sits idle at zero frames, and its clock and status menus are the design system's Menu opened as real popups. Every stylesheet and render passes the coherence lint, so it is the same menu mailo will get.",
+   "notes": [
+    "Updated after the design-system adoption pass: the bar is the Space gradient with grain, status items sit on the frame inks, the tray shows each app's own icon (coloured ones as images, the rest recoloured to the ink), and the popup is transparent around its card. The launcher panel in the first shot is the M4 work in progress on the same compositor.",
+    "Acceptance on nested cosmic-comp and on KWin: exclusive zone 32 px; five seconds idle adds 0 frames and 0 commits; the clock menu opens and dismisses; the popup is transparent around its card.",
+    "What the live bar shows here: the focused app, workspace pills (drag to reorder), tray icons (stand-in glyphs until the design system can draw an app's own icon, which is being added), volume, Wi-Fi, the clock in the local zone.",
+    "Below the daemon's bar in the second shot is the demo bar with fake services and its clock menu open."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic.png",
+     "caption": "the daemon's bar on nested cosmic-comp after adoption: Space gradient, real tray icons"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic-menu.png",
+     "caption": "the clock menu as a transparent popup"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar.png",
+     "caption": "the bar on KWin at scale 1.5 (first version, Home Space tint)"
+    }
+   ]
+  },
+  {
+   "id": "m0-cosmic",
+   "date": "2026-09-24 · Milestone 0 on cosmic-comp",
+   "title": "The host passes four of the five acceptance items on the real compositor; compositor blur makes the bar vanish",
+   "status": "running",
+   "lede": "Nested cosmic-comp 1.8.0 turns out to run with the screen off once GL vblank sync is disabled, so the deferred run happened today. The bar reserves its 32 px, fractional scale maps pixel for pixel, two surfaces share one device, and the dock hover sweep renders every frame with zero idle frames. Blur is the exception: with a blur region requested, cosmic-comp stops drawing the bar at all (one run captured a blank frame), while the same client passes on KWin. The acceptance check now also requires the checkerboard to stay visible so a blank frame can never read as a perfect blur. An investigation is running.",
+   "notes": [
+    "Dock sweep on cosmic: 2059 frames for 2059 callbacks, 0.27 ms median, 0.39 ms p95; five seconds idle: 0 frames, 0 commits, 0 main-thread wakeups.",
+    "Two surfaces on one device: the second costs 1.4 MB.",
+    "Blur: the bar is composited with blur off and disappears with blur on; the cause (our buffer/region or a cosmic-comp bug on the nested GL path) is being isolated with a plain shm client and the AMD adapter."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/cosmic/a.png",
+     "caption": "cosmic-comp: the 32 px bar above the maximized checkerboard (item a)"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/cosmic/b.png",
+     "caption": "cosmic-comp with a blur region requested: the bar is gone (item b, open)"
+    }
+   ]
+  },
+  {
+   "id": "gallery-first-look",
+   "date": "2026-09-24 · quire wave 3",
+   "title": "The design system exists: every component on review pages, in both themes and six accents",
+   "status": "proven",
+   "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 310 tests), and the gallery renders them through the real Blitz pipeline. Its first run caught thirteen defects (text inputs at replaced-element size, an empty toast pill on every root, invisible undo labels, a class collision between the text field and the Space editor's colour field); all are fixed, then a polish pass scoped the reset with :where, moved every spacing in every sheet onto the spacing tokens, and made the colour field's dots round. These are the sheets after both passes. The migration brief has gone to the mailo session.",
+   "notes": [
+    "Two root causes behind most of the list: one shared class name between two components, and a reset rule that outranked every single-class component rule.",
+    "Open: a Blitz hit-testing bug (a lone inline-flex button beside only inline content receives no click; reproduction test written for an upstream report) and overlay bounds that follow the content height."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/controls-light-postmark.png",
+     "caption": "Controls page, light, Postmark: buttons, icon buttons, command pill, segments, tabs, toggles, sliders, inputs at one line"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/overlays-dark-postmark.png",
+     "caption": "Overlays page, dark: the Rich menu, link pills honest and lying, the send pill counting down, the undo toast with its pull tab"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/lists-light-postmark.png",
+     "caption": "Lists page, light: rows with unread dots and chips, sidebar items on the Space's frame colour with the seal, tiles"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/space-light-postmark.png",
+     "caption": "Space page: the editor with its hue x chroma field, stops, grain, presets, the four legibility gates measured live, and the frame tokens it derives"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/materials-dark-postmark.png",
+     "caption": "Materials page, dark: eight materials over a wallpaper, blur on and off"
+    }
+   ]
+  },
+  {
+   "id": "h2-host",
+   "date": "2026-09-24 · shell-host H2",
+   "title": "The real host passes the Milestone 0 acceptance: one process, many surfaces, no idle frames",
+   "status": "proven",
+   "lede": "The spike is retired. The production host (calloop loop, one GPU device, shared renderer, layer surfaces, popups, input, IME, clipboard, blur, fractional scale) runs the same five acceptance items on its demos in a nested KWin and passes them all; 162 tests; the same numbers as the spike within noise.",
+   "notes": [
+    "Dock hover sweep: 73 frames for 73 callbacks, 0.89 ms median; five seconds idle: zero frames, zero commits, zero main-thread wakeups.",
+    "Two driver facts recorded: wgpu ties an instance to one Wayland display; NVIDIA 615.71 crashes on a surface query after a probe instance is dropped, so probe instances are kept alive.",
+    "Waiting on your unlocked screen: the same run on the live session and inside nested cosmic-comp."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/a.png",
+     "caption": "demo_bar on the real host: the 32 px bar above a maximized checkerboard"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b.png",
+     "caption": "demo_bar with compositor blur behind the bar"
+    }
+   ]
+  },
+  {
+   "id": "m0-render",
+   "date": "2026-09-24 · Milestone 0, items a, b, c, f, g",
+   "title": "Blitz renders into a layer-shell bar with compositor blur, and the dock hover animates with zero idle frames",
+   "status": "proven",
+   "lede": "The go/no-go item for the whole program passed with no fallback. A Dioxus document draws into a top-anchored layer surface through one shared GPU renderer; the bar reserves its 32 px, the compositor blurs what is behind it, a hover sweep across twelve dock icons renders every frame in about a millisecond, and five seconds of idle produce no frames at all. Two surfaces in one process cost 2 MB more than one. Run in a nested virtual KWin because the session was locked.",
+   "notes": [
+    "Dock sweep: 69 frames for 70 callbacks, 0.92 ms median, 1.25 ms p95 against a 16.7 ms budget; idle: 0 frames, 0 commits.",
+    "Blur: pixel variance inside the bar dropped from 3306 to 0.56.",
+    "Fractional scale 1.5 and 1.7 map buffer to screen pixel for pixel; a 2-logical-px checker measures 3 px at 1.5.",
+    "NVIDIA on Vulkan works; the AMD iGPU and the GL backend do not present on this machine."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/a.png",
+     "caption": "item a: the 32 px bar (top) above a maximized checkerboard window"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b_blur0.png",
+     "caption": "item b: translucent bar without blur"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/b.png",
+     "caption": "item b: the same bar with compositor blur behind it"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0/f_1.7.png",
+     "caption": "item f: fractional scale 1.7, buffer 1919x54 for 1129x32 logical"
+    }
+   ]
+  },
+  {
+   "id": "m0-widget-headless",
+   "date": "2026-09-24 · Milestone 0, item d",
+   "title": "A custom-painted widget draws into its own GPU texture inside a Blitz document",
+   "status": "proven",
+   "lede": "The path the terminal, video player and PDF viewer will use: a Rust widget owns a wgpu texture, renders into it each frame, and Blitz composites it as an image. Redraw requests stop after the widget says it is idle. The headless render-to-PNG path and its snapshot test (the CI gate for every surface) also work.",
+   "notes": [
+    "Rendered on the RTX 5070 Ti through Vulkan, offscreen; the CPU path leaves the widget transparent by design.",
+    "Snapshot tolerance: at most 2 per channel and 0.1 % of pixels; a deliberate colour change was rejected at 8.2 %."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/0.png",
+     "upscale": 3,
+     "caption": "widget texture at t = 0 s (rotating triangle, 240x180 shown 3x)"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/1.png",
+     "upscale": 3,
+     "caption": "t = 0.5 s"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/2.png",
+     "upscale": 3,
+     "caption": "t = 1.0 s; after 2 s the widget stops asking for frames"
+    }
+   ]
+  },
+  {
+   "id": "m0-protocols",
+   "date": "2026-09-24 · Milestone 0, items b, e, f",
+   "title": "Blur, fractional scale and popups work against KWin from a bare client",
+   "status": "proven",
+   "lede": "Hand-written Wayland protocol handlers (the ones smithay-client-toolkit 0.20 lacks): the compositor advertises blur and honours a region; fractional scale reports this display's real 1.7; an xdg_popup child of a layer surface positions itself with the compositor's own constraint adjustment, and a nested submenu positions relative to it.",
+   "notes": [
+    "Popup 1 configured at (0,28) 180x110 after KWin slid it on-screen; popup 2 at (164,13) 160x90.",
+    "24 tests: rounded-strip regions against a raster oracle, positioner tables, scale rounding.",
+    "No screenshot: the capture tool returned transparent images from that run; fixed for the next spike."
+   ],
+   "images": []
+  },
+  {
+   "id": "m0-nested",
+   "date": "2026-09-24 · dev harness",
+   "title": "cosmic-comp runs nested inside the KDE session with every protocol we need",
+   "status": "proven",
+   "lede": "One script starts a nested COSMIC compositor as a window, records its socket, and lists its globals. It advertises layer-shell v5, background blur, fractional scale, viewporter, COSMIC toplevel and workspace protocols, and text-input v3. ghostty runs inside it; stopping it leaves the host untouched.",
+   "notes": [
+    "Works on the NVIDIA path directly; the AMD fallback was not needed.",
+    "Frosted glass is set through com.system76.CosmicTheme.{Dark,Light}/v2/frosted; 1.8.0 reads only v2."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-nested/0.png",
+     "caption": "the nested compositor as a window on the KDE desktop"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-nested/1.jpeg",
+     "caption": "ghostty running inside the nested compositor"
+    }
+   ]
+  },
+  {
+   "id": "w0-probes",
+   "date": "2026-09-24 · quire wave 0",
+   "title": "Sixteen Blitz CSS probes settle what the design system may use",
+   "status": "proven",
+   "lede": "Each probe renders a tiny document headlessly and checks pixels. Transitions, keyframes, custom properties, animation restart, SVG currentColor, fonts, color-mix and timers all work. Attribute selectors only match with a namespace prefix, focus-visible is always false, ellipsis clips instead of fading, and no backend does backdrop-filter. The design system's CSS emitter and lint now encode these.",
+   "notes": [
+    "Fallbacks adopted: [*|data-x] selectors, a data-modality attribute for focus rings, mask-image fades for truncation, compositor blur only."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/0.jpeg",
+     "caption": "S2: [data-theme] selector never matches on Blitz"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/1.jpeg",
+     "caption": "S2: [*|data-theme] matches (the fix)"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/2.jpeg",
+     "caption": "S3: keyframes with var(), t = 0"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/3.jpeg",
+     "caption": "S3: same document at t = 0.3 s"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/4.jpeg",
+     "caption": "S6: inline SVG stroke follows color via attributes"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/5.jpeg",
+     "caption": "S11: a bundled TTF registered on the font context"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/6.jpeg",
+     "caption": "S13: ellipsis clips (top); mask fade works (bottom)"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/7.jpeg",
+     "caption": "S16: hybrid backend applies blur() but not saturate()"
+    }
+   ]
+  },
+  {
+   "id": "icons-smoke",
+   "date": "2026-09-24 · icon pipeline",
+   "title": "Local image generation runs: FLUX.2 Klein 4B on the 5070 Ti in 22 seconds",
+   "status": "proven",
+   "lede": "ComfyUI in a uv venv with a 2.6 GB quantised FLUX.2 Klein (Apache-2.0). The smoke prompt asked for a single flat object; the model returned a photograph, which is what the style brief and the squircle post-processing will correct. Qwen-Image-2512 waits for 13 GB of free VRAM.",
+   "images": [
+    {
+     "path": "/home/pohsuanlai/comfy/out/smoke-flux2-klein-4b.png",
+     "caption": "smoke render: 'a paper envelope', 512 px, 4 steps"
+    }
+   ]
+  }
+ ]
 }
