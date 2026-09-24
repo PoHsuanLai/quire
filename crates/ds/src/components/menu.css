@@ -15,8 +15,9 @@
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
 
 .ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
-/* TODO(O-12): the separator is derived from the bubble's; its 4px margin is the candidate. */
-.ds-menu-separator{ height:1px; margin:var(--s-4) 0; background:var(--line-soft); }
+/* A separator is a hairline with the shell scale's margin above and below (5, design/13
+   section 13.3.3, settled 2026-09-24), inset to the rows' text. */
+.ds-menu-separator{ height:1px; margin:var(--shell-menu-sep) var(--s-8); background:var(--line-soft); }
 .ds-menu mark{ background:transparent; color:var(--accent); font-weight:800; }
 
 /* A submenu (design/13 section 13.3.4): beside its parent row, opened with no animation (only

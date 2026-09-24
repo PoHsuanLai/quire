@@ -1,0 +1,11 @@
+/* MenuBarItem (the macOS polish pass; design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
+   a bar item's text at the shell scale, and the 4 px pill behind it on hover and while its menu
+   is open. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
+
+.ds-bar-item{ display:inline-flex; align-items:center; height:var(--shell-bar-item); padding:0 var(--shell-bar-pad); border-radius:var(--r-shell-bar-item);
+  font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); color:var(--ink); white-space:nowrap; cursor:default; }
+.ds-bar-item[*|data-emphasis=strong]{ font-weight:700; }
+.ds-bar-item:hover{ background:var(--surface); }
+.ds-bar-item[*|aria-expanded=true]{ background:var(--surface-2); }
+.ds-bar-item .ds-button[*|data-variant=quiet]{ font-size:inherit; font-weight:inherit; color:inherit; padding:0; background:transparent; border-radius:0; }
+.ds-bar-item .ds-button[*|data-variant=quiet]:hover{ background:transparent; color:inherit; }

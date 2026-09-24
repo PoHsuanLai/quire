@@ -13,10 +13,15 @@
 //! scales them: at the default 80 every tint is section 17.2's value, and at 100 each is 1.25
 //! times it (capped at opaque). That reading is this wave's, and it is proposed.
 
+use super::layer::{Layer, LayerAlpha, Side, joined};
 use super::material::Material;
+use super::stack::{
+    HAIRLINE_DARK, HAIRLINE_LIGHT, HIGHLIGHT_DARK, HIGHLIGHT_LIGHT, SHADOW_STRENGTH,
+};
+use super::vibrancy::boosted;
 use crate::appearance::Scheme;
+use crate::tokens::Radius;
 use crate::tokens::hex::{Alpha, Colour, Hex};
-use crate::tokens::{Radius, Shadow};
 
 /// The settings key's default, `appearance.material_tint_alpha = 80` (design/22-SETTINGS.md
 /// section 3.1, proposed): the alpha at which every tint is section 17.2's own.
@@ -26,19 +31,26 @@ pub(crate) const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
 /// 0.94"). The key does not move it: it is the floor that keeps text legible on any backdrop.
 pub(crate) const SOLID_ALPHA: Alpha = Alpha(940);
 
-/// The five `--m-*` values one material paints in one scheme, as CSS values.
+/// The `--m-*` values one material paints in one scheme, as CSS values at the settings keys'
+/// defaults.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MaterialRecipe {
-    /// `--m-tint`: the translucent tint over blur.
+    /// `--m-tint`: the translucent tint over blur, the vibrancy boost baked in.
     pub tint: String,
     /// `--m-tint-solid`: the same tint at alpha .94 or above, when blur is unavailable.
     pub tint_solid: String,
-    /// `--m-edge`: hairline and highlight.
+    /// `--m-edge`: the inner hairline.
     pub edge: String,
-    /// `--m-shadow`: the drop shadow, or `none`.
+    /// `--m-shadow`: the ambient drop shadow (`--m-shadow-ambient`), or `none`.
     pub shadow: String,
     /// `--m-radius`.
     pub radius: String,
+    /// `--m-highlight`: the 1 px inner top highlight, or `none` (stack v2).
+    pub highlight: String,
+    /// `--m-hairline`: the 0.5 px dark outer hairline, or `none` (stack v2).
+    pub hairline: String,
+    /// `--m-shadow-contact`: the tight contact shadow under the card, or `none` (stack v2).
+    pub shadow_contact: String,
 }
 
 /// What `material` paints in `scheme`, with its tint at `tint_alpha` over blur.
@@ -54,20 +66,32 @@ pub fn recipe(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Material
         // The window paints the Space gradient with its layers and grain, never a tint.
         None => ("var(--f-grad)".to_owned(), "var(--f-grad)".to_owned()),
     };
+    let stack = layers(material, scheme);
+    let one = |layer: Option<Layer>| joined(&Vec::from_iter(layer), Layer::css);
     MaterialRecipe {
         tint,
         tint_solid,
-        edge: edge(material, scheme),
-        shadow: shadow(material, scheme).to_owned(),
+        edge: joined(&stack.edge, Layer::css),
+        shadow: one(stack.ambient),
         radius: radius(material).to_owned(),
+        highlight: one(stack.highlight),
+        hairline: one(stack.hairline),
+        shadow_contact: one(stack.contact),
     }
 }
 
-/// The tint's colour and its alpha at the default key, or `None` for the window.
+/// The tint's colour with the vibrancy boost baked in, and its alpha at the default key, or
+/// `None` for the window.
+pub(crate) fn tint(material: Material, scheme: Scheme) -> Option<(Hex, Alpha)> {
+    flat_tint(material, scheme).map(|(hex, alpha)| (boosted(hex, scheme), alpha))
+}
+
+/// Section 17.2's own tint colour, before the vibrancy boost, and its alpha at the default key,
+/// or `None` for the window.
 ///
 /// Light tints are `--surface` (`rgba(248,249,246,…)`) and the popover's `--raise` white; dark
 /// tints are `--paper` (`rgba(21,24,20,…)`) and the popover's dark `--raise`.
-pub(crate) fn tint(material: Material, scheme: Scheme) -> Option<(Hex, Alpha)> {
+pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alpha)> {
     const SURFACE: Hex = Hex([248, 249, 246]);
     const WHITE: Hex = Hex([255, 255, 255]);
     const PAPER_DARK: Hex = Hex([21, 24, 20]);
@@ -108,34 +132,110 @@ fn scaled(base: Alpha, tint_alpha: Alpha) -> Alpha {
     Alpha(u16::try_from(value.min(1000)).unwrap_or(1000))
 }
 
-/// The hairline (the `--f-line` values) and the highlight (the `--shadow-1` inset).
-fn edge(material: Material, scheme: Scheme) -> String {
-    let (hairline, highlight) = match scheme {
-        Scheme::Light => ("rgba(0,0,0,.08)", "rgba(255,255,255,.6)"),
-        Scheme::Dark => ("rgba(255,255,255,.09)", "rgba(255,255,255,.05)"),
-    };
-    match material {
-        Material::Window => "none".to_owned(),
-        Material::Bar => format!("inset 0 -.5px 0 {hairline}"),
-        Material::Dock => {
-            format!("inset 0 0 0 .5px rgba(255,255,255,.55),inset 0 1px 0 {highlight}")
-        }
-        Material::Popover
-        | Material::Sheet
-        | Material::Toast
-        | Material::Osd
-        | Material::Widget => format!("inset 0 0 0 .5px {hairline},inset 0 1px 0 {highlight}"),
-    }
+/// A material's layers, outside in: the outer hairline, the two shadows, the inner edge and
+/// the highlight (stack v2).
+pub(crate) struct Layers {
+    pub hairline: Option<Layer>,
+    pub contact: Option<Layer>,
+    pub ambient: Option<Layer>,
+    pub edge: Vec<Layer>,
+    pub highlight: Option<Layer>,
 }
 
-fn shadow(material: Material, scheme: Scheme) -> &'static str {
+const BLACK: Hex = Hex([0, 0, 0]);
+const WHITE: Hex = Hex([255, 255, 255]);
+
+/// The stack of `material` in `scheme`. The window has none; the bar has its inner bottom edge
+/// and, below it, the outer bottom hairline; every card has all five.
+pub(crate) fn layers(material: Material, scheme: Scheme) -> Layers {
+    let light = scheme == Scheme::Light;
+    let (highlight_input, highlight_alpha) = if light {
+        (HIGHLIGHT_LIGHT, 300)
+    } else {
+        (HIGHLIGHT_DARK, 120)
+    };
+    let (hairline_input, hairline_alpha) = if light {
+        (HAIRLINE_LIGHT, 140)
+    } else {
+        (HAIRLINE_DARK, 600)
+    };
+    // The inner hairline: the `--f-line` values (section 4).
+    let (inner, inner_alpha) = if light { (BLACK, 80) } else { (WHITE, 90) };
+    let outer = |geometry| Layer {
+        side: Side::Outer,
+        geometry,
+        colour: BLACK,
+        alpha: LayerAlpha::Input(hairline_input, Alpha(hairline_alpha)),
+    };
+    let shadow = |geometry, colour, alpha| Layer {
+        side: Side::Outer,
+        geometry,
+        colour,
+        alpha: LayerAlpha::Scaled(Alpha(alpha), SHADOW_STRENGTH),
+    };
+    let inset = |geometry, colour, alpha| Layer {
+        side: Side::Inner,
+        geometry,
+        colour,
+        alpha: LayerAlpha::Fixed(Alpha(alpha)),
+    };
+    let card = |ambient: Layer, edge: Layer| Layers {
+        hairline: Some(outer("0 0 0 .5px")),
+        contact: Some(shadow("0 1px 2px", BLACK, if light { 100 } else { 300 })),
+        ambient: Some(ambient),
+        edge: vec![edge],
+        highlight: Some(Layer {
+            side: Side::Inner,
+            geometry: "0 1px 0",
+            colour: WHITE,
+            alpha: LayerAlpha::Input(highlight_input, Alpha(highlight_alpha)),
+        }),
+    };
+    let hairline_edge = inset("0 0 0 .5px", inner, inner_alpha);
+    let pop = |light_alpha, dark_alpha| {
+        shadow(
+            "0 12px 40px -12px",
+            BLACK,
+            if light { light_alpha } else { dark_alpha },
+        )
+    };
     match material {
-        Material::Window | Material::Bar => "none",
-        Material::Dock => "0 10px 30px -10px rgba(0,0,0,.35)",
-        Material::Popover | Material::Toast | Material::Osd => Shadow::Pop.css(scheme),
-        Material::Sheet => Shadow::Sheet.css(scheme),
-        // "soft": the `--shadow-2` drop without its inset.
-        Material::Widget => "0 6px 16px -6px rgba(26,30,26,.3)",
+        Material::Window => Layers {
+            hairline: None,
+            contact: None,
+            ambient: None,
+            edge: Vec::new(),
+            highlight: None,
+        },
+        Material::Bar => Layers {
+            hairline: Some(outer("0 .5px 0")),
+            contact: None,
+            ambient: None,
+            edge: vec![inset("0 -.5px 0", inner, inner_alpha)],
+            highlight: None,
+        },
+        Material::Dock => card(
+            shadow("0 10px 30px -10px", BLACK, if light { 350 } else { 500 }),
+            inset("0 0 0 .5px", WHITE, 550),
+        ),
+        Material::Popover | Material::Toast | Material::Osd => card(pop(280, 550), hairline_edge),
+        Material::Sheet => card(
+            if light {
+                shadow("0 24px 60px -18px", BLACK, 400)
+            } else {
+                shadow("0 30px 70px -20px", BLACK, 650)
+            },
+            hairline_edge,
+        ),
+        // "Soft": the `--shadow-2` drop in the light scheme, deeper in the dark.
+        Material::Widget => card(
+            if light {
+                shadow("0 6px 16px -6px", Hex([26, 30, 26]), 300)
+            } else {
+                shadow("0 8px 20px -8px", BLACK, 500)
+            },
+            hairline_edge,
+        ),
     }
 }
 
@@ -153,24 +253,46 @@ fn radius(material: Material) -> &'static str {
 
 #[cfg(test)]
 mod tests {
-    use super::{DEFAULT_TINT_ALPHA, recipe};
+    use super::{DEFAULT_TINT_ALPHA, flat_tint, recipe};
     use crate::appearance::Scheme;
     use crate::material::Material;
-    use crate::tokens::hex::Alpha;
+    use crate::tokens::hex::{Alpha, Hex};
 
     #[test]
-    fn the_default_key_paints_section_17_2() {
+    fn the_flat_tints_are_section_17_2() {
+        #[rustfmt::skip]
+        const CASES: &[(Material, Scheme, [u8; 3], u16)] = &[
+            (Material::Bar, Scheme::Light, [248, 249, 246], 700),
+            (Material::Bar, Scheme::Dark, [21, 24, 20], 680),
+            (Material::Dock, Scheme::Light, [248, 249, 246], 590),
+            (Material::Popover, Scheme::Light, [255, 255, 255], 780),
+            (Material::Popover, Scheme::Dark, [42, 47, 40], 780),
+            (Material::Sheet, Scheme::Light, [248, 249, 246], 820),
+            (Material::Toast, Scheme::Dark, [21, 24, 20], 740),
+            (Material::Osd, Scheme::Light, [248, 249, 246], 720),
+            (Material::Widget, Scheme::Dark, [21, 24, 20], 670),
+        ];
+        for &(material, scheme, hex, alpha) in CASES {
+            assert_eq!(
+                flat_tint(material, scheme),
+                Some((Hex(hex), Alpha(alpha))),
+                "{material:?} {scheme:?}"
+            );
+        }
+        assert_eq!(flat_tint(Material::Window, Scheme::Light), None);
+    }
+
+    #[test]
+    fn the_default_key_paints_the_boosted_tint_at_section_17_2s_alphas() {
         #[rustfmt::skip]
         const CASES: &[(Material, Scheme, &str, &str, &str)] = &[
-            (Material::Bar, Scheme::Light, "rgba(248,249,246,.7)", "rgba(248,249,246,.94)", "0"),
-            (Material::Bar, Scheme::Dark, "rgba(21,24,20,.68)", "rgba(21,24,20,.94)", "0"),
-            (Material::Dock, Scheme::Light, "rgba(248,249,246,.59)", "rgba(248,249,246,.94)", "22px"),
+            (Material::Bar, Scheme::Light, "rgba(252,253,249,.7)", "rgba(252,253,249,.94)", "0"),
+            (Material::Bar, Scheme::Dark, "rgba(20,24,19,.68)", "rgba(20,24,19,.94)", "0"),
+            (Material::Dock, Scheme::Light, "rgba(252,253,249,.59)", "rgba(252,253,249,.94)", "22px"),
             (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "14px"),
-            (Material::Popover, Scheme::Dark, "rgba(42,47,40,.78)", "rgba(42,47,40,.94)", "14px"),
-            (Material::Sheet, Scheme::Light, "rgba(248,249,246,.82)", "rgba(248,249,246,.94)", "18px"),
-            (Material::Toast, Scheme::Dark, "rgba(21,24,20,.74)", "rgba(21,24,20,.94)", "16px"),
-            (Material::Osd, Scheme::Light, "rgba(248,249,246,.72)", "rgba(248,249,246,.94)", "18px"),
-            (Material::Widget, Scheme::Dark, "rgba(21,24,20,.67)", "rgba(21,24,20,.94)", "20px"),
+            (Material::Popover, Scheme::Dark, "rgba(41,48,38,.78)", "rgba(41,48,38,.94)", "14px"),
+            (Material::Sheet, Scheme::Light, "rgba(252,253,249,.82)", "rgba(252,253,249,.94)", "18px"),
+            (Material::Widget, Scheme::Dark, "rgba(20,24,19,.67)", "rgba(20,24,19,.94)", "20px"),
             (Material::Window, Scheme::Light, "var(--f-grad)", "var(--f-grad)", "0"),
         ];
         for &(material, scheme, tint, solid, radius) in CASES {
@@ -184,30 +306,50 @@ mod tests {
     #[test]
     fn the_key_scales_the_tint_and_never_the_solid_floor() {
         let low = recipe(Material::Sheet, Scheme::Light, Alpha(400));
-        assert_eq!(low.tint, "rgba(248,249,246,.41)");
-        assert_eq!(low.tint_solid, "rgba(248,249,246,.94)");
+        assert_eq!(low.tint, "rgba(252,253,249,.41)");
+        assert_eq!(low.tint_solid, "rgba(252,253,249,.94)");
         let high = recipe(Material::Sheet, Scheme::Light, Alpha(1000));
-        assert_eq!(high.tint, "rgba(248,249,246,1)");
-        assert_eq!(high.tint_solid, "rgba(248,249,246,.94)");
+        assert_eq!(high.tint, "rgba(252,253,249,1)");
     }
 
     #[test]
-    fn edges_and_shadows_follow_the_scheme() {
+    fn every_card_stacks_hairline_highlight_edge_and_two_shadows() {
         let light = recipe(Material::Popover, Scheme::Light, DEFAULT_TINT_ALPHA);
         let dark = recipe(Material::Popover, Scheme::Dark, DEFAULT_TINT_ALPHA);
-        assert_eq!(
-            light.edge,
-            "inset 0 0 0 .5px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.6)"
-        );
-        assert_eq!(
-            dark.edge,
-            "inset 0 0 0 .5px rgba(255,255,255,.09),inset 0 1px 0 rgba(255,255,255,.05)"
-        );
-        assert_eq!(light.shadow, "0 18px 40px -16px rgba(0,0,0,.45)");
-        let sheet = recipe(Material::Sheet, Scheme::Dark, DEFAULT_TINT_ALPHA);
-        assert_eq!(sheet.shadow, "0 30px 60px -20px rgba(0,0,0,.7)");
+        assert_eq!(light.edge, "inset 0 0 0 .5px rgba(0,0,0,.08)");
+        assert_eq!(dark.edge, "inset 0 0 0 .5px rgba(255,255,255,.09)");
+        assert_eq!(light.highlight, "inset 0 1px 0 rgba(255,255,255,.3)");
+        assert_eq!(dark.highlight, "inset 0 1px 0 rgba(255,255,255,.12)");
+        assert_eq!(light.hairline, "0 0 0 .5px rgba(0,0,0,.14)");
+        assert_eq!(dark.hairline, "0 0 0 .5px rgba(0,0,0,.6)");
+        assert_eq!(light.shadow_contact, "0 1px 2px rgba(0,0,0,.1)");
+        assert_eq!(light.shadow, "0 12px 40px -12px rgba(0,0,0,.28)");
+        for material in [
+            Material::Dock,
+            Material::Popover,
+            Material::Sheet,
+            Material::Toast,
+            Material::Osd,
+            Material::Widget,
+        ] {
+            for scheme in Scheme::ALL {
+                let got = recipe(material, scheme, DEFAULT_TINT_ALPHA);
+                for layer in [
+                    &got.highlight,
+                    &got.hairline,
+                    &got.shadow_contact,
+                    &got.shadow,
+                ] {
+                    assert_ne!(layer, "none", "{material:?} {scheme:?}");
+                }
+            }
+        }
         let bar = recipe(Material::Bar, Scheme::Light, DEFAULT_TINT_ALPHA);
         assert_eq!(bar.edge, "inset 0 -.5px 0 rgba(0,0,0,.08)");
-        assert_eq!(bar.shadow, "none");
+        assert_eq!(bar.hairline, "0 .5px 0 rgba(0,0,0,.14)");
+        assert_eq!(
+            (bar.shadow.as_str(), bar.highlight.as_str()),
+            ("none", "none")
+        );
     }
 }

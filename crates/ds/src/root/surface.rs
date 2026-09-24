@@ -37,6 +37,7 @@ pub fn Surface(
             "data-material": env.material.slug(),
             "data-blur": env.blur.slug(),
             "data-ground": ground.attribute(),
+            "data-corner": radius.and_then(Corner::attribute),
             style: radius.map(radius_style),
             {children}
         }
@@ -45,7 +46,7 @@ pub fn Surface(
 
 /// The inline declaration that overrides a material's corner.
 pub(crate) fn radius_style(radius: Corner) -> String {
-    format!("--m-radius:{};", radius.css())
+    format!("--m-radius:{};{}", radius.css(), radius.squircle_style())
 }
 
 /// The scope a `Surface` provides: the parent's, with each given override applied.

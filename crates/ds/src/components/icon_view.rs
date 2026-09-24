@@ -4,6 +4,7 @@
 //! (spike S8). Both URLs load through the document's net provider, one frame late.
 
 use crate::icon::external::{ExternalIcon, IconSource};
+use crate::icon::family::PlateFamily;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 
@@ -33,8 +34,35 @@ impl Paint {
 
 /// `source` drawn in an icon slot. A glyph takes the slot's `size`; an external icon is drawn
 /// at its own [`ExternalIcon::size`], the size its caller resolved it for.
+///
+/// With a `plate`, the icon sits on an app-icon plate `size` square (design/08-ICONS.md
+/// sections 2.1-2.5 and 4.1): the `n = 5` superellipse in the family's 135 degree gradient,
+/// with the inner highlight, the rim and a drop shadow. A glyph or a symbolic icon is drawn in
+/// the family's glyph colour at `--plate-glyph` (56 %) of the plate, an image at
+/// `--plate-inset` (72 %). The dock's placeholder tile until the generated icons arrive.
 #[component]
-pub fn IconView(source: IconSource, #[props(default)] size: IconSize) -> Element {
+pub fn IconView(
+    source: IconSource,
+    #[props(default)] size: IconSize,
+    #[props(default)] plate: Option<PlateFamily>,
+) -> Element {
+    match plate {
+        Some(family) => rsx! {
+            span {
+                class: "ds-plate",
+                "data-family": family.slug(),
+                "data-size": "{size.px()}",
+                style: "--ic-size:{size.px()}px",
+                span { class: "ds-plate-face", "aria-hidden": "true" }
+                {bare(source, size)}
+            }
+        },
+        None => bare(source, size),
+    }
+}
+
+/// The icon alone, as a slot draws it.
+fn bare(source: IconSource, size: IconSize) -> Element {
     match source {
         IconSource::Glyph(icon) => rsx! {
             Glyph { icon, size }

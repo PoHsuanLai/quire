@@ -16,7 +16,9 @@
 
 use super::emit::{attr_selector, declaration, presence_selector, property, rule};
 use crate::appearance::Scheme;
-use crate::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, tint};
+use crate::material::layer::{Layer, joined};
+use crate::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, flat_tint, layers, tint};
+use crate::material::stack::VIBRANCY;
 use crate::material::{Material, recipe};
 use crate::tokens::{Hex, VarName, ZLayer};
 
@@ -24,8 +26,9 @@ use crate::tokens::{Hex, VarName, ZLayer};
 /// (`.8` at the default). Absent, every tint is section 17.2's own.
 pub(crate) const TINT_ALPHA: VarName = VarName("--m-tint-alpha");
 
-/// The seven variables every material block declares, in the order it writes them.
-pub(crate) const MATERIAL_VARS: [VarName; 7] = [
+/// The variables every material block declares, in the order it writes them. The last four
+/// are stack v2's layers (design/03-COLOR.md section 17.4); `--m-shadow` is the ambient drop.
+pub(crate) const MATERIAL_VARS: [VarName; 12] = [
     VarName("--m-tint"),
     VarName("--m-tint-solid"),
     VarName("--m-edge"),
@@ -33,6 +36,11 @@ pub(crate) const MATERIAL_VARS: [VarName; 7] = [
     VarName("--m-radius"),
     VarName("--m-box"),
     VarName("--m-frame-alpha"),
+    VarName("--m-highlight"),
+    VarName("--m-hairline"),
+    VarName("--m-shadow-contact"),
+    VarName("--m-shadow-ambient"),
+    VarName("--m-inner"),
 ];
 
 /// The material recipes. The tint alpha over blur is a settings key
@@ -80,8 +88,8 @@ fn chrome_css(material: &str) -> String {
                 property("z-index", &ZLayer::Raise.var().reference()),
             ],
         ),
-        // The edge the root's box paints is under the frame now; the frame draws it again
-        // over the gradient.
+        // The inner edge and highlight the root's box paints are under the frame now; the frame
+        // draws them again over the gradient.
         rule(
             &format!("{tinted} > .ds-frame::after"),
             &[
@@ -89,7 +97,7 @@ fn chrome_css(material: &str) -> String {
                 property("position", "absolute"),
                 property("inset", "0"),
                 property("border-radius", "inherit"),
-                property("box-shadow", "var(--m-edge)"),
+                property("box-shadow", "var(--m-inner)"),
             ],
         ),
         rule(
@@ -138,12 +146,20 @@ fn declarations(material: Material, scheme: Scheme) -> Vec<String> {
             default = DEFAULT_TINT_ALPHA.css(),
         )
     };
-    let (tint, frame_alpha) = match tint(material, scheme) {
-        Some((Hex([r, g, b]), base)) => {
-            (format!("rgba({r},{g},{b},{})", scaled(base)), scaled(base))
-        }
-        None => (recipe.tint.clone(), "1".to_owned()),
+    let (tint, solid, frame_alpha) = match (tint(material, scheme), flat_tint(material, scheme)) {
+        (Some((boosted, base)), Some((flat, _))) => (
+            vibrant(boosted, flat, &scaled(base)),
+            vibrant(boosted, flat, &SOLID_ALPHA.css()),
+            scaled(base),
+        ),
+        _ => (
+            recipe.tint.clone(),
+            recipe.tint_solid.clone(),
+            "1".to_owned(),
+        ),
     };
+    let stack = layers(material, scheme);
+    let one = |layer: Option<Layer>| joined(&Vec::from_iter(layer), Layer::tuned_css);
     let [
         tint_var,
         solid_var,
@@ -152,29 +168,70 @@ fn declarations(material: Material, scheme: Scheme) -> Vec<String> {
         radius_var,
         box_var,
         frame_alpha_var,
+        highlight_var,
+        hairline_var,
+        contact_var,
+        ambient_var,
+        inner_var,
     ] = MATERIAL_VARS;
-    // The layers that paint, by reference, so the colours stay in the `--m-*` declarations.
-    let painted = [(edge_var, &recipe.edge), (shadow_var, &recipe.shadow)]
-        .into_iter()
-        .filter(|(_, value)| value.as_str() != "none")
-        .map(|(var, _)| var.reference())
-        .collect::<Vec<_>>();
-    let painted = if painted.is_empty() {
-        "none".to_owned()
-    } else {
-        painted.join(",")
-    };
+    let values = [
+        (hairline_var, one(stack.hairline)),
+        (highlight_var, one(stack.highlight)),
+        (edge_var, joined(&stack.edge, Layer::tuned_css)),
+        (contact_var, one(stack.contact)),
+        (ambient_var, one(stack.ambient)),
+    ];
+    // The layers that paint, outside in, by reference, so the colours stay in the `--m-*`
+    // declarations.
+    let painted = references(&values);
+    // The inner layers alone: a tinted root's frame covers its own box, so it draws them again.
+    let inner = references(&values[1..3]);
+    let [hairline, highlight, edge, contact, ambient] = values.map(|(_, value)| value);
     vec![
         declaration(tint_var, &tint),
-        declaration(solid_var, &recipe.tint_solid),
-        declaration(edge_var, &recipe.edge),
-        declaration(shadow_var, &recipe.shadow),
+        declaration(solid_var, &solid),
+        declaration(edge_var, &edge),
+        declaration(shadow_var, &ambient),
         declaration(radius_var, &recipe.radius),
         declaration(box_var, &painted),
         declaration(frame_alpha_var, &frame_alpha),
+        declaration(highlight_var, &highlight),
+        declaration(hairline_var, &hairline),
+        declaration(contact_var, &contact),
+        declaration(ambient_var, &ambient),
+        declaration(inner_var, &inner),
         property("border-radius", &radius_var.reference()),
         property("box-shadow", &box_var.reference()),
     ]
+}
+
+/// The variables among `values` that paint, as one `box-shadow` list of references, or `none`.
+fn references(values: &[(VarName, String)]) -> String {
+    let painted = values
+        .iter()
+        .filter(|(_, value)| value.as_str() != "none")
+        .map(|(var, _)| var.reference())
+        .collect::<Vec<_>>();
+    if painted.is_empty() {
+        "none".to_owned()
+    } else {
+        painted.join(",")
+    }
+}
+
+/// The tint at `alpha`, its vibrancy boost weighted by the `--m-vibrancy` input (1 by default:
+/// all boost; 0: section 17.2's flat colour). `color-mix()` with `var()` paints (spike S14).
+fn vibrant(boosted: Hex, flat: Hex, alpha: &str) -> String {
+    let rgba = |Hex([r, g, b]): Hex| format!("rgba({r},{g},{b},{alpha})");
+    if boosted == flat {
+        return rgba(flat);
+    }
+    format!(
+        "color-mix(in srgb,{} calc(var({},1)*100%),{})",
+        rgba(boosted),
+        VIBRANCY.as_str(),
+        rgba(flat)
+    )
 }
 
 #[cfg(test)]
@@ -185,12 +242,15 @@ mod tests {
     fn every_tint_scales_its_own_alpha_by_the_key() {
         let css = materials_css();
         const WANT: &[&str] = &[
-            ".ds[*|data-material=bar]{--m-tint:rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8));--m-tint-solid:rgba(248,249,246,.94);",
-            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:rgba(21,24,20,calc(.67*var(--m-tint-alpha,.8)/.8));",
-            ".ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;--m-box:none;--m-frame-alpha:1;border-radius:var(--m-radius);box-shadow:var(--m-box);}",
+            ".ds[*|data-material=bar]{--m-tint:color-mix(in srgb,rgba(252,253,249,calc(.7*var(--m-tint-alpha,.8)/.8)) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8)));--m-tint-solid:color-mix(in srgb,rgba(252,253,249,.94) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,.94));",
+            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:color-mix(in srgb,rgba(20,24,19,calc(.67*var(--m-tint-alpha,.8)/.8))",
+            ".ds[*|data-material=popover]{--m-tint:rgba(255,255,255,calc(.78*var(--m-tint-alpha,.8)/.8));",
+            ".ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;--m-box:none;--m-frame-alpha:1;--m-highlight:none;--m-hairline:none;--m-shadow-contact:none;--m-shadow-ambient:none;--m-inner:none;border-radius:var(--m-radius);box-shadow:var(--m-box);}",
             ".ds[*|data-material][*|data-blur=off]{background:var(--m-tint-solid);}",
-            "--m-radius:0;--m-box:var(--m-edge);--m-frame-alpha:calc(.7*var(--m-tint-alpha,.8)/.8);",
-            "--m-radius:22px;--m-box:var(--m-edge),var(--m-shadow);",
+            "--m-radius:0;--m-box:var(--m-hairline),var(--m-edge);--m-frame-alpha:calc(.7*var(--m-tint-alpha,.8)/.8);",
+            "--m-radius:22px;--m-box:var(--m-hairline),var(--m-highlight),var(--m-edge),var(--m-shadow-contact),var(--m-shadow-ambient);",
+            "--m-highlight:inset 0 1px 0 rgba(255,255,255,var(--m-highlight-light,.3));--m-hairline:0 0 0 .5px rgba(0,0,0,var(--m-hairline-light,.14));--m-shadow-contact:0 1px 2px rgba(0,0,0,calc(.1*var(--m-shadow-strength,1)));",
+            "--m-highlight:inset 0 1px 0 rgba(255,255,255,var(--m-highlight-dark,.12));--m-hairline:0 0 0 .5px rgba(0,0,0,var(--m-hairline-dark,.6));",
             ".ds[*|data-material][*|data-blur=on]{background:var(--m-tint);}",
             ".ds[*|data-material][*|data-frame=tinted]{background:transparent;position:relative;z-index:var(--z-raise);}",
             ".ds[*|data-material][*|data-frame=tinted][*|data-blur=off] > .ds-frame{opacity:.94;}",
