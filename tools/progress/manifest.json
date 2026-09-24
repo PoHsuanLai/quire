@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-24, Milestone 4 reached on nested cosmic-comp: bar, dock and launcher; wallpaper landing",
+  "updated": "2026-09-24, Milestone 4 reached; launcher and dock on the final APIs; wallpaper landing",
   "entries": [
     {
       "id": "m4-launcher",
@@ -9,8 +9,9 @@
       "lede": "The first delivery gate of the program. Two warm surfaces (a transparent catcher and the panel) are toggled through one shared link, so opening never spawns anything. The search core runs every provider on its own thread, stamps results by generation and drops stale ones; queries reach their first results in microseconds. Providers: applications (with desktop actions), open windows, system commands gated on what logind allows, a calculator on fend, and settings keys from the installed schemas plus COSMIC's own pages. The panel is the design system's command palette, keyboard-first, with Ctrl+K opening a row's actions as the same menu the bar and dock use.",
       "notes": [
         "Acceptance on nested cosmic-comp (release build): warm open 52 to 80 ms, p50 57 (the budget is 100); first open 106 ms; both surfaces exist hidden from startup; a second toggle hides, a catcher click closes; 5 s idle after hide adds 0 frames on both surfaces.",
-        "Found live and worked around, now being fixed in the design system: two crashes (a motion timer outliving its component; a text field taking focus during the render pass), and the palette needs an embedded mode, a selection API and app icons in rows.",
-        "Not yet: IME verified live (needs your unlocked session and fcitx5: dev/ime-probe.sh prints the commands), the launcher on the output under the pointer, and system commands (logged, not run, until a session control exists)."
+        "Both crashes are fixed at the source (motion tasks are owned by their scope; focus goes through a host seam) and the launcher's workarounds are gone: the palette fills its panel with no dim box, rows show the app's own icon, the selection follows the pointer, and the actions menu hangs from the selected row. A 20-toggle stress at 150 ms spacing leaves the daemon healthy.",
+        "Not yet: IME verified live (needs your unlocked session and fcitx5: dev/ime-probe.sh prints the commands), the launcher on the output under the pointer, and system commands (logged, not run, until a session control exists).",
+        "Latency re-measurement pending a quiet machine: with a 28-core job running, warm opens read about 117 ms p50 versus 57 ms earlier."
       ],
       "images": [
         {
