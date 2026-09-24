@@ -11,7 +11,11 @@ const FACES: [(ButtonFace, &str, &str); 4] = [
     (ButtonFace::Bold, "Bold", "Bold (Ctrl B)"),
     (ButtonFace::Italic, "Italic", "Italic (Ctrl I)"),
     (ButtonFace::Underline, "Underline", "Underline (Ctrl U)"),
-    (ButtonFace::Strike, "Strikethrough", "Strikethrough (Ctrl Shift S)"),
+    (
+        ButtonFace::Strike,
+        "Strikethrough",
+        "Strikethrough (Ctrl Shift S)",
+    ),
 ];
 
 /// Flip a switch.

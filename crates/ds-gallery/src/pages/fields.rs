@@ -1,9 +1,12 @@
-//! The Controls page's fields: TextInput in both variants and its password kind, and the
-//! SearchField. Split from `controls.rs` to keep that page under its size.
+//! The Controls page's fields: TextInput in every face and kind (text, password, secret,
+//! file, multiline, bare), and the SearchField. Split from `controls.rs` to keep that page
+//! under its size.
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{Availability, InputVariant, SearchField, TextInput, TextInputKind};
+use ds::{
+    Availability, FieldFace, Grow, InputVariant, Rows, SearchField, TextInput, TextInputKind,
+};
 
 #[component]
 pub fn Fields() -> Element {
@@ -46,6 +49,54 @@ pub fn Fields() -> Element {
                 }
                 Specimen { name: "search, empty",
                     SearchField { label: "Search", value: "", placeholder: "Search mail", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} }
+                }
+            }
+        }
+    }
+}
+
+/// mailo gaps 4's kinds and the bare face, each live.
+#[component]
+pub fn FieldKinds() -> Element {
+    let mut heard = use_signal(|| 0usize);
+    let mut committed = use_signal(|| 0usize);
+    let mut picks = use_signal(|| 0u32);
+    let mut notes = use_signal(|| "Poh Lai\nAcme".to_string());
+    let mut fixed = use_signal(String::new);
+    let mut title = use_signal(|| "Work".to_string());
+    let chosen = if picks() == 0 {
+        String::new()
+    } else {
+        format!("signature-{picks}.png")
+    };
+    rsx! {
+        Section { title: "TextInput kinds: secret, file, multiline, bare", note: "Secret keeps its text out of the markup (only its length is shown here, as the callbacks hear it; Enter or leaving it commits). File asks the host to choose (no native picker on Blitz): each pick here names a new file. Multiline grows a row per line, or stays at its rows. Bare takes the face of the text it sits in.",
+            div { class: "g-grid2",
+                Specimen { name: "secret: heard {heard} characters, committed {committed}",
+                    TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Secret, label: "App password", value: "", placeholder: "App password",
+                        oninput: move |text: String| heard.set(text.chars().count()),
+                        onchange: move |text: String| committed.set(text.chars().count()) }
+                }
+                Specimen { name: "file: {picks} picks",
+                    TextInput { variant: InputVariant::Boxed, kind: TextInputKind::File, label: "Signature image", value: chosen, placeholder: "No file chosen",
+                        oninput: |_| {}, on_pick: move |()| picks += 1 }
+                }
+                Specimen { name: "multiline, grows from 2 rows",
+                    TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Multiline { rows: Rows(2), grow: Grow::ToContent }, label: "Signature", value: notes(), placeholder: "Your signature",
+                        oninput: move |text| notes.set(text) }
+                }
+                Specimen { name: "multiline, fixed at 3 rows",
+                    TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Multiline { rows: Rows(3), grow: Grow::Fixed }, label: "Note", value: fixed(), placeholder: "A note",
+                        oninput: move |text| fixed.set(text) }
+                }
+                Specimen { name: "bare, in a title",
+                    h3 { class: "g-bare-title", TextInput { variant: FieldFace::Bare, label: "Space name", value: title(), placeholder: "Name this Space", oninput: move |text| title.set(text) } }
+                }
+                Specimen { name: "bare, in a property row",
+                    div { class: "g-row",
+                        span { class: "g-name", "Folder" }
+                        TextInput { variant: FieldFace::Bare, label: "Folder", value: "Receipts/2026", oninput: |_| {} }
+                    }
                 }
             }
         }

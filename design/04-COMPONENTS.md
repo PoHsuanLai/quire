@@ -729,6 +729,30 @@ renderer holds (`ds::HostFocus`, Q43). Recipient inputs: Enter or `,` adds, Back
 placeholder as an absolutely positioned span shown while the value is empty. `outline:none`
 is required so the global focus ring does not double the accent ring.
 
+**Settled (mailo gaps 4, 2026-09-25).**
+
+- `Bare` face (`InputVariant::Bare`, also named `FieldFace`): no border, padding, ground or radius;
+  font, size, weight, tracking, line height and colour inherited, so a title or a property row's
+  value is edited where it reads. The caret is `--accent`, the selection `--accent-soft`; the
+  placeholder is the parent's colour at .45.
+- `TextInputKind::Secret`: drawn as `Password`, but the component keeps the typed text in its own
+  state, emits it only through `oninput` and `onchange`, and never writes a `value` attribute (the
+  prop is ignored). `Password` still writes its `value`, unchanged since wave 2. mailo's secret
+  field is `Secret`.
+- `TextInputKind::File`: the chosen name in a read-only `span.ds-input[data-kind=file]` (a
+  `role=textbox`, `aria-readonly`) and a Tool `IconButton` (folder, titled "Choose…", named
+  "{label}: Choose…") after it, gap 6. Blitz has no file picker (blitz-dom's `file-input` feature
+  is off in quire's pin, and even on it only draws a Browse button), so a click on either calls
+  `on_pick` and the host opens its own chooser and hands the name back as `value`.
+- `TextInputKind::Multiline { rows: Rows(n), grow: Grow::{Fixed, ToContent} }`: a `textarea`
+  with `rows`, `height:auto`, no resize handle. blitz-dom makes a `textarea` a multiline text
+  editor, reads its text from the `value` attribute (not its children), sizes it at `rows` line
+  heights (2 when absent; `cols` at 0.6 em each, else 300 px) and inserts a newline on Enter.
+  `ToContent` raises `rows` to the value's hard line count; a soft wrap does not grow it.
+- `onchange: EventHandler<String>`: the value committed, on Enter in a one-line field or when the
+  caret leaves any field. Blitz dispatches no `change` event, so the field makes it on both
+  renderers.
+
 ### 7. SearchField
 
 **Purpose.** A search icon plus an Inline TextInput, as the header of a list of results. Mail:

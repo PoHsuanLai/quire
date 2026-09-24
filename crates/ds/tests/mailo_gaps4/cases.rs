@@ -6,6 +6,7 @@ use ds::{
     AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkSize,
     MarkStyle, Provider, ProviderMark, Trailing,
 };
+use ds::{FieldFace, Grow, InputVariant, Rows, TextInput, TextInputKind};
 
 /// An account colour.
 const SLATE: Colour = Colour::Solid(Hex([0x2f, 0x7f, 0x6e]));
@@ -70,5 +71,29 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/face-strike-named.html",
         make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Strike", face: ButtonFace::Strike, aria_label: "Strikethrough", onclick: |_| {} } },
+    },
+    Case {
+        golden: "controls/text_input/secret-value-unwritten.html",
+        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Secret, label: "App password", value: "hunter2", placeholder: "App password", oninput: |_| {} } },
+    },
+    Case {
+        golden: "controls/text_input/file-empty.html",
+        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::File, label: "Signature image", value: "", placeholder: "No file chosen", oninput: |_| {}, on_pick: |()| {} } },
+    },
+    Case {
+        golden: "controls/text_input/file-chosen.html",
+        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::File, label: "Signature image", value: "signature.png", oninput: |_| {}, on_pick: |()| {} } },
+    },
+    Case {
+        golden: "controls/text_input/multiline-fixed.html",
+        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Multiline { rows: Rows(3), grow: Grow::Fixed }, label: "Signature", value: "Poh\nAcme", placeholder: "Your signature", oninput: |_| {} } },
+    },
+    Case {
+        golden: "controls/text_input/multiline-grown.html",
+        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Multiline { rows: Rows(2), grow: Grow::ToContent }, label: "Signature", value: "a\nb\nc\nd", oninput: |_| {} } },
+    },
+    Case {
+        golden: "controls/text_input/bare.html",
+        make: || rsx! { TextInput { variant: FieldFace::Bare, label: "Name", value: "Work", placeholder: "Name this Space", oninput: |_| {} } },
     },
 ];
