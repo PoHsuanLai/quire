@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-24, design system built and gallery-reviewed; host complete; polish and sill freeze running",
+  "updated": "2026-09-24, design system reviewed and handed to mailo; host complete; sill M1 bar wave running",
   "entries": [
     {
       "id": "m0-cosmic",
@@ -28,10 +28,10 @@
       "date": "2026-09-24 \u00b7 quire wave 3",
       "title": "The design system exists: every component on review pages, in both themes and six accents",
       "status": "proven",
-      "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 280 tests), and the gallery renders them through the real Blitz pipeline. Its first run caught thirteen defects (text inputs at replaced-element size, an empty toast pill on every root, invisible undo labels, a class collision between the text field and the Space editor's colour field); all are fixed and these are the regenerated sheets. A polish pass (reset specificity, spacing tokens in every sheet, the stretched dot field) is running.",
+      "lede": "Forty-one components, the token tables, eight materials, forty-six animations and the Space editor are built and green (about 310 tests), and the gallery renders them through the real Blitz pipeline. Its first run caught thirteen defects (text inputs at replaced-element size, an empty toast pill on every root, invisible undo labels, a class collision between the text field and the Space editor's colour field); all are fixed, then a polish pass scoped the reset with :where, moved every spacing in every sheet onto the spacing tokens, and made the colour field's dots round. These are the sheets after both passes. The migration brief has gone to the mailo session.",
       "notes": [
         "Two root causes behind most of the list: one shared class name between two components, and a reset rule that outranked every single-class component rule.",
-        "Still visible here: the colour field's dots stretch into ellipses, the Danger button looks like Mini, one section header's action sits against its label; the polish pass owns all three."
+        "Open: a Blitz hit-testing bug (a lone inline-flex button beside only inline content receives no click; reproduction test written for an upstream report) and overlay bounds that follow the content height."
       ],
       "images": [
         {
