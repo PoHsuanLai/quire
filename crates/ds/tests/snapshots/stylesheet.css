@@ -611,6 +611,33 @@ html,body{margin:0;padding:0;background:transparent}
    TODO(O-3): its icon size and active state are not specified. */
 .ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:pointer; font-size:var(--fs-small); color:var(--ink-faint); padding:var(--s-2) var(--s-4); border-radius:var(--r-small); }
 .ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
+
+/* Frame (mailo gaps 4): words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
+   the foot button's colours (`S:151-153`): `--f-ink-soft` on nothing, `--f-ink` on
+   `--f-pill-hover` under the pointer, `--f-pill` while held or pressed (a pressed one carries the
+   current item's `--shadow-current`, as `aria-current` does on an item). It starts at its left
+   edge, as an item does: Blitz's user-agent `button{justify-content:center}` would centre a
+   frame word stretched across the sidebar. */
+.ds-button[*|data-variant=frame]{
+  display:inline-flex; align-items:center; justify-content:flex-start; text-align:left; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:pointer;
+  padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); transform:scale(var(--squish)); }
+.ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
+
+/* A trailing mark (mailo gaps 4): a dropdown's caret after its value, in the label's colour a
+   step quieter; `line-height:0` so the glyph does not stretch the line. */
+.ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
+
+/* A mark face (mailo gaps 4): the bubble's B, i, U and S (design/04 section 30), each in its own
+   style. S's italic is Georgia; the serif here is `--font-serif` (design/02). */
+.ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
+.ds-button-face[*|data-face=bold]{ font-weight:700; }
+.ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
+.ds-button-face[*|data-face=underline]{ text-decoration:underline; }
+.ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 /* -- chip -- */
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
    washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate.
@@ -1242,6 +1269,9 @@ html,body{margin:0;padding:0;background:transparent}
   width:11px; height:11px; font-size:var(--fs-pico); border-radius:var(--r-micro);
   margin-right:var(--s-4); vertical-align:-1px; box-shadow:0 0 0 var(--hair) var(--line);
 }
+/* A local-folders account (mailo gaps 4): the folder glyph, stroked in `--pc` (the neutral grey)
+   through `currentColor`, centred on the same chip. */
+.ds-provider[*|data-kind=local] .ds-ic{ display:block; }
 .ds-provider[*|data-kind=image]{ padding:var(--s-1-5); }
 .ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }
 /* -- scrim -- */
@@ -1622,13 +1652,49 @@ html,body{margin:0;padding:0;background:transparent}
    field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
    per character over it, where the placeholder would sit. The caret follows the hidden text, so
    it can sit a little off the last dot; the secret itself never paints. */
-.ds-input[*|data-kind=password]{ color:transparent; caret-color:var(--ink); }
+.ds-input[*|data-kind=password],
+.ds-input[*|data-kind=secret]{ color:transparent; caret-color:var(--ink); }
 .ds-input-mask{
   position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink); letter-spacing:.1em;
 }
 .ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
+
+/* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
+   markup, which never carries a `value`. */
+
+/* Bare (mailo gaps 4): the field takes the face of the text it edits. No box, border, padding or
+   ground; font, size, weight, tracking, line height and colour are inherited, so a title or a
+   property row's value is edited in place. Only the caret and the selection are the field's.
+   Blitz sizes a one-line input by its line height, so the height is left to it. */
+.ds-input-wrap[*|data-variant=bare]{ flex:1 1 auto; min-width:0; }
+.ds-input[*|data-variant=bare]{
+  height:auto; border:0; padding:0; margin:0; background:transparent; box-shadow:none; border-radius:0;
+  font:inherit; font-size:inherit; line-height:inherit; letter-spacing:inherit; color:inherit; caret-color:var(--accent);
+}
+.ds-input[*|data-variant=bare]::selection{ background:var(--accent-soft); }
+.ds-input-wrap[*|data-variant=bare] .ds-input-placeholder,
+.ds-input-wrap[*|data-variant=bare] .ds-input-mask{ padding:0; font-size:inherit; line-height:inherit; letter-spacing:inherit; }
+.ds-input-wrap[*|data-variant=bare] .ds-input-placeholder{ color:inherit; opacity:.45; }
+.ds-input[*|data-variant=bare][*|data-kind=password],
+.ds-input[*|data-variant=bare][*|data-kind=secret]{ color:transparent; }
+.ds-input-wrap[*|data-variant=bare] .ds-input-mask{ color:inherit; }
+
+/* Multiline (mailo gaps 4): a `textarea`. Blitz gives it `rows` line heights of content (two when
+   `rows` is absent) plus its padding, so the one-line height above is undone and the field's
+   `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
+   component's. */
+.ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; display:block; }
+.ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
+
+/* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The
+   name is a span drawn as the field (no input: nothing is typed here), cut at its end. The wrap
+   takes its container's width: a span has no 300 px intrinsic width as an input has, so without
+   it the name collapsed to its padding on Blitz. */
+.ds-input-wrap[*|data-kind=file]{ align-items:center; gap:var(--s-6); width:100%; }
+.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:pointer; flex:1 1 0; width:auto; }
+.ds-input-wrap[*|data-kind=file] .ds-input-placeholder{ right:auto; }
 /* -- text_runs -- */
 /* Text runs (mailo gaps 2): a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with

@@ -28,7 +28,11 @@ pub const STYLES: &[(&str, &[&str])] = &[
     ("slider", &[include_str!("../../src/components/slider.css")]),
     (
         "text_input",
-        &[include_str!("../../src/components/text_input.css")],
+        &[
+            include_str!("../../src/components/text_input.css"),
+            include_str!("../../src/components/icon_button.css"),
+            include_str!("../../src/components/icon_view.css"),
+        ],
     ),
     (
         "search_field",
