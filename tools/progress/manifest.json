@@ -2,6 +2,28 @@
   "updated": "2026-09-24, design system built and gallery-reviewed; host complete; polish and sill freeze running",
   "entries": [
     {
+      "id": "m0-cosmic",
+      "date": "2026-09-24 \u00b7 Milestone 0 on cosmic-comp",
+      "title": "The host passes four of the five acceptance items on the real compositor; compositor blur makes the bar vanish",
+      "status": "running",
+      "lede": "Nested cosmic-comp 1.8.0 turns out to run with the screen off once GL vblank sync is disabled, so the deferred run happened today. The bar reserves its 32 px, fractional scale maps pixel for pixel, two surfaces share one device, and the dock hover sweep renders every frame with zero idle frames. Blur is the exception: with a blur region requested, cosmic-comp stops drawing the bar at all (one run captured a blank frame), while the same client passes on KWin. The acceptance check now also requires the checkerboard to stay visible so a blank frame can never read as a perfect blur. An investigation is running.",
+      "notes": [
+        "Dock sweep on cosmic: 2059 frames for 2059 callbacks, 0.27 ms median, 0.39 ms p95; five seconds idle: 0 frames, 0 commits, 0 main-thread wakeups.",
+        "Two surfaces on one device: the second costs 1.4 MB.",
+        "Blur: the bar is composited with blur off and disappears with blur on; the cause (our buffer/region or a cosmic-comp bug on the nested GL path) is being isolated with a plain shm client and the AMD adapter."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/cosmic/a.png",
+          "caption": "cosmic-comp: the 32 px bar above the maximized checkerboard (item a)"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/cosmic/b.png",
+          "caption": "cosmic-comp with a blur region requested: the bar is gone (item b, open)"
+        }
+      ]
+    },
+    {
       "id": "gallery-first-look",
       "date": "2026-09-24 \u00b7 quire wave 3",
       "title": "The design system exists: every component on review pages, in both themes and six accents",
