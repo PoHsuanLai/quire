@@ -5,18 +5,17 @@
    Nothing is laid out while the hub is empty: `ToastHost` renders no toast then, and a rising
    toast mounts hidden, so its first frame is below the edge and the spring runs from there
    (gallery fix A: the hidden pill showed at the bottom of every root). The tab's rule names the
-   toast: the reset's `.ds button{font:inherit;color:inherit}` outranks a lone class, which left
-   the tab's label in the toast's own `--paper` on the tab's `--paper` (gallery fix A). */
+   toast, as S's `.toast .tab` does. */
 
 .ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
-  display:flex; align-items:center; gap:2px; background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
-  padding:5px 5px 5px 15px; box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
+  display:flex; align-items:center; gap:var(--s-2); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
+  padding:var(--s-5) var(--s-5) var(--s-5) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
   transition:transform var(--t-big) var(--e-spring); }
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
-.ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 6px 0 10px; }
-.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:6px; cursor:grab; background:var(--paper); color:var(--ink); border:0;
-  border-radius:var(--r-pill); padding:5px 12px 5px 9px; font-size:var(--fs-small); font-weight:700; touch-action:none;
+.ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
+.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
+  border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
   transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }
 .ds-toast-tab:active{ cursor:grabbing; }
 .ds-toast-tab[*|data-drag=live]{ transition:none; }

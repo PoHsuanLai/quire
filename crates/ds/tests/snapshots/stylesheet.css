@@ -3,20 +3,23 @@
 /* reset.css: the document stays transparent and `.ds` carries the base text (design/02-TYPE.md
    section 3). A shell surface shows the desktop through `html` and `body`; whatever a surface
    paints, its `.ds` root paints. No `:root`, no media query: the root's attributes are explicit
-   (design/05-MOTION.md section 9 rule 11). */
+   (design/05-MOTION.md section 9 rule 11).
+   The element rules scope through `:where(.ds)`, which adds no specificity: each is (0,0,1), so
+   any component rule written as one class outranks them (a `.ds button` form was (0,1,1) and
+   took a lone class's colour and font; FINDINGS "Polish pass"). */
 html,body{margin:0;padding:0;background:transparent}
 .ds,.ds *,.ds *::before,.ds *::after{box-sizing:border-box}
 .ds{background-color:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:var(--fs-base);line-height:1.55;-webkit-font-smoothing:antialiased}
-.ds h1,.ds h2,.ds h3{font-family:var(--font-display);font-weight:700;margin:0;letter-spacing:-.015em;text-wrap:balance}
-.ds h4,.ds h5{font-family:var(--font-display);font-weight:700;margin:0}
-.ds p{margin:0}
-.ds button,.ds input,.ds textarea,.ds select{font:inherit;color:inherit}
+:where(.ds) h1,:where(.ds) h2,:where(.ds) h3{font-family:var(--font-display);font-weight:700;margin:0;letter-spacing:-.015em;text-wrap:balance}
+:where(.ds) h4,:where(.ds) h5{font-family:var(--font-display);font-weight:700;margin:0}
+:where(.ds) p{margin:0}
+:where(.ds) button,:where(.ds) input,:where(.ds) textarea,:where(.ds) select{font:inherit;color:inherit}
 /* The focus ring (`S:55`) on keyboard focus only. Blitz never matches the visible-focus pseudo
    class, so ds-native stamps the input modality on the root and the ring keys on it (spike
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 1px 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 1px 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 1px 0 rgba(255,255,255,.35) inset;--shadow-window:0 18px 40px -22px rgba(0,0,0,.45);--shadow-card:0 0 0 1px rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 1px rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 1px rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--s-1:1px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-14:14px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 1px 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 1px 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 1px 0 rgba(255,255,255,.35) inset;--shadow-window:0 18px 40px -22px rgba(0,0,0,.45);--shadow-card:0 0 0 1px rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 1px rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 1px rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--handle-ring:rgba(255,255,255,.25);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 1px 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 1px 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);color-scheme:dark;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;}
 .ds[*|data-motion=extra]{--t-big:560ms;--t-big-heavy:644ms;--t-crumple-heavy:644ms;--e-spring:cubic-bezier(.34,2,.5,1);--overshoot:1.14;--squish:.86;--tilt:5deg;--stagger:34ms;}
@@ -387,7 +390,7 @@ html,body{margin:0;padding:0;background:transparent}
    no `filter`); opacity .85 stays here. The avatar's hover turn is `--t-quick --e-spring`.
    TODO(O-3): `rotate(-6deg) scale(1.08)` have no tokens. */
 
-.ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:12px; }
+.ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); margin-top:var(--s-12); }
 
 .ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-spring); }
 .ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }
@@ -405,9 +408,9 @@ html,body{margin:0;padding:0;background:transparent}
    are Space dots (space_editor.css) five apart, as in the sidebar foot (`S:845`), painted with
    `--swatch-*`. No states of its own. TODO(O-16): the overall width is the host surface's. */
 
-.ds-appearance{ display:grid; gap:14px; }
+.ds-appearance{ display:grid; gap:var(--s-14); }
 .ds-appearance-row{ min-width:0; }
-.ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:5px; }
+.ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }
 /* -- avatar -- */
 /* Avatar (design/04-COMPONENTS.md section 11). Colours arrive inline as `--av-bg`/`--av-fg`
    (hexes computed in Rust, O-7). Attribute selectors carry `*|`, and a value starting with a
@@ -435,7 +438,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The event attendee stack: `S:519-521`. */
 .ds-avatar[*|data-tone=stack]{ font-size:var(--fs-micro); border:2px solid var(--surface); }
-.ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:-6px; }
+.ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:calc(var(--s-6) * -1); }
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -446,7 +449,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). */
 .ds-button[*|data-variant=primary],
 .ds-button[*|data-variant=secondary]{
-  display:inline-flex; align-items:center; gap:6px; border:0; cursor:pointer; border-radius:var(--r-btn); padding:8px 14px;
+  display:inline-flex; align-items:center; gap:var(--s-6); border:0; cursor:pointer; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
   transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
@@ -459,9 +462,9 @@ html,body{margin:0;padding:0;background:transparent}
 /* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
 .ds-button[*|data-variant=mini],
 .ds-button[*|data-variant=danger]{
-  display:inline-flex; align-items:center; gap:6px; line-height:1; white-space:nowrap;
+  display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
   border:1px solid var(--line); background:var(--surface-2); cursor:pointer;
-  border-radius:var(--r-btn); padding:5px 10px; font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
+  border-radius:var(--r-btn); padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=mini]:hover,
@@ -475,8 +478,10 @@ html,body{margin:0;padding:0;background:transparent}
 /* Danger (derived from `C:958-963`): red only on hover. */
 .ds-button[*|data-variant=danger]:hover{ background:var(--danger-wash); color:var(--danger); }
 
-/* Quiet: `S:601-602`. TODO(O-3): its gap and icon size are not specified; active not specified. */
-.ds-button[*|data-variant=quiet]{ border:0; background:none; cursor:pointer; font-size:var(--fs-small); color:var(--ink-faint); padding:2px 4px; border-radius:var(--r-small); }
+/* Quiet: `S:601-602`. S's link-button has no icon, so no gap; with one it takes the gap every
+   other variant has (6), laid out as they are (polish pass: the glyph touched the label).
+   TODO(O-3): its icon size and active state are not specified. */
+.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:pointer; font-size:var(--fs-small); color:var(--ink-faint); padding:var(--s-2) var(--s-4); border-radius:var(--r-small); }
 .ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
 /* -- chip -- */
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
@@ -490,7 +495,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Accent: `S:198-199`. Label shares its shape (`C:941-944`). */
 .ds-chip[*|data-variant=accent],
 .ds-chip[*|data-variant=label]{
-  font-size:var(--fs-micro); padding:1.5px 7px; border-radius:var(--r-chip);
+  font-size:var(--fs-micro); padding:var(--s-1-5) var(--s-7); border-radius:var(--r-chip);
   background:var(--accent-soft); color:var(--ink);
 }
 .ds-chip[*|data-variant=label][*|data-hue=red]{    background:var(--c-red-soft);    color:var(--c-red-deep); }
@@ -501,22 +506,22 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Neutral: C's `.tag` (`C:615-616`). */
 .ds-chip[*|data-variant=neutral]{
-  font-size:var(--fs-micro); padding:2px 7px; border-radius:var(--r-pill);
+  font-size:var(--fs-micro); padding:var(--s-2) var(--s-7); border-radius:var(--r-pill);
   background:var(--surface-2); border:1px solid var(--line); color:var(--ink-faint);
 }
 
 /* Token: `S:798`. */
-.ds-chip[*|data-variant=token]{ font-size:var(--fs-note); padding:2px 8px; border-radius:var(--r-pill); background:var(--accent-soft); color:var(--ink); }
+.ds-chip[*|data-variant=token]{ font-size:var(--fs-note); padding:var(--s-2) var(--s-8); border-radius:var(--r-pill); background:var(--accent-soft); color:var(--ink); }
 
 /* Status: `S:276-278`. */
-.ds-chip[*|data-variant=status]{ font-size:var(--fs-micro); padding:1px 7px; border-radius:var(--r-pill); }
+.ds-chip[*|data-variant=status]{ font-size:var(--fs-micro); padding:var(--s-1) var(--s-7); border-radius:var(--r-pill); }
 .ds-chip[*|data-variant=status][*|data-status=ok]{ background:var(--ok-wash); color:var(--ok); }
 .ds-chip[*|data-variant=status][*|data-status=bad]{ background:var(--danger-wash); color:var(--danger); }
 
 /* Person: `S:592-598`, entering with `chip-in` on mount. The avatar is an 18 Avatar. The entry
    steps aside while the flash plays, or this rule would outrank the pulse class. */
 .ds-chip[*|data-variant=person]{
-  display:inline-flex; align-items:center; gap:6px; padding:2px 8px 2px 3px; border-radius:var(--r-pill);
+  display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-8) var(--s-2) var(--s-3); border-radius:var(--r-pill);
   background:var(--surface); border:1px solid var(--line);
   font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
 }
@@ -540,8 +545,8 @@ html,body{margin:0;padding:0;background:transparent}
    The colour change on hover is instant, as in S. Disabled, entering, leaving: not specified. */
 
 .ds-command-pill{
-  display:flex; align-items:center; gap:8px; width:100%; border:0; cursor:pointer; text-align:left;
-  padding:8px 10px; border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
+  display:flex; align-items:center; gap:var(--s-8); width:100%; border:0; cursor:pointer; text-align:left;
+  padding:var(--s-8) var(--s-10); border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
   font:inherit; font-size:var(--fs-control); box-shadow:var(--shadow-pill-inset);
   transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -570,7 +575,7 @@ html,body{margin:0;padding:0;background:transparent}
    `DropState` by ListRow and SidebarItem, whose stylesheets carry the rules. */
 
 .ds-drag-ghost{
-  position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:9px 11px;
+  position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:var(--s-9) var(--s-11);
   border-radius:var(--r-card); background:var(--raise); border:1px solid var(--line);
   box-shadow:var(--shadow-drag); font-size:var(--fs-control); font-weight:700; color:var(--ink);
   transform:rotate(var(--tilt)) scale(1.02);
@@ -586,7 +591,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds :hover > .ds-grip{ opacity:1; }
 .ds-grip:hover{ background:var(--surface); color:var(--ink); }
 
-.ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent); margin:2px 0; }
+.ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent); margin:var(--s-2) 0; }
 /* -- edge_strip -- */
 /* EdgeStrip (design/04-COMPONENTS.md section 33): `S:85`, `S:91`, `S:451-454`. The strip is
    rendered only while the sidebar is hidden, so it needs no display toggle. The sidebar
@@ -617,30 +622,30 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-hover-target{ display:inline; }
 .ds-hover-target[*|data-kind=thread]{ display:block; }
 
-.ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:12px 13px; font-size:var(--fs-control);
+.ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
   animation:hc-in var(--t-move) var(--e-spring); }
 .ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }
 
 .ds-hovercard-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-reading); line-height:1.2; }
-.ds-hovercard-sub{ font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); margin-top:2px; }
-.ds-hovercard-msgs{ margin-top:9px; display:grid; gap:7px; }
-.ds-hovercard-msg{ display:grid; grid-template-columns:22px 1fr; gap:8px; align-items:start; }
+.ds-hovercard-sub{ font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); margin-top:var(--s-2); }
+.ds-hovercard-msgs{ margin-top:var(--s-9); display:grid; gap:var(--s-7); }
+.ds-hovercard-msg{ display:grid; grid-template-columns:22px 1fr; gap:var(--s-8); align-items:start; }
 .ds-hovercard-msg b{ font-size:var(--fs-small); }
 .ds-hovercard-msg p{ font-size:var(--fs-small); color:var(--ink-soft); line-height:1.4; max-height:2.8em; overflow:hidden; }
-.ds-hovercard-foot{ margin-top:10px; padding-top:8px; border-top:1px solid var(--line-soft); display:flex; align-items:center; gap:6px;
+.ds-hovercard-foot{ margin-top:var(--s-10); padding-top:var(--s-8); border-top:1px solid var(--line-soft); display:flex; align-items:center; gap:var(--s-6);
   font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); }
 .ds-hovercard-keys{ margin-left:auto; }
-.ds-hovercard-person{ display:flex; gap:10px; align-items:center; }
-.ds-hovercard-stats{ margin-top:9px; display:flex; gap:14px; font-size:var(--fs-small); color:var(--ink-soft); }
+.ds-hovercard-person{ display:flex; gap:var(--s-10); align-items:center; }
+.ds-hovercard-stats{ margin-top:var(--s-9); display:flex; gap:var(--s-14); font-size:var(--fs-small); color:var(--ink-soft); }
 .ds-hovercard-stats b{ display:block; font-family:var(--font-display); font-size:var(--fs-base); color:var(--ink); }
-.ds-hovercard-flag{ margin-top:9px; display:flex; gap:7px; align-items:flex-start; padding:7px 9px; border-radius:var(--r-btn);
+.ds-hovercard-flag{ margin-top:var(--s-9); display:flex; gap:var(--s-7); align-items:flex-start; padding:var(--s-7) var(--s-9); border-radius:var(--r-btn);
   background:var(--danger-wash); color:var(--ink); font-size:var(--fs-small); line-height:1.4; }
-.ds-hovercard-flag .ds-ic{ color:var(--danger); margin-top:1px; }
+.ds-hovercard-flag .ds-ic{ color:var(--danger); margin-top:var(--s-1); }
 .ds-hovercard-flag[*|data-tone=info]{ background:var(--accent-soft); }
 .ds-hovercard-flag[*|data-tone=info] .ds-ic{ color:var(--accent); }
-.ds-hovercard-actions{ margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
+.ds-hovercard-actions{ margin-top:var(--s-10); display:flex; gap:var(--s-6); flex-wrap:wrap; }
 .ds-hovercard-live{ display:inline-block; width:6px; height:6px; border-radius:var(--r-pill); background:var(--ok); }
 /* -- hover_strip -- */
 /* HoverStrip (design/04-COMPONENTS.md section 17): `S:312-323`, `S:441-446`. The buttons are
@@ -657,7 +662,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-strip{
   --j:0;
-  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:3px; padding:3px;
+  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:var(--s-3); padding:var(--s-3);
   border-radius:var(--r-pill); background:var(--raise); border:1px solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out);
 }
@@ -673,7 +678,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-strip .ds-fly{
   position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
   background:var(--ink); color:var(--paper); font-family:var(--font-data); font-size:var(--fs-caption);
-  padding:3px 7px; border-radius:var(--r-small); opacity:0; pointer-events:none;
+  padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0; pointer-events:none;
   transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
 }
 .ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
@@ -728,7 +733,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-kbd{
   font-family:var(--font-data); font-size:var(--fs-note); border:1px solid var(--line); border-bottom-width:2px;
-  border-radius:var(--r-kbd); padding:1px 5px; color:var(--ink-soft); background:var(--surface-2);
+  border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }
 /* -- link_pill -- */
@@ -738,8 +743,8 @@ html,body{margin:0;padding:0;background:transparent}
    first and the registered domain never shrinks (O-30). It enters with `hc-in` at `--t-quick
    --e-out` (`S:433`, `Anim::LinkPillIn`). */
 
-.ds-link-pill{ position:absolute; left:12px; bottom:12px; z-index:var(--z-link-pill); max-width:calc(100% - 24px); display:flex; align-items:center; gap:7px;
-  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:5px 11px 5px 9px; font-family:var(--font-data); font-size:var(--fs-eyebrow);
+.ds-link-pill{ position:absolute; left:12px; bottom:12px; z-index:var(--z-link-pill); max-width:calc(100% - 24px); display:flex; align-items:center; gap:var(--s-7);
+  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-5) var(--s-11) var(--s-5) var(--s-9); font-family:var(--font-data); font-size:var(--fs-eyebrow);
   white-space:nowrap; overflow:hidden; box-shadow:var(--shadow-2); animation:hc-in var(--t-quick) var(--e-out); pointer-events:none; }
 .ds-link-pill b{ color:var(--paper); flex:none; }
 .ds-link-pill-dim{ opacity:.6; flex:none; }
@@ -767,8 +772,8 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-row{
   --i:0; --d:0;
-  position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:10px; align-items:start;
-  padding:10px 11px; margin-bottom:5px; border-radius:var(--r-card); background:var(--surface);
+  position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
+  padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
   border:1px solid transparent; cursor:pointer; user-select:none; list-style:none;
   transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out),
              background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
@@ -804,7 +809,7 @@ html,body{margin:0;padding:0;background:transparent}
 }
 
 /* Dot (`S:185-187`, `S:295-296`). */
-.ds-row-dot{ padding-top:6px; }
+.ds-row-dot{ padding-top:var(--s-6); }
 .ds-dot{
   display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent);
   transition:transform var(--t-quick) var(--e-spring), opacity var(--t-quick) var(--e-out);
@@ -813,19 +818,19 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Text (`S:189-197`). */
 .ds-row-main{ min-width:0; }
-.ds-row-from{ display:flex; align-items:baseline; gap:7px; min-width:0; }
+.ds-row-from{ display:flex; align-items:baseline; gap:var(--s-7); min-width:0; }
 .ds-row-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
 .ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
 .ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint); }
 .ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
 .ds-row[*|data-emphasis=strong] .ds-row-sub{ font-weight:600; }
 .ds-row-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }
-.ds-row-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+.ds-row-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--s-5); }
 .ds-row-time{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
-.ds-row-tags{ display:flex; gap:4px; align-items:center; }
+.ds-row-tags{ display:flex; gap:var(--s-4); align-items:center; }
 
 /* Star and sparks (`S:299-307`). */
-.ds-row .ds-star{
+.ds-star{
   position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
   cursor:pointer; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
   transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
@@ -845,19 +850,19 @@ html,body{margin:0;padding:0;background:transparent}
    at once (`S:2052`, `C:1744`).
    TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; padding:5px; outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-menu{ width:280px; max-height:320px; overflow-y:auto; padding:var(--s-5); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-menu[*|data-kind=slim],
 .ds-menu[*|data-kind=context]{ width:220px; }
-.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; padding:6px; border-radius:var(--r-panel); box-shadow:var(--shadow-2);
+.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; padding:var(--s-6); border-radius:var(--r-panel); box-shadow:var(--shadow-2);
   transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-spring); }
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
 
-.ds-menu-empty{ padding:10px; font-size:var(--fs-meta); color:var(--ink-faint); }
+.ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* TODO(O-12): the separator is derived from the bubble's; its 4px margin is the candidate. */
-.ds-menu-separator{ height:1px; margin:4px 0; background:var(--line-soft); }
+.ds-menu-separator{ height:1px; margin:var(--s-4) 0; background:var(--line-soft); }
 .ds-menu mark{ background:transparent; color:var(--accent); font-weight:800; }
 /* -- menu_entry -- */
 /* Menu items (design/04-COMPONENTS.md section 20): the Rich grid `S:667-673`, Slim `S:678-680`,
@@ -865,7 +870,7 @@ html,body{margin:0;padding:0;background:transparent}
    moves the selection (O-13), so hover and keyboard look alike there; the Dropdown keeps C's
    hover. TODO(O-1): no disabled item. */
 
-.ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:9px; align-items:center; padding:5px 7px; border-radius:var(--r-menu-item); cursor:pointer; }
+.ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:pointer; }
 .ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
 .ds-menu-tile{ width:34px; height:34px; border-radius:var(--r-menu-item); border:1px solid var(--line); background:var(--surface); display:grid; place-items:center;
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
@@ -879,7 +884,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Slim, and Context which is Slim. */
 .ds-menu[*|data-kind=slim] .ds-menu-item,
-.ds-menu[*|data-kind=context] .ds-menu-item{ grid-template-columns:22px 1fr auto; padding:6px 8px; }
+.ds-menu[*|data-kind=context] .ds-menu-item{ grid-template-columns:22px 1fr auto; padding:var(--s-6) var(--s-8); }
 .ds-menu[*|data-kind=slim] .ds-menu-tile,
 .ds-menu[*|data-kind=context] .ds-menu-tile{ width:22px; height:22px; border:0; background:transparent; }
 
@@ -888,7 +893,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Dropdown: a check column, C's hover. Its keyboard selection is not specified; it looks like
    hover. */
-.ds-menu[*|data-kind=dropdown] .ds-menu-item{ display:flex; align-items:center; gap:8px; padding:6px 9px; border-radius:var(--r-btn); font-size:var(--fs-control); color:var(--ink-soft);
+.ds-menu[*|data-kind=dropdown] .ds-menu-item{ display:flex; align-items:center; gap:var(--s-8); padding:var(--s-6) var(--s-9); border-radius:var(--r-btn); font-size:var(--fs-control); color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item:hover,
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }
@@ -908,7 +913,7 @@ html,body{margin:0;padding:0;background:transparent}
   box-shadow:var(--shadow-sheet); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
 .ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
-.ds-peek-tools{ display:flex; justify-content:flex-end; padding:8px 10px 0; }
+.ds-peek-tools{ display:flex; justify-content:flex-end; padding:var(--s-8) var(--s-10) 0; }
 /* -- popover -- */
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
    card and the bubble, and the overlay wrapper every floating component renders into at the end
@@ -952,9 +957,9 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-provider[*|data-size=row]{
   width:11px; height:11px; font-size:var(--fs-pico); border-radius:var(--r-micro);
-  margin-right:4px; vertical-align:-1px; box-shadow:0 0 0 1px var(--line);
+  margin-right:var(--s-4); vertical-align:-1px; box-shadow:0 0 0 1px var(--line);
 }
-.ds-provider[*|data-kind=image]{ padding:1.5px; }
+.ds-provider[*|data-kind=image]{ padding:var(--s-1-5); }
 .ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }
 /* -- scrim -- */
 /* Scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the overlay, dims
@@ -966,29 +971,31 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
-   Its rules name the variant so they outrank TextInput's own (and the reset's font). The field
+   Its rules name the variant so they outrank TextInput's own. The field
    stays one line: TextInput's `em` height follows the 16 px here. Hover and disabled are not
    specified. */
 
-.ds-search{ display:flex; align-items:center; gap:9px; padding:12px 14px; border-bottom:1px solid var(--line-soft); color:var(--ink-faint); }
+.ds-search{ display:flex; align-items:center; gap:var(--s-9); padding:var(--s-12) var(--s-14); border-bottom:1px solid var(--line-soft); color:var(--ink-faint); }
 .ds-search .ds-input-wrap{ flex:1; }
 .ds-search .ds-input[*|data-variant=inline]{ font-size:var(--fs-title); border:0; outline:none; background:transparent; color:var(--ink); width:100%; padding:0; height:1.55em; }
 .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-title); padding:0; }
-.ds-search-tokens{ display:flex; gap:5px; flex-wrap:wrap; padding:0 14px 8px; }
+.ds-search-tokens{ display:flex; gap:var(--s-5); flex-wrap:wrap; padding:0 var(--s-14) var(--s-8); }
 /* -- section_header -- */
 /* SectionHeader (design/04-COMPONENTS.md section 13): Frame `S:120-125`, Group `C:1026-1032`,
    Field `S:250-251`, Menu `S:668`. The rule is a real span (O-22's fallback for `::after`).
    Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state.
    A header heads its group: it is a full-width row of its own, spanning every column when its
    container is a grid (gallery fix A: four headers in a grid read as one run-on row). The
-   eyebrow never wraps; the rule takes the free space. The action's rule names the header: the
-   reset's `.ds button{font:inherit;color:inherit}` outranks a lone class. */
+   eyebrow never wraps; the rule takes the free space. The action's rule names the header, as
+   S's `.s-h button` does. The action always ends the row: after the rule it has no free space
+   to take, and in a header without a rule (Field, Menu) its `margin-left:auto` does what the
+   rule would (polish pass: a Menu header's action sat against its eyebrow). */
 
 .ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); text-transform:uppercase; color:var(--ink-faint); }
-.ds-section-header[*|data-kind=frame]{ gap:6px; padding:14px 6px 5px; font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
-.ds-section-header[*|data-kind=group]{ gap:8px; padding:12px 6px 6px; font-size:var(--fs-caption); letter-spacing:.12em; }
-.ds-section-header[*|data-kind=field]{ margin-bottom:6px; font-size:var(--fs-caption); letter-spacing:.14em; }
-.ds-section-header[*|data-kind=menu]{ padding:7px 8px 3px; font-size:var(--fs-micro); letter-spacing:.14em; }
+.ds-section-header[*|data-kind=frame]{ gap:var(--s-6); padding:var(--s-14) var(--s-6) var(--s-5); font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
+.ds-section-header[*|data-kind=group]{ gap:var(--s-8); padding:var(--s-12) var(--s-6) var(--s-6); font-size:var(--fs-caption); letter-spacing:.12em; }
+.ds-section-header[*|data-kind=field]{ margin-bottom:var(--s-6); font-size:var(--fs-caption); letter-spacing:.14em; }
+.ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:.14em; }
 
 .ds-section-header-text{ white-space:nowrap; }
 .ds-section-header-rule{ flex:1; min-width:0; height:1px; }
@@ -999,8 +1006,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-section-header[*|data-kind=field] .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
 
 .ds-section-header .ds-section-header-action{
-  border:0; background:none; cursor:pointer; font:inherit; letter-spacing:.08em;
-  color:var(--f-ink-faint); padding:0 2px; text-transform:none;
+  margin-left:auto; border:0; background:none; cursor:pointer; font:inherit; letter-spacing:.08em;
+  color:var(--f-ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }
 /* -- segmented -- */
@@ -1010,16 +1017,16 @@ html,body{margin:0;padding:0;background:transparent}
    The pressed fill jumps between segments; there is no sliding thumb.
    TODO(O-1): disabled is not specified. */
 
-.ds-segmented{ display:inline-flex; gap:2px; border:1px solid var(--line); border-radius:var(--r-pill); }
-.ds-segmented[*|data-size=regular]{ padding:3px; background:var(--surface-2); }
-.ds-segmented[*|data-size=small]{ padding:2px; background:var(--surface); }
+.ds-segmented{ display:inline-flex; gap:var(--s-2); border:1px solid var(--line); border-radius:var(--r-pill); }
+.ds-segmented[*|data-size=regular]{ padding:var(--s-3); background:var(--surface-2); }
+.ds-segmented[*|data-size=small]{ padding:var(--s-2); background:var(--surface); }
 
 .ds-segment{
   font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:pointer; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
-.ds-segmented[*|data-size=regular] .ds-segment{ padding:5px 11px; font-size:var(--fs-small); }
-.ds-segmented[*|data-size=small] .ds-segment{ padding:3px 10px; font-size:var(--fs-help); }
+.ds-segmented[*|data-size=regular] .ds-segment{ padding:var(--s-5) var(--s-11); font-size:var(--fs-small); }
+.ds-segmented[*|data-size=small] .ds-segment{ padding:var(--s-3) var(--s-10); font-size:var(--fs-help); }
 .ds-segment:hover{ color:var(--ink); }
 .ds-segment:active{ transform:scale(var(--squish)); }
 .ds-segment[*|aria-pressed=true]{ background:var(--ink); color:var(--paper); }
@@ -1030,28 +1037,27 @@ html,body{margin:0;padding:0;background:transparent}
    `BubbleAction::Separator` draws `ds-bubble-sep` between groups. It enters with `menu-pop` at
    `--t-quick` (`S:684`, `Anim::BubblePop`). */
 
-.ds-popover.ds-bubble{ display:flex; align-items:center; gap:1px; padding:3px; animation:menu-pop var(--t-quick) var(--e-spring); }
-.ds-bubble-button{ border:0; background:transparent; cursor:pointer; height:28px; min-width:28px; padding:0 7px; border-radius:var(--r-bubble-button);
-  color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+.ds-popover.ds-bubble{ display:flex; align-items:center; gap:var(--s-1); padding:var(--s-3); animation:menu-pop var(--t-quick) var(--e-spring); }
+.ds-bubble-button{ border:0; background:transparent; cursor:pointer; height:28px; min-width:28px; padding:0 var(--s-7); border-radius:var(--r-bubble-button);
+  color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
 .ds-bubble-button:hover{ background:var(--surface-2); color:var(--ink); }
 .ds-bubble-button[*|aria-pressed=true]{ color:var(--accent); }
-.ds-bubble-sep{ width:1px; height:18px; background:var(--line-soft); margin:0 3px; }
-.ds-bubble .ds-input{ border:0; outline:none; background:transparent; font-size:var(--fs-meta); width:220px; padding:0 8px; color:var(--ink); }
+.ds-bubble-sep{ width:1px; height:18px; background:var(--line-soft); margin:0 var(--s-3); }
+.ds-bubble .ds-input{ border:0; outline:none; background:transparent; font-size:var(--fs-meta); width:220px; padding:0 var(--s-8); color:var(--ink); }
 /* -- send_pill -- */
 /* SendPill (design/04-COMPONENTS.md section 31), verbatim `S:706-715`: a dark pill at the
    bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
    Undo hover is not specified. C's retry states (`nudge`, `shake`, a Fix button) have no phase
-   in `SendPhase` and are not drawn. The Undo rule names the pill: the reset's
-   `.ds button{font:inherit;color:inherit}` outranks a lone class, which painted Undo's label in
-   the pill's `--paper` on its own `--paper` (gallery fix A). */
+   in `SendPhase` and are not drawn. The Undo rule names the pill, as S's
+   `.sendpill button` does. */
 
-.ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:10px;
-  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:6px 6px 6px 12px; font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
+.ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:var(--s-10);
+  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-6) var(--s-6) var(--s-6) var(--s-12); font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
   transition:transform var(--t-big) var(--e-spring); white-space:nowrap; }
 .ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-send-ring{ display:block; flex:none; }
-.ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:4px 12px; font-size:var(--fs-small); font-weight:700; }
+.ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }
 /* -- sheet -- */
 /* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
    centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
@@ -1075,12 +1081,11 @@ html,body{margin:0;padding:0;background:transparent}
    and the close button sit at the end and an item without them does not centre (gallery fix A:
    Blitz's user-agent `button{justify-content:center}` centred an item with no count). The fade
    of a truncating label then falls on its empty end unless the text really reaches it. The
-   button forms of the base and close rules add the element: the reset's
-   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
+   close rule names the item, as S's `.item .x` does. */
 
-.ds-sidebar-item, button.ds-sidebar-item{
-  display:flex; align-items:center; justify-content:flex-start; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
-  background:transparent; padding:6px 8px; border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
+.ds-sidebar-item{
+  display:flex; align-items:center; justify-content:flex-start; gap:var(--s-9); width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
+  background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
   color:var(--f-ink-soft); position:relative;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -1133,15 +1138,17 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-slider-fill{ height:100%; width:calc(var(--f) * 100%); background:var(--accent); }
 .ds-slider-thumb{
-  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:22px; height:22px; margin-left:-11px;
+  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:22px; height:22px; margin-left:calc(var(--s-11) * -1);
   border-radius:var(--r-pill); border:3px solid var(--handle-ring); box-shadow:var(--shadow-handle); cursor:grab;
 }
 .ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }
 /* -- space_editor -- */
 /* SpaceEditor and SpaceDot (design/04-COMPONENTS.md section 32): `S:246-279`, `S:147-150`.
    Attribute selectors carry `*|` (spike S2). Every colour shown arrives inline from
-   `space::palette` (the handle fills, stop discs, swatch and preset gradients); the field plane
-   is a PNG built in Rust per scheme (O-19) and scaled to fit, as S scales its canvas.
+   `space::palette` (the handle fills, stop discs, swatch and preset gradients); the field is
+   two PNGs built in Rust per scheme (O-19): a colour plane stretched to fit, and a tiled dot
+   cell over it (`space_editor/field.rs`), so the dots stay round where S's scaled canvas
+   would stretch them.
    O-28: the panel is static, not sticky. O-29: the preset hover scale gets the Space dot's
    transform transition. The handle's white border is `--mark-ground` and its shadow
    `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
@@ -1149,46 +1156,49 @@ html,body{margin:0;padding:0;background:transparent}
    `.ds-field` is this editor's colour field only (TextInput's wrapper was also `.ds-field`, and
    its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
    22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
-   in a wide panel drew 140 px discs. The stop's remove button names the stop: the reset's
-   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
+   in a wide panel drew 140 px discs. The stop's remove button names the stop, as
+   S's `.stop .rm` does. */
 
 .ds-space-editor{
   border:1px solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
-  padding:14px; display:grid; gap:14px; color:var(--ink);
+  padding:var(--s-14); display:grid; gap:var(--s-14); color:var(--ink);
 }
-.ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:8px; }
+.ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:var(--s-8); }
 .ds-space-swatch{ width:14px; height:14px; border-radius:var(--r-pill); flex:none; }
 
 .ds-field{
   position:relative; display:block; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
   border:1px solid var(--line);
 }
+/* The colours stretch; the dots are a tiled cell of the ground with a round hole, 9 px as S's
+   18 px canvas cell is at its half scale, so they stay round at any field width. */
 .ds-field-plane{ position:absolute; inset:0; background-size:100% 100%; background-repeat:no-repeat; }
+.ds-field-dots{ position:absolute; inset:0; background-size:9px 9px; background-repeat:repeat; }
 .ds-handle{
-  position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; box-sizing:border-box; border-radius:var(--r-pill);
+  position:absolute; width:22px; height:22px; margin:calc(var(--s-11) * -1) 0 0 calc(var(--s-11) * -1); box-sizing:border-box; border-radius:var(--r-pill);
   border:3px solid var(--mark-ground); box-shadow:var(--shadow-handle); cursor:grab; touch-action:none;
 }
 .ds-handle[*|aria-pressed=true]{ transform:scale(1.15); }
 
-.ds-stops{ display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+.ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
 .ds-stop{
-  display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:var(--surface-2);
-  border-radius:var(--r-pill); padding:3px 5px 3px 4px; font-family:var(--font-data); font-size:var(--fs-caption);
+  display:inline-flex; align-items:center; gap:var(--s-5); border:1px solid var(--line); background:var(--surface-2);
+  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-size:var(--fs-caption);
   color:var(--ink-soft); cursor:pointer;
 }
 .ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
 .ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
 .ds-stop .ds-stop-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }
 
-.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:6px; }
+.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 .ds-preset{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:1px solid var(--line); cursor:pointer; padding:0;
   transition:transform var(--t-quick) var(--e-spring);
 }
 .ds-preset:hover{ transform:scale(1.1); }
 
-.ds-checks{ display:grid; gap:5px; font-size:var(--fs-small); }
-.ds-check{ display:flex; align-items:center; gap:8px; color:var(--ink-soft); }
+.ds-checks{ display:grid; gap:var(--s-5); font-size:var(--fs-small); }
+.ds-check{ display:flex; align-items:center; gap:var(--s-8); color:var(--ink-soft); }
 .ds-check-value{ margin-left:auto; font-family:var(--font-data); font-size:var(--fs-note); font-variant-numeric:tabular-nums; }
 .ds-capnote{ margin:0; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.45; }
 
@@ -1230,10 +1240,10 @@ html,body{margin:0;padding:0;background:transparent}
    place; there is no sliding underline. Attribute selectors carry `*|` (spike S2).
    Active and disabled (O-1) are not specified. */
 
-.ds-tabs{ display:flex; gap:6px; border-bottom:1px solid var(--line); }
+.ds-tabs{ display:flex; gap:var(--s-6); border-bottom:1px solid var(--line); }
 .ds-tab{
   position:relative; border:0; background:transparent; cursor:pointer;
-  padding:10px 14px 12px; font-family:var(--font-display); font-weight:700; font-size:var(--fs-title);
+  padding:var(--s-10) var(--s-14) var(--s-12); font-family:var(--font-display); font-weight:700; font-size:var(--fs-title);
   color:var(--ink-faint); transition:color var(--t-quick) var(--e-out);
 }
 .ds-tab:hover{ color:var(--ink-soft); }
@@ -1255,26 +1265,24 @@ html,body{margin:0;padding:0;background:transparent}
    300 x 150. The height is the line (`1.55em`, the base line height the field inherits in S) plus
    the padding and the 1 px border, in `em` so a consumer's font size (the search row's 16, the
    bubble's 12.5) keeps it one line; the width fills the wrapper, whose width is the consumer's.
-   Font and colour are on `.ds-input-wrap input`: the reset's `.ds input{font:inherit;color:inherit}`
-   outranks a lone class, and this ties it and comes later, while a container's
-   `.ds-bubble .ds-input` still outranks it.
+   Font and colour are on `.ds-input` itself: the reset's element rules are `:where(.ds) input`,
+   (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
 .ds-input-wrap{ position:relative; display:flex; min-width:0; }
 .ds-input-wrap[*|data-variant=inline]{ flex:1; min-width:120px; }
 
-.ds-input{ width:100%; min-width:0; outline:none; }
-.ds-input-wrap input{ font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
+.ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=boxed]{
   height:calc(1.55em + 16px);
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:7px 10px;
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:var(--s-7) var(--s-10);
   transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
 .ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
 .ds-input[*|data-variant=inline]{
   height:calc(1.55em + 8px);
-  border:1px solid transparent; background:transparent; padding:3px 2px; box-shadow:none;
+  border:1px solid transparent; background:transparent; padding:var(--s-3) var(--s-2); box-shadow:none;
 }
 .ds-input[*|data-variant=inline]:focus{ border-color:transparent; box-shadow:none; }
 /* The global keyboard ring must not double the field's own focus (or the Inline container's). */
@@ -1285,8 +1293,8 @@ html,body{margin:0;padding:0;background:transparent}
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:8px 11px; }
-.ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:4px 3px; }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--s-8) var(--s-11); }
+.ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }
 /* -- toast -- */
 /* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
    (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);
@@ -1295,18 +1303,17 @@ html,body{margin:0;padding:0;background:transparent}
    Nothing is laid out while the hub is empty: `ToastHost` renders no toast then, and a rising
    toast mounts hidden, so its first frame is below the edge and the spring runs from there
    (gallery fix A: the hidden pill showed at the bottom of every root). The tab's rule names the
-   toast: the reset's `.ds button{font:inherit;color:inherit}` outranks a lone class, which left
-   the tab's label in the toast's own `--paper` on the tab's `--paper` (gallery fix A). */
+   toast, as S's `.toast .tab` does. */
 
 .ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
-  display:flex; align-items:center; gap:2px; background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
-  padding:5px 5px 5px 15px; box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
+  display:flex; align-items:center; gap:var(--s-2); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
+  padding:var(--s-5) var(--s-5) var(--s-5) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
   transition:transform var(--t-big) var(--e-spring); }
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
-.ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 6px 0 10px; }
-.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:6px; cursor:grab; background:var(--paper); color:var(--ink); border:0;
-  border-radius:var(--r-pill); padding:5px 12px 5px 9px; font-size:var(--fs-small); font-weight:700; touch-action:none;
+.ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
+.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
+  border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
   transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }
 .ds-toast-tab:active{ cursor:grabbing; }
 .ds-toast-tab[*|data-drag=live]{ transition:none; }
@@ -1321,7 +1328,7 @@ html,body{margin:0;padding:0;background:transparent}
    TODO(O-1): disabled is not specified; hover is not specified. */
 
 .ds-toggle{
-  display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:3px;
+  display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:var(--s-3);
   border:1px solid var(--line); border-radius:var(--r-pill); background:var(--surface-2); cursor:pointer;
   transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
@@ -1343,12 +1350,12 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-fly-target{ position:relative; display:inline-flex; }
 .ds-fly{ position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
-  background:var(--ink); color:var(--paper); font-family:var(--font-data); font-size:var(--fs-caption); padding:3px 7px; border-radius:var(--r-small); opacity:0;
+  background:var(--ink); color:var(--paper); font-family:var(--font-data); font-size:var(--fs-caption); padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0;
   pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring); }
 .ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-fly-target:hover .ds-fly{ transition-delay:initial; }
 
-.ds-popover.ds-tip{ width:auto; max-width:260px; padding:6px 10px; font-size:var(--fs-small); border-radius:var(--r-item);
+.ds-popover.ds-tip{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-small); border-radius:var(--r-item);
   animation:hc-in var(--t-move) var(--e-spring); }
 .ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
-.ds-tip-sub{ margin-top:1px; font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); }
+.ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); }

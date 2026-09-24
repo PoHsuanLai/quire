@@ -35,14 +35,14 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `tokens/timing.rs`, `tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (23 `DurationToken`s, `--t-flash` the wave 1 amendment; 13 `DelayToken`s) |
 | `tokens/easing.rs`, `tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `tokens/shape.rs` | 01-LAYOUT §10 |
-| `tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps as `--s-1` … `--s-36`, emitted on `.ds`) |
+| `tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
 | `tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `tokens/layer.rs` | 01-LAYOUT §12 |
 | `css/tokens_css.rs`, `accents_css.rs`, `materials_css.rs` | the plan's token model and cascade order |
 | `css/motion_css.rs`, `css/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `css/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
-| `css/reset.css`, `utilities.css`, `stylesheet.rs` | 02-TYPE §3 (base text on `.ds`); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
+| `css/reset.css`, `utilities.css`, `stylesheet.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
 | `fonts.rs`, `build.rs` | 02-TYPE §2 (faces as bytes; `webview-fonts` keeps the base64 path) |
 
 ## `ds`: motion, geometry, overlays, root
@@ -81,8 +81,9 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 
 `space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),
-`space_editor/field.rs` (the hue x chroma plane, built once per scheme, and the mapping
-between a dot and its place on it, O-19), `space_editor/png.rs` (the PNG encoder it uses) and `space_editor/parts.rs` (stops, grain, presets, contrast checks).
+`space_editor/field.rs` (the hue x chroma colour plane and the tiled round-dot cell over it,
+built once per scheme, and the mapping between a dot and its place on it, O-19),
+`space_editor/png.rs` (the RGB/RGBA PNG encoder they use) and `space_editor/parts.rs` (stops, grain, presets, contrast checks).
 
 Props added at the wave 2 integration (FINDINGS "W2 integration"): `TextInput` and
 `SearchField` `focus: Focus{OnMount, Manual}`; `ListRow` and `SidebarItem` `drop:

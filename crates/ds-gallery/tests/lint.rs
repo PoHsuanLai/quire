@@ -1,11 +1,9 @@
 //! The gallery's own stylesheet passes quire's lint at the strict profile: layout only, every
 //! colour, size, radius, shadow and duration a token (ORCHESTRATION coherence rule 1).
-//!
-//! `Rule::RawSpacing` is set aside for now: the gallery's layout was written before the `--s-*`
-//! scale existed, and three of its lengths (20, 28, 40) are not steps of it. Moving the sheet to
-//! the scale is a follow-up recorded in FINDINGS.md ("Gallery fixes B").
+//! Every margin, padding and gap is a `--s-*` step (`Rule::RawSpacing`); the three lengths the
+//! scale lacked (20, 28, 40) took the step below (18, 26, 36) in the polish pass.
 
-use ds::lint::{LintConfig, Profile, Rule, stylesheet};
+use ds::lint::{LintConfig, Profile, stylesheet};
 
 const GALLERY_CSS: &str = include_str!("../src/gallery.css");
 
@@ -19,7 +17,6 @@ fn the_gallery_stylesheet_is_clean_at_the_strict_profile() {
         },
     )
     .into_iter()
-    .filter(|offence| offence.rule != Rule::RawSpacing)
     .map(|offence| {
         format!(
             "{:?} {}:{}: {}",

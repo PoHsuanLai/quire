@@ -12,12 +12,11 @@
    and the close button sit at the end and an item without them does not centre (gallery fix A:
    Blitz's user-agent `button{justify-content:center}` centred an item with no count). The fade
    of a truncating label then falls on its empty end unless the text really reaches it. The
-   button forms of the base and close rules add the element: the reset's
-   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
+   close rule names the item, as S's `.item .x` does. */
 
-.ds-sidebar-item, button.ds-sidebar-item{
-  display:flex; align-items:center; justify-content:flex-start; gap:9px; width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
-  background:transparent; padding:6px 8px; border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
+.ds-sidebar-item{
+  display:flex; align-items:center; justify-content:flex-start; gap:var(--s-9); width:100%; box-sizing:border-box; text-align:left; cursor:pointer; border:0;
+  background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
   color:var(--f-ink-soft); position:relative;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }

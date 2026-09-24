@@ -7,26 +7,24 @@
    300 x 150. The height is the line (`1.55em`, the base line height the field inherits in S) plus
    the padding and the 1 px border, in `em` so a consumer's font size (the search row's 16, the
    bubble's 12.5) keeps it one line; the width fills the wrapper, whose width is the consumer's.
-   Font and colour are on `.ds-input-wrap input`: the reset's `.ds input{font:inherit;color:inherit}`
-   outranks a lone class, and this ties it and comes later, while a container's
-   `.ds-bubble .ds-input` still outranks it.
+   Font and colour are on `.ds-input` itself: the reset's element rules are `:where(.ds) input`,
+   (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
 .ds-input-wrap{ position:relative; display:flex; min-width:0; }
 .ds-input-wrap[*|data-variant=inline]{ flex:1; min-width:120px; }
 
-.ds-input{ width:100%; min-width:0; outline:none; }
-.ds-input-wrap input{ font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
+.ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=boxed]{
   height:calc(1.55em + 16px);
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:7px 10px;
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-field); padding:var(--s-7) var(--s-10);
   transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
 .ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
 .ds-input[*|data-variant=inline]{
   height:calc(1.55em + 8px);
-  border:1px solid transparent; background:transparent; padding:3px 2px; box-shadow:none;
+  border:1px solid transparent; background:transparent; padding:var(--s-3) var(--s-2); box-shadow:none;
 }
 .ds-input[*|data-variant=inline]:focus{ border-color:transparent; box-shadow:none; }
 /* The global keyboard ring must not double the field's own focus (or the Inline container's). */
@@ -37,5 +35,5 @@
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:8px 11px; }
-.ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:4px 3px; }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--s-8) var(--s-11); }
+.ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }

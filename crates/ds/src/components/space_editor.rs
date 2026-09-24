@@ -230,7 +230,8 @@ fn Field(
             onpointerup: move |_| {
                 drag.up();
             },
-            div { class: "ds-field-plane", style: "background-image:url({plane})" }
+            div { class: "ds-field-plane", style: "background-image:url({plane.colours})" }
+            div { class: "ds-field-dots", style: "background-image:url({plane.dots})" }
             for (index, dot) in look.dots.iter().copied().enumerate() {
                 Handle {
                     key: "{index}",

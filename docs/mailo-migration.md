@@ -16,7 +16,9 @@ only to work around the webview. Doing both at once would make a failure impossi
 
 - This repository's `CONSUMING.md` (all of it — sections 1-4 for the mechanics, section 5 for
   the four coherence rules verbatim, section 8 for what Blitz cannot do, section 9 for the two
-  gaps this wave found and reported, not fixed).
+  gaps `examples/consumer` found, both since fixed in quire).
+- The next section, "The quire APIs this brief assumes": what quire provides today, so no step
+  below rebuilds something quire already has.
 - `design/README.md`'s reading order, at least through `04-COMPONENTS.md`, `05-MOTION.md` and
   `06-INTERACTIONS.md`; `21-SPACES.md` for the `Space`/`SpaceLook` split (section 3 below);
   `22-SETTINGS.md` sections 2 and 9 for the settings-file and schema mechanics.
@@ -30,6 +32,49 @@ only to work around the webview. Doing both at once would make a failure impossi
   `tests/coherence.rs`): the smallest correct instance of everything this migration asks mailo
   to do — one `Ds` root, components instead of raw markup, a stylesheet that lints clean, motion
   through `ds::use_motion_timer` instead of `dioxus::document::eval`.
+
+## The quire APIs this brief assumes (polish pass, 2026-09-24)
+
+Each is in quire today, tested, and documented at the anchor given; read the anchor before the
+step that uses it. Where one of these covers something mailo hand-rolls, the hand-rolled version
+is deleted, not ported.
+
+- **The root, and an idle toast host.** `Ds` renders `OverlayHost` and `ToastHost` after your
+  children; `ToastHost` lays out nothing while the hub is empty (no hidden pill in the markup
+  or the picture). `CONSUMING.md#2-the-ds-root`; FINDINGS
+  `#gallery-fixes-a-2026-09-24` item 2.
+- **Surface overrides.** `Surface { material, theme, accent, blur }`, each `Option` inheriting
+  when `None`: a nested material, scheme, accent or blur state without a second `Ds`.
+  `CONSUMING.md#4-surface--a-nested-material-scheme-accent-or-blur-state`.
+- **HoverCard parts.** `HoverCard { parts: Vec<HoverCardPart> }` (`Title`, `Sub`, `Person`,
+  `Stats`, `Flag`, `Messages`, `Foot`, `Actions`), drawn in order before its children: mailo's
+  `.hc` sender and thread cards (`ui/hover/cards.rs`) become parts, never hand-written
+  `ds-hovercard-*` markup. `CONSUMING.md#6-the-component-catalogue`; design/04-COMPONENTS.md
+  section 22.
+- **Undo through the toast.** `ds::use_toasts().push_undoable(text, token, on_undo)` calls
+  `on_undo` with the token when the person undoes that toast (the pull tab or a click); a later
+  push replaces it, and the handler's scope must outlive the toast. `push(text, undo)` and
+  `last_undo()` remain for a toast with no handler. `CONSUMING.md#overlays`.
+- **Anchoring to a button.** `Button` and `IconButton` take `mounted`; hand the element to a
+  `Menu`/`Popover` as `Anchor::Mounted(MountedRef(event.data()))`, measured when it places
+  itself. No wrapper span to measure. `CONSUMING.md#overlays`; `examples/consumer/src/lib.rs`.
+- **Spacing tokens.** `ds::SpacingToken`: `--s-1`, `--s-1-5`, `--s-2` … `--s-12`, `--s-13`,
+  `--s-14`, `--s-15`, `--s-16`, `--s-18`, `--s-22`, `--s-26`, `--s-36` on `.ds`, each named by
+  its pixel value; mailo's own layout CSS uses them for every margin, padding and gap.
+  design/01-LAYOUT.md#2-units-and-the-spacing-scale.
+- **The lint rules.** `ds::lint` at `Profile::Strict` over mailo's own CSS, `Rule::RawSpacing`
+  included; the markup lint over rendered pages checks unstyled classes, raw form controls and
+  SVG (an `<svg>` is quire's when it is `.ds-ic` or carries `data-ds-svg`), and every inline
+  `style` declaration (a literal colour or duration is an offence, except a custom property on
+  a quire element). `CONSUMING.md#rule-1--no-literal-design-values-in-your-own-css` and
+  `#rule-2--no-raw-markup-only-quire-components`.
+- **The runtime.** `ds_native::launch` and `ds_native::Harness` each enter a process-wide
+  Tokio runtime for their whole life, so `ds_settings::use_environment` works under both with
+  nothing entered by mailo. `CONSUMING.md#3-reading-appearance`.
+- **A Blitz click caveat.** A `Button` whose parent holds only inline content is not hit on
+  Blitz (the parent is); every quire container is a flex row, so wrap a lone button in one.
+  `CONSUMING.md#8-what-blitz-cannot-do-and-what-to-use-instead`; FINDINGS
+  `#polish-pass-2026-09-24`.
 
 ## 1. What changed since the plan was written
 
@@ -60,8 +105,8 @@ concern (section 6 has the full "what mailo keeps" list).
 | `.strip`, `.fly`, `.floater` (`ui/row.rs:251,296,301`) | `HoverStrip` (§17) | the hover-reveal action row and its `zZ` snooze float |
 | `.fmenu` (`ui/menu/mod.rs:58`, `.fmenu.slim` too) | `Menu` with `MenuKind::Rich` or `MenuKind::Slim` | mailo's own `slim` variant is `MenuKind::Slim`; everything else is `MenuKind::Rich` |
 | `.cmdk`, `.cmdk-wrap`, `.cmdk-in` (`ui/command/mod.rs:72-97`) | `CommandPalette<T>` (§25) | |
-| `.hc`, `.hc.beside`, `.hc.tip`, `.hc.side-card` (`ui/hover/cards.rs`) | `HoverCard` + `HoverTarget` (§22) | the three `.hc` modifiers are placement, which `ds::place`/`Placement` computes instead of being hand-picked per call site |
-| `.toast` (`ui/motion/toast.rs:71`) | `Toast` / `use_toasts` (§23) | `ds::use_toasts().push(text, undo)` replaces the whole `motion/toast.rs` state machine |
+| `.hc`, `.hc.beside`, `.hc.tip`, `.hc.side-card` (`ui/hover/cards.rs`) | `HoverCard` + `HoverTarget` (§22) | the three `.hc` modifiers are placement, which `ds::place`/`Placement` computes instead of being hand-picked per call site; the card's contents are `HoverCardPart`s |
+| `.toast` (`ui/motion/toast.rs:71`) | `Toast` / `use_toasts` (§23) | `ds::use_toasts().push_undoable(text, token, on_undo)` (or `push(text, undo)` with no handler) replaces the whole `motion/toast.rs` state machine |
 | `.seg` (`ui/space_editor/parts.rs:21,162`) | `AppearancePicker` (§26) or `SegmentedControl<T>` | the Space editor's Theme segment is literally the appearance picker's job; "Provider marks" (icons vs. letters, `ui/space_editor/parts.rs:162`) is a plain `SegmentedControl<Marks>` — `Marks` has no quire equivalent (section 3) |
 | `.pin.acct`, `.av`, `.n` (`ui/sidebar/panes.rs::AccountTiles`) | `AccountTile` (§27) | `AccountFace` is the data type; `space::avatar_color` stays mailo's (an `AccountId`-keyed colour, not part of `ds::Space`) |
 | `.prov`, `.prov.img`, `.prov.on-tile`, `.prov.in-row` (`provider/icon/chip.rs::ProvChip`) | `ProviderMark` (§28) | `ProvChip`'s two `ChipPlace` variants (`Tile`, `Row`) are `ProviderMark`'s own placement, not a mailo concern once moved |
@@ -151,9 +196,9 @@ calls) is mailo-aware by construction: `AppName::MAILO` is a named constant
 (`crates/ds-settings/src/dirs.rs`) specifically so mailo's own migration does not need a special
 case — `ds_settings::use_environment(AppName::MAILO)` imports mailo's JSON on first run and
 watches `appearance.toml` from then on. Phase A wires this in directly (mailo is still on the
-webview, where `use_environment`'s Tokio requirement is already satisfied — `CONSUMING.md`
-section 3's gap is Blitz-only and does not apply until Phase B); Phase B does **not** need to
-change this call at all, only the window it runs inside of.
+webview, where `use_environment`'s Tokio requirement is already satisfied by `dioxus-desktop`);
+Phase B does **not** need to change this call at all, only the window it runs inside of, since
+`ds_native::launch` enters its own runtime (`CONSUMING.md` section 3).
 
 `Space`'s own file (`spaces.json`, `crates/mail-app/src/space.rs`'s `FILE_NAME`) is **not**
 `ds-settings`'s concern — it stays exactly as it is, a mailo-owned JSON file, since `Space` is
@@ -216,7 +261,7 @@ do not re-port their logic, only delete mailo's copy and fix the call sites that
   mailo's own `paint_script` hand-rolled; **do not re-implement `Fade` — `Ds` has one fade
   behaviour, not two**, so `space_editor`'s live-drag preview (`Fade::None` today, no transition
   while dragging) needs its own plan: either accept the cross-fade during drag too, or hold the
-  preview in `Surface`'s `theme` override instead of changing `Ds`'s own `look` until the drag
+  preview in a `Surface` override (`theme`, `accent`, `blur`) instead of changing `Ds`'s own `look` until the drag
   ends. Decide and record which in this file's own follow-up notes; this brief does not resolve
   it.
 - `crates/mail-app/src/ui/launch.rs` — delete `KEEP_FOCUS`'s injection into `with_custom_head`
