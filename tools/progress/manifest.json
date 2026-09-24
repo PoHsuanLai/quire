@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-24, sill bar and dock proven on cosmic-comp; wallpaper landing; launcher wave next",
+  "updated": "2026-09-24, bar and dock on the final design-system APIs; launcher and wallpaper landing",
   "entries": [
     {
       "id": "m3-dock",
@@ -9,7 +9,7 @@
       "lede": "The second shell surface, on the same design system as the bar. Behind it the application index (353 desktop entries on this machine, icons resolved through the theme chain), launching through transient systemd scopes or D-Bus activation with an activation token, a pins file, and LauncherEntry badges from the session bus. The dock reserves its height, magnifies tiles at the compositor's own frame rate while the pointer is over it and goes back to zero frames when it leaves, launches a pinned app on click, shows a badge within a frame of the signal, and opens the design system's context menu on a right click.",
       "notes": [
         "Acceptance on nested cosmic-comp: reserve 72 px; a one-second hover sweep renders 52 frames for 52 callbacks then 0 frames over 5 s idle; COSMIC Terminal launched in its own scope with its running dot 0.5 s later; a count badge turned red 131 ms after the emitter sent it; a right-click opened the menu with the window, Remove from Dock and Quit.",
-        "Design-system gaps this exposed, being fixed: a Dock-material root paints a shadow band (so the pill is a nested surface for now), icon sizes stop at 22 px (tiles scale the SVG), and the hover label ignores the machine's hide (it shows under the open menu in the third shot).",
+        "After the adoption pass the pill is the Dock material's own Space-gradient tint with its radius and shadow, and the hover label stays hidden while a menu is open. Still open in the design system: a radius override for the pill setting, icon sizes above 22 px, and a caller-driven tooltip.",
         "Not yet built: Open at Login, drag ghost, file drops, minimize targets, sounds; auto-hide is wired but not exercised."
       ],
       "images": [
@@ -34,6 +34,7 @@
       "status": "proven",
       "lede": "The first shell surface built on the design system. The sill daemon starts, takes its single-instance lock, spawns the services (UPower, NetworkManager, PipeWire, the status-notifier tray, the COSMIC toplevel and workspace protocols on their own connection) and puts one bar per output on the nested compositor. The bar reserves its 32 px, sits idle at zero frames, and its clock and status menus are the design system's Menu opened as real popups. Every stylesheet and render passes the coherence lint, so it is the same menu mailo will get.",
       "notes": [
+        "Updated after the design-system adoption pass: the bar is the Space gradient with grain, status items sit on the frame inks, the tray shows each app's own icon (coloured ones as images, the rest recoloured to the ink), and the popup is transparent around its card. The launcher panel in the first shot is the M4 work in progress on the same compositor.",
         "Acceptance on nested cosmic-comp and on KWin: exclusive zone 32 px; five seconds idle adds 0 frames and 0 commits; the clock menu opens and dismisses; the popup is transparent around its card.",
         "What the live bar shows here: the focused app, workspace pills (drag to reorder), tray icons (stand-in glyphs until the design system can draw an app's own icon, which is being added), volume, Wi-Fi, the clock in the local zone.",
         "Below the daemon's bar in the second shot is the demo bar with fake services and its clock menu open."
@@ -41,15 +42,15 @@
       "images": [
         {
           "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic.png",
-          "caption": "the daemon's bar on nested cosmic-comp, live services"
+          "caption": "the daemon's bar on nested cosmic-comp after adoption: Space gradient, real tray icons"
         },
         {
           "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar-cosmic-menu.png",
-          "caption": "the demo bar under it with the clock menu open"
+          "caption": "the clock menu as a transparent popup"
         },
         {
           "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/bar.png",
-          "caption": "the bar on KWin at scale 1.5 with the Home Space tint"
+          "caption": "the bar on KWin at scale 1.5 (first version, Home Space tint)"
         }
       ]
     },
@@ -173,17 +174,17 @@
       ],
       "images": [
         {
-          "path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t0.0.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/0.png",
           "upscale": 3,
           "caption": "widget texture at t = 0 s (rotating triangle, 240x180 shown 3x)"
         },
         {
-          "path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t0.5.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/1.png",
           "upscale": 3,
           "caption": "t = 0.5 s"
         },
         {
-          "path": "/home/pohsuanlai/shell-host-wt/s3/spike/out/d_gpu_t1.0.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-widget-headless/2.png",
           "upscale": 3,
           "caption": "t = 1.0 s; after 2 s the widget stops asking for frames"
         }
@@ -214,11 +215,11 @@
       ],
       "images": [
         {
-          "path": "/home/pohsuanlai/shell-host-wt/harness/scripts/dev/out/host.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-nested/0.png",
           "caption": "the nested compositor as a window on the KDE desktop"
         },
         {
-          "path": "/home/pohsuanlai/shell-host-wt/harness/scripts/dev/out/nested-ghostty.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/m0-nested/1.jpeg",
           "caption": "ghostty running inside the nested compositor"
         }
       ]
@@ -234,35 +235,35 @@
       ],
       "images": [
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s02-ds-cascade-attr.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/0.jpeg",
           "caption": "S2: [data-theme] selector never matches on Blitz"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s02-ds-cascade-nswild.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/1.jpeg",
           "caption": "S2: [*|data-theme] matches (the fix)"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s03-keyframes-t000.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/2.jpeg",
           "caption": "S3: keyframes with var(), t = 0"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s03-keyframes-t030.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/3.jpeg",
           "caption": "S3: same document at t = 0.3 s"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s06-svg-currentcolor.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/4.jpeg",
           "caption": "S6: inline SVG stroke follows color via attributes"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s11-font-registered.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/5.jpeg",
           "caption": "S11: a bundled TTF registered on the font context"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s13-ellipsis-and-fade.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/6.jpeg",
           "caption": "S13: ellipsis clips (top); mask fade works (bottom)"
         },
         {
-          "path": "/home/pohsuanlai/quire-wt/spike/spike/out/s16-filter-hybrid.png",
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/w0-probes/7.jpeg",
           "caption": "S16: hybrid backend applies blur() but not saturate()"
         }
       ]
