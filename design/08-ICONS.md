@@ -368,6 +368,56 @@ Routes, both implemented:
   `--mode tile` keys a model-drawn tile off its ground and re-masks it with our squircle, keeping
   the model's own bevel.
 
+### 2.10 Dialects (proposed, round four, 2026-09-25)
+
+The user on round three: fewer gradients, less vibrant colour, and not every icon from the same
+recipe; mix in other design languages, monochrome among them. So an app icon is now one of four
+**dialects** over one **shared skeleton**, all in one **muted palette**. This replaces 2.9's
+per-app two-hue ground; 2.9's emboss and bevel become the skeleton.
+
+**The skeleton** (every icon, every dialect): the squircle plate (2.1, 2.2); the same light from
+above; the thin top bevel arc, the bottom shade band, the one soft specular point and the rim
+(2.9); the drop shadow (2.5); the same emboss depth (2.9: 0.45 grid units in, 0.8 soft); the
+frame grain at 20 (03 8); no strokes. The 16 and 32 px sizes drop the emboss, the grain and the
+bevel details and keep the flat silhouettes.
+
+**The palette.** Every colour is written in OKLCh. **Chroma cap 0.07**: no plate, symbol or spot
+exceeds it (`tools/icons/src/dialect.rs` `CHROMA_CAP`, test `every_colour_respects_the_cap`).
+For scale, round three's plates ran to 0.15-0.20 and Klein's soft grounds sit near 0.06-0.09.
+Six named hues: slate 255, teal 200, sage 150, ochre 85, clay 40, plum 320. Gradients are gone:
+the plate is one colour, with an almost invisible tonal shift of ±0.012 L across the diagonal
+and the ±0.03 L diffusion from above; Solid drops the tonal shift too.
+
+**The four dialects** (a symbol has up to four roles: `symbol`, `secondary` a quieter second
+shape on the plate, `detail` pressed into the symbol, `spot` one small accent):
+
+| Dialect | Plate | Symbol | Secondary / detail | Spot |
+| --- | --- | --- | --- | --- |
+| Monochrome | the hue at L 0.58, C 0.85 x cap | the same hue at L 0.85, C 0.6 x cap: tone on tone, differing only in lightness | L 0.72 / 0.70, same hue | as secondary |
+| Graphite | neutral near-black, L 0.30, C 0.004 | L 0.93, no hue | L 0.58 / 0.62 grey | as detail |
+| Paper | Post `--surface` `#F8F9F6` | Post `--ink` `#1A1E1A` | `#A0A79B` / `#E3E7DE` | the hue at L 0.62, C = cap: the one spot of colour |
+| Solid | the hue at L 0.62, C = cap, flat | `#FBFBF8` | L 0.84 / 0.72, same hue | as secondary |
+
+Every dialect keeps the symbol at least 0.26 L away from its plate (test
+`symbol_and_plate_differ_in_lightness`), which is what keeps 16 px legible.
+
+**Specs.** `tools/icons/specs/<app>.toml` names the recommended `dialect`, the `tint` (a palette
+name) and the layers with their `fill` role and `relief`; any dialect can render any spec
+(`tools/icons abstract --dialect`, `tools/icons dialects`). A model-drawn face (the round-three
+Klein picks) is brought into a dialect by `tools/icons face --retint <dialect> --tint <hue>`: a
+lightness plane fitted to its border is taken as the ground, the relief above it is kept (scaled
+so the symbol reaches the dialect's symbol lightness), and hue and chroma come from the roles.
+
+**Following the Space.** In Monochrome the tint can come from the workspace's Space: the hue and
+chroma of the accent `ds::space::derive` gives the Space (its first dot at Postmark's weight), so
+the icons follow the same colour as the frame and the card accent
+(`tools/progress/shots/icons/round4-monochrome-space.png`, Work 268 and Home 152). The runtime
+setting is `icons.style` = Colour (default) | Muted | Monochrome with `icons.monochrome_tint` =
+Space (default) | Accent | Neutral (design/22-SETTINGS.md 3.3). In Monochrome, **third-party app
+icons inside our plates are desaturated and re-tinted** to the same hue (their lightness kept, as
+the Klein retint keeps it), so the dock stays one hue. Implementation beyond the keys and the
+sheets waits for the user's pick of a dialect per app.
+
 ## 3. Generation pipeline
 
 Settled route: LOCAL FIRST (PLAN "Icons", "Route").
