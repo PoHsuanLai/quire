@@ -3,8 +3,10 @@
 //!
 //! On a settings struct it emits `impl SettingsSchema for X { fn schema() -> Schema }`, one
 //! `KeySpec` per field, built from `#[settings(...)]` and the field's own type
-//! (`crate::gen_struct`). On a fieldless enum it emits `impl SchemaVariants for X`, so a struct
-//! whose field is that enum can ask it for its variant words at run time (`crate::gen_enum`).
+//! (`crate::gen_struct`): text by type (`String`, `PathBuf`, `Cow<str>`) or `#[settings(text)]`,
+//! a number only with `range` (without one, a `MissingRange { field }` error). On a fieldless
+//! enum of one or more variants it emits `impl SchemaVariants for X`, so a struct whose field is
+//! that enum can ask it for its variant words at run time (`crate::gen_enum`).
 //! Every malformed `#[settings(...)]` is caught in `crate::attrs`, which is unit-tested
 //! directly — there is no `trybuild` in this workspace's lockfile to drive a UI test instead.
 

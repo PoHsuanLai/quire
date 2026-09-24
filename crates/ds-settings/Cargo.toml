@@ -1,6 +1,6 @@
 [package]
 name = "ds-settings"
-description = "Appearance settings I/O: appearance.toml, directory watch, settings portal."
+description = "Settings I/O: generic lenient load, atomic save and directory watch (appearance.toml, spaces.json), settings portal."
 version.workspace = true
 edition.workspace = true
 license.workspace = true

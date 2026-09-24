@@ -20,6 +20,16 @@ pub trait SettingsSchema {
 /// (`crates/ds-settings-derive`), or by hand for a foreign type such as `ds::Theme`
 /// (`crate::schema::foreign`), which this crate may implement a local trait for but may not
 /// add a derive to.
+///
+/// A field whose type implements neither this nor a shape the derive knows by name (text, a
+/// colour, a list, a number with `range`) lands here; the message says what to add.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a settings enum, so the settings derive cannot pick its widget",
+    label = "a settings field of this type needs a shape",
+    note = "a number needs #[settings(range = \"min..=max\")]; a text newtype needs \
+            #[settings(text)]; an enum needs #[derive(SettingsSchema)] (or a hand-written \
+            SchemaVariants for a foreign type)"
+)]
 pub trait SchemaVariants {
     /// Every variant's stored word, in declaration order.
     fn variants() -> Vec<String>;
