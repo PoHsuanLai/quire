@@ -8,6 +8,7 @@
 use crate::clipboard::HostClipboard;
 use crate::error::NativeError;
 use crate::fonts::font_context;
+use crate::frame_links::{LinkInbox, frame_links};
 use crate::frames::FrameParser;
 use crate::memory_shell::MemoryShell;
 use crate::net::DsNet;
@@ -54,6 +55,8 @@ pub(crate) struct Headless {
     pub(crate) layout: Layout,
     /// The document's shell, whose clipboard is in memory.
     pub(crate) shell: Arc<MemoryShell>,
+    /// Links clicked in the document's frames, on their way to the app.
+    links: LinkInbox,
 }
 
 impl Headless {
@@ -64,12 +67,17 @@ impl Headless {
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
         let shell = Arc::new(MemoryShell::default());
+        let (frame_nav, links) = frame_links(&setup.frame_links);
         let frame_net = DsNet::frame(setup.net.clone(), Some(Arc::clone(&net_waker)));
         let config = DocumentConfig {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
             net_provider: Some(DsNet::top(setup.net.clone(), None, Some(net_waker))),
-            html_parser_provider: Some(FrameParser::shared(Arc::new(HtmlProvider), frame_net)),
+            html_parser_provider: Some(FrameParser::shared(
+                Arc::new(HtmlProvider),
+                frame_net,
+                frame_nav,
+            )),
             shell_provider: Some(Arc::clone(&shell) as Arc<dyn ShellProvider>),
             style_threading: StyleThreading::Sequential,
             ..Default::default()
@@ -99,6 +107,7 @@ impl Headless {
             viewport,
             layout: Layout::Running,
             shell,
+            links,
         }
     }
 
@@ -131,6 +140,7 @@ impl Headless {
     /// that landed during styling is applied on the next resolve, spike S7).
     pub(crate) fn frame(&mut self, at: Duration) {
         for _ in 0..MAX_ROUNDS {
+            self.links.drain();
             let rendered = self.flush();
             if self.layout == Layout::Held {
                 return;

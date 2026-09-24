@@ -3,6 +3,7 @@
 //! app see the same providers.
 
 use crate::contexts::RootContexts;
+use crate::frame_links::FrameLinks;
 use crate::net_policy::NetPolicy;
 
 /// The app's providers for one document.
@@ -12,4 +13,6 @@ pub(crate) struct Setup {
     pub(crate) contexts: RootContexts,
     /// Who answers the document's requests, and its frames'.
     pub(crate) net: NetPolicy,
+    /// What a link clicked in a frame does.
+    pub(crate) frame_links: FrameLinks,
 }
