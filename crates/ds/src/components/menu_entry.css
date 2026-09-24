@@ -1,7 +1,7 @@
 /* Menu items (design/04-COMPONENTS.md section 20): the Rich grid `S:667-673`, Slim `S:678-680`,
    checked `S:787-788`, Dropdown `C:1011-1023`. A pointer over a Rich, Slim or Context item
    moves the selection (O-13), so hover and keyboard look alike there; the Dropdown keeps C's
-   hover. TODO(O-1): no disabled item. */
+   hover. Disabled items and submenu parents: design/13-BEHAVIOUR-menus-windows.md 13.3.3-13.3.4. */
 
 .ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:pointer; }
 .ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
@@ -35,3 +35,14 @@
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true] > .ds-ic{ opacity:1; color:var(--accent); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-title{ font-size:inherit; font-weight:inherit; }
 .ds-menu[*|data-kind=dropdown] .ds-menu-trail{ margin-left:auto; }
+
+/* Disabled (design/13 section 13.3.3): opacity .35, not selectable, no hover. */
+.ds-menu-item[*|aria-disabled=true]{ opacity:.35; cursor:default; }
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-soft); }
+
+/* A submenu parent: the 12 px chevron ends the row in the trail's place (design/13 section
+   13.3.3); while its submenu is open it keeps the selected look. */
+.ds-menu-chevron{ display:inline-flex; align-items:center; margin-left:auto; }
+.ds-menu-chevron .ds-ic{ color:var(--ink-faint); }
+.ds-menu-item[*|aria-expanded=true]{ background:var(--accent-soft); }
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }

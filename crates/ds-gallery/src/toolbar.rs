@@ -7,9 +7,9 @@ use crate::page::Page;
 use crate::registry;
 use dioxus::prelude::*;
 use ds::{
-    Accent, Anchor, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu, MenuEntry,
-    MenuKind, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch, Tabs, Theme, Toggle,
-    Trail,
+    Accent, Anchor, Availability, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu,
+    MenuEntry, MenuKind, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch, Tabs, Theme,
+    Toggle, Trail,
 };
 
 /// The toolbar.
@@ -124,6 +124,7 @@ fn Choice<T: Clone + PartialEq + 'static>(
     let items = options
         .iter()
         .map(|(option, name)| MenuEntry::Item {
+            availability: Availability::Enabled,
             value: option.clone(),
             title: name.clone(),
             detail: None,

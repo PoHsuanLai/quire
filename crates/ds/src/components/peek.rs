@@ -57,7 +57,7 @@ pub fn Peek(
                         variant: IconButtonVariant::Tool,
                         icon: Icon::X,
                         label: close.clone(),
-                        onclick: move |()| onclose.call(()),
+                        onclick: move |_| onclose.call(()),
                     }
                 }
                 {children}

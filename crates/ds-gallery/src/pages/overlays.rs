@@ -6,16 +6,17 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Check,
-    CommandPalette, Elevation, Filter, Icon, Key, Menu, MenuEntry, MenuKind, MountedRef, Peek,
-    PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet, Shortcut, Side, Switch, Tile,
-    Trail, use_toast_hub,
+    Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant,
+    Check, CommandPalette, Elevation, Filter, Icon, Key, Menu, MenuEntry, MenuKind, MountedRef,
+    Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet, Shortcut, Side, Switch,
+    Tile, Trail, use_toast_hub,
 };
 
 /// Everything the page can open, one at a time.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum Opened {
     Menu(MenuKind),
+    Nested,
     Palette,
     Popover(Elevation),
     Peek(PeekMode),
@@ -41,6 +42,16 @@ const POSED_AT: Point = Point {
     x: Px(40.0),
     y: Px(330.0),
 };
+
+/// Where a posed snapshot opens the submenu specimen: right of the Rich menu.
+const POSED_NESTED_AT: Point = Point {
+    x: Px(400.0),
+    y: Px(330.0),
+};
+
+/// The nested specimen's submenu parent, opened in the posed snapshot (its choice number:
+/// items and parents counted, headers and rules not).
+const NESTED_OPEN: usize = 2;
 
 /// The overlays page.
 #[component]
@@ -76,13 +87,14 @@ pub fn OverlaysPage() -> Element {
         }
     };
     rsx! {
-        Section { title: "Menus", note: "One menu, four kinds. Arrow keys wrap, Enter or Tab picks, Escape or an outside click closes.",
+        Section { title: "Menus", note: "One menu, four kinds. Arrow keys wrap and skip disabled items, Enter or Tab picks, Escape or an outside click closes. A submenu opens on a 200 ms rest, or at once on Right, Enter or a click; Left or Escape closes it.",
             div {
                 class: "g-row",
                 onmounted: move |event| anchor.set(Some(MountedRef(event.data()))),
                 for (kind , label) in MENUS {
                     {button(Opened::Menu(kind), label)}
                 }
+                {button(Opened::Nested, "Submenus and disabled items")}
             }
         }
         Section { title: "Palette, popovers, peek, sheet, scrim",
@@ -100,6 +112,16 @@ pub fn OverlaysPage() -> Element {
         Cards {}
         Bubble {}
         Pills { showcase }
+        if showcase == Showcase::Posed {
+            Menu::<u8> {
+                kind: MenuKind::Context,
+                anchor: Anchor::Point(POSED_NESTED_AT),
+                entries: nested(),
+                expanded: Some(NESTED_OPEN),
+                onpick: move |_| {},
+                onclose: move |_| {},
+            }
+        }
         match opened() {
             Some(Opened::Menu(kind)) => rsx! {
                 Menu::<u8> {
@@ -108,6 +130,15 @@ pub fn OverlaysPage() -> Element {
                     anchor: at.clone(),
                     entries: entries(kind),
                     filter: if kind == MenuKind::Dropdown { Filter::Typing } else { Filter::None },
+                    onpick: move |_| {},
+                    onclose: close,
+                }
+            },
+            Some(Opened::Nested) => rsx! {
+                Menu::<u8> {
+                    kind: MenuKind::Context,
+                    anchor: at.clone(),
+                    entries: nested(),
                     onpick: move |_| {},
                     onclose: close,
                 }
@@ -165,6 +196,7 @@ fn face(name: &str) -> AvatarFace {
 fn entries(kind: MenuKind) -> Vec<MenuEntry<u8>> {
     let item = |value: u8, title: &str, detail: Option<&str>, tile: Option<Tile>, trail: Trail| {
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value,
             title: title.to_string(),
             detail: detail.map(str::to_string),
@@ -223,11 +255,59 @@ fn entries(kind: MenuKind) -> Vec<MenuEntry<u8>> {
     ]
 }
 
+/// A tray menu's shape: a disabled item, a submenu with a disabled child, a disabled submenu.
+fn nested() -> Vec<MenuEntry<u8>> {
+    let item = |value: u8, title: &str, icon: Option<Icon>, availability| MenuEntry::Item {
+        value,
+        title: title.to_string(),
+        detail: None,
+        tile: icon.map(Tile::Icon),
+        trail: Trail::None,
+        check: None,
+        availability,
+    };
+    vec![
+        MenuEntry::Header("Toshy".to_string()),
+        item(
+            0,
+            "Open preferences",
+            Some(Icon::Settings),
+            Availability::Enabled,
+        ),
+        item(
+            1,
+            "Pause remapping",
+            Some(Icon::Clock),
+            Availability::Disabled,
+        ),
+        MenuEntry::Separator,
+        MenuEntry::Submenu {
+            title: "Keyboard type".to_string(),
+            tile: Some(Tile::Icon(Icon::Command)),
+            availability: Availability::Enabled,
+            children: vec![
+                item(10, "Automatic", None, Availability::Enabled),
+                item(11, "Apple", None, Availability::Enabled),
+                item(12, "Chromebook", None, Availability::Disabled),
+                item(13, "Windows", None, Availability::Enabled),
+            ],
+        },
+        MenuEntry::Submenu {
+            title: "Services".to_string(),
+            tile: Some(Tile::Icon(Icon::Refresh)),
+            availability: Availability::Disabled,
+            children: vec![item(20, "Restart", None, Availability::Enabled)],
+        },
+        item(2, "Quit", Some(Icon::X), Availability::Enabled),
+    ]
+}
+
 /// The palette, holding its own query.
 #[component]
 fn Palette(onclose: EventHandler<()>) -> Element {
     let mut query = use_signal(String::new);
     let item = |value: u8, title: &str, icon: Icon, keys: Vec<Key>| MenuEntry::Item {
+        availability: Availability::Enabled,
         value,
         title: title.to_string(),
         detail: None,
@@ -264,7 +344,7 @@ fn Palette(onclose: EventHandler<()>) -> Element {
         entries
             .into_iter()
             .filter(|entry| match entry {
-                MenuEntry::Item { title, .. } => {
+                MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
                     title.to_lowercase().contains(&typed.to_lowercase())
                 }
                 MenuEntry::Header(_) | MenuEntry::Separator => true,

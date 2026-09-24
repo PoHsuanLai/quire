@@ -115,6 +115,17 @@ proposed).
   3. `NeedsAttention` status uses `--warn` for the recoloured mask (proposed).
 - Blitz: the recoloured tray icon is a `mask-image` data URI with `background:
   currentColor`, the same path as the S6 fallback.
+- Settled mechanics (tray gaps, quire Q6): `ds::IconSource::{Glyph(Icon), Symbolic(ExternalIcon),
+  Image(ExternalIcon)}`, `ExternalIcon { url: IconUrl, size: IconSize }`. `IconUrl` is a `data:`
+  or `file:` URL only (`png`, `svg`, `file`, `parse` constructors). `Symbolic` renders
+  `span.ds-ext-icon[data-kind=symbolic]` with an inline `mask-image:url(...)` over
+  `background-color:currentColor`, `mask-size:100% 100%`; `Image` renders
+  `[data-kind=image]` with the URL as `background-image`, `background-size:100% 100%`. Both are
+  squares of `--ic-size` (the `ExternalIcon`'s size). Proved on Blitz with a PNG mask (the
+  opaque pixels take `--ink`, the transparent ones show the ground) and an RGB PNG (keeps its
+  red), `crates/ds-native/tests/tray_gaps.rs`. Steps 2 and 3 (the chroma test and `--warn` for
+  `NeedsAttention`) stay the caller's decision: the caller picks `Symbolic` or `Image` and sets
+  the colour of the icon's parent.
 
 ### 1.6 Initial shell glyph list
 

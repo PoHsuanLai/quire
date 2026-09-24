@@ -192,6 +192,12 @@ pub enum MenuTrackEvent<K> {
     },
     /// A timer asked for with [`MenuTrackEffect::RequestTick`] fired.
     Tick,
+    /// The keyboard moved the highlight to this item (Up or Down inside the menu): a submenu
+    /// of another item closes, a pending one is dropped, nothing opens.
+    Select(ItemPath),
+    /// Open this item's submenu now: Right, Enter or a click on a parent item
+    /// (design/13 section 13.3.4 "open immediately").
+    Expand(ItemPath),
 }
 
 /// How a menu appears or leaves.
