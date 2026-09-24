@@ -3,7 +3,8 @@
 //! section 13.3.4). `Menu` is the root panel; [`SubMenu`] is every panel below it.
 
 use crate::components::menu::MenuKind;
-use crate::components::menu_entry::{MenuEntry, client_point};
+use crate::components::menu_entry::MenuEntry;
+use crate::components::menu_item::client_point;
 use crate::components::menu_keys::{Child, Decision, Level, decide};
 use crate::components::menu_lines::{
     Act, Choice, Filter, Line, choices, key_act, lines, liveness, settled,
@@ -65,7 +66,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
             shown,
             kind.row(),
             Drawn {
-                selected: self.current(),
+                selected: Some(self.current()),
                 open: tracker.open().map(|open| open.choice),
                 onpick: EventHandler::new(move |index: usize| match choices.get(index) {
                     Some(Choice {

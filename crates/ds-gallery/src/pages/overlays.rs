@@ -122,6 +122,7 @@ pub fn OverlaysPage() -> Element {
         Bubble {}
         Pills { showcase }
         super::launcher::EmbeddedPalette {}
+        super::overlays_mailo::RecentPalette {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,
@@ -401,6 +402,11 @@ fn Palette(onclose: EventHandler<()>) -> Element {
                 MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
                     title.to_lowercase().contains(&typed.to_lowercase())
                 }
+                MenuEntry::Row(row) => row
+                    .title
+                    .plain_text()
+                    .to_lowercase()
+                    .contains(&typed.to_lowercase()),
                 MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => true,
             })
             .collect()

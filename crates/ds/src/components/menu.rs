@@ -8,7 +8,8 @@
 //! beside it, driven by the menu-tracking machine (design/13-BEHAVIOUR-menus-windows.md section
 //! 13.3.4): `menu_panel` holds what the menu and its submenus share.
 
-use crate::components::menu_entry::{MenuEntry, Row};
+use crate::components::menu_entry::MenuEntry;
+use crate::components::menu_item::Row;
 use crate::components::menu_keys::{Decision, Level};
 use crate::components::menu_lines::{Act, Choice, Filter, KeyAct, choices, key_act, lines};
 use crate::components::menu_panel::Panel;
@@ -177,6 +178,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let label = entries.iter().find_map(|entry| match entry {
         MenuEntry::Header(text) => Some(text.clone()),
         MenuEntry::Item { .. }
+        | MenuEntry::Row(_)
         | MenuEntry::Submenu { .. }
         | MenuEntry::Info { .. }
         | MenuEntry::Separator => None,

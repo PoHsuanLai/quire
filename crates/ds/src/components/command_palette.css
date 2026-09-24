@@ -36,3 +36,9 @@
 .ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
 .ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
 .ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
+/* An opaque entrance (mailo gaps 2): `cmdk-rise` springs the card's scale and lift with no fade,
+   so its first frame is already opaque; over a window its scrim does not fade either, since the
+   wrap's opacity would hold the card at its own. */
+.ds-palette[*|data-entrance=cmdk-rise]{ animation:cmdk-rise var(--t-big) var(--e-spring); }
+.ds-palette[*|data-entrance=cmdk-rise][*|data-pulse=b]{ animation-name:cmdk-rise--b; }
+.ds-palette-wrap[*|data-entrance=cmdk-rise]{ animation:none; }

@@ -1536,3 +1536,34 @@ goldens did not change. Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_
      `Expanded` enum because `IconButton { expanded: Option<Switch> }` already writes
      `aria-expanded` from it; a listed button also gets `aria-haspopup="menu"`.
    - Gallery: Lists page, "Search hits and a keyboard-shown strip".
+
+2. **The command panel** (`CommandPalette`, `MenuEntry`).
+   - Neither existing entrance gives an opaque first frame: `peek-in` and `cmdk-in` both start
+     at `opacity:0`, and over a window the wrap's `fade` starts at 0 too (mailo's test fails on
+     either). Reworking `cmdk-in` would change every current caller's entrance, so it is a new
+     variant, `PaletteEntrance::Opaque`, playing a new keyframe `cmdk-rise` (`Anim::CmdkRise`,
+     `--t-big --e-spring` like `cmdk-in`): `cmdk-in`'s three stops with the `opacity`
+     declarations removed, so only the scale and lift spring. With it, an overlay palette's wrap
+     carries `data-entrance=cmdk-rise` and does not fade (the wrap's opacity multiplies the
+     card's); the scrim appears at once. `Anim::ALL` grows to 48. Proof
+     (`mailo_palette.rs`): on the first frame the middle of the card differs from the bare page
+     in over half its pixels with `Opaque`, and in under 1 % with `CmdkIn`. The palette's
+     module passed 300 lines, so its host and entrance moved to `palette_host.rs`
+     (`CommandPaletteHost` and `PaletteEntrance` are still re-exported from `command_palette`).
+   - Runs in a row: `MenuEntry::Row(MenuRow<T>)`, a new variant rather than a new field of
+     `Item` (a field would break every `MenuEntry::Item { .. }` literal; a `String` title
+     cannot become `Text` in a literal). It is the one compile change of this wave: a `match`
+     over `MenuEntry` with no wildcard needs an arm (sill has two, `dock/menu_geometry.rs` and
+     `bar/content.rs`'s test; quire's gallery had one). `Submenu` and `Info` were added the same
+     way. A `Row` is a choice exactly as an `Item` is (picked, navigated, filtered on its plain
+     text); a plain title takes the query's marks, runs keep the caller's. `menu_entry.rs`
+     now holds only the data: an item's drawing moved to `menu_item.rs`, unchanged but for the
+     words (`Words::{Str, Text}`) and the action.
+   - `RowAction { icon, label, on_press: EventHandler<Press> }` on `MenuRow::trailing`: a Strip
+     `IconButton` in `span.ds-menu-action`, whose row gets `data-trailing=action` (a fourth grid
+     column; 22 px buttons in the text menus). The span stops the click (no pick), the
+     press and release (no press-drag-release pick, focus stays), and the pointer moves (the
+     selection does not follow the pointer onto the row). Proof: the second row's × logs
+     `remove:2` after `select:0` and nothing else; with the click and move stops removed the log
+     is `select:0,select:1,remove:2,close,pick:2`.
+   - Gallery: Overlays page, "Command panel: opaque entrance, runs, trailing actions".
