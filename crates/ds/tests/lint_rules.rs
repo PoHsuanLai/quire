@@ -158,6 +158,63 @@ const CASES: &[Case] = &[
         rule: Rule::UnknownAnimation,
         expect: false,
     },
+    // The `animation` shorthand names its keyframes too (mailo gaps 3).
+    Case {
+        name: "unknown animation: a made-up name in the shorthand fails",
+        css: ".chip { animation: sparkle-explosion var(--t-big) var(--e-spring); }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: true,
+    },
+    Case {
+        name: "unknown animation: a made-up name after the shorthand's keywords fails",
+        css: ".chip { animation: infinite alternate both paused sparkle var(--t-big); }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: true,
+    },
+    Case {
+        name: "unknown animation: the second of two shorthand animations is read too",
+        css: ".chip { animation: gulp var(--t-big) var(--e-spring), sparkle var(--t-move) var(--e-out); }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: true,
+    },
+    Case {
+        name: "unknown animation: a real Anim in the shorthand passes",
+        css: ".chip { animation: pill-up var(--t-big) var(--e-spring); }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: false,
+    },
+    Case {
+        name: "unknown animation: keywords, a count and its --b alias pass",
+        css: ".chip { animation: var(--t-ambient) var(--e-in-out) infinite alternate backwards busy--b; }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: false,
+    },
+    Case {
+        name: "unknown animation: a raw easing's own words are not names",
+        css: ".chip { animation: ease-in-out 1s steps(4, jump-end) spin; }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: false,
+    },
+    Case {
+        name: "unknown animation: none passes",
+        css: ".chip { animation: none; }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: false,
+    },
+    Case {
+        name: "unknown animation: a name only a var() knows is not judged",
+        css: ".chip { animation: var(--my-anim) var(--t-big); }",
+        profile: Profile::Standard,
+        rule: Rule::UnknownAnimation,
+        expect: false,
+    },
     // FontFamily
     Case {
         name: "font-family: literal fails",

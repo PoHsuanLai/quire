@@ -24,6 +24,7 @@ pub mod rule;
 pub mod stylesheet;
 pub mod tokenize;
 
+mod animation;
 mod colours;
 mod declaration;
 mod hairline;
@@ -36,5 +37,5 @@ mod walk;
 
 pub use assert::assert_clean;
 pub use markup::markup;
-pub use rule::{Exception, LintConfig, Offence, Profile, Rule};
+pub use rule::{Exception, LintConfig, Offence, Profile, Rule, Stale};
 pub use stylesheet::stylesheet;
