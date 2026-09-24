@@ -8,7 +8,9 @@
 //! colours stay in the `--m-*` declarations. That list is `--m-box`, so a card inside a
 //! transparent root paints the same edge and drop.
 //!
-//! Then the root chrome (`crate::RootChrome`, `crate::FrameTint`): a root drawing the tinted
+//! Then the root chrome (`crate::RootChrome`, `crate::FrameTint`): a window's root
+//! (`data-frame=opaque`) is its own stacking context, so its frame layers and grain paint over
+//! its background; a root drawing the tinted
 //! frame (`data-frame=tinted`) paints no tint of its own, and its `.ds-frame` group shows the
 //! Space gradient at `--m-frame-alpha` over blur and at the solid floor without it; a
 //! transparent root (`data-chrome=transparent`) paints nothing, and its `.ds-popover` and
@@ -73,11 +75,23 @@ pub fn materials_css() -> String {
 
 /// The tinted frame and the transparent root, after the paint rules they override.
 fn chrome_css(material: &str) -> String {
+    let opaque = format!("{material}{}", attr_selector("data-frame", "opaque"));
     let tinted = format!("{material}{}", attr_selector("data-frame", "tinted"));
     let transparent = format!("{material}{}", attr_selector("data-chrome", "transparent"));
     let cards = |root: &str| format!("{root} .ds-popover,{root} .ds-sheet");
     let blurred = format!("{transparent}{}", attr_selector("data-blur", "on"));
     [
+        // A window's root keeps its gradient as its own background, under both layers, so the
+        // window stays opaque through a cross-fade; as its own stacking context the layers
+        // (z -2) and the grain (z -1) paint over that background instead of beneath it, where
+        // the switch was an instant swap and the grain never showed (FINDINGS "mailo gaps").
+        rule(
+            &opaque,
+            &[
+                property("position", "relative"),
+                property("z-index", &ZLayer::Raise.var().reference()),
+            ],
+        ),
         rule(
             &tinted,
             &[

@@ -50,7 +50,7 @@ fn shape_tag(shape: &Shape) -> &'static str {
 #[test]
 fn every_icon_is_an_svg_of_its_shapes() {
     let mut failures = Vec::new();
-    for icon in Icon::MAILO {
+    for icon in Icon::MAILO.iter().chain(Icon::ACTIONS) {
         let page = markup(*icon);
         let shapes = icon.shapes();
         let names = element_names(&page);
@@ -91,8 +91,8 @@ fn the_set_matches_icons_js() {
     );
     assert_eq!(
         Icon::ALL.len(),
-        Icon::MAILO.len() + Icon::SHELL.len(),
-        "ALL is the two sets"
+        Icon::MAILO.len() + Icon::SHELL.len() + Icon::ACTIONS.len(),
+        "ALL is the two sets and the actions"
     );
     let mut duplicates = Vec::new();
     for (index, icon) in Icon::ALL.iter().enumerate() {
@@ -135,4 +135,24 @@ fn star_check_and_undo_keep_their_first_path() {
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// Printer and folder-input as Lucide 1.47.0 publishes them: two paths and a rect, three paths.
+#[test]
+fn printer_and_folder_input_are_lucides() {
+    assert_eq!(
+        Icon::Printer.shapes().last(),
+        Some(&Shape::Rect {
+            x: "6",
+            y: "14",
+            width: "12",
+            height: "8",
+            rx: "1"
+        })
+    );
+    assert_eq!(Icon::Printer.shapes().len(), 3);
+    assert_eq!(
+        Icon::FolderInput.shapes().get(1..),
+        Some(&[Shape::Path("M2 13h10"), Shape::Path("m9 16 3-3-3-3")][..])
+    );
 }

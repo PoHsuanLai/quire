@@ -50,6 +50,34 @@ fn every_accent_is_legible_in_both_schemes() {
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
+/// Every `X` / `X-ink` pair: text on the accent, on `--ok`, on `--warn` and on `--danger`, in
+/// both schemes (the accent here is Postmark; `every_accent_is_legible_in_both_schemes` covers
+/// the other five). Dark `--danger-ink` was white on `#E0705A`, 3.17:1 (FINDINGS "mailo gaps").
+#[test]
+fn every_ink_on_its_colour_is_legible_in_both_schemes() {
+    const PAIRS: [(ColourToken, ColourToken); 4] = [
+        (ColourToken::AccentInk, ColourToken::Accent),
+        (ColourToken::OkInk, ColourToken::Ok),
+        (ColourToken::WarnInk, ColourToken::Warn),
+        (ColourToken::DangerInk, ColourToken::Danger),
+    ];
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL {
+        for (ink, ground) in PAIRS {
+            let (fore, back) = (colour(ink, scheme), colour(ground, scheme));
+            let got = measured(&fore, &back);
+            if got < 4.5 {
+                failures.push(format!(
+                    "{scheme:?}: {} {fore} on {} {back} is {got:.2}, needs 4.5",
+                    ink.var().as_str(),
+                    ground.var().as_str()
+                ));
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+
 /// The four gates for one Space, measured on what the root actually paints: the frame ink from
 /// [`FrameVars`], the stops the gradient is made of, and the card's accent (the Space's when it
 /// lends one, Postmark otherwise).

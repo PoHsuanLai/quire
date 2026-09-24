@@ -14,8 +14,10 @@
 /* Times, counts and numeric cells (design/02-TYPE.md section 9). */
 .ds-tabular{font-variant-numeric:tabular-nums}
 /* The window's frame: two gradient layers that cross-fade on a Space switch, and the grain over
-   them (design/03-COLOR.md sections 4.5 and 8). The back layer is the one a switch fades in. */
-.ds-layer{position:absolute;inset:0;z-index:var(--z-scene);background:var(--f-grad);transition:opacity var(--t-scene) var(--e-out)}
+   them (design/03-COLOR.md sections 4.5 and 8). The back layer is the one a switch fades in.
+   Neither takes the pointer: under a root that is its own stacking context they are hit
+   before the content they sit behind unless they let it through. */
+.ds-layer{position:absolute;inset:0;z-index:var(--z-scene);pointer-events:none;background:var(--f-grad);transition:opacity var(--t-scene) var(--e-out)}
 .ds-layer[*|data-layer=back]{opacity:0}
 .ds-grain{position:absolute;inset:0;z-index:var(--z-grain);pointer-events:none;opacity:var(--f-grain);background-size:128px 128px}
 /* Shell chrome's frame (`data-frame=tinted`, design/21-SPACES.md sections 3 and 5): the same two

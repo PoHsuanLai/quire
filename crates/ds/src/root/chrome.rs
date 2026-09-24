@@ -85,11 +85,14 @@ impl FrameTint {
         }
     }
 
-    /// The `data-frame` value, written only for a tinted root.
+    /// The `data-frame` value: `opaque` on a window's root, `tinted` on shell chrome, absent
+    /// where the root draws no gradient. Both roots that draw one are their own stacking
+    /// context, so the layers' negative z-index paints over the root's own background.
     pub(crate) fn attribute(self) -> Option<&'static str> {
         match self {
+            FrameTint::Opaque => Some("opaque"),
             FrameTint::Tinted => Some("tinted"),
-            FrameTint::Opaque | FrameTint::None => None,
+            FrameTint::None => None,
         }
     }
 }

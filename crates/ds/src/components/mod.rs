@@ -59,7 +59,7 @@ pub mod workspace_pills;
 pub use account_tile::{AccountFace, AccountTile};
 pub use animated_list::AnimatedList;
 pub use appearance_picker::AppearancePicker;
-pub use avatar::{Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+pub use avatar::{Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue};
 pub use button::{Button, ButtonVariant};
 pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};

@@ -39,6 +39,14 @@ pub enum AvatarShape {
     Square,
 }
 
+/// The hue for a person with no stored colour, hashed from their address or name (design/03-COLOR.md
+/// section 13): the same as [`PersonHue::of`], so a consumer never keeps its own hash or hex
+/// table. Paint it with `AvatarTone::Person`, or [`PersonHue::colour`] where a component takes
+/// a [`Colour`]; the eight stored-colour swatches are [`crate::PersonSwatch`].
+pub fn person_hue(name: &str) -> PersonHue {
+    PersonHue::of(name)
+}
+
 /// A person's hue, hashed from their address: `h = (h x 31 + code) mod 360`, drawn
 /// `hsl(h, 38%, 42%)` and converted to hex in Rust (O-7).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -55,8 +63,13 @@ impl PersonHue {
     }
 
     /// The disc colour: `hsl(h, 38%, 42%)` as a hex, so no colour function reaches CSS (O-7).
-    pub(crate) fn hex(self) -> Hex {
+    pub fn hex(self) -> Hex {
         hsl_to_hex(f64::from(self.0 % 360), 0.38, 0.42)
+    }
+
+    /// The disc colour as a [`Colour`], for a component that takes one.
+    pub fn colour(self) -> Colour {
+        Colour::Solid(self.hex())
     }
 }
 
@@ -193,6 +206,14 @@ mod tests {
         let want = ((((100 * 31 + 97) % 360) * 31 + 110) % 360 * 31 + 97) % 360;
         assert_eq!(PersonHue::of("dana"), PersonHue(want));
         assert_eq!(PersonHue::of(""), PersonHue(0));
+    }
+
+    #[test]
+    fn person_hue_is_the_hash_and_its_colour_the_disc() {
+        assert_eq!(super::person_hue("dana"), PersonHue::of("dana"));
+        // "ab": (97 * 31 + 98) % 360 = 225; hsl(225, 38%, 42%) = rgb(66.4, 86.7, 147.8).
+        assert_eq!(super::person_hue("ab"), PersonHue(225));
+        assert_eq!(super::person_hue("ab").colour().css(), "#425794");
     }
 
     #[test]
