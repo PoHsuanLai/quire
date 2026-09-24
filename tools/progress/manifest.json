@@ -1,6 +1,31 @@
 {
-  "updated": "2026-09-24, Milestone 4 reached; launcher and dock on the final APIs; wallpaper landing",
+  "updated": "2026-09-25, polish pass merged (quire v0.1.1); icon round two and the shell's adoption running",
   "entries": [
+    {
+      "id": "polish-and-icons",
+      "date": "2026-09-25 \u00b7 quire polish pass and icon bake-off",
+      "title": "The design system gains the layers macOS stacks, and the first app icons came out too realistic",
+      "status": "running",
+      "lede": "After comparing the shell with macOS, the design system gained a material stack (a vibrancy boost baked into the tint, a 1 px inner highlight, a hairline, a contact shadow and an ambient one), continuous-curvature squircle corners, a shell type scale (13 px bar items, 22 px menu rows, a 22 px launcher field), menu-bar hover pills, dock metrics with running dots and placeholder plates, and a launcher card that fits its content. The gallery's Polish page prints each rendering beside the macOS number it targets. The shell adopts it next. The icon bake-off ran on both local models and produced clean, readable icons, but they are photoreal objects on plates; the verdict was 'too realistic', so round two goes abstract in the paper-and-ink language, with a procedural alternative built from the tokens.",
+      "notes": [
+        "Polish values are all configurable (design/22 keys per item); the docs mark each as settled with its macOS reference and confidence.",
+        "Bake-off numbers: FLUX.2 Klein 4B renders in 3 to 4 s warm at 12 GB; Qwen-Image-2512 in 70 to 90 s at 14.7 GB (cannot share the GPU). Qwen gave the cleaner raw set; both failed the terminal subject."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/polish-dark-postmark.png",
+          "caption": "the Polish page, dark: menu bar and text menu, the material stack off and on, squircle corners, the dock pill with plates, the launcher, the window shadow"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/qwen-plated.png",
+          "caption": "round one, Qwen-Image-2512: five subjects, four seeds, plated, with 16/32/48 px exports; rejected as too realistic"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/klein-plated.png",
+          "caption": "round one, FLUX.2 Klein 4B: the same brief"
+        }
+      ]
+    },
     {
       "id": "m4-launcher",
       "date": "2026-09-24 \u00b7 sill Milestone 4",
