@@ -3,7 +3,6 @@
 use crate::components::vocab::Availability;
 use crate::focus::host::focus_soon;
 use crate::focus::request::{FocusRequest, FocusTicket};
-use dioxus::html::{Code, HasKeyboardData, Key, Location, Modifiers, ModifiersInteraction};
 use dioxus::prelude::*;
 
 /// Boxed for a standalone field, Inline inside another container.
@@ -43,83 +42,6 @@ impl Focus {
     fn on_mount(self) -> bool {
         matches!(self, Focus::OnMount | Focus::Controlled(_))
     }
-}
-
-/// A key event copied out of its `Rc`, so it can be handed on by value: `KeyboardData` is not
-/// `Clone`, and the `serialize` feature that offers a copy is not in the pinned set.
-struct KeySnapshot {
-    key: Key,
-    code: Code,
-    location: Location,
-    modifiers: Modifiers,
-    repeating: Repeat,
-    composing: Composing,
-}
-
-/// Whether a key is auto-repeating.
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum Repeat {
-    Held,
-    Once,
-}
-
-/// Whether a key arrives inside an IME composition.
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum Composing {
-    Inside,
-    Outside,
-}
-
-impl ModifiersInteraction for KeySnapshot {
-    fn modifiers(&self) -> Modifiers {
-        self.modifiers
-    }
-}
-
-impl HasKeyboardData for KeySnapshot {
-    fn key(&self) -> Key {
-        self.key.clone()
-    }
-
-    fn code(&self) -> Code {
-        self.code
-    }
-
-    fn location(&self) -> Location {
-        self.location
-    }
-
-    fn is_auto_repeating(&self) -> bool {
-        self.repeating == Repeat::Held
-    }
-
-    fn is_composing(&self) -> bool {
-        self.composing == Composing::Inside
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-}
-
-/// A key event as an owned value, for an `onkey` handler.
-pub(crate) fn owned_key(event: &KeyboardData) -> KeyboardData {
-    KeyboardData::new(KeySnapshot {
-        key: event.key(),
-        code: event.code(),
-        location: event.location(),
-        modifiers: event.modifiers(),
-        repeating: if event.is_auto_repeating() {
-            Repeat::Held
-        } else {
-            Repeat::Once
-        },
-        composing: if event.is_composing() {
-            Composing::Inside
-        } else {
-            Composing::Outside
-        },
-    })
 }
 
 /// The placeholder as a span over the field, shown while the value is empty: Blitz draws no
@@ -167,7 +89,8 @@ impl FieldFocus {
 
 /// A single-line text field. `focus: Focus::OnMount` puts the caret in it when it mounts (and
 /// writes `autofocus` for a webview); `Focus::Controlled(request)` does too, and again at each
-/// `request.request()`.
+/// `request.request()`. `onkey` hears each key as the event itself, so a caller that takes a
+/// key can `prevent_default` it (sill FINDINGS Q61).
 #[component]
 pub fn TextInput(
     variant: InputVariant,
@@ -176,7 +99,7 @@ pub fn TextInput(
     #[props(default)] placeholder: String,
     #[props(default)] availability: Availability,
     oninput: EventHandler<String>,
-    #[props(default)] onkey: EventHandler<KeyboardData>,
+    #[props(default)] onkey: EventHandler<KeyboardEvent>,
     #[props(default)] focus: Focus,
 ) -> Element {
     let field = FieldFocus {
@@ -206,7 +129,7 @@ pub fn TextInput(
                         oninput.call(event.value());
                     }
                 },
-                onkeydown: move |event| onkey.call(owned_key(&event.data())),
+                onkeydown: move |event| onkey.call(event),
             }
             if let Some(text) = shown {
                 span { class: "ds-input-placeholder", "aria-hidden": "true", "{text}" }

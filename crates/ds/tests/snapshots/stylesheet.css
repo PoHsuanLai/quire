@@ -609,6 +609,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
 .ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
 .ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
+/* Kept mounted while hidden (sill FINDINGS Q63): nothing is laid out, and each showing replays
+   the entrance under the keyframe's other name (`data-pulse`, design/05-MOTION.md section 9
+   rule 2), so the animation starts over even where the engine kept the element's styles. */
+.ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
+.ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
+.ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
 /* -- command_pill -- */
 /* CommandPill (design/04-COMPONENTS.md section 8): `S:92-100`. The inset highlight is
    `--shadow-pill-inset` (O-3); the label truncates with `.ds-truncate` (no ellipsis on Blitz).

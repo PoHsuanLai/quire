@@ -1,13 +1,16 @@
 //! The Overlays page's embedded palette: `CommandPalette` hosted in a surface of its own, as
 //! sill's launcher panel draws it (sill FINDINGS Q40-Q42): no scrim, the card filling its
-//! container and carrying the id a blur region names, `cmdk-in`, app icons in the rows.
+//! container and carrying the id a blur region names, `cmdk-in`, app icons in the rows; and a
+//! warm palette kept mounted while hidden and shown by a button (sill FINDINGS Q63).
 
 use super::app_icons::{APPS, app_icon};
 use super::{Section, Specimen};
+use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Availability, CommandPalette, CommandPaletteHost, Corner, Icon, IconSize, Material, MenuEntry,
-    PaletteEntrance, Radius, Shortcut, Surface, Tile, Trail, components::vocab::Key,
+    Availability, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Icon,
+    IconSize, Material, MenuEntry, PaletteEntrance, Radius, Retain, Shortcut, Shown, Surface,
+    Switch, Tile, Trail, components::vocab::Key,
 };
 
 fn row(value: u8, title: &str, detail: Option<&str>, tile: Tile, trail: Trail) -> MenuEntry<u8> {
@@ -87,7 +90,7 @@ fn Panel(
 #[component]
 pub fn EmbeddedPalette() -> Element {
     rsx! {
-        Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card fills its container and carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (Tile::Source), drawn as it is, filling the tile.",
+        Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card spans its container's width, is as tall as its content (up to the container), carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (Tile::Source), drawn as it is, filling the tile.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Typed \"f\": app icons, cmdk-in",
                     Panel { query: "f", groups: vec![("Applications".to_string(), apps("f"))], entrance: PaletteEntrance::CmdkIn }
@@ -97,6 +100,66 @@ pub fn EmbeddedPalette() -> Element {
                         query: "",
                         groups: vec![("Actions".to_string(), actions()), ("Recent".to_string(), apps(""))],
                         entrance: PaletteEntrance::PeekIn,
+                    }
+                }
+            }
+            div { class: "g-row g-row-top",
+                Specimen { name: "Warm: kept mounted, shown by the button", code: "shown: Some(Shown::Visible | Shown::Hidden), retain: Retain::Nothing".to_string(),
+                    WarmPalette {}
+                }
+            }
+        }
+    }
+}
+
+/// A launcher's warm palette: mounted once, hidden and shown by the button, replaying `cmdk-in`
+/// and starting from an empty query at each showing. Posed, it is shown.
+#[component]
+fn WarmPalette() -> Element {
+    let showcase = use_context::<Signal<Axes>>().peek().showcase;
+    let mut shown = use_signal(|| match showcase {
+        Showcase::Posed => Shown::Visible,
+        Showcase::Live => Shown::Hidden,
+    });
+    let mut query = use_signal(String::new);
+    let typed = query().to_lowercase();
+    let groups = if typed.is_empty() {
+        vec![
+            ("Actions".to_string(), actions()),
+            ("Recent".to_string(), apps("")),
+        ]
+    } else {
+        vec![("Applications".to_string(), apps(&typed))]
+    };
+    let flipped = match shown() {
+        Shown::Visible => Shown::Hidden,
+        Shown::Hidden => Shown::Visible,
+    };
+    rsx! {
+        div { class: "g-col",
+            Button {
+                variant: ButtonVariant::Secondary,
+                label: "Launcher",
+                pressed: Some(if shown() == Shown::Visible { Switch::On } else { Switch::Off }),
+                onclick: move |_| shown.set(flipped),
+            }
+            div { class: "g-launcher",
+                Surface { material: Material::Sheet, radius: Some(Corner::Token(Radius::Panel)),
+                    CommandPalette::<u8> {
+                        label: "Launch",
+                        placeholder: "Search apps, windows, actions",
+                        query: query(),
+                        tokens: Vec::new(),
+                        groups,
+                        empty: "Nothing matches.",
+                        oninput: move |text: String| query.set(text),
+                        onpick: move |_| shown.set(Shown::Hidden),
+                        onclose: move |_| shown.set(Shown::Hidden),
+                        host: CommandPaletteHost::Surface,
+                        entrance: PaletteEntrance::CmdkIn,
+                        id: "gallery-warm-launcher",
+                        shown: shown(),
+                        retain: Retain::Nothing,
                     }
                 }
             }

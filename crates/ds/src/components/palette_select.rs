@@ -55,6 +55,21 @@ impl PaletteSelection {
         }
     }
 
+    /// Back to the first choice, as a palette shown again starts: the palette's own moves
+    /// there and is reported afresh, the caller's is asked for.
+    pub(crate) fn reset(&self) {
+        let mut reported = self.reported;
+        reported.set(None);
+        match (self.controlled, self.on_select) {
+            (Some(_), Some(on_select)) => on_select.call(0),
+            (Some(_), None) => {}
+            (None, _) => {
+                let mut own = self.own;
+                own.set((String::new(), 0));
+            }
+        }
+    }
+
     /// Move to `next`: the palette's own moves, the caller's is asked for.
     pub(crate) fn select(&self, next: usize) {
         match (self.controlled, self.on_select) {
