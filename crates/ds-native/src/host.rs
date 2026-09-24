@@ -6,7 +6,8 @@
 //! - The document's net provider becomes ds-native's `data:`/`file:` one, delegating other
 //!   schemes to dioxus-native's, and waking the shell to paint when a resource lands (S7/S8).
 //! - Rect reads go through `ds::HostMeasure`, which waits out a document the renderer is
-//!   holding instead of panicking (`crate::measure`).
+//!   holding instead of panicking (`crate::measure`); focus changes go through `ds::HostFocus`
+//!   the same way (`crate::focus`).
 //! - Before each frame, the viewport's colour scheme (and the window's decorations) follow the
 //!   scheme the root `.ds` resolved.
 //!
@@ -51,6 +52,7 @@ impl PartialEq for HostProps {
 pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
     use_context_provider(|| crate::measure::MEASURE);
+    use_context_provider(|| crate::focus::FOCUS);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let window = use_window();
     let seen = Rc::clone(&document);

@@ -121,7 +121,7 @@ pub fn Slider(
                 if let Some(mounted) = element() {
                     spawn(async move {
                         // Focus is best-effort: a renderer without it still slides.
-                        let _ = mounted.set_focus(true).await;
+                        let _ = crate::focus::host::focus_element(&mounted).await;
                         if let Some(measured) = client_rect(&mounted).await {
                             track.set(Some(measured));
                             onchange.call(fraction_at(measured, at.x));

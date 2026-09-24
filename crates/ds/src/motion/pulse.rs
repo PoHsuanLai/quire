@@ -15,9 +15,10 @@ pub struct Pulse {
 impl Pulse {
     /// Play the animation again from its first frame. Call from an event handler.
     pub fn fire(&self) {
-        let fired = self.key.peek().fired();
-        let mut key = self.key;
-        key.set(fired);
+        // A pulse whose owner has unmounted has nothing left to play.
+        if let Ok(key) = crate::task::try_get(self.key) {
+            let _ = crate::task::try_set(self.key, key.fired());
+        }
     }
 
     /// What to pass to the component that renders it.

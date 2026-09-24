@@ -296,9 +296,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                     let element = event.data();
                     tracker.panel_mounted(MountedRef(element.clone()));
                     probe.on_mounted(event);
-                    spawn(async move {
-                        let _ = element.set_focus(true).await;
-                    });
+                    crate::focus::host::focus_soon(element);
                 },
                 onmousemove: move |event| hover.hovered(&event),
                 onmouseleave: move |_| leave.left_items(),

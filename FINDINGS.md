@@ -1024,3 +1024,148 @@ Three sensible defaults the user asked for now, all configurable, to be tuned la
   looked at with Read (light and dark, Postmark) — the OSD, Bar, Dock and Widget specimens read
   slightly more opaque than before, as expected of a `.02` alpha raise, with no other visible
   change to layout, radius or shadow.
+
+## Launcher gaps (2026-09-24)
+
+sill's launcher (sill FINDINGS "M4 launcher-ui", F140-F149, Q40-Q45) and its dock (Q15-Q17)
+reported gaps against quire; two were crashes that took the shell daemon down. All are closed on
+branch `launcher-gaps`. Headless proofs: `crates/ds-native/tests/launcher_crash.rs`,
+`launcher_gaps.rs`, `dock_gaps.rs`; SSR goldens under `crates/ds/tests/snapshots/`
+(`overlays/command_palette/{surface-cmdk,app-icon}.html`, `overlays/tooltip/fly-{shown,hidden}.html`,
+`controls/icon_view/{glyph-tile96,image-px}.html`, `root/surface/radius.html`,
+`root/chrome/dock-radius.html`).
+
+- **Q45, crash: a motion task outlived its component.** The cause was not the timer's body but
+  how it was spawned. `ds::time::spawn_in(scope, …)` called `Runtime::spawn(scope, future)`,
+  which runs a task *for* a scope without registering it in that scope's `spawned_tasks`; only
+  a scope's own `spawn` registers, and dioxus-core drops exactly the registered tasks when a
+  scope is removed (`Runtime::remove_scope`). So a palette unmounted before `peek-in` settled
+  left its settle task alive. The runtime skips a task whose scope is gone, which is why an
+  early unmount alone rarely crashed; but dioxus reuses freed scope slots, and once a new scope
+  (the next palette, a result row) sat in the old slot the stale task was polled again and its
+  `phase.set(Settled)` wrote the dropped signal: `ValueDroppedError` at `timer.rs:50`, the
+  daemon's panic on a toggle pair. Fix (`crates/ds/src/task.rs`): `spawn_in` enters the owner's
+  scope and spawns through its own `spawn`, so the task is registered and dropped with it; and
+  every task body writes through `try_set`/`try_get`, which end the task's work on a dropped
+  signal instead of panicking (a signal can belong to another scope than the task). Covered:
+  `MotionTimer` (`on_settled` never runs for a component that is gone), `Roster::leave` and its
+  rest timer, `HoverHub`'s open, close, leave and warm timers (the `HoverIntent` machine itself
+  spawns nothing), `ToastHub`'s hold, and `Pulse::fire` (no task; it writes through `try_set`).
+  Every other task in `ds` is a plain `spawn` from a handler or a hook of the component that
+  owns the signals it writes (rect probes, the menu tracker, the send pill, the toast stage), so
+  it was already registered and dropped with its scope. Proof: `launcher_crash.rs` mounts a
+  `CommandPalette` and a `Menu` and unmounts them 100 ms later, toggles a palette open and shut
+  four times 500 ms apart at Extra motion (each close lands mid `peek-in`), and mounts a palette
+  fifty times with varied lifetimes, while small components are remounted every 16 ms beside it
+  (they keep dioxus reusing freed slots, as the launcher's rows do). On master the fifty-mount
+  test panics on every run (ValueDroppedError, or Q43's RefCell first) and the toggle test on
+  some; the early-unmount pair passes there too, since nothing reuses the slot in time. On this
+  branch all four pass (run three times).
+- **Q43, crash: focus from a task polled inside the render.** dioxus-native-dom's
+  `NodeHandle::set_focus` calls `doc_mut()` when it is *called*, not when its future is polled;
+  `TextInput`'s `Focus::OnMount` spawned a task that called it, and dioxus polls a task woken in
+  the same turn as a dirty scope inside `render_immediate`, while the mutation writer holds the
+  document: "RefCell already borrowed" (`events.rs:161`). The menu's own focus on mount, the
+  submenu's, the tracker's return to its panel and the slider's did the same. Fix: a `HostFocus`
+  seam beside `HostMeasure` (`crates/ds/src/focus/host.rs`). Every focus change is
+  `focus_soon(element)` (a task of the calling scope) or `focus_element(&element).await`, which
+  asks the host's `HostFocus` and answers `Focused::{Done, Busy, Unknown}`; `Busy` waits
+  `FRAME_SLACK` and tries again, up to eight frames. ds-native's `FOCUS`
+  (`crates/ds-native/src/focus.rs`) probes the document with `NodeHandle::try_doc` first and only
+  then moves the focus, so a held document is `Busy` and nothing panics or prints. With no host
+  seam the call and its future are guarded (`crates/ds/src/guarded.rs`, `Guarded` moved there
+  from `geometry/measure.rs`, plus `guarded_call` for a call that borrows when it is made): the
+  panic is caught and read as busy, which changes nothing (the borrow failed first) but the
+  default panic hook still prints it. `ds_native::launch`, the harness and
+  `ds_native::focus::provide()` provide `FOCUS`. Proof: the fifty-mount test (Q43 on master,
+  every run) and a unit test of `guarded_call` against a held `RefCell`.
+- **Q44 Giving a field the keyboard back.** `ds::use_focus_request() -> FocusRequest`,
+  `FocusRequest::request(&self)`, and `Focus::Controlled(FocusRequest)`: the field focuses on
+  mount and again for every request made since the last one it served (a `FocusTicket`
+  counter); `CommandPalette { focus: Some(request) }` passes it to its field. `Focus` lost `Eq`
+  and `Hash` (a signal handle has neither). Proof: a palette in a surface opens an actions
+  `Menu` on Tab, the menu takes the keyboard, Escape fades it out, its `onclose` calls
+  `request()` and the field has the focus again with the card still `data-presence="present"`
+  (not remounted); the same page without the request leaves the field unfocused. The consumer
+  example's subject field takes the keyboard back from its More menu the same way.
+- **Q40 Embedded palette.** `CommandPalette { host: CommandPaletteHost::Surface }` renders the
+  card in place, with no wrap, scrim or overlay slot: `width:100%; height:100%`, a flex column
+  whose list takes the height under the field (`max-height:none`), painting the enclosing
+  material (`--m-tint-solid`, `--m-tint` under `data-blur=on`, `--m-box`, border transparent)
+  at `--r-panel`. It still joins the layer stack (Escape in its field closes it only when
+  nothing is above it). `id: Option<String>` goes on the card in both hosts;
+  `entrance: PaletteEntrance::{PeekIn, CmdkIn}` picks the keyframe (`data-entrance`) and the
+  settle timer's `Anim`. Proof: the card's rect equals its 600 x 400 container, no
+  `.ds-palette-wrap` and no palette overlay exist.
+- **Q41 Selection and row rects.** `selected: Option<usize>` (controlled: Up, Down and the pointer
+  only ask through `on_select`), `on_select: Option<EventHandler<usize>>` (uncontrolled, every
+  change of the effective selection, reported from an effect after the render that made it,
+  the first choice on mount and after a new query included), `on_select_rect:
+  Option<EventHandler<Rect>>` and `onkey: Option<EventHandler<KeyboardData>>` (every key the
+  field gets, after the palette's own reading). The rect comes from the row's element: the
+  palette keeps each row's `MountedRef` by the *line* it is drawn on (the choice-to-line table
+  of the render that mounted it, `palette_lines::choice_lines`), because a row element persists
+  at its line while the choice drawn there changes; it reports when the selection or the element
+  under it changes, reading through the measurer a frame after layout
+  (`palette_rows.rs`; the selection itself is `palette_select.rs`). The pointer moving over a row already moved the selection (O-13); now
+  the caller hears it. Proof: the log reads `select:0,rect:<row 1>`, then after Down
+  `select:1,rect:<row 2>`, then after a pointer move `select:2,rect:<row 3>`, each rect equal to
+  the harness's own measurement of that row; a controlled palette whose caller ignores the
+  request keeps row 1 selected; an actions menu anchored with `Anchor::Rect(rect)` hangs 6 px
+  under the selected row.
+- **Q42 App icons in rows.** `Tile::Source(IconSource)`: `Image` draws the icon file filling the
+  tile (`[data-tile=image] > .ds-ext-icon{width:100%;height:100%}`, no border or ground), a
+  `Symbolic` sits on the plate, a `Glyph` is `Tile::Icon`'s. Proof: a red PNG's icon rect equals
+  its 34 px tile and its centre pixel is red.
+- **Dock Q15 Radius.** `Surface { radius: Option<Corner> }` and `Ds { radius: Option<Corner> }`
+  write `--m-radius` inline, which the material block's `border-radius:var(--m-radius)` then
+  reads. `Corner::{Token(Radius), Px(Px)}` (`tokens/shape.rs`), `From<Radius>`. The dock's pill is
+  its `Ds` root now (sill F125), so the root takes it too. Proof: a dark Dock surface with
+  `Corner::Px(Px(0))` paints the pixel 2 px inside its corner (luma < 80) where the material's
+  22 px leaves the light ground (> 180).
+- **Dock Q16 Icon sizes.** `IconSize::Tile48` (48), `IconSize::Tile96` (96) and
+  `IconSize::Px(IconPx(u8))`. Proof: glyphs lay out at 96, 48 and 71 px. design/08-ICONS.md
+  §1.4's size table should gain the three rows (not in this wave's files).
+- **Dock Q17 Controlled tooltip.** `Tooltip { shown: Option<Shown> }`, `Shown::{Visible, Hidden}`:
+  `[data-shown=visible]` shows the Fly's label at once with no pointer, `[data-shown=hidden]`
+  keeps it down under the pointer; a Card follows `shown` instead of the hover hub. Proof by
+  pixels: a shown label's padding is ink-dark at rest, a hidden one stays the ground under the
+  pointer after 700 ms, and an uncontrolled one still shows there.
+- `ds_native::Harness::is_focused(selector)` (the focus proofs above).
+- Gallery: Overlays has "Palette in a surface" (two 540 x 330 launcher panels: `cmdk-in` with
+  app icons over a query, `peek-in` over the empty query's actions and recent apps); Controls
+  has "Dock tiles" (glyphs and app icons at `Tile48`, `Px(71)`, `Tile96`, and a Dock pill at
+  `Corner::Px(Px(12))` whose middle label is `Shown::Visible`). Overlays grew to 1640 px and
+  Controls to 2400. Sheets regenerated and looked at in both schemes.
+
+What sill changes to drop each workaround (sill FINDINGS F141-F148):
+
+- **900 ms keep-mounted (`ENTRANCE_GUARD`, `mounting.rs`, F145).** Delete it: unmount or remount
+  the palette and the actions menu whenever the state says so. A quick reopening may still
+  reuse the mounted palette if the entrance should not replay, but that is a design choice now,
+  not a crash guard.
+- **60 ms delayed mount (`MOUNT_WAIT`, `events.rs::opened`).** Delete it and mount the palette on
+  the opening. Also give every root the focus seam beside the measurer:
+  `Root::context(ds_native::focus::FOCUS)` next to `Root::context(MEASURE)` (or re-export it
+  from `sill-surfaces` as `MEASURE` is), and `ds_native::focus::provide()` beside
+  `ds_native::measure::provide()` in the popups. Without it nothing crashes, but a collision
+  prints the caught panic.
+- **Remount to regain focus (`actions_closed`/`menu_gone`).** Keep one
+  `let field = use_focus_request();`, pass `focus: field` to the `CommandPalette`, and call
+  `field.request()` from the actions menu's `onclose`; the palette's `key` no longer changes.
+- **Harness retry-on-panic (`tests/launcher_harness::retrying_the_focus_race`, F148).** Delete it;
+  the tests run once.
+- **Fixed actions anchor (`ACTIONS_AT`) and the mirrored selection.** Pass `on_select_rect` and
+  anchor the menu at `Anchor::Rect(rect)`; take the selected row from `on_select` (or own it
+  with `selected`) instead of mirroring Up and Down; read Tab and Ctrl+K from `onkey` instead
+  of the root's `onkeydown`.
+- **Scrim and card size (F141).** `host: CommandPaletteHost::Surface`, `id: Some("launcher-card")`
+  for the blur region at radius 14, `entrance: PaletteEntrance::CmdkIn` if wanted; give the
+  palette's container the panel's size.
+- **Provider glyphs (Q42).** `tile: Some(Tile::Source(icon))` with the app's resolved
+  `IconSource::Image(ExternalIcon { url: IconUrl::file(&path)?, size: IconSize::Tile48 })`.
+- **Dock (F94, F125, F126).** `Ds { radius: Some(Corner::Px(Px(f32::from(dock.pill_radius_px.0)))) }`
+  on the pill root; `IconSize::Px(IconPx(side))` for the tile's resolved icon side instead of
+  22 and `transform:scale`; `Tooltip { shown: Some(if label_gate open { Shown::Visible } else
+  { Shown::Hidden }) }` driven by the machine's `ShowLabel`/`HideLabel` instead of leaving the
+  label out of the document.

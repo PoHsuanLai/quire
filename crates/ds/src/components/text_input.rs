@@ -1,6 +1,8 @@
 //! TextInput: the one field every text input uses (design/04-COMPONENTS.md section 6).
 
 use crate::components::vocab::Availability;
+use crate::focus::host::focus_soon;
+use crate::focus::request::{FocusRequest, FocusTicket};
 use dioxus::html::{Code, HasKeyboardData, Key, Location, Modifiers, ModifiersInteraction};
 use dioxus::prelude::*;
 
@@ -24,13 +26,23 @@ impl InputVariant {
 }
 
 /// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum Focus {
     /// As soon as it is mounted: the palette's input, the bubble's link field.
     OnMount,
     /// Only when the user or the consumer puts it there.
     #[default]
     Manual,
+    /// As it mounts, and again each time the caller calls [`FocusRequest::request`]: a menu
+    /// that took the keyboard hands it back to the field when it closes (sill FINDINGS Q44).
+    Controlled(FocusRequest),
+}
+
+impl Focus {
+    /// Whether the field takes the focus as it mounts.
+    fn on_mount(self) -> bool {
+        matches!(self, Focus::OnMount | Focus::Controlled(_))
+    }
 }
 
 /// A key event copied out of its `Rc`, so it can be handed on by value: `KeyboardData` is not
@@ -117,19 +129,45 @@ fn placeholder_shown<'a>(value: &str, placeholder: &'a str) -> Option<&'a str> {
     (value.is_empty() && !placeholder.is_empty()).then_some(placeholder)
 }
 
-/// Take focus now if the field asks for it on mount. Focus is best-effort: a renderer without
-/// it still shows the field, and the user can click into it.
-fn focus_on_mount(focus: Focus, event: &MountedEvent) {
-    if focus == Focus::OnMount {
-        let mounted = event.data();
-        spawn(async move {
-            let _ = mounted.set_focus(true).await;
-        });
+/// The field's element and the last focus ticket it served.
+#[derive(Clone, Copy)]
+struct FieldFocus {
+    element: CopyValue<Option<std::rc::Rc<MountedData>>>,
+    served: CopyValue<FocusTicket>,
+}
+
+impl FieldFocus {
+    /// Keep the element, and take the focus if the field asks for it on mount. Focus goes
+    /// through `focus_soon`, which waits out a document the renderer holds (sill Q43).
+    fn mounted(self, focus: Focus, event: &MountedEvent) {
+        let mut element = self.element;
+        let mut served = self.served;
+        element.set(Some(event.data()));
+        if let Focus::Controlled(request) = focus {
+            served.set(request.peek());
+        }
+        if focus.on_mount() {
+            focus_soon(event.data());
+        }
+    }
+
+    /// Serve a request made since the last one, once the element is mounted.
+    fn follow(self, request: FocusRequest) {
+        let ticket = request.ticket();
+        let mut served = self.served;
+        let Some(element) = self.element.peek().clone() else {
+            return;
+        };
+        if ticket != *served.peek() {
+            served.set(ticket);
+            focus_soon(element);
+        }
     }
 }
 
 /// A single-line text field. `focus: Focus::OnMount` puts the caret in it when it mounts (and
-/// writes `autofocus` for a webview).
+/// writes `autofocus` for a webview); `Focus::Controlled(request)` does too, and again at each
+/// `request.request()`.
 #[component]
 pub fn TextInput(
     variant: InputVariant,
@@ -141,6 +179,13 @@ pub fn TextInput(
     #[props(default)] onkey: EventHandler<KeyboardData>,
     #[props(default)] focus: Focus,
 ) -> Element {
+    let field = FieldFocus {
+        element: use_hook(|| CopyValue::new(None)),
+        served: use_hook(|| CopyValue::new(FocusTicket::default())),
+    };
+    if let Focus::Controlled(request) = focus {
+        field.follow(request);
+    }
     let shown = placeholder_shown(&value, &placeholder).map(str::to_string);
     let aria_placeholder = (!placeholder.is_empty()).then_some(placeholder.clone());
     rsx! {
@@ -153,9 +198,9 @@ pub fn TextInput(
                 "aria-placeholder": aria_placeholder,
                 "aria-disabled": availability.aria_disabled(),
                 autocomplete: "off",
-                autofocus: (focus == Focus::OnMount).then_some("true"),
+                autofocus: focus.on_mount().then_some("true"),
                 value: "{value}",
-                onmounted: move |event| focus_on_mount(focus, &event),
+                onmounted: move |event| field.mounted(focus, &event),
                 oninput: move |event| {
                     if availability == Availability::Enabled {
                         oninput.call(event.value());

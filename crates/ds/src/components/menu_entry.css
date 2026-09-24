@@ -9,6 +9,10 @@
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
 .ds-menu-tile[*|data-tile=none]{ border:0; background:transparent; }
+/* An app's icon is its own plate (sill FINDINGS Q42): no border or ground under it, and it fills
+   the tile whatever size its caller resolved it at. */
+.ds-menu-tile[*|data-tile=image]{ border:0; background:transparent; }
+.ds-menu-tile[*|data-tile=image] > .ds-ext-icon{ width:100%; height:100%; }
 .ds-menu-title{ display:block; font-size:var(--fs-control); font-weight:600; }
 .ds-menu-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
 .ds-menu-trail{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); }

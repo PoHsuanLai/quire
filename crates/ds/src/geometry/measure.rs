@@ -12,14 +12,11 @@
 //! no host measurer the read is guarded so the same collision is `Busy` too, never a panic.
 
 use super::units::{Point, Px, Rect, Size};
+use crate::guarded::Guarded;
 use crate::time::{FRAME_SLACK, sleep};
 use dioxus::html::geometry::PixelsRect;
 use dioxus::prelude::*;
-use std::future::Future;
-use std::panic::AssertUnwindSafe;
-use std::pin::Pin;
 use std::rc::Rc;
-use std::task::{Context, Poll};
 
 /// One attempt at reading an element's rect through the host.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -40,7 +37,7 @@ pub enum Measured {
 pub struct HostMeasure(pub fn(&MountedData) -> Measured);
 
 /// How many frames a read waits for a busy document before giving up.
-const BUSY_ATTEMPTS: usize = 8;
+pub(crate) const BUSY_ATTEMPTS: usize = 8;
 
 /// `element`'s rect now, through the host's [`HostMeasure`] when there is one. `None` when the
 /// renderer cannot measure it. Call it from a task, never from inside a handler or render.
@@ -73,22 +70,6 @@ async fn unhosted(element: &MountedData) -> Measured {
         Some(Ok(rect)) => Measured::At(from_pixels(rect)),
         Some(Err(_)) => Measured::Unknown,
         None => Measured::Busy,
-    }
-}
-
-/// A future whose poll may panic, polled so that a panic ends it with `None`.
-struct Guarded<F: Future>(Pin<Box<F>>);
-
-impl<F: Future> Future for Guarded<F> {
-    type Output = Option<F::Output>;
-
-    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let inner = self.0.as_mut();
-        match std::panic::catch_unwind(AssertUnwindSafe(move || inner.poll(cx))) {
-            Ok(Poll::Ready(value)) => Poll::Ready(Some(value)),
-            Ok(Poll::Pending) => Poll::Pending,
-            Err(_) => Poll::Ready(None),
-        }
     }
 }
 
@@ -189,47 +170,5 @@ pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
             width: Px(rect.size.width as f32),
             height: Px(rect.size.height as f32),
         },
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::Guarded;
-    use std::cell::RefCell;
-    use std::future::Future;
-    use std::pin::pin;
-    use std::task::{Context, Poll, Waker};
-
-    /// Poll `future` once with a waker that does nothing.
-    fn poll_once<F: Future>(future: F) -> Poll<F::Output> {
-        let mut context = Context::from_waker(Waker::noop());
-        pin!(future).poll(&mut context)
-    }
-
-    /// The Blitz read's failure, reduced: a read that borrows a document the renderer holds.
-    async fn read(document: &RefCell<u32>) -> u32 {
-        *document.borrow()
-    }
-
-    #[test]
-    fn a_read_of_a_held_document_is_busy_not_a_panic() {
-        let document = RefCell::new(7);
-        assert_eq!(
-            poll_once(Guarded(Box::pin(read(&document)))),
-            Poll::Ready(Some(7)),
-            "a free document reads"
-        );
-        let held = document.borrow_mut();
-        assert_eq!(
-            poll_once(Guarded(Box::pin(read(&document)))),
-            Poll::Ready(None),
-            "a held document is busy"
-        );
-        drop(held);
-        assert_eq!(
-            poll_once(Guarded(Box::pin(read(&document)))),
-            Poll::Ready(Some(7)),
-            "and reads again once it is free"
-        );
     }
 }

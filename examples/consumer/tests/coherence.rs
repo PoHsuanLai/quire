@@ -149,6 +149,11 @@ fn the_menu_opens_and_closes_under_harness() {
         .centre(".ds-button[*|data-variant=secondary]")
         .unwrap_or_else(|| panic!("More is not on screen:\n{}", harness.html()));
     harness.click(more);
+    harness.advance(std::time::Duration::from_millis(80));
+    assert!(
+        !harness.is_focused(".ds-input"),
+        "the menu took the keyboard from the field"
+    );
     assert!(
         harness.count(".ds-menu-item") > 0,
         "the menu did not open:\n{}",
@@ -163,5 +168,10 @@ fn the_menu_opens_and_closes_under_harness() {
         harness.count(".ds-menu-item"),
         0,
         "the menu did not close after picking an entry"
+    );
+    harness.advance(std::time::Duration::from_millis(80));
+    assert!(
+        harness.is_focused(".ds-input"),
+        "the field has the keyboard back (Focus::Controlled)"
     );
 }

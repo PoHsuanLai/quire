@@ -1,8 +1,12 @@
 //! The undo toast's state: one visible at a time, each push restarting the 5200 ms hold
 //! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
+//!
+//! The hold is a task of the root that provides the hub and drops with it; it writes through
+//! `try_set`, so a hold that finds the hub gone stops (sill FINDINGS Q45, `crate::task`).
 
 use crate::root::env::Env;
-use crate::time::{sleep, spawn_in};
+use crate::task::{Gone, spawn_in, try_get, try_set};
+use crate::time::sleep;
 use crate::tokens::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
@@ -60,21 +64,27 @@ impl ToastHub {
         undo: Option<UndoToken>,
         on_undo: Option<EventHandler<UndoToken>>,
     ) {
-        let mut handler = self.on_undo;
-        handler.set(on_undo);
-        let mut state = self.state;
-        state.set(ToastState::Shown { text, undo });
-        self.stop_hold();
-        let hold = DelayToken::ToastHold.delay(self.env.peek().resolved.motion);
+        let _ = self.try_show(text, undo, on_undo);
+    }
+
+    fn try_show(
+        &self,
+        text: String,
+        undo: Option<UndoToken>,
+        on_undo: Option<EventHandler<UndoToken>>,
+    ) -> Result<(), Gone> {
+        try_set(self.on_undo, on_undo)?;
+        try_set(self.state, ToastState::Shown { text, undo })?;
+        self.stop_hold()?;
+        let hold = DelayToken::ToastHold.delay(try_get(self.env)?.resolved.motion);
         let hub = *self;
         let started = spawn_in(self.scope, async move {
             sleep(hold).await;
-            let mut task = hub.hold;
-            task.set(None);
-            hub.hide();
+            if try_set(hub.hold, None).is_ok() {
+                hub.hide();
+            }
         });
-        let mut task = self.hold;
-        task.set(Some(started));
+        try_set(self.hold, Some(started))
     }
 
     /// The toast as it is now.
@@ -109,22 +119,19 @@ impl ToastHub {
 
     /// Hide at once.
     pub fn hide(&self) {
-        self.stop_hold();
-        let mut state = self.state;
-        if *state.peek() != ToastState::Hidden {
-            state.set(ToastState::Hidden);
+        if self.stop_hold().is_ok() {
+            let _ = crate::task::try_set_if_changed(self.state, ToastState::Hidden);
         }
     }
 
-    fn stop_hold(&self) {
-        // Copy the task out first: an `if let` on the peek itself keeps the read guard alive
-        // through the body, and the `set` below then panics as already borrowed.
-        let running = *self.hold.peek();
-        if let Some(running) = running {
+    fn stop_hold(&self) -> Result<(), Gone> {
+        // Copied out first: a guard held through the body would make the write below a
+        // double borrow.
+        if let Some(running) = try_get(self.hold)? {
             running.cancel();
-            let mut task = self.hold;
-            task.set(None);
+            try_set(self.hold, None)?;
         }
+        Ok(())
     }
 }
 

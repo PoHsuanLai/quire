@@ -5,7 +5,7 @@ use ds::components::vocab::{Availability, Fraction, Key, PulseKey, Shortcut, Swi
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip,
     ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind, Hex, Icon, IconButton,
-    IconButtonVariant, IconSize, IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize,
+    IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize,
     LabelHue, PersonHue, SearchField, SectionHeader, SegSize, SegmentedControl, Slider, Spinner,
     SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
@@ -184,6 +184,18 @@ pub const CASES: &[Case] = &[
         component: "icon_view",
         state: "image",
         make: || rsx! { IconView { source: image() } },
+    },
+    // The dock's sizes (sill FINDINGS Q16): a glyph at a tile's full magnification, an image at
+    // a size the caller resolved.
+    Case {
+        component: "icon_view",
+        state: "glyph-tile96",
+        make: || rsx! { IconView { source: Icon::Folder.into(), size: IconSize::Tile96 } },
+    },
+    Case {
+        component: "icon_view",
+        state: "image-px",
+        make: || rsx! { IconView { source: IconSource::Image(ExternalIcon { url: IconUrl::png(b"\x89PNG"), size: IconSize::Px(IconPx(71)) }) } },
     },
     // SegmentedControl: both sizes, each with a different choice pressed.
     Case {
