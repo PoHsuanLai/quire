@@ -43,14 +43,7 @@ fn main() {
                 page: args.page.unwrap_or(page::Page::Tokens),
                 ..Axes::default()
             });
-            launch(
-                app::App,
-                AppConfig {
-                    title: "quire gallery".into(),
-                    width: 1280,
-                    height: 900,
-                },
-            );
+            launch(app::App, AppConfig::new("quire gallery", 1280, 900));
         }
     }
 }

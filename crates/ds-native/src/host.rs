@@ -3,8 +3,9 @@
 //! - The input modality (spike S12): every key press (other than a lone modifier) makes it
 //!   `keyboard`, every pointer press makes it `pointer`; `Ds` reads it through `HostModality`
 //!   and stamps `data-modality`.
-//! - The document's net provider becomes ds-native's `data:`/`file:` one, delegating other
-//!   schemes to dioxus-native's, and waking the shell to paint when a resource lands (S7/S8).
+//! - The document's providers become the app's (`crate::install`): the net policy, for the
+//!   document and every frame it builds, waking the shell to paint when a resource lands
+//!   (S7/S8). The app renders once they are in place, a frame after the host.
 //! - Rect reads go through `ds::HostMeasure`, which waits out a document the renderer is
 //!   holding instead of panicking (`crate::measure`); focus changes go through `ds::HostFocus`
 //!   the same way (`crate::focus`).
@@ -18,9 +19,11 @@
 //! The document is reached through a hidden element's `onmounted` handle: dioxus-native builds
 //! the document itself and hands the app nothing else that can see it.
 
-use crate::net::DsNet;
+use crate::clipboard::HostClipboard;
+use crate::frame_links::frame_links;
+use crate::install::install;
 use crate::scheme;
-use blitz_traits::net::NetWaker;
+use crate::setup::Setup;
 use blitz_traits::shell::ColorScheme;
 use dioxus::prelude::*;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
@@ -31,21 +34,23 @@ use dioxus_native_dom::NodeHandle;
 use ds::{HostModality, HostScale, InputModality, Scale};
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::sync::Arc;
 
-/// What `Host` wraps.
-#[derive(Props, Debug, Clone, Copy)]
+/// What `Host` wraps, and what the app gave its document.
+#[derive(Props, Debug, Clone)]
 pub(crate) struct HostProps {
     app: fn() -> Element,
+    /// Fixed for the window's life: read once, as the document mounts.
+    setup: Setup,
 }
 
 impl HostProps {
-    pub(crate) fn new(app: fn() -> Element) -> Self {
-        HostProps { app }
+    pub(crate) fn new(app: fn() -> Element, setup: Setup) -> Self {
+        HostProps { app, setup }
     }
 }
 
 impl PartialEq for HostProps {
+    /// The same app is the same root: `setup` never changes after `launch`.
     fn eq(&self, other: &Self) -> bool {
         std::ptr::fn_addr_eq(self.app, other.app)
     }
@@ -57,6 +62,8 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
+    use_context_provider(|| crate::focus::SELECT);
+    let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let window = use_window();
     let factor = window.scale_factor();
@@ -83,33 +90,45 @@ pub(crate) fn Host(props: HostProps) -> Element {
             window.set_theme(Some(theme(changed)));
         }
     });
+    let frame_nav = use_hook(|| {
+        let (nav, inbox) = frame_links(&props.setup.frame_links);
+        spawn(inbox.serve());
+        nav
+    });
+    let mut installed = use_signal(|| Installed::Pending);
+    let setup = props.setup.clone();
     let App = props.app;
     rsx! {
-        App {}
+        // The app waits one frame for its document's providers: a frame in its first render
+        // would otherwise be parsed with the parent's `file:` provider (`crate::frames`).
+        if installed() == Installed::Done {
+            App {}
+        }
         div {
             style: "display:none",
             onmounted: move |mounted| {
                 if let Some(handle) = mounted.data().downcast::<NodeHandle>() {
-                    install_net(handle);
+                    install(handle, &setup, &clipboard, frame_nav.clone());
                     document.replace(Some(handle.clone()));
+                    installed.set(Installed::Done);
                 }
             },
         }
     }
 }
 
+/// Whether the document has the app's providers yet.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Installed {
+    /// Not yet: the app is not rendered.
+    Pending,
+    /// Yes: the app renders.
+    Done,
+}
+
 /// A winit scale factor in 120ths, the unit `ds::Scale` shares with the Wayland protocol.
 fn scale_of(factor: f64) -> Scale {
     Scale((factor * f64::from(Scale::DENOMINATOR)).round().max(1.0) as u32)
-}
-
-/// Serve `data:` and `file:` on the document, waking its shell to paint when one lands.
-fn install_net(handle: &NodeHandle) {
-    let mut doc = handle.doc_mut();
-    let shell = Arc::clone(&doc.shell_provider);
-    let waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| shell.request_redraw());
-    let fallback = Arc::clone(&doc.net_provider);
-    doc.set_net_provider(DsNet::shared(Some(fallback), Some(waker)));
 }
 
 /// The modality a window event implies, if it implies one.

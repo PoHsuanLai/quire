@@ -1013,6 +1013,28 @@ the reasons and the proofs.
 | `SidebarItem` | `place: Option<PlaceId>` | `PlaceId(String)`, your name for the place (`inbox`, `label:7`), written as `data-place` so a drag can tell which place is under the pointer |
 | `SidebarItem` | `onpointerenter` / `onpointerleave` / `onpointermove` / `onpointerup: Option<EventHandler<PointerEvent>>` | The item's pointer, on every kind: set `drop: DropState::Target` on the place a dragged thread is over (lit `--accent-soft`, scaled 1.045, design/06 section 6.1) and apply the drop on the release. `drop` itself is not new |
 
+### Native phase B (2026-09-25): the Blitz host for an app window
+
+What `ds-native` gives an app that moves its window onto `ds_native::launch` (mailo Phase B).
+FINDINGS.md "Native phase B" has the reasons and the proofs.
+
+**Breaking:** `AppConfig` is a builder: `AppConfig::new("mailo", 1200, 800)`, no longer a
+struct literal.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Root contexts (dioxus desktop's `with_context`) | `AppConfig::with_context(value)`, `with_contexts(RootContexts)`; `Harness::with_contexts(app, viewport, contexts)`, `HarnessConfig::with_context`, `snapshot_with(app, config, moments)` | `value: Clone + Send + Sync + 'static`, read with `use_context::<T>()`; the same values reach the window, a test and a snapshot. No globals. |
+| Network policy | `AppConfig::with_net(NetPolicy)`, `HarnessConfig::with_net` | `NetPolicy::{Local, Custom(Arc<dyn AppNet>), Sealed}`. `Local` (default) is what `launch` always did. Frames get `data:` only unless `Custom`'s `AppNet::decide(&NetRequest) -> NetDecision::{Allow, Deny}` admits a request (`NetRequest::origin()` is `RequestOrigin::{Top, Frame(FrameId)}`); `AppNet::fetch(request, NetReply)` then answers with `reply.bytes(..)` from any thread. ds-native never serves `file:` to a frame. |
+| `<iframe srcdoc>` | nothing: the HTML parser is on in the window and the harness | A frame is a separate document: no shared DOM, no shared cascade, no scripts. `Harness::frame(selector) -> Option<FrameView>` with `id`, `text`, `html`, `count`, `text_of`, `attr`, `width`, `centre`. |
+| Links clicked in a frame | `AppConfig::with_frame_links(FrameLinks)`, `HarnessConfig::with_frame_links` | `FrameLinks::{Inert, Intercept(..)}`, built with `FrameLinks::intercept(\|link: FrameLink\| ..)`; `FrameLink { frame, href }`. The frame never navigates; the handler runs with the document free. |
+| Clipboard | `ds_native::clipboard::{write_text, read_text}` | `Result<_, ClipboardError::{NoHost, Unavailable}>`; call from a handler. Ctrl+C/X/V in every text field need nothing. The harness's clipboard is in memory: `Harness::clipboard_text`, `set_clipboard_text`, `selected_text`. |
+| Focus an app's own element | `ds::focus_soon(element)`, `ds::focus_soon_selecting(element, Select)` | Waits out a busy document as quire's fields do: mailo's `.app` shell after a panel closes. |
+| Select a field's value as it takes the focus | `use_focus_request().with_select_all()` with `TextInput { focus: Focus::Controlled(request) }` | `ds::Select::{None, All}`; the host's `HostSelect` (`ds_native::focus::SELECT`, provided by `launch`, the harness and `ds_native::focus::provide()`). A webview does nothing. |
+| Desktop application id | `AppConfig::with_app_id(AppId("dev.mailo.Mailo".into()))` | The Wayland `app_id` / X11 `WM_CLASS`, for the `.desktop` match. |
+
+The window's app renders one frame after the host, once the document has the app's providers
+(a frame in the first render would otherwise be parsed with the wrong ones).
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire

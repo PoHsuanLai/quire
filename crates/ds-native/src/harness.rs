@@ -10,17 +10,18 @@
 //! Animation time (`resolve(t)`) is the harness's own clock: the sum of every `advance`, so a
 //! frame's CSS time never depends on how slow the machine running the test is.
 
+use crate::contexts::RootContexts;
 use crate::error::NativeError;
+use crate::frame_view::FrameView;
+use crate::harness_config::HarnessConfig;
+use crate::harness_input::{blitz_button, keyboard, modifier, pointer};
 use crate::headless::{Backdrop, Headless, Layout};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
-use blitz_traits::events::{
-    BlitzKeyEvent, BlitzPointerEvent, BlitzPointerId, KeyState, MouseEventButton,
-    MouseEventButtons, PointerCoords, UiEvent,
-};
+use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, MouseEventButtons, UiEvent};
 use dioxus::prelude::*;
 use ds::{InputModality, Key, Point, PointerButton, Px, Rect, Size};
-use keyboard_types::{Code, Key as DomKey, Location, Modifiers};
+use keyboard_types::{Location, Modifiers};
 use std::time::{Duration, Instant};
 
 /// A headless document under test.
@@ -48,41 +49,49 @@ impl std::fmt::Debug for Harness {
 impl Harness {
     /// Build `app` at `viewport` and render its first frame.
     pub fn new(app: fn() -> Element, viewport: Viewport) -> Self {
-        // Entered before `Headless::new`, whose `initial_build` runs `app`'s first render and
-        // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
-        // would run.
-        let runtime = crate::runtime::enter();
-        let mut harness = Harness {
-            viewport,
-            doc: Headless::new(app, viewport),
-            clock: Duration::ZERO,
-            _runtime: runtime,
-        };
-        harness.frame();
-        harness
+        Harness::with_config(app, HarnessConfig::new(viewport))
+    }
+
+    /// Build `app` with `contexts` provided at its root, as `AppConfig::with_contexts` gives a
+    /// window, and render its first frame.
+    pub fn with_contexts(app: fn() -> Element, viewport: Viewport, contexts: RootContexts) -> Self {
+        Harness::with_config(app, HarnessConfig::new(viewport).with_contexts(contexts))
+    }
+
+    /// Build `app` as `config` says and render its first frame.
+    pub fn with_config(app: fn() -> Element, config: HarnessConfig) -> Self {
+        Harness::start(app, config, Layout::Running)
     }
 
     /// Build `app` at `viewport` as a shell surface is built before it is mapped: its renders
     /// run and its tasks are polled, but nothing is styled or laid out until [`Harness::map`]
     /// (every rect reads 0 x 0 until then, sill FINDINGS Q60).
     pub fn unmapped(app: fn() -> Element, viewport: Viewport) -> Self {
+        Harness::start(app, HarnessConfig::new(viewport), Layout::Held)
+    }
+
+    fn start(app: fn() -> Element, config: HarnessConfig, layout: Layout) -> Self {
+        // Entered before `Headless::new`, whose `initial_build` runs `app`'s first render and
+        // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
+        // would run.
         let runtime = crate::runtime::enter();
-        let mut doc = Headless::new(app, viewport);
-        doc.layout = Layout::Held;
+        let viewport = config.viewport();
+        let mut doc = Headless::new(app, viewport, config.setup());
+        doc.layout = layout;
         let mut harness = Harness {
             viewport,
             doc,
             clock: Duration::ZERO,
             _runtime: runtime,
         };
-        harness.frame();
+        harness.settle();
         harness
     }
 
     /// Lay the document out from now on, as the compositor maps its surface, and resolve it.
     pub fn map(&mut self) {
         self.doc.layout = Layout::Running;
-        self.frame();
+        self.settle();
     }
 
     /// Move the pointer to `at`.
@@ -187,7 +196,7 @@ impl Harness {
             self.doc.wakeup().wait_past(seen, deadline - now);
         }
         self.clock += time;
-        self.frame();
+        self.settle();
     }
 
     /// The document as HTML, for assertions.
@@ -269,138 +278,54 @@ impl Harness {
     /// Resolve at `at` and paint: a snapshot at one motion moment.
     pub(crate) fn render_at(&mut self, at: Duration) -> Result<image::RgbaImage, NativeError> {
         self.clock = at;
-        self.frame();
+        self.settle();
         self.doc.paint(Backdrop::Scheme)
     }
 
     /// Hand `event` to the document and bring it up to date.
     fn send(&mut self, event: UiEvent) {
         self.doc.doc.handle_ui_event(event);
-        self.frame();
+        self.settle();
     }
 
-    fn frame(&mut self) {
+    fn settle(&mut self) {
         self.doc.frame(self.clock);
     }
 
-    fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
+    /// What was last copied (Ctrl+C in a field, `ds_native::clipboard::write_text`): the
+    /// harness's clipboard is in memory, never the desktop's.
+    pub fn clipboard_text(&self) -> Option<String> {
+        self.doc.shell.text()
+    }
+
+    /// Put `text` on the harness's clipboard, as another app's copy would.
+    pub fn set_clipboard_text(&mut self, text: &str) {
+        self.doc.shell.put(text.to_owned());
+    }
+
+    /// The text selected in the first text field matching `selector`, if it has a selection.
+    pub fn selected_text(&self, selector: &str) -> Option<String> {
+        self.with_doc(|doc| {
+            let input = doc
+                .get_node(first(doc, selector)?)?
+                .element_data()?
+                .text_input_data()?;
+            input.editor.selected_text().map(str::to_owned)
+        })
+    }
+
+    /// The sub-document of the first `iframe` matching `selector`, once it has one: what a
+    /// frame shows, read without the app's document seeing into it.
+    pub fn frame(&self, selector: &str) -> Option<FrameView<'_>> {
+        FrameView::find(self, selector)
+    }
+
+    pub(crate) fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
         read(&self.doc.doc.inner())
     }
 }
 
 /// The first element matching `selector`; an unparseable selector matches nothing.
-fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
+pub(crate) fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
     doc.query_selector(selector).ok().flatten()
-}
-
-/// The Blitz button, and the held-buttons set while it is down, for a quire pointer button.
-fn blitz_button(button: PointerButton) -> (MouseEventButton, MouseEventButtons) {
-    match button {
-        PointerButton::Primary => (MouseEventButton::Main, MouseEventButtons::Primary),
-        PointerButton::Secondary => (MouseEventButton::Secondary, MouseEventButtons::Secondary),
-        PointerButton::Middle => (MouseEventButton::Auxiliary, MouseEventButtons::Auxiliary),
-    }
-}
-
-/// A mouse pointer event at `at`, for `button`, with `buttons` held.
-fn pointer(at: Point, button: MouseEventButton, buttons: MouseEventButtons) -> BlitzPointerEvent {
-    let (x, y) = (at.x.0, at.y.0);
-    BlitzPointerEvent {
-        id: BlitzPointerId::Mouse,
-        is_primary: true,
-        coords: PointerCoords {
-            page_x: x,
-            page_y: y,
-            screen_x: x,
-            screen_y: y,
-            client_x: x,
-            client_y: y,
-        },
-        button,
-        buttons,
-        mods: Modifiers::empty(),
-        details: Default::default(),
-        element: Default::default(),
-        active_pointers: Default::default(),
-    }
-}
-
-/// The DOM key and physical code for a quire key.
-fn keyboard(key: Key) -> (DomKey, Code) {
-    match key {
-        Key::Ctrl => (DomKey::Control, Code::ControlLeft),
-        Key::Shift => (DomKey::Shift, Code::ShiftLeft),
-        Key::Alt => (DomKey::Alt, Code::AltLeft),
-        Key::Super => (DomKey::Meta, Code::MetaLeft),
-        Key::Char(c) => (DomKey::Character(c.to_string()), letter(c)),
-        Key::Space => (DomKey::Character(" ".into()), Code::Space),
-        Key::Enter => (DomKey::Enter, Code::Enter),
-        Key::Escape => (DomKey::Escape, Code::Escape),
-        Key::Tab => (DomKey::Tab, Code::Tab),
-        Key::Backspace => (DomKey::Backspace, Code::Backspace),
-        Key::Up => (DomKey::ArrowUp, Code::ArrowUp),
-        Key::Down => (DomKey::ArrowDown, Code::ArrowDown),
-        Key::Left => (DomKey::ArrowLeft, Code::ArrowLeft),
-        Key::Right => (DomKey::ArrowRight, Code::ArrowRight),
-    }
-}
-
-/// The modifier flag a held quire key sets; any other key sets none.
-fn modifier(key: Key) -> Modifiers {
-    match key {
-        Key::Ctrl => Modifiers::CONTROL,
-        Key::Shift => Modifiers::SHIFT,
-        Key::Alt => Modifiers::ALT,
-        Key::Super => Modifiers::META,
-        _ => Modifiers::empty(),
-    }
-}
-
-/// The physical key a US layout types `c` with, where it is a letter or a digit.
-fn letter(c: char) -> Code {
-    format!("Key{}", c.to_ascii_uppercase())
-        .parse()
-        .or_else(|_| format!("Digit{c}").parse())
-        .unwrap_or(Code::Unidentified)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{keyboard, letter, modifier};
-    use ds::Key;
-    use keyboard_types::Code;
-
-    const LETTERS: &[(char, Code)] = &[
-        ('a', Code::KeyA),
-        ('Z', Code::KeyZ),
-        ('7', Code::Digit7),
-        ('/', Code::Unidentified),
-    ];
-
-    #[test]
-    fn letters_map_to_their_physical_key() {
-        for &(c, code) in LETTERS {
-            assert_eq!(letter(c), code, "{c:?}");
-        }
-    }
-
-    #[test]
-    fn held_keys_are_modifier_flags() {
-        let cases = [
-            (Key::Ctrl, keyboard_types::Modifiers::CONTROL),
-            (Key::Alt, keyboard_types::Modifiers::ALT),
-            (Key::Char('k'), keyboard_types::Modifiers::empty()),
-        ];
-        for (key, want) in cases {
-            assert_eq!(modifier(key), want, "{key:?}");
-        }
-    }
-
-    #[test]
-    fn escape_is_the_named_key() {
-        assert_eq!(
-            keyboard(Key::Escape),
-            (keyboard_types::Key::Escape, Code::Escape)
-        );
-    }
 }
