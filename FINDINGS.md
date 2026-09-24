@@ -961,3 +961,66 @@ gap against quire. Closed on branch `bar-gaps`; headless proofs in
 - Left: G7 (`PopupSize::FitContent`) is shell-host's, not quire's; the materials page's floor
   chips still measure the flat tint recipe, not the gradient over blur (the numbers above are
   that measurement); disabled status items have no visual (04-COMPONENTS O-1).
+
+## Tune wave (2026-09-24)
+
+Three sensible defaults the user asked for now, all configurable, to be tuned later. Branch
+`tune`; `crates/ds/tests/legibility.rs`, `crates/ds/src/material/recipe.rs`,
+`crates/ds/src/css/materials_css.rs`, `crates/ds/src/icon/classify.rs`,
+`crates/ds/src/error.rs`, `design/03-COLOR.md` section 17.2, `design/21-SPACES.md` sections 3,
+`design/22-SETTINGS.md` section 3.3, `design/08-ICONS.md` section 1.5.
+
+- **Over-blur legibility raises.** "Bar gaps" measured six material/scheme pairs short of 4.5:1
+  over a pure black or white backdrop at the wave 1 tint alphas (worst: the light widget, 3.91
+  over black). The smallest further `.02` raises that clear every pair: Bar dark `.66` to
+  `.68`, Dock light `.55` to `.59`, Dock dark `.66` to `.68`, Osd dark `.66` to `.68`, Widget
+  light `.54` to `.60`, Widget dark `.65` to `.67` (the light bar, Popover and light OSD already
+  cleared it and are unchanged). After the raise the worst margin over the full sweep — 8
+  presets x 2 schemes x 5 tinted materials x {black, white} — is the dark Widget, preset 2, over
+  white, at 4.551:1 (measured with a temporary probe test, then discarded); everything else
+  clears with more room. `crates/ds/src/material/recipe.rs`'s `tint()` carries the new values
+  and the wave-1/wave-2 history in comments; the stylesheet golden
+  (`crates/ds/tests/snapshots/stylesheet.css`) and `crates/ds/src/css/materials_css.rs`'s unit
+  test were re-blessed/updated for the dark-widget literal it still hardcodes.
+  `crates/ds/tests/legibility.rs`'s `the_tinted_chrome_over_blur_shortfall_is_the_recorded_one`
+  (which pinned the count of failures, 50, so a retune would be noticed) is now
+  `the_tinted_chrome_holds_its_ink_over_blur`, asserting the failure list is empty — the same
+  shape as the existing blur-off test, so a future retune that drops any material/scheme pair
+  below 4.5 over blur (with or without compositor blur) fails a test instead of only a doc note.
+  Values marked settled with today's date in design/03-COLOR.md section 17.2 (table and prose)
+  and design/03's open decision 11 (the over-blur half of that question is now specified); the
+  intro sentence there is careful to say only these six alphas are settled — the rest of section
+  17.2 stays proposed, unaffected.
+- **OSD takes the Space gradient.** Confirmed rather than built: bar gaps' `FrameTint::of`
+  already returns `Tinted` for `Material::Osd` (coherence across chrome), and
+  `crates/ds/tests/snapshots/root/chrome/osd.html`'s golden and the Materials gallery sheet
+  already show the gradient on the OSD specimen — no code change needed. design/21-SPACES.md
+  section 3's row is now split: OSD reads "yes (settled 2026-09-24)" on its own row; the
+  remaining "no (proposed)" row is notifications, power menu, lock and polkit only.
+  design/22-SETTINGS.md section 3.14's `spaces.overlay_tint` description is updated to match: it
+  no longer covers OSD, since the OSD now always tints rather than following that toggle.
+- **`icons.symbolic_chroma_max` settings key.** Added to design/22-SETTINGS.md section 3.3:
+  `Fraction`, default `40` (0.04), range `0..200` (0.0..0.2), Advanced (file only), citing
+  design/08-ICONS.md section 1.5 and `ds::icon::ChromaLimit`. `ChromaLimit` gains
+  `impl Default` (0.04, the same as `ChromaLimit::PROPOSED`) and
+  `impl TryFrom<f32> for ChromaLimit`, which takes a plain OKLCH chroma value (as the settings
+  key stores it, not thousandths) and refuses anything outside `0.0..=0.2` with the new
+  `DsError::ChromaLimitRange` (a `String`-formatted value, not a bare `f32`, since `DsError`
+  derives `Eq` and floats cannot — `CONVENTIONS.md` section 2). `design/08-ICONS.md` section 1.5
+  and `classify.rs`'s module doc point at the key instead of saying "no key names it yet".
+  **Left for later, deliberately:** `crates/ds-settings` already has an `IconsSettings` domain
+  struct with five sibling keys in this exact shape (`crates/ds-settings/src/settings.rs`), and
+  registering a sixth field there would be the mechanical next step — but that crate is not in
+  this wave's ownership (crates/ds, crates/ds-gallery, design/03, 21, 22, 08, FINDINGS, CONSUMING
+  only), so it is untouched here. Consequence: `cargo test --workspace --all-features` fails one
+  test outside this wave's files, `ds-settings`'s
+  `crates/ds-settings/tests/schema.rs::every_key_in_catalogue_has_a_spec`, because the new doc
+  row in section 3.3 has no matching `KeySpec` yet (it is not on either allow-list the test
+  already carries for exactly this kind of gap, `SILL_OWNED`/`DOC_ALIASES`). Registering
+  `icons.symbolic_chroma_max` on `IconsSettings` (bumping `icons_keys_are_all_advanced`'s count
+  from 5 to 6) and then having `sill`'s dock/tray code read the key and pass it into
+  `classify_with` are both still open, for whoever owns `ds-settings` and `sill` next.
+- Gallery: `materials-{light,dark}-{postmark,green}.png` regenerated with the six new alphas;
+  looked at with Read (light and dark, Postmark) — the OSD, Bar, Dock and Widget specimens read
+  slightly more opaque than before, as expected of a `.02` alpha raise, with no other visible
+  change to layout, radius or shadow.

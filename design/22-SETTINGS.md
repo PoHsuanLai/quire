@@ -137,6 +137,15 @@ per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICO
 | `icons.squircle_detect_iou` | `Fraction` | `900` (0.90) | | `08-ICONS.md#42-icons-that-are-already-squircles-or-rounded-squares-proposed` | proposed |
 | `icons.plate_glyph_colour_policy` | `PlateGlyphPolicy::{Auto,ForceWhite,ForceInk}` | `Auto` (WCAG-driven per family: red/blue/violet -> white, amber/green -> ink) | | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` | proposed — **flagged for review** |
 | `icons.dark_mode_variant` | `IconDarkVariant::{SameAsLight,Adaptive}` | `SameAsLight` | matches freedesktop convention | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` (Open decision 2) | proposed |
+| `icons.symbolic_chroma_max` | `Fraction` | `40` (0.04) | `0..200` (0.0..0.2) | `08-ICONS.md#15-colour` (step 2); `ds::icon::ChromaLimit` | proposed |
+
+`icons.symbolic_chroma_max` names the threshold `ds::icon::classify_with` already takes as a
+`ChromaLimit` (bar gaps, `crates/ds/src/icon/classify.rs`): a tray or app icon whose opaque
+pixels all sit below this OKLCH chroma is drawn as a symbolic mask in the ink colour, rather
+than shown in its own colour. Advanced (file only, section 5); shown on the **Appearance** or
+**Dock** page if a later wave promotes it — both read icons live. `sill` registers the key in
+its own settings crate (`ds-settings`'s `IconsSettings`, `crates/ds-settings/src/settings.rs`);
+that registration is not done yet (see FINDINGS "Tune wave").
 
 ### 3.4 `bar` (sill/settings.toml)
 
@@ -392,7 +401,7 @@ data, not a key.
 | `spaces.material_tint_alpha` | `Percent` | `80` | alias of `appearance.material_tint_alpha` (3.1) kept in this domain's table for discoverability | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
 | `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
 | `spaces.default_card_accent` | `CardAccent::{Postmark,SpaceHue}` | `Postmark` | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
-| `spaces.overlay_tint` | `OverlayTint::{Off,On}` | `Off` | applies uniformly to notifications, OSD, power menu, lock, polkit (doc answers them as one "no") | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
+| `spaces.overlay_tint` | `OverlayTint::{Off,On}` | `Off` | applies to notifications, power menu, lock and polkit (doc answers them as one "no"); the OSD is settled "yes" as of 2026-09-24 and always tints, so this key no longer covers it | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
 | `spaces.mail_frame_policy` | `MailSpacePolicy::{Own,Workspace,OwnFallbackWorkspace}` | `OwnFallbackWorkspace` | poles are `Own` / `Workspace`; doc's actual proposal is the fallback hybrid | `21-SPACES.md#11-open-decisions` item 1 | proposed — **flagged for review** ("mail-spaces policy Own vs Workspace") |
 | `spaces.wallpaper_follows_space` | `WallpaperPolicy::{Independent,PerWorkspace}` | `Independent` | | `21-SPACES.md#8-wallpaper-proposed` | proposed |
 | `spaces.dock_look_source` | `DockLookSource::{OwnOutput,FocusedWindow}` | `OwnOutput` | multi-output only | `21-SPACES.md#11-open-decisions` item 5 | proposed |
