@@ -65,6 +65,8 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (moved with tests; stroke as attributes) |
 | `icon/geometry_shell.rs` | 08-ICONS §1.6 |
+| `icon/external.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`, `IconUrl` (`data:`/`file:` only) |
+| `error.rs` | CONVENTIONS §5: `DsError`, the crate's one error enum (a refused icon URL) |
 | `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 23 `Rule`s: the stylesheet rules (`RawSpacing` the Strict-profile spacing rule), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
@@ -74,9 +76,13 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 `segmented` §3, `toggle` §4, `slider` §5, `text_input` §6, `search_field` §7, `command_pill` §8,
 `kbd` §9, `chip` §10, `avatar` §11, `tabs` §12, `section_header` §13, `count` §14, `spinner` §15,
 `list_row` and `animated_list` §16, `hover_strip` §17, `tooltip` §18, `sidebar_item` §19,
-`menu` and `menu_entry` §20, `popover` §21, `hover_card` §22, `toast` §23, `scrim`, `sheet` and
+`menu` and `menu_entry` §20 (with `menu_lines`, `menu_keys`, `menu_rows`, `menu_match`,
+`menu_tracker` and `menu_panel`: the choices and keyboard as pure tables, the row drawing, the
+fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s share; 13 §13.3.3-13.3.4),
+`popover` §21, `hover_card` §22, `toast` §23, `scrim`, `sheet` and
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `account_tile` §27,
-`provider_mark` §28, `link_pill` §29, `selection_bubble` §30, `send_pill` §31, `space_editor`
+`provider_mark` §28, `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
+`press` (`Press`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35.
 
 `space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,

@@ -4,10 +4,29 @@ use dioxus::prelude::*;
 use ds::components::vocab::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip,
-    ChipVariant, Colour, Count, CountPlace, Focus, HeaderKind, Hex, Icon, IconButton,
-    IconButtonVariant, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader,
-    SegSize, SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
+    ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind, Hex, Icon, IconButton,
+    IconButtonVariant, IconSize, IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize,
+    LabelHue, PersonHue, SearchField, SectionHeader, SegSize, SegmentedControl, Slider, Spinner,
+    SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
+
+/// A symbolic SVG, 16 px.
+fn symbolic() -> IconSource {
+    IconSource::Symbolic(ExternalIcon {
+        url: IconUrl::svg(
+            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='#bebebe'/></svg>",
+        ),
+        size: IconSize::Base,
+    })
+}
+
+/// A PNG pixmap, 22 px (its bytes stand in: the golden is the markup, not the picture).
+fn image() -> IconSource {
+    IconSource::Image(ExternalIcon {
+        url: IconUrl::png(b"\x89PNG"),
+        size: IconSize::Bar,
+    })
+}
 
 /// One component in one state.
 pub struct Case {
@@ -118,6 +137,43 @@ pub const CASES: &[Case] = &[
         component: "icon_button",
         state: "disabled",
         make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
+    },
+    // IconButton with an external icon (quire gap Q6) and an element id (Q8).
+    Case {
+        component: "icon_button",
+        state: "symbolic",
+        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: symbolic(), label: "Input method", onclick: |_| {} } },
+    },
+    Case {
+        component: "icon_button",
+        state: "image",
+        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: image(), label: "Status", onclick: |_| {} } },
+    },
+    Case {
+        component: "icon_button",
+        state: "with-id",
+        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Star, label: "Tray item", id: "tray-0", onclick: |_| {} } },
+    },
+    Case {
+        component: "button",
+        state: "with-id-symbolic",
+        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Updates", icon: symbolic(), id: "updates", onclick: |_| {} } },
+    },
+    // IconView: a glyph, a symbolic icon, an image.
+    Case {
+        component: "icon_view",
+        state: "glyph",
+        make: || rsx! { IconView { source: Icon::Bell.into(), size: IconSize::Bar } },
+    },
+    Case {
+        component: "icon_view",
+        state: "symbolic",
+        make: || rsx! { IconView { source: symbolic() } },
+    },
+    Case {
+        component: "icon_view",
+        state: "image",
+        make: || rsx! { IconView { source: image() } },
     },
     // SegmentedControl: both sizes, each with a different choice pressed.
     Case {

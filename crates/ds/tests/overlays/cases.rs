@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::vocab::{Check, Fraction, Key, Shortcut, Switch};
-use ds::{Align, Button, ButtonVariant};
+use ds::{Align, Availability, Button, ButtonVariant};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
     BubbleMode, CommandPalette, Dismiss, Elevation, Filter, FlagTone, Glyph, HoverCard,
@@ -54,6 +54,7 @@ fn button_rect() -> Rect {
 
 fn item(value: u8, title: &str) -> MenuEntry<u8> {
     MenuEntry::Item {
+        availability: Availability::Enabled,
         value,
         title: title.to_string(),
         detail: None,
@@ -68,6 +69,7 @@ fn snooze() -> Vec<MenuEntry<u8>> {
     vec![
         MenuEntry::Header("Snooze until".to_string()),
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: 1,
             title: "Later today".to_string(),
             detail: Some("18:00".to_string()),
@@ -76,6 +78,7 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             check: None,
         },
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: 2,
             title: "Tomorrow".to_string(),
             detail: Some("08:00".to_string()),
@@ -84,6 +87,7 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             check: Some(Check::Checked),
         },
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: 3,
             title: "Dana Okafor".to_string(),
             detail: None,
@@ -99,6 +103,7 @@ fn snooze() -> Vec<MenuEntry<u8>> {
 fn group_by() -> Vec<MenuEntry<u8>> {
     vec![
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: 1,
             title: "Date".to_string(),
             detail: None,
@@ -107,6 +112,7 @@ fn group_by() -> Vec<MenuEntry<u8>> {
             check: Some(Check::Checked),
         },
         MenuEntry::Item {
+            availability: Availability::Enabled,
             value: 2,
             title: "Sender".to_string(),
             detail: None,
@@ -117,11 +123,41 @@ fn group_by() -> Vec<MenuEntry<u8>> {
     ]
 }
 
+/// A disabled item, a submenu parent and a disabled submenu parent (quire gap Q7).
+fn nested() -> Vec<MenuEntry<u8>> {
+    let off = |value: u8, title: &str| MenuEntry::Item {
+        availability: Availability::Disabled,
+        value,
+        title: title.to_string(),
+        detail: None,
+        tile: None,
+        trail: Trail::None,
+        check: None,
+    };
+    vec![
+        item(1, "Open"),
+        off(2, "Pause"),
+        MenuEntry::Submenu {
+            title: "More".to_string(),
+            tile: Some(Tile::Icon(Icon::Settings)),
+            availability: Availability::Enabled,
+            children: vec![item(10, "About")],
+        },
+        MenuEntry::Submenu {
+            title: "Services".to_string(),
+            tile: None,
+            availability: Availability::Disabled,
+            children: vec![item(20, "Restart")],
+        },
+    ]
+}
+
 fn palette_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
     vec![
         (
             "Top hit".to_string(),
             vec![MenuEntry::Item {
+                availability: Availability::Enabled,
                 value: 1,
                 title: "Re: UIDL stability".to_string(),
                 detail: Some("Treat UIDL as a hint, not an identity".to_string()),
@@ -137,6 +173,7 @@ fn palette_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
         (
             "Actions".to_string(),
             vec![MenuEntry::Item {
+                availability: Availability::Enabled,
                 value: 2,
                 title: "Sync now".to_string(),
                 detail: None,
@@ -360,6 +397,18 @@ pub const CASES: &[Case] = &[
         component: "menu",
         state: "empty",
         make: || rsx! { Menu::<u8> { kind: MenuKind::Slim, anchor: Anchor::Rect(button_rect()), entries: Vec::new(), onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "disabled-and-submenu",
+        make: || rsx! { Menu { kind: MenuKind::Context, anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), entries: nested(), onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "dropdown-disabled-and-submenu",
+        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: nested(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     // Popover: one per elevation and dismissal.

@@ -2,10 +2,23 @@
 
 /// The CSS files that style a component's markup: its own, then the components it renders.
 pub const STYLES: &[(&str, &[&str])] = &[
-    ("button", &[include_str!("../../src/components/button.css")]),
+    (
+        "button",
+        &[
+            include_str!("../../src/components/button.css"),
+            include_str!("../../src/components/icon_view.css"),
+        ],
+    ),
     (
         "icon_button",
-        &[include_str!("../../src/components/icon_button.css")],
+        &[
+            include_str!("../../src/components/icon_button.css"),
+            include_str!("../../src/components/icon_view.css"),
+        ],
+    ),
+    (
+        "icon_view",
+        &[include_str!("../../src/components/icon_view.css")],
     ),
     (
         "segmented",

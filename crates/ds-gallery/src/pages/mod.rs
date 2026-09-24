@@ -1,6 +1,7 @@
 //! The pages, one file each, and the pieces they share.
 
 pub mod controls;
+pub mod external_icons;
 pub mod gaps;
 pub mod lists;
 pub mod materials;

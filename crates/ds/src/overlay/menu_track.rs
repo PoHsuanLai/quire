@@ -22,4 +22,6 @@ pub use types::{
 };
 
 #[cfg(test)]
+mod keyboard_tests;
+#[cfg(test)]
 mod tests;

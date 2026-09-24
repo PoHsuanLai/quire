@@ -8,10 +8,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, AnimatedList, Appearance, Button, ButtonVariant, Count, Ds, Emphasis, Exit,
-    HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Key, ListPresence, ListRow, Material,
-    Menu, MenuEntry, MenuKind, Point, PulseKey, Px, RowPitch, Selection, Switch, Toggle, Trail,
-    use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Count, Ds,
+    Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Key, ListPresence,
+    ListRow, Material, Menu, MenuEntry, MenuKind, Point, PulseKey, Px, RowPitch, Selection, Switch,
+    Toggle, Trail, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
     DotIndex, Focus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput, Theme,
@@ -260,6 +260,7 @@ fn MenuDemo() -> Element {
         .into_iter()
         .zip(0u8..)
         .map(|(title, value)| MenuEntry::Item {
+            availability: Availability::Enabled,
             value,
             title: title.into(),
             detail: None,
