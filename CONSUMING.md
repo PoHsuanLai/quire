@@ -119,7 +119,8 @@ value.
 
 `ds_settings::use_environment(app: AppName) -> ReadSignal<Environment>` (`ds-settings/src/
 environment.rs`) is the one hook that gives you a live `Environment { settings: AppearanceFile,
-system: SystemPrefs }`: it loads `appearance.toml` (importing mailo's `appearance.json` once,
+system: SystemPrefs }`: it loads `appearance.toml` (importing mailo's `appearance.json` once
+when the app's own `appearance.toml` does not exist yet, for every app, mailo included;
 design/22-SETTINGS.md section 2 "Mailo migration"), watches the directory for edits (30 ms
 debounce), reads the freedesktop settings portal, and watches it for changes — merging both into
 one signal.
@@ -802,6 +803,40 @@ What to opt into:
   `WorkspacePills { label, WorkspacePill { label, current, onclick } }` for the workspace
   indicator; `RunningDot {}` in a tile and `DockFloor {}` in the dock root;
   `IconView { plate: Some(PlateFamily::Blue), .. }` for a plate with depth.
+
+### The mailo gaps (2026-09-24): the window frame, status inks, person colours, two glyphs
+
+What you get with no change of your own:
+
+- **The window frame paints over its root.** A `Material::Window` root stamps
+  `data-frame="opaque"` and is its own stacking context (`position:relative`, `--z-raise`), so its
+  two `.ds-layer`s and `.ds-grain` paint over the root's own gradient background instead of
+  beneath it: a `look` change cross-fades over `--t-scene`, and the Space's grain shows. Neither
+  layer takes the pointer. If a pixel test of yours assumed a flat window ground, give its look
+  `Grain(0)`.
+- **Dark `--danger-ink` is dark** (`#1A0B08`, 6.06:1 on `#E0705A`; white was 3.17:1).
+
+What to use:
+
+- **Status inks.** `--ok-ink`, `--warn-ink`, `--danger-ink` (`ColourToken::{OkInk, WarnInk,
+  DangerInk}`): text on `--ok`, `--warn`, `--danger`, each at least 4.5:1 in both schemes, as
+  `--accent-ink` is on `--accent`.
+
+#### Person colours
+
+A person or account colour never needs a hex constant of yours:
+
+- A person with no stored colour: `ds::person_hue(address) -> PersonHue`, design/03 section 13's
+  hash (`h = (h x 31 + code) mod 360` over UTF-16 code units, drawn `hsl(h, 38%, 42%)`). Paint it
+  with `Avatar { face: AvatarFace { tone: AvatarTone::Person(hue), .. } }`, or pass
+  `hue.colour()` where a component takes a `Colour`.
+- A stored colour, handed out in order: `ds::PersonSwatch` (eight, `--c-person-1` to
+  `--c-person-8`, the same in both schemes: identity is data, not theme).
+  `PersonSwatch::nth(i)` wraps, `.colour()` is the `Colour` for `AvatarTone::Account`, `.var()`
+  the custom property for your own CSS (`background:var(--c-person-3)` lints clean).
+
+- **Glyphs.** `Icon::Printer`, `Icon::FolderInput` (Lucide `printer`, `folder-input`), listed in
+  `Icon::ACTIONS`.
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

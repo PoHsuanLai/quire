@@ -77,7 +77,8 @@ pub enum ColourToken {
     DangerWash,
     /// `--accent-ring`: `--accent` at 35%, the destination ring and the input focus ring.
     AccentRing,
-    /// `--danger-ink`: text on `--danger` (the lying link pill's `#fff`, O-3).
+    /// `--danger-ink`: text on `--danger` (the lying link pill's `#fff` in light, O-3; a dark
+    /// ink in dark, where white on the lifted `--danger` measured 3.17:1).
     DangerInk,
     /// `--mark-ground`: the white chip under a provider mark (O-3).
     MarkGround,
@@ -88,11 +89,15 @@ pub enum ColourToken {
     /// tones (design/04-COMPONENTS.md O-3's `#fff`/`#FFFFFF` list, "fav text"; proposed:
     /// white in either scheme, since the hue itself is always mid-toned enough for it).
     OnHue,
+    /// `--ok-ink`: text on `--ok` (a status pill), clearing 4.5:1 in either scheme.
+    OkInk,
+    /// `--warn-ink`: text on `--warn`, clearing 4.5:1 in either scheme.
+    WarnInk,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 26] = [
+    pub const ALL: [ColourToken; 28] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -119,6 +124,8 @@ impl ColourToken {
         ColourToken::MarkGround,
         ColourToken::HandleRing,
         ColourToken::OnHue,
+        ColourToken::OkInk,
+        ColourToken::WarnInk,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -150,6 +157,8 @@ impl ColourToken {
             ColourToken::MarkGround => "--mark-ground",
             ColourToken::HandleRing => "--handle-ring",
             ColourToken::OnHue => "--on-hue",
+            ColourToken::OkInk => "--ok-ink",
+            ColourToken::WarnInk => "--warn-ink",
         })
     }
 
@@ -195,9 +204,14 @@ impl ColourToken {
             ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),
             ColourToken::WarnWash => (solid(0xEDE6D9), solid(0x333123)),
             ColourToken::DangerWash => (alpha(0xB03A2A, 160), alpha(0xE0705A, 160)),
-            // `#fff` on the lying link pill and the provider chip in both schemes (`S:436`,
-            // `S:552`).
-            ColourToken::DangerInk => (WHITE, WHITE),
+            // `#fff` on the lying link pill in light (`S:436`); in dark `--danger` is lifted to
+            // `#E0705A`, where white measures 3.17:1, so the ink turns dark (mailo's `#1A0B08`,
+            // 6.06:1). The legibility test gates every status pair in both schemes.
+            ColourToken::DangerInk => (WHITE, solid(0x1A0B08)),
+            // White on `--ok` in light (5.21:1); a dark green-black on the lifted dark `--ok`.
+            ColourToken::OkInk => (WHITE, solid(0x0B1A12)),
+            // White on light `--warn` is 4.03:1, under the gate, so both schemes take a dark ink.
+            ColourToken::WarnInk => (solid(0x140D03), solid(0x140D03)),
             ColourToken::MarkGround => (WHITE, WHITE),
             // Proposed (O-3): black at .25 on light, white at .25 on dark.
             ColourToken::HandleRing => (alpha(0x000000, 250), alpha(0xFFFFFF, 250)),

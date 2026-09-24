@@ -80,10 +80,16 @@ fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
 
 // ---- 2 and 3. The toast: nothing when empty, and a legible tab ----------------------------
 
+/// No grain: since the window root paints its grain (FINDINGS "mailo gaps", gap 1) the default
+/// look's 35 is visible noise, and this test asks only that no pill is drawn on a flat ground.
 #[allow(non_snake_case)]
 fn EmptyApp() -> Element {
+    let look = ds::SpaceLook {
+        grain: ds::Grain(0),
+        ..ds::SpaceLook::default()
+    };
     rsx! {
-        Root {
+        Ds { appearance: Appearance::default(), material: Material::Window, look,
             div { style: "height:340px" }
         }
     }
