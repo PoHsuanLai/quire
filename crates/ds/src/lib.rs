@@ -44,15 +44,16 @@ pub use motion::{
     use_roster,
 };
 pub use overlay::{
-    Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, LayerId, LayerStack, OverlayHost,
-    OverlayId, Overlays, ToastHub, ToastState, UndoToken, use_hover_hub, use_overlays,
-    use_toast_hub,
+    Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
+    MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
+    MenuTrackEvent, OverlayHost, OverlayId, Overlays, ToastHub, ToastState, UndoToken,
+    use_hover_hub, use_overlays, use_toast_hub,
 };
 pub use root::{Ds, Env, HostModality, Inject, InputModality, Surface, use_env};
 pub use space::{
     Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
-    POST_LIGHT, PRESETS, Palette, Preset, SpaceLook, Verdict, card, default_look, derive, gradient,
-    ratio, readout, swatch,
+    POST_LIGHT, PRESETS, Palette, Preset, SpaceDefaults, SpaceLook, SpaceStore, Verdict, Workspace,
+    WorkspaceId, WorkspaceIndex, card, default_look, derive, gradient, ratio, readout, swatch,
 };
 pub use text::clip_chars;
 pub use time::{FRAME_SLACK, sleep};

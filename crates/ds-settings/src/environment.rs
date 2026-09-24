@@ -1,8 +1,8 @@
 //! Everything a surface resolves its look from, as one live signal: the settings file and the
 //! desktop's preferences, both watched.
 
+use crate::appearance_file as file;
 use crate::dirs::{self, AppName};
-use crate::file;
 use crate::portal::{self, SystemPrefsWatch};
 use crate::settings::AppearanceFile;
 use crate::watch::{self, AppearanceWatch};

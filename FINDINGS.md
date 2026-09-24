@@ -670,3 +670,60 @@ pre-fix tree (checked by restoring the old sheets) and passes now.
 - The gallery's "What quire does not draw yet" list (`ds-gallery/src/pages/gaps.rs`) still
   names the TextInput, toast, tab, SidebarItem, Space editor and LinkPill items; it is outside
   this branch and should drop them.
+
+## Sill gaps (2026-09-24)
+
+sill's interface freeze reported five gaps against quire (sill FINDINGS Q1-Q5). All five are
+closed on branch `sill-gaps`; sill adopts the APIs in a later wave and can then delete its
+copies (`bar/menu_track/*`, `sill_services::curve`, most of `sill-settings/src/{file,watch}.rs`).
+
+- **Q1 Menu tracking.** `ds::MenuTrack<K>` (`crates/ds/src/overlay/menu_track.rs` and
+  `menu_track/`) is sill's `bar/menu_track` machine with sill's tests. Changes in the port:
+  - It is generic over the caller's menu key `K`, not a `MenuId(u32)`.
+  - The timings live in the machine (`MenuTiming`, built from `menus.*`), so the signature is
+    `step(self, event, now)`, the same shape as `HoverIntent`.
+  - Time is `std::time::Instant`, not sill's `Stamp`, and points are `ds::Point` (f32).
+  - The session is one struct (`Session<K>`), not seven loose fields passed to every helper.
+  - Names that would collide at the crate root were renamed: `Anim` became `MenuAnim`
+    (`Pop`/`Fade`), `Side` became `MenuDirection`, `Pick` became `Pickable`, `Sub` became
+    `Submenu`, `Guard` became `SafeTriangle`.
+
+  One deviation from the brief: `step` returns `Vec<MenuTrackEffect<K>>`, not a single effect.
+  One event can need several effects in order: `Close` then `Pick`, or `Highlight` then
+  `CloseSub` then `RequestTick`. A single effect would need a combined variant for every
+  pair. The safe triangle's hysteresis is design/13 §13.5's rule: the corners are inflated
+  4 px and the apex follows the pointer.
+- **Q2 Curves.** `CubicBezier::at(Fraction) -> Fraction`, `Easing::curve()` and `Easing::at`
+  (`crates/ds/src/motion/curve.rs`). It is integer only (i128). The curve parameter is found by
+  bisection on x in 1/2^24 steps, then y is read there and rounded to the thousandth. Plain
+  bisection replaced Newton: with exact integers it is deterministic, and it needs no guard
+  against a zero slope. The test table was computed with exact rational bisection
+  (Python `fractions`).
+- **Q3 Spaces store.** `ds::SpaceStore { version, by_id, by_index: Vec<Option<SpaceLook>>,
+  extra }` with `look_for`, `look_for_workspace` and `with_look`
+  (`crates/ds/src/space/store.rs`). It follows design/21 §10's schema, which has both `by_id`
+  and `by_index`. `SpaceDefaults` carries the two settings keys the preset fallback needs.
+  A malformed `by_index` entry costs only its own position. The I/O is `ds_settings::SPACES`
+  (`crates/ds-settings/src/spaces.rs`).
+- **Q4 Generic settings I/O.** `ds_settings::file::{FileName, Format, SettingsFile,
+  Settings<T>, load, save}` and `watch::{FileWatch<T>, watch_file}`. `appearance.toml` is
+  `APPEARANCE` and `spaces.json` is `SPACES`. JSON gets the same key-by-key lenient reader
+  (`lenient_json`). The old names still mean `appearance.toml`: `ds_settings::{load, save,
+  watch, load_or_import, FILE_NAME, AppearanceWatch}`, and `AppearanceWatch` is now
+  `FileWatch<AppearanceFile>`. The appearance-specific code moved to `appearance_file.rs`, and
+  `file::load_or_import` is re-exported from there. `SettingsError` gained `EncodeJson`.
+- **Q5 Schema derive.** Three changes:
+  - Text is recognised by type (`String`, `PathBuf`, `Cow<str>`, any path) or by
+    `#[settings(text)]`. `text` together with `range` is an error.
+  - A one-variant enum is `KeyKind::Fixed { variant }`, drawn as the new `Widget::Readout`.
+    Zero variants is still an error. sill can now drop `PanelMaterial::Popover` and
+    `SpaceLookLookup::ByIndexOnly` if it wants.
+  - A known numeric type (the primitives and ds-settings' unit newtypes) without `range` is a
+    compile error that starts `MissingRange { field: <name> }`. A caller's own numeric newtype
+    cannot be recognised from tokens alone. For that case, `SchemaVariants` now carries a
+    `#[diagnostic::on_unimplemented]` message that names the fix (range, text, or the derive),
+    so the error no longer just names the trait.
+
+  There is no `trybuild` in the lockfile. The refusals are unit-tested on the expansion itself
+  (`gen_struct.rs` and `gen_enum.rs` tests), and the accepted shapes are tested through the
+  real derive in `crates/ds-settings/tests/derive.rs`.

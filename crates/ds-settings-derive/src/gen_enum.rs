@@ -22,10 +22,11 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataEnum) -> syn::Res
         }
         words.push(to_snake_case(&variant.ident.to_string()));
     }
-    if words.len() < 2 {
+    if words.is_empty() {
         return Err(syn::Error::new(
             input.span(),
-            "#[derive(SettingsSchema)] on an enum needs at least two variants to pick a widget",
+            "#[derive(SettingsSchema)] on an enum needs at least one variant: a key with no \
+             value cannot be stored",
         ));
     }
     Ok(quote! {
@@ -35,4 +36,41 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataEnum) -> syn::Res
             }
         }
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::expand;
+
+    fn expanded(source: &str) -> syn::Result<proc_macro2::TokenStream> {
+        let input: syn::DeriveInput =
+            syn::parse_str(source).unwrap_or_else(|e| panic!("{source}: {e}"));
+        let syn::Data::Enum(data) = &input.data else {
+            panic!("{source}: not an enum");
+        };
+        expand(&input, data)
+    }
+
+    #[test]
+    fn one_variant_is_enough() {
+        let text = expanded("enum Material { Sheet }")
+            .unwrap_or_else(|e| panic!("{e}"))
+            .to_string();
+        assert!(text.contains("\"sheet\""), "{text}");
+    }
+
+    #[test]
+    fn no_variant_or_a_variant_with_data_is_an_error() {
+        const CASES: &[(&str, &str)] = &[
+            ("enum Nothing {}", "at least one variant"),
+            ("enum Carries { A(u8), B }", "fieldless variants"),
+        ];
+        for (source, want) in CASES {
+            let err = expanded(source).err().map(|e| e.to_string());
+            assert!(
+                err.as_deref().is_some_and(|e| e.contains(want)),
+                "{source}: {err:?}"
+            );
+        }
+    }
 }
