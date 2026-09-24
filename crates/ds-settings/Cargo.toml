@@ -23,3 +23,7 @@ toml = { workspace = true }
 
 [lints]
 workspace = true
+
+[features]
+# Drive zbus on the tokio runtime the shell already runs (see the workspace zbus note).
+tokio = ["zbus/tokio"]

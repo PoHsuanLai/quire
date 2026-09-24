@@ -76,7 +76,11 @@ serde_json = "1"
 futures-timer = "3"
 cssparser = "0.37"
 notify = "8.2"
-zbus = { version = "5.19", default-features = false, features = ["tokio"] }
+# zbus with its default async-io backend: a library must not pick the executor for its
+# consumers (mailo's blocking keyring calls under a tokio runtime panicked when ds-settings
+# forced zbus/tokio through feature unification). Shells that run zbus under tokio enable
+# `ds-settings/tokio` instead.
+zbus = { version = "5.19" }
 dirs = "6"
 toml = "1"
 # SSR renders for component goldens and markup lint (dev-dependency in consumers).
