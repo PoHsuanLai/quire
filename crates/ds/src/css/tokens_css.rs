@@ -11,7 +11,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    PersonSwatch, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
+    PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
 };
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
@@ -92,11 +92,13 @@ fn fixed_tokens() -> Vec<String> {
         .into_iter()
         .map(|layer| declaration(layer.var(), &layer.z().to_string()));
     // The tuned tokens: the shell type scale and the dock's geometry, each read from the input
-    // a consumer writes (`ShellMetrics`, `DockMetrics`) with its settings key's default behind.
+    // a consumer writes (`ShellMetrics`, `DockMetrics`) with its settings key's default behind,
+    // and the pixel tokens, from the scale the root writes with the 1x value behind.
     let tuned = SHELL_TOKENS
         .into_iter()
         .chain(DOCK_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
+        .chain(PixelToken::ALL.map(PixelToken::tuned))
         .map(|token| token.declaration());
     // Identity is data, not theme: the person swatches are the same in both schemes.
     let people = PersonSwatch::ALL

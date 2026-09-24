@@ -9,5 +9,5 @@
   color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
 .ds-bubble-button:hover{ background:var(--surface-2); color:var(--ink); }
 .ds-bubble-button[*|aria-pressed=true]{ color:var(--accent); }
-.ds-bubble-sep{ width:1px; height:18px; background:var(--line-soft); margin:0 var(--s-3); }
+.ds-bubble-sep{ width:var(--hair); height:18px; background:var(--line-soft); margin:0 var(--s-3); }
 .ds-bubble .ds-input{ border:0; outline:none; background:transparent; font-size:var(--fs-meta); width:220px; padding:0 var(--s-8); color:var(--ink); }

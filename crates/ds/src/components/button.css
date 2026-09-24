@@ -15,13 +15,13 @@
 .ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
 .ds-button[*|data-variant=primary]:active,
 .ds-button[*|data-variant=secondary]:active{ transform:translateY(1px) scale(var(--squish)); }
-.ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line); }
+.ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
 
 /* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
 .ds-button[*|data-variant=mini],
 .ds-button[*|data-variant=danger]{
   display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
-  border:1px solid var(--line); background:var(--surface-2); cursor:pointer;
+  border:var(--hair) solid var(--line); background:var(--surface-2); cursor:pointer;
   border-radius:var(--r-btn); padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }

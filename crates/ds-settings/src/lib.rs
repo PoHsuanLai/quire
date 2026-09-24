@@ -42,7 +42,8 @@ pub use portal::{
     scheme_from_portal,
 };
 pub use settings::{
-    AppearanceFile, AppearanceSettings, IconDarkVariant, IconsSettings, PlateGlyphPolicy,
+    AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
+    PlateGlyphPolicy,
 };
 pub use spaces::{SPACES, SpacesWatch};
 pub use units::{Count, Fraction, Ms, Percent, Px, Scalar, Units};

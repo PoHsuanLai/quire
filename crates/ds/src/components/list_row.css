@@ -20,7 +20,7 @@
   --i:0; --d:0;
   position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
   padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
-  border:1px solid transparent; cursor:pointer; user-select:none; list-style:none;
+  border:var(--hair) solid transparent; cursor:pointer; user-select:none; list-style:none;
   transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out),
              background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
   animation:none;

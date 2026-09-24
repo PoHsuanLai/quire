@@ -5,7 +5,7 @@
 
 .ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:pointer; }
 .ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
-.ds-menu-tile{ width:34px; height:34px; border-radius:var(--r-menu-item); border:1px solid var(--line); background:var(--surface); display:grid; place-items:center;
+.ds-menu-tile{ width:34px; height:34px; border-radius:var(--r-menu-item); border:var(--hair) solid var(--line); background:var(--surface); display:grid; place-items:center;
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
 .ds-menu-tile[*|data-tile=none]{ border:0; background:transparent; }

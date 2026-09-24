@@ -21,11 +21,17 @@
 //! (`--m-radius` inline): the dock's pill is its root, and its radius is `dock.pill_radius_px`
 //! (sill FINDINGS Q15). A `stack` writes the material stack's settings (`MaterialStack`: the
 //! highlight, hairline, shadow strength and vibrancy keys) the same way.
+//!
+//! The root also writes the pixel tokens' inputs for its device scale (`scale`, else the host's
+//! `HostScale`, else 1x; `tokens/pixel.rs`), so every hairline is whole device pixels at 1.25,
+//! 1.5 or 1.75 (design/01-LAYOUT.md section 2.1). At 1x it writes nothing.
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
+use super::scale::use_root_scale;
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
+use crate::geometry::Scale;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::material::{BlurState, Material, MaterialStack};
 use crate::overlay::host::{OverlayHost, use_overlays_provider};
@@ -33,8 +39,8 @@ use crate::overlay::hover_hub::{HoverWarmth, use_hover_hub_provider};
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
 use crate::space::{FrameVars, SpaceLook};
-use crate::tokens::Corner;
 use crate::tokens::hex::Alpha;
+use crate::tokens::{Corner, PixelToken};
 use dioxus::prelude::*;
 
 /// How the stylesheet reaches the document.
@@ -62,8 +68,10 @@ pub fn Ds(
     #[props(default)] frame: Option<FrameTint>,
     #[props(default)] radius: Option<Corner>,
     #[props(default)] stack: Option<MaterialStack>,
+    #[props(default)] scale: Option<Scale>,
     children: Element,
 ) -> Element {
+    let scale = use_root_scale(scale);
     let chrome = chrome.unwrap_or(RootChrome::of(material));
     let frame_tint = frame.unwrap_or(FrameTint::of(material, chrome));
     let ground = ground.unwrap_or(Ground::of(material));
@@ -86,8 +94,9 @@ pub fn Ds(
     let tint = tint_alpha.unwrap_or(DEFAULT_TINT_ALPHA);
     let corner = radius.map(super::surface::radius_style).unwrap_or_default();
     let stack = stack.map(|stack| stack.style_attr()).unwrap_or_default();
+    let pixels = PixelToken::style_attr(scale);
     let style = format!(
-        "{}--m-tint-alpha:{};{corner}{stack}",
+        "{}--m-tint-alpha:{};{corner}{stack}{pixels}",
         frame.style_attr(),
         tint.css()
     );

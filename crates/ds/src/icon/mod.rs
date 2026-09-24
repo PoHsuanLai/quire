@@ -25,6 +25,7 @@ mod geometry_shell;
 pub mod plate;
 pub mod render;
 pub mod shape;
+pub mod stroke;
 #[cfg(test)]
 mod tests;
 

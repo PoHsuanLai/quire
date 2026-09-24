@@ -16,7 +16,7 @@
 .ds-overlay[*|data-layer=bubble]{ z-index:var(--z-bubble); }
 .ds-overlay-catch{ position:absolute; inset:0; pointer-events:auto; }
 
-.ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:1px solid var(--line);
+.ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-menu); box-shadow:var(--shadow-pop); }
 .ds-popover[*|data-elevation=bubble]{ border-radius:var(--r-field); box-shadow:var(--shadow-bubble); }
 .ds-popover[*|data-elevation=sheet]{ border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); }
