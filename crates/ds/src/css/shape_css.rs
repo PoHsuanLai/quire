@@ -175,7 +175,7 @@ fn plate_css() -> String {
             property("--r-plate", "22.37%"),
             property(
                 "--plate-inner",
-                "inset 0 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(0,0,0,.08)",
+                "inset 0 var(--hair) 0 rgba(255,255,255,.35),inset 0 0 0 var(--hair) rgba(0,0,0,.08)",
             ),
             property(
                 "--plate-drop",

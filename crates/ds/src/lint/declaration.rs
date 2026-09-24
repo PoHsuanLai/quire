@@ -93,6 +93,7 @@ pub fn offences(
     let strict = profile == Profile::Strict;
     if strict && !is_custom_property {
         raw_geometry(selector, &property, decl, &mut out);
+        super::hairline::raw_hairline(selector, &property, decl, &mut out);
     }
 
     let duration_property = DURATION_PROPERTIES.contains(&property.as_str());
@@ -288,7 +289,13 @@ fn raw_spacing(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
     }
 }
 
-fn push(out: &mut Vec<Offence>, rule: Rule, at: &Located, selector: &str, excerpt: &str) {
+pub(super) fn push(
+    out: &mut Vec<Offence>,
+    rule: Rule,
+    at: &Located,
+    selector: &str,
+    excerpt: &str,
+) {
     let text = if selector.is_empty() {
         excerpt.to_owned()
     } else {

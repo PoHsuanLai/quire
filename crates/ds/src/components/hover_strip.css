@@ -13,7 +13,7 @@
 .ds-strip{
   --j:0;
   position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:var(--s-3); padding:var(--s-3);
-  border-radius:var(--r-pill); background:var(--raise); border:1px solid var(--line); box-shadow:var(--shadow-2);
+  border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out);
 }
 .ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }

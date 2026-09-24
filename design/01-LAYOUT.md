@@ -40,6 +40,31 @@ exactly for a quire component: `--s-1-5` (1.5, the chip and the image provider m
 Measures: reading and writing text is capped at `66ch` (`S:462`, `S:608`, `S:728`); focus-mode
 composer at `70ch` (`S:574`).
 
+### 2.1 Pixel snapping (settled 2026-09-25)
+
+**The rule: every line is a whole number of device pixels, at every scale.** A panel runs at
+1.25, 1.5 or 1.75 as readily as at 1 or 2 (a 27 inch 4K panel at 1.5 is about Apple's 109
+points per inch). macOS renders a fractional scale at 2x and downsamples; we render at the true
+scale, so a `1px` line would be 1.25-1.75 device pixels and blur into two half-ink rows. So:
+
+- Line widths come from the pixel tokens (`ds::PixelToken`), which the root writes for its
+  device scale (`Ds { scale }`, else the host's): `--hair` for a 1 px line (a border, a
+  separator, a rule, a 1 px ring or inset highlight), one device pixel at 1.25-1.75 and 1 px at 1x
+  and 2x; `--hairline` for the material stack's .5 px hairline, one device pixel everywhere but
+  1x; `--px` for exactly one device pixel; `--ring` (3 px) and `--focus-ring` (2.5 px) rounded to
+  whole device pixels; `--dpr` the scale itself. At 1x every token is its design value, so
+  nothing drawn at 1x changes.
+- Positions are snapped by the host: Blitz rounds boxes to whole logical pixels, which at a
+  fractional scale starts a box half-way through a device pixel. `ds_native::snap_to_device`
+  re-rounds the laid-out document on the device grid after every resolve (ds-native's snapshots
+  and harness do; a host that resolves its own documents calls it).
+- A glyph's stroke is an even number of device pixels at a fractional scale (08-ICONS §1.4.1).
+- No consumer stylesheet writes a literal `1px`/`.5px` line width: `Rule::RawHairline`.
+
+What stays unsnapped is recorded in FINDINGS "Pixel snapping": text, a transform that is not a
+pure translation (a motion part-way through), a glyph's diagonals and curves, and the portable
+`ds_native::launch` window, which has no hook between Blitz's resolve and its paint.
+
 ## 3. The window
 
 The window is a coloured frame with the sidebar on the colour and a card inset 8 px on three

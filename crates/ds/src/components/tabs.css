@@ -3,7 +3,7 @@
    place; there is no sliding underline. Attribute selectors carry `*|` (spike S2).
    Active and disabled (O-1) are not specified. */
 
-.ds-tabs{ display:flex; gap:var(--s-6); border-bottom:1px solid var(--line); }
+.ds-tabs{ display:flex; gap:var(--s-6); border-bottom:var(--hair) solid var(--line); }
 .ds-tab{
   position:relative; border:0; background:transparent; cursor:pointer;
   padding:var(--s-10) var(--s-14) var(--s-12); font-family:var(--font-display); font-weight:700; font-size:var(--fs-title);

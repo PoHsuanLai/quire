@@ -1,7 +1,8 @@
 //! One quire document with no window: the pieces `Harness` and `snapshot` share. It gets the
 //! shared font context, the `data:`/`file:` net provider, sequential styling (deterministic, and
-//! no rayon pool per test), the host's input modality, rect read and focus write as root context, and a waker
-//! to sleep on.
+//! no rayon pool per test), the host's input modality, device scale, rect read and focus write as
+//! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
+//! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
 use crate::error::NativeError;
 use crate::fonts::font_context;
@@ -17,7 +18,7 @@ use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, Viewport as BlitzViewport};
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
-use ds::{HostModality, InputModality};
+use ds::{HostModality, HostScale, InputModality, Scale};
 use peniko::kurbo::{Affine, Rect};
 use peniko::{Color, Fill};
 use std::sync::Arc;
@@ -64,6 +65,10 @@ impl Headless {
         let modality =
             vdom.in_runtime(|| Signal::new_in_scope(InputModality::default(), ScopeId::ROOT));
         vdom.provide_root_context(HostModality(modality));
+        let scale = vdom.in_runtime(|| {
+            Signal::new_in_scope(Scale::from_percent(viewport.scale_percent), ScopeId::ROOT)
+        });
+        vdom.provide_root_context(HostScale(scale));
         vdom.provide_root_context(crate::measure::MEASURE);
         vdom.provide_root_context(crate::focus::FOCUS);
         let mut doc = DioxusDocument::new(vdom, config);
@@ -112,7 +117,10 @@ impl Headless {
             }
             let restyled = scheme::follow_root(&mut self.doc.inner.borrow_mut()).is_some();
             let fetched = self.wakeup.fetched();
-            self.doc.inner.borrow_mut().resolve(at.as_secs_f64());
+            let mut inner = self.doc.inner.borrow_mut();
+            inner.resolve(at.as_secs_f64());
+            crate::snap::snap_to_device(&mut inner);
+            drop(inner);
             let landed = self.wakeup.fetched() != fetched;
             if !(rendered || restyled || landed) {
                 return;
