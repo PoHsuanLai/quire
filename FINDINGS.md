@@ -1482,3 +1482,57 @@ What mailo changes:
   `use_environment(AppName::MAILO)`; it may stay (it is idempotent) or go.
 - Keep `Space::motion` and feed it into the `Ds` root's `appearance.motion`; keep `KEEP_FOCUS`
   until Phase B.
+
+## mailo gaps 2 (lists and overlays) (2026-09-25)
+
+mailo's second migration wave moves its rows, strip, command panel, menus and hover cards onto
+quire and reported what they could not express. Branch `mailo-gaps-2a`. Every change is
+additive: a prop defaulting to the old behaviour, a new variant or a new type; the existing
+goldens did not change. Proofs: `crates/ds-native/tests/mailo_lists.rs`, `mailo_overlays.rs`
+(Harness), the goldens added under `tests/snapshots/lists/` and `tests/snapshots/overlays/`
+(`crates/ds/tests/lists/mailo.rs`, `overlays/mailo.rs`), unit tests beside each new module.
+
+1. **Rows and the strip** (`ListRow`, `HoverStrip`).
+   - `subject` and `snippet` are `ds::Text` (`text_runs.rs`): `Plain(String)` or `Runs(Vec<Run>)`,
+     `Run { text, tone: RunTone::{Plain, Mark, Strong, Faint} }`, drawn as `mark.ds-mark` (the
+     soft accent ground mailo's `.row mark.hit` had) and `span.ds-run[data-tone]`; a plain run
+     is a bare text node, so a plain `Text` renders the markup a `String` did (every existing
+     golden is byte-identical). `subject` is `#[props(into)]` and `Text: From<String>, From<&str>,
+     From<&String>`; `format!` in `rsx!` is a `String`. `snippet: Option<Text>` takes a string,
+     `None` or a `Text` through two `SuperFrom` impls under quire's own marker (as `Press` does
+     for `EventHandler<()>`). **Not** `Some(String)`: accepting both `Option<String>` and
+     `Option<Text>` would leave a bare `None` uninferable, and `None` is the commoner call
+     (every in-repo caller writes either a `String` or `None`). The one doc example that wrote
+     `Some("…".to_owned())` now writes the string. A `Display` value that is not a string no
+     longer converts for `subject` (none exists in this repo or mailo).
+   - `list_row.rs` passed 300 lines with the new props, so the star (`row_star.rs`) and the
+     click snapshot (`row_click.rs`) moved out, unchanged; the hooks are `row_hooks.rs`.
+   - `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>`, the event
+     itself, so the caller reads the point as mailo's `corner(&event)` does) on the name
+     (`on_sender`) and the time (`on_time`); `onpointerenter`, `onpointerleave` and
+     `onpointerdown` on the row. The brief named only the row's enter and press; the thread
+     card closes on the row's leave, so the leave is there too. Listeners are always attached
+     and call nothing without a handler: SSR writes no listener, so the markup is unchanged.
+     Proof: the pointer over the name, the subject, the time and away logs
+     `row-enter,sender-enter,sender-leave,time-enter,time-leave`; a press logs `row-down`. The
+     strip, when revealed, covers the time (absolute, right 8): the test's row has none.
+   - `aria_label: Option<String>` on the `li`.
+   - `HoverStrip { shown: Option<Shown> }` (the tooltip's `Shown`): `data-shown=visible` shows
+     the strip and pops its buttons exactly as `.ds-row:hover` does; `hidden` holds it down under
+     the pointer. This closes design/04 O-24 for Blitz, which never matches `:focus-within`
+     (S12): the caller reveals the strip on its keyboard row. Proof: a revealed strip takes a
+     press with the pointer never over the row; without the CSS the press lands on the row.
+   - A strip button's click calls `stop_propagation` (the star already did). This is the one
+     behaviour change for a current caller: a strip click used to open the row too. Proof: a
+     click on the revealed strip's button logs `archive` and not `open`; with the
+     `stop_propagation` removed both tests fail (`open` is logged). Only the click stops: a press
+     still reaches the row's `onpointerdown` (mailo dismisses its card there).
+   - `title` from the label: behind `titles: Titles::{Omitted, FromLabel}` (default `Omitted`),
+     not always on, because every existing row golden carries a strip and the brief keeps
+     current markup; mailo passes `FromLabel`. On the webview a `title` is a native tooltip beside
+     the Fly; on Blitz it draws nothing.
+   - `expanded` is a strip prop, `Vec<(ActionId, Switch)>`, not a field of `StripAction`: a new
+     public field would break every `StripAction { .. }` literal. `Switch` rather than a new
+     `Expanded` enum because `IconButton { expanded: Option<Switch> }` already writes
+     `aria-expanded` from it; a listed button also gets `aria-haspopup="menu"`.
+   - Gallery: Lists page, "Search hits and a keyboard-shown strip".

@@ -385,7 +385,7 @@ rsx! {
         name: "Ada Lovelace".to_owned(),
         via: None,
         subject: "Re: the analytical engine".to_owned(),
-        snippet: Some("I have translated the memoir...".to_owned()),
+        snippet: "I have translated the memoir...".to_owned(),
         time: "2:14 PM".to_owned(),
         tags: rsx! {},
         star: None,
@@ -838,6 +838,27 @@ A person or account colour never needs a hex constant of yours:
 
 - **Glyphs.** `Icon::Printer`, `Icon::FolderInput` (Lucide `printer`, `folder-input`), listed in
   `Icon::ACTIONS`.
+
+### mailo gaps 2 (lists and overlays)
+
+Every row below is additive: a prop that defaults to what the component did before, or a new
+variant. FINDINGS "mailo gaps 2 (lists and overlays)" has the reasons and the proofs. One prop
+per row:
+
+| Component | Prop or type | What it does |
+| --- | --- | --- |
+| `ListRow` | `subject: Text` (`#[props(into)]`) | A `String`, `&str` or `format!` still works; `Text::Runs(vec![Run::new("UIDL", RunTone::Mark), ..])` draws a search hit as `mark.ds-mark` and a `Strong`/`Faint` run as `span.ds-run[data-tone]`. |
+| `ListRow` | `snippet: Option<Text>` | A string, `None` or a `Text`. `Some(string)` no longer infers: write the string itself, or `Some(string.into())` (an `Option<String>` you hold: `.map(Text::from)`). |
+| `ListRow` | `on_sender: Option<PartHooks>` | `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>` each) on the name: the sender card. |
+| `ListRow` | `on_time: Option<PartHooks>` | The same on the time: the time tip (`HoverKind::Tip`, below). |
+| `ListRow` | `onpointerenter` / `onpointerleave: Option<EventHandler<PointerEvent>>` | The row itself: the thread card. |
+| `ListRow` | `onpointerdown: Option<EventHandler<PointerEvent>>` | A press on the row: a drag's start. A strip button's or the star's press still reaches it (only their clicks stop). |
+| `ListRow` | `aria_label: Option<String>` | The row's accessible name ("Open Re: UIDL stability"); absent, its contents name it as before. |
+| `HoverStrip` | `shown: Option<Shown>` | `Some(Shown::Visible)` shows the strip on a keyboard-selected or focused row (Blitz never matches `:focus-within`); `Some(Shown::Hidden)` keeps it down under the pointer; `None` is the hover reveal. |
+| `HoverStrip` | `titles: Titles` | `Titles::FromLabel` writes each button's label as its `title`; `Titles::Omitted` (default) writes none, as before. |
+| `HoverStrip` | `expanded: Vec<(ActionId, Switch)>` | The buttons that open a menu, and whether it is open: `aria-haspopup="menu"`, `aria-expanded`. |
+| `HoverStrip` | (behaviour) | A strip button's click stops at the button: it never opens the row. |
+| `Text`, `Run`, `RunTone` | new types | `Text::{Plain(String), Runs(Vec<Run>)}`, `Run { text, tone: RunTone::{Plain, Mark, Strong, Faint} }`, `Text::plain_text()`. You compute the runs; quire never parses markup out of a string. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

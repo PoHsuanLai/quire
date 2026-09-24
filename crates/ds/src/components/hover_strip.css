@@ -7,8 +7,8 @@
    transform and the `:active` scale applies.
    The Fly waits `--d-fly` before it appears and not at all while hover is warm
    (`.ds[data-hover=warm]`, O-11); `calc(var(--d-fly) * 0)` is a zero delay made of the token.
-   TODO(O-24): C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12);
-   keyboard reveal is not specified for Blitz. */
+   O-24: C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12); the
+   caller reveals it instead through `shown` (`data-shown`, below). */
 
 .ds-strip{
   --j:0;
@@ -33,3 +33,16 @@
 }
 .ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-strip .ds-icon-button:hover .ds-fly{ transition-delay:calc(var(--d-fly) * 0); }
+
+/* Caller-driven (mailo gaps 2): `data-shown=visible` shows the strip with no pointer on its row
+   (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
+   S12, so the caller says so), the buttons popping in as on hover; `data-shown=hidden` keeps it
+   down under the pointer. */
+.ds-strip[*|data-shown=visible]{ opacity:1; pointer-events:auto; }
+.ds-strip[*|data-shown=visible] .ds-icon-button{
+  transform:none; opacity:1;
+  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger));
+}
+.ds-strip[*|data-shown=visible] .ds-icon-button:active{ transform:scale(.88); }
+.ds-row:hover .ds-strip[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
+.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-icon-button{ transform:scale(.7); opacity:0; animation:none; }
