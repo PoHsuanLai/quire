@@ -1169,3 +1169,93 @@ What sill changes to drop each workaround (sill FINDINGS F141-F148):
   22 and `transform:scale`; `Tooltip { shown: Some(if label_gate open { Shown::Visible } else
   { Shown::Hidden }) }` driven by the machine's `ShowLabel`/`HideLabel` instead of leaving the
   label out of the document.
+
+## Palette follow-ups (2026-09-24)
+
+sill's adoption of the launcher gaps (sill FINDINGS "Adoption of the launcher gaps", F164,
+Q60-Q63) left three gaps against `CommandPalette`, closed on branch `palette-followups`.
+Headless proofs: `crates/ds-native/tests/palette_followups.rs` and `palette_actions_key.rs`;
+SSR goldens under `crates/ds/tests/snapshots/overlays/command_palette/` gained `data-shown` and
+`data-pulse`, and `stylesheet.css` gained the palette's three new rules.
+
+- **Q60 The selected row's rect waits for layout.** A palette on a surface that is mapped
+  again reads its selected row before the surface's first layout, got 0 x 0 at the origin,
+  reported that, and never measured again, because neither the selection nor the row element
+  changed afterwards. Now `palette_rows` reads through `geometry::measure::laid_out_rect`: a
+  frame after the row mounts, then again while the read has no area, every frame for 30 tries
+  (about half a second), then every 100 ms for 30 more, then it gives up (`layout_retry`, a
+  pure schedule with a table test). An empty rect is never reported. The row is measured again
+  when the selection, the element under it, or the results change (a `Revision` bumped when the
+  `groups` or the field's `tokens` differ from the last render's, since a token row moves the
+  list without moving the selection). A read still waiting is cancelled when a newer one
+  starts, and an identical rect is not reported twice. To reproduce the fresh surface,
+  `ds_native::Harness::unmapped(app, viewport)` builds a document whose renders and tasks run
+  but which is never styled or laid out until `Harness::map()`. Proof: unmapped for 150 ms the
+  log is `select:0` with no rect (on master it reads `select:0,rect:0x0@0,0`, which is F164);
+  mapped, `rect:588x44@6,81` follows within 100 ms, Down reports row 2's rect, and a token row
+  appearing re-reports row 1 lower down. With the revision keyed on `groups` alone that last
+  step fails, so the test covers the tokens.
+- **Q61 `onkey` hands on the event.** `CommandPalette { onkey: Option<EventHandler<KeyboardEvent>> }`,
+  and `TextInput`'s and `SearchField`'s `onkey: EventHandler<KeyboardEvent>`. The owned
+  `KeySnapshot` copy (`owned_key`) is gone: a dioxus `Event` is a cheap `Rc` clone whose
+  `prevent_default`/`stop_propagation` flags are shared, and dioxus-native-dom copies them to
+  Blitz's `EventState` after the handlers run, so a caller's `prevent_default` cancels Blitz's
+  default action. For Tab that action is `focus_next_node`, and it runs only on keydown. Proof: a
+  caller that prevents Tab keeps the field focused, and one that only counts it loses the focus
+  to the button after the palette (both assert the caller heard the key).
+- **Q63 A palette kept mounted.** `CommandPalette { shown: Option<Shown>, retain: Retain }`,
+  `Retain::{Nothing, Query}` (default `Nothing`), `Shown` being the tooltip's `{Visible, Hidden}`
+  (`components/palette_shown.rs`). `Hidden` puts `data-shown="hidden"` on the card (and on the
+  overlay host's wrap), `display:none`: the rows and field stay in the document but nothing is
+  laid out or painted, and the palette leaves the layer stack (`Float::withdraw`, so a hidden
+  palette takes no Escape and blocks no other layer; `Float::rejoin` on show). On each
+  `Hidden -> Visible` change (`palette_shown::change`, table-tested), an effect after that render
+  rejoins the stack, flips `data-pulse` between `a` and `b`, restarts the settle timer
+  (`data-presence` entering, then present), forgets the last row report so the row is
+  reported afresh, and requests the field's focus. Unless `Retain::Query` is given it also
+  resets the selection (own: the first choice, reported again; controlled: `on_select(0)`) and
+  calls `oninput("")`. A palette mounted hidden does not take the focus until it is first
+  shown: its field is `Focus::Manual` until then and `Focus::Controlled(request)` after, where
+  `request` is the caller's `focus` or the palette's own. **The alias is load-bearing.** Taking
+  `display:none` away does not restart a CSS animation in Stylo. With the two `data-pulse=b`
+  rules removed, even the first show is not mid-entrance 40 ms in (8 384 of 201 600 pixels
+  differ, under the 10 % the test asks), because the entrance already ran out while
+  hidden. The rules name `peek-in--b`/`cmdk-in--b`, which `motion_css` emits and the lint
+  already knows (`lint::registry::is_known_anim`). Proof: hidden, `#card` has no area and the frame
+  is the frame without it; two shows 300 ms apart each render a frame 40 ms in that differs
+  from the settled card in over 10 % of its pixels (they are scaled and faded, looked at); each
+  show focuses the field and the second empties the query `f` typed during the first; hidden
+  again, the card's area is pixel-identical to the first hidden frame. With `Retain::Query`
+  the query survives a hide and show.
+- **Q62 hint (sill's to act on).** While the actions `Menu` is open it has the keyboard, so the
+  second Ctrl+K never reaches the palette's `onkey`. The menu stops only the keys it acts on,
+  and a chord is not one of them, so the keydown bubbles out of the overlay host to the
+  caller's root. The first Ctrl+K has to be stopped as well as prevented in `onkey`, or it
+  bubbles on to that same root handler, which sees the menu already open (the signal write is
+  synchronous) and closes it in the same dispatch. That was the first failure of the proof.
+  `Harness::chord(&[Key::Ctrl], Key::Char('k'))` presses a key with modifiers held. Proof
+  (`palette_actions_key.rs`): Ctrl+K opens the menu and it takes the keyboard; the second Ctrl+K
+  closes it and the field has the keyboard back. CONSUMING.md has the pattern.
+- Gallery: Overlays' "Palette in a surface" has a third specimen, "Warm: kept mounted, shown by
+  the button": a `Launcher` button toggling a `cmdk-in` palette that lists actions and recent
+  apps, and apps as you type, hidden on pick or Escape. Posed (the sheets) it is shown; live it
+  starts hidden. Overlays grew to 2080 px.
+
+What sill changes (read-only here; `crates/sill-surfaces/src/surfaces/launcher/panel.rs`,
+`events.rs`):
+
+- **F164 fallback.** Delete `FIRST_ROW_FOOT` and `measured`, pass
+  `on_select_rect: move |rect| row.set(Some(rect))`, and anchor with `Anchor::Rect` alone (the
+  menu waits for the first report, which now always has an area).
+- **Q61.** `onkey: move |event: KeyboardEvent| key.field_key(&event)`, with `field_key` taking
+  `&KeyboardEvent` and calling `event.prevent_default()` on Tab, Shift+Tab, Ctrl+K and Alt+K. It
+  also calls `stop_propagation()` if the root keeps a handler for the menu's second key. Drop
+  the root `div#panel`'s `onkeydown` that only prevented those keys (`PanelCtx::root_key`).
+- **Q62.** Give that root handler the one job it still needs: while `ActionsMenu::Open`, a
+  Ctrl+K or Alt+K there is `prevent_default`, closes the menu and calls `panel.field.request()`.
+- **Q63 (if the warm opening is wanted).** Render the palette always, not per opening: drop
+  `key: "{session.serial.0}"` and the `if let Some(shown)`, and pass
+  `shown: if opened { Shown::Visible } else { Shown::Hidden }` with `retain: Retain::Nothing`.
+  The session's reset on opening then comes from the palette's `oninput("")` and
+  `on_select(0)`, or stays the session's own. Keep the query and selection with
+  `Retain::Query`.
