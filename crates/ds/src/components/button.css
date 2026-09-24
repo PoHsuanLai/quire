@@ -45,9 +45,11 @@
 /* Frame (mailo gaps 4): words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
    the foot button's colours (`S:151-153`): `--f-ink-soft` on nothing, `--f-ink` on
    `--f-pill-hover` under the pointer, `--f-pill` while held or pressed (a pressed one carries the
-   current item's `--shadow-current`, as `aria-current` does on an item). */
+   current item's `--shadow-current`, as `aria-current` does on an item). It starts at its left
+   edge, as an item does: Blitz's user-agent `button{justify-content:center}` would centre a
+   frame word stretched across the sidebar. */
 .ds-button[*|data-variant=frame]{
-  display:inline-flex; align-items:center; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:flex-start; text-align:left; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:pointer;
   padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
