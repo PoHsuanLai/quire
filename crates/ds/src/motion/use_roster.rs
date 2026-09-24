@@ -4,6 +4,7 @@
 
 use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
+use super::roster_rest::{RestQueue, RestTimer};
 use super::settle::settle;
 use crate::components::vocab::{Emphasis, StaggerIndex};
 use crate::root::env::{Env, use_env_signal};
@@ -11,15 +12,15 @@ use crate::task::{Gone, spawn_in, try_get, try_set};
 use crate::time::sleep;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
-use std::time::Instant;
 
 /// A live roster: read its entries in render, start exits from handlers.
 #[derive(Debug, PartialEq)]
 pub struct Roster<K: 'static> {
-    state: Signal<RosterState<K>>,
+    pub(super) state: Signal<RosterState<K>>,
     env: Signal<Env>,
-    scope: ScopeId,
-    rest_at: Signal<Option<Instant>>,
+    pub(super) scope: ScopeId,
+    pub(super) rest: Signal<Option<RestTimer>>,
+    pub(super) rest_queue: CopyValue<RestQueue>,
     exits: Signal<Vec<ExitTimer<K>>>,
 }
 
@@ -61,6 +62,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
             sleep(length).await;
             let _ = roster.forget_exit(&settling);
             if roster.update(|state| state.settled(&settling)).is_ok() {
+                // A task, not a render: it may start the rest timer itself.
                 roster.schedule_rest();
             }
         });
@@ -105,42 +107,16 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         Ok(Some(timer))
     }
 
-    fn update(&self, step: impl FnOnce(RosterState<K>) -> RosterState<K>) -> Result<(), Gone> {
+    pub(super) fn update(
+        &self,
+        step: impl FnOnce(RosterState<K>) -> RosterState<K>,
+    ) -> Result<(), Gone> {
         let next = step(try_get(self.state)?);
         try_set(self.state, next)
     }
 
-    fn level(&self) -> Result<crate::appearance::MotionLevel, Gone> {
+    pub(super) fn level(&self) -> Result<crate::appearance::MotionLevel, Gone> {
         Ok(try_get(self.env)?.resolved.motion)
-    }
-
-    /// Mark the entering and healing rows present once the longest of their animations has
-    /// settled. A later call that ends later supersedes an earlier one.
-    fn schedule_rest(&self) {
-        let _ = self.try_schedule_rest();
-    }
-
-    fn try_schedule_rest(&self) -> Result<(), Gone> {
-        let level = self.level()?;
-        let Some(length) = try_get(self.state)?
-            .running()
-            .into_iter()
-            .map(|(anim, index)| settle(anim, level, index))
-            .max()
-        else {
-            return Ok(());
-        };
-        let due = Instant::now() + length;
-        let due = try_get(self.rest_at)?.map_or(due, |pending| pending.max(due));
-        try_set(self.rest_at, Some(due))?;
-        let (roster, rest_at) = (*self, self.rest_at);
-        spawn_in(self.scope, async move {
-            sleep(due.saturating_duration_since(Instant::now())).await;
-            if try_get(rest_at) == Ok(Some(due)) && try_set(rest_at, None).is_ok() {
-                let _ = roster.update(RosterState::rest);
-            }
-        });
-        Ok(())
     }
 }
 
@@ -148,27 +124,30 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
 ///
 /// The first render shows every key entering; after that, a change in `keys` reconciles
 /// (new keys enter, keys removed without an exit drop at once). `pitch` is read on the first
-/// render only.
+/// render only. Reconciling is pure and happens in the render; the rest timer it needs is
+/// started after the render, by an effect ([`Roster::queue_rest`]), never from the body.
 pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, pitch: RowPitch) -> Roster<K> {
     let env = use_env_signal();
     let scope = use_hook(current_scope_id);
-    let rest_at = use_signal(|| None);
+    let rest = use_signal(|| None);
+    let rest_queue = use_hook(|| CopyValue::new(RestQueue::Idle));
     let exits = use_signal(Vec::new);
     let state = use_signal(|| RosterState::first_show(&keys, pitch));
     let roster = Roster {
         state,
         env,
         scope,
-        rest_at,
+        rest,
+        rest_queue,
         exits,
     };
     let mut seen = use_hook(|| {
-        roster.schedule_rest();
+        roster.queue_rest();
         CopyValue::new(keys.clone())
     });
     if *seen.peek() != keys {
         let _ = roster.update(|state| state.reconcile(&keys));
-        roster.schedule_rest();
+        roster.queue_rest();
         seen.set(keys);
     }
     roster

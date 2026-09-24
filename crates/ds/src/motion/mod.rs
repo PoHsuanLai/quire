@@ -9,6 +9,7 @@ pub mod presence;
 pub mod pulse;
 pub mod recipe;
 pub mod roster;
+mod roster_rest;
 pub mod settle;
 pub mod timer;
 pub mod use_roster;
