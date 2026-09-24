@@ -65,6 +65,23 @@
 /* The launcher panel's shape, for the embedded palette (sill's 540-wide card), and the dock
    pill's specimen box. A grid item stretches both ways, so the Surface inside fills the box; the
    pill, a flex item, is as wide as its tiles. */
-.g-launcher{display:grid;width:540px;height:330px}
+.g-launcher{display:grid;align-items:start;width:540px;height:330px}
 .g-dock{display:flex;padding-top:var(--s-36)}
 .g-dock-tiles{display:flex;align-items:center;gap:var(--s-12);padding:var(--s-8) var(--s-12)}
+
+/* The Polish page (the macOS polish pass): the bar strip, the menu's room under it, the paired
+   material cards, corner fills, the dock specimen and the window cards. */
+.g-polish-wall{gap:0}
+.g-polish-bar{display:flex;align-items:center;gap:var(--s-4);height:32px;padding:0 var(--s-10)}
+.g-polish-cards{flex-direction:row;flex-wrap:wrap;gap:var(--s-22) var(--s-36)}
+.g-polish-pair{display:flex;gap:var(--s-22)}
+.g-polish-card{display:flex;flex-direction:column;gap:var(--s-4);padding:var(--s-14);min-height:84px}
+.g-polish-fill{width:150px;height:110px}
+.g-polish-corners{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-22);align-items:start}
+.g-polish-plate-box{width:96px;height:96px}
+.g-polish-dock{display:flex;padding-top:var(--s-36)}
+.g-polish-tiles{position:relative;display:flex;align-items:center;gap:var(--dock-gap);padding:var(--dock-pad)}
+.g-polish-tile{position:relative;display:flex;width:var(--dock-tile);height:var(--dock-tile)}
+.g-polish-windows{padding:var(--s-22) var(--s-36) var(--s-36)}
+.g-polish-window{width:260px;height:150px;background:var(--raise);border-radius:var(--r-window)}
+.g-polish-window-old{box-shadow:var(--shadow-pop)}

@@ -333,7 +333,7 @@ Two elevation tokens plus a fixed set of one-off shadows, each tied to one surfa
 | --- | --- | --- | --- |
 | `--shadow-1` | `0 1px 0 rgba(255,255,255,.7) inset, 0 1px 2px rgba(26,30,26,.10)` | `0 1px 0 rgba(255,255,255,.05) inset, 0 2px 4px rgba(0,0,0,.45)` | `S:13`, `S:32` |
 | `--shadow-2` | `0 1px 0 rgba(255,255,255,.7) inset, 0 6px 16px -6px rgba(26,30,26,.30)` | `0 1px 0 rgba(255,255,255,.05) inset, 0 10px 22px -8px rgba(0,0,0,.7)` | `S:14`, `S:33` |
-| Window | `0 18px 40px -22px rgba(0,0,0,.45)` | same | `S:82` |
+| Window (`--shadow-window`, app windows) | `0 1px 3px rgba(0,0,0,.12), 0 24px 64px -16px rgba(0,0,0,.4)` | `0 1px 3px rgba(0,0,0,.4), 0 24px 64px -16px rgba(0,0,0,.66)` | settled 2026-09-24 (the macOS polish pass: a contact shadow under a wide soft ambient one); was `S:82`'s `0 18px 40px -22px rgba(0,0,0,.45)` |
 | Card | `0 0 0 1px rgba(0,0,0,.06), 0 10px 30px -14px rgba(0,0,0,.45)` | same | `S:159` |
 | Side peek | `0 20px 40px -16px rgba(0,0,0,.45)` | same | `S:454` |
 | Peek | `0 24px 50px -18px rgba(0,0,0,.55)` | same | `S:224` |
@@ -575,6 +575,38 @@ translucency and edge, the frame gives the hue.
 | Notification center | Sheet | proposed |
 | OSD | Osd | settled by name |
 | Widgets, quick note | Widget | proposed |
+
+### 17.4 Material stack v2 (settled 2026-09-24, the macOS polish pass)
+
+macOS stacks layers on every chrome material that the section 17.2 recipe lacked, and the shell
+looked flat beside it. Stack v2 adds them to every card-like material (Dock, Popover, Sheet,
+Toast, Osd, Widget) and a bottom hairline to the Bar; the Window is unchanged. The tints' alphas
+(and the legibility gates on them) do not move. Each layer is a `--m-*` variable a material block
+declares and `--m-box` lists outside in; each alpha reads an input the root writes from a
+settings key (`ds::MaterialStack`, `Ds { stack }`), with the default below behind it.
+
+| Layer | Variable | Light | Dark | Key (proposed name, design/22) |
+| --- | --- | --- | --- | --- |
+| Vibrancy | baked into `--m-tint`, `--m-tint-solid` | OKLab chroma x1.4, lightness +.012 (surface `#f8f9f6` becomes `#fcfdf9`) | chroma x1.4, lightness kept (`#151814` becomes `#141813`, the raise `#2a2f28` becomes `#293026`) | `appearance.material_vibrancy`, percent, 100 (0 = section 17.2's flat colour, through `color-mix` on `--m-vibrancy`) |
+| Outer hairline | `--m-hairline` | `0 0 0 .5px rgba(0,0,0,.14)` | `0 0 0 .5px rgba(0,0,0,.60)` | `appearance.material_hairline_light` 14, `_dark` 60 |
+| Contact shadow | `--m-shadow-contact` | `0 1px 2px rgba(0,0,0,.10)` | `0 1px 2px rgba(0,0,0,.30)` | `appearance.material_shadow_strength`, percent, 100 (scales both shadows) |
+| Ambient shadow | `--m-shadow-ambient` (= `--m-shadow`) | menus, toast, OSD `0 12px 40px -12px rgba(0,0,0,.28)`; sheet `0 24px 60px -18px .40`; dock `0 10px 30px -10px .35`; widget `0 6px 16px -6px rgba(26,30,26,.3)` | menus, toast, OSD `.55`; sheet `0 30px 70px -20px .65`; dock `.50`; widget `0 8px 20px -8px .50` | as above |
+| Inner top highlight | `--m-highlight` | `inset 0 1px 0 rgba(255,255,255,.30)` | `inset 0 1px 0 rgba(255,255,255,.12)` | `appearance.material_highlight_light` 30, `_dark` 12 |
+| Inner edge | `--m-edge` | `inset 0 0 0 .5px rgba(0,0,0,.08)` (the dock's `rgba(255,255,255,.55)`) | `rgba(255,255,255,.09)` | none (the `--f-line` values) |
+| Bar | `--m-hairline`, `--m-edge` | `0 .5px 0 rgba(0,0,0,.14)` under `inset 0 -.5px 0 rgba(0,0,0,.08)` | `0 .5px 0 rgba(0,0,0,.60)` | the hairline keys |
+
+Why the tint carries the boost: Blitz neither blurs nor saturates what is behind a surface
+(FINDINGS S15, S16), so macOS's vibrancy cannot be reproduced; brightening and saturating the
+tint itself is the part that can. A tinted root (bar, dock, popover panel, OSD, widget) paints the
+Space gradient instead of the tint, which carries its own hue; its frame redraws the inner edge
+and highlight (`--m-inner`) over the gradient. The gates hold: `tests/legibility.rs` measures the
+boosted tints, over blur and solid, black and white, and all pass.
+
+A squircle corner (`Corner::Squircle(r)`, design/08 section 2.1's `n = 5` superellipse
+reaching `2 r` along each edge) is drawn with a `mask-image`, and a mask clips the element's own
+`box-shadow`; so a squircle material paints its tint on a masked `::before` and keeps the stack on
+its own unmasked box at `--r-squircle`, the circle (about .884 r) the squircle touches at 45
+degrees and never leaves by more than .03 r.
 
 ## 18. SpaceLook per workspace
 

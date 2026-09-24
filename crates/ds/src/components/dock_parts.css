@@ -1,0 +1,6 @@
+/* The dock's running dot and floor (the macOS polish pass; design/10-BEHAVIOUR-dock.md section
+   10.3.2). The floor's paint and mask are generated with the shapes (`css/shape_css.rs`). */
+
+.ds-running-dot{ position:absolute; left:50%; top:calc(100% + var(--dock-dot-gap) - var(--dock-dot) * .5); width:var(--dock-dot); height:var(--dock-dot);
+  margin-left:calc(var(--dock-dot) * -.5); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
+  animation:fade var(--t-quick) var(--e-out); }

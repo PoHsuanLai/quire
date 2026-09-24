@@ -8,6 +8,7 @@ pub mod emit;
 pub mod ground_css;
 pub mod materials_css;
 pub mod motion_css;
+pub mod shape_css;
 pub mod stylesheet;
 pub mod tokens_css;
 

@@ -23,6 +23,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | replaces mailo `ui/paint.rs` `push_palette`/`grain_opacity` |
 | `space/presets.rs` | 03-COLOR §7; 21-SPACES §4 | the eight presets as data; `default_look` |
 | `material/{material,blur,recipe}.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
+| `material/{stack,layer,vibrancy}.rs` | 03-COLOR §17.4 (material stack v2, the macOS polish pass) | `MaterialStack` (the highlight, hairline, shadow-strength and vibrancy keys, written inline by `Ds { stack }`); each layer written with its alpha read from its input; the vibrancy boost baked into the tint in OKLab |
 
 ## `ds`: tokens and stylesheet
 
@@ -39,6 +40,8 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `tokens/layer.rs` | 01-LAYOUT §12 |
+| `tokens/{tuned,shell,dock}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
+| `css/shape_css.rs`, `icon/{plate,family}.rs` | 08-ICONS §2.1-2.5, §4.1 | `Corner::Squircle` (a six-layer mask; the shadow on the unmasked box), the plate (`PlateFamily` on `IconView`), the dock floor |
 | `css/tokens_css.rs`, `accents_css.rs`, `materials_css.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
 | `css/ground_css.rs` | 03-COLOR §4 (the frame inks); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
 | `css/motion_css.rs`, `css/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
@@ -90,7 +93,8 @@ fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s s
 `provider_mark` §28, `palette_lines`, `palette_select` and `palette_rows` (§25's pure lines, the
 selection, its own or the caller's, and the selected row's rect; FINDINGS "Launcher gaps"), `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
 `press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps", "Bar gaps"), `icon_button`'s `Status` variant and `StatusMetrics` (13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
-§32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35.
+§32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
+(13 §13.3.1), `workspace_pills` §37 and `dock_parts` §38 (`RunningDot`, `DockFloor`; 10 §10.3.2).
 
 `space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),

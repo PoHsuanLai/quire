@@ -28,7 +28,7 @@ pub enum Shadow {
     Current,
     /// `--shadow-pill-inset`: the command pill's highlight.
     PillInset,
-    /// `--shadow-window`: the window.
+    /// `--shadow-window`: an app window, a contact and a wide ambient drop.
     Window,
     /// `--shadow-card`: the card.
     Card,
@@ -97,7 +97,11 @@ impl Shadow {
             Shadow::Bubble => "0 12px 28px -12px rgba(0,0,0,.45)",
             Shadow::Current => "0 1px 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25)",
             Shadow::PillInset => "0 1px 0 rgba(255,255,255,.35) inset",
-            Shadow::Window => "0 18px 40px -22px rgba(0,0,0,.45)",
+            // An app window (the macOS polish pass, design/03-COLOR.md section 10, settled
+            // 2026-09-24): a tight contact shadow under a wide, soft ambient one, where S's
+            // `.win` had one mid drop (`S:82`, `0 18px 40px -22px rgba(0,0,0,.45)`).
+            Shadow::Window if dark => "0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66)",
+            Shadow::Window => "0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4)",
             Shadow::Card => "0 0 0 1px rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45)",
             Shadow::Handle => "0 0 0 1px rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35)",
             Shadow::Mark => "0 0 0 1px rgba(0,0,0,.08)",

@@ -13,6 +13,7 @@ pub mod motion;
 pub mod motion_lab;
 pub mod overlays;
 pub mod pills;
+pub mod polish;
 pub mod space;
 pub mod status_items;
 pub mod tokens;

@@ -43,7 +43,9 @@ behaviour and numbers.
 | Exclusive zone | `Reserve(32)` | settled (plan Bar surface) |
 | Title / status item hit height | 24, vertically centred | proposed |
 | Title padding | 0 / 10 px; app name ui 13/700, other titles ui 13/500 | proposed (R5 13 pt, A2 menu items 13) |
-| Open-title highlight | pill 24 high, `--r-item`, `--f-pill`, shown while its menu is open; no transition | proposed |
+| Open-title highlight | pill 24 high (`--shell-bar-item`), radius 4 (`--r-shell-bar-item`), `--f-pill` while its menu is open and `--f-pill-hover` under the pointer; no transition; ds `MenuBarItem` for text items, `IconButton{Status}` draws the same pill | settled 2026-09-24 (the macOS polish pass) |
+| Title text | 13 px (`--fs-shell-bar`) at 500 (`--fw-shell-bar`), the app name 700 | settled 2026-09-24 (R5 13 pt) |
+| Workspace indicator | one segmented group on the frame (ds `WorkspacePills`): a `--f-pill-hover` track 24 high, radius 4, the current workspace on `--f-pill` with `--shadow-current` | settled 2026-09-24 |
 | Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed values (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8. Mechanism settled (bar gaps): ds `IconButton{Status}` reads `--bar-status-box`/`--bar-status-glyph`, written by `ds::StatusMetrics` from the three settings keys |
 | Disabled | opacity .35 | R2 (H) |
 | Material / tint | `Material::Bar` over compositor blur, `--f-*` tokens of the workspace SpaceLook, cross-fade 380 ms | settled (plan Spaces); drawn by `Ds` (bar gaps: `data-frame="tinted"`, the gradient at the bar's tint alpha, `data-ground="frame"`) |
@@ -60,7 +62,7 @@ behaviour and numbers.
 | Outside press | closes (xdg_popup `popup_done`); the press is not delivered to the other client | proposed (compositor grab semantics) |
 | Pick | the menu closes, then the action runs (A6 "Click .it closes then picks") | settled (design); ds `Menu` calls `onpick` then `onclose` in the same handler, so both land before the next frame (bar gaps, sill Q11) |
 | First open animation | `menu-pop --t-move --e-spring` (A5: y -4, s .97, fade -> 0) | settled for ds menus (A5) |
-| Close animation | `fade` over `--t-quick` with `--e-exit` | settled for Escape and outside click (bar gaps: `Anim::MenuOut`, `data-presence="leaving"`, `onclose` after it settles) |
+| Close animation | `fade` over `--t-quick` with `--e-exit` | settled for Escape and outside click (bar gaps: `Anim::MenuOut`, `data-presence="leaving"`, `onclose` after it settles); a ds `Popover` does the same since 2026-09-24 |
 | Highlight | selected item background `--accent-soft` (A3), no transition, follows the pointer and the keyboard | settled (design colour), timing proposed |
 | Keyboard | Up/Down move with **wrap** (A6); Left/Right switch to the adjacent bar menu or close/open a submenu; Enter, Space or Tab pick; Esc closes one level; typing filters (A6) | settled (A6) |
 | Position (bar menus) | design `placeFloat`: `x = title.left - 8`, `y = title.bottom + 6`; flip and clamp 8 px from output edges; status menus right-aligned to `item.right + 8` | settled (A6) |
@@ -75,11 +77,13 @@ behaviour and numbers.
 | Menu radius | `--r-menu` 12 | settled (plan tokens) |
 | Material | `Material::Popover` over blur for bar, dock and tray menus (`03-COLOR.md`) | settled by name |
 | Menu width | min 220 (A4 `.slim` 220), max 420, sized to content | settled min, max proposed |
-| Item height | 24 px (padding 3 / 8, text line 18) | proposed (R5 ~22 pt L; design Slim padding 6/8 gives 30) |
+| Item height | 22 px (`--shell-menu-row`, `menus.item_height_px`) | settled 2026-09-24 (the macOS polish pass; R5 ~22 pt L; was 24 proposed) |
+| Item text | 13 px (`--fs-shell-menu`) at 400 | settled 2026-09-24 (R5 13 pt) |
+| Selected-row highlight | inset by the 5 px panel padding, radius 6 (`--r-shell-highlight`), `--accent-soft` (Dropdown `--surface-2`) | settled 2026-09-24 |
 | Item radius | `--r-item` 9 | settled token |
 | Columns | check 22 px (A4 `.slim` `22px 1fr auto`); optional glyph 16 + gap 6; label `1fr`, ui 13/400, single-line truncate; shortcut `auto`, data 10 `--ink-faint` (A4 `.sc`), rendered with the ds `Shortcut` vocabulary (⌘⇧⌥⌃); submenu chevron 12 px | settled columns (A4), sizes R5 13 pt |
 | Checkmark | 14 px accent check in the 22 px column (A4 "checked = 14 accent check") | settled |
-| Separator | 1 px `--line-soft`, 4 px margin above and below (9 px row) | proposed |
+| Separator | 1 px `--line-soft` hairline, 5 px margin above and below (11 px row, `--shell-menu-sep`, `menus.separator_margin_px`), inset 8 px to the text | settled 2026-09-24 (the macOS polish pass; was 4 proposed) |
 | Section header | data 9.5, .14em, upper (A4 `.g`), 22 px row, not selectable | settled style, height proposed |
 | Status line | an item's row (padding 6 / 8), title ui 13 / 600 `--ink`, detail 11.5 `--ink-faint`, no eyebrow, not selectable, skipped by keys | settled (bar gaps: `MenuEntry::Info`), sizes proposed |
 | Disabled item | opacity .35, not selectable, skipped by arrow keys | R2 (H); settled in ds `Menu` (`MenuEntry::Item { availability }`, tray gaps Q7) |
@@ -172,9 +176,11 @@ is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pat
 | Horizontal | centred on the output under the pointer | settled (plan "centred panel") |
 | Vertical | panel top = `max(--bar-h + 24, round(0.4 x output_h - 230))` (sits slightly above centre) | proposed (R12 UNKNOWN) |
 | Component | ds `CommandPalette` ("the command menu is the same menu, just bigger and centred", A0 S:792) | settled |
-| Radius | `--r-panel` 14 | settled (A4 cmdk r14) |
-| Input | ui 16 (A2 cmdk input), row 56 px with the search glyph 16 and padding 12 / 14 (A4 `.cmdk-in`) | settled font, height proposed |
-| Result row | 44 px: 34 px tile (app icon 32 inside), gap 9, padding 5 / 7, radius 8; title 13/600, subtitle 11.5 faint, trailing data 10 (A4 `.fmenu .it`) | proposed height from the design's fmenu item |
+| Radius | `--r-panel` 14, drawn as a squircle of 14 | settled (A4 cmdk r14; squircle 2026-09-24) |
+| Input | ui 22 at 500 (`--fs-shell-field`, `--fw-shell-field`), search glyph 20 (`--shell-field-glyph`), padding 12 / 16, row about 56 px | settled 2026-09-24 (the macOS polish pass, Spotlight-like; was ui 16 with a 16 px glyph) |
+| Result row | 34 px tile, gap 9, padding 5 / 7, radius 8; title 14/600 (`--fs-shell-row`), detail 12 faint (`--fs-shell-detail`), trailing data 10 | sizes settled 2026-09-24, geometry proposed |
+| Card height | as tall as its content up to the panel (no empty box under the last row); the shell's blur region follows the card's measured rect | settled 2026-09-24 |
+| Corner and shadow | `Corner::Squircle(14)`; the Sheet material's stack v2 (hairline, highlight, contact and ambient shadows, 03-COLOR §17.4) | settled 2026-09-24 |
 | Section header | data 9.5 .14em upper, 24 px | settled style |
 | Selection | `--accent-soft`, moves instantly with keys and hover | settled (A3) |
 | Visible rows | `floor((460 - 56 - 10) / 44)` = 8 | derived |
