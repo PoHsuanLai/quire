@@ -18,9 +18,11 @@ use crate::tokens::{Hex, VarName, ZLayer};
 
 /// What a squircle element writes inline (`Corner::squircle_style`): its extent and the circle
 /// its shadows follow.
+#[cfg_attr(not(feature = "lint"), allow(dead_code))] // Read by the lint's registry.
 pub(crate) const SQUIRCLE_VARS: [VarName; 2] = [VarName("--sq-k"), VarName("--r-squircle")];
 
 /// What the plate and floor rules declare for their own use.
+#[cfg_attr(not(feature = "lint"), allow(dead_code))] // Read by the lint's registry.
 pub(crate) const SHAPE_VARS: [VarName; 7] = [
     VarName("--r-plate"),
     VarName("--plate-inner"),

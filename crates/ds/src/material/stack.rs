@@ -23,6 +23,7 @@ pub(crate) const SHADOW_STRENGTH: VarName = VarName("--m-shadow-strength");
 pub(crate) const VIBRANCY: VarName = VarName("--m-vibrancy");
 
 /// Every input, for the lint's registry.
+#[cfg_attr(not(feature = "lint"), allow(dead_code))] // Read by the lint's registry.
 pub(crate) const STACK_INPUTS: [VarName; 6] = [
     HIGHLIGHT_LIGHT,
     HIGHLIGHT_DARK,

@@ -646,11 +646,13 @@ And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's
   the pointer then only ask through `on_select`. Left to the palette, `on_select` hears every
   change of the selection, the reset to the first choice on a new query included.
   `on_select_rect: Option<EventHandler<Rect>>` hears the selected row's rect (client
-  coordinates, read through the measurer a frame after layout) whenever the selection or the
-  row under it changes: anchor an actions menu with `Anchor::Rect(rect)`. `onkey:
-  Option<EventHandler<KeyboardData>>` hears every key the field gets after the palette has read
-  it (Tab, Ctrl+K), so nothing needs to listen at your root. The pointer moving over a row
-  selects it.
+  coordinates, read through the measurer a frame after layout) whenever the selection, the row
+  under it or the results (groups, tokens) change: anchor an actions menu with
+  `Anchor::Rect(rect)`. It is never an empty rect: a row read before its surface's first layout
+  is read again each frame until it has an area (palette follow-ups, below). `onkey:
+  Option<EventHandler<KeyboardEvent>>` hears every key the field gets after the palette has read
+  it (Tab, Ctrl+K), as the event itself, so nothing needs to listen at your root; call
+  `event.prevent_default()` on a key you take. The pointer moving over a row selects it.
 
   ```rust
   let mut row = use_signal(|| None::<Rect>);
@@ -663,7 +665,10 @@ And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's
           id: "launcher-card".to_string(),
           focus: field,
           on_select_rect: move |rect: Rect| row.set(Some(rect)),
-          onkey: move |key: KeyboardData| if is_actions(&key) { actions.set(true) },
+          onkey: move |key: KeyboardEvent| if is_actions(&key) {
+              key.prevent_default();
+              actions.set(true);
+          },
       }
       if let (true, Some(rect)) = (actions(), row()) {
           Menu { kind: MenuKind::Rich, anchor: Anchor::Rect(rect), entries, onpick,
@@ -681,6 +686,81 @@ And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's
   shows or hides the label on the caller's say alone, at once, whatever the pointer does (the
   dock's label machine: hide on press, while a menu is open, while dragging). `None` is the
   hover behaviour as before. A Card tooltip follows `shown` the same way.
+
+And in the palette follow-ups (FINDINGS "Palette follow-ups", sill Q60-Q63):
+
+- **The selected row's rect waits for layout.** A palette mounted on a surface that has not been
+  laid out yet (a launcher surface mapped again) reads its selected row as 0 x 0; quire now
+  reads it again every frame for about half a second, then every 100 ms for three seconds more,
+  and reports it only once it has an area. It measures again when the selection, the row
+  element or the results (groups, tokens) change, and drops a read still waiting when a newer
+  one starts. Drop any "empty rect means unknown" fallback: `on_select_rect` never hands you
+  one.
+- **`onkey` hands on the event.** `CommandPalette { onkey: Option<EventHandler<KeyboardEvent>> }`
+  (and `TextInput`'s and `SearchField`'s `onkey: EventHandler<KeyboardEvent>`): call
+  `event.prevent_default()` on a key you take, and Blitz does not also act on it (Tab no longer
+  moves the focus off the field). A closure typed `|key: KeyboardData|` becomes
+  `|key: KeyboardEvent|`; `key.key()`, `key.modifiers()` read as before.
+- **A palette kept mounted.** `CommandPalette { shown: Some(Shown::Visible | Shown::Hidden),
+  retain: Retain::Nothing | Retain::Query }` (`Shown` is the tooltip's). Hidden, the card is
+  `display:none` (nothing laid out or painted, no scrim) and leaves the layer stack, while its
+  rows and field stay in the document. Each change to `Visible` replays the entrance
+  (`cmdk-in`/`peek-in`, restarted through the keyframe's `X--b` alias), reports the selected
+  row's rect afresh, gives the field the keyboard and, under `Retain::Nothing` (the default),
+  asks for an empty query through `oninput("")` and goes back to the first choice (a controlled
+  selection is asked for 0 through `on_select`); `Retain::Query` keeps both. A palette mounted
+  hidden does not take the keyboard until it is first shown. `None` (the default) is the
+  palette as before: shown, its entrance played as it mounts.
+
+  ```rust
+  let mut shown = use_signal(|| Shown::Hidden);
+  // The shell's toggle: shown.set(Shown::Visible) on open, Shown::Hidden on hide.
+  rsx! {
+      CommandPalette::<Hit> {
+          label, placeholder, query: query(), tokens: Vec::new(), groups, empty,
+          oninput: move |text: String| query.set(text),
+          onpick, onclose: move |()| shown.set(Shown::Hidden),
+          host: CommandPaletteHost::Surface,
+          entrance: PaletteEntrance::CmdkIn,
+          shown: shown(),
+          retain: Retain::Nothing,
+      }
+  }
+  ```
+
+  A hidden field keeps the focus it had (there is no blur seam): a shell surface that is
+  unmapped while hidden gets no keys, but a palette hidden inside a window that stays up should
+  move the focus somewhere else itself.
+- **Ctrl+K toggles the actions menu.** design/06 §20.2: the second Ctrl+K (or Alt+K) closes the
+  actions menu it opened. While the `Menu` is open it has the keyboard, so the palette's
+  `onkey` never hears that key; listen on the menu instead. `Menu` has no `onkey`, but its
+  keydown bubbles out of the overlay host to your root's `onkeydown` (the menu stops only
+  Escape), so read the second Ctrl+K there while the menu is open, `prevent_default` it, close
+  the menu and hand the field the keyboard back. The palette's `onkey` must stop the first
+  Ctrl+K as well as prevent it: the key it opens the menu on bubbles on to the same root
+  handler, which would see the menu open and close it at once
+  (`crates/ds-native/tests/palette_actions_key.rs`):
+
+  ```rust
+  div {
+      onkeydown: move |event: KeyboardEvent| {
+          if actions() && is_actions(&event) {
+              event.prevent_default();
+              actions.set(false);
+              field.request();
+          }
+      },
+      CommandPalette::<Hit> { /* … */ focus: field,
+          onkey: move |event: KeyboardEvent| if is_actions(&event) {
+              event.prevent_default();
+              // Or the same keydown bubbles on to the root, finds the menu open and closes it.
+              event.stop_propagation();
+              actions.set(true);
+          },
+      }
+      if actions() { Menu { /* … */ onclose: move |()| { actions.set(false); field.request(); } } }
+  }
+  ```
 
 ### The macOS polish pass (2026-09-24): what changed under you, and what to opt into
 

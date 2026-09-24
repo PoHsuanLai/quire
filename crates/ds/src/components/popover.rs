@@ -270,6 +270,27 @@ impl Float {
         queue_effect(move || overlays.show(id, layer, content));
     }
 
+    /// Leave the layer stack while the surface is kept mounted but hidden (a palette with
+    /// `shown: Hidden`): it takes no Escape and no outside click until it [`Float::rejoin`]s.
+    /// Call it from an effect or a handler.
+    pub(crate) fn withdraw(&self) {
+        if let Some(stack) = self.stack {
+            let next = stack.peek().clone().remove(self.layer_id);
+            if *stack.peek() != next {
+                let _ = crate::task::try_set(stack, next);
+            }
+        }
+    }
+
+    /// Join the layer stack again, on top, as a hidden surface is shown. Call it from an effect
+    /// or a handler.
+    pub(crate) fn rejoin(&self) {
+        if let (Stacking::Layer(dismiss), Some(stack)) = (self.stacking, self.stack) {
+            let next = stack.peek().clone().push(self.layer_id, dismiss);
+            let _ = crate::task::try_set(stack, next);
+        }
+    }
+
     /// Whether this surface is the topmost open layer: a scrim or backdrop it draws itself
     /// closes it only then.
     pub(crate) fn is_top(&self) -> bool {

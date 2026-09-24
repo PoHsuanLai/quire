@@ -159,6 +159,44 @@ async fn read_after_layout(element: &MountedRef) -> Option<Rect> {
     last
 }
 
+/// When a read that found no layout yet is tried again: every frame at first (a freshly mapped
+/// surface lays out within a few), then every [`SLOW_RETRY`], then not at all.
+pub(crate) fn layout_retry(attempt: usize) -> Option<std::time::Duration> {
+    match attempt {
+        0..FAST_RETRIES => Some(FRAME_SLACK),
+        FAST_RETRIES..LAYOUT_RETRIES => Some(SLOW_RETRY),
+        _ => None,
+    }
+}
+
+/// Reads tried a frame apart before slowing down (about half a second).
+const FAST_RETRIES: usize = 30;
+/// Reads tried in all before giving up (about three seconds more at [`SLOW_RETRY`]).
+const LAYOUT_RETRIES: usize = 60;
+/// The wait between reads once the frame-paced ones found no layout.
+const SLOW_RETRY: std::time::Duration = std::time::Duration::from_millis(100);
+
+/// Whether `rect` has an area: a rect read before layout is 0 x 0 at the origin.
+pub(crate) fn laid_out(rect: Rect) -> bool {
+    rect.size.width.0 > 0.0 && rect.size.height.0 > 0.0
+}
+
+/// `element`'s rect once it has been laid out: read a frame from now and again on
+/// [`layout_retry`]'s schedule while it is still empty (a surface mapped again reads its rows
+/// before its first layout, sill FINDINGS Q60). `None` when the renderer cannot measure it or it
+/// never gains an area; never an empty rect.
+pub(crate) async fn laid_out_rect(element: &MountedData) -> Option<Rect> {
+    sleep(FRAME_SLACK).await;
+    for attempt in 0.. {
+        let read = client_rect(element).await?;
+        if laid_out(read) {
+            return Some(read);
+        }
+        sleep(layout_retry(attempt)?).await;
+    }
+    None
+}
+
 /// A renderer rect in logical pixels.
 pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
     Rect {
@@ -170,5 +208,46 @@ pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
             width: Px(rect.size.width as f32),
             height: Px(rect.size.height as f32),
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{FRAME_SLACK, SLOW_RETRY, laid_out, layout_retry};
+    use crate::geometry::units::{Point, Px, Rect, Size};
+
+    #[test]
+    fn a_read_before_layout_is_tried_again_frame_paced_then_slower_then_not() {
+        // (attempt, the wait before the next read)
+        let cases = [
+            (0, Some(FRAME_SLACK)),
+            (29, Some(FRAME_SLACK)),
+            (30, Some(SLOW_RETRY)),
+            (59, Some(SLOW_RETRY)),
+            (60, None),
+        ];
+        for (attempt, want) in cases {
+            assert_eq!(layout_retry(attempt), want, "attempt {attempt}");
+        }
+    }
+
+    #[test]
+    fn only_a_rect_with_an_area_is_laid_out() {
+        let at = |width: f32, height: f32| Rect {
+            origin: Point::default(),
+            size: Size {
+                width: Px(width),
+                height: Px(height),
+            },
+        };
+        let cases = [
+            (at(0.0, 0.0), false),
+            (at(668.0, 0.0), false),
+            (at(0.0, 45.0), false),
+            (at(668.0, 45.1), true),
+        ];
+        for (rect, want) in cases {
+            assert_eq!(laid_out(rect), want, "{rect:?}");
+        }
     }
 }

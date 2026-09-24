@@ -65,7 +65,7 @@
 /* The launcher panel's shape, for the embedded palette (sill's 540-wide card), and the dock
    pill's specimen box. A grid item stretches both ways, so the Surface inside fills the box; the
    pill, a flex item, is as wide as its tiles. */
-.g-launcher{display:grid;width:540px;height:330px}
+.g-launcher{display:grid;align-items:start;width:540px;height:330px}
 .g-dock{display:flex;padding-top:var(--s-36)}
 .g-dock-tiles{display:flex;align-items:center;gap:var(--s-12);padding:var(--s-8) var(--s-12)}
 

@@ -11,7 +11,7 @@
 //! frame's CSS time never depends on how slow the machine running the test is.
 
 use crate::error::NativeError;
-use crate::headless::{Backdrop, Headless};
+use crate::headless::{Backdrop, Headless, Layout};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
 use blitz_traits::events::{
@@ -60,6 +60,29 @@ impl Harness {
         };
         harness.frame();
         harness
+    }
+
+    /// Build `app` at `viewport` as a shell surface is built before it is mapped: its renders
+    /// run and its tasks are polled, but nothing is styled or laid out until [`Harness::map`]
+    /// (every rect reads 0 x 0 until then, sill FINDINGS Q60).
+    pub fn unmapped(app: fn() -> Element, viewport: Viewport) -> Self {
+        let runtime = crate::runtime::enter();
+        let mut doc = Headless::new(app, viewport);
+        doc.layout = Layout::Held;
+        let mut harness = Harness {
+            viewport,
+            doc,
+            clock: Duration::ZERO,
+            _runtime: runtime,
+        };
+        harness.frame();
+        harness
+    }
+
+    /// Lay the document out from now on, as the compositor maps its surface, and resolve it.
+    pub fn map(&mut self) {
+        self.doc.layout = Layout::Running;
+        self.frame();
     }
 
     /// Move the pointer to `at`.
@@ -116,13 +139,25 @@ impl Harness {
 
     /// Press and release `key` with the focus where it is. A key makes the modality `keyboard`.
     pub fn key(&mut self, key: Key) {
+        self.chord(&[], key);
+    }
+
+    /// Press and release `key` while `held` modifiers (`Key::Ctrl`, `Shift`, `Alt`, `Super`) are
+    /// down: `chord(&[Key::Ctrl], Key::Char('k'))` is Ctrl+K. A key that is not a modifier in
+    /// `held` adds nothing.
+    pub fn chord(&mut self, held: &[Key], key: Key) {
         self.doc.set_modality(InputModality::Keyboard);
+        let modifiers = held
+            .iter()
+            .copied()
+            .map(modifier)
+            .fold(Modifiers::empty(), |all, one| all | one);
         let (key, code) = keyboard(key);
         for state in [KeyState::Pressed, KeyState::Released] {
             let event = BlitzKeyEvent {
                 key: key.clone(),
                 code,
-                modifiers: Modifiers::empty(),
+                modifiers,
                 location: Location::Standard,
                 is_auto_repeating: false,
                 is_composing: false,
@@ -310,6 +345,17 @@ fn keyboard(key: Key) -> (DomKey, Code) {
     }
 }
 
+/// The modifier flag a held quire key sets; any other key sets none.
+fn modifier(key: Key) -> Modifiers {
+    match key {
+        Key::Ctrl => Modifiers::CONTROL,
+        Key::Shift => Modifiers::SHIFT,
+        Key::Alt => Modifiers::ALT,
+        Key::Super => Modifiers::META,
+        _ => Modifiers::empty(),
+    }
+}
+
 /// The physical key a US layout types `c` with, where it is a letter or a digit.
 fn letter(c: char) -> Code {
     format!("Key{}", c.to_ascii_uppercase())
@@ -320,7 +366,7 @@ fn letter(c: char) -> Code {
 
 #[cfg(test)]
 mod tests {
-    use super::{keyboard, letter};
+    use super::{keyboard, letter, modifier};
     use ds::Key;
     use keyboard_types::Code;
 
@@ -335,6 +381,18 @@ mod tests {
     fn letters_map_to_their_physical_key() {
         for &(c, code) in LETTERS {
             assert_eq!(letter(c), code, "{c:?}");
+        }
+    }
+
+    #[test]
+    fn held_keys_are_modifier_flags() {
+        let cases = [
+            (Key::Ctrl, keyboard_types::Modifiers::CONTROL),
+            (Key::Alt, keyboard_types::Modifiers::ALT),
+            (Key::Char('k'), keyboard_types::Modifiers::empty()),
+        ];
+        for (key, want) in cases {
+            assert_eq!(modifier(key), want, "{key:?}");
         }
     }
 
