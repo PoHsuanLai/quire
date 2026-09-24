@@ -18,14 +18,7 @@ use std::time::Duration;
 const LIFETIME: Duration = Duration::from_secs(3);
 
 fn main() {
-    launch(
-        App,
-        AppConfig {
-            title: "quire: ds-native window".into(),
-            width: 480,
-            height: 320,
-        },
-    );
+    launch(App, AppConfig::new("quire: ds-native window", 480, 320));
 }
 
 #[allow(non_snake_case)]

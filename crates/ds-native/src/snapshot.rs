@@ -7,6 +7,7 @@
 
 use crate::error::NativeError;
 use crate::harness::Harness;
+use crate::harness_config::HarnessConfig;
 use dioxus::prelude::*;
 use std::time::Duration;
 
@@ -49,7 +50,17 @@ pub fn snapshot_at(
     viewport: Viewport,
     moments: &[Duration],
 ) -> Result<Vec<image::RgbaImage>, NativeError> {
-    let mut harness = Harness::new(app, viewport);
+    snapshot_with(app, HarnessConfig::new(viewport), moments)
+}
+
+/// As [`snapshot_at`], with the document built as `config` says: the app's own contexts and
+/// providers, so a component that reads `use_context` renders as it does in the window.
+pub fn snapshot_with(
+    app: fn() -> Element,
+    config: HarnessConfig,
+    moments: &[Duration],
+) -> Result<Vec<image::RgbaImage>, NativeError> {
+    let mut harness = Harness::with_config(app, config);
     harness.advance(MOUNT_SETTLE);
     moments
         .iter()

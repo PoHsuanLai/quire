@@ -8,6 +8,7 @@ use crate::error::NativeError;
 use crate::fonts::font_context;
 use crate::net::DsNet;
 use crate::scheme;
+use crate::setup::Setup;
 use crate::snapshot::Viewport;
 use crate::wake::Wakeup;
 use anyrender::{PaintScene as _, render_to_buffer};
@@ -49,8 +50,9 @@ pub(crate) struct Headless {
 }
 
 impl Headless {
-    /// Build `app` at `viewport` and run its first render (no layout yet).
-    pub(crate) fn new(app: fn() -> Element, viewport: Viewport) -> Self {
+    /// Build `app` at `viewport` with the app's `setup` and run its first render (no layout
+    /// yet).
+    pub(crate) fn new(app: fn() -> Element, viewport: Viewport, setup: &Setup) -> Self {
         let wakeup = Arc::new(Wakeup::default());
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
@@ -61,7 +63,9 @@ impl Headless {
             style_threading: StyleThreading::Sequential,
             ..Default::default()
         };
-        let vdom = VirtualDom::new(app);
+        let mut vdom = VirtualDom::new(app);
+        // The app's own first, so a quire context of the same type (none today) would win.
+        setup.contexts.install(&mut vdom);
         let modality =
             vdom.in_runtime(|| Signal::new_in_scope(InputModality::default(), ScopeId::ROOT));
         vdom.provide_root_context(HostModality(modality));
