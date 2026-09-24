@@ -4,17 +4,17 @@
    at once (`S:2052`, `C:1744`).
    TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; padding:5px; outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-menu{ width:280px; max-height:320px; overflow-y:auto; padding:var(--s-5); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-menu[*|data-kind=slim],
 .ds-menu[*|data-kind=context]{ width:220px; }
-.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; padding:6px; border-radius:var(--r-panel); box-shadow:var(--shadow-2);
+.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; padding:var(--s-6); border-radius:var(--r-panel); box-shadow:var(--shadow-2);
   transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-spring); }
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
 
-.ds-menu-empty{ padding:10px; font-size:var(--fs-meta); color:var(--ink-faint); }
+.ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* TODO(O-12): the separator is derived from the bubble's; its 4px margin is the candidate. */
-.ds-menu-separator{ height:1px; margin:4px 0; background:var(--line-soft); }
+.ds-menu-separator{ height:1px; margin:var(--s-4) 0; background:var(--line-soft); }
 .ds-menu mark{ background:transparent; color:var(--accent); font-weight:800; }

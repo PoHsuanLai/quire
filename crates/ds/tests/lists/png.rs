@@ -27,7 +27,7 @@ pub fn unbase64(text: &str) -> Vec<u8> {
         .collect()
 }
 
-/// A decoded 8-bit RGB PNG.
+/// A decoded 8-bit RGB or RGBA PNG.
 pub struct Image {
     pub width: usize,
     pub height: usize,
@@ -37,11 +37,25 @@ pub struct Image {
 }
 
 impl Image {
-    /// The pixel at `(x, y)` as `#rrggbb`.
+    /// Bytes per pixel: 3 for RGB, 4 for RGBA.
+    fn channels(&self) -> usize {
+        if self.colour_type == 6 { 4 } else { 3 }
+    }
+
+    /// The pixel at `(x, y)` as `#rrggbb`, alpha left out.
     pub fn hex(&self, x: usize, y: usize) -> String {
         let row = &self.rows[y];
-        let [r, g, b] = [row[x * 3], row[x * 3 + 1], row[x * 3 + 2]];
+        let at = x * self.channels();
+        let [r, g, b] = [row[at], row[at + 1], row[at + 2]];
         format!("#{r:02x}{g:02x}{b:02x}")
+    }
+
+    /// The alpha at `(x, y)`: 255 for an RGB image.
+    pub fn alpha(&self, x: usize, y: usize) -> u8 {
+        match self.channels() {
+            4 => self.rows[y][x * 4 + 3],
+            _ => 255,
+        }
     }
 }
 
@@ -76,7 +90,8 @@ pub fn decode(png: &[u8]) -> Image {
         "zlib check bits"
     );
     let raw = inflate(&idat[2..]);
-    let stride = 1 + width * 3;
+    let channels = if header[9] == 6 { 4 } else { 3 };
+    let stride = 1 + width * channels;
     assert_eq!(raw.len(), stride * height, "scanline bytes");
     let rows = raw
         .chunks(stride)

@@ -3,8 +3,8 @@
    The colour change on hover is instant, as in S. Disabled, entering, leaving: not specified. */
 
 .ds-command-pill{
-  display:flex; align-items:center; gap:8px; width:100%; border:0; cursor:pointer; text-align:left;
-  padding:8px 10px; border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
+  display:flex; align-items:center; gap:var(--s-8); width:100%; border:0; cursor:pointer; text-align:left;
+  padding:var(--s-8) var(--s-10); border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
   font:inherit; font-size:var(--fs-control); box-shadow:var(--shadow-pill-inset);
   transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }

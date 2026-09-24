@@ -3,14 +3,16 @@
    Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state.
    A header heads its group: it is a full-width row of its own, spanning every column when its
    container is a grid (gallery fix A: four headers in a grid read as one run-on row). The
-   eyebrow never wraps; the rule takes the free space. The action's rule names the header: the
-   reset's `.ds button{font:inherit;color:inherit}` outranks a lone class. */
+   eyebrow never wraps; the rule takes the free space. The action's rule names the header, as
+   S's `.s-h button` does. The action always ends the row: after the rule it has no free space
+   to take, and in a header without a rule (Field, Menu) its `margin-left:auto` does what the
+   rule would (polish pass: a Menu header's action sat against its eyebrow). */
 
 .ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); text-transform:uppercase; color:var(--ink-faint); }
-.ds-section-header[*|data-kind=frame]{ gap:6px; padding:14px 6px 5px; font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
-.ds-section-header[*|data-kind=group]{ gap:8px; padding:12px 6px 6px; font-size:var(--fs-caption); letter-spacing:.12em; }
-.ds-section-header[*|data-kind=field]{ margin-bottom:6px; font-size:var(--fs-caption); letter-spacing:.14em; }
-.ds-section-header[*|data-kind=menu]{ padding:7px 8px 3px; font-size:var(--fs-micro); letter-spacing:.14em; }
+.ds-section-header[*|data-kind=frame]{ gap:var(--s-6); padding:var(--s-14) var(--s-6) var(--s-5); font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
+.ds-section-header[*|data-kind=group]{ gap:var(--s-8); padding:var(--s-12) var(--s-6) var(--s-6); font-size:var(--fs-caption); letter-spacing:.12em; }
+.ds-section-header[*|data-kind=field]{ margin-bottom:var(--s-6); font-size:var(--fs-caption); letter-spacing:.14em; }
+.ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:.14em; }
 
 .ds-section-header-text{ white-space:nowrap; }
 .ds-section-header-rule{ flex:1; min-width:0; height:1px; }
@@ -21,7 +23,7 @@
 .ds-section-header[*|data-kind=field] .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
 
 .ds-section-header .ds-section-header-action{
-  border:0; background:none; cursor:pointer; font:inherit; letter-spacing:.08em;
-  color:var(--f-ink-faint); padding:0 2px; text-transform:none;
+  margin-left:auto; border:0; background:none; cursor:pointer; font:inherit; letter-spacing:.08em;
+  color:var(--f-ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }

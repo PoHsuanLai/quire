@@ -4,10 +4,8 @@
 //!
 //! Two rules exist only for consumers and are set aside whole: [`Rule::DsInternals`] (quire is
 //! the one crate that styles `.ds-*` and `.ds[data-*]`) and [`Rule::Keyframes`] (quire is where
-//! keyframes live). A third is set aside for now: [`Rule::RawSpacing`], because the component
-//! sheets still write the literal pixels design/04-COMPONENTS.md quotes from `S`; moving them to
-//! `--s-*` is recorded in FINDINGS.md ("Gallery fixes B") as a follow-up, and a consumer runs the
-//! rule in full. Every other rule must be clean, or name its exact selector and reason below.
+//! keyframes live). Every other rule must be clean, [`Rule::RawSpacing`] included (the sheets
+//! read `--s-*` since the polish pass), or name its exact selector and reason below.
 
 #[path = "support/golden.rs"]
 #[allow(dead_code)] // Only the directory scan is used here.
@@ -46,13 +44,14 @@ fn config() -> LintConfig {
     }
 }
 
-/// Whether `offence` is one of the two consumer-only rules on quire's own ground, or the
-/// spacing rule the component sheets are not yet converted to.
+/// Whether `offence` is one of the two consumer-only rules on quire's own ground (the reset's
+/// element rules scope through `:where(.ds)`).
 fn quires_own(offence: &Offence) -> bool {
     match offence.rule {
-        Rule::DsInternals => offence.selector.starts_with(".ds"),
+        Rule::DsInternals => {
+            offence.selector.starts_with(".ds") || offence.selector.starts_with(":where(.ds)")
+        }
         Rule::Keyframes => offence.selector.starts_with("@keyframes "),
-        Rule::RawSpacing => true,
         _ => false,
     }
 }

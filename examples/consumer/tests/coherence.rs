@@ -136,11 +136,12 @@ fn the_sent_badge_times_out_on_ds_motions_own_clock() {
 
 // ---- Bonus: the anchored `Menu` opens and closes under `Harness`. ------------------------
 
-/// Not one of the four coherence rules, but worth pinning: `Page`'s "More" button anchors its
-/// `Menu` through `ds::use_rect` (`onmounted` + a rect read one frame later), and driving that
-/// through `ds_native::Harness` used to panic with `RefCell already borrowed`
-/// (`CONSUMING.md` §9) until wave 2 integration's `ds::HostMeasure` fix landed. This is the
-/// regression test for that fix, from this crate's own (unrelated) reason to open a menu.
+/// Not one of the four coherence rules, but worth pinning: `Page`'s "More" button hands its
+/// element to the `Menu` through `Button`'s `mounted` and `Anchor::Mounted`, measured when the
+/// menu places itself. Measuring a mounted element under `ds_native::Harness` used to panic
+/// with `RefCell already borrowed` (`CONSUMING.md` §9) until wave 2 integration's
+/// `ds::HostMeasure` fix landed; this is the regression test for that fix, from this crate's
+/// own (unrelated) reason to open a menu.
 #[test]
 fn the_menu_opens_and_closes_under_harness() {
     let mut harness = Harness::new(App, VIEW);

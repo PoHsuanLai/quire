@@ -18,8 +18,8 @@
 
 .ds-row{
   --i:0; --d:0;
-  position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:10px; align-items:start;
-  padding:10px 11px; margin-bottom:5px; border-radius:var(--r-card); background:var(--surface);
+  position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
+  padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
   border:1px solid transparent; cursor:pointer; user-select:none; list-style:none;
   transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out),
              background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
@@ -55,7 +55,7 @@
 }
 
 /* Dot (`S:185-187`, `S:295-296`). */
-.ds-row-dot{ padding-top:6px; }
+.ds-row-dot{ padding-top:var(--s-6); }
 .ds-dot{
   display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent);
   transition:transform var(--t-quick) var(--e-spring), opacity var(--t-quick) var(--e-out);
@@ -64,19 +64,19 @@
 
 /* Text (`S:189-197`). */
 .ds-row-main{ min-width:0; }
-.ds-row-from{ display:flex; align-items:baseline; gap:7px; min-width:0; }
+.ds-row-from{ display:flex; align-items:baseline; gap:var(--s-7); min-width:0; }
 .ds-row-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
 .ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
 .ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint); }
 .ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
 .ds-row[*|data-emphasis=strong] .ds-row-sub{ font-weight:600; }
 .ds-row-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }
-.ds-row-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+.ds-row-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--s-5); }
 .ds-row-time{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
-.ds-row-tags{ display:flex; gap:4px; align-items:center; }
+.ds-row-tags{ display:flex; gap:var(--s-4); align-items:center; }
 
 /* Star and sparks (`S:299-307`). */
-.ds-row .ds-star{
+.ds-star{
   position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
   cursor:pointer; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
   transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);

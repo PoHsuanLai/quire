@@ -4,16 +4,16 @@
    The pressed fill jumps between segments; there is no sliding thumb.
    TODO(O-1): disabled is not specified. */
 
-.ds-segmented{ display:inline-flex; gap:2px; border:1px solid var(--line); border-radius:var(--r-pill); }
-.ds-segmented[*|data-size=regular]{ padding:3px; background:var(--surface-2); }
-.ds-segmented[*|data-size=small]{ padding:2px; background:var(--surface); }
+.ds-segmented{ display:inline-flex; gap:var(--s-2); border:1px solid var(--line); border-radius:var(--r-pill); }
+.ds-segmented[*|data-size=regular]{ padding:var(--s-3); background:var(--surface-2); }
+.ds-segmented[*|data-size=small]{ padding:var(--s-2); background:var(--surface); }
 
 .ds-segment{
   font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:pointer; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
-.ds-segmented[*|data-size=regular] .ds-segment{ padding:5px 11px; font-size:var(--fs-small); }
-.ds-segmented[*|data-size=small] .ds-segment{ padding:3px 10px; font-size:var(--fs-help); }
+.ds-segmented[*|data-size=regular] .ds-segment{ padding:var(--s-5) var(--s-11); font-size:var(--fs-small); }
+.ds-segmented[*|data-size=small] .ds-segment{ padding:var(--s-3) var(--s-10); font-size:var(--fs-help); }
 .ds-segment:hover{ color:var(--ink); }
 .ds-segment:active{ transform:scale(var(--squish)); }
 .ds-segment[*|aria-pressed=true]{ background:var(--ink); color:var(--paper); }

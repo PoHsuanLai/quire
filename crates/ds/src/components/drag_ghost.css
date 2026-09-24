@@ -5,7 +5,7 @@
    `DropState` by ListRow and SidebarItem, whose stylesheets carry the rules. */
 
 .ds-drag-ghost{
-  position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:9px 11px;
+  position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:var(--s-9) var(--s-11);
   border-radius:var(--r-card); background:var(--raise); border:1px solid var(--line);
   box-shadow:var(--shadow-drag); font-size:var(--fs-control); font-weight:700; color:var(--ink);
   transform:rotate(var(--tilt)) scale(1.02);
@@ -21,4 +21,4 @@
 .ds :hover > .ds-grip{ opacity:1; }
 .ds-grip:hover{ background:var(--surface); color:var(--ink); }
 
-.ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent); margin:2px 0; }
+.ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent); margin:var(--s-2) 0; }

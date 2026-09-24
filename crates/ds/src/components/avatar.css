@@ -24,4 +24,4 @@
 
 /* The event attendee stack: `S:519-521`. */
 .ds-avatar[*|data-tone=stack]{ font-size:var(--fs-micro); border:2px solid var(--surface); }
-.ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:-6px; }
+.ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:calc(var(--s-6) * -1); }

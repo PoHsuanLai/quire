@@ -2,13 +2,12 @@
    bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
    Undo hover is not specified. C's retry states (`nudge`, `shake`, a Fix button) have no phase
-   in `SendPhase` and are not drawn. The Undo rule names the pill: the reset's
-   `.ds button{font:inherit;color:inherit}` outranks a lone class, which painted Undo's label in
-   the pill's `--paper` on its own `--paper` (gallery fix A). */
+   in `SendPhase` and are not drawn. The Undo rule names the pill, as S's
+   `.sendpill button` does. */
 
-.ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:10px;
-  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:6px 6px 6px 12px; font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
+.ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:var(--s-10);
+  background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-6) var(--s-6) var(--s-6) var(--s-12); font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
   transition:transform var(--t-big) var(--e-spring); white-space:nowrap; }
 .ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-send-ring{ display:block; flex:none; }
-.ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:4px 12px; font-size:var(--fs-small); font-weight:700; }
+.ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }

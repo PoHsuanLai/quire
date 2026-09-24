@@ -6,7 +6,7 @@
    no `filter`); opacity .85 stays here. The avatar's hover turn is `--t-quick --e-spring`.
    TODO(O-3): `rotate(-6deg) scale(1.08)` have no tokens. */
 
-.ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:12px; }
+.ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); margin-top:var(--s-12); }
 
 .ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-spring); }
 .ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }

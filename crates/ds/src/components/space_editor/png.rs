@@ -1,25 +1,58 @@
-//! A small PNG writer for the editor's field plane: 8-bit RGB, one IDAT, compressed with
-//! fixed-Huffman DEFLATE (RFC 1951 section 3.2.6) inside zlib (RFC 1950). The plane is mostly
-//! flat ground and repeated scanlines, so a greedy matcher that only tries "one pixel back" and
-//! "one scanline back" compresses it well without a dependency.
+//! A small PNG writer for the editor's field: 8-bit RGB or RGBA, one IDAT, compressed with
+//! fixed-Huffman DEFLATE (RFC 1951 section 3.2.6) inside zlib (RFC 1950). Both images are
+//! small, so a greedy matcher that only tries "one pixel back" and "one scanline back" is
+//! enough, and needs no dependency.
 
 /// The PNG of `width` x `height` RGB `pixels`, rows top to bottom.
 pub(super) fn rgb(width: usize, height: usize, pixels: &[[u8; 3]]) -> Vec<u8> {
-    let stride = 1 + width * 3;
-    let raw: Vec<u8> = pixels
-        .chunks(width)
+    encode(width, height, Channels::Rgb, pixels.as_flattened())
+}
+
+/// The PNG of `width` x `height` RGBA `pixels` (straight alpha), rows top to bottom.
+pub(super) fn rgba(width: usize, height: usize, pixels: &[[u8; 4]]) -> Vec<u8> {
+    encode(width, height, Channels::Rgba, pixels.as_flattened())
+}
+
+/// A pixel's layout: PNG colour type 2 or 6.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Channels {
+    Rgb,
+    Rgba,
+}
+
+impl Channels {
+    fn bytes(self) -> usize {
+        match self {
+            Channels::Rgb => 3,
+            Channels::Rgba => 4,
+        }
+    }
+
+    fn colour_type(self) -> u8 {
+        match self {
+            Channels::Rgb => 2,
+            Channels::Rgba => 6,
+        }
+    }
+}
+
+fn encode(width: usize, height: usize, channels: Channels, bytes: &[u8]) -> Vec<u8> {
+    let row = width * channels.bytes();
+    let stride = 1 + row;
+    let raw: Vec<u8> = bytes
+        .chunks(row)
         .take(height)
-        .flat_map(|row| std::iter::once(0u8).chain(row.iter().flatten().copied()))
+        .flat_map(|line| std::iter::once(0u8).chain(line.iter().copied()))
         .collect();
     let mut idat = vec![0x78, 0x01];
-    idat.extend(deflate(&raw, &[3, stride]));
+    idat.extend(deflate(&raw, &[channels.bytes(), stride]));
     idat.extend(adler32(&raw).to_be_bytes());
 
     let mut header = Vec::with_capacity(13);
     header.extend(u32::try_from(width).unwrap_or(u32::MAX).to_be_bytes());
     header.extend(u32::try_from(height).unwrap_or(u32::MAX).to_be_bytes());
-    // Bit depth 8, colour type 2 (RGB), deflate, adaptive filtering, no interlace.
-    header.extend([8, 2, 0, 0, 0]);
+    // Bit depth 8, the colour type, deflate, adaptive filtering, no interlace.
+    header.extend([8, channels.colour_type(), 0, 0, 0]);
 
     let mut png = b"\x89PNG\r\n\x1a\n".to_vec();
     chunk(&mut png, *b"IHDR", &header);
