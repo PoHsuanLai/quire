@@ -1,0 +1,17 @@
+[package]
+name = "icons"
+description = "App-icon post-process (design/08-ICONS.md 2, 3.7): key, fit, squircle plate, size set, contact sheets."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+image = { workspace = true }
+clap = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

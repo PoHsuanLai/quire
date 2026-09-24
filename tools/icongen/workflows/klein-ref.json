@@ -1,0 +1,194 @@
+{
+  "prompt": {
+    "unet": {
+      "class_type": "UnetLoaderGGUF",
+      "inputs": {
+        "unet_name": "flux-2-klein-4b-Q4_K_M.gguf"
+      }
+    },
+    "clip": {
+      "class_type": "CLIPLoader",
+      "inputs": {
+        "clip_name": "qwen_3_4b_fp4_flux2.safetensors",
+        "type": "flux2",
+        "device": "default"
+      }
+    },
+    "vae": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "flux2-vae.safetensors"
+      }
+    },
+    "pos": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "clip",
+          0
+        ],
+        "text": "Using the object in image 1 as the style reference (same materials, same lighting, same rounded shapes, same camera angle, same plain light grey background), draw a single document folder with a rounded tab, slightly open instead. Colours: bright cobalt blue and deep ultramarine, with white and warm off-white accents. One object only, centred. No text, no letters, no frame."
+      }
+    },
+    "neg": {
+      "class_type": "ConditioningZeroOut",
+      "inputs": {
+        "conditioning": [
+          "pos",
+          0
+        ]
+      }
+    },
+    "sampler_select": {
+      "class_type": "KSamplerSelect",
+      "inputs": {
+        "sampler_name": "euler"
+      }
+    },
+    "sigmas": {
+      "class_type": "Flux2Scheduler",
+      "inputs": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024
+      }
+    },
+    "noise": {
+      "class_type": "RandomNoise",
+      "inputs": {
+        "noise_seed": 11
+      }
+    },
+    "latent": {
+      "class_type": "EmptyFlux2LatentImage",
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      }
+    },
+    "sample": {
+      "class_type": "SamplerCustomAdvanced",
+      "inputs": {
+        "noise": [
+          "noise",
+          0
+        ],
+        "guider": [
+          "guider",
+          0
+        ],
+        "sampler": [
+          "sampler_select",
+          0
+        ],
+        "sigmas": [
+          "sigmas",
+          0
+        ],
+        "latent_image": [
+          "latent",
+          0
+        ]
+      }
+    },
+    "decode": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "sample",
+          0
+        ],
+        "vae": [
+          "vae",
+          0
+        ]
+      }
+    },
+    "save": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "decode",
+          0
+        ],
+        "filename_prefix": "example"
+      }
+    },
+    "ref_load": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "hero.png"
+      }
+    },
+    "ref_scale": {
+      "class_type": "ImageScaleToTotalPixels",
+      "inputs": {
+        "image": [
+          "ref_load",
+          0
+        ],
+        "upscale_method": "lanczos",
+        "megapixels": 1.0,
+        "resolution_steps": 1
+      }
+    },
+    "ref_latent": {
+      "class_type": "VAEEncode",
+      "inputs": {
+        "pixels": [
+          "ref_scale",
+          0
+        ],
+        "vae": [
+          "vae",
+          0
+        ]
+      }
+    },
+    "pos_ref": {
+      "class_type": "ReferenceLatent",
+      "inputs": {
+        "conditioning": [
+          "pos",
+          0
+        ],
+        "latent": [
+          "ref_latent",
+          0
+        ]
+      }
+    },
+    "neg_ref": {
+      "class_type": "ReferenceLatent",
+      "inputs": {
+        "conditioning": [
+          "neg",
+          0
+        ],
+        "latent": [
+          "ref_latent",
+          0
+        ]
+      }
+    },
+    "guider": {
+      "class_type": "CFGGuider",
+      "inputs": {
+        "model": [
+          "unet",
+          0
+        ],
+        "positive": [
+          "pos_ref",
+          0
+        ],
+        "negative": [
+          "neg_ref",
+          0
+        ],
+        "cfg": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "prompt": {
+    "unet": {
+      "class_type": "UnetLoaderGGUF",
+      "inputs": {
+        "unet_name": "qwen-image-2512-Q3_K_M.gguf"
+      }
+    },
+    "clip": {
+      "class_type": "CLIPLoader",
+      "inputs": {
+        "clip_name": "qwen_2.5_vl_7b_nvfp4.safetensors",
+        "type": "qwen_image",
+        "device": "default"
+      }
+    },
+    "vae": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "qwen_image_vae.safetensors"
+      }
+    },
+    "shift": {
+      "class_type": "ModelSamplingAuraFlow",
+      "inputs": {
+        "model": [
+          "unet",
+          0
+        ],
+        "shift": 3.1
+      }
+    },
+    "pos": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "clip",
+          0
+        ],
+        "text": "A clean, simple 3D illustration of a single closed paper mail envelope with a folded flap, one object only, not a photograph. Centred, seen from a slight three-quarter front angle, filling most of the frame with even space around it. Clean, simple, friendly shapes with softly rounded edges, smooth matte and lightly glossy materials, no fine texture. Soft diffuse studio light from the top left, one gentle contact shadow under the object. Colours: warm amber and honey, with white and warm off-white accents. Plain flat light grey background, no floor line, no horizon. No text, no letters, no numbers, no logo, no frame, no border, no badge, no rounded square behind the object, no outline stroke, no people, no hands."
+      }
+    },
+    "neg": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "clip",
+          0
+        ],
+        "text": "text, watermark, signature, frame, border, rounded square, app tile, background pattern, photograph, realistic skin, busy detail, multiple objects, cropped object"
+      }
+    },
+    "latent": {
+      "class_type": "EmptySD3LatentImage",
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      }
+    },
+    "sample": {
+      "class_type": "KSampler",
+      "inputs": {
+        "model": [
+          "shift",
+          0
+        ],
+        "positive": [
+          "pos",
+          0
+        ],
+        "negative": [
+          "neg",
+          0
+        ],
+        "latent_image": [
+          "latent",
+          0
+        ],
+        "seed": 11,
+        "steps": 20,
+        "cfg": 2.5,
+        "sampler_name": "euler",
+        "scheduler": "simple",
+        "denoise": 1.0
+      }
+    },
+    "decode": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "sample",
+          0
+        ],
+        "vae": [
+          "vae",
+          0
+        ]
+      }
+    },
+    "save": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "decode",
+          0
+        ],
+        "filename_prefix": "example"
+      }
+    }
+  }
+}
