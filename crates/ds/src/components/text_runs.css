@@ -1,0 +1,8 @@
+/* Text runs (mailo gaps 2): a caller's search hit is `mark.ds-mark`, a soft accent ground under
+   the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
+   `data-tone=strong|faint`. Inside a menu the menu's own `mark` rule wins (accent ink, no
+   ground), so a caller's marks there look like the fuzzy matcher's. */
+
+.ds-mark{ background:var(--accent-soft); color:inherit; border-radius:var(--r-micro); padding:0 var(--s-1); }
+.ds-run[*|data-tone=strong]{ font-weight:700; color:var(--ink); }
+.ds-run[*|data-tone=faint]{ color:var(--ink-faint); }

@@ -36,6 +36,9 @@ pub mod peek;
 pub mod popover;
 pub mod press;
 pub mod provider_mark;
+pub(crate) mod row_click;
+pub mod row_hooks;
+pub(crate) mod row_star;
 pub mod scrim;
 pub mod search_field;
 pub mod section_header;
@@ -50,6 +53,7 @@ pub mod spinner;
 pub mod sync_halo;
 pub mod tabs;
 pub mod text_input;
+pub mod text_runs;
 pub mod toast;
 pub mod toggle;
 pub mod tooltip;
@@ -71,7 +75,7 @@ pub use edge_strip::{EdgeStrip, SideState};
 pub use hover_card::{
     FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
 };
-pub use hover_strip::{ActionId, HoverStrip, StripAction};
+pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
@@ -86,6 +90,7 @@ pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
+pub use row_hooks::PartHooks;
 pub use scrim::Scrim;
 pub use search_field::SearchField;
 pub use section_header::{HeaderKind, SectionHeader};
@@ -100,6 +105,7 @@ pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
 pub use text_input::{Focus, InputVariant, TextInput};
+pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
@@ -150,6 +156,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("sync_halo", include_str!("sync_halo.css")),
     ("tabs", include_str!("tabs.css")),
     ("text_input", include_str!("text_input.css")),
+    ("text_runs", include_str!("text_runs.css")),
     ("toast", include_str!("toast.css")),
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),

@@ -7,6 +7,7 @@ pub mod external_icons;
 pub mod gaps;
 pub mod launcher;
 pub mod lists;
+pub mod lists_search;
 pub mod materials;
 pub mod matrix;
 pub mod motion;
