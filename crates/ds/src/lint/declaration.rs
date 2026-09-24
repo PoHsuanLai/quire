@@ -234,7 +234,7 @@ fn is_face_reference(value: &[Located]) -> bool {
         .collect();
     match significant[..] {
         ["inherit"] => true,
-        ["var(", name, ")"] => [Family::Display, Family::Ui, Family::Data]
+        ["var(", name, ")"] => Family::ALL
             .iter()
             .any(|family| family.var().as_str() == name),
         _ => false,

@@ -44,6 +44,18 @@ const FACES: &[(&str, &str, &str, &str)] = &[
     ("Karla", "italic", "400", "karla-italic-400"),
     ("Space Mono", "normal", "400", "space-mono-normal-400"),
     ("Space Mono", "normal", "700", "space-mono-normal-700"),
+    (
+        "Noto Serif",
+        "normal",
+        "400 700",
+        "noto-serif-normal-400-700",
+    ),
+    (
+        "Noto Serif",
+        "italic",
+        "400 700",
+        "noto-serif-italic-400-700",
+    ),
 ];
 
 fn main() {

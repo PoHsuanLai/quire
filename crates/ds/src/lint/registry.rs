@@ -47,7 +47,7 @@ fn collect() -> HashSet<String> {
         .chain(FontSize::ALL.map(FontSize::var))
         .chain(ZLayer::ALL.map(ZLayer::var))
         .chain(OpacityToken::ALL.map(OpacityToken::var))
-        .chain([Family::Display, Family::Ui, Family::Data].map(Family::var))
+        .chain(Family::ALL.map(Family::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
         .chain([StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])

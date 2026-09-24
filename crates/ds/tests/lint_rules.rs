@@ -181,6 +181,20 @@ const CASES: &[Case] = &[
         expect: false,
     },
     Case {
+        name: "font-family: the serif face token passes (mailo gaps 3)",
+        css: ".serif { font-family: var(--font-serif); }",
+        profile: Profile::Strict,
+        rule: Rule::FontFamily,
+        expect: false,
+    },
+    Case {
+        name: "font-family: a serif named outright still fails",
+        css: ".serif { font-family: Georgia, serif; }",
+        profile: Profile::Strict,
+        rule: Rule::FontFamily,
+        expect: true,
+    },
+    Case {
         name: "font-family: a token with a literal fallback fails",
         css: ".chip { font-family: var(--font-data), monospace; }",
         profile: Profile::Standard,
