@@ -4,6 +4,7 @@ pub mod app_icons;
 pub mod controls;
 pub mod dock_tiles;
 pub mod external_icons;
+pub mod fields;
 pub mod gaps;
 pub mod launcher;
 pub mod lists;

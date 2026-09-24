@@ -99,13 +99,13 @@ pub use space_editor::{ActiveDot, DotIndex, SpaceDot, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
-pub use text_input::{Focus, InputVariant, TextInput};
+pub use text_input::{Focus, InputVariant, TextInput, TextInputKind};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
 pub use vocab::{
-    Availability, Check, DropState, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection,
-    Shortcut, StaggerIndex, Switch,
+    Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
+    Selection, Shortcut, StaggerIndex, Switch,
 };
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 

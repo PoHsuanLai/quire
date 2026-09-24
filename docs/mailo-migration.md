@@ -135,6 +135,9 @@ concern (section 6 has the full "what mailo keeps" list).
 | the Space dots editor (`ui/space_editor/{hue,mod}.rs`) | `SpaceEditor` / `SpaceDot` (§32) | this is the one component whose whole job is a settled design, not a stylesheet: read `space_editor/mod.rs` fully before starting |
 | drag-and-drop ghost (search for `dragstart`/`dataTransfer` under `ui/`) | `DragGhost` (§34) | not confirmed present in the files this brief's author read — check before assuming it exists |
 | a syncing indicator, if any (search `SyncState` renders under `ui/`) | `SyncHalo` (§35) | same caveat |
+| raw `button`s with a `title`, an `aria_label` or `aria_expanded` (about 130 across `ui/`) | `Button { title, aria_label, expanded }` (§1), or `IconButton { tooltip, label, expanded }` (§2) for a glyph-only one | mailo gaps 2: `expanded` is `Expanded::{Open, Closed}` on `Button`, a `Switch` on `IconButton` |
+| `Field { kind: FieldKind::{Boxed, Inline, Secret}, on_focus, on_blur }` (`ui/field.rs`) | `TextInput { variant, kind: TextInputKind::{Text, Password}, onfocus, onblur }` (§6) | mailo gaps 2. The "typing in a field" guard hangs off `onfocus`/`onblur`. `TextInput` is controlled: a `Password` writes its `value` like any field (mailo's `Secret` kept it out of the markup), and draws dots over it on Blitz |
+| `Field { kind: FieldKind::Range { min, max } }` (the Space editor's grain) | `Slider` (§5) | already the range: `Fraction` thousandths, so grain `n` is `Fraction(n * 10)`; the `SpaceEditor` draws its own grain row |
 
 Everything under `ui/icon/` (the glyph set) maps to `ds::Glyph`/`ds::Icon` — `08-ICONS.md` and
 `DESIGN.md`'s icon row have the geometry; mailo's own `ui/icon` module is deleted, not ported

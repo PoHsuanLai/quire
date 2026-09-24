@@ -1482,3 +1482,39 @@ What mailo changes:
   `use_environment(AppName::MAILO)`; it may stay (it is idempotent) or go.
 - Keep `Space::motion` and feed it into the `Ds` root's `appearance.motion`; keep `KEEP_FOCUS`
   until Phase B.
+
+## mailo gaps 2 (controls and tiles) (2026-09-25)
+
+mailo's component migration reported the props and variants it still hand-rolls controls for.
+Branch `mailo-gaps-2b`. Every change is additive unless an item says the markup changed. Proofs:
+`crates/ds/tests/mailo_gaps_ssr.rs` (goldens beside each component's existing ones, so the
+controls' and lists' class scans cover them) and one Harness test file per behaviour in
+`crates/ds-native/tests/`. CONSUMING.md "The mailo gaps 2" has one row per new prop.
+
+1. **Button and TextInput.** `Button` takes `title`, `aria_label` and `expanded:
+   Option<Expanded>` (`Expanded::{Open, Closed}`, new in `vocab`: a trigger's open state is a
+   different fact from a toggle's pressed state, so it is not a `Switch`). `IconButton` already
+   had all three (`tooltip`, `label`, `expanded: Option<Switch>`) and is unchanged; its
+   `expanded` stays a `Switch` because changing it would break every caller. `TextInput` takes
+   `onfocus`/`onblur: EventHandler<()>` and `kind: TextInputKind::{Text, Password}`. A range is
+   the existing `Slider` (thousandths, keys, drag), so there is no range kind.
+   - **Blitz dispatches no focus event for a programmatic focus.** A click or Tab goes through
+     blitz-dom's `generate_focus_events` (blur on the old node, focus on the new); the focus
+     seam's `set_focus_to` (ds-native's `HostFocus`, and dioxus-native-dom's own `set_focus`,
+     whose source says "TODO: queue focus events somehow") changes the focused node silently.
+     So a `Focus::OnMount` or `Focus::Controlled` field on Blitz never heard its own focus.
+     Fixed for the field itself: `focus::host::focus_soon_told` calls the field's `onfocus` once a
+     *host's* write succeeds; without a host (the webview) the renderer's real event fires and
+     `told` is not called, so the caller hears it once either way. Not fixable here: the field
+     that *lost* the caret to a seam focus gets no `blur` on Blitz. A caller that tracks "typing"
+     with one flag is unaffected (the new field's focus sets it); one that tracks each field
+     must treat a focus elsewhere as the other's blur. Proof: `field_focus.rs`
+     (`a_click_and_the_seam_both_report_focus_and_a_click_reports_blur`,
+     `a_controlled_request_still_focuses_and_reports_it`); with `told` disabled both fail.
+   - **Blitz draws a password in clear.** blitz-dom lays `type="password"` out as a text editor
+     and paints its characters as typed (no masking anywhere in blitz-dom or blitz-paint at the
+     pinned rev). The field therefore paints its own text transparent (`caret-color` keeps the
+     caret in `--ink`) and lays `.ds-input-mask`, one `•` per character, over it where the
+     placeholder would sit. The caret follows the hidden text's advance, so it can sit a little
+     off the last dot; the secret never paints. A browser masks natively, and its (transparent)
+     dots sit under the same overlay.

@@ -1,9 +1,10 @@
 //! Button: a labelled action in five variants (design/04-COMPONENTS.md section 1).
-//! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini.
+//! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini; `title`,
+//! `aria-label` and `aria-expanded` only when the caller gives them.
 
 use crate::components::icon_view::IconView;
 use crate::components::press::{Press, PressListeners};
-use crate::components::vocab::{Availability, Switch};
+use crate::components::vocab::{Availability, Expanded, Switch};
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;
@@ -47,6 +48,11 @@ impl ButtonVariant {
 /// `onclick` hears the primary, secondary (right-click) and middle buttons, and the keyboard as
 /// primary. `mounted` hands over the element once it is in the document, so a floating
 /// component can anchor to it (`Anchor::Mounted`).
+///
+/// `title` is the hover hint. `aria_label` names the button to assistive technology in place of
+/// its visible label, for a label that is a symbol or too terse to stand alone ("+" or "All").
+/// `expanded` says whether the menu or panel this button opens is showing (`aria-expanded`);
+/// leave it `None` on a button that opens nothing.
 #[component]
 pub fn Button(
     variant: ButtonVariant,
@@ -57,8 +63,12 @@ pub fn Button(
     onclick: EventHandler<Press>,
     #[props(default)] id: Option<String>,
     #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
+    #[props(default)] title: Option<String>,
+    #[props(default)] aria_label: Option<String>,
+    #[props(default)] expanded: Option<Expanded>,
 ) -> Element {
     let pressed = pressed.map(|state| state.aria());
+    let expanded = expanded.map(Expanded::aria);
     let listen = PressListeners::new(onclick);
     let live = availability == Availability::Enabled;
     rsx! {
@@ -67,7 +77,10 @@ pub fn Button(
             id,
             class: "ds-button",
             "data-variant": variant.slug(),
+            title,
+            "aria-label": aria_label,
             "aria-pressed": pressed,
+            "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
             onclick: move |event| {
                 if live {

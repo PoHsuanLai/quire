@@ -839,6 +839,20 @@ A person or account colour never needs a hex constant of yours:
 - **Glyphs.** `Icon::Printer`, `Icon::FolderInput` (Lucide `printer`, `folder-input`), listed in
   `Icon::ACTIONS`.
 
+### The mailo gaps 2 (2026-09-25): controls and tiles
+
+Every row is additive: leave the prop out and the markup is what it was, except where a row
+says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the why of each.
+
+| Component | Prop or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Button` | `title` | `Option<String>` (`None`) | the hover hint, written as `title` |
+| `Button` | `aria_label` | `Option<String>` (`None`) | names the button for assistive technology in place of its visible label (a `+`, an `All`) |
+| `Button` | `expanded` | `Option<Expanded>` (`None`) | `Expanded::{Open, Closed}` as `aria-expanded`, for a button that opens a menu or panel; `IconButton` already had `tooltip`, `label` and `expanded: Option<Switch>` and is unchanged |
+| `TextInput` | `onfocus`, `onblur` | `EventHandler<()>` (no-op) | the caret arrived or left: a click or Tab, and the focus seam (`Focus::OnMount`, `Focus::Controlled`), which on Blitz moves the caret with no event, so the field calls `onfocus` itself |
+| `TextInput` | `kind` | `TextInputKind` (`Text`) | `Password` writes `type="password"` and `data-kind="password"`; Blitz draws a password's characters as typed, so the field's text is transparent and one dot per character is laid over it |
+| `Slider` | (none) | | already the range input: `value: Fraction` in thousandths, keys and drag; map your 0-100 to `Fraction(n * 10)` |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
