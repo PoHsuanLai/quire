@@ -21,8 +21,8 @@ fi
 lock_dir="${XDG_RUNTIME_DIR:-/tmp}"
 lock_file="$lock_dir/agent-build.lock"
 holder_file="$lock_dir/agent-build.holder"
-mem_max="${AGENT_MEM_MAX:-4G}"
-jobs="${CARGO_BUILD_JOBS:-2}"
+mem_max="${AGENT_MEM_MAX:-infinity}"  # the 4 GB gate was dropped on 2026-09-25 (memory pressure gone)
+jobs="${CARGO_BUILD_JOBS:-8}"
 
 sub="${1:-}"
 case "$sub" in
@@ -58,8 +58,8 @@ wait_note() {
   echo "agent-shim: waiting for a build slot (held by: ${holders:-unknown})" >&2
 }
 
-# Build slots: at most AGENT_BUILD_SLOTS compilations run at once (each capped at 4 GB).
-slots="${AGENT_BUILD_SLOTS:-2}"
+# Build slots: at most AGENT_BUILD_SLOTS compilations run at once (no memory cap by default since 2026-09-25).
+slots="${AGENT_BUILD_SLOTS:-6}"
 slot=""
 acquire_slot() {
   local i
