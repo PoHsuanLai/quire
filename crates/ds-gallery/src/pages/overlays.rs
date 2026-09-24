@@ -121,6 +121,7 @@ pub fn OverlaysPage() -> Element {
         Cards {}
         Bubble {}
         Pills { showcase }
+        super::launcher::EmbeddedPalette {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,

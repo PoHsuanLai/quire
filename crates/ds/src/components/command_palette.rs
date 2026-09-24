@@ -1,75 +1,91 @@
 //! CommandPalette: "the same menu, just bigger and centred" (design/04-COMPONENTS.md section 25).
 //!
-//! A SearchField over an embedded Rich menu, on a scrim that closes on a pointer down outside
-//! the panel. Keys come from the search field (design/06-INTERACTIONS.md section 2.3): Up and
-//! Down move the selection CLAMPED, Enter closes and then runs the selection, Escape closes the
-//! topmost layer only. Ranking and grouping are the consumer's (section 11); the palette marks
-//! the query in each title with the same fuzzy matcher. The palette lists what it is given
-//! flat: a submenu parent is drawn with its chevron but runs nothing, and a disabled item is
-//! drawn and skipped as in a menu.
+//! A SearchField over an embedded Rich menu. Keys come from the search field
+//! (design/06-INTERACTIONS.md section 2.3): Up and Down move the selection CLAMPED, Enter closes
+//! and then runs the selection, Escape closes the topmost layer only; every other key reaches
+//! the caller's `onkey` after the palette's own. Ranking and grouping are the consumer's
+//! (section 11); the palette marks the query in each title with the same fuzzy matcher. The
+//! palette lists what it is given flat: a submenu parent is drawn with its chevron but runs
+//! nothing, and a disabled item is drawn and skipped as in a menu.
+//!
+//! It is hosted two ways ([`CommandPaletteHost`]): over the window on a scrim that closes on a
+//! pointer down outside the card, or embedded in a surface of its own (a shell launcher's
+//! panel, sill FINDINGS Q40), where it draws no scrim and its card fills its container.
 
 use crate::components::menu::MenuKind;
-use crate::components::menu_entry::{MenuEntry, fuzzy};
-use crate::components::menu_lines::{Act, Choice, Line, Nav, Step, choices, liveness, moved_live};
+use crate::components::menu_entry::MenuEntry;
+use crate::components::menu_lines::{Act, Choice, Nav, choices, liveness, moved_live};
 use crate::components::menu_rows::{Drawn, render_lines};
-use crate::components::popover::{Dismiss, Stacking, use_entrance, use_float};
+use crate::components::palette_lines::{PaletteKey, choice_lines, headed, marked, palette_key};
+use crate::components::palette_rows::{SelectedLine, use_row_rects};
+use crate::components::palette_select::use_palette_selection;
+use crate::components::popover::{Dismiss, Float, Stacking, use_entrance, use_float};
 use crate::components::search_field::SearchField;
 use crate::components::text_input::Focus;
 use crate::components::vocab::Availability;
+use crate::focus::request::FocusRequest;
+use crate::geometry::{MountedRef, Point, Rect};
 use crate::motion::anim::Anim;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
 
-/// What a key in the search field does to the palette.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum PaletteKey {
-    /// Move the selection, clamped.
-    Move(Step),
-    /// Close, then run the selection.
-    Run,
-    /// Close.
-    Close,
+/// Where the palette draws.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum CommandPaletteHost {
+    /// Over the window, on the palette layer: a scrim, and the card 11 % down.
+    #[default]
+    Overlay,
+    /// In place, filling its container: no scrim, no layer of its own to draw on (a shell
+    /// surface that is the palette). Its card paints the enclosing material.
+    Surface,
 }
 
-/// The palette's reading of a key (design/06-INTERACTIONS.md section 2.3).
-fn palette_key(key: &Key) -> Option<PaletteKey> {
-    match key {
-        Key::ArrowDown => Some(PaletteKey::Move(Step::Down)),
-        Key::ArrowUp => Some(PaletteKey::Move(Step::Up)),
-        Key::Enter => Some(PaletteKey::Run),
-        Key::Escape => Some(PaletteKey::Close),
-        _ => None,
+impl CommandPaletteHost {
+    fn slug(self) -> &'static str {
+        match self {
+            CommandPaletteHost::Overlay => "overlay",
+            CommandPaletteHost::Surface => "surface",
+        }
     }
 }
 
-/// The groups as one list: each non-empty group's title as a header, then its items.
-fn headed<T: Clone>(groups: &[(String, Vec<MenuEntry<T>>)]) -> Vec<MenuEntry<T>> {
-    groups
-        .iter()
-        .filter(|(_, entries)| !entries.is_empty())
-        .flat_map(|(title, entries)| {
-            std::iter::once(MenuEntry::Header(title.clone())).chain(entries.iter().cloned())
-        })
-        .collect()
+/// How the palette's card enters.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum PaletteEntrance {
+    /// `peek-in`, S's palette.
+    #[default]
+    PeekIn,
+    /// `cmdk-in`, C's command menu.
+    CmdkIn,
 }
 
-/// `entries` as menu lines, each item's title marked where `query` matches it.
-fn marked<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Line<'a, T>> {
-    entries
-        .iter()
-        .map(|entry| Line {
-            entry,
-            marks: match entry {
-                MenuEntry::Item { title, .. } | MenuEntry::Submenu { title, .. } => {
-                    fuzzy(query, title).map(|hit| hit.marks).unwrap_or_default()
-                }
-                MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => Vec::new(),
-            },
-        })
-        .collect()
+impl PaletteEntrance {
+    fn anim(self) -> Anim {
+        match self {
+            PaletteEntrance::PeekIn => Anim::PeekIn,
+            PaletteEntrance::CmdkIn => Anim::CmdkIn,
+        }
+    }
+
+    fn slug(self) -> &'static str {
+        match self {
+            PaletteEntrance::PeekIn => "peek-in",
+            PaletteEntrance::CmdkIn => "cmdk-in",
+        }
+    }
 }
 
-/// Search and commands over a scrim.
+/// Search and commands. `host` says where it draws and `entrance` how its card enters; `id`
+/// goes on the card (a shell's blur region names it). `focus` hands the field the keyboard
+/// again after something else took it (a menu that closed); the field always takes it as it
+/// mounts.
+///
+/// The selection is the palette's own unless `selected` is given, in which case it shows that
+/// choice (clamped) and Up, Down and the pointer only ask for another through `on_select`.
+/// Uncontrolled, `on_select` hears every change of the selection, a new query's reset to the
+/// first choice included. `on_select_rect` hears the selected row's rect, in client
+/// coordinates, whenever the selection or the row under it changes: what an actions menu
+/// anchors to. `onkey` hears every key the field gets, after the palette has read it.
 #[component]
 pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     label: String,
@@ -81,21 +97,32 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     oninput: EventHandler<String>,
     onpick: EventHandler<T>,
     onclose: EventHandler<()>,
+    #[props(default)] host: CommandPaletteHost,
+    #[props(default)] entrance: PaletteEntrance,
+    #[props(default)] id: Option<String>,
+    #[props(default)] focus: Option<FocusRequest>,
+    #[props(default)] selected: Option<usize>,
+    #[props(default)] on_select: Option<EventHandler<usize>>,
+    #[props(default)] on_select_rect: Option<EventHandler<Rect>>,
+    #[props(default)] onkey: Option<EventHandler<KeyboardData>>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
-    let presence = use_entrance(Anim::PeekIn);
-    // The selection belongs to the query it was made under: every keystroke puts it back on
-    // the first item (`S:1651`).
-    let mut selected = use_signal(|| (query.clone(), 0usize));
+    let presence = use_entrance(entrance.anim());
+    let selection = use_palette_selection(&query, selected, on_select);
+    let rects = use_row_rects(on_select_rect);
     let entries = headed(&groups);
     let shown = marked(&entries, &query);
     let picks = choices(&shown);
     let live = liveness(&picks);
+    let lines = choice_lines(&entries);
     let count = picks.len();
-    let current = match &*selected.read() {
-        (made, index) if *made == query => (*index).min(count.saturating_sub(1)),
-        _ => 0,
-    };
+    let current = selection.current(count);
+    let at_line = lines.get(current).map(|&line| SelectedLine {
+        choice: current,
+        line,
+    });
+    selection.report(current, count);
+    rects.follow(at_line);
     let run = {
         let picks = picks.clone();
         move |index: usize| {
@@ -109,18 +136,22 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             }
         }
     };
-    let onkey = {
+    let field_key = {
         let run = run.clone();
         let live = live.clone();
-        let event_query = query.clone();
-        move |event: KeyboardData| match palette_key(&event.key()) {
-            Some(PaletteKey::Move(step)) => {
-                let next = moved_live(Nav::Clamp, current, &live, step);
-                selected.set((event_query.clone(), next));
+        let selection = selection.clone();
+        move |event: KeyboardData| {
+            match palette_key(&event.key()) {
+                Some(PaletteKey::Move(step)) => {
+                    selection.select(moved_live(Nav::Clamp, current, &live, step))
+                }
+                Some(PaletteKey::Run) => run(current),
+                Some(PaletteKey::Close) if float.takes_escape() => onclose.call(()),
+                Some(PaletteKey::Close) | None => {}
             }
-            Some(PaletteKey::Run) => run(current),
-            Some(PaletteKey::Close) if float.takes_escape() => onclose.call(()),
-            Some(PaletteKey::Close) | None => {}
+            if let Some(onkey) = onkey {
+                onkey.call(event);
+            }
         }
     };
     let body = if count == 0 {
@@ -136,80 +167,86 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 open: None,
                 onpick: EventHandler::new(run),
                 onpoint: EventHandler::new({
-                    let query = query.clone();
                     let live = live.clone();
-                    move |(index, _): (usize, crate::geometry::Point)| {
+                    let selection = selection.clone();
+                    move |(index, _): (usize, Point)| {
                         let enabled = live.get(index) == Some(&Availability::Enabled);
-                        if enabled && selected.peek().1 != index {
-                            selected.set((query.clone(), index));
+                        if enabled && index != current {
+                            selection.select(index);
                         }
                     }
                 }),
-                onmounted: EventHandler::new(|(_, _): (usize, MountedEvent)| {}),
+                onmounted: EventHandler::new(move |(index, event): (usize, MountedEvent)| {
+                    if let Some(&line) = lines.get(index) {
+                        rects.mounted(line, MountedRef(event.data()), at_line);
+                    }
+                }),
                 onrelease: None,
             },
         )
     };
-    float.show(
-        rsx! {
-            div {
-                class: "ds-palette-wrap",
-                onpointerdown: move |_| {
-                    if float.is_top() {
-                        onclose.call(());
-                    }
-                },
-                div {
-                    class: "ds-palette",
-                    role: "dialog",
-                    "aria-label": "{label}",
-                    "data-presence": presence.slug(),
-                    onpointerdown: move |event| event.stop_propagation(),
-                    SearchField {
-                        label: label.clone(),
-                        value: query.clone(),
-                        placeholder,
-                        tokens,
-                        oninput,
-                        onkey,
-                        focus: Focus::OnMount,
-                    }
-                    div {
-                        class: "ds-menu",
-                        "data-kind": "rich",
-                        "data-embed": "palette",
-                        role: "listbox",
-                        onmousedown: move |event| event.prevent_default(),
-                        {body}
-                    }
-                }
+    let field = match focus {
+        Some(request) => Focus::Controlled(request),
+        None => Focus::OnMount,
+    };
+    let card = rsx! {
+        div {
+            class: "ds-palette",
+            id,
+            role: "dialog",
+            "aria-label": "{label}",
+            "data-host": host.slug(),
+            "data-entrance": entrance.slug(),
+            "data-presence": presence.slug(),
+            onpointerdown: move |event| event.stop_propagation(),
+            SearchField {
+                label: label.clone(),
+                value: query.clone(),
+                placeholder,
+                tokens,
+                oninput,
+                onkey: field_key,
+                focus: field,
             }
-        },
-        onclose,
-    );
-    rsx! {}
+            div {
+                class: "ds-menu",
+                "data-kind": "rich",
+                "data-embed": "palette",
+                role: "listbox",
+                onmousedown: move |event| event.prevent_default(),
+                {body}
+            }
+        }
+    };
+    hosted(host, float, card, onclose)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{PaletteKey, palette_key};
-    use crate::components::menu_lines::Step;
-    use dioxus::prelude::Key;
-
-    #[test]
-    fn palette_keys_follow_section_2_3() {
-        #[rustfmt::skip]
-        let cases: Vec<(Key, Option<PaletteKey>)> = vec![
-            (Key::ArrowDown, Some(PaletteKey::Move(Step::Down))),
-            (Key::ArrowUp, Some(PaletteKey::Move(Step::Up))),
-            (Key::Enter, Some(PaletteKey::Run)),
-            (Key::Escape, Some(PaletteKey::Close)),
-            // Tab is the menu's pick, not the palette's.
-            (Key::Tab, None),
-            (Key::Character("a".to_string()), None),
-        ];
-        for (key, want) in cases {
-            assert_eq!(palette_key(&key), want, "{key:?}");
+/// The card where `host` draws it: in place, or on the palette layer over its scrim, which
+/// closes the palette on a pointer down outside the card while it is the topmost layer.
+fn hosted(
+    host: CommandPaletteHost,
+    float: Float,
+    card: Element,
+    onclose: EventHandler<()>,
+) -> Element {
+    match host {
+        CommandPaletteHost::Surface => card,
+        CommandPaletteHost::Overlay => {
+            float.show(
+                rsx! {
+                    div {
+                        class: "ds-palette-wrap",
+                        onpointerdown: move |_| {
+                            if float.is_top() {
+                                onclose.call(());
+                            }
+                        },
+                        {card}
+                    }
+                },
+                onclose,
+            );
+            rsx! {}
         }
     }
 }

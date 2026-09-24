@@ -705,7 +705,10 @@ Verbatim, `S:781-786`:
 **Motion.** Border and ring `--t-quick --e-out`.
 
 **Behaviour.** Focus on open where the surface says so (palette input focused on open,
-`S:1661`). Recipient inputs: Enter or `,` adds, Backspace on empty removes the last chip
+`S:1661`). `Focus::Controlled(FocusRequest)` (settled 2026-09-24, FINDINGS "Launcher gaps", sill
+Q44) focuses on mount and again at every `request()`: a menu that took the keyboard hands it
+back when it closes, without remounting the field. Every focus change waits out a document the
+renderer holds (`ds::HostFocus`, Q43). Recipient inputs: Enter or `,` adds, Backspace on empty removes the last chip
 (`S:2265-2266`).
 
 **Blitz notes.** `::placeholder` must be verified in the spike; if unsupported, render the
@@ -735,7 +738,8 @@ Mapping: `.cmdk-in` -> `.ds-search`; `.cmdk .tokens` -> `.ds-search-tokens`.
 ```rust
 #[component] pub fn SearchField(label: String, value: String, placeholder: String,
     tokens: Vec<String>, oninput: EventHandler<String>, onkey: EventHandler<KeyboardData>,
-    #[props(default)] focus: Focus /* passed to the field; the palette uses OnMount */) -> Element
+    #[props(default)] focus: Focus /* passed to the field; the palette uses OnMount, or
+                                       Controlled(request) when given a FocusRequest */) -> Element
 ```
 
 **Geometry.** Row: flex, gap 9, padding 12px 14px, bottom border 1px `--line-soft`, icon and
@@ -1537,7 +1541,9 @@ Mapping: `.strip .fly` -> `.ds-fly`; `.hc.tip` -> `.ds-popover.ds-tip`.
 
 ```rust
 #[component] pub fn Tooltip(kind: TooltipKind /* Fly | Card */, text: String,
-    #[props(default)] sub: Option<String>, children: Element /* the target */) -> Element
+    #[props(default)] sub: Option<String>,
+    #[props(default)] shown: Option<Shown> /* Visible | Hidden: the caller's say */,
+    children: Element /* the target */) -> Element
 ```
 
 **Geometry.**
@@ -1575,6 +1581,10 @@ Card: see §22.
 
 **Behaviour.** Warm window: for 400 ms after any hover card closes, flies open at once and the
 next card opens without the 450 ms wait (`S:1711-1712`). 06-INTERACTIONS "hover intent".
+Caller-driven (settled 2026-09-24, FINDINGS "Launcher gaps", sill Q17): `shown: Some(Visible)`
+shows the label with no pointer on it and `Some(Hidden)` keeps it down under one, both at once
+with no delay of their own (`[data-shown]` on `.ds-fly-target`); the dock's label machine (hide
+on press, while a menu is open, while dragging) owns its timing. `None` is the hover behaviour.
 
 **Blitz notes.** The warm state is a class on `.win` set by JS. In ds, `HoverHub` owns it and
 stamps `data-hover="warm|cold"` on `.ds`; the rule becomes
@@ -2252,8 +2262,27 @@ hit, Mail, People, Actions). Mail: Ctrl T / Ctrl K. Shell: the launcher.
 #[component] pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     label: String, placeholder: String, query: String, tokens: Vec<String>,
     groups: Vec<(String, Vec<MenuEntry<T>>)>, empty: String,
-    oninput: EventHandler<String>, onpick: EventHandler<T>, onclose: EventHandler<()>) -> Element
+    oninput: EventHandler<String>, onpick: EventHandler<T>, onclose: EventHandler<()>,
+    #[props(default)] host: CommandPaletteHost,          // Overlay | Surface
+    #[props(default)] entrance: PaletteEntrance,         // PeekIn | CmdkIn
+    #[props(default)] id: Option<String>,                // on the card
+    #[props(default)] focus: Option<FocusRequest>,
+    #[props(default)] selected: Option<usize>,           // controlled selection
+    #[props(default)] on_select: Option<EventHandler<usize>>,
+    #[props(default)] on_select_rect: Option<EventHandler<Rect>>,
+    #[props(default)] onkey: Option<EventHandler<KeyboardData>>) -> Element
 ```
+
+Hosts (settled 2026-09-24, FINDINGS "Launcher gaps", sill Q40-Q41): `Overlay` is the scrim and
+the card 11 % down, as below. `Surface` is the shell launcher's: no wrap and no scrim, the card
+fills its container (`width:100%; height:100%`, the list taking the height under the field) and
+paints the enclosing material's tint and edge (`--m-tint`/`--m-tint-solid`, `--m-box`) at radius
+`--r-panel`, carrying `id` for the blur region. `entrance` picks `peek-in` (S) or `cmdk-in` (C)
+for either host. The selection is exposed: `selected` makes it the caller's (Up, Down and the
+pointer then ask through `on_select`), uncontrolled `on_select` hears every change, and
+`on_select_rect` reports the selected row's rect after layout, for an actions menu anchored to
+it. `onkey` hears every key the field gets after the palette. A row's tile takes
+`Tile::Source(IconSource)`: an app's icon image fills the tile with no plate (Q42).
 
 Ranking and grouping are pure Rust (06-INTERACTIONS "command menu search").
 
@@ -3023,7 +3052,7 @@ suggestion.
 | O-12 | Menu separator | Not in S; derived from the bubble separator. | Candidate: 1 px `--line-soft`, margin 4px 0. |
 | O-13 | Menu item hover | S has none (keyboard only); C Dropdown uses `--surface-2`. | Pointer move over an item moves the selection (`--accent-soft`), so hover and keyboard look the same in Rich/Slim/Context; Dropdown keeps C. |
 | O-14 | Sheet size | Derived from Peek; no size given. | Candidate: width `min(560px, 88%)`, height by content, max = Peek Center inset. |
-| O-15 | Modal focus | Peek and Sheet do not move or trap focus in S. | Focus first focusable on open, restore on close, Tab trapped. Partly settled (FINDINGS "W2 integration", focus on mount): `TextInput{focus: Focus::OnMount}` exists and the palette input and bubble link field use it; Peek and Sheet still neither move nor trap focus. |
+| O-15 | Modal focus | Peek and Sheet do not move or trap focus in S. | Focus first focusable on open, restore on close, Tab trapped. Partly settled (FINDINGS "W2 integration", focus on mount): `TextInput{focus: Focus::OnMount}` exists and the palette input and bubble link field use it; giving focus back is settled (2026-09-24, FINDINGS "Launcher gaps"): `Focus::Controlled(FocusRequest)` and `request()`. Peek and Sheet still neither move nor trap focus. |
 | O-16 | AppearancePicker contents | Whether Look and Warmth (C) are part of it; width. | Theme, Accent, Motion only (the plan's `Appearance`); width set by the host surface. |
 | O-17 | Accent count | Plan: "Accent(6)" in the gallery and a moved test named "exactly-four-accent". | 03-COLOR decides; the picker renders the table. |
 | O-18 | S vs C contradictions | Resolved "S wins" in each section; listed here so nobody re-opens them silently: strip buttons 26 vs 28, gap 3 vs 4, icons 14 vs 15; star inset 6/7 vs 8/8, icon 14 vs 15; icon stroke 2 vs 1.7/1.8; toast hidden 160% vs 140%, hint opacity .7 vs .72; seg padding 5/11 12px vs 6/13 12.5px; Primary padding 14 vs 15; palette 540 vs 420, top 11% vs 14%, input 16 vs 14.5, list 360 vs 252, enter `peek-in` vs `cmdk-in`; peek inset `36px 12%` vs `34px 10%`, `peek-in` .95/12px vs .97/10px; scrim `--scrim` vs ink .16; row dot top 6 vs 5; stagger cap none (S, first show only; ds caps 12) vs 8; sidebar item radius 9 on the frame vs `--r-chip` on the card, seal -7 in `--f-ink` vs -10 in `--seal`; toast click-to-undo |dx| < 3 vs dx == 0; send ring 20 vs 22. | S wins, as written in each section. |

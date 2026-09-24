@@ -4,11 +4,12 @@
 //! submenus follow design/13-BEHAVIOUR-menus-windows.md sections 13.3.3 and 13.3.4.
 
 use crate::components::avatar::{AvatarFace, face};
+use crate::components::icon_view::IconView;
 use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::vocab::{Availability, Check, Selection, Shortcut, Switch};
 use crate::geometry::{Point, Px};
-use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
+use crate::icon::{Icon, IconSource};
 use dioxus::prelude::*;
 
 pub(crate) use crate::components::menu_match::{fuzzy, marked};
@@ -18,6 +19,10 @@ pub(crate) use crate::components::menu_match::{fuzzy, marked};
 pub enum Tile {
     /// A glyph.
     Icon(Icon),
+    /// Any icon source: an app's icon file (drawn as it is, filling the tile, with no plate of
+    /// its own under it), a symbolic icon (on the plate, in the text colour) or a glyph (sill
+    /// FINDINGS Q42).
+    Source(IconSource),
     /// A letter or two.
     Text(String),
     /// An avatar.
@@ -250,6 +255,14 @@ fn tile(tile: Option<&Tile>) -> Element {
                 Glyph { icon: *icon, size: IconSize::Tile }
             }
         },
+        Some(Tile::Source(source)) => {
+            let image = matches!(source, IconSource::Image(_)).then_some("image");
+            rsx! {
+                span { class: "ds-menu-tile", "data-tile": image,
+                    IconView { source: source.clone(), size: IconSize::Tile }
+                }
+            }
+        }
         Some(Tile::Text(text)) => rsx! {
             span { class: "ds-menu-tile", "{text}" }
         },

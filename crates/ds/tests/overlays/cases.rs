@@ -7,11 +7,12 @@ use ds::components::vocab::{Check, Fraction, Key, Shortcut, Switch};
 use ds::{Align, Availability, Button, ButtonVariant};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
-    BubbleMode, CommandPalette, Dismiss, Elevation, Filter, FlagTone, Glyph, HoverCard,
-    HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverStat, HoverTarget, Icon,
-    KeyHint, LinkPill, LinkTarget, Menu, MenuEntrance, MenuEntry, MenuKind, Peek, PeekMode,
-    PersonHue, Placement, Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill,
-    Sheet, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
+    BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, Filter,
+    FlagTone, Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage,
+    HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
+    Menu, MenuEntrance, MenuEntry, MenuKind, PaletteEntrance, Peek, PeekMode, PersonHue, Placement,
+    Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill, Sheet, Shown, Side,
+    Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
 };
 use std::time::Duration;
 
@@ -166,6 +167,40 @@ fn nested() -> Vec<MenuEntry<u8>> {
             children: vec![item(20, "Restart")],
         },
     ]
+}
+
+/// Applications with their own icons: an image and a symbolic one.
+fn app_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
+    let app = |value: u8, title: &str, tile: IconSource| MenuEntry::Item {
+        value,
+        title: title.to_string(),
+        detail: None,
+        tile: Some(Tile::Source(tile)),
+        trail: Trail::None,
+        check: None,
+        availability: Availability::Enabled,
+    };
+    vec![(
+        "Applications".to_string(),
+        vec![
+            app(
+                1,
+                "Firefox",
+                IconSource::Image(ExternalIcon {
+                    url: IconUrl::png(b"\x89PNG"),
+                    size: IconSize::Tile48,
+                }),
+            ),
+            app(
+                2,
+                "Files",
+                IconSource::Symbolic(ExternalIcon {
+                    url: IconUrl::svg("<svg xmlns='http://www.w3.org/2000/svg'/>"),
+                    size: IconSize::Tile,
+                }),
+            ),
+        ],
+    )]
 }
 
 fn palette_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
@@ -546,6 +581,19 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Snooze until…", ds::IconButton { variant: ds::IconButtonVariant::Strip, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
         wait: NOW,
     },
+    // Caller-driven (sill FINDINGS Q17): shown with no pointer, hidden under one.
+    Case {
+        component: "tooltip",
+        state: "fly-shown",
+        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Terminal", shown: Some(Shown::Visible), span { "tile" } } },
+        wait: NOW,
+    },
+    Case {
+        component: "tooltip",
+        state: "fly-hidden",
+        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Terminal", shown: Some(Shown::Hidden), span { "tile" } } },
+        wait: NOW,
+    },
     Case {
         component: "tooltip",
         state: "card-closed",
@@ -613,6 +661,20 @@ pub const CASES: &[Case] = &[
         component: "command_palette",
         state: "empty",
         make: || rsx! { CommandPalette::<u8> { label: "Search and commands", placeholder: "Search mail, people, actions", query: "zz", tokens: Vec::new(), groups: Vec::new(), empty: "Nothing in this Space matches. Search checks subjects, names, addresses and the text of every message.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    // Embedded in a launcher surface (sill FINDINGS Q40): no scrim, `cmdk-in`, the card's id;
+    // and a row whose tile is an app's icon (Q42).
+    Case {
+        component: "command_palette",
+        state: "surface-cmdk",
+        make: || rsx! { CommandPalette { label: "Launch", placeholder: "Search apps, windows, actions", query: "", tokens: Vec::new(), groups: palette_groups(), empty: "Nothing matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {}, host: CommandPaletteHost::Surface, entrance: PaletteEntrance::CmdkIn, id: "launcher-card" } },
+        wait: NOW,
+    },
+    Case {
+        component: "command_palette",
+        state: "app-icon",
+        make: || rsx! { CommandPalette { label: "Launch", placeholder: "Search apps, windows, actions", query: "fi", tokens: Vec::new(), groups: app_groups(), empty: "Nothing matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {}, host: CommandPaletteHost::Surface } },
         wait: NOW,
     },
     // LinkPill: honest and lying.

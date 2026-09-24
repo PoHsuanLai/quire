@@ -1,5 +1,6 @@
 //! Controls: every control in every state its props can express.
 
+use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
@@ -63,6 +64,7 @@ pub fn ControlsPage() -> Element {
         Buttons {}
         StatusItems {}
         ExternalIcons {}
+        DockTiles {}
         Choosers {}
         Fields {}
         Chips {}

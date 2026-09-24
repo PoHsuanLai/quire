@@ -9,6 +9,10 @@
   pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring); }
 .ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-fly-target:hover .ds-fly{ transition-delay:initial; }
+/* Caller-driven (sill FINDINGS Q17): up or down on the caller's say, whatever the pointer does,
+   at once (the caller's machine has already waited). */
+.ds-fly-target[*|data-shown=visible] .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:initial; }
+.ds-fly-target[*|data-shown=hidden]:hover .ds-fly{ opacity:0; transform:translateX(-50%) translateY(3px); transition-delay:initial; }
 
 .ds-popover.ds-tip{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-small); border-radius:var(--r-item);
   animation:hc-in var(--t-move) var(--e-spring); }

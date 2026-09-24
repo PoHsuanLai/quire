@@ -1,5 +1,6 @@
 //! `Surface` as markup: a nested scope re-stamps the attributes it overrides and inherits the
-//! rest, and the `Env` its children read agrees with what it stamped. One golden per override.
+//! rest, and the `Env` its children read agrees with what it stamped. One golden per override,
+//! the corner (`radius`, sill FINDINGS Q15) included.
 
 #[path = "support/golden.rs"]
 #[allow(dead_code)] // Only `check` is used here.
@@ -7,13 +8,14 @@ mod golden;
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::{Accent, Appearance, BlurState, Ds, Material, Scheme, Surface, use_env};
+use ds::{Accent, Appearance, BlurState, Corner, Ds, Material, Radius, Scheme, Surface, use_env};
 
 #[derive(Props, Clone, PartialEq)]
 struct Setup {
     theme: Option<Scheme>,
     accent: Option<Accent>,
     blur: Option<BlurState>,
+    radius: Option<Corner>,
 }
 
 /// What the scope says to a component inside it.
@@ -39,6 +41,7 @@ fn Root(setup: Setup) -> Element {
                 theme: setup.theme,
                 accent: setup.accent,
                 blur: setup.blur,
+                radius: setup.radius,
                 Reads {}
             }
         }
@@ -69,6 +72,7 @@ fn each_override_is_stamped_and_read() {
                 theme: None,
                 accent: None,
                 blur: None,
+                radius: None,
             },
             "light postmark sheet off",
         ),
@@ -78,6 +82,7 @@ fn each_override_is_stamped_and_read() {
                 theme: None,
                 accent: Some(Accent::Violet),
                 blur: None,
+                radius: None,
             },
             "light violet sheet off",
         ),
@@ -87,6 +92,7 @@ fn each_override_is_stamped_and_read() {
                 theme: None,
                 accent: None,
                 blur: Some(BlurState::Available),
+                radius: None,
             },
             "light postmark sheet on",
         ),
@@ -96,8 +102,19 @@ fn each_override_is_stamped_and_read() {
                 theme: Some(Scheme::Dark),
                 accent: Some(Accent::Violet),
                 blur: Some(BlurState::Available),
+                radius: None,
             },
             "dark violet sheet on",
+        ),
+        (
+            "radius",
+            Setup {
+                theme: None,
+                accent: None,
+                blur: None,
+                radius: Some(Corner::Token(Radius::Panel)),
+            },
+            "light postmark sheet off",
         ),
     ];
     let mut failures = Vec::new();

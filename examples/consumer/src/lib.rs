@@ -7,9 +7,10 @@
 //! `ORCHESTRATION.md` against `App`'s own output, the way a real consumer's tests would.
 
 use dioxus::prelude::*;
-use ds::{Availability, 
-    Anchor, Anim, Button, ButtonVariant, Ds, Icon, InputVariant, Material, Menu, MenuEntry,
-    MenuKind, MountedRef, TextInput, Tile, Trail, use_motion_timer, use_toasts,
+use ds::{
+    Anchor, Anim, Availability, Button, ButtonVariant, Ds, Focus, Icon, InputVariant, Material,
+    Menu, MenuEntry, MenuKind, MountedRef, TextInput, Tile, Trail, use_focus_request,
+    use_motion_timer, use_toasts,
 };
 use ds_settings::{AppName, use_environment};
 
@@ -73,7 +74,8 @@ fn entries() -> Vec<MenuEntry<Action>> {
 /// `ds::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`
 /// anchored to the button itself: `Button`'s `mounted` hands over its element and the menu
 /// takes it as `Anchor::Mounted`, measured when placing (`CONSUMING.md` §4, "Overlays"). No
-/// wrapper element is measured in its place.
+/// wrapper element is measured in its place. The subject field has the keyboard as the page
+/// mounts and gets it back whenever the menu closes (`Focus::Controlled`, `CONSUMING.md` §6).
 #[component]
 fn Page() -> Element {
     let mut subject = use_signal(String::new);
@@ -82,6 +84,7 @@ fn Page() -> Element {
     let toasts = use_toasts();
     let badge = use_motion_timer(Anim::Fade);
     let mut sent = use_signal(|| false);
+    let field = use_focus_request();
 
     rsx! {
         div { class: "page",
@@ -90,6 +93,7 @@ fn Page() -> Element {
                 label: "Subject".to_owned(),
                 value: subject(),
                 oninput: move |value| subject.set(value),
+                focus: Focus::Controlled(field),
             }
             div { class: "actions",
                 Button {
@@ -121,12 +125,16 @@ fn Page() -> Element {
                     entries: entries(),
                     onpick: move |action: Action| {
                         menu_open.set(false);
+                        field.request();
                         match action {
                             Action::Duplicate => subject.set(format!("{} (copy)", subject())),
                             Action::Discard => subject.set(String::new()),
                         }
                     },
-                    onclose: move |()| menu_open.set(false),
+                    onclose: move |()| {
+                        menu_open.set(false);
+                        field.request();
+                    },
                 }
             }
         }
