@@ -1,6 +1,6 @@
 //! One quire document with no window: the pieces `Harness` and `snapshot` share. It gets the
 //! shared font context, the `data:`/`file:` net provider, sequential styling (deterministic, and
-//! no rayon pool per test), the host's input modality and rect read as root context, and a waker
+//! no rayon pool per test), the host's input modality, rect read and focus write as root context, and a waker
 //! to sleep on.
 
 use crate::error::NativeError;
@@ -53,6 +53,7 @@ impl Headless {
             vdom.in_runtime(|| Signal::new_in_scope(InputModality::default(), ScopeId::ROOT));
         vdom.provide_root_context(HostModality(modality));
         vdom.provide_root_context(crate::measure::MEASURE);
+        vdom.provide_root_context(crate::focus::FOCUS);
         let mut doc = DioxusDocument::new(vdom, config);
         doc.initial_build();
         Headless {

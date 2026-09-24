@@ -1,11 +1,15 @@
 //! A timer that runs for exactly as long as an animation takes to settle, started from an event
 //! handler (design/05-MOTION.md section 7, the Blitz risk table: "timers start in handlers").
+//!
+//! The settle task belongs to the hook's owner and is dropped with it: a palette unmounted
+//! before its entrance settles takes its timer with it (sill FINDINGS Q45, `crate::task`).
 
 use crate::components::vocab::StaggerIndex;
 use crate::motion::anim::Anim;
 use crate::motion::settle::settle;
 use crate::root::env::{Env, use_env_signal};
-use crate::time::{sleep, spawn_in};
+use crate::task::{Gone, spawn_in, try_get, try_set};
+use crate::time::sleep;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -32,32 +36,42 @@ pub struct MotionTimer {
 }
 
 impl MotionTimer {
-    /// Start (or restart) the timer; `on_settled` runs once, at `settle(anim, level, 0)`.
+    /// Start (or restart) the timer; `on_settled` runs once, at `settle(anim, level, 0)`. A
+    /// timer whose owner has unmounted does nothing, and one running when its owner unmounts is
+    /// dropped with it: `on_settled` never runs for a component that is gone.
     pub fn start(&self, on_settled: EventHandler<()>) {
-        let length = settle(
-            self.anim,
-            self.env.peek().resolved.motion,
-            StaggerIndex::default(),
-        );
-        let mut phase = self.phase;
-        let mut task = self.task;
-        if let Some(running) = *task.peek() {
+        let _ = self.try_start(on_settled);
+    }
+
+    fn try_start(&self, on_settled: EventHandler<()>) -> Result<(), Gone> {
+        let level = try_get(self.env)?.resolved.motion;
+        let length = settle(self.anim, level, StaggerIndex::default());
+        if let Some(running) = try_get(self.task)? {
             running.cancel();
         }
-        phase.set(TimerPhase::Running);
+        try_set(self.phase, TimerPhase::Running)?;
+        let (phase, task) = (self.phase, self.task);
         let started = spawn_in(self.scope, async move {
             sleep(length).await;
-            phase.set(TimerPhase::Settled);
-            task.set(None);
-            on_settled.call(());
+            if settled(phase, task).is_ok() {
+                on_settled.call(());
+            }
         });
-        task.set(Some(started));
+        try_set(self.task, Some(started))
     }
 
     /// Where the timer is.
     pub fn phase(&self) -> TimerPhase {
-        (self.phase)()
+        self.phase
+            .try_read()
+            .map_or(TimerPhase::Settled, |phase| *phase)
     }
+}
+
+/// The timer's end: settled, and no task running.
+fn settled(phase: Signal<TimerPhase>, task: Signal<Option<Task>>) -> Result<(), Gone> {
+    try_set(phase, TimerPhase::Settled)?;
+    try_set(task, None)
 }
 
 /// A settle timer for `anim`, reading the motion level from the enclosing `Ds`.

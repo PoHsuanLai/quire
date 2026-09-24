@@ -8,8 +8,10 @@ pub mod appearance;
 pub mod components;
 pub mod css;
 pub mod error;
+pub mod focus;
 pub mod fonts;
 pub mod geometry;
+mod guarded;
 pub mod icon;
 #[cfg(feature = "lint")]
 pub mod lint;
@@ -18,6 +20,7 @@ pub mod motion;
 pub mod overlay;
 pub mod root;
 pub mod space;
+mod task;
 pub mod text;
 pub mod time;
 pub mod tokens;
@@ -29,6 +32,7 @@ pub use appearance::{
 pub use components::*;
 pub use css::stylesheet;
 pub use error::DsError;
+pub use focus::{FocusRequest, FocusTicket, Focused, HostFocus, use_focus_request};
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
