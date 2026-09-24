@@ -2,6 +2,7 @@
 //! an [`AppConfig`](crate::AppConfig) gives a window, so a test sees what the window would.
 
 use crate::contexts::RootContexts;
+use crate::frame_links::FrameLinks;
 use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
 use crate::snapshot::Viewport;
@@ -34,6 +35,13 @@ impl HarnessConfig {
     /// [`NetPolicy::Local`]).
     pub fn with_net(mut self, policy: NetPolicy) -> Self {
         self.setup.net = policy;
+        self
+    }
+
+    /// What a link clicked inside a frame does (default [`FrameLinks::Inert`]): a frame never
+    /// navigates, so the app opens the link itself or nothing happens.
+    pub fn with_frame_links(mut self, links: FrameLinks) -> Self {
+        self.setup.frame_links = links;
         self
     }
 

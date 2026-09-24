@@ -20,6 +20,7 @@
 //! the document itself and hands the app nothing else that can see it.
 
 use crate::clipboard::HostClipboard;
+use crate::frame_links::frame_links;
 use crate::install::install;
 use crate::scheme;
 use crate::setup::Setup;
@@ -89,6 +90,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
             window.set_theme(Some(theme(changed)));
         }
     });
+    let frame_nav = use_hook(|| {
+        let (nav, inbox) = frame_links(&props.setup.frame_links);
+        spawn(inbox.serve());
+        nav
+    });
     let mut installed = use_signal(|| Installed::Pending);
     let setup = props.setup.clone();
     let App = props.app;
@@ -102,7 +108,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             style: "display:none",
             onmounted: move |mounted| {
                 if let Some(handle) = mounted.data().downcast::<NodeHandle>() {
-                    install(handle, &setup, &clipboard);
+                    install(handle, &setup, &clipboard, frame_nav.clone());
                     document.replace(Some(handle.clone()));
                     installed.set(Installed::Done);
                 }
