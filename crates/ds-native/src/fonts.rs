@@ -61,6 +61,7 @@ mod tests {
         (Family::Display, "Bricolage Grotesque"),
         (Family::Ui, "Karla"),
         (Family::Data, "Space Mono"),
+        (Family::Serif, "Noto Serif"),
     ];
 
     #[test]

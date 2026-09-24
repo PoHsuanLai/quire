@@ -83,7 +83,7 @@ fn fixed_tokens() -> Vec<String> {
     let spacing = SpacingToken::ALL
         .into_iter()
         .map(|step| declaration(step.var(), &step.css()));
-    let families = [Family::Display, Family::Ui, Family::Data]
+    let families = Family::ALL
         .into_iter()
         .map(|family| declaration(family.var(), family.stack()));
     let sizes = FontSize::ALL

@@ -1,4 +1,4 @@
-//! Type: the three faces with the weights they ship, and every step of the size ramp drawn in
+//! Type: the four faces with the weights they ship, and every step of the size ramp drawn in
 //! each face.
 
 use super::Section;
@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::{FACES, Face, FaceStyle, Family, FontSize};
 
 /// The faces, in the order the stylesheet names them.
-const FAMILIES: [Family; 3] = [Family::Display, Family::Ui, Family::Data];
+const FAMILIES: [Family; 4] = Family::ALL;
 
 /// The pangram each face is shown with.
 const PANGRAM: &str = "Sphinx of black quartz, judge my vow — 0123456789";

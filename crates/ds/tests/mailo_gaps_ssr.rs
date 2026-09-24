@@ -1,4 +1,4 @@
-//! The mailo gaps 2 states (controls and tiles): each new prop or variant rendered through
+//! The mailo gaps 2 states (controls and tiles) and 3 (the muted avatar): each new prop or variant rendered through
 //! dioxus-ssr and compared with a golden under its component's directory, so the controls' and
 //! lists' class scans cover them too. Every state here is additive; the goldens of the states
 //! that existed before are in `components_controls.rs` and `components_lists.rs`.

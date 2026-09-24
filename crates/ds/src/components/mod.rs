@@ -31,6 +31,7 @@ pub(crate) mod menu_match;
 pub(crate) mod menu_panel;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_tracker;
+pub(crate) mod muted;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
@@ -69,7 +70,9 @@ pub mod workspace_pills;
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use animated_list::AnimatedList;
 pub use appearance_picker::AppearancePicker;
-pub use avatar::{Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue};
+pub use avatar::{
+    Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
+};
 pub use button::{Button, ButtonVariant};
 pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};

@@ -1,4 +1,4 @@
-//! The three faces and the size ramp (design/02-TYPE.md sections 2 and 4).
+//! The four faces and the size ramp (design/02-TYPE.md sections 2 and 4).
 //!
 //! The plan names the ends, `--fs-micro` 9.5 and `--fs-display` 26; the steps between are named
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
@@ -14,15 +14,22 @@ pub enum Family {
     Ui,
     /// `--font-data`: Space Mono. Anything machine-shaped.
     Data,
+    /// `--font-serif`: Noto Serif. A message a person writes in a serif, and the control that
+    /// offers it (mailo gaps 3); never the interface's own text.
+    Serif,
 }
 
 impl Family {
+    /// Every face, in the order the stylesheet declares them.
+    pub const ALL: [Family; 4] = [Family::Display, Family::Ui, Family::Data, Family::Serif];
+
     /// The custom property: `--font-display`, …
     pub fn var(self) -> VarName {
         VarName(match self {
             Family::Display => "--font-display",
             Family::Ui => "--font-ui",
             Family::Data => "--font-data",
+            Family::Serif => "--font-serif",
         })
     }
 
@@ -32,6 +39,7 @@ impl Family {
             Family::Display => "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif",
             Family::Ui => "\"Karla\",\"Segoe UI\",system-ui,sans-serif",
             Family::Data => "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace",
+            Family::Serif => "\"Noto Serif\",Georgia,\"Times New Roman\",serif",
         }
     }
 }

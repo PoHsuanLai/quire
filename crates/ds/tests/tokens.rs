@@ -246,7 +246,7 @@ fn every_table_name_is_declared_on_the_root() {
         .chain(Shadow::ALL.map(|t| t.var()))
         .chain(FontSize::ALL.map(|t| t.var()))
         .chain(ZLayer::ALL.map(|t| t.var()))
-        .chain([Family::Display, Family::Ui, Family::Data].map(|t| t.var()));
+        .chain(Family::ALL.map(|t| t.var()));
     for name in names {
         assert!(
             light.contains_key(name.as_str()),

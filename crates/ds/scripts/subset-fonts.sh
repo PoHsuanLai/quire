@@ -7,15 +7,24 @@
 # every layout feature, every name record and the variable axes kept. The WOFF2 files stay:
 # they are this script's input and the webview's `@font-face` source.
 #
-# Run from anywhere; needs `uv` (fonttools and brotli are fetched into a throwaway tool env):
+# Run from anywhere; needs `uv` (fonttools and brotli are fetched into a throwaway tool env).
+# With no arguments every WOFF2 is converted; name files to convert only those:
 #   crates/ds/scripts/subset-fonts.sh
+#   crates/ds/scripts/subset-fonts.sh noto-serif-normal-400-700-latin.woff2
+#
+# Noto Serif (the serif face, mailo gaps 3) has no Google Fonts WOFF2 in the repository's
+# history: its WOFF2s were cut from the OFL variable files Fedora ships
+# (`NotoSerif[wght].ttf`, `NotoSerif-Italic[wght].ttf`, version 2.015, weights 400-700) with the
+# same pyftsubset options and `--flavor=woff2`, one per subset, then converted here.
 set -euo pipefail
 cd "$(dirname "$0")/../assets/fonts"
 
 LATIN="U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
 LATIN_EXT="U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF"
 
-for woff2 in *.woff2; do
+files=("$@")
+if [ ${#files[@]} -eq 0 ]; then files=(*.woff2); fi
+for woff2 in "${files[@]}"; do
   stem="${woff2%.woff2}"
   case "$stem" in
     *-latin-ext) range="$LATIN_EXT" ;;
@@ -34,17 +43,21 @@ for woff2 in *.woff2; do
     bricolage-grotesque-*) family="Bricolage Grotesque" ;;
     karla-*) family="Karla" ;;
     space-mono-*) family="Space Mono" ;;
+    noto-serif-*) family="Noto Serif" ;;
     *) echo "unknown family: $stem" >&2; exit 1 ;;
   esac
   # Google's Bricolage names its family after the default instance ("Bricolage Grotesque 96pt
   # ExtraBold"). The renderer registers a face under its name table, and `--font-display`
   # asks for "Bricolage Grotesque", so the family and typographic family are set to the name
   # the stylesheet uses.
-  uv tool run --from fonttools python - "$stem.ttf" "$family" <<'PY'
+  # A newer pyftsubset keeps the input's WOFF2 flavour, so the flavour is dropped here too: the
+  # file must be sfnt for fontique.
+  uv tool run --from fonttools --with brotli python - "$stem.ttf" "$family" <<'PY'
 import sys
 from fontTools.ttLib import TTFont
 path, family = sys.argv[1], sys.argv[2]
 font = TTFont(path)
+font.flavor = None
 names = font["name"]
 for record in list(names.names):
     if record.nameID in (1, 16):

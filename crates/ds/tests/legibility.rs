@@ -376,3 +376,50 @@ fn the_tinted_chrome_holds_its_ink_over_blur() {
     let failures = tinted_chrome_failures(tint_alpha);
     assert!(failures.is_empty(), "{failures:#?}");
 }
+
+/// A muted avatar (`AvatarMuting::Muted`, mailo gaps 3) keeps its letter legible and stands off
+/// its ground no worse than the plain discs do, in both schemes: muting keeps lightness and
+/// takes chroma, so it withdraws the claim without dimming the account. Every stored swatch and
+/// a person hue every 5 degrees; the letter is `--on-hue`, the grounds a tile or chip sits on.
+#[test]
+fn a_muted_avatar_is_as_legible_as_a_plain_one() {
+    use ds::{AvatarMuting, PersonHue, PersonSwatch};
+    let discs: Vec<ds::Colour> = PersonSwatch::ALL
+        .iter()
+        .map(|swatch| swatch.colour())
+        .chain((0..360).step_by(5).map(|hue| PersonHue(hue).colour()))
+        .collect();
+    let muted = |disc: &ds::Colour| AvatarMuting::Muted.apply(*disc).css();
+    let mut failures = Vec::new();
+    for scheme in [Scheme::Light, Scheme::Dark] {
+        let letter = colour(ColourToken::OnHue, scheme);
+        for disc in &discs {
+            let (was, is) = (
+                measured(&letter, &disc.css()),
+                measured(&letter, &muted(disc)),
+            );
+            if is < 3.0 || is < was - 0.3 {
+                failures.push(format!(
+                    "{scheme:?}: the letter on {} is {is:.2} (plain {was:.2})",
+                    muted(disc)
+                ));
+            }
+        }
+        for ground in [ColourToken::Paper, ColourToken::Surface, ColourToken::Raise] {
+            let under = colour(ground, scheme);
+            let floor = |paint: &dyn Fn(&ds::Colour) -> String| {
+                discs
+                    .iter()
+                    .map(|disc| measured(&under, &paint(disc)))
+                    .fold(f64::MAX, f64::min)
+            };
+            let (was, is) = (floor(&|disc| disc.css()), floor(&muted));
+            if is < was - 0.05 {
+                failures.push(format!(
+                    "{scheme:?}: the faintest muted disc on {ground:?} is {is:.2}, plain {was:.2}"
+                ));
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
