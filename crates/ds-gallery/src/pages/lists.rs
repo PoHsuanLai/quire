@@ -98,6 +98,7 @@ pub fn ListsPage() -> Element {
         super::lists_search::SearchRows {}
         super::lists_mailo4::StripPress {}
         Sidebar {}
+        super::lists_mailo4::DropPlaces {}
         Tiles {}
         Picker {}
     }
