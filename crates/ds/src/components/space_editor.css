@@ -71,3 +71,14 @@
 .ds-space-editor-title .ds-input-wrap{ flex:1; }
 .ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
 .ds-checks-heading{ font-family:var(--font-data); font-size:var(--fs-micro); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+
+/* mailo gaps 3. A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
+   `data-stops` counting them) and are painted here, never inline: the same 135deg gradient
+   `space::gradient` writes for the frame, flat for one stop, 0/100 % for two, 0/50/100 % for
+   three. A handle and a stop disc are one picked colour. */
+.ds-space-dot[*|data-stops="1"], .ds-preset[*|data-stops="1"], .ds-space-swatch[*|data-stops="1"]{ background:var(--dot-c1); }
+.ds-space-dot[*|data-stops="2"], .ds-preset[*|data-stops="2"], .ds-space-swatch[*|data-stops="2"]{
+  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 100%); }
+.ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
+  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
+.ds-handle, .ds-stop-disc{ background:var(--dot-c1); }

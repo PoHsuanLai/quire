@@ -31,6 +31,9 @@ pub struct FrameVars {
     pub solid: String,
     /// `--f-grad`: the frame's `linear-gradient`.
     pub gradient: String,
+    /// The gradient's stops, one colour per dot, left to right: what a [`crate::SpaceDot`]
+    /// hands its stylesheet as `--dot-c1..3` (mailo gaps 3). Not written on the root.
+    pub stops: Vec<String>,
     /// `--f-grain`: the grain tile's opacity, `grain / 100 x .20` light, `x .16` dark.
     pub grain_opacity: String,
     /// `--accent`, `--accent-soft`, `--accent-ink` when the card borrows the Space's hue.
@@ -64,6 +67,7 @@ impl FrameVars {
             line: line.to_owned(),
             solid,
             gradient,
+            stops: palette.stops.clone(),
             grain_opacity: grain_opacity(look.grain, scheme),
             accent,
         }

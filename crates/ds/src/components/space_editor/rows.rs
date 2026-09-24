@@ -6,7 +6,8 @@ use crate::appearance::{Motion, Scheme, Theme};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::segmented::SegmentedControl;
 use crate::components::text_input::{InputVariant, TextInput};
-use crate::space::{Dot, SpaceLook, derive, gradient};
+use crate::space::dot_paint::DotPaint;
+use crate::space::{Dot, SpaceLook, derive};
 use dioxus::prelude::*;
 
 /// The Motion row's value and where a pick goes. The Space's own motion is the person's
@@ -48,7 +49,7 @@ pub(super) fn Title(
     name: Option<String>,
     on_rename: Option<EventHandler<String>>,
 ) -> Element {
-    let swatch = gradient(&derive(&dots, scheme));
+    let swatch = DotPaint::gradient(&derive(&dots, scheme).stops);
     let heading = match (&name, on_rename) {
         (_, Some(rename)) => rsx! {
             TextInput {
@@ -64,7 +65,7 @@ pub(super) fn Title(
     };
     rsx! {
         h3 { class: "ds-space-editor-title",
-            span { class: "ds-space-swatch", style: "background:{swatch}" }
+            span { class: "ds-space-swatch", "data-stops": swatch.count(), style: swatch.style_attr() }
             {heading}
         }
     }

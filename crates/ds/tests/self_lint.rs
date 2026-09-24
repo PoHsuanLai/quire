@@ -15,8 +15,19 @@ use ds::lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet
 
 /// Custom properties a component writes inline per element, which no stylesheet block declares:
 /// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the
-/// heal distance (design/05-MOTION.md section 5), and an external icon's size (`IconView`).
-const INLINE_VARS: &[&str] = &["--av-bg", "--av-fg", "--f", "--a", "--dy", "--ic-size"];
+/// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
+/// Space dot's stops (`SpaceDot` and the Space editor's dots, mailo gaps 3).
+const INLINE_VARS: &[&str] = &[
+    "--av-bg",
+    "--av-fg",
+    "--f",
+    "--a",
+    "--dy",
+    "--ic-size",
+    "--dot-c1",
+    "--dot-c2",
+    "--dot-c3",
+];
 
 const EXCEPTIONS: &[Exception] = &[
     Exception {

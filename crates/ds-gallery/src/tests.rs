@@ -6,42 +6,16 @@ use crate::axes::{Axes, Showcase, start_with};
 use crate::page::Page;
 use crate::style;
 use dioxus::prelude::*;
-use ds::lint::{Exception, LintConfig, Profile, Rule, markup};
+use ds::lint::{Exception, LintConfig, Profile, markup};
 use ds_native::{Viewport, snapshot_at};
 use std::time::Duration;
 
-/// Offences in quire's own markup: every one is drawn by a quire component, not by the
-/// gallery, and each is a gap reported to quire (the Gaps page lists them). The computed
-/// custom properties quire writes inline on its own elements (the `--f-*` frame, `--f-grad`,
-/// `--av-bg`, `--pc`) and the SendPill's marked ring are not offences; what is left paints a
-/// literal colour straight into a non-custom property, or is a class nothing styles.
-const EXCEPTIONS: &[Exception] = &[
-    Exception {
-        rule: Rule::HexColour,
-        selector: "button.ds-space-dot",
-        reason: "SpaceDot paints its Space's gradient inline as background, not a custom property",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "button.ds-preset",
-        reason: "the Space editor's preset buttons paint their gradients inline as background",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "div.ds-handle",
-        reason: "the Space editor's dot handles are filled with their picked colour inline as background",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "i.ds-stop-disc",
-        reason: "the Space editor's stop discs are their stop colours inline as background",
-    },
-    Exception {
-        rule: Rule::HexColour,
-        selector: "span.ds-space-swatch",
-        reason: "the Space editor's swatch is its picked colour inline as background",
-    },
-];
+/// Offences in quire's own markup the gallery lives with: none. Every one would be drawn by a
+/// quire component, not by the gallery, and a gap reported to quire (the Gaps page lists them).
+/// The computed custom properties quire writes inline on its own elements (the `--f-*` frame,
+/// `--f-grad`, `--av-bg`, `--pc`, a Space dot's `--dot-c*`) and the SendPill's marked ring are
+/// not offences. The Space editor's five inline gradients and fills were the last (mailo gaps 3).
+const EXCEPTIONS: &[Exception] = &[];
 
 /// The page's markup after its first render, posed.
 fn rendered(page: Page) -> String {
@@ -81,6 +55,25 @@ fn every_page_renders_quire_markup_only() {
     failures.sort();
     failures.dedup();
     assert!(failures.is_empty(), "{failures:#?}");
+}
+
+/// The Space page, SpaceDot and the whole Space editor on it, lints clean under Strict with no
+/// exception: every Space colour is a custom property its stylesheet paints (mailo gaps 3).
+#[test]
+fn the_space_page_is_clean_under_strict() {
+    let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
+    let strict = LintConfig {
+        profile: Profile::Strict,
+        ..LintConfig::default()
+    };
+    let html = rendered(Page::Space);
+    assert!(
+        html.contains("ds-space-dot"),
+        "the page drew its Space dots"
+    );
+    assert!(html.contains("--dot-c1:"), "the dots carry their colours");
+    let offences = markup(&html, &css, &strict);
+    assert!(offences.is_empty(), "{offences:#?}");
 }
 
 #[test]
