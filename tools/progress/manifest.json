@@ -1,6 +1,35 @@
 {
- "updated": "2026-09-25, quire v0.1.3; the shell's polish adoption merged; icon round two awaits the user's pick",
+ "updated": "2026-09-25, icon round three sheets up for the user's pick; pixel snapping and the host's background-layer fix running",
  "entries": [
+  {
+   "id": "icons-round3",
+   "date": "2026-09-25 · icon round three",
+   "title": "Round three presses the symbol into a two-hue bevelled plate; the procedural set reads at every size",
+   "status": "running",
+   "lede": "After round two the user gave a reference direction: symbols embossed into the plate with no outlines or strokes, a matte finish, the plate's bevel catching light in a few crisp narrow spots, a soft two-hue gradient ground per app, no frosted glass, no text. The procedural renderer now draws filled layers raised, recessed or flush with an inner light edge and a soft shade, mixes each app's two-hue ground in OKLCh, and finishes the plate with a narrow top highlight arc, a bottom shade and one specular point; the emboss drops out at 16 and 32 px so the small sizes stay flat. FLUX.2 Klein rendered the same brief two ways: the embossed symbol on a surface that becomes the plate face, and the whole tile re-masked with our squircle. Qwen ran mail and terminal only. The pick is the user's; the agent's reading is that the procedural set is best at every size, Klein's face mode has the most convincing clay emboss but blurs at 16 and washes files and notes to pastel, and a hybrid (Klein's face as the material study on the procedural plate) is open.",
+   "notes": [
+    "design/08 §2.9 records the embossed rules for app icons only; small symbolic glyphs keep Lucide's one stroke. docs/icons-bakeoff.md 'Round three' has the full comparison.",
+    "New tools: `tools/icons face` plates a model-drawn surface or tile, `tools/icons strips` makes the 512/48/32/16 pick sheets, tools/icons/round3.sh runs the set."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round3-procedural.png",
+     "caption": "procedural, embossed: mail, files, terminal, notes, photos at 512, 48, 32 and 16 px on light and dark"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round3-klein-ground-picks.png",
+     "caption": "FLUX.2 Klein, face mode picks: the embossed symbol drawn on the two-hue ground, plated by our squircle"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round3-klein-tile-picks.png",
+     "caption": "FLUX.2 Klein, tile mode picks: the whole bevelled tile drawn by the model, re-masked"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/icons/round3-qwen-ground.png",
+     "caption": "Qwen-Image-2512, face mode, mail and terminal"
+    }
+   ]
+  },
   {
    "id": "polish-adoption",
    "date": "2026-09-25 · sill adopts the polish pass",
