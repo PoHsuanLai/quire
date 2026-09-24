@@ -132,7 +132,11 @@ mod tests {
             };
             Rgba([v, v, v, 1.0])
         });
-        let r = roles(Dialect::Monochrome, "sage".parse().expect("sage"));
+        let r = roles(
+            Dialect::Monochrome,
+            "sage".parse().expect("sage"),
+            crate::ChromaCap::default(),
+        );
         let out = retint(&img, &r);
         let l = |x, y| lightness(&out, x, y);
         assert!(
@@ -149,7 +153,7 @@ mod tests {
         let p = out.get_pixel(4, 64).0;
         let o = oklab([p[0], p[1], p[2]]);
         assert!(
-            (o.b.atan2(o.a).to_degrees().rem_euclid(360.0) - 150.0).abs() < 5.0,
+            (o.b.atan2(o.a).to_degrees().rem_euclid(360.0) - 130.0).abs() < 5.0,
             "sage hue"
         );
     }

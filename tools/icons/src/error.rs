@@ -12,6 +12,9 @@ pub enum IconsError {
     /// A tint that is not in the muted palette (design/08-ICONS.md 2.10).
     #[error("unknown tint {0:?} (slate, teal, sage, ochre, clay, plum)")]
     UnknownTint(String),
+    /// A `--as` override that is not `app=dialect`.
+    #[error("bad dialect override {0:?} (app=monochrome|graphite|paper|solid)")]
+    BadOverride(String),
     /// An abstract icon spec is not valid TOML or names something the vocabulary lacks.
     #[error("spec: {0}")]
     Spec(#[from] toml::de::Error),

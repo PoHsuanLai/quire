@@ -1329,6 +1329,21 @@ Branch `icon-round2`; write-up `docs/icons-bakeoff.md` "Round three"; rules 08-I
 - **The emboss is noise below 48 px.** The procedural renderer drops it at 16 and 32 and
   strengthens recessed fills so the details survive.
 
+## Icon round five: colourways (2026-09-25)
+
+Branch `icon-round5`; write-up `docs/icons-bakeoff.md` "Round five"; palette in 08-ICONS 2.10.
+
+- **Eight hues 45 degrees apart all read at C 0.07**, with clay/rose and teal/slate the only pairs
+  that come close at 16 px.
+- **The dock pill never decides a colourway.** Every hue at every cap is 3.0-4.1 against the pill
+  on the Work and Home frames in both schemes, because the plate's L 0.62 sits between the light
+  and the dark frame; hue only decides harmony with the Space, not legibility.
+- **Near-complements of a Space's hue clash only when bold.** At C 0.07 ochre on Work or plum on
+  Home is fine; at 0.15 they vibrate against the tinted frame.
+- **C 0.15 at L 0.62 is outside sRGB for ochre, jade and teal**; of the three caps, 0.11 is the
+  highest at which every hue's plate colour stays in gamut, which makes it the natural "bolder"
+  step.
+
 ## Icon round four: dialects (2026-09-25)
 
 Branch `icon-round4`; write-up `docs/icons-bakeoff.md` "Round four"; rules 08-ICONS 2.10; keys

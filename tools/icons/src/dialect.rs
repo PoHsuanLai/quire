@@ -12,6 +12,25 @@ use crate::{IconsError, Oklab, Srgb8, oklab};
 /// three's plates ran to about 0.15-0.20; Klein's soft grounds sit near 0.06-0.09.
 pub const CHROMA_CAP: f32 = 0.07;
 
+/// The chroma cap a set of icons is drawn under. The palette's own is [`CHROMA_CAP`]; round five
+/// shows two bolder steps, [`ChromaCap::BOLD`] and [`ChromaCap::BOLDER`], for the user to judge.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ChromaCap(pub f32);
+
+impl ChromaCap {
+    pub const MUTED: ChromaCap = ChromaCap(CHROMA_CAP);
+    pub const BOLD: ChromaCap = ChromaCap(0.11);
+    pub const BOLDER: ChromaCap = ChromaCap(0.15);
+    /// The three levels round five compares.
+    pub const LEVELS: [ChromaCap; 3] = [ChromaCap::MUTED, ChromaCap::BOLD, ChromaCap::BOLDER];
+}
+
+impl Default for ChromaCap {
+    fn default() -> Self {
+        ChromaCap::MUTED
+    }
+}
+
 /// A colour in OKLCh: lightness 0..=1, chroma, hue in degrees.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lch {
@@ -21,9 +40,9 @@ pub struct Lch {
 }
 
 impl Lch {
-    /// The OKLab form, with the chroma cap applied.
+    /// The OKLab form.
     pub fn lab(self) -> Oklab {
-        let c = self.c.min(CHROMA_CAP);
+        let c = self.c;
         let h = self.h.to_radians();
         Oklab {
             l: self.l,
@@ -50,14 +69,18 @@ pub struct Tint {
     pub strength: f32,
 }
 
-/// The muted palette: six named hues; every icon's colour comes from one of them.
-pub const PALETTE: [(&str, f32); 6] = [
-    ("slate", 255.0),
-    ("teal", 200.0),
-    ("sage", 150.0),
-    ("ochre", 85.0),
+/// The palette: eight named hues, evenly spread every 45 degrees around the OKLCh wheel (round
+/// five; round four had six, unevenly spaced: slate 255, teal 200, sage 150, ochre 85, clay 40,
+/// plum 320). Every icon's colour comes from one of them.
+pub const PALETTE: [(&str, f32); 8] = [
     ("clay", 40.0),
-    ("plum", 320.0),
+    ("ochre", 85.0),
+    ("sage", 130.0),
+    ("jade", 175.0),
+    ("teal", 220.0),
+    ("slate", 265.0),
+    ("plum", 310.0),
+    ("rose", 355.0),
 ];
 
 impl FromStr for Tint {
@@ -145,10 +168,10 @@ fn hex(c: u32) -> Oklab {
     oklab(Srgb8::hex(c).unit())
 }
 
-/// The roles of a dialect under a tint. Values are proposed (08 2.10).
-pub fn roles(dialect: Dialect, tint: Tint) -> Roles {
+/// The roles of a dialect under a tint and a chroma cap. Values are proposed (08 2.10).
+pub fn roles(dialect: Dialect, tint: Tint, cap: ChromaCap) -> Roles {
     let (h, k) = (tint.hue, tint.strength.clamp(0.0, 1.0));
-    let cap = CHROMA_CAP * k;
+    let cap = cap.0 * k;
     match dialect {
         Dialect::Monochrome => Roles {
             plate: lch(0.58, 0.85 * cap, h),
@@ -197,7 +220,7 @@ mod tests {
     fn every_colour_respects_the_cap() {
         for d in Dialect::ALL {
             for (name, hue) in PALETTE {
-                let r = roles(d, Tint { hue, strength: 1.0 });
+                let r = roles(d, Tint { hue, strength: 1.0 }, ChromaCap::default());
                 for (role, c) in [
                     ("plate", r.plate),
                     ("symbol", r.symbol),
@@ -215,18 +238,44 @@ mod tests {
     #[test]
     fn symbol_and_plate_differ_in_lightness() {
         for d in Dialect::ALL {
-            let r = roles(d, "slate".parse().expect("slate"));
+            let r = roles(d, "slate".parse().expect("slate"), ChromaCap::default());
             assert!((r.symbol.l - r.plate.l).abs() >= 0.26, "{d:?}");
         }
     }
 
     #[test]
     fn monochrome_is_one_hue_and_graphite_none() {
-        let r = roles(Dialect::Monochrome, "sage".parse().expect("sage"));
+        let r = roles(
+            Dialect::Monochrome,
+            "sage".parse().expect("sage"),
+            ChromaCap::default(),
+        );
         let hue = |p: Oklab| p.b.atan2(p.a).to_degrees().rem_euclid(360.0);
-        assert!((hue(r.plate) - 150.0).abs() < 0.5 && (hue(r.symbol) - 150.0).abs() < 0.5);
-        let g = roles(Dialect::Graphite, "sage".parse().expect("sage"));
+        assert!((hue(r.plate) - 130.0).abs() < 0.5 && (hue(r.symbol) - 130.0).abs() < 0.5);
+        let g = roles(
+            Dialect::Graphite,
+            "sage".parse().expect("sage"),
+            ChromaCap::default(),
+        );
         assert!(chroma(g.plate) < 0.01 && chroma(g.symbol) < 1e-6);
+    }
+
+    /// The eight hues are 45 degrees apart; a bolder cap raises chroma and nothing else.
+    #[test]
+    fn palette_is_even_and_caps_scale() {
+        for w in PALETTE.windows(2) {
+            assert!((w[1].1 - w[0].1 - 45.0).abs() < 1e-3, "{w:?}");
+        }
+        let t: Tint = "clay".parse().expect("clay");
+        for (d, cap) in Dialect::ALL.iter().zip(ChromaCap::LEVELS.iter().cycle()) {
+            let r = roles(*d, t, *cap);
+            for c in [r.plate, r.symbol, r.secondary, r.detail, r.spot] {
+                assert!(chroma(c) <= cap.0 + 1e-4, "{d:?} {cap:?}");
+            }
+        }
+        let muted = roles(Dialect::Solid, t, ChromaCap::MUTED).plate;
+        let bolder = roles(Dialect::Solid, t, ChromaCap::BOLDER).plate;
+        assert!((muted.l - bolder.l).abs() < 1e-6 && chroma(bolder) > 2.0 * chroma(muted));
     }
 
     #[test]

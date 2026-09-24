@@ -404,3 +404,69 @@ picks, then `target/release/icons dialects --spec tools/icons/specs/*.toml --kle
 | Photos | Monochrome clay, the Klein variant | as mail; the off-centre sun keeps it from reading as a person |
 
 That mixes three dialects plus Paper across five apps while keeping one palette and one skeleton.
+
+## Round five: colourways (2026-09-25)
+
+The user: "Can we try more colors for the icons", read as more colourways within round four's
+language. Procedural only; the Klein variants are round three's faces retinted as in round four.
+**The user picks a colourway per app** (and whether to go bolder).
+
+### Sheets (`tools/progress/shots/icons/`)
+
+| Sheet | What it shows |
+| --- | --- |
+| `round5-colourways.png` | each app in its round-four dialect in all eight hues at C 0.07: mail Monochrome (Klein retint of mail s33), files Solid, terminal **Monochrome** (its recommended Graphite has no hue, so it cannot show colourways), notes Paper (only the spot on the fold changes), photos Monochrome (Klein retint of photos s11). Each cell is the 512 px icon with its 16/32/48 at 1:1 on light and dark |
+| `round5-bolder.png` | the five apps in clay, sage and slate (hues 40, 130, 265, a third of the wheel apart) at C 0.07, 0.11 and 0.15; same skeleton, no gradients |
+| `round5-palette.png` | the eight hues as the Solid plate colour (L 0.62) at the three caps, on the light and the dark ground, each labelled with its name, OKLCh values and hex; `CLIP` marks a colour outside sRGB |
+
+Rebuild: the Klein retints with `icons face --mode ground --retint monochrome --tint <hue>
+--chroma <cap> --name <app>-<hue>-<cap>` for mail s33 and photos s11 (48 files), then
+`icons colourways --spec tools/icons/specs/*.toml --as terminal=monochrome --klein-dir <dir>
+--out <png>`, `icons bolder ... --hues clay,sage,slate --out <png>` and `icons palette --out
+<png>`. Each sheet renders in a few seconds.
+
+### What changed
+
+- The palette grew from six uneven hues to eight, 45 degrees apart: clay 40, ochre 85, sage 130,
+  jade 175, teal 220, slate 265, plum 310, rose 355 (design/08 2.10). Sage moved from 150 to 130,
+  teal from 200 to 220, slate from 255 to 265 and plum from 320 to 310; the specs still name the
+  same hues, so the round-four icons shift by those few degrees.
+- `tools/icons`: a `ChromaCap` (0.07 default, 0.11 and 0.15 for comparison) threads through the
+  roles and `face --chroma`; `colourways`, `bolder` and `palette` subcommands, and `--as
+  app=dialect` to show an app in another dialect. The specs are unchanged.
+
+### Reading (the agent's)
+
+- **Eight hues read as eight.** At C 0.07 every neighbour pair is distinct at 512 and at 48; at
+  16 the closest pairs are clay/rose and teal/slate, which separate by hue only a little at that
+  size.
+- **Against the dock.** Every hue, at every cap, sits at a WCAG ratio of 3.0-4.1 against the dock
+  pill on the Work and Home frames in both schemes (the pill is white at .72 over the light frame
+  L 0.94 and white at .10 over the dark frame L 0.22; the plate is L 0.62), so no colourway fails
+  the pill; lightness does that work, not hue.
+- **Against the Space presets' frames.** Work's frame is hue 268 and Home's 152, both at very low
+  chroma (0.04 and 0.03 light). *Sit well*: on Work, slate (the same hue, the icon reads as part
+  of the Space), teal and plum (neighbours, 42-48 degrees away); on Home, sage and jade (22-23
+  degrees away) and ochre and teal. *Clash*: the near-complements, ochre and clay on Work (132-177
+  degrees away) and plum and rose on Home (157-158 degrees). At C 0.07 the clash is mild (the
+  frame is nearly grey); at 0.15 the complements vibrate against the tinted frame and the dock
+  stops reading as one Space. In Monochrome with `icons.monochrome_tint = space` the question does
+  not arise: the icons take the Space's hue.
+- **Bolder.** 0.11 still reads as the same family as round four and makes the set noticeably
+  livelier, especially clay and slate; 0.15 turns the plates into candy again (close to round
+  three's saturation), clips ochre, jade and teal out of sRGB, and loses the matte clay look in the
+  Klein retints. If the user wants more colour, 0.11 is the step to take; 0.15 is the upper bound
+  this sheet exists to rule out.
+
+### Per-app colourway recommendation
+
+| App | Colourway | Why |
+| --- | --- | --- |
+| Mail | slate | the suite's anchor hue, sits on the Work frame, and the Klein envelope is at its best in cool blue |
+| Files | ochre | warm folder colour; clearest white-on-colour of the eight; the one warm Solid plate in the dock |
+| Terminal | jade | a green-teal terminal reads as a terminal, and it separates from mail's slate |
+| Notes | clay spot | a warm mark on the paper page; ochre is taken by files |
+| Photos | rose | a warm dusty pink suits a photo frame and keeps it apart from files' ochre and notes' clay |
+
+Five distinct hues, each app a different part of the wheel, all at C 0.07; move to 0.11 as a set
+if the user wants them louder.
