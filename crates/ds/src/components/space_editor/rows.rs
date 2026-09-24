@@ -20,6 +20,28 @@ pub struct MotionChoice {
     pub on_motion: EventHandler<Motion>,
 }
 
+/// Which motion levels the Motion row offers.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum MotionLevels {
+    /// All five choices a person has: System, Calm, Standard, Extra, Reduced.
+    #[default]
+    All,
+    /// The three a Space itself sets (mailo gaps 4): Calm, Standard, Extra. Following the
+    /// desktop and reducing motion are the person's, not a Space's, so they are not offered;
+    /// a `level` outside the three shows no segment pressed.
+    Contact,
+}
+
+impl MotionLevels {
+    /// The levels offered, in the row's order.
+    pub fn levels(self) -> &'static [Motion] {
+        match self {
+            MotionLevels::All => &Motion::ALL,
+            MotionLevels::Contact => &[Motion::Calm, Motion::Standard, Motion::Extra],
+        }
+    }
+}
+
 /// Which schemes the contrast readout measures.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum MeasuredIn {
@@ -71,15 +93,15 @@ pub(super) fn Title(
     }
 }
 
-/// The Motion row: a segmented control over the person's five choices.
+/// The Motion row: a segmented control over the `levels` offered.
 #[component]
-pub(super) fn MotionRow(choice: MotionChoice) -> Element {
+pub(super) fn MotionRow(choice: MotionChoice, levels: MotionLevels) -> Element {
     rsx! {
         div {
             SectionHeader { kind: HeaderKind::Field, text: "Motion" }
             SegmentedControl::<Motion> {
                 label: "Motion",
-                options: Motion::ALL.into_iter().map(|level| (level, level.label().to_string())).collect::<Vec<_>>(),
+                options: levels.levels().iter().map(|&level| (level, level.label().to_string())).collect::<Vec<_>>(),
                 value: choice.level,
                 onchange: move |level| choice.on_motion.call(level),
             }
@@ -105,8 +127,17 @@ pub(super) fn EachScheme(look: SpaceLook) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::schemes_of;
-    use crate::appearance::{Scheme, Theme};
+    use super::{MotionLevels, schemes_of};
+    use crate::appearance::{Motion, Scheme, Theme};
+
+    #[test]
+    fn the_contact_levels_are_the_three_a_space_sets() {
+        assert_eq!(MotionLevels::default().levels(), &Motion::ALL);
+        assert_eq!(
+            MotionLevels::Contact.levels(),
+            &[Motion::Calm, Motion::Standard, Motion::Extra]
+        );
+    }
 
     #[test]
     fn a_system_space_is_measured_in_both_schemes_and_a_fixed_one_in_its_own() {

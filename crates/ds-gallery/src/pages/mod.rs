@@ -1,6 +1,7 @@
 //! The pages, one file each, and the pieces they share.
 
 pub mod app_icons;
+pub mod button_faces;
 pub mod controls;
 pub mod dock_tiles;
 pub mod external_icons;
