@@ -2,6 +2,7 @@
 //! an [`AppConfig`](crate::AppConfig) gives a window, so a test sees what the window would.
 
 use crate::contexts::RootContexts;
+use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
 use crate::snapshot::Viewport;
 
@@ -26,6 +27,13 @@ impl HarnessConfig {
     /// Provide `value` at the root, read with `use_context::<T>()`.
     pub fn with_context<T: Clone + Send + Sync + 'static>(mut self, value: T) -> Self {
         self.setup.contexts = self.setup.contexts.with(value);
+        self
+    }
+
+    /// Who answers the document's requests beyond `data:`, and its frames' (default
+    /// [`NetPolicy::Local`]).
+    pub fn with_net(mut self, policy: NetPolicy) -> Self {
+        self.setup.net = policy;
         self
     }
 

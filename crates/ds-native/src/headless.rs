@@ -6,6 +6,7 @@
 
 use crate::error::NativeError;
 use crate::fonts::font_context;
+use crate::frames::FrameParser;
 use crate::net::DsNet;
 use crate::scheme;
 use crate::setup::Setup;
@@ -13,7 +14,7 @@ use crate::snapshot::Viewport;
 use crate::wake::Wakeup;
 use anyrender::{PaintScene as _, render_to_buffer};
 use anyrender_vello_cpu::VelloCpuImageRenderer;
-use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
+use blitz_dom::{Document as _, DocumentConfig, DummyHtmlParserProvider, StyleThreading};
 use blitz_paint::paint_scene;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, Viewport as BlitzViewport};
@@ -56,10 +57,15 @@ impl Headless {
         let wakeup = Arc::new(Wakeup::default());
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
+        let frame_net = DsNet::frame(setup.net.clone(), Some(Arc::clone(&net_waker)));
         let config = DocumentConfig {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
-            net_provider: Some(DsNet::shared(None, Some(net_waker))),
+            net_provider: Some(DsNet::top(setup.net.clone(), None, Some(net_waker))),
+            html_parser_provider: Some(FrameParser::shared(
+                Arc::new(DummyHtmlParserProvider),
+                frame_net,
+            )),
             style_threading: StyleThreading::Sequential,
             ..Default::default()
         };

@@ -3,10 +3,13 @@
 //! app see the same providers.
 
 use crate::contexts::RootContexts;
+use crate::net_policy::NetPolicy;
 
 /// The app's providers for one document.
 #[derive(Debug, Clone, Default)]
 pub(crate) struct Setup {
     /// Values provided at the root, read with `use_context`.
     pub(crate) contexts: RootContexts,
+    /// Who answers the document's requests, and its frames'.
+    pub(crate) net: NetPolicy,
 }
