@@ -550,6 +550,13 @@ wave, both named in the orchestrating plan:
    is a security decision, not a rendering one, and needs sign-off from whoever owns `mail-mime`
    before it is chosen, not decided unilaterally by the UI session.
 
+**Native phase B (2026-09-25).** Option 1 no longer needs new plumbing. Blitz's own
+`<iframe srcdoc>` is a separate document at the pinned rev, and ds-native now parses it (the HTML
+parser, G4). ds-native serves it nothing beyond `data:` unless mailo's `NetPolicy::Custom`
+handler admits a request (G3), and freezes its links (`FrameLinks`, G7). `Harness::frame` reads
+the frame's document for the guarantee's tests. The parser is html5ever 0.39 (FINDINGS "Native
+phase B" item 3), and the sign-off above still belongs to `mail-mime`'s owner.
+
 Either way, `reading/tests.rs`'s existing guarantees (`no_div_between_article_and_iframe`, "a
 plain-text message claimed a sandboxed frame" never happening, the two sandbox-attribute checks)
 need an equivalent assertion against whichever mechanism replaces the iframe — write it before
