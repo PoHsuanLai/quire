@@ -682,6 +682,40 @@ And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's
   dock's label machine: hide on press, while a menu is open, while dragging). `None` is the
   hover behaviour as before. A Card tooltip follows `shown` the same way.
 
+### The macOS polish pass (2026-09-24): what changed under you, and what to opt into
+
+Everything below is additive or token-level; no prop was removed or renamed. What you get with no
+change of your own:
+
+- **Shell cards look deeper.** Every card on a material (a menu or popover on a Popover root, a
+  Sheet, a Toast, an OSD, a widget, the dock pill) paints material stack v2: a 0.5 px dark outer
+  hairline, a tight contact shadow, a wide ambient one, a 1 px inner top highlight, and a tint with
+  a vibrancy boost baked in (design/03 section 17.4). The bar gains a bottom hairline. Paper
+  roots (a mail window) are unchanged.
+- **Text menus are 22 px.** Slim, Context and Dropdown rows are 22 px with 13/400 text, a 6 px
+  inset highlight and hairline separators with 5 px margins; Rich keeps its 34 px tiles.
+- **Tooltips are 12 px** (the Fly was 10). **`IconButton { Status }`'s pill is 4 px** (was 9).
+- **`--shadow-window`** is now a contact shadow under a wide soft ambient one.
+- **A `Popover` fades out** over `--t-quick` on Escape or an outside click before `onclose`.
+- **A palette in a surface is as tall as its content** (up to its container), with the launcher
+  scale: a 22/500 query beside a 20 px glyph, 14 px row titles, 12 px details. If you measured the
+  card to size a blur region, measure it again after each query.
+
+What to opt into:
+
+- `Corner::Squircle(Px(r))` anywhere a `Corner` goes (`Ds { radius }`, `Surface { radius }`,
+  `CommandPalette { corner }`): the continuous-curvature corner. Its shadow follows a circle of
+  about .884 r; a blur region should use that radius (`Corner::css()` gives it).
+- `Ds { stack: Some(MaterialStack { .. }) }`: the stack's highlight, hairline, shadow strength
+  and vibrancy from your settings (inherited by every card under the root).
+- `ShellMetrics::style_attr()` and `DockMetrics::style_attr()` on any element around your
+  surfaces: the shell type scale and the dock's geometry from settings; absent, the keys'
+  defaults apply.
+- `MenuBarItem { open, emphasis, children }` around a bar title or the clock;
+  `WorkspacePills { label, WorkspacePill { label, current, onclick } }` for the workspace
+  indicator; `RunningDot {}` in a tile and `DockFloor {}` in the dock root;
+  `IconView { plate: Some(PlateFamily::Blue), .. }` for a plate with depth.
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire

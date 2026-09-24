@@ -416,6 +416,9 @@ Pin (verbatim, `S:108-114`, `S:118`):
 **Blitz notes.** None beyond the shared rules. The Pin's inset white highlight is a literal
 `rgba(255,255,255,.4)`; the token table needs `--shadow-current` (O-3).
 
+**Status radius (the macOS polish pass, settled 2026-09-24).** `Status`'s hover and open pill is
+`--r-shell-bar-item` 4, the bar item's, not `--r-item` 9.
+
 ### 3. SegmentedControl
 
 **Purpose.** One choice out of 2 to 4, all visible. Mail: Reader/Original (`S:1376`), Space
@@ -1591,6 +1594,9 @@ stamps `data-hover="warm|cold"` on `.ds`; the rule becomes
 `.ds[data-hover=warm] .ds-fly{ --fly-delay:0ms }` (proposal, O-11). The Card is placed by
 `place()`, not measured with `offsetHeight`.
 
+**Size (the macOS polish pass, settled 2026-09-24).** Both labels are `--fs-shell-tip` 12 px (the
+Fly was 10); the Fly keeps the data face.
+
 ### 19. SidebarItem
 
 **Purpose.** A navigable place in the sidebar, drawn on the Space colour. Kinds: Place (Inbox,
@@ -1904,6 +1910,15 @@ horizontal): 1px high, full width, `--line-soft`; vertical margin not specified 
   `Material::Popover`, and the menu's own `--raise` fill becomes `--m-tint` (03-COLOR).
 - Filtering and fuzzy ranking are pure Rust (06-INTERACTIONS).
 
+**Shell scale (the macOS polish pass, settled 2026-09-24).** Slim, Context and Dropdown are the
+text menus (design/13 section 13.3.3): rows at least `--shell-menu-row` 22 px, text
+`--fs-shell-menu` 13 at 400, the 22 px check column, the selection an inset highlight at
+`--r-shell-highlight` 6 inside the 5 px panel padding, separators 1 px `--line-soft` with
+`--shell-menu-sep` 5 px above and below and inset 8 px to the text, disabled rows at .35. Rich
+keeps its 34 px tiles. The sizes are tuned tokens (`ShellMetrics`), so `menus.item_height_px`
+and its siblings move them live. On a Popover root (the shell's) the card paints the material
+stack v2 (03-COLOR section 17.4).
+
 ### 21. Popover
 
 **Purpose.** The shared floating surface under Menu (§20), HoverCard (§22), Tooltip Card (§18),
@@ -1950,6 +1965,10 @@ topmost layer only (`LayerStack`).
 **Blitz notes.** This component exists so that no consumer writes `position:fixed` or measures
 layout. Mount point: OverlayHost at the end of `.ds`. Content size for `place()` comes from
 `onmounted` rects (spike S9; fallback LayoutProbe). On shell surfaces: `PopoverRequest`.
+
+**Exit (the macOS polish pass, settled 2026-09-24).** Escape or an outside click marks the popover
+`data-presence="leaving"` and fades it out (`menu-out`, `--t-quick`, `--e-exit`) before `onclose`
+runs, as a menu does.
 
 ### 22. HoverCard
 
@@ -2331,6 +2350,13 @@ close (`C:2257`).
 **Blitz notes.** Through OverlayHost. `scrollIntoView` -> Rust scroll. Snippet truncation ->
 `.ds-truncate` with max width 380. On the shell the launcher is its own layer surface (plan), and
 the wrap's scrim is a transparent overlay catcher surface (plan: "two surfaces kept warm").
+
+**In a surface (the macOS polish pass, settled 2026-09-24).** With `host: Surface` the card is as
+tall as its content up to its container (no empty box under the last row); the query is
+`--fs-shell-field` 22 at `--fw-shell-field` 500 beside a `--shell-field-glyph` 20 px search glyph,
+row titles `--fs-shell-row` 14 and details `--fs-shell-detail` 12; its shadow is the material
+stack's contact and ambient pair (`--m-box`). `corner: Option<Corner>` gives the card another
+radius or a `Corner::Squircle` (the launcher's: `Squircle(14)`).
 
 ### 26. AppearancePicker
 
@@ -3030,6 +3056,52 @@ account in the sidebar. Shell: bar sync indicator. It is Spinner (§15) mounted 
 **Motion.** `breathe`, `spin`. See §15 for the loop cost.
 
 **Blitz notes.** See §15. S dropped the halo (A7: "no … t-ambient"); keeping it is O-25.
+
+### 36. MenuBarItem (the macOS polish pass, settled 2026-09-24)
+
+**Purpose.** A bar title or text status item (the app name, a menu title, the clock) and the pill
+behind it. macOS draws a rounded highlight behind the open title and the hovered item
+(design/13 section 13.3.1); `IconButton { Status }` already draws its own, so only text needs this.
+
+**Markup.** `div.ds-bar-item[aria-expanded][data-emphasis=strong]` around the control.
+**Props.** `open: Switch` (the menu is showing), `emphasis: Emphasis` (`Strong` = 700 for the app
+name), `id`, `children`.
+**Values.** Height `--shell-bar-item` 24 (`bar.open_title_pill_height_px`), side padding
+`--shell-bar-pad` 10 (`bar.title_padding_px`), radius `--r-shell-bar-item` 4
+(`bar.item_radius_px`, proposed key), text `--fs-shell-bar` 13 / `--fw-shell-bar` 500; hover
+`--f-pill-hover`, open `--f-pill`, no transition (a hover switch lands in one frame). A
+`Button { Quiet }` inside gives up its own padding, hover and size.
+
+### 37. WorkspacePills (the macOS polish pass, settled 2026-09-24)
+
+**Purpose.** The bar's workspace indicator as one segmented group on the frame rather than a row
+of separate `Button { Mini }`s.
+**Markup.** `div.ds-ws-pills[role=group]` holding `button.ds-ws-pill[aria-current]`.
+**Props.** `WorkspacePills { label, children }`; `WorkspacePill { label, current: Here, onclick:
+EventHandler<Press>, id }`. A caller that drags pills to reorder wraps each pill in its own element
+and listens there.
+**Values.** Track `--surface` (the frame's `--f-pill-hover`), 24 high, radius 4, padding 2; the
+current pill `--surface-2` (`--f-pill`) with `--shadow-current`; others `--ink-soft`, hover
+`--ink`; text at the bar's shell size.
+
+### 38. RunningDot and DockFloor (the macOS polish pass, settled 2026-09-24)
+
+**Purpose.** The dock's running indicator and its optional reflective floor (design/10 section
+10.3.2).
+**Markup.** `span.ds-running-dot` inside a positioned tile; `div.ds-dock-floor` first in the dock
+root.
+**Values.** Dot `--dock-dot` 4 px, its centre `--dock-dot-gap` 3 px under the tile, `--ink` of the
+dock scope, `fade` in over `--t-quick`. Floor: a light band rising from the pill's floor
+(white .26 to 0 over 40 %), shown at `--dock-floor` (0 unless `dock.floor = On`), masked with the
+pill when the pill is a squircle.
+
+**IconView plates.** `IconView { plate: Some(PlateFamily) }` sits the icon on an app-icon plate
+`size` square (design/08 sections 2.1-2.5, 4.1): `span.ds-plate[data-family]` with a masked
+`span.ds-plate-face` (the whole `n = 5` superellipse, the family's 135 degree gradient, inner
+highlight white .35 and rim black .08) and a drop `0 1px 1.5px .16, 0 6px 16px -6px .3` on the
+unmasked box; a glyph or symbolic icon at `--plate-glyph` 56 % in the family's glyph colour, an
+image at `--plate-inset` 72 %. Families `Red`, `Amber`, `Green`, `Blue`, `Violet`, `Neutral`
+(the neutral plate turns `#2A2E28` to `#1D211B` in the dark scheme).
 
 ## Open decisions
 

@@ -1169,3 +1169,81 @@ What sill changes to drop each workaround (sill FINDINGS F141-F148):
   22 and `transform:scale`; `Tooltip { shown: Some(if label_gate open { Shown::Visible } else
   { Shown::Hidden }) }` driven by the machine's `ShowLabel`/`HideLabel` instead of leaving the
   label out of the document.
+
+## macOS polish (2026-09-24)
+
+The user compared the shell with macOS and found it flat; the brief was to add the layers macOS
+stacks without touching the Arc/Post identity. Branch `macos-polish`. Proofs:
+`crates/ds-native/tests/macos_polish.rs` (pixels), `crates/ds/tests/polish_ssr.rs` (goldens
+under `tests/snapshots/polish/`), unit tests beside each new module; the gallery's new Polish
+page puts each piece beside the macOS number it targets.
+
+- **Material stack v2** (design/03 §17.4). Every card material gains `--m-hairline` (0.5 px
+  black .14 light / .60 dark), `--m-shadow-contact` (`0 1px 2px`, .10 / .30), `--m-shadow-ambient`
+  (menus `0 12px 40px -12px` .28 / .55; sheet, dock, widget their own) and `--m-highlight` (1 px
+  white .30 / .12); the bar a bottom hairline. `--m-box` lists them outside in; a tinted root's
+  frame redraws the inner pair (`--m-inner`). The tint carries a vibrancy boost computed in OKLab
+  (chroma x1.4, light lightness +.012), since Blitz cannot saturate behind (S15, S16), mixed in
+  CSS by `color-mix` on `--m-vibrancy` so a key can switch it off. Each alpha reads an input
+  (`MaterialStack`, `Ds { stack }`). Blitz facts: five `box-shadow` layers paint; an outset
+  shadow is drawn from the averaged `border-radius`; `calc()` inside an `rgba()` alpha and a
+  `color-mix` percentage from `calc(var()*100%)` both paint. Legibility gates re-measured on the
+  boosted tints: all green, no alpha moved. Proof: a dark card over grey has a brighter top row,
+  a darker pixel just outside its side, a contact shadow 1 px under it and the ambient 20 px under.
+- **Squircle corners.** `Corner::Squircle(Px(r))`: one quadrant of the `n = 5` superellipse
+  reaching `2 r` along each edge (capped at half the box), drawn as a six-layer `mask-image` (four
+  quadrant SVGs and two rectangles; Blitz composites mask layers with `add`, and `min()`/`calc()`
+  with percentages resolve in `mask-size`). A mask clips the element's own `box-shadow`, so the
+  tint moves to a masked `::before` (a tinted root masks its `.ds-frame`) and the shadow stays on
+  the unmasked box at `--r-squircle`, the circle of radius .884 r that touches the squircle at 45
+  degrees and is never more than .03 r away. Proof: at radius 40 the pixel whose centre is 11.5 px
+  in on the diagonal is dark for the squircle (inside by 1.6 px) and the white ground for
+  `Px(40)`; well inside and outside agree. A squircle dock root over a clear backdrop keeps its
+  outermost corner empty, paints its 45 degree point and still casts its shadow. CSS radius stays
+  the default everywhere.
+- **Plates.** `IconView { plate: Some(PlateFamily) }` (Red, Amber, Green, Blue, Violet, Neutral;
+  design/08 §2.3): the whole superellipse (a single stretched SVG mask), the 135 degree gradient,
+  the inner highlight .35 and rim .08 on the masked face, the drop on the box, the glyph at 56 %
+  in the family's colour (`--plate-glyph`, an image at `--plate-inset` 72 %). Proof: a 96 px blue
+  plate's corner shows the ground, its top-left is the light stop, its bottom-right darker, its
+  glyph 53.8 px.
+- **Shell type scale.** Tuned tokens (`tokens/tuned.rs`): each is declared on `.ds` from an input
+  with the key's default behind it (`--fs-shell-menu:var(--shell-menu-font,13px)`), so one inline
+  write (`ShellMetrics::style_attr()`) reaches every nested scope, which re-declaring the token
+  itself would not. Bar 13/500, pill 24, radius 4; text menus 22 px rows, 13/400, highlight radius
+  6, separators 5 px margins; launcher field 22/500 with a 20 px glyph, rows 14 / 12; tooltips 12.
+  Applied inside `IconButton{Status}` (radius 4), `Menu` (Slim, Context, Dropdown), `CommandPalette`
+  in a surface and `Tooltip`. Proof: Slim rows are 22 px and the separator sits 5 px under the row.
+- **Bar.** `MenuBarItem { open, emphasis }` (the hover and open pill; proof: the open item's
+  padding differs from a closed one's) and `WorkspacePills`/`WorkspacePill` (one segmented group
+  on the frame, `aria-current`, `Press` from every button).
+- **Dock.** `DockMetrics` (tile 48, gap 8, pad 6, dot 4, dot centre 3 px under the tile, floor
+  off), `RunningDot`, `DockFloor` (a light band, `--dock-floor` 0 or 1). The floor is subtle on a
+  light dock; it reads on a dark one.
+- **Launcher.** The card in a surface is `height:auto; max-height:100%` with the list
+  `flex:0 1 auto`: as tall as its content. `CommandPalette { corner }` takes a squircle. Proof:
+  one result in a 600 x 400 panel is a card under 160 px tall, the glyph 20 px. The launcher-gaps
+  proof that the card equals its container now asserts origin and width, and a height below it.
+- **Windows and popovers.** `--shadow-window` is `0 1px 3px .12, 0 24px 64px -16px .40` (dark
+  .40 / .66). `Popover` fades out on Escape or an outside click (`menu-out`, `--t-quick`) before
+  `onclose`. Proof: after an outside click the popover is `leaving` and the caller still open; 400
+  ms later it is closed and gone.
+- **Settings keys.** Every new number is an input a key writes; design/22 is not in this wave's
+  files, so the keys are named here and in the design docs for the owner of design/22 and
+  ds-settings to add (existing keys' defaults change where marked): `appearance.material_highlight_light`
+  (30), `_dark` (12), `appearance.material_hairline_light` (14), `_dark` (60),
+  `appearance.material_shadow_strength` (100), `appearance.material_vibrancy` (100);
+  `bar.item_font_px` (13), `bar.item_font_weight` (500), `bar.item_radius_px` (4),
+  `bar.open_title_pill_height_px` (24, existing), `bar.title_padding_px` (10, existing);
+  `menus.font_px` (13), `menus.item_height_px` (existing, 24 to 22), `menus.separator_margin_px`
+  (existing, 4 to 5), `menus.highlight_radius_px` (6), `menus.tooltip_font_px` (12);
+  `launcher.field_font_px` (22), `launcher.field_font_weight` (500), `launcher.field_glyph_px`
+  (20), `launcher.row_title_px` (14), `launcher.row_detail_px` (12); `dock.tile_size_px` (48,
+  existing), `dock.tile_gap_px` (existing, 4 to 8), `dock.pill_padding_px` (6),
+  `dock.running_dot_diameter_px` (4, existing), `dock.running_dot_gap_px` (3), `dock.floor`
+  (`DockFloor::{Off,On}`, Off), `dock.pill_radius_px` (existing, 22; 18 recommended as a squircle);
+  `icons.symbolic_fallback_glyph_percent` (56) and `icons.plate_inset_percent` (72) already exist
+  and write `--icons-glyph-share` / `--icons-inset-share`.
+- Goldens re-blessed: `tests/snapshots/stylesheet.css` (the materials, shapes, tuned tokens and
+  component sheets). Control and overlay goldens did not change (the markup is the same; the
+  new props default to absent).

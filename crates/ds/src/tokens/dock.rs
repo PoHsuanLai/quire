@@ -24,7 +24,8 @@ pub const GAP: Tuned = tuned("--dock-gap", "--dock-gap-px", "8px");
 pub const PAD: Tuned = tuned("--dock-pad", "--dock-pad-px", "6px");
 /// `--dock-dot`: the running dot's diameter (`dock.running_dot_diameter_px`, 4).
 pub const DOT: Tuned = tuned("--dock-dot", "--dock-dot-px", "4px");
-/// `--dock-dot-gap`: from the tile's bottom edge to the dot (`dock.running_dot_gap_px`, 3).
+/// `--dock-dot-gap`: from the tile's bottom edge to the dot's centre (`dock.running_dot_gap_px`,
+/// 3), inside the pill's 6 px padding.
 pub const DOT_GAP: Tuned = tuned("--dock-dot-gap", "--dock-dot-gap-px", "3px");
 /// `--dock-floor`: the reflective floor's opacity, 0 or 1 (`dock.floor`, `Off`).
 pub const FLOOR: Tuned = tuned("--dock-floor", "--dock-floor-on", "0");
@@ -54,7 +55,7 @@ pub struct DockMetrics {
     pub pad: Px,
     /// The running dot's diameter, 4.
     pub dot: Px,
-    /// From the tile's bottom edge to the dot, 3.
+    /// From the tile's bottom edge to the dot's centre, 3.
     pub dot_gap: Px,
     /// The reflective floor, off.
     pub floor: DockFloorSetting,
