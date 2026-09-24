@@ -3,6 +3,7 @@
 
 use crate::components::vocab::{Here, Shortcut, Switch};
 use crate::space::FrameVars;
+use crate::space::dot_paint::DotPaint;
 use dioxus::prelude::*;
 
 /// One Space's dot in the sidebar foot.
@@ -19,6 +20,7 @@ pub fn SpaceDot(
         Here::Elsewhere => Switch::Off,
     };
     let keys = shortcut.glyphs();
+    let paint = DotPaint::gradient(&frame.stops);
     rsx! {
         button {
             r#type: "button",
@@ -26,7 +28,8 @@ pub fn SpaceDot(
             "aria-pressed": pressed.aria(),
             "aria-label": "{name} Space",
             title: "{name} ({keys})",
-            style: "background:{frame.gradient}",
+            "data-stops": paint.count(),
+            style: paint.style_attr(),
             onclick: move |_| onclick.call(()),
         }
     }

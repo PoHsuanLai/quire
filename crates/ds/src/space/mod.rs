@@ -3,6 +3,7 @@
 //! (design/03-COLOR.md sections 4-8, design/21-SPACES.md).
 
 pub mod contrast;
+pub(crate) mod dot_paint;
 pub mod frame_vars;
 pub mod look;
 pub mod palette;
