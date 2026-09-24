@@ -6,7 +6,12 @@
 //! transition on `stroke-dashoffset` does not run in Blitz (O-20, spike S6). The pill springs up
 //! on the frame after it mounts. Undo is offered while counting; once done it hides Undo and
 //! slides away after `SentHold` (1600 ms).
+//!
+//! C's outbox states ride on the same pill: a failed [`SendMood`] plays its one-shot, the ring
+//! can spin while the send waits on the outbox ([`SendRing::Spin`]), the button can say Cancel
+//! or be absent ([`PillAction`]), and a refusal reads as a second line under the text.
 
+use crate::components::send_mood::{SendMood, use_mood_pulse};
 use crate::components::vocab::Fraction;
 use crate::root::env::Env;
 use crate::time::{FRAME_SLACK, sleep};
@@ -53,14 +58,92 @@ pub enum SendPhase {
     Done,
 }
 
+/// What the pill's button offers while counting.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum PillAction {
+    /// "Undo": take back a send in its grace period, or one waiting in the outbox.
+    #[default]
+    Undo,
+    /// "Cancel": the same act, named for a send held for later.
+    Cancel,
+    /// No button: a send that is under way or has failed has nothing to take back.
+    Nothing,
+}
+
+impl PillAction {
+    /// The button's word, or `None` for no button.
+    fn word(self) -> Option<&'static str> {
+        match self {
+            PillAction::Undo => Some("Undo"),
+            PillAction::Cancel => Some("Cancel"),
+            PillAction::Nothing => None,
+        }
+    }
+}
+
+/// What the ring does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum SendRing {
+    /// Drains by `progress`: the countdown, or held where it stopped.
+    #[default]
+    Drain,
+    /// A short arc turning at the Spinner's `spin`: waiting on the outbox, no known end.
+    Spin,
+}
+
+/// The run circle's dash for a spinning ring: an arc of 20 and a gap of the rest of 57.
+const SPIN_DASH: &str = "20 37";
+
+impl SendRing {
+    /// `data-ring`: written only while spinning, so a draining pill's markup is as it was.
+    fn slug(self) -> Option<&'static str> {
+        match self {
+            SendRing::Drain => None,
+            SendRing::Spin => Some("spin"),
+        }
+    }
+}
+
+/// The run circle's `stroke-dasharray` and `stroke-dashoffset` for `ring` at `progress`.
+fn run_dash(ring: SendRing, progress: Fraction) -> (String, String) {
+    match ring {
+        SendRing::Drain => (RING.to_string(), drained(progress)),
+        SendRing::Spin => (SPIN_DASH.to_string(), "0".to_string()),
+    }
+}
+
+/// The class list and `data-pulse` for a pill playing `pulse` (a failed mood's one-shot).
+fn pulse_attrs(pulse: crate::components::vocab::PulseKey) -> (String, Option<&'static str>) {
+    match pulse.attrs() {
+        Some((anim, alias)) => (format!("ds-send-pill {anim}"), Some(alias)),
+        None => ("ds-send-pill".to_string(), None),
+    }
+}
+
 /// The undo-send pill.
+///
+/// `mood` plays its one-shot each time it changes to a failed mood (never on mount), and the
+/// pill stays up; `Fatal` also turns it `--danger`. To play the same mood again, pass `Calm` for
+/// a render first. `action` is the button's word while counting (`onundo` hears it either way).
+/// `ring: Spin` turns a short arc instead of draining. `refusal` is a second line under the
+/// text: why an Undo or Cancel was refused ("Too late to take it back"), or "No recipients".
 #[component]
 pub fn SendPill(
     text: String,
     progress: Fraction,
     phase: SendPhase,
     onundo: EventHandler<()>,
+    #[props(default)] mood: SendMood,
+    #[props(default)] action: PillAction,
+    #[props(default)] ring: SendRing,
+    #[props(default)] refusal: Option<String>,
 ) -> Element {
+    let (class, alias) = pulse_attrs(use_mood_pulse(mood));
+    let (dash, offset) = run_dash(ring, progress);
+    let word = match phase {
+        SendPhase::Counting => action.word(),
+        SendPhase::Done => None,
+    };
     let mut shown = use_signal(|| Shown::Hidden);
     use_hook(move || {
         spawn(async move {
@@ -88,9 +171,11 @@ pub fn SendPill(
     };
     rsx! {
         div {
-            class: "ds-send-pill",
+            class,
             "data-shown": shown,
             "data-phase": phase.slug(),
+            "data-mood": mood.slug(),
+            "data-pulse": alias,
             role: "status",
             style: "--f:{progress.css()}",
             // The circles carry no classes: CSS does not reach inside an SVG on Blitz (S6).
@@ -98,6 +183,7 @@ pub fn SendPill(
             svg {
                 class: "ds-send-ring",
                 "data-ds-svg": "ring",
+                "data-ring": ring.slug(),
                 view_box: "0 0 24 24",
                 width: "20",
                 height: "20",
@@ -119,18 +205,25 @@ pub fn SendPill(
                     stroke: "currentColor",
                     "stroke-width": "3",
                     "stroke-linecap": "round",
-                    "stroke-dasharray": "{RING}",
-                    "stroke-dashoffset": drained(progress),
+                    "stroke-dasharray": dash,
+                    "stroke-dashoffset": offset,
                     transform: "rotate(-90 12 12)",
                 }
             }
-            span { "{text}" }
-            if phase == SendPhase::Counting {
+            if let Some(why) = refusal {
+                span { class: "ds-send-pill-text",
+                    span { "{text}" }
+                    span { class: "ds-send-pill-why", "{why}" }
+                }
+            } else {
+                span { "{text}" }
+            }
+            if let Some(word) = word {
                 button {
                     r#type: "button",
                     class: "ds-send-pill-undo",
                     onclick: move |_| onundo.call(()),
-                    "Undo"
+                    "{word}"
                 }
             }
         }

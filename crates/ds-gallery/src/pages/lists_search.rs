@@ -5,8 +5,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, Run,
-    RunTone, Selection, Shown, StaggerIndex, StripAction, Switch, Text, Titles,
+    ActionId, Anim, Button, ButtonVariant, Emphasis, Expanded, HoverStrip, Icon, ListRow, Presence,
+    Run, RunTone, Selection, Shown, StaggerIndex, StripAction, Text, Titles,
 };
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
@@ -94,7 +94,7 @@ pub fn SearchRows() -> Element {
                                 actions: actions(),
                                 shown: if at() == index { Shown::Visible } else { Shown::Hidden },
                                 titles: Titles::FromLabel,
-                                expanded: vec![(ActionId("label".to_string()), if at() == index { Switch::On } else { Switch::Off })],
+                                expanded: vec![(ActionId("label".to_string()), if at() == index { Expanded::Open } else { Expanded::Closed })],
                             }
                         },
                         onclick: move |_| at.set(index),

@@ -1601,6 +1601,120 @@ writes), unit tests in `tokens/pixel.rs`, `icon/stroke.rs`, `geometry/scale.rs` 
 - Scroll offsets are fractional and applied at paint; a scrolled list's rows move by whatever
   the offset is.
 
+## mailo gaps 2 (controls and tiles) (2026-09-25)
+
+mailo's component migration reported the props and variants it still hand-rolls controls for.
+Branch `mailo-gaps-2b`. Every change is additive unless an item says the markup changed. Proofs:
+`crates/ds/tests/mailo_gaps_ssr.rs` (goldens beside each component's existing ones, so the
+controls' and lists' class scans cover them) and one Harness test file per behaviour in
+`crates/ds-native/tests/`. CONSUMING.md "The mailo gaps 2" has one row per new prop.
+
+1. **Button and TextInput.** `Button` takes `title`, `aria_label` and `expanded:
+   Option<Expanded>` (`Expanded::{Open, Closed}`, new in `vocab`: a trigger's open state is a
+   different fact from a toggle's pressed state, so it is not a `Switch`). `IconButton` already
+   had all three (`tooltip`, `label`, `expanded: Option<Switch>`) and is unchanged; its
+   `expanded` stays a `Switch` because changing it would break every caller. `TextInput` takes
+   `onfocus`/`onblur: EventHandler<()>` and `kind: TextInputKind::{Text, Password}`. A range is
+   the existing `Slider` (thousandths, keys, drag), so there is no range kind.
+   - **Blitz dispatches no focus event for a programmatic focus.** A click or Tab goes through
+     blitz-dom's `generate_focus_events` (blur on the old node, focus on the new); the focus
+     seam's `set_focus_to` (ds-native's `HostFocus`, and dioxus-native-dom's own `set_focus`,
+     whose source says "TODO: queue focus events somehow") changes the focused node silently.
+     So a `Focus::OnMount` or `Focus::Controlled` field on Blitz never heard its own focus.
+     Fixed for the field itself: `focus::host::focus_soon_told` calls the field's `onfocus` once a
+     *host's* write succeeds; without a host (the webview) the renderer's real event fires and
+     `told` is not called, so the caller hears it once either way. Not fixable here: the field
+     that *lost* the caret to a seam focus gets no `blur` on Blitz. A caller that tracks "typing"
+     with one flag is unaffected (the new field's focus sets it); one that tracks each field
+     must treat a focus elsewhere as the other's blur. Proof: `field_focus.rs`
+     (`a_click_and_the_seam_both_report_focus_and_a_click_reports_blur`,
+     `a_controlled_request_still_focuses_and_reports_it`); with `told` disabled both fail.
+   - **Blitz draws a password in clear.** blitz-dom lays `type="password"` out as a text editor
+     and paints its characters as typed (no masking anywhere in blitz-dom or blitz-paint at the
+     pinned rev). The field therefore paints its own text transparent (`caret-color` keeps the
+     caret in `--ink`) and lays `.ds-input-mask`, one `•` per character, over it where the
+     placeholder would sit. The caret follows the hidden text's advance, so it can sit a little
+     off the last dot; the secret never paints. A browser masks natively, and its (transparent)
+     dots sit under the same overlay.
+2. **AccountTile.** `mark: MarkStyle` (default `Letter`, so every current tile is as it was)
+   is handed to the tile's `ProviderMark`: mailo's provider-marks setting reaches the tiles.
+   The Add account face is its own component, `AddAccountTile { label, title, onclick }`,
+   rather than an `AccountFace::Add` variant: an add tile has no `pressed` and no `unread`, and a
+   variant would have made both required for it and broken every `match` on `AccountFace`.
+   design/04 section 27 does not draw it; mailo's `.acct-add` does (a dashed `--f-ink-faint`
+   ring around a plus, `--f-ink` on hover), and quire takes that, on a Pin with no ground at
+   rest. That rule has to name `.ds-icon-button.ds-account-tile`: `icon_button.css` comes after
+   `account_tile.css` in the cascade, so an equal-specificity rule lost to the Pin's ground.
+   Proof: `account_tiles.rs::the_add_tile_has_no_plate_at_rest` (the add tile's top edge is the
+   window ground, the account tile's is its plate; with the one-class selector it fails) and
+   `the_add_tile_presses_and_is_never_pressed`.
+3. **SendPill.** `mood: SendMood::{Calm, Nudge, Shake, Fatal}` (named `SendMood`, not `Mood`,
+   in the flat `ds::` namespace), `action: PillAction::{Undo, Cancel, Nothing}` (`Nothing`
+   because mailo's failed and in-flight faces offer no button), `ring: SendRing::{Drain, Spin}`
+   and `refusal: Option<String>`; each defaults to the old markup. A failed mood fires the pulse
+   machinery's A/B alias (`a-nudge`, `a-shake`; `Fatal` shakes as `Shake` does and turns
+   `--danger`) only when the mood *changes*, never on mount (the pill is still springing up, and
+   a keyframe on `transform` would fight that transition), and is put back at rest at
+   `settle(anim)` (554 / 594 ms Standard). The last mood lives in a plain value, as `Count`'s
+   last value does; only the settle timer writes a signal (the finished firing's round, only
+   ever forward, so a slower shake from an older firing cannot reopen a newer nudge). mailo's
+   own CSS looped each twice at its own durations; quire plays each once at design/05's, per
+   principle 7. The spin ring turns the whole `svg` at `--t-spin` (CSS cannot reach inside it on
+   Blitz, S6), with a 20/37 dash written as attributes. Proof: `send_pill_moods.rs`
+   (`a_nudge_plays_once_settles_and_the_pill_stays`: playing 100 ms before `settle(Nudge)`, at
+   rest 50 ms after, still `data-shown=shown`; `a_mood_that_returns_plays_again` on alias `b`;
+   `a_spinning_ring_turns_and_a_draining_one_holds`: the ring's pixels 250 ms apart differ
+   for Spin and are identical for Drain).
+4. **SidebarItem.** A Today item's close button is named `Close {label}` (it was `Close` on
+   every row, so a screen reader heard a column of identical buttons). This is the first of the
+   two changes to existing markup in this wave (the brief asked for both): the `today-entering`, `today-present` and `today-leaving`
+   goldens were re-blessed and differ only in that attribute. `trailing: Option<TodayTrailing>`
+   (`time`, `cancel` as the button's accessible name, `on_cancel`) draws a scheduled row's time
+   and its cancel after the label; the cancel stops propagation, as the close does, so it does
+   not also open the row. A typed struct rather than an `Element` slot: the row owns the markup
+   (a slot would let a consumer put a raw button inside a `role=button` div). Proof:
+   `today_trailing.rs` (cancel then label logs `cancel,open`; the close is `Close Q3 notes`) and
+   the `today-scheduled` golden.
+5. **SpaceEditor.** `on_rename: Option<EventHandler<String>>` turns the title into an inline
+   `TextInput` holding `name` (the title's face and size, not the field's body size);
+   `motion: Option<MotionChoice { level, on_motion }>` adds a Motion row after Appearance;
+   `measured: MeasuredIn::{ThisScheme, EachScheme}` measures each scheme the Space's theme can
+   show, each under a small-caps heading (`schemes_of`: System both, Light or Dark its own).
+   Each defaults to the old markup. The Theme row stays the editor's own
+   `SegmentedControl<Theme>`, not `AppearancePicker`. `Preset` gains `name` (Dusk, Orchard,
+   Harbour, Ember, Lagoon, Heather, Moss, Stone: mailo's names in design/21's order, now in its
+   table), and each preset button is named by it: the second change to existing markup in this
+   wave (the five `space_editor` goldens differ only in the preset buttons' `aria-label`, now
+   the name, and a new `title`). The file was split to stay short: the field and its handles
+   are `space_editor/handles.rs`, `SpaceDot` is `space_editor/dot.rs`, the new rows
+   `space_editor/rows.rs`, and `Checks` became a header over `CheckRows` so each scheme reuses
+   the rows.
+   - **The Motion row is over `Motion`, not `MotionLevel`, as the brief named it.** `MotionLevel`
+     is the resolved level (`Calm`, `Standard`, `Extra`, `Reduced`: no `System`, no label); what
+     a person picks, and what a root takes (`Appearance { motion: Motion }`, and what mailo's
+     `Space::motion` feeds per the first mailo gaps item 6), is `Motion`, which has `System` and a
+     `label()`. A row over `MotionLevel` could not offer "follow the desktop".
+   - Not done: mailo's six extra presets (the retired accents) are not added to quire's
+     `PRESETS: [Preset; 8]`; design/21 names eight, and changing the array's length would break
+     every consumer that indexes it by workspace.
+   Proof: `space_editor_rows.rs` (typing `s` in the title makes the Space "Works"; picking
+   Reduced reports `reduced`; a System Space shows Light and Dark headings over eight checks),
+   the `rows-system`, `rows-dark` and `rename-unnamed` goldens, and
+   `presets::the_presets_are_named_in_the_design_order`.
+
+What mailo changes (docs/mailo-migration.md section 2 has the row for each):
+
+- Raw buttons with a title, an assistive name or an open state become `Button { title,
+  aria_label, expanded }`; `Field` becomes `TextInput { kind, onfocus, onblur }` (the typing
+  guard hangs off the two handlers) and its `Range` kind becomes `Slider`.
+- `AccountTiles` passes its provider-marks setting as `mark`, and its "+" is `AddAccountTile`.
+- `compose/pill.rs` maps `Mood`, `Offer` and `Ring::Spin` onto `SendMood`, `PillAction` and
+  `SendRing`, and `.sp-why` onto `refusal`; its own nudge and shake CSS goes.
+- `compose/later.rs`'s scheduled rows are `SidebarItem { trailing }`; a test that looked for a
+  Today close named "Close" looks for "Close {label}".
+- The Space editor's name, Motion and per-scheme readout are `on_rename`, `motion` and
+  `measured`; a test that found presets by "Preset n" finds them by name.
+
 ## mailo gaps 2 (lists and overlays) (2026-09-25)
 
 mailo's second migration wave moves its rows, strip, command panel, menus and hover cards onto
@@ -1626,6 +1740,10 @@ watching it fail (the strip's and the row action's stops).
      (every in-repo caller writes either a `String` or `None`). The one doc example that wrote
      `Some("…".to_owned())` now writes the string. A `Display` value that is not a string no
      longer converts for `subject` (none exists in this repo or mailo).
+   - Blitz drops the whitespace at the end of an inline element's box: a faint `Re: ` span
+     before a mark drew as `Re:UIDL` in the gallery (a bare text node keeps its space). A toned
+     or marked run's leading and trailing spaces are therefore drawn as text nodes outside its
+     element (`edges`, table-tested); the SSR shows `<span …>Re:</span> <mark …>`.
    - `list_row.rs` passed 300 lines with the new props, so the star (`row_star.rs`) and the
      click snapshot (`row_click.rs`) moved out, unchanged; the hooks are `row_hooks.rs`.
    - `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>`, the event
@@ -1652,10 +1770,10 @@ watching it fail (the strip's and the row action's stops).
      not always on, because every existing row golden carries a strip and the brief keeps
      current markup; mailo passes `FromLabel`. On the webview a `title` is a native tooltip beside
      the Fly; on Blitz it draws nothing.
-   - `expanded` is a strip prop, `Vec<(ActionId, Switch)>`, not a field of `StripAction`: a new
-     public field would break every `StripAction { .. }` literal. `Switch` rather than a new
-     `Expanded` enum because `IconButton { expanded: Option<Switch> }` already writes
-     `aria-expanded` from it; a listed button also gets `aria-haspopup="menu"`.
+   - `expanded` is a strip prop, `Vec<(ActionId, Expanded)>`, not a field of `StripAction`: a
+     new public field would break every `StripAction { .. }` literal. `Expanded::{Open, Closed}`
+     is the controls wave's (`Button { expanded }`), reused rather than a second type for the
+     same attribute; a listed button also gets `aria-haspopup="menu"`.
    - Gallery: Lists page, "Search hits and a keyboard-shown strip".
 
 2. **The command panel** (`CommandPalette`, `MenuEntry`).
@@ -1746,3 +1864,4 @@ What mailo changes:
   row from `onquery`.
 - Hover: sidebar entries as `HoverTarget { as_: TargetElement::Li }`, the time's tip as
   `HoverKind::Tip`.
+

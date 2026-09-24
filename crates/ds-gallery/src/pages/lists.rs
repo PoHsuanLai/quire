@@ -1,6 +1,7 @@
 //! Lists: a live `AnimatedList` whose rows leave by each exit, heal, and come back on undo;
 //! sidebar items; account tiles; the hover strip; the appearance picker.
 
+use super::scheduled::Scheduled;
 use super::{Section, Specimen};
 use crate::axes::Axes;
 use dioxus::prelude::*;
@@ -286,7 +287,7 @@ fn Sidebar() -> Element {
     rsx! {
         Section {
             title: "SidebarItem",
-            note: "On the Space's frame colour. Click a place to move the seal; drop on Snoozed plays the gulp; Today items close.",
+            note: "On the Space's frame colour. Click a place to move the seal; drop on Snoozed plays the gulp; Today items close (each close is named for its row); the scheduled draft shows its time and cancels.",
             div { class: "g-row g-row-top",
                 div { class: "g-side",
                     for (index , (icon , label , count)) in PLACES.into_iter().enumerate() {
@@ -331,6 +332,7 @@ fn Sidebar() -> Element {
                             onclose: Some(EventHandler::new(move |()| today.with_mut(|today| today.retain(|seen| *seen != name)))),
                         }
                     }
+                    Scheduled { key: "{today().len()}" }
                 }
                 div { class: "g-col",
                     Button { variant: ButtonVariant::Mini, label: "Drop on Snoozed (gulp)", onclick: move |_| gulp.fire() }

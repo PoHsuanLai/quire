@@ -2,7 +2,7 @@
 //! result through a Fly tooltip (design/04-COMPONENTS.md section 17).
 
 use crate::components::tooltip::Shown;
-use crate::components::vocab::{Here, StaggerIndex, Switch};
+use crate::components::vocab::{Expanded, Here, StaggerIndex};
 use crate::geometry::Rect;
 use crate::geometry::measure::client_rect;
 use crate::icon::Icon;
@@ -57,7 +57,7 @@ pub fn HoverStrip(
     actions: Vec<StripAction>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] titles: Titles,
-    #[props(default)] expanded: Vec<(ActionId, Switch)>,
+    #[props(default)] expanded: Vec<(ActionId, Expanded)>,
 ) -> Element {
     rsx! {
         div { class: "ds-strip", "data-shown": shown.map(Shown::slug),
@@ -83,7 +83,7 @@ fn StripButton(
     action: StripAction,
     j: StaggerIndex,
     titles: Titles,
-    expanded: Option<Switch>,
+    expanded: Option<Expanded>,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
     let StripAction {
@@ -109,7 +109,7 @@ fn StripButton(
             "aria-label": "{label}",
             title,
             "aria-haspopup": expanded.map(|_| "menu"),
-            "aria-expanded": expanded.map(Switch::aria),
+            "aria-expanded": expanded.map(Expanded::aria),
             onmounted: move |event| element.set(Some(event.data())),
             onpointerenter: move |_| {
                 if let Some(onhover) = onhover {

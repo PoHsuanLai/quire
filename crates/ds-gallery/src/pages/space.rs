@@ -5,8 +5,8 @@ use super::{Caption, Section};
 use crate::axes::{Axes, PresetIndex};
 use dioxus::prelude::*;
 use ds::{
-    Chip, ChipVariant, DotIndex, FrameVars, Here, Key, Shortcut, SpaceDot, SpaceEditor, readout,
-    use_env,
+    Chip, ChipVariant, DotIndex, FrameVars, Here, Key, MeasuredIn, MotionChoice, Shortcut,
+    SpaceDot, SpaceEditor, readout, use_env,
 };
 
 /// The Space page.
@@ -19,6 +19,9 @@ pub fn SpacePage() -> Element {
         (axes.look.clone(), axes.preset)
     };
     let frame = FrameVars::of(&look, scheme);
+    let mut renamed = use_signal(|| None::<String>);
+    let name = renamed().unwrap_or_else(|| preset.label());
+    let motion = axes.read().motion;
     let checks = readout(&look, scheme);
     rsx! {
         Section { title: "Presets", note: "The eight presets as the sidebar foot draws them. Picking one resets the Space; the toolbar's Space menu does the same.",
@@ -35,13 +38,16 @@ pub fn SpacePage() -> Element {
                 }
             }
         }
-        Section { title: "SpaceEditor", note: "Edits the Space the whole gallery is framed in: drag a dot, change the grain, pick a preset.",
+        Section { title: "SpaceEditor", note: "Edits the Space the whole gallery is framed in: drag a dot, change the grain, pick a preset. Rename it in the title; the Motion row drives the gallery's motion; the readout measures each scheme the Space's theme can show.",
             SpaceEditor {
                 look: look.clone(),
                 scheme,
                 active_dot: DotIndex(0),
-                name: Some(preset.label()),
+                name: Some(name),
                 onchange: move |next| axes.with_mut(|axes| axes.look = next),
+                on_rename: move |next: String| renamed.set(Some(next)),
+                motion: MotionChoice { level: motion, on_motion: EventHandler::new(move |next| axes.with_mut(|axes| axes.motion = next)) },
+                measured: MeasuredIn::EachScheme,
             }
         }
         Section { title: "Contrast readout", note: "ds::readout for this Space in the current scheme: the four gates every pick is held to.",
