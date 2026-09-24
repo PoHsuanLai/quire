@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use clap::{Parser, Subcommand};
 mod round4;
+mod round5;
 
 use icons::{
     Bevel, Cell, Dialect, EXPORT_SIZES, Family, IconsError, Look, Shadow, Sheet, SheetStyle, Spec,
@@ -61,6 +62,37 @@ enum Command {
         #[arg(long)]
         out: PathBuf,
     },
+    /// Round five (a): every app in eight colourways at the palette's chroma cap.
+    Colourways {
+        #[arg(long, num_args = 1.., required = true)]
+        spec: Vec<PathBuf>,
+        /// Show an app in another dialect than its spec's: `terminal=monochrome`.
+        #[arg(long = "as", value_delimiter = ',')]
+        as_dialect: Vec<String>,
+        /// Retinted model faces, `<app>-<hue>-<cap>.png` / `.flat.png`, used where present.
+        #[arg(long)]
+        klein_dir: Option<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Round five (b): every app in the given hues at chroma 0.07, 0.11 and 0.15.
+    Bolder {
+        #[arg(long, num_args = 1.., required = true)]
+        spec: Vec<PathBuf>,
+        #[arg(long = "as", value_delimiter = ',')]
+        as_dialect: Vec<String>,
+        #[arg(long)]
+        klein_dir: Option<PathBuf>,
+        #[arg(long, value_delimiter = ',')]
+        hues: Vec<String>,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Round five (c): the palette's swatch board with OKLCh values.
+    Palette {
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// The whole set in Monochrome tinted by the Work and Home presets' Space colours.
     Space {
         #[arg(long, num_args = 1.., required = true)]
@@ -87,6 +119,9 @@ enum Command {
         /// The tint for `--retint`, from the muted palette.
         #[arg(long, default_value = "slate")]
         tint: String,
+        /// The chroma cap for `--retint` (round five's bolder steps: 0.11, 0.15).
+        #[arg(long, default_value_t = icons::CHROMA_CAP)]
+        chroma: f32,
     },
     /// A strip sheet: each `<dir>/<name>.flat.png` at 512, 48, 32 and 16 px 1:1 on light and dark.
     Strips {
@@ -202,7 +237,7 @@ fn face(
     mode: FaceMode,
     out_dir: &Path,
     name: &str,
-    recolour: Option<(Dialect, Tint)>,
+    recolour: Option<(Dialect, Tint, icons::ChromaCap)>,
 ) -> Result<(), IconsError> {
     let t = Template::default();
     let raw = load(input)?;
@@ -214,7 +249,7 @@ fn face(
             let (x0, y0) = ((raw.width() - side) / 2, (raw.height() - side) / 2);
             let crop = image::imageops::crop_imm(&raw, x0, y0, side, side).to_image();
             let crop = match recolour {
-                Some((d, tint)) => retint(&crop, &roles(d, tint)),
+                Some((d, tint, cap)) => retint(&crop, &roles(d, tint, cap)),
                 None => crop,
             };
             (onto_plate(&crop, &t), Bevel::Ours)
@@ -259,6 +294,21 @@ fn strips(dir: &Path, names: &[String], title: &str, out: &Path) -> Result<(), I
     save(&strip_sheet(title, &rows, &SheetStyle::default()), out)
 }
 
+/// `name=dialect` pairs from `--as`.
+fn parse_as(pairs: &[String]) -> Result<Vec<(String, Dialect)>, IconsError> {
+    pairs
+        .iter()
+        .map(|p| {
+            let (name, d) = p
+                .split_once('=')
+                .ok_or_else(|| IconsError::BadOverride(p.clone()))?;
+            let dialect = <Dialect as clap::ValueEnum>::from_str(d, true)
+                .map_err(|_| IconsError::BadOverride(p.clone()))?;
+            Ok((name.to_owned(), dialect))
+        })
+        .collect()
+}
+
 fn load_specs(paths: &[PathBuf]) -> Result<Vec<Spec>, IconsError> {
     paths
         .iter()
@@ -278,6 +328,7 @@ fn abstract_icons(
     let look = |s: &Spec| Look {
         dialect: dialect.unwrap_or(s.dialect),
         tint: s.tint,
+        cap: icons::ChromaCap::default(),
     };
     for spec in &specs {
         let name = &spec.name;
@@ -414,6 +465,34 @@ fn main() -> Result<(), IconsError> {
             out,
         } => round4::dialects(&load_specs(&spec)?, klein_dir.as_deref(), &out),
         Command::Space { spec, out } => round4::space(&load_specs(&spec)?, &out),
+        Command::Colourways {
+            spec,
+            as_dialect,
+            klein_dir,
+            out,
+        } => {
+            let dialects = parse_as(&as_dialect)?;
+            let plan = round5::Plan {
+                dialects: &dialects,
+                klein_dir: klein_dir.as_deref(),
+            };
+            round5::colourways(&load_specs(&spec)?, &plan, &out)
+        }
+        Command::Bolder {
+            spec,
+            as_dialect,
+            klein_dir,
+            hues,
+            out,
+        } => {
+            let dialects = parse_as(&as_dialect)?;
+            let plan = round5::Plan {
+                dialects: &dialects,
+                klein_dir: klein_dir.as_deref(),
+            };
+            round5::bolder(&load_specs(&spec)?, &plan, &hues, &out)
+        }
+        Command::Palette { out } => round5::palette(&out),
         Command::Face {
             input,
             mode,
@@ -421,8 +500,11 @@ fn main() -> Result<(), IconsError> {
             name,
             retint,
             tint,
+            chroma,
         } => {
-            let recolour = retint.map(|d| tint.parse().map(|t| (d, t))).transpose()?;
+            let recolour = retint
+                .map(|d| tint.parse().map(|t| (d, t, icons::ChromaCap(chroma))))
+                .transpose()?;
             face(&input, mode, &out_dir, &name, recolour)
         }
         Command::Strips {

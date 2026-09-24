@@ -7,15 +7,18 @@
 use image::{Rgba, Rgba32FImage};
 
 use crate::{
-    Bevel, Dialect, Layer, Oklab, Plane, PlateGrid, Pt, Relief, Role, Roles, Spec, Srgb8, Template,
-    Tint, apply_grain, compose::over, finish, mark::distance, plate_face, roles, srgb,
+    Bevel, ChromaCap, Dialect, Layer, Oklab, Plane, PlateGrid, Pt, Relief, Role, Roles, Spec,
+    Srgb8, Template, Tint, apply_grain, compose::over, finish, mark::distance, plate_face, roles,
+    srgb,
 };
 
-/// What an icon is drawn as: a dialect under a tint (the spec's own, or an override).
+/// What an icon is drawn as: a dialect under a tint and a chroma cap (the spec's own dialect
+/// and tint, or overrides).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Look {
     pub dialect: Dialect,
     pub tint: Tint,
+    pub cap: ChromaCap,
 }
 
 impl Look {
@@ -24,6 +27,7 @@ impl Look {
         Look {
             dialect: spec.dialect,
             tint: spec.tint,
+            cap: ChromaCap::default(),
         }
     }
 }
@@ -143,7 +147,7 @@ pub fn emblem_object(spec: &Spec, r: &Roles, grid: PlateGrid) -> Rgba32FImage {
 /// the squircle.
 pub fn emblem(spec: &Spec, look: Look, canvas: u32, t: &Template, tile: &Plane) -> Rgba32FImage {
     let grid = PlateGrid::for_canvas(canvas, t);
-    let r = roles(look.dialect, look.tint);
+    let r = roles(look.dialect, look.tint, look.cap);
     let face = plate_face(grid, r.plate, r.shift);
     let face = match canvas >= GRAIN_FROM {
         true => apply_grain(&face, spec.grain, tile),
@@ -186,6 +190,7 @@ fill = "symbol"
             let look = Look {
                 dialect,
                 tint: spec.tint,
+                cap: ChromaCap::default(),
             };
             for size in [16, 48, 512] {
                 let img = emblem(&spec, look, size, &t, &grain_tile());
@@ -209,7 +214,7 @@ fill = "symbol"
     #[test]
     fn raised_layers_are_lit_on_top_and_shaded_below() {
         let spec = parse_spec(DOT).expect("spec");
-        let r = roles(Dialect::Monochrome, spec.tint);
+        let r = roles(Dialect::Monochrome, spec.tint, ChromaCap::default());
         let grid = PlateGrid {
             canvas: 240,
             side: 240,
@@ -233,7 +238,7 @@ fill = "symbol"
     #[test]
     fn small_sizes_drop_the_emboss() {
         let spec = parse_spec(DOT).expect("spec");
-        let r = roles(Dialect::Monochrome, spec.tint);
+        let r = roles(Dialect::Monochrome, spec.tint, ChromaCap::default());
         let obj = emblem_object(&spec, &r, PlateGrid::for_canvas(32, &Template::default()));
         let (a, b) = (obj.get_pixel(16, 11).0, obj.get_pixel(16, 20).0);
         assert!(

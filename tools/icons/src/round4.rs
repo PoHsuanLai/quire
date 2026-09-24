@@ -24,6 +24,7 @@ pub fn dialects(specs: &[Spec], klein_dir: Option<&Path>, out: &Path) -> Result<
                     let look = Look {
                         dialect,
                         tint: spec.tint,
+                        cap: icons::ChromaCap::default(),
                     };
                     let name = dialect.name().to_uppercase();
                     look_cell(spec, look, 512, &name, &t, &tile)
@@ -63,6 +64,7 @@ pub fn space(specs: &[Spec], out: &Path) -> Result<(), IconsError> {
             let look = Look {
                 dialect: Dialect::Monochrome,
                 tint,
+                cap: icons::ChromaCap::default(),
             };
             let cells = specs
                 .iter()
