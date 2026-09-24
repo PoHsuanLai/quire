@@ -205,6 +205,17 @@ written as the element's `id`; `onclick` reports which button pressed. A right-c
 `mouseup` as `Middle`, a click or a keyboard activation as `Primary`. A closure `move |_| …` and
 an `EventHandler<()>` still convert.
 
+Settled (mailo gaps 4, 2026-09-25): a sixth variant, `Frame` (`data-variant="frame"`), for
+words on the Space frame: the sidebar item's chrome (padding 6px 8px, `--r-item`, ui 13.5 / 600,
+`--f-ink-soft` on nothing; `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` held, and
+`--f-pill` with `--shadow-current` when `aria-pressed="true"`). `trailing: Option<Trailing>`
+(`Caret`: `chevron-down` 12 in `span.ds-button-trail` at .7; `Glyph(Icon)` at the variant's icon
+size) follows the label, for a dropdown showing its value. `face: ButtonFace` (`Label` default;
+`Bold`, `Italic`, `Underline`, `Strike`) draws the label as `span.ds-button-face[data-face]`
+holding `B`, `i` (in `--font-serif` italic, S's Georgia), `U` (underlined) or `S` (struck
+through), and names the button by `label` through `aria-label` unless `aria_label` is given;
+`FaceMark { face, label }` is the same span on its own, for a `BubbleButton`'s `label`.
+
 **Geometry.**
 
 | Variant | Padding | Radius | Gap | Font | Colours | Icon |

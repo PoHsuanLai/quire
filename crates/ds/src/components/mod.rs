@@ -5,6 +5,7 @@ pub mod animated_list;
 pub mod appearance_picker;
 pub mod avatar;
 pub mod button;
+pub mod button_face;
 pub mod chip;
 pub mod command_palette;
 pub mod command_pill;
@@ -74,6 +75,7 @@ pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
 pub use button::{Button, ButtonVariant};
+pub use button_face::{ButtonFace, FaceMark, Trailing};
 pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;

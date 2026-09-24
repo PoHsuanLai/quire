@@ -1,5 +1,6 @@
 //! Controls: every control in every state its props can express.
 
+use super::button_faces::ButtonFaces;
 use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
 use super::fields::Fields;
@@ -64,6 +65,7 @@ const AVATAR_SIZES: [AvatarSize; 8] = [
 pub fn ControlsPage() -> Element {
     rsx! {
         Buttons {}
+        ButtonFaces {}
         StatusItems {}
         ExternalIcons {}
         DockTiles {}
