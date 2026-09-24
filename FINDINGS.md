@@ -727,3 +727,75 @@ copies (`bar/menu_track/*`, `sill_services::curve`, most of `sill-settings/src/{
   There is no `trybuild` in the lockfile. The refusals are unit-tested on the expansion itself
   (`gen_struct.rs` and `gen_enum.rs` tests), and the accepted shapes are tested through the
   real derive in `crates/ds-settings/tests/derive.rs`.
+## Polish pass (2026-09-24)
+
+What the two gallery fix branches left behind, closed on branch `polish`. Headless proofs are in
+`crates/ds-native/tests/polish.rs` and `tests/click.rs`; each probe in `polish.rs` except the
+Danger one was checked to fail with its fix reverted (the Danger probe pins behaviour the doc
+already asked for).
+
+- **`:where` on Blitz.** `reset.css`'s element rules now read `:where(.ds) h1`, `:where(.ds) p`,
+  `:where(.ds) button, :where(.ds) input, …` (specificity 0,0,1). Stylo at the pinned rev
+  honours `:where`: a plain `button` under `.ds` still inherits the column's colour and 30 px
+  font through the reset (so the rule is parsed and matched, not dropped), and a
+  `.ds-where-probe{color;font-size}` rule with one class wins over it on a `button` (red and
+  24 px, none of the inherited blue). Written as `.ds button` the same probe loses its colour
+  (checked). Three per-component workarounds from Gallery fixes A were removed because S's own
+  CSS writes a lone class there: `.ds-row .ds-star` is `.ds-star` again, `button.ds-sidebar-item`
+  is gone, and `.ds-input-wrap input`'s font and colour moved back onto `.ds-input`. The ones
+  whose parent class S's CSS itself writes stay, with the S selector now cited as the reason
+  instead of the reset: `.ds-toast .ds-toast-tab` (`.toast .tab`), `.ds-send-pill
+  .ds-send-pill-undo` (`.sendpill button`), `.ds-section-header .ds-section-header-action`
+  (`.s-h button`), `.ds-sidebar-item .ds-sidebar-item-close` (`.item .x`) and `.ds-stop
+  .ds-stop-remove` (`.stop .rm`). `self_lint` recognises `:where(.ds)` as quire's own ground for
+  `DsInternals`. Only the stylesheet golden changed for this.
+- **Spacing.** 218 literal pixels in `margin`/`padding`/`gap` became `var(--s-N)`: 175 in 29
+  component sheets (utilities.css had none) and 43 in `gallery.css`. Negative margins (the
+  Space handle, the slider thumb, the avatar stack) are `calc(var(--s-N) * -1)`. Four component
+  values were off the scale and quoted exactly by 04-COMPONENTS, so they became steps:
+  `--s-1-5` (the chip's `1.5px 7px`, section 10, and the image provider mark's `1.5px`, section
+  28), `--s-13` (the hover card's `12px 13px`, section 22) and `--s-15` (the toast's
+  `5px 5px 5px 15px`, section 23); `SpacingToken` gained `S1Half`, `S13`, `S15` and its `px()`
+  became `tenths()`, and design/01 §2 records the addition. The gallery's three off-scale
+  lengths took the step below: 20 to 18 (`.g-card` top), 28 to 26 (`.g-card` bottom), 40 to 36
+  (`.g-app` bottom), so the gallery card is 2 px shorter at the top and bottom and the page
+  4 px shorter at its foot; nothing else moves. `Rule::RawSpacing` now runs in `self_lint` and
+  in the gallery's lint test, with no set-aside and no exception.
+- **Space editor dots.** The field was one 540 x 352 PNG at `background-size:100% 100%`, so a
+  panel wider than S's stretched every dot into an ellipse. It is now two layers: a 60 x 39 hue x chroma colour plane stretched to the field (a
+  smooth gradient, so stretching is harmless) and, over it, one 18 x 18 RGBA cell of the ground
+  with a round hole of radius 5.2 at its centre, tiled at `background-size:9px 9px` (S's 18 px
+  canvas cell at the half scale its 176 px field draws it). Every dot is round at any width and
+  shows the colour of its own place. `png.rs` writes RGBA too. Proof: a dot's width equals its
+  height within 1 device px at three places in a 280 px and a 560 px panel (with the tile
+  stretched to 16 x 9 px it measures 18 x 8 and fails); SSR tests decode both images. The five Space editor goldens gained the `.ds-field-dots` element.
+- **Three defects the regenerated sheets showed.** (a) Button Danger looking like Mini at rest
+  is the design: 04-COMPONENTS section 1 says Danger is "at rest as Mini; red only on hover".
+  Its hover rule is in place and wins; the new probe checks rest fills are equal and the hovered
+  Danger fill is red and differs from hovered Mini. Not changed. (b) Quiet had no layout for an
+  icon (S's link-button has none), so the glyph touched the label: it is now
+  `inline-flex; align-items:center; gap:var(--s-6)` like every other variant (probe: 6 px).
+  (c) A section header's action sat against the eyebrow when the kind draws no rule (Menu):
+  the action now has `margin-left:auto`, so it ends the row in all four kinds (probe: its right
+  edge is the header's content edge for Frame, Group, Field and Menu).
+- **The click observation (Gallery fixes B).** Reproduced and explained, not fixed: it is not the
+  `if` placeholder. A Button is `inline-flex`, an atomic inline; when its parent holds only
+  inline content (the Button alone, the Button and a placeholder, or the Button beside inline
+  text) the parent is an inline formatting context, and blitz-dom's `Node::hit` returns the
+  parent rather than the Button, so the click goes to the parent. A block after the Button (the
+  anchor test's caption) or a flex parent gives the Button a box of its own and the click lands.
+  `crates/ds-native/tests/click.rs` pins both working shapes and keeps the failing one as an
+  `#[ignore]`d reproduction. The hit test is blitz-dom's (the same one a real window uses);
+  ds-native neither hit-tests nor routes clicks, so there is nothing in quire to fix. Every
+  quire container is a flex row, and CONSUMING.md §8 tells a consumer to put a lone button in
+  one. Upstream report material: the reproduction test.
+- Gaps page: every item the fix branches closed is gone; three remain, each naming its owner
+  here or in Gallery fixes B: the gallery's own wallpaper/stage/grid layout (no quire token or
+  component for them; open, owned here), the overlay bounds being the content-high `.ds` box
+  (Gallery fixes B), and the inline-context click above.
+- `examples/consumer` anchors its menu through `Button { mounted }` and `Anchor::Mounted`; the
+  wrapper span and `use_rect` are gone. CONSUMING.md §2 (idle ToastHost), §4 (Surface's accent
+  and blur), §5 (RawSpacing under Strict, the inline-style rules, `data-ds-svg`), §6 (the
+  Overlays example and the Gallery fixes B props), §8 (the click caveat), §9 and §10 (the gallery
+  exists) were brought up to date, and `docs/mailo-migration.md` gained "The quire APIs this
+  brief assumes" with the anchors the mailo session should read.

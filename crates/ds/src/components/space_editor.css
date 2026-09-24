@@ -1,7 +1,9 @@
 /* SpaceEditor and SpaceDot (design/04-COMPONENTS.md section 32): `S:246-279`, `S:147-150`.
    Attribute selectors carry `*|` (spike S2). Every colour shown arrives inline from
-   `space::palette` (the handle fills, stop discs, swatch and preset gradients); the field plane
-   is a PNG built in Rust per scheme (O-19) and scaled to fit, as S scales its canvas.
+   `space::palette` (the handle fills, stop discs, swatch and preset gradients); the field is
+   two PNGs built in Rust per scheme (O-19): a colour plane stretched to fit, and a tiled dot
+   cell over it (`space_editor/field.rs`), so the dots stay round where S's scaled canvas
+   would stretch them.
    O-28: the panel is static, not sticky. O-29: the preset hover scale gets the Space dot's
    transform transition. The handle's white border is `--mark-ground` and its shadow
    `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
@@ -9,46 +11,49 @@
    `.ds-field` is this editor's colour field only (TextInput's wrapper was also `.ds-field`, and
    its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
    22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
-   in a wide panel drew 140 px discs. The stop's remove button names the stop: the reset's
-   `.ds button{font:inherit;color:inherit}` outranks a lone class. */
+   in a wide panel drew 140 px discs. The stop's remove button names the stop, as
+   S's `.stop .rm` does. */
 
 .ds-space-editor{
   border:1px solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
-  padding:14px; display:grid; gap:14px; color:var(--ink);
+  padding:var(--s-14); display:grid; gap:var(--s-14); color:var(--ink);
 }
-.ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:8px; }
+.ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:var(--s-8); }
 .ds-space-swatch{ width:14px; height:14px; border-radius:var(--r-pill); flex:none; }
 
 .ds-field{
   position:relative; display:block; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
   border:1px solid var(--line);
 }
+/* The colours stretch; the dots are a tiled cell of the ground with a round hole, 9 px as S's
+   18 px canvas cell is at its half scale, so they stay round at any field width. */
 .ds-field-plane{ position:absolute; inset:0; background-size:100% 100%; background-repeat:no-repeat; }
+.ds-field-dots{ position:absolute; inset:0; background-size:9px 9px; background-repeat:repeat; }
 .ds-handle{
-  position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; box-sizing:border-box; border-radius:var(--r-pill);
+  position:absolute; width:22px; height:22px; margin:calc(var(--s-11) * -1) 0 0 calc(var(--s-11) * -1); box-sizing:border-box; border-radius:var(--r-pill);
   border:3px solid var(--mark-ground); box-shadow:var(--shadow-handle); cursor:grab; touch-action:none;
 }
 .ds-handle[*|aria-pressed=true]{ transform:scale(1.15); }
 
-.ds-stops{ display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+.ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
 .ds-stop{
-  display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:var(--surface-2);
-  border-radius:var(--r-pill); padding:3px 5px 3px 4px; font-family:var(--font-data); font-size:var(--fs-caption);
+  display:inline-flex; align-items:center; gap:var(--s-5); border:1px solid var(--line); background:var(--surface-2);
+  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-size:var(--fs-caption);
   color:var(--ink-soft); cursor:pointer;
 }
 .ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
 .ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
 .ds-stop .ds-stop-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }
 
-.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:6px; }
+.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 .ds-preset{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:1px solid var(--line); cursor:pointer; padding:0;
   transition:transform var(--t-quick) var(--e-spring);
 }
 .ds-preset:hover{ transform:scale(1.1); }
 
-.ds-checks{ display:grid; gap:5px; font-size:var(--fs-small); }
-.ds-check{ display:flex; align-items:center; gap:8px; color:var(--ink-soft); }
+.ds-checks{ display:grid; gap:var(--s-5); font-size:var(--fs-small); }
+.ds-check{ display:flex; align-items:center; gap:var(--s-8); color:var(--ink-soft); }
 .ds-check-value{ margin-left:auto; font-family:var(--font-data); font-size:var(--fs-note); font-variant-numeric:tabular-nums; }
 .ds-capnote{ margin:0; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.45; }
 

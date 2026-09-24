@@ -14,7 +14,7 @@
 }
 .ds-slider-fill{ height:100%; width:calc(var(--f) * 100%); background:var(--accent); }
 .ds-slider-thumb{
-  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:22px; height:22px; margin-left:-11px;
+  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:22px; height:22px; margin-left:calc(var(--s-11) * -1);
   border-radius:var(--r-pill); border:3px solid var(--handle-ring); box-shadow:var(--shadow-handle); cursor:grab;
 }
 .ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }

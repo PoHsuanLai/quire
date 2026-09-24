@@ -1,6 +1,14 @@
-//! The editor's hue x chroma field: the dot-grid plane as a PNG built once per scheme, and the
+//! The editor's hue x chroma field: the dot grid as two images built once per scheme, and the
 //! arithmetic between a dot and its place on the field (design/03-COLOR.md section 9,
-//! design/06-INTERACTIONS.md section 2.8). O-19: no canvas on Blitz, so the plane is an image.
+//! design/06-INTERACTIONS.md section 2.8). O-19: no canvas on Blitz, so the plane is images.
+//!
+//! S draws a 540 x 352 canvas, dots every 18 px, and scales it to the field (`S:870`), which
+//! at S's own size is exactly half: 176 px tall, dots every 9 px. Scaled into a wider field the
+//! same drawing stretches its dots into ellipses, so the field is two layers instead. The
+//! colours are a small hue x chroma plane stretched to the field, where stretching a smooth
+//! gradient changes nothing; over it lies one grid cell (18 x 18, drawn at 9 x 9 px) of the
+//! ground with a round hole at its centre, tiled, so every dot stays round at any width and
+//! shows the colour of its own place on the field.
 
 use super::png;
 use crate::appearance::Scheme;
@@ -8,12 +16,14 @@ use crate::space::{Dot, swatch};
 use crate::tokens::Hex;
 use std::sync::LazyLock;
 
-/// The drawing's size; the field scales it to fit (`S:870`).
-pub(super) const WIDTH: usize = 540;
-/// See [`WIDTH`].
-pub(super) const HEIGHT: usize = 352;
-/// Dots every 18 px, starting half a step in (`S:1401`).
-const STEP: usize = 18;
+/// The colour plane's size: one sample per grid cell of S's 540 x 352 drawing, stretched to the
+/// field.
+pub(super) const COLUMNS: usize = 60;
+/// See [`COLUMNS`].
+pub(super) const ROWS: usize = 39;
+/// One grid cell of the drawing: dots every 18 px, starting half a step in (`S:1401`). The
+/// tile is drawn at twice its CSS size, 9 px (`space_editor.css`), as S's canvas is.
+pub(super) const STEP: usize = 18;
 /// Each dot's radius (`S:1404`).
 const RADIUS: f64 = 5.2;
 /// Samples per pixel edge when a dot's rim crosses a pixel, standing in for the canvas's
@@ -44,10 +54,9 @@ pub(super) fn place(dot: Dot) -> (f64, f64) {
     )
 }
 
-/// The colour of the grid dot centred at `(cx, cy)` in drawing pixels, from the palette.
-fn dot_colour(cx: usize, cy: usize, scheme: Scheme) -> [u8; 3] {
-    let dot = dot_at(cx as f64 / WIDTH as f64, cy as f64 / HEIGHT as f64);
-    Hex::parse(&swatch(dot, scheme)).map_or(ground(scheme), |Hex(rgb)| rgb)
+/// The colour at fractions `(x, y)` of the field, from the palette.
+fn colour_at(x: f64, y: f64, scheme: Scheme) -> [u8; 3] {
+    Hex::parse(&swatch(dot_at(x, y), scheme)).map_or(ground(scheme), |Hex(rgb)| rgb)
 }
 
 /// How much of pixel `(x, y)` the circle at `(cx, cy)` covers, 0 to 1.
@@ -63,47 +72,60 @@ fn coverage(x: usize, y: usize, cx: f64, cy: f64) -> f64 {
     inside as f64 / f64::from(n * n)
 }
 
-fn blend(under: [u8; 3], over: [u8; 3], alpha: f64) -> [u8; 3] {
-    // Each channel stays within 0..=255 by construction, so the cast cannot truncate.
-    std::array::from_fn(|i| {
-        (f64::from(under[i]) * (1.0 - alpha) + f64::from(over[i]) * alpha).round() as u8
-    })
+/// The colour plane's pixels, rows top to bottom: each the colour at its own centre.
+fn colours(scheme: Scheme) -> Vec<[u8; 3]> {
+    (0..ROWS)
+        .flat_map(|y| (0..COLUMNS).map(move |x| (x, y)))
+        .map(|(x, y)| {
+            let across = (x as f64 + 0.5) / COLUMNS as f64;
+            let down = (y as f64 + 0.5) / ROWS as f64;
+            colour_at(across, down, scheme)
+        })
+        .collect()
 }
 
-/// The plane's pixels, rows top to bottom: the ground with a disc at every grid point.
-fn pixels(scheme: Scheme) -> Vec<[u8; 3]> {
-    let floor = ground(scheme);
-    let mut out = vec![floor; WIDTH * HEIGHT];
-    let reach = RADIUS.ceil() as usize + 1;
-    for cy in (STEP / 2..HEIGHT).step_by(STEP) {
-        for cx in (STEP / 2..WIDTH).step_by(STEP) {
-            let colour = dot_colour(cx, cy, scheme);
-            for y in cy.saturating_sub(reach)..(cy + reach).min(HEIGHT) {
-                for x in cx.saturating_sub(reach)..(cx + reach).min(WIDTH) {
-                    let alpha = coverage(x, y, cx as f64, cy as f64);
-                    if alpha > 0.0 {
-                        out[y * WIDTH + x] = blend(floor, colour, alpha);
-                    }
-                }
-            }
-        }
-    }
-    out
+/// The tile's pixels: the ground, opaque, with a hole where the cell's dot is.
+fn tile(scheme: Scheme) -> Vec<[u8; 4]> {
+    let [r, g, b] = ground(scheme);
+    let centre = STEP as f64 / 2.0;
+    (0..STEP)
+        .flat_map(|y| (0..STEP).map(move |x| (x, y)))
+        .map(|(x, y)| {
+            // The coverage is 0 to 1, so the alpha stays within 0..=255.
+            let alpha = ((1.0 - coverage(x, y, centre, centre)) * 255.0).round() as u8;
+            [r, g, b, alpha]
+        })
+        .collect()
 }
 
-/// The plane for `scheme` as a `data:` URI, built on first use and kept.
-pub(super) fn plane(scheme: Scheme) -> &'static str {
-    static LIGHT: LazyLock<String> = LazyLock::new(|| uri(Scheme::Light));
-    static DARK: LazyLock<String> = LazyLock::new(|| uri(Scheme::Dark));
-    match scheme {
-        Scheme::Light => &LIGHT,
-        Scheme::Dark => &DARK,
-    }
+/// The field's two images for `scheme`, as `data:` URIs.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) struct Plane {
+    /// The hue x chroma colours, stretched to the field.
+    pub(super) colours: &'static str,
+    /// One cell of the ground with its dot's hole, tiled.
+    pub(super) dots: &'static str,
 }
 
-fn uri(scheme: Scheme) -> String {
-    let png = png::rgb(WIDTH, HEIGHT, &pixels(scheme));
-    format!("data:image/png;base64,{}", png::base64(&png))
+/// The images for `scheme`, built on first use and kept.
+pub(super) fn plane(scheme: Scheme) -> Plane {
+    static LIGHT: LazyLock<(String, String)> = LazyLock::new(|| uris(Scheme::Light));
+    static DARK: LazyLock<(String, String)> = LazyLock::new(|| uris(Scheme::Dark));
+    let (colours, dots) = match scheme {
+        Scheme::Light => &*LIGHT,
+        Scheme::Dark => &*DARK,
+    };
+    Plane { colours, dots }
+}
+
+fn uris(scheme: Scheme) -> (String, String) {
+    let colours = png::rgb(COLUMNS, ROWS, &colours(scheme));
+    let dots = png::rgba(STEP, STEP, &tile(scheme));
+    (uri(&colours), uri(&dots))
+}
+
+fn uri(png: &[u8]) -> String {
+    format!("data:image/png;base64,{}", png::base64(png))
 }
 
 #[cfg(test)]

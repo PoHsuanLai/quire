@@ -292,17 +292,22 @@ fn every_var_the_stylesheet_reads_is_declared() {
     assert!(missing.is_empty(), "read but never declared: {missing:?}");
 }
 
-/// The spacing scale is design/01-LAYOUT.md section 2's common steps, verbatim, each emitted on
-/// `.ds` as its own pixel value and nowhere else (it follows neither scheme nor motion).
+/// The spacing scale is design/01-LAYOUT.md section 2's common steps, verbatim, plus the three
+/// values 04-COMPONENTS quotes for a quire component (1.5, 13, 15), each emitted on `.ds` as
+/// its own pixel value and nowhere else (it follows neither scheme nor motion).
 #[test]
 fn the_spacing_scale_is_the_layout_docs() {
-    const STEPS: [u16; 18] = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 22, 26, 36,
+    const STEPS: [&str; 21] = [
+        "1", "1.5", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
+        "16", "18", "22", "26", "36",
     ];
-    assert_eq!(SpacingToken::ALL.map(SpacingToken::px), STEPS);
+    assert_eq!(
+        SpacingToken::ALL.map(SpacingToken::css),
+        STEPS.map(|step| format!("{step}px"))
+    );
     let light = token_block();
     for step in STEPS {
-        let name = format!("--s-{step}");
+        let name = format!("--s-{}", step.replace('.', "-"));
         assert_eq!(light.get(&name), Some(&format!("{step}px")), "{name}");
     }
     for selector in [
