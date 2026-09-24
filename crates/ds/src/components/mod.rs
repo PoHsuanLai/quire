@@ -117,7 +117,7 @@ pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubb
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use sheet::Sheet;
-pub use sidebar_item::{ItemKind, Preview, SidebarItem, TodayTrailing};
+pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
 pub use space_editor::{ActiveDot, DotIndex, MeasuredIn, MotionChoice, SpaceDot, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
