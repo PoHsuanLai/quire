@@ -428,8 +428,9 @@ could not poll a future spawned from render or measure a mounted element synchro
 ### 6.1 Files you own exclusively
 
 - `crates/mail-app/src/ui/launch.rs` — `dioxus::LaunchBuilder::desktop()` replaced by
-  `ds_native::launch(App, ds_native::AppConfig { title: "mailo".to_owned(), width: 1200, height:
-  800 })`; `with_custom_head`, `KEEP_FOCUS` (kept through Phase A; here `ds_native::focus`,
+  `ds_native::launch(App, ds_native::AppConfig::new("mailo", 1200, 800).with_context(store)…)`
+  (each of today's `LaunchBuilder::with_context` values becomes an `AppConfig::with_context`;
+  tests hand the same values to `Harness::with_contexts`); `with_custom_head`, `KEEP_FOCUS` (kept through Phase A; here `ds_native::focus`,
   which `launch` provides, takes over holding and placing the focus), `NOTHING_MOUNTED`'s
   head-injection path, and the `MAILO_PROBE`/`probe()` debug-head machinery all deleted — `ds_native::Harness` is the
   verification tool the probe existed to approximate (`CONSUMING.md`'s own citation of
@@ -454,14 +455,13 @@ could not poll a future spawned from render or measure a mounted element synchro
 
 ### 6.2 Signatures you may not change
 
-Same as Phase A's section 5.2, plus every `crates/ds-native/src/**` public signature. If
-`ds_native::launch`'s bare `fn() -> Element` (no captures — `CONSUMING.md` section 3 explains
-why `examples/consumer` reads its settings inside `App`'s own body rather than in `main`) is a
-real obstacle for threading mailo's `Store`/`Spaces`/`WindowDirs` contexts through (today
-`launch.rs`'s `run` passes them as `.with_context(...)` on the `desktop::Config` builder, which
-`ds_native::launch` has no equivalent of), **stop and report it** — do not reach for a global
-`static`/`OnceLock` to smuggle a `SqliteStore` handle past a function-pointer boundary without
-checking first whether `ds_native::launch` is meant to grow a context-injection parameter.
+Same as Phase A's section 5.2, plus every `crates/ds-native/src/**` public signature.
+`ds_native::launch`'s bare `fn() -> Element` (no captures) once looked like an obstacle for
+threading mailo's `Store`/`Spaces`/`WindowDirs` contexts through. It is not any more:
+`AppConfig::with_context` (native phase B, G1) is the equivalent of `desktop::Config`'s
+`.with_context(...)`, and `Harness::with_contexts`/`HarnessConfig::with_context` give a test the
+same values. Never reach for a global `static`/`OnceLock` to smuggle a `SqliteStore` handle past
+the function-pointer boundary.
 
 ### 6.3 Done means
 

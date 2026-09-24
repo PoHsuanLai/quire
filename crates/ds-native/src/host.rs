@@ -20,6 +20,7 @@
 
 use crate::net::DsNet;
 use crate::scheme;
+use crate::setup::Setup;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::ColorScheme;
 use dioxus::prelude::*;
@@ -33,19 +34,22 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 
-/// What `Host` wraps.
-#[derive(Props, Debug, Clone, Copy)]
+/// What `Host` wraps, and what the app gave its document.
+#[derive(Props, Debug, Clone)]
 pub(crate) struct HostProps {
     app: fn() -> Element,
+    /// Fixed for the window's life: read once, as the document mounts.
+    setup: Setup,
 }
 
 impl HostProps {
-    pub(crate) fn new(app: fn() -> Element) -> Self {
-        HostProps { app }
+    pub(crate) fn new(app: fn() -> Element, setup: Setup) -> Self {
+        HostProps { app, setup }
     }
 }
 
 impl PartialEq for HostProps {
+    /// The same app is the same root: `setup` never changes after `launch`.
     fn eq(&self, other: &Self) -> bool {
         std::ptr::fn_addr_eq(self.app, other.app)
     }
