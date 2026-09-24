@@ -973,6 +973,28 @@ reasons and the proofs.
 | `LintConfig` | `stale: Stale` (`Fail`) | See section 5: a stale exception fails `assert_clean`; `Stale::Report` prints it instead |
 | `Rule::UnknownAnimation` | (reads the shorthand) | See section 5 |
 
+### The mailo gaps 4 (2026-09-25): controls
+
+Additive: leave a prop out and the markup is what it was. Four enums gained variants
+(`Provider::Local`, `ButtonVariant::Frame`, `InputVariant::Bare`, and `TextInputKind`'s three), so
+a `match` of yours over one of them needs the new arms. FINDINGS "mailo gaps 4 (controls)" has
+the reasons and the proofs.
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Provider` | `Local` | new variant | A local-folders account: `AccountFace::One { provider: Provider::Local, .. }`, so the literal keeps its shape. Its mark is a folder glyph in the neutral IMAP grey (`data-kind="local"`, titled "Local folders"), under either `MarkStyle`: there is no favicon to show |
+| `Button` | `variant: ButtonVariant::Frame` | new variant | Words on the Space frame: `--f-ink-soft` on nothing, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` held or `pressed: Some(Switch::On)` (the sidebar item's current chrome) |
+| `Button` | `trailing` | `Option<Trailing>` (`None`) | `Trailing::Caret` (a 12 px chevron) after a dropdown's value; `Trailing::Glyph(icon)` for any other glyph after the label. Pair it with `expanded` for a trigger |
+| `Button` | `face` | `ButtonFace` (`Label`) | `Bold`, `Italic`, `Underline`, `Strike` draw the label as `B`, `i` (serif italic), `U`, `S` in their style (`span.ds-button-face[data-face]`), and name the button by `label` as `aria-label` (your `aria_label` wins) |
+| `FaceMark` | new component | `face: ButtonFace`, `label: String` | The same face on its own, for a `BubbleButton { label: rsx! { FaceMark { face: ButtonFace::Bold, label: "Bold" } }, .. }` in the selection bubble |
+| `TextInput` | `kind: TextInputKind::Secret` | new variant | mailo's secret field: the text lives in the field's own state and reaches you only through `oninput` and `onchange`; no `value` attribute is ever written (your `value` is ignored), only a dot per character. Clear it by remounting under a new `key`. `Password` is unchanged (controlled, writes its `value`) |
+| `TextInput` | `kind: TextInputKind::File`, `on_pick` | new variant; `EventHandler<()>` (no-op) | A file's name (your `value`, the placeholder while empty) and a "Choose…" Tool button; a click on either calls `on_pick`. Blitz has no file picker: open your own and pass the chosen name back as `value` |
+| `TextInput` | `kind: TextInputKind::Multiline { rows, grow }` | new variant | A `textarea` of `Rows(n)` lines; `Grow::ToContent` adds a row per hard line beyond `n`, `Grow::Fixed` scrolls. Enter types a newline (it does not commit) |
+| `TextInput` | `variant: InputVariant::Bare` (`FieldFace::Bare`) | new variant | No box: the parent's font, size, weight, tracking, line height and colour, with an `--accent` caret; for a title or a property row edited in place. `FieldFace` is `InputVariant` under the name the gap asked for, not a second prop |
+| `TextInput` | `onchange` | `EventHandler<String>` (no-op) | The value committed: Enter in a one-line field, or the caret leaving any field (Blitz sends no `change`; the field makes it on both renderers) |
+| `Rows`, `Grow`, `FieldFace` | new types | | Above |
+| `SpaceEditor` | `motion_levels` | `MotionLevels` (`All`) | `MotionLevels::Contact` offers Calm, Standard and Extra, a Space's own three (mailo's per-Space motion); a `level` outside them presses no segment. A prop, not a `MotionChoice` field, so your `MotionChoice { level, on_motion }` literal still compiles |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
