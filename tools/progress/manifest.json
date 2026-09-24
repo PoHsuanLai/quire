@@ -1,6 +1,24 @@
 {
- "updated": "2026-09-25, icon round five colourways up for the pick; mailo wave 2 merged, wave 3 running",
+ "updated": "2026-09-25, the wallpaper paints and pixel snapping is wired through the shell; icon round five up for the pick; mailo wave 3 running",
  "entries": [
+  {
+   "id": "m2-wallpaper",
+   "date": "2026-09-25 · sill Milestone 2 wallpaper, and pixel snapping wired through",
+   "title": "The shell draws its own wallpaper, after two bugs in two repos; every surface reads its scale and snaps to device pixels",
+   "status": "proven",
+   "lede": "The wallpaper service reads COSMIC's background record, resizes with Lanczos into a per-output cache and cross-fades on light and dark; the surface is a background layer that takes no input. It was built and gated a day before it painted anything. The first cause was in the host: after every present it dropped the redraw request that the image loader raised from another thread mid-render, so a decoded image never got a second paint (found with a standalone host demo, fixed by keeping host-thread and loader-thread requests apart). The second was in the shell: Taffy placed the fixed-position root against a zero-height parent, so the page was zero pixels tall. With both fixed the wallpaper is on by default and its acceptance passes 4 of 4. The same push wires quire's pixel snapping into every surface: each root reads the surface's live fractional scale and the host runs the snapping pass before each paint.",
+   "notes": [
+    "Idle with the full wiring at 1x, 20 s: bar 4→4 frames, dock 3→3, wallpaper 3→3, launcher 0. A first reading of 13 idle frames was the counters crossing the clock's minute repaint.",
+    "Host demo before the fix: a CSS background and a 512 px img stayed on the fallback colour; after: file, data-URL and CSS sources all show the image within about 5 ms of the swap, then 5 s idle at zero frames. Callbacks were never withheld by cosmic-comp, so the suspected #2777 path was not the cause.",
+    "Still to do: a hairline screenshot on the nested output at scale 1.5 to see the snapping on screen."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/wallpaper-cosmic.png",
+     "caption": "the shell's wallpaper surface painting the acceptance image (a blue field with a red marker whose centre pixel the script checks) under the bar and dock"
+    }
+   ]
+  },
   {
    "id": "icons-round5",
    "date": "2026-09-25 · icon round five",
