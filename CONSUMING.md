@@ -901,6 +901,8 @@ says the markup changed. FINDINGS "mailo gaps 2 (controls and tiles)" has the wh
 | `SendPill` | `action` | `PillAction` (`Undo`) | the button's word while counting: `Undo`, `Cancel` (a held send), or `Nothing` (no button); `onundo` hears either word |
 | `SendPill` | `ring` | `SendRing` (`Drain`) | `Spin`: a 20/37 arc turning at the Spinner's `spin` while the send waits on the outbox, `progress` ignored |
 | `SendPill` | `refusal` | `Option<String>` (`None`) | a second, lighter line under the text: why a take-back was refused, or "No recipients" |
+| `SidebarItem` | `trailing` | `Option<TodayTrailing>` (`None`) | a scheduled Today row's `time` (data type, `--f-ink-faint`) and a cancel button named by `cancel`, calling `on_cancel` without opening the row; Today only |
+| `SidebarItem` | (markup changed) | | a Today item's close button is now named `Close {label}`, not `Close`: an assertion or selector on `aria-label="Close"` needs the row's label |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

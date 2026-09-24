@@ -29,6 +29,18 @@ pub enum ItemKind {
     },
 }
 
+/// What a scheduled Today row carries after its label: when it leaves, and a button that
+/// cancels it (the send goes back to being a draft).
+#[derive(Debug, Clone, PartialEq)]
+pub struct TodayTrailing {
+    /// When it leaves, as the caller words it ("Mon 9:00").
+    pub time: String,
+    /// The cancel button's accessible name, in the caller's words ("Cancel sending Q3 notes").
+    pub cancel: String,
+    /// The person cancelled it. The row itself does not also open.
+    pub on_cancel: EventHandler<()>,
+}
+
 /// A preview the item is showing.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Preview {
@@ -82,7 +94,9 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// kinds do not move.
 /// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something. `drop` is
 /// the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
-/// `Source` while the item itself is dragged.
+/// `Source` while the item itself is dragged. A Today item's close button is named "Close
+/// {label}", so each row's close says whose it is; `trailing` puts a scheduled row's time and
+/// its cancel button after the label (Today only; other kinds ignore it).
 #[component]
 pub fn SidebarItem(
     kind: ItemKind,
@@ -95,6 +109,7 @@ pub fn SidebarItem(
     onclick: EventHandler<()>,
     onclose: Option<EventHandler<()>>,
     #[props(default)] drop: DropState,
+    #[props(default)] trailing: Option<TodayTrailing>,
 ) -> Element {
     let (class, alias) = pulse_attrs(pulse);
     let slug = kind.slug();
@@ -158,11 +173,14 @@ pub fn SidebarItem(
                 {face(avatar)}
                 span { class: "ds-sidebar-item-text ds-truncate", "data-emphasis": "plain", "{label}" }
                 {count}
+                if let Some(trailing) = trailing {
+                    {today_trailing(trailing)}
+                }
                 if let Some(onclose) = onclose {
                     button {
                         r#type: "button",
                         class: "ds-sidebar-item-close",
-                        "aria-label": "Close",
+                        "aria-label": "Close {label}",
                         onclick: move |event| {
                             // Closing is not opening: the entry itself must not also navigate.
                             event.stop_propagation();
@@ -173,5 +191,29 @@ pub fn SidebarItem(
                 }
             }
         },
+    }
+}
+
+/// A scheduled row's time and cancel button.
+fn today_trailing(trailing: TodayTrailing) -> Element {
+    let TodayTrailing {
+        time,
+        cancel,
+        on_cancel,
+    } = trailing;
+    rsx! {
+        span { class: "ds-sidebar-item-time", "{time}" }
+        button {
+            r#type: "button",
+            class: "ds-sidebar-item-cancel",
+            "aria-label": "{cancel}",
+            title: "{cancel}",
+            onclick: move |event| {
+                // Cancelling is not opening: the entry itself must not also navigate.
+                event.stop_propagation();
+                on_cancel.call(());
+            },
+            Glyph { icon: Icon::X, size: IconSize::Small }
+        }
     }
 }

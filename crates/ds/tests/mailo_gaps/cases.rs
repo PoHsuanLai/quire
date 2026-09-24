@@ -7,6 +7,36 @@ use ds::{
     Hex, ImageSource, InputVariant, MarkStyle, PillAction, Provider, SendMood, SendPhase, SendPill,
     SendRing, TextInput, TextInputKind,
 };
+use ds::{
+    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Here, ItemKind, PersonHue, Presence,
+    PulseKey, SidebarItem, TodayTrailing,
+};
+
+/// A scheduled draft's favicon.
+const CLOCKED: AvatarFace = AvatarFace {
+    initial: 'Q',
+    size: AvatarSize::Size18,
+    tone: AvatarTone::Person(PersonHue(212)),
+    shape: AvatarShape::Round,
+};
+
+/// A scheduled Today row: its time and cancel, and no close.
+fn scheduled() -> Element {
+    rsx! {
+        SidebarItem {
+            kind: ItemKind::Today { avatar: CLOCKED },
+            label: "Q3 notes",
+            here: Here::Elsewhere,
+            count: None,
+            presence: Presence::Present,
+            preview: None,
+            pulse: PulseKey::rest(Anim::Gulp),
+            onclick: |_| {},
+            onclose: None,
+            trailing: TodayTrailing { time: "Mon 9:00".to_string(), cancel: "Cancel sending Q3 notes".to_string(), on_cancel: EventHandler::new(|()| {}) },
+        }
+    }
+}
 
 /// An account colour.
 const VIOLET: Colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
@@ -76,5 +106,10 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "overlays/send_pill/fatal-refused.html",
         make: || rsx! { SendPill { text: "Not sent", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} } },
+    },
+    // SidebarItem: a scheduled Today row with its time and cancel.
+    Case {
+        golden: "lists/sidebar_item/today-scheduled.html",
+        make: scheduled,
     },
 ];

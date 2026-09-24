@@ -1644,3 +1644,13 @@ controls' and lists' class scans cover them) and one Harness test file per behav
    rest 50 ms after, still `data-shown=shown`; `a_mood_that_returns_plays_again` on alias `b`;
    `a_spinning_ring_turns_and_a_draining_one_holds`: the ring's pixels 250 ms apart differ
    for Spin and are identical for Drain).
+4. **SidebarItem.** A Today item's close button is named `Close {label}` (it was `Close` on
+   every row, so a screen reader heard a column of identical buttons). This is the one change
+   to existing markup in this wave: the `today-entering`, `today-present` and `today-leaving`
+   goldens were re-blessed and differ only in that attribute. `trailing: Option<TodayTrailing>`
+   (`time`, `cancel` as the button's accessible name, `on_cancel`) draws a scheduled row's time
+   and its cancel after the label; the cancel stops propagation, as the close does, so it does
+   not also open the row. A typed struct rather than an `Element` slot: the row owns the markup
+   (a slot would let a consumer put a raw button inside a `role=button` div). Proof:
+   `today_trailing.rs` (cancel then label logs `cancel,open`; the close is `Close Q3 notes`) and
+   the `today-scheduled` golden.

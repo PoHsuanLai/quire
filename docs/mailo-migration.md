@@ -118,6 +118,7 @@ concern (section 6 has the full "what mailo keeps" list).
 | --- | --- | --- |
 | `.cmd` (`ui/sidebar/mod.rs:59`) | `CommandPill` (§8) | the "Search or run a command / ⌃T" trigger |
 | `.item` (`ui/sidebar/panes.rs:318` `.item.pinned`; `ui/compose/desk.rs:168` `.item.today-item.draft`) | `SidebarItem` (§19) | both the pinned-item row and the Today draft row are the same shape |
+| `.item.today-item.later`, `.when`, its `.x` (`ui/compose/later.rs`) | `SidebarItem { kind: ItemKind::Today, trailing: Some(TodayTrailing { time, cancel, on_cancel }) }` (§19) | mailo gaps 2: `cancel` is the button's name ("Cancel sending {title}"); the row's `title` hint and the refusal line under it (`.today-hint.refused`) stay mailo's own markup around the item. Every Today close is now named `Close {label}` |
 | `.row`, `.row-dot`, `.row-main`, `.row-from`, `.row-sub`, `.row-snip`, `.row-tail`, `.row-time` (`ui/row.rs`) | `ListRow` (§16) | `ListRow`'s props (`name`, `via`, `subject`, `snippet`, `time`, `tags`, `star`, `strip`) are exactly this row's fields — see `CONSUMING.md` section 6's Lists example |
 | `.strip`, `.fly`, `.floater` (`ui/row.rs:251,296,301`) | `HoverStrip` (§17) | the hover-reveal action row and its `zZ` snooze float |
 | `.fmenu` (`ui/menu/mod.rs:58`, `.fmenu.slim` too) | `Menu` with `MenuKind::Rich` or `MenuKind::Slim` | mailo's own `slim` variant is `MenuKind::Slim`; everything else is `MenuKind::Rich` |
