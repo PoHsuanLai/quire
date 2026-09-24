@@ -7,6 +7,7 @@
 //! runtime`) so `ds_settings::use_environment` can spawn its portal and file-watch tasks without
 //! panicking.
 
+mod app_id;
 pub mod clipboard;
 mod contexts;
 mod data_url;
@@ -38,6 +39,7 @@ mod snap_tests;
 pub mod snapshot;
 mod wake;
 
+pub use app_id::AppId;
 pub use contexts::RootContexts;
 pub use error::NativeError;
 pub use fonts::{font_context, register_fonts};

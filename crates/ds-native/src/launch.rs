@@ -5,6 +5,7 @@
 //! The window is blitz's portable `dioxus-native` shell (winit), so an app runs the same on any
 //! OS; `crate::host` wraps the app to supply what quire needs on top of it.
 
+use crate::app_id::{AppId, with_app_id};
 use crate::contexts::RootContexts;
 use crate::fonts::font_context;
 use crate::frame_links::FrameLinks;
@@ -24,6 +25,8 @@ pub struct AppConfig {
     width: u32,
     /// The initial height in logical pixels.
     height: u32,
+    /// The desktop application id, if the app has one.
+    app_id: Option<AppId>,
     /// What the document is given beyond quire's own contexts.
     setup: Setup,
 }
@@ -35,8 +38,16 @@ impl AppConfig {
             title: title.into(),
             width,
             height,
+            app_id: None,
             setup: Setup::default(),
         }
+    }
+
+    /// The window's desktop application id (the Wayland `app_id`, the X11 `WM_CLASS`), so the
+    /// desktop matches it to the app's `.desktop` file for its icon and name.
+    pub fn with_app_id(mut self, id: AppId) -> Self {
+        self.app_id = Some(id);
+        self
     }
 
     /// Provide `value` at the root, read with `use_context::<T>()` anywhere in the app: the
@@ -75,6 +86,10 @@ pub fn launch(app: fn() -> Element, config: AppConfig) {
     let window = WindowAttributes::default()
         .with_title(config.title)
         .with_surface_size(LogicalSize::new(config.width, config.height));
+    let window = match &config.app_id {
+        Some(id) => with_app_id(window, id),
+        None => window,
+    };
     let native = dioxus_native::Config::new()
         .with_window_attributes(window)
         .with_font_ctx(font_context());
