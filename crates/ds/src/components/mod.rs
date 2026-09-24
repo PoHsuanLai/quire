@@ -12,6 +12,7 @@ pub mod count;
 pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
+pub mod flow;
 pub mod hover_card;
 pub mod hover_strip;
 pub mod icon_button;
@@ -81,9 +82,10 @@ pub use count::{Count, CountPlace};
 pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
+pub use flow::Flow;
 pub use hover_card::{
-    FlagTone, HoverCard, HoverCardPart, HoverMessage, HoverStat, HoverTarget, KeyHint,
-    TargetElement,
+    FlagTone, HoverAnchor, HoverCard, HoverCardPart, HoverDriver, HoverMessage, HoverStat,
+    HoverTarget, KeyHint, TargetElement, use_hover_intent,
 };
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
