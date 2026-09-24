@@ -16,7 +16,9 @@
 //! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
 //! 80; FINDINGS "W1 tokens"). A host passes the key as the `tint_alpha` prop (thousandths: 800
 //! is .8), which `ds_settings::Environment::tint_alpha` converts from the settings file; without
-//! one the root writes the key's default.
+//! one the root writes the key's default. A `radius` overrides the material's corner the same way
+//! (`--m-radius` inline): the dock's pill is its root, and its radius is `dock.pill_radius_px`
+//! (sill FINDINGS Q15).
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
@@ -29,6 +31,7 @@ use crate::overlay::hover_hub::{HoverWarmth, use_hover_hub_provider};
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
 use crate::space::{FrameVars, SpaceLook};
+use crate::tokens::Corner;
 use crate::tokens::hex::Alpha;
 use dioxus::prelude::*;
 
@@ -55,6 +58,7 @@ pub fn Ds(
     #[props(default)] chrome: Option<RootChrome>,
     #[props(default)] ground: Option<Ground>,
     #[props(default)] frame: Option<FrameTint>,
+    #[props(default)] radius: Option<Corner>,
     children: Element,
 ) -> Element {
     let chrome = chrome.unwrap_or(RootChrome::of(material));
@@ -77,7 +81,12 @@ pub fn Ds(
     let frame = FrameVars::of(&look, resolved.scheme);
     let layers = use_frame_layers(&frame.gradient);
     let tint = tint_alpha.unwrap_or(DEFAULT_TINT_ALPHA);
-    let style = format!("{}--m-tint-alpha:{};", frame.style_attr(), tint.css());
+    let corner = radius.map(super::surface::radius_style).unwrap_or_default();
+    let style = format!(
+        "{}--m-tint-alpha:{};{corner}",
+        frame.style_attr(),
+        tint.css()
+    );
     let hover = match hover.warmth() {
         HoverWarmth::Warm => "warm",
         HoverWarmth::Cold => "cold",

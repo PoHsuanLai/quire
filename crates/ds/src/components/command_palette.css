@@ -1,11 +1,20 @@
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel springing in with
-   `peek-in`, a SearchField over an embedded Rich menu (menu.css). `.cmdk-list` and `.cmdk-g`
-   are superseded and not ported. The wrap fades in over `--t-quick` (`S:231`,
-   `Anim::PaletteFade`). */
+   `peek-in` (or C's `cmdk-in`, `C:1064`), a SearchField over an embedded Rich menu (menu.css).
+   `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
+   (`S:231`, `Anim::PaletteFade`).
+   Hosted in a surface of its own (sill FINDINGS Q40) there is no wrap: the card fills its
+   container, its list takes the height left under the field, and it paints the enclosing
+   material (a shell panel's Sheet, over blur or not) with the material's edge, as the cards of
+   a transparent root do. */
 
 .ds-palette-wrap{ position:absolute; inset:0; display:grid; place-items:start center; padding-top:11%;
   background:var(--scrim); pointer-events:auto; animation:fade var(--t-quick) var(--e-out); }
 .ds-palette{ width:min(540px, 88%); background:var(--raise); color:var(--ink); border:1px solid var(--line);
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
   animation:peek-in var(--t-big) var(--e-spring); }
+.ds-palette[*|data-entrance=cmdk-in]{ animation:cmdk-in var(--t-big) var(--e-spring); }
+.ds-palette[*|data-host=surface]{ width:100%; height:100%; box-sizing:border-box; display:flex; flex-direction:column;
+  background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
+.ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }
+.ds-palette[*|data-host=surface] > .ds-menu[*|data-embed=palette]{ flex:1 1 auto; min-height:0; max-height:none; }

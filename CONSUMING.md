@@ -95,6 +95,7 @@ fn App() -> Element {
 | `chrome` | `Option<RootChrome>` | `None`: `RootChrome::of(material)` | `Painted` or `Transparent`: whether the root box paints its material. A Popover, Sheet or Toast root is transparent by default (it hosts floating cards, which paint the material themselves); pass `Painted` for a root that *is* the panel (the launcher) — section 6, "bar gaps" |
 | `ground` | `Option<Ground>` | `None`: `Ground::of(material)` | `Paper` or `Frame`: which inks the content takes; Bar and Dock default to `Frame` |
 | `frame` | `Option<FrameTint>` | `None`: `FrameTint::of(material, chrome)` | `Opaque` (the window's frame), `Tinted` (the Space gradient at the tint alpha: bar, dock, a painted popover, OSD, widget) or `None` (the material's flat tint) |
+| `radius` | `Option<Corner>` | `None`: the material's own corner | `Corner::Token(Radius::…)` or `Corner::Px(Px(n))`: overrides `--m-radius` inline, for a root whose corner is a setting (the dock's `dock.pill_radius_px`) |
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 
 You almost never write more than one `Ds` per window: it is the root, not a per-panel wrapper —
@@ -201,6 +202,7 @@ rsx! {
 | `accent` | `Option<Accent>` | `None` | force an accent; `None` inherits |
 | `blur` | `Option<BlurState>` | `None` | force the blur state (`Unavailable` paints the solid tint); `None` inherits |
 | `on` | `Option<Ground>` | `None` | the ground its content is drawn on; `None` is the material's (`Frame` for Bar and Dock, paper otherwise), so a paper panel inside a bar root is paper again |
+| `radius` | `Option<Corner>` | `None` | the material's corner (`--m-radius`), overridden: `Corner::Px(Px(f32::from(dock.pill_radius_px.0)))` or `Corner::Token(Radius::Panel)` |
 
 Each `None` inherits, so the common case is the material alone (`crates/ds/tests/surface.rs`
 has a golden per override; FINDINGS "Gallery fixes B").
@@ -444,7 +446,8 @@ A few props worth knowing about before you read the signatures, added in wave 2 
 
 - `TextInput` takes `#[props(default)] focus: Focus` — `Focus::OnMount` focuses it as soon as it
   mounts (the command palette's input, a bubble's link field); the default, `Focus::Manual`, is
-  what every other field wants.
+  what every other field wants; `Focus::Controlled(request)` focuses it on mount and again at
+  every `request.request()` (the launcher gaps, below).
 - `ListRow` and `SidebarItem` take `#[props(default)] drop: DropState` (`Idle`, `Target`,
   `Source`) — drag-and-drop visual state (design/04-COMPONENTS.md §34); leave it `Idle` unless
   you are wiring up drag and drop for that row.
@@ -603,6 +606,81 @@ And in the bar gaps (FINDINGS "Bar gaps", sill Q9-Q13, G7):
   (`DsError::ChromaLimitRange`). No caller reads the key yet — that is on the settings-owning
   side (FINDINGS "Tune wave").
 - **New glyph**: `Icon::Ethernet` (Lucide `ethernet-port`) for a wired network.
+
+And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's Q15-Q17):
+
+- **Unmounting early is safe.** Every task quire spawns (a motion timer's settle, a roster's
+  exit and rest, the hover hub's and the toast hub's timers, a focus retry) is a task of the
+  scope that owns it and is dropped with that scope, and writes only through fallible handles.
+  A palette, menu or popover may be unmounted at any moment, mid entrance included: drop any
+  keep-mounted guard you added for it. `MotionTimer::start`'s `on_settled` never runs for a
+  component that is gone.
+- **Focus waits out a busy document.** `Focus::OnMount`, a menu taking the keyboard and every
+  other focus change go through `ds::HostFocus` (`Focused::{Done, Busy, Unknown}`), tried again
+  a frame later while the renderer holds the document; with no host seam the call is guarded
+  and a collision is busy too, never a panic. A Blitz host that is not `ds_native::launch`
+  provides it beside the measurer:
+
+  ```rust
+  #[component]
+  fn LauncherRoot() -> Element {
+      ds_native::measure::provide();
+      ds_native::focus::provide();
+      rsx! { Ds { appearance, material: Material::Sheet, look, /* … */ } }
+  }
+  ```
+- **Giving a field the keyboard back.** `let field = ds::use_focus_request();` then
+  `TextInput { focus: Focus::Controlled(field), .. }` (or `CommandPalette { focus: Some(field),
+  .. }`), and `field.request()` from a handler (a menu's `onclose`) whenever the field should
+  have the keyboard again. The field takes it as it mounts and at each request; nothing is
+  remounted, so a palette does not replay its entrance.
+- **An embedded palette.** `CommandPalette { host: CommandPaletteHost::Surface, .. }` draws no
+  scrim and no overlay: the card fills its container (give the container the panel's size) and
+  paints the enclosing material's tint, edge and radius-14 corner (`--r-panel`), its list taking
+  the height under the field. `id: Some("…")` goes on the card, for a blur region.
+  `entrance: PaletteEntrance::{PeekIn, CmdkIn}` picks the card's entrance. `Overlay` (the
+  default) is unchanged. Escape in the field still closes it through the layer stack, so a
+  menu opened over it takes Escape first.
+- **The palette's selection.** `selected: Option<usize>` makes it the caller's (choices counted
+  as a menu's `expanded` counts them: items and submenu parents, not headers); Up, Down and
+  the pointer then only ask through `on_select`. Left to the palette, `on_select` hears every
+  change of the selection, the reset to the first choice on a new query included.
+  `on_select_rect: Option<EventHandler<Rect>>` hears the selected row's rect (client
+  coordinates, read through the measurer a frame after layout) whenever the selection or the
+  row under it changes: anchor an actions menu with `Anchor::Rect(rect)`. `onkey:
+  Option<EventHandler<KeyboardData>>` hears every key the field gets after the palette has read
+  it (Tab, Ctrl+K), so nothing needs to listen at your root. The pointer moving over a row
+  selects it.
+
+  ```rust
+  let mut row = use_signal(|| None::<Rect>);
+  let field = use_focus_request();
+  rsx! {
+      CommandPalette::<Hit> {
+          label, placeholder, query, tokens: Vec::new(), groups, empty, oninput, onpick, onclose,
+          host: CommandPaletteHost::Surface,
+          entrance: PaletteEntrance::CmdkIn,
+          id: "launcher-card".to_string(),
+          focus: field,
+          on_select_rect: move |rect: Rect| row.set(Some(rect)),
+          onkey: move |key: KeyboardData| if is_actions(&key) { actions.set(true) },
+      }
+      if let (true, Some(rect)) = (actions(), row()) {
+          Menu { kind: MenuKind::Rich, anchor: Anchor::Rect(rect), entries, onpick,
+                 onclose: move |()| { actions.set(false); field.request(); } }
+      }
+  }
+  ```
+- **App icons in rows.** `Tile::Source(IconSource)` puts any icon in a menu or palette row: an
+  `Image` (an app's icon file) fills the tile with no plate under it, whatever size it was
+  resolved at; a `Symbolic` sits on the plate in the text colour; a `Glyph` is `Tile::Icon`'s.
+- **Icon sizes for tiles.** `IconSize::Tile48` (48), `IconSize::Tile96` (96) and
+  `IconSize::Px(IconPx(n))` for any size a caller resolves (a magnified dock tile): an icon is
+  drawn at that size, not scaled from 22.
+- **A caller-driven tooltip.** `Tooltip { shown: Some(Shown::Visible | Shown::Hidden), .. }`
+  shows or hides the label on the caller's say alone, at once, whatever the pointer does (the
+  dock's label machine: hide on press, while a menu is open, while dragging). `None` is the
+  hover behaviour as before. A Card tooltip follows `shown` the same way.
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

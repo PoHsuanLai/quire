@@ -10,8 +10,8 @@ mod golden;
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BlurState, Ds, Grain, Ground, Inject, Material, PRESETS, RootChrome, SpaceLook,
-    Surface, Theme,
+    Appearance, BlurState, Corner, Ds, Grain, Ground, Inject, Material, PRESETS, Px, RootChrome,
+    SpaceLook, Surface, Theme,
 };
 
 #[derive(Props, Clone, PartialEq)]
@@ -21,6 +21,7 @@ struct Setup {
     chrome: Option<RootChrome>,
     ground: Option<Ground>,
     surface: Option<Ground>,
+    radius: Option<Corner>,
 }
 
 #[allow(non_snake_case)]
@@ -39,6 +40,7 @@ fn Root(setup: Setup) -> Element {
             stylesheet: Inject::Host,
             chrome: setup.chrome,
             ground: setup.ground,
+            radius: setup.radius,
             if let Some(on) = setup.surface {
                 Surface { material: Material::Widget, on: Some(on), p { "inside" } }
             } else {
@@ -61,6 +63,7 @@ fn setup(material: Material) -> Setup {
         chrome: None,
         ground: None,
         surface: None,
+        radius: None,
     }
 }
 
@@ -105,6 +108,13 @@ fn the_overrides_match_their_goldens() {
             Setup {
                 surface: Some(Ground::Frame),
                 ..setup(Material::Window)
+            },
+        ),
+        (
+            "dock-radius",
+            Setup {
+                radius: Some(Corner::Px(Px(12.0))),
+                ..setup(Material::Dock)
             },
         ),
         (

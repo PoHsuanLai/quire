@@ -204,6 +204,13 @@ impl Harness {
         })
     }
 
+    /// Whether the first element matching `selector` has the keyboard focus.
+    pub fn is_focused(&self, selector: &str) -> bool {
+        self.with_doc(|doc| {
+            first(doc, selector).is_some_and(|node| doc.get_focussed_node_id() == Some(node))
+        })
+    }
+
     /// The centre of the first element matching `selector`: where a test clicks it.
     pub fn centre(&self, selector: &str) -> Option<Point> {
         self.rect(selector).map(|rect| Point {

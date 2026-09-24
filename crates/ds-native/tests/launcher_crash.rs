@@ -174,6 +174,18 @@ fn mounts(harness: &Harness) -> String {
     harness.text_of(".mounts").unwrap_or_default()
 }
 
+/// Let the script run for `time`, then on until it has mounted `want` times and the subject is
+/// gone, for at most as long again: a loaded machine stretches every wait the script makes.
+fn run_script(harness: &mut Harness, time: Duration, want: &str, subject: &str) {
+    harness.advance(time);
+    for _ in 0..(time.as_millis() / 100) {
+        if mounts(harness) == want && harness.count(subject) == 0 {
+            return;
+        }
+        harness.advance(ms(100));
+    }
+}
+
 /// How long `anim`'s entrance runs, asked of the motion table: the early unmount is inside it.
 fn entrance(anim: Anim) -> Duration {
     settle(anim, MotionLevel::Standard, StaggerIndex::default())
@@ -186,7 +198,12 @@ fn entrance(anim: Anim) -> Duration {
 fn a_palette_unmounted_before_its_entrance_settles_does_not_panic() {
     assert!(entrance(Anim::PeekIn) > ms(110), "the unmount is early");
     let mut harness = Harness::new(PaletteGoneEarly, VIEW);
-    harness.advance(entrance(Anim::PeekIn) + ms(400));
+    run_script(
+        &mut harness,
+        entrance(Anim::PeekIn) + ms(400),
+        "1",
+        ".ds-palette",
+    );
     assert_eq!(mounts(&harness), "1", "the palette mounted");
     assert_eq!(harness.count(".ds-palette"), 0, "and is gone");
 }
@@ -195,7 +212,12 @@ fn a_palette_unmounted_before_its_entrance_settles_does_not_panic() {
 fn a_menu_unmounted_before_its_entrance_settles_does_not_panic() {
     assert!(entrance(Anim::MenuPop) > ms(110), "the unmount is early");
     let mut harness = Harness::new(MenuGoneEarly, VIEW);
-    harness.advance(entrance(Anim::MenuPop) + ms(400));
+    run_script(
+        &mut harness,
+        entrance(Anim::MenuPop) + ms(400),
+        "1",
+        ".ds-menu",
+    );
     assert_eq!(mounts(&harness), "1", "the menu mounted");
     assert_eq!(harness.count(".ds-menu"), 0, "and is gone");
 }
@@ -204,7 +226,7 @@ fn a_menu_unmounted_before_its_entrance_settles_does_not_panic() {
 fn a_palette_toggled_twice_half_a_second_apart_does_not_panic() {
     assert!(settle(Anim::PeekIn, MotionLevel::Extra, StaggerIndex::default()) > ms(510));
     let mut harness = Harness::new(PaletteToggledTwice, VIEW);
-    harness.advance(ms(2200));
+    run_script(&mut harness, ms(2200), "2", ".ds-palette");
     assert_eq!(mounts(&harness), "2");
     assert_eq!(harness.count(".ds-palette"), 0);
 }
@@ -216,7 +238,7 @@ fn a_palette_mounted_fifty_times_does_not_panic() {
     let total: u64 = (0..50u64)
         .map(|round| 7 + round % 5 + 20 + (round * 37) % 400)
         .sum();
-    harness.advance(ms(total + 200));
+    run_script(&mut harness, ms(total + 200), "50", ".ds-palette");
     assert_eq!(mounts(&harness), "50");
     assert_eq!(harness.count(".ds-palette"), 0);
 }
