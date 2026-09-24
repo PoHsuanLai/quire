@@ -425,6 +425,15 @@ pink removed and the randomness removed:
 | Tide as an optional theme needs a filter-free exit (`dissolve` blurs) | proposed | `05-MOTION.md#12-open-decisions` |
 | Motion levels Calm / Standard / Extra / Reduced apply on top of whichever look is active | proposed (see section 8.1) | plan "Token model" |
 
+### 11.1 The macOS polish pass (2026-09-24)
+
+The shell's chrome takes the layers macOS stacks (material stack v2, 03-COLOR section 17.4), the
+continuous-curvature squircle for the dock, its tiles and the launcher (08-ICONS section 2.1), the
+shell type scale (13 section 13.3) and a wide soft `--shadow-window`. None of this is a look: every
+look keeps its colours, faces (Bricolage, Karla, Space Mono), paper-and-ink cards and the Space
+gradient frame; the stack's layers are neutral black and white at alphas, and the vibrancy boost
+multiplies whatever tint a look gives the material. Riso, Tide and Candy inherit them unchanged.
+
 ## 12. Open decisions
 
 1. **Which looks ship at all.** Post (S) is the default. Keep Riso, Tide and Candy as optional

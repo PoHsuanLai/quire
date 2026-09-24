@@ -177,8 +177,9 @@ fn settle_in(harness: &mut Harness) {
     harness.advance(ms(120));
 }
 
-/// Q40: embedded, the palette draws no scrim, its card fills the container and carries the id
-/// a blur region names, and it enters with the entrance asked for.
+/// Q40: embedded, the palette draws no scrim, its card spans the container's width from its top
+/// and, since the macOS polish pass, is only as tall as its content (at most the container's),
+/// carries the id a blur region names, and enters with the entrance asked for.
 #[test]
 fn an_embedded_palette_fills_its_container_with_no_scrim() {
     let mut harness = Harness::new(OwnSelection, VIEW);
@@ -187,7 +188,15 @@ fn an_embedded_palette_fills_its_container_with_no_scrim() {
     assert_eq!(harness.count(".ds-overlay[*|data-layer=palette]"), 0);
     let card = rect(&harness, "#launcher-card");
     let panel = rect(&harness, ".panel");
-    assert_eq!(card, panel, "the card is its container");
+    assert_eq!(
+        card.origin, panel.origin,
+        "the card starts at its container's corner"
+    );
+    assert_eq!(card.size.width, panel.size.width, "and spans its width");
+    assert!(
+        card.size.height.0 < panel.size.height.0,
+        "and is as tall as its content: {card:?}"
+    );
     assert_eq!(
         harness.attr("#launcher-card", "data-entrance").as_deref(),
         Some("cmdk-in")

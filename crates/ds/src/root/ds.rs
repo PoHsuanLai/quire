@@ -18,14 +18,15 @@
 //! is .8), which `ds_settings::Environment::tint_alpha` converts from the settings file; without
 //! one the root writes the key's default. A `radius` overrides the material's corner the same way
 //! (`--m-radius` inline): the dock's pill is its root, and its radius is `dock.pill_radius_px`
-//! (sill FINDINGS Q15).
+//! (sill FINDINGS Q15). A `stack` writes the material stack's settings (`MaterialStack`: the
+//! highlight, hairline, shadow strength and vibrancy keys) the same way.
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
-use crate::material::{BlurState, Material};
+use crate::material::{BlurState, Material, MaterialStack};
 use crate::overlay::host::{OverlayHost, use_overlays_provider};
 use crate::overlay::hover_hub::{HoverWarmth, use_hover_hub_provider};
 use crate::overlay::stack::LayerStack;
@@ -59,6 +60,7 @@ pub fn Ds(
     #[props(default)] ground: Option<Ground>,
     #[props(default)] frame: Option<FrameTint>,
     #[props(default)] radius: Option<Corner>,
+    #[props(default)] stack: Option<MaterialStack>,
     children: Element,
 ) -> Element {
     let chrome = chrome.unwrap_or(RootChrome::of(material));
@@ -82,8 +84,9 @@ pub fn Ds(
     let layers = use_frame_layers(&frame.gradient);
     let tint = tint_alpha.unwrap_or(DEFAULT_TINT_ALPHA);
     let corner = radius.map(super::surface::radius_style).unwrap_or_default();
+    let stack = stack.map(|stack| stack.style_attr()).unwrap_or_default();
     let style = format!(
-        "{}--m-tint-alpha:{};{corner}",
+        "{}--m-tint-alpha:{};{corner}{stack}",
         frame.style_attr(),
         tint.css()
     );
@@ -104,6 +107,7 @@ pub fn Ds(
             "data-chrome": chrome.attribute(),
             "data-frame": frame_tint.attribute(),
             "data-ground": ground.attribute(),
+            "data-corner": radius.and_then(Corner::attribute),
             style,
             if stylesheet == Inject::Inline {
                 style { {crate::css::stylesheet()} }

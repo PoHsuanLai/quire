@@ -18,8 +18,10 @@
 
 pub mod classify;
 pub mod external;
+pub mod family;
 mod geometry;
 mod geometry_shell;
+pub mod plate;
 pub mod render;
 pub mod shape;
 #[cfg(test)]
@@ -27,6 +29,7 @@ mod tests;
 
 pub use classify::{ChromaLimit, IconKind, classify, classify_with};
 pub use external::{ExternalIcon, IconSource, IconUrl};
+pub use family::PlateFamily;
 use geometry::*;
 pub use shape::Shape;
 

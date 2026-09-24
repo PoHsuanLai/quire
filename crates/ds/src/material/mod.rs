@@ -5,10 +5,14 @@
 //! [`Material::blur`], the intent. (The plan's `blur_region()` was dropped from ds.)
 
 pub mod blur;
+pub(crate) mod layer;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
 pub mod material;
 pub mod recipe;
+pub mod stack;
+pub mod vibrancy;
 
 pub use blur::{Blur, BlurState};
 pub use material::Material;
 pub use recipe::{MaterialRecipe, recipe};
+pub use stack::MaterialStack;

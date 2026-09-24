@@ -6,6 +6,9 @@
 
 use super::emit::{attr_selector, declaration, rule};
 use crate::appearance::{MotionLevel, Scheme};
+use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
+use crate::tokens::dock::DOCK_TOKENS;
+use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
@@ -88,11 +91,19 @@ fn fixed_tokens() -> Vec<String> {
     let layers = ZLayer::ALL
         .into_iter()
         .map(|layer| declaration(layer.var(), &layer.z().to_string()));
+    // The tuned tokens: the shell type scale and the dock's geometry, each read from the input
+    // a consumer writes (`ShellMetrics`, `DockMetrics`) with its settings key's default behind.
+    let tuned = SHELL_TOKENS
+        .into_iter()
+        .chain(DOCK_TOKENS)
+        .chain([PLATE_GLYPH, PLATE_INSET])
+        .map(|token| token.declaration());
     radii
         .chain(spacing)
         .chain(families)
         .chain(sizes)
         .chain(layers)
+        .chain(tuned)
         .collect()
 }
 

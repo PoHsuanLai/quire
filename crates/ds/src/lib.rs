@@ -41,8 +41,10 @@ pub use geometry::{
     PopoverRequest, Px, Rect, RectProbe, Side, Size, place, use_rect,
 };
 pub use icon::render::{Glyph, IconPx, IconSize};
-pub use icon::{ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, Shape};
-pub use material::{Blur, BlurState, Material, MaterialRecipe, recipe};
+pub use icon::{
+    ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, PlateFamily, Shape,
+};
+pub use material::{Blur, BlurState, Material, MaterialRecipe, MaterialStack, recipe};
 pub use motion::{
     Anim, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent, IntentEffect,
     IntentPhase, Iteration, ListPresence, MotionTimer, Presence, Pulse, Recipe, Roster,
@@ -66,9 +68,10 @@ pub use space::{
 pub use text::clip_chars;
 pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
-    AccentQuad, Alpha, Colour, ColourToken, Corner, CubicBezier, DelayToken, DurationKind,
-    DurationToken, Easing, EasingToken, Family, FontSize, Hex, HueMember, LabelHue, Radius,
-    ScalarToken, ScalarValue, Shadow, SpacingToken, VarName, ZLayer, quad,
+    AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
+    DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
+    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, Radius, ScalarToken,
+    ScalarValue, Shadow, ShellMetrics, SpacingToken, Tuned, VarName, ZLayer, quad,
 };
 
 use futures_timer as _;

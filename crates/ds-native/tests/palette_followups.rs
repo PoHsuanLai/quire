@@ -297,7 +297,8 @@ fn differing(a: &RgbaImage, b: &RgbaImage, area: Rect) -> usize {
         .count()
 }
 
-/// Where the card is drawn when shown and at rest.
+/// Where the card's container is: the card starts at its corner and spans its width, as tall as
+/// its content.
 const CARD: Rect = Rect {
     origin: ds::Point {
         x: ds::Px(20.0),
@@ -354,10 +355,16 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
         "shown again, it starts from an empty query"
     );
     harness.advance(ms(900));
+    // Since the macOS polish pass the card is as tall as its content, up to its container.
+    let card = rect(&harness, "#card");
     assert_eq!(
-        rect(&harness, "#card"),
-        CARD,
+        (card.origin, card.size.width),
+        (CARD.origin, CARD.size.width),
         "the card is laid out when shown"
+    );
+    assert!(
+        card.size.height.0 > 100.0 && card.size.height.0 <= CARD.size.height.0,
+        "and as tall as its content: {card:?}"
     );
     assert_eq!(
         harness.attr("#card", "data-presence").as_deref(),
@@ -367,16 +374,16 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
     probe::keep(&first_mid, "kept-first-mid");
     probe::keep(&second_mid, "kept-second-mid");
     probe::keep(&settled, "kept-settled");
-    let area = CARD.size.width.0 * CARD.size.height.0;
+    let area = card.size.width.0 * card.size.height.0;
     for (name, mid) in [("first", &first_mid), ("second", &second_mid)] {
-        let changed = differing(mid, &settled, CARD);
+        let changed = differing(mid, &settled, card);
         assert!(
             changed as f32 > area * 0.1,
             "the {name} show is mid-entrance 40 ms in: {changed} pixels differ"
         );
     }
     assert!(
-        differing(&hidden, &settled, CARD) as f32 > area * 0.5,
+        differing(&hidden, &settled, card) as f32 > area * 0.5,
         "the shown card is painted"
     );
     toggle(&mut harness);

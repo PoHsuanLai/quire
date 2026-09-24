@@ -14,10 +14,22 @@
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
   animation:peek-in var(--t-big) var(--e-spring); }
 .ds-palette[*|data-entrance=cmdk-in]{ animation:cmdk-in var(--t-big) var(--e-spring); }
-.ds-palette[*|data-host=surface]{ width:100%; height:100%; box-sizing:border-box; display:flex; flex-direction:column;
+.ds-palette[*|data-host=surface]{ width:100%; height:auto; max-height:100%; box-sizing:border-box; display:flex; flex-direction:column;
   background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
 .ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }
-.ds-palette[*|data-host=surface] > .ds-menu[*|data-embed=palette]{ flex:1 1 auto; min-height:0; max-height:none; }
+.ds-palette[*|data-host=surface] > .ds-menu[*|data-embed=palette]{ flex:0 1 auto; min-height:0; max-height:none; }
+
+/* The launcher's scale (the macOS polish pass, design/13 section 13.3.9, settled 2026-09-24):
+   the card is as tall as its content up to its container (no empty box under the last row); the
+   query at 22/500 (`--fs-shell-field`) beside a 20 px search glyph (`--shell-field-glyph`);
+   row titles 14 and details 12 (`--fs-shell-row`, `--fs-shell-detail`). Its shadow is the
+   material stack's contact and ambient pair (`--m-box`). */
+.ds-palette[*|data-host=surface] .ds-search{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
+.ds-palette[*|data-host=surface] .ds-search > .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
+.ds-palette[*|data-host=surface] .ds-search .ds-input[*|data-variant=inline],
+.ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
+.ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
+.ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
 /* Kept mounted while hidden (sill FINDINGS Q63): nothing is laid out, and each showing replays
    the entrance under the keyframe's other name (`data-pulse`, design/05-MOTION.md section 9
    rule 2), so the animation starts over even where the engine kept the element's styles. */

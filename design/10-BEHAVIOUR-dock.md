@@ -55,12 +55,12 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | --- | --- | --- | --- | --- |
 | Tile size | `T` | 48 | settled | R1, plan settled decisions |
 | Magnified tile size | `S` | 96 (so max zoom `M = S/T = 2.0`) | settled | plan settled decisions |
-| Gap between tiles | `g` | 4 | proposed | L; icon plates carry their own inset (08-ICONS), so the visible gap is `g + 2 x plate inset` |
-| Pill padding (all four sides) | `pad` | 8 | settled | brief: equals the design card inset 8 (A1 `.win` padding 8) |
+| Gap between tiles | `g` | 8 | settled 2026-09-24 (the macOS polish pass; was 4 proposed) | L; `--dock-gap`, `dock.tile_gap_px`; the plate fills its tile, so the visible gap is `g` |
+| Pill padding (all four sides) | `pad` | 6 | settled 2026-09-24 (the macOS polish pass; was 8) | L, the Big Sur dock's tight pill; `--dock-pad`, `dock.pill_padding_px` (proposed key) |
 | Gutter, pill bottom to screen edge | `gut` | 8 | settled | same card-inset rule |
-| Pill height | `H_p` | `T + 2 pad` = 64 | derived | |
+| Pill height | `H_p` | `T + 2 pad` = 60 | derived | `DockMetrics::pill_height` |
 | Pill width | `W_0` | `n T + (n-1) g + 2 pad` (+ separator block, 10.3.9) | derived | |
-| Pill corner radius | `--m-radius` of `Material::Dock` | 22 | proposed (L) | `03-COLOR.md` materials table (Dock radius 22); the plan names the token only |
+| Pill corner radius | `--m-radius` of `Material::Dock` | 22; the shell draws it as `Corner::Squircle(Px(dock.pill_radius_px))`, recommended 18 | squircle settled 2026-09-24, value proposed (L) | `03-COLOR.md` materials table (Dock radius 22) and §17.4; a squircle of 18 reaches 36 along each edge, capped at half the 60 px pill |
 | Pill material | `Material::Dock` | tint + edge + shadow tokens from `03-COLOR.md`; compositor blur behind | settled | plan "Design: quire", Material enum |
 | Pill tint with Spaces | `--f-*` frame tokens of the current workspace's SpaceLook, cross-fade 380 ms on workspace switch | settled | plan settled decisions (Spaces on the desktop) |
 | Surface height | `H_s` | 160 = `gut + pad + S + T` (room for a magnified tile plus one bounce) | proposed | derived; transparent area outside the input region |
@@ -72,7 +72,9 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 
 | Element | Specification | Status |
 | --- | --- | --- |
-| Running dot | circle 4 px diameter, centred under the tile, centre 4 px below the tile bottom edge (inside the 8 px bottom padding); colour `--f-ink` of the dock scope; shown iff the app has at least one toplevel (any workspace); fades in/out over `--t-quick` | proposed (R26 "4-5 pt below", M) |
+| Running dot | circle 4 px diameter (`--dock-dot`), centred under the tile, centre 3 px below the tile bottom edge (`--dock-dot-gap`; inside the 6 px bottom padding); colour the dock scope's ink; shown iff the app has at least one toplevel (any workspace); fades in over `--t-quick`; ds `RunningDot` | settled 2026-09-24 (the macOS polish pass; R26 "4-5 pt below", L) |
+| Reflective floor | a light band rising from the pill's floor under the tiles (white .26 to 0 over 40 % of the pill), off by default; ds `DockFloor`, `--dock-floor` | settled 2026-09-24 as an option, off (`dock.floor`, proposed key; macOS dropped its 3D floor after 10.9) |
+| Placeholder tile | until the generated icons arrive, an app with no icon is `IconView { plate: Some(family) }`: the 08-ICONS plate in one of the six families with the glyph at 56 % | settled 2026-09-24 |
 | Badge capsule | anchored to the tile's top-right: right edge at tile right + 2, top edge at tile top - 2; height 18, min width 18, horizontal padding 5, radius 9; fill `--danger`, text `--accent-ink`-equivalent white token, ui font 11/700 tabular; text = count; `> 999` renders `999+`; scales with the tile (it is part of the tile's transform); appears with `pop-in --t-move --e-spring`, count changes use `bump` | proposed (R21 H for meaning, geometry L) |
 | Badge source | `com.canonical.Unity.LauncherEntry.Update`: `count` + `count-visible` | settled (plan COSMIC findings) |
 | Progress ring | circle 20 px outer diameter centred at (tile right - 8, tile bottom - 8), on a 22 px `--raise` disc; stroke 3, track `--ink` at the design's faint alpha, arc `--accent`, starts at 12 o'clock, clockwise, `progress` 0..1 from LauncherEntry `progress` + `progress-visible`; arc length changes are not animated faster than `--t-quick` | proposed (L; macOS draws a bar, the plan names a ring) |

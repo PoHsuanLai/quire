@@ -90,7 +90,7 @@ fn Panel(
 #[component]
 pub fn EmbeddedPalette() -> Element {
     rsx! {
-        Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card fills its container and carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (Tile::Source), drawn as it is, filling the tile.",
+        Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card spans its container's width, is as tall as its content (up to the container), carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (Tile::Source), drawn as it is, filling the tile.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Typed \"f\": app icons, cmdk-in",
                     Panel { query: "f", groups: vec![("Applications".to_string(), apps("f"))], entrance: PaletteEntrance::CmdkIn }

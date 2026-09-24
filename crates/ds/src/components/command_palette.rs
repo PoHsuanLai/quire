@@ -29,7 +29,7 @@ use crate::components::vocab::Availability;
 use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::geometry::{MountedRef, Point, Rect};
 use crate::motion::anim::Anim;
-use crate::tokens::ZLayer;
+use crate::tokens::{Corner, ZLayer};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -98,6 +98,9 @@ impl PaletteEntrance {
 /// leaves the layer stack, and each change to `Some(Shown::Visible)` replays the entrance,
 /// empties the query (through `oninput`) and goes back to the first choice unless `retain` is
 /// `Retain::Query`, and gives the field the keyboard. `None` is always shown.
+///
+/// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
+/// radius; absent, it keeps `--r-panel`.
 #[component]
 pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     label: String,
@@ -119,6 +122,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] onkey: Option<EventHandler<KeyboardEvent>>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] retain: Retain,
+    #[props(default)] corner: Option<Corner>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
     let showing = use_showing(shown, entrance.anim());
@@ -228,6 +232,8 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             "data-presence": showing.presence().slug(),
             "data-shown": showing.shown.slug(),
             "data-pulse": showing.alias(),
+            "data-corner": corner.and_then(Corner::attribute),
+            style: corner.map(card_corner),
             onpointerdown: move |event| event.stop_propagation(),
             SearchField {
                 label: label.clone(),
@@ -281,6 +287,14 @@ fn follow_showing(showing: Showing, turn: Turn) {
             }
             turn.request.request();
         }),
+    }
+}
+
+/// The card's own corner: its radius, and a squircle's extent and shadow circle.
+fn card_corner(corner: Corner) -> String {
+    match corner {
+        Corner::Squircle(_) => corner.squircle_style(),
+        Corner::Token(_) | Corner::Px(_) => format!("border-radius:{};", corner.css()),
     }
 }
 

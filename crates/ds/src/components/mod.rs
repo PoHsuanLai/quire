@@ -9,6 +9,7 @@ pub mod chip;
 pub mod command_palette;
 pub mod command_pill;
 pub mod count;
+pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
 pub mod hover_card;
@@ -19,6 +20,7 @@ pub mod kbd;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
+pub mod menu_bar_item;
 pub mod menu_entry;
 pub(crate) mod menu_keys;
 pub(crate) mod menu_lines;
@@ -52,6 +54,7 @@ pub mod toast;
 pub mod toggle;
 pub mod tooltip;
 pub mod vocab;
+pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile};
 pub use animated_list::AnimatedList;
@@ -62,6 +65,7 @@ pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
+pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use hover_card::{
@@ -74,6 +78,7 @@ pub use kbd::{Kbd, KbdSize};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
+pub use menu_bar_item::MenuBarItem;
 pub use menu_entry::{MenuEntry, Tile, Trail};
 pub use menu_lines::Filter;
 pub use palette_shown::Retain;
@@ -102,6 +107,7 @@ pub use vocab::{
     Availability, Check, DropState, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection,
     Shortcut, StaggerIndex, Switch,
 };
+pub use workspace_pills::{WorkspacePill, WorkspacePills};
 
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.
 pub const CSS: &[(&str, &str)] = &[
@@ -114,6 +120,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("command_palette", include_str!("command_palette.css")),
     ("command_pill", include_str!("command_pill.css")),
     ("count", include_str!("count.css")),
+    ("dock_parts", include_str!("dock_parts.css")),
     ("drag_ghost", include_str!("drag_ghost.css")),
     ("edge_strip", include_str!("edge_strip.css")),
     ("hover_card", include_str!("hover_card.css")),
@@ -124,6 +131,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
     ("menu", include_str!("menu.css")),
+    ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
@@ -145,4 +153,5 @@ pub const CSS: &[(&str, &str)] = &[
     ("toast", include_str!("toast.css")),
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),
+    ("workspace_pills", include_str!("workspace_pills.css")),
 ];

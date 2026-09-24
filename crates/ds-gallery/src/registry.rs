@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 11] = [
+pub const REGISTRY: [Entry; 12] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -98,6 +98,13 @@ pub const REGISTRY: [Entry; 11] = [
         lede: "Fire each animation on a sample. Beside it, the CSS duration token at the current level and the Rust settle() that times the state after it.",
         height: 2050,
         body: pages::motion_lab::MotionLabPage,
+    },
+    Entry {
+        page: Page::Polish,
+        title: "Polish",
+        lede: "The shell chrome beside the macOS numbers it targets: the material stack, a text menu and the menu-bar items, squircle corners, the dock pill and its plates, the launcher and the window shadow, each with the target printed under it.",
+        height: 3000,
+        body: pages::polish::PolishPage,
     },
 ];
 

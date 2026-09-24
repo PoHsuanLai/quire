@@ -10,8 +10,13 @@ use crate::appearance::{Accent, Scheme};
 use crate::components::StatusMetrics;
 use crate::css::accents_css::swatch_var;
 use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
+use crate::css::shape_css::{SHAPE_VARS, SQUIRCLE_VARS};
+use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
+use crate::material::stack::STACK_INPUTS;
 use crate::motion::Anim;
 use crate::space::{CardAccent, FrameVars, SpaceLook};
+use crate::tokens::dock::DOCK_TOKENS;
+use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     Radius, ScalarToken, Shadow, SpacingToken, VarName, ZLayer,
@@ -44,6 +49,10 @@ fn collect() -> HashSet<String> {
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
         .chain([StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])
+        .chain(tuned_vars())
+        .chain(STACK_INPUTS)
+        .chain(SQUIRCLE_VARS)
+        .chain(SHAPE_VARS)
         .collect();
     let hues = LabelHue::ALL
         .into_iter()
@@ -66,6 +75,16 @@ fn collect() -> HashSet<String> {
         .chain(swatches)
         .chain(frame)
         .collect()
+}
+
+/// The tuned tokens (the shell type scale, the dock's geometry, the plate's shares) and the
+/// inputs a consumer writes for them.
+fn tuned_vars() -> impl Iterator<Item = VarName> {
+    SHELL_TOKENS
+        .into_iter()
+        .chain(DOCK_TOKENS)
+        .chain([PLATE_GLYPH, PLATE_INSET])
+        .flat_map(|token| [token.token, token.input])
 }
 
 /// Whether `name` (an `animation-name` value, its `X--b` restart alias included) is a
