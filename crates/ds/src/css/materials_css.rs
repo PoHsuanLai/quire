@@ -186,7 +186,7 @@ mod tests {
         let css = materials_css();
         const WANT: &[&str] = &[
             ".ds[*|data-material=bar]{--m-tint:rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8));--m-tint-solid:rgba(248,249,246,.94);",
-            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:rgba(21,24,20,calc(.65*var(--m-tint-alpha,.8)/.8));",
+            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:rgba(21,24,20,calc(.67*var(--m-tint-alpha,.8)/.8));",
             ".ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;--m-box:none;--m-frame-alpha:1;border-radius:var(--m-radius);box-shadow:var(--m-box);}",
             ".ds[*|data-material][*|data-blur=off]{background:var(--m-tint-solid);}",
             "--m-radius:0;--m-box:var(--m-edge);--m-frame-alpha:calc(.7*var(--m-tint-alpha,.8)/.8);",

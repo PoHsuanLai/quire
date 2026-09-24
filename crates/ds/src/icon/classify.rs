@@ -3,9 +3,11 @@
 //! recoloured to the text colour like a symbolic icon; anything with colour in it states a
 //! fact about its app and is shown as it is.
 //!
-//! Near-grey is OKLCH chroma below a threshold (design/08 section 1.5 proposes 0.04). No
-//! settings key names it yet, so [`classify`] uses [`ChromaLimit::PROPOSED`] and
-//! [`classify_with`] takes one; FINDINGS "Bar gaps" asks for the key.
+//! Near-grey is OKLCH chroma below a threshold (design/08 section 1.5 proposes 0.04). The
+//! settings key is `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3, default
+//! 0.04, range 0.0..=0.2); `classify` uses [`ChromaLimit::default`] and [`classify_with`] takes
+//! one built with [`ChromaLimit::try_from`]. `sill` still has to register the key in its own
+//! settings crate and pass the parsed value through (FINDINGS "Tune wave").
 
 use crate::error::DsError;
 
@@ -23,17 +25,45 @@ pub enum IconKind {
 pub struct ChromaLimit(pub u16);
 
 impl ChromaLimit {
-    /// design/08 section 1.5's proposed threshold, 0.04.
+    /// design/08 section 1.5's proposed threshold, 0.04 — the same value
+    /// `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3) ships as its default.
     pub const PROPOSED: ChromaLimit = ChromaLimit(40);
+
+    /// The range `icons.symbolic_chroma_max` allows, in plain OKLCH chroma (design/22-SETTINGS.md
+    /// section 3.3: `0..0.2`).
+    pub const RANGE: std::ops::RangeInclusive<f32> = 0.0..=0.2;
+}
+
+impl Default for ChromaLimit {
+    /// `icons.symbolic_chroma_max`'s default, 0.04.
+    fn default() -> Self {
+        ChromaLimit::PROPOSED
+    }
+}
+
+impl TryFrom<f32> for ChromaLimit {
+    type Error = DsError;
+
+    /// `chroma` as a settings key would carry it — plain OKLCH chroma, not thousandths — refusing
+    /// anything outside `icons.symbolic_chroma_max`'s range (`ChromaLimit::RANGE`, `0.0..=0.2`).
+    fn try_from(chroma: f32) -> Result<Self, DsError> {
+        if !ChromaLimit::RANGE.contains(&chroma) {
+            return Err(DsError::ChromaLimitRange {
+                value: format!("{chroma}"),
+            });
+        }
+        Ok(ChromaLimit((chroma * 1000.0).round() as u16))
+    }
 }
 
 /// The alpha at which a pixel counts as opaque: half coverage. Fainter edge pixels carry
 /// too little of their colour to say anything about it.
 const OPAQUE_FROM: u8 = 128;
 
-/// Whether the PNG `png` is a symbolic or an image icon, at the proposed threshold.
+/// Whether the PNG `png` is a symbolic or an image icon, at the default threshold
+/// (`icons.symbolic_chroma_max`'s default, 0.04).
 pub fn classify(png: &[u8]) -> Result<IconKind, DsError> {
-    classify_with(png, ChromaLimit::PROPOSED)
+    classify_with(png, ChromaLimit::default())
 }
 
 /// Whether the PNG `png` is a symbolic or an image icon: symbolic when every pixel with at
@@ -126,6 +156,21 @@ mod tests {
         assert!((0.02..0.04).contains(&measured), "{measured}");
         assert_eq!(classify(&tinted), Ok(IconKind::Symbolic));
         assert_eq!(classify_with(&tinted, ChromaLimit(20)), Ok(IconKind::Image));
+    }
+
+    #[test]
+    fn default_is_the_proposed_threshold() {
+        assert_eq!(ChromaLimit::default(), ChromaLimit::PROPOSED);
+        assert_eq!(ChromaLimit::default(), ChromaLimit(40));
+    }
+
+    #[test]
+    fn try_from_f32_scales_to_thousandths_and_refuses_out_of_range() {
+        assert_eq!(ChromaLimit::try_from(0.04), Ok(ChromaLimit(40)));
+        assert_eq!(ChromaLimit::try_from(0.0), Ok(ChromaLimit(0)));
+        assert_eq!(ChromaLimit::try_from(0.2), Ok(ChromaLimit(200)));
+        assert!(ChromaLimit::try_from(-0.01).is_err());
+        assert!(ChromaLimit::try_from(0.201).is_err());
     }
 
     #[test]

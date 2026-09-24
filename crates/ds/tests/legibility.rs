@@ -329,25 +329,22 @@ fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<Str
 }
 
 /// Without blur the tinted chrome is its gradient at the solid floor .94, and the ink its
-/// ground draws in holds 4.5 on every stop of every preset over black and over white. Over
-/// blur, at the tint alphas design/03-COLOR.md section 17.2 gives the flat tints, six pairs
-/// fall short over a pure black or white backdrop (worst: the light widget, 3.91 over black);
-/// FINDINGS "Bar gaps" lists the smallest .02 raises that would clear them, for the user.
+/// ground draws in holds 4.5 on every stop of every preset over black and over white.
 #[test]
 fn the_tinted_chrome_holds_its_ink_without_blur() {
     let failures = tinted_chrome_failures(|_, _| 0.94);
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
-/// The over-blur shortfall FINDINGS records is what this measures today: if a retune clears
-/// it, this fails and the finding (and design/21 section 7) should be updated with it.
+/// Over blur, at the tint alphas design/03-COLOR.md section 17.2 gave the flat tints, six
+/// material/scheme pairs fell short over a pure black or white backdrop (worst: the light
+/// widget, 3.91 over black; FINDINGS "Bar gaps"). The smallest .02 raises that clear all of
+/// them are settled (2026-09-24): the dark bar, both dock schemes, the dark OSD and both
+/// widget schemes (`crates/ds/src/material/recipe.rs`). This is now the same gate as the
+/// blur-off test above, just over the tint alpha instead of the solid floor: a future retune
+/// that drops any material/scheme pair below 4.5 over blur fails it.
 #[test]
-fn the_tinted_chrome_over_blur_shortfall_is_the_recorded_one() {
+fn the_tinted_chrome_holds_its_ink_over_blur() {
     let failures = tinted_chrome_failures(tint_alpha);
-    let widget = failures
-        .iter()
-        .filter(|failure| failure.starts_with("Widget Light"))
-        .count();
-    assert_eq!(failures.len(), 50, "{failures:#?}");
-    assert_eq!(widget, 14, "{failures:#?}");
+    assert!(failures.is_empty(), "{failures:#?}");
 }
