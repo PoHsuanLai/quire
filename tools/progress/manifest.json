@@ -1,6 +1,32 @@
 {
-  "updated": "2026-09-24, sill M1 bar proven; M2/M3 wallpaper and dock wave starting",
+  "updated": "2026-09-24, sill bar and dock proven on cosmic-comp; wallpaper landing; launcher wave next",
   "entries": [
+    {
+      "id": "m3-dock",
+      "date": "2026-09-24 \u00b7 sill Milestones 2 and 3",
+      "title": "The dock launches, magnifies, badges and quits real apps on cosmic-comp",
+      "status": "proven",
+      "lede": "The second shell surface, on the same design system as the bar. Behind it the application index (353 desktop entries on this machine, icons resolved through the theme chain), launching through transient systemd scopes or D-Bus activation with an activation token, a pins file, and LauncherEntry badges from the session bus. The dock reserves its height, magnifies tiles at the compositor's own frame rate while the pointer is over it and goes back to zero frames when it leaves, launches a pinned app on click, shows a badge within a frame of the signal, and opens the design system's context menu on a right click.",
+      "notes": [
+        "Acceptance on nested cosmic-comp: reserve 72 px; a one-second hover sweep renders 52 frames for 52 callbacks then 0 frames over 5 s idle; COSMIC Terminal launched in its own scope with its running dot 0.5 s later; a count badge turned red 131 ms after the emitter sent it; a right-click opened the menu with the window, Remove from Dock and Quit.",
+        "Design-system gaps this exposed, being fixed: a Dock-material root paints a shadow band (so the pill is a nested surface for now), icon sizes stop at 22 px (tiles scale the SVG), and the hover label ignores the machine's hide (it shows under the open menu in the third shot).",
+        "Not yet built: Open at Login, drag ghost, file drops, minimize targets, sounds; auto-hide is wired but not exercised."
+      ],
+      "images": [
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic.png",
+          "caption": "the dock at rest under the bar, two tiles (COSMIC Terminal pinned, Trash)"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic-magnified.png",
+          "caption": "pointer over the terminal tile: magnified, neighbour pushed aside"
+        },
+        {
+          "path": "/home/pohsuanlai/quire/tools/progress/shots/sill/dock-cosmic-menu.png",
+          "caption": "after a click launched the terminal: running dot, and the right-click menu"
+        }
+      ]
+    },
     {
       "id": "m1-bar",
       "date": "2026-09-24 \u00b7 sill Milestone 1",
