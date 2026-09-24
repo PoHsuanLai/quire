@@ -8,8 +8,10 @@ pub mod appearance;
 pub mod components;
 pub mod css;
 pub mod error;
+pub mod focus;
 pub mod fonts;
 pub mod geometry;
+mod guarded;
 pub mod icon;
 #[cfg(feature = "lint")]
 pub mod lint;
@@ -18,6 +20,7 @@ pub mod motion;
 pub mod overlay;
 pub mod root;
 pub mod space;
+mod task;
 pub mod text;
 pub mod time;
 pub mod tokens;
@@ -29,6 +32,7 @@ pub use appearance::{
 pub use components::*;
 pub use css::stylesheet;
 pub use error::DsError;
+pub use focus::{FocusRequest, FocusTicket, Focused, HostFocus, use_focus_request};
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
@@ -36,7 +40,7 @@ pub use geometry::{
     Align, Anchor, Flip, HostMeasure, Measured, MountedRef, Placed, Placement, Point,
     PopoverRequest, Px, Rect, RectProbe, Side, Size, place, use_rect,
 };
-pub use icon::render::{Glyph, IconSize};
+pub use icon::render::{Glyph, IconPx, IconSize};
 pub use icon::{ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, Shape};
 pub use material::{Blur, BlurState, Material, MaterialRecipe, recipe};
 pub use motion::{
@@ -62,9 +66,9 @@ pub use space::{
 pub use text::clip_chars;
 pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
-    AccentQuad, Alpha, Colour, ColourToken, CubicBezier, DelayToken, DurationKind, DurationToken,
-    Easing, EasingToken, Family, FontSize, Hex, HueMember, LabelHue, Radius, ScalarToken,
-    ScalarValue, Shadow, SpacingToken, VarName, ZLayer, quad,
+    AccentQuad, Alpha, Colour, ColourToken, Corner, CubicBezier, DelayToken, DurationKind,
+    DurationToken, Easing, EasingToken, Family, FontSize, Hex, HueMember, LabelHue, Radius,
+    ScalarToken, ScalarValue, Shadow, SpacingToken, VarName, ZLayer, quad,
 };
 
 use futures_timer as _;

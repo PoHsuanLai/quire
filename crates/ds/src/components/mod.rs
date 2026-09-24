@@ -26,6 +26,9 @@ pub(crate) mod menu_match;
 pub(crate) mod menu_panel;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_tracker;
+pub(crate) mod palette_lines;
+pub(crate) mod palette_rows;
+pub(crate) mod palette_select;
 pub mod peek;
 pub mod popover;
 pub mod press;
@@ -55,7 +58,7 @@ pub use appearance_picker::AppearancePicker;
 pub use avatar::{Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
 pub use button::{Button, ButtonVariant};
 pub use chip::{Chip, ChipVariant};
-pub use command_palette::CommandPalette;
+pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
@@ -92,7 +95,7 @@ pub use tabs::Tabs;
 pub use text_input::{Focus, InputVariant, TextInput};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
-pub use tooltip::{Tooltip, TooltipKind};
+pub use tooltip::{Shown, Tooltip, TooltipKind};
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Fraction, Here, Key, PulseKey, PulsePhase, Selection,
     Shortcut, StaggerIndex, Switch,

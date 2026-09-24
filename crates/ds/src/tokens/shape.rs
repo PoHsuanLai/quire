@@ -112,3 +112,29 @@ impl Radius {
         }
     }
 }
+
+/// A material's corner, overriding the radius its recipe gives it (`--m-radius`): a radius
+/// token, or a length a settings key names (`dock.pill_radius_px`, sill FINDINGS Q15).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Corner {
+    /// One of the radius tokens.
+    Token(Radius),
+    /// A length in logical pixels.
+    Px(crate::geometry::Px),
+}
+
+impl Corner {
+    /// The CSS value: `var(--r-panel)`, `22px`.
+    pub fn css(self) -> String {
+        match self {
+            Corner::Token(radius) => radius.var().reference(),
+            Corner::Px(length) => format!("{}px", length.0),
+        }
+    }
+}
+
+impl From<Radius> for Corner {
+    fn from(radius: Radius) -> Self {
+        Corner::Token(radius)
+    }
+}

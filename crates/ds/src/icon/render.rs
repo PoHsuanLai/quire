@@ -30,7 +30,18 @@ pub enum IconSize {
     Large,
     /// 22 px: bar status items and control-center tiles (proposed).
     Bar,
+    /// 48 px: a dock tile at rest (design/10-BEHAVIOUR-dock.md, `dock.tile_size_px`'s default).
+    Tile48,
+    /// 96 px: a dock tile at full magnification.
+    Tile96,
+    /// Any other size a caller resolved for itself: a dock tile between rest and full
+    /// magnification, an icon a settings key sizes (sill FINDINGS Q16).
+    Px(IconPx),
 }
+
+/// An icon's side in whole logical pixels, for [`IconSize::Px`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct IconPx(pub u8);
 
 impl IconSize {
     /// The logical size in pixels, written as `data-size`.
@@ -45,6 +56,9 @@ impl IconSize {
             IconSize::Tile => 17,
             IconSize::Large => 18,
             IconSize::Bar => 22,
+            IconSize::Tile48 => 48,
+            IconSize::Tile96 => 96,
+            IconSize::Px(IconPx(side)) => side,
         }
     }
 }

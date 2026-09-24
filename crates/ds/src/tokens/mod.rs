@@ -27,7 +27,7 @@ pub use label_hue::{HueMember, LabelHue};
 pub use layer::ZLayer;
 pub use name::VarName;
 pub use scalar::{ScalarToken, ScalarValue};
-pub use shape::Radius;
+pub use shape::{Corner, Radius};
 pub use spacing::SpacingToken;
 pub use timing::{DurationKind, DurationToken};
 pub use type_scale::{Family, FontSize};

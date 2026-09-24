@@ -542,6 +542,7 @@ outbox pill (C:2118-2186).
 | --- | --- | --- |
 | command menu opens | its input takes focus | S:1661 |
 | command menu closes | S: focus not restored (**gap**); C: the shell takes focus (C:2257). Rule: restore focus to the element that had it | S:1663 |
+| a menu opened from a field closes | the field takes the keyboard back (settled 2026-09-24): the caller passes the field `Focus::Controlled(request)` and calls `request.request()` from the menu's `onclose`; nothing is remounted (FINDINGS "Launcher gaps", sill Q44) | |
 | any menu or the bubble is clicked | mouse down prevented; focus stays in the field that opened it | S:2099, S:1658, S:2135 |
 | recipient added or removed | the same input keeps focus | S:2280, S:2266 |
 | Cc shown | Cc input takes focus | S:2239 |

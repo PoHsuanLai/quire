@@ -5,6 +5,7 @@ use super::chrome::Ground;
 use super::env::{Env, use_env, use_env_provider};
 use crate::appearance::{Accent, Resolved, Scheme};
 use crate::material::{BlurState, Material};
+use crate::tokens::Corner;
 use dioxus::prelude::*;
 
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`
@@ -12,7 +13,8 @@ use dioxus::prelude::*;
 /// frame variables (it inherits the root's). Each override left `None` inherits the enclosing
 /// scope's value, so a specimen in another accent or blur state needs no second `Ds`. `on` is
 /// the ground its content is drawn on: `None` takes the material's (`Ground::of`: the frame for
-/// Bar and Dock, paper otherwise), so a paper panel inside a bar root is paper again.
+/// Bar and Dock, paper otherwise), so a paper panel inside a bar root is paper again. `radius`
+/// overrides the material's corner (`--m-radius`), for a surface whose radius is a setting.
 #[component]
 pub fn Surface(
     material: Material,
@@ -20,6 +22,7 @@ pub fn Surface(
     #[props(default)] accent: Option<Accent>,
     #[props(default)] blur: Option<BlurState>,
     #[props(default)] on: Option<Ground>,
+    #[props(default)] radius: Option<Corner>,
     children: Element,
 ) -> Element {
     let env = scope(use_env(), material, theme, accent, blur);
@@ -34,9 +37,15 @@ pub fn Surface(
             "data-material": env.material.slug(),
             "data-blur": env.blur.slug(),
             "data-ground": ground.attribute(),
+            style: radius.map(radius_style),
             {children}
         }
     }
+}
+
+/// The inline declaration that overrides a material's corner.
+pub(crate) fn radius_style(radius: Corner) -> String {
+    format!("--m-radius:{};", radius.css())
 }
 
 /// The scope a `Surface` provides: the parent's, with each given override applied.
