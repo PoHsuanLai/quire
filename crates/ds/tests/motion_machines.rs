@@ -8,7 +8,7 @@ use ds::overlay::{Pull, PullTab, TabArm};
 use ds::{
     Anim, Drag, DragPhase, Emphasis, Exit, Fraction, HoverEvent, HoverIntent, HoverWarmth,
     IntentEffect, IntentPhase, MotionLevel, Point, Presence, Px, Rect, RosterState, RowPitch, Size,
-    settle, use_pulse,
+    StayError, Stayed, settle, use_pulse,
 };
 use std::time::{Duration, Instant};
 
@@ -288,6 +288,139 @@ fn heal_index_saturates_at_12() {
         })
         .collect();
     assert_eq!(ds, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12]);
+}
+
+#[test]
+fn stay_takes_an_exit_back_in_place() {
+    use Presence::{Entering, Leaving, Present};
+    struct Case {
+        name: &'static str,
+        state: RosterState<&'static str>,
+        stay: &'static str,
+        expect: Vec<Row>,
+        outcome: Result<Stayed, StayError>,
+    }
+    let four = || at_rest(&["a", "b", "c", "d"]);
+    let cases = [
+        Case {
+            name: "a leaving row is present again and nothing below heals",
+            state: four().leave(&"b", Exit::Fold, Emphasis::Plain).0,
+            stay: "b",
+            expect: vec![
+                ("a", Present),
+                ("b", Present),
+                ("c", Present),
+                ("d", Present),
+            ],
+            outcome: Ok(Stayed::Restored),
+        },
+        Case {
+            name: "an unread row's heavier exit is taken back the same way",
+            state: four().leave(&"d", Exit::Crumple, Emphasis::Strong).0,
+            stay: "d",
+            expect: vec![
+                ("a", Present),
+                ("b", Present),
+                ("c", Present),
+                ("d", Present),
+            ],
+            outcome: Ok(Stayed::Restored),
+        },
+        Case {
+            name: "another leaving row keeps leaving",
+            state: four()
+                .leave(&"b", Exit::Fold, Emphasis::Plain)
+                .0
+                .leave(&"c", Exit::Curl, Emphasis::Plain)
+                .0,
+            stay: "c",
+            expect: vec![
+                ("a", Present),
+                ("b", Leaving(Exit::Fold)),
+                ("c", Present),
+                ("d", Present),
+            ],
+            outcome: Ok(Stayed::Restored),
+        },
+        Case {
+            name: "a healing row keeps healing: it is not leaving",
+            state: four()
+                .leave(&"a", Exit::Fold, Emphasis::Plain)
+                .0
+                .settled(&"a"),
+            stay: "c",
+            expect: vec![("b", healing(0)), ("c", healing(1)), ("d", healing(2))],
+            outcome: Ok(Stayed::Unchanged),
+        },
+        Case {
+            name: "a stay above a healing run leaves the heal alone",
+            state: four()
+                .leave(&"c", Exit::Fold, Emphasis::Plain)
+                .0
+                .settled(&"c")
+                .leave(&"a", Exit::Fold, Emphasis::Plain)
+                .0,
+            stay: "a",
+            expect: vec![("a", Present), ("b", Present), ("d", healing(0))],
+            outcome: Ok(Stayed::Restored),
+        },
+        Case {
+            name: "a present row is a no-op",
+            state: four(),
+            stay: "b",
+            expect: vec![
+                ("a", Present),
+                ("b", Present),
+                ("c", Present),
+                ("d", Present),
+            ],
+            outcome: Ok(Stayed::Unchanged),
+        },
+        Case {
+            name: "an entering row is a no-op",
+            state: RosterState::first_show(&["a", "b"], PITCH),
+            stay: "a",
+            expect: vec![("a", Entering), ("b", Entering)],
+            outcome: Ok(Stayed::Unchanged),
+        },
+        Case {
+            name: "a key never listed is an error, not a panic",
+            state: four(),
+            stay: "z",
+            expect: vec![
+                ("a", Present),
+                ("b", Present),
+                ("c", Present),
+                ("d", Present),
+            ],
+            outcome: Err(StayError::UnknownKey),
+        },
+        Case {
+            name: "a row whose exit already settled is gone: an error",
+            state: four()
+                .leave(&"b", Exit::Fold, Emphasis::Plain)
+                .0
+                .settled(&"b"),
+            stay: "b",
+            expect: vec![("a", Present), ("c", healing(0)), ("d", healing(1))],
+            outcome: Err(StayError::UnknownKey),
+        },
+    ];
+    for case in cases {
+        let (got, outcome) = case.state.stay(&case.stay);
+        assert_eq!(outcome, case.outcome, "{}", case.name);
+        assert_eq!(rows(&got), case.expect, "{}", case.name);
+        // The exit's timer, had the hook not cancelled it, would settle nothing now.
+        let late = got.clone().settled(&case.stay);
+        if case.outcome == Ok(Stayed::Restored) {
+            assert_eq!(
+                rows(&late),
+                case.expect,
+                "{}: a late settle heals nothing",
+                case.name
+            );
+        }
+    }
 }
 
 #[test]

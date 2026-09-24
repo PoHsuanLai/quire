@@ -18,7 +18,7 @@ pub use drag::{Drag, DragPhase, DragTracker, use_drag};
 pub use hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};
 pub use presence::{Exit, ListPresence, Presence};
 pub use pulse::{Pulse, use_pulse};
-pub use roster::{RosterEntry, RosterState, RowPitch};
+pub use roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 pub use settle::settle;
 pub use timer::{MotionTimer, TimerPhase, use_motion_timer};
 pub use use_roster::{Roster, use_roster};
