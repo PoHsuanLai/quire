@@ -2,33 +2,28 @@
 //! that switch Spaces (design/04-COMPONENTS.md section 32, design/21-SPACES.md section 6).
 //! Every colour it shows comes from `space::palette`; it computes none.
 
+mod dot;
 mod edit;
 mod field;
+mod handles;
 mod parts;
 pub(crate) mod png;
+mod rows;
 
 use crate::appearance::{Scheme, Theme};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::segmented::SegmentedControl;
-use crate::components::vocab::{Here, Shortcut, Switch};
-use crate::geometry::measure::client_rect;
-use crate::geometry::{Point, Px, Rect};
-use crate::motion::drag::{DragPhase, use_drag};
-use crate::space::{CardAccent, FrameVars, SpaceLook, derive, gradient};
+use crate::space::{CardAccent, SpaceLook};
 use dioxus::prelude::*;
-use edit::Nudge;
+pub use dot::SpaceDot;
+use handles::Field;
 use parts::{Checks, GrainRow, Presets, Stops};
-use std::rc::Rc;
+use rows::{EachScheme, MotionRow, Title};
+pub use rows::{MeasuredIn, MotionChoice};
 
 /// Which of a Space's dots is being edited: 0, 1 or 2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub struct DotIndex(pub u8);
-
-/// A handle's reach: pointer down within its radius picks it (`S:255`, 22 px across).
-const HANDLE_RADIUS: f32 = 11.0;
-
-/// The field follows the pointer from the first pixel (`S:1435-1441`).
-const NO_THRESHOLD: Px = Px(0.0);
 
 /// The dot being edited: the one picked inside the editor for the current `active_dot` prop, or
 /// the prop itself, held inside the Space's dots.
@@ -69,44 +64,6 @@ fn dot_index(index: usize) -> DotIndex {
     DotIndex(u8::try_from(index).unwrap_or(u8::MAX))
 }
 
-/// The handle under `at` on a field occupying `rect`, if any.
-fn handle_under(look: &SpaceLook, rect: Rect, at: Point) -> Option<usize> {
-    look.dots.iter().position(|dot| {
-        let (x, y) = field::place(*dot);
-        let cx = rect.left().0 + x as f32 * rect.size.width.0;
-        let cy = rect.top().0 + y as f32 * rect.size.height.0;
-        (at.x.0 - cx).hypot(at.y.0 - cy) <= HANDLE_RADIUS
-    })
-}
-
-/// The pointer's place on the field as fractions across and down.
-fn fractions(rect: Rect, at: Point) -> (f64, f64) {
-    let share = |offset: f32, length: f32| {
-        if length > 0.0 {
-            f64::from(offset / length)
-        } else {
-            0.0
-        }
-    };
-    (
-        share(at.x.0 - rect.left().0, rect.size.width.0),
-        share(at.y.0 - rect.top().0, rect.size.height.0),
-    )
-}
-
-/// A dioxus client point as a layout point.
-fn point(at: dioxus::html::geometry::ClientPoint) -> Point {
-    Point {
-        x: Px(at.x as f32),
-        y: Px(at.y as f32),
-    }
-}
-
-/// A percentage for an inline `left` or `top`.
-fn percent(share: f64) -> String {
-    format!("{:.2}%", share * 100.0)
-}
-
 /// The Space editor panel.
 ///
 /// Controlled: every edit is emitted as a whole new [`SpaceLook`] through `onchange`, and the
@@ -114,6 +71,12 @@ fn percent(share: f64) -> String {
 /// handle or a stop inside the editor moves it until the consumer passes a different one, and
 /// reports it through `on_active_dot` so the consumer can pass it back. `name` titles the panel
 /// "{name} Space" (section 32 markup); without one it reads "Space".
+///
+/// Three rows are the consumer's to switch on, each absent by default: `on_rename` makes the
+/// title an inline field holding `name`, each keystroke reported; `motion` adds a Motion row
+/// (the Space's own motion, which the consumer feeds to its root's `appearance.motion`);
+/// `measured: MeasuredIn::EachScheme` measures the contrast in each scheme the Space's theme
+/// can show, each under its own heading, where the default measures the scheme it is drawn in.
 #[component]
 pub fn SpaceEditor(
     look: SpaceLook,
@@ -122,6 +85,9 @@ pub fn SpaceEditor(
     onchange: EventHandler<SpaceLook>,
     #[props(default)] name: Option<String>,
     #[props(default)] on_active_dot: Option<EventHandler<ActiveDot>>,
+    #[props(default)] on_rename: Option<EventHandler<String>>,
+    #[props(default)] motion: Option<MotionChoice>,
+    #[props(default)] measured: MeasuredIn,
 ) -> Element {
     let picked = use_signal(|| None::<(DotIndex, DotIndex)>);
     let picker = Picker {
@@ -129,20 +95,11 @@ pub fn SpaceEditor(
         prop: active_dot,
         report: on_active_dot,
     };
-    let title = match name {
-        Some(name) => format!("{name} Space"),
-        None => "Space".to_string(),
-    };
     let dots = look.dots.len();
     let current = active(active_dot, picked(), dots);
-    let palette = derive(&look.dots, scheme);
-    let swatch = gradient(&palette);
     rsx! {
         aside { class: "ds-space-editor", "aria-label": "Space editor",
-            h3 { class: "ds-space-editor-title",
-                span { class: "ds-space-swatch", style: "background:{swatch}" }
-                "{title}"
-            }
+            Title { dots: look.dots.clone(), scheme, name, on_rename }
             div {
                 SectionHeader { kind: HeaderKind::Field, text: "Colour", value: "drag a dot".to_string() }
                 Field { look: look.clone(), scheme, current, picker, onchange }
@@ -161,6 +118,9 @@ pub fn SpaceEditor(
                     },
                 }
             }
+            if let Some(choice) = motion {
+                MotionRow { choice }
+            }
             div {
                 SectionHeader { kind: HeaderKind::Field, text: "Accent inside the card" }
                 SegmentedControl::<CardAccent> {
@@ -177,137 +137,10 @@ pub fn SpaceEditor(
                 }
             }
             Presets { look: look.clone(), scheme, picker, onchange }
-            Checks { look, scheme }
-        }
-    }
-}
-
-/// The hue x chroma plane and its handles.
-#[component]
-fn Field(
-    look: SpaceLook,
-    scheme: Scheme,
-    current: usize,
-    picker: Picker,
-    onchange: EventHandler<SpaceLook>,
-) -> Element {
-    let drag = use_drag::<usize>(NO_THRESHOLD);
-    let mut element = use_signal(|| None::<Rc<MountedData>>);
-    let mut bounds = use_signal(|| None::<Rect>);
-    let palette = derive(&look.dots, scheme);
-    let plane = field::plane(scheme);
-    let look_down = look.clone();
-    let look_move = look.clone();
-    rsx! {
-        div {
-            class: "ds-field",
-            onmounted: move |event| element.set(Some(event.data())),
-            onpointerdown: move |event| {
-                let at = point(event.client_coordinates());
-                let look = look_down.clone();
-                let Some(mounted) = element() else { return };
-                spawn(async move {
-                    let Some(rect) = client_rect(&mounted).await else { return };
-                    bounds.set(Some(rect));
-                    let index = handle_under(&look, rect, at).unwrap_or(current);
-                    picker.pick(dot_index(index));
-                    drag.down(index, at);
-                    let (x, y) = fractions(rect, at);
-                    onchange.call(edit::moved(&look, index, field::dot_at(x, y)));
-                });
-            },
-            onpointermove: move |event| {
-                let (DragPhase::Pending { key, .. } | DragPhase::Live { key, .. }) = drag.phase() else {
-                    return;
-                };
-                let at = point(event.client_coordinates());
-                drag.moved(at);
-                if let Some(rect) = bounds() {
-                    let (x, y) = fractions(rect, at);
-                    onchange.call(edit::moved(&look_move, key, field::dot_at(x, y)));
-                }
-            },
-            onpointerup: move |_| {
-                drag.up();
-            },
-            div { class: "ds-field-plane", style: "background-image:url({plane.colours})" }
-            div { class: "ds-field-dots", style: "background-image:url({plane.dots})" }
-            for (index, dot) in look.dots.iter().copied().enumerate() {
-                Handle {
-                    key: "{index}",
-                    index,
-                    left: percent(field::place(dot).0),
-                    top: percent(field::place(dot).1),
-                    fill: palette.picked.get(index).cloned().unwrap_or_default(),
-                    text: format!("{}°, {}%", dot.hue.round(), (dot.chroma * 100.0).round()),
-                    on: if index == current { Switch::On } else { Switch::Off },
-                    onkey: {
-                        let look = look.clone();
-                        move |nudge: Nudge| {
-                            picker.pick(dot_index(index));
-                            onchange.call(edit::nudged(&look, index, nudge));
-                        }
-                    },
-                }
+            match measured {
+                MeasuredIn::ThisScheme => rsx! { Checks { look, scheme } },
+                MeasuredIn::EachScheme => rsx! { EachScheme { look } },
             }
-        }
-    }
-}
-
-/// One draggable dot: a slider over hue and chroma, moved by arrow keys.
-#[component]
-fn Handle(
-    index: usize,
-    left: String,
-    top: String,
-    fill: String,
-    text: String,
-    on: Switch,
-    onkey: EventHandler<Nudge>,
-) -> Element {
-    let number = index + 1;
-    rsx! {
-        div {
-            class: "ds-handle",
-            role: "slider",
-            tabindex: "0",
-            "aria-label": "Colour {number}",
-            "aria-valuetext": "{text}",
-            "aria-pressed": on.aria(),
-            style: "left:{left};top:{top};background:{fill}",
-            onkeydown: move |event| {
-                if let Some(nudge) = Nudge::of(&event.key()) {
-                    event.prevent_default();
-                    onkey.call(nudge);
-                }
-            },
-        }
-    }
-}
-
-/// One Space's dot in the sidebar foot.
-#[component]
-pub fn SpaceDot(
-    name: String,
-    frame: FrameVars,
-    here: Here,
-    shortcut: Shortcut,
-    onclick: EventHandler<()>,
-) -> Element {
-    let pressed = match here {
-        Here::Current => Switch::On,
-        Here::Elsewhere => Switch::Off,
-    };
-    let keys = shortcut.glyphs();
-    rsx! {
-        button {
-            r#type: "button",
-            class: "ds-space-dot",
-            "aria-pressed": pressed.aria(),
-            "aria-label": "{name} Space",
-            title: "{name} ({keys})",
-            style: "background:{frame.gradient}",
-            onclick: move |_| onclick.call(()),
         }
     }
 }

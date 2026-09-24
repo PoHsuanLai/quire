@@ -70,6 +70,19 @@ pub enum Switch {
     Off,
 }
 
+/// Whether the menu, popover or disclosure a control opens is showing: `aria-expanded`.
+///
+/// Its own type rather than a [`Switch`]: a toggle's pressed state and a trigger's open state
+/// are different facts, and a control can carry both.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Expanded {
+    /// What it controls is showing.
+    Open,
+    /// What it controls is hidden.
+    #[default]
+    Closed,
+}
+
 /// A menu item's check mark: `aria-checked`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Check {
@@ -280,6 +293,16 @@ impl Switch {
         match self {
             Switch::On => Switch::Off,
             Switch::Off => Switch::On,
+        }
+    }
+}
+
+impl Expanded {
+    /// The `aria-expanded` word.
+    pub(crate) fn aria(self) -> &'static str {
+        match self {
+            Expanded::Open => "true",
+            Expanded::Closed => "false",
         }
     }
 }

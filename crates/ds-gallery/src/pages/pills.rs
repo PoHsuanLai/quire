@@ -1,6 +1,7 @@
 //! The overlays page's second half: hover cards and tooltips, the selection bubble, the toast,
 //! the link pill and the send pill.
 
+use super::outbox::Outbox;
 use super::{Section, Specimen};
 use crate::axes::Showcase;
 use dioxus::prelude::*;
@@ -173,7 +174,7 @@ pub fn Pills(showcase: Showcase) -> Element {
                 span { class: "g-code", "last undo: {toasts.last_undo().map_or(\"none\".to_string(), |token| token.0.to_string())}" }
             }
         }
-        Section { title: "LinkPill and SendPill", note: "Each sits at its surface's edge; here each surface is a stage.",
+        Section { title: "LinkPill and SendPill", note: "Each sits at its surface's edge; here each surface is a stage. The outbox states: Cancel for a held send, the spinning ring while it waits, a failed mood (nudge, shake, fatal) played once on demand, and a refusal on a second line.",
             div { class: "g-grid3",
                 Specimen { name: "honest link",
                     div { class: "g-stage",
@@ -188,6 +189,7 @@ pub fn Pills(showcase: Showcase) -> Element {
                 Specimen { name: "send, live",
                     div { class: "g-stage", Countdown { showcase } }
                 }
+                Outbox {}
             }
         }
     }
