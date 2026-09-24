@@ -39,9 +39,9 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             label,
             help,
             section,
-            range,
             unit,
             advanced,
+            hint,
         } = attrs
         else {
             // `#[settings(skip)]`: a catch-all field such as `extra: toml::Table`, not a key.
@@ -53,7 +53,9 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
         } else {
             quote! { ::ds_settings::schema::Exposure::Basic }
         };
-        let kind = kind_expr(&field.ty, range, unit.as_deref())?;
+        let shape = shape_of(&field_ident.to_string(), &field.ty, hint)
+            .map_err(|reason| syn::Error::new(field.ty.span(), reason))?;
+        let kind = kind_expr(shape, &field.ty, unit.as_deref());
         pushes.push(quote! {
             key.push(::ds_settings::schema::KeySpec {
                 path: ::ds_settings::schema::KeyPath(#path.to_owned()),
@@ -86,15 +88,10 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
     })
 }
 
-/// The `KeyKind` expression for one field, from its type and its `#[settings(...)]`.
-fn kind_expr(
-    ty: &syn::Type,
-    range: Option<(i64, i64)>,
-    unit: Option<&str>,
-) -> syn::Result<TokenStream> {
-    Ok(match shape_of(ty, range.is_some()) {
-        Shape::Bounded => {
-            let (min, max) = range.expect("Shape::Bounded only returns when range is Some");
+/// The `KeyKind` expression for one field, from its shape, type and unit.
+fn kind_expr(shape: Shape, ty: &syn::Type, unit: Option<&str>) -> TokenStream {
+    match shape {
+        Shape::Bounded { min, max } => {
             let unit = match unit {
                 Some(unit) => quote! { ::std::option::Option::Some(#unit.to_owned()) },
                 None => quote! { ::std::option::Option::None },
@@ -111,5 +108,70 @@ fn kind_expr(
             }
         }
         Shape::EnumType => quote! { ::ds_settings::schema::kind_of::<#ty>() },
-    })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    //! The compile errors a malformed struct gets, checked on the expansion itself: there is
+    //! no `trybuild` in this workspace's lockfile to drive a UI test instead.
+
+    use super::expand;
+
+    fn expanded(source: &str) -> syn::Result<proc_macro2::TokenStream> {
+        let input: syn::DeriveInput =
+            syn::parse_str(source).unwrap_or_else(|e| panic!("{source}: {e}"));
+        let syn::Data::Struct(data) = &input.data else {
+            panic!("{source}: not a struct");
+        };
+        expand(&input, data)
+    }
+
+    const HEAD: &str = "#[settings(file = \"a/s.toml\", domain = \"d\", page = Page::Dock)]";
+
+    #[test]
+    fn a_number_without_a_range_is_missing_range_naming_the_field() {
+        const CASES: &[(&str, &str)] = &[
+            ("u8", "size"),
+            ("Px", "gap_px"),
+            ("ds_settings::Ms", "delay_ms"),
+        ];
+        for (ty, field) in CASES {
+            let source = format!("{HEAD} struct S {{ #[settings(label = \"L\")] {field}: {ty} }}");
+            let err = expanded(&source).err().map(|e| e.to_string());
+            let want = format!("MissingRange {{ field: {field} }}");
+            assert!(
+                err.as_deref().is_some_and(|e| e.starts_with(&want)),
+                "{ty}: {err:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn text_fields_are_text_by_type_or_attribute() {
+        const CASES: &[&str] = &[
+            "#[settings(label = \"L\")] f: String",
+            "#[settings(label = \"L\")] f: std::path::PathBuf",
+            "#[settings(label = \"L\")] f: Cow<'static, str>",
+            "#[settings(label = \"L\", text)] f: SoundTheme",
+        ];
+        for field in CASES {
+            let source = format!("{HEAD} struct S {{ {field} }}");
+            let tokens = expanded(&source).unwrap_or_else(|e| panic!("{field}: {e}"));
+            let text = tokens.to_string();
+            assert!(text.contains("KeyKind :: Text"), "{field}: {text}");
+        }
+    }
+
+    #[test]
+    fn a_number_with_a_range_is_bounded() {
+        let source = format!(
+            "{HEAD} struct S {{ #[settings(label = \"L\", range = \"1..=9\", unit = \"px\")] f: Px }}"
+        );
+        let text = expanded(&source)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .to_string();
+        assert!(text.contains("KeyKind :: Bounded"), "{text}");
+        assert!(text.contains("min : 1i64"), "{text}");
+    }
 }

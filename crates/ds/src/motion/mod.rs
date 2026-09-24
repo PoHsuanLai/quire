@@ -2,6 +2,7 @@
 //! state machines that decide what moves (design/05-MOTION.md, design/06-INTERACTIONS.md).
 
 pub mod anim;
+pub mod curve;
 pub mod drag;
 pub mod hover_intent;
 pub mod presence;

@@ -554,3 +554,66 @@ against the matching `--snapshot` PNG by eye (PNG snapshots are review artefacts
 gate — rasterisation drifts with Blitz revisions, per `DESIGN.md`'s "Moves verbatim" notes) —
 that is the fastest way to catch a component you have subtly mis-wired (wrong `Material`, a
 missing `Surface`, an icon at the wrong `IconSize`).
+
+## 11. Menu tracking, curves, Spaces store
+
+Three pure pieces a shell needs beside the components, and the generic settings file API they
+sit on.
+
+**Menu tracking** (`ds::MenuTrack<K>`, `crates/ds/src/overlay/menu_track.rs`; design/13
+§13.3.2-13.5). One machine drives bar menus and every ds `Menu`: open on press, click mode,
+press-drag-release, hover switch between open menus, the submenu delay and the safe triangle.
+`K` is your menu key (a bar title id). Feed it events with the time; perform what it returns,
+in order.
+
+```rust
+use ds::{MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent};
+use std::time::Instant;
+
+let track: MenuTrack<u32> = MenuTrack::new(MenuTiming::default()); // 200 ms delay, 300 ms triangle
+let (track, effects) = track.step(MenuTrackEvent::PressTitle(1), Instant::now());
+// effects == [MenuTrackEffect::Open(1, MenuAnim::Pop)]
+// RequestTick(at) asks for MenuTrackEvent::Tick at `at`; SubPlaced{top, bottom} reports a
+// submenu's near-edge corners so the safe triangle can arm.
+```
+
+Build `MenuTiming` from `menus.submenu_delay_ms` and `menus.submenu_triangle_timeout_ms`. Arrow
+keys inside a menu, wrap, disabled skipping and filtering stay with the `Menu` component; the
+machine takes `MenuKey::{Escape, Left, Right, Enter}` (map Space and Tab to `Enter`).
+
+**Curves** (`crates/ds/src/motion/curve.rs`). For motion you drive from a frame clock rather
+than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in thousandths at time
+`t` (thousandths). `Easing::curve()` gives the `CubicBezier` (`linear` is `(0,0,1,1)`), and
+`CubicBezier::at` evaluates it. Integer arithmetic throughout; a spring's overshoot reads above
+1000.
+
+**Spaces store** (`ds::SpaceStore`, `crates/ds/src/space/store.rs`; design/21 §4, §10). Which
+look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
+up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
+`store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
+`spaces.default_grain` and `spaces.default_card_accent`. `store.with_look(&workspace, look)`
+records a look under the id (when there is one) and always under the position.
+
+**Settings files** (`ds_settings::file`, `ds_settings::watch`). Declare a file once and load,
+save and watch it:
+
+```rust
+use ds_settings::{AppName, FileName, Format, Settings, SPACES, config_dir};
+
+let dir = config_dir(AppName::QUIRE).expect("a config dir");
+let store = SPACES.load(&dir);            // lenient: a bad key costs only itself
+SPACES.save(&dir, &store)?;               // atomic temp-and-rename
+let mut watch = SPACES.watch(&dir)?;      // 30 ms debounce; needs a Tokio runtime
+// Your own file, the same way:
+const SHELL: Settings<ShellFile> = Settings::new(FileName("settings.toml"), Format::Toml);
+```
+
+`ds_settings::{load, save, watch}` keep meaning `appearance.toml` (`APPEARANCE`); the generic
+functions are `file::load(&SettingsFile)`, `file::save(&SettingsFile, &T)` and
+`watch_file(SettingsFile)`.
+
+**Settings derive, three more shapes.** Text is recognised by type (`String`, `PathBuf`,
+`Cow<str>`) or by `#[settings(text)]` on a newtype. A one-variant enum is a key
+(`KeyKind::Fixed`, drawn as a read-only `Widget::Readout`). A number without
+`range = "min..=max"` is a compile error that starts `MissingRange { field: <name> }`; a type
+the derive cannot place at all gets an error saying what to add.

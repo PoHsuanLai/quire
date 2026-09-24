@@ -35,6 +35,73 @@ where
     toml::Value::Table(tree).try_into().unwrap_or_default()
 }
 
+/// [`lenient`] for a JSON file (`spaces.json`): the same key-by-key overlay on `T`'s default,
+/// over JSON objects. An array is one value, as in TOML; a type that wants each element read on
+/// its own says so in its own `Deserialize` (`ds::SpaceStore::by_index`).
+pub fn lenient_json<T>(text: &str) -> T
+where
+    T: Serialize + DeserializeOwned + Default,
+{
+    use serde_json::Value;
+    let Ok(Value::Object(given)) = serde_json::from_str::<Value>(text) else {
+        return T::default();
+    };
+    let Ok(Value::Object(mut tree)) = serde_json::to_value(T::default()) else {
+        return T::default();
+    };
+    for (path, value) in json_leaves(&given, Vec::new()) {
+        let mut candidate = tree.clone();
+        json_set(&mut candidate, &path, value);
+        if serde_json::from_value::<T>(Value::Object(candidate.clone())).is_ok() {
+            tree = candidate;
+        }
+    }
+    serde_json::from_value(Value::Object(tree)).unwrap_or_default()
+}
+
+/// Every non-object value in `object` with its key path, depth first.
+fn json_leaves(
+    object: &serde_json::Map<String, serde_json::Value>,
+    prefix: Vec<String>,
+) -> Vec<(Vec<String>, serde_json::Value)> {
+    object
+        .iter()
+        .flat_map(|(key, value)| {
+            let mut path = prefix.clone();
+            path.push(key.clone());
+            match value {
+                serde_json::Value::Object(inner) if !inner.is_empty() => json_leaves(inner, path),
+                other => vec![(path, other.clone())],
+            }
+        })
+        .collect()
+}
+
+/// Put `value` at `path` in `tree`, replacing a non-object on the way with an object.
+fn json_set(
+    tree: &mut serde_json::Map<String, serde_json::Value>,
+    path: &[String],
+    value: serde_json::Value,
+) {
+    match path {
+        [] => {}
+        [last] => {
+            tree.insert(last.clone(), value);
+        }
+        [first, rest @ ..] => {
+            let entry = tree
+                .entry(first.clone())
+                .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+            if !entry.is_object() {
+                *entry = serde_json::Value::Object(serde_json::Map::new());
+            }
+            if let serde_json::Value::Object(inner) = entry {
+                json_set(inner, rest, value);
+            }
+        }
+    }
+}
+
 /// Every non-table value in `table` with its key path, depth first.
 fn leaves(table: &toml::Table, prefix: Vec<String>) -> Vec<(Vec<String>, toml::Value)> {
     table

@@ -7,6 +7,7 @@ pub mod frame_vars;
 pub mod look;
 pub mod palette;
 pub mod presets;
+pub mod store;
 
 pub use contrast::{Verdict, ratio};
 pub use frame_vars::FrameVars;
@@ -16,3 +17,4 @@ pub use palette::{
     gradient, readout, swatch,
 };
 pub use presets::{PRESETS, Preset, default_look};
+pub use store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex};

@@ -3,12 +3,17 @@
 
 pub mod host;
 pub mod hover_hub;
+pub mod menu_track;
 pub mod pull_tab;
 pub mod stack;
 pub mod toast_hub;
 
 pub use host::{OverlayHost, OverlayId, Overlays, use_overlays};
 pub use hover_hub::{HoverHub, HoverKey, HoverKind, HoverWarmth, use_hover_hub};
+pub use menu_track::{
+    ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
+    MenuTrackEffect, MenuTrackEvent,
+};
 pub use pull_tab::{Pull, PullPhase, PullTab, TabArm};
 pub use stack::{Dismissal, LayerId, LayerStack};
 pub use toast_hub::{ToastHub, ToastState, UndoToken, use_toast_hub};
