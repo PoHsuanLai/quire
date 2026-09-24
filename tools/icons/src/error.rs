@@ -9,6 +9,9 @@ pub enum IconsError {
     /// A family name on the command line that 08-ICONS 2.3 does not define.
     #[error("unknown plate family {0:?} (red, amber, green, blue, violet, paper)")]
     UnknownFamily(String),
+    /// An abstract icon spec is not valid TOML or names something the vocabulary lacks.
+    #[error("spec: {0}")]
+    Spec(#[from] toml::de::Error),
     /// Reading or writing an image failed.
     #[error("image: {0}")]
     Image(#[from] image::ImageError),

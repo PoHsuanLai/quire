@@ -1,0 +1,35 @@
+# Files: two offset paper tabs, the back one tinted, the front one paper with an ink label.
+name = "files"
+family = "amber"
+grain = 30
+
+[[layer]]
+kind = "rect"
+at = [7.5, 4.5]
+size = [12.5, 11.5]
+corners = [2, 2, 2.5, 1]
+fill = "soft"
+lift = "lifted"
+
+# Front folder: its tab, then its body over the tab's foot.
+[[layer]]
+kind = "rect"
+at = [4, 7.5]
+size = [7, 4]
+corners = [1.5, 1.5, 0, 0]
+fill = "paper"
+lift = "lifted"
+
+[[layer]]
+kind = "rect"
+at = [4, 9.5]
+size = [14.5, 10]
+corners = [0, 2.5, 2.5, 1]
+fill = "paper"
+lift = "lifted"
+
+[[layer]]
+kind = "bar"
+from = [7.5, 15.5]
+to = [12.5, 15.5]
+stroke = "ink"

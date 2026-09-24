@@ -1292,6 +1292,26 @@ weight licences: `docs/licensing-references.md`. The user picks the model.
   a server started as a background task of the agent dies with it. Start it with `setsid` so
   it survives, and stop it by its `agent-limit16-*` scope as the README says.
 
+## Icon round two: abstract (2026-09-24)
+
+The user found round one "too realistic" and asked for abstract icons in the design language.
+Branch `icon-round2`; write-up `docs/icons-bakeoff.md` "Round two"; the language is 08-ICONS 2.8.
+
+- **The models go flat when asked, but do not keep our rules.** With a flat paper-cut-out brief
+  on a mid-grey ground, Klein and Qwen both dropped the clay look, but Klein outlines everything
+  in black at its own weight and Qwen drifts back to bevels and drop shadows; neither holds the
+  2-unit round-capped stroke or the four-colour rule. Qwen drew the first real terminal
+  (a `>` and a bar) and failed notes on every seed (a green sheet on the green plate).
+- **A mid-grey ground keys cleanly.** Round one's light-grey ground ate white rims; with mid grey
+  every round-two render keyed without loss, paper white and ink both.
+- **"Prompt caret" and "chevron" are ambiguous to the models.** Klein drew down-pointing double
+  chevrons until the prompt said "right-pointing, like a greater-than sign".
+- **Procedural icons from the tokens** (`tools/icons abstract`, TOML specs, six shape kinds as
+  signed distances) are coherent by construction, render every export size natively in about
+  3 s for the set, and stay crisp at 16 px. The cost is designing each arrangement by hand.
+- **A circle over a hill in a rounded frame reads as a person at 16 px** (Klein photos). Keep
+  the sun off-centre, as the procedural photos spec does.
+
 ## macOS polish (2026-09-24)
 
 The user compared the shell with macOS and found it flat; the brief was to add the layers macOS

@@ -1,0 +1,22 @@
+# Mail: a folded paper flap over a paper rectangle (design/08-ICONS.md 2.8).
+# Coordinates are the 24-unit glyph grid laid over the plate; the safe area is 2.4..21.6.
+name = "mail"
+family = "blue"
+grain = 30
+
+# The envelope: paper with Post's card corner (3, 3, 3, 1 in this grid).
+[[layer]]
+kind = "rect"
+at = [4, 6]
+size = [16, 12.5]
+corners = [2.5, 2.5, 2.5, 1]
+fill = "paper"
+lift = "lifted"
+
+# The flap: a cut-out triangle in the plate's deep tone, laid on the paper.
+[[layer]]
+kind = "polygon"
+points = [[5.1, 6.9], [18.9, 6.9], [12, 13]]
+round = 0.9
+fill = "deep"
+lift = "lifted"
