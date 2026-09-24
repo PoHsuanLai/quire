@@ -27,12 +27,24 @@ use std::time::Duration;
 /// More rounds than this without the document settling is a render loop in the app.
 const MAX_ROUNDS: usize = 64;
 
+/// Whether a document is laid out as it renders: a shell surface is not until it is mapped.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub(crate) enum Layout {
+    /// Styled and laid out every frame.
+    #[default]
+    Running,
+    /// Rendered (components run, tasks are polled) but never styled or laid out: a surface
+    /// whose document was built before the compositor mapped it (sill FINDINGS Q60).
+    Held,
+}
+
 /// A headless document and what drives it.
 pub(crate) struct Headless {
     pub(crate) doc: DioxusDocument,
     modality: Signal<InputModality>,
     wakeup: Arc<Wakeup>,
     viewport: Viewport,
+    pub(crate) layout: Layout,
 }
 
 impl Headless {
@@ -61,6 +73,7 @@ impl Headless {
             modality,
             wakeup,
             viewport,
+            layout: Layout::Running,
         }
     }
 
@@ -94,6 +107,9 @@ impl Headless {
     pub(crate) fn frame(&mut self, at: Duration) {
         for _ in 0..MAX_ROUNDS {
             let rendered = self.flush();
+            if self.layout == Layout::Held {
+                return;
+            }
             let restyled = scheme::follow_root(&mut self.doc.inner.borrow_mut()).is_some();
             let fetched = self.wakeup.fetched();
             self.doc.inner.borrow_mut().resolve(at.as_secs_f64());
