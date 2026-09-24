@@ -19,9 +19,15 @@
 .ds-menu-trail .ds-ic{ color:var(--accent); }
 .ds-menu-item[*|aria-checked=true] .ds-menu-title{ color:var(--ink); }
 
-/* Slim, and Context which is Slim. */
+/* Slim, and Context which is Slim: a text menu at the shell scale (the macOS polish pass,
+   design/13 section 13.3.3, settled 2026-09-24): 22 px rows (`--shell-menu-row`), 13 px text
+   at 400, the 22 px check column, and the selection an inset highlight at 6 px
+   (`--r-shell-highlight`). A row with a detail line grows past the minimum. */
 .ds-menu[*|data-kind=slim] .ds-menu-item,
-.ds-menu[*|data-kind=context] .ds-menu-item{ grid-template-columns:22px 1fr auto; padding:var(--s-6) var(--s-8); }
+.ds-menu[*|data-kind=context] .ds-menu-item{ grid-template-columns:22px 1fr auto; gap:var(--s-4); padding:0 var(--s-8) 0 var(--s-2); min-height:var(--shell-menu-row);
+  border-radius:var(--r-shell-highlight); font-size:var(--fs-shell-menu); }
+.ds-menu[*|data-kind=slim] .ds-menu-title,
+.ds-menu[*|data-kind=context] .ds-menu-title{ font-size:var(--fs-shell-menu); font-weight:400; }
 .ds-menu[*|data-kind=slim] .ds-menu-tile,
 .ds-menu[*|data-kind=context] .ds-menu-tile{ width:22px; height:22px; border:0; background:transparent; }
 
@@ -29,8 +35,8 @@
 .ds-menu[*|data-embed=palette] .ds-menu-detail{ max-width:380px; }
 
 /* Dropdown: a check column, C's hover. Its keyboard selection is not specified; it looks like
-   hover. */
-.ds-menu[*|data-kind=dropdown] .ds-menu-item{ display:flex; align-items:center; gap:var(--s-8); padding:var(--s-6) var(--s-9); border-radius:var(--r-btn); font-size:var(--fs-control); color:var(--ink-soft);
+   hover. Rows, text and highlight at the shell scale, as Slim's. */
+.ds-menu[*|data-kind=dropdown] .ds-menu-item{ display:flex; align-items:center; gap:var(--s-8); padding:0 var(--s-9); min-height:var(--shell-menu-row); border-radius:var(--r-shell-highlight); font-size:var(--fs-shell-menu); color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item:hover,
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }

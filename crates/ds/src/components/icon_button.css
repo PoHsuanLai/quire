@@ -47,9 +47,10 @@
    and `--bar-status-glyph` (`ds::StatusMetrics`); the fallbacks are the keys' defaults, 22 and
    16. The glyph is sized here, not by its attributes, because the size is a setting: Blitz and
    browsers let a CSS width override an `svg`'s presentation width. Inks on the frame as the Foot
-   button's; pressed and open on `--f-pill`, the open title's pill. */
+   button's; pressed and open on `--f-pill`, the open title's pill. The pill's radius is the
+   shell scale's 4 px bar-item radius (`--r-shell-bar-item`, the macOS polish pass). */
 .ds-icon-button[*|data-variant=status]{
-  display:inline-grid; place-items:center; width:var(--bar-status-box,22px); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-item);
+  display:inline-grid; place-items:center; width:var(--bar-status-box,22px); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
   background:transparent; color:var(--f-ink-soft); cursor:pointer;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }

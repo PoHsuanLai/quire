@@ -26,7 +26,7 @@ use crate::components::vocab::Availability;
 use crate::focus::request::FocusRequest;
 use crate::geometry::{MountedRef, Point, Rect};
 use crate::motion::anim::Anim;
-use crate::tokens::ZLayer;
+use crate::tokens::{Corner, ZLayer};
 use dioxus::prelude::*;
 
 /// Where the palette draws.
@@ -86,6 +86,8 @@ impl PaletteEntrance {
 /// first choice included. `on_select_rect` hears the selected row's rect, in client
 /// coordinates, whenever the selection or the row under it changes: what an actions menu
 /// anchors to. `onkey` hears every key the field gets, after the palette has read it.
+/// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
+/// radius; absent, it keeps `--r-panel`.
 #[component]
 pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     label: String,
@@ -105,6 +107,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] on_select: Option<EventHandler<usize>>,
     #[props(default)] on_select_rect: Option<EventHandler<Rect>>,
     #[props(default)] onkey: Option<EventHandler<KeyboardData>>,
+    #[props(default)] corner: Option<Corner>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
     let presence = use_entrance(entrance.anim());
@@ -198,6 +201,8 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             "data-host": host.slug(),
             "data-entrance": entrance.slug(),
             "data-presence": presence.slug(),
+            "data-corner": corner.and_then(Corner::attribute),
+            style: corner.map(card_corner),
             onpointerdown: move |event| event.stop_propagation(),
             SearchField {
                 label: label.clone(),
@@ -219,6 +224,14 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
         }
     };
     hosted(host, float, card, onclose)
+}
+
+/// The card's own corner: its radius, and a squircle's extent and shadow circle.
+fn card_corner(corner: Corner) -> String {
+    match corner {
+        Corner::Squircle(_) => corner.squircle_style(),
+        Corner::Token(_) | Corner::Px(_) => format!("border-radius:{};", corner.css()),
+    }
 }
 
 /// The card where `host` draws it: in place, or on the palette layer over its scrim, which

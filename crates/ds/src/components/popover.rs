@@ -317,7 +317,15 @@ pub(crate) fn use_entrance(anim: Anim) -> Presence {
     }
 }
 
-/// A floating surface.
+/// Whether a popover is on its way out.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Leaving {
+    Staying,
+    Fading,
+}
+
+/// A floating surface. Escape or a click outside fades it out over `--t-quick` before
+/// `onclose` runs.
 #[component]
 pub fn Popover(
     anchor: Anchor,
@@ -332,19 +340,34 @@ pub fn Popover(
     let float = use_float(layer, Stacking::Layer(dismiss));
     let at = float.origin(float.anchor_rect(&anchor), placement, gap);
     let probe = float.surface();
+    // Escape and an outside click fade the popover out, then close it, as a menu does (the
+    // macOS polish pass; `Anim::MenuOut`, `--t-quick`).
+    let fade = use_motion_timer(Anim::MenuOut);
+    let mut leaving = use_signal(|| Leaving::Staying);
+    let close = EventHandler::new(move |()| {
+        if *leaving.peek() == Leaving::Staying {
+            leaving.set(Leaving::Fading);
+            fade.start(onclose);
+        }
+    });
+    let presence = match leaving() {
+        Leaving::Fading => Some("leaving"),
+        Leaving::Staying => None,
+    };
     float.show(
         rsx! {
             div {
                 class: "ds-popover",
                 "data-elevation": elevation.slug(),
                 "data-layer": layer_slug(layer),
+                "data-presence": presence,
                 style: position_style(at),
                 onmounted: move |event| probe.on_mounted(event),
-                onkeydown: move |event| escape_closes(float, &event, onclose),
+                onkeydown: move |event| escape_closes(float, &event, close),
                 {children}
             }
         },
-        onclose,
+        close,
     );
     rsx! {}
 }
