@@ -158,9 +158,15 @@ impl Tracker {
     /// Left or Escape with a submenu open: close it, and take the focus back from it.
     pub(crate) fn close_sub(&self) {
         self.feed(MenuTrackEvent::Key(MenuKey::Left));
+        self.refocus();
+    }
+
+    /// Give the panel the focus back, a frame from now: the key or click that asked for it is
+    /// still being handled, and the renderer holds the document until it is (FINDINGS "W2
+    /// integration"). Used after a submenu closes, and after a pick that keeps the menu open
+    /// (Blitz ends a click on a plain element by clearing the focus).
+    pub(crate) fn refocus(&self) {
         if let Some(panel) = self.panel.peek().clone() {
-            // A frame later: the key that closed the submenu is still being handled, and the
-            // renderer holds the document until it is (FINDINGS "W2 integration").
             spawn(async move {
                 sleep(FRAME_SLACK).await;
                 let _ = crate::focus::host::focus_element(&panel.0).await;

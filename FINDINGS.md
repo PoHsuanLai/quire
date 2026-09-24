@@ -2030,7 +2030,7 @@ variant (a `match` over `Provider`, `ButtonVariant`, `InputVariant` or `TextInpu
 new arm). No existing golden changed except `stylesheet.css`, which grew by the new rules.
 Proofs: `crates/ds/tests/mailo_gaps4_ssr.rs` (goldens beside each component's, so the controls'
 and lists' class scans cover them), `crates/ds-native/tests/mailo_fields.rs` and
-`motion_levels.rs`, and `crates/ds/tests/snippet_forms.rs`. CONSUMING.md "The mailo gaps 4" has
+`motion_levels.rs`, and `crates/ds/tests/snippet_forms.rs`. CONSUMING.md "The mailo gaps 4 (2026-09-25): controls" has
 one row per prop.
 
 1. **A local-folders account.** `Provider::Local` rather than a new `AccountFace` variant or an
@@ -2136,3 +2136,95 @@ What mailo changes (docs/mailo-migration.md section 2 has each row):
   `TextInputKind::File` with `on_pick`, a `textarea` `TextInputKind::Multiline`, and an input
   styled as its row `FieldFace::Bare`.
 - The Space editor's Motion row passes `motion_levels: MotionLevels::Contact`.
+
+
+## mailo gaps 4 (overlays and lists) (2026-09-25)
+
+mailo (on v0.1.5, 31 raw controls left) reported four more places where quire's overlays and
+lists kept pieces its own. Branch `mailo-gaps-4a`, one commit per item. Every change is
+additive: a new prop defaulting to the old behaviour, a new type or a new function. No existing
+golden changed (the stylesheet golden gained two rules). CONSUMING.md "The mailo gaps 4 (2026-09-25): overlays and lists" has
+one row per change, docs/mailo-migration.md section 2 the row for each mailo site. Proofs:
+`crates/ds-native/tests/mailo4_{strip,hover,menu,sidebar}.rs` (Harness), the goldens
+`lists/hover_strip/on-press`, `lists/sidebar_item/{place-named,place-drop-target,pinned-named}`,
+`overlays/hover_card/hook-keyed-{inline,unplaced,rect}` and
+`overlays/menu/{stay-checklist,inline-rich,inline-checklist}` (`crates/ds/tests/lists/mailo4.rs`,
+`overlays/mailo4.rs`), and the gallery's Lists and Overlays pages.
+
+1. **A strip press waited on a measurement.** A strip button's `onclick: EventHandler<Rect>`
+   only ran once `client_rect` resolved, so with no layout (a server render, a host whose
+   measurer answers nothing) a press did nothing, and an archive always waited a frame for a
+   read it does not need. `HoverStrip { on_press: Option<EventHandler<ActionId>> }` fires
+   synchronously inside the click, before the read; the measured `onclick` still follows when a
+   rect arrives. A new strip prop was chosen over changing `onclick`'s type (a
+   `Pressed { action, at: Placement }` payload) and over a new `StripAction` field: either would
+   break every `StripAction { .. }` literal (quire's gallery, its tests and mailo's rows), while
+   a defaulted prop breaks nothing, and the strip already carries its per-button state as props
+   (`expanded`, mailo gaps 2) for the same reason. Proof (`mailo4_strip.rs`): under a measurer
+   that answers `Unknown` for every element the click logs `press:archive` and nothing else;
+   with the harness's own measurer it logs `press:archive,rect`, press first.
+2. **Hover cards could only be keyed by quire's own target.** The hub was public but the anchor
+   book was not, so a caller feeding `HoverEvent::Over` from its own hooks got a card at the
+   overlay's corner with no way to place it, and mailo kept its own timer.
+   `use_hover_intent() -> HoverDriver` hands out the hub with the anchor book:
+   `over(key, kind, HoverAnchor)` files the anchor and feeds the machine (suppressed while a
+   peek, the palette or a menu is open, as a target is), `out()`, `press()`, `hub()`.
+   `HoverAnchor::{Rect(Rect), Element(MountedRef), Unplaced}`: `Unplaced` drops any stale rect
+   for the key, so the card opens at the overlay's top-left corner, which is where an
+   unanchored card already opened (the existing `tip-open` golden is unchanged). `HoverTarget`
+   now goes through the same driver, so there is one path into the machine. The anchor enum is
+   `HoverAnchor`, not `Anchor`: `ds::Anchor` (`Point`, `Rect`, `Mounted`) is the popover's and
+   has no unplaced case. `HoverCard { flow: Flow::Inline }` draws the card in the caller's
+   container (`position:static`, no `left`/`top`, `data-flow="inline"`) with the same markup,
+   entrance and card hooks, for a test with no layout or a page that shows a card as part of
+   itself. Proofs (`mailo4_hover.rs`): hook-keyed `li`s with a measured element anchor open a
+   side card 10 right of the item and 6 above it after the wait (none at 400 ms) and switch
+   within 60 ms while warm; a rect anchor from the pointer event opens a sender card at its x,
+   6 below it; under a measurer that answers nothing, with `Unplaced` and `Flow::Inline`, the
+   card is absent at 400 ms, present in its slot at 500 ms with no `style`, not yet leaving 100
+   ms after the pointer left, leaving at 200 ms, gone at 450 ms, reopened at once within the
+   warm window, and removed at once by a press. The SSR goldens assert the same card with no
+   renderer at all.
+3. **Every pick closed a menu, and every menu floated.**
+   - `Menu { dismiss: PickDismiss::{Close, Stay} }` (default `Close`): under `Stay` a pick calls
+     `onpick` only; the caller flips the row's `check` and the menu re-renders with the cursor
+     where it was. design/06 section 5 already names the behaviour (C's properties and label
+     picker "toggle and stay open"). Blitz ends a click on an element with no default action by
+     clearing the focus (`blitz-dom` `handle_click`), which left a Stay menu deaf to Up, Down
+     and Enter after a pointer pick; a Stay menu that floats and holds the keyboard
+     (`Cursor::Auto`) therefore takes the focus back a frame after a pick
+     (`Tracker::refocus`, the path a closed submenu already used). Preventing the click's
+     default on every row would also do it, but would change focus for every closing menu too,
+     so it was not taken. Proof (`mailo4_menu.rs`): a click on Travel logs `pick:1`, the menu
+     is still open, Travel is checked and highlighted and the menu has the focus; a second
+     click unchecks it; Enter checks it again; Escape then closes (`close` after the fade); an
+     outside press closes a Stay menu; a `Close` pick still logs `pick:1,close`.
+   - `Menu { flow: Flow::Inline }`: the rows drawn where the caller renders the menu,
+     `div.ds-menu[data-flow=inline]` without `.ds-popover` (no surface, no entrance, no
+     padding, width from the card), no overlay host and no outside-press catcher, never on the
+     layer stack (`Stacking::Passive`, so Escape and an outside press are the caller's), no
+     focus taken, and no press-drag-release. `Flow` is one type shared with `HoverCard`, since
+     it is the same fact about either. The flow is read when the menu mounts (its stack
+     membership is decided then); switching needs a new key. `MenuKind::Inline` was not used:
+     the kind is the row shape (Rich, Slim, Dropdown, Context), and an inline menu of any shape
+     is wanted (a Dropdown checklist inline). Proof: the inline menu stands inside its card, no
+     overlay menu and no catcher exist, the focus stays put, Escape closes nothing, and a click
+     picks and closes as usual.
+   - `menu.rs` passed 300 lines: the pick and gesture states moved to `menu_pick.rs`, the
+     cursor reports to `menu_active.rs`, the surface choice to `menu_surface.rs`, unchanged in
+     behaviour.
+4. **A sidebar place could not be a drop target.** `SidebarItem` had `drop: DropState`
+   (`Target` is the `--accent-soft`, 1.045 highlight of design/06 section 6.1) but no pointer
+   hooks and no name for the place under the pointer. It gains `place: Option<PlaceId>`
+   (`data-place`) and `onpointerenter`, `onpointerleave`, `onpointermove`, `onpointerup`
+   (`Option<EventHandler<PointerEvent>>`, the event itself as `ListRow`'s hooks are), on every
+   kind. The listeners are always attached and call nothing without a handler, so a server
+   render's markup is unchanged. `DropState` is not new: the brief's `DropState::{Idle, Target}`
+   already existed (with `Source` for the dragged row). Proof (`mailo4_sidebar.rs`): three
+   places carry their `data-place`; the pointer over Archive lights it `data-drop=target` (and
+   no other), moving on to Invoices and releasing logs
+   `enter:archive,leave:archive,enter:label:7,drop:label:7`, and the moves are heard.
+
+Not done: nothing the brief asked for was left out. The strip's measured `onclick` still does
+nothing without layout, by design: a snooze or label menu needs the rect to anchor, and
+`on_press` is how the caller acts without it.
