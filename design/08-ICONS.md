@@ -384,7 +384,15 @@ bevel details and keep the flat silhouettes.
 **The palette.** Every colour is written in OKLCh. **Chroma cap 0.07**: no plate, symbol or spot
 exceeds it (`tools/icons/src/dialect.rs` `CHROMA_CAP`, test `every_colour_respects_the_cap`).
 For scale, round three's plates ran to 0.15-0.20 and Klein's soft grounds sit near 0.06-0.09.
-Six named hues: slate 255, teal 200, sage 150, ochre 85, clay 40, plum 320. Gradients are gone:
+Eight named hues, evenly spread every 45 degrees (round five, 2026-09-25; round four had six
+unevenly spaced ones, slate 255, teal 200, sage 150, ochre 85, clay 40, plum 320): **clay 40,
+ochre 85, sage 130, jade 175, teal 220, slate 265, plum 310, rose 355**. Swatches with their
+OKLCh values and hex: `tools/progress/shots/icons/round5-palette.png` (the Solid plate colour,
+L 0.62). Two bolder caps exist for comparison only, C 0.11 and C 0.15 (`ChromaCap::BOLD`,
+`BOLDER`); at 0.15 ochre, jade and teal leave sRGB at L 0.62 and are clipped. Every hue at every
+cap keeps a WCAG ratio of 3.0-4.1 against the dock pill (white at .72 over the light Work and
+Home frames, white at .10 over the dark ones), because the plate's lightness, not its hue, carries
+that contrast. Gradients are gone:
 the plate is one colour, with an almost invisible tonal shift of ±0.012 L across the diagonal
 and the ±0.03 L diffusion from above; Solid drops the tonal shift too.
 
