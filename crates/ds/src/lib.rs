@@ -7,6 +7,7 @@
 pub mod appearance;
 pub mod components;
 pub mod css;
+pub mod delays;
 pub mod edit;
 pub mod error;
 pub mod focus;
