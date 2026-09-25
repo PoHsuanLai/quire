@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 52 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 53 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -11,7 +11,8 @@
 //! for a command panel that must be opaque on its first frame (mailo gaps 2), plus four for
 //! states the catalogue has no motion for (mailo gaps 3): `PillUp` (a centred pill's entrance),
 //! `RingDrain` (the send ring's countdown), `FadeIn` (C's veil, to `--veil`, where S's `fade`
-//! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing).
+//! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing), plus `SheetOut`, the
+//! sheet's exit (sill FINDINGS Q90).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -131,11 +132,15 @@ pub enum Anim {
     FadeIn,
     /// `busy`: a busy word pulses, never below .45, looping (mailo gaps 3).
     Busy,
+    /// `sheet-out`: a sheet leaving fades and settles 8 px back down, from a .98 scale's worth
+    /// of shrink, over `--t-move --e-exit` (design/05 section 10: exits accelerate), the way it
+    /// came in by `peek-in` reversed and quieter (sill FINDINGS Q90).
+    SheetOut,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 52] = [
+    pub const ALL: [Anim; 53] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -188,6 +193,7 @@ impl Anim {
         Anim::RingDrain,
         Anim::FadeIn,
         Anim::Busy,
+        Anim::SheetOut,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -245,6 +251,7 @@ impl Anim {
             Anim::RingDrain => "a-ring-drain",
             Anim::FadeIn => "a-fade-in",
             Anim::Busy => "a-busy",
+            Anim::SheetOut => "a-sheet-out",
         }
     }
 }

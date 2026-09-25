@@ -62,6 +62,8 @@ pub mod selection_bubble;
 pub mod send_mood;
 pub mod send_pill;
 pub mod sheet;
+pub mod sheet_placement;
+pub(crate) mod sheet_presence;
 pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
@@ -127,7 +129,7 @@ pub use segmented::{SegSize, SegmentedControl};
 pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble};
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
-pub use sheet::Sheet;
+pub use sheet::{Sheet, SheetPlacement};
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
 pub use space_editor::{

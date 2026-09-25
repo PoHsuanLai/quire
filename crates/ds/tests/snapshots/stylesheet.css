@@ -109,7 +109,8 @@ html,body{margin:0;padding:0;background:transparent}
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and the sheet's
+     `sheet-out` (sill Q90), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -292,6 +293,11 @@ html,body{margin:0;padding:0;background:transparent}
 /* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+
+/* sheet-out (quire's, sill Q90): a sheet's exit, `peek-in` reversed and quieter: it fades and
+   settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
+   accelerate), holding its transparent last frame until the host unmaps the surface. */
+@keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -366,6 +372,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
 @keyframes busy--b{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+@keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -470,6 +477,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
 .a-busy[*|data-pulse=a]{animation:busy var(--t-ambient) var(--e-in-out) infinite;}
 .a-busy[*|data-pulse=b]{animation:busy--b var(--t-ambient) var(--e-in-out) infinite;}
+.a-sheet-out[*|data-pulse=a]{animation:sheet-out var(--t-move) var(--e-exit) forwards;}
+.a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -1344,6 +1353,11 @@ html,body{margin:0;padding:0;background:transparent}
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
+
+/* Leaving with its sheet (sill Q90): `menu-out`, the fade a closing menu plays, at `--t-quick
+   --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
+   pointer while it goes. */
+.ds-scrim[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
@@ -1452,6 +1466,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-sheet{ position:absolute; top:36px; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - 72px); overflow-y:auto;
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
+
+/* Leaving (sill Q90): `sheet-out` at `--t-move --e-exit`, holding its transparent last frame,
+   and no longer a target for the pointer while it goes. */
+.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+
+/* Centred (sill Q91): a stage filling the overlay centres the sheet by flex, inside the same
+   36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
+   rect leaves one out). The stage takes no pointer; the sheet does. */
+.ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
+.ds-sheet[*|data-placement=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; }
 /* -- sidebar_item -- */
 /* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
    drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span

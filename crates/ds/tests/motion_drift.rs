@@ -244,6 +244,9 @@ fn the_settle_table() {
         (Anim::RingDrain, MotionLevel::Calm, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
+        // sill Q90: the sheet's exit at --t-move, which only Reduced shortens.
+        (Anim::SheetOut, MotionLevel::Standard, 284),
+        (Anim::SheetOut, MotionLevel::Calm, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(
