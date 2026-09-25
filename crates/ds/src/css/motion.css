@@ -5,7 +5,8 @@
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and the sheet's
+     `sheet-out` (sill Q90), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -188,3 +189,8 @@
 /* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+
+/* sheet-out (quire's, sill Q90): a sheet's exit, `peek-in` reversed and quieter: it fades and
+   settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
+   accelerate), holding its transparent last frame until the host unmaps the surface. */
+@keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }

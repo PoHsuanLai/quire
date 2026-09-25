@@ -13,11 +13,30 @@ pub(crate) fn scrim_button(
     closes: impl Fn() -> bool + 'static,
     onclose: EventHandler<()>,
 ) -> Element {
+    scrim_button_as(label, ScrimLook::default(), closes, onclose)
+}
+
+/// How a modal's own scrim is drawn beyond its label (sheet and modal parts).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub(crate) struct ScrimLook {
+    /// `data-presence="leaving"` while its modal plays its exit, so the scrim fades out with it
+    /// and stops catching the pointer (sill Q90); `None` otherwise.
+    pub(crate) presence: Option<&'static str>,
+}
+
+/// [`scrim_button`] drawn as `look` says.
+pub(crate) fn scrim_button_as(
+    label: &str,
+    look: ScrimLook,
+    closes: impl Fn() -> bool + 'static,
+    onclose: EventHandler<()>,
+) -> Element {
     rsx! {
         button {
             r#type: "button",
             class: "ds-scrim",
             "aria-label": "{label}",
+            "data-presence": look.presence,
             onclick: move |_| {
                 if closes() {
                     onclose.call(());

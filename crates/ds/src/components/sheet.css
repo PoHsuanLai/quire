@@ -5,3 +5,13 @@
 .ds-sheet{ position:absolute; top:36px; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - 72px); overflow-y:auto;
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
+
+/* Leaving (sill Q90): `sheet-out` at `--t-move --e-exit`, holding its transparent last frame,
+   and no longer a target for the pointer while it goes. */
+.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+
+/* Centred (sill Q91): a stage filling the overlay centres the sheet by flex, inside the same
+   36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
+   rect leaves one out). The stage takes no pointer; the sheet does. */
+.ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
+.ds-sheet[*|data-placement=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; }

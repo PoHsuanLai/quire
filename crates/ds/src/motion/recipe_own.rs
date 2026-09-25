@@ -72,3 +72,14 @@ pub(super) const BUSY: Recipe = recipe(
     Fill::None,
     Iteration::Infinite,
 );
+
+/// `sheet-out` (sill FINDINGS Q90): a sheet's exit at `--t-move --e-exit`, the exit design/05
+/// section 10 gives shell chrome. It holds its last, transparent frame until the host unmaps
+/// the surface at `settle(SheetOut)`, so the sheet never flashes back between the two.
+pub(super) const SHEET_OUT: Recipe = recipe(
+    "sheet-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);

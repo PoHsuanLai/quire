@@ -9,3 +9,8 @@
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
+
+/* Leaving with its sheet (sill Q90): `menu-out`, the fade a closing menu plays, at `--t-quick
+   --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
+   pointer while it goes. */
+.ds-scrim[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
