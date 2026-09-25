@@ -3448,3 +3448,89 @@ below.
 - **Gallery.** The Overlays page's Power menu section (the page is 5700 tall): the centred sheet
   over the modal scrim in its own Sheet root, light and dark, with Cancel, a disabled Suspend, a
   Danger Restart and Shut Down, and Small caps for the arrows, Enter and Escape.
+
+## mailo gaps 7 (2026-09-25)
+
+mailo, on v0.1.9 in its native window, reported four gaps. Branch `mailo-gaps-7`, one commit per
+item; blitz rev unchanged (`e99fbdbd`). CONSUMING.md "The mailo gaps 7 (2026-09-25)" has one row
+per change, docs/mailo-migration.md §2 and §6.6 what mailo deletes. Proofs: the Harness tests
+`crates/ds-native/tests/mailo7_{removed_focus,restore,tree_rename}.rs`, the goldens in
+`crates/ds/tests/mailo_gaps7_ssr.rs`, the lint cases in `lint_rules.rs` and the unit test in
+`ds::delays`.
+
+1. **The keyboard after its element is removed.**
+   - **Found: Blitz sends the focus nowhere on removal.** `process_removed_subtree` calls
+     `clear_interaction_state_for_removed_node` for every removed node, which blurs a focused one
+     and sets the focus to `None` (hover and active retarget to the nearest surviving ancestor;
+     focus does not). A quire `Menu` focuses its panel as it opens, so Escape (or a pick) that
+     removed it left every later key going to the root, and mailo's `.app[tabindex]` heard
+     nothing until its own re-focus effect ran. `FocusFallback::Ancestor` covered only a click.
+   - **Found: the ancestors of a removed node cannot be walked.** `remove_node` takes the node's
+     `parent` after processing the subtree, and a dropped node's id may be reused by the next node
+     the same mutation batch creates. So the host remembers, while an element has the keyboard,
+     its focusable ancestors (`focus_chain.rs`: each one's id and tag, so a reused id of another
+     kind is not taken for it), and checks each for life (in the document, same tag,
+     `is_focussable`) only when it focuses.
+   - **Now:** `FocusKeeper` (`focus_keep.rs`) looks at the focus after each settled frame in the
+     harness (after the renders and tasks, so a component's own focus move goes first) and before
+     each window event reaches the document in the window (so a key after the removal is
+     delivered to the new focus). When the element it last saw focused is gone and the focus is
+     nowhere, it focuses the first live candidate among: the opener a surface registered, the
+     removed element's own focusable ancestors, the element focused before it, and the element
+     under the pointer when the focus moved to it. A focus that went nowhere while its element
+     stayed (a blur, a click on nothing) is left alone, even if the element leaves later.
+   - **The menu's panel has no focusable ancestor** (it sits in the overlay layer, outside the
+     app), so the element focused before it is what makes Escape land in the app: `.app` for a
+     menu opened by a key, the button for one opened by a press. **Found: the press's own focus
+     is often overtaken.** The click fallback's restore and the menu's `focus_soon` are both
+     tasks; when the menu's runs first the button never has the keyboard, and the keeper, which
+     looks once per settled frame, would not have seen it anyway. The element under the pointer
+     at the moment the focus moved is the button in that case, so it is the last candidate.
+   - **A menu anchored to an element hands back to it.** A floating `Menu` with
+     `Cursor::Auto` and `Anchor::Mounted(el)` registers `(panel, el)` through the new
+     `ds::HostHandBack` seam in its panel's `onmounted`; the keeper puts `el` (or its nearest
+     focusable ancestor) first. **Found: a hand-back task from the menu's drop loses the race.**
+     The first try (a root task spawned in `use_drop`) ran while the renderer held the document
+     (`Busy`), waited a frame, and by then the keeper had focused `.app`; the registration makes
+     the keeper the only writer, after the removal, with nothing to race.
+   - Proof (`mailo7_removed_focus.rs`): a menu opened from a quire `Button` inside `.app` and
+     closed with Escape leaves the button or `.app` focused and the next `j` reaches `.app`'s
+     handler; opened by `m` on `.app`, Escape gives `.app` the keyboard; anchored to the button
+     and opened by `m` (the button never focused), Escape gives the button the keyboard (only the
+     registration can); a field whose Enter removes it leaves `.pane[tabindex]` (its nearest
+     focusable ancestor) focused and `j` reaches `.app`. Under `BlitzDefault` both stay nowhere
+     and `j` is heard by no one. `launcher_gaps.rs`'s Q44 check that a field without a focus
+     request stays unfocused after the actions menu closes now runs under `BlitzDefault`; under
+     the default the field is focused again (it had the keyboard before the menu), which the same
+     test now asserts.
+2. **A click's restore focused an element the click removed.** mailo's "Show images" button
+   removes itself on press. The click fallback had found the button itself (a `button` is
+   focusable) and its restore focused that node a frame later, after it had left the document.
+   **Now** the fallback hands `restore` a `ChainNode`: every focusable element from the found one
+   up, remembered at the click; `restore` checks liveness at the moment it focuses and takes the
+   first live one (`.app`). A handle `restore` is given directly (`NodeHandle`, `FoundNode`) is
+   walked from when it runs, if it is still in the document. Proof (`mailo7_restore.rs`): the
+   self-removing button leaves `.app` focused and `j` reaches it (it fails on master: the focus
+   stays nowhere); a button that stays keeps the keyboard.
+3. **A tree row renamed in place.** `TreeItem { editing: Option<Element> }` draws the caller's
+   field in the label's place, in `span.ds-tree-item-label.ds-tree-item-edit[data-slot=editing]`:
+   the label's class keeps its flex share, so the slot starts where the label did and is as wide,
+   and a Bare `TextInput` takes the row's face. The slot stops and prevents its clicks, as the
+   trailing slot does. **Preventing the click is safe for a field on Blitz:** the caret is placed
+   and the field focused on pointer-down (`handle_pointerdown`); the click's default only
+   "matches" the text input and does nothing more, and without the fence the summary's own
+   handler toggled the folder (`toggle:Closed`, checked by removing it). Keys are left alone:
+   they start at the field, so its `onkey` hears Enter and Escape first. **The trailing seam:**
+   `data-slot="trailing"` on the trailing slot; `CONSUMER_SEAMS` in `lint/selector.rs` names
+   `data-slot` as a consumer-styleable attribute (it was never internal, the constant keeps it so),
+   and `DataName::parse` now refuses `slot`, so a consumer's button cannot pose as the slot.
+   Proof: goldens `lists/tree_item/editing-{branch,leaf}` (the gaps 6 tree goldens gain the
+   attribute); lint cases (`[*|data-slot=trailing] .fold-more` clean, `.ds-tree-item-trail
+   .fold-more` `DsInternals`); `mailo7_tree_rename.rs`: the slot's left edge and width equal the
+   label's, the row's height, the count and the next row are unmoved; the field has the keyboard
+   with `Projects` selected; a press and typing in it log no toggle and no select, the folder
+   stays open and the value is typed; Enter and Escape reach the field's handler and end the
+   rename.
+4. **Hover delays for tests.** `ds::delays::{HOVER_OPEN, HOVER_CLOSE, HOVER_WARM}` are the
+   token values (450, 150, 400 ms) as `const Duration`s; a unit test holds each equal to its
+   `DelayToken` at every `MotionLevel`.
