@@ -24,6 +24,11 @@ pub enum RunTone {
     Strong,
     /// Quieter than the line: `data-tone="faint"`.
     Faint,
+    /// Slanted: `data-tone="italic"`, the face's italic (notification parts: a body's
+    /// `<i>` from the Notifications spec's markup).
+    Italic,
+    /// Underlined: `data-tone="underline"` (a body's `<u>`).
+    Underline,
 }
 
 impl RunTone {
@@ -32,6 +37,8 @@ impl RunTone {
         match self {
             RunTone::Strong => Some("strong"),
             RunTone::Faint => Some("faint"),
+            RunTone::Italic => Some("italic"),
+            RunTone::Underline => Some("underline"),
             RunTone::Plain | RunTone::Mark => None,
         }
     }
@@ -142,7 +149,7 @@ pub(crate) fn text(text: &Text) -> Element {
 /// One run in its tone. The spaces at either end of a marked or toned run are drawn outside its
 /// element: Blitz drops the whitespace at the end of an inline box, so `Re: ` in a faint span
 /// before a mark would draw as `Re:UIDL` (seen in the gallery, mailo gaps 2).
-fn run(run: &Run) -> Element {
+pub(crate) fn run(run: &Run) -> Element {
     let (lead, core, trail) = edges(&run.text);
     let core = core.to_owned();
     let body = match (run.tone, run.tone.slug()) {
@@ -150,7 +157,7 @@ fn run(run: &Run) -> Element {
         (RunTone::Mark, _) => rsx! {
             mark { class: "ds-mark", "{core}" }
         },
-        (RunTone::Strong | RunTone::Faint, tone) => rsx! {
+        (RunTone::Strong | RunTone::Faint | RunTone::Italic | RunTone::Underline, tone) => rsx! {
             span { class: "ds-run", "data-tone": tone, "{core}" }
         },
     };
@@ -167,7 +174,7 @@ fn run(run: &Run) -> Element {
 }
 
 /// `text` as its leading whitespace, the rest up to its trailing whitespace, and that.
-fn edges(text: &str) -> (&str, &str, &str) {
+pub(crate) fn edges(text: &str) -> (&str, &str, &str) {
     let start = text.len() - text.trim_start().len();
     let end = text.trim_end().len().max(start);
     (&text[..start], &text[start..end], &text[end..])

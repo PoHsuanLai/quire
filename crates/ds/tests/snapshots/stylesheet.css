@@ -2063,6 +2063,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-mark{ background:var(--accent-soft); color:inherit; border-radius:var(--r-micro); padding:0 var(--s-1); }
 .ds-run[*|data-tone=strong]{ font-weight:700; color:var(--ink); }
 .ds-run[*|data-tone=faint]{ color:var(--ink-faint); }
+
+/* Notification parts (sill Q124): a body's `<i>` and `<u>` as tones, and its `<a href>` as
+   `a.ds-run-link`. A link keeps the line's ink and weight a step up, underlined in the accent
+   so it reads as a link on any material without an accent-on-tint contrast to check; under the
+   pointer the words take the accent too. The link keeps its press (the component stops it), so
+   the notification around it never opens from a link. */
+.ds-run[*|data-tone=italic]{ font-style:italic; }
+.ds-run[*|data-tone=underline]{ text-decoration:underline; }
+.ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent); cursor:pointer; }
+.ds-run-link:hover{ color:var(--accent); }
 /* -- toast -- */
 /* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
    (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);
