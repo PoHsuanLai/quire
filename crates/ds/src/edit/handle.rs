@@ -4,7 +4,7 @@
 use crate::edit::host::{HostEdit, Probe};
 use crate::edit::position::{TextPosition, TextRange};
 use crate::focus::focus_soon;
-use crate::geometry::{Point, Rect};
+use crate::geometry::{HostMeasure, Measured, Point, Rect};
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -18,6 +18,8 @@ pub struct EditHandle {
     element: Signal<Option<Rc<MountedData>>>,
     /// The host, read once where the handle is made, so a read needs no scope of its own.
     host: Option<HostEdit>,
+    /// The host's rect read, for [`EditHandle::bounds`].
+    measure: Option<HostMeasure>,
 }
 
 /// The same handle is the same surface.
@@ -32,6 +34,7 @@ pub fn use_edit_handle() -> EditHandle {
     EditHandle {
         element: use_signal(|| None),
         host: use_hook(try_consume_context::<HostEdit>),
+        measure: use_hook(try_consume_context::<HostMeasure>),
     }
 }
 
@@ -55,6 +58,27 @@ impl EditHandle {
     /// The boxes `range` covers: one per line of text, one per whole atom.
     pub fn selection_rects(&self, range: &TextRange) -> Probe<Vec<Rect>> {
         self.with(|host, element| (host.selection_rects)(element, range))
+    }
+
+    /// The surface's own border box, in the same coordinates as the other reads: an app draws
+    /// its caret layer inside the surface's container at `caret_rect - bounds`.
+    pub fn bounds(&self) -> Probe<Rect> {
+        let Some(HostMeasure(measure)) = self.measure else {
+            return Probe::Unknown;
+        };
+        match self
+            .element
+            .try_peek()
+            .ok()
+            .and_then(|element| element.clone())
+        {
+            Some(element) => match measure(&element) {
+                Measured::At(rect) => Probe::Found(rect),
+                Measured::Busy => Probe::Busy,
+                Measured::Unknown => Probe::Unknown,
+            },
+            None => Probe::Unknown,
+        }
     }
 
     /// Give the surface the keyboard, a frame later if the document is busy.
