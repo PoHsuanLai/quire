@@ -59,9 +59,9 @@ pub use icon::{
 pub use material::{Blur, BlurState, Material, MaterialRecipe, MaterialStack, recipe};
 pub use motion::{
     Anim, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent, IntentEffect,
-    IntentPhase, Iteration, ListPresence, MotionTimer, Presence, Pulse, Recipe, Roster,
-    RosterEntry, RosterState, RowPitch, StayError, Stayed, TimerPhase, settle, use_drag,
-    use_motion_timer, use_pulse, use_roster,
+    IntentPhase, Iteration, ListPresence, MotionTimer, Pane, PaneRole, PaneRound, PaneSlide,
+    Presence, Pulse, Recipe, Roster, RosterEntry, RosterState, RowPitch, StayError, Stayed,
+    TimerPhase, settle, use_drag, use_entrance, use_motion_timer, use_pulse, use_roster,
 };
 pub use overlay::{
     Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
@@ -84,8 +84,8 @@ pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
     FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, OpacityToken,
-    PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics, SpacingToken,
-    Tuned, VarName, ZLayer, quad,
+    OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics,
+    SpacingToken, Tuned, VarName, ZLayer, quad,
 };
 pub use window::{
     Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,

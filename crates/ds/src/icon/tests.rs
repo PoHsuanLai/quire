@@ -50,7 +50,7 @@ fn shape_tag(shape: &Shape) -> &'static str {
 #[test]
 fn every_icon_is_an_svg_of_its_shapes() {
     let mut failures = Vec::new();
-    for icon in Icon::MAILO.iter().chain(Icon::ACTIONS) {
+    for icon in Icon::MAILO.iter().chain(Icon::ACTIONS).chain(Icon::CONTROL) {
         let page = markup(*icon);
         let shapes = icon.shapes();
         let names = element_names(&page);
@@ -91,8 +91,8 @@ fn the_set_matches_icons_js() {
     );
     assert_eq!(
         Icon::ALL.len(),
-        Icon::MAILO.len() + Icon::SHELL.len() + Icon::ACTIONS.len(),
-        "ALL is the two sets and the actions"
+        Icon::MAILO.len() + Icon::SHELL.len() + Icon::ACTIONS.len() + Icon::CONTROL.len(),
+        "ALL is the two sets, the actions and the control set"
     );
     let mut duplicates = Vec::new();
     for (index, icon) in Icon::ALL.iter().enumerate() {
@@ -155,4 +155,45 @@ fn printer_and_folder_input_are_lucides() {
         Icon::FolderInput.shapes().get(1..),
         Some(&[Shape::Path("M2 13h10"), Shape::Path("m9 16 3-3-3-3")][..])
     );
+}
+
+/// The "more" glyphs as Lucide 1.47.0 publishes them (mailo gaps 6): three unit circles on the
+/// middle row for `ellipsis`, on the middle column for `ellipsis-vertical`, centre first.
+#[test]
+fn the_ellipses_are_lucides() {
+    let dot = |cx, cy| Shape::Circle { cx, cy, r: "1" };
+    assert_eq!(
+        Icon::Ellipsis.shapes(),
+        &[dot("12", "12"), dot("19", "12"), dot("5", "12")][..]
+    );
+    assert_eq!(
+        Icon::EllipsisVertical.shapes(),
+        &[dot("12", "12"), dot("12", "5"), dot("12", "19")][..]
+    );
+    for icon in [Icon::Ellipsis, Icon::EllipsisVertical] {
+        assert!(
+            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
+            "{icon:?}"
+        );
+    }
+}
+
+/// The control set as Lucide 1.47.0 publishes it (sill FINDINGS Q81): eleven glyphs, Restart
+/// is `rotate-ccw`, Phone is `smartphone`, and `Power` stays in the shell set.
+#[test]
+fn the_control_set_is_lucides() {
+    assert_eq!(Icon::CONTROL.len(), 11);
+    assert!(Icon::SHELL.contains(&Icon::Power), "Power is not repeated");
+    assert_eq!(
+        Icon::Restart.shapes(),
+        &[
+            Shape::Path("M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"),
+            Shape::Path("M3 3v5h5"),
+        ][..]
+    );
+    assert_eq!(
+        Icon::Phone.shapes().last(),
+        Some(&Shape::Path("M12 18h.01"))
+    );
+    assert_eq!(Icon::Gamepad.shapes().len(), 5);
 }

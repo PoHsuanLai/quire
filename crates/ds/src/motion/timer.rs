@@ -60,6 +60,22 @@ impl MotionTimer {
         try_set(self.task, Some(started))
     }
 
+    /// Stop a running timer without settling it: `on_settled` never runs, and the timer is
+    /// idle again. For a motion taken back before it ends (an OSD shown again while it fades out,
+    /// sill FINDINGS Q76). A timer that is not running, or whose owner is gone, is left as it is.
+    pub fn cancel(&self) {
+        let _ = self.try_cancel();
+    }
+
+    fn try_cancel(&self) -> Result<(), Gone> {
+        if let Some(running) = try_get(self.task)? {
+            running.cancel();
+            try_set(self.task, None)?;
+            try_set(self.phase, TimerPhase::Idle)?;
+        }
+        Ok(())
+    }
+
     /// Where the timer is.
     pub fn phase(&self) -> TimerPhase {
         self.phase

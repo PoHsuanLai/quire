@@ -61,7 +61,9 @@ mod tests {
 
     #[test]
     fn a_press_moves_once_past_the_threshold() {
-        const CASES: &[(&str, &[(f32, f32)], usize)] = &[
+        /// A case's name, the pointer's path from the press at the origin, and the moves asked.
+        type Case = (&'static str, &'static [(f32, f32)], usize);
+        const CASES: &[Case] = &[
             ("still", &[], 0),
             ("within 4", &[(3.0, 0.0), (4.0, 4.0)], 0),
             ("past 4 across", &[(5.0, 0.0)], 1),
