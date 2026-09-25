@@ -244,6 +244,11 @@ fn the_settle_table() {
         (Anim::RingDrain, MotionLevel::Calm, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
+        // sill Q80: the pane switch, both panes at `--t-move`, so one timer settles the pair.
+        (Anim::PaneInR, MotionLevel::Standard, 284),
+        (Anim::PaneInL, MotionLevel::Standard, 284),
+        (Anim::PaneOutL, MotionLevel::Standard, 284),
+        (Anim::PaneOutR, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

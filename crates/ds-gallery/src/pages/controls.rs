@@ -4,6 +4,7 @@ use super::button_faces::ButtonFaces;
 use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
 use super::fields::{FieldKinds, Fields};
+use super::glyphs::Glyphs;
 use super::plate_tints::PlateTints;
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
@@ -70,6 +71,7 @@ pub fn ControlsPage() -> Element {
         super::controls_mailo5::ButtonsMailo5 {}
         StatusItems {}
         ExternalIcons {}
+        Glyphs {}
         DockTiles {}
         PlateTints {}
         Choosers {}
