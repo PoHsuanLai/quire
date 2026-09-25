@@ -638,6 +638,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
 .ds-button-face[*|data-face=underline]{ text-decoration:underline; }
 .ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
+
+/* A leading mark (mailo gaps 5): a glyph or a caller's mark (a provider's inline chip) before the
+   label, sitting on the line as the trailing mark does; the button's own gap spaces it. */
+.ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 /* -- chip -- */
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
    washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate.

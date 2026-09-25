@@ -3,7 +3,8 @@
 use dioxus::prelude::*;
 use ds::components::vocab::{DropState, Here, PulseKey};
 use ds::{
-    Anim, Button, ButtonVariant, Icon, ItemKind, PlaceId, Presence, Run, RunTone, SidebarItem, Text,
+    Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkSize, MarkStyle, PlaceId, Presence,
+    Provider, ProviderMark, Run, RunTone, SidebarItem, Text, Trailing,
 };
 
 /// One state and its golden.
@@ -39,7 +40,22 @@ fn archive(drop: DropState) -> Element {
     }
 }
 
+/// The From dropdown's provider, drawn inline.
+fn google() -> Leading {
+    Leading::Mark(
+        rsx! { ProviderMark { provider: Provider::Google, size: MarkSize::Inline, style: MarkStyle::Letter } },
+    )
+}
+
 pub const CASES: &[Case] = &[
+    Case {
+        golden: "controls/button/leading-mark.html",
+        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", leading: google(), trailing: Trailing::Caret, expanded: ds::Expanded::Closed, onclick: |_| {} } },
+    },
+    Case {
+        golden: "controls/button/leading-glyph.html",
+        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} } },
+    },
     Case {
         golden: "lists/sidebar_item/place-drop-accepts.html",
         make: || archive(DropState::Accepts),

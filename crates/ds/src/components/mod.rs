@@ -85,7 +85,7 @@ pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
 pub use button::{Button, ButtonVariant};
-pub use button_face::{ButtonFace, FaceMark, Trailing};
+pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;
