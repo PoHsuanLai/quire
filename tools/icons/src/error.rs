@@ -21,6 +21,9 @@ pub enum IconsError {
     /// Reading or writing an image failed.
     #[error("image: {0}")]
     Image(#[from] image::ImageError),
+    /// `icons install` without `--to`, and neither `$XDG_DATA_HOME` nor `$HOME` is set.
+    #[error("no data directory to install into: set $XDG_DATA_HOME or $HOME, or pass --to")]
+    NoInstallDir,
     /// A file system operation failed.
     #[error("io: {0}")]
     Io(#[from] std::io::Error),

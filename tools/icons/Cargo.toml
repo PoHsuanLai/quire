@@ -16,6 +16,8 @@ serde = { workspace = true }
 toml = { workspace = true }
 # The Space palette derivation, so a Monochrome icon tinted by a Space matches its frame.
 ds = { workspace = true }
+# Where an installed app-icon set is looked up (`icons install`, sill FINDINGS Q71).
+ds-settings = { workspace = true }
 
 [lints]
 workspace = true

@@ -3,6 +3,7 @@
 use std::path::{Path, PathBuf};
 
 use clap::{Parser, Subcommand};
+mod install;
 mod round4;
 mod round5;
 mod round6;
@@ -75,6 +76,16 @@ enum Command {
         out: PathBuf,
         #[arg(long)]
         sheet: Option<PathBuf>,
+    },
+    /// Copy the shipped app-icon set where `ds_settings::apps_dir` finds it: by default this
+    /// repository's `assets/icons/apps` to `$XDG_DATA_HOME/quire/icons/apps`.
+    Install {
+        /// The set to copy (default: the repository's `assets/icons/apps`).
+        #[arg(long)]
+        from: Option<PathBuf>,
+        /// Where to put it (default: `$XDG_DATA_HOME/quire/icons/apps`).
+        #[arg(long)]
+        to: Option<PathBuf>,
     },
     /// Round five (a): every app in eight colourways at the palette's chroma cap.
     Colourways {
@@ -507,6 +518,13 @@ fn main() -> Result<(), IconsError> {
             round5::bolder(&load_specs(&spec)?, &plan, &hues, &out)
         }
         Command::Palette { out } => round5::palette(&out),
+        Command::Install { from, to } => {
+            let from = from.unwrap_or_else(install::repository_set);
+            let to = to.map_or_else(install::default_target, Ok)?;
+            let copied = install::install(&from, &to)?;
+            println!("{copied} icons: {} -> {}", from.display(), to.display());
+            Ok(())
+        }
         Command::Ship {
             manifest,
             renders,
