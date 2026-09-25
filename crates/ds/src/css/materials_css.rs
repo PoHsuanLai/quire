@@ -101,12 +101,28 @@ fn osd_card_css() -> String {
     .concat()
 }
 
+/// The cards a transparent root's material is painted on: a popover, a sheet, a notification's
+/// plate and the layers of its group behind it, and an edge panel (notification parts).
+const CARDS: [&str; 5] = [
+    ".ds-popover",
+    ".ds-sheet",
+    ".ds-notification-plate",
+    ".ds-notification-layer",
+    ".ds-panel",
+];
+
 /// The tinted frame and the transparent root, after the paint rules they override.
 fn chrome_css(material: &str) -> String {
     let opaque = format!("{material}{}", attr_selector("data-frame", "opaque"));
     let tinted = format!("{material}{}", attr_selector("data-frame", "tinted"));
     let transparent = format!("{material}{}", attr_selector("data-chrome", "transparent"));
-    let cards = |root: &str| format!("{root} .ds-popover,{root} .ds-sheet");
+    let cards = |root: &str| {
+        CARDS
+            .iter()
+            .map(|card| format!("{root} {card}"))
+            .collect::<Vec<_>>()
+            .join(",")
+    };
     let blurred = format!("{transparent}{}", attr_selector("data-blur", "on"));
     [
         // A window's root keeps its gradient as its own background, under both layers, so the
@@ -297,7 +313,7 @@ mod tests {
             ".ds[*|data-material][*|data-frame=tinted]{background:transparent;position:relative;z-index:var(--z-raise);}",
             ".ds[*|data-material][*|data-frame=tinted][*|data-blur=off] > .ds-frame{opacity:.94;}",
             ".ds[*|data-material][*|data-chrome=transparent]{background:transparent;box-shadow:none;}",
-            ".ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}",
+            ".ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}",
         ];
         for want in WANT {
             assert!(css.contains(want), "missing {want}\n{css}");

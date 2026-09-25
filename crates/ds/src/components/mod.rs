@@ -4,6 +4,8 @@ pub mod account_tile;
 pub mod animated_list;
 pub mod appearance_picker;
 pub mod avatar;
+pub(crate) mod banner_row;
+pub mod banner_stack;
 pub mod button;
 pub mod button_face;
 pub mod button_size;
@@ -21,6 +23,7 @@ mod edit_surface_keys;
 mod edit_surface_pointer;
 mod edit_surface_state;
 pub mod flow;
+pub mod group_header;
 pub mod hover_card;
 pub mod hover_strip;
 pub mod icon_button;
@@ -52,6 +55,10 @@ pub mod module_panel;
 pub mod module_tile;
 pub mod module_tile_kind;
 pub(crate) mod muted;
+pub(crate) mod notification_body;
+pub mod notification_card;
+pub mod notification_parts;
+pub mod notification_swipe;
 pub mod osd;
 pub(crate) mod osd_phase;
 pub(crate) mod palette_host;
@@ -60,12 +67,14 @@ pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
 pub mod pane_switcher;
+pub mod panel;
 pub mod pass_through;
 pub mod peek;
 pub mod popover;
 pub mod press;
 pub mod provider_mark;
 pub(crate) mod resize_edges;
+pub mod rich_text;
 pub mod row_action;
 pub(crate) mod row_click;
 pub mod row_hooks;
@@ -83,6 +92,7 @@ pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sheet_placement;
 pub(crate) mod sheet_presence;
+pub(crate) mod shown_phase;
 pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
@@ -111,6 +121,7 @@ pub use appearance_picker::{AppearancePicker, PickerLayout};
 pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
+pub use banner_stack::{Banner, BannerKey, BannerPosition, BannerStack};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use button_size::ButtonSize;
@@ -123,6 +134,7 @@ pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use edit_surface::EditSurface;
 pub use flow::Flow;
+pub use group_header::GroupHeader;
 pub use hover_card::{
     FlagTone, HoverAnchor, HoverCard, HoverCardPart, HoverDriver, HoverMessage, HoverStat,
     HoverTarget, KeyHint, TargetElement, use_hover_intent,
@@ -144,14 +156,19 @@ pub use module_grid::{GridColumns, GridMetrics, ModuleGrid};
 pub use module_panel::{ModulePanel, PanelPlate};
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
+pub use notification_card::NotificationCard;
+pub use notification_parts::{AppMark, CardAction, GroupCount, Hover, Layers};
+pub use notification_swipe::Swipe;
 pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
+pub use panel::{Panel, PanelEdge, PanelScrim};
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
+pub use rich_text::{Rich, RichRun, RichText};
 pub use row_action::RowAction;
 pub use row_hooks::PartHooks;
 pub use scrim::Scrim;
@@ -193,6 +210,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("animated_list", include_str!("animated_list.css")),
     ("appearance_picker", include_str!("appearance_picker.css")),
     ("avatar", include_str!("avatar.css")),
+    ("banner_stack", include_str!("banner_stack.css")),
     ("button", include_str!("button.css")),
     ("chip", include_str!("chip.css")),
     ("command_palette", include_str!("command_palette.css")),
@@ -202,6 +220,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("drag_ghost", include_str!("drag_ghost.css")),
     ("edge_strip", include_str!("edge_strip.css")),
     ("edit_surface", include_str!("edit_surface.css")),
+    ("group_header", include_str!("group_header.css")),
     ("hover_card", include_str!("hover_card.css")),
     ("hover_strip", include_str!("hover_strip.css")),
     ("icon_button", include_str!("icon_button.css")),
@@ -213,10 +232,12 @@ pub const CSS: &[(&str, &str)] = &[
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("notification_card", include_str!("notification_card.css")),
     ("osd", include_str!("osd.css")),
     ("module_tile", include_str!("module_tile.css")),
     ("module_panel", include_str!("module_panel.css")),
     ("pane_switcher", include_str!("pane_switcher.css")),
+    ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),

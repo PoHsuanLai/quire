@@ -1429,6 +1429,42 @@ panes on their own. `ControlCenterItem` takes `Icon::Switches` instead of `Setti
 frame of F225 is what CONSUMING section 2 now states; `dock_popup.css` and the tray's popup
 should be checked against it.
 
+### Notification parts (2026-09-25)
+
+sill M6 (sill Q120-Q125); FINDINGS "Notification parts" has the reasons and the proofs. Additive:
+six new components, four new `Anim` variants (`Anim::ALL` is 64; a `match` of yours over `Anim`
+needs `BannerOut`, `BannerIn`, `PanelIn`, `PanelOut`), `Exit::BannerOut`, `RunTone::{Italic,
+Underline}`, `DelayToken::SwipeQuiet`, and `Surface { chrome }`. No existing golden moved but the
+stylesheet's.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `NotificationCard` | `app: AppMark { icon: IconSource, name: Text }`, `age`, `summary` (`Text`), `body: Option<Rich>`, `count: Option<GroupCount>`, `actions: Vec<CardAction { label, on_press }>`, `on_close`, `on_open` (`EventHandler<Press>`), `on_link: Option<EventHandler<String>>`, `on_hover: Option<EventHandler<Hover>>`, `material` (`Toast`), `icon_size: IconPx` (32), `id`, `swipe: Swipe` (`Off`), `swipe_metrics: SwipeMetrics` | One notification. A plate in its material inside a transparent scope of that material, so it paints Toast in any root. First line: the summary (13/700, one line), the group's count chip (from 2), the age (data face, caption size). A press on the plate, Enter or Space opens it; the close button, the actions (Mini) and body links keep their press (`Propagation::Stop`). Under the pointer (`data-hover="on"`, told to `on_hover` so your hold timer pauses) the body opens from two lines to six over `--t-move --e-out`, the actions row opens, and the 18 px close button fades in at the top left. The body's fade is drawn only where the card measured text being cut (`data-clip` `rest` or `always`). `id` names the plate for its blur region (`Element("toast-<id>")`) |
+| `GroupCount`, `Layers` | `{ count: u32, layers: Layers(u8) }` | The chip and up to `Layers::MAX` (3) plates behind the card, each `--notifications-group-offset` (4) lower and 6 narrower each side |
+| `Hover` | `Away`, `Over` | What `on_hover` hears |
+| `Swipe` | `Off`, `Dismiss(EventHandler<()>)` | Swipe to dismiss: a drag follows 1:1 right, a quarter left; released under 80 px and 600 px/s it springs back (`--t-move --e-spring`; snaps under Reduced), past either it flies out right from where it is (`Anim::BannerOut`). A horizontal scroll is summed into the same offset and decided once no delta has come for `DelayToken::SwipeQuiet` (120 ms; Blitz carries no scroll phase). The click that ends a drag never opens the card. Alone, the card reports at `settle(BannerOut)`; in a `BannerStack` it reports at the release and its row carries it out |
+| `SwipeMetrics` | `{ dismiss: Px, velocity: Speed, damping: Fraction }` (80, 600, 250) | From `notifications.swipe_dismiss_px`, `swipe_dismiss_velocity_px_s`, `swipe_damping` |
+| `SwipeState`, `SwipeInput`, `SwipeEffect`, `SwipeLook`, `Click`, `Stamp`, `Speed`; `use_swipe`, `Swiper`, `Held` | the pure machine and its hook | For a swipe of your own; `SwipeState::step(input, metrics)` is table-tested |
+| `BannerStack` | `banners: Vec<Banner { key: BannerKey(u32), card: Element }>`, `position: BannerPosition::{TopRight, BottomRight}`, `gap: Option<Px>`, `on_hidden: Option<EventHandler<BannerKey>>` | The banners you list, newest first (a column, or one running upwards at the bottom right). An arrival slides in (`Anim::BannerIn`, `--t-move --e-spring`); a banner you stop listing slides out right (`Anim::BannerOut`, `--t-move --e-exit`) and stays drawn until `settle(BannerOut)`, then the banners after it heal into its place by the height it measured, and `on_hidden` hears its key: unmap the surface there when your list is empty. Listed again while it leaves, it stays. The hold timer, the cap (`stack_max`) and grouping are yours. Rows are `div.ds-banner[data-banner]` |
+| `GroupHeader` | `icon: IconSource`, `name` (`Text`), `count: u32`, `expanded: Expanded` (`Closed`), `on_toggle`, `on_clear` | One app's head in the center: the icon at 16, the name and count in `SectionHeader`'s group type, then Quiet "N more" (folded) or "Show less" (open) and "Clear" that keep their press |
+| `Panel` | `label`, `shown: Shown`, `on_hidden`, `onclose: Option<EventHandler<()>>`, `width: Px` (384), `edge: PanelEdge::Right`, `material` (`Popover`), `scrim: PanelScrim::{None, Dim(ScrimStrength)}`, `children` | The notification center: 8 in from the top, bottom and right edge, full height, scrolling its content, in the Popover material (design/20 §1.6). Shown, `Anim::PanelIn` (`--t-move --e-out`); hidden, `Anim::PanelOut` (`--t-move --e-exit`) and `on_hidden` at `settle(PanelOut)`; a show while it leaves takes the hide back. Escape inside it and a press on its scrim call `onclose`. Needs a root with a height (`RootExtent::Viewport`) |
+| `Rich`, `RichRun`, `RichText` | `Rich(Vec<RichRun::{Run(Run), Link { text, href }}>)`; `RichText { body, on_link }` | A body with links: a link is `a.ds-run-link` whose press or Enter stops there and hands the href to `on_link`. A `Text`, `String` or `&str` converts, and an optional `Rich` prop takes them as `Some` |
+| `RunTone` | `Italic`, `Underline` | `span.ds-run[data-tone=italic]` and `[data-tone=underline]` (a body's `<i>`, `<u>`) |
+| `NotificationMetrics` | `banner_width`, `banner_min_height`, `banner_padding`, `icon`, `close`, `stack_gap`, `group_offset`, `center_width` (`Px`); `style_attr()` | The eight `notifications.*` geometry keys as `--notifications-*` tokens, written once on any element around the banners or the center (the center's width held to 280-600) |
+| `Surface` | `chrome: Option<RootChrome>` | `Some(RootChrome::Transparent)`: the scope's own box paints nothing and cards inside paint its material |
+| `Harness::wheel(at, dx, dy)` | ds-native | A wheel delta where the pointer is, with winit's sign (positive `dx` is content moving right), as the window delivers it |
+
+**What sill switches to.** The banner surface: one transparent Toast root (`Ds { material:
+Material::Toast, extent: RootExtent::Viewport, .. }`) with `NotificationMetrics` from
+`notifications.*` on a wrapper, holding `BannerStack { banners, position: banner_position,
+on_hidden }`; each banner a `NotificationCard { swipe: Swipe::Dismiss(..), swipe_metrics, on_hover:
+pause or resume the hold, id: "toast-<id>" }`, the server's body markup parsed into a `Rich`. Drop
+the local banner card, its hover expand, its close button, its slide and its stack CSS; unmap
+when `on_hidden` finds the list empty. `notifications.swipe = KeepInCenter` is yours to honour in
+`on_dismiss` (move it to the history, do not drop it). The center: a Popover root holding
+`Panel { shown, on_hidden: unmap, width: Px(center_width_px), onclose }` of `GroupHeader`s over
+`NotificationCard`s (`Swipe::Off` or `Dismiss` as you choose).
+
 ### PDF and printing (2026-09-25)
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and
@@ -1535,6 +1571,9 @@ authority; this table is a pointer. `ds::lint::Rule::BlitzUnsupported`
 | a click on a `Button`/`IconButton` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-native/tests/click.rs`, FINDINGS "Polish pass") |
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_native::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::clip_chars` covers the line-clamp case |
+| `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
+| a wheel phase (a touchpad gesture's end) | notification parts | treat a quiet spell after the last delta as the end (`DelayToken::SwipeQuiet`, `use_swipe`) |
+| a clean removal of a running animation | notification parts | Blitz keeps the last animated value when an animation is taken off an element before a frame resolved past its end: put an entrance on an element that mounts with it rather than on a presence attribute that changes (`BannerStack`) |
 | `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_native::pdf` (section 6, "PDF and printing") |
 
 What *does* work and needs no fallback: a `<style>` in the body (S1), the `.ds[data-*]` custom

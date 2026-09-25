@@ -349,7 +349,7 @@ impl Harness {
     }
 
     /// Hand `event` to the document and bring it up to date.
-    fn send(&mut self, event: UiEvent) {
+    pub(crate) fn send(&mut self, event: UiEvent) {
         // An edit surface holding the pointer hears a move or the release first, wherever it is
         // (`crate::edit_ime`), as the window's hook delivers it before the document.
         self.route_captured(&event);

@@ -3493,6 +3493,86 @@ and a `data-glyph` attribute that was always absent before.
   `Ctrl K`, the five-modifier chord) hit an arrow key, so `data-glyph` never appears in their
   markup.
 
+## Notification parts (2026-09-25)
+
+sill M6's notifications (design/20 §1.6, design/13 §13.3.6) asked for six pieces, Q120-Q125, at
+macOS polish. Branch `notification-parts`. Everything is additive; only the stylesheet golden
+moved. Four `Anim`s join the table (`BannerOut`, `BannerIn`, `PanelIn`, `PanelOut`; `Anim::ALL`
+is 64, `motion.css` holds 55 keyframes), each with its recipe, `X--b` alias, pulse class, settle
+rows (284 ms at Standard) and drift entries; design/05 §4.9 records them.
+
+- **Q120: the card.** `NotificationCard` paints its material from a transparent scope of its own
+  (`Surface { chrome: Some(RootChrome::Transparent) }`; the transparent-root card rule now names
+  `.ds-notification-plate` and `.ds-notification-layer`), so a Toast card sits in a Popover
+  center unchanged. The close button is a sibling of the plate, not inside it, and every action
+  and link keeps its press. Proof: `ds-native/tests/notification_card.rs` (after hovering, a
+  press on the close button, an action and a link logs each and never `open`; a press on the
+  summary or the body's text logs `open`). Goldens `notifications/card-{light,dark,group,popover-root}.html`.
+  - **Line clamp.** Blitz has no `line-clamp` (the risk table), so the body is a `max-height` of
+    whole `1.35em` lines (two, six on hover) with a `max-height` transition, and the fade that
+    marks cut text is decided by measuring: the body reads its text's height and one line's
+    (`span.ds-notification-body-line`, invisible) after layout and writes `data-clip` `rest`
+    (three to six lines) or `always` (more), so a two-line body never fades. Proof: a nine-line
+    body measures `always`; under the pointer its height reaches three times its resting height
+    (two lines to six) and returns when the pointer leaves (`on_hover` hears `Over` and `Away`).
+  - **Blitz hit-tests what a clamp hides.** `overflow:hidden` clips the paint, not the hit test:
+    the clamped body's hidden lines ran under the actions row and took its presses (the action
+    press opened the card), and a link on a hidden line was pressable. The body's text takes no
+    pointer (`pointer-events:none`, links excepted) and the actions row is raised
+    (`z-index:var(--z-raise)`); the test failed with `["close","open","link"]` before and passes
+    after.
+- **Q121: the stack.** `BannerStack` runs the roster with one new rule, `use_leaving_roster`: a
+  key the caller stops listing leaves by an `Exit` (here `Exit::BannerOut`) instead of dropping,
+  a key listed again while leaving stays (`Roster::stay`), and the rows after it heal by the
+  height the leaving row measured as it started to leave (`RosterState::settled_by`), since
+  banners differ in height. `on_hidden` hears the key at the exit's settle. Proof:
+  `ds-native/tests/notification_stack.rs`: of three, the middle one removed is `leaving` and
+  still drawn at half the exit, gone only after `settle(BannerOut)`, the one after it `healing`
+  with `--dy` equal to the removed row's height within half a pixel, the one before never moves,
+  and `on_hidden` hears `2`; an emptied stack reports both keys; a key listed again stays;
+  goldens `notifications/stack-{top-right,bottom-right-dark}.html`.
+  - **Blitz keeps the last animated value when an animation is taken off.** The entrance was
+    first a rule on `data-presence=entering`. In the gallery's snapshot the roster's rest (a
+    Rust timer) turned the rows `present` before any frame had been resolved past `banner-in`'s
+    end, the rule stopped matching, and the rows stayed at the keyframe's first frame, off to
+    the right, at 300 ms, 2 s and 10 s alike (removing the rule put them in place). The entrance
+    now plays on `div.ds-banner-card`, which mounts with it and never loses it. The OSD, the
+    sheet and the panel still switch `data-presence` on a settle timer; a window resolves frames
+    far more often than the gap between the animation's end and its settle, so only a clock
+    that does not advance with the timers (a snapshot) shows it.
+  - **Context reaches a caller's element.** A card built by the caller and handed over as
+    `Banner.card` is mounted under the stack's row, so it sees the stack's context (`Carried`)
+    and a swiped card reports at the release while its row carries it out. Proof: the stack test
+    drags a banner 100 px and finds its row `leaving` at the release and the card holding
+    `--swipe-dx:100px`.
+- **Q122: swipe.** `motion::swipe` is pure and table-tested (`swipe_tests.rs`: 1:1 right, a
+  quarter left, springs back under 80 px and 600 px/s, flies out past either, the release speed
+  from the last two moves within 100 ms, mostly-vertical scroll ignored, a drag swallowing its
+  click). Proof on Blitz: `ds-native/tests/notification_swipe.rs`.
+  - **Wheel.** Blitz forwards winit's `MouseWheel` delta unchanged (positive x is content moving
+    right, the opposite of the web's `deltaX`), multiplies a line by 20 px only for its own
+    scrolling, targets the hover node, which only a pointer move sets, and carries no scroll
+    phase, so a touchpad gesture's end is a quiet spell: `DelayToken::SwipeQuiet` (120 ms).
+    `Harness::wheel` moves the pointer to its point first, as a window has.
+  - **No pointer capture** (as before): a drag that leaves the card is released there
+    (`onpointerleave`), and a move that arrives with no button down is the release Blitz never
+    delivered.
+- **Q123: the center.** `Panel` rather than a `Sheet` placement: design/20 §1.6 gives the center
+  the Popover material and its own surface; a sheet is a modal Sheet-material dialog on the
+  layer stack. It shares the OSD's presence machine (`shown_phase::use_shown_phase`). Its scope
+  fills the root (`ClassedScope`, `.ds-panel-scope`): Taffy places an absolutely positioned box
+  against its parent (Q94's finding), and inside a plain `Surface` the panel was 24 px tall.
+  Proof: `ds-native/tests/notification_center.rs` (at rest 384 wide, 8 in from the right edge,
+  the root's height less 16; `on_hidden` only after `settle(PanelOut)`; a re-show 60 ms into the
+  exit takes it back); goldens `notifications/center-{light,dark-scrim}.html`.
+- **Q124: rich runs.** `RunTone::{Italic, Underline}` and `Rich`/`RichRun::Link`; a link's
+  press stops at the link and prevents the document's own navigation. Existing `Text` callers
+  compile unchanged (a `match` over `RunTone` needs the two arms). Golden
+  `notifications/rich-runs.html`; the card test above proves the link keeps its press.
+- **Q125: the group header.** `GroupHeader`; goldens `notifications/group-header-{closed,open-dark}.html`.
+- **Gallery.** The Overlays page's Notifications section, light and dark over the Work tint (the
+  page is 7100 tall).
+
 ## mailo gaps 7 (2026-09-25)
 
 mailo, on v0.1.9 in its native window, reported four gaps. Branch `mailo-gaps-7`, one commit per

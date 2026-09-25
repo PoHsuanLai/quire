@@ -64,6 +64,10 @@ pub use motion::{
     Presence, Pulse, Recipe, Roster, RosterEntry, RosterState, RowPitch, StayError, Stayed,
     TimerPhase, settle, use_drag, use_entrance, use_motion_timer, use_pulse, use_roster,
 };
+pub use motion::{
+    Click, Held, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,
+    Swiper, use_swipe,
+};
 pub use overlay::{
     Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
     MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
@@ -84,9 +88,9 @@ pub use time::{FRAME_SLACK, sleep};
 pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
-    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, OpacityToken,
-    OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics,
-    SpacingToken, Tuned, VarName, ZLayer, quad,
+    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, NotificationMetrics,
+    OpacityToken, OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow,
+    ShellMetrics, SpacingToken, Tuned, VarName, ZLayer, quad,
 };
 pub use window::{
     Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,

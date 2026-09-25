@@ -131,6 +131,7 @@ pub fn OverlaysPage() -> Element {
         super::overlays_mailo5::FieldFilterMenu {}
         super::control_center::ControlCenter {}
         super::overlays_sheet::PowerMenu {}
+        super::overlays_notifications::Notifications {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,

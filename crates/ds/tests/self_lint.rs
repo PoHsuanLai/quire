@@ -38,6 +38,10 @@ const INLINE_VARS: &[&str] = &[
     // The level control's rubber band and a segment's place in the fill's stagger.
     "--rb",
     "--i",
+    // A notification group's layer count (`NotificationCard`, sill Q120).
+    "--layers",
+    // A swiped card's offset (`NotificationCard { swipe }`, sill Q122).
+    "--swipe-dx",
 ];
 
 const EXCEPTIONS: &[Exception] = &[
