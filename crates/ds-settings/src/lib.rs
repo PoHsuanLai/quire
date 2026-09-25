@@ -19,6 +19,7 @@ pub mod dirs;
 pub mod environment;
 pub mod error;
 pub mod file;
+pub mod icon_assets;
 pub mod lenient;
 pub mod portal;
 pub mod schema;
@@ -36,6 +37,7 @@ pub use ds_settings_derive::SettingsSchema;
 pub use environment::{Environment, use_environment};
 pub use error::SettingsError;
 pub use file::{FileName, Format, Settings, SettingsFile};
+pub use icon_assets::{app_icon_path, apps_dir};
 pub use lenient::{lenient, lenient_json};
 pub use portal::{
     SystemPrefsWatch, contrast_from_portal, read_system_prefs, reduced_motion_from_portal,

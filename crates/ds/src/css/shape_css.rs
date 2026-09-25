@@ -14,6 +14,7 @@ use super::emit::{attr_selector, presence_selector, property, rule};
 use crate::appearance::Scheme;
 use crate::icon::family::{NEUTRAL_DARK, PlateFamily};
 use crate::icon::plate::{Quadrant, fill_mask, plate_mask, quadrant_mask};
+use crate::icon::plate_tint::PLATE_TINT_VARS;
 use crate::tokens::{Hex, VarName, ZLayer};
 
 /// What a squircle element writes inline (`Corner::squircle_style`): its extent and the circle
@@ -241,7 +242,30 @@ fn plate_css() -> String {
         ),
         &stops(base, deep, ink),
     ));
+    css.push_str(&tinted_plate_css(plate));
     css
+}
+
+/// A plate with `data-icon-style` (a `PlateTint`) reads the stops it wrote inline for each
+/// scheme (sill FINDINGS Q72). After the family rules, at their specificity, so it wins in both.
+fn tinted_plate_css(plate: &str) -> String {
+    let tinted = format!("{plate}{}", presence_selector("data-icon-style"));
+    let dark = format!(
+        ".ds{} {tinted}",
+        attr_selector("data-theme", Scheme::Dark.slug())
+    );
+    [tinted, dark]
+        .into_iter()
+        .zip(PLATE_TINT_VARS)
+        .map(|(selector, names)| {
+            let reads = ["--plate-base", "--plate-deep", "--plate-ink"]
+                .into_iter()
+                .zip(names)
+                .map(|(target, source)| property(target, &source.reference()))
+                .collect::<Vec<_>>();
+            rule(&selector, &reads)
+        })
+        .collect()
 }
 
 fn stops(base: Hex, deep: Hex, ink: Hex) -> Vec<String> {
@@ -294,6 +318,8 @@ mod tests {
             ".ds[*|data-frame=tinted][*|data-corner=squircle]::before,.ds[*|data-frame=tinted][*|data-corner=squircle]::after{content:none;}",
             ".ds-plate[*|data-family=amber]{--plate-base:#f0a81e;--plate-deep:#8e5a05;--plate-ink:#16171a;}",
             ".ds[*|data-theme=dark] .ds-plate[*|data-family=neutral]{--plate-base:#2a2e28;",
+            ".ds-plate[*|data-icon-style]{--plate-base:var(--plate-base-l);--plate-deep:var(--plate-deep-l);--plate-ink:var(--plate-ink-l);}",
+            ".ds[*|data-theme=dark] .ds-plate[*|data-icon-style]{--plate-base:var(--plate-base-d);",
             ".ds-dock-floor{--dock-floor-fill:",
         ];
         for want in WANT {

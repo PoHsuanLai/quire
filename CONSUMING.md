@@ -856,7 +856,9 @@ What to opt into:
 - `MenuBarItem { open, emphasis, children }` around a bar title or the clock;
   `WorkspacePills { label, WorkspacePill { label, current, onclick } }` for the workspace
   indicator; `RunningDot {}` in a tile and `DockFloor {}` in the dock root;
-  `IconView { plate: Some(PlateFamily::Blue), .. }` for a plate with depth.
+  `IconView { plate: Some(PlateFamily::Blue), .. }` for a plate with depth, and
+  `plate_tint: PlateTint::of(style, tint)` on it to re-colour the plate for `icons.style`
+  (below, "App icons and the icon style").
 
 ### The mailo gaps (2026-09-24): the window frame, status inks, person colours, two glyphs
 
@@ -1070,6 +1072,30 @@ is the icon's size times the output scale: a 48 px dock tile at scale 1 is `48.p
 RGBA PNGs with the plate, bevel and, from 48 px, the baked drop shadow (design/08 2.5); show
 them through `IconSource::Image(ExternalIcon { url: IconUrl::file(&path)?, size })`.
 
+**Finding them** (sill FINDINGS Q71). Do not search yourself; `ds-settings` owns the order:
+
+| Call | Answers |
+| --- | --- |
+| `ds_settings::apps_dir() -> Option<PathBuf>` | the apps directory: the first of the order below that is a directory |
+| `ds_settings::app_icon_path(app: &str, size: ds_settings::Px, style: ds::icon::IconStyle) -> Option<PathBuf>` | `<apps>/<app>/<px>.png`, `<app>/muted/<px>.png` or `<app>/monochrome/<px>.png`; `size` in physical pixels |
+| `ds_settings::icon_assets::{candidates, find_apps_dir, find_app_icon, sizes_to_try}` | the same steps as pure functions of an `AssetsEnv` and a probe, for your own tests |
+
+The order: `$QUIRE_ICON_ASSETS` (the apps directory itself); `$XDG_DATA_HOME/quire/icons/apps`
+(`~/.local/share` when unset); each `$XDG_DATA_DIRS` entry's `quire/icons/apps`
+(`/usr/local/share:/usr/share` when unset); then quire's own `assets/icons/apps` from
+`ds-settings`'s `CARGO_MANIFEST_DIR` at compile time (`AssetsOrigin::DevAssets`: development
+only, it exists for a path-dependency checkout and never for an installed program). The first
+directory that exists wins whole. The size: the exact one of 16, 22, 24, 32, 36, 44, 48, 64, 72,
+96, 128, 256, 512 (`APP_ICON_PX`), else the nearest shipped size above it, else the largest below
+it (a 1024 request gets 512). An app name is lower-case letters, digits, `-` and `_`
+(`AppIconName::parse`); anything else is `None`. sill's `$SILL_ICON_ASSETS` and
+`../quire/assets/icons/apps` search go; `QUIRE_ICON_ASSETS` replaces the first.
+
+**Installing them.** `cargo run -p icons -- install` copies the repository's `assets/icons/apps`
+to `$XDG_DATA_HOME/quire/icons/apps` (`--from DIR` and `--to DIR` override either end); a
+package copies the same tree to `/usr/share/quire/icons/apps`. Either way it is a plain copy of
+the `.png` tree: `cp -r assets/icons/apps "$XDG_DATA_HOME/quire/icons/"` does the same.
+
 **The style.** Map `IconsSettings` (ds-settings) onto the `ds::icon` pair:
 
 | `icons.style` | our icons | third-party icons |
@@ -1087,6 +1113,24 @@ ds::icon::Tint)` re-colours an RGBA8 buffer (straight alpha) in place: lightness
 Muted scales chroma by `ds::icon::retint::MUTED_SCALE`; Monochrome sets the tint's hue and chroma,
 shaped by lightness and alpha, pulled into sRGB. `Colour` is a no-op. It takes bytes, not an image:
 decode (the `image` crate, as for `classify`) and re-encode yourself.
+
+**The plate.** A third-party icon sits on `IconView { plate: Some(PlateFamily::Neutral) }`, and
+the plate is drawn by quire's stylesheet, so re-colouring the raster alone leaves a dark
+`#2A2E28` plate under a tinted icon (sill FINDINGS Q72). Hand the plate the same pair:
+
+| `icons.style` | `IconView` |
+| --- | --- |
+| `Colour` | `plate_tint: None` (or `PlateTint::of(IconStyle::Colour, _)`, which is `None`) |
+| `Muted` | `plate_tint: Some(PlateTint::Muted)` |
+| `Monochrome` | `plate_tint: Some(PlateTint::Monochrome(tint))` |
+
+`ds::PlateTint::of(style, tint)` builds it from the pair you already pass `retint`. The plate's
+two stops and its glyph ink go through `retint`'s own rule (one implementation) for the light
+and the dark scheme, are written on the plate as `--plate-base-l` ... `--plate-ink-d`, and the
+stylesheet picks the pair under the root's `data-theme`: nothing for you to style, nothing for
+the lint to flag. `ds::icon::PlateStops::of(family, scheme).tinted(tint)` gives the colours if
+you need them elsewhere (a cached composite, a tooltip swatch). The light paper stays near
+white under a tint: `retint` eases chroma to nothing at white, as it does for a white icon.
 
 **When to call it.** After loading an icon and before caching it, keyed by (icon, size, scale,
 style, tint): for a third-party icon in Muted or Monochrome (inside our plate, after the 72 %
