@@ -1403,8 +1403,8 @@ should be checked against it.
 ### PDF and printing (2026-09-25)
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and
-the `anyrender_krilla` painter writes it (text stays text in embedded, subsetted faces; a JPEG
-is embedded as it arrived). FINDINGS.md "PDF output" has the reasons, the limits and the
+the `anyrender_pdfrum` painter writes it through pdfrum (text stays text in embedded, subsetted
+faces at the layout's variable instance; a JPEG or an opaque PNG is embedded as it arrived). FINDINGS.md "PDF output" has the reasons, the limits and the
 measured numbers.
 
 | Need | API | Notes |
@@ -1419,7 +1419,7 @@ measured numbers.
 | CJK text | name the family: `font-family: "Noto Sans CJK TC", sans-serif` | Otherwise fontique's fallback picks (DroidSansFallback on this machine). A variable face prints at the instance the layout used. |
 | Print it | `ds_native::print_dialog(&pdf, title) -> Result<PrintOutcome, PrintError>`, feature `print` | Linux: the desktop portal's print dialog (GTK or KDE backend), then the portal prints the PDF. No portal or no print backend, and other systems: the PDF is written to a temp file and opened in the viewer. `PrintOutcome::{Printed, Cancelled, Opened(PathBuf)}`, `PrintError::{Portal, Write, NoViewer}`. **Blocks** until the dialog is answered: call it off the UI thread. The dialog is not parented to the window. |
 | Try it by hand | `cargo run --release -p ds-native --example pdf -- out.pdf`; `cargo run -p ds-native --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
-| The painter alone | `anyrender_krilla::KrillaScene::new(surface, &mut resources, &sources, area)` | An `anyrender::PaintScene` over any krilla surface, Blitz-free. `Sources { texts: RunTexts, images: ImageSources }` carry what anyrender does not: each run's text (`RunKey`, `RunText`) and each image's encoded bytes by decoded blob id. `GlyphArea::Within(rect)` drops glyphs whose box centre falls outside. |
+| The painter alone | `anyrender_pdfrum::write(&[Page { size, scene, placement, clip, area }], &sources)` | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `Sources { texts: RunTexts, images: ImageSources }` carry what anyrender does not: each run's text (`RunKey`, `RunText`) and each image's encoded bytes by decoded blob id. `GlyphArea::Within(rect)` drops glyphs whose box centre falls outside. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

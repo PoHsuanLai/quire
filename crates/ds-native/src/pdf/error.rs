@@ -6,7 +6,8 @@ pub enum PdfError {
     /// The margins leave no room on the sheet for any content.
     #[error("the margins leave no room on the page")]
     NoContentArea,
-    /// krilla could not write the file (a face it cannot embed, an image it cannot encode).
+    /// pdfrum could not write the file (a face it cannot read or subset, an image it cannot
+    /// embed); the message is pdfrum's.
     #[error("the PDF could not be written: {0}")]
     Write(String),
 }

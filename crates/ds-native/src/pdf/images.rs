@@ -5,7 +5,7 @@
 //! from its pixels.
 
 use crate::data_url;
-use anyrender_krilla::{EncodedImage, ImageSources};
+use anyrender_pdfrum::{EncodedImage, ImageSources};
 use blitz_dom::node::ImageData;
 use blitz_dom::{BaseDocument, LocalName};
 

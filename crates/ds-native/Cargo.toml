@@ -29,9 +29,8 @@ wgpu = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
-# PDF output: the painter, and krilla for the document and its pages.
-anyrender_krilla = { workspace = true }
-krilla = { workspace = true }
+# PDF output: the painter, which writes through pdfrum.
+anyrender_pdfrum = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 
