@@ -219,6 +219,7 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.pill_padding_px` | `Px` | `6` | `0..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `dock.running_dot_gap_px` | `Px` | `3` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `dock.floor` | `DockFloor::{Off,On}` | `Off` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `dock.shipped_icons` | `ShippedIcons::{On,Off}` | `On` | Advanced. Show quire's own app icons (`assets/icons/apps`, design/08 §2.11) for the apps in the shell's mapping table, in the dock and the launcher rows, instead of the app's hicolor icon | `08-ICONS.md#2-11-the-shipped-set`; sill FINDINGS "Icon style" | proposed (2026-09-25) |
 
 ### 3.6 `launcher` (sill/settings.toml)
 
