@@ -58,6 +58,11 @@
 /* Drop target (`C:320-323`). */
 .ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 .ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
+/* A place that can take the drag while the pointer is elsewhere (mailo gaps 5, `DropState::Accepts`):
+   a dashed `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes
+   its width out of the padding, so the label does not move as the drag starts. Blitz paints a
+   dashed border (not a dashed outline, which it draws solid). */
+.ds-sidebar-item[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
