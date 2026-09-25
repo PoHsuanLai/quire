@@ -23,6 +23,7 @@ pub mod overlays_mailo;
 pub mod overlays_mailo4;
 pub mod overlays_mailo5;
 pub mod pills;
+pub mod plate_tints;
 pub mod polish;
 pub mod scheduled;
 pub mod space;

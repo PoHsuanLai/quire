@@ -9,11 +9,25 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::icon::{IconStyle, Tint};
 use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Corner, DockFloor, Ds, Emphasis, Here, Icon,
-    IconSize, IconSource, IconView, Inject, Material, MenuBarItem, PlateFamily, Px, RunningDot,
-    Surface, Switch, WorkspacePill, WorkspacePills,
+    IconSize, IconSource, IconView, Inject, Material, MenuBarItem, PRESETS, PlateFamily, PlateTint,
+    Px, RunningDot, Surface, Switch, Theme, WorkspacePill, WorkspacePills,
 };
+
+/// The Work Space's Monochrome plate tint (sill FINDINGS Q72).
+fn work() -> Option<PlateTint> {
+    PlateTint::of(IconStyle::Monochrome, Tint::space(PRESETS[0].dots))
+}
+
+/// A root in `theme`, for the tinted plates' two schemes.
+fn scheme(theme: Theme) -> Appearance {
+    Appearance {
+        theme,
+        ..Appearance::default()
+    }
+}
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -48,6 +62,26 @@ const CASES: &[Case] = &[
     ("plate-neutral-symbolic", || {
         rsx! {
             IconView { source: IconSource::Glyph(Icon::Window), size: IconSize::Tile96, plate: Some(PlateFamily::Neutral) }
+        }
+    }),
+    // Both schemes' stops are written on the plate; the root's data-theme picks them.
+    ("plate-neutral-monochrome-light", || {
+        rsx! {
+            Ds { appearance: scheme(Theme::Light), material: Material::Dock, stylesheet: Inject::Host,
+                IconView { source: IconSource::Glyph(Icon::Window), size: IconSize::Tile48, plate: Some(PlateFamily::Neutral), plate_tint: work() }
+            }
+        }
+    }),
+    ("plate-neutral-monochrome-dark", || {
+        rsx! {
+            Ds { appearance: scheme(Theme::Dark), material: Material::Dock, stylesheet: Inject::Host,
+                IconView { source: IconSource::Glyph(Icon::Window), size: IconSize::Tile48, plate: Some(PlateFamily::Neutral), plate_tint: work() }
+            }
+        }
+    }),
+    ("plate-blue-muted", || {
+        rsx! {
+            IconView { source: IconSource::Glyph(Icon::Folder), size: IconSize::Tile48, plate: Some(PlateFamily::Blue), plate_tint: Some(PlateTint::Muted) }
         }
     }),
     ("surface-squircle", || {

@@ -81,21 +81,29 @@ pub fn retint(pixels: &mut [u8], style: IconStyle, tint: Tint) {
         if px[3] == 0 {
             continue;
         }
-        let [l, a, b] = oklab([px[0], px[1], px[2]]);
-        let (chroma, hue) = match style {
-            IconStyle::Muted => (a.hypot(b) * f64::from(MUTED_SCALE), b.atan2(a)),
-            _ => {
-                let shape = 1.0 - (2.0 * l - 1.0).powi(2);
-                let cover = f64::from(px[3]) / 255.0;
-                (
-                    f64::from(tint.chroma) * shape.max(0.0) * cover,
-                    f64::from(tint.hue).to_radians(),
-                )
-            }
-        };
-        let rgb = in_gamut(l, chroma, hue);
+        let rgb = recolour([px[0], px[1], px[2]], px[3], style, tint);
         px[..3].copy_from_slice(&rgb);
     }
+}
+
+/// One colour of coverage `alpha` re-coloured for `style`: the rule [`retint`] applies to every
+/// pixel, and the one a tinted plate applies to its stops and its ink (`plate_tint.rs`), so a
+/// third-party icon and the plate under it are re-coloured by the same maths.
+pub(crate) fn recolour(rgb: [u8; 3], alpha: u8, style: IconStyle, tint: Tint) -> [u8; 3] {
+    let [l, a, b] = oklab(rgb);
+    let (chroma, hue) = match style {
+        IconStyle::Colour => return rgb,
+        IconStyle::Muted => (a.hypot(b) * f64::from(MUTED_SCALE), b.atan2(a)),
+        IconStyle::Monochrome => {
+            let shape = 1.0 - (2.0 * l - 1.0).powi(2);
+            let cover = f64::from(alpha) / 255.0;
+            (
+                f64::from(tint.chroma) * shape.max(0.0) * cover,
+                f64::from(tint.hue).to_radians(),
+            )
+        }
+    };
+    in_gamut(l, chroma, hue)
 }
 
 /// The sRGB bytes of an OKLCh colour, chroma lowered until it fits.
