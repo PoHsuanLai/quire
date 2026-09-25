@@ -67,8 +67,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-material][*|data-frame=tinted] > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
 .ds[*|data-material][*|data-frame=tinted][*|data-blur=off] > .ds-frame{opacity:.94;}
 .ds[*|data-material][*|data-chrome=transparent]{background:transparent;box-shadow:none;}
-.ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}
-.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-panel{background:var(--m-tint);}
+.ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel,.ds[*|data-material][*|data-chrome=transparent] .ds-shot-plate{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}
+.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-panel,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-shot-plate{background:var(--m-tint);}
 .ds-osd > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
 .ds[*|data-blur=off] .ds-osd > .ds-frame{opacity:.94;}
 .ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.18);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);--m-level-tick:rgba(0,0,0,.16);}
@@ -115,7 +115,8 @@ html,body{margin:0;padding:0;background:transparent}
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
      `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
      and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
-     (the level control), and the sheet's `sheet-out` (sill Q90), below.
+     (the level control), the sheet's `sheet-out` (sill Q90), and the screenshot thumbnail's
+     `shot-out` (sill Q181), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -342,6 +343,12 @@ html,body{margin:0;padding:0;background:transparent}
    back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
+
+/* shot-out (quire's, sill Q181): the screenshot thumbnail slides out to the right, past its own
+   width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
+   out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
+   --e-spring`. */
+@keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -426,6 +433,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes banner-in--b{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out--b{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes shot-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -554,6 +562,10 @@ html,body{margin:0;padding:0;background:transparent}
 .a-panel-in[*|data-pulse=b]{animation:panel-in--b var(--t-move) var(--e-out);}
 .a-panel-out[*|data-pulse=a]{animation:panel-out var(--t-move) var(--e-exit) forwards;}
 .a-panel-out[*|data-pulse=b]{animation:panel-out--b var(--t-move) var(--e-exit) forwards;}
+.a-shot-in[*|data-pulse=a]{animation:rise var(--t-big) var(--e-spring);}
+.a-shot-in[*|data-pulse=b]{animation:rise--b var(--t-big) var(--e-spring);}
+.a-shot-out[*|data-pulse=a]{animation:shot-out var(--t-move) var(--e-exit) forwards;}
+.a-shot-out[*|data-pulse=b]{animation:shot-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -1905,6 +1917,61 @@ html,body{margin:0;padding:0;background:transparent}
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
 .ds-sheet[*|data-placement=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; }
+/* -- shot_thumbnail -- */
+/* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13; sill
+   Q181). The card is a plate in the Toast material inside a transparent Toast scope (the
+   transparent-root card rule in the materials section paints its tint, edge and drop); its
+   width and height are written inline from `shot_frame`, and so is the picture's letterboxed
+   rect inside it, so the bars round a picture outside 2:1..16:10 are the material. The picture's
+   corners follow the card's less the 4 px mat (`--s-4`, the same number as `shot_frame::MAT`).
+   Attribute selectors carry `*|` (spike S2).
+
+   Motion. Entering, `rise` at `--t-big --e-spring` (`Anim::ShotIn`), restarted under its other
+   name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
+   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out.
+
+   Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
+   actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in
+   staggered by `--j` as HoverStrip's do (`pop-in`, backwards fill, so the `:active` scale applies
+   once it ends). The ghost is the plate at 120 wide and .8 opaque, with no motion. */
+
+.ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
+.ds-shot[*|data-shown=hidden]{ display:none; }
+.ds-shot[*|data-presence=entering]{ animation:rise var(--t-big) var(--e-spring); }
+.ds-shot[*|data-presence=entering][*|data-pulse=b]{ animation-name:rise--b; }
+.ds-shot[*|data-presence=leaving]{ animation:shot-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+
+.ds-shot-plate{ position:relative; box-sizing:border-box; width:100%; border-radius:var(--m-radius); overflow:hidden; }
+.ds-shot-picture{ position:absolute; inset:0; cursor:default; }
+.ds-shot-image{ position:absolute; display:block; border-radius:calc(var(--m-radius) - var(--s-4)); pointer-events:none; user-select:none; }
+
+.ds-shot-actions{ position:absolute; right:var(--s-6); bottom:var(--s-6); z-index:var(--z-raise); display:flex; gap:var(--s-3); padding:var(--s-3);
+  border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
+  opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out); }
+.ds-shot[*|data-hover=on] .ds-shot-actions{ opacity:1; pointer-events:auto; }
+.ds-shot-action{ --j:0; display:flex; transform:scale(.7); opacity:0; }
+.ds-shot[*|data-hover=on] .ds-shot-action{ transform:none; opacity:1;
+  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger)); }
+
+.ds-shot-ghost{ position:relative; box-sizing:border-box; opacity:.8; pointer-events:none; }
+
+/* Swipe to dismiss (`data-swipe` on a card that can be swiped; `notification_swipe`, as a
+   notification card's). The card is drawn `--swipe-dx` off its place: following a drag or a
+   scroll with no transition (`live`), springing back at rest (`--t-move --e-spring`), and flying
+   out to the right from where it was (`gone`, `banner-out`). A card that flew out is already
+   gone when its caller hides it, so its leaving plays nothing and stays invisible, rather than
+   `shot-out` starting over from its place.
+   Reduced motion is decided here, never by a caller: no spring back (it snaps), and the entrance
+   neither lifts nor leaves by sliding; it fades in and out (the motion tokens already shorten
+   both to Reduced's length). */
+.ds-shot[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); transition:transform var(--t-move) var(--e-spring); touch-action:none; }
+.ds-shot[*|data-swipe=live]{ transition:none; }
+.ds-shot[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-shot[*|data-swipe=gone][*|data-presence=leaving]{ animation:none; opacity:0; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-swipe]{ transition:none; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering]{ animation-name:fade; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b]{ animation-name:fade--b; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=leaving]{ animation-name:menu-out; }
 /* -- sidebar_item -- */
 /* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
    drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span

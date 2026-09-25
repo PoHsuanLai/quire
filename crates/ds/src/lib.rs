@@ -59,10 +59,10 @@ pub use icon::{
 };
 pub use material::{Blur, BlurState, Material, MaterialRecipe, MaterialStack, recipe};
 pub use motion::{
-    Anim, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent, IntentEffect,
-    IntentPhase, Iteration, ListPresence, MotionTimer, Pane, PaneRole, PaneRound, PaneSlide,
-    Presence, Pulse, Recipe, Roster, RosterEntry, RosterState, RowPitch, StayError, Stayed,
-    TimerPhase, settle, use_drag, use_entrance, use_motion_timer, use_pulse, use_roster,
+    Anim, DRAG_THRESHOLD, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent,
+    IntentEffect, IntentPhase, Iteration, ListPresence, MotionTimer, Pane, PaneRole, PaneRound,
+    PaneSlide, Presence, Pulse, Recipe, Roster, RosterEntry, RosterState, RowPitch, StayError,
+    Stayed, TimerPhase, settle, use_drag, use_entrance, use_motion_timer, use_pulse, use_roster,
 };
 pub use motion::{
     Click, Held, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,

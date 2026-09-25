@@ -62,3 +62,8 @@ required-features = ["lint"]
 [[test]]
 name = "notifications_ssr"
 required-features = ["lint"]
+
+# The screenshot thumbnail, linted (sill Q181).
+[[test]]
+name = "shot_thumbnail_ssr"
+required-features = ["lint"]

@@ -123,3 +123,6 @@
 .g-notif-swiped{transform:translateX(56px)}
 .g-notif-center{position:relative;width:380px}
 .g-notif-stage{height:540px}
+.g-shot-row{display:flex;flex-wrap:wrap;gap:var(--s-22)}
+.g-shot{width:680px;border-radius:var(--r-panel);overflow:hidden}
+.g-shot-ground{display:flex;align-items:flex-end;gap:var(--s-16);padding:var(--s-16) var(--s-16) var(--s-26)}

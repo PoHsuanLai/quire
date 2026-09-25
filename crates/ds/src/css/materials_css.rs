@@ -102,13 +102,15 @@ fn osd_card_css() -> String {
 }
 
 /// The cards a transparent root's material is painted on: a popover, a sheet, a notification's
-/// plate and the layers of its group behind it, and an edge panel (notification parts).
-const CARDS: [&str; 5] = [
+/// plate and the layers of its group behind it, an edge panel (notification parts), and the
+/// screenshot thumbnail's plate (sill Q181).
+const CARDS: [&str; 6] = [
     ".ds-popover",
     ".ds-sheet",
     ".ds-notification-plate",
     ".ds-notification-layer",
     ".ds-panel",
+    ".ds-shot-plate",
 ];
 
 /// The tinted frame and the transparent root, after the paint rules they override.
@@ -313,7 +315,7 @@ mod tests {
             ".ds[*|data-material][*|data-frame=tinted]{background:transparent;position:relative;z-index:var(--z-raise);}",
             ".ds[*|data-material][*|data-frame=tinted][*|data-blur=off] > .ds-frame{opacity:.94;}",
             ".ds[*|data-material][*|data-chrome=transparent]{background:transparent;box-shadow:none;}",
-            ".ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}",
+            ".ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel,.ds[*|data-material][*|data-chrome=transparent] .ds-shot-plate{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}",
         ];
         for want in WANT {
             assert!(css.contains(want), "missing {want}\n{css}");
