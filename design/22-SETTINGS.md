@@ -356,9 +356,6 @@ found elsewhere in the file that are not yet in that table.
 | `menus.font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `menus.highlight_radius_px` | `Px` | `6` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `menus.tooltip_font_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `window.move_threshold_px` | `Px` | `4` | `1..=16` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
-| `window.tile_menu_press_ms` | `Ms` | `500` | `200..=2000` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
-| `window.tile_menu_hover_ms` | `Ms` | `800` | `450..=3000`; the 450 ms hover intent plus a further hold | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 | `switcher.show_delay_ms` | `Ms` | `150` | `0..500` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `switcher.quick_tap_ms` | `Ms` | `100` | chord+modifier release within this = no UI | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
 | `switcher.icon_size_px` | `Px` | `96` | alt macOS ~128 | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 6 | proposed |
@@ -479,6 +476,16 @@ The power menu (design/20 §1.8): a centred sheet with Log out, Restart, Shut do
 | `power_menu.material` | `PanelMaterial::{Sheet,Popover}` | `Sheet` | | `03-COLOR.md#17-3-material-per-surface`; sill M5 freeze | proposed (2026-09-25) |
 
 Focus (Do Not Disturb) reads the existing `notifications.dnd`; a second focus mode would need a `notifications.focus` row.
+
+### 3.18 `window` (the host app's settings file: sill/settings.toml for shell apps; mailo reads them itself)
+
+The client-decorated window frame (design/13 §13.3.11, design/04 "Window frame"): the titlebar drag threshold and the green light's tiling-menu hold times. All Advanced (§5).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `window.move_threshold_px` | `Px` | `4` | `1..=16` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
+| `window.tile_menu_press_ms` | `Ms` | `500` | `200..=2000` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
+| `window.tile_menu_hover_ms` | `Ms` | `800` | `450..=3000`; the 450 ms hover intent plus a further hold | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 
 ## 4. Rust shape
 
