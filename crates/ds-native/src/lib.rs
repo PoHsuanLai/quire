@@ -8,6 +8,7 @@
 //! panicking.
 
 mod app_id;
+mod click_focus;
 pub mod clipboard;
 mod contexts;
 mod data_url;
@@ -27,6 +28,7 @@ mod frames;
 pub mod harness;
 mod harness_config;
 mod harness_edit;
+mod harness_hit;
 mod harness_input;
 mod headless;
 mod host;
@@ -36,6 +38,7 @@ pub mod measure;
 mod memory_shell;
 mod net;
 mod net_policy;
+mod node_ref;
 mod origin;
 mod route;
 mod runtime;
@@ -48,6 +51,7 @@ pub mod snapshot;
 mod wake;
 
 pub use app_id::AppId;
+pub use click_focus::{CLICK_FOCUS, FocusFallback};
 pub use contexts::RootContexts;
 pub use error::NativeError;
 pub use fonts::{font_context, register_fonts};

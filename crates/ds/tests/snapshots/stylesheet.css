@@ -896,11 +896,15 @@ html,body{margin:0;padding:0;background:transparent}
    The Fly waits `--d-fly` before it appears and not at all while hover is warm
    (`.ds[data-hover=warm]`, O-11); `calc(var(--d-fly) * 0)` is a zero delay made of the token.
    O-24: C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12); the
-   caller reveals it instead through `shown` (`data-shown`, below). */
+   caller reveals it instead through `shown` (`data-shown`, below).
+   Centred with `top:0; bottom:0; margin:auto 0` rather than S's `top:50%;
+   transform:translateY(-50%)`: the same box in a browser, but Blitz's layout rect (what
+   `HostMeasure` reads, and so the rect a button's `onclick` anchors a menu to) leaves transforms
+   out, so the translated strip read half its height low there (FINDINGS "Native focus"). */
 
 .ds-strip{
   --j:0;
-  position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; gap:var(--s-3); padding:var(--s-3);
+  position:absolute; right:8px; top:0; bottom:0; margin:auto 0; height:max-content; display:flex; gap:var(--s-3); padding:var(--s-3);
   border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out);
 }
