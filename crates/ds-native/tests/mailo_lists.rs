@@ -111,17 +111,10 @@ fn centre(harness: &Harness, selector: &str) -> Point {
         .unwrap_or_else(|| panic!("{selector} is not in the document:\n{}", harness.html()))
 }
 
-/// Where the strip's first button is painted: the strip is centred on its row by
-/// `translateY(-50%)`, which the layout rect Blitz reports leaves out (hit testing applies it).
+/// Where the strip's first button is: centred on its row by auto margins, so the layout rect
+/// Blitz reports is where it paints and takes the pointer (FINDINGS "Native focus").
 fn strip_button(harness: &Harness) -> Point {
-    let lift = harness
-        .rect(".ds-strip")
-        .map_or(0.0, |strip| strip.size.height.0 / 2.0);
-    let at = centre(harness, ".ds-strip .ds-icon-button");
-    Point {
-        x: at.x,
-        y: Px(at.y.0 - lift),
-    }
+    centre(harness, ".ds-strip .ds-icon-button")
 }
 
 /// A point well outside the row.

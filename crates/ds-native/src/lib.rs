@@ -27,6 +27,7 @@ mod frames;
 pub mod harness;
 mod harness_config;
 mod harness_edit;
+mod harness_hit;
 mod harness_input;
 mod headless;
 mod host;
