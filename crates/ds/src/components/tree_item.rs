@@ -72,6 +72,17 @@ pub enum TreeShape {
 /// `Propagation::Stop` as well; it costs nothing). `here` marks the current place
 /// (`aria-current`, the sidebar item's current look).
 ///
+/// `editing` is an in-place rename (mailo gaps 7): given, it is drawn in the label's place (in
+/// `span.ds-tree-item-edit[data-slot=editing]`, at the label's metrics, so nothing on the row
+/// moves) instead of the label and its select button. Give it a `TextInput` with
+/// `variant: FieldFace::Bare` (it takes the row's face) and `focus: Focus::Controlled(request)`
+/// from `use_focus_request().with_select_all()` (or `Focus::OnMount`), and handle Enter and
+/// Escape in its `onkey`; take the slot away to end the rename. A press in it never toggles or
+/// selects the row; keys are the field's (they start there), and bubble on as any key does.
+///
+/// The trailing slot carries `data-slot="trailing"`: select on that, never on `.ds-*`, to style
+/// your own element inside it (`[*|data-slot=trailing] .fold-more`).
+///
 /// A drag over the tree works as over the sidebar (design/06 section 6.1): `place` is written
 /// `data-place`, the pointer hooks hand over the row's pointer events, and `drop` is drawn by
 /// the rules `SidebarItem` uses (`.ds-drop-place`): `Accepts` outlined, `Target` lit and grown,
@@ -90,6 +101,7 @@ pub fn TreeItem(
     #[props(default)] here: Here,
     #[props(default)] onselect: Option<EventHandler<Press>>,
     #[props(default)] trailing: Option<Element>,
+    #[props(default)] editing: Option<Element>,
     #[props(default)] drop: DropState,
     #[props(default)] place: Option<PlaceId>,
     #[props(default)] onpointerenter: Option<EventHandler<PointerEvent>>,
@@ -109,7 +121,7 @@ pub fn TreeItem(
         if let Some(icon) = glyph {
             crate::icon::render::Glyph { icon, size: crate::icon::render::IconSize::Base }
         }
-        {label_part(label, onselect)}
+        {label_part(label, onselect, editing)}
         {count}
         if let Some(element) = trailing {
             {trailing_slot(element)}

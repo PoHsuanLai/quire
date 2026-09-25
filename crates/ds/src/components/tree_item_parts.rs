@@ -20,9 +20,17 @@ pub(crate) struct Row {
     pub(crate) place: Option<String>,
 }
 
-/// The label: a button that selects the place and keeps its press (so the folder does not also
-/// open or close) when there is `onselect`, else words that toggle with the row.
-pub(crate) fn label_part(label: Text, onselect: Option<EventHandler<Press>>) -> Element {
+/// The label: the caller's editing slot in its place while the place is renamed, else a button
+/// that selects the place and keeps its press (so the folder does not also open or close) when
+/// there is `onselect`, else words that toggle with the row.
+pub(crate) fn label_part(
+    label: Text,
+    onselect: Option<EventHandler<Press>>,
+    editing: Option<Element>,
+) -> Element {
+    if let Some(field) = editing {
+        return editing_slot(field);
+    }
     match onselect {
         Some(select) => {
             let listen = PressListeners::new(select).with_propagation(Propagation::Stop);
@@ -53,17 +61,45 @@ pub(crate) fn leaf_chevron() -> Element {
 /// The trailing slot. It keeps every press inside it from the summary: a button in it that
 /// forgot `Propagation::Stop` still does not toggle the folder. The button hears its press
 /// first (the event starts at the target), then the slot ends it.
+///
+/// `data-slot="trailing"` is the documented seam a consumer may select on (mailo gaps 7): its
+/// own class inside the hover-revealed slot is styled as `[*|data-slot=trailing] .fold-more`,
+/// which the stylesheet lint's `DsInternals` rule leaves alone, where `.ds-tree-item-trail
+/// .fold-more` reaches into quire's internals.
 pub(crate) fn trailing_slot(element: Element) -> Element {
     rsx! {
         span {
             class: "ds-tree-item-trail",
-            onclick: move |event| {
-                event.stop_propagation();
-                event.prevent_default();
-            },
+            "data-slot": "trailing",
+            onclick: fence,
             {element}
         }
     }
+}
+
+/// The editing slot (mailo gaps 7): the caller's field (a Bare `TextInput` focused on mount,
+/// its text selected) drawn where the label is, taking the label's free space so nothing on the
+/// row moves. A press in it never reaches the summary, so it neither toggles nor selects the
+/// row; the press's own pointer-down still puts the caret in the field (Blitz focuses a text
+/// field on pointer-down, not in the click this fences). Keys are left alone: they start at the
+/// field, so its Enter and Escape handlers hear them first.
+fn editing_slot(field: Element) -> Element {
+    rsx! {
+        span {
+            class: "ds-tree-item-label ds-tree-item-edit",
+            "data-slot": "editing",
+            onclick: fence,
+            ondoubleclick: |event| event.stop_propagation(),
+            onpointerup: |event| event.stop_propagation(),
+            {field}
+        }
+    }
+}
+
+/// End a click at its slot: no summary toggle (the default), no row handler (propagation).
+fn fence(event: MouseEvent) {
+    event.stop_propagation();
+    event.prevent_default();
 }
 
 /// The `details`' `open`, in the null namespace, or no `open` at all.
