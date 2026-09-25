@@ -52,6 +52,29 @@ pub fn Surface(
     }
 }
 
+/// A transparent scope of `material` that also carries a quire class of its own (`class`), for a
+/// component whose scope must be laid out itself: Blitz places an absolutely positioned box
+/// against its parent, not its nearest positioned ancestor, so an edge panel's scope has to fill
+/// the root for the panel inside it to (notification parts, sill Q123).
+#[component]
+pub(crate) fn ClassedScope(material: Material, class: &'static str, children: Element) -> Element {
+    let env = scope(use_env(), material, None, None, None);
+    use_env_provider(env);
+    rsx! {
+        div {
+            class: "ds {class}",
+            "data-theme": env.scheme.slug(),
+            "data-accent": env.resolved.accent.slug(),
+            "data-motion": env.resolved.motion.slug(),
+            "data-material": env.material.slug(),
+            "data-blur": env.blur.slug(),
+            "data-ground": Ground::of(material).attribute(),
+            "data-chrome": RootChrome::Transparent.attribute(),
+            {children}
+        }
+    }
+}
+
 /// The inline declaration that overrides a material's corner.
 pub(crate) fn radius_style(radius: Corner) -> String {
     format!("--m-radius:{};{}", radius.css(), radius.squircle_style())

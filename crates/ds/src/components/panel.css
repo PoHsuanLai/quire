@@ -1,0 +1,19 @@
+/* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel. A stage fills
+   the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
+   bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
+   rule paints it) at the material's radius, and scrolls its own content. It slides in with
+   `panel-in` (`--t-move --e-out`, restarted under its other name on each showing) and out with
+   `panel-out` (`--t-move --e-exit`, held); hidden, nothing is laid out. An optional scrim covers
+   the stage behind it. The panel's material scope fills the root too: Blitz places an absolutely
+   positioned box against its parent, so a scope of no height would give the panel none.
+   Attribute selectors carry `*|` (spike S2). */
+
+.ds-panel-scope{ position:absolute; inset:0; pointer-events:none; }
+.ds-panel-stage{ position:absolute; inset:0; pointer-events:none; }
+.ds-panel-stage[*|data-shown=hidden]{ display:none; }
+.ds-panel{ position:absolute; top:var(--s-8); bottom:var(--s-8); box-sizing:border-box; max-width:calc(100% - var(--s-16));
+  display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
+.ds-panel-stage[*|data-edge=right] > .ds-panel{ right:var(--s-8); }
+.ds-panel[*|data-presence=entering]{ animation:panel-in var(--t-move) var(--e-out); }
+.ds-panel[*|data-presence=entering][*|data-pulse=b]{ animation-name:panel-in--b; }
+.ds-panel[*|data-presence=leaving]{ animation:panel-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }

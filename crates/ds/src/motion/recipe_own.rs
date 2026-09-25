@@ -177,3 +177,25 @@ pub(super) const BANNER_IN: Recipe = recipe(
     Fill::None,
     Iteration::Once,
 );
+
+/// `panel-in` (sill Q123): the notification center's edge panel slides in at `--t-move --e-out`.
+/// Opening it is not contact with the panel, and a spring's overshoot would lift it off the edge
+/// it is anchored to, so it decelerates in (design/05 principle 2). An entrance; it holds
+/// nothing.
+pub(super) const PANEL_IN: Recipe = recipe(
+    "panel-in",
+    DurationToken::Move,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `panel-out` (sill Q123): the edge panel slides back out at `--t-move --e-exit` (design/05
+/// section 10), holding its last frame until the host unmaps it at `settle(PanelOut)`.
+pub(super) const PANEL_OUT: Recipe = recipe(
+    "panel-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);

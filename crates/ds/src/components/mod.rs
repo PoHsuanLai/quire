@@ -66,6 +66,7 @@ pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
 pub mod pane_switcher;
+pub mod panel;
 pub mod pass_through;
 pub mod peek;
 pub mod popover;
@@ -90,6 +91,7 @@ pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sheet_placement;
 pub(crate) mod sheet_presence;
+pub(crate) mod shown_phase;
 pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
@@ -159,6 +161,7 @@ pub use notification_swipe::Swipe;
 pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
+pub use panel::{Panel, PanelEdge, PanelScrim};
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
@@ -233,6 +236,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("module_tile", include_str!("module_tile.css")),
     ("module_panel", include_str!("module_panel.css")),
     ("pane_switcher", include_str!("pane_switcher.css")),
+    ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),
