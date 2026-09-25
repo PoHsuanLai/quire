@@ -122,7 +122,7 @@ pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_filter::Filter;
 pub use menu_pick::PickDismiss;
-pub use module_grid::ModuleGrid;
+pub use module_grid::{GridColumns, GridMetrics, ModuleGrid};
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
 pub use osd::{Level, Osd, OsdPosition};
