@@ -176,3 +176,29 @@ fn the_control_set_is_lucides() {
     );
     assert_eq!(Icon::Gamepad.shapes().len(), 5);
 }
+
+/// The control center's own `Switches` (sill FINDINGS Q103): two 20 x 8 pill tracks 4 px apart
+/// with a dot knob each at opposite ends, inside Lucide's reach, in the shell set.
+#[test]
+fn switches_is_two_tracks_with_knobs_at_opposite_ends() {
+    let shapes = Icon::Switches.shapes();
+    let tracks: Vec<&Shape> = shapes
+        .iter()
+        .filter(|shape| matches!(shape, Shape::Rect { .. }))
+        .collect();
+    let knobs: Vec<(&str, &str)> = shapes
+        .iter()
+        .filter_map(|shape| match shape {
+            Shape::Circle { cx, cy, .. } => Some((*cx, *cy)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(tracks.len(), 2, "{shapes:?}");
+    assert_eq!(
+        knobs,
+        [("6", "6"), ("18", "18")],
+        "left on top, right below"
+    );
+    assert!(Icon::SHELL.contains(&Icon::Switches));
+    assert_eq!(Icon::SHELL.last(), Some(&Icon::Switches));
+}
