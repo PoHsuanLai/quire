@@ -217,16 +217,17 @@
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
-/* banner-out (quire's, sill Q121, Q122): a notification banner slides out to the right, from
-   the offset a swipe left it at (`--swipe-dx`, 0 when none) to past its own width and the
-   surface's edge, fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
+/* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
+   swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
+   `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
+   edge when unset), fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
    frame until the stack drops the row and the rows below heal. */
-@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 
-/* banner-in (quire's, sill Q121): a notification banner slides in from past the surface's right
-   edge to its place at `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first
-   frame: the edge hides it until it arrives. */
-@keyframes banner-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
+/* banner-in (quire's, sill Q121): a notification banner slides in from its entry edge's vector
+   (`--banner-dx`, `--banner-dy`; past the surface's right edge when unset) to its place at
+   `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first frame. */
+@keyframes banner-in{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 
 /* panel-in and panel-out (quire's, sill Q123): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
