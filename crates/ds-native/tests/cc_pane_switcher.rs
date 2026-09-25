@@ -6,11 +6,18 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, Material, Pane, PaneSwitcher, RowTrailing,
+    Anim, Appearance, Button, ButtonVariant, Ds, Icon, Material, Pane, PaneSwitcher, RowTrailing,
     SettingsRow, Switch,
 };
+use ds::{MotionLevel, StaggerIndex, settle};
 use ds_native::{Harness, Viewport};
-use std::time::Duration;
+use std::time::{Duration, Instant};
+
+// `Harness::advance` lets real (wall-clock) time pass: quire's settle timers are `futures-timer`
+// sleeps, which a harness cannot fake (its module documentation). Under a loaded parallel
+// `cargo test --workspace` an `advance(ms(170))` can stretch past a settle it meant to stop short
+// of, so these tests never assert a state at one fixed instant around a settle: they poll with
+// `settle_until` up to a bound, time the settle on the wall clock, and assert the order.
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -60,6 +67,36 @@ fn ask(harness: &mut Harness, id: &str) {
     harness.click(at);
 }
 
+/// How long a pane switch takes to settle at the Standard level (both panes play `--t-move`).
+fn slide() -> Duration {
+    settle(
+        Anim::PaneInR,
+        MotionLevel::Standard,
+        StaggerIndex::default(),
+    )
+}
+
+/// The most a settle may be stretched by a loaded machine before the test gives up.
+const BOUND: Duration = Duration::from_secs(3);
+
+/// Advance in 10 ms steps until `done` holds, for at most `BOUND`; the wall-clock instant it
+/// first held, or `None` when it never did.
+fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) -> Option<Instant> {
+    let started = Instant::now();
+    while started.elapsed() < BOUND {
+        if done(harness) {
+            return Some(Instant::now());
+        }
+        harness.advance(ms(10));
+    }
+    done(harness).then(Instant::now)
+}
+
+/// The switcher has come to rest: one pane drawn, nothing moving.
+fn at_rest(harness: &Harness) -> bool {
+    harness.count(".ds-pane") == 1 && harness.attr(".ds-panes", "data-moving").is_none()
+}
+
 fn presence(harness: &Harness, pane: &str) -> Option<String> {
     harness.attr(&format!(".ds-pane[*|data-pane={pane}]"), "data-presence")
 }
@@ -105,7 +142,10 @@ fn a_switch_plays_both_panes_and_settles_on_the_new_one() {
     );
     assert_eq!(log(&harness), "", "nothing settled yet");
 
-    harness.advance(ms(350));
+    assert!(
+        settle_until(&mut harness, at_rest).is_some(),
+        "the switch settled within {BOUND:?}"
+    );
     assert_eq!(harness.count(".ds-pane"), 1, "the root was dropped");
     assert_eq!(presence(&harness, "detail").as_deref(), Some("present"));
     assert_eq!(harness.attr(".ds-panes", "data-moving"), None);
@@ -116,12 +156,25 @@ fn a_switch_plays_both_panes_and_settles_on_the_new_one() {
 fn a_switch_during_a_slide_reverses_cleanly() {
     let mut harness = Harness::new(PanesApp, VIEW);
     harness.advance(ms(50));
+    let first = Instant::now();
     ask(&mut harness, "to-detail");
-    harness.advance(ms(150));
+    harness.advance(ms(60));
+    // The precondition: the first round is still moving when the reversal is asked for. It has
+    // `slide()` (284 ms) of wall clock to spare against 60 ms of waiting.
+    assert_eq!(
+        harness.attr(".ds-panes", "data-moving").as_deref(),
+        Some("true"),
+        "still sliding to the detail"
+    );
     assert_eq!(presence(&harness, "detail").as_deref(), Some("entering"));
 
+    let reversal = Instant::now();
     ask(&mut harness, "to-root");
-    harness.advance(ms(30));
+    harness.advance(ms(1));
+    assert!(
+        reversal.duration_since(first) < slide(),
+        "the reversal came mid-slide"
+    );
     assert_eq!(harness.count(".ds-pane"), 2);
     assert_eq!(
         presence(&harness, "root").as_deref(),
@@ -130,17 +183,26 @@ fn a_switch_during_a_slide_reverses_cleanly() {
     );
     assert_eq!(presence(&harness, "detail").as_deref(), Some("leaving"));
 
-    // Past the first round's settle (284 ms after it began), before the reversal's.
-    harness.advance(ms(170));
-    assert_eq!(
-        harness.count(".ds-pane"),
-        2,
-        "the reversed round's settle did not land"
+    // Poll to rest, and watch that nothing reports the reversed round on the way.
+    let rested = settle_until(&mut harness, |harness| {
+        assert!(
+            !log(harness).contains("detail"),
+            "the reversed round never reports"
+        );
+        at_rest(harness)
+    })
+    .unwrap_or_else(|| panic!("the reversal settled within {BOUND:?}"));
+    // Order, not an instant: the switcher rests only once the reversal's own round has run its
+    // full settle from when it was asked, so it cannot have rested at the first round's settle.
+    assert!(
+        rested.duration_since(reversal) >= slide(),
+        "the reversal's settle lands a full slide after it was asked: {:?}",
+        rested.duration_since(reversal)
     );
-    assert_eq!(log(&harness), "");
-
-    harness.advance(ms(250));
-    assert_eq!(harness.count(".ds-pane"), 1);
+    assert!(
+        rested.duration_since(first) > slide(),
+        "and after the first round's settle would have"
+    );
     assert_eq!(presence(&harness, "root").as_deref(), Some("present"));
     assert_eq!(log(&harness), "root", "only the last round reported");
 }
