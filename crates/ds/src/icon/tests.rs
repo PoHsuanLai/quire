@@ -156,3 +156,24 @@ fn printer_and_folder_input_are_lucides() {
         Some(&[Shape::Path("M2 13h10"), Shape::Path("m9 16 3-3-3-3")][..])
     );
 }
+
+/// The "more" glyphs as Lucide 1.47.0 publishes them (mailo gaps 6): three unit circles on the
+/// middle row for `ellipsis`, on the middle column for `ellipsis-vertical`, centre first.
+#[test]
+fn the_ellipses_are_lucides() {
+    let dot = |cx, cy| Shape::Circle { cx, cy, r: "1" };
+    assert_eq!(
+        Icon::Ellipsis.shapes(),
+        &[dot("12", "12"), dot("19", "12"), dot("5", "12")][..]
+    );
+    assert_eq!(
+        Icon::EllipsisVertical.shapes(),
+        &[dot("12", "12"), dot("12", "5"), dot("12", "19")][..]
+    );
+    for icon in [Icon::Ellipsis, Icon::EllipsisVertical] {
+        assert!(
+            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
+            "{icon:?}"
+        );
+    }
+}

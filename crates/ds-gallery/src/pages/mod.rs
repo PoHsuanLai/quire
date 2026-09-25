@@ -4,6 +4,7 @@ pub mod app_icons;
 pub mod button_faces;
 pub mod controls;
 pub mod controls_mailo5;
+pub mod controls_mailo6;
 pub mod dock_tiles;
 pub mod edit_surface;
 pub mod external_icons;

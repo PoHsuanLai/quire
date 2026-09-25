@@ -209,6 +209,12 @@ pub enum Icon {
     Printer,
     /// Lucide `folder-input`: mailo's move-to-folder action.
     FolderInput,
+    // mailo gaps 6: the "more" glyphs. Kept at the end so the control set (sill Q81) and these
+    // merge without touching each other's lines.
+    /// Lucide `ellipsis`: a row's or a header's overflow menu, laid across.
+    Ellipsis,
+    /// Lucide `ellipsis-vertical`: the same menu where the row is narrow and tall.
+    EllipsisVertical,
 }
 
 impl Icon {
@@ -304,7 +310,13 @@ impl Icon {
     ];
 
     /// Glyphs for a consumer's actions beyond the two sets (Lucide, `geometry_actions`).
-    pub const ACTIONS: &[Icon] = &[Icon::Printer, Icon::FolderInput];
+    pub const ACTIONS: &[Icon] = &[
+        Icon::Printer,
+        Icon::FolderInput,
+        // mailo gaps 6.
+        Icon::Ellipsis,
+        Icon::EllipsisVertical,
+    ];
 
     /// Every glyph: the mailo set, the shell set, then the actions.
     pub const ALL: &[Icon] = &[
@@ -391,6 +403,9 @@ impl Icon {
         Icon::Brightness,
         Icon::Printer,
         Icon::FolderInput,
+        // mailo gaps 6.
+        Icon::Ellipsis,
+        Icon::EllipsisVertical,
     ];
 
     /// The children of this glyph, in the design's order.
@@ -431,6 +446,9 @@ impl Icon {
             Icon::Plus => PLUS,
             Icon::Printer => geometry_actions::PRINTER,
             Icon::FolderInput => geometry_actions::FOLDER_INPUT,
+            // mailo gaps 6.
+            Icon::Ellipsis => geometry_actions::ELLIPSIS,
+            Icon::EllipsisVertical => geometry_actions::ELLIPSIS_VERTICAL,
             shell => geometry_shell::shapes(shell),
         }
     }
