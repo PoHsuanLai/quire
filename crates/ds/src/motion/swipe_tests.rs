@@ -96,10 +96,13 @@ fn a_release_springs_back_under_both_thresholds_and_flies_out_past_either() {
     }
 }
 
+/// A scroll case: its name, the inputs, and the look, offset and effects they end with.
+type ScrollCase<'a> = (&'a str, &'a [I], SwipeLook, Px, &'a [SwipeEffect]);
+
 #[test]
 fn a_scroll_is_summed_and_decided_when_it_goes_quiet() {
     #[rustfmt::skip]
-    let cases: &[(&str, &[I], SwipeLook, Px, &[SwipeEffect])] = &[
+    let cases: &[ScrollCase<'_>] = &[
         ("far", &[
             I::Scroll { dx: Px(30.0), dy: Px(0.0) },
             I::Scroll { dx: Px(30.0), dy: Px(2.0) },

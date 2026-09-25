@@ -1,0 +1,17 @@
+/* BannerStack (sill Q121; design/13 section 13.3.6): the banners in a column at the right edge,
+   newest first; at the bottom right the column runs upwards. Each row pads itself by the stack's
+   gap (`--notifications-stack-gap`) on the side away from the edge it grows from, so its measured
+   height is its whole pitch. A row enters with `banner-in` and leaves with `banner-out` (both
+   `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
+   the position) with the heal ripple. A card swiped away inside a row holds its offset while the
+   row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-banner-stack{ display:flex; flex-direction:column; align-items:flex-end; }
+.ds-banner-stack[*|data-position=bottom-right]{ flex-direction:column-reverse; }
+.ds-banner{ display:flex; justify-content:flex-end; padding-bottom:var(--notifications-stack-gap); }
+.ds-banner-stack[*|data-position=bottom-right] > .ds-banner{ padding-bottom:0; padding-top:var(--notifications-stack-gap); }
+.ds-banner[*|data-presence=entering]{ animation:banner-in var(--t-move) var(--e-spring); }
+.ds-banner[*|data-presence=leaving]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal)); }
+.ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }

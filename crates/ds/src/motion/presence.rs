@@ -15,6 +15,8 @@ pub enum Exit {
     Crumple,
     /// A Today entry closing: `tab-out` (wave 2 integration amendment).
     TabOut,
+    /// A notification banner leaving: `banner-out`, a slide to the right (sill Q121).
+    BannerOut,
 }
 
 impl Exit {
@@ -25,6 +27,7 @@ impl Exit {
             Exit::Curl => "curl",
             Exit::Crumple => "crumple",
             Exit::TabOut => "tab-out",
+            Exit::BannerOut => "banner-out",
         }
     }
 }

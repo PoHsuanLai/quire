@@ -165,3 +165,15 @@ pub(super) const BANNER_OUT: Recipe = recipe(
     Fill::Forwards,
     Iteration::Once,
 );
+
+/// `banner-in` (sill Q121): a banner's entrance at `--t-move --e-spring`. design/13 section
+/// 13.3.6 proposed `--t-big` (the design toast's); the stack plays it at `--t-move`, the length
+/// of the exit and the heal it may arrive beside, so the stack moves as one. An entrance, so it
+/// holds nothing.
+pub(super) const BANNER_IN: Recipe = recipe(
+    "banner-in",
+    DurationToken::Move,
+    EasingToken::Spring,
+    Fill::None,
+    Iteration::Once,
+);

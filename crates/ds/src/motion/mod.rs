@@ -12,6 +12,7 @@ pub mod pulse;
 pub mod recipe;
 mod recipe_own;
 pub mod roster;
+pub(crate) mod roster_exits;
 mod roster_rest;
 pub mod settle;
 pub mod swipe;

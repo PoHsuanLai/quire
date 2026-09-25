@@ -263,6 +263,8 @@ fn the_settle_table() {
         // sill Q121, Q122: the banner's exit at --t-move, which only Reduced shortens.
         (Anim::BannerOut, MotionLevel::Standard, 284),
         (Anim::BannerOut, MotionLevel::Extra, 284),
+        (Anim::BannerIn, MotionLevel::Standard, 284),
+        (Anim::BannerIn, MotionLevel::Calm, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(
