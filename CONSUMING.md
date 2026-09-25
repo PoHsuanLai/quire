@@ -1033,6 +1033,43 @@ FINDINGS "mailo gaps 5" has the reasons and the proofs.
 | `Button` | `leading` | `Option<Leading>` (`None`) | `Leading::Mark(element)` before the label, for a quire mark you build (`rsx! { ProviderMark { provider, size: MarkSize::Inline, style } }` in the From dropdown's value); `Leading::Glyph(icon)` a glyph. `span.ds-button-lead` |
 | `HoverCardPart` | `FlagText { tone, icon, text: Text }`, `HoverCardPart::flag(tone, icon, impl Into<Text>)` | new variant and constructor | A flag of either tone whose words are runs (the spoof warning's brand and domain in `Strong`). Drawn exactly as `Flag`; `Flag { text: String }` is unchanged, so its literals compile |
 
+### OSD parts (2026-09-25)
+
+Additive (sill FINDINGS Q74 to Q76; FINDINGS "OSD parts" and "Level control"). No existing prop
+changed; `Slider` is unchanged (its pointer-to-value function moved to a shared module). `Anim`
+gained three variants (`Anim::ALL` is 55 long; a `match` over `Anim` needs the new arms).
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `LevelControl` | `label`, `value`, `glyph` | `String`, `Fraction`, `LevelGlyph` | A level with a glyph that follows it: `LevelGlyph::Volume(Muting::{Audible, Muted})` shows no wave at 0, then one, two, three waves by thirds, and a slash when muted; `LevelGlyph::Brightness` a sun whose rays grow with the level. Parts cross-fade over `--t-quick` |
+| `LevelControl` | `mode` | `LevelMode` (`Interactive`) | `Interactive`: `role=slider`, focusable, pointer and keys (arrows step a sixteenth, Shift a sixty-fourth). `ReadOnly`: `role=progressbar`, not focusable, no handlers; `onchange` may be left out |
+| `LevelControl` | `look` | `LevelLook` (`Capsule`) | `Capsule` (26 px, fill in the material's bright ink, glyph inside and knocked out by the fill), `CapsuleKnob` (a round knob at the fill's end, glyph before), `Segments` (sixteen squares filling in by `--stagger`) |
+| `LevelControl` | `tick`, `availability`, `onchange` | `Tick` (`Off`), `Availability`, `EventHandler<Fraction>` | `Tick::Quiet` marks the fill's edge (`Anim::LevelTick`) each time the level crosses a sixteenth; the sound is yours |
+| `LevelControl` | motion | | Set from outside: the fill slides over `--t-quick --e-out`. Under the pointer: no easing. A press swells the track (`scaleY(1.08)`, `--e-spring`); past an end the capsule stretches up to 6 px and springs back on release (not under Reduced). The track is measured once per press, after layout |
+| `Osd` | `shown`, `on_hidden` | `Shown`, `EventHandler<()>` | The OSD card and its presence: shown, `data-presence=entering` (`Anim::OsdIn`) then `present`; hidden, `leaving` (`Anim::OsdOut`), then `on_hidden` at `settle(OsdOut)` and the card is `data-shown=hidden` (not laid out): unmap the surface there. A show while it fades takes the hide back (present at once, no `on_hidden`). The hold is yours (`osd.hold_ms`) |
+| `Osd` | `level`, `label`, `look`, `id`, `children` | `Option<Level { value, glyph }>`, `Option<String>`, `LevelLook`, `Option<String>`, `Element` | A title line (`label`, 13/600) over a read-only `LevelControl` in `look`; `id` for the blur region (`Element("osd")`); children after |
+| `Osd` | `position` | `OsdPosition` (`TopRight`) | `TopRight` (under the bar, the default) or `BottomCentre` (above the dock): which edge takes the card's margin `--osd-margin` and which way `OsdIn`/`OsdOut` move (`--osd-dy`: from above and back up at the top right, from below and back down at the bottom centre) |
+| `OsdMetrics` | `margin`, `style_attr()` | `Px` (24) | `osd.margin_px`, written as `--osd-margin-px` on any element around the card |
+| `Anim` | `OsdIn`, `OsdOut`, `LevelTick` | new variants | `osd-in` `--t-quick --e-out` (from `--osd-dy` at .96 and transparent, no overshoot), `osd-out` `--t-move --e-exit` forwards (to half of `--osd-dy`, transparent), `level-tick` `--t-tap --e-out` |
+
+**Where `Osd` goes.** Directly inside one transparent Osd root, not a painted root nested in a
+transparent one:
+
+```rust
+Ds { appearance, system, look, material: Material::Osd, chrome: Some(RootChrome::Transparent),
+     blur: BlurState::Available, tint_alpha: Some(env.tint_alpha()), stack: Some(env.material_stack()),
+    div { style: OsdMetrics { margin: Px(f32::from(osd.margin_px.0)) }.style_attr(),
+        Osd { shown, label: "MA270U", level: Level { value, glyph: LevelGlyph::Volume(Muting::Audible) },
+              position: OsdPosition::TopRight, id: "osd", on_hidden: move |()| unmap() }
+    }
+}
+```
+
+The root paints nothing and gives the card every token; the card paints the Osd material with the
+Space gradient at its tint (its own `.ds-frame` group) at a control-center module's shape
+(`--r-tile`, 12 padding, 296 wide). Size the surface to the card, its margins and the material's
+shadow, anchored to the `position` edge; the layer margin is then 0.
+
 ### Native phase B (2026-09-25): the Blitz host for an app window
 
 What `ds-native` gives an app that moves its window onto `ds_native::launch` (mailo Phase B).
