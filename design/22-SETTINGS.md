@@ -49,7 +49,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 | File | Owner | Domains |
 | --- | --- | --- |
 | `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
-| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces` |
+| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display` |
 | `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
 
 Rules, all three files:
@@ -412,6 +412,13 @@ until that comparison happens (see handback report).
 | `control_center.grid_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
 | `control_center.grid_padding_px` | `Px` | `12` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
 | `control_center.modules` | `Vec<ControlCenterModule>` | `[Wifi, Bluetooth, Focus, Display, Sound, NowPlaying, Appearance, Battery]` | plan's service list; Claude Doc spec (rev 31) may differ | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed, partial |
+| `control_center.bottom_margin_px` | `Px` | `16` | `0..=64`; the panel scrolls past `output_h - bar_h - this` | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed (M5 freeze, 2026-09-25) |
+| `control_center.menu_bar_wifi` | `InMenuBar::{Show,Hide}` | `Show` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
+| `control_center.menu_bar_bluetooth` | `InMenuBar::{Show,Hide}` | `Hide` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
+| `control_center.menu_bar_sound` | `InMenuBar::{Show,Hide}` | `Show` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
+| `control_center.menu_bar_display` | `InMenuBar::{Show,Hide}` | `Hide` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
+| `control_center.menu_bar_battery` | `InMenuBar::{Show,Hide}` | `Show` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
+| `control_center.menu_bar_now_playing` | `InMenuBar::{Show,Hide}` | `Hide` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
 
 ### 3.14 `spaces` (sill/settings.toml)
 
@@ -458,6 +465,17 @@ All Advanced (§5). The on-screen display for volume and brightness (design/20 �
 | `osd.hold_ms` | `Ms` | `1500` | `300..=10000`; after the last change and before the fade | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
 | `osd.position` | `OsdPosition::{TopRight,BottomCentre}` | `TopRight` | top right under the bar, as current macOS (user, 2026-09-25); `BottomCentre` above the dock | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
 | `osd.margin_px` | `Px` | `24` | `0..=400`; the gap from the bar's reserve (at the top) or the dock's (at the bottom) to the card; was `osd.bottom_margin_px` before the top-right decision | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+
+### 3.17 `power_menu` (sill/settings.toml)
+
+The power menu (design/20 §1.8): a centred sheet with Log out, Restart, Shut down, Suspend and Cancel.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `power_menu.default_action` | `PowerMenuDefault::{LogOut,Restart,ShutDown,Suspend}` | `ShutDown` | the button Return presses when the menu opens | `20-SURFACES.md#1-8-power-menu`; sill M5 freeze | proposed (2026-09-25) |
+| `power_menu.material` | `PanelMaterial::{Sheet,Popover}` | `Sheet` | | `03-COLOR.md#17-3-material-per-surface`; sill M5 freeze | proposed (2026-09-25) |
+
+Focus (Do Not Disturb) reads the existing `notifications.dnd`; a second focus mode would need a `notifications.focus` row.
 
 ## 4. Rust shape
 
@@ -717,6 +735,9 @@ pub struct ShellFile {               // sill/settings.toml
     pub menus: MenusSettings,
     pub notifications: NotificationsSettings,
     pub control_center: ControlCenterSettings,
+    pub osd: OsdSettings,
+    pub power_menu: PowerMenuSettings,
+    pub display: DisplaySettings,
     pub spaces: SpacesSettings,
 }
 
@@ -766,6 +787,9 @@ pub fn apply(old: &Settings, new: &Settings) -> Vec<SettingsChange> {
     if old.shell.menus != new.shell.menus { out.push(SettingsChange::Menus); }
     if old.shell.notifications != new.shell.notifications { out.push(SettingsChange::Notifications); }
     if old.shell.control_center != new.shell.control_center { out.push(SettingsChange::ControlCenter); }
+    if old.shell.osd != new.shell.osd { out.push(SettingsChange::Osd); }
+    if old.shell.power_menu != new.shell.power_menu { out.push(SettingsChange::PowerMenu); }
+    if old.shell.display != new.shell.display { out.push(SettingsChange::Display); }
     if old.shell.spaces != new.shell.spaces { out.push(SettingsChange::Spaces); }
     if old.gestures.gestures != new.gestures.gestures { out.push(SettingsChange::Gestures); }
     if old.gestures.palm_rejection != new.gestures.palm_rejection { out.push(SettingsChange::PalmRejection); }

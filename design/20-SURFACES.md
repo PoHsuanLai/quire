@@ -19,7 +19,7 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Layer / role | layer-shell `Top`, one per output, anchor `TOP\|LEFT\|RIGHT`, `ExclusiveZone::Reserve(h)` | S |
 | Height | height token (value in 01-LAYOUT) | S |
 | Material | `Bar`, tinted by the workspace SpaceLook (`--f-*`); `Ds` draws the gradient at the bar's tint and the frame ground (bar gaps) | S |
-| Content | left: app name, workspace indicator (drag reorder); right: tray, volume, network, battery, clock | S |
+| Content | left: app name, workspace indicator (drag reorder); right: tray, then the module items `control_center.menu_bar_*` shows (sound, network, battery by default; each opens its module's detail pane), the control center item, clock (user direction 2026-09-25: controls at the top right as on macOS) | S |
 | Components | `IconButton{Status}` per status item (settled, bar gaps: box and glyph from `bar.status_*` through `StatusMetrics`), `MenuBarItem` around the app name, titles and clock (the 4 px hover and open pill, 13/500 text; settled 2026-09-24), `WorkspacePills` for the workspace indicator (one segmented group on the frame; settled 2026-09-24), `MenuEntry::Info` for status lines, `Glyph` (`IconSize::Bar` 22, P), `Menu{Dropdown}` + `MenuEntry` for every menu (22 px rows, 13 px text), `Count`, `Tooltip{Fly}` (12 px) | S / P |
 | Motion | menus `menu-pop` `--t-move` `--e-spring`; hover bg `--t-quick` `--e-out`; press `--squish` `--t-tap`; tint cross-fade `--t-scene` 380 ms (21-SPACES §5) | S |
 | Behaviours | 13-BEHAVIOUR-menus-windows (menu bar, menus: open delay, safe triangle), 06 (menus, Escape), 12 (workspace swipe updates indicator) | S |
