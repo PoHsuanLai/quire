@@ -1072,6 +1072,30 @@ is the icon's size times the output scale: a 48 px dock tile at scale 1 is `48.p
 RGBA PNGs with the plate, bevel and, from 48 px, the baked drop shadow (design/08 2.5); show
 them through `IconSource::Image(ExternalIcon { url: IconUrl::file(&path)?, size })`.
 
+**Finding them** (sill FINDINGS Q71). Do not search yourself; `ds-settings` owns the order:
+
+| Call | Answers |
+| --- | --- |
+| `ds_settings::apps_dir() -> Option<PathBuf>` | the apps directory: the first of the order below that is a directory |
+| `ds_settings::app_icon_path(app: &str, size: ds_settings::Px, style: ds::icon::IconStyle) -> Option<PathBuf>` | `<apps>/<app>/<px>.png`, `<app>/muted/<px>.png` or `<app>/monochrome/<px>.png`; `size` in physical pixels |
+| `ds_settings::icon_assets::{candidates, find_apps_dir, find_app_icon, sizes_to_try}` | the same steps as pure functions of an `AssetsEnv` and a probe, for your own tests |
+
+The order: `$QUIRE_ICON_ASSETS` (the apps directory itself); `$XDG_DATA_HOME/quire/icons/apps`
+(`~/.local/share` when unset); each `$XDG_DATA_DIRS` entry's `quire/icons/apps`
+(`/usr/local/share:/usr/share` when unset); then quire's own `assets/icons/apps` from
+`ds-settings`'s `CARGO_MANIFEST_DIR` at compile time (`AssetsOrigin::DevAssets`: development
+only, it exists for a path-dependency checkout and never for an installed program). The first
+directory that exists wins whole. The size: the exact one of 16, 22, 24, 32, 36, 44, 48, 64, 72,
+96, 128, 256, 512 (`APP_ICON_PX`), else the nearest shipped size above it, else the largest below
+it (a 1024 request gets 512). An app name is lower-case letters, digits, `-` and `_`
+(`AppIconName::parse`); anything else is `None`. sill's `$SILL_ICON_ASSETS` and
+`../quire/assets/icons/apps` search go; `QUIRE_ICON_ASSETS` replaces the first.
+
+**Installing them.** `cargo run -p icons -- install` copies the repository's `assets/icons/apps`
+to `$XDG_DATA_HOME/quire/icons/apps` (`--from DIR` and `--to DIR` override either end); a
+package copies the same tree to `/usr/share/quire/icons/apps`. Either way it is a plain copy of
+the `.png` tree: `cp -r assets/icons/apps "$XDG_DATA_HOME/quire/icons/"` does the same.
+
 **The style.** Map `IconsSettings` (ds-settings) onto the `ds::icon` pair:
 
 | `icons.style` | our icons | third-party icons |
