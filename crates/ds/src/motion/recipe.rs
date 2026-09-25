@@ -422,6 +422,9 @@ impl Anim {
             Anim::PaneInL => own::PANE_IN_L,
             Anim::PaneOutL => own::PANE_OUT_L,
             Anim::PaneOutR => own::PANE_OUT_R,
+            Anim::OsdIn => own::OSD_IN,
+            Anim::OsdOut => own::OSD_OUT,
+            Anim::LevelTick => own::LEVEL_TICK,
         }
     }
 }

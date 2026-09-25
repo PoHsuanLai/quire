@@ -12,6 +12,8 @@ pub mod fields;
 pub mod gaps;
 pub mod glyphs;
 pub mod launcher;
+pub mod level;
+pub mod level_tile;
 pub mod lists;
 pub mod lists_mailo4;
 pub mod lists_search;

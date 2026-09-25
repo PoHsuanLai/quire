@@ -109,6 +109,11 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Keyboard / blur / input | `None`; blur `Element("osd")`; input `Empty` | P |
 | Milestone | M6 | S |
 
+Components (quire, 2026-09-25): `ds::Osd` (the card and its presence, `on_hidden` at
+`settle(OsdOut)`, inside one transparent Osd root), `ds::LevelControl { mode: LevelMode::ReadOnly,
+look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition` and
+`ds::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSUMING.md "OSD parts (2026-09-25)".
+
 ### 1.8 Power menu (SPEC Tier 1)
 
 | Field | Value | St |

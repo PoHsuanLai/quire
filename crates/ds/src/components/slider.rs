@@ -1,6 +1,7 @@
 //! Slider: a continuous value, divs and a drag tracker, because Blitz has no native range
 //! (design/04-COMPONENTS.md section 5).
 
+use crate::components::track::fraction_at;
 use crate::components::vocab::{Availability, Fraction};
 use crate::geometry::measure::client_rect;
 use crate::geometry::units::{Point, Px, Rect};
@@ -48,17 +49,6 @@ fn stepped(value: Fraction, step: Fraction, nudge: Nudge) -> Fraction {
         Nudge::Down => Fraction(value.saturating_sub(step.0)),
         Nudge::Up => Fraction(value.saturating_add(step.0)).clamped(),
     }
-}
-
-/// The value under the pointer at `x` on a slider occupying `rect`, clamped to its ends.
-fn fraction_at(rect: Rect, x: Px) -> Fraction {
-    let width = rect.size.width.0;
-    if width <= 0.0 {
-        return Fraction(0);
-    }
-    let share = ((x.0 - rect.left().0) / width).clamp(0.0, 1.0);
-    // In 0..=1000 after the clamp, so the cast cannot truncate.
-    Fraction((share * 1000.0).round() as u16)
 }
 
 /// `aria-valuenow`: the value on the 0..=100 scale the markup declares.
