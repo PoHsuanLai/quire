@@ -1059,6 +1059,23 @@ FINDINGS "mailo gaps 5" has the reasons and the proofs.
 | `Button` | `leading` | `Option<Leading>` (`None`) | `Leading::Mark(element)` before the label, for a quire mark you build (`rsx! { ProviderMark { provider, size: MarkSize::Inline, style } }` in the From dropdown's value); `Leading::Glyph(icon)` a glyph. `span.ds-button-lead` |
 | `HoverCardPart` | `FlagText { tone, icon, text: Text }`, `HoverCardPart::flag(tone, icon, impl Into<Text>)` | new variant and constructor | A flag of either tone whose words are runs (the spoof warning's brand and domain in `Strong`). Drawn exactly as `Flag`; `Flag { text: String }` is unchanged, so its literals compile |
 
+### The mailo gaps 6 (2026-09-25)
+
+Additive: leave a prop out and the markup is what it was. One markup change: `SidebarItem`'s
+class list is `ds-sidebar-item ds-drop-place` (its drop rules moved to the shared class), which
+its goldens show; a selector of yours on `.ds-sidebar-item` still matches. `Icon` gained two
+variants (a `match` of yours over it needs the arms). FINDINGS "mailo gaps 6" has the reasons and
+the proofs.
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Icon` | `Ellipsis`, `EllipsisVertical` | new variants, in `Icon::ACTIONS` | Lucide `ellipsis` and `ellipsis-vertical` (1.47.0): a row's or a header's ⋯ on the glyph grid, in place of a typed `⋯` |
+| `Button`, `IconButton` | `data` | `Vec<DataAttr>` (empty) | Your own `data-*` on the button itself: `DataAttr::new(DataName::parse("folder")?, path)` writes `data-folder="{path}"`. `DataName::parse` takes lowercase letters, digits and `-`, starting with a letter, and refuses (`PassThroughError::Reserved`) a `ds-` name and the names quire writes or reads (`variant`, `size`, `theme`, `accent`, `motion`, `material`). Build names from constants: each distinct name is interned once for the program's life. The wrapping `span` you kept for `data-folder` goes |
+| `Button`, `IconButton` | `extra_class` | `Option<ExtraClass>` (`None`) | Your own class, or a space-separated list, after quire's: `ExtraClass::parse("fold-more")?` gives `class="ds-icon-button fold-more"`. A `ds-` class is refused when it is built; style yours in your own sheet (the markup lint reads your sheet for it, as for any class of yours) |
+| `Scrim` | `layer` | `Option<ZLayer>` (`None`) | An inline scrim's own stacking layer, written `z-index: var(--z-…)` on it. Without one it sets no z-index, so a positioned row your pane draws after it (a row that is `position:relative` for its strip) paints over it. **Pick** a layer above your rows (`ZLayer::Raise` over rows that set none) and below your floating surfaces (the peeked reader, a menu: give those a layer above the one you picked). A floating scrim ignores it (it is on `--z-scrim`) |
+| `TreeItem` | new component | | A place in a sidebar tree: `details.ds-tree-item > summary.ds-tree-item-row` in the sidebar item's chrome, children in `div.ds-tree-item-children[role=group]` one `--s-12` step in. Props: `label: impl Into<Text>`, `open: Disclosure::{Open, Closed}` (controlled), `on_toggle: EventHandler<Disclosure>` (the state a press on the row asks for; the summary's own toggle is prevented), `shape: TreeShape::{Branch, Leaf}` (a leaf is a row with no `details`, its chevron's space kept), `glyph: Option<Icon>`, `count: Option<u32>`, `here: Here`, `onselect: Option<EventHandler<Press>>` (the label becomes a button that selects without toggling), `trailing: Option<Element>` (the ⋯ `IconButton`: the slot keeps every press from the summary; `Propagation::Stop` on the button as well costs nothing), `drop: DropState`, `place: Option<PlaceId>`, and `onpointerenter`, `onpointerleave`, `onpointermove`, `onpointerup` as on `SidebarItem`. The chevron (`chevron-right`, 12) turns a quarter over `--t-quick` as it opens; the ⋯ shows on the row's hover, while its menu is open (`aria-expanded`) and under keyboard focus |
+| `SidebarItem`, `TreeItem` | `.ds-drop-place` | shared class | One rule set for `data-drop="target"`, `data-drop="accepts"` and `data-drag="source"` on either item, last in the component order so it wins over their hover and current rules |
+
 ### OSD parts (2026-09-25)
 
 Additive (sill FINDINGS Q74 to Q76; FINDINGS "OSD parts" and "Level control"). No existing prop
@@ -1109,7 +1126,7 @@ struct literal.
 | Root contexts (dioxus desktop's `with_context`) | `AppConfig::with_context(value)`, `with_contexts(RootContexts)`; `Harness::with_contexts(app, viewport, contexts)`, `HarnessConfig::with_context`, `snapshot_with(app, config, moments)` | `value: Clone + Send + Sync + 'static`, read with `use_context::<T>()`; the same values reach the window, a test and a snapshot. No globals. |
 | Network policy | `AppConfig::with_net(NetPolicy)`, `HarnessConfig::with_net` | `NetPolicy::{Local, Custom(Arc<dyn AppNet>), Sealed}`. `Local` (default) is what `launch` always did. Frames get `data:` only unless `Custom`'s `AppNet::decide(&NetRequest) -> NetDecision::{Allow, Deny}` admits a request (`NetRequest::origin()` is `RequestOrigin::{Top, Frame(FrameId)}`); `AppNet::fetch(request, NetReply)` then answers with `reply.bytes(..)` from any thread. ds-native never serves `file:` to a frame. |
 | `<iframe srcdoc>` | nothing: the HTML parser is on in the window and the harness | A frame is a separate document: no shared DOM, no shared cascade, no scripts. `Harness::frame(selector) -> Option<FrameView>` with `id`, `text`, `html`, `count`, `text_of`, `attr`, `width`, `centre`. |
-| Links clicked in a frame | `AppConfig::with_frame_links(FrameLinks)`, `HarnessConfig::with_frame_links` | `FrameLinks::{Inert, Intercept(..)}`, built with `FrameLinks::intercept(\|link: FrameLink\| ..)`; `FrameLink { frame, href }`. The frame never navigates; the handler runs with the document free. |
+| Links clicked in a frame | `AppConfig::with_frame_links(FrameLinks)`, `HarnessConfig::with_frame_links` | `FrameLinks::{Inert, Intercept { .. }}`, built with `FrameLinks::intercept(\|link: FrameLink\| ..)`; `FrameLink { frame, tag, href, text, title }` ("Frame tags and link text" below). The frame never navigates; the handler runs with the document free. |
 | Clipboard | `ds_native::clipboard::{write_text, read_text}` | `Result<_, ClipboardError::{NoHost, Unavailable}>`; call from a handler. Ctrl+C/X/V in every text field need nothing. The harness's clipboard is in memory: `Harness::clipboard_text`, `set_clipboard_text`, `selected_text`. |
 | Focus an app's own element | `ds::focus_soon(element)`, `ds::focus_soon_selecting(element, Select)` | Waits out a busy document as quire's fields do: mailo's `.app` shell after a panel closes. |
 | Select a field's value as it takes the focus | `use_focus_request().with_select_all()` with `TextInput { focus: Focus::Controlled(request) }` | `ds::Select::{None, All}`; the host's `HostSelect` (`ds_native::focus::SELECT`, provided by `launch`, the harness and `ds_native::focus::provide()`). A webview does nothing. |
@@ -1117,6 +1134,24 @@ struct literal.
 
 The window's app renders one frame after the host, once the document has the app's providers
 (a frame in the first render would otherwise be parsed with the wrong ones).
+
+### Frame tags and link text (2026-09-25): which frame, and what a link says
+
+Additive to "Native phase B". FINDINGS.md "Frame tags and link text" has the reasons and proofs.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Name a frame | `iframe { "data-frame-tag": "msg-42", srcdoc: .. }` | Read as the frame's document is found under its element; blank means untagged. One tag per frame: a lookup returns the newest document carrying it. |
+| Which frame asked | `NetRequest::frame_tag() -> Option<&FrameTag>` beside `origin()` | `None` for the app's own document and an untagged frame. A frame's requests reach `AppNet::decide` on the frame after its document is built (they wait for the tag); `data:` never waits. |
+| Which frame a click came from | `FrameLink { frame, tag, href, .. }` | `tag: Option<FrameTag>`. |
+| Tie an id to the app's frame | `ds_native::frames::tag_of(FrameId) -> Option<FrameTag>`, `frame_by_tag(&FrameTag) -> Option<FrameId>` | Any document on the calling thread: the window's UI thread, or a test's. A frame is forgotten with its document. |
+| A stable key for a frame | `FrameId::index() -> usize` | Never reused within the process. `FrameTag::new(text)`, `as_str()`, `Display`. |
+| What a clicked link says | `FrameLink { frame, tag, href, text, title }` | `text`: the anchor's text content, whitespace-collapsed (empty if the anchor is gone); `title: Option<String>`. Compare `text` with `href` for link honesty. |
+| A link pill | `FrameLinks::intercept(on_click).with_hover(\|hover: FrameLinkHover\| ..)` | `FrameLinkHover { frame, tag, href, text, title, at, phase }`, `phase: HoverPhase::{Enter, Leave}`, `at: ds::Point` in the app document's coordinates (where the pointer is). Once per crossing, never per move: onto a link, off it, from one to the next (a `Leave` then an `Enter`), or out of the window. On `Inert` it reports nothing. |
+
+**Breaking, narrowly:** `FrameLinks::Intercept` is `Intercept { click, hover }` (it was a tuple
+variant); `FrameLinks::intercept(..)` and `Inert` are unchanged. `FrameLink` has two more
+fields, so a struct literal of it (a test's expected value) names `tag`, `text` and `title`.
 
 ### Edit surface (2026-09-25): an app's own editor on Blitz
 

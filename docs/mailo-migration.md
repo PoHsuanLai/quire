@@ -172,6 +172,10 @@ concern (section 6 has the full "what mailo keeps" list).
 | the From dropdown's value with the provider chip inside it (`ui/compose/props.rs`) | `Button { leading: Some(Leading::Mark(rsx! { ProviderMark { provider, size: MarkSize::Inline, style } })), trailing: Some(Trailing::Caret), expanded, .. }` | mailo gaps 5 |
 | the spoof warning's flag with a bold brand and domain (`ui/hover/sender.rs`) | `HoverCardPart::flag(FlagTone::Danger, icon, Text::Runs(..))` | mailo gaps 5: `RunTone::Strong` for the brand and the domain; the plain `Flag { .. }` is unchanged |
 | the composer body's `contenteditable` and `wire.rs`'s glue script (`ui/compose/body.rs`, `wire.rs`, `render.rs`) | `EditSurface { on_input, on_pointer, on_focus, handle, ime_area }` (Phase B only) | edit surface: `data-n` becomes `"data-edit-node": "{n}"`, an object's `contenteditable: "false"` becomes `"data-edit-kind": "atom"`; the adapter that builds `editor::InputEvent`s is §6.5. Phase A keeps the webview's `contenteditable` |
+| a `span` around a quire `Button` or `IconButton` to carry `data-folder` (drag and tests) or a class for the hover reveal | `Button { data: vec![DataAttr::new(DataName::parse("folder")?, path)], extra_class: ExtraClass::parse("fold-more").ok(), .. }` (same on `IconButton`) | mailo gaps 6: the span goes; `data-folder` and the class are on the button. Tests that read `[data-folder]` read the same attribute on the button; the reveal rule targets your class, never `.ds-*` (a `ds-` class or name does not build) |
+| the typed `⋯` in a folder row's `.more` button (`ui/sidebar/folder_row.rs`) | `IconButton { icon: Icon::Ellipsis, label: "Actions for {name}", .. }` | mailo gaps 6; `Icon::EllipsisVertical` for a narrow column |
+| the layered box around the pane's inline scrim (a positioned wrapper with its own z-index so the scrim covers the pane's positioned rows) | `Scrim { flow: Flow::Inline, layer: ZLayer::Raise, .. }` | mailo gaps 6: the scrim carries `z-index: var(--z-raise)` itself; give the peeked reader a layer above it (it no longer wins by tree order alone once the scrim has a layer) |
+| the folder tree: `details.fold`, `summary.fold-row`, `.chev`, `.fold-name`, `.fold-kids`, `.fold-row .more`, and `.item.can-drop` / `.item.is-drop-target` on folder rows (`ui/sidebar/folder_row.rs`, `style/shell.css:99-123`, `style/list.css:43-47`) | `TreeItem { label, open, on_toggle, shape, glyph, count, here, onselect, trailing, drop, place, onpointerenter, onpointerleave, onpointerup, children }` | mailo gaps 6: `open` is yours (keep a `Disclosure` per folder; the summary's own toggle is prevented and `on_toggle` hands you the state asked for); a folder with no children is `shape: TreeShape::Leaf`; the name button's select is `onselect` (it keeps its press); the ⋯ goes in `trailing`; `can-drop` is `DropState::Accepts`, `is-drop-target` is `Target`, drawn by the `.ds-drop-place` rules `SidebarItem` uses. mailo's own tree drop styling, chevron and indent rules go. Found on Blitz: `details { open: true }` written by dioxus hides its children (the attribute lands in the HTML namespace, the user-agent sheet reads the null one); `TreeItem` writes it so it works. The rename field and the menus under a row stay mailo's, as children or siblings |
 
 Everything under `ui/icon/` (the glyph set) maps to `ds::Glyph`/`ds::Icon` — `08-ICONS.md` and
 `DESIGN.md`'s icon row have the geometry; mailo's own `ui/icon` module is deleted, not ported
@@ -612,6 +616,31 @@ Blitz (FINDINGS.md "Native focus"; `CONSUMING.md` "Native focus").
   covers the row's centre when the row is narrower than twice (strip width + 9): a click there
   presses the strip's first button in the webview too.
 
+### 6.7 Frame tags and link text (2026-09-25): what mailo deletes
+
+quire now says which of mailo's frames a request or a link click came from (FINDINGS.md "Frame
+tags and link text"; `CONSUMING.md` "Frame tags and link text").
+
+- **The Original frame's tag.** `reading/blocks.rs`'s `iframe` gets
+  `"data-frame-tag": message_id` (any text naming the message; one per frame).
+- **What goes.** `ui/original/net.rs`'s inference of the message from the URLs a frame asks for
+  (the `cid:`/remote-image URL to message map) and `key(frame: FrameId) -> u64`, the hash of the
+  opaque id. `AppNet::decide` reads `request.frame_tag()` for the message; a link handler reads
+  `link.tag`. Where mailo still needs a frame's id for its own map, `FrameId::index()` is the key,
+  and `ds_native::frames::{tag_of, frame_by_tag}` go from one to the other.
+- **Link honesty.** `FrameLink` carries `text` (the anchor's text, whitespace-collapsed) and
+  `title` beside `href`, so `ui/original/links.rs` compares what the reader saw with where the
+  link goes from the click itself; any lookup of the anchor's text by URL goes.
+- **The link pill.** `original.links()` becomes `FrameLinks::intercept(open).with_hover(pill)`.
+  `pill` gets a `FrameLinkHover` on each crossing: on `HoverPhase::Enter` it shows the pill
+  (`href`, and `text` when they disagree) at `at`, which is in the window's document
+  coordinates, and on `Leave` it hides it. The handler runs on the UI thread with the document
+  free, so it sets a signal the reader's pill reads; nothing arrives while the pointer stays on
+  one link, so it needs no debounce.
+- **What changes under mailo's tests.** A frame's requests reach `decide` one frame after its
+  document is built (they wait for its tag). A harness test settles past that on its own; a test
+  that read the requests between two raw `Harness` calls may need one more `advance`.
+
 ## 7. The reader, Phase B
 
 Mailo's reader has two views today (`crates/mail-app/src/ui/reading/mod.rs::ViewSwitch`):
@@ -652,6 +681,11 @@ parser, G4). ds-native serves it nothing beyond `data:` unless mailo's `NetPolic
 handler admits a request (G3), and freezes its links (`FrameLinks`, G7). `Harness::frame` reads
 the frame's document for the guarantee's tests. The parser is html5ever 0.39 (FINDINGS "Native
 phase B" item 3), and the sign-off above still belongs to `mail-mime`'s owner.
+
+**Frame tags (2026-09-25).** The Original `iframe` carries `data-frame-tag` (the message), so the
+reader's `AppNet` and link handler know the message from `NetRequest::frame_tag()` and
+`FrameLink::tag` rather than from the URL; a click carries the link's text and title, and
+`FrameLinks::with_hover` drives the link pill (section 6.7).
 
 Either way, `reading/tests.rs`'s existing guarantees (`no_div_between_article_and_iframe`, "a
 plain-text message claimed a sandboxed frame" never happening, the two sandbox-attribute checks)

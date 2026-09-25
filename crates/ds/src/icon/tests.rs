@@ -157,6 +157,27 @@ fn printer_and_folder_input_are_lucides() {
     );
 }
 
+/// The "more" glyphs as Lucide 1.47.0 publishes them (mailo gaps 6): three unit circles on the
+/// middle row for `ellipsis`, on the middle column for `ellipsis-vertical`, centre first.
+#[test]
+fn the_ellipses_are_lucides() {
+    let dot = |cx, cy| Shape::Circle { cx, cy, r: "1" };
+    assert_eq!(
+        Icon::Ellipsis.shapes(),
+        &[dot("12", "12"), dot("19", "12"), dot("5", "12")][..]
+    );
+    assert_eq!(
+        Icon::EllipsisVertical.shapes(),
+        &[dot("12", "12"), dot("12", "5"), dot("12", "19")][..]
+    );
+    for icon in [Icon::Ellipsis, Icon::EllipsisVertical] {
+        assert!(
+            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
+            "{icon:?}"
+        );
+    }
+}
+
 /// The control set as Lucide 1.47.0 publishes it (sill FINDINGS Q81): eleven glyphs, Restart
 /// is `rotate-ccw`, Phone is `smartphone`, and `Power` stays in the shell set.
 #[test]

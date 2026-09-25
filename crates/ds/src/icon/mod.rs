@@ -236,6 +236,12 @@ pub enum Icon {
     Gamepad,
     /// Lucide `smartphone`: a Bluetooth device.
     Phone,
+    // mailo gaps 6: the "more" glyphs. Kept at the end so the control set (sill Q81) and these
+    // merge without touching each other's lines.
+    /// Lucide `ellipsis`: a row's or a header's overflow menu, laid across.
+    Ellipsis,
+    /// Lucide `ellipsis-vertical`: the same menu where the row is narrow and tall.
+    EllipsisVertical,
     // Control center parts 2 (sill FINDINGS Q103): quire's own glyphs on Lucide's grid.
     /// Two toggles with their knobs at opposite ends: the control center's bar item
     /// (`geometry_own`, which documents the geometry).
@@ -292,6 +298,9 @@ impl Icon {
             | Icon::Mouse
             | Icon::Gamepad
             | Icon::Phone => geometry_control::shapes(self),
+            // mailo gaps 6.
+            Icon::Ellipsis => geometry_actions::ELLIPSIS,
+            Icon::EllipsisVertical => geometry_actions::ELLIPSIS_VERTICAL,
             Icon::Switches => geometry_own::SWITCHES,
             shell => geometry_shell::shapes(shell),
         }
