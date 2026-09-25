@@ -553,7 +553,6 @@ One invisible square per enabled corner (design/20 §1.16; design/13 §13.3.12 f
 | `hot_corners.bottom_right_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.dwell_ms` | `Ms` | `150` | `0..=2000`; how long the pointer rests before the corner acts | `20-SURFACES.md#3-open-decisions` item 7; F409 | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.rearm_ms` | `Ms` | `500` | `0..=5000`; acts again only after the pointer has left and this long | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.modifier` | `CornerModifier::{None,Super,Alt,Ctrl,Shift}` | `None` | a key held for the corner to act (macOS's modifier option); see G121 | same | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.size_px` | `Px` | `2` | `1..=8`; the invisible square's side | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience` (2 x 2 px) | proposed (M10 freeze, 2026-09-26) |
 
 ## 4. Rust shape

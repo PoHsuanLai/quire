@@ -66,6 +66,13 @@ example of this in this repo).
 
 ## 2. The `Ds` root
 
+**A bare document, with no `Ds` root** (a never-painted input catcher, a 2 px hot-corner
+surface) still carries Blitz's user-agent stylesheet, which sets `body { margin: 8px }`: its
+content never reaches the true (0, 0) corner, and `position: absolute`/`fixed` with `inset: 0`
+paints nothing on it (sill hot corners, 2026-09-26). shell-host injects `body { margin: 0 }`
+into every document it hosts (shell-host F62); a bare document elsewhere (`ds_native::launch`,
+a test) must cancel the margin itself or draw inside a `Ds`.
+
 Every quire component must be drawn inside one `Ds` (`root/ds.rs`; design/03-COLOR.md
 section 17.1; `crates/ds/src/root/ds.rs`). It resolves your appearance to a scheme, an accent
 and a motion level; stamps `data-theme`, `data-accent`, `data-motion`, `data-material`,

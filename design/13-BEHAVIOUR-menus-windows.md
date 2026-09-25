@@ -245,7 +245,6 @@ square (2 px; `1..=8`), input `Whole`, no material, no paint, never keyboard.
 | --- | --- | --- |
 | Dwell | the pointer rests inside the square for `dwell_ms` before the corner acts; leaving earlier cancels | `hot_corners.dwell_ms` 150 (`0..=2000`) |
 | Re-arm | after acting, the corner is disarmed until the pointer has left the square and `rearm_ms` has passed; a pointer parked in the corner acts once | `hot_corners.rearm_ms` 500 (`0..=5000`) |
-| Modifier | with a modifier set, the corner acts only while that key is held; `None` needs no key. A keyboard-less layer surface receives no modifier state on Wayland (shell-host G121): the key stays `None` until the host can answer, and the row is retired if it cannot | `hot_corners.modifier` `None` |
 | Toggle | an action that opens a shell surface closes it when it is already open (Launcher, NotificationCenter, ControlCenter, Workspaces, ShowDesktop); Lock and Command never toggle | |
 | Corner | `top_left`, `top_right`, `bottom_left`, `bottom_right`, each its own action; the bottom right is free (the reference ships a note there; sill has none until M12) | `hot_corners.<corner>` |
 
@@ -271,8 +270,10 @@ Acceptance (sill `dev/accept-hot-corners.sh`, nested compositor, debug-inject or
 (1) enter and rest 150 ms → the action fires once; (2) enter and leave at 100 ms → nothing;
 (3) rest 2 s → exactly once; (4) leave and return within 500 ms → nothing, after 500 ms → again;
 (5) with `size_px` 2, a pointer at (1, 1) of the corner is inside and (2, 2) is outside;
-(6) `Launcher` twice from the same corner opens then closes it; (7) `modifier` is recorded
-against G121, not tested until the host answers.
+(6) `Launcher` twice from the same corner opens then closes it. There is no modifier option: a
+keyboard-less surface cannot learn a held key portably (shell-host F61), so the reference
+desktop's modifier gating was retired on 2026-09-26; it is a compositor-fork item in sill's
+cosmic-gaps list (send modifier state to the surface under the pointer).
 
 ## 13.4 State machines
 
