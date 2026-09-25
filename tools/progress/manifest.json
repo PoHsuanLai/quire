@@ -1,6 +1,32 @@
 {
- "updated": "2026-09-25, windows move and resize; F47 real input fixed; the level control awaits the pick",
+ "updated": "2026-09-25, quire v0.1.9; the level-control pick is open; manual checks wait for the user",
  "entries": [
+  {
+   "id": "v019",
+   "date": "2026-09-25 · quire v0.1.9",
+   "title": "v0.1.9: the control center's parts, the power menu's sheet, a window frame, and the composer's surface hardened",
+   "status": "proven",
+   "lede": "One tag closes the day's second half. For the shell's Milestone 5: module tiles, a module grid and a content panel, settings rows, a pane switcher, a control-center glyph, and a compact appearance picker; for its power menu: a sheet that exits, centres and dims behind a modal scrim, buttons that can be disabled or regular-sized in the danger colour, an overlay root that fills the viewport, and keyboard-cap arrows that finally draw (the bundled mono font had dropped the left and right arrows). For our own windows: a titlebar you can drag, double-click to zoom, traffic lights with a Fill-only tiling menu, over one seam that ds-native implements for winit and the shell implements over the host. For mailo: fields focusable by handle or selector, keep-focus on clicks, frame tags and link text with hover, the editing surface's programmatic focus, pointer capture and caret width, and a tree row with drop state. And every timing test now polls for its state instead of asserting at an instant, because the harness advances real time.",
+   "notes": [
+    "823 tests; the day went from v0.1.2 to v0.1.9. All work landed through the gate worktree; the weekly usage limit stopped six agents mid-gate once and every branch resumed from its own transcript with nothing lost.",
+    "Blitz findings recorded on the way: a Dioxus-written `open` attribute never opens a details element (namespace mismatch); padding and borders are not painted on inline elements; stacking order follows CSS 2.1 Appendix E; about sixty tinted cards in one document lose layers; no pointer capture, worked around at the host.",
+    "Compositor findings for the fork list: cosmic-comp configures every floating window as tiled on all edges, and neither cosmic-comp nor KWin lets a client place its own window, so tiling from the window menu ships Fill only."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/v019-control-center-power-menu.png",
+     "caption": "the gallery's control center (tiles, a Sound panel with the level control, the compact picker) and the power menu (a centred sheet over the modal scrim, a disabled Suspend, a regular-sized danger Restart, small key caps)"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/v019-window-frame.png",
+     "caption": "the window frame: an active window with the tiling menu open (halves unavailable on Wayland), an inactive window with grey lights, a maximised one"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/v019-osd-cards.png",
+     "caption": "the OSD cards at the top right: Sound and Display with the capsule level control, light and dark"
+    }
+   ]
+  },
   {
    "id": "window-interact",
    "date": "2026-09-25 · shell-host windows, and F47",
@@ -18,7 +44,7 @@
    "id": "level-control",
    "date": "2026-09-25 · the level control",
    "title": "A macOS-grade level control for volume and brightness, in three looks for the pick",
-   "status": "running",
+   "status": "proven",
    "lede": "The user said a plain slider is too simple. The new level control has a thick capsule track with the glyph inside it, knocked out two-tone where the fill covers it; the glyph follows the level (speaker waves 0 to 3, a mute slash, sun rays that grow); while dragging the fill follows the pointer with no easing, set from outside it eases over the quick token; a press swells the track with the spring; dragging past an end stretches the capsule a few pixels and it springs back; keys step a sixteenth. Three looks: Capsule (glyph inside), CapsuleKnob (the older look with a separate handle) and Segments (sixteen staggered squares). The same wave built the OSD card: top right under the bar, a title line and the control in control-center module metrics, dropping in from above and fading out with the host unmapping at settle.",
    "notes": [
     "Recommendation: Capsule. It is the current macOS form and carries glyph, level and mute in one shape; Segments look dated and the knob adds a handle that means nothing on a read-only OSD.",
