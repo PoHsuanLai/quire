@@ -65,6 +65,18 @@ toml = "1"
 dioxus-ssr = "0.7"
 # Named directly for image paints in custom widgets (blitz re-exports nothing).
 peniko = "0.6"
+# PDF output (ds-native `pdf`, the `anyrender_krilla` painter): krilla writes the file, embedding
+# and subsetting fonts (its own subsetter, instancing variable fonts) and JPEGs as DCT, as-is.
+# `raster-images` is what `Image::from_jpeg`/`from_png` need; `simple-text` (rustybuzz) is off,
+# since glyphs arrive shaped. krilla pins its own skrifa 0.42 beside parley's.
+krilla = { version = "0.8.2", default-features = false, features = ["raster-images"] }
+# Font tables read directly by the painter (cmap reversed, fvar/avar for a variable instance):
+# the version parley already resolves at the blitz rev, so no second copy for this.
+skrifa = "0.44"
+# Reading PDFs back in tests (text, fonts, images, a rasterised page): dev-dependency only.
+pdfrum = { version = "0.3", default-features = false, features = ["vello-cpu"] }
+# The print portal's fd, from a sealed anonymous file (ds-native's `print` feature, Linux only).
+memfd = "0.6"
 # Proc-macro crates for ds-settings-derive.
 syn = { version = "2", features = ["full", "extra-traits"] }
 quote = "1"
