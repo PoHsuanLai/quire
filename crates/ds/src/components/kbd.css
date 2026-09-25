@@ -9,3 +9,10 @@
   border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }
+
+/* Small's arrow glyphs (sill Q111): at 9.5 px an arrow's stroke reads as a dash. Drawn at
+   `--fs-control` (13) with a tighter line-height so the extra line-box the bigger face would
+   ask for is absorbed instead of growing the cap: the cap's height comes from its padding and
+   border, not the glyph, as long as the line box the glyph sits in is no taller than the one
+   the rest of the Small face already draws. */
+.ds-kbd[*|data-size=small][*|data-glyph=arrow]{ font-size:var(--fs-control); line-height:1.13; }
