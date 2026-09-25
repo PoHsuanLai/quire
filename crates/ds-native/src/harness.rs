@@ -15,6 +15,7 @@ use crate::error::NativeError;
 use crate::frame_view::FrameView;
 use crate::harness_config::HarnessConfig;
 use crate::harness_input::{HeldButtons, blitz_button, keyboard, modifier, pointer};
+pub use crate::harness_settle::{SETTLE_BOUND, settle_until};
 use crate::headless::{Backdrop, Headless, Layout};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
