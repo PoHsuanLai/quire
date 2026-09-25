@@ -806,6 +806,15 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--f-solid); border-radius:var(--r-panel); box-shadow:var(--shadow-pop);
   animation:slide-r var(--t-big) var(--e-spring);
 }
+/* -- edit_surface -- */
+/* EditSurface (FINDINGS "Edit surface"): a block the app's own text lives in. The app draws the
+   caret and the selection, so the surface shows no focus ring. Text keeps its spaces and line
+   breaks (pre-wrap), as the app's model does, and a position's offset counts them as written.
+   Attribute selectors carry `*|` (spike S2). */
+
+.ds-edit{ display:block; white-space:pre-wrap; overflow-wrap:break-word; outline:none; cursor:text; }
+.ds[*|data-modality=keyboard] .ds-edit:focus{ outline:none; }
+.ds-edit [*|data-edit-kind=atom]{ cursor:default; white-space:normal; }
 /* -- hover_card -- */
 /* HoverCard (design/04-COMPONENTS.md section 22): the card `S:399-404`, its blocks `S:405-425`,
    the side card `S:428`, the live dot `S:561`. Enters with `hc-in`; while the hub reports it
