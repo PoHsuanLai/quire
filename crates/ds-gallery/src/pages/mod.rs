@@ -31,6 +31,7 @@ pub mod overlays_mailo5;
 pub mod pills;
 pub mod plate_tints;
 pub mod polish;
+pub mod polish_window;
 pub mod scheduled;
 pub mod space;
 pub mod status_items;

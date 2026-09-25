@@ -3146,6 +3146,55 @@ Some(PlateTint)` (`Muted`, or `Monochrome(Tint)`) re-colours the stops and the i
 rule for both schemes, written inline as `--plate-base-l`/`-deep-l`/`-ink-l` and `-d`, marked
 `data-icon-style`, and read by the sheet under `data-theme` (sill FINDINGS Q72; design/08 4.4).
 
+### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
+
+**Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
+and, later, the shell's apps on shell-host toplevels. It moves, resizes and zooms the window
+through the host seam `ds::HostWindow` (design/13 section 13.3.11; FINDINGS "Window frame").
+**Props.** `Ds { window: WindowFrame }`. `WindowFrame::None` (default) draws nothing and leaves
+the root's markup as it was; `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown,
+Hidden}, timing: FrameTiming }` (`WindowFrame::titlebar(title, lights)` takes the settings'
+default timing). `WindowTitlebar { title, lights, timing, pose: TilePose::{Closed, Open} }` is
+the titlebar alone, for a gallery.
+**Markup.** The root stamps `data-window-frame="titlebar"` and becomes a column:
+`div.ds-titlebar[data-window][data-activation][data-first-mouse]` holding
+`div.ds-lights[role=group]` (three `button.ds-light[data-light=close|minimize|zoom]`, each with
+an `svg.ds-light-mark`) and `span.ds-titlebar-title.ds-truncate`; then `div.ds-window-body`
+with the children; then eight `div.ds-resize-edge[data-edge]` (not while maximized or
+fullscreen).
+
+| Metric | Value | Basis |
+| --- | --- | --- |
+| Titlebar height | 28 | macOS standard titlebar (28 pt) |
+| Light diameter | 12 | macOS (12 pt) |
+| Gap between lights | 8 (`--s-8`) | macOS (20 pt centre to centre) |
+| Inset of the first light | 13 (`--s-13`) from the left edge, centred on the titlebar | brief (macOS) |
+| Title | 13/600 (`--fs-control`), `--f-ink-soft`, `--f-ink-faint` inactive, centred between 84 px insets, `.ds-truncate` | macOS |
+| Light hues | close `--c-red`, minimize `--c-amber`, zoom `--c-green` (the Candy shelf) | design/03 section 15 |
+| Mark ink | the hue's `-deep` in light, its `-soft` in dark (dark on the disc in both) | macOS |
+| Resize zones | 4 px along each side, 12 x 12 at each corner, `--z-edge` | settled 2026-09-25 |
+
+**The reveal rule.** In the active window the lights are coloured at rest; in an inactive one
+they are `--f-pill` discs with a `--f-line` hairline (grey). The pointer over any light colours
+all three (inactive included) and shows all three marks; the keyboard focus on a light shows its
+mark; the green light shows its mark while its menu is open. This is macOS's rule: grey until
+hover applies to background windows, the active window keeps its colours.
+**Marks.** A cross, a bar, and the zoom mark: two outward corners, which turn inward
+("restore", `aria-label="Restore"`) while the window is maximized.
+**Behaviour.** A primary press on the titlebar's empty area that travels more than
+`move_threshold` (4 px) on either axis asks `begin_move` once; less is a click. A double-click
+on the titlebar is `zoom(Zoom::Toggle)`. Neither happens on a light (each light keeps its
+`pointerdown` and `dblclick`), and the move not while the window is maximized or fullscreen. A
+press on an edge zone asks `begin_resize(edge)` at once. Close, minimize and zoom on a click;
+the green light held for `menu_press` (500 ms), rested on for `menu_hover` (800 ms: the 450 ms
+hover intent plus 350 ms), right-clicked, or given ArrowDown opens the Move & Resize menu (a Slim
+`Menu`): Fill (`zoom(Maximize)`), Left half, Right half, Centre (`tile(..)`), each
+`Availability::Disabled` where `supports(..)` said `Support::No` as the menu opened. A hold that
+opened the menu does not also zoom on its release. Escape closes the menu (the menu's own);
+Tab reaches the three lights in order.
+**Motion.** A light springs back from `--squish` over `--t-tap --e-spring` (design/05 principle
+2: the press is contact); colours and marks cross-fade over `--t-quick --e-out`.
+
 ## Open decisions
 
 Each needs a yes/no or a number before the owning wave starts. "Proposal" marks this document's

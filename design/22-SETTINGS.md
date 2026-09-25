@@ -341,7 +341,7 @@ found elsewhere in the file that are not yet in that table.
 | `palm_rejection.mouse_moving_window_ms` | `Ms` | `100` | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
 | `palm_rejection.mouse_moving_lock_multiplier` | `Fraction` | `2000` (2.0x, 40->80) | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
 
-### 3.11 `menus` (sill/settings.toml; also carries `switcher.*`, `sound.*` per `13.6`'s own grouping)
+### 3.11 `menus` (sill/settings.toml; also carries `switcher.*`, `sound.*` and `window.*` per `13.6`'s own grouping)
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -356,6 +356,9 @@ found elsewhere in the file that are not yet in that table.
 | `menus.font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `menus.highlight_radius_px` | `Px` | `6` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `menus.tooltip_font_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `window.move_threshold_px` | `Px` | `4` | `1..=16` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
+| `window.tile_menu_press_ms` | `Ms` | `500` | `200..=2000` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
+| `window.tile_menu_hover_ms` | `Ms` | `800` | `450..=3000`; the 450 ms hover intent plus a further hold | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 | `switcher.show_delay_ms` | `Ms` | `150` | `0..500` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `switcher.quick_tap_ms` | `Ms` | `100` | chord+modifier release within this = no UI | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
 | `switcher.icon_size_px` | `Px` | `96` | alt macOS ~128 | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 6 | proposed |

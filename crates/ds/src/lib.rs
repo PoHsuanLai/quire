@@ -25,6 +25,7 @@ mod task;
 pub mod text;
 pub mod time;
 pub mod tokens;
+pub mod window;
 
 pub use appearance::{
     Accent, Appearance, Contrast, Look, Motion, MotionLevel, PeekMode, ReducedMotion, Resolved,
@@ -85,6 +86,11 @@ pub use tokens::{
     FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, OpacityToken,
     OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow, ShellMetrics,
     SpacingToken, Tuned, VarName, ZLayer, quad,
+};
+pub use window::{
+    Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,
+    WindowHost, WindowState, WindowTile, Zoom, use_window_host, use_window_host_provider,
+    use_window_state,
 };
 
 use futures_timer as _;
