@@ -68,9 +68,9 @@ pub fn ModuleTile(
                 }
             }
             span { class: "ds-module-words",
-                span { class: "ds-module-title ds-truncate", {text(&title)} }
+                span { class: "ds-module-title", {text(&title)} }
                 if let Some(status) = status {
-                    span { class: "ds-module-status ds-truncate", {text(&status)} }
+                    span { class: "ds-module-status", {text(&status)} }
                 }
             }
             {detail}
