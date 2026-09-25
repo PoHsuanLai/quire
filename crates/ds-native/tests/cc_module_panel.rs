@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, Ds, Fraction, Icon, LevelControl, LevelGlyph, Material, ModuleGrid, ModulePanel,
-    ModuleState, ModuleTile, Muting, Point, Px, Rect, TileSpan,
+    ModuleState, ModuleTile, Muting, Point, Px, Rect,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
