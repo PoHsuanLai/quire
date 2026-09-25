@@ -7,6 +7,8 @@ pub const STYLES: &[(&str, &[&str])] = &[
         &[
             include_str!("../../src/components/button.css"),
             include_str!("../../src/components/icon_view.css"),
+            include_str!("../../src/components/text_runs.css"),
+            include_str!("../../src/components/provider_mark.css"),
         ],
     ),
     (

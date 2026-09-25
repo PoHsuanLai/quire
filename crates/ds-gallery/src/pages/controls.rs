@@ -66,6 +66,7 @@ pub fn ControlsPage() -> Element {
     rsx! {
         Buttons {}
         ButtonFaces {}
+        super::controls_mailo5::ButtonsMailo5 {}
         StatusItems {}
         ExternalIcons {}
         DockTiles {}
