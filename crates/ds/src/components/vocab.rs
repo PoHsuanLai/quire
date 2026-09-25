@@ -47,8 +47,9 @@ pub enum Here {
 }
 
 /// Where an item stands in a drag (design/04-COMPONENTS.md section 34): the place under the
-/// pointer that would take the drop writes `data-drop="target"`, the thing being dragged
-/// `data-drag="source"`, and every other item neither.
+/// pointer that would take the drop writes `data-drop="target"`, every other place that could
+/// take it `data-drop="accepts"`, the thing being dragged `data-drag="source"`, and every
+/// other item neither.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum DropState {
     /// Not part of the drag.
@@ -56,6 +57,11 @@ pub enum DropState {
     Idle,
     /// Under the pointer and accepting: lit and grown.
     Target,
+    /// Able to take what is being dragged, while the pointer is elsewhere (mailo gaps 5): every
+    /// place a dragged thread could land is outlined as the drag starts, before the pointer is
+    /// over any, so the reader sees where it may go. A quiet dashed accent hairline, weaker
+    /// than `Target`'s fill, scale and shadow; written `data-drop="accepts"`.
+    Accepts,
     /// Being dragged: dimmed to .35 while its ghost follows the pointer.
     Source,
 }
@@ -262,10 +268,11 @@ impl Availability {
 }
 
 impl DropState {
-    /// The `data-drop` value: `target`, or nothing.
+    /// The `data-drop` value: `target`, `accepts`, or nothing.
     pub fn drop_attr(self) -> Option<&'static str> {
         match self {
             DropState::Target => Some("target"),
+            DropState::Accepts => Some("accepts"),
             DropState::Idle | DropState::Source => None,
         }
     }
@@ -274,7 +281,7 @@ impl DropState {
     pub fn drag_attr(self) -> Option<&'static str> {
         match self {
             DropState::Source => Some("source"),
-            DropState::Idle | DropState::Target => None,
+            DropState::Idle | DropState::Target | DropState::Accepts => None,
         }
     }
 }

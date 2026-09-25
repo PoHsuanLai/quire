@@ -7,6 +7,8 @@
 //! all name a choice by that number. Up and Down skip disabled choices.
 
 use crate::components::menu_entry::{MenuEntry, fuzzy};
+pub use crate::components::menu_filter::Filter;
+use crate::components::menu_filter::Typed;
 use crate::components::vocab::Availability;
 use dioxus::prelude::*;
 
@@ -96,20 +98,10 @@ pub(crate) enum KeyAct {
     Erase,
 }
 
-/// Whether typing filters the entries.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Filter {
-    /// Typing filters with the fuzzy ranker and resets the selection.
-    Typing,
-    /// The entries are fixed.
-    #[default]
-    None,
-}
-
 /// A panel's reading of `key` (design/06-INTERACTIONS.md section 2.4, design/13 section
-/// 13.3.2); `None` for a key it leaves alone. Typing only counts with [`Filter::Typing`] and no
-/// Ctrl, Alt or Super.
-pub(crate) fn key_act(key: &Key, modifiers: Modifiers, filter: Filter) -> Option<KeyAct> {
+/// 13.3.2); `None` for a key it leaves alone. Typing only counts under a filter that types
+/// ([`Filter::Typing`] or [`Filter::Field`]) and with no Ctrl, Alt or Super.
+pub(crate) fn key_act(key: &Key, modifiers: Modifiers, filter: &Filter) -> Option<KeyAct> {
     let chord = modifiers.intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
     match key {
         Key::ArrowDown => Some(KeyAct::Move(Step::Down)),
@@ -118,8 +110,8 @@ pub(crate) fn key_act(key: &Key, modifiers: Modifiers, filter: Filter) -> Option
         Key::ArrowLeft => Some(KeyAct::Back),
         Key::Enter | Key::Tab => Some(KeyAct::Pick),
         Key::Escape => Some(KeyAct::Close),
-        Key::Backspace if filter == Filter::Typing => Some(KeyAct::Erase),
-        Key::Character(text) if filter == Filter::Typing && !chord => {
+        Key::Backspace if filter.types() == Typed::Yes => Some(KeyAct::Erase),
+        Key::Character(text) if filter.types() == Typed::Yes && !chord => {
             Some(KeyAct::Type(text.clone()))
         }
         _ => None,
@@ -306,10 +298,18 @@ mod tests {
             (a, none, Filter::None, None),
             (Key::Backspace, none, Filter::Typing, Some(KeyAct::Erase)),
             (Key::Backspace, none, Filter::None, None),
+            (Key::Character("b".to_string()), none, field(), Some(KeyAct::Type("b".to_string()))),
+            (Key::Backspace, none, field(), Some(KeyAct::Erase)),
+            (Key::ArrowDown, none, field(), Some(KeyAct::Move(Step::Down))),
         ];
+        fn field() -> Filter {
+            Filter::Field {
+                placeholder: "Filter…".to_string(),
+            }
+        }
         for (key, modifiers, filter, want) in cases {
             assert_eq!(
-                key_act(&key, modifiers, filter),
+                key_act(&key, modifiers, &filter),
                 want,
                 "{key:?} {modifiers:?}"
             );

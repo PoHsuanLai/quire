@@ -3,6 +3,7 @@
 pub mod app_icons;
 pub mod button_faces;
 pub mod controls;
+pub mod controls_mailo5;
 pub mod dock_tiles;
 pub mod edit_surface;
 pub mod external_icons;
@@ -20,6 +21,7 @@ pub mod outbox;
 pub mod overlays;
 pub mod overlays_mailo;
 pub mod overlays_mailo4;
+pub mod overlays_mailo5;
 pub mod pills;
 pub mod plate_tints;
 pub mod polish;
