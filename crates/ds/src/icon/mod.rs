@@ -9,7 +9,8 @@
 //!
 //! The icons are data and not markup strings, so nothing here needs a raw HTML sink.
 //! The mailo set's geometry is in `geometry`, transcribed from the design's `ICON` table; the
-//! shell set's is in `geometry_shell` (design/08-ICONS.md section 1.6).
+//! shell set's is in `geometry_shell` (design/08-ICONS.md section 1.6), the control center's in
+//! `geometry_control` (sill FINDINGS Q81); the named sets are in `sets`.
 //!
 //! Moved from mailo (`mail-app/src/ui/icon/mod.rs`) and made `pub`.
 //!
@@ -21,11 +22,13 @@ pub mod external;
 pub mod family;
 mod geometry;
 mod geometry_actions;
+mod geometry_control;
 mod geometry_shell;
 pub mod plate;
 pub mod plate_tint;
 pub mod render;
 pub mod retint;
+mod sets;
 pub mod shape;
 pub mod stroke;
 #[cfg(test)]
@@ -209,190 +212,31 @@ pub enum Icon {
     Printer,
     /// Lucide `folder-input`: mailo's move-to-folder action.
     FolderInput,
+    /// Lucide `play`: Now Playing.
+    Play,
+    /// Lucide `pause`: Now Playing.
+    Pause,
+    /// Lucide `skip-back`: Now Playing's previous track.
+    SkipBack,
+    /// Lucide `skip-forward`: Now Playing's next track.
+    SkipForward,
+    /// Lucide `log-out`: the power menu's Log Out.
+    LogOut,
+    /// Lucide `rotate-ccw`: the power menu's Restart.
+    Restart,
+    /// Lucide `headphones`: an audio output or a Bluetooth device.
+    Headphones,
+    /// Lucide `speaker`: an audio output.
+    Speaker,
+    /// Lucide `mouse`: a Bluetooth device.
+    Mouse,
+    /// Lucide `gamepad`: a Bluetooth device.
+    Gamepad,
+    /// Lucide `smartphone`: a Bluetooth device.
+    Phone,
 }
 
 impl Icon {
-    /// The mailo set, in the order of the keys of `ICON`.
-    ///
-    /// The icon tests lock this list to `icons.js`.
-    pub const MAILO: &[Icon] = &[
-        Icon::Inbox,
-        Icon::Star,
-        Icon::Archive,
-        Icon::Clock,
-        Icon::Trash,
-        Icon::Mail,
-        Icon::MailOpen,
-        Icon::Tag,
-        Icon::Refresh,
-        Icon::Send,
-        Icon::Command,
-        Icon::Columns,
-        Icon::Group,
-        Icon::Panel,
-        Icon::Square,
-        Icon::Maximize,
-        Icon::Corner,
-        Icon::Undo,
-        Icon::Check,
-        Icon::X,
-        Icon::Paperclip,
-        Icon::Pen,
-        Icon::Key,
-        Icon::FilePen,
-        Icon::OctagonAlert,
-        Icon::Pin,
-        Icon::Reply,
-        Icon::ReplyAll,
-        Icon::Forward,
-        Icon::Search,
-        Icon::Settings,
-        Icon::PanelLeft,
-        Icon::Plus,
-    ];
-
-    /// The shell set, in design/08-ICONS.md section 1.6's order.
-    pub const SHELL: &[Icon] = &[
-        Icon::Wifi,
-        Icon::WifiLow,
-        Icon::WifiHigh,
-        Icon::WifiOff,
-        Icon::Ethernet,
-        Icon::Battery,
-        Icon::BatteryLow,
-        Icon::BatteryMedium,
-        Icon::BatteryFull,
-        Icon::BatteryCharging,
-        Icon::BatteryWarning,
-        Icon::Bluetooth,
-        Icon::BluetoothConnected,
-        Icon::BluetoothOff,
-        Icon::Volume,
-        Icon::Volume1,
-        Icon::Volume2,
-        Icon::VolumeX,
-        Icon::Mic,
-        Icon::MicOff,
-        Icon::Sun,
-        Icon::Moon,
-        Icon::SunMoon,
-        Icon::Power,
-        Icon::Lock,
-        Icon::Bell,
-        Icon::BellOff,
-        Icon::Grid,
-        Icon::Window,
-        Icon::Monitor,
-        Icon::Keyboard,
-        Icon::ChevronLeft,
-        Icon::ChevronRight,
-        Icon::ChevronUp,
-        Icon::ChevronDown,
-        Icon::Folder,
-        Icon::File,
-        Icon::Image,
-        Icon::Terminal,
-        Icon::StickyNote,
-        Icon::Camera,
-        Icon::Download,
-        Icon::Upload,
-        Icon::Copy,
-        Icon::Link,
-        Icon::Sparkles,
-        Icon::Gauge,
-        Icon::Brightness,
-    ];
-
-    /// Glyphs for a consumer's actions beyond the two sets (Lucide, `geometry_actions`).
-    pub const ACTIONS: &[Icon] = &[Icon::Printer, Icon::FolderInput];
-
-    /// Every glyph: the mailo set, the shell set, then the actions.
-    pub const ALL: &[Icon] = &[
-        Icon::Inbox,
-        Icon::Star,
-        Icon::Archive,
-        Icon::Clock,
-        Icon::Trash,
-        Icon::Mail,
-        Icon::MailOpen,
-        Icon::Tag,
-        Icon::Refresh,
-        Icon::Send,
-        Icon::Command,
-        Icon::Columns,
-        Icon::Group,
-        Icon::Panel,
-        Icon::Square,
-        Icon::Maximize,
-        Icon::Corner,
-        Icon::Undo,
-        Icon::Check,
-        Icon::X,
-        Icon::Paperclip,
-        Icon::Pen,
-        Icon::Key,
-        Icon::FilePen,
-        Icon::OctagonAlert,
-        Icon::Pin,
-        Icon::Reply,
-        Icon::ReplyAll,
-        Icon::Forward,
-        Icon::Search,
-        Icon::Settings,
-        Icon::PanelLeft,
-        Icon::Plus,
-        Icon::Wifi,
-        Icon::WifiLow,
-        Icon::WifiHigh,
-        Icon::WifiOff,
-        Icon::Ethernet,
-        Icon::Battery,
-        Icon::BatteryLow,
-        Icon::BatteryMedium,
-        Icon::BatteryFull,
-        Icon::BatteryCharging,
-        Icon::BatteryWarning,
-        Icon::Bluetooth,
-        Icon::BluetoothConnected,
-        Icon::BluetoothOff,
-        Icon::Volume,
-        Icon::Volume1,
-        Icon::Volume2,
-        Icon::VolumeX,
-        Icon::Mic,
-        Icon::MicOff,
-        Icon::Sun,
-        Icon::Moon,
-        Icon::SunMoon,
-        Icon::Power,
-        Icon::Lock,
-        Icon::Bell,
-        Icon::BellOff,
-        Icon::Grid,
-        Icon::Window,
-        Icon::Monitor,
-        Icon::Keyboard,
-        Icon::ChevronLeft,
-        Icon::ChevronRight,
-        Icon::ChevronUp,
-        Icon::ChevronDown,
-        Icon::Folder,
-        Icon::File,
-        Icon::Image,
-        Icon::Terminal,
-        Icon::StickyNote,
-        Icon::Camera,
-        Icon::Download,
-        Icon::Upload,
-        Icon::Copy,
-        Icon::Link,
-        Icon::Sparkles,
-        Icon::Gauge,
-        Icon::Brightness,
-        Icon::Printer,
-        Icon::FolderInput,
-    ];
-
     /// The children of this glyph, in the design's order.
     pub fn shapes(self) -> &'static [Shape] {
         match self {
@@ -431,6 +275,17 @@ impl Icon {
             Icon::Plus => PLUS,
             Icon::Printer => geometry_actions::PRINTER,
             Icon::FolderInput => geometry_actions::FOLDER_INPUT,
+            Icon::Play
+            | Icon::Pause
+            | Icon::SkipBack
+            | Icon::SkipForward
+            | Icon::LogOut
+            | Icon::Restart
+            | Icon::Headphones
+            | Icon::Speaker
+            | Icon::Mouse
+            | Icon::Gamepad
+            | Icon::Phone => geometry_control::shapes(self),
             shell => geometry_shell::shapes(shell),
         }
     }

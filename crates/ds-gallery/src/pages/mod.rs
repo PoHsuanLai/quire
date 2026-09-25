@@ -9,6 +9,7 @@ pub mod edit_surface;
 pub mod external_icons;
 pub mod fields;
 pub mod gaps;
+pub mod glyphs;
 pub mod launcher;
 pub mod lists;
 pub mod lists_mailo4;
