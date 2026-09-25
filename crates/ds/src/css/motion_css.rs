@@ -126,7 +126,7 @@ mod tests {
                 "@keyframes {name} has no Anim"
             );
         }
-        assert_eq!(names.len(), 47);
+        assert_eq!(names.len(), 50);
     }
 
     #[test]
@@ -154,6 +154,25 @@ mod tests {
             assert!(
                 body.contains("var(--overshoot)"),
                 "{anim:?}: @keyframes {name} ignores the motion level"
+            );
+        }
+    }
+
+    #[test]
+    fn the_osd_pair_follows_the_cards_anchor() {
+        // One pair for both positions (sill Q75): each keyframe moves by `--osd-dy`, which the
+        // card declares per position, so the top right drops in and the bottom centre rises.
+        let bodies = keyframes(MOTION);
+        for anim in [Anim::OsdIn, Anim::OsdOut] {
+            let name = anim.recipe().keyframes;
+            let body = bodies
+                .iter()
+                .find(|(found, _)| *found == name)
+                .map(|(_, body)| *body)
+                .unwrap_or_default();
+            assert!(
+                body.contains("var(--osd-dy"),
+                "{anim:?}: @keyframes {name} is fixed"
             );
         }
     }

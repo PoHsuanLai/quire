@@ -75,6 +75,7 @@ pub fn PolishPage() -> Element {
     rsx! {
         MenuBarSection {}
         MaterialSection {}
+        OsdSection {}
         CornerSection {}
         DockSection {}
         LauncherSection {}
@@ -208,6 +209,27 @@ fn MaterialSection() -> Element {
             }
             Specimen { name: "Targets",
                 code: target("highlight white .30 light / .12 dark; hairline 0.5 px black .14 / .60; contact 0 1px 2px black .10 / .30; ambient 0 12px 40px -12px black .28 / .55 (menus); vibrancy: tint chroma x1.4, light L +.012", "vibrancy saturates what is behind (not reproducible on Blitz, S15/S16); a 1 px inner highlight, a thin dark outer border and a soft two-part shadow on every menu and popover (L)"),
+            }
+        }
+    }
+}
+
+/// The OSD card at the top right (design/20 section 1.7): a control-center module's shape on the
+/// Osd material over the Work Space, in both schemes; the Level page has its looks and motion.
+#[component]
+fn OsdSection() -> Element {
+    use super::level_tile::{Ground, LevelTile, STATES};
+    rsx! {
+        Section { title: "OSD", note: "The on-screen display at the top right under the bar, as current macOS shows volume and brightness: a title line over the level capsule on the Osd material with the Space's tint, radius --r-tile and the control-center grid's padding. The Level page has the three looks, the motion and the show and hide.",
+            div { class: "g-row g-row-top",
+                for scheme in [Scheme::Light, Scheme::Dark] {
+                    for state in [STATES[1], STATES[4]] {
+                        LevelTile { look: ds::LevelLook::Capsule, scheme, ground: Ground::Work, state }
+                    }
+                }
+            }
+            Specimen { name: "Targets",
+                code: target("card 296 wide, radius 12 (--r-tile), padding 12, title 13/600, capsule 26 high with the glyph inside; drops in over --t-quick --e-out, lifts away over --t-move --e-exit", "a small panel at the top right under the menu bar, a title and a capsule slider with the glyph inside (L)"),
             }
         }
     }

@@ -100,6 +100,14 @@
    hovered. The gallery's class, never a `ds-` one. */
 .g-reveal-row .g-reveal{opacity:.35;transition:opacity var(--t-quick) var(--e-out)}
 .g-reveal-row:hover .g-reveal{opacity:1}
+/* The Level page and the level sheet: a specimen's ground holds an OSD card with its margins. */
+.g-level-tile{display:block;width:344px}
+.g-level-ground{display:flex;flex-direction:column;padding:0 0 var(--s-12)}
+.g-level-grid{display:flex;flex-direction:column;gap:var(--s-12)}
+.g-level-live{display:flex;flex-direction:column;gap:var(--s-16)}
+.g-level-screen{display:block;height:150px;border-radius:var(--r-panel);overflow:hidden}
+.g-level-sheet{display:flex;flex-direction:column;padding:var(--s-6) var(--s-16)}
+.g-level-label{width:150px}
 /* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
 .g-cc-body{padding:var(--s-12)}

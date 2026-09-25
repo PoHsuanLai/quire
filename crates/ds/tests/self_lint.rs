@@ -17,7 +17,8 @@ use ds::lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet
 /// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the
 /// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
 /// Space dot's stops (`SpaceDot` and the Space editor's dots, mailo gaps 3), and a tinted plate's
-/// stops and ink per scheme (`IconView { plate_tint }`, sill FINDINGS Q72).
+/// stops and ink per scheme (`IconView { plate_tint }`, sill FINDINGS Q72), and the level
+/// control's rubber band and segment stagger (`LevelControl`).
 const INLINE_VARS: &[&str] = &[
     "--av-bg",
     "--av-fg",
@@ -34,6 +35,9 @@ const INLINE_VARS: &[&str] = &[
     "--plate-base-d",
     "--plate-deep-d",
     "--plate-ink-d",
+    // The level control's rubber band and a segment's place in the fill's stagger.
+    "--rb",
+    "--i",
 ];
 
 const EXCEPTIONS: &[Exception] = &[

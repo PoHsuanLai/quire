@@ -29,11 +29,13 @@ pub enum Page {
     Polish,
     /// The edit surface over an app's own text, with the caret the app draws from its rect.
     Edit,
+    /// The level control's three looks and the OSD card that carries it.
+    Level,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 13] = [
+    pub const ALL: [Page; 14] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -47,6 +49,7 @@ impl Page {
         Page::MotionLab,
         Page::Polish,
         Page::Edit,
+        Page::Level,
     ];
 
     /// The `--page` word.
@@ -65,6 +68,7 @@ impl Page {
             Page::MotionLab => "motion-lab",
             Page::Polish => "polish",
             Page::Edit => "edit",
+            Page::Level => "level",
         }
     }
 }

@@ -1,6 +1,28 @@
 {
- "updated": "2026-09-25, quire v0.1.7: the edit surface; the icon set ships; Milestone 0 proven on live KWin",
+ "updated": "2026-09-25, the level control's three looks up for the pick; control center and power menu parts landing",
  "entries": [
+  {
+   "id": "level-control",
+   "date": "2026-09-25 · the level control",
+   "title": "A macOS-grade level control for volume and brightness, in three looks for the pick",
+   "status": "running",
+   "lede": "The user said a plain slider is too simple. The new level control has a thick capsule track with the glyph inside it, knocked out two-tone where the fill covers it; the glyph follows the level (speaker waves 0 to 3, a mute slash, sun rays that grow); while dragging the fill follows the pointer with no easing, set from outside it eases over the quick token; a press swells the track with the spring; dragging past an end stretches the capsule a few pixels and it springs back; keys step a sixteenth. Three looks: Capsule (glyph inside), CapsuleKnob (the older look with a separate handle) and Segments (sixteen staggered squares). The same wave built the OSD card: top right under the bar, a title line and the control in control-center module metrics, dropping in from above and fading out with the host unmapping at settle.",
+   "notes": [
+    "Recommendation: Capsule. It is the current macOS form and carries glyph, level and mute in one shape; Segments look dated and the knob adds a handle that means nothing on a read-only OSD.",
+    "Measured: a set from outside follows the ease-out curve (131 vs 130 px at a quarter of the time); a drag is under the pointer 16 ms after the move; the swell is 27 to 29 px; the stretch is 3 px and springs back; Reduced motion has no stretch.",
+    "Blitz finding: one document holding about 60 tinted cards loses layers (every card vanished), so the sheet renders each row on its own. Blitz has no pointer capture, so dragging out of the control's hit zone lets go."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/level-variants.png",
+     "caption": "the three looks in light and dark over the Work tint and a light ground, for volume 0, 40 and 100 percent, muted, and brightness 30 percent; 1x above, 2x below"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/level-motion.png",
+     "caption": "frames: a set from outside easing in, a press swelling the track, a drag past the end stretching the capsule and its spring back"
+    }
+   ]
+  },
   {
    "id": "edit-surface",
    "date": "2026-09-25 · quire v0.1.7",

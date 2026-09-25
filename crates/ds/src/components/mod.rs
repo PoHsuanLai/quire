@@ -21,6 +21,7 @@ pub mod hover_strip;
 pub mod icon_button;
 pub mod icon_view;
 pub mod kbd;
+pub mod level;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
@@ -43,6 +44,8 @@ pub mod module_grid;
 pub mod module_tile;
 pub mod module_tile_kind;
 pub(crate) mod muted;
+pub mod osd;
+pub(crate) mod osd_phase;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
@@ -82,6 +85,7 @@ pub mod text_runs;
 pub mod toast;
 pub mod toggle;
 pub mod tooltip;
+pub(crate) mod track;
 pub mod tree_item;
 pub(crate) mod tree_item_parts;
 pub mod vocab;
@@ -112,6 +116,7 @@ pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
+pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
@@ -123,6 +128,7 @@ pub use menu_pick::PickDismiss;
 pub use module_grid::ModuleGrid;
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
+pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
@@ -182,11 +188,13 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_button", include_str!("icon_button.css")),
     ("icon_view", include_str!("icon_view.css")),
     ("kbd", include_str!("kbd.css")),
+    ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("osd", include_str!("osd.css")),
     ("module_tile", include_str!("module_tile.css")),
     ("pane_switcher", include_str!("pane_switcher.css")),
     ("peek", include_str!("peek.css")),

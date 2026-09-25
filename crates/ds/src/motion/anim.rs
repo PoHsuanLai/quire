@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 56 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 59 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -14,7 +14,9 @@
 //! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing), plus four for the
 //! control center's pane switch (sill Q80): `PaneInR` and `PaneInL` play `slide-r` and
 //! `slide-l` at `--t-move` (design/13 section 13.3.7) where the catalogue's rows are `--t-big`,
-//! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way.
+//! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair (sill FINDINGS Q75):
+//! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
+//! step.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -142,11 +144,23 @@ pub enum Anim {
     PaneOutL,
     /// `pane-out-r`: a detail pane leaving to the right as the root comes back (sill Q80).
     PaneOutR,
+    /// `osd-in`: the OSD card comes in from `--osd-dy` (8 px above it at the top right, below
+    /// it at the bottom centre) and fades in, from a .96 scale, over `--t-quick --e-out`:
+    /// `pop-in`'s entrance without its overshoot, since a level shown under a key press must not
+    /// bounce (design/20 section 1.7; sill FINDINGS Q75).
+    OsdIn,
+    /// `osd-out`: the OSD card fades out and moves half of `--osd-dy` back the way it came (a
+    /// lift at the top right, a drop at the bottom centre) over `--t-move --e-exit`, the exit
+    /// design/05 section 10 gives shell chrome, once its hold ends (sill FINDINGS Q75).
+    OsdOut,
+    /// `level-tick`: the level control's fill edge marks a step crossed, once, at `--t-tap`
+    /// (`Tick::Quiet`; the sound is the shell's).
+    LevelTick,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 56] = [
+    pub const ALL: [Anim; 59] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -203,6 +217,9 @@ impl Anim {
         Anim::PaneInL,
         Anim::PaneOutL,
         Anim::PaneOutR,
+        Anim::OsdIn,
+        Anim::OsdOut,
+        Anim::LevelTick,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -264,6 +281,9 @@ impl Anim {
             Anim::PaneInL => "a-pane-in-l",
             Anim::PaneOutL => "a-pane-out-l",
             Anim::PaneOutR => "a-pane-out-r",
+            Anim::OsdIn => "a-osd-in",
+            Anim::OsdOut => "a-osd-out",
+            Anim::LevelTick => "a-level-tick",
         }
     }
 }

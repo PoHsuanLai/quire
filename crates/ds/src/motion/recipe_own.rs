@@ -111,3 +111,34 @@ pub(super) const PANE_OUT_R: Recipe = recipe(
     Fill::Forwards,
     Iteration::Once,
 );
+
+/// `osd-in` (sill FINDINGS Q75): the OSD card's entrance at design/20 section 1.7's `--t-quick
+/// --e-out`. An entrance, so it holds nothing; the card is at rest when it ends.
+pub(super) const OSD_IN: Recipe = recipe(
+    "osd-in",
+    DurationToken::Quick,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `osd-out` (sill FINDINGS Q75): the OSD card's exit at `--t-move --e-exit` (design/20 section
+/// 1.7, design/05 section 10). It holds its last, transparent frame until the host unmaps the
+/// surface at `settle(OsdOut)`, so the card never flashes back between the two.
+pub(super) const OSD_OUT: Recipe = recipe(
+    "osd-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);
+
+/// `level-tick`: the level control's fill edge shows its mark and lets it go at `--t-tap
+/// --e-out`, the shortest motion token, so a step crossed under a drag is felt, not watched.
+pub(super) const LEVEL_TICK: Recipe = recipe(
+    "level-tick",
+    DurationToken::Tap,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);
