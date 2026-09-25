@@ -99,16 +99,16 @@ peniko = "0.6"
 # PDF library (github.com/PoHsuanLai/pdfrum, MIT OR Apache-2.0). pdfrum-edit writes the file
 # (canvas, glyph-run fonts subset and instanced at the layout's instance, gradients, JPEG and
 # PNG passthrough); `variable-fonts` lets its subsetter instance variable and CFF2 faces.
-# DEVELOPMENT: path to the pdfrum worktree `blitz-print`; the final commit pins a git rev of the
-# pushed pdfrum main, then -> crates.io 0.4 once published.
-pdfrum-edit = { path = "/home/pohsuanlai/pdfrum-wt/print/crates/pdfrum-edit", features = ["variable-fonts"] }
-pdfrum-object = { path = "/home/pohsuanlai/pdfrum-wt/print/crates/pdfrum-object" }
-pdfrum-common = { path = "/home/pohsuanlai/pdfrum-wt/print/crates/pdfrum-common" }
+# Pinned to pdfrum main at 0765e4e5 (glyph runs, gradients, blank documents, PNG passthrough).
+# TODO: -> crates.io 0.4 once published.
+pdfrum-edit = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "0765e4e5", features = ["variable-fonts"] }
+pdfrum-object = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "0765e4e5" }
+pdfrum-common = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "0765e4e5" }
 # Font tables read directly by the painter (cmap reversed, metrics at an instance): the version
 # parley already resolves at the blitz rev, so no second copy for this.
 skrifa = "0.44"
 # Reading PDFs back in tests (text, fonts, images, a rasterised page): dev-dependency only.
-pdfrum = { path = "/home/pohsuanlai/pdfrum-wt/print/crates/pdfrum", default-features = false, features = ["vello-cpu"] }
+pdfrum = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "0765e4e5", default-features = false, features = ["vello-cpu"] }
 # The print portal's fd, from a sealed anonymous file (ds-native's `print` feature, Linux only).
 memfd = "0.6"
 # Proc-macro crates for ds-settings-derive.
