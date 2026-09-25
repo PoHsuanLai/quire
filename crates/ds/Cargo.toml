@@ -62,3 +62,8 @@ required-features = ["lint"]
 [[test]]
 name = "notifications_ssr"
 required-features = ["lint"]
+
+# MonthGrid, linted (sill Q180).
+[[test]]
+name = "month_grid_ssr"
+required-features = ["lint"]
