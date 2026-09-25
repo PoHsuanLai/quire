@@ -18,6 +18,9 @@
 //!   (`crate::edit_ime`).
 //! - Before each frame, the viewport's colour scheme (and the window's decorations) follow the
 //!   scheme the root `.ds` resolved.
+//! - The window itself, as `ds::WindowHost` over [`crate::window::WinitWindow`]: a frame's
+//!   titlebar moves, resizes, zooms, minimizes and closes it; its state is re-read on every
+//!   resize and focus change, so the frame redraws when the window is zoomed or deactivated.
 //! - The window's scale factor, as `ds::HostScale`, so `Ds` writes the pixel tokens for it and a
 //!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
 //!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
@@ -34,7 +37,9 @@ use crate::install::install;
 use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
+use crate::window::WinitWindow;
 use blitz_traits::shell::ColorScheme;
+use blitz_traits::shell::ShellProvider;
 use dioxus::prelude::*;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key as WinitKey, NamedKey};
@@ -44,6 +49,7 @@ use dioxus_native_dom::NodeHandle;
 use ds::{HostModality, HostScale, InputModality, Scale};
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::sync::Arc;
 
 /// What `Host` wraps, and what the app gave its document.
 #[derive(Props, Debug, Clone)]
@@ -88,6 +94,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
         crate::focus::finder(move || found.borrow().clone().map(DocRef::Handle))
     });
     let window = use_window();
+    let shell = use_hook(consume_context::<Arc<dyn ShellProvider>>);
+    let framed = {
+        let window = Arc::clone(&window);
+        ds::use_window_host_provider(move || Rc::new(WinitWindow::new(window, shell)))
+    };
     let factor = window.scale_factor();
     let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));
     let seen = Rc::clone(&document);
@@ -98,6 +109,12 @@ pub(crate) fn Host(props: HostProps) -> Element {
             if *current.peek() != next {
                 current.set(next);
             }
+        }
+        if matches!(
+            event,
+            WindowEvent::SurfaceResized(_) | WindowEvent::Focused(_)
+        ) {
+            framed.refresh();
         }
         if let Some(next) = modality_after(event) {
             let HostModality(mut current) = modality;
