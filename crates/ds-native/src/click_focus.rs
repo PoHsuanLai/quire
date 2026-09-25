@@ -7,8 +7,14 @@
 //! click leaves. So when the ancestor already has the focus, it is cleared here without events
 //! (Blitz's clear then has nothing to clear, and the ancestor hears no spurious blur); either
 //! way the ancestor is focused a frame later, if the click left the focus nowhere.
+//!
+//! The click's handler may remove the very element found (mailo's "Show images" button removes
+//! itself on press), so the fallback remembers every focusable element from the target up
+//! (`crate::focus_chain`), and `restore` focuses the first of them still in the document when it
+//! runs (mailo gaps 7).
 
-use crate::node_ref::{FoundNode, NodeRef, Written};
+use crate::focus_chain::{Candidates, ChainNode, Target};
+use crate::node_ref::{NodeRef, Written};
 use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
 use ds::{Fallback, Focused, HostClickFocus};
@@ -33,42 +39,50 @@ fn fallback(root: &MountedData) -> Fallback {
     let Some(root) = NodeRef::of(root) else {
         return Fallback::Renderer;
     };
-    let Some(Some(ancestor)) = root.read(ancestor_of_click) else {
+    let Some(Some((ancestor, candidates))) = root.read(|doc| {
+        ancestor_of_click(doc).map(|ancestor| (ancestor, Candidates::from(doc, ancestor)))
+    }) else {
         return Fallback::Renderer;
-    };
-    let target = NodeRef {
-        doc: root.doc.clone(),
-        node: ancestor,
     };
     // Already there: clear it without events, so Blitz's clear has nothing to blur, and give it
     // back after the click.
     if root.read(|doc| doc.get_focussed_node_id() == Some(ancestor)) == Some(true) {
-        let _ = target.write(BaseDocument::clear_focus);
+        let _ = root.write(BaseDocument::clear_focus);
     }
-    Fallback::Ancestor(Rc::new(MountedData::new(FoundNode(target))))
+    Fallback::Ancestor(Rc::new(MountedData::new(ChainNode {
+        doc: root.doc.clone(),
+        candidates,
+    })))
 }
 
-/// Focus `ancestor` if the focus is nowhere: a handler that moved it during the click wins.
-fn restore(ancestor: &MountedData) -> Focused {
-    let Some(node) = NodeRef::of(ancestor) else {
+/// Focus the first candidate still in the document if the focus is nowhere: a handler that
+/// moved it during the click wins, and one that removed the ancestor sends it further up.
+/// Liveness is read now, as the focus is written, not when the click asked.
+fn restore(target: &MountedData) -> Focused {
+    let Some(target) = Target::of(target) else {
         return Focused::Unknown;
     };
-    let nowhere = node.read(|doc| {
-        let root = doc.try_root_element().map(|root| root.id);
-        doc.get_focussed_node_id()
-            .is_none_or(|focused| Some(focused) == root)
-    });
-    match nowhere {
+    let picked = target
+        .doc()
+        .read(|doc| nowhere(doc).then(|| target.pick(doc)).flatten());
+    match picked {
         None => Focused::Busy,
-        Some(false) => Focused::Unknown,
-        Some(true) => match node.write(|doc| {
-            doc.set_focus_to(node.node);
+        Some(None) => Focused::Unknown,
+        Some(Some(node)) => match target.doc().write(|doc| {
+            doc.set_focus_to(node);
             doc.shell_provider.request_redraw();
         }) {
             Written::Done => Focused::Done,
             Written::Busy => Focused::Busy,
         },
     }
+}
+
+/// Whether the keyboard is nowhere: no focused node, or the root element.
+pub(crate) fn nowhere(doc: &BaseDocument) -> bool {
+    let root = doc.try_root_element().map(|root| root.id);
+    doc.get_focussed_node_id()
+        .is_none_or(|focused| Some(focused) == root)
 }
 
 /// The focusable ancestor a click at the hover node should leave the focus on, when Blitz would
