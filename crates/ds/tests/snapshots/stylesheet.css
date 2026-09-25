@@ -325,16 +325,17 @@ html,body{margin:0;padding:0;background:transparent}
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
-/* banner-out (quire's, sill Q121, Q122): a notification banner slides out to the right, from
-   the offset a swipe left it at (`--swipe-dx`, 0 when none) to past its own width and the
-   surface's edge, fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
+/* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
+   swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
+   `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
+   edge when unset), fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
    frame until the stack drops the row and the rows below heal. */
-@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 
-/* banner-in (quire's, sill Q121): a notification banner slides in from past the surface's right
-   edge to its place at `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first
-   frame: the edge hides it until it arrives. */
-@keyframes banner-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
+/* banner-in (quire's, sill Q121): a notification banner slides in from its entry edge's vector
+   (`--banner-dx`, `--banner-dy`; past the surface's right edge when unset) to its place at
+   `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first frame. */
+@keyframes banner-in{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 
 /* panel-in and panel-out (quire's, sill Q123): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
@@ -421,8 +422,8 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
 @keyframes level-tick--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
-@keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
-@keyframes banner-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
+@keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
+@keyframes banner-in--b{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out--b{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
@@ -672,10 +673,17 @@ html,body{margin:0;padding:0;background:transparent}
    the row leaves with `banner-out` (both `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
    the position) with the heal ripple. A card swiped away inside a row holds its offset while the
    row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
-   (spike S2). */
+   (spike S2).
+   The entry edge (`data-entry`, `notifications.banner_entry_direction`) sets the vector
+   `banner-in` starts from and `banner-out` ends at: past the right edge by `--s-16`, or its own
+   height and `--s-16` below its place. A row whose card was swiped (`data-flight=swipe`) takes
+   the right-edge vector back, so it leaves along the swipe whatever the entry edge. */
 
 .ds-banner-stack{ display:flex; flex-direction:column; align-items:flex-end; }
 .ds-banner-stack[*|data-position=bottom-right]{ flex-direction:column-reverse; }
+.ds-banner-stack[*|data-entry=right]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
+.ds-banner-stack[*|data-entry=below]{ --banner-dx:0px; --banner-dy:calc(100% + var(--s-16)); }
+.ds-banner[*|data-flight=swipe]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
 .ds-banner{ display:flex; justify-content:flex-end; padding-bottom:var(--notifications-stack-gap); }
 .ds-banner-stack[*|data-position=bottom-right] > .ds-banner{ padding-bottom:0; padding-top:var(--notifications-stack-gap); }
 .ds-banner-card{ display:flex; justify-content:flex-end; animation:banner-in var(--t-move) var(--e-spring); }

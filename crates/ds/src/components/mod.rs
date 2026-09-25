@@ -121,7 +121,7 @@ pub use appearance_picker::{AppearancePicker, PickerLayout};
 pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
-pub use banner_stack::{Banner, BannerKey, BannerPosition, BannerStack};
+pub use banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use button_size::ButtonSize;
