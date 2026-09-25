@@ -33,17 +33,26 @@ pub(crate) struct Printed {
 
 /// `doc`, laid out at `content`'s width, as a PDF on `content`'s sheet.
 pub(crate) fn print(doc: &mut BaseDocument, content: ContentBox) -> Result<Printed, PdfError> {
-    let pages = paginate(&flow::collect(doc), content.height);
     let sources = Sources {
         texts: run_texts::collect(doc),
         images: images::collect(doc),
     };
+    print_from(doc, content, &sources)
+}
+
+/// As [`print`], with the run texts and image sources given rather than read from `doc`.
+pub(crate) fn print_from(
+    doc: &mut BaseDocument,
+    content: ContentBox,
+    sources: &Sources,
+) -> Result<Printed, PdfError> {
+    let pages = paginate(&flow::collect(doc), content.height);
     let mut pdf = Document::new();
     let mut resources = Resources::new();
     let mut glyphs = GlyphTally::default();
     let scrolled = doc.viewport_scroll();
     for band in &pages {
-        let tally = page(&mut pdf, doc, content, *band, &mut resources, &sources)?;
+        let tally = page(&mut pdf, doc, content, *band, &mut resources, sources)?;
         glyphs = add(glyphs, tally);
     }
     doc.set_viewport_scroll(scrolled);

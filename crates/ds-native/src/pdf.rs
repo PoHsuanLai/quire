@@ -17,6 +17,8 @@ mod pages;
 mod paginate;
 mod run_texts;
 mod spec;
+#[cfg(test)]
+mod text_tests;
 
 pub use error::PdfError;
 pub use spec::{Margins, PageSize, PageSpec, Pt};
