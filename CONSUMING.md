@@ -142,6 +142,32 @@ full row and one half row. Three pieces keep every line whole device pixels (des
 Glyphs need nothing from you: under a root at a fractional scale `Glyph` writes a stroke width
 that is an even number of device pixels (design/08-ICONS.md §1.4.1).
 
+### A document's frame must have a height (2026-09-25)
+
+One rule for every surface whose document is a frame around a `Ds` root: a popup's frame, an
+overlay root, a wallpaper, the launcher's catcher (sill F172, F225, Q104). **The frame (the
+document's first box, the one around the `Ds`) is in normal flow and has a height; it is never
+absolutely or fixed positioned, and never left to be sized by content that is itself out of
+flow.** Blitz lays out `#main` and `.ds` at `height:auto`: a frame with `position:absolute;
+inset:0` or `position:fixed` resolves against that 0 px box (Taffy places a fixed box against
+its parent, not the viewport), a `height:100%` resolves against it too, and a frame whose only
+content is a card hung from its anchor is 0 px tall. Then every box from `html` down is 0 px,
+nothing paints (sill's wallpaper, F172) and in the shell no press lands (the bar popup, F225).
+
+- **The surface fills its surface** (popup frame, overlay, wallpaper, catcher): if your quire
+  has `Ds { extent: RootExtent::Viewport }` (the sheet-parts branch, sill Q94), pass it. Until
+  then the floor is on your frame: `display:grid; width:100vw; min-height:100vh` in flow, the
+  room around the card as the frame's padding; the grid's one cell stretches the `Ds` root to
+  fill it, so the root has the viewport's height too. The same floor holds even if the frame is
+  absolutely placed (`crates/ds-native/tests/root_frame.rs` measures all three).
+- **The surface is sized by its content** (a bar, a dock, an OSD card's surface): leave the
+  content in flow; a card that must be positioned is positioned inside a frame that has a height.
+- **Debug it** with the Harness before looking at the compositor: `harness.rect("html")`,
+  `harness.rect(".ds")` and your frame's rect; a height of 0 on any of them is this bug.
+  `harness.count(".ds")` confirms the root mounted at all, and `harness.hits(point, selector)`
+  tells you whether a press at `point` reaches your card. (Whether Blitz's hit test enters a 0 px
+  box has differed between the shell and the harness, so trust the heights, not a click.)
+
 You almost never write more than one `Ds` per window: it is the root, not a per-panel wrapper —
 use `Surface` (section 4) for a nested material, scheme, accent or blur state.
 
