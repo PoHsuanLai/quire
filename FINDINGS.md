@@ -3929,3 +3929,45 @@ keep-together block that must move, and a forced break.
     1.92 now (was 1.91, blitz's minimum). The pinned toolchain stays 1.98.1.
   - Resolving pdfrum `main` moved `smallvec` back up to 1.16.1 (pdfrum pins it exactly).
   - `cargo deny check licenses`: ok.
+
+## Hover under a resting pointer (2026-09-26)
+
+sill Q170: a notification banner that arrived under a resting pointer never counted as hovered
+(no hold pause, no close button) until the pointer left it and came back.
+
+- **Cause (Blitz @ e99fbdbd, not patched).** `BaseDocument::resolve` ends with `refresh_hover`
+  (`blitz-dom/src/resolve.rs:135`, `document.rs:1925`). It hit-tests the last pointer position
+  against the fresh layout and stores the result as the hovered node, dispatching nothing; a TODO
+  there says the enter/leave synthesis is missing. The event driver
+  (`events/driver.rs::handle_pointer_move`) diffs the next move against that stored node. The
+  diff comes out empty, so the element that slid in never hears `pointerover`/`pointerenter`,
+  and the one the pointer left never hears `pointerout`/`pointerleave`.
+- **Recipe (host level, `crates/ds-native/src/hover_sync.rs` decides,
+  `hover_replay.rs` acts, called from `Headless::resolve`).**
+  1. Read `get_hover_node_id()` before and after each `resolve`. If they are equal, or no
+     pointer event has arrived yet, do nothing.
+  2. Otherwise put Blitz's hover back on the old element without events. Probe
+     `hit()` at the old element's current rect (centre, then the corners inset 1 px), mapping
+     each hit through `nearest_non_anonymous_ancestor` (the mapping Blitz applies before it stores
+     a hovered node). The first probe that hits the old element goes to `set_hover_to`. If none
+     does (the element left the tree or is covered), call `clear_hover()`.
+  3. Replay the last pointer event as a `UiEvent::PointerMove` (same position, buttons and
+     modifiers) through `handle_ui_event`. The driver now sees the real diff and dispatches
+     leave/out for the old chain, over/enter for the new one, and one `pointermove` (a browser's
+     "fake mouse move" after a layout shift does the same).
+  4. The frame loop goes round again. The replay left Blitz's hover where the next
+     `refresh_hover` finds it, so that pass changes nothing. At most one replay per round, and
+     `MAX_ROUNDS` bounds the rest.
+- **Proof.** `crates/ds-native/tests/hover_sync.rs`. A block slides under a resting pointer: it
+  is entered once, the field it covers is left once, and the page they share is not entered
+  again. It is entered before the pointer moves at all. With no pointer yet, nothing is heard. A
+  `BannerStack` banner that lands under the resting pointer has its `NotificationCard` at
+  `data-hover="on"` after a 1 px move. Three of these fail with the replay switched off.
+- **Limitation: the covered case.** When the old element is covered everywhere probed, hover is
+  cleared rather than restored, because Blitz can only be told to hover a point. The replay then
+  loses the old element's `pointerleave` and re-enters every shared ancestor.
+  `a_block_covering_the_whole_field_is_still_entered` pins this.
+- **Limitation: coverage.** Only the `Harness` (and `snapshot`) is covered, plus any host that
+  calls `resolve` itself. `ds_native::launch` is not: it opens a blitz-shell window whose frame
+  loop Blitz owns, and ds-native never sees its resolve. shell-host gets the same recipe on its
+  own branch.

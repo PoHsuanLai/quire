@@ -44,6 +44,8 @@ mod harness_settle;
 mod harness_wheel;
 mod headless;
 mod host;
+mod hover_replay;
+mod hover_sync;
 mod install;
 pub mod launch;
 pub mod measure;
