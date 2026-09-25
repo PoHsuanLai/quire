@@ -15,6 +15,7 @@ use crate::frame_book::FrameBook;
 use crate::frame_hover::{FrameHover, HoverTracker};
 use crate::frame_links::{LinkInbox, frame_links, read_link};
 use crate::frames::FrameParser;
+use crate::hover_replay::{RestingPointer, Synced};
 use crate::memory_shell::MemoryShell;
 use crate::net::DsNet;
 use crate::node_ref::DocRef;
@@ -27,6 +28,7 @@ use anyrender_vello_cpu::VelloCpuImageRenderer;
 use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
 use blitz_html::HtmlProvider;
 use blitz_paint::paint_scene;
+use blitz_traits::events::UiEvent;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
 use dioxus::prelude::*;
@@ -73,6 +75,9 @@ pub(crate) struct Headless {
     pub(crate) listeners: EditListeners,
     /// Under `FocusFallback::Ancestor`, where the keyboard goes when its element is removed.
     keeper: Keeper,
+    /// The last pointer event, replayed when a resolve moves the hover by itself
+    /// (`crate::hover_sync`).
+    resting: Option<RestingPointer>,
 }
 
 /// Whether the document hands the keyboard on when its element is removed.
@@ -156,6 +161,14 @@ impl Headless {
             hover: (setup.frame_links.hover(), HoverTracker::default()),
             listeners,
             keeper,
+            resting: None,
+        }
+    }
+
+    /// Remember where `event` leaves the pointer, if it is a pointer event.
+    pub(crate) fn note_pointer(&mut self, event: &UiEvent) {
+        if let Some(resting) = RestingPointer::from_event(event) {
+            self.resting = Some(resting);
         }
     }
 
@@ -201,15 +214,30 @@ impl Headless {
             }
             let restyled = scheme::follow_root(&mut self.doc.inner.borrow_mut()).is_some();
             let fetched = self.wakeup.fetched();
-            let mut inner = self.doc.inner.borrow_mut();
-            inner.resolve(at.as_secs_f64());
-            crate::snap::snap_to_device(&mut inner);
-            drop(inner);
+            let synced = self.resolve(at);
             let landed = self.wakeup.fetched() != fetched;
-            if !(rendered || restyled || landed || kept == Kept::Moved) {
+            if !(rendered
+                || restyled
+                || landed
+                || kept == Kept::Moved
+                || synced == Synced::Replayed)
+            {
                 return;
             }
         }
+    }
+
+    /// Style and lay out at `at`, then dispatch the hover change the layout made under a
+    /// resting pointer, which Blitz's resolve records silently (`crate::hover_sync`). At most
+    /// one replay per round: the replayed move leaves Blitz's hover where the next resolve
+    /// finds it, so that one's re-hit-test changes nothing.
+    fn resolve(&mut self, at: Duration) -> Synced {
+        let mut inner = self.doc.inner.borrow_mut();
+        let before = inner.get_hover_node_id();
+        inner.resolve(at.as_secs_f64());
+        crate::snap::snap_to_device(&mut inner);
+        drop(inner);
+        crate::hover_replay::sync(&mut self.doc, before, self.resting.as_ref())
     }
 
     /// Hand the keyboard to a focusable ancestor of a focused element the renders removed.
