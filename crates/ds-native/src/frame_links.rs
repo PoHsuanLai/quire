@@ -8,6 +8,8 @@
 //! the document is held, and the app's handler must be free to touch the document (focus,
 //! measure) without a "RefCell already borrowed" (sill FINDINGS Q43).
 
+use crate::frame_book::FrameBook;
+use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
 use blitz_traits::navigation::{NavigationOptions, NavigationProvider};
 use std::fmt;
@@ -19,6 +21,9 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 pub struct FrameLink {
     /// The frame's document.
     pub frame: FrameId,
+    /// The frame's `iframe`'s `data-frame-tag`: which of the app's frames it is (mailo's
+    /// message), if the element has one.
+    pub tag: Option<FrameTag>,
     /// The link's target, resolved against the frame's base URL.
     pub href: String,
 }
@@ -60,16 +65,23 @@ impl fmt::Debug for FrameLinkHandler {
 #[derive(Clone)]
 pub struct FrameLinkHandler(Arc<dyn Fn(FrameLink) + Send + Sync>);
 
-/// Every frame document's navigation provider: a click becomes a [`FrameLink`] on the channel,
-/// or nothing when the app keeps frame links inert.
+/// A click as the frame's navigation provider hears it, before the app is told.
+#[derive(Debug)]
+struct Clicked {
+    frame: FrameId,
+    href: String,
+}
+
+/// Every frame document's navigation provider: a click goes on the channel, or nowhere when the
+/// app keeps frame links inert.
 struct FrameNav {
-    sender: Option<UnboundedSender<FrameLink>>,
+    sender: Option<UnboundedSender<Clicked>>,
 }
 
 impl NavigationProvider for FrameNav {
     fn navigate_to(&self, options: NavigationOptions) {
         if let Some(sender) = &self.sender {
-            let _ = sender.send(FrameLink {
+            let _ = sender.send(Clicked {
                 frame: FrameId::of(options.source_document),
                 href: options.url.to_string(),
             });
@@ -79,8 +91,10 @@ impl NavigationProvider for FrameNav {
 
 /// Where the clicks a document's frames report are delivered to the app.
 pub(crate) struct LinkInbox {
-    receiver: UnboundedReceiver<FrameLink>,
+    receiver: UnboundedReceiver<Clicked>,
     handler: Option<FrameLinkHandler>,
+    /// Where the clicked frame's tag is read.
+    book: FrameBook,
 }
 
 impl LinkInbox {
@@ -98,15 +112,23 @@ impl LinkInbox {
         }
     }
 
-    fn deliver(&self, link: FrameLink) {
+    fn deliver(&self, clicked: Clicked) {
         if let Some(FrameLinkHandler(handler)) = &self.handler {
-            handler(link);
+            handler(FrameLink {
+                frame: clicked.frame,
+                tag: self.book.tag(clicked.frame),
+                href: clicked.href,
+            });
         }
     }
 }
 
-/// The frame documents' navigation provider for `links`, and the inbox its clicks arrive in.
-pub(crate) fn frame_links(links: &FrameLinks) -> (Arc<dyn NavigationProvider>, LinkInbox) {
+/// The frame documents' navigation provider for `links`, and the inbox its clicks arrive in,
+/// tagged from `book`.
+pub(crate) fn frame_links(
+    links: &FrameLinks,
+    book: FrameBook,
+) -> (Arc<dyn NavigationProvider>, LinkInbox) {
     let (sender, receiver) = unbounded_channel();
     let (sender, handler) = match links {
         FrameLinks::Inert => (None, None),
@@ -114,6 +136,10 @@ pub(crate) fn frame_links(links: &FrameLinks) -> (Arc<dyn NavigationProvider>, L
     };
     (
         Arc::new(FrameNav { sender }),
-        LinkInbox { receiver, handler },
+        LinkInbox {
+            receiver,
+            handler,
+            book,
+        },
     )
 }

@@ -1092,6 +1092,18 @@ struct literal.
 The window's app renders one frame after the host, once the document has the app's providers
 (a frame in the first render would otherwise be parsed with the wrong ones).
 
+### Frame tags and link text (2026-09-25): which frame, and what a link says
+
+Additive to "Native phase B". FINDINGS.md "Frame tags and link text" has the reasons and proofs.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Name a frame | `iframe { "data-frame-tag": "msg-42", srcdoc: .. }` | Read as the frame's document is found under its element; blank means untagged. One tag per frame: a lookup returns the newest document carrying it. |
+| Which frame asked | `NetRequest::frame_tag() -> Option<&FrameTag>` beside `origin()` | `None` for the app's own document and an untagged frame. A frame's requests reach `AppNet::decide` on the frame after its document is built (they wait for the tag); `data:` never waits. |
+| Which frame a click came from | `FrameLink { frame, tag, href, .. }` | `tag: Option<FrameTag>`. |
+| Tie an id to the app's frame | `ds_native::frames::tag_of(FrameId) -> Option<FrameTag>`, `frame_by_tag(&FrameTag) -> Option<FrameId>` | Any document on the calling thread: the window's UI thread, or a test's. A frame is forgotten with its document. |
+| A stable key for a frame | `FrameId::index() -> usize` | Never reused within the process. `FrameTag::new(text)`, `as_str()`, `Display`. |
+
 ### Edit surface (2026-09-25): an app's own editor on Blitz
 
 `ds::EditSurface` hosts an app's own rendered text (mailo's composer) and hands the app its
