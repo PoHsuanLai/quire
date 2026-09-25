@@ -62,6 +62,8 @@ pub mod segmented;
 pub mod selection_bubble;
 pub mod send_mood;
 pub mod send_pill;
+pub mod settings_row;
+pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sidebar_item;
 pub mod slider;
@@ -129,6 +131,8 @@ pub use segmented::{SegSize, SegmentedControl};
 pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble};
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
+pub use settings_row::SettingsRow;
+pub use settings_row_trailing::RowTrailing;
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
@@ -184,6 +188,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("segmented", include_str!("segmented.css")),
     ("selection_bubble", include_str!("selection_bubble.css")),
     ("send_pill", include_str!("send_pill.css")),
+    ("settings_row", include_str!("settings_row.css")),
     ("sheet", include_str!("sheet.css")),
     ("sidebar_item", include_str!("sidebar_item.css")),
     ("slider", include_str!("slider.css")),
