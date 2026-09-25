@@ -228,6 +228,7 @@ version = "0.1.0"
 dependencies = [
  "anyrender",
  "krilla",
+ "pdfrum",
  "peniko",
  "skrifa 0.44.0",
 ]
