@@ -6,9 +6,13 @@
 //!
 //! A click is delivered through a channel, not called from the provider: Blitz calls it while
 //! the document is held, and the app's handler must be free to touch the document (focus,
-//! measure) without a "RefCell already borrowed" (sill FINDINGS Q43).
+//! measure) without a "RefCell already borrowed" (sill FINDINGS Q43). The link's text and title
+//! are read as it is delivered, from the frame's document, then free: the provider hears only the
+//! URL.
 
+use crate::frame_anchor::LinkFacts;
 use crate::frame_book::FrameBook;
+use crate::frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover};
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
 use blitz_traits::navigation::{NavigationOptions, NavigationProvider};
@@ -26,6 +30,11 @@ pub struct FrameLink {
     pub tag: Option<FrameTag>,
     /// The link's target, resolved against the frame's base URL.
     pub href: String,
+    /// The anchor's text content, whitespace-collapsed: what the reader saw, to compare with
+    /// `href` (mailo's link honesty check). Empty if the anchor could not be found again.
+    pub text: String,
+    /// The anchor's `title`, if it has one.
+    pub title: Option<String>,
 }
 
 /// What a link clicked inside a frame does. The frame never navigates either way.
@@ -35,23 +44,54 @@ pub enum FrameLinks {
     #[default]
     Inert,
     /// The app hears it (mailo opens it in the browser), on the UI thread, with the document
-    /// free.
-    Intercept(FrameLinkHandler),
+    /// free; and, if `hover` reports, hears the pointer come onto and leave each link.
+    Intercept {
+        /// Called with each click.
+        click: FrameLinkHandler,
+        /// Whether the pointer crossing a link is reported too.
+        hover: FrameHover,
+    },
 }
 
 impl FrameLinks {
     /// Call `handler` with every link clicked inside a frame.
     pub fn intercept(handler: impl Fn(FrameLink) + Send + Sync + 'static) -> Self {
-        FrameLinks::Intercept(FrameLinkHandler(Arc::new(handler)))
+        FrameLinks::Intercept {
+            click: FrameLinkHandler(Arc::new(handler)),
+            hover: FrameHover::Ignore,
+        }
+    }
+
+    /// Also call `handler` as the pointer comes onto and leaves a link inside a frame (a link
+    /// pill). `Inert` stays inert: a link that does nothing has nothing to preview.
+    pub fn with_hover(self, handler: impl Fn(FrameLinkHover) + Send + Sync + 'static) -> Self {
+        match self {
+            FrameLinks::Inert => FrameLinks::Inert,
+            FrameLinks::Intercept { click, .. } => FrameLinks::Intercept {
+                click,
+                hover: FrameHover::Report(FrameHoverHandler::new(handler)),
+            },
+        }
+    }
+
+    /// Whether the pointer crossing a link is reported.
+    pub(crate) fn hover(&self) -> FrameHover {
+        match self {
+            FrameLinks::Inert => FrameHover::Ignore,
+            FrameLinks::Intercept { hover, .. } => hover.clone(),
+        }
     }
 }
 
 impl fmt::Debug for FrameLinks {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(match self {
-            FrameLinks::Inert => "Inert",
-            FrameLinks::Intercept(_) => "Intercept(..)",
-        })
+        match self {
+            FrameLinks::Inert => f.write_str("Inert"),
+            FrameLinks::Intercept { hover, .. } => f
+                .debug_struct("Intercept")
+                .field("hover", hover)
+                .finish_non_exhaustive(),
+        }
     }
 }
 
@@ -99,25 +139,29 @@ pub(crate) struct LinkInbox {
 
 impl LinkInbox {
     /// Hand every click waiting to the app, now: the headless document calls it each frame.
-    pub(crate) fn drain(&mut self) {
+    /// `read` finds what the link says; it must release the document before it returns.
+    pub(crate) fn drain(&mut self, read: &dyn Fn(FrameId, &str) -> LinkFacts) {
         while let Ok(link) = self.receiver.try_recv() {
-            self.deliver(link);
+            self.deliver(link, read);
         }
     }
 
     /// Hand each click to the app as it arrives, for the document's life: the window's task.
-    pub(crate) async fn serve(mut self) {
+    pub(crate) async fn serve(mut self, read: impl Fn(FrameId, &str) -> LinkFacts) {
         while let Some(link) = self.receiver.recv().await {
-            self.deliver(link);
+            self.deliver(link, &read);
         }
     }
 
-    fn deliver(&self, clicked: Clicked) {
+    fn deliver(&self, clicked: Clicked, read: &dyn Fn(FrameId, &str) -> LinkFacts) {
         if let Some(FrameLinkHandler(handler)) = &self.handler {
+            let facts = read(clicked.frame, &clicked.href);
             handler(FrameLink {
                 frame: clicked.frame,
                 tag: self.book.tag(clicked.frame),
                 href: clicked.href,
+                text: facts.text,
+                title: facts.title,
             });
         }
     }
@@ -132,7 +176,7 @@ pub(crate) fn frame_links(
     let (sender, receiver) = unbounded_channel();
     let (sender, handler) = match links {
         FrameLinks::Inert => (None, None),
-        FrameLinks::Intercept(handler) => (Some(sender), Some(handler.clone())),
+        FrameLinks::Intercept { click, .. } => (Some(sender), Some(click.clone())),
     };
     (
         Arc::new(FrameNav { sender }),
@@ -142,4 +186,10 @@ pub(crate) fn frame_links(
             book,
         },
     )
+}
+
+/// What the link clicked toward `href` in `frame` says, read from `top`'s frames.
+pub(crate) fn read_link(top: &blitz_dom::BaseDocument, frame: FrameId, href: &str) -> LinkFacts {
+    crate::frame_tree::in_frame(top, frame, &|doc| crate::frame_anchor::clicked(doc, href))
+        .unwrap_or_else(|| LinkFacts::bare(href))
 }

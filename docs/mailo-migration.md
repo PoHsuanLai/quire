@@ -624,6 +624,15 @@ tags and link text"; `CONSUMING.md` "Frame tags and link text").
   opaque id. `AppNet::decide` reads `request.frame_tag()` for the message; a link handler reads
   `link.tag`. Where mailo still needs a frame's id for its own map, `FrameId::index()` is the key,
   and `ds_native::frames::{tag_of, frame_by_tag}` go from one to the other.
+- **Link honesty.** `FrameLink` carries `text` (the anchor's text, whitespace-collapsed) and
+  `title` beside `href`, so `ui/original/links.rs` compares what the reader saw with where the
+  link goes from the click itself; any lookup of the anchor's text by URL goes.
+- **The link pill.** `original.links()` becomes `FrameLinks::intercept(open).with_hover(pill)`.
+  `pill` gets a `FrameLinkHover` on each crossing: on `HoverPhase::Enter` it shows the pill
+  (`href`, and `text` when they disagree) at `at`, which is in the window's document
+  coordinates, and on `Leave` it hides it. The handler runs on the UI thread with the document
+  free, so it sets a signal the reader's pill reads; nothing arrives while the pointer stays on
+  one link, so it needs no debounce.
 - **What changes under mailo's tests.** A frame's requests reach `decide` one frame after its
   document is built (they wait for its tag). A harness test settles past that on its own; a test
   that read the requests between two raw `Harness` calls may need one more `advance`.
@@ -671,7 +680,8 @@ phase B" item 3), and the sign-off above still belongs to `mail-mime`'s owner.
 
 **Frame tags (2026-09-25).** The Original `iframe` carries `data-frame-tag` (the message), so the
 reader's `AppNet` and link handler know the message from `NetRequest::frame_tag()` and
-`FrameLink::tag` rather than from the URL (section 6.7).
+`FrameLink::tag` rather than from the URL; a click carries the link's text and title, and
+`FrameLinks::with_hover` drives the link pill (section 6.7).
 
 Either way, `reading/tests.rs`'s existing guarantees (`no_div_between_article_and_iframe`, "a
 plain-text message claimed a sandboxed frame" never happening, the two sandbox-attribute checks)

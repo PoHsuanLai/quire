@@ -30,11 +30,13 @@ use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::{EditListeners, ime_of};
 use crate::frame_book::FrameBook;
-use crate::frame_links::frame_links;
+use crate::frame_hover::report;
+use crate::frame_links::{frame_links, read_link};
 use crate::install::install;
 use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
+use crate::window_hover::WindowHover;
 use blitz_traits::shell::ColorScheme;
 use dioxus::prelude::*;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
@@ -94,7 +96,17 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let seen = Rc::clone(&document);
     let book = use_hook(FrameBook::new);
     let found = book.clone();
+    let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
+    let hover = props.setup.frame_links.hover();
     use_window_event(move |event, _| {
+        if let crate::frame_hover::FrameHover::Report(_) = hover {
+            let crossings = hovering.borrow_mut().crossings(
+                event,
+                window.scale_factor(),
+                seen.borrow().as_ref(),
+            );
+            report(&hover, crossings);
+        }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
             let HostScale(mut current) = scale;
             let next = scale_of(*scale_factor);
@@ -131,7 +143,14 @@ pub(crate) fn Host(props: HostProps) -> Element {
     });
     let frame_nav = use_hook(|| {
         let (nav, inbox) = frame_links(&props.setup.frame_links, book.clone());
-        spawn(inbox.serve());
+        let read = Rc::clone(&document);
+        spawn(inbox.serve(move |frame, href| {
+            let handle = read.borrow().clone();
+            handle.as_ref().and_then(NodeHandle::try_doc).map_or_else(
+                || crate::frame_anchor::LinkFacts::bare(href),
+                |doc| read_link(&doc, frame, href),
+            )
+        }));
         nav
     });
     let mut installed = use_signal(|| Installed::Pending);
