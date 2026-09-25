@@ -6,6 +6,7 @@
 //! OS; `crate::host` wraps the app to supply what quire needs on top of it.
 
 use crate::app_id::{AppId, with_app_id};
+use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::fonts::font_context;
 use crate::frame_links::FrameLinks;
@@ -68,6 +69,13 @@ impl AppConfig {
     /// navigates, so the app opens the link itself or nothing happens.
     pub fn with_frame_links(mut self, links: FrameLinks) -> Self {
         self.setup.frame_links = links;
+        self
+    }
+
+    /// Where the keyboard goes after a click on nothing focusable (default
+    /// [`FocusFallback::Ancestor`]: the nearest focusable ancestor, as in a browser).
+    pub fn with_focus_fallback(mut self, fallback: FocusFallback) -> Self {
+        self.setup.focus_fallback = fallback;
         self
     }
 

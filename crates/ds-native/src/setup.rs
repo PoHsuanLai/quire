@@ -2,6 +2,7 @@
 //! and the headless document (`HarnessConfig`), so a window, a test and a snapshot of the same
 //! app see the same providers.
 
+use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
 use crate::net_policy::NetPolicy;
@@ -15,4 +16,6 @@ pub(crate) struct Setup {
     pub(crate) net: NetPolicy,
     /// What a link clicked in a frame does.
     pub(crate) frame_links: FrameLinks,
+    /// Where the keyboard goes after a click on nothing focusable.
+    pub(crate) focus_fallback: FocusFallback,
 }

@@ -1112,6 +1112,25 @@ input; the app keeps its document model and draws its own caret and selection. F
 | The host seam | `ds::HostEdit` = `ds_native::edit::EDIT` | `launch` and the harness provide it; another Blitz host calls `ds_native::edit::provide()` (and must forward its own IME events; see FINDINGS). Without a host the geometry reads are `Unknown` and keys still arrive. |
 | Tests | `Harness::ime_start()`, `ime_update(text, cursor)`, `ime_commit(text)`, `ime_end()`, `paste_html(html, text)`, `hit_test(selector, point)`, `ime_switch()`, `ime_cursor_area()`, `within(f)` | `within` runs a closure in the app's runtime, so a test reads an `EditHandle` as a handler would. `cargo run -p ds-native --example edit` prints every input from a real window, for trying an IME by hand. |
 
+### Native focus (2026-09-25): a field by handle, any element by selector, and keep-focus
+
+Three gaps mailo's window hit on `ds_native::launch`. FINDINGS.md "Native focus" has the
+reasons, the strip's measurement and the proofs; `docs/mailo-migration.md` §6.6 says what mailo
+deletes.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Focus, select or blur one of your fields from a handler | `let handle = ds::use_field_handle();` then `TextInput { handle: Some(handle), .. }`; `handle.focus(Select::All)`, `handle.blur()`, `handle.element()` | The field fills the handle as it mounts; before that every call does nothing. On Blitz the field's `onfocus`/`onblur` are called once by the handle (a host write dispatches no event); in a webview the renderer's own event fires instead. `element()` is the field's `Rc<MountedData>` (subscribes when read in render). The task runs in the handle owner's scope, so a closing panel's handler still lands it. |
+| Focus an element you hold no handle for | `ds::focus_by_selector(".find input", Select::All).await -> Result<(), FocusError>` | Await it from a task of a scope that outlives the ask. Waits up to twenty frames for the element to be drawn. A `TextInput` found this way hears `onfocus` once. `FocusError::{NoHost, BadSelector { selector }, NoSuchElement { selector }, Busy, Refused { selector }}`; `NoHost` in a webview (no `HostFind`). Provided by `launch` and the harness, not by `ds_native::focus::provide()` (it needs the document). |
+| The keyboard after a click on nothing focusable | nothing: `FocusFallback::Ancestor` is the default; `AppConfig::with_focus_fallback(FocusFallback::BlitzDefault)` / `HarnessConfig::with_focus_fallback` to turn it off | The nearest focusable ancestor of the click's target (a `tabindex`, or a natively focusable element such as a `button`, the target included) keeps or takes the keyboard a frame later, as in a browser, instead of Blitz clearing it; if the click left the focus somewhere (a handler moved it) that wins. A field the click leaves still hears its blur, an ancestor that already had the focus hears no blur, `dblclick` still arrives, and an `EditSurface` (which takes its own click) keeps its focus. Needs `Ds` at the root (its click handler hands the click to the host); another Blitz host provides `ds_native::CLICK_FOCUS` itself. |
+| The hover strip's rect | nothing | The strip is centred by auto margins now, so the rect `HostMeasure` reads (and a strip button's `onclick: Rect`) is where it paints on Blitz too. A hidden strip takes no hits; a shown one covers the row's centre only when it is wider than half the row. |
+| Tests | `Harness::hits(point, selector)` | Whether a press at `point` lands on (or inside) the element: Blitz's own hit test, with transforms and `pointer-events` applied. |
+
+**New seams** (ds-native provides them; a webview has none): `ds::HostBlur`
+(`ds_native::focus::BLUR`, also in `focus::provide()`), `ds::HostFind { find, same }` with
+`ds::Found::{Element, Missing, Busy, BadSelector}`, and `ds::HostClickFocus { fallback, restore }`
+with `ds::Fallback::{Renderer, Ancestor}`.
+
 ### App icons and the icon style (2026-09-25): what sill does
 
 quire ships its own app icons as files and a pure re-colouring function; loading, caching and

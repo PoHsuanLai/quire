@@ -582,6 +582,36 @@ native_edit.rs` is the pattern.
 a composition interrupted by a focus change ends empty. FINDINGS.md "Edit surface" lists the
 rest.
 
+### 6.6 Native focus (2026-09-25): what mailo deletes
+
+quire now owns the three focus workarounds `crates/mail-app/src/ui/host/native.rs` built on
+Blitz (FINDINGS.md "Native focus"; `CONSUMING.md` "Native focus").
+
+- **Focus by selector.** `Blitz::find`'s `Act::Focus` and `Act::FocusAndSelect` arms, `attempt`'s
+  `query_selector` / `set_focus_to` / `with_text_input(select_all)` writes, the twenty-frame
+  retry and `laid_out_field` go. `Ask::Focus { selector }` becomes
+  `spawn(async move { let _ = ds::focus_by_selector(selector, Select::None).await; })` in the
+  shell's scope (as `as_shell` already does), and `Ask::FocusAndSelect(field)` the same with
+  `Select::All`. Better, for mailo's own fields: `field.rs` passes a `ds::use_field_handle()` as
+  `TextInput { handle }` and the ask calls `handle.focus(Select::All)`. Either way the field's
+  `onfocus` now fires once, so the typing guard is right after a programmatic focus (it was not:
+  a document write dispatches no event). `Act::ScrollIntoView` stays mailo's.
+- **Re-focus after a click.** `Blitz::keep_focus`, its call on every pointer release, and
+  `focus_is_nowhere` go: `ds_native::launch` defaults to `FocusFallback::Ancestor`, so a click on
+  a row leaves the keyboard on `.app[tabindex]` inside the click, not a frame later from mailo.
+  `Blitz::mounted`'s first `focus_soon(app)` and `Ask::FocusApp` stay (nothing is focused before
+  the first click, and a closing panel still hands the keyboard back).
+- **What changes under mailo's tests.** A click on a quire `Button` or strip button now focuses
+  that button (a browser does the same); keys typed next still bubble to `.app`. A harness test
+  that expected the focus nowhere after a click now finds it on the nearest focusable ancestor;
+  `HarnessConfig::with_focus_fallback(FocusFallback::BlitzDefault)` restores the old behaviour
+  for such a test.
+- **The strip.** Nothing to delete. Its box on Blitz is the design's (in a 74 px row: 20 from the
+  top, 34 tall, right edge 9 in from the row's border box, `26n + 3(n - 1) + 8` wide for `n`
+  buttons), and the rect a strip button's `onclick` reports is now where it paints. A shown strip
+  covers the row's centre when the row is narrower than twice (strip width + 9): a click there
+  presses the strip's first button in the webview too.
+
 ## 7. The reader, Phase B
 
 Mailo's reader has two views today (`crates/mail-app/src/ui/reading/mod.rs::ViewSwitch`):

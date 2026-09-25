@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::vocab::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds::{
     ActionId, Anim, Appearance, Ds, HostMeasure, HoverStrip, Icon, ListRow, Material, Measured,
-    Point, Presence, Px, Shown, StripAction,
+    Presence, Shown, StripAction,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -93,18 +93,11 @@ fn Unmeasured() -> Element {
 fn press(app: fn() -> Element) -> String {
     let mut harness = Harness::new(app, VIEW);
     harness.advance(Duration::from_millis(600));
-    // The strip is centred on its row by `translateY(-50%)`, which the layout rect leaves out
-    // and hit testing applies (as in `mailo_lists.rs`).
-    let lift = harness
-        .rect(".ds-strip")
-        .map_or(0.0, |strip| strip.size.height.0 / 2.0);
+    // The strip is centred by auto margins, so its layout rect is where it takes the pointer.
     let at = harness
         .centre(".ds-strip .ds-icon-button")
         .unwrap_or_else(|| panic!("no strip button:\n{}", harness.html()));
-    harness.click(Point {
-        x: at.x,
-        y: Px(at.y.0 - lift),
-    });
+    harness.click(at);
     harness.advance(Duration::from_millis(200));
     harness.text_of(".log").unwrap_or_default()
 }
