@@ -40,6 +40,8 @@ const INLINE_VARS: &[&str] = &[
     "--i",
     // A notification group's layer count (`NotificationCard`, sill Q120).
     "--layers",
+    // A swiped card's offset (`NotificationCard { swipe }`, sill Q122).
+    "--swipe-dx",
 ];
 
 const EXCEPTIONS: &[Exception] = &[

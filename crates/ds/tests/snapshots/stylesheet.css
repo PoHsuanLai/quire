@@ -324,6 +324,12 @@ html,body{margin:0;padding:0;background:transparent}
    settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+
+/* banner-out (quire's, sill Q121, Q122): a notification banner slides out to the right, from
+   the offset a swipe left it at (`--swipe-dx`, 0 when none) to past its own width and the
+   surface's edge, fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
+   frame until the stack drops the row and the rows below heal. */
+@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -404,6 +410,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
 @keyframes level-tick--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+@keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -524,6 +531,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-level-tick[*|data-pulse=b]{animation:level-tick--b var(--t-tap) var(--e-out);}
 .a-sheet-out[*|data-pulse=a]{animation:sheet-out var(--t-move) var(--e-exit) forwards;}
 .a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
+.a-banner-out[*|data-pulse=a]{animation:banner-out var(--t-move) var(--e-exit) forwards;}
+.a-banner-out[*|data-pulse=b]{animation:banner-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -1471,6 +1480,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-notification[*|data-hover=on] .ds-notification-close,
 .ds[*|data-modality=keyboard] .ds-notification-close:focus{ opacity:1; pointer-events:auto; }
 .ds-notification .ds-notification-close:hover{ color:var(--ink); }
+
+/* Swipe to dismiss (sill Q122, `data-swipe` on a card that can be swiped). The card is drawn
+   `--swipe-dx` off its place: following a drag or a scroll with no transition (`live`), easing
+   back with a spring at rest (`rest`, --t-move --e-spring; no spring under Reduced, where it
+   snaps back), and flying out to the right from where it was (`gone`, `banner-out`). */
+.ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); transition:transform var(--t-move) var(--e-spring); touch-action:none; }
+.ds-notification[*|data-swipe=live]{ transition:none; }
+.ds-notification[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds[*|data-motion=reduced] .ds-notification[*|data-swipe]{ transition:none; }
 /* -- osd -- */
 /* Osd (design/20 section 1.7; sill FINDINGS Q76): the on-screen display's card inside a
    transparent Osd root. It paints what a tinted root paints on its own box: the material's box

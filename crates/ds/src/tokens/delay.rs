@@ -37,11 +37,15 @@ pub enum DelayToken {
     FocusAfterMount,
     /// 1200 ms: a mentioned person chip's flash (proposed).
     FlashHold,
+    /// 120 ms: a horizontal scroll over a notification has ended once no delta has come for this
+    /// long, and the swipe decides (proposed, sill Q122). Blitz forwards no scroll phase, so the
+    /// end of a touchpad gesture is a quiet spell, not an event.
+    SwipeQuiet,
 }
 
 impl DelayToken {
     /// Every delay, in table order.
-    pub const ALL: [DelayToken; 13] = [
+    pub const ALL: [DelayToken; 14] = [
         DelayToken::Fly,
         DelayToken::HoverOpen,
         DelayToken::HoverClose,
@@ -55,6 +59,7 @@ impl DelayToken {
         DelayToken::AutosaveDebounce,
         DelayToken::FocusAfterMount,
         DelayToken::FlashHold,
+        DelayToken::SwipeQuiet,
     ];
 
     /// The custom property, for the delays the stylesheet also reads (`--d-fly`, the heal step).
@@ -72,7 +77,8 @@ impl DelayToken {
             | DelayToken::SendTick
             | DelayToken::AutosaveDebounce
             | DelayToken::FocusAfterMount
-            | DelayToken::FlashHold => None,
+            | DelayToken::FlashHold
+            | DelayToken::SwipeQuiet => None,
         }
     }
 
@@ -97,6 +103,7 @@ impl DelayToken {
             DelayToken::AutosaveDebounce => 700,
             DelayToken::FocusAfterMount => 60,
             DelayToken::FlashHold => 1200,
+            DelayToken::SwipeQuiet => 120,
         })
     }
 }

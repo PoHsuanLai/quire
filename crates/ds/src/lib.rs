@@ -63,6 +63,10 @@ pub use motion::{
     Presence, Pulse, Recipe, Roster, RosterEntry, RosterState, RowPitch, StayError, Stayed,
     TimerPhase, settle, use_drag, use_entrance, use_motion_timer, use_pulse, use_roster,
 };
+pub use motion::{
+    Click, Held, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,
+    Swiper, use_swipe,
+};
 pub use overlay::{
     Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
     MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
