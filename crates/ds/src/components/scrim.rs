@@ -3,6 +3,7 @@
 
 use crate::components::flow::Flow;
 use crate::components::popover::{Dismiss, Stacking, use_float};
+use crate::components::scrim_strength::ScrimStrength;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
 
@@ -22,6 +23,8 @@ pub(crate) struct ScrimLook {
     /// `data-presence="leaving"` while its modal plays its exit, so the scrim fades out with it
     /// and stops catching the pointer (sill Q90); `None` otherwise.
     pub(crate) presence: Option<&'static str>,
+    /// How hard it dims.
+    pub(crate) strength: ScrimStrength,
 }
 
 /// [`scrim_button`] drawn as `look` says.
@@ -37,6 +40,7 @@ pub(crate) fn scrim_button_as(
             class: "ds-scrim",
             "aria-label": "{label}",
             "data-presence": look.presence,
+            "data-strength": look.strength.attribute(),
             onclick: move |_| {
                 if closes() {
                     onclose.call(());
@@ -60,8 +64,20 @@ pub(crate) fn scrim_button_as(
 /// one at once since no other layer can be above it in the overlay's sense.
 ///
 /// The flow is fixed for the scrim's life: key it by the flow to switch.
+///
+/// `strength: ScrimStrength::Modal` dims with `--scrim-modal` (.40 light, .55 dark) instead of
+/// `--scrim` (.22), behind a dialog that asks for a decision (sheet and modal parts).
 #[component]
-pub fn Scrim(label: String, onclose: EventHandler<()>, #[props(default)] flow: Flow) -> Element {
+pub fn Scrim(
+    label: String,
+    onclose: EventHandler<()>,
+    #[props(default)] flow: Flow,
+    #[props(default)] strength: ScrimStrength,
+) -> Element {
+    let look = ScrimLook {
+        strength,
+        ..ScrimLook::default()
+    };
     let stacking = match flow {
         Flow::Floating => Stacking::Layer(Dismiss::EscOnly),
         Flow::Inline => Stacking::Passive,
@@ -70,7 +86,7 @@ pub fn Scrim(label: String, onclose: EventHandler<()>, #[props(default)] flow: F
     match flow {
         Flow::Floating => {
             float.show(
-                scrim_button(&label, move || float.is_top(), onclose),
+                scrim_button_as(&label, look, move || float.is_top(), onclose),
                 onclose,
             );
             rsx! {}
@@ -80,6 +96,7 @@ pub fn Scrim(label: String, onclose: EventHandler<()>, #[props(default)] flow: F
                 r#type: "button",
                 class: "ds-scrim",
                 "data-flow": flow.attr(),
+                "data-strength": strength.attribute(),
                 "aria-label": "{label}",
                 onclick: move |_| onclose.call(()),
             }

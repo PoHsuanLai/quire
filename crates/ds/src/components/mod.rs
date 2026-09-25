@@ -55,6 +55,7 @@ pub(crate) mod row_click;
 pub mod row_hooks;
 pub(crate) mod row_star;
 pub mod scrim;
+pub mod scrim_strength;
 pub mod search_field;
 pub mod section_header;
 pub mod segmented;
@@ -123,6 +124,7 @@ pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark
 pub use row_action::RowAction;
 pub use row_hooks::PartHooks;
 pub use scrim::Scrim;
+pub use scrim_strength::ScrimStrength;
 pub use search_field::SearchField;
 pub use section_header::{HeaderKind, SectionHeader};
 pub use segmented::{SegSize, SegmentedControl};

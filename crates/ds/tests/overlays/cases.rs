@@ -11,8 +11,9 @@ use ds::{
     FlagTone, Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage,
     HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
     Menu, MenuEntrance, MenuEntry, MenuKind, PaletteEntrance, Peek, PeekMode, PersonHue, Placement,
-    Point, Popover, Px, Rect, Scrim, SelectionBubble, SendPhase, SendPill, Sheet, SheetPlacement,
-    Shown, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub, use_toasts,
+    Point, Popover, Px, Rect, Scrim, ScrimStrength, SelectionBubble, SendPhase, SendPill, Sheet,
+    SheetPlacement, Shown, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub,
+    use_toasts,
 };
 use std::time::Duration;
 
@@ -633,6 +634,12 @@ pub const CASES: &[Case] = &[
         wait: NOW,
     },
     Case {
+        component: "scrim",
+        state: "modal",
+        make: || rsx! { Scrim { label: "Cancel", onclose: |_| {}, strength: ScrimStrength::Modal } },
+        wait: NOW,
+    },
+    Case {
         component: "peek",
         state: "center",
         make: || rsx! { Peek { mode: PeekMode::Center, label: "Re: UIDL stability", onclose: |_| {}, p { "The reader." } } },
@@ -667,6 +674,12 @@ pub const CASES: &[Case] = &[
         component: "sheet",
         state: "mounted-hidden",
         make: || rsx! { Sheet { label: "Power", onclose: |_| {}, shown: Shown::Hidden, on_hidden: |_| {}, p { "Shut down?" } } },
+        wait: NOW,
+    },
+    Case {
+        component: "sheet",
+        state: "modal-scrim",
+        make: || rsx! { Sheet { label: "Power", onclose: |_| {}, scrim: ScrimStrength::Modal, placement: SheetPlacement::Centre, p { "Shut down?" } } },
         wait: NOW,
     },
     // CommandPalette: results with a query and tokens, and nothing found.
