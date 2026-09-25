@@ -93,3 +93,13 @@ pub(super) const OSD_OUT: Recipe = recipe(
     Fill::Forwards,
     Iteration::Once,
 );
+
+/// `level-tick`: the level control's fill edge shows its mark and lets it go at `--t-tap
+/// --e-out`, the shortest motion token, so a step crossed under a drag is felt, not watched.
+pub(super) const LEVEL_TICK: Recipe = recipe(
+    "level-tick",
+    DurationToken::Tap,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);

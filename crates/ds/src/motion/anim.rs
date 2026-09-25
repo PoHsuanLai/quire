@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 54 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 55 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -12,7 +12,8 @@
 //! states the catalogue has no motion for (mailo gaps 3): `PillUp` (a centred pill's entrance),
 //! `RingDrain` (the send ring's countdown), `FadeIn` (C's veil, to `--veil`, where S's `fade`
 //! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing), plus the OSD's pair
-//! (sill FINDINGS Q75): `OsdIn` and `OsdOut`.
+//! (sill FINDINGS Q75): `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark
+//! when its fill crosses a step.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -141,11 +142,14 @@ pub enum Anim {
     /// lift at the top right, a drop at the bottom centre) over `--t-move --e-exit`, the exit
     /// design/05 section 10 gives shell chrome, once its hold ends (sill FINDINGS Q75).
     OsdOut,
+    /// `level-tick`: the level control's fill edge marks a step crossed, once, at `--t-tap`
+    /// (`Tick::Quiet`; the sound is the shell's).
+    LevelTick,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 54] = [
+    pub const ALL: [Anim; 55] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -200,6 +204,7 @@ impl Anim {
         Anim::Busy,
         Anim::OsdIn,
         Anim::OsdOut,
+        Anim::LevelTick,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -259,6 +264,7 @@ impl Anim {
             Anim::Busy => "a-busy",
             Anim::OsdIn => "a-osd-in",
             Anim::OsdOut => "a-osd-out",
+            Anim::LevelTick => "a-level-tick",
         }
     }
 }

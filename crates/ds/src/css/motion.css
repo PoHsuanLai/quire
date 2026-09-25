@@ -6,7 +6,7 @@
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
      `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and the OSD's
-     `osd-in` and `osd-out` (sill Q75), below.
+     `osd-in` and `osd-out` (sill Q75), and `level-tick` (the level control), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -201,3 +201,7 @@
    is the top right's, the default position. */
 @keyframes osd-in{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
 @keyframes osd-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
+
+/* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
+   a quiet sign that the level crossed a step; the edge rests invisible. */
+@keyframes level-tick{ from{ opacity:1; } to{ opacity:0; } }

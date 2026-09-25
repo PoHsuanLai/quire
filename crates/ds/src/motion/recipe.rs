@@ -420,6 +420,7 @@ impl Anim {
             Anim::Busy => own::BUSY,
             Anim::OsdIn => own::OSD_IN,
             Anim::OsdOut => own::OSD_OUT,
+            Anim::LevelTick => own::LEVEL_TICK,
         }
     }
 }

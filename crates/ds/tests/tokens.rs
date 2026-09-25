@@ -270,6 +270,8 @@ const PER_ELEMENT: &[&str] = &[
     "--i",
     "--j",
     "--f",
+    // The level control's rubber band, written only while it stretches.
+    "--rb",
     "--av-bg",
     "--av-fg",
     "--ic-size",

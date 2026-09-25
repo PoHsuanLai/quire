@@ -250,6 +250,8 @@ fn the_settle_table() {
         (Anim::OsdIn, MotionLevel::Extra, 204),
         (Anim::OsdOut, MotionLevel::Standard, 284),
         (Anim::OsdOut, MotionLevel::Calm, 284),
+        // The level control's step mark, at --t-tap.
+        (Anim::LevelTick, MotionLevel::Standard, 124),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(
