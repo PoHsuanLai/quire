@@ -1,4 +1,9 @@
 //! Sheet and modal parts, Q95: a Small key cap's Left and Right arrows are arrows, not dashes.
+//! Extended for sill Q111: the arrows the font subset now draws are real arrows but only ~4 px
+//! of ink, still close to a dash. `data-glyph="arrow"` (`Key::glyph_kind`) draws Up, Down, Left
+//! and Right at `--fs-control` with a tighter line-height, so the ink is at least 7 px wide
+//! while the cap's own box (padding and border drive its height, not the glyph) stays the
+//! height every other Small cap already has.
 //!
 //! Space Mono's latin subset (Google's `unicode-range`) carried `↑` and `↓` but not `←` and `→`,
 //! so the two fell back to a system face whose arrows at 9.5 px are a thin stroke with a head a
@@ -17,12 +22,13 @@ use probe::{distance, modal, rect};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
-    width: 200,
+    width: 240,
     height: 80,
     scale_percent: 100,
 };
 
-/// One Small cap per arrow, each in its own box so each can be probed alone.
+/// One Small cap per arrow, plus a plain Small letter cap (`plain`) as the height baseline every
+/// arrow cap must still match, each in its own box so each can be probed alone.
 #[allow(non_snake_case)]
 fn Page() -> Element {
     let keys = [
@@ -30,6 +36,7 @@ fn Page() -> Element {
         ("right", Key::Right),
         ("up", Key::Up),
         ("down", Key::Down),
+        ("plain", Key::Char('t')),
     ];
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
@@ -83,7 +90,8 @@ fn a_small_caps_left_and_right_arrows_have_heads() {
     assert!(up_h >= 5, "the up arrow is drawn: {up_w} x {up_h}");
     for side in [".left .ds-kbd", ".right .ds-kbd"] {
         let (width, height) = ink_box(&harness, &frame, side);
-        assert!(width >= 5, "{side}: the arrow is {width} px long");
+        // Q111: 5 px still read as a dash; the arrow face (`--fs-control`) asks for at least 7.
+        assert!(width >= 7, "{side}: the arrow is {width} px long");
         assert!(
             height >= 3 && height * 3 >= width,
             "{side}: the ink is {width} x {height}, a dash rather than an arrow"
@@ -93,6 +101,29 @@ fn a_small_caps_left_and_right_arrows_have_heads() {
         assert!(
             width.abs_diff(up_h) <= 2,
             "{side}: {width} px long against the up arrow's {up_h} px"
+        );
+    }
+}
+
+/// Q111: the bigger arrow face's tighter line-height keeps the cap's own box the height every
+/// other Small cap already has (`plain`, an unstyled Small letter cap) — only the glyph inside
+/// grows, not the rim around it.
+#[test]
+fn a_small_arrow_caps_box_is_the_same_height_as_a_plain_small_cap() {
+    let mut harness = Harness::new(Page, VIEW);
+    harness.advance(Duration::from_millis(50));
+    harness.render().expect("the page renders");
+    let plain_height = rect(&harness, ".plain .ds-kbd").size.height.0;
+    for side in [
+        ".left .ds-kbd",
+        ".right .ds-kbd",
+        ".up .ds-kbd",
+        ".down .ds-kbd",
+    ] {
+        let height = rect(&harness, side).size.height.0;
+        assert!(
+            (height - plain_height).abs() < 1.0,
+            "{side}: cap is {height} px tall against a plain Small cap's {plain_height} px"
         );
     }
 }
