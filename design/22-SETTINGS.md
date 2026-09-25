@@ -398,6 +398,11 @@ found elsewhere in the file that are not yet in that table.
 | `notifications.stack_max` | `Count` | `3` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.stack_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.group_offset_px` | `Px` | `4` | stacked-layer indicator | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
+| `notifications.server` | `NotificationServer::{Own,Passive}` | `Own` | `Own` asks for org.freedesktop.Notifications without replacing a holder; `Passive` leaves it to another daemon | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
+| `notifications.banner_position` | `BannerPosition::{TopRight,BottomRight}` | `TopRight` |  | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
+| `notifications.history_cap` | `Count` | `100` | `0..=1000` | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
+| `notifications.center_width_px` | `Px` | `384` | `280..=600` | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
+| `notifications.swipe` | `NotificationSwipe::{KeepInCenter,Dismiss}` | `KeepInCenter` | macOS keeps a swiped banner in Notification Center (design/13 said dismiss); to be confirmed when M6 lane a reports | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
 
 ### 3.13 `control_center` (sill/settings.toml)
 

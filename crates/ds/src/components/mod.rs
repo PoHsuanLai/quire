@@ -43,6 +43,7 @@ pub(crate) mod menu_lines;
 pub(crate) mod menu_match;
 pub(crate) mod menu_panel;
 pub mod menu_pick;
+pub(crate) mod menu_return;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;

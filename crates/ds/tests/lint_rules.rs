@@ -449,6 +449,20 @@ const CASES: &[Case] = &[
         rule: Rule::DsInternals,
         expect: false,
     },
+    Case {
+        name: "ds internals: a consumer class inside the trailing slot seam passes",
+        css: "[*|data-slot=trailing] .fold-more { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::DsInternals,
+        expect: false,
+    },
+    Case {
+        name: "ds internals: the same class reached through the slot's own class fails",
+        css: ".ds-tree-item-trail .fold-more { color: var(--ink); }",
+        profile: Profile::Standard,
+        rule: Rule::DsInternals,
+        expect: true,
+    },
     // UndeclaredVar
     Case {
         name: "undeclared var: a typo fails",
