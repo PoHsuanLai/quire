@@ -2656,3 +2656,93 @@ Two gaps sill reported after wiring `icons.style` (sill FINDINGS Q71 and Q72).
 - **Limits.** `app_icon_path` probes the disk per call; cache its answer with the decoded icon.
   A partly installed set is not merged with a later step. `$QUIRE_ICON_ASSETS` names the apps
   directory itself, not a data directory.
+
+## OSD parts (2026-09-25)
+
+sill reported three gaps building its OSD (sill FINDINGS Q74, Q75, Q76). Branch `osd-parts`. Mid-way
+the user moved the OSD to the top right under the bar (design/20 §1.7 as updated on master) and
+asked for a richer level control than a read-only slider ("Level control" below). A plain
+`SliderMode::Level` was committed and then reverted in favour of it; `Slider` is the form slider
+again, unchanged.
+
+1. **Q75: the OSD's own motion.** `Anim::OsdIn` (`osd-in`, `--t-quick --e-out`: from `--osd-dy` at a
+   .96 scale and transparent to rest, `pop-in`'s entrance with no overshoot) and `Anim::OsdOut`
+   (`osd-out`, `--t-move --e-exit`, forwards: to half of `--osd-dy` and transparent). One pair whose
+   keyframes read `--osd-dy`, a signed offset the card declares per position (as `--dy` drives
+   `heal`): -8 px at the top right, so the card drops in from above and lifts back out; 8 px at the
+   bottom centre, so it rises and drops. The drift test expresses it unchanged (the recipe's name,
+   duration and easing are what it checks). Recipes in `recipe_own.rs`, `X--b` aliases and pulse
+   classes generated, settle rows in `motion_drift.rs` (204 and 284 ms at Standard), `Anim::ALL`
+   55 with `LevelTick`; the keyframe count assertion in `motion_css.rs` is 48; design/05 §4.6.
+2. **Q76: an `Osd` component.** One card, in one transparent Osd root: the root gives the fade its
+   motion tokens and the card its `--f-*`, `--m-*`, stack and tint; the card paints what a tinted
+   root paints (`.ds-frame` at the frame alpha, the solid floor without blur, the inner pair
+   redrawn), so the nested painted root sill used is gone. Presence is a pure machine
+   (`osd_phase.rs`, table-tested): Hidden, Entering, Present, Leaving; a show while leaving is
+   Present at once and cancels the exit timer (`MotionTimer::cancel`, new), a late settle changes
+   nothing. `on_hidden` runs from `settle(OsdOut)`'s timer. The phase steps in render (so the render
+   draws it), the timers start in an effect after it. Proof: `ds-native/tests/osd_presence.rs`
+   (leaving at once, `on_hidden` not at settle - 40 ms and once at settle + 40 ms, hidden after;
+   shown during the fade: present, no `on_hidden` 500 ms later); goldens `level/osd-*`.
+3. **Q74: the level bar.** `LevelControl` ("Level control" below), `mode: LevelMode::ReadOnly` in
+   the card.
+
+What sill switches to: `Ds { material: Osd, chrome: Transparent, .. }` holding `Osd { shown, label,
+level: Level { value, glyph }, position, id: "osd", on_hidden }` (its view's nested painted root,
+`osd.css`'s fade rules and the `DurationToken::Move + FRAME_SLACK` leave time go); its machine's
+hold stays its own and drives `shown`; `on_hidden` unmaps the surface; `OsdMetrics { margin }`
+carries `osd.margin_px`, with the layer margin 0 and the surface sized to the card plus its margins
+and shadow room; `sill_settings::OsdPosition` maps onto `ds::OsdPosition`.
+
+## Level control (2026-09-25)
+
+The user found a plain read-only slider too simple and asked for macOS-grade looks, variants to
+choose from. `LevelControl` (new; `Slider` stays for settings rows). References, described (no
+asset copied): the current macOS volume and display modules and OSD, a thick capsule whose fill is
+white on the vibrant material with the glyph inside at its left end; the Big Sur control center
+slider, a capsule with a separate round white knob at the fill's end; the classic pre-Big Sur OSD,
+sixteen small squares under the glyph, one per volume key step.
+
+- **Looks** (`LevelLook`): `Capsule` (recommended), `CapsuleKnob`, `Segments`. Capsule 26 px, full
+  radius. Inks are new material tokens per scheme (`material/level.rs`): `--m-level-fill` (a
+  near-white .97 on light, white .94 on dark), `--m-level-well` (black .10 / white .14) with
+  `--m-level-shade` (`inset 0 1px 2px`), the glyph's two inks, the knob's hairline and drop, the
+  tick mark.
+- **Two-tone glyph without blend modes.** The glyph is drawn twice at the same place: on the well
+  in the well's ink, and inside the fill (which clips it) in the dark ink. Where the fill covers
+  it, it reads knocked out.
+- **Glyph follows the level** (`glyph.rs`): stacked `svg` parts that cross-fade by opacity over
+  `--t-quick` (an SVG's own CSS does not animate on Blitz, so no dash draw): Lucide's speaker body,
+  three waves (arcs on one centre at radii 5, 8.25, 11.5, spaced for a 2-unit stroke; Lucide has
+  two) shown by thirds, Lucide `volume-off`'s slash when muted; Lucide's sun, its rays scaled by
+  `.6 + .4 x level`.
+- **Machine** (`machine.rs`, table-tested): press (holds at once), measured (the track is read
+  after layout in a task; a click let go before it lands still sets the level; a move before it is
+  kept), drag, release, rubber band `6 x d / (d + 12)` px past an end, off under Reduced, keys to
+  the next point of the 16 or 64 grid.
+- **Motion.** Set from outside: `width` over `--t-quick --e-out`; under the pointer
+  (`data-drag=live`): no transition. Press: `scaleY(1.08)` over `--t-quick --e-spring` (contact).
+  Release from a stretch: `left`/`right` back over `--t-move --e-spring`. Segments: each changed
+  square after `i x --stagger`. `Tick::Quiet`: the fill edge's mark, `Anim::LevelTick` at `--t-tap`.
+- **Proofs.** `ds-native/tests/level_control.rs`: a set from 20 to 80 % is at the `--e-out` curve's
+  width a quarter and half of `--t-quick` in (131.2 vs 129.8, 153.9 vs 153.9) and painted between,
+  then at 80 %; a press jumps and a move 16 ms later is exactly under the pointer; the press
+  swells the painted fill 27 to 29 px; 12 px past the end stretches the track 3.0 px and it is back
+  600 ms after release; Reduced does not stretch; keys 500 to 563, 438, Shift 453. Goldens
+  `tests/snapshots/level/` per look, glyph state, mode and the OSD card; unit tables for the
+  machine, the glyph's parts, the segments and the inks.
+- **Sheets for the pick.** `ds-gallery --level-sheet DIR` writes `level-variants.png` (each look in
+  light and dark over the Work tint and over a light ground (the Home Space), volume 0, 40, 100 %,
+  muted, brightness 30 %, 1x then 2x) and `level-motion.png` (Harness frames through a set, a press,
+  a drag past the end and the release); copies are in `tools/progress/shots/gallery/`. The gallery's
+  new Level page has them live, and the Polish page an OSD specimen.
+- **Found: one Blitz document with sixty tinted cards loses layers.** Drawn as one page, every
+  card vanished (and with twenty, one row's cards painted at partial opacity), while each row alone
+  is right; the sheet therefore renders each row on its own. Not chased further; a page that
+  needs that many materials at once is not a real surface.
+- **Limits.** Leaving the control's hit zone (the rail and 16 px beside it) while dragging lets go
+  (Blitz has no pointer capture); the swell is 1 px each side at 26 px; the waves are cross-fades,
+  not drawn strokes.
+- **Recommendation: `Capsule`.** It is the current macOS form, needs no separate glyph column, and
+  carries the most information in the least width (glyph, level and mute in one shape); `Segments`
+  reads as dated and steps visibly; the knob adds a target that means nothing on a read-only OSD.
