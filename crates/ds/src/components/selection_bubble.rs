@@ -4,13 +4,12 @@
 //! selection (clamped 8 px inside the window, never flipped below), and runs the link field:
 //! Enter applies the link, Escape hides the bubble.
 
-use crate::components::popover::{
-    Dismiss, Stacking, escape_closes, position_style, use_entrance, use_float,
-};
+use crate::components::popover::{Dismiss, Stacking, escape_closes, position_style, use_float};
 use crate::components::text_input::{Focus, InputVariant, TextInput};
 use crate::components::vocab::Switch;
 use crate::geometry::{Align, Placement, Px, Rect, Side};
 use crate::motion::anim::Anim;
+use crate::motion::entrance::use_entrance;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
 

@@ -2747,3 +2747,102 @@ rev unchanged (`e99fbdbd`). Proofs are harness tests: `native_focus_field.rs`,
      webview too. The same row with the strip hidden opens. So mailo's centre click landed on
      Archive because its strip was shown (hovered, or its row held the focus) and wide enough
      for its row, not because Blitz's box is wrong.
+
+## Control center parts (2026-09-25)
+
+Four additive pieces sill asked for to build the control center with macOS Control Center's
+polish (sill FINDINGS Q78-Q81). No existing golden changed; the stylesheet golden grew by the new
+rules and two keyframes. CONSUMING "Control center parts (2026-09-25)" has the API.
+
+### Q78: a module tile
+
+- **What was wrong.** quire had no control-center tile: sill drew one from a `Button { Mini }`
+  and a local disc, and the chevron that opens a module's detail was a second button beside it
+  whose click also reached the tile, toggling Wi-Fi when the person only wanted its networks.
+- **What quire does now.** `ModuleTile` in a `ModuleGrid` (two columns, gap 8): a
+  `div[role=button]` at `--r-tile` with a 28 px disc, the title at the shell menu's 13/600 and a
+  faint status line. `ModuleState::Off` is the Mini's plate with a paper disc in ink, `On` the
+  plate in `--accent-soft` and the disc in `--accent` with `--accent-ink`, `Busy` the Off disc
+  with the Spinner's breathe around it (`aria-pressed="mixed"`, `aria-busy`). The hover is the
+  Mini's (`--raise`, `--shadow-1`) plus the list row's `--lift`; the press squishes. The tile is
+  not a `button` because the chevron inside it is one. The chevron (`Chevron::Detail`) is 18 x 28,
+  named "{title} details", `aria-expanded` from `expanded`, and keeps its press
+  (`Propagation::Stop`, mailo gaps 5): its click never reaches the tile. Keys are the tile's own on
+  both renderers: Enter or Space toggles, Enter or Right on the chevron opens the detail and stops
+  there (Blitz synthesises no click from a key; the chevron prevents the key's default, so a
+  browser's synthesised click cannot run the press twice). `TileSpan::Full` spans both columns.
+  A half tile's title clips instead of fading: `.ds-truncate`'s fade covers the column's last
+  1.5em whether the words reach it or not, and the column (about 72 of 144 px) is barely wider
+  than "Bluetooth".
+- **Proof.** `ds/tests/control_center_ssr.rs`: goldens `control_center/tile-{off,on,busy}-
+  {half,full}-{light,dark}.html` in a Popover root, and the chevron absent, inert and open; every
+  golden lints clean and every class is styled; the state, span, pressed and chevron attributes
+  are asserted per case. `ds-native/tests/cc_module_tile.rs` on a Blitz document: a chevron press
+  logs `detail` and the tile stays off; a press on the title toggles it; Tab reaches the tile,
+  Enter and Space toggle, Tab reaches the chevron, Enter and Right open the detail and neither
+  toggles.
+- **What sill changes.** Its tile becomes `ModuleTile`, its grid `ModuleGrid`, inside the panel's
+  own 12 px padding.
+
+### Q79: a settings row outside a menu
+
+- **What was wrong.** A network or device list in the control center was `ListRow` (mail's
+  two-line card, far too heavy) or `MenuEntry::Row` (which needs a `Menu`: an overlay, a layer and
+  the keyboard).
+- **What quire does now.** `SettingsRow`: 44 px, a hairline (`--hair`, `--line`) above every row
+  after the first, `MenuEntry::Row`'s type in a Slim menu (title `--fs-shell-menu` at 400, detail
+  `--fs-help` faint), a 16 px glyph in a 22 px column, the Dropdown's `--surface-2` under the
+  pointer. `RowTrailing` is the end: `Check(Switch)` in `--accent` (the row writes
+  `aria-pressed`), `Toggle { value, on_toggle }`, `Chevron`, `Text`, `Glyph`, or nothing. The
+  toggle sits in a span that stops its click and its keys, so flipping headphones on never runs
+  the row. Enter or Space runs `onclick`.
+- **Proof.** Goldens `control_center/row-*.html` (each mark, a bare row, a disabled row) and
+  `rows-networks-{light,dark}.html`; `a_row_writes_its_trailing_mark`.
+  `ds-native/tests/cc_settings_row.rs`: the switch logs `toggle:On` and not the row, the words log
+  the row only, Enter on the focused row runs it, and a disabled row and its switch hear nothing.
+
+### Q80: a pane and its detail
+
+- **What was wrong.** design/13 13.3.7 plays the detail pane in with `slide-r`/`slide-l` at
+  `--t-move --e-spring`, but the catalogue's `Anim::SlideR`/`SlideL` are `--t-big` (their Space
+  switch rows), so no `Anim` matched and the drift test forbids an animation that is not one.
+  There was no exit for the outgoing pane, and `use_entrance` (the one-shot entrance timer every
+  overlay uses) was private to `popover.rs`.
+- **What quire does now.** Four `Anim`s (56 in all): `PaneInR`/`PaneInL` play `slide-r`/`slide-l`
+  at `--t-move --e-spring`; `PaneOutL`/`PaneOutR` play two new keyframes `pane-out-l`/`pane-out-r`
+  (to `-26px`/`+26px` and transparent, the mirror of the slides) at `--t-move --e-exit`, forwards.
+  `PaneSwitcher { shown, root, detail, on_settled }` runs a pure `PaneSlide` machine: asking for
+  the other pane starts a round in which both panes are drawn, the arriving one `entering` and the
+  outgoing one `leaving`, out of the flow at the top so the switcher is the arriving pane's height
+  from the first frame; one `MotionTimer` settles the pair (all four recipes are `--t-move`, a unit
+  test holds it), and `on_settled` hears the pane. Asking again mid-slide starts a new round: each
+  pane takes the other animation from its start (the names differ, so Stylo restarts them), the
+  timer restarts (the reversed round's task is cancelled) and a settle naming an old round changes
+  nothing. The timer is started from an effect after the render, with its handler made in the
+  component's scope (an `EventHandler::new` inside the effect has no scope and panicked in the
+  first run of the Harness test). `use_entrance` is `ds::motion::use_entrance` and `ds::use_entrance`,
+  unchanged; the menu, sheet, peek, bubble, hover card and link pill import it from there, and
+  their goldens are as they were.
+- **Proof.** `pane_slide` unit tests (a switch, a reversal and a stale settle, the arrival and
+  departure of each pane, one duration). Goldens `control_center/panes-{root,detail}.html`.
+  `ds-native/tests/cc_pane_switcher.rs`: after a switch both panes are drawn, entering and leaving,
+  and the switcher's height is the short detail's, not the tall root's; 350 ms later only the
+  detail is drawn, present, and `on_settled` logged `detail`. Reversed 150 ms into a switch, the
+  root turns back to `entering` and the detail to `leaving`; past the first round's settle both are
+  still drawn and nothing is logged; then the root rests and the log is `root` alone. The drift
+  test's settle table has the four at 284 ms (Standard).
+- **Limits.** The height snaps to the arriving pane rather than animating (no measured height
+  transition on Blitz); the leaving pane is clipped where it overhangs. A reversal restarts both
+  animations from their first frame instead of from where they were.
+
+### Q81: control glyphs
+
+- **What quire does now.** `Icon::Play`, `Pause`, `SkipBack`, `SkipForward`, `LogOut`, `Restart`
+  (Lucide `rotate-ccw`), `Headphones`, `Speaker`, `Mouse`, `Gamepad` and `Phone` (Lucide
+  `smartphone`), transcribed from `lucide-static` 1.47.0 into `icon/geometry_control.rs` (ISC,
+  the licence line in `icon/mod.rs`; a `<line>` as the equivalent path, as the shell set does).
+  `Power` was already in the shell set. `Icon::CONTROL` lists them and `Icon::ALL` ends with them;
+  the named sets moved to `icon/sets.rs` so `icon/mod.rs` is under 300 lines. The Controls page
+  draws every glyph by set at 22 px.
+- **Proof.** `every_control_glyph_renders_and_lints_clean` (one child per shape, `ds-ic`, clean
+  under the Strict profile), `the_control_set_is_lucides`, and the set test counting `ALL`.

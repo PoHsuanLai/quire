@@ -2,9 +2,10 @@
 //! (design/04-COMPONENTS.md section 24): Peek Center's surface, over a scrim, sized by its
 //! content up to Peek Center's inset (O-14's proposal).
 
-use crate::components::popover::{Dismiss, Stacking, escape_closes, use_entrance, use_float};
+use crate::components::popover::{Dismiss, Stacking, escape_closes, use_float};
 use crate::components::scrim::scrim_button;
 use crate::motion::anim::Anim;
+use crate::motion::entrance::use_entrance;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
 
