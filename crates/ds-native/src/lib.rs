@@ -1,5 +1,6 @@
-//! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG, a
-//! harness for event-driven tests, and the device-pixel layout snap (`snap`). The only quire
+//! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG,
+//! PDF output (`pdf`, `pdf_app`), a harness for event-driven tests, and the device-pixel layout
+//! snap (`snap`). The only quire
 //! crate that names the blitz crates.
 //!
 //! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
@@ -48,6 +49,7 @@ mod net;
 mod net_policy;
 mod node_ref;
 mod origin;
+mod pdf;
 mod route;
 mod runtime;
 mod scheme;
@@ -77,6 +79,7 @@ pub use headless::Backdrop;
 pub use launch::{AppConfig, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use origin::{FrameId, RequestOrigin};
+pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
 pub use snap::snap_to_device;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
 pub use window::{Decorations, WinitWindow};

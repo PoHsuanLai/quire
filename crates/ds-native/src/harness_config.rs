@@ -59,6 +59,12 @@ impl HarnessConfig {
         self
     }
 
+    /// The same providers at `viewport`.
+    pub(crate) fn with_viewport(mut self, viewport: Viewport) -> Self {
+        self.viewport = viewport;
+        self
+    }
+
     /// The size and scale the document renders at.
     pub fn viewport(&self) -> Viewport {
         self.viewport

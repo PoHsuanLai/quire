@@ -29,6 +29,9 @@ wgpu = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
+# PDF output: the painter, and krilla for the document and its pages.
+anyrender_krilla = { workspace = true }
+krilla = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 
@@ -36,6 +39,8 @@ tokio = { workspace = true }
 workspace = true
 
 [dev-dependencies]
+# Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
+pdfrum = { workspace = true }
 # The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
 ds-settings = { workspace = true }
 
@@ -44,3 +49,6 @@ name = "window"
 
 [[example]]
 name = "edit"
+
+[[example]]
+name = "pdf"
