@@ -1,6 +1,24 @@
 {
- "updated": "2026-09-25, the icon set ships; Milestone 0 proven on live KWin; edit surface in progress",
+ "updated": "2026-09-25, quire v0.1.7: the edit surface; the icon set ships; Milestone 0 proven on live KWin",
  "entries": [
+  {
+   "id": "edit-surface",
+   "date": "2026-09-25 · quire v0.1.7",
+   "title": "A rich-text editing surface for the mail composer, with no fork of the renderer",
+   "status": "proven",
+   "lede": "mailo keeps its own editor core and document model and draws its own caret and selection; quire now gives it the surface underneath. The spike found that the renderer's window-event hook runs before Blitz consumes an event, so IME preedit and commit reach the surface without patching anything, and everything needed for hit-testing and caret geometry was already public. The surface delivers typing, composition steps, paste with HTML, cut and copy, and pointer presses resolved to a text position (element plus byte offset), reports caret and selection rectangles, and sets the IME cursor area. A Harness driver types a Zhuyin composition in tests; an example window prints every input for a manual IME check.",
+   "notes": [
+    "Two Blitz defaults had to be blocked: a press starts its own painted text selection, and a click on a non-field element clears the focus.",
+    "Limits recorded: no automated test drives the real window's IME (re-check at every toolchain bump); no pointer capture during a drag; Tab still moves focus; CJK lines do not wrap at word boundaries; a caret exactly at an inline object's boundary resolves to after it.",
+    "657 tests; quire v0.1.5, v0.1.6 and v0.1.7 went to mailo in one day: nine wave-two, seven wave-three and nine wave-four component gaps, the Phase B host (contexts, sealed frames, HTML parser, clipboard, focus, frame links), and this surface."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/edit-light-postmark.png",
+     "caption": "the gallery's Edit page: two paragraphs and a chip inside the surface, the page's own caret drawn from the host's reported rect"
+    }
+   ]
+  },
   {
    "id": "icons-shipped",
    "date": "2026-09-25 · the shipped icon set",
