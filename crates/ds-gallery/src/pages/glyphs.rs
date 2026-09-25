@@ -17,7 +17,7 @@ const SETS: [(&str, &[Icon]); 4] = [
 #[component]
 pub fn Glyphs() -> Element {
     rsx! {
-        Section { title: "Glyphs", note: "Every Icon at 22 px (IconSize::Bar), by set: the mailo set, the shell set, the actions, and the control set the control center, the power menu and Now Playing draw (Lucide, ISC).",
+        Section { title: "Glyphs", note: "Every Icon at 22 px (IconSize::Bar), by set: the mailo set, the shell set (ending in the control center's own Switches), the actions, and the control set the control center, the power menu and Now Playing draw (Lucide, ISC).",
             for (name , set) in SETS {
                 span { class: "g-name", "{name}" }
                 div { class: "g-grid8",

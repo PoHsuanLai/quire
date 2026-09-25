@@ -68,7 +68,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet{background:var(--m-tint);}
 .ds-osd > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
 .ds[*|data-blur=off] .ds-osd > .ds-frame{opacity:.94;}
-.ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.1);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);--m-level-tick:rgba(0,0,0,.16);}
+.ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.18);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);--m-level-tick:rgba(0,0,0,.16);}
 .ds[*|data-theme=dark]{--m-level-fill:rgba(255,255,255,.94);--m-level-well:rgba(255,255,255,.14);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.35);--m-level-glyph:rgba(255,255,255,.86);--m-level-glyph-fill:rgba(0,0,0,.7);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.45);--m-level-tick:rgba(0,0,0,.2);}
 /* == shapes == */
 .ds[*|data-material][*|data-corner=squircle]{background:transparent;position:relative;z-index:var(--z-raise);border-radius:var(--r-squircle,var(--m-radius));}
@@ -588,6 +588,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-appearance{ display:grid; gap:var(--s-14); }
 .ds-appearance-row{ min-width:0; }
 .ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }
+
+/* Compact (sill FINDINGS Q101): for a host narrower than the Full Motion row (331 px), such as
+   the control center's 296 px module. The segmented rows fill the row and never pass it: small
+   segments with 4 px sides that grow from their words' width to share the rest, so "Reduced"
+   keeps every letter (a segment never shrinks below its words). */
+.ds-appearance[*|data-layout=compact] .ds-segmented{ display:flex; }
+.ds-appearance[*|data-layout=compact] .ds-segmented .ds-segment{ flex:1 1 auto; padding-left:var(--s-4); padding-right:var(--s-4); }
 /* -- avatar -- */
 /* Avatar (design/04-COMPONENTS.md section 11). Colours arrive inline as `--av-bg`/`--av-fg`
    (hexes computed in Rust, O-7). Attribute selectors carry `*|`, and a value starting with a
@@ -1381,7 +1388,7 @@ html,body{margin:0;padding:0;background:transparent}
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
    with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
    pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`) and by `--lift`; pressed it
-   squishes. A Full tile spans both grid columns. The chevron is a quiet 18 x 28 hit target of
+   squishes. A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
 
 .ds-module-tile{
@@ -1423,8 +1430,35 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
 
-/* ModuleGrid (design/13 section 13.3.7): two equal columns, gap 8. */
-.ds-module-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-8); }
+/* ModuleGrid (design/13 section 13.3.7; sill FINDINGS Q102): `--grid-columns` equal columns
+   (2), `--grid-gap` apart (8), `--grid-padding` inside (12); the component writes all three
+   inline from `control_center.grid_*`, and these are the keys' defaults. */
+.ds-module-grid{ --grid-columns:2; --grid-gap:var(--s-8); --grid-padding:var(--s-12); display:grid;
+  grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr)); gap:var(--grid-gap); padding:var(--grid-padding); }
+/* -- module_panel -- */
+/* ModulePanel (sill FINDINGS Q100; design/13 section 13.3.7): a module with content of its own on
+   the tile's frame: `--r-tile` 12, the Off tile's plate (`--surface-2`, a hairline) and the
+   module's padding of 10 / 12. Not pressable, so no hover lift: its content takes the presses.
+   The header row: a 16 px glyph in `--ink-soft`, the title in the tile's type (13/600), the
+   trailing slot at the far end in the tile's status type (`--fs-help`, `--ink-faint`, tabular
+   figures, for a level's percentage). Full by default: it spans every grid column. `Bare`
+   drops the plate where a popover card already is the module's. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-module-panel{
+  display:flex; flex-direction:column; gap:var(--s-8); min-width:0; box-sizing:border-box;
+  padding:var(--s-10) var(--s-12); border:var(--hair) solid var(--line); border-radius:var(--r-tile);
+  background:var(--surface-2); color:var(--ink);
+}
+.ds-module-panel[*|data-span=full]{ grid-column:1 / -1; }
+.ds-module-panel[*|data-plate=bare]{ padding:0; border:0; background:none; }
+
+.ds-module-panel-head{ display:flex; align-items:center; gap:var(--s-6); min-width:0; }
+.ds-module-panel-glyph{ display:flex; align-items:center; flex:none; color:var(--ink-soft); }
+.ds-module-panel-title{ flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden;
+  font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
+.ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
+  font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 /* -- pane_switcher -- */
 /* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
    (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
