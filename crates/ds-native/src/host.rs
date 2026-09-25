@@ -29,11 +29,14 @@
 use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::{EditListeners, ime_of};
-use crate::frame_links::frame_links;
+use crate::frame_book::FrameBook;
+use crate::frame_hover::report;
+use crate::frame_links::{frame_links, read_link};
 use crate::install::install;
 use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
+use crate::window_hover::WindowHover;
 use blitz_traits::shell::ColorScheme;
 use dioxus::prelude::*;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
@@ -91,7 +94,19 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let factor = window.scale_factor();
     let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));
     let seen = Rc::clone(&document);
+    let book = use_hook(FrameBook::new);
+    let found = book.clone();
+    let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
+    let hover = props.setup.frame_links.hover();
     use_window_event(move |event, _| {
+        if let crate::frame_hover::FrameHover::Report(_) = hover {
+            let crossings = hovering.borrow_mut().crossings(
+                event,
+                window.scale_factor(),
+                seen.borrow().as_ref(),
+            );
+            report(&hover, crossings);
+        }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
             let HostScale(mut current) = scale;
             let next = scale_of(*scale_factor);
@@ -116,6 +131,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 sink.call(ime);
             }
         }
+        if matches!(event, WindowEvent::RedrawRequested) {
+            find_frames(&seen.borrow(), &found);
+        }
         if matches!(event, WindowEvent::RedrawRequested)
             && let Some(handle) = seen.borrow().as_ref()
             && let Some(changed) = scheme::follow_root(&mut handle.doc_mut())
@@ -124,8 +142,15 @@ pub(crate) fn Host(props: HostProps) -> Element {
         }
     });
     let frame_nav = use_hook(|| {
-        let (nav, inbox) = frame_links(&props.setup.frame_links);
-        spawn(inbox.serve());
+        let (nav, inbox) = frame_links(&props.setup.frame_links, book.clone());
+        let read = Rc::clone(&document);
+        spawn(inbox.serve(move |frame, href| {
+            let handle = read.borrow().clone();
+            handle.as_ref().and_then(NodeHandle::try_doc).map_or_else(
+                || crate::frame_anchor::LinkFacts::bare(href),
+                |doc| read_link(&doc, frame, href),
+            )
+        }));
         nav
     });
     let mut installed = use_signal(|| Installed::Pending);
@@ -141,7 +166,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             style: "display:none",
             onmounted: move |mounted| {
                 if let Some(handle) = mounted.data().downcast::<NodeHandle>() {
-                    install(handle, &setup, &clipboard, frame_nav.clone());
+                    install(handle, &setup, &clipboard, (frame_nav.clone(), book.clone()));
                     document.replace(Some(handle.clone()));
                     installed.set(Installed::Done);
                 }
@@ -157,6 +182,19 @@ enum Installed {
     Pending,
     /// Yes: the app renders.
     Done,
+}
+
+/// Find the frames attached under the document's `iframe`s since the last frame (each asked
+/// for a redraw as it attached), so their requests reach the app tagged. The document is
+/// released before any request is put to the app.
+fn find_frames(document: &Option<NodeHandle>, book: &FrameBook) {
+    let live = document
+        .as_ref()
+        .and_then(|handle| handle.try_doc())
+        .map(|doc| crate::frame_tree::live_frames(&doc));
+    if let Some(live) = live {
+        book.bind(live);
+    }
 }
 
 /// A winit scale factor in 120ths, the unit `ds::Scale` shares with the Wayland protocol.

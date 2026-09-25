@@ -1,12 +1,14 @@
 //! Button: a labelled action in six variants (design/04-COMPONENTS.md section 1).
 //! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini; `title`,
-//! `aria-label` and `aria-expanded` only when the caller gives them (or a mark face names it).
+//! `aria-label` and `aria-expanded` only when the caller gives them (or a mark face names it);
+//! the consumer's own `data-*` and classes after quire's (mailo gaps 6).
 
 use crate::components::button_face::{
     ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
     trailing as trailing_mark,
 };
 use crate::components::icon_view::IconView;
+use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Expanded, Switch};
@@ -79,6 +81,16 @@ impl ButtonVariant {
 ///
 /// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
 /// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
+///
+/// `data` and `extra_class` (mailo gaps 6) put the consumer's own `data-*` attributes and
+/// classes on the button itself, so it needs no wrapping `span`: `data-folder` for a drag that
+/// reads the place off the element under the pointer, a class for the consumer's own reveal or
+/// layout rule. Both are checked when built ([`DataName::parse`], [`ExtraClass::parse`]): a
+/// `ds-` name or class, or a `data-*` name quire writes itself, is refused, so nothing added
+/// here can restyle the button through quire's rules.
+///
+/// [`DataName::parse`]: crate::DataName::parse
+/// [`ExtraClass::parse`]: crate::ExtraClass::parse
 #[component]
 pub fn Button(
     variant: ButtonVariant,
@@ -96,7 +108,11 @@ pub fn Button(
     #[props(default)] leading: Option<Leading>,
     #[props(default)] face: ButtonFace,
     #[props(default)] propagation: Propagation,
+    #[props(default)] data: Vec<DataAttr>,
+    #[props(default)] extra_class: Option<ExtraClass>,
 ) -> Element {
+    let class = class_list("ds-button", extra_class.as_ref());
+    let data = attributes(&data);
     let aria_label = aria_label.or_else(|| spoken_label(face, &label));
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(Expanded::aria);
@@ -106,7 +122,7 @@ pub fn Button(
         button {
             r#type: "button",
             id,
-            class: "ds-button",
+            class,
             "data-variant": variant.slug(),
             title,
             "aria-label": aria_label,
@@ -135,6 +151,9 @@ pub fn Button(
                     mounted.call(event);
                 }
             },
+            // The consumer's own `data-*` (mailo gaps 6), last: a spread follows the named
+            // attributes.
+            ..data,
             if let Some(mark) = leading {
                 {leading_mark(mark, variant.icon_size())}
             }

@@ -6,7 +6,7 @@
    The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
    `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
-   `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
+   `[data-drag=source]` (.35, section 34), drawn by `.ds-drop-place`. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
    not specified here. Disabled: not specified (O-1).
    The label is the flexible part: it starts at the left and takes the free space, so the count
    and the close button sit at the end and an item without them does not centre (gallery fix A:
@@ -55,14 +55,8 @@
   animation:dest var(--t-float) var(--e-out) infinite alternate;
 }
 
-/* Drop target (`C:320-323`). */
-.ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
-.ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
-/* A place that can take the drag while the pointer is elsewhere (mailo gaps 5, `DropState::Accepts`):
-   a dashed `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes
-   its width out of the padding, so the label does not move as the drag starts. Blitz paints a
-   dashed border (not a dashed outline, which it draws solid). */
-.ds-sidebar-item[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
+/* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
+   (drop_place.css, mailo gaps 6). */
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }

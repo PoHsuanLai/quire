@@ -40,14 +40,14 @@ pub const REGISTRY: [Entry; 14] = [
         page: Page::Controls,
         title: "Controls",
         lede: "Every control in every state it can express: variants, pressed, expanded, disabled, empty and filled. Press Tab to see the keyboard focus ring.",
-        height: 3100,
+        height: 3450,
         body: pages::controls::ControlsPage,
     },
     Entry {
         page: Page::Lists,
         title: "Lists",
         lede: "A live AnimatedList: add rows, remove them with each exit and watch the rows below heal, then undo. Search hits with a keyboard-shown strip, sidebar items, tiles, the hover strip and the appearance picker.",
-        height: 1760,
+        height: 3150,
         body: pages::lists::ListsPage,
     },
     Entry {
