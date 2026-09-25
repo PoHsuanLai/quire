@@ -602,16 +602,19 @@ Settled for the port; the catalogue above is unchanged except where named.
 
 ### 4.9 Added by quire (notification parts, 2026-09-25)
 
-- `banner-in`: `from{ transform:translateX(calc(100% + var(--s-16))) } to{ transform:none }` at
-  `--t-move --e-spring`, `Anim::BannerIn`: a banner slides in from past the surface's edge,
+- `banner-in`: `from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),
+  var(--banner-dy,0px)) } to{ transform:none }` at `--t-move --e-spring`, `Anim::BannerIn`: a
+  banner slides in from past the surface's right edge, or from below its place when the stack's
+  `data-entry=below` sets the vector to `0px, calc(100% + var(--s-16))` (section 12 item 7),
   opaque from its first frame. design/13 §13.3.6 proposed `--t-big`; the stack plays it at the
   `--t-move` of the exit and the heal it may arrive beside. It is played on the card's wrapper
   as it mounts, not on a presence attribute (Blitz keeps the last animated value when an
   animation is taken off an element).
 - `banner-out`: `from{ opacity:1; transform:translateX(var(--swipe-dx,0px)) } to{ opacity:0;
-  transform:translateX(calc(100% + var(--s-16))) }` at `--t-move --e-exit`, forwards,
-  `Anim::BannerOut` (and `Exit::BannerOut` for a roster row): a banner leaves to the right from
-  where a swipe left it; the rows below then `heal`.
+  transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)) }` at
+  `--t-move --e-exit`, forwards, `Anim::BannerOut` (and `Exit::BannerOut` for a roster row): a banner leaves by its
+  entry edge from where a swipe left it (a swiped row, `data-flight=swipe`, always to the right);
+  the rows below then `heal`.
 - `panel-in`: `from{ transform:translateX(calc(100% + var(--s-16))) } to{ transform:none }` at
   `--t-move --e-out`, and `panel-out`, its reverse at `--t-move --e-exit`, forwards
   (`Anim::PanelIn`, `Anim::PanelOut`): the notification center's edge panel. No spring: opening
@@ -921,7 +924,7 @@ Behaviour (what triggers what) is in `06-INTERACTIONS.md#20-desktop-interactions
 | Launcher panel open | `peek-in`, `--t-big`, `--e-spring` (S's command menu); backdrop none (the catcher surface is never animated) | `--e-spring` | proposed for the keyframe; settled (plan) for "catcher never animated" | S:234; plan sill "Launcher v1" |
 | Launcher open latency budget | p95 < 100 ms from `launcher toggle` to first frame, over 20 toggles | n/a (a latency, not a duration) | settled (plan) | plan sill; `dev/accept-launcher.sh` |
 | Undo toast (in apps) | spring in from `translateX(-50%) translateY(160%)` over `--t-big`; hold ToastHold 5200 ms | `--e-spring` | settled (prototype) | S:360-364, S:1552 |
-| Notification banner | spring in (as the toast); hold ~5 s; top-right; swipe right dismisses | `--e-spring` | proposed; entry direction for a top-right banner not specified (section 12) | Appendix C-D (M) |
+| Notification banner | spring in (as the toast); hold ~5 s; top-right; swipe right dismisses | `--e-spring` | proposed; entry direction decided: from the right, `notifications.banner_entry_direction` selects from below (section 12 item 7) | Appendix C-D (M) |
 | Workspace switch: frame tint cross-fade | 380 ms (`--t-scene`) opacity cross-fade of two layers | `--e-out` | settled (user) | plan; S:86, S:1178-1186 |
 | Wallpaper light/dark cross-fade | `--t-big` | not specified | settled (plan) | plan sill "Wallpaper" |
 | Bar menus (tray, clock, volume, network, battery, workspace) | `menu-pop`, `--t-move`, `--e-spring` on first open | `--e-spring` | proposed; conflicts with macOS "no open animation" (section 12) | S:666; plan sill "every menu … with ds Menu"; Appendix C-D |
@@ -1029,8 +1032,12 @@ Source C:739-743. Look-scoped: Riso's archive exit (C:738).
    animation (Appendix C-D). Proposed: bar menus pop on first open, switch instantly while one is
    open, fade on close.
 7. **Notification banner entry direction.** The toast rises from below (translateY 160%);
-   banners sit top-right. Proposed: banners enter from the right edge (translateX) with the same
-   spring and hold 5200 ms; swipe right dismisses. Not specified anywhere.
+   banners sit top-right. **Decided (2026-09-26):** banners enter from the right edge
+   (translateX) by default, with the same spring and hold 5200 ms (the hold is the caller's);
+   `notifications.banner_entry_direction` (`BannerEntry::{FromRight, FromBelow}`, design/22)
+   selects rising from below instead, and the banner leaves back the way it came. quire's `BannerStack { entry }` writes `data-entry`, which
+   sets the `--banner-dx`/`--banner-dy` that the one `banner-in`/`banner-out` pair reads (4.9).
+   Swipe right dismisses, and a swiped banner leaves to the right whatever the entry edge.
 8. **Hover-card spring.** `hc-in` springs 450 ms after rest, which is not "the 200 ms after you
    touched something". Keep as is (it is contact of a kind) or use `--e-out`. Not decided.
 9. **`menu-in` vs `menu-pop`.** Two menu entrances exist (C:1009, S:667). Proposed: `menu-pop`
