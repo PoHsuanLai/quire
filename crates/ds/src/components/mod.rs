@@ -54,6 +54,9 @@ pub mod module_grid;
 pub mod module_panel;
 pub mod module_tile;
 pub mod module_tile_kind;
+pub mod month_grid;
+pub mod month_grid_data;
+pub(crate) mod month_grid_weeks;
 pub(crate) mod muted;
 pub(crate) mod notification_body;
 pub mod notification_card;
@@ -156,6 +159,11 @@ pub use module_grid::{GridColumns, GridMetrics, ModuleGrid};
 pub use module_panel::{ModulePanel, PanelPlate};
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
+pub use month_grid::MonthGrid;
+pub use month_grid_data::{
+    DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
+    Step, WeekNumbers,
+};
 pub use notification_card::NotificationCard;
 pub use notification_parts::{AppMark, CardAction, GroupCount, Hover, Layers};
 pub use notification_swipe::Swipe;
@@ -236,6 +244,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("osd", include_str!("osd.css")),
     ("module_tile", include_str!("module_tile.css")),
     ("module_panel", include_str!("module_panel.css")),
+    ("month_grid", include_str!("month_grid.css")),
     ("pane_switcher", include_str!("pane_switcher.css")),
     ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),

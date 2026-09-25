@@ -1637,6 +1637,58 @@ html,body{margin:0;padding:0;background:transparent}
   font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
 .ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
   font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+/* -- month_grid -- */
+/* MonthGrid (design/04-COMPONENTS.md section 39; design/20 section 1.12; sill Q180): the
+   calendar widget's month. The title in the data face, upper and tracked .12em, in `--accent`
+   (design/02 sections 4-5, "calendar month"); the weekday heads in the data face at
+   `--fs-micro`, upper and tracked as a menu's section header. Seven 32 px columns, led by a
+   24 px week-number column under `data-weeks=show`. A day is its number on a 24 px disc: the
+   neighbours' days in `--ink-faint`, today on `--accent` in `--accent-ink`, a busy day with a
+   4 px dot under it (`--accent`; `--ink-soft` on a neighbour's day). A pressable day
+   (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer and squishes
+   pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05). */
+
+.ds-month{ display:flex; flex-direction:column; align-items:flex-start; color:var(--ink); user-select:none; }
+
+.ds-month-header{ display:flex; align-items:center; gap:var(--s-2); align-self:stretch; min-height:28px; margin-bottom:var(--s-4); }
+.ds-month-title{
+  flex:1; min-width:0; white-space:nowrap; overflow:hidden; padding-left:var(--s-6);
+  font-family:var(--font-data); font-size:var(--fs-caption); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
+}
+
+.ds-month-weeks{ display:flex; flex-direction:column; }
+.ds-month-row{ display:grid; grid-template-columns:repeat(7,32px); }
+.ds-month[*|data-weeks=show] .ds-month-row{ grid-template-columns:24px repeat(7,32px); }
+
+.ds-month-head,
+.ds-month-week{
+  display:grid; place-items:center; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint);
+}
+.ds-month-head{ height:18px; letter-spacing:.14em; text-transform:uppercase; }
+.ds-month-week{ height:24px; align-self:start; }
+
+.ds-month-day{
+  font:inherit; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:var(--s-2);
+  height:30px; padding:0; border:0; background:transparent; color:var(--ink);
+}
+.ds-month-day[*|data-place=before],
+.ds-month-day[*|data-place=after]{ color:var(--ink-faint); }
+
+.ds-month-num{
+  display:grid; place-items:center; width:24px; height:24px; border-radius:var(--r-pill);
+  font-size:var(--fs-help); font-weight:500; line-height:1.3; font-variant-numeric:tabular-nums;
+  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-month-day[*|aria-current=date] .ds-month-num{ background:var(--accent); color:var(--accent-ink); font-weight:700; }
+
+.ds-month-day[*|data-kind=pressable]{ cursor:pointer; }
+.ds-month-day[*|data-kind=pressable]:hover .ds-month-num{ background:var(--surface-2); }
+.ds-month-day[*|data-kind=pressable][*|aria-current=date]:hover .ds-month-num{ background:var(--accent); }
+.ds-month-day[*|data-kind=pressable]:active .ds-month-num{ transform:scale(var(--squish)); }
+
+.ds-month-dot{ flex:none; width:4px; height:4px; border-radius:var(--r-pill); background:var(--accent); }
+.ds-month-day[*|data-place=before] .ds-month-dot,
+.ds-month-day[*|data-place=after] .ds-month-dot{ background:var(--ink-soft); }
 /* -- pane_switcher -- */
 /* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
    (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
