@@ -1,6 +1,27 @@
 {
- "updated": "2026-09-25, PDF printing through pdfrum on quire master; v0.1.10 waits for pdfrum 0.4.0",
+ "updated": "2026-09-26, notification parts landed; v0.1.10 waits for pdfrum 0.4.0",
  "entries": [
+  {
+   "id": "m6-notifications",
+   "date": "2026-09-26 · notifications",
+   "title": "The shell's Milestone 6 lands on new notification parts: card, banner stack, swipe, center panel, rich runs",
+   "status": "proven",
+   "lede": "The shell's notification server, banners and center are complete and proven with real input on the headless compositor recipe. quire supplied the parts: a notification card in the Toast material with the app mark, age, summary and a body clamped to two lines that opens to six on hover, a count chip with offset layers for groups, action buttons and an 18 px close at the top left as on macOS; a banner stack that slides cards in from the right and out again with the rows below healing; a swipe machine that follows a drag one-to-one to the right and damped to the left, springs back under a threshold and flies out past it, with horizontal scroll summed into the same offset; a right-edge full-height panel for the center; rich body runs with italics, underlines and links; and a group header. Real input then found two host pointer bugs (no hover until a second motion after entering a surface; a surface unmapped under the pointer leaving the next one without its enter), which are being fixed in shell-host.",
+   "notes": [
+    "Blitz limits recorded: no line-clamp (the clamp is a max-height in whole lines with a fade drawn only where text is cut); hidden clamped lines still take hits (fixed with pointer-events); wheel deltas keep winit's sign and have no phase; removing an animation freezes its last frame; absolute boxes place against their parent.",
+    "The motion table is at 64 animations and 55 keyframes; 907 tests."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/m6-notifications-light.png",
+     "caption": "the gallery's Notifications section, light: a stack of three banners with one grouped, a card mid-swipe, the group header, the right-edge center"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/gallery/m6-notifications-dark.png",
+     "caption": "the same in dark over the Work tint"
+    }
+   ]
+  },
   {
    "id": "native-pdf",
    "date": "2026-09-25 · printing without a webview",
