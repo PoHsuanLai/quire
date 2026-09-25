@@ -186,6 +186,12 @@ pub const SEPTEMBER: MonthKey = MonthKey {
     month: 9,
 };
 
+/// August 2026: from Monday, six rows (27 July to 6 September), the tallest a month gets.
+pub const AUGUST: MonthKey = MonthKey {
+    year: 2026,
+    month: 8,
+};
+
 /// Today in every sample.
 pub const TODAY: DayKey = DayKey {
     year: 2026,
