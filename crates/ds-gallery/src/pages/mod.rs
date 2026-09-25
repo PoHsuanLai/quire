@@ -2,6 +2,7 @@
 
 pub mod app_icons;
 pub mod button_faces;
+pub mod control_center;
 pub mod controls;
 pub mod controls_mailo5;
 pub mod dock_tiles;
@@ -9,6 +10,7 @@ pub mod edit_surface;
 pub mod external_icons;
 pub mod fields;
 pub mod gaps;
+pub mod glyphs;
 pub mod launcher;
 pub mod level;
 pub mod level_tile;

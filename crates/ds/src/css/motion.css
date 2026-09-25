@@ -5,8 +5,9 @@
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and the OSD's
-     `osd-in` and `osd-out` (sill Q75), and `level-tick` (the level control), below.
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
+     and `pane-out-r` (sill Q80), and the OSD's `osd-in` and `osd-out` (sill Q75) and
+     `level-tick` (the level control), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -189,6 +190,12 @@
 /* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+
+/* pane-out-l, pane-out-r (quire's, sill Q80): a pane switcher's outgoing pane leaves the other
+   way from the one arriving, the mirror of `slide-l` and `slide-r` (26 px and a fade), so the
+   two read as one push. */
+@keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
+@keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 
 /* osd-in and osd-out (quire's, sill Q75): the OSD card's pair, following its anchor through
    `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at

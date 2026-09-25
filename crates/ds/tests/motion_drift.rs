@@ -244,6 +244,11 @@ fn the_settle_table() {
         (Anim::RingDrain, MotionLevel::Calm, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
+        // sill Q80: the pane switch, both panes at `--t-move`, so one timer settles the pair.
+        (Anim::PaneInR, MotionLevel::Standard, 284),
+        (Anim::PaneInL, MotionLevel::Standard, 284),
+        (Anim::PaneOutL, MotionLevel::Standard, 284),
+        (Anim::PaneOutR, MotionLevel::Standard, 284),
         // sill Q75: the OSD's entrance at --t-quick, its exit at --t-move (neither token moves
         // with the look's level but under Reduced).
         (Anim::OsdIn, MotionLevel::Standard, 204),

@@ -570,7 +570,18 @@ Settled for the port; the catalogue above is unchanged except where named.
   `min(1, (--overshoot - 1) x 25)`: 1 at Standard and Extra, 0 at Calm and Reduced. Calm (3.2:
   "no overshoot") now flattens them as it flattens `pop-in`; Standard is the text above.
 
-### 4.6 Added by quire (OSD parts, 2026-09-25)
+### 4.6 Added by quire (control center parts, 2026-09-25)
+
+- `slide-r` and `slide-l` are also played at `--t-move --e-spring` (`Anim::PaneInR`,
+  `Anim::PaneInL`): a control-center detail pane arriving and the root pane coming back
+  (design/13 section 13.3.7). The catalogue's Space-switch rows stay at `--t-big`.
+- `pane-out-l`: `from{ transform:none; opacity:1 } to{ transform:translateX(-26px); opacity:0 }`
+  and `pane-out-r`, its mirror to `+26px`, at `--t-move --e-exit`, forwards: the outgoing pane
+  leaves the other way from the one arriving, over the same duration, so the pair reads as one
+  push and one timer settles both (`PaneSwitcher`, sill Q80). An exit, so it does not spring
+  (principle 2).
+
+### 4.7 Added by quire (OSD parts, 2026-09-25)
 
 - `osd-in`: `from{ opacity:0; transform:translateY(var(--osd-dy)) scale(.96) } to{ opacity:1;
   transform:none }` at `--t-quick --e-out` (design/20 §1.7's "in"), `Anim::OsdIn`: `pop-in`'s

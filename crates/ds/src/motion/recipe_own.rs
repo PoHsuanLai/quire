@@ -73,6 +73,45 @@ pub(super) const BUSY: Recipe = recipe(
     Iteration::Infinite,
 );
 
+/// `slide-r` at the detail pane's `--t-move --e-spring` (design/13 section 13.3.7; sill Q80):
+/// the catalogue's row plays it at `--t-big` for a Space switch, too slow inside a popover.
+pub(super) const PANE_IN_R: Recipe = recipe(
+    "slide-r",
+    DurationToken::Move,
+    EasingToken::Spring,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `slide-l` at the same `--t-move --e-spring`: the root pane coming back.
+pub(super) const PANE_IN_L: Recipe = recipe(
+    "slide-l",
+    DurationToken::Move,
+    EasingToken::Spring,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `pane-out-l` (sill Q80): the outgoing root leaves the way the detail pushes it, over the
+/// same `--t-move` so both panes settle together, at `--e-exit` since an exit does not spring
+/// (design/05 principle 2). It holds its last frame until the pane is dropped.
+pub(super) const PANE_OUT_L: Recipe = recipe(
+    "pane-out-l",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);
+
+/// `pane-out-r` (sill Q80): the outgoing detail leaves to the right as the root comes back.
+pub(super) const PANE_OUT_R: Recipe = recipe(
+    "pane-out-r",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);
+
 /// `osd-in` (sill FINDINGS Q75): the OSD card's entrance at design/20 section 1.7's `--t-quick
 /// --e-out`. An entrance, so it holds nothing; the card is at rest when it ends.
 pub(super) const OSD_IN: Recipe = recipe(
