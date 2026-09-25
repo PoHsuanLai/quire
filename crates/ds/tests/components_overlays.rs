@@ -16,6 +16,8 @@ mod golden;
 mod mailo;
 #[path = "overlays/mailo4.rs"]
 mod mailo4;
+#[path = "overlays/mailo5.rs"]
+mod mailo5;
 
 use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
@@ -124,6 +126,7 @@ fn every_overlay_matches_its_golden() {
         .iter()
         .chain(mailo::MAILO_CASES)
         .chain(mailo4::MAILO4_CASES)
+        .chain(mailo5::MAILO5_CASES)
         .filter_map(|case| {
             let dom = built(case.make, None, case.wait);
             golden::check(&golden_name(case), &inside_root(&dom)).err()

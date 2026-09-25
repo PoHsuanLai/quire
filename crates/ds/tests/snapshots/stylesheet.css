@@ -1296,6 +1296,11 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:pointer; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
+
+/* Inline (mailo gaps 5, `flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the
+   caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
+   ancestor. It sets no z-index: content the caller renders after it in that container paints
+   over it, and every overlay layer stays above it. */
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.

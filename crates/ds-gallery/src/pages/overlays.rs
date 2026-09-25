@@ -127,6 +127,7 @@ pub fn OverlaysPage() -> Element {
         super::overlays_mailo4::HookKeyedCards {}
         super::overlays_mailo4::LabelChecklist {}
         super::overlays_mailo4::InlineActions {}
+        super::overlays_mailo5::InlineScrim {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,
