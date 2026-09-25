@@ -16,7 +16,8 @@ use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;
 use ds::{
-    HostEdit, ImeEvent, ImeListener, ImeSwitch, Pasted, Point, Probe, Rect, TextPosition, TextRange,
+    CapturedPointer, HostEdit, ImeEvent, ImeListener, ImeSwitch, Pasted, Point, Probe, Rect,
+    TextPosition, TextRange,
 };
 
 /// The Blitz edit seam, as the `ds::HostEdit` a root provides as context.
@@ -29,6 +30,7 @@ pub const EDIT: HostEdit = HostEdit {
     read_clipboard_html,
     listen,
     forget,
+    capture,
 };
 
 /// Provide [`EDIT`] and the IME routing it registers surfaces with to the calling component's
@@ -112,5 +114,18 @@ fn listen(element: &MountedData, sink: EventHandler<ImeEvent>) -> Probe<ImeListe
 fn forget(listener: ImeListener) {
     if let Some(listeners) = try_consume_context::<EditListeners>() {
         listeners.remove(listener);
+    }
+}
+
+fn capture(element: &MountedData, sink: EventHandler<CapturedPointer>) -> Probe<()> {
+    if element.downcast::<NodeHandle>().is_none() {
+        return Probe::Unknown;
+    }
+    match try_consume_context::<EditListeners>() {
+        Some(listeners) => {
+            listeners.capture(sink);
+            Probe::Found(())
+        }
+        None => Probe::Unknown,
     }
 }

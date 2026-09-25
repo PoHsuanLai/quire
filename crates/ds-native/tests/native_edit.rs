@@ -240,7 +240,10 @@ fn caret_rects_at(view: Viewport) {
     assert!(near(start.origin.x.0, LEFT), "start {start:?}");
     assert!(near(start.origin.y.0, top), "start {start:?} top {top}");
     assert!(near(start.size.height.0, LINE), "start {start:?}");
-    assert_eq!(start.size.width, Px(0.0));
+    assert!(
+        start.size.width.0 > 0.0,
+        "the caret is --caret-w wide: {start:?}"
+    );
     assert!(
         middle.origin.x.0 > start.origin.x.0 + 20.0,
         "middle {middle:?}"
