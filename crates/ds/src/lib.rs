@@ -52,7 +52,7 @@ pub use geometry::{
 };
 pub use icon::render::{Glyph, IconPx, IconSize};
 pub use icon::{
-    ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, PlateFamily, Shape,
+    ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, PlateFamily, PlateTint, Shape,
 };
 pub use material::{Blur, BlurState, Material, MaterialRecipe, MaterialStack, recipe};
 pub use motion::{

@@ -5,6 +5,7 @@
 
 use crate::icon::external::{ExternalIcon, IconSource};
 use crate::icon::family::PlateFamily;
+use crate::icon::plate_tint::{PlateTint, tint_style};
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 
@@ -40,24 +41,40 @@ impl Paint {
 /// with the inner highlight, the rim and a drop shadow. A glyph or a symbolic icon is drawn in
 /// the family's glyph colour at `--plate-glyph` (56 %) of the plate, an image at
 /// `--plate-inset` (72 %). The dock's placeholder tile until the generated icons arrive.
+///
+/// With a `plate_tint` (`PlateTint::of(style, tint)`, the pair a consumer hands `retint`), the
+/// plate's stops and glyph colour are re-coloured by the same rule as the icon's raster, so a
+/// Muted or Monochrome dock is one hue, plate included (sill FINDINGS Q72). Without one, or
+/// without a plate, it changes nothing.
 #[component]
 pub fn IconView(
     source: IconSource,
     #[props(default)] size: IconSize,
     #[props(default)] plate: Option<PlateFamily>,
+    #[props(default)] plate_tint: Option<PlateTint>,
 ) -> Element {
     match plate {
         Some(family) => rsx! {
             span {
                 class: "ds-plate",
                 "data-family": family.slug(),
+                "data-icon-style": plate_tint.map(PlateTint::slug),
                 "data-size": "{size.px()}",
-                style: "--ic-size:{size.px()}px",
+                style: plate_style(size, family, plate_tint),
                 span { class: "ds-plate-face", "aria-hidden": "true" }
                 {bare(source, size)}
             }
         },
         None => bare(source, size),
+    }
+}
+
+/// The plate's inline custom properties: its size, and its tinted paint when it has one.
+fn plate_style(size: IconSize, family: PlateFamily, tint: Option<PlateTint>) -> String {
+    let side = format!("--ic-size:{}px", size.px());
+    match tint {
+        Some(tint) => format!("{side};{}", tint_style(family, tint)),
+        None => side,
     }
 }
 

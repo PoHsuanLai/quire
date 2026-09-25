@@ -663,6 +663,17 @@ Circle icons (IoU ≥ 0.90 with a circle) keep the 72 % rule.
 No icon found, or the file fails to decode: the neutral plate with the Lucide `app-window`
 glyph at 56 % in ink. No letters: icons carry no text (3.3).
 
+### 4.4 Tinted plates (settled 2026-09-25, sill FINDINGS Q72)
+
+Under `icons.style` Muted or Monochrome the plate is re-coloured with the icon, so the dock is one
+hue plate and all: `IconView { plate, plate_tint: PlateTint::of(style, tint) }` runs the family's
+two stops and its glyph ink through `ds::icon::retint`'s rule (lightness kept; Muted scales
+chroma by 4/7; Monochrome takes the tint's hue and chroma, eased to none at black and white,
+pulled into sRGB), for the light and the dark scheme, and the stylesheet picks the pair under the
+root's `data-theme`. The dark paper `#2A2E28` in the Work tint reads about `#202B4A`; the light
+paper stays white at its light stop and takes chroma about .01 at its deep one, as a white icon
+does. Colour draws the family as 2.3 and 4.1 give it.
+
 ## 5. Licensing notes to record
 
 Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):

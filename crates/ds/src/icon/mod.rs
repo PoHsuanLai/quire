@@ -23,6 +23,7 @@ mod geometry;
 mod geometry_actions;
 mod geometry_shell;
 pub mod plate;
+pub mod plate_tint;
 pub mod render;
 pub mod retint;
 pub mod shape;
@@ -34,6 +35,7 @@ pub use classify::{ChromaLimit, IconKind, classify, classify_with};
 pub use external::{ExternalIcon, IconSource, IconUrl};
 pub use family::PlateFamily;
 use geometry::*;
+pub use plate_tint::{PlateStops, PlateTint};
 pub use retint::{IconStyle, Tint, retint};
 pub use shape::Shape;
 
