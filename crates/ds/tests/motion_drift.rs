@@ -244,6 +244,12 @@ fn the_settle_table() {
         (Anim::RingDrain, MotionLevel::Calm, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
+        // sill Q75: the OSD's entrance at --t-quick, its exit at --t-move (neither token moves
+        // with the look's level but under Reduced).
+        (Anim::OsdIn, MotionLevel::Standard, 204),
+        (Anim::OsdIn, MotionLevel::Extra, 204),
+        (Anim::OsdOut, MotionLevel::Standard, 284),
+        (Anim::OsdOut, MotionLevel::Calm, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

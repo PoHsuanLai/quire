@@ -72,3 +72,24 @@ pub(super) const BUSY: Recipe = recipe(
     Fill::None,
     Iteration::Infinite,
 );
+
+/// `osd-in` (sill FINDINGS Q75): the OSD card's entrance at design/20 section 1.7's `--t-quick
+/// --e-out`. An entrance, so it holds nothing; the card is at rest when it ends.
+pub(super) const OSD_IN: Recipe = recipe(
+    "osd-in",
+    DurationToken::Quick,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `osd-out` (sill FINDINGS Q75): the OSD card's exit at `--t-move --e-exit` (design/20 section
+/// 1.7, design/05 section 10). It holds its last, transparent frame until the host unmaps the
+/// surface at `settle(OsdOut)`, so the card never flashes back between the two.
+pub(super) const OSD_OUT: Recipe = recipe(
+    "osd-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);

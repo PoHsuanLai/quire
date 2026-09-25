@@ -418,6 +418,8 @@ impl Anim {
             Anim::RingDrain => own::RING_DRAIN,
             Anim::FadeIn => own::FADE_IN,
             Anim::Busy => own::BUSY,
+            Anim::OsdIn => own::OSD_IN,
+            Anim::OsdOut => own::OSD_OUT,
         }
     }
 }
