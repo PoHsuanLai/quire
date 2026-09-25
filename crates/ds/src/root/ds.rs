@@ -2,7 +2,8 @@
 //! `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
 //! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
 //! overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`, `LayerStack`
-//! and `Overlays` as context.
+//! and `Overlays` as context. Its click handler, the last to hear a click, hands a click that
+//! landed on nothing focusable to the host's `HostClickFocus` (FINDINGS "Native focus").
 //!
 //! What the root paints follows its material (`chrome.rs`): a Window draws the Space gradient
 //! opaque with its A/B layers and grain (`data-frame="opaque"`, its own stacking context so the
@@ -31,6 +32,7 @@ use super::env::{Env, HostModality, InputModality, use_env_provider};
 use super::scale::use_root_scale;
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
+use crate::focus::click::{HostClickFocus, after_click};
 use crate::geometry::Scale;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::material::{BlurState, Material, MaterialStack};
@@ -42,6 +44,7 @@ use crate::space::{FrameVars, SpaceLook};
 use crate::tokens::hex::Alpha;
 use crate::tokens::{Corner, PixelToken};
 use dioxus::prelude::*;
+use std::rc::Rc;
 
 /// How the stylesheet reaches the document.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -77,6 +80,8 @@ pub fn Ds(
     let ground = ground.unwrap_or(Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
     let host = use_hook(try_consume_context::<HostModality>);
+    let click_focus = use_hook(try_consume_context::<HostClickFocus>);
+    let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let modality = host.map_or(InputModality::default(), |HostModality(current)| current());
     let env = use_env_provider(Env {
         resolved,
@@ -119,6 +124,9 @@ pub fn Ds(
             "data-ground": ground.attribute(),
             "data-corner": radius.and_then(Corner::attribute),
             style,
+            onmounted: move |event: MountedEvent| element.set(Some(event.data())),
+            // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
+            onclick: move |event: MouseEvent| after_click(click_focus, element.peek().clone(), &event),
             if stylesheet == Inject::Inline {
                 style { {crate::css::stylesheet()} }
             }
