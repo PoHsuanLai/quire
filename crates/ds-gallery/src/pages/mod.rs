@@ -2,6 +2,7 @@
 
 pub mod app_icons;
 pub mod button_faces;
+pub mod calendar;
 pub mod control_center;
 pub mod controls;
 pub mod controls_mailo5;

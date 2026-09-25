@@ -3195,6 +3195,86 @@ Tab reaches the three lights in order.
 **Motion.** A light springs back from `--squish` over `--t-tap --e-spring` (design/05 principle
 2: the press is contact); colours and marks cross-fade over `--t-quick --e-out`.
 
+### 39. MonthGrid (the calendar widget's month; sill Q180, 2026-09-26)
+
+**Purpose.** One month of days in seven columns: the calendar widget of the notification center
+and the desktop (design/20 section 1.12, "month grid (new ds component `MonthGrid`)"; section
+1.14). The shell computes the month (which days, which column comes first, which day is today,
+which days have an event, the ISO week of each row); quire only draws it (sill Q180). Its data
+mirrors the shell's grid field for field, so the shell's mapping is a plain `From`.
+
+**Markup.**
+
+```html
+<div class="ds-month" data-weeks="hide|show" aria-label="September 2026">
+  <div class="ds-month-header">
+    <span class="ds-month-title">September 2026</span>
+    <!-- only with onstep -->
+    <button class="ds-icon-button" data-variant="tool" aria-label="Previous month">…</button>
+    <button class="ds-icon-button" data-variant="tool" aria-label="Next month">…</button>
+  </div>
+  <div class="ds-month-row" data-row="heads">
+    <span class="ds-month-week"></span>            <!-- only with data-weeks=show -->
+    <span class="ds-month-head">M</span> … seven
+  </div>
+  <div class="ds-month-weeks [a-slide-l|a-slide-r]" data-pulse="a"?>   <!-- keyed by the month -->
+    <div class="ds-month-row">
+      <span class="ds-month-week">36</span>          <!-- only with data-weeks=show -->
+      <span|button class="ds-month-day" data-kind="pressable"? data-place="before|in|after" data-events="busy|free"
+           aria-current="date"?>
+        <span class="ds-month-num">31</span>
+        <span class="ds-month-dot"></span>           <!-- only when busy -->
+      </span|button>  … seven
+    </div> … four to six
+  </div>
+</div>
+```
+
+**Props.** `#[component] pub fn MonthGrid(data: MonthGridData, weeks: WeekNumbers /* Hide */,
+onstep: Option<EventHandler<Step>>, onpick: Option<EventHandler<DayKey>>) -> Element`.
+`MonthGridData { month: MonthKey, title: Text, heads: [Text; 7], weeks: Vec<MonthWeek> }`;
+`MonthWeek { number: IsoWeek, days: [MonthDay; 7] }`; `MonthDay { key: DayKey, place: DayPlace,
+mark: DayMark, events: Eventful }`. `MonthKey { year, month }` and `DayKey { year, month, day }`
+are the civil month and date as the shell's calendar library gives them (`i16`, `i8`, `i8`);
+the cell's label is the key's day. `DayPlace::{Before, InMonth, After}`,
+`DayMark::{Plain, Today}`, `Eventful::{Free, Busy}`, `WeekNumbers::{Hide, Show}` (the setting
+`calendar.week_numbers`, design/22 section 3.21), `Step::{Previous, Next}`. No header buttons
+without `onstep`; the days are `button`s only with `onpick`, which hears the day's key.
+
+**Geometry.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Day cell | 32 wide, 30 high; the number on a 24 round, `--fs-help` 11.5 / 500, tabular | proposed |
+| Event dot | 4 round, 2 under the number, centred | brief (sill Q180) |
+| Heads | the data face, `--fs-micro` 9.5, upper, tracked .14em as `.ds-section-header` (menu), `--ink-faint`, 18 high | design/02 section 4 ("calendar month and weekday") |
+| Title | the data face, `--fs-caption` 10 / 700, upper, tracked .12em, `--accent` | design/02 sections 4-5 ("calendar month", all upper) |
+| Header | 28 high, the title then the two `IconButton { Tool }` (28 x 26) at the end | design/20 section 1.12 |
+| Week number column | 24 wide, the data face `--fs-micro`, `--ink-faint` | proposed |
+| Rows | no gap; the grid is `7 x 32` (224) wide, `24 + 224` with week numbers | proposed |
+
+**States.**
+
+| State | Rule |
+| --- | --- |
+| in the month | `--ink` |
+| the neighbours' days (`data-place=before|after`) | `--ink-faint` (quieter, still legible) |
+| today (`aria-current="date"`) | the number on an `--accent` disc in `--accent-ink`, 700 |
+| busy (`data-events=busy`) | a 4 px dot under the number: `--accent` (today's too: the dot sits under the disc, not on it); `--ink-soft` on a neighbour's day |
+| pressable hover (`data-kind=pressable`, the `button` form) | the number's disc `--surface-2`; today keeps its accent |
+| pressable active | the disc squishes (`--squish`, `--t-tap`) |
+| focus | the global ring on the cell |
+
+**Motion.** A month change plays once: the weeks are keyed by the month, so a new month mounts a
+new body, which plays `slide-r` (a later month, from the right) or `slide-l` (an earlier one)
+at the catalogue's row, `--t-big --e-spring` (`a-slide-r`/`a-slide-l` with `data-pulse="a"`),
+and drops the class at `settle(Anim::SlideR)`. The direction is the order of the two months, so
+the caller says nothing; the first month drawn, and every render that does not change the month,
+plays nothing (design/05 principle 7, nothing loops: every motion is keyed to a state change). The header and heads do not move.
+
+**Blitz notes.** Rows are CSS grid (`repeat(7, 32px)`), as `ModuleGrid`; the dot is a real span;
+no pseudo-elements.
+
 ## Open decisions
 
 Each needs a yes/no or a number before the owning wave starts. "Proposal" marks this document's

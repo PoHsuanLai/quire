@@ -1470,6 +1470,23 @@ when `on_hidden` finds the list empty. `notifications.swipe = KeepInCenter` is y
 `Panel { shown, on_hidden: unmap, width: Px(center_width_px), onclose }` of `GroupHeader`s over
 `NotificationCard`s (`Swipe::Off` or `Dismiss` as you choose).
 
+### Month grid (2026-09-26)
+
+sill Q180; design/04-COMPONENTS.md section 39. Additive: one component and its data types; no
+existing golden moved but the stylesheet's.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `MonthGrid` | `data: MonthGridData`, `weeks: WeekNumbers` (`Hide`), `onstep: Option<EventHandler<Step>>`, `onpick: Option<EventHandler<DayKey>>` | One month in seven 32 px columns: the title (data face, upper, `--accent`), the previous and next `IconButton { Tool }` only with `onstep` (they hand it `Step::Previous`/`Step::Next`; you shift the month), the weekday heads, then the weeks, led by their ISO week under `WeekNumbers::Show`. The neighbours' days `--ink-faint`, today on an `--accent` disc (`aria-current="date"`), a busy day's 4 px dot. With `onpick` each day is a `button` (`data-kind="pressable"`) that hands over its key. A change of `data.month` slides the new weeks in once, from the right for a later month (`a-slide-r`), from the left for an earlier one (`a-slide-l`), dropped at `settle(Anim::SlideR)`; the first month and a render that keeps the month play nothing, so you say nothing about the direction |
+| `MonthGridData` | `{ month: MonthKey, title: Text, heads: [Text; 7], weeks: Vec<MonthWeek> }` | Your grid, with the words you format: "September 2026", the weekday initials from your first weekday |
+| `MonthWeek`, `MonthDay` | `{ number: IsoWeek, days: [MonthDay; 7] }`; `{ key: DayKey, place: DayPlace, mark: DayMark, events: Eventful }` | Field for field your `GridWeek`/`GridDay`; the cell's label is `key.day` |
+| `MonthKey`, `DayKey`, `IsoWeek` | `{ year: i16, month: i8 }`, `{ year: i16, month: i8, day: i8 }`, `IsoWeek(i8)` | The civil types as jiff hands them (`Date::year()`, `month()`, `day()`), so each `From` is a field copy |
+| `DayPlace`, `DayMark`, `Eventful`, `WeekNumbers`, `Step` | `Before`/`InMonth`/`After`, `Today`/`Plain`, `Busy`/`Free`, `Hide`/`Show`, `Previous`/`Next` | Your grid's enums and the `calendar.week_numbers` setting, variant for variant |
+
+**What sill switches to.** The calendar widget draws `MonthGrid` from `From<&grid::MonthGrid>`
+(title and heads formatted by you); `onstep` shifts the month (`shift_month`) and recomputes the
+grid; drop the widget's own grid CSS.
+
 ### PDF and printing (2026-09-25)
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and
