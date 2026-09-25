@@ -1,7 +1,10 @@
 //! The mailo gaps 5 states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::{Button, ButtonVariant, Run, RunTone, Text};
+use ds::components::vocab::{DropState, Here, PulseKey};
+use ds::{
+    Anim, Button, ButtonVariant, Icon, ItemKind, PlaceId, Presence, Run, RunTone, SidebarItem, Text,
+};
 
 /// One state and its golden.
 pub struct Case {
@@ -17,7 +20,30 @@ fn quoted_head() -> Text {
     ])
 }
 
+/// The Archive place during a drag, in `drop` state.
+fn archive(drop: DropState) -> Element {
+    rsx! {
+        SidebarItem {
+            kind: ItemKind::Place { icon: Icon::Archive },
+            label: "Archive",
+            here: Here::Elsewhere,
+            count: None,
+            presence: Presence::Present,
+            preview: None,
+            pulse: PulseKey::rest(Anim::Gulp),
+            onclick: |_| {},
+            onclose: None,
+            drop,
+            place: PlaceId("archive".to_string()),
+        }
+    }
+}
+
 pub const CASES: &[Case] = &[
+    Case {
+        golden: "lists/sidebar_item/place-drop-accepts.html",
+        make: || archive(DropState::Accepts),
+    },
     Case {
         golden: "controls/button/label-runs.html",
         make: || rsx! { Button { variant: ButtonVariant::Quiet, label: quoted_head(), onclick: |_| {} } },
