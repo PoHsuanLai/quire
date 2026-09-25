@@ -3,6 +3,7 @@
 //! consented remote images). Frames never get `file:` from ds-native: a frame's markup is not
 //! the app's, so a sanitiser miss must not turn into a read of the disk.
 
+use crate::frame_tag::FrameTag;
 use crate::origin::RequestOrigin;
 use blitz_traits::net::{Bytes, NetHandler, NetWaker, Url};
 use std::fmt;
@@ -58,17 +59,25 @@ pub enum NetDecision {
 #[derive(Debug, Clone)]
 pub struct NetRequest {
     origin: RequestOrigin,
+    tag: Option<FrameTag>,
     url: Url,
 }
 
 impl NetRequest {
-    pub(crate) fn new(origin: RequestOrigin, url: Url) -> Self {
-        NetRequest { origin, url }
+    pub(crate) fn new(origin: RequestOrigin, tag: Option<FrameTag>, url: Url) -> Self {
+        NetRequest { origin, tag, url }
     }
 
     /// The document that asked.
     pub fn origin(&self) -> RequestOrigin {
         self.origin
+    }
+
+    /// The asking frame's `data-frame-tag`: which of the app's frames asked (mailo's message),
+    /// without inferring it from the URL. `None` for the app's own document and an untagged
+    /// frame.
+    pub fn frame_tag(&self) -> Option<&FrameTag> {
+        self.tag.as_ref()
     }
 
     /// The absolute URL asked for.
