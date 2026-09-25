@@ -3041,9 +3041,8 @@ mailo's composer runs on `EditSurface`; its six follow-ups, branch `edit-surface
 `controls/edit_surface/app-class-and-data.html`, `tokens/pixel.rs`'s tables.
 
 1. **Class and data.** `EditSurface { extra_class: Option<ExtraClass>, data: Vec<DataAttr> }`,
-   the types mailo gaps 6 gave `Button`. That branch was not on master yet, so
-   `components/pass_through.rs` is brought over byte for byte (and its two `mod.rs` lines), so
-   the two branches merge without a conflict there.
+   the types mailo gaps 6 gave `Button` (`components/pass_through.rs`, brought over byte for byte
+   before that branch landed; the merge of master took it without a conflict).
 2. **A programmatic focus is a press's focus.** `EditHandle::focus()` used to call
    `focus_soon`: a host focus write dispatches no `focus` event, so `on_focus` never heard `In`
    and the IME stayed off. The surface now hands its handle its own focus and blur
