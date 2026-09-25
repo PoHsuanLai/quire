@@ -2656,3 +2656,94 @@ Two gaps sill reported after wiring `icons.style` (sill FINDINGS Q71 and Q72).
 - **Limits.** `app_icon_path` probes the disk per call; cache its answer with the decoded icon.
   A partly installed set is not merged with a later step. `$QUIRE_ICON_ASSETS` names the apps
   directory itself, not a data directory.
+
+## Native focus (2026-09-25)
+
+Three gaps mailo's window reported once it came up on `ds_native::launch` (mailo pins quire by
+tag, v0.1.7/8, behind its `native` feature). Branch `native-focus`, one commit per item; blitz
+rev unchanged (`e99fbdbd`). Proofs are harness tests: `native_focus_field.rs`,
+`native_keep_focus.rs`, `native_strip.rs`.
+
+1. **G8, a field by handle, any element by selector.**
+   - **Found: there is no way to make a `MountedData` for a node found by selector.**
+     dioxus-native-dom's `NodeHandle` has crate-private fields and no constructor, so mailo
+     re-did ds-native's document writes itself (`query_selector`, `set_focus_to`,
+     `with_text_input(select_all)`, retried per frame), and a focus written that way fired no
+     `focus` event. ds-native now wraps a found node in its own `RenderedElementBacking`
+     (`FoundNode`, `node_ref.rs`); the focus, blur and select writes take either handle. A
+     found node answers no other mounted call (rects, scrolling).
+   - **`TextInput { handle: Option<FieldHandle> }`**, from `use_field_handle()`, as
+     `use_edit_handle` is: `focus(Select)`, `blur()`, `element()`. The focus task runs in the
+     handle owner's scope. Blitz's blur is `clear_focus` when the field has the focus
+     (`ds::HostBlur`, `ds_native::focus::BLUR`), again with no event, so the handle calls the
+     field's `onblur` (and the commit it makes on blur) itself.
+   - **`ds::focus_by_selector(selector, Select) -> Result<(), FocusError>`**, async, through
+     `ds::HostFind { find, same }` (provided by `launch` over the host's document handle and by
+     the harness over its document; not by `focus::provide()`, which has no document). It waits
+     up to twenty frames for the element to be drawn (mailo's webview scripts waited twenty).
+     `FocusError::{NoHost, BadSelector, NoSuchElement, Busy, Refused}`; an unknown selector is
+     `NoSuchElement`, never a panic.
+   - **The told-path for a selector.** Every mounted `TextInput` enters a root-context list
+     (`focus/targets.rs`) with its element and its `onfocus`/`onblur`; a node found by selector
+     is matched to an entry through `HostFind::same` (node identity) and its `onfocus` is called
+     once the host's write lands, as `focus_soon_told` does for `Focus::OnMount`.
+   - Unchanged: the element that *loses* the caret to a host focus still hears no blur on Blitz.
+   - Proof: `native_focus_field.rs`. By handle and by selector the field is focused, its log is
+     `focus` exactly once and `selected_text` is the whole value; the handle's blur logs `blur`
+     once and leaves the field; `#nothing-here` is `NoSuchElement` after the wait, `[[` is
+     `BadSelector` at once.
+2. **Keep-focus.** Blitz's `handle_click` default walks up from the target and, when nothing on
+   the way is one of its own (a text field, any `input`, a submit button, a `summary`, a
+   `label`, a link, a `disabled` element), clears the focus. A `button type="button"` is none
+   of these, so a click on a quire `Button` cleared it too. mailo's keys are handled on
+   `.app[tabindex]`, so it re-focused `.app` a frame after every pointer release.
+   - **Now:** `FocusFallback::{Ancestor (default), BlitzDefault}` on `AppConfig` and
+     `HarnessConfig`. Under `Ancestor`, `Ds`'s root click handler (the last handler a click
+     reaches) asks `ds::HostClickFocus` (`ds_native::CLICK_FOCUS`, `click_focus.rs`) what the
+     click will do: when Blitz would clear the focus and the target or an ancestor is focusable
+     (`is_focussable`: a `tabindex` >= 0 or a natively focusable element), that element takes
+     the keyboard once the click is done, if the click left the focus nowhere.
+   - **The default is not prevented.** The EditSurface prevents it, but Blitz's click default
+     also dispatches `dblclick` and the blur of a field the click leaves, and both matter here.
+     So when the ancestor already has the focus it is cleared first without events (Blitz's
+     clear then has nothing to blur), and the ancestor is focused again by a task. A handler
+     that moved the focus during the click wins, because the task only acts on a focus that is
+     nowhere.
+   - **The EditSurface's own focus wins inside it:** it prevents its click's default, and the
+     root skips a click whose default is taken.
+   - **Limits.** The refocus is a task: at once when the document is free, a frame later when the
+     click's own re-render holds it. On the window a key would have to arrive between the click
+     and the next poll to miss it. The ancestor hears no `focus` event (a host write), as with
+     `HostFocus`. Another Blitz host (sill, shell-host) gets the fallback only by providing
+     `CLICK_FOCUS` itself.
+   - Proof: `native_keep_focus.rs`. A click on plain text in `div.app[tabindex=0]` leaves `.app`
+     focused and its keydown hears `j`. With `BlitzDefault` the focus is cleared and the key is
+     not heard. A second click logs no `app-blur`. A double click still logs `dblclick`. A field
+     the click leaves logs `field-blur` and `.app` takes the keyboard. A click inside an
+     `EditSurface` focuses the surface.
+3. **The hover strip on Blitz, measured** (`native_strip.rs`, a 74 px row in a 560 px list, four
+   buttons). Design/04 section 17 says: right 8, vertically centred, padding 3, buttons 26 with
+   gap 3, a 1 px `--line` border. So in a 74 px row the strip is 34 tall and 20 from the row's
+   top. Its right edge is 9 in from the row's border box (8 plus the row's hairline). It is
+   `26n + 3(n - 1) + 8` wide: 121 for four buttons.
+   - **Painted and hit box: already the design's.** Blitz applies `translateY(-50%)` when it
+     paints and when it hit-tests (`Node::hit_inner` inverts the transform). A point 1 px inside
+     each corner of that box hits the strip, 2 px above or below misses it.
+   - **The hidden strip takes no hits.** Blitz honours `pointer-events:none`, and the buttons
+     inherit it. So a click at the centre of a row whose strip is hidden reaches the row.
+   - **Found: the layout rect was wrong.** `get_client_bounding_rect`, which `HostMeasure`
+     reads, leaves transforms out. So the strip read from the row's vertical middle down
+     (top 37, where the painted box's top is 20). That is the "right half from its vertical
+     middle down" mailo reported. A strip button's `onclick: Rect`, which anchors the snooze and
+     label menus, was 17 px low on Blitz.
+   - **Fixed in CSS.** The strip is centred with `top:0; bottom:0; margin:auto 0;
+     height:max-content`: the same box in a browser, with no transform to leave out. The layout
+     rect now reads top 20, height 34, width 121, right inset 9.
+     `mailo_lists.rs`/`mailo4_strip.rs` no longer lift their click by half the strip's height.
+   - **A click at the row's centre** reaches the row with the strip hidden, shown
+     (`Shown::Visible`) and hover-revealed. A shown strip legitimately covers the centre when it
+     is wider than half the row less 9: five buttons (150 px) in a 300 px row put its left edge
+     159 from the right. There a centre click presses the first button (`press:archive`), in the
+     webview too. The same row with the strip hidden opens. So mailo's centre click landed on
+     Archive because its strip was shown (hovered, or its row held the focus) and wide enough
+     for its row, not because Blitz's box is wrong.
