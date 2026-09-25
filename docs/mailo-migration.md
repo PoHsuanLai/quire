@@ -164,6 +164,7 @@ concern (section 6 has the full "what mailo keeps" list).
 | mailo's own toggle-list menu (Labels, the page's Properties; `ui/menu/mod.rs`, the `button.rm` exception) | `Menu { dismiss: PickDismiss::Stay, .. }` (§20) | mailo gaps 4: `onpick` toggles the row's `check` in your entries; the menu stays open with the cursor on the row. Escape and an outside press still close it |
 | the sender card's actions drawn as a menu inside the card (`ui/hover/sender.rs`, `ui/menu/mod.rs`) | `Menu { flow: Flow::Inline, .. }` inside the `HoverCard`'s children | mailo gaps 4: the same rows, no overlay, scrim, grab or focus; `anchor` is ignored (pass any). With the `Menu` above this retires the `button.rm` exception once every mailo menu row is quire's |
 | `button.item` places with `data-place` and `is-drop-target` (`ui/sidebar/panes.rs:292,330`; `ui/sidebar/folder_row.rs:77`; the `button.item` exception) | `SidebarItem { place: Some(PlaceId(name)), onpointerenter, onpointerleave, onpointermove, onpointerup, drop }` (§19) | mailo gaps 4: `data-place` is written from `place`; set `drop: DropState::Target` where mailo added `is-drop-target` (quire's rule lights it `--accent-soft` at 1.045). Tests that read `data-place` read the same attribute. The `button.item` exception goes |
+| the composer body's `contenteditable` and `wire.rs`'s glue script (`ui/compose/body.rs`, `wire.rs`, `render.rs`) | `EditSurface { on_input, on_pointer, on_focus, handle, ime_area }` (Phase B only) | edit surface: `data-n` becomes `"data-edit-node": "{n}"`, an object's `contenteditable: "false"` becomes `"data-edit-kind": "atom"`; the adapter that builds `editor::InputEvent`s is §6.5. Phase A keeps the webview's `contenteditable` |
 
 Everything under `ui/icon/` (the glyph set) maps to `ds::Glyph`/`ds::Icon` — `08-ICONS.md` and
 `DESIGN.md`'s icon row have the geometry; mailo's own `ui/icon` module is deleted, not ported
@@ -515,6 +516,64 @@ equivalent) suite, plus `cargo run -p mail-app` opening a real window that shows
 suite passing is not the same claim as the window actually painting, and this migration's whole
 second phase is a renderer swap, exactly the kind of change that news article warns against
 concluding about from tests alone.
+
+### 6.5 The composer: `EditSurface` and the adapter (mailo plan §3, option A)
+
+mailo keeps `editor::` (its model, `interpret`, undo) and `render.rs`, and replaces `wire.rs`'s
+script with a Rust adapter. quire's `ds::EditSurface` owns the focus and the IME and reports
+geometry; it never edits text or draws a caret. CONSUMING.md §6 "Edit surface" has the API;
+FINDINGS.md "Edit surface" the limits.
+
+**Markup.** `render.rs` wraps the body in `EditSurface { handle, on_input, on_pointer,
+on_focus, ime_area }` and writes `"data-edit-node": "{n}"` where it wrote `data-n`; every
+`Obj` also gets `"data-edit-kind": "atom"` (drop `contenteditable`). The surface is
+`white-space: pre-wrap`, so a paragraph's laid-out text is its runs' text as written.
+
+**Positions.** A `TextPosition { node: EditNode(n), offset: TextOffset(bytes) }` is UTF-8 bytes
+into the paragraph's own text (the text nodes whose nearest `data-edit-node` is that
+paragraph). mailo's `Pos` counts graphemes, so the adapter converts both ways with the
+paragraph's runs text: `Pos::new(n.parse()?, text[..bytes].graphemes(true).count())`, and back
+with the byte index of the `offset`-th grapheme. An atom's offset is 0 or 1 in both.
+
+**`EditInput` to `editor::InputEvent`.** `ranges` is always mailo's own selection
+(`vec![session.selection]`, already in grapheme positions): the surface has no selection of its
+own. `composing` is set only for the composition's start and updates.
+
+| `EditInput` | `InputEvent` |
+| --- | --- |
+| `Text(t)` | `insertText`, `data: Some(t)` |
+| `Key` Enter / Shift+Enter | `insertParagraph` / `insertLineBreak` |
+| `Key` Backspace / Ctrl or Alt+Backspace / Delete | `deleteContentBackward` / `deleteWordBackward` / `deleteContentForward` |
+| `Key` Ctrl(Cmd)+B, I, U; Ctrl+Z; Ctrl+Shift+Z or Ctrl+Y | `formatBold`, `formatItalic`, `formatUnderline`; `historyUndo`; `historyRedo` |
+| `Key` arrows, Home, End (with Shift) | no `InputEvent`: `editor::keys` moves mailo's caret, as `Heard::Select` did |
+| `Composition(Start)` | `compositionstart`, `composing: true` (the core skips it) |
+| `Composition(Update { text, cursor })` | `insertCompositionText`, `composing: true`; keep `text`/`cursor` to draw the preedit at the caret |
+| `Composition(End { text })` | `compositionend`, `data: Some(text)`, `composing: false`: the one insert |
+| `Paste(Pasted::Html { html, text })` | `insertFromPaste`, `data: Some(text)`, `html: Some(html)` (ammonia still sanitises it in `paste.rs`) |
+| `Paste(Pasted::Text(t))` | `insertFromPaste`, `data: Some(t)`, `html: None` |
+| `Cut` | write the selection with `ds_native::clipboard::write_text`, then `deleteByCut` |
+| `Copy` | write the selection; no `InputEvent` |
+
+**Pointer.** `EditPointer { phase, position, extend, clicks }`: `Press` with `Extend::Fresh`
+puts the caret at `position`; `Press` with `Extend::FromAnchor` and every `Drag` move the
+selection's focus; `clicks` 2 and 3 select the word and the paragraph. `position` is `None`
+over nothing addressable: keep the caret.
+
+**Drawing the caret and selection.** A frame after each render that moved the caret or changed
+the text (a task: `ds::sleep(ds::FRAME_SLACK)`), read `handle.caret_rect(&caret)` and
+`handle.selection_rects(&range)`, subtract `handle.bounds()`, and draw them in a
+`position: absolute` layer inside a `position: relative` wrapper around the surface (mailo's own
+classes, quire tokens). Show the caret on `EditFocus::In`, hide it on `Out`. Pass the caret's
+rect as `ime_area` so the IME's candidate window follows it. The `/` and `@` floats anchor at
+`Anchor::Rect(caret_rect)`, which retires the script's `float()`.
+
+**Tests.** `ds_native::Harness` drives it: `click`, `key`, `ime_start`/`ime_update`/`ime_commit`,
+`paste_html`, `hit_test`, and `within(|| handle.caret_rect(..))`. `crates/ds-native/tests/
+native_edit.rs` is the pattern.
+
+**What stays open.** Drag selection only hears moves over the surface (no pointer capture), and
+a composition interrupted by a focus change ends empty. FINDINGS.md "Edit surface" lists the
+rest.
 
 ## 7. The reader, Phase B
 
