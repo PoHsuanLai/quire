@@ -21,6 +21,7 @@ pub mod hover_strip;
 pub mod icon_button;
 pub mod icon_view;
 pub mod kbd;
+pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
@@ -49,6 +50,7 @@ pub mod peek;
 pub mod popover;
 pub mod press;
 pub mod provider_mark;
+pub(crate) mod resize_edges;
 pub mod row_action;
 pub(crate) mod row_click;
 pub mod row_hooks;
@@ -75,7 +77,9 @@ pub mod text_runs;
 pub mod toast;
 pub mod toggle;
 pub mod tooltip;
+pub mod traffic_lights;
 pub mod vocab;
+pub mod window_frame;
 pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
@@ -139,10 +143,12 @@ pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
+pub use traffic_lights::TilePose;
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
     Selection, Shortcut, StaggerIndex, Switch,
 };
+pub use window_frame::{TrafficLights, WindowFrame, WindowTitlebar};
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.
@@ -191,5 +197,6 @@ pub const CSS: &[(&str, &str)] = &[
     ("toast", include_str!("toast.css")),
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),
+    ("window_frame", include_str!("window_frame.css")),
     ("workspace_pills", include_str!("workspace_pills.css")),
 ];

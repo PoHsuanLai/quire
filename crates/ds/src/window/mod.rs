@@ -2,6 +2,8 @@
 //! (`vocab`), the frame's timings (`timing`) and the pure machines behind its gestures (`grab`,
 //! `hold`). The frame itself is `components::window_frame` (FINDINGS "Window frame").
 
+pub(crate) mod grab;
+pub(crate) mod hold;
 pub mod host;
 pub mod timing;
 pub mod vocab;

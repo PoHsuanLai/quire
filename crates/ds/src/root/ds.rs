@@ -26,12 +26,17 @@
 //! The root also writes the pixel tokens' inputs for its device scale (`scale`, else the host's
 //! `HostScale`, else 1x; `tokens/pixel.rs`), so every hairline is whole device pixels at 1.25,
 //! 1.5 or 1.75 (design/01-LAYOUT.md section 2.1). At 1x it writes nothing.
+//!
+//! A client-decorated window passes `window: WindowFrame::Titlebar { .. }`: the root stamps
+//! `data-window-frame` and draws the titlebar, its children in `div.ds-window-body`, and the
+//! resize edges (`components/window_frame.rs`). The default draws nothing more.
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
 use super::scale::use_root_scale;
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
+use crate::components::window_frame::{WindowFrame, framed};
 use crate::focus::click::{HostClickFocus, after_click};
 use crate::geometry::Scale;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
@@ -72,6 +77,7 @@ pub fn Ds(
     #[props(default)] radius: Option<Corner>,
     #[props(default)] stack: Option<MaterialStack>,
     #[props(default)] scale: Option<Scale>,
+    #[props(default)] window: WindowFrame,
     children: Element,
 ) -> Element {
     let scale = use_root_scale(scale);
@@ -105,6 +111,7 @@ pub fn Ds(
         frame.style_attr(),
         tint.css()
     );
+    let framing = window.attribute();
     let hover = match hover.warmth() {
         HoverWarmth::Warm => "warm",
         HoverWarmth::Cold => "cold",
@@ -123,6 +130,7 @@ pub fn Ds(
             "data-frame": frame_tint.attribute(),
             "data-ground": ground.attribute(),
             "data-corner": radius.and_then(Corner::attribute),
+            "data-window-frame": framing,
             style,
             onmounted: move |event: MountedEvent| element.set(Some(event.data())),
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
@@ -137,7 +145,7 @@ pub fn Ds(
                 },
                 FrameTint::None => rsx! {},
             }
-            {children}
+            {framed(window, children)}
             OverlayHost {}
             ToastHost {}
         }

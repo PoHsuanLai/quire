@@ -1,0 +1,59 @@
+/* Window frame (design/04-COMPONENTS.md "Window frame"; design/13-BEHAVIOUR-menus-windows.md
+   section 13.3.11). A framed root is a column: the 28 px titlebar, then `.ds-window-body` taking
+   the rest; the resize edges lie over both. The titlebar is on the frame colour, so its inks are
+   the `--f-*` ones. The lights are 12 px discs 8 px apart, the first 13 px from the window's
+   left edge (macOS). Coloured in the active window, `--f-pill` with a hairline in an inactive
+   one; any light under the pointer colours the group and shows the marks, as on macOS. A press
+   springs back from `--squish` (design/05-MOTION.md principle 2: the spring is spent on
+   contact). */
+
+.ds[*|data-window-frame=titlebar]{ position:relative; display:flex; flex-direction:column; height:100vh; }
+.ds[*|data-window-frame=titlebar] > .ds-window-body{ position:relative; flex:1 1 auto; min-height:0; }
+
+.ds-titlebar{
+  position:relative; flex:0 0 auto; display:flex; align-items:center; height:28px; padding:0 var(--s-13);
+  color:var(--f-ink-soft); cursor:default; user-select:none;
+}
+.ds-titlebar[*|data-activation=inactive]{ color:var(--f-ink-faint); }
+.ds-titlebar-title{
+  position:absolute; top:0; left:84px; right:84px; line-height:28px; text-align:center;
+  font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
+  pointer-events:none;
+}
+
+.ds-lights{ position:relative; display:flex; align-items:center; gap:var(--s-8); }
+.ds-light{
+  display:grid; place-items:center; width:12px; height:12px; padding:0; border:0; border-radius:var(--r-pill);
+  background:var(--f-pill); box-shadow:inset 0 0 0 var(--hair) var(--f-line); cursor:default;
+  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring);
+}
+.ds-light:active{ transform:scale(var(--squish)); }
+.ds-light[*|data-light=close]{ color:var(--c-red-deep); }
+.ds-light[*|data-light=minimize]{ color:var(--c-amber-deep); }
+.ds-light[*|data-light=zoom]{ color:var(--c-green-deep); }
+.ds[*|data-theme=dark] .ds-light[*|data-light=close]{ color:var(--c-red-soft); }
+.ds[*|data-theme=dark] .ds-light[*|data-light=minimize]{ color:var(--c-amber-soft); }
+.ds[*|data-theme=dark] .ds-light[*|data-light=zoom]{ color:var(--c-green-soft); }
+.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=close],
+.ds-lights:hover .ds-light[*|data-light=close]{ background:var(--c-red); }
+.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=minimize],
+.ds-lights:hover .ds-light[*|data-light=minimize]{ background:var(--c-amber); }
+.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=zoom],
+.ds-lights:hover .ds-light[*|data-light=zoom],
+.ds-light[*|data-light=zoom][*|aria-expanded=true]{ background:var(--c-green); }
+.ds-light-mark{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-lights:hover .ds-light-mark,
+.ds-light:focus .ds-light-mark,
+.ds-light[*|aria-expanded=true] .ds-light-mark{ opacity:1; }
+
+/* The grab zones: 4 px along each side, 12 px squares at the corners, over the content and
+   under every floating surface. */
+.ds-resize-edge{ position:absolute; z-index:var(--z-edge); }
+.ds-resize-edge[*|data-edge=top]{ top:0; left:12px; right:12px; height:4px; cursor:ns-resize; }
+.ds-resize-edge[*|data-edge=bottom]{ bottom:0; left:12px; right:12px; height:4px; cursor:ns-resize; }
+.ds-resize-edge[*|data-edge=left]{ left:0; top:12px; bottom:12px; width:4px; cursor:ew-resize; }
+.ds-resize-edge[*|data-edge=right]{ right:0; top:12px; bottom:12px; width:4px; cursor:ew-resize; }
+.ds-resize-edge[*|data-edge=top-left]{ top:0; left:0; width:12px; height:12px; cursor:nwse-resize; }
+.ds-resize-edge[*|data-edge=top-right]{ top:0; right:0; width:12px; height:12px; cursor:nesw-resize; }
+.ds-resize-edge[*|data-edge=bottom-left]{ bottom:0; left:0; width:12px; height:12px; cursor:nesw-resize; }
+.ds-resize-edge[*|data-edge=bottom-right]{ bottom:0; right:0; width:12px; height:12px; cursor:nwse-resize; }
