@@ -41,3 +41,6 @@ ds-settings = { workspace = true }
 
 [[example]]
 name = "window"
+
+[[example]]
+name = "edit"
