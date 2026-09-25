@@ -8,7 +8,7 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface};
+use ds::{DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass};
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -52,6 +52,16 @@ const CASES: &[Case] = &[
             }
         },
     ),
+    ("controls/edit_surface/app-class-and-data.html", || {
+        let data = DataName::parse("draft")
+            .map(|name| vec![DataAttr::new(name, "42")])
+            .unwrap_or_default();
+        rsx! {
+            EditSurface { extra_class: ExtraClass::parse("c-body").ok(), data, on_input: |_| {},
+                p { "data-edit-node": "0", "Hi" }
+            }
+        }
+    }),
     ("controls/edit_surface/empty.html", || {
         rsx! { EditSurface { on_input: |_| {} } }
     }),

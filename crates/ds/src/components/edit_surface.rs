@@ -5,20 +5,20 @@
 //! [`TextPosition`](crate::TextPosition)s through the host, and never draws a caret or a
 //! selection: the app does, from its [`EditHandle`]'s rects.
 
-use crate::components::edit_surface_state::{Pressing, SurfaceState, write_soon};
-use crate::edit::clicks::Clicks;
-use crate::edit::composition::{Composing, on_ime, settle};
-use crate::edit::handle::EditHandle;
-use crate::edit::host::{HostEdit, ImeEvent, ImeSwitch, Probe};
+use crate::components::edit_surface_ctx::SurfaceCtx;
+use crate::components::edit_surface_focus::{
+    blur_surface, focus_surface, focused_in, focused_out, listen_soon,
+};
+use crate::components::edit_surface_keys::key_down;
+use crate::components::edit_surface_pointer::{captured, moved, press, released};
+use crate::components::edit_surface_state::{SurfaceState, write_soon};
+use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
+use crate::edit::composition::on_ime;
+use crate::edit::handle::{EditHandle, SurfaceHooks};
+use crate::edit::host::{HostEdit, ImeEvent};
 use crate::edit::input::EditInput;
-use crate::edit::keys::{KeyAction, classify};
-use crate::edit::pointer::{EditFocus, EditPointer, Extend, PointerPhase};
-use crate::focus::Select;
-use crate::focus::host::focus_soon_told;
-use crate::geometry::measure::BUSY_ATTEMPTS;
-use crate::geometry::{Point, Px, Rect};
-use crate::time::{FRAME_SLACK, sleep};
-use dioxus::html::input_data::MouseButton;
+use crate::edit::pointer::{CapturedPointer, EditFocus, EditPointer};
+use crate::geometry::Rect;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -26,11 +26,14 @@ use std::rc::Rc;
 ///
 /// - `on_input`: text, keys, IME composition steps, paste, cut and copy, in order.
 /// - `on_pointer`: presses, drags and releases of the primary button, with the text position
-///   under the pointer.
-/// - `on_focus`: the surface took or lost the keyboard.
-/// - `handle`: the app's handle for caret and selection rects (`use_edit_handle`).
+///   under the pointer; a drag keeps reporting outside the surface until the release.
+/// - `on_focus`: the surface took or lost the keyboard (a press, Tab, or the handle's
+///   `focus`/`blur`).
+/// - `handle`: the app's handle for caret and selection rects and focus (`use_edit_handle`).
 /// - `ime_area`: where the IME's candidate window should sit (the caret's rect); applied while
 ///   the surface has the keyboard, and again each time it takes it.
+/// - `extra_class`, `data`: the app's own class and `data-*` on the surface's element, so the
+///   surface can be the app's styled body itself (`ExtraClass` and `DataAttr` refuse `ds-`).
 #[component]
 pub fn EditSurface(
     on_input: EventHandler<EditInput>,
@@ -40,31 +43,41 @@ pub fn EditSurface(
     #[props(default)] ime_area: Option<Rect>,
     #[props(into, default)] label: Option<String>,
     #[props(into, default)] id: Option<String>,
+    #[props(default)] extra_class: Option<ExtraClass>,
+    #[props(default)] data: Vec<DataAttr>,
     children: Element,
 ) -> Element {
     let host = use_hook(try_consume_context::<HostEdit>);
     let state = use_hook(|| Rc::new(SurfaceState::default()));
+    let ctx = SurfaceCtx {
+        state: Rc::clone(&state),
+        host,
+        on_input,
+        on_pointer,
+        on_focus,
+    };
     let heard = {
-        let state = Rc::clone(&state);
+        let ctx = ctx.clone();
         use_callback(move |event: ImeEvent| {
-            let (next, inputs) = on_ime(state.composing.get(), event);
-            state.composing.set(next);
-            inputs.into_iter().for_each(|input| on_input.call(input));
+            let (next, inputs) = on_ime(ctx.state.composing.get(), event);
+            ctx.state.composing.set(next);
+            ctx.tell(inputs);
         })
     };
-    let focused_in = {
-        let state = Rc::clone(&state);
-        use_callback(move |()| {
-            let was = state.focus.replace(EditFocus::In);
-            if let (Some(host), Some(element)) = (host, state.element()) {
-                ime_on(host, element, state.ime_area.get());
-            }
-            if was == EditFocus::Out
-                && let Some(told) = on_focus
-            {
-                told.call(EditFocus::In);
-            }
-        })
+    let told = {
+        let ctx = ctx.clone();
+        use_callback(move |()| focused_in(&ctx))
+    };
+    let hooks = {
+        let (focusing, blurring) = (ctx.clone(), ctx.clone());
+        SurfaceHooks {
+            focus: use_callback(move |()| focus_surface(&focusing, told)),
+            blur: use_callback(move |()| blur_surface(&blurring)),
+        }
+    };
+    let capture_sink = {
+        let ctx = ctx.clone();
+        use_callback(move |pointer: CapturedPointer| captured(&ctx, pointer))
     };
     {
         let state = Rc::clone(&state);
@@ -89,235 +102,39 @@ pub fn EditSurface(
     }
 
     let mounted = {
-        let state = Rc::clone(&state);
+        let ctx = ctx.clone();
         move |event: MountedEvent| {
             let element = event.data();
-            state.element.replace(Some(Rc::clone(&element)));
+            ctx.state.element.replace(Some(Rc::clone(&element)));
             if let Some(handle) = handle {
-                handle.set(Rc::clone(&element));
+                handle.set(Rc::clone(&element), hooks);
             }
-            if let Some(host) = host {
-                listen_soon(host, element, heard, Rc::clone(&state));
-            }
+            listen_soon(&ctx, element, heard);
         }
     };
-    let keydown = {
-        let state = Rc::clone(&state);
-        move |event: KeyboardEvent| key_down(&state, host, on_input, &event)
-    };
-    let pointerdown = {
-        let state = Rc::clone(&state);
-        move |event: PointerEvent| {
-            if event.trigger_button() != Some(MouseButton::Primary) {
-                return;
-            }
-            // Blitz's default would start its own text selection, and the click after it
-            // would clear the focus (FINDINGS "Edit surface").
-            event.prevent_default();
-            let at = point_of(&event);
-            let clicks = state.press(at);
-            report(
-                &state,
-                host,
-                on_pointer,
-                &event,
-                PointerPhase::Press,
-                clicks,
-            );
-            if let Some(element) = state.element() {
-                focus_soon_told(element, Select::None, focused_in);
-            }
-        }
-    };
-    let pointermove = {
-        let state = Rc::clone(&state);
-        move |event: PointerEvent| {
-            if state.pressing.get() == Pressing::Up {
-                return;
-            }
-            if !event.held_buttons().contains(MouseButton::Primary) {
-                state.pressing.set(Pressing::Up);
-                return;
-            }
-            report(
-                &state,
-                host,
-                on_pointer,
-                &event,
-                PointerPhase::Drag,
-                last_clicks(&state),
-            );
-        }
-    };
-    let pointerup = {
-        let state = Rc::clone(&state);
-        move |event: PointerEvent| {
-            if state.pressing.replace(Pressing::Up) == Pressing::Down {
-                report(
-                    &state,
-                    host,
-                    on_pointer,
-                    &event,
-                    PointerPhase::Release,
-                    last_clicks(&state),
-                );
-            }
-        }
-    };
-    let blurred = {
-        let state = Rc::clone(&state);
-        move |_: FocusEvent| focused_out(&state, host, on_input, on_focus)
-    };
-
+    let (keys, pressing, moving, releasing, blurred) =
+        (ctx.clone(), ctx.clone(), ctx.clone(), ctx.clone(), ctx);
+    let class = class_list("ds-edit", extra_class.as_ref());
+    let data = attributes(&data);
     rsx! {
         div {
-            class: "ds-edit",
+            class,
             id,
             role: "textbox",
             "aria-multiline": "true",
             "aria-label": label,
             tabindex: "0",
             onmounted: mounted,
-            onkeydown: keydown,
-            onpointerdown: pointerdown,
-            onpointermove: pointermove,
-            onpointerup: pointerup,
+            onkeydown: move |event: KeyboardEvent| key_down(&keys, &event),
+            onpointerdown: move |event: PointerEvent| press(&pressing, &event, capture_sink, told),
+            onpointermove: move |event: PointerEvent| moved(&moving, &event),
+            onpointerup: move |event: PointerEvent| released(&releasing, &event),
             onclick: move |event: MouseEvent| event.prevent_default(),
-            onfocus: move |_: FocusEvent| focused_in.call(()),
-            onblur: blurred,
+            onfocus: move |_: FocusEvent| told.call(()),
+            onblur: move |_: FocusEvent| focused_out(&blurred),
+            // The app's own `data-*`, last: a spread follows the named attributes.
+            ..data,
             {children}
         }
-    }
-}
-
-/// A key on the surface: nothing while the IME composes (it owns the keys), else end a cleared
-/// composition, then hand over what the key means.
-fn key_down(
-    state: &SurfaceState,
-    host: Option<HostEdit>,
-    on_input: EventHandler<EditInput>,
-    event: &KeyboardEvent,
-) {
-    if state.composing.get() == Composing::Active {
-        return;
-    }
-    let (idle, ended) = settle(state.composing.get());
-    state.composing.set(idle);
-    ended.into_iter().for_each(|input| on_input.call(input));
-    let input = match classify(&event.key(), event.modifiers()) {
-        KeyAction::Text(text) => EditInput::Text(text),
-        KeyAction::Key(key) => EditInput::Key(key),
-        KeyAction::Cut => EditInput::Cut,
-        KeyAction::Copy => EditInput::Copy,
-        KeyAction::Paste => {
-            event.prevent_default();
-            match host.and_then(|host| (host.read_clipboard_html)()) {
-                Some(pasted) => EditInput::Paste(pasted),
-                None => return,
-            }
-        }
-    };
-    on_input.call(input);
-}
-
-/// The surface lost the keyboard: end an open composition, switch the IME off, tell the app.
-fn focused_out(
-    state: &SurfaceState,
-    host: Option<HostEdit>,
-    on_input: EventHandler<EditInput>,
-    on_focus: Option<EventHandler<EditFocus>>,
-) {
-    let (idle, ended) = settle(state.composing.get());
-    state.composing.set(idle);
-    ended.into_iter().for_each(|input| on_input.call(input));
-    if let (Some(host), Some(element)) = (host, state.element()) {
-        write_soon(host, element, |host, element| {
-            (host.set_ime)(element, ImeSwitch::Off)
-        });
-    }
-    if state.focus.replace(EditFocus::Out) == EditFocus::In
-        && let Some(told) = on_focus
-    {
-        told.call(EditFocus::Out);
-    }
-}
-
-/// Switch the IME on for the surface and put its candidate window at `area`, when the app gave
-/// one.
-fn ime_on(host: HostEdit, element: Rc<MountedData>, area: Option<Rect>) {
-    write_soon(host, element, move |host, element| {
-        match (host.set_ime)(element, ImeSwitch::On) {
-            Probe::Found(()) => match area {
-                Some(area) => (host.set_ime_cursor_area)(element, area),
-                None => Probe::Found(()),
-            },
-            other => other,
-        }
-    });
-}
-
-/// Register the surface for IME events once the document is free.
-fn listen_soon(
-    host: HostEdit,
-    element: Rc<MountedData>,
-    heard: EventHandler<ImeEvent>,
-    state: Rc<SurfaceState>,
-) {
-    spawn(async move {
-        for _ in 0..BUSY_ATTEMPTS {
-            match (host.listen)(&element, heard) {
-                Probe::Busy => sleep(FRAME_SLACK).await,
-                Probe::Found(listener) => {
-                    if let Some(stale) = state.listener.replace(Some(listener)) {
-                        (host.forget)(stale);
-                    }
-                    return;
-                }
-                Probe::Unknown => return,
-            }
-        }
-    });
-}
-
-/// Tell the app about a pointer event, with the text position the host finds under it.
-fn report(
-    state: &SurfaceState,
-    host: Option<HostEdit>,
-    on_pointer: Option<EventHandler<EditPointer>>,
-    event: &PointerEvent,
-    phase: PointerPhase,
-    clicks: Clicks,
-) {
-    let Some(on_pointer) = on_pointer else {
-        return;
-    };
-    let at = point_of(event);
-    let position = match (host, state.element()) {
-        (Some(host), Some(element)) => (host.hit_test)(&element, at).found(),
-        _ => None,
-    };
-    let extend = if event.modifiers().contains(Modifiers::SHIFT) {
-        Extend::FromAnchor
-    } else {
-        Extend::Fresh
-    };
-    on_pointer.call(EditPointer {
-        phase,
-        at,
-        position,
-        extend,
-        clicks,
-    });
-}
-
-fn last_clicks(state: &SurfaceState) -> Clicks {
-    state.last_clicks()
-}
-
-fn point_of(event: &PointerEvent) -> Point {
-    let at = event.client_coordinates();
-    Point {
-        x: Px(at.x as f32),
-        y: Px(at.y as f32),
     }
 }

@@ -25,10 +25,21 @@ pub(crate) enum Pressing {
     Down,
 }
 
+/// Whether the host routes the pointer to the surface (a press captured it, until release).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub(crate) enum Capture {
+    /// The surface's own pointer events serve.
+    #[default]
+    Free,
+    /// The host's capture carries moves and the release.
+    Held,
+}
+
 /// The surface's memory.
 pub(crate) struct SurfaceState {
     pub(crate) composing: Cell<Composing>,
     pub(crate) pressing: Cell<Pressing>,
+    pub(crate) capture: Cell<Capture>,
     last_press: Cell<Option<LastPress>>,
     pub(crate) focus: Cell<EditFocus>,
     pub(crate) element: RefCell<Option<Rc<MountedData>>>,
@@ -42,6 +53,7 @@ impl Default for SurfaceState {
         SurfaceState {
             composing: Cell::new(Composing::Idle),
             pressing: Cell::new(Pressing::Up),
+            capture: Cell::new(Capture::Free),
             last_press: Cell::new(None),
             focus: Cell::new(EditFocus::Out),
             element: RefCell::new(None),
@@ -58,6 +70,7 @@ impl SurfaceState {
         let clicks = clicks_after(self.last_press.get(), at, when);
         self.last_press.set(Some(LastPress { at, when, clicks }));
         self.pressing.set(Pressing::Down);
+        self.capture.set(Capture::Free);
         clicks
     }
 

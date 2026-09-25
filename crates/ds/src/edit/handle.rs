@@ -16,10 +16,22 @@ use std::rc::Rc;
 #[derive(Debug, Clone, Copy)]
 pub struct EditHandle {
     element: Signal<Option<Rc<MountedData>>>,
+    /// The surface's own focus and blur, set as it mounts: a programmatic focus does what a
+    /// press does.
+    hooks: Signal<Option<SurfaceHooks>>,
     /// The host, read once where the handle is made, so a read needs no scope of its own.
     host: Option<HostEdit>,
     /// The host's rect read, for [`EditHandle::bounds`].
     measure: Option<HostMeasure>,
+}
+
+/// What the surface does to take or give up the keyboard: the same as a press or a blur.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SurfaceHooks {
+    /// Focus the surface, then tell it (`on_focus` In, the IME on, the IME's target).
+    pub(crate) focus: EventHandler<()>,
+    /// Take the keyboard away, then tell it (`on_focus` Out, the IME off).
+    pub(crate) blur: EventHandler<()>,
 }
 
 /// The same handle is the same surface.
@@ -33,6 +45,7 @@ impl PartialEq for EditHandle {
 pub fn use_edit_handle() -> EditHandle {
     EditHandle {
         element: use_signal(|| None),
+        hooks: use_signal(|| None),
         host: use_hook(try_consume_context::<HostEdit>),
         measure: use_hook(try_consume_context::<HostMeasure>),
     }
@@ -40,9 +53,11 @@ pub fn use_edit_handle() -> EditHandle {
 
 impl EditHandle {
     /// The surface's element, once mounted; the surface sets it.
-    pub(crate) fn set(&self, element: Rc<MountedData>) {
+    pub(crate) fn set(&self, element: Rc<MountedData>, hooks: SurfaceHooks) {
         let mut slot = self.element;
         slot.set(Some(element));
+        let mut surface = self.hooks;
+        surface.set(Some(hooks));
     }
 
     /// The text position under `at`.
@@ -50,7 +65,8 @@ impl EditHandle {
         self.with(|host, element| (host.hit_test)(element, at))
     }
 
-    /// The caret's box at `position`: zero width, its line's height.
+    /// The caret's box at `position`: `--caret-w` wide from the insertion point, its line's
+    /// height.
     pub fn caret_rect(&self, position: &TextPosition) -> Probe<Rect> {
         self.with(|host, element| (host.caret_rect)(element, position))
     }
@@ -81,10 +97,26 @@ impl EditHandle {
         }
     }
 
-    /// Give the surface the keyboard, a frame later if the document is busy.
+    /// Give the surface the keyboard, a frame later if the document is busy, exactly as a press
+    /// does: `on_focus` hears [`EditFocus::In`](crate::EditFocus), the IME is switched on and
+    /// the surface becomes its target.
     pub fn focus(&self) {
-        if let Some(element) = self.element.peek().clone() {
-            focus_soon(element);
+        match self.hooks.try_peek().ok().and_then(|hooks| *hooks) {
+            Some(hooks) => hooks.focus.call(()),
+            None => {
+                if let Some(element) = self.element.try_peek().ok().and_then(|e| e.clone()) {
+                    focus_soon(element);
+                }
+            }
+        }
+    }
+
+    /// Take the keyboard away from the surface: `on_focus` hears
+    /// [`EditFocus::Out`](crate::EditFocus), an open composition ends and the IME is switched
+    /// off, as at a real blur.
+    pub fn blur(&self) {
+        if let Some(hooks) = self.hooks.try_peek().ok().and_then(|hooks| *hooks) {
+            hooks.blur.call(());
         }
     }
 
