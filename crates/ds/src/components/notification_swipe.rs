@@ -28,9 +28,30 @@ pub enum Swipe {
     Dismiss(EventHandler<()>),
 }
 
-/// Marks a card as carried by a `BannerStack` row, whose own exit flies it out.
+/// Marks a card as carried by a `BannerStack` row, whose own exit flies it out; the card marks
+/// the row's flight `Swipe` when it goes, so the row leaves along the swipe rather than by the
+/// stack's entry edge.
+#[derive(Clone, Copy, PartialEq)]
+pub(crate) struct Carried(pub(crate) Signal<Flight>);
+
+/// Which way a leaving `BannerStack` row flies out.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Carried;
+pub(crate) enum Flight {
+    /// Back past the edge it entered by (the caller dropped it: a timeout, a close).
+    Edge,
+    /// To the right, the way its card was swiped.
+    Swipe,
+}
+
+impl Flight {
+    /// `data-flight`, written only for a swipe: an edge flight reads the stack's own vector.
+    pub(crate) fn slug(self) -> Option<&'static str> {
+        match self {
+            Flight::Edge => None,
+            Flight::Swipe => Some("swipe"),
+        }
+    }
+}
 
 /// Pixels per line of a line-based wheel delta: what Blitz scrolls a line by.
 const LINE_PX: f64 = 20.0;
@@ -61,7 +82,10 @@ pub(crate) fn use_card_swipe(swipe: &Swipe, metrics: SwipeMetrics) -> CardSwipe 
     let on_dismiss = EventHandler::new(move |()| {
         let Some(heard) = heard else { return };
         match carried {
-            Some(Carried) => heard.call(()),
+            Some(Carried(mut flight)) => {
+                flight.set(Flight::Swipe);
+                heard.call(());
+            }
             None => flight.start(EventHandler::new(move |()| heard.call(()))),
         }
     });

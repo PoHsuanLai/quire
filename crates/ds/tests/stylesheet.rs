@@ -220,3 +220,42 @@ fn the_grain_is_the_prototypes_tile_as_alpha_noise() {
         "the stylesheet does not paint the grain"
     );
 }
+
+/// The declarations of the first rule whose selector is exactly `selector`.
+fn rule_body(css: &str, selector: &str) -> Option<String> {
+    css.split('}')
+        .filter_map(|rule| rule.split_once('{'))
+        .find(|(head, _)| head.trim() == selector)
+        .map(|(_, body)| body.to_owned())
+}
+
+/// `banner-in` and `banner-out` read `--banner-dx`/`--banner-dy`, so every entry edge (and the
+/// swiped row, which leaves along the swipe) must set both, or a banner would inherit the other
+/// axis from an enclosing stack or fall back to the right edge (design/05 section 12 item 7).
+#[test]
+fn every_banner_entry_edge_sets_both_axes_of_its_vector() {
+    let css = strip_comments(stylesheet());
+    for selector in [
+        ".ds-banner-stack[*|data-entry=right]",
+        ".ds-banner-stack[*|data-entry=below]",
+        ".ds-banner[*|data-flight=swipe]",
+    ] {
+        let body = rule_body(&css, selector).unwrap_or_else(|| panic!("no rule for {selector}"));
+        let declared = properties(&body);
+        for axis in ["--banner-dx", "--banner-dy"] {
+            assert!(
+                declared.iter().any(|name| name == axis),
+                "{selector} does not set {axis}: {body}"
+            );
+        }
+    }
+    for keyframes in ["@keyframes banner-in{", "@keyframes banner-out{"] {
+        let at = css
+            .find(keyframes)
+            .unwrap_or_else(|| panic!("no {keyframes}"));
+        let block = css[at..].split("} }").next().unwrap_or_default();
+        for axis in ["var(--banner-dx", "var(--banner-dy"] {
+            assert!(block.contains(axis), "{keyframes} does not read {axis}");
+        }
+    }
+}

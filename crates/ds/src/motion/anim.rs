@@ -17,8 +17,8 @@
 //! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair (sill FINDINGS Q75):
 //! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
 //! step, plus `SheetOut`, the sheet's exit (sill FINDINGS Q90), plus `BannerOut`, a
-//! notification banner's slide out to the right (sill Q121, Q122), and `BannerIn`, its slide in,
-//! plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123).
+//! notification banner's slide out by its entry edge (sill Q121, Q122), and `BannerIn`, its
+//! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -162,11 +162,13 @@ pub enum Anim {
     /// of shrink, over `--t-move --e-exit` (design/05 section 10: exits accelerate), the way it
     /// came in by `peek-in` reversed and quieter (sill FINDINGS Q90).
     SheetOut,
-    /// `banner-out`: a notification banner slides out to the right from wherever a swipe left
-    /// it (`--swipe-dx`) and fades, over `--t-move --e-exit`, the exit design/05 section 10
+    /// `banner-out`: a notification banner slides out by its stack's entry edge (to the right
+    /// by default, `--banner-dx`/`--banner-dy`) from wherever a swipe left it (`--swipe-dx`)
+    /// and fades, over `--t-move --e-exit`, the exit design/05 section 10
     /// gives shell chrome; the rows below it then heal (sill Q121, Q122).
     BannerOut,
-    /// `banner-in`: a notification banner slides in from past the right edge to its place,
+    /// `banner-in`: a notification banner slides in from its stack's entry edge (past the right
+    /// edge by default, or from below; `--banner-dx`/`--banner-dy`) to its place,
     /// over `--t-move --e-spring` (sill Q121; design/13 section 13.3.6's entrance, at the
     /// stack's `--t-move` so a banner that arrives as another leaves moves with it).
     BannerIn,

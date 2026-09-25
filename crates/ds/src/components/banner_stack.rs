@@ -1,17 +1,22 @@
 //! BannerStack: the notification banners on screen, newest first (sill Q121; design/20 section
 //! 1.6, design/13 section 13.3.6). The caller lists the banners it shows; the stack plays each
-//! arrival in from the right (`Anim::BannerIn`, `--t-move --e-spring`), and each banner the
-//! caller stops listing out to the right (`Anim::BannerOut`, `--t-move --e-exit`), keeping it in
-//! the tree until its exit settles; the banners after it then heal into its place, by the height
-//! it measured. `on_hidden` hears each banner's key once its exit has settled, so a host whose
-//! list is empty then can unmap the surface. The hold timer, the stack's cap and grouping are
-//! the caller's.
+//! arrival in from its `entry` edge (`Anim::BannerIn`, `--t-move --e-spring`), and each banner
+//! the caller stops listing back out past it (`Anim::BannerOut`, `--t-move --e-exit`), keeping
+//! it in the tree until its exit settles; the banners after it then heal into its place, by
+//! the height it measured. `on_hidden` hears each banner's key once its exit has settled, so a
+//! host whose list is empty then can unmap the surface. The hold timer, the stack's cap and
+//! grouping are the caller's.
+//!
+//! `entry` is `notifications.banner_entry_direction` (design/05 section 12 item 7): from the
+//! right by default, or rising from below. Both play the one `banner-in`/`banner-out` pair,
+//! which translates by `--banner-dx`/`--banner-dy`; the stack's `data-entry` sets them, so the
+//! edge is a setting and not a second set of keyframes (and of `Anim` variants to settle).
 //!
 //! A card swiped away inside the stack holds where the finger left it and reports at once; the
-//! caller's removal makes its row slide out from there (`NotificationCard`'s swipe).
+//! caller's removal makes its row slide out from there, to the right whatever the entry edge,
+//! since it leaves along the swipe (`NotificationCard`'s swipe, the row's `data-flight`).
 
 use crate::components::banner_row::BannerRow;
-use crate::components::notification_swipe::Carried;
 use crate::geometry::Px;
 use crate::motion::presence::Exit;
 use crate::motion::roster::RowPitch;
@@ -62,19 +67,40 @@ impl BannerPosition {
     }
 }
 
+/// Which edge a banner enters from and leaves by (`notifications.banner_entry_direction`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum BannerEntry {
+    /// From past the surface's right edge, the edge the stack stands at.
+    #[default]
+    FromRight,
+    /// Rising from below its place, and sinking back down as it fades out.
+    FromBelow,
+}
+
+impl BannerEntry {
+    /// The `data-entry` word, which picks the `--banner-dx`/`--banner-dy` the keyframes read.
+    pub fn slug(self) -> &'static str {
+        match self {
+            BannerEntry::FromRight => "right",
+            BannerEntry::FromBelow => "below",
+        }
+    }
+}
+
 /// The pitch a banner that measured nothing heals by: the least banner and the gap.
 const FALLBACK_PITCH: RowPitch = RowPitch(Px(64.0 + 8.0));
 
 /// The banners, newest first. `gap` overrides `--notifications-stack-gap` (the
-/// `notifications.stack_gap_px` a `NotificationMetrics` around the stack writes).
+/// `notifications.stack_gap_px` a `NotificationMetrics` around the stack writes); `entry` is the
+/// edge banners come in from.
 #[component]
 pub fn BannerStack(
     banners: Vec<Banner>,
     #[props(default)] position: BannerPosition,
+    #[props(default)] entry: BannerEntry,
     #[props(default)] gap: Option<Px>,
     #[props(default)] on_hidden: Option<EventHandler<BannerKey>>,
 ) -> Element {
-    use_context_provider(|| Carried);
     let pitches = use_pitches();
     let keys: Vec<BannerKey> = banners.iter().map(|banner| banner.key).collect();
     let cards = use_cards(&banners);
@@ -97,6 +123,7 @@ pub fn BannerStack(
         div {
             class: "ds-banner-stack",
             "data-position": position.slug(),
+            "data-entry": entry.slug(),
             role: "log",
             "aria-label": "Notifications",
             style,

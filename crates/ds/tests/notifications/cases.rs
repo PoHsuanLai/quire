@@ -2,9 +2,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    AppMark, Appearance, Banner, BannerKey, BannerPosition, BannerStack, CardAction, Ds, Expanded,
-    GroupCount, GroupHeader, Icon, IconSource, Inject, Layers, Material, NotificationCard, Panel,
-    PanelScrim, Px, Rich, RichRun, RichText, RootExtent, Run, RunTone, ScrimStrength, Shown, Theme,
+    AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerPosition, BannerStack, CardAction,
+    Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Layers, Material,
+    NotificationCard, Panel, PanelScrim, Px, Rich, RichRun, RichText, RootExtent, Run, RunTone,
+    ScrimStrength, Shown, Theme,
 };
 
 /// A specimen: its golden name and how it is made.
@@ -21,6 +22,7 @@ pub const SPECIMENS: &[Specimen] = &[
     ("card-popover-root", card_popover_root),
     ("stack-top-right", stack_top_right),
     ("stack-bottom-right-dark", stack_bottom_right_dark),
+    ("stack-entry-below", stack_entry_below),
     ("center-light", center_light),
     ("center-dark-scrim", center_dark_scrim),
 ];
@@ -147,8 +149,8 @@ pub fn card_popover_root() -> Element {
     }
 }
 
-/// Two banners in a stack at `position` in `theme` (Q121).
-fn stack(theme: Theme, position: BannerPosition) -> Element {
+/// Two banners in a stack at `position` in `theme`, entering from `entry` (Q121).
+fn stack(theme: Theme, position: BannerPosition, entry: BannerEntry) -> Element {
     let banners = [(2, "Grace Hopper", "9:41"), (1, "Ada Lovelace", "now")]
         .into_iter()
         .map(|(n, who, age)| Banner {
@@ -158,17 +160,34 @@ fn stack(theme: Theme, position: BannerPosition) -> Element {
             },
         })
         .collect::<Vec<_>>();
-    toast(theme, rsx! { BannerStack { banners, position } })
+    toast(theme, rsx! { BannerStack { banners, position, entry } })
 }
 
 /// Top right, light (Q121).
 pub fn stack_top_right() -> Element {
-    stack(Theme::Light, BannerPosition::TopRight)
+    stack(
+        Theme::Light,
+        BannerPosition::TopRight,
+        BannerEntry::FromRight,
+    )
 }
 
 /// Bottom right, dark (Q121).
 pub fn stack_bottom_right_dark() -> Element {
-    stack(Theme::Dark, BannerPosition::BottomRight)
+    stack(
+        Theme::Dark,
+        BannerPosition::BottomRight,
+        BannerEntry::FromRight,
+    )
+}
+
+/// Top right, light, rising from below (`notifications.banner_entry_direction`).
+pub fn stack_entry_below() -> Element {
+    stack(
+        Theme::Light,
+        BannerPosition::TopRight,
+        BannerEntry::FromBelow,
+    )
 }
 
 /// The center in `theme`: a group header over two cards, in a Popover root (Q123).

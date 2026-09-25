@@ -8,8 +8,12 @@
 //! row's `data-presence=entering`: Blitz keeps the last animated value when an animation is
 //! taken off an element, so a presence that turned `present` before a frame had been resolved
 //! past the entrance's end (a loaded machine, a snapshot's clock) froze the row mid-slide.
+//!
+//! The row hands its card a `Carried` holding its `Flight`: a card swiped away marks it, and the
+//! row writes `data-flight=swipe`, which points its exit right whatever the stack's entry edge.
 
 use crate::components::banner_stack::{BannerKey, BannerPosition};
+use crate::components::notification_swipe::{Carried, Flight};
 use crate::geometry::Px;
 use crate::geometry::measure::client_rect;
 use crate::motion::presence::Presence;
@@ -32,6 +36,8 @@ pub(crate) fn BannerRow(
     let mut element = use_signal(|| None::<Rc<MountedData>>);
     let mut leaving_seen = use_hook(|| CopyValue::new(Seen::No));
     let scope = use_hook(current_scope_id);
+    let flight = use_signal(|| Flight::Edge);
+    use_context_provider(|| Carried(flight));
     // A task of the row's own scope: the read also runs from an effect, which has none.
     let measure = move || {
         if let Some(mounted) = element.peek().clone() {
@@ -53,6 +59,7 @@ pub(crate) fn BannerRow(
             "data-banner": "{banner.0}",
             "data-presence": presence.slug(),
             "data-exit": exit_slug(presence),
+            "data-flight": flight().slug(),
             style: heal_style(presence, position),
             onmounted: move |event| {
                 element.set(Some(event.data()));
