@@ -425,6 +425,7 @@ impl Anim {
             Anim::OsdIn => own::OSD_IN,
             Anim::OsdOut => own::OSD_OUT,
             Anim::LevelTick => own::LEVEL_TICK,
+            Anim::SheetOut => own::SHEET_OUT,
         }
     }
 }

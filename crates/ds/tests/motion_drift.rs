@@ -257,6 +257,9 @@ fn the_settle_table() {
         (Anim::OsdOut, MotionLevel::Calm, 284),
         // The level control's step mark, at --t-tap.
         (Anim::LevelTick, MotionLevel::Standard, 124),
+        // sill Q90: the sheet's exit at --t-move, which only Reduced shortens.
+        (Anim::SheetOut, MotionLevel::Standard, 284),
+        (Anim::SheetOut, MotionLevel::Calm, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

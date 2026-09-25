@@ -30,9 +30,12 @@
 //! A client-decorated window passes `window: WindowFrame::Titlebar { .. }`: the root stamps
 //! `data-window-frame` and draws the titlebar, its children in `div.ds-window-body`, and the
 //! resize edges (`components/window_frame.rs`). The default draws nothing more.
+//! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
+//! positioned content (a centred sheet) is otherwise 0 px tall (sill FINDINGS Q94).
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
+use super::extent::RootExtent;
 use super::scale::use_root_scale;
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
@@ -78,6 +81,7 @@ pub fn Ds(
     #[props(default)] stack: Option<MaterialStack>,
     #[props(default)] scale: Option<Scale>,
     #[props(default)] window: WindowFrame,
+    #[props(default)] extent: RootExtent,
     children: Element,
 ) -> Element {
     let scale = use_root_scale(scale);
@@ -131,6 +135,7 @@ pub fn Ds(
             "data-ground": ground.attribute(),
             "data-corner": radius.and_then(Corner::attribute),
             "data-window-frame": framing,
+            "data-extent": extent.attribute(),
             style,
             onmounted: move |event: MountedEvent| element.set(Some(event.data())),
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.

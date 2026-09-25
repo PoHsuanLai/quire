@@ -12,3 +12,12 @@
 /* An inline scrim's own layer (mailo gaps 6, `layer: Some(ZLayer)`) is written on the element as
    `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
    below its floating surfaces. With none it stays at z-index auto, as above. */
+
+/* Modal (sheet and modal parts): `--scrim-modal`, .40 light and .55 dark, behind a dialog that
+   asks for a decision; design/03 section 17. */
+.ds-scrim[*|data-strength=modal]{ background:var(--scrim-modal); }
+
+/* Leaving with its sheet (sill Q90): `menu-out`, the fade a closing menu plays, at `--t-quick
+   --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
+   pointer while it goes. */
+.ds-scrim[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }

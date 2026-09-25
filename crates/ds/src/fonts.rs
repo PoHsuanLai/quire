@@ -8,6 +8,10 @@
 //! The files are subset TTFs (latin and latin-ext, Google Fonts' own split), made from mailo's
 //! WOFF2 copies by `scripts/subset-fonts.sh`, because fontique reads sfnt and not WOFF2
 //! (FINDINGS F14). The script also names every face's family the way `--font-*` asks for it.
+//! Space Mono's latin files are the exception: they are subset from the Space Mono 1.003 release
+//! with the latin file's own code points plus U+2190-2193, because Google's latin range keeps
+//! `↑` and `↓` but drops `←` and `→`, and a Small key cap's fallback arrows read as dashes
+//! (FINDINGS "Sheet and modal parts", sill Q95). Every other glyph is the same outline.
 //! Licences are in `assets/fonts/OFL-*.txt`.
 
 use crate::tokens::Family;

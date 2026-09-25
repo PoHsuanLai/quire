@@ -109,5 +109,7 @@
 .g-level-sheet{display:flex;flex-direction:column;padding:var(--s-6) var(--s-16)}
 .g-level-label{width:150px}
 /* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
+.g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
+.g-modal-stage{height:300px}
 .g-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
 .g-cc-body{padding:var(--s-12)}
