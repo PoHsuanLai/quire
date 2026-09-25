@@ -88,6 +88,11 @@ impl Candidates {
             .find(|mark| mark.takes_focus(doc))
             .map(Mark::node)
     }
+
+    /// These candidates, then `more`.
+    pub(crate) fn then(&self, more: &Candidates) -> Candidates {
+        Candidates(self.0.iter().chain(more.0.iter()).cloned().collect())
+    }
 }
 
 /// Candidates as a mounted handle, so `ds::HostClickFocus::restore` receives the whole run the

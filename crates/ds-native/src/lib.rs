@@ -23,6 +23,7 @@ mod edit_window;
 pub mod error;
 pub mod focus;
 mod focus_chain;
+mod focus_keep;
 pub mod fonts;
 mod frame_anchor;
 mod frame_book;
