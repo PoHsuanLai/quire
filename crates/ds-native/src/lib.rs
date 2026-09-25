@@ -50,6 +50,8 @@ mod net_policy;
 mod node_ref;
 mod origin;
 mod pdf;
+#[cfg(feature = "print")]
+mod print;
 mod route;
 mod runtime;
 mod scheme;
@@ -80,6 +82,8 @@ pub use launch::{AppConfig, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use origin::{FrameId, RequestOrigin};
 pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
+#[cfg(feature = "print")]
+pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use snap::snap_to_device;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
 pub use window::{Decorations, WinitWindow};
