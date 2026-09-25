@@ -116,12 +116,19 @@ pub fn token_violations(css: &str) -> Vec<String> {
         "@keyframes",
         ":root",
         "text-overflow",
-        "filter",
         "color-mix",
     ] {
         if css.contains(banned) {
             found.push(format!("contains {banned}"));
         }
+    }
+    // The `filter` and `backdrop-filter` properties, not a class that names a filter
+    // (`.ds-menu-filter`, mailo gaps 5).
+    if css
+        .match_indices("filter")
+        .any(|(at, word)| css[at + word.len()..].trim_start().starts_with(':'))
+    {
+        found.push("contains a filter property".to_string());
     }
     for (at, _) in css.match_indices('#') {
         found.push(format!(
