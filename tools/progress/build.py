@@ -17,7 +17,7 @@ from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "out" / "progress.html"
-MAX_W = 1400
+MAX_W = 1100
 
 
 def embed(path: str, upscale: int = 1) -> tuple[str, int, int]:
@@ -34,7 +34,7 @@ def embed(path: str, upscale: int = 1) -> tuple[str, int, int]:
         img.save(buf, format="PNG", optimize=True)
         mime = "image/png"
     else:
-        img.convert("RGB").save(buf, format="JPEG", quality=82, optimize=True)
+        img.convert("RGB").save(buf, format="JPEG", quality=74, optimize=True)
         mime = "image/jpeg"
     data = base64.b64encode(buf.getvalue()).decode("ascii")
     return f"data:{mime};base64,{data}", img.width, img.height
