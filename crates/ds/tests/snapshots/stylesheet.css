@@ -14,6 +14,9 @@ html,body{margin:0;padding:0;background:transparent}
 :where(.ds) h4,:where(.ds) h5{font-family:var(--font-display);font-weight:700;margin:0}
 :where(.ds) p{margin:0}
 :where(.ds) button,:where(.ds) input,:where(.ds) textarea,:where(.ds) select{font:inherit;color:inherit}
+/* An overlay root (`RootExtent::Viewport`, sill Q94): at least the viewport, since a root of
+   positioned content lays out nothing and Taffy places a fixed box against its parent. */
+.ds[*|data-extent=viewport]{min-height:100vh;min-width:100vw}
 /* The focus ring (`S:55`) on keyboard focus only. Blitz never matches the visible-focus pseudo
    class, so ds-native stamps the input modality on the root and the ring keys on it (spike
    S12). */

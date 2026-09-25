@@ -26,9 +26,13 @@
 //! The root also writes the pixel tokens' inputs for its device scale (`scale`, else the host's
 //! `HostScale`, else 1x; `tokens/pixel.rs`), so every hairline is whole device pixels at 1.25,
 //! 1.5 or 1.75 (design/01-LAYOUT.md section 2.1). At 1x it writes nothing.
+//!
+//! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
+//! positioned content (a centred sheet) is otherwise 0 px tall (sill FINDINGS Q94).
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
+use super::extent::RootExtent;
 use super::scale::use_root_scale;
 use crate::appearance::{Appearance, SystemPrefs, resolve};
 use crate::components::toast::ToastHost;
@@ -72,6 +76,7 @@ pub fn Ds(
     #[props(default)] radius: Option<Corner>,
     #[props(default)] stack: Option<MaterialStack>,
     #[props(default)] scale: Option<Scale>,
+    #[props(default)] extent: RootExtent,
     children: Element,
 ) -> Element {
     let scale = use_root_scale(scale);
@@ -123,6 +128,7 @@ pub fn Ds(
             "data-frame": frame_tint.attribute(),
             "data-ground": ground.attribute(),
             "data-corner": radius.and_then(Corner::attribute),
+            "data-extent": extent.attribute(),
             style,
             onmounted: move |event: MountedEvent| element.set(Some(event.data())),
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.

@@ -70,7 +70,7 @@ pub use overlay::{
 };
 pub use root::{
     Ds, Env, FrameTint, Ground, HostModality, HostScale, Inject, InputModality, RootChrome,
-    Surface, use_env, use_scale,
+    RootExtent, Surface, use_env, use_scale,
 };
 pub use space::{
     Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
