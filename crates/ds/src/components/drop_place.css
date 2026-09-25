@@ -1,0 +1,15 @@
+/* A drop place (mailo gaps 6): the drop states SidebarItem and TreeItem share, one rule set for
+   both (design/04-COMPONENTS.md section 34, C's drop target `C:320-323`). Last in the component
+   order so each state wins over either item's hover and current rules, which have the same
+   specificity. Both items have the sidebar item's padding (--s-6 --s-8), which the Accepts
+   border takes its width out of. */
+
+/* Target: under a dragged thread and accepting it. */
+.ds-drop-place[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+/* Source: the item itself is being dragged (.35, section 34). */
+.ds-drop-place[*|data-drag=source]{ opacity:.35; }
+/* Accepts (mailo gaps 5): a place that can take the drag while the pointer is elsewhere: a dashed
+   `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes its
+   width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
+   border (not a dashed outline, which it draws solid). */
+.ds-drop-place[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }

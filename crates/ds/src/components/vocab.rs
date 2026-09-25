@@ -323,6 +323,16 @@ impl Switch {
     }
 }
 
+impl Here {
+    /// The `aria-current` word.
+    pub(crate) fn aria_current(self) -> &'static str {
+        match self {
+            Here::Current => "true",
+            Here::Elsewhere => "false",
+        }
+    }
+}
+
 impl Expanded {
     /// The `aria-expanded` word.
     pub(crate) fn aria(self) -> &'static str {
