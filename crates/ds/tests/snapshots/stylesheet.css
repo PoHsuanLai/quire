@@ -1517,6 +1517,9 @@ html,body{margin:0;padding:0;background:transparent}
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
+/* An inline scrim's own layer (mailo gaps 6, `layer: Some(ZLayer)`) is written on the element as
+   `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
+   below its floating surfaces. With none it stays at z-index auto, as above. */
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
@@ -1660,7 +1663,7 @@ html,body{margin:0;padding:0;background:transparent}
    The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
    `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
-   `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
+   `[data-drag=source]` (.35, section 34), drawn by `.ds-drop-place`. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
    not specified here. Disabled: not specified (O-1).
    The label is the flexible part: it starts at the left and takes the free space, so the count
    and the close button sit at the end and an item without them does not centre (gallery fix A:
@@ -1709,14 +1712,8 @@ html,body{margin:0;padding:0;background:transparent}
   animation:dest var(--t-float) var(--e-out) infinite alternate;
 }
 
-/* Drop target (`C:320-323`). */
-.ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
-.ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
-/* A place that can take the drag while the pointer is elsewhere (mailo gaps 5, `DropState::Accepts`):
-   a dashed `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes
-   its width out of the padding, so the label does not move as the drag starts. Blitz paints a
-   dashed border (not a dashed outline, which it draws solid). */
-.ds-sidebar-item[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
+/* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
+   (drop_place.css, mailo gaps 6). */
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
@@ -2040,6 +2037,54 @@ html,body{margin:0;padding:0;background:transparent}
   animation:hc-in var(--t-move) var(--e-spring); }
 .ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); }
+/* -- tree_item -- */
+/* TreeItem (mailo gaps 6): a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
+   (design/04-COMPONENTS.md section 19: padding --s-6 --s-8, --r-item, ui 13.5/600 --f-ink-soft,
+   --f-pill-hover under the pointer, --f-pill and the current shadow when current). The drop
+   states are `.ds-drop-place`'s (drop_place.css), shared with SidebarItem. Attribute selectors
+   carry `*|` (spike S2). The summary's own marker is removed (`list-style:none`: Blitz draws a
+   `disclosure-closed` list marker from its user-agent sheet); the chevron is a Glyph that
+   turns a quarter over --t-quick as the item opens. `:focus-within` is false on Blitz (spike
+   S12), so the trailing ⋯ shows on the row's hover, while its menu is open (`aria-expanded`),
+   and under keyboard focus. */
+
+.ds-tree-item{ display:flex; flex-direction:column; min-width:0; }
+.ds-tree-item-row{
+  display:flex; align-items:center; justify-content:flex-start; gap:var(--s-6); width:100%; box-sizing:border-box; min-width:0;
+  list-style:none; cursor:pointer; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
+  font:inherit; font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft); position:relative;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-tree-item[*|data-shape=leaf] > .ds-tree-item-row{ cursor:default; }
+.ds-tree-item-row:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+.ds-tree-item-row[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
+
+/* The chevron: 12 px, --f-ink-faint, right at rest and down when open. A leaf keeps the box. */
+.ds-tree-item-chevron{
+  flex:none; display:flex; align-items:center; justify-content:center; width:var(--s-12); height:var(--s-12); line-height:0;
+  color:var(--f-ink-faint); transition:transform var(--t-quick) var(--e-out);
+}
+.ds-tree-item-row[*|aria-expanded=true] .ds-tree-item-chevron{ transform:rotate(90deg); }
+
+/* The label takes the free space, so the count and the ⋯ sit at the end. As a button (a place
+   that selects) it is words on the row, nothing of a button's own: `display:block` because
+   Blitz's user-agent `button` centres its content (the sidebar item's gallery fix A). */
+.ds-tree-item-label{
+  display:block; flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; text-align:left;
+  border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer;
+}
+
+/* The trailing slot: hidden until the row is hovered, its menu is open or it has the keyboard.
+   It lends its height into the row's padding, so a row with a 26 px Strip button is as tall as
+   one without. */
+.ds-tree-item-trail{ flex:none; display:flex; align-items:center; line-height:0; margin:calc(-1 * var(--s-6)) 0; }
+.ds-tree-item-trail > *{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-tree-item-row:hover .ds-tree-item-trail > *,
+.ds-tree-item-trail > [*|aria-expanded=true],
+.ds[*|data-modality=keyboard] .ds-tree-item-trail > :focus{ opacity:1; }
+
+/* The children, one indent step in, the same rhythm as the sidebar's items. */
+.ds-tree-item-children{ display:flex; flex-direction:column; gap:var(--s-2); padding-left:var(--s-12); }
 /* -- workspace_pills -- */
 /* WorkspacePills (the macOS polish pass): one segmented group on the frame, not a row of
    buttons. The track is the frame's hover fill; the current workspace is the raised pressed
@@ -2053,3 +2098,19 @@ html,body{margin:0;padding:0;background:transparent}
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-ws-pill:hover{ color:var(--ink); }
 .ds-ws-pill[*|aria-current=true]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
+/* -- drop_place -- */
+/* A drop place (mailo gaps 6): the drop states SidebarItem and TreeItem share, one rule set for
+   both (design/04-COMPONENTS.md section 34, C's drop target `C:320-323`). Last in the component
+   order so each state wins over either item's hover and current rules, which have the same
+   specificity. Both items have the sidebar item's padding (--s-6 --s-8), which the Accepts
+   border takes its width out of. */
+
+/* Target: under a dragged thread and accepting it. */
+.ds-drop-place[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+/* Source: the item itself is being dragged (.35, section 34). */
+.ds-drop-place[*|data-drag=source]{ opacity:.35; }
+/* Accepts (mailo gaps 5): a place that can take the drag while the pointer is elsewhere: a dashed
+   `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes its
+   width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
+   border (not a dashed outline, which it draws solid). */
+.ds-drop-place[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
