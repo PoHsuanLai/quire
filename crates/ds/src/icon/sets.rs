@@ -43,7 +43,8 @@ impl Icon {
         Icon::Plus,
     ];
 
-    /// The shell set, in design/08-ICONS.md section 1.6's order.
+    /// The shell set, in design/08-ICONS.md section 1.6's order, then the control center's own
+    /// `Switches` (sill FINDINGS Q103).
     pub const SHELL: &[Icon] = &[
         Icon::Wifi,
         Icon::WifiLow,
@@ -93,6 +94,7 @@ impl Icon {
         Icon::Sparkles,
         Icon::Gauge,
         Icon::Brightness,
+        Icon::Switches,
     ];
 
     /// Glyphs for a consumer's actions beyond the two sets (Lucide, `geometry_actions`).
@@ -197,6 +199,7 @@ impl Icon {
         Icon::Sparkles,
         Icon::Gauge,
         Icon::Brightness,
+        Icon::Switches,
         Icon::Printer,
         Icon::FolderInput,
         Icon::Play,
