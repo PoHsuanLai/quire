@@ -1033,6 +1033,23 @@ FINDINGS "mailo gaps 5" has the reasons and the proofs.
 | `Button` | `leading` | `Option<Leading>` (`None`) | `Leading::Mark(element)` before the label, for a quire mark you build (`rsx! { ProviderMark { provider, size: MarkSize::Inline, style } }` in the From dropdown's value); `Leading::Glyph(icon)` a glyph. `span.ds-button-lead` |
 | `HoverCardPart` | `FlagText { tone, icon, text: Text }`, `HoverCardPart::flag(tone, icon, impl Into<Text>)` | new variant and constructor | A flag of either tone whose words are runs (the spoof warning's brand and domain in `Strong`). Drawn exactly as `Flag`; `Flag { text: String }` is unchanged, so its literals compile |
 
+### The mailo gaps 6 (2026-09-25)
+
+Additive: leave a prop out and the markup is what it was. One markup change: `SidebarItem`'s
+class list is `ds-sidebar-item ds-drop-place` (its drop rules moved to the shared class), which
+its goldens show; a selector of yours on `.ds-sidebar-item` still matches. `Icon` gained two
+variants (a `match` of yours over it needs the arms). FINDINGS "mailo gaps 6" has the reasons and
+the proofs.
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Icon` | `Ellipsis`, `EllipsisVertical` | new variants, in `Icon::ACTIONS` | Lucide `ellipsis` and `ellipsis-vertical` (1.47.0): a row's or a header's ⋯ on the glyph grid, in place of a typed `⋯` |
+| `Button`, `IconButton` | `data` | `Vec<DataAttr>` (empty) | Your own `data-*` on the button itself: `DataAttr::new(DataName::parse("folder")?, path)` writes `data-folder="{path}"`. `DataName::parse` takes lowercase letters, digits and `-`, starting with a letter, and refuses (`PassThroughError::Reserved`) a `ds-` name and the names quire writes or reads (`variant`, `size`, `theme`, `accent`, `motion`, `material`). Build names from constants: each distinct name is interned once for the program's life. The wrapping `span` you kept for `data-folder` goes |
+| `Button`, `IconButton` | `extra_class` | `Option<ExtraClass>` (`None`) | Your own class, or a space-separated list, after quire's: `ExtraClass::parse("fold-more")?` gives `class="ds-icon-button fold-more"`. A `ds-` class is refused when it is built; style yours in your own sheet (the markup lint reads your sheet for it, as for any class of yours) |
+| `Scrim` | `layer` | `Option<ZLayer>` (`None`) | An inline scrim's own stacking layer, written `z-index: var(--z-…)` on it. Without one it sets no z-index, so a positioned row your pane draws after it (a row that is `position:relative` for its strip) paints over it. **Pick** a layer above your rows (`ZLayer::Raise` over rows that set none) and below your floating surfaces (the peeked reader, a menu: give those a layer above the one you picked). A floating scrim ignores it (it is on `--z-scrim`) |
+| `TreeItem` | new component | | A place in a sidebar tree: `details.ds-tree-item > summary.ds-tree-item-row` in the sidebar item's chrome, children in `div.ds-tree-item-children[role=group]` one `--s-12` step in. Props: `label: impl Into<Text>`, `open: Disclosure::{Open, Closed}` (controlled), `on_toggle: EventHandler<Disclosure>` (the state a press on the row asks for; the summary's own toggle is prevented), `shape: TreeShape::{Branch, Leaf}` (a leaf is a row with no `details`, its chevron's space kept), `glyph: Option<Icon>`, `count: Option<u32>`, `here: Here`, `onselect: Option<EventHandler<Press>>` (the label becomes a button that selects without toggling), `trailing: Option<Element>` (the ⋯ `IconButton`: the slot keeps every press from the summary; `Propagation::Stop` on the button as well costs nothing), `drop: DropState`, `place: Option<PlaceId>`, and `onpointerenter`, `onpointerleave`, `onpointermove`, `onpointerup` as on `SidebarItem`. The chevron (`chevron-right`, 12) turns a quarter over `--t-quick` as it opens; the ⋯ shows on the row's hover, while its menu is open (`aria-expanded`) and under keyboard focus |
+| `SidebarItem`, `TreeItem` | `.ds-drop-place` | shared class | One rule set for `data-drop="target"`, `data-drop="accepts"` and `data-drag="source"` on either item, last in the component order so it wins over their hover and current rules |
+
 ### Native phase B (2026-09-25): the Blitz host for an app window
 
 What `ds-native` gives an app that moves its window onto `ds_native::launch` (mailo Phase B).
