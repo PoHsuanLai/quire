@@ -1335,6 +1335,29 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
+/* -- osd -- */
+/* Osd (design/20 section 1.7; sill FINDINGS Q76): the on-screen display's card inside a
+   transparent Osd root. It paints what a tinted root paints on its own box: the material's box
+   shadow, and a `.ds-frame` group of the Space gradient at the frame alpha (the solid floor
+   without blur and the inner pair over it are in the materials section). Its shape and padding
+   are a control-center module's (design/13 section 13.3.7: `--r-tile`, the grid's 12 padding);
+   its width a module spanning both columns of the 320 panel. Attribute selectors carry `*|`
+   (spike S2).
+
+   Motion. `osd-in` at `--t-quick --e-out` while entering, restarted under its other name on each
+   showing (`data-pulse`); `osd-out` at `--t-move --e-exit`, held, while leaving. Both move by
+   `--osd-dy`, which follows the anchor: from above at the top right, from below at the bottom
+   centre. Hidden, nothing is laid out. */
+
+.ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
+  width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
+.ds-osd[*|data-position=top-right]{ --osd-dy:-8px; margin:var(--osd-margin) var(--s-12) 0 auto; }
+.ds-osd[*|data-position=bottom-centre]{ --osd-dy:8px; margin:0 auto var(--osd-margin); }
+.ds-osd[*|data-shown=hidden]{ display:none; }
+.ds-osd[*|data-presence=entering]{ animation:osd-in var(--t-quick) var(--e-out); }
+.ds-osd[*|data-presence=entering][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
+.ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
