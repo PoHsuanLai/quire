@@ -6,6 +6,8 @@
 
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "control_center/panes.rs"]
+mod panes;
 #[path = "control_center/rows.rs"]
 mod rows;
 #[path = "control_center/tiles.rs"]
@@ -69,7 +71,16 @@ fn specimens() -> Vec<Rendered> {
     let rows = rows::CASES
         .into_iter()
         .map(|(case, name)| (name.to_owned(), row_markup(case)));
-    tiles.chain(rows).collect()
+    let panes = panes::CASES
+        .into_iter()
+        .map(|(shown, name)| (name.to_owned(), pane_markup(shown)));
+    tiles.chain(rows).chain(panes).collect()
+}
+
+fn pane_markup(shown: ds::Pane) -> String {
+    let mut dom = VirtualDom::new_with_props(panes::panes, panes::PaneProps { shown });
+    dom.rebuild_in_place();
+    dioxus_ssr::render(&dom)
 }
 
 fn row_markup(case: rows::RowCase) -> String {
@@ -176,4 +187,19 @@ fn a_row_writes_its_trailing_mark() {
         }
     }
     assert!(!row_markup(rows::RowCase::None).contains("data-trailing"));
+}
+
+/// A switcher mounted on a pane draws that pane alone, at rest, and moves nothing.
+#[test]
+fn a_switcher_at_rest_draws_one_pane() {
+    for (shown, name) in panes::CASES {
+        let html = pane_markup(shown);
+        assert_eq!(html.matches("class=\"ds-pane\"").count(), 1, "{name}");
+        assert!(
+            html.contains(&format!("data-pane=\"{}\"", shown.slug())),
+            "{name}"
+        );
+        assert!(html.contains("data-presence=\"present\""), "{name}");
+        assert!(!html.contains("data-moving"), "{name}");
+    }
 }

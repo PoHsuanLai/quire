@@ -106,7 +106,8 @@ html,body{margin:0;padding:0;background:transparent}
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and `pane-out-l`
+     and `pane-out-r` (sill Q80), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -289,6 +290,12 @@ html,body{margin:0;padding:0;background:transparent}
 /* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+
+/* pane-out-l, pane-out-r (quire's, sill Q80): a pane switcher's outgoing pane leaves the other
+   way from the one arriving, the mirror of `slide-l` and `slide-r` (26 px and a fade), so the
+   two read as one push. */
+@keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
+@keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -363,6 +370,8 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
 @keyframes busy--b{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+@keyframes pane-out-l--b{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
+@keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -467,6 +476,14 @@ html,body{margin:0;padding:0;background:transparent}
 .a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
 .a-busy[*|data-pulse=a]{animation:busy var(--t-ambient) var(--e-in-out) infinite;}
 .a-busy[*|data-pulse=b]{animation:busy--b var(--t-ambient) var(--e-in-out) infinite;}
+.a-pane-in-r[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-spring);}
+.a-pane-in-r[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-spring);}
+.a-pane-in-l[*|data-pulse=a]{animation:slide-l var(--t-move) var(--e-spring);}
+.a-pane-in-l[*|data-pulse=b]{animation:slide-l--b var(--t-move) var(--e-spring);}
+.a-pane-out-l[*|data-pulse=a]{animation:pane-out-l var(--t-move) var(--e-exit) forwards;}
+.a-pane-out-l[*|data-pulse=b]{animation:pane-out-l--b var(--t-move) var(--e-exit) forwards;}
+.a-pane-out-r[*|data-pulse=a]{animation:pane-out-r var(--t-move) var(--e-exit) forwards;}
+.a-pane-out-r[*|data-pulse=b]{animation:pane-out-r--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -1282,6 +1299,20 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-chevron:active{ transform:scale(var(--squish)); }
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
+/* -- pane_switcher -- */
+/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
+   (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
+   and the outgoing one leaves the other way (`pane-out-l`, `pane-out-r`) at `--t-move
+   --e-exit`, held at its last frame until it is dropped. The leaving pane is out of the flow,
+   pinned to the top, so the switcher is as tall as the pane arriving; what it overhangs is
+   clipped. */
+
+.ds-panes{ position:relative; overflow:hidden; }
+.ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
+.ds-pane[*|data-pane=detail][*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
+.ds-pane[*|data-pane=root][*|data-presence=entering]{ animation:slide-l var(--t-move) var(--e-spring); }
+.ds-pane[*|data-pane=root][*|data-presence=leaving]{ animation:pane-out-l var(--t-move) var(--e-exit) forwards; }
+.ds-pane[*|data-pane=detail][*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.

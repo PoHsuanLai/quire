@@ -47,6 +47,7 @@ pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
+pub mod pane_switcher;
 pub mod peek;
 pub mod popover;
 pub mod press;
@@ -118,6 +119,7 @@ pub use menu_pick::PickDismiss;
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
 pub use palette_shown::Retain;
+pub use pane_switcher::PaneSwitcher;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
@@ -179,6 +181,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
     ("module_tile", include_str!("module_tile.css")),
+    ("pane_switcher", include_str!("pane_switcher.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),
