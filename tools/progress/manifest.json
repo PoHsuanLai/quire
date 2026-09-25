@@ -1,8 +1,38 @@
 {
- "updated": "2026-09-26, notification parts landed; v0.1.10 waits for pdfrum 0.4.0",
+ "updated": "2026-09-26, shell M10 parts landed (calendar, widgets, screenshot thumbnail, hot corners); v0.1.10 waits for pdfrum 0.4.0",
  "archive_url": "https://claude.ai/artifact/GhMLUQjwi9FUxkJgoxrGUB",
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
+  {
+   "id": "m10-parts",
+   "date": "2026-09-26 · widgets",
+   "title": "The shell's Milestone 10 gets its calendar, widgets, screenshot thumbnail and hot corners; sill's adoption is next",
+   "status": "proven",
+   "lede": "quire cut the design parts for the shell's Milestone 10 today, on quire master and shell-host master together. MonthGrid (design/04 §39) lays a month across seven columns with weekday initials, quiets the neighbouring month's days, seats today on the accent disc, marks busy days with a dot, offers an optional ISO week column, and slides the whole grid in from whichever side the new month came from on previous/next. WidgetFrame (design/04 §40) comes in small, medium and large on a 164 px cell with a 16 px gap: a card on the Widget material over the desktop, or a flat tile inside the notification center, sized by WidgetMetrics and pulsing once when its value bumps; inside sit ClockFace, analog with separate day and night faces and an accent second hand, or digital, and LevelRing for the battery with low and critical tones and a charging bolt. ShotThumbnail (design/04 §41) is the floating screenshot card, 240 px wide and letterboxed between 2:1 and 16:10 (pillarboxed for a portrait shot), rising in with a spring and sliding out on dismiss, with hover actions, swipe-to-dismiss riding the same swipe machine as a notification, a drag threshold that hands off to the host, a drag ghost, and reduced motion handled inside the component. On the shell-host side, a drag source (SurfaceHandle::start_drag, F60) is now proven by dropping a file onto a terminal on the virtual compositor; F61 found that a keyboard-less surface cannot portably learn whether a modifier key is held, so the shell retires the modifier-key variant of its hot corners and keeps dwell and screen-edge triggers only. Hot corners themselves follow design/13 §13.3.12 (a 150 ms dwell, a 500 ms re-arm, and an action table), and the whole set follows design/22 §3.19-§3.23 for session, widgets, calendar, screenshot and hot_corners. quire's parts are proven; sill still has to adopt them.",
+   "notes": [
+    "Earlier in the day, F59 found the host never re-dispatched pointer enter/leave after a layout-driven hover change, so a banner arriving under a resting pointer stayed unhovered; the shell's real-input repro confirmed the fix, quire's own Harness got the same repair, and BannerStack learned an entry edge.",
+    "F60 and F61 together settle the drag story: F60 proves the host can originate a drag (a file dropped onto a terminal on the virtual compositor); F61 closes off the modifier-held hot corner, since a surface with no keyboard cannot portably read a held modifier key.",
+    "Design references: design/04 §39 (MonthGrid), §40 (WidgetFrame, WidgetMetrics, ClockFace, LevelRing), §41 (ShotThumbnail); design/13 §13.3.12 (hot corners: dwell, re-arm, action table); design/22 §3.19-§3.23 (session, widgets, calendar, screenshot, hot_corners)."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/calendar-light.png",
+     "caption": "MonthGrid, light and dark: weekday initials, today on the accent disc, busy-day dots, and the optional ISO week column"
+    },
+    {
+     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/widgets-light.png",
+     "caption": "WidgetFrame on the light page: the desktop's Widget-material card (Battery, World Clock, Batteries) beside the notification center's dark tile"
+    },
+    {
+     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/widgets-dark.png",
+     "caption": "the same WidgetFrame set on the dark page: the notification-center tile beside the desktop card"
+    },
+    {
+     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/thumbnail-light.png",
+     "caption": "ShotThumbnail, light and dark: the 240 px card letterboxed to 2:1, a pillarboxed portrait shot, and the compact drag ghost"
+    }
+   ]
+  },
   {
    "id": "m6-notifications",
    "date": "2026-09-26 · notifications",
