@@ -2357,3 +2357,57 @@ The notes mailo listed, and what would close each:
 - **No `app_id`.** Done (item 7).
 - **OS file drops.** blitz-shell ignores `WindowEvent::DragDropped`. That is upstream; mailo has
   no drop site.
+
+## Edit surface (2026-09-25)
+
+mailo's composer keeps its own renderer-free editor core (`editor::InputEvent { input_type, data,
+ranges, composing, html }`) and draws its own caret and selection; on Blitz it needs a surface
+that delivers input and reports geometry (mailo Phase B plan §3, option A). Branch
+`edit-surface`, blitz rev unchanged (`e99fbdbd`).
+
+### Spike: how IME reaches a component, and what layout exposes (read at the pinned rev)
+
+- **The drop.** blitz-shell converts winit `Ime` to `BlitzImeEvent` (`convert_events.rs:31-46`)
+  and hands it to the document as `UiEvent::Ime`; blitz-dom's driver targets the focused node
+  and its default action edits only a focused `input`/`textarea` (`events/ime.rs`);
+  dioxus-native-dom maps `DomEventData::Ime(_)` to `None` (`dioxus_document.rs:332`), so no
+  Dioxus handler ever sees it, and its composition converter is `unimplemented!()`.
+- **(b) works: ds-native sees the event first, no fork.** dioxus-native's application runs
+  every `use_window_event` handler *before* it passes the winit event to blitz-shell's view
+  (`dioxus_application.rs:197-199`), inside the registering scope's runtime
+  (`hooks.rs:23`). ds-native's `Host` already listens there (modality, scale); it now also
+  takes `WindowEvent::Ime`, reads the document's focused node through its `NodeHandle`, and
+  routes the event to the edit surface registered at that node or an ancestor. blitz-dom's
+  own IME handling then no-ops (the surface is not a text field). The harness owns its
+  document, so its IME driver calls the same router directly. Route (a), a dioxus-native-dom
+  patch on a fork, is not needed; route (c), a blitz `Widget`, would paint and hit-test
+  outside the DOM and lose mailo's own markup, so it was not pursued.
+- **IME has to be switched on by the surface.** blitz-dom enables IME (`ShellProvider::
+  set_ime_enabled`, `set_ime_cursor_area`) only when a text field takes the focus
+  (`node.rs:675-712`); winit delivers no `Ime` events otherwise. The surface's host seam does
+  the same for a focused surface through the document's shell provider, and disables it on
+  blur.
+- **Hit-testing is reachable.** `BaseDocument::find_text_position(x, y)` (public) answers the
+  inline root under a point and a byte offset into that root's laid-out text
+  (`inline_layout_data.text`, the parley layout's string), using the same hit test and
+  transforms as the pointer. `Node::inline_root_ancestor`, `Node::absolute_position`,
+  `final_layout` and `element_data().inline_layout_data` are public, and parley 0.11's
+  `Cursor::from_byte_index(..).geometry(..)` and `Selection::geometry(..)` give caret and
+  selection boxes in the layout's (device-scaled) coordinates. So caret and selection rects
+  for any element's inline content are computable in ds-native with no blitz change.
+- **What the layout does not give: the text node.** A glyph run's brush is the *element* whose
+  style span it is in (`TextBrush { id }`), not the text node, and the layout text is the
+  concatenation of every text node after white-space collapsing (and case transforms, list
+  markers, `br` as `\n`). ds-native aligns the DOM text nodes of an inline root to its layout
+  text character by character (collapsed whitespace and generated text are skipped), so a
+  layout offset maps to (text node, byte) and back.
+- **Clipboard HTML.** `ShellProvider` has text only. The window reads `text/html` through
+  arboard directly (`arboard::Clipboard::get().html()`, 3.6.1, already in the graph through
+  blitz-shell's `clipboard` feature); the harness keeps an HTML slot in its memory clipboard.
+- **Focus.** A click's default action on a non-field element clears the focus
+  (`events/pointer.rs:816`) and a press starts Blitz's own document text selection
+  (`pointer.rs:499`); a host focus write dispatches no `focus` event. The surface prevents the
+  press's and the click's default actions, focuses itself through `HostFocus`, and treats the
+  write's success as its focus-in; Tab still dispatches real focus events.
+
+**Chosen route: (b).** No fork, no `[patch]`, no pinned-block change for blitz.
