@@ -492,6 +492,15 @@ The client-decorated window frame (design/13 §13.3.11, design/04 "Window frame"
 | `window.tile_menu_press_ms` | `Ms` | `500` | `200..=2000` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 | `window.tile_menu_hover_ms` | `Ms` | `800` | `450..=3000`; the 450 ms hover intent plus a further hold | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 
+### 3.19 `session` (sill/settings.toml)
+
+The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock screen, §1.10 polkit prompt; sill FINDINGS "M7"): which lock screen and which polkit agent `dist/sill-session` starts. Both are a name from a fixed vocabulary or a command line, so a user can point at a program this list does not know. Page Accounts, all Advanced (§5). Idle timeouts are not sill's: cosmic-idle keeps them in COSMIC's own config.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `session.locker` | `String` | `"auto"` | `auto` (cosmic-greeter, else swaylock, else hyprlock, whichever is installed; under cosmic-session, COSMIC's own resident locker), `off`, `cosmic-greeter`, `swaylock`, `hyprlock`, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
+| `session.polkit_agent` | `String` | `"auto"` | `auto` (polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, then cosmic-osd last: running cosmic-osd only for polkit would add its own volume popup beside sill's OSD), `off`, one of those names, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-10-polkit-prompt-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
+
 ## 4. Rust shape
 
 Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module

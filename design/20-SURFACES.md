@@ -154,7 +154,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Motion | password error `shake-x` 420 ms `(.36,.07,.19,.97)` once; unlock `fade` `--t-move` `--e-exit` | S / P |
 | Behaviours | lock before sleep on logind `PrepareForSleep` (SPEC); 06 (Escape clears field) | S |
 | Keyboard | lock surfaces always receive keyboard | S |
-| Milestone | borrowed (swaylock/hyprlock) at M7; own at M11 | S |
+| Milestone | borrowed at M7 (`session.locker`, design/22 §3.19: cosmic-greeter, else swaylock, else hyprlock); own at M11 | S |
 
 ### 1.10 Polkit prompt (SPEC Tier 1)
 
@@ -166,7 +166,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Motion | `peek-in` in; wrong password `shake-x` once | P |
 | Keyboard | `Exclusive` | P |
 | Blur / input | blur `Element("panel")`; input `Whole` | P |
-| Milestone | borrowed (lxqt-policykit / polkit-gnome) at M7; own at M11 | S |
+| Milestone | borrowed at M7 (`session.polkit_agent`, design/22 §3.19: polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, else cosmic-osd); own at M11 | S |
 
 ### 1.11 App switcher (SPEC Tier 2)
 
