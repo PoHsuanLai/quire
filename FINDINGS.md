@@ -2543,3 +2543,28 @@ Two gaps sill reported after wiring `icons.style` (sill FINDINGS Q71 and Q72).
 - **Limits.** The light paper stays white at its top-left stop under any tint (retint's rule has
   no room at white, the same as a white icon); the tint shows at the deep stop and in the ink.
   A consumer that needs another lightness for tinted paper needs a design decision, not a flag.
+
+### Q71: where the app icons are
+
+- **What was wrong.** quire shipped `assets/icons/apps` and no way to find it; sill searched
+  `$SILL_ICON_ASSETS`, the XDG data dirs and a sibling checkout on its own, so each consumer
+  would have written its own order.
+- **What quire does now.** `ds_settings::icon_assets` (re-exported as `ds_settings::apps_dir` and
+  `ds_settings::app_icon_path`): `$QUIRE_ICON_ASSETS`, `$XDG_DATA_HOME/quire/icons/apps`, each
+  `$XDG_DATA_DIRS/quire/icons/apps`, then the repository's `assets/icons/apps` from
+  `CARGO_MANIFEST_DIR` (`AssetsOrigin::DevAssets`, development only). First existing directory
+  wins, whole. `app_icon_path(app, Px, IconStyle)` picks `<app>/[muted|monochrome/]<px>.png`,
+  the exact size from design/08 2.11's thirteen (`APP_ICON_PX`), else the nearest larger, else
+  the largest smaller. It lives in `ds-settings`, not `ds`: it reads the environment and the
+  disk, and `ds` stays effect-free (`check-boundary.sh`'s note); every step is a pure function
+  of an `AssetsEnv` and a probe, table-tested. `icons install [--from] [--to]` copies the set to
+  `$XDG_DATA_HOME/quire/icons/apps`; `tools/icons/tests/install.rs` runs the binary into a
+  scratch directory and finds all 195 files (5 apps x 3 styles x 13 sizes) through the lookup,
+  and checks the tool's `SHIP_PX` against `APP_ICON_PX`.
+- **What sill changes.** Drop its own search and `$SILL_ICON_ASSETS` (use `QUIRE_ICON_ASSETS`),
+  call `ds_settings::app_icon_path(app, Px(tile * scale), style)`; for Monochrome files keep
+  calling `retint` after loading. For third-party icons on a plate, pass
+  `plate_tint: PlateTint::of(style, tint)` (Q72) with the same pair it hands `retint`.
+- **Limits.** `app_icon_path` probes the disk per call; cache its answer with the decoded icon.
+  A partly installed set is not merged with a later step. `$QUIRE_ICON_ASSETS` names the apps
+  directory itself, not a data directory.
