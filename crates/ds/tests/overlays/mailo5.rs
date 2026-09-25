@@ -81,7 +81,7 @@ pub const MAILO5_CASES: &[Case] = &[
         state: "inline",
         make: || {
             rsx! {
-                div { class: "pane", style: "position:relative",
+                div { style: "position:relative",
                     p { "The list." }
                     Scrim { label: "Close peek", onclose: |_| {}, flow: Flow::Inline }
                     article { "The peeked reader." }
