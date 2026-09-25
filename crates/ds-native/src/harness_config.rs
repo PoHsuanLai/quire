@@ -1,6 +1,7 @@
 //! How a [`Harness`](crate::Harness) builds its document: the viewport, and the same providers
 //! an [`AppConfig`](crate::AppConfig) gives a window, so a test sees what the window would.
 
+use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
 use crate::net_policy::NetPolicy;
@@ -42,6 +43,13 @@ impl HarnessConfig {
     /// navigates, so the app opens the link itself or nothing happens.
     pub fn with_frame_links(mut self, links: FrameLinks) -> Self {
         self.setup.frame_links = links;
+        self
+    }
+
+    /// Where the keyboard goes after a click on nothing focusable (default
+    /// [`FocusFallback::Ancestor`]: the nearest focusable ancestor, as in a browser).
+    pub fn with_focus_fallback(mut self, fallback: FocusFallback) -> Self {
+        self.setup.focus_fallback = fallback;
         self
     }
 
