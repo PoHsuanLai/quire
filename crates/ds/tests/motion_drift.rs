@@ -249,6 +249,14 @@ fn the_settle_table() {
         (Anim::PaneInL, MotionLevel::Standard, 284),
         (Anim::PaneOutL, MotionLevel::Standard, 284),
         (Anim::PaneOutR, MotionLevel::Standard, 284),
+        // sill Q75: the OSD's entrance at --t-quick, its exit at --t-move (neither token moves
+        // with the look's level but under Reduced).
+        (Anim::OsdIn, MotionLevel::Standard, 204),
+        (Anim::OsdIn, MotionLevel::Extra, 204),
+        (Anim::OsdOut, MotionLevel::Standard, 284),
+        (Anim::OsdOut, MotionLevel::Calm, 284),
+        // The level control's step mark, at --t-tap.
+        (Anim::LevelTick, MotionLevel::Standard, 124),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

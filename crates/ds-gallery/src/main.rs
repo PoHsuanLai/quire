@@ -7,6 +7,8 @@ mod axes;
 mod data_uri;
 mod error;
 mod legibility;
+mod level_motion;
+mod level_sheet;
 mod page;
 mod pages;
 mod registry;
@@ -31,6 +33,13 @@ fn main() {
             std::process::exit(2);
         }
     };
+    if let Some(dir) = args.level_sheet {
+        if let Err(error) = level_sheet::run(&dir) {
+            eprintln!("ds-gallery: {error}");
+            std::process::exit(1);
+        }
+        return;
+    }
     match args.snapshot {
         Some(dir) => {
             if let Err(error) = snapshot::run(&dir) {

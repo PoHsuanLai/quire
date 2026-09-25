@@ -581,6 +581,18 @@ Settled for the port; the catalogue above is unchanged except where named.
   push and one timer settles both (`PaneSwitcher`, sill Q80). An exit, so it does not spring
   (principle 2).
 
+### 4.7 Added by quire (OSD parts, 2026-09-25)
+
+- `osd-in`: `from{ opacity:0; transform:translateY(var(--osd-dy)) scale(.96) } to{ opacity:1;
+  transform:none }` at `--t-quick --e-out` (design/20 §1.7's "in"), `Anim::OsdIn`: `pop-in`'s
+  entrance with no overshoot.
+- `osd-out`: `from{ opacity:1; transform:none } to{ opacity:0;
+  transform:translateY(calc(var(--osd-dy) * .5)) }` at `--t-move --e-exit`, forwards (§10's exit
+  rule), `Anim::OsdOut`.
+- `--osd-dy` is the card's signed offset for its anchor, declared by `ds::Osd` per position:
+  `-8px` at the top right (drops in from above, lifts back out), `8px` at the bottom centre
+  (rises in, drops away). Played outside the card, the fallback is the top right's.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and
