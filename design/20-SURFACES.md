@@ -101,10 +101,10 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 
 | Field | Value | St |
 | --- | --- | --- |
-| Layer / role | `Overlay`, anchor `BOTTOM`, centred, no exclusive zone | P |
+| Layer / role | `Overlay`, anchor `TOP\|RIGHT` under the bar's reserve (`osd.position = TopRight`, the default, as current macOS shows its volume and brightness panel), `osd.margin_px` from the bar's reserve; `BottomCentre` keeps the old bottom-centred placement above the dock; no exclusive zone | S (user, 2026-09-25) |
 | Material | `Osd` | S |
-| Components | `Glyph` (volume/brightness at `Bar` 22), level bar (`Slider` read-only) | P |
-| Motion | in `fade` `--t-quick` `--e-out`; level change transition `--t-quick` `--e-out`; hold 1500 ms then `fade` `--t-move` `--e-exit` | P |
+| Components | `Osd` (owns the card and its presence): `Glyph` (volume/brightness at `Bar` 22), a title line, level bar (`Slider { mode: Level }`: no thumb, not focusable, fill transition); a small panel styled like a control-center slider module (§1.5 grid metrics, `--r-tile`) | S |
+| Motion | in `Anim::OsdIn` (a short drop-and-fade from above at TopRight; a rise at BottomCentre; the direction follows the anchor) `--t-quick` `--e-out`; level change transition `--t-quick` `--e-out`; hold `osd.hold_ms` (1500) then `Anim::OsdOut` `--t-move` `--e-exit`, the host unmaps at settle | S |
 | Behaviours | 13 (UI sounds: volume pop from freedesktop sound theme) | S |
 | Keyboard / blur / input | `None`; blur `Element("osd")`; input `Empty` | P |
 | Milestone | M6 | S |
