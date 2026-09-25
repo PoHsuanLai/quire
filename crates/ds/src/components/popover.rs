@@ -11,8 +11,7 @@
 use crate::geometry::measure::client_rect;
 use crate::geometry::{Anchor, MountedRef, Placement, Point, Px, Rect, RectProbe, Size, place};
 use crate::motion::anim::Anim;
-use crate::motion::presence::Presence;
-use crate::motion::timer::{TimerPhase, use_motion_timer};
+use crate::motion::timer::use_motion_timer;
 use crate::overlay::host::{OverlayId, Overlays, use_overlays};
 use crate::overlay::stack::{Dismissal, LayerId, LayerStack};
 use crate::time::{FRAME_SLACK, sleep};
@@ -323,18 +322,6 @@ pub(crate) fn escape_closes(float: Float, event: &KeyboardEvent, onclose: EventH
         event.stop_propagation();
         event.prevent_default();
         onclose.call(());
-    }
-}
-
-/// `data-presence` for a surface that plays `anim` as it mounts: entering until `settle(anim)`,
-/// then present. Leaving surfaces are removed at once (design/04-COMPONENTS.md sections 20,
-/// 24, 25), so there is no leaving state here.
-pub(crate) fn use_entrance(anim: Anim) -> Presence {
-    let timer = use_motion_timer(anim);
-    use_hook(|| timer.start(EventHandler::new(|()| {})));
-    match timer.phase() {
-        TimerPhase::Settled => Presence::Present,
-        TimerPhase::Idle | TimerPhase::Running => Presence::Entering,
     }
 }
 

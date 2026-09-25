@@ -17,7 +17,8 @@ use ds::lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet
 /// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the
 /// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
 /// Space dot's stops (`SpaceDot` and the Space editor's dots, mailo gaps 3), and a tinted plate's
-/// stops and ink per scheme (`IconView { plate_tint }`, sill FINDINGS Q72).
+/// stops and ink per scheme (`IconView { plate_tint }`, sill FINDINGS Q72), and the level
+/// control's rubber band and segment stagger (`LevelControl`).
 const INLINE_VARS: &[&str] = &[
     "--av-bg",
     "--av-fg",
@@ -34,6 +35,9 @@ const INLINE_VARS: &[&str] = &[
     "--plate-base-d",
     "--plate-deep-d",
     "--plate-ink-d",
+    // The level control's rubber band and a segment's place in the fill's stagger.
+    "--rb",
+    "--i",
 ];
 
 const EXCEPTIONS: &[Exception] = &[
@@ -111,6 +115,12 @@ fn every_exception_still_suppresses_something() {
     assert!(stale.is_empty(), "exceptions that match nothing: {stale:?}");
 }
 
+/// The consumer classes the mailo gaps 6 goldens put on a button through `extra_class`: a
+/// consumer's own sheet styles them, as it would in the app, so they are in scope here and
+/// nowhere in quire's sheet.
+const CONSUMER_CSS: &str =
+    ".row-reveal{opacity:0}\n.quiet-until-hover{opacity:0}\n.fold-more{opacity:0}";
+
 /// Coherence rule 2 on quire's own output: every control golden, rendered markup, uses only
 /// classes the stylesheet styles, no hand-written SVG or form control, and no literal paint
 /// outside the custom properties a component computes (the avatar's `--av-bg`, O-7), which
@@ -118,12 +128,13 @@ fn every_exception_still_suppresses_something() {
 #[test]
 fn every_control_golden_lints_clean() {
     let config = LintConfig::default();
+    let css = format!("{}\n{CONSUMER_CSS}", ds::stylesheet());
     let goldens = golden::all_in("controls");
     assert!(goldens.len() > 60, "only {} goldens", goldens.len());
     let failures: Vec<String> = goldens
         .iter()
         .flat_map(|(name, html)| {
-            markup(html, ds::stylesheet(), &config)
+            markup(html, &css, &config)
                 .into_iter()
                 .map(move |offence| format!("{name}: {:?} {}", offence.rule, offence.text))
         })

@@ -19,6 +19,7 @@
 use super::emit::{attr_selector, declaration, presence_selector, property, rule};
 use crate::appearance::Scheme;
 use crate::material::layer::{Layer, joined};
+use crate::material::level::level_css;
 use crate::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, flat_tint, layers, tint};
 use crate::material::stack::VIBRANCY;
 use crate::material::{Material, recipe};
@@ -70,7 +71,34 @@ pub fn materials_css() -> String {
         &[property("background", "var(--m-tint)")],
     ));
     css.push_str(&chrome_css(&material));
+    css.push_str(&osd_card_css());
+    css.push_str(&level_css());
     css
+}
+
+/// The OSD card (`crate::Osd`, sill FINDINGS Q76): a card inside a transparent Osd root that
+/// paints what a tinted root paints on its own box (its `.ds-frame` group at the frame alpha, the
+/// solid floor without blur, the inner pair redrawn over it), so one root serves both the fade and
+/// the card's tokens.
+fn osd_card_css() -> String {
+    let card = ".ds-osd > .ds-frame";
+    [
+        rule(
+            &format!("{card}::after"),
+            &[
+                property("content", "\"\""),
+                property("position", "absolute"),
+                property("inset", "0"),
+                property("border-radius", "inherit"),
+                property("box-shadow", "var(--m-inner)"),
+            ],
+        ),
+        rule(
+            &format!(".ds{} {card}", attr_selector("data-blur", "off")),
+            &[property("opacity", &SOLID_ALPHA.css())],
+        ),
+    ]
+    .concat()
 }
 
 /// The tinted frame and the transparent root, after the paint rules they override.

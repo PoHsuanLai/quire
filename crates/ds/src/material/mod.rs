@@ -6,6 +6,7 @@
 
 pub mod blur;
 pub(crate) mod layer;
+pub(crate) mod level;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
 pub mod material;
 pub mod recipe;

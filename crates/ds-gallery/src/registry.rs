@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 13] = [
+pub const REGISTRY: [Entry; 14] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -40,21 +40,21 @@ pub const REGISTRY: [Entry; 13] = [
         page: Page::Controls,
         title: "Controls",
         lede: "Every control in every state it can express: variants, pressed, expanded, disabled, empty and filled. Press Tab to see the keyboard focus ring.",
-        height: 2400,
+        height: 3450,
         body: pages::controls::ControlsPage,
     },
     Entry {
         page: Page::Lists,
         title: "Lists",
         lede: "A live AnimatedList: add rows, remove them with each exit and watch the rows below heal, then undo. Search hits with a keyboard-shown strip, sidebar items, tiles, the hover strip and the appearance picker.",
-        height: 1760,
+        height: 3150,
         body: pages::lists::ListsPage,
     },
     Entry {
         page: Page::Overlays,
         title: "Overlays",
         lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
-        height: 3450,
+        height: 5250,
         body: pages::overlays::OverlaysPage,
     },
     Entry {
@@ -112,6 +112,13 @@ pub const REGISTRY: [Entry; 13] = [
         lede: "An EditSurface over an app's own paragraphs and a chip: the surface hands the app its input and reports geometry; the caret here is the page's own, drawn from the host's caret rect.",
         height: 600,
         body: pages::edit_surface::EditPage,
+    },
+    Entry {
+        page: Page::Level,
+        title: "Level",
+        lede: "The level control in its three looks for the user to choose from (capsule with the glyph inside, capsule and knob, sixteen segments), live and as a grid of states, and the OSD card at the top right that carries it.",
+        height: 2300,
+        body: pages::level::LevelPage,
     },
 ];
 

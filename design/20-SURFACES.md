@@ -75,8 +75,8 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Layer / role | xdg popup from the bar | P |
 | Material | `Popover` | P |
 | Content | Wi-Fi, Bluetooth, volume, brightness, Do Not Disturb, power profile, Now Playing (MPRIS), BT device batteries, focus modes | S |
-| Components | `Toggle`, `Slider`, `SegmentedControl` (power profile), `ListRow` (networks, devices), `AppearancePicker` (the one picker), `SectionHeader`, `Button{Mini}` | S |
-| Motion | open `menu-pop` `--t-move` `--e-spring`; toggle knob spring `--t-quick` `--e-spring`; sub-page slide `slide-r`/`slide-l` P | S / P |
+| Components | `ModuleGrid` of `ModuleTile`s (a module's disc, title, status and detail chevron; Off/On/Busy; Half or Full span), `PaneSwitcher` (the grid and a module's detail pane), `SettingsRow` (networks, devices, outputs: 44 px, the text menu's type, a check, toggle, chevron, value or glyph at the end), `Toggle`, `Slider`, `SegmentedControl` (power profile), `AppearancePicker` (the one picker), `SectionHeader`, `Button{Mini}`; glyphs from `Icon::CONTROL` (Now Playing's Play/Pause/SkipBack/SkipForward, device Headphones/Speaker/Mouse/Gamepad/Phone). Built 2026-09-25 (sill Q78-Q81; CONSUMING "Control center parts") | S |
+| Motion | open `menu-pop` `--t-move` `--e-spring`; toggle knob spring `--t-quick` `--e-spring`; sub-page slide `slide-r`/`slide-l` P, built as `PaneSwitcher`: `Anim::PaneInR`/`PaneInL` (`slide-r`/`slide-l` at `--t-move --e-spring`) in, `PaneOutL`/`PaneOutR` (`pane-out-l`/`pane-out-r` at `--t-move --e-exit`) out the other way, at once | S / P |
 | Behaviours | 13 (control center), 06 (Escape, menus) | S |
 | Keyboard | popup grab → bar `OnDemand` | S |
 | Blur / input | blur and input = popup surface `Whole` | P |
@@ -108,6 +108,11 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Behaviours | 13 (UI sounds: volume pop from freedesktop sound theme) | S |
 | Keyboard / blur / input | `None`; blur `Element("osd")`; input `Empty` | P |
 | Milestone | M6 | S |
+
+Components (quire, 2026-09-25): `ds::Osd` (the card and its presence, `on_hidden` at
+`settle(OsdOut)`, inside one transparent Osd root), `ds::LevelControl { mode: LevelMode::ReadOnly,
+look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition` and
+`ds::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSUMING.md "OSD parts (2026-09-25)".
 
 ### 1.8 Power menu (SPEC Tier 1)
 

@@ -2,6 +2,7 @@
 
 use crate::components::button_size::disabled;
 use crate::components::icon_view::IconView;
+use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::vocab::{Availability, Switch};
 use crate::geometry::Px;
@@ -62,6 +63,16 @@ impl IconButtonVariant {
 /// button, so a glyph inside a `<summary>` does not toggle its `<details>`.
 /// `availability: Availability::Disabled` writes `aria-disabled` and `disabled` and draws the
 /// button at .35 with no hover and no press; `onclick` never runs (sill Q93).
+///
+/// `data` and `extra_class` (mailo gaps 6) put the consumer's own `data-*` attributes and
+/// classes on the button itself, as on a `Button`, so it needs no wrapping `span`: `data-folder` for a drag that
+/// reads the place off the element under the pointer, a class for the consumer's own reveal or
+/// layout rule. Both are checked when built ([`DataName::parse`], [`ExtraClass::parse`]): a
+/// `ds-` name or class, or a `data-*` name quire writes itself, is refused, so nothing added
+/// here can restyle the button through quire's rules.
+///
+/// [`DataName::parse`]: crate::DataName::parse
+/// [`ExtraClass::parse`]: crate::ExtraClass::parse
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,
@@ -75,7 +86,11 @@ pub fn IconButton(
     #[props(default)] id: Option<String>,
     #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
     #[props(default)] propagation: Propagation,
+    #[props(default)] data: Vec<DataAttr>,
+    #[props(default)] extra_class: Option<ExtraClass>,
 ) -> Element {
+    let class = class_list("ds-icon-button", extra_class.as_ref());
+    let data = attributes(&data);
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(|state| state.aria());
     let listen = PressListeners::new(onclick).with_propagation(propagation);
@@ -84,7 +99,7 @@ pub fn IconButton(
         button {
             r#type: "button",
             id,
-            class: "ds-icon-button",
+            class,
             "data-variant": variant.slug(),
             "aria-label": "{label}",
             title: tooltip,
@@ -114,6 +129,9 @@ pub fn IconButton(
                     mounted.call(event);
                 }
             },
+            // The consumer's own `data-*` (mailo gaps 6), last: a spread follows the named
+            // attributes.
+            ..data,
             IconView { source: icon, size: variant.icon_size() }
         }
     }

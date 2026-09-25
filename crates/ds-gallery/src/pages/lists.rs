@@ -99,6 +99,7 @@ pub fn ListsPage() -> Element {
         super::lists_mailo4::StripPress {}
         Sidebar {}
         super::lists_mailo4::DropPlaces {}
+        super::lists_mailo6::FolderTree {}
         Tiles {}
         Picker {}
     }
