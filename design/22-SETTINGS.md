@@ -448,6 +448,17 @@ All Advanced (§5). The display service reads the EDID, classifies the panel's g
 | `display.font_rendering` | `FontRendering::{Auto,Off}` | `Auto` | `Auto` sets hinting and subpixel positioning from the output's ppi | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.color_management` | `ColorManagement::{Auto,Off}` | `Auto` | stored only: cosmic-comp 1.8.0 has no `wp_color_manager_v1`, so the palette fits sRGB there; KWin 6.7.5 offers parametric Display P3 | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 
+### 3.16 `osd` (sill/settings.toml)
+
+All Advanced (§5). The on-screen display for volume and brightness (design/20 §1.7): a Material::Osd card that takes the Space gradient tint, holds, then fades.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `osd.enabled` | `OsdEnabled::{On,Off}` | `On` | shows sill's own volume and brightness changes | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+| `osd.hold_ms` | `Ms` | `1500` | `300..=10000`; after the last change and before the fade | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+| `osd.position` | `OsdPosition::{Bottom,Top}` | `Bottom` | centred along that edge | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+| `osd.bottom_margin_px` | `Px` | `24` | `0..=400`; the gap from the dock's reserve (or the bar's, at the top) to the card | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+
 ## 4. Rust shape
 
 Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module
