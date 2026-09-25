@@ -58,6 +58,10 @@ pub const STYLES: &[(&str, &[&str])] = &[
     ),
     ("count", &[include_str!("../../src/components/count.css")]),
     (
+        "edit_surface",
+        &[include_str!("../../src/components/edit_surface.css")],
+    ),
+    (
         "spinner",
         &[include_str!("../../src/components/spinner.css")],
     ),

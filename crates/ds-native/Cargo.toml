@@ -19,6 +19,8 @@ dioxus-native-dom = { workspace = true }
 # `html`: an `<iframe srcdoc>` in the window parses into a real sub-document (G4). `clipboard`:
 # copy and paste in every text field, and `ds_native::clipboard` (G5).
 dioxus-native = { workspace = true, features = ["html", "clipboard"] }
+# `text/html` from the system clipboard for an edit surface's paste.
+arboard = { workspace = true }
 anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
 anyrender_vello_cpu = { workspace = true }
@@ -39,3 +41,6 @@ ds-settings = { workspace = true }
 
 [[example]]
 name = "window"
+
+[[example]]
+name = "edit"

@@ -87,3 +87,8 @@
 .g-polish-windows{padding:var(--s-22) var(--s-36) var(--s-36)}
 .g-polish-window{width:260px;height:150px;background:var(--raise);border-radius:var(--r-window)}
 .g-polish-window-old{box-shadow:var(--shadow-pop)}
+.g-edit{position:relative;width:440px;border:var(--hair) solid var(--line);border-radius:var(--r-btn);background:var(--surface-2);color:var(--ink);font-size:var(--fs-body);line-height:1.55}
+.g-edit-body{padding:var(--s-8) var(--s-12)}
+.g-edit p{margin:0}
+.g-edit-chip{display:inline-block}
+.g-edit-caret{position:absolute;width:2px;background:var(--accent);pointer-events:none}
