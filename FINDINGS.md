@@ -2411,3 +2411,83 @@ that delivers input and reports geometry (mailo Phase B plan §3, option A). Bra
   write's success as its focus-in; Tab still dispatches real focus events.
 
 **Chosen route: (b).** No fork, no `[patch]`, no pinned-block change for blitz.
+
+### Built
+
+- **`ds::EditSurface`** (`components/edit_surface.rs`, state in `edit_surface_state.rs`): a
+  `div.ds-edit` (`role=textbox`, `aria-multiline`, `tabindex=0`, `white-space: pre-wrap`, no
+  focus ring) around the app's children. Its vocabulary is `ds::edit`: `EditInput`,
+  `Composition`, `Pasted`, `KeyInput`, `EditPointer`, `TextPosition`/`TextRange` over
+  `data-edit-node` keys, `EditKind::{Text, Atom}`, `EditHandle`, and the seam `HostEdit` (fn
+  pointers like `HostFocus`, answering `Probe::{Found, Busy, Unknown}`). The IME's steps go
+  through a pure machine (`edit/composition.rs`), keys through a pure table (`edit/keys.rs`),
+  multi-clicks through `edit/clicks.rs`; each is table-tested.
+- **The surface keeps two Blitz defaults from running.** A press would start Blitz's own document
+  text selection (painted) and the click after it would clear the focus, so the surface prevents
+  both and focuses itself through `HostFocus`, treating the write's success as its focus-in
+  (a host write dispatches no `focus` event). It keeps its own click count for the same reason.
+- **`ds_native::edit`** (`edit.rs`, `edit_tree.rs`, `edit_align.rs`, `edit_locate.rs`,
+  `edit_geometry.rs`, `edit_hit.rs`, `edit_ime.rs`): resolves a `TextPosition` to an inline
+  root and a layout byte through the DOM-to-layout alignment, and back; caret boxes from
+  `parley::Cursor::geometry`, selection boxes from `parley::Selection::geometry` per inline root
+  in reading order plus every whole atom between the ends; hit-testing through `doc.hit` (an
+  atom answers its nearer side), then `Cursor::from_point` in the vertically nearest stretch of
+  text, so a point in padding, between paragraphs or past a line's end still lands. Geometry is
+  in the coordinates `get_client_bounding_rect` (and so `HostMeasure`) uses: the unrounded
+  layout to a 64th of a pixel, less the viewport scroll, so an app subtracting
+  `EditHandle::bounds` gets exact offsets.
+- **IME routing**: `EditListeners` (root context) maps a surface's node to its sink; the window's
+  `Host` and the harness hand an event to the listener registered at the focused node or its
+  nearest registered ancestor. The surface turns the IME on (`set_ime_enabled`) and places its
+  candidate window (`set_ime_cursor_area`, from `ime_area`) as it takes the keyboard, and turns
+  it off at blur. The harness's memory shell records both.
+- **Clipboard HTML**: `ds_native::clipboard::read_html()`; `arboard` joins the pinned block
+  (`version = "3.6", default-features = false`, blitz-shell's own line), a new line shell-host
+  and sill copy; neither uses it. The lockfile gains only the edge.
+- **Proofs**: `crates/ds-native/tests/native_edit.rs`: a click focuses the surface and switches
+  the IME on; typed keys arrive as `Text`, `Text`, `Key(Enter)`, `Key(Ctrl+b)`; a composition
+  (start, two updates, commit) arrives as `Start`, `Update(ㄓ)`, `Update(ㄓㄨ)`, `Update("")`,
+  `End(注)`, and typing after it is text again; keys during a preedit are withheld; a paste
+  carries `Html { html, text }`, a plain one `Text`, and Ctrl+C/X are `Copy`/`Cut`; hit-testing a
+  paragraph with a hard break across two text nodes answers offsets 11 (second line's start), 10
+  (past the first line's end), 22 (past the second's) and 14 (right of a caret rect), and either
+  half of a chip answers its side; caret rects at a line's start, middle, end and the next line's
+  start, at 100 and 150 percent; a selection across the break is two boxes (from the anchor's
+  caret to the line's end, from the line's start to the focus's caret), the same either way
+  round; a selection over a chip includes its box; the IME area follows the app's `ime_area`
+  and is not set before the surface has the keyboard. SSR goldens under
+  `controls/edit_surface/`. Gallery: the Edit page, with the page's own caret placed from the
+  host's rect. The window path (`cargo run -p ds-native --example edit`) opens on Wayland and
+  closes cleanly.
+
+### Limits
+
+- **The window's IME is proven by reading, not by a test.** dioxus-native's hook order is what
+  makes route (b) work; the harness drives the same router, but no test drives winit. Try it by
+  hand with fcitx5 or IBus: `cargo run -p ds-native --example edit` prints every input. If a
+  blitz bump reorders `use_window_event` after the document, IME silently stops reaching the
+  surface: re-check `dioxus_application.rs::window_event` in the toolchain-bump wave.
+- **Other Blitz hosts** (shell-host's surfaces, sill) get the seam from
+  `ds_native::edit::provide()`, but nothing forwards their IME events yet: a host that owns its
+  winit or Wayland text-input would need a ds-native entry point to hand them over. Not built.
+- **Offsets are UTF-8 bytes**, not graphemes; mailo converts. The alignment tolerates collapsed
+  whitespace, `br`, list markers and case transforms, but generated text that begins with the
+  same character as the text after it (`1. ` before `1 apple`) could shift the map by that
+  character; the surface's `pre-wrap` avoids collapsing altogether.
+- **A caret between two text nodes of one paragraph that an inline atom separates** resolves to
+  the later node's start, after the atom; the atom's own positions (0/1) name either side
+  exactly.
+- **No pointer capture**: a drag hears moves only over the surface, and a release outside is
+  noticed at the next move without the button.
+- **Tab moves the focus** (Blitz's default) and is also delivered as `Key(Tab)`; the surface
+  cannot keep Tab for list indentation yet.
+- **Focus lost mid-composition** ends the composition empty; a commit the IME sends after the
+  blur is not delivered (the surface no longer has the keyboard). Surrounding-text requests
+  (`Ime::DeleteSurrounding`) are ignored: the surface never offers surrounding text.
+- **Transforms**: geometry ignores a CSS transform on the surface or its ancestors (Blitz's hit
+  test applies them, the rects do not). Scroll offsets are applied.
+- **CJK line breaking**: laying out CJK text prints `ICU4X data error: No segmentation model for
+  complex script: Chinese/Japanese` (parley's line breaker at this rev); lines still wrap, but not
+  at dictionary word boundaries.
+- **Clipboard HTML on Wayland** goes through arboard's X11 backend (XWayland), as blitz-shell's
+  text clipboard already does at this rev (`wayland-data-control` is off in both).
