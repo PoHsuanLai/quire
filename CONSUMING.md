@@ -1486,6 +1486,21 @@ existing golden moved but the stylesheet's.
 **What sill switches to.** The calendar widget draws `MonthGrid` from `From<&grid::MonthGrid>`
 (title and heads formatted by you); `onstep` shifts the month (`shift_month`) and recomputes the
 grid; drop the widget's own grid CSS.
+### Screenshot thumbnail (2026-09-26)
+
+sill Q181; design/04-COMPONENTS.md section 41. Additive: two new components, two new `Anim`
+variants (`Anim::ALL` is 66; a `match` of yours over `Anim` needs `ShotIn`, `ShotOut`),
+`DRAG_THRESHOLD`, and constructors on the existing `ImageSource`. No existing golden moved but
+the stylesheet's.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `ShotThumbnail` | `image: ImageSource`, `size: ImageSize`, `shown: Shown`, `on_hidden: EventHandler<()>`, `width: Px` (240), `actions: Vec<ThumbAction { icon: Icon, label: Text, onpress: EventHandler<()> }>`, `onopen: Option<EventHandler<()>>`, `ondrag: Option<EventHandler<DragStart>>`, `onhover: Option<EventHandler<Hover>>`, `id: Option<String>`, `swipe: Swipe` (`Off`), `swipe_metrics: SwipeMetrics` | The picture letterboxed in a Toast-material card (the box follows the picture between 2:1 and 16:10, inside a 4 px mat). Shown, `Anim::ShotIn` (`rise` at `--t-big --e-spring`); hidden, `Anim::ShotOut` (a slide right, `--t-move --e-exit`) and `on_hidden` at `settle(ShotOut)`; a show while it leaves takes the hide back. The hold is yours: pause it on `onhover(Hover::Over)`. Hover shows the actions; a click on the picture (or Enter, Space) opens; a press that travels `DRAG_THRESHOLD` calls `ondrag` once and its click does not open. `swipe: Swipe::Dismiss(..)` is `NotificationCard`'s swipe to dismiss, same machine and metrics; with it on a rightward press is the swipe's, never a drag out. No position of its own: it composes in a `BannerStack { position: BottomRight }`. Reduced motion is handled inside (no spring back; fades rather than rise and slide); nothing is left for your CSS |
+| `ShotGhost` | `image`, `size` | The card at 120 wide and .8 opaque, for your drag icon |
+| `DragStart` | `{ from: Point, at: Point }` | The press point and where it crossed the threshold, client coordinates |
+| `ImageSource` | `ImageSource(String)`; `::file(&Path) -> Result<_, DsError>`, `::png(&[u8])` | A `data:` URI or `file:` URL, written as an `<img>`'s `src` (now also ProviderMark's, moved to `components::image_source`) |
+| `ImageSize` | `{ width: u32, height: u32 }` | The picture's pixels; only the ratio is read |
+| `DRAG_THRESHOLD` | `Px(8.0)` | The Manhattan travel that makes a press a drag (section 34) |
 
 ### PDF and printing (2026-09-25)
 

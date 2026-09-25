@@ -622,6 +622,17 @@ Settled for the port; the catalogue above is unchanged except where named.
 - A swiped card springs back with a `transform` transition at `--t-move --e-spring` (principle
   2: it is the release of a touch), none under Reduced, where it snaps back.
 
+### 4.10 Added by quire (screenshot thumbnail, 2026-09-26)
+
+- `rise` at `--t-big --e-spring` (`Anim::ShotIn`): the screenshot thumbnail's entrance
+  (design/20 section 1.13). The catalogue's `rise` row plays at `--t-move --e-out` for rows; the
+  thumbnail is a surface arriving, so it takes the toast's `--t-big --e-spring`.
+- `shot-out`: `from{ opacity:1; transform:none } to{ opacity:0; transform:translateX(calc(100% +
+  var(--s-16))) }` at `--t-move --e-exit`, forwards (`Anim::ShotOut`): the thumbnail slides out
+  to the right, past its own width, when dismissed or when its hold ends, holding its last frame
+  until the host unmaps it at `settle(ShotOut)`. `slide-r` is an entrance (from 26 px right to
+  rest); this is its exit, carried off the edge the card sits at.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and

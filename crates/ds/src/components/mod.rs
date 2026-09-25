@@ -33,6 +33,7 @@ pub mod hover_card;
 pub mod hover_strip;
 pub mod icon_button;
 pub mod icon_view;
+pub mod image_source;
 pub mod kbd;
 pub mod level;
 pub mod level_ring;
@@ -101,6 +102,10 @@ pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sheet_placement;
 pub(crate) mod sheet_presence;
+pub(crate) mod shot_frame;
+pub mod shot_ghost;
+pub mod shot_press;
+pub mod shot_thumbnail;
 pub(crate) mod shown_phase;
 pub mod sidebar_item;
 pub mod slider;
@@ -157,6 +162,7 @@ pub use hover_card::{
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
+pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
 pub use level_ring::{LevelRing, RingMark};
@@ -203,6 +209,9 @@ pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use settings_row::SettingsRow;
 pub use settings_row_trailing::RowTrailing;
 pub use sheet::{Sheet, SheetPlacement};
+pub use shot_ghost::ShotGhost;
+pub use shot_press::DragStart;
+pub use shot_thumbnail::{ShotThumbnail, ThumbAction};
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
 pub use space_editor::{
@@ -275,6 +284,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("send_pill", include_str!("send_pill.css")),
     ("settings_row", include_str!("settings_row.css")),
     ("sheet", include_str!("sheet.css")),
+    ("shot_thumbnail", include_str!("shot_thumbnail.css")),
     ("sidebar_item", include_str!("sidebar_item.css")),
     ("slider", include_str!("slider.css")),
     ("space_editor", include_str!("space_editor.css")),

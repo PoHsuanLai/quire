@@ -430,6 +430,8 @@ impl Anim {
             Anim::BannerIn => own::BANNER_IN,
             Anim::PanelIn => own::PANEL_IN,
             Anim::PanelOut => own::PANEL_OUT,
+            Anim::ShotIn => own::SHOT_IN,
+            Anim::ShotOut => own::SHOT_OUT,
         }
     }
 }
