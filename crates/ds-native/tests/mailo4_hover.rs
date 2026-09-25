@@ -12,9 +12,10 @@ use ds::{
     Appearance, Ds, Flow, HostMeasure, HoverAnchor, HoverCard, HoverKey, HoverKind, Material,
     Measured, MountedRef, Point, Px, Rect, Size, use_hover_intent,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use probe::rect;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
     width: 720,
@@ -163,10 +164,23 @@ fn pin(n: usize) -> String {
 fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
     let mut harness = Harness::new(ByElement, VIEW);
     harness.advance(ms(50));
+    let entered = Instant::now();
     harness.pointer_move(centre(&harness, &pin(2)));
-    harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-hovercard"), 0, "open before 450 ms");
+    // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
+    // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
+    // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
     harness.advance(ms(150));
+    assert_eq!(
+        harness.count(".ds-hovercard"),
+        0,
+        "not open well before 450 ms"
+    );
+    let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
+    assert!(
+        opened.duration_since(entered) >= Duration::from_millis(450),
+        "the card opened only once the intent wait had fully run: {:?}",
+        opened.duration_since(entered)
+    );
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:1"));
     harness.advance(ms(100));
     // A side card: 10 right of the item, 6 above its top (design/06 section 3).
@@ -202,10 +216,24 @@ fn a_card_keyed_on_a_rect_the_caller_has_opens_below_it() {
 fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     let mut harness = Harness::new(Unplaced, VIEW);
     harness.advance(ms(50));
+    let entered = Instant::now();
     harness.pointer_move(centre(&harness, &pin(1)));
-    harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-hovercard"), 0, "open before 450 ms");
-    harness.advance(ms(100));
+    // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
+    // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
+    // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
+    harness.advance(ms(150));
+    assert_eq!(
+        harness.count(".ds-hovercard"),
+        0,
+        "not open well before 450 ms"
+    );
+    let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
+    assert!(
+        opened.duration_since(entered) >= Duration::from_millis(450),
+        "the card opened only once the intent wait had fully run: {:?}",
+        opened.duration_since(entered)
+    );
+    harness.advance(ms(50));
     assert_eq!(
         harness.text_of(".slot > .ds-hovercard .card-of").as_deref(),
         Some("pin:0"),
@@ -218,17 +246,22 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     );
     assert_eq!(harness.attr(".ds-hovercard", "style"), None);
     // Out: 150 ms to close, then `hc-out` plays before the card goes.
+    let left = Instant::now();
     harness.pointer_move(AWAY);
-    harness.advance(ms(100));
+    // Well under half the 150 ms close delay, same reasoning as the open check above.
+    harness.advance(ms(60));
     assert_ne!(
         harness.attr(".ds-hovercard", "data-presence").as_deref(),
         Some("leaving"),
-        "closing before 150 ms"
+        "not closing well before 150 ms"
     );
-    harness.advance(ms(100));
-    assert_eq!(
-        harness.attr(".ds-hovercard", "data-presence").as_deref(),
-        Some("leaving")
+    let leaving = settle_until(&mut harness, |h| {
+        h.attr(".ds-hovercard", "data-presence").as_deref() == Some("leaving")
+    });
+    assert!(
+        leaving.duration_since(left) >= Duration::from_millis(150),
+        "the close intent fired only once the full delay had run: {:?}",
+        leaving.duration_since(left)
     );
     harness.advance(ms(250));
     assert_eq!(harness.count(".ds-hovercard"), 0, "{}", harness.html());

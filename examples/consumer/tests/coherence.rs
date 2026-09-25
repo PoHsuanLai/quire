@@ -17,6 +17,7 @@
 use consumer::{App, STYLE};
 use ds::lint::{LintConfig, Profile, Rule, assert_clean, markup};
 use ds::{Anim, MotionLevel, StaggerIndex, settle};
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -170,14 +171,4 @@ fn the_menu_opens_and_closes_under_harness() {
         harness.is_focused(".ds-input"),
         "the field has the keyboard back (Focus::Controlled)"
     );
-}
-
-/// Advance the harness a frame at a time until `done` holds or two seconds have passed.
-fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) {
-    for _ in 0..125 {
-        if done(harness) {
-            return;
-        }
-        harness.advance(std::time::Duration::from_millis(16));
-    }
 }

@@ -10,9 +10,10 @@ use ds::{
     Anim, Appearance, Button, ButtonVariant, Ds, Fraction, Material, MotionLevel, SendMood,
     SendPhase, SendPill, SendRing, StaggerIndex, settle,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use probe::pixels;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -57,6 +58,10 @@ fn a_nudge_plays_once_settles_and_the_pill_stays() {
     );
     assert!(!pulsing(&harness), "no one-shot on mount");
 
+    // Marked before the click that starts the pulse's settle timer, so nothing but real
+    // overhead is spent before this instant: the comparison against `settles` below stays a
+    // true lower bound.
+    let pulsed = Instant::now();
     harness.click(harness.centre("#nudge").expect("the nudge button"));
     harness.advance(ms(16));
     assert!(pulsing(&harness), "{}", harness.html());
@@ -70,13 +75,16 @@ fn a_nudge_plays_once_settles_and_the_pill_stays() {
     );
 
     let settles = settle(Anim::Nudge, MotionLevel::Standard, StaggerIndex::new(0));
-    harness.advance(settles - ms(100));
-    assert!(pulsing(&harness), "still playing before settle");
-    harness.advance(ms(150));
+    // Half the settle, not `settles - 100ms` (fixed 2026-09-25, FINDINGS "Timing tests"): the
+    // old margin was 100 ms of a 520 ms window (81 % through it), so a loaded machine's
+    // overshoot on `advance` could cross the boundary before this read.
+    harness.advance(settles / 2);
+    assert!(pulsing(&harness), "still playing at half the settle");
+    let rested = settle_until(&mut harness, |h| !pulsing(h));
     assert!(
-        !pulsing(&harness),
-        "at rest after settle: {}",
-        harness.html()
+        rested.duration_since(pulsed) >= settles,
+        "the pulse rested only once the full settle had run: {:?}",
+        rested.duration_since(pulsed)
     );
     assert_eq!(harness.attr(".ds-send-pill", "data-pulse"), None);
     assert_eq!(

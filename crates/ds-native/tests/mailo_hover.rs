@@ -10,9 +10,10 @@ use ds::{
     Appearance, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material, Point, Px,
     TargetElement, use_hover_hub,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use probe::rect;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
     width: 720,
@@ -87,10 +88,23 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
         harness.html()
     );
     let second = "ul.pins > li:nth-child(2)";
+    let entered = Instant::now();
     harness.pointer_move(centre(&harness, second));
-    harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-hovercard"), 0, "open before 450 ms");
+    // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
+    // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
+    // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
     harness.advance(ms(150));
+    assert_eq!(
+        harness.count(".ds-hovercard"),
+        0,
+        "not open well before 450 ms"
+    );
+    let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
+    assert!(
+        opened.duration_since(entered) >= Duration::from_millis(450),
+        "the card opened only once the intent wait had fully run: {:?}",
+        opened.duration_since(entered)
+    );
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:1"));
     // A side card: 10 right of the item, 6 above its top (design/06 section 3).
     harness.advance(ms(100));

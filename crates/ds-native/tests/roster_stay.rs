@@ -8,8 +8,9 @@ use ds::{
     ListRow, Material, Point, PulseKey, Px, RowPitch, Selection, StaggerIndex, Stayed, settle,
     use_roster,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -142,17 +143,31 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
     // Fold it again 150 ms later: the first fold's timer, had it survived the stay, would drop
     // the row about 100 ms into the second fold.
     harness.advance(ms(150));
+    let refolded = Instant::now();
     harness.click(centre(&harness, &row(2)));
-    harness.advance(ms(250));
+    // Well under half the second fold's own settle(Fold) (~454 ms), and comfortably past the
+    // ~104 ms mark where the first fold's stale timer would have dropped the row had it
+    // survived (fixed 2026-09-25, FINDINGS "Timing tests"): the old 250 ms check was 55 % of
+    // the window, over the margin a loaded machine's overshoot on `advance` can eat into.
+    harness.advance(ms(200));
     assert_eq!(
         harness.count(".ds-row"),
         3,
-        "the second fold is still playing"
+        "the second fold is still playing, and the stale first-fold timer never fired"
     );
     assert_eq!(
         harness.attr(&row(2), "data-presence").as_deref(),
         Some("leaving")
     );
-    harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-row"), 2, "{}", harness.html());
+    let fold = settle(
+        Anim::Fold,
+        ds::MotionLevel::Standard,
+        StaggerIndex::default(),
+    );
+    let dropped = settle_until(&mut harness, |h| h.count(".ds-row") == 2);
+    assert!(
+        dropped.duration_since(refolded) >= fold,
+        "the second fold dropped the row only once its own full settle had run: {:?}",
+        dropped.duration_since(refolded)
+    );
 }

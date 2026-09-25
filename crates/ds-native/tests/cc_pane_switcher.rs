@@ -10,6 +10,7 @@ use ds::{
     SettingsRow, Switch,
 };
 use ds::{MotionLevel, StaggerIndex, settle};
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use std::time::{Duration, Instant};
 
@@ -17,7 +18,8 @@ use std::time::{Duration, Instant};
 // sleeps, which a harness cannot fake (its module documentation). Under a loaded parallel
 // `cargo test --workspace` an `advance(ms(170))` can stretch past a settle it meant to stop short
 // of, so these tests never assert a state at one fixed instant around a settle: they poll with
-// `settle_until` up to a bound, time the settle on the wall clock, and assert the order.
+// `ds_native::harness::settle_until` up to a bound, time the settle on the wall clock, and
+// assert the order.
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -76,22 +78,6 @@ fn slide() -> Duration {
     )
 }
 
-/// The most a settle may be stretched by a loaded machine before the test gives up.
-const BOUND: Duration = Duration::from_secs(3);
-
-/// Advance in 10 ms steps until `done` holds, for at most `BOUND`; the wall-clock instant it
-/// first held, or `None` when it never did.
-fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) -> Option<Instant> {
-    let started = Instant::now();
-    while started.elapsed() < BOUND {
-        if done(harness) {
-            return Some(Instant::now());
-        }
-        harness.advance(ms(10));
-    }
-    done(harness).then(Instant::now)
-}
-
 /// The switcher has come to rest: one pane drawn, nothing moving.
 fn at_rest(harness: &Harness) -> bool {
     harness.count(".ds-pane") == 1 && harness.attr(".ds-panes", "data-moving").is_none()
@@ -142,10 +128,7 @@ fn a_switch_plays_both_panes_and_settles_on_the_new_one() {
     );
     assert_eq!(log(&harness), "", "nothing settled yet");
 
-    assert!(
-        settle_until(&mut harness, at_rest).is_some(),
-        "the switch settled within {BOUND:?}"
-    );
+    settle_until(&mut harness, at_rest);
     assert_eq!(harness.count(".ds-pane"), 1, "the root was dropped");
     assert_eq!(presence(&harness, "detail").as_deref(), Some("present"));
     assert_eq!(harness.attr(".ds-panes", "data-moving"), None);
@@ -190,8 +173,7 @@ fn a_switch_during_a_slide_reverses_cleanly() {
             "the reversed round never reports"
         );
         at_rest(harness)
-    })
-    .unwrap_or_else(|| panic!("the reversal settled within {BOUND:?}"));
+    });
     // Order, not an instant: the switcher rests only once the reversal's own round has run its
     // full settle from when it was asked, so it cannot have rested at the first round's settle.
     assert!(
