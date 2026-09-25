@@ -146,6 +146,17 @@ is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pat
 | Do Not Disturb | no banners and no sounds except urgency Critical; everything still enters the history | proposed |
 | Sound | the `sound-name` or `sound-file` hint, else `message-new-instant`; `suppress-sound` honoured | proposed |
 
+Built in quire (2026-09-25, sill Q120-Q125; CONSUMING.md "Notification parts"): the banner is
+`NotificationCard` (the hover row as written: body two lines to six over `--t-move --e-out`,
+actions and the 18 px top-left close button on hover, `on_hover` for the caller's timer), the
+stack `BannerStack` (enter from the right at `--t-move --e-spring`; exit right at `--t-move
+--e-exit`; the banners below heal by the leaving one's measured height), swipe to dismiss
+`Swipe::Dismiss` with the thresholds above as `SwipeMetrics` (a horizontal scroll is decided
+after a 120 ms quiet spell, `DelayToken::SwipeQuiet`, since Blitz forwards no scroll phase), the
+grouped layers `GroupCount { layers }` at `--notifications-group-offset`, the history's group
+head `GroupHeader`, and the notification center, as on macOS a panel at the right edge, `Panel`.
+Whether a swiped banner stays in the center is `notifications.swipe`, the caller's.
+
 ### 13.3.7 Control center
 
 | Value | Number | Status | Basis |

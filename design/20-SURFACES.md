@@ -97,6 +97,22 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Blur / input | per toast `Element("toast-<id>")`; input same | P |
 | Milestone | M6 | S |
 
+Components (quire, 2026-09-25; sill Q120-Q125; CONSUMING.md "Notification parts"): the banner
+is `ds::NotificationCard` (app icon at 32, summary 13/700, age in the data face, a `Rich` body
+clamped two lines to six on hover, `CardAction` Mini buttons, the 18 px close button at the top
+left, a `GroupCount` chip with up to three offset layers, `Swipe::Dismiss`), in the Toast
+material by default from inside its own transparent scope; the stack is `ds::BannerStack`
+(`BannerPosition::{TopRight, BottomRight}`, `on_hidden` per key at `settle(BannerOut)`); the
+center is `ds::Panel` (right edge, `notifications.center_width_px`, Popover material, `shown` and
+`on_hidden`) of `ds::GroupHeader`s over cards. Motion as built: banner in `Anim::BannerIn`
+(`banner-in`, from past the right edge, `--t-move --e-spring`, where the row above proposed
+`slide-l --t-big`), out `Anim::BannerOut` (`banner-out`, to the right from the swipe's offset,
+`--t-move --e-exit`, where the row proposed a fade), the rows below `heal` by the leaving
+banner's measured height; center `Anim::PanelIn`/`PanelOut` (`--t-move`, `--e-out` in, no
+overshoot off its edge). The center's material stays Popover as this table says; design/03
+§17.3's "Sheet" row for it is the older proposal. `NotificationMetrics` writes the geometry
+keys.
+
 ### 1.7 OSD (SPEC Tier 1)
 
 | Field | Value | St |

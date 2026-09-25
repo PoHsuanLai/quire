@@ -600,6 +600,25 @@ Settled for the port; the catalogue above is unchanged except where named.
   `peek-in` reversed and quieter. A sheet its host hides plays it and reports `on_hidden` at
   `settle(SheetOut)`; its scrim plays `menu-out` at `--t-quick` meanwhile.
 
+### 4.9 Added by quire (notification parts, 2026-09-25)
+
+- `banner-in`: `from{ transform:translateX(calc(100% + var(--s-16))) } to{ transform:none }` at
+  `--t-move --e-spring`, `Anim::BannerIn`: a banner slides in from past the surface's edge,
+  opaque from its first frame. design/13 §13.3.6 proposed `--t-big`; the stack plays it at the
+  `--t-move` of the exit and the heal it may arrive beside. It is played on the card's wrapper
+  as it mounts, not on a presence attribute (Blitz keeps the last animated value when an
+  animation is taken off an element).
+- `banner-out`: `from{ opacity:1; transform:translateX(var(--swipe-dx,0px)) } to{ opacity:0;
+  transform:translateX(calc(100% + var(--s-16))) }` at `--t-move --e-exit`, forwards,
+  `Anim::BannerOut` (and `Exit::BannerOut` for a roster row): a banner leaves to the right from
+  where a swipe left it; the rows below then `heal`.
+- `panel-in`: `from{ transform:translateX(calc(100% + var(--s-16))) } to{ transform:none }` at
+  `--t-move --e-out`, and `panel-out`, its reverse at `--t-move --e-exit`, forwards
+  (`Anim::PanelIn`, `Anim::PanelOut`): the notification center's edge panel. No spring: opening
+  it is not contact with it (principle 2), and an overshoot would lift it off its edge.
+- A swiped card springs back with a `transform` transition at `--t-move --e-spring` (principle
+  2: it is the release of a touch), none under Reduced, where it snaps back.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and
