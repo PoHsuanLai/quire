@@ -1,6 +1,6 @@
 //! SettingsRow on a real Blitz document (sill FINDINGS Q79): a toggle row's switch flips the
 //! device and never runs the row; a press on the row's words runs the row and leaves the switch
-//! alone; Enter on the focused row runs it; a disabled row does neither.
+//! alone; Enter on the focused row runs it (a press leaves the focus on the row); a disabled row does neither.
 
 use dioxus::prelude::*;
 use ds::{
@@ -93,8 +93,8 @@ fn a_toggle_rows_switch_is_its_own_and_the_row_is_the_rows() {
         "the words run the row only"
     );
 
-    harness.key(Key::Tab);
-    assert!(harness.is_focused(FIRST), "Tab reaches the row");
+    // The press left the keyboard on the row (FocusFallback::Ancestor): Enter runs it.
+    assert!(harness.is_focused(FIRST), "the pressed row holds the focus");
     harness.key(Key::Enter);
     harness.advance(TICK);
     assert_eq!(log(&harness), "toggle:On,row:headphones,row:headphones");
