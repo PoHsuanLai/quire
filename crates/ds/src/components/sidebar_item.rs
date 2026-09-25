@@ -75,19 +75,15 @@ impl Preview {
     }
 }
 
-/// The `aria-current` word.
-fn aria_current(here: Here) -> &'static str {
-    match here {
-        Here::Current => "true",
-        Here::Elsewhere => "false",
-    }
-}
+/// The item's classes: its own and the drop place's, whose rules draw `drop` (shared with
+/// `TreeItem`, mailo gaps 6).
+const CLASS: &str = "ds-sidebar-item ds-drop-place";
 
 /// The class list and `data-pulse` for an item playing `pulse` (the gulp).
 fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
     match pulse.attrs() {
-        Some((anim, alias)) => (format!("ds-sidebar-item {anim}"), Some(alias)),
-        None => ("ds-sidebar-item".to_string(), None),
+        Some((anim, alias)) => (format!("{CLASS} {anim}"), Some(alias)),
+        None => (CLASS.to_string(), None),
     }
 }
 
@@ -133,7 +129,7 @@ pub fn SidebarItem(
     let (class, alias) = pulse_attrs(pulse);
     let place = place.map(|PlaceId(name)| name);
     let slug = kind.slug();
-    let current = aria_current(here);
+    let current = here.aria_current();
     let preview = preview.map(Preview::slug);
     let count = count.map(|value| rsx! { Count { value, place: CountPlace::Item } });
     match kind {

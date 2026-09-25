@@ -96,7 +96,13 @@ impl Icon {
     ];
 
     /// Glyphs for a consumer's actions beyond the two sets (Lucide, `geometry_actions`).
-    pub const ACTIONS: &[Icon] = &[Icon::Printer, Icon::FolderInput];
+    pub const ACTIONS: &[Icon] = &[
+        Icon::Printer,
+        Icon::FolderInput,
+        // mailo gaps 6.
+        Icon::Ellipsis,
+        Icon::EllipsisVertical,
+    ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
     /// `geometry_control`; sill FINDINGS Q81). `Power` is in the shell set.
@@ -199,6 +205,9 @@ impl Icon {
         Icon::Brightness,
         Icon::Printer,
         Icon::FolderInput,
+        // mailo gaps 6.
+        Icon::Ellipsis,
+        Icon::EllipsisVertical,
         Icon::Play,
         Icon::Pause,
         Icon::SkipBack,
