@@ -41,6 +41,7 @@ pub(crate) mod menu_rows;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
 pub mod module_grid;
+pub mod module_panel;
 pub mod module_tile;
 pub mod module_tile_kind;
 pub(crate) mod muted;
@@ -123,6 +124,7 @@ pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_filter::Filter;
 pub use menu_pick::PickDismiss;
 pub use module_grid::{GridColumns, GridMetrics, ModuleGrid};
+pub use module_panel::{ModulePanel, PanelPlate};
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
 pub use osd::{Level, Osd, OsdPosition};
@@ -191,6 +193,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("menu_entry", include_str!("menu_entry.css")),
     ("osd", include_str!("osd.css")),
     ("module_tile", include_str!("module_tile.css")),
+    ("module_panel", include_str!("module_panel.css")),
     ("pane_switcher", include_str!("pane_switcher.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),

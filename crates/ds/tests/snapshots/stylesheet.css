@@ -1428,6 +1428,30 @@ html,body{margin:0;padding:0;background:transparent}
    inline from `control_center.grid_*`, and these are the keys' defaults. */
 .ds-module-grid{ --grid-columns:2; --grid-gap:var(--s-8); --grid-padding:var(--s-12); display:grid;
   grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr)); gap:var(--grid-gap); padding:var(--grid-padding); }
+/* -- module_panel -- */
+/* ModulePanel (sill FINDINGS Q100; design/13 section 13.3.7): a module with content of its own on
+   the tile's frame: `--r-tile` 12, the Off tile's plate (`--surface-2`, a hairline) and the
+   module's padding of 10 / 12. Not pressable, so no hover lift: its content takes the presses.
+   The header row: a 16 px glyph in `--ink-soft`, the title in the tile's type (13/600), the
+   trailing slot at the far end in the tile's status type (`--fs-help`, `--ink-faint`, tabular
+   figures, for a level's percentage). Full by default: it spans every grid column. `Bare`
+   drops the plate where a popover card already is the module's. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-module-panel{
+  display:flex; flex-direction:column; gap:var(--s-8); min-width:0; box-sizing:border-box;
+  padding:var(--s-10) var(--s-12); border:var(--hair) solid var(--line); border-radius:var(--r-tile);
+  background:var(--surface-2); color:var(--ink);
+}
+.ds-module-panel[*|data-span=full]{ grid-column:1 / -1; }
+.ds-module-panel[*|data-plate=bare]{ padding:0; border:0; background:none; }
+
+.ds-module-panel-head{ display:flex; align-items:center; gap:var(--s-6); min-width:0; }
+.ds-module-panel-glyph{ display:flex; align-items:center; flex:none; color:var(--ink-soft); }
+.ds-module-panel-title{ flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden;
+  font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
+.ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
+  font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 /* -- pane_switcher -- */
 /* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
    (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
