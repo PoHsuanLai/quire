@@ -1,6 +1,19 @@
 {
- "updated": "2026-09-25, quire v0.1.9; the level-control pick is open; manual checks wait for the user",
+ "updated": "2026-09-25, PDF printing through pdfrum on quire master; v0.1.10 waits for pdfrum 0.4.0",
  "entries": [
+  {
+   "id": "native-pdf",
+   "date": "2026-09-25 · printing without a webview",
+   "title": "Blitz pages become vector PDFs through pdfrum: mailo's last webview blocker falls",
+   "status": "proven",
+   "lede": "The user decided mailo goes native-only, printing included, and that the PDF must go through their own pdfrum library rather than a third-party writer. Blitz lays the page out once at the paper's content width; a painter over pdfrum's canvas draws each page as vector graphics with embedded, subsetted fonts and the real text behind every glyph run (read from the layout's clusters, so ligatures and CJK extract exactly); page breaks follow two markers since Blitz cannot parse the CSS ones, keep-together boxes move whole, orphans and widows are held, and no glyph is left hidden under a clip. Variable fonts embed at the weight the layout used. A print dialog goes through the desktop portal behind a feature. pdfrum itself gained a glyph-run API with ToUnicode and ActualText, gradient shadings, blend modes, PNG pass-through, blank documents and variable-font instancing, under its own gates.",
+   "notes": [
+    "The three-page fixture (Latin, CJK, a JPEG, an alpha PNG, a moved block, a forced break): 42 KB, about 6 ms per print after the first in release, JPEG embedded byte-identical, and a rasterised page differs from the headless snapshot by a mean of half a channel level.",
+    "Two findings on the way: the prototype's thin grey CJK was the variable font's Thin default instance, not a fallback; and a glyph with no text used to swallow the next glyph's text, a bug the earlier writer had too.",
+    "pdfrum is pinned by git revision until the user publishes 0.4.0 (the whole chain together, because of a dependency pin); then quire v0.1.10 is tagged and mailo deletes its webview path."
+   ],
+   "images": []
+  },
   {
    "id": "v019",
    "date": "2026-09-25 · quire v0.1.9",
