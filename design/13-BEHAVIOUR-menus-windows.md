@@ -150,7 +150,8 @@ is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pat
 
 | Value | Number | Status | Basis |
 | --- | --- | --- | --- |
-| Anchor | a popover from its bar status item; participates in bar hover-switch (13.3.2) | proposed |
+| Anchor | a popover from its bar status item, which sits at the right end of the status area just left of the clock (as on macOS); participates in bar hover-switch (13.3.2) | settled (user, 2026-09-25) |
+| Module bar items | any module can also be shown as its own bar status item (macOS "Show in Menu Bar"): a click on that item opens the module's detail pane as a popover directly, not the whole control center; the setting is per module (M5 freeze names the keys) | proposed (user direction, 2026-09-25) |
 | Open / close | `menu-pop --t-move --e-spring` / `fade --t-quick --e-exit` | settled open (brief), close proposed |
 | Size | width 320, height fits content, max `output_h - --bar-h - 16` then scrolls (no rubber band) | proposed (R9 UNKNOWN) |
 | Grid | 2 columns, gap 8, padding 12; module tiles `--r-tile` 12; sliders span both columns | proposed |
