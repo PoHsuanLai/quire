@@ -21,7 +21,7 @@ pub mod use_roster;
 pub mod use_swipe;
 
 pub use anim::{Anim, Fill, Iteration, Recipe};
-pub use drag::{Drag, DragPhase, DragTracker, use_drag};
+pub use drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag};
 pub use entrance::use_entrance;
 pub use hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};
 pub use pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};

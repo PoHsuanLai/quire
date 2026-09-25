@@ -7,7 +7,8 @@
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
      `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
      and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
-     (the level control), and the sheet's `sheet-out` (sill Q90), below.
+     (the level control), the sheet's `sheet-out` (sill Q90), and the screenshot thumbnail's
+     `shot-out` (sill Q181), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -234,3 +235,9 @@
    back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
+
+/* shot-out (quire's, sill Q181): the screenshot thumbnail slides out to the right, past its own
+   width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
+   out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
+   --e-spring`. */
+@keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }

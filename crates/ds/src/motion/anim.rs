@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 64 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 66 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -18,7 +18,8 @@
 //! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
 //! step, plus `SheetOut`, the sheet's exit (sill FINDINGS Q90), plus `BannerOut`, a
 //! notification banner's slide out by its entry edge (sill Q121, Q122), and `BannerIn`, its
-//! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123).
+//! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123),
+//! plus `ShotIn` and `ShotOut`, the screenshot thumbnail's pair (sill Q181).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -179,11 +180,18 @@ pub enum Anim {
     /// `panel-out`: the edge panel slides back out past the edge over `--t-move --e-exit`,
     /// holding its last frame until the host unmaps it at `settle(PanelOut)` (sill Q123).
     PanelOut,
+    /// `rise` at `--t-big --e-spring`: the screenshot thumbnail arrives as a surface, at the
+    /// toast's spring rather than a row's `--t-move --e-out` (design/20 section 1.13; sill Q181).
+    ShotIn,
+    /// `shot-out`: the screenshot thumbnail slides out to the right past its own width and
+    /// fades, over `--t-move --e-exit`, holding its last frame until the host unmaps it at
+    /// `settle(ShotOut)` (design/20 section 1.13: "slide-r out"; sill Q181).
+    ShotOut,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 64] = [
+    pub const ALL: [Anim; 66] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -248,6 +256,8 @@ impl Anim {
         Anim::BannerIn,
         Anim::PanelIn,
         Anim::PanelOut,
+        Anim::ShotIn,
+        Anim::ShotOut,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -317,6 +327,8 @@ impl Anim {
             Anim::BannerIn => "a-banner-in",
             Anim::PanelIn => "a-panel-in",
             Anim::PanelOut => "a-panel-out",
+            Anim::ShotIn => "a-shot-in",
+            Anim::ShotOut => "a-shot-out",
         }
     }
 }

@@ -268,6 +268,10 @@ fn the_settle_table() {
         // sill Q123: the center's edge panel, in and out at --t-move.
         (Anim::PanelIn, MotionLevel::Standard, 284),
         (Anim::PanelOut, MotionLevel::Standard, 284),
+        // sill Q181: the screenshot thumbnail rises in at --t-big and slides out at --t-move.
+        (Anim::ShotIn, MotionLevel::Standard, 454),
+        (Anim::ShotIn, MotionLevel::Calm, 334),
+        (Anim::ShotOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

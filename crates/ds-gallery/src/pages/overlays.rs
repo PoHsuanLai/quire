@@ -134,6 +134,7 @@ pub fn OverlaysPage() -> Element {
         super::overlays_notifications::Notifications {}
         super::calendar::Calendar {}
         super::widgets::Widgets {}
+        super::overlays_shot::ShotThumbnails {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,

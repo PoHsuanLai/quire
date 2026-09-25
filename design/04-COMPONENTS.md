@@ -75,6 +75,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 33 | EdgeStrip (+ side peek) | S `.edge`, `.side-peek` | hidden sidebar | dock auto-hide edge (planned) |
 | 34 | DragGhost and DropTarget | C `.ghost` `.is-drop-target`; S `.ograb` `.drop-line` | drag thread to place, move composer object | dock drag-out (planned) |
 | 35 | SyncHalo | C `.acct-ring .halo` | account sync | bar sync indicator |
+| 41 | ShotThumbnail, ShotGhost | none (design/20 section 1.13) | none | screenshot thumbnail |
 
 ## Shared vocabulary
 
@@ -3146,55 +3147,6 @@ Some(PlateTint)` (`Muted`, or `Monochrome(Tint)`) re-colours the stops and the i
 rule for both schemes, written inline as `--plate-base-l`/`-deep-l`/`-ink-l` and `-d`, marked
 `data-icon-style`, and read by the sheet under `data-theme` (sill FINDINGS Q72; design/08 4.4).
 
-### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
-
-**Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
-and, later, the shell's apps on shell-host toplevels. It moves, resizes and zooms the window
-through the host seam `ds::HostWindow` (design/13 section 13.3.11; FINDINGS "Window frame").
-**Props.** `Ds { window: WindowFrame }`. `WindowFrame::None` (default) draws nothing and leaves
-the root's markup as it was; `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown,
-Hidden}, timing: FrameTiming }` (`WindowFrame::titlebar(title, lights)` takes the settings'
-default timing). `WindowTitlebar { title, lights, timing, pose: TilePose::{Closed, Open} }` is
-the titlebar alone, for a gallery.
-**Markup.** The root stamps `data-window-frame="titlebar"` and becomes a column:
-`div.ds-titlebar[data-window][data-activation][data-first-mouse]` holding
-`div.ds-lights[role=group]` (three `button.ds-light[data-light=close|minimize|zoom]`, each with
-an `svg.ds-light-mark`) and `span.ds-titlebar-title.ds-truncate`; then `div.ds-window-body`
-with the children; then eight `div.ds-resize-edge[data-edge]` (not while maximized or
-fullscreen).
-
-| Metric | Value | Basis |
-| --- | --- | --- |
-| Titlebar height | 28 | macOS standard titlebar (28 pt) |
-| Light diameter | 12 | macOS (12 pt) |
-| Gap between lights | 8 (`--s-8`) | macOS (20 pt centre to centre) |
-| Inset of the first light | 13 (`--s-13`) from the left edge, centred on the titlebar | brief (macOS) |
-| Title | 13/600 (`--fs-control`), `--f-ink-soft`, `--f-ink-faint` inactive, centred between 84 px insets, `.ds-truncate` | macOS |
-| Light hues | close `--c-red`, minimize `--c-amber`, zoom `--c-green` (the Candy shelf) | design/03 section 15 |
-| Mark ink | the hue's `-deep` in light, its `-soft` in dark (dark on the disc in both) | macOS |
-| Resize zones | 4 px along each side, 12 x 12 at each corner, `--z-edge` | settled 2026-09-25 |
-
-**The reveal rule.** In the active window the lights are coloured at rest; in an inactive one
-they are `--f-pill` discs with a `--f-line` hairline (grey). The pointer over any light colours
-all three (inactive included) and shows all three marks; the keyboard focus on a light shows its
-mark; the green light shows its mark while its menu is open. This is macOS's rule: grey until
-hover applies to background windows, the active window keeps its colours.
-**Marks.** A cross, a bar, and the zoom mark: two outward corners, which turn inward
-("restore", `aria-label="Restore"`) while the window is maximized.
-**Behaviour.** A primary press on the titlebar's empty area that travels more than
-`move_threshold` (4 px) on either axis asks `begin_move` once; less is a click. A double-click
-on the titlebar is `zoom(Zoom::Toggle)`. Neither happens on a light (each light keeps its
-`pointerdown` and `dblclick`), and the move not while the window is maximized or fullscreen. A
-press on an edge zone asks `begin_resize(edge)` at once. Close, minimize and zoom on a click;
-the green light held for `menu_press` (500 ms), rested on for `menu_hover` (800 ms: the 450 ms
-hover intent plus 350 ms), right-clicked, or given ArrowDown opens the Move & Resize menu (a Slim
-`Menu`): Fill (`zoom(Maximize)`), Left half, Right half, Centre (`tile(..)`), each
-`Availability::Disabled` where `supports(..)` said `Support::No` as the menu opened. A hold that
-opened the menu does not also zoom on its release. Escape closes the menu (the menu's own);
-Tab reaches the three lights in order.
-**Motion.** A light springs back from `--squish` over `--t-tap --e-spring` (design/05 principle
-2: the press is contact); colours and marks cross-fade over `--t-quick --e-out`.
-
 ### 39. MonthGrid (the calendar widget's month; sill Q180, 2026-09-26)
 
 **Purpose.** One month of days in seven columns: the calendar widget of the notification center
@@ -3334,6 +3286,117 @@ the SendPill's ring is a countdown drawn inside the pill, not a level.
 **Motion.** None in steady state; a value change plays `bump` once (`--t-move --e-spring`, the
 Count's pulse). No transition on the ring's dash (a `stroke-dashoffset` transition does not run in
 Blitz, O-20).
+
+### 41. ShotThumbnail and ShotGhost (screenshot thumbnail, settled 2026-09-26)
+
+**Purpose.** The floating thumbnail after a screenshot (design/20 section 1.13; sill Q181): the
+picture, letterboxed in a card of the `Toast` material with its drop, at the bottom right of an
+Overlay surface. A click on the picture opens it; a drag past the threshold hands the host a
+drag start (the host does the drag, with `ShotGhost` as its icon); hovering shows a row of
+actions (Delete now, Mark Up and Copy Text later). The hold (`screenshot.thumbnail_hold_ms`,
+5200, design/22 section 3.22) is the caller's timer, paused on `onhover`, as `BannerStack`'s is.
+**Markup.** Inside a transparent `Toast` scope (`Surface { chrome: Transparent }`, as
+`NotificationCard`):
+`div.ds-shot[data-shown][data-presence][data-pulse][data-hover]` holding
+`div.ds-shot-plate[role=group][aria-label=Screenshot]` (the material card, `id` for the host's
+input and blur region, `Element("thumb")`), which holds `div.ds-shot-picture[role=button]` (the
+press target, `aria-label="Open screenshot"`) around `img.ds-shot-image` placed inline at its
+letterboxed rect, and `div.ds-shot-actions[role=toolbar]` of `span.ds-shot-action[style=--j]`
+each around an `IconButton { Strip }`. `ShotGhost` draws `div.ds-shot-ghost` around the same
+plate at the ghost width.
+**Props.**
+
+```rust
+pub struct ImageSource(pub String)              // a data: URI or file: URL; ::file(&Path), ::png(&[u8])
+pub struct ImageSize { pub width: u32, pub height: u32 }   // the picture's pixels, for its ratio
+pub struct ThumbAction { pub icon: Icon, pub label: Text, pub onpress: EventHandler<()> }
+pub struct DragStart { pub from: Point, pub at: Point }    // press point, and where it crossed
+#[component] pub fn ShotThumbnail(image: ImageSource, size: ImageSize, shown: Shown,
+    on_hidden: EventHandler<()> /* default */, width: Px /* 240 */, actions: Vec<ThumbAction>,
+    onopen: Option<EventHandler<()>>, ondrag: Option<EventHandler<DragStart>>,
+    onhover: Option<EventHandler<Hover>>, id: Option<String>,
+    swipe: Swipe /* Off */, swipe_metrics: SwipeMetrics /* notifications.swipe_* */) -> Element
+#[component] pub fn ShotGhost(image: ImageSource, size: ImageSize) -> Element
+```
+
+**Values.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Card width | `width`, 240 by default (sill's `THUMB_WIDTH`) | design/20 names none; about a sixth of a 1440 px screen |
+| Mat | 4 (`--s-4`) round the picture | the material shows as a thin frame |
+| Picture box | the image's own ratio, held between 2:1 (widest) and 16:10 (tallest); outside that the picture is letterboxed (bars of the material) | sill sizes its surface for 16:10 |
+| Card radius | `--m-radius` (Toast, 16); the picture's `--m-radius` less the mat | design/20 section 1.13 |
+| Actions | a pill at the bottom right, 6 in, `--raise`, `--shadow-2`, strip buttons popping in by `--j` x `--stagger` | HoverStrip (section 17) |
+| Drag threshold | 8 px Manhattan (`DRAG_THRESHOLD`) | section 34 |
+| Ghost | 120 wide, opacity .8, no motion | a drag icon is small and lets the drop target show through |
+
+**Motion.** Shown: `Anim::ShotIn` (`rise` at `--t-big --e-spring`); hidden (a dismissal or the
+hold's end): `Anim::ShotOut` (`shot-out`, a slide right past its own width that fades, at
+`--t-move --e-exit`, held), and `on_hidden` at `settle(ShotOut)`; a show while it leaves takes
+the hide back (`Osd`'s machine). The actions fade in over `--t-quick --e-out`.
+**Behaviour.** A press on the picture that travels 8 px (Manhattan) calls `ondrag` once, with
+the press point and the crossing point; the click that ends such a press does not open. A press
+that stays under the threshold opens on its click (`onopen`), as do Enter and Space on the
+picture. The pointer entering or leaving the card calls `onhover` (`Hover::Over`, `Away`) and
+shows or hides the actions. Actions keep their press: none also opens. `swipe:
+Swipe::Dismiss(handler)` is `NotificationCard`'s swipe to dismiss, the same machine and metrics
+(`notification_swipe`): a drag or a horizontal scroll to the right past 80 px or 600 px/s flies
+the card out (`banner-out`) and calls the handler at its settle, or at once inside a
+`BannerStack` row, which carries the flight. With it on, a press crossing the threshold mostly to
+the right is the swipe's and never a drag out; left, up and down still drag out. The card has no
+position of its own (no margin, no anchor): a `BannerStack { position: BottomRight }` or the
+caller's surface places it, and `shown`/`on_hidden` work in either. Under Reduced motion the card
+decides for itself: no spring back, and it fades in and out rather than rising and sliding.
+
+### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
+
+**Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
+and, later, the shell's apps on shell-host toplevels. It moves, resizes and zooms the window
+through the host seam `ds::HostWindow` (design/13 section 13.3.11; FINDINGS "Window frame").
+**Props.** `Ds { window: WindowFrame }`. `WindowFrame::None` (default) draws nothing and leaves
+the root's markup as it was; `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown,
+Hidden}, timing: FrameTiming }` (`WindowFrame::titlebar(title, lights)` takes the settings'
+default timing). `WindowTitlebar { title, lights, timing, pose: TilePose::{Closed, Open} }` is
+the titlebar alone, for a gallery.
+**Markup.** The root stamps `data-window-frame="titlebar"` and becomes a column:
+`div.ds-titlebar[data-window][data-activation][data-first-mouse]` holding
+`div.ds-lights[role=group]` (three `button.ds-light[data-light=close|minimize|zoom]`, each with
+an `svg.ds-light-mark`) and `span.ds-titlebar-title.ds-truncate`; then `div.ds-window-body`
+with the children; then eight `div.ds-resize-edge[data-edge]` (not while maximized or
+fullscreen).
+
+| Metric | Value | Basis |
+| --- | --- | --- |
+| Titlebar height | 28 | macOS standard titlebar (28 pt) |
+| Light diameter | 12 | macOS (12 pt) |
+| Gap between lights | 8 (`--s-8`) | macOS (20 pt centre to centre) |
+| Inset of the first light | 13 (`--s-13`) from the left edge, centred on the titlebar | brief (macOS) |
+| Title | 13/600 (`--fs-control`), `--f-ink-soft`, `--f-ink-faint` inactive, centred between 84 px insets, `.ds-truncate` | macOS |
+| Light hues | close `--c-red`, minimize `--c-amber`, zoom `--c-green` (the Candy shelf) | design/03 section 15 |
+| Mark ink | the hue's `-deep` in light, its `-soft` in dark (dark on the disc in both) | macOS |
+| Resize zones | 4 px along each side, 12 x 12 at each corner, `--z-edge` | settled 2026-09-25 |
+
+**The reveal rule.** In the active window the lights are coloured at rest; in an inactive one
+they are `--f-pill` discs with a `--f-line` hairline (grey). The pointer over any light colours
+all three (inactive included) and shows all three marks; the keyboard focus on a light shows its
+mark; the green light shows its mark while its menu is open. This is macOS's rule: grey until
+hover applies to background windows, the active window keeps its colours.
+**Marks.** A cross, a bar, and the zoom mark: two outward corners, which turn inward
+("restore", `aria-label="Restore"`) while the window is maximized.
+**Behaviour.** A primary press on the titlebar's empty area that travels more than
+`move_threshold` (4 px) on either axis asks `begin_move` once; less is a click. A double-click
+on the titlebar is `zoom(Zoom::Toggle)`. Neither happens on a light (each light keeps its
+`pointerdown` and `dblclick`), and the move not while the window is maximized or fullscreen. A
+press on an edge zone asks `begin_resize(edge)` at once. Close, minimize and zoom on a click;
+the green light held for `menu_press` (500 ms), rested on for `menu_hover` (800 ms: the 450 ms
+hover intent plus 350 ms), right-clicked, or given ArrowDown opens the Move & Resize menu (a Slim
+`Menu`): Fill (`zoom(Maximize)`), Left half, Right half, Centre (`tile(..)`), each
+`Availability::Disabled` where `supports(..)` said `Support::No` as the menu opened. A hold that
+opened the menu does not also zoom on its release. Escape closes the menu (the menu's own);
+Tab reaches the three lights in order.
+**Motion.** A light springs back from `--squish` over `--t-tap --e-spring` (design/05 principle
+2: the press is contact); colours and marks cross-fade over `--t-quick --e-out`.
 
 ## Open decisions
 

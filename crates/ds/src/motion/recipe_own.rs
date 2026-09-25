@@ -199,3 +199,25 @@ pub(super) const PANEL_OUT: Recipe = recipe(
     Fill::Forwards,
     Iteration::Once,
 );
+
+/// `rise` at `--t-big --e-spring` (sill Q181): the screenshot thumbnail's entrance. A surface
+/// arriving, so it springs at the toast's length (design/20 section 1.13) where a row's `rise`
+/// decelerates at `--t-move`. An entrance; it holds nothing.
+pub(super) const SHOT_IN: Recipe = recipe(
+    "rise",
+    DurationToken::Big,
+    EasingToken::Spring,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `shot-out` (sill Q181): the thumbnail slides out to the right at `--t-move --e-exit`
+/// (design/05 section 10: exits accelerate), holding its last frame until the host unmaps it at
+/// `settle(ShotOut)`.
+pub(super) const SHOT_OUT: Recipe = recipe(
+    "shot-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);

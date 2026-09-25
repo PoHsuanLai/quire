@@ -5,6 +5,11 @@ use crate::components::vocab::Fraction;
 use crate::geometry::units::{Point, Px, Rect};
 use dioxus::prelude::*;
 
+/// How far a press travels, `|dx| + |dy|`, before it is a drag rather than a click: 8 px, the
+/// prototypes' threshold (design/04-COMPONENTS.md section 34). Named so a component that hands
+/// its drag to the host (the screenshot thumbnail) and its test agree on one number.
+pub const DRAG_THRESHOLD: Px = Px(8.0);
+
 /// Where a drag is.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DragPhase<K> {
