@@ -184,7 +184,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 
 | Field | Value | St |
 | --- | --- | --- |
-| Layer / role | xdg popup from the bar clock | P |
+| Layer / role | a widget in the notification center (M6's center replaced the clock's popup) | P |
 | Material | `Popover` | P |
 | Components | month grid (new ds component `MonthGrid`, add to 04 first), `ListRow` events, `IconButton{Tool}` prev/next | P |
 | Motion | `menu-pop`; month change `slide-l`/`slide-r` | P |
@@ -207,7 +207,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 
 | Field | Value | St |
 | --- | --- | --- |
-| Layer / role | `Bottom` layer (above wallpaper, below windows), one surface per widget P | P |
+| Layer / role | one `Bottom` surface per output (above wallpaper, below windows), the widgets on a grid inside it | P |
 | Material | `Widget` | S |
 | Content | calendar, weather, battery (SPEC) | S |
 | Components | `SectionHeader`, `Count`, `ListRow` | P |
@@ -234,7 +234,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Layer / role | `Overlay`, one tiny surface per enabled corner, anchor corner, 2 x 2 px P | S / P |
 | Material | none (fully transparent) | S |
 | Motion | none | S |
-| Behaviours | 13 (dwell time and action table) | P |
+| Behaviours | `13-BEHAVIOUR-menus-windows.md#13-3-12-hot-corners` (dwell, re-arm, modifier, action table) | P |
 | Keyboard / blur / input | `None`; blur none; input `Whole` | P |
 | Milestone | M10 | S |
 
