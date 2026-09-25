@@ -13,15 +13,25 @@ use std::rc::Rc;
 /// holds the document (ask again next frame) and [`Probe::Unknown`] before the surface mounts,
 /// with no host, or where nothing addressable is. Geometry is the last layout's: after a change
 /// to the text, read on the next frame.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
 pub struct EditHandle {
     element: Signal<Option<Rc<MountedData>>>,
+    /// The host, read once where the handle is made, so a read needs no scope of its own.
+    host: Option<HostEdit>,
+}
+
+/// The same handle is the same surface.
+impl PartialEq for EditHandle {
+    fn eq(&self, other: &Self) -> bool {
+        self.element == other.element
+    }
 }
 
 /// A handle owned by the calling component.
 pub fn use_edit_handle() -> EditHandle {
     EditHandle {
         element: use_signal(|| None),
+        host: use_hook(try_consume_context::<HostEdit>),
     }
 }
 
@@ -55,7 +65,7 @@ impl EditHandle {
     }
 
     fn with<T>(&self, read: impl FnOnce(&HostEdit, &MountedData) -> Probe<T>) -> Probe<T> {
-        let Some(host) = try_consume_context::<HostEdit>() else {
+        let Some(host) = self.host else {
             return Probe::Unknown;
         };
         match self

@@ -8,7 +8,11 @@
 //!   (S7/S8). The app renders once they are in place, a frame after the host.
 //! - Rect reads go through `ds::HostMeasure`, which waits out a document the renderer is
 //!   holding instead of panicking (`crate::measure`); focus changes go through `ds::HostFocus`
-//!   the same way (`crate::focus`).
+//!   the same way (`crate::focus`); an edit surface's geometry and IME through `ds::HostEdit`
+//!   (`crate::edit`).
+//! - IME events: dioxus-native-dom drops them, but this window hook hears each winit event
+//!   before the document does, so an IME event goes to the edit surface that has the keyboard
+//!   (`crate::edit_ime`).
 //! - Before each frame, the viewport's colour scheme (and the window's decorations) follow the
 //!   scheme the root `.ds` resolved.
 //! - The window's scale factor, as `ds::HostScale`, so `Ds` writes the pixel tokens for it and a
@@ -20,6 +24,7 @@
 //! the document itself and hands the app nothing else that can see it.
 
 use crate::clipboard::HostClipboard;
+use crate::edit_ime::{EditListeners, ime_of};
 use crate::frame_links::frame_links;
 use crate::install::install;
 use crate::scheme;
@@ -63,6 +68,8 @@ pub(crate) fn Host(props: HostProps) -> Element {
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
     use_context_provider(|| crate::focus::SELECT);
+    use_context_provider(|| crate::edit::EDIT);
+    let listeners = use_context_provider(EditListeners::default);
     let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let window = use_window();
@@ -81,6 +88,17 @@ pub(crate) fn Host(props: HostProps) -> Element {
             let HostModality(mut current) = modality;
             if *current.peek() != next {
                 current.set(next);
+            }
+        }
+        if let WindowEvent::Ime(ime) = event
+            && let Some(ime) = ime_of(ime)
+        {
+            let sink = seen
+                .borrow()
+                .as_ref()
+                .and_then(|handle| handle.try_doc().and_then(|doc| listeners.target(&doc)));
+            if let Some(sink) = sink {
+                sink.call(ime);
             }
         }
         if matches!(event, WindowEvent::RedrawRequested)

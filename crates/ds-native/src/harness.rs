@@ -27,7 +27,7 @@ use std::time::{Duration, Instant};
 /// A headless document under test.
 pub struct Harness {
     viewport: Viewport,
-    doc: Headless,
+    pub(crate) doc: Headless,
     /// Animation time: the sum of every `advance`.
     clock: Duration,
     /// Keeps a Tokio runtime entered on this thread for as long as the harness lives, so a
@@ -199,6 +199,12 @@ impl Harness {
         self.settle();
     }
 
+    /// Run `f` inside the app's runtime, as its handlers run: a test reads an app-facing handle
+    /// (`ds::EditHandle::caret_rect`) the way the app would.
+    pub fn within<T>(&mut self, f: impl FnOnce() -> T) -> T {
+        self.doc.doc.vdom.in_runtime(f)
+    }
+
     /// The document as HTML, for assertions.
     pub fn html(&self) -> String {
         self.with_doc(|doc| doc.root_element().outer_html())
@@ -290,6 +296,11 @@ impl Harness {
 
     fn settle(&mut self) {
         self.doc.frame(self.clock);
+    }
+
+    /// Bring the document up to date after input delivered outside `send`.
+    pub(crate) fn settle_now(&mut self) {
+        self.settle();
     }
 
     /// What was last copied (Ctrl+C in a field, `ds_native::clipboard::write_text`): the
