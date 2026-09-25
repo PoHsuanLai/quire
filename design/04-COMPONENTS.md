@@ -75,6 +75,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 33 | EdgeStrip (+ side peek) | S `.edge`, `.side-peek` | hidden sidebar | dock auto-hide edge (planned) |
 | 34 | DragGhost and DropTarget | C `.ghost` `.is-drop-target`; S `.ograb` `.drop-line` | drag thread to place, move composer object | dock drag-out (planned) |
 | 35 | SyncHalo | C `.acct-ring .halo` | account sync | bar sync indicator |
+| 39 | ShotThumbnail, ShotGhost | none (design/20 section 1.13) | none | screenshot thumbnail |
 
 ## Shared vocabulary
 
@@ -3145,6 +3146,68 @@ image at `--plate-inset` 72 %. Families `Red`, `Amber`, `Green`, `Blue`, `Violet
 Some(PlateTint)` (`Muted`, or `Monochrome(Tint)`) re-colours the stops and the ink by `retint`'s
 rule for both schemes, written inline as `--plate-base-l`/`-deep-l`/`-ink-l` and `-d`, marked
 `data-icon-style`, and read by the sheet under `data-theme` (sill FINDINGS Q72; design/08 4.4).
+
+### 39. ShotThumbnail and ShotGhost (screenshot thumbnail, settled 2026-09-26)
+
+**Purpose.** The floating thumbnail after a screenshot (design/20 section 1.13; sill Q181): the
+picture, letterboxed in a card of the `Toast` material with its drop, at the bottom right of an
+Overlay surface. A click on the picture opens it; a drag past the threshold hands the host a
+drag start (the host does the drag, with `ShotGhost` as its icon); hovering shows a row of
+actions (Delete now, Mark Up and Copy Text later). The hold (`screenshot.thumbnail_hold_ms`,
+5200, design/22 section 3.22) is the caller's timer, paused on `onhover`, as `BannerStack`'s is.
+**Markup.** Inside a transparent `Toast` scope (`Surface { chrome: Transparent }`, as
+`NotificationCard`):
+`div.ds-shot[data-shown][data-presence][data-pulse][data-hover]` holding
+`div.ds-shot-plate[role=group][aria-label=Screenshot]` (the material card, `id` for the host's
+input and blur region, `Element("thumb")`), which holds `div.ds-shot-picture[role=button]` (the
+press target, `aria-label="Open screenshot"`) around `img.ds-shot-image` placed inline at its
+letterboxed rect, and `div.ds-shot-actions[role=toolbar]` of `span.ds-shot-action[style=--j]`
+each around an `IconButton { Strip }`. `ShotGhost` draws `div.ds-shot-ghost` around the same
+plate at the ghost width.
+**Props.**
+
+```rust
+pub struct ImageSource(pub String)              // a data: URI or file: URL; ::file(&Path), ::png(&[u8])
+pub struct ImageSize { pub width: u32, pub height: u32 }   // the picture's pixels, for its ratio
+pub struct ThumbAction { pub icon: Icon, pub label: Text, pub onpress: EventHandler<()> }
+pub struct DragStart { pub from: Point, pub at: Point }    // press point, and where it crossed
+#[component] pub fn ShotThumbnail(image: ImageSource, size: ImageSize, shown: Shown,
+    on_hidden: EventHandler<()> /* default */, width: Px /* 240 */, actions: Vec<ThumbAction>,
+    onopen: Option<EventHandler<()>>, ondrag: Option<EventHandler<DragStart>>,
+    onhover: Option<EventHandler<Hover>>, id: Option<String>,
+    swipe: Swipe /* Off */, swipe_metrics: SwipeMetrics /* notifications.swipe_* */) -> Element
+#[component] pub fn ShotGhost(image: ImageSource, size: ImageSize) -> Element
+```
+
+**Values.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Card width | `width`, 240 by default (sill's `THUMB_WIDTH`) | design/20 names none; about a sixth of a 1440 px screen |
+| Mat | 4 (`--s-4`) round the picture | the material shows as a thin frame |
+| Picture box | the image's own ratio, held between 2:1 (widest) and 16:10 (tallest); outside that the picture is letterboxed (bars of the material) | sill sizes its surface for 16:10 |
+| Card radius | `--m-radius` (Toast, 16); the picture's `--m-radius` less the mat | design/20 section 1.13 |
+| Actions | a pill at the bottom right, 6 in, `--raise`, `--shadow-2`, strip buttons popping in by `--j` x `--stagger` | HoverStrip (section 17) |
+| Drag threshold | 8 px Manhattan (`DRAG_THRESHOLD`) | section 34 |
+| Ghost | 120 wide, opacity .8, no motion | a drag icon is small and lets the drop target show through |
+
+**Motion.** Shown: `Anim::ShotIn` (`rise` at `--t-big --e-spring`); hidden (a dismissal or the
+hold's end): `Anim::ShotOut` (`shot-out`, a slide right past its own width that fades, at
+`--t-move --e-exit`, held), and `on_hidden` at `settle(ShotOut)`; a show while it leaves takes
+the hide back (`Osd`'s machine). The actions fade in over `--t-quick --e-out`.
+**Behaviour.** A press on the picture that travels 8 px (Manhattan) calls `ondrag` once, with
+the press point and the crossing point; the click that ends such a press does not open. A press
+that stays under the threshold opens on its click (`onopen`), as do Enter and Space on the
+picture. The pointer entering or leaving the card calls `onhover` (`Hover::Over`, `Away`) and
+shows or hides the actions. Actions keep their press: none also opens. `swipe:
+Swipe::Dismiss(handler)` is `NotificationCard`'s swipe to dismiss, the same machine and metrics
+(`notification_swipe`): a drag or a horizontal scroll to the right past 80 px or 600 px/s flies
+the card out (`banner-out`) and calls the handler at its settle, or at once inside a
+`BannerStack` row, which carries the flight. With it on, a press crossing the threshold mostly to
+the right is the swipe's and never a drag out; left, up and down still drag out. The card has no
+position of its own (no margin, no anchor): a `BannerStack { position: BottomRight }` or the
+caller's surface places it, and `shown`/`on_hidden` work in either. Under Reduced motion the card
+decides for itself: no spring back, and it fades in and out rather than rising and sliding.
 
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 

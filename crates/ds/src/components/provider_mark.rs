@@ -37,9 +37,7 @@ pub enum MarkSize {
     Inline,
 }
 
-/// An image the app supplies, as a `data:` URI. quire never fetches.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ImageSource(pub String);
+pub use crate::components::image_source::ImageSource;
 
 /// Letter or image.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

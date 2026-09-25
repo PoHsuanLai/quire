@@ -132,6 +132,7 @@ pub fn OverlaysPage() -> Element {
         super::control_center::ControlCenter {}
         super::overlays_sheet::PowerMenu {}
         super::overlays_notifications::Notifications {}
+        super::overlays_shot::ShotThumbnails {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,
