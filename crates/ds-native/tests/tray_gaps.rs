@@ -12,11 +12,12 @@ use ds::{
     IconButtonVariant, IconSize, IconSource, IconUrl, IconView, Key, Material, Menu, MenuEntry,
     MenuKind, Point, PointerButton, Press, Px, Theme, Trail,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 /// Wide enough for a menu and its submenu side by side.
 const VIEW: Viewport = Viewport {
@@ -298,24 +299,28 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
     let mut harness = Harness::new(MenuApp, VIEW);
     harness.advance(ms(80));
     let parent = centre(&harness, PARENT);
+    let armed = Instant::now();
     harness.pointer_move(parent);
     assert_eq!(
         selected(&harness),
         "More",
         "the pointer highlights the parent"
     );
-    harness.advance(ms(120));
+    // A "not yet" check only at well under half the 200 ms delay (fixed 2026-09-25, FINDINGS
+    // "Timing tests"): the old 120 ms check flaked under load, since `advance` only guarantees
+    // *at least* the time asked for, and a busy machine can stretch it past the boundary it
+    // meant to stop short of.
+    harness.advance(ms(80));
     assert_eq!(
         harness.count(SUBMENU),
         0,
-        "not open before the 200 ms delay"
+        "not open well before the 200 ms delay"
     );
-    harness.advance(ms(250));
-    assert_eq!(
-        harness.count(SUBMENU),
-        1,
-        "open after the delay:\n{}",
-        harness.html()
+    let opened = settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
+    assert!(
+        opened.duration_since(armed) >= Duration::from_millis(200),
+        "the submenu opened only once the full delay had run: {:?}",
+        opened.duration_since(armed)
     );
     assert_eq!(
         harness.attr(PARENT, "aria-expanded").as_deref(),

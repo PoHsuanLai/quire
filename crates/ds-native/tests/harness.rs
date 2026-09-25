@@ -16,9 +16,10 @@ use ds::{
 use ds::{
     DotIndex, Focus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput, Theme,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use ds_settings::{AppName, use_environment};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -181,19 +182,23 @@ fn the_toast_hub_hides_after_its_hold_and_not_before() {
     let mut harness = Harness::new(ToastHubApp, VIEW);
     let state = |harness: &Harness| harness.text_of(".probe-toast");
     assert_eq!(state(&harness).as_deref(), Some("hidden"));
+    let pushed = Instant::now();
     harness.click(centre(&harness, ".ds-button"));
     assert_eq!(state(&harness).as_deref(), Some("shown"));
-    harness.advance(ms(5000));
+    // Half the 5200 ms hold, not 5000 ms (fixed 2026-09-25, FINDINGS "Timing tests"): the old
+    // check left only 200 ms of margin (4 % of the window) against a loaded machine's overshoot
+    // on `advance`.
+    harness.advance(ms(2600));
     assert_eq!(
         state(&harness).as_deref(),
         Some("shown"),
-        "hid before 5200 ms"
+        "hid well before the hold ends"
     );
-    harness.advance(ms(400));
-    assert_eq!(
-        state(&harness).as_deref(),
-        Some("hidden"),
-        "still shown after 5400 ms"
+    let hidden = settle_until(&mut harness, |h| state(h).as_deref() == Some("hidden"));
+    assert!(
+        hidden.duration_since(pushed) >= ms(5200),
+        "hid only once the full hold had run: {:?}",
+        hidden.duration_since(pushed)
     );
 }
 
@@ -228,19 +233,22 @@ fn HoverHubProbe() -> Element {
 fn the_hover_hub_opens_after_450_ms_and_not_before() {
     let mut harness = Harness::new(HoverHubApp, VIEW);
     let state = |harness: &Harness| harness.text_of(".probe-hover");
+    let rested = Instant::now();
     harness.pointer_move(centre(&harness, ".probe-target"));
     assert_eq!(state(&harness).as_deref(), Some("closed"));
-    harness.advance(ms(400));
+    // Under half the 450 ms open delay, not 400 ms (fixed 2026-09-25, FINDINGS "Timing tests"):
+    // the old check left only 50 ms of margin (11 % of the window).
+    harness.advance(ms(200));
     assert_eq!(
         state(&harness).as_deref(),
         Some("closed"),
-        "open before 450 ms"
+        "open well before 450 ms"
     );
-    harness.advance(ms(100));
-    assert_eq!(
-        state(&harness).as_deref(),
-        Some("open"),
-        "still closed at 500 ms"
+    let opened = settle_until(&mut harness, |h| state(h).as_deref() == Some("open"));
+    assert!(
+        opened.duration_since(rested) >= ms(450),
+        "opened only once the full delay had run: {:?}",
+        opened.duration_since(rested)
     );
 }
 
@@ -323,11 +331,18 @@ fn HoverCardDemo() -> Element {
 #[test]
 fn a_hover_card_appears_after_450_ms_and_not_before() {
     let mut harness = Harness::new(HoverCardApp, VIEW);
+    let rested = Instant::now();
     harness.pointer_move(centre(&harness, ".ds-hover-target"));
-    harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-hovercard"), 0, "open before 450 ms");
-    harness.advance(ms(100));
-    assert_eq!(harness.count(".ds-hovercard"), 1, "{}", harness.html());
+    // Under half the 450 ms open delay, not 400 ms (fixed 2026-09-25, FINDINGS "Timing tests"):
+    // the old check left only 50 ms of margin (11 % of the window).
+    harness.advance(ms(200));
+    assert_eq!(harness.count(".ds-hovercard"), 0, "open well before 450 ms");
+    let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
+    assert!(
+        opened.duration_since(rested) >= ms(450),
+        "appeared only once the full delay had run: {:?}",
+        opened.duration_since(rested)
+    );
 }
 
 #[allow(non_snake_case)]
@@ -353,6 +368,7 @@ fn ToastDemo() -> Element {
 fn a_toast_hides_after_5200_ms() {
     let mut harness = Harness::new(ToastApp, VIEW);
     let shown = |harness: &Harness| harness.attr(".ds-toast", "data-shown");
+    let pushed = Instant::now();
     harness.click(centre(&harness, ".ds-button"));
     // It mounts below the edge for a frame, so the spring rises from there (gallery fix A).
     assert_eq!(shown(&harness).as_deref(), Some("hidden"));
@@ -362,14 +378,21 @@ fn a_toast_hides_after_5200_ms() {
         harness.text_of(".ds-toast-text").as_deref(),
         Some("Archived")
     );
-    harness.advance(ms(4900));
+    // Half the 5200 ms hold, not 5000 ms (fixed 2026-09-25, FINDINGS "Timing tests"): the old
+    // check left only 200 ms of margin (4 % of the window) against a loaded machine's overshoot
+    // on `advance`.
+    harness.advance(ms(2500));
     assert_eq!(
         shown(&harness).as_deref(),
         Some("shown"),
-        "hid before 5200 ms"
+        "hid well before the hold ends"
     );
-    harness.advance(ms(400));
-    assert_eq!(shown(&harness).as_deref(), Some("hidden"));
+    let hidden = settle_until(&mut harness, |h| shown(h).as_deref() == Some("hidden"));
+    assert!(
+        hidden.duration_since(pushed) >= ms(5200),
+        "hid only once the full hold had run: {:?}",
+        hidden.duration_since(pushed)
+    );
     // Sunk: after `--t-big` and a frame nothing is laid out.
     harness.advance(ms(500));
     assert_eq!(harness.count(".ds-toast"), 0);
