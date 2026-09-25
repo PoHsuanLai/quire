@@ -4,12 +4,17 @@
 //! previous and next `IconButton { Tool }`; the weekday heads; then the weeks, optionally led by
 //! their ISO week numbers, the neighbours' days quieter, today on the accent disc and a busy
 //! day's dot. A change of month slides the weeks in once (`month_grid_weeks`).
+//!
+//! Two densities (sill Q190): the regular grid, and a compact one that fits a small desktop
+//! widget's 132 x 132 content box, which the regular grid (224 x 254 for six weeks) overflows.
+//! `MonthDensity::Auto` picks between them by the enclosing `WidgetFrame`.
 
-use crate::components::icon_button::{IconButton, IconButtonVariant};
 use crate::components::month_grid_data::{DayKey, MonthGridData, MonthKey, Step, WeekNumbers};
+use crate::components::month_grid_density::{Drawn, MonthDensity};
+use crate::components::month_grid_header::header;
 use crate::components::month_grid_weeks::{MonthSlide, MonthWeeks};
 use crate::components::text_runs::{Text, text};
-use crate::icon::Icon;
+use crate::components::widget_scope::use_enclosing_frame;
 use dioxus::prelude::*;
 
 /// A month. `data` is the month as the shell laid it out; `weeks` whether each row leads with
@@ -20,24 +25,29 @@ use dioxus::prelude::*;
 /// Changing `data.month` slides the new month's weeks in once: from the right for a later
 /// month (`slide-r`), from the left for an earlier one (`slide-l`); the first month drawn and
 /// a render that keeps the month play nothing.
+///
+/// `density` (`Auto`) is written as `data-density`: `Auto` draws compact inside a
+/// `WidgetFrame { size: Small }` and regular inside a Medium or Large one or outside any frame;
+/// `Regular` and `Compact` force it. The compact grid is seven 18 px columns of 18 px rows, a
+/// 14 px header of `--fs-micro` title and 14 px glyph buttons, 10 px heads, today on a 16 px
+/// disc and a 3 px dot: 126 x 132 for a six-week month, measured on Blitz (the
+/// `month_grid_density` harness test), inside the small frame's 132 x 132. It never draws
+/// week numbers, whatever `weeks` says: a week column would not fit.
 #[component]
 pub fn MonthGrid(
     data: MonthGridData,
     #[props(default)] weeks: WeekNumbers,
+    #[props(default)] density: MonthDensity,
     #[props(default)] onstep: Option<EventHandler<Step>>,
     #[props(default)] onpick: Option<EventHandler<DayKey>>,
 ) -> Element {
     let slide = use_month_slide(data.month);
+    let drawn = density.resolve(use_enclosing_frame());
+    let weeks = shown_weeks(weeks, drawn);
     let label = data.title.plain_text();
     rsx! {
-        div { class: "ds-month", "data-weeks": weeks.slug(), "aria-label": "{label}",
-            div { class: "ds-month-header",
-                span { class: "ds-month-title", {text(&data.title)} }
-                if let Some(onstep) = onstep {
-                    {step_button(Step::Previous, Icon::ChevronLeft, onstep)}
-                    {step_button(Step::Next, Icon::ChevronRight, onstep)}
-                }
-            }
+        div { class: "ds-month", "data-weeks": weeks.slug(), "data-density": drawn.slug(), "aria-label": "{label}",
+            {header(&data.title, drawn, onstep)}
             {heads(&data.heads, weeks)}
             // A keyed list of one: a key only remounts inside a list, so a new month is a new
             // body (and a new slide) while a render that keeps the month keeps the body.
@@ -68,16 +78,11 @@ fn heads(heads: &[Text; 7], weeks: WeekNumbers) -> Element {
     }
 }
 
-/// One of the header's step buttons.
-fn step_button(step: Step, icon: Icon, onstep: EventHandler<Step>) -> Element {
-    rsx! {
-        IconButton {
-            variant: IconButtonVariant::Tool,
-            icon,
-            label: step.label(),
-            tooltip: step.label().to_owned(),
-            onclick: move |_| onstep.call(step),
-        }
+/// The week numbers drawn: the caller's, except never at the compact density.
+fn shown_weeks(weeks: WeekNumbers, drawn: Drawn) -> WeekNumbers {
+    match drawn {
+        Drawn::Regular => weeks,
+        Drawn::Compact => WeekNumbers::Hide,
     }
 }
 

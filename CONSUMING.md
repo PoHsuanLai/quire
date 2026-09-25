@@ -1486,6 +1486,20 @@ existing golden moved but the stylesheet's.
 **What sill switches to.** The calendar widget draws `MonthGrid` from `From<&grid::MonthGrid>`
 (title and heads formatted by you); `onstep` shifts the month (`shift_month`) and recomputes the
 grid; drop the widget's own grid CSS.
+
+**Density (sill Q190, 2026-09-26).** Additive: `MonthGrid` gains `density: MonthDensity`
+(`Auto`), and `WidgetFrame` now provides its size to its content. Every `.ds-month` now carries
+`data-density`, so a golden of yours holding a grid gains `data-density="regular"`; quire's
+three month goldens moved by that attribute alone, and the stylesheet's by the new rules.
+
+| Where | Prop or type | What it does |
+| --- | --- | --- |
+| `MonthGrid` | `density: MonthDensity` (`Auto`) | Written as `data-density=regular\|compact`. `Auto` follows the enclosing `WidgetFrame`: compact inside `size: Small`, regular inside `Medium`/`Large` or outside any frame. `Regular`/`Compact` force it |
+| `MonthDensity` | `Auto`/`Regular`/`Compact` | Compact is seven 18 px columns, a 14 px header (title at `--fs-micro`, 14 px glyph step buttons `ds-month-step` in place of the Tool buttons), 10 px heads, a 16 px today disc and a 3 px dot: 126 x 132 for a six-week month, inside a small desktop frame's 132 x 132 content box. It never shows week numbers, whatever `weeks` says (`calendar.week_numbers` applies to the regular grid only) |
+
+**What sill switches to.** Put the calendar's `MonthGrid` straight in its `WidgetFrame` and say
+nothing about density: the small widget draws compact, the medium and large regular. Style
+nothing under `.ds-month`.
 ### Screenshot thumbnail (2026-09-26)
 
 sill Q181; design/04-COMPONENTS.md section 41. Additive: two new components, two new `Anim`

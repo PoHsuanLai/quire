@@ -63,6 +63,8 @@ pub mod module_tile;
 pub mod module_tile_kind;
 pub mod month_grid;
 pub mod month_grid_data;
+pub mod month_grid_density;
+pub(crate) mod month_grid_header;
 pub(crate) mod month_grid_weeks;
 pub(crate) mod muted;
 pub(crate) mod notification_body;
@@ -128,6 +130,7 @@ pub(crate) mod tree_item_parts;
 pub mod vocab;
 pub mod widget_frame;
 pub mod widget_kind;
+pub(crate) mod widget_scope;
 pub mod window_frame;
 pub mod workspace_pills;
 
@@ -183,6 +186,7 @@ pub use month_grid_data::{
     DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
     Step, WeekNumbers,
 };
+pub use month_grid_density::MonthDensity;
 pub use notification_card::NotificationCard;
 pub use notification_parts::{AppMark, CardAction, GroupCount, Hover, Layers};
 pub use notification_swipe::Swipe;
