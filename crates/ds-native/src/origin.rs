@@ -12,6 +12,12 @@ impl FrameId {
     pub(crate) fn of(document: usize) -> Self {
         FrameId(document)
     }
+
+    /// A number naming this frame's document for as long as the process runs: a stable key for
+    /// the app's own maps (mailo's per-frame state), never reused by a later document.
+    pub fn index(self) -> usize {
+        self.0
+    }
 }
 
 /// The document a request came from.

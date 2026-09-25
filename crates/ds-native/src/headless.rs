@@ -10,7 +10,9 @@ use crate::clipboard::HostClipboard;
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
 use crate::fonts::font_context;
-use crate::frame_links::{LinkInbox, frame_links};
+use crate::frame_book::FrameBook;
+use crate::frame_hover::{FrameHover, HoverTracker};
+use crate::frame_links::{LinkInbox, frame_links, read_link};
 use crate::frames::FrameParser;
 use crate::memory_shell::MemoryShell;
 use crate::net::DsNet;
@@ -61,6 +63,10 @@ pub(crate) struct Headless {
     pub(crate) shell: Arc<MemoryShell>,
     /// Links clicked in the document's frames, on their way to the app.
     links: LinkInbox,
+    /// The document's frames and their tags.
+    book: FrameBook,
+    /// Whether the app hears the pointer cross links in frames, and the link it is on.
+    hover: (FrameHover, HoverTracker),
     /// The edit surfaces listening for IME events.
     pub(crate) listeners: EditListeners,
 }
@@ -73,8 +79,13 @@ impl Headless {
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
         let shell = Arc::new(MemoryShell::default());
-        let (frame_nav, links) = frame_links(&setup.frame_links);
-        let frame_net = DsNet::frame(setup.net.clone(), Some(Arc::clone(&net_waker)));
+        let book = FrameBook::new();
+        let (frame_nav, links) = frame_links(&setup.frame_links, book.clone());
+        let frame_net = DsNet::frame(
+            setup.net.clone(),
+            Some(Arc::clone(&net_waker)),
+            book.clone(),
+        );
         let config = DocumentConfig {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
@@ -122,6 +133,8 @@ impl Headless {
             layout: Layout::Running,
             shell,
             links,
+            book,
+            hover: (setup.frame_links.hover(), HoverTracker::default()),
             listeners,
         }
     }
@@ -155,8 +168,11 @@ impl Headless {
     /// that landed during styling is applied on the next resolve, spike S7).
     pub(crate) fn frame(&mut self, at: Duration) {
         for _ in 0..MAX_ROUNDS {
-            self.links.drain();
+            let inner = &self.doc.inner;
+            self.links
+                .drain(&|frame, href| read_link(&inner.borrow(), frame, href));
             let rendered = self.flush();
+            self.find_frames();
             if self.layout == Layout::Held {
                 return;
             }
@@ -171,6 +187,24 @@ impl Headless {
                 return;
             }
         }
+    }
+
+    /// Find the frames the renders attached under their `iframe`s, so their requests reach the
+    /// app tagged. The document is free by then: the app's `decide` may touch it.
+    fn find_frames(&mut self) {
+        let live = crate::frame_tree::live_frames(&self.doc.inner.borrow());
+        self.book.bind(live);
+    }
+
+    /// The pointer moved to `at`: tell the app if it came onto or left a link in a frame.
+    pub(crate) fn hover_at(&mut self, at: ds::Point) {
+        let (hover, tracker) = &mut self.hover;
+        if let FrameHover::Ignore = hover {
+            return;
+        }
+        let under = crate::frame_hit::link_under(&self.doc.inner.borrow(), at);
+        let crossings = tracker.step(under, at, &self.book);
+        crate::frame_hover::report(hover, crossings);
     }
 
     /// Paint the document as it was last resolved, over `backdrop`.
