@@ -70,3 +70,18 @@ fn each_weight_of_a_variable_face_embeds_its_own_instance() {
         "the two instances have different outlines"
     );
 }
+
+#[test]
+fn each_instance_is_named_after_its_weight() {
+    let mut harness = Harness::new(app, SMALL);
+    let bytes = harness.pdf(PageSpec::default()).expect("the app prints");
+    let mut names: Vec<String> = pdf_read::open(&bytes)
+        .embedded_fonts()
+        .into_iter()
+        .filter_map(|font| Some(font.name.split_once('+')?.1.to_owned()))
+        .filter(|name| name.starts_with("Karla"))
+        .collect();
+    names.sort();
+    // Named after the instance each subset was cut at, not the variable face's default.
+    assert_eq!(names, ["Karla-Bold", "Karla-Regular"]);
+}

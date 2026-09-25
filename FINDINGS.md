@@ -3847,8 +3847,17 @@ gecko-only; `@page` is ignored. So pagination reads markers. It is one pure func
   whose default instance is Thin. The prototype ignored the coordinates and embedded Thin. With
   the instance honoured, the CJK prints at 400, as on screen.
   - It is shared into pdfrum without a copy (`ByteSpan::from_owner`) and subset to about 20 KB.
-- The embedded font keeps the default instance's PostScript name (`NotoSansCJKtc-Thin`,
-  `Karla-Regular` for the 700 instance). That is cosmetic.
+- **The embedded subset is named after its instance** (pdfrum `02a8dcb6`). A variable face's
+  subset used to keep the default instance's PostScript name, which named the default instance:
+  `pdffonts` listed `NotoSansCJKtc-Thin` for glyphs printed at 400, and mailo's viewers showed
+  it.
+  - `/BaseFont` and `/FontName` now take the named `fvar` instance's own name
+    (`NotoSansCJKtc-Regular`, `Karla-Bold`).
+  - An unnamed instance follows the OpenType recommendation (`Karla_550wght`).
+  - Proofs: `native_pdf_app.rs::each_instance_is_named_after_its_weight` (the Karla subsets are
+    exactly `Karla-Bold` and `Karla-Regular`) and the fixture's CJK subset ending in
+    `NotoSansCJKtc-Regular` (`native_pdf.rs`). Both fail on the previous rev
+    (`NotoSansCJKtc-Thin`).
 
 ### Images
 
@@ -3915,9 +3924,8 @@ keep-together block that must move, and a forced break.
 - **Pinned block** (`docs/workspace-deps.toml`, copied into `Cargo.toml`): `pdfrum-edit` (with
   `variable-fonts`), `pdfrum-object`, `pdfrum-common`, `pdfrum` (tests, `vello-cpu`), `skrifa =
   0.44` (parley's own) and `memfd = 0.6`.
-  - They are a git rev of pdfrum `main` (`0765e4e5`) until pdfrum 0.4 is on crates.io.
-  - pdfrum's MSRV is 1.92, above quire's declared `rust-version = "1.91"`. The pinned
-    toolchain (1.98.1) builds both; the declared minimum wants raising in the next
-    toolchain-bump wave.
+  - They are a git rev of pdfrum `main` (`02a8dcb6`) until pdfrum 0.4 is on crates.io.
+  - pdfrum's crates declare `rust-version = "1.92"`, so quire's workspace `rust-version` is
+    1.92 now (was 1.91, blitz's minimum). The pinned toolchain stays 1.98.1.
   - Resolving pdfrum `main` moved `smallvec` back up to 1.16.1 (pdfrum pins it exactly).
   - `cargo deny check licenses`: ok.

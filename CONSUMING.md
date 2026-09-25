@@ -12,6 +12,11 @@ Citations below follow `design/README.md#3-citation-convention`:
 
 ## 1. Adding quire
 
+**Rust version.** quire's minimum is `rust-version = "1.92"`: pdfrum's crates (PDF output,
+`ds-native`) declare 1.92, above the 1.91 blitz needs at the pinned rev. The toolchain quire
+builds and tests on stays pinned at 1.98.1 (`rust-toolchain.toml`); a consumer on an older
+compiler than 1.92 cannot build `ds-native`.
+
 **zbus and your executor.** `ds-settings` builds zbus with its default `async-io` backend, which
 works under any executor, tokio included. Do not enable `zbus/tokio` in an app: Cargo unifies
 features, and with `tokio` on, zbus's blocking API panics on a thread that drives a tokio
