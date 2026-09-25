@@ -6,6 +6,8 @@
 
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "control_center/rows.rs"]
+mod rows;
 #[path = "control_center/tiles.rs"]
 mod tiles;
 
@@ -60,11 +62,20 @@ fn tile_markup(case: tiles::TileCase) -> String {
 
 /// Every specimen, rendered.
 fn specimens() -> Vec<Rendered> {
-    tiles::grid()
+    let tiles = tiles::grid()
         .into_iter()
         .chain(tiles::chevrons())
-        .map(|(name, case)| (name, tile_markup(case)))
-        .collect()
+        .map(|(name, case)| (name, tile_markup(case)));
+    let rows = rows::CASES
+        .into_iter()
+        .map(|(case, name)| (name.to_owned(), row_markup(case)));
+    tiles.chain(rows).collect()
+}
+
+fn row_markup(case: rows::RowCase) -> String {
+    let mut dom = VirtualDom::new_with_props(rows::row, rows::RowProps { case });
+    dom.rebuild_in_place();
+    dioxus_ssr::render(&dom)
 }
 
 #[test]
@@ -131,4 +142,38 @@ fn a_tile_writes_its_state_span_and_chevron() {
         assert!(html.contains("aria-label=\"Wi-Fi details\""), "{name}");
         assert!(html.contains("aria-expanded=\"false\""), "{name}");
     }
+}
+
+/// A row writes its trailing kind, a check row whether it is the chosen one, and a toggle row
+/// names its switch by the row's title.
+#[test]
+fn a_row_writes_its_trailing_mark() {
+    let cases = [
+        (
+            rows::RowCase::CheckOn,
+            "data-trailing=\"check\"",
+            Some("aria-pressed=\"true\""),
+        ),
+        (
+            rows::RowCase::CheckOff,
+            "data-trailing=\"check\"",
+            Some("aria-pressed=\"false\""),
+        ),
+        (
+            rows::RowCase::Toggle,
+            "data-trailing=\"toggle\"",
+            Some("aria-label=\"Headphones\""),
+        ),
+        (rows::RowCase::Chevron, "data-trailing=\"chevron\"", None),
+        (rows::RowCase::Value, "84%</span>", None),
+        (rows::RowCase::Disabled, "aria-disabled=\"true\"", None),
+    ];
+    for (case, want, also) in cases {
+        let html = row_markup(case);
+        assert!(html.contains(want), "{case:?}: {html}");
+        if let Some(also) = also {
+            assert!(html.contains(also), "{case:?}: {html}");
+        }
+    }
+    assert!(!row_markup(rows::RowCase::None).contains("data-trailing"));
 }
