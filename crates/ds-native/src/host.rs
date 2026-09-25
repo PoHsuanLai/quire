@@ -29,6 +29,7 @@
 use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::{EditListeners, ime_of};
+use crate::edit_window::{captured_of, modifiers_of};
 use crate::frame_links::frame_links;
 use crate::install::install;
 use crate::node_ref::DocRef;
@@ -91,6 +92,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let factor = window.scale_factor();
     let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));
     let seen = Rc::clone(&document);
+    let held = use_hook(|| Rc::new(std::cell::Cell::new(keyboard_types::Modifiers::empty())));
     use_window_event(move |event, _| {
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
             let HostScale(mut current) = scale;
@@ -104,6 +106,14 @@ pub(crate) fn Host(props: HostProps) -> Element {
             if *current.peek() != next {
                 current.set(next);
             }
+        }
+        if let WindowEvent::ModifiersChanged(state) = event {
+            held.set(modifiers_of(state.state()));
+        }
+        if let Some(pointer) = captured_of(event, window.scale_factor(), held.get())
+            && let Some(sink) = listeners.captured(pointer.phase)
+        {
+            sink.call(pointer);
         }
         if let WindowEvent::Ime(ime) = event
             && let Some(ime) = ime_of(ime)

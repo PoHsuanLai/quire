@@ -16,11 +16,44 @@ pub(crate) fn blitz_button(button: PointerButton) -> (MouseEventButton, MouseEve
     }
 }
 
-/// A mouse pointer event at `at`, for `button`, with `buttons` held.
+/// The pointer buttons the harness's mouse holds down: a move between a press and its release
+/// carries them, so a drag is a drag.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct HeldButtons(MouseEventButtons);
+
+impl HeldButtons {
+    /// Whether `button` is down.
+    pub fn contains(self, button: PointerButton) -> bool {
+        self.0.contains(blitz_button(button).1)
+    }
+
+    /// Whether none is down.
+    pub fn is_empty(self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// These, with `button` down too.
+    pub(crate) fn with(self, button: PointerButton) -> Self {
+        HeldButtons(self.0 | blitz_button(button).1)
+    }
+
+    /// These, with `button` up.
+    pub(crate) fn without(self, button: PointerButton) -> Self {
+        HeldButtons(self.0 - blitz_button(button).1)
+    }
+
+    /// Blitz's set.
+    pub(crate) fn blitz(self) -> MouseEventButtons {
+        self.0
+    }
+}
+
+/// A mouse pointer event at `at`, for `button`, with `buttons` held and `mods` down.
 pub(crate) fn pointer(
     at: Point,
     button: MouseEventButton,
     buttons: MouseEventButtons,
+    mods: Modifiers,
 ) -> BlitzPointerEvent {
     let (x, y) = (at.x.0, at.y.0);
     BlitzPointerEvent {
@@ -36,7 +69,7 @@ pub(crate) fn pointer(
         },
         button,
         buttons,
-        mods: Modifiers::empty(),
+        mods,
         details: Default::default(),
         element: Default::default(),
         active_pointers: Default::default(),
@@ -60,6 +93,12 @@ pub(crate) fn keyboard(key: Key) -> (DomKey, Code) {
         Key::Down => (DomKey::ArrowDown, Code::ArrowDown),
         Key::Left => (DomKey::ArrowLeft, Code::ArrowLeft),
         Key::Right => (DomKey::ArrowRight, Code::ArrowRight),
+        Key::Home => (DomKey::Home, Code::Home),
+        Key::End => (DomKey::End, Code::End),
+        Key::Delete => (DomKey::Delete, Code::Delete),
+        Key::PageUp => (DomKey::PageUp, Code::PageUp),
+        Key::PageDown => (DomKey::PageDown, Code::PageDown),
+        Key::Insert => (DomKey::Insert, Code::Insert),
     }
 }
 

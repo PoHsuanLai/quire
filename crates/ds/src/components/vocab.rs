@@ -219,6 +219,18 @@ pub enum Key {
     Left,
     /// Right arrow.
     Right,
+    /// Home: the line's start in a text surface.
+    Home,
+    /// End: the line's end.
+    End,
+    /// Delete (forward delete), drawn `⌦`.
+    Delete,
+    /// Page Up.
+    PageUp,
+    /// Page Down.
+    PageDown,
+    /// Insert: with Shift a paste, with Ctrl a copy, in a text surface.
+    Insert,
 }
 
 /// A key combination, modifiers first, rendered as glyphs with no separator: `⌃T`
@@ -236,7 +248,8 @@ impl Shortcut {
 impl Key {
     /// The text one key cap shows. Only `⌃ ⇧ ⌥ ⌘`, upper-case characters and `↵` are the
     /// doc's; the rest are not specified in design/04-COMPONENTS.md (O-2 names only the
-    /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace and the arrows need sign-off.
+    /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace, the arrows and Home, End, Delete, PageUp,
+    /// PageDown and Insert need sign-off.
     pub(crate) fn glyph(self) -> String {
         match self {
             Key::Ctrl => "⌃".to_string(),
@@ -253,6 +266,12 @@ impl Key {
             Key::Down => "↓".to_string(),
             Key::Left => "←".to_string(),
             Key::Right => "→".to_string(),
+            Key::Home => "↖".to_string(),
+            Key::End => "↘".to_string(),
+            Key::Delete => "⌦".to_string(),
+            Key::PageUp => "⇞".to_string(),
+            Key::PageDown => "⇟".to_string(),
+            Key::Insert => "Ins".to_string(),
         }
     }
 }

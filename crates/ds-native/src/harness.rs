@@ -14,11 +14,11 @@ use crate::contexts::RootContexts;
 use crate::error::NativeError;
 use crate::frame_view::FrameView;
 use crate::harness_config::HarnessConfig;
-use crate::harness_input::{blitz_button, keyboard, modifier, pointer};
+use crate::harness_input::{HeldButtons, blitz_button, keyboard, modifier, pointer};
 use crate::headless::{Backdrop, Headless, Layout};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
-use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, MouseEventButtons, UiEvent};
+use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
 use dioxus::prelude::*;
 use ds::{InputModality, Key, Point, PointerButton, Px, Rect, Size};
 use keyboard_types::{Location, Modifiers};
@@ -30,6 +30,8 @@ pub struct Harness {
     pub(crate) doc: Headless,
     /// Animation time: the sum of every `advance`.
     clock: Duration,
+    /// The mouse buttons down now.
+    held: HeldButtons,
     /// Keeps a Tokio runtime entered on this thread for as long as the harness lives, so a
     /// component under test that calls `ds_settings::use_environment` does not panic; see
     /// `crate::runtime`. Never read, only held: it does its work by staying alive and being
@@ -83,6 +85,7 @@ impl Harness {
             doc,
             clock: Duration::ZERO,
             _runtime: runtime,
+            held: HeldButtons::default(),
         };
         harness.settle();
         harness
@@ -94,12 +97,18 @@ impl Harness {
         self.settle();
     }
 
-    /// Move the pointer to `at`.
+    /// Move the pointer to `at`, with whatever buttons are down (a drag while one is).
     pub fn pointer_move(&mut self, at: Point) {
+        self.pointer_move_with(at, Modifiers::empty());
+    }
+
+    /// Move the pointer to `at` with `mods` held.
+    pub fn pointer_move_with(&mut self, at: Point, mods: Modifiers) {
         self.send(UiEvent::PointerMove(pointer(
             at,
             MouseEventButton::Main,
-            MouseEventButtons::None,
+            self.held.blitz(),
+            mods,
         )));
     }
 
@@ -115,19 +124,66 @@ impl Harness {
 
     /// Press `button` at `at`. A pointer press makes the modality `pointer`.
     pub fn button_down(&mut self, at: Point, button: PointerButton) {
+        self.button_down_with(at, button, Modifiers::empty());
+    }
+
+    /// Press `button` at `at` with `mods` held (Shift+click is `Modifiers::SHIFT`); it stays
+    /// down until [`Harness::button_up_with`].
+    pub fn button_down_with(&mut self, at: Point, button: PointerButton, mods: Modifiers) {
         self.doc.set_modality(InputModality::Pointer);
-        let (which, held) = blitz_button(button);
-        self.send(UiEvent::PointerDown(pointer(at, which, held)));
+        self.held = self.held.with(button);
+        let (which, _) = blitz_button(button);
+        self.send(UiEvent::PointerDown(pointer(
+            at,
+            which,
+            self.held.blitz(),
+            mods,
+        )));
     }
 
     /// Release `button` at `at`.
     pub fn button_up(&mut self, at: Point, button: PointerButton) {
+        self.button_up_with(at, button, Modifiers::empty());
+    }
+
+    /// Release `button` at `at` with `mods` held.
+    pub fn button_up_with(&mut self, at: Point, button: PointerButton, mods: Modifiers) {
+        self.held = self.held.without(button);
         let (which, _) = blitz_button(button);
         self.send(UiEvent::PointerUp(pointer(
             at,
             which,
-            MouseEventButtons::None,
+            self.held.blitz(),
+            mods,
         )));
+    }
+
+    /// The mouse buttons down now.
+    pub fn held_buttons(&self) -> HeldButtons {
+        self.held
+    }
+
+    /// Press the primary button at `from`, move to `to` in `steps` even steps with it held, and
+    /// release it there: a drag selection.
+    pub fn drag(&mut self, from: Point, to: Point, steps: u16) {
+        self.pointer_move(from);
+        self.pointer_down(from);
+        let steps = steps.max(1);
+        for step in 1..=steps {
+            let part = f32::from(step) / f32::from(steps);
+            self.pointer_move(Point {
+                x: Px(from.x.0 + (to.x.0 - from.x.0) * part),
+                y: Px(from.y.0 + (to.y.0 - from.y.0) * part),
+            });
+        }
+        self.pointer_up(to);
+    }
+
+    /// Press and release the primary button at `at` with `mods` held, after moving there.
+    pub fn click_with(&mut self, at: Point, mods: Modifiers) {
+        self.pointer_move_with(at, mods);
+        self.button_down_with(at, PointerButton::Primary, mods);
+        self.button_up_with(at, PointerButton::Primary, mods);
     }
 
     /// Press and release `button` at `at`, after moving there: a right-click is
@@ -290,6 +346,9 @@ impl Harness {
 
     /// Hand `event` to the document and bring it up to date.
     fn send(&mut self, event: UiEvent) {
+        // An edit surface holding the pointer hears a move or the release first, wherever it is
+        // (`crate::edit_ime`), as the window's hook delivers it before the document.
+        self.route_captured(&event);
         self.doc.doc.handle_ui_event(event);
         self.settle();
     }
