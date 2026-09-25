@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 13] = [
+pub const REGISTRY: [Entry; 14] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -112,6 +112,13 @@ pub const REGISTRY: [Entry; 13] = [
         lede: "An EditSurface over an app's own paragraphs and a chip: the surface hands the app its input and reports geometry; the caret here is the page's own, drawn from the host's caret rect.",
         height: 600,
         body: pages::edit_surface::EditPage,
+    },
+    Entry {
+        page: Page::Level,
+        title: "Level",
+        lede: "The level control in its three looks for the user to choose from (capsule with the glyph inside, capsule and knob, sixteen segments), live and as a grid of states, and the OSD card at the top right that carries it.",
+        height: 2300,
+        body: pages::level::LevelPage,
     },
 ];
 
