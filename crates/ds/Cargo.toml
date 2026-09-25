@@ -48,3 +48,7 @@ required-features = ["lint"]
 [[test]]
 name = "self_lint"
 required-features = ["lint"]
+
+[[test]]
+name = "control_center_ssr"
+required-features = ["lint"]
