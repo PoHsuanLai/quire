@@ -1,0 +1,41 @@
+# The shipped set (design/08-ICONS.md 2.11), picked by the user on 2026-09-25 from rounds four
+# (dialect) and five (hue). `tools/icons ship` reads this and writes assets/icons/apps/.
+# Klein renders are round three's face-mode picks under the --renders directory; they are
+# never committed, the exported PNGs are.
+chroma = 0.07
+muted_chroma = 0.04
+
+[[app]]
+name = "mail"
+spec = "specs/mail.toml"
+dialect = "monochrome"
+hue = "slate"
+source = { kind = "klein-retint", render = "mail-s33.png" }
+
+[[app]]
+name = "files"
+spec = "specs/files.toml"
+dialect = "solid"
+hue = "ochre"
+source = { kind = "procedural" }
+
+[[app]]
+name = "terminal"
+spec = "specs/terminal.toml"
+dialect = "monochrome"
+hue = "jade"
+source = { kind = "procedural" }
+
+[[app]]
+name = "notes"
+spec = "specs/notes.toml"
+dialect = "paper"
+hue = "clay"
+source = { kind = "procedural" }
+
+[[app]]
+name = "photos"
+spec = "specs/photos.toml"
+dialect = "monochrome"
+hue = "rose"
+source = { kind = "klein-retint", render = "photos-s11.png" }

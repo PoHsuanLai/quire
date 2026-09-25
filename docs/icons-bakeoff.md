@@ -470,3 +470,27 @@ Rebuild: the Klein retints with `icons face --mode ground --retint monochrome --
 
 Five distinct hues, each app a different part of the wheel, all at C 0.07; move to 0.11 as a set
 if the user wants them louder.
+
+## Round six: shipped (2026-09-25)
+
+The user: "go with your suggestion for now". The shipped set is round four's dialect and round
+five's hue per app (design/08-ICONS.md 2.11): mail Monochrome slate (Klein retint), files Solid
+ochre, terminal Monochrome jade, notes Paper with a clay spot, photos Monochrome rose (Klein
+retint), all at chroma 0.07.
+
+- **Assets.** `assets/icons/apps/<app>/<px>.png` (Colour), `<app>/muted/` (cap 0.04) and
+  `<app>/monochrome/` (neutral grey, tinted at run time), 13 sizes each, 195 PNGs, 6.1 MB. Written
+  by `tools/icons ship` from `tools/icons/ship.toml`; the Klein source renders stay out of git.
+- **Consistency.** Both kinds of face go through one finish (squircle, bevel arc, bottom shade,
+  specular point, rim), one grain and one drop shadow at every size.
+  `tools/icons/tests/shipped.rs` measures the exported 512s in every style: the silhouette, the
+  bevel shade and arc, and the shadow's reach match across the five. One exception it records:
+  the Paper plate is too close to white for the white arc to show.
+- **The run-time half.** `ds::icon::retint` (bytes in, bytes out, no renderer) re-colours our
+  Monochrome set and third-party icons; `ds::icon::Tint::space` takes the Space's accent through
+  `ds::space::derive`, as the round-four sheet did. `sill` picks the file per style and calls
+  `retint` after loading, before caching (CONSUMING.md "App icons and the icon style").
+- **Sheet.** `tools/progress/shots/icons/round6-shipped.png`: the shipped set, the Muted set, and
+  the Monochrome set tinted through `ds::icon::retint` for Work (268) and Home (152), each at 512
+  with 16/32/48 on light and dark, all read back from `assets/icons/apps/`, so the sheet is
+  exactly what ships.
