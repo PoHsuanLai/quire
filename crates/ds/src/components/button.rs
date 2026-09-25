@@ -4,7 +4,7 @@
 
 use crate::components::button_face::{ButtonFace, FaceMark, Trailing, trailing as trailing_mark};
 use crate::components::icon_view::IconView;
-use crate::components::press::{Press, PressListeners};
+use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::vocab::{Availability, Expanded, Switch};
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
@@ -65,6 +65,9 @@ impl ButtonVariant {
 /// or a glyph. `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
 /// and then names the button by `label` through `aria-label`, unless `aria_label` says
 /// otherwise.
+///
+/// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
+/// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
 #[component]
 pub fn Button(
     variant: ButtonVariant,
@@ -80,11 +83,12 @@ pub fn Button(
     #[props(default)] expanded: Option<Expanded>,
     #[props(default)] trailing: Option<Trailing>,
     #[props(default)] face: ButtonFace,
+    #[props(default)] propagation: Propagation,
 ) -> Element {
     let aria_label = aria_label.or_else(|| face.is_mark().then(|| label.clone()));
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(Expanded::aria);
-    let listen = PressListeners::new(onclick);
+    let listen = PressListeners::new(onclick).with_propagation(propagation);
     let live = availability == Availability::Enabled;
     rsx! {
         button {
