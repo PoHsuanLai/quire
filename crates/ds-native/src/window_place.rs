@@ -64,11 +64,13 @@ mod tests {
     #[test]
     fn each_placement_lands_on_its_output() {
         #[rustfmt::skip]
-        const CASES: &[(WindowTile, Option<(i32, i32, u32, u32)>)] = &[
+        /// A placement and where it lands: x, y, width, height.
+        type Case = (WindowTile, Option<(i32, i32, u32, u32)>);
+        const CASES: &[Case] = &[
             (WindowTile::Fill, None),
             (WindowTile::LeftHalf, Some((1920, 0, 1280, 1440))),
             (WindowTile::RightHalf, Some((3200, 0, 1281, 1440))),
-            (WindowTile::Centre, Some((2560, 320, 1200, 800))),
+            (WindowTile::Centre, Some((2600, 320, 1200, 800))),
         ];
         for &(tile, expected) in CASES {
             let placed = placement(OUTPUT, (1200, 800), tile)
