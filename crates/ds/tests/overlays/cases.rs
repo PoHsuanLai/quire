@@ -279,7 +279,7 @@ fn SenderCard(kind: HoverKind) -> Element {
 
 /// A sender card composed from parts, open: the same card [`SenderCard`] writes by hand.
 #[component]
-fn PartsCard(parts: Vec<HoverCardPart>) -> Element {
+pub fn PartsCard(parts: Vec<HoverCardPart>) -> Element {
     let hub = use_hover_hub();
     let key = HoverKey("sender:3".to_string());
     use_hook({

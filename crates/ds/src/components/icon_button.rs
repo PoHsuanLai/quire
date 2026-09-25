@@ -1,7 +1,7 @@
 //! IconButton: an icon-only action, `aria-label` mandatory (design/04-COMPONENTS.md section 2).
 
 use crate::components::icon_view::IconView;
-use crate::components::press::{Press, PressListeners};
+use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::vocab::{Availability, Switch};
 use crate::geometry::Px;
 use crate::icon::external::IconSource;
@@ -57,7 +57,8 @@ impl IconButtonVariant {
 /// written as the element's `id`, so a popup can anchor to it by id. `onclick` hears the
 /// primary, secondary (right-click) and middle buttons, and the keyboard as primary.
 /// `mounted` hands over the element once it is in the document, so a floating component can
-/// anchor to it (`Anchor::Mounted`).
+/// anchor to it (`Anchor::Mounted`). `propagation: Propagation::Stop` keeps the press at the
+/// button, so a glyph inside a `<summary>` does not toggle its `<details>`.
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,
@@ -70,10 +71,11 @@ pub fn IconButton(
     onclick: EventHandler<Press>,
     #[props(default)] id: Option<String>,
     #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
+    #[props(default)] propagation: Propagation,
 ) -> Element {
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(|state| state.aria());
-    let listen = PressListeners::new(onclick);
+    let listen = PressListeners::new(onclick).with_propagation(propagation);
     let live = availability == Availability::Enabled;
     rsx! {
         button {

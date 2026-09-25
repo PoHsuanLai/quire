@@ -640,6 +640,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
 .ds-button-face[*|data-face=underline]{ text-decoration:underline; }
 .ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
+
+/* A leading mark (mailo gaps 5): a glyph or a caller's mark (a provider's inline chip) before the
+   label, sitting on the line as the trailing mark does; the button's own gap spaces it. */
+.ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 /* -- chip -- */
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
    washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate.
@@ -1137,6 +1141,16 @@ html,body{margin:0;padding:0;background:transparent}
    does. */
 .ds-popover.ds-menu[*|data-entrance=instant]{ animation:none; }
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+
+/* The query line of `filter: Filter::Field` (mailo gaps 5): the typed text in a row at the top of
+   the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
+   line, 3/2 padding, no box of its own) over a hairline that sets it apart from the rows. The
+   menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
+   the field's caret colour, and the placeholder takes the field's `--ink-faint`. */
+.ds-menu-filter{ display:flex; align-items:center; min-height:calc(1.55em + 8px); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
+  border-bottom:var(--hair) solid var(--line-soft); font-size:var(--fs-body); line-height:1.55; color:var(--ink); white-space:nowrap; overflow:hidden; }
+.ds-menu-filter-placeholder{ color:var(--ink-faint); }
+.ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent); flex:none; }
 /* -- menu_bar_item -- */
 /* MenuBarItem (the macOS polish pass; design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
    a bar item's text at the shell scale, and the 4 px pill behind it on hover and while its menu
@@ -1298,6 +1312,11 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:pointer; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
+
+/* Inline (mailo gaps 5, `flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the
+   caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
+   ancestor. It sets no z-index: content the caller renders after it in that container paints
+   over it, and every overlay layer stays above it. */
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
@@ -1467,6 +1486,11 @@ html,body{margin:0;padding:0;background:transparent}
 /* Drop target (`C:320-323`). */
 .ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 .ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
+/* A place that can take the drag while the pointer is elsewhere (mailo gaps 5, `DropState::Accepts`):
+   a dashed `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes
+   its width out of the padding, so the label does not move as the drag starts. Blitz paints a
+   dashed border (not a dashed outline, which it draws solid). */
+.ds-sidebar-item[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }

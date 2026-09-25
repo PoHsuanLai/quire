@@ -2,9 +2,13 @@
 //! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini; `title`,
 //! `aria-label` and `aria-expanded` only when the caller gives them (or a mark face names it).
 
-use crate::components::button_face::{ButtonFace, FaceMark, Trailing, trailing as trailing_mark};
+use crate::components::button_face::{
+    ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
+    trailing as trailing_mark,
+};
 use crate::components::icon_view::IconView;
-use crate::components::press::{Press, PressListeners};
+use crate::components::press::{Press, PressListeners, Propagation};
+use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Expanded, Switch};
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
@@ -62,13 +66,23 @@ impl ButtonVariant {
 /// leave it `None` on a button that opens nothing.
 ///
 /// `trailing` puts a mark after the label: `Trailing::Caret` for a dropdown showing its value,
-/// or a glyph. `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
+/// or a glyph. `leading` puts one before it (mailo gaps 5): `Leading::Mark` holds an element
+/// such as a `ProviderMark`, for a From dropdown whose value shows the account's provider;
+/// `Leading::Glyph` a glyph (for a lone glyph, `icon` is the same thing). `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
 /// and then names the button by `label` through `aria-label`, unless `aria_label` says
 /// otherwise.
+///
+/// `label` is a [`Text`]: a `String` or `&str` as before, or runs in their tones (mailo gaps 5:
+/// a quoted message's head, "who" strong and "when" faint), drawn inside the label's span. A
+/// label of runs names the button by its characters (`Text::plain_text`) through `aria-label`,
+/// unless `aria_label` says otherwise.
+///
+/// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
+/// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
 #[component]
 pub fn Button(
     variant: ButtonVariant,
-    label: String,
+    #[props(into)] label: Text,
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] pressed: Option<Switch>,
     #[props(default)] availability: Availability,
@@ -79,12 +93,14 @@ pub fn Button(
     #[props(default)] aria_label: Option<String>,
     #[props(default)] expanded: Option<Expanded>,
     #[props(default)] trailing: Option<Trailing>,
+    #[props(default)] leading: Option<Leading>,
     #[props(default)] face: ButtonFace,
+    #[props(default)] propagation: Propagation,
 ) -> Element {
-    let aria_label = aria_label.or_else(|| face.is_mark().then(|| label.clone()));
+    let aria_label = aria_label.or_else(|| spoken_label(face, &label));
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(Expanded::aria);
-    let listen = PressListeners::new(onclick);
+    let listen = PressListeners::new(onclick).with_propagation(propagation);
     let live = availability == Availability::Enabled;
     rsx! {
         button {
@@ -119,6 +135,9 @@ pub fn Button(
                     mounted.call(event);
                 }
             },
+            if let Some(mark) = leading {
+                {leading_mark(mark, variant.icon_size())}
+            }
             if let Some(icon) = icon {
                 IconView { source: icon, size: variant.icon_size() }
             }

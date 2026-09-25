@@ -5,6 +5,7 @@
 
 use crate::components::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::kbd::Kbd;
+use crate::components::text_runs::{Text, text as runs};
 use crate::components::vocab::Shortcut;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -39,6 +40,20 @@ pub enum HoverCardPart {
         /// What it says.
         text: String,
     },
+    /// A flag whose words are runs (mailo gaps 5): the spoof warning sets the brand and the
+    /// domain in the strong tone ("Not **Acme**: sent from **acme-billing.example**"). The
+    /// same block as [`HoverCardPart::Flag`], either tone; build it with
+    /// [`HoverCardPart::flag`], which takes a `String`, a `&str` or a [`Text`]. A variant of its
+    /// own rather than a change to `Flag`'s `text`, so every `Flag { text: String }` literal
+    /// keeps compiling.
+    FlagText {
+        /// Danger (`--danger-wash`) or info (`--accent-soft`).
+        tone: FlagTone,
+        /// The glyph, coloured by the tone.
+        icon: Icon,
+        /// What it says, in runs.
+        text: Text,
+    },
     /// A thread card's latest messages, each a 22 px avatar, a name and two lines of text.
     Messages(Vec<HoverMessage>),
     /// The quiet line at the foot, with an optional key hint pushed to the right.
@@ -50,6 +65,17 @@ pub enum HoverCardPart {
     },
     /// Mini buttons, wrapping.
     Actions(Vec<Element>),
+}
+
+impl HoverCardPart {
+    /// A flag of either tone whose words are plain or runs: [`HoverCardPart::FlagText`].
+    pub fn flag(tone: FlagTone, icon: Icon, text: impl Into<Text>) -> Self {
+        HoverCardPart::FlagText {
+            tone,
+            icon,
+            text: text.into(),
+        }
+    }
 }
 
 /// A flag's tone: `data-tone` on `.ds-hovercard-flag`.
@@ -131,12 +157,8 @@ pub(super) fn part(part: HoverCardPart) -> Element {
                 }
             }
         },
-        HoverCardPart::Flag { tone, icon, text } => rsx! {
-            div { class: "ds-hovercard-flag", "data-tone": tone.slug(),
-                Glyph { icon, size: IconSize::Compact }
-                span { "{text}" }
-            }
-        },
+        HoverCardPart::Flag { tone, icon, text } => flag(tone, icon, &Text::Plain(text)),
+        HoverCardPart::FlagText { tone, icon, text } => flag(tone, icon, &text),
         HoverCardPart::Messages(messages) => rsx! {
             div { class: "ds-hovercard-msgs",
                 for message in messages {
@@ -168,5 +190,15 @@ pub(super) fn part(part: HoverCardPart) -> Element {
                 }
             }
         },
+    }
+}
+
+/// A flag block: the tone's glyph beside its words.
+fn flag(tone: FlagTone, icon: Icon, text: &Text) -> Element {
+    rsx! {
+        div { class: "ds-hovercard-flag", "data-tone": tone.slug(),
+            Glyph { icon, size: IconSize::Compact }
+            span { {runs(text)} }
+        }
     }
 }

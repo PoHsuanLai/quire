@@ -1015,6 +1015,24 @@ the reasons and the proofs.
 | `SidebarItem` | `place: Option<PlaceId>` | `PlaceId(String)`, your name for the place (`inbox`, `label:7`), written as `data-place` so a drag can tell which place is under the pointer |
 | `SidebarItem` | `onpointerenter` / `onpointerleave` / `onpointermove` / `onpointerup: Option<EventHandler<PointerEvent>>` | The item's pointer, on every kind: set `drop: DropState::Target` on the place a dragged thread is over (lit `--accent-soft`, scaled 1.045, design/06 section 6.1) and apply the drop on the release. `drop` itself is not new |
 
+### The mailo gaps 5 (2026-09-25)
+
+Additive: leave a prop out and the markup is what it was, and every existing golden is unchanged
+(the stylesheet golden grew by the new rules). Two things a consumer can notice: `DropState` and
+`HoverCardPart` gained a variant (a `match` of yours over either needs the new arm), and `Filter`
+is `Clone` but no longer `Copy` (its new variant holds a `String`: pass it by value or clone it).
+FINDINGS "mailo gaps 5" has the reasons and the proofs.
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Button`, `IconButton` | `propagation` | `Propagation` (`Bubble`) | `Propagation::Stop` keeps the press at the button: its propagation is stopped and its default prevented before `onclick` runs, so a header action inside a `<summary>` does not toggle the `<details>`. On Blitz both are needed (a click's default action walks up the ancestors to the summary). `Press` is unchanged: it already carries the button, the modifiers and the point |
+| `Scrim` | `flow` | `Flow` (`Floating`) | `Flow::Inline` draws the scrim where you render it (`button.ds-scrim[data-flow=inline]`), at your container's stacking level: `position:absolute; inset:0` in the nearest positioned ancestor, no overlay, no layer on the stack, no Escape of its own. A press still calls `onclose`. **Layering:** it dims what your container drew before it and lies under what the container draws after it (the peeked reader) and under every floating surface; to put something above it, render it after the scrim in the same positioned container |
+| `Button` | `label` | `Text` (`#[props(into)]`) | A `String`, `&str` or `"{formatted}"` as before; `Text::Runs(vec![Run::new(who, RunTone::Strong), Run::new(when, RunTone::Faint)])` draws the runs inside the label's span. A label of runs names the button by `Text::plain_text()` as `aria-label` (your `aria_label` wins). `FaceMark`'s `label` takes a `Text` the same way |
+| `Menu` | `filter: Filter::Field { placeholder }` | new variant | Typing filters and `onquery` fires as under `Typing`, and the query is drawn in `div.ds-menu-filter` (`role=searchbox`), a row at the top styled as the inline `TextInput`: the placeholder while empty, then the typed text with a drawn caret. The row is not a choice: the cursor stays on the rows below. `Typing` is unchanged |
+| `DropState` | `Accepts` | new variant | `data-drop="accepts"`: a place that can take the live drag while the pointer is elsewhere. On a `SidebarItem`, a dashed `--accent` hairline inside the item's box (the label does not move), quieter than `Target`. Set it on every accepting place as the drag starts, `Target` on the one under the pointer |
+| `Button` | `leading` | `Option<Leading>` (`None`) | `Leading::Mark(element)` before the label, for a quire mark you build (`rsx! { ProviderMark { provider, size: MarkSize::Inline, style } }` in the From dropdown's value); `Leading::Glyph(icon)` a glyph. `span.ds-button-lead` |
+| `HoverCardPart` | `FlagText { tone, icon, text: Text }`, `HoverCardPart::flag(tone, icon, impl Into<Text>)` | new variant and constructor | A flag of either tone whose words are runs (the spoof warning's brand and domain in `Strong`). Drawn exactly as `Flag`; `Flag { text: String }` is unchanged, so its literals compile |
+
 ### Native phase B (2026-09-25): the Blitz host for an app window
 
 What `ds-native` gives an app that moves its window onto `ds_native::launch` (mailo Phase B).
