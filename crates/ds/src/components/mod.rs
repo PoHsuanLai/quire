@@ -21,6 +21,7 @@ pub mod hover_strip;
 pub mod icon_button;
 pub mod icon_view;
 pub mod kbd;
+pub mod level;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
@@ -40,6 +41,8 @@ pub(crate) mod menu_rows;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
 pub(crate) mod muted;
+pub mod osd;
+pub(crate) mod osd_phase;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
@@ -75,6 +78,7 @@ pub mod text_runs;
 pub mod toast;
 pub mod toggle;
 pub mod tooltip;
+pub(crate) mod track;
 pub mod vocab;
 pub mod workspace_pills;
 
@@ -103,6 +107,7 @@ pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
+pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
@@ -111,6 +116,7 @@ pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_filter::Filter;
 pub use menu_pick::PickDismiss;
+pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
@@ -165,11 +171,13 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_button", include_str!("icon_button.css")),
     ("icon_view", include_str!("icon_view.css")),
     ("kbd", include_str!("kbd.css")),
+    ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("osd", include_str!("osd.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),
