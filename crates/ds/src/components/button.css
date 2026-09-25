@@ -5,10 +5,15 @@
 
 .ds-button{ font:inherit; }
 
-/* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). */
+/* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
+   `--hair` border (sill Q110): Primary's is transparent, so it draws exactly as it did with
+   `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
+   the box model gains the same border width Secondary and Danger already have, so all three
+   stand the same height at a given size instead of Primary sitting one `--hair` short top and
+   bottom. */
 .ds-button[*|data-variant=primary],
 .ds-button[*|data-variant=secondary]{
-  display:inline-flex; align-items:center; gap:var(--s-6); border:0; cursor:pointer; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
+  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:pointer; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
   transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
