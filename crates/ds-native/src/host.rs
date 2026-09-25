@@ -27,6 +27,7 @@ use crate::clipboard::HostClipboard;
 use crate::edit_ime::{EditListeners, ime_of};
 use crate::frame_links::frame_links;
 use crate::install::install;
+use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
 use blitz_traits::shell::ColorScheme;
@@ -67,11 +68,16 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
+    use_context_provider(|| crate::focus::BLUR);
     use_context_provider(|| crate::focus::SELECT);
     use_context_provider(|| crate::edit::EDIT);
     let listeners = use_context_provider(EditListeners::default);
     let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
+    let found = Rc::clone(&document);
+    use_context_provider(move || {
+        crate::focus::finder(move || found.borrow().clone().map(DocRef::Handle))
+    });
     let window = use_window();
     let factor = window.scale_factor();
     let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));

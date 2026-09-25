@@ -6,6 +6,7 @@ use crate::components::text_input::InputVariant;
 use crate::components::text_input_focus::{FieldFocus, Focus};
 use crate::components::text_input_kind::{Rows, TextInputKind};
 use crate::components::vocab::Availability;
+use crate::focus::targets::Told;
 use crate::icon::Icon;
 use dioxus::prelude::*;
 
@@ -28,6 +29,8 @@ pub(crate) struct Field {
     pub focus: Focus,
     pub focuser: FieldFocus,
     pub handlers: Handlers,
+    /// What a host's focus write tells the field, which no renderer event will.
+    pub told: Told,
 }
 
 /// The placeholder as a span over the field, shown while the value is empty: Blitz draws no
@@ -52,6 +55,7 @@ pub(crate) fn line(field: Field, kind: TextInputKind, value: String) -> Element 
         focus,
         focuser,
         handlers,
+        told,
     } = field;
     let mask = kind.mask(&value);
     let shown = placeholder_shown(&value, &placeholder);
@@ -69,7 +73,7 @@ pub(crate) fn line(field: Field, kind: TextInputKind, value: String) -> Element 
                 autocomplete: "off",
                 autofocus: focus.on_mount().then_some("true"),
                 value: written,
-                onmounted: move |event| focuser.mounted(focus, &event, handlers.onfocus),
+                onmounted: move |event| focuser.mounted(focus, &event, told),
                 onfocus: move |_| handlers.onfocus.call(()),
                 onblur: move |_| {
                     handlers.onchange.call(());
@@ -108,6 +112,7 @@ pub(crate) fn area(field: Field, rows: Rows, value: String) -> Element {
         focus,
         focuser,
         handlers,
+        told,
     } = field;
     let shown = placeholder_shown(&value, &placeholder);
     rsx! {
@@ -122,7 +127,7 @@ pub(crate) fn area(field: Field, rows: Rows, value: String) -> Element {
                 "aria-disabled": availability.aria_disabled(),
                 autofocus: focus.on_mount().then_some("true"),
                 value: "{value}",
-                onmounted: move |event| focuser.mounted(focus, &event, handlers.onfocus),
+                onmounted: move |event| focuser.mounted(focus, &event, told),
                 onfocus: move |_| handlers.onfocus.call(()),
                 onblur: move |_| {
                     handlers.onchange.call(());
