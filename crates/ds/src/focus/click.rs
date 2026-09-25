@@ -41,7 +41,10 @@ impl std::fmt::Debug for Fallback {
 pub struct HostClickFocus {
     /// Called from the root's click handler, before the renderer's default action.
     pub fallback: fn(&MountedData) -> Fallback,
-    /// Called a frame later with the ancestor `fallback` found.
+    /// Called a frame later with the ancestor `fallback` found. It checks that the ancestor is
+    /// still in the document when it focuses, not when the click asked: a click whose handler
+    /// removed it (a "Show images" button that goes once pressed) sends the keyboard to the
+    /// next focusable ancestor instead (mailo gaps 7).
     pub restore: fn(&MountedData) -> Focused,
 }
 

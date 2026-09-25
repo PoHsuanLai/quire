@@ -22,6 +22,7 @@ mod edit_tree;
 mod edit_window;
 pub mod error;
 pub mod focus;
+mod focus_chain;
 pub mod fonts;
 mod frame_anchor;
 mod frame_book;
