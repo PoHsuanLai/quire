@@ -1,4 +1,4 @@
-//! The control center's parts as markup (sill FINDINGS Q78-Q81): every control glyph renders and
+//! The control center's parts as markup (sill FINDINGS Q78-Q81, Q100-Q102): every control glyph renders and
 //! lints clean; the goldens are `tests/snapshots/control_center/<name>.html`, each linted and
 //! every `ds-` class in it styled by the stylesheet.
 //!
@@ -6,6 +6,8 @@
 
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "control_center/panels.rs"]
+mod panels;
 #[path = "control_center/panes.rs"]
 mod panes;
 #[path = "control_center/rows.rs"]
@@ -74,7 +76,16 @@ fn specimens() -> Vec<Rendered> {
     let panes = panes::CASES
         .into_iter()
         .map(|(shown, name)| (name.to_owned(), pane_markup(shown)));
-    tiles.chain(rows).chain(panes).collect()
+    let parts = panels::CASES
+        .into_iter()
+        .map(|(case, name)| (name.to_owned(), part_markup(case)));
+    tiles.chain(rows).chain(panes).chain(parts).collect()
+}
+
+fn part_markup(case: panels::PartCase) -> String {
+    let mut dom = VirtualDom::new_with_props(panels::part, panels::PartProps { case });
+    dom.rebuild_in_place();
+    dioxus_ssr::render(&dom)
 }
 
 fn pane_markup(shown: ds::Pane) -> String {

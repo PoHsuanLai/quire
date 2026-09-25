@@ -3,7 +3,7 @@
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
    with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
    pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`) and by `--lift`; pressed it
-   squishes. A Full tile spans both grid columns. The chevron is a quiet 18 x 28 hit target of
+   squishes. A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
 
 .ds-module-tile{
@@ -45,5 +45,8 @@
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
 
-/* ModuleGrid (design/13 section 13.3.7): two equal columns, gap 8. */
-.ds-module-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-8); }
+/* ModuleGrid (design/13 section 13.3.7; sill FINDINGS Q102): `--grid-columns` equal columns
+   (2), `--grid-gap` apart (8), `--grid-padding` inside (12); the component writes all three
+   inline from `control_center.grid_*`, and these are the keys' defaults. */
+.ds-module-grid{ --grid-columns:2; --grid-gap:var(--s-8); --grid-padding:var(--s-12); display:grid;
+  grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr)); gap:var(--grid-gap); padding:var(--grid-padding); }

@@ -3185,3 +3185,112 @@ Our client-decorated windows need a movable, resizable, zoomable frame: mailo on
    intent and 350 ms more) open the tiling menu, so passing over the green light on the way to
    close does not; right-click and ArrowDown open it too. The grey rule is macOS's: inactive
    windows are grey until the pointer is over the group; the active window keeps its colours.
+## Control center parts 2 (2026-09-25)
+
+Six follow-ups from sill's finished control center (sill FINDINGS Q100-Q105). Additive except
+two visible changes: `ModuleGrid` now pads itself by 12 (the key's default), and the light
+level well is darker. CONSUMING "Control center parts 2 (2026-09-25)" has the API.
+
+### Q100: a module that holds content
+
+- **What was wrong.** `ModuleTile` is a toggle with a glyph, a title and a status and holds no
+  children, so sill drew the Sound, Display, Now Playing, Appearance and Battery modules on a
+  plate of its own (`.sill-cc-module`: `--r-tile`, `--surface-2`, a hairline, 10/12 padding),
+  and a second rule to drop that plate in a bar item's dropdown.
+- **What quire does now.** `ModulePanel { glyph, title, trailing, span, plate, children }`: the
+  Off tile's plate at `--r-tile` with the module padding of 10/12; an optional header row (a 16
+  px glyph in `--ink-soft`, the title in the tile's 13/600, the trailing slot at the far end in
+  the status type with tabular figures, for a level's percentage) over the children. Not
+  pressable (no role, no handler, no hover lift): its content takes every press. `span` is
+  `Full` by default (`grid-column:1 / -1`); `PanelPlate::Bare` drops plate, border and padding
+  where a popover card already is the module's.
+- **Proof.** Goldens `control_center/panel-level-{light,dark}.html` and `panel-bare.html`, linted,
+  every class styled. `ds-native/tests/cc_module_panel.rs`: on a 320 px grid the panel is at x 12,
+  296 wide; a press at 30 % of the level's rail sets 30 %, a drag to 80 % follows, and the
+  header's trailing slot follows the level.
+
+### Q101: the picker at the control center's width
+
+- **What was wrong.** In a 296 px module (270 px of content) `AppearancePicker`'s Motion row is
+  331 px (five regular segments), so "Reduced" was clipped.
+- **What quire does now.** `layout: PickerLayout::{Full, Compact}` (Full by default, unchanged).
+  Compact sets the segmented rows at the small size, each row filling the width it has, with
+  segments of 4 px sides that grow from their words' width (`flex:1 1 auto`, `min-width` left at
+  auto), so no label is squeezed and every row ends inside the content box. The markup writes
+  `data-layout`.
+- **Proof.** `ds-native/tests/cc_picker_compact.rs` at 296: Full's Motion row ends past the
+  content box (the bug is real); in Compact every row (Theme, the swatches, Motion) ends at
+  x 295, the content box's edge, and the last segment is "Reduced", whole. Golden
+  `control_center/picker-compact.html`; the three existing picker goldens gained
+  `data-layout="full"` only.
+
+### Q102: the grid's columns, gap and padding
+
+- **What was wrong.** `ModuleGrid` was two columns at gap 8, fixed, and left its padding to the
+  panel: `control_center.grid_columns`, `grid_gap_px` and `grid_padding_px` sized only sill's
+  popup estimate.
+- **What quire does now.** `ModuleGrid { columns: GridColumns, gap: Px, padding: Px }`, defaults
+  2/8/12 (design/22 section 3.13), written inline as `--grid-columns`, `--grid-gap`,
+  `--grid-padding` (`GridMetrics::style_attr`: lengths rounded, never negative, never fewer than
+  one column) and read by `repeat(var(--grid-columns),minmax(0,1fr))`. `TileSpan::Full` and a
+  Full `ModulePanel` span every column. **Visible change:** the grid now pads itself by 12, so a
+  consumer that pads its panel too either passes `padding: Px(0.0)` or drops its own.
+- **Proof.** `ds-native/tests/cc_module_grid.rs`: three columns, gap 6, padding 10 at 320 put
+  three 96 px tiles in one row at x 10, 112, 214 and a Full tile at x 10, 300 wide. Golden
+  `control_center/grid-3-columns.html`; `panes-root.html` gained the inline metrics only.
+
+### Q103: a control center glyph
+
+- **What was wrong.** sill's control center bar item used `Settings` (a gear), which reads as
+  "open Settings", not as a panel of switches.
+- **What quire does now.** `Icon::Switches` (the end of the enum and of `Icon::SHELL`): two pill
+  tracks 20 x 8 (`rx` 4) at y 2 and y 14 on Lucide's 24 grid and 2 px round stroke, 2 px of clear
+  space between their strokes, each with a dot knob of radius 1 centred in an end cap: left on the
+  top track, right on the bottom. Composed from Lucide `toggle-left`/`toggle-right`'s parts and
+  stacked as `sliders-horizontal` stacks its rails; macOS draws its control center as two
+  switches too, but nothing is traced from its symbol. The geometry and why each number is what
+  it is are in `icon/geometry_own.rs`. At 16 px a ring knob would touch its track, so the knob is
+  a stroked point, as Lucide draws its dots.
+- **Proof.** `icon::tests::switches_is_two_tracks_with_knobs_at_opposite_ends`; the control glyph
+  lint in `control_center_ssr.rs` covers it through the shell set's rendering; the gallery's
+  glyph page shows it beside `Settings` and `Wifi` (it iterates `Icon::SHELL`). Checked by eye at
+  22 and 16 px at 3x.
+
+### Q104: a document's frame must have a height
+
+- **What was wrong.** Three sill surfaces met the same bug: the wallpaper (F172), every bar popup
+  (F225) and, earlier, the launcher's catcher. A frame with `position:absolute; inset:0` (or
+  `fixed`, or `height:100%`) resolves against `#main` and `.ds`, which Blitz lays out at
+  `height:auto`; with its content out of flow the frame is 0 px, and so is every box from `html`
+  down. Nothing said so in CONSUMING.
+- **What quire does now.** CONSUMING section 2 "A document's frame must have a height": the rule,
+  the reason, `RootExtent::Viewport` (the sheet-parts branch, not on master at this writing) or
+  until then the floor (`display:grid; width:100vw; min-height:100vh` on the frame, which
+  stretches the root to fill its one cell), and a debug tip (the Harness's `rect` of `html`,
+  `.ds` and the frame; `count(".ds")`; `hits`).
+- **Proof.** `ds-native/tests/root_frame.rs`, with a card placed absolutely in the root as a popup
+  card is: the absolutely placed frame with no floor is 0 px, and so are `.ds` and `html`; the
+  floor inside an absolutely placed frame and an in-flow frame both give the frame and the root
+  160 px (the viewport) and take a press on the card's button.
+- **Found on the way.** In the harness a press on the button inside the 0 px frame still lands,
+  where sill's live popup (F225) took none: Blitz's hit test and the shell's input path differ on
+  0 px ancestors. So the test holds the heights, which are what the rule is about, and the debug
+  tip says to trust the rects over a click.
+
+### Q105: the capsule's fill against its well, light scheme
+
+- **What was wrong.** On light the capsule's fill (near-white, `rgba(253,253,251,.97)`) sat over a
+  black .10 well, which on the control center's `--surface-2` plate is itself nearly white.
+- **Measured** (`ds-native/tests/level_contrast.rs`: the painted fill at 40 % of the track and
+  the well at 80 %, middle row, level at 50 %, WCAG contrast ratio):
+
+  | Ground | Before (well .10) | After (well .18) | Dark (unchanged) |
+  | --- | --- | --- | --- |
+  | The paper (a Window root) | 1.55:1 | 1.85:1 | 10.21:1 |
+  | The module plate (`ModulePanel` in a painted Popover) | 1.37:1 | 1.66:1 | 8.79:1 |
+  | The OSD card over the Work tint (the level sheet's rows) | 1.64:1 | 1.93:1 | 9.95:1 |
+
+- **What quire does now.** The light well is black .18 (`material/level.rs`); the fill, the glyph
+  inks and every dark ink are unchanged. .17 held the module at 1.61, too close to the floor. The
+  test holds light at 1.6:1 or more on all three grounds. `ds-gallery --level-sheet` re-rendered
+  `tools/progress/shots/gallery/level-variants.png` and `level-motion.png` under the same names.

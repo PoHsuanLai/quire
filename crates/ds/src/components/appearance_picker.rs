@@ -3,7 +3,7 @@
 
 use crate::appearance::{Accent, Appearance, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
 use crate::components::section_header::{HeaderKind, SectionHeader};
-use crate::components::segmented::SegmentedControl;
+use crate::components::segmented::{SegSize, SegmentedControl};
 use crate::components::vocab::Switch;
 use crate::css::accents_css::swatch_var;
 use dioxus::prelude::*;
@@ -27,6 +27,36 @@ fn motion_hint(motion: Motion, system: SystemPrefs) -> Option<String> {
     }
 }
 
+/// How the picker lays its rows out for the width it has.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum PickerLayout {
+    /// Each segmented row as wide as its words at the regular size: a settings page or a sheet.
+    #[default]
+    Full,
+    /// The rows fill the width they are given and no more, at the small size, with narrow
+    /// segments that grow to fill it: the control center's 296 px module, where the Full
+    /// Motion row (331 px) clips "Reduced" (sill FINDINGS Q101).
+    Compact,
+}
+
+impl PickerLayout {
+    /// The `data-layout` word.
+    fn slug(self) -> &'static str {
+        match self {
+            PickerLayout::Full => "full",
+            PickerLayout::Compact => "compact",
+        }
+    }
+
+    /// The segmented rows' size.
+    fn seg_size(self) -> SegSize {
+        match self {
+            PickerLayout::Full => SegSize::Regular,
+            PickerLayout::Compact => SegSize::Small,
+        }
+    }
+}
+
 /// `aria-pressed` for a swatch.
 fn pressed(accent: Accent, value: Accent) -> Switch {
     if accent == value {
@@ -39,13 +69,16 @@ fn pressed(accent: Accent, value: Accent) -> Switch {
 /// Theme, accent and motion rows. Every change is emitted at once as a whole [`Appearance`];
 /// the consumer persists it. The swatches are the accent table's six (O-17), each painted with
 /// its `--swatch-*` token; the Motion row offers `System` as well as the four levels, because
-/// [`Motion`] defaults to it (the doc's markup lists only the four).
+/// [`Motion`] defaults to it (the doc's markup lists only the four). `layout` fits it to a narrow
+/// host ([`PickerLayout::Compact`]).
 #[component]
 pub fn AppearancePicker(
     value: Appearance,
     system: SystemPrefs,
     onchange: EventHandler<Appearance>,
+    #[props(default)] layout: PickerLayout,
 ) -> Element {
+    let size = layout.seg_size();
     let themes: Vec<(Theme, String)> = Theme::ALL
         .into_iter()
         .map(|theme| (theme, theme.label().to_string()))
@@ -55,13 +88,14 @@ pub fn AppearancePicker(
         .map(|motion| (motion, motion.label().to_string()))
         .collect();
     rsx! {
-        div { class: "ds-appearance", role: "group", "aria-label": "Appearance",
+        div { class: "ds-appearance", role: "group", "aria-label": "Appearance", "data-layout": layout.slug(),
             div { class: "ds-appearance-row",
                 SectionHeader { kind: HeaderKind::Field, text: "Theme", value: theme_hint(value.theme, system) }
                 SegmentedControl::<Theme> {
                     label: "Theme",
                     options: themes,
                     value: value.theme,
+                    size,
                     onchange: move |theme| onchange.call(Appearance { theme, ..value }),
                 }
             }
@@ -86,6 +120,7 @@ pub fn AppearancePicker(
                     label: "Motion",
                     options: motions,
                     value: value.motion,
+                    size,
                     onchange: move |motion| onchange.call(Appearance { motion, ..value }),
                 }
             }

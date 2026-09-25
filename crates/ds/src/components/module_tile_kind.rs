@@ -51,13 +51,13 @@ pub enum Chevron {
     Detail,
 }
 
-/// How many of the control center's two grid columns a tile takes (design/13 section 13.3.7).
+/// How many of the control center's grid columns a tile takes (design/13 section 13.3.7).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum TileSpan {
     /// One column.
     #[default]
     Half,
-    /// Both columns, as a slider module.
+    /// Every column (`grid-column:1 / -1`), as a slider module.
     Full,
 }
 
