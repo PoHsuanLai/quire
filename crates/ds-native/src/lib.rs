@@ -1,7 +1,7 @@
 //! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG,
-//! PDF output (`pdf`, `pdf_app`), a harness for event-driven tests, and the device-pixel layout
-//! snap (`snap`). The only quire
-//! crate that names the blitz crates.
+//! PDF output (`pdf`, `pdf_app`, and `print_dialog` behind the `print` feature), a harness for
+//! event-driven tests, and the device-pixel layout snap (`snap`). The only quire crate that
+//! names the blitz crates.
 //!
 //! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
 //! forbids it to `ds`): `launch` and `Harness` each enter a process-wide runtime (`crate::
