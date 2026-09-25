@@ -33,7 +33,10 @@ fn render(make: fn() -> Element) -> String {
     dioxus_ssr::render(&dom)
 }
 
-const CASES: &[(&str, fn() -> Element)] = &[
+/// A golden's name and how to render it.
+type Case = (&'static str, fn() -> Element);
+
+const CASES: &[Case] = &[
     (
         "controls/edit_surface/two-paragraphs-and-a-chip.html",
         || {
