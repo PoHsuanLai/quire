@@ -1037,7 +1037,7 @@ FINDINGS "mailo gaps 5" has the reasons and the proofs.
 
 Additive (sill FINDINGS Q74 to Q76; FINDINGS "OSD parts" and "Level control"). No existing prop
 changed; `Slider` is unchanged (its pointer-to-value function moved to a shared module). `Anim`
-gained three variants (`Anim::ALL` is 55 long; a `match` over `Anim` needs the new arms).
+gained three variants (`Anim::ALL` is 59 long with the control center's four; a `match` over `Anim` needs the new arms).
 
 | Component | Prop, type or variant | Type (default) | What it does |
 | --- | --- | --- | --- |
