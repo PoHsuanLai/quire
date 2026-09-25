@@ -95,15 +95,11 @@ fn the_typed_query_shows_in_the_field_and_filters_the_rows() {
         "the fuzzy ranker kept r..e: {shown:?}"
     );
     assert_eq!(
-        harness
-            .attr(
-                ".ds-menu-item[*|aria-selected=true] .ds-menu-title",
-                "class"
-            )
-            .is_some(),
-        true,
+        harness.count(".ds-menu-item[*|aria-selected=true]"),
+        1,
         "the cursor is on a row, below the field"
     );
+    assert_eq!(harness.attr(".ds-menu-filter", "aria-selected"), None);
 
     harness.key(Key::Backspace);
     harness.key(Key::Char('c'));
