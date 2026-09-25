@@ -21,7 +21,7 @@ pub use clicks::Clicks;
 pub use handle::{EditHandle, use_edit_handle};
 pub use host::{HostEdit, ImeEvent, ImeListener, ImeSwitch, Probe};
 pub use input::{Composition, EditInput, KeyInput, Pasted, PreeditCursor};
-pub use pointer::{EditFocus, EditPointer, Extend, PointerPhase};
+pub use pointer::{CapturedPointer, EditFocus, EditPointer, Extend, PointerPhase};
 pub use position::{
     EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextOffset, TextPosition, TextRange,
 };

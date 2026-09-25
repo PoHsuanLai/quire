@@ -4,7 +4,8 @@
 
 use crate::edit_hit::hit;
 use crate::harness::{Harness, first};
-use ds::{ImeEvent, ImeSwitch, Key, Point, Rect, TextPosition};
+use blitz_traits::events::{MouseEventButton, UiEvent};
+use ds::{CapturedPointer, ImeEvent, ImeSwitch, Key, Point, PointerPhase, Px, Rect, TextPosition};
 
 impl Harness {
     /// The IME attaches to the focused surface (winit's `Ime::Enabled`); a composition starts
@@ -56,6 +57,30 @@ impl Harness {
     /// Where the document last put the IME's candidate window.
     pub fn ime_cursor_area(&self) -> Option<Rect> {
         self.doc.shell.ime_area()
+    }
+
+    /// Hand a pointer move or primary release to the edit surface holding the pointer, if one
+    /// does.
+    pub(crate) fn route_captured(&mut self, event: &UiEvent) {
+        let (phase, pointer) = match event {
+            UiEvent::PointerMove(pointer) => (PointerPhase::Drag, pointer),
+            UiEvent::PointerUp(pointer) if pointer.button == MouseEventButton::Main => {
+                (PointerPhase::Release, pointer)
+            }
+            _ => return,
+        };
+        let Some(sink) = self.doc.listeners.captured(phase) else {
+            return;
+        };
+        let captured = CapturedPointer {
+            phase,
+            at: Point {
+                x: Px(pointer.coords.client_x),
+                y: Px(pointer.coords.client_y),
+            },
+            modifiers: pointer.mods,
+        };
+        self.doc.doc.vdom.in_runtime(|| sink.call(captured));
     }
 
     /// Hand `event` to the surface that has the keyboard, and bring the document up to date.

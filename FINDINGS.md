@@ -2678,7 +2678,8 @@ that delivers input and reports geometry (mailo Phase B plan §3, option A). Bra
   the later node's start, after the atom; the atom's own positions (0/1) name either side
   exactly.
 - **No pointer capture**: a drag hears moves only over the surface, and a release outside is
-  noticed at the next move without the button.
+  noticed at the next move without the button. (Closed in "Edit surface 2": a press captures
+  the pointer until the release.)
 - **Tab moves the focus** (Blitz's default) and is also delivered as `Key(Tab)`; the surface
   cannot keep Tab for list indentation yet.
 - **Focus lost mid-composition** ends the composition empty; a commit the IME sends after the
@@ -3032,6 +3033,63 @@ rules and two keyframes. CONSUMING "Control center parts (2026-09-25)" has the A
   draws every glyph by set at 22 px.
 - **Proof.** `every_control_glyph_renders_and_lints_clean` (one child per shape, `ds-ic`, clean
   under the Strict profile), `the_control_set_is_lucides`, and the set test counting `ALL`.
+
+## Edit surface 2 (2026-09-25)
+
+mailo's composer runs on `EditSurface`; its six follow-ups, branch `edit-surface-2`. Proofs:
+`crates/ds-native/tests/native_edit2.rs`, `native_edit_stacking.rs`, the SSR golden
+`controls/edit_surface/app-class-and-data.html`, `tokens/pixel.rs`'s tables.
+
+1. **Class and data.** `EditSurface { extra_class: Option<ExtraClass>, data: Vec<DataAttr> }`,
+   the types mailo gaps 6 gave `Button` (`components/pass_through.rs`, brought over byte for byte
+   before that branch landed; the merge of master took it without a conflict).
+2. **A programmatic focus is a press's focus.** `EditHandle::focus()` used to call
+   `focus_soon`: a host focus write dispatches no `focus` event, so `on_focus` never heard `In`
+   and the IME stayed off. The surface now hands its handle its own focus and blur
+   (`SurfaceHooks`): `focus()` goes through the same `focus_soon_told` a press uses, and on
+   success runs the surface's focus-in (`on_focus(In)`, the IME on and at `ime_area`); the
+   surface is the IME's target because routing follows the document's focus. `blur()` is the
+   `ds::HostBlur` write plus the surface's focus-out (`on_focus(Out)`, an open composition
+   ended empty, the IME off). Proof: focus, a composition that reaches the surface, blur, and a
+   commit after it that does not.
+3. **Harness input.** `Key::{Home, End, Delete, PageUp, PageDown, Insert}` (with key-cap glyphs,
+   pending O-2 sign-off like the arrows); `HeldButtons` (the harness's mouse buttons down, carried
+   by every move between a press and its release, `Harness::held_buttons`); `Modifiers` on
+   `pointer_move_with`, `button_down_with`, `button_up_with`, `click_with`; `drag(from, to,
+   steps)`. The other keyboard-types keys (function keys, media keys) are not added: nothing
+   tests them. Proofs: Shift+click reports `Extend::FromAnchor` at `p1:0`; a drag from `p0` to
+   `p1` reports Press at `p0`, then Drag and Release in `p1`.
+4. **Pointer capture, done without Blitz changes.** A press on the surface registers its sink
+   with the document's `EditListeners` (`HostEdit::capture`); until the primary release every
+   pointer move and the release go to it, wherever the pointer is. The window's hook hears
+   winit's `PointerMoved`/`PointerButton` before the document (the same ordering the IME route
+   uses; logical position = physical / scale factor; modifiers from `ModifiersChanged`), and the
+   harness routes its own events before handing them to the document. While captured the
+   surface ignores its own `pointermove`/`pointerup`, so nothing is heard twice. Proof: a drag
+   that ends over a button below the surface still reports its drags and the release (the
+   position resolves to the nearest text), and a move after the release reports nothing; with
+   the routing switched off the test fails.
+5. **Stacking: Blitz agrees with CSS 2.1 Appendix E here; the surface is not the cause.**
+   Pixel tests (`native_edit_stacking.rs`): a red `position:absolute` layer, then a blue block over
+   the same box. Blocks with `position:relative` (z-index auto) paint over the earlier layer (step 8,
+   tree order); a static block paints under it (steps 3/7 before 8); `z-index:1` is over it; a
+   `z-index:-1` layer goes under its container's own background when the container makes no
+   stacking context (the root's step 2). With mailo's shape, a red layer then an `EditSurface`
+   with `extra_class: c-body`: when `.c-body{position:relative}` the text's ink is over the layer;
+   without it the layer covers the text, as a browser would draw it. So the rule for mailo:
+   **the selection layer before the surface, `.c-body` positioned, no `z-index` on either** (or a
+   positive `z-index` on `.c-body`). mailo's layer painted over its text means its `.c-body` was
+   not positioned in the end (the rule not applying, or the positioned box being a wrapper that
+   no longer exists now the surface carries the class): the opacity workaround can go.
+   `EditSurface`'s own sheet sets no `position`, which is right: the app decides.
+6. **`--caret-w`.** `PixelToken::CaretW` (`--caret-w: var(--scale-caret-w, 1px)`), 1 px floored
+   to whole device pixels like `--hair`, and `PixelToken::logical(scale)`. `caret_rect` is that
+   wide at the document's scale (1 px at 1x and 2x, 0.667 px at 1.5), from the insertion point
+   rightwards. The stylesheet golden gains the one declaration; the root's inline writes gain
+   `--scale-caret-w` at a fractional scale. The gallery's caret draws `width: var(--caret-w)`.
+
+Still open: a composition interrupted by a focus change ends empty; capture in hosts other than
+`launch` and the harness (shell-host, sill) is not routed, as their IME is not.
 
 ## Frame tags and link text (2026-09-25)
 

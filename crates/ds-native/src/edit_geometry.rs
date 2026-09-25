@@ -5,22 +5,18 @@
 use crate::edit_locate::{Order, Side, Spot, order_of};
 use crate::edit_tree::Segment;
 use blitz_dom::{BaseDocument, Node, NodeId};
-use ds::{Point, Px, Rect, Size};
+use ds::{PixelToken, Point, Px, Rect, Scale, Size};
 use parley::{Affinity, BoundingBox, Cursor, Selection};
 
-/// The caret's box at `spot`: zero width, the height of its line.
+/// The caret's box at `spot`: `--caret-w` wide from the insertion point, its line's height.
 pub(crate) fn caret(doc: &BaseDocument, spot: Spot) -> Option<Rect> {
     match spot {
         Spot::Text { root, byte } => {
             let node = doc.get_node(root)?;
             let layout = &node.element_data()?.inline_layout_data.as_ref()?.layout;
             let cursor = Cursor::from_byte_index(layout, byte, Affinity::Downstream);
-            Some(to_logical(
-                doc,
-                node,
-                layout.scale(),
-                cursor.geometry(layout, 0.0),
-            ))
+            let line = to_logical(doc, node, layout.scale(), cursor.geometry(layout, 0.0));
+            Some(caret_wide(doc, line))
         }
         Spot::Atom { atom, side } => {
             let border = border_box(doc, doc.get_node(atom)?);
@@ -28,13 +24,19 @@ pub(crate) fn caret(doc: &BaseDocument, spot: Spot) -> Option<Rect> {
                 Side::Before => border.origin.x,
                 Side::After => border.origin.x + border.size.width,
             };
-            Some(line_at(x, border.origin.y, border.size.height))
+            Some(caret_wide(
+                doc,
+                line_at(x, border.origin.y, border.size.height),
+            ))
         }
         Spot::Empty { element } => {
             let node = doc.get_node(element)?;
             let origin = content_origin(doc, node);
             let height = node.unrounded_layout().content_box_height();
-            Some(line_at(Px(origin.0), Px(origin.1), Px(height)))
+            Some(caret_wide(
+                doc,
+                line_at(Px(origin.0), Px(origin.1), Px(height)),
+            ))
         }
     }
 }
@@ -119,6 +121,20 @@ fn to_logical(doc: &BaseDocument, node: &Node, scale: f32, bounds: BoundingBox) 
             width: Px(((bounds.x1 - bounds.x0) / scale) as f32),
             height: Px(((bounds.y1 - bounds.y0) / scale) as f32),
         },
+    }
+}
+
+/// `line` as wide as the `--caret-w` token at the document's scale (whole device pixels), from
+/// the insertion point rightwards, so an app draws the caret the rect describes.
+fn caret_wide(doc: &BaseDocument, line: Rect) -> Rect {
+    let scale = Scale((doc.viewport().scale() * Scale::DENOMINATOR as f32).round() as u32);
+    let width = PixelToken::CaretW.logical(scale).unwrap_or(Px(1.0));
+    Rect {
+        size: Size {
+            width,
+            height: line.size.height,
+        },
+        ..line
     }
 }
 

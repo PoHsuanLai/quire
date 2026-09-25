@@ -115,11 +115,12 @@ fn every_exception_still_suppresses_something() {
     assert!(stale.is_empty(), "exceptions that match nothing: {stale:?}");
 }
 
-/// The consumer classes the mailo gaps 6 goldens put on a button through `extra_class`: a
-/// consumer's own sheet styles them, as it would in the app, so they are in scope here and
-/// nowhere in quire's sheet.
-const CONSUMER_CSS: &str =
-    ".row-reveal{opacity:0}\n.quiet-until-hover{opacity:0}\n.fold-more{opacity:0}";
+/// The consumer classes the mailo gaps 6 goldens put on a button through `extra_class`, and
+/// the edit surface 2 golden on the surface (mailo's `.c-body`, positioned so its text stacks
+/// over a selection layer): a consumer's own sheet styles them, as it would in the app, so they
+/// are in scope here and nowhere in quire's sheet.
+const CONSUMER_CSS: &str = ".row-reveal{opacity:0}\n.quiet-until-hover{opacity:0}\n.fold-more{opacity:0}\n\
+     .c-body{position:relative}";
 
 /// Coherence rule 2 on quire's own output: every control golden, rendered markup, uses only
 /// classes the stylesheet styles, no hand-written SVG or form control, and no literal paint
