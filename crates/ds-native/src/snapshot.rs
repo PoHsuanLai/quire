@@ -20,7 +20,7 @@ const AT_REST: Duration = Duration::from_secs(10);
 /// lands one frame late, spike S7) and the one-frame waits quire starts on mount (`FRAME_SLACK`,
 /// 34 ms, after an effect's round: the toast and the send pill rise on it). Without it a posed
 /// toast was never drawn (gallery fix A).
-const MOUNT_SETTLE: Duration = Duration::from_millis(120);
+pub(crate) const MOUNT_SETTLE: Duration = Duration::from_millis(120);
 
 /// The size and scale a snapshot renders at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

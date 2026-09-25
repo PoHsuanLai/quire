@@ -176,6 +176,9 @@ concern (section 6 has the full "what mailo keeps" list).
 | the typed `⋯` in a folder row's `.more` button (`ui/sidebar/folder_row.rs`) | `IconButton { icon: Icon::Ellipsis, label: "Actions for {name}", .. }` | mailo gaps 6; `Icon::EllipsisVertical` for a narrow column |
 | the layered box around the pane's inline scrim (a positioned wrapper with its own z-index so the scrim covers the pane's positioned rows) | `Scrim { flow: Flow::Inline, layer: ZLayer::Raise, .. }` | mailo gaps 6: the scrim carries `z-index: var(--z-raise)` itself; give the peeked reader a layer above it (it no longer wins by tree order alone once the scrim has a layer) |
 | the folder tree: `details.fold`, `summary.fold-row`, `.chev`, `.fold-name`, `.fold-kids`, `.fold-row .more`, and `.item.can-drop` / `.item.is-drop-target` on folder rows (`ui/sidebar/folder_row.rs`, `style/shell.css:99-123`, `style/list.css:43-47`) | `TreeItem { label, open, on_toggle, shape, glyph, count, here, onselect, trailing, drop, place, onpointerenter, onpointerleave, onpointerup, children }` | mailo gaps 6: `open` is yours (keep a `Disclosure` per folder; the summary's own toggle is prevented and `on_toggle` hands you the state asked for); a folder with no children is `shape: TreeShape::Leaf`; the name button's select is `onselect` (it keeps its press); the ⋯ goes in `trailing`; `can-drop` is `DropState::Accepts`, `is-drop-target` is `Target`, drawn by the `.ds-drop-place` rules `SidebarItem` uses. mailo's own tree drop styling, chevron and indent rules go. Found on Blitz: `details { open: true }` written by dioxus hides its children (the attribute lands in the HTML namespace, the user-agent sheet reads the null one); `TreeItem` writes it so it works. The rename field and the menus under a row stay mailo's, as children or siblings |
+| the rename field drawn below its folder row (`ui/sidebar/folder_row.rs`: the row, then a field under it while renaming) | `TreeItem { editing: Some(rsx! { TextInput { variant: FieldFace::Bare, focus: Focus::Controlled(use_focus_request().with_select_all()), onkey, .. } }), .. }` | mailo gaps 7: the field sits in the label's place at its metrics, nothing on the row moves; Enter and Escape reach its `onkey` first; a press in it neither toggles nor selects the folder. Pass `None` to end the rename. The below-the-row field and its layout rules go |
+| a rule for mailo's own class inside the tree row's hover-revealed ⋯ slot (`.ds-tree-item-trail .fold-more`, or a lint exception for it) | `[*\|data-slot=trailing] .fold-more` | mailo gaps 7: `data-slot="trailing"` is the documented seam; the lint's `DsInternals` leaves it alone, and any exception for the old selector is stale |
+| literal hover delays in mailo's tests (450, 150, 400 ms) | `ds::delays::HOVER_OPEN`, `HOVER_CLOSE`, `HOVER_WARM` | mailo gaps 7: the token values as `Duration`s, for tests only |
 
 Everything under `ui/icon/` (the glyph set) maps to `ds::Glyph`/`ds::Icon` — `08-ICONS.md` and
 `DESIGN.md`'s icon row have the geometry; mailo's own `ui/icon` module is deleted, not ported
@@ -596,9 +599,9 @@ static `.c-body` is painted over the text, as in a browser.
 **What stays open.** A composition interrupted by a focus change ends empty. FINDINGS.md "Edit surface" lists the
 rest.
 
-### 6.6 Native focus (2026-09-25): what mailo deletes
+### 6.6 Native focus (2026-09-25, and mailo gaps 7): what mailo deletes
 
-quire now owns the three focus workarounds `crates/mail-app/src/ui/host/native.rs` built on
+quire now owns the focus workarounds `crates/mail-app/src/ui/host/native.rs` built on
 Blitz (FINDINGS.md "Native focus"; `CONSUMING.md` "Native focus").
 
 - **Focus by selector.** `Blitz::find`'s `Act::Focus` and `Act::FocusAndSelect` arms, `attempt`'s
@@ -615,6 +618,17 @@ Blitz (FINDINGS.md "Native focus"; `CONSUMING.md` "Native focus").
   a row leaves the keyboard on `.app[tabindex]` inside the click, not a frame later from mailo.
   `Blitz::mounted`'s first `focus_soon(app)` and `Ask::FocusApp` stay (nothing is focused before
   the first click, and a closing panel still hands the keyboard back).
+- **Re-focus after a removal (mailo gaps 7).** mailo's native re-focus effect (the one that
+  put the keyboard back on `.app` once the focus was found nowhere) and the `focus_app`
+  workaround after a quire `Menu` closes go: under `FocusFallback::Ancestor`, when the focused
+  element leaves the document ds-native focuses its nearest focusable ancestor, or, for a
+  floating menu's panel, the menu's `Anchor::Mounted` element if it has one, else the element
+  focused before the menu opened (the button that opened it, or `.app`). A key pressed next
+  reaches `.app` through the host's look before the window event reaches the document, so there
+  is no frame to miss. Likewise a click whose handler removes its own button ("Show images")
+  leaves the keyboard on `.app`. `Blitz::mounted`'s first `focus_soon(app)` stays (nothing is
+  focused before the first interaction). A harness test of mailo's that expected the focus
+  nowhere after a menu closed now finds it on the opener or `.app`.
 - **What changes under mailo's tests.** A click on a quire `Button` or strip button now focuses
   that button (a browser does the same); keys typed next still bubble to `.app`. A harness test
   that expected the focus nowhere after a click now finds it on the nearest focusable ancestor;
@@ -703,6 +717,31 @@ need an equivalent assertion against whichever mechanism replaces the iframe —
 switching, not after, so the old and new mechanisms can both be checked against it during the
 transition.
 
+**Printing (2026-09-25): the last webview use goes.** `ui/print/window.rs` (a tao window, a wry
+webview, `webkit2gtk::PrintOperation`) is replaced by two calls, both off the UI thread (a
+`spawn_blocking`): render the printout to PDF, then hand it to the system's print dialog.
+
+```rust
+// The print view as a Dioxus tree, with the reader's contexts and its sealed or custom NetPolicy:
+let pdf = ds_native::pdf_app(print_view, HarnessConfig::new(viewport).with_contexts(ctx), PageSpec::default())?;
+// Or, keeping mail-mime::print's HTML as the single source (a whole document, data: images only):
+let pdf = ds_native::pdf(&printout_html, PageSpec::default())?;
+match ds_native::print_dialog(&pdf, &thread.subject)? {   // feature "print"
+    PrintOutcome::Printed | PrintOutcome::Cancelled => {}
+    PrintOutcome::Opened(path) => toast(format!("Opened {} for printing", path.display())),
+}
+```
+
+What the print HTML changes, since Blitz drops CSS fragmentation: `.message.new-page { break-before:
+page }` becomes `data-break-before="page"` on the article (per-message pages); `.headers` and
+`.attachments` gain `data-break-inside="avoid"`; `@page { margin: 18mm 16mm }` becomes the
+`PageSpec` (it is already `Margins::default()`). Keep `@media print` rules as they are. Name the
+CJK families in the print CSS ahead of the generic one (`"Noto Serif CJK TC"`, `"Noto Sans CJK
+TC"`), or fontique's fallback chooses. "Save for printing" writes the same PDF bytes instead of
+the HTML. The printout's tests assert on text, not pixels: `Harness::pdf(spec)` (or `pdf(..)`)
+read back with `pdfrum` (FINDINGS "PDF output" has the pattern: `crates/ds-native/tests/
+native_pdf.rs`). On Wayland the dialog opens unparented (no xdg-foreign handle yet).
+
 ## 8. What mailo keeps
 
 Its own page layout and grid (`.app`, `.card`), its own containers around migrated components
@@ -715,6 +754,11 @@ itself — the header, the `ViewSwitch`, the find bar's own layout). None of `.a
 easing/radius/font-size/z-index anywhere, quire tokens only, even in mailo's own layout CSS) and
 `ds::lint::markup` (coherence rule 2: every class on every rendered element is either one quire
 exports or one this remaining CSS defines).
+
+For printing, mailo keeps `mail-mime::print` (the printout's HTML, its CSP and `data:`-only
+images, and the choice of a page per message) and `mail-app::print` (reading the store); what
+goes is the webview window that printed it. The page-break markers, `PageSpec`, the PDF and the
+print dialog are quire's (`ds_native::{pdf, pdf_app, print_dialog}`, section 7 "Printing").
 
 ## 9. Acceptance gates, both phases
 

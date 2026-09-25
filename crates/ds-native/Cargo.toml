@@ -1,6 +1,6 @@
 [package]
 name = "ds-native"
-description = "Blitz glue for quire: launch, fonts, headless snapshots, test harness."
+description = "Blitz glue for quire: launch, fonts, headless snapshots, PDF output and printing, test harness."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -29,13 +29,28 @@ wgpu = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
+# PDF output: the painter, which writes through pdfrum.
+anyrender_pdfrum = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The print portal (the `print` feature): zbus with quire's async-io default (no executor is
+# forced on the app), and a sealed memfd for the PDF's file descriptor.
+zbus = { workspace = true, optional = true }
+memfd = { workspace = true, optional = true }
+
+[features]
+# `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
+# Off by default, so an app that never prints builds no D-Bus client for it.
+print = ["dep:zbus", "dep:memfd"]
 
 [lints]
 workspace = true
 
 [dev-dependencies]
+# Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
+pdfrum = { workspace = true }
 # The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
 ds-settings = { workspace = true }
 
@@ -44,3 +59,10 @@ name = "window"
 
 [[example]]
 name = "edit"
+
+[[example]]
+name = "pdf"
+
+[[example]]
+name = "print"
+required-features = ["print"]

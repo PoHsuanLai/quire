@@ -8,6 +8,14 @@ use super::rule::{Offence, Rule};
 use super::text::render;
 use super::tokenize::Located;
 
+/// Attributes quire writes as documented seams a consumer may select on, and so never
+/// `DsInternals`, unlike the internal ones below: `data-slot` names a component's slot for the
+/// consumer's element (`[*|data-slot=trailing] .fold-more` on a `TreeItem`'s hover-revealed
+/// trailing slot, mailo gaps 7), as `--dot-c*` are the custom properties a Space's colours reach
+/// its dots by. Styling inside a slot through quire's own class (`.ds-tree-item-trail`) is still
+/// `DsInternals`.
+pub(crate) const CONSUMER_SEAMS: &[&str] = &["data-slot"];
+
 /// The eleven attributes a `.ds` root carries that a consumer must never select on
 /// (design/22-SETTINGS.md, CONVENTIONS §11, design/04-COMPONENTS.md "Shared vocabulary"): the
 /// scope's, the root chrome's `data-chrome`, `data-frame` and `data-ground` (bar gaps), and its
@@ -110,7 +118,8 @@ fn ds_internals(prelude: &[Located], out: &mut Vec<Offence>) {
             && let Some((name, _prefixed)) = attribute_name(prelude, index)
         {
             let lower = name.text.to_ascii_lowercase();
-            if INTERNAL_ATTRS.contains(&lower.as_str()) {
+            if INTERNAL_ATTRS.contains(&lower.as_str()) && !CONSUMER_SEAMS.contains(&lower.as_str())
+            {
                 out.push(Offence {
                     rule: Rule::DsInternals,
                     selector: String::new(),

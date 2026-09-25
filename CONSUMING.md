@@ -1078,6 +1078,24 @@ the proofs.
 | `TreeItem` | new component | | A place in a sidebar tree: `details.ds-tree-item > summary.ds-tree-item-row` in the sidebar item's chrome, children in `div.ds-tree-item-children[role=group]` one `--s-12` step in. Props: `label: impl Into<Text>`, `open: Disclosure::{Open, Closed}` (controlled), `on_toggle: EventHandler<Disclosure>` (the state a press on the row asks for; the summary's own toggle is prevented), `shape: TreeShape::{Branch, Leaf}` (a leaf is a row with no `details`, its chevron's space kept), `glyph: Option<Icon>`, `count: Option<u32>`, `here: Here`, `onselect: Option<EventHandler<Press>>` (the label becomes a button that selects without toggling), `trailing: Option<Element>` (the ⋯ `IconButton`: the slot keeps every press from the summary; `Propagation::Stop` on the button as well costs nothing), `drop: DropState`, `place: Option<PlaceId>`, and `onpointerenter`, `onpointerleave`, `onpointermove`, `onpointerup` as on `SidebarItem`. The chevron (`chevron-right`, 12) turns a quarter over `--t-quick` as it opens; the ⋯ shows on the row's hover, while its menu is open (`aria-expanded`) and under keyboard focus |
 | `SidebarItem`, `TreeItem` | `.ds-drop-place` | shared class | One rule set for `data-drop="target"`, `data-drop="accepts"` and `data-drag="source"` on either item, last in the component order so it wins over their hover and current rules |
 
+### The mailo gaps 7 (2026-09-25)
+
+Additive but for one behaviour: under `FocusFallback::Ancestor` (the default) the keyboard no
+longer goes nowhere when the element that had it is removed. One markup change: `TreeItem`'s
+trailing slot carries `data-slot="trailing"`, which its goldens show. `DataName::parse("slot")`
+is now refused (`PassThroughError::Reserved`). FINDINGS "mailo gaps 7" has the reasons and the
+proofs; `docs/mailo-migration.md` §2 and §6.6 say what mailo deletes.
+
+| Component or seam | Prop, type or behaviour | Type (default) | What it does |
+| --- | --- | --- | --- |
+| ds-native (`launch`, `Harness`) | the focused element is removed | behaviour, under `FocusFallback::Ancestor` | Blitz resets the focus to nowhere when the focused node leaves the document. ds-native now looks at the focus after each settled frame (harness) and before each window event reaches the document (window), and when the element it last saw focused is gone and the focus is nowhere, focuses the first live focusable element among: the opener a surface registered (`HostHandBack`), the removed element's own focusable ancestors (remembered while it was there), the element focused before it, and the element under the pointer when the focus moved to it. A focus cleared on purpose (a blur, a click on nothing) is left alone. `FocusFallback::BlitzDefault` turns it off. Not provided by `focus::provide()`: it needs the host's loop |
+| `Menu` | closing gives the keyboard back | behaviour | A floating menu that took the keyboard (`Cursor::Auto`) and is anchored with `Anchor::Mounted(el)` registers its panel with the host as it mounts; when the panel is removed with the keyboard, `el` (or its nearest focusable ancestor, if `el` is not focusable) has it next. Anchored at a point or a rect, the host's order above applies: in practice the element focused before the menu opened, or the button whose press opened it. `Button { mounted }` gives you the button's element for the anchor |
+| `HostClickFocus::restore` | liveness at the moment of focusing | behaviour | The click's fallback remembers every focusable element from the click's target up; `restore` focuses the first still in the document when it runs, so a button that removes itself on press ("Show images") leaves the keyboard on its focusable ancestor (`.app`), not on nothing |
+| `ds::HostHandBack` | new seam | `HostHandBack(Rc<dyn Fn(&MountedData, &MountedData)>)` | `(surface, opener)`: when `surface` is removed with the keyboard, `opener` has it next. ds-native provides it under `Ancestor`; a webview has none. A component of yours that takes the keyboard into a floating surface may call it from the surface's `onmounted` |
+| `TreeItem` | `editing` | `Option<Element>` (`None`) | An in-place rename: drawn in the label's place, in `span.ds-tree-item-label.ds-tree-item-edit[data-slot=editing]`, at the label's metrics (same left edge and width, the row's height, the count and the next row unmoved), instead of the label and its select button. Give it `TextInput { variant: FieldFace::Bare, focus: Focus::Controlled(use_focus_request().with_select_all()), onkey, .. }`: it takes the row's face, gets the keyboard with its text selected, and its `onkey` hears Enter and Escape first; take the slot away (`None`) to end the rename. A press in it never toggles or selects the row (the slot fences the click; the press's pointer-down still places the caret) |
+| `TreeItem` | `[data-slot="trailing"]` | markup | The trailing slot's documented seam: style your own element inside the hover-revealed slot as `[*\|data-slot=trailing] .fold-more`. The stylesheet lint's `DsInternals` leaves `data-slot` alone (`CONSUMER_SEAMS` in `crates/ds/src/lint/selector.rs`); `.ds-tree-item-trail .fold-more` is still `DsInternals` |
+| `ds::delays` | `HOVER_OPEN`, `HOVER_CLOSE`, `HOVER_WARM` | `Duration` (450, 150, 400 ms) | The hover-intent delays as constants for tests (a test waits `HOVER_OPEN` plus slack before asserting a card is open), equal to `DelayToken::HoverOpen`, `HoverClose` and `HoverWarm` at any motion level (a test holds them equal). Test-facing: components read the token |
+
 ### OSD parts (2026-09-25)
 
 Additive (sill FINDINGS Q74 to Q76; FINDINGS "OSD parts" and "Level control"). No existing prop
@@ -1447,6 +1465,27 @@ when `on_hidden` finds the list empty. `notifications.swipe = KeepInCenter` is y
 `Panel { shown, on_hidden: unmap, width: Px(center_width_px), onclose }` of `GroupHeader`s over
 `NotificationCard`s (`Swipe::Off` or `Dismiss` as you choose).
 
+### PDF and printing (2026-09-25)
+
+A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and
+the `anyrender_pdfrum` painter writes it through pdfrum (text stays text in embedded, subsetted
+faces at the layout's variable instance; a JPEG or an opaque PNG is embedded as it arrived). FINDINGS.md "PDF output" has the reasons, the limits and the
+measured numbers.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| An HTML document as a PDF | `ds_native::pdf(&html, PageSpec::default()) -> Result<Vec<u8>, PdfError>` | A whole document (`<!DOCTYPE html>...`). quire's faces are registered; the network is sealed: only `data:` URLs load (no `file:`, no fetch). `@media print` applies. Laid out once at the page's content width, at scale 1. |
+| A Dioxus tree as a PDF | `ds_native::pdf_app(app, HarnessConfig::new(viewport), spec)` | Built as `config` says (its contexts and `NetPolicy`; the viewport is replaced by the page's content box), rendered until its mount-time work and images have landed (as `snapshot`), then printed. |
+| In a test | `Harness::pdf(spec) -> Result<Vec<u8>, PdfError>` | Prints the harness's document as it is now, at the page width with `@media print`; the harness's own viewport and media come back afterwards. Read the PDF back with `pdfrum` (dev-dependency) to assert on text. |
+| The sheet | `PageSpec { size, margins }`; `PageSize::{A4, Letter, Custom { width: Pt, height: Pt }}`; `Margins { top, right, bottom, left }`, `Margins::uniform(Pt)`, `Margins::symmetric(vertical, horizontal)`; `Pt::from_mm`, `Pt::from_inches` | `PageSpec::default()` is A4 with 18 mm above and below, 16 mm at the sides. `@page` is not read: the spec's margins are the only ones. `PdfError::NoContentArea` when the margins meet. |
+| Start a new page at an element | `"data-break-before": "page"` | CSS `break-before`/`page-break-before` do nothing on Blitz (stylo drops them). A marker at the document's top makes no blank page. |
+| Keep a box on one page | `"data-break-inside": "avoid"` | Moved whole to the next page when it would straddle the cut, unless it is taller than a page (then it is cut between its lines). Lines, images, `svg`, `canvas`, `iframe` and table rows are kept whole on their own; a text block keeps its first two and last two lines together (orphans and widows of 2). |
+| Screen-only or print-only styling | `@media print { .. }` | Applies in `pdf`, `pdf_app` and `Harness::pdf`. |
+| CJK text | name the family: `font-family: "Noto Sans CJK TC", sans-serif` | Otherwise fontique's fallback picks (DroidSansFallback on this machine). A variable face prints at the instance the layout used. |
+| Print it | `ds_native::print_dialog(&pdf, title) -> Result<PrintOutcome, PrintError>`, feature `print` | Linux: the desktop portal's print dialog (GTK or KDE backend), then the portal prints the PDF. No portal or no print backend, and other systems: the PDF is written to a temp file and opened in the viewer. `PrintOutcome::{Printed, Cancelled, Opened(PathBuf)}`, `PrintError::{Portal, Write, NoViewer}`. **Blocks** until the dialog is answered: call it off the UI thread. The dialog is not parented to the window. |
+| Try it by hand | `cargo run --release -p ds-native --example pdf -- out.pdf`; `cargo run -p ds-native --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
+| The painter alone | `anyrender_pdfrum::write(&[Page { size, scene, placement, clip, area }], &sources)` | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `Sources { texts: RunTexts, images: ImageSources }` carry what anyrender does not: each run's text (`RunKey`, `RunText`) and each image's encoded bytes by decoded blob id. `GlyphArea::Within(rect)` drops glyphs whose box centre falls outside. |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
@@ -1535,6 +1574,7 @@ authority; this table is a pointer. `ds::lint::Rule::BlitzUnsupported`
 | `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
 | a wheel phase (a touchpad gesture's end) | notification parts | treat a quiet spell after the last delta as the end (`DelayToken::SwipeQuiet`, `use_swipe`) |
 | a clean removal of a running animation | notification parts | Blitz keeps the last animated value when an animation is taken off an element before a frame resolved past its end: put an entrance on an element that mounts with it rather than on a presence attribute that changes (`BannerStack`) |
+| `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_native::pdf` (section 6, "PDF and printing") |
 
 What *does* work and needs no fallback: a `<style>` in the body (S1), the `.ds[data-*]` custom
 property cascade once selectors carry `*|` (S2), `@keyframes` including `var()` inside them (S3),

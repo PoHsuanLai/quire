@@ -11,9 +11,13 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 # ds is renderer-free and effect-free so mailo can adopt it on the webview; ds-settings does I/O but never renders.
+# ds-native reaches D-Bus only through its opt-in `print` feature, so an app that never prints
+# builds no D-Bus client for it; anyrender_pdfrum stays Blitz-free so it can go upstream.
 RULES=(
-  "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg"
-  "ds-settings: blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg"
+  "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
+  "ds-settings: blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
+  "ds-native: zbus memfd"
+  "anyrender_pdfrum: blitz blitz-dom blitz-paint blitz-traits blitz-html parley stylo_taffy dioxus dioxus-native"
 )
 fail=0
 

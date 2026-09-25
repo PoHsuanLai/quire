@@ -1,6 +1,7 @@
-//! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG, a
-//! harness for event-driven tests, and the device-pixel layout snap (`snap`). The only quire
-//! crate that names the blitz crates.
+//! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG,
+//! PDF output (`pdf`, `pdf_app`, and `print_dialog` behind the `print` feature), a harness for
+//! event-driven tests, and the device-pixel layout snap (`snap`). The only quire crate that
+//! names the blitz crates.
 //!
 //! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
 //! forbids it to `ds`): `launch` and `Harness` each enter a process-wide runtime (`crate::
@@ -22,6 +23,8 @@ mod edit_tree;
 mod edit_window;
 pub mod error;
 pub mod focus;
+mod focus_chain;
+mod focus_keep;
 pub mod fonts;
 mod frame_anchor;
 mod frame_book;
@@ -49,6 +52,9 @@ mod net;
 mod net_policy;
 mod node_ref;
 mod origin;
+mod pdf;
+#[cfg(feature = "print")]
+mod print;
 mod route;
 mod runtime;
 mod scheme;
@@ -78,6 +84,9 @@ pub use headless::Backdrop;
 pub use launch::{AppConfig, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use origin::{FrameId, RequestOrigin};
+pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
+#[cfg(feature = "print")]
+pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use snap::snap_to_device;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
 pub use window::{Decorations, WinitWindow};
