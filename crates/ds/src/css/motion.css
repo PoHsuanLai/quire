@@ -227,3 +227,9 @@
    edge to its place at `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first
    frame: the edge hides it until it arrives. */
 @keyframes banner-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
+
+/* panel-in and panel-out (quire's, sill Q123): the notification center's edge panel slides in
+   from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
+   back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
+@keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
+@keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }

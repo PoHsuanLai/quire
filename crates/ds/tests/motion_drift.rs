@@ -265,6 +265,9 @@ fn the_settle_table() {
         (Anim::BannerOut, MotionLevel::Extra, 284),
         (Anim::BannerIn, MotionLevel::Standard, 284),
         (Anim::BannerIn, MotionLevel::Calm, 284),
+        // sill Q123: the center's edge panel, in and out at --t-move.
+        (Anim::PanelIn, MotionLevel::Standard, 284),
+        (Anim::PanelOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(
