@@ -24,6 +24,7 @@ mod geometry_actions;
 mod geometry_shell;
 pub mod plate;
 pub mod render;
+pub mod retint;
 pub mod shape;
 pub mod stroke;
 #[cfg(test)]
@@ -33,6 +34,7 @@ pub use classify::{ChromaLimit, IconKind, classify, classify_with};
 pub use external::{ExternalIcon, IconSource, IconUrl};
 pub use family::PlateFamily;
 use geometry::*;
+pub use retint::{IconStyle, Tint, retint};
 pub use shape::Shape;
 
 /// One glyph: the mailo set, named for its key in the design's `ICON` table, then the shell

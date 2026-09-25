@@ -20,6 +20,7 @@ mod plane;
 mod plate;
 mod retint;
 mod sheet;
+mod ship;
 mod spec;
 mod swatch;
 mod template;
@@ -42,6 +43,10 @@ pub use plane::Plane;
 pub use plate::{PlateGrid, gradient, plate_mask};
 pub use retint::retint;
 pub use sheet::{Cell, Sheet, SheetStyle, build_sheet, size_strip, strip, strip_sheet};
+pub use ship::{
+    FACE_CROP, Manifest, Prepared, SHIP_PX, ShipApp, Source, Style, face_icon, klein_face,
+    ship_icon, style_look,
+};
 pub use spec::{Grain, Layer, Relief, Role, Spec, parse_spec};
 pub use swatch::palette_board;
 pub use template::{Fraction, Template};
