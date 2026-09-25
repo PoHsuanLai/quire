@@ -856,7 +856,9 @@ What to opt into:
 - `MenuBarItem { open, emphasis, children }` around a bar title or the clock;
   `WorkspacePills { label, WorkspacePill { label, current, onclick } }` for the workspace
   indicator; `RunningDot {}` in a tile and `DockFloor {}` in the dock root;
-  `IconView { plate: Some(PlateFamily::Blue), .. }` for a plate with depth.
+  `IconView { plate: Some(PlateFamily::Blue), .. }` for a plate with depth, and
+  `plate_tint: PlateTint::of(style, tint)` on it to re-colour the plate for `icons.style`
+  (below, "App icons and the icon style").
 
 ### The mailo gaps (2026-09-24): the window frame, status inks, person colours, two glyphs
 
@@ -1087,6 +1089,24 @@ ds::icon::Tint)` re-colours an RGBA8 buffer (straight alpha) in place: lightness
 Muted scales chroma by `ds::icon::retint::MUTED_SCALE`; Monochrome sets the tint's hue and chroma,
 shaped by lightness and alpha, pulled into sRGB. `Colour` is a no-op. It takes bytes, not an image:
 decode (the `image` crate, as for `classify`) and re-encode yourself.
+
+**The plate.** A third-party icon sits on `IconView { plate: Some(PlateFamily::Neutral) }`, and
+the plate is drawn by quire's stylesheet, so re-colouring the raster alone leaves a dark
+`#2A2E28` plate under a tinted icon (sill FINDINGS Q72). Hand the plate the same pair:
+
+| `icons.style` | `IconView` |
+| --- | --- |
+| `Colour` | `plate_tint: None` (or `PlateTint::of(IconStyle::Colour, _)`, which is `None`) |
+| `Muted` | `plate_tint: Some(PlateTint::Muted)` |
+| `Monochrome` | `plate_tint: Some(PlateTint::Monochrome(tint))` |
+
+`ds::PlateTint::of(style, tint)` builds it from the pair you already pass `retint`. The plate's
+two stops and its glyph ink go through `retint`'s own rule (one implementation) for the light
+and the dark scheme, are written on the plate as `--plate-base-l` ... `--plate-ink-d`, and the
+stylesheet picks the pair under the root's `data-theme`: nothing for you to style, nothing for
+the lint to flag. `ds::icon::PlateStops::of(family, scheme).tinted(tint)` gives the colours if
+you need them elsewhere (a cached composite, a tooltip swatch). The light paper stays near
+white under a tint: `retint` eases chroma to nothing at white, as it does for a white icon.
 
 **When to call it.** After loading an icon and before caching it, keyed by (icon, size, scale,
 style, tint): for a third-party icon in Muted or Monochrome (inside our plate, after the 72 %

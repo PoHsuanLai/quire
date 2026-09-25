@@ -1,14 +1,26 @@
 //! App icons for the gallery's launcher and dock specimens: coloured rounded squares, PNG-encoded,
 //! standing in for the icon files an icon theme lookup returns.
 
+use ds::icon::{IconStyle, Tint, retint};
 use ds::{ExternalIcon, IconSize, IconSource, IconUrl};
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 
 /// A 64 px app icon: a rounded square in `hue`'s colour, lighter at the top, with a white disc.
 pub fn app_icon(hue: [u8; 3], size: IconSize) -> Option<IconSource> {
+    app_icon_in(hue, size, IconStyle::Colour, Tint::NEUTRAL)
+}
+
+/// The same icon re-coloured for `style` by `ds::icon::retint`, as a shell re-colours a
+/// third-party icon before it sits on a tinted plate.
+pub fn app_icon_in(
+    hue: [u8; 3],
+    size: IconSize,
+    style: IconStyle,
+    tint: Tint,
+) -> Option<IconSource> {
     let side = 64u32;
-    let picture = RgbaImage::from_fn(side, side, |x, y| {
+    let mut picture = RgbaImage::from_fn(side, side, |x, y| {
         let (fx, fy) = (x as f32 + 0.5, y as f32 + 0.5);
         let inside = rounded(fx, fy, side as f32, 14.0);
         let (dx, dy) = (fx - 32.0, fy - 34.0);
@@ -21,6 +33,7 @@ pub fn app_icon(hue: [u8; 3], size: IconSize) -> Option<IconSource> {
         };
         Rgba([r, g, b, if inside { 255 } else { 0 }])
     });
+    retint(&mut picture, style, tint);
     let mut bytes = Cursor::new(Vec::new());
     picture.write_to(&mut bytes, ImageFormat::Png).ok()?;
     Some(IconSource::Image(ExternalIcon {

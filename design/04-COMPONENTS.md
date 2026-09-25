@@ -3141,7 +3141,10 @@ pill when the pill is a squircle.
 highlight white .35 and rim black .08) and a drop `0 1px 1.5px .16, 0 6px 16px -6px .3` on the
 unmasked box; a glyph or symbolic icon at `--plate-glyph` 56 % in the family's glyph colour, an
 image at `--plate-inset` 72 %. Families `Red`, `Amber`, `Green`, `Blue`, `Violet`, `Neutral`
-(the neutral plate turns `#2A2E28` to `#1D211B` in the dark scheme).
+(the neutral plate turns `#2A2E28` to `#1D211B` in the dark scheme). `plate_tint:
+Some(PlateTint)` (`Muted`, or `Monochrome(Tint)`) re-colours the stops and the ink by `retint`'s
+rule for both schemes, written inline as `--plate-base-l`/`-deep-l`/`-ink-l` and `-d`, marked
+`data-icon-style`, and read by the sheet under `data-theme` (sill FINDINGS Q72; design/08 4.4).
 
 ## Open decisions
 
