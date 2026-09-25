@@ -21,6 +21,7 @@ pub mod hover_strip;
 pub mod icon_button;
 pub mod icon_view;
 pub mod kbd;
+pub mod level;
 pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
@@ -40,12 +41,19 @@ pub mod menu_pick;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
+pub mod module_grid;
+pub mod module_tile;
+pub mod module_tile_kind;
 pub(crate) mod muted;
+pub mod osd;
+pub(crate) mod osd_phase;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
+pub mod pane_switcher;
+pub mod pass_through;
 pub mod peek;
 pub mod popover;
 pub mod press;
@@ -62,6 +70,8 @@ pub mod segmented;
 pub mod selection_bubble;
 pub mod send_mood;
 pub mod send_pill;
+pub mod settings_row;
+pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sidebar_item;
 pub mod slider;
@@ -77,7 +87,10 @@ pub mod text_runs;
 pub mod toast;
 pub mod toggle;
 pub mod tooltip;
+pub(crate) mod track;
 pub mod traffic_lights;
+pub mod tree_item;
+pub(crate) mod tree_item_parts;
 pub mod vocab;
 pub mod window_frame;
 pub mod workspace_pills;
@@ -107,6 +120,7 @@ pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
+pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
@@ -115,7 +129,13 @@ pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_filter::Filter;
 pub use menu_pick::PickDismiss;
+pub use module_grid::ModuleGrid;
+pub use module_tile::ModuleTile;
+pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
+pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
+pub use pane_switcher::PaneSwitcher;
+pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
@@ -129,6 +149,8 @@ pub use segmented::{SegSize, SegmentedControl};
 pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble};
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
+pub use settings_row::SettingsRow;
+pub use settings_row_trailing::RowTrailing;
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
@@ -144,6 +166,7 @@ pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
 pub use traffic_lights::TilePose;
+pub use tree_item::{Disclosure, TreeItem, TreeShape};
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
     Selection, Shortcut, StaggerIndex, Switch,
@@ -171,11 +194,15 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_button", include_str!("icon_button.css")),
     ("icon_view", include_str!("icon_view.css")),
     ("kbd", include_str!("kbd.css")),
+    ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("osd", include_str!("osd.css")),
+    ("module_tile", include_str!("module_tile.css")),
+    ("pane_switcher", include_str!("pane_switcher.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),
@@ -185,6 +212,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("segmented", include_str!("segmented.css")),
     ("selection_bubble", include_str!("selection_bubble.css")),
     ("send_pill", include_str!("send_pill.css")),
+    ("settings_row", include_str!("settings_row.css")),
     ("sheet", include_str!("sheet.css")),
     ("sidebar_item", include_str!("sidebar_item.css")),
     ("slider", include_str!("slider.css")),
@@ -197,6 +225,10 @@ pub const CSS: &[(&str, &str)] = &[
     ("toast", include_str!("toast.css")),
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),
+    ("tree_item", include_str!("tree_item.css")),
     ("window_frame", include_str!("window_frame.css")),
     ("workspace_pills", include_str!("workspace_pills.css")),
+    // Last: the drop states SidebarItem and TreeItem share (mailo gaps 6) must win over either
+    // item's hover and current rules, which have the same specificity.
+    ("drop_place", include_str!("drop_place.css")),
 ];

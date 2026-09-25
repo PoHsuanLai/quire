@@ -26,3 +26,44 @@ pub(super) const FOLDER_INPUT: &[Shape] = &[
     Shape::Path("M2 13h10"),
     Shape::Path("m9 16 3-3-3-3"),
 ];
+
+// mailo gaps 6: the "more" glyphs, for a row's or a header's overflow menu (mailo's folder rows
+// drew a literal `⋯`, which takes the font's weight and baseline rather than the glyph grid's).
+
+/// Lucide `ellipsis`: three dots across.
+pub(super) const ELLIPSIS: &[Shape] = &[
+    Shape::Circle {
+        cx: "12",
+        cy: "12",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "19",
+        cy: "12",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "5",
+        cy: "12",
+        r: "1",
+    },
+];
+
+/// Lucide `ellipsis-vertical`: three dots down.
+pub(super) const ELLIPSIS_VERTICAL: &[Shape] = &[
+    Shape::Circle {
+        cx: "12",
+        cy: "12",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "12",
+        cy: "5",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "12",
+        cy: "19",
+        r: "1",
+    },
+];

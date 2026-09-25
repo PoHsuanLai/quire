@@ -1034,6 +1034,60 @@ FINDINGS "mailo gaps 5" has the reasons and the proofs.
 | `Button` | `leading` | `Option<Leading>` (`None`) | `Leading::Mark(element)` before the label, for a quire mark you build (`rsx! { ProviderMark { provider, size: MarkSize::Inline, style } }` in the From dropdown's value); `Leading::Glyph(icon)` a glyph. `span.ds-button-lead` |
 | `HoverCardPart` | `FlagText { tone, icon, text: Text }`, `HoverCardPart::flag(tone, icon, impl Into<Text>)` | new variant and constructor | A flag of either tone whose words are runs (the spoof warning's brand and domain in `Strong`). Drawn exactly as `Flag`; `Flag { text: String }` is unchanged, so its literals compile |
 
+### The mailo gaps 6 (2026-09-25)
+
+Additive: leave a prop out and the markup is what it was. One markup change: `SidebarItem`'s
+class list is `ds-sidebar-item ds-drop-place` (its drop rules moved to the shared class), which
+its goldens show; a selector of yours on `.ds-sidebar-item` still matches. `Icon` gained two
+variants (a `match` of yours over it needs the arms). FINDINGS "mailo gaps 6" has the reasons and
+the proofs.
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Icon` | `Ellipsis`, `EllipsisVertical` | new variants, in `Icon::ACTIONS` | Lucide `ellipsis` and `ellipsis-vertical` (1.47.0): a row's or a header's ⋯ on the glyph grid, in place of a typed `⋯` |
+| `Button`, `IconButton` | `data` | `Vec<DataAttr>` (empty) | Your own `data-*` on the button itself: `DataAttr::new(DataName::parse("folder")?, path)` writes `data-folder="{path}"`. `DataName::parse` takes lowercase letters, digits and `-`, starting with a letter, and refuses (`PassThroughError::Reserved`) a `ds-` name and the names quire writes or reads (`variant`, `size`, `theme`, `accent`, `motion`, `material`). Build names from constants: each distinct name is interned once for the program's life. The wrapping `span` you kept for `data-folder` goes |
+| `Button`, `IconButton` | `extra_class` | `Option<ExtraClass>` (`None`) | Your own class, or a space-separated list, after quire's: `ExtraClass::parse("fold-more")?` gives `class="ds-icon-button fold-more"`. A `ds-` class is refused when it is built; style yours in your own sheet (the markup lint reads your sheet for it, as for any class of yours) |
+| `Scrim` | `layer` | `Option<ZLayer>` (`None`) | An inline scrim's own stacking layer, written `z-index: var(--z-…)` on it. Without one it sets no z-index, so a positioned row your pane draws after it (a row that is `position:relative` for its strip) paints over it. **Pick** a layer above your rows (`ZLayer::Raise` over rows that set none) and below your floating surfaces (the peeked reader, a menu: give those a layer above the one you picked). A floating scrim ignores it (it is on `--z-scrim`) |
+| `TreeItem` | new component | | A place in a sidebar tree: `details.ds-tree-item > summary.ds-tree-item-row` in the sidebar item's chrome, children in `div.ds-tree-item-children[role=group]` one `--s-12` step in. Props: `label: impl Into<Text>`, `open: Disclosure::{Open, Closed}` (controlled), `on_toggle: EventHandler<Disclosure>` (the state a press on the row asks for; the summary's own toggle is prevented), `shape: TreeShape::{Branch, Leaf}` (a leaf is a row with no `details`, its chevron's space kept), `glyph: Option<Icon>`, `count: Option<u32>`, `here: Here`, `onselect: Option<EventHandler<Press>>` (the label becomes a button that selects without toggling), `trailing: Option<Element>` (the ⋯ `IconButton`: the slot keeps every press from the summary; `Propagation::Stop` on the button as well costs nothing), `drop: DropState`, `place: Option<PlaceId>`, and `onpointerenter`, `onpointerleave`, `onpointermove`, `onpointerup` as on `SidebarItem`. The chevron (`chevron-right`, 12) turns a quarter over `--t-quick` as it opens; the ⋯ shows on the row's hover, while its menu is open (`aria-expanded`) and under keyboard focus |
+| `SidebarItem`, `TreeItem` | `.ds-drop-place` | shared class | One rule set for `data-drop="target"`, `data-drop="accepts"` and `data-drag="source"` on either item, last in the component order so it wins over their hover and current rules |
+
+### OSD parts (2026-09-25)
+
+Additive (sill FINDINGS Q74 to Q76; FINDINGS "OSD parts" and "Level control"). No existing prop
+changed; `Slider` is unchanged (its pointer-to-value function moved to a shared module). `Anim`
+gained three variants (`Anim::ALL` is 59 long with the control center's four; a `match` over `Anim` needs the new arms).
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `LevelControl` | `label`, `value`, `glyph` | `String`, `Fraction`, `LevelGlyph` | A level with a glyph that follows it: `LevelGlyph::Volume(Muting::{Audible, Muted})` shows no wave at 0, then one, two, three waves by thirds, and a slash when muted; `LevelGlyph::Brightness` a sun whose rays grow with the level. Parts cross-fade over `--t-quick` |
+| `LevelControl` | `mode` | `LevelMode` (`Interactive`) | `Interactive`: `role=slider`, focusable, pointer and keys (arrows step a sixteenth, Shift a sixty-fourth). `ReadOnly`: `role=progressbar`, not focusable, no handlers; `onchange` may be left out |
+| `LevelControl` | `look` | `LevelLook` (`Capsule`) | `Capsule` (26 px, fill in the material's bright ink, glyph inside and knocked out by the fill), `CapsuleKnob` (a round knob at the fill's end, glyph before), `Segments` (sixteen squares filling in by `--stagger`) |
+| `LevelControl` | `tick`, `availability`, `onchange` | `Tick` (`Off`), `Availability`, `EventHandler<Fraction>` | `Tick::Quiet` marks the fill's edge (`Anim::LevelTick`) each time the level crosses a sixteenth; the sound is yours |
+| `LevelControl` | motion | | Set from outside: the fill slides over `--t-quick --e-out`. Under the pointer: no easing. A press swells the track (`scaleY(1.08)`, `--e-spring`); past an end the capsule stretches up to 6 px and springs back on release (not under Reduced). The track is measured once per press, after layout |
+| `Osd` | `shown`, `on_hidden` | `Shown`, `EventHandler<()>` | The OSD card and its presence: shown, `data-presence=entering` (`Anim::OsdIn`) then `present`; hidden, `leaving` (`Anim::OsdOut`), then `on_hidden` at `settle(OsdOut)` and the card is `data-shown=hidden` (not laid out): unmap the surface there. A show while it fades takes the hide back (present at once, no `on_hidden`). The hold is yours (`osd.hold_ms`) |
+| `Osd` | `level`, `label`, `look`, `id`, `children` | `Option<Level { value, glyph }>`, `Option<String>`, `LevelLook`, `Option<String>`, `Element` | A title line (`label`, 13/600) over a read-only `LevelControl` in `look`; `id` for the blur region (`Element("osd")`); children after |
+| `Osd` | `position` | `OsdPosition` (`TopRight`) | `TopRight` (under the bar, the default) or `BottomCentre` (above the dock): which edge takes the card's margin `--osd-margin` and which way `OsdIn`/`OsdOut` move (`--osd-dy`: from above and back up at the top right, from below and back down at the bottom centre) |
+| `OsdMetrics` | `margin`, `style_attr()` | `Px` (24) | `osd.margin_px`, written as `--osd-margin-px` on any element around the card |
+| `Anim` | `OsdIn`, `OsdOut`, `LevelTick` | new variants | `osd-in` `--t-quick --e-out` (from `--osd-dy` at .96 and transparent, no overshoot), `osd-out` `--t-move --e-exit` forwards (to half of `--osd-dy`, transparent), `level-tick` `--t-tap --e-out` |
+
+**Where `Osd` goes.** Directly inside one transparent Osd root, not a painted root nested in a
+transparent one:
+
+```rust
+Ds { appearance, system, look, material: Material::Osd, chrome: Some(RootChrome::Transparent),
+     blur: BlurState::Available, tint_alpha: Some(env.tint_alpha()), stack: Some(env.material_stack()),
+    div { style: OsdMetrics { margin: Px(f32::from(osd.margin_px.0)) }.style_attr(),
+        Osd { shown, label: "MA270U", level: Level { value, glyph: LevelGlyph::Volume(Muting::Audible) },
+              position: OsdPosition::TopRight, id: "osd", on_hidden: move |()| unmap() }
+    }
+}
+```
+
+The root paints nothing and gives the card every token; the card paints the Osd material with the
+Space gradient at its tint (its own `.ds-frame` group) at a control-center module's shape
+(`--r-tile`, 12 padding, 296 wide). Size the surface to the card, its margins and the material's
+shadow, anchored to the `position` edge; the layer margin is then 0.
+
 ### Native phase B (2026-09-25): the Blitz host for an app window
 
 What `ds-native` gives an app that moves its window onto `ds_native::launch` (mailo Phase B).
@@ -1198,6 +1252,35 @@ style, tint): for a third-party icon in Muted or Monochrome (inside our plate, a
 inset of design/08 4.1, so the plate and the icon take one hue), and for our own Monochrome
 files. Never on a symbolic icon (it takes the text colour) and never per frame: a workspace
 switch that changes the Space tint re-keys the cache, the next paint loads the new entries.
+
+### Control center parts (2026-09-25)
+
+Additive: four new components, four new `Anim` variants, eleven new `Icon` variants and a public
+`use_entrance`; no existing golden changed (the stylesheet golden grew by the new rules and two
+keyframes). A `match` of yours over `Anim` or `Icon` needs the new arms, and an array sized by
+`Anim::ALL` is now 56 long. FINDINGS "Control center parts (2026-09-25)" has the reasons and the
+proofs (sill Q78-Q81).
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `ModuleTile` | new component | `glyph: Icon`, `title` (`#[props(into)] Text`), `status: Option<Text>`, `state: ModuleState`, `chevron: Chevron` (`None`), `span: TileSpan` (`Half`), `onclick: EventHandler<Press>`, `on_detail: Option<EventHandler<Press>>`, `expanded: Expanded` (`Closed`, the chevron's `aria-expanded`), `availability`. A `div[role=button]` at `--r-tile` 12: a press, Enter or Space toggles (`onclick`); the chevron is its own button, `Propagation::Stop`, named "{title} details", and a press, Enter or Right on it calls `on_detail` and never `onclick`. Writes `data-state`, `data-span`, `aria-pressed` (`mixed` while busy) and `aria-busy` |
+| `ModuleState` | `Off`, `On`, `Busy` | Off: a paper disc with ink on the Mini's plate. On: the disc in `--accent` with `--accent-ink`, the plate `--accent-soft`. Busy: the Off disc with the Spinner's breathe around it |
+| `Chevron`, `TileSpan` | `None`/`Detail`; `Half`/`Full` | Whether the tile ends in the detail chevron; one grid column or both (a Full tile spans the `ModuleGrid`) |
+| `ModuleGrid` | new component | `children`: two equal columns, gap 8 (design/13 13.3.7). Your panel keeps its own padding of 12 |
+| `SettingsRow` | new component | `glyph: Option<Icon>`, `title` (`Text`), `detail: Option<Text>`, `trailing: RowTrailing` (`None`), `availability`, `onclick: EventHandler<Press>`. 44 px, a hairline above every row after the first, `MenuEntry::Row`'s shell type (title 13/400, detail `--fs-help` faint), a 16 px glyph in a 22 px column; Enter or Space runs `onclick`. Outside any `Menu`: no overlay, no layer, no focus taken |
+| `RowTrailing` | `None`, `Check(Switch)`, `Toggle { value, on_toggle }`, `Chevron`, `Text(Text)`, `Glyph(Icon)` | A check in `--accent` when `On` (the row writes `aria-pressed`); a `Toggle` named by the row's title whose press and keys stay in the switch (the row's `onclick` does not run); a chevron, a value or a glyph in `--ink-faint` |
+| `PaneSwitcher` | new component | `shown: Pane`, `root: Element`, `detail: Element`, `on_settled: Option<EventHandler<Pane>>`. Changing `shown` plays the arriving pane in (`slide-r` for the detail, `slide-l` for the root, `--t-move --e-spring`) and the outgoing one out the other way (`pane-out-l`/`pane-out-r`, `--t-move --e-exit`) at once; the leaving pane is out of the flow so the height is the arriving pane's; both settle at `settle(Anim::PaneInR)` and `on_settled` hears the pane. A change mid-slide reverses (a new round; the old settle is dropped). Markup: `div.ds-panes[data-shown][data-moving]` > `div.ds-pane[data-pane][data-presence]`, the leaving one `aria-hidden` |
+| `Pane`, `PaneSlide`, `PaneRole`, `PaneRound` | new types | `Pane::{Root, Detail}`; the pure machine the switcher runs (`show`, `settle`, `role`), for a switcher of your own |
+| `Anim` | `PaneInR`, `PaneInL`, `PaneOutL`, `PaneOutR` | `slide-r`/`slide-l` at `--t-move --e-spring` (the catalogue's rows are `--t-big`), and the two new keyframes `pane-out-l`/`pane-out-r` at `--t-move --e-exit forwards`. `Anim::ALL` is 56 |
+| `use_entrance(anim) -> Presence` | now public (`ds::use_entrance`, `ds::motion::use_entrance`) | `Entering` until `settle(anim)`, then `Present`, started on mount: the entrance every floating quire surface plays, for a surface of your own. Moved from `popover.rs`; behaviour unchanged |
+| `Icon` | `Play`, `Pause`, `SkipBack`, `SkipForward`, `LogOut`, `Restart` (Lucide `rotate-ccw`), `Headphones`, `Speaker`, `Mouse`, `Gamepad`, `Phone` (Lucide `smartphone`) | Lucide 1.47.0, ISC, the set's 24 grid and 2 px round stroke; `Icon::CONTROL` lists them and `Icon::ALL` ends with them. `Power` was already in the shell set |
+
+**What sill switches to.** The control center's hand-built tile, network row and sub-page slide
+become `ModuleGrid` of `ModuleTile`, `SettingsRow` and `PaneSwitcher`; delete their CSS (every
+class they styled is a quire class now, and a local animation would trip `UnknownAnimation`).
+Keep `shown` (and which module's detail is open) in your own state: the chevron's `on_detail`
+sets it to `Pane::Detail`, the detail's back button to `Pane::Root`. Now Playing and the power
+menu take the new glyphs instead of text or a local SVG.
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

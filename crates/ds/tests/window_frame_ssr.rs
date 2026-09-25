@@ -51,7 +51,10 @@ fn window(lights: TrafficLights) -> Element {
     }
 }
 
-const CASES: &[(&str, fn() -> Element)] = &[
+/// A golden's name and how to render it.
+type Case = (&'static str, fn() -> Element);
+
+const CASES: &[Case] = &[
     ("controls/window_frame/lights.html", || {
         window(TrafficLights::Shown)
     }),
