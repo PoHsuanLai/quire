@@ -13,7 +13,7 @@
 
 use super::name::VarName;
 use super::tuned::Tuned;
-use crate::geometry::Scale;
+use crate::geometry::{Px, Scale};
 
 /// One pixel token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -35,6 +35,9 @@ pub enum PixelToken {
     /// `--focus-ring`: the keyboard focus outline's width, 2.5 px rounded down to whole device
     /// pixels (Blitz's style engine floors an outline width the same way).
     FocusRing,
+    /// `--caret-w`: a text caret's width (an app's own caret over an `EditSurface`, whose
+    /// `caret_rect` is this wide), 1 px rounded down to whole device pixels like `--hair`.
+    CaretW,
 }
 
 /// How a token's design length becomes whole device pixels.
@@ -54,13 +57,14 @@ struct Thousandths(u32);
 
 impl PixelToken {
     /// Every pixel token, in stylesheet order.
-    pub const ALL: [PixelToken; 6] = [
+    pub const ALL: [PixelToken; 7] = [
         PixelToken::Dpr,
         PixelToken::Px,
         PixelToken::Hair,
         PixelToken::Hairline,
         PixelToken::Ring,
         PixelToken::FocusRing,
+        PixelToken::CaretW,
     ];
 
     /// The token components read and the input the root writes, with the 1x value behind it.
@@ -72,6 +76,7 @@ impl PixelToken {
             PixelToken::Hairline => ("--hairline", "--scale-hairline", ".5px"),
             PixelToken::Ring => ("--ring", "--scale-ring", "3px"),
             PixelToken::FocusRing => ("--focus-ring", "--scale-focus-ring", "2.5px"),
+            PixelToken::CaretW => ("--caret-w", "--scale-caret-w", "1px"),
         };
         Tuned {
             token: VarName(token),
@@ -102,6 +107,15 @@ impl PixelToken {
         self.snap().map(|snap| device_pixels(snap, scale))
     }
 
+    /// The token's length at `scale` in logical pixels (whole device pixels divided by the
+    /// scale), for a host that reports geometry in it: `EditSurface`'s caret rect is
+    /// `CaretW.logical(scale)` wide. `None` for `--dpr`.
+    pub fn logical(self, scale: Scale) -> Option<Px> {
+        let device = self.device_pixels(scale)?;
+        let per_logical = scale.numerator() as f32 / Scale::DENOMINATOR as f32;
+        Some(Px(device as f32 / per_logical.max(f32::EPSILON)))
+    }
+
     fn snap(self) -> Option<Snap> {
         match self {
             PixelToken::Dpr => None,
@@ -110,6 +124,7 @@ impl PixelToken {
             PixelToken::Hairline => Some(Snap::Floor(Thousandths(500))),
             PixelToken::Ring => Some(Snap::Nearest(Thousandths(3000))),
             PixelToken::FocusRing => Some(Snap::Floor(Thousandths(2500))),
+            PixelToken::CaretW => Some(Snap::Floor(Thousandths(1000))),
         }
     }
 
@@ -164,7 +179,7 @@ fn decimal(numerator: u64, denominator: u64) -> String {
 #[cfg(test)]
 mod tests {
     use super::PixelToken;
-    use crate::geometry::Scale;
+    use crate::geometry::{Px, Scale};
 
     /// Each token's CSS at 1.25, 1.5, 1.75 and 2.
     const TABLE: &[(PixelToken, [&str; 4])] = &[
@@ -180,6 +195,10 @@ mod tests {
             PixelToken::FocusRing,
             ["2.4px", "2px", "2.28572px", "2.5px"],
         ),
+        (
+            PixelToken::CaretW,
+            ["0.8px", "0.66667px", "0.57143px", "1px"],
+        ),
     ];
 
     const SCALES: [Scale; 4] = [Scale(150), Scale(180), Scale(210), Scale(240)];
@@ -191,6 +210,23 @@ mod tests {
                 assert_eq!(token.css(scale), want, "{token:?} at {scale:?}");
             }
         }
+    }
+
+    #[test]
+    fn a_caret_is_one_device_pixel_or_one_logical_pixel_in_logical_pixels() {
+        let cases = [
+            (Scale::ONE, 1.0),
+            (Scale(180), 2.0 / 3.0),
+            (Scale(240), 1.0),
+        ];
+        for (scale, want) in cases {
+            let got = PixelToken::CaretW.logical(scale).map(|Px(width)| width);
+            assert!(
+                got.is_some_and(|width| (width - want).abs() < 1e-4),
+                "{scale:?}: {got:?}"
+            );
+        }
+        assert_eq!(PixelToken::Dpr.logical(Scale::ONE), None);
     }
 
     #[test]
@@ -214,7 +250,7 @@ mod tests {
     #[test]
     fn at_one_every_token_is_its_design_value_and_the_root_writes_nothing() {
         let design: Vec<String> = PixelToken::ALL.map(|token| token.css(Scale::ONE)).to_vec();
-        assert_eq!(design, ["1", "1px", "1px", ".5px", "3px", "2.5px"]);
+        assert_eq!(design, ["1", "1px", "1px", ".5px", "3px", "2.5px", "1px"]);
         assert_eq!(PixelToken::style_attr(Scale::ONE), "");
     }
 
@@ -234,7 +270,8 @@ mod tests {
         assert_eq!(
             style,
             "--scale-dpr:1.5;--scale-px:0.66667px;--scale-hair:0.66667px;\
-             --scale-hairline:0.66667px;--scale-ring:3.33334px;--scale-focus-ring:2px;"
+             --scale-hairline:0.66667px;--scale-ring:3.33334px;--scale-focus-ring:2px;\
+             --scale-caret-w:0.66667px;"
         );
     }
 }

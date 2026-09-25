@@ -5,6 +5,7 @@
 use crate::edit::clicks::Clicks;
 use crate::edit::position::TextPosition;
 use crate::geometry::Point;
+use dioxus::prelude::Modifiers;
 
 /// A pointer event over the surface.
 #[derive(Debug, Clone, PartialEq)]
@@ -50,4 +51,17 @@ pub enum EditFocus {
     In,
     /// It lost it.
     Out,
+}
+
+/// A pointer event the host routes to the surface that captured the pointer at a press: every
+/// move and the release until the button comes up, wherever the pointer is, so a drag selection
+/// keeps following it outside the surface's box.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CapturedPointer {
+    /// [`PointerPhase::Drag`] for a move, [`PointerPhase::Release`] for the release.
+    pub phase: PointerPhase,
+    /// Where, in the window's logical pixels.
+    pub at: Point,
+    /// The modifiers held.
+    pub modifiers: Modifiers,
 }

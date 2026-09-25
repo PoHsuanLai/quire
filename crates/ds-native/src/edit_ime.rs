@@ -7,7 +7,7 @@
 use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::EventHandler;
 use dioxus_native::winit::event::Ime;
-use ds::{ImeEvent, ImeListener};
+use ds::{CapturedPointer, ImeEvent, ImeListener, PointerPhase};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -19,6 +19,8 @@ pub(crate) struct EditListeners(Rc<RefCell<Registry>>);
 struct Registry {
     next: u64,
     entries: Vec<Entry>,
+    /// The surface a press captured the pointer for, until the release.
+    captured: Option<EventHandler<CapturedPointer>>,
 }
 
 struct Entry {
@@ -40,6 +42,21 @@ impl EditListeners {
     /// Stop delivering to `id`.
     pub(crate) fn remove(&self, id: ImeListener) {
         self.0.borrow_mut().entries.retain(|entry| entry.id != id);
+    }
+
+    /// Route the pointer to `sink` until the release.
+    pub(crate) fn capture(&self, sink: EventHandler<CapturedPointer>) {
+        self.0.borrow_mut().captured = Some(sink);
+    }
+
+    /// The captured surface's sink for `phase`, released with it at the release. `None` when
+    /// no surface holds the pointer.
+    pub(crate) fn captured(&self, phase: PointerPhase) -> Option<EventHandler<CapturedPointer>> {
+        let mut registry = self.0.borrow_mut();
+        match phase {
+            PointerPhase::Release => registry.captured.take(),
+            PointerPhase::Press | PointerPhase::Drag => registry.captured,
+        }
     }
 
     /// The listener for `doc`'s focused node: the one registered nearest above it.

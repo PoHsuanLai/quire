@@ -1174,6 +1174,17 @@ input; the app keeps its document model and draws its own caret and selection. F
 | The host seam | `ds::HostEdit` = `ds_native::edit::EDIT` | `launch` and the harness provide it; another Blitz host calls `ds_native::edit::provide()` (and must forward its own IME events; see FINDINGS). Without a host the geometry reads are `Unknown` and keys still arrive. |
 | Tests | `Harness::ime_start()`, `ime_update(text, cursor)`, `ime_commit(text)`, `ime_end()`, `paste_html(html, text)`, `hit_test(selector, point)`, `ime_switch()`, `ime_cursor_area()`, `within(f)` | `within` runs a closure in the app's runtime, so a test reads an `EditHandle` as a handler would. `cargo run -p ds-native --example edit` prints every input from a real window, for trying an IME by hand. |
 
+#### Edit surface 2 (2026-09-25)
+
+| Need | API | Notes |
+| --- | --- | --- |
+| The surface as the app's own styled body | `EditSurface { extra_class: ExtraClass::parse("c-body").ok(), data: vec![DataAttr::new(DataName::parse("draft")?, id)] }` | The same `ExtraClass`/`DataAttr` as `Button` (mailo gaps 6): a `ds-` class, a `ds-` name or a name quire writes is refused. The class follows `ds-edit`. |
+| Focus the surface from code | `handle.focus()`, `handle.blur()` | Exactly what a press and a blur do: `on_focus` hears `In`/`Out`, the IME is switched on (pointed at `ime_area`) or off, the surface is the IME's target while it has the keyboard; `blur` ends an open composition. |
+| A drag past the surface | nothing: a press captures the pointer | Every move and the primary release reach `on_pointer` until the release, wherever the pointer is (positions resolve to the nearest text). |
+| The caret's width | `caret_rect(..).size.width` = `--caret-w` (`ds::PixelToken::CaretW`) | 1 px floored to whole device pixels (one device pixel at 1.25-1.75), from the insertion point rightwards. Draw the caret at the rect as given, or with `width: var(--caret-w)`. |
+| Stacking a selection layer | the layer before the surface, the surface `position: relative`, neither with a `z-index` | Blitz follows CSS 2.1 Appendix E here: a positioned box with `z-index: auto` paints in tree order, so the later positioned surface's text is over the layer; a static surface is under every positioned box, the layer included. FINDINGS "Edit surface 2". |
+| Driving it in a test | `Harness::click_with(at, Modifiers::SHIFT)`, `pointer_move_with`, `button_down_with`, `button_up_with`, `drag(from, to, steps)`, `held_buttons() -> HeldButtons`, `Key::{Home, End, Delete, PageUp, PageDown, Insert}` | A move between a press and its release carries the held buttons, so it is a drag. |
+
 ### Native focus (2026-09-25): a field by handle, any element by selector, and keep-focus
 
 Three gaps mailo's window hit on `ds_native::launch`. FINDINGS.md "Native focus" has the
