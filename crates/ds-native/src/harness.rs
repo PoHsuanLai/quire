@@ -353,6 +353,7 @@ impl Harness {
         // An edit surface holding the pointer hears a move or the release first, wherever it is
         // (`crate::edit_ime`), as the window's hook delivers it before the document.
         self.route_captured(&event);
+        self.doc.note_pointer(&event);
         self.doc.doc.handle_ui_event(event);
         self.settle();
     }
