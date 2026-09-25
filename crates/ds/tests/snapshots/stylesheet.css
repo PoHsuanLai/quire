@@ -1262,11 +1262,11 @@ html,body{margin:0;padding:0;background:transparent}
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
    with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
    pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`) and by `--lift`; pressed it
-   squishes. A Full tile spans both grid columns. The chevron is a quiet 24 x 28 hit target of
-   its own, `--ink-faint` until the pointer is on it. */
+   squishes. A Full tile spans both grid columns. The chevron is a quiet 18 x 28 hit target of
+   its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
 
 .ds-module-tile{
-  position:relative; display:flex; align-items:center; gap:var(--s-8); min-width:0; min-height:52px; box-sizing:border-box;
+  position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:52px; box-sizing:border-box;
   padding:var(--s-8) var(--s-4) var(--s-8) var(--s-10); border:var(--hair) solid var(--line); border-radius:var(--r-tile);
   background:var(--surface-2); color:var(--ink); cursor:pointer; user-select:none;
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
@@ -1287,11 +1287,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-tile[*|data-state=on] .ds-module-disc{ background:var(--accent); color:var(--accent-ink); }
 
 .ds-module-words{ display:flex; flex-direction:column; flex:1; min-width:0; }
+/* Clipped, not faded: `.ds-truncate`'s fade covers the last 1.5em of the column whether the
+   words reach it or not, and a half tile's column is about as wide as "Bluetooth". */
+.ds-module-title,
+.ds-module-status{ white-space:nowrap; overflow:hidden; }
 .ds-module-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
 .ds-module-status{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
 
 .ds-module-chevron{
-  font:inherit; display:grid; place-items:center; flex:none; width:24px; height:28px; padding:0; border:0; border-radius:var(--r-btn);
+  font:inherit; display:grid; place-items:center; flex:none; width:18px; height:28px; padding:0; border:0; border-radius:var(--r-btn);
   background:transparent; color:var(--ink-faint); cursor:pointer;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -1299,6 +1303,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-chevron:active{ transform:scale(var(--squish)); }
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
+
+/* ModuleGrid (design/13 section 13.3.7): two equal columns, gap 8. */
+.ds-module-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-8); }
 /* -- pane_switcher -- */
 /* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
    (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
