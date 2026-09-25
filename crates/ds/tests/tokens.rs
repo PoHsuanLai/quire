@@ -284,6 +284,8 @@ const PER_ELEMENT: &[&str] = &[
     "--plate-base-d",
     "--plate-deep-d",
     "--plate-ink-d",
+    // A notification group's layer count (`NotificationCard`, sill Q120).
+    "--layers",
 ];
 
 #[test]

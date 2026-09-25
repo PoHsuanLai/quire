@@ -52,6 +52,9 @@ pub mod module_panel;
 pub mod module_tile;
 pub mod module_tile_kind;
 pub(crate) mod muted;
+pub(crate) mod notification_body;
+pub mod notification_card;
+pub mod notification_parts;
 pub mod osd;
 pub(crate) mod osd_phase;
 pub(crate) mod palette_host;
@@ -146,6 +149,8 @@ pub use module_grid::{GridColumns, GridMetrics, ModuleGrid};
 pub use module_panel::{ModulePanel, PanelPlate};
 pub use module_tile::ModuleTile;
 pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
+pub use notification_card::NotificationCard;
+pub use notification_parts::{AppMark, CardAction, GroupCount, Hover, Layers};
 pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
@@ -217,6 +222,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("notification_card", include_str!("notification_card.css")),
     ("osd", include_str!("osd.css")),
     ("module_tile", include_str!("module_tile.css")),
     ("module_panel", include_str!("module_panel.css")),
