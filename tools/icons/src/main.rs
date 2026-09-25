@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use clap::{Parser, Subcommand};
 mod round4;
 mod round5;
+mod round6;
 
 use icons::{
     Bevel, Cell, Dialect, EXPORT_SIZES, Family, IconsError, Look, Shadow, Sheet, SheetStyle, Spec,
@@ -61,6 +62,19 @@ enum Command {
         klein_dir: Option<PathBuf>,
         #[arg(long)]
         out: PathBuf,
+    },
+    /// Export the shipped set (08 2.11) from `ship.toml`: every size of every style into
+    /// `<out>/<app>/[muted|monochrome/]<px>.png`; optionally the round-six sheet from the files.
+    Ship {
+        #[arg(long)]
+        manifest: PathBuf,
+        /// Where the manifest's Klein renders are (round three's face-mode renders).
+        #[arg(long)]
+        renders: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        sheet: Option<PathBuf>,
     },
     /// Round five (a): every app in eight colourways at the palette's chroma cap.
     Colourways {
@@ -493,6 +507,18 @@ fn main() -> Result<(), IconsError> {
             round5::bolder(&load_specs(&spec)?, &plan, &hues, &out)
         }
         Command::Palette { out } => round5::palette(&out),
+        Command::Ship {
+            manifest,
+            renders,
+            out,
+            sheet,
+        } => {
+            round6::ship(&manifest, &renders, &out)?;
+            match sheet {
+                Some(s) => round6::sheet(&manifest, &out, &s),
+                None => Ok(()),
+            }
+        }
         Command::Face {
             input,
             mode,
