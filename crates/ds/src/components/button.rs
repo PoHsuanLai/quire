@@ -7,6 +7,7 @@ use crate::components::button_face::{
     ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
     trailing as trailing_mark,
 };
+use crate::components::button_size::{ButtonSize, disabled};
 use crate::components::icon_view::IconView;
 use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::press::{Press, PressListeners, Propagation};
@@ -91,9 +92,18 @@ impl ButtonVariant {
 ///
 /// [`DataName::parse`]: crate::DataName::parse
 /// [`ExtraClass::parse`]: crate::ExtraClass::parse
+///
+/// `size` (sill Q92) draws the variant at another size: `Some(ButtonSize::Regular)` gives a
+/// Danger the Primary's geometry, so Restart sits level with Shut Down and Cancel beside it.
+/// `None` keeps the variant's own size (Danger and Mini are Mini-sized) and writes nothing.
+///
+/// `availability: Availability::Disabled` (sill Q93) writes `aria-disabled` and `disabled`,
+/// draws the button at .35 with no hover and no press (design/13 section 13.3.3's disabled
+/// item), and drops every press: `onclick` never runs.
 #[component]
 pub fn Button(
     variant: ButtonVariant,
+    #[props(default)] size: Option<ButtonSize>,
     #[props(into)] label: Text,
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] pressed: Option<Switch>,
@@ -129,6 +139,8 @@ pub fn Button(
             "aria-pressed": pressed,
             "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
+            disabled: disabled(availability),
+            "data-size": size.map(ButtonSize::slug),
             onclick: move |event| {
                 if live {
                     listen.click(&event);

@@ -93,11 +93,16 @@ pub enum ColourToken {
     OkInk,
     /// `--warn-ink`: text on `--warn`, clearing 4.5:1 in either scheme.
     WarnInk,
+    /// `--scrim-modal`: the dimming behind a modal that asks for a decision (a shutdown dialog),
+    /// black at .40 in light and .55 in dark, where `--scrim` (.22) only pushes a peek back
+    /// (sill FINDINGS "Sheet and modal parts"; design/03-COLOR.md section 17). A colour like
+    /// `--scrim`, not an opacity, because its strength differs by scheme.
+    ScrimModal,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 28] = [
+    pub const ALL: [ColourToken; 29] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -126,6 +131,7 @@ impl ColourToken {
         ColourToken::OnHue,
         ColourToken::OkInk,
         ColourToken::WarnInk,
+        ColourToken::ScrimModal,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -159,6 +165,7 @@ impl ColourToken {
             ColourToken::OnHue => "--on-hue",
             ColourToken::OkInk => "--ok-ink",
             ColourToken::WarnInk => "--warn-ink",
+            ColourToken::ScrimModal => "--scrim-modal",
         })
     }
 
@@ -212,6 +219,9 @@ impl ColourToken {
             ColourToken::OkInk => (WHITE, solid(0x0B1A12)),
             // White on light `--warn` is 4.03:1, under the gate, so both schemes take a dark ink.
             ColourToken::WarnInk => (solid(0x140D03), solid(0x140D03)),
+            // A modal's dimming: stronger in dark, where the paper is already near black and the
+            // sheet stands out by its hairline and shadow; the legibility test gates both.
+            ColourToken::ScrimModal => (alpha(0x000000, 400), alpha(0x000000, 550)),
             ColourToken::MarkGround => (WHITE, WHITE),
             // Proposed (O-3): black at .25 on light, white at .25 on dark.
             ColourToken::HandleRing => (alpha(0x000000, 250), alpha(0xFFFFFF, 250)),

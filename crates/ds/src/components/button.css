@@ -1,6 +1,7 @@
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
-   TODO(O-1): disabled has no visual; `aria-disabled` only drops the handler. */
+   Disabled (sill Q93) takes design/13 section 13.3.3's settled disabled item, .35, rather than
+   O-1's unsigned .45 candidate: below. */
 
 .ds-button{ font:inherit; }
 
@@ -56,6 +57,18 @@
 .ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
 .ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); transform:scale(var(--squish)); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
+
+/* Size (sill Q92), after the variants so it wins at equal weight: `data-size` is written only
+   when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
+   Primary's box (`S:386-391`) at the variant's colours, so a Danger Restart stands level with a
+   Primary Shut Down beside it; Mini is Mini's (`S:165-173`). Quiet and Frame keep their own. */
+.ds-button[*|data-size=regular]{ padding:var(--s-8) var(--s-14); font-size:var(--fs-control); font-weight:700; line-height:inherit; }
+.ds-button[*|data-size=mini]{ padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+
+/* Disabled (sill Q93; design/13 section 13.3.3's disabled item): .35, the default cursor, and no
+   pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
+   dropped handlers keep a press from firing. */
+.ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
 
 /* A trailing mark (mailo gaps 4): a dropdown's caret after its value, in the label's colour a
    step quieter; `line-height:0` so the glyph does not stretch the line. */

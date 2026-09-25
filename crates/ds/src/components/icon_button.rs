@@ -1,5 +1,6 @@
 //! IconButton: an icon-only action, `aria-label` mandatory (design/04-COMPONENTS.md section 2).
 
+use crate::components::button_size::disabled;
 use crate::components::icon_view::IconView;
 use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::press::{Press, PressListeners, Propagation};
@@ -60,6 +61,8 @@ impl IconButtonVariant {
 /// `mounted` hands over the element once it is in the document, so a floating component can
 /// anchor to it (`Anchor::Mounted`). `propagation: Propagation::Stop` keeps the press at the
 /// button, so a glyph inside a `<summary>` does not toggle its `<details>`.
+/// `availability: Availability::Disabled` writes `aria-disabled` and `disabled` and draws the
+/// button at .35 with no hover and no press; `onclick` never runs (sill Q93).
 ///
 /// `data` and `extra_class` (mailo gaps 6) put the consumer's own `data-*` attributes and
 /// classes on the button itself, as on a `Button`, so it needs no wrapping `span`: `data-folder` for a drag that
@@ -103,6 +106,7 @@ pub fn IconButton(
             "aria-pressed": pressed,
             "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
+            disabled: disabled(availability),
             onclick: move |event| {
                 if live {
                     listen.click(&event);
