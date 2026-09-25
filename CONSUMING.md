@@ -1160,6 +1160,17 @@ action logind refuses (drop any local dimming); `Kbd { size: KbdSize::Small }` f
 hints (drop any drawn-arrow workaround); and the wallpaper's `100vw/100vh` rule can become
 `extent: RootExtent::Viewport` on its root.
 
+### Button heights and small key caps (2026-09-25)
+
+Two follow-ups from the power menu review, additive: no prop is new, so nothing you called
+before changes shape. FINDINGS "Button heights and small key caps" has the reasons and the
+proofs (sill Q110, Q111).
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Button` | nothing | | `ButtonVariant::Primary` (and `Secondary`, which shares its rule) now carries a transparent `--hair` border rather than `border:0`; the paint is the same, but Primary, Secondary and Danger now stand the same height at a given `ButtonSize` (Primary drew 2 px shorter than a Danger beside it at Regular before this) |
+| `Kbd` | nothing | | At `KbdSize::Small`, the arrow keys' (`←↑→↓`) cap draws its glyph at `--fs-control` with a tighter line-height and gains `data-glyph="arrow"` (every other key writes no `data-glyph`); the cap's own height is unchanged, only its glyph is bigger, so a Small `←` no longer reads as a dash |
+
 ### Native phase B (2026-09-25): the Blitz host for an app window
 
 What `ds-native` gives an app that moves its window onto `ds_native::launch` (mailo Phase B).

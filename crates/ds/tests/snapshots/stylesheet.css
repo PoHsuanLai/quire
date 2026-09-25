@@ -641,10 +641,15 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-button{ font:inherit; }
 
-/* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). */
+/* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
+   `--hair` border (sill Q110): Primary's is transparent, so it draws exactly as it did with
+   `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
+   the box model gains the same border width Secondary and Danger already have, so all three
+   stand the same height at a given size instead of Primary sitting one `--hair` short top and
+   bottom. */
 .ds-button[*|data-variant=primary],
 .ds-button[*|data-variant=secondary]{
-  display:inline-flex; align-items:center; gap:var(--s-6); border:0; cursor:pointer; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
+  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:pointer; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
   transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
@@ -1087,6 +1092,13 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }
+
+/* Small's arrow glyphs (sill Q111): at 9.5 px an arrow's stroke reads as a dash. Drawn at
+   `--fs-control` (13) with a tighter line-height so the extra line-box the bigger face would
+   ask for is absorbed instead of growing the cap: the cap's height comes from its padding and
+   border, not the glyph, as long as the line box the glyph sits in is no taller than the one
+   the rest of the Small face already draws. */
+.ds-kbd[*|data-size=small][*|data-glyph=arrow]{ font-size:var(--fs-control); line-height:1.13; }
 /* -- level -- */
 /* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
    follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,

@@ -233,6 +233,25 @@ pub enum Key {
     Insert,
 }
 
+/// A shape a key's glyph draws as, for `Kbd`'s `data-glyph`: a hook for a face rule that only
+/// some glyphs need. `Arrow` is the only member today — a Small cap's `data-glyph="arrow"`
+/// draws Up, Down, Left and Right larger than the rest of the small face (sill Q111: at 9.5 px
+/// an arrow's stroke reads as a dash).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub(crate) enum GlyphKind {
+    /// Up, Down, Left, Right.
+    Arrow,
+}
+
+impl GlyphKind {
+    /// The `data-glyph` word.
+    pub(crate) fn slug(self) -> &'static str {
+        match self {
+            GlyphKind::Arrow => "arrow",
+        }
+    }
+}
+
 /// A key combination, modifiers first, rendered as glyphs with no separator: `⌃T`
 /// (design/04-COMPONENTS.md O-2).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -272,6 +291,15 @@ impl Key {
             Key::PageUp => "⇞".to_string(),
             Key::PageDown => "⇟".to_string(),
             Key::Insert => "Ins".to_string(),
+        }
+    }
+
+    /// The `data-glyph` shape `Kbd` writes for this key, or `None` for every key whose glyph
+    /// needs no face rule of its own (sill Q111).
+    pub(crate) fn glyph_kind(self) -> Option<GlyphKind> {
+        match self {
+            Key::Up | Key::Down | Key::Left | Key::Right => Some(GlyphKind::Arrow),
+            _ => None,
         }
     }
 }
