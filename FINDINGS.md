@@ -3449,6 +3449,50 @@ below.
   over the modal scrim in its own Sheet root, light and dark, with Cancel, a disabled Suspend, a
   Danger Restart and Shut Down, and Small caps for the arrows, Enter and Escape.
 
+## Button heights and small key caps (2026-09-25)
+
+Two Sheet and modal parts follow-ups from the power menu review, sill Q110 and Q111. Branch
+`button-kbd-fixes`. Both additive: no markup a caller wrote changes shape, only a border colour
+and a `data-glyph` attribute that was always absent before.
+
+- **Q110: a Primary stood shorter than its neighbours.** `ButtonVariant::Primary` drew with
+  `border:0` while Secondary (which shares Primary's rule) and Danger both carry
+  `border:var(--hair) solid var(--line)`. At `ButtonSize::Regular` that is a `--hair` top and
+  bottom Primary never paid for: 36 px against Secondary and Danger's 38 px, so a Shut Down
+  (Primary) sat visibly shorter than the Cancel and Restart beside it. Fixed in the box model,
+  not the paint: Primary (and Secondary, before Secondary's own rule repaints it) now carries
+  `border:var(--hair) solid transparent`. `background-clip`'s default is `border-box`, so a
+  transparent border does not create a gap — the background already painted there shows through
+  the border area exactly as it did at `border:0` — but the border now costs the same box-model
+  height Secondary and Danger's `--hair` already costs, so all three match at both sizes the
+  power menu draws them at. Proof: `ds-native/tests/button_heights.rs`
+  (`primary_secondary_and_danger_share_one_height_at_regular_and_at_mini`) lays out Primary,
+  Secondary and Danger side by side at `ButtonSize::Regular`, then again at `ButtonSize::Mini`
+  (Danger with no `size` prop, its own Mini height), and asserts all three heights are equal at
+  each size and that Mini is shorter than Regular. No golden's markup changed (the CSS is the
+  only diff), so none moved.
+- **Q111: a Small cap's arrow was still a dash.** Q95 fixed the font subset so `←` and `→` are
+  drawn by Space Mono rather than falling back to a system face, but at `KbdSize::Small`'s
+  9.5 px (`--fs-micro`) the arrow's own stroke is only about 4-6 px of ink: readable as an arrow
+  under a loupe, still close to a dash at a glance. `Key::glyph_kind` (vocab.rs) marks Up, Down,
+  Left and Right; `Kbd` writes `data-glyph="arrow"` on their cap only (every other key writes no
+  `data-glyph` at all, so their markup is unchanged). `.ds-kbd[data-size=small][data-glyph=arrow]`
+  draws that cap's glyph at `--fs-control` (13, up from 9.5) with `line-height:1.13` rather than
+  the browser's own metric for that face: the line-box the bigger glyph asks for
+  (`font-size * line-height`) comes out within a device pixel of the line-box `--fs-micro` at its
+  own default line-height already gave the cap, so the cap's padding-and-border box (its height
+  in a shortcut hint row) does not move, only the glyph inside it grows. The cap's *width* does
+  grow a little (18 px to 20 px in the harness, an inline-block sized by its own content) — no
+  existing shortcut hint aligns key caps to a fixed width, only to a common height, so this is
+  not a regression the way a height change would be. Proof:
+  `ds-native/tests/kbd_arrows.rs`: `a_small_caps_left_and_right_arrows_have_heads`'s width floor
+  moved from 5 to 7 px (an arrow's ink is now 8 px wide in the harness, comfortably over);
+  `a_small_arrow_caps_box_is_the_same_height_as_a_plain_small_cap` (new) lays out a plain Small
+  letter cap beside all four Small arrow caps and asserts every arrow cap's height is within
+  1 px of the letter cap's. No golden moved: none of `controls/kbd`'s existing cases (`Ctrl T`,
+  `Ctrl K`, the five-modifier chord) hit an arrow key, so `data-glyph` never appears in their
+  markup.
+
 ## PDF output (2026-09-25)
 
 mailo is going native-only, and printing was its last webview use. Branch `native-pdf`; blitz rev
