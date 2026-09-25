@@ -113,7 +113,7 @@ pub use menu_pick::PickDismiss;
 pub use palette_shown::Retain;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
-pub use press::{PointerButton, Press};
+pub use press::{PointerButton, Press, Propagation};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
 pub use row_action::RowAction;
 pub use row_hooks::PartHooks;

@@ -68,23 +68,66 @@ pub(crate) fn button_of(trigger: Option<MouseButton>) -> Option<PointerButton> {
     }
 }
 
+/// Whether a press goes on to the control's ancestors after the control has heard it (mailo
+/// gaps 5). A button inside a `<summary>` (a collapsible section's header action) must keep its
+/// press to itself, or the `<details>` around it toggles as well: the caller only receives a
+/// [`Press`], never the event, so it cannot stop the event itself.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Propagation {
+    /// The press reaches the ancestors too, as any click does (the default).
+    #[default]
+    Bubble,
+    /// The press ends at the control: its propagation is stopped before `onclick` runs, and
+    /// its default action is prevented, since on Blitz a click's default action walks up the
+    /// ancestors (it is what toggles a `<details>` from its `<summary>`). A `type=button` has
+    /// no default action of its own, so nothing the control does is lost.
+    Stop,
+}
+
+impl Propagation {
+    /// Keep `event` at the control when the press stops there.
+    fn apply(self, event: &MouseEvent) {
+        match self {
+            Propagation::Bubble => {}
+            Propagation::Stop => {
+                event.stop_propagation();
+                event.prevent_default();
+            }
+        }
+    }
+}
+
 /// The three listeners a pressable control puts on its element, all reporting through `press`:
 /// `click` (primary, and keyboard activation), `contextmenu` (secondary: Blitz and browsers
 /// send a right-click as that and never as a click; its default is prevented), and `mouseup`
-/// for the middle button, which neither fires as a click on Blitz.
+/// for the middle button, which neither fires as a click on Blitz. Under
+/// [`Propagation::Stop`] each of them keeps its event at the control before reporting.
 #[derive(Clone, Copy)]
 pub(crate) struct PressListeners {
     press: EventHandler<Press>,
+    propagation: Propagation,
 }
 
 impl PressListeners {
-    /// Listeners that report to `press`.
+    /// Listeners that report to `press` and let the event bubble on.
     pub(crate) fn new(press: EventHandler<Press>) -> Self {
-        PressListeners { press }
+        PressListeners {
+            press,
+            propagation: Propagation::Bubble,
+        }
+    }
+
+    /// The same listeners, keeping or passing on the event as `propagation` says.
+    pub(crate) fn with_propagation(self, propagation: Propagation) -> Self {
+        PressListeners {
+            propagation,
+            ..self
+        }
     }
 
     /// A `click`: primary, or whatever button the event names.
     pub(crate) fn click(&self, event: &MouseEvent) {
+        self.propagation.apply(event);
         if let Some(button) = button_of(event.trigger_button()) {
             self.press.call(Press::of(event, button));
         }
@@ -93,12 +136,14 @@ impl PressListeners {
     /// A `contextmenu`: a secondary press. The page's own menu is the app's to open.
     pub(crate) fn context_menu(&self, event: &MouseEvent) {
         event.prevent_default();
+        self.propagation.apply(event);
         self.press.call(Press::of(event, PointerButton::Secondary));
     }
 
     /// A `mouseup`: only the middle button counts (the primary one arrives as `click`).
     pub(crate) fn mouse_up(&self, event: &MouseEvent) {
         if event.trigger_button() == Some(MouseButton::Auxiliary) {
+            self.propagation.apply(event);
             self.press.call(Press::of(event, PointerButton::Middle));
         }
     }
