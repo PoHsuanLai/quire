@@ -19,6 +19,7 @@ use crate::components::menu_keys::{Decision, Level};
 use crate::components::menu_lines::{Act, Choice, Filter, KeyAct, choices, key_act, lines};
 use crate::components::menu_panel::Panel;
 use crate::components::menu_pick::{Closing, Gesture, PickDismiss, kept_focus, picker};
+use crate::components::menu_return::hand_back;
 use crate::components::menu_surface::{Surface, stacking};
 use crate::components::menu_tracker::{Tracker, Via, use_tracker};
 use crate::components::popover::{escape_closes, use_float};
@@ -60,6 +61,11 @@ use dioxus::prelude::*;
 /// keys are handled when the focus is inside it, and a caller that keeps the focus elsewhere
 /// drives it with [`Cursor::Controlled`]. The flow is fixed for the menu's life: key the menu
 /// by it to switch.
+///
+/// A floating menu that took the keyboard gives it back when it closes (mailo gaps 7): to the
+/// anchor's element when `anchor` is [`Anchor::Mounted`] (or its nearest focusable ancestor),
+/// if it is still there, through the host's `HostHandBack`; anchored at a point or a rect,
+/// ds-native gives it to the element focused before the menu opened.
 #[component]
 pub fn Menu<T: Clone + PartialEq + 'static>(
     kind: MenuKind,
@@ -159,6 +165,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     };
     let child = panel.submenu(kind, timing, 0);
     let probe = float.surface();
+    let opener = anchor.clone();
     let hover = panel.clone();
     let leave = panel.clone();
     let presence = match (closing(), entrance, flow) {
@@ -188,6 +195,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                 // A field beside the menu that drives its cursor keeps the keyboard, and an
                 // inline menu leaves it with its caller.
                 if active.takes_focus() && flow == Flow::Floating {
+                    hand_back(&element, &opener, flow, active);
                     crate::focus::host::focus_soon(element);
                 }
             },

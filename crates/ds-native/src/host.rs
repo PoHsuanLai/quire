@@ -12,7 +12,9 @@
 //!   `ds::HostFind` (`crate::focus`); an edit surface's geometry and IME through `ds::HostEdit`
 //!   (`crate::edit`).
 //! - Under `FocusFallback::Ancestor` (the default), `ds::HostClickFocus`: a click on nothing
-//!   focusable leaves the keyboard on the nearest focusable ancestor (`crate::click_focus`).
+//!   focusable leaves the keyboard on the nearest focusable ancestor (`crate::click_focus`),
+//!   and so does the removal of the focused element (`crate::focus_keep`), looked at on every
+//!   window event before the document hears it, so a key after a menu closed reaches the app.
 //! - IME events: dioxus-native-dom drops them, but this window hook hears each winit event
 //!   before the document does, so an IME event goes to the edit surface that has the keyboard
 //!   (`crate::edit_ime`).
@@ -33,6 +35,7 @@ use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::{EditListeners, ime_of};
 use crate::edit_window::{captured_of, modifiers_of};
+use crate::focus_keep::{FocusKeeper, hand_back_seam, keep};
 use crate::frame_book::FrameBook;
 use crate::frame_hover::report;
 use crate::frame_links::{frame_links, read_link};
@@ -85,9 +88,14 @@ pub(crate) fn Host(props: HostProps) -> Element {
     use_context_provider(|| crate::focus::BLUR);
     use_context_provider(|| crate::focus::SELECT);
     let fallback = props.setup.focus_fallback;
-    use_hook(|| {
-        (fallback == FocusFallback::Ancestor)
-            .then(|| provide_context(crate::click_focus::CLICK_FOCUS))
+    let keeper = use_hook(|| match fallback {
+        FocusFallback::Ancestor => {
+            provide_context(crate::click_focus::CLICK_FOCUS);
+            let keeper = Rc::new(RefCell::new(FocusKeeper::default()));
+            provide_context(hand_back_seam(Rc::clone(&keeper)));
+            Some(keeper)
+        }
+        FocusFallback::BlitzDefault => None,
     });
     use_context_provider(|| crate::edit::EDIT);
     let listeners = use_context_provider(EditListeners::default);
@@ -112,6 +120,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
     use_window_event(move |event, _| {
+        if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
+            keep(&mut keeper.borrow_mut(), &DocRef::Handle(handle.clone()));
+        }
         if let crate::frame_hover::FrameHover::Report(_) = hover {
             let crossings = hovering.borrow_mut().crossings(
                 event,

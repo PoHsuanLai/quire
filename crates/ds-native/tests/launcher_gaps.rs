@@ -11,7 +11,7 @@ use ds::{
     FocusRequest, IconSize, IconSource, IconUrl, Key, Material, Menu, MenuEntry, MenuKind,
     PaletteEntrance, Px, Rect, Tile, Trail, use_focus_request,
 };
-use ds_native::{Harness, Viewport};
+use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -290,8 +290,10 @@ fn open_and_close_actions(harness: &mut Harness) {
 }
 
 /// Q44: the field gets the keyboard back when the menu closes and asks for it, without a
-/// remount (the card is still at rest, not replaying its entrance); without the request it
-/// does not.
+/// remount (the card is still at rest, not replaying its entrance); without the request, under
+/// Blitz's own focus behaviour, it does not. Under the default `FocusFallback::Ancestor` it does
+/// without the request too: the host hands the keyboard of a removed panel to the element
+/// focused before it (mailo gaps 7).
 #[test]
 fn a_focus_request_gives_the_field_the_keyboard_back() {
     let mut harness = Harness::new(OwnSelection, VIEW);
@@ -310,12 +312,22 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
         Some("present"),
         "the palette was not remounted"
     );
-    let mut kept = Harness::new(KeptFocus, VIEW);
+    let mut kept = Harness::with_config(
+        KeptFocus,
+        HarnessConfig::new(VIEW).with_focus_fallback(FocusFallback::BlitzDefault),
+    );
     kept.advance(ms(700));
     open_and_close_actions(&mut kept);
     assert!(
         !kept.is_focused("#launcher-card .ds-input"),
         "without the request the field stays unfocused"
+    );
+    let mut handed = Harness::new(KeptFocus, VIEW);
+    handed.advance(ms(700));
+    open_and_close_actions(&mut handed);
+    assert!(
+        handed.is_focused("#launcher-card .ds-input"),
+        "the host handed the removed menu's keyboard back to the field"
     );
 }
 
