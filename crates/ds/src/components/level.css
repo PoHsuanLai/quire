@@ -1,0 +1,61 @@
+/* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
+   follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
+   `material/level.rs`); `--f` is the level and `--rb` the rubber band's stretch, both written
+   inline by the component. Attribute selectors carry `*|` (spike S2).
+
+   Motion. A level set from outside slides over `--t-quick --e-out`; under the pointer
+   (`data-drag=live`) the fill follows it with no transition. A press swells the track
+   (`scaleY(1.08)`, `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
+   stretches by `--rb` along that end and springs back over `--t-move --e-spring` when released.
+   Glyph parts cross-fade over `--t-quick`; the sun's rays scale with `--f`. */
+
+.ds-level{ --level-h:26px; display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
+.ds-level-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
+/* Where a press and a drag land: the rail and a margin round it, so a drag a little past an end
+   still reaches the control. Last in the rail, so it is over everything drawn there. */
+.ds-level-hit{ position:absolute; top:calc(var(--s-6) * -1); bottom:calc(var(--s-6) * -1); left:calc(var(--s-16) * -1); right:calc(var(--s-16) * -1); }
+.ds-level-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
+
+/* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
+.ds-level-track{ position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-well); box-shadow:var(--m-level-shade);
+  transition:transform var(--t-quick) var(--e-spring), left var(--t-move) var(--e-spring), right var(--t-move) var(--e-spring); }
+.ds-level-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out); }
+.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.08); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level[*|data-drag=live] .ds-level-fill{ transition:none; }
+.ds-level[*|data-over=end] .ds-level-track{ right:calc(var(--rb) * -1); }
+.ds-level[*|data-over=start] .ds-level-track{ left:calc(var(--rb) * -1); }
+
+/* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
+   the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
+.ds-level-in{ position:absolute; top:0; bottom:0; left:var(--s-6); display:flex; align-items:center; }
+.ds-level-track > .ds-level-in{ color:var(--m-level-glyph); }
+.ds-level-fill > .ds-level-in{ color:var(--m-level-glyph-fill); }
+.ds-level-glyph{ position:relative; display:block; flex:none; }
+.ds-level-glyph[*|data-size="16"]{ width:16px; height:16px; }
+.ds-level-glyph[*|data-size="22"]{ width:22px; height:22px; }
+.ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
+.ds-level-part[*|data-on=off]{ opacity:0; }
+.ds-level-part[*|data-part=rays]{ transform:scale(calc(.6 + .4 * var(--f))); }
+
+/* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
+.ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }
+
+/* The knob: a round disc of the fill's ink riding the fill's end; the fill ends at its centre. */
+.ds-level[*|data-look=capsule-knob] .ds-level-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
+.ds-level-knob{ position:absolute; top:0; left:calc(var(--f) * (100% - var(--level-h))); width:var(--level-h); height:var(--level-h);
+  border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
+  transition:left var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring), margin-left var(--t-move) var(--e-spring); }
+.ds-level[*|data-drag=live] .ds-level-knob{ transform:scale(1.08); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level[*|data-over=end] .ds-level-knob{ margin-left:var(--rb); }
+.ds-level[*|data-over=start] .ds-level-knob{ margin-left:calc(var(--rb) * -1); }
+
+/* Sixteen squares: the ones that change fill in (or empty) one `--stagger` after another. */
+.ds-level[*|data-look=segments] .ds-level-rail{ height:auto; }
+.ds-level-segments{ display:flex; gap:var(--s-2); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level-seg{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
+  transition:background-color var(--t-quick) var(--e-out) calc(var(--i) * var(--stagger)); }
+.ds-level-seg[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
+.ds-level[*|data-drag=live] .ds-level-segments{ transform:scaleY(1.08); }
+.ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }

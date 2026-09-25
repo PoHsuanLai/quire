@@ -12,10 +12,12 @@ use crate::css::accents_css::swatch_var;
 use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
 use crate::css::shape_css::{SHAPE_VARS, SQUIRCLE_VARS};
 use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
+use crate::material::level::LEVEL_VARS;
 use crate::material::stack::STACK_INPUTS;
 use crate::motion::Anim;
 use crate::space::{CardAccent, FrameVars, SpaceLook};
 use crate::tokens::dock::DOCK_TOKENS;
+use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
@@ -53,6 +55,7 @@ fn collect() -> HashSet<String> {
         .chain([StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])
         .chain(tuned_vars())
         .chain(STACK_INPUTS)
+        .chain(LEVEL_VARS)
         .chain(SQUIRCLE_VARS)
         .chain(SHAPE_VARS)
         .collect();
@@ -87,6 +90,7 @@ fn tuned_vars() -> impl Iterator<Item = VarName> {
     SHELL_TOKENS
         .into_iter()
         .chain(DOCK_TOKENS)
+        .chain(OSD_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
         .chain(PixelToken::ALL.map(PixelToken::tuned))
         .flat_map(|token| [token.token, token.input])
