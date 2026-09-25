@@ -8,6 +8,7 @@
 //! panicking.
 
 mod app_id;
+mod click_focus;
 pub mod clipboard;
 mod contexts;
 mod data_url;
@@ -50,6 +51,7 @@ pub mod snapshot;
 mod wake;
 
 pub use app_id::AppId;
+pub use click_focus::{CLICK_FOCUS, FocusFallback};
 pub use contexts::RootContexts;
 pub use error::NativeError;
 pub use fonts::{font_context, register_fonts};

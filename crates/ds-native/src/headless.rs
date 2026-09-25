@@ -5,6 +5,7 @@
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
+use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
@@ -102,6 +103,9 @@ impl Headless {
         vdom.provide_root_context(crate::focus::FOCUS);
         vdom.provide_root_context(crate::focus::BLUR);
         vdom.provide_root_context(crate::focus::SELECT);
+        if setup.focus_fallback == FocusFallback::Ancestor {
+            vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);
+        }
         vdom.provide_root_context(HostClipboard::memory(Arc::clone(&shell)));
         vdom.provide_root_context(crate::edit::EDIT);
         vdom.provide_root_context(listeners.clone());
