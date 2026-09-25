@@ -37,6 +37,8 @@ pub const SELECT: HostSelect = HostSelect(select_all);
 
 /// Provide [`FOCUS`], [`BLUR`] and [`SELECT`] to the calling component's subtree. Call it at the
 /// top of a root that `ds_native::launch` did not start, before any quire field or menu mounts.
+/// The click-focus fallback is separate: provide [`CLICK_FOCUS`](crate::CLICK_FOCUS) as well to
+/// keep the focus on a `tabindex` ancestor after a click, as `launch` does by default.
 pub fn provide() -> HostFocus {
     use_context_provider(|| SELECT);
     use_context_provider(|| BLUR);
