@@ -105,7 +105,7 @@ fn osd_card_css() -> String {
 /// plate and the layers of its group behind it, an edge panel (notification parts), a
 /// desktop widget's card (sill FINDINGS Q182; a widget tile has no material of its own), and
 /// the screenshot thumbnail's plate (sill Q181).
-const CARDS: [&str; 6] = [
+const CARDS: [&str; 7] = [
     ".ds-popover",
     ".ds-sheet",
     ".ds-notification-plate",
