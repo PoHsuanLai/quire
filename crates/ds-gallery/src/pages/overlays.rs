@@ -133,6 +133,7 @@ pub fn OverlaysPage() -> Element {
         super::overlays_sheet::PowerMenu {}
         super::overlays_notifications::Notifications {}
         super::calendar::Calendar {}
+        super::widgets::Widgets {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,

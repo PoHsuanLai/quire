@@ -6,10 +6,15 @@ pub mod appearance_picker;
 pub mod avatar;
 pub(crate) mod banner_row;
 pub mod banner_stack;
+pub mod bump_on;
 pub mod button;
 pub mod button_face;
 pub mod button_size;
 pub mod chip;
+pub mod clock_angles;
+pub(crate) mod clock_dial;
+pub mod clock_face;
+pub mod clock_kind;
 pub mod command_palette;
 pub mod command_pill;
 pub mod count;
@@ -30,6 +35,7 @@ pub mod icon_button;
 pub mod icon_view;
 pub mod kbd;
 pub mod level;
+pub mod level_ring;
 pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
@@ -115,6 +121,8 @@ pub mod traffic_lights;
 pub mod tree_item;
 pub(crate) mod tree_item_parts;
 pub mod vocab;
+pub mod widget_frame;
+pub mod widget_kind;
 pub mod window_frame;
 pub mod workspace_pills;
 
@@ -125,10 +133,14 @@ pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
 pub use banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack};
+pub use bump_on::{Bumped, use_bump_on};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use button_size::ButtonSize;
 pub use chip::{Chip, ChipVariant};
+pub use clock_angles::{Hands, Tenths, hands};
+pub use clock_face::ClockFace;
+pub use clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
@@ -147,6 +159,7 @@ pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use kbd::{Kbd, KbdSize};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
+pub use level_ring::{LevelRing, RingMark};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
@@ -209,6 +222,8 @@ pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
     Selection, Shortcut, StaggerIndex, Switch,
 };
+pub use widget_frame::WidgetFrame;
+pub use widget_kind::{WidgetHost, WidgetSize, WidgetTitle};
 pub use window_frame::{TrafficLights, WindowFrame, WindowTitlebar};
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 
@@ -221,6 +236,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("banner_stack", include_str!("banner_stack.css")),
     ("button", include_str!("button.css")),
     ("chip", include_str!("chip.css")),
+    ("clock_face", include_str!("clock_face.css")),
     ("command_palette", include_str!("command_palette.css")),
     ("command_pill", include_str!("command_pill.css")),
     ("count", include_str!("count.css")),
@@ -235,6 +251,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_view", include_str!("icon_view.css")),
     ("kbd", include_str!("kbd.css")),
     ("level", include_str!("level.css")),
+    ("level_ring", include_str!("level_ring.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
     ("menu", include_str!("menu.css")),
@@ -270,6 +287,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),
     ("tree_item", include_str!("tree_item.css")),
+    ("widget_frame", include_str!("widget_frame.css")),
     ("window_frame", include_str!("window_frame.css")),
     ("workspace_pills", include_str!("workspace_pills.css")),
     // Last: the drop states SidebarItem and TreeItem share (mailo gaps 6) must win over either

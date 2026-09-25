@@ -1,0 +1,14 @@
+/* LevelRing (design/04 "Widgets"; design/20 section 1.14; sill FINDINGS Q183): a 52 px ring,
+   the track at .2 of the tone and the level arc in it. The tone is `--ok`, `--warn` at a fifth
+   or less and `--danger` at a tenth or less; a charging ring stays `--ok` and wears a bolt on a
+   paper disc at twelve. The middle holds the caller's glyph. The ring bumps when its percentage
+   changes (`use_bump_on`). The vectors take their colour from their own element (spike S6). */
+
+.ds-ring{ position:relative; display:inline-block; flex:none; width:52px; height:52px; color:var(--ok); }
+.ds-ring[*|data-tone=low]{ color:var(--warn); }
+.ds-ring[*|data-tone=critical]{ color:var(--danger); }
+.ds-ring-arc{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+.ds-ring-centre{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.ds-ring-bolt{ position:absolute; top:-3px; left:50%; display:flex; align-items:center; justify-content:center; width:14px; height:14px; transform:translateX(-50%);
+  border-radius:var(--r-pill); background:var(--paper); color:var(--ok); }
+.ds-ring-bolt-mark{ display:block; width:10px; height:10px; }

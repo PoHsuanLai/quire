@@ -3274,6 +3274,66 @@ plays nothing (design/05 principle 7, nothing loops: every motion is keyed to a 
 
 **Blitz notes.** Rows are CSS grid (`repeat(7, 32px)`), as `ModuleGrid`; the dot is a real span;
 no pseudo-elements.
+### 40. Widgets: WidgetFrame, WidgetMetrics, ClockFace and LevelRing (settled 2026-09-26)
+
+**Purpose.** The card every widget is drawn on, on the desktop layer and in the notification
+center's widget column (design/20 section 1.14; design/22 section 3.20; sill FINDINGS Q182,
+Q183), and the two faces sill cannot draw from text alone: an analog world clock and a battery
+level ring. The card's corner, padding and title row are the frame's, so a widget writes no CSS
+for them.
+
+**WidgetMetrics.** Writes the grid unit as tuned tokens on any element around the widgets:
+`--widget-cell` from `widgets.desktop_cell_px` (164, held to `120..=240`) and `--widget-gap` from
+`widgets.desktop_gap_px` (16, held to `0..=48`); `WidgetMetrics::default().style_attr()` writes
+what the stylesheet falls back to.
+
+**WidgetFrame.** `WidgetFrame { size: WidgetSize::{Small, Medium, Large}, host:
+WidgetHost::{Desktop, Tile}, title: Option<WidgetTitle { glyph: Icon, text: Text }>, id:
+Option<String>, children }`.
+Markup: `div.ds-widget[data-size][data-host]` holding an optional
+`div.ds-widget-title` (a `Glyph` at 14 and the text) and `div.ds-widget-body`.
+
+| Metric | Value | Basis |
+| --- | --- | --- |
+| Small | `--widget-cell` square (164) | design/22 section 3.20 |
+| Medium | `2 x --widget-cell + --widget-gap` wide, one cell tall (344 x 164) | design/22 section 3.20 |
+| Large | `2 x --widget-cell + --widget-gap` square (344) | design/22 section 3.20 |
+| Desktop card | the `Widget` material's plate inside a transparent `Widget` scope (as the notification plate): its tint, hairline and soft drop, its own corner `--m-radius` (20), padding `--s-16` | design/20 section 1.14 (material `Widget`) |
+| Tile | no material of its own, on the Popover it sits in: `--surface-2` fill, `--line` hairline, `--r-tile` (12), padding `--s-12`, as a `ModuleTile` | brief (Q182) |
+| Title row | glyph 14 and `--fs-help` 600 in `--ink-soft`, `--s-6` apart, `--s-8` above the body | brief |
+
+The tile takes the same footprint as the desktop card: the center's column (384 less its
+padding) holds a medium tile's 344.
+
+**Bump on change.** `use_bump_on(value)` returns the `PulseKey` of an `Anim::Bump` fired through
+`use_pulse` each time `value` differs from the one last rendered (never on mount), and back at
+rest `settle(Bump)` after each firing, so a battery's percentage or a clock's minute bumps once
+and nothing loops (design/20 section 1.14: "value change `bump`"). `Bumped { on: value, children
+}` wraps its children in `span.ds-bumped` wearing that pulse, for a widget that bumps a run of
+text rather than a component.
+
+**ClockFace.** `ClockFace { time: ClockTime { hour, minute, second: Seconds::{Shown(s), Hidden}
+}, phase: DayPhase::{Day, Night}, look: ClockLook::{Analog, Digital}, label: Text }`.
+Markup: `div.ds-clock[data-look][data-phase]`. Analog: a dial (`div.ds-clock-dial`, 72 round, in a
+scope forced to the light scheme by day and the dark by night, so the day face is always paper
+with ink hands and the night face ink with paper hands whatever the desktop's scheme) holding
+two `svg[data-ds-svg]` drawn on `currentColor` (twelve ticks, the hour and minute hands and the
+hub; the second hand in `--accent` when shown). Digital: the time in `--font-data` tabular
+(`09:41`, `09:41:07` with seconds), bumping on each new minute. The label (the city) sits under
+either in `--fs-help`. The hand angles are pure (`clock_angles.rs`): hour `30 x (h mod 12) + m / 2
++ s / 120` degrees, minute `6 x m + s / 10`, second `6 x s`.
+
+**LevelRing.** `LevelRing { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text,
+children }`: a stroked ring (`svg.ds-ring[data-ds-svg=ring]`, circumference 100 so the dash is
+the level in percent), a track at .2 of `currentColor`, the level in `--ok`, `--warn` at or under
+20 %, `--danger` at or under 10 % (a charging ring stays `--ok`); `Charging` adds a bolt on a
+paper disc at the top. `children` (a device glyph) sit in the middle; `role=progressbar` with
+`aria-valuenow` in percent. The level bumps on change (`use_bump_on`). No `ProgressRing` existed:
+the SendPill's ring is a countdown drawn inside the pill, not a level.
+
+**Motion.** None in steady state; a value change plays `bump` once (`--t-move --e-spring`, the
+Count's pulse). No transition on the ring's dash (a `stroke-dashoffset` transition does not run in
+Blitz, O-20).
 
 ## Open decisions
 

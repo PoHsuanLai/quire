@@ -20,6 +20,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
+use crate::tokens::widgets::WIDGET_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
@@ -93,6 +94,7 @@ fn tuned_vars() -> impl Iterator<Item = VarName> {
         .chain(DOCK_TOKENS)
         .chain(OSD_TOKENS)
         .chain(NOTIFICATION_TOKENS)
+        .chain(WIDGET_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
         .chain(PixelToken::ALL.map(PixelToken::tuned))
         .flat_map(|token| [token.token, token.input])
