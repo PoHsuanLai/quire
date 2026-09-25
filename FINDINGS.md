@@ -2334,6 +2334,101 @@ becomes `Scrim { flow: Flow::Inline }` before the reader; the quoted-message hea
 runs; its "Filter…" menus `Filter::Field`; the drag's outline `DropState::Accepts`; the From
 value `leading: Leading::Mark(ProviderMark)`; the spoof flag `HoverCardPart::flag` with runs.
 
+## mailo gaps 6 (2026-09-25)
+
+mailo, on v0.1.8 with one raw control left, reported four gaps. Branch `mailo-gaps-6`, one commit
+per item. Every prop is additive; the one markup change is `SidebarItem`'s class list
+(`ds-sidebar-item ds-drop-place`), which its goldens show. CONSUMING.md "The mailo gaps 6
+(2026-09-25)" has one row per change, docs/mailo-migration.md section 2 the row for each mailo
+site. Proofs: the Harness tests `crates/ds-native/tests/mailo6_{scrim_layer,tree_item}.rs`, the
+goldens in `crates/ds/tests/mailo_gaps6_ssr.rs` and `overlays/mailo6.rs`, the lint test
+`crates/ds/tests/pass_through_lint.rs`, and the gallery's Controls and Lists pages.
+
+1. **A "more" glyph.** `Icon::Ellipsis` and `Icon::EllipsisVertical`, Lucide `ellipsis` and
+   `ellipsis-vertical` from lucide-static 1.47.0 (three unit circles each, centre first, as
+   published), in `geometry_actions` and `Icon::ACTIONS`. They sit at the end of the enum and of
+   each table under a comment, so the control set another branch adds to the same enum merges
+   without touching these lines. A test locks the circles. The Controls page's glyph grid
+   (from the control-set branch, merged) draws them with the actions, and a "Glyphs: more"
+   section draws both at the row and header sizes and on Strip and Tool buttons. After the merge
+   they follow the control set at the end of the enum, and `Icon::ALL` lists them with the
+   actions, before the control set.
+2. **The consumer's data and class on a quire button.** `Button` and `IconButton` take `data:
+   Vec<DataAttr>` and `extra_class: Option<ExtraClass>`. `DataAttr { name: DataName, value:
+   String }` renders `data-<name>`; `DataName::parse` takes lowercase ASCII letters, digits and
+   `-` starting with a letter (HTML folds a `data-*` name to lowercase; Blitz does not, so an
+   uppercase one would mean two things), and refuses a `ds-` name and the names quire writes or
+   reads (`variant`, `size`, `theme`, `accent`, `motion`, `material`), so no consumer attribute
+   can restyle a quire element. `ExtraClass::parse` takes one class or a space-separated list,
+   each token letters, digits, `-` and `_` starting with a letter or `_`, and refuses any `ds-`
+   token. **Found: dioxus attributes are named by `&'static str`.** An attribute named at run
+   time has no static name, so each distinct `data-*` name is interned once (a `Mutex`ed set of
+   leaked strings, one per name, for the program's life) when it is parsed; names are a
+   consumer's small vocabulary (`folder`), and the value carries the data. The attributes are
+   spread after the named ones (dioxus requires a spread last). Proof: goldens
+   `controls/button/{data-attr,extra-class}`, `controls/icon_button/data-attr-extra-class`;
+   `pass_through_lint.rs` renders a button with a consumer class and lints it clean against
+   quire's sheet plus the consumer's rule, shows the same markup against quire's sheet alone
+   names the class unstyled (so the clean result is not vacuous), shows `ds-` classes and
+   reserved names refused with `PassThroughError::Reserved`, and that a consumer rule reaching
+   for `.ds-button` is the stylesheet lint's `DsInternals`. `self_lint`'s control scan now reads
+   a three-class consumer sheet for those goldens. On Blitz, `mailo6_tree_item.rs` reads
+   `data-folder` off a trailing `IconButton`.
+3. **A layer for the inline scrim.** `Scrim { layer: Option<ZLayer> }` (the token enum is
+   `ZLayer`); an inline scrim with one writes `style="z-index:var(--z-…)"` on itself, from the
+   token table. Without one it keeps z-index auto, and a positioned sibling drawn after it
+   paints over it: that is CSS (positioned boxes at z-index auto paint in tree order), not a
+   Blitz quirk. The component documents the rule: the caller picks a layer above its rows and
+   below its floating surfaces, which then need a layer above it. A floating scrim ignores the
+   prop (it is on `--z-scrim` already). Proof (`mailo6_scrim_layer.rs`): with no layer, a press
+   at a positioned row's centre hits the row (`Harness::hits`) and a click logs the row; with
+   `ZLayer::Raise` the same spot hits the scrim and the click dismisses. Golden
+   `overlays/scrim/inline-layer-raise`.
+4. **A tree row.** `TreeItem` is `details.ds-tree-item > summary.ds-tree-item-row` in the
+   sidebar item's chrome, `open: Disclosure::{Open, Closed}` controlled through `on_toggle`,
+   `TreeShape::{Branch, Leaf}` (a leaf is a row with no `details`; mailo draws its leaves as
+   rows), `label: impl Into<Text>`, `glyph`, `count`, `here`, `onselect` (the label becomes a
+   button that selects and keeps its press), `trailing: Option<Element>`, `drop`, `place` and
+   the four pointer hooks, children in `div.ds-tree-item-children[role=group]` one `--s-12`
+   step in (mailo's own indent). The summary's click prevents its default (the details' own
+   toggle) and reports `open.flip()`; the app's state is the only state. The trailing slot
+   stops and prevents every click that reaches it, so a ⋯ that forgot `Propagation::Stop` still
+   does not toggle; its button hears the press first. The chevron is `chevron-right` at 12,
+   turned a quarter by `aria-expanded=true` over `--t-quick`; the ⋯ shows on the row's hover,
+   while its menu is open and under keyboard focus (`:focus-within` is false on Blitz, S12), and
+   lends its height into the row's padding so a row with a 26 px Strip button is as tall as one
+   without. **Found: a `details` that dioxus opens stays closed on Blitz.** dioxus-native writes
+   every attribute in the HTML namespace (`qual_name` defaults to `ns!(html)`), and blitz-dom's
+   user-agent rule `details:not([open]) > :not(summary:first-of-type) { display:none
+   !important }` matches only a null-namespace `open` (the one its own summary toggle writes),
+   so the children of `details { open: true }` never show, and an author rule cannot override a
+   user-agent `!important`. dioxus-native also writes `open: false` as the text "false", which
+   is an open attribute all the same. `TreeItem` writes `open` itself as an `Attribute` with an
+   empty namespace (the null one) and value "true", or `AttributeValue::None` (removed) when
+   closed; "true" rather than empty because dioxus-ssr writes `open` only when truthy. mailo's
+   own folder tree (`details { class: "fold", open: true }`) hides its subfolders on Blitz for
+   this reason. **The shared drop rules:** the three drop rules moved from `sidebar_item.css` to
+   `drop_place.css` as `.ds-drop-place[data-drop=target|accepts]`, `[data-drag=source]`, last in
+   the component order (they tie on specificity with the items' hover and current rules), and
+   both items carry the class; no rule is written twice. Proof (`mailo6_tree_item.rs`): a Stop ⋯
+   and a Bubble ⋯ each log their press and toggle nothing; the selectable label logs a select
+   and toggles nothing; the chevron and the plain label call `on_toggle` with the other state
+   and the next row moves up or down by the child's height (a hidden node keeps its last layout
+   box on Blitz, so the test reads the following row, not the child); `data-drop` is `accepts`
+   and `target`; the Accepts row keeps an idle row's box and label position; and the Target row
+   paints a different colour from an idle row at the same spot. Goldens
+   `lists/tree_item/{open,closed}-{idle,accepts,target,source}` and `leaf-current`; the existing
+   `SidebarItem` goldens gained `ds-drop-place` in their class list.
+
+Not done: no keyboard toggle of its own on `TreeItem`. Blitz's summary activation arrives as the
+summary's click, which the component handles; no Harness test presses Enter on a summary.
+
+What mailo changes (docs/mailo-migration.md section 2 has each row): its `span` wrappers around
+buttons for `data-folder` and the reveal class become `data`/`extra_class`; the `⋯` text becomes
+`Icon::Ellipsis`; the inline scrim takes `layer: ZLayer::Raise` instead of mailo's layered box
+around it; the folder tree's `details`, chevron, `.fold-kids` indent and `can-drop` /
+`is-drop-target` rules become `TreeItem`.
+
 ## Native phase B (2026-09-25)
 
 mailo's Phase B plan (moving its window onto `ds_native::launch`) named the host gaps below,
