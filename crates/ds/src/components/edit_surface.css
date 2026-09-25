@@ -1,0 +1,8 @@
+/* EditSurface (FINDINGS "Edit surface"): a block the app's own text lives in. The app draws the
+   caret and the selection, so the surface shows no focus ring. Text keeps its spaces and line
+   breaks (pre-wrap), as the app's model does, and a position's offset counts them as written.
+   Attribute selectors carry `*|` (spike S2). */
+
+.ds-edit{ display:block; white-space:pre-wrap; overflow-wrap:break-word; outline:none; cursor:text; }
+.ds[*|data-modality=keyboard] .ds-edit:focus{ outline:none; }
+.ds-edit [*|data-edit-kind=atom]{ cursor:default; white-space:normal; }

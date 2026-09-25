@@ -13,6 +13,8 @@ pub mod count;
 pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
+pub mod edit_surface;
+mod edit_surface_state;
 pub mod flow;
 pub mod hover_card;
 pub mod hover_strip;
@@ -90,6 +92,7 @@ pub use count::{Count, CountPlace};
 pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
+pub use edit_surface::EditSurface;
 pub use flow::Flow;
 pub use hover_card::{
     FlagTone, HoverAnchor, HoverCard, HoverCardPart, HoverDriver, HoverMessage, HoverStat,
@@ -155,6 +158,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("dock_parts", include_str!("dock_parts.css")),
     ("drag_ghost", include_str!("drag_ghost.css")),
     ("edge_strip", include_str!("edge_strip.css")),
+    ("edit_surface", include_str!("edit_surface.css")),
     ("hover_card", include_str!("hover_card.css")),
     ("hover_strip", include_str!("hover_strip.css")),
     ("icon_button", include_str!("icon_button.css")),
