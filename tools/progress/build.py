@@ -17,7 +17,9 @@ from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "out" / "progress.html"
+OUT_ARCHIVE = HERE / "out" / "progress-archive.html"
 MAX_W = 1100
+MAX_MB = 15.5
 
 
 def embed(path: str, upscale: int = 1) -> tuple[str, int, int]:
@@ -67,15 +69,60 @@ def entry(e: dict) -> str:
 </article>"""
 
 
+def archive_link(href: str | None, label: str) -> str:
+    if not href:
+        return ""
+    return f'<p class="archive-link"><a href="{html.escape(href)}">{html.escape(label)}</a></p>'
+
+
+def render(title: str, entries: list[dict], updated: str, link_html: str) -> str:
+    body = "".join(entry(e) for e in entries)
+    return (
+        TEMPLATE.replace("{{TITLE}}", html.escape(title))
+        .replace("{{ARCHIVE_LINK}}", link_html)
+        .replace("{{ENTRIES}}", body)
+        .replace("{{UPDATED}}", html.escape(updated))
+    )
+
+
 def build() -> None:
     manifest = json.loads((HERE / "manifest.json").read_text())
-    entries = "".join(entry(e) for e in manifest["entries"])
-    page = TEMPLATE.replace("{{ENTRIES}}", entries).replace(
-        "{{UPDATED}}", html.escape(manifest["updated"])
+    updated = manifest["updated"]
+    all_entries = manifest["entries"]
+    main_entries = [e for e in all_entries if e.get("page") != "archive"]
+    archive_entries = [e for e in all_entries if e.get("page") == "archive"]
+
+    archive_url = manifest.get("archive_url")
+    main_url = manifest.get("main_url")
+
+    main_page = render(
+        "Desktop Shell Progress",
+        main_entries,
+        updated,
+        archive_link(archive_url, "Earlier milestones: archive"),
     )
+    archive_page = render(
+        "Desktop Shell Progress: archive",
+        archive_entries,
+        updated,
+        archive_link(main_url, "Back to current progress"),
+    )
+
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(page)
-    print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB, {len(manifest['entries'])} entries)")
+    OUT.write_text(main_page)
+    OUT_ARCHIVE.write_text(archive_page)
+
+    over_limit = []
+    for path, entries in ((OUT, main_entries), (OUT_ARCHIVE, archive_entries)):
+        size_mb = path.stat().st_size / (1024 * 1024)
+        print(f"wrote {path} ({size_mb:.2f} MB, {len(entries)} entries)")
+        if size_mb > MAX_MB:
+            over_limit.append((path, size_mb))
+
+    if over_limit:
+        for path, size_mb in over_limit:
+            print(f"ERROR: {path} is {size_mb:.2f} MB, over the {MAX_MB} MB limit")
+        raise SystemExit(1)
 
 
 TEMPLATE = """<!doctype html>
@@ -83,7 +130,7 @@ TEMPLATE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Desktop Shell Progress</title>
+<title>{{TITLE}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Karla:ital,wght@0,400..700;1,400&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -148,6 +195,9 @@ h2{font:700 20px/1.15 var(--font-display);letter-spacing:-.015em;margin:0;order:
 .shot.pixel img{image-rendering:pixelated}
 .shot figcaption{font:10.5px/1.4 var(--font-data);color:var(--ink-faint);padding:7px 2px 0}
 .shot img:hover{box-shadow:var(--shadow-2);transition:box-shadow var(--t-quick) var(--e-out)}
+.archive-link{margin:0 0 18px}
+.archive-link a{font:11px var(--font-data);letter-spacing:.04em;color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+.archive-link a:hover{border-bottom-color:var(--accent)}
 @media (prefers-reduced-motion: reduce){*{transition:none !important}}
 </style>
 </head>
@@ -155,6 +205,7 @@ h2{font:700 20px/1.15 var(--font-display);letter-spacing:-.015em;margin:0;order:
 <div class="wrap">
   <div class="eyebrow">quire · shell-host · sill</div>
   <h1>Desktop shell progress</h1>
+  {{ARCHIVE_LINK}}
   <p class="intro">Screenshots and results as they land, newest first. Each entry is one milestone gate or spike result; the design docs and code are in the repos.</p>
   <p class="updated">Updated {{UPDATED}}</p>
   {{ENTRIES}}
