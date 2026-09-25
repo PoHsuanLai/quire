@@ -216,3 +216,9 @@
    settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+
+/* banner-out (quire's, sill Q121, Q122): a notification banner slides out to the right, from
+   the offset a swipe left it at (`--swipe-dx`, 0 when none) to past its own width and the
+   surface's edge, fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
+   frame until the stack drops the row and the rows below heal. */
+@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }

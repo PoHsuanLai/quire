@@ -153,3 +153,15 @@ pub(super) const SHEET_OUT: Recipe = recipe(
     Fill::Forwards,
     Iteration::Once,
 );
+
+/// `banner-out` (sill Q121, Q122): a banner's exit at `--t-move --e-exit` (design/13 section
+/// 13.3.6: "timeout and dismiss both slide right, `--t-move --e-exit`"), from the offset a swipe
+/// left it at. It holds its last, transparent frame until the stack drops the row at
+/// `settle(BannerOut)` and the rows below heal.
+pub(super) const BANNER_OUT: Recipe = recipe(
+    "banner-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);

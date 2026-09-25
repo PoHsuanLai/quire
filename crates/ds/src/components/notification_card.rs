@@ -16,17 +16,22 @@
 //!
 //! A group (`count`) shows its count in a chip and draws `layers` offset plates behind the card,
 //! each `--notifications-group-offset` lower and a little narrower.
+//!
+//! `swipe: Swipe::Dismiss(on_dismiss)` lets a drag or a horizontal scroll to the right dismiss
+//! the card (sill Q122, `notification_swipe`); the click that ends a drag never opens it.
 
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::icon_view::IconView;
 use crate::components::notification_body::NotificationBody;
 use crate::components::notification_parts::{AppMark, CardAction, GroupCount, Hover};
+use crate::components::notification_swipe::{Swipe, use_card_swipe};
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::rich_text::Rich;
 use crate::components::text_runs::{Text, text};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconPx, IconSize};
 use crate::material::Material;
+use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use dioxus::prelude::*;
@@ -36,7 +41,8 @@ use dioxus::prelude::*;
 /// `actions`. `on_open` hears a press on the card, Enter or Space; `on_close` a press on the
 /// close button; `on_link` a press on a link in the body. `icon_size` is the icon's side
 /// (`notifications.icon_px`, 32); `id` names the plate for its blur region
-/// (`Element("toast-<id>")`).
+/// (`Element("toast-<id>")`). `swipe` turns swipe to dismiss on, with `swipe_metrics` from the
+/// `notifications.swipe_*` keys.
 #[component]
 pub fn NotificationCard(
     app: AppMark,
@@ -52,7 +58,10 @@ pub fn NotificationCard(
     #[props(default = Material::Toast)] material: Material,
     #[props(default = IconPx(32))] icon_size: IconPx,
     #[props(default)] id: Option<String>,
+    #[props(default)] swipe: Swipe,
+    #[props(default)] swipe_metrics: SwipeMetrics,
 ) -> Element {
+    let swiper = use_card_swipe(&swipe, swipe_metrics);
     let mut hover = use_signal(Hover::default);
     let mut point = move |next: Hover| {
         if *hover.peek() != next {
@@ -65,14 +74,30 @@ pub fn NotificationCard(
     let layers = count.map_or(0, |group| group.layers.drawn());
     let label = format!("{}: {}", app.name.plain_text(), summary.plain_text());
     let open = PressListeners::new(on_open);
+    let style = [
+        (layers > 0).then(|| format!("--layers:{layers}")),
+        swiper.style(),
+    ]
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>();
+    let style = (!style.is_empty()).then(|| style.join(";"));
     rsx! {
         Surface { material, chrome: RootChrome::Transparent,
             div {
                 class: "ds-notification",
                 "data-hover": hover().slug(),
-                style: (layers > 0).then(|| format!("--layers:{layers}")),
+                "data-swipe": swiper.look(),
+                style,
                 onpointerenter: move |_| point(Hover::Over),
-                onpointerleave: move |_| point(Hover::Away),
+                onpointerleave: move |_| {
+                    point(Hover::Away);
+                    swiper.up();
+                },
+                onpointerdown: move |event| swiper.down(&event),
+                onpointermove: move |event| swiper.moved(&event),
+                onpointerup: move |_| swiper.up(),
+                onwheel: move |event| swiper.wheel(&event),
                 for n in (1..=layers).rev() {
                     div { key: "{n}", class: "ds-notification-layer", "aria-hidden": "true", style: "--i:{n}" }
                 }
@@ -82,7 +107,11 @@ pub fn NotificationCard(
                     role: "button",
                     tabindex: "0",
                     "aria-label": "{label}",
-                    onclick: move |event| open.click(&event),
+                    onclick: move |event| {
+                        if swiper.click_passes() {
+                            open.click(&event);
+                        }
+                    },
                     onkeydown: move |event| {
                         if opens(&event.key()) {
                             event.prevent_default();
