@@ -3032,3 +3032,69 @@ rules and two keyframes. CONSUMING "Control center parts (2026-09-25)" has the A
   draws every glyph by set at 22 px.
 - **Proof.** `every_control_glyph_renders_and_lints_clean` (one child per shape, `ds-ic`, clean
   under the Strict profile), `the_control_set_is_lucides`, and the set test counting `ALL`.
+
+## Frame tags and link text (2026-09-25)
+
+mailo's sealed Original view (working on v0.1.7/8; isolation, no-script, no-file and
+no-navigation hold under its hostile-body suite) reported two additive gaps in ds-native's frame
+support. Branch `frame-tags`, one commit per item; the blitz rev is unchanged (`e99fbdbd`).
+
+1. **Which frame is which.** A `FrameId` named a Blitz document and had no public accessor, and
+   `FrameView` exists only in the Harness, so mailo inferred which message a frame showed from the
+   URLs it requested and keyed frames by hashing the id.
+   - **What quire does now.** The app writes `data-frame-tag="<text>"` on its `iframe`. The tag is
+     `FrameTag(String)` on `NetRequest::frame_tag()`, on `FrameLink::tag`, and through
+     `ds_native::frames::{tag_of, frame_by_tag}`; `FrameId::index()` is a stable key.
+   - **Found: a frame's first requests are made before it has an element.** Blitz's
+     `attach_iframe_document` parses the sub-document through the parser provider (which is
+     handed only the HTML and a `DocumentConfig`, nothing naming the `iframe`) and attaches it to
+     the element afterwards; the parse is where the body's images are asked for. The parent is
+     mutably borrowed throughout, so nothing can read the element's attribute then. ds-native
+     therefore holds each frame's requests for the app in a per-document `FrameBook`
+     (`frame_book.rs`) until the next walk of the document's `iframe`s (`frame_tree.rs`, run after
+     each render in the harness and on each redraw in the window; an attach asks for a redraw)
+     finds the frame's document under its element and reads the tag; then the held requests go
+     to `AppNet::decide` with it. `data:` is served at once as before (it never reaches the app),
+     and `Local`/`Sealed` are untouched. A frame gone before it is found drops what it held.
+   - **The lookups need no context.** Each document's book registers with a thread-local list,
+     so `tag_of`/`frame_by_tag` answer from any handler on the UI thread (and a test's thread),
+     and a book is forgotten with its document.
+   - Proof: `native_frame_tags.rs`. Two srcdoc frames tagged `msg-1` and `msg-2`: each frame's
+     image request reaches the app as `Frame(id)` with its own tag; a click in each carries its
+     tag; `frame_by_tag` finds each frame's id (as `Harness::frame` reports it) and `tag_of` the
+     reverse; after the harness is dropped neither lookup finds anything. With the walk removed
+     the requests never reach the app (checked by hand).
+2. **What a link says.** `FrameLink` had only `href`; mailo's link-honesty check compares a
+   link's visible text with its destination, and its link pill needs to know when the pointer is
+   on a link inside the frame, which Blitz never tells the app (it forwards the move into the
+   frame's document and keeps the hover state there).
+   - **What quire does now.** `FrameLink` has `text` (the anchor's text content, whitespace
+     runs collapsed and trimmed) and `title`. `FrameLinks::intercept(..).with_hover(handler)`
+     delivers `FrameLinkHover { frame, tag, href, text, title, at, phase: Enter | Leave }`.
+   - **Found: the navigation provider hears only a URL.** Blitz's click default calls
+     `navigate_to` with the resolved URL and the source document id, while the document is
+     held. The text is read when the click is delivered, with the document free: the frame's
+     document is found again by id (`frame_tree::in_frame`) and the anchor is the one under its
+     hover node (a click), else the focused one (a key), else the first `a[href]` resolving to
+     the same URL (`frame_anchor.rs`); a vanished anchor gives empty text.
+   - **Hover is hit-tested by ds-native, not read from Blitz.** The window's event hook hears a
+     move before the document does, so reading the frame's hover node there would lag one move.
+     `frame_hit.rs` hit-tests the app's document at the point, and on an `iframe` goes into its
+     document the way Blitz forwards events (minus the element's position, plus the frame's
+     scroll); the nearest `a[href]` ancestor is the link. `HoverTracker` keeps the last link
+     (frame and node) and reports only a change: a leave before an enter, nothing while on the
+     same link or on none. The window converts winit's physical position by the scale factor
+     and treats `PointerLeft` as off every link; the harness reports from `pointer_move`. With
+     `FrameHover::Ignore` (the default, and always on `Inert`) nothing is hit-tested.
+   - **Breaking, narrowly.** `FrameLinks::Intercept` became `Intercept { click, hover }`;
+     `FrameLinks::intercept` and `Inert` are unchanged, and mailo builds its links with them.
+     `FrameLink`'s new fields change a struct literal of it (the frame-links test's).
+   - Proof: `native_frame_link_text.rs`. A frame placed 20 px in and 40 px down with two links
+     and a paragraph: clicks carry `"Your bank"` with title `Sign in` (from `Your\n   bank`) and
+     `"Offer"` with none. Moving onto the first link reports one `Enter` with its href, text,
+     title, tag and the move's point; two more moves on it report nothing; moving onto the
+     paragraph reports `Leave` at the paragraph. Link to link is `Leave` then `Enter` at the same
+     point, and onto the app's own text is `Leave`. `Inert.with_hover(..)` reports nothing.
+   - **Not run in a window here.** The window path (`window_hover.rs`, the hook in `host.rs`,
+     reading a click's text through the document handle in the link task) is compiled and
+     shares every function the harness tests call, but no test drives winit.

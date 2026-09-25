@@ -5,11 +5,31 @@
 //! like the app. Wrapping the parser is the one place that sees every frame document before it
 //! exists (a `srcdoc`, a `src` load, a frame nested in a frame): it swaps the inherited provider
 //! for the frame one before the document parses, and so before its first image is asked for.
+//!
+//! The app names a frame by putting `data-frame-tag` on its `iframe`; [`tag_of`] and
+//! [`frame_by_tag`] tie a [`FrameId`] (what a request or a link click carries) to that name, from
+//! any handler on the UI thread, in the window or a test.
 
+use crate::frame_tag::FrameTag;
+use crate::origin::FrameId;
 use blitz_dom::{Document, DocumentConfig, DocumentMutator, HtmlParserProvider, NodeId};
 use blitz_traits::navigation::NavigationProvider;
 use blitz_traits::net::NetProvider;
 use std::sync::Arc;
+
+/// The tag on `frame`'s `iframe`, while the frame is live in a document on this thread (the
+/// window's UI thread, or a test's) and its element has a non-blank `data-frame-tag`. A frame is
+/// found under its element on the frame after its document is built, which is before any of its
+/// requests reach the app.
+pub fn tag_of(frame: FrameId) -> Option<FrameTag> {
+    crate::frame_book::tag_of(frame)
+}
+
+/// The live frame whose `iframe` carries `tag`, in any document on this thread: the newest
+/// document if several frames carry it (a reloaded frame is a new document).
+pub fn frame_by_tag(tag: &FrameTag) -> Option<FrameId> {
+    crate::frame_book::frame_by_tag(tag)
+}
 
 /// The document's parser, with every frame document it builds given `net`.
 pub(crate) struct FrameParser {
