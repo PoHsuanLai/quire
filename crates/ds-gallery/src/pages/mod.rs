@@ -28,6 +28,7 @@ pub mod overlays;
 pub mod overlays_mailo;
 pub mod overlays_mailo4;
 pub mod overlays_mailo5;
+pub mod overlays_sheet;
 pub mod pills;
 pub mod plate_tints;
 pub mod polish;

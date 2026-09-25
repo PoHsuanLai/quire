@@ -130,6 +130,7 @@ pub fn OverlaysPage() -> Element {
         super::overlays_mailo5::InlineScrim {}
         super::overlays_mailo5::FieldFilterMenu {}
         super::control_center::ControlCenter {}
+        super::overlays_sheet::PowerMenu {}
         if showcase == Showcase::Posed {
             Menu::<u8> {
                 kind: MenuKind::Context,
