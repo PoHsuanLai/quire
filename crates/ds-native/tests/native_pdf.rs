@@ -66,6 +66,13 @@ fn latin_and_cjk_faces_are_embedded_and_subsetted() {
     let named = |part: &str| fonts.iter().find(|font| font.name.contains(part));
     let latin = named("NotoSerif").expect("the Latin serif is embedded");
     let cjk = named("NotoSansCJK").expect("the CJK face is embedded");
+    // The CJK face is one variable collection whose default instance is Thin; the subset is
+    // cut at the layout's 400 and must say so, not list as Thin in a viewer.
+    assert!(
+        cjk.name.ends_with("NotoSansCJKtc-Regular"),
+        "the CJK subset is named {}",
+        cjk.name
+    );
     for font in &fonts {
         let tag = font.name.split_once('+').map_or("", |(tag, _)| tag);
         assert!(
