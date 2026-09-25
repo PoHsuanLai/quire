@@ -33,9 +33,9 @@ pub use appearance::{
 pub use components::*;
 pub use css::stylesheet;
 pub use edit::{
-    Clicks, Composition, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditFocus, EditHandle, EditInput,
-    EditKind, EditNode, EditPointer, Extend, HostEdit, ImeEvent, ImeListener, ImeSwitch, KeyInput,
-    Pasted, PointerPhase, PreeditCursor, Probe, TextOffset, TextPosition, TextRange,
+    CapturedPointer, Clicks, Composition, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditFocus, EditHandle,
+    EditInput, EditKind, EditNode, EditPointer, Extend, HostEdit, ImeEvent, ImeListener, ImeSwitch,
+    KeyInput, Pasted, PointerPhase, PreeditCursor, Probe, TextOffset, TextPosition, TextRange,
     use_edit_handle,
 };
 pub use error::DsError;

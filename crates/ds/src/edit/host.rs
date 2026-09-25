@@ -4,6 +4,7 @@
 //! [`Probe::Unknown`], and the surface still delivers keys, text and clipboard shortcuts.
 
 use crate::edit::input::Pasted;
+use crate::edit::pointer::CapturedPointer;
 use crate::edit::position::{TextPosition, TextRange};
 use crate::geometry::{Point, Rect};
 use dioxus::prelude::{EventHandler, MountedData};
@@ -67,7 +68,8 @@ pub struct ImeListener(pub u64);
 pub struct HostEdit {
     /// The text position under a point.
     pub hit_test: fn(&MountedData, Point) -> Probe<TextPosition>,
-    /// The caret's box at a position: zero width, the height of its line.
+    /// The caret's box at a position: `--caret-w` wide (whole device pixels), the height of its
+    /// line, starting at the insertion point.
     pub caret_rect: fn(&MountedData, &TextPosition) -> Probe<Rect>,
     /// The boxes a selection covers, one per line of text and one per whole atom.
     pub selection_rects: fn(&MountedData, &TextRange) -> Probe<Vec<Rect>>,
@@ -81,4 +83,7 @@ pub struct HostEdit {
     pub listen: fn(&MountedData, EventHandler<ImeEvent>) -> Probe<ImeListener>,
     /// Stop delivering to a listener.
     pub forget: fn(ImeListener),
+    /// Route every pointer move and the release to `sink` until the button comes up, wherever
+    /// the pointer is: called at a press on the surface.
+    pub capture: fn(&MountedData, EventHandler<CapturedPointer>) -> Probe<()>,
 }
