@@ -39,6 +39,7 @@ pub mod space;
 pub mod status_items;
 pub mod tokens;
 pub mod type_ramp;
+pub mod widgets;
 
 use crate::axes::Axes;
 use dioxus::prelude::*;

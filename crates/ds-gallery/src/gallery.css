@@ -123,3 +123,13 @@
 .g-notif-swiped{transform:translateX(56px)}
 .g-notif-center{position:relative;width:380px}
 .g-notif-stage{height:540px}
+/* The widgets specimen (sill Q182, Q183): the desktop's cards and the center's tiles side by
+   side over the wallpaper, each host's three sizes wrapping in its own column. */
+.g-widgets{flex-direction:row;flex-wrap:wrap;gap:var(--s-22)}
+.g-widgets-desk{width:560px}
+.g-widgets-center{width:560px;border-radius:var(--r-panel);overflow:hidden}
+.g-widgets-grid{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--s-16);padding:var(--s-12)}
+.g-widgets-clocks{display:flex;justify-content:space-between;gap:var(--s-8)}
+.g-widgets-rings{display:flex;justify-content:space-between;gap:var(--s-8);margin-bottom:var(--s-16)}
+.g-widgets-battery{display:flex;flex-direction:column;align-items:center;gap:var(--s-6)}
+.g-widgets-percent{font-family:var(--font-data);font-size:var(--fs-title);font-weight:600}

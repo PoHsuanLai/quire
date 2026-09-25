@@ -58,6 +58,10 @@ required-features = ["lint"]
 name = "control_center_ssr"
 required-features = ["lint"]
 
+[[test]]
+name = "widgets_ssr"
+required-features = ["lint"]
+
 # The notification parts, linted (sill Q120-Q125).
 [[test]]
 name = "notifications_ssr"
