@@ -1166,11 +1166,17 @@ section 13.3.11 the metrics and rules.
 
 **What each host implements.** ds-native: everything, with the halves and the centre
 `Support::No` where winit cannot read the window's position (Wayland) and placed from
-`current_monitor()` elsewhere (X11). sill, for a shell-host toplevel: a `HostWindow` over its
-`SurfaceHandle` (`begin_move`, `begin_resize(edge)`, `set_maximized(..)`; `supports` is `Yes` for
-Fill only, since no Wayland protocol lets it place a toplevel), provided with
-`use_window_host_provider`, and `WindowHost::publish` from `use_toplevel_state()` on each
-configure. quire does not depend on shell-host.
+`current_monitor()` elsewhere (X11). sill, for a shell-host toplevel (shell-host master
+`cb9078c`): a `HostWindow` over its `SurfaceHandle`: `begin_move()` and
+`begin_resize(edge) -> Result<(), GrabRefused>` (the error dropped: the frame has nothing to do
+when the compositor refuses), `zoom` as `set_maximized(Maximize::{Set, Unset})` (Toggle reads the
+last `ToplevelState`), `minimize` as `set_minimized()`, `close` as sill closes its own toplevel;
+`supports` is `Yes` for Fill only and `tile` answers `TileError::Unsupported` for the rest (no
+compositor lets a client place a toplevel: shell-host FINDINGS F50, ours "Window frame"). Its
+`ResizeEdge` has the same eight variants as `ds::ResizeEdge`. It provides the host with
+`use_window_host_provider` and calls `WindowHost::publish` from `use_toplevel_state()` on each
+configure (`Maximize::Set` is `Maximized::On`, `Fullscreen::Set` is `Fullscreen::On`, its
+`Activation` maps variant for variant). quire does not depend on shell-host.
 
 ### App icons and the icon style (2026-09-25): what sill does
 
