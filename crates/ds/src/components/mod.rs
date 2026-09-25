@@ -6,6 +6,7 @@ pub mod appearance_picker;
 pub mod avatar;
 pub mod button;
 pub mod button_face;
+pub mod button_size;
 pub mod chip;
 pub mod command_palette;
 pub mod command_pill;
@@ -86,6 +87,7 @@ pub use avatar::{
 };
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
+pub use button_size::ButtonSize;
 pub use chip::{Chip, ChipVariant};
 pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;

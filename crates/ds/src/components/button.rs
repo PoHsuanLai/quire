@@ -6,6 +6,7 @@ use crate::components::button_face::{
     ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
     trailing as trailing_mark,
 };
+use crate::components::button_size::ButtonSize;
 use crate::components::icon_view::IconView;
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::text_runs::Text;
@@ -79,9 +80,14 @@ impl ButtonVariant {
 ///
 /// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
 /// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
+///
+/// `size` (sill Q92) draws the variant at another size: `Some(ButtonSize::Regular)` gives a
+/// Danger the Primary's geometry, so Restart sits level with Shut Down and Cancel beside it.
+/// `None` keeps the variant's own size (Danger and Mini are Mini-sized) and writes nothing.
 #[component]
 pub fn Button(
     variant: ButtonVariant,
+    #[props(default)] size: Option<ButtonSize>,
     #[props(into)] label: Text,
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] pressed: Option<Switch>,
@@ -113,6 +119,7 @@ pub fn Button(
             "aria-pressed": pressed,
             "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
+            "data-size": size.map(ButtonSize::slug),
             onclick: move |event| {
                 if live {
                     listen.click(&event);

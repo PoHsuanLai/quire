@@ -3,11 +3,11 @@
 use dioxus::prelude::*;
 use ds::components::vocab::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
 use ds::{
-    Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip,
-    ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind, Hex, Icon, IconButton,
-    IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize,
-    LabelHue, PersonHue, SearchField, SectionHeader, SegSize, SegmentedControl, Slider, Spinner,
-    SpinnerKind, Tabs, TextInput, Toggle, Verdict,
+    Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize,
+    ButtonVariant, Chip, ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind,
+    Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView,
+    InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
+    SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
 
 /// A symbolic SVG, 16 px.
@@ -96,6 +96,17 @@ pub const CASES: &[Case] = &[
         component: "button",
         state: "disabled",
         make: || rsx! { Button { variant: ButtonVariant::Primary, label: "Send", availability: Availability::Disabled, onclick: |_| {} } },
+    },
+    // Sheet and modal parts (sill Q92): a size apart from the variant.
+    Case {
+        component: "button",
+        state: "danger-regular",
+        make: || rsx! { Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Restart", onclick: |_| {} } },
+    },
+    Case {
+        component: "button",
+        state: "primary-mini",
+        make: || rsx! { Button { variant: ButtonVariant::Primary, size: ButtonSize::Mini, label: "Send", onclick: |_| {} } },
     },
     // IconButton: four variants, expanded, pressed, tooltip, disabled.
     Case {
