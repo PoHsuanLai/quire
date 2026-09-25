@@ -3098,6 +3098,7 @@ support. Branch `frame-tags`, one commit per item; the blitz rev is unchanged (`
    - **Not run in a window here.** The window path (`window_hover.rs`, the hook in `host.rs`,
      reading a click's text through the document handle in the link task) is compiled and
      shares every function the harness tests call, but no test drives winit.
+
 ## Sheet and modal parts (2026-09-25)
 
 sill's power menu (a centred sheet, design/20 §1.8) found six gaps, Q90-Q95, and a scrim too
