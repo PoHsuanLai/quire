@@ -1692,7 +1692,15 @@ html,body{margin:0;padding:0;background:transparent}
    neighbours' days in `--ink-faint`, today on `--accent` in `--accent-ink`, a busy day with a
    4 px dot under it (`--accent`; `--ink-soft` on a neighbour's day). A pressable day
    (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer and squishes
-   pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05). */
+   pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
+
+   Compact (`data-density=compact`, sill Q190): a small desktop widget's content box is 132 x
+   132, which the regular grid (224 wide, 254 tall for six weeks) overflows. Seven 18 px columns
+   (126) of 18 px rows; a 14 px header (the title at `--fs-micro`, same tracking, and the plain
+   14 px `ds-month-step` glyph buttons, as a Tool button's 28 x 26 would cost a fifth of the
+   height); 10 px heads at `--fs-nano`; the number at `--fs-caption` on a 16 px disc; a 3 px dot
+   tucked 1 px into the disc's foot so a row stays 18. Six weeks: 14 + 10 + 6 x 18 = 132. The
+   compact grid never draws week numbers, so no `data-weeks=show` rule applies to it. */
 
 .ds-month{ display:flex; flex-direction:column; align-items:flex-start; color:var(--ink); user-select:none; }
 
@@ -1735,6 +1743,22 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-month-dot{ flex:none; width:4px; height:4px; border-radius:var(--r-pill); background:var(--accent); }
 .ds-month-day[*|data-place=before] .ds-month-dot,
 .ds-month-day[*|data-place=after] .ds-month-dot{ background:var(--ink-soft); }
+
+.ds-month-step{
+  font:inherit; display:grid; place-items:center; width:14px; height:14px; padding:0; border:0; border-radius:var(--r-pill);
+  background:transparent; color:var(--ink-faint); cursor:pointer;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-month-step:hover{ color:var(--ink); background:var(--surface-2); }
+.ds-month-step:active{ transform:scale(var(--squish)); }
+
+.ds-month[*|data-density=compact] .ds-month-header{ height:14px; min-height:0; gap:var(--s-1); margin-bottom:0; }
+.ds-month[*|data-density=compact] .ds-month-title{ font-size:var(--fs-micro); line-height:1; padding-left:var(--s-3); }
+.ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,18px); }
+.ds-month[*|data-density=compact] .ds-month-head{ height:10px; font-size:var(--fs-nano); line-height:1; }
+.ds-month[*|data-density=compact] .ds-month-day{ height:18px; gap:0; }
+.ds-month[*|data-density=compact] .ds-month-num{ width:16px; height:16px; font-size:var(--fs-caption); line-height:1; }
+.ds-month[*|data-density=compact] .ds-month-dot{ width:3px; height:3px; margin-top:calc(-1 * var(--s-1)); }
 /* -- pane_switcher -- */
 /* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
    (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,

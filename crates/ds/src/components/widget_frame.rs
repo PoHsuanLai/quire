@@ -11,6 +11,7 @@
 
 use crate::components::text_runs::text;
 use crate::components::widget_kind::{WidgetHost, WidgetSize, WidgetTitle};
+use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
 use crate::material::Material;
 use crate::root::chrome::RootChrome;
@@ -19,6 +20,9 @@ use dioxus::prelude::*;
 
 /// `children` on a widget's card, `size` on the grid unit, for `host`. `title` draws a glyph and
 /// a name above the content. `id` names the card for the layer's input and blur regions.
+///
+/// The frame provides its `size` to its content (`widget_scope`), so content that must fit
+/// the frame, a `MonthGrid` at `MonthDensity::Auto`, fits itself without being told.
 #[component]
 pub fn WidgetFrame(
     #[props(default)] size: WidgetSize,
@@ -27,6 +31,7 @@ pub fn WidgetFrame(
     #[props(default)] id: Option<String>,
     children: Element,
 ) -> Element {
+    use_frame_provider(size);
     let card = rsx! {
         div {
             class: "ds-widget",
