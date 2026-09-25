@@ -9,6 +9,7 @@ use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
+use crate::focus_keep::{FocusKeeper, Kept, hand_back_seam, keep};
 use crate::fonts::font_context;
 use crate::frame_book::FrameBook;
 use crate::frame_hover::{FrameHover, HoverTracker};
@@ -33,6 +34,7 @@ use dioxus_native_dom::DioxusDocument;
 use ds::{HostModality, HostScale, InputModality, Scale};
 use peniko::kurbo::{Affine, Rect};
 use peniko::{Color, Fill};
+use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::task::{Context, Waker};
@@ -69,6 +71,17 @@ pub(crate) struct Headless {
     hover: (FrameHover, HoverTracker),
     /// The edit surfaces listening for IME events.
     pub(crate) listeners: EditListeners,
+    /// Under `FocusFallback::Ancestor`, where the keyboard goes when its element is removed.
+    keeper: Keeper,
+}
+
+/// Whether the document hands the keyboard on when its element is removed.
+#[derive(Debug, Clone)]
+enum Keeper {
+    /// To the nearest focusable ancestor (`crate::focus_keep`).
+    Ancestor(Rc<RefCell<FocusKeeper>>),
+    /// Blitz's own: nowhere.
+    Off,
 }
 
 impl Headless {
@@ -114,9 +127,15 @@ impl Headless {
         vdom.provide_root_context(crate::focus::FOCUS);
         vdom.provide_root_context(crate::focus::BLUR);
         vdom.provide_root_context(crate::focus::SELECT);
-        if setup.focus_fallback == FocusFallback::Ancestor {
-            vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);
-        }
+        let keeper = match setup.focus_fallback {
+            FocusFallback::Ancestor => {
+                vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);
+                let keeper = Rc::new(RefCell::new(FocusKeeper::default()));
+                vdom.provide_root_context(hand_back_seam(Rc::clone(&keeper)));
+                Keeper::Ancestor(keeper)
+            }
+            FocusFallback::BlitzDefault => Keeper::Off,
+        };
         vdom.provide_root_context(HostClipboard::memory(Arc::clone(&shell)));
         vdom.provide_root_context(crate::edit::EDIT);
         vdom.provide_root_context(listeners.clone());
@@ -136,6 +155,7 @@ impl Headless {
             book,
             hover: (setup.frame_links.hover(), HoverTracker::default()),
             listeners,
+            keeper,
         }
     }
 
@@ -172,6 +192,9 @@ impl Headless {
             self.links
                 .drain(&|frame, href| read_link(&inner.borrow(), frame, href));
             let rendered = self.flush();
+            // After the renders and tasks have run, so a component's own hand-back (a menu's
+            // to its anchor) goes first.
+            let kept = self.keep_focus();
             self.find_frames();
             if self.layout == Layout::Held {
                 return;
@@ -183,9 +206,20 @@ impl Headless {
             crate::snap::snap_to_device(&mut inner);
             drop(inner);
             let landed = self.wakeup.fetched() != fetched;
-            if !(rendered || restyled || landed) {
+            if !(rendered || restyled || landed || kept == Kept::Moved) {
                 return;
             }
+        }
+    }
+
+    /// Hand the keyboard to a focusable ancestor of a focused element the renders removed.
+    fn keep_focus(&mut self) -> Kept {
+        match &mut self.keeper {
+            Keeper::Ancestor(keeper) => keep(
+                &mut keeper.borrow_mut(),
+                &DocRef::Cell(Rc::clone(&self.doc.inner)),
+            ),
+            Keeper::Off => Kept::Still,
         }
     }
 

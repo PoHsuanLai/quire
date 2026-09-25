@@ -2169,6 +2169,11 @@ html,body{margin:0;padding:0;background:transparent}
   border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer;
 }
 
+/* The editing slot (mailo gaps 7): the caller's field in the label's place and box, so a rename
+   moves nothing on the row; a Bare field inherits the row's face. */
+.ds-tree-item-edit{ display:flex; align-items:center; cursor:text; }
+.ds-tree-item-edit > *{ flex:1 1 0; min-width:0; }
+
 /* The trailing slot: hidden until the row is hovered, its menu is open or it has the keyboard.
    It lends its height into the row's padding, so a row with a 26 px Strip button is as tall as
    one without. */
