@@ -10,8 +10,9 @@ use ds::{
     Menu, MenuEntrance, MenuEntry, MenuKind, MotionLevel, Point, PointerButton, Press, Px,
     StaggerIndex, Trail, settle,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -235,16 +236,25 @@ fn fade() -> Duration {
 fn escape_fades_the_menu_out_before_it_closes() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
+    let escaped = Instant::now();
     harness.key(Key::Escape);
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),
         Some("leaving")
     );
-    harness.advance(fade() - ms(40));
-    assert_eq!(log(&harness), "", "still fading");
+    // Half the fade, not `fade() - 40ms` (fixed 2026-09-25, FINDINGS "Timing tests"): the old
+    // margin was only 40 ms of a 170 ms window, so a loaded machine's overshoot on `advance`
+    // (it guarantees *at least* the time asked for, never exactly it) could cross the boundary
+    // before this read.
+    harness.advance(fade() / 2);
+    assert_eq!(log(&harness), "", "still fading at half the fade");
     assert_eq!(harness.count(".ds-menu"), 1);
-    harness.advance(ms(80));
-    assert_eq!(log(&harness), "close");
+    let closed = settle_until(&mut harness, |h| log(h) == "close");
+    assert!(
+        closed.duration_since(escaped) >= fade(),
+        "onclose landed only once the full fade had run: {:?}",
+        closed.duration_since(escaped)
+    );
     assert_eq!(harness.count(".ds-menu"), 0);
 }
 

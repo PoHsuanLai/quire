@@ -30,6 +30,7 @@ mod harness_config;
 mod harness_edit;
 mod harness_hit;
 mod harness_input;
+mod harness_settle;
 mod headless;
 mod host;
 mod install;

@@ -434,3 +434,13 @@ These apply to quire, shell-host, sill and every bundled app, on top of §0-§10
   component or token is added to quire first (stop and report), never patched locally.
 - Every value the design docs mark "proposed" is read from a settings key
   (`design/22-SETTINGS.md`) with that default; never hard-coded.
+- Timing tests never assert a state at one fixed instant near a settle, hover-intent, submenu
+  or toast boundary: `ds_native::Harness::advance` lets real wall-clock time pass (quire's
+  timers are `futures-timer` sleeps a harness cannot fake), it only ever guarantees *at least*
+  the time asked for, and a loaded parallel `cargo test --workspace` can stretch it past a
+  boundary the test meant to stop short of. Instead, poll with `ds_native::harness::settle_until`
+  up to its bound, time the settle on the wall clock (`Instant::now()`), and assert order (A
+  landed before B, or only after at least the window's duration since it was asked for) rather
+  than a state at an instant; a "not yet" check may still assert a fixed elapsed time, but only
+  at or under half the window, so a loaded machine's overshoot cannot cross the boundary first
+  (FINDINGS "Timing tests").

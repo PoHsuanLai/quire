@@ -8,8 +8,9 @@ use ds::{
     Anim, Appearance, Ds, Fraction, Level, LevelGlyph, Material, MotionLevel, Muting, Osd,
     RootChrome, Shown, StaggerIndex, settle,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
 static HIDDEN: GlobalSignal<u32> = Signal::global(|| 0);
@@ -51,9 +52,6 @@ fn show(harness: &mut Harness, shown: Shown) {
     harness.advance(ms(1));
 }
 
-/// A margin either side of a settle: the harness's timers run on the wall clock.
-const MARGIN: u64 = 40;
-
 #[test]
 fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
     let mut harness = Harness::new(Card, VIEW);
@@ -61,23 +59,40 @@ fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
     harness.advance(ms(300));
     assert_eq!(presence(&harness).as_deref(), Some("present"));
     let out = settle(Anim::OsdOut, MotionLevel::Standard, StaggerIndex::default());
-    let out = u64::try_from(out.as_millis()).unwrap_or(u64::MAX);
+    // Marked before the state write that starts the settle timer, so nothing but real overhead
+    // is spent before this instant: the comparison against `out` below stays a true lower
+    // bound.
+    let hiding = Instant::now();
     show(&mut harness, Shown::Hidden);
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));
-    harness.advance(ms(out - MARGIN));
+
+    // Half the fade, not `out - 40ms` (fixed 2026-09-25, FINDINGS "Timing tests"): the old
+    // margin was 40 ms of a ~250 ms window (84 % through it), so a loaded machine's overshoot
+    // on `advance` (it guarantees *at least* the time asked for, never exactly it) could cross
+    // the boundary before this read.
+    harness.advance(out / 2);
     assert_eq!(
         hidden(&mut harness),
         0,
-        "not before settle(OsdOut) = {out} ms"
+        "not well before settle(OsdOut) = {out:?}"
     );
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));
-    harness.advance(ms(2 * MARGIN));
-    assert_eq!(hidden(&mut harness), 1, "at settle(OsdOut)");
+
+    let gone = settle_until(&mut harness, |h| presence(h).is_none());
+    assert!(
+        gone.duration_since(hiding) >= out,
+        "the card left only once the full fade had run: {:?}",
+        gone.duration_since(hiding)
+    );
+    assert_eq!(
+        hidden(&mut harness),
+        1,
+        "on_hidden ran once, at settle(OsdOut)"
+    );
     assert_eq!(
         harness.attr(".ds-osd", "data-shown").as_deref(),
         Some("hidden")
     );
-    assert_eq!(presence(&harness), None);
     // Shown again: it enters from its first frame.
     show(&mut harness, Shown::Visible);
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
