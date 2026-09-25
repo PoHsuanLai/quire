@@ -593,6 +593,13 @@ Settled for the port; the catalogue above is unchanged except where named.
   `-8px` at the top right (drops in from above, lifts back out), `8px` at the bottom centre
   (rises in, drops away). Played outside the card, the fallback is the top right's.
 
+### 4.8 Added by quire (sheet and modal parts, 2026-09-25)
+
+- `sheet-out`: `from{ opacity:1; transform:none } to{ opacity:0; transform:scale(.98)
+  translateY(8px) }` at `--t-move --e-exit`, forwards (section 10's exit rule), `Anim::SheetOut`:
+  `peek-in` reversed and quieter. A sheet its host hides plays it and reports `on_hidden` at
+  `settle(SheetOut)`; its scrim plays `menu-out` at `--t-quick` meanwhile.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and

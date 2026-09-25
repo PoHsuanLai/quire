@@ -121,8 +121,8 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Layer / role | `Overlay`, full-output scrim + centred panel | P |
 | Material | `Sheet` over `Scrim` | P |
 | Content | Log out, Restart, Shut down, Suspend (logind-zbus) | S |
-| Components | `Scrim`, `Sheet`, `Button{Primary, Secondary, Danger}`, `Kbd` hints | P |
-| Motion | panel `peek-in` `--t-big` `--e-spring`; scrim `fade` `--t-move` | P |
+| Components | `Ds { material: Sheet, extent: RootExtent::Viewport }` holding `Sheet { placement: SheetPlacement::Centre, scrim: ScrimStrength::Modal, shown, on_hidden }`; `Button{Secondary}` Cancel, `Button{Danger, size: Regular}` Restart, `Button{Primary}` Shut Down, an unavailable action `Availability::Disabled`; `Kbd{Small}` hints (sheet and modal parts, sill Q90-Q95) | P |
+| Motion | panel `peek-in` `--t-big` `--e-spring`; scrim `fade` `--t-move`; out: panel `sheet-out` `--t-move` `--e-exit`, scrim `menu-out` `--t-quick`, unmapped at `settle(SheetOut)` | P |
 | Behaviours | 06 (Escape, focus ring), 13 (focus/raise) | S |
 | Keyboard | `Exclusive`; arrows move, Enter confirms, Esc closes | P |
 | Blur / input | blur `Element("panel")`; input `Whole` | P |

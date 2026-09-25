@@ -105,6 +105,7 @@ fn App() -> Element {
 | `radius` | `Option<Corner>` | `None`: the material's own corner | `Corner::Token(Radius::…)` or `Corner::Px(Px(n))`: overrides `--m-radius` inline, for a root whose corner is a setting (the dock's `dock.pill_radius_px`) |
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 | `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
+| `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (sill F172; FINDINGS "Sheet and modal parts") |
 | `scale` | `Option<Scale>` | `None`: the host's `ds::HostScale`, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostScale` themselves; a host that is not `ds-native` passes `scale` |
 
 ### Pixel snapping: `scale`, the pixel tokens and `snap_to_device` (2026-09-25)
@@ -1086,6 +1087,33 @@ The root paints nothing and gives the card every token; the card paints the Osd 
 Space gradient at its tint (its own `.ds-frame` group) at a control-center module's shape
 (`--r-tile`, 12 padding, 296 wide). Size the surface to the card, its margins and the material's
 shadow, anchored to the `position` edge; the layer margin is then 0.
+
+### Sheet and modal parts (2026-09-25)
+
+Additive: leave a prop out and the markup is what it was, except that a disabled `Button` or
+`IconButton` now also carries `disabled="true"` and draws at .35 (the two disabled goldens gained
+the attribute). `ColourToken` gained `ScrimModal` (a `match` of yours over it needs the arm).
+FINDINGS "Sheet and modal parts" has the reasons and the proofs (sill Q90-Q95).
+
+| Component | Prop, type or variant | Type (default) | What it does |
+| --- | --- | --- | --- |
+| `Sheet` | `shown`, `on_hidden` | `Option<Shown>` (`None`), `Option<EventHandler<()>>` (`None`) | `None`: shown while mounted, as before. `Shown::Hidden` plays `sheet-out` (`Anim::SheetOut`, `--t-move --e-exit`, forwards), fades the scrim, leaves the layer stack at once, and calls `on_hidden` at `settle(SheetOut)` (284 ms at Standard), never before: unmap the surface there. `Shown::Visible` again while it leaves enters again and `on_hidden` does not run. Mounted hidden it draws nothing (`data-presence` is `entering`, `present` or `leaving`) |
+| `Sheet` | `placement` | `SheetPlacement` (`Top`) | `Top`: 36 px from the top, as before. `Centre`: centred both ways in its root (`div.ds-sheet-stage` around `.ds-sheet[data-placement=centre]`, flex, no transform), inside the same 36 px inset. Needs a root with a height: `Ds { extent: RootExtent::Viewport }` |
+| `Sheet` | `scrim` | `ScrimStrength` (`Standard`) | `Modal` dims with `--scrim-modal` |
+| `Scrim` | `strength` | `ScrimStrength` (`Standard`) | `Modal`: `--scrim-modal` (black .40 light, .55 dark) instead of `--scrim` (.22), `data-strength="modal"`, for a dialog that asks for a decision |
+| `ColourToken` | `ScrimModal` | new variant, `--scrim-modal` | A colour like `--scrim`, since its strength differs by scheme |
+| `Button` | `size` | `Option<ButtonSize>` (`None`) | `None` keeps the variant's own size (Danger and Mini are Mini-sized). `Some(ButtonSize::Regular)` draws any variant in Primary's box (8 x 14, `--fs-control` 700), so a Danger Restart stands level with Shut Down; `Some(ButtonSize::Mini)` in Mini's. `data-size` |
+| `Button`, `IconButton` | `availability: Availability::Disabled` | existing prop, new look | `aria-disabled="true"` and `disabled="true"`, opacity .35 (design/13's disabled item), default cursor, `pointer-events:none`: no hover lift, wash or press squish, and `onclick` never runs |
+| `Ds` | `extent` | `RootExtent` (`Content`) | `Viewport`: the root is at least the viewport (`min-height:100vh; min-width:100vw`, `data-extent="viewport"`). **Use it for every overlay surface** whose content is positioned (an OSD, a sheet, a click catcher): a `Content` root holding only such content is 0 px tall, and so is everything it places (sill F172) |
+| `Kbd` | nothing | | `←` and `→` now come from Space Mono (they fell back to a system face and read as dashes at `KbdSize::Small`), and the cap is `inline-block`, so its border and padding paint on Blitz |
+
+**What sill switches to** for the power menu: `Ds { material: Material::Sheet, extent:
+RootExtent::Viewport, .. }` with `Sheet { placement: SheetPlacement::Centre, scrim:
+ScrimStrength::Modal, shown, on_hidden: unmap, .. }`; `Button { size: Some(ButtonSize::Regular) }`
+on the Danger actions (drop any local size CSS); `availability: Availability::Disabled` on an
+action logind refuses (drop any local dimming); `Kbd { size: KbdSize::Small }` for the arrow
+hints (drop any drawn-arrow workaround); and the wallpaper's `100vw/100vh` rule can become
+`extent: RootExtent::Viewport` on its root.
 
 ### Native phase B (2026-09-25): the Blitz host for an app window
 

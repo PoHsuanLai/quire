@@ -3032,3 +3032,77 @@ rules and two keyframes. CONSUMING "Control center parts (2026-09-25)" has the A
   draws every glyph by set at 22 px.
 - **Proof.** `every_control_glyph_renders_and_lints_clean` (one child per shape, `ds-ic`, clean
   under the Strict profile), `the_control_set_is_lucides`, and the set test counting `ALL`.
+
+## Sheet and modal parts (2026-09-25)
+
+sill's power menu (a centred sheet, design/20 §1.8) found six gaps, Q90-Q95, and a scrim too
+light for a modal. Branch `sheet-parts`. Everything is additive; the goldens that moved are named
+below.
+
+- **Q90: the sheet had no exit.** `Anim::SheetOut` (`sheet-out`: fade, a .98 scale and 8 px back
+  down, `--t-move --e-exit`, forwards) joins the motion table with its recipe, `X--b` alias, pulse
+  class, settle row (284 ms Standard and Calm) and drift entries; `Anim::ALL` is 60 after the
+  merge. `Sheet { shown: Option<Shown>, on_hidden }` runs a small machine (`sheet_presence.rs`,
+  `Stage::{Up, Leaving, Gone}`, a pure `step`): hidden, the sheet goes `leaving`, withdraws from
+  the layer stack, its scrim plays `menu-out`, and `on_hidden` runs from the exit timer's settle;
+  shown again while leaving, the stage is `Up` again, the entrance timer restarts and the stale
+  exit settle finds the stage is no longer `Leaving` and does nothing. Both timers' handlers are
+  made in render (one made inside `queue_effect` has no scope and panicked, as the pane switcher
+  found). Proof: `ds-native/tests/sheet_exit.rs` (60 ms before `settle(SheetOut)` nothing is
+  logged and the sheet is drawn; 20 ms after it `hidden` is logged and the sheet is gone; a
+  re-show 100 ms into the exit enters, logs nothing past the old settle, and a later hide logs
+  once); goldens `overlays/sheet/{shown,mounted-hidden}.html`; `sheet/default.html` unchanged.
+- **Q91: centred.** `SheetPlacement::Centre` wraps the sheet in `div.ds-sheet-stage` (absolute,
+  inset 0, flex-centred, the 36 px inset as padding, no pointer) and makes the sheet `position:
+  relative`. No transform: the entrance and exit keyframes own it, and Blitz's layout rect leaves
+  a transform out (as with the hover strip). Proof: in a 640 x 400 viewport root the sheet's
+  middle is within 1 px of 200 and of 320; golden `overlays/sheet/centre.html`.
+- **Q92: Danger's size.** `Button { size: Option<ButtonSize> }`; `None` writes nothing and keeps
+  the variant's size (Danger stays Mini-sized, as its goldens encode), so no golden moved.
+  `Regular` is Primary's box in the variant's colours, `Mini` is Mini's. Proof: a Danger Regular
+  is exactly the Secondary's height beside it, a sizeless Danger more than 4 px shorter; goldens
+  `controls/button/{danger-regular,primary-mini}.html`.
+- **Q93: disabled.** `Availability::Disabled` (the existing vocabulary: `Enabled`/`Disabled`, not
+  `Available`/`Unavailable`) now writes `disabled="true"` beside `aria-disabled`, and both sheets
+  draw it at .35, the settled disabled menu item of design/13 §13.3.3 (design/04's O-1 only has an
+  unsigned .45 candidate), with the default cursor and `pointer-events:none`, so no hover lift,
+  wash or squish can match. The attribute is written only when disabled: passing a `bool` wrote
+  `disabled="false"` on every enabled button, which Blitz treats as disabled, and a Bubble press
+  stopped toggling its `<details>` (`mailo5_propagation` caught it). Proof:
+  `ds-native/tests/sheet_buttons.rs` (a press on a disabled Button and IconButton logs nothing,
+  the enabled neighbour's logs; the disabled label's darkest ink is far lighter, and with the
+  opacity rule removed the test fails at 271 against 271). Goldens: `controls/button/disabled`
+  and `controls/icon_button/disabled` gained the attribute; `danger-regular-disabled` is new.
+- **Q94: the root's height.** A `.ds` root is a block as tall as its content; a root holding only
+  positioned content (a centred sheet, an OSD card, a catcher) is 0 px tall, and so is its
+  overlay and the sheet's `max-height:calc(100% - 72px)`, so the sheet drew no body at all. This
+  is sill F172's trap again: dioxus-native-dom's `#main` is `height:auto`, so no `height:100%`
+  above the root resolves, and a `position:fixed; inset:0` box is placed by Taffy against its
+  parent (the 0 px root), not the viewport. `Ds { extent: RootExtent::Viewport }` writes
+  `data-extent="viewport"` and `min-height:100vh; min-width:100vw` (vh and vw do resolve against
+  the viewport on Blitz, which is how sill fixed its wallpaper). Proof:
+  `ds-native/tests/root_extent.rs` (a `Content` root and its sheet measure 0 px tall; a `Viewport`
+  root measures 640 x 400 and its sheet has its content's height). `data-extent` joins the root
+  attributes the lint forbids a consumer to select on.
+- **Q95: Kbd arrows.** The cause was the font, not the stroke: `space-mono-normal-*-latin.ttf` is
+  Google Fonts' `latin` subset, whose `unicode-range` keeps `↑` (U+2191) and `↓` (U+2193) but
+  not `←` (U+2190) or `→` (U+2192). Those two fell back to a system face, whose arrows at 9.5 px
+  are a thin shaft with a head about a pixel tall: a dash. Fixed at the source: both latin files
+  are re-subset from the Space Mono 1.003 release (`google/fonts` `ofl/spacemono`, the version the
+  old files carry, with the same hinting programs) with the old files' own code points plus
+  U+2190-2193 (fontTools `Subsetter`, all layout features, glyph names kept); every shared glyph's
+  outline and advance compare equal. The woff2 copies are regenerated and the webview's `latin`
+  range names U+2190-2193. A second Blitz fact surfaced: Blitz lays out an inline box's text but
+  not its padding or border, so every cap was its glyph on a patch of `--surface-2` with the caps
+  run together; `.ds-kbd` is now `inline-block`. Proof: `ds-native/tests/kbd_arrows.rs` (a Small
+  cap's `←` and `→` ink is at least 5 px long, at least 3 px and a third of its length tall, and
+  as long as the `↑` is tall, within 2 px); with the old font files it fails, `←` 4 px long.
+- **Scrim strength.** `--scrim-modal`, black .40 light and .55 dark, as a `ColourToken`
+  (`ScrimModal`) rather than the `OpacityToken` the brief named: `--scrim` is itself a colour and
+  `OpacityToken` has one value for both schemes. `Scrim { strength: ScrimStrength::Modal }` and
+  `Sheet { scrim }` write `data-strength="modal"`. The legibility gate is in design/03 §17.3.1:
+  3.05:1 sheet-to-paper in light (1.89 under `--scrim`), 1.09 against 1.04 in dark, ink 15.6 and
+  15.0:1. Goldens `overlays/scrim/modal.html`, `overlays/sheet/modal-scrim.html`.
+- **Gallery.** The Overlays page's Power menu section (the page is 5700 tall): the centred sheet
+  over the modal scrim in its own Sheet root, light and dark, with Cancel, a disabled Suspend, a
+  Danger Restart and Shut Down, and Small caps for the arrows, Enter and Escape.
