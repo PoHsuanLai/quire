@@ -97,7 +97,8 @@ pub const CASES: &[Case] = &[
         state: "disabled",
         make: || rsx! { Button { variant: ButtonVariant::Primary, label: "Send", availability: Availability::Disabled, onclick: |_| {} } },
     },
-    // Sheet and modal parts (sill Q92): a size apart from the variant.
+    // Sheet and modal parts (sill Q92, Q93): a size apart from the variant, and a disabled
+    // Danger at Regular (a power menu's unavailable Suspend).
     Case {
         component: "button",
         state: "danger-regular",
@@ -107,6 +108,11 @@ pub const CASES: &[Case] = &[
         component: "button",
         state: "primary-mini",
         make: || rsx! { Button { variant: ButtonVariant::Primary, size: ButtonSize::Mini, label: "Send", onclick: |_| {} } },
+    },
+    Case {
+        component: "button",
+        state: "danger-regular-disabled",
+        make: || rsx! { Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: |_| {} } },
     },
     // IconButton: four variants, expanded, pressed, tooltip, disabled.
     Case {

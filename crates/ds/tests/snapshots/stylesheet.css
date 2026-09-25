@@ -575,7 +575,8 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
-   TODO(O-1): disabled has no visual; `aria-disabled` only drops the handler. */
+   Disabled (sill Q93) takes design/13 section 13.3.3's settled disabled item, .35, rather than
+   O-1's unsigned .45 candidate: below. */
 
 .ds-button{ font:inherit; }
 
@@ -638,6 +639,11 @@ html,body{margin:0;padding:0;background:transparent}
    Primary Shut Down beside it; Mini is Mini's (`S:165-173`). Quiet and Frame keep their own. */
 .ds-button[*|data-size=regular]{ padding:var(--s-8) var(--s-14); font-size:var(--fs-control); font-weight:700; line-height:inherit; }
 .ds-button[*|data-size=mini]{ padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+
+/* Disabled (sill Q93; design/13 section 13.3.3's disabled item): .35, the default cursor, and no
+   pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
+   dropped handlers keep a press from firing. */
+.ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
 
 /* A trailing mark (mailo gaps 4): a dropdown's caret after its value, in the label's colour a
    step quieter; `line-height:0` so the glyph does not stretch the line. */
@@ -935,7 +941,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
    The glyph is sized by `Glyph` itself; no rule here sizes or strokes an icon (spike S6).
-   TODO(O-1): disabled has no visual; `aria-disabled` only drops the handler. */
+   Disabled (sill Q93): .35, as a disabled menu item (design/13 section 13.3.3), at the end. */
 
 .ds-icon-button{ font:inherit; }
 
@@ -994,6 +1000,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=status]:active,
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
+
+/* Disabled (sill Q93): .35, the default cursor, and no pointer, so no hover or press matches;
+   `disabled` and the dropped handlers keep a press from firing. */
+.ds-icon-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
 /* -- icon_view -- */
 /* IconView (design/08-ICONS.md section 1.5): an external icon in any icon slot. The size and the
    URL arrive inline (`--ic-size`, and `mask-image` or `background-image`), so this sheet only
