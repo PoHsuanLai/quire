@@ -612,6 +612,22 @@ Blitz (FINDINGS.md "Native focus"; `CONSUMING.md` "Native focus").
   covers the row's centre when the row is narrower than twice (strip width + 9): a click there
   presses the strip's first button in the webview too.
 
+### 6.7 Frame tags and link text (2026-09-25): what mailo deletes
+
+quire now says which of mailo's frames a request or a link click came from (FINDINGS.md "Frame
+tags and link text"; `CONSUMING.md` "Frame tags and link text").
+
+- **The Original frame's tag.** `reading/blocks.rs`'s `iframe` gets
+  `"data-frame-tag": message_id` (any text naming the message; one per frame).
+- **What goes.** `ui/original/net.rs`'s inference of the message from the URLs a frame asks for
+  (the `cid:`/remote-image URL to message map) and `key(frame: FrameId) -> u64`, the hash of the
+  opaque id. `AppNet::decide` reads `request.frame_tag()` for the message; a link handler reads
+  `link.tag`. Where mailo still needs a frame's id for its own map, `FrameId::index()` is the key,
+  and `ds_native::frames::{tag_of, frame_by_tag}` go from one to the other.
+- **What changes under mailo's tests.** A frame's requests reach `decide` one frame after its
+  document is built (they wait for its tag). A harness test settles past that on its own; a test
+  that read the requests between two raw `Harness` calls may need one more `advance`.
+
 ## 7. The reader, Phase B
 
 Mailo's reader has two views today (`crates/mail-app/src/ui/reading/mod.rs::ViewSwitch`):
@@ -652,6 +668,10 @@ parser, G4). ds-native serves it nothing beyond `data:` unless mailo's `NetPolic
 handler admits a request (G3), and freezes its links (`FrameLinks`, G7). `Harness::frame` reads
 the frame's document for the guarantee's tests. The parser is html5ever 0.39 (FINDINGS "Native
 phase B" item 3), and the sign-off above still belongs to `mail-mime`'s owner.
+
+**Frame tags (2026-09-25).** The Original `iframe` carries `data-frame-tag` (the message), so the
+reader's `AppNet` and link handler know the message from `NetRequest::frame_tag()` and
+`FrameLink::tag` rather than from the URL (section 6.7).
 
 Either way, `reading/tests.rs`'s existing guarantees (`no_div_between_article_and_iframe`, "a
 plain-text message claimed a sandboxed frame" never happening, the two sandbox-attribute checks)

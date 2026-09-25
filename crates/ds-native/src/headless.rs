@@ -10,6 +10,7 @@ use crate::clipboard::HostClipboard;
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
 use crate::fonts::font_context;
+use crate::frame_book::FrameBook;
 use crate::frame_links::{LinkInbox, frame_links};
 use crate::frames::FrameParser;
 use crate::memory_shell::MemoryShell;
@@ -61,6 +62,8 @@ pub(crate) struct Headless {
     pub(crate) shell: Arc<MemoryShell>,
     /// Links clicked in the document's frames, on their way to the app.
     links: LinkInbox,
+    /// The document's frames and their tags.
+    book: FrameBook,
     /// The edit surfaces listening for IME events.
     pub(crate) listeners: EditListeners,
 }
@@ -73,8 +76,13 @@ impl Headless {
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
         let shell = Arc::new(MemoryShell::default());
-        let (frame_nav, links) = frame_links(&setup.frame_links);
-        let frame_net = DsNet::frame(setup.net.clone(), Some(Arc::clone(&net_waker)));
+        let book = FrameBook::new();
+        let (frame_nav, links) = frame_links(&setup.frame_links, book.clone());
+        let frame_net = DsNet::frame(
+            setup.net.clone(),
+            Some(Arc::clone(&net_waker)),
+            book.clone(),
+        );
         let config = DocumentConfig {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
@@ -122,6 +130,7 @@ impl Headless {
             layout: Layout::Running,
             shell,
             links,
+            book,
             listeners,
         }
     }
@@ -157,6 +166,7 @@ impl Headless {
         for _ in 0..MAX_ROUNDS {
             self.links.drain();
             let rendered = self.flush();
+            self.find_frames();
             if self.layout == Layout::Held {
                 return;
             }
@@ -171,6 +181,13 @@ impl Headless {
                 return;
             }
         }
+    }
+
+    /// Find the frames the renders attached under their `iframe`s, so their requests reach the
+    /// app tagged. The document is free by then: the app's `decide` may touch it.
+    fn find_frames(&mut self) {
+        let live = crate::frame_tree::live_frames(&self.doc.inner.borrow());
+        self.book.bind(live);
     }
 
     /// Paint the document as it was last resolved, over `backdrop`.

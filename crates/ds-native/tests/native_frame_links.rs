@@ -82,6 +82,7 @@ fn an_intercepted_click_reaches_the_app_and_the_frame_stays() {
         heard,
         vec![FrameLink {
             frame: before,
+            tag: None,
             href: "https://example.org/offer".to_owned()
         }]
     );
