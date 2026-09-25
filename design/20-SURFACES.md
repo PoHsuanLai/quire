@@ -19,7 +19,7 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 | Layer / role | layer-shell `Top`, one per output, anchor `TOP\|LEFT\|RIGHT`, `ExclusiveZone::Reserve(h)` | S |
 | Height | height token (value in 01-LAYOUT) | S |
 | Material | `Bar`, tinted by the workspace SpaceLook (`--f-*`); `Ds` draws the gradient at the bar's tint and the frame ground (bar gaps) | S |
-| Content | left: app name, workspace indicator (drag reorder); right: tray, volume, network, battery, clock | S |
+| Content | left: app name, workspace indicator (drag reorder); right: tray, then the module items `control_center.menu_bar_*` shows (sound, network, battery by default; each opens its module's detail pane), the control center item, clock (user direction 2026-09-25: controls at the top right as on macOS) | S |
 | Components | `IconButton{Status}` per status item (settled, bar gaps: box and glyph from `bar.status_*` through `StatusMetrics`), `MenuBarItem` around the app name, titles and clock (the 4 px hover and open pill, 13/500 text; settled 2026-09-24), `WorkspacePills` for the workspace indicator (one segmented group on the frame; settled 2026-09-24), `MenuEntry::Info` for status lines, `Glyph` (`IconSize::Bar` 22, P), `Menu{Dropdown}` + `MenuEntry` for every menu (22 px rows, 13 px text), `Count`, `Tooltip{Fly}` (12 px) | S / P |
 | Motion | menus `menu-pop` `--t-move` `--e-spring`; hover bg `--t-quick` `--e-out`; press `--squish` `--t-tap`; tint cross-fade `--t-scene` 380 ms (21-SPACES §5) | S |
 | Behaviours | 13-BEHAVIOUR-menus-windows (menu bar, menus: open delay, safe triangle), 06 (menus, Escape), 12 (workspace swipe updates indicator) | S |
@@ -101,10 +101,10 @@ Chrome that sits on a Space tint uses the `--f-*` frame tokens (21-SPACES).
 
 | Field | Value | St |
 | --- | --- | --- |
-| Layer / role | `Overlay`, anchor `BOTTOM`, centred, no exclusive zone | P |
+| Layer / role | `Overlay`, anchor `TOP\|RIGHT` under the bar's reserve (`osd.position = TopRight`, the default, as current macOS shows its volume and brightness panel), `osd.margin_px` from the bar's reserve; `BottomCentre` keeps the old bottom-centred placement above the dock; no exclusive zone | S (user, 2026-09-25) |
 | Material | `Osd` | S |
-| Components | `Glyph` (volume/brightness at `Bar` 22), level bar (`Slider` read-only) | P |
-| Motion | in `fade` `--t-quick` `--e-out`; level change transition `--t-quick` `--e-out`; hold 1500 ms then `fade` `--t-move` `--e-exit` | P |
+| Components | `Osd` (owns the card and its presence): `Glyph` (volume/brightness at `Bar` 22), a title line, level bar (`Slider { mode: Level }`: no thumb, not focusable, fill transition); a small panel styled like a control-center slider module (§1.5 grid metrics, `--r-tile`) | S |
+| Motion | in `Anim::OsdIn` (a short drop-and-fade from above at TopRight; a rise at BottomCentre; the direction follows the anchor) `--t-quick` `--e-out`; level change transition `--t-quick` `--e-out`; hold `osd.hold_ms` (1500) then `Anim::OsdOut` `--t-move` `--e-exit`, the host unmaps at settle | S |
 | Behaviours | 13 (UI sounds: volume pop from freedesktop sound theme) | S |
 | Keyboard / blur / input | `None`; blur `Element("osd")`; input `Empty` | P |
 | Milestone | M6 | S |
