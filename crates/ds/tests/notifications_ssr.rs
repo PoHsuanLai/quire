@@ -4,10 +4,10 @@
 //!
 //! `DS_BLESS=1 cargo test -p ds --features lint --test notifications_ssr` rewrites the goldens.
 
-#[path = "support/golden.rs"]
-mod golden;
 #[path = "notifications/cases.rs"]
 mod cases;
+#[path = "support/golden.rs"]
+mod golden;
 
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
