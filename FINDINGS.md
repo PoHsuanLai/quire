@@ -2246,6 +2246,94 @@ Not done: nothing the brief asked for was left out. The strip's measured `onclic
 nothing without layout, by design: a snooze or label menu needs the rect to anchor, and
 `on_press` is how the caller acts without it.
 
+## mailo gaps 5 (2026-09-25)
+
+mailo, on v0.1.6 with 5 raw controls left, reported seven small gaps. Branch `mailo-gaps-5`, one
+commit per item. Every change is additive; no existing golden changed (the stylesheet golden
+grew by the new rules). CONSUMING.md "The mailo gaps 5 (2026-09-25)" has one row per change,
+docs/mailo-migration.md section 2 the row for each mailo site. Proofs: the Harness tests
+`crates/ds-native/tests/mailo5_{propagation,scrim,menu_field,drop_accepts}.rs`, the goldens in
+`crates/ds/tests/mailo_gaps5_ssr.rs` (controls and lists) and `overlays/mailo5.rs`, and the
+gallery's Controls and Overlays pages.
+
+1. **A press that must not bubble.** `Button` and `IconButton` take `propagation:
+   Propagation::{Bubble, Stop}` (default `Bubble`), not a bool. The caller only receives a
+   `Press`, so it could not stop the event itself. Under `Stop` each of the three press
+   listeners (click, contextmenu, middle mouseup) stops propagation and prevents the default
+   before reporting. **Found: stopping propagation is not enough on Blitz.** blitz-dom's click
+   default action (`events/pointer.rs`, `handle_click`) walks up from the target to the first
+   element with an action, and a `summary` inside a `details` is one, so a click on a button in
+   the summary toggles the details however the event propagates. Preventing the click's default
+   skips that walk; a `type=button` has no default action of its own, so nothing is lost. With
+   only `stop_propagation` the Harness test fails on the first assertion (the details opens).
+   `Press` gained nothing: it already carries the button, the modifiers and the client point,
+   and the event itself is renderer-bound. Proof (`mailo5_propagation.rs`): a Stop `Button` and
+   a Stop `IconButton` inside summaries log their presses and leave their details closed, with
+   the summary's own handler not called; a Bubble button logs its press, then the summary's, and
+   its details opens; a click on the summary's text still toggles a section whose button stops.
+2. **A scrim under a peeked reader.** `Scrim { flow: Flow::Inline }` reuses the shared `Flow`.
+   It is drawn where the caller renders it, `button.ds-scrim[data-flow=inline]`, with the
+   scrim's own `position:absolute; inset:0`, so it covers the nearest positioned ancestor. It
+   joins no overlay and no layer (`Stacking::Passive`, as the inline menu), sets no z-index, and
+   calls `onclose` on a press at once (there is no stack for it to be under). The layering rule,
+   in the component's docs: it dims its container's earlier content and lies under its later
+   content and every floating surface. The brief named the handler `on_press`; the scrim's
+   existing `onclose` is kept, as renaming it would have broken every caller. Proof
+   (`mailo5_scrim.rs`): the scrim is the pane's child, absent from the overlay, and its rect is
+   the pane's; a press on the reader drawn after it reaches the reader and not the scrim; a
+   press on the uncovered veil dismisses. Golden `overlays/scrim/inline`.
+3. **A label of runs.** `Button`'s `label` is `#[props(into)] Text`, the wave-2 run model, drawn
+   through the same run renderer as `ListRow`'s subject inside the label's span; a `String`,
+   `&str` or formatted literal renders the same markup as before (every existing button golden
+   is unchanged, and the whole workspace compiled without a call-site change). A label of runs
+   is named by `Text::plain_text()` through `aria-label`, so the name is one string whatever
+   spans the tones need; a plain label is still named by its own text. `FaceMark`'s `label`
+   takes a `Text` too. Goldens `controls/button/label-runs{,-named}`; a table test of the
+   spoken name.
+4. **A visible filter line.** `Filter::Field { placeholder }` beside `Typing` and `None`, in a new
+   `menu_filter.rs` (the enum moved there from `menu_lines.rs`, re-exported as before). Keys are
+   identical to `Typing` (`Filter::types()`); the row is `div.ds-menu-filter[role=searchbox]`,
+   drawn and not a real input: the menu holds the keyboard, and an input would take the focus
+   from the cursor it drives. It shows the placeholder, or the typed text, with a drawn
+   `--accent` caret, in the inline `TextInput`'s measures over a hairline. **`Filter` is no
+   longer `Copy`** (the variant holds a `String`); the panel's key reading takes it by reference.
+   The controls' CSS scan banned the substring `filter` (for the unpainted `filter` property),
+   which the class `ds-menu-filter` tripped; it now bans a `filter`/`backdrop-filter`
+   declaration only. Proof (`mailo5_menu_field.rs`): the placeholder shows in a row above the
+   first choice; typing `r`, `e` shows `re` and leaves Receipts and Travel (the fuzzy ranker's
+   subsequence match), Backspace and `c` leave only Receipts, the highlighted row is always a
+   choice, and Enter picks it; the log reads `query:r,query:re,query:r,query:rc,pick:Receipts`.
+   Goldens `overlays/menu/filter-field{,-inline}`.
+5. **Places that accept a drag.** `DropState::Accepts`, `data-drop="accepts"`. On a
+   `SidebarItem` it is a dashed `--accent` hairline, with the hairline taken out of the padding so
+   the item keeps its size and its label stays put. Not an `outline`: blitz-paint draws every
+   outline style but `none` as solid (`render/border.rs`, `draw_outline`), while it dashes a
+   border. It is weaker than `Target` (no fill, no scale, no shadow). A `ListRow` writes the same
+   attribute and has no rule for it (rows are not drop targets). Proof (`mailo5_drop_accepts.rs`:
+   same box and label position as an idle place) and golden
+   `lists/sidebar_item/place-drop-accepts`.
+6. **A leading mark.** `Button { leading: Option<Leading::{Glyph(Icon), Mark(Element)}> }`
+   beside `trailing`, drawn first in `span.ds-button-lead`. The slot takes an `Element` rather
+   than a `Provider` so any quire mark fits; keeping it to quire components is the caller's, as
+   for any children. Goldens `controls/button/leading-{mark,glyph}`.
+7. **A flag of runs.** A struct variant's field cannot take `impl Into<Text>`, and changing
+   `Flag`'s `text` to `Text` would have broken every `Flag { text: String }` literal. So
+   `HoverCardPart::FlagText { tone, icon, text: Text }` is added with the constructor
+   `HoverCardPart::flag(tone, icon, impl Into<Text>)`, both tones (the "Info if symmetrical" of
+   the brief is `FlagTone::Info`, which it covers). `Flag` is drawn through the same function as
+   a plain `Text`, so its goldens are unchanged, and a plain `FlagText` renders byte for byte as
+   `Flag`. Goldens `overlays/hover_card/part-flag-runs-{danger,info}`, `part-flag-text-plain`.
+
+Not done: no gallery specimen for `Propagation`, `DropState::Accepts` or the flag of runs (the
+brief named four; they have goldens and Harness tests). The accepts outline and the filter row
+are golden- and geometry-tested, not pixel-tested.
+
+What mailo changes (docs/mailo-migration.md section 2 has each row): its summary buttons pass
+`propagation: Propagation::Stop` and drop their own `stop_propagation`; the reader pane's scrim
+becomes `Scrim { flow: Flow::Inline }` before the reader; the quoted-message head a `Button` with
+runs; its "Filter…" menus `Filter::Field`; the drag's outline `DropState::Accepts`; the From
+value `leading: Leading::Mark(ProviderMark)`; the spoof flag `HoverCardPart::flag` with runs.
+
 ## Native phase B (2026-09-25)
 
 mailo's Phase B plan (moving its window onto `ds_native::launch`) named the host gaps below,
