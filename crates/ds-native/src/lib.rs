@@ -37,6 +37,7 @@ pub mod measure;
 mod memory_shell;
 mod net;
 mod net_policy;
+mod node_ref;
 mod origin;
 mod route;
 mod runtime;

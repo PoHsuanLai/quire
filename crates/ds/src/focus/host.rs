@@ -68,7 +68,7 @@ pub(crate) fn focus_soon_told(element: Rc<MountedData>, select: Select, told: Ev
 }
 
 /// Move the focus to `element`, then do `select` with its text; the focus's outcome.
-async fn focus_selecting(element: &MountedData, select: Select) -> Focused {
+pub(crate) async fn focus_selecting(element: &MountedData, select: Select) -> Focused {
     let focused = focus_element(element).await;
     if focused == Focused::Done
         && select == Select::All
@@ -81,11 +81,44 @@ async fn focus_selecting(element: &MountedData, select: Select) -> Focused {
 
 /// Move the focus to `element`, waiting out a busy document for up to `BUSY_ATTEMPTS` frames.
 pub(crate) async fn focus_element(element: &MountedData) -> Focused {
-    match try_consume_context::<HostFocus>() {
-        Some(HostFocus(focus)) => retry_busy(|| focus(element)).await,
+    let host = try_consume_context::<HostFocus>().map(|HostFocus(focus)| focus);
+    write(element, host, Toward::In).await
+}
+
+/// The host's write that takes the keyboard from an element, provided beside [`HostFocus`] by
+/// `ds-native`: [`Focused::Done`] when the element had the focus and no longer has it,
+/// [`Focused::Unknown`] when it did not have it. Without one, the blur goes through
+/// `MountedData::set_focus(false)`, guarded as [`focus_soon`] guards a focus.
+#[derive(Debug, Clone, Copy)]
+pub struct HostBlur(pub fn(&MountedData) -> Focused);
+
+/// Take the keyboard from `element`, waiting out a busy document for up to `BUSY_ATTEMPTS`
+/// frames.
+pub(crate) async fn blur_element(element: &MountedData) -> Focused {
+    let host = try_consume_context::<HostBlur>().map(|HostBlur(blur)| blur);
+    write(element, host, Toward::Out).await
+}
+
+/// Which way a focus write moves the keyboard.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Toward {
+    /// Into the element.
+    In,
+    /// Out of it.
+    Out,
+}
+
+/// A focus write through `host`, else through the renderer (guarded), retried while busy.
+async fn write(
+    element: &MountedData,
+    host: Option<fn(&MountedData) -> Focused>,
+    toward: Toward,
+) -> Focused {
+    match host {
+        Some(host) => retry_busy(|| host(element)).await,
         None => {
             for _ in 0..BUSY_ATTEMPTS {
-                match unhosted(element).await {
+                match unhosted(element, toward).await {
                     Focused::Busy => sleep(FRAME_SLACK).await,
                     tried => return tried,
                 }
@@ -96,7 +129,7 @@ pub(crate) async fn focus_element(element: &MountedData) -> Focused {
 }
 
 /// Try a host write until the document is free, for up to `BUSY_ATTEMPTS` frames.
-async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
+pub(crate) async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
     for _ in 0..BUSY_ATTEMPTS {
         match write() {
             Focused::Busy => sleep(FRAME_SLACK).await,
@@ -107,8 +140,8 @@ async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
 }
 
 /// A focus change with no host seam: the call and its future guarded, a panic read as busy.
-async fn unhosted(element: &MountedData) -> Focused {
-    match guarded_call(|| element.set_focus(true)).await {
+async fn unhosted(element: &MountedData, toward: Toward) -> Focused {
+    match guarded_call(|| element.set_focus(toward == Toward::In)).await {
         Some(Ok(())) => Focused::Done,
         Some(Err(_)) => Focused::Unknown,
         None => Focused::Busy,

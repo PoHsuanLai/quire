@@ -7,6 +7,8 @@ use dioxus::prelude::*;
 use crate::components::text_input_focus::FieldFocus;
 pub use crate::components::text_input_focus::Focus;
 pub use crate::components::text_input_kind::{Grow, Rows, TextInputKind};
+use crate::focus::FieldHandle;
+use crate::focus::targets::Told;
 
 /// The field's face: Boxed for a standalone field, Inline inside another container, Bare in
 /// the text it edits.
@@ -56,6 +58,11 @@ fn held(kind: TextInputKind, value: String, typed: Signal<String>) -> String {
 /// caret in the field through a host that dispatches no event (Blitz), the field calls `onfocus`
 /// itself. A range is [`Slider`](crate::Slider).
 ///
+/// `handle` ([`use_field_handle`](crate::use_field_handle)) is the caller's grip on the field
+/// from any handler: `focus(Select)`, `blur()` and the mounted element. A focus or blur through
+/// it (or through [`focus_by_selector`](crate::focus_by_selector)) calls `onfocus`/`onblur` once
+/// on Blitz too.
+///
 /// `kind` picks what it holds ([`TextInputKind`]): `Secret` keeps its text out of the markup,
 /// `File` asks the host through `on_pick`, `Multiline` is a `textarea`. `onchange` hears the
 /// value committed: Enter in a one-line field, or the caret leaving any field (Blitz sends no
@@ -75,14 +82,23 @@ pub fn TextInput(
     #[props(default)] onblur: EventHandler<()>,
     #[props(default)] onchange: EventHandler<String>,
     #[props(default)] on_pick: EventHandler<()>,
+    #[props(default)] handle: Option<FieldHandle>,
 ) -> Element {
-    let focuser = FieldFocus::use_new();
+    let focuser = FieldFocus::use_new(handle);
     let mut typed = use_signal(String::new);
     if let Focus::Controlled(request) = focus {
         focuser.follow(request, onfocus);
     }
     let text = held(kind, value, typed);
     let committed = text.clone();
+    let blurred = text.clone();
+    let told = Told {
+        focus: use_callback(move |()| onfocus.call(())),
+        blur: use_callback(move |()| {
+            onchange.call(blurred.clone());
+            onblur.call(());
+        }),
+    };
     let field = Field {
         variant,
         label,
@@ -100,6 +116,7 @@ pub fn TextInput(
             onblur,
             onchange: EventHandler::new(move |()| onchange.call(committed.clone())),
         },
+        told,
     };
     match kind {
         TextInputKind::File => file(field, text, on_pick),
