@@ -1,7 +1,13 @@
 //! One row of a `BannerStack` (sill Q121): the card in a `div.ds-banner` that plays the row's
-//! motion (`banner-in`, `banner-out`, `heal`), and the height it measures, which is how far the
-//! rows after it heal when it leaves. The gap to the next banner is the row's own padding, so
-//! the measured height is the whole pitch.
+//! exit and heal (`banner-out`, `heal`), with the entrance (`banner-in`) on the `div.ds-banner-card`
+//! inside it, and the height it measures, which is how far the rows after it heal when it
+//! leaves. The gap to the next banner is the row's own padding, so the measured height is the
+//! whole pitch.
+//!
+//! The entrance is the inner element's, played once as it mounts, rather than a rule on the
+//! row's `data-presence=entering`: Blitz keeps the last animated value when an animation is
+//! taken off an element, so a presence that turned `present` before a frame had been resolved
+//! past the entrance's end (a loaded machine, a snapshot's clock) froze the row mid-slide.
 
 use crate::components::banner_stack::{BannerKey, BannerPosition};
 use crate::geometry::Px;
@@ -52,7 +58,7 @@ pub(crate) fn BannerRow(
                 element.set(Some(event.data()));
                 measure();
             },
-            {card}
+            div { class: "ds-banner-card", {card} }
         }
     }
 }
