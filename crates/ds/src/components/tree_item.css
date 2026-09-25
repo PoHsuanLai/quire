@@ -27,9 +27,10 @@
 .ds-tree-item-row[*|aria-expanded=true] .ds-tree-item-chevron{ transform:rotate(90deg); }
 
 /* The label takes the free space, so the count and the ⋯ sit at the end. As a button (a place
-   that selects) it is words on the row, nothing of a button's own. */
+   that selects) it is words on the row, nothing of a button's own: `display:block` because
+   Blitz's user-agent `button` centres its content (the sidebar item's gallery fix A). */
 .ds-tree-item-label{
-  flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; text-align:left;
+  display:block; flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; text-align:left;
   border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer;
 }
 

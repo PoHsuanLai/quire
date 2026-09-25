@@ -61,7 +61,7 @@ pub fn FolderTree() -> Element {
         Section {
             title: "TreeItem: a folder tree as drop places",
             note: "A details/summary row in the sidebar item's chrome. open is the app's (the chevron turns over --t-quick); the label selects without toggling; the ⋯ in the trailing slot carries data-folder and never toggles. During a drag every folder is DropState::Accepts and the one under the pointer Target, drawn by the same .ds-drop-place rules as SidebarItem.",
-            div { class: "g-col g-stage-pad", style: "width:240px",
+            div { class: "g-side",
                 TreeItem {
                     label: "Projects",
                     open: projects(),
