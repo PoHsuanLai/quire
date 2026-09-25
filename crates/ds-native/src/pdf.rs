@@ -1,5 +1,5 @@
 //! PDF output: a quire document laid out by Blitz, paginated by quire's rules, and painted into
-//! a vector PDF through the krilla painter (`anyrender_krilla`). Text is real text in embedded,
+//! a vector PDF through the pdfrum painter (`anyrender_pdfrum`). Text is real text in embedded,
 //! subsetted faces (selectable, searchable, taken from the layout rather than guessed from the
 //! font); a JPEG is embedded as it arrived.
 //!

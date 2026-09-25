@@ -7,7 +7,7 @@ use crate::pdf::html;
 use crate::pdf::pages::{self, Printed};
 use crate::pdf::run_texts;
 use crate::pdf::spec::{ContentBox, PageSpec};
-use anyrender_krilla::Sources;
+use anyrender_pdfrum::Sources;
 
 /// Which text source a print uses.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

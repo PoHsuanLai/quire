@@ -98,15 +98,28 @@ impl RunText {
     }
 
     /// The run cut down to the glyphs at `kept` (ascending indices): the ones a page keeps.
-    /// A cluster is kept whole if any of its glyphs is.
+    /// A cluster is kept whole if any of its glyphs is. Glyphs are of one cluster when their
+    /// ranges are equal, not merely when they start together: an empty range (a glyph with no
+    /// text) and the next glyph's share a start and are still two clusters.
     pub(crate) fn select(&self, kept: &[usize]) -> RunText {
-        RunText::from_glyphs(kept.iter().filter_map(|&index| {
-            let range = self.clusters.get(index)?;
-            Some(GlyphSource {
-                cluster: range.start,
-                text: self.text.get(range.clone()).unwrap_or(""),
-            })
-        }))
+        let mut run = RunText::default();
+        let mut last: Option<&Range<usize>> = None;
+        for &index in kept {
+            let Some(range) = self.clusters.get(index) else {
+                continue;
+            };
+            match (last, run.clusters.last().cloned()) {
+                (Some(previous), Some(held)) if previous == range => run.clusters.push(held),
+                _ => {
+                    let start = run.text.len();
+                    run.text
+                        .push_str(self.text.get(range.clone()).unwrap_or(""));
+                    run.clusters.push(start..run.text.len());
+                }
+            }
+            last = Some(range);
+        }
+        run
     }
 }
 
@@ -160,6 +173,16 @@ mod tests {
         let run = RunText::from_glyphs([glyph(0, "é"), glyph(0, "é"), glyph(3, "t")]);
         assert_eq!(run.text(), "ét");
         assert_eq!(run.clusters(), &[0..2, 0..2, 2..3]);
+    }
+
+    #[test]
+    fn a_glyph_without_text_does_not_swallow_the_next() {
+        // A ligature the cmap cannot name (no text), then `c`: two clusters, though both
+        // ranges start at the same byte.
+        let run = RunText::from_glyphs([glyph(0, ""), glyph(1, "c")]);
+        let kept = run.select(&[0, 1]);
+        assert_eq!(kept.text(), "c");
+        assert_eq!(kept.clusters(), &[0..0, 0..1]);
     }
 
     #[test]

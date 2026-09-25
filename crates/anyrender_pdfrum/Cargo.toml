@@ -1,0 +1,27 @@
+[package]
+name = "anyrender_pdfrum"
+description = "anyrender scenes as vector PDF pages through pdfrum: paths, gradients, images kept in their source encoding, and embedded, subsetted fonts with real text."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+# Blitz-agnostic on purpose: it names anyrender, peniko, pdfrum and skrifa only, so it can be
+# offered upstream to anyrender as it is. What only the renderer knows (each run's source text,
+# each image's source bytes) arrives as plain data in `Sources`.
+[dependencies]
+anyrender = { workspace = true }
+peniko = { workspace = true }
+pdfrum-edit = { workspace = true }
+pdfrum-object = { workspace = true }
+pdfrum-common = { workspace = true }
+skrifa = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+# Reading the written pages back.
+pdfrum = { workspace = true }
