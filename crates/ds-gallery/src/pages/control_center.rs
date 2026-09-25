@@ -1,7 +1,8 @@
 //! The Overlays page's control center (sill FINDINGS Q78-Q80): a Popover panel of the Work
 //! Space, tinted over the wallpaper, in light and dark. Its root pane is a `ModuleGrid` of
 //! `ModuleTile`s (Wi-Fi on, Bluetooth off, both with a chevron; Focus; a busy Hotspot; a
-//! full-span Now Playing); a chevron pushes the module's detail, a `SettingsRow` list, through
+//! full-span Now Playing), then the Sound module and the compact Appearance picker on
+//! `ModulePanel`s (Q100, Q101); a chevron pushes the module's detail, a `SettingsRow` list, through
 //! the `PaneSwitcher`, and the back button returns. Posed, the dark panel shows the detail.
 
 use super::Section;
@@ -12,6 +13,10 @@ use ds::{
     Appearance, Button, ButtonVariant, CardAccent, Chevron, Ds, FrameTint, Grain, Icon, Inject,
     Material, ModuleGrid, ModuleState, ModuleTile, Pane, PaneSwitcher, RootChrome, RowTrailing,
     SettingsRow, Switch, Text, Theme, TileSpan, default_look,
+};
+use ds::{
+    AppearancePicker, Fraction, LevelControl, LevelGlyph, ModulePanel, Muting, PickerLayout, Px,
+    SystemPrefs,
 };
 
 /// The module whose detail a chevron opened.
@@ -37,7 +42,7 @@ const PANELS: [(Theme, Pane); 2] = [(Theme::Light, Pane::Root), (Theme::Dark, Pa
 #[component]
 pub fn ControlCenter() -> Element {
     rsx! {
-        Section { title: "Control center", note: "A Popover panel of the Work Space over the wallpaper, light and dark: a ModuleGrid (2 columns, gap 8) of ModuleTiles (--r-tile 12; On paints the disc --accent on an --accent-soft plate, Off a paper disc, Busy breathes), a Full tile spanning both columns. A tile toggles; its chevron (its own hit target, Enter or Right) pushes the module's detail through the PaneSwitcher: slide-r in, the grid out to the left, both at --t-move, the height following the pane. The detail lists SettingsRows (44 px, hairlines, the text menu's type); the back button slides it out to the right.",
+        Section { title: "Control center", note: "A Popover panel of the Work Space over the wallpaper, light and dark: a ModuleGrid (2 columns, gap 8) of ModuleTiles (--r-tile 12; On paints the disc --accent on an --accent-soft plate, Off a paper disc, Busy breathes), a Full tile spanning both columns, then ModulePanels on the tile's frame holding the Sound level (glyph, title, its percentage in the trailing slot) and the compact AppearancePicker. A tile toggles; its chevron (its own hit target, Enter or Right) pushes the module's detail through the PaneSwitcher: slide-r in, the grid out to the left, both at --t-move, the height following the pane. The detail lists SettingsRows (44 px, hairlines, the text menu's type); the back button slides it out to the right.",
             div { class: "g-wall g-polish-cards", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for (theme , posed) in PANELS {
                     Panel { theme, posed }
@@ -93,12 +98,16 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
     let mut wifi = use_signal(|| ModuleState::On);
     let mut bluetooth = use_signal(|| ModuleState::Off);
     let mut focus = use_signal(|| ModuleState::Off);
+    let mut volume = use_signal(|| Fraction(400));
+    let mut appearance = use_signal(Appearance::default);
+    let percent = volume().0 / 10;
     let flip = |state: ModuleState| match state {
         ModuleState::On => ModuleState::Off,
         ModuleState::Off | ModuleState::Busy => ModuleState::On,
     };
     rsx! {
-        ModuleGrid {
+        // The panel's body pads both panes, so the grid adds none of its own.
+        ModuleGrid { padding: Px(0.0),
             ModuleTile {
                 glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: wifi(), chevron: Chevron::Detail,
                 onclick: move |_| wifi.set(flip(wifi())), on_detail: move |_| on_open.call(Module::WiFi),
@@ -110,6 +119,12 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
             ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Do Not Disturb", state: focus(), onclick: move |_| focus.set(flip(focus())) }
             ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Connecting…", state: ModuleState::Busy, onclick: |_| {} }
             ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
+            ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "{percent}%" },
+                LevelControl { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), onchange: move |next| volume.set(next) }
+            }
+            ModulePanel {
+                AppearancePicker { value: appearance(), system: SystemPrefs::default(), onchange: move |next| appearance.set(next), layout: PickerLayout::Compact }
+            }
         }
     }
 }
