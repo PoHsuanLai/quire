@@ -16,19 +16,19 @@
    ],
    "images": [
     {
-     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/calendar-light.png",
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m10/calendar-light.png",
      "caption": "MonthGrid, light and dark: weekday initials, today on the accent disc, busy-day dots, and the optional ISO week column"
     },
     {
-     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/widgets-light.png",
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m10/widgets-light.png",
      "caption": "WidgetFrame on the light page: the desktop's Widget-material card (Battery, World Clock, Batteries) beside the notification center's dark tile"
     },
     {
-     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/widgets-dark.png",
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m10/widgets-dark.png",
      "caption": "the same WidgetFrame set on the dark page: the notification-center tile beside the desktop card"
     },
     {
-     "path": "/home/pohsuanlai/quire-wt/progress2/tools/progress/shots/m10/thumbnail-light.png",
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m10/thumbnail-light.png",
      "caption": "ShotThumbnail, light and dark: the 240 px card letterboxed to 2:1, a pillarboxed portrait shot, and the compact drag ghost"
     }
    ]
