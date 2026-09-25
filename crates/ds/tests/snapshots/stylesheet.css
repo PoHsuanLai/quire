@@ -1321,6 +1321,9 @@ html,body{margin:0;padding:0;background:transparent}
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
+/* An inline scrim's own layer (mailo gaps 6, `layer: Some(ZLayer)`) is written on the element as
+   `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
+   below its floating surfaces. With none it stays at z-index auto, as above. */
 /* -- search_field -- */
 /* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
    (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
