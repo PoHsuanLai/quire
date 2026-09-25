@@ -578,8 +578,18 @@ rect as `ime_area` so the IME's candidate window follows it. The `/` and `@` flo
 `paste_html`, `hit_test`, and `within(|| handle.caret_rect(..))`. `crates/ds-native/tests/
 native_edit.rs` is the pattern.
 
-**What stays open.** Drag selection only hears moves over the surface (no pointer capture), and
-a composition interrupted by a focus change ends empty. FINDINGS.md "Edit surface" lists the
+**Round two (FINDINGS "Edit surface 2").** Put the surface's class and data on it
+(`extra_class: ExtraClass::parse("c-body")`, `data`) and drop the wrapper `div.c-body`. Focus it
+from code with `handle.focus()` (the subject field's Enter, a template insert): it fires
+`EditFocus::In` and switches the IME on as a press does, so the caret shows and a composition
+works at once; `handle.blur()` is the other half. Drag selection now follows the pointer past the
+surface until the release. Draw the caret at `caret_rect` as given: it is `--caret-w` wide (one
+device pixel at a fractional scale). For the selection layer, keep it before the surface in the
+DOM and give `.c-body` `position: relative`, with no `z-index` on either: Blitz stacks them as CSS
+2.1 does, the surface's text over the layer, so the opacity workaround goes. A layer behind a
+static `.c-body` is painted over the text, as in a browser.
+
+**What stays open.** A composition interrupted by a focus change ends empty. FINDINGS.md "Edit surface" lists the
 rest.
 
 ### 6.6 Native focus (2026-09-25): what mailo deletes
