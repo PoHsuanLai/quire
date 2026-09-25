@@ -49,7 +49,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 | File | Owner | Domains |
 | --- | --- | --- |
 | `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
-| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display` |
+| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display`, `session`, `widgets`, `calendar`, `screenshot`, `hot_corners` |
 | `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
 
 Rules, all three files:
@@ -500,6 +500,61 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 | --- | --- | --- | --- | --- | --- |
 | `session.locker` | `String` | `"auto"` | `auto` (cosmic-greeter, else swaylock, else hyprlock, whichever is installed; under cosmic-session, COSMIC's own resident locker), `off`, `cosmic-greeter`, `swaylock`, `hyprlock`, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
 | `session.polkit_agent` | `String` | `"auto"` | `auto` (polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, then cosmic-osd last: running cosmic-osd only for polkit would add its own volume popup beside sill's OSD), `off`, one of those names, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-10-polkit-prompt-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
+
+### 3.20 `widgets` (sill/settings.toml)
+
+The widgets under the notification center's history and the desktop widget layer (design/20 §1.14; sill FINDINGS "M10 freeze" F404, F405). A small widget is one grid cell, a medium two by one, a large two by two; where a desktop widget sits is saved state, not a key. Page Dock, all Advanced (§5).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `widgets.center` | `Vec<WidgetKind>` (`Calendar, UpNext, Battery, NowPlaying, WorldClock`) | `[Calendar, UpNext, Battery]` | which widgets show under the notifications, in order | `20-SURFACES.md#1-14-desktop-widgets-spec-tier-2`; sill FINDINGS "M10 freeze" F404 | proposed (M10 freeze, 2026-09-26) |
+| `widgets.desktop` | `DesktopWidgets::{Off,On}` | `Off` | the desktop widget layer (macOS Sonoma); `sill widgets toggle-desktop` flips it | same; F405 | proposed (M10 freeze, 2026-09-26) |
+| `widgets.desktop_widgets` | `Vec<WidgetKind>` | `[Calendar, Battery]` | which widgets the desktop shows; where they sit is saved state (`desktop-widgets.json`), not a key | same; F405 | proposed (M10 freeze, 2026-09-26) |
+| `widgets.desktop_cell_px` | `Px` | `164` | `120..=240`; a small widget is one cell, a medium 2x1, a large 2x2 | same; F405 | proposed (M10 freeze, 2026-09-26) |
+| `widgets.desktop_gap_px` | `Px` | `16` | `0..=48`; between cells and around the grid | same; F405 | proposed (M10 freeze, 2026-09-26) |
+| `widgets.world_clocks` | `Text` | `""` | IANA zone names separated by `;` (a `Vec` of text is not derivable yet, as for `display.scale_overrides`) | same; F404 | proposed (M10 freeze, 2026-09-26) |
+
+### 3.21 `calendar` (sill/settings.toml)
+
+The calendar sources and the Calendar and Up Next widgets (design/20 §1.12; sill F401–F403): `.ics` files and vdir folders, watched; no CalDAV client of sill's own. Page Notifications, all Advanced.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `calendar.sources` | `Text` | `"auto"` | `auto` (KOrganizer's file via Akonadi's iCal resource, `~/.local/share/sill/calendars`, `~/.calendars`), `off`, or `.ics` files and folders separated by `;` | `20-SURFACES.md#1-12-calendar-popup-spec-tier-2`; F401, F402 | proposed (M10 freeze, 2026-09-26) |
+| `calendar.first_weekday` | `FirstWeekday::{Monday,Sunday}` | `Monday` | the month's first column (ISO 8601) | same; F403 | proposed (M10 freeze, 2026-09-26) |
+| `calendar.week_numbers` | `WeekNumbers::{Hide,Show}` | `Hide` | a column of ISO week numbers | same; F403 | proposed (M10 freeze, 2026-09-26) |
+| `calendar.up_next_days` | `Count` | `7` | `1..=31`; how far Up Next looks ahead | same; F403 | proposed (M10 freeze, 2026-09-26) |
+| `calendar.up_next_max` | `Count` | `3` | `1..=10`; how many events Up Next lists | same; F403 | proposed (M10 freeze, 2026-09-26) |
+
+### 3.22 `screenshot` (sill/settings.toml)
+
+The floating thumbnail after a screenshot and the tool that takes one (design/20 §1.13; sill F406, F408): the thumbnail holds `ToastHold` (5200 ms) and pauses under the pointer; dragging it out is a file drag once shell-host has a drag source (G120). Page Keyboard and Shortcuts, all Advanced.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `screenshot.thumbnail` | `ShotThumbnail::{Show,Hide}` | `Show` | the floating thumbnail after a screenshot (macOS's "Show Floating Thumbnail") | `20-SURFACES.md#1-13-screenshot-thumbnail-spec-integrated-experience-priority-pick`; F408 | proposed (M10 freeze, 2026-09-26) |
+| `screenshot.thumbnail_hold_ms` | `Ms` | `5200` | `1000..=30000`; paused while hovered (`ToastHold`) | same; F408 | proposed (M10 freeze, 2026-09-26) |
+| `screenshot.folders` | `Text` | `"auto"` | `auto` (Pictures and Pictures/Screenshots), `off`, or folders separated by `;`, watched for new screenshots | same; F406 | proposed (M10 freeze, 2026-09-26) |
+| `screenshot.tool` | `Text` | `"auto"` | `auto` (cosmic-screenshot), `off`, or a command line run by `/bin/sh -c` with the kind as `$1` and the folder as `$2` | same; F406 | proposed (M10 freeze, 2026-09-26) |
+
+### 3.23 `hot_corners` (sill/settings.toml)
+
+One invisible square per enabled corner (design/20 §1.16; design/13 §13.3.12 for the dwell, re-arm, modifier and action rules; sill F409). Page Dock, all Advanced.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `hot_corners.top_left` | `CornerAction::{None,Launcher,NotificationCenter,ControlCenter,ShowDesktop,Lock,Workspaces,Command}` | `None` | what the corner does; `None` spawns no surface | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience`; F409 | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.top_right` | `CornerAction` | `None` | as `top_left` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.bottom_left` | `CornerAction` | `None` | as `top_left` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.bottom_right` | `CornerAction` | `None` | as `top_left` (macOS ships Quick Note here; sill has none until M12) | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.top_left_command` | `Text` | `""` | run by `/bin/sh -c` when the corner is `Command` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.top_right_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.bottom_left_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.bottom_right_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.dwell_ms` | `Ms` | `150` | `0..=2000`; how long the pointer rests before the corner acts | `20-SURFACES.md#3-open-decisions` item 7; F409 | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.rearm_ms` | `Ms` | `500` | `0..=5000`; acts again only after the pointer has left and this long | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.modifier` | `CornerModifier::{None,Super,Alt,Ctrl,Shift}` | `None` | a key held for the corner to act (macOS's modifier option); see G121 | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.size_px` | `Px` | `2` | `1..=8`; the invisible square's side | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience` (2 x 2 px) | proposed (M10 freeze, 2026-09-26) |
 
 ## 4. Rust shape
 

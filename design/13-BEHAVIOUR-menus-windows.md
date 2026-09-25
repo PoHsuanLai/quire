@@ -234,6 +234,46 @@ The frame quire draws for a window that asks for no server decorations
 | Keyboard | Tab reaches close, minimize, zoom; Enter or Space presses; Escape closes the menu | settled |
 | Placement on Wayland | Left half, Right half and Centre are unavailable: a toplevel can neither read nor set its position (FINDINGS "Window frame") | limit |
 
+### 13.3.12 Hot corners (settled 2026-09-26 with sill's M10 freeze; keys in design/22 §3.23)
+
+The reference desktop fires a corner the moment the pointer touches it, which is why its users
+complain about accidental triggers; ours waits. One invisible surface per enabled corner
+(design/20 §1.16): an `Overlay` layer surface anchored to the output corner, `hot_corners.size_px`
+square (2 px; `1..=8`), input `Whole`, no material, no paint, never keyboard.
+
+| Rule | Value | Key |
+| --- | --- | --- |
+| Dwell | the pointer rests inside the square for `dwell_ms` before the corner acts; leaving earlier cancels | `hot_corners.dwell_ms` 150 (`0..=2000`) |
+| Re-arm | after acting, the corner is disarmed until the pointer has left the square and `rearm_ms` has passed; a pointer parked in the corner acts once | `hot_corners.rearm_ms` 500 (`0..=5000`) |
+| Modifier | with a modifier set, the corner acts only while that key is held; `None` needs no key. A keyboard-less layer surface receives no modifier state on Wayland (shell-host G121): the key stays `None` until the host can answer, and the row is retired if it cannot | `hot_corners.modifier` `None` |
+| Toggle | an action that opens a shell surface closes it when it is already open (Launcher, NotificationCenter, ControlCenter, Workspaces, ShowDesktop); Lock and Command never toggle | |
+| Corner | `top_left`, `top_right`, `bottom_left`, `bottom_right`, each its own action; the bottom right is free (the reference ships a note there; sill has none until M12) | `hot_corners.<corner>` |
+
+Action table (`CornerAction`):
+
+| Action | Does |
+| --- | --- |
+| `None` | nothing; the corner's surface is not spawned |
+| `Launcher` | `sill launcher toggle` |
+| `NotificationCenter` | `sill notifications toggle` |
+| `ControlCenter` | `sill control-center toggle` |
+| `ShowDesktop` | the compositor's show-desktop; toggles back |
+| `Lock` | the session's locker (`session.locker`) |
+| `Workspaces` | the workspace overview |
+| `Command` | `/bin/sh -c` of `hot_corners.<corner>_command`; an empty command does nothing and logs once |
+
+State machine (pure, table-tested in sill): `Idle` → pointer enters → `Dwelling { since }` →
+leaves → `Idle`; `since + dwell_ms` elapses → act → `Disarmed { left: None }` → leaves →
+`Disarmed { left: Some(t) }` → `t + rearm_ms` elapses → `Idle`. A pointer that enters while
+`Disarmed` does nothing. Hover intent (design/06) is not used: the dwell is its own timer.
+
+Acceptance (sill `dev/accept-hot-corners.sh`, nested compositor, debug-inject or fake input):
+(1) enter and rest 150 ms → the action fires once; (2) enter and leave at 100 ms → nothing;
+(3) rest 2 s → exactly once; (4) leave and return within 500 ms → nothing, after 500 ms → again;
+(5) with `size_px` 2, a pointer at (1, 1) of the corner is inside and (2, 2) is outside;
+(6) `Launcher` twice from the same corner opens then closes it; (7) `modifier` is recorded
+against G121, not tested until the host answers.
+
 ## 13.4 State machines
 
 Pure; `now` is an argument; effects are returned.
