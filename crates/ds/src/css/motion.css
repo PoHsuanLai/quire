@@ -222,3 +222,8 @@
    surface's edge, fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
    frame until the stack drops the row and the rows below heal. */
 @keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
+
+/* banner-in (quire's, sill Q121): a notification banner slides in from past the surface's right
+   edge to its place at `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first
+   frame: the edge hides it until it arrives. */
+@keyframes banner-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }

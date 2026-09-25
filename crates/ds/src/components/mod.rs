@@ -4,6 +4,8 @@ pub mod account_tile;
 pub mod animated_list;
 pub mod appearance_picker;
 pub mod avatar;
+pub(crate) mod banner_row;
+pub mod banner_stack;
 pub mod button;
 pub mod button_face;
 pub mod button_size;
@@ -116,6 +118,7 @@ pub use appearance_picker::{AppearancePicker, PickerLayout};
 pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
+pub use banner_stack::{Banner, BannerKey, BannerPosition, BannerStack};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use button_size::ButtonSize;
@@ -203,6 +206,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("animated_list", include_str!("animated_list.css")),
     ("appearance_picker", include_str!("appearance_picker.css")),
     ("avatar", include_str!("avatar.css")),
+    ("banner_stack", include_str!("banner_stack.css")),
     ("button", include_str!("button.css")),
     ("chip", include_str!("chip.css")),
     ("command_palette", include_str!("command_palette.css")),

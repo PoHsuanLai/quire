@@ -2,12 +2,16 @@
 
 use dioxus::prelude::*;
 use ds::{
-    AppMark, Appearance, CardAction, Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource,
-    Inject, Layers, Material, NotificationCard, Rich, RichRun, RichText, Run, RunTone, Theme,
+    AppMark, Appearance, Banner, BannerKey, BannerPosition, BannerStack, CardAction, Ds, Expanded,
+    GroupCount, GroupHeader, Icon, IconSource, Inject, Layers, Material, NotificationCard, Rich,
+    RichRun, RichText, Run, RunTone, Theme,
 };
 
-/// Every specimen: its golden name and how it is made.
-pub const SPECIMENS: &[(&str, fn() -> Element)] = &[
+/// A specimen: its golden name and how it is made.
+pub type Specimen = (&'static str, fn() -> Element);
+
+/// Every specimen.
+pub const SPECIMENS: &[Specimen] = &[
     ("rich-runs", rich_runs),
     ("group-header-closed", group_header_closed),
     ("group-header-open-dark", group_header_open_dark),
@@ -15,6 +19,8 @@ pub const SPECIMENS: &[(&str, fn() -> Element)] = &[
     ("card-dark", card_dark),
     ("card-group", card_group),
     ("card-popover-root", card_popover_root),
+    ("stack-top-right", stack_top_right),
+    ("stack-bottom-right-dark", stack_bottom_right_dark),
 ];
 
 /// `body` in a Toast root in `theme`.
@@ -137,4 +143,28 @@ pub fn card_popover_root() -> Element {
             NotificationCard { app: mail(), age: "9:41", summary: "Grace Hopper", on_close: |_| {}, on_open: |_| {} }
         }
     }
+}
+
+/// Two banners in a stack at `position` in `theme` (Q121).
+fn stack(theme: Theme, position: BannerPosition) -> Element {
+    let banners = [(2, "Grace Hopper", "9:41"), (1, "Ada Lovelace", "now")]
+        .into_iter()
+        .map(|(n, who, age)| Banner {
+            key: BannerKey(n),
+            card: rsx! {
+                NotificationCard { app: mail(), age, summary: who, body: "Are we still on for Thursday?", on_close: |_| {}, on_open: |_| {} }
+            },
+        })
+        .collect::<Vec<_>>();
+    toast(theme, rsx! { BannerStack { banners, position } })
+}
+
+/// Top right, light (Q121).
+pub fn stack_top_right() -> Element {
+    stack(Theme::Light, BannerPosition::TopRight)
+}
+
+/// Bottom right, dark (Q121).
+pub fn stack_bottom_right_dark() -> Element {
+    stack(Theme::Dark, BannerPosition::BottomRight)
 }

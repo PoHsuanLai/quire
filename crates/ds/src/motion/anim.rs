@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 61 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 62 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -17,7 +17,7 @@
 //! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair (sill FINDINGS Q75):
 //! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
 //! step, plus `SheetOut`, the sheet's exit (sill FINDINGS Q90), plus `BannerOut`, a
-//! notification banner's slide out to the right (sill Q121, Q122).
+//! notification banner's slide out to the right (sill Q121, Q122), and `BannerIn`, its slide in.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -165,11 +165,15 @@ pub enum Anim {
     /// it (`--swipe-dx`) and fades, over `--t-move --e-exit`, the exit design/05 section 10
     /// gives shell chrome; the rows below it then heal (sill Q121, Q122).
     BannerOut,
+    /// `banner-in`: a notification banner slides in from past the right edge to its place,
+    /// over `--t-move --e-spring` (sill Q121; design/13 section 13.3.6's entrance, at the
+    /// stack's `--t-move` so a banner that arrives as another leaves moves with it).
+    BannerIn,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 61] = [
+    pub const ALL: [Anim; 62] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -231,6 +235,7 @@ impl Anim {
         Anim::LevelTick,
         Anim::SheetOut,
         Anim::BannerOut,
+        Anim::BannerIn,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -297,6 +302,7 @@ impl Anim {
             Anim::LevelTick => "a-level-tick",
             Anim::SheetOut => "a-sheet-out",
             Anim::BannerOut => "a-banner-out",
+            Anim::BannerIn => "a-banner-in",
         }
     }
 }

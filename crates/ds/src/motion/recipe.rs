@@ -427,6 +427,7 @@ impl Anim {
             Anim::LevelTick => own::LEVEL_TICK,
             Anim::SheetOut => own::SHEET_OUT,
             Anim::BannerOut => own::BANNER_OUT,
+            Anim::BannerIn => own::BANNER_IN,
         }
     }
 }

@@ -147,12 +147,26 @@ impl<K: Clone + PartialEq> RosterState<K> {
     /// first row below has heal index 0, the next 1, and so on (capped like the stagger).
     /// Nothing happens for a key that is not leaving.
     pub fn settled(self, key: &K) -> Self {
-        let RosterState { entries, pitch } = self;
+        let pitch = self.pitch;
+        self.settled_by(key, pitch)
+    }
+
+    /// [`Self::settled`], with the rows below healing by `pitch` rather than the roster's own:
+    /// the height the leaving row measured, for rows whose heights differ (a notification
+    /// banner opened by hover, a grouped one).
+    pub fn settled_by(self, key: &K, pitch: RowPitch) -> Self {
+        let RosterState {
+            entries,
+            pitch: own,
+        } = self;
         let Some(at) = entries
             .iter()
             .position(|e| &e.key == key && matches!(e.presence, Presence::Leaving(_)))
         else {
-            return RosterState { entries, pitch };
+            return RosterState {
+                entries,
+                pitch: own,
+            };
         };
         let mut below = 0;
         let entries = entries
@@ -171,7 +185,10 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 }
             })
             .collect();
-        RosterState { entries, pitch }
+        RosterState {
+            entries,
+            pitch: own,
+        }
     }
 
     /// Every entering and healing row has settled: mark them present.
@@ -242,7 +259,7 @@ pub enum StayError {
 
 /// The animation an exit plays: an unread (`Emphasis::Strong`) row plays the heavy variant of
 /// every row exit, 15 % slower (design/05-MOTION.md principle 6, section 8). A Today entry's
-/// `tab-out` has no heavy variant.
+/// `tab-out` and a banner's `banner-out` have no heavy variant.
 pub(crate) fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
     match (exit, emphasis) {
         (Exit::Fold, Emphasis::Strong) => Anim::FoldHeavy,
@@ -252,5 +269,6 @@ pub(crate) fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
         (Exit::Crumple, Emphasis::Strong) => Anim::CrumpleHeavy,
         (Exit::Crumple, Emphasis::Plain) => Anim::Crumple,
         (Exit::TabOut, _) => Anim::TabOut,
+        (Exit::BannerOut, _) => Anim::BannerOut,
     }
 }
