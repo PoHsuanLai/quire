@@ -1,12 +1,33 @@
 //! The mailo gaps 5 overlay cases: a scrim drawn inline in the pane it dims, under the reader
-//! the pane draws after it; a menu whose filter draws its query line.
+//! the pane draws after it; a menu whose filter draws its query line; a hover card's flag whose
+//! words are runs.
 
-use crate::cases::Case;
+use crate::cases::{Case, PartsCard};
 use dioxus::prelude::*;
-use ds::{Anchor, Filter, Flow, Menu, MenuEntry, MenuKind, MenuRow, Point, Px, Scrim};
+use ds::{
+    Anchor, Filter, FlagTone, Flow, HoverCardPart, Icon, Menu, MenuEntry, MenuKind, MenuRow, Point,
+    Px, Run, RunTone, Scrim, Text,
+};
 use std::time::Duration;
 
 const NOW: Duration = Duration::ZERO;
+/// Past the 450 ms hover intent.
+const INTENT: Duration = Duration::from_millis(520);
+
+/// The spoof warning: the brand and the domain in the strong tone.
+fn spoof(tone: FlagTone) -> HoverCardPart {
+    HoverCardPart::flag(
+        tone,
+        Icon::OctagonAlert,
+        Text::Runs(vec![
+            Run::new("Not ", RunTone::Plain),
+            Run::new("Acme", RunTone::Strong),
+            Run::new(": this was sent from ", RunTone::Plain),
+            Run::new("acme-billing.example", RunTone::Strong),
+            Run::new(".", RunTone::Plain),
+        ]),
+    )
+}
 
 /// The labels a thread can carry.
 fn labels() -> Vec<MenuEntry<u8>> {
@@ -25,6 +46,24 @@ fn field() -> Filter {
 }
 
 pub const MAILO5_CASES: &[Case] = &[
+    Case {
+        component: "hover_card",
+        state: "part-flag-runs-danger",
+        make: || rsx! { PartsCard { parts: vec![spoof(FlagTone::Danger)] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-flag-runs-info",
+        make: || rsx! { PartsCard { parts: vec![spoof(FlagTone::Info)] } },
+        wait: INTENT,
+    },
+    Case {
+        component: "hover_card",
+        state: "part-flag-text-plain",
+        make: || rsx! { PartsCard { parts: vec![HoverCardPart::flag(FlagTone::Danger, Icon::OctagonAlert, "Not the address Dana usually writes from.")] } },
+        wait: INTENT,
+    },
     Case {
         component: "menu",
         state: "filter-field",
