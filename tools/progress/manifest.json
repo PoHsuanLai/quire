@@ -1,6 +1,27 @@
 {
- "updated": "2026-09-25, the wallpaper paints and pixel snapping is wired through the shell; icon round five up for the pick; mailo wave 3 running",
+ "updated": "2026-09-25, Milestone 0 proven on the live KDE session; icon set being shipped; edit surface in progress",
  "entries": [
+  {
+   "id": "m0-kwin-live",
+   "date": "2026-09-25 · Milestone 0 on the live KDE session",
+   "title": "The host passes its Milestone 0 acceptance on the real KWin session at scale 2",
+   "status": "proven",
+   "lede": "With the KDE session unlocked, the same acceptance the host passed on nested cosmic-comp ran on the user's live Plasma 6 desktop: one 4K output at scale 2, NVIDIA over Vulkan, compositor blur on. The bar reserves its 32 px and paints its probe colour; blur behind the bar drops the variance by 99.98 % while the checkerboard below it stays sharp; the dock's hover sweep renders a frame per callback in every present mode with sub-millisecond frames and idles at zero frames, zero commits and zero main-thread wakeups; two surfaces share one device. The fractional-scale item was written for a 1.5 output and the display is at 2 now, so only its buffer and checker checks apply, and those pass.",
+   "notes": [
+    "The first attempt failed before any demo ran: the invoking shell had no runtime-directory variable, so nothing could find the compositor socket.",
+    "Fractional item: buffer 3840x64 for 1920x32 logical, checker runs of exactly 4 device pixels, preferred scale 240; its screen-row check failed because the capture held no bar at all (spectacle shot before the surface was mapped or after the demo exited), so it is a capture-timing question, not a rendering one. Recorded as shell-host F45."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/kwin/live-a-bar.png",
+     "caption": "item a on live KWin: the demo bar at the top of the real desktop, a maximised probe window below it"
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/kwin/live-b-blur.png",
+     "caption": "item b: the bar over the checkerboard with compositor blur on"
+    }
+   ]
+  },
   {
    "id": "m2-wallpaper",
    "date": "2026-09-25 · sill Milestone 2 wallpaper, and pixel snapping wired through",
