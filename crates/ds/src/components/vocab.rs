@@ -369,6 +369,14 @@ impl Expanded {
             Expanded::Closed => "false",
         }
     }
+
+    /// The `data-expanded` word, for a part styled by whether what it heads is open.
+    pub(crate) fn slug(self) -> &'static str {
+        match self {
+            Expanded::Open => "open",
+            Expanded::Closed => "closed",
+        }
+    }
 }
 
 impl Selection {

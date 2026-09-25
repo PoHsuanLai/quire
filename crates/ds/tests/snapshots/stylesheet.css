@@ -903,6 +903,20 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-edit{ display:block; white-space:pre-wrap; overflow-wrap:break-word; outline:none; cursor:text; }
 .ds[*|data-modality=keyboard] .ds-edit:focus{ outline:none; }
 .ds-edit [*|data-edit-kind=atom]{ cursor:default; white-space:normal; }
+/* -- group_header -- */
+/* GroupHeader (sill Q125; design/20 section 1.6, design/13 section 13.3.6): one app's head in
+   the notification center. The words are `SectionHeader`'s group type (the data face in
+   capitals, `--fs-caption`, .12em apart, `--ink-faint`) with the app's name a step stronger in
+   `--ink-soft`; the icon is 16 in its own column; the count is tabular; the trailing pair (the
+   fold toggle and Clear, Quiet buttons) ends the row. */
+
+.ds-group-header{ display:flex; align-items:center; gap:var(--s-8); width:100%; box-sizing:border-box; padding:var(--s-12) var(--s-6) var(--s-6);
+  font-family:var(--font-data); font-size:var(--fs-caption); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
+.ds-group-header-icon{ display:flex; flex:none; line-height:0; }
+.ds-group-header-name{ min-width:0; overflow:hidden; white-space:nowrap; color:var(--ink-soft); }
+.ds-group-header-count{ font-variant-numeric:tabular-nums; }
+.ds-group-header-actions{ display:flex; align-items:center; gap:var(--s-2); margin-left:auto; flex:none;
+  font-family:var(--font-ui); letter-spacing:0; text-transform:none; }
 /* -- hover_card -- */
 /* HoverCard (design/04-COMPONENTS.md section 22): the card `S:399-404`, its blocks `S:405-425`,
    the side card `S:428`, the live dot `S:561`. Enters with `hc-in`; while the hub reports it

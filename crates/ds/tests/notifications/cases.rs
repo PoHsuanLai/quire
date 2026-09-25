@@ -1,11 +1,16 @@
 //! The notification parts' specimens (sill Q120-Q125), each in a Toast root of its scheme.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Inject, Material, Rich, RichRun, RichText, Run, RunTone, Theme};
+use ds::{
+    Appearance, Ds, Expanded, GroupHeader, Icon, IconSource, Inject, Material, Rich, RichRun,
+    RichText, Run, RunTone, Theme,
+};
 
 /// Every specimen: its golden name and how it is made.
 pub const SPECIMENS: &[(&str, fn() -> Element)] = &[
     ("rich-runs", rich_runs),
+    ("group-header-closed", group_header_closed),
+    ("group-header-open-dark", group_header_open_dark),
 ];
 
 /// `body` in a Toast root in `theme`.
@@ -31,4 +36,24 @@ pub fn rich_runs() -> Element {
         RichRun::Run(Run::new(".", RunTone::Plain)),
     ]);
     toast(Theme::Light, rsx! { p { RichText { body, on_link: |_| {} } } })
+}
+
+/// A folded group of four from Mail (Q125).
+pub fn group_header_closed() -> Element {
+    toast(
+        Theme::Light,
+        rsx! {
+            GroupHeader { icon: IconSource::Glyph(Icon::Mail), name: "Mail", count: 4, on_toggle: |_| {}, on_clear: |_| {} }
+        },
+    )
+}
+
+/// An open group, in the dark scheme (Q125).
+pub fn group_header_open_dark() -> Element {
+    toast(
+        Theme::Dark,
+        rsx! {
+            GroupHeader { icon: IconSource::Glyph(Icon::Terminal), name: "Terminal", count: 2, expanded: Expanded::Open, on_toggle: |_| {}, on_clear: |_| {} }
+        },
+    )
 }
