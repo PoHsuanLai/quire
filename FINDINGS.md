@@ -3048,9 +3048,12 @@ Our client-decorated windows need a movable, resizable, zoomable frame: mailo on
    stub records what it was asked), provided as `ds::WindowHost`, which also carries the last
    `WindowState` as a signal for `use_window_state()`. The brief's `Tile` is `WindowTile`:
    `ds::Tile` is already a menu row's tile, re-exported at the crate root. `Availability` has no
-   `Unavailable`; the menu's rows use `Availability::Disabled`. shell-host's `window` worktree
-   (branch `window-interact` today) has no `SurfaceHandle::begin_move`, `begin_resize`,
-   `set_maximized` or `use_toplevel_state` yet; sill's host is designed to those names.
+   `Unavailable`; the menu's rows use `Availability::Disabled`. shell-host's side landed on its
+   master (`cb9078c`) while this branch was built: `SurfaceHandle::begin_move()` and
+   `begin_resize(ResizeEdge) -> Result<(), GrabRefused>`, `set_maximized(Maximize)`,
+   `set_minimized()`, `set_fullscreen(Fullscreen)` and `use_toplevel_state()`. Its `ResizeEdge`
+   has the same eight variants as ours, so sill's `HostWindow` is a variant-for-variant map
+   (CONSUMING "Window frame"). Its F50 reaches the conclusion of item 5 below independently.
 2. **winit is 0.31.0-beta.3, not 0.30** (dioxus-native at the pinned rev). What the frame relies
    on, read in `winit-core` and `winit-wayland` 0.31.0-beta.3:
    - `drag_window` and `drag_resize_window` send `xdg_toplevel.move`/`resize` with the pointer's
