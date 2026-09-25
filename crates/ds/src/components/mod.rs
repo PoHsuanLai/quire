@@ -39,6 +39,8 @@ pub mod menu_pick;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
+pub mod module_tile;
+pub mod module_tile_kind;
 pub(crate) mod muted;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
@@ -111,6 +113,8 @@ pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_filter::Filter;
 pub use menu_pick::PickDismiss;
+pub use module_tile::ModuleTile;
+pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
 pub use palette_shown::Retain;
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
@@ -170,6 +174,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("module_tile", include_str!("module_tile.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),
