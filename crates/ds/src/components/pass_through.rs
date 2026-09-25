@@ -44,8 +44,12 @@ pub enum PassThroughError {
 }
 
 /// `data-*` names quire writes on its controls or reads on the root: a consumer attribute of
-/// the same name would change how quire's stylesheet draws the element.
-const RESERVED_DATA: &[&str] = &["variant", "size", "theme", "accent", "motion", "material"];
+/// the same name would change how quire's stylesheet draws the element. `slot` is quire's seam
+/// name (`[data-slot=trailing]` on a tree row's trailing slot, mailo gaps 7): a consumer button
+/// carrying it would be taken for the slot by the consumer's own seam rules.
+const RESERVED_DATA: &[&str] = &[
+    "variant", "size", "theme", "accent", "motion", "material", "slot",
+];
 
 /// The prefix of every quire class and of the names a consumer cannot take.
 const DS_PREFIX: &str = "ds-";
@@ -215,6 +219,7 @@ mod tests {
             ("ds", Err(())),
             ("variant", Err(())),
             ("theme", Err(())),
+            ("slot", Err(())),
         ];
         for (given, want) in cases {
             let got = DataName::parse(given)
