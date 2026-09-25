@@ -3749,6 +3749,9 @@ keep-together block that must move, and a forced break.
 - **Pinned block** (`docs/workspace-deps.toml`, copied into `Cargo.toml`): `pdfrum-edit` (with
   `variable-fonts`), `pdfrum-object`, `pdfrum-common`, `pdfrum` (tests, `vello-cpu`), `skrifa =
   0.44` (parley's own) and `memfd = 0.6`.
-  - While pdfrum's `blitz-print` is unmerged, these are paths into its worktree. They become a
-    git rev of pushed pdfrum `main`, then crates.io 0.4.
+  - They are a git rev of pdfrum `main` (`0765e4e5`) until pdfrum 0.4 is on crates.io.
+  - pdfrum's MSRV is 1.92, above quire's declared `rust-version = "1.91"`. The pinned
+    toolchain (1.98.1) builds both; the declared minimum wants raising in the next
+    toolchain-bump wave.
+  - Resolving pdfrum `main` moved `smallvec` back up to 1.16.1 (pdfrum pins it exactly).
   - `cargo deny check licenses`: ok.
