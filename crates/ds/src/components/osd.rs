@@ -15,12 +15,10 @@
 //! surface to the card, its margins and the material's shadow, anchored to that edge.
 
 use crate::components::level::{LevelControl, LevelGlyph, LevelLook, LevelMode};
-use crate::components::osd_phase::{OsdEffect, OsdInput, OsdPhase, input, step};
+use crate::components::shown_phase::use_shown_phase;
 use crate::components::tooltip::Shown;
 use crate::components::vocab::Fraction;
 use crate::motion::anim::Anim;
-use crate::motion::timer::{MotionTimer, use_motion_timer};
-use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
 /// The level an OSD shows: the value and the glyph that follows it.
@@ -53,30 +51,6 @@ impl OsdPosition {
     }
 }
 
-/// Which of `osd-in`'s two names the card plays: flipped on each showing, so the entrance
-/// restarts even where the engine kept the element's styles (design/05 section 9 rule 2).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Alias {
-    A,
-    B,
-}
-
-impl Alias {
-    fn flipped(self) -> Self {
-        match self {
-            Alias::A => Alias::B,
-            Alias::B => Alias::A,
-        }
-    }
-
-    fn slug(self) -> &'static str {
-        match self {
-            Alias::A => "a",
-            Alias::B => "b",
-        }
-    }
-}
-
 /// The on-screen display. `shown` is the caller's, and `on_hidden` runs once the card has faded
 /// out after a hide; a show while it fades takes the hide back (it is present again at once and
 /// `on_hidden` does not run for that hide).
@@ -91,7 +65,7 @@ pub fn Osd(
     #[props(default)] id: Option<String>,
     children: Element,
 ) -> Element {
-    let phase = use_osd_phase(shown, on_hidden);
+    let phase = use_shown_phase(shown, on_hidden, Anim::OsdIn, Anim::OsdOut);
     let (now, alias) = phase;
     let level_label = label.clone().unwrap_or_else(|| "Level".to_owned());
     let named = label.clone();
@@ -116,74 +90,5 @@ pub fn Osd(
             }
             {children}
         }
-    }
-}
-
-/// The card's phase and entrance alias for this render, driven by `shown`: a change of `shown`
-/// steps the machine at once (so the render draws the new phase), and its timers start in an
-/// effect after it.
-fn use_osd_phase(shown: Shown, on_hidden: EventHandler<()>) -> (OsdPhase, Alias) {
-    let fade_in = use_motion_timer(Anim::OsdIn);
-    let fade_out = use_motion_timer(Anim::OsdOut);
-    let mut phase = use_hook(|| CopyValue::new(OsdPhase::Hidden));
-    let mut alias = use_hook(|| CopyValue::new(Alias::A));
-    let mut last = use_hook(|| CopyValue::new(None::<Shown>));
-    let mut hidden = use_hook(|| CopyValue::new(on_hidden));
-    hidden.set(on_hidden);
-    // Read in render so a settled timer renders the card again.
-    let _ = (fade_in.phase(), fade_out.phase());
-    let in_settled = use_hook(|| {
-        EventHandler::new(move |()| {
-            let (next, _) = step(*phase.peek(), OsdInput::InSettled);
-            phase.set(next);
-        })
-    });
-    let out_settled = use_hook(|| {
-        EventHandler::new(move |()| {
-            let (next, effect) = step(*phase.peek(), OsdInput::OutSettled);
-            phase.set(next);
-            if effect == OsdEffect::Gone {
-                hidden.peek().call(());
-            }
-        })
-    });
-    let change = input(*last.peek(), shown);
-    last.set(Some(shown));
-    if let Some(change) = change {
-        let (next, effect) = step(*phase.peek(), change);
-        phase.set(next);
-        if effect == OsdEffect::PlayIn {
-            let flipped = alias.peek().flipped();
-            alias.set(flipped);
-        }
-        run(
-            effect,
-            Timers {
-                fade_in,
-                fade_out,
-                in_settled,
-                out_settled,
-            },
-        );
-    }
-    (*phase.peek(), *alias.peek())
-}
-
-/// The card's two timers and what each calls when it settles.
-#[derive(Clone, Copy)]
-struct Timers {
-    fade_in: MotionTimer,
-    fade_out: MotionTimer,
-    in_settled: EventHandler<()>,
-    out_settled: EventHandler<()>,
-}
-
-/// Start or stop the timers `effect` asks for, after this render.
-fn run(effect: OsdEffect, timers: Timers) {
-    match effect {
-        OsdEffect::PlayIn => queue_effect(move || timers.fade_in.start(timers.in_settled)),
-        OsdEffect::PlayOut => queue_effect(move || timers.fade_out.start(timers.out_settled)),
-        OsdEffect::CancelOut => queue_effect(move || timers.fade_out.cancel()),
-        OsdEffect::None | OsdEffect::Gone => {}
     }
 }

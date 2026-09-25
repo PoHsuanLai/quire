@@ -260,6 +260,14 @@ fn the_settle_table() {
         // sill Q90: the sheet's exit at --t-move, which only Reduced shortens.
         (Anim::SheetOut, MotionLevel::Standard, 284),
         (Anim::SheetOut, MotionLevel::Calm, 284),
+        // sill Q121, Q122: the banner's exit at --t-move, which only Reduced shortens.
+        (Anim::BannerOut, MotionLevel::Standard, 284),
+        (Anim::BannerOut, MotionLevel::Extra, 284),
+        (Anim::BannerIn, MotionLevel::Standard, 284),
+        (Anim::BannerIn, MotionLevel::Calm, 284),
+        // sill Q123: the center's edge panel, in and out at --t-move.
+        (Anim::PanelIn, MotionLevel::Standard, 284),
+        (Anim::PanelOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

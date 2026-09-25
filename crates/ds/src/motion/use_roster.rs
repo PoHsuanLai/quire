@@ -21,14 +21,14 @@ pub struct Roster<K: 'static> {
     pub(super) scope: ScopeId,
     pub(super) rest: Signal<Option<RestTimer>>,
     pub(super) rest_queue: CopyValue<RestQueue>,
-    exits: Signal<Vec<ExitTimer<K>>>,
+    pub(super) exits: Signal<Vec<ExitTimer<K>>>,
 }
 
 /// The settle timer of one leaving row, kept so a stay (or a second leave) can cancel it.
 #[derive(Debug, Clone, PartialEq)]
-struct ExitTimer<K> {
-    key: K,
-    task: Task,
+pub(super) struct ExitTimer<K> {
+    pub(super) key: K,
+    pub(super) task: Task,
 }
 
 impl<K: 'static> Clone for Roster<K> {
@@ -89,7 +89,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
     }
 
     /// Cancel `key`'s pending exit timer, if it has one.
-    fn cancel_exit(&self, key: &K) -> Result<(), Gone> {
+    pub(super) fn cancel_exit(&self, key: &K) -> Result<(), Gone> {
         if let Some(timer) = self.forget_exit(key)? {
             timer.task.cancel();
         }
@@ -97,7 +97,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
     }
 
     /// Drop `key`'s exit timer from the list, handing it back.
-    fn forget_exit(&self, key: &K) -> Result<Option<ExitTimer<K>>, Gone> {
+    pub(super) fn forget_exit(&self, key: &K) -> Result<Option<ExitTimer<K>>, Gone> {
         let mut exits = try_get(self.exits)?;
         let Some(at) = exits.iter().position(|timer| &timer.key == key) else {
             return Ok(None);
@@ -127,20 +127,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
 /// render only. Reconciling is pure and happens in the render; the rest timer it needs is
 /// started after the render, by an effect ([`Roster::queue_rest`]), never from the body.
 pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, pitch: RowPitch) -> Roster<K> {
-    let env = use_env_signal();
-    let scope = use_hook(current_scope_id);
-    let rest = use_signal(|| None);
-    let rest_queue = use_hook(|| CopyValue::new(RestQueue::Idle));
-    let exits = use_signal(Vec::new);
-    let state = use_signal(|| RosterState::first_show(&keys, pitch));
-    let roster = Roster {
-        state,
-        env,
-        scope,
-        rest,
-        rest_queue,
-        exits,
-    };
+    let roster = use_roster_parts(&keys, pitch);
     let mut seen = use_hook(|| {
         roster.queue_rest();
         CopyValue::new(keys.clone())
@@ -151,4 +138,19 @@ pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, pitch: RowPitch)
         seen.set(keys);
     }
     roster
+}
+
+/// The roster's hooks, first showing `keys`: the state and the timers' signals.
+pub(super) fn use_roster_parts<K: Clone + PartialEq + 'static>(
+    keys: &[K],
+    pitch: RowPitch,
+) -> Roster<K> {
+    Roster {
+        state: use_signal(|| RosterState::first_show(keys, pitch)),
+        env: use_env_signal(),
+        scope: use_hook(current_scope_id),
+        rest: use_signal(|| None),
+        rest_queue: use_hook(|| CopyValue::new(RestQueue::Idle)),
+        exits: use_signal(Vec::new),
+    }
 }

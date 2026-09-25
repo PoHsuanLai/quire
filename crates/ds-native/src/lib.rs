@@ -41,6 +41,7 @@ mod harness_edit;
 mod harness_hit;
 mod harness_input;
 mod harness_settle;
+mod harness_wheel;
 mod headless;
 mod host;
 mod install;

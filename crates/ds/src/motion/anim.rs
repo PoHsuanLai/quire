@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 60 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 64 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -16,7 +16,9 @@
 //! `slide-l` at `--t-move` (design/13 section 13.3.7) where the catalogue's rows are `--t-big`,
 //! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair (sill FINDINGS Q75):
 //! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
-//! step, plus `SheetOut`, the sheet's exit (sill FINDINGS Q90).
+//! step, plus `SheetOut`, the sheet's exit (sill FINDINGS Q90), plus `BannerOut`, a
+//! notification banner's slide out to the right (sill Q121, Q122), and `BannerIn`, its slide in,
+//! plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -160,11 +162,26 @@ pub enum Anim {
     /// of shrink, over `--t-move --e-exit` (design/05 section 10: exits accelerate), the way it
     /// came in by `peek-in` reversed and quieter (sill FINDINGS Q90).
     SheetOut,
+    /// `banner-out`: a notification banner slides out to the right from wherever a swipe left
+    /// it (`--swipe-dx`) and fades, over `--t-move --e-exit`, the exit design/05 section 10
+    /// gives shell chrome; the rows below it then heal (sill Q121, Q122).
+    BannerOut,
+    /// `banner-in`: a notification banner slides in from past the right edge to its place,
+    /// over `--t-move --e-spring` (sill Q121; design/13 section 13.3.6's entrance, at the
+    /// stack's `--t-move` so a banner that arrives as another leaves moves with it).
+    BannerIn,
+    /// `panel-in`: an edge panel (the notification center) slides in from past the right edge
+    /// over `--t-move --e-out`: a large surface decelerates in, since a spring's overshoot would
+    /// pull it off the edge it is anchored to (sill Q123).
+    PanelIn,
+    /// `panel-out`: the edge panel slides back out past the edge over `--t-move --e-exit`,
+    /// holding its last frame until the host unmaps it at `settle(PanelOut)` (sill Q123).
+    PanelOut,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 60] = [
+    pub const ALL: [Anim; 64] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -225,6 +242,10 @@ impl Anim {
         Anim::OsdOut,
         Anim::LevelTick,
         Anim::SheetOut,
+        Anim::BannerOut,
+        Anim::BannerIn,
+        Anim::PanelIn,
+        Anim::PanelOut,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -290,6 +311,10 @@ impl Anim {
             Anim::OsdOut => "a-osd-out",
             Anim::LevelTick => "a-level-tick",
             Anim::SheetOut => "a-sheet-out",
+            Anim::BannerOut => "a-banner-out",
+            Anim::BannerIn => "a-banner-in",
+            Anim::PanelIn => "a-panel-in",
+            Anim::PanelOut => "a-panel-out",
         }
     }
 }

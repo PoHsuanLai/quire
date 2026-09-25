@@ -113,3 +113,13 @@
 .g-modal-stage{height:300px}
 .g-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
 .g-cc-body{padding:var(--s-12)}
+/* The notifications specimen (sill Q120-Q125): per scheme, the Work tint holding the banners
+   and a posed mid-drag card on the left, and the center's edge panel on the right, in a stage the
+   height of a small screen (the panel is absolutely placed, so the stage gives its root a height). */
+.g-notif-row{display:flex;flex-wrap:wrap;gap:var(--s-22)}
+.g-notif{width:820px;border-radius:var(--r-panel);overflow:hidden}
+.g-notif-ground{display:flex;gap:var(--s-16);padding:var(--s-16)}
+.g-notif-left{display:flex;flex-direction:column;gap:var(--s-12);width:392px}
+.g-notif-swiped{transform:translateX(56px)}
+.g-notif-center{position:relative;width:380px}
+.g-notif-stage{height:540px}

@@ -12,10 +12,13 @@ pub mod pulse;
 pub mod recipe;
 mod recipe_own;
 pub mod roster;
+pub(crate) mod roster_exits;
 mod roster_rest;
 pub mod settle;
+pub mod swipe;
 pub mod timer;
 pub mod use_roster;
+pub mod use_swipe;
 
 pub use anim::{Anim, Fill, Iteration, Recipe};
 pub use drag::{Drag, DragPhase, DragTracker, use_drag};
@@ -26,5 +29,9 @@ pub use presence::{Exit, ListPresence, Presence};
 pub use pulse::{Pulse, use_pulse};
 pub use roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 pub use settle::settle;
+pub use swipe::{
+    Click, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,
+};
 pub use timer::{MotionTimer, TimerPhase, use_motion_timer};
 pub use use_roster::{Roster, use_roster};
+pub use use_swipe::{Held, Swiper, use_swipe};

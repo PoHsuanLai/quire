@@ -17,6 +17,7 @@ use crate::material::stack::STACK_INPUTS;
 use crate::motion::Anim;
 use crate::space::{CardAccent, FrameVars, SpaceLook};
 use crate::tokens::dock::DOCK_TOKENS;
+use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
@@ -91,6 +92,7 @@ fn tuned_vars() -> impl Iterator<Item = VarName> {
         .into_iter()
         .chain(DOCK_TOKENS)
         .chain(OSD_TOKENS)
+        .chain(NOTIFICATION_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
         .chain(PixelToken::ALL.map(PixelToken::tuned))
         .flat_map(|token| [token.token, token.input])
