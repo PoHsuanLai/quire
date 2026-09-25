@@ -1156,6 +1156,35 @@ inset of design/08 4.1, so the plate and the icon take one hue), and for our own
 files. Never on a symbolic icon (it takes the text colour) and never per frame: a workspace
 switch that changes the Space tint re-keys the cache, the next paint loads the new entries.
 
+### Control center parts (2026-09-25)
+
+Additive: four new components, four new `Anim` variants, eleven new `Icon` variants and a public
+`use_entrance`; no existing golden changed (the stylesheet golden grew by the new rules and two
+keyframes). A `match` of yours over `Anim` or `Icon` needs the new arms, and an array sized by
+`Anim::ALL` is now 56 long. FINDINGS "Control center parts (2026-09-25)" has the reasons and the
+proofs (sill Q78-Q81).
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `ModuleTile` | new component | `glyph: Icon`, `title` (`#[props(into)] Text`), `status: Option<Text>`, `state: ModuleState`, `chevron: Chevron` (`None`), `span: TileSpan` (`Half`), `onclick: EventHandler<Press>`, `on_detail: Option<EventHandler<Press>>`, `expanded: Expanded` (`Closed`, the chevron's `aria-expanded`), `availability`. A `div[role=button]` at `--r-tile` 12: a press, Enter or Space toggles (`onclick`); the chevron is its own button, `Propagation::Stop`, named "{title} details", and a press, Enter or Right on it calls `on_detail` and never `onclick`. Writes `data-state`, `data-span`, `aria-pressed` (`mixed` while busy) and `aria-busy` |
+| `ModuleState` | `Off`, `On`, `Busy` | Off: a paper disc with ink on the Mini's plate. On: the disc in `--accent` with `--accent-ink`, the plate `--accent-soft`. Busy: the Off disc with the Spinner's breathe around it |
+| `Chevron`, `TileSpan` | `None`/`Detail`; `Half`/`Full` | Whether the tile ends in the detail chevron; one grid column or both (a Full tile spans the `ModuleGrid`) |
+| `ModuleGrid` | new component | `children`: two equal columns, gap 8 (design/13 13.3.7). Your panel keeps its own padding of 12 |
+| `SettingsRow` | new component | `glyph: Option<Icon>`, `title` (`Text`), `detail: Option<Text>`, `trailing: RowTrailing` (`None`), `availability`, `onclick: EventHandler<Press>`. 44 px, a hairline above every row after the first, `MenuEntry::Row`'s shell type (title 13/400, detail `--fs-help` faint), a 16 px glyph in a 22 px column; Enter or Space runs `onclick`. Outside any `Menu`: no overlay, no layer, no focus taken |
+| `RowTrailing` | `None`, `Check(Switch)`, `Toggle { value, on_toggle }`, `Chevron`, `Text(Text)`, `Glyph(Icon)` | A check in `--accent` when `On` (the row writes `aria-pressed`); a `Toggle` named by the row's title whose press and keys stay in the switch (the row's `onclick` does not run); a chevron, a value or a glyph in `--ink-faint` |
+| `PaneSwitcher` | new component | `shown: Pane`, `root: Element`, `detail: Element`, `on_settled: Option<EventHandler<Pane>>`. Changing `shown` plays the arriving pane in (`slide-r` for the detail, `slide-l` for the root, `--t-move --e-spring`) and the outgoing one out the other way (`pane-out-l`/`pane-out-r`, `--t-move --e-exit`) at once; the leaving pane is out of the flow so the height is the arriving pane's; both settle at `settle(Anim::PaneInR)` and `on_settled` hears the pane. A change mid-slide reverses (a new round; the old settle is dropped). Markup: `div.ds-panes[data-shown][data-moving]` > `div.ds-pane[data-pane][data-presence]`, the leaving one `aria-hidden` |
+| `Pane`, `PaneSlide`, `PaneRole`, `PaneRound` | new types | `Pane::{Root, Detail}`; the pure machine the switcher runs (`show`, `settle`, `role`), for a switcher of your own |
+| `Anim` | `PaneInR`, `PaneInL`, `PaneOutL`, `PaneOutR` | `slide-r`/`slide-l` at `--t-move --e-spring` (the catalogue's rows are `--t-big`), and the two new keyframes `pane-out-l`/`pane-out-r` at `--t-move --e-exit forwards`. `Anim::ALL` is 56 |
+| `use_entrance(anim) -> Presence` | now public (`ds::use_entrance`, `ds::motion::use_entrance`) | `Entering` until `settle(anim)`, then `Present`, started on mount: the entrance every floating quire surface plays, for a surface of your own. Moved from `popover.rs`; behaviour unchanged |
+| `Icon` | `Play`, `Pause`, `SkipBack`, `SkipForward`, `LogOut`, `Restart` (Lucide `rotate-ccw`), `Headphones`, `Speaker`, `Mouse`, `Gamepad`, `Phone` (Lucide `smartphone`) | Lucide 1.47.0, ISC, the set's 24 grid and 2 px round stroke; `Icon::CONTROL` lists them and `Icon::ALL` ends with them. `Power` was already in the shell set |
+
+**What sill switches to.** The control center's hand-built tile, network row and sub-page slide
+become `ModuleGrid` of `ModuleTile`, `SettingsRow` and `PaneSwitcher`; delete their CSS (every
+class they styled is a quire class now, and a local animation would trip `UnknownAnimation`).
+Keep `shown` (and which module's detail is open) in your own state: the chevron's `on_detail`
+sets it to `Pane::Detail`, the detail's back button to `Pane::Root`. Now Playing and the power
+menu take the new glyphs instead of text or a local SVG.
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
