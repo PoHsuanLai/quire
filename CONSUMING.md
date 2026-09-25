@@ -1035,6 +1035,26 @@ struct literal.
 The window's app renders one frame after the host, once the document has the app's providers
 (a frame in the first render would otherwise be parsed with the wrong ones).
 
+### Edit surface (2026-09-25): an app's own editor on Blitz
+
+`ds::EditSurface` hosts an app's own rendered text (mailo's composer) and hands the app its
+input; the app keeps its document model and draws its own caret and selection. FINDINGS.md
+"Edit surface" has the route (no blitz fork) and the limits. mailo's adapter is in
+`docs/mailo-migration.md` §6.5.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| A focusable block over the app's own markup | `EditSurface { on_input, on_pointer, on_focus, handle, ime_area, label, id, children }` | Mark every addressable element `"data-edit-node": "{key}"` (`ds::EDIT_NODE_ATTR`); an object the caret goes around also `"data-edit-kind": EditKind::Atom.slug()`. The surface is `white-space: pre-wrap` and shows no focus ring, caret or selection. |
+| Typed input | `on_input: EventHandler<EditInput>` | `EditInput::{Text(String), Key(KeyInput { key, modifiers }), Composition(..), Paste(Pasted), Cut, Copy}`. A printable key is `Text`; Ctrl/Cmd chords and named keys are `Key`; Ctrl+V/X/C (Shift+Insert, Shift+Delete, Ctrl+Insert) are `Paste`/`Cut`/`Copy`. Tab still moves the focus. |
+| IME composition | `EditInput::Composition(Composition::{Start, Update { text, cursor }, End { text }})` | `Start` comes with the first preedit; an `Update` with empty text means the preedit was cleared (winit does that before every commit); `End { text }` is the commit, empty when cancelled. Keys are withheld while a preedit shows. A commit outside a composition is `Text`. |
+| Paste with HTML | `EditInput::Paste(Pasted::{Text(String), Html { html, text }})`; `ds_native::clipboard::read_html()` | The window reads `text/html` from arboard; the harness from its memory clipboard. The HTML is untrusted: sanitise it. |
+| Pointer to text position | `on_pointer: EventHandler<EditPointer>` | `EditPointer { phase: PointerPhase::{Press, Drag, Release}, at, position: Option<TextPosition>, extend: Extend::{Fresh, FromAnchor}, clicks: Clicks }`. `TextPosition { node: EditNode(key), offset: TextOffset(bytes) }`: UTF-8 bytes into the element's own text; an atom is 0 (before) or 1 (after). The surface focuses itself on a press. |
+| Caret, selection and surface rects | `let handle = use_edit_handle();` then `handle.caret_rect(&pos)`, `handle.selection_rects(&TextRange { anchor, focus })`, `handle.hit_test(point)`, `handle.bounds()`, `handle.focus()` | Each answers `Probe::{Found(T), Busy, Unknown}`. Window logical pixels, the same coordinates as `HostMeasure`; a caret is zero wide and its line tall; a selection is one rect per line plus each whole atom. Read a frame after the text changes. |
+| The IME's candidate window | `EditSurface { ime_area: Some(caret_rect) }` | Applied while the surface has the keyboard and each time it takes it; the IME is switched on at focus and off at blur. |
+| Focus in and out | `on_focus: EventHandler<EditFocus>` | `EditFocus::{In, Out}`: show or hide the app's caret. |
+| The host seam | `ds::HostEdit` = `ds_native::edit::EDIT` | `launch` and the harness provide it; another Blitz host calls `ds_native::edit::provide()` (and must forward its own IME events; see FINDINGS). Without a host the geometry reads are `Unknown` and keys still arrive. |
+| Tests | `Harness::ime_start()`, `ime_update(text, cursor)`, `ime_commit(text)`, `ime_end()`, `paste_html(html, text)`, `hit_test(selector, point)`, `ime_switch()`, `ime_cursor_area()`, `within(f)` | `within` runs a closure in the app's runtime, so a test reads an `EditHandle` as a handler would. `cargo run -p ds-native --example edit` prints every input from a real window, for trying an IME by hand. |
+
 ### App icons and the icon style (2026-09-25): what sill does
 
 quire ships its own app icons as files and a pure re-colouring function; loading, caching and

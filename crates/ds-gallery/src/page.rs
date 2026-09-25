@@ -27,11 +27,13 @@ pub enum Page {
     MotionLab,
     /// The shell chrome beside the macOS numbers it targets.
     Polish,
+    /// The edit surface over an app's own text, with the caret the app draws from its rect.
+    Edit,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 12] = [
+    pub const ALL: [Page; 13] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -44,6 +46,7 @@ impl Page {
         Page::Matrix,
         Page::MotionLab,
         Page::Polish,
+        Page::Edit,
     ];
 
     /// The `--page` word.
@@ -61,6 +64,7 @@ impl Page {
             Page::Matrix => "matrix",
             Page::MotionLab => "motion-lab",
             Page::Polish => "polish",
+            Page::Edit => "edit",
         }
     }
 }

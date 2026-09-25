@@ -1561,6 +1561,7 @@ dependencies = [
  "anyrender",
  "anyrender_vello_cpu",
  "anyrender_vello_hybrid",
+ "arboard",
  "blitz-dom",
  "blitz-html",
  "blitz-paint",

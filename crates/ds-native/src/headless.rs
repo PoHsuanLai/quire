@@ -6,6 +6,7 @@
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
 use crate::clipboard::HostClipboard;
+use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
 use crate::fonts::font_context;
 use crate::frame_links::{LinkInbox, frame_links};
@@ -57,6 +58,8 @@ pub(crate) struct Headless {
     pub(crate) shell: Arc<MemoryShell>,
     /// Links clicked in the document's frames, on their way to the app.
     links: LinkInbox,
+    /// The edit surfaces listening for IME events.
+    pub(crate) listeners: EditListeners,
 }
 
 impl Headless {
@@ -82,6 +85,7 @@ impl Headless {
             style_threading: StyleThreading::Sequential,
             ..Default::default()
         };
+        let listeners = EditListeners::default();
         let mut vdom = VirtualDom::new(app);
         // The app's own first, so a quire context of the same type (none today) would win.
         setup.contexts.install(&mut vdom);
@@ -95,9 +99,9 @@ impl Headless {
         vdom.provide_root_context(crate::measure::MEASURE);
         vdom.provide_root_context(crate::focus::FOCUS);
         vdom.provide_root_context(crate::focus::SELECT);
-        vdom.provide_root_context(HostClipboard::of(
-            Arc::clone(&shell) as Arc<dyn ShellProvider>
-        ));
+        vdom.provide_root_context(HostClipboard::memory(Arc::clone(&shell)));
+        vdom.provide_root_context(crate::edit::EDIT);
+        vdom.provide_root_context(listeners.clone());
         let mut doc = DioxusDocument::new(vdom, config);
         doc.initial_build();
         Headless {
@@ -108,6 +112,7 @@ impl Headless {
             layout: Layout::Running,
             shell,
             links,
+            listeners,
         }
     }
 

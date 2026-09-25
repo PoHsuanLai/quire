@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 12] = [
+pub const REGISTRY: [Entry; 13] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -105,6 +105,13 @@ pub const REGISTRY: [Entry; 12] = [
         lede: "The shell chrome beside the macOS numbers it targets: the material stack, a text menu and the menu-bar items, squircle corners, the dock pill and its plates, the launcher and the window shadow, each with the target printed under it.",
         height: 3000,
         body: pages::polish::PolishPage,
+    },
+    Entry {
+        page: Page::Edit,
+        title: "Edit",
+        lede: "An EditSurface over an app's own paragraphs and a chip: the surface hands the app its input and reports geometry; the caret here is the page's own, drawn from the host's caret rect.",
+        height: 600,
+        body: pages::edit_surface::EditPage,
     },
 ];
 
