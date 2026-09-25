@@ -1329,6 +1329,23 @@ Branch `icon-round2`; write-up `docs/icons-bakeoff.md` "Round three"; rules 08-I
 - **The emboss is noise below 48 px.** The procedural renderer drops it at 16 and 32 and
   strengthens recessed fills so the details survive.
 
+## Icon round six: the shipped set (2026-09-25)
+
+Branch `icon-ship`; design/08-ICONS.md 2.11; assets in `assets/icons/apps/`.
+
+- **One finish makes model faces and drawn faces one set.** Resampling the Klein face onto each
+  size's plate and drawing the plate, grain, bevel, rim and shadow at that size with the same code
+  as the procedural icons gives matching silhouettes, bevels and shadows; the exported 512s agree
+  within 2 px of shadow reach (`tools/icons/tests/shipped.rs`).
+- **A near-white plate cannot show the bevel arc.** The Paper plate (L 0.98) has no headroom for
+  a white highlight; its bevel reads through the bottom shade and the rim only.
+- **Exporting Monochrome neutral and tinting at run time holds up.** The neutral set retinted by
+  `ds::icon::retint` with the Work or Home tint reads like round four's Monochrome rendered in
+  that hue (compare `round6-shipped.png` with `round4-monochrome-space.png`), and one set serves
+  every Space.
+- **The grain dominates PNG size**: a 1024 icon is about 1.2 MB, a 512 about 300 KB; stopping
+  `@2` at 256 (design/08 2.6) keeps the whole three-style set at 6.1 MB.
+
 ## Icon round five: colourways (2026-09-25)
 
 Branch `icon-round5`; write-up `docs/icons-bakeoff.md` "Round five"; palette in 08-ICONS 2.10.

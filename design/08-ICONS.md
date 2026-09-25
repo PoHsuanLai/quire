@@ -426,6 +426,39 @@ icons inside our plates are desaturated and re-tinted** to the same hue (their l
 the Klein retint keeps it), so the dock stays one hue. Implementation beyond the keys and the
 sheets waits for the user's pick of a dialect per app.
 
+### 2.11 The shipped set (settled with the user 2026-09-25: "go with your suggestion for now")
+
+| App | Dialect | Hue | Source |
+| --- | --- | --- | --- |
+| Mail | Monochrome | slate (265) | Klein retint (round three face mode, seed 33) |
+| Files | Solid | ochre (85) | procedural |
+| Terminal | Monochrome | jade (175) | procedural |
+| Notes | Paper, clay spot | clay (40) | procedural |
+| Photos | Monochrome | rose (355) | Klein retint (round three face mode, seed 11) |
+
+All at chroma cap 0.07. `tools/icons/ship.toml` names each app's spec, dialect, hue and source;
+`tools/icons ship --manifest tools/icons/ship.toml --renders <round-three renders> --out
+assets/icons/apps` writes every size of every style, each drawn directly (a Klein face is
+resampled onto each size's plate; plate, grain, bevel, rim and shadow are drawn at that size):
+16, 22, 24, 32, 36, 44, 48, 64, 72, 96, 128, 256, 512 px (the freedesktop sizes, their `@2` up to
+256@2 as 2.6 settles, and the 1.5x sizes 36, 48, 72, 96). 1024 is not exported (2.6 stops `@2`
+at 256; with the grain a 1024 PNG is about 1.2 MB).
+
+**Styles** (`icons.style`, design/22 3.3): **Colour** = the table above
+(`assets/icons/apps/<app>/<px>.png`); **Muted** = the same at chroma cap **0.04**
+(`<app>/muted/`); **Monochrome** = every app in the Monochrome dialect, exported neutral grey
+(`<app>/monochrome/`) and tinted at run time by `ds::icon::retint` from `icons.monochrome_tint`
+(Space, Accent, Neutral). Third-party icons in our plates go through the same `retint` in Muted
+(chroma x 4/7) and Monochrome (keep lightness, take the tint's hue and chroma). `sill`'s part:
+CONSUMING.md "App icons and the icon style".
+
+**Consistency.** Procedural and Klein-derived icons share the plate geometry, bevel arc, bottom
+shade, specular point, rim, drop shadow, grain and the one palette by construction (one finish,
+one shadow, one grain for both). `tools/icons/tests/shipped.rs` checks it on the exported 512s
+of every style: silhouette against the squircle, bevel shade on all five, bevel arc on every
+plate that is not near white (the Paper plate, L 0.98, has no room for a white arc: its bevel
+shows as the shade and rim only), and the drop shadow's reach within 2 px.
+
 ## 3. Generation pipeline
 
 Settled route: LOCAL FIRST (PLAN "Icons", "Route").

@@ -1035,6 +1035,45 @@ struct literal.
 The window's app renders one frame after the host, once the document has the app's providers
 (a frame in the first render would otherwise be parsed with the wrong ones).
 
+### App icons and the icon style (2026-09-25): what sill does
+
+quire ships its own app icons as files and a pure re-colouring function; loading, caching and
+reading the settings are `sill`'s (design/08-ICONS.md 2.11).
+
+**The files.** `assets/icons/apps/<app>/<px>.png` is the shipped (Colour) set;
+`assets/icons/apps/<app>/muted/<px>.png` the Muted set (chroma cap 0.04);
+`assets/icons/apps/<app>/monochrome/<px>.png` the Monochrome set, exported **neutral grey**. Apps:
+`mail`, `files`, `terminal`, `notes`, `photos`. Sizes (every one drawn directly, not
+downscaled): 16, 22, 24, 32, 36, 44, 48, 64, 72, 96, 128, 256, 512. Pick the file whose size
+is the icon's size times the output scale: a 48 px dock tile at scale 1 is `48.png`, at 1.5
+`72.png`, at 2 `96.png`; the freedesktop `hicolor/<N>x<N>@2` of 24 is `48.png`. They are
+RGBA PNGs with the plate, bevel and, from 48 px, the baked drop shadow (design/08 2.5); show
+them through `IconSource::Image(ExternalIcon { url: IconUrl::file(&path)?, size })`.
+
+**The style.** Map `IconsSettings` (ds-settings) onto the `ds::icon` pair:
+
+| `icons.style` | our icons | third-party icons |
+| --- | --- | --- |
+| `Colour` | `<app>/<px>.png` | as they come |
+| `Muted` | `<app>/muted/<px>.png` | `retint(.., IconStyle::Muted, _)`: chroma x 4/7 |
+| `Monochrome` | `<app>/monochrome/<px>.png`, then `retint(.., IconStyle::Monochrome, tint)` | `retint(.., IconStyle::Monochrome, tint)` |
+
+`icons.monochrome_tint` gives the `ds::icon::Tint`: `Space` -> `Tint::space(&look.dots)` (the
+workspace's SpaceLook dots, the same `ds::space::derive` accent the frame uses), `Accent` ->
+`Tint::from_hex(&card_accent)`, `Neutral` -> `Tint::NEUTRAL`.
+
+**The function.** `ds::icon::retint(pixels: &mut [u8], style: ds::icon::IconStyle, tint:
+ds::icon::Tint)` re-colours an RGBA8 buffer (straight alpha) in place: lightness and alpha kept;
+Muted scales chroma by `ds::icon::retint::MUTED_SCALE`; Monochrome sets the tint's hue and chroma,
+shaped by lightness and alpha, pulled into sRGB. `Colour` is a no-op. It takes bytes, not an image:
+decode (the `image` crate, as for `classify`) and re-encode yourself.
+
+**When to call it.** After loading an icon and before caching it, keyed by (icon, size, scale,
+style, tint): for a third-party icon in Muted or Monochrome (inside our plate, after the 72 %
+inset of design/08 4.1, so the plate and the icon take one hue), and for our own Monochrome
+files. Never on a symbolic icon (it takes the text colour) and never per frame: a workspace
+switch that changes the Space tint re-keys the cache, the next paint loads the new entries.
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire

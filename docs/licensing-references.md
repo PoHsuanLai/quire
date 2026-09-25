@@ -42,7 +42,13 @@ Not used: `HiDream-ai/HiDream-O1-Image` (MIT), design/08's third candidate.
 
 ## Outputs
 
-Bake-off renders are not assets: they stay under `~/comfy/out/bakeoff/` and are not committed;
-only the contact sheets under `tools/progress/shots/icons/` are. Shipped icons will carry "our
-own licence" per design/08 section 5, with the recipe (model, weights sha256, workflow sha256,
-seed, prompt) committed next to each.
+Bake-off renders are not assets: they stay under `~/comfy/out/bakeoff/` (and `round2..5/`) and
+are not committed; only the contact sheets under `tools/progress/shots/icons/` are.
+
+**The shipped app icons** (`assets/icons/apps/`, design/08-ICONS.md 2.11) are our own icons,
+under the repository's licence (MIT OR Apache-2.0). Three (files, terminal, notes) are drawn by
+`tools/icons` from our specs; two (mail, photos) are derived from FLUX.2 Klein 4B renders
+(`black-forest-labs/FLUX.2-klein-4B`, Apache-2.0 weights, table above; round-three face mode,
+mail seed 33 and photos seed 11, prompt and workflow sha256 in `~/comfy/out/round3/klein-ground/
+runs.jsonl`), retinted and plated by `tools/icons ship` from `tools/icons/ship.toml`. The source
+renders are not committed; the exported PNGs are.
