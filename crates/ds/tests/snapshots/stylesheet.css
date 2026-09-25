@@ -588,6 +588,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-appearance{ display:grid; gap:var(--s-14); }
 .ds-appearance-row{ min-width:0; }
 .ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }
+
+/* Compact (sill FINDINGS Q101): for a host narrower than the Full Motion row (331 px), such as
+   the control center's 296 px module. The segmented rows fill the row and never pass it: small
+   segments with 4 px sides that grow from their words' width to share the rest, so "Reduced"
+   keeps every letter (a segment never shrinks below its words). */
+.ds-appearance[*|data-layout=compact] .ds-segmented{ display:flex; }
+.ds-appearance[*|data-layout=compact] .ds-segmented .ds-segment{ flex:1 1 auto; padding-left:var(--s-4); padding-right:var(--s-4); }
 /* -- avatar -- */
 /* Avatar (design/04-COMPONENTS.md section 11). Colours arrive inline as `--av-bg`/`--av-fg`
    (hexes computed in Rust, O-7). Attribute selectors carry `*|`, and a value starting with a

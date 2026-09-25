@@ -91,7 +91,7 @@ pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use animated_list::AnimatedList;
-pub use appearance_picker::AppearancePicker;
+pub use appearance_picker::{AppearancePicker, PickerLayout};
 pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
