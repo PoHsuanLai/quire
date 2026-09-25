@@ -73,6 +73,34 @@ impl Trailing {
     }
 }
 
+/// A mark before the label (mailo gaps 5), the counterpart of [`Trailing`]: a glyph, or an
+/// element the caller draws with quire's own components. The From dropdown shows the chosen
+/// account's provider as `Leading::Mark(rsx! { ProviderMark { size: MarkSize::Inline, .. } })`
+/// inside its value. The slot takes an `Element` rather than a `Provider` so any quire mark (an
+/// avatar, a person colour's dot) fits without a variant per kind; what goes in it is the
+/// caller's to keep to quire components, as for any children.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Leading {
+    /// A glyph at the button's icon size, in the label's colour.
+    Glyph(Icon),
+    /// A mark the caller built: a `ProviderMark`, an `Avatar`.
+    Mark(Element),
+}
+
+/// The leading mark, in its own span so the sheet can size and space it.
+pub(crate) fn leading(mark: Leading, icon_size: IconSize) -> Element {
+    match mark {
+        Leading::Glyph(icon) => rsx! {
+            span { class: "ds-button-lead",
+                Glyph { icon, size: icon_size }
+            }
+        },
+        Leading::Mark(element) => rsx! {
+            span { class: "ds-button-lead", {element} }
+        },
+    }
+}
+
 /// The label drawn in `face`: a span of words (runs in their tones, mailo gaps 5), or the
 /// face's letter in its style. The mark is `aria-hidden`, since the button is named by its
 /// label. Usable on its own as a `BubbleButton`'s `label`, so the bubble's marks need no raw
