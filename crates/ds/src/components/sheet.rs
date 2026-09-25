@@ -8,6 +8,7 @@
 
 use crate::components::popover::{Dismiss, Stacking, escape_closes, use_float};
 use crate::components::scrim::{ScrimLook, scrim_button_as};
+use crate::components::scrim_strength::ScrimStrength;
 pub use crate::components::sheet_placement::SheetPlacement;
 use crate::components::sheet_presence::{SheetShowing, Step, use_sheet_showing};
 use crate::components::tooltip::Shown;
@@ -25,6 +26,8 @@ use dioxus::prelude::*;
 /// `placement` says where it stands: [`SheetPlacement::Top`] (the default) 36 px from the top,
 /// [`SheetPlacement::Centre`] centred in its root both ways. A centred sheet needs a root that
 /// has a height: an overlay root passes `Ds { extent: RootExtent::Viewport }`.
+///
+/// `scrim` is its scrim's strength: [`ScrimStrength::Modal`] for a decision (a power menu).
 #[component]
 pub fn Sheet(
     label: String,
@@ -32,6 +35,7 @@ pub fn Sheet(
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
     #[props(default)] placement: SheetPlacement,
+    #[props(default)] scrim: ScrimStrength,
     children: Element,
 ) -> Element {
     let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
@@ -50,6 +54,7 @@ pub fn Sheet(
     let close = format!("Close {label}");
     let look = ScrimLook {
         presence: showing.leaving().then_some("leaving"),
+        strength: scrim,
     };
     let panel = rsx! {
         div {

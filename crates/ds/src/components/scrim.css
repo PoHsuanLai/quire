@@ -10,6 +10,10 @@
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
 
+/* Modal (sheet and modal parts): `--scrim-modal`, .40 light and .55 dark, behind a dialog that
+   asks for a decision; design/03 section 17. */
+.ds-scrim[*|data-strength=modal]{ background:var(--scrim-modal); }
+
 /* Leaving with its sheet (sill Q90): `menu-out`, the fade a closing menu plays, at `--t-quick
    --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
    pointer while it goes. */

@@ -423,3 +423,48 @@ fn a_muted_avatar_is_as_legible_as_a_plain_one() {
     }
     assert!(failures.is_empty(), "{failures:#?}");
 }
+
+/// `ground` as `#rrggbb`, from a `#rrggbb` token.
+fn rgb(hex: &str) -> [u8; 3] {
+    let channel = |at: usize| u8::from_str_radix(&hex[at..at + 2], 16).unwrap_or(0);
+    [channel(1), channel(3), channel(5)]
+}
+
+/// The paper under `scrim`, and the sheet's solid tint over that: the two grounds a modal shows.
+fn modal_grounds(scrim: ColourToken, scheme: Scheme) -> (String, String) {
+    let paper = rgb(&colour(ColourToken::Paper, scheme));
+    let dimmed = over(&colour(scrim, scheme), paper);
+    let sheet = recipe(Material::Sheet, scheme, DEFAULT_TINT_ALPHA).tint_solid;
+    let ground = over(&sheet, rgb(&dimmed));
+    (dimmed, ground)
+}
+
+/// Sheet and modal parts: `--scrim-modal` sets a modal sheet apart from the paper it dims more
+/// than `--scrim` does, by 3:1 in light (where the sheet is near white), while the sheet's own
+/// ink still reads at 4.5:1 on its tint over the dimmed paper in both schemes.
+#[test]
+fn the_modal_scrim_sets_the_sheet_apart_and_keeps_its_ink() {
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL {
+        let (standard_paper, standard_sheet) = modal_grounds(ColourToken::Scrim, scheme);
+        let (modal_paper, modal_sheet) = modal_grounds(ColourToken::ScrimModal, scheme);
+        let standard = measured(&standard_sheet, &standard_paper);
+        let modal = measured(&modal_sheet, &modal_paper);
+        if modal <= standard {
+            failures.push(format!(
+                "{scheme:?}: modal {modal:.2} is not above standard {standard:.2}"
+            ));
+        }
+        if scheme == Scheme::Light && modal < 3.0 {
+            failures.push(format!(
+                "light: the sheet stands {modal:.2}:1 off the dimmed paper"
+            ));
+        }
+        let ink = colour(ColourToken::Ink, scheme);
+        let reads = measured(&ink, &modal_sheet);
+        if reads < 4.5 {
+            failures.push(format!("{scheme:?}: {ink} on {modal_sheet} is {reads:.2}"));
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
