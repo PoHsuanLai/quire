@@ -2,7 +2,7 @@
 //! numbers it targets (design/13-BEHAVIOUR-menus-windows.md section 13.2, design/10-BEHAVIOUR-dock.md
 //! section 10.2, plan Appendix C), each with the target printed under it: the material stack,
 //! a text menu and the menu-bar items, the squircle corner, the dock pill and its tiles, the
-//! launcher and the window shadow.
+//! launcher and the window shadow; then the window frame (`polish_window`).
 
 use super::app_icons::{APPS, app_icon};
 use super::{Section, Specimen};
@@ -22,7 +22,7 @@ use ds::{
 /// A nested root in `material` with the page's look and blur state, as a shell surface's root: its chrome is
 /// the material's own (a Popover root is transparent and its cards paint), unlike `Scope`'s.
 #[component]
-fn Root(
+pub(super) fn Root(
     material: Material,
     #[props(default)] stack: Option<MaterialStack>,
     #[props(default)] radius: Option<Corner>,
@@ -79,6 +79,7 @@ pub fn PolishPage() -> Element {
         DockSection {}
         LauncherSection {}
         WindowSection {}
+        super::polish_window::WindowFrameSection {}
     }
 }
 
