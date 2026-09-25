@@ -68,6 +68,7 @@ pub fn ControlsPage() -> Element {
         Buttons {}
         ButtonFaces {}
         super::controls_mailo5::ButtonsMailo5 {}
+        super::controls_mailo6::MoreGlyphs {}
         StatusItems {}
         ExternalIcons {}
         DockTiles {}
