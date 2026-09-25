@@ -17,5 +17,9 @@ peniko = { workspace = true }
 krilla = { workspace = true }
 skrifa = { workspace = true }
 
+[dev-dependencies]
+# Reading the painted page back.
+pdfrum = { workspace = true }
+
 [lints]
 workspace = true
