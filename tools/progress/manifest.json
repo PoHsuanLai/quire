@@ -1,6 +1,19 @@
 {
- "updated": "2026-09-25, the level control's three looks up for the pick; control center and power menu parts landing",
+ "updated": "2026-09-25, windows move and resize; F47 real input fixed; the level control awaits the pick",
  "entries": [
+  {
+   "id": "window-interact",
+   "date": "2026-09-25 · shell-host windows, and F47",
+   "title": "Our own windows can be moved, resized and zoomed; and the host had never received real input until now",
+   "status": "proven",
+   "lede": "Client-decorated windows (mailo on Blitz, the future apps) gain interactive move and resize with the pointer's press serial, maximise, minimise and fullscreen, the window's state readable by the frame, and an invisible 7 px resize margin around the visible frame with the right cursors, excluded from the window geometry and the blur. On the way the agent found that the host had never created a pointer or keyboard at all: the toolkit routes a seat that already exists at bind time through a different callback than a seat announced later, and the handler ignored it. Every acceptance so far drove surfaces through the debug-injection path, which bypasses Wayland input, so nothing noticed. Fixed in the same branch; everything believed about live typing, hovering and clicking through the host is unverified until re-run with a real mouse and keyboard.",
+   "notes": [
+    "Headless KWin with fake input: a titlebar drag moves the frame by the drag; a bottom-right margin drag grows 480x320 to 580x380 with the origin fixed; maximise fills the output minus the bar; cursor shapes default, nwse-resize, ns-resize; 5 s idle at 0 frames. Nested cosmic-comp: maximise and fullscreen work; a move with the pointer elsewhere is refused, nothing sent.",
+    "For the compositor fork list: cosmic-comp 1.8 configures every floating window as tiled on all four edges, so no resize margin can exist there; and neither cosmic-comp nor KWin lets a client tile itself left, right or centred (no placement request in xdg_toplevel, none in cosmic's toplevel manager, KDE's set_position is KDE-only), so the window menu ships Fill only.",
+    "The document's own CSS cursor is now applied; it used to be recorded and never shown."
+   ],
+   "images": []
+  },
   {
    "id": "level-control",
    "date": "2026-09-25 · the level control",

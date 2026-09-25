@@ -4,9 +4,14 @@
 //! are answered on the calling thread. The waker fires after each answer so the host paints the
 //! frame the resource landed in: blitz applies a loaded image on the next resolve, one frame late
 //! (spike S7).
+//!
+//! A frame's request for the app waits in the document's `FrameBook` until the frame is found
+//! under its `iframe`, so it reaches the app with the frame's tag (`crate::frame_book`).
 
 use crate::data_url;
-use crate::net_policy::{NetPolicy, NetReply, NetRequest};
+use crate::frame_book::FrameBook;
+use crate::frame_tag::FrameTag;
+use crate::net_policy::{NetDecision, NetPolicy, NetReply, NetRequest};
 use crate::origin::{FrameId, RequestOrigin};
 use crate::route::{Document, Policy, Route, route};
 use blitz_traits::net::{Bytes, NetHandler, NetProvider, NetWaker, Request};
@@ -15,7 +20,7 @@ use std::sync::Arc;
 /// Serves one kind of document under the app's policy.
 pub(crate) struct DsNet {
     /// The app's document or a frame's.
-    document: Document,
+    served: Served,
     /// The app's choice.
     policy: NetPolicy,
     /// Who answers the app document's other schemes under `NetPolicy::Local`, if anyone.
@@ -32,7 +37,7 @@ impl DsNet {
         waker: Option<Arc<dyn NetWaker>>,
     ) -> Arc<dyn NetProvider> {
         Arc::new(DsNet {
-            document: Document::Top,
+            served: Served::Top,
             policy,
             fallback,
             waker,
@@ -43,20 +48,21 @@ impl DsNet {
     pub(crate) fn frame(
         policy: NetPolicy,
         waker: Option<Arc<dyn NetWaker>>,
+        book: FrameBook,
     ) -> Arc<dyn NetProvider> {
         Arc::new(DsNet {
-            document: Document::Frame,
+            served: Served::Frame(book),
             policy,
             fallback: None,
             waker,
         })
     }
 
-    /// Where a request from Blitz document `doc_id` came from.
-    fn origin(&self, doc_id: usize) -> RequestOrigin {
-        match self.document {
-            Document::Top => RequestOrigin::Top,
-            Document::Frame => RequestOrigin::Frame(FrameId::of(doc_id)),
+    /// Which kind of document this provider serves.
+    fn document(&self) -> Document {
+        match self.served {
+            Served::Top => Document::Top,
+            Served::Frame(_) => Document::Frame,
         }
     }
 
@@ -78,15 +84,59 @@ impl DsNet {
         }
     }
 
-    /// Put the request to the app, and fetch it through the app if it is admitted.
+    /// Put the request to the app: the app document's now, a frame's once its tag is known.
     fn ask_app(&self, doc_id: usize, request: Request, handler: Box<dyn NetHandler>) {
         let NetPolicy::Custom(app) = &self.policy else {
             return;
         };
-        let asked = NetRequest::new(self.origin(doc_id), request.url);
-        if app.decide(&asked) == crate::net_policy::NetDecision::Allow {
-            let reply = NetReply::new(handler, asked.url().to_owned(), doc_id, self.waker.clone());
-            app.fetch(asked, reply);
+        let asking = Asking {
+            app: Arc::clone(app),
+            waker: self.waker.clone(),
+            doc_id,
+            request,
+            handler,
+        };
+        match &self.served {
+            Served::Top => asking.ask(RequestOrigin::Top, None),
+            Served::Frame(book) => {
+                let frame = FrameId::of(doc_id);
+                book.ask(
+                    frame,
+                    Box::new(move |tag| asking.ask(RequestOrigin::Frame(frame), tag)),
+                );
+            }
+        }
+    }
+}
+
+/// Which document a provider serves, and for a frame, the book its requests wait in.
+enum Served {
+    Top,
+    Frame(FrameBook),
+}
+
+/// One request on its way to the app.
+struct Asking {
+    app: Arc<dyn crate::net_policy::AppNet>,
+    waker: Option<Arc<dyn NetWaker>>,
+    doc_id: usize,
+    request: Request,
+    handler: Box<dyn NetHandler>,
+}
+
+impl Asking {
+    /// Put the request to the app as coming from `origin` (tagged `tag`), and fetch it through
+    /// the app if it is admitted.
+    fn ask(self, origin: RequestOrigin, tag: Option<FrameTag>) {
+        let asked = NetRequest::new(origin, tag, self.request.url);
+        if self.app.decide(&asked) == NetDecision::Allow {
+            let reply = NetReply::new(
+                self.handler,
+                asked.url().to_owned(),
+                self.doc_id,
+                self.waker,
+            );
+            self.app.fetch(asked, reply);
         }
     }
 }
@@ -94,7 +144,7 @@ impl DsNet {
 impl NetProvider for DsNet {
     fn fetch(&self, doc_id: usize, request: Request, handler: Box<dyn NetHandler>) {
         match route(
-            self.document,
+            self.document(),
             request.url.scheme(),
             Policy::of(&self.policy),
         ) {
