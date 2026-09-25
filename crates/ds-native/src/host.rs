@@ -8,8 +8,11 @@
 //!   (S7/S8). The app renders once they are in place, a frame after the host.
 //! - Rect reads go through `ds::HostMeasure`, which waits out a document the renderer is
 //!   holding instead of panicking (`crate::measure`); focus changes go through `ds::HostFocus`
-//!   the same way (`crate::focus`); an edit surface's geometry and IME through `ds::HostEdit`
+//!   and `ds::HostBlur` the same way, and an element named by selector is found through
+//!   `ds::HostFind` (`crate::focus`); an edit surface's geometry and IME through `ds::HostEdit`
 //!   (`crate::edit`).
+//! - Under `FocusFallback::Ancestor` (the default), `ds::HostClickFocus`: a click on nothing
+//!   focusable leaves the keyboard on the nearest focusable ancestor (`crate::click_focus`).
 //! - IME events: dioxus-native-dom drops them, but this window hook hears each winit event
 //!   before the document does, so an IME event goes to the edit surface that has the keyboard
 //!   (`crate::edit_ime`).
@@ -23,10 +26,12 @@
 //! The document is reached through a hidden element's `onmounted` handle: dioxus-native builds
 //! the document itself and hands the app nothing else that can see it.
 
+use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::{EditListeners, ime_of};
 use crate::frame_links::frame_links;
 use crate::install::install;
+use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
 use blitz_traits::shell::ColorScheme;
@@ -67,11 +72,21 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
+    use_context_provider(|| crate::focus::BLUR);
     use_context_provider(|| crate::focus::SELECT);
+    let fallback = props.setup.focus_fallback;
+    use_hook(|| {
+        (fallback == FocusFallback::Ancestor)
+            .then(|| provide_context(crate::click_focus::CLICK_FOCUS))
+    });
     use_context_provider(|| crate::edit::EDIT);
     let listeners = use_context_provider(EditListeners::default);
     let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
+    let found = Rc::clone(&document);
+    use_context_provider(move || {
+        crate::focus::finder(move || found.borrow().clone().map(DocRef::Handle))
+    });
     let window = use_window();
     let factor = window.scale_factor();
     let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));
