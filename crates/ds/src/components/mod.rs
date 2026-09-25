@@ -63,6 +63,7 @@ pub mod send_pill;
 pub mod sheet;
 pub mod sidebar_item;
 pub mod slider;
+pub(crate) mod slider_level;
 pub mod space_editor;
 pub mod spinner;
 pub mod sync_halo;
@@ -127,7 +128,7 @@ pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
-pub use slider::Slider;
+pub use slider::{Slider, SliderMode};
 pub use space_editor::{
     ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
 };
