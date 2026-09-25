@@ -6,8 +6,8 @@ use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip,
     ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind, Hex, Icon, IconButton,
     IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize,
-    LabelHue, PersonHue, SearchField, SectionHeader, SegSize, SegmentedControl, Slider, SliderMode,
-    Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
+    LabelHue, PersonHue, SearchField, SectionHeader, SegSize, SegmentedControl, Slider, Spinner,
+    SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
 
 /// A symbolic SVG, 16 px.
@@ -463,12 +463,6 @@ pub const MOTION_CASES: &[Case] = &[
         component: "slider",
         state: "disabled",
         make: || rsx! { Slider { label: "Brightness", value: Fraction(500), availability: Availability::Disabled, onchange: |_| {} } },
-    },
-    // The OSD's read-only level bar (sill FINDINGS Q74): no thumb, no tabindex, a progressbar.
-    Case {
-        component: "slider",
-        state: "level",
-        make: || rsx! { Slider { label: "Volume", value: Fraction(620), mode: SliderMode::Level } },
     },
     Case {
         component: "chip",

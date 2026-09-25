@@ -18,9 +18,3 @@
   border-radius:var(--r-pill); border:3px solid var(--handle-ring); box-shadow:var(--shadow-handle); cursor:grab;
 }
 .ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }
-
-/* The read-only level (`SliderMode::Level`, sill FINDINGS Q74): the track and fill alone, nothing
-   to take hold of. The fill slides to a new level over `--t-quick --e-out` (design/20 section
-   1.7), where the control's fill follows the pointer 1:1 and never transitions. */
-.ds-slider[*|data-mode=level]{ cursor:default; }
-.ds-slider[*|data-mode=level] .ds-slider-fill{ transition:width var(--t-quick) var(--e-out); }

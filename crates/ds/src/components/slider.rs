@@ -1,9 +1,6 @@
 //! Slider: a continuous value, divs and a drag tracker, because Blitz has no native range
-//! (design/04-COMPONENTS.md section 5). [`SliderMode::Level`] draws the same track and fill as a
-//! read-only level bar (`slider_level.rs`): the OSD's volume and brightness (design/20 section
-//! 1.7; sill FINDINGS Q74).
+//! (design/04-COMPONENTS.md section 5).
 
-use crate::components::slider_level::LevelBar;
 use crate::components::vocab::{Availability, Fraction};
 use crate::geometry::measure::client_rect;
 use crate::geometry::units::{Point, Px, Rect};
@@ -65,7 +62,7 @@ fn fraction_at(rect: Rect, x: Px) -> Fraction {
 }
 
 /// `aria-valuenow`: the value on the 0..=100 scale the markup declares.
-pub(crate) fn percent(value: Fraction) -> u16 {
+fn percent(value: Fraction) -> u16 {
     (value.clamped().0 + 5) / 10
 }
 
@@ -77,53 +74,18 @@ fn point(at: ClientPoint) -> Point {
     }
 }
 
-/// What a slider is for.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum SliderMode {
-    /// A control: the thumb, the keyboard focus and the drag tracker; the fill follows the
-    /// pointer 1:1.
-    #[default]
-    Interactive,
-    /// A read-only level (`role="progressbar"`): no thumb, no tabindex, no drag tracker, and the
-    /// fill slides to a new value over `--t-quick --e-out` instead of jumping, because a level
-    /// that changes under a key press is read as motion, not as a jump (design/20 section 1.7,
-    /// "level change `--t-quick` `--e-out`").
-    Level,
-}
-
-/// A value in a range, or with `mode: SliderMode::Level` a read-only level bar. `onchange` is
-/// never called in `Level`, so a level bar may leave it out.
-#[component]
-pub fn Slider(
-    label: String,
-    value: Fraction,
-    #[props(default)] step: Fraction,
-    #[props(default)] availability: Availability,
-    #[props(default)] mode: SliderMode,
-    #[props(default)] onchange: EventHandler<Fraction>,
-) -> Element {
-    match mode {
-        SliderMode::Interactive => rsx! {
-            Control { label, value, step, availability, onchange }
-        },
-        SliderMode::Level => rsx! {
-            LevelBar { label, value, availability }
-        },
-    }
-}
-
-/// The control.
+/// A value in a range.
 ///
 /// The `DragTracker` owns the gesture: pointer down jumps the value to the pointer and marks
 /// the thumb live, moves follow 1:1, up releases. The slider's rect is read in the pointer-down
 /// handler, after layout, never in `onmounted` (spike S9), and the pointer-down also focuses the
 /// slider, since Blitz focuses only text inputs on click (spike S12).
 #[component]
-fn Control(
+pub fn Slider(
     label: String,
     value: Fraction,
-    step: Fraction,
-    availability: Availability,
+    #[props(default)] step: Fraction,
+    #[props(default)] availability: Availability,
     onchange: EventHandler<Fraction>,
 ) -> Element {
     let drag = use_drag::<()>(NO_THRESHOLD);
