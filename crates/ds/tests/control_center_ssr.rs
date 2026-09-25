@@ -4,6 +4,11 @@
 //!
 //! `DS_BLESS=1 cargo test -p ds --features lint --test control_center_ssr` rewrites the goldens.
 
+#[path = "support/golden.rs"]
+mod golden;
+#[path = "control_center/tiles.rs"]
+mod tiles;
+
 use dioxus::prelude::*;
 use ds::icon::render::GlyphProps;
 use ds::lint::{LintConfig, Profile, markup};
@@ -42,4 +47,88 @@ fn every_control_glyph_renders_and_lints_clean() {
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// A rendered specimen: its golden name and markup.
+type Rendered = (String, String);
+
+fn tile_markup(case: tiles::TileCase) -> String {
+    let mut dom = VirtualDom::new_with_props(tiles::tile, case);
+    dom.rebuild_in_place();
+    dioxus_ssr::render(&dom)
+}
+
+/// Every specimen, rendered.
+fn specimens() -> Vec<Rendered> {
+    tiles::grid()
+        .into_iter()
+        .chain(tiles::chevrons())
+        .map(|(name, case)| (name, tile_markup(case)))
+        .collect()
+}
+
+#[test]
+fn every_specimen_matches_its_golden() {
+    let failures: Vec<String> = specimens()
+        .iter()
+        .filter_map(|(name, html)| {
+            golden::check(&format!("control_center/{name}.html"), html).err()
+        })
+        .collect();
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn every_specimen_lints_clean_and_every_class_is_styled() {
+    let sheet = ds::stylesheet();
+    let mut failures = Vec::new();
+    for (name, html) in specimens() {
+        for offence in markup(&html, sheet, &LintConfig::default()) {
+            failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
+        }
+        for class in html
+            .split("class=\"")
+            .skip(1)
+            .filter_map(|rest| rest.split('"').next())
+            .flat_map(str::split_whitespace)
+            .filter(|class| class.starts_with("ds-"))
+        {
+            let needle = format!(".{class}");
+            let styled = sheet.match_indices(&needle).any(|(at, _)| {
+                !sheet[at + needle.len()..]
+                    .starts_with(|c: char| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+            });
+            if !styled {
+                failures.push(format!("{name}: .{class} is not styled"));
+            }
+        }
+    }
+    failures.dedup();
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// A tile says what it is in its attributes: the state as `data-state` and `aria-pressed`
+/// (mixed while busy), the span, and the chevron's own name and `aria-expanded`.
+#[test]
+fn a_tile_writes_its_state_span_and_chevron() {
+    for (name, case) in tiles::grid() {
+        let html = tile_markup(case.clone());
+        let (state, pressed) = match case.state {
+            ds::ModuleState::Off => ("off", "false"),
+            ds::ModuleState::On => ("on", "true"),
+            ds::ModuleState::Busy => ("busy", "mixed"),
+        };
+        assert!(html.contains(&format!("data-state=\"{state}\"")), "{name}");
+        assert!(
+            html.contains(&format!("aria-pressed=\"{pressed}\"")),
+            "{name}"
+        );
+        assert_eq!(
+            html.contains("ds-spinner"),
+            state == "busy",
+            "{name}: breathe only while busy"
+        );
+        assert!(html.contains("aria-label=\"Wi-Fi details\""), "{name}");
+        assert!(html.contains("aria-expanded=\"false\""), "{name}");
+    }
 }
