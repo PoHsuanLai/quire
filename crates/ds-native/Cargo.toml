@@ -35,6 +35,17 @@ krilla = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 
+[target.'cfg(target_os = "linux")'.dependencies]
+# The print portal (the `print` feature): zbus with quire's async-io default (no executor is
+# forced on the app), and a sealed memfd for the PDF's file descriptor.
+zbus = { workspace = true, optional = true }
+memfd = { workspace = true, optional = true }
+
+[features]
+# `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
+# Off by default, so an app that never prints builds no D-Bus client for it.
+print = ["dep:zbus", "dep:memfd"]
+
 [lints]
 workspace = true
 
@@ -52,3 +63,7 @@ name = "edit"
 
 [[example]]
 name = "pdf"
+
+[[example]]
+name = "print"
+required-features = ["print"]

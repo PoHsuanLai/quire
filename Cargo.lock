@@ -1680,12 +1680,14 @@ dependencies = [
  "image",
  "keyboard-types 0.7.0",
  "krilla",
+ "memfd",
  "parley",
  "pdfrum",
  "peniko",
  "thiserror 2.0.20",
  "tokio",
  "wgpu",
+ "zbus",
 ]
 
 [[package]]
