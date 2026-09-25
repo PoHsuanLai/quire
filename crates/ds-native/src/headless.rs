@@ -5,6 +5,7 @@
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
+use crate::click_focus::FocusFallback;
 use crate::clipboard::HostClipboard;
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
@@ -13,6 +14,7 @@ use crate::frame_links::{LinkInbox, frame_links};
 use crate::frames::FrameParser;
 use crate::memory_shell::MemoryShell;
 use crate::net::DsNet;
+use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
 use crate::snapshot::Viewport;
@@ -29,6 +31,7 @@ use dioxus_native_dom::DioxusDocument;
 use ds::{HostModality, HostScale, InputModality, Scale};
 use peniko::kurbo::{Affine, Rect};
 use peniko::{Color, Fill};
+use std::rc::Rc;
 use std::sync::Arc;
 use std::task::{Context, Waker};
 use std::time::Duration;
@@ -98,11 +101,18 @@ impl Headless {
         vdom.provide_root_context(HostScale(scale));
         vdom.provide_root_context(crate::measure::MEASURE);
         vdom.provide_root_context(crate::focus::FOCUS);
+        vdom.provide_root_context(crate::focus::BLUR);
         vdom.provide_root_context(crate::focus::SELECT);
+        if setup.focus_fallback == FocusFallback::Ancestor {
+            vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);
+        }
         vdom.provide_root_context(HostClipboard::memory(Arc::clone(&shell)));
         vdom.provide_root_context(crate::edit::EDIT);
         vdom.provide_root_context(listeners.clone());
         let mut doc = DioxusDocument::new(vdom, config);
+        let found = DocRef::Cell(Rc::clone(&doc.inner));
+        doc.vdom
+            .provide_root_context(crate::focus::finder(move || Some(found.clone())));
         doc.initial_build();
         Headless {
             doc,
