@@ -106,7 +106,8 @@ html,body{margin:0;padding:0;background:transparent}
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), below.
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and the OSD's
+     `osd-in` and `osd-out` (sill Q75), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -289,6 +290,18 @@ html,body{margin:0;padding:0;background:transparent}
 /* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+
+/* osd-in and osd-out (quire's, sill Q75): the OSD card's pair, following its anchor through
+   `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at
+   the top right, so the card drops in from above and lifts back up as it goes; 8px at the bottom
+   centre, so it rises in and drops away. In: from `--osd-dy` at a .96 scale and transparent, to
+   rest, at `--t-quick --e-out` (design/20 section 1.7): `pop-in`'s entrance with no overshoot,
+   since a level shown under a key press settles, it does not bounce. Out: to half of `--osd-dy`
+   and transparent at `--t-move --e-exit` (design/05 section 10), holding that last frame until
+   the host unmaps the surface. Played outside the card (its `a-osd-in` pulse class), the offset
+   is the top right's, the default position. */
+@keyframes osd-in{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
+@keyframes osd-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -363,6 +376,8 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
 @keyframes busy--b{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+@keyframes osd-in--b{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
+@keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -467,6 +482,10 @@ html,body{margin:0;padding:0;background:transparent}
 .a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
 .a-busy[*|data-pulse=a]{animation:busy var(--t-ambient) var(--e-in-out) infinite;}
 .a-busy[*|data-pulse=b]{animation:busy--b var(--t-ambient) var(--e-in-out) infinite;}
+.a-osd-in[*|data-pulse=a]{animation:osd-in var(--t-quick) var(--e-out);}
+.a-osd-in[*|data-pulse=b]{animation:osd-in--b var(--t-quick) var(--e-out);}
+.a-osd-out[*|data-pulse=a]{animation:osd-out var(--t-move) var(--e-exit) forwards;}
+.a-osd-out[*|data-pulse=b]{animation:osd-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,

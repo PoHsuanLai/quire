@@ -570,6 +570,18 @@ Settled for the port; the catalogue above is unchanged except where named.
   `min(1, (--overshoot - 1) x 25)`: 1 at Standard and Extra, 0 at Calm and Reduced. Calm (3.2:
   "no overshoot") now flattens them as it flattens `pop-in`; Standard is the text above.
 
+### 4.6 Added by quire (OSD parts, 2026-09-25)
+
+- `osd-in`: `from{ opacity:0; transform:translateY(var(--osd-dy)) scale(.96) } to{ opacity:1;
+  transform:none }` at `--t-quick --e-out` (design/20 §1.7's "in"), `Anim::OsdIn`: `pop-in`'s
+  entrance with no overshoot.
+- `osd-out`: `from{ opacity:1; transform:none } to{ opacity:0;
+  transform:translateY(calc(var(--osd-dy) * .5)) }` at `--t-move --e-exit`, forwards (§10's exit
+  rule), `Anim::OsdOut`.
+- `--osd-dy` is the card's signed offset for its anchor, declared by `ds::Osd` per position:
+  `-8px` at the top right (drops in from above, lifts back out), `8px` at the bottom centre
+  (rises in, drops away). Played outside the card, the fallback is the top right's.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and
