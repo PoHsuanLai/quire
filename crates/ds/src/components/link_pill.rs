@@ -4,10 +4,10 @@
 //! link and drops it on leave: no intent delay, no exit. It enters with `Anim::LinkPillIn`
 //! (`hc-in` at `--t-quick --e-out`, `S:433`), reported as `data-presence` like every entrance.
 
-use crate::components::popover::use_entrance;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::motion::anim::Anim;
+use crate::motion::entrance::use_entrance;
 use dioxus::prelude::*;
 
 /// Where a link goes, as mail decided it.
