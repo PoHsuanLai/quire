@@ -40,7 +40,7 @@ pub const REGISTRY: [Entry; 13] = [
         page: Page::Controls,
         title: "Controls",
         lede: "Every control in every state it can express: variants, pressed, expanded, disabled, empty and filled. Press Tab to see the keyboard focus ring.",
-        height: 2750,
+        height: 3450,
         body: pages::controls::ControlsPage,
     },
     Entry {
@@ -54,7 +54,7 @@ pub const REGISTRY: [Entry; 13] = [
         page: Page::Overlays,
         title: "Overlays",
         lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
-        height: 3450,
+        height: 5250,
         body: pages::overlays::OverlaysPage,
     },
     Entry {

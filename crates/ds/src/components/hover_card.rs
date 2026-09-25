@@ -17,10 +17,11 @@ pub use parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint};
 pub use target::{HoverTarget, TargetElement};
 
 use crate::components::flow::Flow;
-use crate::components::popover::{Float, Stacking, position_style, use_entrance, use_float};
+use crate::components::popover::{Float, Stacking, position_style, use_float};
 use crate::geometry::measure::client_rect;
 use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
 use crate::motion::anim::Anim;
+use crate::motion::entrance::use_entrance;
 use crate::motion::hover_intent::HoverEvent;
 use crate::overlay::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use crate::time::{FRAME_SLACK, sleep};

@@ -4,7 +4,9 @@
 pub mod anim;
 pub mod curve;
 pub mod drag;
+pub mod entrance;
 pub mod hover_intent;
+pub mod pane_slide;
 pub mod presence;
 pub mod pulse;
 pub mod recipe;
@@ -17,7 +19,9 @@ pub mod use_roster;
 
 pub use anim::{Anim, Fill, Iteration, Recipe};
 pub use drag::{Drag, DragPhase, DragTracker, use_drag};
+pub use entrance::use_entrance;
 pub use hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};
+pub use pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
 pub use presence::{Exit, ListPresence, Presence};
 pub use pulse::{Pulse, use_pulse};
 pub use roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};

@@ -100,3 +100,6 @@
    hovered. The gallery's class, never a `ds-` one. */
 .g-reveal-row .g-reveal{opacity:.35;transition:opacity var(--t-quick) var(--e-out)}
 .g-reveal-row:hover .g-reveal{opacity:1}
+/* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
+.g-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
+.g-cc-body{padding:var(--s-12)}

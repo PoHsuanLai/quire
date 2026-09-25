@@ -39,12 +39,16 @@ pub mod menu_pick;
 pub(crate) mod menu_rows;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
+pub mod module_grid;
+pub mod module_tile;
+pub mod module_tile_kind;
 pub(crate) mod muted;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
+pub mod pane_switcher;
 pub mod pass_through;
 pub mod peek;
 pub mod popover;
@@ -61,6 +65,8 @@ pub mod segmented;
 pub mod selection_bubble;
 pub mod send_mood;
 pub mod send_pill;
+pub mod settings_row;
+pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sidebar_item;
 pub mod slider;
@@ -114,7 +120,11 @@ pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
 pub use menu_filter::Filter;
 pub use menu_pick::PickDismiss;
+pub use module_grid::ModuleGrid;
+pub use module_tile::ModuleTile;
+pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
 pub use palette_shown::Retain;
+pub use pane_switcher::PaneSwitcher;
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
@@ -129,6 +139,8 @@ pub use segmented::{SegSize, SegmentedControl};
 pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble};
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
+pub use settings_row::SettingsRow;
+pub use settings_row_trailing::RowTrailing;
 pub use sheet::Sheet;
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
@@ -175,6 +187,8 @@ pub const CSS: &[(&str, &str)] = &[
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
+    ("module_tile", include_str!("module_tile.css")),
+    ("pane_switcher", include_str!("pane_switcher.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
     ("provider_mark", include_str!("provider_mark.css")),
@@ -184,6 +198,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("segmented", include_str!("segmented.css")),
     ("selection_bubble", include_str!("selection_bubble.css")),
     ("send_pill", include_str!("send_pill.css")),
+    ("settings_row", include_str!("settings_row.css")),
     ("sheet", include_str!("sheet.css")),
     ("sidebar_item", include_str!("sidebar_item.css")),
     ("slider", include_str!("slider.css")),

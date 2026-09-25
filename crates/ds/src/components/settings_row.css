@@ -1,0 +1,25 @@
+/* SettingsRow (sill FINDINGS Q79): a 44 px row with a hairline (`--hair`, `--line`) above every
+   row after the first, the words in the shell text menu's type (title `--fs-shell-menu` at 400,
+   detail `--fs-help` in `--ink-faint`, as `MenuEntry::Row` in a Slim menu, design/13 section
+   13.3.3), a 16 px glyph in a 22 px column, and the trailing mark at the end. Under the pointer
+   the row takes the Dropdown's `--surface-2` at the shell highlight's radius. A check is
+   `--accent`; a chevron, a value and a glyph are `--ink-faint`. */
+
+.ds-settings-row{
+  display:flex; align-items:center; gap:var(--s-8); min-height:44px; box-sizing:border-box; padding:0 var(--s-8);
+  border-top:var(--hair) solid transparent; border-radius:var(--r-shell-highlight); color:var(--ink); cursor:pointer; user-select:none;
+  transition:background-color var(--t-quick) var(--e-out);
+}
+.ds-settings-row + .ds-settings-row{ border-top-color:var(--line); }
+.ds-settings-row:hover{ background:var(--surface-2); }
+.ds-settings-row[*|aria-disabled=true]{ opacity:.35; cursor:default; }
+.ds-settings-row[*|aria-disabled=true]:hover{ background:transparent; }
+
+.ds-settings-row-glyph{ display:grid; place-items:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-settings-row-words{ display:flex; flex-direction:column; flex:1; min-width:0; }
+.ds-settings-row-title{ font-size:var(--fs-shell-menu); font-weight:400; line-height:1.3; }
+.ds-settings-row-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+.ds-settings-row-trail{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); }
+.ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent); }
+.ds-settings-row-value{ font-size:var(--fs-help); }
