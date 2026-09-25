@@ -2334,6 +2334,101 @@ becomes `Scrim { flow: Flow::Inline }` before the reader; the quoted-message hea
 runs; its "Filter…" menus `Filter::Field`; the drag's outline `DropState::Accepts`; the From
 value `leading: Leading::Mark(ProviderMark)`; the spoof flag `HoverCardPart::flag` with runs.
 
+## mailo gaps 6 (2026-09-25)
+
+mailo, on v0.1.8 with one raw control left, reported four gaps. Branch `mailo-gaps-6`, one commit
+per item. Every prop is additive; the one markup change is `SidebarItem`'s class list
+(`ds-sidebar-item ds-drop-place`), which its goldens show. CONSUMING.md "The mailo gaps 6
+(2026-09-25)" has one row per change, docs/mailo-migration.md section 2 the row for each mailo
+site. Proofs: the Harness tests `crates/ds-native/tests/mailo6_{scrim_layer,tree_item}.rs`, the
+goldens in `crates/ds/tests/mailo_gaps6_ssr.rs` and `overlays/mailo6.rs`, the lint test
+`crates/ds/tests/pass_through_lint.rs`, and the gallery's Controls and Lists pages.
+
+1. **A "more" glyph.** `Icon::Ellipsis` and `Icon::EllipsisVertical`, Lucide `ellipsis` and
+   `ellipsis-vertical` from lucide-static 1.47.0 (three unit circles each, centre first, as
+   published), in `geometry_actions` and `Icon::ACTIONS`. They sit at the end of the enum and of
+   each table under a comment, so the control set another branch adds to the same enum merges
+   without touching these lines. A test locks the circles. The Controls page's glyph grid
+   (from the control-set branch, merged) draws them with the actions, and a "Glyphs: more"
+   section draws both at the row and header sizes and on Strip and Tool buttons. After the merge
+   they follow the control set at the end of the enum, and `Icon::ALL` lists them with the
+   actions, before the control set.
+2. **The consumer's data and class on a quire button.** `Button` and `IconButton` take `data:
+   Vec<DataAttr>` and `extra_class: Option<ExtraClass>`. `DataAttr { name: DataName, value:
+   String }` renders `data-<name>`; `DataName::parse` takes lowercase ASCII letters, digits and
+   `-` starting with a letter (HTML folds a `data-*` name to lowercase; Blitz does not, so an
+   uppercase one would mean two things), and refuses a `ds-` name and the names quire writes or
+   reads (`variant`, `size`, `theme`, `accent`, `motion`, `material`), so no consumer attribute
+   can restyle a quire element. `ExtraClass::parse` takes one class or a space-separated list,
+   each token letters, digits, `-` and `_` starting with a letter or `_`, and refuses any `ds-`
+   token. **Found: dioxus attributes are named by `&'static str`.** An attribute named at run
+   time has no static name, so each distinct `data-*` name is interned once (a `Mutex`ed set of
+   leaked strings, one per name, for the program's life) when it is parsed; names are a
+   consumer's small vocabulary (`folder`), and the value carries the data. The attributes are
+   spread after the named ones (dioxus requires a spread last). Proof: goldens
+   `controls/button/{data-attr,extra-class}`, `controls/icon_button/data-attr-extra-class`;
+   `pass_through_lint.rs` renders a button with a consumer class and lints it clean against
+   quire's sheet plus the consumer's rule, shows the same markup against quire's sheet alone
+   names the class unstyled (so the clean result is not vacuous), shows `ds-` classes and
+   reserved names refused with `PassThroughError::Reserved`, and that a consumer rule reaching
+   for `.ds-button` is the stylesheet lint's `DsInternals`. `self_lint`'s control scan now reads
+   a three-class consumer sheet for those goldens. On Blitz, `mailo6_tree_item.rs` reads
+   `data-folder` off a trailing `IconButton`.
+3. **A layer for the inline scrim.** `Scrim { layer: Option<ZLayer> }` (the token enum is
+   `ZLayer`); an inline scrim with one writes `style="z-index:var(--z-…)"` on itself, from the
+   token table. Without one it keeps z-index auto, and a positioned sibling drawn after it
+   paints over it: that is CSS (positioned boxes at z-index auto paint in tree order), not a
+   Blitz quirk. The component documents the rule: the caller picks a layer above its rows and
+   below its floating surfaces, which then need a layer above it. A floating scrim ignores the
+   prop (it is on `--z-scrim` already). Proof (`mailo6_scrim_layer.rs`): with no layer, a press
+   at a positioned row's centre hits the row (`Harness::hits`) and a click logs the row; with
+   `ZLayer::Raise` the same spot hits the scrim and the click dismisses. Golden
+   `overlays/scrim/inline-layer-raise`.
+4. **A tree row.** `TreeItem` is `details.ds-tree-item > summary.ds-tree-item-row` in the
+   sidebar item's chrome, `open: Disclosure::{Open, Closed}` controlled through `on_toggle`,
+   `TreeShape::{Branch, Leaf}` (a leaf is a row with no `details`; mailo draws its leaves as
+   rows), `label: impl Into<Text>`, `glyph`, `count`, `here`, `onselect` (the label becomes a
+   button that selects and keeps its press), `trailing: Option<Element>`, `drop`, `place` and
+   the four pointer hooks, children in `div.ds-tree-item-children[role=group]` one `--s-12`
+   step in (mailo's own indent). The summary's click prevents its default (the details' own
+   toggle) and reports `open.flip()`; the app's state is the only state. The trailing slot
+   stops and prevents every click that reaches it, so a ⋯ that forgot `Propagation::Stop` still
+   does not toggle; its button hears the press first. The chevron is `chevron-right` at 12,
+   turned a quarter by `aria-expanded=true` over `--t-quick`; the ⋯ shows on the row's hover,
+   while its menu is open and under keyboard focus (`:focus-within` is false on Blitz, S12), and
+   lends its height into the row's padding so a row with a 26 px Strip button is as tall as one
+   without. **Found: a `details` that dioxus opens stays closed on Blitz.** dioxus-native writes
+   every attribute in the HTML namespace (`qual_name` defaults to `ns!(html)`), and blitz-dom's
+   user-agent rule `details:not([open]) > :not(summary:first-of-type) { display:none
+   !important }` matches only a null-namespace `open` (the one its own summary toggle writes),
+   so the children of `details { open: true }` never show, and an author rule cannot override a
+   user-agent `!important`. dioxus-native also writes `open: false` as the text "false", which
+   is an open attribute all the same. `TreeItem` writes `open` itself as an `Attribute` with an
+   empty namespace (the null one) and value "true", or `AttributeValue::None` (removed) when
+   closed; "true" rather than empty because dioxus-ssr writes `open` only when truthy. mailo's
+   own folder tree (`details { class: "fold", open: true }`) hides its subfolders on Blitz for
+   this reason. **The shared drop rules:** the three drop rules moved from `sidebar_item.css` to
+   `drop_place.css` as `.ds-drop-place[data-drop=target|accepts]`, `[data-drag=source]`, last in
+   the component order (they tie on specificity with the items' hover and current rules), and
+   both items carry the class; no rule is written twice. Proof (`mailo6_tree_item.rs`): a Stop ⋯
+   and a Bubble ⋯ each log their press and toggle nothing; the selectable label logs a select
+   and toggles nothing; the chevron and the plain label call `on_toggle` with the other state
+   and the next row moves up or down by the child's height (a hidden node keeps its last layout
+   box on Blitz, so the test reads the following row, not the child); `data-drop` is `accepts`
+   and `target`; the Accepts row keeps an idle row's box and label position; and the Target row
+   paints a different colour from an idle row at the same spot. Goldens
+   `lists/tree_item/{open,closed}-{idle,accepts,target,source}` and `leaf-current`; the existing
+   `SidebarItem` goldens gained `ds-drop-place` in their class list.
+
+Not done: no keyboard toggle of its own on `TreeItem`. Blitz's summary activation arrives as the
+summary's click, which the component handles; no Harness test presses Enter on a summary.
+
+What mailo changes (docs/mailo-migration.md section 2 has each row): its `span` wrappers around
+buttons for `data-folder` and the reveal class become `data`/`extra_class`; the `⋯` text becomes
+`Icon::Ellipsis`; the inline scrim takes `layer: ZLayer::Raise` instead of mailo's layered box
+around it; the folder tree's `details`, chevron, `.fold-kids` indent and `can-drop` /
+`is-drop-target` rules become `TreeItem`.
+
 ## Native phase B (2026-09-25)
 
 mailo's Phase B plan (moving its window onto `ds_native::launch`) named the host gaps below,
@@ -2657,6 +2752,97 @@ Two gaps sill reported after wiring `icons.style` (sill FINDINGS Q71 and Q72).
   A partly installed set is not merged with a later step. `$QUIRE_ICON_ASSETS` names the apps
   directory itself, not a data directory.
 
+## OSD parts (2026-09-25)
+
+sill reported three gaps building its OSD (sill FINDINGS Q74, Q75, Q76). Branch `osd-parts`. Mid-way
+the user moved the OSD to the top right under the bar (design/20 §1.7 as updated on master) and
+asked for a richer level control than a read-only slider ("Level control" below). A plain
+`SliderMode::Level` was committed and then reverted in favour of it; `Slider` is the form slider
+again, unchanged.
+
+1. **Q75: the OSD's own motion.** `Anim::OsdIn` (`osd-in`, `--t-quick --e-out`: from `--osd-dy` at a
+   .96 scale and transparent to rest, `pop-in`'s entrance with no overshoot) and `Anim::OsdOut`
+   (`osd-out`, `--t-move --e-exit`, forwards: to half of `--osd-dy` and transparent). One pair whose
+   keyframes read `--osd-dy`, a signed offset the card declares per position (as `--dy` drives
+   `heal`): -8 px at the top right, so the card drops in from above and lifts back out; 8 px at the
+   bottom centre, so it rises and drops. The drift test expresses it unchanged (the recipe's name,
+   duration and easing are what it checks). Recipes in `recipe_own.rs`, `X--b` aliases and pulse
+   classes generated, settle rows in `motion_drift.rs` (204 and 284 ms at Standard), `Anim::ALL`
+   59 with `LevelTick` and master's four pane anims; the keyframe count assertion in `motion_css.rs`
+   is 50; design/05 §4.7.
+2. **Q76: an `Osd` component.** One card, in one transparent Osd root: the root gives the fade its
+   motion tokens and the card its `--f-*`, `--m-*`, stack and tint; the card paints what a tinted
+   root paints (`.ds-frame` at the frame alpha, the solid floor without blur, the inner pair
+   redrawn), so the nested painted root sill used is gone. Presence is a pure machine
+   (`osd_phase.rs`, table-tested): Hidden, Entering, Present, Leaving; a show while leaving is
+   Present at once and cancels the exit timer (`MotionTimer::cancel`, new), a late settle changes
+   nothing. `on_hidden` runs from `settle(OsdOut)`'s timer. The phase steps in render (so the render
+   draws it), the timers start in an effect after it. Proof: `ds-native/tests/osd_presence.rs`
+   (leaving at once, `on_hidden` not at settle - 40 ms and once at settle + 40 ms, hidden after;
+   shown during the fade: present, no `on_hidden` 500 ms later); goldens `level/osd-*`.
+3. **Q74: the level bar.** `LevelControl` ("Level control" below), `mode: LevelMode::ReadOnly` in
+   the card.
+
+What sill switches to: `Ds { material: Osd, chrome: Transparent, .. }` holding `Osd { shown, label,
+level: Level { value, glyph }, position, id: "osd", on_hidden }` (its view's nested painted root,
+`osd.css`'s fade rules and the `DurationToken::Move + FRAME_SLACK` leave time go); its machine's
+hold stays its own and drives `shown`; `on_hidden` unmaps the surface; `OsdMetrics { margin }`
+carries `osd.margin_px`, with the layer margin 0 and the surface sized to the card plus its margins
+and shadow room; `sill_settings::OsdPosition` maps onto `ds::OsdPosition`.
+
+## Level control (2026-09-25)
+
+The user found a plain read-only slider too simple and asked for macOS-grade looks, variants to
+choose from. `LevelControl` (new; `Slider` stays for settings rows). References, described (no
+asset copied): the current macOS volume and display modules and OSD, a thick capsule whose fill is
+white on the vibrant material with the glyph inside at its left end; the Big Sur control center
+slider, a capsule with a separate round white knob at the fill's end; the classic pre-Big Sur OSD,
+sixteen small squares under the glyph, one per volume key step.
+
+- **Looks** (`LevelLook`): `Capsule` (recommended), `CapsuleKnob`, `Segments`. Capsule 26 px, full
+  radius. Inks are new material tokens per scheme (`material/level.rs`): `--m-level-fill` (a
+  near-white .97 on light, white .94 on dark), `--m-level-well` (black .10 / white .14) with
+  `--m-level-shade` (`inset 0 1px 2px`), the glyph's two inks, the knob's hairline and drop, the
+  tick mark.
+- **Two-tone glyph without blend modes.** The glyph is drawn twice at the same place: on the well
+  in the well's ink, and inside the fill (which clips it) in the dark ink. Where the fill covers
+  it, it reads knocked out.
+- **Glyph follows the level** (`glyph.rs`): stacked `svg` parts that cross-fade by opacity over
+  `--t-quick` (an SVG's own CSS does not animate on Blitz, so no dash draw): Lucide's speaker body,
+  three waves (arcs on one centre at radii 5, 8.25, 11.5, spaced for a 2-unit stroke; Lucide has
+  two) shown by thirds, Lucide `volume-off`'s slash when muted; Lucide's sun, its rays scaled by
+  `.6 + .4 x level`.
+- **Machine** (`machine.rs`, table-tested): press (holds at once), measured (the track is read
+  after layout in a task; a click let go before it lands still sets the level; a move before it is
+  kept), drag, release, rubber band `6 x d / (d + 12)` px past an end, off under Reduced, keys to
+  the next point of the 16 or 64 grid.
+- **Motion.** Set from outside: `width` over `--t-quick --e-out`; under the pointer
+  (`data-drag=live`): no transition. Press: `scaleY(1.08)` over `--t-quick --e-spring` (contact).
+  Release from a stretch: `left`/`right` back over `--t-move --e-spring`. Segments: each changed
+  square after `i x --stagger`. `Tick::Quiet`: the fill edge's mark, `Anim::LevelTick` at `--t-tap`.
+- **Proofs.** `ds-native/tests/level_control.rs`: a set from 20 to 80 % is at the `--e-out` curve's
+  width a quarter and half of `--t-quick` in (131.2 vs 129.8, 153.9 vs 153.9) and painted between,
+  then at 80 %; a press jumps and a move 16 ms later is exactly under the pointer; the press
+  swells the painted fill 27 to 29 px; 12 px past the end stretches the track 3.0 px and it is back
+  600 ms after release; Reduced does not stretch; keys 500 to 563, 438, Shift 453. Goldens
+  `tests/snapshots/level/` per look, glyph state, mode and the OSD card; unit tables for the
+  machine, the glyph's parts, the segments and the inks.
+- **Sheets for the pick.** `ds-gallery --level-sheet DIR` writes `level-variants.png` (each look in
+  light and dark over the Work tint and over a light ground (the Home Space), volume 0, 40, 100 %,
+  muted, brightness 30 %, 1x then 2x) and `level-motion.png` (Harness frames through a set, a press,
+  a drag past the end and the release); copies are in `tools/progress/shots/gallery/`. The gallery's
+  new Level page has them live, and the Polish page an OSD specimen.
+- **Found: one Blitz document with sixty tinted cards loses layers.** Drawn as one page, every
+  card vanished (and with twenty, one row's cards painted at partial opacity), while each row alone
+  is right; the sheet therefore renders each row on its own. Not chased further; a page that
+  needs that many materials at once is not a real surface.
+- **Limits.** Leaving the control's hit zone (the rail and 16 px beside it) while dragging lets go
+  (Blitz has no pointer capture); the swell is 1 px each side at 26 px; the waves are cross-fades,
+  not drawn strokes.
+- **Recommendation: `Capsule`.** It is the current macOS form, needs no separate glyph column, and
+  carries the most information in the least width (glyph, level and mute in one shape); `Segments`
+  reads as dated and steps visibly; the knob adds a target that means nothing on a read-only OSD.
+
 ## Native focus (2026-09-25)
 
 Three gaps mailo's window reported once it came up on `ds_native::launch` (mailo pins quire by
@@ -2747,3 +2933,102 @@ rev unchanged (`e99fbdbd`). Proofs are harness tests: `native_focus_field.rs`,
      webview too. The same row with the strip hidden opens. So mailo's centre click landed on
      Archive because its strip was shown (hovered, or its row held the focus) and wide enough
      for its row, not because Blitz's box is wrong.
+
+## Control center parts (2026-09-25)
+
+Four additive pieces sill asked for to build the control center with macOS Control Center's
+polish (sill FINDINGS Q78-Q81). No existing golden changed; the stylesheet golden grew by the new
+rules and two keyframes. CONSUMING "Control center parts (2026-09-25)" has the API.
+
+### Q78: a module tile
+
+- **What was wrong.** quire had no control-center tile: sill drew one from a `Button { Mini }`
+  and a local disc, and the chevron that opens a module's detail was a second button beside it
+  whose click also reached the tile, toggling Wi-Fi when the person only wanted its networks.
+- **What quire does now.** `ModuleTile` in a `ModuleGrid` (two columns, gap 8): a
+  `div[role=button]` at `--r-tile` with a 28 px disc, the title at the shell menu's 13/600 and a
+  faint status line. `ModuleState::Off` is the Mini's plate with a paper disc in ink, `On` the
+  plate in `--accent-soft` and the disc in `--accent` with `--accent-ink`, `Busy` the Off disc
+  with the Spinner's breathe around it (`aria-pressed="mixed"`, `aria-busy`). The hover is the
+  Mini's (`--raise`, `--shadow-1`) plus the list row's `--lift`; the press squishes. The tile is
+  not a `button` because the chevron inside it is one. The chevron (`Chevron::Detail`) is 18 x 28,
+  named "{title} details", `aria-expanded` from `expanded`, and keeps its press
+  (`Propagation::Stop`, mailo gaps 5): its click never reaches the tile. Keys are the tile's own on
+  both renderers: Enter or Space toggles, Enter or Right on the chevron opens the detail and stops
+  there (Blitz synthesises no click from a key; the chevron prevents the key's default, so a
+  browser's synthesised click cannot run the press twice). `TileSpan::Full` spans both columns.
+  A half tile's title clips instead of fading: `.ds-truncate`'s fade covers the column's last
+  1.5em whether the words reach it or not, and the column (about 72 of 144 px) is barely wider
+  than "Bluetooth".
+- **Proof.** `ds/tests/control_center_ssr.rs`: goldens `control_center/tile-{off,on,busy}-
+  {half,full}-{light,dark}.html` in a Popover root, and the chevron absent, inert and open; every
+  golden lints clean and every class is styled; the state, span, pressed and chevron attributes
+  are asserted per case. `ds-native/tests/cc_module_tile.rs` on a Blitz document: a chevron press
+  logs `detail` and the tile stays off; a press on the title toggles it; Tab reaches the tile,
+  Enter and Space toggle, Tab reaches the chevron, Enter and Right open the detail and neither
+  toggles.
+- **What sill changes.** Its tile becomes `ModuleTile`, its grid `ModuleGrid`, inside the panel's
+  own 12 px padding.
+
+### Q79: a settings row outside a menu
+
+- **What was wrong.** A network or device list in the control center was `ListRow` (mail's
+  two-line card, far too heavy) or `MenuEntry::Row` (which needs a `Menu`: an overlay, a layer and
+  the keyboard).
+- **What quire does now.** `SettingsRow`: 44 px, a hairline (`--hair`, `--line`) above every row
+  after the first, `MenuEntry::Row`'s type in a Slim menu (title `--fs-shell-menu` at 400, detail
+  `--fs-help` faint), a 16 px glyph in a 22 px column, the Dropdown's `--surface-2` under the
+  pointer. `RowTrailing` is the end: `Check(Switch)` in `--accent` (the row writes
+  `aria-pressed`), `Toggle { value, on_toggle }`, `Chevron`, `Text`, `Glyph`, or nothing. The
+  toggle sits in a span that stops its click and its keys, so flipping headphones on never runs
+  the row. Enter or Space runs `onclick`.
+- **Proof.** Goldens `control_center/row-*.html` (each mark, a bare row, a disabled row) and
+  `rows-networks-{light,dark}.html`; `a_row_writes_its_trailing_mark`.
+  `ds-native/tests/cc_settings_row.rs`: the switch logs `toggle:On` and not the row, the words log
+  the row only, Enter on the focused row runs it, and a disabled row and its switch hear nothing.
+
+### Q80: a pane and its detail
+
+- **What was wrong.** design/13 13.3.7 plays the detail pane in with `slide-r`/`slide-l` at
+  `--t-move --e-spring`, but the catalogue's `Anim::SlideR`/`SlideL` are `--t-big` (their Space
+  switch rows), so no `Anim` matched and the drift test forbids an animation that is not one.
+  There was no exit for the outgoing pane, and `use_entrance` (the one-shot entrance timer every
+  overlay uses) was private to `popover.rs`.
+- **What quire does now.** Four `Anim`s (56 in all): `PaneInR`/`PaneInL` play `slide-r`/`slide-l`
+  at `--t-move --e-spring`; `PaneOutL`/`PaneOutR` play two new keyframes `pane-out-l`/`pane-out-r`
+  (to `-26px`/`+26px` and transparent, the mirror of the slides) at `--t-move --e-exit`, forwards.
+  `PaneSwitcher { shown, root, detail, on_settled }` runs a pure `PaneSlide` machine: asking for
+  the other pane starts a round in which both panes are drawn, the arriving one `entering` and the
+  outgoing one `leaving`, out of the flow at the top so the switcher is the arriving pane's height
+  from the first frame; one `MotionTimer` settles the pair (all four recipes are `--t-move`, a unit
+  test holds it), and `on_settled` hears the pane. Asking again mid-slide starts a new round: each
+  pane takes the other animation from its start (the names differ, so Stylo restarts them), the
+  timer restarts (the reversed round's task is cancelled) and a settle naming an old round changes
+  nothing. The timer is started from an effect after the render, with its handler made in the
+  component's scope (an `EventHandler::new` inside the effect has no scope and panicked in the
+  first run of the Harness test). `use_entrance` is `ds::motion::use_entrance` and `ds::use_entrance`,
+  unchanged; the menu, sheet, peek, bubble, hover card and link pill import it from there, and
+  their goldens are as they were.
+- **Proof.** `pane_slide` unit tests (a switch, a reversal and a stale settle, the arrival and
+  departure of each pane, one duration). Goldens `control_center/panes-{root,detail}.html`.
+  `ds-native/tests/cc_pane_switcher.rs`: after a switch both panes are drawn, entering and leaving,
+  and the switcher's height is the short detail's, not the tall root's; 350 ms later only the
+  detail is drawn, present, and `on_settled` logged `detail`. Reversed 150 ms into a switch, the
+  root turns back to `entering` and the detail to `leaving`; past the first round's settle both are
+  still drawn and nothing is logged; then the root rests and the log is `root` alone. The drift
+  test's settle table has the four at 284 ms (Standard).
+- **Limits.** The height snaps to the arriving pane rather than animating (no measured height
+  transition on Blitz); the leaving pane is clipped where it overhangs. A reversal restarts both
+  animations from their first frame instead of from where they were.
+
+### Q81: control glyphs
+
+- **What quire does now.** `Icon::Play`, `Pause`, `SkipBack`, `SkipForward`, `LogOut`, `Restart`
+  (Lucide `rotate-ccw`), `Headphones`, `Speaker`, `Mouse`, `Gamepad` and `Phone` (Lucide
+  `smartphone`), transcribed from `lucide-static` 1.47.0 into `icon/geometry_control.rs` (ISC,
+  the licence line in `icon/mod.rs`; a `<line>` as the equivalent path, as the shell set does).
+  `Power` was already in the shell set. `Icon::CONTROL` lists them and `Icon::ALL` ends with them;
+  the named sets moved to `icon/sets.rs` so `icon/mod.rs` is under 300 lines. The Controls page
+  draws every glyph by set at 22 px.
+- **Proof.** `every_control_glyph_renders_and_lints_clean` (one child per shape, `ds-ic`, clean
+  under the Strict profile), `the_control_set_is_lucides`, and the set test counting `ALL`.

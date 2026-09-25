@@ -22,7 +22,7 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);color-scheme:dark;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;}
 .ds[*|data-motion=extra]{--t-big:560ms;--t-big-heavy:644ms;--t-crumple-heavy:644ms;--e-spring:cubic-bezier(.34,2,.5,1);--overshoot:1.14;--squish:.86;--tilt:5deg;--stagger:34ms;}
@@ -69,6 +69,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-material][*|data-chrome=transparent]{background:transparent;box-shadow:none;}
 .ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}
 .ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet{background:var(--m-tint);}
+.ds-osd > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
+.ds[*|data-blur=off] .ds-osd > .ds-frame{opacity:.94;}
+.ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.1);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);--m-level-tick:rgba(0,0,0,.16);}
+.ds[*|data-theme=dark]{--m-level-fill:rgba(255,255,255,.94);--m-level-well:rgba(255,255,255,.14);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.35);--m-level-glyph:rgba(255,255,255,.86);--m-level-glyph-fill:rgba(0,0,0,.7);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.45);--m-level-tick:rgba(0,0,0,.2);}
 /* == shapes == */
 .ds[*|data-material][*|data-corner=squircle]{background:transparent;position:relative;z-index:var(--z-raise);border-radius:var(--r-squircle,var(--m-radius));}
 .ds[*|data-material][*|data-corner=squircle]::before{content:"";position:absolute;inset:0;z-index:var(--z-scene);border-radius:0;pointer-events:none;mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0.00%20100.00L0.02%2074.54L0.09%2066.41L0.19%2060.51L0.34%2055.71L0.54%2051.61L0.77%2047.99L1.05%2044.73L1.38%2041.76L1.75%2039.03L2.16%2036.49L2.61%2034.12L3.12%2031.90L3.67%2029.81L4.26%2027.84L4.90%2025.98L5.59%2024.21L6.33%2022.54L7.12%2020.95L7.95%2019.44L8.84%2018.01L9.79%2016.64L10.78%2015.35L11.83%2014.11L12.94%2012.94L14.11%2011.83L15.35%2010.78L16.64%209.79L18.01%208.84L19.44%207.95L20.95%207.12L22.54%206.33L24.21%205.59L25.98%204.90L27.84%204.26L29.81%203.67L31.90%203.12L34.12%202.61L36.49%202.16L39.03%201.75L41.76%201.38L44.73%201.05L47.99%200.77L51.61%200.54L55.71%200.34L60.51%200.19L66.41%200.09L74.54%200.02L100.00%200.00L100.00%20100.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M100.00%20100.00L99.98%2074.54L99.91%2066.41L99.81%2060.51L99.66%2055.71L99.46%2051.61L99.23%2047.99L98.95%2044.73L98.62%2041.76L98.25%2039.03L97.84%2036.49L97.39%2034.12L96.88%2031.90L96.33%2029.81L95.74%2027.84L95.10%2025.98L94.41%2024.21L93.67%2022.54L92.88%2020.95L92.05%2019.44L91.16%2018.01L90.21%2016.64L89.22%2015.35L88.17%2014.11L87.06%2012.94L85.89%2011.83L84.65%2010.78L83.36%209.79L81.99%208.84L80.56%207.95L79.05%207.12L77.46%206.33L75.79%205.59L74.02%204.90L72.16%204.26L70.19%203.67L68.10%203.12L65.88%202.61L63.51%202.16L60.97%201.75L58.24%201.38L55.27%201.05L52.01%200.77L48.39%200.54L44.29%200.34L39.49%200.19L33.59%200.09L25.46%200.02L0.00%200.00L0.00%20100.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0.00%200.00L0.02%2025.46L0.09%2033.59L0.19%2039.49L0.34%2044.29L0.54%2048.39L0.77%2052.01L1.05%2055.27L1.38%2058.24L1.75%2060.97L2.16%2063.51L2.61%2065.88L3.12%2068.10L3.67%2070.19L4.26%2072.16L4.90%2074.02L5.59%2075.79L6.33%2077.46L7.12%2079.05L7.95%2080.56L8.84%2081.99L9.79%2083.36L10.78%2084.65L11.83%2085.89L12.94%2087.06L14.11%2088.17L15.35%2089.22L16.64%2090.21L18.01%2091.16L19.44%2092.05L20.95%2092.88L22.54%2093.67L24.21%2094.41L25.98%2095.10L27.84%2095.74L29.81%2096.33L31.90%2096.88L34.12%2097.39L36.49%2097.84L39.03%2098.25L41.76%2098.62L44.73%2098.95L47.99%2099.23L51.61%2099.46L55.71%2099.66L60.51%2099.81L66.41%2099.91L74.54%2099.98L100.00%20100.00L100.00%200.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M100.00%200.00L99.98%2025.46L99.91%2033.59L99.81%2039.49L99.66%2044.29L99.46%2048.39L99.23%2052.01L98.95%2055.27L98.62%2058.24L98.25%2060.97L97.84%2063.51L97.39%2065.88L96.88%2068.10L96.33%2070.19L95.74%2072.16L95.10%2074.02L94.41%2075.79L93.67%2077.46L92.88%2079.05L92.05%2080.56L91.16%2081.99L90.21%2083.36L89.22%2084.65L88.17%2085.89L87.06%2087.06L85.89%2088.17L84.65%2089.22L83.36%2090.21L81.99%2091.16L80.56%2092.05L79.05%2092.88L77.46%2093.67L75.79%2094.41L74.02%2095.10L72.16%2095.74L70.19%2096.33L68.10%2096.88L65.88%2097.39L63.51%2097.84L60.97%2098.25L58.24%2098.62L55.27%2098.95L52.01%2099.23L48.39%2099.46L44.29%2099.66L39.49%2099.81L33.59%2099.91L25.46%2099.98L0.00%20100.00L0.00%200.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0%200H100V100H0Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0%200H100V100H0Z'/%3E%3C/svg%3E");mask-position:left top,right top,left bottom,right bottom,center,center;mask-size:min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),100% calc(100% - 2*min(var(--sq-k,28px),50%)),calc(100% - 2*min(var(--sq-k,28px),50%)) 100%;mask-repeat:no-repeat;}
@@ -109,8 +113,9 @@ html,body{margin:0;padding:0;background:transparent}
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
      so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), and the sheet's
-     `sheet-out` (sill Q90), below.
+     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
+     and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
+     (the level control), and the sheet's `sheet-out` (sill Q90), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -294,6 +299,27 @@ html,body{margin:0;padding:0;background:transparent}
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 
+/* pane-out-l, pane-out-r (quire's, sill Q80): a pane switcher's outgoing pane leaves the other
+   way from the one arriving, the mirror of `slide-l` and `slide-r` (26 px and a fade), so the
+   two read as one push. */
+@keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
+@keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
+
+/* osd-in and osd-out (quire's, sill Q75): the OSD card's pair, following its anchor through
+   `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at
+   the top right, so the card drops in from above and lifts back up as it goes; 8px at the bottom
+   centre, so it rises in and drops away. In: from `--osd-dy` at a .96 scale and transparent, to
+   rest, at `--t-quick --e-out` (design/20 section 1.7): `pop-in`'s entrance with no overshoot,
+   since a level shown under a key press settles, it does not bounce. Out: to half of `--osd-dy`
+   and transparent at `--t-move --e-exit` (design/05 section 10), holding that last frame until
+   the host unmaps the surface. Played outside the card (its `a-osd-in` pulse class), the offset
+   is the top right's, the default position. */
+@keyframes osd-in{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
+@keyframes osd-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
+
+/* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
+   a quiet sign that the level crossed a step; the edge rests invisible. */
+@keyframes level-tick{ from{ opacity:1; } to{ opacity:0; } }
 /* sheet-out (quire's, sill Q90): a sheet's exit, `peek-in` reversed and quieter: it fades and
    settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
    accelerate), holding its transparent last frame until the host unmaps the surface. */
@@ -372,6 +398,11 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
 @keyframes busy--b{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+@keyframes pane-out-l--b{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
+@keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
+@keyframes osd-in--b{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
+@keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
+@keyframes level-tick--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
@@ -477,6 +508,20 @@ html,body{margin:0;padding:0;background:transparent}
 .a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
 .a-busy[*|data-pulse=a]{animation:busy var(--t-ambient) var(--e-in-out) infinite;}
 .a-busy[*|data-pulse=b]{animation:busy--b var(--t-ambient) var(--e-in-out) infinite;}
+.a-pane-in-r[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-spring);}
+.a-pane-in-r[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-spring);}
+.a-pane-in-l[*|data-pulse=a]{animation:slide-l var(--t-move) var(--e-spring);}
+.a-pane-in-l[*|data-pulse=b]{animation:slide-l--b var(--t-move) var(--e-spring);}
+.a-pane-out-l[*|data-pulse=a]{animation:pane-out-l var(--t-move) var(--e-exit) forwards;}
+.a-pane-out-l[*|data-pulse=b]{animation:pane-out-l--b var(--t-move) var(--e-exit) forwards;}
+.a-pane-out-r[*|data-pulse=a]{animation:pane-out-r var(--t-move) var(--e-exit) forwards;}
+.a-pane-out-r[*|data-pulse=b]{animation:pane-out-r--b var(--t-move) var(--e-exit) forwards;}
+.a-osd-in[*|data-pulse=a]{animation:osd-in var(--t-quick) var(--e-out);}
+.a-osd-in[*|data-pulse=b]{animation:osd-in--b var(--t-quick) var(--e-out);}
+.a-osd-out[*|data-pulse=a]{animation:osd-out var(--t-move) var(--e-exit) forwards;}
+.a-osd-out[*|data-pulse=b]{animation:osd-out--b var(--t-move) var(--e-exit) forwards;}
+.a-level-tick[*|data-pulse=a]{animation:level-tick var(--t-tap) var(--e-out);}
+.a-level-tick[*|data-pulse=b]{animation:level-tick--b var(--t-tap) var(--e-out);}
 .a-sheet-out[*|data-pulse=a]{animation:sheet-out var(--t-move) var(--e-exit) forwards;}
 .a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
@@ -1035,6 +1080,68 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }
+/* -- level -- */
+/* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
+   follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
+   `material/level.rs`); `--f` is the level and `--rb` the rubber band's stretch, both written
+   inline by the component. Attribute selectors carry `*|` (spike S2).
+
+   Motion. A level set from outside slides over `--t-quick --e-out`; under the pointer
+   (`data-drag=live`) the fill follows it with no transition. A press swells the track
+   (`scaleY(1.08)`, `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
+   stretches by `--rb` along that end and springs back over `--t-move --e-spring` when released.
+   Glyph parts cross-fade over `--t-quick`; the sun's rays scale with `--f`. */
+
+.ds-level{ --level-h:26px; display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
+.ds-level-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
+/* Where a press and a drag land: the rail and a margin round it, so a drag a little past an end
+   still reaches the control. Last in the rail, so it is over everything drawn there. */
+.ds-level-hit{ position:absolute; top:calc(var(--s-6) * -1); bottom:calc(var(--s-6) * -1); left:calc(var(--s-16) * -1); right:calc(var(--s-16) * -1); }
+.ds-level-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
+
+/* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
+.ds-level-track{ position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-well); box-shadow:var(--m-level-shade);
+  transition:transform var(--t-quick) var(--e-spring), left var(--t-move) var(--e-spring), right var(--t-move) var(--e-spring); }
+.ds-level-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out); }
+.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.08); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level[*|data-drag=live] .ds-level-fill{ transition:none; }
+.ds-level[*|data-over=end] .ds-level-track{ right:calc(var(--rb) * -1); }
+.ds-level[*|data-over=start] .ds-level-track{ left:calc(var(--rb) * -1); }
+
+/* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
+   the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
+.ds-level-in{ position:absolute; top:0; bottom:0; left:var(--s-6); display:flex; align-items:center; }
+.ds-level-track > .ds-level-in{ color:var(--m-level-glyph); }
+.ds-level-fill > .ds-level-in{ color:var(--m-level-glyph-fill); }
+.ds-level-glyph{ position:relative; display:block; flex:none; }
+.ds-level-glyph[*|data-size="16"]{ width:16px; height:16px; }
+.ds-level-glyph[*|data-size="22"]{ width:22px; height:22px; }
+.ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
+.ds-level-part[*|data-on=off]{ opacity:0; }
+.ds-level-part[*|data-part=rays]{ transform:scale(calc(.6 + .4 * var(--f))); }
+
+/* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
+.ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }
+
+/* The knob: a round disc of the fill's ink riding the fill's end; the fill ends at its centre. */
+.ds-level[*|data-look=capsule-knob] .ds-level-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
+.ds-level-knob{ position:absolute; top:0; left:calc(var(--f) * (100% - var(--level-h))); width:var(--level-h); height:var(--level-h);
+  border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
+  transition:left var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring), margin-left var(--t-move) var(--e-spring); }
+.ds-level[*|data-drag=live] .ds-level-knob{ transform:scale(1.08); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level[*|data-over=end] .ds-level-knob{ margin-left:var(--rb); }
+.ds-level[*|data-over=start] .ds-level-knob{ margin-left:calc(var(--rb) * -1); }
+
+/* Sixteen squares: the ones that change fill in (or empty) one `--stagger` after another. */
+.ds-level[*|data-look=segments] .ds-level-rail{ height:auto; }
+.ds-level-segments{ display:flex; gap:var(--s-2); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level-seg{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
+  transition:background-color var(--t-quick) var(--e-out) calc(var(--i) * var(--stagger)); }
+.ds-level-seg[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
+.ds-level[*|data-drag=live] .ds-level-segments{ transform:scaleY(1.08); }
+.ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }
 /* -- link_pill -- */
 /* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
    reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
@@ -1275,6 +1382,93 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
+/* -- osd -- */
+/* Osd (design/20 section 1.7; sill FINDINGS Q76): the on-screen display's card inside a
+   transparent Osd root. It paints what a tinted root paints on its own box: the material's box
+   shadow, and a `.ds-frame` group of the Space gradient at the frame alpha (the solid floor
+   without blur and the inner pair over it are in the materials section). Its shape and padding
+   are a control-center module's (design/13 section 13.3.7: `--r-tile`, the grid's 12 padding);
+   its width a module spanning both columns of the 320 panel. Attribute selectors carry `*|`
+   (spike S2).
+
+   Motion. `osd-in` at `--t-quick --e-out` while entering, restarted under its other name on each
+   showing (`data-pulse`); `osd-out` at `--t-move --e-exit`, held, while leaving. Both move by
+   `--osd-dy`, which follows the anchor: from above at the top right, from below at the bottom
+   centre. Hidden, nothing is laid out. */
+
+.ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
+  width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
+.ds-osd[*|data-position=top-right]{ --osd-dy:-8px; margin:var(--osd-margin) var(--s-12) 0 auto; }
+.ds-osd[*|data-position=bottom-centre]{ --osd-dy:8px; margin:0 auto var(--osd-margin); }
+.ds-osd[*|data-shown=hidden]{ display:none; }
+.ds-osd[*|data-presence=entering]{ animation:osd-in var(--t-quick) var(--e-out); }
+.ds-osd[*|data-presence=entering][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
+.ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
+/* -- module_tile -- */
+/* ModuleTile (sill FINDINGS Q78; design/20 section 1.5, design/13 section 13.3.7): a module on
+   the control center's grid, `--r-tile` 12. Off: the Mini button's plate (`--surface-2` and a
+   hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
+   with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
+   pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`) and by `--lift`; pressed it
+   squishes. A Full tile spans both grid columns. The chevron is a quiet 18 x 28 hit target of
+   its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
+
+.ds-module-tile{
+  position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:52px; box-sizing:border-box;
+  padding:var(--s-8) var(--s-4) var(--s-8) var(--s-10); border:var(--hair) solid var(--line); border-radius:var(--r-tile);
+  background:var(--surface-2); color:var(--ink); cursor:pointer; user-select:none;
+  transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+}
+.ds-module-tile[*|data-span=full]{ grid-column:1 / -1; }
+.ds-module-tile:hover{ background:var(--raise); box-shadow:var(--shadow-1); transform:translateY(var(--lift)); }
+.ds-module-tile:active{ transform:scale(var(--squish)) translateY(1px); }
+.ds-module-tile[*|data-state=on]{ background:var(--accent-soft); border-color:transparent; }
+.ds-module-tile[*|data-state=on]:hover{ background:var(--accent-soft); }
+.ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
+.ds-module-tile[*|aria-disabled=true]:hover{ background:var(--surface-2); box-shadow:none; transform:none; }
+
+.ds-module-disc{
+  position:relative; display:grid; place-items:center; flex:none; width:28px; height:28px; border-radius:var(--r-pill);
+  background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-module-tile[*|data-state=on] .ds-module-disc{ background:var(--accent); color:var(--accent-ink); }
+
+.ds-module-words{ display:flex; flex-direction:column; flex:1; min-width:0; }
+/* Clipped, not faded: `.ds-truncate`'s fade covers the last 1.5em of the column whether the
+   words reach it or not, and a half tile's column is about as wide as "Bluetooth". */
+.ds-module-title,
+.ds-module-status{ white-space:nowrap; overflow:hidden; }
+.ds-module-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
+.ds-module-status{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+.ds-module-chevron{
+  font:inherit; display:grid; place-items:center; flex:none; width:18px; height:28px; padding:0; border:0; border-radius:var(--r-btn);
+  background:transparent; color:var(--ink-faint); cursor:pointer;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-module-chevron:hover{ color:var(--ink); background:var(--surface); }
+.ds-module-chevron:active{ transform:scale(var(--squish)); }
+.ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
+.ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
+
+/* ModuleGrid (design/13 section 13.3.7): two equal columns, gap 8. */
+.ds-module-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-8); }
+/* -- pane_switcher -- */
+/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
+   (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
+   and the outgoing one leaves the other way (`pane-out-l`, `pane-out-r`) at `--t-move
+   --e-exit`, held at its last frame until it is dropped. The leaving pane is out of the flow,
+   pinned to the top, so the switcher is as tall as the pane arriving; what it overhangs is
+   clipped. */
+
+.ds-panes{ position:relative; overflow:hidden; }
+.ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
+.ds-pane[*|data-pane=detail][*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
+.ds-pane[*|data-pane=root][*|data-presence=entering]{ animation:slide-l var(--t-move) var(--e-spring); }
+.ds-pane[*|data-pane=root][*|data-presence=leaving]{ animation:pane-out-l var(--t-move) var(--e-exit) forwards; }
+.ds-pane[*|data-pane=detail][*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
@@ -1353,6 +1547,9 @@ html,body{margin:0;padding:0;background:transparent}
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
+/* An inline scrim's own layer (mailo gaps 6, `layer: Some(ZLayer)`) is written on the element as
+   `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
+   below its floating surfaces. With none it stays at z-index auto, as above. */
 
 /* Modal (sheet and modal parts): `--scrim-modal`, .40 light and .55 dark, behind a dialog that
    asks for a decision; design/03 section 17. */
@@ -1462,6 +1659,32 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-send-pill-text{ display:flex; flex-direction:column; gap:var(--s-2); }
 .ds-send-pill-why{ font-weight:500; opacity:.8; white-space:normal; max-width:280px; }
 .ds-send-pill[*|data-mood=fatal] .ds-send-pill-undo{ background:var(--danger-ink); color:var(--danger); }
+/* -- settings_row -- */
+/* SettingsRow (sill FINDINGS Q79): a 44 px row with a hairline (`--hair`, `--line`) above every
+   row after the first, the words in the shell text menu's type (title `--fs-shell-menu` at 400,
+   detail `--fs-help` in `--ink-faint`, as `MenuEntry::Row` in a Slim menu, design/13 section
+   13.3.3), a 16 px glyph in a 22 px column, and the trailing mark at the end. Under the pointer
+   the row takes the Dropdown's `--surface-2` at the shell highlight's radius. A check is
+   `--accent`; a chevron, a value and a glyph are `--ink-faint`. */
+
+.ds-settings-row{
+  display:flex; align-items:center; gap:var(--s-8); min-height:44px; box-sizing:border-box; padding:0 var(--s-8);
+  border-top:var(--hair) solid transparent; border-radius:var(--r-shell-highlight); color:var(--ink); cursor:pointer; user-select:none;
+  transition:background-color var(--t-quick) var(--e-out);
+}
+.ds-settings-row + .ds-settings-row{ border-top-color:var(--line); }
+.ds-settings-row:hover{ background:var(--surface-2); }
+.ds-settings-row[*|aria-disabled=true]{ opacity:.35; cursor:default; }
+.ds-settings-row[*|aria-disabled=true]:hover{ background:transparent; }
+
+.ds-settings-row-glyph{ display:grid; place-items:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-settings-row-words{ display:flex; flex-direction:column; flex:1; min-width:0; }
+.ds-settings-row-title{ font-size:var(--fs-shell-menu); font-weight:400; line-height:1.3; }
+.ds-settings-row-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+.ds-settings-row-trail{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); }
+.ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent); }
+.ds-settings-row-value{ font-size:var(--fs-help); }
 /* -- sheet -- */
 /* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
    centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
@@ -1489,7 +1712,7 @@ html,body{margin:0;padding:0;background:transparent}
    The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
    leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
    `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
-   `[data-drag=source]` (.35, section 34). The Candy label hue on the icon and seal (`C:950-951`) is a Look,
+   `[data-drag=source]` (.35, section 34), drawn by `.ds-drop-place`. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
    not specified here. Disabled: not specified (O-1).
    The label is the flexible part: it starts at the left and takes the free space, so the count
    and the close button sit at the end and an item without them does not centre (gallery fix A:
@@ -1538,14 +1761,8 @@ html,body{margin:0;padding:0;background:transparent}
   animation:dest var(--t-float) var(--e-out) infinite alternate;
 }
 
-/* Drop target (`C:320-323`). */
-.ds-sidebar-item[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
-.ds-sidebar-item[*|data-drag=source]{ opacity:.35; }
-/* A place that can take the drag while the pointer is elsewhere (mailo gaps 5, `DropState::Accepts`):
-   a dashed `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes
-   its width out of the padding, so the label does not move as the drag starts. Blitz paints a
-   dashed border (not a dashed outline, which it draws solid). */
-.ds-sidebar-item[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
+/* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
+   (drop_place.css, mailo gaps 6). */
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
@@ -1869,6 +2086,54 @@ html,body{margin:0;padding:0;background:transparent}
   animation:hc-in var(--t-move) var(--e-spring); }
 .ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-size:var(--fs-note); color:var(--ink-faint); }
+/* -- tree_item -- */
+/* TreeItem (mailo gaps 6): a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
+   (design/04-COMPONENTS.md section 19: padding --s-6 --s-8, --r-item, ui 13.5/600 --f-ink-soft,
+   --f-pill-hover under the pointer, --f-pill and the current shadow when current). The drop
+   states are `.ds-drop-place`'s (drop_place.css), shared with SidebarItem. Attribute selectors
+   carry `*|` (spike S2). The summary's own marker is removed (`list-style:none`: Blitz draws a
+   `disclosure-closed` list marker from its user-agent sheet); the chevron is a Glyph that
+   turns a quarter over --t-quick as the item opens. `:focus-within` is false on Blitz (spike
+   S12), so the trailing ⋯ shows on the row's hover, while its menu is open (`aria-expanded`),
+   and under keyboard focus. */
+
+.ds-tree-item{ display:flex; flex-direction:column; min-width:0; }
+.ds-tree-item-row{
+  display:flex; align-items:center; justify-content:flex-start; gap:var(--s-6); width:100%; box-sizing:border-box; min-width:0;
+  list-style:none; cursor:pointer; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
+  font:inherit; font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft); position:relative;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+}
+.ds-tree-item[*|data-shape=leaf] > .ds-tree-item-row{ cursor:default; }
+.ds-tree-item-row:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+.ds-tree-item-row[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
+
+/* The chevron: 12 px, --f-ink-faint, right at rest and down when open. A leaf keeps the box. */
+.ds-tree-item-chevron{
+  flex:none; display:flex; align-items:center; justify-content:center; width:var(--s-12); height:var(--s-12); line-height:0;
+  color:var(--f-ink-faint); transition:transform var(--t-quick) var(--e-out);
+}
+.ds-tree-item-row[*|aria-expanded=true] .ds-tree-item-chevron{ transform:rotate(90deg); }
+
+/* The label takes the free space, so the count and the ⋯ sit at the end. As a button (a place
+   that selects) it is words on the row, nothing of a button's own: `display:block` because
+   Blitz's user-agent `button` centres its content (the sidebar item's gallery fix A). */
+.ds-tree-item-label{
+  display:block; flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; text-align:left;
+  border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer;
+}
+
+/* The trailing slot: hidden until the row is hovered, its menu is open or it has the keyboard.
+   It lends its height into the row's padding, so a row with a 26 px Strip button is as tall as
+   one without. */
+.ds-tree-item-trail{ flex:none; display:flex; align-items:center; line-height:0; margin:calc(-1 * var(--s-6)) 0; }
+.ds-tree-item-trail > *{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-tree-item-row:hover .ds-tree-item-trail > *,
+.ds-tree-item-trail > [*|aria-expanded=true],
+.ds[*|data-modality=keyboard] .ds-tree-item-trail > :focus{ opacity:1; }
+
+/* The children, one indent step in, the same rhythm as the sidebar's items. */
+.ds-tree-item-children{ display:flex; flex-direction:column; gap:var(--s-2); padding-left:var(--s-12); }
 /* -- workspace_pills -- */
 /* WorkspacePills (the macOS polish pass): one segmented group on the frame, not a row of
    buttons. The track is the frame's hover fill; the current workspace is the raised pressed
@@ -1882,3 +2147,19 @@ html,body{margin:0;padding:0;background:transparent}
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-ws-pill:hover{ color:var(--ink); }
 .ds-ws-pill[*|aria-current=true]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
+/* -- drop_place -- */
+/* A drop place (mailo gaps 6): the drop states SidebarItem and TreeItem share, one rule set for
+   both (design/04-COMPONENTS.md section 34, C's drop target `C:320-323`). Last in the component
+   order so each state wins over either item's hover and current rules, which have the same
+   specificity. Both items have the sidebar item's padding (--s-6 --s-8), which the Accepts
+   border takes its width out of. */
+
+/* Target: under a dragged thread and accepting it. */
+.ds-drop-place[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+/* Source: the item itself is being dragged (.35, section 34). */
+.ds-drop-place[*|data-drag=source]{ opacity:.35; }
+/* Accepts (mailo gaps 5): a place that can take the drag while the pointer is elsewhere: a dashed
+   `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes its
+   width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
+   border (not a dashed outline, which it draws solid). */
+.ds-drop-place[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }

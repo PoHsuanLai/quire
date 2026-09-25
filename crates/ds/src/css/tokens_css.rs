@@ -8,6 +8,7 @@ use super::emit::{attr_selector, declaration, rule};
 use crate::appearance::{MotionLevel, Scheme};
 use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
 use crate::tokens::dock::DOCK_TOKENS;
+use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
@@ -101,6 +102,7 @@ fn fixed_tokens() -> Vec<String> {
     let tuned = SHELL_TOKENS
         .into_iter()
         .chain(DOCK_TOKENS)
+        .chain(OSD_TOKENS)
         .chain([PLATE_GLYPH, PLATE_INSET])
         .chain(PixelToken::ALL.map(PixelToken::tuned))
         .map(|token| token.declaration());
