@@ -450,14 +450,14 @@ All Advanced (§5). The display service reads the EDID, classifies the panel's g
 
 ### 3.16 `osd` (sill/settings.toml)
 
-All Advanced (§5). The on-screen display for volume and brightness (design/20 §1.7): a Material::Osd card that takes the Space gradient tint, holds, then fades.
+All Advanced (§5). The on-screen display for volume and brightness (design/20 §1.7): a Material::Osd card at the top right under the bar (as current macOS), styled like a control-center slider module, that takes the Space gradient tint, holds, then fades.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `osd.enabled` | `OsdEnabled::{On,Off}` | `On` | shows sill's own volume and brightness changes | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
 | `osd.hold_ms` | `Ms` | `1500` | `300..=10000`; after the last change and before the fade | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
-| `osd.position` | `OsdPosition::{Bottom,Top}` | `Bottom` | centred along that edge | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
-| `osd.bottom_margin_px` | `Px` | `24` | `0..=400`; the gap from the dock's reserve (or the bar's, at the top) to the card | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+| `osd.position` | `OsdPosition::{TopRight,BottomCentre}` | `TopRight` | top right under the bar, as current macOS (user, 2026-09-25); `BottomCentre` above the dock | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+| `osd.margin_px` | `Px` | `24` | `0..=400`; the gap from the bar's reserve (at the top) or the dock's (at the bottom) to the card; was `osd.bottom_margin_px` before the top-right decision | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
 
 ## 4. Rust shape
 
