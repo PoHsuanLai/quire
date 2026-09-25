@@ -206,6 +206,23 @@ Played from the freedesktop sound theme (`sound.theme`, default `freedesktop`) b
 | Invalid key in our apps | alert beep | `bell` | proposed |
 | Settings | | `sound.ui_sounds = On | Off` (default On), `sound.volume_feedback = On | Off` (default On) | proposed |
 
+### 13.3.11 Window frame (our client-decorated windows; settled 2026-09-25)
+
+The frame quire draws for a window that asks for no server decorations
+(`Ds { window: WindowFrame::Titlebar }`, design/04 "Window frame"). It acts through the host seam
+`ds::HostWindow`: ds-native over winit, sill over shell-host's `SurfaceHandle`.
+
+| Behaviour | Specification | Status |
+| --- | --- | --- |
+| Move | a primary press on the titlebar's empty area, then travel of more than `window.move_threshold_px` (4) on either axis: `begin_move()` once, while the button is still down (Wayland's `xdg_toplevel.move` takes the press's serial). Not on a light; not while maximized or fullscreen | settled |
+| Double-click the titlebar | `zoom(Toggle)`: maximized restores, anything else maximizes (macOS's "double-click a window's title bar to zoom", its default) | settled |
+| Resize | a primary press on an edge zone (4 px sides, 12 px corners): `begin_resize(edge)` at once. No zones while maximized or fullscreen | settled |
+| Green light | a click is `zoom(Toggle)`; its mark is "restore" while maximized | settled |
+| Tiling menu | held `window.tile_menu_press_ms` (500), rested on `window.tile_menu_hover_ms` (800 = the 450 ms hover intent + 350), right-click, or ArrowDown on the focused light: Move & Resize with Fill (= maximize), Left half, Right half, Centre; a placement the host reports `Support::No` for is unavailable. The hold that opened it does not also zoom | settled shape (macOS Sequoia), delays proposed |
+| First click | the titlebar, the lights and the edge zones carry `data-first-mouse` (13.3.8) | settled |
+| Keyboard | Tab reaches close, minimize, zoom; Enter or Space presses; Escape closes the menu | settled |
+| Placement on Wayland | Left half, Right half and Centre are unavailable: a toplevel can neither read nor set its position (FINDINGS "Window frame") | limit |
+
 ## 13.4 State machines
 
 Pure; `now` is an argument; effects are returned.
@@ -298,6 +315,9 @@ first mouse        activating iff (t_press - t_activated) <= 100 ms
 | --- | --- | --- | --- |
 | `menus.submenu_delay_ms` | ms | 200 (0..1000) | proposed |
 | `switcher.show_delay_ms` | ms | 150 (0..500) | proposed |
+| `window.move_threshold_px` | px | 4 (1..16) | proposed |
+| `window.tile_menu_press_ms` | ms | 500 (200..2000) | proposed |
+| `window.tile_menu_hover_ms` | ms | 800 (450..3000) | proposed |
 | `notifications.dnd` | `On | Off` | `Off` | proposed |
 | `notifications.banner_style` per app | `Banner | Alert | None` | `Banner` | R8 (M: macOS per-app style) |
 | `sound.theme` | name | `freedesktop` | proposed |
@@ -330,6 +350,10 @@ Platform limits:
 - cosmic-comp #2230: a popup or layer under a still pointer gets no enter; menus open by press
   so this affects only the first hover highlight.
 - No foreign-toplevel protocol on KWin: switcher and window lists are empty there.
+- No client placement on Wayland: `xdg_toplevel` has no position request, so our windows'
+  Left half, Right half and Centre are unavailable there (neither cosmic-comp's
+  `zcosmic_toplevel_manager_v1` nor KWin's `org_kde_plasma_window` sets a geometry either;
+  FINDINGS "Window frame").
 - Toshy's Cmd mapping on app_id-less layer surfaces is unverified (plan shell risks); the
   switcher accepts both Alt+Tab and Super+Tab chords.
 

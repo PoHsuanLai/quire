@@ -106,6 +106,7 @@ fn App() -> Element {
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 | `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
 | `scale` | `Option<Scale>` | `None`: the host's `ds::HostScale`, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostScale` themselves; a host that is not `ds-native` passes `scale` |
+| `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::HostWindow` — section 6, "Window frame" |
 
 ### Pixel snapping: `scale`, the pixel tokens and `snap_to_device` (2026-09-25)
 
@@ -1093,6 +1094,29 @@ deletes.
 (`ds_native::focus::BLUR`, also in `focus::provide()`), `ds::HostFind { find, same }` with
 `ds::Found::{Element, Missing, Busy, BadSelector}`, and `ds::HostClickFocus { fallback, restore }`
 with `ds::Fallback::{Renderer, Ancestor}`.
+
+### Window frame (2026-09-25): a client-decorated window
+
+A window that asks for no server decorations draws its own frame. FINDINGS.md "Window frame" has
+the reasons, the winit and Wayland findings and the proofs; design/04 "Window frame" and design/13
+section 13.3.11 the metrics and rules.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| The frame | `Ds { window: WindowFrame::titlebar("Mailo", TrafficLights::Shown), .. }` | The root stamps `data-window-frame="titlebar"` and is a column of `100vh`: the titlebar, then `div.ds-window-body` (`flex:1; min-height:0; position:relative`) holding your children, so your shell fills it with `height:100%`. `TrafficLights::Hidden` keeps the titlebar without the lights. Pass `timing: FrameTiming { move_threshold, menu_press, menu_hover }` from `window.move_threshold_px`, `window.tile_menu_press_ms` and `window.tile_menu_hover_ms` (design/22 section 3.11) once you read settings; `FrameTiming::default()` is their defaults. |
+| No server frame on the window | `AppConfig::with_decorations(ds_native::Decorations::Client)` | Default `Server`: winit's frame (xdg-decoration's server mode on KWin and cosmic-comp, winit's own adwaita frame where a compositor has none). An app that draws `WindowFrame::Titlebar` passes `Client`. |
+| The host seam | `ds::HostWindow` (`begin_move`, `begin_resize(ResizeEdge)`, `zoom(Zoom::{Toggle, Maximize, Restore})`, `minimize`, `close`, `tile(WindowTile::{Fill, LeftHalf, RightHalf, Centre}) -> Result<(), TileError::Unsupported>`, `supports(WindowTile) -> Support::{Yes, No}`, `state() -> WindowState`) | A trait, provided as `ds::WindowHost` context with `use_window_host_provider(\|\| Rc::new(host))`. `ds_native::launch` provides `ds_native::WinitWindow` for you. `ds::WindowTile` is named so because `ds::Tile` is a menu row's tile. |
+| The window's state | `ds::use_window_state() -> WindowState { maximized: Maximized::{On, Off}, fullscreen: Fullscreen::{On, Off}, activated: Activation::{Active, Inactive} }` | Redraws on every change the host reports: `WindowHost::refresh()` (re-read `state()`) or `publish(state)`. `launch` refreshes on every resize and focus change. With no host: its own size, not fullscreen, active. |
+| The titlebar alone (a gallery, a picture) | `WindowTitlebar { title, lights, timing, pose: TilePose::Open }` | Draws the titlebar in any root; `pose` opens the tiling menu as it mounts. |
+| Tests | a stub `impl HostWindow` provided above your `Ds` | `crates/ds-native/tests/window_frame_controls.rs` is the pattern: the stub logs each request into a signal the page shows. |
+
+**What each host implements.** ds-native: everything, with the halves and the centre
+`Support::No` where winit cannot read the window's position (Wayland) and placed from
+`current_monitor()` elsewhere (X11). sill, for a shell-host toplevel: a `HostWindow` over its
+`SurfaceHandle` (`begin_move`, `begin_resize(edge)`, `set_maximized(..)`; `supports` is `Yes` for
+Fill only, since no Wayland protocol lets it place a toplevel), provided with
+`use_window_host_provider`, and `WindowHost::publish` from `use_toplevel_state()` on each
+configure. quire does not depend on shell-host.
 
 ### App icons and the icon style (2026-09-25): what sill does
 

@@ -2747,3 +2747,87 @@ rev unchanged (`e99fbdbd`). Proofs are harness tests: `native_focus_field.rs`,
      webview too. The same row with the strip hidden opens. So mailo's centre click landed on
      Archive because its strip was shown (hovered, or its row held the focus) and wide enough
      for its row, not because Blitz's box is wrong.
+
+## Window frame (2026-09-25)
+
+Our client-decorated windows need a movable, resizable, zoomable frame: mailo on Blitz through
+`ds_native::launch`, and later the shell's apps on shell-host's xdg toplevels. Branch
+`window-frame`, one commit per item; blitz rev unchanged (`e99fbdbd`). Proofs:
+`crates/ds-native/tests/window_frame_controls.rs` (harness, stub host),
+`crates/ds/tests/window_frame_ssr.rs` (goldens under `controls/window_frame/`), the unit tests in
+`ds/src/window/{grab,hold}.rs` and `ds-native/src/window_place.rs`, and the Polish page's
+"Window frame" section. Nothing was run on a live session (the user was away; nothing touched
+`wayland-0`), so every platform claim below is read from the pinned sources, not observed.
+
+1. **The seam.** `ds::HostWindow` is a trait (each host holds its own window handle, and a test's
+   stub records what it was asked), provided as `ds::WindowHost`, which also carries the last
+   `WindowState` as a signal for `use_window_state()`. The brief's `Tile` is `WindowTile`:
+   `ds::Tile` is already a menu row's tile, re-exported at the crate root. `Availability` has no
+   `Unavailable`; the menu's rows use `Availability::Disabled`. shell-host's `window` worktree
+   (branch `window-interact` today) has no `SurfaceHandle::begin_move`, `begin_resize`,
+   `set_maximized` or `use_toplevel_state` yet; sill's host is designed to those names.
+2. **winit is 0.31.0-beta.3, not 0.30** (dioxus-native at the pinned rev). What the frame relies
+   on, read in `winit-core` and `winit-wayland` 0.31.0-beta.3:
+   - `drag_window` and `drag_resize_window` send `xdg_toplevel.move`/`resize` with the pointer's
+     `latest_button_serial`, which every press and release updates. While the button is held
+     it is the press's serial, so asking for the move on the first motion past the threshold
+     (not on the press, which would steal a double-click) is valid. After the release it is not,
+     so a move asked late does nothing.
+   - `outer_position` answers `NotSupported` for a Wayland toplevel ("the compositor does not
+     report absolute positions"), and `set_outer_position`'s Wayland body is the comment "Not
+     possible.". So a client cannot place itself on Wayland: `WinitWindow::supports` answers
+     `Support::No` for Left half, Right half and Centre whenever `outer_position` fails or no
+     monitor position is known, and `tile` returns `TileError::Unsupported`. On X11 (and
+     wherever winit can place a window) they are placed from `current_monitor()`'s position and
+     video-mode size. winit reports no work area, so a half there covers the output's panels
+     too. Not tried on a live X11 server.
+   - `set_minimized(false)` is ignored on Wayland and `is_minimized` is always `None`; the seam
+     has no un-minimize. `is_maximized` and `fullscreen` read the last configure, `has_focus`
+     the keyboard focus, so `launch` refreshes the state on every `SurfaceResized` and `Focused`.
+   - `show_window_menu` is implemented for Wayland toplevels in this beta although its doc says
+     unsupported. The frame does not use it; a right-click on the titlebar could.
+   - Close has no winit request: blitz-shell's `ShellProvider::request_window_close` (the
+     document's shell provider, a root context) sends `BlitzShellEvent::CloseWindow`, handled as
+     `CloseRequested`: the window is dropped and the loop exits. There is no veto hook, so an app
+     with unsaved work has nowhere to intercept the red light yet.
+   - `with_decorations(false)` (`Decorations::Client`) is how the app asks for no second frame;
+     winit-wayland is built with `sctk-adwaita`, so `Server` on a compositor with no
+     xdg-decoration server mode draws winit's adwaita frame.
+3. **Blitz double-click.** `dblclick` arrives on the titlebar (the keep-focus work found the
+   root's click fallback leaves it alone; `a_double_click_on_the_titlebar_zooms`). A light stops
+   its own `dblclick` and `pointerdown`; with that removed the harness logs `close,close,zoom:Toggle`
+   and a move, so the tests prove the stop.
+4. **Selectors in the harness** need the attribute namespace (`[*|data-light=zoom]`), as the
+   stylesheet does (spike S2); `[data-light=zoom]` matches nothing.
+5. **Compositor gaps: placements no client protocol offers.** Only Fill has a request a client
+   may send: `xdg_toplevel.set_maximized`. Left half, Right half and Centre need a way to set a
+   toplevel's position (and, for the halves, a work-area size), and none exists:
+   - xdg-shell (stable, as vendored by wayland-protocols 0.32.13): `xdg_toplevel`'s requests
+     are `destroy`, `set_parent`, `set_title`, `set_app_id`, `show_window_menu`, `move`,
+     `resize`, `set_max_size`, `set_min_size`, `set_maximized`, `unset_maximized`,
+     `set_fullscreen`, `unset_fullscreen`, `set_minimized`. The `tiled_left/right/top/bottom`
+     states go the other way, compositor to client. None of the staging protocols vendored there
+     (`xdg-toplevel-drag`, `xdg-toplevel-tag`, `xdg-toplevel-icon`, `xdg-dialog`,
+     `xdg-session-management`) sets a position.
+   - cosmic-comp: `zcosmic_toplevel_manager_v1` (v4, the shell's privileged protocol, not an
+     app's) has `close`, `activate`, `set/unset_maximized`, `set/unset_minimized`,
+     `set/unset_fullscreen`, `set_rectangle` (a minimize animation's target, in surface
+     coordinates), `set/unset_sticky` and workspace moves. No geometry.
+   - KWin: `org_kde_plasma_window` (plasma-window-management, also privileged) has `set_state`,
+     `set_virtual_desktop`, `set/unset_minimized_geometry`, `highlight`, `close`,
+     `request_move`, `request_resize` (both interactive), `get_icon`, virtual-desktop and
+     activity requests and `send_to_output`. No geometry.
+   So Left half, Right half and Centre are compositor gaps on both cosmic-comp and KWin, for our
+   apps and for sill alike: until a compositor offers a placement request, the menu shows them
+   unavailable on Wayland. (KWin's scripting D-Bus interface can set a window's geometry; that is
+   not a Wayland protocol and was not examined.)
+6. **Choices the brief left open.** The frame is a `Ds` prop, `window: WindowFrame` (the prop
+   `frame` is `FrameTint`'s), default `None`, so every existing golden is unchanged (only the
+   stylesheet golden grew). The lights are the frame's own `button.ds-light`s, not
+   `IconButton`s: a 12 px disc with a mark is not one of IconButton's variants, and a new
+   variant would have edited `icon_button.rs`, which a sibling branch owns; they use the same
+   press path (a click, the keyboard) and their marks are quire's own vectors
+   (`data-ds-svg="light"`). Both a long press (500 ms) and a hover-hold (800 ms: the 450 ms hover
+   intent and 350 ms more) open the tiling menu, so passing over the green light on the way to
+   close does not; right-click and ArrowDown open it too. The grey rule is macOS's: inactive
+   windows are grey until the pointer is over the group; the active window keeps its colours.
