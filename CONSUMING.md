@@ -1429,6 +1429,27 @@ panes on their own. `ControlCenterItem` takes `Icon::Switches` instead of `Setti
 frame of F225 is what CONSUMING section 2 now states; `dock_popup.css` and the tray's popup
 should be checked against it.
 
+### PDF and printing (2026-09-25)
+
+A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and
+the `anyrender_pdfrum` painter writes it through pdfrum (text stays text in embedded, subsetted
+faces at the layout's variable instance; a JPEG or an opaque PNG is embedded as it arrived). FINDINGS.md "PDF output" has the reasons, the limits and the
+measured numbers.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| An HTML document as a PDF | `ds_native::pdf(&html, PageSpec::default()) -> Result<Vec<u8>, PdfError>` | A whole document (`<!DOCTYPE html>...`). quire's faces are registered; the network is sealed: only `data:` URLs load (no `file:`, no fetch). `@media print` applies. Laid out once at the page's content width, at scale 1. |
+| A Dioxus tree as a PDF | `ds_native::pdf_app(app, HarnessConfig::new(viewport), spec)` | Built as `config` says (its contexts and `NetPolicy`; the viewport is replaced by the page's content box), rendered until its mount-time work and images have landed (as `snapshot`), then printed. |
+| In a test | `Harness::pdf(spec) -> Result<Vec<u8>, PdfError>` | Prints the harness's document as it is now, at the page width with `@media print`; the harness's own viewport and media come back afterwards. Read the PDF back with `pdfrum` (dev-dependency) to assert on text. |
+| The sheet | `PageSpec { size, margins }`; `PageSize::{A4, Letter, Custom { width: Pt, height: Pt }}`; `Margins { top, right, bottom, left }`, `Margins::uniform(Pt)`, `Margins::symmetric(vertical, horizontal)`; `Pt::from_mm`, `Pt::from_inches` | `PageSpec::default()` is A4 with 18 mm above and below, 16 mm at the sides. `@page` is not read: the spec's margins are the only ones. `PdfError::NoContentArea` when the margins meet. |
+| Start a new page at an element | `"data-break-before": "page"` | CSS `break-before`/`page-break-before` do nothing on Blitz (stylo drops them). A marker at the document's top makes no blank page. |
+| Keep a box on one page | `"data-break-inside": "avoid"` | Moved whole to the next page when it would straddle the cut, unless it is taller than a page (then it is cut between its lines). Lines, images, `svg`, `canvas`, `iframe` and table rows are kept whole on their own; a text block keeps its first two and last two lines together (orphans and widows of 2). |
+| Screen-only or print-only styling | `@media print { .. }` | Applies in `pdf`, `pdf_app` and `Harness::pdf`. |
+| CJK text | name the family: `font-family: "Noto Sans CJK TC", sans-serif` | Otherwise fontique's fallback picks (DroidSansFallback on this machine). A variable face prints at the instance the layout used. |
+| Print it | `ds_native::print_dialog(&pdf, title) -> Result<PrintOutcome, PrintError>`, feature `print` | Linux: the desktop portal's print dialog (GTK or KDE backend), then the portal prints the PDF. No portal or no print backend, and other systems: the PDF is written to a temp file and opened in the viewer. `PrintOutcome::{Printed, Cancelled, Opened(PathBuf)}`, `PrintError::{Portal, Write, NoViewer}`. **Blocks** until the dialog is answered: call it off the UI thread. The dialog is not parented to the window. |
+| Try it by hand | `cargo run --release -p ds-native --example pdf -- out.pdf`; `cargo run -p ds-native --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
+| The painter alone | `anyrender_pdfrum::write(&[Page { size, scene, placement, clip, area }], &sources)` | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `Sources { texts: RunTexts, images: ImageSources }` carry what anyrender does not: each run's text (`RunKey`, `RunText`) and each image's encoded bytes by decoded blob id. `GlyphArea::Within(rect)` drops glyphs whose box centre falls outside. |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
@@ -1514,6 +1535,7 @@ authority; this table is a pointer. `ds::lint::Rule::BlitzUnsupported`
 | a click on a `Button`/`IconButton` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-native/tests/click.rs`, FINDINGS "Polish pass") |
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_native::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::clip_chars` covers the line-clamp case |
+| `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_native::pdf` (section 6, "PDF and printing") |
 
 What *does* work and needs no fallback: a `<style>` in the body (S1), the `.ds[data-*]` custom
 property cascade once selectors carry `*|` (S2), `@keyframes` including `var()` inside them (S3),
