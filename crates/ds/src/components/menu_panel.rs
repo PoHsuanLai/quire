@@ -126,7 +126,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
 
     /// What `event` means here; the caller acts on `Query`, `CloseMenu` and `Back`, which
     /// belong to the root or the parent.
-    pub(crate) fn key(&self, event: &KeyboardEvent, filter: Filter) -> Decision<T> {
+    pub(crate) fn key(&self, event: &KeyboardEvent, filter: &Filter) -> Decision<T> {
         let Some(act) = key_act(&event.key(), event.modifiers(), filter) else {
             return Decision::Nothing;
         };
@@ -281,7 +281,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
                 },
                 onmousemove: move |event| hover.hovered(&event),
                 onkeydown: move |event| {
-                    if keys.key(&event, Filter::None) == Decision::Back {
+                    if keys.key(&event, &Filter::None) == Decision::Back {
                         onback.call(());
                     }
                 },

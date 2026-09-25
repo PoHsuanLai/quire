@@ -14,6 +14,7 @@ use crate::components::flow::Flow;
 use crate::components::menu_active::{asks, follow_active};
 use crate::components::menu_cursor::Cursor;
 use crate::components::menu_entry::MenuEntry;
+use crate::components::menu_filter::filter_row;
 use crate::components::menu_keys::{Decision, Level};
 use crate::components::menu_lines::{Act, Choice, Filter, KeyAct, choices, key_act, lines};
 use crate::components::menu_panel::Panel;
@@ -50,7 +51,7 @@ use dioxus::prelude::*;
 /// composer's `/` and `@` menus): the menu shows that choice, leaves the keyboard in the field,
 /// and Up, Down and the pointer only ask for a move through `on_active`; the field's own keys
 /// pick with the value it knows. `onquery` hears the typed filter's text on every change
-/// ([`Filter::Typing`]), for an entry that names it ("Create label '…'").
+/// ([`Filter::Typing`] or [`Filter::Field`]), for an entry that names it ("Create label '…'").
 ///
 /// `flow: Flow::Inline` draws the same rows where the caller renders the menu (mailo gaps 4: a
 /// sender card's actions): no overlay, no surface, no entrance, no layer on the stack (so no
@@ -139,11 +140,12 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     };
     follow_active(active, panel.current(), reported, on_active);
     panel.onrelease = Some(released(picks, panel.onpick, fade_out, gesture, on_release));
+    let field = filter_row(&filter, &typed);
     let onkey = {
         let panel = panel.clone();
-        move |event: KeyboardEvent| match panel.key(&event, filter) {
+        move |event: KeyboardEvent| match panel.key(&event, &filter) {
             Decision::CloseMenu => escape_closes(float, &event, fade_out),
-            Decision::Query => typed_query(&event, filter, query, onquery, tracker),
+            Decision::Query => typed_query(&event, &filter, query, onquery, tracker),
             _ => {}
         }
     };
@@ -203,6 +205,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                 }
             },
             onkeydown: onkey,
+            {field}
             {body}
         }
     };
@@ -255,7 +258,7 @@ fn released<T: Clone + 'static>(
 /// the highlight goes back to the first match.
 fn typed_query(
     event: &KeyboardEvent,
-    filter: Filter,
+    filter: &Filter,
     query: Signal<String>,
     onquery: Option<EventHandler<String>>,
     tracker: Tracker,
