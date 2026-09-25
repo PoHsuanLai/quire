@@ -593,6 +593,16 @@ translucency and edge, the frame gives the hue.
 | OSD | Osd | settled by name |
 | Widgets, quick note | Widget | proposed |
 
+### 17.3.1 Modal scrim (sheet and modal parts, 2026-09-25)
+
+`--scrim` (black .22) pushes a peek or a palette back; behind a dialog that asks for a decision
+(the power menu) it is too light. `--scrim-modal` is black at .40 in light and .55 in dark
+(`ColourToken::ScrimModal`, `Scrim { strength: ScrimStrength::Modal }`, `Sheet { scrim }`).
+Gated in `tests/legibility.rs`: the Sheet material's solid tint stands 3.05:1 off the modally
+dimmed paper in light (1.89 under `--scrim`), more than under `--scrim` in dark (1.09 against
+1.04, where the sheet's hairline and shadow carry the edge), and `--ink` reads 15.6 and 15.0:1 on
+the sheet in both schemes.
+
 ### 17.4 Material stack v2 (settled 2026-09-24, the macOS polish pass)
 
 macOS stacks layers on every chrome material that the section 17.2 recipe lacked, and the shell
