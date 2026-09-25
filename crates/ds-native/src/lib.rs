@@ -49,6 +49,8 @@ pub mod snap;
 mod snap_tests;
 pub mod snapshot;
 mod wake;
+pub mod window;
+mod window_place;
 
 pub use app_id::AppId;
 pub use click_focus::{CLICK_FOCUS, FocusFallback};
@@ -65,6 +67,7 @@ pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use origin::{FrameId, RequestOrigin};
 pub use snap::snap_to_device;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
+pub use window::{Decorations, WinitWindow};
 
 // The window renderer dioxus-native runs on; named here so the pinned versions stay the ones
 // the render stack resolves.
