@@ -53,6 +53,7 @@ pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
 pub mod pane_switcher;
+pub mod pass_through;
 pub mod peek;
 pub mod popover;
 pub mod press;
@@ -86,6 +87,8 @@ pub mod toast;
 pub mod toggle;
 pub mod tooltip;
 pub(crate) mod track;
+pub mod tree_item;
+pub(crate) mod tree_item_parts;
 pub mod vocab;
 pub mod workspace_pills;
 
@@ -130,6 +133,7 @@ pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
 pub use osd::{Level, Osd, OsdPosition};
 pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
+pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
@@ -159,6 +163,7 @@ pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
+pub use tree_item::{Disclosure, TreeItem, TreeShape};
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
     Selection, Shortcut, StaggerIndex, Switch,
@@ -217,5 +222,9 @@ pub const CSS: &[(&str, &str)] = &[
     ("toast", include_str!("toast.css")),
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),
+    ("tree_item", include_str!("tree_item.css")),
     ("workspace_pills", include_str!("workspace_pills.css")),
+    // Last: the drop states SidebarItem and TreeItem share (mailo gaps 6) must win over either
+    // item's hover and current rules, which have the same specificity.
+    ("drop_place", include_str!("drop_place.css")),
 ];

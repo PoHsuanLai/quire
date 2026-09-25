@@ -125,7 +125,8 @@ fn sheets(component: &str) -> Vec<&'static str> {
             "provider_mark",
             "count",
         ],
-        "sidebar_item" => &["sidebar_item", "avatar", "count"],
+        "sidebar_item" => &["sidebar_item", "drop_place", "avatar", "count"],
+        "tree_item" => &["tree_item", "drop_place", "count", "icon_button"],
         "sync_halo" => &["sync_halo", "spinner", "avatar"],
         "hover_strip" => &["hover_strip", "icon_button"],
         "appearance_picker" => &[

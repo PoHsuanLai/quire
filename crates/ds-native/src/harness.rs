@@ -94,13 +94,15 @@ impl Harness {
         self.settle();
     }
 
-    /// Move the pointer to `at`.
+    /// Move the pointer to `at`. Coming onto or leaving a link in a frame is reported as the
+    /// window reports it (`FrameLinks::with_hover`).
     pub fn pointer_move(&mut self, at: Point) {
         self.send(UiEvent::PointerMove(pointer(
             at,
             MouseEventButton::Main,
             MouseEventButtons::None,
         )));
+        self.doc.hover_at(at);
     }
 
     /// Press the primary button at `at`. A pointer press makes the modality `pointer`.

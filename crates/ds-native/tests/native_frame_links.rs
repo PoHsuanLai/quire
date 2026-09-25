@@ -82,7 +82,10 @@ fn an_intercepted_click_reaches_the_app_and_the_frame_stays() {
         heard,
         vec![FrameLink {
             frame: before,
-            href: "https://example.org/offer".to_owned()
+            tag: None,
+            href: "https://example.org/offer".to_owned(),
+            text: "Offer".to_owned(),
+            title: None,
         }]
     );
     let after = harness
