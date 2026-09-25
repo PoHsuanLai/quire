@@ -3448,3 +3448,215 @@ below.
 - **Gallery.** The Overlays page's Power menu section (the page is 5700 tall): the centred sheet
   over the modal scrim in its own Sheet root, light and dark, with Cancel, a disabled Suspend, a
   Danger Restart and Shut Down, and Small caps for the arrows, Enter and Escape.
+
+## PDF output (2026-09-25)
+
+mailo is going native-only, and printing was its last webview use. Branch `native-pdf`; blitz rev
+unchanged (`e99fbdbd`). The route is the one mailo's research prototyped: Blitz lays the document
+out, an anyrender painter writes krilla pages, and the result is a vector PDF.
+
+### What was built
+
+- **`crates/anyrender_krilla`**, a sibling crate rather than a module of ds-native. It is an
+  `anyrender::PaintScene` over any krilla surface, and it names only anyrender, peniko, krilla
+  and skrifa (the boundary script now enforces "no Blitz, no parley"), so it can be offered to
+  DioxusLabs/anyrender as it is. It covers fills, strokes (in the shape's space, so widths scale),
+  transforms, clip/blend/opacity layers, linear, radial (two-point conical) and sweep gradients as
+  krilla shadings, images and glyph runs.
+- **`ds_native::{pdf, pdf_app}`, `Harness::pdf`**, `PageSpec { size: PageSize::{A4, Letter,
+  Custom { width, height }}, margins: Margins }` in `Pt`, `PdfError`. Code: `crates/ds-native/
+  src/pdf/` (`html`, `flow`, `paginate`, `run_texts`, `images`, `pages`, `spec`).
+  - `pdf(html)` builds an `HtmlDocument` as a snapshot's document is built: quire's shared font
+    context, the HTML parser, sequential styling. Its `NetPolicy` is `Sealed` (only `data:` loads)
+    and its `MediaType` is `print()`.
+  - **Blitz honours `@media print`**: the fixture's screen-only paragraph is absent from the PDF.
+  - The document is laid out once, at the content box's width, at scale 1 (a CSS px is a layout
+    pixel; the research found that re-laying out at 300 dpi reflowed the text). It is resolved
+    until no image lands.
+  - `Harness::pdf` switches the live document to the page viewport and print media, prints it,
+    then restores both.
+  - `pdf_app` is a harness at the page viewport, advanced by the snapshot's mount settle, then
+    `Harness::pdf`.
+- **Pages.** The document is paginated once. Each page is `paint_scene` with the viewport scrolled
+  to the page's top, under a transform (0.75 pt per px, the margins) and a clip to the page's
+  band.
+  - **Found: the clip ends half a CSS pixel above the cut.** Poppler at 96 dpi snaps a clip outward
+    to whole device pixels. It showed a full-width grey row at page 1's foot: the top border of
+    the block moved to page 2, which begins exactly at the cut.
+- **`print_dialog(pdf, title)`**, feature `print` (zbus and memfd, Linux only; the boundary
+  script checks that ds-native's default build reaches neither).
+  - The flow: `PreparePrint`, then `Print` with a sealed, rewound memfd and the dialog's `token`.
+    Each `Response` is subscribed on the request path from `handle_token` before the call is made.
+  - Checked against the live portal's introspection: `PreparePrint ssa{sv}a{sv}a{sv}`,
+    `Print ssha{sv}`, version 4.
+  - Falls back to a temp file plus `xdg-open` / `open` / `start` when there is no session bus, no
+    portal or no Print backend.
+  - `PrintOutcome::{Printed, Cancelled, Opened(path)}`.
+  - It blocks until the dialog is answered.
+  - The dialog is unparented. The portal wants `wayland:<xdg-foreign handle>`, and neither winit
+    nor `launch` exports one.
+  - xdg-desktop-portal-gtk issue #562 (a second PreparePrint + Print in one backend process can
+    lose the fd) is not detected.
+  - Not run by a test, because it would open a real dialog. `--example print` runs it by hand.
+
+### Page-break rules
+
+stylo is built for servo here, and marks `break-before`, `break-inside` and `page-break-*` as
+gecko-only; `@page` is ignored. So pagination reads markers. It is one pure function,
+`paginate(&Flow, page_height)`, table-tested.
+
+- A **forced break** at `data-break-before="page"` ends the page at the element's border-box top.
+  A marker at the document's top makes no blank page.
+- Otherwise a page ends where it is full, **moved up past every keep-together span** the cut
+  would split, until it splits none. The spans are:
+  - each line box (parley `LineMetrics::block_min/max_coord`);
+  - `img`, `svg`, `canvas`, `video`, `iframe` and `tr` border boxes;
+  - `data-break-inside="avoid"` boxes;
+  - each text block's first two and last two lines: **orphans and widows of 2**, CSS's initial
+    values, as spans; a 3-line block therefore moves whole.
+- A span **taller than a page** is not kept. It is cut where the page is full, and its own lines
+  still move whole.
+- A span starting at the page top is never moved, so every page makes progress.
+- **Margins** come from `PageSpec` only. `Margins::default()` is 18 mm / 16 mm, mailo's `@page`.
+- **Glyphs outside the page's band are dropped, never left under the clip.** `GlyphArea::
+  Within(rect)`: a glyph is written only if the centre of its box (its advance across, ascent to
+  descent down) is inside, so each glyph belongs to exactly one of two pages sharing an edge.
+  - The test drives this: with `GlyphArea::Anywhere`, two tests fail. The next message's heading
+    turns up in page 2's text layer, and glyphs sit outside the content box.
+
+### The text behind each glyph (task 4): reachable, and used
+
+- **blitz-paint hands anyrender glyph ids and positions only.** `stroke_text` calls `draw_glyphs`
+  with `glyph_run.positioned_glyphs()`.
+- **But the layouts are public, and parley 0.11 keeps each cluster's text.** `inline_layout_data
+  { text, layout }`, a list item's outside marker layout (its text is the marker) and a text
+  input's `editor.raw_text()` / `try_layout()` are all reachable. A parley `GlyphRun`'s glyphs
+  are its run's `visual_clusters()` glyphs, in order, and each `Cluster` has `text_range()` into
+  the layout's text.
+- **So before painting, ds-native walks every layout** (`pdf/run_texts.rs`).
+  - It pairs each glyph run's glyphs with their clusters' text, and keys the run as the painter
+    will see it: `RunKey` = the face's blob id and index, the size's bits, and each glyph's id and
+    x/y bits.
+  - The painter looks the key up on every `draw_glyphs` call (`Sources::texts`).
+  - **A ligature's continuation clusters** (zero glyphs, `is_ligature_continuation`) join the
+    glyph's cluster, so `fi` drawn as one glyph carries `fi`.
+  - krilla writes one ToUnicode entry per glyph. When a glyph's text conflicts with an earlier
+    use, it wraps the span in `/ActualText`.
+- **Proofs** (`crates/ds-native/src/pdf/text_tests.rs`, read back with pdfrum):
+  - Noto Serif `field office flat` extracts exactly. Every glyph's text came from the layout
+    (`GlyphTally::cmap_text == 0`).
+  - `一⼀一` in Noto Sans CJK TC extracts exactly, though 一 and ⼀ share one glyph.
+- **The fallback** is for runs with no entry: SVG text (usvg outlines it), a custom widget's
+  scene, anything painted outside those three layout kinds. It is the face's cmap read backwards.
+  - Where code points share a glyph, it **prefers the canonical code point**: not a CJK radical
+    (U+2E80-2FDF), a compatibility ideograph, a presentation form (U+FB00-FDFF, FE30-FE4F,
+    FE70-FEFF, FF00-FFEF) or private use; lowest code point otherwise.
+  - Its limits, shown by `the_cmap_fallback_cannot_spell_a_ligature`: printing the same
+    ligatures with no run texts, pdfrum reads `"\u{1}eld o\u{7}\u{8}e t"`. The ligature glyphs
+    have no cmap entry, so they carry no text and come back as raw CIDs. The words are
+    unsearchable.
+  - `the_cmap_fallback_prefers_the_ideograph_to_the_radical` reads `一⼀一` back as `一一一`.
+  - Arabic and Indic contextual forms would be wrong the same way.
+- **Limits of the layout path:**
+  - Two runs with the same key but different text take the first recorded, in document order.
+    Only glyph-sharing code points can cause that, with everything else identical.
+  - Right-to-left runs are drawn in visual order, with their clusters' logical text per glyph.
+    This is not tested.
+  - The key includes the blob id, so the renderer must paint the very `FontData` the layout
+    holds. Blitz does; a caller building its own `Blob` gets the fallback. `anyrender_krilla`'s
+    `tests/scene.rs` shows it.
+- **Upstream**, the clean fix is still a text-and-clusters argument on anyrender's `draw_glyphs`.
+  The pre-walk replicates `GlyphRunIter`'s split of a run into glyph runs (runs are consumed in
+  line order), so a parley change there would show as runs falling back to the cmap
+  (`GlyphTally::cmap_text` rising). Re-check it in the toolchain-bump wave.
+
+### Variable fonts (task 5): the layout's instance is embedded
+
+- anyrender passes a run's normalized coordinates (F2Dot14, after `avar`); krilla's
+  `Font::new_variable` takes user-space axis values and instantiates the subset itself
+  (`subsetter::subset_with_variations`, glyf and CFF2).
+- The painter therefore inverts `avar` (its segment maps are monotonic) and denormalizes through
+  `fvar`, both table-tested.
+- Faces are cached per blob, index and coordinates. Karla at 400 and at 700 embeds two different
+  subsets (`native_pdf_app.rs`).
+- **Found: the prototype's "thin, grey" CJK was the default instance, not a fallback choice.**
+  Noto Sans CJK on this machine is one variable CFF2 collection (`NotoSansCJK-VF.ttc`, 32 MB)
+  whose default instance is Thin. The prototype ignored the coordinates and embedded Thin. With
+  the instance honoured, the fixture's CJK prints at 400, as on screen (rasterised page checked
+  by eye).
+- The embedded font keeps the default instance's PostScript name (`NotoSansCJKtc-Thin`,
+  `Karla-Regular` for the 700 instance). That is cosmetic; `pdffonts` shows it.
+
+### Images
+
+- Blitz keeps only decoded RGBA. ds-native re-decodes each `<img>`'s `src`, and each background
+  image's URL, when it is a `data:` URL. It records the encoded bytes against the decoded blob's
+  id (`ImageSources`), and the painter uses them when the sizes agree.
+- A **JPEG is written as-is** (krilla `Image::from_jpeg`, DCTDecode). The fixture's 10,391-byte
+  JPEG is in the PDF byte for byte, once.
+- A **PNG** goes through krilla `from_png`: decoded, then written Flate with its alpha as an
+  SMask. PDF has no "PNG as-is"; the fixture's 120 x 40 PNG costs 335 bytes.
+- Anything else, including images an app's `AppNet` fetched, is drawn from the decoded pixels
+  (Flate).
+- An image brush draws once, clipped to its shape; Blitz tiles backgrounds itself.
+
+### Simplified
+
+- Box shadows are dropped.
+- Filters and backdrop filters are ignored.
+- Compositing operators other than source-over paint as source-over. The blend (mix) modes map
+  one to one.
+- Gradients interpolate in sRGB whatever colour space they name; hue direction is ignored.
+- Synthetic bold is drawn as fill plus stroke of the same ink, so it stays text. Synthetic
+  oblique is one skew about the baseline.
+
+### Measured (this machine)
+
+The fixture (`tests/support/print_fixture.rs`) has an A4 heading in Karla and Latin and CJK
+paragraphs. It also has a 320 x 200 JPEG and a 120 x 40 PNG as `data:` URLs, a keep-together
+block that must move, and a forced break.
+
+- **Pages:** 3. The block starts page 2; the forced break starts page 3.
+- **Size: 47,338 bytes.** Karla 3.3 KB, Noto Serif 5.7 KB, Noto Sans CJK TC 20.0 KB and
+  DroidSansFallback 2.5 KB, all subset; the JPEG is 10.4 KB.
+- **Time, release** (`cargo run --release -p ds-native --example pdf`, four runs):
+  - 24-28 ms for the first print in a process, which builds the shared font context and scans
+    the system fonts;
+  - 8-9 ms for a second print.
+- **Time, debug test build:** 72 ms for a warm print (`the_fixture_is_small_and_quick`, bound
+  300 KB and 500 ms).
+- **Visual check** (`native_pdf_raster.rs`): a page rasterised by pdfrum at 96 dpi against the
+  headless snapshot of the same app. The mean channel difference is 0.57/255 and 0.20% of pixels
+  differ by more than 64 (bounds 3.0 and 2%). Glyph anti-aliasing is the difference; the layout
+  is identical.
+- pdfrum 0.3 (the user's own reader, MIT/Apache) is a dev-dependency only, with default features
+  off plus `vello-cpu`. It gives text with ActualText and ToUnicode, character boxes, embedded
+  font programs, stored image bytes and a rasteriser, which is what saved the work.
+
+### Limits
+
+- **Pagination is quire's heuristic, not CSS fragmentation.**
+  - A box's background and border split at a cut, as a browser's do.
+  - A single line or image taller than a page is cut.
+  - Table headers do not repeat.
+  - Floats and absolutely positioned boxes are not kept.
+  - Orphans and widows are fixed at 2; the CSS properties are not read.
+  - `break-after` is not supported.
+  - There are no running headers, footers or page numbers.
+- **The glyph centre rule** leaves up to half a glyph box outside the page for a line taller than
+  a page. It happens only then; every other line is kept whole.
+- **Font fallback is fontique's.** The fixture's Karla heading got its CJK from
+  DroidSansFallback. Print CSS should name the CJK families.
+- **CJK line breaking** still prints `ICU4X data error: No segmentation model` at this rev
+  (FINDINGS "Edit surface").
+- **The dialog**: unparented on Wayland; issue #562 undetected; COSMIC has no Print backend of its
+  own, so a system without xdg-desktop-portal-gtk falls back to the viewer.
+- **Deviation from the brief:** `Harness::pdf` returns `Result<Vec<u8>, PdfError>`, not
+  `Vec<u8>`. krilla can fail to write (a face it cannot embed), and CONVENTIONS §5 forbids a
+  panic on input.
+- **Pinned block additions** (`docs/workspace-deps.toml`, copied into this `Cargo.toml`; shell-host
+  and sill copy them): `krilla = 0.8.2` (no default features, `raster-images`), `skrifa = 0.44`
+  (the version parley already resolves), `pdfrum = 0.3` (tests), `memfd = 0.6`.
+  - krilla brings pdf-writer 0.15, subsetter 0.2.6, xmp-writer, imagesize, write-fonts, and a
+    second skrifa/read-fonts (0.42/0.41 beside parley's 0.44).
+  - `cargo deny check licenses`: ok.

@@ -703,6 +703,31 @@ need an equivalent assertion against whichever mechanism replaces the iframe —
 switching, not after, so the old and new mechanisms can both be checked against it during the
 transition.
 
+**Printing (2026-09-25): the last webview use goes.** `ui/print/window.rs` (a tao window, a wry
+webview, `webkit2gtk::PrintOperation`) is replaced by two calls, both off the UI thread (a
+`spawn_blocking`): render the printout to PDF, then hand it to the system's print dialog.
+
+```rust
+// The print view as a Dioxus tree, with the reader's contexts and its sealed or custom NetPolicy:
+let pdf = ds_native::pdf_app(print_view, HarnessConfig::new(viewport).with_contexts(ctx), PageSpec::default())?;
+// Or, keeping mail-mime::print's HTML as the single source (a whole document, data: images only):
+let pdf = ds_native::pdf(&printout_html, PageSpec::default())?;
+match ds_native::print_dialog(&pdf, &thread.subject)? {   // feature "print"
+    PrintOutcome::Printed | PrintOutcome::Cancelled => {}
+    PrintOutcome::Opened(path) => toast(format!("Opened {} for printing", path.display())),
+}
+```
+
+What the print HTML changes, since Blitz drops CSS fragmentation: `.message.new-page { break-before:
+page }` becomes `data-break-before="page"` on the article (per-message pages); `.headers` and
+`.attachments` gain `data-break-inside="avoid"`; `@page { margin: 18mm 16mm }` becomes the
+`PageSpec` (it is already `Margins::default()`). Keep `@media print` rules as they are. Name the
+CJK families in the print CSS ahead of the generic one (`"Noto Serif CJK TC"`, `"Noto Sans CJK
+TC"`), or fontique's fallback chooses. "Save for printing" writes the same PDF bytes instead of
+the HTML. The printout's tests assert on text, not pixels: `Harness::pdf(spec)` (or `pdf(..)`)
+read back with `pdfrum` (FINDINGS "PDF output" has the pattern: `crates/ds-native/tests/
+native_pdf.rs`). On Wayland the dialog opens unparented (no xdg-foreign handle yet).
+
 ## 8. What mailo keeps
 
 Its own page layout and grid (`.app`, `.card`), its own containers around migrated components
@@ -715,6 +740,11 @@ itself — the header, the `ViewSwitch`, the find bar's own layout). None of `.a
 easing/radius/font-size/z-index anywhere, quire tokens only, even in mailo's own layout CSS) and
 `ds::lint::markup` (coherence rule 2: every class on every rendered element is either one quire
 exports or one this remaining CSS defines).
+
+For printing, mailo keeps `mail-mime::print` (the printout's HTML, its CSP and `data:`-only
+images, and the choice of a page per message) and `mail-app::print` (reading the store); what
+goes is the webview window that printed it. The page-break markers, `PageSpec`, the PDF and the
+print dialog are quire's (`ds_native::{pdf, pdf_app, print_dialog}`, section 7 "Printing").
 
 ## 9. Acceptance gates, both phases
 
