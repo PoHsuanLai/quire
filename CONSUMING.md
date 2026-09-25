@@ -1101,7 +1101,7 @@ struct literal.
 | Root contexts (dioxus desktop's `with_context`) | `AppConfig::with_context(value)`, `with_contexts(RootContexts)`; `Harness::with_contexts(app, viewport, contexts)`, `HarnessConfig::with_context`, `snapshot_with(app, config, moments)` | `value: Clone + Send + Sync + 'static`, read with `use_context::<T>()`; the same values reach the window, a test and a snapshot. No globals. |
 | Network policy | `AppConfig::with_net(NetPolicy)`, `HarnessConfig::with_net` | `NetPolicy::{Local, Custom(Arc<dyn AppNet>), Sealed}`. `Local` (default) is what `launch` always did. Frames get `data:` only unless `Custom`'s `AppNet::decide(&NetRequest) -> NetDecision::{Allow, Deny}` admits a request (`NetRequest::origin()` is `RequestOrigin::{Top, Frame(FrameId)}`); `AppNet::fetch(request, NetReply)` then answers with `reply.bytes(..)` from any thread. ds-native never serves `file:` to a frame. |
 | `<iframe srcdoc>` | nothing: the HTML parser is on in the window and the harness | A frame is a separate document: no shared DOM, no shared cascade, no scripts. `Harness::frame(selector) -> Option<FrameView>` with `id`, `text`, `html`, `count`, `text_of`, `attr`, `width`, `centre`. |
-| Links clicked in a frame | `AppConfig::with_frame_links(FrameLinks)`, `HarnessConfig::with_frame_links` | `FrameLinks::{Inert, Intercept(..)}`, built with `FrameLinks::intercept(\|link: FrameLink\| ..)`; `FrameLink { frame, href }`. The frame never navigates; the handler runs with the document free. |
+| Links clicked in a frame | `AppConfig::with_frame_links(FrameLinks)`, `HarnessConfig::with_frame_links` | `FrameLinks::{Inert, Intercept { .. }}`, built with `FrameLinks::intercept(\|link: FrameLink\| ..)`; `FrameLink { frame, tag, href, text, title }` ("Frame tags and link text" below). The frame never navigates; the handler runs with the document free. |
 | Clipboard | `ds_native::clipboard::{write_text, read_text}` | `Result<_, ClipboardError::{NoHost, Unavailable}>`; call from a handler. Ctrl+C/X/V in every text field need nothing. The harness's clipboard is in memory: `Harness::clipboard_text`, `set_clipboard_text`, `selected_text`. |
 | Focus an app's own element | `ds::focus_soon(element)`, `ds::focus_soon_selecting(element, Select)` | Waits out a busy document as quire's fields do: mailo's `.app` shell after a panel closes. |
 | Select a field's value as it takes the focus | `use_focus_request().with_select_all()` with `TextInput { focus: Focus::Controlled(request) }` | `ds::Select::{None, All}`; the host's `HostSelect` (`ds_native::focus::SELECT`, provided by `launch`, the harness and `ds_native::focus::provide()`). A webview does nothing. |
@@ -1109,6 +1109,24 @@ struct literal.
 
 The window's app renders one frame after the host, once the document has the app's providers
 (a frame in the first render would otherwise be parsed with the wrong ones).
+
+### Frame tags and link text (2026-09-25): which frame, and what a link says
+
+Additive to "Native phase B". FINDINGS.md "Frame tags and link text" has the reasons and proofs.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Name a frame | `iframe { "data-frame-tag": "msg-42", srcdoc: .. }` | Read as the frame's document is found under its element; blank means untagged. One tag per frame: a lookup returns the newest document carrying it. |
+| Which frame asked | `NetRequest::frame_tag() -> Option<&FrameTag>` beside `origin()` | `None` for the app's own document and an untagged frame. A frame's requests reach `AppNet::decide` on the frame after its document is built (they wait for the tag); `data:` never waits. |
+| Which frame a click came from | `FrameLink { frame, tag, href, .. }` | `tag: Option<FrameTag>`. |
+| Tie an id to the app's frame | `ds_native::frames::tag_of(FrameId) -> Option<FrameTag>`, `frame_by_tag(&FrameTag) -> Option<FrameId>` | Any document on the calling thread: the window's UI thread, or a test's. A frame is forgotten with its document. |
+| A stable key for a frame | `FrameId::index() -> usize` | Never reused within the process. `FrameTag::new(text)`, `as_str()`, `Display`. |
+| What a clicked link says | `FrameLink { frame, tag, href, text, title }` | `text`: the anchor's text content, whitespace-collapsed (empty if the anchor is gone); `title: Option<String>`. Compare `text` with `href` for link honesty. |
+| A link pill | `FrameLinks::intercept(on_click).with_hover(\|hover: FrameLinkHover\| ..)` | `FrameLinkHover { frame, tag, href, text, title, at, phase }`, `phase: HoverPhase::{Enter, Leave}`, `at: ds::Point` in the app document's coordinates (where the pointer is). Once per crossing, never per move: onto a link, off it, from one to the next (a `Leave` then an `Enter`), or out of the window. On `Inert` it reports nothing. |
+
+**Breaking, narrowly:** `FrameLinks::Intercept` is `Intercept { click, hover }` (it was a tuple
+variant); `FrameLinks::intercept(..)` and `Inert` are unchanged. `FrameLink` has two more
+fields, so a struct literal of it (a test's expected value) names `tag`, `text` and `title`.
 
 ### Edit surface (2026-09-25): an app's own editor on Blitz
 
