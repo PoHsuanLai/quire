@@ -13,6 +13,7 @@ use crate::frame_links::FrameLinks;
 use crate::host::{Host, HostProps};
 use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
+use crate::window::Decorations;
 use dioxus::prelude::*;
 use dioxus_native::{LogicalSize, WindowAttributes};
 
@@ -28,6 +29,8 @@ pub struct AppConfig {
     height: u32,
     /// The desktop application id, if the app has one.
     app_id: Option<AppId>,
+    /// Who draws the window's frame.
+    decorations: Decorations,
     /// What the document is given beyond quire's own contexts.
     setup: Setup,
 }
@@ -40,6 +43,7 @@ impl AppConfig {
             width,
             height,
             app_id: None,
+            decorations: Decorations::Server,
             setup: Setup::default(),
         }
     }
@@ -48,6 +52,14 @@ impl AppConfig {
     /// desktop matches it to the app's `.desktop` file for its icon and name.
     pub fn with_app_id(mut self, id: AppId) -> Self {
         self.app_id = Some(id);
+        self
+    }
+
+    /// Who draws the window's frame (default [`Decorations::Server`]). An app whose root draws
+    /// `ds::WindowFrame::Titlebar` passes [`Decorations::Client`], so the window has no second
+    /// frame around it.
+    pub fn with_decorations(mut self, decorations: Decorations) -> Self {
+        self.decorations = decorations;
         self
     }
 
@@ -93,7 +105,8 @@ pub fn launch(app: fn() -> Element, config: AppConfig) {
     let _runtime = crate::runtime::enter();
     let window = WindowAttributes::default()
         .with_title(config.title)
-        .with_surface_size(LogicalSize::new(config.width, config.height));
+        .with_surface_size(LogicalSize::new(config.width, config.height))
+        .with_decorations(config.decorations.winit());
     let window = match &config.app_id {
         Some(id) => with_app_id(window, id),
         None => window,

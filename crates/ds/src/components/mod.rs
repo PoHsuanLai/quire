@@ -22,6 +22,7 @@ pub mod icon_button;
 pub mod icon_view;
 pub mod kbd;
 pub mod level;
+pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
 pub mod menu;
@@ -57,6 +58,7 @@ pub mod peek;
 pub mod popover;
 pub mod press;
 pub mod provider_mark;
+pub(crate) mod resize_edges;
 pub mod row_action;
 pub(crate) mod row_click;
 pub mod row_hooks;
@@ -86,9 +88,11 @@ pub mod toast;
 pub mod toggle;
 pub mod tooltip;
 pub(crate) mod track;
+pub mod traffic_lights;
 pub mod tree_item;
 pub(crate) mod tree_item_parts;
 pub mod vocab;
+pub mod window_frame;
 pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
@@ -161,11 +165,13 @@ pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
+pub use traffic_lights::TilePose;
 pub use tree_item::{Disclosure, TreeItem, TreeShape};
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
     Selection, Shortcut, StaggerIndex, Switch,
 };
+pub use window_frame::{TrafficLights, WindowFrame, WindowTitlebar};
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.
@@ -220,6 +226,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("toggle", include_str!("toggle.css")),
     ("tooltip", include_str!("tooltip.css")),
     ("tree_item", include_str!("tree_item.css")),
+    ("window_frame", include_str!("window_frame.css")),
     ("workspace_pills", include_str!("workspace_pills.css")),
     // Last: the drop states SidebarItem and TreeItem share (mailo gaps 6) must win over either
     // item's hover and current rules, which have the same specificity.

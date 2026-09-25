@@ -67,6 +67,15 @@ pub const STYLES: &[(&str, &[&str])] = &[
         "spinner",
         &[include_str!("../../src/components/spinner.css")],
     ),
+    // The frame's own sheet, and the utilities its root and title take (`ds-layer`,
+    // `ds-grain`, `ds-truncate`).
+    (
+        "window_frame",
+        &[
+            include_str!("../../src/components/window_frame.css"),
+            include_str!("../../src/css/utilities.css"),
+        ],
+    ),
 ];
 
 /// Every value of every `class="..."` attribute in `html`.

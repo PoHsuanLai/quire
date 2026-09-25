@@ -102,8 +102,8 @@ pub const REGISTRY: [Entry; 14] = [
     Entry {
         page: Page::Polish,
         title: "Polish",
-        lede: "The shell chrome beside the macOS numbers it targets: the material stack, a text menu and the menu-bar items, squircle corners, the dock pill and its plates, the launcher and the window shadow, each with the target printed under it.",
-        height: 3000,
+        lede: "The shell chrome beside the macOS numbers it targets: the material stack, a text menu and the menu-bar items, squircle corners, the dock pill and its plates, the launcher and the window shadow, each with the target printed under it; then the window frame with its traffic lights and the tiling menu open.",
+        height: 4250,
         body: pages::polish::PolishPage,
     },
     Entry {
