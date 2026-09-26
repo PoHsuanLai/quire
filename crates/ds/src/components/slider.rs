@@ -95,6 +95,7 @@ pub fn Slider(
             class: "ds-slider",
             role: "slider",
             tabindex: "0",
+            "data-wheel": "capture",
             "aria-label": "{label}",
             "aria-valuemin": "0",
             "aria-valuemax": "100",

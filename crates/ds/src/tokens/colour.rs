@@ -98,11 +98,15 @@ pub enum ColourToken {
     /// (sill FINDINGS "Sheet and modal parts"; design/03-COLOR.md section 17). A colour like
     /// `--scrim`, not an opacity, because its strength differs by scheme.
     ScrimModal,
+    /// `--scroll-thumb`: the host's own overlay scrollbar thumb (design/11-BEHAVIOUR-scroll.md
+    /// section 11.3.12): `--ink` at .5 alpha, over the layer's own .8 opacity (effective .4), in
+    /// light; `--paper`'s equivalent (white at the same effective alpha) in dark.
+    ScrollThumb,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 29] = [
+    pub const ALL: [ColourToken; 30] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -132,6 +136,7 @@ impl ColourToken {
         ColourToken::OkInk,
         ColourToken::WarnInk,
         ColourToken::ScrimModal,
+        ColourToken::ScrollThumb,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -166,6 +171,7 @@ impl ColourToken {
             ColourToken::OkInk => "--ok-ink",
             ColourToken::WarnInk => "--warn-ink",
             ColourToken::ScrimModal => "--scrim-modal",
+            ColourToken::ScrollThumb => "--scroll-thumb",
         })
     }
 
@@ -222,6 +228,10 @@ impl ColourToken {
             // A modal's dimming: stronger in dark, where the paper is already near black and the
             // sheet stands out by its hairline and shadow; the legibility test gates both.
             ColourToken::ScrimModal => (alpha(0x000000, 400), alpha(0x000000, 550)),
+            // `--ink` at .5 over the layer's .8 opacity in light (effective .4); `--paper`'s
+            // equivalent, white at the same effective alpha, in dark (design/11-BEHAVIOUR-scroll.md
+            // section 11.3.12).
+            ColourToken::ScrollThumb => (alpha(0x000000, 400), alpha(0xFFFFFF, 400)),
             ColourToken::MarkGround => (WHITE, WHITE),
             // Proposed (O-3): black at .25 on light, white at .25 on dark.
             ColourToken::HandleRing => (alpha(0x000000, 250), alpha(0xFFFFFF, 250)),

@@ -42,8 +42,9 @@ pub enum Rule {
     UndeclaredVar,
     /// `!important`.
     Important,
-    /// A property or value Blitz does not paint: `filter`, `backdrop-filter`,
-    /// `mix-blend-mode`, `position: sticky`, `text-overflow`, `line-clamp`, `text-shadow`.
+    /// A property or value Blitz does not paint, or that fights the host: `filter`,
+    /// `backdrop-filter`, `mix-blend-mode`, `position: sticky`, `text-overflow`, `line-clamp`,
+    /// `text-shadow`, `scroll-behavior: smooth` (design/11-BEHAVIOUR-scroll.md#11-3-1-ownership).
     BlitzUnsupported,
     /// An attribute selector without the `*|` namespace: `[data-theme=dark]` never matches on
     /// Blitz, `[*|data-theme=dark]` matches there and in browsers (spike S2).

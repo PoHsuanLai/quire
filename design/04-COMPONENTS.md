@@ -605,7 +605,7 @@ brightness, OSD.
 **Markup.**
 
 ```html
-<div class="ds-slider" role="slider" tabindex="0" aria-label="Grain"
+<div class="ds-slider" role="slider" tabindex="0" data-wheel="capture" aria-label="Grain"
      aria-valuemin="0" aria-valuemax="100" aria-valuenow="35" style="--f:.35">
   <div class="ds-slider-track"><div class="ds-slider-fill"></div></div>
   <div class="ds-slider-thumb" data-drag="idle|live"></div>
@@ -652,7 +652,9 @@ brightness, OSD.
 **Behaviour.** Pointer down on track or thumb captures the pointer and jumps the value to the
 pointer (`S:1435-1441`, the field does the same). Move updates, up releases. Keys: Left/Down
 minus one step, Right/Up plus one step (the handle uses 5° / .05 steps, `S:1455-1456`; slider
-step is a prop). See 06-INTERACTIONS "drag tracker".
+step is a prop). See 06-INTERACTIONS "drag tracker". `data-wheel="capture"` (11-BEHAVIOUR-scroll.md
+section 11.3.1) marks the slider as one of the ds components that consumes wheel input itself, so
+shell-host's scroll engine hands it the raw event instead of scrolling the page under it.
 
 **Blitz notes.** `setPointerCapture` is JS; `DragTracker` in Rust owns the capture and writes
 `--f`. The white border and shadow literals need tokens (`--handle-ring`, O-3).
@@ -2234,7 +2236,7 @@ scrim (sheet)"). Shell: dialogs, settings sheets.
   </div>
   …reader…
 </div>
-<div class="ds-sheet" role="dialog" aria-label="…">…</div>   <!-- derived -->
+<div class="ds-sheet" role="dialog" aria-label="…" data-overscroll="band">…</div>   <!-- derived -->
 ```
 
 **Props.**
