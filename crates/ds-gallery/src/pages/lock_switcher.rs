@@ -1,29 +1,47 @@
 //! The Lock and switcher page (M11): the shell's own lock screen over the calm wallpaper (at
 //! rest, a wrong password posed at its shake, and checking in the Space's colour), the polkit
-//! prompt's sheet, and the app switcher with five and fourteen apps.
+//! prompt's sheet, the three kinds of picture the prompt takes (a face, a photo, a persona),
+//! and the app switcher with five and fourteen apps.
 
 use super::Section;
 use crate::axes::Axes;
-use crate::wallpaper;
+use crate::{portrait, wallpaper};
 use dioxus::prelude::*;
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
     Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp, Text,
-    person_hue, use_env,
+    Material, PersonaSpec, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
+    Text, UserPicture, person_hue, use_env,
 };
+
+/// The person's letter disc.
+fn letter() -> AvatarFace {
+    AvatarFace {
+        initial: 'P',
+        size: AvatarSize::Size64,
+        tone: AvatarTone::Person(person_hue("pohsuan")),
+        shape: AvatarShape::Round,
+    }
+}
 
 /// The person at the lock screen.
 fn user() -> LockUser {
-    LockUser {
-        name: "Po-Hsuan Lai".to_owned(),
-        avatar: AvatarFace {
-            initial: 'P',
-            size: AvatarSize::Size64,
-            tone: AvatarTone::Person(person_hue("pohsuan")),
-            shape: AvatarShape::Round,
-        },
-    }
+    LockUser::new("Po-Hsuan Lai", letter())
+}
+
+/// The three kinds of picture, captioned.
+fn pictures() -> [(&'static str, UserPicture); 3] {
+    [
+        ("UserPicture::Face(AvatarFace)", letter().into()),
+        (
+            "UserPicture::Photo(ImageSource), cropped round",
+            ImageSource(portrait::uri().to_owned()).into(),
+        ),
+        (
+            "UserPicture::Persona(PersonaSpec)",
+            PersonaSpec::from_seed(11).into(),
+        ),
+    ]
 }
 
 /// One lock specimen: its caption, state, caps lock, look, hint and pose.
@@ -99,6 +117,16 @@ pub fn LockSwitcherPage() -> Element {
                 }
             }
         }
+        Section { title: "The person's picture", note: "LockUser {{ name, picture: UserPicture }}, built with LockUser::new(name, picture): a letter disc redrawn at 64, the user's own photo ($HOME/.face or AccountsService's icon, as ImageSource::file) cropped round with object-fit: cover (this stand-in is taller than wide), or their persona. The persona's mood is the prompt's own: attentive while typing or checking, a wince when Wrong, happy when Accepted, idle otherwise; a key or the pointer in the prompt wakes it, and it rests again 20 s after. Faces and photos have no moods. The polkit sheet draws the same three at 48.",
+            div { class: "g-row g-row-top",
+                for (caption, picture) in pictures() {
+                    div { class: "g-col",
+                        PictureStage { picture }
+                        span { class: "g-name", "{caption}" }
+                    }
+                }
+            }
+        }
         Section { title: "Polkit prompt", note: "PolkitPrompt: a narrow centred Sheet (SheetWidth::Narrow, 340) over the modal scrim, entering with peek-in. The avatar at 48, the title, the program's message, Details as a hover card, the name over a boxed Secret field, Cancel (Secondary) and Authenticate (Primary) at equal width. Left at rest; right locked out after too many tries, the field and Authenticate closed.",
             div { class: "g-row g-row-top",
                 PolkitStage { state: PromptState::Idle }
@@ -151,6 +179,33 @@ fn LockStage(pose: Pose) -> Element {
                         }
                     },
                 }
+                }
+            }
+        }
+    }
+}
+
+/// A lock prompt for a person shown by `picture`, alone over the calm wallpaper at full size.
+#[component]
+fn PictureStage(picture: UserPicture) -> Element {
+    let axes = use_context::<Signal<Axes>>();
+    let (theme, accent, motion) = {
+        let axes = axes.read();
+        (axes.theme, axes.accent, axes.motion)
+    };
+    let scheme = use_env().scheme;
+    rsx! {
+        div { class: "g-lock-picture", style: "background-image:url(\"{wallpaper::calm_uri(scheme)}\")",
+            Ds {
+                appearance: Appearance { theme, accent, motion },
+                material: Material::Window,
+                stylesheet: Inject::Host,
+                chrome: Some(RootChrome::Transparent),
+                LockPrompt {
+                    user: LockUser { picture, ..user() },
+                    hint: Some(Text::from("Press Enter to unlock")),
+                    oninput: |_| {},
+                    onsubmit: |_| {},
                 }
             }
         }

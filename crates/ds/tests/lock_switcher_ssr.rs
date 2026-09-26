@@ -14,20 +14,33 @@ use ds::lint::{LintConfig, markup};
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
     Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp, Text, Theme,
-    TilePresence, person_hue,
+    Material, PersonaSpec, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
+    Text, Theme, TilePresence, person_hue,
 };
 
 fn user() -> LockUser {
-    LockUser {
-        name: "Dana Reyes".to_owned(),
-        avatar: AvatarFace {
+    LockUser::new(
+        "Dana Reyes",
+        AvatarFace {
             initial: 'D',
             size: AvatarSize::Size20,
             tone: AvatarTone::Person(person_hue("dana")),
             shape: AvatarShape::Round,
         },
-    }
+    )
+}
+
+/// Dana with her photo, a portrait-shaped PNG the disc crops.
+fn photo_user() -> LockUser {
+    LockUser::new(
+        "Dana Reyes",
+        ImageSource("data:image/png;base64,AAAA".to_owned()),
+    )
+}
+
+/// Dana as her persona.
+fn persona_user() -> LockUser {
+    LockUser::new("Dana Reyes", PersonaSpec::from_seed(7))
 }
 
 fn root(material: Material, body: Element) -> Element {
@@ -55,6 +68,16 @@ fn prompt(state: PromptState, caps: CapsLock, look: LockLook) -> Element {
     )
 }
 
+fn prompt_for(user: LockUser, state: PromptState) -> Element {
+    root(
+        Material::Window,
+        rsx! {
+            LockPrompt { user, state, hint: Some(Text::from("Press Enter to unlock")),
+                oninput: |_| {}, onsubmit: |_| {} }
+        },
+    )
+}
+
 fn screen() -> Element {
     root(
         Material::Window,
@@ -69,13 +92,21 @@ fn screen() -> Element {
 }
 
 fn polkit(state: PromptState, caps: CapsLock) -> Element {
+    polkit_with(user(), state, caps)
+}
+
+fn polkit_for(user: LockUser, state: PromptState) -> Element {
+    polkit_with(user, state, CapsLock::Off)
+}
+
+fn polkit_with(user: LockUser, state: PromptState, caps: CapsLock) -> Element {
     root(
         Material::Sheet,
         rsx! {
             PolkitPrompt {
                 action: "Authentication is required to change the system's time zone.",
                 detail: Some(Text::from("org.freedesktop.timedate1.set-timezone")),
-                user: user(),
+                user,
                 state,
                 caps,
                 oninput: |_| {},
@@ -184,6 +215,21 @@ const SPECIMENS: &[Specimen] = &[
     }),
     ("switcher-leaving", || {
         switcher(5, "terminal", 1440.0, Some("terminal"))
+    }),
+    ("prompt-photo", || {
+        prompt_for(photo_user(), PromptState::Idle)
+    }),
+    ("prompt-persona", || {
+        prompt_for(persona_user(), PromptState::Idle)
+    }),
+    ("prompt-persona-accepted", || {
+        prompt_for(persona_user(), PromptState::Accepted)
+    }),
+    ("polkit-photo", || {
+        polkit_for(photo_user(), PromptState::Idle)
+    }),
+    ("polkit-persona", || {
+        polkit_for(persona_user(), PromptState::Idle)
     }),
 ];
 
@@ -307,4 +353,40 @@ fn the_markup_carries_the_props() {
         "{leaving}"
     );
     assert!(leaving.contains("data-presence=\"leaving\""), "{leaving}");
+}
+
+/// A photo is cropped round at the face's size (64 at the lock, 48 in the polkit sheet), with
+/// no letter; a persona is drawn at Medium, idle at rest and happy once accepted.
+#[test]
+fn the_picture_is_the_kind_the_user_carries() {
+    let by_name = |name: &str| {
+        let make = SPECIMENS
+            .iter()
+            .find(|(named, _)| *named == name)
+            .unwrap_or_else(|| panic!("a specimen {name}"))
+            .1;
+        render(make)
+    };
+    let photo = by_name("prompt-photo");
+    for want in [
+        "class=\"ds-user-photo\" data-size=\"64\"",
+        "class=\"ds-user-photo-image\"",
+        "src=\"data:image/png;base64,AAAA\"",
+    ] {
+        assert!(photo.contains(want), "{want} in {photo}");
+    }
+    assert!(!photo.contains("ds-avatar"), "{photo}");
+    assert!(
+        by_name("polkit-photo").contains("class=\"ds-user-photo\" data-size=\"48\""),
+        "the polkit photo at 48"
+    );
+    let persona = by_name("prompt-persona");
+    assert!(
+        persona.contains("data-size=\"64\" data-mood=\"idle\""),
+        "{persona}"
+    );
+    assert!(!persona.contains("ds-avatar"), "{persona}");
+    let accepted = by_name("prompt-persona-accepted");
+    assert!(accepted.contains("data-mood=\"happy\""), "{accepted}");
+    assert!(accepted.contains("data-state=\"accepted\""), "{accepted}");
 }

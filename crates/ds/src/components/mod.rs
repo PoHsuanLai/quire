@@ -43,6 +43,8 @@ pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
 pub mod lock_clock;
+pub(crate) mod lock_mood;
+pub(crate) mod lock_picture;
 pub mod lock_prompt;
 pub mod lock_screen;
 pub mod lock_vocab;

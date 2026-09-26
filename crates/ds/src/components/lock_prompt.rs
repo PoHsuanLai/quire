@@ -1,9 +1,11 @@
 //! LockPrompt: who is asked, and the password field (design/20-SURFACES.md section 1.9;
-//! design/04-COMPONENTS.md section 42). The avatar, the name, a pill field of flat white glass
-//! with an enter arrow inside it, a caps-lock mark, and a hint line under it.
+//! design/04-COMPONENTS.md section 42). The person's picture, the name, a pill field of flat
+//! white glass with an enter arrow inside it, a caps-lock mark, and a hint line under it.
 
-use crate::components::avatar::{AvatarFace, AvatarSize, face};
+use crate::components::lock_mood::{Caret, Stir, prompt_mood, use_stir};
+use crate::components::lock_picture::{AT_LOCK, Liveliness, prompt_picture};
 use crate::components::lock_vocab::{CapsLock, LockLook, LockUser, PromptState};
+use crate::components::persona::{UserPicture, WakeStamp};
 use crate::components::secret_entry::{Filled, SecretEntry, use_secret_entry};
 use crate::components::spinner::{Spinner, SpinnerKind};
 use crate::components::text_input::{Focus, InputVariant, TextInput, TextInputKind};
@@ -23,6 +25,11 @@ const ENTER_PASSWORD: &str = "Enter Password";
 /// `Wrong` shakes the field once and empties it when the shake settles, `LockedOut` closes the
 /// field and says when it opens. `caps` marks caps lock; `hint` is the line under the field
 /// ("Touch the key or enter your password"). The field takes the keyboard as it mounts.
+///
+/// `user.picture` is drawn at 64: a face or a photo as it is, a persona playing the prompt's
+/// own mood (attentive while typing or checking, a wince when `Wrong`, happy when `Accepted`,
+/// idle otherwise), woken by any key or pointer activity in the prompt and by each new `wake`
+/// the caller passes (a display coming back on).
 #[component]
 pub fn LockPrompt(
     user: LockUser,
@@ -31,23 +38,41 @@ pub fn LockPrompt(
     #[props(default)] look: LockLook,
     #[props(default)] placeholder: Option<String>,
     #[props(default)] hint: Option<Text>,
+    #[props(default)] wake: Option<WakeStamp>,
     oninput: EventHandler<String>,
     onsubmit: EventHandler<String>,
 ) -> Element {
     let entry = use_secret_entry(&state, oninput);
-    let avatar = AvatarFace {
-        size: AvatarSize::Size64,
-        ..user.avatar
+    let mut caret = use_signal(|| Caret::In);
+    let stir = use_stir();
+    let lively = Lively::of(&user.picture);
+    let life = Liveliness {
+        mood: prompt_mood(&state, entry.filled(), caret(), entry.pulse.phase()),
+        wake: stir.stamp(wake),
     };
     let line = hint_line(&state, hint);
+    let field = Field {
+        entry,
+        caps,
+        placeholder: placeholder.unwrap_or_else(|| ENTER_PASSWORD.to_owned()),
+        onsubmit,
+        oncaret: EventHandler::new(move |at: Caret| {
+            if *caret.peek() != at {
+                caret.set(at);
+            }
+        }),
+    };
     rsx! {
         div {
             class: "ds-lock-prompt",
             "data-look": look.slug(),
             "data-state": state.slug(),
-            {face(avatar)}
+            onkeydown: move |_| lively.stir(stir),
+            onmousemove: move |_| lively.stir(stir),
+            onmousedown: move |_| lively.stir(stir),
+            {prompt_picture(user.picture, AT_LOCK, life)}
             div { class: "ds-lock-name", "{user.name}" }
-            {lock_field(entry, &state, caps, placeholder.unwrap_or_else(|| ENTER_PASSWORD.to_owned()), onsubmit)}
+            {lock_field(field, &state)}
             if let Some(line) = line {
                 div { class: "ds-lock-hint", {text(&line)} }
             }
@@ -63,14 +88,48 @@ fn hint_line(state: &PromptState, hint: Option<Text>) -> Option<Text> {
     }
 }
 
-/// The pill: the secret field, the caps mark and the enter button, shaking as one.
-fn lock_field(
+/// Whether the prompt's picture moves: only a persona is woken by activity, so a face or a
+/// photo costs no render per pointer move.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Lively {
+    Persona,
+    Still,
+}
+
+impl Lively {
+    fn of(picture: &UserPicture) -> Self {
+        match picture {
+            UserPicture::Persona(_) => Lively::Persona,
+            UserPicture::Face(_) | UserPicture::Photo(_) => Lively::Still,
+        }
+    }
+
+    fn stir(self, stir: Stir) {
+        if self == Lively::Persona {
+            stir.stirred();
+        }
+    }
+}
+
+/// What the pill holds and reports.
+struct Field {
     entry: SecretEntry,
-    state: &PromptState,
     caps: CapsLock,
     placeholder: String,
     onsubmit: EventHandler<String>,
-) -> Element {
+    /// Where the caret went: into the field (focus, typing) or out of it.
+    oncaret: EventHandler<Caret>,
+}
+
+/// The pill: the secret field, the caps mark and the enter button, shaking as one.
+fn lock_field(field: Field, state: &PromptState) -> Element {
+    let Field {
+        entry,
+        caps,
+        placeholder,
+        onsubmit,
+        oncaret,
+    } = field;
     let availability = state.availability();
     let pulse = entry.pulse.attrs();
     let class = match &pulse {
@@ -99,7 +158,12 @@ fn lock_field(
                     placeholder: placeholder.clone(),
                     availability,
                     focus: Focus::OnMount,
-                    oninput: move |next: String| entry.input(next),
+                    onfocus: move |()| oncaret.call(Caret::In),
+                    onblur: move |()| oncaret.call(Caret::Out),
+                    oninput: move |next: String| {
+                        oncaret.call(Caret::In);
+                        entry.input(next);
+                    },
                     onkey: move |event: KeyboardEvent| match event.key() {
                         Key::Enter => go(),
                         Key::Escape => {
