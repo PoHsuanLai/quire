@@ -49,6 +49,11 @@ required-features = ["lint"]
 name = "self_lint"
 required-features = ["lint"]
 
+# The HIG guardrails, warnings for now (design/27 section 7, H0).
+[[test]]
+name = "hig_lint"
+required-features = ["lint"]
+
 # A consumer class on a quire button, linted (mailo gaps 6).
 [[test]]
 name = "pass_through_lint"

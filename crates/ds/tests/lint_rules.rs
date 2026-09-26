@@ -806,8 +806,8 @@ fn a_raw_hairline_points_at_its_token() {
     );
 }
 
-/// `CASES` and `MARKUP_CASES` cover every `Rule`, with both a passing and a failing case — not
-/// just the ones a contributor remembered to hand-pick.
+/// `CASES` and `MARKUP_CASES` cover every error `Rule`, with both a passing and a failing case —
+/// not just the ones a contributor remembered to hand-pick. The warnings are `hig_lint.rs`'s.
 #[test]
 fn every_rule_variant_is_covered() {
     let cases = CASES
@@ -816,7 +816,10 @@ fn every_rule_variant_is_covered() {
         .chain(MARKUP_CASES.iter().map(|case| (case.rule, case.expect)));
     let seen: Vec<(Rule, bool)> = cases.collect();
     let mut missing = Vec::new();
-    for rule in Rule::ALL {
+    for rule in Rule::ALL
+        .into_iter()
+        .filter(|rule| rule.severity() == ds::lint::Severity::Error)
+    {
         if !seen.contains(&(rule, true)) {
             missing.push(format!("{rule:?} has no failing case"));
         }
