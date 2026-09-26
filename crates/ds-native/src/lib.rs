@@ -63,6 +63,7 @@ mod pdf;
 mod pdf_thumb;
 #[cfg(feature = "print")]
 mod print;
+pub mod reveal;
 mod route;
 mod runtime;
 mod scheme;

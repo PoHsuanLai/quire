@@ -5,6 +5,7 @@
 
 use dioxus::prelude::MountedData;
 
+use crate::focus::caret::InitialCaret;
 use crate::focus::host::Focused;
 
 /// The field's text after the focus lands in it.
@@ -15,6 +16,25 @@ pub enum Select {
     None,
     /// All of it selected, so the first key typed replaces it.
     All,
+}
+
+/// What a focus write does with the field's text once the caret is in it: nothing, or the caret
+/// put at an [`InitialCaret`] place (a [`Select::All`] is [`InitialCaret::SelectAll`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub(crate) enum Landing {
+    /// Left where the renderer puts it.
+    Leave,
+    /// Put there.
+    Place(InitialCaret),
+}
+
+impl From<Select> for Landing {
+    fn from(select: Select) -> Self {
+        match select {
+            Select::None => Landing::Leave,
+            Select::All => Landing::Place(InitialCaret::SelectAll),
+        }
+    }
 }
 
 /// The host's select-all write, provided as root context by `ds-native` beside `HostFocus`
