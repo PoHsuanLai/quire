@@ -3,10 +3,13 @@
    and the outgoing one leaves the other way (`pane-out-l`, `pane-out-r`) at `--t-move
    --e-exit`, held at its last frame until it is dropped. The leaving pane is out of the flow,
    pinned to the top, so the switcher is as tall as the pane arriving; what it overhangs is
-   clipped. */
+   clipped. A pane at rest plays `hold`, which moves nothing, so the settle timer (wall clock)
+   never drops a slide without starting another animation: Blitz at the pinned rev keeps a
+   dropped animation's last value (sill G295). */
 
 .ds-panes{ position:relative; overflow:hidden; }
 .ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
+.ds-pane[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-pane[*|data-pane=detail][*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
 .ds-pane[*|data-pane=root][*|data-presence=entering]{ animation:slide-l var(--t-move) var(--e-spring); }
 .ds-pane[*|data-pane=root][*|data-presence=leaving]{ animation:pane-out-l var(--t-move) var(--e-exit) forwards; }
