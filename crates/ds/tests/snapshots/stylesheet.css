@@ -22,8 +22,8 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-widget-hero:47px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
-.ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-widget-hero:47px;--fs-lock-clock:140px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
+.ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;}
 .ds[*|data-motion=extra]{--t-big:560ms;--t-big-heavy:644ms;--t-crumple-heavy:644ms;--e-spring:cubic-bezier(.34,2,.5,1);--overshoot:1.14;--squish:.86;--tilt:5deg;--stagger:34ms;}
 .ds[*|data-motion=reduced]{--t-tap:60ms;--t-quick:60ms;--t-move:60ms;--t-big:60ms;--t-ambient:60ms;--t-big-heavy:60ms;--t-spark:60ms;--t-curl:60ms;--t-curl-heavy:60ms;--t-crumple-heavy:60ms;--t-send:60ms;--t-float:60ms;--t-hc-out:60ms;--t-scene:60ms;--t-shake:60ms;--t-park:60ms;--t-nudge:60ms;--t-shake-long:60ms;--t-sail:60ms;--t-boat-return:60ms;--t-spin:60ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;}
@@ -647,6 +647,37 @@ html,body{margin:0;padding:0;background:transparent}
    keeps every letter (a segment never shrinks below its words). */
 .ds-appearance[*|data-layout=compact] .ds-segmented{ display:flex; }
 .ds-appearance[*|data-layout=compact] .ds-segmented .ds-segment{ flex:1 1 auto; padding-left:var(--s-4); padding-right:var(--s-4); }
+/* -- app_switcher -- */
+/* AppSwitcher (design/04-COMPONENTS.md section 43; design/13 section 13.3.5; design/20 section
+   1.11): one row on the Osd material, painted as the OSD card is (the Space gradient at the
+   frame alpha, the material's hairline and drop, `--m-radius` 18), padding 16, cells `--switcher-cell` (112) with icons
+   `--switcher-icon` (96) and `--switcher-gap` (8) between them, all written inline from
+   `SwitcherMetrics` and the output's width. The selection is one rounded square of `--f-pill`
+   (`--r-tile`, 12) behind the row that moves to the selected cell by `--switcher-at` with a
+   `--t-quick --e-spring` transition. The selected app's name is its Fly, drawn under the tile in
+   the UI face at 13/600 (not the Fly's usual dark label above). A row wider than its view is
+   scrolled by `--switcher-shift`, at once (a transition there played on the panel's first
+   frame on Blitz, sliding the row in as it appeared). It appears with `fade` at `--t-quick`, no pop; a quitting
+   tile plays `fold` (`a-fold`). Flat: no gloss on the panel or the selection. */
+
+.ds-switcher{ --switcher-cell:112px; --switcher-icon:96px; --switcher-gap:8px; --switcher-view:592px; --switcher-shift:0px; --switcher-at:0;
+  position:relative; z-index:var(--z-raise); display:inline-flex; box-sizing:border-box; max-width:100%; padding:var(--s-16) var(--s-16) var(--s-10);
+  border-radius:var(--m-radius); box-shadow:var(--m-box); color:var(--f-ink); animation:fade var(--t-quick) var(--e-out); }
+/* The panel paints what the OSD card paints (design/20 section 1.7, the same material): the
+   Space gradient at the frame alpha, the solid floor without blur, the inner pair over it. */
+.ds-switcher > .ds-frame::after{ content:""; position:absolute; inset:0; border-radius:inherit; box-shadow:var(--m-inner); }
+.ds[*|data-blur=off] .ds-switcher > .ds-frame{ opacity:.94; }
+.ds-switcher-view{ width:var(--switcher-view); overflow:hidden; padding-bottom:var(--s-26); }
+.ds-switcher-row{ position:relative; display:flex; gap:var(--switcher-gap); width:max-content; margin-left:calc(-1 * var(--switcher-shift)); }
+.ds-switcher-ring{ position:absolute; left:0; top:0; width:var(--switcher-cell); height:var(--switcher-cell); border-radius:var(--r-tile); background:var(--f-pill);
+  transform:translateX(calc(var(--switcher-at) * (var(--switcher-cell) + var(--switcher-gap)))); transition:transform var(--t-quick) var(--e-spring); }
+.ds-switcher-cell{ position:relative; display:grid; place-items:center; flex:none; width:var(--switcher-cell); height:var(--switcher-cell); cursor:default; }
+.ds-switcher-icon{ display:grid; place-items:center; width:var(--switcher-icon); height:var(--switcher-icon); }
+.ds-switcher-icon .ds-ext-icon{ width:var(--switcher-icon); height:var(--switcher-icon); }
+
+/* The name under the selected tile: the Fly moved below its target and set in the UI face. */
+.ds-switcher-cell .ds-fly{ top:calc(100% + var(--s-14)); bottom:auto; padding:0; background:transparent; color:var(--f-ink);
+  font-family:var(--font-ui); font-size:var(--fs-control); font-weight:600; border-radius:0; }
 /* -- avatar -- */
 /* Avatar (design/04-COMPONENTS.md section 11). Colours arrive inline as `--av-bg`/`--av-fg`
    (hexes computed in Rust, O-7). Attribute selectors carry `*|`, and a value starting with a
@@ -670,6 +701,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-avatar[*|data-size="28"]{ width:28px; height:28px; font-size:var(--fs-small); }
 .ds-avatar[*|data-size="30"]{ width:30px; height:30px; font-size:var(--fs-control); }
 .ds-avatar[*|data-size="34"]{ width:34px; height:34px; font-size:var(--fs-reading); }
+.ds-avatar[*|data-size="48"]{ width:48px; height:48px; font-size:var(--fs-subject); }
+.ds-avatar[*|data-size="64"]{ width:64px; height:64px; font-size:var(--fs-display); }
 .ds-avatar[*|data-size="34"][*|data-shape=square]{ border-radius:var(--r-menu-item); font-size:var(--fs-control); }
 
 /* The event attendee stack: `S:519-521`. */
@@ -1422,6 +1455,78 @@ html,body{margin:0;padding:0;background:transparent}
   position:absolute; left:50%; top:50%; width:3px; height:3px; border-radius:var(--r-pill);
   background:var(--warn); opacity:0;
 }
+/* -- lock_screen -- */
+/* LockScreen (design/04-COMPONENTS.md section 42; design/20 section 1.9): the wallpaper covering
+   the stage under `--lock-veil`, the clock 7 % of the width from the top and the prompt 6 % from
+   the bottom, centred across, as the reference lock screen stands. The stage fills its root
+   (`RootExtent::Viewport` for a surface). */
+
+.ds-lock{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:space-between; box-sizing:border-box;
+  width:100%; height:100%; min-height:100%; overflow:hidden; padding:7% var(--s-16) 5%; color:var(--lock-ink); }
+.ds-lock-wallpaper{ position:absolute; inset:0; background-size:cover; background-position:center; background-repeat:no-repeat; }
+.ds-lock-veil{ position:absolute; inset:0; background:var(--lock-veil); }
+.ds-lock-top,
+.ds-lock-bottom{ position:relative; display:flex; justify-content:center; width:100%; }
+/* -- lock_clock -- */
+/* LockClock (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright: white
+   type over the wallpaper, no shadow, no bevel. The date is the display face at 600, a quiet
+   white; the time the display face at `--fs-lock-clock` (140), 700, tight, tabular so a changing
+   minute does not shift it. Under `data-look=space` the date sits in a pill of the Space
+   gradient in the frame's ink (Arc's colour on the small surfaces; the time stays white). */
+
+.ds-lock-clock{ display:flex; flex-direction:column; align-items:center; color:var(--lock-ink); text-align:center; }
+.ds-lock-date{ font-family:var(--font-display); font-size:var(--fs-amount); font-weight:600; letter-spacing:.01em; line-height:1.2; color:var(--lock-ink-soft); }
+.ds-lock-time{ font-family:var(--font-display); font-size:var(--fs-lock-clock); font-weight:700; letter-spacing:-.035em; line-height:1; font-variant-numeric:tabular-nums; color:var(--lock-ink); margin-top:var(--s-2); }
+
+.ds-lock-clock[*|data-look=space] .ds-lock-date{ background:var(--f-grad); color:var(--f-ink); border-radius:var(--r-pill); padding:var(--s-3) var(--s-14); margin-bottom:var(--s-8); }
+/* -- lock_prompt -- */
+/* LockPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright, as
+   the reference lock screen: the avatar at 64, the name in white 16/700, a pill of flat white
+   glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) holding the secret field, the
+   caps-lock mark and a 28 px enter arrow in a brighter glass disc that shows once something is
+   typed, and a small hint line in `--lock-ink-soft`. The pill plays `shake-x` once through its
+   pulse class (`a-shake-x`, `--t-shake --e-shake`) when a password was wrong. Under
+   `data-look=space` the pill is the Space gradient in the frame's ink. */
+
+.ds-lock-prompt{ display:flex; flex-direction:column; align-items:center; color:var(--lock-ink); }
+.ds-lock-name{ margin-top:var(--s-10); font-family:var(--font-ui); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--lock-ink); }
+
+.ds-lock-field{ display:flex; align-items:center; gap:var(--s-6); box-sizing:border-box; width:260px; height:38px; margin-top:var(--s-14);
+  padding:0 var(--s-5) 0 var(--s-16); border-radius:var(--r-pill); background:var(--lock-glass); color:var(--lock-ink);
+  transition:background-color var(--t-quick) var(--e-out); }
+.ds-lock-field:hover{ background:var(--lock-glass-strong); }
+.ds-lock-field[*|aria-disabled=true]{ opacity:.6; }
+
+/* The inline field inside the pill: the pill's ink, a larger face so the dots read as dots. */
+.ds-lock-field .ds-input-wrap{ flex:1 1 auto; min-width:0; }
+.ds-lock-field .ds-input,
+.ds-lock-field .ds-input-mask,
+.ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
+.ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
+.ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
+.ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
+
+.ds-lock-caps{ display:inline-flex; flex:none; color:var(--lock-ink-soft); }
+
+.ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
+  background:var(--lock-glass-strong); color:var(--lock-ink); cursor:pointer;
+  transition:opacity var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring); }
+.ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
+.ds-lock-go[*|aria-busy=true]{ opacity:1; }
+.ds-lock-go:active{ transform:scale(var(--squish)); }
+.ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
+.ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
+
+.ds-lock-hint{ margin-top:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-small); font-weight:500; color:var(--lock-ink-soft); text-align:center; }
+
+/* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
+.ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
+.ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-go{ background:var(--f-pill); color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-spinner{ border-color:var(--f-ink); }
 /* -- menu -- */
 /* Menu (design/04-COMPONENTS.md section 20): Rich and Slim `S:665-680`, `S:787-791`; Dropdown
    `C:1003-1023`; Context is Slim at the pointer. The surface is `.ds-popover`'s. The menu holds
@@ -1869,6 +1974,26 @@ html,body{margin:0;padding:0;background:transparent}
 /* Closed by Escape or an outside click, a popover fades out before it goes, as a menu does
    (`menu-out`, `--t-quick --e-exit`; the macOS polish pass), taking no pointer while it does. */
 .ds-popover[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+/* -- polkit_prompt -- */
+/* PolkitPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.10): a narrow centred
+   sheet (`SheetWidth::Narrow`, 340) as the reference desktop's password alert: everything
+   centred in one column, the avatar at 48, a bold title (display 16/700), the program's message
+   in the soft ink, "Details" in the accent with the detail as a hover card, the person's name
+   over a boxed secret field that shakes once when it was wrong (`a-shake-x`), and Cancel and
+   Authenticate side by side at equal width. Flat: the sheet's own material, no extra shadow. */
+
+.ds-polkit{ display:flex; flex-direction:column; align-items:center; box-sizing:border-box; width:100%; padding:var(--s-22) var(--s-22) var(--s-18); text-align:center; color:var(--ink); }
+.ds-polkit-title{ margin-top:var(--s-12); font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
+.ds-polkit-action{ margin-top:var(--s-6); font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
+.ds-polkit-details{ margin-top:var(--s-6); font-size:var(--fs-small); }
+.ds-polkit-details-word{ color:var(--accent); font-weight:600; cursor:default; }
+.ds-polkit-user{ align-self:stretch; margin-top:var(--s-16); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft); text-align:left; }
+.ds-polkit-field{ position:relative; display:flex; align-self:stretch; margin-top:var(--s-6); }
+.ds-polkit-field .ds-input-wrap{ flex:1 1 auto; }
+.ds-polkit-caps{ position:absolute; right:var(--s-10); top:0; bottom:0; display:flex; align-items:center; color:var(--ink-faint); pointer-events:none; }
+.ds-polkit-hint{ margin-top:var(--s-8); font-size:var(--fs-small); color:var(--danger); }
+.ds-polkit-actions{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
+.ds-polkit-actions .ds-button{ width:100%; justify-content:center; }
 /* -- provider_mark -- */
 /* ProviderMark (design/04-COMPONENTS.md section 28): `S:552-560`. The white chip is
    `--mark-ground` and the provider's identity colour arrives inline as `--pc` (O-3); the rings
@@ -2064,6 +2189,10 @@ html,body{margin:0;padding:0;background:transparent}
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
 .ds-sheet[*|data-placement=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; }
+
+/* Narrow (`SheetWidth::Narrow`, M11): an alert's column, as the reference desktop's password
+   prompt; the rest of the sheet is as above. */
+.ds-sheet[*|data-width=narrow]{ width:min(340px, 88%); }
 /* -- shot_thumbnail -- */
 /* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13; sill
    Q181). The card is a plate in the Toast material inside a transparent Toast scope (the

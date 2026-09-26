@@ -118,6 +118,9 @@ face's cap height is .66 em): `--fs-dial` 9 (a world clock row's dial numerals),
 18 (a small clock's dial numerals), `--fs-widget-figure` 20 (a battery's percentage under its
 ring) and `--fs-widget-hero` 47 (a small battery's percentage).
 
+Above them sits `--fs-lock-clock` 140, the lock screen's time in the display face at 700
+(design/04 section 42; proposed, M11 2026-09-26: the user asked for a very large, heavy clock).
+
 ## 5. Tracking
 
 Letter-spacing is fixed per role; uppercase data text is always tracked wide.

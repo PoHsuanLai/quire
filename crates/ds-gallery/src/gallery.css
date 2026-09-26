@@ -147,3 +147,14 @@
 .g-wr-dials{display:flex;justify-content:space-between;align-items:center;flex:1;padding:0 var(--s-6)}
 .g-wr-dial{display:flex;flex-direction:column;align-items:center}
 .g-wr-offset{font-family:var(--font-ui);font-size:var(--fs-small);font-weight:700;line-height:1.2;color:var(--ink-faint)}
+/* The Lock and switcher page (M11): a lock screen at a 16:10 output's proportions, and two at
+   half scale (a transform, so the lock screen lays itself out at full size); a wrong password
+   posed at shake-x's 20 % frame; the polkit sheet's stage; the switcher on the calm wallpaper. */
+.g-lock-full{width:1216px;border-radius:var(--r-panel);overflow:hidden}
+.g-lock-size{width:1216px;height:760px}
+.g-lock-mini{width:596px;height:372px;border-radius:var(--r-panel);overflow:hidden}
+.g-lock-mini .g-lock-stage{transform:scale(.49);transform-origin:0 0}
+.g-shake-pose{transform:translateX(-6px)}
+.g-polkit{width:588px;background-size:cover;background-position:center}
+.g-polkit-stage{height:540px}
+.g-switcher-wall{display:flex;justify-content:center;padding:var(--s-36) var(--s-16);border-radius:var(--r-panel);background-size:cover;background-position:center}

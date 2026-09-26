@@ -76,6 +76,8 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 34 | DragGhost and DropTarget | C `.ghost` `.is-drop-target`; S `.ograb` `.drop-line` | drag thread to place, move composer object | dock drag-out (planned) |
 | 35 | SyncHalo | C `.acct-ring .halo` | account sync | bar sync indicator |
 | 41 | ShotThumbnail, ShotGhost | none (design/20 section 1.13) | none | screenshot thumbnail |
+| 42 | LockScreen, LockClock, LockPrompt, PolkitPrompt | none (design/20 sections 1.9, 1.10) | none | lock screen, polkit prompt |
+| 43 | AppSwitcher | none (design/13 section 13.3.5, design/20 section 1.11) | none | app switcher |
 
 ## Shared vocabulary
 
@@ -3386,6 +3388,119 @@ the right is the swipe's and never a drag out; left, up and down still drag out.
 position of its own (no margin, no anchor): a `BannerStack { position: BottomRight }` or the
 caller's surface places it, and `shown`/`on_hidden` work in either. Under Reduced motion the card
 decides for itself: no spring back, and it fades in and out rather than rising and sliding.
+
+### 42. LockScreen, LockClock, LockPrompt and PolkitPrompt (M11, 2026-09-26; values proposed)
+
+**Purpose.** The shell's own lock screen (design/20 section 1.9) and polkit prompt (section
+1.10), replacing the borrowed ones of M7. The user's rule for them (2026-09-26): the reference
+desktop's surfaces are flat and bright, carried by colour and big confident type, with no bevel,
+gloss or neumorphic shadow and no monospace label; the lock screen matches the reference lock
+screen's layout (a large clock over the wallpaper, the avatar and name, a translucent pill
+password field, a small hint line). Arc's colour may reach the small surfaces: under
+`LockLook::Space` the date sits in a pill and the field is painted with the Space gradient.
+
+**Props.**
+
+```rust
+pub enum LockLook { Clear /* default */, Space }
+pub enum PromptState { Idle /* default */, Checking, Wrong, LockedOut { until: String } }
+pub enum CapsLock { On, Off /* default */ }
+pub struct LockUser { pub name: String, pub avatar: AvatarFace }
+#[component] pub fn LockScreen(wallpaper: Option<ImageSource>, clock: Element, prompt: Element) -> Element
+#[component] pub fn LockClock(time: String, date: String, look: LockLook) -> Element
+#[component] pub fn LockPrompt(user: LockUser, state: PromptState, caps: CapsLock, look: LockLook,
+    placeholder: Option<String> /* "Enter Password" */, hint: Option<Text>,
+    oninput: EventHandler<String>, onsubmit: EventHandler<String>) -> Element
+#[component] pub fn PolkitPrompt(action: Text, detail: Option<Text>, title: Option<String>,
+    user: LockUser, state: PromptState, caps: CapsLock, oninput: EventHandler<String>,
+    onsubmit: EventHandler<String>, oncancel: EventHandler<()>, shown: Option<Shown>,
+    on_hidden: Option<EventHandler<()>>) -> Element
+pub enum SheetWidth { Regular /* default, 560 */, Narrow /* 340 */ }   // Sheet { width }
+```
+
+**Markup.** `LockScreen`: `div.ds-lock[role=dialog]` holding `div.ds-lock-wallpaper` (the picture
+as an inline `background-image`, its URL escaped; only `data:` and `file:`), `div.ds-lock-veil`,
+`div.ds-lock-top` (the clock) and `div.ds-lock-bottom` (the prompt). `LockClock`:
+`div.ds-lock-clock[data-look]` holding `div.ds-lock-date` then `div.ds-lock-time`. `LockPrompt`:
+`div.ds-lock-prompt[data-look][data-state]` holding the `Avatar` (64), `div.ds-lock-name`,
+`div.ds-lock-field[data-filled]` (with `a-shake-x` and `data-pulse` while shaking) holding an
+Inline `TextInput { kind: Secret }`, `span.ds-lock-caps` (caps on) and `button.ds-lock-go` (a
+`Glyph` `ArrowRight`, or `span.ds-lock-busy` around a `Spinner` while checking), then
+`div.ds-lock-hint`. `PolkitPrompt`: a `Sheet { placement: Centre, scrim: Modal, width: Narrow }`
+holding `div.ds-polkit[data-state]`: the `Avatar` (48), `div.ds-polkit-title`,
+`div.ds-polkit-action`, `div.ds-polkit-details` (a `Tooltip { Card }` on
+`span.ds-polkit-details-word`), `div.ds-polkit-user`, `div.ds-polkit-field` (a Boxed secret
+`TextInput`, `span.ds-polkit-caps`), `div.ds-polkit-hint` (locked out), and
+`div.ds-polkit-actions` (Cancel `Secondary`, Authenticate `Primary`).
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Stage | the wallpaper covering it (`background-size:cover`) under `--lock-veil` (black .12 light, .28 dark); padding 7 % of the width on top, 5 % below | reference layout; the veil keeps white type legible on a pale picture |
+| Date | display face `--fs-amount` (22) 600, `--lock-ink-soft` (white .78) | reference: the day over the time |
+| Time | display face `--fs-lock-clock` (140) 700, tracking -.035em, tabular, `--lock-ink` (white), 2 below the date | the user's "very large, heavy"; reference proportions (about a fifth of the width for "9:41") |
+| Avatar | 64 (`AvatarSize::Size64`, `--fs-display` letter); 48 in the polkit sheet | reference |
+| Name | UI 16/700 (`--fs-title`), white, 10 below the avatar | reference |
+| Field | 260 x 38 pill (`--r-pill`), `--lock-glass` (white .24 light, .18 dark), 14 below the name, padding 16 left and 5 right; the secret's dots at `--fs-base` white, tracked .14em; placeholder `--lock-ink-soft`; hover `--lock-glass-strong` | reference; flat, no blur assumed (spike S15) |
+| Enter button | 28 disc of `--lock-glass-strong`, `ArrowRight` at 13, shown once something is typed (opacity over `--t-quick --e-out`), pressed `--squish` | reference |
+| Caps mark | `CapsLock` glyph at 14 in `--lock-ink-soft`, before the button | reference |
+| Hint | UI 12/500 (`--fs-small`), `--lock-ink-soft`, 12 below the field | reference |
+| Space look | date pill: `--f-grad`, `--f-ink`, padding 3 x 14; field: `--f-grad`, dots and caret `--f-ink`, placeholder `--f-ink-soft`, button `--f-pill` | Arc (09 H1) |
+| Polkit sheet | 340 wide (`SheetWidth::Narrow`), centred, one centred column: padding 22/22/18, title display 16/700, message `--fs-control` `--ink-soft`, Details `--fs-small` 600 `--accent`, name `--fs-small` 600 `--ink-soft` over the field, lock-out line `--danger`, the two buttons in two equal columns 8 apart, 18 below | the reference's password alert |
+
+**Behaviour.** The password is a `Secret` field: its text lives in the prompt and reaches the
+caller only through `oninput` and `onsubmit`; no `value` attribute is ever written. Enter (or the
+arrow, or Authenticate) calls `onsubmit(text)` unless the text is empty or the state is
+`Checking`/`LockedOut`. Escape in the lock field empties it (design/06); in the polkit sheet it
+cancels (the sheet's own Escape). Emptying remounts the field under a new key, calls
+`oninput("")` and puts the caret back. `Checking` and `LockedOut` write `aria-disabled` on the
+field and drop typing. **Motion.** Entering `Wrong` plays `shake-x` once on the field (the
+`a-shake-x` pulse: 420 ms `(.36,.07,.19,.97)`); at `settle(Anim::ShakeX)` the field empties and
+the pulse rests; it plays again only after the state has left `Wrong` (an older firing's timer
+never cuts a newer one short). The polkit sheet enters with `peek-in` and leaves with `sheet-out`
+(section 24). The unlock fade (design/20 section 1.9, `fade --t-move --e-exit`) is not drawn
+here: the host fades or unmaps its lock surfaces.
+
+### 43. AppSwitcher (M11, 2026-09-26; values proposed)
+
+**Purpose.** The Cmd+Tab panel (design/13 section 13.3.5, every value of whose table is here;
+design/20 section 1.11). It draws and reports only: the 150 ms show delay, the keys (Tab,
+Shift+Tab, grave, arrows, Q, H, Escape), the modifier's release and the MRU order are the
+shell's.
+
+**Props.**
+
+```rust
+pub struct AppKey(pub String);
+pub enum TilePresence { Present /* default */, Leaving }
+pub struct SwitcherApp { pub key: AppKey, pub name: String, pub icon: IconSource,
+    pub plate: Option<PlateFamily>, pub presence: TilePresence }        // SwitcherApp::new(key, name, icon)
+pub struct SwitcherMetrics { pub icon: Px, pub cell: Px, pub gap: Px, pub min_icon: Px } // 96, 112, 8, 48
+pub fn switcher_fit(count: usize, selected: usize, SwitcherMetrics, Option<Px>) -> SwitcherFit
+#[component] pub fn AppSwitcher(apps: Vec<SwitcherApp>, selected: AppKey, output: Option<Px>,
+    metrics: SwitcherMetrics, onhover: EventHandler<AppKey>, onactivate: EventHandler<AppKey>) -> Element
+```
+
+**Markup.** `div.ds-switcher[role=listbox]` (its geometry inline as `--switcher-cell`, `-icon`,
+`-gap`, `-view`, `-shift`, `-at`) holding `div.ds-frame` (the Space gradient and grain, as the
+OSD card) and `div.ds-switcher-view` around `div.ds-switcher-row`: `span.ds-switcher-ring`, then
+per app `div.ds-switcher-cell[role=option][aria-selected][aria-label]` (`a-fold` with
+`data-pulse` and `data-presence="leaving"` while leaving) holding a `Tooltip { Fly, shown }` around
+`span.ds-switcher-icon` and its `IconView`.
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Panel | `Material::Osd` in a transparent root, painted as the OSD card: the Space gradient at the frame alpha (the solid floor without blur), `--m-box`, `--m-radius` (18); padding 16, 10 below the name line | design/13 13.3.5 (Osd, radius 18, padding 16); design/20 1.7 |
+| Cells | `--switcher-cell` 112 with icons `--switcher-icon` 96, `--switcher-gap` 8 | `switcher.cell_size_px`, `icon_size_px`, `cell_gap_px` |
+| Selection | one `--f-pill` square of the cell's size, `--r-tile` (12), behind the row, moved to the selected cell by `transform` with `--t-quick --e-spring` | design/13 13.3.5; design/20 1.11 |
+| Name | the selected cell's Fly, moved under the tile (14 below the icon) and set in the UI face 13/600 in `--f-ink`, no label box; the others' Flys are `Shown::Hidden` | design/13 13.3.5 ("ui 13/600 centred"); design/20 1.11 (`Tooltip{Fly}`); the user's no-monospace rule |
+| Overflow | the panel fits `output - 64`: past that the cells shrink (icon + 16), down to icons of `switcher.overflow_min_icon_px` (48); past that the view is the room left and the row is scrolled (`margin-left`) with the selection centred, clamped to the row's ends | design/13 13.3.5 |
+| Appear | `fade` at `--t-quick --e-out`, no pop; closing is the host's (instant on release) | design/13 13.3.5 |
+| Quit (Q) | the leaving tile plays `fold` once (`--t-big --e-exit`, held); the shell drops it at `settle(Anim::Fold)` | design/13 13.3.5 |
+
+**Behaviour.** The pointer entering a tile calls `onhover(key)` (the shell selects it; "hover
+selects"), a click `onactivate(key)` ("click activates"); the component never moves the
+selection itself. The scroll is not animated: a transition on it played on the panel's first
+frame on Blitz, sliding the row in as it appeared.
 
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 

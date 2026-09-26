@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 16] = [
+pub const REGISTRY: [Entry; 17] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -133,6 +133,13 @@ pub const REGISTRY: [Entry; 16] = [
         lede: "The widgets posed as the reference screenshots design/23 section 1.1 measures, at the same size, for the side-by-side comparison: the battery alone, four small rings, the medium row with a low and a charging device, the small analog clock, and the medium world clock by day and by night.",
         height: 1150,
         body: pages::widget_reference::WidgetReferencePage,
+    },
+    Entry {
+        page: Page::LockSwitcher,
+        title: "Lock and switcher",
+        lede: "The shell's own lock screen over the calm wallpaper (at rest, a wrong password mid-shake, checking in the Space's colour), the polkit prompt's sheet, and the app switcher with five and fourteen apps, shrunk and scrolled.",
+        height: 3150,
+        body: pages::lock_switcher::LockSwitcherPage,
     },
 ];
 

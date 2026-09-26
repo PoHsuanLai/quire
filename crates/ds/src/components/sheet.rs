@@ -11,6 +11,7 @@ use crate::components::scrim::{ScrimLook, scrim_button_as};
 use crate::components::scrim_strength::ScrimStrength;
 pub use crate::components::sheet_placement::SheetPlacement;
 use crate::components::sheet_presence::{SheetShowing, Step, use_sheet_showing};
+pub use crate::components::sheet_width::SheetWidth;
 use crate::components::tooltip::Shown;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
@@ -28,6 +29,9 @@ use dioxus::prelude::*;
 /// has a height: an overlay root passes `Ds { extent: RootExtent::Viewport }`.
 ///
 /// `scrim` is its scrim's strength: [`ScrimStrength::Modal`] for a decision (a power menu).
+///
+/// `width` is [`SheetWidth::Regular`] (560) by default, [`SheetWidth::Narrow`] (340) for an
+/// alert or a password prompt.
 #[component]
 pub fn Sheet(
     label: String,
@@ -36,6 +40,7 @@ pub fn Sheet(
     #[props(default)] on_hidden: Option<EventHandler<()>>,
     #[props(default)] placement: SheetPlacement,
     #[props(default)] scrim: ScrimStrength,
+    #[props(default)] width: SheetWidth,
     children: Element,
 ) -> Element {
     let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
@@ -61,6 +66,7 @@ pub fn Sheet(
             class: "ds-sheet",
             "data-presence": showing.slug(),
             "data-placement": placement.attribute(),
+            "data-width": width.attribute(),
             "data-overscroll": "band",
             role: "dialog",
             "aria-label": "{label}",
