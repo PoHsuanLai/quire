@@ -444,6 +444,38 @@ this a real test of rule 4: a `Duration::from_millis(1200)` literal would still 
 Fade`'s token were retuned tomorrow, which is exactly the drift `ds::motion` is supposed to make
 impossible.
 
+**Exact timing on a loaded machine: the virtual clock (sill Q380).** The harness above runs
+quire's timers on the wall clock, so `advance(hold - 10ms)` can overshoot the boundary under
+load. Build it on the virtual clock instead and `advance` moves one clock that drives both the
+CSS animations and every ds timer (motion timers, presence and roster rests, hover intent, toast
+holds, pending, detail tweens, menu submenu delays): it steps to each timer's due instant in
+order, runs the renders that queued and resolves the CSS at that same instant, and returns at
+once. The two assertions above then hold exactly, every run:
+
+```rust
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+
+let config = HarnessConfig::new(Viewport { width: 480, height: 360, scale_percent: 100 })
+    .with_clock(Clock::Virtual);
+let mut harness = Harness::with_config(YourApp, config);
+```
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall` (unchanged). `Harness::clock() -> Clock` |
+| "Now" in a test | `Harness::now() -> Instant` | The virtual clock's now (or the wall clock's); `settle_until` returns instants on the same clock, and its 3 s bound is the harness's time. On the virtual clock, time a window from `harness.now()`, never `Instant::now()` |
+| Read the time in your own component | `ds::time::now()`, `ds::time::since(instant)`, `ds::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
+| Install a virtual clock yourself (another harness) | `ds::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
+
+Not on the virtual clock: work off the harness's thread (a Tokio task such as `ds_settings`'
+file watch, a D-Bus reply, a resource fetched by a custom `AppNet` on another thread).
+`advance` on the virtual clock never waits for the wall clock, so a test that needs such work
+to land stays on `Clock::Wall`. Nor Blitz's own clock reads (rev e99fbdbd): its double-click
+count (a press within 500 ms and 2 px of the last) and scrollbar fade read `Instant` in fields a
+host cannot set, so on the virtual clock two clicks at one spot are always a double click, however
+far apart the test advanced them; click a second spot in between, or keep that test on the wall
+clock.
+
 ## 6. The component catalogue
 
 Every component is `ds::<Name>`, one `.rs`/`.css` pair per `design/04-COMPONENTS.md` section
@@ -1761,7 +1793,7 @@ moment_table(&[(Link::Off, Link::Joining, Moment::Pending), (Link::Joining, Link
 | Layers of a glyph | `LayerGlyph { icon, size, layering: Layering::{Whole, Pending(frame, spec), Filling(n)} }` | One `svg` per shape (`.ds-layer-part[data-lit]`), the Wi-Fi glyph's from the dot out; a stalled loop dims the glyph |
 | A glyph that changes | `MorphGlyph { icon, size, style: MorphStyle::{DownUp, OffUp, CrossFade, Slash}, slashed: Slashed }` | Plays on each new icon (Slash: on each `slashed` change); still on first frame; snaps under Reduced. Decorative: put the state in words beside it (R8) |
 | A readout that changes | `RollDigits { value: String }` | Only the changed digits roll |
-| Prove the idle-frame rule | `ds_native::harness::assert_settles_to_zero_frames(&mut harness)` | Within 3 s of wall clock, no CSS animation runs and no Rust timer wakes the document for 500 ms (`Harness::wakes()` counts wakes). End every moment's test with it |
+| Prove the idle-frame rule | `ds_native::harness::assert_settles_to_zero_frames(&mut harness)` | Within 3 s of the harness's clock (wall or virtual), no CSS animation runs and no Rust timer wakes the document for 500 ms (`Harness::wakes()` counts wakes). End every moment's test with it |
 | Keep your CSS in the grammar | `Rule::InfiniteLoop` (every profile, an error) and `Rule::OffGrammarTiming` (`Profile::Details` only) | `InfiniteLoop`: `animation-iteration-count: infinite` or `infinite` in the `animation` shorthand. `Profile::Details` is `Strict` plus timing only by the grammar's tokens (`ds::detail::grammar`); opt in when your sheets pass |
 
 **Breaking: `Spinner` needs an operation.** `Spinner { kind, operation: Operation }`. It no

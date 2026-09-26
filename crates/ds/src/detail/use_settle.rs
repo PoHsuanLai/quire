@@ -15,7 +15,7 @@ use crate::time::sleep;
 use crate::tokens::{DelayToken, DurationToken, EasingToken};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// What a success cue settles as this frame: `Rest` until a new Success cue, then the style's
 /// landing once (Fill steps its layers, Check draws and holds `SettleHold`, LockIn seals with the
@@ -101,9 +101,12 @@ impl Lander {
                 length: DurationToken::Move.duration(level),
                 easing: EasingToken::Out.easing(level),
             };
-            let started = Instant::now();
-            while !draw.done(started.elapsed()) {
-                try_set(self.now, Settling::Drawing(drawn(draw, started.elapsed())))?;
+            let started = crate::time::now();
+            while !draw.done(crate::time::since(started)) {
+                try_set(
+                    self.now,
+                    Settling::Drawing(drawn(draw, crate::time::since(started))),
+                )?;
                 sleep(FRAME).await;
             }
         }

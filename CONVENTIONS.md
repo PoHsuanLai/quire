@@ -443,4 +443,8 @@ These apply to quire, shell-host, sill and every bundled app, on top of §0-§10
   landed before B, or only after at least the window's duration since it was asked for) rather
   than a state at an instant; a "not yet" check may still assert a fixed elapsed time, but only
   at or under half the window, so a loaded machine's overshoot cannot cross the boundary first
-  (FINDINGS "Timing tests").
+  (FINDINGS "Timing tests"). A test built with `HarnessConfig::with_clock(Clock::Virtual)` is
+  exempt: there `advance` moves one clock for CSS and every ds timer, so a fixed instant is exact
+  and a boundary assertion (`advance(window - 1ms)` not yet, `advance(1ms)` now) is the better
+  test (FINDINGS "Q380"). ds code reads time only through `ds::time::now`/`since`/`sleep`, never
+  `Instant::now()` or `futures_timer` directly, or the virtual clock cannot reach it.

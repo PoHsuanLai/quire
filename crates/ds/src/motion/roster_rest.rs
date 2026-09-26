@@ -73,7 +73,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         else {
             return Ok(());
         };
-        let due = Instant::now() + length;
+        let due = crate::time::now() + length;
         if let Some(pending) = try_get(self.rest)? {
             if pending.due >= due {
                 return Ok(());
@@ -82,7 +82,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         }
         let roster = *self;
         let task = spawn_in(self.scope, async move {
-            sleep(due.saturating_duration_since(Instant::now())).await;
+            sleep(due.saturating_duration_since(crate::time::now())).await;
             if try_set(roster.rest, None).is_ok() {
                 let _ = roster.update(RosterState::rest);
             }

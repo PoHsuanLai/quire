@@ -13,7 +13,6 @@ use crate::time::{FRAME_SLACK, sleep};
 use dioxus::prelude::*;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-use std::time::Instant;
 
 /// Whether the primary button went down on the surface and is still down.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -66,7 +65,7 @@ impl Default for SurfaceState {
 impl SurfaceState {
     /// Count a press at `at` now, remembering it for the next.
     pub(crate) fn press(&self, at: Point) -> Clicks {
-        let when = Instant::now();
+        let when = crate::time::now();
         let clicks = clicks_after(self.last_press.get(), at, when);
         self.last_press.set(Some(LastPress { at, when, clicks }));
         self.pressing.set(Pressing::Down);
