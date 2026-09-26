@@ -692,7 +692,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "command_palette",
         state: "empty",
-        make: || rsx! { CommandPalette::<u8> { label: "Search and commands", placeholder: "Search mail, people, actions", query: "zz", tokens: Vec::new(), groups: Vec::new(), empty: "Nothing in this Space matches. Search checks subjects, names, addresses and the text of every message.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { CommandPalette::<u8> { label: "Search and commands", placeholder: "Search mail, people, actions", query: "zz", tokens: Vec::new(), groups: ds::PaletteGroups::default(), empty: "Nothing in this Space matches. Search checks subjects, names, addresses and the text of every message.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     // Embedded in a launcher surface (sill FINDINGS Q40): no scrim, `cmdk-in`, the card's id;

@@ -73,3 +73,14 @@
 .ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
+
+/* Shaped rows (sill Q290, `RowShape`): a file's thumbnail fills its tile with no plate; a
+   clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4) since Blitz has
+   no line clamp; a clipboard picture sits under its title at its own aspect; the time leads the
+   trail. */
+.ds-menu-tile[*|data-tile=thumb]{ border:0; background:transparent; overflow:hidden; }
+.ds-menu-thumb{ display:block; width:100%; height:100%; object-fit:cover; border-radius:var(--r-menu-item); }
+.ds-menu-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
+  max-height:calc(var(--lines) * 1.35em); }
+.ds-menu-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
+.ds-menu-when{ margin-right:var(--s-6); }

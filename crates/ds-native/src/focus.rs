@@ -19,7 +19,10 @@
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written, same};
 use blitz_dom::Node;
 use dioxus::prelude::*;
-use ds::{Focused, Found, HostBlur, HostFind, HostFocus, HostSelect};
+use ds::{
+    Caret, Collapsed, Focused, Found, HostBlur, HostCaret, HostFind, HostFocus, HostSelect,
+    caret_at,
+};
 use std::rc::Rc;
 
 /// The Blitz focus write, as the `ds::HostFocus` a root provides as context. `launch` and the
@@ -35,7 +38,11 @@ pub const BLUR: HostBlur = HostBlur(blur);
 /// field focused with `FocusRequest::with_select_all` has its whole value selected.
 pub const SELECT: HostSelect = HostSelect(select_all);
 
-/// Provide [`FOCUS`], [`BLUR`] and [`SELECT`] to the calling component's subtree. Call it at the
+/// The Blitz caret read, as the `ds::HostCaret` a root provides beside [`FOCUS`]: where the
+/// caret sits in a field when a key reaches it (a command palette's `claim`, sill Q299).
+pub const CARET: HostCaret = HostCaret(caret);
+
+/// Provide [`FOCUS`], [`BLUR`], [`SELECT`] and [`CARET`] to the calling component's subtree. Call it at the
 /// top of a root that `ds_native::launch` did not start, before any quire field or menu mounts.
 /// The click-focus fallback is separate: provide [`CLICK_FOCUS`](crate::CLICK_FOCUS) and
 /// [`PRESS_FOCUS`](crate::PRESS_FOCUS) as well to keep the focus on a `tabindex` ancestor after a
@@ -43,6 +50,7 @@ pub const SELECT: HostSelect = HostSelect(select_all);
 /// hand-off of a removed element's keyboard to its ancestor (and `ds::HostHandBack`) needs the
 /// host's own loop and is `launch`'s and the harness's only.
 pub fn provide() -> HostFocus {
+    use_context_provider(|| CARET);
     use_context_provider(|| SELECT);
     use_context_provider(|| BLUR);
     use_context_provider(|| FOCUS)
@@ -121,6 +129,31 @@ fn select_all(element: &MountedData) -> Focused {
         Field::NotLaidOut => Focused::Busy,
         Field::Absent => Focused::Unknown,
     }
+}
+
+/// Where the caret is in `element`'s text field: read from the field's editor, which a key
+/// handler may do (Blitz holds no borrow of the document while a handler runs). A node that is
+/// not a laid-out field, or a document busy rendering, reads `Unknown`.
+fn caret(element: &MountedData) -> Caret {
+    let Some(node) = NodeRef::of(element) else {
+        return Caret::Unknown;
+    };
+    node.read(|doc| {
+        let input = doc.get_node(node.node)?.element_data()?.text_input_data()?;
+        let selection = input.editor.raw_selection();
+        let collapsed = if selection.is_collapsed() {
+            Collapsed::Yes
+        } else {
+            Collapsed::No
+        };
+        Some(caret_at(
+            input.editor.raw_text(),
+            selection.focus().index(),
+            collapsed,
+        ))
+    })
+    .flatten()
+    .unwrap_or(Caret::Unknown)
 }
 
 fn done(written: Written) -> Focused {

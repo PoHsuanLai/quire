@@ -1,0 +1,34 @@
+/* PreviewPane (sill Q292; design/04-COMPONENTS.md section 47): a column filling the palette's
+   aside, 16 px in: the media box (220 tall; a picture or page fitted at its aspect, text
+   clipped, an icon or an emoji centred), the caption, the facts, then the actions at the foot.
+   It slides in from the right (`slide-r`, `--t-move --e-spring`, restarted under its other name
+   on each showing) and out the same way (`pane-out-r`, held); hidden, nothing is laid out.
+   The actions never take the keyboard (the launcher's field keeps it): the one the caller's
+   keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
+.ds-preview{ display:flex; flex-direction:column; gap:var(--s-12); box-sizing:border-box; width:100%; height:100%; min-height:0; padding:var(--s-16); overflow:hidden; color:var(--ink); }
+.ds-preview[*|data-shown=hidden]{ display:none; }
+.ds-preview[*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
+.ds-preview[*|data-presence=entering][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-preview[*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+
+.ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; }
+.ds-preview-image{ position:absolute; display:block; object-fit:contain; border-radius:var(--r-tiny); }
+.ds-preview-text{ align-self:stretch; width:100%; box-sizing:border-box; padding:var(--s-10); overflow:hidden; white-space:pre-wrap; font-size:var(--fs-meta); line-height:1.45;
+  background:var(--surface); border:var(--hair) solid var(--line-soft); border-radius:var(--r-small); color:var(--ink-soft); }
+.ds-preview-text[*|data-face=mono]{ font-family:var(--font-code); font-size:var(--fs-help); }
+.ds-preview-emoji{ font-size:var(--fs-emoji-preview); line-height:1; }
+
+.ds-preview-caption{ display:flex; flex-direction:column; align-items:center; gap:var(--s-2); text-align:center; min-width:0; }
+.ds-preview-title{ font-size:var(--fs-title); font-weight:600; color:var(--ink); }
+.ds-preview-line{ max-width:100%; font-size:var(--fs-small); color:var(--ink-faint); }
+
+.ds-preview-facts{ display:flex; flex-direction:column; gap:var(--s-4); margin:0; font-size:var(--fs-small); }
+.ds-preview-fact{ display:flex; gap:var(--s-8); }
+.ds-preview-fact dt{ flex:none; width:40%; color:var(--ink-faint); text-align:right; }
+.ds-preview-fact dd{ margin:0; min-width:0; color:var(--ink); }
+
+.ds-preview-actions{ display:flex; flex-wrap:wrap; gap:var(--s-6); margin-top:auto; }
+.ds-preview-action{ display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-4) var(--s-8); border:var(--hair) solid var(--line); border-radius:var(--r-small);
+  background:var(--surface); color:var(--ink); font:inherit; font-size:var(--fs-small); cursor:default; }
+.ds-preview-action-label{ white-space:nowrap; }
+.ds-preview-action[*|data-focused=true]{ box-shadow:0 0 0 var(--focus-ring) var(--accent-ring); }

@@ -5,6 +5,7 @@
 
 use crate::components::avatar::AvatarFace;
 use crate::components::row_action::RowAction;
+use crate::components::row_shape::RowShape;
 use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Check, Shortcut};
 use crate::icon::{Icon, IconSource};
@@ -112,6 +113,9 @@ pub struct MenuRow<T> {
     pub availability: Availability,
     /// A button at its end that acts without picking it.
     pub trailing: Option<RowAction>,
+    /// How it draws beyond its title and detail: `Plain`, or a file's or a clipboard entry's
+    /// shape (sill Q290). Picked, navigated and matched on its title whatever its shape.
+    pub shape: RowShape,
 }
 
 impl<T> MenuRow<T> {
@@ -126,6 +130,7 @@ impl<T> MenuRow<T> {
             check: None,
             availability: Availability::Enabled,
             trailing: None,
+            shape: RowShape::Plain,
         }
     }
 }
