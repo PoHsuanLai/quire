@@ -3059,6 +3059,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-reveal[*|data-reveal=play] > :nth-child(10){ --i:9; }
 .ds-reveal[*|data-reveal=play] > :nth-child(11){ --i:10; }
 .ds-reveal[*|data-reveal=play] > :nth-child(12){ --i:11; }
+/* -- detail_layer -- */
+/* LayerGlyph (design/26-DETAILS.md section 3.2): an icon as stacked layers, each its own `svg`
+   so the stylesheet can fade it (it cannot reach inside an SVG on Blitz). The first layer is in
+   flow and sizes the box. Unlit layers are faint; a stalled pending loop dims the glyph. Each
+   change is a `--t-quick` fade: the step timer, not a keyframe, paces the loop. */
+
+.ds-layer-glyph{ position:relative; display:inline-block; flex:none; line-height:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-layer-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-layer-part:first-child{ position:relative; }
+.ds-layer-part[*|data-lit=off]{ opacity:.18; }
+.ds-layer-glyph[*|data-pending=still]{ opacity:.45; }
+.ds-check-mark{ display:block; flex:none; }
 /* -- detail_morph -- */
 /* MorphGlyph (design/26-DETAILS.md section 3.2): two stacked layers, each an `svg` in an HTML
    wrapper the stylesheet can move (Blitz's stylesheet does not reach inside an SVG). The incoming
