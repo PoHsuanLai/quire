@@ -4,10 +4,12 @@
 
 /* One line, clipped, fading out at the end: the ellipsis Blitz cannot draw (spike S13). */
 .ds-truncate{white-space:nowrap;overflow:hidden;min-width:0;mask-image:linear-gradient(to right,#000 calc(100% - 1.5em),transparent)}
-/* Machine facts in the data face, a size smaller (`S:56`). */
-.ds-mono{font-family:var(--font-data);font-size:.78em;letter-spacing:-.02em}
-/* The eyebrow over a section (`S:57`). */
-.ds-eyebrow{font-family:var(--font-data);font-size:var(--fs-eyebrow);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+/* Machine facts in the data face, a size smaller (`S:56`; .86em under the System typeface, whose
+   data face is Inter and not a wide monospace). */
+.ds-mono{font-family:var(--font-data);font-size:var(--fs-mono);letter-spacing:var(--tracking-mono);font-variant-numeric:tabular-nums}
+/* The eyebrow over a section (`S:57`): under the System typeface Inter SemiBold caps at
+   `--fs-micro`, .06em apart; under Editorial the tracked mono of the prototype. */
+.ds-eyebrow{font-family:var(--font-data);font-size:var(--fs-caps);font-weight:var(--fw-caps);letter-spacing:var(--tracking-caps);text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--ink-faint)}
 /* Every Glyph: a block that never shrinks in a flex row (design/04-COMPONENTS.md "Global rules",
    `S:58-59`). Size and stroke are the SVG's own attributes (spike S6), never CSS. */
 .ds-ic{display:block;flex:none}

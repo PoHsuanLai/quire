@@ -54,15 +54,40 @@ fn base_context() -> FontContext {
 #[cfg(test)]
 mod tests {
     use super::{font_context, register_fonts};
-    use ds::Family;
+    use ds::{Family, Typeface};
 
-    /// The family name each token's `font-family` stack leads with.
-    const NAMES: &[(Family, &str)] = &[
-        (Family::Display, "Bricolage Grotesque"),
-        (Family::Ui, "Karla"),
-        (Family::Data, "Space Mono"),
-        (Family::Serif, "Noto Serif"),
-    ];
+    /// Every family name a token's `font-family` stack leads with, in either typeface: Inter,
+    /// Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.
+    fn names() -> Vec<(Family, &'static str)> {
+        let mut names: Vec<(Family, &'static str)> = Typeface::ALL
+            .into_iter()
+            .flat_map(|typeface| {
+                Family::ALL
+                    .into_iter()
+                    .map(move |family| (family, family.face_name(typeface)))
+            })
+            .collect();
+        names.sort_by_key(|(_, name)| *name);
+        names.dedup_by_key(|(_, name)| *name);
+        names
+    }
+
+    #[test]
+    fn both_typefaces_name_six_faces() {
+        let mut got: Vec<&str> = names().into_iter().map(|(_, name)| name).collect();
+        got.sort_unstable();
+        assert_eq!(
+            got,
+            [
+                "Bricolage Grotesque",
+                "Inter",
+                "Inter Display",
+                "Karla",
+                "Noto Serif",
+                "Space Mono"
+            ]
+        );
+    }
 
     #[test]
     fn every_family_resolves_after_registration() {
@@ -73,14 +98,14 @@ mod tests {
             }),
             source_cache: parley::fontique::SourceCache::default(),
         };
-        for (family, name) in NAMES {
+        for (family, name) in names() {
             assert!(
                 fonts.collection.family_by_name(name).is_none(),
                 "{family:?}: {name} before registering"
             );
         }
         register_fonts(&mut fonts);
-        for (family, name) in NAMES {
+        for (family, name) in names() {
             assert!(
                 fonts.collection.family_by_name(name).is_some(),
                 "{family:?}: {name} is not registered"
@@ -91,7 +116,7 @@ mod tests {
     #[test]
     fn the_shared_context_carries_the_faces() {
         let mut fonts = font_context();
-        for (family, name) in NAMES {
+        for (family, name) in names() {
             assert!(
                 fonts.collection.family_by_name(name).is_some(),
                 "{family:?}: {name} missing from font_context()"

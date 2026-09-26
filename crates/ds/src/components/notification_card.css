@@ -31,7 +31,7 @@
 .ds-notification-summary{ flex:1; font-size:var(--fs-shell-menu); font-weight:700; line-height:1.35; color:var(--ink); }
 .ds-notification-count{ flex:none; padding:0 var(--s-5); border-radius:var(--r-pill); background:var(--accent-soft); color:var(--ink);
   font-size:var(--fs-nano); font-weight:700; line-height:1.6; font-variant-numeric:tabular-nums; }
-.ds-notification-age{ flex:none; font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); white-space:nowrap; }
+.ds-notification-age{ flex:none; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--ink-faint); white-space:nowrap; }
 
 .ds-notification-body{ position:relative; overflow:hidden; max-height:calc(2 * 1.35em); font-size:var(--fs-shell-menu); line-height:1.35; color:var(--ink);
   transition:max-height var(--t-move) var(--e-out); }

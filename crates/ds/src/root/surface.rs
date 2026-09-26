@@ -3,15 +3,17 @@
 
 use super::chrome::{Ground, RootChrome};
 use super::env::{Env, use_env, use_env_provider};
+use super::typeface::use_typeface;
 use crate::appearance::{Accent, Resolved, Scheme};
 use crate::material::{BlurState, Material};
 use crate::tokens::Corner;
 use dioxus::prelude::*;
 
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`
-/// stamping the scope's theme, accent, motion, material and blur, with no stylesheet and no
-/// frame variables (it inherits the root's). Each override left `None` inherits the enclosing
-/// scope's value, so a specimen in another accent or blur state needs no second `Ds`. `on` is
+/// stamping the scope's theme, the root's typeface, and the scope's accent, motion, material and
+/// blur, with no stylesheet and no frame variables (it inherits the root's). Each override left
+/// `None` inherits the enclosing scope's value, so a specimen in another accent or blur state
+/// needs no second `Ds`. `on` is
 /// the ground its content is drawn on: `None` takes the material's (`Ground::of`: the frame for
 /// Bar and Dock, paper otherwise), so a paper panel inside a bar root is paper again. `radius`
 /// overrides the material's corner (`--m-radius`), for a surface whose radius is a setting.
@@ -34,11 +36,13 @@ pub fn Surface(
 ) -> Element {
     let env = scope(use_env(), material, theme, accent, blur);
     let ground = on.unwrap_or(Ground::of(material));
+    let typeface = use_typeface();
     use_env_provider(env);
     rsx! {
         div {
             class: "ds",
             "data-theme": env.scheme.slug(),
+            "data-typeface": typeface.slug(),
             "data-accent": env.resolved.accent.slug(),
             "data-motion": env.resolved.motion.slug(),
             "data-material": env.material.slug(),
@@ -59,11 +63,13 @@ pub fn Surface(
 #[component]
 pub(crate) fn ClassedScope(material: Material, class: &'static str, children: Element) -> Element {
     let env = scope(use_env(), material, None, None, None);
+    let typeface = use_typeface();
     use_env_provider(env);
     rsx! {
         div {
             class: "ds {class}",
             "data-theme": env.scheme.slug(),
+            "data-typeface": typeface.slug(),
             "data-accent": env.resolved.accent.slug(),
             "data-motion": env.resolved.motion.slug(),
             "data-material": env.material.slug(),

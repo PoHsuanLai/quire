@@ -5,7 +5,7 @@
    fold toggle and Clear, Quiet buttons) ends the row. */
 
 .ds-group-header{ display:flex; align-items:center; gap:var(--s-8); width:100%; box-sizing:border-box; padding:var(--s-12) var(--s-6) var(--s-6);
-  font-family:var(--font-data); font-size:var(--fs-caption); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); }
+  font-family:var(--font-data); font-size:var(--fs-caption); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps-narrow); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
 .ds-group-header-icon{ display:flex; flex:none; line-height:0; }
 .ds-group-header-name{ min-width:0; overflow:hidden; white-space:nowrap; color:var(--ink-soft); }
 .ds-group-header-count{ font-variant-numeric:tabular-nums; }

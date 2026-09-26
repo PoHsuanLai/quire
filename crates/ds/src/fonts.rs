@@ -1,4 +1,6 @@
-//! The four faces, shipped inside the binary as bytes (design/02-TYPE.md section 2).
+//! The faces, shipped inside the binary as bytes (design/02-TYPE.md section 2): Inter and Inter
+//! Display (the System typeface), Bricolage Grotesque, Karla and Space Mono (the Editorial
+//! typeface; Space Mono is also the code face in both), and Noto Serif.
 //!
 //! On Blitz the bytes are registered with the renderer's font context once (`ds-native`'s
 //! `register_fonts`); nothing about fonts is in the stylesheet. The `webview-fonts` feature
@@ -12,6 +14,9 @@
 //! with the latin file's own code points plus U+2190-2193, because Google's latin range keeps
 //! `↑` and `↓` but drops `←` and `→`, and a Small key cap's fallback arrows read as dashes
 //! (FINDINGS "Sheet and modal parts", sill Q95). Every other glyph is the same outline.
+//! Inter is cut from the official Inter 4.1 release by `scripts/cut-inter.sh` (version and
+//! SHA-256 recorded there): its variable font pinned to `opsz` 14 for Inter (400-700, italic
+//! 400) and to `opsz` 32 for Inter Display (500-800), since the renderer sets no optical size.
 //! Licences are in `assets/fonts/OFL-*.txt`.
 
 use crate::tokens::Family;
@@ -46,7 +51,10 @@ pub enum Subset {
 /// One font file.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Face {
-    /// Which family it belongs to.
+    /// The family name it registers as, the name a `--font-*` stack leads with: `"Inter"`.
+    pub name: &'static str,
+    /// The job it was cut for (under the typeface that names it; Space Mono also does
+    /// [`Family::Code`] in both).
     pub family: Family,
     /// Upright or italic.
     pub style: FaceStyle,
@@ -59,8 +67,9 @@ pub struct Face {
 }
 
 macro_rules! face {
-    ($family:expr, $style:expr, $min:expr, $max:expr, $subset:expr, $file:literal) => {
+    ($name:literal, $family:expr, $style:expr, $min:expr, $max:expr, $subset:expr, $file:literal) => {
         Face {
+            name: $name,
             family: $family,
             style: $style,
             weight: Weight {
@@ -76,6 +85,61 @@ macro_rules! face {
 /// Every face the design system ships.
 pub static FACES: &[Face] = &[
     face!(
+        "Inter",
+        Family::Ui,
+        FaceStyle::Normal,
+        400,
+        700,
+        Subset::Latin,
+        "inter-normal-400-700-latin.ttf"
+    ),
+    face!(
+        "Inter",
+        Family::Ui,
+        FaceStyle::Normal,
+        400,
+        700,
+        Subset::LatinExt,
+        "inter-normal-400-700-latin-ext.ttf"
+    ),
+    face!(
+        "Inter",
+        Family::Ui,
+        FaceStyle::Italic,
+        400,
+        400,
+        Subset::Latin,
+        "inter-italic-400-latin.ttf"
+    ),
+    face!(
+        "Inter",
+        Family::Ui,
+        FaceStyle::Italic,
+        400,
+        400,
+        Subset::LatinExt,
+        "inter-italic-400-latin-ext.ttf"
+    ),
+    face!(
+        "Inter Display",
+        Family::Display,
+        FaceStyle::Normal,
+        500,
+        800,
+        Subset::Latin,
+        "inter-display-normal-500-800-latin.ttf"
+    ),
+    face!(
+        "Inter Display",
+        Family::Display,
+        FaceStyle::Normal,
+        500,
+        800,
+        Subset::LatinExt,
+        "inter-display-normal-500-800-latin-ext.ttf"
+    ),
+    face!(
+        "Bricolage Grotesque",
         Family::Display,
         FaceStyle::Normal,
         500,
@@ -84,6 +148,7 @@ pub static FACES: &[Face] = &[
         "bricolage-grotesque-normal-500-800-latin.ttf"
     ),
     face!(
+        "Bricolage Grotesque",
         Family::Display,
         FaceStyle::Normal,
         500,
@@ -92,6 +157,7 @@ pub static FACES: &[Face] = &[
         "bricolage-grotesque-normal-500-800-latin-ext.ttf"
     ),
     face!(
+        "Karla",
         Family::Ui,
         FaceStyle::Normal,
         400,
@@ -100,6 +166,7 @@ pub static FACES: &[Face] = &[
         "karla-normal-400-700-latin.ttf"
     ),
     face!(
+        "Karla",
         Family::Ui,
         FaceStyle::Normal,
         400,
@@ -108,6 +175,7 @@ pub static FACES: &[Face] = &[
         "karla-normal-400-700-latin-ext.ttf"
     ),
     face!(
+        "Karla",
         Family::Ui,
         FaceStyle::Italic,
         400,
@@ -116,6 +184,7 @@ pub static FACES: &[Face] = &[
         "karla-italic-400-latin.ttf"
     ),
     face!(
+        "Karla",
         Family::Ui,
         FaceStyle::Italic,
         400,
@@ -124,6 +193,7 @@ pub static FACES: &[Face] = &[
         "karla-italic-400-latin-ext.ttf"
     ),
     face!(
+        "Space Mono",
         Family::Data,
         FaceStyle::Normal,
         400,
@@ -132,6 +202,7 @@ pub static FACES: &[Face] = &[
         "space-mono-normal-400-latin.ttf"
     ),
     face!(
+        "Space Mono",
         Family::Data,
         FaceStyle::Normal,
         400,
@@ -140,6 +211,7 @@ pub static FACES: &[Face] = &[
         "space-mono-normal-400-latin-ext.ttf"
     ),
     face!(
+        "Space Mono",
         Family::Data,
         FaceStyle::Normal,
         700,
@@ -148,6 +220,7 @@ pub static FACES: &[Face] = &[
         "space-mono-normal-700-latin.ttf"
     ),
     face!(
+        "Space Mono",
         Family::Data,
         FaceStyle::Normal,
         700,
@@ -156,6 +229,7 @@ pub static FACES: &[Face] = &[
         "space-mono-normal-700-latin-ext.ttf"
     ),
     face!(
+        "Noto Serif",
         Family::Serif,
         FaceStyle::Normal,
         400,
@@ -164,6 +238,7 @@ pub static FACES: &[Face] = &[
         "noto-serif-normal-400-700-latin.ttf"
     ),
     face!(
+        "Noto Serif",
         Family::Serif,
         FaceStyle::Normal,
         400,
@@ -172,6 +247,7 @@ pub static FACES: &[Face] = &[
         "noto-serif-normal-400-700-latin-ext.ttf"
     ),
     face!(
+        "Noto Serif",
         Family::Serif,
         FaceStyle::Italic,
         400,
@@ -180,6 +256,7 @@ pub static FACES: &[Face] = &[
         "noto-serif-italic-400-700-latin.ttf"
     ),
     face!(
+        "Noto Serif",
         Family::Serif,
         FaceStyle::Italic,
         400,
@@ -199,17 +276,18 @@ pub fn font_face_css() -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{FACES, FaceStyle, Subset};
+    use crate::appearance::Typeface;
     use crate::tokens::Family;
 
     #[test]
     fn every_family_ships_both_subsets() {
-        // Each (family, style, weight) appears once per subset, and no file is empty.
+        // Each (name, style, weight) appears once per subset, and no file is empty.
         for face in FACES {
             assert!(!face.bytes.is_empty(), "{face:?} is empty");
             let twins = FACES
                 .iter()
                 .filter(|other| {
-                    other.family == face.family
+                    other.name == face.name
                         && other.style == face.style
                         && other.weight == face.weight
                 })
@@ -218,20 +296,24 @@ mod tests {
             assert_eq!(
                 twins.len(),
                 2,
-                "{:?} {:?} {:?}",
-                face.family,
+                "{} {:?} {:?}",
+                face.name,
                 face.style,
                 face.weight
             );
             assert!(twins.contains(&Subset::Latin) && twins.contains(&Subset::LatinExt));
         }
-        for family in Family::ALL {
-            assert!(
-                FACES
-                    .iter()
-                    .any(|face| face.family == family && face.style == FaceStyle::Normal),
-                "{family:?} has no upright face"
-            );
+        // Every stack, in either typeface, leads with a face that ships upright.
+        for typeface in Typeface::ALL {
+            for family in Family::ALL {
+                let name = family.face_name(typeface);
+                assert!(
+                    FACES
+                        .iter()
+                        .any(|face| face.name == name && face.style == FaceStyle::Normal),
+                    "{family:?} under {typeface:?} leads with {name}, which ships no upright face"
+                );
+            }
         }
     }
 
@@ -244,8 +326,8 @@ mod tests {
             let magic = face.bytes.get(..4).unwrap_or_default();
             assert!(
                 SFNT.contains(&magic),
-                "{:?} {:?} {:?} starts {magic:02x?}",
-                face.family,
+                "{} {:?} {:?} starts {magic:02x?}",
+                face.name,
                 face.style,
                 face.subset
             );
