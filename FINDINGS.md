@@ -4152,9 +4152,35 @@ not installed).
   digits and spaces from Noto Color Emoji (wide keycap bases): "m 9 -extra- 1 .pdf", "0 0 : 2 2",
   huge word gaps in the launcher, the bar clock and every sill capture. The gallery comparison
   did not catch it. The text stacks are back to Inter / system-ui; `--font-emoji` and
-  `.ds-emoji-text` stay for emoji-only content (the emoji grid, the preview glyph). Root cause
-  not yet known (why Inter does not claim U+0020 and 0-9 first in sill's documents); until it is,
-  never put the emoji face in a stack that carries ordinary text.
+  `.ds-emoji-text` stay for emoji-only content (the emoji grid, the preview glyph).
+  **Root cause (2026-09-27): Inter is not a family in sill's documents at all — a shell-host
+  bug.** shell-host gives every surface a clone of `SharedFonts::system()` (`dom/fonts.rs`):
+  `FontContext::new()` (system fonts) plus Blitz's bullet face. `SharedFonts::register`, which
+  would add quire's faces, has no caller anywhere in shell-host or sill, and Inter is not
+  installed on the system (`fc-list` has no Inter), so `family_by_name("Inter")` is `None` there
+  while quire's `ds_native::font_context()` (gallery, harness, `launch`) registers `ds::FACES`.
+  The stack's first family that exists under shell-host is therefore Noto Color Emoji, and
+  parley takes each cluster from the first family in the stack that maps it: the emoji face's
+  cmap holds U+0020, 0-9, `#` and `*` (the keycap bases), so spaces and digits came from it and
+  every other character from system-ui. It is not a fallback-order quirk: with Inter registered
+  the same stack lays out exactly as `"Inter"` alone. `tests/text_stack_fonts.rs` lays the stack
+  out through Blitz under both contexts (16 px): "00:22" is 45 px under quire's (= Inter's) and
+  84 under shell-host's against 41 for system-ui; "m9-extra-1.pdf" 114 / 132 / 108; "a b c" 37 /
+  65 / 32; and a stack naming Inter under shell-host is system-ui's to the pixel. **So sill has
+  been drawing system-ui (Noto Sans here) wherever it asked for Inter, Inter Display, Bricolage
+  Grotesque, Karla, Space Mono or Noto Serif**, and every sill capture's type is not quire's
+  (shell-host's headless `Fonts::Bundled` registers one file, the first `.ttf` in quire's font
+  folder, Bricolage's latin-ext, so it has no Inter either). The fix is shell-host's:
+  `SharedFonts::system()` registers `ds::FACES` (`ds_native::register_fonts(&mut ctx)` does
+  exactly that). The safe way to colour emoji in ordinary text afterwards is the same stack,
+  `"Inter","Noto Color Emoji",system-ui,sans-serif`, *only once the text face is registered in
+  every host*: the text face must precede the emoji face (so it claims the space and the digits)
+  and the emoji face must precede `system-ui` (which maps emoji itself, from Symbola, so a face
+  named after it is never reached; `tests/text_stack_fonts.rs` checks that too). fontique has no
+  `unicode-range`, so a range-limited registration would mean shipping a copy of the emoji font
+  with its ASCII cmap entries removed under another family name; with the host fixed it is not
+  needed. Until shell-host registers the faces, never put the emoji face in a stack that carries
+  ordinary text.
 - **CBDT does not paint, and must not be made to.** glifo decodes CBDT's PNG strikes only with
   its `png` feature, which nothing in our tree enables (vello_cpu's default does, but
   anyrender_vello_cpu turns defaults off). Turning it on fixes vello_cpu and crashes the window
@@ -4178,3 +4204,26 @@ not installed).
 3. **Pre-rendered sprite sheets of the whole set**: only if the scrolling measurement fails. It
    costs several MB of PNG per size, a build step, and loses the system font's updates.
 4. **CBDT**: no. It paints nothing, and the one-feature fix panics the window renderer.
+
+## Palette fixes: selection in view, caret at the end, trail gap (2026-09-27)
+
+- **Blitz's `scroll_into_view` scrolls the document viewport only** (`BaseDocument::
+  scroll_into_view` aligns against `viewport_scroll` and calls `scroll_to` on the root), so
+  `MountedData::scroll_to_with_options` never moves a nested scroller such as the palette's
+  360 px list. ds-native's `HostReveal` (`ds_native::reveal::REVEAL`, provided by `launch`, the
+  harness and `ds_native::focus::provide`) reads the item's offset in the list from the layout
+  tree and sets the list's own offset with `scroll_to` (instant, clamped); the rule is
+  `ds::nearest_scroll`, CSSOM's `block: nearest`. A webview keeps the renderer's own call (sill
+  Q340). A group's "Show More" stop is drawn in its header, above its rows, so reaching it with
+  Down scrolls the list *up* to the header.
+- **Blitz offsets an element's own client rect by its own scroll offset**
+  (`Node::absolute_position` subtracts the node's `scroll_offset` before recursing), so a
+  scrolled list's `getBoundingClientRect` moves up with its content. A test that wants the
+  list's visible rect reads it before anything scrolls (`tests/palette_fixes.rs`).
+- **Blitz lays a plain inline span's horizontal margin out as nothing**: a shaped row's
+  `.ds-menu-when{ margin-right }` gave "00:33↵" with no gap (sill Q343). `.ds-menu-when` and the
+  new `.ds-menu-keys` are `inline-block`, and the gap is 6 px (`--s-6`) as intended.
+- **A Blitz field's caret starts at byte 0** when its value is set, and a focus write does not
+  move it; the palette now asks for `InitialCaret::End` through `FocusRequest::with_caret` and
+  the host's `HostPlaceCaret` (parley's `move_to_text_end`), so a palette opened on a query reads
+  Right as `Caret::AtEnd` at once (sill Q341).
