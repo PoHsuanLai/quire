@@ -53,7 +53,7 @@
 }
 .ds-month-day[*|aria-current=date] .ds-month-num{ background:var(--accent); color:var(--accent-ink); font-weight:700; }
 
-.ds-month-day[*|data-kind=pressable]{ cursor:pointer; }
+.ds-month-day[*|data-kind=pressable]{ cursor:default; }
 .ds-month-day[*|data-kind=pressable]:hover .ds-month-num{ background:var(--surface-2); }
 .ds-month-day[*|data-kind=pressable][*|aria-current=date]:hover .ds-month-num{ background:var(--accent); }
 .ds-month-day[*|data-kind=pressable]:active .ds-month-num{ transform:scale(var(--squish)); }
@@ -64,7 +64,7 @@
 
 .ds-month-step{
   font:inherit; display:grid; place-items:center; width:14px; height:14px; padding:0; border:0; border-radius:var(--r-pill);
-  background:transparent; color:var(--ink-faint); cursor:pointer;
+  background:transparent; color:var(--ink-faint); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-month-step:hover{ color:var(--ink); background:var(--surface-2); }

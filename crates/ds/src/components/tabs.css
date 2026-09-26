@@ -5,7 +5,7 @@
 
 .ds-tabs{ display:flex; gap:var(--s-6); border-bottom:var(--hair) solid var(--line); }
 .ds-tab{
-  position:relative; border:0; background:transparent; cursor:pointer;
+  position:relative; border:0; background:transparent; cursor:default;
   padding:var(--s-10) var(--s-14) var(--s-12); font-family:var(--font-display); font-weight:700; font-size:var(--fs-title);
   color:var(--ink-faint); transition:color var(--t-quick) var(--e-out);
 }

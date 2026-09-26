@@ -7,7 +7,7 @@
    TODO(O-3): the live scale 1.15 (`S:257`) has no scalar token.
    The thumb's fill, the hover state and disabled (O-1) are not specified. */
 
-.ds-slider{ position:relative; display:block; width:100%; height:22px; cursor:pointer; }
+.ds-slider{ position:relative; display:block; width:100%; height:22px; cursor:default; }
 .ds-slider-track{
   position:absolute; left:0; right:0; top:9px; height:4px; overflow:hidden;
   border-radius:var(--r-pill); background:var(--line);

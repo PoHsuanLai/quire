@@ -28,7 +28,7 @@
 .ds-lock-caps{ display:inline-flex; flex:none; color:var(--lock-ink-soft); }
 
 .ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
-  background:var(--lock-glass-strong); color:var(--lock-ink); cursor:pointer;
+  background:var(--lock-glass-strong); color:var(--lock-ink); cursor:default;
   transition:opacity var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring); }
 .ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
 .ds-lock-go[*|aria-busy=true]{ opacity:1; }

@@ -48,7 +48,7 @@
 
 .ds-notification .ds-notification-close{ position:absolute; top:calc(-1 * var(--s-6)); left:calc(-1 * var(--s-6)); z-index:var(--z-raise);
   display:flex; align-items:center; justify-content:center; box-sizing:border-box; width:var(--notifications-close); height:var(--notifications-close); padding:0;
-  border:var(--hair) solid var(--line); border-radius:var(--r-pill); background:var(--raise); color:var(--ink-soft); box-shadow:var(--shadow-1); cursor:pointer;
+  border:var(--hair) solid var(--line); border-radius:var(--r-pill); background:var(--raise); color:var(--ink-soft); box-shadow:var(--shadow-1); cursor:default;
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out); }
 .ds-notification[*|data-hover=on] .ds-notification-close,
 .ds[*|data-modality=keyboard] .ds-notification-close:focus{ opacity:1; pointer-events:auto; }

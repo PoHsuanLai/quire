@@ -87,5 +87,5 @@
    takes its container's width: a span has no 300 px intrinsic width as an input has, so without
    it the name collapsed to its padding on Blitz. */
 .ds-input-wrap[*|data-kind=file]{ align-items:center; gap:var(--s-6); width:100%; }
-.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:pointer; flex:1 1 0; width:auto; }
+.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:default; flex:1 1 0; width:auto; }
 .ds-input-wrap[*|data-kind=file] .ds-input-placeholder{ right:auto; }
