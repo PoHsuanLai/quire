@@ -4,7 +4,10 @@ Status: D0 built, 2026-09-27, branch `details-d0b` (quire): `ds::detail` holds t
 types and the primitives (section 4.1 is now the sketch they grew from; the shipped API is in
 CONSUMING.md "Details"), the tokens of 3.4, `Spinner` on `use_pending`, the harness's
 `assert_settles_to_zero_frames`, the lint rules `InfiniteLoop` and `OffGrammarTiming`, and the
-gallery's Details page. D1-D7 are not started. The catalogue (section 5) still describes the
+gallery's Details page. D1's quire lane is built, 2026-09-27, branch `details-d1`: the layered
+status glyphs (`WifiGlyph`, `BatteryGlyph`, `BluetoothGlyph`, `VolumeGlyph`, `StatusGlyph`;
+design/04 section 51, CONSUMING.md "Status glyphs"); sill's bar wiring (D1's sill lane) and
+D2-D7 are not started. The catalogue (section 5) still describes the
 state before D0. Status legend as in `13-BEHAVIOUR-menus-windows.md`:
 **settled** = decided with the user or already built; **proposed** = chosen here, the user
 judges. Reference confidence: **H** the vendor's own guidelines or documentation, **M** a
@@ -491,10 +494,18 @@ the state is shown with no motion (a snap).
 
 ### 5.1 Bar status items
 
+The quire side of this section is built (wave D1, `details-d1`): each item below has its glyph
+and `Detailed` state in `ds::components::status`; the Today column still describes sill's bar,
+which moves onto them in D1's sill lane (CONSUMING.md "Status glyphs" lists what it passes).
+
 #### 5.1.1 Wi-Fi item
 States: Off, Joining, Connected {bars 1-3, secured}, NoInternet, Failed. Today the sill glyph is a
 bucket of `WifiLow`/`Wifi`/`WifiHigh`/`WifiOff`, and `Link::Connecting` shows `WifiOff`
-(`bar/status.rs`).
+(`bar/status.rs`): the bar reads "Wi-Fi off" while it is connecting, a bug (G1's sill side:
+`Link::Connecting` must be `WifiState::Joining`). Built as `WifiState::{Off, Idle, Joining,
+Joined { bars, reach }, Failed}`: Idle (on, joined to nothing) is the faint fan, distinct from
+Off's slash; no internet is `Joined { reach: NoInternet }`; the lock is the menu's, not the
+bar's.
 
 | Moment | Our detail | Reference | Today | Gap |
 | --- | --- | --- | --- | --- |
@@ -808,7 +819,7 @@ land on the primitives rather than beside them: battery-fill is the first consum
 | --- | --- | --- | --- | --- |
 | D0 | D0a primitives: time | `Moment`, `Touch`, `FirstShow`, `EventStamp`, `Operation`, `Detailed`, `use_detail`, `moment_table`; `Tween` on `CubicBezier::at` and a frame clock that stops at rest; `Sweep`, `CountUp`, `Reveal`; tokens `--t-sweep`, `--t-count-step`, `SettleHold` into design/05 and the token table; gallery page "Details" with a replay button per primitive; harness tests (idle after settle, Reduced jumps, retarget mid-flight) | Q | foundation. **Built 2026-09-27** (`details-d0b`) |
 | D0 | D0b primitives: state | `Pending` (+ `--t-pending-step`, `PendingGrace`, `PendingCap`), `Settle`, `Shake`, `MorphGlyph`, `RollDigits`, `Nudge`; `Spinner` rebuilt on `Pending` (its two infinite loops gone; `ModuleState::Busy` and `PromptState::Checking` inherit the bound; `SyncHalo`'s idle breathe, mailo's, goes as design/05 §12 item 4 proposes, so tell the mailo session before it lands) | Q | G15, G45 (quire side). **Built 2026-09-27** (`details-d0b`), with one change: `SyncHalo` keeps its loops (it is mail's; mailo decides, design/05 §12 item 4), listed in `ds/tests/details_lint.rs` with the three other mail loops |
-| D1 | status glyphs | a layered `StatusGlyph` family: Wi-Fi (dot + 3 arcs, the "!" badge), battery (outline, fill layer, bolt, plug), Bluetooth (base, slash, connected dots), volume (on `LevelGlyph`), each with its `Detailed` state and moment table | Q | G1-G4, G8-G10, G12 (quire side) |
+| D1 | status glyphs | a layered `StatusGlyph` family: Wi-Fi (dot + 3 arcs, the "!" badge), battery (outline, fill layer, bolt, plug), Bluetooth (base, slash, connected dots), volume (on `LevelGlyph`), each with its `Detailed` state and moment table | Q | G1-G4, G8-G10, G12 (quire side), and the glyph side of G5-G7 (the failed-join shake, the Bluetooth glyph and its bounded breath). **Built 2026-09-27** (`details-d1`) |
 | D1 | bar wiring | sill's bar items on `StatusGlyph`: `Link::Connecting` → Joining with an op stamp from the network service, no-internet from connectivity, battery thresholds (`bar.battery_low_percent`), the Bluetooth bar item | S | G1-G12 |
 | D2 | control center modules | `ModuleTile` disc glyph on `MorphGlyph`/`Settle`; `SettingsRow` trailing `Pending`/`Settle{Check}`/`Shake`; Now Playing play/pause `MorphGlyph{OffUp}`, position bar, track cross-fade; Battery module rings on `Sweep`/`CountUp`; a keyboard-brightness module on `LevelControl` | Q+S | G14, G16-G18, G20, G21, G23, G25-G30 |
 | D3 | OSD | default `LevelLook::Segments` for the OSD (user confirms), nothing else | Q+S (a settings default) | G31 |

@@ -1,0 +1,20 @@
+/* The status glyphs (design/26-DETAILS.md 5.1, wave D1): each glyph a stack of parts, one `svg`
+   per part, so the stylesheet can move each part (it cannot reach inside an SVG on Blitz, spike
+   S6). The first part is in flow and sizes the box. A part fades between lit, faint and hidden
+   over `--t-quick`, a hidden one shrunk to .7 so it grows in (the badge, the bolt, the plug, the
+   dots); the battery's fill cross-fades to `--battery-low` over `--t-quick` (R15) and dims under
+   a mark. A pending loop's steps are set from Rust: a stalled loop dims the glyph, a breath's low
+   half fades over `--t-pending-step`. Nothing here loops; each change ends at 0 frames (R3).
+   Attribute selectors carry `*|` (spike S2). */
+
+.ds-status-glyph{ position:relative; display:inline-block; flex:none; line-height:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-status-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
+.ds-status-part:first-child{ position:relative; }
+.ds-status-part[*|data-show=faint]{ opacity:.25; }
+.ds-status-part[*|data-show=hidden]{ opacity:0; transform:scale(.7); }
+.ds-status-part[*|data-tone=low]{ color:var(--battery-low); }
+.ds-status-part[*|data-under=mark]{ opacity:.35; }
+.ds-status-glyph[*|data-pending=still]{ opacity:.45; }
+.ds-status-glyph[*|data-pending=high], .ds-status-glyph[*|data-pending=low]{ transition:opacity var(--t-pending-step) var(--e-linear); }
+.ds-status-glyph[*|data-pending=low]{ opacity:.45; }
+.ds-status-glyph > .ds-level-glyph{ width:100%; height:100%; }

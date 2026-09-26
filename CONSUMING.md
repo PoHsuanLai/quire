@@ -1776,6 +1776,43 @@ item 4). A consumer sheet that plays one of those keyframes `infinite` itself no
 `InfiniteLoop`: rebuild it on `use_pending`, or name it in your `LintConfig::exceptions` with its
 reason.
 
+### Status glyphs (2026-09-27): the bar's Wi-Fi, battery, Bluetooth and volume as layers
+
+design/26-DETAILS.md wave D1 (quire lane), design/04 section 51, FINDINGS.md "Details D1".
+Additive: no existing prop, class or type changed. New at the crate root: `WifiGlyph`,
+`BatteryGlyph`, `BluetoothGlyph`, `VolumeGlyph`, `StatusGlyph` and their states `WifiState`
+(`WifiBars`, `WifiReach`), `BatteryState` (`BatteryPower`, `LowAt`), `BluetoothState`,
+`VolumeState` (`VolumeWaves`), `StatusState`. New classes `.ds-status-glyph`, `.ds-status-part`
+(consumers never style them). No lint rule and no design/22 row changed.
+
+Each glyph takes its state and an `IconSize` (default `IconSize::Bar`, 22 px), draws in
+`currentColor`, and is `aria-hidden`: put the state's `words()` in the item's label or menu (R8).
+Hand it the state every render; it decides the moment itself (its `Detailed` table), so a poll
+that returns the same state plays nothing and a finer change than is drawn (67 to 68 %, 80.4 to
+80.1 %) is no moment.
+
+**What sill's bar passes (D1's sill lane).**
+
+| Item | From the service | State | Notes |
+| --- | --- | --- | --- |
+| Wi-Fi | `Link::Connecting` | `WifiState::Joining(EventStamp(n))` | **The bug**: `network_icon` maps `Link::Connecting` to `Icon::WifiOff`, so the bar says "Wi-Fi off" while it joins. `n` is an op stamp the network service mints once per join attempt (each entry into Connecting); it must not change while the same join runs, or the loop restarts its grace. A join shorter than `PendingGrace` (400 ms) shows no loop |
+| Wi-Fi | `Link::Wifi { strength, .. }` with `connectivity` | `WifiState::Joined { bars: WifiBars::of(Fraction(strength.0 * 10)), reach }` | `reach`: `Connectivity::None \| Portal \| Limited` → `WifiReach::NoInternet` (the "!" badge, G4; today these show `WifiOff`), `Full \| Unknown` → `Internet` |
+| Wi-Fi | `Link::Disconnected` | `WifiState::Idle` (radio on) or `WifiState::Off` (radio off) | Off draws the slash; Idle is the faint fan. Without a radio state, use `Idle` |
+| Wi-Fi | a failed activation | `WifiState::Failed(EventStamp(n))` | a new stamp per failure (one shake each, R6); the reason goes in the menu's words |
+| Wi-Fi | `Link::Wired`, `Link::Other` | (not this glyph) | keep `Icon::Ethernet` / `Icon::Link` |
+| Battery | `Battery { level, charge, .. }` | `BatteryState { level: Fraction(level.0 * 10), power, low_at }` | `power`: `Charge::Charging` → `Charging` (bolt), `Full \| Idle` → `Held` (plug), `Discharging \| Empty \| Unknown` → `Battery`. `low_at: LowAt(Fraction(p * 10))` from a new key `bar.battery_low_percent` (default 20, design/26 G10, proposed). `Presence::Absent`: hide the item |
+| Bluetooth | adapter and devices | `BluetoothState::{Off, On, Connecting(EventStamp), Connected, Failed(EventStamp)}` | the bar item is new (G6, off by default: `control_center.menu_bar_bluetooth = Hide`); stamps as for Wi-Fi |
+| Volume | `Volume { presence, mute, level, .. }` | `VolumeState::NoDevice` (absent), `Muted`, else `Heard(VolumeWaves::of(Fraction(level.0 * 10)))` | at level 0 the glyph is the speaker with no waves (today `VolumeX`); map 0 to `Muted` to keep the slash |
+
+`StatusGlyph { status: StatusState::Wifi(state) }` is the same four behind one prop, for an item
+list that holds any of them. On a surface the person just opened (the control center),
+`BatteryGlyph { first: FirstShow::Animate }` sweeps the fill in from empty; the bar leaves it
+`Still` (R1).
+
+**The key needs two steps.** `bar.battery_low_percent` is not yet a design/22 row: sill adds the
+key (in `AWAITING_ROWS`), then the row lands in quire, so sill's keys test never sees a row with no
+key.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive

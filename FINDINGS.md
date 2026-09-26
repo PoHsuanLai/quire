@@ -4637,3 +4637,41 @@ sill Q360 and Q361. Branch `q360-q361`.
   disc's foot, `--accent-ink` on today's disc. Six weeks: 14 + 10 + 6 x 19 = 138 (139 with the
   last disc), inside 140. `month_grid_density.rs` measures it and checks today's disc is 20 x 20
   inside its column. No class or API change.
+
+## Details D1 (2026-09-27)
+
+design/26-DETAILS.md wave D1, the quire lane: the bar's status glyphs as layers
+(`ds::components::status`). Branch `details-d1`. API in CONSUMING.md "Status glyphs"; the
+drawing in design/04 section 51.
+
+- **One layer renderer, not `LayerGlyph`.** `LayerGlyph` layers an `Icon`'s own shapes; the
+  status glyphs need parts no Lucide icon has (the "!" badge, the battery's Rust-sized fill, a
+  filled bolt and plug, the connected dots) and three shows per part (lit, faint, hidden), so
+  they stack their own parts (`status/part.rs`) by the same rule: one `svg` per part in an HTML
+  wrapper the stylesheet can fade. The fill is recomputed per frame by `use_sweep`; the slash is
+  a `use_tween` on its dash offset. Everything else is a `--t-quick` CSS transition, so a glyph
+  at rest paints nothing.
+- **Idle is not Off.** The catalogue's Wi-Fi states had no "on, joined to nothing"; sill's
+  `Link::Disconnected` is that most of the time. `WifiState::Idle` is the faint fan, `Off` the
+  slashed one. No internet is `Joined { reach: NoInternet }` rather than its own variant, so the
+  bars stay true under the badge and a change of reach is a Change, not a re-join.
+- **Joining carries the service's stamp, not a token.** A `PendingToken` holds an `Instant`,
+  which a service's plain state should not; `Joining(EventStamp)` and `use_operation` mint the
+  token when the Pending cue arrives, so the same stamp re-polled plays nothing and a new stamp
+  restarts the grace and the cap. The cap is measured from when the glyph saw the join, not from
+  when the service started it (under a second apart on the bar).
+- **The battery quantises to its drawn steps (R2).** The fill is 11 grid units in 22 half-unit
+  steps; a level change inside a step is no moment, and any charge at all shows one step. The
+  low tone is part of what is compared, so crossing `low_at` inside one step still cross-fades
+  the colour. The bolt and plug sit over the fill, which dims to .35 under them: an SVG mask
+  would knock the fill out as the reference does, but it would switch at once while the mark
+  fades in, and it leans on one more usvg feature on Blitz for a 22 px glyph.
+- **Volume adds no motion of its own.** `VolumeGlyph` is `LevelGlyph`'s parts behind a
+  `Detailed` state; its slash fades rather than draws on (as the OSD's does). Drawing it on
+  would change `LevelControl` and the OSD too; left for the user to ask.
+- **Tests.** Every catalogue row is a `moment_table` row (`ds/tests/status_tables.rs`); each
+  moment runs on a real Blitz document and ends in `assert_settles_to_zero_frames`
+  (`ds-native/tests/status_*.rs`), including a join held past `PendingCap` (a ten-second test:
+  the loop holds its dimmed still frame and stops asking for frames) and Reduced for each glyph.
+- **Not here (sill's lane).** The bar wiring, the network service's join stamp, the Bluetooth bar
+  item, `bar.battery_low_percent` and its design/22 row, and the critical-battery nudge (G11).
