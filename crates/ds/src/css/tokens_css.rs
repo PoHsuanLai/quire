@@ -9,6 +9,7 @@ use super::emit::{attr_selector, declaration, rule};
 use crate::appearance::{MotionLevel, Scheme, Typeface};
 use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
 use crate::tokens::dock::DOCK_TOKENS;
+use crate::tokens::emoji_face::{FONT_EMOJI, FONT_EMOJI_STACK};
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
@@ -135,6 +136,7 @@ fn fixed_tokens() -> Vec<String> {
         .chain(layers)
         .chain(opacities)
         .chain(tuned)
+        .chain([declaration(FONT_EMOJI, FONT_EMOJI_STACK)])
         .collect()
 }
 

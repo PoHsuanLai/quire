@@ -4136,10 +4136,18 @@ not installed).
 - **COLRv1 paints in colour on both backends.** glifo interprets COLRv1 paint graphs (layers,
   gradients, clips) on either renderer; parley shapes skin-tone modifiers, flags and ZWJ
   sequences to single glyphs. Nothing in quire needs changing.
-- **The fallback is the catch.** With only `Inter, sans-serif` the emoji come from Symbola. A
-  surface that shows emoji must name `'Noto Color Emoji'` in its stack after the text face
-  (`font-family: 'Inter', 'Noto Color Emoji', sans-serif`); a `--font-emoji` token is the clean
-  way to say it once (not added here: tokens are shared with the details-d0 branch).
+- **The fallback is the catch.** With only `Inter, sans-serif` the emoji come from Symbola. The
+  stack must name `'Noto Color Emoji'`, and **after** the text face: with the emoji face first
+  (`'Noto Color Emoji', 'Inter'`), "Ab 2#" drew "Ab" and nothing for "2#", because Noto Color
+  Emoji maps the digits, `#` and `*` to the empty bases of keycap sequences and the first face
+  that maps a character wins. quire now carries it: `--font-emoji` (`"Inter","Noto Color
+  Emoji",system-ui,sans-serif`) and the utility `.ds-emoji-text` apply it
+  (`tests/colour_emoji.rs` asserts the emoji paints colour and the text is Inter's, pixel for
+  pixel), and the System display, UI and data stacks and Editorial's display and UI stacks name
+  the emoji face after their text faces. Before that change and after it, the gallery's contact
+  sheet (76 pictures per typeface) was compared pixel for pixel: the only differences were the
+  widget pages' battery rings and one 4 x 7 px spot on the dark Editorial lists page, and a second
+  run of the unchanged build differs from the first in exactly those places, so no glyph moved.
 - **CBDT does not paint, and must not be made to.** glifo decodes CBDT's PNG strikes only with
   its `png` feature, which nothing in our tree enables (vello_cpu's default does, but
   anyrender_vello_cpu turns defaults off). Turning it on fixes vello_cpu and crashes the window
