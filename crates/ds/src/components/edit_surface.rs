@@ -10,7 +10,11 @@ use crate::components::edit_surface_focus::{
     blur_surface, focus_surface, focused_in, focused_out, listen_soon,
 };
 use crate::components::edit_surface_keys::key_down;
-use crate::components::edit_surface_pointer::{captured, moved, press, released};
+use crate::components::edit_surface_pointer::{captured, moved, point_of_mouse, press, released};
+use crate::components::edit_surface_spell::{SpellCtx, respell, touch};
+use crate::components::edit_surface_spell_menu::{
+    Asked, Opened, SpellLayer, SpellLink, at_caret, at_pointer,
+};
 use crate::components::edit_surface_state::{SurfaceState, write_soon};
 use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::edit::composition::on_ime;
@@ -18,7 +22,10 @@ use crate::edit::handle::{EditHandle, SurfaceHooks};
 use crate::edit::host::{HostEdit, ImeEvent};
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{CapturedPointer, EditFocus, EditPointer};
+use crate::edit::position::TextPosition;
 use crate::geometry::Rect;
+use crate::spell::lang::Spell;
+use crate::spell::marks::SpellReplace;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -34,6 +41,11 @@ use std::rc::Rc;
 ///   the surface has the keyboard, and again each time it takes it.
 /// - `extra_class`, `data`: the app's own class and `data-*` on the surface's element, so the
 ///   surface can be the app's styled body itself (`ExtraClass` and `DataAttr` refuse `ds-`).
+/// - `spell`: [`Spell::On`] checks the spelling through the host's `HostSpell` and marks each
+///   misspelt word with a dotted underline; `Off` (the default) changes nothing. `caret` is the
+///   app's caret, so the word being typed stays unmarked until the caret leaves it and the
+///   context-menu key knows which word it is on; `on_replace` hears a suggestion picked from the
+///   spelling menu, to apply as one undoable edit (design/04-COMPONENTS.md section 50).
 #[component]
 pub fn EditSurface(
     on_input: EventHandler<EditInput>,
@@ -45,10 +57,22 @@ pub fn EditSurface(
     #[props(into, default)] id: Option<String>,
     #[props(default)] extra_class: Option<ExtraClass>,
     #[props(default)] data: Vec<DataAttr>,
+    #[props(default)] spell: Spell,
+    #[props(default)] caret: Option<TextPosition>,
+    #[props(default)] on_replace: Option<EventHandler<SpellReplace>>,
     children: Element,
 ) -> Element {
     let host = use_hook(try_consume_context::<HostEdit>);
     let state = use_hook(|| Rc::new(SurfaceState::default()));
+    let checker = SpellCtx::use_new(host);
+    let menu = use_signal(|| None::<Opened>);
+    let on_input = {
+        let checker = checker.clone();
+        use_callback(move |input: EditInput| {
+            on_input.call(input);
+            touch(&checker);
+        })
+    };
     let ctx = SurfaceCtx {
         state: Rc::clone(&state),
         host,
@@ -93,6 +117,17 @@ pub fn EditSurface(
         }));
     }
     {
+        let checker = checker.clone();
+        use_effect(use_reactive!(|spell| respell(&checker, spell)));
+    }
+    {
+        let checker = checker.clone();
+        use_effect(use_reactive!(|caret| {
+            checker.state.caret.replace(caret);
+            touch(&checker);
+        }));
+    }
+    {
         let state = Rc::clone(&state);
         use_drop(move || {
             if let (Some(host), Some(listener)) = (host, state.listener.take()) {
@@ -103,9 +138,12 @@ pub fn EditSurface(
 
     let mounted = {
         let ctx = ctx.clone();
+        let checker = checker.clone();
         move |event: MountedEvent| {
             let element = event.data();
             ctx.state.element.replace(Some(Rc::clone(&element)));
+            checker.state.surface.replace(Some(Rc::clone(&element)));
+            touch(&checker);
             if let Some(handle) = handle {
                 handle.set(Rc::clone(&element), hooks);
             }
@@ -114,6 +152,12 @@ pub fn EditSurface(
     };
     let (keys, pressing, moving, releasing, blurred) =
         (ctx.clone(), ctx.clone(), ctx.clone(), ctx.clone(), ctx);
+    let (pointed, keyed) = (checker.clone(), checker.clone());
+    let layer = (spell != Spell::Off).then(|| SpellLink {
+        ctx: checker,
+        on_replace,
+        refocus: hooks.focus,
+    });
     let class = class_list("ds-edit", extra_class.as_ref());
     let data = attributes(&data);
     rsx! {
@@ -125,7 +169,19 @@ pub fn EditSurface(
             "aria-label": label,
             tabindex: "0",
             onmounted: mounted,
-            onkeydown: move |event: KeyboardEvent| key_down(&keys, &event),
+            onkeydown: move |event: KeyboardEvent| {
+                if menu_key(&event) && at_caret(&keyed, menu) == Asked::Opened {
+                    event.prevent_default();
+                    return;
+                }
+                key_down(&keys, &event)
+            },
+            oncontextmenu: move |event: MouseEvent| {
+                if at_pointer(&pointed, menu, point_of_mouse(&event)) == Asked::Opened {
+                    event.prevent_default();
+                    event.stop_propagation();
+                }
+            },
             onpointerdown: move |event: PointerEvent| press(&pressing, &event, capture_sink, told),
             onpointermove: move |event: PointerEvent| moved(&moving, &event),
             onpointerup: move |event: PointerEvent| released(&releasing, &event),
@@ -135,6 +191,18 @@ pub fn EditSurface(
             // The app's own `data-*`, last: a spread follows the named attributes.
             ..data,
             {children}
+            if let Some(link) = layer {
+                SpellLayer { boxes: link.ctx.boxes, menu, link }
+            }
         }
+    }
+}
+
+/// The context-menu key, or Shift+F10, its stand-in on keyboards without one.
+fn menu_key(event: &KeyboardEvent) -> bool {
+    match event.key() {
+        Key::ContextMenu => true,
+        Key::F10 => event.modifiers() == Modifiers::SHIFT,
+        _ => false,
     }
 }

@@ -1255,6 +1255,28 @@ input; the app keeps its document model and draws its own caret and selection. F
 | Stacking a selection layer | the layer before the surface, the surface `position: relative`, neither with a `z-index` | Blitz follows CSS 2.1 Appendix E here: a positioned box with `z-index: auto` paints in tree order, so the later positioned surface's text is over the layer; a static surface is under every positioned box, the layer included. FINDINGS "Edit surface 2". |
 | Driving it in a test | `Harness::click_with(at, Modifiers::SHIFT)`, `pointer_move_with`, `button_down_with`, `button_up_with`, `drag(from, to, steps)`, `held_buttons() -> HeldButtons`, `Key::{Home, End, Delete, PageUp, PageDown, Insert}` | A move between a press and its release carries the held buttons, so it is a drag. |
 
+#### Spelling (2026-09-27)
+
+A misspelt word in an `EditSurface` gets the reference's red dotted underline, drawn over the
+text (the app's markup is untouched), and a right-click on it offers suggestions. Off by default.
+design/04-COMPONENTS.md section 50 has the behaviour; FINDINGS.md "Spelling" the reasons and
+limits.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Check a surface's spelling | `EditSurface { spell: Spell::On { lang: None }, caret: Some(caret), on_replace }` | `Spell::Off` is the default. `lang: Some(Lang::parse("de_DE")?)` checks this surface in its own language; `None` in the host's (the locale's: `LC_ALL`, else `LANG`). `caret` is your caret: the word being typed stays unmarked until it leaves, and the context-menu key opens the menu on the word under it. |
+| Apply a suggestion | `on_replace: EventHandler<SpellReplace>` | `SpellReplace { range: TextRange, text }`: replace `range` with `text` as **one undoable edit**. Without `on_replace` the menu offers Ignore and Learn only. |
+| The checker | `ds-native` feature `spellcheck` | `ds_native::launch` provides it; another root calls `ds_native::spell::provide()`. System Hunspell dictionaries (`/usr/share/hunspell`, nothing bundled) checked by `spellbook` (MPL-2.0, unmodified) on a worker thread; "Learn Spelling" writes `$XDG_DATA_HOME/quire/spelling/<lang>.dic`. No checker: nothing is marked. |
+| In a test | `ds_native::spell::provide_with(SpellConfig { dictionaries, user }, langs)` in the test app's root | A tiny `.aff`/`.dic` in a temporary directory, never the system's (`crates/ds-native/tests/spell_edit.rs`). The harness does not provide a checker of its own. |
+| What is never marked | nothing to do | URLs, email addresses, paths, text between backticks or in `code`/`pre`/`kbd`/`samp`/`tt`/`var`, all-capital words, words with a digit, and CJK text (by Unicode block). |
+| Marks over your own text | `ds::SpellMarks { boxes }` | The layer `EditSurface` draws, for a surface that checks spelling itself. `--spell-mark` is the colour token. |
+| The seam | `ds::HostSpell(Rc<dyn SpellService>)` | `languages`, `paragraphs`, `check`, `suggest`, `ignore`, `learn`; `ds_native::spell::NativeSpell` implements it. |
+
+**For mailo.** Enable `spellcheck`, pass `spell`, `caret` and `on_replace` on the composer's
+surface, and turn `SpellReplace` into an `insertReplacementText` input event with the range
+converted to graphemes (the core already takes that type as one step);
+`docs/mailo-migration.md` §6.8 has the details. Nothing else in the adapter changes.
+
 ### Native focus (2026-09-25): a field by handle, any element by selector, and keep-focus
 
 Three gaps mailo's window hit on `ds_native::launch`. FINDINGS.md "Native focus" has the

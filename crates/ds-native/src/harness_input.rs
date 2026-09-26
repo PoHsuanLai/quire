@@ -99,6 +99,7 @@ pub(crate) fn keyboard(key: Key) -> (DomKey, Code) {
         Key::PageUp => (DomKey::PageUp, Code::PageUp),
         Key::PageDown => (DomKey::PageDown, Code::PageDown),
         Key::Insert => (DomKey::Insert, Code::Insert),
+        Key::ContextMenu => (DomKey::ContextMenu, Code::ContextMenu),
     }
 }
 

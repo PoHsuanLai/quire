@@ -116,11 +116,15 @@ pub enum ColourToken {
     /// `--lock-veil`: the dimming the lock screen lays over its wallpaper so white type reads on
     /// a pale picture (black at .12 in light, .28 in dark).
     LockVeil,
+    /// `--spell-mark`: the dotted underline under a misspelt word in an `EditSurface`
+    /// (design/04-COMPONENTS.md section 50; proposed): the danger hue at full strength, since
+    /// a dot a few pixels across needs all of its chroma to read as red.
+    SpellMark,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 35] = [
+    pub const ALL: [ColourToken; 36] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -156,6 +160,7 @@ impl ColourToken {
         ColourToken::LockGlass,
         ColourToken::LockGlassStrong,
         ColourToken::LockVeil,
+        ColourToken::SpellMark,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -196,6 +201,7 @@ impl ColourToken {
             ColourToken::LockGlass => "--lock-glass",
             ColourToken::LockGlassStrong => "--lock-glass-strong",
             ColourToken::LockVeil => "--lock-veil",
+            ColourToken::SpellMark => "--spell-mark",
         })
     }
 
@@ -234,6 +240,8 @@ impl ColourToken {
             ColourToken::Ok => (solid(0x2C7A57), solid(0x5EB489)),
             ColourToken::Warn => (solid(0xA5761A), solid(0xD2A249)),
             ColourToken::Danger => (solid(0xB03A2A), solid(0xE0705A)),
+            // The danger hue, as `--danger` (proposed, design/04-COMPONENTS.md section 50).
+            ColourToken::SpellMark => (solid(0xB03A2A), solid(0xE0705A)),
             // Not redefined in dark (section 3).
             ColourToken::Scrim => (alpha(0x000000, 220), alpha(0x000000, 220)),
             // The sender's page stays white in a dark window (section 12, mailo's `--frame`).
