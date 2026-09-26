@@ -1275,7 +1275,7 @@ limits.
 **For mailo.** Enable `spellcheck`, pass `spell`, `caret` and `on_replace` on the composer's
 surface, and turn `SpellReplace` into an `insertReplacementText` input event with the range
 converted to graphemes (the core already takes that type as one step);
-`docs/mailo-migration.md` §6.8 has the details. Nothing else in the adapter changes.
+`docs/mailo-migration.md` §6.9 has the details. Nothing else in the adapter changes.
 
 ### Native focus (2026-09-25): a field by handle, any element by selector, and keep-focus
 
