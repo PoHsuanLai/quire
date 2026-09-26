@@ -1,5 +1,5 @@
 //! How dense a `MonthGrid` is drawn (design/04-COMPONENTS.md section 39; sill Q190). A small
-//! desktop widget is one 164 px cell padded 16, so 132 px of content, and the regular grid
+//! desktop widget is one 164 px cell padded 12, so 140 px of content, and the regular grid
 //! (seven 32 px columns, 224 wide) does not fit it; the compact density does. A caller cannot
 //! restyle the grid (its classes are quire's), so the density is a prop, and by default it
 //! follows the `WidgetFrame` the grid sits in.
@@ -15,7 +15,7 @@ pub enum MonthDensity {
     Auto,
     /// Seven 32 px columns, whatever encloses it.
     Regular,
-    /// Seven 18 px columns in 132 x 132, whatever encloses it; never week numbers.
+    /// Seven 20 px columns in 140 x 140, whatever encloses it; never week numbers.
     Compact,
 }
 

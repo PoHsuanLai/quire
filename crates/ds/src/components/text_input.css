@@ -11,7 +11,11 @@
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
-.ds-input-wrap{ position:relative; display:flex; min-width:0; }
+/* A field reads from its leading edge wherever it sits (Q360): a centred container (the polkit
+   card's `text-align:center`) would centre the mask and the placeholder, which span the field,
+   while Blitz lays the input's own text and caret out from the start whatever `text-align` says,
+   so the dots drew mid-field with the caret before them. */
+.ds-input-wrap{ position:relative; display:flex; min-width:0; text-align:start; }
 .ds-input-wrap[*|data-variant=inline]{ flex:1; min-width:120px; }
 
 .ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }

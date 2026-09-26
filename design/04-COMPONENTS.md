@@ -3237,7 +3237,7 @@ without `onstep`; the days are `button`s only with `onpick`, which hears the day
 | Rows | no gap; the grid is `7 x 32` (224) wide, `24 + 224` with week numbers | proposed |
 
 **Density (sill Q190, 2026-09-26).** A small desktop widget (`WidgetFrame { size: Small }`) is
-one 164 cell padded 16, a 132 x 132 content box; the regular grid (224 wide, 254 tall for six
+one 164 cell padded 12, a 140 x 140 content box; the regular grid (224 wide, 254 tall for six
 weeks) overflows it, and a shell cannot restyle `.ds-month-*`, so the grid has a compact density
 of its own, as a small calendar widget has in the reference desktop (design/20 section 1.14).
 `MonthDensity::{Auto, Regular, Compact}`, written as `data-density=regular|compact`. **The auto
@@ -3247,13 +3247,13 @@ content: `Small` draws compact; `Medium`, `Large` or no frame draws regular. `Re
 
 | Part (compact) | Value | Basis |
 | --- | --- | --- |
-| Day cell | 18 wide, 18 high; the number `--fs-caption` 10 on a 16 round | fits 7 x 18 = 126 in 132 |
-| Event dot | 3 round, tucked 1 into the disc's foot (the row stays 18) | brief (Q190) |
+| Day cell | 20 wide, 19 high; the number `--fs-caption` 10 on a round twice its size (20), overhanging the row by 1 into the next row's clear top | fits 7 x 20 = 140 in 140; the 16 round of Q190 left two 700 tabular digits (about 12) touching its rim, so the disc takes the regular grid's proportion (24 round 11.5) (Q361) |
+| Event dot | 3 round, inside the disc's foot (tucked 4, the row stays 19); `--accent-ink` on today's disc | brief (Q190), Q361 |
 | Heads | `--fs-nano` 9, same face, tracking and ink, 10 high | brief |
 | Title | `--fs-micro` 9.5, same face, weight, tracking and `--accent` | brief |
 | Header | 14 high, no gap under it; the step buttons are plain 14 px `button.ds-month-step` round an 11 px glyph (`--ink-faint`, `--surface-2` under the pointer, squish pressed), since the Tool button's 28 x 26 would take a fifth of the height | brief |
 | Week numbers | never drawn, whatever `weeks` says (`data-weeks=hide`): a column would not fit | brief |
-| Whole grid | 126 x 132 for a six-week month (14 + 10 + 6 x 18), measured on Blitz inside the small frame's 132 x 132 (`ds-native/tests/month_grid_density.rs`) | measured |
+| Whole grid | 140 x 138 for a six-week month (14 + 10 + 6 x 19; 139 with the last disc's overhang), measured on Blitz inside the small frame's 140 x 140 (`ds-native/tests/month_grid_density.rs`) | measured |
 
 **States.**
 

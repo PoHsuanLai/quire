@@ -8,13 +8,17 @@
    (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer and squishes
    pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
 
-   Compact (`data-density=compact`, sill Q190): a small desktop widget's content box is 132 x
-   132, which the regular grid (224 wide, 254 tall for six weeks) overflows. Seven 18 px columns
-   (126) of 18 px rows; a 14 px header (the title at `--fs-micro`, same tracking, and the plain
-   14 px `ds-month-step` glyph buttons, as a Tool button's 28 x 26 would cost a fifth of the
-   height); 10 px heads at `--fs-nano`; the number at `--fs-caption` on a 16 px disc; a 3 px dot
-   tucked 1 px into the disc's foot so a row stays 18. Six weeks: 14 + 10 + 6 x 18 = 132. The
-   compact grid never draws week numbers, so no `data-weeks=show` rule applies to it. */
+   Compact (`data-density=compact`, sill Q190, Q361): a small desktop widget's content box is
+   140 x 140, which the regular grid (224 wide, 254 tall for six weeks) overflows. Seven 20 px
+   columns (140) of 19 px rows; a 14 px header (the title at `--fs-micro`, same tracking, and the
+   plain 14 px `ds-month-step` glyph buttons, as a Tool button's 28 x 26 would cost a fifth of
+   the height); 10 px heads at `--fs-nano`; the number at `--fs-caption` on a disc of twice its
+   size (20), so two tabular digits (about 12 px at 700) keep 4 px a side, as the regular grid's
+   24 px disc round 11.5 px digits does (Q361: the 16 px disc left two digits touching its rim).
+   The disc overhangs its 19 px row by 1 px into the next row's clear top; a 3 px dot sits inside
+   the disc's foot (tucked 4), `--accent-ink` on today's disc. Six weeks: 14 + 10 + 6 x 19 = 138,
+   139 with the last disc's overhang. The compact grid never draws week numbers, so no
+   `data-weeks=show` rule applies to it. */
 
 .ds-month{ display:flex; flex-direction:column; align-items:flex-start; color:var(--ink); user-select:none; }
 
@@ -68,8 +72,11 @@
 
 .ds-month[*|data-density=compact] .ds-month-header{ height:14px; min-height:0; gap:var(--s-1); margin-bottom:0; }
 .ds-month[*|data-density=compact] .ds-month-title{ font-size:var(--fs-micro); line-height:1; padding-left:var(--s-3); }
-.ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,18px); }
+.ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,20px); }
 .ds-month[*|data-density=compact] .ds-month-head{ height:10px; font-size:var(--fs-nano); line-height:1; }
-.ds-month[*|data-density=compact] .ds-month-day{ height:18px; gap:0; }
-.ds-month[*|data-density=compact] .ds-month-num{ width:16px; height:16px; font-size:var(--fs-caption); line-height:1; }
-.ds-month[*|data-density=compact] .ds-month-dot{ width:3px; height:3px; margin-top:calc(-1 * var(--s-1)); }
+.ds-month[*|data-density=compact] .ds-month-day{ height:19px; gap:0; }
+.ds-month[*|data-density=compact] .ds-month-num{
+  flex:none; width:calc(2 * var(--fs-caption)); height:calc(2 * var(--fs-caption)); font-size:var(--fs-caption); line-height:1;
+}
+.ds-month[*|data-density=compact] .ds-month-dot{ width:3px; height:3px; margin-top:calc(-1 * var(--s-4)); }
+.ds-month[*|data-density=compact] .ds-month-day[*|aria-current=date] .ds-month-dot{ background:var(--accent-ink); }
