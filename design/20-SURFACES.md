@@ -361,6 +361,23 @@ widget and popup read from it once it exists and stay local-only until then.
 | Components | `MonthGrid` (04 §39), week/day views (new, quire first), `ListRow` events, `Sheet` editor | P |
 | Milestone | after M12's first apps; scoped on its own (research pass on calendar UIs first) | P |
 
+### 2.11 Capture
+
+Its own app and its own repo (user, 2026-09-26), deferred to the app pass (M12). One app for
+stills and video, aimed at the best tools (Screen Studio, OBS), not the reference platform's
+recorder. The M10 screenshot thumbnail (1.13) becomes the shared after-capture surface for both.
+
+| Field | Value | St |
+| --- | --- | --- |
+| Repo | new (name open); MIT OR Apache-2.0, no GPL/AGPL code (libobs, Cap, gpu-screen-recorder are read for ideas only), no FFmpeg | S |
+| Capture | stills and windows through sill's privileged compositor capture (no prompt); portal + PipeWire (`ashpd`, `pipewire`) for other sessions | P |
+| Compose | scenes, webcam, overlays, cursor smoothing, click-following zoom, window backgrounds on our own wgpu/vello stack | P |
+| Encode | a **vendor-neutral encoder trait** (user: "not nvidia specific"). Primary backend `gpu-video` (MIT, Software Mansion; Vulkan Video, `wgpu::Texture` in, H.264 + HEVC encode, AV1 in progress; needs wgpu 30, ours is 29: take it at a toolchain bump; NOT the rest of smelter, whose real-time licence is restrictive). Fallbacks: VA-API (`cros-codecs`) where a driver has no Vulkan Video encode (this machine's RADV iGPU exposes the encode queue but no codec extension, 2026-09-26), `rav1e` software. The app never names a vendor; backend chosen by probing, overridable | P |
+| Frames | zero-copy: DMA-BUF in, GPU compose, GPU encode; no CPU copy on any backend | P |
+| Audio | per-source PipeWire capture, `nnnoiseless`, mixer, multi-track | P |
+| Output | `muxide` MP4; replay buffer; streaming (`webrtc` WHIP, `srt-tokio`, `rml_rtmp`) | P |
+| Milestone | app pass (M12). First step: a proof that DMA-BUF frames reach a hardware encoder with no CPU copy through the trait, on NVIDIA AND on the AMD iGPU of this machine, before any UI | P |
+
 ## 3. Open decisions
 
 1. Launcher panel Material: `Popover` (proposed) or a dedicated `Palette` variant.

@@ -237,6 +237,15 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `launcher.field_glyph_px` | `Px` | `20` | `12..=40` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.row_title_px` | `Px` | `14` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.row_detail_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `launcher.files_backend` | `FilesBackend::{Auto,Tracker,Baloo,Fd,Off}` | `Auto` | Auto asks Tracker 3, else Baloo, else fd/plocate under the home folder; a named backend that is missing searches nothing | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.files_budget_ms` | `Ms` | `150` | `20..=2000`; after it, what was found shows | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.clipboard_history` | `ClipboardHistory::{Memory,Off}` | `Memory` | memory only, forgotten when sill stops; password-manager copies never kept; Off watches nothing | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.clipboard_cap` | `Count` | `50` | `1..=500`; the oldest goes first | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.clipboard_image_max_mb` | `Count` | `8` | `0..=64`; larger images are not kept, 0 keeps none | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.emoji_skin_tone` | `EmojiSkinTone::{Default,Light,MediumLight,Medium,MediumDark,Dark}` | `Default` | Unicode's five modifiers or the yellow default | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.web_search` | `WebSearch::{On,Off}` | `On` | "Search the web for …" as the last result | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.web_engine_url` | `String` | `https://duckduckgo.com/?q={query}` | an http(s) address with `{query}`; anything else offers nothing | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.currency` | `CurrencyRates::{Off,Ecb}` | `Off` | Ecb fetches the ECB daily reference rates at most once a day | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
 
 ### 3.7 `scroll` (sill/settings.toml)
 
@@ -893,6 +902,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | none of this doc's keys are keyboard shortcuts (those are COSMIC `system_actions`/`custom` shortcut files, PLAN "Design: `<shell>`"); this page is out of `22-SETTINGS`'s scope |
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app), `sound.ui_sounds`, `sound.volume_feedback` |
+| **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
 | **Spaces** | `spaces.mail_frame_policy`, `spaces.wallpaper_follows_space`; the per-workspace dots/grain/theme/accent editor writes `spaces.json` (state), not these defaults |
 | **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source` |
 
