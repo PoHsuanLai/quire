@@ -33,6 +33,8 @@ peniko = { workspace = true }
 anyrender_pdfrum = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+# PDF thumbnails (the `pdf-thumb` feature): pdfrum's reader and CPU rasteriser.
+pdfrum = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # The print portal (the `print` feature): zbus with quire's async-io default (no executor is
@@ -44,6 +46,9 @@ memfd = { workspace = true, optional = true }
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
 # Off by default, so an app that never prints builds no D-Bus client for it.
 print = ["dep:zbus", "dep:memfd"]
+# `PdfFileThumb`: a PDF's first page rasterised off the UI thread and cached, drawn by
+# `ds::PdfThumb`. Off by default, so an app that shows no PDF builds no PDF reader.
+pdf-thumb = ["dep:pdfrum"]
 
 [lints]
 workspace = true
@@ -51,6 +56,9 @@ workspace = true
 [dev-dependencies]
 # Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
 pdfrum = { workspace = true }
+# Writing PDFs for the thumbnail tests (a filled page, an encrypted one).
+pdfrum-edit = { workspace = true }
+pdfrum-common = { workspace = true }
 # The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
 ds-settings = { workspace = true }
 
@@ -66,3 +74,7 @@ name = "pdf"
 [[example]]
 name = "print"
 required-features = ["print"]
+
+[[test]]
+name = "pdf_thumb"
+required-features = ["pdf-thumb"]

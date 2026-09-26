@@ -11,7 +11,8 @@ publish.workspace = true
 [dependencies]
 ds = { workspace = true, features = ["lint"] }
 ds-settings = { workspace = true }
-ds-native = { workspace = true }
+# `pdf-thumb`: so a workspace build compiles and tests `PdfFileThumb` (its tests need it).
+ds-native = { workspace = true, features = ["pdf-thumb"] }
 dioxus = { workspace = true }
 image = { workspace = true }
 thiserror = { workspace = true }

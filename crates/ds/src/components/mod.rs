@@ -91,6 +91,8 @@ pub(crate) mod palette_shown;
 pub mod pane_switcher;
 pub mod panel;
 pub mod pass_through;
+pub mod pdf_thumb;
+mod pdf_thumb_grace;
 pub mod peek;
 pub mod persona;
 pub mod polkit_prompt;
@@ -219,6 +221,9 @@ pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
 pub use panel::{Panel, PanelEdge, PanelScrim};
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
+pub use pdf_thumb::{
+    PDF_DEFAULT_SHEET, PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble, sheet_rect,
+};
 pub use peek::Peek;
 pub use persona::{
     Accessory, BLINK_MAX, BLINK_MIN, Backdrop, Brows, Cheeks, Creature, Eyes, HairTone, HeadShape,
@@ -316,6 +321,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("pane_switcher", include_str!("pane_switcher.css")),
     ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),
+    ("pdf_thumb", include_str!("pdf_thumb.css")),
     ("persona", include_str!("persona.css")),
     ("popover", include_str!("popover.css")),
     ("polkit_prompt", include_str!("polkit_prompt.css")),
