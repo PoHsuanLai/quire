@@ -17,6 +17,7 @@ against them.
 | `06-INTERACTIONS.md` | Every behaviour as a state machine: keys, hover intent, menus, drag, Escape. |
 | `07-LOOKS.md` | Post, Riso, Tide, Candy and warmth; which look Spaces is. |
 | `08-ICONS.md` | Lucide/Tabler glyphs; our app icon template and generation pipeline; third-party plates. |
+| `09-ARC-HEURISTICS.md` | The workflow brief extracted from Arc: seven heuristics (Spaces as workflows, the sidebar, split view, integrated capture, shortcuts over icons, everything a setting, onboarding), each with a check. |
 | `10-BEHAVIOUR-dock.md` | macOS dock behaviour with numbers, mapped to our dock, with acceptance tests. |
 | `11-BEHAVIOUR-scroll.md` | Momentum, rubber band, acceleration, scrollbars; host-side physics. |
 | `12-BEHAVIOUR-gestures.md` | Magic Mouse 2 gestures, thresholds, palm rejection, configurable mapping. |
@@ -32,7 +33,7 @@ against them.
 1. `00-PRINCIPLES.md` (why).
 2. `03-COLOR.md`, `02-TYPE.md`, `01-LAYOUT.md` (tokens).
 3. `04-COMPONENTS.md`, `05-MOTION.md`, `06-INTERACTIONS.md` (the building blocks).
-4. `07-LOOKS.md`, `08-ICONS.md`, `21-SPACES.md` (the look around them).
+4. `07-LOOKS.md`, `08-ICONS.md`, `09-ARC-HEURISTICS.md`, `21-SPACES.md` (the look and the workflow around them).
 5. The BEHAVIOUR doc for what you build (`10`-`13`).
 6. `20-SURFACES.md` for your surface's row.
 7. `CHECKLIST.md` before asking for review.

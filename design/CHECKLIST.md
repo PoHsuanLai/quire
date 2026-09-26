@@ -43,6 +43,16 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
       `04-COMPONENTS.md`.
 - [ ] The surface uses the components and Material listed for it. Cite `20-SURFACES.md`.
 
+## 4b. Workflow (09-ARC-HEURISTICS.md)
+
+- [ ] The brief names which of H1..H7 the work serves; a surface serving none is kept small and
+      conventional. Cite `09-ARC-HEURISTICS.md#2-the-seven-heuristics`.
+- [ ] Everything the surface shows belongs to a Space and follows a Space switch (H1).
+- [ ] Navigation is a vertical list on the sidebar, never a horizontal tab strip (H2).
+- [ ] Every action has a key and shows it; the command menu lists it (H5).
+- [ ] Every default the surface introduces is a key in 22 (H6).
+- [ ] Any convention break has one skippable onboarding moment (H7).
+
 ## 5. Motion
 
 - [ ] Durations and easings are tokens only (`lint` `RawDuration`, `RawEasing`). Cite
