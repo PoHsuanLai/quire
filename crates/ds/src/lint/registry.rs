@@ -20,6 +20,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
+use crate::tokens::type_voice::VoiceToken;
 use crate::tokens::widget_paint::WidgetPaint;
 use crate::tokens::widgets::WIDGET_TOKENS;
 use crate::tokens::{
@@ -54,6 +55,7 @@ fn collect() -> HashSet<String> {
         .chain(ZLayer::ALL.map(ZLayer::var))
         .chain(OpacityToken::ALL.map(OpacityToken::var))
         .chain(Family::ALL.map(Family::var))
+        .chain(VoiceToken::ALL.map(VoiceToken::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
         .chain([StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])

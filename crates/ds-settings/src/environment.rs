@@ -38,6 +38,7 @@ impl Environment {
     ///             appearance: now.settings.appearance.appearance(),
     ///             system: now.system,
     ///             tint_alpha: Some(now.tint_alpha()),
+    ///             typeface: Some(now.settings.appearance.typeface()),
     ///             material: Material::Window,
     ///             {children}
     ///         }

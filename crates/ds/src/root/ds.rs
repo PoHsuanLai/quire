@@ -1,5 +1,5 @@
-//! The root: `div.ds` carrying `data-theme`, `data-accent`, `data-motion`, `data-material`,
-//! `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
+//! The root: `div.ds` carrying `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
+//! `data-material`, `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
 //! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
 //! overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`, `LayerStack`
 //! and `Overlays` as context. Its click handler, the last to hear a click, hands a click that
@@ -30,6 +30,12 @@
 //! A client-decorated window passes `window: WindowFrame::Titlebar { .. }`: the root stamps
 //! `data-window-frame` and draws the titlebar, its children in `div.ds-window-body`, and the
 //! resize edges (`components/window_frame.rs`). The default draws nothing more.
+//! `typeface` picks the faces the family tokens name (design/02-TYPE.md section 2): System
+//! (Inter), or `Typeface::Editorial`, mail's Bricolage, Karla and Space Mono. `None` (the
+//! default) takes the enclosing root's, so a root nested in another speaks as it does, and a
+//! top-level root is System.
+//! The host reads it from `appearance.typeface` (`ds_settings::AppearanceSettings::typeface`), or
+//! an app that keeps its own voice passes Editorial outright.
 //! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
 //! positioned content (a centred sheet) is otherwise 0 px tall (sill FINDINGS Q94).
 
@@ -37,7 +43,8 @@ use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};
 use super::extent::RootExtent;
 use super::scale::use_root_scale;
-use crate::appearance::{Appearance, SystemPrefs, resolve};
+use super::typeface::{use_typeface, use_typeface_provider};
+use crate::appearance::{Appearance, SystemPrefs, Typeface, resolve};
 use crate::components::toast::ToastHost;
 use crate::components::window_frame::{WindowFrame, framed};
 use crate::focus::click::{HostClickFocus, after_click};
@@ -82,8 +89,11 @@ pub fn Ds(
     #[props(default)] scale: Option<Scale>,
     #[props(default)] window: WindowFrame,
     #[props(default)] extent: RootExtent,
+    #[props(default)] typeface: Option<Typeface>,
     children: Element,
 ) -> Element {
+    let typeface = typeface.unwrap_or(use_typeface());
+    use_typeface_provider(typeface);
     let scale = use_root_scale(scale);
     let chrome = chrome.unwrap_or(RootChrome::of(material));
     let frame_tint = frame.unwrap_or(FrameTint::of(material, chrome));
@@ -124,6 +134,7 @@ pub fn Ds(
         div {
             class: "ds",
             "data-theme": resolved.scheme.slug(),
+            "data-typeface": typeface.slug(),
             "data-accent": resolved.accent.slug(),
             "data-motion": resolved.motion.slug(),
             "data-material": material.slug(),

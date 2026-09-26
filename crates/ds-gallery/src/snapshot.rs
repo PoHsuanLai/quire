@@ -8,7 +8,7 @@ use crate::error::GalleryError;
 use crate::page::Page;
 use crate::registry;
 use crate::sheet;
-use ds::{Accent, Motion, Scheme, Theme};
+use ds::{Accent, Motion, Scheme, Theme, Typeface};
 use ds_native::{Viewport, snapshot_at};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -38,13 +38,20 @@ pub struct Shot {
     pub accent: Accent,
     /// The device scale in percent.
     pub scale: u16,
+    /// The typeface.
+    pub typeface: Typeface,
 }
 
 impl Shot {
-    /// Its file name: `tokens-light-postmark.png`.
+    /// Its file name: `tokens-light-postmark.png`, with `-editorial` before the extension under
+    /// the Editorial typeface.
     pub fn file(&self) -> String {
+        let typeface = match self.typeface {
+            Typeface::System => "",
+            Typeface::Editorial => "-editorial",
+        };
         format!(
-            "{}-{}-{}.png",
+            "{}-{}-{}{typeface}.png",
             self.page.slug(),
             self.scheme.slug(),
             self.accent.slug()
@@ -63,6 +70,7 @@ impl Shot {
             accent: self.accent,
             motion: Motion::Standard,
             showcase: Showcase::Posed,
+            typeface: self.typeface,
             ..Axes::default()
         }
     }
@@ -94,6 +102,7 @@ pub fn shots_of(pages: &[Page]) -> Vec<Shot> {
                     scheme,
                     accent,
                     scale: 100,
+                    typeface: Typeface::System,
                 })
             })
         })
@@ -119,9 +128,15 @@ pub fn progress_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tools/progress/shots/gallery")
 }
 
-/// Render every shot into `dir` (only `page`'s when one is named, at `scale` percent), write
+/// Render every shot into `dir` (only `page`'s when one is named, at `scale` percent, in
+/// `typeface`), write
 /// `dir/index.html`, and copy the pictures to [`progress_dir`]. Returns the pictures written.
-pub fn run(dir: &Path, page: Option<Page>, scale: u16) -> Result<Vec<Shot>, GalleryError> {
+pub fn run(
+    dir: &Path,
+    page: Option<Page>,
+    scale: u16,
+    typeface: Typeface,
+) -> Result<Vec<Shot>, GalleryError> {
     let made = |path: &Path| {
         let path = path.to_path_buf();
         move |source| GalleryError::Write { path, source }
@@ -134,7 +149,11 @@ pub fn run(dir: &Path, page: Option<Page>, scale: u16) -> Result<Vec<Shot>, Gall
         None => shots(),
     }
     .into_iter()
-    .map(|shot| Shot { scale, ..shot })
+    .map(|shot| Shot {
+        scale,
+        typeface,
+        ..shot
+    })
     .collect::<Vec<_>>();
     for (done, shot) in shots.iter().enumerate() {
         let picture = render(shot)?;

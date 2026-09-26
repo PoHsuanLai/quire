@@ -23,6 +23,7 @@ pub fn App() -> Element {
             material: now.material,
             blur: now.blur,
             tint_alpha: Some(tint()),
+            typeface: Some(now.typeface),
             // The page is the specimen sheet whatever material the toolbar picks: its root always
             // paints, and its components stay on paper.
             chrome: Some(RootChrome::Painted),

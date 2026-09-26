@@ -15,7 +15,7 @@
 .ds-menu-tile[*|data-tile=image] > .ds-ext-icon{ width:100%; height:100%; }
 .ds-menu-title{ display:block; font-size:var(--fs-control); font-weight:600; }
 .ds-menu-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-.ds-menu-trail{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); }
+.ds-menu-trail{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--ink-faint); }
 .ds-menu-trail .ds-ic{ color:var(--accent); }
 .ds-menu-item[*|aria-checked=true] .ds-menu-title{ color:var(--ink); }
 

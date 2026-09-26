@@ -6,7 +6,7 @@
 
 use crate::schema::Page;
 use crate::units::{Fraction, Percent};
-use ds::{Accent, Appearance, Look, Motion, Theme, Warmth};
+use ds::{Accent, Appearance, Look, Motion, Theme, Typeface, Warmth};
 use serde::{Deserialize, Serialize};
 
 /// `appearance.*`: what every surface resolves its look from.
@@ -50,6 +50,14 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub motion_level: Motion,
+    /// `appearance.typeface`: System (Inter) unless the person picks mail's editorial faces.
+    #[settings(
+        label = "Typeface",
+        help = "The desktop's face, Inter, or mail's editorial faces: Bricolage Grotesque, \
+                Karla and Space Mono.",
+        section = "Appearance"
+    )]
+    pub typeface: Typeface,
     /// `appearance.material_tint_alpha`: the tint's alpha over compositor blur (proposed 80).
     #[settings(
         label = "Material tint",
@@ -134,6 +142,7 @@ impl Default for AppearanceSettings {
             warmth: Warmth::Neutral,
             accent: Accent::Postmark,
             motion_level: Motion::System,
+            typeface: Typeface::System,
             material_tint_alpha: Percent(80),
             material_highlight_light: Percent(30),
             material_highlight_dark: Percent(12),
@@ -147,6 +156,11 @@ impl Default for AppearanceSettings {
 }
 
 impl AppearanceSettings {
+    /// `appearance.typeface`, as the root's `typeface` (`Ds { typeface }`).
+    pub fn typeface(&self) -> Typeface {
+        self.typeface
+    }
+
     /// The three choices a `ds::Ds` root resolves.
     pub fn appearance(&self) -> Appearance {
         Appearance {

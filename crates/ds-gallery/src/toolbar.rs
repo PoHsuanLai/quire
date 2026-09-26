@@ -1,5 +1,5 @@
 //! The toolbar: every axis the gallery sweeps, built from quire's own controls: segmented
-//! controls for theme, accent and motion level, menus for the material and the Space, a toggle
+//! controls for theme, typeface, accent and motion level, menus for the material and the Space, a toggle
 //! for blur, tabs for the page.
 
 use crate::axes::{Axes, PresetIndex, material_label, motion_of};
@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::{
     Accent, Anchor, Availability, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu,
     MenuEntry, MenuKind, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch, Tabs, Theme,
-    Toggle, Trail,
+    Toggle, Trail, Typeface,
 };
 
 /// The toolbar.
@@ -24,6 +24,10 @@ pub fn Toolbar() -> Element {
     let themes = Theme::ALL
         .into_iter()
         .map(|theme| (theme, theme.label().to_string()))
+        .collect::<Vec<_>>();
+    let typefaces = Typeface::ALL
+        .into_iter()
+        .map(|typeface| (typeface, typeface.label().to_string()))
         .collect::<Vec<_>>();
     let accents = Accent::ALL
         .into_iter()
@@ -49,6 +53,11 @@ pub fn Toolbar() -> Element {
             Tool { name: "Theme",
                 SegmentedControl::<Theme> { label: "Theme", options: themes, value: now.theme, size: SegSize::Small,
                     onchange: move |theme| axes.with_mut(|axes| axes.theme = theme),
+                }
+            }
+            Tool { name: "Type",
+                SegmentedControl::<Typeface> { label: "Typeface", options: typefaces, value: now.typeface, size: SegSize::Small,
+                    onchange: move |typeface| axes.with_mut(|axes| axes.typeface = typeface),
                 }
             }
             Tool { name: "Accent",

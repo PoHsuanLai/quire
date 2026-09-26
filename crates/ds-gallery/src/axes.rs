@@ -9,7 +9,7 @@ use crate::page::Page;
 use ds::tokens::Alpha;
 use ds::{
     Accent, Appearance, BlurState, CardAccent, Grain, Material, Motion, MotionLevel, SpaceLook,
-    Theme, default_look,
+    Theme, Typeface, default_look,
 };
 use ds_settings::AppearanceSettings;
 use std::cell::RefCell;
@@ -62,6 +62,8 @@ pub struct Axes {
     pub tint_alpha: Alpha,
     /// Whether overlays wait for a click or open posed, for a snapshot.
     pub showcase: Showcase,
+    /// The typeface the root speaks in.
+    pub typeface: Typeface,
 }
 
 /// How the pages that open things on demand start.
@@ -91,6 +93,7 @@ impl Default for Axes {
             look: PresetIndex::default().look(),
             tint_alpha: Alpha(u16::from(settings.material_tint_alpha.0) * 10),
             showcase: Showcase::Live,
+            typeface: settings.typeface,
         }
     }
 }

@@ -4029,3 +4029,34 @@ design/11-BEHAVIOUR-scroll.md section 11.7's row for quire: `scrollbar-width: no
   exists on `Slider` yet (the attribute is a marker for a host that is not built in this branch),
   and whether `data-overscroll`/`data-wheel` are read correctly is shell-host's test to write, not
   this one's.
+
+## Inter, the system typeface (2026-09-26)
+
+The user's decision: "make this desktop use mostly inter". `appearance.typeface`
+(`Typeface::{System, Editorial}`, default System) on `Ds` and in `AppearanceSettings`; design/02
+section 2.
+
+- **Faces.** Inter 4.1 from the official release (zip SHA-256
+  `9883fdd4a49d4fb66bd8177ba6625ef9a64aa45899767dde3d36aa425756b11e`, recorded in
+  `crates/ds/scripts/cut-inter.sh`), OFL 1.1 (`assets/fonts/OFL-inter.txt`). Blitz sets no
+  optical size from the font size (no `font-optical-sizing`; `font-variation-settings` would also
+  have reached Bricolage's own `opsz`), so the variable font's `opsz` is pinned into two families
+  by `fonttools varLib.instancer`: Inter (opsz 14, wght 400..700, italic 400 static) and Inter
+  Display (opsz 32, wght 500..800), then subset by the same ranges and `subset-fonts.sh` as the
+  others. parley applies `font-variant-numeric` (blitz `stylo_to_parley::font_variant_numeric`),
+  so `tnum` works: the layout features kept are `kern mark mkmk ccmp locl calt case tnum pnum
+  zero`; the `ss`/`cv` sets and fraction/super forms were 44% of each file and nothing asks for
+  them. Growth: +608,140 bytes of TTF in the binary (1,346,348 before), +243,040 bytes of WOFF2
+  and licence in the repository only (the `webview-fonts` path).
+- **Tabular Inter changes more than digits.** Inter's `tnum` also gives the hyphen and colon
+  tabular widths, so `2026-09-24` under `.ds-mono` reads a little open. Accepted: it keeps times
+  and dates aligned, which is the data face's job.
+- **Editorial is exact.** Rendered at 2x, the Controls, Lock and Widget reference pages under
+  Editorial are pixel-identical to master below the toolbar (the gallery gained a Type tool).
+  A nested `Ds` takes its enclosing root's typeface (`typeface: None`); the lock page's own roots
+  first rendered in Inter under Editorial until that was so.
+- **Layout.** No quire test pinning a pixel moved (month grid compact still 126 x 132 in its
+  140 x 140 box). Text widths: UI text +6 to +8% (Karla to Inter), data text -14 to -16% (Space
+  Mono to Inter tabular), the eyebrow -25% wide and -14% tall (11 px mono to 9.5 px caps), the
+  widget clock digits +11%. Line boxes do not move where a `line-height` is set (almost
+  everywhere); `.ds-mono` grows 18.1 to 20.0 px tall (.78em to .86em).

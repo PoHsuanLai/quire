@@ -190,6 +190,7 @@ fn the_root_stamps_exactly_its_attributes() {
         let mut want = expected(&[
             ("class", "ds".to_owned()),
             ("data-theme", case.theme.to_owned()),
+            ("data-typeface", "system".to_owned()),
             ("data-accent", case.accent.to_owned()),
             ("data-motion", case.motion.to_owned()),
             ("data-material", case.material.to_owned()),
@@ -206,8 +207,12 @@ fn the_root_stamps_exactly_its_attributes() {
                 .collect::<Vec<_>>(),
         ));
         assert_eq!(attributes_of(&markup, 0), want, "{}", case.name);
+        // The theme and motion always resolve; `system` is only ever the typeface's own word.
+        let unresolved = markup
+            .to_lowercase()
+            .replace("data-typeface=\"system\"", "");
         assert!(
-            !markup.to_lowercase().contains("system"),
+            !unresolved.contains("system"),
             "{}: \"system\" reached the markup: {markup}",
             case.name
         );
@@ -332,6 +337,7 @@ fn a_surface_nests_a_scope_without_a_stylesheet() {
     let want = expected(&[
         ("class", "ds".to_owned()),
         ("data-theme", "dark".to_owned()),
+        ("data-typeface", "system".to_owned()),
         ("data-accent", "postmark".to_owned()),
         ("data-motion", "standard".to_owned()),
         ("data-material", "popover".to_owned()),

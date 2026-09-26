@@ -23,7 +23,7 @@
 .g-grid8{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--s-8)}
 .g-note{font-size:var(--fs-small);color:var(--ink-soft);max-width:760px}
 .g-name{font-size:var(--fs-small);font-weight:600;color:var(--ink)}
-.g-code{font-family:var(--font-data);font-size:var(--fs-caption);color:var(--ink-faint);overflow-wrap:anywhere}
+.g-code{font-family:var(--font-code);font-size:var(--fs-caption);color:var(--ink-faint);overflow-wrap:anywhere}
 .g-pass{color:var(--ok)}
 .g-fail{color:var(--danger)}
 

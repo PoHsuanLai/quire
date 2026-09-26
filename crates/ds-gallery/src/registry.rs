@@ -32,8 +32,8 @@ pub const REGISTRY: [Entry; 19] = [
     Entry {
         page: Page::Type,
         title: "Type",
-        lede: "The four faces and the size ramp: every --fs step drawn at its size, with its role.",
-        height: 1500,
+        lede: "The five face jobs in the toolbar's typeface and the size ramp: every --fs step drawn at its size, with its role.",
+        height: 2500,
         body: pages::type_ramp::TypePage,
     },
     Entry {
