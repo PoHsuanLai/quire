@@ -188,6 +188,12 @@ Plus the 32 mailo glyphs (mod.rs:21-54), unchanged.
 
 ## 2. App icon template
 
+The plate language is the one the desktop widgets use too, named **Neumorphism & Soft UI**
+(user, 2026-09-26): shapes in the plate's own colour, softly extruded or inset by a pair of
+low-contrast shadows with the light up-left, rounded, matte, abstract, no gloss and no bezel.
+The definition and its shadow tokens live in `23-WIDGETS.md#2` and apply to any small object
+drawn on a plate: an icon's symbol, a widget's gauge, a control's well.
+
 The model draws only the object. The plate, gradient, highlight, mask and sizes are applied
 by code (settled, PLAN "Icons" item 1).
 
