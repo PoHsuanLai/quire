@@ -3895,6 +3895,103 @@ render; the callback asks at the moment with the caret in hand. It is a new prop
 `show-more-selected`), `ds-native/tests/launcher_v2.rs` (Show More reached and run by keyboard;
 Space taken only while browsing, Right only at the end).
 
+### 50. EditSurface spelling (mailo's composer, 2026-09-27; values proposed)
+
+**Purpose.** Spellchecking in an app's own editor on `EditSurface` (the surface itself is in
+FINDINGS.md "Edit surface" and CONSUMING.md "Edit surface"): a misspelt word gets the reference
+platform's red dotted underline, and a right-click on it offers replacements. Off by default,
+so a surface that says nothing draws exactly what it drew before.
+
+**Split.** `ds` holds the vocabulary and the pure rules: `Spell`, `Lang`, the tokeniser and its
+skip rules (`spell::words`), the CJK test (`spell::script`), how marks follow an edit and which
+word is being typed (`spell::marks`), and the seam `HostSpell(Rc<dyn SpellService>)`.
+`ds_native::spell` (cargo feature `spellcheck`) implements the seam: the system's Hunspell
+dictionaries, checked and suggested by `spellbook` (MPL-2.0, used unmodified) on one worker
+thread per configuration; nothing is bundled. `ds_native::launch` provides it under the
+feature; another root calls `ds_native::spell::provide()`.
+
+**Markup.** The marks never touch the app's document: a layer is the surface's last child,
+absolutely positioned (out of the flow, so an app rule such as `.c-body > *` cannot move the
+text), taking no pointer, with one box per line of each marked word placed from the layer's own
+measured corner.
+
+```html
+<div class="ds-edit" role="textbox" …>
+  <p data-edit-node="0">Teh cat sat</p>          <!-- the app's own -->
+  <div class="ds-spell-layer" aria-hidden="true">
+    <span class="ds-spell-mark" style="left:0px;top:-20px;width:27.5px;height:calc(10px + .62em)"></span>
+  </div>
+</div>
+```
+
+**Props.**
+
+```rust
+pub enum Spell { Off /* default */, On { lang: Option<Lang> } }
+pub struct Lang(String);                 // Lang::parse("en_US.UTF-8") -> en_US; C/POSIX refused
+pub struct SpellReplace { pub range: TextRange, pub text: String }
+#[component] pub fn EditSurface(/* as before */ spell: Spell, caret: Option<TextPosition>,
+    on_replace: Option<EventHandler<SpellReplace>>, ..) -> Element
+#[component] pub fn SpellMarks(boxes: Vec<Rect>, onmounted: Option<EventHandler<MountedEvent>>) -> Element
+pub trait SpellService { fn languages(&self) -> Vec<Lang>;
+    fn paragraphs(&self, &MountedData) -> Probe<Vec<Paragraph>>;
+    fn check(&self, Vec<Lang>, Vec<String>) -> SpellFuture<Vec<String>>;
+    fn suggest(&self, Vec<Lang>, String) -> SpellFuture<Vec<String>>;
+    fn ignore(&self, String); fn learn(&self, Lang, String) -> SpellFuture<Learned>; }
+pub struct HostSpell(pub Rc<dyn SpellService>);
+pub const SPELL_SUGGESTIONS: usize;      // 5
+// ds-native, feature `spellcheck`:
+pub fn provide() -> HostSpell;           // system dictionaries, the locale's language
+pub fn provide_with(SpellConfig, Vec<Lang>) -> HostSpell;
+pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
+```
+
+**Values.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Mark | a dotted bottom border, round dots `calc(var(--hair) * 2)` across (2 px at 1x, whole device pixels at any scale), in `--spell-mark` | the reference's red dotted underline; Blitz draws `dotted` as round dots |
+| `--spell-mark` | the danger hue at full strength: `#B03A2A` light, `#E0705A` dark | proposed: a dot a few pixels across needs all its chroma to read as red |
+| Mark height | half the line box plus .62 em, so the dots sit just under the descenders whatever the line height | proposed |
+| Debounce | `DelayToken::SpellDebounce`, 300 ms after the last input or caret move | proposed |
+| Menu | quire's context `Menu` at the pointer (or under the caret for the key): up to 5 suggestions (`No Guesses Found` when none), a rule, `Ignore Spelling`, `Learn Spelling` | the reference's spelling items |
+| Language | the surface's `lang`, else the host's: `LC_ALL`, else `LANG`; a region with no dictionary falls back (`en_NZ` → `en_US`, `de_CH` → `de_DE`) | proposed; the list setting is not in design/22 yet |
+| User dictionary | `$XDG_DATA_HOME/quire/spelling/<lang>.dic`, one word per line | proposed |
+
+**Behaviour.**
+
+- A frame after each input and each caret move the surface reads its paragraphs (every
+  `data-edit-node` text element's own text) and moves the marks with the edit: a mark whose word
+  is still whole where it was, or shifted by the paragraph's change in length, stays; any other
+  goes until the next check. After the debounce, only the paragraphs whose text changed since
+  their last check go to the worker; the answer replaces their marks.
+- The word being typed is not marked: when a paragraph changes, the word touching the caret is
+  held unmarked until the caret leaves it (a space, an arrow, a click elsewhere). Clicking into a
+  word already marked, without typing, keeps its mark.
+- Never checked: a chunk that is a URL (`scheme://`, `www.`, `mailto:`), an email address
+  (`local@domain.tld`) or a path (`/`, `~/`, `./`, `../`); text between paired backticks, or
+  inside `code`, `pre`, `kbd`, `samp`, `tt` or `var`; an all-capital word; a word with a digit.
+- CJK is never marked: a Han, kana, Hangul or Bopomofo character (Zhuyin's tone marks, CJK
+  punctuation and full-width forms included), found by Unicode block, is never part of a word.
+  A Latin word inside CJK text is still checked.
+- A right-click on a marked word, or the context-menu key (or Shift+F10) with the caret on one,
+  opens the menu; anywhere else the event goes on to the app. A suggestion reaches the app as
+  one `SpellReplace` (one undoable edit); Ignore accepts the word everywhere until the process
+  ends; Learn writes it to the user's dictionary and accepts it at once. The menu takes the
+  keyboard (`on_focus` hears `Out`) and the surface takes it back when it closes (`In`).
+- No `HostSpell`, no dictionary for the language, or `Spell::Off`: nothing is marked.
+
+**Motion.** None: a mark appears and goes with the check, as the reference's does.
+
+**Tests.** `ds/src/spell/words_tests.rs` (tokenisation, every skip rule, CJK), `script.rs` (the
+CJK blocks), `marks_tests.rs` (marks following an edit, the word being typed), `lang.rs`;
+`ds/tests/edit_surface_ssr.rs` (`spell-on.html`, `spell-marked.html`);
+`ds-native/src/spell/choose.rs` (dictionary fallback, the locale);
+`ds-native/tests/spell_worker.rs` (a temporary `.aff`/`.dic`: check, suggest, ignore, learn and
+read back, the system's en_US only where installed); `ds-native/tests/spell_edit.rs` (typed
+misspelling marked after the debounce, the typed word held, right-click and pick, undo restores
+it, Ignore, the context-menu key and Learn).
+
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 
 **Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
