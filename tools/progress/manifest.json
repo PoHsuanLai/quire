@@ -1,43 +1,35 @@
 {
- "updated": "2026-09-26: widget looks to pick (battery, clock, card finish), design/23 written",
+ "updated": "2026-09-26: widgets redrawn in Neumorphism & Soft UI; picks pending; M8 started",
  "archive_url": "https://claude.ai/artifact/GhMLUQjwi9FUxkJgoxrGUB",
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
   {
    "id": "widget-looks",
    "date": "2026-09-26 · decision",
-   "title": "Widget looks to pick: the flat battery ring, clock and card are replaced by depth candidates",
+   "title": "Widgets redrawn in Neumorphism & Soft UI: battery glyph with the number, soft-inset world clock",
    "status": "decision",
-   "lede": "The first widget parts were rejected as flat, so this is a design pass with references first (design/23-WIDGETS.md: the reference desktop's widget style, phone widget conventions, Windows 11 widgets, and Fantastical, Notion Calendar, Amie, Google Calendar and Vimcal for the calendar brief) and rendered candidates second, at 2x over a calm wallpaper. Every candidate keeps the same props, so the shell's wiring does not change; only the look does. The rule now recorded: nothing flat, every part carries a material cue (an inset well, a raised boss, a bezel, a gloss, the plate bevel the app icons use) and a type-hierarchy cue (the display face for the hero number, the data face for labels). The calendar widget is not restyled here: it is queued to the downstream widgets pass, alongside the plan for a calendar app that connects to cloud providers.",
+   "lede": "Third round. Round one (a thin stroked ring, a plain dial) was rejected as flat; round two (rings in wells, glossy cells, bezels, sky faces, lit cards) was rejected as skeuomorphic. The user named the target: modern abstract, and for the battery a battery icon with a number as on the reference desktop. The style is now named in the design docs as Neumorphism & Soft UI (design/23 §2, design/08 §2): shapes in the plate's own colour, softly extruded or inset by a pair of low-contrast shadows with the light up-left, rounded, matte, abstract glyphs, no gloss, no bezels, text on the ink tokens for contrast. The battery is a soft-extruded glyph with an inset channel filled to the level (ink by default, amber low, red critical, green with a bolt while charging) beside the percentage in the display face; the world clock is a dial inset into the plate, plate-coloured by day and near-black by night, thick rounded hands, four quarter marks, an accent second hand; the digital form sets the time at hero size with a sun or moon mark. Rendered at 2x over a calm wallpaper. The props stay, so the shell's wiring is unchanged; the calendar widget is untouched and queued.",
    "notes": [
-    "Picks needed (design/23 §6): battery gauge Well, Cell, or both (proposed: Cell for the Small widget, Well for the Medium's row of devices); clock dial Bezel or Sky (proposed: Sky for the Medium's four dials, Bezel for the Large); should the Lit card finish become the default for desktop widgets (proposed: yes); hero number 34 or 40 px; day/night by sunrise and sunset where the zone is known (proposed) or fixed 06:00–18:00; calendar month load as dots (proposed) or a heat tint; the Small calendar as a date face with the next event (proposed) or the compact month grid; numerals on the dial none (proposed) or 12/3/6/9; the Small clock's day/night cue as the 16 px sky disc or a 40 px dial in the corner.",
-    "What each candidate does: Well puts the ring in a groove pressed into the plate around a raised disc that holds the device glyph, the level as a glossy arc and the charging bolt as a lit disc; Cell is a recessed capsule bed holding a glossy liquid as wide as the level with a terminal cap, low and critical recolouring only the liquid; Bezel is a raised rim round a recessed sky face with a minute track, tapered hands over a shadow and an accent-ringed hub; Sky sinks the whole dial into the plate with the sky as its ground; Lit adds the icon plate's bevel, a sheen down the top and a shaded foot to the card. Day dials are always the pale pair and night dials the slate pair, whatever the desktop's scheme.",
-    "Known weak spot: in the light scheme the Lit finish reads through tonal falloff and the deeper drop rather than a visible top line, because the card is near white. Sheets are 2x only; fractional scales unchecked."
+    "Picks needed (design/23 §6): battery fill ink (proposed) or accent; second hand yes (proposed) or never; quarter marks four (proposed) or none; Small clock digital with sun/moon (proposed) or one large soft dial; night dial on a dark desktop near-black (proposed) or pale day dials on dark desktops too; hero size 44 (proposed) or 40; calendar (queued): load dots or heat tint, date face or month grid in the Small size.",
+    "Known limits: the lit side of a soft shadow barely shows on the near-white light plate, so depth is carried by the dark side there; Blitz draws no SVG blur, so the hands' shading is two offset copies; the amber sun mark can read like a status dot; reference proportions are from memory, not measured; not yet rendered inside the shell itself.",
+    "Removed with this round: the well, cell, bezel, sky and lit candidates and their sixteen paint tokens; added: the soft-shadow token pairs (extruded and inset), the night ground, and the hero size."
    ],
    "images": [
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-looks/battery-light.png",
-     "caption": "Battery, light: Ring (today) over Well over Cell, each in a Small and a Medium card on the Lit finish."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/battery-light.png",
+     "caption": "Battery, light: the Small card's hero percentage with the glyph, and the Medium card's device rows (8 % critical, 45 %, 100 %, 15 % charging)."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-looks/battery-dark.png",
-     "caption": "Battery, dark: the same three."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/battery-dark.png",
+     "caption": "Battery, dark."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-looks/clock-light.png",
-     "caption": "World clock, light: Paper (today) over Bezel over Sky; Taipei and Tokyo by day, London and New York by night."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/clock-light.png",
+     "caption": "World clock, light: the Small card's digital time with the sun mark; four dials, Taipei and Tokyo by day, London and New York by night."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-looks/clock-dark.png",
-     "caption": "World clock, dark: the same three."
-    },
-    {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-looks/finish-light.png",
-     "caption": "Card finish, light: Plain (today) beside Lit."
-    },
-    {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-looks/finish-dark.png",
-     "caption": "Card finish, dark: Plain beside Lit."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/clock-dark.png",
+     "caption": "World clock, dark."
     }
    ]
   },
