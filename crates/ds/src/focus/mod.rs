@@ -13,7 +13,7 @@ pub mod select;
 pub mod selector;
 pub(crate) mod targets;
 
-pub use click::{Fallback, HostClickFocus};
+pub use click::{Fallback, HostClickFocus, HostPressFocus};
 pub use field::{FieldHandle, use_field_handle};
 pub use hand_back::HostHandBack;
 pub use host::{Focused, HostBlur, HostFocus, focus_soon, focus_soon_selecting};

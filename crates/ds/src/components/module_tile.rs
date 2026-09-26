@@ -14,6 +14,7 @@ use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::spinner::{Spinner, SpinnerKind};
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Expanded};
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -110,7 +111,10 @@ fn chevron_button(
             onclick: move |event| match listen {
                 Some(listen) => listen.click(&event),
                 // An inert chevron still is not the tile: its press toggles nothing.
-                None => event.stop_propagation(),
+                None => {
+                    event.stop_propagation();
+                    kept_click(&event);
+                }
             },
             onkeydown: move |event| {
                 if opens(&event.key()) {

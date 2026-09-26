@@ -4,6 +4,7 @@
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::text_runs::{Text, text};
 use crate::components::tree_item::Disclosure;
+use crate::focus::click::kept_click;
 use dioxus::core::{Attribute, AttributeValue};
 use dioxus::prelude::*;
 
@@ -79,10 +80,12 @@ pub(crate) fn trailing_slot(element: Element) -> Element {
 
 /// The editing slot (mailo gaps 7): the caller's field (a Bare `TextInput` focused on mount,
 /// its text selected) drawn where the label is, taking the label's free space so nothing on the
-/// row moves. A press in it never reaches the summary, so it neither toggles nor selects the
+/// row moves. A click in it never reaches the summary, so it neither toggles nor selects the
 /// row; the press's own pointer-down still puts the caret in the field (Blitz focuses a text
-/// field on pointer-down, not in the click this fences). Keys are left alone: they start at the
-/// field, so its Enter and Escape handlers hear them first.
+/// field on pointer-down, not in the click this fences). Its pointer-up goes on, as any
+/// pointer-up does: the row's `onpointerup` and an app's (mailo's `.app`, which ends a drag
+/// there) hear a press that ends in the field. Keys are left alone: they start at the field, so
+/// its Enter and Escape handlers hear them first.
 fn editing_slot(field: Element) -> Element {
     rsx! {
         span {
@@ -90,16 +93,18 @@ fn editing_slot(field: Element) -> Element {
             "data-slot": "editing",
             onclick: fence,
             ondoubleclick: |event| event.stop_propagation(),
-            onpointerup: |event| event.stop_propagation(),
             {field}
         }
     }
 }
 
-/// End a click at its slot: no summary toggle (the default), no row handler (propagation).
+/// End a click at its slot: no summary toggle (the default), no row handler (propagation). The
+/// root never hears it, so the slot hands it to the host's click focus (`kept_click`): what was
+/// pressed in it has the keyboard, and a press in the editing slot's field leaves the field's.
 fn fence(event: MouseEvent) {
     event.stop_propagation();
     event.prevent_default();
+    kept_click(&event);
 }
 
 /// The `details`' `open`, in the null namespace, or no `open` at all.

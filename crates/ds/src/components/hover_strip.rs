@@ -3,6 +3,7 @@
 
 use crate::components::tooltip::Shown;
 use crate::components::vocab::{Expanded, Here, StaggerIndex};
+use crate::focus::click::kept_click;
 use crate::geometry::Rect;
 use crate::geometry::measure::client_rect;
 use crate::icon::Icon;
@@ -151,6 +152,8 @@ fn StripButton(
                         }
                     });
                 }
+                // The root never hears it: the button takes the keyboard as it would there.
+                kept_click(&event);
             },
             Glyph { icon, size: IconSize::Compact }
             span { class: "ds-fly", role: "tooltip", "{fly}" }

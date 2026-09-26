@@ -135,6 +135,7 @@ impl Headless {
         let keeper = match setup.focus_fallback {
             FocusFallback::Ancestor => {
                 vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);
+                vdom.provide_root_context(crate::click_focus::PRESS_FOCUS);
                 let keeper = Rc::new(RefCell::new(FocusKeeper::default()));
                 vdom.provide_root_context(hand_back_seam(Rc::clone(&keeper)));
                 Keeper::Ancestor(keeper)
