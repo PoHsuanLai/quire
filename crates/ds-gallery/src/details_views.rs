@@ -24,6 +24,16 @@ fn pulsed(class: &str, key: Option<(String, &'static str)>) -> (String, Option<&
     }
 }
 
+/// What a Wi-Fi state says in words, so no moment is carried by motion alone (R8).
+fn words(net: &Net) -> &'static str {
+    match net {
+        Net::Off => "Off",
+        Net::Joining => "Joining…",
+        Net::Joined => "Joined",
+        Net::Failed(_) => "Couldn't join",
+    }
+}
+
 /// A bar that sweeps to the charge and the percentage counting in step (Sweep + CountUp).
 #[component]
 pub fn SweepCountView(charge: Charge, first: FirstShow) -> Element {
@@ -33,7 +43,7 @@ pub fn SweepCountView(charge: Charge, first: FirstShow) -> Element {
     let count = use_count_up(i64::from(percent), detail.cue(), CountPace::InStep(sweep));
     let width = f32::from(sweep.share().0.min(1000)) / 10.0;
     rsx! {
-        div { class: "g-detail g-detail-sweep",
+        div { class: "g-detail",
             div { class: "g-bar", div { class: "g-bar-fill", style: "width:{width}%" } }
             span { class: "g-figure", "{count.shown()}%" }
         }
@@ -53,8 +63,9 @@ pub fn NetView(net: Net) -> Element {
         }
     };
     rsx! {
-        div { class: "g-detail g-detail-glyph",
+        div { class: "g-detail",
             LayerGlyph { icon: Icon::Wifi, size: IconSize::Bar, layering }
+            span { class: "g-detail-word", {words(detail.state())} }
         }
     }
 }
@@ -65,8 +76,9 @@ pub fn CheckView(net: Net) -> Element {
     let detail = use_detail(net, FirstShow::Still, Touch::Remote);
     let settling = use_settle(detail.cue(), SettleStyle::Check);
     rsx! {
-        div { class: "g-detail g-detail-glyph",
+        div { class: "g-detail",
             span { class: "g-check-well", CheckMark { settling, size: IconSize::Bar } }
+            span { class: "g-detail-word", {words(detail.state())} }
         }
     }
 }
@@ -115,7 +127,7 @@ pub fn SealView(seal: Seal, touch: Touch) -> Element {
 #[component]
 pub fn SlashView(slashed: Slashed) -> Element {
     rsx! {
-        div { class: "g-detail g-detail-glyph",
+        div { class: "g-detail",
             MorphGlyph { icon: Icon::Volume, size: IconSize::Bar, style: MorphStyle::Slash, slashed }
         }
     }
