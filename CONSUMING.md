@@ -1684,6 +1684,19 @@ Additive: one token, one utility class; the stylesheet's golden moved, no other 
 `.ds-emoji` is AnimatedEmoji's own root class; the text utility is `.ds-emoji-text`, not
 `.ds-emoji`.
 
+### Hybrid harness backend (2026-09-27): paint and time a test on vello_hybrid
+
+FINDINGS.md "Hybrid harness backend". Additive: every existing constructor still paints on
+vello_cpu.
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| A harness on the GPU renderer shell surfaces use | `Harness::try_with_config(app, HarnessConfig::new(viewport).with_backend(Backend::Hybrid))` | anyrender_vello_hybrid on an offscreen wgpu device opened once per harness. `Err(NativeError::Renderer(..))` where no adapter opens (CI): skip on it. `Harness::with_config` with `Backend::Hybrid` never panics either; its pictures return that error |
+| Which GPU | `.with_adapter(AdapterPref::{Auto, Discrete, Integrated, Named(..)})` | shell-host's order: a non-empty `WGPU_ADAPTER_NAME` (substring, any case) wins, then the kind, Vulkan before GL, software last. `Harness::adapter()` names the one in use (`None` on vello_cpu) |
+| Pixels | `render()`, `render_over(..)` | The same premultiplied RGBA on both backends (read back from the texture), so pixel assertions and PNG captures work unchanged |
+| Frame time | `Harness::paint_timed() -> Result<PaintTime, _>` | Paints over the scheme ground without reading back. `PaintTime { scene, total }`, `render()` = `total - scene`. vello_hybrid: submitted and the device polled until the GPU finishes, so `total` includes the GPU. Style and layout happen in the input call before (`wheel`, `click`): time that yourself |
+| The emoji-grid benchmark | `cargo test -p ds-native --release --test hybrid_backend -- --ignored --nocapture` | 300 `.ds-emoji-text` cells scrolled 180 frames on vello_cpu and each distinct GPU |
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive
