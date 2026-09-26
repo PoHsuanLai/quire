@@ -1618,7 +1618,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
 /* The field draws its caret among the dots in their ink (Q360b); the input's own stays hidden. */
 .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-.ds-lock-field .ds-input-caret::before{ background:var(--lock-ink); }
+/* Half the pill's .14em tracking back, so the caret stays centred in the gap (Q360b). */
+.ds-lock-field .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
 .ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
 .ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
 
@@ -2765,7 +2766,11 @@ html,body{margin:0;padding:0;background:transparent}
 /* The caret takes no room in the line: a point on the baseline, its bar hung from the line's top
    (Inter's ascent .969em plus the half-leading of a 1.55 line, (1.55 - 1.21) / 2 = .17em). */
 .ds-input-caret{ position:relative; display:inline-block; width:0; height:0; }
-.ds-input-caret::before{ content:""; position:absolute; left:0; top:-1.139em; width:1.5px; height:1.55em; background:var(--ink); }
+/* The caret stands in the middle of the gap between two dots, not against the next one: the
+   point Blitz's layout gives is after the previous dot's tracking, so the bar goes back half the
+   tracking (.1em) and half its own width. A bullet's side bearings are equal, so that is the
+   gap's centre; the caret after the last dot keeps the same place, half a gap after it. */
+.ds-input-caret::before{ content:""; position:absolute; left:calc(-.05em - .75px); top:-1.139em; width:1.5px; height:1.55em; background:var(--ink); }
 .ds-input-mask-selected{ background:var(--accent-soft); }
 .ds-input-mask{
   position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
@@ -2799,7 +2804,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-input[*|data-variant=bare][*|data-kind=secret]{ color:transparent; }
 .ds-input-wrap[*|data-variant=bare] .ds-input-mask{ color:inherit; }
 /* A bare field's line height is its parent's, so its caret spans the text's ascent and descent. */
-.ds-input-wrap[*|data-variant=bare] .ds-input-caret::before{ top:-.969em; height:1.21em; background:var(--accent); }
+/* A bare field's tracking is its parent's, usually none: the bar is centred on the point. */
+.ds-input-wrap[*|data-variant=bare] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent); }
 
 /* Multiline (mailo gaps 4): a `textarea`. Blitz gives it `rows` line heights of content (two when
    `rows` is absent) plus its padding, so the one-line height above is undone and the field's
