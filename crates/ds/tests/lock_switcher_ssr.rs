@@ -390,3 +390,32 @@ fn the_picture_is_the_kind_the_user_carries() {
     assert!(accepted.contains("data-mood=\"happy\""), "{accepted}");
     assert!(accepted.contains("data-state=\"accepted\""), "{accepted}");
 }
+
+fn polkit_named() -> Element {
+    root(
+        Material::Sheet,
+        rsx! {
+            PolkitPrompt {
+                action: "Authentication is required to change the system's time zone.",
+                user: user(),
+                oninput: |_| {},
+                onsubmit: |_| {},
+                oncancel: |_| {},
+                panel_id: Some("polkit-panel".to_owned()),
+            }
+        },
+    )
+}
+
+/// The shell resolves the polkit sheet's blur region by the panel's id (sill Q260).
+#[test]
+fn the_polkit_sheet_carries_the_panel_id() {
+    let html = render(polkit_named);
+    assert!(
+        html.contains(r#"class="ds-sheet" id="polkit-panel""#)
+            || html.contains(r#"id="polkit-panel""#) && html.contains("ds-sheet"),
+        "{html}"
+    );
+    let plain = render(|| polkit(PromptState::Idle, CapsLock::Off));
+    assert!(!plain.contains(r#"id=""#), "no empty id without a panel_id");
+}
