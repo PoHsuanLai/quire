@@ -3247,13 +3247,17 @@ content: `Small` draws compact; `Medium`, `Large` or no frame draws regular. `Re
 
 | Part (compact) | Value | Basis |
 | --- | --- | --- |
-| Day cell | 20 wide, 19 high; the number `--fs-caption` 10 on a round twice its size (20), overhanging the row by 1 into the next row's clear top | fits 7 x 20 = 140 in 140; the 16 round of Q190 left two 700 tabular digits (about 12) touching its rim, so the disc takes the regular grid's proportion (24 round 11.5) (Q361) |
-| Event dot | 3 round, inside the disc's foot (tucked 4, the row stays 19); `--accent-ink` on today's disc | brief (Q190), Q361 |
-| Heads | `--fs-nano` 9, same face, tracking and ink, 10 high | brief |
-| Title | `--fs-micro` 9.5, same face, weight, tracking and `--accent` | brief |
-| Header | 14 high, no gap under it; the step buttons are plain 14 px `button.ds-month-step` round an 11 px glyph (`--ink-faint`, `--surface-2` under the pointer, squish pressed), since the Tool button's 28 x 26 would take a fifth of the height | brief |
-| Week numbers | never drawn, whatever `weeks` says (`data-weeks=hide`): a column would not fit | brief |
-| Whole grid | 140 x 138 for a six-week month (14 + 10 + 6 x 19; 139 with the last disc's overhang), measured on Blitz inside the small frame's 140 x 140 (`ds-native/tests/month_grid_density.rs`) | measured |
+| Whole grid | **fills the box** (compact-spacing pass, 2026-09-27): `.ds-month` is `flex:1` in the frame's body, so in a small frame it is the 140 x 140 content box; the header and heads keep their heights and the weeks share the rest. The user's report on sill's capture: the grid sat in the top two thirds of the tile, the heads were cramped against the header and the first row, rows (19) and columns (20) differed, the margins were unbalanced | design/23 section 5.1 (the reference's small Month widget fills its card) |
+| Columns | seven, evenly across the width (`repeat(7, minmax(20px, 1fr))`, 20 each in 140; the disc is the floor) | fills the width |
+| Rows | the weeks share the height left under the header and heads, evenly (`flex: 1 1 20px`): six weeks 118 / 6 = 19.67, five weeks 118 / 5 = 23.6 (a five-week month has taller rows); 20 where the box sets no height | design/23 section 5.1, W16; measured on Blitz |
+| Optical foot | the weeks run 4 (`--s-4`) past the box's foot, so the last row's numbers end as far from the card's edge as the title's caps start from the top: ink insets measured on the 4x snapshots, top 15.2, left 16.5, right 15.8, bottom 16.8 (five weeks) and 14.8 (six); before the pass the five-week bottom was 38.8 | the 12 padding (design/23 M4) is to ink, not to line boxes; measured |
+| Day cell | a column wide, a row high; the number `--fs-caption` 10 on a round twice its size (20), in the middle of the row (six weeks: the disc overhangs its row by .33 a side into the neighbours' clear space) | Q361 (the 16 round left two 700 tabular digits touching its rim) |
+| Event dot | 3 round, inside the disc's foot (tucked 4, 1 under it, so the day's stack stays the disc's 20 and a busy day centres as a free one); `--accent-ink` on today's disc | Q190, Q361 |
+| Heads | the UI face at `--fs-nano` 9, `--fw-caps`, tracked, upper, `--ink-faint`, 12 high | the reference's weekday initials; widgets never use the data face's mono (design/23 section 3.2) |
+| Title | the UI face at `--fs-micro` 9.5, `--fw-caps` (600), tracked, upper, `--accent`; its left edge 4 in (`--s-4`), where a two-digit first column's number starts | the reference: month name top left in the accent, small caps weight |
+| Header | 14 high, no gap under it; the step buttons are plain 14 px `button.ds-month-step` round an 11 px glyph (`--ink-faint`, `--surface-2` under the pointer, squish pressed), since the Tool button's 28 x 26 would take a fifth of the height | Q190 |
+| Week numbers | never drawn, whatever `weeks` says (`data-weeks=hide`): a column would not fit | Q190 |
+| Snapshots | `tools/progress/shots/gallery/calendar-compact-{before,after}-{5wk,6wk}-{light,dark}-{1x,4x}.png`, from `ds-native/tests/month_grid_shots.rs` (`QUIRE_CAL_SHOTS=<dir> QUIRE_CAL_TAG=<tag>`) | |
 
 **States.**
 
@@ -3275,7 +3279,9 @@ the caller says nothing; the first month drawn, and every render that does not c
 plays nothing (design/05 principle 7, nothing loops: every motion is keyed to a state change). The header and heads do not move.
 
 **Blitz notes.** Rows are CSS grid (`repeat(7, 32px)`), as `ModuleGrid`; the dot is a real span;
-no pseudo-elements.
+no pseudo-elements. Compact: the weeks are a flex column whose rows grow and shrink alike from a
+20 px basis (`min-height:0`, one `minmax(0,1fr)` grid track), so every row gets the same share
+whatever its cells hold.
 ### 40. Widgets: WidgetFrame, WidgetMetrics, ClockFace and BatteryLevel (settled 2026-09-26; drawing proposed, design/23)
 
 **Purpose.** The card every widget is drawn on, on the desktop layer and in the notification

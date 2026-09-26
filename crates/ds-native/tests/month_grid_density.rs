@@ -1,8 +1,10 @@
 //! The compact MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39; sill
-//! Q190): at `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week month with
-//! its step buttons lies wholly inside the frame's content box (164 less 12 padding a side,
-//! 140 x 140, the widgets' measured inset, design/23 section 1.1), where the regular grid (224 x 254) did not; today's disc is round
-//! and roomy enough for two digits (Q361). A layout, not a timing, so one look.
+//! Q190): at `MonthDensity::Auto` inside a small desktop `WidgetFrame`, the month fills the
+//! frame's content box (164 less 12 padding a side, 140 x 140, the widgets' measured inset,
+//! design/23 section 1.1), where the regular grid (224 x 254) overflowed it: seven even 20 px
+//! columns, and the weeks sharing the height left under the header and heads, so a five-week
+//! month's rows are taller than a six-week one's (the compact-spacing pass, 2026-09-27); today's
+//! disc is round and roomy enough for two digits (Q361). A layout, not a timing, so one look.
 
 #[path = "../../ds/tests/support/month_sample.rs"]
 mod month_sample;
@@ -56,7 +58,7 @@ fn within(inner: Rect, outer: Rect) -> bool {
 }
 
 #[test]
-fn the_compact_grid_fits_a_small_widget() {
+fn the_compact_grid_fills_a_small_widget() {
     let mut harness = Harness::new(SmallCalendar, VIEW);
     harness.advance(Duration::from_millis(50));
     assert_eq!(
@@ -82,30 +84,100 @@ fn the_compact_grid_fits_a_small_widget() {
         1 + 6,
         "the heads and six weeks"
     );
-    for part in [grid, last] {
-        assert!(within(part, body), "{part:?} inside {body:?}");
-    }
+    // The month fills the content box: the header, the heads, then the weeks sharing the rest.
+    assert_eq!(
+        (grid.size.width.0, grid.size.height.0),
+        (140.0, 140.0),
+        "the month is the frame's content box"
+    );
     let header = rect(&harness, ".ds-month-header");
     let heads = rect(&harness, ".ds-month-row[*|data-row=heads]");
     for (name, part) in [("header", header), ("heads", heads)] {
         assert!(within(part, body), "{name} {part:?} inside {body:?}");
     }
-    for selector in [".ds-month-step", ".ds-month-day:last-child"] {
-        let part = rect(&harness, selector);
-        assert!(within(part, body), "{selector} {part:?} inside {body:?}");
-    }
-    // The drawn extent: the widest row by the header's top to the last week's foot.
-    let tall = last.origin.y.0 + last.size.height.0 - header.origin.y.0;
     assert_eq!(
-        (heads.size.width.0, tall),
-        (140.0, 138.0),
-        "the measured compact size"
+        (
+            header.size.height.0,
+            heads.size.height.0,
+            heads.size.width.0
+        ),
+        (14.0, 12.0, 140.0),
+        "a 14 header, 12 heads, seven 20 columns"
     );
-    // The last week's discs overhang their row by a pixel, still inside the frame.
-    let foot = rect(&harness, ".ds-month-weeks > :last-child .ds-month-num");
     assert!(
-        within(foot, body),
-        "the last week's disc {foot:?} inside {body:?}"
+        within(rect(&harness, ".ds-month-step"), body),
+        "the step buttons inside the body"
+    );
+    // The weeks run 4 past the content box's foot (the optical inset: the last row's number sits
+    // as far from the card's foot as the title from its top), still inside the card.
+    let foot = body.origin.y.0 + body.size.height.0;
+    assert!(
+        (last.origin.y.0 + last.size.height.0 - foot - 4.0).abs() < 0.01,
+        "the weeks end 4 under the body: {last:?} {body:?}"
+    );
+    assert!(within(last, card), "{last:?} inside the card {card:?}");
+    let pitches = week_pitches(&harness, 6);
+    for pitch in &pitches {
+        assert!(
+            (pitch - 118.0 / 6.0).abs() < 0.01,
+            "six weeks share 140 - 14 - 12 + 4 = 118 evenly: {pitches:?}"
+        );
+    }
+    let disc = rect(&harness, ".ds-month-weeks > :last-child .ds-month-num");
+    assert!(
+        within(disc, card),
+        "the last week's disc {disc:?} inside {card:?}"
+    );
+    let day = rect(&harness, ".ds-month-weeks > :first-child > :first-child");
+    assert!(
+        (day.size.width.0 - 20.0).abs() < 0.01,
+        "a column is 140 / 7: {day:?}"
+    );
+}
+
+/// The heights of the first `count` week rows.
+fn week_pitches(harness: &Harness, count: usize) -> Vec<f32> {
+    (1..=count)
+        .map(|at| {
+            rect(harness, &format!(".ds-month-weeks > :nth-child({at})"))
+                .size
+                .height
+                .0
+        })
+        .collect()
+}
+
+/// The five-week September: the same header and heads, and five rows sharing the 118 the six
+/// weeks share, each 23.6 against the six-week month's 19.67.
+#[test]
+fn a_five_week_month_spreads_its_rows_over_the_height() {
+    let mut harness = Harness::new(SmallSeptember, VIEW);
+    harness.advance(Duration::from_millis(50));
+    assert_eq!(harness.count(".ds-month-weeks > .ds-month-row"), 5);
+    let pitches = week_pitches(&harness, 5);
+    for pitch in &pitches {
+        assert!(
+            (pitch - 118.0 / 5.0).abs() < 0.01,
+            "five weeks share 118 evenly: {pitches:?}"
+        );
+    }
+    let body = rect(&harness, ".ds-widget-body");
+    let last = rect(&harness, ".ds-month-weeks");
+    assert!(
+        (last.origin.y.0 + last.size.height.0 - body.origin.y.0 - body.size.height.0 - 4.0).abs()
+            < 0.01,
+        "the weeks reach the same optical foot as six do: {last:?} {body:?}"
+    );
+    // The day's number sits in the middle of its row, the disc with it.
+    let cell = rect(&harness, ".ds-month-day[*|aria-current=date]");
+    let disc = rect(&harness, ".ds-month-day[*|aria-current=date] .ds-month-num");
+    let (mid_cell, mid_disc) = (
+        cell.origin.y.0 + cell.size.height.0 / 2.0,
+        disc.origin.y.0 + disc.size.height.0 / 2.0,
+    );
+    assert!(
+        (mid_cell - mid_disc).abs() < 0.01,
+        "today's disc centred in its row: {cell:?} {disc:?}"
     );
 }
 
