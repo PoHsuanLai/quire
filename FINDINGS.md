@@ -4113,3 +4113,53 @@ section 2.
   Mono to Inter tabular), the eyebrow -25% wide and -14% tall (11 px mono to 9.5 px caps), the
   widget clock digits +11%. Line boxes do not move where a `line-height` is set (almost
   everywhere); `.ds-mono` grows 18.1 to 20.0 px tall (.78em to .86em).
+
+## Colour emoji (2026-09-26)
+
+Probe for sill's M9 emoji grid: does Blitz at the pinned rev (parley, skrifa, glifo 0.2,
+vello_cpu 0.1, vello_hybrid 0.1) paint colour emoji? `examples/emoji_probe.rs` lays five emoji
+(😀 🎉 👍🏽 🇹🇼 👨‍👩‍👧) out in rows through Blitz on the headless path and counts, per 88 x 72 cell,
+inked pixels and coloured ones (channel spread over 60); `examples/emoji_probe_hybrid.rs` draws
+😀 and 🎉 as glyph runs through anyrender (what Blitz's text painting calls) once on vello_cpu
+and once on vello_hybrid on the GPU (RTX 5070 Ti), read back, measured the same way.
+`tests/colour_emoji.rs` keeps the COLRv1 result as a regression test (skipped where the font is
+not installed).
+
+| Face (48 px) | vello_cpu via Blitz | vello_cpu glyph run | vello_hybrid glyph run |
+| --- | --- | --- | --- |
+| Noto Color Emoji **COLRv1** (installed, `Noto-COLRv1.ttf`), named in the stack | colour: 😀 2016 inked / 1731 coloured, 🎉 1439/1322, 👍🏽 1417/1216 (skin tone applied), 🇹🇼 2143/2088 (one flag glyph), 👨‍👩‍👧 2776/0 (one ZWJ glyph; Noto's family is drawn in greys) | colour, 2010/1733, 1438/1323 | colour, 2010/1734, 1435/1323 (same as the CPU to within anti-aliasing) |
+| Noto Color Emoji **CBDT** (googlefonts/noto-emoji `2D/fonts/NotoColorEmoji.ttf`, OFL, fetched for the probe, not committed) | nothing: 0 inked in every cell | nothing | nothing |
+| CBDT with glifo's `png` feature turned on (tried, reverted) | colour, as COLRv1 | colour | **panics**: `pixmap image sources are not supported by Vello Hybrid` (vello_hybrid 0.1 `render/wgpu.rs:694`) |
+| No emoji family named (system fallback) | monochrome, and wrong: fontique falls back to Symbola (`fc-match` agrees), so 👍🏽 is a thumb plus a tofu box, 🇹🇼 is two boxed letters, the family three separate faces | | |
+| Noto Emoji (monochrome), named | monochrome outlines, 0 coloured | | |
+
+- **COLRv1 paints in colour on both backends.** glifo interprets COLRv1 paint graphs (layers,
+  gradients, clips) on either renderer; parley shapes skin-tone modifiers, flags and ZWJ
+  sequences to single glyphs. Nothing in quire needs changing.
+- **The fallback is the catch.** With only `Inter, sans-serif` the emoji come from Symbola. A
+  surface that shows emoji must name `'Noto Color Emoji'` in its stack after the text face
+  (`font-family: 'Inter', 'Noto Color Emoji', sans-serif`); a `--font-emoji` token is the clean
+  way to say it once (not added here: tokens are shared with the details-d0 branch).
+- **CBDT does not paint, and must not be made to.** glifo decodes CBDT's PNG strikes only with
+  its `png` feature, which nothing in our tree enables (vello_cpu's default does, but
+  anyrender_vello_cpu turns defaults off). Turning it on fixes vello_cpu and crashes the window
+  renderer on the first bitmap glyph, so a CBDT font installed on a user's machine is harmless
+  today only because it draws nothing.
+- **Not measured.** vello_hybrid's `glyph_run` has the glyph atlas cache off
+  (`atlas_cache_enabled: false`), so a COLRv1 glyph's paint graph is re-rasterised every frame it
+  is drawn; a full picker grid (a few hundred glyphs) scrolling at 60 Hz is the case to time
+  before M9 ships; the probe drew ten glyphs and timed nothing.
+
+**Recommendation for the emoji grid**, in order:
+
+1. **COLRv1 by name** for the whole set: `'Noto Color Emoji'` in the grid's font stack, the
+   system's own font (Fedora installs the COLRv1 build by default), full Unicode coverage, skin
+   tones, flags and ZWJ sequences, crisp at any size and scale. Time a scrolling grid on
+   vello_hybrid first (above).
+2. **AnimatedEmoji's static first frames** (`playback: EmojiPlayback::Still`) for the 42 we ship,
+   wherever the grid picks the user's picture: those cells must look exactly like the picture
+   they become, and they already exist, so the picture picker uses them and the general emoji grid
+   uses COLRv1.
+3. **Pre-rendered sprite sheets of the whole set**: only if the scrolling measurement fails. It
+   costs several MB of PNG per size, a build step, and loses the system font's updates.
+4. **CBDT**: no. It paints nothing, and the one-feature fix panics the window renderer.

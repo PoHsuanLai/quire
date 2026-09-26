@@ -59,6 +59,12 @@ pdfrum = { workspace = true }
 # Writing PDFs for the thumbnail tests (a filled page, an encrypted one).
 pdfrum-edit = { workspace = true }
 pdfrum-common = { workspace = true }
+# The colour-emoji probe's backend half (examples/emoji_probe_hybrid.rs): glyph ids from the
+# cmap, and vello_hybrid driven headless on a wgpu device.
+skrifa = { workspace = true }
+vello_hybrid = { workspace = true }
+wgpu_context = { workspace = true }
+rustc-hash = { workspace = true }
 # The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
 ds-settings = { workspace = true }
 
@@ -70,6 +76,12 @@ name = "edit"
 
 [[example]]
 name = "pdf"
+
+[[example]]
+name = "emoji_probe"
+
+[[example]]
+name = "emoji_probe_hybrid"
 
 [[example]]
 name = "print"
