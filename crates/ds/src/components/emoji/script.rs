@@ -5,7 +5,7 @@
 
 use super::id::EmojiId;
 use super::sheet::durations;
-use crate::components::persona::Mood;
+use crate::components::user_picture::Mood;
 use std::time::Duration;
 
 /// What the picture shows: which emoji, at which frame of its loop.
@@ -49,12 +49,37 @@ pub(crate) enum MoodChange {
     Same,
 }
 
-/// The emoji a mood swaps in once, if any.
+/// The emoji a mood swaps in once, if any: a glance with the eyes when the user starts typing,
+/// the confounded face for a wrong password, the partying face on unlock.
 pub(crate) fn reaction(mood: Mood) -> Option<EmojiId> {
     match mood {
+        Mood::Attentive => Some(EmojiId::ATTENTIVE),
         Mood::Wince => Some(EmojiId::WRONG),
         Mood::Happy => Some(EmojiId::UNLOCKED),
-        Mood::Idle | Mood::Attentive | Mood::Asleep => None,
+        Mood::Idle | Mood::Asleep => None,
+    }
+}
+
+/// How the user's own emoji plays after any reaction, inside the awake window.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Pace {
+    /// Loop after loop: watching the field.
+    Steady,
+    /// One loop, then [`IDLE_REST`] on the rest frame, and again: at rest, but alive.
+    Slow,
+    /// Not at all: asleep.
+    Still,
+}
+
+/// The rest between an idle picture's loops.
+pub(crate) const IDLE_REST: Duration = Duration::from_secs(4);
+
+/// The pace a mood plays at.
+pub(crate) fn pace(mood: Mood) -> Pace {
+    match mood {
+        Mood::Attentive => Pace::Steady,
+        Mood::Idle | Mood::Wince | Mood::Happy => Pace::Slow,
+        Mood::Asleep => Pace::Still,
     }
 }
 
@@ -80,8 +105,8 @@ fn length(emoji: EmojiId) -> Duration {
 }
 
 /// The script for a wake: the reaction once if the mood just changed to one, then the user's
-/// emoji looping for whole loops while they fit in `window`, then at rest. Asleep shows the
-/// sleeping face's rest frame and nothing moves.
+/// emoji at the mood's [`Pace`] for whole loops while they fit in `window`, then at rest. Asleep
+/// shows the sleeping face's rest frame and nothing moves.
 pub(crate) fn script(
     user: EmojiId,
     mood: Mood,
@@ -89,7 +114,6 @@ pub(crate) fn script(
     playing: Playing,
     window: Duration,
 ) -> Vec<Step> {
-    let rest = resting(user, mood);
     let swap = match change {
         MoodChange::Changed => reaction(mood),
         MoodChange::Same => None,
@@ -106,14 +130,36 @@ pub(crate) fn script(
         }
         spent += length(swapped);
     }
-    let loops = mood != Mood::Asleep && playing == Playing::Frames;
-    let each = length(user);
-    if loops && !each.is_zero() {
-        while spent + each <= window {
-            steps.extend(once(user));
-            spent += each;
-        }
+    if playing == Playing::Frames {
+        steps.extend(loops(user, pace(mood), window.saturating_sub(spent)));
     }
-    steps.push(Step::Show(rest));
+    steps.push(Step::Show(resting(user, mood)));
+    steps
+}
+
+/// `user`'s whole loops at `pace` inside `room`, ending wherever the last loop ends.
+fn loops(user: EmojiId, pace: Pace, room: Duration) -> Vec<Step> {
+    let each = length(user);
+    let gap = match pace {
+        Pace::Steady => Duration::ZERO,
+        Pace::Slow => IDLE_REST,
+        Pace::Still => return Vec::new(),
+    };
+    if each.is_zero() {
+        return Vec::new();
+    }
+    let mut steps = Vec::new();
+    let mut spent = Duration::ZERO;
+    while spent + each <= room {
+        if spent > Duration::ZERO && !gap.is_zero() {
+            if spent + gap + each > room {
+                break;
+            }
+            steps.extend([Step::Show(Shown::rest(user)), Step::Wait(gap)]);
+            spent += gap;
+        }
+        steps.extend(once(user));
+        spent += each;
+    }
     steps
 }

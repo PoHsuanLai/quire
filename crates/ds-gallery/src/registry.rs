@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 19] = [
+pub const REGISTRY: [Entry; 18] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -137,21 +137,14 @@ pub const REGISTRY: [Entry; 19] = [
     Entry {
         page: Page::LockSwitcher,
         title: "Lock and switcher",
-        lede: "The shell's own lock screen over the calm wallpaper (at rest, a wrong password mid-shake, checking in the Space's colour), the three kinds of picture the prompt takes (a face, a photo, a persona), the polkit prompt's sheet, and the app switcher with five and fourteen apps, shrunk and scrolled.",
+        lede: "The shell's own lock screen over the calm wallpaper (at rest, a wrong password mid-shake, checking in the Space's colour), the three kinds of picture the prompt takes (a face, an emoji, a photo), the polkit prompt's sheet, and the app switcher with five and fourteen apps, shrunk and scrolled.",
         height: 3500,
         body: pages::lock_switcher::LockSwitcherPage,
     },
     Entry {
-        page: Page::Persona,
-        title: "Persona",
-        lede: "The user's own character (design/24-PERSONA.md): 48 seeds, two finishes for the user's pick, every top on every creature, every mood at Large, the three sizes, and a user picture of each kind.",
-        height: 3200,
-        body: pages::persona::PersonaPage,
-    },
-    Entry {
         page: Page::Emoji,
         title: "Emoji",
-        lede: "Animated emoji for the user's picture (design/25-EMOJI.md): the 42 shipped Noto Animated Emoji at Large, the reactions a mood swaps in, one pick in every mood, the sizes and the discs.",
+        lede: "Animated emoji for the user's picture (design/25-EMOJI.md): the 42 shipped Noto Animated Emoji at Large, the reactions a mood swaps in, one pick in every mood, the sizes and the discs, and the user picture's picker.",
         height: 2500,
         body: pages::emoji::EmojiPage,
     },
