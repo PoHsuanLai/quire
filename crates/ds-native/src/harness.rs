@@ -81,6 +81,7 @@ impl Harness {
         let viewport = config.viewport();
         let mut doc = Headless::new(app, viewport, config.setup());
         doc.layout = layout;
+        doc.painter = crate::harness_backend::painter(&config);
         let mut harness = Harness {
             viewport,
             doc,
