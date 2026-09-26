@@ -1552,6 +1552,27 @@ LockPrompt }` and moves `PromptState` as PAM answers; the polkit agent draws `Po
 the switcher surface draws `AppSwitcher` after its 150 ms timer and maps keys to `selected`.
 Style nothing under `.ds-lock*`, `.ds-polkit*` or `.ds-switcher*`.
 
+### Persona (2026-09-26): the user's animated character
+
+design/24-PERSONA.md. `Persona { spec: PersonaSpec, size: PersonaSize::{Small, Medium, Large},
+mood: Mood, wake: WakeStamp, finish: PersonaFinish }` draws the user's character (28, 64 or
+128 px) on its disc. `PersonaSpec` is user data (serde, every field defaults): save it as it is;
+`PersonaSpec::from_seed(u64)` gives a pleasant random one and `PersonaSpec::default()` a blob.
+
+| You want | Pass |
+| --- | --- |
+| At rest | `Mood::Idle`: blinks and breathes for 20 s after mount, a new `wake` or a mood change, then paints nothing |
+| The user is typing | `Mood::Attentive` |
+| A wrong password | `Mood::Wince` (shakes once and holds; set `Attentive` when typing resumes) |
+| Unlocked | `Mood::Happy` (one hop) |
+| The display is off | `Mood::Asleep` |
+| Wake it (pointer moved, a key) | `wake: stamp.next()` |
+| The icons are muted | `finish: PersonaFinish::Muted` |
+
+Reduced motion is quire's: moods change at once and nothing blinks. A surface that can show
+either a letter or a persona takes `UserPicture::{Face(AvatarFace), Persona(PersonaSpec)}` and
+draws it with `UserPortrait { picture, size, mood, wake }`. Never style `.ds-persona*`.
+
 ### PDF and printing (2026-09-25)
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and

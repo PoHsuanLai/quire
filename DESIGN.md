@@ -96,6 +96,9 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 `press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps", "Bar gaps"), `icon_button`'s `Status` variant and `StatusMetrics` (13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1), `workspace_pills` §37 and `dock_parts` §38 (`RunningDot`, `DockFloor`; 10 §10.3.2).
+`persona` is a directory and 24-PERSONA: the user's animated character (`Persona`, `PersonaSpec`,
+`Mood`, `UserPicture`/`UserPortrait`), its parts, derived palette, still and moving layers, and
+the pulses and blink timer that play its moods (`life.rs`).
 
 `space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),

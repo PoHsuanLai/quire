@@ -80,11 +80,16 @@ pub enum DurationToken {
     /// [`DurationKind::Hold`]: keeps 1200 ms under Reduced instead of shortening to 60 ms, so
     /// the ring is still visible (FINDINGS.md "W1 integration" left this open; resolved here).
     Flash,
+    /// `--t-awake` 20 s: how long a persona stays awake (blinking and breathing) after a wake
+    /// or a mood change, and the length of its one breathing run (design/24-PERSONA.md).
+    Awake,
+    /// `--t-drift` 2400 ms: a sleeping persona's single `z` rising and fading (design/24).
+    Drift,
 }
 
 impl DurationToken {
     /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 23] = [
+    pub const ALL: [DurationToken; 25] = [
         DurationToken::Tap,
         DurationToken::Quick,
         DurationToken::Move,
@@ -108,6 +113,8 @@ impl DurationToken {
         DurationToken::Spin,
         DurationToken::SendRing,
         DurationToken::Flash,
+        DurationToken::Awake,
+        DurationToken::Drift,
     ];
 
     /// The custom property: `--t-tap`, `--t-big-heavy`, …
@@ -136,6 +143,8 @@ impl DurationToken {
             DurationToken::Spin => "--t-spin",
             DurationToken::SendRing => "--t-send-ring",
             DurationToken::Flash => "--t-flash",
+            DurationToken::Awake => "--t-awake",
+            DurationToken::Drift => "--t-drift",
         })
     }
 
@@ -193,6 +202,8 @@ impl DurationToken {
             (DurationToken::Spin, _) => 1100,
             (DurationToken::SendRing, _) => 5000,
             (DurationToken::Flash, _) => 1200,
+            (DurationToken::Awake, _) => 20000,
+            (DurationToken::Drift, _) => 2400,
         }
     }
 }

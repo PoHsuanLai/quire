@@ -432,6 +432,11 @@ impl Anim {
             Anim::PanelOut => own::PANEL_OUT,
             Anim::ShotIn => own::SHOT_IN,
             Anim::ShotOut => own::SHOT_OUT,
+            Anim::PersonaBlink => own::PERSONA_BLINK,
+            Anim::PersonaBreathe => own::PERSONA_BREATHE,
+            Anim::PersonaWince => own::PERSONA_WINCE,
+            Anim::PersonaHop => own::PERSONA_HOP,
+            Anim::PersonaDrift => own::PERSONA_DRIFT,
         }
     }
 }
