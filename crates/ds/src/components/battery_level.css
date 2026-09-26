@@ -1,0 +1,31 @@
+/* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"; sill FINDINGS
+   Q183): a battery glyph, 32 x 16 (40 x 20 in a small widget, beside
+   its hero percentage), in the soft language. The body is the plate's own colour
+   pushed out of it (`--soft-light` up and left, `--soft-dark` down and right, 5 corner); a
+   channel is pressed into it (`--soft-inset-dark`, `--soft-inset-light`, 3 in, 3 corner); 1.5 inside
+   the channel a solid matte fill as long as the level, in `--ink`, `--warn` at a fifth or less,
+   `--danger` at a tenth or less, `--ok` while charging (a charging battery is never low); a
+   small raised cap at the right; while charging a bolt in `--ink` over the body, cut out of it by
+   an outline in the plate's colour. An optional device glyph sits before it in `--ink-soft`. The
+   fill bumps once when the percentage changes (`use_bump_on`). The bolt takes its colour from
+   its own element (spike S6). */
+
+.ds-battery{ display:inline-flex; align-items:center; flex:none; color:var(--ink); }
+.ds-battery-device{ display:inline-flex; align-items:center; margin-right:var(--s-6); color:var(--ink-soft); }
+.ds-battery-glyph{ position:relative; display:block; flex:none; width:32px; height:16px; }
+.ds-widget[*|data-size=small] .ds-battery-glyph{ width:40px; height:20px; }
+.ds-battery-body{ position:absolute; top:0; bottom:0; left:0; right:var(--s-3); box-sizing:border-box; padding:var(--s-3);
+  border-radius:var(--r-small); box-shadow:var(--soft-light), var(--soft-dark); }
+.ds-battery-channel{ display:flex; box-sizing:border-box; width:100%; height:100%; padding:var(--s-1-5); overflow:hidden; border-radius:var(--r-micro);
+  box-shadow:var(--soft-inset-dark), var(--soft-inset-light); }
+.ds-battery-fill{ display:block; flex:none; height:100%; width:calc(var(--f) * 100%); min-width:var(--s-3); border-radius:var(--r-micro);
+  background:var(--ink); }
+.ds-battery[*|data-tone=low] .ds-battery-fill{ background:var(--warn); }
+.ds-battery[*|data-tone=critical] .ds-battery-fill{ background:var(--danger); }
+.ds-battery[*|data-mark=charging] .ds-battery-fill{ background:var(--ok); }
+.ds-battery-cap{ position:absolute; top:32%; bottom:32%; right:0; width:var(--s-2); border-radius:0 var(--r-micro) var(--r-micro) 0;
+  background:var(--ink-faint); }
+.ds-battery-knockout,
+.ds-battery-bolt{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+.ds-battery-knockout{ color:var(--m-tint-solid, var(--surface)); }
+.ds-battery-bolt{ color:var(--ink); }

@@ -6,6 +6,7 @@ pub mod appearance_picker;
 pub mod avatar;
 pub(crate) mod banner_row;
 pub mod banner_stack;
+pub mod battery_level;
 pub mod bump_on;
 pub mod button;
 pub mod button_face;
@@ -13,7 +14,6 @@ pub mod button_size;
 pub mod chip;
 pub mod clock_angles;
 pub(crate) mod clock_dial;
-pub(crate) mod clock_dial_depth;
 pub mod clock_face;
 pub mod clock_kind;
 pub mod command_palette;
@@ -37,8 +37,6 @@ pub mod icon_view;
 pub mod image_source;
 pub mod kbd;
 pub mod level;
-pub mod level_ring;
-mod level_ring_looks;
 pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
@@ -132,7 +130,6 @@ pub(crate) mod tree_item_parts;
 pub mod vocab;
 pub mod widget_frame;
 pub mod widget_kind;
-pub mod widget_looks;
 pub(crate) mod widget_scope;
 pub mod window_frame;
 pub mod workspace_pills;
@@ -144,6 +141,7 @@ pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
 pub use banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack};
+pub use battery_level::{BatteryLevel, LevelRing, RingMark};
 pub use bump_on::{Bumped, use_bump_on};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
@@ -171,7 +169,6 @@ pub use icon_view::IconView;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
-pub use level_ring::{LevelRing, RingMark};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use menu::{Menu, MenuEntrance, MenuKind};
@@ -240,7 +237,6 @@ pub use vocab::{
 };
 pub use widget_frame::WidgetFrame;
 pub use widget_kind::{WidgetHost, WidgetSize, WidgetTitle};
-pub use widget_looks::{BatteryLook, DialLook, FrameFinish};
 pub use window_frame::{TrafficLights, WindowFrame, WindowTitlebar};
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 
@@ -251,6 +247,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("appearance_picker", include_str!("appearance_picker.css")),
     ("avatar", include_str!("avatar.css")),
     ("banner_stack", include_str!("banner_stack.css")),
+    ("battery_level", include_str!("battery_level.css")),
     ("button", include_str!("button.css")),
     ("chip", include_str!("chip.css")),
     ("clock_face", include_str!("clock_face.css")),
@@ -268,7 +265,6 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_view", include_str!("icon_view.css")),
     ("kbd", include_str!("kbd.css")),
     ("level", include_str!("level.css")),
-    ("level_ring", include_str!("level_ring.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
     ("menu", include_str!("menu.css")),
