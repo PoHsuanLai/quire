@@ -1,0 +1,9 @@
+/* MorphGlyph (design/26-DETAILS.md section 3.2): two stacked layers, each an `svg` in an HTML
+   wrapper the stylesheet can move (Blitz's stylesheet does not reach inside an SVG). The incoming
+   layer is in flow and sizes the box; the outgoing one and the slash sit over it. Each layer plays
+   its pulse class once (`a-morph-*`) and is still after. */
+
+.ds-morph-glyph{ position:relative; display:inline-block; flex:none; line-height:0; }
+.ds-morph-layer{ display:block; }
+.ds-morph-layer[*|data-morph=out]{ position:absolute; left:0; top:0; }
+.ds-morph-slash{ position:absolute; left:0; top:0; }

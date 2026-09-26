@@ -1,0 +1,18 @@
+/* Reveal (design/26-DETAILS.md R13): a list's children rise in turn on first show only. The
+   wrapper is `data-reveal=play` for exactly the first settle of the twelfth row, then `still`, so
+   nothing replays. Each child's index is its place, capped at 12. */
+
+.ds-reveal{ display:block; }
+.ds-reveal[*|data-reveal=play] > *{ --i:12; animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
+.ds-reveal[*|data-reveal=play] > :nth-child(1){ --i:0; }
+.ds-reveal[*|data-reveal=play] > :nth-child(2){ --i:1; }
+.ds-reveal[*|data-reveal=play] > :nth-child(3){ --i:2; }
+.ds-reveal[*|data-reveal=play] > :nth-child(4){ --i:3; }
+.ds-reveal[*|data-reveal=play] > :nth-child(5){ --i:4; }
+.ds-reveal[*|data-reveal=play] > :nth-child(6){ --i:5; }
+.ds-reveal[*|data-reveal=play] > :nth-child(7){ --i:6; }
+.ds-reveal[*|data-reveal=play] > :nth-child(8){ --i:7; }
+.ds-reveal[*|data-reveal=play] > :nth-child(9){ --i:8; }
+.ds-reveal[*|data-reveal=play] > :nth-child(10){ --i:9; }
+.ds-reveal[*|data-reveal=play] > :nth-child(11){ --i:10; }
+.ds-reveal[*|data-reveal=play] > :nth-child(12){ --i:11; }

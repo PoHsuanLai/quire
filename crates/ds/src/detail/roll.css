@@ -1,0 +1,8 @@
+/* RollDigits (design/26-DETAILS.md A7): a changed character rolls up into its place as the old
+   one rolls out above it, each once (`a-roll-in`, `a-roll-out`); unchanged ones stand. The column
+   clips the two so only its own place shows. */
+
+.ds-roll-digits{ display:inline-flex; white-space:pre; }
+.ds-roll-digit{ display:inline-block; }
+.ds-roll-col{ position:relative; display:inline-block; overflow:hidden; }
+.ds-roll-col > .ds-roll-old{ position:absolute; left:0; top:0; }

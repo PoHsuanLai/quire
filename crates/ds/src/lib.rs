@@ -8,6 +8,7 @@ pub mod appearance;
 pub mod components;
 pub mod css;
 pub mod delays;
+pub mod detail;
 pub mod edit;
 pub mod error;
 pub mod file_drop;
