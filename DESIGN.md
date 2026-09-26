@@ -99,6 +99,8 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 `persona` is a directory and 24-PERSONA: the user's animated character (`Persona`, `PersonaSpec`,
 `Mood`, `UserPicture`/`UserPortrait`), its parts, derived palette, still and moving layers, and
 the pulses and blink timer that play its moods (`life.rs`).
+`emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
+manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that plays it (`life.rs`).
 
 `space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),

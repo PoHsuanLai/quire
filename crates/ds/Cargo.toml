@@ -86,3 +86,8 @@ required-features = ["lint"]
 [[test]]
 name = "persona_ssr"
 required-features = ["lint"]
+
+# Animated emoji, linted (design/25-EMOJI.md).
+[[test]]
+name = "emoji_ssr"
+required-features = ["lint"]
