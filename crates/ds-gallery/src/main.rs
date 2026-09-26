@@ -5,6 +5,9 @@ mod app;
 mod args;
 mod axes;
 mod data_uri;
+mod detail_frames;
+mod details_states;
+mod details_views;
 mod error;
 mod legibility;
 mod level_motion;
@@ -37,6 +40,13 @@ fn main() {
     };
     if let Some(dir) = args.level_sheet {
         if let Err(error) = level_sheet::run(&dir) {
+            eprintln!("ds-gallery: {error}");
+            std::process::exit(1);
+        }
+        return;
+    }
+    if let Some(dir) = args.detail_frames {
+        if let Err(error) = detail_frames::run(&dir) {
             eprintln!("ds-gallery: {error}");
             std::process::exit(1);
         }

@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 18] = [
+pub const REGISTRY: [Entry; 19] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -147,6 +147,13 @@ pub const REGISTRY: [Entry; 18] = [
         lede: "Animated emoji for the user's picture (design/25-EMOJI.md): the 42 shipped Noto Animated Emoji at Large, the reactions a mood swaps in, one pick in every mood, the sizes and the discs, and the user picture's picker.",
         height: 2500,
         body: pages::emoji::EmojiPage,
+    },
+    Entry {
+        page: Page::Details,
+        title: "Details",
+        lede: "The grammar of small state details (design/26-DETAILS.md): Sweep with CountUp in step, Reveal, the bounded pending loop on a layered Wi-Fi glyph and on the Spinner, Settle's fill, check and seal, Shake, Nudge, every MorphGlyph style and RollDigits, each with a button that plays its moment again. Nothing here loops: each settles to 0 frames.",
+        height: 1500,
+        body: pages::details::DetailsPage,
     },
 ];
 
