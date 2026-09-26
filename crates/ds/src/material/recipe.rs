@@ -7,6 +7,13 @@
 //! design/21-SPACES.md section 3 recorded (`tests/legibility.rs`,
 //! `the_tinted_chrome_holds_its_ink_over_blur`).
 //!
+//! The user relaxed that gate for `Material::Widget` alone (2026-09-26, "relax the contrast
+//! then": design/03-COLOR.md section 17, design/23-WIDGETS.md section 4.3): the light widget
+//! tint now fits the reference exactly, the measured near-white at the measured .48, which
+//! cannot hold 4.5:1 over black. The widget card's own text is large or bold, so
+//! `tests/legibility.rs` checks 3:1 for `Material::Widget` (and the Space-tinted widget card)
+//! instead, and every other material still holds 4.5:1.
+//!
 //! The tint alpha over blur is a settings key (`appearance.material_tint_alpha`, default 80),
 //! so the recipe takes it rather than hard-coding `.80`. Section 17.2 gives each material its
 //! own alpha (the bar .70, the dock .59, …), and one key cannot name eight numbers, so the key
@@ -96,9 +103,10 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
     const WHITE: Hex = Hex([255, 255, 255]);
     const PAPER_DARK: Hex = Hex([21, 24, 20]);
     const RAISE_DARK: Hex = Hex([42, 47, 40]);
-    // The light widget's neutral grey (design/23 section 1.1): boosted, the reference's plate
-    // `#e4e4e4`.
-    const WIDGET_GREY: Hex = Hex([224, 224, 224]);
+    // The light widget's tint (the contrast-relax pass, 2026-09-26, design/23-WIDGETS.md
+    // section 1.1 M27-M28, design/03-COLOR.md section 17): the reference's own measured
+    // near-white, boosted.
+    const WIDGET_NEAR_WHITE: Hex = Hex([247, 248, 248]);
     let light = scheme == Scheme::Light;
     let (hex, alpha) = match material {
         Material::Window => return None,
@@ -121,14 +129,22 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
         Material::Osd => (PAPER_DARK, 680),
         // The widget adds grain over its tint; the grain is the component's, not the recipe's.
         // .50 -> .54 (wave 1, light, over black) -> .60 (settled 2026-09-24, over blur: held
-        // 3.91:1 over black at .54, the worst of the six). The reference's card measures .48
-        // of a near-white over a Gaussian blur of sigma 22 (design/23-WIDGETS.md section 1.1,
-        // M26-M30), under this floor; at the floor, the tint that best fits the measured
-        // composite is a neutral grey that lands on the reference's opaque plate, 228 once
-        // boosted (the vibrancy pass, 2026-09-26, proposed).
-        Material::Widget if light => (WIDGET_GREY, 600),
-        // .45 -> .65 (wave 1, dark, over white) -> .67 (settled 2026-09-24, over blur).
-        Material::Widget => (PAPER_DARK, 670),
+        // 3.91:1 over black at .54, the worst of the six) -> **.48** (the user's decision,
+        // 2026-09-26, "relax the contrast then": design/23-WIDGETS.md section 1.1 M27-M28 fit
+        // the reference exactly, the card's own measured near-white at its own measured alpha).
+        // At .48 the card's ink is 3.86:1 over black and 16.70:1 over white: it no longer
+        // clears the small-text 4.5:1 gate, but the widget's own text is large or bold (the
+        // hero and figure numerals, bold city names; large-text guideline is 3:1), which the
+        // relaxed gate in `tests/legibility.rs` checks instead (design/03-COLOR.md section 17).
+        Material::Widget if light => (WIDGET_NEAR_WHITE, 480),
+        // .45 -> .65 (wave 1, dark, over white) -> .67 (settled 2026-09-24, over blur) -> .55
+        // (the contrast-relax pass, 2026-09-26): the dark tint was not measured against the
+        // reference, so it takes the smallest alpha that clears the 3:1 large-text floor for
+        // every gate `tests/legibility.rs` runs against it, not only the flat tint over black
+        // and white (3.30:1 and 16.16:1 at .55) but the Space-tinted widget card over every
+        // preset's darkest stop too (worst 3.12:1, preset 2's `#291c1a` over white); .53 clears
+        // the flat tint alone but falls to 2.92:1 on that preset, and .54 only reaches 2.997:1.
+        Material::Widget => (PAPER_DARK, 550),
     };
     Some((hex, Alpha(alpha)))
 }
@@ -286,7 +302,7 @@ mod tests {
             (Material::Sheet, Scheme::Light, [248, 249, 246], 820),
             (Material::Toast, Scheme::Dark, [21, 24, 20], 740),
             (Material::Osd, Scheme::Light, [248, 249, 246], 720),
-            (Material::Widget, Scheme::Dark, [21, 24, 20], 670),
+            (Material::Widget, Scheme::Dark, [21, 24, 20], 550),
         ];
         for &(material, scheme, hex, alpha) in CASES {
             assert_eq!(
@@ -308,7 +324,7 @@ mod tests {
             (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "14px"),
             (Material::Popover, Scheme::Dark, "rgba(41,48,38,.78)", "rgba(41,48,38,.94)", "14px"),
             (Material::Sheet, Scheme::Light, "rgba(252,253,249,.82)", "rgba(252,253,249,.94)", "18px"),
-            (Material::Widget, Scheme::Dark, "rgba(20,24,19,.67)", "rgba(20,24,19,.94)", "20px"),
+            (Material::Widget, Scheme::Dark, "rgba(20,24,19,.55)", "rgba(20,24,19,.94)", "20px"),
             (Material::Window, Scheme::Light, "var(--f-grad)", "var(--f-grad)", "0"),
         ];
         for &(material, scheme, tint, solid, radius) in CASES {
@@ -319,14 +335,16 @@ mod tests {
         }
     }
 
-    /// The vibrancy pass (design/23-WIDGETS.md section 1.1, M26-M34): the light card is a
-    /// neutral grey at the gated .60, rimmed one point dark outside and light inside, with a
-    /// short drop; the dark card keeps its tint, edge and drop and takes the one-point rim.
+    /// The contrast-relax pass (design/23-WIDGETS.md section 1.1, M26-M34; design/03-COLOR.md
+    /// section 17, 2026-09-26): the light card fits the reference exactly, its measured
+    /// near-white at its measured .48, rimmed one point dark outside and light inside, with a
+    /// short drop; the dark card keeps its tint colour, edge and drop, raised only to .55 (the
+    /// same see-through the 3:1 large-text floor allows), and takes the one-point rim.
     #[test]
     fn the_widget_card_is_the_measured_grey_rim_and_drop() {
         let light = recipe(Material::Widget, Scheme::Light, DEFAULT_TINT_ALPHA);
-        assert_eq!(light.tint, "rgba(228,228,228,.6)");
-        assert_eq!(light.tint_solid, "rgba(228,228,228,.94)");
+        assert_eq!(light.tint, "rgba(251,252,252,.48)");
+        assert_eq!(light.tint_solid, "rgba(251,252,252,.94)");
         assert_eq!(light.hairline, "0 0 0 var(--hair) rgba(0,0,0,.14)");
         assert_eq!(light.edge, "inset 0 0 0 var(--hair) rgba(255,255,255,.1)");
         assert_eq!(light.shadow, "0 2px 8px rgba(0,0,0,.12)");

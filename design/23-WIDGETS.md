@@ -104,18 +104,24 @@ desktop screenshots with the desktop in front (Aqua library, `14-Sonoma-Desktop-
 show the cards opaque; the translucent look is the desktop's background mode and its widget
 editing mode.
 
-**What quire paints (the conflict).** The legibility gate (`material-legible-over-black-and-white`,
-`tests/legibility.rs`) needs the card's `--ink` at 4.5:1 over a black and a white backdrop, and the
-Space-tinted card (`CardTint::Space`) shares the tint's alpha; the lowest light alpha that passes
-both is .60 (at .58 preset 2's stop `#f3dcd8` falls to 4.43:1 over black). The measured .48 over a
-near-white (3.77:1 over black, 3.86 once boosted) and .65 over a mid grey (3.43:1) both fail it. So the light
-tint keeps alpha .60 and takes the colour that best fits the measured tone at that alpha: over a
-wallpaper `B`, the reference is about `.52 B + 119` (M26-M28) and a tint `T` at .60 paints
-`.40 B + .60 T`, closest over the wallpaper's range at `.60 T` = 134-137, a neutral grey that the
-vibrancy boost lands on `rgb(228,228,228)`, the reference's own opaque plate (R-cs's plate around
-the dragged clock is `rgb(228,228,228)`), 4.82:1 over black. The x1.8 saturation (M29) is the
-compositor's to add (section 4.3); the dark scheme was not measured and keeps .67 of the dark
-paper.
+**What quire paints (the conflict, resolved 2026-09-26, "relax the contrast then").** The
+legibility gate (`material-legible-over-black-and-white`, `tests/legibility.rs`) needs the
+card's `--ink` at 4.5:1 over a black and a white backdrop, and the Space-tinted card
+(`CardTint::Space`) shares the tint's alpha; the lowest light alpha that passes both at 4.5:1 is
+.60 (at .58 preset 2's stop `#f3dcd8` falls to 4.43:1 over black), which the vibrancy pass
+(2026-09-26) shipped, at the cost of matching the reference: .48 over a near-white
+(3.77:1 over black, 3.86 once boosted) fails 4.5:1. The user's decision relaxes the gate
+instead of the fit: the card may be as see-through as the reference measures, and the widget's
+own text — the hero and figure numerals, bold city names — is large or bold, where the
+accessibility guideline for large text is 3:1, not 4.5:1 (design/03-COLOR.md section 17). So the
+light tint takes the measured colour and alpha exactly, `rgb(247,248,248)` at **.48**, 3.86:1
+over black and 16.70:1 over white once boosted, clearing 3:1 with margin. The dark scheme was
+not measured against the reference, so it is raised only as far as the relaxed 3:1 floor needs
+across every gate `tests/legibility.rs` runs: the flat dark tint alone clears 3:1 at .53
+(3.09:1 over white), but the Space-tinted card's darkest preset stop (preset 2's `#291c1a`) needs
+.55 to clear it with margin (3.12:1 over white); dark keeps .55 of the dark paper. Some widget
+text sits below the WCAG large-text size even so; section 4.3 lists it. The x1.8 saturation
+(M29) is the compositor's to add (section 4.3).
 
 ## 2. Flat, bright, measured
 
@@ -244,13 +250,36 @@ Space's colour reaches the card (Arc's contribution). The optional title row is 
 at 12 and the name in the UI face 600 `--fs-caption` `--ink-soft`; the Batteries and Clock
 widgets pass none.
 
-**The card's see-through (vibrancy pass, 2026-09-26).** Over compositor blur the light card
-paints a neutral grey, `rgb(228,228,228)` at .60 (the reference's .48 cannot pass the legibility
-gate, section 1.1), with a 1 pt dark rim outside (`--m-hairline` at `var(--hair)`), a 1 pt white
-rim at .10 inside (`--m-edge`) and a short drop `0 2px 8px` black .12 (`--m-shadow`) (M32-M34);
-without blur `--m-tint-solid` is the same grey at .94. The dark card is unchanged but for the
-1 pt rim. The World Clock card of the reference is opaque `#1c1c1e` (M31); ours stays the
-material's (open decision 4).
+**The card's see-through (contrast-relax pass, 2026-09-26, "relax the contrast then": the user's
+decision, superseding the vibrancy pass's .60 grey below).** Over compositor blur the light card
+fits the reference exactly, its measured near-white `rgb(247,248,248)` at its measured **.48**
+(section 1.1, M27-M28), with a 1 pt dark rim outside (`--m-hairline` at `var(--hair)`), a 1 pt
+white rim at .10 inside (`--m-edge`) and a short drop `0 2px 8px` black .12 (`--m-shadow`)
+(M32-M34); without blur `--m-tint-solid` is the same near-white at .94. This drops the card's
+ink below the small-text 4.5:1 gate over black (3.86:1); the trade is accepted because the
+widget's own text is large or bold (design/03-COLOR.md section 17), where the guideline is 3:1.
+The dark card keeps its tint colour and takes the smallest alpha the relaxed 3:1 floor needs
+across every gate, **.55** (was .67); it is unchanged but for the alpha and the 1 pt rim. The
+World Clock card of the reference is opaque `#1c1c1e` (M31); ours stays the material's (open
+decision 4).
+
+**Small text over a see-through card.** Not every widget element clears the WCAG large-text
+size (18.66 px bold or 24 px regular) that justifies the relaxed 3:1 floor above, even though
+its face is bold. These may be hard to read over very dark or very bright wallpapers; their
+sizes are unchanged by this pass:
+
+- The world clock's dial numerals (`ds-clock-numeral`), Bricolage 800 at `--fs-dial` (9 px) in a
+  Medium row's four small dials, and at `--fs-dial-large` (18 px) on a Small frame's single
+  large dial — 18 px sits just under the 18.66 px bold cutoff.
+- The world clock's city label and its day and offset lines (`ds-clock-label`, `ds-clock-city`),
+  Karla 700 at `--fs-small` (12 px).
+- The battery percentage figure (`--fs-widget-figure`, 20 px) in a Medium row of rings: Bricolage
+  weight 500 (Medium), not bold, so the regular-text floor (24 px) applies, not the bold one.
+
+The battery's hero percentage (`--fs-widget-hero`, 47 px) and the digital clock's digits
+(`--fs-subject` or `--fs-widget-hero`, weight 800) both clear the large-text size regardless of
+weight; the digital clock is drawn only on the notification center's tile (the unchanged
+Popover material), never on the desktop card.
 
 **Compositor blur, recommended (for sill and the compositor).** Blur behind a desktop widget
 with a Gaussian of **sigma 22 logical pixels** (M26): 44 device pixels at 2x. On a compositor that
@@ -281,6 +310,12 @@ data face's caps (the current `--accent` caps title reads as a form label). Moti
 (`slide-l`/`slide-r`).
 
 ## 6. Open decisions (for the user; the gallery's "Widget looks" and "Widget reference" pages render the proposal)
+
+**Settled 2026-09-26, "relax the contrast then":** the card's translucency against its own
+legibility gate is no longer open. The card fits the reference's measured see-through exactly
+(alpha .48 of a near-white light, .55 of the dark paper dark) rather than being held back to
+whatever alpha clears 4.5:1; the widget's own text is gated at 3:1 (the large-text floor)
+instead, since it is large or bold. See section 4.3 and design/03-COLOR.md section 17.
 
 1. **Battery percentage weight:** 500, the display face's lightest, as the reference measures
    (Regular to Medium, M13; proposed), or 800 as the fourth-pass brief asked ("heaviest weight
