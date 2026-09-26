@@ -1730,6 +1730,20 @@ vello_cpu.
 | Frame time | `Harness::paint_timed() -> Result<PaintTime, _>` | Paints over the scheme ground without reading back. `PaintTime { scene, total }`, `render()` = `total - scene`. vello_hybrid: submitted and the device polled until the GPU finishes, so `total` includes the GPU. Style and layout happen in the input call before (`wheel`, `click`): time that yourself |
 | The emoji-grid benchmark | `cargo test -p ds-native --release --test hybrid_backend -- --ignored --nocapture` | 300 `.ds-emoji-text` cells scrolled 180 frames on vello_cpu and each distinct GPU |
 
+### HIG guardrails (2026-09-27): lint warnings, the 10 px floor, standard shortcuts
+
+design/27-HIG-PARITY.md section 7, wave H0. Nothing here fails a consumer's test yet.
+
+| Change | What you do |
+| --- | --- |
+| Five lint rules land as `Severity::Warning`, run only under `Profile::Strict`/`Details`: `PointerCursor`, `MinFontSize`, `FocusRingShape` (CSS), `UnnamedControl`, `ThreeDots` (markup) | Nothing breaks: `stylesheet` and `markup` return errors only; `assert_clean` prints warnings to stderr and passes. Read them with `ds::lint::warnings(css, &config)` and `ds::lint::markup_warnings(html, &config)`; an `Exception` silences one (and is not stale while it does). Each rule turns into an error only after the consumers are swept and told |
+| `Rule` gains five variants (`Rule::ALL` is 31); `Rule::severity`, `Offence::severity`, `ds::lint::WARNINGS` | An exhaustive `match` on `Rule` needs the arms |
+| Under System `--fs-nano`, `--fs-micro` and `--fs-dial` are 10 px (were 9, 9.5, 8); Editorial unchanged. `FontSize::MIN_PX`, `FontSize::FLOORED`, `FontSize::px_in`, `FontSize::follows_typeface` (`Voiced`) | Chips, the kbd's small face, avatars at 16-20, month-grid heads and the world clock dial draw a little larger under System; re-check a tight box |
+| `--focus-gap` (a pixel token, 1 px; `PixelToken::FocusGap`) | A focus ring's radius is `calc(var(--r-*) + var(--focus-gap))` (`FocusRingShape`) |
+| `StandardAction`, `SpaceNumber`, `Reserved`; `Shortcut::standard(action)`, `Shortcut::custom(keys) -> Result<Shortcut, Reserved>`, `Shortcut::keys()`, `StandardAction::owning(keys)` | Bind standard keys through the table (⌘Y Quick Look, ⌘R Reveal, ⌘C Copy for launcher rows); `custom` refuses a reserved combination. `Shortcut(vec![..])` still compiles |
+| `Shortcut::glyphs` and `Kbd` draw modifiers in the Mac's order ⌃⌥⇧⌘ whatever order they were given in | A golden with `⌘⇧…` becomes `⇧⌘…` |
+| quire's controls use `cursor:default` (the arrow); only `.ds-run-link` keeps the hand | A consumer rule that restored `pointer` on a control now warns |
+
 ### Details (2026-09-27): small state details through `ds::detail`
 
 design/26-DETAILS.md, wave D0. FINDINGS.md "Details D0". Everything is in `ds::detail`; `Spinner`

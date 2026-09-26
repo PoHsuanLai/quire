@@ -20,7 +20,9 @@ use std::collections::HashSet;
 
 use super::inline_style::{self, Owner};
 use super::kind;
+use super::markup_hig;
 use super::rule::{LintConfig, Offence, Rule};
+use super::severity::{self, WarningsRun};
 use super::tokenize::{self, Located};
 
 /// Form controls quire's components render; one without a `ds-` class was written by hand.
@@ -30,6 +32,17 @@ const CONTROLS: &[&str] = &["button", "input", "select", "textarea"];
 /// `config.exceptions` covers.
 pub fn markup(html: &str, consumer_css: &str, config: &LintConfig) -> Vec<Offence> {
     config.partition(every_offence(html, consumer_css)).0
+}
+
+/// Every warning in `html` that none of `config.exceptions` covers: [`Rule::UnnamedControl`]
+/// and [`Rule::ThreeDots`] (design/27 section 7, H0), under [`super::Profile::Strict`] and
+/// [`super::Profile::Details`] only. [`markup`] never returns these, so a consumer asserting
+/// `markup(..).is_empty()` is unmoved until a rule turns Strict.
+pub fn markup_warnings(html: &str, config: &LintConfig) -> Vec<Offence> {
+    match severity::warnings_run(config.profile) {
+        WarningsRun::Off => Vec::new(),
+        WarningsRun::On => config.partition(markup_hig::offences(html)).0,
+    }
 }
 
 /// Every offence in `html`, exceptions not applied.
@@ -51,12 +64,8 @@ fn every_offence(html: &str, consumer_css: &str) -> Vec<Offence> {
 
 fn check_tag(tag: &str, line: u32, column: u32, defined: &HashSet<String>, out: &mut Vec<Offence>) {
     let name = tag_name(tag);
-    let classes: Vec<&str> = attr_value(tag, "class")
-        .map(|(value, _)| value.split_whitespace().collect())
-        .unwrap_or_default();
-    let selector: String = std::iter::once(name.to_ascii_lowercase())
-        .chain(classes.iter().map(|class| format!(".{class}")))
-        .collect();
+    let classes = classes_of(tag);
+    let selector = element_selector(tag);
     let mut push = |rule: Rule, line: u32, column: u32, text: String| {
         out.push(Offence {
             rule,
@@ -96,6 +105,20 @@ fn check_tag(tag: &str, line: u32, column: u32, defined: &HashSet<String>, out: 
             push(rule, line, column, text);
         }
     }
+}
+
+/// The classes on `tag`.
+fn classes_of(tag: &str) -> Vec<&str> {
+    attr_value(tag, "class")
+        .map(|(value, _)| value.split_whitespace().collect())
+        .unwrap_or_default()
+}
+
+/// The element as an [`super::Exception`] names it: `tag.class.class`.
+pub(super) fn element_selector(tag: &str) -> String {
+    std::iter::once(tag_name(tag).to_ascii_lowercase())
+        .chain(classes_of(tag).iter().map(|class| format!(".{class}")))
+        .collect()
 }
 
 /// Whether `class` is one quire's components write: the root's `ds` or any `ds-*`.
@@ -157,7 +180,7 @@ fn find_tag_start(html: &str, from: usize) -> Option<usize> {
 
 /// The byte offset just past the `>` that closes the tag starting at `start`, respecting
 /// quoted attribute values (which may themselves contain `>`).
-fn tag_end(html: &str, start: usize) -> Option<usize> {
+pub(super) fn tag_end(html: &str, start: usize) -> Option<usize> {
     let bytes = html.as_bytes();
     let mut index = start + 1;
     let mut quote: Option<u8> = None;
@@ -175,7 +198,7 @@ fn tag_end(html: &str, start: usize) -> Option<usize> {
     None
 }
 
-fn tag_name(tag: &str) -> &str {
+pub(super) fn tag_name(tag: &str) -> &str {
     let body = tag.trim_start_matches('<');
     let end = body
         .find(|c: char| c.is_whitespace() || c == '/' || c == '>')
@@ -187,7 +210,7 @@ fn tag_name(tag: &str) -> &str {
 /// `tag`. Matches the attribute name at a token boundary (preceded by whitespace, since a tag
 /// never opens with an attribute), never as a suffix of a longer name (`data-class=` does not
 /// match `class`).
-fn attr_value<'a>(tag: &'a str, attr: &str) -> Option<(&'a str, usize)> {
+pub(super) fn attr_value<'a>(tag: &'a str, attr: &str) -> Option<(&'a str, usize)> {
     let lower = tag.to_ascii_lowercase();
     let needle = format!("{attr}=");
     let mut search_from = 0;
@@ -214,7 +237,7 @@ fn attr_value<'a>(tag: &'a str, attr: &str) -> Option<(&'a str, usize)> {
     None
 }
 
-fn line_col_at(text: &str, byte_offset: usize) -> (u32, u32) {
+pub(super) fn line_col_at(text: &str, byte_offset: usize) -> (u32, u32) {
     let mut line = 1u32;
     let mut column = 1u32;
     for ch in text[..byte_offset.min(text.len())].chars() {

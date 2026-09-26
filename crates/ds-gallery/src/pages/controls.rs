@@ -121,8 +121,8 @@ fn Buttons() -> Element {
         }
         Section { title: "CommandPill and Kbd",
             div { class: "g-row",
-                CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![Key::Ctrl, Key::Char('k')]), onclick: |_| {} }
-                Kbd { shortcut: Shortcut(vec![Key::Ctrl, Key::Shift, Key::Char('p')]) }
+                CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![Key::Super, Key::Char('k')]), onclick: |_| {} }
+                Kbd { shortcut: Shortcut(vec![Key::Shift, Key::Super, Key::Char('p')]) }
                 Kbd { shortcut: Shortcut(vec![Key::Super, Key::Enter]), size: KbdSize::Small }
                 Kbd { shortcut: Shortcut(vec![Key::Escape, Key::Tab, Key::Backspace, Key::Up, Key::Down, Key::Left, Key::Right, Key::Space]), size: KbdSize::Small }
             }

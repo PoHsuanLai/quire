@@ -92,7 +92,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "command_pill",
         state: "default",
-        make: || rsx! { CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![Key::Ctrl, Key::Char('t')]), onclick: |_| {} } },
+        make: || rsx! { CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![Key::Super, Key::Char('k')]), onclick: |_| {} } },
     },
     // ProviderMark: every provider's letter across the three sizes, and a favicon.
     Case {

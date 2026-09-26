@@ -103,7 +103,7 @@ binding once 04 is approved.
 | `Fraction(u16)` | permille 0..=1000 | Inline `style="--f: <value/1000>"` consumed by Slider fill/thumb, SendPill ring, progress. |
 | `StaggerIndex(u8)` | 0..=12 (capped at 12 by `use_roster`; C capped at 8, `C:1709`) | Inline `style="--i: n"` (rows) or `--j` (strip buttons, `S:1287`). |
 | `PulseKey` | opaque key from `use_pulse` | `class="a-<anim>"` + `data-pulse="a"|"b"`: the A/B alias swap restarts a keyframe without `void el.offsetWidth` (`S:1520`, `S:1525`). |
-| `Shortcut(Vec<Key>)` | keys | Rendered with glyphs `⌘ ⇧ ⌥ ⌃` then the key, e.g. `⌃T`. S writes "Ctrl T" as plain text (`S:841`); see Open decisions O-2. |
+| `Shortcut(Vec<Key>)` | keys | Rendered with glyphs, modifiers in the Mac's order `⌃ ⌥ ⇧ ⌘` whatever order they were given in, then the key, e.g. `⇧⌘Z` (design/27 section 6.2). Bind a standard combination with `Shortcut::standard(StandardAction)`; `Shortcut::custom(keys)` returns `Err(Reserved(action))` for any combination in the table (06 section 2.0). S writes "Ctrl T" as plain text (`S:841`); see Open decisions O-2. |
 
 Motion states set by `use_roster` / `use_motion_timer` (not props):
 `data-presence="entering"|"present"|"leaving"|"healing"` and, for leaving rows,
@@ -121,6 +121,12 @@ Focus ring (verbatim, `S:55`; same `C:190`):
 ```css
 :focus-visible{ outline:2.5px solid var(--accent); outline-offset:2px; border-radius:4px; }
 ```
+
+Pointer (design/27 section 6.3, H0): every control shows the arrow (`cursor:default`), never
+the prototype's `cursor:pointer`; the pointing hand is only for a link (`a`, `role=link`, a
+`*-link` class such as `.ds-run-link`); `grab` on a drag handle; resize cursors on dividers and
+window edges. The CSS quoted from S and C below keeps their `cursor:pointer` as source; quire's
+sheets do not (lint `PointerCursor`).
 
 Icon base `Glyph` (verbatim, `S:58-59`; same `C:973-974`). Every icon is Lucide geometry on a
 24 grid; components only override width and height.

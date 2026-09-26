@@ -8,7 +8,7 @@
 /* Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
 .ds-icon-button[*|data-variant=tool]{
   display:inline-grid; place-items:center; width:28px; height:26px; border:var(--hair) solid transparent; border-radius:var(--r-btn);
-  background:transparent; color:var(--ink-faint); cursor:pointer;
+  background:transparent; color:var(--ink-faint); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-icon-button[*|data-variant=tool]:hover{ color:var(--ink); background:var(--surface); }
@@ -17,7 +17,7 @@
 
 /* Foot: `S:151-153`. Active: not specified. */
 .ds-icon-button[*|data-variant=foot]{
-  width:24px; height:24px; border-radius:var(--r-menu-item); border:0; background:transparent; cursor:pointer;
+  width:24px; height:24px; border-radius:var(--r-menu-item); border:0; background:transparent; cursor:default;
   display:grid; place-items:center; color:var(--f-ink-soft);
 }
 .ds-icon-button[*|data-variant=foot]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
@@ -25,7 +25,7 @@
 /* Strip: the button half of `S:312-323`; the reveal and `pop-in` belong to HoverStrip (section 17).
    TODO(O-3, O-10): `.88` has no scalar token; `!important` is dropped (HoverStrip settles pop-in). */
 .ds-icon-button[*|data-variant=strip]{
-  position:relative; width:26px; height:26px; border:0; border-radius:var(--r-pill); background:transparent; cursor:pointer;
+  position:relative; width:26px; height:26px; border:0; border-radius:var(--r-pill); background:transparent; cursor:default;
   display:grid; place-items:center; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
@@ -34,7 +34,7 @@
 
 /* Pin: `S:108-114`, `S:118`; the current-item shadow is `--shadow-current` (O-3). */
 .ds-icon-button[*|data-variant=pin]{
-  aspect-ratio:1; border:0; border-radius:var(--r-tile); cursor:pointer; background:var(--f-pill-hover);
+  aspect-ratio:1; border:0; border-radius:var(--r-tile); cursor:default; background:var(--f-pill-hover);
   display:grid; place-items:center; position:relative; color:var(--f-ink);
   transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -51,7 +51,7 @@
    shell scale's 4 px bar-item radius (`--r-shell-bar-item`, the macOS polish pass). */
 .ds-icon-button[*|data-variant=status]{
   display:inline-grid; place-items:center; width:var(--bar-status-box,22px); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
-  background:transparent; color:var(--f-ink-soft); cursor:pointer;
+  background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-icon-button[*|data-variant=status] > .ds-ic,

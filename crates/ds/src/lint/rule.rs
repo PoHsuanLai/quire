@@ -71,11 +71,30 @@ pub enum Rule {
     /// `--t-count-step`, `--t-fill`): moments are timed by the grammar's tokens (`ds::detail::grammar`,
     /// design/26-DETAILS.md sections 3.1 and 3.4).
     OffGrammarTiming,
+    /// `cursor: pointer` on a rule whose subject is not a link: controls use the arrow, and the
+    /// pointing hand means only "this is a link" (design/27-HIG-PARITY.md section 6.3). A link is
+    /// an `a`, a `[role=link]`, or a class with a `link` segment (`.ds-run-link`). A
+    /// [`super::Severity::Warning`] under Strict until sill's sweep is clean.
+    PointerCursor,
+    /// A font size under the 10 px floor (design/27 section 3.16): a literal below 10 px, or a
+    /// `var(--fs-*)` whose System value is below it. A [`super::Severity::Warning`] under Strict.
+    MinFontSize,
+    /// A `border-radius` in a `:focus` rule that is not `calc(var(--r-*) + var(--focus-gap))`:
+    /// a ring follows its control's shape, one gap out (design/27 sections 3.9 and 6.4). A
+    /// [`super::Severity::Warning`] under Strict.
+    FocusRingShape,
+    /// Markup: an interactive element (a button, a link, a form control, a `role` that takes
+    /// input) with no accessible name: no text, no `aria-label`, `aria-labelledby`, `title` or
+    /// `alt` (design/27 section 3.1). A [`super::Severity::Warning`] under Strict.
+    UnnamedControl,
+    /// Markup: "..." (three full stops) in text or a label attribute where "…" belongs
+    /// (design/02-TYPE.md section 13). A [`super::Severity::Warning`] under Strict.
+    ThreeDots,
 }
 
 impl Rule {
     /// Every rule, in declaration order.
-    pub const ALL: [Rule; 26] = [
+    pub const ALL: [Rule; 31] = [
         Rule::HexColour,
         Rule::ColourFunction,
         Rule::NamedColour,
@@ -102,6 +121,11 @@ impl Rule {
         Rule::RawMarkup,
         Rule::InfiniteLoop,
         Rule::OffGrammarTiming,
+        Rule::PointerCursor,
+        Rule::MinFontSize,
+        Rule::FocusRingShape,
+        Rule::UnnamedControl,
+        Rule::ThreeDots,
     ];
 }
 
@@ -112,7 +136,8 @@ pub enum Profile {
     /// `RawSpacing`, `RawHairline`).
     #[default]
     Standard,
-    /// Every rule but [`Rule::OffGrammarTiming`].
+    /// Every rule but [`Rule::OffGrammarTiming`]; the HIG guardrails
+    /// ([`super::Severity::Warning`] rules) report without failing.
     Strict,
     /// Every rule: `Strict` and the details grammar's timing (design/26-DETAILS.md). Off by
     /// default so a consumer opts in once its own sheets pass.
