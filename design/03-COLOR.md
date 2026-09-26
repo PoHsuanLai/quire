@@ -573,7 +573,7 @@ fails it.
 | Sheet | `rgba(248,249,246,.82)` | `rgba(21,24,20,.78)` | hairline + highlight | `--shadow-sheet` = `0 24px 50px -18px rgba(0,0,0,.55)` light / `0 30px 60px -20px rgba(0,0,0,.7)` dark | 18 | behind | `.peek` (`S:221-224`) |
 | Toast | `rgba(248,249,246,.80)` | `rgba(21,24,20,.74)` | hairline + highlight | `--shadow-pop` | 16 | behind | `.toast` is inverse ink/paper in mail (`S:360-362`); the shell banner is a material, see open decision 12 |
 | Osd | `rgba(248,249,246,.72)` | `rgba(21,24,20,.68)` (settled 2026-09-24; was .66) | hairline + highlight | `--shadow-pop` | 18 | behind | none |
-| Widget | `rgba(248,249,246,.60)` (settled 2026-09-24; .50 to .54 wave 1, to .60 over blur) + grain | `rgba(21,24,20,.67)` (settled 2026-09-24; .45 to .65 wave 1, to .67 over blur) + grain | hairline + highlight | soft: `0 6px 16px -6px rgba(26,30,26,.30)` (`--shadow-2` drop) | 20 | behind | `.editor` / `.note` (`S:246`, `S:283`) |
+| Widget | `rgba(224,224,224,.60)` (vibrancy pass 2026-09-26, proposed: the measured tone at the settled .60, design/23 section 1.1 M26-M30; was `rgba(248,249,246,.60)`, settled 2026-09-24; .50 to .54 wave 1, to .60 over blur) + grain | `rgba(21,24,20,.67)` (settled 2026-09-24; .45 to .65 wave 1, to .67 over blur) + grain | light: a 1 px white rim at .10 inside, a 1 px outer hairline (M32, M33); dark: hairline + highlight | light `0 2px 8px rgba(0,0,0,.12)` (M34); dark `0 8px 20px -8px rgba(0,0,0,.50)` | 20 | behind (sigma 22 recommended, design/23 section 4.3) | `.editor` / `.note` (`S:246`, `S:283`) |
 
 Tinted shell chrome (bar, dock, launcher, control center) additionally carries the workspace's
 `--f-*` frame tokens over the material (section 18 and `21-SPACES.md`): the material gives the
@@ -625,11 +625,11 @@ settings key (`ds::MaterialStack`, `Ds { stack }`), with the default below behin
 | Layer | Variable | Light | Dark | Key (proposed name, design/22) |
 | --- | --- | --- | --- | --- |
 | Vibrancy | baked into `--m-tint`, `--m-tint-solid` | OKLab chroma x1.4, lightness +.012 (surface `#f8f9f6` becomes `#fcfdf9`) | chroma x1.4, lightness kept (`#151814` becomes `#141813`, the raise `#2a2f28` becomes `#293026`) | `appearance.material_vibrancy`, percent, 100 (0 = section 17.2's flat colour, through `color-mix` on `--m-vibrancy`) |
-| Outer hairline | `--m-hairline` | `0 0 0 .5px rgba(0,0,0,.14)` | `0 0 0 .5px rgba(0,0,0,.60)` | `appearance.material_hairline_light` 14, `_dark` 60 |
+| Outer hairline | `--m-hairline` | `0 0 0 .5px rgba(0,0,0,.14)` (the widget's 1 px, M32) | `0 0 0 .5px rgba(0,0,0,.60)` | `appearance.material_hairline_light` 14, `_dark` 60 |
 | Contact shadow | `--m-shadow-contact` | `0 1px 2px rgba(0,0,0,.10)` | `0 1px 2px rgba(0,0,0,.30)` | `appearance.material_shadow_strength`, percent, 100 (scales both shadows) |
-| Ambient shadow | `--m-shadow-ambient` (= `--m-shadow`) | menus, toast, OSD `0 12px 40px -12px rgba(0,0,0,.28)`; sheet `0 24px 60px -18px .40`; dock `0 10px 30px -10px .35`; widget `0 6px 16px -6px rgba(26,30,26,.3)` | menus, toast, OSD `.55`; sheet `0 30px 70px -20px .65`; dock `.50`; widget `0 8px 20px -8px .50` | as above |
+| Ambient shadow | `--m-shadow-ambient` (= `--m-shadow`) | menus, toast, OSD `0 12px 40px -12px rgba(0,0,0,.28)`; sheet `0 24px 60px -18px .40`; dock `0 10px 30px -10px .35`; widget `0 2px 8px .12` (M34, 2026-09-26; was `0 6px 16px -6px rgba(26,30,26,.3)`) | menus, toast, OSD `.55`; sheet `0 30px 70px -20px .65`; dock `.50`; widget `0 8px 20px -8px .50` | as above |
 | Inner top highlight | `--m-highlight` | `inset 0 1px 0 rgba(255,255,255,.30)` | `inset 0 1px 0 rgba(255,255,255,.12)` | `appearance.material_highlight_light` 30, `_dark` 12 |
-| Inner edge | `--m-edge` | `inset 0 0 0 .5px rgba(0,0,0,.08)` (the dock's `rgba(255,255,255,.55)`) | `rgba(255,255,255,.09)` | none (the `--f-line` values) |
+| Inner edge | `--m-edge` | `inset 0 0 0 .5px rgba(0,0,0,.08)` (the dock's `rgba(255,255,255,.55)`; the widget's `inset 0 0 0 1px rgba(255,255,255,.10)`, M33) | `rgba(255,255,255,.09)` | none (the `--f-line` values) |
 | Bar | `--m-hairline`, `--m-edge` | `0 .5px 0 rgba(0,0,0,.14)` under `inset 0 -.5px 0 rgba(0,0,0,.08)` | `0 .5px 0 rgba(0,0,0,.60)` | the hairline keys |
 
 **Pixel snapping (2026-09-25).** The .5 px widths in this table are `var(--hairline)` and the

@@ -138,6 +138,8 @@
 .g-shot-ground{display:flex;align-items:flex-end;gap:var(--s-16);padding:var(--s-16) var(--s-16) var(--s-26)}
 .g-wl-wall{padding:var(--s-22)}
 .g-wl-cards{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--s-16)}
+.g-wb-wall{position:relative;padding:0}
+.g-wb-slot{position:absolute;border-radius:var(--m-radius)}
 .g-wr-solo{display:flex;flex-direction:column;justify-content:space-between;flex:1;min-width:0}
 .g-wr-hero{margin-bottom:calc(-1 * var(--s-6));font-family:var(--font-display);font-size:var(--fs-widget-hero);font-weight:500;line-height:1;letter-spacing:-.01em;color:var(--ink)}
 .g-wr-grid{display:flex;flex-wrap:wrap;justify-content:space-between;align-content:space-between;flex:1}
