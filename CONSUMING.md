@@ -1763,3 +1763,50 @@ functions are `file::load(&SettingsFile)`, `file::save(&SettingsFile, &T)` and
 (`KeyKind::Fixed`, drawn as a read-only `Widget::Readout`). A number without
 `range = "min..=max"` is a compile error that starts `MissingRange { field: <name> }`; a type
 the derive cannot place at all gets an error saying what to add.
+
+## 12. Scrolling
+
+shell-host owns scroll physics for every Blitz document (design/11-BEHAVIOUR-scroll.md section
+11.3.1): it does not forward wheel or axis input to Blitz's default scroll action, it writes raw
+offsets itself every frame, and it paints its own overlay scrollbar thumb. Everything below is
+quire's side of that split (design/11 section 11.7); the engine itself is shell-host's.
+
+**Every scroll container hides Blitz's own scrollbar.** Every ds component whose content scrolls
+(`Menu`, `Panel`, `Sheet`, `TextInput`'s multiline kind) carries `scrollbar-width: none` in its own
+CSS. Blitz honours this at the DOM level (`blitz-dom`'s `Node::wants_scrollbar` returns `false`
+immediately when the computed `scrollbar-width` is `none`, before it even asks whether the content
+overflows) — the host's thumb is the only one that ever paints. Give your own scroll containers
+the same rule; `Rule::BlitzUnsupported`/self_lint do not check for its absence (there is nothing to
+flag: an *absent* `scrollbar-width: none` is not, by itself, an offence), so this is a convention
+to follow, not a lint you can lean on.
+
+**`data-wheel="capture"` marks a component that consumes wheel input itself.** A ds component
+that reads the wheel directly — today, only `Slider` (design/04-COMPONENTS.md section 5; a
+zoomable canvas would be the other kind design/11 names) — carries this attribute so the host
+hands it the raw `BlitzWheelEvent` through `handle_ui_event` instead of scrolling whatever
+contains it; the component's own handler must call `prevent_default` once it exists (design/11
+section 11.3.1 item 2). It is a marker only: quire does not itself drive a wheel-triggered value
+change on `Slider` yet, so add the same attribute to your own wheel-consuming controls even before
+you wire up the handler, and remove it from a component that turns out not to need it — an
+un-marked wheel-consumer silently gets scrolled instead of heard.
+
+**`data-overscroll="band"` marks a container that may rubber-band; its absence means clamp.**
+design/11 section 11.3.7 has the full table. In short: `Panel` and `Sheet` carry it (ordinary ds
+scroll containers, not on the exclusion list); `Menu`, `Popover`, the dock and the launcher result
+list never do (excluded by name, R14); a text field never does (also excluded). Your own scroll
+containers — a list's row scroller, a reader pane — should carry it too, unless they are one of
+the excluded kinds; an un-marked container the host finds just clamps at its edge, which is the
+safer failure than defaulting to elastic.
+
+**`scroll-behavior: smooth` is banned**, in your own CSS as much as quire's:
+`ds::lint::Rule::BlitzUnsupported` flags it (`crates/ds/src/lint/blitz.rs`) because Blitz's own
+300 ms `ScrollTo` would fight the host's engine. Drive a programmatic scroll through the host's
+`ScrollCmd` instead (design/11 sections 11.3.1 and 11.3.11); `scroll-behavior: auto` (the
+default) lints clean.
+
+**`--scroll-thumb`**: the colour the host paints its overlay scrollbar thumb in
+(design/11 section 11.3.12) — `--ink` at .5 alpha over the layer's own .8 opacity (effective .4)
+in light, `--paper`'s equivalent (white at the same effective alpha) in dark. It is a token like
+any other (`ds::ColourToken::ScrollThumb`, registered in the lint's known-variable table the same
+way every other colour is); quire's stylesheet declares it, the host reads it, and no component
+CSS references it directly, since no ds component paints the thumb itself.
