@@ -96,6 +96,9 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
     const WHITE: Hex = Hex([255, 255, 255]);
     const PAPER_DARK: Hex = Hex([21, 24, 20]);
     const RAISE_DARK: Hex = Hex([42, 47, 40]);
+    // The light widget's neutral grey (design/23 section 1.1): boosted, the reference's plate
+    // `#e4e4e4`.
+    const WIDGET_GREY: Hex = Hex([224, 224, 224]);
     let light = scheme == Scheme::Light;
     let (hex, alpha) = match material {
         Material::Window => return None,
@@ -118,8 +121,12 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
         Material::Osd => (PAPER_DARK, 680),
         // The widget adds grain over its tint; the grain is the component's, not the recipe's.
         // .50 -> .54 (wave 1, light, over black) -> .60 (settled 2026-09-24, over blur: held
-        // 3.91:1 over black at .54, the worst of the six).
-        Material::Widget if light => (SURFACE, 600),
+        // 3.91:1 over black at .54, the worst of the six). The reference's card measures .48
+        // of a near-white over a Gaussian blur of sigma 22 (design/23-WIDGETS.md section 1.1,
+        // M26-M30), under this floor; at the floor, the tint that best fits the measured
+        // composite is a neutral grey that lands on the reference's opaque plate, 228 once
+        // boosted (the vibrancy pass, 2026-09-26, proposed).
+        Material::Widget if light => (WIDGET_GREY, 600),
         // .45 -> .65 (wave 1, dark, over white) -> .67 (settled 2026-09-24, over blur).
         Material::Widget => (PAPER_DARK, 670),
     };
@@ -227,15 +234,24 @@ pub(crate) fn layers(material: Material, scheme: Scheme) -> Layers {
             },
             hairline_edge,
         ),
-        // "Soft": the `--shadow-2` drop in the light scheme, deeper in the dark.
-        Material::Widget => card(
-            if light {
-                shadow("0 6px 16px -6px", Hex([26, 30, 26]), 300)
-            } else {
-                shadow("0 8px 20px -8px", BLACK, 500)
-            },
-            hairline_edge,
-        ),
+        // Measured on the reference's desktop card (design/23-WIDGETS.md section 1.1, M32-M34):
+        // a one-point dark rim outside, a lighter rim inside, and a short soft drop. The dark
+        // scheme was not measured: it takes the one-point rim and keeps its edge and drop.
+        Material::Widget => Layers {
+            hairline: Some(outer("0 0 0 var(--hair)")),
+            ..card(
+                if light {
+                    shadow("0 2px 8px", BLACK, 120)
+                } else {
+                    shadow("0 8px 20px -8px", BLACK, 500)
+                },
+                if light {
+                    inset("0 0 0 var(--hair)", WHITE, 100)
+                } else {
+                    hairline_edge
+                },
+            )
+        },
     }
 }
 
@@ -301,6 +317,26 @@ mod tests {
             assert_eq!(got.tint_solid, solid, "{material:?} {scheme:?}");
             assert_eq!(got.radius, radius, "{material:?} {scheme:?}");
         }
+    }
+
+    /// The vibrancy pass (design/23-WIDGETS.md section 1.1, M26-M34): the light card is a
+    /// neutral grey at the gated .60, rimmed one point dark outside and light inside, with a
+    /// short drop; the dark card keeps its tint, edge and drop and takes the one-point rim.
+    #[test]
+    fn the_widget_card_is_the_measured_grey_rim_and_drop() {
+        let light = recipe(Material::Widget, Scheme::Light, DEFAULT_TINT_ALPHA);
+        assert_eq!(light.tint, "rgba(228,228,228,.6)");
+        assert_eq!(light.tint_solid, "rgba(228,228,228,.94)");
+        assert_eq!(light.hairline, "0 0 0 var(--hair) rgba(0,0,0,.14)");
+        assert_eq!(light.edge, "inset 0 0 0 var(--hair) rgba(255,255,255,.1)");
+        assert_eq!(light.shadow, "0 2px 8px rgba(0,0,0,.12)");
+        let dark = recipe(Material::Widget, Scheme::Dark, DEFAULT_TINT_ALPHA);
+        assert_eq!(dark.hairline, "0 0 0 var(--hair) rgba(0,0,0,.6)");
+        assert_eq!(
+            dark.edge,
+            "inset 0 0 0 var(--hairline) rgba(255,255,255,.09)"
+        );
+        assert_eq!(dark.shadow, "0 8px 20px -8px rgba(0,0,0,.5)");
     }
 
     #[test]
