@@ -3,6 +3,7 @@
 //! generated from it (`crate::css`), so CSS and the Rust timers cannot drift
 //! (design/05-MOTION.md section 7.1).
 
+pub mod accent_band;
 pub mod accent_table;
 pub mod colour;
 pub mod delay;

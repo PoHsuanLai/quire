@@ -334,12 +334,19 @@ pub(crate) fn oklch_hex(lightness: f64, chroma: f64, hue: f64) -> String {
     hex(lightness, chroma, hue)
 }
 
+/// `oklch(lightness chroma hue)` as 8-bit sRGB channels, its chroma reduced until it fits sRGB:
+/// the bytes [`oklch_hex`] writes, for the accent band (`tokens::accent_band`), which keeps
+/// colours as `Hex`.
+pub(crate) fn oklch_bytes(lightness: f64, chroma: f64, hue: f64) -> [u8; 3] {
+    oklch_to_rgb(lightness, fit(lightness, chroma, hue), hue)
+        .map(|channel| channel_byte(encode(channel)))
+}
+
 fn hex(lightness: f64, chroma: f64, hue: f64) -> String {
-    let [red, green, blue] = oklch_to_rgb(lightness, fit(lightness, chroma, hue), hue);
     let mut out = String::with_capacity(7);
     out.push('#');
-    for channel in [red, green, blue] {
-        push_byte(&mut out, channel_byte(encode(channel)));
+    for byte in oklch_bytes(lightness, chroma, hue) {
+        push_byte(&mut out, byte);
     }
     out
 }

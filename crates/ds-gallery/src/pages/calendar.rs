@@ -7,7 +7,7 @@
 //! Q190): `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week August.
 
 #[path = "../../../ds/tests/support/month_sample.rs"]
-mod month_sample;
+pub(crate) mod month_sample;
 
 use super::Section;
 use crate::axes::Axes;
