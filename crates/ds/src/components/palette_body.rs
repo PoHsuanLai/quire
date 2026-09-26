@@ -21,6 +21,8 @@ pub(crate) struct StopEvents {
     pub point: EventHandler<usize>,
     /// A row's or a cell's element mounted.
     pub mounted: EventHandler<(usize, MountedEvent)>,
+    /// A header action's element mounted (it reports no rect, but is kept in view).
+    pub action_mounted: EventHandler<(usize, MountedEvent)>,
 }
 
 /// Every drawn group, the stop `current` highlighted.
@@ -101,6 +103,9 @@ fn draw_group<T>(shown: &ShownGroup<'_, T>, current: usize, events: StopEvents) 
                 Some(_) => action_selection,
                 None => Selection::Unselected,
             },
+            on_action_mounted: EventHandler::new(move |event: MountedEvent| {
+                events.action_mounted.call((first + size, event))
+            }),
         }
         {body}
     }

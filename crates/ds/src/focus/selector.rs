@@ -103,7 +103,7 @@ pub async fn focus_by_selector(
     let element = find(&host, &selector).await?;
     let told = try_consume_context::<FocusTargets>()
         .and_then(|targets| targets.told_at(&element, host.same));
-    match focus_selecting(&element, select).await {
+    match focus_selecting(&element, select.into()).await {
         Focused::Done => {
             if let Some(told) = told {
                 told.focus.call(());

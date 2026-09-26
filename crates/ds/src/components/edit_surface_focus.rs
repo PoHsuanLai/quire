@@ -51,7 +51,7 @@ pub(crate) fn focused_out(ctx: &SurfaceCtx) {
 /// which calls it instead.
 pub(crate) fn focus_surface(ctx: &SurfaceCtx, told: EventHandler<()>) {
     if let Some(element) = ctx.state.element() {
-        focus_soon_told(element, Select::None, told);
+        focus_soon_told(element, Select::None.into(), told);
     }
 }
 

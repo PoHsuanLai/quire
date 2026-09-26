@@ -20,8 +20,8 @@ use crate::node_ref::{DocRef, FoundNode, NodeRef, Written, same};
 use blitz_dom::Node;
 use dioxus::prelude::*;
 use ds::{
-    Caret, Collapsed, Focused, Found, HostBlur, HostCaret, HostFind, HostFocus, HostSelect,
-    caret_at,
+    Caret, Collapsed, Focused, Found, HostBlur, HostCaret, HostFind, HostFocus, HostPlaceCaret,
+    HostSelect, InitialCaret, caret_at,
 };
 use std::rc::Rc;
 
@@ -42,7 +42,13 @@ pub const SELECT: HostSelect = HostSelect(select_all);
 /// caret sits in a field when a key reaches it (a command palette's `claim`, sill Q299).
 pub const CARET: HostCaret = HostCaret(caret);
 
-/// Provide [`FOCUS`], [`BLUR`], [`SELECT`] and [`CARET`] to the calling component's subtree. Call it at the
+/// The Blitz caret write, as the `ds::HostPlaceCaret` a root provides beside [`CARET`]: a field
+/// focused by a request `with_caret` has its caret put at the end, the start, or over the whole
+/// value (a command palette opened on a query, sill Q341).
+pub const PLACE_CARET: HostPlaceCaret = HostPlaceCaret(place_caret);
+
+/// Provide [`FOCUS`], [`BLUR`], [`SELECT`], [`CARET`], [`PLACE_CARET`] and the list scroll
+/// ([`REVEAL`](crate::reveal::REVEAL), sill Q340) to the calling component's subtree. Call it at the
 /// top of a root that `ds_native::launch` did not start, before any quire field or menu mounts.
 /// The click-focus fallback is separate: provide [`CLICK_FOCUS`](crate::CLICK_FOCUS) and
 /// [`PRESS_FOCUS`](crate::PRESS_FOCUS) as well to keep the focus on a `tabindex` ancestor after a
@@ -50,6 +56,8 @@ pub const CARET: HostCaret = HostCaret(caret);
 /// hand-off of a removed element's keyboard to its ancestor (and `ds::HostHandBack`) needs the
 /// host's own loop and is `launch`'s and the harness's only.
 pub fn provide() -> HostFocus {
+    use_context_provider(|| crate::reveal::REVEAL);
+    use_context_provider(|| PLACE_CARET);
     use_context_provider(|| CARET);
     use_context_provider(|| SELECT);
     use_context_provider(|| BLUR);
@@ -112,6 +120,12 @@ fn blur(element: &MountedData) -> Focused {
 /// Select all of `element`'s text, if the document is free and the element is a Blitz text
 /// field. Run after [`focus`] has put the caret in it, so the selection is not collapsed by it.
 fn select_all(element: &MountedData) -> Focused {
+    place_caret(element, InitialCaret::SelectAll)
+}
+
+/// Put the caret of `element`'s text field at `caret`, if the document is free and the element is
+/// a Blitz text field. Run after [`focus`] has put the caret in it.
+fn place_caret(element: &MountedData, caret: InitialCaret) -> Focused {
     let Some(node) = NodeRef::of(element) else {
         return Focused::Unknown;
     };
@@ -121,7 +135,11 @@ fn select_all(element: &MountedData) -> Focused {
     };
     match field {
         Field::Editable => done(node.write(|doc| {
-            doc.with_text_input(node.node, |mut driver| driver.select_all());
+            doc.with_text_input(node.node, |mut driver| match caret {
+                InitialCaret::SelectAll => driver.select_all(),
+                InitialCaret::End => driver.move_to_text_end(),
+                InitialCaret::Start => driver.move_to_text_start(),
+            });
             doc.shell_provider.request_redraw();
         })),
         // Blitz builds a field's editor with its first layout; a field focused on mount is
