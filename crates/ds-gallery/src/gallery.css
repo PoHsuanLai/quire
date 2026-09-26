@@ -161,13 +161,7 @@
 .g-polkit{width:588px;background-size:cover;background-position:center}
 .g-polkit-stage{height:540px}
 .g-switcher-wall{display:flex;justify-content:center;padding:var(--s-36) var(--s-16);border-radius:var(--r-panel);background-size:cover;background-position:center}
-.g-persona-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--s-12) var(--s-8)}
-.g-persona-cell{align-items:center}
-.g-persona-name{width:80px}
-.g-persona-sizes{align-items:flex-end;gap:var(--s-12)}
-.g-persona-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-16)}
 .g-emoji-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--s-12) var(--s-8)}
 .g-emoji-cell{align-items:center}
 .g-emoji-reactions{gap:var(--s-22);align-items:flex-start}
 .g-emoji-sizes{align-items:flex-end;gap:var(--s-12)}
-.g-persona-half{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--s-8)}

@@ -1,12 +1,12 @@
-//! What the lock prompt's persona is doing (design/04-COMPONENTS.md section 42;
-//! design/24-PERSONA.md section 4), read from the prompt's own state so the shell sets no mood:
+//! What the lock prompt's picture is doing (design/04-COMPONENTS.md section 42;
+//! design/25-EMOJI.md section 5), read from the prompt's own state so the shell sets no mood:
 //! attentive while the person types or the password is tried, a wince when it was wrong, happy
 //! once it was accepted, idle otherwise; and a [`WakeStamp`] that any key or pointer activity in
-//! the prompt advances, so the persona rests again 20 s after the last of it.
+//! the prompt advances, so an emoji rests again 20 s after the last of it.
 
 use crate::components::lock_vocab::PromptState;
-use crate::components::persona::{Mood, WakeStamp};
 use crate::components::secret_entry::Filled;
+use crate::components::user_picture::{Mood, WakeStamp};
 use crate::components::vocab::PulsePhase;
 use dioxus::prelude::*;
 use std::time::{Duration, Instant};
@@ -20,7 +20,7 @@ pub(crate) enum Caret {
     Out,
 }
 
-/// The persona's mood for a prompt in `state` whose field holds `filled` with the caret `caret`,
+/// The picture's mood for a prompt in `state` whose field holds `filled` with the caret `caret`,
 /// its shake at `shake`. A wrong password winces through the shake and while the field is
 /// empty after it; typing again turns it attentive, so the next wrong winces once more (a
 /// wince does not escalate).
@@ -42,7 +42,7 @@ pub(crate) fn prompt_mood(
 }
 
 /// The finest a stream of activity (a moving pointer, held keys) advances the stamp: each
-/// advance replays the persona's breath from its start, so a stream wakes it once a second at
+/// advance restarts an emoji's awake window, so a stream wakes it once a second at
 /// most, and it rests between 19 and 20 s after the last of it.
 const GRAIN: Duration = Duration::from_secs(1);
 
@@ -70,7 +70,7 @@ impl Stir {
         }
     }
 
-    /// The stamp the persona takes: the prompt's own, moved on by the caller's `outside` one,
+    /// The stamp the picture takes: the prompt's own, moved on by the caller's `outside` one,
     /// so a change in either wakes it.
     pub(crate) fn stamp(self, outside: Option<WakeStamp>) -> WakeStamp {
         let own = (self.stamp)();
@@ -90,8 +90,8 @@ pub(crate) fn use_stir() -> Stir {
 mod tests {
     use super::{Caret, prompt_mood};
     use crate::components::lock_vocab::PromptState;
-    use crate::components::persona::Mood;
     use crate::components::secret_entry::Filled;
+    use crate::components::user_picture::Mood;
     use crate::components::vocab::PulsePhase;
 
     #[test]

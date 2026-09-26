@@ -34,7 +34,6 @@ pub mod overlays_mailo5;
 pub mod overlays_notifications;
 pub mod overlays_sheet;
 pub mod overlays_shot;
-pub mod persona;
 pub mod pills;
 pub mod plate_tints;
 pub mod polish;

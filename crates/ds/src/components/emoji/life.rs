@@ -1,14 +1,14 @@
 //! Playing a [`script`](super::script) (design/25-EMOJI.md section 5). A wake (mounting, a new
 //! [`WakeStamp`], a new mood, a new pick) cancels the running script and starts the next; the
 //! task that plays it ends on a rest frame, so once the awake window has closed nothing is
-//! scheduled and nothing is painted (the idle-frame rule). The same machinery as the
-//! persona's blink timer: a task owned by the component's scope, dropped with it.
+//! scheduled and nothing is painted (the idle-frame rule). A task owned by the component's
+//! scope, dropped with it.
 
 use super::disc::EmojiPlayback;
 use super::id::EmojiId;
 use super::script::{MoodChange, Playing, Shown, Step, resting, script};
 use crate::appearance::MotionLevel;
-use crate::components::persona::{Mood, WakeStamp};
+use crate::components::user_picture::{Mood, WakeStamp};
 use crate::root::env::{Env, use_env_signal};
 use crate::task::{spawn_in, try_get, try_set};
 use crate::time::sleep;
@@ -40,8 +40,8 @@ pub(crate) fn use_frames(
         env: use_env_signal(),
         scope: use_hook(current_scope_id),
     };
-    // As the persona: the last wake seen lives in a plain value, not a signal written while
-    // rendering.
+    // The last wake seen lives in a plain value, not a signal written while rendering (as
+    // `use_bump_on`).
     let mut seen = use_hook(|| CopyValue::new(None::<Seen>));
     let before = *seen.peek();
     if before != Some((user, mood, wake, playback)) {

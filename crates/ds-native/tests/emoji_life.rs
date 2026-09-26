@@ -1,12 +1,14 @@
 //! design/25-EMOJI.md section 5 on a real Blitz document: an animated emoji's frame advances
 //! while it is awake and, 21 s after the wake, rests on frame 0 with nothing scheduled or
-//! painting (the idle-frame rule); a wince shows the wrong-password emoji, then the user's
-//! own again; under Reduced motion, or with `EmojiPlayback::Still`, the frame never leaves 0.
+//! painting (the idle-frame rule); idle rests between its loops; a wince shows the
+//! wrong-password emoji, then the user's own again; as a `UserPortrait` each mood shows its
+//! emoji and Happy plays the accept beat; under Reduced motion, or with `EmojiPlayback::Still`,
+//! the frame never leaves 0 and no beat plays.
 
 use dioxus::prelude::*;
 use ds::{
-    AnimatedEmoji, Appearance, Ds, EmojiId, EmojiPlayback, Material, Mood, Motion, PersonaSize,
-    Theme,
+    AnimatedEmoji, Appearance, Ds, EmojiId, EmojiPlayback, Material, Mood, Motion, PictureSize,
+    Theme, UserPicture, UserPortrait,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -22,10 +24,19 @@ static MOOD: GlobalSignal<Mood> = Signal::global(|| Mood::Idle);
 static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 
 #[allow(non_snake_case)]
+fn AttentiveStage() -> Element {
+    rsx! {
+        Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
+            AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood: Mood::Attentive }
+        }
+    }
+}
+
+#[allow(non_snake_case)]
 fn Stage() -> Element {
     rsx! {
         Ds { appearance: Appearance { theme: Theme::Light, motion: MOTION(), ..Appearance::default() }, material: Material::Window,
-            AnimatedEmoji { emoji: EmojiId::Wink, size: PersonaSize::Large, mood: MOOD() }
+            AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood: MOOD() }
         }
     }
 }
@@ -47,7 +58,8 @@ fn inked(image: &image::RgbaImage) -> usize {
 #[test]
 fn the_frame_advances_while_awake_and_rests_twenty_one_seconds_after_the_wake() {
     let woke = Instant::now();
-    let mut harness = Harness::new(Stage, VIEW);
+    // Attentive plays loop after loop, so it is still moving at 9 s.
+    let mut harness = Harness::new(AttentiveStage, VIEW);
     let first = frame(&harness);
     let before = harness.render().expect("render");
     let moved = settle_until(&mut harness, |h| frame(h) != first);
@@ -155,7 +167,7 @@ fn under_reduced_motion_only_still_frames_show() {
 fn StillStage() -> Element {
     rsx! {
         Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
-            AnimatedEmoji { emoji: EmojiId::Wink, size: PersonaSize::Medium, playback: EmojiPlayback::Still }
+            AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Medium, playback: EmojiPlayback::Still }
         }
     }
 }
@@ -172,4 +184,102 @@ fn a_still_picture_never_leaves_its_rest_frame() {
         );
     }
     assert!(!harness.is_animating());
+}
+
+/// Advance until `done` holds, for at most `bound` of wall clock; the instant it first held.
+fn within(harness: &mut Harness, bound: Duration, done: impl Fn(&Harness) -> bool) -> Instant {
+    let started = Instant::now();
+    while started.elapsed() < bound {
+        if done(harness) {
+            return Instant::now();
+        }
+        harness.advance(Duration::from_millis(10));
+    }
+    assert!(done(harness), "no state held within {bound:?}");
+    Instant::now()
+}
+
+fn moving(harness: &Harness) -> bool {
+    frame(harness).as_deref() != Some("0")
+}
+
+/// Idle is slow: one loop, then the rest frame for 4 s, then the next loop.
+#[test]
+fn idle_rests_between_its_loops() {
+    let mut harness = Harness::new(Stage, VIEW);
+    settle_until(&mut harness, moving);
+    let ended = settle_until(&mut harness, |h| !moving(h));
+    let again = within(&mut harness, Duration::from_secs(10), moving);
+    let rest = again.duration_since(ended);
+    assert!(
+        rest >= Duration::from_millis(3800),
+        "the next loop began after only {rest:?}"
+    );
+}
+
+static PICTURE_MOOD: GlobalSignal<Mood> = Signal::global(|| Mood::Idle);
+
+#[allow(non_snake_case)]
+fn PortraitStage() -> Element {
+    rsx! {
+        Ds { appearance: Appearance { theme: Theme::Light, motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+            UserPortrait { picture: UserPicture::Emoji(EmojiId::Wink), size: PictureSize::Medium, mood: PICTURE_MOOD() }
+        }
+    }
+}
+
+fn accepting(harness: &Harness) -> bool {
+    harness.has_class(".ds-user-picture", "a-picture-accept")
+}
+
+/// The mapping as a user picture: each mood's change swaps in its emoji (the eyes, the
+/// confounded face, the partying face) and the sleeping face holds still; Happy also lifts the
+/// whole picture once. 21 s after the last wake, it is at rest and asks for no frame.
+#[test]
+fn as_a_user_picture_each_mood_shows_its_emoji() {
+    let mut harness = Harness::new(PortraitStage, VIEW);
+    assert_eq!(face(&harness).as_deref(), Some("wink"));
+    assert!(!accepting(&harness));
+    let rows = [
+        (Mood::Attentive, "eyes"),
+        (Mood::Wince, "confounded"),
+        (Mood::Happy, "partying"),
+    ];
+    for (mood, swapped) in rows {
+        harness.within(|| *PICTURE_MOOD.write() = mood);
+        settle_until(&mut harness, |h| face(h).as_deref() == Some(swapped));
+        if mood == Mood::Happy {
+            assert!(accepting(&harness), "Happy lifts: {}", harness.html());
+        }
+        settle_until(&mut harness, |h| face(h).as_deref() == Some("wink"));
+    }
+    assert!(!accepting(&harness), "the beat is at rest after it plays");
+    harness.within(|| *PICTURE_MOOD.write() = Mood::Asleep);
+    settle_until(&mut harness, |h| face(h).as_deref() == Some("sleeping"));
+    for _ in 0..10 {
+        harness.advance(Duration::from_millis(100));
+        assert_eq!(frame(&harness).as_deref(), Some("0"), "asleep moved");
+    }
+    // Back to idle, then 21 s later at rest with nothing asked for.
+    harness.within(|| *PICTURE_MOOD.write() = Mood::Idle);
+    let woke = Instant::now();
+    harness.advance(Duration::from_secs(21).saturating_sub(woke.elapsed()));
+    assert_eq!(frame(&harness).as_deref(), Some("0"), "not at rest at 21 s");
+    assert_eq!(face(&harness).as_deref(), Some("wink"));
+    assert!(!harness.is_animating(), "asks for frames at rest");
+}
+
+/// Under Reduced motion a picture's accept beat is not played, and its frames stay still.
+#[test]
+fn under_reduced_motion_the_accept_beat_does_not_play() {
+    let mut harness = Harness::new(PortraitStage, VIEW);
+    harness.within(|| *MOTION.write() = Motion::Reduced);
+    harness.advance(Duration::from_millis(100));
+    harness.within(|| *PICTURE_MOOD.write() = Mood::Happy);
+    settle_until(&mut harness, |h| face(h).as_deref() == Some("partying"));
+    for _ in 0..10 {
+        harness.advance(Duration::from_millis(50));
+        assert!(!accepting(&harness), "a beat under Reduced");
+        assert_eq!(frame(&harness).as_deref(), Some("0"));
+    }
 }
