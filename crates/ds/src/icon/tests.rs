@@ -223,3 +223,31 @@ fn switches_is_two_tracks_with_knobs_at_opposite_ends() {
     assert!(Icon::SHELL.contains(&Icon::Switches));
     assert_eq!(Icon::SHELL.last(), Some(&Icon::Switches));
 }
+
+/// The launcher's provider glyphs as Lucide 1.47.0 publishes them (sill Q296): `clipboard` is a
+/// clip over a board, `smile` a face of three paths in a circle, `globe` a circle, a meridian
+/// and the equator; all three in the actions set.
+#[test]
+fn the_launcher_glyphs_are_lucides() {
+    assert_eq!(
+        Icon::Clipboard.shapes().first(),
+        Some(&Shape::Rect {
+            x: "8",
+            y: "2",
+            width: "8",
+            height: "4",
+            rx: "1"
+        })
+    );
+    assert_eq!(
+        Icon::Smile.shapes().get(1),
+        Some(&Shape::Path("M16.472 15a6 6 0 01-8.943 0"))
+    );
+    assert_eq!(Icon::Globe.shapes().last(), Some(&Shape::Path("M2 12h20")));
+    for icon in [Icon::Clipboard, Icon::Smile, Icon::Globe] {
+        assert!(
+            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
+            "{icon:?}"
+        );
+    }
+}
