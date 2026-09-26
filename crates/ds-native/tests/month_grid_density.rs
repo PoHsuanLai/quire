@@ -1,7 +1,8 @@
 //! The compact MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39; sill
 //! Q190): at `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week month with
 //! its step buttons lies wholly inside the frame's content box (164 less 12 padding a side,
-//! 140 x 140, the widgets' measured inset, design/23 section 1.1), where the regular grid (224 x 254) did not. A layout, not a timing, so one look.
+//! 140 x 140, the widgets' measured inset, design/23 section 1.1), where the regular grid (224 x 254) did not; today's disc is round
+//! and roomy enough for two digits (Q361). A layout, not a timing, so one look.
 
 #[path = "../../ds/tests/support/month_sample.rs"]
 mod month_sample;
@@ -12,7 +13,7 @@ use ds::{
     WidgetMetrics, WidgetSize,
 };
 use ds_native::{Harness, Viewport};
-use month_sample::{AUGUST, First, sample};
+use month_sample::{AUGUST, First, SEPTEMBER, sample};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -97,7 +98,55 @@ fn the_compact_grid_fits_a_small_widget() {
     let tall = last.origin.y.0 + last.size.height.0 - header.origin.y.0;
     assert_eq!(
         (heads.size.width.0, tall),
-        (126.0, 132.0),
+        (140.0, 138.0),
         "the measured compact size"
+    );
+    // The last week's discs overhang their row by a pixel, still inside the frame.
+    let foot = rect(&harness, ".ds-month-weeks > :last-child .ds-month-num");
+    assert!(
+        within(foot, body),
+        "the last week's disc {foot:?} inside {body:?}"
+    );
+}
+
+/// The same widget on September, whose today (the 26th) is two digits.
+#[allow(non_snake_case)]
+fn SmallSeptember() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+            div { style: WidgetMetrics::default().style_attr(),
+                WidgetFrame { size: WidgetSize::Small,
+                    MonthGrid { data: sample(SEPTEMBER, First::Monday), onstep: move |_: Step| {} }
+                }
+            }
+        }
+    }
+}
+
+/// Q361: the 16 px disc left two tabular digits (about 12 px at 700) touching its rim. Today's
+/// disc is a circle twice the number's size (`--fs-caption` 10), so two digits keep about 4 px
+/// a side, as the regular grid's 24 px disc does round its 11.5 px number.
+#[test]
+fn todays_compact_disc_is_a_circle_twice_its_number() {
+    let mut harness = Harness::new(SmallSeptember, VIEW);
+    harness.advance(Duration::from_millis(50));
+    assert_eq!(
+        harness
+            .text_of(".ds-month-day[*|aria-current=date] .ds-month-num")
+            .as_deref(),
+        Some("26"),
+        "today is two digits"
+    );
+    let disc = rect(&harness, ".ds-month-day[*|aria-current=date] .ds-month-num");
+    assert_eq!(
+        (disc.size.width.0, disc.size.height.0),
+        (20.0, 20.0),
+        "twice --fs-caption, round"
+    );
+    let cell = rect(&harness, ".ds-month-day[*|aria-current=date]");
+    assert!(
+        disc.origin.x.0 >= cell.origin.x.0 - 0.01
+            && disc.origin.x.0 + disc.size.width.0 <= cell.origin.x.0 + cell.size.width.0 + 0.01,
+        "the disc {disc:?} stays inside its column {cell:?}"
     );
 }

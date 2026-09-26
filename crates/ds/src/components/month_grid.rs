@@ -6,7 +6,7 @@
 //! day's dot. A change of month slides the weeks in once (`month_grid_weeks`).
 //!
 //! Two densities (sill Q190): the regular grid, and a compact one that fits a small desktop
-//! widget's 132 x 132 content box, which the regular grid (224 x 254 for six weeks) overflows.
+//! widget's 140 x 140 content box, which the regular grid (224 x 254 for six weeks) overflows.
 //! `MonthDensity::Auto` picks between them by the enclosing `WidgetFrame`.
 
 use crate::components::month_grid_data::{DayKey, MonthGridData, MonthKey, Step, WeekNumbers};
@@ -28,10 +28,11 @@ use dioxus::prelude::*;
 ///
 /// `density` (`Auto`) is written as `data-density`: `Auto` draws compact inside a
 /// `WidgetFrame { size: Small }` and regular inside a Medium or Large one or outside any frame;
-/// `Regular` and `Compact` force it. The compact grid is seven 18 px columns of 18 px rows, a
-/// 14 px header of `--fs-micro` title and 14 px glyph buttons, 10 px heads, today on a 16 px
-/// disc and a 3 px dot: 126 x 132 for a six-week month, measured on Blitz (the
-/// `month_grid_density` harness test), inside the small frame's 132 x 132. It never draws
+/// `Regular` and `Compact` force it. The compact grid is seven 20 px columns of 19 px rows, a
+/// 14 px header of `--fs-micro` title and 14 px glyph buttons, 10 px heads, today on a 20 px
+/// disc (twice `--fs-caption`, sill Q361) and a 3 px dot: 140 x 138 for a six-week month,
+/// measured on Blitz (the `month_grid_density` harness test), inside the small frame's
+/// 140 x 140. It never draws
 /// week numbers, whatever `weeks` says: a week column would not fit.
 #[component]
 pub fn MonthGrid(
