@@ -1,11 +1,11 @@
 //! PolkitPrompt: a program asks for the person's password (design/20-SURFACES.md section 1.10;
 //! design/04-COMPONENTS.md section 42). A narrow centred `Sheet` over a modal scrim, entering
-//! with `peek-in`: the person's avatar, a bold title, the program's message, "Details" as a hover
+//! with `peek-in`: the person's picture, a bold title, the program's message, "Details" as a hover
 //! card, the password in a boxed `Secret` field that shakes once when it was wrong, then Cancel
 //! and Authenticate.
 
-use crate::components::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::button::{Button, ButtonVariant};
+use crate::components::lock_picture::{AT_POLKIT, Liveliness, prompt_picture};
 use crate::components::lock_vocab::{CapsLock, LockUser, PromptState};
 use crate::components::scrim_strength::ScrimStrength;
 use crate::components::secret_entry::{SecretEntry, use_secret_entry};
@@ -45,10 +45,6 @@ pub fn PolkitPrompt(
 ) -> Element {
     let entry = use_secret_entry(&state, oninput);
     let availability = state.availability();
-    let avatar = AvatarFace {
-        size: AvatarSize::Size48,
-        ..user.avatar
-    };
     let go = move || {
         if availability == Availability::Enabled {
             entry.submit(onsubmit);
@@ -68,7 +64,7 @@ pub fn PolkitPrompt(
             scrim: ScrimStrength::Modal,
             width: SheetWidth::Narrow,
             div { class: "ds-polkit", "data-state": state.slug(),
-                {face(avatar)}
+                {prompt_picture(user.picture, AT_POLKIT, Liveliness::default())}
                 div { class: "ds-polkit-title", {title.unwrap_or_else(|| AUTHENTICATE.to_owned())} }
                 div { class: "ds-polkit-action", {text(&action)} }
                 if let Some(detail) = detail {

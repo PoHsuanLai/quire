@@ -137,8 +137,8 @@ pub const REGISTRY: [Entry; 18] = [
     Entry {
         page: Page::LockSwitcher,
         title: "Lock and switcher",
-        lede: "The shell's own lock screen over the calm wallpaper (at rest, a wrong password mid-shake, checking in the Space's colour), the polkit prompt's sheet, and the app switcher with five and fourteen apps, shrunk and scrolled.",
-        height: 3150,
+        lede: "The shell's own lock screen over the calm wallpaper (at rest, a wrong password mid-shake, checking in the Space's colour), the three kinds of picture the prompt takes (a face, a photo, a persona), the polkit prompt's sheet, and the app switcher with five and fourteen apps, shrunk and scrolled.",
+        height: 3500,
         body: pages::lock_switcher::LockSwitcherPage,
     },
     Entry {

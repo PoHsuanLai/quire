@@ -154,8 +154,14 @@ runs and no transition applies, so a mood changes at once and nothing blinks or 
   `--t-awake` 20 s and `--t-drift` 2400 ms (design/05 section 4.11).
 - Gallery page **Persona** (`--page persona`) and `ds-gallery --persona-frames DIR` (eight
   frames through each mood's motion, taken through a `Harness`).
-- The lock prompt (a separate branch) takes `LockUser { avatar: AvatarFace }` today; switching
-  it to `UserPicture` and `UserPortrait` is its follow-up. Nothing in the lock files changed here.
+- The lock and polkit prompts take `LockUser { name, picture: UserPicture }` (2026-09-26, Q243).
+  `UserPicture` gained `Photo(ImageSource)` (the user's `~/.face` or AccountsService icon,
+  cropped round with `object-fit: cover` at the face's size) and `From` for all three kinds.
+  The lock prompt drives the mood itself (design/04 section 42): typing and checking are
+  Attentive, `PromptState::Wrong` is Wince (once per wrong), the new `PromptState::Accepted` is
+  Happy, otherwise Idle; key and pointer activity in the prompt advance the wake stamp (at most
+  once a second), and `LockPrompt { wake }` adds the caller's. Files: `lock_mood.rs`,
+  `lock_picture.rs`; tested in `ds-native/tests/lock_switcher.rs` and the lock SSR goldens.
 
 ## 7. Open decisions
 
@@ -164,5 +170,5 @@ runs and no transition applies, so a mood changes at once and nothing blinks or 
    shows the persona or the letter; not in design/22 yet.
 3. **Escalation**: the reference escalates its annoyance; ours winces the same every time
    (principle 6). Confirm.
-4. **Wake sources on the lock screen**: pointer movement and key presses are assumed; the lock
-   screen owner decides.
+4. **Wake sources on the lock screen**: keys, pointer moves and presses inside the prompt wake it
+   (built); the shell adds its own (a display waking) through `LockPrompt { wake }`.

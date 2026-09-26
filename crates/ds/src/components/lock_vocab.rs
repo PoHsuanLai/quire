@@ -2,7 +2,7 @@
 //! (design/20-SURFACES.md sections 1.9 and 1.10; design/04-COMPONENTS.md section 42): whose it
 //! is, how the asking is going, whether caps lock is on, and where the Space's colour reaches.
 
-use crate::components::avatar::AvatarFace;
+use crate::components::persona::UserPicture;
 use crate::components::vocab::Availability;
 
 /// Where the current Space's colour reaches on the lock screen. The reference lock screen is
@@ -29,7 +29,8 @@ impl LockLook {
 }
 
 /// How the asking is going. The caller moves it: `Checking` while the password is tried,
-/// `Wrong` when it failed (the field shakes once and clears), `LockedOut` after too many tries.
+/// `Wrong` when it failed (the field shakes once and clears), `LockedOut` after too many tries,
+/// `Accepted` once it was right (a persona plays Happy before the host unlocks).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub enum PromptState {
     /// Waiting for a password.
@@ -45,6 +46,9 @@ pub enum PromptState {
         /// When it opens again, as the caller writes the time.
         until: String,
     },
+    /// It was right: the field stays closed while the lock screen goes away. A persona plays
+    /// Happy (one hop, `settle(Anim::PersonaHop)`); unlock the session at that settle.
+    Accepted,
 }
 
 impl PromptState {
@@ -55,6 +59,7 @@ impl PromptState {
             PromptState::Checking => "checking",
             PromptState::Wrong => "wrong",
             PromptState::LockedOut { .. } => "locked-out",
+            PromptState::Accepted => "accepted",
         }
     }
 
@@ -62,7 +67,9 @@ impl PromptState {
     pub(crate) fn availability(&self) -> Availability {
         match self {
             PromptState::Idle | PromptState::Wrong => Availability::Enabled,
-            PromptState::Checking | PromptState::LockedOut { .. } => Availability::Disabled,
+            PromptState::Checking | PromptState::LockedOut { .. } | PromptState::Accepted => {
+                Availability::Disabled
+            }
         }
     }
 
@@ -87,9 +94,20 @@ pub enum CapsLock {
 pub struct LockUser {
     /// Their name, as the session shows it.
     pub name: String,
-    /// Their avatar; the prompt draws it at its own size (64 at the lock screen, 48 in a
-    /// polkit prompt), whatever size it carries.
-    pub avatar: AvatarFace,
+    /// Their picture: a letter disc, their photo or their persona. The prompt draws it at its
+    /// own size (64 at the lock screen, 48 in a polkit prompt), whatever size a face carries.
+    pub picture: UserPicture,
+}
+
+impl LockUser {
+    /// The person called `name`, shown by `picture`: an `AvatarFace`, an `ImageSource` (their
+    /// photo) or a `PersonaSpec`.
+    pub fn new(name: impl Into<String>, picture: impl Into<UserPicture>) -> Self {
+        LockUser {
+            name: name.into(),
+            picture: picture.into(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -110,6 +128,7 @@ mod tests {
                 Availability::Disabled,
                 "locked-out",
             ),
+            (PromptState::Accepted, Availability::Disabled, "accepted"),
         ];
         for (state, availability, slug) in cases {
             assert_eq!(state.availability(), availability, "{state:?}");

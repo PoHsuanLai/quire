@@ -154,6 +154,7 @@
 .g-lock-size{width:1216px;height:760px}
 .g-lock-mini{width:596px;height:372px;border-radius:var(--r-panel);overflow:hidden}
 .g-lock-mini .g-lock-stage{transform:scale(.49);transform-origin:0 0}
+.g-lock-picture{width:380px;padding:var(--s-26) 0;border-radius:var(--r-panel);overflow:hidden;background-size:cover;background-position:center}
 .g-shake-pose{transform:translateX(-6px)}
 .g-polkit{width:588px;background-size:cover;background-position:center}
 .g-polkit-stage{height:540px}
