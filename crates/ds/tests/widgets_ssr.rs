@@ -12,9 +12,9 @@ mod golden;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
-    Appearance, BatteryLevel, CardTint, ClockFace, ClockLook, ClockTime, DayPhase, Ds, Fraction,
-    Glyph, Icon, IconSize, Inject, Material, RingMark, RootChrome, Seconds, Theme, WidgetFrame,
-    WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle,
+    Appearance, BatteryFigure, BatteryLevel, CardTint, ClockFace, ClockLook, ClockTime, DayPhase,
+    Ds, Fraction, Glyph, Icon, IconSize, Inject, Material, Motion, RingMark, RootChrome, Seconds,
+    Theme, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle,
 };
 
 #[derive(Props, Clone)]
@@ -43,6 +43,16 @@ fn render(make: fn() -> Element) -> String {
 fn desktop(theme: Theme, body: Element) -> Element {
     rsx! {
         Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent), stylesheet: Inject::Host,
+            div { style: WidgetMetrics::default().style_attr(), {body} }
+        }
+    }
+}
+
+/// `body` on the desktop under Reduced motion: a battery ring draws its level on its first
+/// frame instead of sweeping to it, so its golden is the ring at rest.
+fn settled(theme: Theme, body: Element) -> Element {
+    rsx! {
+        Ds { appearance: Appearance { theme, motion: Motion::Reduced, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent), stylesheet: Inject::Host,
             div { style: WidgetMetrics::default().style_attr(), {body} }
         }
     }
@@ -142,25 +152,25 @@ const CASES: &[Case] = &[
         )
     }),
     ("battery-8", || {
-        desktop(
+        settled(
             Theme::Light,
             rsx! { BatteryLevel { level: Fraction(80), label: "Mouse" } },
         )
     }),
     ("battery-45", || {
-        desktop(
+        settled(
             Theme::Light,
             rsx! { BatteryLevel { level: Fraction(450), label: "Headphones", Glyph { icon: Icon::Headphones, size: IconSize::Base } } },
         )
     }),
     ("battery-100", || {
-        desktop(
+        settled(
             Theme::Dark,
             rsx! { BatteryLevel { level: Fraction(1000), label: "Keyboard" } },
         )
     }),
     ("battery-charging-15", || {
-        desktop(
+        settled(
             Theme::Light,
             rsx! { BatteryLevel { level: Fraction(150), mark: RingMark::Charging, label: "This computer" } },
         )
@@ -340,4 +350,26 @@ fn the_battery_draws_its_level_and_tone() {
         "the track leaves the bolt's gap: {charging}"
     );
     assert!(!html("battery-45").contains("ds-battery-bolt"));
+}
+
+/// At full motion a ring's first frame is the start of its fill: no arc and no bolt yet, but
+/// the true level to assistive technology and the low red already chosen from it.
+#[test]
+fn a_battery_first_draws_empty_and_true() {
+    let first = render(|| {
+        desktop(
+            Theme::Light,
+            rsx! {
+                BatteryLevel { level: Fraction(80), label: "Mouse" }
+                BatteryLevel { level: Fraction(150), mark: RingMark::Charging, label: "This computer" }
+                BatteryFigure { level: Fraction(930) }
+            },
+        )
+    });
+    assert!(!first.contains("ds-battery-arc"), "{first}");
+    assert!(!first.contains("ds-battery-bolt"), "{first}");
+    assert!(first.contains("aria-valuenow=\"8\""), "{first}");
+    assert!(first.contains("aria-valuenow=\"15\""), "{first}");
+    assert!(first.contains("data-tone=\"critical\""), "{first}");
+    assert!(first.contains(">0%<"), "the figure counts from 0: {first}");
 }

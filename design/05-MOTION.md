@@ -186,6 +186,8 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | HealStep | 18ms per row | Rust-only (and CSS delay) | heal ripple | S:330 |
 | SentHold | 1600ms | Rust-only | send pill after "Sent" | S:2342 |
 | `FRAME_SLACK` | 34ms | Rust-only | added to every `settle()` | plan, `time.rs` |
+| `--t-fill` | 800ms | Rust-driven (no keyframe) | a battery ring's fill and its counting figure (4.12) | design/23 section 1.1 |
+| `FRAME_TICK` | 16ms | Rust-only | the sampling rate of a motion driven from Rust (`use_level_run`), not a design duration | `time.rs` |
 
 `--tilt` has no Reduced/Calm meaning beyond 0deg; the drag ghost simply does not tilt.
 
@@ -664,6 +666,20 @@ change) as finite plays, never `infinite`, and then the persona rests and paints
 idle-frame rule wins; tested in `ds-native/tests/persona_life.rs` with
 `Harness::is_animating`). The gaps are a fixed sequence from the spec's stored seed, so the
 same persona behaves the same after every wake. Under Reduced nothing is fired at all.
+
+### 4.12 Added by quire (battery fill, 2026-09-26)
+
+No keyframe: a battery ring's arc is an SVG path, which Blitz's stylesheet cannot animate, so
+the fill is driven from Rust (`ds::use_level_run`, as the persona drives its parts). On mount and on
+each new `WakeStamp` the arc sweeps from empty to the level over `--t-fill` (800 ms, a new token)
+at `--e-out`; on a new level, from the level drawn last. The path is recomputed on a 16 ms tick
+and written only when it changes; the task ends when the sweep and its tail are done, so a ring
+at rest re-renders nothing and paints 0 frames (tested in `ds-native/tests/battery_fill.rs`
+with `Harness::is_animating`). Its tail: a charging bolt fades in over `--t-quick`, linear,
+after an entrance fill. `BatteryFigure` counts the percentage in step. Under Reduced there is no
+sweep at all (not a 60 ms one): the first frame is the final state. This replaces the ring's
+`bump` on a new percentage (section 5 row 18 still applies to a figure a host wraps in
+`Bumped`).
 
 ## 5. Assignments
 

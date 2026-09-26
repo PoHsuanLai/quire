@@ -1,5 +1,7 @@
-//! sill Q182 on a real Blitz document: a widget's value bumps once when it changes, and is at
-//! rest again once the bump has settled. Nothing plays on mount and nothing loops.
+//! sill Q182 on a real Blitz document: a widget's text bumps once when it changes, and is at
+//! rest again once the bump has settled. Nothing plays on mount and nothing loops. The battery
+//! ring beside it no longer bumps: it sweeps to the new level (design/23 section 4.1,
+//! `battery_fill.rs`), wearing `data-pulse` while it moves.
 
 use dioxus::prelude::*;
 use ds::{
@@ -39,24 +41,31 @@ fn battery_bumping(harness: &Harness) -> bool {
     harness.has_class(".ds-battery", "a-bump")
 }
 
+fn battery_moving(harness: &Harness) -> bool {
+    harness.attr(".ds-battery", "data-pulse").is_some()
+}
+
 fn text_bumping(harness: &Harness) -> bool {
     harness.has_class(".ds-bumped", "a-bump")
 }
 
-/// One change: the battery and the text each bump, on the first alias, and both are at rest again
-/// no sooner than `settle(Bump)` after the change, and stay at rest.
+/// One change: the text bumps, on the first alias, while the ring sweeps (never bumping); both
+/// are at rest again, the text no sooner than `settle(Bump)` after the change, and stay at rest.
 #[test]
 fn a_change_bumps_once_and_settles() {
     let mut harness = Harness::new(Battery, VIEW);
-    harness.advance(Duration::from_millis(100));
-    assert!(!battery_bumping(&harness), "nothing bumps on mount");
+    settle_until(&mut harness, |h| !battery_moving(h));
     assert!(!text_bumping(&harness), "nothing bumps on mount");
 
     let changed = Instant::now();
     harness.click(harness.centre("#drain").expect("the drain button"));
-    settle_until(&mut harness, |h| battery_bumping(h) && text_bumping(h));
+    settle_until(&mut harness, |h| battery_moving(h) && text_bumping(h));
+    assert!(
+        !battery_bumping(&harness),
+        "the ring sweeps instead of bumping"
+    );
     assert_eq!(
-        harness.attr(".ds-battery", "data-pulse").as_deref(),
+        harness.attr(".ds-bumped", "data-pulse").as_deref(),
         Some("a")
     );
     assert_eq!(
@@ -65,7 +74,7 @@ fn a_change_bumps_once_and_settles() {
     );
 
     let settles = settle(Anim::Bump, MotionLevel::Standard, StaggerIndex::new(0));
-    let rested = settle_until(&mut harness, |h| !battery_bumping(h) && !text_bumping(h));
+    let rested = settle_until(&mut harness, |h| !battery_moving(h) && !text_bumping(h));
     assert!(
         rested.duration_since(changed) >= settles,
         "at rest only once the whole bump had run: {:?}",
@@ -75,27 +84,28 @@ fn a_change_bumps_once_and_settles() {
 
     // Nothing loops: a further settle's worth of time brings no second bump.
     harness.advance(settles);
-    assert!(!battery_bumping(&harness), "{}", harness.html());
+    assert!(!battery_moving(&harness), "{}", harness.html());
     assert!(!text_bumping(&harness), "{}", harness.html());
+    assert!(!harness.is_animating(), "a widget at rest asks for frames");
 }
 
-/// A second change bumps again, on the other alias, so the keyframe restarts.
+/// A second change bumps the text again, on the other alias, so the keyframe restarts.
 #[test]
 fn a_second_change_bumps_again_on_the_other_alias() {
     let mut harness = Harness::new(Battery, VIEW);
     harness.advance(Duration::from_millis(100));
     harness.click(harness.centre("#drain").expect("drain"));
-    settle_until(&mut harness, battery_bumping);
-    settle_until(&mut harness, |h| !battery_bumping(h));
+    settle_until(&mut harness, text_bumping);
+    settle_until(&mut harness, |h| !text_bumping(h));
     harness.click(harness.centre("#drain").expect("drain"));
-    settle_until(&mut harness, battery_bumping);
+    settle_until(&mut harness, text_bumping);
     assert_eq!(
-        harness.attr(".ds-battery", "data-pulse").as_deref(),
+        harness.attr(".ds-bumped", "data-pulse").as_deref(),
         Some("b")
     );
     assert_eq!(
         harness.attr(".ds-battery", "aria-valuenow").as_deref(),
         Some("60")
     );
-    settle_until(&mut harness, |h| !battery_bumping(h));
+    settle_until(&mut harness, |h| !text_bumping(h) && !battery_moving(h));
 }
