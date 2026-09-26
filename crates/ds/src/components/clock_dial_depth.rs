@@ -50,12 +50,13 @@ fn index(dial: DialLook, minute: u16) -> Option<Bar> {
     }
 }
 
-/// The dial's indices.
-pub(crate) fn ticks_svg(dial: DialLook) -> Element {
+/// The dial's indices, as `class`: `ds-clock-ticks` for the indices, `ds-clock-ticks-lit` for
+/// the light catching their lower edge (they are pressed into the face).
+pub(crate) fn ticks_svg(class: &'static str, dial: DialLook) -> Element {
     let bars = (0..60u16).filter_map(|minute| index(dial, minute).map(|bar| (minute, bar)));
     let dots = (0..12u16).filter(|hour| dial == DialLook::Sky && !hour.is_multiple_of(3));
     rsx! {
-        svg { class: "ds-clock-ticks", "data-ds-svg": "clock", view_box: "0 0 100 100", "aria-hidden": "true",
+        svg { class, "data-ds-svg": "clock", view_box: "0 0 100 100", "aria-hidden": "true",
             for (minute , bar) in bars {
                 line {
                     key: "m{minute}",

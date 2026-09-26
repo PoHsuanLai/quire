@@ -1,8 +1,8 @@
 //! The Widget looks page (design/23-WIDGETS.md): the candidate depth looks for the desktop
-//! widgets, each in a Small and a Medium `WidgetFrame` on the desktop over the wallpaper, in the
-//! page's scheme. The battery at three levels and charging, in each `BatteryLook`; the world
-//! clock by day and by night, in each `DialLook`; then the card's two finishes side by side.
-//! The first of each is what the widgets draw today, for comparison.
+//! widgets, each in a Small and a Medium `WidgetFrame` on the desktop over a calm wallpaper, in
+//! the page's scheme. The battery at three levels and charging, in each `BatteryLook`; the world
+//! clock by day and by night, in each `DialLook`, all on the lit card; then the card's two
+//! finishes one above the other. The first look of each is what the widgets draw today.
 
 use super::Section;
 use crate::axes::Axes;
@@ -11,7 +11,7 @@ use dioxus::prelude::*;
 use ds::{
     Appearance, BatteryLook, ClockFace, ClockLook, ClockTime, DayPhase, DialLook, Ds, Fraction,
     FrameFinish, Glyph, Icon, IconSize, Inject, LevelRing, Material, RingMark, RootChrome, Seconds,
-    WidgetFrame, WidgetMetrics, WidgetSize, WidgetTitle,
+    WidgetFrame, WidgetMetrics, WidgetSize, WidgetTitle, use_env,
 };
 
 /// One device on the battery widgets.
@@ -102,7 +102,7 @@ const CITIES: [City; 4] = [
 /// What each look is, for its caption.
 fn battery_note(look: BatteryLook) -> &'static str {
     match look {
-        BatteryLook::Ring => "Ring (today): a stroked ring on a faint track, on the plain card",
+        BatteryLook::Ring => "Ring (today): a stroked ring on a faint track",
         BatteryLook::Well => {
             "Well: the ring lies in a groove pressed into the plate, round a raised boss holding the glyph; the level is a glossy liquid; the bolt is a lit boss"
         }
@@ -114,9 +114,7 @@ fn battery_note(look: BatteryLook) -> &'static str {
 
 fn dial_note(dial: DialLook) -> &'static str {
     match dial {
-        DialLook::Paper => {
-            "Paper (today): a flat paper disc by day, ink by night, on the plain card"
-        }
+        DialLook::Paper => "Paper (today): a flat paper disc by day, ink by night",
         DialLook::Bezel => {
             "Bezel: a raised rim round a recessed sky face, a minute track, tapered hands over their shadow, a hub ringed in the accent"
         }
@@ -130,16 +128,6 @@ fn finish_note(finish: FrameFinish) -> &'static str {
     match finish {
         FrameFinish::Plain => "Plain (today): the Widget material's plate",
         FrameFinish::Lit => "Lit: the plate bevel, a sheen down the top and a shaded foot",
-    }
-}
-
-/// The card finish each candidate is shown on: the current look on the plain card, the new
-/// ones on the lit card.
-fn finish_for(current: bool) -> FrameFinish {
-    if current {
-        FrameFinish::Plain
-    } else {
-        FrameFinish::Lit
     }
 }
 
@@ -192,8 +180,9 @@ fn Wall(children: Element) -> Element {
         let axes = axes.read();
         (axes.theme, axes.accent, axes.motion, axes.blur)
     };
+    let scheme = use_env().scheme;
     rsx! {
-        div { class: "g-wall g-wl-wall", style: "background-image:url(\"{wallpaper::uri()}\")",
+        div { class: "g-wall g-wl-wall", style: "background-image:url(\"{wallpaper::calm_uri(scheme)}\")",
             Ds {
                 appearance: Appearance { theme, accent, motion },
                 material: Material::Widget,
@@ -231,7 +220,7 @@ fn Hero(number: &'static str, label: &'static str, children: Element) -> Element
 
 #[component]
 fn BatterySmall(look: BatteryLook) -> Element {
-    let finish = finish_for(look == BatteryLook::Ring);
+    let finish = FrameFinish::Lit;
     let title = Some(WidgetTitle::new(Icon::BatteryFull, "Battery"));
     rsx! {
         WidgetFrame { size: WidgetSize::Small, finish, title,
@@ -265,7 +254,7 @@ fn BatterySmall(look: BatteryLook) -> Element {
 
 #[component]
 fn BatteryMedium(look: BatteryLook) -> Element {
-    let finish = finish_for(look == BatteryLook::Ring);
+    let finish = FrameFinish::Lit;
     let title = Some(WidgetTitle::new(Icon::BatteryFull, "Batteries"));
     let percent = |device: Device| (device.level + 5) / 10;
     rsx! {
@@ -305,7 +294,7 @@ fn BatteryMedium(look: BatteryLook) -> Element {
 
 #[component]
 fn ClockSmall(dial: DialLook) -> Element {
-    let finish = finish_for(dial == DialLook::Paper);
+    let finish = FrameFinish::Lit;
     let [city, ..] = CITIES;
     rsx! {
         WidgetFrame { size: WidgetSize::Small, finish, title: Some(WidgetTitle::new(Icon::Clock, "Clock")),
@@ -319,7 +308,7 @@ fn ClockSmall(dial: DialLook) -> Element {
 
 #[component]
 fn ClockMedium(dial: DialLook) -> Element {
-    rsx! { ClockMediumIn { dial, finish: finish_for(dial == DialLook::Paper) } }
+    rsx! { ClockMediumIn { dial, finish: FrameFinish::Lit } }
 }
 
 #[component]

@@ -106,13 +106,13 @@ icons round three), no illustration: the depth is bevel, well and gloss, as the 
 | Cue | What it is | Value (proposed; tokens in 3.3) | Borrowed from |
 | --- | --- | --- | --- |
 | Plate | the widget card: the `Widget` material (tint, hairline, contact and ambient drop, 20 corner) | `03-COLOR.md` 17.2, 17.4 | the material |
-| Plate bevel (`Lit` finish) | a thin top highlight arc, brighter than the material's own, a soft sheen fading down the top third, and a soft shade band along the bottom inner edge | highlight `inset 0 1px 0` white .55 light / .14 dark; sheen white .22 → 0 over the top 42 %; bottom shade ink .06 / black .22 | icon plate bevel (08 2.9) |
-| Well | a gauge's bed, pressed into the plate: darker than the plate, shaded under its top edge, lit along its bottom edge | ink .08 fill light / black .28 dark; `inset 0 1px 3px` ink .22 / black .55 top shade; `inset 0 -1px 0` white .6 / .06 bottom light | icon `recessed` relief (08 2.9), the P2 "recessed" mounting |
-| Gloss | the level's fill catches the light: a lighter band on its top half and a 1 px specular line along its top | white .38 → 0 at 55 % over the tone; line white .5 | the pill's inner highlight (07 3.2, `--shadow-pill-inset`) |
-| Boss | a raised disc (the ring's centre, the bolt, the bezel): lit top, shaded foot, a contact shadow | `--widget-boss`: `inset 0 1px 0` white .9 / .12, `0 1px 2px` ink .18 / black .55, `0 2px 6px -2px` .22 / .5 | `--shadow-1` |
-| Bezel | a raised ring round a dial: the ring's gradient lit on top, dark below, then the face recessed inside it | rim light → rim dark at 180 deg | icon plate thickness (08 2.9) |
-| Sky face | the dial's ground by phase: a vertical gradient, deeper at the zenith, paler at the horizon | day `#d3e0ea` → `#fbfbf8`; night `#0d1320` → `#2a3446` | the W13 day/night faces, kept in our palette (slate 265 at low chroma) |
-| Hand shadow | each hand drawn twice: a copy offset 2 px down and 1 px right, ink at .22 by day, black at .5 by night | SVG attribute paint (spike S6), no filter (Blitz paints none) | the icons' "seat" (08 2.9) |
+| Plate bevel (`Lit` finish) | a warmer, brighter wash; a bright top highlight line and a faint inner rim; a sheen fading down the top third; a shade rising from the foot over half the card (the icons' light from above); a contact edge and a deeper drop | `--widget-lift`, `--widget-sheen` over the top 34 %, `--widget-foot` up to 55 %, `--widget-bevel` (3.3) | icon plate bevel and matte diffusion (08 2.9) |
+| Well | a gauge's bed, pressed into the plate: darker than the plate, a two-stop shade under its top edge, light along its inner foot and a lit lip outside it | `--widget-well`, `--widget-well-shade` (3.3) | icon `recessed` relief (08 2.9), the P2 "recessed" mounting |
+| Gloss | the level's fill catches the light: a lighter band on its top half, a shaded foot, a specular line along its top | `--widget-gloss` to 0 at 52 %, `--widget-liquid-shade` up to 45 %, `--widget-spec` 1 px | the pill's inner highlight (07 3.2, `--shadow-pill-inset`) |
+| Boss | a raised disc or cap (the ring's centre, the bolt, the bezel, the cell's terminal): lit top, shaded foot, a contact shadow and a soft drop | `--widget-boss` (3.3) | `--shadow-1` |
+| Bezel | a raised ring round a dial: the rim's gradient lit on top and dark below, seated by `--widget-boss`, then the face recessed 5 px inside it | `--widget-rim-top` → `--widget-rim-bottom` | icon plate thickness (08 2.9) |
+| Sky face | the dial's ground by phase, across the whole face: deeper at the zenith, paler at the horizon, with a glass highlight fading down its top 42 % | day `#a9c8e2` → `#f7fafc`; night `#060a13` → `#2c3a54`; `--widget-glass` | the W13 day/night faces, kept in our palette (slate 265) |
+| Hand shadow | each hand drawn twice: a copy offset 3 px down and 1.5 px right, ink at .30 by day, black at .65 by night; indices pressed in, with a `--widget-spec` copy 1 px below each | SVG attribute paint (spike S6), no filter (Blitz paints none) | the icons' "seat" and emboss (08 2.9) |
 | Grain | the plate keeps the Space grain it already takes as a material | `03-COLOR.md` 8 | the frame |
 
 **Type.** The hero value (a battery's percentage, a small clock's time, the date face) is the
@@ -122,21 +122,33 @@ baseline-aligned. Labels (the device, the city, the zone offset) are the data fa
 (`--font-data`) at `--fs-nano`/`--fs-caption`, upper, tracked .08em, `--ink-soft`. The ratio
 hero : label is 34 : 10, above 3:1, the size juxtaposition C2 names.
 
-### 3.3 Tokens (proposed; all in `ds::tokens::WidgetPaint`, light / dark)
+### 3.3 Tokens (proposed; all in `ds::tokens::WidgetPaint`, light / dark; round two 2026-09-26)
 
 | Token | Light | Dark | Used by |
 | --- | --- | --- | --- |
-| `--widget-well` | `rgba(26,30,26,.08)` | `rgba(0,0,0,.28)` | wells (ring groove, cell bed) |
-| `--widget-well-shade` | `inset 0 1px 3px rgba(26,30,26,.22),inset 0 -1px 0 rgba(255,255,255,.6)` | `inset 0 1px 3px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.06)` | wells |
-| `--widget-gloss` | `rgba(255,255,255,.38)` | `rgba(255,255,255,.26)` | a fill's gloss band |
-| `--widget-spec` | `rgba(255,255,255,.55)` | `rgba(255,255,255,.35)` | a fill's specular line, the lit bolt's halo |
-| `--widget-sheen` | `rgba(255,255,255,.22)` | `rgba(255,255,255,.05)` | the `Lit` plate's top sheen |
-| `--widget-bevel` | `inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(26,30,26,.06)` | `inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.22)` | the `Lit` plate's highlight and foot |
-| `--widget-rim-top` / `--widget-rim-bottom` | `#ffffff` / `#c9cfc6` | `#4a5263` / `#10141c` | the bezel |
-| `--widget-sky-top` / `--widget-sky-bottom` | `#d3e0ea` / `#fbfbf8` | `#0d1320` / `#2a3446` | the sky face (the dial scope's scheme is its phase) |
-| `--widget-hand-shadow` | `rgba(26,30,26,.22)` | `rgba(0,0,0,.5)` | the hands' shadow copy, the liquid's seat, the sky dial's hairline |
-| `--widget-boss` | `inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(26,30,26,.18),0 2px 6px -2px rgba(26,30,26,.22)` | `inset 0 1px 0 rgba(255,255,255,.12),0 1px 2px rgba(0,0,0,.55),0 2px 6px -2px rgba(0,0,0,.5)` | bosses, the bezel |
+| `--widget-well` | `rgba(26,30,26,.10)` | `rgba(0,0,0,.34)` | wells (ring groove, cell bed) |
+| `--widget-well-shade` | `inset 0 2px 4px rgba(26,30,26,.30),inset 0 1px 1px rgba(26,30,26,.20),inset 0 -1px 0 rgba(255,255,255,.85),0 1px 0 rgba(255,255,255,.7)` | `inset 0 2px 5px rgba(0,0,0,.75),inset 0 1px 1px rgba(0,0,0,.5),inset 0 -1px 0 rgba(255,255,255,.10),0 1px 0 rgba(255,255,255,.08)` | wells, the dial face, the sky disc |
+| `--widget-gloss` | `rgba(255,255,255,.60)` | `rgba(255,255,255,.38)` | a fill's gloss band, the ring's gloss arc, the lit bolt, the nub |
+| `--widget-spec` | `rgba(255,255,255,.85)` | `rgba(255,255,255,.45)` | a fill's specular line, the light under pressed indices, the sky dial's lip |
+| `--widget-sheen` | `rgba(255,255,255,.55)` | `rgba(255,255,255,.09)` | the `Lit` plate's top sheen, a boss's face |
+| `--widget-bevel` | `inset 0 1px 0 rgba(255,255,255,.95),inset 0 0 0 1px rgba(255,255,255,.22),inset 0 -2px 3px -1px rgba(26,30,26,.14),0 1px 0 rgba(26,30,26,.10),0 12px 28px -12px rgba(26,30,26,.40)` | `inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.04),inset 0 -2px 3px -1px rgba(0,0,0,.45),0 14px 30px -12px rgba(0,0,0,.7)` | the `Lit` plate (1 px is `var(--hair)`) |
+| `--widget-lift` | `rgba(255,251,242,.30)` | `rgba(255,250,240,.035)` | the `Lit` plate's warmer, brighter wash |
+| `--widget-foot` | `rgba(26,30,26,.12)` | `rgba(0,0,0,.25)` | the `Lit` plate's shade from the foot; the cell bed's seat |
+| `--widget-rim-top` / `--widget-rim-bottom` | `#ffffff` / `#a9b2a6` | `#5a6376` / `#0a0d13` | the bezel |
+| `--widget-sky-top` / `--widget-sky-bottom` | `#a9c8e2` / `#f7fafc` | `#060a13` / `#2c3a54` | the sky face (the dial scope's scheme is its phase) |
+| `--widget-glass` | `rgba(255,255,255,.55)` | `rgba(255,255,255,.14)` | the glass highlight across a face's top |
+| `--widget-hand-shadow` | `rgba(26,30,26,.30)` | `rgba(0,0,0,.65)` | the hands' shadow copy, the liquid's seat, the hub's |
+| `--widget-liquid-shade` | `rgba(0,0,0,.18)` | `rgba(0,0,0,.30)` | a liquid's shaded foot |
+| `--widget-boss` | `inset 0 1px 0 #fff,inset 0 -1px 1px rgba(26,30,26,.08),0 1px 2px rgba(26,30,26,.25),0 4px 10px -3px rgba(26,30,26,.35)` | `inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 1px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.7),0 4px 10px -3px rgba(0,0,0,.7)` | bosses, the bolt, the bezel, the nub |
 | `--fs-widget-hero` | 34 px | same | the hero value |
+
+Round two (2026-09-26, after the first 1x sheet): the wells took a two-stop inset and a lit
+lip, so a ring sits in the plate; the boss a real drop; the `Lit` plate a warmer wash, a
+stronger sheen, a shade over the lower half, a contact edge and a deeper drop; the sky a
+dial-wide gradient strong enough to read at 72 px, and a glass highlight; the indices pressed
+in; the hand shadow twice as far; the cell's gloss and foot stronger, a seat hairline on the
+bed and a glossed terminal. Judged at 2x over a calm two-stop wallpaper
+(`ds-gallery --snapshot DIR --page widget-looks --scale 200`), never the test pattern.
 
 A dial is drawn in its phase's scheme (`04-COMPONENTS.md` section 40), so the dark column of a
 dial token is its night value on any desktop.
@@ -155,8 +167,8 @@ well, gloss and bevel stay; only the liquid changes hue.
 | Look | Drawing | Size |
 | --- | --- | --- |
 | `Ring` (current) | a 3.5-unit stroke on a .2 track; bolt on a paper disc | 52 |
-| `Well` (candidate) | the ring lies in a **groove**: a disc of `--widget-well` with `--widget-well-shade`, a raised **boss** in the middle (the plate's own tint, `--shadow-1`, lit top) holding the glyph, so the groove is the ring between them. The level arc (stroke 5 of 36, round caps) fills the groove in the tone, with a narrower `--widget-gloss` arc (stroke 1.6 at 1.07 of the radius) riding its outer half, so the liquid reads rounded. Charging: the bolt sits on a small boss at twelve, lit in the tone with a `--widget-spec` halo | 56 |
-| `Cell` (candidate) | a horizontal **cell**: a recessed capsule bed (`--widget-well`, `--widget-well-shade`, `--r-pill`) 3 px inset round a **liquid** capsule whose width is the level (min one height, so 1 % still reads as a bead), filled with the tone under a `--widget-gloss` band on its top half and a 1 px `--widget-spec` line; a terminal nub at the right, the well's colour. Charging: a bolt in the bed's middle, `--ink` on the plate's tint boss with a `--widget-spec` halo; the tone never goes low | fills its parent's width, 26 high (Small widget: full width) |
+| `Well` (candidate) | the ring lies in a **groove**: a disc of `--widget-well` with `--widget-well-shade`, a raised **boss** in the middle (`--raise` under `--widget-sheen`, `--widget-boss`, inset 19 %) holding the glyph, so the groove is the ring between them. The level arc (stroke 4.4 at .9 of the radius, round caps) is set into the groove in the tone, with a narrower `--widget-gloss` arc (stroke 1.5 at .96) riding its outer half, so the liquid reads rounded. Charging: the bolt sits on a small boss at twelve, filled with the tone under `--widget-gloss` | 60 |
+| `Cell` (candidate) | a horizontal **cell**: a recessed capsule bed (`--widget-well`, `--widget-well-shade`, `--r-pill`) 3 px inset round a **liquid** capsule whose width is the level (min one height, so 1 % still reads as a bead), filled with the tone under a `--widget-gloss` band on its top half and a 1 px `--widget-spec` line; a terminal nub at the right, a glossed `--ink-faint` cap with `--widget-boss`. Charging: a bolt in the bed's middle, `--ink` on a `--raise` boss; the tone never goes low | fills its parent's width, 28 high (Small widget: full width) |
 
 **Composition** (the shell composes, quire provides the parts):
 - **Small**: the title row ("Battery"); the hero percentage in the display face with `%` at
@@ -178,7 +190,7 @@ drawn in its phase's scheme.
 | Look | Face | Ticks | Hands |
 | --- | --- | --- | --- |
 | `Paper` (current) | flat `--paper` disc, `--shadow-1` | twelve, quarters heavier | ink bars, accent second |
-| `Bezel` (candidate) | a raised **bezel** 4 px wide (`--widget-rim-top` → `--widget-rim-bottom` down, a contact shadow under it) round a **recessed** face in the sky gradient (`--widget-sky-top` → `--widget-sky-bottom`) with `--widget-well-shade` under the bezel's inner edge | a 60-minute track (hairlines at .25) and twelve hour bars (quarters longer and heavier) | tapered: the hour and minute hands are round-capped bars that thicken from the hub (2 units) to 5 and 3.5 at their ends as two strokes; each drawn over its **shadow copy**; the hub a boss in the accent with a paper centre; the second hand in `--accent` with a counterweight |
+| `Bezel` (candidate) | a raised **bezel** 5 px wide (`--widget-rim-top` → `--widget-rim-bottom` down, a contact shadow under it) round a **recessed** face in the sky gradient (`--widget-sky-top` → `--widget-sky-bottom`) with `--widget-well-shade` under the bezel's inner edge | a 60-minute track (hairlines at .25) and twelve hour bars (quarters longer and heavier) | tapered: the hour and minute hands are round-capped bars that thicken from the hub (2 units) to 5 and 3.5 at their ends as two strokes; each drawn over its **shadow copy**; the hub a boss in the accent with a paper centre; the second hand in `--accent` with a counterweight |
 | `Sky` (candidate) | no bezel: the whole dial is a **well** in the plate, its ground the sky gradient, the well shade inside its edge, a hairline seat and a 1 px lit lip at its foot | twelve round **dots** (quarters as short bars), no minute track: calmer at 72 px | as `Bezel` |
 
 - **Day and night**: day is the sky's pale pair with ink hands; night the deep slate pair with
@@ -195,10 +207,13 @@ drawn in its phase's scheme.
 ### 4.3 The frame (`WidgetFrame`, `finish: FrameFinish`)
 
 `WidgetFrame` keeps every prop and gains `finish: FrameFinish::{Plain, Lit}` (default `Plain`,
-the current card; `data-finish=lit` otherwise). `Lit` adds the plate bevel (3.2): the
-`--widget-bevel` highlight and foot inside the material's own edge, and the `--widget-sheen` on
-the top of the card. It changes nothing on a `Tile` (the notification center's tiles sit on a
-Popover, which already carries the edge).
+the current card; `data-finish=lit` otherwise). `Lit` is the plate bevel (3.2): over the
+material's tint, `--widget-lift` (a warmer, brighter wash), `--widget-sheen` down the top 34 %
+and `--widget-foot` rising over the lower 55 %; inside the material's own edge and drop,
+`--widget-bevel` (the top highlight line, a faint inner rim, a soft inner foot shade, a contact
+edge and a deeper drop). The title row steps back to `--ink-faint` at 500 so the hero value
+leads. It changes nothing on a `Tile` (the notification center's tiles sit on a Popover, which
+already carries the edge).
 
 ## 5. Calendar widget (research and specification only; queued)
 

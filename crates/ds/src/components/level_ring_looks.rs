@@ -13,8 +13,8 @@ pub(super) fn well(dash: Option<String>, centre: Element) -> Element {
     rsx! {
         span { class: "ds-ring-well" }
         if let Some(dash) = dash {
-            {arc("ds-ring-arc", "4.2", dash.clone(), "rotate(-90 18 18)")}
-            {arc("ds-ring-gloss", "1.6", dash, "rotate(-90 18 18) translate(18 18) scale(1.07) translate(-18 -18)")}
+            {arc("ds-ring-arc", "4.4", dash.clone(), "rotate(-90 18 18) translate(18 18) scale(.9) translate(-18 -18)")}
+            {arc("ds-ring-gloss", "1.5", dash, "rotate(-90 18 18) translate(18 18) scale(.96) translate(-18 -18)")}
         }
         span { class: "ds-ring-boss" }
         span { class: "ds-ring-centre", {centre} }

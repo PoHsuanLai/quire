@@ -23,9 +23,15 @@
 .ds-bumped{ display:inline-block; }
 
 /* The lit finish (design/23-WIDGETS.md section 4.3; `data-finish=lit`): the plate's bevel, as
-   the app icon plate's (design/08 section 2.9): a brighter top highlight and a shaded foot inside
-   the material's own edge and drop, and a sheen down the card's top. The material's paint rule
-   is `.ds[data-material][data-chrome=transparent] .ds-widget[data-host=desktop]`; this one adds
-   an attribute, so it wins without reordering. */
+   the app icon plate's (design/08 section 2.9): a warmer, brighter wash over the material
+   (`--widget-lift`), a sheen down the top third (`--widget-sheen`), a shade rising from the foot over
+   half the card (`--widget-foot`, the icons' light from above), and inside the material's own edge and drop a bright top highlight line, a
+   faint inner rim, a soft inner shade at the bottom and a deeper drop (`--widget-bevel`). The title row steps
+   back to `--ink-faint`, 500, so the hero value leads. The material's paint rule is
+   `.ds[data-material][data-chrome=transparent] .ds-widget[data-host=desktop]`; this one adds an
+   attribute, so it wins without reordering. */
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-finish=lit]{
-  background-image:linear-gradient(var(--widget-sheen), transparent 42%); box-shadow:var(--widget-bevel), var(--m-box); }
+  background-image:linear-gradient(var(--widget-sheen), transparent 34%), linear-gradient(to top, var(--widget-foot), transparent 55%),
+    linear-gradient(var(--widget-lift), var(--widget-lift));
+  box-shadow:var(--widget-bevel), var(--m-box); }
+.ds-widget[*|data-finish=lit] .ds-widget-title{ font-weight:500; color:var(--ink-faint); }

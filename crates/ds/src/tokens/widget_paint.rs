@@ -21,6 +21,10 @@ pub enum WidgetPaint {
     Sheen,
     /// `--widget-bevel`: the lit plate's top highlight and foot.
     Bevel,
+    /// `--widget-lift`: the lit plate's warmer, brighter wash.
+    Lift,
+    /// `--widget-foot`: the lit plate's shade band along its foot.
+    Foot,
     /// `--widget-rim-top`: a dial bezel's lit top.
     RimTop,
     /// `--widget-rim-bottom`: a dial bezel's shaded foot.
@@ -29,26 +33,34 @@ pub enum WidgetPaint {
     SkyTop,
     /// `--widget-sky-bottom`: a sky face at the horizon.
     SkyBottom,
+    /// `--widget-glass`: the highlight across the top of a dial's face.
+    Glass,
     /// `--widget-hand-shadow`: the shadow copy under a clock's hands.
     HandShadow,
+    /// `--widget-liquid-shade`: the darker foot of a level's liquid.
+    LiquidShade,
     /// `--widget-boss`: a raised disc's lit top and seated foot.
     Boss,
 }
 
 impl WidgetPaint {
     /// Every widget paint, in stylesheet order.
-    pub const ALL: [WidgetPaint; 12] = [
+    pub const ALL: [WidgetPaint; 16] = [
         WidgetPaint::Well,
         WidgetPaint::WellShade,
         WidgetPaint::Gloss,
         WidgetPaint::Spec,
         WidgetPaint::Sheen,
         WidgetPaint::Bevel,
+        WidgetPaint::Lift,
+        WidgetPaint::Foot,
         WidgetPaint::RimTop,
         WidgetPaint::RimBottom,
         WidgetPaint::SkyTop,
         WidgetPaint::SkyBottom,
+        WidgetPaint::Glass,
         WidgetPaint::HandShadow,
+        WidgetPaint::LiquidShade,
         WidgetPaint::Boss,
     ];
 
@@ -61,11 +73,15 @@ impl WidgetPaint {
             WidgetPaint::Spec => "--widget-spec",
             WidgetPaint::Sheen => "--widget-sheen",
             WidgetPaint::Bevel => "--widget-bevel",
+            WidgetPaint::Lift => "--widget-lift",
+            WidgetPaint::Foot => "--widget-foot",
             WidgetPaint::RimTop => "--widget-rim-top",
             WidgetPaint::RimBottom => "--widget-rim-bottom",
             WidgetPaint::SkyTop => "--widget-sky-top",
             WidgetPaint::SkyBottom => "--widget-sky-bottom",
+            WidgetPaint::Glass => "--widget-glass",
             WidgetPaint::HandShadow => "--widget-hand-shadow",
+            WidgetPaint::LiquidShade => "--widget-liquid-shade",
             WidgetPaint::Boss => "--widget-boss",
         })
     }
@@ -74,41 +90,49 @@ impl WidgetPaint {
     pub fn css(self, scheme: Scheme) -> &'static str {
         let dark = scheme == Scheme::Dark;
         match self {
-            WidgetPaint::Well if dark => "rgba(0,0,0,.28)",
-            WidgetPaint::Well => "rgba(26,30,26,.08)",
+            WidgetPaint::Well if dark => "rgba(0,0,0,.34)",
+            WidgetPaint::Well => "rgba(26,30,26,.10)",
             WidgetPaint::WellShade if dark => {
-                "inset 0 1px 3px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.06)"
+                "inset 0 2px 5px rgba(0,0,0,.75),inset 0 1px 1px rgba(0,0,0,.5),inset 0 -1px 0 rgba(255,255,255,.10),0 1px 0 rgba(255,255,255,.08)"
             }
             WidgetPaint::WellShade => {
-                "inset 0 1px 3px rgba(26,30,26,.22),inset 0 -1px 0 rgba(255,255,255,.6)"
+                "inset 0 2px 4px rgba(26,30,26,.30),inset 0 1px 1px rgba(26,30,26,.20),inset 0 -1px 0 rgba(255,255,255,.85),0 1px 0 rgba(255,255,255,.7)"
             }
-            WidgetPaint::Gloss if dark => "rgba(255,255,255,.26)",
-            WidgetPaint::Gloss => "rgba(255,255,255,.38)",
-            WidgetPaint::Spec if dark => "rgba(255,255,255,.35)",
-            WidgetPaint::Spec => "rgba(255,255,255,.55)",
-            WidgetPaint::Sheen if dark => "rgba(255,255,255,.05)",
-            WidgetPaint::Sheen => "rgba(255,255,255,.22)",
+            WidgetPaint::Gloss if dark => "rgba(255,255,255,.38)",
+            WidgetPaint::Gloss => "rgba(255,255,255,.60)",
+            WidgetPaint::Spec if dark => "rgba(255,255,255,.45)",
+            WidgetPaint::Spec => "rgba(255,255,255,.85)",
+            WidgetPaint::Sheen if dark => "rgba(255,255,255,.09)",
+            WidgetPaint::Sheen => "rgba(255,255,255,.55)",
             WidgetPaint::Bevel if dark => {
-                "inset 0 var(--hair) 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.22)"
+                "inset 0 var(--hair) 0 rgba(255,255,255,.22),inset 0 0 0 var(--hair) rgba(255,255,255,.04),inset 0 -2px 3px -1px rgba(0,0,0,.45),0 14px 30px -12px rgba(0,0,0,.7)"
             }
             WidgetPaint::Bevel => {
-                "inset 0 var(--hair) 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(26,30,26,.06)"
+                "inset 0 var(--hair) 0 rgba(255,255,255,.95),inset 0 0 0 var(--hair) rgba(255,255,255,.22),inset 0 -2px 3px -1px rgba(26,30,26,.14),0 1px 0 rgba(26,30,26,.10),0 12px 28px -12px rgba(26,30,26,.40)"
             }
-            WidgetPaint::RimTop if dark => "#4a5263",
+            WidgetPaint::Lift if dark => "rgba(255,250,240,.035)",
+            WidgetPaint::Lift => "rgba(255,251,242,.30)",
+            WidgetPaint::Foot if dark => "rgba(0,0,0,.25)",
+            WidgetPaint::Foot => "rgba(26,30,26,.12)",
+            WidgetPaint::RimTop if dark => "#5a6376",
             WidgetPaint::RimTop => "#ffffff",
-            WidgetPaint::RimBottom if dark => "#10141c",
-            WidgetPaint::RimBottom => "#c9cfc6",
-            WidgetPaint::SkyTop if dark => "#0d1320",
-            WidgetPaint::SkyTop => "#d3e0ea",
-            WidgetPaint::SkyBottom if dark => "#2a3446",
-            WidgetPaint::SkyBottom => "#fbfbf8",
-            WidgetPaint::HandShadow if dark => "rgba(0,0,0,.5)",
-            WidgetPaint::HandShadow => "rgba(26,30,26,.22)",
+            WidgetPaint::RimBottom if dark => "#0a0d13",
+            WidgetPaint::RimBottom => "#a9b2a6",
+            WidgetPaint::SkyTop if dark => "#060a13",
+            WidgetPaint::SkyTop => "#a9c8e2",
+            WidgetPaint::SkyBottom if dark => "#2c3a54",
+            WidgetPaint::SkyBottom => "#f7fafc",
+            WidgetPaint::Glass if dark => "rgba(255,255,255,.14)",
+            WidgetPaint::Glass => "rgba(255,255,255,.55)",
+            WidgetPaint::HandShadow if dark => "rgba(0,0,0,.65)",
+            WidgetPaint::HandShadow => "rgba(26,30,26,.30)",
+            WidgetPaint::LiquidShade if dark => "rgba(0,0,0,.30)",
+            WidgetPaint::LiquidShade => "rgba(0,0,0,.18)",
             WidgetPaint::Boss if dark => {
-                "inset 0 var(--hair) 0 rgba(255,255,255,.12),0 1px 2px rgba(0,0,0,.55),0 2px 6px -2px rgba(0,0,0,.5)"
+                "inset 0 var(--hair) 0 rgba(255,255,255,.16),inset 0 -1px 1px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.7),0 4px 10px -3px rgba(0,0,0,.7)"
             }
             WidgetPaint::Boss => {
-                "inset 0 var(--hair) 0 rgba(255,255,255,.9),0 1px 2px rgba(26,30,26,.18),0 2px 6px -2px rgba(26,30,26,.22)"
+                "inset 0 var(--hair) 0 rgba(255,255,255,1),inset 0 -1px 1px rgba(26,30,26,.08),0 1px 2px rgba(26,30,26,.25),0 4px 10px -3px rgba(26,30,26,.35)"
             }
         }
     }
