@@ -8,7 +8,10 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass};
+use ds::{
+    DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass, Point,
+    Px, Rect, Size, Spell, SpellMarks,
+};
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -64,6 +67,34 @@ const CASES: &[Case] = &[
     }),
     ("controls/edit_surface/empty.html", || {
         rsx! { EditSurface { on_input: |_| {} } }
+    }),
+    // Spelling on: the marks' layer is the surface's last child, empty until the host checks.
+    ("controls/edit_surface/spell-on.html", || {
+        rsx! {
+            EditSurface { spell: Spell::On { lang: None }, on_input: |_| {},
+                p { "data-edit-node": "0", "Teh cat sat" }
+            }
+        }
+    }),
+    // A marked paragraph: "Teh" underlined, as the layer draws it once the host has answered
+    // (its box is the word's line box from the layer's corner).
+    ("controls/edit_surface/spell-marked.html", || {
+        let teh = Rect {
+            origin: Point {
+                x: Px(0.0),
+                y: Px(-20.0),
+            },
+            size: Size {
+                width: Px(27.5),
+                height: Px(20.0),
+            },
+        };
+        rsx! {
+            div { class: "ds-edit", role: "textbox",
+                p { "data-edit-node": "0", "Teh cat sat" }
+                SpellMarks { boxes: vec![teh] }
+            }
+        }
     }),
 ];
 

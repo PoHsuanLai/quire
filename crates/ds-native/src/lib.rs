@@ -67,6 +67,8 @@ pub mod snap;
 #[cfg(test)]
 mod snap_tests;
 pub mod snapshot;
+#[cfg(feature = "spellcheck")]
+pub mod spell;
 mod wake;
 pub mod window;
 mod window_hover;

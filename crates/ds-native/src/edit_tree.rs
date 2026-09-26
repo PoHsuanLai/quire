@@ -210,7 +210,7 @@ fn segment_at(doc: &BaseDocument, node: &Node) -> Option<Segment> {
 }
 
 /// Whether `node` is not displayed (`display: none`), so none of its text is laid out.
-fn is_hidden(node: &Node) -> bool {
+pub(crate) fn is_hidden(node: &Node) -> bool {
     node.primary_styles()
         .is_some_and(|style| style.clone_display().is_none())
 }

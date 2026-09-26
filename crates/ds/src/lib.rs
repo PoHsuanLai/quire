@@ -22,6 +22,7 @@ pub mod motion;
 pub mod overlay;
 pub mod root;
 pub mod space;
+pub mod spell;
 mod task;
 pub mod text;
 pub mod time;
@@ -84,6 +85,10 @@ pub use space::{
     Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
     POST_LIGHT, PRESETS, Palette, Preset, SpaceDefaults, SpaceLook, SpaceStore, Verdict, Workspace,
     WorkspaceId, WorkspaceIndex, card, default_look, derive, gradient, ratio, readout, swatch,
+};
+pub use spell::{
+    HostSpell, Lang, Learned, Misspelt, Paragraph, Span, Spell, SpellFuture, SpellReplace,
+    SpellService, Typing, is_cjk,
 };
 pub use text::clip_chars;
 pub use time::{FRAME_SLACK, FRAME_TICK, sleep};

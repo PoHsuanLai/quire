@@ -32,4 +32,11 @@ pub enum DsError {
         /// The value as given, formatted (no floats in a type that derives `Eq`).
         value: String,
     },
+    /// A language name that is not a dictionary's (`en_US`, `de`) or a locale's (`en_US.UTF-8`):
+    /// `C`, `POSIX`, or anything without a two- or three-letter language code.
+    #[error("not a language: {value:?}")]
+    Language {
+        /// The value as given.
+        value: String,
+    },
 }

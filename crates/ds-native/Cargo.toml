@@ -35,6 +35,9 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 # PDF thumbnails (the `pdf-thumb` feature): pdfrum's reader and CPU rasteriser.
 pdfrum = { workspace = true, optional = true }
+# Spellchecking (the `spellcheck` feature): the checker, and XDG data for the user dictionary.
+spellbook = { workspace = true, optional = true }
+dirs = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # The print portal (the `print` feature): zbus with quire's async-io default (no executor is
@@ -49,6 +52,10 @@ print = ["dep:zbus", "dep:memfd"]
 # `PdfFileThumb`: a PDF's first page rasterised off the UI thread and cached, drawn by
 # `ds::PdfThumb`. Off by default, so an app that shows no PDF builds no PDF reader.
 pdf-thumb = ["dep:pdfrum"]
+# `ds_native::spell`: an `EditSurface`'s spellchecker (`ds::HostSpell`), system Hunspell
+# dictionaries checked on one worker thread. Off by default, so an app that never checks
+# spelling builds no checker.
+spellcheck = ["dep:spellbook", "dep:dirs"]
 
 [lints]
 workspace = true
@@ -90,6 +97,14 @@ required-features = ["print"]
 [[test]]
 name = "pdf_thumb"
 required-features = ["pdf-thumb"]
+
+[[test]]
+name = "spell_worker"
+required-features = ["spellcheck"]
+
+[[test]]
+name = "spell_edit"
+required-features = ["spellcheck"]
 
 [[test]]
 name = "pdf_thumb_queue"
