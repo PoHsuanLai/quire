@@ -104,6 +104,7 @@ fn fixed_tokens() -> Vec<String> {
         .map(|step| declaration(step.var(), &step.css()));
     let sizes = FontSize::ALL
         .into_iter()
+        .filter(|size| !FontSize::CAP_FITTED.contains(size))
         .map(|size| declaration(size.var(), size.css()));
     let layers = ZLayer::ALL
         .into_iter()
@@ -137,15 +138,19 @@ fn fixed_tokens() -> Vec<String> {
         .collect()
 }
 
-/// The family stacks and the voice tokens under `typeface` (design/02-TYPE.md section 2).
+/// The family stacks, the voice tokens and the cap-fitted sizes under `typeface`
+/// (design/02-TYPE.md sections 2 and 4.1).
 fn typeface_tokens(typeface: Typeface) -> Vec<String> {
+    let sizes = FontSize::CAP_FITTED
+        .into_iter()
+        .map(|size| declaration(size.var(), size.css_in(typeface)));
     let families = Family::ALL
         .into_iter()
         .map(|family| declaration(family.var(), family.stack_in(typeface)));
     let voice = VoiceToken::ALL
         .into_iter()
         .map(|token| declaration(token.var(), token.css(typeface)));
-    families.chain(voice).collect()
+    families.chain(voice).chain(sizes).collect()
 }
 
 /// Durations, the CSS delays, easings and scalars at `level`.

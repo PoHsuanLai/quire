@@ -1605,6 +1605,7 @@ Grotesque, Karla and Space Mono exactly as before. A new `--font-code` is Space 
 | mailo's roots | `typeface: Some(Typeface::Editorial)` on its top-level `Ds` (nested roots inherit it) | mail keeps its voice with one prop |
 | Your CSS | `font-family:var(--font-code)` for code and aligned logs; keep `var(--font-data)` for times, counts and labels | the data face is Inter under System; a fixed pitch is only in `--font-code` |
 | Text-width estimates | Re-measure: Inter's lowercase and digits average 0.552 em at 400 (7.18 px at 13 px) against Karla's 0.527 em (6.86 px); capitals 0.68 em against 0.60 em; data text is narrower than Space Mono's 0.612 em | Inter is wider than Karla, narrower than Space Mono |
+| Widget and lock sizes | Re-measure anything sized from `--fs-dial` (9 to 8), `--fs-dial-large` (18 to 16.5), `--fs-widget-figure` (20 to 18), `--fs-widget-hero` (47 to 42.5) or `--fs-lock-clock` (140 to 127) under System | they follow the typeface so Inter Display's taller caps (.7275 em against .66) draw the measured cap heights; Editorial keeps the old sizes |
 | New tokens | `--font-code`; the voice tokens `--tracking-heading`, `--tracking-lock-clock`, `--tracking-lock-date`, `--tracking-caps`, `--tracking-caps-narrow`, `--fw-caps`, `--fs-caps`, `--tracking-mono`, `--fs-mono` (design/02 section 2.1) | values that follow the typeface |
 
 ### PDF and printing (2026-09-25)
