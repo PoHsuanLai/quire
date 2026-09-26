@@ -1,4 +1,5 @@
-//! The gallery's command line: `ds-gallery [--page PAGE] [--snapshot DIR] [--level-sheet DIR]`.
+//! The gallery's command line: `ds-gallery [--page PAGE] [--snapshot DIR [--scale PERCENT]]
+//! [--level-sheet DIR]`.
 
 use crate::page::Page;
 use std::path::PathBuf;
@@ -6,12 +7,14 @@ use std::path::PathBuf;
 /// What the gallery was asked to do.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Args {
-    /// Open on this page (the tokens page when absent).
+    /// Open on this page (the tokens page when absent); with `--snapshot`, render only it.
     pub page: Option<Page>,
     /// Render every page and state into this directory as a contact sheet, then exit.
     pub snapshot: Option<PathBuf>,
     /// Render the level control's variant and motion sheets into this directory, then exit.
     pub level_sheet: Option<PathBuf>,
+    /// With `--snapshot`, the device scale in percent (100 when absent; 100 to 300).
+    pub scale: Option<u16>,
 }
 
 /// A command line that is not one the gallery understands.
@@ -22,7 +25,7 @@ impl std::fmt::Display for ArgsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR] [--level-sheet DIR]",
+            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR]",
             self.0,
             slugs()
         )
@@ -67,6 +70,15 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                 }
                 parsed.level_sheet = once(parsed.level_sheet, PathBuf::from(dir), "--level-sheet")?;
             }
+            "--scale" => {
+                let word = value("a percentage")?;
+                let scale = word
+                    .parse::<u16>()
+                    .ok()
+                    .filter(|scale| (100..=300).contains(scale))
+                    .ok_or_else(|| ArgsError(format!("--scale takes 100 to 300, not {word:?}")))?;
+                parsed.scale = once(parsed.scale, scale, "--scale")?;
+            }
             _ => return Err(ArgsError(format!("unknown argument {flag:?}"))),
         }
     }
@@ -109,6 +121,7 @@ mod tests {
             page,
             snapshot: snapshot.map(PathBuf::from),
             level_sheet: None,
+            scale: None,
         }
     }
 
@@ -146,6 +159,15 @@ mod tests {
                 &["--page", "type", "--page", "gaps"],
                 Err("--page given twice"),
             ),
+            (
+                &["--snapshot", "out", "--scale", "200"],
+                Ok(Args {
+                    scale: Some(200),
+                    ..args(None, Some("out"))
+                }),
+            ),
+            (&["--scale", "50"], Err("--scale takes 100 to 300")),
+            (&["--scale", "2x"], Err("--scale takes 100 to 300")),
             (&["--verbose"], Err("unknown argument")),
             (&["tokens"], Err("unknown argument")),
         ];

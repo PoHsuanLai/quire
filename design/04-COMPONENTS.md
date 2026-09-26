@@ -3307,6 +3307,12 @@ paper disc at the top. `children` (a device glyph) sit in the middle; `role=prog
 `aria-valuenow` in percent. The level bumps on change (`use_bump_on`). No `ProgressRing` existed:
 the SendPill's ring is a countdown drawn inside the pill, not a level.
 
+**Candidate looks (proposed 2026-09-26, design/23-WIDGETS.md section 4).** `LevelRing { look:
+BatteryLook::{Ring, Well, Cell} }`, `ClockFace { dial: DialLook::{Paper, Bezel, Sky} }` and
+`WidgetFrame { finish: FrameFinish::{Plain, Lit} }`, each defaulting to the look above and writing
+`data-look`, `data-dial` or `data-finish` only when another is chosen; the user picks from the
+gallery's "Widget looks" page.
+
 **Motion.** None in steady state; a value change plays `bump` once (`--t-move --e-spring`, the
 Count's pulse). No transition on the ring's dash (a `stroke-dashoffset` transition does not run in
 Blitz, O-20).

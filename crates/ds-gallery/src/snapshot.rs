@@ -36,6 +36,8 @@ pub struct Shot {
     pub scheme: Scheme,
     /// The accent.
     pub accent: Accent,
+    /// The device scale in percent.
+    pub scale: u16,
 }
 
 impl Shot {
@@ -65,26 +67,33 @@ impl Shot {
         }
     }
 
-    /// The viewport: the gallery's width, the page's own height, 1x.
+    /// The viewport: the gallery's width, the page's own height, at the shot's scale.
     pub fn viewport(&self) -> Viewport {
         Viewport {
             width: WIDTH,
             height: registry::entry(self.page).height,
-            scale_percent: 100,
+            scale_percent: self.scale,
         }
     }
 }
 
 /// Every picture, page by page.
 pub fn shots() -> Vec<Shot> {
-    Page::ALL
-        .into_iter()
+    shots_of(&Page::ALL)
+}
+
+/// The pictures of `pages`, page by page.
+pub fn shots_of(pages: &[Page]) -> Vec<Shot> {
+    pages
+        .iter()
+        .copied()
         .flat_map(|page| {
             SCHEMES.into_iter().flat_map(move |scheme| {
                 ACCENTS.into_iter().map(move |accent| Shot {
                     page,
                     scheme,
                     accent,
+                    scale: 100,
                 })
             })
         })
@@ -110,9 +119,9 @@ pub fn progress_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tools/progress/shots/gallery")
 }
 
-/// Render every shot into `dir`, write `dir/index.html`, and copy the pictures to
-/// [`progress_dir`]. Returns the pictures written.
-pub fn run(dir: &Path) -> Result<Vec<Shot>, GalleryError> {
+/// Render every shot into `dir` (only `page`'s when one is named, at `scale` percent), write
+/// `dir/index.html`, and copy the pictures to [`progress_dir`]. Returns the pictures written.
+pub fn run(dir: &Path, page: Option<Page>, scale: u16) -> Result<Vec<Shot>, GalleryError> {
     let made = |path: &Path| {
         let path = path.to_path_buf();
         move |source| GalleryError::Write { path, source }
@@ -120,7 +129,13 @@ pub fn run(dir: &Path) -> Result<Vec<Shot>, GalleryError> {
     std::fs::create_dir_all(dir).map_err(made(dir))?;
     let progress = progress_dir();
     std::fs::create_dir_all(&progress).map_err(made(&progress))?;
-    let shots = shots();
+    let shots = match page {
+        Some(page) => shots_of(&[page]),
+        None => shots(),
+    }
+    .into_iter()
+    .map(|shot| Shot { scale, ..shot })
+    .collect::<Vec<_>>();
     for (done, shot) in shots.iter().enumerate() {
         let picture = render(shot)?;
         let path = dir.join(shot.file());
