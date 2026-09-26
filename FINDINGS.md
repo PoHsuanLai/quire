@@ -4332,7 +4332,7 @@ window"; what mailo writes in `docs/mailo-migration.md` §6.8.
 
 mailo's composer wants the reference platform's spellchecking on `EditSurface`. Branch
 `spellcheck`. design/04-COMPONENTS.md section 50 has the behaviour; CONSUMING.md "Spelling" the
-API; `docs/mailo-migration.md` §6.8 what mailo adds.
+API; `docs/mailo-migration.md` §6.9 what mailo adds.
 
 ### Decisions
 
