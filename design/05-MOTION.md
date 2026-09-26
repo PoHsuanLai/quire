@@ -47,7 +47,9 @@ Quoted from the prototypes. Each one is a rule the port is reviewed against.
 7. **Nothing loops.** "SMALL MOTION — every one keyed to a state change, none loops" (S:290).
    Known exceptions in the prototypes, all listed so the port can decide each one: the
    destination preview `dest` (`infinite alternate`, S:447), the sync halo `breathe` and `spin`
-   (C:288, C:291), and the Pip mascot (excluded, section 11). Errors shake once and hold still:
+   (C:288, C:291), and the Pip mascot (excluded, section 11). The persona's blink and breath
+   (section 4.11, design/24-PERSONA.md section 5) are quire's one idle exception: finite plays,
+   only for 20 s after a wake or a mood change, then 0 frames. Errors shake once and hold still:
    "A looping error animation is something you learn to ignore inside a day" (C:2326).
 8. **Rows rise only when a list is first shown.** "rows rise in only when a list is first shown,
    not on every re-render" (S:292-294).
@@ -632,6 +634,36 @@ Settled for the port; the catalogue above is unchanged except where named.
   to the right, past its own width, when dismissed or when its hold ends, holding its last frame
   until the host unmaps it at `settle(ShotOut)`. `slide-r` is an entrance (from 26 px right to
   rest); this is its exit, carried off the edge the card sits at.
+
+### 4.11 Added by quire (persona, 2026-09-26)
+
+The user's character (design/24-PERSONA.md). Five keyframes, each played once through a pulse
+(`a-persona-*`, `data-pulse`) and taken off at its `settle`; every move is in shares of the
+persona's own box, so 28, 64 and 128 px move alike.
+
+- `persona-blink`: `0%,100%{ transform:scaleY(1) } 45%,55%{ transform:scaleY(.1) }` at
+  `--t-quick --e-in-out` (`Anim::PersonaBlink`), about the eyes' own line. Fired by a Rust timer
+  at gaps of 3 to 6 s from the spec's seed, only in Idle and Attentive, only inside the awake
+  window.
+- `persona-breathe`: four swells to `scale(1.012,1.026)` inside one run of `--t-awake` (20 s,
+  a new token) at `--e-in-out` (`Anim::PersonaBreathe`), from the chin; once per wake.
+- `persona-wince`: shake-x's four beats as `translateX(-7% / 6% / -4% / 2%)` with a -3 and 2
+  degree turn, at `--t-shake --e-shake` (`Anim::PersonaWince`), once.
+- `persona-hop`: `35%{ transform:translateY(-12%) scale(.97,1.04) }` between rests, at `--t-big
+  --e-spring` (`Anim::PersonaHop`): the unlock answers the user's contact (principle 2).
+- `persona-drift`: one `z` from `scale(.6)`, opaque at 20 %, to `translate(12%,-20%)
+  scale(1.15)` and transparent, at `--t-drift` (2400 ms, a new token) `--e-out`
+  (`Anim::PersonaDrift`), once; at rest it is invisible.
+- Transitions: Attentive's glance down and the brows (`--t-quick --e-out`), Asleep's lean
+  (`--t-big --e-out`); none under Reduced.
+
+**Exception to principle 7 (nothing loops) and to principle 1's "no randomness".** Idle blinks
+and breathes with no state change asking for it, and its blink gaps vary. Allowed because both
+are bounded: the motion runs only for 20 s after a wake (mount, a new `WakeStamp`, a mood
+change) as finite plays, never `infinite`, and then the persona rests and paints 0 frames (the
+idle-frame rule wins; tested in `ds-native/tests/persona_life.rs` with
+`Harness::is_animating`). The gaps are a fixed sequence from the spec's stored seed, so the
+same persona behaves the same after every wake. Under Reduced nothing is fired at all.
 
 ## 5. Assignments
 
