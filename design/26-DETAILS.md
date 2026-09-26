@@ -1,7 +1,11 @@
 # 26 Details: the grammar of small state changes
 
-Status: draft for review, 2026-09-26, branch `detail-grammar` (quire). Docs only: the primitives'
-API below is a sketch, not code. Status legend as in `13-BEHAVIOUR-menus-windows.md`:
+Status: D0 built, 2026-09-27, branch `details-d0b` (quire): `ds::detail` holds the grammar as
+types and the primitives (section 4.1 is now the sketch they grew from; the shipped API is in
+CONSUMING.md "Details"), the tokens of 3.4, `Spinner` on `use_pending`, the harness's
+`assert_settles_to_zero_frames`, the lint rules `InfiniteLoop` and `OffGrammarTiming`, and the
+gallery's Details page. D1-D7 are not started. The catalogue (section 5) still describes the
+state before D0. Status legend as in `13-BEHAVIOUR-menus-windows.md`:
 **settled** = decided with the user or already built; **proposed** = chosen here, the user
 judges. Reference confidence: **H** the vendor's own guidelines or documentation, **M** a
 reliable secondary source (a review, a developer write-up, a support thread that describes the
@@ -86,8 +90,8 @@ state change *means* to the person looking; the component decides it from its ow
 | **Preview** | the pointer (or focus) is on the element: show what a press would do | marks fade in (the traffic lights' glyphs), a card expands, a label flies; hover intent where it opens anything | `--t-quick` `--e-out`; expansion `--t-move` `--e-out`; intent 450/150/400 (design/06) | R10 |
 | **Dismiss** | the element leaves | the exit design/05 §8 and §10 give its kind (`fold`, `banner-out`, `osd-out`, `shot-out` …); the receiver answers | the exit's token, `--e-exit` | design/05 principles 3, 4, 10 |
 
-Moments that are *not* in the list, on purpose: an Idle "alive" moment (only the persona has one,
-design/24 §5, and it is bounded), a Celebration (design/05 principle 11: "never celebrate a
+Moments that are *not* in the list, on purpose: an Idle "alive" moment (only an animated emoji
+has one, design/25 §5, and it is bounded; the persona that first had it was dropped), a Celebration (design/05 principle 11: "never celebrate a
 retraction"; concessions are dull, design/00 §4 rule 10), and Escalation (R6).
 
 ### 3.2 Motion families
@@ -192,7 +196,7 @@ operation timeouts are the services' (sill), not motion tokens.
 
 ## 4. The primitives
 
-### 4.1 API sketch (quire, `ds::detail`; not in the crate yet)
+### 4.1 API sketch (quire, `ds::detail`; built in D0 with the changes CONSUMING.md "Details" lists)
 
 Typed, no `bool` (CONVENTIONS §11), small structs, every effect started from a handler or an
 effect hook, never from render (design/05 §7.1). Each primitive is a hook returning what the
@@ -680,10 +684,10 @@ States: Hidden, Shown(level, glyph), Muted.
 
 | Element / moment | Our detail | Reference | Today | Gap |
 | --- | --- | --- | --- | --- |
-| Typing | each dot appears `pop-in` at `--t-tap` `--e-out` (typing is contact, but frequent: no overshoot, R12); the persona goes Attentive (built) | dots appear per key (L) | dots snap | **G44** (small) |
+| Typing | each dot appears `pop-in` at `--t-tap` `--e-out` (typing is contact, but frequent: no overshoot, R12); the user's picture goes Attentive (built, design/25 §7) | dots appear per key (L) | dots snap | **G44** (small) |
 | Checking (Pending) | the enter arrow `Pending{Spin}` bounded (replaces the `Spinner`'s infinite spin) | a spinner while authenticating (L) | `Checking` spins (unbounded) | **G45** |
-| Wrong password (Failure) | `Shake` once, empty the field on settle; persona winces once (built); same every time (R6) | the login window shakes (M, [SHAKE]: about three shakes in 0.3 s); the character escalates (M, design/24) | built | none (we refuse escalation) |
-| Unlock (Success) | persona hop (built), then the lock surface `fade` `--t-move --e-exit` | fade to the desktop (L) | built (20 §1.9) | none |
+| Wrong password (Failure) | `Shake` once, empty the field on settle; the picture winces once (built); same every time (R6) | the login window shakes (M, [SHAKE]: about three shakes in 0.3 s); the character escalates (M, design/24) | built | none (we refuse escalation) |
+| Unlock (Success) | the picture's accept beat, `picture-accept` (built), then the lock surface `fade` `--t-move --e-exit` | fade to the desktop (L) | built (20 §1.9) | none |
 | Caps lock | the mark `pop-in` / fade `--t-quick` | caps-lock glyph in the field (L) | snaps | **G46** (small) |
 | Locked out | the field dims (Unavailable), the time in the hint | "try again in" (L) | built (words) | none |
 | Polkit | same as the lock prompt (built) | same (M) | built | follows G45 |
@@ -802,8 +806,8 @@ land on the primitives rather than beside them: battery-fill is the first consum
 
 | Wave | Lane | Scope | Where | Closes |
 | --- | --- | --- | --- | --- |
-| D0 | D0a primitives: time | `Moment`, `Touch`, `FirstShow`, `EventStamp`, `Operation`, `Detailed`, `use_detail`, `moment_table`; `Tween` on `CubicBezier::at` and a frame clock that stops at rest; `Sweep`, `CountUp`, `Reveal`; tokens `--t-sweep`, `--t-count-step`, `SettleHold` into design/05 and the token table; gallery page "Details" with a replay button per primitive; harness tests (idle after settle, Reduced jumps, retarget mid-flight) | Q | foundation |
-| D0 | D0b primitives: state | `Pending` (+ `--t-pending-step`, `PendingGrace`, `PendingCap`), `Settle`, `Shake`, `MorphGlyph`, `RollDigits`, `Nudge`; `Spinner` rebuilt on `Pending` (its two infinite loops gone; `ModuleState::Busy` and `PromptState::Checking` inherit the bound; `SyncHalo`'s idle breathe, mailo's, goes as design/05 §12 item 4 proposes, so tell the mailo session before it lands) | Q | G15, G45 (quire side) |
+| D0 | D0a primitives: time | `Moment`, `Touch`, `FirstShow`, `EventStamp`, `Operation`, `Detailed`, `use_detail`, `moment_table`; `Tween` on `CubicBezier::at` and a frame clock that stops at rest; `Sweep`, `CountUp`, `Reveal`; tokens `--t-sweep`, `--t-count-step`, `SettleHold` into design/05 and the token table; gallery page "Details" with a replay button per primitive; harness tests (idle after settle, Reduced jumps, retarget mid-flight) | Q | foundation. **Built 2026-09-27** (`details-d0b`) |
+| D0 | D0b primitives: state | `Pending` (+ `--t-pending-step`, `PendingGrace`, `PendingCap`), `Settle`, `Shake`, `MorphGlyph`, `RollDigits`, `Nudge`; `Spinner` rebuilt on `Pending` (its two infinite loops gone; `ModuleState::Busy` and `PromptState::Checking` inherit the bound; `SyncHalo`'s idle breathe, mailo's, goes as design/05 §12 item 4 proposes, so tell the mailo session before it lands) | Q | G15, G45 (quire side). **Built 2026-09-27** (`details-d0b`), with one change: `SyncHalo` keeps its loops (it is mail's; mailo decides, design/05 §12 item 4), listed in `ds/tests/details_lint.rs` with the three other mail loops |
 | D1 | status glyphs | a layered `StatusGlyph` family: Wi-Fi (dot + 3 arcs, the "!" badge), battery (outline, fill layer, bolt, plug), Bluetooth (base, slash, connected dots), volume (on `LevelGlyph`), each with its `Detailed` state and moment table | Q | G1-G4, G8-G10, G12 (quire side) |
 | D1 | bar wiring | sill's bar items on `StatusGlyph`: `Link::Connecting` → Joining with an op stamp from the network service, no-internet from connectivity, battery thresholds (`bar.battery_low_percent`), the Bluetooth bar item | S | G1-G12 |
 | D2 | control center modules | `ModuleTile` disc glyph on `MorphGlyph`/`Settle`; `SettingsRow` trailing `Pending`/`Settle{Check}`/`Shake`; Now Playing play/pause `MorphGlyph{OffUp}`, position bar, track cross-fade; Battery module rings on `Sweep`/`CountUp`; a keyboard-brightness module on `LevelControl` | Q+S | G14, G16-G18, G20, G21, G23, G25-G30 |
