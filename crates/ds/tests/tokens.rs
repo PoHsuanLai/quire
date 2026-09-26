@@ -291,6 +291,8 @@ const PER_ELEMENT: &[&str] = &[
     // A persona's disc and the line its eyes close towards (`Persona`, design/24).
     "--pa-ground",
     "--pa-eyes",
+    // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
+    "--em-disc",
 ];
 
 #[test]

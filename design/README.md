@@ -27,6 +27,7 @@ against them.
 | `22-SETTINGS.md` | Every proposed value as a settings key with its default; storage, Rust shape, UI mapping. |
 | `23-WIDGETS.md` | Desktop widgets' depth language, the battery and clock candidate looks, the calendar widget brief. |
 | `24-PERSONA.md` | The user's animated character: parts, derived palette, moods, and its bounded exception to "nothing loops". |
+| `25-EMOJI.md` | Animated emoji as the user's picture: source and CC BY 4.0 attribution, the curated set, the sheet pipeline, frame budget, the idle rule. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
 ## 2. Reading order

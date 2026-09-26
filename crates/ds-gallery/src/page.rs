@@ -40,11 +40,13 @@ pub enum Page {
     LockSwitcher,
     /// The persona: seeds, moods and sizes.
     Persona,
+    /// Animated emoji: the set, the reactions, sizes and discs.
+    Emoji,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 18] = [
+    pub const ALL: [Page; 19] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -63,6 +65,7 @@ impl Page {
         Page::WidgetReference,
         Page::LockSwitcher,
         Page::Persona,
+        Page::Emoji,
     ];
 
     /// The `--page` word.
@@ -86,6 +89,7 @@ impl Page {
             Page::WidgetReference => "widget-reference",
             Page::LockSwitcher => "lock",
             Page::Persona => "persona",
+            Page::Emoji => "emoji",
         }
     }
 }
