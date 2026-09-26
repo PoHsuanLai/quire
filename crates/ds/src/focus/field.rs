@@ -72,7 +72,7 @@ impl FieldHandle {
         };
         let hosted = self.hosted();
         self.run(async move {
-            if focus_selecting(&target.element, select).await == Focused::Done && hosted {
+            if focus_selecting(&target.element, select.into()).await == Focused::Done && hosted {
                 target.told.focus.call(());
             }
         });

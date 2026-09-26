@@ -43,16 +43,17 @@ pub use edit::{
 pub use error::DsError;
 pub use focus::{
     Caret, Collapsed, Fallback, FieldHandle, FocusError, FocusRequest, FocusTicket, Focused, Found,
-    HostBlur, HostCaret, HostClickFocus, HostFind, HostFocus, HostHandBack, HostPressFocus,
-    HostSelect, Select, caret_at, focus_by_selector, focus_soon, focus_soon_selecting,
-    use_field_handle, use_focus_request,
+    HostBlur, HostCaret, HostClickFocus, HostFind, HostFocus, HostHandBack, HostPlaceCaret,
+    HostPressFocus, HostSelect, InitialCaret, Select, caret_at, focus_by_selector, focus_soon,
+    focus_soon_selecting, use_field_handle, use_focus_request,
 };
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
 pub use geometry::{
-    Align, Anchor, Flip, Grid, HostMeasure, Measured, MountedRef, Placed, Placement, Point,
-    PopoverRequest, Px, Rect, RectProbe, Scale, Side, Size, place, use_rect,
+    Align, Anchor, Flip, Grid, HostMeasure, HostReveal, Measured, MountedRef, Placed, Placement,
+    Point, PopoverRequest, Px, Rect, RectProbe, Scale, ScrollSpan, Scrolled, Side, Size,
+    nearest_scroll, place, use_rect,
 };
 pub use icon::render::{Glyph, IconPx, IconSize};
 pub use icon::{

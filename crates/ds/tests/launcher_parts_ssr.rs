@@ -15,7 +15,7 @@ use ds::{
     Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EMOJI_COLUMNS,
     EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource, Inject, Key,
     Material, MenuEntry, MenuRow, Mono, PaletteGroup, PaletteGroups, PaneAction, PaneContent,
-    PdfPage, PreviewPane, Px, RowShape, Shortcut, Tile,
+    PdfPage, PreviewPane, Px, RowShape, Shortcut, Tile, Trail,
 };
 
 fn root(body: Element) -> Element {
@@ -80,6 +80,17 @@ fn files() -> Element {
         )],
         0,
     )
+}
+
+/// A file row with a shortcut after its time (sill Q343): the two in boxes of their own.
+fn file_with_keys() -> Element {
+    let row = MenuEntry::Row(MenuRow {
+        tile: Some(Tile::Icon(Icon::File)),
+        shape: file(None),
+        trail: Trail::Shortcut(Shortcut(vec![Key::Enter])),
+        ..MenuRow::new(1, "Invoice.pdf")
+    });
+    palette(vec![PaletteGroup::list("Documents", vec![row])], 0)
 }
 
 fn clips() -> Element {
@@ -316,6 +327,7 @@ type Specimen = (&'static str, fn() -> Element);
 
 const SPECIMENS: &[Specimen] = &[
     ("row-file", files),
+    ("row-file-keys", file_with_keys),
     ("row-clip", clips),
     ("show-more", show_more),
     ("show-more-selected", show_more_selected),
@@ -389,6 +401,14 @@ fn the_markup_carries_the_states() {
     assert!(
         files.contains("~/Documents") && files.contains("ds-menu-when"),
         "{files}"
+    );
+    let keyed = render(file_with_keys);
+    assert!(
+        keyed.contains(
+            "<span class=\"ds-menu-trail\"><span class=\"ds-menu-when\">Yesterday</span>\
+             <span class=\"ds-menu-keys\">↵</span></span>"
+        ),
+        "the time and the shortcut are separate boxes (Q343): {keyed}"
     );
     let clips = render(clips);
     assert!(clips.contains("data-shape=\"clip-text\""), "{clips}");

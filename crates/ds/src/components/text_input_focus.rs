@@ -3,7 +3,7 @@
 use crate::focus::field::FieldHandle;
 use crate::focus::host::focus_soon_told;
 use crate::focus::request::{FocusRequest, FocusTicket};
-use crate::focus::select::Select;
+use crate::focus::select::Landing;
 use crate::focus::targets::{FocusTarget, FocusTargets, Told};
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -23,10 +23,10 @@ pub enum Focus {
 
 impl Focus {
     /// What the field does with its text when the focus lands: a controlled request's choice.
-    fn select(self) -> Select {
+    fn landing(self) -> Landing {
         match self {
-            Focus::Controlled(request) => request.select(),
-            Focus::OnMount | Focus::Manual => Select::None,
+            Focus::Controlled(request) => request.landing(),
+            Focus::OnMount | Focus::Manual => Landing::Leave,
         }
     }
 
@@ -84,7 +84,7 @@ impl FieldFocus {
             served.set(request.peek());
         }
         if focus.on_mount() {
-            focus_soon_told(event.data(), focus.select(), told.focus);
+            focus_soon_told(event.data(), focus.landing(), told.focus);
         }
     }
 
@@ -97,7 +97,7 @@ impl FieldFocus {
         };
         if ticket != *served.peek() {
             served.set(ticket);
-            focus_soon_told(element, request.select(), told);
+            focus_soon_told(element, request.landing(), told);
         }
     }
 }

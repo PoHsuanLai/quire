@@ -90,19 +90,24 @@ pub(crate) fn words(shape: &RowShape, title: Element, detail: Option<Element>) -
     }
 }
 
-/// The trail column: a shaped row's time before the row's own trail.
+/// The trail column: a shaped row's time before the row's own trail, each in a box of its own
+/// so the gap between them holds (sill Q343: Blitz drops a plain inline span's margin, and
+/// "00:33" ran into "↵").
 pub(crate) fn trail(shape: &RowShape, text: String) -> Element {
     let when = match shape {
         RowShape::Plain => None,
         RowShape::File { modified, .. } => Some(modified.clone()),
         RowShape::Clip { age, .. } => Some(age.clone()),
     };
+    let keys = (!text.is_empty()).then_some(text);
     rsx! {
         span { class: "ds-menu-trail",
             if let Some(when) = when {
                 span { class: "ds-menu-when", "{when}" }
             }
-            "{text}"
+            if let Some(keys) = keys {
+                span { class: "ds-menu-keys", "{keys}" }
+            }
         }
     }
 }

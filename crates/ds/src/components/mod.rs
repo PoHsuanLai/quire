@@ -91,6 +91,7 @@ pub mod palette_claim;
 pub mod palette_group;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
+pub(crate) mod palette_reveal;
 pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;

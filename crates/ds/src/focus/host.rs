@@ -8,7 +8,8 @@
 //! [`HostFocus`] answers [`Focused::Busy`] instead, and with no host the call is guarded
 //! (`crate::guarded`) so the collision is `Busy` too; the change is tried again a frame later.
 
-use crate::focus::select::{HostSelect, Select};
+use crate::focus::caret::{HostPlaceCaret, InitialCaret};
+use crate::focus::select::{HostSelect, Landing, Select};
 use crate::geometry::measure::BUSY_ATTEMPTS;
 use crate::guarded::guarded_call;
 use crate::time::{FRAME_SLACK, sleep};
@@ -48,7 +49,7 @@ pub fn focus_soon(element: Rc<MountedData>) {
 /// [`Select::All`] selects a field's whole value through the host's [`HostSelect`].
 pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
     spawn(async move {
-        let _ = focus_selecting(&element, select).await;
+        let _ = focus_selecting(&element, select.into()).await;
     });
 }
 
@@ -58,25 +59,40 @@ pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
 /// whose caller listens for focus would never hear that the seam put the caret in it. Without a
 /// host the renderer's own `set_focus` fires the element's real `focus` event, which the field
 /// already forwards, so `told` is not called and the caller hears it once.
-pub(crate) fn focus_soon_told(element: Rc<MountedData>, select: Select, told: EventHandler<()>) {
+pub(crate) fn focus_soon_told(element: Rc<MountedData>, landing: Landing, told: EventHandler<()>) {
     let hosted = try_consume_context::<HostFocus>().is_some();
     spawn(async move {
-        if focus_selecting(&element, select).await == Focused::Done && hosted {
+        if focus_selecting(&element, landing).await == Focused::Done && hosted {
             told.call(());
         }
     });
 }
 
-/// Move the focus to `element`, then do `select` with its text; the focus's outcome.
-pub(crate) async fn focus_selecting(element: &MountedData, select: Select) -> Focused {
+/// Move the focus to `element`, then do `landing` with its text; the focus's outcome.
+pub(crate) async fn focus_selecting(element: &MountedData, landing: Landing) -> Focused {
     let focused = focus_element(element).await;
     if focused == Focused::Done
-        && select == Select::All
-        && let Some(HostSelect(select_all)) = try_consume_context::<HostSelect>()
+        && let Landing::Place(caret) = landing
     {
-        let _ = retry_busy(|| select_all(element)).await;
+        let _ = place_caret(element, caret).await;
     }
     focused
+}
+
+/// Put the caret of the focused field `element` at `caret`, through the host: a whole-value
+/// selection through its [`HostSelect`], an end through its [`HostPlaceCaret`]. Without the
+/// host's write the caret stays where the renderer put it ([`Focused::Unknown`]).
+async fn place_caret(element: &MountedData, caret: InitialCaret) -> Focused {
+    match caret {
+        InitialCaret::SelectAll => match try_consume_context::<HostSelect>() {
+            Some(HostSelect(select_all)) => retry_busy(|| select_all(element)).await,
+            None => Focused::Unknown,
+        },
+        InitialCaret::End | InitialCaret::Start => match try_consume_context::<HostPlaceCaret>() {
+            Some(HostPlaceCaret(place)) => retry_busy(|| place(element, caret)).await,
+            None => Focused::Unknown,
+        },
+    }
 }
 
 /// Move the focus to `element`, waiting out a busy document for up to `BUSY_ATTEMPTS` frames.
