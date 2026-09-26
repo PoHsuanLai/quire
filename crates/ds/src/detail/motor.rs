@@ -44,7 +44,7 @@ impl Motor {
             running.cancel();
         }
         try_set(self.task, None)?;
-        let started = Instant::now();
+        let started = crate::time::now();
         let run = try_get(self.pose)?.run.wrapping_add(1);
         let posed = move |elapsed| Pose {
             run,
@@ -68,7 +68,7 @@ impl Motor {
     ) -> Result<(), Gone> {
         loop {
             sleep(FRAME).await;
-            let elapsed = started.elapsed();
+            let elapsed = crate::time::since(started);
             try_set(self.pose, posed(elapsed))?;
             if glide.done(elapsed) {
                 return try_set(self.task, None);

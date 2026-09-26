@@ -53,7 +53,7 @@ impl Swiper {
 
     /// Now, as the machine's stamp.
     pub fn now(&self) -> Stamp {
-        Stamp(self.origin.elapsed())
+        Stamp(crate::time::since(self.origin))
     }
 
     fn try_feed(&self, input: SwipeInput) -> Result<(), Gone> {
@@ -105,7 +105,7 @@ pub fn use_swipe(metrics: SwipeMetrics, on_dismiss: EventHandler<()>) -> Swiper 
         quiet: use_signal(|| None),
         env: use_env_signal(),
         scope: use_hook(current_scope_id),
-        origin: use_hook(Instant::now),
+        origin: use_hook(crate::time::now),
         metrics,
         on_dismiss,
     }

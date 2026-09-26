@@ -23,7 +23,7 @@ use crate::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use crate::time::{FRAME_TICK, sleep};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// Where a new sweep starts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -120,12 +120,12 @@ fn start(runner: Runner, level: Fraction, origin: Origin, tokens: RunTokens) -> 
     };
     let timing = tokens.timing(motion);
     try_set_if_changed(runner.frame, frame_at(run, timing, Duration::ZERO))?;
-    let started = Instant::now();
+    let started = crate::time::now();
     let (frame, task) = (runner.frame, runner.task);
     let running = spawn_in(runner.scope, async move {
         loop {
             sleep(FRAME_TICK).await;
-            let elapsed = started.elapsed();
+            let elapsed = crate::time::since(started);
             if try_set_if_changed(frame, frame_at(run, timing, elapsed)).is_err() {
                 return;
             }

@@ -98,7 +98,7 @@ pub use spell::{
     SpellService, Typing, is_cjk,
 };
 pub use text::clip_chars;
-pub use time::{FRAME_SLACK, FRAME_TICK, sleep};
+pub use time::{ClockGuard, FRAME_SLACK, FRAME_TICK, VirtualClock, sleep};
 pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,

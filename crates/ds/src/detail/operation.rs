@@ -65,7 +65,7 @@ impl PendingToken {
     pub fn start(deadline: Deadline) -> PendingToken {
         PendingToken {
             serial: STARTED.fetch_add(1, Ordering::Relaxed) + 1,
-            started: Instant::now(),
+            started: crate::time::now(),
             deadline,
         }
     }
@@ -82,7 +82,7 @@ impl PendingToken {
 
     /// How long it has been running.
     pub fn elapsed(self) -> Duration {
-        self.started.elapsed()
+        crate::time::since(self.started)
     }
 }
 

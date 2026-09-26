@@ -18,7 +18,6 @@ use crate::overlay::menu_track::{
 };
 use crate::time::{FRAME_SLACK, sleep};
 use dioxus::prelude::*;
-use std::time::Instant;
 
 /// How a submenu was asked for: by the keyboard it takes the focus, by the pointer it leaves
 /// the focus where it is.
@@ -194,7 +193,7 @@ impl Tracker {
     fn feed(&self, event: MenuTrackEvent<()>) {
         let mut track = self.track;
         let current = track.peek().clone();
-        let (next, effects) = current.step(event, Instant::now());
+        let (next, effects) = current.step(event, crate::time::now());
         track.set(next);
         for effect in effects {
             self.apply(effect);
@@ -224,7 +223,7 @@ impl Tracker {
             MenuTrackEffect::RequestTick(at) => {
                 let tracker = *self;
                 spawn(async move {
-                    sleep(at.saturating_duration_since(Instant::now())).await;
+                    sleep(at.saturating_duration_since(crate::time::now())).await;
                     tracker.feed(MenuTrackEvent::Tick);
                 });
             }
