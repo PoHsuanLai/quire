@@ -22,7 +22,9 @@
 //! `unicode-range`s, except that Space Mono's `latin` also carries `←` and `→` (U+2190, U+2192;
 //! Google's range keeps only `↑` and `↓`), so a key cap's four arrows come from one face (sill
 //! FINDINGS Q95). The range below names them for every face; a face without them falls back as
-//! before, since `unicode-range` only says where to look. Licences are in `assets/fonts/OFL-*.txt`.
+//! before, since `unicode-range` only says where to look. Inter's files are cut from its official
+//! release by `scripts/cut-inter.sh` into the same two subsets. Licences are in
+//! `assets/fonts/OFL-*.txt`.
 
 use std::env;
 use std::fs;
@@ -37,6 +39,14 @@ const LATIN_EXT: &str = "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+0
 
 /// Family, style, weight (a range for a variable face), and the file stem before the subset.
 const FACES: &[(&str, &str, &str, &str)] = &[
+    ("Inter", "normal", "400 700", "inter-normal-400-700"),
+    ("Inter", "italic", "400", "inter-italic-400"),
+    (
+        "Inter Display",
+        "normal",
+        "500 800",
+        "inter-display-normal-500-800",
+    ),
     (
         "Bricolage Grotesque",
         "normal",
