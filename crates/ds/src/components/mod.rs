@@ -141,6 +141,7 @@ pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
 pub mod spinner;
+pub mod standard_action;
 pub mod switcher_fit;
 pub mod sync_halo;
 pub mod tabs;
@@ -273,6 +274,7 @@ pub use space_editor::{
     ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
 };
 pub use spinner::{Spinner, SpinnerKind};
+pub use standard_action::{Reserved, SpaceNumber, StandardAction};
 pub use switcher_fit::{
     SWITCHER_MARGIN, SWITCHER_PADDING, SwitcherFit, SwitcherMetrics, fit as switcher_fit,
 };

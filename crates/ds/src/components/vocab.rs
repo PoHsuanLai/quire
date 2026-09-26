@@ -261,18 +261,38 @@ impl GlyphKind {
 }
 
 /// A key combination, modifiers first, rendered as glyphs with no separator: `⌃T`
-/// (design/04-COMPONENTS.md O-2).
+/// (design/04-COMPONENTS.md O-2). Bind a standard one with [`Shortcut::standard`] and an app's
+/// own with [`Shortcut::custom`], which refuses a reserved combination (design/27 section 6.2).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub struct Shortcut(pub Vec<Key>);
 
 impl Shortcut {
-    /// The glyph text: `⌃T`.
+    /// The glyph text, modifiers in the Mac's order whatever order they were given in: `⌃⌥⇧⌘`,
+    /// then the key (`⇧⌘Z`).
     pub fn glyphs(&self) -> String {
-        self.0.iter().map(|key| key.glyph()).collect()
+        self.keys().into_iter().map(|key| key.glyph()).collect()
+    }
+
+    /// The keys in the order they are drawn: modifiers first in the Mac's order (⌃⌥⇧⌘),
+    /// deduplicated, then the rest as given.
+    pub fn keys(&self) -> Vec<Key> {
+        super::standard_action::normalized(self.0.iter().copied())
     }
 }
 
 impl Key {
+    /// A modifier's place in the Mac's order (Control, Option, Shift, Command), or `None` for a
+    /// key that is not a modifier.
+    pub(crate) fn modifier_rank(self) -> Option<u8> {
+        match self {
+            Key::Ctrl => Some(0),
+            Key::Alt => Some(1),
+            Key::Shift => Some(2),
+            Key::Super => Some(3),
+            _ => None,
+        }
+    }
+
     /// The text one key cap shows. Only `⌃ ⇧ ⌥ ⌘`, upper-case characters and `↵` are the
     /// doc's; the rest are not specified in design/04-COMPONENTS.md (O-2 names only the
     /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace, the arrows and Home, End, Delete, PageUp,
