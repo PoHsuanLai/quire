@@ -41,6 +41,13 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
   dots only, and the caret follows; Ctrl+A/Ctrl+C then paste into a Text field pastes the
   secret (the clipboard is the app's own; documented).
 
+- **Spelling (branch `spellcheck`, design/04 section 50).** `cargo run -p ds-gallery`, Edit
+  page: `noet` and `speling` carry red round dots just under the glyphs, like TextEdit's; a
+  right-click on one lists suggestions, Ignore and Learn and the menu looks right at 1x and at a
+  fractional scale; click into a word and type (no mark until you leave it); a Chinese or
+  Japanese line typed through fcitx5 is never marked. Learn writes
+  `~/.local/share/quire/spelling/en_US.dic`.
+
 ## mailo
 
 Kept by the mailo session in its own repo.

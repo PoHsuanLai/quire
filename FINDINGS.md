@@ -4171,3 +4171,77 @@ not installed).
 3. **Pre-rendered sprite sheets of the whole set**: only if the scrolling measurement fails. It
    costs several MB of PNG per size, a build step, and loses the system font's updates.
 4. **CBDT**: no. It paints nothing, and the one-feature fix panics the window renderer.
+
+## Spelling (2026-09-27)
+
+mailo's composer wants the reference platform's spellchecking on `EditSurface`. Branch
+`spellcheck`. design/04-COMPONENTS.md section 50 has the behaviour; CONSUMING.md "Spelling" the
+API; `docs/mailo-migration.md` §6.8 what mailo adds.
+
+### Decisions
+
+- **Checker: `spellbook` 0.4, unmodified.** Pure Rust, reads Hunspell `.aff`/`.dic` as the
+  system ships them, no C library. MPL-2.0: file-level copyleft, already allowed by
+  `deny.toml` (stylo, cssparser and `option-ext` arrive under it); depending on it obliges
+  nothing of ours, and no source of it is copied (CONVENTIONS "Borrowing from other
+  projects"). Its deps (`hashbrown` 0.17, `foldhash` 0.2) are MIT or Apache-2.0 and Zlib.
+  `cargo deny check licenses` passes with and without `--all-features`.
+- **Dictionaries come from the system** (`/usr/share/hunspell`, then Debian's `myspell`
+  directories, then `$XDG_DATA_HOME/hunspell`); nothing is bundled. Fedora 44 here has the
+  `en_*` set. A language with no dictionary marks nothing rather than everything.
+- **ds stays pure.** Tokenising, the skip rules, the CJK test, how marks follow an edit and which
+  word is being typed are pure functions in `ds::spell`, table-tested. The seam is a trait,
+  `SpellService`, because two implementations are swapped there (the worker and a test's fake);
+  its answers are boxed futures, so `ds` needs no executor or channel crate. `ds_native::spell`
+  (feature `spellcheck`) owns every file read and write and the worker thread.
+- **Marks are decoration, not document.** The app's markup is never touched: a layer, last in
+  the surface and absolutely positioned, holds one box per line of each marked word, from
+  `HostEdit::selection_rects` less the layer's own measured corner. Out of the flow because
+  mailo's `.c-body > * { margin: 0 0 .55em }` would give an in-flow layer a margin and move the
+  text; last because mailo's placeholder rule is `.c-body.ph > p:first-child`. Blitz draws
+  `border-bottom: dotted` as round dots (`blitz-paint` `draw_dotted_border_edge`), which is the
+  reference's look; `text-decoration-style: dotted` would need the app's markup.
+- **Tasks belong to the surface.** A pick runs in the menu's handler, and a task spawned there is
+  the menu's: it was cancelled the moment the menu closed, so the recheck after a replacement
+  never ran, and an undo straight after brought back a word whose paragraph read as already
+  checked. Every checker task now spawns in the surface's scope (`task::spawn_in`), and a
+  paragraph edited since the last read is dropped from the checked set, so an undo to the text a
+  check once saw is checked again.
+- **The word being typed.** When a paragraph changes, the word touching the caret (`start <=
+  caret <= end`) is held unmarked until the caret stops touching it. The surface does not own
+  the caret, so the app passes it (`caret`); mailo already computes that `TextPosition`.
+- **The replacement is the app's edit.** `EditInput` is matched exhaustively by mailo's adapter,
+  so a new variant would have broken it; `on_replace: EventHandler<SpellReplace>` is additive,
+  and mailo's core already takes `insertReplacementText` as one undoable step.
+
+### Proofs
+
+`ds/src/spell/*_tests.rs` and `lang.rs`, `ds-native/src/spell/choose.rs`,
+`ds-native/tests/spell_worker.rs` (a temporary dictionary; the system's `en_US` only where
+installed: `recieve`, `definately` and `colour` wrong, `receive` right),
+`ds-native/tests/spell_edit.rs` (the harness: marked at least 300 ms after the last key, under
+the second word, dots under the glyphs; `teh` unmarked while the caret is on it, marked once a
+space moves it off; right-click, pick "the", then Ctrl+Z restores "teh" and its mark; Ignore;
+the context-menu key and Learn writing `en_US.dic`; a right-click off a mark opens nothing), SSR
+goldens `controls/edit_surface/spell-on.html` and `spell-marked.html`. Looked at: a harness
+picture of four marks under `Teh`, `brwn`, `teh`, `helo` in Inter at 16 px (round red dots just
+under the descenders).
+
+### Limits
+
+- **Geometry follows reads, not layout.** Marks are re-measured after each input, caret move and
+  check; a resize or a font load that reflows the text without either leaves them where they were
+  until the next one.
+- **Busy dictionaries.** The first check in a language loads its dictionary on the worker (the
+  whole `spell_worker` binary, system `en_US` included, runs in 0.07 s here); the UI never
+  waits for it, the marks just land later.
+- **The menu takes the keyboard**, so `on_focus` hears `Out` and `In` around it; the reference
+  keeps the caret shown. Undecided whether to keep the surface focused instead.
+- **Languages.** The default is the locale's single language; a list of languages (checked with
+  every one, a word right in any is right) works through the seam but has no setting yet: the
+  proposed `appearance.spelling_languages` row is not in design/22.
+- **Grammar, autocorrect and "Show Spelling and Grammar"** are not built.
+- **CJK is skipped, not checked.** Thai, Lao and Khmer (no spaces either) are not in the CJK
+  blocks and would be checked as whole runs against a Latin dictionary; nothing tests them.
+- **Other Blitz hosts** (shell-host, sill) get the checker only by calling
+  `ds_native::spell::provide()`; the harness provides none (tests call `provide_with`).
