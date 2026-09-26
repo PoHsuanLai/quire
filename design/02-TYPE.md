@@ -2,38 +2,90 @@
 
 ## 1. What this governs
 
-This file fixes the three typefaces, which one each element uses, every size, weight,
-line-height and tracking pair, the text colours that go with them, numerals, and the truncation
+This file fixes the two typefaces (System and Editorial) and the faces each maps its jobs to,
+which job each element uses, every size, weight, line-height and tracking pair, the text colours that go with them, numerals, and the truncation
 rules. It covers the mail prototype's elements exhaustively so a shell surface can pick the
 matching role instead of inventing a size. Colour tokens are named here and defined in
 `03-COLOR.md`. Source keys `S`, `C`, `P` are defined in `00-PRINCIPLES.md` section 1; `S` wins
 every conflict with `C`.
 
-## 2. The three faces
+## 2. The faces
 
-Three families, each with one job: display for names and headings, UI for reading and controls,
-data for anything machine-shaped.
+Five jobs, each with one token: display for names and headings, UI for reading and controls,
+data for anything machine-shaped, code where a fixed pitch carries meaning, serif for a message a
+person writes in a serif. Which face does each job is the root's **typeface**
+(`appearance.typeface`, `22-SETTINGS.md` section 3.1; `Ds { typeface }`, written as
+`data-typeface` on every `.ds`, like the theme).
+
+The user's decision (2026-09-26): "make this desktop use mostly inter". The reference desktop's
+system font (SF Pro) is licensed for its own platform only; Inter (SIL OFL 1.1, rsms/inter) is
+the open equivalent, and has a Display optical cut for large sizes. Inter is the system face of
+the whole desktop; the monospace face stays only where monospace carries meaning (code, `Kbd`,
+aligned logs); mail's editorial faces remain an opt-in voice for an app, not the default.
+
+| Token | System (default) | Editorial | Job |
+| --- | --- | --- | --- |
+| `--font-display` | Inter Display (`opsz` 32), `wght` 500..800 | Bricolage Grotesque | headings, names, initials in avatars, Space name, big numbers, the lock clock |
+| `--font-ui` | Inter (`opsz` 14), `wght` 400..700; italic 400 | Karla | body text and every control |
+| `--font-data` | Inter, always tabular (`font-variant-numeric:tabular-nums` on every data rule) | Space Mono | eyebrows, section headers, counts, times, chips, shortcuts, tokens, table heads |
+| `--font-code` | Space Mono | Space Mono | code, `Kbd`, aligned logs |
+| `--font-serif` | Noto Serif | Noto Serif | a message written in a serif, and the control that offers it |
 
 ```css
+/* .ds (System) */
+--font-display:"Inter Display","Inter",system-ui,sans-serif;
+--font-ui:"Inter",system-ui,sans-serif;
+--font-data:"Inter",system-ui,sans-serif;
+--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+/* .ds[data-typeface=editorial]: exactly the prototype's (S:20-22, identical in C:44-46) */
 --font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
 --font-ui:"Karla","Segoe UI",system-ui,sans-serif;
 --font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 ```
 
-`S:20-22` (identical in `C:44-46`)
+Editorial's faces, as the prototype loads them:
 
-| Token | Family | Axes and weights loaded by `S` | Loaded by `C` | Job |
-| --- | --- | --- | --- | --- |
-| `--font-display` | Bricolage Grotesque | variable, `opsz` 12..96, `wght` 500..800 | static instances at opsz 12..96: 500, 700, 800 | headings, names, initials in avatars, Space name, big numbers, composer title |
-| `--font-ui` | Karla | roman `wght` 400..700; italic 400 | roman 400, 500, 600, 700; italic 400 | body text and every control |
-| `--font-data` | Space Mono | 400, 700 | 400, 700 | eyebrows, section headers, counts, times, chips, keys, shortcuts, tokens, table heads, code |
+| Face | Axes and weights loaded by `S` | Loaded by `C` |
+| --- | --- | --- |
+| Bricolage Grotesque | variable, `opsz` 12..96, `wght` 500..800 | static instances at opsz 12..96: 500, 700, 800 |
+| Karla | roman `wght` 400..700; italic 400 | roman 400, 500, 600, 700; italic 400 |
+| Space Mono | 400, 700 | 400, 700 |
 
 Loading URLs: `S:4`, `C:4`. The design system ships the faces as subset TTFs (latin plus
 latin-ext) registered with the renderer, not as CSS `@font-face` (`P:289`, `P:306`, `P:324`).
+Inter is cut from the official Inter 4.1 release (`crates/ds/scripts/cut-inter.sh` records the
+zip's SHA-256): the renderer sets no optical size from the font size, so the variable font's
+`opsz` axis is pinned into two families, Inter at 14 and Inter Display at 32, each keeping its
+`wght` range; the layout features kept are `kern`, `mark`, `mkmk`, `ccmp`, `locl`, `calt`,
+`case`, `tnum`, `pnum` and `zero`.
+
+### 2.1 The voice tokens
+
+Sizes stay per role in both typefaces. What Inter wants differently is tracking (its own dynamic
+metrics: tight at display sizes, zero at body, far less than a monospace face in caps) and the
+weight of a caps label (a monospace label reads at 400; Inter caps at 9.5-10 px need 600 to hold
+the line). Those values are tokens, declared per typeface on `.ds`:
+
+| Token | System | Editorial | Used by |
+| --- | --- | --- | --- |
+| `--tracking-heading` | -0.02em | -0.015em | `h1`-`h3` |
+| `--tracking-lock-clock` | -0.02em | -0.035em | the lock screen's time |
+| `--tracking-lock-date` | -0.01em | 0.01em | the lock screen's date |
+| `--tracking-caps` | 0.06em | 0.14em | eyebrow; section header (frame, field, menu); calendar weekday heads; checks heading |
+| `--tracking-caps-narrow` | 0.06em | 0.12em | group header; section header (group); calendar month |
+| `--fw-caps` | 600 | 400 | the same caps labels (the calendar month stays 700) |
+| `--fs-caps` | `--fs-micro` (9.5) | `--fs-eyebrow` (11) | eyebrow |
+| `--tracking-mono` | 0 | -0.02em | `.ds-mono` |
+| `--fs-mono` | .86em | .78em | `.ds-mono` |
+
+The eyebrow under System is Inter SemiBold small-caps-like: uppercase, 0.06em apart, at
+`--fs-micro`.
 
 ## 3. Base text
 
-Every element inherits one base: UI face, 15 px, line-height 1.55, antialiased.
+Every element inherits one base: UI face, 15 px, line-height 1.55, antialiased. The block below
+is `S`'s; in the design system the tracking and the eyebrow's size and weight are the voice
+tokens of section 2.1, which under Editorial carry exactly these values.
 
 ```css
 body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-ui);
@@ -58,6 +110,30 @@ Rules that follow from the base:
 - `.mono` is relative: 0.78 of the parent size with -0.02em tracking (`S:56`).
 
 ## 4. The size ramp
+
+### 4.1 Under System (Inter)
+
+Every size in 4.2 stays, role for role; the faces and the pairs move as follows.
+
+| Band | Face | Weight | Tracking | Notes |
+| --- | --- | --- | --- | --- |
+| 140 (lock clock) | Inter Display | 700 | -0.02em | tabular |
+| 20-47 (subject, headings, amount, day, display, widget figures) | Inter Display | as in 4.2 (700; 800 for the day number) | -0.02em on `h1`-`h3`; the rest as in 4.2 | Inter's dynamic metrics give -0.017em at 20 and -0.02em at 26 and up; the Display cut is already spaced for it |
+| 22 (lock date) | Inter Display | 600 | -0.01em | |
+| 13-16.5 (display: titles, names, tile letters) | Inter Display | as in 4.2 | 0 | |
+| 12.5-16 (UI: body, controls, rows) | Inter | as in 4.2 (400/500/600/700) | 0 | Inter's metrics give -0.004em at 13 and -0.011em at 16; the stylesheet keeps body at 0 |
+| 9-12 (UI: help, small, tooltips) | Inter | as in 4.2 | 0 | Inter's metrics give +0.005em at 11 |
+| 9.5-11.5 (data: times, counts, chips, shortcuts, cells) | Inter, tabular | 400 (700 where 4.2 says so) | 0, or as in section 5 for the non-caps rows | tabular figures everywhere the data face is used |
+| 9.5-11 (data caps: eyebrow, section headers, group heads, weekday heads, checks heading) | Inter, tabular | 600 (`--fw-caps`) | 0.06em (`--tracking-caps`, `--tracking-caps-narrow`) | the eyebrow drops from 11 to `--fs-micro` 9.5 |
+| 7.5-12.5 (display 800: initials, marks) | Inter Display | 800 | 0 | |
+| 9.5-10.5 (code: `Kbd`) | Space Mono (`--font-code`) | 400 | 0 | unchanged |
+
+Widget and lock sizes (`--fs-dial`, `--fs-dial-large`, `--fs-widget-figure`, `--fs-widget-hero`)
+were set from the display face's cap height .66 em; Inter Display's cap height is .727 em, so
+under System those caps draw about 10% taller than the reference measurement. The sizes are kept
+(the user's instruction: sizes stay); re-fitting them to Inter's cap height is open decision 8.
+
+### 4.2 Under Editorial (the prototype's pairs)
 
 `S` uses 22 distinct sizes between 7.5 and 26 px in app surfaces. This is the full ramp with the
 role each size carries; every row cites its rules.
@@ -123,7 +199,9 @@ Above them sits `--fs-lock-clock` 140, the lock screen's time in the display fac
 
 ## 5. Tracking
 
-Letter-spacing is fixed per role; uppercase data text is always tracked wide.
+Letter-spacing is fixed per role; uppercase data text is always tracked wide. The table is
+Editorial's; under System the rows that are voice tokens (section 2.1) take Inter's values, and
+the others (0.02em, 0.06em, 0.08em, 0.1em) are kept, since they are small enough to suit Inter.
 
 | Tracking | Where | Source |
 | --- | --- | --- |
@@ -246,8 +324,9 @@ The design system cannot rely on `text-overflow:ellipsis` or line clamp in Blitz
 
 ## Open decisions
 
-1. **Display axes.** `S` loads Bricolage as a variable font (`wght 500..800`), `C` as three static
-   instances (500, 700, 800) (`S:4`, `C:4`). Which the design system ships, and whether the
+1. **Display axes.** Inter's `opsz` axis is pinned per family, Inter at 14 and Inter Display at
+   32 (section 2). For Bricolage: `S` loads it as a variable font (`wght 500..800`), `C` as three
+   static instances (500, 700, 800) (`S:4`, `C:4`). Which the design system ships, and whether the
    `opsz` axis is set automatically by size or pinned, is not specified.
 2. **`h4` and `h5` weight** comes from browser defaults in `S`, not a rule. A native renderer may
    default differently; the intended weight (700 is the inference) is not specified.
@@ -263,6 +342,9 @@ The design system cannot rely on `text-overflow:ellipsis` or line clamp in Blitz
    font (`P:1471`); no size is settled for any shell surface.
 7. **Ellipsis in Blitz.** Whether the mask-fade replacement is acceptable visually for every row in
    section 10 is not specified (`P:420-422`).
+8. **Widget sizes under Inter.** The widget sizes were fitted to the display face's .66 em cap;
+   Inter Display's is .727 em. Whether System should carry its own widget sizes (about 0.91 of
+   each) is not decided.
 
 ## Sources
 
