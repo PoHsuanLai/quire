@@ -15,7 +15,7 @@ use crate::error::NativeError;
 use crate::frame_view::FrameView;
 use crate::harness_config::HarnessConfig;
 use crate::harness_input::{HeldButtons, blitz_button, keyboard, modifier, pointer};
-pub use crate::harness_settle::{SETTLE_BOUND, settle_until};
+pub use crate::harness_settle::{QUIET, SETTLE_BOUND, assert_settles_to_zero_frames, settle_until};
 use crate::headless::{Backdrop, Headless, Layout};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
@@ -320,6 +320,14 @@ impl Harness {
     /// "a surface at rest paints 0 frames" as the host sees it (it asks for no redraw).
     pub fn is_animating(&self) -> bool {
         self.with_doc(BaseDocument::is_animating)
+    }
+
+    /// How many times the document's waker has fired so far: a timer that fired, a resource that
+    /// landed. Unchanged across an `advance` means nothing woke the document in that time, so no
+    /// Rust timer asked for a frame (the idle-frame rule's other half: `is_animating` sees only
+    /// CSS).
+    pub fn wakes(&self) -> u64 {
+        self.doc.wakeup().generation()
     }
 
     /// Whether the first element matching `selector` has the keyboard focus.
