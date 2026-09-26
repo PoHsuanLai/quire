@@ -75,7 +75,7 @@
    `rows` is absent) plus its padding, so the one-line height above is undone and the field's
    `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
    component's. */
-.ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; display:block; }
+.ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; scrollbar-width:none; display:block; }
 .ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
 
 /* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The

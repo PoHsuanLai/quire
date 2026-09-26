@@ -508,6 +508,20 @@ const CASES: &[Case] = &[
         rule: Rule::BlitzUnsupported,
         expect: false,
     },
+    Case {
+        name: "blitz unsupported: scroll-behavior: smooth fails",
+        css: ".ds-scroller { scroll-behavior: smooth; }",
+        profile: Profile::Standard,
+        rule: Rule::BlitzUnsupported,
+        expect: true,
+    },
+    Case {
+        name: "blitz unsupported: scroll-behavior: auto passes",
+        css: ".ds-scroller { scroll-behavior: auto; }",
+        profile: Profile::Standard,
+        rule: Rule::BlitzUnsupported,
+        expect: false,
+    },
     // UnprefixedAttributeSelector
     Case {
         name: "unprefixed attribute: [data-open] fails",
