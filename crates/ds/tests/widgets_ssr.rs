@@ -1,6 +1,6 @@
 //! The widget parts as markup (sill FINDINGS Q182, Q183; design/04-COMPONENTS.md "Widgets"):
 //! the frame in each size on the desktop and as a tile, the clock face in both looks and
-//! phases, and the level ring at three levels and charging. Each golden is
+//! phases, and the battery at three levels and charging. Each golden is
 //! `tests/snapshots/widgets/<name>.html`; each lints clean and every `ds-` class in it is
 //! styled by the stylesheet.
 //!
@@ -12,8 +12,8 @@ mod golden;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
-    Appearance, ClockFace, ClockLook, ClockTime, DayPhase, Ds, Fraction, Glyph, Icon, IconSize,
-    Inject, LevelRing, Material, RingMark, RootChrome, Seconds, Theme, WidgetFrame, WidgetHost,
+    Appearance, BatteryLevel, ClockFace, ClockLook, ClockTime, DayPhase, Ds, Fraction, Glyph, Icon,
+    IconSize, Inject, Material, RingMark, RootChrome, Seconds, Theme, WidgetFrame, WidgetHost,
     WidgetMetrics, WidgetSize, WidgetTitle,
 };
 
@@ -129,28 +129,28 @@ const CASES: &[Case] = &[
             rsx! { ClockFace { time: LATE, phase: DayPhase::Night, look: ClockLook::Digital, label: "London" } },
         )
     }),
-    ("ring-8", || {
+    ("battery-8", || {
         desktop(
             Theme::Light,
-            rsx! { LevelRing { level: Fraction(80), label: "Mouse" } },
+            rsx! { BatteryLevel { level: Fraction(80), label: "Mouse" } },
         )
     }),
-    ("ring-45", || {
+    ("battery-45", || {
         desktop(
             Theme::Light,
-            rsx! { LevelRing { level: Fraction(450), label: "Headphones", Glyph { icon: Icon::Headphones, size: IconSize::Base } } },
+            rsx! { BatteryLevel { level: Fraction(450), label: "Headphones", Glyph { icon: Icon::Headphones, size: IconSize::Base } } },
         )
     }),
-    ("ring-100", || {
+    ("battery-100", || {
         desktop(
             Theme::Dark,
-            rsx! { LevelRing { level: Fraction(1000), label: "Keyboard" } },
+            rsx! { BatteryLevel { level: Fraction(1000), label: "Keyboard" } },
         )
     }),
-    ("ring-charging-15", || {
+    ("battery-charging-15", || {
         desktop(
             Theme::Light,
-            rsx! { LevelRing { level: Fraction(150), mark: RingMark::Charging, label: "This computer" } },
+            rsx! { BatteryLevel { level: Fraction(150), mark: RingMark::Charging, label: "This computer" } },
         )
     }),
 ];
@@ -229,42 +229,53 @@ fn a_frame_says_its_size_and_host_and_only_the_desktop_has_a_material() {
     assert!(!html("frame-small-tile").contains("ds-widget-title"));
 }
 
-/// Day forces the dial's scope to the light scheme and night to the dark, whatever the root's;
-/// the second hand is drawn only when the seconds are shown.
+/// The dial is drawn in the light scheme by day and by night (the night disc is the light
+/// scheme's ink), whatever the root's; the second hand is drawn only when the seconds are shown;
+/// a digital face wears the sun by day and the moon by night.
 #[test]
-fn the_dial_takes_its_phases_scheme_and_its_second_hand_only_when_shown() {
+fn the_dial_keeps_its_pairs_and_its_second_hand_only_when_shown() {
     let day = html("clock-analog-day");
     assert!(day.contains("data-theme=\"light\""), "{day}");
+    assert!(day.contains("data-phase=\"day\""), "{day}");
     assert!(!day.contains("ds-clock-second"), "{day}");
     assert!(
         day.contains("rotate(295 50 50)"),
         "the hour hand at ten to ten: {day}"
     );
     let night = html("clock-analog-night-seconds");
-    assert!(night.contains("data-theme=\"dark\""), "{night}");
+    assert!(night.contains("data-theme=\"light\""), "{night}");
+    assert!(night.contains("data-phase=\"night\""), "{night}");
     assert!(night.contains("ds-clock-second"), "{night}");
     assert!(
         night.contains("rotate(252 50 50)"),
         "the second hand at 42 s: {night}"
     );
-    assert!(html("clock-digital-night-seconds").contains(">23:05:42<"));
-    assert!(html("clock-digital-day").contains(">09:50<"));
+    let digital_night = html("clock-digital-night-seconds");
+    assert!(digital_night.contains(">23:05:42<"), "{digital_night}");
+    assert!(digital_night.contains("ds-clock-moon"), "{digital_night}");
+    let digital_day = html("clock-digital-day");
+    assert!(digital_day.contains(">09:50<"), "{digital_day}");
+    assert!(digital_day.contains("ds-clock-sun"), "{digital_day}");
+    assert!(
+        !day.contains("ds-clock-sun"),
+        "an analog face wears no mark"
+    );
 }
 
-/// The ring's arc is the level in percent, its tone follows the level unless charging, and it
+/// The fill is the level of the channel, its tone follows the level unless charging, and it
 /// reports its value as a progress bar.
 #[test]
-fn the_ring_draws_its_level_and_tone() {
+fn the_battery_draws_its_level_and_tone() {
     let cases = [
-        ("ring-8", "8 100", "critical", "8"),
-        ("ring-45", "45 100", "ok", "45"),
-        ("ring-100", "100 100", "ok", "100"),
-        ("ring-charging-15", "15 100", "ok", "15"),
+        ("battery-8", "0.08", "critical", "8"),
+        ("battery-45", "0.45", "ok", "45"),
+        ("battery-100", "1", "ok", "100"),
+        ("battery-charging-15", "0.15", "ok", "15"),
     ];
-    for (name, dash, tone, now) in cases {
+    for (name, width, tone, now) in cases {
         let html = html(name);
         assert!(
-            html.contains(&format!("stroke-dasharray=\"{dash}\"")),
+            html.contains(&format!("style=\"--f:{width}\"")),
             "{name}: {html}"
         );
         assert!(
@@ -277,6 +288,8 @@ fn the_ring_draws_its_level_and_tone() {
         );
         assert!(!html.contains("a-bump"), "{name}: nothing bumps on mount");
     }
-    assert!(html("ring-charging-15").contains("ds-ring-bolt"));
-    assert!(!html("ring-45").contains("ds-ring-bolt"));
+    let charging = html("battery-charging-15");
+    assert!(charging.contains("data-mark=\"charging\""), "{charging}");
+    assert!(charging.contains("ds-battery-bolt"), "{charging}");
+    assert!(!html("battery-45").contains("ds-battery-bolt"));
 }

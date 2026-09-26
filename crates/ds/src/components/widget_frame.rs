@@ -11,7 +11,6 @@
 
 use crate::components::text_runs::text;
 use crate::components::widget_kind::{WidgetHost, WidgetSize, WidgetTitle};
-use crate::components::widget_looks::FrameFinish;
 use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
 use crate::material::Material;
@@ -21,7 +20,6 @@ use dioxus::prelude::*;
 
 /// `children` on a widget's card, `size` on the grid unit, for `host`. `title` draws a glyph and
 /// a name above the content. `id` names the card for the layer's input and blur regions.
-/// `finish` bevels a desktop card (design/23-WIDGETS.md section 4.3); a tile ignores it.
 ///
 /// The frame provides its `size` to its content (`widget_scope`), so content that must fit
 /// the frame, a `MonthGrid` at `MonthDensity::Auto`, fits itself without being told.
@@ -31,7 +29,6 @@ pub fn WidgetFrame(
     #[props(default)] host: WidgetHost,
     #[props(default)] title: Option<WidgetTitle>,
     #[props(default)] id: Option<String>,
-    #[props(default)] finish: FrameFinish,
     children: Element,
 ) -> Element {
     use_frame_provider(size);
@@ -41,10 +38,9 @@ pub fn WidgetFrame(
             id,
             "data-size": size.slug(),
             "data-host": host.slug(),
-            "data-finish": finish.attr(),
             if let Some(title) = title {
                 div { class: "ds-widget-title",
-                    Glyph { icon: title.glyph, size: IconSize::Compact }
+                    Glyph { icon: title.glyph, size: IconSize::Tiny }
                     span { class: "ds-widget-title-text", {text(&title.text)} }
                 }
             }

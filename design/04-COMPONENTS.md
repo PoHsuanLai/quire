@@ -3247,12 +3247,13 @@ plays nothing (design/05 principle 7, nothing loops: every motion is keyed to a 
 
 **Blitz notes.** Rows are CSS grid (`repeat(7, 32px)`), as `ModuleGrid`; the dot is a real span;
 no pseudo-elements.
-### 40. Widgets: WidgetFrame, WidgetMetrics, ClockFace and LevelRing (settled 2026-09-26)
+### 40. Widgets: WidgetFrame, WidgetMetrics, ClockFace and BatteryLevel (settled 2026-09-26; drawing proposed, design/23)
 
 **Purpose.** The card every widget is drawn on, on the desktop layer and in the notification
 center's widget column (design/20 section 1.14; design/22 section 3.20; sill FINDINGS Q182,
 Q183), and the two faces sill cannot draw from text alone: an analog world clock and a battery
-level ring. The card's corner, padding and title row are the frame's, so a widget writes no CSS
+glyph. Their drawing is the widget style "Neumorphism & Soft UI" (design/23-WIDGETS.md
+sections 2 to 4). The card's corner, padding and title row are the frame's, so a widget writes no CSS
 for them.
 
 **WidgetMetrics.** Writes the grid unit as tuned tokens on any element around the widgets:
@@ -3264,7 +3265,7 @@ what the stylesheet falls back to.
 WidgetHost::{Desktop, Tile}, title: Option<WidgetTitle { glyph: Icon, text: Text }>, id:
 Option<String>, children }`.
 Markup: `div.ds-widget[data-size][data-host]` holding an optional
-`div.ds-widget-title` (a `Glyph` at 14 and the text) and `div.ds-widget-body`.
+`div.ds-widget-title` (a `Glyph` at 12 and the text) and `div.ds-widget-body`.
 The frame provides its `size` to its content through a context (`widget_scope`), so content
 that must fit the frame fits itself: a `MonthGrid` at `MonthDensity::Auto` is compact in a
 `Small` frame (section 39).
@@ -3276,7 +3277,7 @@ that must fit the frame fits itself: a `MonthGrid` at `MonthDensity::Auto` is co
 | Large | `2 x --widget-cell + --widget-gap` square (344) | design/22 section 3.20 |
 | Desktop card | the `Widget` material's plate inside a transparent `Widget` scope (as the notification plate): its tint, hairline and soft drop, its own corner `--m-radius` (20), padding `--s-16` | design/20 section 1.14 (material `Widget`) |
 | Tile | no material of its own, on the Popover it sits in: `--surface-2` fill, `--line` hairline, `--r-tile` (12), padding `--s-12`, as a `ModuleTile` | brief (Q182) |
-| Title row | glyph 14 and `--fs-help` 600 in `--ink-soft`, `--s-6` apart, `--s-8` above the body | brief |
+| Title row | a quiet eyebrow: glyph 12 and the name in `--font-data` `--fs-micro`, upper, tracked .08em, both `--ink-faint`, `--s-5` apart, `--s-8` above the body | design/23 section 4.3 |
 
 The tile takes the same footprint as the desktop card: the center's column (384 less its
 padding) holds a medium tile's 344.
@@ -3290,32 +3291,28 @@ text rather than a component.
 
 **ClockFace.** `ClockFace { time: ClockTime { hour, minute, second: Seconds::{Shown(s), Hidden}
 }, phase: DayPhase::{Day, Night}, look: ClockLook::{Analog, Digital}, label: Text }`.
-Markup: `div.ds-clock[data-look][data-phase]`. Analog: a dial (`div.ds-clock-dial`, 72 round, in a
-scope forced to the light scheme by day and the dark by night, so the day face is always paper
-with ink hands and the night face ink with paper hands whatever the desktop's scheme) holding
-two `svg[data-ds-svg]` drawn on `currentColor` (twelve ticks, the hour and minute hands and the
-hub; the second hand in `--accent` when shown). Digital: the time in `--font-data` tabular
-(`09:41`, `09:41:07` with seconds), bumping on each new minute. The label (the city) sits under
-either in `--fs-help`. The hand angles are pure (`clock_angles.rs`): hour `30 x (h mod 12) + m / 2
-+ s / 120` degrees, minute `6 x m + s / 10`, second `6 x s`.
+Markup: `div.ds-clock[data-look][data-phase]`, then `span.ds-clock-label` (the city, with the
+phase's mark before it on a digital face). Analog: `div.ds-clock-dial`, a 56 px soft well in the
+plate (the plate's colour by day, `--soft-night` by night) holding four `svg[data-ds-svg]` on
+`currentColor`: four quarter marks; the hour and minute hands and the 6 px hub three times (a
+shade, a light, the hands; design/23 section 2.1); the second hand in `--accent` when shown.
+Digital: the time in `--font-display` 700 tabular (`09:41`, `09:41:07` with seconds), at
+`--fs-widget-hero` in a Small frame and `--fs-subject` elsewhere, bumping on each new minute; a
+sun (`svg.ds-clock-sun`, `--warn`) or moon (`svg.ds-clock-moon`, `--ink-faint`) before the
+city. The hand angles are pure (`clock_angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120`
+degrees, minute `6 x m + s / 10`, second `6 x s`.
 
-**LevelRing.** `LevelRing { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text,
-children }`: a stroked ring (`svg.ds-ring[data-ds-svg=ring]`, circumference 100 so the dash is
-the level in percent), a track at .2 of `currentColor`, the level in `--ok`, `--warn` at or under
-20 %, `--danger` at or under 10 % (a charging ring stays `--ok`); `Charging` adds a bolt on a
-paper disc at the top. `children` (a device glyph) sit in the middle; `role=progressbar` with
-`aria-valuenow` in percent. The level bumps on change (`use_bump_on`). No `ProgressRing` existed:
-the SendPill's ring is a countdown drawn inside the pill, not a level.
-
-**Candidate looks (proposed 2026-09-26, design/23-WIDGETS.md section 4).** `LevelRing { look:
-BatteryLook::{Ring, Well, Cell} }`, `ClockFace { dial: DialLook::{Paper, Bezel, Sky} }` and
-`WidgetFrame { finish: FrameFinish::{Plain, Lit} }`, each defaulting to the look above and writing
-`data-look`, `data-dial` or `data-finish` only when another is chosen; the user picks from the
-gallery's "Widget looks" page.
+**BatteryLevel** (renamed from `LevelRing`, which stays as an alias). `BatteryLevel { level:
+Fraction, mark: RingMark::{Plain, Charging}, label: Text, children }`: a battery glyph
+(`span.ds-battery-glyph`, 32 x 16, 40 x 20 in a Small frame): an extruded rounded body, an inset
+channel, and in it a solid fill as long as the level (`--f`) in `--ink`, `--warn` at or under
+20 %, `--danger` at or under 10 %, `--ok` while charging (never low); a terminal cap; `Charging`
+adds a bolt over the body. `children` (an optional device glyph) sit before it; `role=progressbar`
+with `aria-valuenow` in percent. The level bumps on change (`use_bump_on`). The depth candidates
+of the second pass (`look`, `dial`, `finish`) are removed.
 
 **Motion.** None in steady state; a value change plays `bump` once (`--t-move --e-spring`, the
-Count's pulse). No transition on the ring's dash (a `stroke-dashoffset` transition does not run in
-Blitz, O-20).
+Count's pulse). No transition on the battery's fill (O-20).
 
 ### 41. ShotThumbnail and ShotGhost (screenshot thumbnail, settled 2026-09-26)
 

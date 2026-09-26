@@ -20,7 +20,7 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
-use crate::tokens::widget_paint::WidgetPaint;
+use crate::tokens::soft::SoftPaint;
 use crate::tokens::widgets::WIDGET_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
@@ -49,7 +49,7 @@ fn collect() -> HashSet<String> {
         .chain(Radius::ALL.map(Radius::var))
         .chain(SpacingToken::ALL.map(SpacingToken::var))
         .chain(Shadow::ALL.map(Shadow::var))
-        .chain(WidgetPaint::ALL.map(WidgetPaint::var))
+        .chain(SoftPaint::ALL.map(SoftPaint::var))
         .chain(FontSize::ALL.map(FontSize::var))
         .chain(ZLayer::ALL.map(ZLayer::var))
         .chain(OpacityToken::ALL.map(OpacityToken::var))
