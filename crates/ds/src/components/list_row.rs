@@ -1,7 +1,7 @@
 //! ListRow: one item in a list, the thread row (design/04-COMPONENTS.md section 16).
 
 use crate::components::row_click::snapshot;
-use crate::components::row_hooks::{PartHooks, enter, leave, relay};
+use crate::components::row_hooks::{PartHooks, relay, use_back};
 use crate::components::row_star::star_button;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
@@ -86,7 +86,10 @@ fn exit(presence: Presence) -> Option<&'static str> {
 /// `subject` and `snippet` are [`Text`]: a string as before, or the runs a search hit marked.
 /// `on_sender` and `on_time` hear the pointer entering and leaving the name and the time (their
 /// own hover cards); `onpointerenter`, `onpointerleave` and `onpointerdown` hear the row itself
-/// (the thread card, a drag's start). `aria_label` names the row for a screen reader ("Open
+/// (the thread card, a drag's start). `onpointerback` hears the pointer leave the name or the
+/// time and rest on the row for the card's close grace (`HoverClose`): where a row reopens its own card, which the parts' own leave
+/// cannot tell, since the pointer may have left for a card floating over the rows (FINDINGS
+/// "A part's leave is not the row's enter"). `aria_label` names the row for a screen reader ("Open
 /// Re: UIDL stability"); absent, the row is named by its contents as before.
 #[component]
 pub fn ListRow(
@@ -110,8 +113,10 @@ pub fn ListRow(
     #[props(default)] onpointerenter: Option<EventHandler<PointerEvent>>,
     #[props(default)] onpointerleave: Option<EventHandler<PointerEvent>>,
     #[props(default)] onpointerdown: Option<EventHandler<PointerEvent>>,
+    #[props(default)] onpointerback: Option<EventHandler<PointerEvent>>,
     #[props(default)] aria_label: Option<String>,
 ) -> Element {
+    let back = use_back(onpointerback);
     rsx! {
         li {
             class: "ds-row",
@@ -125,8 +130,8 @@ pub fn ListRow(
             "data-drag": drop.drag_attr(),
             style: row_style(index, presence),
             onclick: move |event| onclick.call(snapshot(&event.data())),
-            onpointerenter: relay(onpointerenter),
-            onpointerleave: relay(onpointerleave),
+            onpointerenter: back.enter(onpointerenter),
+            onpointerleave: back.leave(onpointerleave),
             onpointerdown: relay(onpointerdown),
             div { class: "ds-row-dot",
                 span { class: "ds-dot" }
@@ -135,8 +140,8 @@ pub fn ListRow(
                 div { class: "ds-row-from",
                     span {
                         class: NameFit::of(&name, NAME_BUDGET).class(),
-                        onpointerenter: enter(on_sender),
-                        onpointerleave: leave(on_sender),
+                        onpointerenter: back.part_enter(on_sender),
+                        onpointerleave: back.part_leave(on_sender),
                         "{name}"
                     }
                     if let Some(via) = via {
@@ -151,8 +156,8 @@ pub fn ListRow(
             div { class: "ds-row-tail",
                 span {
                     class: "ds-row-time",
-                    onpointerenter: enter(on_time),
-                    onpointerleave: leave(on_time),
+                    onpointerenter: back.part_enter(on_time),
+                    onpointerleave: back.part_leave(on_time),
                     "{time}"
                 }
                 span { class: "ds-row-tags", {tags} }

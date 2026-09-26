@@ -975,6 +975,7 @@ per row:
 | `ListRow` | `on_sender: Option<PartHooks>` | `PartHooks { onpointerenter, onpointerleave }` (`EventHandler<PointerEvent>` each) on the name: the sender card. |
 | `ListRow` | `on_time: Option<PartHooks>` | The same on the time: the time tip (`HoverKind::Tip`, below). |
 | `ListRow` | `onpointerenter` / `onpointerleave: Option<EventHandler<PointerEvent>>` | The row itself: the thread card. |
+| `ListRow` | `onpointerback: Option<EventHandler<PointerEvent>>` | (2026-09-27) The pointer left the name or the time and rested on the row for the close grace (`HoverClose`, 150 ms), crossing nothing: where the row reopens its thread card. Do not do that from a part's `onpointerleave`: the pointer may have left for the card floating over the rows, and a warm hub would swap the card at once (FINDINGS "A part's leave is not the row's enter"). |
 | `ListRow` | `onpointerdown: Option<EventHandler<PointerEvent>>` | A press on the row: a drag's start. A strip button's or the star's press still reaches it (only their clicks stop). |
 | `ListRow` | `aria_label: Option<String>` | The row's accessible name ("Open Re: UIDL stability"); absent, its contents name it as before. |
 | `HoverStrip` | `shown: Option<Shown>` | `Some(Shown::Visible)` shows the strip on a keyboard-selected or focused row (Blitz never matches `:focus-within`); `Some(Shown::Hidden)` keeps it down under the pointer; `None` is the hover reveal. |

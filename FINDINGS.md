@@ -4401,3 +4401,74 @@ under the descenders).
   blocks and would be checked as whole runs against a Latin dictionary; nothing tests them.
 - **Other Blitz hosts** (shell-host, sill) get the checker only by calling
   `ds_native::spell::provide()`; the harness provides none (tests call `provide_with`).
+
+## A part's leave is not the row's enter (2026-09-27)
+
+mailo: with the sender card open over the message list, moving the pointer onto the card opened
+a different card (the row's thread card, then the next rows' sender cards), so the card's
+actions (Pin to sidebar, Their mail, Copy address) could not be pressed. The guess was that
+Blitz's hit test ignores the card's stacking layer. It does not; the cause was a hook. Branch
+`overlay-hit-test`; blitz rev unchanged (`e99fbdbd`), no Blitz fork.
+
+- **Blitz's hit test follows its paint order (e99fbdbd).** `Node::hit_inner`
+  (`blitz-dom/src/node/node.rs:1322`) tries, at each stacking-context root, the positive-z
+  hoisted children first (`:1421`), then `paint_children` in reverse (`:1437`), then the
+  negative-z ones (`:1444`), then the node itself. blitz-paint (`render.rs:993-1016`) paints the
+  same three lists forwards. `flush_styles_to_layout_impl` (`layout/damage.rs:622`) builds them:
+  a child with a non-zero `z-index` that is positioned (or a flex/grid item) is hoisted to the
+  nearest stacking-context root, sorted by z; the rest are sorted by `node_to_paint_order`
+  (`:740`), which puts positioned (`z-index: auto`) children above in-flow and floated ones,
+  tree order within a level. So what is painted on top is what is hit.
+- **Proof (`crates/ds-native/tests/overlay_hit.rs`).** Eight `position: relative` rows, a card
+  over rows 1-4: `position: fixed` after the rows, `position: absolute; z-index: 5` before or
+  after them, and through the overlay host (`.ds-overlay`, the card layer's z-index, last in
+  `.ds`) each take the pointer and the click, and no row hears either. quire's `HoverCard` over
+  `ListRow`s, wired as mailo wires them, keeps the sender card while the pointer jumps onto it or
+  crosses the row to it, and its button takes the click.
+- **The cause: mailo's name hook.** `ui/row.rs` gives `ListRow`'s `on_sender` (and `on_time`) an
+  `onpointerleave` that calls `over(Hook::Thread(id))`: "leaving the name is being back on the
+  row". The sender card is placed 6 px below the name, over the rows. When the pointer leaves the
+  name for the card, the leave still says "back on the row", the hub is warm (a card is open),
+  so the row's thread card replaces the sender card at once, beside the list. The pointer is
+  now over bare rows, so the next row's name opens its sender card, and so on: "a different
+  row's card". mailo's own harness shows it: the card's centre hits the card before the move
+  (`hits(".ds-hovercard")`), and the card is gone right after it. With the name's leave
+  calling only `out()`, the same run keeps the sender card to its last action.
+- **The fix (quire, additive): `ListRow`'s `onpointerback`.** A part's leave cannot know where
+  the pointer went. `ListRow` owns the row's and the parts' listeners, so it answers: it counts
+  the row's enters and leaves and the parts' crossings (`components/row_hooks.rs` `Back`), and a
+  part's leave calls `onpointerback` after the close grace (`HoverClose`, 150 ms) only if
+  nothing was crossed meanwhile and the pointer is still on the row. The wait matters twice:
+  the trip from a name to its card crosses 6 px of row, and the row's leave and the part's
+  arrive in one burst in an order engines disagree on (next bullet). A pointer that rests on the
+  row gets the thread card when the sender card's own grace ends, which is when the hub would
+  have closed it anyway. mailo: `docs/mailo-migration.md` §6.10.
+- **Blitz sends leaves outermost first.** `events/driver.rs::handle_pointer_move` reverses both
+  chains (`:67`) and sends `pointerleave` from the first differing ancestor down (`:93`): the
+  row hears its leave before the name. UI Events sends `mouseleave` innermost first. Anything
+  that orders a row's and a part's leave (as mailo's hook implicitly did) breaks on one engine
+  or the other; `onpointerback` does not depend on it.
+- **A real Blitz deviation, not mailo's bug.** CSS 2.1 Appendix E step 8 paints every
+  `z-index: auto` positioned box of a stacking context in tree order, across subtrees.
+  `node_to_paint_order` ranks them per parent only: a static box sorts below its positioned
+  siblings, so an `absolute` card with no z-index inside a static wrapper after `relative` rows
+  goes under the rows, for paint and hit alike (in a browser it is on top). Conversely a fixed
+  card in a static wrapper before a static list of relative rows stays on top in Blitz and not
+  in a browser. `blitz_orders_auto_positioned_boxes_among_siblings_only` pins the first case
+  and flips when Blitz follows step 8. It cannot reach quire's surfaces: every floating one
+  renders in the overlay host with a z-index (hoisted, `damage.rs:675`). An upstream fix would
+  hoist `z-index: auto` positioned descendants to the stacking-context root as a zero-z layer
+  in tree order (the `HoistedPaintChildren` list, with a tree-order key) rather than sorting
+  them among siblings; not written, since nothing here needs it.
+- **Also seen, harmless here.** `resolve` runs `flush_styles_to_layout` (which records hoisted
+  offsets and each root's `content_area` from `final_layout`) before `resolve_layout`
+  (`resolve.rs:111`, `:115`), so a hoisted box's hit offsets trail a layout change by one
+  resolve. The overlay host's layer covers the root (`inset: 0`), so its offsets never move.
+- **sill and shell-host.** shell-host's `dom/document.rs` hit-tests with the same Blitz
+  (`element_from_point` for first-mouse, `doc.hit` for `element_at`; `dom/scroll.rs` too), at
+  the same rev, so its hits follow the same paint order: a sill popup drawn with a z-index, or
+  last among positioned siblings, is hit where it is painted. The one trap is the step-8
+  deviation above (an `absolute`/`fixed` popup with no z-index inside a static wrapper that
+  sorts below positioned siblings). sill's popups that use quire's overlay host are safe;
+  sill passes no `PartHooks`, so the hook that broke mailo is not in it. sill's own CSS was not
+  audited box by box for the deviation. Nothing here was changed in shell-host or sill.
