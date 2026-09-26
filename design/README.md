@@ -28,6 +28,7 @@ against them.
 | `23-WIDGETS.md` | Desktop widgets' depth language, the battery and clock candidate looks, the calendar widget brief. |
 | `24-PERSONA.md` | The user's animated character: parts, derived palette, moods, and its bounded exception to "nothing loops". |
 | `25-EMOJI.md` | Animated emoji as the user's picture: source and CC BY 4.0 attribution, the curated set, the sheet pipeline, frame budget, the idle rule. |
+| `27-HIG-PARITY.md` | Audit against the pre-2025 (macOS 14/15) HIG: archived snapshots, gaps ranked, a verdict and rule per HIG page, proposed waves H0-H7. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
 ## 2. Reading order
