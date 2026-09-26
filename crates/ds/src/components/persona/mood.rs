@@ -106,18 +106,9 @@ pub(crate) enum Blinking {
     Still,
 }
 
-/// A wake counter: pass a different value (`WakeStamp::next`) to wake the persona, as a lock
-/// screen does when the pointer moves or a key is pressed. Mounting and every mood change wake
-/// it too.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct WakeStamp(pub u32);
-
-impl WakeStamp {
-    /// The next stamp.
-    pub fn next(self) -> WakeStamp {
-        WakeStamp(self.0.wrapping_add(1))
-    }
-}
+/// A wake counter, shared with the other components that replay an entrance (the battery
+/// ring's fill); it lives in [`crate::motion`] and is re-exported here for persona callers.
+pub use crate::motion::WakeStamp;
 
 /// How much colour a persona carries: in full, or muted as the icons' Muted style mutes them
 /// (design/08 section 2.11; chroma x .55, lightness and hue kept). A surface that follows

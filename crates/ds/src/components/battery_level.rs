@@ -6,13 +6,33 @@
 //! charging, a bolt in a gap cut at twelve. The widget puts the percentage under it.
 //!
 //! The arcs are SVG paths Rust computes (`battery_ring.rs`), each on `currentColor` from its own
-//! element (spike S6), with no transition (O-20). The ring bumps once when its percentage changes.
+//! element (spike S6), with no CSS transition (O-20). The arc fills from Rust instead
+//! ([`use_battery_fill`]): on mount and on each new `wake` it sweeps from empty to the level, on
+//! each new level from the old one to the new, recomputing its path each frame while it moves
+//! and never at rest; a charging bolt fades in once the sweep has arrived. The low red and
+//! `aria-valuenow` follow the true level from the first frame.
 
 use crate::components::battery_ring::{Span, arc_path};
-use crate::components::bump_on::{bump_attrs, use_bump_on};
 use crate::components::text_runs::Text;
 use crate::components::vocab::Fraction;
+use crate::motion::{RunFrame, RunTokens, WakeStamp, use_level_run};
+use crate::tokens::{DurationToken, EasingToken};
 use dioxus::prelude::*;
+
+/// The fill's timing: `--t-fill` at `--e-out`, then the bolt's fade over `--t-quick`.
+pub const FILL: RunTokens = RunTokens {
+    duration: DurationToken::Fill,
+    easing: EasingToken::Out,
+    tail: DurationToken::Quick,
+};
+
+/// The frame of a battery ring's fill toward `level`: from empty on mount and on each new
+/// `wake`, from the last level drawn on each new `level`, at once under Reduced motion.
+/// [`BatteryLevel`] draws its arc from it and [`crate::use_battery_figure`] its count, so a ring
+/// and a percentage given the same `level` and `wake` move in step.
+pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
+    use_level_run(level.clamped(), wake, FILL)
+}
 
 /// The charging bolt, in its own 10 x 16 box.
 const BOLT: &str = "M7 0 0 9.6h4.6L3.2 16 10 6.4H5.4L7 0Z";
@@ -70,24 +90,28 @@ impl RingTone {
 }
 
 /// A battery ring at `level` (permille), charging or not, named `label` for assistive
-/// technology. `children` (a device's glyph, optional) sit in the ring's middle.
+/// technology. `children` (a device's glyph, optional) sit in the ring's middle. The arc fills
+/// on mount and again on each new `wake` (a host passes `WakeStamp::next` when its widgets come
+/// into view), and sweeps to each new level; `data-pulse` is `a` while it moves.
 #[component]
 pub fn BatteryLevel(
     level: Fraction,
     #[props(default)] mark: RingMark,
     #[props(into)] label: Text,
+    #[props(default)] wake: WakeStamp,
     children: Element,
 ) -> Element {
     let level = level.clamped();
-    let percent = (level.0 + 5) / 10;
-    let (class, alias) = bump_attrs("ds-battery", use_bump_on(percent));
+    let percent = percent_of(level);
+    let frame = use_battery_fill(level, wake);
+    let alias = moving(frame, level);
     let span = match mark {
         RingMark::Plain => Span::FULL,
         RingMark::Charging => Span::GAPPED,
     };
     rsx! {
         div {
-            class,
+            class: "ds-battery",
             "data-pulse": alias,
             "data-tone": RingTone::of(level, mark).slug(),
             "data-mark": mark.slug(),
@@ -97,16 +121,42 @@ pub fn BatteryLevel(
             "aria-valuemax": "100",
             "aria-valuenow": "{percent}",
             {ring(RingLayer::Track, arc_path(span))}
-            {ring(RingLayer::Arc, arc_path(span.filled(level)))}
+            {ring(RingLayer::Arc, arc_path(span.filled(frame.shown)))}
             if let Some(device) = given(children) {
                 span { class: "ds-battery-device", {device} }
             }
-            if mark == RingMark::Charging {
+            if mark == RingMark::Charging && frame.tail.0 > 0 {
                 svg { class: "ds-battery-bolt", "data-ds-svg": "battery", view_box: "0 0 10 16", "aria-hidden": "true",
+                    style: fading(frame.tail),
                     path { d: BOLT, fill: "currentColor" }
                 }
             }
         }
+    }
+}
+
+/// A level in whole percent, rounded: what `aria-valuenow` reads, and the count a figure shows
+/// for the level drawn in a frame (the fill's count-at-progress: `percent_of(level_at(run, p))`).
+pub fn percent_of(level: Fraction) -> u16 {
+    (level.clamped().0 + 5) / 10
+}
+
+/// `data-pulse` while the fill moves (`a`), absent at rest: kept for hosts that select a
+/// moving ring by it, as they did its bump.
+fn moving(frame: RunFrame, level: Fraction) -> Option<&'static str> {
+    if frame == RunFrame::rest(level) {
+        None
+    } else {
+        Some("a")
+    }
+}
+
+/// The bolt's opacity while it fades in; nothing once it is whole.
+fn fading(tail: Fraction) -> Option<String> {
+    if tail.0 >= 1000 {
+        None
+    } else {
+        Some(format!("opacity:{:.3}", f32::from(tail.0) / 1000.0))
     }
 }
 
