@@ -269,3 +269,10 @@
 /* nudge-up: attention, once (design/26 Attention): the element lifts and settles. `nudge` is
    the centred outbox pill's and carries its translateX(-50%). */
 @keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
+
+/* hold (quire's, sill G295): a keyframe that moves nothing. A resting state that follows an
+   animated one (a surface present again after a hide was taken back, a row or a pane at rest)
+   plays it at `--t-tap --e-linear`, so the restyle that drops the running animation starts
+   another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until
+   something restyles it again; a starting animation is that restyle, in the same frame. */
+@keyframes hold{ from{ } to{ } }

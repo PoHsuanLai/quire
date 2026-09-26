@@ -8,7 +8,9 @@
 
    Motion. Entering, `rise` at `--t-big --e-spring` (`Anim::ShotIn`), restarted under its other
    name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
-   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out.
+   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
+   declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
+   take-back drops an animation without starting another (sill G295).
 
    Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
    actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in
@@ -17,8 +19,9 @@
 
 .ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
 .ds-shot[*|data-shown=hidden]{ display:none; }
-.ds-shot[*|data-presence=entering]{ animation:rise var(--t-big) var(--e-spring); }
-.ds-shot[*|data-presence=entering][*|data-pulse=b]{ animation-name:rise--b; }
+.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:rise var(--t-big) var(--e-spring); }
+.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:rise--b; }
+.ds-shot[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-shot[*|data-presence=leaving]{ animation:shot-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
 .ds-shot-plate{ position:relative; box-sizing:border-box; width:100%; border-radius:var(--m-radius); overflow:hidden; }
@@ -49,6 +52,7 @@
 .ds-shot[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 .ds-shot[*|data-swipe=gone][*|data-presence=leaving]{ animation:none; opacity:0; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-swipe]{ transition:none; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering]{ animation-name:fade; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b]{ animation-name:fade--b; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present]{ animation-name:fade; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=held]{ animation-name:hold; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=leaving]{ animation-name:menu-out; }

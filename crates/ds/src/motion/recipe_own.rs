@@ -232,3 +232,14 @@ pub(super) const PICTURE_ACCEPT: Recipe = recipe(
     Fill::None,
     Iteration::Once,
 );
+
+/// `hold` (sill G295): moves nothing, at `--t-tap --e-linear`. A resting state that follows an
+/// animated one plays it, so the restyle that drops the running animation starts another and
+/// the element is restyled from its resting style, not left at the dropped animation's value.
+pub(super) const HOLD: Recipe = recipe(
+    "hold",
+    DurationToken::Tap,
+    EasingToken::Linear,
+    Fill::None,
+    Iteration::Once,
+);
