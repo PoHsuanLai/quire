@@ -1690,6 +1690,7 @@ dependencies = [
  "spellbook",
  "thiserror 2.0.20",
  "tokio",
+ "vello_common 0.1.0",
  "vello_hybrid",
  "webbrowser",
  "wgpu",

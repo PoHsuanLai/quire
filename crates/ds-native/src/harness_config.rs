@@ -4,6 +4,8 @@
 use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
+use crate::gpu_adapter::AdapterPref;
+use crate::harness_backend::Backend;
 use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
 use crate::snapshot::Viewport;
@@ -15,6 +17,8 @@ use crate::snapshot::Viewport;
 pub struct HarnessConfig {
     viewport: Viewport,
     setup: Setup,
+    backend: Backend,
+    adapter: AdapterPref,
 }
 
 impl HarnessConfig {
@@ -23,6 +27,8 @@ impl HarnessConfig {
         HarnessConfig {
             viewport,
             setup: Setup::default(),
+            backend: Backend::default(),
+            adapter: AdapterPref::default(),
         }
     }
 
@@ -57,6 +63,30 @@ impl HarnessConfig {
     pub fn with_contexts(mut self, contexts: RootContexts) -> Self {
         self.setup.contexts = self.setup.contexts.and(contexts);
         self
+    }
+
+    /// The renderer pictures and [`Harness::paint_timed`](crate::Harness::paint_timed) paint
+    /// with (default [`Backend::Cpu`]). See [`Backend::Hybrid`] for how a missing GPU shows.
+    pub fn with_backend(mut self, backend: Backend) -> Self {
+        self.backend = backend;
+        self
+    }
+
+    /// Which GPU a [`Backend::Hybrid`] harness opens (default [`AdapterPref::Auto`]); a
+    /// non-empty `WGPU_ADAPTER_NAME` overrides it.
+    pub fn with_adapter(mut self, adapter: AdapterPref) -> Self {
+        self.adapter = adapter;
+        self
+    }
+
+    /// The renderer the document paints with.
+    pub fn backend(&self) -> Backend {
+        self.backend
+    }
+
+    /// The GPU a hybrid harness prefers.
+    pub fn adapter(&self) -> &AdapterPref {
+        &self.adapter
     }
 
     /// The same providers at `viewport`.

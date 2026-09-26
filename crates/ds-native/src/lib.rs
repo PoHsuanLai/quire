@@ -36,7 +36,10 @@ mod frame_tag;
 mod frame_tree;
 mod frame_view;
 pub mod frames;
+mod gpu_adapter;
+mod gpu_paint;
 pub mod harness;
+mod harness_backend;
 mod harness_config;
 mod harness_drop;
 mod harness_edit;
@@ -58,6 +61,7 @@ mod net_policy;
 mod node_ref;
 mod open_window;
 mod origin;
+mod painter;
 mod pdf;
 #[cfg(feature = "pdf-thumb")]
 mod pdf_thumb;
@@ -92,7 +96,9 @@ pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase}
 pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
 pub use frame_tag::FrameTag;
 pub use frame_view::FrameView;
+pub use gpu_adapter::{ADAPTER_ENV, AdapterPref};
 pub use harness::Harness;
+pub use harness_backend::Backend;
 pub use harness_config::HarnessConfig;
 pub use harness_input::HeldButtons;
 pub use headless::Backdrop;
@@ -100,6 +106,7 @@ pub use launch::{AppConfig, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with};
 pub use origin::{FrameId, RequestOrigin};
+pub use painter::PaintTime;
 pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
 #[cfg(feature = "pdf-thumb")]
 pub use pdf_thumb::{
