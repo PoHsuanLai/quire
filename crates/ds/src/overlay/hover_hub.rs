@@ -16,7 +16,7 @@ use crate::time::sleep;
 use crate::tokens::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// A card the hub is tracking: the consumer's key and the kind of card.
 type Card = (HoverKey, HoverKind);
@@ -71,7 +71,7 @@ impl HoverHub {
     }
 
     fn try_feed(&self, event: HoverEvent<Card>) -> Result<(), Gone> {
-        let (next, effect) = try_get(self.intent)?.step(event, Instant::now());
+        let (next, effect) = try_get(self.intent)?.step(event, crate::time::now());
         try_set_if_changed(self.intent, next)?;
         self.apply(effect)
     }
@@ -99,7 +99,7 @@ impl HoverHub {
     /// Whether cards open at once right now.
     pub fn warmth(&self) -> HoverWarmth {
         let _expiry = self.warm_tick.read();
-        self.intent.read().warmth(Instant::now())
+        self.intent.read().warmth(crate::time::now())
     }
 
     fn apply(&self, effect: IntentEffect<Card>) -> Result<(), Gone> {

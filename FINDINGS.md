@@ -4675,3 +4675,44 @@ drawing in design/04 section 51.
   the loop holds its dimmed still frame and stops asking for frames) and Reduced for each glyph.
 - **Not here (sill's lane).** The bar wiring, the network service's join stamp, the Bluetooth bar
   item, `bar.battery_low_percent` and its design/22 row, and the critical-battery nudge (G11).
+
+## A harness on virtual time (sill Q380, 2026-09-27)
+
+- **The flake.** sill's gate failed a different `Harness` test each run (notification center
+  render, launcher actions, launcher card) at load average 50-120; each passed alone. The cause
+  is the split clock the harness module doc already admitted: CSS resolved at the harness's own
+  time (the sum of `advance`s), while every ds timer (`futures-timer` sleeps) and every
+  `Instant::now()` (hover intent, roster rest, menu tracker, pending tokens, detail tweens) ran on
+  the wall clock. Under load the two drift, so an entrance timer can end before the frame clock
+  played the entrance (G295's shape) or a check lands on the other side of a boundary.
+- **The fix.** `ds::time` owns time: `now()`, `since(instant)` and `sleep(d)` read a thread-local
+  clock, the wall clock by default. `ds::VirtualClock` is a timeline (origin, elapsed, a queue of
+  sleeps keyed by due instant then start order); `install()` makes it the thread's clock until its
+  `ClockGuard` drops. Every `Instant::now()`/`.elapsed()` in ds non-test code now goes through
+  `ds::time` (edit surface, lock mood, menu tracker, motor, pending token, use_settle,
+  use_level_run, use_swipe, roster rest, hover hub); every ds sleep already went through
+  `ds::sleep`. `tests/clock_rule.rs` scans ds's sources so a direct `Instant::now()` or
+  `futures_timer` cannot come back. ds stays free of blitz and tokio.
+- **The harness.** `HarnessConfig::with_clock(Clock::Virtual)` installs a `VirtualClock` before
+  the first render; `advance(d)` then stops at each timer due before the end in order (moving the
+  clock, running the woken tasks and renders, resolving the CSS at that same instant), then at the
+  end, and never waits on the wall clock. `Harness::now()` and `settle_until` /
+  `assert_settles_to_zero_frames` use the harness's clock (identical on the wall clock).
+- **Proofs.** `ds-native/tests/virtual_clock.rs`: a panel entrance, a hover card and a toast run
+  in 20 ms steps idle and twice with every core spun (2x cores busy threads) and give identical
+  samples (presence, rects, hover cards, toast state, `is_animating`, painted-frame hashes), with
+  the panel present exactly at the first step past `settle(PanelIn)`, the card at 450 ms, the toast
+  hidden at 5200 ms; the G295 shape (a wall-clock stall longer than the entrance before the first
+  advance) leaves the panel entering until exactly `settle(PanelIn)`, twice alike. The same
+  scenario on `Clock::Wall` under the same load differs at the first sample (80 ms: present vs
+  entering).
+- **Default stays Wall.** With `Virtual` as the default 24 of ds-native's tests fail: they time
+  windows with `Instant::now()` against `settle_until`'s instant, sleep the thread to simulate a
+  stall, or click the same spot twice with a long `advance` between (see Limits). Each is a test
+  rewrite, not a clock bug (checked on `cc_pane_switcher`), so the switch is per test.
+- **Limits.** Off-thread work (Tokio tasks such as `ds_settings`' watch, D-Bus replies, a custom
+  `AppNet` answering from another thread) is not on the virtual clock. Blitz (rev e99fbdbd) reads
+  `Instant` itself for the double-click count (`last_mousedown_time`, 500 ms) and scrollbar fade,
+  in `pub(crate)` fields, so they cannot take an injected clock without a Blitz patch: on the
+  virtual clock two clicks at one spot are always a double click.
+

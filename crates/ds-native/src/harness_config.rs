@@ -6,6 +6,7 @@ use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
 use crate::gpu_adapter::AdapterPref;
 use crate::harness_backend::Backend;
+use crate::harness_clock::Clock;
 use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
 use crate::snapshot::Viewport;
@@ -19,6 +20,7 @@ pub struct HarnessConfig {
     setup: Setup,
     backend: Backend,
     adapter: AdapterPref,
+    clock: Clock,
 }
 
 impl HarnessConfig {
@@ -29,6 +31,7 @@ impl HarnessConfig {
             setup: Setup::default(),
             backend: Backend::default(),
             adapter: AdapterPref::default(),
+            clock: Clock::default(),
         }
     }
 
@@ -77,6 +80,19 @@ impl HarnessConfig {
     pub fn with_adapter(mut self, adapter: AdapterPref) -> Self {
         self.adapter = adapter;
         self
+    }
+
+    /// The clock the harness's timers run on (default [`Clock::Wall`]). [`Clock::Virtual`]
+    /// makes `advance` move one clock for CSS animations and every ds timer, so a test sees the
+    /// same frames however loaded the machine is (sill Q380).
+    pub fn with_clock(mut self, clock: Clock) -> Self {
+        self.clock = clock;
+        self
+    }
+
+    /// The clock the harness's timers run on.
+    pub fn clock(&self) -> Clock {
+        self.clock
     }
 
     /// The renderer the document paints with.
