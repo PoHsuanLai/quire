@@ -38,15 +38,13 @@ pub enum Page {
     WidgetReference,
     /// The shell's own lock screen, polkit prompt and app switcher (M11).
     LockSwitcher,
-    /// The persona: seeds, moods and sizes.
-    Persona,
     /// Animated emoji: the set, the reactions, sizes and discs.
     Emoji,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 19] = [
+    pub const ALL: [Page; 18] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -64,7 +62,6 @@ impl Page {
         Page::WidgetLooks,
         Page::WidgetReference,
         Page::LockSwitcher,
-        Page::Persona,
         Page::Emoji,
     ];
 
@@ -88,7 +85,6 @@ impl Page {
             Page::WidgetLooks => "widget-looks",
             Page::WidgetReference => "widget-reference",
             Page::LockSwitcher => "lock",
-            Page::Persona => "persona",
             Page::Emoji => "emoji",
         }
     }

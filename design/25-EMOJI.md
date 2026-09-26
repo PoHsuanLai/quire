@@ -6,13 +6,17 @@ the user picks, and it should move, as the reference desktop's animated emoji do
 proprietary; we use Google's open **Noto Animated Emoji** instead. Code, classes and assets say
 **emoji**.
 
+2026-09-26 (branch `user-picture-emoji`): the persona is removed (design/24 is a note now), and
+the emoji is one kind of user picture beside the letter and the photo (section 7).
+
 ## 1. What this governs
 
 `ds::AnimatedEmoji` (the picture), `ds::EmojiId` (which emoji, user data), `ds::EmojiDisc`
-(none, or a tinted disc), `ds::EmojiPlayback` (awake or still), `ds::EMOJI_ATTRIBUTION`, the sheets and manifest under
-`crates/ds/assets/emoji/`, and the pipeline that makes them, `tools/emoji`. Moods and wakes
-are the persona's (`Mood`, `WakeStamp`, `PersonaSize`, design/24 section 4): a surface drives an
-emoji exactly as it drives a persona.
+(none, or a tinted disc on a `DiscHue`), `ds::EmojiPlayback` (awake or still),
+`ds::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/ds/assets/emoji/`, and the
+pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `UserPicture`,
+`UserPortrait`, `PictureChoice`, `resolve_picture`, `UserPicturePicker`, `Mood`, `WakeStamp`,
+`PictureSize` and the accept beat `Anim::PictureAccept`.
 
 ## 2. Source, licence and attribution
 
@@ -53,8 +57,7 @@ gestures and characters, and the reactions.
 | Characters | ghost 1f47b, robot 1f916, fox 1f98a |
 
 Reactions a mood swaps in: `EmojiId::WRONG` = confounded (a wrong password), `UNLOCKED` =
-partying, `ASLEEP` = sleeping. `ATTENTIVE` = eyes is in the set, but the Attentive mood keeps
-the user's own emoji and plays it (the brief). `EmojiId::default()` is blush, a smiling face
+partying, `ASLEEP` = sleeping, `ATTENTIVE` = eyes (a glance when typing starts; section 5). `EmojiId::default()` is blush, a smiling face
 that is neither reaction. Not every Noto emoji is animated upstream (881 are, 2026-09-26); the
 set was checked against the site's `data/api.json`.
 
@@ -98,17 +101,21 @@ The run is reproducible: a rebuild from the cache writes identical bytes.
 
 The caller sets the mood; the emoji plays it. Mounting, a new `wake: WakeStamp`, every mood
 change and a new pick **wake** it. Each wake computes a script (pure, `script.rs`) and a task
-owned by the component plays it (`life.rs`, the persona's timer machinery):
+owned by the component plays it (`life.rs`). The mapping (2026-09-26, the persona's moods on
+the emoji; `emoji/script.rs` `reaction` and `pace`, tested row by row in `emoji/tests.rs`):
 
-| Mood | Shows | On change |
-| --- | --- | --- |
-| Idle | the pick, looping for the awake window, then its rest frame | none |
-| Attentive | the pick, playing | none |
-| Wince | the pick | `EmojiId::WRONG` once through (1.84 s), then the pick, playing |
-| Happy | the pick | `EmojiId::UNLOCKED` once through, then the pick, playing |
-| Asleep | `EmojiId::ASLEEP`'s rest frame, still | nothing plays |
+| Mood | When (lock prompt) | On change, once through | Then, inside the 20 s window | At rest |
+| --- | --- | --- | --- | --- |
+| Idle | nothing typed | nothing | **slow**: the pick's loop, 4 s on its rest frame (`IDLE_REST`), again | the pick, frame 0 |
+| Attentive | typing, or checking | `eyes` (1.36 s): a glance at the field | **steady**: the pick, loop after loop | the pick, frame 0 |
+| Wince | wrong password | `confounded` (1.84 s) | slow | the pick, frame 0 |
+| Happy | accepted | `partying` (1.68 s), and the accept beat | slow | the pick, frame 0 |
+| Asleep | display off | nothing | nothing | `sleeping`, frame 0 |
 
-Nothing plays twice for one mood change (a reaction does not escalate, as design/24 section 5).
+Idle is slow so a lock screen at rest is alive but calm; Attentive is steady because the person
+is at the keyboard. A new wake stamp with the same mood (activity in the prompt) replays the
+pace, never the reaction. Nothing plays twice for one mood change (a reaction does not
+escalate).
 Reduced motion (and `EmojiPlayback::Still`): only still frames; a reaction's rest frame is shown for as long as its loop
 would have played, then the pick's.
 
@@ -126,13 +133,72 @@ would have played, then the pick's.
   only while they fit inside the 20 s window (`--t-awake`), so it ends on frame 0 with no jump,
   and then the task has ended: nothing is scheduled, no CSS animation or transition exists, and
   the document asks for no frame. Tested in `ds-native/tests/emoji_life.rs`: frames advance
-  within 2 s of the wake and are still advancing at 9 s; at 21 s the frame is 0, stays 0 for a
-  further second, and `Harness::is_animating()` is false. `emoji/tests.rs` checks every script
-  of every emoji in every mood ends on frame 0 within the window.
-- Loops are the one bounded exception to "nothing loops", the same exception design/24 section 5
-  gives the persona's breathing and blinks.
+  within 2 s of the wake and (Attentive) are still advancing at 9 s; at 21 s the frame is 0,
+  stays 0 for a further second, and `Harness::is_animating()` is false; Idle rests at least
+  3.8 s between loops; as a `UserPortrait`, each mood shows its emoji and is at rest with no
+  frame asked for 21 s after the last wake. `emoji/tests.rs` checks every script of every emoji
+  in every mood ends on frame 0 within the window.
+- Loops are quire's one bounded exception to "nothing loops" (design/05 section 2): finite
+  plays inside the awake window, never `infinite`.
 
-## 7. Built (quire)
+## 7. The emoji as the user's picture (2026-09-26)
+
+The user dropped the persona (design/24). A user's picture is one of three kinds:
+
+```rust
+pub enum UserPicture {
+    Face(AvatarFace),   // the letter disc, unchanged
+    Emoji(EmojiId),     // an animated emoji, in the same disc size and place
+    Photo(ImageSource), // $HOME/.face or AccountsService's icon, cropped round
+}
+```
+
+- **Drawing.** `UserPortrait { picture, size: PictureSize, mood, wake }`, or `LockPrompt` and
+  `PolkitPrompt` through `LockUser`. Every kind sits in `div.ds-user-picture[data-mood]`, the
+  wrapper that plays the accept beat; inside it the letter is the avatar exactly as before, the
+  emoji is `AnimatedEmoji` bare (no disc) at the picture's size, and the photo is
+  `div.ds-user-photo`. At the lock screen all three are 64 px; in the polkit sheet 48 (the emoji
+  drawn at `Medium` in a 48 box).
+- **Moods.** The emoji plays the section 5 mapping; the letter and the photo have no moods of
+  their own. The lock prompt derives the mood from its own state (design/04 section 42) and is
+  woken by activity only when the picture is an emoji, so a letter costs no render per pointer
+  move. The polkit sheet shows Wince when `Wrong` and Happy when `Accepted`, otherwise Idle.
+- **The accept beat** (`Anim::PictureAccept`, keyframe `picture-accept`, `--t-big
+  --e-spring`: 420 ms at Standard, 300 Calm, 560 Extra, as the persona's hop it replaces): when
+  the mood changes to Happy, the whole picture, of any kind, lifts 8 % and lands once; the pulse
+  is taken off at its settle. A lock screen unlocks at `settle(Anim::PictureAccept, level, StaggerIndex::default())`
+  (sill times it with `use_motion_timer(Anim::PictureAccept)`). Not played on mount, and not
+  played at all under Reduced motion. `Anim::PersonaHop` remains one release as a deprecated
+  alias.
+- **Reduced motion.** The emoji shows still frames only (a reaction's rest frame for its
+  length); the beat is not fired; the 20 s window and the idle rule are unchanged.
+
+**The stored choice.** `PictureChoice::{Auto, Letter, Emoji(EmojiId), Photo}` (serde, adjacently
+tagged, the emoji by its stable slug: `{"kind":"emoji","v":"heart-eyes"}`; default `Auto`).
+`resolve_picture(choice, face: FaceFile, letter: AvatarFace) -> UserPicture` is pure:
+
+| Choice | `FaceFile::Found(src)` | `FaceFile::Missing` |
+| --- | --- | --- |
+| Auto | Photo(src) | Face(letter) |
+| Letter | Face(letter) | Face(letter) |
+| Emoji(id) | Emoji(id) | Emoji(id) |
+| Photo | Photo(src) | Face(letter) |
+
+The caller (sill's auth service) reads `~/.face` or AccountsService's icon; `resolve_picture`
+never touches the disk. Proposed settings row (design/22, once sill lists it):
+`session.user_picture` | `PictureChoice` | `Auto` | Users page, first run.
+
+**The picker.** `UserPicturePicker { letter, choice, onpick, columns (8), label ("Picture") }`:
+the letter disc first, then the 42 as `AnimatedEmoji` still frames (`EmojiPlayback::Still`), each
+a 64 px disc in a 76 px cell (`PICTURE_CELL`), one radio group (`role=radiogroup`, cells
+`role=radio` with `aria-checked`), the current choice marked with the emoji grid's selection
+look (`--accent-soft`). A click or an arrow key picks (the arrows follow `grid_step`, the emoji
+grid's rule). `Auto` and `Photo` mark no cell: the Users page offers them as rows beside the
+picker. It is not an `EmojiGrid`: that grid draws text glyphs in the colour font, one caller
+value per glyph, and holds a separate selection cursor; the picker draws pictures and is a radio
+group. It reuses the grid's step rule and column style.
+
+## 8. Built (quire)
 
 - `crates/ds/src/components/emoji/`: `id.rs` (`EmojiId`), `sheet.rs` (sheets, manifest, the
   frame position), `script.rs` (the wake script), `life.rs` (playing it), `disc.rs`
@@ -141,7 +207,7 @@ would have played, then the pick's.
   holding `div.ds-emoji-face[data-emoji][data-frame]` whose `background-size` is the grid in
   shares (`800% 400%`) and whose `background-position` is the frame in shares, so one sheet fits
   every size.
-- The disc: none, or `Tinted(Backdrop)` on the icon palette's eight hues (design/08 section 2.10;
+- The disc: none, or `Tinted(DiscHue)` on the icon palette's eight hues (design/08 section 2.10;
   OKLCh .91/.055 light, .40/.06 dark), the face inset 14 %.
 - `EmojiPlayback::{Awake, Still}` (`data-playback`): `Still` shows rest frames only, as
   Reduced motion does, for a picker or any grid of many emoji (42 loops at once is motion
@@ -150,13 +216,21 @@ would have played, then the pick's.
   mood, the sizes and the discs, and the credit line; every picture there is `Still`, so the
   snapshot shows rest frames (a snapshot lets 120 ms of timers run at mount).
 
-## 8. Integration and open decisions
+- The user's picture (section 7): `crates/ds/src/components/user_picture/`: `picture.rs`
+  (`UserPicture`), `mood.rs` (`Mood`, `PictureSize`, `WakeStamp`), `portrait.rs`
+  (`UserPortrait` and the shared drawing), `accept.rs` (the accept beat), `choice.rs`
+  (`PictureChoice`, `FaceFile`, `resolve_picture`), `picker.rs` (`UserPicturePicker`);
+  `user_picture.css`. Goldens: `tests/snapshots/user_picture/` (letter, emoji at rest, photo,
+  picker) and `tests/snapshots/lock_switcher/*-emoji*.html`; harness: `emoji_life.rs` and
+  `lock_switcher.rs`. The picker is on the gallery's Emoji page, the three kinds in the
+  prompt on Lock and switcher.
 
-1. `UserPicture::Persona` becomes `UserPicture::Emoji(EmojiId)` once the `user-picture` branch
-   lands (a separate change; nothing in the lock or picture files changed here). The persona
-   code stays until then.
-2. **Settings key**: `account.emoji` (an `EmojiId`, default blush) and `account.emoji_disc`
-   (an `EmojiDisc`, default none); not in design/22 yet.
+## 9. Integration and open decisions
+
+1. Done 2026-09-26: `UserPicture::Emoji(EmojiId)` replaced `UserPicture::Persona` (section 7).
+2. **Settings key**: proposed `session.user_picture`, a `PictureChoice`, default `Auto`
+   (section 7); not in design/22 yet (sill lists its keys first). It supersedes the earlier
+   `account.emoji` proposal; a tinted disc is not offered in the picture yet.
 3. **Frame rate**: 12.5 fps to fit 8 MB. Smoother means fewer emoji, 128 px only, or a larger
    budget: the user's call.
 4. **Credits surface**: where the attribution line is shown (the about box of Settings is the

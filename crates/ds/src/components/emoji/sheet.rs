@@ -6,7 +6,7 @@
 //! document fetches nothing.
 
 use super::id::EmojiId;
-use crate::components::persona::PersonaSize;
+use crate::components::user_picture::PictureSize;
 use crate::icon::IconUrl;
 use serde::Deserialize;
 use std::sync::{LazyLock, OnceLock};
@@ -23,10 +23,10 @@ pub(crate) enum SheetPx {
 
 impl SheetPx {
     /// The sheet a picture of `size` reads: always enough pixels for a 2x display.
-    pub(crate) fn for_size(size: PersonaSize) -> SheetPx {
+    pub(crate) fn for_size(size: PictureSize) -> SheetPx {
         match size {
-            PersonaSize::Small | PersonaSize::Medium => SheetPx::Px128,
-            PersonaSize::Large => SheetPx::Px256,
+            PictureSize::Small | PictureSize::Medium => SheetPx::Px128,
+            PictureSize::Large => SheetPx::Px256,
         }
     }
 

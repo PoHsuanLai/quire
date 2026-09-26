@@ -1,6 +1,6 @@
 //! The Lock and switcher page (M11): the shell's own lock screen over the calm wallpaper (at
 //! rest, a wrong password posed at its shake, and checking in the Space's colour), the polkit
-//! prompt's sheet, the three kinds of picture the prompt takes (a face, a photo, a persona),
+//! prompt's sheet, the three kinds of picture the prompt takes (a face, an emoji, a photo),
 //! and the app switcher with five and fourteen apps.
 
 use super::Section;
@@ -9,9 +9,9 @@ use crate::{portrait, wallpaper};
 use dioxus::prelude::*;
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
-    Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    Material, PersonaSpec, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
-    Text, UserPicture, person_hue, use_env,
+    EmojiId, Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen,
+    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp, Text,
+    UserPicture, person_hue, use_env,
 };
 
 /// The person's letter disc.
@@ -33,13 +33,10 @@ fn user() -> LockUser {
 fn pictures() -> [(&'static str, UserPicture); 3] {
     [
         ("UserPicture::Face(AvatarFace)", letter().into()),
+        ("UserPicture::Emoji(EmojiId)", EmojiId::HeartEyes.into()),
         (
             "UserPicture::Photo(ImageSource), cropped round",
             ImageSource(portrait::uri().to_owned()).into(),
-        ),
-        (
-            "UserPicture::Persona(PersonaSpec)",
-            PersonaSpec::from_seed(11).into(),
         ),
     ]
 }
@@ -117,7 +114,7 @@ pub fn LockSwitcherPage() -> Element {
                 }
             }
         }
-        Section { title: "The person's picture", note: "LockUser {{ name, picture: UserPicture }}, built with LockUser::new(name, picture): a letter disc redrawn at 64, the user's own photo ($HOME/.face or AccountsService's icon, as ImageSource::file) cropped round with object-fit: cover (this stand-in is taller than wide), or their persona. The persona's mood is the prompt's own: attentive while typing or checking, a wince when Wrong, happy when Accepted, idle otherwise; a key or the pointer in the prompt wakes it, and it rests again 20 s after. Faces and photos have no moods. The polkit sheet draws the same three at 48.",
+        Section { title: "The person's picture", note: "LockUser {{ name, picture: UserPicture }}, built with LockUser::new(name, picture): a letter disc redrawn at 64, an animated emoji in the same place, or the user's own photo ($HOME/.face or AccountsService's icon, as ImageSource::file) cropped round with object-fit: cover (this stand-in is taller than wide). The mood is the prompt's own: attentive while typing or checking, a wince when Wrong, happy when Accepted, idle otherwise. Every kind lifts once on Accepted (picture-accept); the emoji also plays each mood, woken by a key or the pointer in the prompt, and rests again 20 s after. The polkit sheet draws the same three at 48.",
             div { class: "g-row g-row-top",
                 for (caption, picture) in pictures() {
                     div { class: "g-col",

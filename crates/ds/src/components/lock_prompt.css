@@ -1,6 +1,6 @@
 /* LockPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright, as
-   the reference lock screen: the person's picture at 64 (a face, a photo cropped round, or the
-   persona playing the prompt's mood), the name in white 16/700, a pill of flat white
+   the reference lock screen: the person's picture at 64 (a face, a photo cropped round, or an
+   animated emoji playing the prompt's mood), the name in white 16/700, a pill of flat white
    glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) holding the secret field, the
    caps-lock mark and a 28 px enter arrow in a brighter glass disc that shows once something is
    typed, and a small hint line in `--lock-ink-soft`. The pill plays `shake-x` once through its

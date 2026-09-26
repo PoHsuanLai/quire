@@ -1,6 +1,5 @@
 //! The quire gallery: every component across theme, accent, motion, material, blur and Space
-//! preset; a matrix page; a motion lab; `--snapshot DIR` for a contact sheet; and
-//! `--persona-frames DIR` for the persona's motion as stills.
+//! preset; a matrix page; a motion lab; and `--snapshot DIR` for a contact sheet.
 
 mod app;
 mod args;
@@ -12,7 +11,6 @@ mod level_motion;
 mod level_sheet;
 mod page;
 mod pages;
-mod persona_frames;
 mod portrait;
 mod registry;
 mod sheet;
@@ -39,13 +37,6 @@ fn main() {
     };
     if let Some(dir) = args.level_sheet {
         if let Err(error) = level_sheet::run(&dir) {
-            eprintln!("ds-gallery: {error}");
-            std::process::exit(1);
-        }
-        return;
-    }
-    if let Some(dir) = args.persona_frames {
-        if let Err(error) = persona_frames::run(&dir) {
             eprintln!("ds-gallery: {error}");
             std::process::exit(1);
         }

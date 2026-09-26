@@ -169,7 +169,7 @@ impl EmojiId {
     pub const UNLOCKED: EmojiId = EmojiId::Partying;
     /// The display is off: its rest frame, still.
     pub const ASLEEP: EmojiId = EmojiId::Sleeping;
-    /// Watching the field: shown by the picker's reaction row; the Attentive mood keeps the
-    /// user's own emoji and plays it.
+    /// Watching the field: a glance, shown once through when the user starts typing, then the
+    /// user's own emoji again, playing steadily.
     pub const ATTENTIVE: EmojiId = EmojiId::Eyes;
 }

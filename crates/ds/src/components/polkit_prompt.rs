@@ -5,7 +5,7 @@
 //! and Authenticate.
 
 use crate::components::button::{Button, ButtonVariant};
-use crate::components::lock_picture::{AT_POLKIT, Liveliness, prompt_picture};
+use crate::components::lock_picture::{AT_POLKIT, prompt_picture};
 use crate::components::lock_vocab::{CapsLock, LockUser, PromptState};
 use crate::components::scrim_strength::ScrimStrength;
 use crate::components::secret_entry::{SecretEntry, use_secret_entry};
@@ -13,6 +13,7 @@ use crate::components::sheet::{Sheet, SheetPlacement, SheetWidth};
 use crate::components::text_input::{Focus, InputVariant, TextInput, TextInputKind};
 use crate::components::text_runs::{Text, text};
 use crate::components::tooltip::{Shown, Tooltip, TooltipKind};
+use crate::components::user_picture::{Liveliness, Mood};
 use crate::components::vocab::Availability;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -67,7 +68,7 @@ pub fn PolkitPrompt(
             width: SheetWidth::Narrow,
             id: panel_id,
             div { class: "ds-polkit", "data-state": state.slug(),
-                {prompt_picture(user.picture, AT_POLKIT, Liveliness::default())}
+                {prompt_picture(user.picture, AT_POLKIT, polkit_life(&state))}
                 div { class: "ds-polkit-title", {title.unwrap_or_else(|| AUTHENTICATE.to_owned())} }
                 div { class: "ds-polkit-action", {text(&action)} }
                 if let Some(detail) = detail {
@@ -88,6 +89,20 @@ pub fn PolkitPrompt(
                 }
             }
         }
+    }
+}
+
+/// What the sheet's picture plays: the accept beat once accepted, a wince when wrong, else at
+/// rest. Nothing in the sheet wakes it; it is on screen for a moment.
+fn polkit_life(state: &PromptState) -> Liveliness {
+    let mood = match state {
+        PromptState::Accepted => Mood::Happy,
+        PromptState::Wrong => Mood::Wince,
+        PromptState::Idle | PromptState::Checking | PromptState::LockedOut { .. } => Mood::Idle,
+    };
+    Liveliness {
+        mood,
+        ..Liveliness::default()
     }
 }
 

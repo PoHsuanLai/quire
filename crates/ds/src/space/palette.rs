@@ -328,8 +328,8 @@ fn encode(channel: f64) -> f64 {
 }
 
 /// `oklch(lightness chroma hue)` as `#rrggbb`, its chroma reduced until it fits sRGB: the
-/// derived colours a component computes in Rust rather than naming a token (the persona's
-/// palette, design/24-PERSONA.md section 3).
+/// derived colours a component computes in Rust rather than naming a token (an animated emoji's
+/// tinted disc, design/25-EMOJI.md).
 pub(crate) fn oklch_hex(lightness: f64, chroma: f64, hue: f64) -> String {
     hex(lightness, chroma, hue)
 }

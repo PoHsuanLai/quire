@@ -11,14 +11,14 @@ mod golden;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
-    AnimatedEmoji, Appearance, Backdrop, Ds, EmojiDisc, EmojiId, Inject, Material, Mood,
-    PersonaSize, Theme,
+    AnimatedEmoji, Appearance, DiscHue, Ds, EmojiDisc, EmojiId, Inject, Material, Mood,
+    PictureSize, Theme,
 };
 
 #[derive(Props, Clone, PartialEq)]
 struct SpecimenProps {
     emoji: EmojiId,
-    size: PersonaSize,
+    size: PictureSize,
     mood: Mood,
     disc: EmojiDisc,
     theme: Theme,
@@ -57,7 +57,7 @@ fn redacted(html: &str) -> String {
 fn large(emoji: EmojiId, mood: Mood) -> SpecimenProps {
     SpecimenProps {
         emoji,
-        size: PersonaSize::Large,
+        size: PictureSize::Large,
         mood,
         disc: EmojiDisc::None,
         theme: Theme::Light,
@@ -77,22 +77,22 @@ fn specimens() -> Vec<(String, SpecimenProps)> {
     all.push((
         "wink-small".into(),
         SpecimenProps {
-            size: PersonaSize::Small,
+            size: PictureSize::Small,
             ..large(EmojiId::Wink, Mood::Idle)
         },
     ));
     all.push((
         "heart-eyes-medium-disc".into(),
         SpecimenProps {
-            size: PersonaSize::Medium,
-            disc: EmojiDisc::Tinted(Backdrop::Teal),
+            size: PictureSize::Medium,
+            disc: EmojiDisc::Tinted(DiscHue::Teal),
             ..large(EmojiId::HeartEyes, Mood::Idle)
         },
     ));
     all.push((
         "fox-disc-dark".into(),
         SpecimenProps {
-            disc: EmojiDisc::Tinted(Backdrop::Plum),
+            disc: EmojiDisc::Tinted(DiscHue::Plum),
             theme: Theme::Dark,
             ..large(EmojiId::Fox, Mood::Idle)
         },

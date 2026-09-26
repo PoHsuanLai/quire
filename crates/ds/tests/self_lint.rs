@@ -42,9 +42,6 @@ const INLINE_VARS: &[&str] = &[
     "--layers",
     // A swiped card's offset (`NotificationCard { swipe }`, sill Q122).
     "--swipe-dx",
-    // A persona's disc and the line its eyes close towards (`Persona`, design/24).
-    "--pa-ground",
-    "--pa-eyes",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
 ];

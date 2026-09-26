@@ -3,13 +3,13 @@
 //! white glass with an enter arrow inside it, a caps-lock mark, and a hint line under it.
 
 use crate::components::lock_mood::{Caret, Stir, prompt_mood, use_stir};
-use crate::components::lock_picture::{AT_LOCK, Liveliness, prompt_picture};
+use crate::components::lock_picture::{AT_LOCK, prompt_picture};
 use crate::components::lock_vocab::{CapsLock, LockLook, LockUser, PromptState};
-use crate::components::persona::{UserPicture, WakeStamp};
 use crate::components::secret_entry::{Filled, SecretEntry, use_secret_entry};
 use crate::components::spinner::{Spinner, SpinnerKind};
 use crate::components::text_input::{Focus, InputVariant, TextInput, TextInputKind};
 use crate::components::text_runs::{Text, text};
+use crate::components::user_picture::{Liveliness, UserPicture, WakeStamp};
 use crate::components::vocab::Availability;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -26,10 +26,11 @@ const ENTER_PASSWORD: &str = "Enter Password";
 /// field and says when it opens. `caps` marks caps lock; `hint` is the line under the field
 /// ("Touch the key or enter your password"). The field takes the keyboard as it mounts.
 ///
-/// `user.picture` is drawn at 64: a face or a photo as it is, a persona playing the prompt's
-/// own mood (attentive while typing or checking, a wince when `Wrong`, happy when `Accepted`,
-/// idle otherwise), woken by any key or pointer activity in the prompt and by each new `wake`
-/// the caller passes (a display coming back on).
+/// `user.picture` is drawn at 64 and plays the prompt's own mood (attentive while typing or
+/// checking, a wince when `Wrong`, happy when `Accepted`, idle otherwise): every kind plays the
+/// accept beat on `Accepted`; an emoji plays each mood (design/25-EMOJI.md section 5), woken by
+/// any key or pointer activity in the prompt and by each new `wake` the caller passes (a
+/// display coming back on).
 #[component]
 pub fn LockPrompt(
     user: LockUser,
@@ -88,24 +89,24 @@ fn hint_line(state: &PromptState, hint: Option<Text>) -> Option<Text> {
     }
 }
 
-/// Whether the prompt's picture moves: only a persona is woken by activity, so a face or a
-/// photo costs no render per pointer move.
+/// Whether the prompt's picture is woken by activity: only an emoji, so a face or a photo
+/// costs no render per pointer move.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Lively {
-    Persona,
+    Emoji,
     Still,
 }
 
 impl Lively {
     fn of(picture: &UserPicture) -> Self {
         match picture {
-            UserPicture::Persona(_) => Lively::Persona,
+            UserPicture::Emoji(_) => Lively::Emoji,
             UserPicture::Face(_) | UserPicture::Photo(_) => Lively::Still,
         }
     }
 
     fn stir(self, stir: Stir) {
-        if self == Lively::Persona {
+        if self == Lively::Emoji {
             stir.stirred();
         }
     }

@@ -1,11 +1,32 @@
-//! The optional disc behind an animated emoji, and whether it plays. The disc: none, or a tinted circle on one of the icon
-//! palette's eight hues (design/08 section 2.10), pale on light and deep on dark as the
-//! persona's disc is.
+//! The optional disc behind an animated emoji, and whether it plays. The disc: none, or a
+//! tinted circle on one of the icon palette's eight hues (design/08 section 2.10), pale on light
+//! and deep on dark.
 
 use crate::appearance::Scheme;
-use crate::components::persona::Backdrop;
 use crate::space::palette::oklch_hex;
 use serde::{Deserialize, Serialize};
+
+/// One of the icon palette's eight hues, for a tinted disc. Stored by its name (`"teal"`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DiscHue {
+    /// Hue 40.
+    Clay,
+    /// Hue 85.
+    Ochre,
+    /// Hue 130.
+    Sage,
+    /// Hue 175.
+    Jade,
+    /// Hue 220.
+    Teal,
+    /// Hue 265.
+    Slate,
+    /// Hue 310.
+    Plum,
+    /// Hue 355.
+    Rose,
+}
 
 /// What sits behind the emoji (`data-disc`). User data beside the [`super::EmojiId`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
@@ -15,7 +36,7 @@ pub enum EmojiDisc {
     #[default]
     None,
     /// A tinted circle, the emoji inset on it.
-    Tinted(Backdrop),
+    Tinted(DiscHue),
 }
 
 impl EmojiDisc {
@@ -28,24 +49,24 @@ impl EmojiDisc {
     }
 }
 
-fn hue(backdrop: Backdrop) -> f64 {
-    match backdrop {
-        Backdrop::Clay => 40.0,
-        Backdrop::Ochre => 85.0,
-        Backdrop::Sage => 130.0,
-        Backdrop::Jade => 175.0,
-        Backdrop::Teal => 220.0,
-        Backdrop::Slate => 265.0,
-        Backdrop::Plum => 310.0,
-        Backdrop::Rose => 355.0,
+fn hue(disc: DiscHue) -> f64 {
+    match disc {
+        DiscHue::Clay => 40.0,
+        DiscHue::Ochre => 85.0,
+        DiscHue::Sage => 130.0,
+        DiscHue::Jade => 175.0,
+        DiscHue::Teal => 220.0,
+        DiscHue::Slate => 265.0,
+        DiscHue::Plum => 310.0,
+        DiscHue::Rose => 355.0,
     }
 }
 
 /// The disc's colour as `#rrggbb` in `scheme`.
-pub(crate) fn tint(backdrop: Backdrop, scheme: Scheme) -> String {
+pub(crate) fn tint(disc: DiscHue, scheme: Scheme) -> String {
     match scheme {
-        Scheme::Light => oklch_hex(0.91, 0.055, hue(backdrop)),
-        Scheme::Dark => oklch_hex(0.40, 0.06, hue(backdrop)),
+        Scheme::Light => oklch_hex(0.91, 0.055, hue(disc)),
+        Scheme::Dark => oklch_hex(0.40, 0.06, hue(disc)),
     }
 }
 

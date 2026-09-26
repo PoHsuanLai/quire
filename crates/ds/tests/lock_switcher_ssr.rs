@@ -13,9 +13,9 @@ use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
-    Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    Material, PersonaSpec, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
-    Text, Theme, TilePresence, person_hue,
+    EmojiId, Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen,
+    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp, Text,
+    Theme, TilePresence, person_hue,
 };
 
 fn user() -> LockUser {
@@ -38,9 +38,9 @@ fn photo_user() -> LockUser {
     )
 }
 
-/// Dana as her persona.
-fn persona_user() -> LockUser {
-    LockUser::new("Dana Reyes", PersonaSpec::from_seed(7))
+/// Dana as her emoji.
+fn emoji_user() -> LockUser {
+    LockUser::new("Dana Reyes", EmojiId::HeartEyes)
 }
 
 fn root(material: Material, body: Element) -> Element {
@@ -219,17 +219,17 @@ const SPECIMENS: &[Specimen] = &[
     ("prompt-photo", || {
         prompt_for(photo_user(), PromptState::Idle)
     }),
-    ("prompt-persona", || {
-        prompt_for(persona_user(), PromptState::Idle)
+    ("prompt-emoji", || {
+        prompt_for(emoji_user(), PromptState::Idle)
     }),
-    ("prompt-persona-accepted", || {
-        prompt_for(persona_user(), PromptState::Accepted)
+    ("prompt-emoji-accepted", || {
+        prompt_for(emoji_user(), PromptState::Accepted)
     }),
     ("polkit-photo", || {
         polkit_for(photo_user(), PromptState::Idle)
     }),
-    ("polkit-persona", || {
-        polkit_for(persona_user(), PromptState::Idle)
+    ("polkit-emoji", || {
+        polkit_for(emoji_user(), PromptState::Idle)
     }),
 ];
 
@@ -243,12 +243,36 @@ fn render(make: fn() -> Element) -> String {
     dioxus_ssr::render(&dom)
 }
 
+/// `html` with every emoji sheet's `data:` URI replaced by its length (as `emoji_ssr`), so a
+/// golden stays readable and still notices a different sheet; the stand-in pictures' short URIs
+/// are kept.
+fn redacted(html: &str) -> String {
+    let mut out = String::new();
+    let mut rest = html;
+    while let Some(at) = rest.find("data:image/png;base64,") {
+        out.push_str(&rest[..at]);
+        let tail = &rest[at..];
+        let end = tail.find(['"', '&', ')']).unwrap_or(tail.len());
+        match end {
+            0..=64 => out.push_str(&tail[..end]),
+            _ => out.push_str(&format!("data:image/png;base64,({} chars)", end)),
+        }
+        rest = &tail[end..];
+    }
+    out.push_str(rest);
+    out
+}
+
 #[test]
 fn every_specimen_matches_its_golden() {
     let failures: Vec<String> = SPECIMENS
         .iter()
         .filter_map(|(name, make)| {
-            golden::check(&format!("lock_switcher/{name}.html"), &render(*make)).err()
+            golden::check(
+                &format!("lock_switcher/{name}.html"),
+                &redacted(&render(*make)),
+            )
+            .err()
         })
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
@@ -356,7 +380,7 @@ fn the_markup_carries_the_props() {
 }
 
 /// A photo is cropped round at the face's size (64 at the lock, 48 in the polkit sheet), with
-/// no letter; a persona is drawn at Medium, idle at rest and happy once accepted.
+/// no letter; an emoji is drawn at Medium, idle at rest and happy once accepted.
 #[test]
 fn the_picture_is_the_kind_the_user_carries() {
     let by_name = |name: &str| {
@@ -380,13 +404,13 @@ fn the_picture_is_the_kind_the_user_carries() {
         by_name("polkit-photo").contains("class=\"ds-user-photo\" data-size=\"48\""),
         "the polkit photo at 48"
     );
-    let persona = by_name("prompt-persona");
+    let emoji = by_name("prompt-emoji");
     assert!(
-        persona.contains("data-size=\"64\" data-mood=\"idle\""),
-        "{persona}"
+        emoji.contains("class=\"ds-emoji\" data-size=\"64\" data-mood=\"idle\""),
+        "{emoji}"
     );
-    assert!(!persona.contains("ds-avatar"), "{persona}");
-    let accepted = by_name("prompt-persona-accepted");
+    assert!(!emoji.contains("ds-avatar"), "{emoji}");
+    let accepted = by_name("prompt-emoji-accepted");
     assert!(accepted.contains("data-mood=\"happy\""), "{accepted}");
     assert!(accepted.contains("data-state=\"accepted\""), "{accepted}");
 }
