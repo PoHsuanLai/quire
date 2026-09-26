@@ -1523,6 +1523,35 @@ the stylesheet's.
 | `ImageSize` | `{ width: u32, height: u32 }` | The picture's pixels; only the ratio is read |
 | `DRAG_THRESHOLD` | `Px(8.0)` | The Manhattan travel that makes a press a drag (section 34) |
 
+### Lock, polkit and switcher (2026-09-26)
+
+M11; design/04-COMPONENTS.md sections 42 and 43; design/20 sections 1.9 to 1.11; design/13
+section 13.3.5. Additive: new components and vocabulary, a narrow `Sheet` width, two avatar
+sizes (`Size48`, `Size64`: a `match` of yours over `AvatarSize` needs them), two glyphs
+(`Icon::ArrowRight`, `Icon::CapsLock`, in `Icon::ACTIONS`), five colour tokens (`--lock-ink`,
+`--lock-ink-soft`, `--lock-glass`, `--lock-glass-strong`, `--lock-veil`) and one size
+(`--fs-lock-clock`, 140). No existing golden moved but the stylesheet's.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `LockScreen` | `wallpaper: Option<ImageSource>`, `clock: Element`, `prompt: Element` | The lock surface's stage: the wallpaper covering it under `--lock-veil` (pass it already blurred; Blitz blurs nothing), the clock 7 % of the width from the top, the prompt near the bottom, centred. Put it in `Ds { material: Material::Window, extent: RootExtent::Viewport }`, one per output |
+| `LockClock` | `time: String`, `date: String`, `look: LockLook` (`Clear`) | The date, then the time in the display face at `--fs-lock-clock` 700, white. You word both (locale, 12/24 h) and re-render each minute. `LockLook::Space` sets the date in a pill of the Space gradient |
+| `LockPrompt` | `user: LockUser { name: String, avatar: AvatarFace }`, `state: PromptState` (`Idle`), `caps: CapsLock` (`Off`), `look: LockLook` (`Clear`), `placeholder: Option<String>` ("Enter Password"), `hint: Option<Text>`, `oninput: EventHandler<String>`, `onsubmit: EventHandler<String>` | The avatar (drawn at 64 whatever size it carries), the name, a 260 x 38 pill of flat white glass holding a `Secret` field (its text is never in the markup: there is no `value` prop), the caps-lock mark, an enter arrow that shows once something is typed, and the hint line. Enter or the arrow calls `onsubmit(text)` (never with an empty text); Escape empties the field and calls `oninput("")`. The field takes the keyboard as it mounts and again after each emptying. `LockLook::Space` paints the pill with the Space gradient |
+| `PromptState` | `Idle`, `Checking`, `Wrong`, `LockedOut { until: String }` | Yours to move. `Checking`: the field and the submit are closed, the arrow spins. `Wrong`: the field plays `shake-x` once (`settle(Anim::ShakeX)`, 420 ms) and empties itself when it settles, calling `oninput("")`; it shakes again only after the state has been something else (go through `Checking` for the next try). `LockedOut`: closed, the hint line says "Try again at {until}" |
+| `CapsLock` | `On`, `Off` | Read the modifier state from the keyboard and pass it; `On` draws the caps-lock arrow in the field |
+| `LockLook` | `Clear`, `Space` | Where the Space's colour reaches (the date pill and the field); the time stays white |
+| `PolkitPrompt` | `action: Text`, `detail: Option<Text>`, `title: Option<String>` ("Authentication Required"), `user: LockUser`, `state: PromptState`, `caps: CapsLock`, `oninput`, `onsubmit`, `oncancel: EventHandler<()>`, `shown: Option<Shown>`, `on_hidden: Option<EventHandler<()>>` | A narrow centred `Sheet` over the modal scrim (`peek-in` in, `sheet-out` out, `on_hidden` at its settle): the avatar at 48, the title, `action`, "Details" with `detail` as a hover card, the name over a boxed `Secret` field, Cancel and Authenticate at equal width. Enter or Authenticate submits; Cancel, Escape and the scrim call `oncancel`. `Wrong` shakes the field once and empties it; `LockedOut` shows "Too many tries. Try again at {until}." in `--danger`. Put it in `Ds { material: Material::Sheet, extent: RootExtent::Viewport }` |
+| `Sheet` | `width: SheetWidth` (`Regular`) | `SheetWidth::Narrow` draws the sheet `min(340px, 88%)` wide (`data-width="narrow"`); a regular sheet's markup is unchanged |
+| `AppSwitcher` | `apps: Vec<SwitcherApp>`, `selected: AppKey`, `output: Option<Px>`, `metrics: SwitcherMetrics`, `onhover: EventHandler<AppKey>`, `onactivate: EventHandler<AppKey>` | The Cmd+Tab row on the Osd material, painted as the OSD card is (the Space gradient at the frame alpha). Cells of `metrics.cell` with icons of `metrics.icon`, `metrics.gap` apart, padding 16; the selection a `--f-pill` square behind the selected cell, moving with `--t-quick --e-spring`; the selected app's name under it (its `Tooltip { Fly }`, shown by the switcher). Past `output - 64` the icons shrink, down to `metrics.min_icon`, then the row scrolls with the selection centred where it can be. The pointer entering a tile calls `onhover(key)`, a click `onactivate(key)`: the selection is yours to move. It fades in over `--t-quick`. The show delay, the keys and the modifier's release are yours. Put it in `Ds { material: Material::Osd, chrome: Some(RootChrome::Transparent) }` |
+| `SwitcherApp` | `{ key: AppKey, name: String, icon: IconSource, plate: Option<PlateFamily>, presence: TilePresence }`; `SwitcherApp::new(key, name, icon)` | One tile. A glyph is drawn at the cell's icon size (on `plate` when given); an external icon is stretched to that square, so resolve it at `metrics.icon`. `presence: TilePresence::Leaving` plays `fold` once (Q: the app quits); drop it from `apps` at `settle(Anim::Fold)` |
+| `SwitcherMetrics` | `{ icon: Px, cell: Px, gap: Px, min_icon: Px }`, default 96, 112, 8, 48 | From `switcher.icon_size_px`, `cell_size_px`, `cell_gap_px`, `overflow_min_icon_px` |
+| `switcher_fit` | `fn(count, selected, SwitcherMetrics, Option<Px>) -> SwitcherFit { icon, cell, view, shift }` | The row's fit, pure, if you need the numbers (to size the surface: the panel is `view + 32` wide) |
+
+**What sill switches to.** The lock surface draws `LockScreen { clock: LockClock, prompt:
+LockPrompt }` and moves `PromptState` as PAM answers; the polkit agent draws `PolkitPrompt`;
+the switcher surface draws `AppSwitcher` after its 150 ms timer and maps keys to `selected`.
+Style nothing under `.ds-lock*`, `.ds-polkit*` or `.ds-switcher*`.
+
 ### PDF and printing (2026-09-25)
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and

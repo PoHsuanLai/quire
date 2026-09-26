@@ -20,6 +20,8 @@
 .ds-avatar[*|data-size="28"]{ width:28px; height:28px; font-size:var(--fs-small); }
 .ds-avatar[*|data-size="30"]{ width:30px; height:30px; font-size:var(--fs-control); }
 .ds-avatar[*|data-size="34"]{ width:34px; height:34px; font-size:var(--fs-reading); }
+.ds-avatar[*|data-size="48"]{ width:48px; height:48px; font-size:var(--fs-subject); }
+.ds-avatar[*|data-size="64"]{ width:64px; height:64px; font-size:var(--fs-display); }
 .ds-avatar[*|data-size="34"][*|data-shape=square]{ border-radius:var(--r-menu-item); font-size:var(--fs-control); }
 
 /* The event attendee stack: `S:519-521`. */

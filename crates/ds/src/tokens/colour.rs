@@ -102,11 +102,25 @@ pub enum ColourToken {
     /// section 11.3.12): `--ink` at .5 alpha, over the layer's own .8 opacity (effective .4), in
     /// light; `--paper`'s equivalent (white at the same effective alpha) in dark.
     ScrollThumb,
+    /// `--lock-ink`: the lock screen's type over the wallpaper, white in either scheme (the
+    /// clock, the name, the field's dots; design/20-SURFACES.md section 1.9).
+    LockInk,
+    /// `--lock-ink-soft`: the lock screen's quieter line (the date, the hint, a placeholder),
+    /// white at .78.
+    LockInkSoft,
+    /// `--lock-glass`: the lock screen's translucent field, flat white over the wallpaper (.24
+    /// in light, .18 in dark); no blur is assumed (spike S15).
+    LockGlass,
+    /// `--lock-glass-strong`: the field's enter button and a hovered field, a step brighter.
+    LockGlassStrong,
+    /// `--lock-veil`: the dimming the lock screen lays over its wallpaper so white type reads on
+    /// a pale picture (black at .12 in light, .28 in dark).
+    LockVeil,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 30] = [
+    pub const ALL: [ColourToken; 35] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -137,6 +151,11 @@ impl ColourToken {
         ColourToken::WarnInk,
         ColourToken::ScrimModal,
         ColourToken::ScrollThumb,
+        ColourToken::LockInk,
+        ColourToken::LockInkSoft,
+        ColourToken::LockGlass,
+        ColourToken::LockGlassStrong,
+        ColourToken::LockVeil,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -172,6 +191,11 @@ impl ColourToken {
             ColourToken::WarnInk => "--warn-ink",
             ColourToken::ScrimModal => "--scrim-modal",
             ColourToken::ScrollThumb => "--scroll-thumb",
+            ColourToken::LockInk => "--lock-ink",
+            ColourToken::LockInkSoft => "--lock-ink-soft",
+            ColourToken::LockGlass => "--lock-glass",
+            ColourToken::LockGlassStrong => "--lock-glass-strong",
+            ColourToken::LockVeil => "--lock-veil",
         })
     }
 
@@ -233,6 +257,13 @@ impl ColourToken {
             // section 11.3.12).
             ColourToken::ScrollThumb => (alpha(0x000000, 400), alpha(0xFFFFFF, 400)),
             ColourToken::MarkGround => (WHITE, WHITE),
+            // The lock screen draws on the wallpaper, not on the card, so its type is white in
+            // either scheme and its field a flat white glass (design/20-SURFACES.md section 1.9).
+            ColourToken::LockInk => (WHITE, WHITE),
+            ColourToken::LockInkSoft => (alpha(0xFFFFFF, 780), alpha(0xFFFFFF, 780)),
+            ColourToken::LockGlass => (alpha(0xFFFFFF, 240), alpha(0xFFFFFF, 180)),
+            ColourToken::LockGlassStrong => (alpha(0xFFFFFF, 380), alpha(0xFFFFFF, 300)),
+            ColourToken::LockVeil => (alpha(0x000000, 120), alpha(0x000000, 280)),
             // Proposed (O-3): black at .25 on light, white at .25 on dark.
             ColourToken::HandleRing => (alpha(0x000000, 250), alpha(0xFFFFFF, 250)),
             // `#fff`/`#FFFFFF` on the avatar's person and account tones in both schemes (O-3).

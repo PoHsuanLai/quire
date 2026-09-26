@@ -112,6 +112,10 @@ role each size carries; every row cites its rules.
 The design system's type tokens span `--fs-micro 9.5 .. --fs-display 26` (`P:296`); names for
 the steps between are not specified.
 
+Two shell sizes sit above the ramp: `--fs-widget-hero` 44 (a widget's hero value, design/23) and
+`--fs-lock-clock` 140, the lock screen's time in the display face at 700 (design/04 section 42;
+proposed, M11 2026-09-26: the user asked for a very large, heavy clock).
+
 ## 5. Tracking
 
 Letter-spacing is fixed per role; uppercase data text is always tracked wide.
