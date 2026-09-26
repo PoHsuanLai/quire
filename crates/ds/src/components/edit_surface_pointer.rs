@@ -118,3 +118,12 @@ fn point_of(event: &PointerEvent) -> Point {
         y: Px(at.y as f32),
     }
 }
+
+/// Where a mouse event (a right-click's `contextmenu`) happened, in the window.
+pub(crate) fn point_of_mouse(event: &MouseEvent) -> Point {
+    let at = event.client_coordinates();
+    Point {
+        x: Px(at.x as f32),
+        y: Px(at.y as f32),
+    }
+}

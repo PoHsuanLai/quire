@@ -712,6 +712,33 @@ second window"; FINDINGS.md of the same name). Both are additive; nothing mailo 
   document exactly as that call did. mailo's `dioxus_native::use_window_event`, `use_window` and
   document head calls keep working unchanged, in every window.
 
+### 6.9 Spelling in the composer (2026-09-27): what mailo adds
+
+quire's `EditSurface` checks spelling itself (design/04-COMPONENTS.md section 50; FINDINGS.md
+"Spelling"; `CONSUMING.md` "Spelling"). It is off unless asked for, so nothing changes until
+mailo turns it on.
+
+- **Turn it on.** `ds-native = { .., features = ["spellcheck"] }`; `ds_native::launch` then
+  provides the checker (the system's Hunspell dictionaries, the locale's language). In
+  `ui/compose/surface.rs`, add to the `EditSurface`:
+  `spell: Spell::On { lang: None }`, `caret: Some(adapt::text_position(doc, session.caret.pos))`
+  (the position `Surface` already computes for its caret rect) and `on_replace`.
+- **`on_replace` is one undoable edit.** `SpellReplace { range, text }`: convert `range` to
+  mailo's grapheme `Range` exactly as a pointer position is converted, and hand the core one
+  `InputEvent` with `input_type: "insertReplacementText"`, `data: Some(text)` and
+  `ranges: vec![range]` (the web's own input type for a spelling replacement), so `editor::`
+  records it as one step and Ctrl+Z restores the misspelling. The adapter's `asked` table does
+  not change: this is not an `EditInput`.
+- **What mailo does not do.** Tokenise, skip URLs, addresses and code, run a checker, draw the
+  underline, or build the menu: quire does all of it, off the UI thread. A `code` element in
+  the body is skipped already; a draft in Chinese or Japanese is never marked.
+- **The menu takes the keyboard.** While the spelling menu is open `on_focus` hears `Out`, and
+  `In` again when it closes (the surface takes the keyboard back); hide and show the caret as
+  for any blur.
+- **Per draft language.** `Spell::On { lang: Some(Lang::parse("de_DE")?) }` checks one draft in
+  another language. A user-level list (`appearance.spelling_languages`) is proposed but not in
+  design/22 yet; until it is, `None` means the locale's (`LC_ALL`, else `LANG`).
+
 ## 7. The reader, Phase B
 
 Mailo's reader has two views today (`crates/mail-app/src/ui/reading/mod.rs::ViewSwitch`):

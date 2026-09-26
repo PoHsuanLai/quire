@@ -41,11 +41,14 @@ pub enum DelayToken {
     /// long, and the swipe decides (proposed, sill Q122). Blitz forwards no scroll phase, so the
     /// end of a touchpad gesture is a quiet spell, not an event.
     SwipeQuiet,
+    /// 300 ms: an `EditSurface` checks the paragraphs that changed once the typing has paused
+    /// this long (proposed, design/04-COMPONENTS.md section 50).
+    SpellDebounce,
 }
 
 impl DelayToken {
     /// Every delay, in table order.
-    pub const ALL: [DelayToken; 14] = [
+    pub const ALL: [DelayToken; 15] = [
         DelayToken::Fly,
         DelayToken::HoverOpen,
         DelayToken::HoverClose,
@@ -60,6 +63,7 @@ impl DelayToken {
         DelayToken::FocusAfterMount,
         DelayToken::FlashHold,
         DelayToken::SwipeQuiet,
+        DelayToken::SpellDebounce,
     ];
 
     /// The custom property, for the delays the stylesheet also reads (`--d-fly`, the heal step).
@@ -78,7 +82,8 @@ impl DelayToken {
             | DelayToken::AutosaveDebounce
             | DelayToken::FocusAfterMount
             | DelayToken::FlashHold
-            | DelayToken::SwipeQuiet => None,
+            | DelayToken::SwipeQuiet
+            | DelayToken::SpellDebounce => None,
         }
     }
 
@@ -104,6 +109,7 @@ impl DelayToken {
             DelayToken::FocusAfterMount => 60,
             DelayToken::FlashHold => 1200,
             DelayToken::SwipeQuiet => 120,
+            DelayToken::SpellDebounce => 300,
         })
     }
 }
