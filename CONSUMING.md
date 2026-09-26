@@ -1602,6 +1602,22 @@ LockUser::new(name, face)            // was: LockUser { name, avatar: face }
 `state: Accepted` → after `settle(Anim::PersonaHop, level, StaggerIndex::default())` unlock
 (and fade the surface). With a face or photo `Accepted` just holds the field closed.
 
+### PDF thumbnail (2026-09-26): a PDF's first page from a path
+
+sill M9 launcher v2; design/04-COMPONENTS.md section 45. Additive: two components, two enums,
+new classes (`ds-pdf-thumb`, `ds-pdf-thumb-sheet`, `ds-pdf-thumb-page`, `ds-pdf-thumb-plate`) and
+attributes (`data-state` on `.ds-pdf-thumb`, `data-trouble` on the plate), and a ds-native cargo
+feature. No existing golden moved but the stylesheet's.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `ds_native::PdfFileThumb` (feature `pdf-thumb`) | `path: PathBuf`, `size: Size`, `label: Option<String>` | The first page of the PDF at `path`, fitted into `size` at its own aspect on a white sheet with a hairline edge. Read and rasterised on a worker thread, cached by path, modification time, device size and scale; you never rasterise. Loading shows nothing for 400 ms, then the dimmed blank sheet; no pages or an empty file, the blank sheet; not a PDF, missing, or password-locked, a file (or lock) glyph on a red plate. `label` is what a screen reader reads (pass the file name) |
+| `ds::PdfThumb` | `page: PdfPage`, `size: Size`, `label` | The drawing alone, for a page you already have: `PdfPage::{Loading, Ready { image: ImageSource, sheet: ImageSize }, Empty, Failed(PdfTrouble::{Unreadable, Locked})}` |
+| `ds_native::pdf_thumb_blocking` | `&ThumbRequest { path, size, scale }` -> `PdfPage` | The same page, from the cache or read now on the calling thread (a Quick Look worker's own prefetch); blocks, so never on the UI thread. `pdf_thumb_cached` answers from the cache only; `pdf_thumb_bytes(bytes, DeviceBox)` rasterises bytes with no file and no cache |
+| Cargo | `ds-native = { …, features = ["pdf-thumb"] }` | Brings in pdfrum (already in the pinned block); off by default |
+
+Never style `.ds-pdf-thumb*`; size it with `size`, not CSS.
+
 ### Animated emoji (2026-09-26): the user's picture as a moving emoji
 
 design/25-EMOJI.md. `AnimatedEmoji { emoji: EmojiId, size: PersonaSize, mood: Mood, wake:

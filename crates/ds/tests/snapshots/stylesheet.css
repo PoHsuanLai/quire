@@ -2008,6 +2008,28 @@ html,body{margin:0;padding:0;background:transparent}
   animation:peek-in var(--t-big) var(--e-spring); }
 .ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
 .ds-peek-tools{ display:flex; justify-content:flex-end; padding:var(--s-8) var(--s-10) 0; }
+/* -- pdf_thumb -- */
+/* PdfThumb (design/04-COMPONENTS.md section 45; sill M9's launcher preview, design/20 section
+   2.4's Quick Look). The room is sized inline from `size`; the sheet is placed inline at the
+   page's aspect, centred (`sheet_rect`). The sheet is paper, `--foreign-ground` (white in both
+   schemes: a PDF page is white whatever the desktop's scheme), with a hairline edge in `--line`
+   and the resting lift `--shadow-1`; the page's pixels fill it.
+
+   States (`data-state`): `loading`, the sheet laid out but transparent (nothing shows for the
+   grace, 400 ms); `pending`, the blank sheet at half strength, faded in over `--t-quick`
+   (the pending look's still frame: no loop, so it costs no frames however long the read);
+   `ready`, the page; `empty`, the blank sheet; `failed`, no sheet, the file-type glyph on a
+   red app-icon plate (`data-trouble=unreadable|locked`), centred. Attribute selectors carry
+   `*|` (spike S2). */
+
+.ds-pdf-thumb{ position:relative; box-sizing:border-box; flex:none; max-width:100%; }
+.ds-pdf-thumb-sheet{ position:absolute; box-sizing:border-box; overflow:hidden;
+  background:var(--foreign-ground); border:var(--hairline) solid var(--line); border-radius:var(--r-micro);
+  box-shadow:var(--shadow-1); transition:opacity var(--t-quick) var(--e-out); }
+.ds-pdf-thumb[*|data-state=loading] .ds-pdf-thumb-sheet{ opacity:0; }
+.ds-pdf-thumb[*|data-state=pending] .ds-pdf-thumb-sheet{ opacity:.5; }
+.ds-pdf-thumb-page{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; }
+.ds-pdf-thumb-plate{ position:absolute; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; }
 /* -- persona -- */
 /* Persona (design/24-PERSONA.md): the user's character on a disc. The disc's colour arrives
    inline as `--pa-ground` (a derived hex, per scheme, computed in Rust) and the eyes' line as

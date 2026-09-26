@@ -55,6 +55,8 @@ mod net_policy;
 mod node_ref;
 mod origin;
 mod pdf;
+#[cfg(feature = "pdf-thumb")]
+mod pdf_thumb;
 #[cfg(feature = "print")]
 mod print;
 mod route;
@@ -87,6 +89,11 @@ pub use launch::{AppConfig, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use origin::{FrameId, RequestOrigin};
 pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
+#[cfg(feature = "pdf-thumb")]
+pub use pdf_thumb::{
+    DeviceBox, PdfFileThumb, THUMB_CACHE_ENTRIES, ThumbKey, ThumbRequest, pdf_thumb_blocking,
+    pdf_thumb_bytes, pdf_thumb_cached,
+};
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use snap::snap_to_device;

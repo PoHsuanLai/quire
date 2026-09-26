@@ -91,3 +91,8 @@ required-features = ["lint"]
 [[test]]
 name = "emoji_ssr"
 required-features = ["lint"]
+
+# The PDF thumbnail, linted (sill M9).
+[[test]]
+name = "pdf_thumb_ssr"
+required-features = ["lint"]
