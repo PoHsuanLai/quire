@@ -89,6 +89,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     use_context_provider(|| crate::focus::FOCUS);
     use_context_provider(|| crate::focus::BLUR);
     use_context_provider(|| crate::focus::SELECT);
+    use_context_provider(|| crate::focus::CARET);
     let fallback = props.setup.focus_fallback;
     let keeper = use_hook(|| match fallback {
         FocusFallback::Ancestor => {

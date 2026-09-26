@@ -4,6 +4,7 @@
 use crate::components::menu_entry::{MenuEntry, Trail};
 use crate::components::menu_item::{Branch, ItemView, Row, RowEvents, Words, info, item};
 use crate::components::menu_lines::Line;
+use crate::components::menu_shape::PLAIN;
 use crate::components::press::Press;
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::{Selection, Switch};
@@ -69,6 +70,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         availability: *availability,
                         branch: Branch::Leaf,
                         trailing: None,
+                        shape: PLAIN,
                     },
                     index,
                 ),
@@ -84,6 +86,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         availability: row.availability,
                         branch: Branch::Leaf,
                         trailing: row.trailing.as_ref(),
+                        shape: &row.shape,
                     },
                     index,
                 ),
@@ -108,6 +111,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                             Switch::Off
                         }),
                         trailing: None,
+                        shape: PLAIN,
                     },
                     index,
                 ),

@@ -17,5 +17,5 @@ mod worker;
 pub use cache::{THUMB_CACHE_ENTRIES, pdf_thumb_cached};
 pub use raster::pdf_thumb_bytes;
 pub use request::{DeviceBox, ThumbKey, ThumbRequest, pdf_thumb_blocking, pdf_thumb_rasters};
-pub use view::PdfFileThumb;
+pub use view::{PdfFileThumb, use_pdf_page};
 pub use worker::QUEUE_DEPTH;

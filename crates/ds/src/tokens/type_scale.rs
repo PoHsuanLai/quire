@@ -138,8 +138,12 @@ pub enum FontSize {
     Day,
     /// `--fs-display` 26: composer subject.
     Display,
+    /// `--fs-emoji-cell` 30: an emoji in an emoji grid's 56 px cell (sill Q291).
+    EmojiCell,
     /// `--fs-widget-hero` 47: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
     WidgetHero,
+    /// `--fs-emoji-preview` 96: one emoji in a preview pane (sill Q292).
+    EmojiPreview,
     /// `--fs-lock-clock` 140: the lock screen's time, the largest type the shell draws
     /// (design/20-SURFACES.md section 1.9; design/04-COMPONENTS.md section 42).
     LockClock,
@@ -156,7 +160,7 @@ impl FontSize {
     ];
 
     /// Every step, smallest first.
-    pub const ALL: [FontSize; 27] = [
+    pub const ALL: [FontSize; 29] = [
         FontSize::Pico,
         FontSize::Dial,
         FontSize::Nano,
@@ -182,7 +186,9 @@ impl FontSize {
         FontSize::Amount,
         FontSize::Day,
         FontSize::Display,
+        FontSize::EmojiCell,
         FontSize::WidgetHero,
+        FontSize::EmojiPreview,
         FontSize::LockClock,
     ];
 
@@ -214,6 +220,8 @@ impl FontSize {
             FontSize::Amount => "--fs-amount",
             FontSize::Day => "--fs-day",
             FontSize::Display => "--fs-display",
+            FontSize::EmojiCell => "--fs-emoji-cell",
+            FontSize::EmojiPreview => "--fs-emoji-preview",
             FontSize::WidgetHero => "--fs-widget-hero",
             FontSize::LockClock => "--fs-lock-clock",
         })
@@ -267,6 +275,8 @@ impl FontSize {
             FontSize::Amount => "22px",
             FontSize::Day => "24px",
             FontSize::Display => "26px",
+            FontSize::EmojiCell => "30px",
+            FontSize::EmojiPreview => "96px",
             FontSize::WidgetHero => "47px",
             FontSize::LockClock => "140px",
         }

@@ -202,6 +202,19 @@ pub(crate) fn choices<T: Clone>(lines: &[Line<'_, T>]) -> Vec<Choice<T>> {
         .collect()
 }
 
+/// How many of `lines` are choices.
+pub(crate) fn choices_len<T>(lines: &[Line<'_, T>]) -> usize {
+    lines
+        .iter()
+        .filter(|line| {
+            matches!(
+                line.entry,
+                MenuEntry::Item { .. } | MenuEntry::Row(_) | MenuEntry::Submenu { .. }
+            )
+        })
+        .count()
+}
+
 /// Each choice's availability, in order.
 pub(crate) fn liveness<T>(choices: &[Choice<T>]) -> Vec<Availability> {
     choices.iter().map(|choice| choice.availability).collect()

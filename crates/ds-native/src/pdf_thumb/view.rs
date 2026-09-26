@@ -23,15 +23,26 @@ struct Arrived {
 /// finishes into the cache but is not shown. `label` is read by a screen reader (the file's name, say).
 #[component]
 pub fn PdfFileThumb(path: PathBuf, size: Size, #[props(default)] label: Option<String>) -> Element {
-    let request = ThumbRequest {
-        path,
-        size,
-        scale: use_scale(),
-    };
+    let page = use_pdf_page(Some(path), size).unwrap_or_default();
+    rsx! {
+        PdfThumb { page, size, label }
+    }
+}
+
+/// The first page of the PDF at `path` for a `size` box, as `PdfFileThumb` reads it (cached, else
+/// asked of the worker, `Loading` until it lands), for a part that draws the page itself: the
+/// preview pane's `PaneContent::Pdf { page, name }` with `ds::PANE_MEDIA` (sill Q292). `None`
+/// for no path, so a pane that shows a PDF only some of the time calls the hook on every render
+/// (hooks keep their order) and passes the path only while it shows one; a path that goes away
+/// leaves a request already queued to finish into the cache.
+pub fn use_pdf_page(path: Option<PathBuf>, size: Size) -> Option<PdfPage> {
+    let scale = use_scale();
+    let request = path.map(|path| ThumbRequest { path, size, scale });
     let slot = use_hook(Slot::fresh);
     let arrived = use_signal(|| None::<Arrived>);
     let mut running = use_hook(|| CopyValue::new(None::<Task>));
     let mut seen = use_hook(|| CopyValue::new(None::<ThumbRequest>));
+    let request = request?;
     let fresh = seen.peek().as_ref() != Some(&request);
     if fresh {
         seen.set(Some(request.clone()));
@@ -53,9 +64,7 @@ pub fn PdfFileThumb(path: PathBuf, size: Size, #[props(default)] label: Option<S
             PdfPage::Loading
         }
     };
-    rsx! {
-        PdfThumb { page, size, label }
-    }
+    Some(page)
 }
 
 /// Ask the worker for the page, again if a full queue pushed the job out, and hand it back.
