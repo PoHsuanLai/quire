@@ -1,12 +1,30 @@
 //! The four legibility floors the materials page reads out live: the card's ink over each
 //! material's tint, translucent (`data-blur=on`) and solid (`off`), composited over the two worst
 //! backdrops, black and white (design/21-SPACES.md section 7, `tests/legibility.rs` in ds).
+//! `Material::Widget` alone is held to [`WIDGET_FLOOR`] rather than [`FLOOR`] (the contrast-relax
+//! pass, 2026-09-26; see [`floor_for`]).
 
 use ds::tokens::Alpha;
 use ds::{ColourToken, Material, Scheme, Verdict, ratio, recipe};
 
 /// WCAG AA for body text: what every floor has to clear.
 pub const FLOOR: f64 = 4.5;
+
+/// WCAG AA for large or bold text: `Material::Widget`'s own floor (the user's decision,
+/// 2026-09-26, "relax the contrast then": design/03-COLOR.md section 17,
+/// design/23-WIDGETS.md section 4.3). The widget's own text is large or bold, so it is held to
+/// the large-text guideline rather than the small-text one every other material keeps.
+pub const WIDGET_FLOOR: f64 = 3.0;
+
+/// The floor `material` has to clear: [`WIDGET_FLOOR`] for `Material::Widget`, [`FLOOR`] for
+/// everything else.
+pub fn floor_for(material: Material) -> f64 {
+    if material == Material::Widget {
+        WIDGET_FLOOR
+    } else {
+        FLOOR
+    }
+}
 
 /// What a panel is composited over.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -62,12 +80,14 @@ pub struct Floor {
     pub backdrop: Backdrop,
     /// The ink's contrast ratio on the composited tint.
     pub measured: f64,
+    /// What it has to clear: [`floor_for`] the material it was measured on.
+    pub floor: f64,
 }
 
 impl Floor {
-    /// Whether it clears [`FLOOR`].
+    /// Whether it clears [`Floor::floor`].
     pub fn verdict(&self) -> Verdict {
-        if self.measured >= FLOOR {
+        if self.measured >= self.floor {
             Verdict::Pass
         } else {
             Verdict::Fail
@@ -80,6 +100,7 @@ impl Floor {
 pub fn floors(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Vec<Floor> {
     let painted = recipe(material, scheme, tint_alpha);
     let ink = ColourToken::Ink.value(scheme).css();
+    let floor = floor_for(material);
     let tints = [
         (Tint::OverBlur, painted.tint),
         (Tint::Solid, painted.tint_solid),
@@ -94,6 +115,7 @@ pub fn floors(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Vec<Floo
             tint,
             backdrop,
             measured: ratio(&ink, &over(colour, backdrop.rgb())).unwrap_or(0.0),
+            floor,
         })
         .collect()
 }

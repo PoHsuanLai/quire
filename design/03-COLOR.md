@@ -564,6 +564,22 @@ user asked to be tunable later, not a final measurement; `crates/ds/tests/legibi
 `the_tinted_chrome_holds_its_ink_over_blur` pins the floor so a retune that drops back below 4.5
 fails it.
 
+**The contrast-relax pass (2026-09-26): `Material::Widget` alone gives up the 4.5:1 floor.** The
+user's decision, "relax the contrast then": the light widget card may be as see-through as the
+reference (design/23-WIDGETS.md section 1.1 M26-M30, measured alpha .48 of a near-white
+`rgb(247,248,248)`, fitted over a blurred wallpaper), at the cost of the 4.5:1 small-text rule
+over the worst-case black backdrop — accepted because the widget's own text is large or bold
+(the hero and figure numerals, bold city names), where the accessibility guideline for large
+text is 3:1, not 4.5:1. `crates/ds/tests/legibility.rs` now gates `Material::Widget` (and the
+Space-tinted widget card, `CardTint::Space`) at 3:1 instead of 4.5:1, over black and white,
+solid and blurred; every other material keeps the 4.5:1 floor. The light tint drops from .60 to
+.48 (3.86:1 over black, 16.70:1 over white). The dark tint was never measured against the
+reference, so it is raised only as far as the relaxed floor needs across every gate the tests
+run — the flat tint alone would clear 3:1 at .53, but the Space-tinted card's darkest preset
+stop needs .55 (worst 3.12:1 over white); dark moves from .67 to .55. Some widget text sits
+below the WCAG large-text size even by this reading (design/23-WIDGETS.md section 4.3 lists it);
+their sizes are unchanged, so they may be hard to read over very dark or very bright wallpapers.
+
 | Material | Tint light | Tint dark | Edge | Shadow | Radius | Blur | Nearest precedent in `S` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Window | `--f-grad` + `.ds-layer` + `.ds-grain` | same | none | none | 0 (the card inside keeps 12/12/12/4) | none | `.win` (`S:77-87`) |
@@ -573,7 +589,7 @@ fails it.
 | Sheet | `rgba(248,249,246,.82)` | `rgba(21,24,20,.78)` | hairline + highlight | `--shadow-sheet` = `0 24px 50px -18px rgba(0,0,0,.55)` light / `0 30px 60px -20px rgba(0,0,0,.7)` dark | 18 | behind | `.peek` (`S:221-224`) |
 | Toast | `rgba(248,249,246,.80)` | `rgba(21,24,20,.74)` | hairline + highlight | `--shadow-pop` | 16 | behind | `.toast` is inverse ink/paper in mail (`S:360-362`); the shell banner is a material, see open decision 12 |
 | Osd | `rgba(248,249,246,.72)` | `rgba(21,24,20,.68)` (settled 2026-09-24; was .66) | hairline + highlight | `--shadow-pop` | 18 | behind | none |
-| Widget | `rgba(224,224,224,.60)` (vibrancy pass 2026-09-26, proposed: the measured tone at the settled .60, design/23 section 1.1 M26-M30; was `rgba(248,249,246,.60)`, settled 2026-09-24; .50 to .54 wave 1, to .60 over blur) + grain | `rgba(21,24,20,.67)` (settled 2026-09-24; .45 to .65 wave 1, to .67 over blur) + grain | light: a 1 px white rim at .10 inside, a 1 px outer hairline (M32, M33); dark: hairline + highlight | light `0 2px 8px rgba(0,0,0,.12)` (M34); dark `0 8px 20px -8px rgba(0,0,0,.50)` | 20 | behind (sigma 22 recommended, design/23 section 4.3) | `.editor` / `.note` (`S:246`, `S:283`) |
+| Widget | `rgba(247,248,248,.48)` (contrast-relax pass 2026-09-26, proposed: the reference's own measured near-white at its own measured alpha, design/23 section 1.1 M27-M28; was `rgba(224,224,224,.60)`, the vibrancy pass 2026-09-26; .50 to .54 wave 1, to .60 over blur; gated at 3:1 not 4.5:1, see above) + grain | `rgba(21,24,20,.55)` (contrast-relax pass 2026-09-26: raised only as far as the relaxed 3:1 floor needs; was .67, settled 2026-09-24; .45 to .65 wave 1) + grain | light: a 1 px white rim at .10 inside, a 1 px outer hairline (M32, M33); dark: hairline + highlight | light `0 2px 8px rgba(0,0,0,.12)` (M34); dark `0 8px 20px -8px rgba(0,0,0,.50)` | 20 | behind (sigma 22 recommended, design/23 section 4.3) | `.editor` / `.note` (`S:246`, `S:283`) |
 
 Tinted shell chrome (bar, dock, launcher, control center) additionally carries the workspace's
 `--f-*` frame tokens over the material (section 18 and `21-SPACES.md`): the material gives the
