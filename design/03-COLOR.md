@@ -698,6 +698,104 @@ Settled rules:
 Precedent: `S`'s two Spaces are presets 0 and 1 in order and `Ctrl 1..9` switches Spaces by
 index (`S:1027`, `S:1086`, `S:1669`).
 
+## 20. Accent band (proposed, awaiting the user's pick)
+
+**Status: proposed, awaiting the user's pick (2026-09-27).** Postmark (section 5) stays the
+default; nothing paints from the band yet. The user's note: Postmark `#23508F` (OKLCH L .434,
+C .115) is "too heavy, need to be more light and translucent … make some constraints on the
+accent color. mailo already has this."
+
+### 20.1 The constraint
+
+Every accent, built-in or lent by a Space, comes from one function,
+`ds::tokens::accent_band::accent_roles(band, AccentPick { hue, weight }, scheme) -> AccentRoles`,
+the way mailo derives the Space accent (section 4.3): lightness is the band's, the person picks
+only the hue (and a Space lends its dot's chroma as the weight, so a grey Space lends a
+grey-blue). A band fixes per scheme: the fill's starting lightness, the chroma span (quiet at
+weight 0, the ceiling at full weight), the ink rule, the text accent's starting lightness, and
+the wash's and ring's starting alphas. The function then steps, as mailo's accent loop does:
+
+| Role | Paints | Rule | Gate (`accent_band::floors`) |
+| --- | --- | --- | --- |
+| `fill` (solid) | primary button, today disc, toggle on, tile disc, slider fill, armed toast tab | OKLCH (band L, chroma at weight, hue), gamut-fitted; L steps .01 toward the ink until the ink reads | ink on fill >= 4.5 |
+| `ink` | text and glyphs on the fill | `White`: `#FFFFFF`, the fill steps darker; `Deep`: OKLCH (.22, .03, hue), the fill steps lighter | (as above) |
+| `text` | links, the month title, menu check and marks, search match, caret | same hue and chroma; L steps away from the card (darker in light, lighter in dark) | >= 4.5 on `--paper`, `--surface`, `--surface-2`, `--raise` |
+| `wash` (translucent) | selected row, menu and launcher highlight, chip, tile on, input focus halo | the fill at an alpha over whatever lies beneath (the Mac's selection); the alpha rises .01 only until it shows | `--ink` on the wash >= 4.5 over every ground; wash >= 1.15:1 off its ground; alpha <= .60 |
+| `ring` | keyboard focus ring (3 px, 1 px gap, design/27 6.4) | the text accent at an alpha; rises .05 until it stands off | >= 3:1 against every ground (WCAG 1.4.11) |
+
+No text on the accent qualifies for the 3:1 large-text floor (button labels, the disc's number
+and menu text are all under 18 pt / 14 pt bold), so the ink gate is 4.5 everywhere. The fill's
+own contrast against the ground is reported, not gated: a toggle's knob and a disc's shape also
+show the state. The sweep `tokens::accent_band::tests::every_hue_in_every_band_is_legible` runs
+every 5 degrees of hue x weights 0 to 1 in tenths x both schemes x every candidate (4,752 cases)
+and names the colour that fails; mailo's `every_pick_is_legible` is its model.
+
+A consequence worth knowing: white ink at 4.5:1 pins a white-ink fill to OKLCH L .55-.59 at any
+hue (the Mac's `#007AFF`, L .60, carries white at only 4.02:1). A lighter solid needs dark ink
+(band B, and C in dark). The lightness the user sees therefore comes mostly from the chroma and
+the wash: the big areas (selected rows, menu and launcher highlight, tiles, chips) become a
+translucent tint instead of an opaque one.
+
+### 20.2 Candidates
+
+The built-in accents take the Candy hues (Red 28, Amber 76, Green 147, Blue 260, Violet 294) and
+Postmark 257. Inside one band Postmark and Blue come out nearly the same; which survives (or
+Blue becomes, say, a teal at 200) is part of the pick. Numbers below are for hue 257 at full
+weight, then the range over the whole sweep.
+
+| | Postmark (today) | A · System | B · Airy | C · Calm |
+| --- | --- | --- | --- | --- |
+| Idea | navy, opaque tint | the Mac's system-blue family: vivid mid-light fill, light washes | pastel fills with a deep ink, dusty text accent | calmer chroma; light as A, dark as B |
+| Light: band | fixed quad | fill L .62, C .04-.19, White, text L .58, wash .16 | fill L .80, C .03-.10, Deep, text L .54, wash .18 | fill L .64, C .04-.14, White, text L .56, wash .18 |
+| Light: fill / ink | `#23508F` / `#F4F8FF` 8.0:1 | `#1673E4` / white 4.56 | `#94C0FE` / `#111B28` 9.3 | `#3C77C8` / white 4.50 |
+| Light: text | `#23508F` | `#0067D5` | `#426AA2` | `#2D68B8` |
+| Light: wash | `#DCE5F3` solid | fill at .16 | fill at .32 | fill at .18 |
+| Light: ring | `#23508F` solid 2.5 px | text at .75 | text at .80 | text at .75 |
+| Light: fill vs ground | 7.1 | 3.8 | 1.6 | 3.8 |
+| Dark: band | fixed quad | fill L .62, C .04-.17, White, text L .72, wash .26 | fill L .78, C .03-.10, Deep, text L .76, wash .20 | fill L .74, C .04-.12, Deep, text L .74, wash .22 |
+| Dark: fill / ink | `#7FA6E6` / `#0B142A` | `#2975D9` / white 4.53 | `#8EBAF7` / `#111B28` 8.7 | `#79ADF6` / `#111B28` 7.5 |
+| Dark: text | `#7FA6E6` | `#66A6FE` | `#88B3F0` | `#79ADF6` |
+| Dark: wash / ring | `#1E2A44` solid / solid | .26 / .65 | .20 / .60 | .22 / .60 |
+| Sweep: fill L light / dark | | .55-.59 / .55-.59 | .80 / .78 | .55-.58 / .74 |
+| Sweep: wash alpha light / dark | | .16 / .26 | .29-.36 / .20 | .18 / .22 |
+| Sweep: ring alpha light / dark | | .70-.80 / .60-.70 | .75-.80 / .55-.60 | .75-.80 / .60-.65 |
+| Sweep: fill vs ground light / dark | | 3.77-3.97 / 2.89-3.04 | 1.50-1.64 / 6.5-7.1 | 3.77-3.97 / 5.6-6.3 |
+
+Every candidate clears every gate at every hue and weight (least: ink on fill 4.50, text 4.50,
+ink on wash 7.3, ring 3.00). B's light fill stands only 1.5:1 off white: the button and the
+toggle read by their shape and knob, not their colour, which WCAG 1.4.11 allows only as long as
+the state is not shown by colour alone.
+
+The contact sheet (`ds-gallery --accent-sheet DIR`, `crates/ds-gallery/src/accent_sheet.rs`)
+draws, per column and scheme, over the calm wallpaper and a Popover, Widget and Sheet material:
+the primary button, a toggle on, the segmented control (it selects in `--ink`, unchanged by any
+band), a chip, a link, the focus ring, a menu highlight, a selected row, the control center's
+tiles, the compact calendar (month title, today disc, dots), the launcher's selected row, and the
+six built-in hues. Pictures: `tools/progress/shots/accent/accent-candidates-{light,dark}.png`, and
+`accent-{postmark,a-system,b-airy,c-calm}-{light,dark}.png` per column.
+
+### 20.3 What switching would change (after the pick)
+
+- `ds::tokens`: `AccentQuad { accent, ink, soft, seal }` (four `Hex`) gives way to
+  `AccentRoles { fill, ink, text, wash: Alpha, ring: Alpha }`; `quad(accent, scheme)` becomes
+  `accent_roles(&BAND, AccentPick { hue: hue_of(accent), weight: Weight::FULL }, scheme)`, and the
+  Space accent (`palette::derive`'s `accent`, `accent_soft`, `accent_ink`) calls the same function
+  with the dot's chroma as the weight, so section 5's two derivations become one.
+- CSS: `--accent` stays the fill; `--accent-soft` becomes `rgba(...)` (translucent), so a consumer
+  that parses it as a hex or measures it as opaque breaks (quire's own `tests/legibility.rs`
+  "ink on the accent tint" composites it first); `--accent-ring` becomes the text at the ring
+  alpha and the focus outline reads it (design/27 6.4 (a)) instead of solid `--accent`; a new
+  `--accent-text` takes every text use of `--accent` (menu `mark`, check and trail glyphs,
+  `.ds-month-title` and `.ds-month-dot`, the info flag glyph, polkit's details word, settings
+  check, bubble pressed, link hover, caret, drop line). `--seal` equals the fill.
+- sill: no API break if it paints through tokens; any hard-coded `#23508F` or `--accent` used as
+  text on a material should move to `--accent-text`, and its screenshots all change. Under B,
+  sill's primary buttons and today disc carry dark ink.
+- mailo: its Space accent already sits in a band (section 5); adopting quire's function replaces
+  `accent`, `accentSoft`, `accentInk` with the five roles, the selected-row tint becomes
+  translucent, and its `every_pick_is_legible` gains the wash and ring gates.
+- `Accent` (the picker's six) keeps its slugs; Postmark and Blue need a decision (20.2).
+
 ## Open decisions
 
 1. **Static frame fallback versus derived values.** `.win` defaults `--f-pill` to
@@ -715,6 +813,7 @@ index (`S:1027`, `S:1086`, `S:1669`).
 6. **The six accents.** The design system carries mailo's `accents.css` "6 hues x 4 props"
    (`P:59`) and the gallery has an Accent(6) axis (`P:269`); their values are not in either
    prototype. How the six accents relate to Postmark and the Space accent is not specified.
+   Proposed (2026-09-27): all of them generated from one band, section 20, awaiting the pick.
 7. **`--seal`** is defined but unused in `S` (the seal is `--f-ink`); whether the token survives is
    not specified.
 8. **Editor handle in dark** uses the light pick lightness 0.74 while the field dots use 0.66
