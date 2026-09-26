@@ -30,6 +30,7 @@ mod edit_surface_focus;
 mod edit_surface_keys;
 mod edit_surface_pointer;
 mod edit_surface_state;
+pub mod emoji;
 pub mod flow;
 pub mod group_header;
 pub mod hover_card;
@@ -169,6 +170,7 @@ pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use edit_surface::EditSurface;
+pub use emoji::{AnimatedEmoji, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback};
 pub use flow::Flow;
 pub use group_header::GroupHeader;
 pub use hover_card::{
@@ -284,6 +286,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("drag_ghost", include_str!("drag_ghost.css")),
     ("edge_strip", include_str!("edge_strip.css")),
     ("edit_surface", include_str!("edit_surface.css")),
+    ("emoji", include_str!("emoji.css")),
     ("group_header", include_str!("group_header.css")),
     ("hover_card", include_str!("hover_card.css")),
     ("hover_strip", include_str!("hover_strip.css")),

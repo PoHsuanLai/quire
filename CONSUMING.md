@@ -1573,6 +1573,29 @@ Reduced motion is quire's: moods change at once and nothing blinks. A surface th
 either a letter or a persona takes `UserPicture::{Face(AvatarFace), Persona(PersonaSpec)}` and
 draws it with `UserPortrait { picture, size, mood, wake }`. Never style `.ds-persona*`.
 
+### Animated emoji (2026-09-26): the user's picture as a moving emoji
+
+design/25-EMOJI.md. `AnimatedEmoji { emoji: EmojiId, size: PersonaSize, mood: Mood, wake:
+WakeStamp, disc: EmojiDisc }` draws the emoji the user picked (28, 64 or 128 px) and plays it
+for 20 s after mount, a new `wake`, a mood change or a new pick, then rests on its first frame
+and paints nothing. Drive it exactly as a `Persona` (the same `Mood` and `WakeStamp`).
+
+| You want | Pass |
+| --- | --- |
+| The user's choice | `emoji: EmojiId` (user data, serde as its slug: `"heart-eyes"`); `EmojiId::default()` is a smiling face; `EmojiId::ALL` is the picker's list, `.text()` and `.name()` its labels |
+| A wrong password | `Mood::Wince`: the confounded face once through, then the pick |
+| Unlocked | `Mood::Happy`: the partying face once through |
+| The user is typing | `Mood::Attentive`: the pick, playing |
+| The display is off | `Mood::Asleep`: the sleeping face, still |
+| Wake it | `wake: stamp.next()` |
+| A disc behind it | `disc: EmojiDisc::Tinted(Backdrop::Teal)` (default `EmojiDisc::None`) |
+| A picker's grid of the set | `playback: EmojiPlayback::Still`: rest frames only |
+
+Reduced motion is quire's: still frames only. **Credit**: the frames are Noto Animated Emoji,
+CC BY 4.0; a product that shows them puts `ds::EMOJI_ATTRIBUTION` in its about box or credits
+(design/25 section 2). `UserPicture` does not take an emoji yet (design/25 section 8). Never
+style `.ds-emoji*`.
+
 ### Widget vibrancy (2026-09-26)
 
 design/23-WIDGETS.md sections 1.1 (M26-M34) and 4.3. Values only: no class, attribute or prop
