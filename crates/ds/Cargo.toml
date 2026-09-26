@@ -76,3 +76,8 @@ required-features = ["lint"]
 [[test]]
 name = "shot_thumbnail_ssr"
 required-features = ["lint"]
+
+# The lock screen, polkit prompt and app switcher, linted (M11).
+[[test]]
+name = "lock_switcher_ssr"
+required-features = ["lint"]

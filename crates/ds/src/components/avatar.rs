@@ -28,6 +28,10 @@ pub enum AvatarSize {
     Size30,
     /// 34: hover-card person header, rich menu tile.
     Size34,
+    /// 48: the person a polkit prompt asks for (`PolkitPrompt`).
+    Size48,
+    /// 64: the person at the lock screen (`LockPrompt`).
+    Size64,
 }
 
 /// Round, or the favicon's rounded square.
@@ -137,6 +141,8 @@ impl AvatarSize {
             AvatarSize::Size28 => 28,
             AvatarSize::Size30 => 30,
             AvatarSize::Size34 => 34,
+            AvatarSize::Size48 => 48,
+            AvatarSize::Size64 => 64,
         }
     }
 }

@@ -2,6 +2,7 @@
 
 pub mod account_tile;
 pub mod animated_list;
+pub mod app_switcher;
 pub mod appearance_picker;
 pub mod avatar;
 pub(crate) mod banner_row;
@@ -41,6 +42,10 @@ pub mod level;
 pub(crate) mod light_mark;
 pub mod link_pill;
 pub mod list_row;
+pub mod lock_clock;
+pub mod lock_prompt;
+pub mod lock_screen;
+pub mod lock_vocab;
 pub mod menu;
 pub(crate) mod menu_active;
 pub mod menu_bar_item;
@@ -83,6 +88,7 @@ pub mod pane_switcher;
 pub mod panel;
 pub mod pass_through;
 pub mod peek;
+pub mod polkit_prompt;
 pub mod popover;
 pub mod press;
 pub mod provider_mark;
@@ -95,6 +101,7 @@ pub(crate) mod row_star;
 pub mod scrim;
 pub mod scrim_strength;
 pub mod search_field;
+pub(crate) mod secret_entry;
 pub mod section_header;
 pub mod segmented;
 pub mod selection_bubble;
@@ -105,6 +112,7 @@ pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sheet_placement;
 pub(crate) mod sheet_presence;
+pub mod sheet_width;
 pub(crate) mod shot_frame;
 pub mod shot_ghost;
 pub mod shot_press;
@@ -114,6 +122,7 @@ pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
 pub mod spinner;
+pub mod switcher_fit;
 pub mod sync_halo;
 pub mod tabs;
 pub mod text_input;
@@ -137,6 +146,7 @@ pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use animated_list::AnimatedList;
+pub use app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence};
 pub use appearance_picker::{AppearancePicker, PickerLayout};
 pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
@@ -172,6 +182,10 @@ pub use kbd::{Kbd, KbdSize};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
+pub use lock_clock::LockClock;
+pub use lock_prompt::LockPrompt;
+pub use lock_screen::LockScreen;
+pub use lock_vocab::{CapsLock, LockLook, LockUser, PromptState};
 pub use menu::{Menu, MenuEntrance, MenuKind};
 pub use menu_bar_item::MenuBarItem;
 pub use menu_cursor::Cursor;
@@ -197,6 +211,7 @@ pub use pane_switcher::PaneSwitcher;
 pub use panel::{Panel, PanelEdge, PanelScrim};
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
+pub use polkit_prompt::PolkitPrompt;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
@@ -213,7 +228,7 @@ pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use settings_row::SettingsRow;
 pub use settings_row_trailing::RowTrailing;
-pub use sheet::{Sheet, SheetPlacement};
+pub use sheet::{Sheet, SheetPlacement, SheetWidth};
 pub use shot_ghost::ShotGhost;
 pub use shot_press::DragStart;
 pub use shot_thumbnail::{ShotThumbnail, ThumbAction};
@@ -223,6 +238,9 @@ pub use space_editor::{
     ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
 };
 pub use spinner::{Spinner, SpinnerKind};
+pub use switcher_fit::{
+    SWITCHER_MARGIN, SWITCHER_PADDING, SwitcherFit, SwitcherMetrics, fit as switcher_fit,
+};
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
 pub use text_input::{FieldFace, Focus, Grow, InputVariant, Rows, TextInput, TextInputKind};
@@ -246,6 +264,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("account_tile", include_str!("account_tile.css")),
     ("animated_list", include_str!("animated_list.css")),
     ("appearance_picker", include_str!("appearance_picker.css")),
+    ("app_switcher", include_str!("app_switcher.css")),
     ("avatar", include_str!("avatar.css")),
     ("banner_stack", include_str!("banner_stack.css")),
     ("battery_level", include_str!("battery_level.css")),
@@ -268,6 +287,9 @@ pub const CSS: &[(&str, &str)] = &[
     ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),
+    ("lock_screen", include_str!("lock_screen.css")),
+    ("lock_clock", include_str!("lock_clock.css")),
+    ("lock_prompt", include_str!("lock_prompt.css")),
     ("menu", include_str!("menu.css")),
     ("menu_bar_item", include_str!("menu_bar_item.css")),
     ("menu_entry", include_str!("menu_entry.css")),
@@ -280,6 +302,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),
     ("popover", include_str!("popover.css")),
+    ("polkit_prompt", include_str!("polkit_prompt.css")),
     ("provider_mark", include_str!("provider_mark.css")),
     ("scrim", include_str!("scrim.css")),
     ("search_field", include_str!("search_field.css")),

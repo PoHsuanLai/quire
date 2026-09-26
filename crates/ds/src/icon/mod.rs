@@ -246,6 +246,11 @@ pub enum Icon {
     /// Two toggles with their knobs at opposite ends: the control center's bar item
     /// (`geometry_own`, which documents the geometry).
     Switches,
+    // Lock and switcher parts (M11): the lock field's enter arrow and its caps-lock mark.
+    /// Lucide `arrow-right`: the lock field's enter button.
+    ArrowRight,
+    /// Lucide `arrow-big-up-dash`: caps lock is on.
+    CapsLock,
 }
 
 impl Icon {
@@ -302,6 +307,8 @@ impl Icon {
             Icon::Ellipsis => geometry_actions::ELLIPSIS,
             Icon::EllipsisVertical => geometry_actions::ELLIPSIS_VERTICAL,
             Icon::Switches => geometry_own::SWITCHES,
+            Icon::ArrowRight => geometry_actions::ARROW_RIGHT,
+            Icon::CapsLock => geometry_actions::CAPS_LOCK,
             shell => geometry_shell::shapes(shell),
         }
     }

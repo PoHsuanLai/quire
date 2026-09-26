@@ -99,11 +99,14 @@ pub enum FontSize {
     Display,
     /// `--fs-widget-hero` 47: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
     WidgetHero,
+    /// `--fs-lock-clock` 140: the lock screen's time, the largest type the shell draws
+    /// (design/20-SURFACES.md section 1.9; design/04-COMPONENTS.md section 42).
+    LockClock,
 }
 
 impl FontSize {
     /// Every step, smallest first.
-    pub const ALL: [FontSize; 26] = [
+    pub const ALL: [FontSize; 27] = [
         FontSize::Pico,
         FontSize::Dial,
         FontSize::Nano,
@@ -130,6 +133,7 @@ impl FontSize {
         FontSize::Day,
         FontSize::Display,
         FontSize::WidgetHero,
+        FontSize::LockClock,
     ];
 
     /// The custom property: `--fs-micro`, …
@@ -161,6 +165,7 @@ impl FontSize {
             FontSize::Day => "--fs-day",
             FontSize::Display => "--fs-display",
             FontSize::WidgetHero => "--fs-widget-hero",
+            FontSize::LockClock => "--fs-lock-clock",
         })
     }
 
@@ -193,6 +198,7 @@ impl FontSize {
             FontSize::Day => "24px",
             FontSize::Display => "26px",
             FontSize::WidgetHero => "47px",
+            FontSize::LockClock => "140px",
         }
     }
 }

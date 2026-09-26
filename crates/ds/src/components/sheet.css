@@ -15,3 +15,7 @@
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
 .ds-sheet[*|data-placement=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; }
+
+/* Narrow (`SheetWidth::Narrow`, M11): an alert's column, as the reference desktop's password
+   prompt; the rest of the sheet is as above. */
+.ds-sheet[*|data-width=narrow]{ width:min(340px, 88%); }

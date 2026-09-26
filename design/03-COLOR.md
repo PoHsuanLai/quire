@@ -603,6 +603,16 @@ dimmed paper in light (1.89 under `--scrim`), more than under `--scrim` in dark 
 1.04, where the sheet's hairline and shadow carry the edge), and `--ink` reads 15.6 and 15.0:1 on
 the sheet in both schemes.
 
+### 17.3.2 Lock screen colours (M11, 2026-09-26; proposed)
+
+The lock screen draws on the wallpaper, not on a card, so its colours are their own and the same
+in both schemes: `--lock-ink` white (the time, the name, the field's dots), `--lock-ink-soft`
+white .78 (the date, the hint, the placeholder), `--lock-glass` white .24 light and .18 dark (the
+password pill, flat; no blur is assumed), `--lock-glass-strong` white .38 and .30 (the enter
+button, a hovered pill), and `--lock-veil` black .12 light and .28 dark over the wallpaper so the
+white type reads on a pale picture. Under `LockLook::Space` the field and the date pill take the
+Space gradient and the frame's ink instead (design/04 section 42).
+
 ### 17.4 Material stack v2 (settled 2026-09-24, the macOS polish pass)
 
 macOS stacks layers on every chrome material that the section 17.2 recipe lacked, and the shell

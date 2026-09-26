@@ -36,11 +36,13 @@ pub enum Page {
     WidgetLooks,
     /// The widgets posed as the reference screenshots, at their size, for side-by-side proof.
     WidgetReference,
+    /// The shell's own lock screen, polkit prompt and app switcher (M11).
+    LockSwitcher,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 16] = [
+    pub const ALL: [Page; 17] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -57,6 +59,7 @@ impl Page {
         Page::Level,
         Page::WidgetLooks,
         Page::WidgetReference,
+        Page::LockSwitcher,
     ];
 
     /// The `--page` word.
@@ -78,6 +81,7 @@ impl Page {
             Page::Level => "level",
             Page::WidgetLooks => "widget-looks",
             Page::WidgetReference => "widget-reference",
+            Page::LockSwitcher => "lock",
         }
     }
 }
