@@ -299,12 +299,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "kbd",
         state: "regular",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Ctrl, Key::Char('t')]) } },
+        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Super, Key::Char('k')]) } },
     },
     Case {
         component: "kbd",
         state: "small",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Ctrl, Key::Char('k')]), size: KbdSize::Small } },
+        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Ctrl, Key::Super, Key::Char('s')]), size: KbdSize::Small } },
     },
     Case {
         component: "kbd",
