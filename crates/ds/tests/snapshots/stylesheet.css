@@ -1116,6 +1116,22 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-edit{ display:block; white-space:pre-wrap; overflow-wrap:break-word; outline:none; cursor:text; }
 .ds[*|data-modality=keyboard] .ds-edit:focus{ outline:none; }
 .ds-edit [*|data-edit-kind=atom]{ cursor:default; white-space:normal; }
+/* -- emoji -- */
+/* Animated emoji (design/25-EMOJI.md): one sprite sheet per emoji on `.ds-emoji-face`, the
+   frame chosen by `background-position`, which the component's Rust timer moves only inside
+   the 20 s awake window. The sheet, its size and its position arrive as inline style properties
+   computed in Rust (the sheet is a `data:` URI; no colour or duration is written inline). An
+   optional disc (`data-disc=tinted`) takes its derived colour as `--em-disc` and insets the
+   emoji on it. Nothing here animates: no transition, no keyframes. */
+
+.ds-emoji{ position:relative; flex:none; box-sizing:border-box; border-radius:var(--r-pill); }
+.ds-emoji[*|data-size="28"]{ width:28px; height:28px; }
+.ds-emoji[*|data-size="64"]{ width:64px; height:64px; }
+.ds-emoji[*|data-size="128"]{ width:128px; height:128px; }
+.ds-emoji[*|data-disc=tinted]{ background:var(--em-disc); }
+
+.ds-emoji-face{ position:absolute; inset:0; background-repeat:no-repeat; }
+.ds-emoji[*|data-disc=tinted] .ds-emoji-face{ inset:14%; }
 /* -- group_header -- */
 /* GroupHeader (sill Q125; design/20 section 1.6, design/13 section 13.3.6): one app's head in
    the notification center. The words are `SectionHeader`'s group type (the data face in

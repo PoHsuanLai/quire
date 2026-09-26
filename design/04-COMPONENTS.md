@@ -78,6 +78,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 41 | ShotThumbnail, ShotGhost | none (design/20 section 1.13) | none | screenshot thumbnail |
 | 42 | LockScreen, LockClock, LockPrompt, PolkitPrompt | none (design/20 sections 1.9, 1.10) | none | lock screen, polkit prompt |
 | 43 | AppSwitcher | none (design/13 section 13.3.5, design/20 section 1.11) | none | app switcher |
+| 44 | AnimatedEmoji | none (design/25-EMOJI.md) | none | the user's picture: lock and login screen, user menu, settings |
 
 ## Shared vocabulary
 
@@ -3520,6 +3521,46 @@ per app `div.ds-switcher-cell[role=option][aria-selected][aria-label]` (`a-fold`
 selects"), a click `onactivate(key)` ("click activates"); the component never moves the
 selection itself. The scroll is not animated: a transition on it played on the panel's first
 frame on Blitz, sliding the row in as it appeared.
+
+### 44. AnimatedEmoji (the user's picture as a moving emoji, 2026-09-26; design/25)
+
+**Purpose.** The user's picture as an emoji they pick from a shipped set of 42 Noto Animated
+Emoji (CC BY 4.0), moving: it plays its loop for 20 s after a wake and then rests. Replaces the
+persona as the user's picture once `UserPicture` takes `Emoji(EmojiId)` (design/25 section 8).
+
+**Markup.**
+
+```html
+<div class="ds-emoji" data-size="28|64|128" data-mood="idle|attentive|wince|happy|asleep"
+     data-disc="none|tinted" data-playback="awake|still" aria-hidden="true" style="--em-disc:#…">
+  <div class="ds-emoji-face" data-emoji="wink" data-frame="0"
+       style="background-image:url(data:image/png;base64,…);background-size:800% 400%;background-position:0% 0%"></div>
+</div>
+```
+
+**Props.**
+
+```rust
+#[component] pub fn AnimatedEmoji(emoji: EmojiId, size: PersonaSize,
+    #[props(default)] mood: Mood, #[props(default)] wake: WakeStamp,
+    #[props(default)] disc: EmojiDisc /* None | Tinted(Backdrop) */,
+    #[props(default)] playback: EmojiPlayback /* Awake | Still */) -> Element
+pub enum EmojiId { Grinning, …, Blush /* default */, …, Fox } // serde: its slug
+```
+
+**Geometry.** 28, 64 or 128 px square (`PersonaSize`). Small and Medium read the 128 px sheet,
+Large the 256 px one, so every size has 2x pixels. With a disc the face is inset 14 %.
+
+**Behaviour.** A Rust timer moves `background-position` frame by frame (per-frame holds from the
+manifest, 80 ms steps) only inside the 20 s awake window (`--t-awake`), whole loops only, ending
+on frame 0, the emoji's rest pose; then nothing is scheduled. Wince swaps in `EmojiId::WRONG`
+(confounded) once through, Happy `EmojiId::UNLOCKED` (partying), then the pick again; Asleep
+shows `EmojiId::ASLEEP` (sleeping) still. Reduced motion, or `playback: EmojiPlayback::Still`
+(a picker's grid): still frames only.
+
+**Tests.** `ds/tests/emoji_ssr.rs` (goldens, lint), `ds/src/components/emoji/tests.rs` (sheets,
+manifest, the script's idle rule), `ds-native/tests/emoji_life.rs` (frames advance, rest at 21 s,
+the wince swap, Reduced).
 
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 
