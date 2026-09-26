@@ -237,7 +237,7 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `launcher.field_glyph_px` | `Px` | `20` | `12..=40` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.row_title_px` | `Px` | `14` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.row_detail_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `launcher.files_backend` | `FilesBackend::{Auto,Tracker,Baloo,Fd,Off}` | `Auto` | Auto asks Tracker 3, else Baloo, else fd/plocate under the home folder; a named backend that is missing searches nothing | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.files_backend` | `FilesBackend::{Auto,Tracker,Baloo,Fd,Off}` | `Auto` | auto asks a running Tracker 3, else a running Baloo, else fd/plocate under the home folder; it never starts an indexer. tracker or baloo asks that index and may start it; a named backend that is missing searches nothing | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
 | `launcher.files_budget_ms` | `Ms` | `150` | `20..=2000`; after it, what was found shows | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
 | `launcher.clipboard_history` | `ClipboardHistory::{Memory,Off}` | `Memory` | memory only, forgotten when sill stops; password-manager copies never kept; Off watches nothing | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
 | `launcher.clipboard_cap` | `Count` | `50` | `1..=500`; the oldest goes first | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
