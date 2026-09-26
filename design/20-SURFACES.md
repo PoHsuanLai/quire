@@ -259,6 +259,24 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Hot corners | Overlay | none | None | none | 10 |
 | Quick note | Top | Window | OnDemand | none | 12 P |
 
+### 1.17 Accounts (system service)
+
+One place for the user's online accounts, like the reference platform's Apple Account and
+Internet Accounts (user, 2026-09-26): sign in once, and every native app (Mail, Calendar,
+Photos, Files/Drive, Notes, Contacts) uses that account; several accounts side by side.
+
+| Field | Value | St |
+| --- | --- | --- |
+| Shape | a user-session service with a D-Bus API, its own repo, portable (the account core also runs in-process on non-Linux, so mailo stays cross-platform) | P |
+| Providers | Google, Microsoft, Fastmail, iCloud where possible, and "custom server": IMAP/SMTP, JMAP, CalDAV, CardDAV, WebDAV, Nextcloud (a self-hosted server gives the whole iCloud-like set) | P |
+| Services per account | mail, calendar, contacts, files, photos, notes; each switchable per account (the reference's per-service toggles) | P |
+| Secrets | OAuth refresh tokens and passwords in the Secret Service (keyring), never in config files; apps get short-lived access tokens from the service, scoped to what they asked for | P |
+| Compatibility | also answer GNOME Online Accounts' D-Bus API if cheap, so foreign apps that read it see the same accounts (research) | P |
+| Seeds | mailo already has account discovery (autoconfig), OAuth, IMAP/SMTP/JMAP and CalDAV/CardDAV (`mail-domain`, `mail-proto`, `mail-pim`): extract the account core from mailo the way latchkey was extracted, coordinated with the mailo session | P |
+| UI | a Settings pane (accounts list, add account sheet, per-service toggles, sign-out), and the first-run "sign in" step | P |
+| Risk | Google's restricted scopes (Gmail, Drive) need a verified OAuth client and a security assessment; decide per provider whether we ship our own client ID or ask the user for one | P |
+| Milestone | before the app pass's first sync-using app; the design doc (28-ACCOUNTS) and research first | P |
+
 ## 2. Apps
 
 All apps are xdg toplevels through shell-host (`spawn_toplevel`), `Material::Window`, on
@@ -342,11 +360,21 @@ Open decision (2026-09-24): the terminal core is undecided until the app-suite m
 
 ### 2.9 Photos
 
+The reference platform's Photos app is the target (user, 2026-09-26): a library, not a file
+browser. Its own repo; in the app pass (M12). §2.7 stays the Preview-like document viewer and
+Quick Look (2.4) stays the space-bar peek; all three share the image and PDF parts.
+
 | Field | Value | St |
 | --- | --- | --- |
-| Components | grid tiles, `SidebarItem`, `Peek` viewer, `Slider` edits | P |
-| Motion | viewer `peek-in`; grid `rise` on first show only | P |
-| Milestone | M12 (medium priority) | S |
+| Library | one library over the user's photo folders and every account's photo service (1.17); Library by Years / Months / Days / All, Albums, Favourites, Recently Deleted, Hidden (locked), imports | P |
+| Viewer | full-window viewer with swipe between photos, pinch/scroll zoom, info panel (date, place, camera, lens, exposure), Live Photo / motion playback, video playback | P |
+| Edits | non-destructive (original kept, edit list stored beside it): crop, straighten, rotate, exposure/colour adjustments, filters, markup (shared with Capture 2.11 and the viewer 2.7), revert | P |
+| Search and grouping | on-device only: places (EXIF GPS, offline geocoder), dates, people and objects through a local model, never a cloud service | P |
+| Sync | through the system account (1.17): photos from a cloud provider appear in the same library; shared albums where the provider has them | P |
+| Components | grid tiles with a zoomable time grid, `SidebarItem`, the viewer, `Slider` edits, `Sheet` for import and share | P |
+| Motion | the grid-to-viewer zoom (the tile grows into the viewer and shrinks back), grid `rise` on first show only | P |
+| Formats | JPEG, PNG, WebP, AVIF, HEIC/HEIF, RAW previews, GIF, video (through Capture's decode path) | P |
+| Milestone | app pass (M12); research on the reference's Photos behaviour first | P |
 
 ### 2.10 Calendar
 
