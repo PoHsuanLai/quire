@@ -23,6 +23,7 @@ use crate::components::palette_claim::{Claim, FieldKey};
 use crate::components::palette_group::PaletteGroups;
 pub use crate::components::palette_host::{CommandPaletteHost, PaletteEntrance};
 use crate::components::palette_lines::{PaletteKey, palette_key};
+use crate::components::palette_reveal::{Reveal, use_reveal};
 use crate::components::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::palette_select::{PaletteSelection, use_palette_selection};
 use crate::components::palette_shown::{Change, Retain, Seen, Showing, use_showing};
@@ -36,7 +37,7 @@ use crate::components::search_field::SearchField;
 use crate::components::text_input::Focus;
 use crate::components::tooltip::Shown;
 use crate::components::vocab::Availability;
-use crate::focus::caret::{Caret, HostCaret};
+use crate::focus::caret::{Caret, HostCaret, InitialCaret};
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::geometry::{MountedRef, Px, Rect};
@@ -83,6 +84,16 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// empties the query (through `oninput`) and goes back to the first stop unless `retain` is
 /// `Retain::Query`, and gives the field the keyboard. `None` is always shown.
 ///
+/// `initial_caret` is where the field's caret goes each time the palette gives it the keyboard
+/// (as it mounts, as it is shown again, and when `focus` asks): after the query by default, as
+/// Spotlight does, so a palette opened on a query reads Right as [`Caret::AtEnd`] at once (sill
+/// Q341). A `focus` request that places the caret itself (`with_select_all`, `with_caret`) keeps
+/// its own placement.
+///
+/// The list keeps the selected stop in view whoever moved it (sill Q340): it scrolls the least
+/// that shows it, aligning it with the nearer edge, never centring it, and does not animate the
+/// scroll. A stop the pointer selected is left where it is.
+///
 /// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
 /// radius; absent, it keeps `--r-panel`.
 #[component]
@@ -110,16 +121,18 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] corner: Option<Corner>,
     #[props(default)] aside: Option<Element>,
     #[props(default = ASIDE_WIDTH)] aside_width: Px,
+    #[props(default)] initial_caret: InitialCaret,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
     let showing = use_showing(shown, entrance.anim());
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);
+    let reveal = use_reveal();
     let revision = use_revision(&(tokens.clone(), groups.key()));
     let own_focus = use_focus_request();
     let handle = use_field_handle();
     let host_caret = try_use_context::<HostCaret>();
-    let request = focus.unwrap_or(own_focus);
+    let request = landing(focus.unwrap_or(own_focus), initial_caret);
     let shown_groups = shown_groups(&groups.0, &query);
     let all = stops(&shown_groups);
     let grids = grid_spans(&shown_groups);
@@ -132,12 +145,14 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     });
     selection.report(current, count);
     rects.follow(at_line, revision);
+    reveal.follow(at_line.map(|at| at.choice), revision);
     follow_showing(
         showing,
         Turn {
             float,
             selection: selection.clone(),
             rects,
+            reveal,
             retain,
             oninput,
             request,
@@ -207,11 +222,15 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                     move |index: usize| {
                         let enabled = live.get(index) == Some(&Availability::Enabled);
                         if enabled && index != current {
+                            reveal.pointed(index, revision);
                             selection.select(index);
                         }
                     }
                 }),
-                mounted: onmounted_stop(rects, at_line, revision),
+                mounted: onmounted_stop(rects, reveal, at_line, revision),
+                action_mounted: EventHandler::new(move |(index, event): (usize, MountedEvent)| {
+                    reveal.stop_mounted(index, MountedRef(event.data()));
+                }),
             },
         )
     };
@@ -261,6 +280,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 "data-embed": "palette",
                 role: "listbox",
                 onmousedown: move |event| event.prevent_default(),
+                onmounted: move |event| reveal.list_mounted(MountedRef(event.data())),
                 {body}
             }
             {side}
@@ -269,13 +289,15 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     hosted(host, entrance, float, card, showing.shown, onclose)
 }
 
-/// A stop's element mounted: book it, and report it if it is the selected one.
+/// A stop's element mounted: book it, report it if it is the selected one, and keep it in view.
 fn onmounted_stop(
     rects: crate::components::palette_rows::RowRects,
+    reveal: Reveal,
     at_line: Option<SelectedLine>,
     revision: crate::components::palette_rows::Revision,
 ) -> EventHandler<(usize, MountedEvent)> {
     EventHandler::new(move |(index, event): (usize, MountedEvent)| {
+        reveal.stop_mounted(index, MountedRef(event.data()));
         rects.mounted(index, MountedRef(event.data()), at_line, revision);
     })
 }
@@ -302,11 +324,21 @@ fn caret_of(host: Option<HostCaret>, handle: FieldHandle) -> Caret {
     }
 }
 
+/// The field's focus request with the caret placed at `caret`, unless the caller's request already
+/// places it (`with_select_all`, `with_caret`).
+fn landing(request: FocusRequest, caret: InitialCaret) -> FocusRequest {
+    match request.caret() {
+        Some(_) => request,
+        None => request.with_caret(caret),
+    }
+}
+
 /// What a change of `shown` acts on.
 struct Turn {
     float: Float,
     selection: PaletteSelection,
     rects: crate::components::palette_rows::RowRects,
+    reveal: Reveal,
     retain: Retain,
     oninput: EventHandler<String>,
     request: FocusRequest,
@@ -321,11 +353,13 @@ fn follow_showing(showing: Showing, turn: Turn) {
         Change::Hide => queue_effect(move || {
             turn.float.withdraw();
             turn.rects.forget();
+            turn.reveal.forget();
         }),
         Change::Show => queue_effect(move || {
             turn.float.rejoin();
             showing.replay();
             turn.rects.forget();
+            turn.reveal.forget();
             if turn.retain == Retain::Nothing {
                 turn.selection.reset();
                 turn.oninput.call(String::new());

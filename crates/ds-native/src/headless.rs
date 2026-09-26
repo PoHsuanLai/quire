@@ -133,6 +133,8 @@ impl Headless {
         vdom.provide_root_context(crate::focus::BLUR);
         vdom.provide_root_context(crate::focus::SELECT);
         vdom.provide_root_context(crate::focus::CARET);
+        vdom.provide_root_context(crate::focus::PLACE_CARET);
+        vdom.provide_root_context(crate::reveal::REVEAL);
         let keeper = match setup.focus_fallback {
             FocusFallback::Ancestor => {
                 vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);

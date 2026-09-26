@@ -21,6 +21,27 @@ pub enum Caret {
 #[derive(Debug, Clone, Copy)]
 pub struct HostCaret(pub fn(&MountedData) -> Caret);
 
+/// Where a field's caret goes when the keyboard lands in it (sill Q341): a command palette
+/// opened on a query puts it after the last character, as Spotlight does, so Right at once
+/// reads [`Caret::AtEnd`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum InitialCaret {
+    /// Collapsed after the last character.
+    #[default]
+    End,
+    /// Collapsed before the first character.
+    Start,
+    /// The whole text selected, so the first key typed replaces it.
+    SelectAll,
+}
+
+/// The host's caret write, provided as root context by ds-native beside [`HostCaret`]
+/// (`launch`, its harness and `ds_native::focus::provide`): put the caret of the field `element`
+/// at an [`InitialCaret`] place. Without one (a webview) the caret stays where the renderer put
+/// it. `Focused::Busy` asks to be tried again a frame later.
+#[derive(Debug, Clone, Copy)]
+pub struct HostPlaceCaret(pub fn(&MountedData, InitialCaret) -> crate::focus::host::Focused);
+
 /// Where a caret at byte `focus` of `text`, with the selection `collapsed` or not, sits.
 pub fn caret_at(text: &str, focus: usize, collapsed: Collapsed) -> Caret {
     match collapsed {

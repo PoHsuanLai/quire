@@ -1757,6 +1757,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
   max-height:calc(var(--lines) * 1.35em); }
 .ds-menu-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
+/* Each part of a shaped trail is its own box, the time's gap before the shortcut included (sill
+   Q343): Blitz lays a plain inline span's horizontal margin out as nothing. */
+.ds-menu-when, .ds-menu-keys{ display:inline-block; }
 .ds-menu-when{ margin-right:var(--s-6); }
 /* -- notification_card -- */
 /* NotificationCard (sill Q120; design/20 section 1.6, design/13 section 13.3.6). The card is a
