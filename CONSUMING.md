@@ -1305,6 +1305,50 @@ compositor lets a client place a toplevel: shell-host FINDINGS F50, ours "Window
 configure (`Maximize::Set` is `Maximized::On`, `Fullscreen::Set` is `Fullscreen::On`, its
 `Activation` maps variant for variant). quire does not depend on shell-host.
 
+### File drops and a second window (2026-09-27): for mailo
+
+Two things mailo's native window needed that Blitz does not give an app: attachments dropped onto
+the composer from a file manager (mailo item 21), and a message opened in a window of its own
+(mailo item 8). FINDINGS.md "File drops and a second window" has the reasons, the Blitz and winit
+findings and the proofs; `docs/mailo-migration.md` §6.8 says what mailo writes.
+
+**File drops.**
+
+| Need | API | Notes |
+| --- | --- | --- |
+| An element that takes files | `let drop = ds::use_file_drop(move \|files: ds::FileDrop\| attach(files.paths));` then on the element `onmounted: move \|event\| drop.mounted(event)` and `"data-drop": drop.drop_attr()` | `FileDrop { paths: Vec<PathBuf>, point: Point }`, the point in the window's logical pixels. The target is the element and everything inside it that is not a target of its own: the innermost target under the release hears it, found by Blitz's own hit test (`element_from_point`, transforms and `pointer-events` applied). |
+| Lighting it | `drop.drop_attr()` / `drop.place() -> DropState` | `data-drop="target"` while files are over it, `"accepts"` while files are anywhere else over the window, nothing otherwise: the values quire's own drop places write (`DropState::Target`, `Accepts`), not a new `over`. Style your own element's `[data-drop=target]` with tokens (`--accent`, `--accent-soft`). |
+| What the drag looks like from it | `drop.drag() -> ds::FileDrag::{Idle, Over { paths, point }, Dropped { paths, point }}` | Subscribes. `Dropped` stays on the target that took the files until the next drag enters the window. |
+| Paths only | nothing | A drag with no `file:` URI (a link or text out of a browser, an image's bytes) is `Offer::Other`: refused (the cursor shows no drop), nothing lights, no `ondrop`. A URI list mixing files and URLs counts as not files. |
+| The cursor | nothing | The window tells the platform `Copy` over a target and refuses elsewhere, so a release off every target is not a drop at all (winit reports `DragLeft`). |
+| Tests | `Harness::file_drag(FileDragInput) -> DropAcceptance` | `FileDragInput::{Entered { point }, Offered(Offer::Files(paths) \| Offer::Other), Moved { point }, Dropped, Left}`, the steps the window's hook makes of winit's events; the answer is what the window would tell the platform. `crates/ds-native/tests/file_drop.rs` is the pattern. |
+
+The seam is `ds::HostFileDrop` (`new(hit)`, `feed(input) -> DropAcceptance`), provided by
+`launch`'s window and the harness; another Blitz host feeds it the same inputs. Without it (a
+webview) a target never lights.
+
+**A second window.**
+
+| Need | API | Notes |
+| --- | --- | --- |
+| Open one | `ds_native::open_window(WindowSpec::new("Message", 720, 560), MessageRoot) -> Result<WindowHandle, OpenWindowError>` | Call it from a component or handler inside a window `launch` runs. `MessageRoot` renders its own `Ds`, as the first window's root does. `OpenWindowError::NoHost` in the harness, a snapshot or a webview. |
+| Open one with its data | `ds_native::open_window_with(spec, MessageWindow, MessageWindowProps { id })` | Any `fn(P) -> Element` with `P: Clone + 'static`, so a `#[component]`'s props struct. |
+| Shape it | `WindowSpec::new(title, width, height)`, `.with_app_id(AppId)`, `.with_decorations(Decorations)` | Without them it takes the first window's application id (the desktop groups it with the app) and decorations. |
+| Close, raise, ask | `handle.close()`, `handle.focus()`, `handle.life() -> WindowLife::{Opening, Open, Closed}` | Asked of the event loop, answered as it next wakes (at once in practice). Dropping the handle leaves the window open. `life()` is a plain read, not a signal. |
+| Share state with it | props, or an `Arc` both read | A `Signal` belongs to one VirtualDom and cannot cross into another. Pass the data by props, or give both windows the same shared value: anything you pass to `AppConfig::with_context` is provided (cloned) at every window's root, so an `Arc<Mutex<_>>` or a `tokio::sync::watch` there is shared. |
+
+What the new window gets is exactly what `launch` gives the first: the same `Host` (modality, the
+focus, blur, select and caret seams, `HostFind`, click focus under the app's `FocusFallback`, the
+edit surface's IME, `WindowHost` over its own winit window, the scale, file drops), the app's
+`AppConfig` setup (root contexts, net policy, frame links, focus fallback), the quire faces, and
+dioxus-native's window contexts, so `dioxus_native::use_window` and `use_window_event` work in it.
+
+**Closing.** A window's own frame close (`WindowHost::close`), the compositor's close or
+`handle.close()` drops that window's VirtualDom (its `use_drop`s run); the app runs on. Closing
+the first window ends `launch` as it always did, and every window it opened closes with it (they
+are dropped first). A second window's `use_window_event` does not hear its `CloseRequested`
+(passing it on would end the event loop): act on close in a `use_drop` in its root.
+
 ### App icons and the icon style (2026-09-25): what sill does
 
 quire ships its own app icons as files and a pure re-colouring function; loading, caching and

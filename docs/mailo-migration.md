@@ -680,6 +680,38 @@ tags and link text"; `CONSUMING.md` "Frame tags and link text").
   document is built (they wait for its tag). A harness test settles past that on its own; a test
   that read the requests between two raw `Harness` calls may need one more `advance`.
 
+### 6.8 File drops and a second window (2026-09-27): what mailo writes
+
+Two things mailo could not do on `ds_native::launch` until now (CONSUMING.md "File drops and a
+second window"; FINDINGS.md of the same name). Both are additive; nothing mailo has changes.
+
+- **Attachments dropped onto the composer (item 21).** In the composer's component:
+  `let drop = ds::use_file_drop(move |files: ds::FileDrop| attach(files.paths));`, and on the
+  composer's own element `onmounted: move |event| drop.mounted(event)` and
+  `"data-drop": drop.drop_attr()`. Style mailo's own `.composer[data-drop=target]` (files over
+  it) and `[data-drop=accepts]` (files elsewhere over the window) with tokens only. `ondrop`
+  hears absolute paths; reading and attaching them is mailo's (off the UI thread for big files).
+  A dragged link or text is ignored and the cursor refuses it; say so nowhere, it just does not
+  drop. A harness test drives it with `Harness::file_drag(FileDragInput::…)`, as
+  `crates/ds-native/tests/file_drop.rs` does. The webview build has no seam: the composer never
+  lights there, so keep the webview's own drop handling behind the `native` feature switch if
+  it has one.
+- **A message in its own window (item 8).** From the reader's "Open in new window" handler:
+  `ds_native::open_window_with(WindowSpec::new(subject, 720, 640), MessageWindow,
+  MessageWindowProps { message: id })`. `MessageWindow` renders its own `Ds` (read the
+  appearance the way the main root does) with `WindowFrame::titlebar` if mailo draws its own
+  frame (the window takes the main window's decorations and app id by default). It reads the
+  store through the same root context the main window has (`AppConfig::with_context`); a
+  `Signal` from the main window cannot be passed to it. Keep the returned `WindowHandle` keyed by
+  message id to `focus()` an already open one instead of opening a second (`life()` says whether
+  it is still `Open`). Closing the main window closes every message window; a message window
+  that must save on close does it in a `use_drop` in its root, since its window-event hook does
+  not hear its own `CloseRequested`.
+- **What changes under mailo.** `ds_native::launch` now runs the event loop itself instead of
+  `dioxus_native::launch_cfg_with_props` (so it can add windows), building the window and its
+  document exactly as that call did. mailo's `dioxus_native::use_window_event`, `use_window` and
+  document head calls keep working unchanged, in every window.
+
 ## 7. The reader, Phase B
 
 Mailo's reader has two views today (`crates/mail-app/src/ui/reading/mod.rs::ViewSwitch`):
