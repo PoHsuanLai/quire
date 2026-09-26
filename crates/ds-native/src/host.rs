@@ -25,6 +25,9 @@
 //! - The window itself, as `ds::WindowHost` over [`crate::window::WinitWindow`]: a frame's
 //!   titlebar moves, resizes, zooms, minimizes and closes it; its state is re-read on every
 //!   resize and focus change, so the frame redraws when the window is zoomed or deactivated.
+//! - Files dragged in from outside (winit's data-transfer events, which blitz-shell ignores), as
+//!   `ds::HostFileDrop`: the drag is hit-tested through the document and the target under a
+//!   release hears its `ondrop` (`crate::window_drop`, `crate::drop_hit`).
 //! - The window's scale factor, as `ds::HostScale`, so `Ds` writes the pixel tokens for it and a
 //!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
 //!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
@@ -46,7 +49,10 @@ use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
 use crate::window::WinitWindow;
+use crate::window_build::WindowSlot;
+use crate::window_drop::WindowDrop;
 use crate::window_hover::WindowHover;
+use crate::window_requests::Root;
 use blitz_traits::shell::ColorScheme;
 use blitz_traits::shell::ShellProvider;
 use dioxus::prelude::*;
@@ -61,24 +67,48 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 /// What `Host` wraps, and what the app gave its document.
-#[derive(Props, Debug, Clone)]
+#[derive(Props, Clone)]
 pub(crate) struct HostProps {
-    app: fn() -> Element,
+    root: Root,
     /// Fixed for the window's life: read once, as the document mounts.
     setup: Setup,
 }
 
+impl std::fmt::Debug for HostProps {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HostProps")
+            .field("setup", &self.setup)
+            .finish_non_exhaustive()
+    }
+}
+
 impl HostProps {
-    pub(crate) fn new(app: fn() -> Element, setup: Setup) -> Self {
-        HostProps { app, setup }
+    pub(crate) fn new(root: Root, setup: Setup) -> Self {
+        HostProps { root, setup }
     }
 }
 
 impl PartialEq for HostProps {
-    /// The same app is the same root: `setup` never changes after `launch`.
+    /// The same root is the same window: `setup` never changes after `launch`.
     fn eq(&self, other: &Self) -> bool {
-        std::ptr::fn_addr_eq(self.app, other.app)
+        self.root.same(&other.root)
     }
+}
+
+/// A root opened with its props (`ds_native::open_window_with`), as a component of its own.
+#[derive(Clone)]
+struct SharedRoot(Rc<dyn Fn() -> Element>);
+
+impl PartialEq for SharedRoot {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+#[allow(non_snake_case)] // A component: rsx names it like a type.
+#[component]
+fn Rooted(root: SharedRoot) -> Element {
+    (root.0)()
 }
 
 /// The app with the host's modality, net provider and scheme around it.
@@ -110,6 +140,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
         crate::focus::finder(move || found.borrow().clone().map(DocRef::Handle))
     });
     let window = use_window();
+    use_hook(|| {
+        if let Some(slot) = try_consume_context::<WindowSlot>() {
+            slot.fill(Arc::clone(&window));
+        }
+    });
     let shell = use_hook(consume_context::<Arc<dyn ShellProvider>>);
     let framed = {
         let window = Arc::clone(&window);
@@ -123,7 +158,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let found = book.clone();
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
-    use_window_event(move |event, _| {
+    let file_drop = use_context_provider(crate::drop_hit::drop_seam);
+    let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
+    use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
             keep(&mut keeper.borrow_mut(), &DocRef::Handle(handle.clone()));
         }
@@ -173,6 +210,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 sink.call(ime);
             }
         }
+        let inputs = dragged
+            .borrow_mut()
+            .inputs(event, event_loop, window.scale_factor());
+        for input in inputs {
+            let answer = file_drop.feed(input);
+            dragged.borrow_mut().answer(event_loop, answer);
+        }
         if matches!(event, WindowEvent::RedrawRequested) {
             find_frames(&seen.borrow(), &found);
         }
@@ -197,12 +241,15 @@ pub(crate) fn Host(props: HostProps) -> Element {
     });
     let mut installed = use_signal(|| Installed::Pending);
     let setup = props.setup.clone();
-    let App = props.app;
+    let root = props.root.clone();
     rsx! {
         // The app waits one frame for its document's providers: a frame in its first render
         // would otherwise be parsed with the parent's `file:` provider (`crate::frames`).
         if installed() == Installed::Done {
-            App {}
+            match root {
+                Root::Plain(App) => rsx! { App {} },
+                Root::Shared(root) => rsx! { Rooted { root: SharedRoot(root) } },
+            }
         }
         div {
             style: "display:none",
