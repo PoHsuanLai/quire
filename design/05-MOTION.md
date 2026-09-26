@@ -680,6 +680,28 @@ sweep at all (not a 60 ms one): the first frame is the final state. This replace
 `bump` on a new percentage (section 5 row 18 still applies to a figure a host wraps in
 `Bumped`).
 
+### 4.13 Added by quire (small-state details, 2026-09-26)
+
+The primitives of design/26-DETAILS.md section 4. Six keyframes and eight `Anim` rows, each
+played once on an HTML wrapper (Blitz's stylesheet cannot reach inside an SVG) and taken off at
+its `settle`. Nothing here loops: the bounded pending loop is a Rust step timer over CSS
+transitions (`--t-pending-step`), not a keyframe.
+
+- `morph-in`: `from{ opacity:0; transform:scale(.7) } to{ opacity:1; transform:none }` at
+  `--t-quick --e-out`, backwards (`Anim::MorphIn`): `MorphGlyph`'s incoming glyph (DownUp, OffUp).
+- `morph-out`: the reverse, forwards (`Anim::MorphOut`): DownUp's outgoing glyph.
+- `fade` at `--t-quick --e-out` (`Anim::MorphFadeIn`) and `morph-fade-out` (`from{ opacity:1 }
+  to{ opacity:0 }`, forwards, `Anim::MorphFadeOut`): a cross-fade's two glyphs.
+- `roll-in`: `from{ opacity:0; transform:translateY(60%) } to{ opacity:1; transform:none }` and
+  `roll-out`: `to{ opacity:0; transform:translateY(-60%) }`, both `--t-quick --e-out`
+  (`Anim::RollIn`, `Anim::RollOut`): `RollDigits`, one column per changed digit.
+- `gulp` at `--t-big --e-out` (`Anim::SealOut`): a success seal (`SettleStyle::LockIn`) that
+  nobody touched; the spring row `Anim::Gulp` plays only with `Touch::Contact` (design/26 R5).
+- `nudge-up`: `0%,100%{ transform:none } 40%{ translateY(-6px) } 70%{ translateY(1px) }` at
+  `--t-nudge --e-out` (`Anim::NudgeUp`): attention once per request (`use_nudge`, R6). `nudge`
+  keeps the outbox pill's `translateX(-50%)` and so cannot move an element that is not centred
+  that way.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and
