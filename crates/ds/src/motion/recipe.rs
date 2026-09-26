@@ -6,6 +6,7 @@
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
 
 use super::anim::Anim;
+use super::recipe_detail as detail;
 use super::recipe_own as own;
 use crate::tokens::{DurationToken, EasingToken};
 
@@ -433,6 +434,14 @@ impl Anim {
             Anim::ShotIn => own::SHOT_IN,
             Anim::ShotOut => own::SHOT_OUT,
             Anim::PictureAccept => own::PICTURE_ACCEPT,
+            Anim::MorphIn => detail::MORPH_IN,
+            Anim::MorphOut => detail::MORPH_OUT,
+            Anim::MorphFadeIn => detail::MORPH_FADE_IN,
+            Anim::MorphFadeOut => detail::MORPH_FADE_OUT,
+            Anim::RollIn => detail::ROLL_IN,
+            Anim::RollOut => detail::ROLL_OUT,
+            Anim::SealOut => detail::SEAL_OUT,
+            Anim::NudgeUp => detail::NUDGE_UP,
         }
     }
 }

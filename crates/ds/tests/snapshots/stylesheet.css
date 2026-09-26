@@ -357,6 +357,27 @@ html,body{margin:0;padding:0;background:transparent}
    lift and the landing. In shares of the picture's own box, so every size moves alike. Played
    once and at rest after, so a picture paints nothing once it has landed. */
 @keyframes picture-accept{ 0%{ transform:none; } 35%{ transform:translateY(-8%) scale(1.03); } 100%{ transform:none; } }
+
+/* The small-state details' own (quire's, design/26-DETAILS.md section 3.2). Each plays once on
+   an HTML wrapper and ends at rest; nothing here loops. */
+
+/* morph-in, morph-out: a glyph that changes state grows in from .7 as the old one shrinks to .7
+   and fades (MorphStyle::DownUp; OffUp plays only morph-in). */
+@keyframes morph-in{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
+@keyframes morph-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
+
+/* morph-fade-out: the outgoing glyph of a cross-fade (MorphStyle::CrossFade); the incoming one
+   plays `fade`. */
+@keyframes morph-fade-out{ from{ opacity:1; } to{ opacity:0; } }
+
+/* roll-in, roll-out: a digit that changed rolls up into its place as the old one rolls out
+   above it (RollDigits). */
+@keyframes roll-in{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
+@keyframes roll-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
+
+/* nudge-up: attention, once (design/26 Attention): the element lifts and settles. `nudge` is
+   the centred outbox pill's and carries its translateX(-50%). */
+@keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -443,6 +464,12 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes panel-out--b{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes shot-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes picture-accept--b{ 0%{ transform:none; } 35%{ transform:translateY(-8%) scale(1.03); } 100%{ transform:none; } }
+@keyframes morph-in--b{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
+@keyframes morph-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
+@keyframes morph-fade-out--b{ from{ opacity:1; } to{ opacity:0; } }
+@keyframes roll-in--b{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
+@keyframes roll-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
+@keyframes nudge-up--b{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -577,6 +604,22 @@ html,body{margin:0;padding:0;background:transparent}
 .a-shot-out[*|data-pulse=b]{animation:shot-out--b var(--t-move) var(--e-exit) forwards;}
 .a-picture-accept[*|data-pulse=a]{animation:picture-accept var(--t-big) var(--e-spring);}
 .a-picture-accept[*|data-pulse=b]{animation:picture-accept--b var(--t-big) var(--e-spring);}
+.a-morph-in[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-out) backwards;}
+.a-morph-in[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-out) backwards;}
+.a-morph-out[*|data-pulse=a]{animation:morph-out var(--t-quick) var(--e-out) forwards;}
+.a-morph-out[*|data-pulse=b]{animation:morph-out--b var(--t-quick) var(--e-out) forwards;}
+.a-morph-fade-in[*|data-pulse=a]{animation:fade var(--t-quick) var(--e-out) backwards;}
+.a-morph-fade-in[*|data-pulse=b]{animation:fade--b var(--t-quick) var(--e-out) backwards;}
+.a-morph-fade-out[*|data-pulse=a]{animation:morph-fade-out var(--t-quick) var(--e-out) forwards;}
+.a-morph-fade-out[*|data-pulse=b]{animation:morph-fade-out--b var(--t-quick) var(--e-out) forwards;}
+.a-roll-in[*|data-pulse=a]{animation:roll-in var(--t-quick) var(--e-out) backwards;}
+.a-roll-in[*|data-pulse=b]{animation:roll-in--b var(--t-quick) var(--e-out) backwards;}
+.a-roll-out[*|data-pulse=a]{animation:roll-out var(--t-quick) var(--e-out) forwards;}
+.a-roll-out[*|data-pulse=b]{animation:roll-out--b var(--t-quick) var(--e-out) forwards;}
+.a-seal-out[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-out);}
+.a-seal-out[*|data-pulse=b]{animation:gulp--b var(--t-big) var(--e-out);}
+.a-nudge-up[*|data-pulse=a]{animation:nudge-up var(--t-nudge) var(--e-out);}
+.a-nudge-up[*|data-pulse=b]{animation:nudge-up--b var(--t-nudge) var(--e-out);}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
