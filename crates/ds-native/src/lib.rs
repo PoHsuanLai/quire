@@ -52,9 +52,11 @@ mod install;
 pub mod launch;
 pub mod measure;
 mod memory_shell;
+mod native_providers;
 mod net;
 mod net_policy;
 mod node_ref;
+mod open_window;
 mod origin;
 mod pdf;
 #[cfg(feature = "pdf-thumb")]
@@ -71,14 +73,17 @@ mod snap_tests;
 pub mod snapshot;
 mod wake;
 pub mod window;
+mod window_build;
 mod window_drop;
 mod window_hover;
 mod window_place;
+mod window_requests;
+mod window_shell;
 
 pub use app_id::AppId;
 pub use click_focus::{CLICK_FOCUS, FocusFallback, PRESS_FOCUS};
 pub use contexts::RootContexts;
-pub use error::NativeError;
+pub use error::{NativeError, OpenWindowError};
 pub use fonts::{font_context, register_fonts};
 pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
 pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
@@ -90,6 +95,7 @@ pub use harness_input::HeldButtons;
 pub use headless::Backdrop;
 pub use launch::{AppConfig, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
+pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with};
 pub use origin::{FrameId, RequestOrigin};
 pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
 #[cfg(feature = "pdf-thumb")]
@@ -102,6 +108,7 @@ pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use snap::snap_to_device;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
 pub use window::{Decorations, WinitWindow};
+pub use window_requests::WindowLife;
 
 // The window renderer dioxus-native runs on; named here so the pinned versions stay the ones
 // the render stack resolves.
