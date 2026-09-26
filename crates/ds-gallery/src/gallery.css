@@ -137,7 +137,7 @@
 .g-shot{width:680px;border-radius:var(--r-panel);overflow:hidden}
 .g-shot-ground{display:flex;align-items:flex-end;gap:var(--s-16);padding:var(--s-16) var(--s-16) var(--s-26)}
 .g-wl-wall{padding:var(--s-16)}
-.g-wl-grid{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--s-26) var(--s-36);padding:var(--s-8)}
+.g-wl-grid{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s-26);padding:var(--s-8)}
 .g-wl-candidate{display:flex;flex-direction:column;gap:var(--s-8);width:560px}
 .g-wl-note{font-size:var(--fs-small);font-weight:600;line-height:1.35;color:var(--ink);background:var(--raise);padding:var(--s-4) var(--s-8);border-radius:var(--r-small)}
 .g-wl-cards{display:flex;align-items:flex-start;gap:var(--s-16)}

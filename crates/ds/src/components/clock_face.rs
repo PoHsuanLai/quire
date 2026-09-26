@@ -86,7 +86,8 @@ fn AnalogDial(time: ClockTime, phase: DayPhase) -> Element {
 }
 
 /// A depth dial, in its phase's scheme: the face (a sky inside a bezel, or a sky well), the
-/// indices, the hands over their shadow, the second hand, and the hub.
+/// indices over the light on their lower edge, the hands over their shadow, the second hand,
+/// the hub, and the glass highlight over the top of the face.
 #[component]
 fn DepthDial(time: ClockTime, phase: DayPhase, dial: DialLook) -> Element {
     let material = use_env().material;
@@ -96,13 +97,15 @@ fn DepthDial(time: ClockTime, phase: DayPhase, dial: DialLook) -> Element {
         Surface { material, theme: dial_scheme(phase), chrome: RootChrome::Transparent,
             div { class: "ds-clock-dial",
                 span { class: "ds-clock-face" }
-                {ticks_svg(dial)}
+                {ticks_svg("ds-clock-ticks-lit", dial)}
+                {ticks_svg("ds-clock-ticks", dial)}
                 {tapered_svg("ds-clock-shade", at, shown)}
                 {tapered_svg("ds-clock-hands", at, false)}
                 if shown {
                     {depth::second_svg(at.second)}
                 }
                 span { class: "ds-clock-hub" }
+                span { class: "ds-clock-glass" }
             }
         }
     }
