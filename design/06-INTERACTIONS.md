@@ -23,6 +23,36 @@ as a state machine or a rule table so that it can be implemented as a pure `step
 
 "Mod" = Ctrl or Cmd (`e.ctrlKey || e.metaKey`, S:1666). On this desktop Toshy maps Cmd to Ctrl.
 
+### 2.0 The port's keys (design/27 section 6.2, H0)
+
+Sections 2.1 to 2.8 record the prototype. The port writes every binding in Mac terms (Command
+is `Key::Super`, drawn `⌘`); the platform layer resolves Command (Toshy maps it to Ctrl), so a
+binding never says "Mod".
+
+- **Reserved.** `ds::StandardAction` is the table of the Mac's standard shortcuts and the ones
+  this desktop reserves (⌘Space launcher, ⌃1-⌃9 Spaces, ⌃⌘S sidebar, ⌘Y Quick Look, ⌘R reveal,
+  ⌘C copy, …). `Shortcut::standard(action)` binds one; `Shortcut::custom(keys)` returns
+  `Err(Reserved(action))` for a combination in the table, so no app repurposes Cmd+S or Cmd+T.
+  A test walks the whole table (no two actions share a combination).
+- **Drawn.** Modifiers in the order Control, Option, Shift, Command (`⌃⌥⇧⌘`), then the key;
+  an upper character is drawn as itself (`⌘?`, not `⇧⌘/`).
+- **Command first.** Command is the main modifier, Shift second, Option sparingly, Control
+  avoided in an app's own shortcuts (the system uses it). A new shortcut is not made by adding a
+  modifier to an unrelated one.
+
+The prototype's global keys, re-mapped:
+
+| Prototype (2.1) | Port | Why |
+| --- | --- | --- |
+| Mod+T, Mod+K: command menu | ⌘K | ⌘T is Show Fonts (New Tab in an app with tabs) |
+| Mod+S: toggle the sidebar | ⌃⌘S (`StandardAction::ToggleSidebar`) | ⌘S is Save |
+| Mod+1 … Mod+9: switch Space | ⌃1 … ⌃9 (`StandardAction::SwitchToSpace`) | the Mac's "Switch to Desktop N"; ⌘1-⌘9 stay the apps' (design/27 section 8, decision 5) |
+| (none): the launcher | ⌘Space (`StandardAction::Launcher`) | Spotlight's key |
+
+**Tab.** Tab reaches every control by default, buttons, toggles, sliders and segments included
+(09 H5; design/27 section 8, decision 3). The Mac's own default, text fields and lists only, is
+the setting `appearance.keyboard_navigation = TextAndLists` (H2); `All` is the default.
+
 ### 2.1 Global (S, window listener)
 
 | Keys | Action | Guard | Source |

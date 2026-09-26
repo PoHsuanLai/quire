@@ -15,6 +15,20 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
       consumer CSS (`lint` rule `RawFontSize`). Cite `02-TYPE.md`.
 - [ ] Truncation follows 02 (single-line mask fade `.ds-truncate`, 2-line clamp only where
       listed). Cite `02-TYPE.md`.
+- [ ] No UI text under 10 px under System: sizes are `--fs-*` steps at or above the floor
+      (`lint` `MinFontSize`); a smaller drawing names its selector and reason in an exception.
+      Cite `02-TYPE.md` section 12.
+
+## 1b. Writing (02-TYPE.md section 13)
+
+- [ ] Buttons, menu items, menu titles, segments, tabs and column headings in Title Case;
+      alert and notification bodies, help and errors in sentence case with punctuation.
+- [ ] "…" (never "...") on a command that opens a view asking for more (`lint` `ThreeDots`).
+- [ ] Alerts: "Cancel" titles the cancel button; the default names its action; no "Yes"/"No";
+      "OK" only where the alert only informs.
+- [ ] Tooltips at most 75 characters, starting with a verb; errors say how to fix, no blame.
+- [ ] Every control has an accessible name: text, or an `aria-label` on a glyph-only control
+      (`lint` `UnnamedControl`).
 
 ## 2. Layout
 
@@ -93,6 +107,15 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
       `06-INTERACTIONS.md`.
 - [ ] Escape closes the innermost layer only (`LayerStack` order). Cite
       `06-INTERACTIONS.md`.
+- [ ] Pointer: the arrow on every control; the pointing hand only on a link; `grab` on drag
+      handles (`lint` `PointerCursor`). Cite `04-COMPONENTS.md` "Global rules",
+      `27-HIG-PARITY.md` section 6.3.
+- [ ] Shortcuts: standard ones bound through `Shortcut::standard(StandardAction)`, the app's own
+      through `Shortcut::custom` (which refuses a reserved key); nothing repurposes a standard
+      combination (no Cmd+S sidebar, no Cmd+T command menu); modifiers drawn `⌃⌥⇧⌘`. Cite
+      `06-INTERACTIONS.md` section 2.0.
+- [ ] Tab reaches every control (the default `All`); a surface that traps Tab for its own use
+      says so. Cite `06-INTERACTIONS.md` section 2.0.
 - [ ] Menus: arrow keys wrap, Enter/Tab pick, typing filters, outside click closes. Cite
       `06-INTERACTIONS.md`, `13-BEHAVIOUR-menus-windows.md`.
 
@@ -128,6 +151,9 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 
 - [ ] `ds::lint::assert_clean(css, Strict)` passes for every stylesheet the wave touched.
 - [ ] `ds::lint::markup` passes on every SSR render (every class is one quire exports).
+- [ ] The warnings (`ds::lint::warnings`, `ds::lint::markup_warnings` under Strict: the HIG
+      guardrails, printed by `assert_clean`) are read, and each is fixed or listed for the
+      consumer before the rule turns Strict (`27-HIG-PARITY.md` section 7).
 - [ ] `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`,
       `cargo test --workspace`, `./scripts/check-boundary.sh`, `cargo deny check licenses`,
       in the gate worktree with its own `CARGO_TARGET_DIR`.

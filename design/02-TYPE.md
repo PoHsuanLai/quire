@@ -135,11 +135,15 @@ rounded to .5 px, so the drawn caps keep the measured heights. Settled, open dec
 
 | Token | Editorial | System | Cap drawn (System) |
 | --- | --- | --- | --- |
-| `--fs-dial` | 9 | 8 | 5.82 (5.94 measured) |
+| `--fs-dial` | 9 | 10 (the floor, section 12; fitted it would be 8) | 7.28 (5.94 measured) |
 | `--fs-dial-large` | 18 | 16.5 | 12.00 (11.88) |
 | `--fs-widget-figure` | 20 | 18 | 13.10 (13.20) |
 | `--fs-widget-hero` | 47 | 42.5 | 30.92 (31.02) |
 | `--fs-lock-clock` | 140 | 127 | 92.39 (92.40) |
+
+Three more sizes follow the typeface: under System `--fs-nano` (9), `--fs-micro` (9.5) and
+`--fs-dial` (9, fitted to 8) are raised to the 10 px floor (section 12). Editorial keeps the
+prototype's values.
 
 ### 4.2 Under Editorial (the prototype's pairs)
 
@@ -330,6 +334,59 @@ The design system cannot rely on `text-overflow:ellipsis` or line clamp in Blitz
 | Reader-empty caption | mono (`.mono`, 0.78em) "pick a thread" | mono 11 px "pick a thread · or drag one onto a place" | `S:1388`, `C:1207` |
 | Hero / intro heading | `clamp(26px,3.6vw,36px)` / 1.02 | `clamp(30px,5.4vw,46px)` / 0.98 | `S:63`, `C:205` |
 | Tabs | none | display 700 16, padding `10px 14px 12px` | `C:244-247` |
+
+## 12. The size floor
+
+The Mac's smallest text is 10 pt (design/27-HIG-PARITY.md section 3.16), so under System no UI
+text is smaller than 10 px (`FontSize::MIN_PX`, the `--fs-min` of design/27). The token table
+holds it: `--fs-nano`, `--fs-micro` and `--fs-dial` are 10 under System (`FontSize::FLOORED`),
+`--fs-help` is 11.5. One step stays under it: `--fs-pico` 7.5, the letter of an in-row provider
+mark, which is a drawing in an 11 px mark, not text (a reviewed exception in quire's own lint).
+
+The lint `MinFontSize` (a warning under Strict until sill and mailo are swept, design/27 section
+7) flags a `font-size` or `font` literal under 10 px (`pt` counted as 4/3 px) and a
+`var(--fs-*)` whose System value is under 10. A drawing that needs a smaller size names its
+selector in an `Exception` with the reason. Editorial (mailo's voice) keeps the prototype's
+ramp; the 13 px shell density is H5's (design/27 section 8, decision 1).
+
+## 13. Writing
+
+The Mac's written style (design/27 section 3.17). Where text is data, the lint holds it; the
+rest is a reviewer's line (CHECKLIST section 1b).
+
+**Case, per element.**
+
+| Element | Case | Example |
+| --- | --- | --- |
+| Button, menu item, menu title, segment label, tab label, column heading, toolbar item | Title Case | "Move to Trash", "Show All Tabs" |
+| Section header (sidebar, settings group, menu section) | Title Case, not upper-case, not tracked (H5 moves the caps headers) | "Favourites" |
+| Setting label beside a control (box, slider, pop-up) | Sentence case ending in a colon | "Show in menu bar:" |
+| Alert title | Title Case, no end punctuation, or a question | "Delete This Space?" |
+| Alert and notification body, help text, empty states, errors | Sentence case with punctuation | "Choose a password with at least 8 characters." |
+| Tooltip (help tag) | Sentence case, no end punctuation for a fragment | "Show the sidebar" |
+
+Title Case capitalises every word except articles, coordinating conjunctions and prepositions
+of four letters or fewer ("a", "an", "the", "and", "but", "or", "for", "in", "of", "on", "to",
+"with", "from", "into"), unless the word is first or last.
+
+**The ellipsis.** A command that opens a view asking for more before it acts ends in "…"
+(U+2026), never three full stops: "Rename…", "Export…", "Settings…" where it opens a sheet; not
+on a command that acts at once ("Delete") or only shows something ("Show Details"). The lint
+`ThreeDots` flags "..." in any text or `aria-label`, `title`, `alt` or `placeholder`.
+
+**Alert buttons.** The cancel button is always "Cancel". The default button names the action
+("Delete", "Replace", "Log Out"); "OK" only in an alert that informs and offers no choice;
+never "Yes" or "No". A default button is never destructive (H4's `AlertButtons`).
+
+**Tooltips.** 60-75 characters at most, starting with a verb, not repeating the control's name
+("Show the sidebar", not "Sidebar button: shows the sidebar").
+
+**Voice.** Plain words, "you" (never "the user"), no exclamation marks (09 H7), no "oops"; an
+error says what happened near where it happened and how to fix it, with no blame; an empty state
+says what to do next.
+
+**Names.** Every control has an accessible name: its text, or an `aria-label` for a glyph-only
+control (lint `UnnamedControl`, a warning under Strict; design/27 section 3.1).
 
 ## Open decisions
 
