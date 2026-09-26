@@ -1,35 +1,50 @@
 {
- "updated": "2026-09-26: widgets redrawn in Neumorphism & Soft UI; picks pending; M8 started",
+ "updated": "2026-09-26: widgets matched to the reference (round four); M8 code complete; M11 and the animated avatar started",
  "archive_url": "https://claude.ai/artifact/GhMLUQjwi9FUxkJgoxrGUB",
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
   {
-   "id": "widget-looks",
+   "id": "widget-reference",
    "date": "2026-09-26 · decision",
-   "title": "Widgets redrawn in Neumorphism & Soft UI: battery glyph with the number, soft-inset world clock",
+   "title": "Widgets matched to the reference: flat, bright rings and dials, measured from real screenshots",
    "status": "decision",
-   "lede": "Third round. Round one (a thin stroked ring, a plain dial) was rejected as flat; round two (rings in wells, glossy cells, bezels, sky faces, lit cards) was rejected as skeuomorphic. The user named the target: modern abstract, and for the battery a battery icon with a number as on the reference desktop. The style is now named in the design docs as Neumorphism & Soft UI (design/23 §2, design/08 §2): shapes in the plate's own colour, softly extruded or inset by a pair of low-contrast shadows with the light up-left, rounded, matte, abstract glyphs, no gloss, no bezels, text on the ink tokens for contrast. The battery is a soft-extruded glyph with an inset channel filled to the level (ink by default, amber low, red critical, green with a bolt while charging) beside the percentage in the display face; the world clock is a dial inset into the plate, plate-coloured by day and near-black by night, thick rounded hands, four quarter marks, an accent second hand; the digital form sets the time at hero size with a sun or moon mark. Rendered at 2x over a calm wallpaper. The props stay, so the shell's wiring is unchanged; the calendar widget is untouched and queued.",
+   "lede": "Fourth round, after three rejected ones (a crude ring; skeuomorphic wells and bezels; neumorphic soft shapes). This time the agent downloaded real screenshots of the reference desktop's Batteries and World Clock widgets, measured them (card 164 px with a 19–20 px corner and a 12 px inset, a 64 px ring with a stroke of 0.093 of its width in a bright green, the track as the plate darkened, a bolt at twelve when charging, dials with twelve heavy numerals and sixty ticks, necked hands and an orange seconds hand, white day faces and dark night faces, no header rows) and redrew ours to land within a few pixels at 2x, checked side by side. What still gives ours away is the typeface, our outline device glyphs against the reference's filled ones, and the card material: the reference cards are translucent and pick up the wallpaper, and its World Clock card is dark even in light mode.",
    "notes": [
-    "Picks needed (design/23 §6): battery fill ink (proposed) or accent; second hand yes (proposed) or never; quarter marks four (proposed) or none; Small clock digital with sun/moon (proposed) or one large soft dial; night dial on a dark desktop near-black (proposed) or pale day dials on dark desktops too; hero size 44 (proposed) or 40; calendar (queued): load dots or heat tint, date face or month grid in the Small size.",
-    "Known limits: the lit side of a soft shadow barely shows on the near-white light plate, so depth is carried by the dark side there; Blitz draws no SVG blur, so the hands' shading is two offset copies; the amber sun mark can read like a status dot; reference proportions are from memory, not measured; not yet rendered inside the shell itself.",
-    "Removed with this round: the well, cell, bezel, sky and lit candidates and their sixteen paint tokens; added: the soft-shadow token pairs (extruded and inset), the night ground, and the hero size."
+    "Picks (design/23 §6): battery percentage weight 500 as measured, or heavier; battery track the plate darkened as measured, or a light green; one red for low and critical as the reference, or amber then red; World Clock card dark in both schemes as the reference, or following the scheme; filled device glyphs (new icons) or our outline set; every widget card tinted by the Space (Arc) or the neutral material; the calendar items stay queued.",
+    "Not proven: no dark-scheme battery reference and no native medium Batteries screenshot were found (the medium comparison uses the phone widget); the Space tint is subtle in the gallery; the shell has not adopted it yet (its battery rows move to the ring layout)."
    ],
    "images": [
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/battery-light.png",
-     "caption": "Battery, light: the Small card's hero percentage with the glyph, and the Medium card's device rows (8 % critical, 45 %, 100 %, 15 % charging)."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-battery-small-light.png",
+     "caption": "Battery, Small: the ring with the device glyph and the percentage (light)."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/battery-dark.png",
-     "caption": "Battery, dark."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-battery-small-dark.png",
+     "caption": "Battery, Small: the ring with the device glyph and the percentage (dark)."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/clock-light.png",
-     "caption": "World clock, light: the Small card's digital time with the sun mark; four dials, Taipei and Tokyo by day, London and New York by night."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-battery-medium-light.png",
+     "caption": "Battery, Medium: a row of rings; low turns red, a bolt marks charging (light)."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-soft/clock-dark.png",
-     "caption": "World clock, dark."
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-battery-medium-dark.png",
+     "caption": "Battery, Medium: a row of rings; low turns red, a bolt marks charging (dark)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-clock-small-light.png",
+     "caption": "World clock, Small: a flat dial with numerals, 60 ticks and an orange seconds hand (light)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-clock-small-dark.png",
+     "caption": "World clock, Small: a flat dial with numerals, 60 ticks and an orange seconds hand (dark)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-clock-medium-light.png",
+     "caption": "World clock, Medium: four dials, white by day and dark by night (light)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widget-reference/ours-clock-medium-dark.png",
+     "caption": "World clock, Medium: four dials, white by day and dark by night (dark)."
     }
    ]
   },
