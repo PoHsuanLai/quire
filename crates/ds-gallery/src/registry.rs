@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 15] = [
+pub const REGISTRY: [Entry; 16] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -123,9 +123,16 @@ pub const REGISTRY: [Entry; 15] = [
     Entry {
         page: Page::WidgetLooks,
         title: "Widget looks",
-        lede: "The widgets in Neumorphism & Soft UI (design/23-WIDGETS.md) for the user's judgement: the battery as a soft battery glyph filled to the level beside its percentage, and the world clock as the time in the display face and as four soft dials; each in a Small and a Medium card over a calm wallpaper.",
+        lede: "The widgets flat, bright and measured (design/23-WIDGETS.md section 2): the battery as bright rings with the device glyph inside and the percentage under each, and the world clock as white day dials and dark night dials with an orange seconds hand; each in a Small and a Medium card over a calm wallpaper, the second medium card tinted by the Space.",
         height: 1000,
         body: pages::widget_looks::WidgetLooksPage,
+    },
+    Entry {
+        page: Page::WidgetReference,
+        title: "Widget reference",
+        lede: "The widgets posed as the reference screenshots design/23 section 1.1 measures, at the same size, for the side-by-side comparison: the battery alone, four small rings, the medium row with a low and a charging device, the small analog clock, and the medium world clock by day and by night.",
+        height: 1150,
+        body: pages::widget_reference::WidgetReferencePage,
     },
 ];
 

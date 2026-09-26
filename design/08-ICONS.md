@@ -188,11 +188,24 @@ Plus the 32 mailo glyphs (mod.rs:21-54), unchanged.
 
 ## 2. App icon template
 
-The plate language is the one the desktop widgets use too, named **Neumorphism & Soft UI**
-(user, 2026-09-26): shapes in the plate's own colour, softly extruded or inset by a pair of
-low-contrast shadows with the light up-left, rounded, matte, abstract, no gloss and no bezel.
-The definition and its shadow tokens live in `23-WIDGETS.md#2` and apply to any small object
-drawn on a plate: an icon's symbol, a widget's gauge, a control's well.
+The plate language is named **Neumorphism & Soft UI** (user, 2026-09-26), and the name
+covers the icon plates only: the desktop widgets are flat and bright instead
+(`23-WIDGETS.md#2`, the fourth pass, 2026-09-26). Its definition, moved here from
+`23-WIDGETS.md` when the widgets left it:
+
+1. **Monochrome with the material.** The symbol is the plate itself, not a second material: it
+   has the plate's own colour, so the icon reads as one object moulded out of one sheet.
+2. **Extruded or inset, by a pair of soft shadows.** A shape is pushed out of the plate or
+   pressed into it, drawn only by two low-contrast shadows of the plate's own light, a lit one
+   and a shaded one, with a wide blur and a small offset; no outlines, no bevel lines, no lips.
+3. **One light, from the top left**, which never turns with the shape.
+4. **Rounded everything**, round caps on every stroke.
+5. **Matte.** No gloss, no specular line, no sheen, no glass, no bezel; at most a very faint
+   gradient of the plate's own colour for the extrusion.
+6. **Abstract geometric symbols**, no illustration and no realism.
+
+The icons draw their shading in the raster pipeline (section 2.9), not from tokens; the
+`--soft-*` tokens the widgets used in their third pass are removed.
 
 The model draws only the object. The plate, gradient, highlight, mask and sizes are applied
 by code (settled, PLAN "Icons" item 1).

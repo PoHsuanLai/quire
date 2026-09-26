@@ -1,180 +1,212 @@
-# 23 Widgets: Neumorphism & Soft UI, the battery, the world clock, the calendar
+# 23 Widgets: flat, bright, measured; the battery, the world clock, the calendar
 
 Status legend as in `13-BEHAVIOUR-menus-windows.md`: **settled** = decided with the user;
-**proposed** = chosen here, rendered in the gallery's "Widget looks" page, the user judges.
-Confidence of a reference value: **H** primary source (the vendor's own guidelines or docs),
-**M** a reliable secondary source (a review, a teardown, a design write-up that measured the
-product), **L** observed from screenshots and memory of the shipping product, not measured,
-**UNKNOWN** nothing published. The reference platforms are named here as sources only; code,
-class names and asset names never name them.
+**proposed** = chosen here, rendered in the gallery's "Widget looks" and "Widget reference"
+pages, the user judges. Confidence of a reference value: **H** primary source (the vendor's own
+guidelines or docs), **M** a reliable secondary source (a review, a teardown, a design write-up
+that measured the product), **L** observed from screenshots and memory of the shipping product,
+not measured, **UNKNOWN** nothing published; a value in section 1.1 is **measured** (M) from a
+real screenshot with the method named. The reference platforms are named here as sources only;
+code, class names, tokens and asset names never name them.
 
 ## 1. What this governs
 
-The small desktop widgets' look: the style every widget is drawn in (section 2, "Neumorphism &
-Soft UI"), how our widgets apply it (section 3), the battery, the world clock and the card
+The small desktop widgets' look: the style every widget is drawn in (section 2, "Flat, bright,
+measured"), how our widgets apply it (section 3), the battery, the world clock and the card
 (section 4), and the research and specification for the calendar widget (section 5, queued:
-this pass does not restyle `MonthGrid`). The frame's footprint and padding stay
-`04-COMPONENTS.md` section 40; the surface row stays `20-SURFACES.md` section 1.14; the
-material stays `03-COLOR.md` section 17. The reference survey behind all of it is section 8.
+this pass does not restyle `MonthGrid`). The frame's footprint stays `04-COMPONENTS.md` section
+40; the surface row stays `20-SURFACES.md` section 1.14; the material stays `03-COLOR.md`
+section 17. The reference survey behind all of it is section 8; the measurements behind the
+drawing are section 1.1.
 
 **Why this file exists.** The user's verdicts, in order (2026-09-26):
 1. First widgets (a flat stroked ring, a plain paper dial): "too ugly"; "this battery circle
    thing looks nothing different to other old looking linux distros".
 2. Second pass (depth: the ring in a well round a boss, a glossy cell, bezel and sky dials, a lit
-   card): "all widgets looks bad. i want modern abstract design. i think for battery
-   specifically drop the circle, use a battery icon and a number to show, like mac".
-3. Direction for the third pass: the widget style is **Neumorphism & Soft UI** (section 2).
+   card): "all widgets looks bad"; "for battery specifically drop the circle, use a battery icon
+   and a number to show, like mac".
+3. Third pass: Neumorphism & Soft UI (soft extruded and inset shapes in the plate's colour).
+   Rejected.
+4. The agreed diagnosis for the fourth pass (this one): the reference widgets are **flat and
+   bright**. What makes them right is colour (a bright green ring, white day dials, black night
+   dials, an orange seconds hand), no header row on the Batteries and Clock widgets, one rounded
+   grotesque with small quiet labels and never a monospace face, crisp high-contrast detail at
+   small size, and, from Arc, the plate may take the Space's colour. So this pass redraws the
+   widgets **to match the reference's own widgets, measured side by side from real
+   screenshots** (section 1.1), and the gallery's "Widget reference" page renders ours at the
+   reference crops' size for the comparison.
 
-So: not crude, not skeuomorphic; no ring, no gauge, no bezel, no gloss, no well with a lip. The
-depth candidates of pass two (`BatteryLook`, `DialLook`, `FrameFinish` and their `--widget-*`
-paints) are removed.
+### 1.1 Measured references (2026-09-26)
 
-## 2. Neumorphism & Soft UI
+Sources (screenshots, reference-only, never committed): **R-bs** the Batteries widget small with
+one device, macOS 14 desktop, 2x (Intego, "How to Use Desktop Widgets on macOS Sonoma",
+`widgets3.png`); **R-bg** Batteries small with four places, 2x (same article, `widgets5.png`);
+**R-bm** Batteries medium with a low and a charging device, iOS today view, about 2x of a 169 pt
+card (iDownloadBlog, "How to see AirPods battery percentage", `airpods-and-case-battery-in-widget.jpg`);
+**R-bmm** Batteries medium on the Mac, the widget gallery's preview at 1.25 px/pt (Intego,
+`widgets4.png`); **R-cs** Clock small, analog, day, 2x (Intego, `widgets3.png`); **R-cm** World
+Clock medium, three day dials and one night dial, macOS 15, native 2x (512 Pixels' Aqua
+screenshot library, `15-Sequoia-Notification-Center.png`); **R-ca** the Clock app's large day and
+night dials (512 Pixels, `14-Sonoma-Clock.png`); **R-kl** Calendar small and medium (512 Pixels
+`15-Sequoia-Notification-Center.png`; Macworld, "How to add widgets to the macOS Sonoma Desktop").
+Measured with Pillow (runs of pixels of one colour along rows, columns and rays from a dial's
+centre); every length below is in points of a 164 pt small card (a 344 x 164 medium) unless it
+is a ratio.
 
-**Neumorphism & Soft UI** is the widget style's name; every widget and every agent working on
-one uses it. Definition (proposed 2026-09-26, the user's direction):
+| # | Quantity | Value | How measured | Conf. |
+| --- | --- | --- | --- | --- |
+| M1 | Small card | 164 x 164 (330 px at 2x) | R-bs, R-cs, R-bg: the plate's bounds against the wallpaper's saturation | M |
+| M2 | Medium card | 344 x 163 (688 x 325 px at 2x) | R-cm: the dark plate's bounds along a row and a column | M |
+| M3 | Card corner | about 19-20 (.12 of the small card), continuous | R-cm: the inset of the first plate pixel on rows 0-40 px from the top | M |
+| M4 | Small inset (ring, grid) | 12 at the top and the left | R-bs, R-bg: the ring's bounding box to the card's | M |
+| M5 | Ring diameter | 64 (.39 of the small card; 63 in R-bmm, .40 of the card's height in R-bm) | R-bs, R-bg: the green run's extent | M |
+| M6 | Ring stroke | .093 of the ring's diameter (6 of 64); .088 in R-bm, .10 in R-bmm | R-bs: the green run's width along the centre row | M |
+| M7 | Ring fill | `#27cd41` (39,205,65) | R-bs: most common green pixel | M |
+| M8 | Ring track | the plate darkened by about 12 % black, not a hue: (181,136,126) over a plate of (206,156,141) | R-bs: the ring's pixels outside the arc against the plate beside it; R-bm the same on a yellow plate | M |
+| M9 | Low | red arc, `(233,78,60)` on R-bm's plate, at 13 %; no separate critical colour seen | R-bm | M |
+| M10 | Arc | clockwise from twelve, round caps (the cap shows before twelve) | R-bm: 83 % ends at 300 degrees; green at 355 degrees is the start cap | M |
+| M11 | Charging | a bolt .16 of the ring tall, .10 wide, centred on the stroke at twelve (its top 4 % above the ring), in a gap in the ring of about 17 degrees between the caps | R-bm: the bolt's dark pixels; non-green angles along the stroke | M |
+| M12 | Glyph | the device's filled symbol, .50 of the ring wide (32 x 18 laptop), black, centred | R-bs | M |
+| M13 | Small, one device | the ring at the top left; the percentage at the bottom left: cap height 33 (about 46 pt type), stems .12-.14 of the cap (Regular to Medium, not heavy), baseline 15.5 above the card's bottom | R-bs: dark rows and columns of "93%" | M |
+| M14 | Small, several | a 2 x 2 grid of 64 rings, 12 inset, 11.5 apart; no numbers; an empty place is a track ring | R-bg | M |
+| M15 | Medium | four 63-64 rings on an 80 pitch from 20 in; the percentage under each, cap 12.8-14.6 (about 18-20 pt Regular), 17.6-23 below the ring; the block centred vertically | R-bmm, R-bm | M |
+| M16 | Small clock dial | .90 of the card (148 of 164), 8 inset; the face white, the plate around it light grey | R-cs: the white run's extent | M |
+| M17 | Small clock ticks | 60, all from .885 to .96 of the radius (5.5 long), 1.5 wide; the hour ticks ink `#1c1c1e`, the minute ticks grey (179 on white: ink at .3) | R-cs: dark runs along rays every 6 degrees | M |
+| M18 | Small clock numerals | 12, cap .163 of the radius (.073 of the card), centred on .73 of the radius, heavy (stem .2 of the cap) | R-cs: dark rows and columns round 12 and 3 | M |
+| M19 | Medium clock dial | 62.5 across, 29.5 below the card's top, 19 in, on an 81 pitch; numerals only, no ticks; cap .096 of the diameter on .82 of the radius | R-cm | M |
+| M20 | Hands | hour to .56 of the radius, minute to .9; a thin neck (.017 of the diameter) for the first .14 of the radius, then .034-.04 wide to a round tip; ink by day, white by night | R-cs, R-cm: dark runs along the hand and across it | M |
+| M21 | Seconds hand | `#f99101`-`#f29a37` (system orange), about 1 wide, from .2 of the radius behind the hub to .96; a hub of ink (.054 of the radius) under an orange ring with a white pin | R-cs, R-cm: orange pixels; a row through the centre | M |
+| M22 | Faces | day `#ffffff`, ink `#1c1c1e`; night `#343436` with white numerals and hands (R-ca's large night dial is black) | R-cm, R-ca: most common colours inside the discs | M |
+| M23 | World Clock card | `#1c1c1e`, dark in the light scheme too | R-cm, and the same widget in Apple's newsroom images | M |
+| M24 | Clock labels | the city bold white, cap about 7.5 (11 pt type); the day and the offset bold grey (`#5b5b5e` on the dark card), the same size, on two lines; 6.5 from the dial to the city | R-cm: white and grey text rows | M |
+| M25 | Header row | none on Batteries or Clock: the content fills the card | every source | M |
 
-1. **Monochrome with the material.** A shape is the plate itself, not a second material: it
-   has the plate's own colour (no fill of its own, or the plate's tint), so a widget reads as one
-   object moulded out of one sheet.
-2. **Extruded or inset, by a pair of soft shadows.** A shape is either pushed out of the plate
-   (**extruded**, raised) or pressed into it (**inset**). Both are drawn only by two shadows of
-   the plate's own light: a lit one and a shaded one, low-contrast, with a wide blur and a small
-   offset. Nothing else makes depth: no outlines, no bevel lines, no lips.
-3. **One light, from the top left.** An extruded shape throws `--soft-light` up and to the left
-   and `--soft-dark` down and to the right; an inset shape takes `--soft-inset-dark` inside its
-   upper left edge and `--soft-inset-light` inside its lower right. The direction never turns
-   with the shape (a clock hand keeps its light at the top left whichever way it points).
-4. **Rounded everything.** Every corner is rounded (the plate's 20, the battery body's 6, the
-   channel's 3, pills and discs); every stroke has round caps.
-5. **Matte.** No gloss, no specular line, no sheen, no glass; no gradient except, where a shape
-   needs it, a very faint one of the plate's own colour for the extrusion. No bezels.
-6. **Abstract geometric glyphs.** A battery is a rounded rectangle with a cap, a clock a disc with
-   two bars, the sun a disc, the moon a crescent of two circles; no illustration, no realism
-   (`08-ICONS.md`, the app icons are the benchmark for the level of abstraction).
-7. **Legible type and glyphs stay on the ink tokens.** Neumorphism's known weakness is contrast:
-   shapes the colour of their ground cannot carry meaning. So every value that must be read (the
-   hero number, labels, hands, the battery's fill, the bolt) is drawn in `--ink`, `--ink-soft`,
-   `--ink-faint` or a status colour (`--ok`, `--warn`, `--danger`, `--accent`), never in a soft
-   tone, and the text pairs are `03-COLOR.md` section 6's with the `CHECKLIST.md` contrast gates.
-   The soft shadows only say which shapes stand out and which are pressed in.
-8. **The card is not extruded.** The widget card is the `Widget` material's plate as it is: its
-   own tint, hairline, contact and ambient drop (`03-COLOR.md` 17) are its only separation from
-   the wallpaper. The soft pairs apply to the shapes on the card.
+## 2. Flat, bright, measured
 
-### 2.1 Tokens (`ds::tokens::SoftPaint`; proposed 2026-09-26)
+The widget style's name is **Flat, bright, measured** (proposed 2026-09-26, the fourth pass).
+"Neumorphism & Soft UI" names the icon plates only (`08-ICONS.md` section 2).
 
-| Token | Light | Dark | Role |
-| --- | --- | --- | --- |
-| `--soft-tone-light` | `rgba(255,255,255,.95)` | `rgba(255,255,255,.07)` | the lit tone |
-| `--soft-tone-dark` | `rgba(26,30,26,.26)` | `rgba(0,0,0,.62)` | the shaded tone |
-| `--soft-light` | `-2px -2px 5px var(--soft-tone-light)` | same, dark tone | an extruded shape's lit side |
-| `--soft-dark` | `2px 2px 6px var(--soft-tone-dark)` | same | an extruded shape's shaded side |
-| `--soft-inset-light` | `inset -2px -2px 4px var(--soft-tone-light)` | same | an inset shape's lit inner edge |
-| `--soft-inset-dark` | `inset 2px 2px 5px var(--soft-tone-dark)` | same | an inset shape's shaded inner edge |
-| `--soft-night` | `#1a1e1a` | `#0a0c0a` | a night dial's ground, darker than the plate in either scheme |
+1. **Flat.** A shape is a solid fill or a solid stroke of one colour on the plate: no shadows
+   inside the card, no insets, no bevels, no gloss, no gradients. The card itself is the
+   `Widget` material's plate (`03-COLOR.md` 17), optionally tinted by the Space (4.3).
+2. **Bright.** Meaning is carried by a few saturated colours at full strength, measured from
+   the reference (section 1.1): the battery's green and red, the white day dial and the dark
+   night dial, the orange seconds hand. Tracks and minor ticks are the ink or the plate at low
+   alpha, never a second hue.
+3. **Measured.** Every size and ratio comes from section 1.1: ring to card, stroke to ring,
+   numerals to dial, hands to radius. A new widget is measured from its reference the same way
+   before it is drawn.
+4. **No header on a glanceable widget.** The Batteries and Clock widgets have no title row;
+   their content fills the card at the measured inset. The frame's `title` stays for widgets that
+   need one.
+5. **One rounded grotesque.** Numerals in the display face (`--font-display`, Bricolage
+   Grotesque): the clock's at its heaviest (800); a battery's percentage at its lightest (500),
+   because the reference's percentage is Regular to Medium (M13). Labels in the UI face
+   (`--font-ui`, Karla), small and bold. Never the data face in a widget.
+6. **Crisp at small size.** Fine ticks and thin hands at the measured widths, high contrast
+   against the face; hands end in round caps; numerals are text, not paths.
 
-An extruded box is `box-shadow: var(--soft-light), var(--soft-dark)`; an inset box
-`box-shadow: var(--soft-inset-dark), var(--soft-inset-light)`. An SVG shape cannot take a
-`box-shadow` (and Blitz paints no filter): it is drawn three times, a copy in
-`--soft-tone-dark` shifted down and right and a little wider, a copy in `--soft-tone-light`
-shifted up and left, then the shape; the shift is applied before any turn, so the light stays
-at the top left. On the light Widget plate (near white) the lit tone barely shows, so the
-extrusion is carried by the shaded side; on the dark plate both show.
+### 2.1 Tokens (`ds::tokens::WidgetPaint`; proposed 2026-09-26)
+
+| Token | Light | Dark | Role | From |
+| --- | --- | --- | --- | --- |
+| `--battery-fill` | `#28cd41` | `#32d74b` | the ring's arc, healthy or charging | M7 |
+| `--battery-low` | `#ff3b30` | `#ff453a` | the arc at a fifth or less (low and critical) | M9 |
+| `--battery-track` | `rgba(0,0,0,.12)` | `rgba(255,255,255,.14)` | the ring's full circle: the plate darkened (lightened on dark) | M8 |
+| `--clock-face-day` | `#ffffff` | same | a day dial | M22 |
+| `--clock-face-night` | `#343436` | same | a night dial | M22 |
+| `--clock-ink-day` | `#1c1c1e` | same | numerals, ticks, hands on a day dial | M22 |
+| `--clock-ink-night` | `#ffffff` | same | the same on a night dial | M22 |
+| `--clock-seconds` | `#ff9500` | `#ff9f0a` | the seconds hand and its ring | M21 |
+
+Sizes (`02-TYPE.md`): `--fs-dial` 9 and `--fs-dial-large` 18 (the numerals, M18, M19),
+`--fs-widget-figure` 20 (a battery's percentage in a row, M15), `--fs-widget-hero` 47 (a small
+battery's percentage, M13), each set so the display face's cap (.66 em) matches the measured cap.
+The third pass's `--soft-*` tokens are removed.
 
 ## 3. Our widget language
 
 ### 3.1 The rule
 
-**Abstract, matte, big type; no gauges, no bezels, no gloss.** A widget is one soft plate with
-at most a few soft shapes on it and one hero value in large display type. The app icons
-(`assets/icons/apps`) are the benchmark for abstraction: if a shape would not sit in that set's
-language, it does not go on a widget. A stroked ring on a track, a dial with a minute track or
-numerals, a glossy liquid, a well with a lip, a bezel, a sky gradient: each fails the rule.
+**Match the reference's widget, measured.** A widget is its content on the plate at the
+measured inset, drawn flat in the section 2.1 colours, with no header. Where our parts differ
+from the reference's they differ only in face (Bricolage and Karla for the system face) and in
+glyph (our icon set for the device symbols).
 
 ### 3.2 Type
 
-The hero value (a battery's percentage, a small clock's time, the date face) is the display
-face (`--font-display`, Bricolage Grotesque) at `--fs-widget-hero` (44 px, raised from 34 so the
-small widget has no dead middle band) weight 700, tracked -.02em, tabular numerals; its unit
-(`%`) at `--fs-subject` 600. Names (a device, a city) are the UI face (`--font-ui`) at
-`--fs-control`/`--fs-help` 600 `--ink`; secondary data (a zone offset, a device under the hero,
-a row's percentage) the data face (`--font-data`) at `--fs-caption`/`--fs-small` `--ink-soft`
-or `--ink-faint`, tabular. The card's title row is a quiet eyebrow (4.3).
+Numerals are the display face: dial numerals 800 at `--fs-dial` or `--fs-dial-large`; a
+battery's percentage 500 at `--fs-widget-figure` in a row and `--fs-widget-hero` alone; a
+digital time 800, tabular, tracked -.02em. Labels are the UI face 700 at `--fs-small`: the city
+`--ink`, its day and offset `--ink-faint` (M24). No widget uses `--font-data`.
 
 ### 3.3 Composition
 
-- **Small**: the eyebrow at the top; the content anchored to the bottom left (hero, then its
-  label); nothing floats in the middle band.
-- **Medium**: the eyebrow, then either rows (the battery: glyph, name, number) spread over the
-  body's height, or four faces spread across it (the world clock), each with its label under it.
-- Padding 16 (the material's); nothing touches the plate's edge nearer than that.
+- **Small**: the content fills the card at the frame's 12 inset (M4): one ring at the top left
+  and the percentage at the bottom left, or four rings in a 2 x 2 grid, or one large dial 8 in.
+- **Medium**: a row of four across the card, centred vertically: rings with the percentage 18
+  under each, or 62 dials with the city, day and offset under each.
 
 ## 4. Specification per widget
 
 ### 4.1 Battery (`BatteryLevel`; `LevelRing` is its old name)
 
 `BatteryLevel { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text, children }`,
-renamed from `LevelRing` (kept as `pub use BatteryLevel as LevelRing`, so a caller of the old
-name compiles unchanged); every prop kept, the `look` prop removed. Markup
-`div.ds-battery[data-tone][data-mark][role=progressbar][aria-valuenow]` holding, when
-`children` is given, `span.ds-battery-device` (a device glyph, `--ink-soft`, 6 before the
-battery), then `span.ds-battery-glyph` (32 x 16; 40 x 20 in a Small frame, beside the hero):
+every prop kept (`LevelRing` stays an alias). Markup: `div.ds-battery[data-tone][data-mark]
+[role=progressbar][aria-valuenow]`, 64 x 64, holding `svg.ds-battery-track`, `svg.ds-battery-arc`
+(absent at 0), `span.ds-battery-device` around `children` when given, and `svg.ds-battery-bolt`
+while charging.
 
-| Part | Drawing |
-| --- | --- |
-| Body | a rounded rectangle (corner `--r-small` 6) of the plate's own colour, **extruded**: `--soft-light`, `--soft-dark`; 3 short of the right edge for the cap |
-| Channel | 3 inside the body, corner `--r-micro` 3, **inset**: `--soft-inset-dark`, `--soft-inset-light` |
-| Fill | 1.5 inside the channel, a solid matte bar as long as the level (`--f`, never shorter than 3, so 1 % is a sliver), corner 3; `--ink` by default, `--warn` at a fifth or less, `--danger` at a tenth or less, `--ok` while charging (a charging battery is never low) |
-| Cap | a 2 x 36 % terminal at the right, `--ink-faint` |
-| Bolt | while charging, a bolt in `--ink` over the body, cut out of the body and fill by a 3-unit outline in the plate's colour (`--m-tint-solid`) |
+| Part | Drawing | From |
+| --- | --- | --- |
+| Track | a full circle, stroke .093 of the ring (9.3 in the 100 box), round caps, `--battery-track`; while charging, the circle less the bolt's gap | M6, M8 |
+| Arc | clockwise from twelve as far as the level, the same stroke, round caps, `--battery-fill`; `--battery-low` at a fifth or less (`data-tone` `low` at 20 % or less, `critical` at 10 % or less, both red); charging is never low; the path is computed in Rust (`battery_ring.rs`), no transition (O-20) | M7, M9, M10 |
+| Device | the caller's glyph centred at .47 of the ring, `--ink` | M12 |
+| Bolt | while charging: a bolt .16 of the ring tall and .10 wide, `--ink`, centred on the stroke at twelve; the track and the arc leave a 29 degree gap between their ends' centres (17 between the caps) and the arc fills the rest | M11 |
 
-**Composition** (the shell composes, quire provides the parts):
-- **Small**: the eyebrow ("Battery"); at the bottom left the hero percentage (display face,
-  `--fs-widget-hero`, `%` at `--fs-subject`) with the glyph (40 x 20) beside it on the baseline,
-  10 apart; under it the device name in the data face `--fs-caption` `--ink-faint`.
-- **Medium**: the eyebrow ("Batteries"); up to four rows spread over the body: the glyph, the
-  name (UI face `--fs-control` 600, `--ink`, ellipsised), the percentage right-aligned (data face
-  `--fs-small`, tabular, `--ink-soft`), 10 apart.
+**Composition** (the shell composes, quire provides the ring):
+- **Small, one device**: the ring at the top left; the percentage at the bottom left in the
+  display face 500 at `--fs-widget-hero`, its baseline about 15 above the card's bottom.
+- **Small, several**: a 2 x 2 grid of rings, no numbers; an empty place a ring at 0.
+- **Medium**: four rings across from 20 in, the percentage 18 under each in the display face 500
+  at `--fs-widget-figure`, the block centred vertically.
 
-Motion: the fill bumps once on a new percentage (`use_bump_on`); its length does not animate
-(O-20).
+Motion: the ring bumps once on a new percentage (`use_bump_on`).
 
 ### 4.2 World clock (`ClockFace`)
 
 `ClockFace { time, phase: DayPhase, look: ClockLook::{Analog, Digital}, label }`: every prop
-kept, the `dial` prop removed.
+kept. Markup: `div.ds-clock[data-look][data-phase]` holding `div.ds-clock-dial` (analog) or
+`span.ds-clock-digits` (digital), then `span.ds-clock-label` around `span.ds-clock-city`.
 
-| Part | Analog |
-| --- | --- |
-| Dial | a 56 px disc **inset** in the plate (`--soft-inset-dark`, `--soft-inset-light`): by day the plate's own colour; by night `--soft-night`, keeping only its inset shade (a lit inner edge on a dark ground reads as gloss) |
-| Marks | four quarter marks, 2 px round bars 3.4 long, at .4 of the hands' colour; no tick ring, no numerals |
-| Hands | thick round bars from the centre: the hour hand 3.9 px to .55 of the radius, the minute hand 2.8 px to .8; the hub 6 px; **extruded** as SVG (a `--soft-tone-dark` copy shifted down and right, a `--soft-tone-light` copy up and left; by night the light copy is dropped); `--ink` by day, `--paper` by night (`--ink-soft` on a dark desktop, whose ink is already pale) |
-| Second hand | 1 px, `--accent`, from 10 behind the hub to .84 of the radius, with a 3 px `--accent` dot; flat |
+| Part | Analog | From |
+| --- | --- | --- |
+| Dial | a disc, 62 across in a row; in a Small frame the card less 8 at each side (148), the city dropped; `--clock-face-day` or `--clock-face-night` | M16, M19, M22 |
+| Ticks | `svg.ds-clock-ticks`: 60 from .885 to .96 of the radius, 1 unit wide, every fifth at full ink and the rest at .3; drawn only on the large dial | M17 |
+| Numerals | `div.ds-clock-numerals` of twelve `span.ds-clock-numeral`, the display face 800, centred on .82 of the radius (`--fs-dial`) or .73 on the large dial (`--fs-dial-large`) | M18, M19 |
+| Hands | `svg.ds-clock-hands`: the hour hand to .56 of the radius and the minute hand to .9, each a 1.7-unit neck to .14 then 3.6 units wide, round caps; a hub of 2.7; `--clock-ink-day` or `--clock-ink-night` | M20 |
+| Seconds | when shown, `svg.ds-clock-second`: 1.2 units from .2 behind the hub to .96, and a ring of 1.8 at the hub, `--clock-seconds`; `svg.ds-clock-pin`, a .9 pin of the face's colour | M21 |
 
-The dial is drawn in the desktop's scheme (pass two forced a light scope by day and a dark one
-by night; a soft shape must share its plate's colour, so the dial now follows the plate).
+**Digital** (the notification center's tile; the reference's desktop widget has no digital
+form): the time in the display face 800, tabular, at `--fs-widget-hero` in a Small frame and
+`--fs-subject` elsewhere, bumping on each new minute; the city with the phase's mark before it
+(the sun a disc in `--warn`, the moon a crescent in `--ink-faint`).
 
-**Digital**: the time in the display face, 700, tabular, tracked -.02em, at `--fs-widget-hero` in
-a Small frame and `--fs-subject` anywhere else (four fit a Medium tile); under it the city in the
-UI face `--fs-help` 600 with the phase's mark before it: the **sun** a 12 px disc in `--warn`,
-the **moon** a crescent (a disc less a second disc) in `--ink-faint`. It bumps on each new minute.
-
-**Composition**:
-- **Small**: the eyebrow ("Clock"); at the bottom left the time, the city with its mark, then
-  the offset ("Today", "+1 h") in the data face `--fs-caption` `--ink-faint`.
-- **Medium**: the eyebrow ("World Clock"); four dials spread across the body, each with the city
-  (UI face `--fs-help` 600 `--ink`) and the offset (data face) under it.
-- **Day and night**: the phase the shell computes (sunrise and sunset where it knows the zone,
-  else 06:00-18:00; W13 publishes none).
+**Composition**: Small, the large dial alone. Medium, four dials across, each with the city
+(UI face 700 `--fs-small`, `--ink`) and, from the shell, its day and offset on two lines in the
+same face in `--ink-faint`. Day and night: the phase the shell computes (sunrise and sunset
+where it knows the zone, else 06:00-18:00).
 
 ### 4.3 The frame (`WidgetFrame`)
 
-`WidgetFrame` keeps every prop but `finish` (removed with the `Lit` card). The card is the
-`Widget` material's plate as it is (section 2, item 8). The title row is a **quiet eyebrow**: the
-glyph at 12 and the name in the data face at `--fs-micro`, upper, tracked .08em, weight 400,
-both `--ink-faint`, 5 apart, so the widget's own value leads. Padding 16 on the desktop, 12 as a
-tile (unchanged).
+`WidgetFrame { size, host, tint: CardTint::{Material, Space}, title, id, children }`: `tint`
+is new, default `Material`. The desktop card is the `Widget` material's plate, corner
+`--m-radius` 20 (M3), padding 12 (M4); the tile is unchanged (12 padding, `--r-tile`).
+`CardTint::Space` writes `data-tint="space"` and lays the Space's gradient (`.ds-frame`, the
+tinted chrome's layer) over the plate at the material's frame alpha, under the content, so the
+Space's colour reaches the card (Arc's contribution). The optional title row is quiet: the glyph
+at 12 and the name in the UI face 600 `--fs-caption` `--ink-soft`; the Batteries and Clock
+widgets pass none.
 
 ## 5. Calendar widget (research and specification only; queued)
 
@@ -184,28 +216,31 @@ brief for the pass that does it.
 
 | Size | Content | Reference | Our spec (proposed) |
 | --- | --- | --- | --- |
-| Small | **date face**: the weekday in the data face, upper, `--accent` (W15's red weekday in our accent), the date in the display face at `--fs-widget-hero` x 1.6 (54) weight 700; under it the next event as a pill (below) or "No more events today" in `--ink-faint` | W15, C1 | the date face sits on the plate; the compact month grid moves to Medium |
-| Medium | the date face and next two events on the left half; the month on the right half as the compact grid with **load dots** (one per event, max three, 3 px, the calendar's colour) and today on the accent disc (in the pass that restyles it, an extruded soft disc per section 2) | C1 (grid + events), W15 | `MonthGrid` compact at Medium gains `Eventful::Count(n)` dots; heat map an open decision |
-| Large | the month on top (regular density), the day's events under it as **event pills** | C1-C4 | pill: `--r-chip` corner, the calendar colour at .14 over the plate, a 3 px left bar in the full colour, the title in the colour's `-deep` (dark scheme: `-soft`) `--fs-help` 600, the time in the data face `--fs-nano` `--ink-soft`; 26 high, 4 apart |
+| Small | **date face**: the weekday in the UI face, bold, upper, `--accent` (W15's red weekday in our accent), the date in the display face at `--fs-widget-hero` x 1.6 (54) weight 700; under it the next event as a pill (below) or "No more events today" in `--ink-faint` | W15, C1 | the date face sits on the plate; the compact month grid moves to Medium |
+| Medium | the date face and next two events on the left half; the month on the right half as the compact grid with **load dots** (one per event, max three, 3 px, the calendar's colour) and today on the accent disc (in the pass that restyles it, an a flat accent disc per section 2) | C1 (grid + events), W15 | `MonthGrid` compact at Medium gains `Eventful::Count(n)` dots; heat map an open decision |
+| Large | the month on top (regular density), the day's events under it as **event pills** | C1-C4 | pill: `--r-chip` corner, the calendar colour at .14 over the plate, a 3 px left bar in the full colour, the title in the colour's `-deep` (dark scheme: `-soft`) `--fs-help` 600, the time in the UI face `--fs-nano` `--ink-soft`; 26 high, 4 apart |
 
 Neighbour days `--ink-faint`; weekends optionally tinted (C1); past days dimmed to `--ink-faint`
 (C1). The grid keeps no boxes (common trait e); the month title in the display face, not the
 data face's caps (the current `--accent` caps title reads as a form label). Motion unchanged
 (`slide-l`/`slide-r`).
 
-## 6. Open decisions (for the user; the gallery's "Widget looks" page renders the proposal)
+## 6. Open decisions (for the user; the gallery's "Widget looks" and "Widget reference" pages render the proposal)
 
-1. **Battery fill colour:** `--ink` by default (proposed: the reference's menu-bar battery fills
-   in the ink and turns green, amber, red by state) or the accent?
-2. **Second hand:** keep the thin accent second hand when a zone shows seconds (proposed), or
-   never draw one on a widget?
-3. **Quarter marks:** four (proposed) or none (a bare disc with hands)?
-4. **Small clock:** the digital time with the sun or moon (proposed, rendered) or one large soft
-   dial?
-5. **Night dial on a dark desktop:** `--soft-night` (near black, proposed) keeps day and night
-   apart only by the ground's depth and the hands' tone; or a pale day dial on dark desktops too,
-   as the reference does (breaks section 2 item 1)?
-6. **Hero size:** `--fs-widget-hero` 44 (proposed; 34 left a dead band in the Small card) or 40?
+1. **Battery percentage weight:** 500, the display face's lightest, as the reference measures
+   (Regular to Medium, M13; proposed), or 800 as the fourth-pass brief asked ("heaviest weight
+   for numerals")? The clock's numerals are 800 either way.
+2. **Battery track:** the plate darkened (`rgba(0,0,0,.12)`, as measured, M8; proposed) or a
+   light tint of the ring's green, as the brief's diagnosis described it?
+3. **Low colour:** one red for low (20 % or less) and critical (10 % or less), as the reference
+   shows at 13 % (proposed), or amber for low and red for critical?
+4. **World Clock card:** the reference's medium World Clock card is dark in the light scheme too
+   (M23); ours follows the scheme (proposed). A dark card by force would need the shell to scope
+   the widget dark.
+5. **The laptop glyph:** our icon set has no laptop; this computer shows `Monitor`, and the
+   devices' glyphs are outline where the reference's are filled. A filled device set is an icon
+   task (`08-ICONS.md`).
+6. **Space tint by default:** `CardTint::Material` (proposed) or `Space` for every widget?
 7. **Calendar** (section 5, unchanged): month load as dots (proposed) or a heat tint; the Small
    calendar as the date face with the next event (proposed) or the compact month grid.
 
@@ -231,6 +266,13 @@ data face's caps (the current `--accent` caps title reads as a form label). Moti
   (2024-10-23) and "Google Calendar Material 3 Expressive redesign starts rolling out"
   (2025-08-07).
 - vimcal.com and reviews (efficient.app): colour coding by keyword, dark mode.
+- Screenshots measured in section 1.1 (reference-only, never committed): Intego, "How to Use
+  Desktop Widgets on macOS Sonoma" (`widgets3.png`, `widgets4.png`, `widgets5.png`); 512 Pixels,
+  Aqua screenshot library, macOS 14 and 15 (`14-Sonoma-Clock.png`,
+  `15-Sequoia-Notification-Center.png`); iDownloadBlog, "How to see AirPods battery percentage on
+  any device" (`airpods-and-case-battery-in-widget.jpg`); Macworld, "How to add widgets to the
+  macOS Sonoma Desktop"; Apple Newsroom, "macOS Sonoma brings new capabilities" (2023-06-05)
+  desktop images.
 - Sibling docs: `03-COLOR.md` 8, 17; `04-COMPONENTS.md` 39, 40; `07-LOOKS.md` 3, 11.1;
   `08-ICONS.md` 2.5, 2.9, 2.10; `20-SURFACES.md` 1.12, 1.14; `CHECKLIST.md` (contrast).
 
@@ -251,9 +293,9 @@ data face's caps (the current `--accent` caps title reads as a form label). Moti
 | W9 | Card | an opaque card per scheme (white in light, near-black `#1c1c1e`-like in dark), a large continuous corner (about 22 pt at small size), a soft wide drop on the desktop; no visible hairline in light | L | screenshots of macOS 14-15 desktop widgets |
 | W10 | Hierarchy | one hero value per small widget in a heavy rounded or display cut (the temperature, the date, the percentage) at roughly 2.5-3x the label size; the label above it in a small bold caption, often coloured (Calendar's red weekday) | L | screenshots |
 | W11 | Batteries | Small: one ring per device (up to four in a 2 x 2) with the device's glyph in the ring, green, no numbers; Medium: the rings in a row with the percentage under each; Large: a list, a horizontal bar per device with glyph, name and percentage. Charging shows a bolt at the ring's top; low turns the ring red | M | Apple Support Communities 251854825 (small = rings, medium = rings + percentage); L for the rest |
-| W12 | Batteries ring | a thick round-capped arc on a darker track of the same hue; the glyph is the device's SF Symbol in the ring's middle; the ring's track is not a separate grey but the tone at low alpha | L | screenshots |
+| W12 | Batteries ring | a thick round-capped arc (.093 of the ring) on a track that is the plate darkened, not a hue; the glyph is the device's filled symbol in the ring's middle; measured in section 1.1 (M5-M12) | M | section 1.1 |
 | W13 | World clock | Analog faces, one per city in the Medium widget (four across), the city under each; the whole face white by day and black by night | M | timeanddate/Apple discussions: "white face during the daytime and a black one at night"; the switch time is not published (discussion 251886962 observes it off sunrise and sunset) |
-| W14 | Clock dial | twelve numerals on the paper face (no minute track at widget size), orange second hand with a hub ring, black hour and minute hands that are thin near the hub and thicken towards the tip; the day/night switch recolours face, numerals and hands together | L | screenshots |
+| W14 | Clock dial | twelve heavy numerals; sixty ticks on the small widget's large dial, none on the medium's; orange seconds hand with a hub ring; black hands with a thin neck near the hub; the day/night switch recolours face, numerals and hands together; measured in section 1.1 (M16-M22) | M | section 1.1 |
 | W15 | Calendar | Small: the weekday in red caps, the date in a large display weight, then the next event with a coloured left bar; Medium: that on the left and the month grid or events on the right; Large: the month grid with today on a red disc, event dots | L | screenshots |
 
 ### 8.2 The phone platforms' widget galleries
@@ -265,8 +307,8 @@ data face's caps (the current `--accent` caps title reads as a form label). Moti
 | P3 | Paper vs glass treatment | paper "a more grounded, print-like style that feels solid"; glass "adds depth and visual separation between foreground and background elements" | H | HIG Widgets, "Treatment styles" |
 | P4 | Android (Material 3) | widgets take the dynamic colour of the wallpaper; the 2025 calendar redesign puts each day in "its own rounded rectangle" | M | 9to5google, Android Police (Calendar Material 3 Expressive) |
 
-P2 and P3 are the reference vendor's own words for what the user asks of us: a widget is an
-object with thickness (elevated) and its gauges are cut into it (recessed).
+P2 and P3 were the second pass's basis (an object with thickness, gauges cut into it); the user
+rejected that pass, and the desktop widgets measured in section 1.1 are flat.
 
 ### 8.3 Windows 11 widgets
 

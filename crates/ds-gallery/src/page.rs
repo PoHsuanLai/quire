@@ -31,13 +31,16 @@ pub enum Page {
     Edit,
     /// The level control's three looks and the OSD card that carries it.
     Level,
-    /// The widget faces' candidate looks: the battery, the world clock and the card's finish.
+    /// The widgets in their flat, bright look: the battery and the world clock, with the Space
+    /// tint on the card.
     WidgetLooks,
+    /// The widgets posed as the reference screenshots, at their size, for side-by-side proof.
+    WidgetReference,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 15] = [
+    pub const ALL: [Page; 16] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -53,6 +56,7 @@ impl Page {
         Page::Edit,
         Page::Level,
         Page::WidgetLooks,
+        Page::WidgetReference,
     ];
 
     /// The `--page` word.
@@ -73,6 +77,7 @@ impl Page {
             Page::Edit => "edit",
             Page::Level => "level",
             Page::WidgetLooks => "widget-looks",
+            Page::WidgetReference => "widget-reference",
         }
     }
 }
