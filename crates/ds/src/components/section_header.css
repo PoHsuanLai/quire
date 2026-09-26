@@ -8,11 +8,11 @@
    to take, and in a header without a rule (Field, Menu) its `margin-left:auto` does what the
    rule would (polish pass: a Menu header's action sat against its eyebrow). */
 
-.ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); text-transform:uppercase; color:var(--ink-faint); }
-.ds-section-header[*|data-kind=frame]{ gap:var(--s-6); padding:var(--s-14) var(--s-6) var(--s-5); font-size:var(--fs-caption); letter-spacing:.14em; color:var(--f-ink-faint); }
-.ds-section-header[*|data-kind=group]{ gap:var(--s-8); padding:var(--s-12) var(--s-6) var(--s-6); font-size:var(--fs-caption); letter-spacing:.12em; }
-.ds-section-header[*|data-kind=field]{ margin-bottom:var(--s-6); font-size:var(--fs-caption); letter-spacing:.14em; }
-.ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:.14em; }
+.ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); font-weight:var(--fw-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
+.ds-section-header[*|data-kind=frame]{ gap:var(--s-6); padding:var(--s-14) var(--s-6) var(--s-5); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps); color:var(--f-ink-faint); }
+.ds-section-header[*|data-kind=group]{ gap:var(--s-8); padding:var(--s-12) var(--s-6) var(--s-6); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps-narrow); }
+.ds-section-header[*|data-kind=field]{ margin-bottom:var(--s-6); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps); }
+.ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); }
 
 .ds-section-header-text{ white-space:nowrap; }
 .ds-section-header-rule{ flex:1; min-width:0; height:var(--hair); }

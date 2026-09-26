@@ -38,7 +38,7 @@
 .ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
 .ds-stop{
   display:inline-flex; align-items:center; gap:var(--s-5); border:var(--hair) solid var(--line); background:var(--surface-2);
-  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-size:var(--fs-caption);
+  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption);
   color:var(--ink-soft); cursor:pointer;
 }
 .ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
@@ -70,7 +70,7 @@
 .ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
 .ds-space-editor-title .ds-input-wrap{ flex:1; }
 .ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
-.ds-checks-heading{ font-family:var(--font-data); font-size:var(--fs-micro); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+.ds-checks-heading{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; color:var(--ink-faint); }
 
 /* mailo gaps 3. A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
    `data-stops` counting them) and are painted here, never inline: the same 135deg gradient

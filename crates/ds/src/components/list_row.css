@@ -67,7 +67,7 @@
 .ds-row-from{ display:flex; align-items:baseline; gap:var(--s-7); min-width:0; }
 .ds-row-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
 .ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
-.ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-size:var(--fs-micro); color:var(--ink-faint); }
+.ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); color:var(--ink-faint); }
 .ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
 .ds-row[*|data-emphasis=strong] .ds-row-sub{ font-weight:600; }
 .ds-row-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }

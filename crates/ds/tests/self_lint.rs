@@ -64,11 +64,6 @@ const EXCEPTIONS: &[Exception] = &[
         reason: "a symbolic icon is its mask over the text colour, the Glyph's currentColor \
                  stroke by other means (design/08-ICONS.md section 1.5, spike S7)",
     },
-    Exception {
-        rule: Rule::RawFontSize,
-        selector: ".ds-mono",
-        reason: "machine facts are a size smaller than whatever they sit in: .78em (`S:56`)",
-    },
 ];
 
 fn config() -> LintConfig {

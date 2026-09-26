@@ -13,7 +13,7 @@
   transition:transform var(--t-big) var(--e-spring); }
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
-.ds-toast-hint{ font-family:var(--font-data); font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
+.ds-toast-hint{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
 .ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
   border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
   transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }

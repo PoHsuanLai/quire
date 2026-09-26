@@ -1,27 +1,41 @@
-//! The four faces and the size ramp (design/02-TYPE.md sections 2 and 4).
+//! The five face jobs and the size ramp (design/02-TYPE.md sections 2 and 4).
 //!
 //! The plan names the ends, `--fs-micro` 9.5 and `--fs-display` 26; the steps between are named
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
 
 use super::name::VarName;
+use crate::appearance::Typeface;
 
-/// A type family, by job.
+/// A type family, by job. Which face does each job depends on the root's [`Typeface`]
+/// (design/02-TYPE.md section 2): the `.ds` block names the System faces and the
+/// `.ds[data-typeface=editorial]` block the Editorial ones.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Family {
-    /// `--font-display`: Bricolage Grotesque. Headings, names, initials.
+    /// `--font-display`: Inter Display (System) or Bricolage Grotesque (Editorial). Headings,
+    /// names, initials, big numbers.
     Display,
-    /// `--font-ui`: Karla. Body text and every control.
+    /// `--font-ui`: Inter (System) or Karla (Editorial). Body text and every control.
     Ui,
-    /// `--font-data`: Space Mono. Anything machine-shaped.
+    /// `--font-data`: Inter, always tabular (System), or Space Mono (Editorial). Anything
+    /// machine-shaped: times, counts, chips, eyebrows, section headers.
     Data,
     /// `--font-serif`: Noto Serif. A message a person writes in a serif, and the control that
     /// offers it (mailo gaps 3); never the interface's own text.
     Serif,
+    /// `--font-code`: Space Mono in either typeface. Only where a fixed pitch carries meaning:
+    /// code, `Kbd`, aligned logs.
+    Code,
 }
 
 impl Family {
     /// Every face, in the order the stylesheet declares them.
-    pub const ALL: [Family; 4] = [Family::Display, Family::Ui, Family::Data, Family::Serif];
+    pub const ALL: [Family; 5] = [
+        Family::Display,
+        Family::Ui,
+        Family::Data,
+        Family::Serif,
+        Family::Code,
+    ];
 
     /// The custom property: `--font-display`, …
     pub fn var(self) -> VarName {
@@ -30,17 +44,40 @@ impl Family {
             Family::Ui => "--font-ui",
             Family::Data => "--font-data",
             Family::Serif => "--font-serif",
+            Family::Code => "--font-code",
         })
     }
 
-    /// The `font-family` stack, face first, then its fallbacks.
+    /// The `font-family` stack under the default typeface ([`Typeface::System`]).
     pub fn stack(self) -> &'static str {
-        match self {
-            Family::Display => "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif",
-            Family::Ui => "\"Karla\",\"Segoe UI\",system-ui,sans-serif",
-            Family::Data => "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace",
-            Family::Serif => "\"Noto Serif\",Georgia,\"Times New Roman\",serif",
+        self.stack_in(Typeface::System)
+    }
+
+    /// The `font-family` stack under `typeface`, face first, then its fallbacks.
+    pub fn stack_in(self, typeface: Typeface) -> &'static str {
+        match (self, typeface) {
+            (Family::Display, Typeface::System) => {
+                "\"Inter Display\",\"Inter\",system-ui,sans-serif"
+            }
+            (Family::Ui | Family::Data, Typeface::System) => "\"Inter\",system-ui,sans-serif",
+            (Family::Display, Typeface::Editorial) => {
+                "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif"
+            }
+            (Family::Ui, Typeface::Editorial) => "\"Karla\",\"Segoe UI\",system-ui,sans-serif",
+            (Family::Data, Typeface::Editorial) | (Family::Code, _) => {
+                "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
+            }
+            (Family::Serif, _) => "\"Noto Serif\",Georgia,\"Times New Roman\",serif",
         }
+    }
+
+    /// The family name the stack leads with under `typeface`: the name its face registers as.
+    pub fn face_name(self, typeface: Typeface) -> &'static str {
+        let stack = self.stack_in(typeface);
+        stack
+            .strip_prefix('"')
+            .and_then(|rest| rest.split('"').next())
+            .unwrap_or(stack)
     }
 }
 

@@ -1,11 +1,12 @@
 /* Kbd (design/04-COMPONENTS.md section 9): `S:67-68`; Small is the hint row's 9.5 (`S:662`).
+   In the code face (`--font-code`, Space Mono in either typeface): a key cap is fixed pitch.
    Static: no hover, active, focus or motion. Attribute selectors carry `*|` (spike S2).
    `inline-block` (sheet and modal parts, sill Q95): Blitz lays out an inline box's text but not
    its padding or border, so an inline cap was its glyph on a patch of `--surface-2`, caps run
    together; a block-level box keeps the rim and the 5 px sides the browser gave S's `kbd`. */
 
 .ds-kbd{ display:inline-block;
-  font-family:var(--font-data); font-size:var(--fs-note); border:var(--hair) solid var(--line); border-bottom-width:2px;
+  font-family:var(--font-code); font-size:var(--fs-note); border:var(--hair) solid var(--line); border-bottom-width:2px;
   border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }

@@ -16,10 +16,10 @@ use super::tokenize::Located;
 /// `DsInternals`.
 pub(crate) const CONSUMER_SEAMS: &[&str] = &["data-slot"];
 
-/// The eleven attributes a `.ds` root carries that a consumer must never select on
+/// The twelve attributes a `.ds` root carries that a consumer must never select on
 /// (design/22-SETTINGS.md, CONVENTIONS §11, design/04-COMPONENTS.md "Shared vocabulary"): the
 /// scope's, the root chrome's `data-chrome`, `data-frame` and `data-ground` (bar gaps), and its
-/// `data-extent` (sheet and modal parts, sill Q94).
+/// `data-extent` (sheet and modal parts, sill Q94), and its `data-typeface`.
 const INTERNAL_ATTRS: &[&str] = &[
     "data-theme",
     "data-accent",
@@ -32,6 +32,7 @@ const INTERNAL_ATTRS: &[&str] = &[
     "data-frame",
     "data-ground",
     "data-extent",
+    "data-typeface",
 ];
 
 /// SVG element types whose paint never reaches a stylesheet rule (FINDINGS spike S6).

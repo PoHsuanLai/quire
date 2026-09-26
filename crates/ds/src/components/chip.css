@@ -4,7 +4,7 @@
    Person chip's flash (`a-chip-flash`: `0 0 0 3px var(--accent-soft)` held for `--t-flash`,
    `S:2119`). */
 
-.ds-chip{ font-family:var(--font-data); white-space:nowrap; }
+.ds-chip{ font-family:var(--font-data); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
 /* Accent: `S:198-199`. Label shares its shape (`C:941-944`). */
 .ds-chip[*|data-variant=accent],
