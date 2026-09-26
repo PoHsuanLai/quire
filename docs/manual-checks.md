@@ -13,6 +13,11 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
   track, low-battery colour, dark World Clock card, filled device glyphs, Space tint default.
 - [ ] **Level-control look** (progress page, OSD): Capsule (recommended) / CapsuleKnob / Segments.
 - [ ] **palmrest live steps**: section below.
+- [ ] **Lock decisions** (sill M11, done on nested): the lockout policy after failed passwords,
+  `lock_grace` (how long after the screen sleeps the password is still not asked), and whether
+  sill's own lock becomes the default over the borrowed locker.
+- [ ] **Widget follow-ups (optional)**: dim desktop widgets under a focused window (the reference
+  does), drag-to-move desktop widgets.
 - [ ] **A real sill login** (`dist/sill-session`): the first run of the whole desktop on real
   hardware; sill's queue lists what to look at (M7 login, M11 lock screen and polkit agent).
 - [ ] **Real-mouse and real-keyboard re-runs**: every live-input result before shell-host F47
