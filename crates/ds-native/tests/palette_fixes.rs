@@ -183,20 +183,29 @@ fn the_list_keeps_the_callers_selection_in_view() {
     );
 }
 
-/// Q340: the palette's own Down (no caller) scrolls too.
+/// Twenty-four rows in one group, as sill's real-input run had them.
+fn rows_24() -> PaletteGroups<u8> {
+    let rows = (0..24).map(|n| item(n, &format!("Row {n}"))).collect();
+    PaletteGroups(vec![PaletteGroup::list("Many", rows)])
+}
+
+/// Q340 under the palette's own keys (sill's real-input run): Down pressed eleven times in a
+/// 24-row group, with no caller holding the selection, brings row 11 (below the fold at rest)
+/// into view against the bottom edge; Up back to row 3 brings it in against the top edge. The
+/// palette is on a surface 420 px tall, as sill's launcher panel bounds it.
 #[test]
-fn down_past_the_fold_scrolls_the_palettes_own_selection_into_view() {
+fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
     #[allow(non_snake_case)]
     fn Own() -> Element {
         rsx! {
             Ds { appearance: Appearance::default(), material: Material::Sheet,
-                div { style: "width:600px; height:800px",
+                div { style: "width:600px; height:420px; display:flex; flex-direction:column",
                     CommandPalette::<u8> {
                         label: "Launch",
                         placeholder: "Search",
                         query: String::new(),
                         tokens: Vec::new(),
-                        groups: long_groups(),
+                        groups: rows_24(),
                         empty: "Nothing",
                         oninput: move |_| {},
                         onpick: move |_| {},
@@ -211,13 +220,38 @@ fn down_past_the_fold_scrolls_the_palettes_own_selection_into_view() {
     let mut harness = Harness::new(Own, VIEW);
     harness.advance(ms(200));
     let view = harness.rect("#card .ds-menu").expect("the list is drawn");
-    for _ in 0..12 {
+    let row_11 = harness
+        .rect("#card .ds-menu-item:nth-of-type(13)")
+        .expect("row 11 is laid out");
+    assert!(top(row_11) > bottom(view), "row 11 starts below the fold");
+    for _ in 0..11 {
         harness.key(Key::Down);
         harness.advance(ms(20));
     }
     harness.advance(ms(100));
+    assert_eq!(
+        harness
+            .text_of("#card .ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .as_deref(),
+        Some("Row 11")
+    );
     let shown = selected_rect(&harness);
-    assert!(inside(shown, view), "row 12 in view: {shown:?} in {view:?}");
+    assert!(inside(shown, view), "row 11 in view: {shown:?} in {view:?}");
+    assert!(
+        (bottom(shown) - bottom(view)).abs() < 1.0,
+        "against the bottom edge: {shown:?} in {view:?}"
+    );
+    for _ in 0..8 {
+        harness.key(Key::Up);
+        harness.advance(ms(20));
+    }
+    harness.advance(ms(100));
+    let up = selected_rect(&harness);
+    assert!(inside(up, view), "row 3 in view: {up:?} in {view:?}");
+    assert!(
+        (top(up) - top(view)).abs() < 1.0,
+        "against the top edge: {up:?} in {view:?}"
+    );
 }
 
 /// The words a claim's log writes for a caret.
