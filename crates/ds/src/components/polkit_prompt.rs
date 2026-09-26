@@ -28,7 +28,8 @@ const AUTHENTICATE: &str = "Authentication Required";
 /// and Cancel, Escape or a click on the scrim call `oncancel`. `state` is the caller's, as for
 /// [`crate::LockPrompt`]: `Checking` closes the field and the buttons but Cancel, `Wrong` shakes
 /// the field once and empties it, `LockedOut` says when it opens again. `shown` and `on_hidden`
-/// are the sheet's own, for a host that unmaps its surface after the exit.
+/// are the sheet's own, for a host that unmaps its surface after the exit. `panel_id` names the
+/// sheet's panel, for a host whose blur region resolves an element id (sill Q260).
 #[component]
 pub fn PolkitPrompt(
     #[props(into)] action: Text,
@@ -42,6 +43,7 @@ pub fn PolkitPrompt(
     oncancel: EventHandler<()>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
+    #[props(default)] panel_id: Option<String>,
 ) -> Element {
     let entry = use_secret_entry(&state, oninput);
     let availability = state.availability();
@@ -63,6 +65,7 @@ pub fn PolkitPrompt(
             placement: SheetPlacement::Centre,
             scrim: ScrimStrength::Modal,
             width: SheetWidth::Narrow,
+            id: panel_id,
             div { class: "ds-polkit", "data-state": state.slug(),
                 {prompt_picture(user.picture, AT_POLKIT, Liveliness::default())}
                 div { class: "ds-polkit-title", {title.unwrap_or_else(|| AUTHENTICATE.to_owned())} }

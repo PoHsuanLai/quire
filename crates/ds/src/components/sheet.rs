@@ -32,6 +32,8 @@ use dioxus::prelude::*;
 ///
 /// `width` is [`SheetWidth::Regular`] (560) by default, [`SheetWidth::Narrow`] (340) for an
 /// alert or a password prompt.
+///
+/// `id` names the panel element, for a host that resolves its blur or input region by id.
 #[component]
 pub fn Sheet(
     label: String,
@@ -41,6 +43,7 @@ pub fn Sheet(
     #[props(default)] placement: SheetPlacement,
     #[props(default)] scrim: ScrimStrength,
     #[props(default)] width: SheetWidth,
+    #[props(default)] id: Option<String>,
     children: Element,
 ) -> Element {
     let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
@@ -64,6 +67,7 @@ pub fn Sheet(
     let panel = rsx! {
         div {
             class: "ds-sheet",
+            id,
             "data-presence": showing.slug(),
             "data-placement": placement.attribute(),
             "data-width": width.attribute(),
