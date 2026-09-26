@@ -87,11 +87,22 @@ pub enum DurationToken {
     /// its percentage counting alongside (design/23-WIDGETS.md sections 1.1 and 4.1). Driven
     /// frame by frame from Rust at `--e-out`; no keyframe plays it.
     Fill,
+    /// `--t-sweep` 700 ms (Calm 500, Extra 900): an arc or bar sweeping in from zero, and the
+    /// count in step with it, on Appear (design/26-DETAILS.md section 3.4). Reduced plays no
+    /// sweep at all: the primitive shows the target at once.
+    Sweep,
+    /// `--t-count-step` 33 ms: the floor between two repaints of a counting number (30 Hz), so
+    /// 0 to 93 over `--t-sweep` is at most 21 text frames (design/26 section 3.4). A
+    /// [`DurationKind::Hold`]: a repaint floor, not motion.
+    CountStep,
+    /// `--t-pending-step` 300 ms (Calm 360): one step of a bounded pending loop, linear
+    /// (design/26 section 3.4); a four-layer Wi-Fi cycle is 1200 ms.
+    PendingStep,
 }
 
 impl DurationToken {
     /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 25] = [
+    pub const ALL: [DurationToken; 28] = [
         DurationToken::Tap,
         DurationToken::Quick,
         DurationToken::Move,
@@ -117,6 +128,9 @@ impl DurationToken {
         DurationToken::Flash,
         DurationToken::Awake,
         DurationToken::Fill,
+        DurationToken::Sweep,
+        DurationToken::CountStep,
+        DurationToken::PendingStep,
     ];
 
     /// The custom property: `--t-tap`, `--t-big-heavy`, …
@@ -147,6 +161,9 @@ impl DurationToken {
             DurationToken::Flash => "--t-flash",
             DurationToken::Awake => "--t-awake",
             DurationToken::Fill => "--t-fill",
+            DurationToken::Sweep => "--t-sweep",
+            DurationToken::CountStep => "--t-count-step",
+            DurationToken::PendingStep => "--t-pending-step",
         })
     }
 
@@ -164,6 +181,8 @@ impl DurationToken {
         match self {
             // The undo window is time a person has to act, not motion (mailo gaps 3).
             DurationToken::Flash | DurationToken::SendRing => DurationKind::Hold,
+            // A repaint floor for a counting number: it paces text, it does not move anything.
+            DurationToken::CountStep => DurationKind::Hold,
             _ => DurationKind::Motion,
         }
     }
@@ -177,6 +196,9 @@ impl DurationToken {
         match (self, level) {
             (DurationToken::Big, MotionLevel::Calm) => 300,
             (DurationToken::Big, MotionLevel::Extra) => 560,
+            (DurationToken::Sweep, MotionLevel::Calm) => 500,
+            (DurationToken::Sweep, MotionLevel::Extra) => 900,
+            (DurationToken::PendingStep, MotionLevel::Calm) => 360,
             // `calc(var(--t-big) * 1.15)`, rounded as section 3.4 lists it: Calm 345,
             // Standard 483, Extra 644. Crumple runs at `--t-big`, so its heavy form is the same.
             (DurationToken::BigHeavy | DurationToken::CrumpleHeavy, level) => {
@@ -206,6 +228,9 @@ impl DurationToken {
             (DurationToken::Flash, _) => 1200,
             (DurationToken::Awake, _) => 20000,
             (DurationToken::Fill, _) => 800,
+            (DurationToken::Sweep, _) => 700,
+            (DurationToken::CountStep, _) => 33,
+            (DurationToken::PendingStep, _) => 300,
         }
     }
 }

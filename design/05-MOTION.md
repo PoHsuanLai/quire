@@ -190,6 +190,12 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | `FRAME_SLACK` | 34ms | Rust-only | added to every `settle()` | plan, `time.rs` |
 | `--t-fill` | 800ms | Rust-driven (no keyframe) | a battery ring's fill and its counting figure (4.12) | design/23 section 1.1 |
 | `FRAME_TICK` | 16ms | Rust-only | the sampling rate of a motion driven from Rust (`use_level_run`), not a design duration | `time.rs` |
+| `--t-sweep` | 700ms (Calm 500, Extra 900; Reduced: no sweep, the primitive shows the target at once) | CSS and Rust | an arc or bar sweeping in on Appear, and the count in step with it (`ds::detail::Sweep`, `CountUp`) | design/26 §3.4 |
+| `--t-count-step` | 33ms, every level | Rust repaint floor (a hold: Reduced keeps it) | a counting number repaints its text at most this often | design/26 §3.4 |
+| `--t-pending-step` | 300ms (Calm 360), linear | CSS and Rust | one step of a bounded pending loop (`use_pending`); a four-layer cycle is 1200ms | design/26 §3.4 |
+| PendingGrace | 400ms, every level | Rust-only | a pending loop shows only if the operation is still running after this | design/26 §3.4, R4 |
+| PendingCap | 10s, every level | Rust-only | after this a pending loop holds its still frame; the most a `PendingToken`'s deadline can be | design/26 §3.4, R4 |
+| SettleHold | 900ms, every level | Rust-only | how long a success check stays drawn | design/26 §3.4, R14 |
 
 `--tilt` has no Reduced/Calm meaning beyond 0deg; the drag ghost simply does not tilt.
 
