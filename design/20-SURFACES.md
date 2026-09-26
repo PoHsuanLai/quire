@@ -150,7 +150,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | --- | --- | --- |
 | Layer / role | `ext-session-lock-v1` lock surface per output (not layer-shell) | S |
 | Material | `Window` (opaque); background = pre-blurred wallpaper crop | P |
-| Components | clock (display face), `Avatar`, `TextInput{Boxed}` password, `Button{Primary}` | P |
+| Components | clock (display face), `Avatar` (or the user's `Persona` through `UserPicture`, design/24: Attentive while typing, Wince on a wrong password, Happy on unlock, Asleep with the display off), `TextInput{Boxed}` password, `Button{Primary}` | P |
 | Motion | password error `shake-x` 420 ms `(.36,.07,.19,.97)` once; unlock `fade` `--t-move` `--e-exit` | S / P |
 | Behaviours | lock before sleep on logind `PrepareForSleep` (SPEC); 06 (Escape clears field) | S |
 | Keyboard | lock surfaces always receive keyboard | S |
