@@ -80,6 +80,42 @@ is a ratio.
 | M23 | World Clock card | `#1c1c1e`, dark in the light scheme too | R-cm, and the same widget in Apple's newsroom images | M |
 | M24 | Clock labels | the city bold white, cap about 7.5 (11 pt type); the day and the offset bold grey (`#5b5b5e` on the dark card), the same size, on two lines; 6.5 from the dial to the city | R-cm: white and grey text rows | M |
 | M25 | Header row | none on Batteries or Clock: the content fills the card | every source | M |
+| M26 | Card see-through, blurred (R-bm) | the card is `C = a T + (1 - a) sat(G_s * W)`: a Gaussian blur of sigma **22 pt** (45 px at 2x; the best fit lies between 40 and 50 px, rms 4.4 levels of 255; with no saturation gain 4.7 at 25 pt, 5.9 at 35 pt, 8.0 at 4 pt and 8.6 unblurred) | R-bm: the same wallpaper W stands bare in the first of the three screenshots and under the large card in the third, so W under the card is known; 908 card-plate samples clear of text and rules, W blurred at 13 radii and fitted by least squares | M |
+| M27 | Tint alpha, blurred (R-bm) | **.48** (.47-.51 across the best radii) | R-bm, the fit in M26 | M |
+| M28 | Tint colour, blurred (R-bm) | a near-white, `rgb(247,248,248)`; the card over black would be 119 grey | R-bm, the fit in M26: `u = a T` = (119,120,120) | M |
+| M29 | Saturation | **x1.8** of what shows through (1.4-2.0 fit alike; x1.0 fits 6 % worse, rms 4.70 against 4.43); the desktop card R-bs shows none (its chroma is `1 - a` of the wallpaper's to within 6 %) | R-bm: `sat` in M26 scales the blurred wallpaper's distance from its luma; R-bs: the card's chroma against the wallpaper's beside it | L |
+| M30 | Card see-through, desktop (R-bs, R-bg) | a straight mix, **no blur** (the wallpaper's band edges cross the card in 1-2 px at 2x, as sharp as outside), alpha **.65** of a mid grey `rgb(176,172,171)` (the card over black would be 115 grey); fit rms 1.0 | R-bs, R-bg (same session, the same pixels): three flat band pairs (orange, deep red, green) inside against the wallpaper beside the card, a shared alpha by least squares | M |
+| M31 | World Clock card, translucent? | **opaque**: every plate pixel is `#1c1c1e` exactly over a forest backdrop that varies from (45,47,40) to (176,164,126) beside it; with a window in front (the desktop's background mode) the same widget joins the shared translucent look | R-cm: the plate's pixels along two rows and a column; Intego `widgets7.png` for the background mode | M |
+| M32 | Outer rim | a 1 pt dark rim (2 px at 2x), the wallpaper times .88 (black at about .12); the blurred phone card R-bm has none | R-bs: rows and columns across the four edges | M |
+| M33 | Inner rim | lighter, not darker: the first pixels inside are 4-10 levels over the plate, fading over about 6 pt; no top highlight stronger than the sides | R-bs: the same rows and columns | M |
+| M34 | Shadow | short and soft, deeper below: about `0 2pt 8pt` (sigma 4 pt) black .12-.15 (the wallpaper darkened .10 at the bottom edge, .05 at the top and .04 at the sides, fading over 8 pt); R-bm has none | R-bs: the wallpaper's darkening outside each edge against 20 pt out | M |
+
+**How M26-M34 were measured (2026-09-26, the vibrancy pass).** A card over a blur is modelled as
+`C = a T + (1 - a) sat_s(G_sigma * W)`: `W` the wallpaper, `G_sigma * W` its Gaussian blur (Pillow
+`GaussianBlur`, whose radius is sigma), `sat_s` a saturation gain about Rec. 709 luma, `T` the tint,
+`a` its alpha. For each sigma and s on a grid, `a` and `u = a T` are the least-squares solution of
+the three channels' linear equations over the samples; the best (sigma, s) is the lowest residual.
+R-bm is the one source where the wallpaper under a card is visible elsewhere (its three phone
+screenshots share a wallpaper at the same offset, to 1.6 levels of JPEG noise); R-bs has no clean
+wallpaper, so its bands, flat inside and nearly flat outside, are paired across the card's edge.
+The two sources disagree on blur (22 pt against none) and agree on the tone the tint gives: the
+card over black would be 115-119 grey, the card lets .35-.52 of the wallpaper through. The
+desktop screenshots with the desktop in front (Aqua library, `14-Sonoma-Desktop-Widgets.png`)
+show the cards opaque; the translucent look is the desktop's background mode and its widget
+editing mode.
+
+**What quire paints (the conflict).** The legibility gate (`material-legible-over-black-and-white`,
+`tests/legibility.rs`) needs the card's `--ink` at 4.5:1 over a black and a white backdrop, and the
+Space-tinted card (`CardTint::Space`) shares the tint's alpha; the lowest light alpha that passes
+both is .60 (at .58 preset 2's stop `#f3dcd8` falls to 4.43:1 over black). The measured .48 over a
+near-white (3.77:1 over black, 3.86 once boosted) and .65 over a mid grey (3.43:1) both fail it. So the light
+tint keeps alpha .60 and takes the colour that best fits the measured tone at that alpha: over a
+wallpaper `B`, the reference is about `.52 B + 119` (M26-M28) and a tint `T` at .60 paints
+`.40 B + .60 T`, closest over the wallpaper's range at `.60 T` = 134-137, a neutral grey that the
+vibrancy boost lands on `rgb(228,228,228)`, the reference's own opaque plate (R-cs's plate around
+the dragged clock is `rgb(228,228,228)`), 4.82:1 over black. The x1.8 saturation (M29) is the
+compositor's to add (section 4.3); the dark scheme was not measured and keeps .67 of the dark
+paper.
 
 ## 2. Flat, bright, measured
 
@@ -207,6 +243,25 @@ tinted chrome's layer) over the plate at the material's frame alpha, under the c
 Space's colour reaches the card (Arc's contribution). The optional title row is quiet: the glyph
 at 12 and the name in the UI face 600 `--fs-caption` `--ink-soft`; the Batteries and Clock
 widgets pass none.
+
+**The card's see-through (vibrancy pass, 2026-09-26).** Over compositor blur the light card
+paints a neutral grey, `rgb(228,228,228)` at .60 (the reference's .48 cannot pass the legibility
+gate, section 1.1), with a 1 pt dark rim outside (`--m-hairline` at `var(--hair)`), a 1 pt white
+rim at .10 inside (`--m-edge`) and a short drop `0 2px 8px` black .12 (`--m-shadow`) (M32-M34);
+without blur `--m-tint-solid` is the same grey at .94. The dark card is unchanged but for the
+1 pt rim. The World Clock card of the reference is opaque `#1c1c1e` (M31); ours stays the
+material's (open decision 4).
+
+**Compositor blur, recommended (for sill and the compositor).** Blur behind a desktop widget
+with a Gaussian of **sigma 22 logical pixels** (M26): 44 device pixels at 2x. On a compositor that
+blurs by a dual-Kawase pass count or a "strength" (COSMIC's `frosted` theme value), pick the
+setting whose blur of a sharp edge spreads 10-90 % over about 56 logical pixels (2.56 sigma). The
+reference also raises the saturation of what shows through by about 1.8 (M29, low confidence);
+the tint cannot do that (it only mixes), so it is a compositor gap: `sill/docs/cosmic-gaps.md`
+should carry "saturation x1.8 inside the widget's blur region". Blur on the desktop widget is a
+choice the shell may skip: the reference's desktop card in its editing mode shows no blur at all
+(M30), and the gallery's "Compositor blur" wall (the Widget reference page) shows the tint over
+the blur the fit implies.
 
 ## 5. Calendar widget (research and specification only; queued)
 

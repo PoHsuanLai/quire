@@ -19,6 +19,7 @@ mod snapshot;
 mod style;
 mod toolbar;
 mod wallpaper;
+mod wallpaper_vivid;
 
 #[cfg(test)]
 mod tests;
