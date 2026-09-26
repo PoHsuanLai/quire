@@ -1,8 +1,13 @@
 //! SyncHalo: a ring around an account avatar, breathing while idle and spinning while syncing
 //! (design/04-COMPONENTS.md section 35).
+//!
+//! Mail's (mailo pins quire by tag), and unchanged by design/26's first wave: its two rings still
+//! loop for as long as they show (design/05 section 12 item 4 proposes removing the idle breathe;
+//! mailo decides). It draws the Spinner's ring markup itself, because the `Spinner` component is
+//! now a bounded pending loop that needs an `Operation`; the loops live in `sync_halo.css`, the
+//! one stylesheet the details lint lets loop for this reason.
 
 use crate::components::avatar::{Avatar, AvatarSize, AvatarTone};
-use crate::components::spinner::{Spinner, SpinnerKind};
 use dioxus::prelude::*;
 
 /// Whether the account is syncing.
@@ -24,11 +29,12 @@ impl SyncState {
         }
     }
 
-    /// The ring it wears: Breathe while idle, Spin while busy (`C:288-292`).
-    fn ring(self) -> SpinnerKind {
+    /// The ring it wears, as the Spinner's `data-kind`: Breathe while idle, Spin while busy
+    /// (`C:288-292`).
+    fn ring(self) -> &'static str {
         match self {
-            SyncState::Idle => SpinnerKind::Breathe,
-            SyncState::Busy => SpinnerKind::Spin,
+            SyncState::Idle => "breathe",
+            SyncState::Busy => "spin",
         }
     }
 }
@@ -39,7 +45,7 @@ impl SyncState {
 pub fn SyncHalo(initial: char, tone: AvatarTone, state: SyncState) -> Element {
     rsx! {
         div { class: "ds-account-ring", "data-sync": state.slug(),
-            Spinner { kind: state.ring() }
+            span { class: "ds-spinner", "data-kind": state.ring(), "aria-hidden": "true" }
             Avatar { initial, size: AvatarSize::Size30, tone }
         }
     }

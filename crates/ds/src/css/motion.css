@@ -248,3 +248,24 @@
    lift and the landing. In shares of the picture's own box, so every size moves alike. Played
    once and at rest after, so a picture paints nothing once it has landed. */
 @keyframes picture-accept{ 0%{ transform:none; } 35%{ transform:translateY(-8%) scale(1.03); } 100%{ transform:none; } }
+
+/* The small-state details' own (quire's, design/26-DETAILS.md section 3.2). Each plays once on
+   an HTML wrapper and ends at rest; nothing here loops. */
+
+/* morph-in, morph-out: a glyph that changes state grows in from .7 as the old one shrinks to .7
+   and fades (MorphStyle::DownUp; OffUp plays only morph-in). */
+@keyframes morph-in{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
+@keyframes morph-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
+
+/* morph-fade-out: the outgoing glyph of a cross-fade (MorphStyle::CrossFade); the incoming one
+   plays `fade`. */
+@keyframes morph-fade-out{ from{ opacity:1; } to{ opacity:0; } }
+
+/* roll-in, roll-out: a digit that changed rolls up into its place as the old one rolls out
+   above it (RollDigits). */
+@keyframes roll-in{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
+@keyframes roll-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
+
+/* nudge-up: attention, once (design/26 Attention): the element lifts and settles. `nudge` is
+   the centred outbox pill's and carries its translateX(-50%). */
+@keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }

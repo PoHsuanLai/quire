@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 67 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 75 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -20,7 +20,9 @@
 //! notification banner's slide out by its entry edge (sill Q121, Q122), and `BannerIn`, its
 //! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123),
 //! plus `ShotIn` and `ShotOut`, the screenshot thumbnail's pair (sill Q181), plus
-//! `PictureAccept`, the user picture's accept beat on unlock (design/25-EMOJI.md section 7).
+//! `PictureAccept`, the user picture's accept beat on unlock (design/25-EMOJI.md section 7), plus the small-state details' eight (design/26-DETAILS.md
+//! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`, `RollIn`, `RollOut`,
+//! `SealOut` and `NudgeUp`.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -192,6 +194,22 @@ pub enum Anim {
     /// `--t-big --e-spring` when the password was right (the answer to the user's own contact, so
     /// it may spring; design/25 section 7). A lock screen unlocks at its `settle`.
     PictureAccept,
+    /// `morph-in`: a glyph growing into a new state (design/26 `MorphGlyph`).
+    MorphIn,
+    /// `morph-out`: the glyph it replaces shrinking away.
+    MorphOut,
+    /// `fade` at `--t-quick`: a cross-fade's incoming glyph.
+    MorphFadeIn,
+    /// `morph-fade-out`: a cross-fade's outgoing glyph.
+    MorphFadeOut,
+    /// `roll-in`: a changed digit rolling into place (`RollDigits`).
+    RollIn,
+    /// `roll-out`: the digit it replaces rolling away.
+    RollOut,
+    /// `gulp` at `--e-out`: a success seal nobody touched (design/26 R5).
+    SealOut,
+    /// `nudge-up`: attention, once (design/26 `use_nudge`).
+    NudgeUp,
 }
 
 impl Anim {
@@ -202,7 +220,7 @@ impl Anim {
     pub const PersonaHop: Anim = Anim::PictureAccept;
 
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 67] = [
+    pub const ALL: [Anim; 75] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -270,6 +288,14 @@ impl Anim {
         Anim::ShotIn,
         Anim::ShotOut,
         Anim::PictureAccept,
+        Anim::MorphIn,
+        Anim::MorphOut,
+        Anim::MorphFadeIn,
+        Anim::MorphFadeOut,
+        Anim::RollIn,
+        Anim::RollOut,
+        Anim::SealOut,
+        Anim::NudgeUp,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -342,6 +368,14 @@ impl Anim {
             Anim::ShotIn => "a-shot-in",
             Anim::ShotOut => "a-shot-out",
             Anim::PictureAccept => "a-picture-accept",
+            Anim::MorphIn => "a-morph-in",
+            Anim::MorphOut => "a-morph-out",
+            Anim::MorphFadeIn => "a-morph-fade-in",
+            Anim::MorphFadeOut => "a-morph-fade-out",
+            Anim::RollIn => "a-roll-in",
+            Anim::RollOut => "a-roll-out",
+            Anim::SealOut => "a-seal-out",
+            Anim::NudgeUp => "a-nudge-up",
         }
     }
 }

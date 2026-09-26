@@ -2,7 +2,8 @@
 //! coherence rule 1: every downstream crate runs this same check on its own CSS, and quire's
 //! own output has to pass it too).
 //!
-//! Two rules exist only for consumers and are set aside whole: [`Rule::DsInternals`] (quire is
+//! The details grammar's two rules are judged per sheet in `details_lint.rs`, which names the
+//! sheets allowed to loop. Two rules exist only for consumers and are set aside whole: [`Rule::DsInternals`] (quire is
 //! the one crate that styles `.ds-*` and `.ds[data-*]`) and [`Rule::Keyframes`] (quire is where
 //! keyframes live). Every other rule must be clean, [`Rule::RawSpacing`] included (the sheets
 //! read `--s-*` since the polish pass), or name its exact selector and reason below.
@@ -44,6 +45,8 @@ const INLINE_VARS: &[&str] = &[
     "--swipe-dx",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
+    // A stepping spinner's angle (`Spinner`, design/26 R4).
+    "--turn",
 ];
 
 const EXCEPTIONS: &[Exception] = &[
@@ -82,6 +85,8 @@ fn quires_own(offence: &Offence) -> bool {
             offence.selector.starts_with(".ds") || offence.selector.starts_with(":where(.ds)")
         }
         Rule::Keyframes => offence.selector.starts_with("@keyframes "),
+        // Judged sheet by sheet, with each allowed loop's reason, in `details_lint.rs`.
+        Rule::InfiniteLoop | Rule::OffGrammarTiming => true,
         _ => false,
     }
 }

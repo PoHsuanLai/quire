@@ -44,11 +44,22 @@ pub enum DelayToken {
     /// 300 ms: an `EditSurface` checks the paragraphs that changed once the typing has paused
     /// this long (proposed, design/04-COMPONENTS.md section 50).
     SpellDebounce,
+    /// 400 ms: a pending loop shows only if its operation is still running after this, so a
+    /// fast join shows no loop at all (design/26-DETAILS.md section 3.4, R4, proposed). It
+    /// measures the operation, not motion: Reduced keeps it.
+    PendingGrace,
+    /// 10 s: after this a pending loop holds its still frame while the operation continues, so
+    /// a stuck operation costs 0 frames (design/26 section 3.4, R4, proposed). The only length
+    /// a `PendingToken`'s deadline may reach.
+    PendingCap,
+    /// 900 ms: how long a success check stays drawn before the element rests or leaves
+    /// (design/26 section 3.4, R14, proposed). Reading time: Reduced keeps it.
+    SettleHold,
 }
 
 impl DelayToken {
     /// Every delay, in table order.
-    pub const ALL: [DelayToken; 15] = [
+    pub const ALL: [DelayToken; 18] = [
         DelayToken::Fly,
         DelayToken::HoverOpen,
         DelayToken::HoverClose,
@@ -64,6 +75,9 @@ impl DelayToken {
         DelayToken::FlashHold,
         DelayToken::SwipeQuiet,
         DelayToken::SpellDebounce,
+        DelayToken::PendingGrace,
+        DelayToken::PendingCap,
+        DelayToken::SettleHold,
     ];
 
     /// The custom property, for the delays the stylesheet also reads (`--d-fly`, the heal step).
@@ -83,7 +97,10 @@ impl DelayToken {
             | DelayToken::FocusAfterMount
             | DelayToken::FlashHold
             | DelayToken::SwipeQuiet
-            | DelayToken::SpellDebounce => None,
+            | DelayToken::SpellDebounce
+            | DelayToken::PendingGrace
+            | DelayToken::PendingCap
+            | DelayToken::SettleHold => None,
         }
     }
 
@@ -110,6 +127,9 @@ impl DelayToken {
             DelayToken::FlashHold => 1200,
             DelayToken::SwipeQuiet => 120,
             DelayToken::SpellDebounce => 300,
+            DelayToken::PendingGrace => 400,
+            DelayToken::PendingCap => 10_000,
+            DelayToken::SettleHold => 900,
         })
     }
 }

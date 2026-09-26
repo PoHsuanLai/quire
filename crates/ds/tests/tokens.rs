@@ -290,6 +290,8 @@ const PER_ELEMENT: &[&str] = &[
     "--swipe-dx",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
+    // A stepping spinner's angle (`Spinner`, design/26 R4).
+    "--turn",
 ];
 
 #[test]

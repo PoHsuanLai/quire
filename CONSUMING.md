@@ -1698,6 +1698,84 @@ vello_cpu.
 | Frame time | `Harness::paint_timed() -> Result<PaintTime, _>` | Paints over the scheme ground without reading back. `PaintTime { scene, total }`, `render()` = `total - scene`. vello_hybrid: submitted and the device polled until the GPU finishes, so `total` includes the GPU. Style and layout happen in the input call before (`wheel`, `click`): time that yourself |
 | The emoji-grid benchmark | `cargo test -p ds-native --release --test hybrid_backend -- --ignored --nocapture` | 300 `.ds-emoji-text` cells scrolled 180 frames on vello_cpu and each distinct GPU |
 
+### Details (2026-09-27): small state details through `ds::detail`
+
+design/26-DETAILS.md, wave D0. FINDINGS.md "Details D0". Everything is in `ds::detail`; `Spinner`
+is the one breaking change (below).
+
+**How a component plays a detail.** Keep your state as your own enum and implement `Detailed`
+for it: the one place that says what each change *means* (a `Moment`). Write both functions as
+exhaustive `match`es with no catch-all `_` arm, so a new variant fails to compile until
+its moments are decided. Compare what the person sees (three bars, 80 %), not the raw value
+(R2). Then track the state with `use_detail` and hand its `Cue` to the primitives:
+
+```rust
+use ds::detail::{
+    Detailed, FirstShow, Layers, Moment, PendingSpec, PendingStyle, SettleStyle, Touch,
+    use_detail, use_operation, use_pending, use_settle, use_shake, moment_table,
+};
+
+#[derive(Debug, Clone, PartialEq)]
+enum Link { Off, Joining, Joined }
+
+impl Detailed for Link {
+    fn moment(from: &Self, to: &Self) -> Moment {
+        match (from, to) {
+            (_, Link::Joining) => Moment::Pending,
+            (Link::Joining, Link::Joined) => Moment::Success,
+            (Link::Off | Link::Joined, Link::Joined) => Moment::Change,
+            (Link::Off | Link::Joining | Link::Joined, Link::Off) => Moment::Unavailable,
+        }
+    }
+    fn first(state: &Self) -> Moment {
+        match state {
+            Link::Joining => Moment::Pending,
+            Link::Off | Link::Joined => Moment::Rest, // bar chrome is always there (R1)
+        }
+    }
+}
+
+// In the component:
+let detail = use_detail(link, FirstShow::Still, Touch::Remote);
+let frame = use_pending(use_operation(detail.cue()), PendingSpec { style: PendingStyle::Iterate, layers: Layers(4) });
+let settling = use_settle(detail.cue(), SettleStyle::Fill(Layers(4)));
+
+// In its tests: the table as data.
+moment_table(&[(Link::Off, Link::Joining, Moment::Pending), (Link::Joining, Link::Joined, Moment::Success)]);
+```
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| Track a state | `use_detail(state, FirstShow, Touch) -> Detail<S>` | `.state()`, `.moment()`, `.cue()`. The first frame is `S::first` (an Appear only with `FirstShow::Animate`: the surface was just opened, R1); each change after is `S::moment(old, new)`. The same state rendered again replays nothing; a newer change supersedes (R11) |
+| What the primitives take | `Cue` | Only `use_detail` makes one (its fields are private), so a component cannot play a moment its own table does not name. `Moment` itself is a plain enum your `Detailed` impl returns |
+| Test a table | `moment_table(&[(from, to, Moment)])`, `first_table(&[(state, Moment)])` | Panics naming every row that differs |
+| Spring only on contact (R5) | `Touch::from_event(&event)` inside `onclick` / `onpointerdown` / `onkeydown` | `Touch::Contact(Contact)`; `Contact` has no other constructor, so a service or timer cannot claim one. `Ease::Spring(Contact)` in a `TweenSpec` and `SettleStyle::LockIn`'s `gulp` need it; everything else settles at `--e-out`. H1 (design/27) will put the release velocity inside `Contact`; its fields are private, so that is not a break |
+| A pending loop (R4) | `Operation::Running(PendingToken::start(Deadline::cap()))` where the operation starts (the handler, the service event), `Operation::Idle` when it ends; `use_pending(op, PendingSpec) -> PendingFrame` | `Idle` for `PendingGrace` (400 ms, so a fast join shows nothing), then `Step(n)` every `--t-pending-step`, then `Stalled` (0 frames) from the token's deadline for as long as the operation still runs. `Deadline::within(d)` clamps to `PendingCap` (10 s); a token cannot be written by hand. Reduced: `Stalled` after the grace. `PendingFrame::lit(spec, layer)`, `.slug()` |
+| A state that says "busy" but carries no token | `use_operation(detail.cue())` | Running for as long as the cue is a Pending moment, a new token per new Pending change (how `ModuleState::Busy` and `PromptState::Checking` bound their rings) |
+| An arc or bar sweeping | `use_sweep(level: Fraction, cue) -> Sweep`, `.share()` | Appear from zero over `--t-sweep` (700 ms; Calm 500, Extra 900), Change/Progress from where it is over `--t-quick`, retargeting mid-flight (R10); Reduced: the target at once. Rust-driven: write the share into an SVG path or a `--f` |
+| A number counting | `use_count_up(value: i64, cue, CountPace::InStep(sweep) \| CountPace::Own(DurationToken)) -> CountUp`, `.shown()` | Never past the target; repaints at most every `--t-count-step` (33 ms) |
+| Any other Rust-driven share | `use_tween(target, TweenSpec { duration, ease: Ease })` | `Tween::now()`, `progress()`, `landed()`; asks for frames only while it moves |
+| A list's first show | `Reveal { first: FirstShow, children }` | `rise` with `--stagger`, index capped at 12, only with `Animate` (R13) |
+| Success | `use_settle(cue, SettleStyle::{Fill(Layers), Check, LockIn}) -> Settling` | `Filling(n)`, `Drawing(Fraction)` (draw it with `CheckMark { settling, size }`; it holds `SettleHold`, 900 ms, then goes), `Sealing(PulseKey)` (`gulp` on contact, `seal-out` otherwise), then `Rest` |
+| Failure, attention | `use_shake(cue) -> PulseKey`, `use_nudge(cue) -> PulseKey` | Once per new change, identical every time, never for the same stamp again (R6); no shake under Reduced. Put `.attrs()` on an HTML wrapper |
+| Layers of a glyph | `LayerGlyph { icon, size, layering: Layering::{Whole, Pending(frame, spec), Filling(n)} }` | One `svg` per shape (`.ds-layer-part[data-lit]`), the Wi-Fi glyph's from the dot out; a stalled loop dims the glyph |
+| A glyph that changes | `MorphGlyph { icon, size, style: MorphStyle::{DownUp, OffUp, CrossFade, Slash}, slashed: Slashed }` | Plays on each new icon (Slash: on each `slashed` change); still on first frame; snaps under Reduced. Decorative: put the state in words beside it (R8) |
+| A readout that changes | `RollDigits { value: String }` | Only the changed digits roll |
+| Prove the idle-frame rule | `ds_native::harness::assert_settles_to_zero_frames(&mut harness)` | Within 3 s of wall clock, no CSS animation runs and no Rust timer wakes the document for 500 ms (`Harness::wakes()` counts wakes). End every moment's test with it |
+| Keep your CSS in the grammar | `Rule::InfiniteLoop` (every profile, an error) and `Rule::OffGrammarTiming` (`Profile::Details` only) | `InfiniteLoop`: `animation-iteration-count: infinite` or `infinite` in the `animation` shorthand. `Profile::Details` is `Strict` plus timing only by the grammar's tokens (`ds::detail::grammar`); opt in when your sheets pass |
+
+**Breaking: `Spinner` needs an operation.** `Spinner { kind, operation: Operation }`. It no
+longer loops: nothing for `PendingGrace`, a step per `--t-pending-step`, its still frame from the
+token's deadline. `ModuleTile` (`ModuleState::Busy`) and `LockPrompt` (`PromptState::Checking`)
+derive the operation from their own state; you pass nothing new. `PromptState` and `ModuleState`
+implement `Detailed` (`PromptState::Accepted` is a Success).
+
+**Not changed:** `SyncHalo`, `SendPill`'s ring, `SidebarItem`'s drop pulse and the `Anim` loop
+rows (`Dest`, `Breathe`, `Spin`, `Busy`) keep their loops for mailo to decide (design/05 §12
+item 4). A consumer sheet that plays one of those keyframes `infinite` itself now fails
+`InfiniteLoop`: rebuild it on `use_pending`, or name it in your `LintConfig::exceptions` with its
+reason.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive

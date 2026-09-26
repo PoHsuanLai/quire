@@ -165,3 +165,19 @@
 .g-emoji-cell{align-items:center}
 .g-emoji-reactions{gap:var(--s-22);align-items:flex-start}
 .g-emoji-sizes{align-items:flex-end;gap:var(--s-12)}
+/* Details page (design/26-DETAILS.md): one cell per primitive, its well above its caption and
+   the buttons that move it. */
+.g-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-12)}
+.g-detail-cell{display:flex;flex-direction:column;gap:var(--s-10);padding:var(--s-12);border-radius:var(--r-panel);background:var(--surface-2)}
+.g-detail{display:flex;align-items:center;justify-content:center;gap:var(--s-12);min-height:72px;padding:var(--s-10) var(--s-14);border-radius:var(--r-small);background:var(--surface);color:var(--ink)}
+.g-detail-list{flex-direction:column;align-items:stretch;justify-content:flex-start}
+.g-detail-word{font-size:var(--fs-small);color:var(--ink-soft);min-width:84px}
+.g-bar{position:relative;width:160px;height:10px;border-radius:var(--r-pill);background:var(--line);overflow:hidden}
+.g-bar-fill{height:100%;border-radius:var(--r-pill);background:var(--accent)}
+.g-figure{font-family:var(--font-data);font-size:var(--fs-title);min-width:48px}
+.g-check-well{display:grid;place-items:center;width:22px;height:22px;color:var(--ok)}
+.g-shake-field{padding:var(--s-6) var(--s-14);border-radius:var(--r-pill);background:var(--raise);box-shadow:var(--shadow-1);color:var(--ink-faint)}
+.g-nudge-bell{display:inline-block}
+.g-seal{width:36px;height:36px;border-radius:var(--r-pill);background:var(--accent)}
+.g-spin-well{position:relative;display:grid;place-items:center;width:32px;height:32px;margin:var(--s-6);border-radius:var(--r-pill);background:var(--paper);color:var(--ink-soft)}
+.g-reveal-row{padding:var(--s-4) var(--s-10);border-radius:var(--r-small);background:var(--surface-2);font-size:var(--fs-small);margin-bottom:var(--s-4)}

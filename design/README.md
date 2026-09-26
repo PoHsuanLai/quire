@@ -28,6 +28,7 @@ against them.
 | `23-WIDGETS.md` | Desktop widgets' depth language, the battery and clock candidate looks, the calendar widget brief. |
 | `24-PERSONA.md` | Dropped 2026-09-26 in favour of emoji: what the persona was and what carried over. |
 | `25-EMOJI.md` | Animated emoji and the user's picture: source and CC BY 4.0 attribution, the curated set, the sheet pipeline, moods, frame budget, the idle rule; the picture's kinds, stored choice, accept beat and picker (section 7). |
+| `26-DETAILS.md` | The grammar of small state details: the moments every stateful element passes through, the primitives that play them, and a per-element catalogue with the reference, today and the gap. |
 | `27-HIG-PARITY.md` | Audit against the pre-2025 (macOS 14/15) HIG: archived snapshots, gaps ranked, a verdict and rule per HIG page, proposed waves H0-H7. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
@@ -38,7 +39,7 @@ against them.
 3. `04-COMPONENTS.md`, `05-MOTION.md`, `06-INTERACTIONS.md` (the building blocks).
 4. `07-LOOKS.md`, `08-ICONS.md`, `09-ARC-HEURISTICS.md`, `21-SPACES.md` (the look and the workflow around them).
 5. The BEHAVIOUR doc for what you build (`10`-`13`).
-6. `20-SURFACES.md` for your surface's row.
+6. `20-SURFACES.md` for your surface's row; `26-DETAILS.md` for its elements' state details.
 7. `CHECKLIST.md` before asking for review.
 
 An agent brief names the sections to read; it does not replace this order for new readers.

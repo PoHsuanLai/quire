@@ -5,3 +5,11 @@
 
 .ds-account-ring{ position:relative; width:30px; height:30px; flex:none; }
 .ds-account-ring .ds-avatar{ position:absolute; inset:0; border-radius:var(--r-pill); font-size:var(--fs-control); }
+
+/* The halo's two rings, which loop (mail's, unchanged by design/26 D0: the Spinner component is a
+   bounded pending loop now, and this is the one place the old loops remain, TODO(O-9, O-25)). */
+.ds-account-ring > .ds-spinner[*|data-kind=breathe]{ animation:breathe var(--t-ambient) var(--e-in-out) infinite; }
+.ds-account-ring > .ds-spinner[*|data-kind=spin]{
+  opacity:.9; transform:none; border-style:dashed;
+  animation:spin var(--t-spin) var(--e-linear) infinite;
+}

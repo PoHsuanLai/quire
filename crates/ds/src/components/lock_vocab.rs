@@ -4,6 +4,7 @@
 
 use crate::components::user_picture::UserPicture;
 use crate::components::vocab::Availability;
+use crate::detail::{Detailed, Moment};
 
 /// Where the current Space's colour reaches on the lock screen. The reference lock screen is
 /// white type and a white glass field over the wallpaper; Arc's colour may take the field.
@@ -77,6 +78,46 @@ impl PromptState {
     /// Whether this is the failed state, the one that shakes.
     pub(crate) fn is_wrong(&self) -> bool {
         matches!(self, PromptState::Wrong)
+    }
+}
+
+impl Detailed for PromptState {
+    /// Checking is the pending try (its arrow spins, bounded, R4); Wrong after it is the failure
+    /// (the field shakes once, R6); a lock-out closes the prompt; Accepted is the success (the
+    /// picture's accept beat); anything else is a Change.
+    fn moment(from: &Self, to: &Self) -> Moment {
+        match (from, to) {
+            (_, PromptState::Checking) => Moment::Pending,
+            (PromptState::Checking, PromptState::Wrong) => Moment::Failure,
+            (_, PromptState::LockedOut { .. }) => Moment::Unavailable,
+            (_, PromptState::Accepted) => Moment::Success,
+            (
+                PromptState::Idle
+                | PromptState::Wrong
+                | PromptState::LockedOut { .. }
+                | PromptState::Accepted,
+                PromptState::Wrong,
+            )
+            | (
+                PromptState::Idle
+                | PromptState::Checking
+                | PromptState::Wrong
+                | PromptState::LockedOut { .. }
+                | PromptState::Accepted,
+                PromptState::Idle,
+            ) => Moment::Change,
+        }
+    }
+
+    /// A prompt shown mid-try is an operation already running; otherwise it is simply there.
+    fn first(state: &Self) -> Moment {
+        match state {
+            PromptState::Checking => Moment::Pending,
+            PromptState::Idle
+            | PromptState::Wrong
+            | PromptState::LockedOut { .. }
+            | PromptState::Accepted => Moment::Rest,
+        }
     }
 }
 

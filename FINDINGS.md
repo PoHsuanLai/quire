@@ -4552,3 +4552,50 @@ only on vello_cpu. Branch `harness-hybrid`. API in CONSUMING.md "Hybrid harness 
   Blitz's `element_from_point` (`Harness::hits` is false over it), so `Harness::wheel` over it
   scrolls nothing; the same scroll container in normal flow scrolls. The benchmark's grid is in
   flow. Not investigated further.
+
+## Details D0 (2026-09-27)
+
+design/26-DETAILS.md wave D0 (D0a and D0b together): the grammar of small state details as
+types, its primitives, the bounded Spinner, the idle-frame assertion, two lint rules and the
+gallery's Details page. Branch `details-d0b`. API in CONSUMING.md "Details".
+
+- **Moved onto the rewritten history.** The first attempt (`details-d0`) was based on history
+  from before the identity rewrite; its eight commits were cherry-picked one by one onto master
+  and re-authored. Master had moved under them: the persona is gone (its `Drift` token,
+  keyframes, `Anim` rows and `--pa-*` vars were dropped from the details commits, and the
+  details' motion section is design/05 §4.13, after the battery fill's §4.12), `LockPrompt`
+  gained a `Field` struct and the user's picture (the Checking operation rides in `Field`), and
+  `PromptState::Accepted` is new (its moment is Success; first frame Rest).
+- **What the types enforce.** A primitive takes a `Cue`, which only `use_detail` makes from a
+  state's own `Detailed` table; a spring needs a `Contact`, which only a handler's event gives;
+  a pending loop needs a `PendingToken` whose deadline cannot pass `PendingCap`. `Moment` is a
+  plain enum (a table has to name moments), so "only via `use_detail`" holds for the `Cue` that
+  carries one, not for the enum.
+- **Idle frames are checked from both sides.** `is_animating()` sees only CSS; a Rust timer
+  (a tween, a pending step) wakes the document through its waker, so `Harness::wakes()` counts
+  those and `assert_settles_to_zero_frames` requires a 500 ms window with neither. Every
+  primitive and both `Detailed` components (`ModuleState`, `PromptState`) end their tests with
+  it; `details_layers.rs` covers the ones the first attempt had left out (`LayerGlyph` with a
+  Fill, `CheckMark`, LockIn on contact and remote, OffUp and CrossFade).
+- **The gallery page snapshots at rest.** `snapshot_at` runs no Rust timer, so an Appear sweep
+  would be caught at its first step; the page's specimens mount `FirstShow::Still` and each
+  replay mounts them `Animate`. `--detail-frames DIR` renders eight-frame strips of the sweep,
+  the pending loop, the check, the shake and the slash through a live harness. The check's
+  draw-on is faster than a frame strip's real render interval, so its strip shows it drawn by
+  the second frame; `details_layers.rs` checks the partial dash offsets instead.
+- **The lint on sill (2026-09-27, sill master b454262 against this branch).** All 22 of sill's
+  stylesheets under `Standard`, `Strict` and `Details`: 0 `InfiniteLoop`, 0 `OffGrammarTiming`
+  (sill times its motion with `--t-big`, `--t-move`, `--t-scene`, `--e-out` and `--e-exit`
+  only). sill's 14 `*_lint` tests (stylesheets and SSR markup) pass. So `InfiniteLoop` lands as
+  an error in every profile, as designed; sill has nothing to change.
+- **mailo** (pinned at v0.1.11). It uses none of `Spinner`, `ModuleTile`, `LockPrompt` or
+  `SyncHalo`, so the Spinner break does not reach it, and `SendPill` and `SidebarItem` keep
+  their loops. One thing breaks on the bump: `accounts.css`
+  `.files-look.acct-busy{ animation: busy var(--t-ambient) var(--e-in-out) infinite }` fails
+  `InfiniteLoop` in its Strict `our_stylesheet_lints_clean`. mailo either adds an exception
+  (`Rule::InfiniteLoop`, `.files-look.acct-busy`, with its reason) to `exceptions::STYLE`, or
+  drives the busy word from a `PendingToken` started with the account's sign-in and
+  `use_pending` (design/26 R4).
+- **Open.** The battery ring's fill (`use_level_run`, `--t-fill` 800 ms) predates `use_sweep`
+  (`--t-sweep` 700 ms) and should move onto it; until then `--t-fill` is outside the grammar's
+  durations. `Touch::Contact` carries no velocity yet (H1, design/27).

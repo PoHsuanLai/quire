@@ -66,6 +66,25 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
       `05-MOTION.md`.
 - [ ] Reduced motion level checked once (60 ms everywhere). Cite `05-MOTION.md`.
 
+## 5b. State details (26-DETAILS.md)
+
+- [ ] Every stateful component the change touches keeps its state as its own enum and implements
+      `Detailed`: its moments (Appear, Pending, Progress, Success, Failure, Change, Select,
+      Attention, Unavailable, Preview, Dismiss) are the ones its catalogue entry in 26 specifies.
+      A stateful component is not done until its moments are specified in 26 and implemented
+      with the primitives (`Sweep`, `CountUp`, `Reveal`, `Pending`, `Settle`, `Shake`,
+      `MorphGlyph`, `Nudge`), never with a one-off keyframe or timer. Cite
+      `26-DETAILS.md#5-the-catalogue`.
+- [ ] Its moment table is tested as data (`moment_table`), including the transitions that must be
+      `Rest` (a value that did not change as drawn, R2).
+- [ ] Each moment's harness test ends at rest: `is_animating() == false` after settle (R3); no
+      `infinite` animation anywhere.
+- [ ] A pending loop runs only while a real operation is pending, after `PendingGrace`, and holds
+      still after `PendingCap` (R4).
+- [ ] Springs only on `Touch::Contact` (R5); a failure shakes once and never escalates (R6).
+- [ ] Reduced shows every final state at once; every moment has a still state that carries its
+      meaning without motion (R7, R8).
+
 ## 6. Interactions
 
 - [ ] Full keyboard path: every action reachable, focus ring 2.5 px accent offset 2.
