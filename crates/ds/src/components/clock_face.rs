@@ -2,14 +2,18 @@
 //! "Widgets"; sill FINDINGS Q183), an analog dial for the medium and large widgets or the time
 //! as digits for the small one, with the zone's name under it.
 //!
-//! The analog dial is drawn in the soft language (design/23 section 2): a well pressed into the
-//! plate, of the plate's own colour by day and ink-dark by night, four quarter marks, thick
-//! round hands that stand out of it, a small hub and a thin accent second hand. The digital face sets the time in the display face and marks the phase with a sun or a moon
-//! beside the city. The hand angles are `clock_angles.rs`; the vectors `clock_dial.rs`.
+//! The analog dial is flat and bright, as the reference measures (design/23 section 2): a white
+//! face by day and a dark one by night, twelve heavy numerals, sixty fine ticks where the dial is
+//! large enough for them (a small widget's), thin dark hands (pale by night) and an orange
+//! seconds hand. The digital face sets the time in the display face and marks the phase with a
+//! sun or a moon beside the city. The hand angles are `clock_angles.rs`; the parts
+//! `clock_dial.rs`.
 
 use crate::components::bump_on::{bump_attrs, use_bump_on};
 use crate::components::clock_angles::hands;
-use crate::components::clock_dial::{HandLayer, hands_svg, marks_svg, phase_mark, second_svg};
+use crate::components::clock_dial::{
+    hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg,
+};
 use crate::components::clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use crate::components::text_runs::{Text, text};
 use dioxus::prelude::*;
@@ -43,21 +47,23 @@ pub fn ClockFace(
     }
 }
 
-/// The dial: a soft well in the plate, the quarter marks, the hands standing out of it, and
-/// the second hand when shown.
+/// The dial: the face, its ticks (shown only on a large dial), the numerals, the hands, and the
+/// seconds hand with its pin when shown.
 #[component]
 fn AnalogDial(time: ClockTime) -> Element {
     let at = hands(time);
     let second = match time.second {
-        Seconds::Shown(_) => Some(second_svg(at.second)),
+        Seconds::Shown(_) => Some(rsx! {
+            {second_svg(at.second)}
+            {pin_svg()}
+        }),
         Seconds::Hidden => None,
     };
     rsx! {
         div { class: "ds-clock-dial",
-            {marks_svg()}
-            for layer in HandLayer::ALL {
-                {hands_svg(at, layer)}
-            }
+            {ticks_svg()}
+            {numerals()}
+            {hands_svg(at)}
             {second}
         }
     }

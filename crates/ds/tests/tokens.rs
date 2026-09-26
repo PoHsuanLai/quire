@@ -244,7 +244,7 @@ fn every_table_name_is_declared_on_the_root() {
         .chain(Radius::ALL.map(|t| t.var()))
         .chain(SpacingToken::ALL.map(|t| t.var()))
         .chain(Shadow::ALL.map(|t| t.var()))
-        .chain(ds::tokens::SoftPaint::ALL.map(|t| t.var()))
+        .chain(ds::tokens::WidgetPaint::ALL.map(|t| t.var()))
         .chain(FontSize::ALL.map(|t| t.var()))
         .chain(ZLayer::ALL.map(|t| t.var()))
         .chain(Family::ALL.map(|t| t.var()));
