@@ -4047,6 +4047,40 @@ read back, the system's en_US only where installed); `ds-native/tests/spell_edit
 misspelling marked after the debounce, the typed word held, right-click and pick, undo restores
 it, Ignore, the context-menu key and Learn).
 
+### 51. Status glyphs: WifiGlyph, BatteryGlyph, BluetoothGlyph, VolumeGlyph (design/26 wave D1, 2026-09-27; motion settled by 26, drawing proposed)
+
+**Purpose.** The bar's status items as layered glyphs whose every state change plays the moment
+design/26 section 5.1 assigns it (G1-G4, G8-G10, G12, and G5-G7 on the glyph side), then paints 0
+frames. Ink only (`currentColor`), on Lucide's 24 grid with its 2-unit stroke; the glyph is
+decorative (`aria-hidden`) and each state has its words (`words()`, R8) for the item's label and
+menu. `StatusGlyph { status: StatusState }` holds the four as one family.
+
+**Markup.** `span.ds-status-glyph[data-kind=wifi|battery|bluetooth|volume]`, one
+`svg.ds-ic.ds-status-part[data-part][data-show=lit|faint|hidden]` per part; the first part is in
+flow and sizes the box. A pulse (`a-shake-x`, `a-seal-out`) goes on the wrapper with its
+`data-pulse` alias; `data-pending` on the wrapper is `idle`, `still` (a held loop, the glyph at
+.45), or for Bluetooth `high`/`low` (a breath's halves).
+
+| Glyph | Parts (inside out) | State (`Detailed`) | Moments |
+| --- | --- | --- | --- |
+| `WifiGlyph` | `dot`, `arc-1`..`arc-3` (Lucide `wifi`), `badge` ("!" at the lower right), `slash` | `WifiState::{Off, Idle, Joining(EventStamp), Joined { bars: WifiBars, reach: WifiReach }, Failed(EventStamp)}` | Joining: `Pending{Iterate, Layers(4)}` after `PendingGrace`, held dimmed at `PendingCap`; Joining to Joined: `Settle{Fill}` from the dot out to the real bars; bars: the arcs cross-fade lit/faint; no internet: the badge grows in (`--t-quick`, from .7); Failed: `Shake` once per stamp, then faint; Off: the slash draws on over `--t-quick` |
+| `BatteryGlyph` | `outline` (Lucide `battery`), `fill` (a filled bar in the body, 22 steps), `bolt`, `plug` (filled) | `BatteryState { level: Fraction, power: BatteryPower::{Battery, Charging, Held}, low_at: LowAt }` | a new fill step: `Sweep` from where it is over `--t-quick` (a finer change is none, R2); plugged in: the bolt (charging) or plug (held) grows in and the fill dims to .35 under it; at or under `low_at` on battery: the fill cross-fades to `--battery-low` (R15); `first: FirstShow::Animate` sweeps in from empty over `--t-sweep` |
+| `BluetoothGlyph` | `rune` (Lucide `bluetooth`), `dots` (two round dots), `slash` | `BluetoothState::{Off, On, Connecting(EventStamp), Connected, Failed(EventStamp)}` | Connecting: `Pending{Breathe}` (.45 to 1 per `--t-pending-step`, linear), held at `PendingCap`; Connecting to Connected: `Settle{LockIn}` (`seal-out`, remote) as the dots grow in; Failed: `Shake`; Off: the slash draws on, the rune faint |
+| `VolumeGlyph` | `LevelGlyph`'s body, three waves and slash | `VolumeState::{Heard(VolumeWaves), Muted, NoDevice}` | waves cross-fade by thirds; mute fades the waves out and the slash in (`LevelGlyph`'s own `--t-quick`); no count, no bump (R12) |
+
+**Values (proposed).** Faint parts at .25, a held loop at .45, a hidden part at 0 and scale .7; the
+fill's box is x 4.5, y 8.5, 11 by 7 units, corner 1, in 22 steps (half a unit: under a logical
+pixel at the bar's 22 px); the default low threshold is a fifth (`LowAt::default()`), which the
+shell reads from `bar.battery_low_percent` (design/26 G10, proposed; sill's key).
+
+**Tests.** `ds/tests/status_tables.rs` (every catalogue row as a `moment_table`, the first frames,
+the quantising: bars by thirds, waves by thirds, the fill's steps, the low threshold);
+`ds/src/components/status/{wifi.rs, battery_state.rs}` (layers per state, frame and fill; steps and
+tone); `ds-native/tests/status_wifi.rs`, `status_battery.rs`, `status_bluetooth_volume.rs` (each
+moment on a real Blitz document ending in `assert_settles_to_zero_frames`, the join's grace and
+its cap, a repeated stamp that does not shake, and Reduced: the still frame at once, the slash and
+the fill jumping, no shake). Gallery: Details, "Status glyphs".
+
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 
 **Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
