@@ -82,9 +82,9 @@ required-features = ["lint"]
 name = "lock_switcher_ssr"
 required-features = ["lint"]
 
-# The persona, linted (design/24-PERSONA.md).
+# The user's picture and its picker, linted (design/25-EMOJI.md section 7).
 [[test]]
-name = "persona_ssr"
+name = "user_picture_ssr"
 required-features = ["lint"]
 
 # Animated emoji, linted (design/25-EMOJI.md).

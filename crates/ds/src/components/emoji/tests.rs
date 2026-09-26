@@ -1,7 +1,7 @@
 use super::id::EmojiId;
-use super::script::{MoodChange, Playing, Shown, Step, script};
+use super::script::{IDLE_REST, MoodChange, Pace, Playing, Shown, Step, pace, reaction, script};
 use super::sheet::{MANIFEST_JSON, SheetPx, durations, png, position, timing};
-use crate::components::persona::Mood;
+use crate::components::user_picture::Mood;
 use std::time::Duration;
 
 const WINDOW: Duration = Duration::from_secs(20);
@@ -114,8 +114,16 @@ fn every_script_rests_inside_the_window() {
     }
 }
 
+/// How many of `emoji`'s loops a script plays: each loop shows its frame 1 once.
+fn passes(steps: &[Step], emoji: EmojiId) -> usize {
+    shown(steps)
+        .iter()
+        .filter(|f| f.emoji == emoji && f.frame == 1)
+        .count()
+}
+
 #[test]
-fn idle_loops_the_users_emoji_for_most_of_the_window() {
+fn idle_plays_the_users_loop_now_and_then() {
     let steps = script(
         EmojiId::Wink,
         Mood::Idle,
@@ -124,8 +132,57 @@ fn idle_loops_the_users_emoji_for_most_of_the_window() {
         WINDOW,
     );
     let loop_length: Duration = durations(EmojiId::Wink).into_iter().sum();
-    assert!(waited(&steps) + loop_length > WINDOW);
+    let count = passes(&steps, EmojiId::Wink);
+    // One loop, a rest, another: as many as fit, with a rest between each.
+    let cycle = loop_length + IDLE_REST;
+    let fit = (WINDOW + IDLE_REST).as_millis() / cycle.as_millis();
+    assert_eq!(count as u128, fit, "{count} loops");
+    assert!(count >= 2, "idle plays more than once");
     assert!(shown(&steps).iter().all(|f| f.emoji == EmojiId::Wink));
+    assert!(
+        steps.contains(&Step::Wait(IDLE_REST)),
+        "idle rests between loops"
+    );
+}
+
+#[test]
+fn attentive_glances_then_plays_steadily() {
+    let steps = script(
+        EmojiId::Wink,
+        Mood::Attentive,
+        MoodChange::Changed,
+        Playing::Frames,
+        WINDOW,
+    );
+    let frames = shown(&steps);
+    let glance = timing(EmojiId::ATTENTIVE).frames as usize;
+    assert!(frames[..glance].iter().all(|f| f.emoji == EmojiId::Eyes));
+    assert!(frames[glance..].iter().all(|f| f.emoji == EmojiId::Wink));
+    assert!(
+        !steps.contains(&Step::Wait(IDLE_REST)),
+        "attentive never rests"
+    );
+    let loop_length: Duration = durations(EmojiId::Wink).into_iter().sum();
+    assert!(
+        waited(&steps) + loop_length > WINDOW,
+        "attentive fills the window"
+    );
+}
+
+/// The mapping, one row per mood: the emoji a change to it swaps in, and the pace after.
+#[test]
+fn every_mood_has_its_reaction_and_pace() {
+    const CASES: [(Mood, Option<EmojiId>, Pace); 5] = [
+        (Mood::Idle, None, Pace::Slow),
+        (Mood::Attentive, Some(EmojiId::Eyes), Pace::Steady),
+        (Mood::Wince, Some(EmojiId::Confounded), Pace::Slow),
+        (Mood::Happy, Some(EmojiId::Partying), Pace::Slow),
+        (Mood::Asleep, None, Pace::Still),
+    ];
+    for (mood, swap, speed) in CASES {
+        assert_eq!(reaction(mood), swap, "{mood:?}");
+        assert_eq!(pace(mood), speed, "{mood:?}");
+    }
 }
 
 #[test]

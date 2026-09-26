@@ -104,7 +104,6 @@ pub mod pass_through;
 pub mod pdf_thumb;
 mod pdf_thumb_grace;
 pub mod peek;
-pub mod persona;
 pub mod polkit_prompt;
 pub mod popover;
 pub mod press;
@@ -157,6 +156,7 @@ pub(crate) mod track;
 pub mod traffic_lights;
 pub mod tree_item;
 pub(crate) mod tree_item_parts;
+pub mod user_picture;
 pub mod vocab;
 pub mod widget_frame;
 pub mod widget_kind;
@@ -192,7 +192,7 @@ pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use edit_surface::EditSurface;
 pub use edit_surface_spell_menu::{SPELL_SUGGESTIONS, SpellMarks};
-pub use emoji::{AnimatedEmoji, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback};
+pub use emoji::{AnimatedEmoji, DiscHue, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback};
 pub use emoji_grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid};
 pub use emoji_grid_nav::{GridEdge, GridMove, GridStep, grid_step};
 pub use flow::Flow;
@@ -243,11 +243,6 @@ pub use pdf_thumb::{
     PDF_DEFAULT_SHEET, PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble, sheet_rect,
 };
 pub use peek::Peek;
-pub use persona::{
-    Accessory, BLINK_MAX, BLINK_MIN, Backdrop, Brows, Cheeks, Creature, Eyes, HairTone, HeadShape,
-    Mood, Mouth, Persona, PersonaFinish, PersonaSeed, PersonaSize, PersonaSpec, Tone, Top,
-    UserPicture, UserPortrait, WakeStamp,
-};
 pub use polkit_prompt::PolkitPrompt;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
@@ -290,6 +285,10 @@ pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
 pub use traffic_lights::TilePose;
 pub use tree_item::{Disclosure, TreeItem, TreeShape};
+pub use user_picture::{
+    FaceFile, Mood, PICTURE_CELL, PICTURE_COLUMNS, PictureChoice, PictureSize, UserPicture,
+    UserPicturePicker, UserPortrait, WakeStamp, resolve_picture,
+};
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
     Selection, Shortcut, StaggerIndex, Switch,
@@ -344,7 +343,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),
     ("pdf_thumb", include_str!("pdf_thumb.css")),
-    ("persona", include_str!("persona.css")),
+    ("user_picture", include_str!("user_picture.css")),
     ("popover", include_str!("popover.css")),
     ("polkit_prompt", include_str!("polkit_prompt.css")),
     ("preview_pane", include_str!("preview_pane.css")),

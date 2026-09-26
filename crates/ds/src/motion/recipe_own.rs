@@ -222,51 +222,13 @@ pub(super) const SHOT_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `persona-blink` (design/24-PERSONA.md section 4): the eyes close and open at `--t-quick
-/// --e-in-out`. Fired by the persona's blink timer, 3 to 6 s apart, only while it is awake.
-pub(super) const PERSONA_BLINK: Recipe = recipe(
-    "persona-blink",
-    DurationToken::Quick,
-    EasingToken::InOut,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `persona-breathe` (design/24 section 4): four breaths inside one 20 s run (`--t-awake`),
-/// eased in and out between keyframes; it ends at rest, so the persona paints nothing after.
-pub(super) const PERSONA_BREATHE: Recipe = recipe(
-    "persona-breathe",
-    DurationToken::Awake,
-    EasingToken::InOut,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `persona-wince` (design/24 section 4): `shake-x`'s timing and curve, in shares of the
-/// persona's own width so 28 px and 128 px shake alike.
-pub(super) const PERSONA_WINCE: Recipe = recipe(
-    "persona-wince",
-    DurationToken::Shake,
-    EasingToken::Shake,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `persona-hop` (design/24 section 4): one hop at `--t-big --e-spring`; the unlock answers
-/// the user's own contact (principle 2).
-pub(super) const PERSONA_HOP: Recipe = recipe(
-    "persona-hop",
+/// `picture-accept` (design/25-EMOJI.md section 7): the user's picture lifts once and lands at
+/// `--t-big --e-spring`, as the dropped persona's hop did; the unlock answers the user's own
+/// contact (principle 2). A lock screen unlocks at its settle.
+pub(super) const PICTURE_ACCEPT: Recipe = recipe(
+    "picture-accept",
     DurationToken::Big,
     EasingToken::Spring,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `persona-drift` (design/24 section 4): one `z` rises and fades over `--t-drift`, once.
-pub(super) const PERSONA_DRIFT: Recipe = recipe(
-    "persona-drift",
-    DurationToken::Drift,
-    EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );

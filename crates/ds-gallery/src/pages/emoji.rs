@@ -1,26 +1,28 @@
 //! The Emoji page (design/25-EMOJI.md): the whole shipped set at Large, the reactions a mood
-//! swaps in, one pick in every mood, the three sizes, and the eight discs. Every picture here
+//! swaps in, one pick in every mood, the three sizes, the eight discs, and the user picture's
+//! picker. Every picture here
 //! is `EmojiPlayback::Still` (a sheet of 42 loops is what a picker must not do), so each shows
 //! its rest frame; the motion is proved by `ds-native/tests/emoji_life.rs`.
 
 use super::{Caption, Section};
 use dioxus::prelude::*;
 use ds::{
-    AnimatedEmoji, Backdrop, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback, Mood,
-    PersonaSize,
+    AnimatedEmoji, AvatarFace, AvatarShape, AvatarSize, AvatarTone, DiscHue, EMOJI_ATTRIBUTION,
+    EmojiDisc, EmojiId, EmojiPlayback, Mood, PictureChoice, PictureSize, UserPicturePicker,
+    person_hue,
 };
 
 const STILL: EmojiPlayback = EmojiPlayback::Still;
 
-const BACKDROPS: [Backdrop; 8] = [
-    Backdrop::Clay,
-    Backdrop::Ochre,
-    Backdrop::Sage,
-    Backdrop::Jade,
-    Backdrop::Teal,
-    Backdrop::Slate,
-    Backdrop::Plum,
-    Backdrop::Rose,
+const HUES: [DiscHue; 8] = [
+    DiscHue::Clay,
+    DiscHue::Ochre,
+    DiscHue::Sage,
+    DiscHue::Jade,
+    DiscHue::Teal,
+    DiscHue::Slate,
+    DiscHue::Plum,
+    DiscHue::Rose,
 ];
 
 /// The reactions, with what shows them.
@@ -30,7 +32,7 @@ const REACTIONS: [(EmojiId, &str); 4] = [
     (EmojiId::ASLEEP, "Asleep: the display is off, still"),
     (
         EmojiId::ATTENTIVE,
-        "Attentive keeps the pick; this is in the set",
+        "Attentive: a glance once, then the pick",
     ),
 ];
 
@@ -42,7 +44,7 @@ pub fn EmojiPage() -> Element {
             div { class: "g-emoji-grid",
                 for emoji in EmojiId::ALL {
                     div { key: "{emoji.slug()}", class: "g-col g-emoji-cell",
-                        AnimatedEmoji { emoji, size: PersonaSize::Large, playback: STILL }
+                        AnimatedEmoji { emoji, size: PictureSize::Large, playback: STILL }
                         Caption { name: emoji.slug().to_string() }
                     }
                 }
@@ -52,7 +54,7 @@ pub fn EmojiPage() -> Element {
             div { class: "g-row g-emoji-reactions",
                 for (emoji, note) in REACTIONS {
                     div { key: "{emoji.slug()}", class: "g-col g-emoji-cell",
-                        AnimatedEmoji { emoji, size: PersonaSize::Large, playback: STILL }
+                        AnimatedEmoji { emoji, size: PictureSize::Large, playback: STILL }
                         Caption { name: emoji.slug().to_string(), code: note.to_string() }
                     }
                 }
@@ -62,7 +64,7 @@ pub fn EmojiPage() -> Element {
             div { class: "g-row g-emoji-reactions",
                 for mood in Mood::ALL {
                     div { key: "{mood.slug()}", class: "g-col g-emoji-cell",
-                        AnimatedEmoji { emoji: EmojiId::Wink, size: PersonaSize::Large, mood, playback: STILL }
+                        AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood, playback: STILL }
                         Caption { name: mood.slug().to_string() }
                     }
                 }
@@ -71,19 +73,37 @@ pub fn EmojiPage() -> Element {
         Section { title: "Sizes and discs", note: "Small 28, Medium 64 and Large 128, bare; then Medium on each of the icon palette's eight hues (EmojiDisc::Tinted).",
             div { class: "g-col",
                 div { class: "g-row g-emoji-sizes",
-                    AnimatedEmoji { emoji: EmojiId::HeartEyes, size: PersonaSize::Small, playback: STILL }
-                    AnimatedEmoji { emoji: EmojiId::HeartEyes, size: PersonaSize::Medium, playback: STILL }
-                    AnimatedEmoji { emoji: EmojiId::HeartEyes, size: PersonaSize::Large, playback: STILL }
+                    AnimatedEmoji { emoji: EmojiId::HeartEyes, size: PictureSize::Small, playback: STILL }
+                    AnimatedEmoji { emoji: EmojiId::HeartEyes, size: PictureSize::Medium, playback: STILL }
+                    AnimatedEmoji { emoji: EmojiId::HeartEyes, size: PictureSize::Large, playback: STILL }
                 }
                 div { class: "g-row g-emoji-sizes",
-                    for (index, backdrop) in BACKDROPS.into_iter().enumerate() {
-                        AnimatedEmoji { key: "{index}", emoji: EmojiId::ALL[index * 5], size: PersonaSize::Medium, disc: EmojiDisc::Tinted(backdrop), playback: STILL }
+                    for (index, hue) in HUES.into_iter().enumerate() {
+                        AnimatedEmoji { key: "{index}", emoji: EmojiId::ALL[index * 5], size: PictureSize::Medium, disc: EmojiDisc::Tinted(hue), playback: STILL }
                     }
                 }
             }
         }
+        Section { title: "Picker", note: "UserPicturePicker: the letter, then the 42 as still frames at 64, one radio group with the current choice marked (here the fox). Click a disc, or use the arrows, to choose; Settings' Users page and first run show it.",
+            PickerStage {}
+        }
         Section { title: "Credit", note: EMOJI_ATTRIBUTION.to_string(),
             div {}
         }
+    }
+}
+
+/// The picker, holding its own choice so the gallery can be clicked through.
+#[component]
+fn PickerStage() -> Element {
+    let mut choice = use_signal(|| PictureChoice::Emoji(EmojiId::Fox));
+    let letter = AvatarFace {
+        initial: 'P',
+        size: AvatarSize::Size64,
+        tone: AvatarTone::Person(person_hue("pohsuan")),
+        shape: AvatarShape::Round,
+    };
+    rsx! {
+        UserPicturePicker { letter, choice: choice(), onpick: move |next| choice.set(next) }
     }
 }
