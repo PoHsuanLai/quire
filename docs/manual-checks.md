@@ -13,6 +13,11 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
   track, low-battery colour, dark World Clock card, filled device glyphs, Space tint default.
 - [ ] **Level-control look** (progress page, OSD): Capsule (recommended) / CapsuleKnob / Segments.
 - [ ] **palmrest live steps**: section below.
+- [ ] **Spotlight settings** (launcher v2, design/22 §5 Spotlight page, all proposed): clipboard
+  history on (memory only, never password-manager copies) or off; web search as the last result
+  on or off (engine DuckDuckGo by default); the default emoji skin tone.
+- [ ] **Launcher v2 real-input look** (progress page "Launcher v2"): Space / Cmd+Y / Right-at-end
+  open the preview, arrow keys wrap in the emoji grid, holding Down through PDFs stays smooth.
 - [ ] **Lock decisions** (sill M11, done on nested): the lockout policy after failed passwords,
   `lock_grace` (how long after the screen sleeps the password is still not asked), and whether
   sill's own lock becomes the default over the borrowed locker.
