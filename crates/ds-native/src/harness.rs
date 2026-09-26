@@ -314,6 +314,13 @@ impl Harness {
         })
     }
 
+    /// Whether the document would paint another frame on its own: a CSS animation or
+    /// transition running, a canvas, a scroll animation. `false` is the idle-frame rule's
+    /// "a surface at rest paints 0 frames" as the host sees it (it asks for no redraw).
+    pub fn is_animating(&self) -> bool {
+        self.with_doc(BaseDocument::is_animating)
+    }
+
     /// Whether the first element matching `selector` has the keyboard focus.
     pub fn is_focused(&self, selector: &str) -> bool {
         self.with_doc(|doc| {

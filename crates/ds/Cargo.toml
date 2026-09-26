@@ -76,3 +76,8 @@ required-features = ["lint"]
 [[test]]
 name = "shot_thumbnail_ssr"
 required-features = ["lint"]
+
+# The persona, linted (design/24-PERSONA.md).
+[[test]]
+name = "persona_ssr"
+required-features = ["lint"]

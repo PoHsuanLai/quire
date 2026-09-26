@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 15] = [
+pub const REGISTRY: [Entry; 16] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -126,6 +126,13 @@ pub const REGISTRY: [Entry; 15] = [
         lede: "The widgets in Neumorphism & Soft UI (design/23-WIDGETS.md) for the user's judgement: the battery as a soft battery glyph filled to the level beside its percentage, and the world clock as the time in the display face and as four soft dials; each in a Small and a Medium card over a calm wallpaper.",
         height: 1000,
         body: pages::widget_looks::WidgetLooksPage,
+    },
+    Entry {
+        page: Page::Persona,
+        title: "Persona",
+        lede: "The user's own character (design/24-PERSONA.md): 48 seeds, two finishes for the user's pick, every top on every creature, every mood at Large, the three sizes, and a user picture of each kind.",
+        height: 3200,
+        body: pages::persona::PersonaPage,
     },
 ];
 

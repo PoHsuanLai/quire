@@ -149,3 +149,9 @@
 .g-wl-pct{font-family:var(--font-data);font-size:var(--fs-small);font-variant-numeric:tabular-nums;color:var(--ink-soft)}
 .g-wl-dials{display:flex;justify-content:space-between;align-items:flex-end;flex:1;padding:0 var(--s-6)}
 .g-wl-dial{display:flex;flex-direction:column;align-items:center;gap:var(--s-2)}
+.g-persona-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--s-12) var(--s-8)}
+.g-persona-cell{align-items:center}
+.g-persona-name{width:80px}
+.g-persona-sizes{align-items:flex-end;gap:var(--s-12)}
+.g-persona-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-16)}
+.g-persona-half{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--s-8)}
