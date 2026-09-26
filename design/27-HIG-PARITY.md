@@ -1,6 +1,6 @@
 # 27 HIG parity: quire against the pre-2025 Human Interface Guidelines
 
-Status: draft for review, 2026-09-26, branch `hig-parity` (quire). Docs only. Every rule this file
+Status: reviewed 2026-09-26 (§8 settled), branch `hig-parity` (quire). Docs only. Every rule this file
 proposes is **proposed**; nothing here changes a settled value in another doc until the user
 settles it (README §5). Confidence keys as in `13-BEHAVIOUR-menus-windows.md`: **H** the vendor's
 own guidelines or documentation (here: an archived HIG page), **M** a reliable secondary source,
@@ -816,21 +816,18 @@ regenerated; drag threshold 3 px, return-to-source, count badge, drag cursors; s
 microphone and screen-cast indicators with the portal purpose string; notification interruption
 levels.
 
-## 8. Open decisions
+## 8. Decisions (settled by the user 2026-09-26)
 
-1. **Density.** Move the System typeface's UI to the Mac's 13 px body (H5), or keep the
-   prototype's 15 px? Proposed: 13 px for shell surfaces and system apps; mailo keeps 15 px
-   under Editorial.
-2. **Sidebar icon colour.** The Mac colours sidebar icons with the accent; our sidebar sits on
-   the Space colour. Proposed: keep ink (5.12).
-3. **Keyboard navigation default.** The Mac's default Tab order skips buttons; ours reaches
-   every control (09 H5). Proposed: `All` by default, `TextAndLists` available.
-4. **Dock and menu motion under the spring model.** The dock's bounce and magnification are
-   specified by curves and durations (10); converting them is not in H1. Proposed: leave them.
-5. **Space switching keys.** Ctrl+1..9 (the Mac's "Switch to Desktop N" keys, L) or keep Mod+1..9 (Arc)?
-   Proposed: Ctrl+1..9, with Cmd+1..9 left to apps.
-6. **Global menus for foreign apps.** Reading exported menus over the session bus works for
-   apps that export them; others get only the App menu. Proposed: accept that limit.
+1. **Density.** SETTLED: 13 px body for shell surfaces and system apps under System (H5); mailo
+   keeps 15 px under Editorial.
+2. **Sidebar icon colour.** SETTLED: keep ink on the Space colour (5.12).
+3. **Keyboard navigation default.** SETTLED: `All` by default (Tab reaches every control, 09 H5);
+   the Mac's `TextAndLists` is a setting.
+4. **Dock and menu motion under the spring model.** SETTLED (proposal taken): the dock's bounce and
+   magnification keep their curves (10); not converted in H1.
+5. **Space switching keys.** SETTLED (proposal taken): Ctrl+1..9, with Cmd+1..9 left to apps.
+6. **Global menus for foreign apps.** SETTLED (proposal taken): apps that do not export menus get
+   only the App menu.
 
 ## 9. Sources
 
