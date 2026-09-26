@@ -57,7 +57,7 @@ pub use use_pending::use_pending;
 pub use use_settle::use_settle;
 
 /// The details' stylesheets, appended to the components' in cascade order.
-pub(crate) const CSS: &[(&str, &str)] = &[
+pub const CSS: &[(&str, &str)] = &[
     ("detail_reveal", include_str!("reveal.css")),
     ("detail_morph", include_str!("morph.css")),
     ("detail_roll", include_str!("roll.css")),

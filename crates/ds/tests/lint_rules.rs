@@ -588,6 +588,57 @@ const CASES: &[Case] = &[
         rule: Rule::SvgPaintInCss,
         expect: false,
     },
+    // InfiniteLoop (design/26 R3): every profile.
+    Case {
+        name: "infinite loop: the longhand fails",
+        css: ".chip { animation-iteration-count: infinite; }",
+        profile: Profile::Standard,
+        rule: Rule::InfiniteLoop,
+        expect: true,
+    },
+    Case {
+        name: "infinite loop: infinite in the shorthand fails",
+        css: ".chip { animation: busy var(--t-ambient) var(--e-in-out) infinite; }",
+        profile: Profile::Standard,
+        rule: Rule::InfiniteLoop,
+        expect: true,
+    },
+    Case {
+        name: "infinite loop: a keyframe played once passes",
+        css: ".chip { animation: gulp var(--t-big) var(--e-spring); animation-iteration-count: 1; }",
+        profile: Profile::Strict,
+        rule: Rule::InfiniteLoop,
+        expect: false,
+    },
+    // OffGrammarTiming (design/26 3.4): only under Profile::Details.
+    Case {
+        name: "off-grammar timing: an ambient token in a transition fails under Details",
+        css: ".chip { transition: opacity var(--t-ambient) var(--e-out); }",
+        profile: Profile::Details,
+        rule: Rule::OffGrammarTiming,
+        expect: true,
+    },
+    Case {
+        name: "off-grammar timing: the spin token in an animation fails under Details",
+        css: ".chip { animation: gulp var(--t-spin) var(--e-linear); }",
+        profile: Profile::Details,
+        rule: Rule::OffGrammarTiming,
+        expect: true,
+    },
+    Case {
+        name: "off-grammar timing: grammar tokens pass",
+        css: ".chip { transition: opacity var(--t-quick) var(--e-out), transform var(--t-pending-step) var(--e-linear); }",
+        profile: Profile::Details,
+        rule: Rule::OffGrammarTiming,
+        expect: false,
+    },
+    Case {
+        name: "off-grammar timing: Strict does not run it",
+        css: ".chip { transition: opacity var(--t-ambient) var(--e-out); }",
+        profile: Profile::Strict,
+        rule: Rule::OffGrammarTiming,
+        expect: false,
+    },
 ];
 
 /// A markup case: rendered `html` against the stylesheet `css`.

@@ -5,9 +5,10 @@
 use crate::tokens::{DurationToken, EasingToken};
 
 /// Durations a moment may play for. Left out on purpose: the loops and ambient life
-/// (`--t-ambient`, `--t-spin`, `--t-float`, `--t-awake`, `--t-drift`), the orphaned boat
-/// (`--t-sail`, `--t-boat-return`), the holds that are not motion (`--t-send-ring`, `--t-flash`)
-/// and the Rust-only repaint floor (`--t-count-step`).
+/// (`--t-ambient`, `--t-spin`, `--t-float`, `--t-awake`), the orphaned boat (`--t-sail`,
+/// `--t-boat-return`), the holds that are not motion (`--t-send-ring`, `--t-flash`), the Rust-only
+/// repaint floor (`--t-count-step`) and the battery ring's Rust-driven fill (`--t-fill`, which
+/// predates `--t-sweep`; design/05 section 4.12).
 pub const GRAMMAR_DURATIONS: [DurationToken; 18] = [
     DurationToken::Tap,
     DurationToken::Quick,
