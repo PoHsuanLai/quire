@@ -79,6 +79,11 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 42 | LockScreen, LockClock, LockPrompt, PolkitPrompt | none (design/20 sections 1.9, 1.10) | none | lock screen, polkit prompt |
 | 43 | AppSwitcher | none (design/13 section 13.3.5, design/20 section 1.11) | none | app switcher |
 | 44 | AnimatedEmoji | none (design/25-EMOJI.md) | none | the user's picture: lock and login screen, user menu, settings |
+| 45 | PdfThumb, PdfFileThumb | none | none | launcher preview, Quick Look |
+| 46 | EmojiGrid | macOS Character Viewer (reference) | none | launcher emoji section |
+| 47 | PreviewPane | macOS Quick Look / Spotlight preview (reference) | none | launcher preview pane, Quick Look |
+| 48 | RowShape (palette rows: File, Clip) | Spotlight file and clipboard rows (reference) | none | launcher file and clipboard results |
+| 49 | PaletteGroup ("Show More") and the key claim | Spotlight sections (reference) | Ctrl T / Ctrl K (unchanged) | launcher sections, Space and Right for the preview |
 
 ## Shared vocabulary
 
@@ -1163,8 +1168,13 @@ time. The plan's "spring underline" means this; there is no sliding underline be
 ```rust
 #[component] pub fn SectionHeader(kind: HeaderKind, text: String,
     #[props(default)] value: Option<String>,
-    #[props(default)] action: Option<(String, EventHandler<()>)>) -> Element
+    #[props(default)] action: Option<(String, EventHandler<()>)>,
+    #[props(default)] action_selection: Selection) -> Element   // Selected: data-selected on the action
 ```
+
+`action_selection: Selected` (sill Q294, 2026-09-26) draws the action as a keyboard selection,
+`data-selected="true"`: `--accent-soft` behind it, `--ink` words, `--r-tiny`. The palette sets it
+while its cursor rests on a group's "Show More" (section 49); nothing else changes.
 
 **Geometry.**
 
@@ -2330,8 +2340,18 @@ hit, Mail, People, Actions). Mail: Ctrl T / Ctrl K. Shell: the launcher.
     #[props(default)] selected: Option<usize>,           // controlled selection
     #[props(default)] on_select: Option<EventHandler<usize>>,
     #[props(default)] on_select_rect: Option<EventHandler<Rect>>,
-    #[props(default)] onkey: Option<EventHandler<KeyboardData>>) -> Element
+    #[props(default)] onkey: Option<EventHandler<KeyboardData>>,
+    #[props(default)] claim: Option<Callback<FieldKey, Claim>>,   // section 49
+    #[props(default)] shown: Option<Shown>, #[props(default)] retain: Retain,
+    #[props(default)] corner: Option<Corner>,
+    #[props(default)] aside: Option<Element>,                     // section 47
+    #[props(default = ASIDE_WIDTH)] aside_width: Px) -> Element   // 360
 ```
+
+`groups` is `#[props(into)] PaletteGroups<T>` since sill M9 (section 49): the older
+`Vec<(String, Vec<MenuEntry<T>>)>` still converts, so every existing call compiles unchanged;
+only a bare `groups: Vec::new()` needs `PaletteGroups::default()`, since two `Vec`s now
+convert.
 
 Hosts (settled 2026-09-24, FINDINGS "Launcher gaps", sill Q40-Q41): `Overlay` is the scrim and
 the card 11 % down, as below. `Surface` is the shell launcher's: no wrap and no scrim, the card
@@ -3639,6 +3659,241 @@ pdf_thumb.rs` (the sheet's fit), `ds-native/tests/pdf_thumb.rs` (a generated PDF
 its colour and aspect, the cache hit and the mtime miss, the failures, a document painting the
 page), `ds-native/tests/pdf_thumb_queue.rs` (20 quick requests run at most 4 rasters and show the
 last), `ds-native/src/pdf_thumb/cache.rs` (eviction).
+
+### 46. EmojiGrid (sill M9 launcher v2, Q291, 2026-09-26; values proposed)
+
+**Purpose.** Emoji as a grid of cells moved through in two dimensions: the launcher's Emoji
+section, and later a character picker. On its own it takes the keyboard; in a `CommandPalette`
+it is one group (`GroupEntries::Grid`, section 49) and the palette's field keeps the keyboard.
+
+**Markup.**
+
+```html
+<div class="ds-emoji-grid ds-emoji-text" role="grid" aria-label="Emoji" tabindex="0"
+     style="grid-template-columns:repeat(8,56px);grid-auto-rows:56px">
+  <div class="ds-emoji-cell" role="gridcell" aria-selected="true" aria-label="party popper">
+    <span class="ds-fly-target"><span class="ds-emoji-glyph" aria-hidden="true">🎉</span>
+      <span class="ds-fly" role="tooltip">party popper</span></span>
+  </div>
+</div>
+<!-- in a palette: no tabindex, aria-label the group's title -->
+```
+
+**Props.**
+
+```rust
+pub struct EmojiCell<T> { pub value: T, pub glyph: String, pub name: String }
+pub struct EmojiCells<T> { pub cells: Vec<EmojiCell<T>>, pub columns: u8, pub cell: Px }
+pub const EMOJI_CELL: Px;      // 56
+pub const EMOJI_COLUMNS: u8;   // 8
+#[component] pub fn EmojiGrid<T>(cells: Vec<EmojiCell<T>>, onpick: EventHandler<T>,
+    columns: u8 /* 8 */, cell: Px /* 56 */, selected: Option<usize>,
+    on_select: Option<EventHandler<usize>>, label: String /* "Emoji" */) -> Element
+pub fn grid_step(selected: usize, step: GridStep, count: usize, columns: u8) -> GridMove;
+pub enum GridStep { Up, Down, Left, Right }
+pub enum GridMove { To(usize), Out(GridEdge) }   pub enum GridEdge { Top, Bottom }
+```
+
+**Values.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Cell | `cell` square (56 in the launcher: eight in the 540 results column less padding), radius `--r-menu-item` | design/13 section 13.3.9 |
+| Glyph | `--fs-emoji-cell` 30, line-height 1, the `--font-emoji` stack (`.ds-emoji-text`) | proposed |
+| Selected | `--accent-soft`, as a palette row | design/27 section 6.4 (b): a highlight, never a ring |
+| Name | the cell's `aria-label` and its Fly tooltip; never a caption under the cell | reference |
+| Pointer | the arrow (`cursor:default`) | design/27 section 6.3 |
+
+**Behaviour.** Left and Right walk the cells in reading order and wrap from a row's end to the
+next row's start (the reference's character viewer); they stop at the first and last cell. Up
+and Down move a whole row in the same column; Down into a shorter last row lands on its last
+cell. Past the top or bottom row `grid_step` answers `Out(edge)`: a grid on its own stays, a
+palette moves on to the neighbouring group's nearest live stop. On its own, Enter or Space picks
+the selected cell and a click picks the cell clicked; the pointer over a cell asks to select it.
+The selection is always the caller's (`selected`, `on_select`); from none, the first arrow asks
+for cell 0.
+
+**Tests.** `ds/src/components/emoji_grid_nav.rs` (the moves), `ds/src/components/palette_stops.rs`
+(entering and leaving in a palette), `ds/tests/launcher_parts_ssr.rs` (`grid-in-palette`,
+`grid-alone`), `ds-native/tests/launcher_v2.rs` (the palette walk and the grid on its own).
+
+### 47. PreviewPane (sill M9 launcher v2, Q292, 2026-09-26; values proposed)
+
+**Purpose.** A Quick-Look-style pane for one thing: its picture, page, text, icon or facts over
+a caption, and its actions with their keys. The launcher sets it beside its results with
+`CommandPalette { aside }`; the Quick Look app (design/20 section 2.4) is to reuse it.
+
+**Markup.**
+
+```html
+<div class="ds-palette" data-aside="shown" style="--aside:360px;">   <!-- the card -->
+  <div class="ds-search">…</div>
+  <div class="ds-menu" data-embed="palette">…</div>
+  <div class="ds-palette-aside" style="width:360px">
+    <div class="ds-preview" role="region" aria-label="Invoice.pdf preview"
+         data-content="image|text|pdf|app|facts|emoji|web" data-shown="visible"
+         data-presence="entering|present|leaving" data-pulse="a|b">
+      <div class="ds-preview-media">…</div>          <!-- img.ds-preview-image, div.ds-preview-text[data-face=mono|prose],
+                                                          .ds-pdf-thumb, an icon, span.ds-preview-emoji.ds-emoji-text -->
+      <div class="ds-preview-caption"><b class="ds-preview-title">Invoice.pdf</b>
+        <small class="ds-preview-line ds-truncate">…</small></div>
+      <dl class="ds-preview-facts"><div class="ds-preview-fact"><dt>Kind</dt><dd>Setting</dd></div></dl>
+      <div class="ds-preview-actions">
+        <button type="button" class="ds-preview-action" tabindex="-1" data-focused="true">
+          <span class="ds-preview-action-label">Open</span><kbd class="ds-kbd" data-size="small">↵</kbd></button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**Props.**
+
+```rust
+pub enum PaneContent {
+    Image { src: ImageSource, size: ImageSize }, Text { excerpt: String, mono: Mono },
+    Pdf { page: PdfPage, name: String }, App { icon: IconSource, name: String, detail: Option<String> },
+    Facts { icon: IconSource, title: String, rows: Vec<(String, String)> },
+    Emoji { glyph: String, name: String }, Web { host: String, url: String } }
+pub enum Mono { Monospace, Proportional }
+pub struct PaneAction { pub label: String, pub shortcut: Shortcut }
+pub const PANE_MEDIA: Size;   // 328 x 220
+#[component] pub fn PreviewPane(content: PaneContent, actions: Vec<PaneAction>,
+    focused: Option<usize>, onaction: EventHandler<usize>,
+    shown: Shown /* Visible */, on_hidden: EventHandler<()>) -> Element
+// ds-native, feature `pdf-thumb`:
+pub fn use_pdf_page(path: Option<PathBuf>, size: Size) -> Option<PdfPage>
+```
+
+**The PDF split.** ds reads no file (section 45), so `PaneContent::Pdf` takes the page, not the
+path. A Blitz app gets the page from `ds_native::use_pdf_page(path, ds::PANE_MEDIA)`, the hook
+`PdfFileThumb` itself now runs on: cached, else asked of the one `pdf-thumb` worker, `Loading`
+until it lands. It takes an `Option` so the component that draws the pane calls it on every
+render and passes the path only while the content is a PDF: the pane stays one mounted element
+whatever the selection shows, so moving from a file to a PDF does not replay the pane's entrance
+(a wrapper component per content kind would remount it). A webview app rasterises the page
+itself and passes it the same way.
+
+**Values.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Width | the palette's `aside_width`, 360 by default (`ASIDE_WIDTH`), past a `--hair` `--line-soft` divider | sill F654 (360 beside the 540 results) |
+| Card | over a window, `min(540 + aside, 96%)` wide; in a surface, its container's width (the host widens it) | design/13 section 13.3.9 "the card widens by the pane" |
+| Padding, gap | 16, 12 | proposed |
+| Media | 220 tall; a picture or page fitted at its own aspect (`sheet_rect` in `PANE_MEDIA`); text on `--surface` with a `--line-soft` edge, radius `--r-small`, `--fs-meta` (mono: `--font-code` at `--fs-help`); app icon 96, facts icon 64, web: the Globe glyph on a Blue plate at 64; an emoji at `--fs-emoji-preview` 96 in the colour face | proposed |
+| Caption | title `--fs-title` 600, line `--fs-small` `--ink-faint`, centred | proposed |
+| Facts | label `--ink-faint` right-aligned in 40 %, value `--ink`, `--fs-small` | proposed |
+| Actions | at the foot; `--surface` buttons with a `--line` edge, radius `--r-small`, the label then its `Kbd` small; the focused one shows the focus ring (`--focus-ring` in `--accent-ring`); arrow pointer | design/09 H5 (every action shows its key), design/27 sections 6.3, 6.4 |
+
+**Motion.** Mounted or turned `Visible`: `Anim::PaneInR` (`slide-r`, `--t-move --e-spring`),
+restarted under its other name on each showing. Turned `Hidden`: `Anim::PaneOutR` (`pane-out-r`,
+`--t-move --e-exit`, held), then `on_hidden` at its settle, when the caller drops the pane and
+the palette's `aside`. The content's own moments (swap, pending) are D0's (sill Q297), not here.
+
+**Behaviour.** The pane never takes the keyboard: the launcher's field keeps it (design/13
+section 13.3.9's keys are the caller's, through the palette's `claim`, section 49), so `focused`
+draws which action the caller's Tab has reached. A click on an action calls `onaction(i)`.
+
+**Tests.** `ds/tests/launcher_parts_ssr.rs` (`pane-*`, `palette-aside`), `ds-native/tests/
+launcher_v2.rs` (the card widening over a window, the results narrowing in a surface, the exit
+settling before `on_hidden`), `ds-native/tests/pdf_thumb.rs` (a pane drawing a PDF through
+`use_pdf_page`).
+
+### 48. RowShape: file and clipboard rows in the palette (sill M9 launcher v2, Q290, 2026-09-26; values proposed)
+
+**Purpose.** The launcher's file and clipboard results, as palette rows rather than new markup.
+
+**Why a `MenuRow` field.** A palette row is a menu row (section 20); `ListRow` (section 16) is
+mail's thread row, with a dot, a star and a hover strip the launcher has no use for, and its
+selection is not the palette's. `MenuEntry::Row(MenuRow)` already carries runs, a trailing action
+and a constructor callers spread (`..MenuRow::new(value, title)`), so a new field is additive
+for every caller; a field on `MenuEntry::Item` would have broken every `Item` literal in sill,
+mailo and quire. The shape changes only what a row draws: it is picked, navigated and matched
+on its title as any row.
+
+**Props.**
+
+```rust
+pub struct MenuRow<T> { …, pub shape: RowShape }        // Plain by default (MenuRow::new)
+pub enum RowShape { Plain,
+    File { thumb: Option<ImageSource>, location: String, modified: String },
+    Clip { body: ClipBody, age: String } }
+pub enum ClipBody { Text { excerpt: String, lines: u8 }, Image { src: ImageSource, size: ImageSize } }
+```
+
+**Markup.** The row as section 20 draws it, with `data-shape="file|clip-text|clip-image"`:
+
+| Shape | Tile | Words | Trail |
+| --- | --- | --- | --- |
+| File | the thumbnail (`img.ds-menu-thumb` filling a `data-tile="thumb"` tile, no plate), else the row's tile (a mime glyph) | the title, then `location` as the second line (the row's `detail` is not drawn) | `span.ds-menu-when` (`modified`) before the row's trail |
+| Clip, text | the row's tile | `span.ds-menu-clip`: the excerpt in `--font-code` at `--fs-help`, line-height 1.35, `pre-wrap`, clipped to `--lines` (1 to 4) since Blitz has no line clamp; the title is not drawn (it is still what the query matches) | the age, then the trail |
+| Clip, image | the row's tile | the title, then `img.ds-menu-clip-image` 44 tall at its aspect, at most 200 wide, `--r-tiny` with a `--line` edge | the age, then the trail |
+
+A plain row's markup is unchanged: no `data-shape`, no `ds-menu-when`.
+
+**Tests.** `ds/src/components/row_shape.rs` (the picture's box, the line budget),
+`ds/tests/launcher_parts_ssr.rs` (`row-file`, `row-clip`).
+
+### 49. PaletteGroup, "Show More" and the key claim (sill M9 launcher v2, Q294 and Q299, 2026-09-26)
+
+**Groups.**
+
+```rust
+pub struct PaletteGroup<T> { pub title: String, pub entries: GroupEntries<T>,
+    pub action: Option<(String, EventHandler<()>)> }
+pub enum GroupEntries<T> { List(Vec<MenuEntry<T>>), Grid(EmojiCells<T>) }
+impl PaletteGroup<T> { fn list(title, entries) -> Self; fn grid(title, EmojiCells) -> Self;
+    fn with_action(self, label, EventHandler<()>) -> Self }
+pub struct PaletteGroups<T>(pub Vec<PaletteGroup<T>>);   // From<Vec<PaletteGroup<T>>>,
+                                                         // From<Vec<(String, Vec<MenuEntry<T>>)>>, Default
+```
+
+A group with no rows or cells is not drawn, header and action included. Its header is
+`SectionHeader { kind: Menu, action }`.
+
+**The cursor's stops.** The palette's cursor rests on *stops*: each row (an item or a submenu
+parent, as before), each emoji cell, and each group's header action, numbered in drawing order
+with a group's action **after its last row or cell**. `selected`, `on_select` and
+`on_select_rect` name a stop by that number; for a palette of plain rows it is the choice number
+it always was. Up and Down walk the stops clamped, skipping disabled rows; inside a grid they
+move a row and leave it past its top or bottom row (section 46); Left and Right move only inside
+a grid, where the palette prevents their default (elsewhere they are the field's caret keys). A
+header action is not measured: `on_select_rect` reports nothing while the cursor is on one.
+
+**"Show More" by keyboard.** Down past a group's last row rests on its header's action, drawn
+selected (`data-selected`, section 13); Enter runs it and the palette stays open (a pick closes,
+an action does not); Down goes on to the next group. Chosen over a chord because Tab is the
+launcher's provider filter (design/06 section 20.2), Cmd chords are Q298's to assign, and a stop
+in the order is reachable with the keys a person is already pressing; the action sits in the
+header visually and last in its group in the order, the place Down reaches after the rows it
+would reveal.
+
+**The key claim.** `claim: Option<Callback<FieldKey, Claim>>` hears every key the field gets
+first, with where the caret is:
+
+```rust
+pub struct FieldKey { pub event: KeyboardEvent, pub caret: Caret }
+pub enum Claim { Take, Pass }
+pub enum Caret { AtEnd, Inside, Unknown }   // ds::focus::caret; Unknown: no host, no field
+pub struct HostCaret(pub fn(&MountedData) -> Caret);   // ds-native: ds_native::focus::CARET
+```
+
+`Claim::Take` keeps the key from everything else: the palette does not read it, its default is
+prevented (the field types no Space, moves no caret) and `onkey` does not hear it. `Pass` goes on
+as before. The caret is read from the field's editor when the key arrives: `AtEnd` for a bare
+caret after the last character (an empty field too), `Inside` for any other place or any
+selection. Blitz holds no borrow of the document while a handler runs, so the read is exact;
+without ds-native's `HostCaret` (a webview) it is `Unknown`. A verdict-returning callback was
+chosen over a declarative `KeyPolicy`: whether Space is the pane's depends on the caller's own
+state (browsing or typing, sill F654), which a policy would have to mirror into props every
+render; the callback asks at the moment with the caret in hand. It is a new prop beside
+`onkey`, so no existing `onkey` changes.
+
+**Tests.** `ds/src/components/palette_stops.rs` (the stop order and the moves),
+`ds/src/focus/caret.rs` (the caret's place), `ds/tests/launcher_parts_ssr.rs` (`show-more`,
+`show-more-selected`), `ds-native/tests/launcher_v2.rs` (Show More reached and run by keyboard;
+Space taken only while browsing, Right only at the end).
 
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 

@@ -27,3 +27,6 @@
   color:var(--f-ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }
+/* A palette's cursor on a group's action (sill Q294, "Show More"): the rows' selection look,
+   `--accent-soft` behind the words, which take the ink. */
+.ds-section-header .ds-section-header-action[*|data-selected=true]{ background:var(--accent-soft); color:var(--ink); border-radius:var(--r-tiny); }

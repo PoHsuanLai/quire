@@ -79,3 +79,40 @@ pub(super) const CAPS_LOCK: &[Shape] = &[
     Shape::Path("M9 19h6"),
     Shape::Path("M9 15v-3H5l7-7 7 7h-4v3H9z"),
 ];
+
+// Launcher v2 (sill Q296): the clipboard, emoji and web providers' glyphs.
+
+/// Lucide `clipboard` (its clip's `ry` equals its `rx`, so the rect is as published).
+pub(super) const CLIPBOARD: &[Shape] = &[
+    Shape::Rect {
+        x: "8",
+        y: "2",
+        width: "8",
+        height: "4",
+        rx: "1",
+    },
+    Shape::Path("M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"),
+];
+
+/// Lucide `smile`.
+pub(super) const SMILE: &[Shape] = &[
+    Shape::Path("M15 10V9"),
+    Shape::Path("M16.472 15a6 6 0 01-8.943 0"),
+    Shape::Path("M9 10V9"),
+    Shape::Circle {
+        cx: "12",
+        cy: "12",
+        r: "10",
+    },
+];
+
+/// Lucide `globe`.
+pub(super) const GLOBE: &[Shape] = &[
+    Shape::Circle {
+        cx: "12",
+        cy: "12",
+        r: "10",
+    },
+    Shape::Path("M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"),
+    Shape::Path("M2 12h20"),
+];
