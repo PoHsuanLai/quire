@@ -8,12 +8,14 @@
 //! key handler's event can give; Reduced motion is inside every primitive, and every primitive's
 //! clock stops when its moment ends.
 
+mod check_mark;
 mod count_up;
 mod cue;
 mod detailed;
 mod first_show;
 mod glide;
 pub mod grammar;
+mod layer_glyph;
 mod level;
 mod moment;
 mod morph;
@@ -34,10 +36,12 @@ mod use_operation;
 mod use_pending;
 mod use_settle;
 
+pub use check_mark::CheckMark;
 pub use count_up::{CountPace, CountUp, use_count_up};
 pub use cue::Cue;
 pub use detailed::{Detailed, first_table, moment_table};
 pub use first_show::FirstShow;
+pub use layer_glyph::{LayerGlyph, Layering};
 pub use moment::Moment;
 pub use morph::{MorphStyle, Slashed};
 pub use morph_glyph::MorphGlyph;
@@ -59,6 +63,7 @@ pub use use_settle::use_settle;
 /// The details' stylesheets, appended to the components' in cascade order.
 pub const CSS: &[(&str, &str)] = &[
     ("detail_reveal", include_str!("reveal.css")),
+    ("detail_layer", include_str!("layer.css")),
     ("detail_morph", include_str!("morph.css")),
     ("detail_roll", include_str!("roll.css")),
 ];

@@ -165,3 +165,15 @@
 .g-emoji-cell{align-items:center}
 .g-emoji-reactions{gap:var(--s-22);align-items:flex-start}
 .g-emoji-sizes{align-items:flex-end;gap:var(--s-12)}
+/* Details page (design/26-DETAILS.md): specimen wells for the small-state primitives. */
+.g-detail{display:inline-flex;align-items:center;gap:var(--s-12);min-height:56px;padding:var(--s-10) var(--s-14);border-radius:var(--r-panel);background:var(--surface);color:var(--ink)}
+.g-detail-glyph{justify-content:center;min-width:56px}
+.g-bar{position:relative;width:180px;height:10px;border-radius:var(--r-pill);background:var(--line);overflow:hidden}
+.g-bar-fill{height:100%;border-radius:var(--r-pill);background:var(--accent)}
+.g-figure{font-family:var(--font-data);font-size:var(--fs-title);min-width:48px}
+.g-check-well{display:grid;place-items:center;width:22px;height:22px;color:var(--ok)}
+.g-shake-field{padding:var(--s-6) var(--s-14);border-radius:var(--r-pill);background:var(--raise);box-shadow:var(--shadow-1);color:var(--ink-faint)}
+.g-nudge-bell{display:inline-block}
+.g-seal{width:36px;height:36px;border-radius:var(--r-pill);background:var(--accent);cursor:pointer}
+.g-spin-well{position:relative;display:block;width:28px;height:28px;margin:var(--s-8);border-radius:var(--r-pill);background:var(--paper)}
+.g-reveal-row{padding:var(--s-4) var(--s-10);border-radius:var(--r-small);background:var(--surface);font-size:var(--fs-small);margin-bottom:var(--s-4);min-width:160px}
