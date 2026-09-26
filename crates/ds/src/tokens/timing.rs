@@ -85,11 +85,15 @@ pub enum DurationToken {
     Awake,
     /// `--t-drift` 2400 ms: a sleeping persona's single `z` rising and fading (design/24).
     Drift,
+    /// `--t-fill` 800 ms: a battery ring sweeping from empty (or its last level) to its level,
+    /// its percentage counting alongside (design/23-WIDGETS.md sections 1.1 and 4.1). Driven
+    /// frame by frame from Rust at `--e-out`; no keyframe plays it.
+    Fill,
 }
 
 impl DurationToken {
     /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 25] = [
+    pub const ALL: [DurationToken; 26] = [
         DurationToken::Tap,
         DurationToken::Quick,
         DurationToken::Move,
@@ -115,6 +119,7 @@ impl DurationToken {
         DurationToken::Flash,
         DurationToken::Awake,
         DurationToken::Drift,
+        DurationToken::Fill,
     ];
 
     /// The custom property: `--t-tap`, `--t-big-heavy`, …
@@ -145,6 +150,7 @@ impl DurationToken {
             DurationToken::Flash => "--t-flash",
             DurationToken::Awake => "--t-awake",
             DurationToken::Drift => "--t-drift",
+            DurationToken::Fill => "--t-fill",
         })
     }
 
@@ -204,6 +210,7 @@ impl DurationToken {
             (DurationToken::Flash, _) => 1200,
             (DurationToken::Awake, _) => 20000,
             (DurationToken::Drift, _) => 2400,
+            (DurationToken::Fill, _) => 800,
         }
     }
 }

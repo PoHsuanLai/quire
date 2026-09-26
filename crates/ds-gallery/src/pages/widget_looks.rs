@@ -10,9 +10,9 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BatteryLevel, CardTint, ClockFace, ClockTime, DayPhase, Ds, Fraction, Glyph, Icon,
-    IconSize, Inject, Material, RingMark, RootChrome, Seconds, SpaceLook, WidgetFrame,
-    WidgetMetrics, WidgetSize, use_env,
+    Appearance, BatteryFigure, BatteryLevel, CardTint, ClockFace, ClockTime, DayPhase, Ds,
+    Fraction, Glyph, Icon, IconSize, Inject, Material, RingMark, RootChrome, Seconds, SpaceLook,
+    WidgetFrame, WidgetMetrics, WidgetSize, use_env,
 };
 
 /// One device on the battery widgets.
@@ -167,7 +167,7 @@ fn BatterySmall() -> Element {
         WidgetFrame { size: WidgetSize::Small,
             div { class: "g-wr-solo",
                 {ring(computer)}
-                span { class: "g-wr-hero", "84%" }
+                span { class: "g-wr-hero", BatteryFigure { level: Fraction(computer.level) } }
             }
         }
     }
@@ -181,7 +181,7 @@ fn BatteryMedium(tint: CardTint) -> Element {
                 for device in DEVICES {
                     div { key: "{device.name}", class: "g-wr-cell",
                         {ring(device)}
-                        span { class: "g-wr-figure", "{(device.level + 5) / 10}%" }
+                        span { class: "g-wr-figure", BatteryFigure { level: Fraction(device.level) } }
                     }
                 }
             }

@@ -10,8 +10,8 @@ use super::widget_blur::BlurWall;
 use super::widget_looks::Wall;
 use dioxus::prelude::*;
 use ds::{
-    BatteryLevel, ClockFace, ClockTime, DayPhase, Fraction, Glyph, Icon, IconSize, RingMark,
-    Seconds, WidgetFrame, WidgetSize,
+    BatteryFigure, BatteryLevel, Button, ButtonVariant, ClockFace, ClockTime, DayPhase, Fraction,
+    Glyph, Icon, IconSize, RingMark, Seconds, WakeStamp, WidgetFrame, WidgetSize,
 };
 
 /// One device on the battery widgets.
@@ -81,15 +81,18 @@ const CITIES: [City; 4] = [
 /// The page.
 #[component]
 pub fn WidgetReferencePage() -> Element {
+    let mut wake = use_signal(WakeStamp::default);
     rsx! {
         Section { title: "Compositor blur", note: "The cards over a vivid wallpaper, blur on: behind each card a copy of the wallpaper blurred as the compositor blurs it (a Gaussian of sigma 22, the reference fit, design/23 M26), clipped to the card, so the tint composes over it as it will in the shell. The walls below paint what the toolbar's Blur axis asks for.",
             BlurWall {}
         }
-        Section { title: "Batteries", note: "Small with one device (the ring at the top left, the percentage under it), small with four places, and medium with a row of four (13 % is low and red; 99 % is charging, with the bolt in the ring's gap).",
+        Section { title: "Batteries", note: "Small with one device (the ring at the top left, the percentage under it), small with four places, and medium with a row of four (13 % is low and red; 99 % is charging, with the bolt in the ring's gap). Each ring fills from empty over --t-fill at --e-out as the page appears, its percentage counting alongside, and the bolt fades in when its ring has arrived (design/23 section 4.1); Replay passes the rings a new WakeStamp.",
+            Button { id: "replay-fill", variant: ButtonVariant::Mini, label: "Replay the fill",
+                onclick: move |_| wake.set(wake().next()) }
             Wall {
-                BatterySolo {}
-                BatteryGrid {}
-                BatteryRow {}
+                BatterySolo { wake: wake() }
+                BatteryGrid { wake: wake() }
+                BatteryRow { wake: wake() }
             }
         }
         Section { title: "Clock", note: "Small: one large day dial with sixty ticks and the seconds hand. Medium: four dials in a row, three by day and Paris by night, the city and the day and offset under each.",
@@ -101,33 +104,33 @@ pub fn WidgetReferencePage() -> Element {
     }
 }
 
-fn ring(device: Device) -> Element {
+fn ring(device: Device, wake: WakeStamp) -> Element {
     rsx! {
-        BatteryLevel { level: Fraction(device.level), mark: device.mark, label: device.name,
+        BatteryLevel { level: Fraction(device.level), mark: device.mark, label: device.name, wake,
             Glyph { icon: device.icon, size: IconSize::Base }
         }
     }
 }
 
 #[component]
-pub(super) fn BatterySolo() -> Element {
+pub(super) fn BatterySolo(#[props(default)] wake: WakeStamp) -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Small,
             div { class: "g-wr-solo",
-                {ring(device("This computer", Icon::Monitor, 930, RingMark::Plain))}
-                span { class: "g-wr-hero", "93%" }
+                {ring(device("This computer", Icon::Monitor, 930, RingMark::Plain), wake)}
+                span { class: "g-wr-hero", BatteryFigure { level: Fraction(930), wake } }
             }
         }
     }
 }
 
 #[component]
-pub(super) fn BatteryGrid() -> Element {
+pub(super) fn BatteryGrid(#[props(default)] wake: WakeStamp) -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Small,
             div { class: "g-wr-grid",
-                {ring(device("This computer", Icon::Monitor, 930, RingMark::Plain))}
-                {ring(device("Headphones", Icon::Headphones, 800, RingMark::Plain))}
+                {ring(device("This computer", Icon::Monitor, 930, RingMark::Plain), wake)}
+                {ring(device("Headphones", Icon::Headphones, 800, RingMark::Plain), wake)}
                 BatteryLevel { level: Fraction(0), label: "No device" }
                 BatteryLevel { level: Fraction(0), label: "No device" }
             }
@@ -136,14 +139,14 @@ pub(super) fn BatteryGrid() -> Element {
 }
 
 #[component]
-pub(super) fn BatteryRow() -> Element {
+pub(super) fn BatteryRow(#[props(default)] wake: WakeStamp) -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Medium,
             div { class: "g-wr-row",
                 for device in ROW {
                     div { key: "{device.name}", class: "g-wr-cell",
-                        {ring(device)}
-                        span { class: "g-wr-figure", "{(device.level + 5) / 10}%" }
+                        {ring(device, wake)}
+                        span { class: "g-wr-figure", BatteryFigure { level: Fraction(device.level), wake } }
                     }
                 }
             }

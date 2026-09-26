@@ -3314,18 +3314,22 @@ frame and `--fs-subject` elsewhere, bumping on each new minute; a sun (`svg.ds-c
 second `6 x s`.
 
 **BatteryLevel** (renamed from `LevelRing`, which stays as an alias). `BatteryLevel { level:
-Fraction, mark: RingMark::{Plain, Charging}, label: Text, children }`: a ring 64 across
+Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, children }`: a ring 64 across
 (`div.ds-battery`, `role=progressbar` with `aria-valuenow` in percent): `svg.ds-battery-track`, a
 full circle in `--battery-track`; `svg.ds-battery-arc`, clockwise from twelve as far as the level
 in `--battery-fill`, `--battery-low` at or under 20 % (`data-tone` `low`, and `critical` at or
 under 10 %, the same red); charging is never low; stroke .093 of the ring, round caps, the path
 computed in Rust (`battery_ring.rs`). `children` (the device glyph) sit centred in
 `span.ds-battery-device` at .47 of the ring. `Charging` (`data-mark="charging"`) cuts a gap at
-twelve in both strokes and sets `svg.ds-battery-bolt` in it. The ring bumps on change
-(`use_bump_on`). The percentage is the caller's (design/23 section 4.1).
+twelve in both strokes and sets `svg.ds-battery-bolt` in it once the fill has arrived. The
+percentage is the caller's (design/23 section 4.1), counted in step with the fill by
+`BatteryFigure { level, wake }` (`span.ds-battery-figure`, tabular) or `use_battery_figure`.
 
-**Motion.** None in steady state; a value change plays `bump` once (`--t-move --e-spring`, the
-Count's pulse). No transition on the battery's fill (O-20).
+**Motion.** None in steady state. The battery's arc fills from Rust (no keyframe, no CSS
+transition, O-20): from empty on mount and each new `wake`, from the old level on a change,
+over `--t-fill` at `--e-out`, `data-pulse="a"` while it moves; the bolt fades in over
+`--t-quick` after an entrance fill; nothing under Reduced (design/05 section 4.12). The clock's
+digital time still plays `bump` on a new minute (`--t-move --e-spring`, the Count's pulse).
 
 ### 41. ShotThumbnail and ShotGhost (screenshot thumbnail, settled 2026-09-26)
 
