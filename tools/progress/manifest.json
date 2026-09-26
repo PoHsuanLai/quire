@@ -1,8 +1,45 @@
 {
- "updated": "2026-09-26: widgets matched to the reference (round four); M8 code complete; M11 and the animated avatar started",
+ "updated": "2026-09-26: lock screen, password prompt and app switcher parts; session locking",
  "archive_url": "https://claude.ai/artifact/GhMLUQjwi9FUxkJgoxrGUB",
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
+  {
+   "id": "m11-parts",
+   "date": "2026-09-26 · lock and switcher",
+   "title": "The shell's own lock screen, password prompt and app switcher: parts and session locking",
+   "status": "proven",
+   "lede": "Milestone 11 replaces the borrowed lock screen and password prompt with our own, and adds the Cmd+Tab app switcher. quire now has the parts: a lock screen with a very large heavy clock under the date, the user's picture and name, and a translucent pill password field that shakes once and clears on a wrong password, shows a spinner while checking and marks caps lock; a password prompt for system actions on a narrow sheet with a details card and a locked-out state; and the app switcher on the OSD material with 112 px cells and 96 px icons, a selection square that springs between apps, the app's name under it, and shrinking then scrolling for many apps. The password never enters the page's markup. shell-host gained real session locking (the ext-session-lock protocol): one lock surface per display, keyboard without a click, unlock after the shell's password check, and fail-secure behaviour if the shell crashes, proven on a nested COSMIC compositor with a code guard that makes locking the user's own session impossible. The shell wires the password check, the polkit agent and the switcher's keys next; an animated user picture is being designed to replace the letter avatar.",
+   "notes": [
+    "Switcher icons in these images are placeholder glyph plates, not the shipped app icons.",
+    "Not proven yet: the lock on a real session (several displays, fractional scale); the switcher's spring and fold watched moving; the Space look of the lock screen on a colourful Space."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m11/lock-dark.png",
+     "caption": "The lock screen: the date above a 140 px heavy clock, the avatar and name, a glass pill password field and the hint line (dark)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m11/lock-light.png",
+     "caption": "The lock screen: the date above a 140 px heavy clock, the avatar and name, a glass pill password field and the hint line (light)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m11/polkit-dark.png",
+     "caption": "The password prompt for system actions: a narrow sheet over the scrim, at rest and locked out after too many tries (dark)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m11/polkit-light.png",
+     "caption": "The password prompt for system actions: a narrow sheet over the scrim, at rest and locked out after too many tries (light)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m11/switcher-dark.png",
+     "caption": "The app switcher: five apps; fourteen shrunk to fit; fourteen at the 48 px minimum, scrolled to keep the selection in view (dark)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m11/switcher-light.png",
+     "caption": "The app switcher: five apps; fourteen shrunk to fit; fourteen at the 48 px minimum, scrolled to keep the selection in view (light)."
+    }
+   ]
+  },
   {
    "id": "widget-reference",
    "date": "2026-09-26 · decision",
