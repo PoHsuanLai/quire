@@ -1286,7 +1286,11 @@ progress) and Breathe (idle but live). Mail: account sync. Shell: bar sync, netw
 It is drawn as a ring around its parent (the halo is `inset:-4px` of a 30 px avatar). Standalone
 size: not specified (O-9).
 
-**Props.** `#[component] pub fn Spinner(kind: SpinnerKind /* Spin | Breathe */) -> Element`
+**Props.** `#[component] pub fn Spinner(kind: SpinnerKind /* Spin | Breathe */, operation: Operation) -> Element`
+(D0, design/26 R4: the ring is a bounded pending loop on `ds::detail::use_pending`: nothing for
+`PendingGrace`, a step every `--t-pending-step`, its still frame from the operation token's
+deadline; no `infinite` animation. The keyframe-loop CSS below is the prototype's, kept for
+reference; the shipped sheet is `components/spinner.css`.)
 
 **Geometry.** absolute, `inset:-4px` of the host, radius 999px, 2px `--accent` border. Spin: border
 dashed, opacity .9.

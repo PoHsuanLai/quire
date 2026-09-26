@@ -61,11 +61,21 @@ pub enum Rule {
     /// `Glyph` (`.ds-ic`), a `<button>`, `<input>`, `<select>` or `<textarea>` outside a quire
     /// component (coherence rule 2).
     RawMarkup,
+    /// `animation-iteration-count: infinite`, or `infinite` in the `animation` shorthand: a loop
+    /// never lets the surface idle. A pending state is a bounded loop (`ds::detail::use_pending`)
+    /// that holds still at its deadline (design/26-DETAILS.md R3, R4). Every profile.
+    InfiniteLoop,
+    /// Under [`Profile::Details`]: an `animation` or `transition` timed by a duration or easing
+    /// token the details grammar does not play (`--t-ambient`, `--t-spin`, `--t-float`,
+    /// `--t-awake`, `--t-sail`, `--t-boat-return`, `--t-send-ring`, `--t-flash`,
+    /// `--t-count-step`, `--t-fill`): moments are timed by the grammar's tokens (`ds::detail::grammar`,
+    /// design/26-DETAILS.md sections 3.1 and 3.4).
+    OffGrammarTiming,
 }
 
 impl Rule {
     /// Every rule, in declaration order.
-    pub const ALL: [Rule; 24] = [
+    pub const ALL: [Rule; 26] = [
         Rule::HexColour,
         Rule::ColourFunction,
         Rule::NamedColour,
@@ -90,6 +100,8 @@ impl Rule {
         Rule::SvgPaintInCss,
         Rule::UnstyledClass,
         Rule::RawMarkup,
+        Rule::InfiniteLoop,
+        Rule::OffGrammarTiming,
     ];
 }
 
@@ -100,8 +112,11 @@ pub enum Profile {
     /// `RawSpacing`, `RawHairline`).
     #[default]
     Standard,
-    /// Every rule.
+    /// Every rule but [`Rule::OffGrammarTiming`].
     Strict,
+    /// Every rule: `Strict` and the details grammar's timing (design/26-DETAILS.md). Off by
+    /// default so a consumer opts in once its own sheets pass.
+    Details,
 }
 
 /// What [`crate::lint::assert_clean`] does with an exception that suppressed nothing.

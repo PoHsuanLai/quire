@@ -3,8 +3,10 @@
 //! rasteriser changes with Blitz revisions).
 
 use dioxus::prelude::*;
+use ds::detail::{Deadline, FirstShow, Operation, PendingToken, Reveal};
 use ds::{Appearance, Button, ButtonVariant, Ds, Material, Spinner, SpinnerKind};
-use ds_native::{Viewport, snapshot, snapshot_at};
+use ds_native::harness::settle_until;
+use ds_native::{Harness, Viewport, snapshot, snapshot_at};
 use image::RgbaImage;
 use std::time::Duration;
 
@@ -18,8 +20,10 @@ const VIEW: Viewport = Viewport {
 fn ButtonApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
-            Spinner { kind: SpinnerKind::Breathe }
+            Reveal { first: FirstShow::Animate,
+                Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
+            }
+            Spinner { kind: SpinnerKind::Breathe, operation: Operation::Idle }
         }
     }
 }
@@ -55,16 +59,17 @@ fn a_button_root_at_two_motion_moments() {
         assert_eq!(frame.dimensions(), (480, 240));
         assert!(colours(frame) > 16, "the frame at {moment:?} is blank");
     }
-    // The breathing ring fades in between the two moments, so time reached the document.
+    // The revealed button rises between the two moments, so time reached the document.
     assert_ne!(frames[0], frames[1], "nothing moved between 0 and 250 ms");
 }
 
 #[allow(non_snake_case)]
 fn SpinApp() -> Element {
+    let operation = use_hook(|| Operation::Running(PendingToken::start(Deadline::cap())));
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "position:relative; width:40px; height:40px; margin:20px",
-                Spinner { kind: SpinnerKind::Spin }
+                Spinner { kind: SpinnerKind::Spin, operation }
             }
         }
     }
@@ -72,19 +77,32 @@ fn SpinApp() -> Element {
 
 #[test]
 fn the_spinner_turns() {
-    // A quarter of `--t-spin` apart: the dashed ring has turned 90 degrees, so its dashes sit
-    // elsewhere. With a base `transform:scale(1)` the keyframe interpolated between two identity
-    // matrices and the ring never moved (the wave 2 ds-native finding).
-    let moments = [Duration::from_millis(100), Duration::from_millis(375)];
-    let frames = snapshot_at(SpinApp, VIEW, &moments).expect("renders");
-    for (frame, moment) in frames.iter().zip(moments) {
-        keep(frame, &format!("spin-t{:03}", moment.as_millis()));
-        assert!(colours(frame) > 2, "the frame at {moment:?} is blank");
+    // Two steps apart the dashed ring has turned a further 180 degrees (a quarter per
+    // `--t-pending-step`), so its dashes sit elsewhere. With a base `transform:scale(1)` a turn
+    // interpolated between two identity matrices and the ring never moved (the wave 2 ds-native
+    // finding); the ring's angle only grows while it steps.
+    let mut harness = Harness::new(SpinApp, VIEW);
+    let step = |h: &Harness| {
+        h.attr(".ds-spinner", "style").and_then(|style| {
+            style
+                .strip_prefix("--turn:")?
+                .strip_suffix("deg")?
+                .parse::<u32>()
+                .ok()
+        })
+    };
+    settle_until(&mut harness, |h| step(h).is_some());
+    let first = harness.render().expect("renders");
+    let at = step(&harness).unwrap_or(0);
+    settle_until(&mut harness, |h| {
+        step(h).is_some_and(|turn| turn >= at + 180)
+    });
+    let later = harness.render().expect("renders");
+    for (frame, name) in [(&first, "spin-first"), (&later, "spin-later")] {
+        keep(frame, name);
+        assert!(colours(frame) > 2, "the {name} frame is blank");
     }
-    assert!(
-        frames[0] != frames[1],
-        "the spinner did not turn between the two moments"
-    );
+    assert!(first != later, "the spinner did not turn between two steps");
 }
 
 /// A green square as an SVG, the shape quire's icon masks and grain arrive in.

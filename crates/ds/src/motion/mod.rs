@@ -11,6 +11,7 @@ pub mod pane_slide;
 pub mod presence;
 pub mod pulse;
 pub mod recipe;
+mod recipe_detail;
 mod recipe_own;
 pub mod roster;
 pub(crate) mod roster_exits;

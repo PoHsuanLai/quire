@@ -14,6 +14,7 @@ use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::spinner::{Spinner, SpinnerKind};
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Expanded};
+use crate::detail::{FirstShow, Touch, use_detail, use_operation};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -36,6 +37,8 @@ pub fn ModuleTile(
     #[props(default)] availability: Availability,
 ) -> Element {
     let live = availability == Availability::Enabled;
+    // Busy is an operation the tile's own state starts: its ring is bounded by the cap (R4).
+    let operation = use_operation(use_detail(state, FirstShow::Still, Touch::Remote).cue());
     let listen = PressListeners::new(onclick);
     let detail = match chevron {
         Chevron::Detail => Some(chevron_button(&title, on_detail, expanded, availability)),
@@ -65,7 +68,7 @@ pub fn ModuleTile(
             span { class: "ds-module-disc",
                 Glyph { icon: glyph, size: IconSize::Base }
                 if state == ModuleState::Busy {
-                    Spinner { kind: SpinnerKind::Breathe }
+                    Spinner { kind: SpinnerKind::Breathe, operation }
                 }
             }
             span { class: "ds-module-words",

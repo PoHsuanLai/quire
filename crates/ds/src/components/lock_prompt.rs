@@ -11,6 +11,7 @@ use crate::components::text_input::{Focus, InputVariant, TextInput, TextInputKin
 use crate::components::text_runs::{Text, text};
 use crate::components::user_picture::{Liveliness, UserPicture, WakeStamp};
 use crate::components::vocab::Availability;
+use crate::detail::{FirstShow, Operation, Touch, use_detail, use_operation};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -52,11 +53,14 @@ pub fn LockPrompt(
         wake: stir.stamp(wake),
     };
     let line = hint_line(&state, hint);
+    // Checking is an operation the prompt's own state starts: its arrow's spin is bounded (R4).
+    let operation = use_operation(use_detail(state.clone(), FirstShow::Still, Touch::Remote).cue());
     let field = Field {
         entry,
         caps,
         placeholder: placeholder.unwrap_or_else(|| ENTER_PASSWORD.to_owned()),
         onsubmit,
+        operation,
         oncaret: EventHandler::new(move |at: Caret| {
             if *caret.peek() != at {
                 caret.set(at);
@@ -118,6 +122,8 @@ struct Field {
     caps: CapsLock,
     placeholder: String,
     onsubmit: EventHandler<String>,
+    /// The try the prompt's own state started: it bounds the arrow's spin (R4).
+    operation: Operation,
     /// Where the caret went: into the field (focus, typing) or out of it.
     oncaret: EventHandler<Caret>,
 }
@@ -129,6 +135,7 @@ fn lock_field(field: Field, state: &PromptState) -> Element {
         caps,
         placeholder,
         onsubmit,
+        operation,
         oncaret,
     } = field;
     let availability = state.availability();
@@ -180,13 +187,18 @@ fn lock_field(field: Field, state: &PromptState) -> Element {
                     Glyph { icon: Icon::CapsLock, size: IconSize::Compact }
                 }
             }
-            {go_button(state, entry.filled(), EventHandler::new(move |()| go()))}
+            {go_button(state, entry.filled(), EventHandler::new(move |()| go()), operation)}
         }
     }
 }
 
 /// The enter arrow inside the pill: a spinner while the password is tried.
-fn go_button(state: &PromptState, filled: Filled, onpress: EventHandler<()>) -> Element {
+fn go_button(
+    state: &PromptState,
+    filled: Filled,
+    onpress: EventHandler<()>,
+    operation: Operation,
+) -> Element {
     let availability = state.availability();
     let checking = *state == PromptState::Checking;
     rsx! {
@@ -200,7 +212,7 @@ fn go_button(state: &PromptState, filled: Filled, onpress: EventHandler<()>) -> 
             onclick: move |_| onpress.call(()),
             if checking {
                 span { class: "ds-lock-busy",
-                    Spinner { kind: SpinnerKind::Spin }
+                    Spinner { kind: SpinnerKind::Spin, operation }
                 }
             } else {
                 Glyph { icon: Icon::ArrowRight, size: IconSize::Small }

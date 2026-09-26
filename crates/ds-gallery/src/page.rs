@@ -40,11 +40,13 @@ pub enum Page {
     LockSwitcher,
     /// Animated emoji: the set, the reactions, sizes and discs.
     Emoji,
+    /// The small-state details: every primitive of design/26 with a replay button.
+    Details,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 18] = [
+    pub const ALL: [Page; 19] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -63,6 +65,7 @@ impl Page {
         Page::WidgetReference,
         Page::LockSwitcher,
         Page::Emoji,
+        Page::Details,
     ];
 
     /// The `--page` word.
@@ -86,6 +89,7 @@ impl Page {
             Page::WidgetReference => "widget-reference",
             Page::LockSwitcher => "lock",
             Page::Emoji => "emoji",
+            Page::Details => "details",
         }
     }
 }

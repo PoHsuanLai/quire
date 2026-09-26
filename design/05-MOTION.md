@@ -50,7 +50,9 @@ Quoted from the prototypes. Each one is a rule the port is reviewed against.
    (C:288, C:291), and the Pip mascot (excluded, section 11). An animated emoji's loops
    (section 4.11, design/25-EMOJI.md sections 5 and 6) are quire's one idle exception: finite
    plays, only for 20 s after a wake or a mood change, then 0 frames. Errors shake once and hold still:
-   "A looping error animation is something you learn to ignore inside a day" (C:2326).
+   "A looping error animation is something you learn to ignore inside a day" (C:2326). A loop
+   while an operation runs is bounded by design/26-DETAILS.md §3.3 R4 (`PendingGrace`,
+   `PendingCap`); the grammar of small state details is that file.
 8. **Rows rise only when a list is first shown.** "rows rise in only when a list is first shown,
    not on every re-render" (S:292-294).
 9. **The body is opaque.** The message body is animated as one block; staggering lives in the
@@ -188,6 +190,12 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | `FRAME_SLACK` | 34ms | Rust-only | added to every `settle()` | plan, `time.rs` |
 | `--t-fill` | 800ms | Rust-driven (no keyframe) | a battery ring's fill and its counting figure (4.12) | design/23 section 1.1 |
 | `FRAME_TICK` | 16ms | Rust-only | the sampling rate of a motion driven from Rust (`use_level_run`), not a design duration | `time.rs` |
+| `--t-sweep` | 700ms (Calm 500, Extra 900; Reduced: no sweep, the primitive shows the target at once) | CSS and Rust | an arc or bar sweeping in on Appear, and the count in step with it (`ds::detail::Sweep`, `CountUp`) | design/26 §3.4 |
+| `--t-count-step` | 33ms, every level | Rust repaint floor (a hold: Reduced keeps it) | a counting number repaints its text at most this often | design/26 §3.4 |
+| `--t-pending-step` | 300ms (Calm 360), linear | CSS and Rust | one step of a bounded pending loop (`use_pending`); a four-layer cycle is 1200ms | design/26 §3.4 |
+| PendingGrace | 400ms, every level | Rust-only | a pending loop shows only if the operation is still running after this | design/26 §3.4, R4 |
+| PendingCap | 10s, every level | Rust-only | after this a pending loop holds its still frame; the most a `PendingToken`'s deadline can be | design/26 §3.4, R4 |
+| SettleHold | 900ms, every level | Rust-only | how long a success check stays drawn | design/26 §3.4, R14 |
 
 `--tilt` has no Reduced/Calm meaning beyond 0deg; the drag ghost simply does not tilt.
 
@@ -671,6 +679,28 @@ after an entrance fill. `BatteryFigure` counts the percentage in step. Under Red
 sweep at all (not a 60 ms one): the first frame is the final state. This replaces the ring's
 `bump` on a new percentage (section 5 row 18 still applies to a figure a host wraps in
 `Bumped`).
+
+### 4.13 Added by quire (small-state details, 2026-09-26)
+
+The primitives of design/26-DETAILS.md section 4. Six keyframes and eight `Anim` rows, each
+played once on an HTML wrapper (Blitz's stylesheet cannot reach inside an SVG) and taken off at
+its `settle`. Nothing here loops: the bounded pending loop is a Rust step timer over CSS
+transitions (`--t-pending-step`), not a keyframe.
+
+- `morph-in`: `from{ opacity:0; transform:scale(.7) } to{ opacity:1; transform:none }` at
+  `--t-quick --e-out`, backwards (`Anim::MorphIn`): `MorphGlyph`'s incoming glyph (DownUp, OffUp).
+- `morph-out`: the reverse, forwards (`Anim::MorphOut`): DownUp's outgoing glyph.
+- `fade` at `--t-quick --e-out` (`Anim::MorphFadeIn`) and `morph-fade-out` (`from{ opacity:1 }
+  to{ opacity:0 }`, forwards, `Anim::MorphFadeOut`): a cross-fade's two glyphs.
+- `roll-in`: `from{ opacity:0; transform:translateY(60%) } to{ opacity:1; transform:none }` and
+  `roll-out`: `to{ opacity:0; transform:translateY(-60%) }`, both `--t-quick --e-out`
+  (`Anim::RollIn`, `Anim::RollOut`): `RollDigits`, one column per changed digit.
+- `gulp` at `--t-big --e-out` (`Anim::SealOut`): a success seal (`SettleStyle::LockIn`) that
+  nobody touched; the spring row `Anim::Gulp` plays only with `Touch::Contact` (design/26 R5).
+- `nudge-up`: `0%,100%{ transform:none } 40%{ translateY(-6px) } 70%{ translateY(1px) }` at
+  `--t-nudge --e-out` (`Anim::NudgeUp`): attention once per request (`use_nudge`, R6). `nudge`
+  keeps the outbox pill's `translateX(-50%)` and so cannot move an element that is not centred
+  that way.
 
 ## 5. Assignments
 

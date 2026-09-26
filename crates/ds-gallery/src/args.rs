@@ -1,5 +1,5 @@
 //! The gallery's command line: `ds-gallery [--page PAGE] [--typeface system|editorial]
-//! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR]`.
+//! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]`.
 
 use crate::page::Page;
 use ds::Typeface;
@@ -14,6 +14,9 @@ pub struct Args {
     pub snapshot: Option<PathBuf>,
     /// Render the level control's variant and motion sheets into this directory, then exit.
     pub level_sheet: Option<PathBuf>,
+    /// Render the small-state details' frames through each moment into this directory, then
+    /// exit (design/26).
+    pub detail_frames: Option<PathBuf>,
     /// With `--snapshot`, the device scale in percent (100 when absent; 100 to 300).
     pub scale: Option<u16>,
     /// The typeface the root speaks in (the settings default when absent).
@@ -28,7 +31,7 @@ impl std::fmt::Display for ArgsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR]",
+            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]",
             self.0,
             slugs()
         )
@@ -72,6 +75,14 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                     return Err(ArgsError("--level-sheet needs a directory".into()));
                 }
                 parsed.level_sheet = once(parsed.level_sheet, PathBuf::from(dir), "--level-sheet")?;
+            }
+            "--detail-frames" => {
+                let dir = value("a directory")?;
+                if dir.is_empty() {
+                    return Err(ArgsError("--detail-frames needs a directory".into()));
+                }
+                parsed.detail_frames =
+                    once(parsed.detail_frames, PathBuf::from(dir), "--detail-frames")?;
             }
             "--scale" => {
                 let word = value("a percentage")?;
@@ -133,6 +144,7 @@ mod tests {
             page,
             snapshot: snapshot.map(PathBuf::from),
             level_sheet: None,
+            detail_frames: None,
             scale: None,
             typeface: None,
         }
@@ -162,6 +174,13 @@ mod tests {
             (
                 &["--level-sheet", ""],
                 Err("--level-sheet needs a directory"),
+            ),
+            (
+                &["--detail-frames", "out"],
+                Ok(Args {
+                    detail_frames: Some(PathBuf::from("out")),
+                    ..args(None, None)
+                }),
             ),
             (&["--page"], Err("--page needs a page")),
             (&["--page", "motionlab"], Err("no page is called")),

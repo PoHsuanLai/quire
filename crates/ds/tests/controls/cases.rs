@@ -2,6 +2,7 @@
 
 use dioxus::prelude::*;
 use ds::components::vocab::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
+use ds::detail::{Deadline, Operation, PendingToken};
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize,
     ButtonVariant, Chip, ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind,
@@ -444,14 +445,19 @@ pub const CASES: &[Case] = &[
     Case {
         component: "spinner",
         state: "spin",
-        make: || rsx! { Spinner { kind: SpinnerKind::Spin } },
+        make: || rsx! { Spinner { kind: SpinnerKind::Spin, operation: running() } },
     },
     Case {
         component: "spinner",
         state: "breathe",
-        make: || rsx! { Spinner { kind: SpinnerKind::Breathe } },
+        make: || rsx! { Spinner { kind: SpinnerKind::Breathe, operation: running() } },
     },
 ];
+
+/// An operation that has just started: a spinner's first frame is its grace, so it draws idle.
+fn running() -> Operation {
+    Operation::Running(PendingToken::start(Deadline::cap()))
+}
 
 /// Cases driven by the motion module: the slider's drag tracker and the pulse classes. The
 /// count's bump needs a second render, so it is `components_controls::a_count_bumps_on_change`.
