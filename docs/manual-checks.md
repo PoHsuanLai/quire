@@ -4,6 +4,20 @@ Things only a person at the machine can verify. While the user is away they are 
 work; each is ticked off with the date and what was seen. sill keeps its own queue at
 `sill/docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
 
+## Waiting on you (picks and checks, queued 2026-09-26)
+
+- [ ] **mailo fcitx5 check**: mailo's native-only flip is committed on a branch and waits on it.
+  Type Chewing (ㄋㄧˇㄏㄠˇ → 你好) into mailo's native build and confirm the preedit shows and
+  commits; the mailo session has the exact steps.
+- [ ] **Widget picks** (progress page "Widgets matched to the reference"): percent weight, ring
+  track, low-battery colour, dark World Clock card, filled device glyphs, Space tint default.
+- [ ] **Level-control look** (progress page, OSD): Capsule (recommended) / CapsuleKnob / Segments.
+- [ ] **palmrest live steps**: section below.
+- [ ] **A real sill login** (`dist/sill-session`): the first run of the whole desktop on real
+  hardware; sill's queue lists what to look at (M7 login, M11 lock screen and polkit agent).
+- [ ] **Real-mouse and real-keyboard re-runs**: every live-input result before shell-host F47
+  used injected input; sill's queue lists them.
+
 ## quire
 
 - [ ] **EditSurface IME in a real window** (v0.1.7, FINDINGS "Edit surface"): with fcitx5 on

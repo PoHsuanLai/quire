@@ -188,7 +188,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Material | `Popover` | P |
 | Components | month grid (new ds component `MonthGrid`, add to 04 first), `ListRow` events, `IconButton{Tool}` prev/next | P |
 | Motion | `menu-pop`; month change `slide-l`/`slide-r` | P |
-| Data | Calendar app (CalDAV) feeds it (SPEC) | S |
+| Data | the Calendar app (2.10, its own repo) feeds it; until then local only | S |
 | Milestone | M10 P (Tier 2) | P |
 
 ### 1.13 Screenshot thumbnail (SPEC integrated experience, priority pick)
@@ -346,6 +346,19 @@ Open decision (2026-09-24): the terminal core is undecided until the app-suite m
 | Components | grid tiles, `SidebarItem`, `Peek` viewer, `Slider` edits | P |
 | Motion | viewer `peek-in`; grid `rise` on first show only | P |
 | Milestone | M12 (medium priority) | S |
+
+### 2.10 Calendar
+
+Its own app and its own repo (user, 2026-09-26: "not going to be so simple"), like mail: a
+mailo-like client that connects several cloud calendar providers (CalDAV, Google, Microsoft),
+with UI borrowed from good calendar apps. It is NOT part of the widgets pass; the M10 calendar
+widget and popup read from it once it exists and stay local-only until then.
+
+| Field | Value | St |
+| --- | --- | --- |
+| Repo | new (name open), depends on quire; account and sync core modelled on mailo's | P |
+| Components | `MonthGrid` (04 §39), week/day views (new, quire first), `ListRow` events, `Sheet` editor | P |
+| Milestone | after M12's first apps; scoped on its own (research pass on calendar UIs first) | P |
 
 ## 3. Open decisions
 
