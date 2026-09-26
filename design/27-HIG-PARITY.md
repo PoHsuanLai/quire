@@ -769,6 +769,12 @@ warnings, with sill told first), the markup rules `UnnamedControl` and `ThreeDot
 order. Fix the violations inside quire (cursor rules, "..." strings, prototype shortcuts
 Mod+S/Mod+T). Doc: 02 §13 writing rules, 06 §2 re-mapped keys, CHECKLIST lines for writing,
 pointer and shortcuts.
+sill's side (Whopper, 2026-09-26): 0 `cursor:pointer`, no literal font sizes (all `var(--fs-*)`),
+real ellipses already, no Mod+S/Mod+T bindings. So `MinFontSize` is a **token** rule in quire:
+`--fs-micro`, `--fs-nano`, `--fs-help` and `--fs-dial` must resolve to >= 10 px under System (fix in
+the token table, not in sill); the lint also rejects literal sizes below 10 in any stylesheet.
+`FocusRingShape` and `UnnamedControl` run as warnings over sill's surface markup tests and the
+list goes to sill before they turn Strict.
 
 **H1: Driven motion (quire).** `Spring { damping, response }`, `use_spring`, `Touch::Contact(Velocity)`
 extending 26's `Touch`, `SpringSpec::for_touch`, projection with the .998 rate, retargeting;
