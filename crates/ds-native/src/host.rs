@@ -49,8 +49,10 @@ use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
 use crate::window::WinitWindow;
+use crate::window_build::WindowSlot;
 use crate::window_drop::WindowDrop;
 use crate::window_hover::WindowHover;
+use crate::window_requests::Root;
 use blitz_traits::shell::ColorScheme;
 use blitz_traits::shell::ShellProvider;
 use dioxus::prelude::*;
@@ -65,24 +67,48 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 /// What `Host` wraps, and what the app gave its document.
-#[derive(Props, Debug, Clone)]
+#[derive(Props, Clone)]
 pub(crate) struct HostProps {
-    app: fn() -> Element,
+    root: Root,
     /// Fixed for the window's life: read once, as the document mounts.
     setup: Setup,
 }
 
+impl std::fmt::Debug for HostProps {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HostProps")
+            .field("setup", &self.setup)
+            .finish_non_exhaustive()
+    }
+}
+
 impl HostProps {
-    pub(crate) fn new(app: fn() -> Element, setup: Setup) -> Self {
-        HostProps { app, setup }
+    pub(crate) fn new(root: Root, setup: Setup) -> Self {
+        HostProps { root, setup }
     }
 }
 
 impl PartialEq for HostProps {
-    /// The same app is the same root: `setup` never changes after `launch`.
+    /// The same root is the same window: `setup` never changes after `launch`.
     fn eq(&self, other: &Self) -> bool {
-        std::ptr::fn_addr_eq(self.app, other.app)
+        self.root.same(&other.root)
     }
+}
+
+/// A root opened with its props (`ds_native::open_window_with`), as a component of its own.
+#[derive(Clone)]
+struct SharedRoot(Rc<dyn Fn() -> Element>);
+
+impl PartialEq for SharedRoot {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+#[allow(non_snake_case)] // A component: rsx names it like a type.
+#[component]
+fn Rooted(root: SharedRoot) -> Element {
+    (root.0)()
 }
 
 /// The app with the host's modality, net provider and scheme around it.
@@ -114,6 +140,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
         crate::focus::finder(move || found.borrow().clone().map(DocRef::Handle))
     });
     let window = use_window();
+    use_hook(|| {
+        if let Some(slot) = try_consume_context::<WindowSlot>() {
+            slot.fill(Arc::clone(&window));
+        }
+    });
     let shell = use_hook(consume_context::<Arc<dyn ShellProvider>>);
     let framed = {
         let window = Arc::clone(&window);
@@ -210,12 +241,15 @@ pub(crate) fn Host(props: HostProps) -> Element {
     });
     let mut installed = use_signal(|| Installed::Pending);
     let setup = props.setup.clone();
-    let App = props.app;
+    let root = props.root.clone();
     rsx! {
         // The app waits one frame for its document's providers: a frame in its first render
         // would otherwise be parsed with the parent's `file:` provider (`crate::frames`).
         if installed() == Installed::Done {
-            App {}
+            match root {
+                Root::Plain(App) => rsx! { App {} },
+                Root::Shared(root) => rsx! { Rooted { root: SharedRoot(root) } },
+            }
         }
         div {
             style: "display:none",

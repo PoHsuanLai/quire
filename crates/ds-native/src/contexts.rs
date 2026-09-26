@@ -45,17 +45,6 @@ impl RootContexts {
             vdom.insert_any_root_context(factory());
         }
     }
-
-    /// The list `dioxus_native::launch_cfg_with_props` inserts at the window's root.
-    pub(crate) fn for_launch(&self) -> Vec<Box<dyn Fn() -> Box<dyn Any> + Send + Sync>> {
-        self.factories
-            .iter()
-            .map(|factory| {
-                let factory = Arc::clone(factory);
-                Box::new(move || factory()) as Box<dyn Fn() -> Box<dyn Any> + Send + Sync>
-            })
-            .collect()
-    }
 }
 
 impl fmt::Debug for RootContexts {

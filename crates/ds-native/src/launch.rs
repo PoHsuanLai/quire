@@ -3,19 +3,21 @@
 //! and a redraw when a timer or an image lands.
 //!
 //! The window is blitz's portable `dioxus-native` shell (winit), so an app runs the same on any
-//! OS; `crate::host` wraps the app to supply what quire needs on top of it.
+//! OS; `crate::host` wraps the app to supply what quire needs on top of it. ds-native runs the
+//! event loop itself (`crate::window_shell`), one dioxus-native application per window, so the
+//! app can open more windows (`crate::open_window`).
 
-use crate::app_id::{AppId, with_app_id};
+use crate::app_id::AppId;
 use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
-use crate::fonts::font_context;
 use crate::frame_links::FrameLinks;
-use crate::host::{Host, HostProps};
 use crate::net_policy::NetPolicy;
 use crate::setup::Setup;
 use crate::window::Decorations;
+use crate::window_build::{Base, Shape};
+use crate::window_requests::{Requests, Root};
+use crate::window_shell::Windows;
 use dioxus::prelude::*;
-use dioxus_native::{LogicalSize, WindowAttributes};
 
 /// How the window starts, and what its document is given: build it with [`AppConfig::new`] and
 /// the `with_*` methods.
@@ -98,27 +100,30 @@ impl AppConfig {
     }
 }
 
-/// Run `app` until its window closes.
+/// Run `app` until its window closes. Windows it opens with [`crate::open_window`] close with
+/// it.
 pub fn launch(app: fn() -> Element, config: AppConfig) {
     // Held until this call returns, which does not happen until the window closes — i.e., for
     // the process's life. See `crate::runtime` for why a host thread must enter Tokio at all.
     let _runtime = crate::runtime::enter();
-    let window = WindowAttributes::default()
-        .with_title(config.title)
-        .with_surface_size(LogicalSize::new(config.width, config.height))
-        .with_decorations(config.decorations.winit());
-    let window = match &config.app_id {
-        Some(id) => with_app_id(window, id),
-        None => window,
+    let event_loop = blitz_shell::create_default_event_loop();
+    let waker = event_loop.create_proxy();
+    let base = Base {
+        setup: config.setup,
+        app_id: config.app_id.clone(),
+        decorations: config.decorations,
+        requests: Requests::new(move || waker.wake_up()),
     };
-    let native = dioxus_native::Config::new()
-        .with_window_attributes(window)
-        .with_font_ctx(font_context());
-    let contexts = config.setup.contexts.for_launch();
-    dioxus_native::launch_cfg_with_props(
-        Host,
-        HostProps::new(app, config.setup),
-        contexts,
-        vec![Box::new(native)],
-    );
+    let shape = Shape {
+        title: config.title,
+        size: (config.width, config.height),
+        app_id: config.app_id,
+        decorations: config.decorations,
+    };
+    let windows = Windows::new(event_loop.create_proxy(), Root::Plain(app), shape, base);
+    // As dioxus-native's own `launch` does: an event loop that cannot run leaves the app no
+    // window to show anything in, which is a broken host, not bad input.
+    event_loop
+        .run_app(windows)
+        .expect("the window's event loop could not run");
 }
