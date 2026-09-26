@@ -4171,3 +4171,103 @@ not installed).
 3. **Pre-rendered sprite sheets of the whole set**: only if the scrolling measurement fails. It
    costs several MB of PNG per size, a build step, and loses the system font's updates.
 4. **CBDT**: no. It paints nothing, and the one-feature fix panics the window renderer.
+
+## File drops and a second window (2026-09-27)
+
+Two gaps mailo's native window needed (mailo items 21 and 8). Branch `drop-and-windows`; blitz
+rev unchanged (`e99fbdbd`), no Blitz fork. APIs in CONSUMING.md "File drops and a second
+window"; what mailo writes in `docs/mailo-migration.md` §6.8.
+
+1. **File drops.**
+   - **winit 0.31 (beta.3) does not hand over paths in its drag events.** The brief expected
+     `DragEntered/DragMoved/DragDropped/DragLeft` with paths; at this version they are
+     `DragEntered { id, position: Option<_> }`, `DragPosition { id, position, proposed_action }`,
+     `DragDropped { id, proposed_action }` and `DragLeft { id }`, over a data-transfer API: the
+     app reads what the drag offers (`ActiveEventLoop::data_transfer(id)`), asks for a type
+     (`fetch_data_transfer(id, &TypeHint::UriList)`), and the bytes arrive later as
+     `DataTransferReceived`. A drag is **refused until the app accepts it**
+     (`set_valid_dnd_actions(id, &[DndAction::Copy])`), and a refused drag let go arrives as
+     `DragLeft`, not `DragDropped`.
+   - **Fetch on enter, not on drop.** Wayland finishes the offer inside the `DragDropped` it
+     sends, so a fetch after the release is `Ignored`; X11 keeps it until the data comes. The
+     host fetches the URI list as the drag enters, and a release that comes before the paths is
+     held (`Released`) and lands when they arrive.
+   - **Wayland and X11 differ in the details, not the shape.** Wayland gives the position on
+     enter (`Some`, physical pixels converted from the surface's logical ones); X11 gives `None`
+     and the first position with the first `XdndPosition`, and only proposes `Copy`. X11 answers
+     each position with the accept state the app set *before* it (winit sends `XdndStatus` before
+     the event reaches the app), so the cursor there trails the pointer by one move. Both deliver
+     the same five events otherwise, so the host has one code path.
+   - **Blitz ignores every one of them**: blitz-shell's `handle_winit_event` matches the three
+     drag events with empty arms, and the document has no drag or drop events at all. The
+     dioxus-native window hook ds-native already uses for IME (it hears each winit event before
+     the document) is where the host reads them, and it has the `ActiveEventLoop` the
+     data-transfer calls need.
+   - **What was built.** `ds` (pure): `FileDrag`, `FileDragInput`, `FileDrop`, `Offer`,
+     `DropAcceptance`, `DropHit`, a tracker, `HostFileDrop` and `use_file_drop`. ds-native:
+     `crate::window_drop` (winit to inputs, the fetch, the answer), `crate::drop_hit` (Blitz's
+     `element_from_point`, then the innermost registered target on the ancestor chain), and
+     `Harness::file_drag`. A target writes the existing `DropState` values (`data-drop="target"`
+     over it, `"accepts"` elsewhere during a file drag), so no new attribute value or class.
+   - **Paths only.** A URI list is read with winit's `try_as_file_paths`, which fails the whole
+     list if any entry is not a `file:` URI; such a drag, and one that offers no URI list, is
+     `Offer::Other`, refused and never lit.
+   - Proof: `ds` unit tests (the tracker's table, the view and acceptance table) and
+     `tests/file_drop.rs` on a real Blitz document: files entering over the composer light it
+     `target` and its inner chip `accepts`; moving off lights both `accepts` and refuses; leaving
+     clears both and drops nothing; a release over the composer hands it exactly the two paths and
+     it shows `Dropped` until the next drag; a release on the chip reaches only the chip; a
+     release before the paths lands when they come; a dragged URL lights and drops nothing.
+   - **Not verified: a real drop from a file manager.** The winit half (`crate::window_drop`) is
+     not driven by any test (a test cannot make an `ActiveEventLoop`), and no drag was performed
+     by a person. `cargo run -p ds-native --example file_drop` is the check; it is queued in
+     `docs/manual-checks.md` (quire) for Wayland and X11.
+2. **A second window.**
+   - **dioxus-native at this rev has no public way for a running app to open one.**
+     `DioxusNativeApplication::add_window` pushes onto blitz-shell's `pending_windows`, which only
+     `can_create_surfaces` drains (a resume, which a desktop never repeats), and a window made
+     that way gets none of dioxus-native's contexts: its own `Document`, the window, the shell,
+     history, the renderer, and `use_window_event`'s registry, whose type is crate-private, so no
+     outside code can provide it either. `launch_cfg_with_props` runs the event loop itself and
+     returns no application.
+   - **The route through public types.** ds-native now runs the loop itself: it builds each
+     window's document as `launch_cfg_with_props` does (with quire's features: no `net`, no hot
+     reload) and runs one `DioxusNativeApplication` per window under its own `ApplicationHandler`
+     (`crate::window_shell`), which routes each window event to the application whose window it is
+     and forwards the lifecycle calls to all. Each application sets its one window up with every
+     dioxus-native context, exactly as for a first window. Two dioxus-native providers are private
+     (the `dioxus:` asset net provider and the link opener); ds-native has its own of each, doing
+     what those do at quire's features (`crate::native_providers`), with `dioxus-asset-resolver`
+     and `webbrowser` at the versions already in the tree. `blitz-shell` is named directly for
+     `BlitzShellProxy`, `WindowConfig` and the event loop. Three workspace dependencies, no new
+     crate in the lock.
+   - **Closing a second window must not end the loop.** blitz-shell exits the loop when an
+     application's last window closes, and every second window is its own application's last. So
+     each application's shell events go through a relay only the handler reads: a window's
+     `CloseWindow` (its frame's close) and a compositor's `CloseRequested` for a second window drop
+     that application instead of reaching it. The first window's close drops the others first, then
+     reaches blitz-shell and ends the loop as before (winit wants windows gone before the loop
+     exits).
+   - **A closed window's renderer must outlive it (NVIDIA, Wayland).** Each vello-hybrid renderer
+     owns a wgpu instance. Dropping a second window's renderer made the first window's next frame
+     crash inside `libnvidia-eglcore` (`vkAcquireNextImageKHR` through a null function pointer;
+     backtrace through `wgpu_hal::vulkan::Surface::acquire_texture`). A closing window's renderer is
+     now suspended (its surface released, as blitz-shell does) and kept, and the next window opened
+     draws with it; with that, closing and reopening is clean. Not reported upstream yet; whether
+     any other driver cares is unknown.
+   - **What cannot be done cleanly:** a second window's `use_window_event` never hears its own
+     `CloseRequested` (handing it on would end the loop through blitz-shell's exit), so an app acts
+     on close in a `use_drop`; the VirtualDom's drop runs them. A `Signal` cannot cross between
+     windows (each VirtualDom has its own runtime); data goes by props or a shared `Arc`.
+   - Proof: unit tests for the request queue (every request wakes the loop once and is answered
+     in order; `Opening` until the loop opens it) and the close rule, and a live run of
+     `cargo run -p ds-native --example second_window` with `QUIRE_AUTOPILOT=1`, no wrapper, on the
+     desktop's Wayland session (KWin, NVIDIA) and under X11 (XWayland): the first window and every
+     message window print the same eight seams present (`HostModality`, `HostScale`, `HostCaret`,
+     `HostClickFocus`, `HostFind`, `HostFileDrop`, `WindowHost`, and the app's own
+     `with_context` value); a window closed by its handle prints its `use_drop` and reads
+     `Closed`; one that closes itself through its frame's `WindowHost::close` does the same; closing
+     the first window with a third open drops the third, and `launch` returns, exit 0. No harness
+     test: the harness has no event loop, and `open_window` there is `OpenWindowError::NoHost`.
+   - Manual (queued): the compositor's close of a second window (its title-bar button, Alt+F4)
+     and `handle.focus()` raising it; the runs above closed windows only from the app's side.
