@@ -46,7 +46,7 @@ pub enum TextInputKind {
 }
 
 /// One masked character.
-const MASK_DOT: char = '\u{2022}';
+pub(crate) const MASK_DOT: char = '\u{2022}';
 
 impl TextInputKind {
     /// The `type` attribute of the single-line `input`.

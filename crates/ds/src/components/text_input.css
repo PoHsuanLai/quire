@@ -44,15 +44,32 @@
 
 /* A password (`data-kind=password`): Blitz draws a password field's characters as typed, so the
    field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
-   per character over it, where the placeholder would sit. The caret follows the hidden text, so
-   it can sit a little off the last dot; the secret itself never paints. */
+   per character over it, where the placeholder would sit; the secret itself never paints.
+   Blitz measures the hidden text in its editor's own face, untracked, so its caret drifts off
+   the Inter dots tracked .1em (two dots short at eleven). Where the host reads the selection
+   (ds-native) the field draws its own caret among the dots (Q360b): the input's is transparent
+   (`data-caret=drawn`) and `.ds-input-caret` is Blitz's caret redrawn, 1.5 px wide, the height of
+   the line, in the dots' ink (`--ink`; the lock pill repeats its own), not blinking (Blitz's does not blink either), shown only while the
+   field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
+   the plan's `--accent-soft` behind its dots. */
 .ds-input[*|data-kind=password],
 .ds-input[*|data-kind=secret]{ color:transparent; caret-color:var(--ink); }
+.ds-input[*|data-caret=drawn]{ caret-color:transparent; }
+/* The caret takes no room in the line: a point on the baseline, its bar hung from the line's top
+   (Inter's ascent .969em plus the half-leading of a 1.55 line, (1.55 - 1.21) / 2 = .17em). */
+.ds-input-caret{ position:relative; display:inline-block; width:0; height:0; }
+.ds-input-caret::before{ content:""; position:absolute; left:0; top:-1.139em; width:1.5px; height:1.55em; background:var(--ink); }
+.ds-input-mask-selected{ background:var(--accent-soft); }
 .ds-input-mask{
   position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink); letter-spacing:.1em;
 }
-.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); }
+/* Boxed, the mask's line is the field's ground (its content box is the input's, to the pixel),
+   so Blitz's own selection, which it paints over the hidden text in a fixed colour no style
+   reaches, stays under it and only the dots' highlight shows. An Inline field's ground is its
+   container's (the lock pill's glass), which the mask cannot repeat: there Blitz's highlight
+   shows beside the dots' when a range is selected (FINDINGS Q360b). */
+.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); background:var(--surface); background-clip:content-box; }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 
 /* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
@@ -74,6 +91,8 @@
 .ds-input[*|data-variant=bare][*|data-kind=password],
 .ds-input[*|data-variant=bare][*|data-kind=secret]{ color:transparent; }
 .ds-input-wrap[*|data-variant=bare] .ds-input-mask{ color:inherit; }
+/* A bare field's line height is its parent's, so its caret spans the text's ascent and descent. */
+.ds-input-wrap[*|data-variant=bare] .ds-input-caret::before{ top:-.969em; height:1.21em; background:var(--accent); }
 
 /* Multiline (mailo gaps 4): a `textarea`. Blitz gives it `rows` line heights of content (two when
    `rows` is absent) plus its padding, so the one-line height above is undone and the field's
