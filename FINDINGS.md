@@ -2934,6 +2934,59 @@ rev unchanged (`e99fbdbd`). Proofs are harness tests: `native_focus_field.rs`,
      webview too. The same row with the strip hidden opens. So mailo's centre click landed on
      Archive because its strip was shown (hovered, or its row held the focus) and wide enough
      for its row, not because Blitz's box is wrong.
+4. **A click a quire control keeps to itself (mailo, against v0.1.10; branch
+   `stop-click-focus`).** mailo measured the focus on `html` right after a `HoverStrip` Archive
+   click, against §6.6 of `docs/mailo-migration.md` ("a click on a quire strip button focuses
+   that button").
+   - **Found: two ways a quire click never reached the root's fallback.** A control that stops
+     the click's propagation (the strip's buttons, a `TreeItem`'s select button and trailing
+     slot, `Propagation::Stop`, the row star, a sidebar item's close and cancel, a menu row's
+     action, a settings row's switch slot, the space editor's remove, an inert tile chevron, a
+     rich-text link) keeps it from `Ds`'s click handler. Blitz's default still ran and cleared
+     the focus (a `button type="button"` is none of Blitz's own), and with the pressed button
+     still in the document the removal keeper took the clear for a deliberate one
+     (`Seen::Released`) and left it: the keyboard was on `html`. And a control that prevents the
+     default (every `Propagation::Stop`, the tree row's `summary`, which prevents its own toggle)
+     made the root pass the click by (`after_click` skips a click whose default is taken), while
+     Blitz, its default prevented, left the focus wherever it was: a click on a tree row from
+     nowhere left it nowhere.
+   - **Checked: no capture phase.** dioxus 0.7's events have no capture listeners, and Blitz's
+     driver dispatches along the target's chain bottom-up only (`events/driver.rs`), so the root
+     cannot hear a click before a control stops it.
+   - **The rule now.** Every quire click handler that stops a click, or prevents its default,
+     calls `focus::click::kept_click` last, after its own work (the root is the last to hear a
+     click, and a handler's own later focus must still win). `Ds` provides its seams and its
+     element as context (`ClickRoot`) for that. With the default left to run, the click goes
+     through `HostClickFocus` exactly as the root's does (fallback now, restore a frame later
+     if the focus is nowhere). With the default prevented, Blitz will not clear the focus, so
+     the new `ds::HostPressFocus` (`ds_native::PRESS_FOCUS`, provided beside `CLICK_FOCUS`
+     under `FocusFallback::Ancestor`) gives the nearest focusable element from the pressed one
+     up the keyboard at once, inside the click. The pressed control, or its focusable ancestor
+     (the `summary` for a tree row's plain label), has the keyboard afterwards, as a pressed
+     button does in a browser.
+   - **Limit: a field keeps the keyboard through a prevented kept click.** A host write
+     dispatches no event, so moving the focus off a text field (or an editable surface,
+     `role=textbox`) without Blitz's clear would leave it unblurred: a rename field would never
+     hear that it lost the keyboard. `PRESS_FOCUS` leaves the focus there, as before this fix.
+     A kept click whose default runs (a strip button) is Blitz's clear, with its `blur`, so there
+     the button takes the keyboard from the field as any click does.
+   - **Held in the source.** `crates/ds/tests/kept_click_rule.rs` reads every component's
+     `onclick` handlers (a named one, `onclick: fence`, from its function) and fails on one that
+     stops the click without `kept_click`. A handler that only prevents the default is not
+     scanned (the `summary` is the one today).
+   - **The editing slot's pointer-up.** `TreeItem`'s editing slot stopped `pointerup` as well as
+     the click, so an ancestor's `onpointerup` (mailo's `.app`, which ends a drag there, and the
+     row's own drop relay) never heard a press that ended in the rename field. Nothing depended
+     on it (Blitz's pointer-up default, the click, is unaffected), so the fence is gone; the
+     click and double click stay fenced.
+   - Proof: `crates/ds-native/tests/kept_click_focus.rs`. After a click on a strip button, a
+     tree row's select button, the ⋯ in its trailing slot and a plain tree label, the pressed
+     control (the label's `summary`) is focused, not `html`, the press stayed the control's and
+     `j` reaches `.app`; a kept click takes the keyboard from `.app`; under
+     `FocusFallback::BlitzDefault` none of them gets it (the negative control); a rename field
+     keeps the keyboard through a select click elsewhere; a press in the field reaches `.app`'s
+     `onpointerup`. The four focus cases, the take from `.app` and the pointer-up failed on master;
+     the negative control and the field's case pass on both.
 
 ## Control center parts (2026-09-25)
 

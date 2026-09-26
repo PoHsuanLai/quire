@@ -10,6 +10,7 @@
 //! written as before.
 
 use crate::components::text_runs::{OptionalText, Run, RunTone, Text, edges, run};
+use crate::focus::click::kept_click;
 use dioxus::core::SuperFrom;
 use dioxus::prelude::*;
 
@@ -155,6 +156,7 @@ fn link(text: &str, href: &str, on_link: Option<EventHandler<String>>) -> Elemen
                 if let Some(on_link) = on_link {
                     on_link.call(pressed.clone());
                 }
+                kept_click(&event);
             },
             onkeydown: move |event| {
                 if event.key() == Key::Enter {

@@ -3,6 +3,7 @@
 //! tray icon's right-click has to reach the app as a secondary press, its middle click as a
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 
+use crate::focus::click::kept_click;
 use crate::geometry::{Point, Px};
 use dioxus::core::SuperFrom;
 use dioxus::html::input_data::MouseButton;
@@ -80,7 +81,9 @@ pub enum Propagation {
     /// The press ends at the control: its propagation is stopped before `onclick` runs, and
     /// its default action is prevented, since on Blitz a click's default action walks up the
     /// ancestors (it is what toggles a `<details>` from its `<summary>`). A `type=button` has
-    /// no default action of its own, so nothing the control does is lost.
+    /// no default action of its own, so nothing the control does is lost. The keyboard still
+    /// moves to the control, as for any press: the control hands the click to the host's
+    /// click focus itself (FINDINGS "Native focus").
     Stop,
 }
 
@@ -125,11 +128,16 @@ impl PressListeners {
         }
     }
 
-    /// A `click`: primary, or whatever button the event names.
+    /// A `click`: primary, or whatever button the event names. A click kept at the control
+    /// ([`Propagation::Stop`]) is handed to the host's click focus last, as the root would have
+    /// (`focus::click::kept_click`): the control has the keyboard afterwards.
     pub(crate) fn click(&self, event: &MouseEvent) {
         self.propagation.apply(event);
         if let Some(button) = button_of(event.trigger_button()) {
             self.press.call(Press::of(event, button));
+        }
+        if self.propagation == Propagation::Stop {
+            kept_click(event);
         }
     }
 

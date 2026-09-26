@@ -5,6 +5,7 @@ use crate::components::avatar::{AvatarFace, face};
 use crate::components::count::{Count, CountPlace};
 use crate::components::row_hooks::relay;
 use crate::components::vocab::{DropState, Here, PulseKey};
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::motion::presence::Presence;
@@ -216,6 +217,7 @@ pub fn SidebarItem(
                             // Closing is not opening: the entry itself must not also navigate.
                             event.stop_propagation();
                             onclose.call(());
+                            kept_click(&event);
                         },
                         Glyph { icon: Icon::X, size: IconSize::Small }
                     }
@@ -243,6 +245,7 @@ fn today_trailing(trailing: TodayTrailing) -> Element {
                 // Cancelling is not opening: the entry itself must not also navigate.
                 event.stop_propagation();
                 on_cancel.call(());
+                kept_click(&event);
             },
             Glyph { icon: Icon::X, size: IconSize::Small }
         }
