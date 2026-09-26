@@ -41,6 +41,7 @@ pub mod space;
 pub mod status_items;
 pub mod tokens;
 pub mod type_ramp;
+pub mod widget_looks;
 pub mod widgets;
 
 use crate::axes::Axes;

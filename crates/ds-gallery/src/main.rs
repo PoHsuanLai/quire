@@ -42,7 +42,7 @@ fn main() {
     }
     match args.snapshot {
         Some(dir) => {
-            if let Err(error) = snapshot::run(&dir) {
+            if let Err(error) = snapshot::run(&dir, args.page) {
                 eprintln!("ds-gallery: {error}");
                 std::process::exit(1);
             }

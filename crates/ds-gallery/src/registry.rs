@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 14] = [
+pub const REGISTRY: [Entry; 15] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -119,6 +119,13 @@ pub const REGISTRY: [Entry; 14] = [
         lede: "The level control in its three looks for the user to choose from (capsule with the glyph inside, capsule and knob, sixteen segments), live and as a grid of states, and the OSD card at the top right that carries it.",
         height: 2300,
         body: pages::level::LevelPage,
+    },
+    Entry {
+        page: Page::WidgetLooks,
+        title: "Widget looks",
+        lede: "The candidate depth looks for the desktop widgets (design/23-WIDGETS.md) for the user to pick from: the battery as the current ring, a ring in a groove round a raised boss, and a glossy cell; the world clock as the current paper dial, a bezel round a sky face, and a sky well; each in a Small and a Medium card over the wallpaper; then the card's plain and lit finish.",
+        height: 1950,
+        body: pages::widget_looks::WidgetLooksPage,
     },
 ];
 

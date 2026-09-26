@@ -24,6 +24,7 @@ against them.
 | `20-SURFACES.md` | Per shell surface and per app: layer, Material, components, motion, behaviours, milestone. |
 | `21-SPACES.md` | Spaces on the desktop: SpaceLook per workspace, frame tokens on shell chrome, storage. |
 | `22-SETTINGS.md` | Every proposed value as a settings key with its default; storage, Rust shape, UI mapping. |
+| `23-WIDGETS.md` | Desktop widgets' depth language, the battery and clock candidate looks, the calendar widget brief. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
 ## 2. Reading order

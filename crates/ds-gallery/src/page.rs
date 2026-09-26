@@ -31,11 +31,13 @@ pub enum Page {
     Edit,
     /// The level control's three looks and the OSD card that carries it.
     Level,
+    /// The widget faces' candidate looks: the battery, the world clock and the card's finish.
+    WidgetLooks,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 14] = [
+    pub const ALL: [Page; 15] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -50,6 +52,7 @@ impl Page {
         Page::Polish,
         Page::Edit,
         Page::Level,
+        Page::WidgetLooks,
     ];
 
     /// The `--page` word.
@@ -69,6 +72,7 @@ impl Page {
             Page::Polish => "polish",
             Page::Edit => "edit",
             Page::Level => "level",
+            Page::WidgetLooks => "widget-looks",
         }
     }
 }

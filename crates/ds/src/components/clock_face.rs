@@ -11,8 +11,10 @@ use crate::appearance::Scheme;
 use crate::components::bump_on::{bump_attrs, use_bump_on};
 use crate::components::clock_angles::hands;
 use crate::components::clock_dial::{hands_svg, second_svg};
+use crate::components::clock_dial_depth::{self as depth, tapered_svg, ticks_svg};
 use crate::components::clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use crate::components::text_runs::{Text, text};
+use crate::components::widget_looks::DialLook;
 use crate::root::chrome::RootChrome;
 use crate::root::env::use_env;
 use crate::root::surface::Surface;
@@ -27,22 +29,34 @@ fn dial_scheme(phase: DayPhase) -> Scheme {
 }
 
 /// A clock showing `time`, tinted for `phase`, drawn as `look`, with `label` (the city) under
-/// it. A digital face bumps once on each new minute; an analog one moves its hands.
+/// it. A digital face bumps once on each new minute; an analog one moves its hands. `dial`
+/// builds the analog dial (design/23-WIDGETS.md section 4.2): the flat paper disc by default,
+/// a bezel round a sky face, or a sky well; on a digital face a depth dial sets the time in
+/// the display face with a small sky disc of the phase beside it.
 #[component]
 pub fn ClockFace(
     time: ClockTime,
     #[props(default)] phase: DayPhase,
     #[props(default)] look: ClockLook,
     #[props(into)] label: Text,
+    #[props(default)] dial: DialLook,
 ) -> Element {
-    let face = match look {
-        ClockLook::Analog => rsx! { AnalogDial { time, phase } },
-        ClockLook::Digital => rsx! { Digits { time } },
+    let face = match (look, dial) {
+        (ClockLook::Analog, DialLook::Paper) => rsx! { AnalogDial { time, phase } },
+        (ClockLook::Analog, _) => rsx! { DepthDial { time, phase, dial } },
+        (ClockLook::Digital, DialLook::Paper) => rsx! { Digits { time } },
+        (ClockLook::Digital, _) => rsx! {
+            span { class: "ds-clock-row",
+                Digits { time }
+                SkyDisc { phase }
+            }
+        },
     };
     rsx! {
         div {
             class: "ds-clock",
             "data-look": look.slug(),
+            "data-dial": dial.attr(),
             "data-phase": phase.slug(),
             role: "img",
             "aria-label": "{label.plain_text()} {time.digits()}",
@@ -67,6 +81,40 @@ fn AnalogDial(time: ClockTime, phase: DayPhase) -> Element {
                 {hands_svg(at)}
                 {second}
             }
+        }
+    }
+}
+
+/// A depth dial, in its phase's scheme: the face (a sky inside a bezel, or a sky well), the
+/// indices, the hands over their shadow, the second hand, and the hub.
+#[component]
+fn DepthDial(time: ClockTime, phase: DayPhase, dial: DialLook) -> Element {
+    let material = use_env().material;
+    let at = hands(time);
+    let shown = matches!(time.second, Seconds::Shown(_));
+    rsx! {
+        Surface { material, theme: dial_scheme(phase), chrome: RootChrome::Transparent,
+            div { class: "ds-clock-dial",
+                span { class: "ds-clock-face" }
+                {ticks_svg(dial)}
+                {tapered_svg("ds-clock-shade", at, shown)}
+                {tapered_svg("ds-clock-hands", at, false)}
+                if shown {
+                    {depth::second_svg(at.second)}
+                }
+                span { class: "ds-clock-hub" }
+            }
+        }
+    }
+}
+
+/// A small disc of the phase's sky, the day or night cue beside a digital time.
+#[component]
+fn SkyDisc(phase: DayPhase) -> Element {
+    let material = use_env().material;
+    rsx! {
+        Surface { material, theme: dial_scheme(phase), chrome: RootChrome::Transparent,
+            span { class: "ds-clock-sky" }
         }
     }
 }
