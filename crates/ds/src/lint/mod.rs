@@ -27,6 +27,7 @@ pub mod tokenize;
 mod animation;
 mod colours;
 mod declaration;
+mod details;
 mod hairline;
 mod inline_style;
 mod kind;
