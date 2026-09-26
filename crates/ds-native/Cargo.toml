@@ -90,3 +90,7 @@ required-features = ["print"]
 [[test]]
 name = "pdf_thumb"
 required-features = ["pdf-thumb"]
+
+[[test]]
+name = "pdf_thumb_queue"
+required-features = ["pdf-thumb"]
