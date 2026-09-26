@@ -67,3 +67,15 @@ pub(super) const ELLIPSIS_VERTICAL: &[Shape] = &[
         r: "1",
     },
 ];
+
+// Lock and switcher parts (M11): the lock field's enter button and its caps-lock mark.
+
+/// Lucide `arrow-right`.
+pub(super) const ARROW_RIGHT: &[Shape] = &[Shape::Path("M5 12h14"), Shape::Path("m12 5 7 7-7 7")];
+
+/// Lucide `arrow-big-up-dash` in its square-cornered form: the caps-lock key's arrow over its
+/// bar.
+pub(super) const CAPS_LOCK: &[Shape] = &[
+    Shape::Path("M9 19h6"),
+    Shape::Path("M9 15v-3H5l7-7 7 7h-4v3H9z"),
+];

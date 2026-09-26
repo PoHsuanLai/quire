@@ -104,6 +104,9 @@ impl Icon {
         // mailo gaps 6.
         Icon::Ellipsis,
         Icon::EllipsisVertical,
+        // Lock and switcher parts (M11).
+        Icon::ArrowRight,
+        Icon::CapsLock,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
@@ -211,6 +214,8 @@ impl Icon {
         // mailo gaps 6.
         Icon::Ellipsis,
         Icon::EllipsisVertical,
+        Icon::ArrowRight,
+        Icon::CapsLock,
         Icon::Play,
         Icon::Pause,
         Icon::SkipBack,

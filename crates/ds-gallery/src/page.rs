@@ -33,11 +33,13 @@ pub enum Page {
     Level,
     /// The widget faces' candidate looks: the battery, the world clock and the card's finish.
     WidgetLooks,
+    /// The shell's own lock screen, polkit prompt and app switcher (M11).
+    LockSwitcher,
 }
 
 impl Page {
     /// Every page, in the gallery's order.
-    pub const ALL: [Page; 15] = [
+    pub const ALL: [Page; 16] = [
         Page::Tokens,
         Page::Type,
         Page::Controls,
@@ -53,6 +55,7 @@ impl Page {
         Page::Edit,
         Page::Level,
         Page::WidgetLooks,
+        Page::LockSwitcher,
     ];
 
     /// The `--page` word.
@@ -73,6 +76,7 @@ impl Page {
             Page::Edit => "edit",
             Page::Level => "level",
             Page::WidgetLooks => "widget-looks",
+            Page::LockSwitcher => "lock",
         }
     }
 }

@@ -1,0 +1,47 @@
+/* LockPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright, as
+   the reference lock screen: the avatar at 64, the name in white 16/700, a pill of flat white
+   glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) holding the secret field, the
+   caps-lock mark and a 28 px enter arrow in a brighter glass disc that shows once something is
+   typed, and a small hint line in `--lock-ink-soft`. The pill plays `shake-x` once through its
+   pulse class (`a-shake-x`, `--t-shake --e-shake`) when a password was wrong. Under
+   `data-look=space` the pill is the Space gradient in the frame's ink. */
+
+.ds-lock-prompt{ display:flex; flex-direction:column; align-items:center; color:var(--lock-ink); }
+.ds-lock-name{ margin-top:var(--s-10); font-family:var(--font-ui); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--lock-ink); }
+
+.ds-lock-field{ display:flex; align-items:center; gap:var(--s-6); box-sizing:border-box; width:260px; height:38px; margin-top:var(--s-14);
+  padding:0 var(--s-5) 0 var(--s-16); border-radius:var(--r-pill); background:var(--lock-glass); color:var(--lock-ink);
+  transition:background-color var(--t-quick) var(--e-out); }
+.ds-lock-field:hover{ background:var(--lock-glass-strong); }
+.ds-lock-field[*|aria-disabled=true]{ opacity:.6; }
+
+/* The inline field inside the pill: the pill's ink, a larger face so the dots read as dots. */
+.ds-lock-field .ds-input-wrap{ flex:1 1 auto; min-width:0; }
+.ds-lock-field .ds-input,
+.ds-lock-field .ds-input-mask,
+.ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
+.ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
+.ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
+.ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
+
+.ds-lock-caps{ display:inline-flex; flex:none; color:var(--lock-ink-soft); }
+
+.ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
+  background:var(--lock-glass-strong); color:var(--lock-ink); cursor:pointer;
+  transition:opacity var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring); }
+.ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
+.ds-lock-go[*|aria-busy=true]{ opacity:1; }
+.ds-lock-go:active{ transform:scale(var(--squish)); }
+.ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
+.ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
+
+.ds-lock-hint{ margin-top:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-small); font-weight:500; color:var(--lock-ink-soft); text-align:center; }
+
+/* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
+.ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
+.ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-go{ background:var(--f-pill); color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-spinner{ border-color:var(--f-ink); }
