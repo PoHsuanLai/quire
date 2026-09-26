@@ -371,7 +371,7 @@ recorder. The M10 screenshot thumbnail (1.13) becomes the shared after-capture s
 | Repo | new (name open); MIT OR Apache-2.0, no GPL/AGPL code (libobs, Cap, gpu-screen-recorder are read for ideas only), no FFmpeg | S |
 | Capture | stills and windows through sill's privileged compositor capture (no prompt); portal + PipeWire (`ashpd`, `pipewire`) for other sessions | P |
 | Compose | scenes, webcam, overlays, cursor smoothing, click-following zoom, window backgrounds on our own wgpu/vello stack | P |
-| Encode | a **vendor-neutral encoder trait** (user: "not nvidia specific"): backends VA-API (`cros-codecs`, AMD/Intel), Vulkan Video (vendor-neutral, NVIDIA/AMD/Intel drivers), NVENC (`nvidia-video-codec-sdk`) as one backend among them, `rav1e` software fallback; the app never names a vendor; backend chosen by probing, overridable | P |
+| Encode | a **vendor-neutral encoder trait** (user: "not nvidia specific"). Primary backend `gpu-video` (MIT, Software Mansion; Vulkan Video, `wgpu::Texture` in, H.264 + HEVC encode, AV1 in progress; needs wgpu 30, ours is 29: take it at a toolchain bump; NOT the rest of smelter, whose real-time licence is restrictive). Fallbacks: VA-API (`cros-codecs`) where a driver has no Vulkan Video encode (this machine's RADV iGPU exposes the encode queue but no codec extension, 2026-09-26), `rav1e` software. The app never names a vendor; backend chosen by probing, overridable | P |
 | Frames | zero-copy: DMA-BUF in, GPU compose, GPU encode; no CPU copy on any backend | P |
 | Audio | per-source PipeWire capture, `nnnoiseless`, mixer, multi-track | P |
 | Output | `muxide` MP4; replay buffer; streaming (`webrtc` WHIP, `srt-tokio`, `rml_rtmp`) | P |
