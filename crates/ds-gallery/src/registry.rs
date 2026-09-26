@@ -131,7 +131,7 @@ pub const REGISTRY: [Entry; 16] = [
         page: Page::WidgetReference,
         title: "Widget reference",
         lede: "The widgets posed as the reference screenshots design/23 section 1.1 measures, at the same size, for the side-by-side comparison: the battery alone, four small rings, the medium row with a low and a charging device, the small analog clock, and the medium world clock by day and by night.",
-        height: 1150,
+        height: 1650,
         body: pages::widget_reference::WidgetReferencePage,
     },
 ];

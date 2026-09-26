@@ -1523,6 +1523,20 @@ the stylesheet's.
 | `ImageSize` | `{ width: u32, height: u32 }` | The picture's pixels; only the ratio is read |
 | `DRAG_THRESHOLD` | `Px(8.0)` | The Manhattan travel that makes a press a drag (section 34) |
 
+### Widget vibrancy (2026-09-26)
+
+design/23-WIDGETS.md sections 1.1 (M26-M34) and 4.3. Values only: no class, attribute or prop
+changed; the stylesheet's golden moved. The light `Widget` material now paints a neutral grey,
+`rgba(228,228,228,.60)` over blur and `.94` without, a 1 px dark rim outside (`--m-hairline` at
+`var(--hair)`, both schemes), a 1 px white rim at .10 inside (`--m-edge`) and a short drop
+`0 2px 8px` black .12 (`--m-shadow`); the dark widget is unchanged but for the 1 px rim.
+
+| Where | What to do | Why |
+| --- | --- | --- |
+| The widget frames' blur region (sill) | Keep requesting `ext-background-effect` blur behind each desktop widget card; set the compositor's blur to a Gaussian of **sigma 22 logical pixels** (44 device pixels at 2x), or the nearest strength that spreads a sharp edge 10-90 % over about 56 logical pixels | The reference card's blur, fitted (M26). Without blur the card paints `--m-tint-solid`, the same grey near-opaque |
+| cosmic-gaps (sill) | Add "saturation x1.8 of what shows through a widget's blur" | Measured on the reference (M29, low confidence); a tint can only mix, so the boost is the compositor's or nobody's |
+| Nothing else | The tint's alpha stays .60, above the reference's .48, because the legibility gate needs `--ink` at 4.5:1 over a black backdrop (design/23 section 1.1, "What quire paints") | A lower alpha is a change to the gate, the user's call |
+
 ### PDF and printing (2026-09-25)
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and

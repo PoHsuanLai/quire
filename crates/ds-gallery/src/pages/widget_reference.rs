@@ -6,6 +6,7 @@
 //! in Cupertino, 8:25 in Tokyo, 9:25 in Sydney by day and 1:25 in Paris by night.
 
 use super::Section;
+use super::widget_blur::BlurWall;
 use super::widget_looks::Wall;
 use dioxus::prelude::*;
 use ds::{
@@ -81,6 +82,9 @@ const CITIES: [City; 4] = [
 #[component]
 pub fn WidgetReferencePage() -> Element {
     rsx! {
+        Section { title: "Compositor blur", note: "The cards over a vivid wallpaper, blur on: behind each card a copy of the wallpaper blurred as the compositor blurs it (a Gaussian of sigma 22, the reference fit, design/23 M26), clipped to the card, so the tint composes over it as it will in the shell. The walls below paint what the toolbar's Blur axis asks for.",
+            BlurWall {}
+        }
         Section { title: "Batteries", note: "Small with one device (the ring at the top left, the percentage under it), small with four places, and medium with a row of four (13 % is low and red; 99 % is charging, with the bolt in the ring's gap).",
             Wall {
                 BatterySolo {}
@@ -106,7 +110,7 @@ fn ring(device: Device) -> Element {
 }
 
 #[component]
-fn BatterySolo() -> Element {
+pub(super) fn BatterySolo() -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Small,
             div { class: "g-wr-solo",
@@ -118,7 +122,7 @@ fn BatterySolo() -> Element {
 }
 
 #[component]
-fn BatteryGrid() -> Element {
+pub(super) fn BatteryGrid() -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Small,
             div { class: "g-wr-grid",
@@ -132,7 +136,7 @@ fn BatteryGrid() -> Element {
 }
 
 #[component]
-fn BatteryRow() -> Element {
+pub(super) fn BatteryRow() -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Medium,
             div { class: "g-wr-row",
@@ -148,7 +152,7 @@ fn BatteryRow() -> Element {
 }
 
 #[component]
-fn ClockSmall() -> Element {
+pub(super) fn ClockSmall() -> Element {
     let time = ClockTime {
         hour: 10,
         minute: 32,
@@ -162,7 +166,7 @@ fn ClockSmall() -> Element {
 }
 
 #[component]
-fn ClockMedium() -> Element {
+pub(super) fn ClockMedium() -> Element {
     rsx! {
         WidgetFrame { size: WidgetSize::Medium,
             div { class: "g-wr-dials",
