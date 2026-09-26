@@ -350,6 +350,36 @@ Neighbour days `--ink-faint`; weekends optionally tinted (C1); past days dimmed 
 data face's caps (the current `--accent` caps title reads as a form label). Motion unchanged
 (`slide-l`/`slide-r`).
 
+### 5.1 The compact month's spacing (2026-09-27)
+
+The user's report on sill's capture (`widgets-desktop-cosmic.png`, the small calendar tile):
+"looks weird". The compact grid was packed into the top of the 140 x 140 content box (a
+five-week month left 21 of it empty, the ink's bottom inset 38.8 against 15.2 at the top), the
+title and weekday heads sat tight on each other and on the first row, and the rows (19) ran
+closer than the columns (20).
+
+**What the reference does (W16).** The small Month widget of the Calendar (macOS 14-15, the same
+widget as the phone's): the month's name top left in the red accent, small, semibold, upper; the
+weekday initials under it in grey; then the dates, today on a red disc. The grid **fills the
+card**: the columns span the content width and the weeks the content height, so a five-week
+month's rows stand taller than a six-week month's; there is no blank sixth row. Confidence low:
+no Month widget appears in the screenshot sources of section 1.1 (the 512 Pixels library's
+macOS 12-15 Notification Center and desktop-widget captures show the Up Next and date faces
+only), and a search found no capture to measure, so the row rule is from use of the widget, not
+from pixels. The fixed-six-rows alternative was rejected: it is the "third left empty" the user
+reported, for every five-week month.
+
+**What quire draws** (design/04-COMPONENTS.md section 39, the compact table): the header 14 and
+the heads 12 keep their heights; the weeks share the rest evenly (19.67 for six weeks, 23.6 for
+five); seven 20 columns across the 140; the number centred in its row with the 20 disc; the
+weeks run 4 past the content box so the ink's insets come out even (top 15.2, left 16.5, right
+15.8, bottom 16.8 five-week and 14.8 six-week, measured on the 4x snapshots); the title and
+heads in the UI face (section 3.2: no widget uses `--font-data`), the title at `--fw-caps`
+(600). Six weeks cannot have square pitch and air under the header both in 140: square would
+leave 20 for header and heads together, less than the pass started from (24), so the six-week
+rows stay a third of a pixel under the columns. Snapshots before and after, light and dark, 1x
+and 4x: `tools/progress/shots/gallery/calendar-compact-*.png`.
+
 ## 6. Open decisions (for the user; the gallery's "Widget looks" and "Widget reference" pages render the proposal)
 
 **Settled 2026-09-26, "relax the contrast then":** the card's translucency against its own
@@ -431,6 +461,7 @@ instead, since it is large or bold. See section 4.3 and design/03-COLOR.md secti
 | W13 | World clock | Analog faces, one per city in the Medium widget (four across), the city under each; the whole face white by day and black by night | M | timeanddate/Apple discussions: "white face during the daytime and a black one at night"; the switch time is not published (discussion 251886962 observes it off sunrise and sunset) |
 | W14 | Clock dial | twelve heavy numerals; sixty ticks on the small widget's large dial, none on the medium's; orange seconds hand with a hub ring; black hands with a thin neck near the hub; the day/night switch recolours face, numerals and hands together; measured in section 1.1 (M16-M22) | M | section 1.1 |
 | W15 | Calendar | Small: the weekday in red caps, the date in a large display weight, then the next event with a coloured left bar; Medium: that on the left and the month grid or events on the right; Large: the month grid with today on a red disc, event dots | L | screenshots |
+| W16 | Calendar, small Month | the month name top left in the accent, semibold caps; weekday initials; the dates fill the card, columns across its width and the weeks down its height (five weeks: taller rows; no blank sixth row); today on a red disc | L | use of the widget; no measurable capture found (section 5.1) |
 
 ### 8.2 The phone platforms' widget galleries
 
