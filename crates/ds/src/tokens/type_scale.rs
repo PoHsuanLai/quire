@@ -142,6 +142,15 @@ pub enum FontSize {
 }
 
 impl FontSize {
+    /// The steps fitted to a measured cap height, whose size follows the typeface.
+    pub const CAP_FITTED: [FontSize; 5] = [
+        FontSize::Dial,
+        FontSize::DialLarge,
+        FontSize::WidgetFigure,
+        FontSize::WidgetHero,
+        FontSize::LockClock,
+    ];
+
     /// Every step, smallest first.
     pub const ALL: [FontSize; 27] = [
         FontSize::Pico,
@@ -206,8 +215,28 @@ impl FontSize {
         })
     }
 
-    /// The size in CSS: `9.5px`.
+    /// The size in CSS under the default typeface ([`Typeface::System`]): `9.5px`.
     pub fn css(self) -> &'static str {
+        self.css_in(Typeface::System)
+    }
+
+    /// The size in CSS under `typeface`. Every step is the same in both but the five fitted to a
+    /// measured cap height (design/23 section 1.1, the display face's cap at .66 em): under
+    /// System those are the Editorial size x .66 / .7275 (Inter Display's cap height), rounded
+    /// to .5 px, so the drawn caps keep the measured heights (design/02 open decision 8).
+    pub fn css_in(self, typeface: Typeface) -> &'static str {
+        match (self, typeface) {
+            (FontSize::Dial, Typeface::System) => "8px",
+            (FontSize::DialLarge, Typeface::System) => "16.5px",
+            (FontSize::WidgetFigure, Typeface::System) => "18px",
+            (FontSize::WidgetHero, Typeface::System) => "42.5px",
+            (FontSize::LockClock, Typeface::System) => "127px",
+            _ => self.editorial_css(),
+        }
+    }
+
+    /// The size under Editorial: the ramp as design/02 section 4.2 gives it.
+    fn editorial_css(self) -> &'static str {
         match self {
             FontSize::Pico => "7.5px",
             FontSize::Dial => "9px",

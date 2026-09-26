@@ -168,3 +168,43 @@ fn a_nested_root_takes_the_enclosing_typeface() {
     );
     assert!(markup.contains("<p>editorial</p>"), "{markup}");
 }
+
+#[test]
+fn the_cap_fitted_sizes_keep_the_measured_caps() {
+    // Bricolage's cap height is .66 em, Inter Display's 1490 / 2048: each System size draws the
+    // Editorial size's cap to within the .5 px rounding.
+    const BRICOLAGE: f64 = 0.66;
+    const INTER_DISPLAY: f64 = 1490.0 / 2048.0;
+    let px = |css: &str| {
+        css.trim_end_matches("px")
+            .parse::<f64>()
+            .unwrap_or(f64::NAN)
+    };
+    for size in ds::FontSize::CAP_FITTED {
+        let editorial = px(size.css_in(Typeface::Editorial));
+        let system = px(size.css_in(Typeface::System));
+        let want = editorial * BRICOLAGE / INTER_DISPLAY;
+        assert!(
+            (system - want).abs() <= 0.25,
+            "{size:?}: {system} for {want}"
+        );
+        assert_eq!(
+            system * 2.0,
+            (system * 2.0).round(),
+            "{size:?} on the .5 px grid"
+        );
+    }
+    for size in ds::FontSize::ALL {
+        if !ds::FontSize::CAP_FITTED.contains(&size) {
+            assert_eq!(
+                size.css_in(Typeface::System),
+                size.css_in(Typeface::Editorial)
+            );
+        }
+    }
+    let css = stylesheet();
+    let editorial = block(css, ".ds[*|data-typeface=editorial]");
+    assert!(editorial.contains("--fs-widget-hero:47px;"));
+    assert!(editorial.contains("--fs-lock-clock:140px;"));
+    assert!(block(css, ".ds").contains("--fs-widget-hero:42.5px;"));
+}

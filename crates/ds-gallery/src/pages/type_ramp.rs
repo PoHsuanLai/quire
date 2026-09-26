@@ -35,7 +35,7 @@ pub fn TypePage() -> Element {
                 span { class: "g-head", "data" }
                 for size in FontSize::ALL {
                     span { class: "g-code", "{size.var().as_str()}" }
-                    span { class: "g-code", "{size.css()}" }
+                    span { class: "g-code", "{size.css_in(typeface)}" }
                     for family in [Family::Ui, Family::Display, Family::Data] {
                         span {
                             class: "ds-truncate",

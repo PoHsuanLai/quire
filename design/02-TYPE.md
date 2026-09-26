@@ -128,10 +128,18 @@ Every size in 4.2 stays, role for role; the faces and the pairs move as follows.
 | 7.5-12.5 (display 800: initials, marks) | Inter Display | 800 | 0 | |
 | 9.5-10.5 (code: `Kbd`) | Space Mono (`--font-code`) | 400 | 0 | unchanged |
 
-Widget and lock sizes (`--fs-dial`, `--fs-dial-large`, `--fs-widget-figure`, `--fs-widget-hero`)
-were set from the display face's cap height .66 em; Inter Display's cap height is .727 em, so
-under System those caps draw about 10% taller than the reference measurement. The sizes are kept
-(the user's instruction: sizes stay); re-fitting them to Inter's cap height is open decision 8.
+Five sizes follow the typeface, because they were fitted to measured cap heights (the widgets
+against `23-WIDGETS.md` section 1.1 with the display face's cap at .66 em; the lock clock with
+them): under System each is the Editorial size x .66 / .7275 (Inter Display's cap height),
+rounded to .5 px, so the drawn caps keep the measured heights. Settled, open decision 8.
+
+| Token | Editorial | System | Cap drawn (System) |
+| --- | --- | --- | --- |
+| `--fs-dial` | 9 | 8 | 5.82 (5.94 measured) |
+| `--fs-dial-large` | 18 | 16.5 | 12.00 (11.88) |
+| `--fs-widget-figure` | 20 | 18 | 13.10 (13.20) |
+| `--fs-widget-hero` | 47 | 42.5 | 30.92 (31.02) |
+| `--fs-lock-clock` | 140 | 127 | 92.39 (92.40) |
 
 ### 4.2 Under Editorial (the prototype's pairs)
 
@@ -192,9 +200,10 @@ Outside that span, the desktop widgets carry four sizes of their own, each set s
 height matches the reference widget's measured cap (`23-WIDGETS.md` section 1.1; the display
 face's cap height is .66 em): `--fs-dial` 9 (a world clock row's dial numerals), `--fs-dial-large`
 18 (a small clock's dial numerals), `--fs-widget-figure` 20 (a battery's percentage under its
-ring) and `--fs-widget-hero` 47 (a small battery's percentage).
+ring) and `--fs-widget-hero` 47 (a small battery's percentage). These are Editorial's; System's
+are in section 4.1.
 
-Above them sits `--fs-lock-clock` 140, the lock screen's time in the display face at 700
+Above them sits `--fs-lock-clock` 140 (127 under System), the lock screen's time in the display face at 700
 (design/04 section 42; proposed, M11 2026-09-26: the user asked for a very large, heavy clock).
 
 ## 5. Tracking
@@ -342,9 +351,8 @@ The design system cannot rely on `text-overflow:ellipsis` or line clamp in Blitz
    font (`P:1471`); no size is settled for any shell surface.
 7. **Ellipsis in Blitz.** Whether the mask-fade replacement is acceptable visually for every row in
    section 10 is not specified (`P:420-422`).
-8. **Widget sizes under Inter.** The widget sizes were fitted to the display face's .66 em cap;
-   Inter Display's is .727 em. Whether System should carry its own widget sizes (about 0.91 of
-   each) is not decided.
+8. **Widget sizes under Inter.** Settled (2026-09-26): the five cap-fitted sizes follow the
+   typeface, section 4.1.
 
 ## Sources
 
