@@ -146,6 +146,7 @@ impl Headless {
         vdom.provide_root_context(HostClipboard::memory(Arc::clone(&shell)));
         vdom.provide_root_context(crate::edit::EDIT);
         vdom.provide_root_context(listeners.clone());
+        vdom.provide_root_context(crate::drop_hit::drop_seam());
         let mut doc = DioxusDocument::new(vdom, config);
         let found = DocRef::Cell(Rc::clone(&doc.inner));
         doc.vdom
