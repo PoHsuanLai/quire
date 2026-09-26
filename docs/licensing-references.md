@@ -52,3 +52,18 @@ under the repository's licence (MIT OR Apache-2.0). Three (files, terminal, note
 mail seed 33 and photos seed 11, prompt and workflow sha256 in `~/comfy/out/round3/klein-ground/
 runs.jsonl`), retinted and plated by `tools/icons ship` from `tools/icons/ship.toml`. The source
 renders are not committed; the exported PNGs are.
+
+## Animated emoji (2026-09-26, branch `animated-emoji`)
+
+| Asset | Source | Licence | How it is verified | How it ships |
+| --- | --- | --- | --- | --- |
+| `crates/ds/assets/emoji/*.png` (42 emoji x 128 and 256 px sprite sheets, 7.67 MB) | Noto Animated Emoji by Google, `https://fonts.gstatic.com/s/e/notoemoji/latest/<codepoint>/512.webp` as linked from googlefonts.github.io/noto-emoji-animation | CC BY 4.0 | the source site's FAQ, "Animated Noto Emoji is licensed under CC BY 4.0", linking the 4.0 legal code (read from the site bundle 2026-09-26) | `include_bytes!` into `ds`, with `ATTRIBUTION.txt` and `CC-BY-4.0.txt` beside the sheets; design/25-EMOJI.md section 2 carries the attribution line an about box or credits page shows |
+
+CC BY 4.0 is a licence on the *data*, not on a crate: `cargo deny check licenses` reads only
+each crate's declared licence (`ds` stays MIT OR Apache-2.0 for its code), so it neither sees
+nor needs an allow entry for the sheets, as it does not for the OFL fonts in
+`crates/ds/assets/fonts`. The obligation CC BY places on us, attribution with a link to the
+licence and a note that the files were changed, is met by `ATTRIBUTION.txt` beside the files and
+by the credit line in design/25; a distributor of a quire binary must carry that line in its
+credits (CONSUMING, "Animated emoji"). The still `512.png` files `tools/emoji` reads to find each
+loop's rest pose stay in its cache and are not shipped.
