@@ -3,7 +3,7 @@
 
 use super::{Scope, Section};
 use crate::axes::{Axes, material_label};
-use crate::legibility::{FLOOR, floors};
+use crate::legibility::floors;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::tokens::Alpha;
@@ -93,7 +93,7 @@ fn Chrome(material: Material) -> Element {
                     for floor in measured {
                         Chip {
                             variant: ChipVariant::Status(floor.verdict()),
-                            text: format!("{}, over {}: {:.2} (needs {FLOOR})", floor.tint.label(), floor.backdrop.label(), floor.measured),
+                            text: format!("{}, over {}: {:.2} (needs {})", floor.tint.label(), floor.backdrop.label(), floor.measured, floor.floor),
                         }
                     }
                 }
