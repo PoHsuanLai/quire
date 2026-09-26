@@ -50,7 +50,9 @@ Quoted from the prototypes. Each one is a rule the port is reviewed against.
    (C:288, C:291), and the Pip mascot (excluded, section 11). An animated emoji's loops
    (section 4.11, design/25-EMOJI.md sections 5 and 6) are quire's one idle exception: finite
    plays, only for 20 s after a wake or a mood change, then 0 frames. Errors shake once and hold still:
-   "A looping error animation is something you learn to ignore inside a day" (C:2326).
+   "A looping error animation is something you learn to ignore inside a day" (C:2326). A loop
+   while an operation runs is bounded by design/26-DETAILS.md §3.3 R4 (`PendingGrace`,
+   `PendingCap`); the grammar of small state details is that file.
 8. **Rows rise only when a list is first shown.** "rows rise in only when a list is first shown,
    not on every re-render" (S:292-294).
 9. **The body is opaque.** The message body is animated as one block; staggering lives in the
