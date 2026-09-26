@@ -151,8 +151,8 @@ pub const REGISTRY: [Entry; 19] = [
     Entry {
         page: Page::Details,
         title: "Details",
-        lede: "The grammar of small state details (design/26-DETAILS.md): Sweep with CountUp in step, Reveal, the bounded pending loop on a layered Wi-Fi glyph and on the Spinner, Settle's fill, check and seal, Shake, Nudge, every MorphGlyph style and RollDigits, each with a button that plays its moment again. Nothing here loops: each settles to 0 frames.",
-        height: 1760,
+        lede: "The grammar of small state details (design/26-DETAILS.md): Sweep with CountUp in step, Reveal, the bounded pending loop on a layered Wi-Fi glyph and on the Spinner, Settle's fill, check and seal, Shake, Nudge, every MorphGlyph style and RollDigits, each with a button that plays its moment again, and the bar's layered status glyphs (Wi-Fi, battery, Bluetooth, volume) in every state they draw. Nothing here loops: each settles to 0 frames.",
+        height: 2480,
         body: pages::details::DetailsPage,
     },
 ];

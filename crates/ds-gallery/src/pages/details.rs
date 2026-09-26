@@ -22,12 +22,13 @@ pub fn DetailsPage() -> Element {
         TimeSection {}
         StateSection {}
         MorphSection {}
+        super::details_status::StatusSection {}
     }
 }
 
 /// One primitive: its well, its caption, and the buttons that move it.
 #[component]
-fn Cell(name: String, code: String, controls: Element, children: Element) -> Element {
+pub(super) fn Cell(name: String, code: String, controls: Element, children: Element) -> Element {
     rsx! {
         div { class: "g-detail-cell",
             {children}
@@ -41,7 +42,7 @@ fn Cell(name: String, code: String, controls: Element, children: Element) -> Ele
 }
 
 /// A mini button.
-fn mini(label: &'static str, onclick: impl FnMut(Press) + 'static) -> Element {
+pub(super) fn mini(label: &'static str, onclick: impl FnMut(Press) + 'static) -> Element {
     rsx! { Button { variant: ButtonVariant::Mini, label, onclick } }
 }
 

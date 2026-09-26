@@ -141,6 +141,7 @@ pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
 pub mod spinner;
+pub mod status;
 pub mod switcher_fit;
 pub mod sync_halo;
 pub mod tabs;
@@ -273,6 +274,10 @@ pub use space_editor::{
     ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
 };
 pub use spinner::{Spinner, SpinnerKind};
+pub use status::{
+    BatteryGlyph, BatteryPower, BatteryState, BluetoothGlyph, BluetoothState, LowAt, StatusGlyph,
+    StatusState, VolumeGlyph, VolumeState, VolumeWaves, WifiBars, WifiGlyph, WifiReach, WifiState,
+};
 pub use switcher_fit::{
     SWITCHER_MARGIN, SWITCHER_PADDING, SwitcherFit, SwitcherMetrics, fit as switcher_fit,
 };
@@ -361,6 +366,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("slider", include_str!("slider.css")),
     ("space_editor", include_str!("space_editor.css")),
     ("spinner", include_str!("spinner.css")),
+    ("status_glyph", include_str!("status_glyph.css")),
     ("sync_halo", include_str!("sync_halo.css")),
     ("tabs", include_str!("tabs.css")),
     ("text_input", include_str!("text_input.css")),
