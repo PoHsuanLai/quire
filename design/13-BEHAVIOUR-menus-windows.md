@@ -199,6 +199,11 @@ Whether a swiped banner stays in the center is `notifications.swipe`, the caller
 | Open | `peek-in --t-big --e-spring` (s .95, y 12 -> 1, A5) | settled (brief, A5) |
 | Close | `fade --t-quick --e-exit`; the catcher is never animated or dimmed (plan) | settled catcher, fade proposed |
 | Open latency | p95 < 100 ms over 20 toggles (`accept-launcher.sh`) | settled (plan) |
+| Sections | provider groups with a `SectionHeader`; a group longer than its share shows "Show More" as the header's trailing action, reachable by keyboard | proposed (sill M9, Q302) |
+| Preview pane | a Quick-Look-style pane beside the list; the card widens by the pane | proposed (Q302) |
+| Preview keys | Space toggles the pane only while browsing (not while typing); Cmd+Y always toggles it; Right at the end of the text shows it, a second Right or Cmd+Right focuses it; Tab walks the pane's controls when it has focus, in the results Tab stays the provider filter; Esc closes one level at a time (pane focus, pane, query, launcher) | proposed (Q302) |
+| Row chords | Cmd+R reveal, Cmd+C copy, Cmd+Y Quick Look, through `StandardAction` (27 §6.2) | proposed (Q298) |
+| Emoji grid | a grid group inside the palette, 2D arrow keys, skin tone from `launcher.emoji_skin_tone`, colour faces through `.ds-emoji` | proposed (Q291) |
 
 ### 13.3.10 UI sounds
 
