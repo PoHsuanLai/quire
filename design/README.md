@@ -26,8 +26,8 @@ against them.
 | `21-SPACES.md` | Spaces on the desktop: SpaceLook per workspace, frame tokens on shell chrome, storage. |
 | `22-SETTINGS.md` | Every proposed value as a settings key with its default; storage, Rust shape, UI mapping. |
 | `23-WIDGETS.md` | Desktop widgets' depth language, the battery and clock candidate looks, the calendar widget brief. |
-| `24-PERSONA.md` | The user's animated character: parts, derived palette, moods, and its bounded exception to "nothing loops". |
-| `25-EMOJI.md` | Animated emoji as the user's picture: source and CC BY 4.0 attribution, the curated set, the sheet pipeline, frame budget, the idle rule. |
+| `24-PERSONA.md` | Dropped 2026-09-26 in favour of emoji: what the persona was and what carried over. |
+| `25-EMOJI.md` | Animated emoji and the user's picture: source and CC BY 4.0 attribution, the curated set, the sheet pipeline, moods, frame budget, the idle rule; the picture's kinds, stored choice, accept beat and picker (section 7). |
 | `27-HIG-PARITY.md` | Audit against the pre-2025 (macOS 14/15) HIG: archived snapshots, gaps ranked, a verdict and rule per HIG page, proposed waves H0-H7. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 

@@ -96,9 +96,9 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 `press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps", "Bar gaps"), `icon_button`'s `Status` variant and `StatusMetrics` (13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1), `workspace_pills` §37 and `dock_parts` §38 (`RunningDot`, `DockFloor`; 10 §10.3.2).
-`persona` is a directory and 24-PERSONA: the user's animated character (`Persona`, `PersonaSpec`,
-`Mood`, `UserPicture`/`UserPortrait`), its parts, derived palette, still and moving layers, and
-the pulses and blink timer that play its moods (`life.rs`).
+`user_picture` is a directory and 25-EMOJI section 7: `UserPicture`/`UserPortrait`, `Mood`,
+`PictureSize`, the accept beat, `PictureChoice`/`resolve_picture` and `UserPicturePicker`
+(24-PERSONA is a note: the persona was dropped 2026-09-26).
 `emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
 manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that plays it (`life.rs`).
 

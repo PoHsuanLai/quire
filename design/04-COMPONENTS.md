@@ -3431,7 +3431,7 @@ pub enum LockLook { Clear /* default */, Space }
 pub enum PromptState { Idle /* default */, Checking, Wrong, LockedOut { until: String }, Accepted }
 pub enum CapsLock { On, Off /* default */ }
 pub struct LockUser { pub name: String, pub picture: UserPicture }   // LockUser::new(name, impl Into<UserPicture>)
-pub enum UserPicture { Face(AvatarFace), Photo(ImageSource), Persona(PersonaSpec) }   // From each
+pub enum UserPicture { Face(AvatarFace), Emoji(EmojiId), Photo(ImageSource) }   // From each (design/25 section 7)
 #[component] pub fn LockScreen(wallpaper: Option<ImageSource>, clock: Element, prompt: Element) -> Element
 #[component] pub fn LockClock(time: String, date: String, look: LockLook) -> Element
 #[component] pub fn LockPrompt(user: LockUser, state: PromptState, caps: CapsLock, look: LockLook,
@@ -3448,15 +3448,15 @@ pub enum SheetWidth { Regular /* default, 560 */, Narrow /* 340 */ }   // Sheet 
 as an inline `background-image`, its URL escaped; only `data:` and `file:`), `div.ds-lock-veil`,
 `div.ds-lock-top` (the clock) and `div.ds-lock-bottom` (the prompt). `LockClock`:
 `div.ds-lock-clock[data-look]` holding `div.ds-lock-date` then `div.ds-lock-time`. `LockPrompt`:
-`div.ds-lock-prompt[data-look][data-state]` holding the picture at 64 (the `Avatar`,
-`div.ds-user-photo[data-size=64]` around `img.ds-user-photo-image`, or the `Persona` at
-`Medium`), `div.ds-lock-name`,
+`div.ds-lock-prompt[data-look][data-state]` holding the picture at 64 in
+`div.ds-user-picture[data-mood]` (the `Avatar`, the `AnimatedEmoji` at `Medium`, or
+`div.ds-user-photo[data-size=64]` around `img.ds-user-photo-image`), `div.ds-lock-name`,
 `div.ds-lock-field[data-filled]` (with `a-shake-x` and `data-pulse` while shaking) holding an
 Inline `TextInput { kind: Secret }`, `span.ds-lock-caps` (caps on) and `button.ds-lock-go` (a
 `Glyph` `ArrowRight`, or `span.ds-lock-busy` around a `Spinner` while checking), then
 `div.ds-lock-hint`. `PolkitPrompt`: a `Sheet { placement: Centre, scrim: Modal, width: Narrow }`
-holding `div.ds-polkit[data-state]`: the picture at 48 (the `Avatar`, the photo at 48, or the
-`Persona` drawn at `Medium` in a 48 box, idle), `div.ds-polkit-title`,
+holding `div.ds-polkit[data-state]`: the picture at 48 in `div.ds-user-picture` (the `Avatar`,
+the emoji drawn at `Medium` in a 48 box, or the photo at 48), `div.ds-polkit-title`,
 `div.ds-polkit-action`, `div.ds-polkit-details` (a `Tooltip { Card }` on
 `span.ds-polkit-details-word`), `div.ds-polkit-user`, `div.ds-polkit-field` (a Boxed secret
 `TextInput`, `span.ds-polkit-caps`), `div.ds-polkit-hint` (locked out), and
@@ -3467,7 +3467,7 @@ holding `div.ds-polkit[data-state]`: the picture at 48 (the `Avatar`, the photo 
 | Stage | the wallpaper covering it (`background-size:cover`) under `--lock-veil` (black .12 light, .28 dark); padding 7 % of the width on top, 5 % below | reference layout; the veil keeps white type legible on a pale picture |
 | Date | display face `--fs-amount` (22) 600, `--lock-ink-soft` (white .78) | reference: the day over the time |
 | Time | display face `--fs-lock-clock` (140) 700, tracking -.035em, tabular, `--lock-ink` (white), 2 below the date | the user's "very large, heavy"; reference proportions (about a fifth of the width for "9:41") |
-| Picture | 64 (`AvatarSize::Size64`, `--fs-display` letter; a photo in a 64 disc, clipped, `object-fit:cover` centred over `--surface-2`; a persona at `Medium`); 48 in the polkit sheet | reference; the photo is freedesktop's `~/.face` or AccountsService's icon |
+| Picture | 64 (`AvatarSize::Size64`, `--fs-display` letter; a photo in a 64 disc, clipped, `object-fit:cover` centred over `--surface-2`; an emoji at `Medium`, bare); 48 in the polkit sheet | reference; the photo is freedesktop's `~/.face` or AccountsService's icon |
 | Name | UI 16/700 (`--fs-title`), white, 10 below the avatar | reference |
 | Field | 260 x 38 pill (`--r-pill`), `--lock-glass` (white .24 light, .18 dark), 14 below the name, padding 16 left and 5 right; the secret's dots at `--fs-base` white, tracked .14em; placeholder `--lock-ink-soft`; hover `--lock-glass-strong` | reference; flat, no blur assumed (spike S15) |
 | Enter button | 28 disc of `--lock-glass-strong`, `ArrowRight` at 13, shown once something is typed (opacity over `--t-quick --e-out`), pressed `--squish` | reference |
@@ -3489,16 +3489,20 @@ never cuts a newer one short). The polkit sheet enters with `peek-in` and leaves
 (section 24). The unlock fade (design/20 section 1.9, `fade --t-move --e-exit`) is not drawn
 here: the host fades or unmaps its lock surfaces.
 
-**The persona's mood (2026-09-26).** A `UserPicture::Persona` in the lock prompt takes its mood
-from the prompt, so the shell sets none: `Attentive` while the field holds text and has the caret
-and while `Checking`; `Wince` on `Wrong`, through the shake and while the emptied field stays
-empty (typing again turns it `Attentive`, so each wrong winces once and none escalates, design/24
-section 5); `Happy` on `Accepted` (one `persona-hop`; the host unlocks at its settle); `Idle`
-otherwise, `LockedOut` included. Its `WakeStamp` advances on a key, pointer move or press inside
-the prompt, at most once a second (each wake replays the breath from its start), so it rests
-between 19 and 20 s after the last activity; the prompt's `wake` prop adds the caller's stamp
-(the display waking). `Accepted` closes the field like `Checking`. Faces and photos have no moods.
-The polkit sheet's persona stays `Idle`.
+**The picture's mood (2026-09-26; the persona was dropped for the emoji the same day).** The
+lock prompt's picture takes its mood from the prompt, so the shell sets none: `Attentive` while
+the field holds text and has the caret and while `Checking`; `Wince` on `Wrong`, through the
+shake and while the emptied field stays empty (typing again turns it `Attentive`, so each wrong
+winces once and none escalates); `Happy` on `Accepted`; `Idle` otherwise, `LockedOut` included.
+An emoji plays the mapping of design/25 section 5 (a glance, the confounded face, the partying
+face; slow at idle, steady while typing). Every kind, letter and photo included, plays the
+accept beat on `Accepted` (`picture-accept`, `Anim::PictureAccept`, `--t-big --e-spring`; the
+host unlocks at its settle; not under Reduced motion). An emoji's `WakeStamp` advances on a key,
+pointer move or press inside the prompt, at most once a second, so it rests between 19 and 20 s
+after the last activity; the prompt's `wake` prop adds the caller's stamp (the display waking). A
+letter or a photo is not woken, so activity costs it no render. `Accepted` closes the field like
+`Checking`. The polkit sheet's picture is `Wince` on `Wrong`, `Happy` on `Accepted`, else
+`Idle`, and is not woken by activity.
 
 ### 43. AppSwitcher (M11, 2026-09-26; values proposed)
 
@@ -3546,7 +3550,7 @@ frame on Blitz, sliding the row in as it appeared.
 
 **Purpose.** The user's picture as an emoji they pick from a shipped set of 42 Noto Animated
 Emoji (CC BY 4.0), moving: it plays its loop for 20 s after a wake and then rests. Replaces the
-persona as the user's picture once `UserPicture` takes `Emoji(EmojiId)` (design/25 section 8).
+persona as the user's picture; `UserPicture::Emoji(EmojiId)` carries it (design/25 section 7).
 
 **Markup.**
 
@@ -3561,26 +3565,73 @@ persona as the user's picture once `UserPicture` takes `Emoji(EmojiId)` (design/
 **Props.**
 
 ```rust
-#[component] pub fn AnimatedEmoji(emoji: EmojiId, size: PersonaSize,
+#[component] pub fn AnimatedEmoji(emoji: EmojiId, size: PictureSize,
     #[props(default)] mood: Mood, #[props(default)] wake: WakeStamp,
-    #[props(default)] disc: EmojiDisc /* None | Tinted(Backdrop) */,
+    #[props(default)] disc: EmojiDisc /* None | Tinted(DiscHue) */,
     #[props(default)] playback: EmojiPlayback /* Awake | Still */) -> Element
 pub enum EmojiId { Grinning, …, Blush /* default */, …, Fox } // serde: its slug
 ```
 
-**Geometry.** 28, 64 or 128 px square (`PersonaSize`). Small and Medium read the 128 px sheet,
+**Geometry.** 28, 64 or 128 px square (`PictureSize`). Small and Medium read the 128 px sheet,
 Large the 256 px one, so every size has 2x pixels. With a disc the face is inset 14 %.
 
 **Behaviour.** A Rust timer moves `background-position` frame by frame (per-frame holds from the
 manifest, 80 ms steps) only inside the 20 s awake window (`--t-awake`), whole loops only, ending
-on frame 0, the emoji's rest pose; then nothing is scheduled. Wince swaps in `EmojiId::WRONG`
-(confounded) once through, Happy `EmojiId::UNLOCKED` (partying), then the pick again; Asleep
-shows `EmojiId::ASLEEP` (sleeping) still. Reduced motion, or `playback: EmojiPlayback::Still`
-(a picker's grid): still frames only.
+on frame 0, the emoji's rest pose; then nothing is scheduled. Idle plays the pick slowly (a loop,
+4 s at rest, again); Attentive swaps in `EmojiId::ATTENTIVE` (eyes) once, then plays the pick
+steadily; Wince swaps in `EmojiId::WRONG` (confounded) once through, Happy `EmojiId::UNLOCKED`
+(partying), then the pick again at the idle pace; Asleep shows `EmojiId::ASLEEP` (sleeping)
+still (design/25 section 5). Reduced motion, or `playback: EmojiPlayback::Still` (a picker's
+grid): still frames only.
 
 **Tests.** `ds/tests/emoji_ssr.rs` (goldens, lint), `ds/src/components/emoji/tests.rs` (sheets,
-manifest, the script's idle rule), `ds-native/tests/emoji_life.rs` (frames advance, rest at 21 s,
-the wince swap, Reduced).
+manifest, the script's idle rule, the mood mapping), `ds-native/tests/emoji_life.rs` (frames
+advance, rest at 21 s, idle's rests, the wince swap, each mood as a `UserPortrait`, Reduced).
+
+### 44a. UserPicture, UserPortrait and UserPicturePicker (2026-09-26; design/25 section 7)
+
+**Purpose.** The user's picture as one of three kinds, drawn the same way everywhere, and the
+grid where the user picks it (Settings' Users page, first run). Replaces the persona (design/24).
+
+**Props.**
+
+```rust
+pub enum UserPicture { Face(AvatarFace), Emoji(EmojiId), Photo(ImageSource) }   // From each
+pub enum PictureSize { Small /* 28 */, Medium /* 64 */, Large /* 128 */ }
+pub enum Mood { Idle /* default */, Attentive, Wince, Happy, Asleep }
+#[component] pub fn UserPortrait(picture: UserPicture, size: PictureSize,
+    #[props(default)] mood: Mood, #[props(default)] wake: WakeStamp) -> Element
+pub enum PictureChoice { Auto /* default */, Letter, Emoji(EmojiId), Photo }   // serde: {"kind","v"}
+pub enum FaceFile { Found(ImageSource), Missing }
+pub fn resolve_picture(choice: PictureChoice, face: FaceFile, letter: AvatarFace) -> UserPicture
+#[component] pub fn UserPicturePicker(letter: AvatarFace, choice: PictureChoice,
+    onpick: EventHandler<PictureChoice>, #[props(default = 8)] columns: u8,
+    #[props(default = "Picture")] label: String) -> Element
+```
+
+**Markup.** `UserPortrait`: `div.ds-user-picture[data-mood]` (`a-picture-accept` and
+`data-pulse` while the beat plays) around the `Avatar` at its own size, the `AnimatedEmoji`
+(bare) or `div.ds-user-photo[data-size]` around `img.ds-user-photo-image`. The picker:
+`div.ds-picture-picker[role=radiogroup][tabindex=0]` with the grid's inline columns, holding 43
+`div.ds-picture-cell[role=radio][aria-checked][aria-label]`: the letter's `Avatar` at 64
+("Letter P"), then each emoji's `AnimatedEmoji { size: Medium, playback: Still }` (its name).
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Wrapper | inline-flex, its picture's size; `transform-origin:50% 100%` | the beat lifts from the base |
+| Accept beat | `picture-accept`: `35%{ translateY(-8%) scale(1.03) }` between rests, `--t-big --e-spring` | the persona's hop, gentler, for every kind |
+| Picker cell | 76 px (`PICTURE_CELL`), the 64 px disc centred, no gap; chosen: `--accent-soft` on `--r-menu-item` | the emoji grid's selection look |
+
+**Behaviour.** `UserPortrait` plays the beat when `mood` changes to Happy (not on mount; never
+under Reduced motion); an emoji also plays the mood (section 44). The picker is a radio group: a
+click or an arrow key (the emoji grid's `grid_step`: Left and Right wrap rows, Up and Down stay
+inside) calls `onpick` with the new choice; `choice` is the caller's and marks one cell (none for
+`Auto` or `Photo`). Nothing in the picker plays.
+
+**Tests.** `ds/tests/user_picture_ssr.rs` (goldens of the letter, the emoji at rest, the photo
+and the picker; lint; the serde round trip; the `resolve_picture` table), `ds/src/components/
+user_picture/picker.rs` (cells and marks), `ds-native/tests/lock_switcher.rs` (the emoji's moods
+in the lock prompt; the letter's beat).
 
 ### 45. PdfThumb and PdfFileThumb (a PDF's first page; sill M9 launcher v2, 2026-09-26; values proposed)
 

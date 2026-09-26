@@ -1539,11 +1539,11 @@ sizes (`Size48`, `Size64`: a `match` of yours over `AvatarSize` needs them), two
 | --- | --- | --- |
 | `LockScreen` | `wallpaper: Option<ImageSource>`, `clock: Element`, `prompt: Element` | The lock surface's stage: the wallpaper covering it under `--lock-veil` (pass it already blurred; Blitz blurs nothing), the clock 7 % of the width from the top, the prompt near the bottom, centred. Put it in `Ds { material: Material::Window, extent: RootExtent::Viewport }`, one per output |
 | `LockClock` | `time: String`, `date: String`, `look: LockLook` (`Clear`) | The date, then the time in the display face at `--fs-lock-clock` 700, white. You word both (locale, 12/24 h) and re-render each minute. `LockLook::Space` sets the date in a pill of the Space gradient |
-| `LockPrompt` | `user: LockUser { name: String, picture: UserPicture }` (`LockUser::new(name, picture)`), `state: PromptState` (`Idle`), `caps: CapsLock` (`Off`), `look: LockLook` (`Clear`), `placeholder: Option<String>` ("Enter Password"), `hint: Option<Text>`, `wake: Option<WakeStamp>`, `oninput: EventHandler<String>`, `onsubmit: EventHandler<String>` | The person's picture at 64 (a face whatever size it carries, a photo cropped round, or the persona playing the prompt's own mood; see "Lock picture" below), the name, a 260 x 38 pill of flat white glass holding a `Secret` field (its text is never in the markup: there is no `value` prop), the caps-lock mark, an enter arrow that shows once something is typed, and the hint line. Enter or the arrow calls `onsubmit(text)` (never with an empty text); Escape empties the field and calls `oninput("")`. The field takes the keyboard as it mounts and again after each emptying. `LockLook::Space` paints the pill with the Space gradient |
-| `PromptState` | `Idle`, `Checking`, `Wrong`, `LockedOut { until: String }`, `Accepted` | Yours to move. `Accepted` (the password was right): the field stays closed and a persona plays Happy; unlock at `settle(Anim::PersonaHop)`. `Checking`: the field and the submit are closed, the arrow spins. `Wrong`: the field plays `shake-x` once (`settle(Anim::ShakeX)`, 420 ms) and empties itself when it settles, calling `oninput("")`; it shakes again only after the state has been something else (go through `Checking` for the next try). `LockedOut`: closed, the hint line says "Try again at {until}" |
+| `LockPrompt` | `user: LockUser { name: String, picture: UserPicture }` (`LockUser::new(name, picture)`), `state: PromptState` (`Idle`), `caps: CapsLock` (`Off`), `look: LockLook` (`Clear`), `placeholder: Option<String>` ("Enter Password"), `hint: Option<Text>`, `wake: Option<WakeStamp>`, `oninput: EventHandler<String>`, `onsubmit: EventHandler<String>` | The person's picture at 64 (a face whatever size it carries, an animated emoji playing the prompt's own mood, or a photo cropped round; see "User picture" below), the name, a 260 x 38 pill of flat white glass holding a `Secret` field (its text is never in the markup: there is no `value` prop), the caps-lock mark, an enter arrow that shows once something is typed, and the hint line. Enter or the arrow calls `onsubmit(text)` (never with an empty text); Escape empties the field and calls `oninput("")`. The field takes the keyboard as it mounts and again after each emptying. `LockLook::Space` paints the pill with the Space gradient |
+| `PromptState` | `Idle`, `Checking`, `Wrong`, `LockedOut { until: String }`, `Accepted` | Yours to move. `Accepted` (the password was right): the field stays closed and the picture plays Happy (the accept beat, and an emoji's partying face); unlock at `settle(Anim::PictureAccept)`. `Checking`: the field and the submit are closed, the arrow spins. `Wrong`: the field plays `shake-x` once (`settle(Anim::ShakeX)`, 420 ms) and empties itself when it settles, calling `oninput("")`; it shakes again only after the state has been something else (go through `Checking` for the next try). `LockedOut`: closed, the hint line says "Try again at {until}" |
 | `CapsLock` | `On`, `Off` | Read the modifier state from the keyboard and pass it; `On` draws the caps-lock arrow in the field |
 | `LockLook` | `Clear`, `Space` | Where the Space's colour reaches (the date pill and the field); the time stays white |
-| `PolkitPrompt` | `action: Text`, `detail: Option<Text>`, `title: Option<String>` ("Authentication Required"), `user: LockUser`, `state: PromptState`, `caps: CapsLock`, `oninput`, `onsubmit`, `oncancel: EventHandler<()>`, `shown: Option<Shown>`, `on_hidden: Option<EventHandler<()>>` | A narrow centred `Sheet` over the modal scrim (`peek-in` in, `sheet-out` out, `on_hidden` at its settle): the person's picture at 48 (a persona there stays idle), the title, `action`, "Details" with `detail` as a hover card, the name over a boxed `Secret` field, Cancel and Authenticate at equal width. Enter or Authenticate submits; Cancel, Escape and the scrim call `oncancel`. `Wrong` shakes the field once and empties it; `LockedOut` shows "Too many tries. Try again at {until}." in `--danger`. Put it in `Ds { material: Material::Sheet, extent: RootExtent::Viewport }` |
+| `PolkitPrompt` | `action: Text`, `detail: Option<Text>`, `title: Option<String>` ("Authentication Required"), `user: LockUser`, `state: PromptState`, `caps: CapsLock`, `oninput`, `onsubmit`, `oncancel: EventHandler<()>`, `shown: Option<Shown>`, `on_hidden: Option<EventHandler<()>>` | A narrow centred `Sheet` over the modal scrim (`peek-in` in, `sheet-out` out, `on_hidden` at its settle): the person's picture at 48 (an emoji there winces on `Wrong`; every kind plays the accept beat on `Accepted`), the title, `action`, "Details" with `detail` as a hover card, the name over a boxed `Secret` field, Cancel and Authenticate at equal width. Enter or Authenticate submits; Cancel, Escape and the scrim call `oncancel`. `Wrong` shakes the field once and empties it; `LockedOut` shows "Too many tries. Try again at {until}." in `--danger`. Put it in `Ds { material: Material::Sheet, extent: RootExtent::Viewport }` |
 | `Sheet` | `width: SheetWidth` (`Regular`) | `SheetWidth::Narrow` draws the sheet `min(340px, 88%)` wide (`data-width="narrow"`); a regular sheet's markup is unchanged |
 | `AppSwitcher` | `apps: Vec<SwitcherApp>`, `selected: AppKey`, `output: Option<Px>`, `metrics: SwitcherMetrics`, `onhover: EventHandler<AppKey>`, `onactivate: EventHandler<AppKey>` | The Cmd+Tab row on the Osd material, painted as the OSD card is (the Space gradient at the frame alpha). Cells of `metrics.cell` with icons of `metrics.icon`, `metrics.gap` apart, padding 16; the selection a `--f-pill` square behind the selected cell, moving with `--t-quick --e-spring`; the selected app's name under it (its `Tooltip { Fly }`, shown by the switcher). Past `output - 64` the icons shrink, down to `metrics.min_icon`, then the row scrolls with the selection centred where it can be. The pointer entering a tile calls `onhover(key)`, a click `onactivate(key)`: the selection is yours to move. It fades in over `--t-quick`. The show delay, the keys and the modifier's release are yours. Put it in `Ds { material: Material::Osd, chrome: Some(RootChrome::Transparent) }` |
 | `SwitcherApp` | `{ key: AppKey, name: String, icon: IconSource, plate: Option<PlateFamily>, presence: TilePresence }`; `SwitcherApp::new(key, name, icon)` | One tile. A glyph is drawn at the cell's icon size (on `plate` when given); an external icon is stretched to that square, so resolve it at `metrics.icon`. `presence: TilePresence::Leaving` plays `fold` once (Q: the app quits); drop it from `apps` at `settle(Anim::Fold)` |
@@ -1555,31 +1555,14 @@ LockPrompt }` and moves `PromptState` as PAM answers; the polkit agent draws `Po
 the switcher surface draws `AppSwitcher` after its 150 ms timer and maps keys to `selected`.
 Style nothing under `.ds-lock*`, `.ds-polkit*` or `.ds-switcher*`.
 
-### Persona (2026-09-26): the user's animated character
+### Persona (2026-09-26, removed the same day)
 
-design/24-PERSONA.md. `Persona { spec: PersonaSpec, size: PersonaSize::{Small, Medium, Large},
-mood: Mood, wake: WakeStamp, finish: PersonaFinish }` draws the user's character (28, 64 or
-128 px) on its disc. `PersonaSpec` is user data (serde, every field defaults): save it as it is;
-`PersonaSpec::from_seed(u64)` gives a pleasant random one and `PersonaSpec::default()` a blob.
+The persona was dropped for the animated emoji (design/24 is a note now). Everything it added is
+gone; see "User picture (2026-09-26, breaking)" below for the list and what replaces it.
 
-| You want | Pass |
-| --- | --- |
-| At rest | `Mood::Idle`: blinks and breathes for 20 s after mount, a new `wake` or a mood change, then paints nothing |
-| The user is typing | `Mood::Attentive` |
-| A wrong password | `Mood::Wince` (shakes once and holds; set `Attentive` when typing resumes) |
-| Unlocked | `Mood::Happy` (one hop) |
-| The display is off | `Mood::Asleep` |
-| Wake it (pointer moved, a key) | `wake: stamp.next()` |
-| The icons are muted | `finish: PersonaFinish::Muted` |
+### Lock picture (2026-09-26): photo and moods in the lock and polkit prompts
 
-Reduced motion is quire's: moods change at once and nothing blinks. A surface that can show
-a letter, a photo or a persona takes `UserPicture::{Face(AvatarFace), Photo(ImageSource),
-Persona(PersonaSpec)}` and draws it with `UserPortrait { picture, size, mood, wake }`; the lock
-and polkit prompts take one in `LockUser` ("Lock picture" below). Never style `.ds-persona*`.
-
-### Lock picture (2026-09-26): photo, persona and moods in the lock and polkit prompts
-
-design/04 section 42; design/24 section 4. **Breaking, one line:** `LockUser`'s `avatar:
+design/04 section 42; design/25 section 7. **Breaking, one line:** `LockUser`'s `avatar:
 AvatarFace` is now `picture: UserPicture`. Write
 
 ```rust
@@ -1593,14 +1576,14 @@ LockUser::new(name, face)            // was: LockUser { name, avatar: face }
 
 | Where | Prop, type or function | What it does |
 | --- | --- | --- |
-| `UserPicture` | `Face(AvatarFace)`, `Photo(ImageSource)`, `Persona(PersonaSpec)`; `From` each | `Photo` is the user's own picture: `$HOME/.face` or AccountsService's `IconFile`, as `ImageSource::file(path)`. Drawn in a disc (`div.ds-user-photo[data-size]` clipping an `img` with `object-fit: cover`), at the face's size: 64 at the lock, 48 in the polkit sheet, `size` in `UserPortrait` |
-| `LockPrompt` mood | from its own state | A persona is `Attentive` while the field holds text and has the caret, and while `Checking`; `Wince` when `Wrong` (once per wrong: typing again turns it attentive, the next `Wrong` winces once more, never harder); `Happy` when `Accepted`; `Idle` otherwise. Set nothing: move `PromptState` as before |
-| `LockPrompt` wake | `wake: Option<WakeStamp>` | A key, a pointer move or a press in the prompt wakes the persona (at most once a second), so it rests again 20 s after the last activity. Pass `Some(stamp.next())` to wake it from outside, e.g. when the display comes back on |
-| Faces and photos | | Have no moods and ignore `wake` |
+| `UserPicture` | `Face(AvatarFace)`, `Emoji(EmojiId)`, `Photo(ImageSource)`; `From` each | `Photo` is the user's own picture: `$HOME/.face` or AccountsService's `IconFile`, as `ImageSource::file(path)`. Drawn in a disc (`div.ds-user-photo[data-size]` clipping an `img` with `object-fit: cover`), at the face's size: 64 at the lock, 48 in the polkit sheet, `size` in `UserPortrait` |
+| `LockPrompt` mood | from its own state | The picture is `Attentive` while the field holds text and has the caret, and while `Checking`; `Wince` when `Wrong` (once per wrong: typing again turns it attentive, the next `Wrong` winces once more, never harder); `Happy` when `Accepted`; `Idle` otherwise. Set nothing: move `PromptState` as before |
+| `LockPrompt` wake | `wake: Option<WakeStamp>` | A key, a pointer move or a press in the prompt wakes an emoji (at most once a second), so it rests again 20 s after the last activity. Pass `Some(stamp.next())` to wake it from outside, e.g. when the display comes back on |
+| Faces and photos | | Play only the accept beat and ignore `wake` |
 
-**The unlock, with a persona.** `onsubmit(text)` → `state: Checking` → PAM says yes →
-`state: Accepted` → after `settle(Anim::PersonaHop, level, StaggerIndex::default())` unlock
-(and fade the surface). With a face or photo `Accepted` just holds the field closed.
+**The unlock.** `onsubmit(text)` → `state: Checking` → PAM says yes → `state: Accepted` → after
+`settle(Anim::PictureAccept, level, StaggerIndex::default())` unlock (and fade the surface), for
+every kind of picture.
 
 ### PDF thumbnail (2026-09-26): a PDF's first page from a path
 
@@ -1665,26 +1648,64 @@ Never style `.ds-emoji-grid`, `.ds-emoji-cell`, `.ds-emoji-glyph`, `.ds-preview*
 
 ### Animated emoji (2026-09-26): the user's picture as a moving emoji
 
-design/25-EMOJI.md. `AnimatedEmoji { emoji: EmojiId, size: PersonaSize, mood: Mood, wake:
+design/25-EMOJI.md. `AnimatedEmoji { emoji: EmojiId, size: PictureSize, mood: Mood, wake:
 WakeStamp, disc: EmojiDisc }` draws the emoji the user picked (28, 64 or 128 px) and plays it
 for 20 s after mount, a new `wake`, a mood change or a new pick, then rests on its first frame
-and paints nothing. Drive it exactly as a `Persona` (the same `Mood` and `WakeStamp`).
+and paints nothing. As the user's picture, use `UserPicture::Emoji` ("User picture" below).
 
 | You want | Pass |
 | --- | --- |
 | The user's choice | `emoji: EmojiId` (user data, serde as its slug: `"heart-eyes"`); `EmojiId::default()` is a smiling face; `EmojiId::ALL` is the picker's list, `.text()` and `.name()` its labels |
+| At rest | `Mood::Idle`: the pick's loop now and then (a loop, 4 s still, again) |
 | A wrong password | `Mood::Wince`: the confounded face once through, then the pick |
 | Unlocked | `Mood::Happy`: the partying face once through |
-| The user is typing | `Mood::Attentive`: the pick, playing |
+| The user is typing | `Mood::Attentive`: the eyes once, then the pick, loop after loop |
 | The display is off | `Mood::Asleep`: the sleeping face, still |
 | Wake it | `wake: stamp.next()` |
-| A disc behind it | `disc: EmojiDisc::Tinted(Backdrop::Teal)` (default `EmojiDisc::None`) |
+| A disc behind it | `disc: EmojiDisc::Tinted(DiscHue::Teal)` (default `EmojiDisc::None`) |
 | A picker's grid of the set | `playback: EmojiPlayback::Still`: rest frames only |
 
 Reduced motion is quire's: still frames only. **Credit**: the frames are Noto Animated Emoji,
 CC BY 4.0; a product that shows them puts `ds::EMOJI_ATTRIBUTION` in its about box or credits
-(design/25 section 2). `UserPicture` does not take an emoji yet (design/25 section 8). Never
-style `.ds-emoji*`.
+(design/25 section 2). Never style `.ds-emoji*`.
+
+### User picture (2026-09-26, breaking): a letter, an animated emoji or a photo
+
+design/25 section 7; design/04 sections 42 and 44a. The persona is removed and the emoji is a
+kind of user picture.
+
+**Breaking.**
+
+- `UserPicture` gained `Emoji(EmojiId)` and lost `Persona(PersonaSpec)`: a `match` over it needs
+  the `Emoji` arm (a `_ =>` arm, as sill's `initial_of`, needs nothing).
+- Renamed: `PersonaSize` → `PictureSize` (same variants and sizes); `Backdrop` → `DiscHue` (same
+  variants and serde names; only `EmojiDisc::Tinted` takes it now).
+- `Anim::PersonaHop` → `Anim::PictureAccept` (same `--t-big --e-spring`: 420 ms at Standard, 300 Calm, 560 Extra).
+  `Anim::PersonaHop` still compiles for one release as a deprecated alias of it; switch the
+  lock screen's `use_motion_timer(Anim::PersonaHop)` to `Anim::PictureAccept`.
+- Removed items: `Persona`, `PersonaSpec`, `PersonaSeed`, `PersonaFinish`, `Accessory`,
+  `Backdrop` (renamed), `Brows`, `Cheeks`, `Creature`, `Eyes`, `HairTone`, `HeadShape`,
+  `Mouth`, `Tone`, `Top`, `BLINK_MIN`, `BLINK_MAX`, `PersonaSize` (renamed), `Anim::PersonaBlink`,
+  `Anim::PersonaBreathe`, `Anim::PersonaWince`, `Anim::PersonaDrift`, `DurationToken::Drift`.
+- Removed classes and attributes: `.ds-persona`, `.ds-persona-hop`, `-shake`, `-breath`,
+  `-tilt`, `-look`, `-blink`, `-layer`, `-z`; `data-part` on a persona layer;
+  `data-ds-svg="persona"`; `--pa-ground`, `--pa-eyes`, `--t-drift`; the keyframes
+  `persona-blink`, `-breathe`, `-wince`, `-hop`, `-drift` (and their `--b` aliases) and the
+  classes `a-persona-blink`, `-breathe`, `-wince`, `-hop`, `-drift`; the gallery's `persona`
+  page and `--persona-frames` flag.
+- Added classes: `.ds-user-picture` (with `data-mood`, and `a-picture-accept` while its beat
+  plays) around every drawn picture, in `UserPortrait`, `LockPrompt` and `PolkitPrompt`;
+  `.ds-picture-picker`, `.ds-picture-cell`. The lock goldens moved by that wrapper.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `UserPicture` | `Face(AvatarFace)`, `Emoji(EmojiId)`, `Photo(ImageSource)`; `From` each | What stands for the user; `LockUser::new(name, EmojiId::Wink)` works |
+| `UserPortrait` | `picture`, `size: PictureSize`, `mood: Mood`, `wake: WakeStamp` | Draws any kind: a face at its own size, an emoji or a photo at `size`; every kind plays the accept beat when `mood` turns `Happy` |
+| `PictureChoice` | `Auto` (default), `Letter`, `Emoji(EmojiId)`, `Photo` | The stored choice, serde `{"kind":"emoji","v":"heart-eyes"}`. Proposed key `session.user_picture` (list it in sill's design/22 first) |
+| `resolve_picture` | `fn(PictureChoice, FaceFile, AvatarFace) -> UserPicture` | Pure: `Auto` and `Photo` draw `FaceFile::Found(src)` as the photo, else the letter; `Letter` the letter; `Emoji` the emoji. Read `~/.face` yourself and pass `FaceFile::{Found(ImageSource), Missing}` |
+| `UserPicturePicker` | `letter: AvatarFace`, `choice: PictureChoice`, `onpick: EventHandler<PictureChoice>`, `columns: u8` (8), `label: String` ("Picture") | The letter and the 42 emoji as still 64 px discs in 76 px cells (`PICTURE_CELL`), one radio group; a click or an arrow key calls `onpick`. `Auto` and `Photo` mark no cell: offer them as rows beside it |
+
+Never style `.ds-user-picture`, `.ds-user-photo*` or `.ds-picture-*`.
 
 ### Widget vibrancy (2026-09-26)
 
