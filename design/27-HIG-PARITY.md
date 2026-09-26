@@ -762,7 +762,12 @@ no one touched.
 In priority order. Each wave is one quire lane (and a sill lane where named), gated as usual. Waves
 H0 and H1 can run in parallel; H2 needs H0's lint rules; H4 needs H1's springs for its sheets.
 
-**H0: Guardrails (quire; small).** The cheap, mechanical rules that stop new drift before the
+**H0: Guardrails (quire; small). Built on `hig-h0` (2026-09-27): the five rules as
+`Severity::Warning` under Strict (`ds::lint::warnings`, `ds::lint::markup_warnings`;
+`stylesheet` and `markup` return errors only, so no consumer test moves), `--fs-nano`,
+`--fs-micro` and `--fs-dial` at 10 px under System, `--focus-gap`, `StandardAction` with
+`Shortcut::{standard, custom}` and the ⌃⌥⇧⌘ order, quire's cursors on the arrow, docs 02 §12-13,
+06 §2.0, CHECKLIST.** The cheap, mechanical rules that stop new drift before the
 larger waves: the CSS lint rules `PointerCursor`, `MinFontSize` and `FocusRingShape` (landing as
 warnings, with sill told first), the markup rules `UnnamedControl` and `ThreeDots`, the
 `StandardAction` table with `Shortcut::custom` refusing reserved keys, and the modifier render
