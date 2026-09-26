@@ -22,8 +22,8 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--soft-tone-light:rgba(255,255,255,.95);--soft-tone-dark:rgba(26,30,26,.26);--soft-light:-2px -2px 5px var(--soft-tone-light);--soft-dark:2px 2px 6px var(--soft-tone-dark);--soft-inset-light:inset -2px -2px 4px var(--soft-tone-light);--soft-inset-dark:inset 2px 2px 5px var(--soft-tone-dark);--soft-night:#1a1e1a;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-widget-hero:44px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
-.ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--soft-tone-light:rgba(255,255,255,.07);--soft-tone-dark:rgba(0,0,0,.62);--soft-night:#0a0c0a;color-scheme:dark;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-widget-hero:47px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
+.ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;}
 .ds[*|data-motion=extra]{--t-big:560ms;--t-big-heavy:644ms;--t-crumple-heavy:644ms;--e-spring:cubic-bezier(.34,2,.5,1);--overshoot:1.14;--squish:.86;--tilt:5deg;--stagger:34ms;}
 .ds[*|data-motion=reduced]{--t-tap:60ms;--t-quick:60ms;--t-move:60ms;--t-big:60ms;--t-ambient:60ms;--t-big-heavy:60ms;--t-spark:60ms;--t-curl:60ms;--t-curl-heavy:60ms;--t-crumple-heavy:60ms;--t-send:60ms;--t-float:60ms;--t-hc-out:60ms;--t-scene:60ms;--t-shake:60ms;--t-park:60ms;--t-nudge:60ms;--t-shake-long:60ms;--t-sail:60ms;--t-boat-return:60ms;--t-spin:60ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;}
@@ -704,36 +704,25 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }
 /* -- battery_level -- */
 /* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"; sill FINDINGS
-   Q183): a battery glyph, 32 x 16 (40 x 20 in a small widget, beside
-   its hero percentage), in the soft language. The body is the plate's own colour
-   pushed out of it (`--soft-light` up and left, `--soft-dark` down and right, 5 corner); a
-   channel is pressed into it (`--soft-inset-dark`, `--soft-inset-light`, 3 in, 3 corner); 1.5 inside
-   the channel a solid matte fill as long as the level, in `--ink`, `--warn` at a fifth or less,
-   `--danger` at a tenth or less, `--ok` while charging (a charging battery is never low); a
-   small raised cap at the right; while charging a bolt in `--ink` over the body, cut out of it by
-   an outline in the plate's colour. An optional device glyph sits before it in `--ink-soft`. The
-   fill bumps once when the percentage changes (`use_bump_on`). The bolt takes its colour from
-   its own element (spike S6). */
+   Q183): a flat, bright ring, 64 across (the reference's ring in a small and a medium widget).
+   The track is a full circle in `--battery-track`, the plate darkened; over it the level's arc
+   from twelve, clockwise, round-capped, in `--battery-fill`, `--battery-low` at a fifth or less
+   (low and critical alike); the stroke is .093 of the ring's diameter. The device's glyph sits
+   in the middle at .47 of the ring in `--ink`. While charging, a bolt in `--ink`, .16 of the
+   ring tall, sits on the stroke at twelve in the gap the ring leaves for it. Each vector takes
+   its colour from its own element (spike S6). The ring bumps once when the percentage changes
+   (`use_bump_on`). */
 
-.ds-battery{ display:inline-flex; align-items:center; flex:none; color:var(--ink); }
-.ds-battery-device{ display:inline-flex; align-items:center; margin-right:var(--s-6); color:var(--ink-soft); }
-.ds-battery-glyph{ position:relative; display:block; flex:none; width:32px; height:16px; }
-.ds-widget[*|data-size=small] .ds-battery-glyph{ width:40px; height:20px; }
-.ds-battery-body{ position:absolute; top:0; bottom:0; left:0; right:var(--s-3); box-sizing:border-box; padding:var(--s-3);
-  border-radius:var(--r-small); box-shadow:var(--soft-light), var(--soft-dark); }
-.ds-battery-channel{ display:flex; box-sizing:border-box; width:100%; height:100%; padding:var(--s-1-5); overflow:hidden; border-radius:var(--r-micro);
-  box-shadow:var(--soft-inset-dark), var(--soft-inset-light); }
-.ds-battery-fill{ display:block; flex:none; height:100%; width:calc(var(--f) * 100%); min-width:var(--s-3); border-radius:var(--r-micro);
-  background:var(--ink); }
-.ds-battery[*|data-tone=low] .ds-battery-fill{ background:var(--warn); }
-.ds-battery[*|data-tone=critical] .ds-battery-fill{ background:var(--danger); }
-.ds-battery[*|data-mark=charging] .ds-battery-fill{ background:var(--ok); }
-.ds-battery-cap{ position:absolute; top:32%; bottom:32%; right:0; width:var(--s-2); border-radius:0 var(--r-micro) var(--r-micro) 0;
-  background:var(--ink-faint); }
-.ds-battery-knockout,
-.ds-battery-bolt{ position:absolute; inset:0; display:block; width:100%; height:100%; }
-.ds-battery-knockout{ color:var(--m-tint-solid, var(--surface)); }
-.ds-battery-bolt{ color:var(--ink); }
+.ds-battery{ position:relative; display:block; flex:none; width:64px; height:64px; color:var(--ink); }
+.ds-battery-track,
+.ds-battery-arc{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+.ds-battery-track{ color:var(--battery-track); }
+.ds-battery-arc{ color:var(--battery-fill); }
+.ds-battery[*|data-tone=low] .ds-battery-arc,
+.ds-battery[*|data-tone=critical] .ds-battery-arc{ color:var(--battery-low); }
+.ds-battery-device{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.ds-battery-device .ds-ic{ width:47%; height:47%; }
+.ds-battery-bolt{ position:absolute; left:45%; top:-3.35%; display:block; width:10%; height:16%; color:var(--ink); }
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -873,42 +862,49 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-chip-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }
 /* -- clock_face -- */
 /* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"; sill FINDINGS Q183).
-   The analog dial is a 56 px soft well (four fit a medium widget's row): the plate pressed in
-   (`--soft-inset-dark` up and left inside it, `--soft-inset-light` down and right), of the
-   plate's own colour by day and `--soft-night` by night (whose well keeps only its shade: a
-   light inside a dark ground would read as gloss). Four quarter marks at .4 of the hands'
-   colour; the hour and minute hands and the hub are thick and round and stand out of the well:
-   each is drawn over a shade in `--soft-tone-dark` thrown down and right and a light in
-   `--soft-tone-light` thrown up and left (by night the light is dropped: it would glow on the
-   dark ground). The hands are `--ink` by day, `--paper` by night (`--ink-soft` on a dark desktop,
-   whose ink is already pale); the thin second hand and its dot are `--accent`. The vectors fill
+   The analog dial is flat, as the reference measures: 62 across in a row (four fit a medium
+   widget), and in a small widget as large as the card less 8 at each side, with the city
+   dropped (the reference's small clock has none). The face is `--clock-face-day` or
+   `--clock-face-night`; numerals, ticks and hands take `--clock-ink-day` or `--clock-ink-night`.
+   Twelve numerals in the display face at its heaviest, centred on .82 of the radius (.73 on the
+   large dial, whose sixty ticks stand outside them; a row's dial has no ticks). The seconds hand
+   and its ring are `--clock-seconds`, the pin in the ring the face's colour. The vectors fill
    the dial and take their colour from their own element (CSS does not reach inside an SVG on
    Blitz, spike S6). The digital face is the display face, tabular, the hero size in a small
    widget and a step down anywhere else, and bumps on each new minute; its city wears the
    phase's mark, a sun disc in `--warn` or a crescent moon in `--ink-faint`. The city is the UI
-   face under either. */
+   face, bold, under either. */
 
-.ds-clock{ display:flex; flex-direction:column; align-items:center; gap:var(--s-8); min-width:0; color:var(--ink); }
-.ds-clock-dial{ position:relative; width:56px; height:56px; border-radius:var(--r-pill); color:var(--ink);
-  box-shadow:var(--soft-inset-dark), var(--soft-inset-light); }
-.ds-clock[*|data-phase=night] .ds-clock-dial{ background:var(--soft-night); color:var(--paper); box-shadow:var(--soft-inset-dark); }
-.ds[*|data-theme=dark] .ds-clock[*|data-phase=night] .ds-clock-dial{ color:var(--ink-soft); }
-.ds-clock-marks,
-.ds-clock-shade,
-.ds-clock-lit,
+.ds-clock{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); min-width:0; color:var(--ink); }
+.ds-clock-dial{ position:relative; flex:none; width:62px; height:62px; border-radius:var(--r-pill);
+  background:var(--clock-face-day); color:var(--clock-ink-day); }
+.ds-clock[*|data-phase=night] .ds-clock-dial{ background:var(--clock-face-night); color:var(--clock-ink-night); }
+.ds-clock-ticks,
 .ds-clock-hands,
-.ds-clock-second{ position:absolute; inset:0; display:block; width:100%; height:100%; }
-.ds-clock-shade{ color:var(--soft-tone-dark); }
-.ds-clock-lit{ color:var(--soft-tone-light); }
-.ds-clock[*|data-phase=night] .ds-clock-lit{ display:none; }
-.ds-clock-second{ color:var(--accent); }
+.ds-clock-second,
+.ds-clock-pin{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+.ds-clock-ticks{ display:none; }
+.ds-clock-second{ color:var(--clock-seconds); }
+.ds-clock-pin{ color:var(--clock-face-day); }
+.ds-clock[*|data-phase=night] .ds-clock-pin{ color:var(--clock-face-night); }
+.ds-clock-numerals{ position:absolute; inset:9%; }
+.ds-clock-numeral{ position:absolute; width:2em; height:1em; margin-left:-1em; margin-top:-.5em; text-align:center;
+  font-family:var(--font-display); font-size:var(--fs-dial); font-weight:800; line-height:1; }
+
+.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog]{ flex:1; justify-content:center; }
+.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-dial{ width:calc(var(--widget-cell) - 2 * var(--s-8));
+  height:calc(var(--widget-cell) - 2 * var(--s-8)); margin:calc(-1 * var(--s-4)) 0; }
+.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-ticks{ display:block; }
+.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-numerals{ inset:13.5%; }
+.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-numeral{ font-size:var(--fs-dial-large); }
+.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-label{ display:none; }
 
 .ds-clock[*|data-look=digital]{ align-items:flex-start; gap:var(--s-4); }
 .ds-clock-digits{ display:inline-block; font-family:var(--font-display); font-variant-numeric:tabular-nums; font-size:var(--fs-subject);
-  font-weight:700; letter-spacing:-.02em; line-height:1; }
+  font-weight:800; letter-spacing:-.02em; line-height:1; }
 .ds-widget[*|data-size=small] .ds-clock-digits{ font-size:var(--fs-widget-hero); }
-.ds-clock-label{ display:flex; align-items:center; gap:var(--s-4); max-width:100%; font-family:var(--font-ui); font-size:var(--fs-help);
-  font-weight:600; line-height:1.25; color:var(--ink); }
+.ds-clock-label{ display:flex; align-items:center; gap:var(--s-4); max-width:100%; font-family:var(--font-ui); font-size:var(--fs-small);
+  font-weight:700; line-height:1.2; color:var(--ink); }
 .ds-clock-city{ white-space:nowrap; overflow:hidden; }
 .ds-clock-sun,
 .ds-clock-moon{ display:block; flex:none; width:12px; height:12px; }
@@ -2575,23 +2571,27 @@ html,body{margin:0;padding:0;background:transparent}
    gap wide (344 x 164), a large two by two (344 square); `WidgetMetrics` writes both tokens from
    `widgets.desktop_cell_px` and `desktop_gap_px`. The desktop card is the Widget material's
    plate (its tint, hairline and drop come from the transparent-root card rule in the materials
-   section) with the material's own corner, padded 16. The tile sits on the Popover it is in, a
-   ModuleTile's plate: `--surface-2`, a hairline, `--r-tile` 12, padded 12. The title row is a
-   quiet eyebrow (design/23-WIDGETS.md section 4.3): the glyph at 12 and the name in the data
-   face at `--fs-micro`, upper, tracked .08em, both `--ink-faint`, so the widget's own value
-   leads. Attribute selectors carry `*|` (spike S2). */
+   section) with the material's own corner (20, .12 of the small card, as measured), padded 12
+   (the reference's inset, design/23 section 1.1). With a Space tint the Space's gradient lies
+   over the plate at the material's frame alpha (`.ds-frame`), under the content; the card stacks
+   its own layers so the frame's `--z-scene` lands above the plate, not behind it. The tile sits
+   on the Popover it is in, a ModuleTile's plate: `--surface-2`, a hairline, `--r-tile` 12,
+   padded 12. The optional title row is quiet (design/23-WIDGETS.md section 4.3): the glyph at
+   12 and the name in the UI face at `--fs-caption` 600, both `--ink-soft`, so the widget's own
+   value leads. Attribute selectors carry `*|` (spike S2). */
 
 .ds-widget{ position:relative; display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box; overflow:hidden;
   width:var(--widget-cell); height:var(--widget-cell); color:var(--ink); }
 .ds-widget[*|data-size=medium]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); }
 .ds-widget[*|data-size=large]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); height:calc(2 * var(--widget-cell) + var(--widget-gap)); }
-.ds-widget[*|data-host=desktop]{ padding:var(--s-16); border-radius:var(--m-radius); }
+.ds-widget[*|data-host=desktop]{ padding:var(--s-12); border-radius:var(--m-radius); }
+.ds-widget[*|data-tint=space]{ z-index:var(--z-raise); }
 .ds-widget[*|data-host=tile]{ padding:var(--s-12); border:var(--hair) solid var(--line); border-radius:var(--r-tile); background:var(--surface-2); }
 
-.ds-widget-title{ display:flex; align-items:center; gap:var(--s-5); flex:none; min-width:0; font-family:var(--font-data);
-  font-size:var(--fs-micro); font-weight:400; line-height:1.25; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.ds-widget-title{ position:relative; z-index:var(--z-raise); display:flex; align-items:center; gap:var(--s-5); flex:none; min-width:0;
+  font-family:var(--font-ui); font-size:var(--fs-caption); font-weight:600; line-height:1.25; color:var(--ink-soft); }
 .ds-widget-title-text{ white-space:nowrap; overflow:hidden; }
-.ds-widget-body{ display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
+.ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 
 /* Bumped: a run of text a widget bumps on change (`use_bump_on`); transformable while it plays. */
 .ds-bumped{ display:inline-block; }

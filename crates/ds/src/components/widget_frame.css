@@ -3,23 +3,27 @@
    gap wide (344 x 164), a large two by two (344 square); `WidgetMetrics` writes both tokens from
    `widgets.desktop_cell_px` and `desktop_gap_px`. The desktop card is the Widget material's
    plate (its tint, hairline and drop come from the transparent-root card rule in the materials
-   section) with the material's own corner, padded 16. The tile sits on the Popover it is in, a
-   ModuleTile's plate: `--surface-2`, a hairline, `--r-tile` 12, padded 12. The title row is a
-   quiet eyebrow (design/23-WIDGETS.md section 4.3): the glyph at 12 and the name in the data
-   face at `--fs-micro`, upper, tracked .08em, both `--ink-faint`, so the widget's own value
-   leads. Attribute selectors carry `*|` (spike S2). */
+   section) with the material's own corner (20, .12 of the small card, as measured), padded 12
+   (the reference's inset, design/23 section 1.1). With a Space tint the Space's gradient lies
+   over the plate at the material's frame alpha (`.ds-frame`), under the content; the card stacks
+   its own layers so the frame's `--z-scene` lands above the plate, not behind it. The tile sits
+   on the Popover it is in, a ModuleTile's plate: `--surface-2`, a hairline, `--r-tile` 12,
+   padded 12. The optional title row is quiet (design/23-WIDGETS.md section 4.3): the glyph at
+   12 and the name in the UI face at `--fs-caption` 600, both `--ink-soft`, so the widget's own
+   value leads. Attribute selectors carry `*|` (spike S2). */
 
 .ds-widget{ position:relative; display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box; overflow:hidden;
   width:var(--widget-cell); height:var(--widget-cell); color:var(--ink); }
 .ds-widget[*|data-size=medium]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); }
 .ds-widget[*|data-size=large]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); height:calc(2 * var(--widget-cell) + var(--widget-gap)); }
-.ds-widget[*|data-host=desktop]{ padding:var(--s-16); border-radius:var(--m-radius); }
+.ds-widget[*|data-host=desktop]{ padding:var(--s-12); border-radius:var(--m-radius); }
+.ds-widget[*|data-tint=space]{ z-index:var(--z-raise); }
 .ds-widget[*|data-host=tile]{ padding:var(--s-12); border:var(--hair) solid var(--line); border-radius:var(--r-tile); background:var(--surface-2); }
 
-.ds-widget-title{ display:flex; align-items:center; gap:var(--s-5); flex:none; min-width:0; font-family:var(--font-data);
-  font-size:var(--fs-micro); font-weight:400; line-height:1.25; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.ds-widget-title{ position:relative; z-index:var(--z-raise); display:flex; align-items:center; gap:var(--s-5); flex:none; min-width:0;
+  font-family:var(--font-ui); font-size:var(--fs-caption); font-weight:600; line-height:1.25; color:var(--ink-soft); }
 .ds-widget-title-text{ white-space:nowrap; overflow:hidden; }
-.ds-widget-body{ display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
+.ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 
 /* Bumped: a run of text a widget bumps on change (`use_bump_on`); transformable while it plays. */
 .ds-bumped{ display:inline-block; }

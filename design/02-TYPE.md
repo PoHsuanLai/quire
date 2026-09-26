@@ -112,6 +112,12 @@ role each size carries; every row cites its rules.
 The design system's type tokens span `--fs-micro 9.5 .. --fs-display 26` (`P:296`); names for
 the steps between are not specified.
 
+Outside that span, the desktop widgets carry four sizes of their own, each set so its cap
+height matches the reference widget's measured cap (`23-WIDGETS.md` section 1.1; the display
+face's cap height is .66 em): `--fs-dial` 9 (a world clock row's dial numerals), `--fs-dial-large`
+18 (a small clock's dial numerals), `--fs-widget-figure` 20 (a battery's percentage under its
+ring) and `--fs-widget-hero` 47 (a small battery's percentage).
+
 ## 5. Tracking
 
 Letter-spacing is fixed per role; uppercase data text is always tracked wide.

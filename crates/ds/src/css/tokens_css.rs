@@ -14,8 +14,8 @@ use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::widgets::WIDGET_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SoftPaint, SpacingToken,
-    VarName, ZLayer,
+    OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
+    WidgetPaint, ZLayer,
 };
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
@@ -63,10 +63,10 @@ fn scheme_tokens(scheme: Scheme) -> Vec<String> {
     let shadows = Shadow::ALL
         .into_iter()
         .map(|shadow| declaration(shadow.var(), shadow.css(scheme)));
-    let soft = SoftPaint::ALL
+    let widget = WidgetPaint::ALL
         .into_iter()
         .map(|paint| declaration(paint.var(), paint.css(scheme)));
-    colours.chain(hues).chain(shadows).chain(soft).collect()
+    colours.chain(hues).chain(shadows).chain(widget).collect()
 }
 
 /// A colour token as the stylesheet writes it.

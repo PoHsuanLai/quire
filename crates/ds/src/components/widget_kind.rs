@@ -49,6 +49,28 @@ impl WidgetHost {
     }
 }
 
+/// What a desktop widget's card is tinted with (design/23-WIDGETS.md section 4.3).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum CardTint {
+    /// The `Widget` material's own tint.
+    #[default]
+    Material,
+    /// The material with the Space's gradient over it at the material's frame alpha, as the
+    /// tinted chrome carries it (design/03-COLOR.md section 17.2), so the Space's colour reaches
+    /// the card.
+    Space,
+}
+
+impl CardTint {
+    /// `data-tint`: written only for a Space tint.
+    pub fn slug(self) -> Option<&'static str> {
+        match self {
+            CardTint::Material => None,
+            CardTint::Space => Some("space"),
+        }
+    }
+}
+
 /// A widget's title row: a glyph and a name ("Batteries", a calendar's month).
 #[derive(Debug, Clone, PartialEq)]
 pub struct WidgetTitle {

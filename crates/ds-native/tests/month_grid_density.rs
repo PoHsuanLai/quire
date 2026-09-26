@@ -1,7 +1,7 @@
 //! The compact MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39; sill
 //! Q190): at `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week month with
-//! its step buttons lies wholly inside the frame's content box (164 less 16 padding a side,
-//! 132 x 132), where the regular grid (224 x 254) did not. A layout, not a timing, so one look.
+//! its step buttons lies wholly inside the frame's content box (164 less 12 padding a side,
+//! 140 x 140, the widgets' measured inset, design/23 section 1.1), where the regular grid (224 x 254) did not. A layout, not a timing, so one look.
 
 #[path = "../../ds/tests/support/month_sample.rs"]
 mod month_sample;
@@ -68,12 +68,12 @@ fn the_compact_grid_fits_a_small_widget() {
     let last = rect(&harness, ".ds-month-weeks");
     assert_eq!(
         (body.size.width.0, body.size.height.0),
-        (132.0, 132.0),
-        "the small frame's content box is 164 less 16 a side"
+        (140.0, 140.0),
+        "the small frame's content box is 164 less 12 a side"
     );
     assert!(
-        (body.origin.x.0 - card.origin.x.0 - 16.0).abs() < 0.01
-            && (body.origin.y.0 - card.origin.y.0 - 16.0).abs() < 0.01,
+        (body.origin.x.0 - card.origin.x.0 - 12.0).abs() < 0.01
+            && (body.origin.y.0 - card.origin.y.0 - 12.0).abs() < 0.01,
         "the body is the card's content box: {card:?} {body:?}"
     );
     assert_eq!(
