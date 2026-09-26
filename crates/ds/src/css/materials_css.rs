@@ -305,7 +305,7 @@ mod tests {
         let css = materials_css();
         const WANT: &[&str] = &[
             ".ds[*|data-material=bar]{--m-tint:color-mix(in srgb,rgba(252,253,249,calc(.7*var(--m-tint-alpha,.8)/.8)) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8)));--m-tint-solid:color-mix(in srgb,rgba(252,253,249,.94) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,.94));",
-            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:color-mix(in srgb,rgba(20,24,19,calc(.67*var(--m-tint-alpha,.8)/.8))",
+            ".ds[*|data-theme=dark][*|data-material=widget]{--m-tint:color-mix(in srgb,rgba(20,24,19,calc(.55*var(--m-tint-alpha,.8)/.8))",
             ".ds[*|data-material=popover]{--m-tint:rgba(255,255,255,calc(.78*var(--m-tint-alpha,.8)/.8));",
             ".ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;--m-box:none;--m-frame-alpha:1;--m-highlight:none;--m-hairline:none;--m-shadow-contact:none;--m-shadow-ambient:none;--m-inner:none;border-radius:var(--m-radius);box-shadow:var(--m-box);}",
             ".ds[*|data-material][*|data-blur=off]{background:var(--m-tint-solid);}",

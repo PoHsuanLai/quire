@@ -232,6 +232,13 @@ fn the_solid_tints_hold_text_over_black_and_white() {
 /// assume an opaque ground; how they hold over blur is design/03-COLOR.md open decision 11, so
 /// this is the floor, measured on what `recipe` paints. Four alphas were raised to meet it in
 /// wave 1 (the dark bar and dock .66, the widget .54 light and .65 dark).
+///
+/// `Material::Widget` alone is gated at 3:1 instead (the user's decision, 2026-09-26, "relax
+/// the contrast then": design/03-COLOR.md section 17, design/23-WIDGETS.md section 4.3). The
+/// light widget tint now fits the reference exactly (the measured near-white at the measured
+/// .48) and cannot hold 4.5:1 over black; the trade is accepted because the widget's own text
+/// is large or bold (the hero and figure numerals, bold city names), where the accessibility
+/// guideline for large text is 3:1, not 4.5:1.
 #[test]
 fn the_translucent_tints_hold_text_over_black_and_white() {
     let mut failures = Vec::new();
@@ -239,12 +246,17 @@ fn the_translucent_tints_hold_text_over_black_and_white() {
         for scheme in Scheme::ALL {
             let ink = colour(ColourToken::Ink, scheme);
             let tint = recipe(material, scheme, DEFAULT_TINT_ALPHA).tint;
+            let floor = if material == Material::Widget {
+                3.0
+            } else {
+                4.5
+            };
             for (name, backdrop) in [("black", BLACK), ("white", WHITE)] {
                 let ground = over(&tint, backdrop);
                 let got = measured(&ink, &ground);
-                if got < 4.5 {
+                if got < floor {
                     failures.push(format!(
-                        "{material:?} {scheme:?} over {name}: {ink} on {ground} is {got:.2}"
+                        "{material:?} {scheme:?} over {name}: {ink} on {ground} is {got:.2}, needs {floor}"
                     ));
                 }
             }
@@ -317,6 +329,12 @@ fn chrome_ink(material: Material, vars: &FrameVars, scheme: Scheme) -> String {
 /// The tinted chrome (bar gaps): the ink a material's ground draws in, on every stop of every
 /// preset's gradient laid at the material's alpha over black and over white, in both schemes;
 /// `solid` is the blur-off floor .94, the other the tint alpha over blur at the key's default.
+///
+/// `Material::Widget` (the Space-tinted widget card, `CardTint::Space`) is gated at 3:1 rather
+/// than 4.5:1, the same relaxation `the_translucent_tints_hold_text_over_black_and_white`
+/// applies to its flat tint (the user's decision, 2026-09-26, "relax the contrast then":
+/// design/03-COLOR.md section 17, design/23-WIDGETS.md section 4.3): the widget's own text is
+/// large or bold, where the accessibility guideline is 3:1.
 fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<String> {
     let mut failures = Vec::new();
     let tinted = [
@@ -329,6 +347,11 @@ fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<Str
     for material in tinted {
         for scheme in Scheme::ALL {
             let alpha = alpha_of(material, scheme);
+            let floor = if material == Material::Widget {
+                3.0
+            } else {
+                4.5
+            };
             for (index, preset) in PRESETS.iter().enumerate() {
                 let look = SpaceLook {
                     dots: preset.dots.to_vec(),
@@ -342,9 +365,9 @@ fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<Str
                     for (name, backdrop) in [("black", BLACK), ("white", WHITE)] {
                         let ground = over(&tint, backdrop);
                         let got = measured(&ink, &ground);
-                        if got < 4.5 {
+                        if got < floor {
                             failures.push(format!(
-                                "{material:?} {scheme:?} preset {} stop {stop} at {alpha} over {name}: {ink} on {ground} is {got:.2}",
+                                "{material:?} {scheme:?} preset {} stop {stop} at {alpha} over {name}: {ink} on {ground} is {got:.2}, needs {floor}",
                                 index + 1
                             ));
                         }
