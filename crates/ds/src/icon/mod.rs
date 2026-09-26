@@ -251,6 +251,13 @@ pub enum Icon {
     ArrowRight,
     /// Lucide `arrow-big-up-dash`: caps lock is on.
     CapsLock,
+    // Launcher v2 (sill Q296): the clipboard, emoji and web providers.
+    /// Lucide `clipboard`: the clipboard history.
+    Clipboard,
+    /// Lucide `smile`: emoji.
+    Smile,
+    /// Lucide `globe`: the web.
+    Globe,
 }
 
 impl Icon {
@@ -309,6 +316,9 @@ impl Icon {
             Icon::Switches => geometry_own::SWITCHES,
             Icon::ArrowRight => geometry_actions::ARROW_RIGHT,
             Icon::CapsLock => geometry_actions::CAPS_LOCK,
+            Icon::Clipboard => geometry_actions::CLIPBOARD,
+            Icon::Smile => geometry_actions::SMILE,
+            Icon::Globe => geometry_actions::GLOBE,
             shell => geometry_shell::shapes(shell),
         }
     }

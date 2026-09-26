@@ -107,6 +107,10 @@ impl Icon {
         // Lock and switcher parts (M11).
         Icon::ArrowRight,
         Icon::CapsLock,
+        // Launcher v2 (sill Q296).
+        Icon::Clipboard,
+        Icon::Smile,
+        Icon::Globe,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
@@ -216,6 +220,9 @@ impl Icon {
         Icon::EllipsisVertical,
         Icon::ArrowRight,
         Icon::CapsLock,
+        Icon::Clipboard,
+        Icon::Smile,
+        Icon::Globe,
         Icon::Play,
         Icon::Pause,
         Icon::SkipBack,
