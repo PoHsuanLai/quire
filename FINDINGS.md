@@ -4626,7 +4626,7 @@ sill Q360 and Q361. Branch `q360-q361`.
   text is measured in the editor's default family, untracked, while the dots are Inter tracked
   .1em, so the caret lands within a dot or two of the end for ordinary input. Closing that
   needs the editor to take the element's font (an upstream change) or a field-drawn caret over
-  the mask; neither is done.
+  the mask; the second is done in Q360b below.
 - **Q361: the compact MonthGrid's today disc.** The 16 px disc round `--fs-caption` 10 at 700
   left two tabular Inter digits (about 12 px) under 2 px a side, and "27" touched the rim. The
   regular grid puts 11.5 px digits on a 24 px disc (about 2.1x), so the compact disc takes the
@@ -4637,3 +4637,58 @@ sill Q360 and Q361. Branch `q360-q361`.
   disc's foot, `--accent-ink` on today's disc. Six weeks: 14 + 10 + 6 x 19 = 138 (139 with the
   last disc), inside 140. `month_grid_density.rs` measures it and checks today's disc is 20 x 20
   inside its column. No class or API change.
+
+## A masked field draws its own caret (2026-09-27)
+
+sill Q360b, the follow-up to Q360. Branch `q360b`.
+
+- **The drift.** Blitz's `create_text_editor` (rev e99fbdbd) gives an input's editor only the
+  font size, line height and brush, so a `Password` or `Secret` field's hidden text is measured
+  in the editor's default family, untracked, while `.ds-input-mask` draws Inter dots tracked
+  .1em (.14em in the lock pill). Blitz's caret follows the hidden text: in the polkit field it
+  sat 5.8 px short of the fourth dot's advance, 13.5 px short of the eighth, about two dots at
+  eleven, and the gap grows with the length.
+- **Fix: the mask draws the caret.** A new host seam, `ds::HostSelection(fn(&MountedData) ->
+  FieldSelection)`, provided by ds-native as `focus::SELECTION` (in `launch`, the harness and
+  `focus::provide()`), reads whether the field has the keyboard and its anchor and focus in
+  characters. The field re-reads it in a task after each key, input, mouse down or up, focus
+  and blur (Blitz moves the caret after the handlers ran; the task runs after that, and waits
+  out a busy document for up to four frames). With the seam and a non-empty mask the input
+  carries `data-caret=drawn` (`caret-color: transparent`; Blitz honours `caret-color` and
+  paints nothing for transparent) and the mask is cut at the selection: the dots before, a
+  `span.ds-input-mask-selected` on `--accent-soft` for a range, a `span.ds-input-caret` for a
+  collapsed caret, the dots after. An empty field keeps Blitz's caret: at the start it is
+  right.
+- **The caret matches Blitz's.** Blitz paints `cursor_geometry(1.5)`: 1.5 px wide, the line
+  box's height, in `caret-color` (else the text colour), and never blinks (nothing in blitz-dom
+  toggles parley's `show_cursor`), so the drawn caret does not blink either and needs no
+  reduced-motion case. Its colour is the dots' ink, named per face since the lint keeps
+  `currentColor` to strokes and fills (`--ink`, `--lock-ink`, `--f-ink`, which
+  design/04 section 42 already names for the Space pill's caret), `--accent` on Bare. It takes
+  no room: a zero-size inline box on the baseline with the bar hung from the line's top
+  (`top:-1.139em`, Inter's ascent .969em plus the half-leading of a 1.55 line). A first try, an
+  inline-block the line's height with `vertical-align:top`, pushed the line's baseline down and
+  the dots dropped 4 px whenever the caret showed: Blitz sat the box on the baseline.
+- **Selection.** Blitz paints its own selection over the hidden text in `SELECTION_COLOR`
+  (rgb 180 213 255, a constant in blitz-paint), which no style reaches. A Boxed mask's content
+  box is exactly the input's, so the mask takes `--surface` clipped to its content box and
+  Blitz's highlight stays under it. An Inline field's ground is its container's (the lock
+  pill's glass over the wallpaper), which the mask cannot repeat, so a range selected there
+  shows Blitz's highlight beside the dots' one. Not fixed.
+- **Characters, not graphemes.** The mask has one dot per `char` (as since wave 2) and Blitz
+  moves the caret by grapheme cluster, so the caret's character offset always falls between
+  dots. Dots per grapheme would need `unicode-segmentation` in ds; not done.
+- **Open.** A secret longer than the field: Blitz scrolls its editor to keep the caret in view,
+  the mask does not scroll (it clips at the right), so a caret past the field's width is
+  clipped with the dots. Passwords that long in a 260 to 300 px field are rare.
+- **Regression.** `ds-native/tests/secret_mask_align.rs` reads the painted pixels in the polkit
+  field: after 4, 11 and 24 characters the caret's ink sits within 1 px of the last dot's
+  advance end (the mask's padding plus N dot pitches, both from darkness-weighted centres; it
+  measures 0.02 px and 0.2 px off), the dots do not move when the caret shows, and Tab away
+  leaves no caret ink; after Left x3 the caret is before the third dot from the end, within 1 px
+  of the eighth dot's end. With the drawn caret off the first check fails at 5.8 px.
+- **API.** New: `ds::HostSelection`, `ds::FieldSelection`, `ds_native::focus::SELECTION`. New
+  classes `.ds-input-caret`, `.ds-input-mask-selected` inside `.ds-input-mask`, and
+  `data-caret=drawn` on a masked `input.ds-input`; `.ds-input-mask`'s text is still one dot per
+  character. `lock_prompt.css` keeps its `caret-color` for the empty field and adds a
+  `data-caret=drawn` rule so the drawn caret wins there too.

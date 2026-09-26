@@ -49,10 +49,10 @@ pub use file_drop::{
     Offer, use_file_drop,
 };
 pub use focus::{
-    Caret, Collapsed, Fallback, FieldHandle, FocusError, FocusRequest, FocusTicket, Focused, Found,
-    HostBlur, HostCaret, HostClickFocus, HostFind, HostFocus, HostHandBack, HostPlaceCaret,
-    HostPressFocus, HostSelect, InitialCaret, Select, caret_at, focus_by_selector, focus_soon,
-    focus_soon_selecting, use_field_handle, use_focus_request,
+    Caret, Collapsed, Fallback, FieldHandle, FieldSelection, FocusError, FocusRequest, FocusTicket,
+    Focused, Found, HostBlur, HostCaret, HostClickFocus, HostFind, HostFocus, HostHandBack,
+    HostPlaceCaret, HostPressFocus, HostSelect, HostSelection, InitialCaret, Select, caret_at,
+    focus_by_selector, focus_soon, focus_soon_selecting, use_field_handle, use_focus_request,
 };
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;

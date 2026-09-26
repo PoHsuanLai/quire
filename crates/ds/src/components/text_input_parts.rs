@@ -5,6 +5,7 @@ use crate::components::icon_button::{IconButton, IconButtonVariant};
 use crate::components::text_input::InputVariant;
 use crate::components::text_input_focus::{FieldFocus, Focus};
 use crate::components::text_input_kind::{Rows, TextInputKind};
+use crate::components::text_input_mask::{CaretMark, MaskCaret, MaskParts};
 use crate::components::vocab::Availability;
 use crate::focus::targets::Told;
 use crate::icon::Icon;
@@ -28,6 +29,8 @@ pub(crate) struct Field {
     pub availability: Availability,
     pub focus: Focus,
     pub focuser: FieldFocus,
+    /// A masked field's own caret over its dots (sill Q360b).
+    pub caret: MaskCaret,
     pub handlers: Handlers,
     /// What a host's focus write tells the field, which no renderer event will.
     pub told: Told,
@@ -54,10 +57,13 @@ pub(crate) fn line(field: Field, kind: TextInputKind, value: String) -> Element 
         availability,
         focus,
         focuser,
+        caret,
         handlers,
         told,
     } = field;
-    let mask = kind.mask(&value);
+    let count = kind.mask(&value).map_or(0, |dots| dots.chars().count());
+    let owner = caret.owner(count);
+    let mask = (count > 0).then(|| MaskParts::cut(count, caret.selection(), owner));
     let shown = placeholder_shown(&value, &placeholder);
     let written = (kind != TextInputKind::Secret).then_some(value);
     rsx! {
@@ -67,32 +73,53 @@ pub(crate) fn line(field: Field, kind: TextInputKind, value: String) -> Element 
                 "data-variant": variant.slug(),
                 r#type: kind.input_type(),
                 "data-kind": kind.data_kind(),
+                "data-caret": owner.data_caret(),
                 "aria-label": "{label}",
                 "aria-placeholder": aria_placeholder(&placeholder),
                 "aria-disabled": availability.aria_disabled(),
                 autocomplete: "off",
                 autofocus: focus.on_mount().then_some("true"),
                 value: written,
-                onmounted: move |event| focuser.mounted(focus, &event, told),
-                onfocus: move |_| handlers.onfocus.call(()),
+                onmounted: move |event| {
+                    caret.mounted(&event);
+                    focuser.mounted(focus, &event, told);
+                },
+                onfocus: move |_| {
+                    caret.refresh();
+                    handlers.onfocus.call(());
+                },
                 onblur: move |_| {
+                    caret.refresh();
                     handlers.onchange.call(());
                     handlers.onblur.call(());
                 },
+                onmousedown: move |_| caret.refresh(),
+                onmouseup: move |_| caret.refresh(),
                 oninput: move |event| {
+                    caret.refresh();
                     if availability == Availability::Enabled {
                         handlers.oninput.call(event.value());
                     }
                 },
                 onkeydown: move |event: KeyboardEvent| {
+                    caret.refresh();
                     if event.key() == Key::Enter {
                         handlers.onchange.call(());
                     }
                     handlers.onkey.call(event);
                 },
             }
-            if let Some(dots) = mask {
-                span { class: "ds-input-mask", "aria-hidden": "true", "{dots}" }
+            if let Some(parts) = mask {
+                span { class: "ds-input-mask", "aria-hidden": "true",
+                    "{parts.before}"
+                    if !parts.selected.is_empty() {
+                        span { class: "ds-input-mask-selected", "{parts.selected}" }
+                    }
+                    if parts.caret == CaretMark::Shown {
+                        span { class: "ds-input-caret" }
+                    }
+                    "{parts.after}"
+                }
             }
             if let Some(text) = shown {
                 span { class: "ds-input-placeholder", "aria-hidden": "true", "{text}" }
@@ -113,6 +140,7 @@ pub(crate) fn area(field: Field, rows: Rows, value: String) -> Element {
         focuser,
         handlers,
         told,
+        ..
     } = field;
     let shown = placeholder_shown(&value, &placeholder);
     rsx! {
