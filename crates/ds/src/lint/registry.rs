@@ -55,6 +55,7 @@ fn collect() -> HashSet<String> {
         .chain(ZLayer::ALL.map(ZLayer::var))
         .chain(OpacityToken::ALL.map(OpacityToken::var))
         .chain(Family::ALL.map(Family::var))
+        .chain([crate::tokens::FONT_EMOJI])
         .chain(VoiceToken::ALL.map(VoiceToken::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])

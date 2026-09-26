@@ -303,6 +303,7 @@ paper (Post surface tokens). Only mail's frame shows the Space colour (21-SPACES
 | Material | `Window` | P |
 | Components | toolbar `IconButton{Tool}`, pdfrum page widget (`blitz_dom::Widget`) | S |
 | Motion | `peek-in` in, `fade` out | P |
+| Thumbnails | a PDF's first page (and the page strip's pages) reuse the launcher preview's part, `ds_native::PdfFileThumb` over `ds::PdfThumb` (design/04 section 45): same raster, same cache | S |
 | Keyboard | Space and Esc close | P |
 | Milestone | M12 | S |
 

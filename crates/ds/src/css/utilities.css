@@ -13,6 +13,10 @@
 /* Every Glyph: a block that never shrinks in a flex row (design/04-COMPONENTS.md "Global rules",
    `S:58-59`). Size and stroke are the SVG's own attributes (spike S6), never CSS. */
 .ds-ic{display:block;flex:none}
+/* Emoji in colour (FINDINGS "Colour emoji"): Inter, then the COLRv1 Noto Color Emoji face, so
+   text stays Inter (the emoji face maps digits and # to empty keycap bases) and every emoji falls
+   to colour. For an emoji grid, a reaction, any text that carries emoji. */
+.ds-emoji-text{font-family:var(--font-emoji)}
 /* Times, counts and numeric cells (design/02-TYPE.md section 9). */
 .ds-tabular{font-variant-numeric:tabular-nums}
 /* The window's frame: two gradient layers that cross-fade on a Space switch, and the grain over
