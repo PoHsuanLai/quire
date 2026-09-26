@@ -8,7 +8,8 @@
      `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
      and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
      (the level control), the sheet's `sheet-out` (sill Q90), and the screenshot thumbnail's
-     `shot-out` (sill Q181), below.
+     `shot-out` (sill Q181), and the persona's five, `persona-blink`, `persona-breathe`,
+     `persona-wince`, `persona-hop` and `persona-drift` (design/24-PERSONA.md), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -241,3 +242,22 @@
    out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
    --e-spring`. */
 @keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
+
+/* The persona's five (quire's, design/24-PERSONA.md section 4). Each plays once and ends at
+   rest, so a persona whose awake window has closed paints nothing. Moves are in shares of the
+   persona's own box, so every size moves alike. */
+
+/* persona-blink: the open eyes close towards their own line and open again. */
+@keyframes persona-blink{ 0%,100%{ transform:scaleY(1); } 45%,55%{ transform:scaleY(.1); } }
+
+/* persona-breathe: four tiny swells from the chin inside one --t-awake run. */
+@keyframes persona-breathe{ 0%,25%,50%,75%,100%{ transform:scale(1,1); } 12.5%,37.5%,62.5%,87.5%{ transform:scale(1.012,1.026); } }
+
+/* persona-wince: shake-x's four beats as shares of the width, with a small turn. */
+@keyframes persona-wince{ 20%{ transform:translateX(-7%) rotate(-3deg); } 40%{ transform:translateX(6%) rotate(2deg); } 60%{ transform:translateX(-4%); } 80%{ transform:translateX(2%); } }
+
+/* persona-hop: up and back down; the spring curve on each leg gives the lift and the landing. */
+@keyframes persona-hop{ 0%{ transform:none; } 35%{ transform:translateY(-12%) scale(.97,1.04); } 100%{ transform:none; } }
+
+/* persona-drift: one z rises to the upper right, grows and fades. */
+@keyframes persona-drift{ 0%{ opacity:0; transform:translate(0,0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translate(12%,-20%) scale(1.15); } }

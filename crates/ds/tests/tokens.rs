@@ -288,6 +288,9 @@ const PER_ELEMENT: &[&str] = &[
     // A notification group's layer count (`NotificationCard`, sill Q120).
     "--layers",
     "--swipe-dx",
+    // A persona's disc and the line its eyes close towards (`Persona`, design/24).
+    "--pa-ground",
+    "--pa-eyes",
 ];
 
 #[test]
