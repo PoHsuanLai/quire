@@ -49,6 +49,8 @@ impl Family {
 pub enum FontSize {
     /// `--fs-pico` 7.5: in-row provider mark.
     Pico,
+    /// `--fs-dial` 9: a medium world clock dial's numerals (design/23-WIDGETS.md section 4.2).
+    Dial,
     /// `--fs-nano` 9: pin count, favicon letter.
     Nano,
     /// `--fs-micro` 9.5: chip, via, group header.
@@ -81,6 +83,10 @@ pub enum FontSize {
     Title,
     /// `--fs-heading-3` 16.5: composer `h3`.
     Heading3,
+    /// `--fs-dial-large` 18: a small clock widget's dial numerals (design/23 section 4.2).
+    DialLarge,
+    /// `--fs-widget-figure` 20: a battery's percentage under its ring (design/23 section 4.1).
+    WidgetFigure,
     /// `--fs-subject` 20: reader subject.
     Subject,
     /// `--fs-heading` 21: parsed-body and composer headings.
@@ -91,14 +97,15 @@ pub enum FontSize {
     Day,
     /// `--fs-display` 26: composer subject.
     Display,
-    /// `--fs-widget-hero` 44: a widget's hero value (design/23-WIDGETS.md section 3.2).
+    /// `--fs-widget-hero` 47: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
     WidgetHero,
 }
 
 impl FontSize {
     /// Every step, smallest first.
-    pub const ALL: [FontSize; 23] = [
+    pub const ALL: [FontSize; 26] = [
         FontSize::Pico,
+        FontSize::Dial,
         FontSize::Nano,
         FontSize::Micro,
         FontSize::Caption,
@@ -115,6 +122,8 @@ impl FontSize {
         FontSize::Subhead,
         FontSize::Title,
         FontSize::Heading3,
+        FontSize::DialLarge,
+        FontSize::WidgetFigure,
         FontSize::Subject,
         FontSize::Heading,
         FontSize::Amount,
@@ -127,6 +136,7 @@ impl FontSize {
     pub fn var(self) -> VarName {
         VarName(match self {
             FontSize::Pico => "--fs-pico",
+            FontSize::Dial => "--fs-dial",
             FontSize::Nano => "--fs-nano",
             FontSize::Micro => "--fs-micro",
             FontSize::Caption => "--fs-caption",
@@ -143,6 +153,8 @@ impl FontSize {
             FontSize::Subhead => "--fs-subhead",
             FontSize::Title => "--fs-title",
             FontSize::Heading3 => "--fs-heading-3",
+            FontSize::DialLarge => "--fs-dial-large",
+            FontSize::WidgetFigure => "--fs-widget-figure",
             FontSize::Subject => "--fs-subject",
             FontSize::Heading => "--fs-heading",
             FontSize::Amount => "--fs-amount",
@@ -156,6 +168,7 @@ impl FontSize {
     pub fn css(self) -> &'static str {
         match self {
             FontSize::Pico => "7.5px",
+            FontSize::Dial => "9px",
             FontSize::Nano => "9px",
             FontSize::Micro => "9.5px",
             FontSize::Caption => "10px",
@@ -172,12 +185,14 @@ impl FontSize {
             FontSize::Subhead => "15.5px",
             FontSize::Title => "16px",
             FontSize::Heading3 => "16.5px",
+            FontSize::DialLarge => "18px",
+            FontSize::WidgetFigure => "20px",
             FontSize::Subject => "20px",
             FontSize::Heading => "21px",
             FontSize::Amount => "22px",
             FontSize::Day => "24px",
             FontSize::Display => "26px",
-            FontSize::WidgetHero => "44px",
+            FontSize::WidgetHero => "47px",
         }
     }
 }

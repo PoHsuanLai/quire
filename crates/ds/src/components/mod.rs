@@ -7,6 +7,7 @@ pub mod avatar;
 pub(crate) mod banner_row;
 pub mod banner_stack;
 pub mod battery_level;
+pub(crate) mod battery_ring;
 pub mod bump_on;
 pub mod button;
 pub mod button_face;
@@ -236,7 +237,7 @@ pub use vocab::{
     Selection, Shortcut, StaggerIndex, Switch,
 };
 pub use widget_frame::WidgetFrame;
-pub use widget_kind::{WidgetHost, WidgetSize, WidgetTitle};
+pub use widget_kind::{CardTint, WidgetHost, WidgetSize, WidgetTitle};
 pub use window_frame::{TrafficLights, WindowFrame, WindowTitlebar};
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 

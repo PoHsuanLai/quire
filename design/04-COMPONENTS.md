@@ -3254,8 +3254,8 @@ no pseudo-elements.
 **Purpose.** The card every widget is drawn on, on the desktop layer and in the notification
 center's widget column (design/20 section 1.14; design/22 section 3.20; sill FINDINGS Q182,
 Q183), and the two faces sill cannot draw from text alone: an analog world clock and a battery
-glyph. Their drawing is the widget style "Neumorphism & Soft UI" (design/23-WIDGETS.md
-sections 2 to 4). The card's corner, padding and title row are the frame's, so a widget writes no CSS
+glyph. Their drawing is the widget style "Flat, bright, measured" (design/23-WIDGETS.md
+sections 2 to 4), matched to the reference widgets measured in design/23 section 1.1. The card's corner, padding and title row are the frame's, so a widget writes no CSS
 for them.
 
 **WidgetMetrics.** Writes the grid unit as tuned tokens on any element around the widgets:
@@ -3264,10 +3264,12 @@ for them.
 what the stylesheet falls back to.
 
 **WidgetFrame.** `WidgetFrame { size: WidgetSize::{Small, Medium, Large}, host:
-WidgetHost::{Desktop, Tile}, title: Option<WidgetTitle { glyph: Icon, text: Text }>, id:
-Option<String>, children }`.
-Markup: `div.ds-widget[data-size][data-host]` holding an optional
-`div.ds-widget-title` (a `Glyph` at 12 and the text) and `div.ds-widget-body`.
+WidgetHost::{Desktop, Tile}, tint: CardTint::{Material, Space}, title: Option<WidgetTitle {
+glyph: Icon, text: Text }>, id: Option<String>, children }`.
+Markup: `div.ds-widget[data-size][data-host][data-tint]` holding, with `CardTint::Space`, a
+`div.ds-frame` (the Space's gradient at the material's frame alpha, under the content), an
+optional `div.ds-widget-title` (a `Glyph` at 12 and the text) and `div.ds-widget-body`.
+`data-tint="space"` is written only for the Space tint.
 The frame provides its `size` to its content through a context (`widget_scope`), so content
 that must fit the frame fits itself: a `MonthGrid` at `MonthDensity::Auto` is compact in a
 `Small` frame (section 39).
@@ -3277,9 +3279,10 @@ that must fit the frame fits itself: a `MonthGrid` at `MonthDensity::Auto` is co
 | Small | `--widget-cell` square (164) | design/22 section 3.20 |
 | Medium | `2 x --widget-cell + --widget-gap` wide, one cell tall (344 x 164) | design/22 section 3.20 |
 | Large | `2 x --widget-cell + --widget-gap` square (344) | design/22 section 3.20 |
-| Desktop card | the `Widget` material's plate inside a transparent `Widget` scope (as the notification plate): its tint, hairline and soft drop, its own corner `--m-radius` (20), padding `--s-16` | design/20 section 1.14 (material `Widget`) |
+| Desktop card | the `Widget` material's plate inside a transparent `Widget` scope (as the notification plate): its tint, hairline and soft drop, its own corner `--m-radius` (20), padding `--s-12` (the reference's measured inset) | design/20 section 1.14 (material `Widget`); design/23 section 1.1 M3, M4 |
 | Tile | no material of its own, on the Popover it sits in: `--surface-2` fill, `--line` hairline, `--r-tile` (12), padding `--s-12`, as a `ModuleTile` | brief (Q182) |
-| Title row | a quiet eyebrow: glyph 12 and the name in `--font-data` `--fs-micro`, upper, tracked .08em, both `--ink-faint`, `--s-5` apart, `--s-8` above the body | design/23 section 4.3 |
+| Space tint | `CardTint::Space`: the Space's gradient over the plate at `--m-frame-alpha`; the card stacks its own layers (`z-index` `--z-raise`) | design/23 section 4.3 |
+| Title row | optional and quiet: glyph 12 and the name in `--font-ui` `--fs-caption` 600, both `--ink-soft`, `--s-5` apart, `--s-8` above the body; the Batteries and Clock widgets pass none | design/23 section 4.3 |
 
 The tile takes the same footprint as the desktop card: the center's column (384 less its
 padding) holds a medium tile's 344.
@@ -3293,25 +3296,31 @@ text rather than a component.
 
 **ClockFace.** `ClockFace { time: ClockTime { hour, minute, second: Seconds::{Shown(s), Hidden}
 }, phase: DayPhase::{Day, Night}, look: ClockLook::{Analog, Digital}, label: Text }`.
-Markup: `div.ds-clock[data-look][data-phase]`, then `span.ds-clock-label` (the city, with the
-phase's mark before it on a digital face). Analog: `div.ds-clock-dial`, a 56 px soft well in the
-plate (the plate's colour by day, `--soft-night` by night) holding four `svg[data-ds-svg]` on
-`currentColor`: four quarter marks; the hour and minute hands and the 6 px hub three times (a
-shade, a light, the hands; design/23 section 2.1); the second hand in `--accent` when shown.
-Digital: the time in `--font-display` 700 tabular (`09:41`, `09:41:07` with seconds), at
-`--fs-widget-hero` in a Small frame and `--fs-subject` elsewhere, bumping on each new minute; a
-sun (`svg.ds-clock-sun`, `--warn`) or moon (`svg.ds-clock-moon`, `--ink-faint`) before the
-city. The hand angles are pure (`clock_angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120`
-degrees, minute `6 x m + s / 10`, second `6 x s`.
+Markup: `div.ds-clock[data-look][data-phase]`, then `span.ds-clock-label` around
+`span.ds-clock-city` (with the phase's mark before it on a digital face). Analog:
+`div.ds-clock-dial`, a flat disc 62 across (in a Small frame the card less 8 a side, with the
+label hidden), `--clock-face-day` or `--clock-face-night`, holding `svg.ds-clock-ticks` (60,
+shown only on the Small frame's dial), `div.ds-clock-numerals` of twelve `span.ds-clock-numeral`
+(display face 800, `--fs-dial` or `--fs-dial-large`), `svg.ds-clock-hands` (hour to .56 of the
+radius, minute to .9, a thin neck then a round-capped bar, and the hub; `--clock-ink-day` or
+`--clock-ink-night`) and, when the seconds are shown, `svg.ds-clock-second` (`--clock-seconds`)
+and `svg.ds-clock-pin`. Every vector is on `currentColor` with `data-ds-svg`. Digital: the time in
+`--font-display` 800 tabular (`09:41`, `09:41:07` with seconds), at `--fs-widget-hero` in a Small
+frame and `--fs-subject` elsewhere, bumping on each new minute; a sun (`svg.ds-clock-sun`,
+`--warn`) or moon (`svg.ds-clock-moon`, `--ink-faint`) before the city. The hand angles are pure
+(`clock_angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120` degrees, minute `6 x m + s / 10`,
+second `6 x s`.
 
 **BatteryLevel** (renamed from `LevelRing`, which stays as an alias). `BatteryLevel { level:
-Fraction, mark: RingMark::{Plain, Charging}, label: Text, children }`: a battery glyph
-(`span.ds-battery-glyph`, 32 x 16, 40 x 20 in a Small frame): an extruded rounded body, an inset
-channel, and in it a solid fill as long as the level (`--f`) in `--ink`, `--warn` at or under
-20 %, `--danger` at or under 10 %, `--ok` while charging (never low); a terminal cap; `Charging`
-adds a bolt over the body. `children` (an optional device glyph) sit before it; `role=progressbar`
-with `aria-valuenow` in percent. The level bumps on change (`use_bump_on`). The depth candidates
-of the second pass (`look`, `dial`, `finish`) are removed.
+Fraction, mark: RingMark::{Plain, Charging}, label: Text, children }`: a ring 64 across
+(`div.ds-battery`, `role=progressbar` with `aria-valuenow` in percent): `svg.ds-battery-track`, a
+full circle in `--battery-track`; `svg.ds-battery-arc`, clockwise from twelve as far as the level
+in `--battery-fill`, `--battery-low` at or under 20 % (`data-tone` `low`, and `critical` at or
+under 10 %, the same red); charging is never low; stroke .093 of the ring, round caps, the path
+computed in Rust (`battery_ring.rs`). `children` (the device glyph) sit centred in
+`span.ds-battery-device` at .47 of the ring. `Charging` (`data-mark="charging"`) cuts a gap at
+twelve in both strokes and sets `svg.ds-battery-bolt` in it. The ring bumps on change
+(`use_bump_on`). The percentage is the caller's (design/23 section 4.1).
 
 **Motion.** None in steady state; a value change plays `bump` once (`--t-move --e-spring`, the
 Count's pulse). No transition on the battery's fill (O-20).

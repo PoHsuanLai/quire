@@ -10,7 +10,7 @@
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
 use crate::components::text_runs::text;
-use crate::components::widget_kind::{WidgetHost, WidgetSize, WidgetTitle};
+use crate::components::widget_kind::{CardTint, WidgetHost, WidgetSize, WidgetTitle};
 use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
 use crate::material::Material;
@@ -18,8 +18,10 @@ use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use dioxus::prelude::*;
 
-/// `children` on a widget's card, `size` on the grid unit, for `host`. `title` draws a glyph and
-/// a name above the content. `id` names the card for the layer's input and blur regions.
+/// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint`.
+/// `title` draws a glyph and a name above the content (the Batteries and Clock widgets take
+/// none: their content fills the card). `id` names the card for the layer's input and blur
+/// regions.
 ///
 /// The frame provides its `size` to its content (`widget_scope`), so content that must fit
 /// the frame, a `MonthGrid` at `MonthDensity::Auto`, fits itself without being told.
@@ -27,6 +29,7 @@ use dioxus::prelude::*;
 pub fn WidgetFrame(
     #[props(default)] size: WidgetSize,
     #[props(default)] host: WidgetHost,
+    #[props(default)] tint: CardTint,
     #[props(default)] title: Option<WidgetTitle>,
     #[props(default)] id: Option<String>,
     children: Element,
@@ -38,6 +41,10 @@ pub fn WidgetFrame(
             id,
             "data-size": size.slug(),
             "data-host": host.slug(),
+            "data-tint": tint.slug(),
+            if tint == CardTint::Space {
+                div { class: "ds-frame" }
+            }
             if let Some(title) = title {
                 div { class: "ds-widget-title",
                     Glyph { icon: title.glyph, size: IconSize::Tiny }

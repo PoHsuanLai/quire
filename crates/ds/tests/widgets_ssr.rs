@@ -12,9 +12,9 @@ mod golden;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
-    Appearance, BatteryLevel, ClockFace, ClockLook, ClockTime, DayPhase, Ds, Fraction, Glyph, Icon,
-    IconSize, Inject, Material, RingMark, RootChrome, Seconds, Theme, WidgetFrame, WidgetHost,
-    WidgetMetrics, WidgetSize, WidgetTitle,
+    Appearance, BatteryLevel, CardTint, ClockFace, ClockLook, ClockTime, DayPhase, Ds, Fraction,
+    Glyph, Icon, IconSize, Inject, Material, RingMark, RootChrome, Seconds, Theme, WidgetFrame,
+    WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle,
 };
 
 #[derive(Props, Clone)]
@@ -94,6 +94,12 @@ const CASES: &[Case] = &[
             rsx! { WidgetFrame { size: WidgetSize::Large, "Up next" } },
         )
     }),
+    ("frame-medium-desktop-space", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetFrame { size: WidgetSize::Medium, tint: CardTint::Space, "84%" } },
+        )
+    }),
     ("frame-small-tile", || {
         center(rsx! { WidgetFrame { size: WidgetSize::Small, host: WidgetHost::Tile, "84%" } })
     }),
@@ -109,6 +115,12 @@ const CASES: &[Case] = &[
         desktop(
             Theme::Light,
             rsx! { ClockFace { time: TEN_TO_TEN, label: "Taipei" } },
+        )
+    }),
+    ("clock-analog-small-frame", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetFrame { size: WidgetSize::Small, ClockFace { time: LATE, label: "Taipei" } } },
         )
     }),
     ("clock-analog-night-seconds", || {
@@ -227,17 +239,30 @@ fn a_frame_says_its_size_and_host_and_only_the_desktop_has_a_material() {
         "the popover root only"
     );
     assert!(!html("frame-small-tile").contains("ds-widget-title"));
+    assert!(
+        !desktop.contains("data-tint"),
+        "the material's own tint is unmarked"
+    );
+    let space = html("frame-medium-desktop-space");
+    assert!(space.contains("data-tint=\"space\""), "{space}");
+    assert!(space.contains("class=\"ds-frame\""), "{space}");
 }
 
-/// The dial is drawn in the light scheme by day and by night (the night disc is the light
-/// scheme's ink), whatever the root's; the second hand is drawn only when the seconds are shown;
-/// a digital face wears the sun by day and the moon by night.
+/// The dial says its phase (its face and ink follow it); twelve numerals stand round it; the
+/// second hand and its pin are drawn only when the seconds are shown; a digital face wears the
+/// sun by day and the moon by night.
 #[test]
 fn the_dial_keeps_its_pairs_and_its_second_hand_only_when_shown() {
     let day = html("clock-analog-day");
     assert!(day.contains("data-theme=\"light\""), "{day}");
     assert!(day.contains("data-phase=\"day\""), "{day}");
     assert!(!day.contains("ds-clock-second"), "{day}");
+    assert!(!day.contains("ds-clock-pin"), "{day}");
+    assert_eq!(
+        day.matches("class=\"ds-clock-numeral\"").count(),
+        12,
+        "{day}"
+    );
     assert!(
         day.contains("rotate(295 50 50)"),
         "the hour hand at ten to ten: {day}"
@@ -246,6 +271,7 @@ fn the_dial_keeps_its_pairs_and_its_second_hand_only_when_shown() {
     assert!(night.contains("data-theme=\"light\""), "{night}");
     assert!(night.contains("data-phase=\"night\""), "{night}");
     assert!(night.contains("ds-clock-second"), "{night}");
+    assert!(night.contains("ds-clock-pin"), "{night}");
     assert!(
         night.contains("rotate(252 50 50)"),
         "the second hand at 42 s: {night}"
@@ -262,22 +288,40 @@ fn the_dial_keeps_its_pairs_and_its_second_hand_only_when_shown() {
     );
 }
 
-/// The fill is the level of the channel, its tone follows the level unless charging, and it
-/// reports its value as a progress bar.
+/// The arc runs clockwise from twelve as far as the level (a full level is the whole circle),
+/// its tone follows the level unless charging, a charging ring leaves a gap at twelve for its
+/// bolt, and it reports its value as a progress bar.
 #[test]
 fn the_battery_draws_its_level_and_tone() {
     let cases = [
-        ("battery-8", "0.08", "critical", "8"),
-        ("battery-45", "0.45", "ok", "45"),
-        ("battery-100", "1", "ok", "100"),
-        ("battery-charging-15", "0.15", "ok", "15"),
+        (
+            "battery-8",
+            "M50.00 4.65A45.35 45.35 0 0 1 71.85 10.26",
+            "critical",
+            "8",
+        ),
+        (
+            "battery-45",
+            "M50.00 4.65A45.35 45.35 0 0 1 64.01 93.13",
+            "ok",
+            "45",
+        ),
+        (
+            "battery-100",
+            "M50.00 4.65A45.35 45.35 0 0 1 50.00 95.35A45.35 45.35 0 0 1 50.00 4.65Z",
+            "ok",
+            "100",
+        ),
+        (
+            "battery-charging-15",
+            "M61.35 6.09A45.35 45.35 0 0 1 90.81 30.23",
+            "ok",
+            "15",
+        ),
     ];
-    for (name, width, tone, now) in cases {
+    for (name, arc, tone, now) in cases {
         let html = html(name);
-        assert!(
-            html.contains(&format!("style=\"--f:{width}\"")),
-            "{name}: {html}"
-        );
+        assert!(html.contains(&format!("d=\"{arc}\"")), "{name}: {html}");
         assert!(
             html.contains(&format!("data-tone=\"{tone}\"")),
             "{name}: {html}"
@@ -291,5 +335,9 @@ fn the_battery_draws_its_level_and_tone() {
     let charging = html("battery-charging-15");
     assert!(charging.contains("data-mark=\"charging\""), "{charging}");
     assert!(charging.contains("ds-battery-bolt"), "{charging}");
+    assert!(
+        charging.contains("d=\"M61.35 6.09A45.35 45.35 0 1 1 38.65 6.09\""),
+        "the track leaves the bolt's gap: {charging}"
+    );
     assert!(!html("battery-45").contains("ds-battery-bolt"));
 }
