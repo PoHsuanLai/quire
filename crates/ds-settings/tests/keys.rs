@@ -29,6 +29,7 @@ const APPEARANCE_SETTINGS_FIELDS: &[&str] = &[
     "warmth",
     "accent",
     "motion_level",
+    "typeface",
     "material_tint_alpha",
     "material_highlight_light",
     "material_highlight_dark",
