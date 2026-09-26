@@ -6,7 +6,7 @@ use std::path::PathBuf;
 /// What the gallery was asked to do.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Args {
-    /// Open on this page (the tokens page when absent).
+    /// Open on this page (the tokens page when absent); with `--snapshot`, render only it.
     pub page: Option<Page>,
     /// Render every page and state into this directory as a contact sheet, then exit.
     pub snapshot: Option<PathBuf>,

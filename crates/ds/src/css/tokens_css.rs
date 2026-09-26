@@ -15,7 +15,7 @@ use crate::tokens::widgets::WIDGET_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
-    ZLayer,
+    WidgetPaint, ZLayer,
 };
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
@@ -49,7 +49,8 @@ fn changed(base: &[String], next: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Everything that follows the scheme: the card colours, the label hues, the shadows.
+/// Everything that follows the scheme: the card colours, the label hues, the shadows, the widget
+/// paints.
 fn scheme_tokens(scheme: Scheme) -> Vec<String> {
     let colours = ColourToken::ALL
         .into_iter()
@@ -62,7 +63,10 @@ fn scheme_tokens(scheme: Scheme) -> Vec<String> {
     let shadows = Shadow::ALL
         .into_iter()
         .map(|shadow| declaration(shadow.var(), shadow.css(scheme)));
-    colours.chain(hues).chain(shadows).collect()
+    let widget = WidgetPaint::ALL
+        .into_iter()
+        .map(|paint| declaration(paint.var(), paint.css(scheme)));
+    colours.chain(hues).chain(shadows).chain(widget).collect()
 }
 
 /// A colour token as the stylesheet writes it.

@@ -21,3 +21,11 @@
 
 /* Bumped: a run of text a widget bumps on change (`use_bump_on`); transformable while it plays. */
 .ds-bumped{ display:inline-block; }
+
+/* The lit finish (design/23-WIDGETS.md section 4.3; `data-finish=lit`): the plate's bevel, as
+   the app icon plate's (design/08 section 2.9): a brighter top highlight and a shaded foot inside
+   the material's own edge and drop, and a sheen down the card's top. The material's paint rule
+   is `.ds[data-material][data-chrome=transparent] .ds-widget[data-host=desktop]`; this one adds
+   an attribute, so it wins without reordering. */
+.ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-finish=lit]{
+  background-image:linear-gradient(var(--widget-sheen), transparent 42%); box-shadow:var(--widget-bevel), var(--m-box); }

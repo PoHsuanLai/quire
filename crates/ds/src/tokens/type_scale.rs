@@ -91,11 +91,13 @@ pub enum FontSize {
     Day,
     /// `--fs-display` 26: composer subject.
     Display,
+    /// `--fs-widget-hero` 34: a widget's hero value (design/23-WIDGETS.md section 3.2).
+    WidgetHero,
 }
 
 impl FontSize {
     /// Every step, smallest first.
-    pub const ALL: [FontSize; 22] = [
+    pub const ALL: [FontSize; 23] = [
         FontSize::Pico,
         FontSize::Nano,
         FontSize::Micro,
@@ -118,6 +120,7 @@ impl FontSize {
         FontSize::Amount,
         FontSize::Day,
         FontSize::Display,
+        FontSize::WidgetHero,
     ];
 
     /// The custom property: `--fs-micro`, …
@@ -145,6 +148,7 @@ impl FontSize {
             FontSize::Amount => "--fs-amount",
             FontSize::Day => "--fs-day",
             FontSize::Display => "--fs-display",
+            FontSize::WidgetHero => "--fs-widget-hero",
         })
     }
 
@@ -173,6 +177,7 @@ impl FontSize {
             FontSize::Amount => "22px",
             FontSize::Day => "24px",
             FontSize::Display => "26px",
+            FontSize::WidgetHero => "34px",
         }
     }
 }
