@@ -11,7 +11,7 @@
 .ds-tree-item{ display:flex; flex-direction:column; min-width:0; }
 .ds-tree-item-row{
   display:flex; align-items:center; justify-content:flex-start; gap:var(--s-6); width:100%; box-sizing:border-box; min-width:0;
-  list-style:none; cursor:pointer; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
+  list-style:none; cursor:default; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
   font:inherit; font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft); position:relative;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -31,7 +31,7 @@
    Blitz's user-agent `button` centres its content (the sidebar item's gallery fix A). */
 .ds-tree-item-label{
   display:block; flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; text-align:left;
-  border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer;
+  border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:default;
 }
 
 /* The editing slot (mailo gaps 7): the caller's field in the label's place and box, so a rename

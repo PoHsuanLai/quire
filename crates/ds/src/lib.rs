@@ -104,7 +104,7 @@ pub use tokens::{
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
     FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, NotificationMetrics,
     OpacityToken, OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow,
-    ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, WidgetMetrics, ZLayer, quad,
+    ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WidgetMetrics, ZLayer, quad,
 };
 pub use window::{
     Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,

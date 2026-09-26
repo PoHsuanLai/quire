@@ -14,7 +14,7 @@
   transition:transform var(--t-big) var(--e-spring); white-space:nowrap; }
 .ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-send-ring{ display:block; flex:none; }
-.ds-send-pill .ds-send-pill-undo{ border:0; cursor:pointer; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }
+.ds-send-pill .ds-send-pill-undo{ border:0; cursor:default; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }
 
 .ds-send-pill[*|data-mood=fatal]{ background:var(--danger); color:var(--danger-ink); }
 .ds-send-ring[*|data-ring=spin]{ animation:spin var(--t-spin) var(--e-linear) infinite; }

@@ -7,7 +7,7 @@
 
 .ds-settings-row{
   display:flex; align-items:center; gap:var(--s-8); min-height:44px; box-sizing:border-box; padding:0 var(--s-8);
-  border-top:var(--hair) solid transparent; border-radius:var(--r-shell-highlight); color:var(--ink); cursor:pointer; user-select:none;
+  border-top:var(--hair) solid transparent; border-radius:var(--r-shell-highlight); color:var(--ink); cursor:default; user-select:none;
   transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-settings-row + .ds-settings-row{ border-top-color:var(--line); }

@@ -2,7 +2,7 @@
    with `--scrim` and fades in; a click closes. Hover is not specified; the focus ring is the
    global one (it is a button). */
 
-.ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:pointer; pointer-events:auto;
+.ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
 
 /* Inline (mailo gaps 5, `flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the

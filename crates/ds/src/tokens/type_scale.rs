@@ -81,16 +81,26 @@ impl Family {
     }
 }
 
+/// Whether a size step is the same under both typefaces.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Voiced {
+    /// One value, declared once on `.ds`.
+    Fixed,
+    /// A value per typeface, declared on each typeface's block.
+    PerTypeface,
+}
+
 /// One step of the size ramp.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FontSize {
     /// `--fs-pico` 7.5: in-row provider mark.
     Pico,
-    /// `--fs-dial` 9: a medium world clock dial's numerals (design/23-WIDGETS.md section 4.2).
+    /// `--fs-dial` 9 (10 under System, the floor): a medium world clock dial's numerals
+    /// (design/23-WIDGETS.md section 4.2).
     Dial,
-    /// `--fs-nano` 9: pin count, favicon letter.
+    /// `--fs-nano` 9 (10 under System): pin count, favicon letter.
     Nano,
-    /// `--fs-micro` 9.5: chip, via, group header.
+    /// `--fs-micro` 9.5 (10 under System): chip, via, group header.
     Micro,
     /// `--fs-caption` 10: row time, section header, shortcut.
     Caption,
@@ -146,6 +156,14 @@ pub enum FontSize {
 }
 
 impl FontSize {
+    /// The smallest UI text size under System, in px: the Mac's 10 pt floor (design/27-HIG-PARITY.md
+    /// section 3.16, `--fs-min`). The lint `MinFontSize` rejects a size below it.
+    pub const MIN_PX: f32 = 10.0;
+
+    /// The steps the Editorial ramp draws below [`Self::MIN_PX`] and System raises to it
+    /// (design/27 section 7, H0). `Dial` is also cap-fitted; the floor wins.
+    pub const FLOORED: [FontSize; 3] = [FontSize::Dial, FontSize::Nano, FontSize::Micro];
+
     /// The steps fitted to a measured cap height, whose size follows the typeface.
     pub const CAP_FITTED: [FontSize; 5] = [
         FontSize::Dial,
@@ -231,15 +249,35 @@ impl FontSize {
     /// The size in CSS under `typeface`. Every step is the same in both but the five fitted to a
     /// measured cap height (design/23 section 1.1, the display face's cap at .66 em): under
     /// System those are the Editorial size x .66 / .7275 (Inter Display's cap height), rounded
-    /// to .5 px, so the drawn caps keep the measured heights (design/02 open decision 8).
+    /// to .5 px, so the drawn caps keep the measured heights (design/02 open decision 8); and
+    /// the [`Self::FLOORED`] steps, which System raises to the 10 px floor (design/27 section
+    /// 3.16; the dial's fitted 8 px included).
     pub fn css_in(self, typeface: Typeface) -> &'static str {
         match (self, typeface) {
-            (FontSize::Dial, Typeface::System) => "8px",
+            (FontSize::Dial | FontSize::Nano | FontSize::Micro, Typeface::System) => "10px",
             (FontSize::DialLarge, Typeface::System) => "16.5px",
             (FontSize::WidgetFigure, Typeface::System) => "18px",
             (FontSize::WidgetHero, Typeface::System) => "42.5px",
             (FontSize::LockClock, Typeface::System) => "127px",
             _ => self.editorial_css(),
+        }
+    }
+
+    /// The size in px under `typeface`, for a check against [`Self::MIN_PX`].
+    pub fn px_in(self, typeface: Typeface) -> f32 {
+        self.css_in(typeface)
+            .trim_end_matches("px")
+            .parse()
+            .unwrap_or(f32::NAN)
+    }
+
+    /// Whether the size differs between the typefaces: declared on each typeface's block
+    /// rather than once.
+    pub fn follows_typeface(self) -> Voiced {
+        if self.css_in(Typeface::System) == self.css_in(Typeface::Editorial) {
+            Voiced::Fixed
+        } else {
+            Voiced::PerTypeface
         }
     }
 

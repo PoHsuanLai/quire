@@ -52,7 +52,7 @@ pub use shell::{BarType, FontWeight, LauncherType, MenuType, ShellMetrics};
 pub use spacing::SpacingToken;
 pub use timing::{DurationKind, DurationToken};
 pub use tuned::Tuned;
-pub use type_scale::{Family, FontSize};
+pub use type_scale::{Family, FontSize, Voiced};
 pub use type_voice::VoiceToken;
 pub use widget_paint::WidgetPaint;
 pub use widgets::WidgetMetrics;
