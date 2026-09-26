@@ -52,7 +52,9 @@ fn main() {
     }
     match args.snapshot {
         Some(dir) => {
-            if let Err(error) = snapshot::run(&dir, args.page, args.scale.unwrap_or(100)) {
+            let typeface = args.typeface.unwrap_or_default();
+            if let Err(error) = snapshot::run(&dir, args.page, args.scale.unwrap_or(100), typeface)
+            {
                 eprintln!("ds-gallery: {error}");
                 std::process::exit(1);
             }
@@ -60,6 +62,7 @@ fn main() {
         None => {
             start_with(Axes {
                 page: args.page.unwrap_or(page::Page::Tokens),
+                typeface: args.typeface.unwrap_or_default(),
                 ..Axes::default()
             });
             launch(app::App, AppConfig::new("quire gallery", 1280, 900));

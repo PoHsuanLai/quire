@@ -54,6 +54,12 @@ impl SchemaVariants for ds::Motion {
     }
 }
 
+impl SchemaVariants for ds::Typeface {
+    fn variants() -> Vec<String> {
+        variants_of(&ds::Typeface::ALL)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::SchemaVariants;
@@ -83,6 +89,14 @@ mod tests {
                 "extra".to_owned(),
                 "reduced".to_owned(),
             ]
+        );
+    }
+
+    #[test]
+    fn typeface_is_two_words() {
+        assert_eq!(
+            ds::Typeface::variants(),
+            vec!["system".to_owned(), "editorial".to_owned()]
         );
     }
 

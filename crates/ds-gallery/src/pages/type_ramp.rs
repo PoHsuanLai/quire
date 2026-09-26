@@ -1,12 +1,12 @@
-//! Type: the four faces with the weights they ship, and every step of the size ramp drawn in
-//! each face.
+//! Type: the five face jobs in the root's typeface with the files that ship for each, and every
+//! step of the size ramp drawn in each face.
 
 use super::Section;
 use dioxus::prelude::*;
-use ds::{FACES, Face, FaceStyle, Family, FontSize};
+use ds::{FACES, Face, FaceStyle, Family, FontSize, Typeface, use_typeface};
 
 /// The faces, in the order the stylesheet names them.
-const FAMILIES: [Family; 4] = Family::ALL;
+const FAMILIES: [Family; 5] = Family::ALL;
 
 /// The pangram each face is shown with.
 const PANGRAM: &str = "Sphinx of black quartz, judge my vow — 0123456789";
@@ -14,14 +14,15 @@ const PANGRAM: &str = "Sphinx of black quartz, judge my vow — 0123456789";
 /// The type page.
 #[component]
 pub fn TypePage() -> Element {
+    let typeface = use_typeface();
     rsx! {
-        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, with the files ds::FACES ships for it.",
+        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, in the toolbar's typeface, with the files ds::FACES ships for it.",
             for family in FAMILIES {
                 div { class: "g-col",
                     div { style: "font-family:{family.var().reference()};font-size:var(--fs-display);font-weight:400", "{PANGRAM}" }
                     div { style: "font-family:{family.var().reference()};font-size:var(--fs-display);font-weight:700", "{PANGRAM}" }
-                    span { class: "g-code", "{family.var().as_str()}: {family.stack()}" }
-                    span { class: "g-code", "{files(family)}" }
+                    span { class: "g-code", "{family.var().as_str()}: {family.stack_in(typeface)}" }
+                    span { class: "g-code", "{files(family, typeface)}" }
                 }
             }
         }
@@ -58,11 +59,12 @@ pub fn TypePage() -> Element {
     }
 }
 
-/// The files a family ships: `normal 200-800 latin, …`.
-fn files(family: Family) -> String {
+/// The files the face a family names under `typeface` ships: `normal 200-800 latin, …`.
+fn files(family: Family, typeface: Typeface) -> String {
+    let name = family.face_name(typeface);
     FACES
         .iter()
-        .filter(|face| face.family == family)
+        .filter(|face| face.name == name)
         .map(describe)
         .collect::<Vec<_>>()
         .join(" · ")
