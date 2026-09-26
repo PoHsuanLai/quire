@@ -136,3 +136,26 @@
 .g-shot-row{display:flex;flex-wrap:wrap;gap:var(--s-22)}
 .g-shot{width:680px;border-radius:var(--r-panel);overflow:hidden}
 .g-shot-ground{display:flex;align-items:flex-end;gap:var(--s-16);padding:var(--s-16) var(--s-16) var(--s-26)}
+.g-wl-wall{padding:var(--s-16)}
+.g-wl-grid{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s-26);padding:var(--s-8)}
+.g-wl-candidate{display:flex;flex-direction:column;gap:var(--s-8);width:560px}
+.g-wl-note{font-size:var(--fs-small);font-weight:600;line-height:1.35;color:var(--ink);background:var(--raise);padding:var(--s-4) var(--s-8);border-radius:var(--r-small)}
+.g-wl-cards{display:flex;align-items:flex-start;gap:var(--s-16)}
+.g-wl-hero{display:flex;flex-direction:column;gap:var(--s-6);flex:1;justify-content:flex-end}
+.g-wl-stack{display:flex;flex-direction:column;gap:var(--s-2);min-width:0}
+.g-wl-number{font-family:var(--font-display);font-size:var(--fs-widget-hero);font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+.g-wl-unit{font-size:var(--fs-title);font-weight:600;color:var(--ink-soft);margin-left:var(--s-2)}
+.g-wl-label{font-family:var(--font-data);font-size:var(--fs-nano);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);white-space:nowrap}
+.g-wl-ring-small{display:flex;flex-direction:column;align-items:center;gap:var(--s-6)}
+.g-wl-well-small{display:flex;align-items:center;gap:var(--s-12);flex:1}
+.g-wl-rings{display:flex;justify-content:space-between;align-items:flex-start;flex:1;padding:var(--s-4) var(--s-4) 0}
+.g-wl-ring-col{display:flex;flex-direction:column;align-items:center;gap:var(--s-8)}
+.g-wl-ring-pct{font-family:var(--font-data);font-size:var(--fs-help);font-weight:700;color:var(--ink)}
+.g-wl-cells{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-10) var(--s-16);flex:1;align-content:center}
+.g-wl-cell-row{display:flex;flex-direction:column;gap:var(--s-5);min-width:0}
+.g-wl-cell-head{display:flex;align-items:center;gap:var(--s-5);color:var(--ink-soft)}
+.g-wl-cell-name{flex:1;font-size:var(--fs-help);font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden}
+.g-wl-cell-pct{font-family:var(--font-data);font-size:var(--fs-caption);font-weight:700;color:var(--ink)}
+.g-wl-digital{display:flex;flex-direction:column;gap:var(--s-2);flex:1;justify-content:flex-end}
+.g-wl-dials{display:flex;justify-content:space-between;flex:1;align-items:flex-start}
+.g-wl-dial{align-items:center}

@@ -8,8 +8,10 @@
 //! once when its percentage changes.
 
 use crate::components::bump_on::{bump_attrs, use_bump_on};
+use crate::components::level_ring_looks::{cell, well};
 use crate::components::text_runs::Text;
 use crate::components::vocab::Fraction;
+use crate::components::widget_looks::BatteryLook;
 use dioxus::prelude::*;
 
 /// The ring's radius for a circumference of 100 in its 36-unit box: `100 / 2π`.
@@ -78,12 +80,14 @@ fn dash(level: Fraction) -> Option<String> {
 }
 
 /// A level ring at `level` (permille), charging or not, named `label` for assistive
-/// technology; `children` (a device's glyph) sit in the middle.
+/// technology; `children` (a device's glyph) sit in the middle. `look` picks the drawing
+/// (design/23-WIDGETS.md section 4.1): the flat ring by default, the ring in a groove, or a cell.
 #[component]
 pub fn LevelRing(
     level: Fraction,
     #[props(default)] mark: RingMark,
     #[props(into)] label: Text,
+    #[props(default)] look: BatteryLook,
     children: Element,
 ) -> Element {
     let level = level.clamped();
@@ -95,13 +99,20 @@ pub fn LevelRing(
             "data-pulse": alias,
             "data-tone": RingTone::of(level, mark).slug(),
             "data-mark": mark.slug(),
+            "data-look": look.attr(),
             role: "progressbar",
             "aria-label": "{label.plain_text()}",
             "aria-valuemin": "0",
             "aria-valuemax": "100",
             "aria-valuenow": "{percent}",
-            {ring(dash(level))}
-            span { class: "ds-ring-centre", {children} }
+            match look {
+                BatteryLook::Ring => rsx! {
+                    {ring(dash(level))}
+                    span { class: "ds-ring-centre", {children} }
+                },
+                BatteryLook::Well => well(dash(level), children),
+                BatteryLook::Cell => cell(level, children),
+            }
             if mark == RingMark::Charging {
                 span { class: "ds-ring-bolt", {bolt()} }
             }

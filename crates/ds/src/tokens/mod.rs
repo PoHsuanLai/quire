@@ -25,6 +25,7 @@ pub mod spacing;
 pub mod timing;
 pub mod tuned;
 pub mod type_scale;
+pub mod widget_paint;
 pub mod widgets;
 
 pub use accent_table::{AccentQuad, quad};
@@ -49,4 +50,5 @@ pub use spacing::SpacingToken;
 pub use timing::{DurationKind, DurationToken};
 pub use tuned::Tuned;
 pub use type_scale::{Family, FontSize};
+pub use widget_paint::WidgetPaint;
 pub use widgets::WidgetMetrics;
