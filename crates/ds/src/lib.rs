@@ -10,6 +10,7 @@ pub mod css;
 pub mod delays;
 pub mod edit;
 pub mod error;
+pub mod file_drop;
 pub mod focus;
 pub mod fonts;
 pub mod geometry;
@@ -41,6 +42,10 @@ pub use edit::{
     use_edit_handle,
 };
 pub use error::DsError;
+pub use file_drop::{
+    DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop, FileDropHandle, HostFileDrop,
+    Offer, use_file_drop,
+};
 pub use focus::{
     Caret, Collapsed, Fallback, FieldHandle, FocusError, FocusRequest, FocusTicket, Focused, Found,
     HostBlur, HostCaret, HostClickFocus, HostFind, HostFocus, HostHandBack, HostPressFocus,

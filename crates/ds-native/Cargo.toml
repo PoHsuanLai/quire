@@ -19,6 +19,11 @@ dioxus-native-dom = { workspace = true }
 # `html`: an `<iframe srcdoc>` in the window parses into a real sub-document (G4). `clipboard`:
 # copy and paste in every text field, and `ds_native::clipboard` (G5).
 dioxus-native = { workspace = true, features = ["html", "clipboard"] }
+# `open_window`: a second window on the same event loop, each with its own VirtualDom
+# (`crate::windows`), and the two providers dioxus-native keeps private (`crate::native_providers`).
+blitz-shell = { workspace = true }
+dioxus-asset-resolver = { workspace = true }
+webbrowser = { workspace = true }
 # `text/html` from the system clipboard for an edit surface's paste.
 arboard = { workspace = true }
 anyrender = { workspace = true }
@@ -73,6 +78,12 @@ name = "window"
 
 [[example]]
 name = "edit"
+
+[[example]]
+name = "second_window"
+
+[[example]]
+name = "file_drop"
 
 [[example]]
 name = "pdf"

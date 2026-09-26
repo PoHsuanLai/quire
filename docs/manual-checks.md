@@ -45,6 +45,20 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
 - [ ] **Password/Secret fields**: in the gallery's Fields page, type into the Secret field:
   dots only, and the caret follows; Ctrl+A/Ctrl+C then paste into a Text field pastes the
   secret (the clipboard is the app's own; documented).
+- [ ] **A real file drop from a file manager** (branch `drop-and-windows`, FINDINGS "File drops
+  and a second window"): `cargo run -p ds-native --example file_drop`, then drag two files from
+  Dolphin onto the window. Expect the box's dashed outline to turn accent as the drag enters,
+  solid accent and a copy cursor while over the box, a refused cursor off it, and on release over
+  it "Attached 2 file(s)" with both absolute paths listed and printed. Drag a link out of a
+  browser: nothing lights, the cursor refuses, nothing prints. Repeat once under X11
+  (`WAYLAND_DISPLAY= cargo run …`): there the cursor may trail one move behind. No test drives
+  winit's data-transfer events.
+- [ ] **A second window's compositor close and raise** (same branch): `cargo run -p ds-native
+  --example second_window`, press "Open message" twice. Close one message window with its
+  title-bar button (or Alt+F4): it goes, the terminal prints its `VirtualDom dropped`, the other
+  windows stay. Close the first window with a message window open: both go and the process
+  exits. The autopilot run (`QUIRE_AUTOPILOT=1`) covered closes from the app's side only, and
+  never looked at whether `handle.focus()` raised the window.
 
 ## mailo
 
