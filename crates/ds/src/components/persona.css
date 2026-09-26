@@ -40,3 +40,15 @@
 .ds[*|data-motion=reduced] .ds-persona-tilt,
 .ds[*|data-motion=reduced] .ds-persona-look,
 .ds[*|data-motion=reduced] .ds-persona-layer{ transition:none; }
+
+/* UserPicture::Photo: the user's own picture, cropped round. The disc clips (overflow hidden
+   under the pill radius) and the image covers it (`object-fit:cover`, centred), so a portrait
+   or landscape photo fills the disc without stretching. The sizes are the avatar's and the
+   persona's: 28, 48 (the polkit prompt), 64 and 128; --surface-2 shows until the image lands. */
+.ds-user-photo{ position:relative; flex:none; box-sizing:border-box; overflow:hidden; border-radius:var(--r-pill);
+  background:var(--surface-2); }
+.ds-user-photo[*|data-size="28"]{ width:28px; height:28px; }
+.ds-user-photo[*|data-size="48"]{ width:48px; height:48px; }
+.ds-user-photo[*|data-size="64"]{ width:64px; height:64px; }
+.ds-user-photo[*|data-size="128"]{ width:128px; height:128px; }
+.ds-user-photo-image{ display:block; width:100%; height:100%; object-fit:cover; object-position:50% 50%; }

@@ -87,7 +87,7 @@ fn band(t: u32) -> Rgb<u8> {
 }
 
 /// `picture` as PNG bytes. Encoding an in-memory RGB buffer of the stated size cannot fail.
-fn png(picture: &RgbImage) -> Vec<u8> {
+pub(crate) fn png(picture: &RgbImage) -> Vec<u8> {
     let mut bytes = Vec::new();
     let encoded = PngEncoder::new(&mut bytes).write_image(
         picture.as_raw(),

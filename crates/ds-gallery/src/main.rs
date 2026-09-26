@@ -13,6 +13,7 @@ mod level_sheet;
 mod page;
 mod pages;
 mod persona_frames;
+mod portrait;
 mod registry;
 mod sheet;
 mod snapshot;

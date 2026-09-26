@@ -3403,14 +3403,15 @@ password field, a small hint line). Arc's colour may reach the small surfaces: u
 
 ```rust
 pub enum LockLook { Clear /* default */, Space }
-pub enum PromptState { Idle /* default */, Checking, Wrong, LockedOut { until: String } }
+pub enum PromptState { Idle /* default */, Checking, Wrong, LockedOut { until: String }, Accepted }
 pub enum CapsLock { On, Off /* default */ }
-pub struct LockUser { pub name: String, pub avatar: AvatarFace }
+pub struct LockUser { pub name: String, pub picture: UserPicture }   // LockUser::new(name, impl Into<UserPicture>)
+pub enum UserPicture { Face(AvatarFace), Photo(ImageSource), Persona(PersonaSpec) }   // From each
 #[component] pub fn LockScreen(wallpaper: Option<ImageSource>, clock: Element, prompt: Element) -> Element
 #[component] pub fn LockClock(time: String, date: String, look: LockLook) -> Element
 #[component] pub fn LockPrompt(user: LockUser, state: PromptState, caps: CapsLock, look: LockLook,
     placeholder: Option<String> /* "Enter Password" */, hint: Option<Text>,
-    oninput: EventHandler<String>, onsubmit: EventHandler<String>) -> Element
+    wake: Option<WakeStamp>, oninput: EventHandler<String>, onsubmit: EventHandler<String>) -> Element
 #[component] pub fn PolkitPrompt(action: Text, detail: Option<Text>, title: Option<String>,
     user: LockUser, state: PromptState, caps: CapsLock, oninput: EventHandler<String>,
     onsubmit: EventHandler<String>, oncancel: EventHandler<()>, shown: Option<Shown>,
@@ -3422,12 +3423,15 @@ pub enum SheetWidth { Regular /* default, 560 */, Narrow /* 340 */ }   // Sheet 
 as an inline `background-image`, its URL escaped; only `data:` and `file:`), `div.ds-lock-veil`,
 `div.ds-lock-top` (the clock) and `div.ds-lock-bottom` (the prompt). `LockClock`:
 `div.ds-lock-clock[data-look]` holding `div.ds-lock-date` then `div.ds-lock-time`. `LockPrompt`:
-`div.ds-lock-prompt[data-look][data-state]` holding the `Avatar` (64), `div.ds-lock-name`,
+`div.ds-lock-prompt[data-look][data-state]` holding the picture at 64 (the `Avatar`,
+`div.ds-user-photo[data-size=64]` around `img.ds-user-photo-image`, or the `Persona` at
+`Medium`), `div.ds-lock-name`,
 `div.ds-lock-field[data-filled]` (with `a-shake-x` and `data-pulse` while shaking) holding an
 Inline `TextInput { kind: Secret }`, `span.ds-lock-caps` (caps on) and `button.ds-lock-go` (a
 `Glyph` `ArrowRight`, or `span.ds-lock-busy` around a `Spinner` while checking), then
 `div.ds-lock-hint`. `PolkitPrompt`: a `Sheet { placement: Centre, scrim: Modal, width: Narrow }`
-holding `div.ds-polkit[data-state]`: the `Avatar` (48), `div.ds-polkit-title`,
+holding `div.ds-polkit[data-state]`: the picture at 48 (the `Avatar`, the photo at 48, or the
+`Persona` drawn at `Medium` in a 48 box, idle), `div.ds-polkit-title`,
 `div.ds-polkit-action`, `div.ds-polkit-details` (a `Tooltip { Card }` on
 `span.ds-polkit-details-word`), `div.ds-polkit-user`, `div.ds-polkit-field` (a Boxed secret
 `TextInput`, `span.ds-polkit-caps`), `div.ds-polkit-hint` (locked out), and
@@ -3438,7 +3442,7 @@ holding `div.ds-polkit[data-state]`: the `Avatar` (48), `div.ds-polkit-title`,
 | Stage | the wallpaper covering it (`background-size:cover`) under `--lock-veil` (black .12 light, .28 dark); padding 7 % of the width on top, 5 % below | reference layout; the veil keeps white type legible on a pale picture |
 | Date | display face `--fs-amount` (22) 600, `--lock-ink-soft` (white .78) | reference: the day over the time |
 | Time | display face `--fs-lock-clock` (140) 700, tracking -.035em, tabular, `--lock-ink` (white), 2 below the date | the user's "very large, heavy"; reference proportions (about a fifth of the width for "9:41") |
-| Avatar | 64 (`AvatarSize::Size64`, `--fs-display` letter); 48 in the polkit sheet | reference |
+| Picture | 64 (`AvatarSize::Size64`, `--fs-display` letter; a photo in a 64 disc, clipped, `object-fit:cover` centred over `--surface-2`; a persona at `Medium`); 48 in the polkit sheet | reference; the photo is freedesktop's `~/.face` or AccountsService's icon |
 | Name | UI 16/700 (`--fs-title`), white, 10 below the avatar | reference |
 | Field | 260 x 38 pill (`--r-pill`), `--lock-glass` (white .24 light, .18 dark), 14 below the name, padding 16 left and 5 right; the secret's dots at `--fs-base` white, tracked .14em; placeholder `--lock-ink-soft`; hover `--lock-glass-strong` | reference; flat, no blur assumed (spike S15) |
 | Enter button | 28 disc of `--lock-glass-strong`, `ArrowRight` at 13, shown once something is typed (opacity over `--t-quick --e-out`), pressed `--squish` | reference |
@@ -3459,6 +3463,17 @@ the pulse rests; it plays again only after the state has left `Wrong` (an older 
 never cuts a newer one short). The polkit sheet enters with `peek-in` and leaves with `sheet-out`
 (section 24). The unlock fade (design/20 section 1.9, `fade --t-move --e-exit`) is not drawn
 here: the host fades or unmaps its lock surfaces.
+
+**The persona's mood (2026-09-26).** A `UserPicture::Persona` in the lock prompt takes its mood
+from the prompt, so the shell sets none: `Attentive` while the field holds text and has the caret
+and while `Checking`; `Wince` on `Wrong`, through the shake and while the emptied field stays
+empty (typing again turns it `Attentive`, so each wrong winces once and none escalates, design/24
+section 5); `Happy` on `Accepted` (one `persona-hop`; the host unlocks at its settle); `Idle`
+otherwise, `LockedOut` included. Its `WakeStamp` advances on a key, pointer move or press inside
+the prompt, at most once a second (each wake replays the breath from its start), so it rests
+between 19 and 20 s after the last activity; the prompt's `wake` prop adds the caller's stamp
+(the display waking). `Accepted` closes the field like `Checking`. Faces and photos have no moods.
+The polkit sheet's persona stays `Idle`.
 
 ### 43. AppSwitcher (M11, 2026-09-26; values proposed)
 
