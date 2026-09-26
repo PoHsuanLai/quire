@@ -1,6 +1,6 @@
 //! A MonthGrid's header: the month's title and, with `onstep`, the previous and next buttons
 //! (design/04-COMPONENTS.md section 39). The regular grid uses `IconButton { Tool }` (28 x 26);
-//! that alone is taller than the compact grid can spare in a small widget's 132 px (sill Q190),
+//! that alone is taller than the compact grid can spare in a small widget's 140 px (sill Q190),
 //! so the compact grid draws plain 14 px glyph buttons (`ds-month-step`, an 11 px glyph).
 
 use crate::components::icon_button::{IconButton, IconButtonVariant};

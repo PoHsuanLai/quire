@@ -4552,3 +4552,41 @@ only on vello_cpu. Branch `harness-hybrid`. API in CONSUMING.md "Hybrid harness 
   Blitz's `element_from_point` (`Harness::hits` is false over it), so `Harness::wheel` over it
   scrolls nothing; the same scroll container in normal flow scrolls. The benchmark's grid is in
   flow. Not investigated further.
+
+## A secret's dots in a centred card; the compact month's today disc (2026-09-27)
+
+sill Q360 and Q361. Branch `q360-q361`.
+
+- **Q360, root cause: our CSS, exposed by a Blitz gap.** `.ds-polkit` centres its text
+  (`text-align:center`), and `.ds-input-mask` (the row of dots laid over a `Secret` or
+  `Password` field, `left:0; right:0` across it) inherited that, so the dots were centred in
+  the field. Blitz lays a text input's own text and caret out from the start whatever
+  `text-align` says, so the (transparent) typed text and its caret stayed at the leading
+  edge: eight characters in the 296 px polkit field drew the dots from 114 px in and the caret
+  at 69 px, before them. The placeholder was unaffected only because it has no `right:0` and
+  shrinks to its text. Fonts played no part, so bundled faces on or off looked the same. Fix:
+  `.ds-input-wrap{ text-align:start }`, so the input, the mask and the placeholder all read from
+  the leading edge in any container (a browser, which does centre an input's text in a centred
+  block, agrees). No class or API change. Regression: `ds-native/tests/secret_mask_align.rs`
+  types into a real `PolkitPrompt` and reads the painted ink: first ink at the padding, all of it
+  in the field's leading third (before the fix: first ink 69 px in, the dots out to 180).
+- **Blitz facts (rev e99fbdbd), not fixed upstream here.** `create_text_editor`
+  (`blitz-dom/src/layout/construct.rs`) clears the editor's styles and sets only the font size,
+  line height and brush: an input's text never takes `text-align`, `font-family`, `font-weight`
+  or `letter-spacing`. Minimal repro: `<div style="text-align:center"><input value="abc"
+  style="width:300px"></div>` draws "abc" at the left on Blitz and centred in a browser. The
+  second half is why a masked field's caret can still sit a little off its last dot: the hidden
+  text is measured in the editor's default family, untracked, while the dots are Inter tracked
+  .1em, so the caret lands within a dot or two of the end for ordinary input. Closing that
+  needs the editor to take the element's font (an upstream change) or a field-drawn caret over
+  the mask; neither is done.
+- **Q361: the compact MonthGrid's today disc.** The 16 px disc round `--fs-caption` 10 at 700
+  left two tabular Inter digits (about 12 px) under 2 px a side, and "27" touched the rim. The
+  regular grid puts 11.5 px digits on a 24 px disc (about 2.1x), so the compact disc takes the
+  same proportion from the token: `calc(2 * var(--fs-caption))`, 20 px, still a circle. To hold
+  it the columns go 18 to 20 (seven fill the small frame's 140 px content box, which is 164 less
+  12 a side; the 132 in the old comments predates the 12 px inset) and the rows 18 to 19; a disc
+  overhangs its row by 1 px into the next row's clear top, and the busy dot sits inside the
+  disc's foot, `--accent-ink` on today's disc. Six weeks: 14 + 10 + 6 x 19 = 138 (139 with the
+  last disc), inside 140. `month_grid_density.rs` measures it and checks today's disc is 20 x 20
+  inside its column. No class or API change.
