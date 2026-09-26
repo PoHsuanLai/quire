@@ -61,6 +61,7 @@ pub fn Sheet(
             class: "ds-sheet",
             "data-presence": showing.slug(),
             "data-placement": placement.attribute(),
+            "data-overscroll": "band",
             role: "dialog",
             "aria-label": "{label}",
             onkeydown: move |event| escape_closes(float, &event, onclose),

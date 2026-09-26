@@ -92,6 +92,7 @@ pub fn Panel(
                     "aria-label": "{label}",
                     "data-presence": phase.presence(),
                     "data-pulse": alias.slug(),
+                    "data-overscroll": "band",
                     style: "width:{width.0}px",
                     onkeydown: move |event| {
                         if event.key() == Key::Escape {

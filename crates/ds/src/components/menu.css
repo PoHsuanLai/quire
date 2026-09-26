@@ -4,7 +4,7 @@
    at once (`S:2052`, `C:1744`).
    TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; padding:var(--s-5); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--s-5); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-menu[*|data-kind=slim],
 .ds-menu[*|data-kind=context]{ width:220px; }

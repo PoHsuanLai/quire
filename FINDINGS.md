@@ -3971,3 +3971,61 @@ sill Q170: a notification banner that arrived under a resting pointer never coun
   calls `resolve` itself. `ds_native::launch` is not: it opens a blitz-shell window whose frame
   loop Blitz owns, and ds-native never sees its resolve. shell-host gets the same recipe on its
   own branch.
+
+## Scroll physics wave 1: quire's row (2026-09-26)
+
+design/11-BEHAVIOUR-scroll.md section 11.7's row for quire: `scrollbar-width: none`,
+`scroll-behavior: smooth` banned, `--scroll-thumb`, `data-wheel="capture"`,
+`data-overscroll="band"`. shell-host's own engine is a separate branch; nothing here runs it.
+
+- **`scrollbar-width: none` is honoured by Blitz, and cheaply.** `blitz-dom`
+  (`e99fbdbd`, `packages/blitz-dom/src/node/scrollbar.rs`) grew its own overlay-scrollbar
+  painting (`Node::wants_scrollbar`, `Node::scrollbar_thumb`) since the plan's own spike table
+  was written — a synthetic thumb Blitz paints itself, Chromium-style geometry (10 px thick, 32 px
+  minimum thumb length, a 500 ms fade delay and a 200 ms fade). `wants_scrollbar` reads the
+  computed `scrollbar-width` first and returns `false` immediately when it is `None`, before it
+  even asks whether the axis overflows — so `scrollbar-width: none` suppresses Blitz's thumb
+  outright, not merely its width, and does so independently of `overflow: auto` vs `scroll`. Added
+  to every ds scroll container's own rule (`.ds-menu`, `.ds-panel`, `.ds-sheet`,
+  `.ds-input[*|data-kind=multiline]`) rather than as a blanket reset rule, since `reset.css`
+  declares no scroll container of its own.
+- **`scroll-behavior: smooth` joins `Rule::BlitzUnsupported`'s table**
+  (`crates/ds/src/lint/blitz.rs`), rather than a new `Rule` variant: the existing rule is already
+  a per-property/value table (`position: sticky` is the precedent — one property, banned only for
+  one value), so a new row reuses the offence path, the exception mechanism and the doc comment
+  wholesale. `scroll-behavior: auto` (the default) lints clean.
+- **`--scroll-thumb`** (`ds::tokens::ColourToken::ScrollThumb`): `--ink` at .5 alpha over the
+  layer's own .8 opacity (effective .4, `alpha(0x000000, 400)`) in light; `--paper`'s equivalent,
+  white at the same effective alpha (`alpha(0xFFFFFF, 400)`), in dark — the same shape as
+  `HandleRing`'s black-in-light/white-in-dark pair, one alpha rather than two literal RGB pairs.
+  Registered the same way every other colour token is (`lint::registry::declared_vars` derives
+  its known-variable list from `ColourToken::ALL`, so nothing else needed touching). No
+  `--scroll-thumb-hover`: design/11 section 11.3.12 only changes the *track*'s fill on hover
+  (`--line-soft`, already a token) and the thumb's thickness, never its colour.
+- **`data-wheel="capture"`: only `Slider` gets it today.** design/11 section 11.3.1 item 2 names
+  "sliders, zoomable canvases" as the exception; of quire's own components, `EditSurface`
+  (`.ds-edit`) sets no `overflow` at all (it grows with its content, per FINDINGS "Edit surface"),
+  and `LevelControl`'s capsule (`.ds-level`) has no `onwheel` handler — neither "scrolls
+  internally" or "takes wheel" today, so the brief's own conditions (`only if it scrolls
+  internally`, `if it takes wheel`) are unmet and both are left unmarked. Only `Slider` carries the
+  attribute; `every_slider_carries_the_wheel_capture_marker`
+  (`crates/ds/tests/components_controls.rs`) pins it across every slider case, not just the
+  default one.
+- **`data-overscroll="band"`, scope.** Of quire's own ds components with a real scroll container
+  (`overflow-y: auto`/`overflow: auto`), only two are not already excluded by design/11's own
+  R14 list (`Menu` is a menu; multiline `TextInput` is a text field): `Panel` (the notification
+  center's edge panel) and `Sheet` (its own doc comment: "the general modal panel for settings and
+  dialogs"). Both now carry the attribute. `Peek`'s own box (`.ds-peek`) is `overflow: hidden` and
+  never scrolls itself — its markup comment literally says `…reader…` where the consumer's content
+  goes (design/04-COMPONENTS.md section 24), confirming "the reader" in the brief is mailo's
+  `.reader-body` (design/01-LAYOUT.md section 7), not a ds component; the same is true of "list
+  rows' scroller" (mailo's `.list`, design/01-LAYOUT.md section 5). Both are documented in
+  design/11 section 11.3.7's new table and in `CONSUMING.md` section 12 as guidance for the
+  consumer that owns them, since there is no ds element to mark.
+- **sill has no `scroll-behavior` use.** `grep -rn "scroll-behavior" ~/sill/crates` returns
+  nothing, so the new `Rule::BlitzUnsupported` row cannot regress sill's Strict lint (it reads
+  quire by path — CONVENTIONS "Warn before lint rules land").
+- **Unproven.** Everything above is quire's markup/CSS/lint/token row only: no `onwheel` handler
+  exists on `Slider` yet (the attribute is a marker for a host that is not built in this branch),
+  and whether `data-overscroll`/`data-wheel` are read correctly is shell-host's test to write, not
+  this one's.

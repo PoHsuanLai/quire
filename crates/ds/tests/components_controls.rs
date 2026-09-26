@@ -252,3 +252,27 @@ fn a_pulse_alternates_its_alias() {
         assert_eq!(key.anim(), Anim::Bump);
     }
 }
+
+/// The slider consumes wheel input itself (11-BEHAVIOUR-scroll.md section 11.3.1 item 2:
+/// "sliders, zoomable canvases"): shell-host's scroll engine hands `data-wheel="capture"`
+/// elements the raw `BlitzWheelEvent` instead of scrolling the page under them. Every slider
+/// case carries the marker, not just the default one, so a state that later drops it (a variant,
+/// a disabled slider) is caught here rather than only in a golden diff.
+#[test]
+fn every_slider_carries_the_wheel_capture_marker() {
+    let sliders: Vec<&Case> = CASES
+        .iter()
+        .chain(MOTION_CASES.iter())
+        .filter(|case| case.component == "slider")
+        .collect();
+    assert!(!sliders.is_empty(), "no slider cases to check");
+    for case in sliders {
+        let html = render(case.make);
+        assert!(
+            html.contains("data-wheel=\"capture\""),
+            "{}/{} is missing data-wheel=\"capture\": {html}",
+            case.component,
+            case.state
+        );
+    }
+}

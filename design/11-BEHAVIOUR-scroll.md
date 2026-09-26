@@ -159,6 +159,27 @@ Worked numbers (`d = 1000`): O = 100 -> s = 52.1 px; O = 300 -> 141.6 px; O = 10
 Linear alternative: O = 1000 -> 50 px. Snap-back from 100 px, `v0 = 0`: `|s| < 1` at 368 ms.
 Impact at 2000 px/s: peak 18.3 px at 80 ms, below 1 px at ~451 ms.
 
+**`data-overscroll="band"`, by container.** "Applies to" above is the rule; this is the rule
+applied to every scroll container quire or a consumer draws, so the host can read one attribute
+rather than re-derive "is this a menu" from a class name. A container the host finds without the
+attribute clamps (no rubber band) rather than defaulting to elastic — the safer failure, since an
+un-marked scroller is more likely a mistake than a menu quire forgot to exclude.
+
+| Container | `data-overscroll` | Why |
+| --- | --- | --- |
+| `Panel` (`.ds-panel`, the notification center's edge panel) | `band` | an ordinary ds scroll container, not on the exclusion list |
+| `Sheet` (`.ds-sheet`, the general modal panel for settings and dialogs) | `band` | same: a panel, not a menu or a popover |
+| A list's row scroller (mailo's `.list`, design/01-LAYOUT.md section 5; not a ds component — the consumer's own scrolling wrapper around `AnimatedList`) | `band` | ordinary list scrolling |
+| The reader (mailo's `.reader-body`, design/01-LAYOUT.md section 7, drawn as `Peek`'s or `Sheet`'s `children`) | `band` | ordinary document scrolling; `Peek`'s own `.ds-peek` is `overflow:hidden` and never scrolls itself |
+| `Menu` (`.ds-menu`) | absent | excluded by name (R14): a menu never rubber-bands |
+| The dock | absent | excluded by name (R14) |
+| `Popover` (`.ds-popover`), the launcher result list | absent | excluded by name (R14) |
+| `TextInput` multiline (`.ds-input[*|data-kind=multiline]`) | absent | a text field (R14); it still carries `scrollbar-width:none` (item 1) since that is unconditional |
+
+Every row above still carries `scrollbar-width: none` (item 1): the attribute governs only
+whether the host lets the container stretch past its edge, not whether Blitz paints its own
+scrollbar (that is banned everywhere a ds container scrolls).
+
 ### 11.3.8 Scroll acceleration (device units to px)
 
 For the Magic Mouse the conversion is computed once, in `palmrest` (12 §12.3.8), so that our
@@ -424,8 +445,8 @@ fade 240 ms, double-scroll grace 150 ms.
 | Engine, latching, rubber band, keyboard, thumb painting, frame requests | `shell-host/src/scroll/{engine,latch,rubber,keys,indicator}.rs` (pure except `indicator` paint) + `input/pointer.rs` (axis -> engine), `handlers/pointer.rs` (source, `axis_stop`, `axis_relative_direction`) |
 | palmrest client | `shell-host/src/input/palmrest.rs`: connects to the palmrest socket if present, sends `PointerOver`, feeds Gesture inputs; absent daemon = no-op |
 | Units to px, axis lock, gains | palmrest `feel` module (12 §12.3.8) |
-| Scroll notification hook | `ds-native::use_scroll` |
-| `scrollbar-width: none`, `scroll-behavior` ban, `--scroll-thumb` token | quire (`css/reset.css`, `lint::Rule::BlitzUnsupported`, tokens) |
+| Scroll notification hook | shell-host's `use_scroll` (beside `use_surface`: the host owns the engine, so the hook lives on its side, not `ds-native`'s) |
+| `scrollbar-width: none`, `scroll-behavior` ban, `--scroll-thumb` token, `data-wheel="capture"`, `data-overscroll="band"` | quire (component CSS, `lint::Rule::BlitzUnsupported`, tokens, component markup — §11.3.7's table, §11.3.1 item 2) |
 | Settings UI | Settings app; writes both our keys and the compositor's natural-scroll keys |
 
 Platform limits:
