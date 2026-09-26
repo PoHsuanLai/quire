@@ -17,6 +17,7 @@ use crate::components::tree_item_parts::{
     Row, label_part, leaf_chevron, open_attribute, trailing_slot,
 };
 use crate::components::vocab::{DropState, Expanded, Here};
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use dioxus::prelude::*;
 
@@ -163,6 +164,8 @@ pub fn TreeItem(
                         // back; the app's state decides, through `open`.
                         event.prevent_default();
                         on_toggle.call(open.flip());
+                        // The root passes a prevented click by: the row takes the keyboard here.
+                        kept_click(&event);
                     },
                     span { class: "ds-tree-item-chevron", "aria-hidden": "true",
                         crate::icon::render::Glyph { icon: Icon::ChevronRight, size: crate::icon::render::IconSize::Tiny }

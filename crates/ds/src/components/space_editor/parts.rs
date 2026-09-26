@@ -8,6 +8,7 @@ use crate::components::chip::{Chip, ChipVariant};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::slider::Slider;
 use crate::components::vocab::Fraction;
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::space::dot_paint::DotPaint;
@@ -51,6 +52,7 @@ pub(super) fn Stops(
                                     event.stop_propagation();
                                     picker.pick(DotIndex(0));
                                     onchange.call(edit::removed(&look, index));
+                                    kept_click(&event);
                                 }
                             },
                             Glyph { icon: Icon::X, size: IconSize::Micro }

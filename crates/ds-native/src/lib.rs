@@ -71,7 +71,7 @@ mod window_hover;
 mod window_place;
 
 pub use app_id::AppId;
-pub use click_focus::{CLICK_FOCUS, FocusFallback};
+pub use click_focus::{CLICK_FOCUS, FocusFallback, PRESS_FOCUS};
 pub use contexts::RootContexts;
 pub use error::NativeError;
 pub use fonts::{font_context, register_fonts};

@@ -5,6 +5,7 @@
 use crate::components::text_runs::{Text, text};
 use crate::components::toggle::Toggle;
 use crate::components::vocab::{Availability, Switch};
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -96,7 +97,10 @@ fn toggle(
         span {
             class: "ds-settings-row-trail",
             "data-mark": "toggle",
-            onclick: move |event| event.stop_propagation(),
+            onclick: move |event| {
+                event.stop_propagation();
+                kept_click(&event);
+            },
             onkeydown: move |event| event.stop_propagation(),
             Toggle { label, value, availability, onchange: on_toggle }
         }
