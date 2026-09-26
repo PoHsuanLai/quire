@@ -739,6 +739,42 @@ mailo turns it on.
   another language. A user-level list (`appearance.spelling_languages`) is proposed but not in
   design/22 yet; until it is, `None` means the locale's (`LC_ALL`, else `LANG`).
 
+### 6.10 The sender card's actions (2026-09-27): what mailo changes
+
+mailo's report: with the sender card open over the list, moving onto the card opened another
+card, so Pin to sidebar, Their mail and Copy address could not be pressed. Blitz hits the card
+where it is painted (the overlay host's layer carries a z-index); the card was replaced by
+mailo's own name hook (FINDINGS.md "A part's leave is not the row's enter"). Needs the quire
+that has `ListRow::onpointerback`.
+
+- **`ui/row.rs`, the `part` closure.** A part's `onpointerleave` no longer opens the thread
+  card; it lets the card go like any other target's leave:
+
+  ```rust
+  onpointerleave: EventHandler::new(move |event: PointerEvent| {
+      event.stop_propagation();
+      out(driver);
+  }),
+  ```
+
+- **`ui/row.rs`, the `ds::ListRow`.** Being back on the row is quire's to say:
+
+  ```rust
+  onpointerback: EventHandler::new(move |_: PointerEvent| {
+      enter(Hook::Thread(id), element(row_box()));
+  }),
+  ```
+
+  It fires 150 ms after the pointer leaves the name or the time if the pointer stayed on the
+  row; the sender card's close grace ends at the same time, so the thread card follows it
+  without a gap. A pointer that went to the card (or another row, or away) fires nothing.
+- **Checked in mailo's harness** against this quire (`[patch]` to the branch): the pointer
+  moved from row 1's name to the card's actions in ten steps keeps `sender:` open throughout,
+  over rows 2-4, and at rest; `tests/native_harness.rs` (32) and the `hover` lib tests (16)
+  pass unchanged.
+- **Nothing else.** The card itself (`HoverLayer`, `ds::HoverCard`, its inline `Floating`
+  menu) needs no change; nothing floating needs to move into the overlay host.
+
 ## 7. The reader, Phase B
 
 Mailo's reader has two views today (`crates/mail-app/src/ui/reading/mod.rs::ViewSwitch`):
