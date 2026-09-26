@@ -109,7 +109,10 @@ The rules, each with its source:
     celebration when you allow images, because allowing them is a concession, not an
     achievement" (`C:1363-1364`).
 
-Exact timings, curves and keyframes are `05-MOTION.md`.
+Exact timings, curves and keyframes are `05-MOTION.md`. The small state details every stateful
+element shows (the moments Appear, Pending, Success, Failure, Change and the rest, the primitives
+that play them, and the catalogue per element) are `26-DETAILS.md`: one grammar, so a detail is
+never hand-made for one item.
 
 ## 5. Interaction principles
 
