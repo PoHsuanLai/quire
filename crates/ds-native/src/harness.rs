@@ -9,10 +9,15 @@
 //! resolves the document at the matching animation time, and sleeps again until the deadline.
 //! Animation time (`resolve(t)`) is the harness's own clock: the sum of every `advance`, so a
 //! frame's CSS time never depends on how slow the machine running the test is.
+//!
+//! That is the default, [`Clock::Wall`]. A harness built with
+//! `HarnessConfig::with_clock(Clock::Virtual)` runs quire's timers on the same clock as its CSS
+//! instead, and `advance` takes no wall-clock time at all (`crate::harness_clock`).
 
 use crate::contexts::RootContexts;
 use crate::error::NativeError;
 use crate::frame_view::FrameView;
+use crate::harness_clock::{Clock, HarnessClock};
 use crate::harness_config::HarnessConfig;
 use crate::harness_input::{HeldButtons, blitz_button, keyboard, modifier, pointer};
 pub use crate::harness_settle::{QUIET, SETTLE_BOUND, assert_settles_to_zero_frames, settle_until};
@@ -38,6 +43,9 @@ pub struct Harness {
     /// `crate::runtime`. Never read, only held: it does its work by staying alive and being
     /// dropped with the harness.
     _runtime: tokio::runtime::EnterGuard<'static>,
+    /// The clock timers run on. Last, so a virtual clock stays installed while the document
+    /// (and every task sleeping on it) drops.
+    time: HarnessClock,
 }
 
 impl std::fmt::Debug for Harness {
@@ -45,6 +53,7 @@ impl std::fmt::Debug for Harness {
         f.debug_struct("Harness")
             .field("viewport", &self.viewport)
             .field("clock", &self.clock)
+            .field("time", &self.time.choice())
             .finish_non_exhaustive()
     }
 }
@@ -78,6 +87,9 @@ impl Harness {
         // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
         // would run.
         let runtime = crate::runtime::enter();
+        // Installed before the first render, so a hook that notes the time as it mounts reads
+        // the harness's clock.
+        let time = HarnessClock::start(config.clock());
         let viewport = config.viewport();
         let mut doc = Headless::new(app, viewport, config.setup());
         doc.layout = layout;
@@ -88,6 +100,7 @@ impl Harness {
             clock: Duration::ZERO,
             _runtime: runtime,
             held: HeldButtons::default(),
+            time,
         };
         harness.settle();
         harness
@@ -241,9 +254,36 @@ impl Harness {
         }
     }
 
-    /// Let `time` pass: fire due timers and render. It takes `time` of wall-clock time; see the
-    /// module documentation for why.
+    /// Let `time` pass: fire due timers and render. On the wall clock it takes `time` of
+    /// wall-clock time; see the module documentation for why. On the virtual clock it steps to
+    /// each timer's due instant in order, rendering and resolving at each, and returns at once.
     pub fn advance(&mut self, time: Duration) {
+        match self.time.virtual_clock() {
+            Some(clock) => crate::harness_clock::advance(self, &clock, time),
+            None => self.advance_wall(time),
+        }
+    }
+
+    /// Which clock this harness's timers run on.
+    pub fn clock(&self) -> Clock {
+        self.time.choice()
+    }
+
+    /// Now on this harness's clock: the wall clock's now, or the virtual clock's (which
+    /// `ds::time::now` also reads on this thread). Compare it with other instants from the same
+    /// harness, e.g. the one [`settle_until`] returns.
+    pub fn now(&self) -> Instant {
+        self.time.now()
+    }
+
+    /// Resolve the document at animation time `at` after running what is queued: one step of a
+    /// virtual advance.
+    pub(crate) fn resolve_at(&mut self, at: Duration) {
+        self.clock = at;
+        self.settle();
+    }
+
+    fn advance_wall(&mut self, time: Duration) {
         let started = Instant::now();
         let deadline = started + time;
         loop {
