@@ -20,7 +20,7 @@
   --i:0; --d:0;
   position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
   padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
-  border:var(--hair) solid transparent; cursor:pointer; user-select:none; list-style:none;
+  border:var(--hair) solid transparent; cursor:default; user-select:none; list-style:none;
   transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out),
              background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
   animation:none;
@@ -78,7 +78,7 @@
 /* Star and sparks (`S:299-307`). */
 .ds-star{
   position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
-  cursor:pointer; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
+  cursor:default; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
   transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-row:hover .ds-star, .ds-star[*|aria-pressed=true]{ opacity:1; }

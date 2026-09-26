@@ -225,7 +225,8 @@ fn a_shortcut_is_glyphs_without_separators() {
     assert_eq!(shortcut.glyphs(), "⌃⇧T");
     assert_eq!(
         Shortcut(vec![Key::Super, Key::Alt, Key::Enter]).glyphs(),
-        "⌘⌥↵"
+        "⌥⌘↵",
+        "the Mac's order, whatever order the keys were given in"
     );
     assert_eq!(Shortcut::default().glyphs(), "");
 }

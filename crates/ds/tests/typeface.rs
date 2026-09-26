@@ -192,7 +192,12 @@ fn the_cap_fitted_sizes_keep_the_measured_caps() {
             .parse::<f64>()
             .unwrap_or(f64::NAN)
     };
-    for size in ds::FontSize::CAP_FITTED {
+    // A floored step (the dial) is raised to the 10 px floor under System instead (design/27
+    // section 3.16).
+    let fitted = ds::FontSize::CAP_FITTED
+        .into_iter()
+        .filter(|size| !ds::FontSize::FLOORED.contains(size));
+    for size in fitted {
         let editorial = px(size.css_in(Typeface::Editorial));
         let system = px(size.css_in(Typeface::System));
         let want = editorial * BRICOLAGE / INTER_DISPLAY;
@@ -207,7 +212,7 @@ fn the_cap_fitted_sizes_keep_the_measured_caps() {
         );
     }
     for size in ds::FontSize::ALL {
-        if !ds::FontSize::CAP_FITTED.contains(&size) {
+        if !ds::FontSize::CAP_FITTED.contains(&size) && !ds::FontSize::FLOORED.contains(&size) {
             assert_eq!(
                 size.css_in(Typeface::System),
                 size.css_in(Typeface::Editorial)

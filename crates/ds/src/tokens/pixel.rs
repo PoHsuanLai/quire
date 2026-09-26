@@ -38,6 +38,10 @@ pub enum PixelToken {
     /// `--caret-w`: a text caret's width (an app's own caret over an `EditSurface`, whose
     /// `caret_rect` is this wide), 1 px rounded down to whole device pixels like `--hair`.
     CaretW,
+    /// `--focus-gap`: the space between a control and its focus ring, 1 px rounded down to whole
+    /// device pixels. A ring's radius is its control's plus this gap, so a pill gets a pill ring
+    /// (design/27-HIG-PARITY.md sections 3.9 and 6.4; the lint `FocusRingShape`).
+    FocusGap,
 }
 
 /// How a token's design length becomes whole device pixels.
@@ -57,7 +61,7 @@ struct Thousandths(u32);
 
 impl PixelToken {
     /// Every pixel token, in stylesheet order.
-    pub const ALL: [PixelToken; 7] = [
+    pub const ALL: [PixelToken; 8] = [
         PixelToken::Dpr,
         PixelToken::Px,
         PixelToken::Hair,
@@ -65,6 +69,7 @@ impl PixelToken {
         PixelToken::Ring,
         PixelToken::FocusRing,
         PixelToken::CaretW,
+        PixelToken::FocusGap,
     ];
 
     /// The token components read and the input the root writes, with the 1x value behind it.
@@ -77,6 +82,7 @@ impl PixelToken {
             PixelToken::Ring => ("--ring", "--scale-ring", "3px"),
             PixelToken::FocusRing => ("--focus-ring", "--scale-focus-ring", "2.5px"),
             PixelToken::CaretW => ("--caret-w", "--scale-caret-w", "1px"),
+            PixelToken::FocusGap => ("--focus-gap", "--scale-focus-gap", "1px"),
         };
         Tuned {
             token: VarName(token),
@@ -124,7 +130,7 @@ impl PixelToken {
             PixelToken::Hairline => Some(Snap::Floor(Thousandths(500))),
             PixelToken::Ring => Some(Snap::Nearest(Thousandths(3000))),
             PixelToken::FocusRing => Some(Snap::Floor(Thousandths(2500))),
-            PixelToken::CaretW => Some(Snap::Floor(Thousandths(1000))),
+            PixelToken::CaretW | PixelToken::FocusGap => Some(Snap::Floor(Thousandths(1000))),
         }
     }
 
@@ -199,6 +205,10 @@ mod tests {
             PixelToken::CaretW,
             ["0.8px", "0.66667px", "0.57143px", "1px"],
         ),
+        (
+            PixelToken::FocusGap,
+            ["0.8px", "0.66667px", "0.57143px", "1px"],
+        ),
     ];
 
     const SCALES: [Scale; 4] = [Scale(150), Scale(180), Scale(210), Scale(240)];
@@ -250,7 +260,10 @@ mod tests {
     #[test]
     fn at_one_every_token_is_its_design_value_and_the_root_writes_nothing() {
         let design: Vec<String> = PixelToken::ALL.map(|token| token.css(Scale::ONE)).to_vec();
-        assert_eq!(design, ["1", "1px", "1px", ".5px", "3px", "2.5px", "1px"]);
+        assert_eq!(
+            design,
+            ["1", "1px", "1px", ".5px", "3px", "2.5px", "1px", "1px"]
+        );
         assert_eq!(PixelToken::style_attr(Scale::ONE), "");
     }
 
@@ -271,7 +284,7 @@ mod tests {
             style,
             "--scale-dpr:1.5;--scale-px:0.66667px;--scale-hair:0.66667px;\
              --scale-hairline:0.66667px;--scale-ring:3.33334px;--scale-focus-ring:2px;\
-             --scale-caret-w:0.66667px;"
+             --scale-caret-w:0.66667px;--scale-focus-gap:0.66667px;"
         );
     }
 }

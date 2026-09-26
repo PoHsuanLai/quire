@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 
 use super::Offence;
 use super::rule::{Exception, LintConfig, Rule, Stale};
+use super::severity;
 use super::stylesheet::every_offence;
 
 /// Panic, listing every offence with its line and column, unless `css` is clean once
@@ -11,10 +12,15 @@ use super::stylesheet::every_offence;
 /// exception that suppressed nothing is stale, and a stale exception is a failure unless
 /// `config.stale` is [`Stale::Report`], which prints it and passes. Either way it prints what
 /// each exception suppressed (to stderr on success, in the panic otherwise).
+///
+/// Warnings ([`super::Severity::Warning`]) never fail it: they are printed to stderr, and an
+/// exception that suppresses only a warning is not stale.
 pub fn assert_clean(css: &str, config: &LintConfig) {
-    let (offences, suppressed) = config.partition(every_offence(css, config));
+    let (unexcused, suppressed) = config.partition(every_offence(css, config));
+    let (offences, warnings) = severity::split(unexcused);
     let stale = stale(config, &suppressed);
     let counts = suppressed_counts(config, &suppressed);
+    eprint!("{}", warning_text(&warnings));
     match (offences.is_empty(), stale.is_empty(), config.stale) {
         (true, true, _) | (true, false, Stale::Report) => {
             eprint!("{counts}{}", stale_text(&stale));
@@ -49,6 +55,26 @@ fn offence_text(offences: &[Offence]) -> String {
         }
     }
     message
+}
+
+/// One line per warning, or nothing.
+fn warning_text(warnings: &[Offence]) -> String {
+    if warnings.is_empty() {
+        return String::new();
+    }
+    let lines: String = warnings
+        .iter()
+        .map(|offence| {
+            format!(
+                "  {:?} {}:{}: {}\n",
+                offence.rule, offence.line, offence.column, offence.text
+            )
+        })
+        .collect();
+    format!(
+        "quire lint warns {} time(s) (not yet failing; design/27 section 7):\n{lines}",
+        warnings.len()
+    )
 }
 
 /// One line per stale exception, or nothing.

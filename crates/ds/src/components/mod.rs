@@ -141,6 +141,7 @@ pub mod sidebar_item;
 pub mod slider;
 pub mod space_editor;
 pub mod spinner;
+pub mod standard_action;
 pub mod status;
 pub mod switcher_fit;
 pub mod sync_halo;
@@ -274,6 +275,7 @@ pub use space_editor::{
     ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
 };
 pub use spinner::{Spinner, SpinnerKind};
+pub use standard_action::{Reserved, SpaceNumber, StandardAction};
 pub use status::{
     BatteryGlyph, BatteryPower, BatteryState, BluetoothGlyph, BluetoothState, LowAt, StatusGlyph,
     StatusState, VolumeGlyph, VolumeState, VolumeWaves, WifiBars, WifiGlyph, WifiReach, WifiState,

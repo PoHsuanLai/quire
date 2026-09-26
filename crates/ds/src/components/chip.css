@@ -40,4 +40,4 @@
   font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
 }
 .ds-chip[*|data-variant=person]:not(.a-chip-flash){ animation:chip-in var(--t-move) var(--e-spring); }
-.ds-chip-remove{ border:0; background:none; padding:0; cursor:pointer; color:var(--ink-faint); line-height:0; }
+.ds-chip-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }

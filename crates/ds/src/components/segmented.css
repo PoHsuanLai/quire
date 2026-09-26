@@ -9,7 +9,7 @@
 .ds-segmented[*|data-size=small]{ padding:var(--s-2); background:var(--surface); }
 
 .ds-segment{
-  font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:pointer; color:var(--ink-soft);
+  font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-segmented[*|data-size=regular] .ds-segment{ padding:var(--s-5) var(--s-11); font-size:var(--fs-small); }

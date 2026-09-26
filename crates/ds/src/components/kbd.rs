@@ -30,7 +30,7 @@ impl KbdSize {
 #[component]
 pub fn Kbd(shortcut: Shortcut, #[props(default)] size: KbdSize) -> Element {
     rsx! {
-        for key in shortcut.0 {
+        for key in shortcut.keys() {
             kbd {
                 class: "ds-kbd",
                 "data-size": size.slug(),
