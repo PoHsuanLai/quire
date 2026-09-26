@@ -25,6 +25,9 @@
 //! - The window itself, as `ds::WindowHost` over [`crate::window::WinitWindow`]: a frame's
 //!   titlebar moves, resizes, zooms, minimizes and closes it; its state is re-read on every
 //!   resize and focus change, so the frame redraws when the window is zoomed or deactivated.
+//! - Files dragged in from outside (winit's data-transfer events, which blitz-shell ignores), as
+//!   `ds::HostFileDrop`: the drag is hit-tested through the document and the target under a
+//!   release hears its `ondrop` (`crate::window_drop`, `crate::drop_hit`).
 //! - The window's scale factor, as `ds::HostScale`, so `Ds` writes the pixel tokens for it and a
 //!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
 //!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
@@ -46,6 +49,7 @@ use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
 use crate::window::WinitWindow;
+use crate::window_drop::WindowDrop;
 use crate::window_hover::WindowHover;
 use blitz_traits::shell::ColorScheme;
 use blitz_traits::shell::ShellProvider;
@@ -123,7 +127,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let found = book.clone();
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
-    use_window_event(move |event, _| {
+    let file_drop = use_context_provider(crate::drop_hit::drop_seam);
+    let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
+    use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
             keep(&mut keeper.borrow_mut(), &DocRef::Handle(handle.clone()));
         }
@@ -172,6 +178,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
             if let Some(sink) = sink {
                 sink.call(ime);
             }
+        }
+        let inputs = dragged
+            .borrow_mut()
+            .inputs(event, event_loop, window.scale_factor());
+        for input in inputs {
+            let answer = file_drop.feed(input);
+            dragged.borrow_mut().answer(event_loop, answer);
         }
         if matches!(event, WindowEvent::RedrawRequested) {
             find_frames(&seen.borrow(), &found);
