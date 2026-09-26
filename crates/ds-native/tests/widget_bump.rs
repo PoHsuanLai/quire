@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Bumped, Button, ButtonVariant, Ds, Fraction, LevelRing, Material,
+    Anim, Appearance, BatteryLevel, Bumped, Button, ButtonVariant, Ds, Fraction, Material,
     MotionLevel, RootChrome, StaggerIndex, WidgetFrame, WidgetMetrics, WidgetSize, settle,
 };
 use ds_native::harness::settle_until;
@@ -27,7 +27,7 @@ fn Battery() -> Element {
                 Button { id: "drain", variant: ButtonVariant::Mini, label: "Drain",
                     onclick: move |_| level.set(Fraction(level().0.saturating_sub(100))) }
                 WidgetFrame { size: WidgetSize::Small,
-                    LevelRing { level: level(), label: "This computer" }
+                    BatteryLevel { level: level(), label: "This computer" }
                     Bumped { on: percent, span { class: "ds-count", "{percent}%" } }
                 }
             }
@@ -35,44 +35,47 @@ fn Battery() -> Element {
     }
 }
 
-fn ring_bumping(harness: &Harness) -> bool {
-    harness.has_class(".ds-ring", "a-bump")
+fn battery_bumping(harness: &Harness) -> bool {
+    harness.has_class(".ds-battery", "a-bump")
 }
 
 fn text_bumping(harness: &Harness) -> bool {
     harness.has_class(".ds-bumped", "a-bump")
 }
 
-/// One change: the ring and the text each bump, on the first alias, and both are at rest again
+/// One change: the battery and the text each bump, on the first alias, and both are at rest again
 /// no sooner than `settle(Bump)` after the change, and stay at rest.
 #[test]
 fn a_change_bumps_once_and_settles() {
     let mut harness = Harness::new(Battery, VIEW);
     harness.advance(Duration::from_millis(100));
-    assert!(!ring_bumping(&harness), "nothing bumps on mount");
+    assert!(!battery_bumping(&harness), "nothing bumps on mount");
     assert!(!text_bumping(&harness), "nothing bumps on mount");
 
     let changed = Instant::now();
     harness.click(harness.centre("#drain").expect("the drain button"));
-    settle_until(&mut harness, |h| ring_bumping(h) && text_bumping(h));
-    assert_eq!(harness.attr(".ds-ring", "data-pulse").as_deref(), Some("a"));
+    settle_until(&mut harness, |h| battery_bumping(h) && text_bumping(h));
     assert_eq!(
-        harness.attr(".ds-ring", "aria-valuenow").as_deref(),
+        harness.attr(".ds-battery", "data-pulse").as_deref(),
+        Some("a")
+    );
+    assert_eq!(
+        harness.attr(".ds-battery", "aria-valuenow").as_deref(),
         Some("70")
     );
 
     let settles = settle(Anim::Bump, MotionLevel::Standard, StaggerIndex::new(0));
-    let rested = settle_until(&mut harness, |h| !ring_bumping(h) && !text_bumping(h));
+    let rested = settle_until(&mut harness, |h| !battery_bumping(h) && !text_bumping(h));
     assert!(
         rested.duration_since(changed) >= settles,
         "at rest only once the whole bump had run: {:?}",
         rested.duration_since(changed)
     );
-    assert_eq!(harness.attr(".ds-ring", "data-pulse"), None);
+    assert_eq!(harness.attr(".ds-battery", "data-pulse"), None);
 
     // Nothing loops: a further settle's worth of time brings no second bump.
     harness.advance(settles);
-    assert!(!ring_bumping(&harness), "{}", harness.html());
+    assert!(!battery_bumping(&harness), "{}", harness.html());
     assert!(!text_bumping(&harness), "{}", harness.html());
 }
 
@@ -82,14 +85,17 @@ fn a_second_change_bumps_again_on_the_other_alias() {
     let mut harness = Harness::new(Battery, VIEW);
     harness.advance(Duration::from_millis(100));
     harness.click(harness.centre("#drain").expect("drain"));
-    settle_until(&mut harness, ring_bumping);
-    settle_until(&mut harness, |h| !ring_bumping(h));
+    settle_until(&mut harness, battery_bumping);
+    settle_until(&mut harness, |h| !battery_bumping(h));
     harness.click(harness.centre("#drain").expect("drain"));
-    settle_until(&mut harness, ring_bumping);
-    assert_eq!(harness.attr(".ds-ring", "data-pulse").as_deref(), Some("b"));
+    settle_until(&mut harness, battery_bumping);
     assert_eq!(
-        harness.attr(".ds-ring", "aria-valuenow").as_deref(),
+        harness.attr(".ds-battery", "data-pulse").as_deref(),
+        Some("b")
+    );
+    assert_eq!(
+        harness.attr(".ds-battery", "aria-valuenow").as_deref(),
         Some("60")
     );
-    settle_until(&mut harness, |h| !ring_bumping(h));
+    settle_until(&mut harness, |h| !battery_bumping(h));
 }

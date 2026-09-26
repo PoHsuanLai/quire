@@ -91,7 +91,7 @@ pub enum FontSize {
     Day,
     /// `--fs-display` 26: composer subject.
     Display,
-    /// `--fs-widget-hero` 34: a widget's hero value (design/23-WIDGETS.md section 3.2).
+    /// `--fs-widget-hero` 44: a widget's hero value (design/23-WIDGETS.md section 3.2).
     WidgetHero,
 }
 
@@ -177,7 +177,7 @@ impl FontSize {
             FontSize::Amount => "22px",
             FontSize::Day => "24px",
             FontSize::Display => "26px",
-            FontSize::WidgetHero => "34px",
+            FontSize::WidgetHero => "44px",
         }
     }
 }

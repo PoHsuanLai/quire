@@ -1,24 +1,23 @@
-//! The Widget looks page (design/23-WIDGETS.md): the candidate depth looks for the desktop
-//! widgets, each in a Small and a Medium `WidgetFrame` on the desktop over a calm wallpaper, in
-//! the page's scheme. The battery at three levels and charging, in each `BatteryLook`; the world
-//! clock by day and by night, in each `DialLook`, all on the lit card; then the card's two
-//! finishes one above the other. The first look of each is what the widgets draw today.
+//! The Widget looks page (design/23-WIDGETS.md): the widgets in "Neumorphism & Soft UI" for the
+//! user's judgement, each widget in a Small and a Medium `WidgetFrame` on the desktop over a calm
+//! wallpaper, in the page's scheme. The battery as a battery glyph and its percentage, one
+//! device and four; the world clock as the time in the display face, and as four flat dials,
+//! two by day and two by night.
 
 use super::Section;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BatteryLook, ClockFace, ClockLook, ClockTime, DayPhase, DialLook, Ds, Fraction,
-    FrameFinish, Glyph, Icon, IconSize, Inject, LevelRing, Material, RingMark, RootChrome, Seconds,
-    WidgetFrame, WidgetMetrics, WidgetSize, WidgetTitle, use_env,
+    Appearance, BatteryLevel, ClockFace, ClockLook, ClockTime, DayPhase, Ds, Fraction, Icon,
+    Inject, Material, RingMark, RootChrome, Seconds, WidgetFrame, WidgetMetrics, WidgetSize,
+    WidgetTitle, use_env,
 };
 
 /// One device on the battery widgets.
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Device {
     name: &'static str,
-    glyph: Option<Icon>,
     level: u16,
     mark: RingMark,
 }
@@ -27,25 +26,21 @@ struct Device {
 const DEVICES: [Device; 4] = [
     Device {
         name: "Mouse",
-        glyph: Some(Icon::Mouse),
         level: 80,
         mark: RingMark::Plain,
     },
     Device {
         name: "Headphones",
-        glyph: Some(Icon::Headphones),
         level: 450,
         mark: RingMark::Plain,
     },
     Device {
         name: "Keyboard",
-        glyph: Some(Icon::Keyboard),
         level: 1000,
         mark: RingMark::Plain,
     },
     Device {
-        name: "Laptop",
-        glyph: Some(Icon::Monitor),
+        name: "This computer",
         level: 150,
         mark: RingMark::Charging,
     },
@@ -71,15 +66,15 @@ const fn at(hour: u8, minute: u8) -> ClockTime {
 const CITIES: [City; 4] = [
     City {
         name: "Taipei",
-        time: at(9, 50),
+        time: at(10, 9),
         phase: DayPhase::Day,
         offset: "Today",
     },
     City {
         name: "London",
         time: ClockTime {
-            hour: 2,
-            minute: 50,
+            hour: 3,
+            minute: 9,
             second: Seconds::Shown(42),
         },
         phase: DayPhase::Night,
@@ -87,86 +82,32 @@ const CITIES: [City; 4] = [
     },
     City {
         name: "New York",
-        time: at(21, 50),
+        time: at(22, 9),
         phase: DayPhase::Night,
         offset: "-12 h",
     },
     City {
         name: "Tokyo",
-        time: at(10, 50),
+        time: at(11, 9),
         phase: DayPhase::Day,
         offset: "+1 h",
     },
 ];
 
-/// What each look is, for its caption.
-fn battery_note(look: BatteryLook) -> &'static str {
-    match look {
-        BatteryLook::Ring => "Ring (today): a stroked ring on a faint track",
-        BatteryLook::Well => {
-            "Well: the ring lies in a groove pressed into the plate, round a raised boss holding the glyph; the level is a glossy liquid; the bolt is a lit boss"
-        }
-        BatteryLook::Cell => {
-            "Cell: a recessed capsule bed holding a glossy liquid as wide as the level, with a nub; low and critical recolour the liquid only"
-        }
-    }
-}
-
-fn dial_note(dial: DialLook) -> &'static str {
-    match dial {
-        DialLook::Paper => "Paper (today): a flat paper disc by day, ink by night",
-        DialLook::Bezel => {
-            "Bezel: a raised rim round a recessed sky face, a minute track, tapered hands over their shadow, a hub ringed in the accent"
-        }
-        DialLook::Sky => {
-            "Sky: the dial is a well in the plate with the sky as its ground, dots and quarter bars, tapered hands over their shadow"
-        }
-    }
-}
-
-fn finish_note(finish: FrameFinish) -> &'static str {
-    match finish {
-        FrameFinish::Plain => "Plain (today): the Widget material's plate",
-        FrameFinish::Lit => "Lit: the plate bevel, a sheen down the top and a shaded foot",
-    }
-}
-
 /// The page.
 #[component]
 pub fn WidgetLooksPage() -> Element {
     rsx! {
-        Section { title: "Battery", note: "LevelRing {{ look }}: a Small card with this computer at 84 % (the hero percentage in the display face), and a Medium card with four devices: 8 % (critical), 45 %, 100 %, and 15 % charging (never low while charging).",
+        Section { title: "Battery", note: "BatteryLevel: an extruded battery body with an inset channel filled to the level (ink; amber at a fifth or less, red at a tenth, green while charging, with a bolt) and the percentage beside it. Small: this computer at 84 %, the percentage the hero. Medium: a row per device at 8, 45, 100 and 15 % charging.",
             Wall {
-                for look in BatteryLook::ALL {
-                    Candidate { note: battery_note(look),
-                        BatterySmall { look }
-                        BatteryMedium { look }
-                    }
-                }
+                BatterySmall {}
+                BatteryMedium {}
             }
         }
-        Section { title: "World clock", note: "ClockFace {{ dial }}: a Small card with the digital row and a Medium card with four analog dials, Taipei and Tokyo by day, London (seconds shown) and New York by night; the day dial is always the light pair and the night dial the dark pair, whatever the desktop.",
+        Section { title: "World clock", note: "ClockFace: Small, the time in the display face with the sun beside the city; Medium, four dials inset in the plate with extruded hands, Taipei and Tokyo by day (the plate's colour, ink hands), London (seconds shown) and New York by night (a near-black well, pale hands).",
             Wall {
-                for dial in DialLook::ALL {
-                    Candidate { note: dial_note(dial),
-                        ClockSmall { dial }
-                        ClockMedium { dial }
-                    }
-                }
-            }
-        }
-        Section { title: "Card finish", note: "WidgetFrame {{ finish }}: Plain is the Widget material's plate as it is; Lit adds the plate bevel of the app icons (a brighter top highlight, a sheen down the top, a shaded foot) inside the material's own edge and drop.",
-            Wall {
-                for finish in FrameFinish::ALL {
-                    Candidate { note: finish_note(finish),
-                        WidgetFrame { size: WidgetSize::Small, finish, title: Some(WidgetTitle::new(Icon::BatteryFull, "Battery")),
-                            Hero { number: "84", label: "This computer",
-                                LevelRing { level: Fraction(840), label: "This computer", look: BatteryLook::Cell }
-                            }
-                        }
-                        ClockMediumIn { dial: DialLook::Sky, finish }
-                    }
-                }
+                ClockSmall {}
+                ClockMedium {}
             }
         }
     }
@@ -189,102 +130,43 @@ fn Wall(children: Element) -> Element {
                 blur,
                 chrome: Some(RootChrome::Transparent),
                 stylesheet: Inject::Host,
-                div { class: "g-wl-grid", style: WidgetMetrics::default().style_attr(), {children} }
+                div { class: "g-wl-cards", style: WidgetMetrics::default().style_attr(), {children} }
             }
         }
     }
 }
 
-/// One candidate: its caption over its cards.
-#[component]
-fn Candidate(note: &'static str, children: Element) -> Element {
-    rsx! {
-        div { class: "g-wl-candidate",
-            span { class: "g-wl-note", "{note}" }
-            div { class: "g-wl-cards", {children} }
-        }
-    }
-}
-
-/// A hero value in the display face with its unit, the gauge under it, and a label.
-#[component]
-fn Hero(number: &'static str, label: &'static str, children: Element) -> Element {
-    rsx! {
-        div { class: "g-wl-hero",
-            span { class: "g-wl-number", "{number}" span { class: "g-wl-unit", "%" } }
-            {children}
-            span { class: "g-wl-label", "{label}" }
-        }
-    }
+fn percent(device: Device) -> u16 {
+    (device.level + 5) / 10
 }
 
 #[component]
-fn BatterySmall(look: BatteryLook) -> Element {
-    let finish = FrameFinish::Lit;
+fn BatterySmall() -> Element {
     let title = Some(WidgetTitle::new(Icon::BatteryFull, "Battery"));
     rsx! {
-        WidgetFrame { size: WidgetSize::Small, finish, title,
-            match look {
-                BatteryLook::Ring => rsx! {
-                    div { class: "g-wl-ring-small",
-                        LevelRing { level: Fraction(840), label: "This computer", look }
-                        span { class: "g-widgets-percent", "84%" }
-                    }
-                },
-                BatteryLook::Well => rsx! {
-                    div { class: "g-wl-well-small",
-                        LevelRing { level: Fraction(840), label: "This computer", look,
-                            Glyph { icon: Icon::Monitor, size: IconSize::Base }
-                        }
-                        div { class: "g-wl-stack",
-                            span { class: "g-wl-number", "84" span { class: "g-wl-unit", "%" } }
-                            span { class: "g-wl-label", "Built-in" }
-                        }
-                    }
-                },
-                BatteryLook::Cell => rsx! {
-                    Hero { number: "84", label: "This computer",
-                        LevelRing { level: Fraction(840), label: "This computer", look }
-                    }
-                },
+        WidgetFrame { size: WidgetSize::Small, title,
+            div { class: "g-wl-foot",
+                div { class: "g-wl-hero",
+                    span { class: "g-wl-number", "84" span { class: "g-wl-unit", "%" } }
+                    BatteryLevel { level: Fraction(840), label: "This computer, 84%" }
+                }
+                span { class: "g-wl-label", "This computer" }
             }
         }
     }
 }
 
 #[component]
-fn BatteryMedium(look: BatteryLook) -> Element {
-    let finish = FrameFinish::Lit;
+fn BatteryMedium() -> Element {
     let title = Some(WidgetTitle::new(Icon::BatteryFull, "Batteries"));
-    let percent = |device: Device| (device.level + 5) / 10;
     rsx! {
-        WidgetFrame { size: WidgetSize::Medium, finish, title,
-            if look == BatteryLook::Cell {
-                div { class: "g-wl-cells",
-                    for device in DEVICES {
-                        div { key: "{device.name}", class: "g-wl-cell-row",
-                            div { class: "g-wl-cell-head",
-                                if let Some(icon) = device.glyph {
-                                    Glyph { icon, size: IconSize::Compact }
-                                }
-                                span { class: "g-wl-cell-name", "{device.name}" }
-                                span { class: "g-wl-cell-pct", "{percent(device)}%" }
-                            }
-                            LevelRing { level: Fraction(device.level), mark: device.mark, label: device.name, look }
-                        }
-                    }
-                }
-            } else {
-                div { class: "g-wl-rings",
-                    for device in DEVICES {
-                        div { key: "{device.name}", class: "g-wl-ring-col",
-                            LevelRing { level: Fraction(device.level), mark: device.mark, label: device.name, look,
-                                if let Some(icon) = device.glyph {
-                                    Glyph { icon, size: IconSize::Base }
-                                }
-                            }
-                            span { class: "g-wl-ring-pct", "{percent(device)}%" }
-                        }
+        WidgetFrame { size: WidgetSize::Medium, title,
+            div { class: "g-wl-rows",
+                for device in DEVICES {
+                    div { key: "{device.name}", class: "g-wl-row",
+                        BatteryLevel { level: Fraction(device.level), mark: device.mark, label: device.name }
+                        span { class: "g-wl-name", "{device.name}" }
+                        span { class: "g-wl-pct", "{percent(device)}%" }
                     }
                 }
             }
@@ -293,13 +175,12 @@ fn BatteryMedium(look: BatteryLook) -> Element {
 }
 
 #[component]
-fn ClockSmall(dial: DialLook) -> Element {
-    let finish = FrameFinish::Lit;
+fn ClockSmall() -> Element {
     let [city, ..] = CITIES;
     rsx! {
-        WidgetFrame { size: WidgetSize::Small, finish, title: Some(WidgetTitle::new(Icon::Clock, "Clock")),
-            div { class: "g-wl-digital",
-                ClockFace { time: city.time, phase: city.phase, look: ClockLook::Digital, label: city.name, dial }
+        WidgetFrame { size: WidgetSize::Small, title: Some(WidgetTitle::new(Icon::Clock, "Clock")),
+            div { class: "g-wl-foot",
+                ClockFace { time: city.time, phase: city.phase, look: ClockLook::Digital, label: city.name }
                 span { class: "g-wl-label", "{city.offset}" }
             }
         }
@@ -307,18 +188,13 @@ fn ClockSmall(dial: DialLook) -> Element {
 }
 
 #[component]
-fn ClockMedium(dial: DialLook) -> Element {
-    rsx! { ClockMediumIn { dial, finish: FrameFinish::Lit } }
-}
-
-#[component]
-fn ClockMediumIn(dial: DialLook, finish: FrameFinish) -> Element {
+fn ClockMedium() -> Element {
     rsx! {
-        WidgetFrame { size: WidgetSize::Medium, finish, title: Some(WidgetTitle::new(Icon::Clock, "World Clock")),
+        WidgetFrame { size: WidgetSize::Medium, title: Some(WidgetTitle::new(Icon::Clock, "World Clock")),
             div { class: "g-wl-dials",
                 for city in CITIES {
-                    div { key: "{city.name}", class: "g-wl-stack g-wl-dial",
-                        ClockFace { time: city.time, phase: city.phase, label: city.name, dial }
+                    div { key: "{city.name}", class: "g-wl-dial",
+                        ClockFace { time: city.time, phase: city.phase, label: city.name }
                         span { class: "g-wl-label", "{city.offset}" }
                     }
                 }

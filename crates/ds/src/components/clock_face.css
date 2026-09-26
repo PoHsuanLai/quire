@@ -1,55 +1,42 @@
-/* ClockFace (design/04 "Widgets"; design/20 section 1.14; sill FINDINGS Q183). The analog dial
-   is a 72 px round paper face (four fit a medium widget's row) in a scope of its phase's scheme
-   (light by day, dark by night), so the face is `--paper` and the hands `--ink` of that scheme;
-   the second hand is `--accent`. The vectors fill the dial and take their colour from their own
-   element (CSS does not reach inside an SVG on Blitz, spike S6). The digital face is the data
-   face, tabular, and bumps on each new minute. The label (the city) sits under either in the
-   help type. */
+/* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"; sill FINDINGS Q183).
+   The analog dial is a 56 px soft well (four fit a medium widget's row): the plate pressed in
+   (`--soft-inset-dark` up and left inside it, `--soft-inset-light` down and right), of the
+   plate's own colour by day and `--soft-night` by night (whose well keeps only its shade: a
+   light inside a dark ground would read as gloss). Four quarter marks at .4 of the hands'
+   colour; the hour and minute hands and the hub are thick and round and stand out of the well:
+   each is drawn over a shade in `--soft-tone-dark` thrown down and right and a light in
+   `--soft-tone-light` thrown up and left (by night the light is dropped: it would glow on the
+   dark ground). The hands are `--ink` by day, `--paper` by night (`--ink-soft` on a dark desktop,
+   whose ink is already pale); the thin second hand and its dot are `--accent`. The vectors fill
+   the dial and take their colour from their own element (CSS does not reach inside an SVG on
+   Blitz, spike S6). The digital face is the display face, tabular, the hero size in a small
+   widget and a step down anywhere else, and bumps on each new minute; its city wears the
+   phase's mark, a sun disc in `--warn` or a crescent moon in `--ink-faint`. The city is the UI
+   face under either. */
 
-.ds-clock{ display:flex; flex-direction:column; align-items:center; gap:var(--s-6); min-width:0; color:var(--ink); }
-.ds-clock-dial{ position:relative; width:72px; height:72px; border-radius:var(--r-pill);
-  background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1); }
+.ds-clock{ display:flex; flex-direction:column; align-items:center; gap:var(--s-8); min-width:0; color:var(--ink); }
+.ds-clock-dial{ position:relative; width:56px; height:56px; border-radius:var(--r-pill); color:var(--ink);
+  box-shadow:var(--soft-inset-dark), var(--soft-inset-light); }
+.ds-clock[*|data-phase=night] .ds-clock-dial{ background:var(--soft-night); color:var(--paper); box-shadow:var(--soft-inset-dark); }
+.ds[*|data-theme=dark] .ds-clock[*|data-phase=night] .ds-clock-dial{ color:var(--ink-soft); }
+.ds-clock-marks,
+.ds-clock-shade,
+.ds-clock-lit,
 .ds-clock-hands,
 .ds-clock-second{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+.ds-clock-shade{ color:var(--soft-tone-dark); }
+.ds-clock-lit{ color:var(--soft-tone-light); }
+.ds-clock[*|data-phase=night] .ds-clock-lit{ display:none; }
 .ds-clock-second{ color:var(--accent); }
 
-.ds-clock-digits{ display:inline-block; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-title); font-weight:600; line-height:1.1; }
-.ds-clock[*|data-look=digital][*|data-phase=night] .ds-clock-digits{ color:var(--ink-soft); }
-.ds-clock-label{ max-width:100%; font-size:var(--fs-help); font-weight:600; line-height:1.25; color:var(--ink-soft); white-space:nowrap; overflow:hidden; }
-
-/* The depth dials (design/23-WIDGETS.md section 4.2), written only when chosen (`data-dial`),
-   still in the phase's scheme. Bezel: a raised rim (`--widget-rim-*` lit top to shaded foot,
-   seated by `--widget-boss`) round a face recessed 5 px into it. Sky: no rim; the dial is a well
-   in the plate. Both: the face is a sky across the whole dial (`--widget-sky-*`, deeper at the
-   zenith) under the well shade; the indices are pressed in (a copy in `--widget-spec` a pixel
-   below each); the tapered hands stand over a shadow copy offset down and right; the accent
-   second hand has a counterweight; a paper hub ringed in the accent; and a glass highlight
-   fades down the top of the face. A digital face with a depth dial sets the time in the
-   display face beside a disc of the sky. */
-
-.ds-clock[*|data-dial] .ds-clock-dial{ background:transparent; box-shadow:none; }
-.ds-clock[*|data-dial=bezel] .ds-clock-dial{ background-image:linear-gradient(var(--widget-rim-top), var(--widget-rim-bottom));
-  box-shadow:var(--widget-boss); }
-.ds-clock[*|data-dial=sky] .ds-clock-dial{ box-shadow:0 1px 0 var(--widget-spec); }
-.ds-clock-face{ position:absolute; inset:0; border-radius:var(--r-pill);
-  background-image:linear-gradient(var(--widget-sky-top), var(--widget-sky-bottom)); box-shadow:var(--widget-well-shade); }
-.ds-clock[*|data-dial=bezel] .ds-clock-face{ inset:5px; }
-.ds-clock-glass{ position:absolute; inset:7px; border-radius:var(--r-pill); pointer-events:none;
-  background-image:linear-gradient(var(--widget-glass), transparent 42%); }
-.ds-clock[*|data-dial=sky] .ds-clock-glass{ inset:3px; }
-.ds-clock-ticks,
-.ds-clock-ticks-lit,
-.ds-clock-shade{ position:absolute; inset:0; display:block; width:100%; height:100%; }
-.ds-clock-ticks{ color:var(--ink); }
-.ds-clock-ticks-lit{ color:var(--widget-spec); transform:translateY(1px); }
-.ds-clock-shade{ color:var(--widget-hand-shadow); transform:translate(1.5px, 3px); }
-.ds-clock[*|data-dial] .ds-clock-hands{ color:var(--ink); }
-.ds-clock-hub{ position:absolute; top:50%; left:50%; box-sizing:border-box; width:10px; height:10px; margin-top:calc(var(--s-5) * -1); margin-left:calc(var(--s-5) * -1);
-  border:2.5px solid var(--accent); border-radius:var(--r-pill); background:var(--paper); box-shadow:0 1px 2px var(--widget-hand-shadow); }
-
-.ds-clock[*|data-dial][*|data-look=digital]{ align-items:flex-start; gap:var(--s-4); }
-.ds-clock-row{ display:flex; align-items:center; gap:var(--s-8); }
-.ds-clock[*|data-dial] .ds-clock-digits{ font-family:var(--font-display); font-size:var(--fs-widget-hero); font-weight:700; letter-spacing:-.02em; line-height:1; }
-.ds-clock[*|data-dial][*|data-look=digital][*|data-phase=night] .ds-clock-digits{ color:var(--ink); }
-.ds-clock-sky{ display:block; width:18px; height:18px; border-radius:var(--r-pill);
-  background-image:linear-gradient(var(--widget-sky-top), var(--widget-sky-bottom)); box-shadow:var(--widget-well-shade); }
+.ds-clock[*|data-look=digital]{ align-items:flex-start; gap:var(--s-4); }
+.ds-clock-digits{ display:inline-block; font-family:var(--font-display); font-variant-numeric:tabular-nums; font-size:var(--fs-subject);
+  font-weight:700; letter-spacing:-.02em; line-height:1; }
+.ds-widget[*|data-size=small] .ds-clock-digits{ font-size:var(--fs-widget-hero); }
+.ds-clock-label{ display:flex; align-items:center; gap:var(--s-4); max-width:100%; font-family:var(--font-ui); font-size:var(--fs-help);
+  font-weight:600; line-height:1.25; color:var(--ink); }
+.ds-clock-city{ white-space:nowrap; overflow:hidden; }
+.ds-clock-sun,
+.ds-clock-moon{ display:block; flex:none; width:12px; height:12px; }
+.ds-clock-sun{ color:var(--warn); }
+.ds-clock-moon{ color:var(--ink-faint); }
