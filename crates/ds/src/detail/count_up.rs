@@ -116,6 +116,9 @@ fn start(cue: Cue, last_serial: u32, shown: i64, value: i64, motion: MotionLevel
 
 /// The number at `tween`'s frame, repainted no more often than `--t-count-step`.
 fn floored(count: Counting, tween: Tween) -> i64 {
+    if tween.landed() && tween.run() != count.armed {
+        return count.to;
+    }
     match count.last {
         Some((run, at, number)) if run == tween.run() && at == bucket(tween.elapsed()) => number,
         _ => shown(count, tween),
@@ -132,7 +135,7 @@ fn shown(count: Counting, tween: Tween) -> i64 {
         return count.to;
     }
     let span = count.to - count.from;
-    let along = count.from + span * i64::from(tween.progress().0) / 1000;
+    let along = count.from + (span * i64::from(tween.progress().0) + span.signum() * 500) / 1000;
     if span >= 0 {
         along.min(count.to)
     } else {
