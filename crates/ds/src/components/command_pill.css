@@ -13,5 +13,5 @@
 .ds-command-pill-label{ min-width:0; }
 .ds-command-pill-keys{
   margin-left:auto; white-space:nowrap; flex:none;
-  font-family:var(--font-data); font-size:var(--fs-caption); color:var(--f-ink-faint);
+  font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--f-ink-faint);
 }

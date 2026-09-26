@@ -25,6 +25,7 @@ pub mod spacing;
 pub mod timing;
 pub mod tuned;
 pub mod type_scale;
+pub mod type_voice;
 pub mod widget_paint;
 pub mod widgets;
 
@@ -50,5 +51,6 @@ pub use spacing::SpacingToken;
 pub use timing::{DurationKind, DurationToken};
 pub use tuned::Tuned;
 pub use type_scale::{Family, FontSize};
+pub use type_voice::VoiceToken;
 pub use widget_paint::WidgetPaint;
 pub use widgets::WidgetMetrics;

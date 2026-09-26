@@ -1,11 +1,12 @@
-//! The token blocks: `.ds` (light, Standard) and `.ds[data-theme=dark]`, plus one
-//! `.ds[data-motion=…]` block per non-standard level.
+//! The token blocks: `.ds` (light, Standard, System typeface) and `.ds[data-theme=dark]`, the
+//! `.ds[data-typeface=editorial]` block, plus one `.ds[data-motion=…]` block per non-standard
+//! level.
 //!
-//! The dark block and each level block write only the tokens whose value differs from `.ds`'s,
+//! The dark block, the typeface block and each level block write only the tokens whose value differs from `.ds`'s,
 //! so every name a dark or level block sets is also declared on `.ds` (tests/tokens.rs).
 
 use super::emit::{attr_selector, declaration, rule};
-use crate::appearance::{MotionLevel, Scheme};
+use crate::appearance::{MotionLevel, Scheme, Typeface};
 use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
 use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
@@ -15,7 +16,7 @@ use crate::tokens::widgets::WIDGET_TOKENS;
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
-    WidgetPaint, ZLayer,
+    VoiceToken, WidgetPaint, ZLayer,
 };
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
@@ -23,6 +24,7 @@ use crate::tokens::{
 pub fn tokens_css() -> String {
     let mut light = scheme_tokens(Scheme::Light);
     light.extend(fixed_tokens());
+    light.extend(typeface_tokens(Typeface::System));
     light.extend(motion_tokens(MotionLevel::Standard));
     light.push("color-scheme:light;".to_owned());
     let mut dark = changed(&scheme_tokens(Scheme::Light), scheme_tokens(Scheme::Dark));
@@ -31,6 +33,16 @@ pub fn tokens_css() -> String {
     css.push_str(&rule(
         &format!(".ds{}", attr_selector("data-theme", Scheme::Dark.slug())),
         &dark,
+    ));
+    css.push_str(&rule(
+        &format!(
+            ".ds{}",
+            attr_selector("data-typeface", Typeface::Editorial.slug())
+        ),
+        &changed(
+            &typeface_tokens(Typeface::System),
+            typeface_tokens(Typeface::Editorial),
+        ),
     ));
     for level in [MotionLevel::Calm, MotionLevel::Extra, MotionLevel::Reduced] {
         let overrides = changed(&motion_tokens(MotionLevel::Standard), motion_tokens(level));
@@ -90,11 +102,9 @@ fn fixed_tokens() -> Vec<String> {
     let spacing = SpacingToken::ALL
         .into_iter()
         .map(|step| declaration(step.var(), &step.css()));
-    let families = Family::ALL
-        .into_iter()
-        .map(|family| declaration(family.var(), family.stack()));
     let sizes = FontSize::ALL
         .into_iter()
+        .filter(|size| !FontSize::CAP_FITTED.contains(size))
         .map(|size| declaration(size.var(), size.css()));
     let layers = ZLayer::ALL
         .into_iter()
@@ -121,12 +131,26 @@ fn fixed_tokens() -> Vec<String> {
     radii
         .chain(people)
         .chain(spacing)
-        .chain(families)
         .chain(sizes)
         .chain(layers)
         .chain(opacities)
         .chain(tuned)
         .collect()
+}
+
+/// The family stacks, the voice tokens and the cap-fitted sizes under `typeface`
+/// (design/02-TYPE.md sections 2 and 4.1).
+fn typeface_tokens(typeface: Typeface) -> Vec<String> {
+    let sizes = FontSize::CAP_FITTED
+        .into_iter()
+        .map(|size| declaration(size.var(), size.css_in(typeface)));
+    let families = Family::ALL
+        .into_iter()
+        .map(|family| declaration(family.var(), family.stack_in(typeface)));
+    let voice = VoiceToken::ALL
+        .into_iter()
+        .map(|token| declaration(token.var(), token.css(typeface)));
+    families.chain(voice).chain(sizes).collect()
 }
 
 /// Durations, the CSS delays, easings and scalars at `level`.

@@ -1,7 +1,8 @@
-//! The gallery's command line: `ds-gallery [--page PAGE] [--snapshot DIR [--scale PERCENT]]
-//! [--level-sheet DIR] [--persona-frames DIR]`.
+//! The gallery's command line: `ds-gallery [--page PAGE] [--typeface system|editorial]
+//! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--persona-frames DIR]`.
 
 use crate::page::Page;
+use ds::Typeface;
 use std::path::PathBuf;
 
 /// What the gallery was asked to do.
@@ -17,6 +18,8 @@ pub struct Args {
     pub persona_frames: Option<PathBuf>,
     /// With `--snapshot`, the device scale in percent (100 when absent; 100 to 300).
     pub scale: Option<u16>,
+    /// The typeface the root speaks in (the settings default when absent).
+    pub typeface: Option<Typeface>,
 }
 
 /// A command line that is not one the gallery understands.
@@ -92,6 +95,15 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                     .ok_or_else(|| ArgsError(format!("--scale takes 100 to 300, not {word:?}")))?;
                 parsed.scale = once(parsed.scale, scale, "--scale")?;
             }
+            "--typeface" => {
+                let word = value("a typeface")?;
+                let typeface = Typeface::parse(&word).ok_or_else(|| {
+                    ArgsError(format!(
+                        "--typeface takes system or editorial, not {word:?}"
+                    ))
+                })?;
+                parsed.typeface = once(parsed.typeface, typeface, "--typeface")?;
+            }
             _ => return Err(ArgsError(format!("unknown argument {flag:?}"))),
         }
     }
@@ -136,6 +148,7 @@ mod tests {
             level_sheet: None,
             persona_frames: None,
             scale: None,
+            typeface: None,
         }
     }
 
@@ -187,6 +200,14 @@ mod tests {
                     ..args(None, Some("out"))
                 }),
             ),
+            (
+                &["--typeface", "editorial"],
+                Ok(Args {
+                    typeface: Some(ds::Typeface::Editorial),
+                    ..args(None, None)
+                }),
+            ),
+            (&["--typeface", "serif"], Err("--typeface takes system")),
             (&["--scale", "50"], Err("--scale takes 100 to 300")),
             (&["--scale", "2x"], Err("--scale takes 100 to 300")),
             (&["--verbose"], Err("unknown argument")),

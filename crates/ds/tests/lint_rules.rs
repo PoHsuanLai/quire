@@ -245,6 +245,27 @@ const CASES: &[Case] = &[
         expect: false,
     },
     Case {
+        name: "font-family: the code face token passes (Inter system face)",
+        css: ".log { font-family: var(--font-code); }",
+        profile: Profile::Strict,
+        rule: Rule::FontFamily,
+        expect: false,
+    },
+    Case {
+        name: "font-family: Inter named outright fails",
+        css: ".label { font-family: \"Inter\", sans-serif; }",
+        profile: Profile::Strict,
+        rule: Rule::FontFamily,
+        expect: true,
+    },
+    Case {
+        name: "a voice token is declared",
+        css: ".label { letter-spacing: var(--tracking-caps); font-weight: var(--fw-caps); }",
+        profile: Profile::Strict,
+        rule: Rule::UndeclaredVar,
+        expect: false,
+    },
+    Case {
         name: "font-family: a serif named outright still fails",
         css: ".serif { font-family: Georgia, serif; }",
         profile: Profile::Strict,

@@ -16,6 +16,8 @@
 # history: its WOFF2s were cut from the OFL variable files Fedora ships
 # (`NotoSerif[wght].ttf`, `NotoSerif-Italic[wght].ttf`, version 2.015, weights 400-700) with the
 # same pyftsubset options and `--flavor=woff2`, one per subset, then converted here.
+# Inter (the System typeface) is the same: `cut-inter.sh` cuts its WOFF2s from the official
+# release's variable fonts and then runs this script on them.
 set -euo pipefail
 cd "$(dirname "$0")/../assets/fonts"
 
@@ -44,6 +46,8 @@ for woff2 in "${files[@]}"; do
     karla-*) family="Karla" ;;
     space-mono-*) family="Space Mono" ;;
     noto-serif-*) family="Noto Serif" ;;
+    inter-display-*) family="Inter Display" ;;
+    inter-*) family="Inter" ;;
     *) echo "unknown family: $stem" >&2; exit 1 ;;
   esac
   # Google's Bricolage names its family after the default instance ("Bricolage Grotesque 96pt

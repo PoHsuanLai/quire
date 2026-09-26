@@ -30,7 +30,7 @@ pub mod window;
 
 pub use appearance::{
     Accent, Appearance, Contrast, Look, Motion, MotionLevel, PeekMode, ReducedMotion, Resolved,
-    Scheme, SystemPrefs, Theme, Warmth, resolve,
+    Scheme, SystemPrefs, Theme, Typeface, Warmth, resolve,
 };
 pub use components::*;
 pub use css::stylesheet;
@@ -77,7 +77,7 @@ pub use overlay::{
 };
 pub use root::{
     Ds, Env, FrameTint, Ground, HostModality, HostScale, Inject, InputModality, RootChrome,
-    RootExtent, Surface, use_env, use_scale,
+    RootExtent, Surface, use_env, use_scale, use_typeface,
 };
 pub use space::{
     Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
@@ -91,7 +91,7 @@ pub use tokens::{
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
     FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, NotificationMetrics,
     OpacityToken, OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow,
-    ShellMetrics, SpacingToken, Tuned, VarName, WidgetMetrics, ZLayer, quad,
+    ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, WidgetMetrics, ZLayer, quad,
 };
 pub use window::{
     Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,
