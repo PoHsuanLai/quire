@@ -24,7 +24,8 @@
 .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
 /* The field draws its caret among the dots in their ink (Q360b); the input's own stays hidden. */
 .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-.ds-lock-field .ds-input-caret::before{ background:var(--lock-ink); }
+/* Half the pill's .14em tracking back, so the caret stays centred in the gap (Q360b). */
+.ds-lock-field .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
 .ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
 .ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
 

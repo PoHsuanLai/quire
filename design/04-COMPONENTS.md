@@ -754,7 +754,8 @@ is required so the global focus ring does not double the accent ring.
   field's hidden text in its editor's face, untracked, so its caret drifts off the Inter dots.
   Where the host reads the selection (`ds::HostSelection`, ds-native's `focus::SELECTION`), the
   input carries `data-caret=drawn` (`caret-color: transparent`) and `.ds-input-mask` draws the
-  caret itself: `span.ds-input-caret` between the dots at the caret's character, Blitz's caret
+  caret itself: `span.ds-input-caret` centred in the gap between the dots at the caret's
+  character (half the tracking back; half a gap after the last dot at the end), Blitz's caret
   redrawn (1.5 px, the line's height, the dots' ink, `--accent` on Bare, no blink, as Blitz's
   does not blink), shown only while the field has the keyboard and nothing is selected. A
   selected range is `span.ds-input-mask-selected` on `--accent-soft`. A Boxed mask's line is

@@ -4669,6 +4669,13 @@ sill Q360b, the follow-up to Q360. Branch `q360b`.
   (`top:-1.139em`, Inter's ascent .969em plus the half-leading of a 1.55 line). A first try, an
   inline-block the line's height with `vertical-align:top`, pushed the line's baseline down and
   the dots dropped 4 px whenever the caret showed: Blitz sat the box on the baseline.
+- **Centred in the gap.** The point the layout gives is the previous dot's advance end, which
+  includes its tracking, so a bar drawn from there stood against the next dot's ink (after Left
+  x3 in the polkit field, 0.25 px into the ninth dot). A bullet's side bearings are equal, so the
+  gap's centre is half the tracking back: the bar goes back `calc(-.05em - .75px)` (half of
+  .1em and half its 1.5 px; `-.07em` in the lock pill's .14em, `-.75px` on Bare, whose tracking
+  is its parent's). The end caret keeps the same rule and stands half a gap after the last dot.
+  Measured: 2.25 px clear of the eighth dot's ink and 1.25 px of the ninth's.
 - **Selection.** Blitz paints its own selection over the hidden text in `SELECTION_COLOR`
   (rgb 180 213 255, a constant in blitz-paint), which no style reaches. A Boxed mask's content
   box is exactly the input's, so the mask takes `--surface` clipped to its content box and
@@ -4682,11 +4689,13 @@ sill Q360b, the follow-up to Q360. Branch `q360b`.
   the mask does not scroll (it clips at the right), so a caret past the field's width is
   clipped with the dots. Passwords that long in a 260 to 300 px field are rare.
 - **Regression.** `ds-native/tests/secret_mask_align.rs` reads the painted pixels in the polkit
-  field: after 4, 11 and 24 characters the caret's ink sits within 1 px of the last dot's
-  advance end (the mask's padding plus N dot pitches, both from darkness-weighted centres; it
-  measures 0.02 px and 0.2 px off), the dots do not move when the caret shows, and Tab away
-  leaves no caret ink; after Left x3 the caret is before the third dot from the end, within 1 px
-  of the eighth dot's end. With the drawn caret off the first check fails at 5.8 px.
+  field: after 4, 11 and 24 characters the caret's ink sits within 1 px of the middle of the gap
+  after the last dot (the mask's padding plus N dot pitches, both from darkness-weighted centres,
+  less half the tracking; 0.1 px off) and at least 1 px clear of that dot's ink, the dots do not
+  move when the caret shows, and Tab away leaves no caret ink; after Left x3 the caret has at
+  least 1 px of clear space to the eighth and the ninth dot's ink and sits within 1 px of the
+  gap's middle. With the drawn caret off the first check fails at 5.8 px; with it flush at the
+  advance end, Left x3 fails at -0.25 px.
 - **API.** New: `ds::HostSelection`, `ds::FieldSelection`, `ds_native::focus::SELECTION`. New
   classes `.ds-input-caret`, `.ds-input-mask-selected` inside `.ds-input-mask`, and
   `data-caret=drawn` on a masked `input.ds-input`; `.ds-input-mask`'s text is still one dot per

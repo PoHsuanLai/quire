@@ -6,8 +6,9 @@
 //!
 //! Q360b: Blitz measures the hidden text in its editor's own face, untracked, so its caret fell
 //! short of the Inter dots tracked .1em (two dots short at eleven). The field draws its own caret
-//! among the dots: after N characters the painted caret sits at the end of the N-th dot's advance,
-//! after Left x3 before the third dot from the end, and an unfocused field paints no caret.
+//! among the dots, centred in the gap: after N characters the painted caret sits half a gap after
+//! the N-th dot, after Left x3 clear of both the eighth and the ninth dot, and an unfocused field
+//! paints no caret.
 
 use dioxus::prelude::*;
 use ds::{
@@ -152,8 +153,8 @@ fn caret_left(shot: &RgbaImage, field: Rect) -> Option<f32> {
     Some(caret.centre(shot, from, last + 1, ground) - 0.75)
 }
 
-/// Each dot's ink, left to right: `(left column, centre)` in page pixels.
-fn dots(shot: &RgbaImage, field: Rect) -> Vec<(u32, f32)> {
+/// Each dot's ink, left to right, in page pixels.
+fn dots(shot: &RgbaImage, field: Rect) -> Vec<Dot> {
     let band = Band::of(field);
     let ground = luma(*shot.get_pixel(band.right - 2, band.top + 2));
     let columns: Vec<u32> = (band.left..band.right)
@@ -167,13 +168,20 @@ fn dots(shot: &RgbaImage, field: Rect) -> Vec<(u32, f32)> {
         }
     }
     runs.into_iter()
-        .map(|(from, to)| {
-            (
-                from,
-                band.centre(shot, from.saturating_sub(1), to + 1, ground),
-            )
+        .map(|(from, to)| Dot {
+            left: from,
+            right: to + 1,
+            centre: band.centre(shot, from.saturating_sub(1), to + 1, ground),
         })
         .collect()
+}
+
+/// One dot's ink: its first column, the column after its last, and its darkness-weighted centre.
+#[derive(Debug, Clone, Copy)]
+struct Dot {
+    left: u32,
+    right: u32,
+    centre: f32,
 }
 
 /// A polkit prompt with `typed` in its field and the keys `after` pressed, settled.
@@ -194,7 +202,7 @@ fn typed_into(typed: &str, after: &[Key]) -> Harness {
 
 /// Where the field's dots are once it has lost the keyboard (and whether a caret still paints):
 /// the dots unfocused are where they were, with no caret among them.
-fn blurred_dots(harness: &mut Harness, field: Rect) -> (Vec<(u32, f32)>, Option<f32>) {
+fn blurred_dots(harness: &mut Harness, field: Rect) -> (Vec<Dot>, Option<f32>) {
     harness.key(Key::Tab);
     harness.advance(Duration::from_millis(300));
     assert!(
@@ -211,11 +219,18 @@ fn ink_top(shot: &RgbaImage, field: Rect, x: u32) -> Option<u32> {
     (band.top..band.bottom).find(|&y| inked(*shot.get_pixel(x, y)))
 }
 
-/// Where the n-th dot's advance ends, from the dots' pitch and the mask's leading padding.
-fn advance_end(dots: &[(u32, f32)], n: usize, text_start: f32) -> f32 {
-    let (first, last) = (dots[0].1, dots[dots.len() - 1].1);
+/// The mask's tracking (`letter-spacing: .1em` at `--fs-body` 13.5 px).
+const TRACKING: f32 = 1.35;
+
+/// The drawn caret's width, as Blitz's.
+const CARET_W: f32 = 1.5;
+
+/// Where the caret after the n-th dot stands: centred in the gap after it, half the tracking
+/// before the dot's advance ends (the mask's padding plus n dot pitches).
+fn caret_after(dots: &[Dot], n: usize, text_start: f32) -> f32 {
+    let (first, last) = (dots[0].centre, dots[dots.len() - 1].centre);
     let pitch = (last - first) / (dots.len() - 1) as f32;
-    text_start + n as f32 * pitch
+    text_start + n as f32 * pitch - TRACKING / 2.0 - CARET_W / 2.0
 }
 
 #[test]
@@ -232,22 +247,27 @@ fn the_drawn_caret_sits_at_the_end_of_the_last_dot() {
         let (dots, after_blur) = blurred_dots(&mut harness, field);
         assert_eq!(dots.len(), n, "one dot per character: {dots:?}");
         assert_eq!(after_blur, None, "an unfocused field paints no caret");
-        let first_dot = dots[0].0 + 1;
+        let first_dot = dots[0].left + 1;
         assert_eq!(
             ink_top(&shot, field, first_dot),
             ink_top(&harness.render().expect("a frame"), field, first_dot),
             "{n} typed: the caret takes no room in the line, so the dots do not move with it"
         );
-        let end = advance_end(&dots, n, mask.origin.x.0 + MASK_PAD);
+        let want = caret_after(&dots, n, mask.origin.x.0 + MASK_PAD);
         assert!(
-            (caret - end).abs() <= 1.0,
-            "{n} typed: the caret is at {caret:.2}, the last dot's advance ends at {end:.2}"
+            (caret - want).abs() <= 1.0,
+            "{n} typed: the caret is at {caret:.2}, half a gap after the last dot is {want:.2}"
+        );
+        let gap = caret - dots[n - 1].right as f32;
+        assert!(
+            gap >= 1.0,
+            "{n} typed: {gap:.2} px from the last dot's ink to the caret"
         );
     }
 }
 
 #[test]
-fn after_left_three_times_the_caret_is_before_the_third_dot_from_the_end() {
+fn after_left_three_times_the_caret_stands_clear_between_the_eighth_and_ninth_dots() {
     let n = 11;
     let typed: String = "hunter2xWq".chars().cycle().take(n).collect();
     let mut harness = typed_into(&typed, &[Key::Left, Key::Left, Key::Left]);
@@ -259,16 +279,20 @@ fn after_left_three_times_the_caret_is_before_the_third_dot_from_the_end() {
     let caret = caret_left(&shot, field).expect("a caret in the focused field");
     let (dots, _) = blurred_dots(&mut harness, field);
     assert_eq!(dots.len(), n);
-    let third_from_end = dots[n - 3].0 as f32;
-    assert!(
-        caret < third_from_end,
-        "the caret at {caret:.2} is not before the third dot from the end at {third_from_end}"
+    let (eighth, ninth) = (dots[n - 4], dots[n - 3]);
+    let (before, after) = (
+        caret - eighth.right as f32,
+        ninth.left as f32 - (caret + CARET_W),
     );
-    let end = advance_end(&dots, n - 3, mask.origin.x.0 + MASK_PAD);
     assert!(
-        (caret - end).abs() <= 1.0,
-        "the caret is at {caret:.2}, the {}th dot's advance ends at {end:.2}",
-        n - 3
+        before >= 1.0 && after >= 1.0,
+        "the caret at {caret:.2} is not clear of both neighbours: {before:.2} px after the \
+         eighth dot's ink, {after:.2} px before the ninth's ({eighth:?}, {ninth:?})"
+    );
+    let want = caret_after(&dots, n - 3, mask.origin.x.0 + MASK_PAD);
+    assert!(
+        (caret - want).abs() <= 1.0,
+        "the caret is at {caret:.2}, the middle of the gap after the eighth dot is {want:.2}"
     );
 }
 
