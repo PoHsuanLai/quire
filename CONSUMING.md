@@ -1635,6 +1635,34 @@ Additive: one token, one utility class; the stylesheet's golden moved, no other 
 `.ds-emoji` is AnimatedEmoji's own root class; the text utility is `.ds-emoji-text`, not
 `.ds-emoji`.
 
+### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
+
+sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive
+for every call written before it: `CommandPalette.groups` now takes `PaletteGroups<T>`, which your
+`Vec<(String, Vec<MenuEntry<T>>)>` converts into unchanged (only a bare `groups: Vec::new()` needs
+`PaletteGroups::default()`); `MenuRow` gains `shape` (built through `..MenuRow::new(..)` as every
+caller does, nothing changes); `SearchField` gains `handle`, `SectionHeader` gains
+`action_selection`, the type scale gains `--fs-emoji-cell` and `--fs-emoji-preview`. No existing
+golden moved but the stylesheet's.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `MenuRow` | `shape: RowShape` (`Plain`) | `RowShape::File { thumb: Option<ImageSource>, location, modified }`: the thumbnail fills the tile (else your tile, the mime glyph), the name is the title, `location` (`~/Documents`) the second line in place of `detail`, `modified` leads the trail. `RowShape::Clip { body: ClipBody::Text { excerpt, lines } \| ClipBody::Image { src, size }, age }`: the text in the code face clipped to `lines` (1 to 4) in place of the title (which is still what the query matches), or the title over a 44 px tall picture; `age` leads the trail. Use `MenuEntry::Row(MenuRow { shape, tile, ..MenuRow::new(row, name) })` for file and clipboard results instead of `MenuEntry::Item` |
+| `CommandPalette` | `groups: PaletteGroups<T>` (`#[props(into)]`) | `PaletteGroups(vec![PaletteGroup::list(title, entries).with_action("Show More", handler), PaletteGroup::grid("Emoji", EmojiCells { cells, columns: EMOJI_COLUMNS, cell: EMOJI_CELL })])`. The cursor's numbers (`selected`, `on_select`) count *stops*: every row, every emoji cell, and each group's action after its last row or cell. With plain rows only, the numbers are what they were |
+| `PaletteGroup` | `{ title, entries: GroupEntries::{List(Vec<MenuEntry<T>>), Grid(EmojiCells<T>)}, action: Option<(String, EventHandler<()>)> }`; `list`, `grid`, `with_action` | The header's action is drawn as `SectionHeader`'s; Down past the group's last row rests on it (drawn selected), Enter runs it and the palette stays open. Swap the label to "Show Less" yourself when it expands |
+| `EmojiCell`, `EmojiCells` | `{ value: T, glyph, name }`; `{ cells, columns: u8, cell: Px }`; `EMOJI_COLUMNS` 8, `EMOJI_CELL` 56 | In a palette the field keeps the keyboard: Down enters the grid at its first cell, Left/Right walk cells wrapping rows, Up/Down move a row and leave the grid past its top and bottom rows, Enter picks (and closes). The name is the cell's label and Fly tooltip; show it in your preview pane too (`PaneContent::Emoji`). The grid carries `.ds-emoji-text` |
+| `EmojiGrid` | `cells`, `onpick`, `columns` (8), `cell` (56), `selected: Option<usize>`, `on_select`, `label` ("Emoji") | The same grid on its own, focusable, with its own arrow keys (it stays put at its edges) and Enter or Space picking; the selection is yours. `grid_step(selected, GridStep, count, columns) -> GridMove::{To(i), Out(GridEdge)}` is the pure move, to replace your `grid_step` stand-in (it wraps Left/Right across rows, which your freeze test's clamped Right from 7 does not) |
+| `CommandPalette` | `claim: Option<Callback<FieldKey, Claim>>` | Hears every key the field gets **before** the palette, the field and `onkey`, as `FieldKey { event, caret: Caret::{AtEnd, Inside, Unknown} }`. Answer `Claim::Take` and nothing else acts on it (the field types no Space, moves no caret); `Claim::Pass` and all goes on as before. Your preview keys: take `" "` while browsing, take `ArrowRight` when `caret == Caret::AtEnd`. `Unknown` only without ds-native's `HostCaret` (a webview, or a host that did not call `ds_native::focus::provide`; `launch` and the harness provide it) |
+| `CommandPalette` | `aside: Option<Element>`, `aside_width: Px` (`ASIDE_WIDTH`, 360) | Your pane beside the results, under the field, past a hairline. Over a window the card widens by `aside_width`; in a surface (the launcher) the card still fills its container: widen your panel by `PREVIEW_WIDTH_PX` while the pane is shown, and the blur region follows the card as before |
+| `PreviewPane` | `content: PaneContent`, `actions: Vec<PaneAction { label, shortcut: Shortcut }>`, `focused: Option<usize>`, `onaction: EventHandler<usize>`, `shown: Shown` (`Visible`), `on_hidden` | `PaneContent::{Image { src, size }, Text { excerpt, mono: Mono::{Monospace, Proportional} }, Pdf { page: PdfPage, name }, App { icon: IconSource, name, detail: Option<String> }, Facts { icon, title, rows: Vec<(String, String)> }, Emoji { glyph, name }, Web { host, url }}`. The pane never takes the keyboard: `focused` draws the ring on the action your Tab reached, and a click calls `onaction(i)`. It slides in as it mounts; to close it, pass `shown: Shown::Hidden`, keep it (and `aside`) until `on_hidden`, then drop both |
+| `ds_native::use_pdf_page` (feature `pdf-thumb`) | `(path: Option<PathBuf>, size: Size) -> Option<PdfPage>` | The page `PdfFileThumb` draws, for `PaneContent::Pdf { page, name }`: call it on every render of the component that draws the pane, with `Some(path)` only while the preview is a PDF and `size: ds::PANE_MEDIA`; `None` in, `None` out. Keep one `PreviewPane` mounted whatever the content, so a selection moving onto a PDF does not replay the pane's entrance |
+| `Icon` | `Clipboard`, `Smile`, `Globe` (Lucide, in `Icon::ACTIONS`) | The clipboard, emoji and web providers' glyphs: replace the `Copy`, `Sparkles` and `Search` stand-ins (a `match` of yours over `Icon` needs the three) |
+
+Never style `.ds-emoji-grid`, `.ds-emoji-cell`, `.ds-emoji-glyph`, `.ds-preview*`,
+`.ds-palette-aside`, `.ds-menu-thumb`, `.ds-menu-clip*` or `.ds-menu-when`, nor
+`[data-shape]`, `[data-aside]`, `[data-content]`, `[data-face]`, `[data-focused]` or
+`.ds-section-header-action[data-selected]`.
+
 ### Animated emoji (2026-09-26): the user's picture as a moving emoji
 
 design/25-EMOJI.md. `AnimatedEmoji { emoji: EmojiId, size: PersonaSize, mood: Mood, wake:
