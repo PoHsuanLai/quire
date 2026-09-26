@@ -1,8 +1,37 @@
 {
- "updated": "2026-09-26: your animated character (persona); lock screen and switcher parts",
+ "updated": "2026-09-27",
  "archive_url": "https://claude.ai/artifact/GhMLUQjwi9FUxkJgoxrGUB",
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
+  {
+   "id": "m9-launcher-v2",
+   "date": "2026-09-27 · milestone",
+   "title": "Launcher v2: files, clipboard, colour emoji and a Quick-Look-style preview",
+   "status": "done",
+   "lede": "The launcher now searches files (through a running indexer, else a fast name search under your home folder; it never starts an indexer on its own), keeps a memory-only clipboard history, and has a colour emoji grid with arrow keys that wrap like the character viewer. Results come in sections with Show More, and a preview pane opens beside the list: Space while browsing, Cmd+Y always, or Right at the end of the text. PDFs preview through pdfrum on one background worker, so holding Down through a folder of PDFs renders only the one you stop on. Everything shown is from sill running the real parts, with real keys.",
+   "notes": [
+    "Found and fixed on the way: yesterday's colour-emoji change drew digits and spaces from the emoji font under sill (\"0 0 : 2 2\"); the text fonts are back to Inter and emoji-only content uses its own style.",
+    "Still open: a small gap between a row's time and its shortcut, the hybrid-renderer timing of the emoji grid, and three settings for you on the Spotlight page (clipboard history, web search, skin tone)."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m9/launcher-v2-preview-pdf.png",
+     "caption": "Sections, file rows and the PDF preview pane."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m9/launcher-v2-preview-image.png",
+     "caption": "An image preview with its actions (Reveal in Files, Copy Path)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m9/launcher-v2-pane-focus.png",
+     "caption": "The pane's actions reached by keyboard."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/m9/launcher-v2-emoji.png",
+     "caption": "The colour emoji grid."
+    }
+   ]
+  },
   {
    "id": "persona",
    "date": "2026-09-26 · decision",
@@ -26,7 +55,8 @@
      "path": "/home/pohsuanlai/quire/tools/progress/shots/persona/moods.png",
      "caption": "Each mood as eight frames: idle blink, attentive glance, wince, happy hop, asleep with a drifting z."
     }
-   ]
+   ],
+   "page": "archive"
   },
   {
    "id": "m11-parts",
