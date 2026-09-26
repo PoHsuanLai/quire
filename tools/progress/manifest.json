@@ -4,6 +4,35 @@
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
   {
+   "id": "inter-font-pass",
+   "date": "2026-09-27 · type",
+   "title": "The whole shell now draws its text in Inter, the fonts quire ships",
+   "status": "done",
+   "lede": "Until today shell-host never registered quire's own fonts, so the shell fell back to whatever the system had. Now every shell surface gets them from the host. sill re-ran every nested check under Inter and retook every capture: nothing new wraps, clips or shifts, and no failure came from a width that moved.",
+   "notes": [
+    "Better on the way: the arrow keycaps are real arrows, times and shortcuts sit apart in the launcher, labels meant for Space Mono are now Space Mono, and the bar clock uses even-width digits so it stops jumping between minutes.",
+    "Found and being fixed: the password field puts its dots about 90 px in with the caret before them; the small calendar's today circle is tight around two digits; with all five widgets in the widget center, the on-screen frame stacks two widgets over the Calendar (sill's own capture of the same screen is correct)."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/inter/launcher.png",
+     "caption": "Launcher v2 results in Inter."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/inter/control-center.png",
+     "caption": "Control center."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/inter/lock.png",
+     "caption": "Lock screen with the letter user picture."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/inter/widgets-desktop.png",
+     "caption": "Desktop widgets; the calendar's today circle (top right) is the one being resized."
+    }
+   ]
+  },
+  {
    "id": "m9-launcher-v2",
    "date": "2026-09-27 · milestone",
    "title": "Launcher v2: files, clipboard, colour emoji and a Quick-Look-style preview",
