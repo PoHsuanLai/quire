@@ -3624,16 +3624,21 @@ pub fn pdf_thumb_bytes(Vec<u8>, DeviceBox) -> PdfPage;  // no file, no cache
 ready 1). No loop.
 
 **Behaviour.** A page already cached for the file as it is now draws at once. Otherwise the
-first frame is `loading`; a worker thread reads and rasterises the page (a panic in the reader
-on hostile bytes reads as unreadable), and its page replaces the loading state. A new path or
-size starts a new read; the old one still finishes into the cache but is not shown. An
+first frame is `loading`; the request joins the queue of the one long-lived `pdf-thumb`
+worker thread, which reads and rasterises the page (a panic in the reader on hostile bytes reads
+as unreadable), and its page replaces the loading state. The queue is latest-wins: each
+thumbnail holds at most one waiting job, so a new path or size replaces its request that has not
+started (holding an arrow key through 20 PDFs runs two rasters, not twenty); a raster already
+running finishes into the cache but is not shown; a job whose thumbnail has gone is skipped; at
+most `QUEUE_DEPTH` (8) jobs wait, and a job pushed out of a full queue is asked for again. An
 encrypted file that opens with the empty user password draws; one that needs a password is
 `Failed(Locked)`.
 
 **Tests.** `ds/tests/pdf_thumb_ssr.rs` (a golden of each state, lint), `ds/src/components/
 pdf_thumb.rs` (the sheet's fit), `ds-native/tests/pdf_thumb.rs` (a generated PDF rasterised in
 its colour and aspect, the cache hit and the mtime miss, the failures, a document painting the
-page), `ds-native/src/pdf_thumb/cache.rs` (eviction).
+page), `ds-native/tests/pdf_thumb_queue.rs` (20 quick requests run at most 4 rasters and show the
+last), `ds-native/src/pdf_thumb/cache.rs` (eviction).
 
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 

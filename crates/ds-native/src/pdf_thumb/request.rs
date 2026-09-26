@@ -4,6 +4,7 @@ use super::cache;
 use super::raster::rasterise;
 use ds::{PdfPage, PdfTrouble, Scale, Size};
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::SystemTime;
 
 /// The largest side a thumbnail is rasterised at, in device pixels: a preview pane at 3x, and a
@@ -83,10 +84,20 @@ pub fn pdf_thumb_blocking(request: &ThumbRequest) -> PdfPage {
     if let Some(hit) = cache::lookup(&key) {
         return hit;
     }
+    RASTERS.fetch_add(1, Ordering::Relaxed);
     let page = match std::fs::read(&key.path) {
         Ok(bytes) => rasterise(bytes, key.fit),
         Err(_) => PdfPage::Failed(PdfTrouble::Unreadable),
     };
     cache::insert(key, page.clone());
     page
+}
+
+/// Files read and rasterised (cache misses) so far in this process.
+static RASTERS: AtomicU64 = AtomicU64::new(0);
+
+/// How many pages this process has read and rasterised, cache hits not counted: a diagnostic,
+/// and how a test proves superseded requests never ran.
+pub fn pdf_thumb_rasters() -> u64 {
+    RASTERS.load(Ordering::Relaxed)
 }
