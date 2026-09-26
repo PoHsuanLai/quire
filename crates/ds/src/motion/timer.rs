@@ -40,16 +40,21 @@ impl MotionTimer {
     /// timer whose owner has unmounted does nothing, and one running when its owner unmounts is
     /// dropped with it: `on_settled` never runs for a component that is gone.
     pub fn start(&self, on_settled: EventHandler<()>) {
-        let _ = self.try_start(on_settled, StaggerIndex::default());
+        let _ = self.try_start(Some(on_settled), StaggerIndex::default());
     }
 
     /// Start (or restart) the timer for a stagger whose last member is at `index`: it settles at
-    /// `settle(anim, level, index)` (a `Reveal`'s twelfth row, design/26 R13).
+    /// `settle(anim, level, index)` (a `Reveal`'s twelfth row, design/26 R13). It calls nothing
+    /// when it settles, so it may be started from an effect, outside any scope.
     pub(crate) fn start_staggered(&self, index: StaggerIndex) {
-        let _ = self.try_start(EventHandler::new(|()| {}), index);
+        let _ = self.try_start(None, index);
     }
 
-    fn try_start(&self, on_settled: EventHandler<()>, index: StaggerIndex) -> Result<(), Gone> {
+    fn try_start(
+        &self,
+        on_settled: Option<EventHandler<()>>,
+        index: StaggerIndex,
+    ) -> Result<(), Gone> {
         let level = try_get(self.env)?.resolved.motion;
         let length = settle(self.anim, level, index);
         if let Some(running) = try_get(self.task)? {
@@ -59,7 +64,7 @@ impl MotionTimer {
         let (phase, task) = (self.phase, self.task);
         let started = spawn_in(self.scope, async move {
             sleep(length).await;
-            if settled(phase, task).is_ok() {
+            if let (Ok(()), Some(on_settled)) = (settled(phase, task), on_settled) {
                 on_settled.call(());
             }
         });

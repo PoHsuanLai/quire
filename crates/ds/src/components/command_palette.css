@@ -53,3 +53,14 @@
 .ds-palette[*|data-aside=shown] > .ds-search-tokens{ grid-row:2; grid-column:1 / -1; }
 .ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
 .ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
+/* The results' motions (design/26-DETAILS.md section 5.6): the first-show rise is
+   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More (sill Q373) rises
+   the rows it added in downward, each `--stagger` after the one before (`--i`, capped at 12);
+   its Show Less heals everything after the last row kept up from `--dy`, the height the removed
+   rows took, set on the list while it plays. At rest the list's children play `hold` (moves
+   nothing), below every motion here and the reveal's (which come later in the cascade): a rise
+   or heal whose settle timer (wall clock) ends it before the frame clock does is replaced by
+   another animation, never dropped midway (sill G295). */
+.ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-menu-item[*|data-row-motion=rise]{ animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
+.ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-spring) backwards; }
