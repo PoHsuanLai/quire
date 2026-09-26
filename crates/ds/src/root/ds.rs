@@ -3,7 +3,9 @@
 //! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
 //! overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`, `LayerStack`
 //! and `Overlays` as context. Its click handler, the last to hear a click, hands a click that
-//! landed on nothing focusable to the host's `HostClickFocus` (FINDINGS "Native focus").
+//! landed on nothing focusable to the host's `HostClickFocus` (FINDINGS "Native focus"), and it
+//! provides the same seams to the controls inside it, which hand over a click they keep to
+//! themselves (`focus::click::kept_click`).
 //!
 //! What the root paints follows its material (`chrome.rs`): a Window draws the Space gradient
 //! opaque with its A/B layers and grain (`data-frame="opaque"`, its own stacking context so the
@@ -47,7 +49,7 @@ use super::typeface::{use_typeface, use_typeface_provider};
 use crate::appearance::{Appearance, SystemPrefs, Typeface, resolve};
 use crate::components::toast::ToastHost;
 use crate::components::window_frame::{WindowFrame, framed};
-use crate::focus::click::{HostClickFocus, after_click};
+use crate::focus::click::ClickRoot;
 use crate::geometry::Scale;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::material::{BlurState, Material, MaterialStack};
@@ -100,8 +102,8 @@ pub fn Ds(
     let ground = ground.unwrap_or(Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
     let host = use_hook(try_consume_context::<HostModality>);
-    let click_focus = use_hook(try_consume_context::<HostClickFocus>);
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
+    let click_root = use_context_provider(|| ClickRoot::of(element));
     let modality = host.map_or(InputModality::default(), |HostModality(current)| current());
     let env = use_env_provider(Env {
         resolved,
@@ -150,7 +152,7 @@ pub fn Ds(
             style,
             onmounted: move |event: MountedEvent| element.set(Some(event.data())),
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
-            onclick: move |event: MouseEvent| after_click(click_focus, element.peek().clone(), &event),
+            onclick: move |event: MouseEvent| click_root.clicked(&event),
             if stylesheet == Inject::Inline {
                 style { {crate::css::stylesheet()} }
             }

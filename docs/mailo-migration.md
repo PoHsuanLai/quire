@@ -629,6 +629,21 @@ Blitz (FINDINGS.md "Native focus"; `CONSUMING.md` "Native focus").
   leaves the keyboard on `.app`. `Blitz::mounted`'s first `focus_soon(app)` stays (nothing is
   focused before the first interaction). A harness test of mailo's that expected the focus
   nowhere after a menu closed now finds it on the opener or `.app`.
+- **Re-focus after a click a quire component kept (mailo, against v0.1.10).** quire now keeps
+  this section's promise for clicks its components keep to themselves: a `HoverStrip` button, a
+  `TreeItem`'s name (its select button) and the ⋯ in its trailing slot, a plain tree row, any
+  `Propagation::Stop` control. Each hands its click to the host itself, so the pressed control
+  has the keyboard afterwards (not `html`). mailo deletes the workaround: the
+  `super::host::Host::press_ended()` call in `.app`'s `onpointerup` in `ui/app.rs` (the
+  handler stays for `super::motion::drag::release`), `Host::press_ended` in `ui/host/mod.rs`,
+  `Blitz::after_press` in `ui/host/native.rs` (the `CLICK_FOCUS.restore` it ran a frame later)
+  and the module doc's line about "the one gap left". Two differences from the workaround: the
+  keyboard lands on the pressed button, not on `.app` (keys still bubble to `.app`, and Enter
+  or Space on a focused button presses it again, as in a browser); and a rename field that has
+  the keyboard keeps it through a click on another folder's name (a host write cannot blur it),
+  so end the rename in the select handler if that click should end it. `TreeItem`'s editing
+  slot no longer stops `pointerup`, so `.app`'s `onpointerup` (and the drag release in it) hears
+  a press that ends in the rename field.
 - **What changes under mailo's tests.** A click on a quire `Button` or strip button now focuses
   that button (a browser does the same); keys typed next still bubble to `.app`. A harness test
   that expected the focus nowhere after a click now finds it on the nearest focusable ancestor;

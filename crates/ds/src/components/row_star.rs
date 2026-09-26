@@ -3,6 +3,7 @@
 //! file holds the row.
 
 use crate::components::vocab::{PulseKey, PulsePhase, Switch};
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::Shape;
 use crate::motion::anim::Anim;
@@ -84,6 +85,7 @@ pub(crate) fn star_button(
                 // The star acts on its own; the row must not also open.
                 event.stop_propagation();
                 onchange.call(state.flipped());
+                kept_click(&event);
             },
             span { class: pop_class, "data-pulse": pop_alias, {star_glyph(state)} }
             span { class: "ds-sparks",

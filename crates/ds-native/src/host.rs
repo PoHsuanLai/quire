@@ -11,8 +11,10 @@
 //!   and `ds::HostBlur` the same way, and an element named by selector is found through
 //!   `ds::HostFind` (`crate::focus`); an edit surface's geometry and IME through `ds::HostEdit`
 //!   (`crate::edit`).
-//! - Under `FocusFallback::Ancestor` (the default), `ds::HostClickFocus`: a click on nothing
-//!   focusable leaves the keyboard on the nearest focusable ancestor (`crate::click_focus`),
+//! - Under `FocusFallback::Ancestor` (the default), `ds::HostClickFocus` and
+//!   `ds::HostPressFocus`: a click on nothing focusable leaves the keyboard on the nearest
+//!   focusable ancestor, and a click a quire control kept to itself on the pressed control
+//!   (`crate::click_focus`),
 //!   and so does the removal of the focused element (`crate::focus_keep`), looked at on every
 //!   window event before the document hears it, so a key after a menu closed reaches the app.
 //! - IME events: dioxus-native-dom drops them, but this window hook hears each winit event
@@ -91,6 +93,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let keeper = use_hook(|| match fallback {
         FocusFallback::Ancestor => {
             provide_context(crate::click_focus::CLICK_FOCUS);
+            provide_context(crate::click_focus::PRESS_FOCUS);
             let keeper = Rc::new(RefCell::new(FocusKeeper::default()));
             provide_context(hand_back_seam(Rc::clone(&keeper)));
             Some(keeper)

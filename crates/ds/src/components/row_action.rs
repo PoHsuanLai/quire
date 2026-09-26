@@ -5,6 +5,7 @@
 
 use crate::components::icon_button::{IconButton, IconButtonVariant};
 use crate::components::press::Press;
+use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use dioxus::prelude::*;
 
@@ -30,7 +31,10 @@ pub(crate) fn trailing(action: &RowAction) -> Element {
         span {
             class: "ds-menu-action",
             // A click here is the action's, never the row's pick.
-            onclick: move |event| event.stop_propagation(),
+            onclick: move |event| {
+                event.stop_propagation();
+                kept_click(&event);
+            },
             // The row keeps the focus where it was and does not start a press-drag-release.
             onmousedown: move |event| {
                 event.prevent_default();

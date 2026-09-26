@@ -43,8 +43,8 @@ pub use edit::{
 pub use error::DsError;
 pub use focus::{
     Fallback, FieldHandle, FocusError, FocusRequest, FocusTicket, Focused, Found, HostBlur,
-    HostClickFocus, HostFind, HostFocus, HostHandBack, HostSelect, Select, focus_by_selector,
-    focus_soon, focus_soon_selecting, use_field_handle, use_focus_request,
+    HostClickFocus, HostFind, HostFocus, HostHandBack, HostPressFocus, HostSelect, Select,
+    focus_by_selector, focus_soon, focus_soon_selecting, use_field_handle, use_focus_request,
 };
 #[cfg(feature = "webview-fonts")]
 pub use fonts::font_face_css;
