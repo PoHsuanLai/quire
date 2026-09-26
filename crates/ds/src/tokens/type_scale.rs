@@ -57,17 +57,13 @@ impl Family {
     pub fn stack_in(self, typeface: Typeface) -> &'static str {
         match (self, typeface) {
             (Family::Display, Typeface::System) => {
-                "\"Inter Display\",\"Inter\",\"Noto Color Emoji\",system-ui,sans-serif"
+                "\"Inter Display\",\"Inter\",system-ui,sans-serif"
             }
-            (Family::Ui | Family::Data, Typeface::System) => {
-                "\"Inter\",\"Noto Color Emoji\",system-ui,sans-serif"
-            }
+            (Family::Ui | Family::Data, Typeface::System) => "\"Inter\",system-ui,sans-serif",
             (Family::Display, Typeface::Editorial) => {
-                "\"Bricolage Grotesque\",\"Trebuchet MS\",\"Noto Color Emoji\",system-ui,sans-serif"
+                "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif"
             }
-            (Family::Ui, Typeface::Editorial) => {
-                "\"Karla\",\"Segoe UI\",\"Noto Color Emoji\",system-ui,sans-serif"
-            }
+            (Family::Ui, Typeface::Editorial) => "\"Karla\",\"Segoe UI\",system-ui,sans-serif",
             (Family::Data, Typeface::Editorial) | (Family::Code, _) => {
                 "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
             }

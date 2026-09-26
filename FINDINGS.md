@@ -4148,6 +4148,13 @@ not installed).
   sheet (76 pictures per typeface) was compared pixel for pixel: the only differences were the
   widget pages' battery rings and one 4 x 7 px spot on the dark Editorial lists page, and a second
   run of the unchanged build differs from the first in exactly those places, so no glyph moved.
+  **Reverted 2026-09-27 (sill Q342):** under sill on vello the stacks with the emoji face drew
+  digits and spaces from Noto Color Emoji (wide keycap bases): "m 9 -extra- 1 .pdf", "0 0 : 2 2",
+  huge word gaps in the launcher, the bar clock and every sill capture. The gallery comparison
+  did not catch it. The text stacks are back to Inter / system-ui; `--font-emoji` and
+  `.ds-emoji-text` stay for emoji-only content (the emoji grid, the preview glyph). Root cause
+  not yet known (why Inter does not claim U+0020 and 0-9 first in sill's documents); until it is,
+  never put the emoji face in a stack that carries ordinary text.
 - **CBDT does not paint, and must not be made to.** glifo decodes CBDT's PNG strikes only with
   its `png` feature, which nothing in our tree enables (vello_cpu's default does, but
   anyrender_vello_cpu turns defaults off). Turning it on fixes vello_cpu and crashes the window
