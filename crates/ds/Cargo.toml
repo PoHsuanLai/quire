@@ -81,3 +81,8 @@ required-features = ["lint"]
 [[test]]
 name = "lock_switcher_ssr"
 required-features = ["lint"]
+
+# The persona, linted (design/24-PERSONA.md).
+[[test]]
+name = "persona_ssr"
+required-features = ["lint"]

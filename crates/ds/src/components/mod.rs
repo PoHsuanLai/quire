@@ -88,6 +88,7 @@ pub mod pane_switcher;
 pub mod panel;
 pub mod pass_through;
 pub mod peek;
+pub mod persona;
 pub mod polkit_prompt;
 pub mod popover;
 pub mod press;
@@ -211,6 +212,11 @@ pub use pane_switcher::PaneSwitcher;
 pub use panel::{Panel, PanelEdge, PanelScrim};
 pub use pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 pub use peek::Peek;
+pub use persona::{
+    Accessory, BLINK_MAX, BLINK_MIN, Backdrop, Brows, Cheeks, Creature, Eyes, HairTone, HeadShape,
+    Mood, Mouth, Persona, PersonaFinish, PersonaSeed, PersonaSize, PersonaSpec, Tone, Top,
+    UserPicture, UserPortrait, WakeStamp,
+};
 pub use polkit_prompt::PolkitPrompt;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
@@ -301,6 +307,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("pane_switcher", include_str!("pane_switcher.css")),
     ("panel", include_str!("panel.css")),
     ("peek", include_str!("peek.css")),
+    ("persona", include_str!("persona.css")),
     ("popover", include_str!("popover.css")),
     ("polkit_prompt", include_str!("polkit_prompt.css")),
     ("provider_mark", include_str!("provider_mark.css")),

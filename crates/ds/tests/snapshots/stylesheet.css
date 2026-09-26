@@ -22,11 +22,11 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-widget-hero:47px;--fs-lock-clock:140px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#23508f;--accent-ink:#f4f8ff;--accent-soft:#dce5f3;--seal:#23508f;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:color-mix(in srgb,var(--accent) 35%,transparent);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--fs-pico:7.5px;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-widget-hero:47px;--fs-lock-clock:140px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--t-awake:20000ms;--t-drift:2400ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#7fa6e6;--accent-ink:#0b142a;--accent-soft:#1e2a44;--seal:#7fa6e6;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;}
 .ds[*|data-motion=extra]{--t-big:560ms;--t-big-heavy:644ms;--t-crumple-heavy:644ms;--e-spring:cubic-bezier(.34,2,.5,1);--overshoot:1.14;--squish:.86;--tilt:5deg;--stagger:34ms;}
-.ds[*|data-motion=reduced]{--t-tap:60ms;--t-quick:60ms;--t-move:60ms;--t-big:60ms;--t-ambient:60ms;--t-big-heavy:60ms;--t-spark:60ms;--t-curl:60ms;--t-curl-heavy:60ms;--t-crumple-heavy:60ms;--t-send:60ms;--t-float:60ms;--t-hc-out:60ms;--t-scene:60ms;--t-shake:60ms;--t-park:60ms;--t-nudge:60ms;--t-shake-long:60ms;--t-sail:60ms;--t-boat-return:60ms;--t-spin:60ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;}
+.ds[*|data-motion=reduced]{--t-tap:60ms;--t-quick:60ms;--t-move:60ms;--t-big:60ms;--t-ambient:60ms;--t-big-heavy:60ms;--t-spark:60ms;--t-curl:60ms;--t-curl-heavy:60ms;--t-crumple-heavy:60ms;--t-send:60ms;--t-float:60ms;--t-hc-out:60ms;--t-scene:60ms;--t-shake:60ms;--t-park:60ms;--t-nudge:60ms;--t-shake-long:60ms;--t-sail:60ms;--t-boat-return:60ms;--t-spin:60ms;--t-awake:60ms;--t-drift:60ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;}
 /* == accents == */
 .ds{--swatch-postmark:#23508f;--swatch-red:#b7352b;--swatch-amber:#8e5a05;--swatch-green:#1a7a33;--swatch-blue:#0b5fe0;--swatch-violet:#6b3fcc;}
 .ds[*|data-theme=dark]{--swatch-postmark:#7fa6e6;--swatch-red:#ff8a80;--swatch-amber:#f0b84a;--swatch-green:#6edb86;--swatch-blue:#6fb0ff;--swatch-violet:#b69bff;}
@@ -116,7 +116,8 @@ html,body{margin:0;padding:0;background:transparent}
      `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
      and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
      (the level control), the sheet's `sheet-out` (sill Q90), and the screenshot thumbnail's
-     `shot-out` (sill Q181), below.
+     `shot-out` (sill Q181), and the persona's five, `persona-blink`, `persona-breathe`,
+     `persona-wince`, `persona-hop` and `persona-drift` (design/24-PERSONA.md), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
@@ -349,6 +350,25 @@ html,body{margin:0;padding:0;background:transparent}
    out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
    --e-spring`. */
 @keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
+
+/* The persona's five (quire's, design/24-PERSONA.md section 4). Each plays once and ends at
+   rest, so a persona whose awake window has closed paints nothing. Moves are in shares of the
+   persona's own box, so every size moves alike. */
+
+/* persona-blink: the open eyes close towards their own line and open again. */
+@keyframes persona-blink{ 0%,100%{ transform:scaleY(1); } 45%,55%{ transform:scaleY(.1); } }
+
+/* persona-breathe: four tiny swells from the chin inside one --t-awake run. */
+@keyframes persona-breathe{ 0%,25%,50%,75%,100%{ transform:scale(1,1); } 12.5%,37.5%,62.5%,87.5%{ transform:scale(1.012,1.026); } }
+
+/* persona-wince: shake-x's four beats as shares of the width, with a small turn. */
+@keyframes persona-wince{ 20%{ transform:translateX(-7%) rotate(-3deg); } 40%{ transform:translateX(6%) rotate(2deg); } 60%{ transform:translateX(-4%); } 80%{ transform:translateX(2%); } }
+
+/* persona-hop: up and back down; the spring curve on each leg gives the lift and the landing. */
+@keyframes persona-hop{ 0%{ transform:none; } 35%{ transform:translateY(-12%) scale(.97,1.04); } 100%{ transform:none; } }
+
+/* persona-drift: one z rises to the upper right, grows and fades. */
+@keyframes persona-drift{ 0%{ opacity:0; transform:translate(0,0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translate(12%,-20%) scale(1.15); } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -434,6 +454,11 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out--b{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes shot-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes persona-blink--b{ 0%,100%{ transform:scaleY(1); } 45%,55%{ transform:scaleY(.1); } }
+@keyframes persona-breathe--b{ 0%,25%,50%,75%,100%{ transform:scale(1,1); } 12.5%,37.5%,62.5%,87.5%{ transform:scale(1.012,1.026); } }
+@keyframes persona-wince--b{ 20%{ transform:translateX(-7%) rotate(-3deg); } 40%{ transform:translateX(6%) rotate(2deg); } 60%{ transform:translateX(-4%); } 80%{ transform:translateX(2%); } }
+@keyframes persona-hop--b{ 0%{ transform:none; } 35%{ transform:translateY(-12%) scale(.97,1.04); } 100%{ transform:none; } }
+@keyframes persona-drift--b{ 0%{ opacity:0; transform:translate(0,0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translate(12%,-20%) scale(1.15); } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -566,6 +591,16 @@ html,body{margin:0;padding:0;background:transparent}
 .a-shot-in[*|data-pulse=b]{animation:rise--b var(--t-big) var(--e-spring);}
 .a-shot-out[*|data-pulse=a]{animation:shot-out var(--t-move) var(--e-exit) forwards;}
 .a-shot-out[*|data-pulse=b]{animation:shot-out--b var(--t-move) var(--e-exit) forwards;}
+.a-persona-blink[*|data-pulse=a]{animation:persona-blink var(--t-quick) var(--e-in-out);}
+.a-persona-blink[*|data-pulse=b]{animation:persona-blink--b var(--t-quick) var(--e-in-out);}
+.a-persona-breathe[*|data-pulse=a]{animation:persona-breathe var(--t-awake) var(--e-in-out);}
+.a-persona-breathe[*|data-pulse=b]{animation:persona-breathe--b var(--t-awake) var(--e-in-out);}
+.a-persona-wince[*|data-pulse=a]{animation:persona-wince var(--t-shake) var(--e-shake);}
+.a-persona-wince[*|data-pulse=b]{animation:persona-wince--b var(--t-shake) var(--e-shake);}
+.a-persona-hop[*|data-pulse=a]{animation:persona-hop var(--t-big) var(--e-spring);}
+.a-persona-hop[*|data-pulse=b]{animation:persona-hop--b var(--t-big) var(--e-spring);}
+.a-persona-drift[*|data-pulse=a]{animation:persona-drift var(--t-drift) var(--e-out);}
+.a-persona-drift[*|data-pulse=b]{animation:persona-drift--b var(--t-drift) var(--e-out);}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -1947,6 +1982,49 @@ html,body{margin:0;padding:0;background:transparent}
   animation:peek-in var(--t-big) var(--e-spring); }
 .ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
 .ds-peek-tools{ display:flex; justify-content:flex-end; padding:var(--s-8) var(--s-10) 0; }
+/* -- persona -- */
+/* Persona (design/24-PERSONA.md): the user's character on a disc. The disc's colour arrives
+   inline as `--pa-ground` (a derived hex, per scheme, computed in Rust) and the eyes' line as
+   `--pa-eyes`, the origin a blink closes towards. Every part is its own SVG layer stacked on
+   the 100 x 100 canvas, because stylesheet rules and animations do not reach inside an SVG on
+   Blitz (spike S6); the wrappers are what move.
+
+   Nesting, outside in: hop (Happy's `persona-hop`), shake (Wince's `persona-wince`), breath
+   (`persona-breathe` while awake), tilt (Asleep's lean, a transition), then the still layer,
+   the look (Attentive's glance down, a transition) around the blink (`persona-blink`), the
+   brows, the mouth and what is worn. The sleeping `z` sits outside the head and plays
+   `persona-drift` once; at rest it is invisible. Every animation is a pulse class the
+   persona's timers put on and take off (motion.css); nothing here loops.
+
+   Reduced motion: no transitions, so a mood changes at once (the timers fire nothing). */
+
+.ds-persona{ position:relative; flex:none; box-sizing:border-box; border-radius:var(--r-pill);
+  background:var(--pa-ground); color:var(--ink-soft); }
+.ds-persona[*|data-size="28"]{ width:28px; height:28px; }
+.ds-persona[*|data-size="64"]{ width:64px; height:64px; }
+.ds-persona[*|data-size="128"]{ width:128px; height:128px; }
+
+.ds-persona-hop,.ds-persona-shake,.ds-persona-breath,.ds-persona-tilt,.ds-persona-look,.ds-persona-blink{
+  position:absolute; inset:0; }
+.ds-persona-layer,.ds-persona-z{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+.ds-persona-breath{ transform-origin:50% 85%; }
+.ds-persona-blink{ transform-origin:50% var(--pa-eyes); }
+.ds-persona-z{ opacity:0; }
+
+.ds-persona-tilt{ transform-origin:50% 80%; transition:transform var(--t-big) var(--e-out); }
+.ds-persona[*|data-mood=asleep] .ds-persona-tilt{ transform:rotate(-7deg) translateY(2%); }
+
+.ds-persona-look{ transition:transform var(--t-quick) var(--e-out); }
+.ds-persona[*|data-mood=attentive] .ds-persona-look{ transform:translateY(4%); }
+
+.ds-persona-layer[*|data-part=brows]{ transition:transform var(--t-quick) var(--e-out); }
+.ds-persona[*|data-mood=happy] .ds-persona-layer[*|data-part=brows]{ transform:translateY(-2.5%); }
+.ds-persona[*|data-mood=attentive] .ds-persona-layer[*|data-part=brows]{ transform:translateY(1.5%); }
+
+.ds[*|data-motion=reduced] .ds-persona-tilt,
+.ds[*|data-motion=reduced] .ds-persona-look,
+.ds[*|data-motion=reduced] .ds-persona-layer{ transition:none; }
 /* -- popover -- */
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
    card and the bubble, and the overlay wrapper every floating component renders into at the end
