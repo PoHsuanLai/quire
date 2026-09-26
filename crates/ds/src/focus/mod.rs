@@ -4,6 +4,7 @@
 //! element by selector (G8), where the keyboard goes after a click on nothing focusable, and
 //! where it goes when a surface that took it leaves (mailo gaps 7).
 
+pub mod caret;
 pub mod click;
 pub mod field;
 pub mod hand_back;
@@ -13,6 +14,7 @@ pub mod select;
 pub mod selector;
 pub(crate) mod targets;
 
+pub use caret::{Caret, Collapsed, HostCaret, caret_at};
 pub use click::{Fallback, HostClickFocus, HostPressFocus};
 pub use field::{FieldHandle, use_field_handle};
 pub use hand_back::HostHandBack;

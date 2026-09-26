@@ -1,0 +1,10 @@
+/* EmojiGrid (sill Q291; design/04-COMPONENTS.md section 46): cells at the caller's side in the
+   caller's columns (inline `grid-template-columns` and `grid-auto-rows`), each emoji centred at
+   `--fs-emoji-cell` (30, for the launcher's 56 px cell) in the colour face (`.ds-emoji-text`). The selected cell takes the rows' selection
+   look, `--accent-soft` on the item radius; the pointer is the arrow (design/27 section 6.3), and
+   the grid shows no focus ring of its own, its selection being the highlight (6.4). A name shows
+   as the cell's Fly tooltip. */
+.ds-emoji-grid{ display:grid; gap:0; padding:var(--s-2) 0; outline:none; cursor:default; }
+.ds-emoji-cell{ display:grid; place-items:center; min-width:0; box-sizing:border-box; border-radius:var(--r-menu-item); cursor:default; }
+.ds-emoji-cell[*|aria-selected=true]{ background:var(--accent-soft); }
+.ds-emoji-glyph{ display:block; font-size:var(--fs-emoji-cell); line-height:1; }

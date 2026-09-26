@@ -6,8 +6,10 @@ use crate::components::avatar::face;
 use crate::components::icon_view::IconView;
 use crate::components::menu_entry::{Tile, Trail};
 use crate::components::menu_match::marked;
+use crate::components::menu_shape;
 use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::row_action::{RowAction, trailing};
+use crate::components::row_shape::RowShape;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Check, Selection, Switch};
 use crate::geometry::{Point, Px};
@@ -78,6 +80,8 @@ pub(crate) struct ItemView<'a> {
     pub branch: Branch,
     /// A button at its end that acts without picking it.
     pub trailing: Option<&'a RowAction>,
+    /// How it draws beyond its words (a file, a clipboard entry).
+    pub shape: &'a RowShape,
 }
 
 /// What a row reports: a click of a live row (`pick`; a parent opens its submenu), the
@@ -116,14 +120,15 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
         Branch::Parent(open) => (Some("true"), Some(open.aria())),
     };
     let trail = match view.branch {
-        Branch::Leaf => trail(view.trail, view.check, row),
+        Branch::Leaf => trail(view.trail, view.check, row, view.shape),
         Branch::Parent(_) => chevron(),
     };
     let live = view.availability == Availability::Enabled;
     let tile = match row {
-        Row::Tiled => Some(tile(view.tile)),
+        Row::Tiled => Some(menu_shape::thumb_tile(view.shape).unwrap_or_else(|| tile(view.tile))),
         Row::Checked => None,
     };
+    let words = menu_shape::words(view.shape, title, detail);
     rsx! {
         div {
             class: "ds-menu-item",
@@ -134,6 +139,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
             "aria-haspopup": popup,
             "aria-expanded": expanded,
             "data-trailing": view.trailing.map(|_| "action"),
+            "data-shape": menu_shape::slug(view.shape),
             onmousedown: move |event| event.prevent_default(),
             onmousemove: move |event| {
                 event.stop_propagation();
@@ -156,12 +162,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
                 Glyph { icon: Icon::Check }
             }
             {tile}
-            span {
-                b { class: "ds-menu-title", {title} }
-                if let Some(detail) = detail {
-                    small { class: "ds-menu-detail ds-truncate", {detail} }
-                }
-            }
+            {words}
             {trail}
             {action}
         }
@@ -227,8 +228,9 @@ fn tile(tile: Option<&Tile>) -> Element {
     }
 }
 
-/// The trail: a checked item in a tiled menu shows the check instead of its shortcut.
-fn trail(trail: &Trail, check: Option<Check>, row: Row) -> Element {
+/// The trail: a checked item in a tiled menu shows the check instead of its shortcut; a shaped
+/// row leads it with its time.
+fn trail(trail: &Trail, check: Option<Check>, row: Row, shape: &RowShape) -> Element {
     if row == Row::Tiled && check == Some(Check::Checked) {
         return rsx! {
             span { class: "ds-menu-trail",
@@ -241,6 +243,9 @@ fn trail(trail: &Trail, check: Option<Check>, row: Row) -> Element {
         Trail::Shortcut(shortcut) => shortcut.glyphs(),
         Trail::Note(note) => note.clone(),
     };
+    if *shape != RowShape::Plain {
+        return menu_shape::trail(shape, text);
+    }
     rsx! {
         span { class: "ds-menu-trail", "{text}" }
     }

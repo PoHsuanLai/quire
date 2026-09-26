@@ -92,7 +92,7 @@ pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
 #[cfg(feature = "pdf-thumb")]
 pub use pdf_thumb::{
     DeviceBox, PdfFileThumb, QUEUE_DEPTH, THUMB_CACHE_ENTRIES, ThumbKey, ThumbRequest,
-    pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached, pdf_thumb_rasters,
+    pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached, pdf_thumb_rasters, use_pdf_page,
 };
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};

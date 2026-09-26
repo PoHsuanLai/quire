@@ -122,7 +122,7 @@ const CASES: &[Case] = &[
                 placeholder: "Search",
                 query: "",
                 tokens: Vec::new(),
-                groups: Vec::new(),
+                groups: ds::PaletteGroups::default(),
                 empty: "Nothing",
                 oninput: |_| {},
                 onpick: |_| {},

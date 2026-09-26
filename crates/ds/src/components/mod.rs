@@ -32,6 +32,8 @@ mod edit_surface_keys;
 mod edit_surface_pointer;
 mod edit_surface_state;
 pub mod emoji;
+pub mod emoji_grid;
+pub mod emoji_grid_nav;
 pub mod flow;
 pub mod group_header;
 pub mod hover_card;
@@ -65,6 +67,7 @@ pub(crate) mod menu_panel;
 pub mod menu_pick;
 pub(crate) mod menu_return;
 pub(crate) mod menu_rows;
+mod menu_shape;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
 pub mod module_grid;
@@ -83,11 +86,15 @@ pub mod notification_parts;
 pub mod notification_swipe;
 pub mod osd;
 pub(crate) mod osd_phase;
+pub(crate) mod palette_body;
+pub mod palette_claim;
+pub mod palette_group;
 pub(crate) mod palette_host;
 pub(crate) mod palette_lines;
 pub(crate) mod palette_rows;
 pub(crate) mod palette_select;
 pub(crate) mod palette_shown;
+pub(crate) mod palette_stops;
 pub mod pane_switcher;
 pub mod panel;
 pub mod pass_through;
@@ -98,12 +105,15 @@ pub mod persona;
 pub mod polkit_prompt;
 pub mod popover;
 pub mod press;
+pub mod preview_content;
+pub mod preview_pane;
 pub mod provider_mark;
 pub(crate) mod resize_edges;
 pub mod rich_text;
 pub mod row_action;
 pub(crate) mod row_click;
 pub mod row_hooks;
+pub mod row_shape;
 pub(crate) mod row_star;
 pub mod scrim;
 pub mod scrim_strength;
@@ -171,7 +181,7 @@ pub use chip::{Chip, ChipVariant};
 pub use clock_angles::{Hands, Tenths, hands};
 pub use clock_face::ClockFace;
 pub use clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
-pub use command_palette::{CommandPalette, CommandPaletteHost, PaletteEntrance};
+pub use command_palette::{ASIDE_WIDTH, CommandPalette, CommandPaletteHost, PaletteEntrance};
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
 pub use dock_parts::{DockFloor, RunningDot};
@@ -179,6 +189,8 @@ pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use edit_surface::EditSurface;
 pub use emoji::{AnimatedEmoji, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback};
+pub use emoji_grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid};
+pub use emoji_grid_nav::{GridEdge, GridMove, GridStep, grid_step};
 pub use flow::Flow;
 pub use group_header::GroupHeader;
 pub use hover_card::{
@@ -217,6 +229,8 @@ pub use notification_card::NotificationCard;
 pub use notification_parts::{AppMark, CardAction, GroupCount, Hover, Layers};
 pub use notification_swipe::Swipe;
 pub use osd::{Level, Osd, OsdPosition};
+pub use palette_claim::{Claim, FieldKey};
+pub use palette_group::{GroupEntries, PaletteGroup, PaletteGroups};
 pub use palette_shown::Retain;
 pub use pane_switcher::PaneSwitcher;
 pub use panel::{Panel, PanelEdge, PanelScrim};
@@ -233,10 +247,13 @@ pub use persona::{
 pub use polkit_prompt::PolkitPrompt;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
+pub use preview_content::{Mono, PANE_MEDIA, PaneContent};
+pub use preview_pane::{PaneAction, PreviewPane};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
 pub use rich_text::{Rich, RichRun, RichText};
 pub use row_action::RowAction;
 pub use row_hooks::PartHooks;
+pub use row_shape::{ClipBody, RowShape};
 pub use scrim::Scrim;
 pub use scrim_strength::ScrimStrength;
 pub use search_field::SearchField;
@@ -298,6 +315,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("edge_strip", include_str!("edge_strip.css")),
     ("edit_surface", include_str!("edit_surface.css")),
     ("emoji", include_str!("emoji.css")),
+    ("emoji_grid", include_str!("emoji_grid.css")),
     ("group_header", include_str!("group_header.css")),
     ("hover_card", include_str!("hover_card.css")),
     ("hover_strip", include_str!("hover_strip.css")),
@@ -325,6 +343,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("persona", include_str!("persona.css")),
     ("popover", include_str!("popover.css")),
     ("polkit_prompt", include_str!("polkit_prompt.css")),
+    ("preview_pane", include_str!("preview_pane.css")),
     ("provider_mark", include_str!("provider_mark.css")),
     ("scrim", include_str!("scrim.css")),
     ("search_field", include_str!("search_field.css")),

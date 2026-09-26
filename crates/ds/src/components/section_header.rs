@@ -1,5 +1,6 @@
 //! SectionHeader: a small-caps label that names a group (design/04-COMPONENTS.md section 13).
 
+use crate::components::vocab::Selection;
 use dioxus::prelude::*;
 
 /// Where the header sits.
@@ -43,14 +44,18 @@ enum Rule {
 }
 
 /// A group's name. The visual order is text, value, rule, action (S puts the rule between the
-/// text and the Frame's action button, `S:120-125`).
+/// text and the Frame's action button, `S:120-125`). `action_selection: Selected` draws the
+/// action as a keyboard selection (`data-selected`): a command palette's cursor resting on a
+/// group's "Show More" (sill Q294).
 #[component]
 pub fn SectionHeader(
     kind: HeaderKind,
     text: String,
     #[props(default)] value: Option<String>,
     #[props(default)] action: Option<(String, EventHandler<()>)>,
+    #[props(default)] action_selection: Selection,
 ) -> Element {
+    let selected = (action_selection == Selection::Selected).then_some("true");
     // The rule is a real span, not `::after`: pseudo-elements are unverified in Blitz (O-22's
     // fallback, `ds-section-header-rule`).
     rsx! {
@@ -66,6 +71,7 @@ pub fn SectionHeader(
                 button {
                     r#type: "button",
                     class: "ds-section-header-action",
+                    "data-selected": selected,
                     onclick: move |_| onclick.call(()),
                     "{label}"
                 }

@@ -264,6 +264,7 @@ fn what_cannot_be_drawn_fails_and_what_has_no_page_is_blank() {
 
 static SHOWN_PATH: OnceLock<PathBuf> = OnceLock::new();
 static BROKEN_PATH: OnceLock<PathBuf> = OnceLock::new();
+static PANE_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 #[allow(non_snake_case)]
 fn Shown() -> Element {
@@ -324,4 +325,61 @@ fn a_broken_file_lands_on_the_plate() {
         Some("unreadable")
     );
     assert_eq!(harness.count(".ds-pdf-thumb-sheet"), 0);
+}
+
+/// The preview pane's pattern (sill Q292): a component that calls `use_pdf_page` on every
+/// render, with the path only while its content is a PDF, and hands the page to
+/// `PaneContent::Pdf`. Starts on a web row, then turns to the PDF.
+#[allow(non_snake_case)]
+fn PanePreview() -> Element {
+    let mut pdf = use_signal(|| false);
+    let path = pdf().then(|| PANE_PATH.get().cloned().unwrap_or_default());
+    let page = ds_native::use_pdf_page(path, ds::PANE_MEDIA);
+    let content = match page {
+        Some(page) => ds::PaneContent::Pdf {
+            page,
+            name: "Pane.pdf".to_string(),
+        },
+        None => ds::PaneContent::Web {
+            host: "example.org".to_string(),
+            url: "https://example.org".to_string(),
+        },
+    };
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            button { class: "to-pdf", onclick: move |_| pdf.set(true), "PDF" }
+            ds::PreviewPane { content }
+        }
+    }
+}
+
+#[test]
+fn the_pane_draws_a_pdf_from_its_path_through_use_pdf_page() {
+    PANE_PATH.get_or_init(|| file("pane.pdf", &letter(BLUE)));
+    let mut harness = Harness::new(
+        PanePreview,
+        Viewport {
+            width: 480,
+            height: 480,
+            scale_percent: 100,
+        },
+    );
+    harness.advance(Duration::from_millis(50));
+    assert_eq!(
+        harness.attr(".ds-preview", "data-content").as_deref(),
+        Some("web")
+    );
+    let at = harness.centre(".to-pdf").expect("the button");
+    harness.click(at);
+    settle_until(&mut harness, |h| {
+        h.attr(".ds-pdf-thumb", "data-state").as_deref() == Some("ready")
+    });
+    assert_eq!(
+        harness.attr(".ds-preview", "data-content").as_deref(),
+        Some("pdf")
+    );
+    assert_eq!(
+        harness.attr(".ds-pdf-thumb", "aria-label").as_deref(),
+        Some("Pane.pdf")
+    );
 }
