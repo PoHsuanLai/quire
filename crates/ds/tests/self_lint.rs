@@ -44,6 +44,8 @@ const INLINE_VARS: &[&str] = &[
     "--swipe-dx",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
+    // A stepping spinner's angle (`Spinner`, design/26 R4).
+    "--turn",
 ];
 
 const EXCEPTIONS: &[Exception] = &[

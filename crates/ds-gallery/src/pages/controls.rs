@@ -137,6 +137,11 @@ fn Choosers() -> Element {
     let mut level = use_signal(|| Fraction(350));
     let mut tab = use_signal(|| 0u8);
     let mut count = use_signal(|| 3u32);
+    // The spinners run a bounded operation started as the page opens (design/26 R4): they step
+    // after the grace and hold still at the cap; the Details page replays one.
+    let busy = use_hook(|| {
+        ds::detail::Operation::Running(ds::detail::PendingToken::start(ds::detail::Deadline::cap()))
+    });
     let views: Vec<(u8, String)> = ["List", "Columns", "Cards"]
         .into_iter()
         .zip(0..)
@@ -192,8 +197,8 @@ fn Choosers() -> Element {
                 Specimen { name: "item",
                     Count { value: count() }
                 }
-                Specimen { name: "spin", Spinner { kind: SpinnerKind::Spin } }
-                Specimen { name: "breathe", Spinner { kind: SpinnerKind::Breathe } }
+                Specimen { name: "spin", Spinner { kind: SpinnerKind::Spin, operation: busy } }
+                Specimen { name: "breathe", Spinner { kind: SpinnerKind::Breathe, operation: busy } }
                 Specimen { name: "halo idle",
                     SyncHalo { initial: 'P', tone: AvatarTone::Ink, state: SyncState::Idle }
                 }

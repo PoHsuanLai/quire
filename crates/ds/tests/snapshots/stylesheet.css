@@ -2635,23 +2635,26 @@ html,body{margin:0;padding:0;background:transparent}
   background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
 .ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
 /* -- spinner -- */
-/* Spinner (design/04-COMPONENTS.md section 15): C's sync halo (`C:284-292`), a ring at
-   `inset:-4px` around a positioned parent. Attribute selectors carry `*|` (spike S2).
-   `ease-in-out` and `1.1s` are the tokens `--e-in-out` and `--t-spin` (O-3).
-   The spinning ring has no base transform: `spin` animates from the element's own transform
-   to `rotate(360deg)`, and from `scale(1)` both ends are the identity matrix, so the ring never
-   turned (wave 2 ds-native finding; `ds-native/tests/snapshot.rs::the_spinner_turns`).
-   TODO(O-9): standalone size not specified; both kinds loop, so Blitz never idles while one shows. */
+/* Spinner (design/04-COMPONENTS.md section 15; design/26-DETAILS.md R4): C's sync halo
+   (`C:284-292`), a ring at `inset:-4px` around a positioned parent, played as a bounded pending
+   loop. A Rust step timer (`use_pending`) writes `data-pending` and, while it steps, `data-beat`
+   (Breathe) or `--turn` (Spin); each step is a transition of `--t-pending-step`, and the timer
+   stops at the operation's deadline, so nothing here loops and the ring costs 0 frames once it
+   holds its still frame. Attribute selectors carry `*|` (spike S2).
+   Idle: not shown. Breathe steps between 1 and .45 (the `busy` keyframe's floor) and holds at .45.
+   Spin turns a quarter per step (the angle only grows while it steps, so it never runs back) and
+   holds its dashed ring. TODO(O-9): standalone size not specified. */
 
 .ds-spinner{
   position:absolute; inset:-4px; border-radius:var(--r-pill); border:2px solid var(--accent);
   opacity:0; transform:scale(.85);
 }
-.ds-spinner[*|data-kind=breathe]{ animation:breathe var(--t-ambient) var(--e-in-out) infinite; }
-.ds-spinner[*|data-kind=spin]{
-  opacity:.9; transform:none; border-style:dashed;
-  animation:spin var(--t-spin) var(--e-linear) infinite;
-}
+.ds-spinner[*|data-kind=breathe][*|data-pending=step]{ opacity:1; transform:none; transition:opacity var(--t-pending-step) var(--e-in-out), transform var(--t-pending-step) var(--e-in-out); }
+.ds-spinner[*|data-kind=breathe][*|data-pending=step][*|data-beat=low]{ opacity:.45; }
+.ds-spinner[*|data-kind=breathe][*|data-pending=still]{ opacity:.45; transform:none; }
+.ds-spinner[*|data-kind=spin]{ border-style:dashed; }
+.ds-spinner[*|data-kind=spin][*|data-pending=step]{ opacity:.9; transform:rotate(var(--turn)); transition:transform var(--t-pending-step) var(--e-linear); }
+.ds-spinner[*|data-kind=spin][*|data-pending=still]{ opacity:.9; transform:none; }
 /* -- sync_halo -- */
 /* SyncHalo (design/04-COMPONENTS.md section 35): `C:278-292`. The ring and its two loops are
    the Spinner's (section 15); this file places the ring box and the avatar inside it, which is
@@ -2660,6 +2663,14 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-account-ring{ position:relative; width:30px; height:30px; flex:none; }
 .ds-account-ring .ds-avatar{ position:absolute; inset:0; border-radius:var(--r-pill); font-size:var(--fs-control); }
+
+/* The halo's two rings, which loop (mail's, unchanged by design/26 D0: the Spinner component is a
+   bounded pending loop now, and this is the one place the old loops remain, TODO(O-9, O-25)). */
+.ds-account-ring > .ds-spinner[*|data-kind=breathe]{ animation:breathe var(--t-ambient) var(--e-in-out) infinite; }
+.ds-account-ring > .ds-spinner[*|data-kind=spin]{
+  opacity:.9; transform:none; border-style:dashed;
+  animation:spin var(--t-spin) var(--e-linear) infinite;
+}
 /* -- tabs -- */
 /* Tabs (design/04-COMPONENTS.md section 12): C's `.tabs` (`C:243-257`); the bar's margins are
    page layout. The underline is a real span (O-22's fallback for `::after`) that grows in
