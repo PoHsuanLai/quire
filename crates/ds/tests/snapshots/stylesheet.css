@@ -3029,3 +3029,41 @@ html,body{margin:0;padding:0;background:transparent}
    width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
    border (not a dashed outline, which it draws solid). */
 .ds-drop-place[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
+/* -- detail_reveal -- */
+/* Reveal (design/26-DETAILS.md R13): a list's children rise in turn on first show only. The
+   wrapper is `data-reveal=play` for exactly the first settle of the twelfth row, then `still`, so
+   nothing replays. Each child's index is its place, capped at 12. */
+
+.ds-reveal{ display:block; }
+.ds-reveal[*|data-reveal=play] > *{ --i:12; animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
+.ds-reveal[*|data-reveal=play] > :nth-child(1){ --i:0; }
+.ds-reveal[*|data-reveal=play] > :nth-child(2){ --i:1; }
+.ds-reveal[*|data-reveal=play] > :nth-child(3){ --i:2; }
+.ds-reveal[*|data-reveal=play] > :nth-child(4){ --i:3; }
+.ds-reveal[*|data-reveal=play] > :nth-child(5){ --i:4; }
+.ds-reveal[*|data-reveal=play] > :nth-child(6){ --i:5; }
+.ds-reveal[*|data-reveal=play] > :nth-child(7){ --i:6; }
+.ds-reveal[*|data-reveal=play] > :nth-child(8){ --i:7; }
+.ds-reveal[*|data-reveal=play] > :nth-child(9){ --i:8; }
+.ds-reveal[*|data-reveal=play] > :nth-child(10){ --i:9; }
+.ds-reveal[*|data-reveal=play] > :nth-child(11){ --i:10; }
+.ds-reveal[*|data-reveal=play] > :nth-child(12){ --i:11; }
+/* -- detail_morph -- */
+/* MorphGlyph (design/26-DETAILS.md section 3.2): two stacked layers, each an `svg` in an HTML
+   wrapper the stylesheet can move (Blitz's stylesheet does not reach inside an SVG). The incoming
+   layer is in flow and sizes the box; the outgoing one and the slash sit over it. Each layer plays
+   its pulse class once (`a-morph-*`) and is still after. */
+
+.ds-morph-glyph{ position:relative; display:inline-block; flex:none; line-height:0; }
+.ds-morph-layer{ display:block; }
+.ds-morph-layer[*|data-morph=out]{ position:absolute; left:0; top:0; }
+.ds-morph-slash{ position:absolute; left:0; top:0; }
+/* -- detail_roll -- */
+/* RollDigits (design/26-DETAILS.md A7): a changed character rolls up into its place as the old
+   one rolls out above it, each once (`a-roll-in`, `a-roll-out`); unchanged ones stand. The column
+   clips the two so only its own place shows. */
+
+.ds-roll-digits{ display:inline-flex; white-space:pre; }
+.ds-roll-digit{ display:inline-block; }
+.ds-roll-col{ position:relative; display:inline-block; overflow:hidden; }
+.ds-roll-col > .ds-roll-old{ position:absolute; left:0; top:0; }

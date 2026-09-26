@@ -40,12 +40,18 @@ impl MotionTimer {
     /// timer whose owner has unmounted does nothing, and one running when its owner unmounts is
     /// dropped with it: `on_settled` never runs for a component that is gone.
     pub fn start(&self, on_settled: EventHandler<()>) {
-        let _ = self.try_start(on_settled);
+        let _ = self.try_start(on_settled, StaggerIndex::default());
     }
 
-    fn try_start(&self, on_settled: EventHandler<()>) -> Result<(), Gone> {
+    /// Start (or restart) the timer for a stagger whose last member is at `index`: it settles at
+    /// `settle(anim, level, index)` (a `Reveal`'s twelfth row, design/26 R13).
+    pub(crate) fn start_staggered(&self, index: StaggerIndex) {
+        let _ = self.try_start(EventHandler::new(|()| {}), index);
+    }
+
+    fn try_start(&self, on_settled: EventHandler<()>, index: StaggerIndex) -> Result<(), Gone> {
         let level = try_get(self.env)?.resolved.motion;
-        let length = settle(self.anim, level, StaggerIndex::default());
+        let length = settle(self.anim, level, index);
         if let Some(running) = try_get(self.task)? {
             running.cancel();
         }
