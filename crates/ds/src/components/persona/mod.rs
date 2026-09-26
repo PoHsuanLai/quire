@@ -17,6 +17,7 @@ pub mod spec;
 mod tests;
 
 pub use mood::{Mood, PersonaFinish, PersonaSize, WakeStamp};
+pub(crate) use picture::photo;
 pub use picture::{UserPicture, UserPortrait};
 pub use seed::{BLINK_MAX, BLINK_MIN};
 pub use spec::{

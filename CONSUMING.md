@@ -1536,11 +1536,11 @@ sizes (`Size48`, `Size64`: a `match` of yours over `AvatarSize` needs them), two
 | --- | --- | --- |
 | `LockScreen` | `wallpaper: Option<ImageSource>`, `clock: Element`, `prompt: Element` | The lock surface's stage: the wallpaper covering it under `--lock-veil` (pass it already blurred; Blitz blurs nothing), the clock 7 % of the width from the top, the prompt near the bottom, centred. Put it in `Ds { material: Material::Window, extent: RootExtent::Viewport }`, one per output |
 | `LockClock` | `time: String`, `date: String`, `look: LockLook` (`Clear`) | The date, then the time in the display face at `--fs-lock-clock` 700, white. You word both (locale, 12/24 h) and re-render each minute. `LockLook::Space` sets the date in a pill of the Space gradient |
-| `LockPrompt` | `user: LockUser { name: String, avatar: AvatarFace }`, `state: PromptState` (`Idle`), `caps: CapsLock` (`Off`), `look: LockLook` (`Clear`), `placeholder: Option<String>` ("Enter Password"), `hint: Option<Text>`, `oninput: EventHandler<String>`, `onsubmit: EventHandler<String>` | The avatar (drawn at 64 whatever size it carries), the name, a 260 x 38 pill of flat white glass holding a `Secret` field (its text is never in the markup: there is no `value` prop), the caps-lock mark, an enter arrow that shows once something is typed, and the hint line. Enter or the arrow calls `onsubmit(text)` (never with an empty text); Escape empties the field and calls `oninput("")`. The field takes the keyboard as it mounts and again after each emptying. `LockLook::Space` paints the pill with the Space gradient |
-| `PromptState` | `Idle`, `Checking`, `Wrong`, `LockedOut { until: String }` | Yours to move. `Checking`: the field and the submit are closed, the arrow spins. `Wrong`: the field plays `shake-x` once (`settle(Anim::ShakeX)`, 420 ms) and empties itself when it settles, calling `oninput("")`; it shakes again only after the state has been something else (go through `Checking` for the next try). `LockedOut`: closed, the hint line says "Try again at {until}" |
+| `LockPrompt` | `user: LockUser { name: String, picture: UserPicture }` (`LockUser::new(name, picture)`), `state: PromptState` (`Idle`), `caps: CapsLock` (`Off`), `look: LockLook` (`Clear`), `placeholder: Option<String>` ("Enter Password"), `hint: Option<Text>`, `wake: Option<WakeStamp>`, `oninput: EventHandler<String>`, `onsubmit: EventHandler<String>` | The person's picture at 64 (a face whatever size it carries, a photo cropped round, or the persona playing the prompt's own mood; see "Lock picture" below), the name, a 260 x 38 pill of flat white glass holding a `Secret` field (its text is never in the markup: there is no `value` prop), the caps-lock mark, an enter arrow that shows once something is typed, and the hint line. Enter or the arrow calls `onsubmit(text)` (never with an empty text); Escape empties the field and calls `oninput("")`. The field takes the keyboard as it mounts and again after each emptying. `LockLook::Space` paints the pill with the Space gradient |
+| `PromptState` | `Idle`, `Checking`, `Wrong`, `LockedOut { until: String }`, `Accepted` | Yours to move. `Accepted` (the password was right): the field stays closed and a persona plays Happy; unlock at `settle(Anim::PersonaHop)`. `Checking`: the field and the submit are closed, the arrow spins. `Wrong`: the field plays `shake-x` once (`settle(Anim::ShakeX)`, 420 ms) and empties itself when it settles, calling `oninput("")`; it shakes again only after the state has been something else (go through `Checking` for the next try). `LockedOut`: closed, the hint line says "Try again at {until}" |
 | `CapsLock` | `On`, `Off` | Read the modifier state from the keyboard and pass it; `On` draws the caps-lock arrow in the field |
 | `LockLook` | `Clear`, `Space` | Where the Space's colour reaches (the date pill and the field); the time stays white |
-| `PolkitPrompt` | `action: Text`, `detail: Option<Text>`, `title: Option<String>` ("Authentication Required"), `user: LockUser`, `state: PromptState`, `caps: CapsLock`, `oninput`, `onsubmit`, `oncancel: EventHandler<()>`, `shown: Option<Shown>`, `on_hidden: Option<EventHandler<()>>` | A narrow centred `Sheet` over the modal scrim (`peek-in` in, `sheet-out` out, `on_hidden` at its settle): the avatar at 48, the title, `action`, "Details" with `detail` as a hover card, the name over a boxed `Secret` field, Cancel and Authenticate at equal width. Enter or Authenticate submits; Cancel, Escape and the scrim call `oncancel`. `Wrong` shakes the field once and empties it; `LockedOut` shows "Too many tries. Try again at {until}." in `--danger`. Put it in `Ds { material: Material::Sheet, extent: RootExtent::Viewport }` |
+| `PolkitPrompt` | `action: Text`, `detail: Option<Text>`, `title: Option<String>` ("Authentication Required"), `user: LockUser`, `state: PromptState`, `caps: CapsLock`, `oninput`, `onsubmit`, `oncancel: EventHandler<()>`, `shown: Option<Shown>`, `on_hidden: Option<EventHandler<()>>` | A narrow centred `Sheet` over the modal scrim (`peek-in` in, `sheet-out` out, `on_hidden` at its settle): the person's picture at 48 (a persona there stays idle), the title, `action`, "Details" with `detail` as a hover card, the name over a boxed `Secret` field, Cancel and Authenticate at equal width. Enter or Authenticate submits; Cancel, Escape and the scrim call `oncancel`. `Wrong` shakes the field once and empties it; `LockedOut` shows "Too many tries. Try again at {until}." in `--danger`. Put it in `Ds { material: Material::Sheet, extent: RootExtent::Viewport }` |
 | `Sheet` | `width: SheetWidth` (`Regular`) | `SheetWidth::Narrow` draws the sheet `min(340px, 88%)` wide (`data-width="narrow"`); a regular sheet's markup is unchanged |
 | `AppSwitcher` | `apps: Vec<SwitcherApp>`, `selected: AppKey`, `output: Option<Px>`, `metrics: SwitcherMetrics`, `onhover: EventHandler<AppKey>`, `onactivate: EventHandler<AppKey>` | The Cmd+Tab row on the Osd material, painted as the OSD card is (the Space gradient at the frame alpha). Cells of `metrics.cell` with icons of `metrics.icon`, `metrics.gap` apart, padding 16; the selection a `--f-pill` square behind the selected cell, moving with `--t-quick --e-spring`; the selected app's name under it (its `Tooltip { Fly }`, shown by the switcher). Past `output - 64` the icons shrink, down to `metrics.min_icon`, then the row scrolls with the selection centred where it can be. The pointer entering a tile calls `onhover(key)`, a click `onactivate(key)`: the selection is yours to move. It fades in over `--t-quick`. The show delay, the keys and the modifier's release are yours. Put it in `Ds { material: Material::Osd, chrome: Some(RootChrome::Transparent) }` |
 | `SwitcherApp` | `{ key: AppKey, name: String, icon: IconSource, plate: Option<PlateFamily>, presence: TilePresence }`; `SwitcherApp::new(key, name, icon)` | One tile. A glyph is drawn at the cell's icon size (on `plate` when given); an external icon is stretched to that square, so resolve it at `metrics.icon`. `presence: TilePresence::Leaving` plays `fold` once (Q: the app quits); drop it from `apps` at `settle(Anim::Fold)` |
@@ -1570,8 +1570,34 @@ mood: Mood, wake: WakeStamp, finish: PersonaFinish }` draws the user's character
 | The icons are muted | `finish: PersonaFinish::Muted` |
 
 Reduced motion is quire's: moods change at once and nothing blinks. A surface that can show
-either a letter or a persona takes `UserPicture::{Face(AvatarFace), Persona(PersonaSpec)}` and
-draws it with `UserPortrait { picture, size, mood, wake }`. Never style `.ds-persona*`.
+a letter, a photo or a persona takes `UserPicture::{Face(AvatarFace), Photo(ImageSource),
+Persona(PersonaSpec)}` and draws it with `UserPortrait { picture, size, mood, wake }`; the lock
+and polkit prompts take one in `LockUser` ("Lock picture" below). Never style `.ds-persona*`.
+
+### Lock picture (2026-09-26): photo, persona and moods in the lock and polkit prompts
+
+design/04 section 42; design/24 section 4. **Breaking, one line:** `LockUser`'s `avatar:
+AvatarFace` is now `picture: UserPicture`. Write
+
+```rust
+LockUser::new(name, face)            // was: LockUser { name, avatar: face }
+```
+
+(`LockUser::new(name: impl Into<String>, picture: impl Into<UserPicture>)`; or
+`LockUser { name, picture: face.into() }`). `PromptState` gained `Accepted`, so an exhaustive
+`match` of yours over it needs the arm. `UserPicture` is no longer `Copy` (a photo holds a
+`String`): `.clone()` where you copied one.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `UserPicture` | `Face(AvatarFace)`, `Photo(ImageSource)`, `Persona(PersonaSpec)`; `From` each | `Photo` is the user's own picture: `$HOME/.face` or AccountsService's `IconFile`, as `ImageSource::file(path)`. Drawn in a disc (`div.ds-user-photo[data-size]` clipping an `img` with `object-fit: cover`), at the face's size: 64 at the lock, 48 in the polkit sheet, `size` in `UserPortrait` |
+| `LockPrompt` mood | from its own state | A persona is `Attentive` while the field holds text and has the caret, and while `Checking`; `Wince` when `Wrong` (once per wrong: typing again turns it attentive, the next `Wrong` winces once more, never harder); `Happy` when `Accepted`; `Idle` otherwise. Set nothing: move `PromptState` as before |
+| `LockPrompt` wake | `wake: Option<WakeStamp>` | A key, a pointer move or a press in the prompt wakes the persona (at most once a second), so it rests again 20 s after the last activity. Pass `Some(stamp.next())` to wake it from outside, e.g. when the display comes back on |
+| Faces and photos | | Have no moods and ignore `wake` |
+
+**The unlock, with a persona.** `onsubmit(text)` → `state: Checking` → PAM says yes →
+`state: Accepted` → after `settle(Anim::PersonaHop, level, StaggerIndex::default())` unlock
+(and fade the surface). With a face or photo `Accepted` just holds the field closed.
 
 ### Widget vibrancy (2026-09-26)
 

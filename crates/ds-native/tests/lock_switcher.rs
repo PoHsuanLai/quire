@@ -2,13 +2,15 @@
 //! wrong password shakes the field once and the field empties only after the shake has settled;
 //! Enter hands the typed secret to `onsubmit`, never writing it into the markup; Escape empties
 //! the field; the switcher reports the tile the pointer rests on and the one clicked, and keeps
-//! the selection inside its view when the row scrolls.
+//! the selection inside its view when the row scrolls. A persona in the lock prompt takes its
+//! mood from the prompt: attentive while typing, a wince once per wrong password, happy once
+//! accepted.
 
 use dioxus::prelude::*;
 use ds::{
     Anim, AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds,
-    Icon, IconSource, Key, LockPrompt, LockUser, Material, MotionLevel, PlateFamily, PolkitPrompt,
-    PromptState, Px, RootChrome, StaggerIndex, SwitcherApp, person_hue, settle,
+    Icon, IconSource, Key, LockPrompt, LockUser, Material, MotionLevel, PersonaSpec, PlateFamily,
+    PolkitPrompt, PromptState, Px, RootChrome, StaggerIndex, SwitcherApp, person_hue, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -30,14 +32,30 @@ fn ms(n: u64) -> Duration {
 }
 
 fn user() -> LockUser {
-    LockUser {
-        name: "Dana Reyes".to_owned(),
-        avatar: AvatarFace {
+    LockUser::new(
+        "Dana Reyes",
+        AvatarFace {
             initial: 'D',
             size: AvatarSize::Size34,
             tone: AvatarTone::Person(person_hue("dana")),
             shape: AvatarShape::Round,
         },
+    )
+}
+
+#[allow(non_snake_case)]
+fn PersonaLock() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "display:flex; justify-content:center; padding:24px",
+                LockPrompt {
+                    user: LockUser::new("Dana Reyes", PersonaSpec::from_seed(7)),
+                    state: STATE(),
+                    oninput: move |text: String| HEARD.write().push(text),
+                    onsubmit: move |text: String| SUBMITTED.write().push(text),
+                }
+            }
+        }
     }
 }
 
@@ -158,6 +176,87 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     assert_eq!(
         harness.attr(".ds-lock-prompt", "data-state").as_deref(),
         Some("wrong")
+    );
+}
+
+fn mood(harness: &Harness) -> Option<String> {
+    harness.attr(".ds-lock-prompt .ds-persona", "data-mood")
+}
+
+fn wincing(harness: &Harness) -> bool {
+    harness.has_class(".ds-lock-prompt .ds-persona-shake", "a-persona-wince")
+}
+
+/// Poll until the persona's mood is `want`, and say whether it got there.
+fn mood_becomes(harness: &mut Harness, want: &str) -> Option<String> {
+    settle_until(harness, |h| mood(h).as_deref() == Some(want));
+    mood(harness)
+}
+
+#[test]
+fn the_persona_winces_once_per_wrong_password_and_is_happy_when_accepted() {
+    let mut harness = mounted(PersonaLock);
+    assert_eq!(
+        mood(&harness).as_deref(),
+        Some("idle"),
+        "{}",
+        harness.html()
+    );
+    assert_eq!(
+        harness
+            .attr(".ds-lock-prompt .ds-persona", "data-size")
+            .as_deref(),
+        Some("64")
+    );
+    type_text(&mut harness, "abc");
+    assert_eq!(
+        mood_becomes(&mut harness, "attentive").as_deref(),
+        Some("attentive")
+    );
+
+    set_state(&mut harness, PromptState::Checking);
+    assert_eq!(mood(&harness).as_deref(), Some("attentive"), "checking");
+
+    set_state(&mut harness, PromptState::Wrong);
+    assert_eq!(
+        mood_becomes(&mut harness, "wince").as_deref(),
+        Some("wince")
+    );
+    assert!(wincing(&harness), "the wince plays: {}", harness.html());
+    // It shakes once and holds the squint: once the field has emptied, still wincing.
+    settle_until(&mut harness, |h| !wincing(h) && !shaking(h));
+    assert_eq!(dots(&harness, ".ds-lock-field"), None, "the field emptied");
+    assert_eq!(mood(&harness).as_deref(), Some("wince"), "held");
+
+    // Typing again turns it attentive; the next wrong password winces once more, no harder.
+    type_text(&mut harness, "abd");
+    assert_eq!(
+        mood_becomes(&mut harness, "attentive").as_deref(),
+        Some("attentive")
+    );
+    set_state(&mut harness, PromptState::Checking);
+    set_state(&mut harness, PromptState::Wrong);
+    assert_eq!(
+        mood_becomes(&mut harness, "wince").as_deref(),
+        Some("wince")
+    );
+    assert!(wincing(&harness), "the second wrong winces again");
+    settle_until(&mut harness, |h| !wincing(h));
+
+    type_text(&mut harness, "abe");
+    set_state(&mut harness, PromptState::Checking);
+    set_state(&mut harness, PromptState::Accepted);
+    assert_eq!(
+        mood_becomes(&mut harness, "happy").as_deref(),
+        Some("happy")
+    );
+    assert!(
+        harness.has_class(".ds-lock-prompt .ds-persona-hop", "a-persona-hop"),
+        "accepted hops once"
+    );
+    assert_eq!(
+        harness.attr(".ds-lock-prompt", "data-state").as_deref(),
+        Some("accepted")
     );
 }
 

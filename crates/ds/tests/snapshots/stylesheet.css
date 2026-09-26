@@ -1516,7 +1516,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-clock[*|data-look=space] .ds-lock-date{ background:var(--f-grad); color:var(--f-ink); border-radius:var(--r-pill); padding:var(--s-3) var(--s-14); margin-bottom:var(--s-8); }
 /* -- lock_prompt -- */
 /* LockPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright, as
-   the reference lock screen: the avatar at 64, the name in white 16/700, a pill of flat white
+   the reference lock screen: the person's picture at 64 (a face, a photo cropped round, or the
+   persona playing the prompt's mood), the name in white 16/700, a pill of flat white
    glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) holding the secret field, the
    caps-lock mark and a 28 px enter arrow in a brighter glass disc that shows once something is
    typed, and a small hint line in `--lock-ink-soft`. The pill plays `shake-x` once through its
@@ -2025,6 +2026,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .ds-persona-tilt,
 .ds[*|data-motion=reduced] .ds-persona-look,
 .ds[*|data-motion=reduced] .ds-persona-layer{ transition:none; }
+
+/* UserPicture::Photo: the user's own picture, cropped round. The disc clips (overflow hidden
+   under the pill radius) and the image covers it (`object-fit:cover`, centred), so a portrait
+   or landscape photo fills the disc without stretching. The sizes are the avatar's and the
+   persona's: 28, 48 (the polkit prompt), 64 and 128; --surface-2 shows until the image lands. */
+.ds-user-photo{ position:relative; flex:none; box-sizing:border-box; overflow:hidden; border-radius:var(--r-pill);
+  background:var(--surface-2); }
+.ds-user-photo[*|data-size="28"]{ width:28px; height:28px; }
+.ds-user-photo[*|data-size="48"]{ width:48px; height:48px; }
+.ds-user-photo[*|data-size="64"]{ width:64px; height:64px; }
+.ds-user-photo[*|data-size="128"]{ width:128px; height:128px; }
+.ds-user-photo-image{ display:block; width:100%; height:100%; object-fit:cover; object-position:50% 50%; }
 /* -- popover -- */
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
    card and the bubble, and the overlay wrapper every floating component renders into at the end
@@ -2055,12 +2068,14 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- polkit_prompt -- */
 /* PolkitPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.10): a narrow centred
    sheet (`SheetWidth::Narrow`, 340) as the reference desktop's password alert: everything
-   centred in one column, the avatar at 48, a bold title (display 16/700), the program's message
+   centred in one column, the person's picture at 48 (a face, a photo, or a persona at rest), a bold title (display 16/700), the program's message
    in the soft ink, "Details" in the accent with the detail as a hover card, the person's name
    over a boxed secret field that shakes once when it was wrong (`a-shake-x`), and Cancel and
    Authenticate side by side at equal width. Flat: the sheet's own material, no extra shadow. */
 
 .ds-polkit{ display:flex; flex-direction:column; align-items:center; box-sizing:border-box; width:100%; padding:var(--s-22) var(--s-22) var(--s-18); text-align:center; color:var(--ink); }
+/* A persona is drawn at Medium and set in a 48 box: it is drawn and moves in shares of its box. */
+.ds-polkit .ds-persona[*|data-size]{ width:48px; height:48px; }
 .ds-polkit-title{ margin-top:var(--s-12); font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
 .ds-polkit-action{ margin-top:var(--s-6); font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
 .ds-polkit-details{ margin-top:var(--s-6); font-size:var(--fs-small); }
