@@ -31,6 +31,12 @@ anyrender_vello_hybrid = { workspace = true }
 anyrender_vello_cpu = { workspace = true }
 parley = { workspace = true }
 wgpu = { workspace = true }
+# The hybrid harness backend (`crate::gpu_paint`): vello_hybrid driven directly on an offscreen
+# device, its image ids, and the device handle anyrender_vello_hybrid paints with.
+vello_hybrid = { workspace = true }
+vello_common = { workspace = true }
+wgpu_context = { workspace = true }
+rustc-hash = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
@@ -72,11 +78,8 @@ pdfrum = { workspace = true }
 pdfrum-edit = { workspace = true }
 pdfrum-common = { workspace = true }
 # The colour-emoji probe's backend half (examples/emoji_probe_hybrid.rs): glyph ids from the
-# cmap, and vello_hybrid driven headless on a wgpu device.
+# cmap (vello_hybrid and wgpu_context are normal dependencies now).
 skrifa = { workspace = true }
-vello_hybrid = { workspace = true }
-wgpu_context = { workspace = true }
-rustc-hash = { workspace = true }
 # The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
 ds-settings = { workspace = true }
 

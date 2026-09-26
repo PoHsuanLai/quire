@@ -19,23 +19,20 @@ use crate::hover_replay::{RestingPointer, Synced};
 use crate::memory_shell::MemoryShell;
 use crate::net::DsNet;
 use crate::node_ref::DocRef;
+use crate::painter::{Canvas, PaintTime, Painter};
 use crate::scheme;
 use crate::setup::Setup;
 use crate::snapshot::Viewport;
 use crate::wake::Wakeup;
-use anyrender::{PaintScene as _, render_to_buffer};
-use anyrender_vello_cpu::VelloCpuImageRenderer;
 use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
 use blitz_html::HtmlProvider;
-use blitz_paint::paint_scene;
 use blitz_traits::events::UiEvent;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
 use ds::{HostModality, HostScale, InputModality, Scale};
-use peniko::kurbo::{Affine, Rect};
-use peniko::{Color, Fill};
+use peniko::Color;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -78,6 +75,8 @@ pub(crate) struct Headless {
     /// The last pointer event, replayed when a resolve moves the hover by itself
     /// (`crate::hover_sync`).
     resting: Option<RestingPointer>,
+    /// What paints it: vello_cpu unless the harness asked for vello_hybrid.
+    pub(crate) painter: Painter,
 }
 
 /// Whether the document hands the keyboard on when its element is removed.
@@ -167,6 +166,7 @@ impl Headless {
             listeners,
             keeper,
             resting: None,
+            painter: Painter::Cpu,
         }
     }
 
@@ -276,29 +276,39 @@ impl Headless {
 
     /// Paint the document as it was last resolved, over `backdrop`.
     pub(crate) fn paint(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, NativeError> {
-        let (width, height) = physical(self.viewport);
-        let scale = scale(self.viewport);
+        let canvas = self.canvas(backdrop);
         let mut inner = self.doc.inner.borrow_mut();
-        let ground = match (backdrop, inner.viewport().color_scheme) {
+        let pixels = self.painter.picture(&mut inner, canvas)?;
+        let (width, height) = (canvas.width, canvas.height);
+        let length = pixels.len();
+        image::RgbaImage::from_raw(width, height, pixels).ok_or_else(|| {
+            NativeError::Renderer(format!(
+                "the renderer returned {length} bytes for {width}x{height}"
+            ))
+        })
+    }
+
+    /// Paint the document as it was last resolved, over `backdrop`, to the end, and time it.
+    pub(crate) fn paint_timed(&mut self, backdrop: Backdrop) -> Result<PaintTime, NativeError> {
+        let canvas = self.canvas(backdrop);
+        let mut inner = self.doc.inner.borrow_mut();
+        self.painter.time(&mut inner, canvas)
+    }
+
+    /// The frame to paint over `backdrop`, at the viewport's device size.
+    fn canvas(&self, backdrop: Backdrop) -> Canvas {
+        let (width, height) = physical(self.viewport);
+        let ground = match (backdrop, self.doc.inner.borrow().viewport().color_scheme) {
             (Backdrop::Clear, _) => Color::TRANSPARENT,
             (Backdrop::Scheme, ColorScheme::Dark) => Color::BLACK,
             (Backdrop::Scheme, ColorScheme::Light) => Color::WHITE,
         };
-        let canvas = Rect::new(0.0, 0.0, f64::from(width), f64::from(height));
-        let pixels = render_to_buffer::<VelloCpuImageRenderer, _>(
-            |scene| {
-                scene.fill(Fill::NonZero, Affine::IDENTITY, ground, None, &canvas);
-                paint_scene(scene, &mut inner, scale, width, height, 0, 0);
-            },
+        Canvas {
             width,
             height,
-        );
-        let length = pixels.len();
-        image::RgbaImage::from_raw(width, height, pixels).ok_or_else(|| {
-            NativeError::Renderer(format!(
-                "vello_cpu returned {length} bytes for {width}x{height}"
-            ))
-        })
+            scale: scale(self.viewport),
+            ground,
+        }
     }
 }
 
@@ -319,7 +329,7 @@ fn scale(viewport: Viewport) -> f64 {
 }
 
 /// The viewport in device pixels.
-fn physical(viewport: Viewport) -> (u32, u32) {
+pub(crate) fn physical(viewport: Viewport) -> (u32, u32) {
     let device = |logical: u32| (f64::from(logical) * scale(viewport)).round() as u32;
     (device(viewport.width), device(viewport.height))
 }

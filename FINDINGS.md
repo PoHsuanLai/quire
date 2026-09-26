@@ -4189,7 +4189,8 @@ not installed).
 - **Not measured.** vello_hybrid's `glyph_run` has the glyph atlas cache off
   (`atlas_cache_enabled: false`), so a COLRv1 glyph's paint graph is re-rasterised every frame it
   is drawn; a full picker grid (a few hundred glyphs) scrolling at 60 Hz is the case to time
-  before M9 ships; the probe drew ten glyphs and timed nothing.
+  before M9 ships; the probe drew ten glyphs and timed nothing. **Measured 2026-09-27: "Hybrid
+  harness backend" below.**
 
 **Recommendation for the emoji grid**, in order:
 
@@ -4472,3 +4473,82 @@ Blitz's hit test ignores the card's stacking layer. It does not; the cause was a
   sorts below positioned siblings). sill's popups that use quire's overlay host are safe;
   sill passes no `PartHooks`, so the hook that broke mailo is not in it. sill's own CSS was not
   audited box by box for the deviation. Nothing here was changed in shell-host or sill.
+
+## Hybrid harness backend (2026-09-27)
+
+sill Q330: time the emoji picker's grid on vello_hybrid, the renderer shell surfaces use, not
+only on vello_cpu. Branch `harness-hybrid`. API in CONSUMING.md "Hybrid harness backend".
+
+- **What was built.** `HarnessConfig::with_backend(Backend::Hybrid)` paints the same document
+  through anyrender_vello_hybrid into an offscreen `Rgba8Unorm` texture on one wgpu device
+  opened when the harness is built (`crate::gpu_paint`); the renderer, its `Resources` and the
+  uploaded images live for the harness's life, as in a window. Pictures are read back, so
+  `render()` / `render_over()` and every pixel assertion work on both backends
+  (`tests/hybrid_backend.rs`: under 1% of pixels differ by more than 24 levels from vello_cpu,
+  the anti-aliased edges; flat fills are identical). The adapter is chosen as shell-host's
+  `GpuContext::offscreen` chooses it (`AdapterPref`, `WGPU_ADAPTER_NAME`), reimplemented in
+  `crate::gpu_adapter` because quire cannot depend on shell-host. No adapter:
+  `Harness::try_with_config` returns `NativeError::Renderer`, no panic.
+- **Timing is honest.** `Harness::paint_timed()` paints without a readback and, on
+  vello_hybrid, submits and polls the device with `wait_indefinitely` before stopping the clock,
+  so the frame's time includes the GPU finishing it. `PaintTime::scene` is the part spent
+  building the scene (Blitz's paint walk plus vello_hybrid flattening paths and glyphs into
+  strips, all on the CPU); the rest is recording, submission and the GPU. On vello_cpu the
+  harness still builds a fresh renderer per picture (unchanged), so its numbers include that.
+- **The benchmark** (`emoji_grid_scrolls_on_both_backends`, `#[ignore]`, run in release):
+  a 400 x 480 viewport at 100%, one `overflow-y:scroll` grid of 300 `.ds-emoji-text` cells
+  (50 x 48 px, 32 px glyphs, U+1F300 onwards, all distinct COLRv1 glyphs; about 90 visible at
+  once), scrolled 7 px per frame for 180 frames by `Harness::wheel`, each frame painted with
+  `paint_timed`. Two controls: the same 300 cells holding "Ab" in Inter, and a 104-cell grid
+  (13 rows) to price the cells scrolled out of view. Three runs on this machine (Ryzen 9 9950X,
+  RTX 5070 Ti on NVIDIA 615.71 Vulkan; the 9950X's iGPU, RADV RAPHAEL_MENDOCINO, selectable with
+  `AdapterPref::Integrated` or `WGPU_ADAPTER_NAME=AMD`). Median of the three runs' figures, ms:
+
+| Grid | Backend | p50 | p95 | max | scene p50 |
+| --- | --- | --- | --- | --- | --- |
+| 300 emoji | vello_cpu | 11.33 | 17.03 | 21.88 | 10.22 |
+| 300 emoji | vello_hybrid, RTX 5070 Ti | 4.33 | 5.05 | 6.40 | 3.15 |
+| 300 emoji | vello_hybrid, AMD iGPU | 4.91 | 6.65 | 10.07 | 3.07 |
+| 300 "Ab" cells | vello_cpu | 0.81 | 0.97 | 1.12 | 0.53 |
+| 300 "Ab" cells | vello_hybrid, RTX 5070 Ti | 2.16 | 2.24 | 2.59 | 0.47 |
+| 300 "Ab" cells | vello_hybrid, AMD iGPU | 1.59 | 2.22 | 2.28 | 0.46 |
+| 104 emoji | vello_cpu | 7.04 | 10.09 | 11.32 | 6.12 |
+| 104 emoji | vello_hybrid, RTX 5070 Ti | 4.35 | 4.40 | 5.27 | 2.30 |
+| 104 emoji | vello_hybrid, AMD iGPU | 3.72 | 3.91 | 5.09 | 2.22 |
+
+  The wheel event plus style and layout is 0.03 to 0.1 ms p50 (0.47 ms worst) on every run: a
+  scroll does not relayout. The first frame is 6 to 7 ms on vello_hybrid (once 13 ms on the iGPU).
+  The runs are noisy on vello_cpu (p50 9.55 to 12.37 ms for the main grid over four runs) and steady
+  on vello_hybrid (4.32 to 4.34 on the 5070 Ti).
+- **The grid fits a 60 Hz frame on vello_hybrid with room to spare**: p95 5 to 7 ms on either
+  GPU against a 16.7 ms budget, the worst frame 10 ms (the iGPU). On vello_cpu the p95 is 17
+  ms, over budget, so the CPU backend is the one that would miss frames.
+- **What sill should know about vello_hybrid's glyph cost.**
+  - **It is CPU time, not GPU time.** vello_hybrid rasterises coarsely on the CPU (paths and
+    glyph outlines into sparse strips) and only fills them on the GPU. With the atlas cache off
+    (`Scene::glyph_run` hard-codes `atlas_cache_enabled: false`, and anyrender_vello_hybrid's
+    `draw_glyphs` never turns it on), every visible COLRv1 glyph's paint graph (layers,
+    gradients, clips) is walked and flattened again every frame: the scene is 3.1 ms (p50) for the
+    emoji grid against 0.5 ms for the same cells as text, so about 2.6 ms for ~90 visible
+    emoji, **roughly 30 µs per visible emoji per frame** at 32 px, on a 9950X core. A slower CPU
+    scales it; a faster GPU does not help (the 5070 Ti and the iGPU build the same 3.1 ms
+    scene).
+  - **Cells scrolled out of view are cheap but not free.** 300 cells against 104 (about the
+    same number visible) is 3.1 against 2.2 ms of scene: ~4.5 µs per off-screen cell, Blitz's walk
+    and clipped glyph runs, not a full re-rasterisation. A virtualised grid saves under 1 ms.
+  - **The rest of the frame is 1.1 to 1.8 ms whatever the content** (`total - scene`: 1.7 ms on
+    the 5070 Ti for the text grid, 1.2 for the emoji grid; 1.1 and 1.8 on the iGPU): recording,
+    submission and waiting for the GPU. `paint_timed` serialises it after the scene; a window
+    can overlap it with the next frame's CPU work, so a window's frame is probably nearer the
+    scene time than `total` (not measured).
+  - **Size and scale were not varied.** The cost is flattening outlines into strips, which
+    should grow with the glyph's pixel size; time the picker's real cell size at 125% and 150%
+    (`Viewport::scale_percent`) before relying on these numbers there.
+  - Turning the atlas cache on should make a scrolling grid far cheaper after the first frame
+    (glifo would keep each rasterised glyph and draw it as an image; not tried), but it is not
+    reachable from anyrender at this pin: it needs anyrender_vello_hybrid to call `.atlas_cache(true)` on its
+    glyph run (an upstream change, or a fork of the one crate).
+- **A harness gotcha found on the way**: inside `Ds`, a `position:absolute` child is not hit by
+  Blitz's `element_from_point` (`Harness::hits` is false over it), so `Harness::wheel` over it
+  scrolls nothing; the same scroll container in normal flow scrolls. The benchmark's grid is in
+  flow. Not investigated further.
