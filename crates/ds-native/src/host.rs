@@ -102,6 +102,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
         FocusFallback::BlitzDefault => None,
     });
     use_context_provider(|| crate::edit::EDIT);
+    // An `EditSurface { spell: Spell::On {..} }` checks through the system's dictionaries.
+    #[cfg(feature = "spellcheck")]
+    crate::spell::provide();
     let listeners = use_context_provider(EditListeners::default);
     let clipboard = use_context_provider(HostClipboard::default);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));

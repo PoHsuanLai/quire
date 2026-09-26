@@ -1,12 +1,14 @@
 //! The Edit page: an app's own two paragraphs and a chip inside `EditSurface`, with the caret an
 //! app draws placed from the host's caret rect (the surface draws none). Click in the text to
-//! move it; the last input is printed.
+//! move it; the last input is printed. Spelling is on: a misspelt word gets the dotted
+//! underline, and a right-click on it opens the suggestions (the page applies none: its text is
+//! fixed).
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
     Chip, ChipVariant, EditHandle, EditInput, EditKind, EditPointer, EditSurface, FRAME_SLACK,
-    PointerPhase, Probe, Rect, TextPosition, sleep, use_edit_handle,
+    PointerPhase, Probe, Rect, Spell, TextPosition, sleep, use_edit_handle,
 };
 
 /// How many frames the caret waits for a layout before giving up.
@@ -35,6 +37,8 @@ pub fn EditPage() -> Element {
                     EditSurface {
                         handle,
                         label: "Message",
+                        spell: Spell::On { lang: None },
+                        caret: Some(caret()),
                         on_input: move |input: EditInput| last.set(format!("{input:?}")),
                         on_pointer: move |pointer: EditPointer| {
                             if pointer.phase == PointerPhase::Press
@@ -44,7 +48,7 @@ pub fn EditPage() -> Element {
                             }
                         },
                         div { class: "g-edit-body",
-                            p { "data-edit-node": "g0", "Dear Ada," }
+                            p { "data-edit-node": "g0", "Dear Ada, a quick noet about speling:" }
                             p { "data-edit-node": "g1",
                                 "Lunch with "
                                 span { class: "g-edit-chip", "data-edit-node": "g2", "data-edit-kind": EditKind::Atom.slug(),

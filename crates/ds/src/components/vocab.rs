@@ -231,6 +231,8 @@ pub enum Key {
     PageDown,
     /// Insert: with Shift a paste, with Ctrl a copy, in a text surface.
     Insert,
+    /// The context-menu key (the Menu key): opens a text surface's spelling menu at the caret.
+    ContextMenu,
 }
 
 /// A shape a key's glyph draws as, for `Kbd`'s `data-glyph`: a hook for a face rule that only
@@ -268,7 +270,7 @@ impl Key {
     /// The text one key cap shows. Only `⌃ ⇧ ⌥ ⌘`, upper-case characters and `↵` are the
     /// doc's; the rest are not specified in design/04-COMPONENTS.md (O-2 names only the
     /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace, the arrows and Home, End, Delete, PageUp,
-    /// PageDown and Insert need sign-off.
+    /// PageDown, Insert and ContextMenu need sign-off.
     pub(crate) fn glyph(self) -> String {
         match self {
             Key::Ctrl => "⌃".to_string(),
@@ -291,6 +293,7 @@ impl Key {
             Key::PageUp => "⇞".to_string(),
             Key::PageDown => "⇟".to_string(),
             Key::Insert => "Ins".to_string(),
+            Key::ContextMenu => "Menu".to_string(),
         }
     }
 
