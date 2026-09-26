@@ -75,8 +75,8 @@ a test) must cancel the margin itself or draw inside a `Ds`.
 
 Every quire component must be drawn inside one `Ds` (`root/ds.rs`; design/03-COLOR.md
 section 17.1; `crates/ds/src/root/ds.rs`). It resolves your appearance to a scheme, an accent
-and a motion level; stamps `data-theme`, `data-accent`, `data-motion`, `data-material`,
-`data-blur`, `data-modality` and `data-hover` on its own `div.ds`; injects the stylesheet
+and a motion level; stamps `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
+`data-material`, `data-blur`, `data-modality` and `data-hover` on its own `div.ds`; injects the stylesheet
 (unless you ask it not to); and provides the `Env`, `HoverHub`, `ToastHub`, `LayerStack` and
 `Overlays` contexts every component reads. It also renders `OverlayHost` and `ToastHost` after
 your children, so menus, popovers and toasts always have somewhere to mount. `ToastHost` lays
@@ -264,7 +264,8 @@ your own component.
 A subtree in a different `Material`, or forced to a scheme, accent or blur state other than the
 root's (a popover over a dark card, an always-light preview pane, a specimen in another accent)
 is a `Surface`, not a second `Ds`: no stylesheet, no frame layers, just a nested `div.ds` that
-re-stamps `data-theme`/`data-accent`/`data-motion`/`data-material`/`data-blur` and updates the
+re-stamps `data-theme`/`data-typeface`/`data-accent`/`data-motion`/`data-material`/`data-blur`
+(the typeface is always the root's) and updates the
 `Env` every component under it reads.
 
 ```rust
@@ -1586,6 +1587,25 @@ changed; the stylesheet's golden moved. The light `Widget` material now paints a
 | The widget frames' blur region (sill) | Keep requesting `ext-background-effect` blur behind each desktop widget card; set the compositor's blur to a Gaussian of **sigma 22 logical pixels** (44 device pixels at 2x), or the nearest strength that spreads a sharp edge 10-90 % over about 56 logical pixels | The reference card's blur, fitted (M26). Without blur the card paints `--m-tint-solid`, the same grey near-opaque |
 | cosmic-gaps (sill) | Add "saturation x1.8 of what shows through a widget's blur" | Measured on the reference (M29, low confidence); a tint can only mix, so the boost is the compositor's or nobody's |
 | Nothing else | The tint's alpha stays .60, above the reference's .48, because the legibility gate needs `--ink` at 4.5:1 over a black backdrop (design/23 section 1.1, "What quire paints") | A lower alpha is a change to the gate, the user's call |
+
+### Inter, the system typeface (2026-09-26)
+
+design/02-TYPE.md section 2; design/22-SETTINGS.md `appearance.typeface`. The desktop's type is
+Inter now: `Ds` takes `typeface: Option<Typeface>` and stamps `data-typeface` on its `div.ds`
+(every `Surface` re-stamps the root's). `None`, the default, takes the enclosing root's, so a
+root nested in another speaks as it does and a top-level root is `Typeface::System`. Under System
+`--font-ui` and `--font-data` are Inter (the data face always tabular), `--font-display` is
+Inter Display (Inter's `opsz` 32 cut); `Typeface::Editorial` maps them back to Bricolage
+Grotesque, Karla and Space Mono exactly as before. A new `--font-code` is Space Mono in both, and
+`Kbd` uses it. Additive only: no class, attribute or prop was removed or renamed.
+
+| Where | What to do | Why |
+| --- | --- | --- |
+| Every root the shell draws | Nothing, or pass `typeface: Some(env.settings.appearance.typeface())` to follow the setting | System is the default |
+| mailo's roots | `typeface: Some(Typeface::Editorial)` on its top-level `Ds` (nested roots inherit it) | mail keeps its voice with one prop |
+| Your CSS | `font-family:var(--font-code)` for code and aligned logs; keep `var(--font-data)` for times, counts and labels | the data face is Inter under System; a fixed pitch is only in `--font-code` |
+| Text-width estimates | Re-measure: Inter's lowercase and digits average 0.552 em at 400 (7.18 px at 13 px) against Karla's 0.527 em (6.86 px); capitals 0.68 em against 0.60 em; data text is narrower than Space Mono's 0.612 em | Inter is wider than Karla, narrower than Space Mono |
+| New tokens | `--font-code`; the voice tokens `--tracking-heading`, `--tracking-lock-clock`, `--tracking-lock-date`, `--tracking-caps`, `--tracking-caps-narrow`, `--fw-caps`, `--fs-caps`, `--tracking-mono`, `--fs-mono` (design/02 section 2.1) | values that follow the typeface |
 
 ### PDF and printing (2026-09-25)
 
