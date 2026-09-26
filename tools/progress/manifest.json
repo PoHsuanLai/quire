@@ -1,8 +1,33 @@
 {
- "updated": "2026-09-26: lock screen, password prompt and app switcher parts; session locking",
+ "updated": "2026-09-26: your animated character (persona); lock screen and switcher parts",
  "archive_url": "https://claude.ai/artifact/GhMLUQjwi9FUxkJgoxrGUB",
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
+  {
+   "id": "persona",
+   "date": "2026-09-26 · decision",
+   "title": "Your own animated character for the lock screen: a family of cute flat creatures that blink, glance, wince, hop and sleep",
+   "status": "decision",
+   "lede": "You asked for a moving, emoji-like user picture like the reference desktop's lock screen. This is our own, drawn from flat shapes in the icon language rather than the reference's assets: people, bears, cats, bunnies and blobs, each built from small choices (head, tone, eyes, brows, mouth, hair or ears, cheeks, an accessory, a backdrop), so any seed gives a pleasant random character and your pick is saved as settings data for a character editor later. It reacts: idle it blinks every few seconds and breathes slightly; while you type your password it glances down at the field; a wrong password makes it wince and shake its head once; unlocking makes it smile and hop; when the display sleeps it falls asleep with a single drifting z. Everything stops 20 seconds after the last activity, so the lock screen goes back to drawing nothing when idle, and reduced motion changes moods without animating. The lock screen can take it in place of the letter avatar next.",
+   "notes": [
+    "Pick: the Colour finish (as shown, brighter than the icons) or the Muted finish (the same characters at about half the colour, matching the icons' muted style). Also open (design/24 §7): whether the lock screen shows the character or the letter by default, and what wakes it there.",
+    "The motion strips are eight stills taken through each mood; the gallery images show resting faces."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/persona/seeds-light.png",
+     "caption": "Forty-eight random characters, one per seed (light)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/persona/seeds-dark.png",
+     "caption": "The same forty-eight (dark)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/persona/moods.png",
+     "caption": "Each mood as eight frames: idle blink, attentive glance, wince, happy hop, asleep with a drifting z."
+    }
+   ]
+  },
   {
    "id": "m11-parts",
    "date": "2026-09-26 · lock and switcher",
