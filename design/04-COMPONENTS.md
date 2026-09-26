@@ -3562,6 +3562,84 @@ shows `EmojiId::ASLEEP` (sleeping) still. Reduced motion, or `playback: EmojiPla
 manifest, the script's idle rule), `ds-native/tests/emoji_life.rs` (frames advance, rest at 21 s,
 the wince swap, Reduced).
 
+### 45. PdfThumb and PdfFileThumb (a PDF's first page; sill M9 launcher v2, 2026-09-26; values proposed)
+
+**Purpose.** A PDF's first page as a thumbnail: the launcher's preview pane now, Quick Look
+(design/20 section 2.4) later, the same part in both. The consumer passes a path and a size and
+never rasterises anything itself.
+
+**Split.** `ds::PdfThumb` draws a page it is handed (`PdfPage`) and reads no file: ds stays
+renderer-free and effect-free (`scripts/check-boundary.sh`), and pdfrum's CPU rasteriser is a
+renderer. `ds_native::PdfFileThumb` (cargo feature `pdf-thumb`, off by default so an app that
+shows no PDF builds no PDF reader) takes the path, reads and rasterises page 1 with pdfrum 0.4's
+`VelloCpuBackend` on a worker thread, caches the result by (path, modification time, device
+size, scale), and feeds `PdfThumb`. A consumer that is not on Blitz (mailo on the webview)
+can still draw `PdfThumb` from a raster of its own.
+
+**Markup.**
+
+```html
+<div class="ds-pdf-thumb" data-state="loading|pending|ready|empty|failed" role="img"
+     aria-label="PDF preview" aria-busy="true" style="width:160px;height:200px">
+  <div class="ds-pdf-thumb-sheet" style="left:2.73px;top:0px;width:154.55px;height:200px">
+    <img class="ds-pdf-thumb-page" alt="" src="data:image/png;base64,…" draggable="false">
+  </div>
+  <!-- failed, instead of the sheet: -->
+  <div class="ds-pdf-thumb-plate" data-trouble="unreadable|locked"><span class="ds-plate" …>…</span></div>
+</div>
+```
+
+**Props.**
+
+```rust
+pub enum PdfPage { Loading /* default */, Ready { image: ImageSource, sheet: ImageSize },
+    Empty, Failed(PdfTrouble) }
+pub enum PdfTrouble { Unreadable, Locked }
+pub const PDF_THUMB_GRACE: Duration;          // 400 ms, design/26 PendingGrace
+pub const PDF_DEFAULT_SHEET: ImageSize;       // A4 portrait, 595 x 842 pt
+pub fn sheet_rect(room: Size, shape: ImageSize) -> Rect;
+#[component] pub fn PdfThumb(page: PdfPage, size: Size, label: Option<String>) -> Element
+// ds-native, feature `pdf-thumb`:
+#[component] pub fn PdfFileThumb(path: PathBuf, size: Size, label: Option<String>) -> Element
+pub struct ThumbRequest { pub path: PathBuf, pub size: Size, pub scale: Scale }
+pub fn pdf_thumb_blocking(&ThumbRequest) -> PdfPage;    // cached, else read + raster now
+pub fn pdf_thumb_cached(&ThumbRequest) -> Option<PdfPage>;
+pub fn pdf_thumb_bytes(Vec<u8>, DeviceBox) -> PdfPage;  // no file, no cache
+```
+
+**Values.**
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Sheet | the page's displayed aspect (crop box, after rotation), the largest that fits `size`, centred | a page is never cropped or stretched |
+| Paper | `--foreign-ground` (white in both schemes), rendered on white | a PDF page is white whatever the desktop's scheme |
+| Edge | `var(--hairline) solid var(--line)`, radius `--r-micro`, lift `--shadow-1` | a sheet of paper, not a card |
+| Loading | the sheet laid out at A4 and transparent for 400 ms, then `pending`: the blank sheet at .5, faded in over `--t-quick` | design/26 R4: a fast read shows nothing; the pending look's still frame costs no frames |
+| Empty | the blank sheet (an empty file, or a document with no pages) | |
+| Failed | no sheet; `Icon::File` (unreadable) or `Icon::Lock` (a user password) on a red app-icon plate, two fifths of the room's shorter side (16 to 96) | design/08 plates; the file type, not an error mark |
+| Raster | device pixels = `size` x scale, rounded up, each side at most 2048; PNG in a `data:` URI | sharp at the scale drawn |
+| Cache | 64 pages, the oldest dropped first; the key's modification time means a file rewritten in place misses | a launcher scrolling results reuses pages |
+
+**Motion.** The sheet's opacity changes over `--t-quick --e-out` (loading 0, pending .5,
+ready 1). No loop.
+
+**Behaviour.** A page already cached for the file as it is now draws at once. Otherwise the
+first frame is `loading`; the request joins the queue of the one long-lived `pdf-thumb`
+worker thread, which reads and rasterises the page (a panic in the reader on hostile bytes reads
+as unreadable), and its page replaces the loading state. The queue is latest-wins: each
+thumbnail holds at most one waiting job, so a new path or size replaces its request that has not
+started (holding an arrow key through 20 PDFs runs two rasters, not twenty); a raster already
+running finishes into the cache but is not shown; a job whose thumbnail has gone is skipped; at
+most `QUEUE_DEPTH` (8) jobs wait, and a job pushed out of a full queue is asked for again. An
+encrypted file that opens with the empty user password draws; one that needs a password is
+`Failed(Locked)`.
+
+**Tests.** `ds/tests/pdf_thumb_ssr.rs` (a golden of each state, lint), `ds/src/components/
+pdf_thumb.rs` (the sheet's fit), `ds-native/tests/pdf_thumb.rs` (a generated PDF rasterised in
+its colour and aspect, the cache hit and the mtime miss, the failures, a document painting the
+page), `ds-native/tests/pdf_thumb_queue.rs` (20 quick requests run at most 4 rasters and show the
+last), `ds-native/src/pdf_thumb/cache.rs` (eviction).
+
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 
 **Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
