@@ -90,6 +90,31 @@ is a ratio.
 | M33 | Inner rim | lighter, not darker: the first pixels inside are 4-10 levels over the plate, fading over about 6 pt; no top highlight stronger than the sides | R-bs: the same rows and columns | M |
 | M34 | Shadow | short and soft, deeper below: about `0 2pt 8pt` (sigma 4 pt) black .12-.15 (the wallpaper darkened .10 at the bottom edge, .05 at the top and .04 at the sides, fading over 8 pt); R-bm has none | R-bs: the wallpaper's darkening outside each edge against 20 pt out | M |
 
+**The fill as the widget appears (research 2026-09-26, the user's ask: "apple has this animation
+that fills the circle and then show the percentage").** No frame-accurate recording of the
+reference Batteries widget appearing was found (web searches for videos and write-ups of the
+widget, the AirPods pop-up and WWDC widget sessions; none measured). What could be established,
+with confidence (H high, M medium, L low):
+
+| # | Finding | Source | Conf. |
+| --- | --- | --- | --- |
+| F1 | Widgets animate what changed between two timeline entries, by default with an implicit spring and implicit content transitions; the platform's own sample runs a widget's change at `.smooth(duration: 1.8)` | WWDC23 "Bring widgets to life" (session 10028), transcript | H |
+| F2 | A widget's number changes through `.contentTransition(.numericText(...))`, "made specifically for important numeric values": the platform rolls the changing digits rather than cross-fading the whole label | same session; the API's documented purpose | M |
+| F3 | The ring sweeps from twelve, clockwise, from empty to the level, with the percentage arriving alongside | the user's description of the reference; the static arc's start (M10) | M |
+| F4 | Duration and easing of the reference's sweep | not measured: no video found. The platform's default `.spring()` (response .55 s, damping .825) settles in roughly .6-.8 s; the sample in F1 runs 1.8 s | L |
+| F5 | Whether the number counts through every integer or rolls its digits once | not seen for this widget; F2 suggests a digit roll | L |
+| F6 | The charging bolt's arrival relative to the sweep | not seen | L |
+
+**What quire does** (section 4.1): the arc sweeps from twelve over `--t-fill` (800 ms, at the slow end of F4's
+default spring and well under F1's 1.8 s sample; a guess, not a measurement) at `--e-out`
+(deceleration without overshoot: principle 2 of design/05 keeps springs for contact, and a ring
+past its level would claim charge the battery has not got). The figure counts through the whole
+percentages in step with the arc, as the user described it (F5 left open; a count is also
+what a Blitz text node can do without a digit-roll transition). The bolt fades in over
+`--t-quick` once the arc has arrived (F6 our choice: the bolt is a state of the level, so it
+waits for the level). Everything is re-measurable if a recording turns up: the token, the curve
+and the tail are data (`BATTERY_FILL`).
+
 **How M26-M34 were measured (2026-09-26, the vibrancy pass).** A card over a blur is modelled as
 `C = a T + (1 - a) sat_s(G_sigma * W)`: `W` the wallpaper, `G_sigma * W` its Gaussian blur (Pillow
 `GaussianBlur`, whose radius is sigma), `sat_s` a saturation gain about Rec. 709 luma, `T` the tint,
@@ -193,11 +218,13 @@ digital time 800, tabular, tracked -.02em. Labels are the UI face 700 at `--fs-s
 
 ### 4.1 Battery (`BatteryLevel`; `LevelRing` is its old name)
 
-`BatteryLevel { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text, children }`,
-every prop kept (`LevelRing` stays an alias). Markup: `div.ds-battery[data-tone][data-mark]
-[role=progressbar][aria-valuenow]`, 64 x 64, holding `svg.ds-battery-track`, `svg.ds-battery-arc`
-(absent at 0), `span.ds-battery-device` around `children` when given, and `svg.ds-battery-bolt`
-while charging.
+`BatteryLevel { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, children }`,
+every earlier prop kept (`LevelRing` stays an alias; `wake` defaults). Markup: `div.ds-battery[data-tone][data-mark]
+[role=progressbar][aria-valuenow][data-pulse]`, 64 x 64, holding `svg.ds-battery-track`, `svg.ds-battery-arc`
+(absent while it draws 0), `span.ds-battery-device` around `children` when given, and `svg.ds-battery-bolt`
+while charging, once the fill has arrived. The percentage the widget draws is
+`BatteryFigure { level, wake }` (`span.ds-battery-figure`, `{n}%`, tabular) or, for a host that
+draws its own text, `use_battery_figure(level, wake) -> u16`.
 
 | Part | Drawing | From |
 | --- | --- | --- |
@@ -213,7 +240,19 @@ while charging.
 - **Medium**: four rings across from 20 in, the percentage 18 under each in the display face 500
   at `--fs-widget-figure`, the block centred vertically.
 
-Motion: the ring bumps once on a new percentage (`use_bump_on`).
+Motion, the fill (section 1.1, F1-F6): on mount and on each new `wake` (a host passes
+`WakeStamp::next` when its widgets come into view) the arc sweeps from empty to the level over
+`--t-fill` (800 ms) at `--e-out`; on a new level it sweeps from the level drawn last to the new one
+(this replaces the bump on a new percentage). Blitz's stylesheet cannot reach inside an SVG, so
+the path is recomputed in Rust each frame (`use_level_run`, a 16 ms tick) while it moves and the task
+ends when it arrives: at rest nothing re-renders and nothing asks for a frame (the idle-frame
+rule). `BatteryFigure` / `use_battery_figure` read the same fill, so given the same `level` and
+`wake` the count moves in step with the arc and ends exactly on the true percentage. The low
+red (`data-tone`) and `aria-valuenow` follow the true level from the first frame. While
+charging, the bolt is absent during an entrance fill and fades in over `--t-quick` when it ends;
+a change of level while charging keeps it. `data-pulse` is `a` while the fill moves and absent
+at rest (hosts that selected the old bump by it still find a moving ring). Under Reduced motion
+there is no sweep: the first frame is the final one.
 
 ### 4.2 World clock (`ClockFace`)
 
@@ -331,7 +370,10 @@ instead, since it is large or bold. See section 4.3 and design/03-COLOR.md secti
    devices' glyphs are outline where the reference's are filled. A filled device set is an icon
    task (`08-ICONS.md`).
 6. **Space tint by default:** `CardTint::Material` (proposed) or `Space` for every widget?
-7. **Calendar** (section 5, unchanged): month load as dots (proposed) or a heat tint; the Small
+7. **The battery fill's timing** (section 1.1, F4-F6): 800 ms at `--e-out`, the figure counting
+   through every percent, the bolt after the fill, all our choices where the reference could
+   not be measured. A recording of the reference widget appearing would settle them.
+8. **Calendar** (section 5, unchanged): month load as dots (proposed) or a heat tint; the Small
    calendar as the date face with the next event (proposed) or the compact month grid.
 
 ## 7. Sources

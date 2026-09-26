@@ -68,6 +68,7 @@ pub use motion::{
     Click, Held, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,
     Swiper, use_swipe,
 };
+pub use motion::{LevelRun, RunFrame, RunPhase, RunTail, RunTiming, RunTokens, use_level_run};
 pub use overlay::{
     Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
     MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
@@ -84,7 +85,7 @@ pub use space::{
     WorkspaceId, WorkspaceIndex, card, default_look, derive, gradient, ratio, readout, swatch,
 };
 pub use text::clip_chars;
-pub use time::{FRAME_SLACK, sleep};
+pub use time::{FRAME_SLACK, FRAME_TICK, sleep};
 pub use tokens::{
     AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,

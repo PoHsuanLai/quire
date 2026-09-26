@@ -7,6 +7,7 @@ pub mod appearance_picker;
 pub mod avatar;
 pub(crate) mod banner_row;
 pub mod banner_stack;
+pub mod battery_figure;
 pub mod battery_level;
 pub(crate) mod battery_ring;
 pub mod bump_on;
@@ -155,7 +156,10 @@ pub use avatar::{
     Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue, person_hue,
 };
 pub use banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack};
-pub use battery_level::{BatteryLevel, LevelRing, RingMark};
+pub use battery_figure::{BatteryFigure, use_battery_figure};
+pub use battery_level::{
+    BatteryLevel, FILL as BATTERY_FILL, LevelRing, RingMark, use_battery_fill,
+};
 pub use bump_on::{Bumped, use_bump_on};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};

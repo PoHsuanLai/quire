@@ -6,6 +6,7 @@ pub mod curve;
 pub mod drag;
 pub mod entrance;
 pub mod hover_intent;
+pub mod level_run;
 pub mod pane_slide;
 pub mod presence;
 pub mod pulse;
@@ -17,13 +18,16 @@ mod roster_rest;
 pub mod settle;
 pub mod swipe;
 pub mod timer;
+pub mod use_level_run;
 pub mod use_roster;
 pub mod use_swipe;
+pub mod wake;
 
 pub use anim::{Anim, Fill, Iteration, Recipe};
 pub use drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag};
 pub use entrance::use_entrance;
 pub use hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};
+pub use level_run::{LevelRun, RunFrame, RunPhase, RunTail, RunTiming, RunTokens};
 pub use pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
 pub use presence::{Exit, ListPresence, Presence};
 pub use pulse::{Pulse, use_pulse};
@@ -33,5 +37,7 @@ pub use swipe::{
     Click, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,
 };
 pub use timer::{MotionTimer, TimerPhase, use_motion_timer};
+pub use use_level_run::use_level_run;
 pub use use_roster::{Roster, use_roster};
 pub use use_swipe::{Held, Swiper, use_swipe};
+pub use wake::WakeStamp;
