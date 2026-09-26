@@ -1,0 +1,13 @@
+[project]
+name = "emojitool"
+version = "0.1.0"
+description = "Fetch Noto Animated Emoji and pack each into a sprite sheet for quire (design/25-EMOJI.md)."
+requires-python = ">=3.12"
+dependencies = ["pillow>=11"]
+
+[project.scripts]
+emojitool = "emojitool.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
