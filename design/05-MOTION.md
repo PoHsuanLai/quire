@@ -701,6 +701,9 @@ transitions (`--t-pending-step`), not a keyframe.
   `--t-nudge --e-out` (`Anim::NudgeUp`): attention once per request (`use_nudge`, R6). `nudge`
   keeps the outbox pill's `translateX(-50%)` and so cannot move an element that is not centred
   that way.
+- `slide-r` at `--t-move --e-out` (`Anim::PaneInROut`, sill Q370): the preview pane's entrance
+  when nothing the person touched showed it; `Anim::PaneInR` (the spring) plays only when a key
+  or press did (design/26 R5).
 
 ## 5. Assignments
 

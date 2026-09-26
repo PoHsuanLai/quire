@@ -78,3 +78,13 @@ pub(super) const NUDGE_UP: Recipe = recipe(
     Fill::None,
     Iteration::Once,
 );
+
+/// `slide-r` at `--t-move --e-out`: the preview pane's entrance when nothing the person touched
+/// showed it (R5: `Anim::PaneInR` springs, on contact only).
+pub(super) const PANE_IN_R_OUT: Recipe = recipe(
+    "slide-r",
+    DurationToken::Move,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);

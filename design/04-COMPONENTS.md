@@ -3865,10 +3865,17 @@ itself and passes it the same way.
 | Facts | label `--ink-faint` right-aligned in 40 %, value `--ink`, `--fs-small` | proposed |
 | Actions | at the foot; `--surface` buttons with a `--line` edge, radius `--r-small`, the label then its `Kbd` small; the focused one shows the focus ring (`--focus-ring` in `--accent-ring`); arrow pointer | design/09 H5 (every action shows its key), design/27 sections 6.3, 6.4 |
 
-**Motion.** Mounted or turned `Visible`: `Anim::PaneInR` (`slide-r`, `--t-move --e-spring`),
-restarted under its other name on each showing. Turned `Hidden`: `Anim::PaneOutR` (`pane-out-r`,
-`--t-move --e-exit`, held), then `on_hidden` at its settle, when the caller drops the pane and
-the palette's `aside`. The content's own moments (swap, pending) are D0's (sill Q297), not here.
+**Motion.** Mounted or turned `Visible`: `slide-r` over `--t-move`, restarted under its other
+name on each showing, at `--e-spring` (`Anim::PaneInR`) only when `cue` says a contact caused it,
+else at `--e-out` (`Anim::PaneInROut`; design/26 R5, sill Q370). Turned `Hidden`:
+`Anim::PaneOutR` (`pane-out-r`, `--t-move --e-exit`, held), then `on_hidden` at its settle, when
+the caller drops the pane and the palette's `aside`. The content's moments come from `cue:
+PaneCue` (the caller's `use_detail` cue, or a bare `Touch`): a Preview, Change or Failure fades
+the media in at `--t-quick` (`Anim::MorphFadeIn`) in place; Reduced snaps. `operation:
+Operation` is the load the media waits on (Q371): `use_pending` with a Spin ring, nothing for
+`PendingGrace`, then the media box holds `.ds-preview-pending` (the ring, 20 px mark, over
+"Loading…" in `--ink-faint` `--fs-small`), still from the token's deadline; the pane is
+`aria-busy` while it runs. design/26 section 5.6 has the table.
 
 **Behaviour.** The pane never takes the keyboard: the launcher's field keeps it (design/13
 section 13.3.9's keys are the caller's, through the palette's `claim`, section 49), so `focused`
@@ -3877,7 +3884,7 @@ draws which action the caller's Tab has reached. A click on an action calls `ona
 **Tests.** `ds/tests/launcher_parts_ssr.rs` (`pane-*`, `palette-aside`), `ds-native/tests/
 launcher_v2.rs` (the card widening over a window, the results narrowing in a surface, the exit
 settling before `on_hidden`), `ds-native/tests/pdf_thumb.rs` (a pane drawing a PDF through
-`use_pdf_page`).
+`use_pdf_page`), `ds-native/tests/launcher_pane_cues.rs` (each moment, Reduced, 0 frames).
 
 ### 48. RowShape: file and clipboard rows in the palette (sill M9 launcher v2, Q290, 2026-09-26; values proposed)
 
@@ -3948,6 +3955,23 @@ in the order is reachable with the keys a person is already pressing; the action
 header visually and last in its group in the order, the place Down reaches after the rows it
 would reveal.
 
+**Show More and Show Less motion** (design/26 section 5.6, sill Q373, 2026-09-27). The palette
+plays them itself, from its own action: when the person runs a group's action (Enter on it, or a
+click) and the next results differ from the last only in that group keeping its first rows and
+gaining or losing rows after them, it is an expand or a collapse. Expand: the added rows carry
+`data-row-motion=rise` with `--i` their place among the added (capped at 12) and `rise` at
+`--t-move --e-out` with `--stagger`; once laid out, their height is read and kept for the group.
+Collapse: the last row kept carries `data-row-motion=heal-from`, the list `--dy` (the kept height,
+scaled to the rows removed), and everything after that row `heal`s up (`--t-move --e-spring`: the
+person ran it, R5); with no height kept this opening it closes up at once. A group that grows or
+shrinks without its action ran is a new result set: nothing moves. An emoji grid group's action
+plays nothing.
+
+**First-show rise** (Q372). `reveal: RevealCue` (`#[props(into)]`, default
+`RevealCue::First(FirstShow::Still)`: no rise). `First(Animate)` rises the list's children
+(`[data-reveal=play]` on `.ds-menu`, design/26's `Reveal` rule) on mount and on each showing;
+`Cue(cue)` rises on each new Appear of the caller's `use_detail` cue and never for a Change.
+
 **The key claim.** `claim: Option<Callback<FieldKey, Claim>>` hears every key the field gets
 first, with where the caret is:
 
@@ -3972,7 +3996,9 @@ render; the callback asks at the moment with the caret in hand. It is a new prop
 **Tests.** `ds/src/components/palette_stops.rs` (the stop order and the moves),
 `ds/src/focus/caret.rs` (the caret's place), `ds/tests/launcher_parts_ssr.rs` (`show-more`,
 `show-more-selected`), `ds-native/tests/launcher_v2.rs` (Show More reached and run by keyboard;
-Space taken only while browsing, Right only at the end).
+Space taken only while browsing, Right only at the end), `ds/src/components/palette_expand.rs`
+(what is an expand), `ds-native/tests/launcher_palette_cues.rs` (the rise, the expand and the
+collapse, Reduced, 0 frames).
 
 ### 50. EditSurface spelling (mailo's composer, 2026-09-27; values proposed)
 

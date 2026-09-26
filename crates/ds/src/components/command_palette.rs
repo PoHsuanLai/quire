@@ -23,6 +23,7 @@ use crate::components::palette_claim::{Claim, FieldKey};
 use crate::components::palette_group::PaletteGroups;
 pub use crate::components::palette_host::{CommandPaletteHost, PaletteEntrance};
 use crate::components::palette_lines::{PaletteKey, palette_key};
+use crate::components::palette_motion::{Book, use_action_book, use_list_motion};
 use crate::components::palette_reveal::{Reveal, use_reveal};
 use crate::components::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::palette_select::{PaletteSelection, use_palette_selection};
@@ -37,6 +38,7 @@ use crate::components::search_field::SearchField;
 use crate::components::text_input::Focus;
 use crate::components::tooltip::Shown;
 use crate::components::vocab::Availability;
+use crate::detail::RevealCue;
 use crate::focus::caret::{Caret, HostCaret, InitialCaret};
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
@@ -94,6 +96,14 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// that shows it, aligning it with the nearer edge, never centring it, and does not animate the
 /// scroll. A stop the pointer selected is left where it is.
 ///
+/// `reveal` plays the rows' first-show rise (design/26 R13, sill Q372): each row, header and
+/// grid `rise`s at `--t-move --e-out`, `--stagger` after the one before (capped at 12), on each
+/// opening with `FirstShow::Animate`, or on each new Appear of the caller's own `use_detail` cue
+/// (the first result set after an opening); a Change (a later result set) replaces in place with
+/// no stagger. The default, `FirstShow::Still`, never rises. A group's own action (Show More,
+/// Show Less) plays section 5.4's group expand whoever passes a cue (Q373): the rows it adds
+/// rise in downward; the rows it removes go and what follows heals up by their height.
+///
 /// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
 /// radius; absent, it keeps `--r-panel`.
 #[component]
@@ -122,18 +132,31 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] aside: Option<Element>,
     #[props(default = ASIDE_WIDTH)] aside_width: Px,
     #[props(default)] initial_caret: InitialCaret,
+    #[props(into, default)] reveal: RevealCue,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
     let showing = use_showing(shown, entrance.anim());
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);
-    let reveal = use_reveal();
-    let revision = use_revision(&(tokens.clone(), groups.key()));
+    let in_view = use_reveal();
+    let actions = use_action_book();
+    let key = groups.key();
+    let revision = use_revision(&(tokens.clone(), key.clone()));
     let own_focus = use_focus_request();
     let handle = use_field_handle();
     let host_caret = try_use_context::<HostCaret>();
     let request = landing(focus.unwrap_or(own_focus), initial_caret);
     let shown_groups = shown_groups(&groups.0, &query);
+    let motion = use_list_motion(
+        reveal,
+        showing.change,
+        &key,
+        &shown_groups,
+        Book {
+            actions,
+            stops: in_view,
+        },
+    );
     let all = stops(&shown_groups);
     let grids = grid_spans(&shown_groups);
     let live: Vec<Availability> = all.iter().map(|stop| stop.availability()).collect();
@@ -145,14 +168,14 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     });
     selection.report(current, count);
     rects.follow(at_line, revision);
-    reveal.follow(at_line.map(|at| at.choice), revision);
+    in_view.follow(at_line.map(|at| at.choice), revision);
     follow_showing(
         showing,
         Turn {
             float,
             selection: selection.clone(),
             rects,
-            reveal,
+            reveal: in_view,
             retain,
             oninput,
             request,
@@ -165,7 +188,10 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 onclose.call(());
                 onpick.call(value);
             }
-            Run::Action(action) => action.call(()),
+            Run::Action(action) => {
+                actions.ran();
+                action.call(());
+            }
             Run::Nothing => {}
         }
     };
@@ -222,16 +248,18 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                     move |index: usize| {
                         let enabled = live.get(index) == Some(&Availability::Enabled);
                         if enabled && index != current {
-                            reveal.pointed(index, revision);
+                            in_view.pointed(index, revision);
                             selection.select(index);
                         }
                     }
                 }),
-                mounted: onmounted_stop(rects, reveal, at_line, revision),
+                mounted: onmounted_stop(rects, in_view, at_line, revision),
                 action_mounted: EventHandler::new(move |(index, event): (usize, MountedEvent)| {
-                    reveal.stop_mounted(index, MountedRef(event.data()));
+                    in_view.stop_mounted(index, MountedRef(event.data()));
                 }),
+                action_ran: EventHandler::new(move |()| actions.ran()),
             },
+            &motion,
         )
     };
     let field = match showing.seen {
@@ -280,7 +308,9 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 "data-embed": "palette",
                 role: "listbox",
                 onmousedown: move |event| event.prevent_default(),
-                onmounted: move |event| reveal.list_mounted(MountedRef(event.data())),
+                "data-reveal": motion.reveal_slug(),
+                style: motion.heal_style(),
+                onmounted: move |event| in_view.list_mounted(MountedRef(event.data())),
                 {body}
             }
             {side}

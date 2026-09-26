@@ -25,7 +25,8 @@ use std::time::Duration;
 
 /// How long a page may take to arrive before the pending look shows: design/26's
 /// `PendingGrace` (400 ms, Rust-only, not following the motion level: it measures the read, not
-/// motion).
+/// motion). The read is played on `ds::detail`'s pending primitive (`use_pending`) with this as
+/// its token's deadline, so the look holds still from the grace on and never steps.
 pub const PDF_THUMB_GRACE: Duration = Duration::from_millis(400);
 
 /// A sheet whose page is not known yet (loading, or no pages): A4 portrait, in points.

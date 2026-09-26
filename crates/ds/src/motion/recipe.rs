@@ -443,6 +443,7 @@ impl Anim {
             Anim::SealOut => detail::SEAL_OUT,
             Anim::NudgeUp => detail::NUDGE_UP,
             Anim::Hold => own::HOLD,
+            Anim::PaneInROut => detail::PANE_IN_R_OUT,
         }
     }
 }
