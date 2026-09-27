@@ -62,6 +62,12 @@ impl Timeline {
         self.waiting.borrow().len()
     }
 
+    /// The due instant of every sleep still waiting, earliest first (ties broken by issue
+    /// order, `TimerKey`'s `Ord`): for a diagnostic when a settle check gives up on this clock.
+    pub(super) fn due_times(&self) -> Vec<Duration> {
+        self.waiting.borrow().keys().map(|key| key.due).collect()
+    }
+
     /// Move to `at` (never backwards) and wake every sleep due by then, earliest first.
     pub(super) fn advance_to(&self, at: Duration) {
         let at = at.max(self.elapsed.get());

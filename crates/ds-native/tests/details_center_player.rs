@@ -10,7 +10,7 @@ use ds::{
     Appearance, Ds, Material, Motion, NowPlayingTrack, PlayPauseButton, Playback, Text,
     TrackPosition,
 };
-use ds_native::harness::assert_settles_to_zero_frames;
+use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -89,7 +89,18 @@ fn play_pause_offers_the_next_action_springing_only_under_its_press() {
         0,
         "OffUp: the old glyph goes at once"
     );
-    assert_settles_to_zero_frames(&mut harness);
+    // Not `assert_settles_to_zero_frames`: the track is still `Playing` here (61.4 s into 200 s),
+    // so `TrackPosition`'s own per-second ticker (`track_position.rs`) keeps a Rust timer
+    // legitimately pending until the track ends or it is paused — the documented R3 exception
+    // for a live position/clock display (design/26-DETAILS.md R3, "Clock second hand"), not a
+    // settle bug. Check only the half this moment is really about: the glyph's own CSS morph
+    // runs its course and stops.
+    settle_until(&mut harness, |h| !h.is_animating());
+    assert!(
+        !harness.is_animating(),
+        "the glyph's own transition should be done: {}",
+        harness.html()
+    );
     // The button's own press: the change it causes springs.
     let at = harness.centre("#toggle button").expect("the button");
     harness.click(at);
