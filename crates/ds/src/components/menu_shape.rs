@@ -3,7 +3,9 @@
 //! time as trailing data. Split from `menu_item`, which calls these for a row whose shape is not
 //! `Plain`.
 
+use crate::components::chord::Chord;
 use crate::components::row_shape::{ClipBody, RowShape, clip_box, clip_lines};
+use crate::components::vocab::Shortcut;
 use dioxus::prelude::*;
 
 /// A plain row's shape, for the entries that carry none.
@@ -90,10 +92,10 @@ pub(crate) fn words(shape: &RowShape, title: Element, detail: Option<Element>) -
     }
 }
 
-/// The trail column: a shaped row's time before the row's own trail, each in a box of its own
-/// so the gap between them holds (sill Q343: Blitz drops a plain inline span's margin, and
-/// "00:33" ran into "↵").
-pub(crate) fn trail(shape: &RowShape, text: String) -> Element {
+/// The trail column: a shaped row's time before the row's own trail, then a shown chord, each
+/// in a box of its own so the gap between them holds (sill Q343: Blitz drops a plain inline
+/// span's margin, and "00:33" ran into "↵").
+pub(crate) fn trail(shape: &RowShape, text: String, chord: Option<Shortcut>) -> Element {
     let when = match shape {
         RowShape::Plain => None,
         RowShape::File { modified, .. } => Some(modified.clone()),
@@ -107,6 +109,9 @@ pub(crate) fn trail(shape: &RowShape, text: String) -> Element {
             }
             if let Some(keys) = keys {
                 span { class: "ds-menu-keys", "{keys}" }
+            }
+            if let Some(shortcut) = chord {
+                Chord { shortcut }
             }
         }
     }

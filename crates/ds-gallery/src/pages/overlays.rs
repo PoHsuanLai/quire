@@ -122,6 +122,7 @@ pub fn OverlaysPage() -> Element {
         Bubble {}
         Pills { showcase }
         super::launcher::EmbeddedPalette {}
+        super::launcher_hints::SpotlightHints {}
         super::overlays_mailo::RecentPalette {}
         super::overlays_mailo::FieldMenu {}
         super::overlays_mailo4::HookKeyedCards {}

@@ -9,9 +9,10 @@ use crate::components::menu_match::marked;
 use crate::components::menu_shape;
 use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::row_action::{RowAction, trailing};
+use crate::components::row_chord::{RowChord, shown_chord};
 use crate::components::row_shape::RowShape;
 use crate::components::text_runs::{Text, text};
-use crate::components::vocab::{Availability, Check, Selection, StaggerIndex, Switch};
+use crate::components::vocab::{Availability, Check, Selection, Shortcut, StaggerIndex, Switch};
 use crate::geometry::{Point, Px};
 use crate::icon::Icon;
 use crate::icon::IconSource;
@@ -92,6 +93,8 @@ pub(crate) struct ItemView<'a> {
     pub tile: Option<&'a Tile>,
     /// The trail.
     pub trail: &'a Trail,
+    /// The action's chord, after the trail when its rule shows it.
+    pub chord: &'a RowChord,
     /// The check mark.
     pub check: Option<Check>,
     /// The title's matched characters, by char index.
@@ -146,7 +149,10 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
         Branch::Parent(open) => (Some("true"), Some(open.aria())),
     };
     let trail = match view.branch {
-        Branch::Leaf => trail(view.trail, view.check, row, view.shape),
+        Branch::Leaf => {
+            let chord = shown_chord(view.chord, view.selection).cloned();
+            trail(view.trail, view.check, row, view.shape, chord)
+        }
         Branch::Parent(_) => chevron(),
     };
     let live = view.availability == Availability::Enabled;
@@ -258,8 +264,14 @@ fn tile(tile: Option<&Tile>) -> Element {
 }
 
 /// The trail: a checked item in a tiled menu shows the check instead of its shortcut; a shaped
-/// row leads it with its time.
-fn trail(trail: &Trail, check: Option<Check>, row: Row, shape: &RowShape) -> Element {
+/// row leads it with its time; a shown chord ends it.
+fn trail(
+    trail: &Trail,
+    check: Option<Check>,
+    row: Row,
+    shape: &RowShape,
+    chord: Option<Shortcut>,
+) -> Element {
     if row == Row::Tiled && check == Some(Check::Checked) {
         return rsx! {
             span { class: "ds-menu-trail",
@@ -272,8 +284,8 @@ fn trail(trail: &Trail, check: Option<Check>, row: Row, shape: &RowShape) -> Ele
         Trail::Shortcut(shortcut) => shortcut.glyphs(),
         Trail::Note(note) => note.clone(),
     };
-    if *shape != RowShape::Plain {
-        return menu_shape::trail(shape, text);
+    if *shape != RowShape::Plain || chord.is_some() {
+        return menu_shape::trail(shape, text, chord);
     }
     rsx! {
         span { class: "ds-menu-trail", "{text}" }
