@@ -2,8 +2,8 @@
    Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
    Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
    Driven motion (design/05 section 14, H1; design/27 section 5.15): the segments are equal, as
-   the Mac's are, and the pressed fill is one thumb behind them (last in the markup, so a segment is still its
-   `nth-child`; the segments stack above it), `--seg-x` segments from the
+   the Mac's are, and the pressed fill is one thumb behind them (the control's `::before`, so every child is still
+   a segment; the segments stack above it by `--z-raise`), `--seg-x` segments from the
    start, written by a spring in Rust (`--seg-n` segments in all); nothing here transitions it.
    TODO(O-1): disabled is not specified. */
 
@@ -13,8 +13,8 @@
 .ds-segmented[*|data-size=small]{ --seg-pad:var(--s-2); background:var(--surface); }
 
 /* One segment's width: the inside less the gaps, shared equally. */
-.ds-segment-thumb{
-  position:absolute; top:var(--seg-pad); bottom:var(--seg-pad); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
+.ds-segmented::before{
+  content:""; position:absolute; top:var(--seg-pad); bottom:var(--seg-pad); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
   width:calc((100% - 2 * var(--seg-pad) - (var(--seg-n) - 1) * var(--s-2)) / var(--seg-n));
   left:calc(var(--seg-pad) + var(--seg-x) * ((100% - 2 * var(--seg-pad) - (var(--seg-n) - 1) * var(--s-2)) / var(--seg-n) + var(--s-2)));
 }

@@ -87,7 +87,6 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
                     "{text}"
                 }
             }
-            span { class: "ds-segment-thumb", "aria-hidden": "true" }
         }
     }
 }
