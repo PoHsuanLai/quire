@@ -1,5 +1,7 @@
 use super::{Capping, Dot, derive, gradient, js_round};
 use crate::appearance::Scheme;
+use crate::tokens::Hex;
+use crate::tokens::accent_band::over;
 
 const WORK: &[Dot] = &[
     Dot {
@@ -140,9 +142,6 @@ fn derive_matches_the_mockup() {
             ("soft", got.soft.as_str(), "soft"),
             ("faint", got.faint.as_str(), "faint"),
             ("hover", got.hover.as_str(), "hover"),
-            ("accent", got.accent.as_str(), "accent"),
-            ("accent_soft", got.accent_soft.as_str(), "accentSoft"),
-            ("accent_ink", got.accent_ink.as_str(), "accentInk"),
         ] {
             let want_value = want[key].as_str().unwrap_or("");
             assert_colour(space, theme, field, got_value, want_value);
@@ -220,14 +219,27 @@ fn every_pick_is_legible() {
                             )),
                         }
                     }
-                    match ratio(&palette.accent, surface) {
+                    // The accent as text reads on the card; the translucent wash is laid over
+                    // the card before the card's ink is measured on it.
+                    match ratio(&palette.accent_text, surface) {
                         Some(measured) if measured < 4.5 => {
-                            failures.push(format!("{case}: accent {measured:.2} < 4.5"));
+                            failures.push(format!("{case}: accent text {measured:.2} < 4.5"));
                         }
                         Some(_) => {}
-                        None => failures.push(format!("{case}: accent is not a hex pair")),
+                        None => failures.push(format!("{case}: accent text is not a hex pair")),
                     }
-                    match ratio(card_ink, &palette.accent_soft) {
+                    match ratio(&palette.accent_ink, &palette.accent) {
+                        Some(measured) if measured < 4.5 => {
+                            failures.push(format!("{case}: ink on accent {measured:.2} < 4.5"));
+                        }
+                        Some(_) => {}
+                        None => failures.push(format!("{case}: accent ink is not a hex pair")),
+                    }
+                    let roles = palette.accent_roles;
+                    let wash = Hex::parse(surface)
+                        .map(|ground| over(roles.fill, roles.wash, ground).css())
+                        .unwrap_or_default();
+                    match ratio(card_ink, &wash) {
                         Some(measured) if measured < 4.5 => {
                             failures.push(format!("{case}: card ink {measured:.2} < 4.5"));
                         }
@@ -273,6 +285,12 @@ fn gradient_matches_the_mockup() {
             accent: String::new(),
             accent_soft: String::new(),
             accent_ink: String::new(),
+            accent_text: String::new(),
+            accent_ring: String::new(),
+            accent_roles: crate::tokens::accent_of(
+                crate::appearance::Accent::Postmark,
+                Scheme::Light,
+            ),
             capped: Capping::Uncapped,
         };
         assert_eq!(gradient(&palette), want, "{name}");
@@ -318,14 +336,18 @@ fn the_readout_is_the_ratio_of_the_derived_tokens() {
                     .map(|stop| ratio(fore, stop).expect("hex"))
                     .fold(f64::INFINITY, f64::min)
             };
-            let (tint_accent, tint) = match accent {
-                CardAccent::SpaceHue => (palette.accent.clone(), palette.accent_soft.clone()),
-                CardAccent::Postmark => (post.accent.to_owned(), post.accent_soft.to_owned()),
+            let roles = match accent {
+                CardAccent::SpaceHue => palette.accent_roles,
+                CardAccent::Postmark => {
+                    crate::tokens::accent_of(crate::appearance::Accent::Postmark, scheme)
+                }
             };
+            let ground = Hex::parse(post.surface).expect("hex");
+            let tint = over(roles.fill, roles.wash, ground).css();
             let want = [
                 worst(&palette.ink),
                 worst(&palette.faint),
-                ratio(&tint_accent, post.surface).expect("hex"),
+                ratio(&roles.text.css(), post.surface).expect("hex"),
                 ratio(post.ink, &tint).expect("hex"),
             ];
             let checks = readout(&space, scheme);

@@ -1066,7 +1066,7 @@ the reasons and the proofs.
 | `TextInput` | `kind: TextInputKind::Secret` | new variant | mailo's secret field: the text lives in the field's own state and reaches you only through `oninput` and `onchange`; no `value` attribute is ever written (your `value` is ignored), only a dot per character. Clear it by remounting under a new `key`. `Password` is unchanged (controlled, writes its `value`) |
 | `TextInput` | `kind: TextInputKind::File`, `on_pick` | new variant; `EventHandler<()>` (no-op) | A file's name (your `value`, the placeholder while empty) and a "Choose…" Tool button; a click on either calls `on_pick`. Blitz has no file picker: open your own and pass the chosen name back as `value` |
 | `TextInput` | `kind: TextInputKind::Multiline { rows, grow }` | new variant | A `textarea` of `Rows(n)` lines; `Grow::ToContent` adds a row per hard line beyond `n`, `Grow::Fixed` scrolls. Enter types a newline (it does not commit) |
-| `TextInput` | `variant: InputVariant::Bare` (`FieldFace::Bare`) | new variant | No box: the parent's font, size, weight, tracking, line height and colour, with an `--accent` caret; for a title or a property row edited in place. `FieldFace` is `InputVariant` under the name the gap asked for, not a second prop. On Blitz the typed value takes the size, line and colour but not the family or weight (blitz-dom's editor reads only those three); a webview takes all of it |
+| `TextInput` | `variant: InputVariant::Bare` (`FieldFace::Bare`) | new variant | No box: the parent's font, size, weight, tracking, line height and colour, with an `--accent-text` caret; for a title or a property row edited in place. `FieldFace` is `InputVariant` under the name the gap asked for, not a second prop. On Blitz the typed value takes the size, line and colour but not the family or weight (blitz-dom's editor reads only those three); a webview takes all of it |
 | `TextInput` | `onchange` | `EventHandler<String>` (no-op) | The value committed: Enter in a one-line field, or the caret leaving any field (Blitz sends no `change`; the field makes it on both renderers) |
 | `Rows`, `Grow`, `FieldFace` | new types | | Above |
 | `SpaceEditor` | `motion_levels` | `MotionLevels` (`All`) | `MotionLevels::Contact` offers Calm, Standard and Extra, a Space's own three (mailo's per-Space motion); a `level` outside them presses no segment. A prop, not a `MotionChoice` field, so your `MotionChoice { level, on_motion }` literal still compiles |
@@ -1103,7 +1103,7 @@ FINDINGS "mailo gaps 5" has the reasons and the proofs.
 | `Scrim` | `flow` | `Flow` (`Floating`) | `Flow::Inline` draws the scrim where you render it (`button.ds-scrim[data-flow=inline]`), at your container's stacking level: `position:absolute; inset:0` in the nearest positioned ancestor, no overlay, no layer on the stack, no Escape of its own. A press still calls `onclose`. **Layering:** it dims what your container drew before it and lies under what the container draws after it (the peeked reader) and under every floating surface; to put something above it, render it after the scrim in the same positioned container |
 | `Button` | `label` | `Text` (`#[props(into)]`) | A `String`, `&str` or `"{formatted}"` as before; `Text::Runs(vec![Run::new(who, RunTone::Strong), Run::new(when, RunTone::Faint)])` draws the runs inside the label's span. A label of runs names the button by `Text::plain_text()` as `aria-label` (your `aria_label` wins). `FaceMark`'s `label` takes a `Text` the same way |
 | `Menu` | `filter: Filter::Field { placeholder }` | new variant | Typing filters and `onquery` fires as under `Typing`, and the query is drawn in `div.ds-menu-filter` (`role=searchbox`), a row at the top styled as the inline `TextInput`: the placeholder while empty, then the typed text with a drawn caret. The row is not a choice: the cursor stays on the rows below. `Typing` is unchanged |
-| `DropState` | `Accepts` | new variant | `data-drop="accepts"`: a place that can take the live drag while the pointer is elsewhere. On a `SidebarItem`, a dashed `--accent` hairline inside the item's box (the label does not move), quieter than `Target`. Set it on every accepting place as the drag starts, `Target` on the one under the pointer |
+| `DropState` | `Accepts` | new variant | `data-drop="accepts"`: a place that can take the live drag while the pointer is elsewhere. On a `SidebarItem`, a dashed `--accent-text` hairline inside the item's box (the label does not move), quieter than `Target`. Set it on every accepting place as the drag starts, `Target` on the one under the pointer |
 | `Button` | `leading` | `Option<Leading>` (`None`) | `Leading::Mark(element)` before the label, for a quire mark you build (`rsx! { ProviderMark { provider, size: MarkSize::Inline, style } }` in the From dropdown's value); `Leading::Glyph(icon)` a glyph. `span.ds-button-lead` |
 | `HoverCardPart` | `FlagText { tone, icon, text: Text }`, `HoverCardPart::flag(tone, icon, impl Into<Text>)` | new variant and constructor | A flag of either tone whose words are runs (the spoof warning's brand and domain in `Strong`). Drawn exactly as `Flag`; `Flag { text: String }` is unchanged, so its literals compile |
 
@@ -1497,11 +1497,11 @@ proofs (sill Q78-Q81).
 | Where | Prop, type or function | What it does |
 | --- | --- | --- |
 | `ModuleTile` | new component | `glyph: Icon`, `title` (`#[props(into)] Text`), `status: Option<Text>`, `state: ModuleState`, `chevron: Chevron` (`None`), `span: TileSpan` (`Half`), `onclick: EventHandler<Press>`, `on_detail: Option<EventHandler<Press>>`, `expanded: Expanded` (`Closed`, the chevron's `aria-expanded`), `availability`. A `div[role=button]` at `--r-tile` 12: a press, Enter or Space toggles (`onclick`); the chevron is its own button, `Propagation::Stop`, named "{title} details", and a press, Enter or Right on it calls `on_detail` and never `onclick`. Writes `data-state`, `data-span`, `aria-pressed` (`mixed` while busy) and `aria-busy` |
-| `ModuleState` | `Off`, `On`, `Busy` | Off: a paper disc with ink on the Mini's plate. On: the disc in `--accent` with `--accent-ink`, the plate `--accent-soft`. Busy: the Off disc with the Spinner's breathe around it |
+| `ModuleState` | `Off`, `On`, `Busy` | Off: a paper disc with ink on the Mini's plate. On: the disc in `--accent` with `--accent-ink` and an inset `--accent-text` hairline, the plate `--accent-soft` (translucent). Busy: the Off disc with the Spinner's breathe around it |
 | `Chevron`, `TileSpan` | `None`/`Detail`; `Half`/`Full` | Whether the tile ends in the detail chevron; one grid column or both (a Full tile spans the `ModuleGrid`) |
 | `ModuleGrid` | new component | `children`: two equal columns, gap 8 (design/13 13.3.7). Your panel keeps its own padding of 12 |
 | `SettingsRow` | new component | `glyph: Option<Icon>`, `title` (`Text`), `detail: Option<Text>`, `trailing: RowTrailing` (`None`), `availability`, `onclick: EventHandler<Press>`. 44 px, a hairline above every row after the first, `MenuEntry::Row`'s shell type (title 13/400, detail `--fs-help` faint), a 16 px glyph in a 22 px column; Enter or Space runs `onclick`. Outside any `Menu`: no overlay, no layer, no focus taken |
-| `RowTrailing` | `None`, `Check(Switch)`, `Toggle { value, on_toggle }`, `Chevron`, `Text(Text)`, `Glyph(Icon)` | A check in `--accent` when `On` (the row writes `aria-pressed`); a `Toggle` named by the row's title whose press and keys stay in the switch (the row's `onclick` does not run); a chevron, a value or a glyph in `--ink-faint` |
+| `RowTrailing` | `None`, `Check(Switch)`, `Toggle { value, on_toggle }`, `Chevron`, `Text(Text)`, `Glyph(Icon)` | A check in `--accent-text` when `On` (the row writes `aria-pressed`); a `Toggle` named by the row's title whose press and keys stay in the switch (the row's `onclick` does not run); a chevron, a value or a glyph in `--ink-faint` |
 | `PaneSwitcher` | new component | `shown: Pane`, `root: Element`, `detail: Element`, `on_settled: Option<EventHandler<Pane>>`. Changing `shown` plays the arriving pane in (`slide-r` for the detail, `slide-l` for the root, `--t-move --e-spring`) and the outgoing one out the other way (`pane-out-l`/`pane-out-r`, `--t-move --e-exit`) at once; the leaving pane is out of the flow so the height is the arriving pane's; both settle at `settle(Anim::PaneInR)` and `on_settled` hears the pane. A change mid-slide reverses (a new round; the old settle is dropped). Markup: `div.ds-panes[data-shown][data-moving]` > `div.ds-pane[data-pane][data-presence]`, the leaving one `aria-hidden` |
 | `Pane`, `PaneSlide`, `PaneRole`, `PaneRound` | new types | `Pane::{Root, Detail}`; the pure machine the switcher runs (`show`, `settle`, `role`), for a switcher of your own |
 | `Anim` | `PaneInR`, `PaneInL`, `PaneOutL`, `PaneOutR` | `slide-r`/`slide-l` at `--t-move --e-spring` (the catalogue's rows are `--t-big`), and the two new keyframes `pane-out-l`/`pane-out-r` at `--t-move --e-exit forwards`. `Anim::ALL` is 56 |
@@ -1587,7 +1587,7 @@ existing golden moved but the stylesheet's.
 
 | Where | Prop, type or function | What it does |
 | --- | --- | --- |
-| `MonthGrid` | `data: MonthGridData`, `weeks: WeekNumbers` (`Hide`), `onstep: Option<EventHandler<Step>>`, `onpick: Option<EventHandler<DayKey>>` | One month in seven 32 px columns: the title (data face, upper, `--accent`), the previous and next `IconButton { Tool }` only with `onstep` (they hand it `Step::Previous`/`Step::Next`; you shift the month), the weekday heads, then the weeks, led by their ISO week under `WeekNumbers::Show`. The neighbours' days `--ink-faint`, today on an `--accent` disc (`aria-current="date"`), a busy day's 4 px dot. With `onpick` each day is a `button` (`data-kind="pressable"`) that hands over its key. A change of `data.month` slides the new weeks in once, from the right for a later month (`a-slide-r`), from the left for an earlier one (`a-slide-l`), dropped at `settle(Anim::SlideR)`; the first month and a render that keeps the month play nothing, so you say nothing about the direction |
+| `MonthGrid` | `data: MonthGridData`, `weeks: WeekNumbers` (`Hide`), `onstep: Option<EventHandler<Step>>`, `onpick: Option<EventHandler<DayKey>>` | One month in seven 32 px columns: the title (data face, upper, `--accent-text`), the previous and next `IconButton { Tool }` only with `onstep` (they hand it `Step::Previous`/`Step::Next`; you shift the month), the weekday heads, then the weeks, led by their ISO week under `WeekNumbers::Show`. The neighbours' days `--ink-faint`, today on an `--accent` disc (`aria-current="date"`), a busy day's 4 px dot. With `onpick` each day is a `button` (`data-kind="pressable"`) that hands over its key. A change of `data.month` slides the new weeks in once, from the right for a later month (`a-slide-r`), from the left for an earlier one (`a-slide-l`), dropped at `settle(Anim::SlideR)`; the first month and a render that keeps the month play nothing, so you say nothing about the direction |
 | `MonthGridData` | `{ month: MonthKey, title: Text, heads: [Text; 7], weeks: Vec<MonthWeek> }` | Your grid, with the words you format: "September 2026", the weekday initials from your first weekday |
 | `MonthWeek`, `MonthDay` | `{ number: IsoWeek, days: [MonthDay; 7] }`; `{ key: DayKey, place: DayPlace, mark: DayMark, events: Eventful }` | Field for field your `GridWeek`/`GridDay`; the cell's label is `key.day` |
 | `MonthKey`, `DayKey`, `IsoWeek` | `{ year: i16, month: i8 }`, `{ year: i16, month: i8, day: i8 }`, `IsoWeek(i8)` | The civil types as jiff hands them (`Date::year()`, `month()`, `day()`), so each `From` is a field copy |
@@ -1769,6 +1769,37 @@ results.cue()` to `CommandPalette` (drop `_results`); F803's "nothing plays" bec
 above. A `match` over `ds::Anim` needs `PaneInROut`. Keep one `PreviewPane` mounted across content
 kinds as before (the cross-fade needs it). Never style `.ds-preview-pending*`,
 `[data-touch]`, `[data-row-motion]` or `[data-reveal]`.
+
+### Accent band (2026-09-27, breaking): six accent tokens, one derivation
+
+Every accent is generated by the settled accent band (B, Airy; design/03-COLOR.md section 20):
+the six built-in accents from their hues, a Space's from its first dot. The accent is lighter
+(pastel fills with a deep ink) and its large areas are translucent.
+
+| Token | `ColourToken` | Role | Light / dark, Postmark |
+| --- | --- | --- | --- |
+| `--accent` | `Accent` | solid fill: primary button, toggle on, today disc, tile disc, slider fill, pressed mini button | `#94c0fe` / `#8ebaf7` |
+| `--accent-ink` | `AccentInk` | text and glyphs on `--accent` (4.5:1 or better at every hue) | `#111b28` / `#111b28` |
+| `--accent-text` | `AccentText` (new) | the accent as text or a thin mark on the card: links, titles, checks, carets, unread dots, selection borders, drop lines (4.5:1 on every card ground) | `#426aa2` / `#88b3f0` |
+| `--accent-soft` | `AccentSoft` | the wash: selected rows, menu and launcher highlight, chips, a tile that is on. **`rgba(...)`, not a hex** | `rgba(148,192,254,.32)` / `rgba(142,186,247,.2)` |
+| `--accent-ring` | `AccentRing` | the keyboard focus ring and the destination ring (3:1 on every ground) | `rgba(66,106,162,.8)` / `rgba(136,179,240,.6)` |
+| `--seal` | `Seal` | equals `--accent` | as `--accent` |
+
+What to change:
+
+- **Text in the accent reads `--accent-text`, never `--accent`.** `--accent` is now a pastel
+  fill that stands only 1.5:1 off white: text, a 1-3 px border, a caret, a dot or an outline in
+  it is illegible. Only a fill with `--accent-ink` on it keeps `--accent`.
+- **`--accent-soft` is translucent.** Don't parse it as `#rrggbb`; to measure against it,
+  composite it first (`ds::tokens::accent_band::over(roles.fill, roles.wash, ground)`).
+- **No state on the fill's colour alone.** Pair an accent fill with a shape, a knob position,
+  an `--accent-ink` label or an `--accent-text` edge (design/03 section 20.4).
+- **Rust:** `ds::quad(accent, scheme) -> AccentQuad` is gone; use `ds::accent_of(accent, scheme)
+  -> AccentRoles { fill, ink, text, wash, ring }` (`quad(a, s).accent` is `accent_of(a, s).fill`).
+  `Palette` gains `accent_text`, `accent_ring` and `accent_roles`; `FrameVars.accent` is
+  `Option<AccentRoles>`; `Card` (`POST_LIGHT`, `POST_DARK`) no longer carries accent literals.
+- **Blue** (`Accent::Blue`, slug `blue`) now generates from hue 215, a sky blue, so it no longer
+  duplicates Postmark in the picker.
 
 ### Details (2026-09-27): small state details through `ds::detail`
 

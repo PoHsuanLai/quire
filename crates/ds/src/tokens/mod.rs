@@ -3,6 +3,7 @@
 //! generated from it (`crate::css`), so CSS and the Rust timers cannot drift
 //! (design/05-MOTION.md section 7.1).
 
+pub mod accent_band;
 pub mod accent_table;
 pub mod colour;
 pub mod delay;
@@ -30,7 +31,8 @@ pub mod type_voice;
 pub mod widget_paint;
 pub mod widgets;
 
-pub use accent_table::{AccentQuad, quad};
+pub use accent_band::AccentRoles;
+pub use accent_table::accent_of;
 pub use colour::ColourToken;
 pub use delay::DelayToken;
 pub use dock::{DockFloorSetting, DockMetrics};

@@ -14,5 +14,5 @@
    the notification around it never opens from a link. */
 .ds-run[*|data-tone=italic]{ font-style:italic; }
 .ds-run[*|data-tone=underline]{ text-decoration:underline; }
-.ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent); cursor:pointer; }
-.ds-run-link:hover{ color:var(--accent); }
+.ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent-text); cursor:pointer; }
+.ds-run-link:hover{ color:var(--accent-text); }
