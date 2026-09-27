@@ -23,3 +23,9 @@
   font-size:var(--fs-shell-menu); font-weight:600; line-height:var(--cc-head); }
 .ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
   font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+
+/* A module whose content is unavailable (Q491, `availability: Disabled`): the header's glyph and
+   trailing figure (a level's percentage) at the disabled .35 beside the dimmed level; the title
+   stays legible so the module is still named. */
+.ds-module-panel[*|aria-disabled=true] .ds-module-panel-glyph,
+.ds-module-panel[*|aria-disabled=true] .ds-module-panel-trailing{ opacity:.35; }

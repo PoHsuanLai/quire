@@ -64,3 +64,13 @@
 .ds-level-seg[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
 .ds-level[*|data-drag=live] .ds-level-segments{ transform:scaleY(1.08); }
 .ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }
+
+/* Disabled (Q491): a level that cannot be moved says so. The rail and the lead glyph drop to the
+   disabled .35 (design/13 section 13.3.3's disabled item), the knob is not drawn (nothing to
+   grab), and the pointer is the not-allowed cursor; no press registers (the component takes no
+   input), so nothing swells or stretches. */
+.ds-level[*|aria-disabled=true]{ cursor:not-allowed; }
+.ds-level[*|aria-disabled=true] .ds-level-rail,
+.ds-level[*|aria-disabled=true] .ds-level-lead{ opacity:.35; }
+.ds-level[*|aria-disabled=true] .ds-level-knob{ display:none; }
+.ds-level[*|aria-disabled=true] .ds-level-track{ transform:none; }

@@ -42,7 +42,7 @@ const PANELS: [(Theme, Pane); 2] = [(Theme::Light, Pane::Root), (Theme::Dark, Pa
 #[component]
 pub fn ControlCenter() -> Element {
     rsx! {
-        Section { title: "Control center", note: "A Popover panel of the Work Space over the wallpaper, light and dark: a ModuleGrid (2 columns, gap 10) of 56 px ModuleTiles (--cc-module-r 8, inside the panel's 18 at padding 10; On paints the disc --accent on an --accent-soft plate, Off a paper disc, Busy breathes), a Full tile spanning both columns, then ModulePanels on the tile's frame holding the Sound level (glyph, title, its percentage in the trailing slot; a 22 capsule with a 20 knob, the module 64 tall) and the compact AppearancePicker. A tile toggles; its chevron (its own hit target, Enter or Right) pushes the module's detail through the PaneSwitcher: slide-r in, the grid out to the left, both at --t-move, the height following the pane. The detail lists SettingsRows (44 px, hairlines, the text menu's type); the back button slides it out to the right.",
+        Section { title: "Control center", note: "A Popover panel of the Work Space over the wallpaper, light and dark: a ModuleGrid (2 columns, gap 10) of 56 px ModuleTiles (--cc-module-r 8, inside the panel's 18 at padding 10; On paints the disc --accent on an --accent-soft plate, Off a paper disc, Busy breathes), a Full tile spanning both columns, then ModulePanels on the tile's frame holding the Sound level, a disabled Display level (Q491: the capsule and its header glyph and figure at .35, no knob, the not-allowed cursor), (glyph, title, its percentage in the trailing slot; a 22 capsule with a 20 knob, the module 64 tall) and the compact AppearancePicker. A tile toggles; its chevron (its own hit target, Enter or Right) pushes the module's detail through the PaneSwitcher: slide-r in, the grid out to the left, both at --t-move, the height following the pane. The detail lists SettingsRows (44 px, hairlines, the text menu's type); the back button slides it out to the right.",
             div { class: "g-wall g-polish-cards", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for (theme , posed) in PANELS {
                     Panel { theme, posed }
@@ -121,6 +121,10 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
             ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
             ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "{percent}%" },
                 LevelControl { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: LevelLook::CapsuleKnob, onchange: move |next| volume.set(next) }
+            }
+            // Q491: a level that cannot move (no brightness control on this display) says so.
+            ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "0%" }, availability: ds::Availability::Disabled,
+                LevelControl { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: LevelLook::CapsuleKnob, availability: ds::Availability::Disabled }
             }
             ModulePanel {
                 AppearancePicker { value: appearance(), system: SystemPrefs::default(), onchange: move |next| appearance.set(next), layout: PickerLayout::Compact }
