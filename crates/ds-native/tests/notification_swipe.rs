@@ -51,7 +51,9 @@ fn ms(n: u64) -> Duration {
 }
 
 fn start(motion: Motion) -> (Harness, Point) {
-    start_on(motion, Clock::Wall)
+    // On the virtual clock: the release velocity and the wheel's quiet window both read
+    // ds::time, and on the wall clock they raced under load.
+    start_on(motion, Clock::Virtual)
 }
 
 /// `start`, on `clock`.
