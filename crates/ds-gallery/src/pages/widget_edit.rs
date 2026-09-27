@@ -3,16 +3,17 @@
 //! `Panel` at the bottom edge holding `WidgetGallery`, no taller than half the desktop, so the
 //! top rows where a new widget lands stay in view. Live: Add places the widget on the desktop
 //! above the sheet at the size it takes there, and the gallery's own list shows it; Remove takes
-//! it away.
+//! it away, the card on the desktop shrinking and fading out (`CardPresence::Leaving`, sill
+//! G423) before the page drops it.
 
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds::{
-    Appearance, BatteryWidget, Ds, Inject, Lift, Material, MonthWidget, Panel, PanelEdge, Px,
-    RootChrome, Shown, SpaceLook, Widget, WidgetGallery, WidgetHost, WidgetMetrics, WidgetSize,
-    WorldClockWidget, use_env, use_widget_registry,
+    Appearance, BatteryWidget, CardPresence, Ds, Inject, Material, MonthWidget, Panel, PanelEdge,
+    Px, RootChrome, Shown, SpaceLook, Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost,
+    WidgetMetrics, WidgetSize, WorldClockWidget, use_env,
 };
 
 /// The desktop's grid: six columns of the 164 cell and 16 gap in the stage's 1120.
@@ -63,7 +64,15 @@ pub(super) fn EditWidgetsStage() -> Element {
     };
     let scheme = use_env().scheme;
     let mut layout = use_signal(opening);
+    let mut leaving = use_signal(Vec::<WidgetPlacement>::new);
     let metrics = WidgetMetrics::default().style_attr();
+    let onedit = move |edit: WidgetEdit| {
+        let before = layout();
+        if let Ok(next) = apply(before.clone(), edit, GRID) {
+            leaving.with_mut(|going| going.extend(removed(&before, &next)));
+            layout.set(next);
+        }
+    };
     rsx! {
         div { class: "g-we-stage", style: "background-image:url(\"{wallpaper::calm_uri(scheme)}\")",
             Ds {
@@ -75,19 +84,16 @@ pub(super) fn EditWidgetsStage() -> Element {
                 stylesheet: Inject::Host,
                 div { class: "g-we-desk", style: "{metrics}",
                     for item in on_desktop(&layout()) {
-                        DeskCard { key: "{item.id.0}", item }
+                        DeskCard { key: "{item.id.0}", item, presence: CardPresence::Placed, on_gone: |()| {} }
+                    }
+                    for item in leaving() {
+                        DeskCard { key: "{item.id.0}", item: item.clone(), presence: CardPresence::Leaving,
+                            on_gone: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
                     }
                 }
                 Panel { label: "Edit Widgets", shown: Shown::Visible, edge: PanelEdge::Bottom, width: Px(1040.0), height: Px(330.0), material: Material::Sheet,
                     div { class: "g-we-sheet", style: "{metrics}",
-                        WidgetGallery {
-                            layout: layout(),
-                            onedit: move |edit: WidgetEdit| {
-                                if let Ok(next) = apply(layout(), edit, GRID) {
-                                    layout.set(next);
-                                }
-                            },
-                        }
+                        WidgetGallery { layout: layout(), onedit }
                     }
                 }
             }
@@ -105,17 +111,35 @@ fn on_desktop(layout: &WidgetLayout) -> Vec<WidgetPlacement> {
         .collect()
 }
 
-/// One placed widget at its cell, drawn with its preview entry.
+/// The desktop placements in `before` that `after` no longer holds.
+fn removed(before: &WidgetLayout, after: &WidgetLayout) -> Vec<WidgetPlacement> {
+    on_desktop(before)
+        .into_iter()
+        .filter(|item| after.items().iter().all(|kept| kept.id != item.id))
+        .collect()
+}
+
+/// One placed widget at its cell, drawn with its preview entry, leaving when `presence` says.
 #[component]
-fn DeskCard(item: WidgetPlacement) -> Element {
-    let registry = use_widget_registry();
+fn DeskCard(item: WidgetPlacement, presence: CardPresence, on_gone: EventHandler<()>) -> Element {
     let WidgetAt::Desktop(cell) = item.at else {
         return rsx! {};
     };
     let (left, top) = (8 + cell.column * PITCH, 8 + cell.row * PITCH);
-    let card = registry
-        .get(&item.kind)
-        .map(|info| info.preview(item.size, WidgetHost::Desktop, Lift::Rest));
+    let size = item.size;
+    let on_gone = Some(on_gone);
+    let card = match item.kind.as_str() {
+        "quire.battery" => rsx! {
+            WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(size)), size, presence, on_gone }
+        },
+        "quire.world-clock" => rsx! {
+            WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(WorldClockWidget::preview(size)), size, presence, on_gone }
+        },
+        "quire.month" => rsx! {
+            WidgetCard { widget: MonthWidget, timeline: Timeline::now(MonthWidget::preview(size)), size, presence, on_gone }
+        },
+        _ => rsx! {},
+    };
     rsx! {
         div { class: "g-we-cell", style: "left:{left}px;top:{top}px",
             {card}

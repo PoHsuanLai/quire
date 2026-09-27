@@ -154,6 +154,17 @@ pub(super) const SHEET_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
+/// `widget-out` (sill G423): a widget's card leaving when the person removes it, at `--t-move
+/// --e-exit` (design/05 principle 3: exits accelerate), holding its last, transparent frame
+/// until the host drops the card at `settle(WidgetOut)`.
+pub(super) const WIDGET_OUT: Recipe = recipe(
+    "widget-out",
+    DurationToken::Move,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);
+
 /// `banner-out` (sill Q121, Q122): a banner's exit at `--t-move --e-exit` (design/13 section
 /// 13.3.6: "timeout and dismiss both slide right, `--t-move --e-exit`"), from the offset a swipe
 /// left it at. It holds its last, transparent frame until the stack drops the row at

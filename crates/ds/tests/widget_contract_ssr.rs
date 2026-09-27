@@ -14,12 +14,13 @@ use ds::lint::{LintConfig, markup};
 use ds::tokens::LabelHue;
 use ds::widget::{WireRefresh, WireTimeline};
 use ds::{
-    Appearance, BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayKey,
-    DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Ds, Eventful, Fraction, IconSize, Inject,
-    IsoWeek, Lift, Material, MonthDay, MonthEntry, MonthGridData, MonthKey, MonthWeek, MonthWidget,
-    Motion, Panel, PanelEdge, Px, RingMark, RootChrome, RootExtent, Seconds, Shown, Theme,
-    Timeline, WeekNumbers, Widget, WidgetCard, WidgetEdit, WidgetGallery, WidgetHost, WidgetLayout,
-    WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide, WorldClockWidget,
+    Appearance, BatteryCell, BatteryEntry, BatteryWidget, CardPresence, ClockCity, ClockEntry,
+    ClockTime, DayKey, DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Ds, Eventful, Fraction,
+    IconSize, Inject, IsoWeek, Lift, Material, MonthDay, MonthEntry, MonthGridData, MonthKey,
+    MonthWeek, MonthWidget, Motion, Panel, PanelEdge, Px, RingMark, RootChrome, RootExtent,
+    Seconds, Shown, Theme, Timeline, WeekNumbers, Widget, WidgetCard, WidgetEdit, WidgetGallery,
+    WidgetHost, WidgetLayout, WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide,
+    WorldClockWidget,
 };
 use ds::{EventLine, MonthFace, TodayLine};
 use std::time::{Duration, Instant};
@@ -298,6 +299,12 @@ const CASES: &[Case] = &[
         desktop(
             Theme::Light,
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, lift: Lift::Lifted } },
+        )
+    }),
+    ("battery-leaving", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, presence: CardPresence::Leaving, on_gone: |()| {} } },
         )
     }),
     ("slot-guide", || {
@@ -730,4 +737,20 @@ fn the_bottom_sheet_says_its_edge_and_its_extent() {
     assert!(css.contains(
         ".ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }"
     ));
+}
+
+/// A card its host removed says it is leaving and plays its exit on its pulse class (sill G423);
+/// a placed card says nothing.
+#[test]
+fn a_leaving_card_plays_its_exit() {
+    let leaving = html("battery-leaving");
+    assert!(
+        leaving.contains("class=\"ds-widget a-widget-out\""),
+        "{leaving}"
+    );
+    assert!(leaving.contains("data-presence=\"leaving\""), "{leaving}");
+    assert!(leaving.contains("data-pulse=\"a\""), "{leaving}");
+    let placed = html("battery-row");
+    assert!(!placed.contains("data-presence"), "{placed}");
+    assert!(!placed.contains("a-widget-out"), "{placed}");
 }

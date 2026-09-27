@@ -219,6 +219,12 @@
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
+/* widget-out (quire's, sill G423): a widget's card leaving as the person removes it: it shrinks
+   to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
+   accelerate), holding its transparent last frame until the host drops the card. Under Reduced
+   it only fades (`menu-out`). */
+@keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
+
 /* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
    swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
    `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right

@@ -95,7 +95,8 @@ impl Anim {
             | Anim::PanelOut
             | Anim::ShotOut
             | Anim::MorphOut
-            | Anim::RollOut => CrossFade(Out),
+            | Anim::RollOut
+            | Anim::WidgetOut => CrossFade(Out),
             Anim::SealPop
             | Anim::Gulp
             | Anim::StarPop

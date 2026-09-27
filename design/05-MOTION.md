@@ -718,6 +718,18 @@ transitions (`--t-pending-step`), not a keyframe.
   arrives plays `Anim::RowIn` (`row-in`, `--t-big --e-spring`) for the press, `Anim::Rise`
   otherwise, taken off at its `settle`.
 
+### 4.14 Added by quire (a widget card's exit, 2026-09-28)
+
+- `widget-out`: `from{ opacity:1; transform:none } to{ opacity:0; transform:scale(.85) }` at
+  `--t-move --e-exit`, forwards (`Anim::WidgetOut`, sill G423): a desktop widget the person
+  removes in Edit Widgets shrinks about its centre and fades (principle 3: exits accelerate;
+  principle 4: removing is acting, so it gets an exit), holding its transparent last frame until
+  the host drops the card at `settle(WidgetOut)` (principle 10). Played on the card's pulse class
+  when its host passes `CardPresence::Leaving` to `WidgetCard`/`WidgetFrame`, which calls
+  `on_gone` at that settle. Reduced: `CrossFade(Out)` (`menu-out`), over Reduced's settle. A
+  leave taken back plays `hold` so no half-faded value stays (sill G295). Not a roster row: a
+  desktop card leaves nothing to heal.
+
 ## 5. Assignments
 
 Which element plays which keyframe. "exit" = `cubic-bezier(.55,0,.75,.2)` (`--e-exit`). Fill and
