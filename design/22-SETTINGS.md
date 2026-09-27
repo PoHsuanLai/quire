@@ -171,6 +171,7 @@ that registration is not done yet (see FINDINGS "Tune wave").
 | `bar.item_font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `bar.item_font_weight` | `Count` | `500` | `100..=900`; the app name is always bold | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `bar.item_radius_px` | `Px` | `4` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `bar.battery_low_percent` | `Percent` | `20` | `5..=50`; at or under this charge, on battery, the fill turns `--battery-low` and the item nudges once per discharge | `26-DETAILS.md` §5.1.3 G10, G11; sill FINDINGS F822 | proposed (D1, 2026-09-27) |
 
 ### 3.5 `dock` (sill/settings.toml)
 
