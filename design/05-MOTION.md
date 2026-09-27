@@ -634,6 +634,10 @@ Settled for the port; the catalogue above is unchanged except where named.
   it is not contact with it (principle 2), and an overshoot would lift it off its edge.
 - A swiped card springs back with a `transform` transition at `--t-move --e-spring` (principle
   2: it is the release of a touch), none under Reduced, where it snaps back.
+- The same panel at the bottom edge (`PanelEdge::Bottom`, Edit Widgets' sheet, sill Q521) moves
+  as a sheet, not as an edge panel: its first showing plays `peek-in` at `--t-move --e-out`
+  (`Anim::PeekFullIn`'s recipe), and every hide or show after it is the sheet's spring on
+  `--present-p` (opacity, 12 px down, 95 %; Reduced: opacity only). No new keyframe.
 
 ### 4.10 Added by quire (screenshot thumbnail, 2026-09-26)
 

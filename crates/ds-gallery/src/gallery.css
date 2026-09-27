@@ -137,7 +137,12 @@
 .g-wl-devices{display:flex;flex-wrap:wrap;gap:var(--s-16)}
 .g-wl-device{display:flex;flex-direction:column;align-items:center;gap:var(--s-6);width:72px;color:var(--ink)}
 .g-wl-device-name{font-family:var(--font-ui);font-size:var(--fs-small);color:var(--ink-soft)}
-.g-wl-gallery{padding:var(--s-16);border-radius:var(--r-panel);background:var(--surface)}
+/* Edit Widgets as met (sill Q521): a 1120 x 720 desktop, its widgets at their cells, the sheet
+   at the bottom edge holding the gallery, which fills it. */
+.g-we-stage{position:relative;width:1120px;border-radius:var(--r-panel);overflow:hidden;background-size:cover}
+.g-we-desk{position:relative;height:720px}
+.g-we-cell{position:absolute}
+.g-we-sheet{display:flex;flex-direction:column;flex:1;min-height:0}
 .g-wb-wall{position:relative;padding:0}
 .g-wb-slot{position:absolute;border-radius:var(--m-radius)}
 /* The Lock and switcher page (M11): a lock screen at a 16:10 output's proportions, and two at

@@ -743,7 +743,19 @@ sizes, just one". The gallery draws the widget looked at once, at its desktop si
 placed row has no size control (sill Q520). `WidgetEdit::Resize` stays for a host's own use; the
 gallery never sends it. `GalleryWords::size` and `sizes` are kept for compatibility and unused.
 The gallery is three columns for a wide sheet (the list; the preview and the two buttons on
-`--surface-2`; the placed lists, which scroll on their own) and fills the height it is given. The gallery keeps no layout: each choice
+`--surface-2`; the placed lists, which scroll on their own) and fills the height it is given.
+
+**The sheet (sill Q521, 2026-09-28).** The reference's Edit Widgets is a sheet along the bottom
+of the screen with the desktop's widgets in view above it; the first gallery stood at the right
+edge, 720 wide, over the top-right columns where widgets gather and a new one lands. The host
+shows the gallery in `Panel { edge: PanelEdge::Bottom, width, height }`: centred `--s-8` above
+the bottom, `width` wide at most (less `--s-8` a side), `height` tall (440 by default) but never
+more than half the root (`max-height: calc(50% - --s-8)`), so at least the top half of the
+desktop, two rows of cells and more, stays uncovered. It arrives as a sheet does, `peek-in` at
+`--t-move --e-out` (`Anim::PeekFullIn`'s recipe; no spring, opening is not contact), and after
+that follows the sheet's spring (`--present-p`: fades and settles 12 px down at 95 % as it goes;
+only a fade under Reduced). The gallery inside fills it when it sits in a flex column
+(`flex:1; min-height:0`). The gallery keeps no layout: each choice
 is a `WidgetEdit` (`Add { kind, size, host }`, `Remove(id)`, `Resize(id, size)`,
 `Move(id, at)`) to `onedit`; the host applies it with `apply(layout, edit, DesktopGrid)` and
 passes the new layout back. Words are the host's (`GalleryWords`, English by default).

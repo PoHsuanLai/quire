@@ -12,13 +12,12 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::tokens::LabelHue;
-use ds::widget::apply;
 use ds::{
     Appearance, BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase,
-    DesktopGrid, Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry,
-    MonthIntent, MonthWidget, RingMark, RootChrome, Seconds, SpaceLook, Timeline, WeekNumbers,
-    Widget, WidgetCard, WidgetContext, WidgetEdit, WidgetFrame, WidgetGallery, WidgetHost,
-    WidgetLayout, WidgetMetrics, WidgetSize, WidgetSlotGuide, WorldClockWidget, use_env,
+    Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry, MonthIntent,
+    MonthWidget, RingMark, RootChrome, Seconds, SpaceLook, Timeline, WeekNumbers, Widget,
+    WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetSlotGuide,
+    WorldClockWidget, use_env,
 };
 use ds::{EventLine, MonthFace, TodayLine};
 
@@ -116,8 +115,8 @@ pub fn WidgetLooksPage() -> Element {
                 WidgetSlotGuide { size: WidgetSize::Medium }
             }
         }
-        Section { title: "Edit Widgets", note: "WidgetGallery over the registry (WidgetRegistry::quire()): the widgets listed with their descriptions; the one looked at drawn once, at the one size it takes (sill Q520: no size picker); Add to Desktop and Add to Notification Center hand the host a WidgetEdit at the size the widget takes on that surface, which it applies to the layout it keeps as data and passes back; at the right, what is placed on each surface and Remove. Live.",
-            EditWidgets {}
+        Section { title: "Edit Widgets", note: "The desktop with its widgets placed from the right and Edit Widgets as a sheet at the bottom (Panel with PanelEdge::Bottom, sill Q521), never taller than half the desktop, so the top rows where a new widget lands stay in view. WidgetGallery over the registry: the widgets listed with their descriptions; the one looked at drawn once, at the one size it takes (sill Q520: no size picker); Add to Desktop and Add to Notification Center hand the host a WidgetEdit at the size the widget takes on that surface, which it applies to the layout it keeps as data and passes back; at the right, what is placed on each surface and Remove. Live.",
+            super::widget_edit::EditWidgetsStage {}
         }
     }
 }
@@ -159,47 +158,6 @@ fn MonthCard(size: WidgetSize, host: WidgetHost, busy: Busy) -> Element {
         WidgetCard { widget: MonthWidget, timeline: Timeline::now(entry), size, host,
             onintent: move |intent: MonthIntent| match intent {
                 MonthIntent::Step(step) => month.set(shift(month(), step)),
-            }
-        }
-    }
-}
-
-/// The gallery on a panel, a layout of three widgets already placed, live.
-#[component]
-fn EditWidgets() -> Element {
-    const GRID: DesktopGrid = DesktopGrid {
-        columns: 6,
-        rows: 4,
-    };
-    let start = || {
-        [
-            (
-                BatteryWidget::kind(),
-                WidgetSize::Small,
-                WidgetHost::Desktop,
-            ),
-            (
-                WorldClockWidget::kind(),
-                WidgetSize::Medium,
-                WidgetHost::Desktop,
-            ),
-            (MonthWidget::kind(), WidgetSize::Large, WidgetHost::Tile),
-        ]
-        .into_iter()
-        .fold(WidgetLayout::default(), |layout, (kind, size, host)| {
-            apply(layout.clone(), WidgetEdit::Add { kind, size, host }, GRID).unwrap_or(layout)
-        })
-    };
-    let mut layout = use_signal(start);
-    rsx! {
-        div { class: "g-wl-gallery", style: WidgetMetrics::default().style_attr(),
-            WidgetGallery {
-                layout: layout(),
-                onedit: move |edit: WidgetEdit| {
-                    if let Ok(next) = apply(layout(), edit, GRID) {
-                        layout.set(next);
-                    }
-                },
             }
         }
     }

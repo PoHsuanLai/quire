@@ -17,9 +17,9 @@ use ds::{
     Appearance, BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayKey,
     DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Ds, Eventful, Fraction, IconSize, Inject,
     IsoWeek, Lift, Material, MonthDay, MonthEntry, MonthGridData, MonthKey, MonthWeek, MonthWidget,
-    Motion, RingMark, RootChrome, Seconds, Theme, Timeline, WeekNumbers, Widget, WidgetCard,
-    WidgetEdit, WidgetGallery, WidgetHost, WidgetLayout, WidgetMetrics, WidgetRegistry, WidgetSize,
-    WidgetSlotGuide, WorldClockWidget,
+    Motion, Panel, PanelEdge, Px, RingMark, RootChrome, RootExtent, Seconds, Shown, Theme,
+    Timeline, WeekNumbers, Widget, WidgetCard, WidgetEdit, WidgetGallery, WidgetHost, WidgetLayout,
+    WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide, WorldClockWidget,
 };
 use ds::{EventLine, MonthFace, TodayLine};
 use std::time::{Duration, Instant};
@@ -324,6 +324,17 @@ const CASES: &[Case] = &[
             Theme::Light,
             rsx! { WidgetGallery { layout, onedit: |_| {} } },
         )
+    }),
+    ("edit-widgets-sheet", || {
+        rsx! {
+            Ds { appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Sheet, extent: RootExtent::Viewport, stylesheet: Inject::Host,
+                Panel { label: "Edit Widgets", shown: Shown::Visible, edge: PanelEdge::Bottom, width: Px(1040.0), height: Px(330.0), material: Material::Sheet,
+                    div { style: WidgetMetrics::default().style_attr(),
+                        WidgetGallery { layout: WidgetLayout::default(), onedit: |_| {} }
+                    }
+                }
+            }
+        }
     }),
     ("devices", || {
         desktop(
@@ -700,4 +711,23 @@ fn the_gallery_offers_one_size_per_widget() {
     assert!(!gallery.contains("ds-segmented"), "{gallery}");
     assert!(!gallery.contains("data-lift=\"lifted\""), "{gallery}");
     assert!(gallery.contains(">Batteries<"), "the placed row: {gallery}");
+}
+
+/// Edit Widgets' sheet at the bottom edge (sill Q521): the panel says its edge and carries the
+/// width and the height it was given; the stylesheet holds it under half the root and plays the
+/// sheet's `peek-in` on its first showing.
+#[test]
+fn the_bottom_sheet_says_its_edge_and_its_extent() {
+    let sheet = html("edit-widgets-sheet");
+    assert!(sheet.contains("data-edge=\"bottom\""), "{sheet}");
+    assert!(sheet.contains("width:1040px;height:330px;"), "{sheet}");
+    assert!(sheet.contains("ds-widget-gallery"), "{sheet}");
+    let css = ds::stylesheet();
+    assert!(
+        css.contains("max-height:calc(50% - var(--s-8))"),
+        "never taller than half the root"
+    );
+    assert!(css.contains(
+        ".ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }"
+    ));
 }
