@@ -37,6 +37,11 @@
 .ds-widget[*|data-lift=lifted]{ transform:scale(var(--pickup)); z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
 
+/* Leaving (sill G423): a card its host removed plays `widget-out` on its pulse class (shrinks to
+   .85 and fades at `--t-move --e-exit`; a fade alone under Reduced) and takes no pointer while
+   it goes; the host drops it at `settle(WidgetOut)`. */
+.ds-widget[*|data-presence=leaving]{ pointer-events:none; }
+
 /* WidgetSlotGuide (sill Q431, design/23 section 9.8): where a dragged widget will land, the
    card's footprint at the snap cell, a quiet translucent plate in the card's corner with no
    content, faded in (`a-fade`) as the drag reaches the cell. */

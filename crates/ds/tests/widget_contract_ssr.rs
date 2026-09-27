@@ -14,12 +14,13 @@ use ds::lint::{LintConfig, markup};
 use ds::tokens::LabelHue;
 use ds::widget::{WireRefresh, WireTimeline};
 use ds::{
-    Appearance, BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayKey,
-    DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Ds, Eventful, Fraction, IconSize, Inject,
-    IsoWeek, Lift, Material, MonthDay, MonthEntry, MonthGridData, MonthKey, MonthWeek, MonthWidget,
-    Motion, RingMark, RootChrome, Seconds, Theme, Timeline, WeekNumbers, Widget, WidgetCard,
-    WidgetEdit, WidgetGallery, WidgetHost, WidgetLayout, WidgetMetrics, WidgetRegistry, WidgetSize,
-    WidgetSlotGuide, WorldClockWidget,
+    Appearance, BatteryCell, BatteryEntry, BatteryWidget, CardPresence, ClockCity, ClockEntry,
+    ClockTime, DayKey, DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Ds, Eventful, Fraction,
+    IconSize, Inject, IsoWeek, Lift, Material, MonthDay, MonthEntry, MonthGridData, MonthKey,
+    MonthWeek, MonthWidget, Motion, Panel, PanelEdge, Px, RingMark, RootChrome, RootExtent,
+    Seconds, Shown, Theme, Timeline, WeekNumbers, Widget, WidgetCard, WidgetEdit, WidgetGallery,
+    WidgetHost, WidgetLayout, WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide,
+    WorldClockWidget,
 };
 use ds::{EventLine, MonthFace, TodayLine};
 use std::time::{Duration, Instant};
@@ -194,6 +195,30 @@ const CASES: &[Case] = &[
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium } },
         )
     }),
+    ("battery-row-one", || {
+        let entry =
+            BatteryEntry::Devices(vec![cell("MacBook", Device::Laptop, 930, RingMark::Plain)]);
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Medium } },
+        )
+    }),
+    ("battery-row-two", || {
+        let entry = BatteryEntry::Devices(vec![
+            cell("MacBook", Device::Laptop, 930, RingMark::Plain),
+            cell("Headphones", Device::Headphones, 800, RingMark::Plain),
+        ]);
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Medium } },
+        )
+    }),
+    ("battery-row-waiting", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, size: WidgetSize::Medium } },
+        )
+    }),
     ("battery-row-tile", || {
         center(
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, host: WidgetHost::Tile } },
@@ -276,6 +301,12 @@ const CASES: &[Case] = &[
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, lift: Lift::Lifted } },
         )
     }),
+    ("battery-leaving", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, presence: CardPresence::Leaving, on_gone: |()| {} } },
+        )
+    }),
     ("slot-guide", || {
         desktop(
             Theme::Light,
@@ -300,6 +331,17 @@ const CASES: &[Case] = &[
             Theme::Light,
             rsx! { WidgetGallery { layout, onedit: |_| {} } },
         )
+    }),
+    ("edit-widgets-sheet", || {
+        rsx! {
+            Ds { appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Sheet, extent: RootExtent::Viewport, stylesheet: Inject::Host,
+                Panel { label: "Edit Widgets", shown: Shown::Visible, edge: PanelEdge::Bottom, width: Px(1040.0), height: Px(330.0), material: Material::Sheet,
+                    div { style: WidgetMetrics::default().style_attr(),
+                        WidgetGallery { layout: WidgetLayout::default(), onedit: |_| {} }
+                    }
+                }
+            }
+        }
     }),
     ("devices", || {
         desktop(
@@ -410,6 +452,32 @@ fn the_batteries_lay_out_as_the_reference() {
         "the watch at 13 %: {row}"
     );
     assert!(row.contains("data-mark=\"charging\""), "{row}");
+    for (name, batteries) in [
+        ("battery-row-one", 1),
+        ("battery-row-two", 2),
+        ("battery-row", 4),
+    ] {
+        let row = html(name);
+        assert_eq!(
+            row.matches("class=\"ds-batteries-cell\"").count(),
+            4,
+            "{name}: four places at the fixed pitch (M15): {row}"
+        );
+        assert_eq!(
+            row.matches("data-place=\"empty\"").count(),
+            4 - batteries,
+            "{name}: a bare track in each place left over: {row}"
+        );
+        assert_eq!(row.matches('%').count(), batteries, "{name}: {row}");
+    }
+    let row_waiting = html("battery-row-waiting");
+    assert_eq!(row_waiting.matches("data-place=\"empty\"").count(), 4);
+    let sheet = ds::stylesheet();
+    assert!(
+        sheet.contains(".ds-batteries[*|data-layout=row]{ justify-content:center;")
+            && !sheet.contains(".ds-batteries[*|data-layout=row]{ justify-content:space-between"),
+        "the row keeps its pitch rather than spreading to the ends"
+    );
     let waiting = html("battery-waiting");
     assert!(waiting.contains("data-waiting"), "{waiting}");
     assert!(!waiting.contains("ds-battery-arc"), "{waiting}");
@@ -614,10 +682,9 @@ fn the_gallery_browses_the_registry_and_lists_the_layout() {
         gallery.contains(">See the charge of this computer and your devices.<"),
         "{gallery}"
     );
-    assert_eq!(
-        gallery.matches("class=\"ds-widget-gallery-size\"").count(),
-        2,
-        "Small and Medium"
+    assert!(
+        gallery.contains("class=\"ds-widget-gallery-preview\" data-size=\"small\""),
+        "the batteries at their one desktop size: {gallery}"
     );
     assert!(
         gallery.contains(">82%<") || gallery.contains("aria-valuenow=\"82\""),
@@ -629,4 +696,61 @@ fn the_gallery_browses_the_registry_and_lists_the_layout() {
         "{gallery}"
     );
     assert!(gallery.contains(">Batteries<"), "{gallery}");
+}
+
+/// Edit Widgets draws each widget once, at the one size it takes (sill Q520): one preview, no
+/// size control on it or on a placed row, and every class it writes styled.
+#[test]
+fn the_gallery_offers_one_size_per_widget() {
+    let gallery = html("gallery");
+    assert_eq!(
+        gallery
+            .matches("class=\"ds-widget-gallery-preview\"")
+            .count(),
+        1,
+        "{gallery}"
+    );
+    assert_eq!(
+        gallery.matches("class=\"ds-widget\"").count(),
+        1,
+        "one card: {gallery}"
+    );
+    assert!(!gallery.contains("ds-segmented"), "{gallery}");
+    assert!(!gallery.contains("data-lift=\"lifted\""), "{gallery}");
+    assert!(gallery.contains(">Batteries<"), "the placed row: {gallery}");
+}
+
+/// Edit Widgets' sheet at the bottom edge (sill Q521): the panel says its edge and carries the
+/// width and the height it was given; the stylesheet holds it under half the root and plays the
+/// sheet's `peek-in` on its first showing.
+#[test]
+fn the_bottom_sheet_says_its_edge_and_its_extent() {
+    let sheet = html("edit-widgets-sheet");
+    assert!(sheet.contains("data-edge=\"bottom\""), "{sheet}");
+    assert!(sheet.contains("width:1040px;height:330px;"), "{sheet}");
+    assert!(sheet.contains("ds-widget-gallery"), "{sheet}");
+    let css = ds::stylesheet();
+    assert!(
+        css.contains("max-height:calc(50% - var(--s-8))"),
+        "never taller than half the root"
+    );
+    assert!(css.contains(
+        ".ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }"
+    ));
+}
+
+/// A card its host removed says it is leaving and plays its exit on its pulse class (sill G423);
+/// a placed card says nothing.
+#[test]
+fn a_leaving_card_plays_its_exit() {
+    let leaving = html("battery-leaving");
+    assert!(
+        leaving.contains("class=\"ds-widget a-widget-out\""),
+        "{leaving}"
+    );
+    assert!(leaving.contains("data-presence=\"leaving\""), "{leaving}");
+    assert!(leaving.contains("data-pulse=\"a\""), "{leaving}");
+    let placed = html("battery-row");
+    assert!(!placed.contains("data-presence"), "{placed}");
+    assert!(!placed.contains("a-widget-out"), "{placed}");
 }

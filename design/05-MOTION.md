@@ -634,6 +634,10 @@ Settled for the port; the catalogue above is unchanged except where named.
   it is not contact with it (principle 2), and an overshoot would lift it off its edge.
 - A swiped card springs back with a `transform` transition at `--t-move --e-spring` (principle
   2: it is the release of a touch), none under Reduced, where it snaps back.
+- The same panel at the bottom edge (`PanelEdge::Bottom`, Edit Widgets' sheet, sill Q521) moves
+  as a sheet, not as an edge panel: its first showing plays `peek-in` at `--t-move --e-out`
+  (`Anim::PeekFullIn`'s recipe), and every hide or show after it is the sheet's spring on
+  `--present-p` (opacity, 12 px down, 95 %; Reduced: opacity only). No new keyframe.
 
 ### 4.10 Added by quire (screenshot thumbnail, 2026-09-26)
 
@@ -708,6 +712,23 @@ transitions (`--t-pending-step`), not a keyframe.
 - `morph-in` at `--t-quick --e-spring` (`Anim::MorphInSpring`, design/26 D2): `MorphGlyph`'s
   incoming glyph when the person's own press caused the change (play/pause, a Focus disc); every
   other morph grows in at `--e-out` (`Anim::MorphIn`, design/26 R5).
+- Edit Widgets' "Added" (sill Q523, design/23 section 9.7) is built from these, with no new
+  keyframe: the Add button's check draws on (`SettleStyle::Check`) and grows in with
+  `Anim::MorphInSpring` for the person's press (`Anim::MorphIn` otherwise); the placed row that
+  arrives plays `Anim::RowIn` (`row-in`, `--t-big --e-spring`) for the press, `Anim::Rise`
+  otherwise, taken off at its `settle`.
+
+### 4.14 Added by quire (a widget card's exit, 2026-09-28)
+
+- `widget-out`: `from{ opacity:1; transform:none } to{ opacity:0; transform:scale(.85) }` at
+  `--t-move --e-exit`, forwards (`Anim::WidgetOut`, sill G423): a desktop widget the person
+  removes in Edit Widgets shrinks about its centre and fades (principle 3: exits accelerate;
+  principle 4: removing is acting, so it gets an exit), holding its transparent last frame until
+  the host drops the card at `settle(WidgetOut)` (principle 10). Played on the card's pulse class
+  when its host passes `CardPresence::Leaving` to `WidgetCard`/`WidgetFrame`, which calls
+  `on_gone` at that settle. Reduced: `CrossFade(Out)` (`menu-out`), over Reduced's settle. A
+  leave taken back plays `hold` so no half-faded value stays (sill G295). Not a roster row: a
+  desktop card leaves nothing to heal.
 
 ## 5. Assignments
 
