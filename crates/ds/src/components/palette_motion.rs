@@ -5,6 +5,14 @@
 //! height the removed rows took (`heal`, which springs: the person ran the action). The palette
 //! owns its rows and outlives its result sets, so it plays these itself; a later result set
 //! replaces in place with no motion (R1, R12).
+//!
+//! The person's own Enter or click is not the only way a group's action runs (sill Q400): a
+//! caller may run it itself (`sill debug launcher-key enter` stepping the keyboard machine
+//! directly, a demo's own button) and just hand the palette the next `groups`, with no Enter or
+//! click of its own for the palette to have seen. [`PaletteHandle::mark_group_action`] books that
+//! change as though it were: the caller marks the group before making the change, and only a
+//! resize of that same group plays; anything else (a new result set, or another group's) plays
+//! nothing, as an unmarked caller-driven change always has.
 
 use crate::components::menu_rows::RowsMotion;
 use crate::components::palette_expand::{GroupResize, Resize, resized};
@@ -22,17 +30,22 @@ use crate::time::{FRAME_SLACK, sleep};
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 
-/// Whether the person ran a group's action since the results last changed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Whether a group's action ran since the results last changed: through the palette itself, or
+/// (sill Q400) marked by the caller.
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum Ran {
     Nothing,
-    Action,
+    /// The palette's own Enter or click: any group's resize matches.
+    Own,
+    /// The caller marked this group (`PaletteHandle::mark_group_action`): only its resize
+    /// matches; a resize of another group, or anything else, is a new result set.
+    Marked(String),
 }
 
-/// Where the palette books a run of a group's action (Enter on it, or a click): the next change
-/// of the results is that action's, and only then is a group's growing or shrinking a Show More
-/// or Show Less rather than a new result set.
-#[derive(Clone, Copy)]
+/// Where the palette books a run of a group's action (Enter on it, or a click, or the caller's
+/// mark): the next change of the results is that action's, and only then is a group's growing or
+/// shrinking a Show More or Show Less rather than a new result set.
+#[derive(Clone, Copy, PartialEq)]
 pub(crate) struct ActionBook(CopyValue<Ran>);
 
 /// The palette's action book.
@@ -41,16 +54,60 @@ pub(crate) fn use_action_book() -> ActionBook {
 }
 
 impl ActionBook {
-    /// A group's action ran.
+    /// A group's action ran through the palette itself.
     pub(crate) fn ran(self) {
-        let mut ran = self.0;
-        ran.set(Ran::Action);
+        self.book(Ran::Own);
+    }
+
+    /// The caller marked `group`'s action as about to run.
+    fn ran_for(self, group: String) {
+        self.book(Ran::Marked(group));
+    }
+
+    fn book(self, ran: Ran) {
+        let mut slot = self.0;
+        slot.set(ran);
     }
 
     /// Whether one ran since the last call, forgetting it.
     fn take(self) -> Ran {
         let mut ran = self.0;
         ran.replace(Ran::Nothing)
+    }
+}
+
+/// A caller's mark on a `CommandPalette`'s next change of results (sill Q400): pass it as
+/// `CommandPalette { handle: Some(handle) }`, then call [`mark_group_action`](Self::mark_group_action)
+/// before making the change yourself (running a group's action without going through the
+/// palette's own Enter or click, e.g. `sill debug launcher-key enter`, a demo's own button). The
+/// palette plays that group's Show More or Show Less exactly as it would its own; any other
+/// caller-driven change, unmarked, plays nothing, as before.
+#[derive(Clone, Copy, PartialEq)]
+pub struct PaletteHandle(ActionBook);
+
+impl std::fmt::Debug for PaletteHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PaletteHandle").finish_non_exhaustive()
+    }
+}
+
+/// A handle a caller keeps across renders, like [`use_field_handle`](crate::use_field_handle)'s.
+pub fn use_palette_handle() -> PaletteHandle {
+    PaletteHandle(use_action_book())
+}
+
+impl PaletteHandle {
+    /// Mark the next change of the palette's `groups` as `group`'s own action: its resize (Show
+    /// More or Show Less) plays as though the person had run it through the palette itself. A
+    /// change that turns out not to be that group resizing (a new result set, or another group's
+    /// resize) plays nothing.
+    pub fn mark_group_action(&self, group: impl Into<String>) {
+        self.0.ran_for(group.into());
+    }
+
+    /// This handle's book, for the palette it names.
+    pub(crate) fn book(self) -> ActionBook {
+        self.0
     }
 }
 
@@ -152,7 +209,8 @@ fn use_resize<T: Clone + PartialEq + 'static>(key: &GroupsKey<T>, book: ActionBo
     }
     let before = last.replace(key.clone());
     Results::Changed(match book.take() {
-        Ran::Action => resized(&before, key),
+        Ran::Own => resized(&before, key),
+        Ran::Marked(group) => resized(&before, key).filter(|resize| resize.title == group),
         Ran::Nothing => None,
     })
 }

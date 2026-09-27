@@ -190,7 +190,10 @@ pub use chip::{Chip, ChipVariant};
 pub use clock_angles::{Hands, Tenths, hands};
 pub use clock_face::ClockFace;
 pub use clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
-pub use command_palette::{ASIDE_WIDTH, CommandPalette, CommandPaletteHost, PaletteEntrance};
+pub use command_palette::{
+    ASIDE_WIDTH, CommandPalette, CommandPaletteHost, PaletteEntrance, PaletteHandle,
+    use_palette_handle,
+};
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
 pub use dock_parts::{DockFloor, RunningDot};
