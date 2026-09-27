@@ -44,11 +44,15 @@ pub fn MonthGrid(
     #[props(default)] onpick: Option<EventHandler<DayKey>>,
 ) -> Element {
     let slide = use_month_slide(data.month);
-    let drawn = density.resolve(use_enclosing_frame());
+    let frame = use_enclosing_frame();
+    let drawn = density.resolve(frame);
+    // In a widget's card the month fills the content box at either density (design/23
+    // section 5.2): the rows share its height, the columns its width.
+    let fit = frame.map(|_| "frame");
     let weeks = shown_weeks(weeks, drawn);
     let label = data.title.plain_text();
     rsx! {
-        div { class: "ds-month", "data-weeks": weeks.slug(), "data-density": drawn.slug(), "aria-label": "{label}",
+        div { class: "ds-month", "data-weeks": weeks.slug(), "data-density": drawn.slug(), "data-fit": fit, "aria-label": "{label}",
             {header(&data.title, drawn, onstep)}
             {heads(&data.heads, weeks)}
             // A keyed list of one: a key only remounts inside a list, so a new month is a new

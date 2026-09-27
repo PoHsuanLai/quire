@@ -19,6 +19,9 @@ pub enum ScalarToken {
     Tilt,
     /// `--stagger`: the delay per list index.
     Stagger,
+    /// `--pickup`: the scale of a desktop widget picked up to be moved (sill Q430, design/23
+    /// section 9.8), and of a card lifted in the widget gallery.
+    Pickup,
 }
 
 /// A scalar's value, in its own unit, thousandths where it is fractional.
@@ -36,12 +39,13 @@ pub enum ScalarValue {
 
 impl ScalarToken {
     /// Every scalar, in stylesheet order.
-    pub const ALL: [ScalarToken; 5] = [
+    pub const ALL: [ScalarToken; 6] = [
         ScalarToken::Overshoot,
         ScalarToken::Squish,
         ScalarToken::Lift,
         ScalarToken::Tilt,
         ScalarToken::Stagger,
+        ScalarToken::Pickup,
     ];
 
     /// The custom property: `--overshoot`, …
@@ -52,6 +56,7 @@ impl ScalarToken {
             ScalarToken::Lift => "--lift",
             ScalarToken::Tilt => "--tilt",
             ScalarToken::Stagger => "--stagger",
+            ScalarToken::Pickup => "--pickup",
         })
     }
 
@@ -74,6 +79,9 @@ impl ScalarToken {
             (ScalarToken::Stagger, Standard) => ScalarValue::Time(Duration::from_millis(26)),
             (ScalarToken::Stagger, Extra) => ScalarValue::Time(Duration::from_millis(34)),
             (ScalarToken::Stagger, Calm | Reduced) => ScalarValue::Time(Duration::ZERO),
+            (ScalarToken::Pickup, Standard | Extra) => ScalarValue::Factor(1040),
+            (ScalarToken::Pickup, Calm) => ScalarValue::Factor(1020),
+            (ScalarToken::Pickup, Reduced) => ScalarValue::Factor(1000),
         }
     }
 }

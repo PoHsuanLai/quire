@@ -2182,6 +2182,58 @@ kind of user picture.
 
 Never style `.ds-user-picture`, `.ds-user-photo*` or `.ds-picture-*`.
 
+### Widget interface (2026-09-27): one trait, quire's card, Edit Widgets, placements as data
+
+design/23-WIDGETS.md sections 4.3, 4.4, 5.2, 6 (settled) and 9. Everything new is in
+`ds::widget` (re-exported at the root) and `ds::catalog`. The pattern, reused later by other
+surfaces: **a registry, one trait, a picker, placements as data**.
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| Draw any widget | `WidgetCard { widget: BatteryWidget, timeline, size, host, wake, id, onrefresh, onintent, lift }` | The only way a widget is drawn. The card (footprint, corner, inset, material, Space tint, title row, `data-widget`, lift) is quire's; the widget draws its content only. A size the widget does not offer is held to its first (`ds::widget::fit`) |
+| Hand it data | `Timeline::now(entry)` for a live widget; `Timeline::new(vec![Dated::new(EntryDate::At(t), entry), ..], Refresh::AtEnd)` for dated entries | `t` from `ds::time::now()`. The card redraws at each date on the design system's clock (the virtual clock in tests), asks `onrefresh(RefreshAsk)` once when the policy comes due (never within `REFRESH_FLOOR`, 1 s, of arrival), and asks for no frame otherwise. A new timeline by value replaces the old; an equal one changes nothing |
+| quire's widgets | `BatteryWidget` (`BatteryEntry::{Waiting, Devices(Vec<BatteryCell { name, device: Device, level, mark }>), Absent(words)}`), `WorldClockWidget` (`ClockEntry::{Waiting, Cities(Vec<ClockCity { name, time, phase, notes }>), Absent(words)}`), `MonthWidget` (`MonthEntry::{Waiting, Month(Box<MonthFace { grid, weeks, today: Option<TodayLine>, events: Vec<EventLine { time, title, hue: LabelHue }>, no_events }>)}`, `MonthIntent::Step(Step)`) | Their layouts (the batteries' solo, grid and row, the clocks' row with notes, the month's per-size layouts: Small the month, Medium today beside it, Large the month over the day's events) are quire's now; style nothing inside |
+| Your own widget | `impl Widget for UpNext { type Entry; type Intent; fn kind(); fn name(); fn description(); fn sizes(); fn placeholder(size); fn preview(size); fn view(entry, cx) }` | `Entry` and `Intent` are serde data (`NoIntent` for none); `view` is a pure function returning markup, no hooks; `cx: WidgetContext { size, host, wake, act }` |
+| List what can be placed | `WidgetRegistry::quire().with::<UpNext>()?`, `provide_widget_registry(reg)`, `use_widget_registry()` | `WidgetInfo { kind, name, description, sizes }` and `.preview(size, host, lift)` |
+| Keep what is placed | `WidgetLayout` (`Placements<WidgetKind, WidgetSize, WidgetAt>`), `WidgetAt::{Desktop(GridCell { column, row }), Center(Order)}` | Serde; store it in settings. Edit only through `ds::widget::apply(layout, WidgetEdit::{Add, Remove, Resize, Move}, DesktopGrid) -> Result<WidgetLayout, LayoutError::{Full, Taken, Unknown}>` |
+| Edit Widgets | `WidgetGallery { layout, onedit, words: GalleryWords }` | Browses the registry with previews at each size, lifts the size picked, sends `WidgetEdit`s; you apply and pass the layout back |
+| Pick a widget up | `WidgetCard { lift: Lift::Lifted }` or `WidgetFrame { lift }` | `--pickup` (1.04; new scalar), `--shadow-drag` replacing the resting drop, `--z-drag`, `--t-quick` `--e-out`; settles to zero frames |
+| Show where it lands | `WidgetSlotGuide { size, host }` | The footprint at the snap cell, faded in; you position it |
+| A filled device glyph | `DeviceGlyph { device: Device::Headphones, size }` | Twelve devices, one filled path each, `currentColor` |
+| Another process's widget | `WireTimeline<E>` JSON, `.received(now)`, `WireTimeline::sent(t, now)` | Format only; the D-Bus transport is design/23 section 9.5, not built |
+
+**Changed under you (visual, no call site breaks):**
+- Every desktop `WidgetFrame` is Space-tinted by default (`CardTint::Space`): a desktop card's
+  markup gains `data-tint="space"` and a `div.ds-frame`; a tile lays none (`CardTint::on`). Pass
+  `tint: CardTint::Material` only for a comparison.
+- On a desktop card the month's title and the Medium card's weekday are `--ink-soft` (sill Q412,
+  option (b), the branch default until the user picks between it and a more opaque card;
+  design/23 section 4.3). Today's disc and the busy dots keep the accent.
+- `MonthDensity::Auto` draws compact in a Medium frame too; inside any frame a month writes
+  `data-fit="frame"` (the compact grid fills its box, the regular one keeps its 32 px pitch and
+  centres).
+- Rust: `ScalarToken::ALL` has six
+  entries (`Pickup`); `WidgetFrame` gains `kind` and `lift` (defaulted); `WidgetSize`,
+  `WidgetHost`, `RingMark`, `ClockTime`, `Seconds`, `DayPhase`, `ClockLook`, `Text`, `Run`,
+  `RunTone`, `LabelHue` and the month grid's data types derive serde. New root names (`Widget`,
+  `WidgetKind`, `Timeline`, `Device`, `Lift`, ...) clash only under a glob import of `ds`.
+
+**What sill changes** (read against sill `1506faa`):
+
+| Where in sill | Change |
+| --- | --- |
+| `sill-surfaces/src/widgets/mod.rs`, `Widget` | Replace the `ds::WidgetFrame { match kind { .. } }` dispatcher with one `ds::WidgetCard` per kind (`widget: ds::BatteryWidget`, `ds::WorldClockWidget`, `ds::MonthWidget`, and sill's own `UpNext`, `NowPlaying`), passing `size`, `host`, `wake: use_widget_wake()`, `id: widget_element_id(kind)`. `cells()` goes: use `ds::widget::cells` |
+| `widgets/battery.rs` | Becomes a provider: `battery_rows` to `ds::BatteryEntry::Devices(vec![ds::BatteryCell { name, device, level: Fraction(level * 10), mark }])` (`BatteryOwner::ThisMachine` to `Device::Laptop`, `BtKind` to the nearest `Device`), `Absent("No batteries")` when empty, `Timeline::now(entry)`. Delete `BatteryLayout`, `solo`, `grid`, `row_of`, `ring`, `empty_ring`, `row_glyph`, `ring_label` (the ring is labelled with the name; `aria-valuenow` carries the level) and `style/widget_battery.css` |
+| `widgets/world_clock.rs` | `clock_rows` to `ds::ClockEntry::Cities(vec![ds::ClockCity { name: city, time, phase, notes: vec![offset] }])`, `Absent("No cities: add them in widgets.world_clocks")`. Delete `look_of` (quire picks digits for the tile), `MAX_CITIES` (`ds::widget::MAX_CITIES`), the component's markup and `style/widget_world_clock.css`. Optional: send the next hour of minutes with `Refresh::AtEnd` instead of redrawing on `use_clock` |
+| `widgets/calendar/view.rs`, `calendar/shown.rs` | `ds::MonthGrid { .. }` becomes `ds::WidgetCard { widget: ds::MonthWidget, timeline, onintent }` with `timeline = Timeline::now(MonthEntry::Month(Box::new(MonthFace { today: Some(TodayLine { weekday, day }), events, no_events: "No events today".into(), ..MonthFace::of(grid_data(&grid, today), weeks) })))`; `MonthIntent::Step(step)` shifts the month. Feed `events` from Up Next's rows (time, title, the calendar's colour as a `LabelHue`). Drop the grid's wrapper CSS in `style/widget_calendar.css` |
+| `widgets/up_next.rs`, `widgets/now_playing.rs` | `impl ds::Widget` for each (kinds `sill.up-next`, `sill.now-playing`; Now Playing's play, pause and skip as its `Intent`), their data as the `Entry`; register them: `ds::WidgetRegistry::quire().with::<UpNext>()?.with::<NowPlaying>()?` provided at the desktop layer's and the center's roots |
+| `widgets/frame.rs` | `frame_title`/`frame_head` move into each widget's `Widget::title()` (quire's three have none); `style/widget_frame.css` goes |
+| `sill-settings/src/widgets.rs` (`center`, `desktop_widgets`) | Replace both lists with one `layout: ds::WidgetLayout` key (kinds by name: `quire.battery`, `quire.world-clock`, `quire.month`, `sill.up-next`, `sill.now-playing`), migrating the old lists (size from `size_of`, desktop cells from `desktop_widgets/placement.rs`, center order by index). A design/22 row follows, keys first (`AWAITING_ROWS`) |
+| `surfaces/desktop_widgets/placement.rs`, `geometry.rs` | Positions come from the layout; new widgets from `ds::widget::apply(.., WidgetEdit::Add ..)` (same top-right, column-major scan as `first_free`); drops `WidgetEdit::Move(id, WidgetAt::Desktop(cell))` through `apply` (a refused move is `LayoutError::Taken`) |
+| `surfaces/desktop_widgets/placed.rs` (the 1040 lift, `Pose`), `view.rs`, `style/desktop_widgets.css` (`.sill-dw-place[data-lift=up]`) | Pass `lift: ds::Lift::Lifted` to the held card and delete the local scale, shadow and z-index; draw `ds::WidgetSlotGuide { size }` at the snap cell (Q431) instead of anything local |
+| A new Edit Widgets surface (a sheet from the desktop's context menu or the center's Edit button) | `ds::WidgetGallery { layout, onedit }`: apply each edit with `ds::widget::apply` against the output's `DesktopGrid` and write the layout to settings |
+| Goldens | Desktop widget markup gains `data-tint="space"`, `div.ds-frame`, `data-widget`; framed months gain `data-fit` (Medium turns compact and gains the today column; Large gains the events list) |
+
 ### Widget vibrancy (2026-09-26)
 
 design/23-WIDGETS.md sections 1.1 (M26-M34) and 4.3. Values only: no class, attribute or prop

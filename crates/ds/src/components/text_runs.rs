@@ -11,9 +11,10 @@
 
 use dioxus::core::SuperFrom;
 use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// How one run is set.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum RunTone {
     /// The line's own tone.
     #[default]
@@ -45,7 +46,7 @@ impl RunTone {
 }
 
 /// A piece of a line in one tone.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Run {
     /// The characters.
     pub text: String,
@@ -64,7 +65,7 @@ impl Run {
 }
 
 /// A line of text: whole, or as runs the caller computed.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Text {
     /// One run in the line's own tone: what a `String` becomes.
     Plain(String),

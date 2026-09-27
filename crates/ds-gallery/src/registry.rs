@@ -123,8 +123,8 @@ pub const REGISTRY: [Entry; 19] = [
     Entry {
         page: Page::WidgetLooks,
         title: "Widget looks",
-        lede: "The widgets flat, bright and measured (design/23-WIDGETS.md section 2): the battery as bright rings with the device glyph inside and the percentage under each, and the world clock as white day dials and dark night dials with an orange seconds hand; each in a Small and a Medium card over a calm wallpaper, the second medium card tinted by the Space.",
-        height: 1000,
+        lede: "The widgets flat, bright and measured (design/23-WIDGETS.md section 2), every card drawn through the widget contract (WidgetCard, section 9) and tinted by the Space: the battery as bright rings with the filled device glyph inside and the percentage under each, the world clock as white day dials and dark night dials following the scheme; the calendar filling its card at every size; one card on the bare material for comparison; the filled device set; a widget picked up and the drop-slot guide; and Edit Widgets, the gallery over the registry that edits the placements the host keeps as data.",
+        height: 3560,
         body: pages::widget_looks::WidgetLooksPage,
     },
     Entry {

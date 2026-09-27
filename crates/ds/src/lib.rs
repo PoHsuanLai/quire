@@ -6,6 +6,7 @@
 
 pub mod appearance;
 mod busy;
+pub mod catalog;
 pub mod components;
 pub mod css;
 pub mod delays;
@@ -30,6 +31,7 @@ mod task;
 pub mod text;
 pub mod time;
 pub mod tokens;
+pub mod widget;
 pub mod window;
 
 pub use appearance::{
@@ -107,6 +109,13 @@ pub use tokens::{
     OpacityToken, OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow,
     ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WidgetMetrics, ZLayer,
     accent_of,
+};
+pub use widget::{
+    BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, Dated, DesktopGrid, EntryDate,
+    EventLine, GalleryWords, GridCell, MonthEntry, MonthFace, MonthIntent, MonthWidget, NoIntent,
+    Refresh, RefreshAsk, Timeline, TodayLine, Widget, WidgetAt, WidgetCard, WidgetContext,
+    WidgetEdit, WidgetGallery, WidgetInfo, WidgetKind, WidgetLayout, WidgetRegistry, WireTimeline,
+    WorldClockWidget, provide_widget_registry, use_widget, use_widget_registry,
 };
 pub use window::{
     Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,

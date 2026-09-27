@@ -23,6 +23,7 @@ mod oklab;
 mod picked;
 mod roles;
 mod text_grounds;
+mod widget_grounds;
 
 pub use band::{AccentBand, AccentPick, ChromaSpan, Hue, InkRule, Milli, SchemeBand, Weight};
 pub use derive::accent_roles;
@@ -35,6 +36,7 @@ pub use text_grounds::{
     BACKDROPS, Ground, GroundKind, TEXT_MATERIALS, TextOn, least_on, material_grounds,
     text_grounds, text_on,
 };
+pub use widget_grounds::{WALLPAPERS, widget_grounds};
 
 #[cfg(test)]
 mod tests;

@@ -47,6 +47,7 @@ fn build() -> String {
 fn components() -> String {
     CSS.iter()
         .chain(crate::detail::CSS)
+        .chain(crate::widget::CSS)
         .map(|(name, css)| format!("/* -- {name} -- */\n{}\n", css.trim_end()))
         .collect()
 }
