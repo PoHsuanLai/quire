@@ -28,11 +28,12 @@ use dioxus::prelude::*;
 ///
 /// `density` (`Auto`) is written as `data-density`: `Auto` draws compact inside a
 /// `WidgetFrame { size: Small }` and regular inside a Medium or Large one or outside any frame;
-/// `Regular` and `Compact` force it. The compact grid is seven 20 px columns of 19 px rows, a
-/// 14 px header of `--fs-micro` title and 14 px glyph buttons, 10 px heads, today on a 20 px
-/// disc (twice `--fs-caption`, sill Q361) and a 3 px dot: 140 x 138 for a six-week month,
-/// measured on Blitz (the `month_grid_density` harness test), inside the small frame's
-/// 140 x 140. It never draws
+/// `Regular` and `Compact` force it. The compact grid fills its box (in a small frame, the
+/// 140 x 140 content box): a 14 px header of `--fs-micro` title and 14 px glyph buttons, 12 px
+/// heads, then the weeks sharing the rest evenly, seven columns across (20 each) and the rows
+/// down (19.67 for six weeks, 23.6 for five, the weeks running 4 past the box's foot as an
+/// optical inset), today on a 20 px disc (twice `--fs-caption`, sill Q361) in the middle of its
+/// row and a 3 px dot, measured on Blitz (the `month_grid_density` harness test). It never draws
 /// week numbers, whatever `weeks` says: a week column would not fit.
 #[component]
 pub fn MonthGrid(

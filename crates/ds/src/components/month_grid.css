@@ -8,17 +8,20 @@
    (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer and squishes
    pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
 
-   Compact (`data-density=compact`, sill Q190, Q361): a small desktop widget's content box is
-   140 x 140, which the regular grid (224 wide, 254 tall for six weeks) overflows. Seven 20 px
-   columns (140) of 19 px rows; a 14 px header (the title at `--fs-micro`, same tracking, and the
-   plain 14 px `ds-month-step` glyph buttons, as a Tool button's 28 x 26 would cost a fifth of
-   the height); 10 px heads at `--fs-nano`; the number at `--fs-caption` on a disc of twice its
-   size (20), so two tabular digits (about 12 px at 700) keep 4 px a side, as the regular grid's
-   24 px disc round 11.5 px digits does (Q361: the 16 px disc left two digits touching its rim).
-   The disc overhangs its 19 px row by 1 px into the next row's clear top; a 3 px dot sits inside
-   the disc's foot (tucked 4), `--accent-ink` on today's disc. Six weeks: 14 + 10 + 6 x 19 = 138,
-   139 with the last disc's overhang. The compact grid never draws week numbers, so no
-   `data-weeks=show` rule applies to it. */
+   Compact (`data-density=compact`, sill Q190, Q361, the compact-spacing pass of 2026-09-27): a
+   small desktop widget's content box is 140 x 140, which the regular grid (224 wide, 254 tall
+   for six weeks) overflows. The month fills that box as the reference's small Month widget
+   does (design/23 section 5.1): a 14 px header (the title in the UI face at `--fs-micro`,
+   `--fw-caps`, tracked, upper, `--accent`, its left edge 4 in, where a two-digit first column
+   starts; the plain 14 px `ds-month-step` glyph buttons), 12 px heads at `--fs-nano` in the UI
+   face, then the weeks sharing the rest evenly: seven columns across the width (20 each in
+   140) and the rows over the height, 118 / 6 = 19.67 for six weeks, 118 / 5 = 23.6 for five.
+   The weeks run 4 past the box's foot so the last row's numbers end as far from the card's
+   foot as the title's caps start from its top (about 15 and 17: an optical inset, the 12 of
+   padding measured to ink, not to line boxes). The number at `--fs-caption` on a disc of twice
+   its size (20, Q361) sits in the middle of its row; a 3 px dot inside the disc's foot (tucked
+   4, with 1 under it so a busy day's stack is the disc's 20 and centres alike), `--accent-ink`
+   on today's disc. The compact grid never draws week numbers. */
 
 .ds-month{ display:flex; flex-direction:column; align-items:flex-start; color:var(--ink); user-select:none; }
 
@@ -70,13 +73,25 @@
 .ds-month-step:hover{ color:var(--ink); background:var(--surface-2); }
 .ds-month-step:active{ transform:scale(var(--squish)); }
 
-.ds-month[*|data-density=compact] .ds-month-header{ height:14px; min-height:0; gap:var(--s-1); margin-bottom:0; }
-.ds-month[*|data-density=compact] .ds-month-title{ font-size:var(--fs-micro); line-height:1; padding-left:var(--s-3); }
-.ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,20px); }
-.ds-month[*|data-density=compact] .ds-month-head{ height:10px; font-size:var(--fs-nano); line-height:1; }
-.ds-month[*|data-density=compact] .ds-month-day{ height:19px; gap:0; }
+/* Compact: the month fills the small frame's content box (flex:1 in `.ds-widget-body`); the
+   header and heads keep their heights and the weeks share the rest, so a five-week month's rows
+   are taller than a six-week one's. */
+.ds-month[*|data-density=compact]{ flex:1; min-height:0; align-items:stretch; }
+.ds-month[*|data-density=compact] .ds-month-header{ height:var(--s-14); min-height:0; gap:var(--s-1); margin-bottom:0; }
+.ds-month[*|data-density=compact] .ds-month-title{
+  font-family:var(--font-ui); font-size:var(--fs-micro); font-weight:var(--fw-caps); line-height:1; padding-left:var(--s-4);
+}
+.ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,minmax(calc(2 * var(--fs-caption)),1fr)); }
+.ds-month[*|data-density=compact] .ds-month-head{ height:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-nano); line-height:1; }
+.ds-month[*|data-density=compact] .ds-month-weeks{ flex:1; min-height:0; margin-bottom:calc(-1 * var(--s-4)); }
+.ds-month[*|data-density=compact] .ds-month-weeks > .ds-month-row{
+  flex:1 1 calc(2 * var(--fs-caption)); min-height:0; grid-template-rows:minmax(0,1fr);
+}
+.ds-month[*|data-density=compact] .ds-month-day{ height:auto; min-height:0; gap:0; justify-content:center; }
 .ds-month[*|data-density=compact] .ds-month-num{
   flex:none; width:calc(2 * var(--fs-caption)); height:calc(2 * var(--fs-caption)); font-size:var(--fs-caption); line-height:1;
 }
-.ds-month[*|data-density=compact] .ds-month-dot{ width:3px; height:3px; margin-top:calc(-1 * var(--s-4)); }
+.ds-month[*|data-density=compact] .ds-month-dot{
+  width:var(--s-3); height:var(--s-3); margin:calc(-1 * var(--s-4)) 0 var(--s-1);
+}
 .ds-month[*|data-density=compact] .ds-month-day[*|aria-current=date] .ds-month-dot{ background:var(--accent-ink); }

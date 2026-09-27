@@ -15,7 +15,8 @@ pub enum MonthDensity {
     Auto,
     /// Seven 32 px columns, whatever encloses it.
     Regular,
-    /// Seven 20 px columns in 140 x 140, whatever encloses it; never week numbers.
+    /// Fills its box, whatever encloses it: seven even columns (20 px in a small frame's 140) and
+    /// the weeks sharing the height (20 px rows where the box sets no height); never week numbers.
     Compact,
 }
 
