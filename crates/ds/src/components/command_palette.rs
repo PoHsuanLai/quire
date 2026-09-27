@@ -24,6 +24,7 @@ use crate::components::palette_group::PaletteGroups;
 pub use crate::components::palette_host::{CommandPaletteHost, PaletteEntrance};
 use crate::components::palette_lines::{PaletteKey, palette_key};
 use crate::components::palette_motion::{Book, use_action_book, use_list_motion};
+pub use crate::components::palette_motion::{PaletteHandle, use_palette_handle};
 use crate::components::palette_reveal::{Reveal, use_reveal};
 use crate::components::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::palette_select::{PaletteSelection, use_palette_selection};
@@ -106,6 +107,12 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 ///
 /// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
 /// radius; absent, it keeps `--r-panel`.
+///
+/// `handle` ([`use_palette_handle`]) lets a caller that runs a group's action itself (sill Q400:
+/// `sill debug launcher-key enter`, a demo's own button — never the palette's own Enter or
+/// click) still get Show More's rise or Show Less's heal: call its `mark_group_action(group)`
+/// before making the change that follows. Absent, or the change turns out not to be that
+/// group's, the change plays nothing, same as any other new result set.
 #[component]
 pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     label: String,
@@ -133,13 +140,15 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default = ASIDE_WIDTH)] aside_width: Px,
     #[props(default)] initial_caret: InitialCaret,
     #[props(into, default)] reveal: RevealCue,
+    #[props(default)] handle: Option<PaletteHandle>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
     let showing = use_showing(shown, entrance.anim());
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);
     let in_view = use_reveal();
-    let actions = use_action_book();
+    let own_actions = use_action_book();
+    let actions = handle.map(PaletteHandle::book).unwrap_or(own_actions);
     let key = groups.key();
     let revision = use_revision(&(tokens.clone(), key.clone()));
     let own_focus = use_focus_request();
