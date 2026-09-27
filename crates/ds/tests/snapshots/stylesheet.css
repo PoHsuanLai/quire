@@ -328,6 +328,12 @@ html,body{margin:0;padding:0;background:transparent}
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
+/* widget-out (quire's, sill G423): a widget's card leaving as the person removes it: it shrinks
+   to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
+   accelerate), holding its transparent last frame until the host drops the card. Under Reduced
+   it only fades (`menu-out`). */
+@keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
+
 /* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
    swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
    `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
@@ -465,6 +471,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
 @keyframes level-tick--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+@keyframes widget-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 @keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 @keyframes banner-in--b{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
@@ -634,6 +641,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-pane-in-r-out[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
 .a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-spring) backwards;}
 .a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-spring) backwards;}
+.a-widget-out[*|data-pulse=a]{animation:widget-out var(--t-move) var(--e-exit) forwards;}
+.a-widget-out[*|data-pulse=b]{animation:widget-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 .ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=b]{animation-name:hold--b;}
@@ -767,6 +776,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=b]{animation-name:menu-out--b;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
    design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which
@@ -2418,7 +2429,8 @@ html,body{margin:0;padding:0;background:transparent}
   transform:translateX(calc(var(--pane-p) * -1 * var(--s-26))); opacity:calc(1 - var(--pane-p)); }
 .ds[*|data-motion=reduced] .ds-pane{ transform:none; }
 /* -- panel -- */
-/* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel. A stage fills
+/* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel, and Edit
+   Widgets' bottom sheet (sill Q521, below). A stage fills
    the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
    rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
@@ -2443,6 +2455,19 @@ html,body{margin:0;padding:0;background:transparent}
   transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
 .ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
 .ds-panel[*|data-presence=leaving]{ pointer-events:none; }
+
+/* At the bottom (sill Q521, the reference's Edit Widgets sheet): centred `--s-8` above the root's
+   bottom, as wide as the host asks less `--s-8` at each side, as tall as it asks but never more
+   than half the root, so the top of the desktop, where widgets land, stays in view. It arrives as
+   a sheet does, `peek-in` at `--t-move --e-out` (no spring: opening is not contact), and after
+   that follows the sheet's spring: it fades and settles 12 px down at 95 % as it goes, and comes
+   back the same way. Under Reduced it only fades. */
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel{ top:auto; left:0; right:0; margin:0 auto; max-height:calc(50% - var(--s-8)); }
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=entering],
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+  transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
+.ds[*|data-motion=reduced] .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ transform:none; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
@@ -3503,6 +3528,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget[*|data-lift=lifted]{ transform:scale(var(--pickup)); z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
 
+/* Leaving (sill G423): a card its host removed plays `widget-out` on its pulse class (shrinks to
+   .85 and fades at `--t-move --e-exit`; a fade alone under Reduced) and takes no pointer while
+   it goes; the host drops it at `settle(WidgetOut)`. */
+.ds-widget[*|data-presence=leaving]{ pointer-events:none; }
+
 /* WidgetSlotGuide (sill Q431, design/23 section 9.8): where a dragged widget will land, the
    card's footprint at the snap cell, a quiet translucent plate in the card's corner with no
    content, faded in (`a-fade`) as the drag reaches the cell. */
@@ -3659,20 +3689,22 @@ html,body{margin:0;padding:0;background:transparent}
    compositions the reference measures, moved into quire with the widget contract so no host
    lays out a widget's content. The card itself (corner, inset, material, tint) is
    `widget_frame`'s. Batteries: Small with one device, the ring top left and the hero figure
-   bottom left (M13); Small with several, a 2 x 2 grid of rings (M14); Medium, a row of rings,
-   the figure 18 under each (M15). World Clock: Medium, four dials across with the city and the
+   bottom left (M13); Small with several, a 2 x 2 grid of rings (M14); Medium, four places on the
+   reference's fixed 80 pitch (a 64 ring and a 16 gap, the row centred so the first sits 20 in),
+   the figure 18 under each and a bare track with an empty figure line in a place with no battery
+   (M15). World Clock: Medium, four dials across with the city and the
    notes under each (M19, M24); Small, the large dial alone (clock_face's small-card rules).
    Attribute selectors carry `*|` (spike S2). */
 
 .ds-batteries{ display:flex; flex:1; min-width:0; min-height:0; }
 .ds-batteries[*|data-layout=solo]{ flex-direction:column; justify-content:space-between; }
 .ds-batteries[*|data-layout=grid]{ flex-wrap:wrap; justify-content:space-between; align-content:space-between; }
-.ds-batteries[*|data-layout=row]{ justify-content:space-between; align-items:center; padding:0 var(--s-8); }
+.ds-batteries[*|data-layout=row]{ justify-content:center; align-items:center; gap:var(--s-16); }
 .ds-batteries[*|data-layout=absent]{ align-items:center; justify-content:center; }
 .ds-batteries-hero{ margin-bottom:calc(-1 * var(--s-6)); font-family:var(--font-display); font-size:var(--fs-widget-hero);
   font-weight:500; line-height:1; letter-spacing:-.01em; color:var(--ink); }
-.ds-batteries-cell{ display:flex; flex-direction:column; align-items:center; gap:var(--s-18); }
-.ds-batteries-figure{ font-family:var(--font-display); font-size:var(--fs-widget-figure); font-weight:500; line-height:1; color:var(--ink); }
+.ds-batteries-cell{ display:flex; flex:none; width:64px; flex-direction:column; align-items:center; gap:var(--s-18); }
+.ds-batteries-figure{ min-height:1em; font-family:var(--font-display); font-size:var(--fs-widget-figure); font-weight:500; line-height:1; color:var(--ink); }
 .ds-batteries-quiet,
 .ds-world-clock-quiet{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:700; line-height:1.2; color:var(--ink-faint); }
 
@@ -3714,15 +3746,20 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget[*|data-host=desktop] .ds-month-weekday{ color:var(--ink-soft); }
 /* -- widget_gallery -- */
 /* WidgetGallery, "Edit Widgets" (design/23-WIDGETS.md section 9.7): the reference's widget
-   gallery in three bands. At the left, the registry's widgets as a list, each its name (UI face
-   600) over its description (`--ink-soft`), the one looked at on `--accent-soft`. Beside it, that
-   widget at each size it offers, drawn with its preview entry on the real card at the real size
-   over `--surface-2`, the size's name under each; the picked one lifts (`Lift`, the dragged
-   widget's own), and the two buttons add it. Under both, what is placed on the desktop and in
-   the notification center, one row each: the name, the size, Remove. */
+   gallery in three columns, laid out for a wide sheet at the bottom of the desktop. At the left,
+   the registry's widgets as a list, each its name (UI face 600) over its description
+   (`--ink-soft`), the one looked at on `--accent-soft`. In the middle, that widget drawn once, at
+   the one size it takes, with its preview entry on the real card over `--surface-2`, and the two
+   buttons that add it. At the right, what is placed on the desktop and in the notification
+   center, one row each: the name and Remove. The gallery fills the height it is given
+   (`flex:1` in a column, or its grid row), and the placed column scrolls on its own, so a new
+   row can be brought into view without moving the rest; it is inset 6 at each side so a row
+   rising in on the spring (`row-in`'s 1.04) is not clipped by it. Attribute selectors carry `*|`
+   (spike S2). */
 
-.ds-widget-gallery{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr); gap:var(--s-16); color:var(--ink); }
-.ds-widget-gallery-kinds{ display:flex; flex-direction:column; gap:var(--s-2); }
+.ds-widget-gallery{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr) minmax(0,280px); grid-template-rows:minmax(0,1fr);
+  flex:1; min-height:0; gap:var(--s-16); color:var(--ink); }
+.ds-widget-gallery-kinds{ display:flex; flex-direction:column; gap:var(--s-2); min-height:0; overflow-y:auto; scrollbar-width:none; }
 .ds-widget-gallery-kind{ font:inherit; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-2); padding:var(--s-8) var(--s-10);
   border:0; border-radius:var(--r-tile); background:transparent; color:var(--ink); text-align:left; cursor:default;
   transition:background-color var(--t-quick) var(--e-out); }
@@ -3731,19 +3768,21 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-name{ font-family:var(--font-ui); font-size:var(--fs-body); font-weight:600; }
 .ds-widget-gallery-description{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-soft); }
 
-.ds-widget-gallery-detail{ display:flex; flex-direction:column; gap:var(--s-16); min-width:0; }
-.ds-widget-gallery-sizes{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s-22); padding:var(--s-16); border-radius:var(--r-panel);
-  background:var(--surface-2); }
-.ds-widget-gallery-size{ display:flex; flex-direction:column; align-items:center; gap:var(--s-8); cursor:default; }
-.ds-widget-gallery-size-name{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft); }
-.ds-widget-gallery-size[*|aria-pressed=true] .ds-widget-gallery-size-name{ color:var(--accent-text); }
-.ds-widget-gallery-actions{ display:flex; flex-wrap:wrap; gap:var(--s-8); }
+.ds-widget-gallery-detail{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--s-16); min-width:0; min-height:0;
+  padding:var(--s-16); border-radius:var(--r-panel); background:var(--surface-2); }
+.ds-widget-gallery-preview{ display:flex; justify-content:center; }
+.ds-widget-gallery-actions{ display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s-8); }
 .ds-widget-gallery-actions > .ds-button{ flex:none; white-space:nowrap; }
 
-.ds-widget-gallery-placed{ grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s-16); }
+.ds-widget-gallery-placed{ display:flex; flex-direction:column; gap:var(--s-16); min-height:0; padding:0 var(--s-6); overflow-y:auto; scrollbar-width:none; }
 .ds-widget-gallery-surface{ display:flex; flex-direction:column; gap:var(--s-6); }
 .ds-widget-gallery-heading{ font-family:var(--font-ui); font-size:var(--fs-caption); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps);
   text-transform:uppercase; color:var(--ink-faint); }
 .ds-widget-gallery-none{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
+
+/* "Added" (sill Q523): while the widget an Add button placed settles in, the button leads with a
+   check (`CheckMark`, drawn on) in its own box, which grows in with `morph-in` (the spring only
+   for the person's own press). A row that arrives rises in on its own pulse class. */
+.ds-widget-gallery-added{ display:inline-flex; align-items:center; }

@@ -10,6 +10,7 @@
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
 use crate::components::text_runs::text;
+use crate::components::widget_exit::{CardPresence, use_card_exit};
 use crate::components::widget_kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
@@ -29,6 +30,10 @@ use dioxus::prelude::*;
 ///
 /// The frame provides its `size` to its content (`widget_scope`), so content that must fit
 /// the frame, a `MonthGrid` at `MonthDensity::Auto`, fits itself without being told.
+///
+/// `presence: CardPresence::Leaving` plays the card's exit (sill G423): it shrinks and fades
+/// (`widget-out`, a fade alone under Reduced) and `on_gone` runs once at `settle(WidgetOut)`,
+/// when the host stops drawing it. The host keeps the card until then.
 #[component]
 pub fn WidgetFrame(
     #[props(default)] size: WidgetSize,
@@ -38,20 +43,29 @@ pub fn WidgetFrame(
     #[props(default)] id: Option<String>,
     #[props(default)] kind: Option<WidgetKind>,
     #[props(default)] lift: Lift,
+    #[props(default)] presence: CardPresence,
+    #[props(default)] on_gone: Option<EventHandler<()>>,
     children: Element,
 ) -> Element {
     use_frame_provider(size);
+    let motion = use_card_exit(presence, on_gone);
+    let class = match motion.pulse() {
+        Some(pulse) => format!("ds-widget {pulse}"),
+        None => "ds-widget".to_owned(),
+    };
     let tint = tint.on(host);
     let kind = kind.map(|kind| kind.as_str().to_owned());
     let card = rsx! {
         div {
-            class: "ds-widget",
+            class,
             id,
             "data-size": size.slug(),
             "data-host": host.slug(),
             "data-tint": tint.slug(),
             "data-widget": kind,
             "data-lift": lift.slug(),
+            "data-presence": motion.presence(),
+            "data-pulse": motion.pulse().map(|_| "a"),
             if tint == CardTint::Space {
                 div { class: "ds-frame" }
             }

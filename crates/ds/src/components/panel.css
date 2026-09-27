@@ -1,4 +1,5 @@
-/* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel. A stage fills
+/* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel, and Edit
+   Widgets' bottom sheet (sill Q521, below). A stage fills
    the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
    rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
@@ -23,3 +24,16 @@
   transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
 .ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
 .ds-panel[*|data-presence=leaving]{ pointer-events:none; }
+
+/* At the bottom (sill Q521, the reference's Edit Widgets sheet): centred `--s-8` above the root's
+   bottom, as wide as the host asks less `--s-8` at each side, as tall as it asks but never more
+   than half the root, so the top of the desktop, where widgets land, stays in view. It arrives as
+   a sheet does, `peek-in` at `--t-move --e-out` (no spring: opening is not contact), and after
+   that follows the sheet's spring: it fades and settles 12 px down at 95 % as it goes, and comes
+   back the same way. Under Reduced it only fades. */
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel{ top:auto; left:0; right:0; margin:0 auto; max-height:calc(50% - var(--s-8)); }
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=entering],
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+  transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
+.ds[*|data-motion=reduced] .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ transform:none; }

@@ -83,6 +83,16 @@ pub trait Widget: Clone + PartialEq + Default + 'static {
     /// The sizes it draws, the first the one it is added at.
     fn sizes() -> &'static [WidgetSize];
 
+    /// The one size it takes in `host`: what Edit Widgets previews and adds (the user's decision,
+    /// 2026-09-28: one size per widget, no size picker; design/23 section 9.7). The first of
+    /// [`Widget::sizes`] unless the widget says otherwise; a host narrows it further with
+    /// [`crate::WidgetRegistry::sized`]. A size the widget does not draw is held to its first
+    /// ([`fit`]).
+    fn size_in(host: WidgetHost) -> WidgetSize {
+        let _ = host;
+        Self::sizes().first().copied().unwrap_or_default()
+    }
+
     /// What it shows before its provider's first entry: honest about having no data (bare
     /// tracks, not a made-up level).
     fn placeholder(size: WidgetSize) -> Self::Entry;

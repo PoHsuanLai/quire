@@ -241,8 +241,11 @@ the shell passes the batteries):
 - **Small, one device**: the ring at the top left; the percentage at the bottom left in the
   display face 500 at `--fs-widget-hero`, its baseline about 15 above the card's bottom.
 - **Small, several**: a 2 x 2 grid of rings, no numbers; an empty place a ring at 0.
-- **Medium**: four rings across from 20 in, the percentage 18 under each in the display face 500
-  at `--fs-widget-figure`, the block centred vertically.
+- **Medium**: four places on a fixed 80 pitch (a 64 ring and a 16 gap) from 20 in, the percentage
+  18 under each in the display face 500 at `--fs-widget-figure`, the block centred vertically.
+  Fewer than four batteries take the first places and each place left over is a bare track over
+  an empty figure line, so the pitch never stretches (sill Q522: one battery used to sit alone in
+  the middle and two at the card's ends).
 
 Motion, the fill (section 1.1, F1-F6): on mount and on each new `wake` (a host passes
 `WakeStamp::next` when its widgets come into view) the arc sweeps from empty to the level over
@@ -631,6 +634,7 @@ pub trait Widget: Clone + PartialEq + Default + 'static {
     fn name() -> Text;                        // "Batteries"
     fn description() -> Text;                 // one line in the gallery
     fn sizes() -> &'static [WidgetSize];      // the first is the size it is added at
+    fn size_in(host: WidgetHost) -> WidgetSize { first of sizes() } // the one size per host (9.7)
     fn placeholder(size: WidgetSize) -> Self::Entry; // before the first entry: honest, no data
     fn preview(size: WidgetSize) -> Self::Entry;     // sample data for the gallery
     fn view(entry: &Self::Entry, cx: WidgetContext<Self::Intent>) -> Element;
@@ -678,6 +682,11 @@ solo, grid and row; the clocks' row with its notes) are quire's views now (`widg
 `provide_widget_registry`; `use_widget_registry` reads it (quire's own when none is provided).
 Each `WidgetInfo` carries the kind, name, description and sizes, and draws the widget's card
 with its preview entry at any size, lifted or not, without its type: what the gallery shows.
+Each also carries **one size per host** (`WidgetInfo::size_in(host)`, from `Widget::size_in`;
+the user's decision, 2026-09-28): Batteries Small on the desktop and Medium in the center, World
+Clock Medium in both, the month Small on the desktop and Large in the center (sill's `size_of`,
+moved into the widgets as design/28 section 4.1 asked). A host narrows a kind to another size it
+draws with `WidgetRegistry::sized(&kind, host, size) -> Result<Self, UnsizedKind>`.
 
 ### 9.5 Widgets from another process (documented; the transport is not built)
 
@@ -714,7 +723,7 @@ remote-kind registry are the pass that builds out-of-process widgets.
 | `MonthWidget` "Calendar" | `quire.month` | Small, Medium, Large | `MonthEntry::{Waiting, Month(Box<MonthFace { grid, weeks, today, events, no_events }>)}` | `MonthIntent::Step(Step)` |
 
 Batteries: Small with one battery the ring and the hero figure; Small with several the 2 x 2 grid,
-empty places bare tracks; Medium the row with the figure under each; `Waiting` is four bare
+empty places bare tracks; Medium the row of four fixed places with the figure under each, empty places bare tracks (Q522); `Waiting` is four bare
 tracks and no number. World Clock: Small the large dial alone; Medium four dials with the notes
 (the day, the offset) under each; digits in the tile. Month: the reference's layout per size
 (section 5.2); the steps only when the host listens (`onintent`).
@@ -724,9 +733,44 @@ Up Next and Now Playing are sill's widgets: they move onto the same trait in sil
 ### 9.7 Edit Widgets (`WidgetGallery`) and the layout as data
 
 The reference's widget gallery: the person browses every registered widget (name and
-description), sees it drawn at each size it offers from its preview entry, picks a size (the
-card lifts, 9.8), and adds it to the desktop or the notification center; below, what is placed
-on each surface, a size picker per widget, and Remove. The gallery keeps no layout: each choice
+description), sees it drawn once from its preview entry, and adds it to the desktop or the
+notification center; beside it, what is placed on each surface, by name, and Remove.
+
+**One size (settled 2026-09-28).** The user, on the first Edit Widgets: "simplify: no different
+sizes, just one". The gallery draws the widget looked at once, at its desktop size
+(`size_in(Desktop)`), and each Add button adds it at the size it takes on that surface
+(`size_in(Desktop)`, `size_in(Tile)`); no size is picked, nothing lifts in the gallery, and a
+placed row has no size control (sill Q520). `WidgetEdit::Resize` stays for a host's own use; the
+gallery never sends it. `GalleryWords::size` and `sizes` are kept for compatibility and unused.
+The gallery is three columns for a wide sheet (the list; the preview and the two buttons on
+`--surface-2`; the placed lists, which scroll on their own) and fills the height it is given.
+
+**The sheet (sill Q521, 2026-09-28).** The reference's Edit Widgets is a sheet along the bottom
+of the screen with the desktop's widgets in view above it; the first gallery stood at the right
+edge, 720 wide, over the top-right columns where widgets gather and a new one lands. The host
+shows the gallery in `Panel { edge: PanelEdge::Bottom, width, height }`: centred `--s-8` above
+the bottom, `width` wide at most (less `--s-8` a side), `height` tall (440 by default) but never
+more than half the root (`max-height: calc(50% - --s-8)`), so at least the top half of the
+desktop, two rows of cells and more, stays uncovered. It arrives as a sheet does, `peek-in` at
+`--t-move --e-out` (`Anim::PeekFullIn`'s recipe; no spring, opening is not contact), and after
+that follows the sheet's spring (`--present-p`: fades and settles 12 px down at 95 % as it goes;
+only a fade under Reduced). The gallery inside fills it when it sits in a flex column
+(`flex:1; min-height:0`).
+
+**"Added" (sill Q523, 2026-09-28).** The user: "show that the thing is added". The gallery keeps
+no layout, so it learns an Add landed by finding the new placement in the next layout the host
+hands back (a refused Add, a full desktop, lands nothing and shows nothing). Then:
+- the button that asked settles to a check (design/26's Success, `SettleStyle::Check`): its
+  label gives way to a check and `GalleryWords::added` ("Added"); the check is drawn on over
+  `--t-move --e-out` and held `SettleHold` (900 ms), then the button is itself again. The check
+  grows in with `morph-in`, on the spring (`Anim::MorphInSpring`) because the person's own press
+  caused it (design/05 principle 2; a placement from elsewhere grows at `--e-out`). Reduced: the
+  whole check for its hold, no draw, no growth. Each button is keyed to its widget, so a check
+  never follows the person to another widget;
+- the new row in the placed column rises in (`row-in`, `--t-big --e-spring`, for the person's
+  Add; `rise`, `--t-move --e-out`, otherwise) and is brought into view in the column, moving it
+  the least that shows the row (`geometry::reveal`, the palette's rule). Rows already placed when
+  the gallery opened sit still (design/05 principle 8). The gallery keeps no layout: each choice
 is a `WidgetEdit` (`Add { kind, size, host }`, `Remove(id)`, `Resize(id, size)`,
 `Move(id, at)`) to `onedit`; the host applies it with `apply(layout, edit, DesktopGrid)` and
 passes the new layout back. Words are the host's (`GalleryWords`, English by default).
@@ -761,6 +805,14 @@ use, no frame-accurate recording found).
   cell, `aria-hidden`. The host places it at the snap cell; quire draws it.
 
 Both settle to zero frames (`ds-native/tests/widget_edit.rs`, on the virtual clock).
+
+**Leaving (sill G423, 2026-09-28).** A desktop widget removed in Edit Widgets used to vanish in a
+frame. `WidgetCard { presence: CardPresence::Leaving, on_gone }` (and `WidgetFrame`) plays the
+card's exit, `widget-out` (design/05 section 4.14: shrinks to .85 and fades at `--t-move
+--e-exit`; a fade alone under Reduced), takes no pointer (`data-presence="leaving"`), and calls
+`on_gone` once at `settle(WidgetOut)`. The host keeps drawing the removed card until then and
+drops it there; passing `Placed` again before then takes the exit back and `on_gone` never runs
+(`ds-native/tests/widget_card_exit.rs`).
 
 ### 9.9 What sill changes
 

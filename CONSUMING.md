@@ -2392,6 +2392,34 @@ surfaces: **a registry, one trait, a picker, placements as data**.
 | A new Edit Widgets surface (a sheet from the desktop's context menu or the center's Edit button) | `ds::WidgetGallery { layout, onedit }`: apply each edit with `ds::widget::apply` against the output's `DesktopGrid` and write the layout to settings |
 | Goldens | Desktop widget markup gains `data-tint="space"`, `div.ds-frame`, `data-widget`; framed months gain `data-fit` (Medium turns compact and gains the today column; Large gains the events list) |
 
+### Edit Widgets, one size (2026-09-28): the gallery, the bottom sheet, "Added", card exits
+
+design/23-WIDGETS.md sections 4.1, 9.7 and 9.10; design/28 section 4.1; sill Q520-Q523, G423. The
+user's verdict on Edit Widgets: one size per widget, show that the thing was added. Everything is
+additive: no call site breaks; the markup of a Batteries row and of the gallery changed.
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| The one size a widget takes on a surface (Q520) | `Widget::size_in(host) -> WidgetSize` (default: the first of `sizes()`), `WidgetInfo::size_in(host)`, `WidgetRegistry::sized(&kind, host, size) -> Result<WidgetRegistry, UnsizedKind>` | quire's: Batteries Small/Medium, World Clock Medium/Medium, month Small/Large (desktop/center), as sill's `size_of`. A size the kind does not draw is refused |
+| Show that an Add landed (Q523) | Nothing: `WidgetGallery` does it when the layout you hand back holds the new placement. New word `GalleryWords::added` ("Added") | The button settles to a check (drawn over `--t-move`, held `SettleHold`; the check grows in on the spring for the person's press); the new placed row rises in (`row-in` for the press) and is scrolled into view in the placed column. A refused Add shows nothing |
+| A widget card that leaves (G423) | `WidgetCard { presence: CardPresence::Leaving, on_gone }` (also on `WidgetFrame`; both default `Placed`/`None`) | Plays `widget-out` (`Anim::WidgetOut`, new: shrinks to .85 and fades, `--t-move --e-exit`; Reduced: `menu-out`), writes `data-presence="leaving"` and takes no pointer, calls `on_gone` once at `settle(WidgetOut)`; keep drawing the card until then. `Placed` again takes it back (`on_gone` never runs). `Anim::ALL` has 79 entries |
+| A sheet at the bottom of the desktop (Q521) | `Panel { edge: PanelEdge::Bottom, width, height, .. }` (new variant; new prop `height`, default 440, used only at the bottom) | Centred `--s-8` above the bottom, `width` wide at most, never taller than half the root; `peek-in` on its first showing, the sheet's spring after; `shown`/`on_hidden`/`onclose`/`scrim` as at the right |
+| Edit Widgets (Q520) | `WidgetGallery { layout, onedit, words }`, unchanged | One preview per widget at `size_in(Desktop)`; Add sends `WidgetEdit::Add { size: size_in(host) }`; placed rows are the name and Remove, no size control; three columns (list, preview, placed) that fill the height given, the placed column scrolling |
+
+**What sill changes** (read against sill `70db27b`):
+
+| Where in sill | Change |
+| --- | --- |
+| `widgets/mod.rs`, `registry()` (Q520) | Keep `size_of` as the source and hand it to quire once: after `.with::<UpNext>()` and `.with::<NowPlaying>()`, fold every `(kind, host)` through `registry.sized(&kind_id(kind), host, size_of(kind, host))?` (`ds::widget::UnsizedKind` if a kind does not draw that size), or implement `fn size_in(host) -> WidgetSize` on `UpNext` and `NowPlaying` (Medium on both hosts) and drop the fold for quire's three, which already say `size_in` as `size_of` does |
+| `widgets/sizes.rs`, `widgets.sizes` (Q520) | Nothing in the gallery writes a size any more: `WidgetGallery` sends `WidgetEdit::Add { size: info.size_in(host), .. }` and never `Resize`. `edited` may keep handling `Resize` (no caller), and `widgets.sizes` stays readable for anyone who set it by hand; drop both when `layout.toml` lands |
+| `surfaces/edit_widgets/view.rs` (Q520) | Nothing to call differently. The gallery no longer needs 720 px for a Large preview: see Q521 for the sheet it goes in. `GalleryWords::size`/`sizes` are unused |
+| `surfaces/edit_widgets/view.rs`, `Opened` (Q521) | `Panel { edge: PanelEdge::Bottom, width: Px(EDIT_WIDTH), height: Px(EDIT_HEIGHT), .. }` with `EDIT_WIDTH` about 1040 (the list 200, a Medium preview 344 with its plate, the placed column 280, gaps and padding) and `EDIT_HEIGHT` about 400; quire holds it under half the output, so the top-right columns stay in view. Update the module doc ("at the right edge") |
+| `style/edit_widgets.css`, `.sill-ew-column` (Q521) | Make the column a flex column that fills the panel (`display:flex; flex-direction:column; flex:1; min-height:0`) so the gallery fills the rest under the title row and its placed column scrolls on its own (Q523 scrolls a new row into view there) |
+| `surfaces/edit_widgets/view.rs` (Q523) | Nothing to call: the check and the row's rise come from the layout sill already hands back after each write. For them to show, pass the new layout promptly (the gallery compares consecutive layouts). If sill builds `GalleryWords`, add `added` (or spread `..GalleryWords::default()`) |
+| `widgets/mod.rs`, `Place` and `Widget` (G423) | Add `presence: ds::CardPresence` and `on_gone: Option<EventHandler<()>>` to `Place` (or as props of `Widget`) and pass both to each provider's `ds::WidgetCard` (`calendar`, `up_next`, `battery`, `now_playing`, `world_clock`) |
+| `surfaces/desktop_widgets/view.rs`, `Grid` (G423) | When a kind leaves `widgets.desktop_widgets` (an Edit Widgets Remove), keep its last `PlaceBox` in a `leaving` list and draw it with `presence: CardPresence::Leaving`; drop it in `on_gone` (quire calls it once at `settle(Anim::WidgetOut)`, 284 ms at Standard in Post). Leave it out of the input and blur regions (`widget_regions`) from the moment it leaves: it takes no pointer. A kind added back while it leaves: draw it placed again (`CardPresence::Placed` takes the exit back) |
+| Goldens with a Medium Batteries card (Q522) | The row is four `div.ds-batteries-cell` places on an 80 pitch whatever the count: a place with no battery is `div.ds-batteries-cell[data-place=empty]` holding a bare track and an empty `span.ds-batteries-figure`. Re-bless; nothing to change in code |
+
 ### Widget vibrancy (2026-09-26)
 
 design/23-WIDGETS.md sections 1.1 (M26-M34) and 4.3. Values only: no class, attribute or prop
