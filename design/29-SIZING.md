@@ -383,19 +383,19 @@ progress page beside Colour.
 Every step lands on the progress page at a gate, with a sill session warned before any Strict
 lint (`Rule::RawControlHeight`).
 
-## 13. Open decisions
+## 13. Decisions (settled with the user 2026-09-28)
 
-| # | Decision | Recommendation | Alternative |
-| --- | --- | --- | --- |
-| 1 | Which system | A's numbers on B's mechanism (10) | A literal; B at u = 24; C |
-| 2 | Bar height | 24 (the reference), items 22 | keep 32 with 22 items centred; 28 |
-| 3 | Knob inset | 1 (reference) | 2 (a visible ring of track round the knob) |
-| 4 | Toggle in settings rows | S (26 x 15, the reference's form-row mini) | M (38 x 22) everywhere |
-| 5 | Segmented shape | rounded rectangle (r6 / r5, reference) | keep the capsule |
-| 6 | Control center radius | panel 18 = module 8 + padding 10 (R6) | the reference's about 16 and 10 (not concentric) |
-| 7 | Control center level look | capsule with a knob (reference) | today's knobless capsule |
-| 8 | Dark plate fix | F3 | F1; F2 |
-| 9 | Does mailo move with the shell | not yet: one density step larger until audited | same scale everywhere |
+| # | Decision | Settled |
+| --- | --- | --- |
+| 1 | Which system | A's numbers built on B's mechanism: one `SizeScale` in Rust computes every size from R1-R6 (user picked A) |
+| 2 | Bar height | 24, items 22, status slots 30 x 22 (user) |
+| 3 | Knob inset | 1 (reference) |
+| 4 | Toggle in settings rows | S (26 x 15) |
+| 5 | Segmented shape | rounded rectangle (well r6, segment r5) |
+| 6 | Control center radius | panel 18 = module 8 + padding 10 (R6) |
+| 7 | Control center level look | capsule with a knob |
+| 8 | Dark plate fix | F3 tone band (user) |
+| 9 | Does mailo move with the shell | not yet: one density step larger until audited |
 
 ## 14. Sources
 
