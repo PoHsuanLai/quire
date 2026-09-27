@@ -1203,7 +1203,7 @@ spring per axis, `go(target, touch, Release { x, y }, response)` handing each ax
 velocity along it; `PointThrow::landing` picks the cell nearest the projection. The frame
 task sleeps `FRAME_TICK` (16 ms) on `ds::time`, so a harness on `Clock::Virtual` drives it
 exactly; it ends the moment the spring rests, and asks for nothing after (design/26 R3). A
-component writes the position into a custom property on its own element (`--knob-x`, `--seg-x`,
+component writes the position into a custom property on its own element (`--knob-x`, `--seg-dx`,
 `--switcher-at`, `--pane-p`, `--present-p`, `--swipe-dx`, `--drag-dx`/`--drag-dy`, the slider's
 `--f`), and its stylesheet draws from it with no transition.
 
@@ -1236,7 +1236,7 @@ Reduced rule.
 | Part | Spring | Touch | Was |
 | --- | --- | --- | --- |
 | Toggle knob | `--knob-x` px, Quick | the click (1.0) | `transform` transition `--t-move --e-spring` |
-| Segmented thumb (new: equal segments, one sliding thumb) | `--seg-x` segments, Quick | the click (1.0) | the pressed fill jumped |
+| Segmented thumb (new: equal segments, one sliding thumb) | `--seg-dx` segments from the selected cell (`--seg-col`), Quick | the click (1.0) | the pressed fill jumped |
 | App switcher ring | `--switcher-at` cells, Quick | remote (the shell's keys, 1.0) | transition `--t-quick --e-spring` |
 | Slider | `--f`, Quick | the release (0.8 when thrown toward) | 1:1 only; the release dropped its speed |
 | Notification card (and screenshot thumbnail) swipe return | `--swipe-dx` px, Move | the release, with its velocity | transition `--t-move --e-spring` |
