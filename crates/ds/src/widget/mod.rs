@@ -33,7 +33,8 @@ pub use layout::{
     apply, cells, first_free,
 };
 pub use registry::{
-    TakenKind, WidgetInfo, WidgetRegistry, provide_widget_registry, use_widget_registry,
+    TakenKind, UnsizedKind, WidgetInfo, WidgetRegistry, provide_widget_registry,
+    use_widget_registry,
 };
 pub use timeline::{Dated, EntryDate, REFRESH_FLOOR, Refresh, RefreshAsk, Timeline, Wake};
 pub use use_widget::use_widget;

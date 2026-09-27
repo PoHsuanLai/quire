@@ -1,8 +1,8 @@
 //! Moving and choosing widgets on a real Blitz document and the virtual clock (design/23
 //! section 9.7-9.8; sill Q430, Q431): a card picked up says so and settles to zero frames, lifted
 //! and put down; the drop-slot guide fades in and then asks for nothing; the Edit Widgets gallery
-//! lifts the size picked, hands the host an edit for each button, and shows the layout the host
-//! hands back.
+//! draws each widget once at the one size it takes (sill Q520), hands the host an edit for each
+//! button, and shows the layout the host hands back.
 
 use dioxus::prelude::*;
 use ds::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
@@ -96,31 +96,37 @@ fn the_slot_guide_fades_in_then_asks_for_nothing() {
 }
 
 #[test]
-fn the_gallery_lifts_the_size_picked_and_edits_the_layout() {
+fn the_gallery_draws_one_size_and_edits_the_layout() {
     let mut harness = harness(Gallery);
     assert_eq!(harness.count(".ds-widget-gallery-kind"), 3);
     assert_eq!(
-        harness.count(".ds-widget-gallery-size .ds-widget[*|data-lift=lifted]"),
-        0
+        harness.count(".ds-widget-gallery-preview .ds-widget"),
+        1,
+        "one preview per widget (sill Q520)"
     );
-    let medium = harness
-        .centre(".ds-widget-gallery-size[*|data-size=medium] .ds-widget-gallery-size-name")
-        .expect("the medium preview");
-    harness.click(medium);
-    harness.advance(Duration::ZERO);
     assert_eq!(
         harness
-            .attr(
-                ".ds-widget-gallery-size[*|data-size=medium]",
-                "aria-pressed"
-            )
+            .attr(".ds-widget-gallery-preview .ds-widget", "data-size")
             .as_deref(),
-        Some("true")
+        Some("small"),
+        "the batteries at their desktop size"
     );
     assert_eq!(
-        harness.count(".ds-widget-gallery-size[*|data-size=medium] .ds-widget[*|data-lift=lifted]"),
-        1,
-        "the picked size lifts"
+        harness.count(".ds-segmented"),
+        0,
+        "no size control anywhere"
+    );
+    let clock = harness
+        .centre(".ds-widget-gallery-kind:nth-child(2)")
+        .expect("World Clock in the list");
+    harness.click(clock);
+    harness.advance(Duration::ZERO);
+    assert_eq!(harness.count(".ds-widget-gallery-preview .ds-widget"), 1);
+    assert_eq!(
+        harness
+            .attr(".ds-widget-gallery-preview .ds-widget", "data-widget")
+            .as_deref(),
+        Some("quire.world-clock")
     );
     assert_eq!(harness.count(".ds-widget-gallery-row"), 0);
     let add = harness
@@ -134,7 +140,12 @@ fn the_gallery_lifts_the_size_picked_and_edits_the_layout() {
     );
     assert_eq!(
         harness.text_of(".ds-widget-gallery-row-name").as_deref(),
-        Some("Batteries")
+        Some("World Clock")
+    );
+    assert_eq!(
+        harness.count(".ds-widget-gallery-row .ds-segmented"),
+        0,
+        "a placed row has no size control"
     );
     let remove = harness
         .centre(".ds-widget-gallery-row .ds-button")

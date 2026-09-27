@@ -634,6 +634,7 @@ pub trait Widget: Clone + PartialEq + Default + 'static {
     fn name() -> Text;                        // "Batteries"
     fn description() -> Text;                 // one line in the gallery
     fn sizes() -> &'static [WidgetSize];      // the first is the size it is added at
+    fn size_in(host: WidgetHost) -> WidgetSize { first of sizes() } // the one size per host (9.7)
     fn placeholder(size: WidgetSize) -> Self::Entry; // before the first entry: honest, no data
     fn preview(size: WidgetSize) -> Self::Entry;     // sample data for the gallery
     fn view(entry: &Self::Entry, cx: WidgetContext<Self::Intent>) -> Element;
@@ -681,6 +682,11 @@ solo, grid and row; the clocks' row with its notes) are quire's views now (`widg
 `provide_widget_registry`; `use_widget_registry` reads it (quire's own when none is provided).
 Each `WidgetInfo` carries the kind, name, description and sizes, and draws the widget's card
 with its preview entry at any size, lifted or not, without its type: what the gallery shows.
+Each also carries **one size per host** (`WidgetInfo::size_in(host)`, from `Widget::size_in`;
+the user's decision, 2026-09-28): Batteries Small on the desktop and Medium in the center, World
+Clock Medium in both, the month Small on the desktop and Large in the center (sill's `size_of`,
+moved into the widgets as design/28 section 4.1 asked). A host narrows a kind to another size it
+draws with `WidgetRegistry::sized(&kind, host, size) -> Result<Self, UnsizedKind>`.
 
 ### 9.5 Widgets from another process (documented; the transport is not built)
 
@@ -727,9 +733,17 @@ Up Next and Now Playing are sill's widgets: they move onto the same trait in sil
 ### 9.7 Edit Widgets (`WidgetGallery`) and the layout as data
 
 The reference's widget gallery: the person browses every registered widget (name and
-description), sees it drawn at each size it offers from its preview entry, picks a size (the
-card lifts, 9.8), and adds it to the desktop or the notification center; below, what is placed
-on each surface, a size picker per widget, and Remove. The gallery keeps no layout: each choice
+description), sees it drawn once from its preview entry, and adds it to the desktop or the
+notification center; beside it, what is placed on each surface, by name, and Remove.
+
+**One size (settled 2026-09-28).** The user, on the first Edit Widgets: "simplify: no different
+sizes, just one". The gallery draws the widget looked at once, at its desktop size
+(`size_in(Desktop)`), and each Add button adds it at the size it takes on that surface
+(`size_in(Desktop)`, `size_in(Tile)`); no size is picked, nothing lifts in the gallery, and a
+placed row has no size control (sill Q520). `WidgetEdit::Resize` stays for a host's own use; the
+gallery never sends it. `GalleryWords::size` and `sizes` are kept for compatibility and unused.
+The gallery is three columns for a wide sheet (the list; the preview and the two buttons on
+`--surface-2`; the placed lists, which scroll on their own) and fills the height it is given. The gallery keeps no layout: each choice
 is a `WidgetEdit` (`Add { kind, size, host }`, `Remove(id)`, `Resize(id, size)`,
 `Move(id, at)`) to `onedit`; the host applies it with `apply(layout, edit, DesktopGrid)` and
 passes the new layout back. Words are the host's (`GalleryWords`, English by default).

@@ -2290,10 +2290,18 @@ design/23-WIDGETS.md sections 4.1, 9.7 and 9.10; design/28 section 4.1; sill Q52
 user's verdict on Edit Widgets: one size per widget, show that the thing was added. Everything is
 additive: no call site breaks; the markup of a Batteries row and of the gallery changed.
 
+| Want | Call | Notes |
+| --- | --- | --- |
+| The one size a widget takes on a surface (Q520) | `Widget::size_in(host) -> WidgetSize` (default: the first of `sizes()`), `WidgetInfo::size_in(host)`, `WidgetRegistry::sized(&kind, host, size) -> Result<WidgetRegistry, UnsizedKind>` | quire's: Batteries Small/Medium, World Clock Medium/Medium, month Small/Large (desktop/center), as sill's `size_of`. A size the kind does not draw is refused |
+| Edit Widgets (Q520) | `WidgetGallery { layout, onedit, words }`, unchanged | One preview per widget at `size_in(Desktop)`; Add sends `WidgetEdit::Add { size: size_in(host) }`; placed rows are the name and Remove, no size control; three columns (list, preview, placed) that fill the height given, the placed column scrolling |
+
 **What sill changes** (read against sill `70db27b`):
 
 | Where in sill | Change |
 | --- | --- |
+| `widgets/mod.rs`, `registry()` (Q520) | Keep `size_of` as the source and hand it to quire once: after `.with::<UpNext>()` and `.with::<NowPlaying>()`, fold every `(kind, host)` through `registry.sized(&kind_id(kind), host, size_of(kind, host))?` (`ds::widget::UnsizedKind` if a kind does not draw that size), or implement `fn size_in(host) -> WidgetSize` on `UpNext` and `NowPlaying` (Medium on both hosts) and drop the fold for quire's three, which already say `size_in` as `size_of` does |
+| `widgets/sizes.rs`, `widgets.sizes` (Q520) | Nothing in the gallery writes a size any more: `WidgetGallery` sends `WidgetEdit::Add { size: info.size_in(host), .. }` and never `Resize`. `edited` may keep handling `Resize` (no caller), and `widgets.sizes` stays readable for anyone who set it by hand; drop both when `layout.toml` lands |
+| `surfaces/edit_widgets/view.rs` (Q520) | Nothing to call differently. The gallery no longer needs 720 px for a Large preview: see Q521 for the sheet it goes in. `GalleryWords::size`/`sizes` are unused |
 | Goldens with a Medium Batteries card (Q522) | The row is four `div.ds-batteries-cell` places on an 80 pitch whatever the count: a place with no battery is `div.ds-batteries-cell[data-place=empty]` holding a bare track and an empty `span.ds-batteries-figure`. Re-bless; nothing to change in code |
 
 ### Widget vibrancy (2026-09-26)

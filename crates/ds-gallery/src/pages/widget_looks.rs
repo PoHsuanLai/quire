@@ -116,7 +116,7 @@ pub fn WidgetLooksPage() -> Element {
                 WidgetSlotGuide { size: WidgetSize::Medium }
             }
         }
-        Section { title: "Edit Widgets", note: "WidgetGallery over the registry (WidgetRegistry::quire()): the widgets listed with their descriptions; the one looked at drawn at each of its sizes from its preview entry, the picked size lifted; Add to Desktop and Add to Notification Center hand the host a WidgetEdit, which it applies to the layout it keeps as data (kind, size, place, position) and passes back; below, what is placed on each surface, its size and Remove. Live.",
+        Section { title: "Edit Widgets", note: "WidgetGallery over the registry (WidgetRegistry::quire()): the widgets listed with their descriptions; the one looked at drawn once, at the one size it takes (sill Q520: no size picker); Add to Desktop and Add to Notification Center hand the host a WidgetEdit at the size the widget takes on that surface, which it applies to the layout it keeps as data and passes back; at the right, what is placed on each surface and Remove. Live.",
             EditWidgets {}
         }
     }
