@@ -161,6 +161,9 @@ mod tests {
         Point { x: Px(x), y: Px(y) }
     }
 
+    /// A release (where, how fast) and the cell it should land in.
+    type Case = ((f32, f32), (i32, i32), (f32, f32));
+
     #[test]
     fn a_throw_lands_in_the_cell_nearest_its_projection() {
         let cells = [
@@ -169,7 +172,7 @@ mod tests {
             pt(0.0, 200.0),
             pt(200.0, 200.0),
         ];
-        const CASES: &[((f32, f32), (i32, i32), (f32, f32))] = &[
+        const CASES: &[Case] = &[
             ((60.0, 60.0), (0, 0), (0.0, 0.0)),
             ((60.0, 60.0), (600, 0), (200.0, 0.0)),
             ((60.0, 60.0), (600, 600), (200.0, 200.0)),

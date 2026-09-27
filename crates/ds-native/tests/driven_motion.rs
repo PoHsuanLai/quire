@@ -221,7 +221,7 @@ fn a_toggle_clicked_again_mid_slide_turns_back_from_where_it_is() {
         (turned - mid).abs() < 0.01,
         "no jump at the turn: {mid} -> {turned}"
     );
-    assert_eq!(harness.within(|| WIFI()), Switch::Off);
+    assert_eq!(harness.within(|| *WIFI.read()), Switch::Off);
     assert_settles_to_zero_frames(&mut harness);
     assert_eq!(knob(&harness), 0.0);
 }

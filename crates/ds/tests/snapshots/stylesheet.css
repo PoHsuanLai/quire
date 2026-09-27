@@ -1298,6 +1298,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-grip:hover{ background:var(--surface); color:var(--ink); }
 
 .ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent-text); margin:var(--s-2) 0; }
+
+/* DragReturnFrame (design/05 section 14, H1): what a hand drags, drawn `--drag-dx`/`--drag-dy`
+   off its place, written by two springs in Rust; nothing here transitions it. */
+.ds-drag-return{ --drag-dx:0px; --drag-dy:0px; transform:translate(var(--drag-dx), var(--drag-dy)); }
 /* -- edge_strip -- */
 /* EdgeStrip (design/04-COMPONENTS.md section 33): `S:85`, `S:91`, `S:451-454`. The strip is
    rendered only while the sidebar is hidden, so it needs no display toggle. The sidebar
@@ -2256,32 +2260,31 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-month[*|data-density=compact] .ds-month-day[*|aria-current=date] .ds-month-dot{ background:var(--accent-ink); }
 /* -- pane_switcher -- */
-/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
-   (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
-   and the outgoing one leaves the other way (`pane-out-l`, `pane-out-r`) at `--t-move
-   --e-exit`, held at its last frame until it is dropped. The leaving pane is out of the flow,
-   pinned to the top, so the switcher is as tall as the pane arriving; what it overhangs is
-   clipped. A pane at rest plays `hold`, which moves nothing, so the settle timer (wall clock)
-   never drops a slide without starting another animation: Blitz at the pinned rev keeps a
-   dropped animation's last value (sill G295). */
+/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane slides in (the
+   detail from the right, the root from the left) and the outgoing one leaves the other way,
+   26 px and a fade, as `slide-r`/`slide-l` and `pane-out-l`/`pane-out-r` drew it. Driven motion
+   (design/05 section 14, H1): both are drawn from one spring in Rust, `--pane-p` (0 the root, 1
+   the detail), so a reversal turns back from where the panes are; nothing here animates them.
+   The leaving pane is out of the flow, pinned to the top, so the switcher is as tall as the pane
+   arriving; what it overhangs is clipped. A pane at rest plays `hold`, which moves nothing
+   (sill G295: Blitz at the pinned rev keeps a dropped animation's last value). Under Reduced the
+   panes only cross-fade. */
 
-.ds-panes{ position:relative; overflow:hidden; }
+.ds-panes{ --pane-p:0; position:relative; overflow:hidden; }
 .ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
 .ds-pane[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-pane[*|data-pane=detail][*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
-.ds-pane[*|data-pane=root][*|data-presence=entering]{ animation:slide-l var(--t-move) var(--e-spring); }
-.ds-pane[*|data-pane=root][*|data-presence=leaving]{ animation:pane-out-l var(--t-move) var(--e-exit) forwards; }
-.ds-pane[*|data-pane=detail][*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; }
+.ds-pane[*|data-pane=detail][*|data-presence=entering],.ds-pane[*|data-pane=detail][*|data-presence=leaving]{
+  transform:translateX(calc((1 - var(--pane-p)) * var(--s-26))); opacity:var(--pane-p); }
+.ds-pane[*|data-pane=root][*|data-presence=entering],.ds-pane[*|data-pane=root][*|data-presence=leaving]{
+  transform:translateX(calc(var(--pane-p) * -1 * var(--s-26))); opacity:calc(1 - var(--pane-p)); }
+.ds[*|data-motion=reduced] .ds-pane{ transform:none; }
 /* -- panel -- */
 /* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel. A stage fills
    the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
-   rule paints it) at the material's radius, and scrolls its own content. It slides in with
-   `panel-in` (`--t-move --e-out`, restarted under its other name on each showing) and out with
-   `panel-out` (`--t-move --e-exit`, held); hidden, nothing is laid out. Present keeps the
-   entrance declared, so the settle timer never cancels a slide the frame clock is still playing;
-   present again after a hide was taken back (`data-pulse=held`), it plays `hold`, so dropping
-   `panel-out` starts an animation in the same restyle (sill G295). An optional scrim covers
+   rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
+   in with `panel-in` (`--t-move --e-out`); present keeps the entrance declared, so the settle
+   timer never cancels a slide the frame clock is still playing. Hidden, nothing is laid out. An optional scrim covers
    the stage behind it. The panel's material scope fills the root too: Blitz places an absolutely
    positioned box against its parent, so a scope of no height would give the panel none.
    Attribute selectors carry `*|` (spike S2). */
@@ -2293,9 +2296,14 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; scrollbar-width:none; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
 .ds-panel-stage[*|data-edge=right] > .ds-panel{ right:var(--s-8); }
 .ds-panel[*|data-presence=entering],.ds-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
-.ds-panel[*|data-presence=entering][*|data-pulse=b],.ds-panel[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
-.ds-panel[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-panel[*|data-presence=leaving]{ animation:panel-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+/* Driven (design/05 section 14, H1): after its first entrance the panel is drawn from a spring in
+   Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
+   leaves no value behind (sill G295); a show while it leaves turns it back from where it is.
+   Under Reduced it fades in place instead. */
+.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear);
+  transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
+.ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
+.ds-panel[*|data-presence=leaving]{ pointer-events:none; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
@@ -2555,7 +2563,8 @@ html,body{margin:0;padding:0;background:transparent}
    Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
    Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
    Driven motion (design/05 section 14, H1; design/27 section 5.15): the segments are equal, as
-   the Mac's are, and the pressed fill is one thumb behind them, `--seg-x` segments from the
+   the Mac's are, and the pressed fill is one thumb behind them (last in the markup, so a segment is still its
+   `nth-child`; the segments stack above it), `--seg-x` segments from the
    start, written by a spring in Rust (`--seg-n` segments in all); nothing here transitions it.
    TODO(O-1): disabled is not specified. */
 
@@ -2572,7 +2581,7 @@ html,body{margin:0;padding:0;background:transparent}
 }
 
 .ds-segment{
-  position:relative; font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
+  position:relative; z-index:var(--z-raise); font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
   transition:color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-segmented[*|data-size=regular] .ds-segment{ padding:var(--s-5) var(--s-11); font-size:var(--fs-small); }
@@ -2705,9 +2714,15 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
 
-/* Leaving (sill Q90): `sheet-out` at `--t-move --e-exit`, holding its transparent last frame,
-   and no longer a target for the pointer while it goes. */
-.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+/* Driven (design/05 section 14, H1; sill Q90): after its first entrance the sheet is drawn from
+   a spring in Rust, `--present-p` (0 gone, 1 shown): it fades and settles 12 px down at 95 % as
+   it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
+   nothing, so the entrance it drops leaves no value behind (sill G295). Leaving, it is no longer
+   a target for the pointer. Under Reduced it only fades. */
+.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+  transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
+.ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
+.ds-sheet[*|data-presence=leaving]{ pointer-events:none; }
 
 /* Centred (sill Q91): a stage filling the overlay centres the sheet by flex, inside the same
    36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
