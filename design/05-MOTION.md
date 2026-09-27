@@ -196,6 +196,7 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | PendingGrace | 400ms, every level | Rust-only | a pending loop shows only if the operation is still running after this | design/26 §3.4, R4 |
 | PendingCap | 10s, every level | Rust-only | after this a pending loop holds its still frame; the most a `PendingToken`'s deadline can be | design/26 §3.4, R4 |
 | SettleHold | 900ms, every level | Rust-only | how long a success check stays drawn | design/26 §3.4, R14 |
+| `--t-idle-dim` | 2000ms (proposed; Reduced: 60ms by this table, but the primitive never plays it — it snaps straight to the level instead, the way `--t-sweep` does) | Rust-driven (no keyframe) | the pre-screen-off idle overlay's fade in towards its own level; waking is never timed, it snaps (`ds::detail::use_idle_dim`, `IdleDim`) | design/22 §3.24 `idle.dim_s`/`idle.dim_level_pct`; Q447 |
 
 `--tilt` has no Reduced/Calm meaning beyond 0deg; the drag ghost simply does not tilt.
 

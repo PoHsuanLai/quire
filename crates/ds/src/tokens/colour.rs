@@ -125,11 +125,17 @@ pub enum ColourToken {
     /// (design/04-COMPONENTS.md section 50; proposed): the danger hue at full strength, since
     /// a dot a few pixels across needs all of its chroma to read as red.
     SpellMark,
+    /// `--scrim-idle`: the pre-screen-off idle overlay's colour, black, the same in both
+    /// schemes — not `--scrim` or `--scrim-modal`, whose alphas are fixed. This one's opacity is
+    /// the person's own `idle.dim_level_pct` (10..90), set inline by `IdleDim` itself
+    /// (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle (Q420 B)": dim with an
+    /// overlay, never real brightness), so the token carries no alpha of its own.
+    ScrimIdle,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 37] = [
+    pub const ALL: [ColourToken; 38] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -167,6 +173,7 @@ impl ColourToken {
         ColourToken::LockGlassStrong,
         ColourToken::LockVeil,
         ColourToken::SpellMark,
+        ColourToken::ScrimIdle,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -209,6 +216,7 @@ impl ColourToken {
             ColourToken::LockGlassStrong => "--lock-glass-strong",
             ColourToken::LockVeil => "--lock-veil",
             ColourToken::SpellMark => "--spell-mark",
+            ColourToken::ScrimIdle => "--scrim-idle",
         })
     }
 
@@ -253,6 +261,10 @@ impl ColourToken {
             ColourToken::SpellMark => (solid(0xB03A2A), solid(0xE0705A)),
             // Not redefined in dark (section 3).
             ColourToken::Scrim => (alpha(0x000000, 220), alpha(0x000000, 220)),
+            // Opaque black in either scheme: `IdleDim` sets the overlay's own opacity from
+            // `idle.dim_level_pct`, so the token itself carries no alpha (design/03-COLOR.md
+            // section 17.3.3).
+            ColourToken::ScrimIdle => (solid(0x000000), solid(0x000000)),
             // The sender's page stays white in a dark window (section 12, mailo's `--frame`).
             ColourToken::ForeignGround => (WHITE, WHITE),
             ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),

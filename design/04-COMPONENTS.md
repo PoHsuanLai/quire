@@ -4209,6 +4209,49 @@ Tab reaches the three lights in order.
 **Motion.** A light springs back from `--squish` over `--t-tap --e-spring` (design/05 principle
 2: the press is contact); colours and marks cross-fade over `--t-quick --e-out`.
 
+### 53. IdleDim: the pre-screen-off dim overlay (Q447, 2026-09-27)
+
+**Purpose.** sill's own idle service dims the screen with a full-screen overlay before it goes
+off, never real brightness (design/22-SETTINGS.md section 3.24 `idle.dim_level_pct` 10..90,
+`idle.dim_s`; sill FINDINGS "sill idle (Q420 B)"). `IdleDim` is that overlay: a scrim that
+ignores every pointer and key event (sill's idle service, not this component, wakes the
+display), black at the caller's own level, fading in as the lead time runs out and snapping to
+nothing the instant an input arrives, whatever it was doing.
+
+**Markup.** `div.ds-idle-dim[aria-hidden]`, one element, its own inline `opacity`.
+
+**Props.**
+
+```rust
+#[component] pub fn IdleDim(level: Percent, phase: IdleDimPhase) -> Element
+```
+
+`level` is `idle.dim_level_pct` (10..90). `phase` is `IdleDimPhase::{Awake, Dimmed}`
+(design/26-DETAILS.md's grammar of small state changes, but not built on `Detailed`/`Cue`:
+the phase is already exactly what it means, dim or wake, so there is nothing left to classify).
+
+**Where it goes.** Its own root, above every other surface: `Ds { extent: RootExtent::Viewport,
+chrome: Some(RootChrome::Transparent), .. }` with `IdleDim` as the root's only child (a document's
+frame needs a height for an all-positioned root, CONSUMING.md).
+
+**Values.** `--scrim-idle` (design/03-COLOR.md section 17.3.3): opaque black, the same in both
+schemes; the level lives in the component's own `opacity`, not in the token.
+
+**Motion.** Not a keyframe: `ds::detail::use_idle_dim` drives the share from Rust, like `Sweep`
+(design/26 section 4.1, "Why Rust tweens"), because waking must retarget the share to zero
+mid-fade and a CSS `animation` cannot do that without a restyle. Dimming fades in over
+`--t-idle-dim --e-out` (design/05 section 3.4, ~2s, proposed); waking always snaps, with no
+frames, and so does a live settings edit that moves `level` while already dimmed
+(design/22-SETTINGS.md section 2: "no surface animates from a settings change"). Reduced motion
+never fades in either: it jumps straight to the level, the way `Sweep`'s own `Stand` plan does.
+Ends at 0 frames once landed (R3).
+
+**Tests.** `ds/src/detail/idle_dim.rs` (the plan table: waking and a settings edit always snap,
+dimming fades except under Reduced); `ds-native/tests/idle_dim.rs` on `Clock::Virtual` (the fade
+lands on the level at `--t-idle-dim`, an input mid-fade snaps to zero at once, Reduced motion
+shows the level from its first frame, `assert_settles_to_zero_frames` once landed). CONSUMING.md
+"Idle dim".
+
 ## Open decisions
 
 Each needs a yes/no or a number before the owning wave starts. "Proposal" marks this document's

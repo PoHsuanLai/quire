@@ -632,6 +632,19 @@ button, a hovered pill), and `--lock-veil` black .12 light and .28 dark over the
 white type reads on a pale picture. Under `LockLook::Space` the field and the date pill take the
 Space gradient and the frame's ink instead (design/04 section 42).
 
+### 17.3.3 Idle dim scrim (Q447, 2026-09-27)
+
+sill's own idle service dims the screen with a full-screen overlay before it goes off, never
+real brightness (design/22-SETTINGS.md section 3.24 `idle.dim_level_pct` 10..90,
+`idle.dim_s`; sill FINDINGS "sill idle (Q420 B)"). `--scrim-idle` (`ColourToken::ScrimIdle`) is
+that overlay's colour: opaque black, the same in both schemes, not `--scrim` (§17) or
+`--scrim-modal` (§17.3.1), whose alphas are the fixed strengths of a menu backdrop and a modal
+dialog. This one's strength is the person's own setting, not a fixed alpha the token can carry —
+`IdleDim` (design/04 section 4.14, `ds::detail::use_idle_dim`) sets the overlay element's own
+`opacity` from `idle.dim_level_pct` each frame it moves, so `--scrim-idle` stays a plain colour
+and the level lives where the rest of this system keeps a per-instance value, in the component,
+not the token table.
+
 ### 17.4 Material stack v2 (settled 2026-09-24, the macOS polish pass)
 
 macOS stacks layers on every chrome material that the section 17.2 recipe lacked, and the shell

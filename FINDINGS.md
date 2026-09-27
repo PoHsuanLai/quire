@@ -4889,3 +4889,61 @@ section 52 the components.
 - **Not here (sill's lane).** The stamps from the network, Bluetooth and sink services, the
   device batteries, the keyboard backlight service and its module, and moving Now Playing and the
   Battery module onto the new parts.
+
+## sill idle: units and the dim overlay (Q445, Q447, 2026-09-27)
+
+Two small asks from sill's own idle service (design/22-SETTINGS.md section 3.24; sill FINDINGS
+"sill idle (Q420 B)", read-only there — this wave is quire's side only, none of it touches sill).
+
+- **Q445: `Secs`/`Mins`, not `Count` with a unit label.** Before this, `idle.dim_s`,
+  `idle.locked_screen_off_s`, `session.lock_grace_s`, `idle.screen_off_*_min` and
+  `idle.suspend_*_min` were all `Count` with a unit noted only in prose, because `ds-settings` had
+  no seconds or minutes type (`Ms` is milliseconds and does not reach idle's tens-of-minutes to
+  hours range). `Secs(u16)` and `Mins(u16)` (`crates/ds-settings/src/units.rs`) are new, added to
+  the derive's `NUMBERS` list (`ds-settings-derive/src/shape.rs`) exactly like `Px`/`Ms`/`Count`:
+  no clamp of their own, schema-rendered with a slider whose unit and range come from the field's
+  own `#[settings(range, unit)]` attribute, lenient-parsed the same way (a value that will not fit
+  `u16` falls back to the field's default). `Count` itself is untouched and still works everywhere
+  it already did.
+- **The `Power` page.** `idle.*` and `session.lock_grace_s` had said "Page Accounts for now (no
+  Power page yet)" since Q441/Q420 B; `Page::Power` is a new variant of `ds_settings::schema::Page`
+  (`crates/ds-settings/src/schema/key.rs`), and design/22-SETTINGS.md sections 3.19, 3.24, 5 and
+  9.3 now point at it. The rest of `session.*` stays on Accounts; only `lock_grace_s` moved, since
+  it answers the idle service, not the locker or the polkit agent.
+- **sill's own follow-up (not done here, read-only in `~/sill`).** sill's `KeySpecs` for the nine
+  `idle.*` keys and `session.lock_grace_s` switch their `kind` from `Count` to `Secs`/`Mins`
+  exactly per row (see design/22-SETTINGS.md section 3.24's Type column, updated here): the four
+  `_min` keys to `Mins`, `dim_s`/`locked_screen_off_s`/`lock_grace_s` to `Secs`. sill's keys test
+  reads design/22's types from this file, so once quire's `Secs`/`Mins` are in (a released quire,
+  or sill's path dependency picking up this branch), that test drives the change; `Count` is not
+  removed from anywhere, so nothing else in sill breaks in the meantime.
+- **Q447: `IdleDim`, a Rust tween, not a keyframe.** sill's idle service dims with a full-screen
+  overlay before screen-off, never real brightness (`idle.dim_level_pct` 10..90, `idle.dim_s` the
+  lead time). The overlay needed a colour token whose alpha is a live setting rather than a fixed
+  strength like `--scrim`/`--scrim-modal`'s: `ColourToken::ScrimIdle` (design/03-COLOR.md section
+  17.3.3) is opaque black, unchanged by scheme; `IdleDim` (design/04-COMPONENTS.md section 53)
+  sets the overlay's own `opacity` from the level. The fade itself could not be a CSS `@keyframes`
+  the way every other quire entrance is: waking must retarget the share to zero mid-fade, and a
+  CSS `animation` cannot do that without a restyle. So it is Rust-driven instead, exactly like
+  `Sweep` (design/26-DETAILS.md section 4.1) — a new primitive, `ds::detail::idle_dim`
+  (`IdleDimPhase::{Awake, Dimmed}`, `use_idle_dim`), not built on `Detailed`/`Cue`: that machinery
+  classifies an arbitrary change into one of the grammar's moments, and a two-state phase that
+  already says exactly what it means has nothing left to classify. `DurationToken::IdleDim`
+  (`--t-idle-dim`, 2000 ms, design/05-MOTION.md section 3.4) is the fade-in's length; waking, a
+  live settings edit that changes the level while still dimmed, and Reduced motion all snap
+  straight to the target with no frames, the same way `Sweep`'s own `Stand` plan does for Reduced.
+- **Tested on `Clock::Virtual`** (`ds-native/tests/idle_dim.rs`): the fade lands on the level at
+  `--t-idle-dim`, an input mid-fade snaps to zero on the very next frame, a settings edit while
+  dimmed snaps to the new level rather than fading to it, and Reduced motion shows the level from
+  its first frame — every case checked with `assert_settles_to_zero_frames`. The plan table itself
+  (`ds/src/detail/idle_dim.rs`) is a pure unit test, no harness needed.
+- **API surface, all additive.** New: `ds::IdleDim`, `ds::Percent` (a `ds`-side twin of
+  `ds_settings::Percent`, 0..100 clamped; `ds` may not depend on `ds-settings`, so the two agree by
+  shape, not by sharing a type — CONSUMING.md notes this), `ds::detail::{IdleDimPhase,
+  use_idle_dim}`, `ds::DurationToken::IdleDim`, `ds::ColourToken::ScrimIdle`,
+  `ds_settings::{Secs, Mins}`, `ds_settings::schema::Page::Power`. Nothing existing changed shape;
+  `Anim::ALL` is still 78 (this wave added no keyframe).
+- **Gate.** `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`,
+  `cargo test --workspace` (195 suites, 0 failed) and `./scripts/check-boundary.sh` all pass on
+  branch `idle-units`. The stylesheet golden (`crates/ds/tests/snapshots/stylesheet.css`) was
+  re-blessed for the two new tokens; nothing else in it moved.

@@ -43,6 +43,7 @@ pub mod hover_card;
 pub mod hover_strip;
 pub mod icon_button;
 pub mod icon_view;
+pub mod idle_dim;
 pub mod image_source;
 pub mod kbd;
 pub mod level;
@@ -222,6 +223,7 @@ pub use hover_card::{
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
+pub use idle_dim::IdleDim;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};
@@ -319,8 +321,8 @@ pub use user_picture::{
     UserPicturePicker, UserPortrait, WakeStamp, resolve_picture,
 };
 pub use vocab::{
-    Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, PulseKey, PulsePhase,
-    Selection, Shortcut, StaggerIndex, Switch,
+    Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent, PulseKey,
+    PulsePhase, Selection, Shortcut, StaggerIndex, Switch,
 };
 pub use widget_frame::WidgetFrame;
 pub use widget_kind::{CardTint, WidgetHost, WidgetSize, WidgetTitle};
@@ -353,6 +355,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("hover_strip", include_str!("hover_strip.css")),
     ("icon_button", include_str!("icon_button.css")),
     ("icon_view", include_str!("icon_view.css")),
+    ("idle_dim", include_str!("idle_dim.css")),
     ("kbd", include_str!("kbd.css")),
     ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
