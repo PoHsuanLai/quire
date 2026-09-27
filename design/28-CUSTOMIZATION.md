@@ -780,6 +780,8 @@ After: Focus modes and filters (4.15), stacks (4.5), out-of-process widgets over
 
 ## 7. Open decisions (for the user; each has a recommendation)
 
+**Settled 2026-09-27.** The user picked 2 (B, reorderable), 3 (A, quire templates), 4 (add When Active) and 5 (A, membership only); 1, 6, 7, 8 and 9 follow the recommendations (1 B `layout.toml`, 6 A `ds-settings`, 7 consume KRunner and GNOME providers, 8 and 9 as recommended).
+
 1. **Where placements live.** (A) as list keys in `settings.toml`; (B) a `layout.toml` per
    program beside `settings.toml`, schema'd the same way; (C) keep today's per-surface JSON files
    (`dock.json`, `desktop-widgets.json`) and add more. **Recommend B**: placements change by
