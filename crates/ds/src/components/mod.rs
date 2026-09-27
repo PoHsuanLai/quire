@@ -1,6 +1,8 @@
 //! Every component, one `<name>.rs` and `<name>.css` pair each (design/04-COMPONENTS.md).
 
 pub mod account_tile;
+pub mod alert;
+pub mod alert_vocab;
 pub mod animated_list;
 pub mod app_switcher;
 pub mod appearance_picker;
@@ -49,6 +51,8 @@ pub mod icon_view;
 pub mod idle_dim;
 pub mod image_source;
 pub mod kbd;
+pub mod leaving_list;
+pub(crate) mod leaving_row;
 pub mod level;
 pub(crate) mod light_mark;
 pub mod link_pill;
@@ -185,6 +189,8 @@ pub mod window_frame;
 pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
+pub use alert::Alert;
+pub use alert_vocab::{AlertButton, AlertEmphasis};
 pub use animated_list::AnimatedList;
 pub use app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence};
 pub use appearance_picker::{AppearancePicker, PickerLayout};
@@ -233,6 +239,7 @@ pub use icon_view::IconView;
 pub use idle_dim::IdleDim;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
+pub use leaving_list::{LeavingItem, LeavingList};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
@@ -341,6 +348,7 @@ pub use workspace_pills::{WorkspacePill, WorkspacePills};
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.
 pub const CSS: &[(&str, &str)] = &[
     ("account_tile", include_str!("account_tile.css")),
+    ("alert", include_str!("alert.css")),
     ("animated_list", include_str!("animated_list.css")),
     ("appearance_picker", include_str!("appearance_picker.css")),
     ("app_switcher", include_str!("app_switcher.css")),
@@ -370,6 +378,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("chord", include_str!("chord.css")),
     ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
+    ("leaving_list", include_str!("leaving_list.css")),
     ("list_row", include_str!("list_row.css")),
     ("lock_screen", include_str!("lock_screen.css")),
     ("lock_clock", include_str!("lock_clock.css")),

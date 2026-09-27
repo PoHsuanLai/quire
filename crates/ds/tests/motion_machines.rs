@@ -290,6 +290,47 @@ fn heal_index_saturates_at_12() {
     assert_eq!(ds, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12]);
 }
 
+/// A batch (sill Q510): its rows leave staggered in list order, and once it settles they drop
+/// together and each row below heals by the measured heights of the dropped rows above it.
+#[test]
+fn a_batch_leaves_staggered_and_heals_by_the_heights_above() {
+    let pitch = |key: &&'static str| match *key {
+        "a" => RowPitch(Px(40.0)),
+        "c" => RowPitch(Px(55.0)),
+        _ => RowPitch(Px(999.0)),
+    };
+    let (leaving, running) =
+        at_rest(&["a", "b", "c", "d"]).leave_batch(&["a", "c", "z"], Exit::Fold, Emphasis::Plain);
+    assert_eq!(
+        running,
+        vec![
+            (Anim::Fold, StaggerIndex::new(0)),
+            (Anim::Fold, StaggerIndex::new(1))
+        ]
+    );
+    assert_eq!(indices(&leaving), vec![0, 1, 1, 3], "b and d keep theirs");
+    let heal = |dy: f32, d: usize| Presence::Healing {
+        dy: Px(dy),
+        d: StaggerIndex::new(d),
+    };
+    let settled = leaving.settled_batch(&["a", "c"], pitch);
+    assert_eq!(
+        rows(&settled),
+        vec![("b", heal(40.0, 0)), ("d", heal(95.0, 1))]
+    );
+
+    // A row taken back is not dropped, and nothing above it that stays moves.
+    let (leaving, _) =
+        at_rest(&["a", "b", "c"]).leave_batch(&["a", "b"], Exit::Fold, Emphasis::Plain);
+    let (kept, stayed) = leaving.stay(&"b");
+    assert_eq!(stayed, Ok(Stayed::Restored));
+    let settled = kept.settled_batch(&["a", "b"], pitch);
+    assert_eq!(
+        rows(&settled),
+        vec![("b", heal(40.0, 0)), ("c", heal(40.0, 1))]
+    );
+}
+
 #[test]
 fn stay_takes_an_exit_back_in_place() {
     use Presence::{Entering, Leaving, Present};

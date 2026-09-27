@@ -46,15 +46,15 @@ pub const REGISTRY: [Entry; 19] = [
     Entry {
         page: Page::Lists,
         title: "Lists",
-        lede: "A live AnimatedList: add rows, remove them with each exit and watch the rows below heal, then undo. Search hits with a keyboard-shown strip, sidebar items, tiles, the hover strip and the appearance picker.",
-        height: 3150,
+        lede: "A live AnimatedList: add rows, remove them with each exit and watch the rows below heal, then undo. A LeavingList of notification groups that clear, fold and heal by measured heights. Search hits with a keyboard-shown strip, sidebar items, tiles, the hover strip and the appearance picker.",
+        height: 3950,
         body: pages::lists::ListsPage,
     },
     Entry {
         page: Page::Overlays,
         title: "Overlays",
         lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
-        height: 9950,
+        height: 10800,
         body: pages::overlays::OverlaysPage,
     },
     Entry {

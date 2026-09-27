@@ -1,0 +1,20 @@
+/* Alert (sill Q490; design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
+   narrow sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred over a modal
+   scrim: one centred column as the polkit prompt's, the optional icon at 48, the title in the
+   display face 16/700, the message in `--fs-control` in the soft ink, then Cancel and the action
+   in two equal columns 8 apart, 18 below, the action on the right. The default button is
+   Primary (accent-filled); the other is Secondary, or, for a destructive action, a Danger at the
+   Regular size whose label is red at rest as well as on hover. The panel's entrance and exit
+   are the sheet's (`peek-in`, then the driven spring).
+   Inline (`data-flow=inline`): a stage over the nearest positioned ancestor, on the peek layer,
+   holding the modal scrim and the sheet's centring stage, so it fits a control-center popover. */
+
+.ds-alert{ display:flex; flex-direction:column; align-items:center; box-sizing:border-box; width:100%; padding:var(--s-22) var(--s-22) var(--s-18); text-align:center; color:var(--ink); }
+.ds-alert-icon{ display:flex; margin-bottom:var(--s-12); }
+.ds-alert-title{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
+.ds-alert-message{ margin-top:var(--s-6); font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
+.ds-alert-actions{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
+.ds-alert-slot{ display:flex; min-width:0; }
+.ds-alert-slot .ds-button{ width:100%; justify-content:center; }
+.ds-alert[*|data-emphasis=destructive] .ds-button[*|data-variant=danger]{ color:var(--danger); }
+.ds-alert-stage{ position:absolute; inset:0; z-index:var(--z-peek); }
