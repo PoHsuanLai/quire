@@ -523,7 +523,7 @@ S has no hover or active rule. C does (verbatim, `C:236-237`); adopt both:
 | hover | `--ink` text (from C) |
 | active | scale(`--squish`) (from C) |
 | focus-visible | global ring on the segment |
-| pressed (current) | `--ink` bg, `--paper` text |
+| pressed (current) | `--ink` bg (the thumb), `--paper` text |
 | disabled | not specified (O-1) |
 | entering / leaving | none |
 
@@ -532,6 +532,13 @@ places it.
 
 **Motion.** Background and colour `--t-quick --e-out`; transform `--t-tap --e-out`. The pressed
 fill jumps from one segment to the next; there is no sliding thumb in either prototype.
+
+As built (design/27 section 5.15, design/05 section 14): the pressed fill is one thumb, placed in
+the selected segment's own grid cell (so at rest it covers exactly that segment's laid-out box, at
+every scale) and shifted from there by a spring while it slides. A label's ink is not
+transitioned: it is `--paper` while the thumb covers most of it (`data-thumb="under"`) and
+`--ink-soft` otherwise, so the words change colour where the thumb is. A colour transition ran on
+its own clock and left labels in the thumb's light ink on the light track (2026-09-28).
 
 **Behaviour.** Click selects. Keyboard: not specified in the prototypes (each segment is a plain
 button, Tab moves between them). 06-INTERACTIONS decides whether Left/Right move the selection.
@@ -2449,8 +2456,10 @@ S's Space editor rows (field label + SegmentedControl: Appearance System/Light/D
 hint of the Space"/"Postmark", `S:877-888`) and C's controls row (label + segmented control
 for Look, Warmth, Motion, Theme, `C:1131-1157`).
 
-**Purpose.** Pick Theme, Accent and Motion for an app or the whole shell (`Appearance` in
-`resolve(app, look_theme, system)`).
+**Purpose.** Pick Theme and Accent for an app or the whole shell (`Appearance` in
+`resolve(app, look_theme, system)`). Motion is not offered (the user's decision, 2026-09-28: the
+motion level need not be user-configurable): the picker passes `Appearance::motion` through
+unchanged, and the system's reduced-motion preference still maps into it.
 
 **Markup.**
 
@@ -2467,10 +2476,6 @@ for Look, Warmth, Motion, Theme, `C:1131-1157`).
       …one per accent…
     </div>
   </div>
-  <div class="ds-appearance-row">
-    <div class="ds-section-header" data-kind="field">Motion</div>
-    <div class="ds-segmented" role="group" aria-label="Motion">…Calm | Standard | Extra | Reduced…</div>
-  </div>
 </div>
 ```
 
@@ -2484,8 +2489,7 @@ for Look, Warmth, Motion, Theme, `C:1131-1157`).
 **Geometry.** Rows stacked; the Space editor's stack gap is 14 (`S:247`); a row is a Field
 SectionHeader (margin-bottom 6) over its control. Swatches reuse the Space dot (§32: 22 px
 circle, 2px border, gap 5 as in the sidebar foot `S:845`). Overall width not specified (O-16).
-Labels: Theme uses S's words (System, Light, Dark; C says Auto); Motion uses C's (Calm,
-Standard, Extra) plus the plan's Reduced.
+Labels: Theme uses S's words (System, Light, Dark; C says Auto).
 
 **States.** Inherited from SegmentedControl (§3) and Space dot (§32). No states of its own.
 

@@ -1,7 +1,7 @@
 //! AppearancePicker at the control center's width (sill FINDINGS Q101): in a 296 px
-//! `ModulePanel` (a 320 px panel's grid, padding 12) the Full Motion row runs past the panel's
-//! content box and clips "Reduced"; `PickerLayout::Compact` keeps every row inside it, and no
-//! segment is narrower than its words. Measured on the laid-out rects.
+//! `ModulePanel` (a 320 px panel's grid, padding 12) `PickerLayout::Compact` keeps every row
+//! inside the panel's content box, and no segment is narrower than its words. The picker has no
+//! Motion row in either layout (the user's decision, 2026-09-28). Measured on the laid-out rects.
 
 use dioxus::prelude::*;
 use ds::{
@@ -60,22 +60,25 @@ fn right(rect: Rect) -> f32 {
     rect.origin.x.0 + rect.size.width.0
 }
 
-const ROWS: [&str; 3] = [
+const ROWS: [&str; 2] = [
     ".ds-appearance-row:nth-child(1) .ds-segmented",
     ".ds-appearance-row:nth-child(2) .ds-appearance-swatches",
-    ".ds-appearance-row:nth-child(3) .ds-segmented",
 ];
 
 #[test]
-fn the_module_is_296_and_the_full_motion_row_overflows_it() {
-    let harness = laid_out(PickerLayout::Full);
-    assert_eq!(rect(&harness, ".ds-module-panel").size.width.0, 296.0);
-    let content = right(rect(&harness, ".ds-appearance"));
-    let motion = right(rect(&harness, ROWS[2]));
-    assert!(
-        motion > content,
-        "the Full Motion row ends at {motion}, inside the content's {content}: nothing to fix"
-    );
+fn the_module_is_296_and_neither_layout_offers_motion() {
+    for layout in [PickerLayout::Full, PickerLayout::Compact] {
+        let harness = laid_out(layout);
+        assert_eq!(rect(&harness, ".ds-module-panel").size.width.0, 296.0);
+        assert_eq!(harness.count(".ds-appearance-row"), 2, "{layout:?}");
+        // One segmented control, and it is the Theme row's.
+        assert_eq!(harness.count(".ds-segmented"), 1, "{layout:?}");
+        assert_eq!(
+            harness.attr(".ds-segmented", "aria-label").as_deref(),
+            Some("Theme"),
+            "{layout:?}"
+        );
+    }
 }
 
 #[test]
@@ -97,13 +100,13 @@ fn every_compact_row_fits_the_module_and_no_segment_is_squeezed() {
     // not fit would run past the content box above rather than clip a label.
     let last = rect(
         &harness,
-        ".ds-appearance-row:nth-child(3) .ds-segment:last-child",
+        ".ds-appearance-row:nth-child(1) .ds-segment:last-child",
     );
     assert_eq!(
         harness
-            .text_of(".ds-appearance-row:nth-child(3) .ds-segment:last-child")
+            .text_of(".ds-appearance-row:nth-child(1) .ds-segment:last-child")
             .as_deref(),
-        Some("Reduced")
+        Some("Dark")
     );
-    assert!(right(last) <= right(content) + 0.5, "Reduced: {last:?}");
+    assert!(right(last) <= right(content) + 0.5, "Dark: {last:?}");
 }

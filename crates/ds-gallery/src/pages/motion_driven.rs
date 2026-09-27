@@ -57,7 +57,7 @@ fn SegmentCell() -> Element {
         (2, "Month".to_owned()),
     ];
     rsx! {
-        Cell { name: "Segmented thumb", code: "use_spring(--seg-x), Quick",
+        Cell { name: "Segmented thumb", code: "use_spring(--seg-dx), Quick",
             controls: rsx! {
                 {mini("Day", move |_| pick.set(0))}
                 {mini("Month", move |_| pick.set(2))}
