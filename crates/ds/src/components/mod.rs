@@ -149,6 +149,7 @@ pub mod tabs;
 pub mod text_input;
 pub mod text_input_focus;
 pub mod text_input_kind;
+pub(crate) mod text_input_mask;
 pub(crate) mod text_input_parts;
 pub mod text_runs;
 pub mod toast;

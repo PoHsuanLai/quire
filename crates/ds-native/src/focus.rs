@@ -20,8 +20,8 @@ use crate::node_ref::{DocRef, FoundNode, NodeRef, Written, same};
 use blitz_dom::Node;
 use dioxus::prelude::*;
 use ds::{
-    Caret, Collapsed, Focused, Found, HostBlur, HostCaret, HostFind, HostFocus, HostPlaceCaret,
-    HostSelect, InitialCaret, caret_at,
+    Caret, Collapsed, FieldSelection, Focused, Found, HostBlur, HostCaret, HostFind, HostFocus,
+    HostPlaceCaret, HostSelect, HostSelection, InitialCaret, caret_at,
 };
 use std::rc::Rc;
 
@@ -47,7 +47,11 @@ pub const CARET: HostCaret = HostCaret(caret);
 /// value (a command palette opened on a query, sill Q341).
 pub const PLACE_CARET: HostPlaceCaret = HostPlaceCaret(place_caret);
 
-/// Provide [`FOCUS`], [`BLUR`], [`SELECT`], [`CARET`], [`PLACE_CARET`] and the list scroll
+/// The Blitz selection read, as the `ds::HostSelection` a root provides beside [`CARET`]: a
+/// masked field draws its own caret and selection over its dots (sill Q360b).
+pub const SELECTION: HostSelection = HostSelection(selection);
+
+/// Provide [`FOCUS`], [`BLUR`], [`SELECT`], [`CARET`], [`SELECTION`], [`PLACE_CARET`] and the list scroll
 /// ([`REVEAL`](crate::reveal::REVEAL), sill Q340) to the calling component's subtree. Call it at the
 /// top of a root that `ds_native::launch` did not start, before any quire field or menu mounts.
 /// The click-focus fallback is separate: provide [`CLICK_FOCUS`](crate::CLICK_FOCUS) and
@@ -59,6 +63,7 @@ pub fn provide() -> HostFocus {
     use_context_provider(|| crate::reveal::REVEAL);
     use_context_provider(|| PLACE_CARET);
     use_context_provider(|| CARET);
+    use_context_provider(|| SELECTION);
     use_context_provider(|| SELECT);
     use_context_provider(|| BLUR);
     use_context_provider(|| FOCUS)
@@ -172,6 +177,33 @@ fn caret(element: &MountedData) -> Caret {
     })
     .flatten()
     .unwrap_or(Caret::Unknown)
+}
+
+/// Whether `element`'s field has the keyboard and where its selection is, in characters of its
+/// text. A node that is not a laid-out field, or a document busy rendering, reads `Unknown`.
+fn selection(element: &MountedData) -> FieldSelection {
+    let Some(node) = NodeRef::of(element) else {
+        return FieldSelection::Unknown;
+    };
+    node.read(|doc| {
+        let field = doc.get_node(node.node)?;
+        if !field.is_focussed() {
+            return Some(FieldSelection::Unfocused);
+        }
+        let editor = &field.element_data()?.text_input_data()?.editor;
+        let text = editor.raw_text();
+        let chars = |byte: usize| {
+            text.get(..byte)
+                .map_or(text.chars().count(), |s| s.chars().count())
+        };
+        let selection = editor.raw_selection();
+        Some(FieldSelection::Focused {
+            anchor: chars(selection.anchor().index()),
+            focus: chars(selection.focus().index()),
+        })
+    })
+    .flatten()
+    .unwrap_or(FieldSelection::Unknown)
 }
 
 fn done(written: Written) -> Focused {
