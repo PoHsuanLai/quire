@@ -25,6 +25,9 @@ use std::rc::Rc;
 
 /// A level: the glyph that follows it and the capsule, knob or segments that show it.
 /// `onchange` is never called in `LevelMode::ReadOnly`, so a read-only level may leave it out.
+/// `Availability::Disabled` draws it plainly unavailable (Q491: a disabled level used to look like
+/// an enabled one at 0 %): the capsule and glyph at the disabled .35, no knob, the not-allowed
+/// cursor, no press, drag, key or swell, and out of the tab order.
 /// `glyph` is a `LevelGlyph` that follows `value`, or a `VolumeState` (both convert): then the
 /// speaker draws that state's waves and slash, as the bar's volume item does (sill Q392).
 #[component]
@@ -80,9 +83,11 @@ pub fn LevelControl(
         Hold::Idle => "idle",
         Hold::Pressing { .. } | Hold::Held { .. } => "live",
     };
-    let (role, tabindex) = match mode {
-        LevelMode::Interactive => ("slider", Some("0")),
-        LevelMode::ReadOnly => ("progressbar", None),
+    // A disabled level (Q491) is not a stop in the tab order: it takes no key and no press.
+    let (role, tabindex) = match (mode, availability) {
+        (LevelMode::Interactive, Availability::Enabled) => ("slider", Some("0")),
+        (LevelMode::Interactive, Availability::Disabled) => ("slider", None),
+        (LevelMode::ReadOnly, _) => ("progressbar", None),
     };
     let fill = value.css();
     let rb = stretch
