@@ -21,7 +21,7 @@
 /* A separator is a hairline with the shell scale's margin above and below (5, design/13
    section 13.3.3, settled 2026-09-24), inset to the rows' text. */
 .ds-menu-separator{ height:var(--hair); margin:var(--shell-menu-sep) var(--s-8); background:var(--line-soft); }
-.ds-menu mark{ background:transparent; color:var(--accent); font-weight:800; }
+.ds-menu mark{ background:transparent; color:var(--accent-text); font-weight:800; }
 
 /* A submenu (design/13 section 13.3.4): beside its parent row, opened with no animation (only
    the first menu of a session pops). */
@@ -41,4 +41,4 @@
 .ds-menu-filter{ display:flex; align-items:center; min-height:calc(1.55em + 8px); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
   border-bottom:var(--hair) solid var(--line-soft); font-size:var(--fs-body); line-height:1.55; color:var(--ink); white-space:nowrap; overflow:hidden; }
 .ds-menu-filter-placeholder{ color:var(--ink-faint); }
-.ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent); flex:none; }
+.ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent-text); flex:none; }

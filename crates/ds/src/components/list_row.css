@@ -26,7 +26,7 @@
   animation:none;
 }
 .ds-row:hover{ transform:translateY(var(--lift)); box-shadow:var(--shadow-2); border-color:var(--line); }
-.ds-row[*|aria-selected=true]{ background:var(--raise); border-color:var(--accent); box-shadow:var(--shadow-1); }
+.ds-row[*|aria-selected=true]{ background:var(--raise); border-color:var(--accent-text); box-shadow:var(--shadow-1); }
 
 /* Entering: first show (`S:294`) or an arrival (`C:373`). */
 .ds-list[*|data-presence=entering] .ds-row[*|data-presence=entering]{
@@ -62,7 +62,7 @@
 /* Dot (`S:185-187`, `S:295-296`). */
 .ds-row-dot{ padding-top:var(--s-6); }
 .ds-dot{
-  display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent);
+  display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
   transition:transform var(--t-quick) var(--e-spring), opacity var(--t-quick) var(--e-out);
 }
 .ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }

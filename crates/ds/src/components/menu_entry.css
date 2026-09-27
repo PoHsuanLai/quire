@@ -16,7 +16,7 @@
 .ds-menu-title{ display:block; font-size:var(--fs-control); font-weight:600; }
 .ds-menu-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
 .ds-menu-trail{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--ink-faint); }
-.ds-menu-trail .ds-ic{ color:var(--accent); }
+.ds-menu-trail .ds-ic{ color:var(--accent-text); }
 .ds-menu-item[*|aria-checked=true] .ds-menu-title{ color:var(--ink); }
 
 /* Slim, and Context which is Slim: a text menu at the shell scale (the macOS polish pass,
@@ -42,7 +42,7 @@
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item > .ds-ic{ opacity:0; }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true]{ color:var(--ink); font-weight:600; }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true] > .ds-ic{ opacity:1; color:var(--accent); }
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true] > .ds-ic{ opacity:1; color:var(--accent-text); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-title{ font-size:inherit; font-weight:inherit; }
 .ds-menu[*|data-kind=dropdown] .ds-menu-trail{ margin-left:auto; }
 

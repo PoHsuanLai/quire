@@ -51,7 +51,7 @@
 
 /* Destination preview (`S:447-448`). */
 .ds-sidebar-item[*|data-preview=destination]{
-  background:var(--f-pill-hover); color:var(--f-ink); box-shadow:0 0 0 1.5px var(--accent) inset;
+  background:var(--f-pill-hover); color:var(--f-ink); box-shadow:0 0 0 1.5px var(--accent-text) inset;
   animation:dest var(--t-float) var(--e-out) infinite alternate;
 }
 

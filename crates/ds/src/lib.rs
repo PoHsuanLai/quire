@@ -101,11 +101,12 @@ pub use spell::{
 pub use text::clip_chars;
 pub use time::{ClockGuard, FRAME_SLACK, FRAME_TICK, VirtualClock, sleep};
 pub use tokens::{
-    AccentQuad, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
+    AccentRoles, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
     DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
     FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, NotificationMetrics,
     OpacityToken, OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow,
-    ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WidgetMetrics, ZLayer, quad,
+    ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WidgetMetrics, ZLayer,
+    accent_of,
 };
 pub use window::{
     Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,

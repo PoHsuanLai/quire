@@ -2,9 +2,9 @@
 //!
 //! The dark blocks carry `data-theme=dark` as well, one attribute more specific than both the
 //! light accent blocks and the dark token block, so a dark root takes its accent's dark quad
-//! whatever the source order. Each block sets exactly the four accent properties. A Space that
-//! lends the card its hue writes `--accent` and its pair inline on the root, which beats all of
-//! these.
+//! whatever the source order. Each block sets exactly the six accent properties (design/03-COLOR.md
+//! section 20). A Space that lends the card its hue writes the same six inline on the root, which
+//! beats all of these.
 //!
 //! The `--swatch-<accent>` properties on `.ds` are every accent's own `--accent`, for a picker
 //! that has to paint all six at once: a swatch written `var(--accent)` would show the selected
@@ -12,7 +12,7 @@
 
 use super::emit::{attr_selector, declaration, rule};
 use crate::appearance::{Accent, Scheme};
-use crate::tokens::{AccentQuad, ColourToken, quad};
+use crate::tokens::{AccentRoles, ColourToken, accent_of};
 
 /// The accent quads, light and dark.
 pub fn accents_css() -> String {
@@ -24,7 +24,7 @@ pub fn accents_css() -> String {
         for accent in Accent::ALL {
             css.push_str(&rule(
                 &selector(accent, scheme),
-                &four(quad(accent, scheme)),
+                &six(accent_of(accent, scheme)),
             ));
         }
     }
@@ -45,7 +45,7 @@ fn swatches(scheme: Scheme) -> Vec<String> {
             format!(
                 "{}:{};",
                 swatch_var(accent),
-                quad(accent, scheme).accent.css()
+                accent_of(accent, scheme).fill.css()
             )
         })
         .collect()
@@ -64,11 +64,13 @@ fn selector(accent: Accent, scheme: Scheme) -> String {
     format!(".ds{theme}{}", attr_selector("data-accent", accent.slug()))
 }
 
-fn four(quad: AccentQuad) -> Vec<String> {
+fn six(roles: AccentRoles) -> Vec<String> {
     vec![
-        declaration(ColourToken::Accent.var(), &quad.accent.css()),
-        declaration(ColourToken::AccentInk.var(), &quad.ink.css()),
-        declaration(ColourToken::AccentSoft.var(), &quad.soft.css()),
-        declaration(ColourToken::Seal.var(), &quad.seal.css()),
+        declaration(ColourToken::Accent.var(), &roles.fill.css()),
+        declaration(ColourToken::AccentInk.var(), &roles.ink.css()),
+        declaration(ColourToken::AccentSoft.var(), &roles.wash_colour().css()),
+        declaration(ColourToken::AccentText.var(), &roles.text.css()),
+        declaration(ColourToken::AccentRing.var(), &roles.ring_colour().css()),
+        declaration(ColourToken::Seal.var(), &roles.fill.css()),
     ]
 }

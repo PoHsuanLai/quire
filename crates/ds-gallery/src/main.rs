@@ -1,6 +1,8 @@
 //! The quire gallery: every component across theme, accent, motion, material, blur and Space
 //! preset; a matrix page; a motion lab; and `--snapshot DIR` for a contact sheet.
 
+mod accent_sheet;
+mod accent_specimens;
 mod app;
 mod args;
 mod axes;
@@ -38,6 +40,13 @@ fn main() {
             std::process::exit(2);
         }
     };
+    if let Some(dir) = args.accent_sheet {
+        if let Err(error) = accent_sheet::run(&dir) {
+            eprintln!("ds-gallery: {error}");
+            std::process::exit(1);
+        }
+        return;
+    }
     if let Some(dir) = args.level_sheet {
         if let Err(error) = level_sheet::run(&dir) {
             eprintln!("ds-gallery: {error}");

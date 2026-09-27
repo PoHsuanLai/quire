@@ -28,7 +28,7 @@
 .ds-month-header{ display:flex; align-items:center; gap:var(--s-2); align-self:stretch; min-height:28px; margin-bottom:var(--s-4); }
 .ds-month-title{
   flex:1; min-width:0; white-space:nowrap; overflow:hidden; padding-left:var(--s-6);
-  font-family:var(--font-data); font-size:var(--fs-caption); font-weight:700; letter-spacing:var(--tracking-caps-narrow); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--accent);
+  font-family:var(--font-data); font-size:var(--fs-caption); font-weight:700; letter-spacing:var(--tracking-caps-narrow); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--accent-text);
 }
 
 .ds-month-weeks{ display:flex; flex-direction:column; }
@@ -61,7 +61,7 @@
 .ds-month-day[*|data-kind=pressable][*|aria-current=date]:hover .ds-month-num{ background:var(--accent); }
 .ds-month-day[*|data-kind=pressable]:active .ds-month-num{ transform:scale(var(--squish)); }
 
-.ds-month-dot{ flex:none; width:4px; height:4px; border-radius:var(--r-pill); background:var(--accent); }
+.ds-month-dot{ flex:none; width:4px; height:4px; border-radius:var(--r-pill); background:var(--accent-text); }
 .ds-month-day[*|data-place=before] .ds-month-dot,
 .ds-month-day[*|data-place=after] .ds-month-dot{ background:var(--ink-soft); }
 

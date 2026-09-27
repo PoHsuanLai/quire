@@ -82,17 +82,11 @@ fn scheme_tokens(scheme: Scheme) -> Vec<String> {
     colours.chain(hues).chain(shadows).chain(widget).collect()
 }
 
-/// A colour token as the stylesheet writes it.
-///
-/// `--accent-ring` is the one exception to writing the table's value: it is `--accent` at .35,
-/// and `--accent` changes with `data-accent` and with a Space's hue, so the stylesheet mixes it
-/// from whatever `--accent` the root resolves (spike S14: `color-mix()` with `var()` paints).
-/// With Postmark it is exactly [`ColourToken::value`]'s `rgba(…,.35)`.
+/// A colour token as the stylesheet writes it: the table's value. The accent family is
+/// Postmark's here; each `data-accent` block (`accents_css`) and a Space that lends its hue
+/// overwrite all six, `--accent-ring` included, since its alpha is derived per hue.
 fn colour_value(token: ColourToken, scheme: Scheme) -> String {
-    match token {
-        ColourToken::AccentRing => "color-mix(in srgb,var(--accent) 35%,transparent)".to_owned(),
-        _ => token.value(scheme).css(),
-    }
+    token.value(scheme).css()
 }
 
 /// Everything that is the same in both schemes and at every level: radii, spacing, type, z.

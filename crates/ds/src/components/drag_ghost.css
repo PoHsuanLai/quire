@@ -21,4 +21,4 @@
 .ds :hover > .ds-grip{ opacity:1; }
 .ds-grip:hover{ background:var(--surface); color:var(--ink); }
 
-.ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent); margin:var(--s-2) 0; }
+.ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent-text); margin:var(--s-2) 0; }

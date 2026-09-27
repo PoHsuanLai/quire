@@ -1,5 +1,6 @@
 //! The gallery's command line: `ds-gallery [--page PAGE] [--typeface system|editorial]
-//! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]`.
+//! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]
+//! [--accent-sheet DIR]`.
 
 use crate::page::Page;
 use ds::Typeface;
@@ -14,6 +15,9 @@ pub struct Args {
     pub snapshot: Option<PathBuf>,
     /// Render the level control's variant and motion sheets into this directory, then exit.
     pub level_sheet: Option<PathBuf>,
+    /// Render the accent candidates' contact sheets into this directory, then exit
+    /// (design/03-COLOR.md section 20).
+    pub accent_sheet: Option<PathBuf>,
     /// Render the small-state details' frames through each moment into this directory, then
     /// exit (design/26).
     pub detail_frames: Option<PathBuf>,
@@ -31,7 +35,7 @@ impl std::fmt::Display for ArgsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]",
+            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR] [--accent-sheet DIR]",
             self.0,
             slugs()
         )
@@ -75,6 +79,14 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                     return Err(ArgsError("--level-sheet needs a directory".into()));
                 }
                 parsed.level_sheet = once(parsed.level_sheet, PathBuf::from(dir), "--level-sheet")?;
+            }
+            "--accent-sheet" => {
+                let dir = value("a directory")?;
+                if dir.is_empty() {
+                    return Err(ArgsError("--accent-sheet needs a directory".into()));
+                }
+                parsed.accent_sheet =
+                    once(parsed.accent_sheet, PathBuf::from(dir), "--accent-sheet")?;
             }
             "--detail-frames" => {
                 let dir = value("a directory")?;
@@ -144,6 +156,7 @@ mod tests {
             page,
             snapshot: snapshot.map(PathBuf::from),
             level_sheet: None,
+            accent_sheet: None,
             detail_frames: None,
             scale: None,
             typeface: None,
@@ -160,6 +173,13 @@ mod tests {
                 Ok(args(Some(Page::MotionLab), None)),
             ),
             (&["--snapshot", "out"], Ok(args(None, Some("out")))),
+            (
+                &["--accent-sheet", "shots"],
+                Ok(Args {
+                    accent_sheet: Some(PathBuf::from("shots")),
+                    ..args(None, None)
+                }),
+            ),
             (
                 &["--snapshot=target/gallery", "--page", "matrix"],
                 Ok(args(Some(Page::Matrix), Some("target/gallery"))),
