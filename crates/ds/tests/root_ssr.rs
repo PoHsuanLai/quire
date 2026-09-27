@@ -182,9 +182,15 @@ fn the_root_stamps_exactly_its_attributes() {
     for case in cases {
         let look = case.setup.look.clone();
         let markup = render(case.setup);
-        // The frame variables, then the tint alpha the root writes at the settings default.
+        // The frame variables, the material's text accent on a Popover, Sheet or Toast
+        // (design/03-COLOR.md section 20.6), then the tint alpha the root writes at the
+        // settings default.
+        let text = match case.material {
+            "popover" | "sheet" | "toast" => "--accent-text:var(--accent-text-material);",
+            _ => "",
+        };
         let style = format!(
-            "{}--m-tint-alpha:.8;",
+            "{}{text}--m-tint-alpha:.8;",
             FrameVars::of(&look, case.scheme).style_attr()
         );
         let mut want = expected(&[
@@ -342,6 +348,10 @@ fn a_surface_nests_a_scope_without_a_stylesheet() {
         ("data-motion", "standard".to_owned()),
         ("data-material", "popover".to_owned()),
         ("data-blur", "off".to_owned()),
+        (
+            "style",
+            "--accent-text:var(--accent-text-material);".to_owned(),
+        ),
     ]);
     assert_eq!(nested, want);
     assert_eq!(markup.matches("<style").count(), 1, "the root's only");

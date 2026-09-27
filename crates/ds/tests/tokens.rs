@@ -109,12 +109,13 @@ fn every_dark_and_level_name_has_a_light_value() {
 }
 
 #[test]
-fn each_accent_block_sets_exactly_the_six() {
-    let six: BTreeSet<&str> = [
+fn each_accent_block_sets_exactly_the_seven() {
+    let seven: BTreeSet<&str> = [
         "--accent",
         "--accent-ink",
         "--accent-soft",
         "--accent-text",
+        "--accent-text-material",
         "--accent-ring",
         "--seal",
     ]
@@ -126,8 +127,8 @@ fn each_accent_block_sets_exactly_the_six() {
     assert_eq!(blocks.len(), Accent::ALL.len() * Scheme::ALL.len());
     for (selector, decls) in blocks {
         let names: BTreeSet<&str> = decls.iter().map(|(name, _)| name.as_str()).collect();
-        assert_eq!(names, six, "{selector}");
-        assert_eq!(decls.len(), 6, "{selector} repeats a property");
+        assert_eq!(names, seven, "{selector}");
+        assert_eq!(decls.len(), 7, "{selector} repeats a property");
     }
 }
 
@@ -147,6 +148,7 @@ fn each_accent_block_is_the_bands_roles() {
                 ("--accent-ink", want.ink.css()),
                 ("--accent-soft", want.wash_colour().css()),
                 ("--accent-text", want.text.css()),
+                ("--accent-text-material", want.text_material.css()),
                 ("--accent-ring", want.ring_colour().css()),
                 ("--seal", want.fill.css()),
             ] {

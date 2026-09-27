@@ -7,6 +7,7 @@ use super::typeface::use_typeface;
 use crate::appearance::{Accent, Resolved, Scheme};
 use crate::material::{BlurState, Material};
 use crate::tokens::Corner;
+use crate::tokens::accent_band::{TextOn, text_on};
 use dioxus::prelude::*;
 
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`
@@ -50,7 +51,7 @@ pub fn Surface(
             "data-ground": ground.attribute(),
             "data-corner": radius.and_then(Corner::attribute),
             "data-chrome": chrome.and_then(RootChrome::attribute),
-            style: radius.map(radius_style),
+            style: scope_style(env.material, radius),
             {children}
         }
     }
@@ -76,9 +77,30 @@ pub(crate) fn ClassedScope(material: Material, class: &'static str, children: El
             "data-blur": env.blur.slug(),
             "data-ground": Ground::of(material).attribute(),
             "data-chrome": RootChrome::Transparent.attribute(),
+            style: scope_style(env.material, None),
             {children}
         }
     }
+}
+
+/// The inline declaration that points `--accent-text` at `--accent-text-material` on a root of a
+/// translucent material that carries accent text (design/03-COLOR.md section 20.6), or nothing.
+/// Inline, so it follows a Space's own inline accent and beats the `data-accent` blocks.
+pub(crate) fn accent_text_style(material: Material) -> &'static str {
+    match text_on(material) {
+        TextOn::Card => "",
+        TextOn::Material => "--accent-text:var(--accent-text-material);",
+    }
+}
+
+/// A nested scope's inline style: its accent text and its corner, or none at all.
+fn scope_style(material: Material, radius: Option<Corner>) -> Option<String> {
+    let style = format!(
+        "{}{}",
+        accent_text_style(material),
+        radius.map(radius_style).unwrap_or_default()
+    );
+    (!style.is_empty()).then_some(style)
 }
 
 /// The inline declaration that overrides a material's corner.

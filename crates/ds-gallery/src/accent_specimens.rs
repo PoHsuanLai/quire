@@ -17,6 +17,7 @@ struct Paint {
     fill: String,
     ink: String,
     text: String,
+    text_material: String,
     wash: String,
     ring: String,
 }
@@ -29,17 +30,28 @@ impl Paint {
             fill: roles.fill.css(),
             ink: roles.ink.css(),
             text: roles.text.css(),
+            text_material: roles.text_material.css(),
             wash: roles.wash_colour().css(),
             ring: roles.ring_colour().css(),
         }
     }
 
-    /// The custom properties that repaint a subtree (each root already writes Postmark's; a
-    /// hue swatch writes its own).
+    /// The custom properties that repaint a subtree on the card (each root already writes
+    /// Postmark's; a hue swatch writes its own).
     fn vars(&self) -> String {
+        self.vars_with(&self.text)
+    }
+
+    /// The same inside a Popover or Sheet, whose root points `--accent-text` at the material's
+    /// text (design/03-COLOR.md section 20.6); written inline, it has to say so itself.
+    fn material_vars(&self) -> String {
+        self.vars_with(&self.text_material)
+    }
+
+    fn vars_with(&self, text: &str) -> String {
         format!(
-            "--accent:{0};--seal:{0};--accent-ink:{1};--accent-text:{2};--accent-soft:{3};--accent-ring:{4};",
-            self.fill, self.ink, self.text, self.wash, self.ring
+            "--accent:{0};--seal:{0};--accent-ink:{1};--accent-text:{2};--accent-text-material:{3};--accent-soft:{4};--accent-ring:{5};",
+            self.fill, self.ink, text, self.text_material, self.wash, self.ring
         )
     }
 }
@@ -78,10 +90,11 @@ fn theme_of(scheme: Scheme) -> Theme {
 pub fn Specimens(scheme: Scheme) -> Element {
     let paint = Paint::of(Accent::Postmark, scheme);
     let vars = paint.vars();
+    let material_vars = paint.material_vars();
     let wall = format!("background-image:url(\"{}\")", wallpaper::calm_uri(scheme));
     let summary = format!(
-        "fill {} · ink {} · text {} · wash {} · ring {}",
-        paint.fill, paint.ink, paint.text, paint.wash, paint.ring
+        "fill {} · ink {} · text {} / {} on glass · wash {} · ring {}",
+        paint.fill, paint.ink, paint.text, paint.text_material, paint.wash, paint.ring
     );
     rsx! {
         style { {CSS} }
@@ -96,7 +109,7 @@ pub fn Specimens(scheme: Scheme) -> Element {
                     material: Material::Popover,
                     stylesheet: Inject::Host,
                     chrome: Some(RootChrome::Painted),
-                    div { class: "g-acc-panel", style: "{vars}", Controls {} }
+                    div { class: "g-acc-panel", style: "{material_vars}", Controls {} }
                 }
                 Ds {
                     appearance: Appearance { theme: theme_of(scheme), ..Appearance::default() },
@@ -116,7 +129,7 @@ pub fn Specimens(scheme: Scheme) -> Element {
                     material: Material::Sheet,
                     stylesheet: Inject::Host,
                     chrome: Some(RootChrome::Transparent),
-                    div { class: "g-acc-launcher", Launcher { vars: vars.clone() } }
+                    div { class: "g-acc-launcher", Launcher { vars: material_vars } }
                 }
             }
             div { class: "g-acc-hues",

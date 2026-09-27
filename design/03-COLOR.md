@@ -726,9 +726,10 @@ the wash's and ring's starting alphas. The function then steps, as mailo's accen
 | --- | --- | --- | --- |
 | `fill` (solid) | primary button, today disc, toggle on, tile disc, slider fill, armed toast tab | OKLCH (band L, chroma at weight, hue), gamut-fitted; L steps .01 toward the ink until the ink reads | ink on fill >= 4.5 |
 | `ink` | text and glyphs on the fill | `White`: `#FFFFFF`, the fill steps darker; `Deep`: OKLCH (.22, .03, hue), the fill steps lighter | (as above) |
-| `text` | links, the month title and busy dots, menu check and marks, search match, caret, unread dot, selected-row border, drop line, spinner ring, input focus border, tab indicator | same hue and chroma; L steps away from the card (darker in light, lighter in dark) | >= 4.5 on `--paper`, `--surface`, `--surface-2`, `--raise` |
+| `text` | links, the month title and busy dots, menu check and marks, search match, caret, unread dot, selected-row border, drop line, spinner ring, input focus border, tab indicator | same hue and chroma; L steps away from the card (darker in light, lighter in dark) | >= 4.5 on `--paper`, `--surface`, `--surface-2`, `--raise` and on the wash over each (20.6) |
+| `text_material` | the same marks on a translucent Popover, Sheet or Toast (a root of one points `--accent-text` at it) | as `text` | >= 4.5 on every `text` ground, and on those three materials over a black and a white backdrop and the wash over them (20.6) |
 | `wash` (translucent) | selected row, menu and launcher highlight, chip, tile on, input focus halo | the fill at an alpha over whatever lies beneath (the Mac's selection); the alpha rises .01 only until it shows | `--ink` on the wash >= 4.5 over every ground; wash >= 1.15:1 off its ground; alpha <= .60 |
-| `ring` | keyboard focus ring (3 px, 1 px gap, design/27 6.4) | the text accent at an alpha; rises .05 until it stands off | >= 3:1 against every ground (WCAG 1.4.11) |
+| `ring` | keyboard focus ring (3 px, 1 px gap, design/27 6.4) | the card's text accent at an alpha; rises .05 until it stands off | >= 3:1 against every card ground (WCAG 1.4.11) |
 
 No text on the accent qualifies for the 3:1 large-text floor (button labels, the disc's number
 and menu text are all under 18 pt / 14 pt bold), so the ink gate is 4.5 everywhere. The fill's
@@ -825,6 +826,7 @@ B's light fill stands 1.5-1.6:1 off white, so no state may rest on the fill's co
 | Slider fill | the fill's length and the knob | holds |
 | Selected list row (mailo's card) | `--raise`, `--shadow-1` and a border | the border moved to `--accent-text` |
 | Menu and launcher highlight, chip, selected row wash | a wash behind `--ink` text; the highlight is also the keyboard position | colour only by nature (the Mac's too); the wash is gated to show at 1.15:1 |
+| Primary button, disabled (the power menu's default Shut Down) | was the fill at .35 only | fixed: an `--accent-text` edge (20.6) |
 | sill's dock tile progress ring (`conic-gradient(var(--accent) …)`) | the arc's length | sill's; its arc stands 1.5:1 off a light track, see sill's list |
 
 ### 20.5 Blue moves to 215
@@ -836,6 +838,73 @@ existing gap (Violet to Postmark, 0.064); `accent_band::tests::every_built_in_sw
 holds every pair at 0.06 or more in both schemes. Both slugs stay, so stored settings load
 unchanged; a stored `blue` now shows the sky blue. The hue strip at the foot of
 `accent-b-final-{light,dark}.png` shows the six.
+
+### 20.6 Text on the wash and on the materials (2026-09-27, sill Q410, Q411)
+
+The first cut gated the text accent on the card's four opaque grounds only. Two places it is
+read were not among them, and both fell under 4.5 in sill's captures:
+
+- **The wash.** A menu's or the launcher's match highlight (`.ds-menu mark`) sits on the
+  selected row's `--accent-soft`. `#426aa2` on the wash over `--paper` (`#d5e3f5`) is 4.23:1
+  (Q410).
+- **The materials.** PolkitPrompt's "Details" sits on a Sheet, 82 % tint over whatever lies
+  behind. `#426aa2` is 4.28:1 on the on-screen composite (`#e5e3db`) and 3.53:1 over black
+  (`#cfcfcc`, sill's surface capture) (Q411).
+
+The gate now composites every ground a screen can show before measuring
+(`accent_band::text_grounds`): the card's four grounds; the wash over each; the three materials
+that carry accent text (Popover, Sheet, Toast: `accent_band::TEXT_MATERIALS`) at their default
+tints over the two reference backdrops, black and white (the same two `tests/legibility.rs`
+holds their own ink over); and the wash over those. The text steps (.01) until it reads on all
+of them, every 5 degrees of hue, weights 0 to 1, both schemes.
+
+**Two text accents, not one.** No single value clears both kinds of ground and stays band B:
+
+| Postmark (h 257) | Card grounds + wash | + materials over black and white, + wash |
+| --- | --- | --- |
+| Light | `#396198` (L .50; was `#426aa2`) | `#295086` (L .43), Postmark's old navy weight (`#23508F`, L .434) that the band was picked to leave |
+| Dark | `#8ebaf7` (L .78; was `#88b3f0`) | `#d5e6fe` (L .92), nearly the ink |
+
+So the band returns both. `text` (`--accent-text`) is gated on the card's grounds and the wash
+over them; it paints windows and cards, where the ground is opaque and known. `text_material`
+(`--accent-text-material`) is gated on every ground above; a `Ds` root or `Surface` of a
+Popover, Sheet or Toast writes `--accent-text:var(--accent-text-material)` inline, so every
+component inside it (menu marks and checks, the launcher's match, PolkitPrompt's "Details", a
+banner's link) takes it with no change of its own. A separate `--accent-text-on-wash` was
+considered and rejected: on the card it would spare the text only .04 of lightness in light and
+.01 in dark, and on the materials it is the backdrop, not the wash, that moves the text most
+(.54 to .43 in light, .76 to .89 in dark, before the wash's last .01-.04). The fills and washes
+are unchanged.
+
+Sweep ranges (every hue and weight):
+
+| | `text` L | `text_material` L | ring alpha | least ratios (text on card / on wash; material text on card / on material / on washed material) |
+| --- | --- | --- | --- | --- |
+| Light | .47-.50 (was .54 start) | .42-.44 | .70-.75 | 5.18 / 4.50; 5.69 / 4.62 / 4.50 |
+| Dark | .77-.79 (was .76 start) | .91-.93 | .55 | 6.74 / 4.50; 7.11 / 5.20 / 4.50 |
+
+(L is the OKLab lightness of the gamut-fitted colour.)
+
+One ground is left out, and the test pins it: the dark Popover's wash over a white backdrop,
+where the card's own `--ink` reaches only 4.14:1. The accent cannot be asked to read where the
+ink does not; the shortfall is the dark Popover tint's (.78) over a white backdrop, recorded
+for the material pass. The ring stays gated on the card's grounds (3:1), now from the card's
+text: light .70-.75 (was .75-.80), dark .55 (was .55-.60).
+
+The measured grounds, before and after:
+
+| Q | Where | Ground | Before (`#426aa2`) | After |
+| --- | --- | --- | --- | --- |
+| Q410 | launcher match on the selected row (a Sheet) | `#d5e3f5` | 4.23 | 6.24 (`#295086`) |
+| Q410 | a menu match on a selected row in a window card | wash over `--paper` | 4.23 | 4.83 (`#396198`) |
+| Q411 | PolkitPrompt "Details", on screen | `#e5e3db` | 4.28 | 6.32 (`#295086`) |
+| Q411 | PolkitPrompt "Details", over black | `#cfcfcc` | 3.53 | 5.20 (`#295086`) |
+
+**A disabled default button** (sill Q413). The Mac keeps a disabled default button's shape and
+edge at the reduced opacity. Band B's pastel fill at .35 was barely apart from the disabled
+Secondary beside it, the state carried by the fill's colour alone (20.4). A disabled Primary
+now keeps an `--accent-text` edge (`button.css`), as the pressed Mini and the armed toast tab
+do.
 
 ## Open decisions
 
