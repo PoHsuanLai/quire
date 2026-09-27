@@ -8,6 +8,7 @@ use crate::components::menu_item::{
 use crate::components::menu_lines::Line;
 use crate::components::menu_shape::PLAIN;
 use crate::components::press::Press;
+use crate::components::row_chord::NO_CHORD;
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::{Selection, StaggerIndex, Switch};
 use crate::geometry::Point;
@@ -100,6 +101,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         detail: detail.as_deref().map(Words::Str),
                         tile: tile.as_ref(),
                         trail,
+                        chord: NO_CHORD,
                         check: *check,
                         marks: &line.marks,
                         selection: Selection::of(&Some(index), &drawn.selected),
@@ -117,6 +119,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         detail: row.detail.as_ref().map(Words::Text),
                         tile: row.tile.as_ref(),
                         trail: &row.trail,
+                        chord: &row.chord,
                         check: row.check,
                         marks: &line.marks,
                         selection: Selection::of(&Some(index), &drawn.selected),
@@ -139,6 +142,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         detail: None,
                         tile: tile.as_ref(),
                         trail: &Trail::None,
+                        chord: NO_CHORD,
                         check: None,
                         marks: &line.marks,
                         selection: Selection::of(&Some(index), &drawn.selected),
