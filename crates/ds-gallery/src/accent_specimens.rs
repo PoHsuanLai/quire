@@ -1,52 +1,17 @@
-//! What each column of the accent sheet draws (`accent_sheet.rs`): the columns, the paint each
-//! lends its surfaces, and the surfaces.
+//! What the accent sheet draws (`accent_sheet.rs`): the paint the settled band lends, and the
+//! surfaces.
 
 use crate::pages::calendar::month_sample::{AUGUST, First, month as lay_out};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::tokens::accent_band::{AccentPick, Candidate, Weight, accent_roles, hue_of};
 use ds::{
     Accent, Appearance, Availability, Button, ButtonVariant, Chip, ChipVariant, CommandPalette,
     CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, ModuleGrid, ModuleState,
     ModuleTile, MonthGrid, PaletteEntrance, Radius, RootChrome, Scheme, SegmentedControl, Surface,
-    Switch, Theme, Tile, Toggle, Trail, WidgetFrame, WidgetMetrics, WidgetSize, quad,
+    Switch, Theme, Tile, Toggle, Trail, WidgetFrame, WidgetMetrics, WidgetSize, accent_of,
 };
 
-/// One column of the sheet.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Column {
-    /// Postmark as it ships: the baseline.
-    Postmark,
-    /// A candidate band at Postmark's hue.
-    Band(Candidate),
-}
-
-impl Column {
-    /// Every column, left to right.
-    pub const ALL: [Column; 4] = [
-        Column::Postmark,
-        Column::Band(Candidate::System),
-        Column::Band(Candidate::Airy),
-        Column::Band(Candidate::Calm),
-    ];
-
-    /// The crop's file slug.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Column::Postmark => "postmark",
-            Column::Band(candidate) => candidate.slug(),
-        }
-    }
-
-    fn label(self) -> &'static str {
-        match self {
-            Column::Postmark => "Postmark (today)",
-            Column::Band(candidate) => candidate.label(),
-        }
-    }
-}
-
-/// The colours a column lends its surfaces, as CSS.
+/// The colours an accent lends its surfaces, as CSS.
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Paint {
     fill: String,
@@ -57,38 +22,20 @@ struct Paint {
 }
 
 impl Paint {
-    /// `accent` in `scheme` as `column` draws it. Postmark's quad has no text or ring role: its
-    /// text is `--accent`, its ring the solid `--accent` outline, its wash the solid tint.
-    fn of(column: Column, accent: Accent, scheme: Scheme) -> Paint {
-        match column {
-            Column::Postmark => {
-                let quad = quad(accent, scheme);
-                Paint {
-                    fill: quad.accent.css(),
-                    ink: quad.ink.css(),
-                    text: quad.accent.css(),
-                    wash: quad.soft.css(),
-                    ring: quad.accent.css(),
-                }
-            }
-            Column::Band(candidate) => {
-                let pick = AccentPick {
-                    hue: hue_of(accent),
-                    weight: Weight::FULL,
-                };
-                let roles = accent_roles(&candidate.band(), pick, scheme);
-                Paint {
-                    fill: roles.fill.css(),
-                    ink: roles.ink.css(),
-                    text: roles.text.css(),
-                    wash: roles.wash_colour().css(),
-                    ring: roles.ring_colour().css(),
-                }
-            }
+    /// `accent` in `scheme`, from the settled band.
+    fn of(accent: Accent, scheme: Scheme) -> Paint {
+        let roles = accent_of(accent, scheme);
+        Paint {
+            fill: roles.fill.css(),
+            ink: roles.ink.css(),
+            text: roles.text.css(),
+            wash: roles.wash_colour().css(),
+            ring: roles.ring_colour().css(),
         }
     }
 
-    /// The custom properties that repaint a subtree.
+    /// The custom properties that repaint a subtree (each root already writes Postmark's; a
+    /// hue swatch writes its own).
     fn vars(&self) -> String {
         format!(
             "--accent:{0};--seal:{0};--accent-ink:{1};--accent-text:{2};--accent-soft:{3};--accent-ring:{4};",
@@ -97,16 +44,15 @@ impl Paint {
     }
 }
 
-/// The sheet's own rules: the proposed role split (text uses read `--accent-text`), the static
-/// menu and rows, and the focus ring drawn as the Mac draws it (3 px, 1 px gap).
+/// The sheet's own rules: the static menu and rows, and the focus ring drawn as the Mac draws
+/// it (3 px, 1 px gap).
 const CSS: &str = "\
 .g-acc{display:flex;flex-direction:column;gap:12px;padding:14px;width:352px;background:var(--paper)}\
 .g-acc-head{display:flex;flex-direction:column;gap:2px}\
 .g-acc-wall{display:flex;flex-direction:column;gap:14px;padding:14px;border-radius:14px;background-size:cover;background-position:center}\
 .g-acc-panel{display:flex;flex-direction:column;gap:10px;padding:12px;color:var(--ink);font-size:13px}\
 .g-acc-line{display:flex;flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}\
-.g-acc .ds-month-title,.g-acc-link{color:var(--accent-text)}\
-.g-acc .ds-month-dot{background:var(--accent-text)}\
+.g-acc-link{color:var(--accent-text)}\
 .g-acc-link{font-weight:600}\
 .g-acc-focus{box-shadow:0 0 0 1px var(--surface),0 0 0 4px var(--accent-ring);border-radius:6px}\
 .g-acc-list{display:flex;flex-direction:column;gap:1px}\
@@ -127,10 +73,10 @@ fn theme_of(scheme: Scheme) -> Theme {
     }
 }
 
-/// One column's surfaces in `scheme`.
+/// The surfaces in `scheme`.
 #[component]
-pub fn Specimens(column: Column, scheme: Scheme) -> Element {
-    let paint = Paint::of(column, Accent::Postmark, scheme);
+pub fn Specimens(scheme: Scheme) -> Element {
+    let paint = Paint::of(Accent::Postmark, scheme);
     let vars = paint.vars();
     let wall = format!("background-image:url(\"{}\")", wallpaper::calm_uri(scheme));
     let summary = format!(
@@ -141,7 +87,7 @@ pub fn Specimens(column: Column, scheme: Scheme) -> Element {
         style { {CSS} }
         div { class: "g-acc",
             div { class: "g-acc-head",
-                span { class: "g-name", "{column.label()} — {scheme.slug()}" }
+                span { class: "g-name", "Accent band B (Airy), Postmark — {scheme.slug()}" }
                 span { class: "g-code", "{summary}" }
             }
             div { class: "g-acc-wall", style: "{wall}",
@@ -175,7 +121,7 @@ pub fn Specimens(column: Column, scheme: Scheme) -> Element {
             }
             div { class: "g-acc-hues",
                 for accent in Accent::ALL {
-                    Hue { column, accent, scheme }
+                    Hue { accent, scheme }
                 }
             }
         }
@@ -290,8 +236,8 @@ fn Launcher(vars: String) -> Element {
 
 /// One built-in accent: its fill with ink, and its text on its wash.
 #[component]
-fn Hue(column: Column, accent: Accent, scheme: Scheme) -> Element {
-    let vars = Paint::of(column, accent, scheme).vars();
+fn Hue(accent: Accent, scheme: Scheme) -> Element {
+    let vars = Paint::of(accent, scheme).vars();
     rsx! {
         div { class: "g-acc-hue", style: "{vars}",
             div { class: "g-acc-disc", "14" }

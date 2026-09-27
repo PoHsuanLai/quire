@@ -5,7 +5,7 @@ use super::{Caption, Scope, Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
     Accent, ColourToken, HueMember, LabelHue, Material, Radius, Scheme, Shadow, Surface, ZLayer,
-    quad,
+    accent_of,
 };
 
 /// design/01-LAYOUT.md section 2's common steps. The design names these values and quire has no
@@ -40,7 +40,7 @@ pub fn TokensPage() -> Element {
             note: "The four properties of each accent, light then dark. The card's own accent follows the toolbar.",
             div { class: "g-grid6",
                 for accent in Accent::ALL {
-                    AccentQuad { accent }
+                    AccentRoles { accent }
                 }
             }
         }
@@ -95,9 +95,9 @@ pub fn TokensPage() -> Element {
     }
 }
 
-/// One accent's four properties, in both schemes.
+/// One accent's six properties, in both schemes.
 #[component]
-fn AccentQuad(accent: Accent) -> Element {
+fn AccentRoles(accent: Accent) -> Element {
     rsx! {
         div { class: "g-col",
             span { class: "g-name", "{accent.label()}" }
@@ -105,7 +105,7 @@ fn AccentQuad(accent: Accent) -> Element {
                 Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),
                     div { class: "g-cell",
                         div { class: "g-row",
-                            for (name , hex) in quad_parts(accent, scheme) {
+                            for (name , hex) in role_parts(accent, scheme) {
                                 div {
                                     class: "g-chip-swatch",
                                     title: "{name} {hex}",
@@ -113,7 +113,7 @@ fn AccentQuad(accent: Accent) -> Element {
                                 }
                             }
                         }
-                        span { class: "g-code", "{quad(accent, scheme).accent.css()}" }
+                        span { class: "g-code", "{accent_of(accent, scheme).fill.css()}" }
                     }
                 }
             }
@@ -121,13 +121,14 @@ fn AccentQuad(accent: Accent) -> Element {
     }
 }
 
-/// The accent quad as `(name, hex)`.
-fn quad_parts(accent: Accent, scheme: Scheme) -> [(&'static str, String); 4] {
-    let quad = quad(accent, scheme);
+/// The accent's roles as `(name, value)`.
+fn role_parts(accent: Accent, scheme: Scheme) -> [(&'static str, String); 5] {
+    let roles = accent_of(accent, scheme);
     [
-        ("--accent", quad.accent.css()),
-        ("--accent-soft", quad.soft.css()),
-        ("--accent-ink", quad.ink.css()),
-        ("--seal", quad.seal.css()),
+        ("--accent", roles.fill.css()),
+        ("--accent-soft", roles.wash_colour().css()),
+        ("--accent-text", roles.text.css()),
+        ("--accent-ring", roles.ring_colour().css()),
+        ("--accent-ink", roles.ink.css()),
     ]
 }

@@ -6,7 +6,7 @@
 use ds::tokens::{DelayToken, HueMember};
 use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
-    ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, quad, stylesheet,
+    ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of, stylesheet,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -109,8 +109,16 @@ fn every_dark_and_level_name_has_a_light_value() {
 }
 
 #[test]
-fn each_accent_block_sets_exactly_the_four() {
-    let four: BTreeSet<&str> = ["--accent", "--accent-ink", "--accent-soft", "--seal"].into();
+fn each_accent_block_sets_exactly_the_six() {
+    let six: BTreeSet<&str> = [
+        "--accent",
+        "--accent-ink",
+        "--accent-soft",
+        "--accent-text",
+        "--accent-ring",
+        "--seal",
+    ]
+    .into();
     let blocks: Vec<_> = rules(stylesheet())
         .into_iter()
         .filter(|(sel, _)| sel.contains("data-accent="))
@@ -118,13 +126,13 @@ fn each_accent_block_sets_exactly_the_four() {
     assert_eq!(blocks.len(), Accent::ALL.len() * Scheme::ALL.len());
     for (selector, decls) in blocks {
         let names: BTreeSet<&str> = decls.iter().map(|(name, _)| name.as_str()).collect();
-        assert_eq!(names, four, "{selector}");
-        assert_eq!(decls.len(), 4, "{selector} repeats a property");
+        assert_eq!(names, six, "{selector}");
+        assert_eq!(decls.len(), 6, "{selector} repeats a property");
     }
 }
 
 #[test]
-fn each_accent_block_is_the_quad() {
+fn each_accent_block_is_the_bands_roles() {
     for scheme in Scheme::ALL {
         let theme = match scheme {
             Scheme::Light => "",
@@ -133,14 +141,16 @@ fn each_accent_block_is_the_quad() {
         for accent in Accent::ALL {
             let selector = format!(".ds{theme}[*|data-accent={}]", accent.slug());
             let decls = block(&selector);
-            let want = quad(accent, scheme);
-            for (name, hex) in [
-                ("--accent", want.accent),
-                ("--accent-ink", want.ink),
-                ("--accent-soft", want.soft),
-                ("--seal", want.seal),
+            let want = accent_of(accent, scheme);
+            for (name, value) in [
+                ("--accent", want.fill.css()),
+                ("--accent-ink", want.ink.css()),
+                ("--accent-soft", want.wash_colour().css()),
+                ("--accent-text", want.text.css()),
+                ("--accent-ring", want.ring_colour().css()),
+                ("--seal", want.fill.css()),
             ] {
-                assert_eq!(decls.get(name), Some(&hex.css()), "{selector} {name}");
+                assert_eq!(decls.get(name), Some(&value), "{selector} {name}");
             }
         }
     }

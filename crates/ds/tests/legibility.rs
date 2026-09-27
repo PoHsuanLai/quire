@@ -2,10 +2,12 @@
 //! preset frame; and the materials' text over the two worst backdrops, black and white
 //! (design/21-SPACES.md section 7, the plan's `material-legible-over-black-and-white`).
 
+use ds::Hex;
 use ds::tokens::Alpha;
+use ds::tokens::accent_band::over as wash_over;
 use ds::{
     Accent, CardAccent, ColourToken, Dot, FrameVars, Grain, Material, PRESETS, Scheme, SpaceLook,
-    Theme, derive, quad, ratio, recipe,
+    Theme, accent_of, derive, ratio, recipe,
 };
 
 /// The alpha the settings key ships with (`appearance.material_tint_alpha = 80`).
@@ -26,16 +28,18 @@ fn every_accent_is_legible_in_both_schemes() {
         let surface = colour(ColourToken::Surface, scheme);
         let ink = colour(ColourToken::Ink, scheme);
         for accent in Accent::ALL {
-            let quad = quad(accent, scheme);
+            let roles = accent_of(accent, scheme);
+            let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
+            let wash = wash_over(roles.fill, roles.wash, ground).css();
             let pairs = [
                 (
-                    "accent on the card",
-                    quad.accent.css(),
+                    "accent text on the card",
+                    roles.text.css(),
                     surface.clone(),
-                    3.0,
+                    4.5,
                 ),
-                ("ink on the accent tint", ink.clone(), quad.soft.css(), 4.5),
-                ("text on the accent", quad.ink.css(), quad.accent.css(), 4.5),
+                ("ink on the accent wash", ink.clone(), wash, 4.5),
+                ("text on the accent", roles.ink.css(), roles.fill.css(), 4.5),
             ];
             for (label, fore, back, floor) in pairs {
                 let got = measured(&fore, &back);
@@ -86,13 +90,13 @@ fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
     let stops = derive(&look.dots, scheme).stops;
     let surface = colour(ColourToken::Surface, scheme);
     let ink = colour(ColourToken::Ink, scheme);
-    let (accent, soft) = match &vars.accent {
-        Some([accent, soft, _]) => (accent.clone(), soft.clone()),
-        None => (
-            colour(ColourToken::Accent, scheme),
-            colour(ColourToken::AccentSoft, scheme),
-        ),
-    };
+    let roles = vars
+        .accent
+        .unwrap_or_else(|| accent_of(Accent::Postmark, scheme));
+    let accent = roles.text.css();
+    // The wash is translucent: laid over the card before the card's ink is measured on it.
+    let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
+    let soft = wash_over(roles.fill, roles.wash, ground).css();
     let worst = |fore: &str| {
         stops
             .iter()
@@ -113,14 +117,14 @@ fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
             3.0,
         ),
         (
-            "accent on the card",
+            "accent text on the card",
             accent.clone(),
             surface.clone(),
             measured(&accent, &surface),
-            3.0,
+            4.5,
         ),
         (
-            "ink on the accent tint",
+            "ink on the accent wash",
             ink.clone(),
             soft.clone(),
             measured(&ink, &soft),

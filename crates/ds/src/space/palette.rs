@@ -10,6 +10,7 @@
 
 use super::contrast::ratio;
 use crate::appearance::Scheme;
+use crate::tokens::accent_band::{AccentPick, AccentRoles, BAND, Hue, Weight, accent_roles};
 use serde::{Deserialize, Serialize};
 
 mod card;
@@ -72,12 +73,19 @@ pub struct Palette {
     pub hover: String,
     /// A selected pill. Dark is `rgba(255,255,255,.10)`; light is white at .72.
     pub pill: String,
-    /// The accent inside the card, the Space's hue at Postmark's weight.
+    /// The accent inside the card: the settled band's fill at the Space's hue, the first dot's
+    /// chroma as its weight (design/03-COLOR.md section 20).
     pub accent: String,
-    /// The accent's tint, behind a selected row.
+    /// The accent's translucent wash, behind a selected row: `rgba(...)`, never a hex.
     pub accent_soft: String,
     /// Text drawn on top of [`Self::accent`].
     pub accent_ink: String,
+    /// The accent as text or a thin mark on the card.
+    pub accent_text: String,
+    /// The focus ring: [`Self::accent_text`] at an alpha, `rgba(...)`.
+    pub accent_ring: String,
+    /// The same accent as typed roles, for a caller that measures or composites.
+    pub accent_roles: AccentRoles,
     /// Whether a stop's chroma was lowered so the text on it stays legible.
     pub capped: Capping,
 }
@@ -98,8 +106,8 @@ struct Frame {
 /// A light frame therefore sits at L 0.936 with chroma 0.052, and a dark one
 /// at L 0.215 with chroma 0.042. Fitting a colour into sRGB steps chroma down
 /// by [`GAMUT_STEP`] (0.002). The contrast cap steps it by [`CAP_STEP`] (0.003).
-/// The accent's lightness moves by [`ACCENT_STEP`] (0.01). Those three steps
-/// are the approved mockup's.
+/// Those two steps are the approved mockup's; the accent's own steps are the band's
+/// (`tokens::accent_band::floors`).
 const FRAME_LIGHT: Frame = Frame {
     lightness: 0.936,
     step: -0.012,
@@ -125,8 +133,6 @@ const PICK_C: f64 = 0.15;
 const GAMUT_STEP: f64 = 0.002;
 /// How far the contrast cap drops chroma when text would fail. See [`FRAME_LIGHT`].
 const CAP_STEP: f64 = 0.003;
-/// How far the accent's lightness moves toward passing on the card. See [`FRAME_LIGHT`].
-const ACCENT_STEP: f64 = 0.01;
 
 const HOVER_DARK: &str = "rgba(255,255,255,.06)";
 const PILL_DARK: &str = "rgba(255,255,255,.10)";
@@ -197,24 +203,7 @@ pub fn derive(dots: &[Dot], scheme: Scheme) -> Palette {
         PILL_LIGHT.to_owned()
     };
 
-    let surface = card(scheme).surface;
-    let mut accent_l = if dark { 0.77 } else { 0.45 };
-    let accent_c = 0.045 + 0.035 * k;
-    let mut accent = hex(accent_l, accent_c, hue0);
-    while below(&accent, surface, 4.5) && accent_l > 0.2 && accent_l < 0.95 {
-        accent_l += if dark { ACCENT_STEP } else { -ACCENT_STEP };
-        accent = hex(accent_l, accent_c, hue0);
-    }
-    let accent_soft = if dark {
-        hex(0.29, 0.03, hue0)
-    } else {
-        hex(0.935, 0.018, hue0)
-    };
-    let accent_ink = if dark {
-        hex(0.2, 0.02, hue0)
-    } else {
-        "#FFFFFF".to_owned()
-    };
+    let accent_roles = space_accent(hue0, k, scheme);
     let picked = dots
         .iter()
         .map(|dot| hex(PICK_L, f64::from(dot.chroma) * PICK_C, f64::from(dot.hue)))
@@ -228,15 +217,32 @@ pub fn derive(dots: &[Dot], scheme: Scheme) -> Palette {
         faint,
         hover,
         pill,
-        accent,
-        accent_soft,
-        accent_ink,
+        accent: accent_roles.fill.css(),
+        accent_soft: accent_roles.wash_colour().css(),
+        accent_ink: accent_roles.ink.css(),
+        accent_text: accent_roles.text.css(),
+        accent_ring: accent_roles.ring_colour().css(),
+        accent_roles,
         capped: if capped {
             Capping::Capped
         } else {
             Capping::Uncapped
         },
     }
+}
+
+/// The card accent a Space lends: the settled band at its first dot's hue, weighted by that
+/// dot's chroma, so a grey Space lends a grey-blue (design/03-COLOR.md section 20). The one
+/// derivation every accent shares; it replaced mailo's `oklch(aL, .045 + .035k, h0)`.
+fn space_accent(hue: f64, chroma: f64, scheme: Scheme) -> AccentRoles {
+    // A dot's hue is 0..360 and its chroma 0..1; both land in range after the clamp.
+    let degrees = hue.rem_euclid(360.0).round() as u16 % 360;
+    let weight = (chroma.clamp(0.0, 1.0) * 1000.0).round() as u16;
+    let pick = AccentPick {
+        hue: Hue(degrees),
+        weight: Weight(weight),
+    };
+    accent_roles(&BAND, pick, scheme)
 }
 
 /// The colour one point of the editor's hue × chroma field is drawn in.

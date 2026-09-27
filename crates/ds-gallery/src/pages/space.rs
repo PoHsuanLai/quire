@@ -72,7 +72,7 @@ pub fn SpacePage() -> Element {
                 Caption { name: "--f-grain", code: frame.grain_opacity.clone() }
                 Caption {
                     name: "card accent",
-                    code: frame.accent.as_ref().map_or("Postmark (the card keeps its own)".to_string(), |[accent, soft, ink]| format!("{accent} / {soft} / {ink}")),
+                    code: frame.accent.as_ref().map_or("Postmark (the card keeps its own)".to_string(), |roles| format!("{} / {} / {} / {}", roles.fill.css(), roles.wash_colour().css(), roles.text.css(), roles.ink.css())),
                 }
             }
             Caption { name: "--f-grad", code: frame.gradient.clone() }

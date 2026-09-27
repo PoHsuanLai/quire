@@ -46,8 +46,8 @@ fn Composer() -> Element {
         FileDrag::Dropped { paths, .. } => format!("Attached {} file(s)", paths.len()),
     };
     let border = match drop.drop_attr() {
-        Some("target") => "2px solid var(--accent)",
-        Some(_) => "2px dashed var(--accent)",
+        Some("target") => "2px solid var(--accent-text)",
+        Some(_) => "2px dashed var(--accent-text)",
         None => "2px dashed var(--line)",
     };
     rsx! {
