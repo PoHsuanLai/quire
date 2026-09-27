@@ -30,20 +30,12 @@
      "caption": "Light: today's Postmark, then A, B, C."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-candidates-dark.png",
-     "caption": "Dark: the same four columns."
-    },
-    {
      "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-before-5wk-light-4x.png",
      "caption": "Calendar before (4x): packed at the top."
     },
     {
      "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-after-5wk-light-4x.png",
      "caption": "Calendar after (4x): fills the tile."
-    },
-    {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-after-6wk-dark-4x.png",
-     "caption": "A six-week month, dark."
     }
    ]
   },
