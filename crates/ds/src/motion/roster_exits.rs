@@ -39,7 +39,7 @@ impl<K: Clone + PartialEq + 'static> Pitches<K> {
     }
 
     /// `key`'s pitch, if it measured one.
-    fn of(&self, key: &K) -> Option<RowPitch> {
+    pub(crate) fn of(&self, key: &K) -> Option<RowPitch> {
         self.0.try_peek().ok().and_then(|book| {
             book.iter()
                 .find(|(held, _)| held == key)
@@ -48,7 +48,7 @@ impl<K: Clone + PartialEq + 'static> Pitches<K> {
     }
 
     /// Forget `key`: its row has gone.
-    fn forget(&self, key: &K) {
+    pub(crate) fn forget(&self, key: &K) {
         let mut book = self.0;
         let _ = book
             .try_write()

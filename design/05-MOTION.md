@@ -890,6 +890,7 @@ proposed here; the rest are the plan's.
 | Undo toast hides | `setTimeout(hide, 5200)`, reset on every new undo | ToastHold 5200 ms | S:1552, C:1920 |
 | Row exit completes | `animationend` or fallback `setTimeout(finish, 900)` | `settle()` of Fold, FoldHeavy, Curl or Crumple | S:1545, C:1892-1893 |
 | Heal ripple class removed | `setTimeout(…, 600)` (S), 700 (C, and C has no heal CSS) | `settle(Heal, k)` per row | S:1544, C:1859 |
+| A batch of rows leaves (a Clear in the notification center) | none (S and C remove one row at a time) | the batch's longest `settle(exit, i)`, `i` its place in the batch capped at 12; then the rows drop together and the rows below heal by the dropped rows' summed measured heights (design/04 section 54, sill Q510) | quire |
 | Gulp class removed | `setTimeout(…, 460)` | `settle(Gulp)` = 454 ms | S:1520, C:1851 |
 | Today entry removed after close | `animationend` or `setTimeout(done, 400)` | `settle(TabOut)` = 284 ms | S:1485 |
 | List re-render after read toggle | `setTimeout(renderList, 260)` | *ReadReflow* 260 ms (the dot's transition is 170 ms) | S:1533 |

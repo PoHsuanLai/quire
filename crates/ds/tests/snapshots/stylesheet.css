@@ -1685,6 +1685,52 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-link-pill-dim[*|data-part=path]{ flex:0 1 auto; min-width:0; overflow:hidden; }
 .ds-link-pill[*|data-truth=lying]{ background:var(--danger); color:var(--danger-ink); }
 .ds-link-pill[*|data-truth=lying] b{ color:var(--danger-ink); }
+/* -- leaving_list -- */
+/* LeavingList (sill Q510; design/04-COMPONENTS.md section 54): the consumer's rows in a column,
+   each in a `div.ds-leaving-row` that carries the roster's motion state, as ListRow does
+   (`data-presence=entering|present|leaving|healing`, `data-exit`). The row is a flow root, so
+   its content's margins stay inside it and its measured height is the whole distance the rows
+   below heal. Rows listed on a first show rise, staggered by `--i` (`S:294`); a row arriving
+   into a list at rest plays `row-in` (`C:373`). A leaving row plays its exit forwards, delayed
+   by its place in its batch (`--i` x `--stagger`), and takes no pointer. The rows below a
+   settled batch heal from `--dy` (the dropped rows' summed height) with the heal ripple
+   (`--d` x `--d-heal`). At rest a row plays `hold`, which moves nothing (sill G295). The Today
+   entry's `tab-out` collapses its own height and is not played here. Under Reduced motion
+   (design/05 section 14.4) an entrance is `fade`, an exit `menu-out`, and a heal `hold`: the
+   rows below take their places without sliding. Attribute selectors carry `*|` (spike S2). */
+
+.ds-leaving-list{ display:flex; flex-direction:column; }
+.ds-leaving-row{ --i:0; --d:0; display:flow-root; animation:none; }
+
+.ds-leaving-list[*|data-presence=entering] .ds-leaving-row[*|data-presence=entering]{
+  animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+.ds-leaving-list[*|data-presence=present] .ds-leaving-row[*|data-presence=entering]{
+  animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+.ds-leaving-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+
+.ds-leaving-row[*|data-presence=leaving]{ pointer-events:none; }
+.ds-leaving-row[*|data-presence=leaving][*|data-exit=fold]{
+  animation:fold var(--t-big) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+.ds-leaving-row[*|data-presence=leaving][*|data-exit=curl]{
+  animation:curl var(--t-curl) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+.ds-leaving-row[*|data-presence=leaving][*|data-exit=crumple]{
+  animation:crumple var(--t-big) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+.ds-leaving-row[*|data-presence=leaving][*|data-exit=banner-out]{
+  animation:banner-out var(--t-move) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
+}
+
+.ds-leaving-row[*|data-presence=healing]{
+  animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal));
+}
+
+.ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=entering]{ animation-name:fade; }
+.ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=leaving]{ animation-name:menu-out; }
+.ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=healing]{ animation-name:hold; }
 /* -- list_row -- */
 /* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`, `S:326-333`, C's
    crumple (`C:714`) and arrival (`C:373`). Attribute selectors carry `*|` (spike S2).

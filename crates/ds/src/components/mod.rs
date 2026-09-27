@@ -48,6 +48,8 @@ pub mod icon_view;
 pub mod idle_dim;
 pub mod image_source;
 pub mod kbd;
+pub mod leaving_list;
+pub(crate) mod leaving_row;
 pub mod level;
 pub(crate) mod light_mark;
 pub mod link_pill;
@@ -230,6 +232,7 @@ pub use icon_view::IconView;
 pub use idle_dim::IdleDim;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
+pub use leaving_list::{LeavingItem, LeavingList};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
@@ -365,6 +368,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("kbd", include_str!("kbd.css")),
     ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
+    ("leaving_list", include_str!("leaving_list.css")),
     ("list_row", include_str!("list_row.css")),
     ("lock_screen", include_str!("lock_screen.css")),
     ("lock_clock", include_str!("lock_clock.css")),
