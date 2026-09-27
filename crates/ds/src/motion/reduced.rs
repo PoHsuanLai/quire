@@ -72,6 +72,7 @@ impl Anim {
             | Anim::PanelIn
             | Anim::ShotIn
             | Anim::MorphIn
+            | Anim::MorphInSpring
             | Anim::RollIn => CrossFade(In),
             Anim::Fold
             | Anim::FoldHeavy

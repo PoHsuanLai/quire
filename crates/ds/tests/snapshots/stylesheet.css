@@ -765,6 +765,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-nudge-up[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=b]{animation-name:fade--b;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
    design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which
