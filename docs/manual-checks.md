@@ -9,19 +9,19 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
 - [ ] **mailo fcitx5 check**: mailo's native-only flip is committed on a branch and waits on it.
   Type Chewing (ㄋㄧˇㄏㄠˇ → 你好) into mailo's native build and confirm the preedit shows and
   commits; the mailo session has the exact steps.
-- [ ] **Widget picks** (progress page "Widgets matched to the reference"): percent weight, ring
+- [x] **Widget picks** (settled 2026-09-27: battery percent 500, track = plate darkened, one red; World Clock follows the scheme; filled device glyphs; cards tinted by the Space; the widget card becomes an interface) (progress page "Widgets matched to the reference"): percent weight, ring
   track, low-battery colour, dark World Clock card, filled device glyphs, Space tint default.
-- [ ] **Level-control look** (progress page, OSD): Capsule (recommended) / CapsuleKnob / Segments.
+- [x] **Level-control look** (settled 2026-09-27: Capsule) (progress page, OSD): Capsule (recommended) / CapsuleKnob / Segments.
 - [ ] **palmrest live steps**: section below.
-- [ ] **Spotlight settings** (launcher v2, design/22 §5 Spotlight page, all proposed): clipboard
+- [x] **Spotlight settings** (settled 2026-09-27: clipboard history on, web search on, default skin tone) (launcher v2, design/22 §5 Spotlight page, all proposed): clipboard
   history on (memory only, never password-manager copies) or off; web search as the last result
   on or off (engine DuckDuckGo by default); the default emoji skin tone.
 - [ ] **Launcher v2 real-input look** (progress page "Launcher v2"): Space / Cmd+Y / Right-at-end
   open the preview, arrow keys wrap in the emoji grid, holding Down through PDFs stays smooth.
-- [ ] **Lock decisions** (sill M11, done on nested): the lockout policy after failed passwords,
+- [x] **Lock decisions** (settled 2026-09-27: sill's own lock by default, 5 s grace after the screen sleeps, no lockout delay) (sill M11, done on nested): the lockout policy after failed passwords,
   `lock_grace` (how long after the screen sleeps the password is still not asked), and whether
   sill's own lock becomes the default over the borrowed locker.
-- [ ] **Widget follow-ups (optional)**: dim desktop widgets under a focused window (the reference
+- [x] **Widget follow-ups** (settled 2026-09-27: drag to move yes, dim under a window no): dim desktop widgets under a focused window (the reference
   does), drag-to-move desktop widgets.
 - [ ] **A real sill login** (`dist/sill-session`): the first run of the whole desktop on real
   hardware; sill's queue lists what to look at (M7 login, M11 lock screen and polkit agent).

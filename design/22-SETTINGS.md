@@ -240,11 +240,11 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `launcher.row_detail_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.files_backend` | `FilesBackend::{Auto,Tracker,Baloo,Fd,Off}` | `Auto` | auto asks a running Tracker 3, else a running Baloo, else fd/plocate under the home folder; it never starts an indexer. tracker or baloo asks that index and may start it; a named backend that is missing searches nothing | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
 | `launcher.files_budget_ms` | `Ms` | `150` | `20..=2000`; after it, what was found shows | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
-| `launcher.clipboard_history` | `ClipboardHistory::{Memory,Off}` | `Memory` | memory only, forgotten when sill stops; password-manager copies never kept; Off watches nothing | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.clipboard_history` | `ClipboardHistory::{Memory,Off}` | `Memory` | memory only, forgotten when sill stops; password-manager copies never kept; Off watches nothing | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | settled (user, 2026-09-27) |
 | `launcher.clipboard_cap` | `Count` | `50` | `1..=500`; the oldest goes first | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
 | `launcher.clipboard_image_max_mb` | `Count` | `8` | `0..=64`; larger images are not kept, 0 keeps none | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | proposed (2026-09-26) |
-| `launcher.emoji_skin_tone` | `EmojiSkinTone::{Default,Light,MediumLight,Medium,MediumDark,Dark}` | `Default` | Unicode's five modifiers or the yellow default | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
-| `launcher.web_search` | `WebSearch::{On,Off}` | `On` | "Search the web for …" as the last result | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
+| `launcher.emoji_skin_tone` | `EmojiSkinTone::{Default,Light,MediumLight,Medium,MediumDark,Dark}` | `Default` | Unicode's five modifiers or the yellow default | `20-SURFACES.md` §1.3; sill M9 (Q301) | settled (user, 2026-09-27) |
+| `launcher.web_search` | `WebSearch::{On,Off}` | `On` | "Search the web for …" as the last result | `20-SURFACES.md` §1.3; sill M9 (Q301) | settled (user, 2026-09-27) |
 | `launcher.web_engine_url` | `String` | `https://duckduckgo.com/?q={query}` | an http(s) address with `{query}`; anything else offers nothing | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
 | `launcher.currency` | `CurrencyRates::{Off,Ecb}` | `Off` | Ecb fetches the ECB daily reference rates at most once a day | `20-SURFACES.md` §1.3; sill M9 (Q301) | proposed (2026-09-26) |
 
