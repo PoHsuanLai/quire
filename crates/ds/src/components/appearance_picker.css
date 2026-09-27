@@ -7,8 +7,8 @@
 .ds-appearance-row{ min-width:0; }
 .ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }
 
-/* Compact (sill FINDINGS Q101): for a narrow host, such as the control center's 296 px module.
-   The segmented row fills the row and never passes it: small segments with 4 px sides, still
+/* Compact (sill FINDINGS Q101): for a narrow host, such as the control center's 300 px module.
+   The segmented row fills the row and never passes it: Regular (22) segments with 4 px sides, still
    equal columns sharing the width (a grid, as every segmented control is: a flex row here once
    grew each segment from its own words, so the segments were unequal and the thumb, a
    segment's width, missed the selected one). */

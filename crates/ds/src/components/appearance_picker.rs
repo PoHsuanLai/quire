@@ -26,9 +26,9 @@ pub enum PickerLayout {
     /// Each segmented row as wide as its words at the regular size: a settings page or a sheet.
     #[default]
     Full,
-    /// The rows fill the width they are given and no more, at the small size, with narrow
-    /// sides on equal segments that share it: the control center's 296 px module (sill
-    /// FINDINGS Q101).
+    /// The rows fill the width they are given and no more, at the control center's Regular
+    /// size (22, design/29-SIZING.md), with narrow sides on equal segments that share it: the
+    /// control center's 300 px module (sill FINDINGS Q101).
     Compact,
 }
 
@@ -45,7 +45,7 @@ impl PickerLayout {
     fn seg_size(self) -> SegSize {
         match self {
             PickerLayout::Full => SegSize::Regular,
-            PickerLayout::Compact => SegSize::Small,
+            PickerLayout::Compact => SegSize::Regular,
         }
     }
 }
