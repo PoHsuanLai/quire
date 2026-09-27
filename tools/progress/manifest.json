@@ -4,6 +4,50 @@
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
   {
+   "id": "accent-band",
+   "date": "2026-09-27 · decision",
+   "title": "A lighter accent, kept in bounds: you picked B (Airy)",
+   "status": "done",
+   "lede": "Every accent now comes from one function that keeps it inside band B: light fills carrying dark ink, translucent washes for selections, menus and chips, a deeper blue for text and thin marks, and a focus ring drawn from it. The Space accents come from the same function, so mailo's frame and the shell match. Every hue is checked for legibility in both themes. Blue moved to a sky blue so it no longer duplicates Postmark. Landed in quire and sill on 2026-09-27; the candidate sheets stay below as the record.",
+   "notes": [
+    "A · System: the Mac-like bright blue, white text on it; washes at 16%.",
+    "B · Airy: the lightest; buttons and today's date get dark text because white can't be read on a fill that light. The fill itself stands out less from white, so it relies on shape too.",
+    "C · Calm: a softer blue than A with white text in light mode, dark text in dark mode.",
+    "Also asked: Postmark and Blue come out nearly the same inside one band, so one of the two accents in the picker should go.",
+    "Calendar: the compact month now fills its widget; rows spread over the height (taller rows in a five-week month), margins balanced."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-b-final-light.png",
+     "caption": "Band B, light: the final look."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-b-final-dark.png",
+     "caption": "Band B, dark."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-candidates-light.png",
+     "caption": "Light: today's Postmark, then A, B, C."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-candidates-dark.png",
+     "caption": "Dark: the same four columns."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-before-5wk-light-4x.png",
+     "caption": "Calendar before (4x): packed at the top."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-after-5wk-light-4x.png",
+     "caption": "Calendar after (4x): fills the tile."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-after-6wk-dark-4x.png",
+     "caption": "A six-week month, dark."
+    }
+   ]
+  },
+  {
    "id": "inter-font-pass",
    "date": "2026-09-27 · type",
    "title": "The whole shell now draws its text in Inter, the fonts quire ships",
