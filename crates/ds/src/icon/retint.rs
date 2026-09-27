@@ -11,9 +11,15 @@
 //!   by lightness (full at mid lightness, none at black or white) and by alpha (a translucent
 //!   shadow takes little colour), then pulled back into sRGB.
 //!
+//! In the dark scheme Muted and Monochrome then band the lightness ([`super::tone_band`], fix F3
+//! of design/29-SIZING.md): the art is lifted into .62-.96 and a plate into .46-.56, so a dark
+//! dock's icons are neither black nor lost on their plates. [`retint_in`] takes the scheme;
+//! [`retint`] is the light scheme's rule.
+//!
 //! The quire app icons ship a neutral grey Monochrome set for exactly this call; a third-party
 //! icon is re-coloured the same way, so a Monochrome dock is one hue.
 
+use super::tone_band::Tone;
 use crate::Scheme;
 use crate::space::{Dot, derive};
 
@@ -71,9 +77,16 @@ impl Tint {
     }
 }
 
-/// Re-colours `pixels` (RGBA8, straight alpha) in place for `style`. A trailing partial pixel
-/// is left alone.
+/// Re-colours `pixels` (RGBA8, straight alpha) in place for `style`, lightness kept (the light
+/// scheme's rule; [`retint_in`] for the dark one). A trailing partial pixel is left alone.
 pub fn retint(pixels: &mut [u8], style: IconStyle, tint: Tint) {
+    retint_in(pixels, style, tint, Scheme::Light);
+}
+
+/// Re-colours `pixels` (RGBA8, straight alpha) in place for `style` in `scheme`: in the dark,
+/// Muted and Monochrome lift the art's lightness into the tone band (`L' = .62 + .34 L`) so it
+/// stays above its plate. A trailing partial pixel is left alone.
+pub fn retint_in(pixels: &mut [u8], style: IconStyle, tint: Tint, scheme: Scheme) {
     if style == IconStyle::Colour {
         return;
     }
@@ -81,16 +94,30 @@ pub fn retint(pixels: &mut [u8], style: IconStyle, tint: Tint) {
         if px[3] == 0 {
             continue;
         }
-        let rgb = recolour([px[0], px[1], px[2]], px[3], style, tint);
+        let rgb = recolour(
+            [px[0], px[1], px[2]],
+            px[3],
+            style,
+            tint,
+            (scheme, Tone::Art),
+        );
         px[..3].copy_from_slice(&rgb);
     }
 }
 
-/// One colour of coverage `alpha` re-coloured for `style`: the rule [`retint`] applies to every
-/// pixel, and the one a tinted plate applies to its stops and its ink (`plate_tint.rs`), so a
-/// third-party icon and the plate under it are re-coloured by the same maths.
-pub(crate) fn recolour(rgb: [u8; 3], alpha: u8, style: IconStyle, tint: Tint) -> [u8; 3] {
+/// One colour of coverage `alpha` re-coloured for `style`, as part of `tone` in `scheme`: the
+/// rule [`retint_in`] applies to every pixel, and the one a tinted plate applies to its stops
+/// (`Tone::Plate`) and its ink (`Tone::Art`) (`plate_tint.rs`), so a third-party icon and the
+/// plate under it are re-coloured by the same maths.
+pub(crate) fn recolour(
+    rgb: [u8; 3],
+    alpha: u8,
+    style: IconStyle,
+    tint: Tint,
+    (scheme, tone): (Scheme, Tone),
+) -> [u8; 3] {
     let [l, a, b] = oklab(rgb);
+    let l = tone.lightness(l, scheme);
     let (chroma, hue) = match style {
         IconStyle::Colour => return rgb,
         IconStyle::Muted => (a.hypot(b) * f64::from(MUTED_SCALE), b.atan2(a)),
@@ -137,7 +164,7 @@ fn encode(c: f64) -> u8 {
 }
 
 /// OKLab (Björn Ottosson, 2020) of sRGB bytes: `[L, a, b]`.
-fn oklab([r, g, b]: [u8; 3]) -> [f64; 3] {
+pub(crate) fn oklab([r, g, b]: [u8; 3]) -> [f64; 3] {
     let [r, g, b] = [r, g, b].map(linear);
     let l = (0.412_221_470_8 * r + 0.536_332_536_3 * g + 0.051_445_992_9 * b).cbrt();
     let m = (0.211_903_498_2 * r + 0.680_699_545_1 * g + 0.107_396_956_6 * b).cbrt();
