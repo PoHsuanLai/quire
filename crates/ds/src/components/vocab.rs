@@ -109,6 +109,33 @@ pub enum Check {
 #[serde(transparent)]
 pub struct Fraction(pub u16);
 
+/// A percentage, 0 to 100, clamped on construction: `IdleDim`'s `level`
+/// (design/22-SETTINGS.md section 3.24 `idle.dim_level_pct`). `ds` may not depend on
+/// `ds-settings` (`scripts/check-boundary.sh`), so the two `Percent` types agree by shape, not
+/// by sharing a definition; a caller already holding `ds_settings::Percent` passes its `.0`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(from = "u8", into = "u8")]
+pub struct Percent(pub u8);
+
+impl Percent {
+    /// `value`, clamped to 100.
+    pub fn new(value: u8) -> Self {
+        Percent(value.min(100))
+    }
+}
+
+impl From<u8> for Percent {
+    fn from(value: u8) -> Self {
+        Percent::new(value)
+    }
+}
+
+impl From<Percent> for u8 {
+    fn from(value: Percent) -> Self {
+        value.0
+    }
+}
+
 /// A row's place in a staggered entrance, saturating at [`StaggerIndex::CAP`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub struct StaggerIndex(u8);
@@ -441,5 +468,19 @@ impl Fraction {
         let permille = self.clamped().0;
         let text = format!("{}.{:03}", permille / 1000, permille % 1000);
         text.trim_end_matches('0').trim_end_matches('.').to_string()
+    }
+}
+
+#[cfg(test)]
+mod percent_tests {
+    use super::Percent;
+
+    #[test]
+    fn a_percent_is_clamped_on_construction() {
+        const CASES: &[(u8, u8)] = &[(0, 0), (80, 80), (100, 100), (101, 100), (255, 100)];
+        for &(given, want) in CASES {
+            assert_eq!(Percent::new(given), Percent(want), "{given}");
+            assert_eq!(Percent::from(given), Percent(want), "from {given}");
+        }
     }
 }
