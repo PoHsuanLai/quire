@@ -1952,7 +1952,7 @@ signature; every new item is in `ds::motion` (and `ds::detail` for the contact).
 
 - `Toggle`: the knob is `--knob-x` from a spring; a second click mid-slide turns it back.
 - `SegmentedControl`: the segments are now equal width, as the Mac's, and the pressed fill is one
-  thumb (`.ds-segment-thumb`) that slides; the pressed segment's text is `--paper` over it. The
+  thumb (the control's `::before`, no new element) that slides; the pressed segment's text is `--paper` over it. The
   control is as wide as its widest segment times the count, so a row that fitted a narrow
   segmented control may need to be checked.
 - `Slider`: the thumb is drawn from a spring (still 1:1 under a drag); a release faster than
