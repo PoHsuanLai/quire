@@ -2284,6 +2284,18 @@ surfaces: **a registry, one trait, a picker, placements as data**.
 | A new Edit Widgets surface (a sheet from the desktop's context menu or the center's Edit button) | `ds::WidgetGallery { layout, onedit }`: apply each edit with `ds::widget::apply` against the output's `DesktopGrid` and write the layout to settings |
 | Goldens | Desktop widget markup gains `data-tint="space"`, `div.ds-frame`, `data-widget`; framed months gain `data-fit` (Medium turns compact and gains the today column; Large gains the events list) |
 
+### Edit Widgets, one size (2026-09-28): the gallery, the bottom sheet, "Added", card exits
+
+design/23-WIDGETS.md sections 4.1, 9.7 and 9.10; design/28 section 4.1; sill Q520-Q523, G423. The
+user's verdict on Edit Widgets: one size per widget, show that the thing was added. Everything is
+additive: no call site breaks; the markup of a Batteries row and of the gallery changed.
+
+**What sill changes** (read against sill `70db27b`):
+
+| Where in sill | Change |
+| --- | --- |
+| Goldens with a Medium Batteries card (Q522) | The row is four `div.ds-batteries-cell` places on an 80 pitch whatever the count: a place with no battery is `div.ds-batteries-cell[data-place=empty]` holding a bare track and an empty `span.ds-batteries-figure`. Re-bless; nothing to change in code |
+
 ### Widget vibrancy (2026-09-26)
 
 design/23-WIDGETS.md sections 1.1 (M26-M34) and 4.3. Values only: no class, attribute or prop

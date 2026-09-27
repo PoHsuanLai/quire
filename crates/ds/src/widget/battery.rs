@@ -182,6 +182,9 @@ fn grid(cells: &[BatteryCell], wake: WakeStamp) -> Element {
     }
 }
 
+/// The Medium row: four places at the reference's fixed 80 pitch (M15), the batteries in the
+/// first and a bare track, with no number, in each place left over, so one battery sits at the
+/// left of the row rather than alone in the middle, and two never spread to the card's ends.
 fn row(cells: &[BatteryCell], wake: WakeStamp) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": BatteryLayout::Row.slug(),
@@ -191,6 +194,20 @@ fn row(cells: &[BatteryCell], wake: WakeStamp) -> Element {
                     span { class: "ds-batteries-figure", BatteryFigure { level: cell.level, wake } }
                 }
             }
+            for place in cells.len()..MAX_RINGS {
+                {empty_cell(place)}
+            }
+        }
+    }
+}
+
+/// A row's place with no battery: the bare track over an empty figure line, so it keeps the
+/// pitch and the height of a place with one.
+fn empty_cell(place: usize) -> Element {
+    rsx! {
+        div { key: "empty-{place}", class: "ds-batteries-cell", "data-place": "empty",
+            {empty(place)}
+            span { class: "ds-batteries-figure" }
         }
     }
 }
@@ -200,7 +217,12 @@ fn waiting(layout: BatteryLayout) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": layout.slug(), "data-waiting": "",
             for place in 0..MAX_RINGS {
-                {empty(place)}
+                {
+                    match layout {
+                        BatteryLayout::Row => empty_cell(place),
+                        BatteryLayout::Solo | BatteryLayout::Grid => empty(place),
+                    }
+                }
             }
         }
     }
