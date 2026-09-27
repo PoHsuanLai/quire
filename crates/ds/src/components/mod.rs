@@ -22,6 +22,7 @@ pub mod clock_kind;
 pub mod command_palette;
 pub mod command_pill;
 pub mod count;
+pub mod device_battery;
 pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
@@ -72,6 +73,7 @@ pub(crate) mod menu_rows;
 mod menu_shape;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
+pub(crate) mod module_disc;
 pub mod module_grid;
 pub mod module_panel;
 pub mod module_tile;
@@ -86,6 +88,8 @@ pub(crate) mod notification_body;
 pub mod notification_card;
 pub mod notification_parts;
 pub mod notification_swipe;
+pub mod now_playing;
+pub mod now_playing_kind;
 pub mod osd;
 pub(crate) mod osd_phase;
 pub(crate) mod palette_body;
@@ -106,6 +110,7 @@ pub mod pass_through;
 pub mod pdf_thumb;
 mod pdf_thumb_grace;
 pub mod peek;
+pub mod play_pause;
 pub mod polkit_prompt;
 pub mod popover;
 pub mod press;
@@ -116,6 +121,7 @@ pub mod provider_mark;
 pub(crate) mod resize_edges;
 pub mod rich_text;
 pub mod row_action;
+pub(crate) mod row_battery;
 pub(crate) mod row_click;
 pub mod row_hooks;
 pub mod row_shape;
@@ -130,6 +136,7 @@ pub mod selection_bubble;
 pub mod send_mood;
 pub mod send_pill;
 pub mod settings_row;
+pub mod settings_row_phase;
 pub mod settings_row_trailing;
 pub mod sheet;
 pub mod sheet_placement;
@@ -159,6 +166,7 @@ pub mod toast;
 pub mod toggle;
 pub mod tooltip;
 pub(crate) mod track;
+pub mod track_position;
 pub mod traffic_lights;
 pub mod tree_item;
 pub(crate) mod tree_item_parts;
@@ -196,6 +204,7 @@ pub use command_palette::{
 };
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
+pub use device_battery::DeviceBattery;
 pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
@@ -231,7 +240,7 @@ pub use menu_pick::PickDismiss;
 pub use module_grid::{GridColumns, GridMetrics, ModuleGrid};
 pub use module_panel::{ModulePanel, PanelPlate};
 pub use module_tile::ModuleTile;
-pub use module_tile_kind::{Chevron, ModuleState, TileSpan};
+pub use module_tile_kind::{Chevron, DiscMotion, ModuleState, TileSpan};
 pub use month_grid::MonthGrid;
 pub use month_grid_data::{
     DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
@@ -241,6 +250,8 @@ pub use month_grid_density::MonthDensity;
 pub use notification_card::NotificationCard;
 pub use notification_parts::{AppMark, CardAction, GroupCount, Hover, Layers};
 pub use notification_swipe::Swipe;
+pub use now_playing::NowPlayingTrack;
+pub use now_playing_kind::Playback;
 pub use osd::{Level, Osd, OsdPosition};
 pub use palette_claim::{Claim, FieldKey};
 pub use palette_group::{GroupEntries, PaletteGroup, PaletteGroups};
@@ -252,6 +263,7 @@ pub use pdf_thumb::{
     PDF_DEFAULT_SHEET, PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble, sheet_rect,
 };
 pub use peek::Peek;
+pub use play_pause::PlayPauseButton;
 pub use polkit_prompt::PolkitPrompt;
 pub use popover::{Dismiss, Elevation, Popover};
 pub use press::{PointerButton, Press, Propagation};
@@ -272,6 +284,7 @@ pub use selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubb
 pub use send_mood::SendMood;
 pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use settings_row::SettingsRow;
+pub use settings_row_phase::{RowDisc, RowPhase, RowWork};
 pub use settings_row_trailing::RowTrailing;
 pub use sheet::{Sheet, SheetPlacement, SheetWidth};
 pub use shot_ghost::ShotGhost;
@@ -298,6 +311,7 @@ pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
 pub use tooltip::{Shown, Tooltip, TooltipKind};
+pub use track_position::TrackPosition;
 pub use traffic_lights::TilePose;
 pub use tree_item::{Disclosure, TreeItem, TreeShape};
 pub use user_picture::{
@@ -370,6 +384,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("selection_bubble", include_str!("selection_bubble.css")),
     ("send_pill", include_str!("send_pill.css")),
     ("settings_row", include_str!("settings_row.css")),
+    ("now_playing", include_str!("now_playing.css")),
     ("sheet", include_str!("sheet.css")),
     ("shot_thumbnail", include_str!("shot_thumbnail.css")),
     ("sidebar_item", include_str!("sidebar_item.css")),

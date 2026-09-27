@@ -6,8 +6,11 @@ CONSUMING.md "Details"), the tokens of 3.4, `Spinner` on `use_pending`, the harn
 `assert_settles_to_zero_frames`, the lint rules `InfiniteLoop` and `OffGrammarTiming`, and the
 gallery's Details page. D1's quire lane is built, 2026-09-27, branch `details-d1`: the layered
 status glyphs (`WifiGlyph`, `BatteryGlyph`, `BluetoothGlyph`, `VolumeGlyph`, `StatusGlyph`;
-design/04 section 51, CONSUMING.md "Status glyphs"); sill's bar wiring (D1's sill lane) and
-D2-D7 are not started. The catalogue (section 5) still describes the
+design/04 section 51, CONSUMING.md "Status glyphs"); sill's bar wiring (D1's sill lane) is
+not started. D2's quire lane is built, 2026-09-27, branch `details-d2`: the control center
+modules' details (the tile disc's fill and morph, `SettingsRow` phases, `PlayPauseButton`,
+`NowPlayingTrack`, `TrackPosition`, `DeviceBattery`, `LevelGlyph::KeyboardBrightness`; design/04
+section 52, CONSUMING.md "Control center details"); D2's sill lane and D3-D7 are not started. The catalogue (section 5) still describes the
 state before D0. Status legend as in `13-BEHAVIOUR-menus-windows.md`:
 **settled** = decided with the user or already built; **proposed** = chosen here, the user
 judges. Reference confidence: **H** the vendor's own guidelines or documentation, **M** a
@@ -827,7 +830,7 @@ land on the primitives rather than beside them: battery-fill is the first consum
 | D0 | D0b primitives: state | `Pending` (+ `--t-pending-step`, `PendingGrace`, `PendingCap`), `Settle`, `Shake`, `MorphGlyph`, `RollDigits`, `Nudge`; `Spinner` rebuilt on `Pending` (its two infinite loops gone; `ModuleState::Busy` and `PromptState::Checking` inherit the bound; `SyncHalo`'s idle breathe, mailo's, goes as design/05 §12 item 4 proposes, so tell the mailo session before it lands) | Q | G15, G45 (quire side). **Built 2026-09-27** (`details-d0b`), with one change: `SyncHalo` keeps its loops (it is mail's; mailo decides, design/05 §12 item 4), listed in `ds/tests/details_lint.rs` with the three other mail loops |
 | D1 | status glyphs | a layered `StatusGlyph` family: Wi-Fi (dot + 3 arcs, the "!" badge), battery (outline, fill layer, bolt, plug), Bluetooth (base, slash, connected dots), volume (on `LevelGlyph`), each with its `Detailed` state and moment table | Q | G1-G4, G8-G10, G12 (quire side), and the glyph side of G5-G7 (the failed-join shake, the Bluetooth glyph and its bounded breath). **Built 2026-09-27** (`details-d1`) |
 | D1 | bar wiring | sill's bar items on `StatusGlyph`: `Link::Connecting` → Joining with an op stamp from the network service, no-internet from connectivity, battery thresholds (`bar.battery_low_percent`), the Bluetooth bar item | S | G1-G12 |
-| D2 | control center modules | `ModuleTile` disc glyph on `MorphGlyph`/`Settle`; `SettingsRow` trailing `Pending`/`Settle{Check}`/`Shake`; Now Playing play/pause `MorphGlyph{OffUp}`, position bar, track cross-fade; Battery module rings on `Sweep`/`CountUp`; a keyboard-brightness module on `LevelControl` | Q+S | G14, G16-G18, G20, G21, G23, G25-G30 |
+| D2 | control center modules | `ModuleTile` disc glyph on `MorphGlyph`/`Settle`; `SettingsRow` trailing `Pending`/`Settle{Check}`/`Shake`; Now Playing play/pause `MorphGlyph{OffUp}`, position bar, track cross-fade; Battery module rings on `Sweep`/`CountUp`; a keyboard-brightness module on `LevelControl` | Q+S | G14, G16-G18, G20, G21, G23, G25-G30. **Quire lane built 2026-09-27** (`details-d2`): `ModuleTile { disc: DiscMotion }`, `SettingsRow { phase: RowPhase, work: RowWork, disc: RowDisc }` and `RowTrailing::Battery`, `PlayPauseButton`, `NowPlayingTrack`, `TrackPosition`, `DeviceBattery`, `LevelGlyph::KeyboardBrightness`, `Icon::MoonFilled`, `Anim::MorphInSpring`; the sill lane is CONSUMING.md "Control center details" |
 | D3 | OSD | default `LevelLook::Segments` for the OSD (user confirms), nothing else | Q+S (a settings default) | G31 |
 | D4 | dock | badge appear and clear, running dot out, progress ring on `Sweep` + `Settle`, remove poof, Downloads stack tile's one bounce | S (quire only if `ProgressRing` from D6 is not in yet) | G36-G40 |
 | D5 | notifications | group content cross-fade and chip bump, center group expand (`Reveal`) and collapse (`heal`), the X → Clear morph, action `Settle`/`Shake` | Q+S | G32-G35 |

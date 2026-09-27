@@ -1,10 +1,13 @@
 //! What a `SettingsRow` ends in (sill FINDINGS Q79): nothing, a check, a toggle, a chevron, a
-//! value, or a glyph. The toggle is fenced: its press and its keys stay inside it, so flipping
-//! a device's switch never also runs the row.
+//! value, a glyph, or a device's battery. The toggle is fenced: its press and its keys stay inside
+//! it, so flipping a device's switch never also runs the row. A check that arrives with a success
+//! draws on (`Settle{Check}`, design/26 G26).
 
+use crate::components::row_battery::RowBattery;
 use crate::components::text_runs::{Text, text};
 use crate::components::toggle::Toggle;
-use crate::components::vocab::{Availability, Switch};
+use crate::components::vocab::{Availability, Fraction, Switch};
+use crate::detail::{CheckMark, FirstShow, Settling};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -31,6 +34,9 @@ pub enum RowTrailing {
     Text(Text),
     /// A glyph in the faint ink: a lock on a secured network.
     Glyph(Icon),
+    /// A connected device's battery: its glyph and percentage, sweeping in from empty with the
+    /// count in step when it first shows (design/26 G21), then moving from where it is.
+    Battery(Fraction),
 }
 
 impl RowTrailing {
@@ -43,6 +49,7 @@ impl RowTrailing {
             RowTrailing::Chevron => Some("chevron"),
             RowTrailing::Text(_) => Some("text"),
             RowTrailing::Glyph(_) => Some("glyph"),
+            RowTrailing::Battery(_) => Some("battery"),
         }
     }
 
@@ -56,13 +63,24 @@ impl RowTrailing {
     }
 }
 
-/// The trailing mark drawn, `title` naming a toggle.
-pub(crate) fn trailing(mark: &RowTrailing, title: &Text, availability: Availability) -> Element {
+/// The trailing mark drawn, `title` naming a toggle; a check draws on while `settling` says; a
+/// battery sweeps in as `first` says.
+pub(crate) fn trailing(
+    mark: &RowTrailing,
+    title: &Text,
+    availability: Availability,
+    settling: Settling,
+    first: FirstShow,
+) -> Element {
     match mark.clone() {
         RowTrailing::None => rsx! {},
         RowTrailing::Check(Switch::On) => rsx! {
             span { class: "ds-settings-row-trail", "data-mark": "check",
-                Glyph { icon: Icon::Check, size: IconSize::Compact }
+                if let Settling::Drawing(_) = settling {
+                    CheckMark { settling, size: IconSize::Compact }
+                } else {
+                    Glyph { icon: Icon::Check, size: IconSize::Compact }
+                }
             }
         },
         RowTrailing::Check(Switch::Off) => rsx! {
@@ -80,6 +98,11 @@ pub(crate) fn trailing(mark: &RowTrailing, title: &Text, availability: Availabil
         RowTrailing::Glyph(icon) => rsx! {
             span { class: "ds-settings-row-trail",
                 Glyph { icon, size: IconSize::Compact }
+            }
+        },
+        RowTrailing::Battery(level) => rsx! {
+            span { class: "ds-settings-row-trail ds-settings-row-value", "data-mark": "battery",
+                RowBattery { level, first }
             }
         },
     }

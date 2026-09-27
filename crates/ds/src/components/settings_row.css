@@ -23,3 +23,24 @@
 .ds-settings-row-trail{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); }
 .ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-settings-row-value{ font-size:var(--fs-help); }
+
+/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8; wave D2). The glyph may sit
+   on a 26 px disc: paper with ink for an item not in use, `--accent` with `--accent-ink` and an
+   inset `--accent-text` hairline for the item in use (the tile disc's look), the colour
+   cross-fading over `--t-quick`. While a pending loop steps on the glyph (`data-pending=step`, set
+   from Rust) it breathes between 1 and .45 over `--t-pending-step`; held still at the cap it stays
+   at .45. A spinner in the trailing slot turns in a 14 px well. A success seals the glyph with
+   `gulp` once; a failure shakes the row once. Nothing here loops. */
+.ds-settings-row-glyph{ transition:opacity var(--t-quick) var(--e-out); }
+.ds-settings-row-glyph[*|data-disc]{
+  width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
+  transition:opacity var(--t-quick) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-settings-row-glyph[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
+.ds-settings-row-glyph[*|data-pending=step]{ transition:opacity var(--t-pending-step) var(--e-in-out); }
+.ds-settings-row-glyph[*|data-beat=low],
+.ds-settings-row-glyph[*|data-pending=still]{ opacity:.45; }
+.ds-settings-row-trail[*|data-mark=pending]{ width:14px; height:14px; justify-content:center; }
+.ds-settings-row-spin{ position:relative; display:block; width:6px; height:6px; }
+.ds-settings-row-trail[*|data-mark=battery]{ gap:var(--s-4); }
+.ds-settings-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }

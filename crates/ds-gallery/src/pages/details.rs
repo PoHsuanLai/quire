@@ -23,6 +23,7 @@ pub fn DetailsPage() -> Element {
         StateSection {}
         MorphSection {}
         super::details_status::StatusSection {}
+        super::details_center::CenterSection {}
     }
 }
 

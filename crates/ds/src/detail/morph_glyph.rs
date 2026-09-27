@@ -5,6 +5,7 @@ use super::glide::Glide;
 use super::level::use_level;
 use super::morph::{MorphStyle, Slashed};
 use super::motor::use_motor;
+use super::touch::Touch;
 use crate::appearance::MotionLevel;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -27,18 +28,25 @@ struct Shown {
     before: Option<Icon>,
     /// Which change this is: its layers' keys and pulse alias.
     round: u32,
+    /// Who caused the change: the incoming glyph springs only on contact (R5).
+    touch: Touch,
 }
 
 /// `icon` at `size`, morphing into each new icon it is given by `style`, and for
 /// `MorphStyle::Slash` drawing its slash on or off as `slashed` changes (over `--t-quick`). The
 /// first frame is still; a render with the same icon and slash plays nothing (R2); under Reduced
 /// every change snaps (R7). Decorative (`aria-hidden`): the words beside it carry the state.
+///
+/// `touch` is who caused the change to the icon it is given with: `Touch::Contact` (the person
+/// pressed the element, play/pause) grows a DownUp or OffUp glyph in with `--e-spring`
+/// (`Anim::MorphInSpring`), anything else at `--e-out` (R5). Default `Touch::Remote`.
 #[component]
 pub fn MorphGlyph(
     icon: Icon,
     size: IconSize,
     style: MorphStyle,
     #[props(default)] slashed: Slashed,
+    #[props(default)] touch: Touch,
 ) -> Element {
     let (incoming, outgoing) = anims(style);
     let timer = use_motion_timer(incoming);
@@ -51,6 +59,7 @@ pub fn MorphGlyph(
             slashed,
             before: None,
             round: 0,
+            touch: Touch::Remote,
         })
     });
     let was = *seen.peek();
@@ -62,6 +71,7 @@ pub fn MorphGlyph(
             slashed,
             before,
             round: was.round.wrapping_add(1),
+            touch,
         });
         let turned = was.slashed != slashed;
         queue_effect(move || {
@@ -74,6 +84,7 @@ pub fn MorphGlyph(
         });
     }
     let shown = *seen.peek();
+    let incoming = sprung(incoming, shown.touch);
     let playing = timer.phase() == TimerPhase::Running && shown.before.is_some();
     let px = size.px();
     let stroke = stroke_width(size, use_scale());
@@ -129,6 +140,14 @@ fn anims(style: MorphStyle) -> (Anim, Option<Anim>) {
         MorphStyle::DownUp => (Anim::MorphIn, Some(Anim::MorphOut)),
         MorphStyle::OffUp => (Anim::MorphIn, None),
         MorphStyle::CrossFade | MorphStyle::Slash => (Anim::MorphFadeIn, Some(Anim::MorphFadeOut)),
+    }
+}
+
+/// The incoming animation as `touch` may play it: a growth the person's press caused springs.
+fn sprung(incoming: Anim, touch: Touch) -> Anim {
+    match (incoming, touch) {
+        (Anim::MorphIn, Touch::Contact(_)) => Anim::MorphInSpring,
+        (anim, Touch::Contact(_) | Touch::Remote) => anim,
     }
 }
 

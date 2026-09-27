@@ -9,13 +9,12 @@
 //! chevron prevents the default of the keys it takes, so a browser's synthesised click cannot
 //! run the same press twice.
 
-use crate::components::icon_view::IconView;
-use crate::components::module_tile_kind::{Chevron, ModuleState, TileSpan};
+use crate::components::module_disc::ModuleDisc;
+use crate::components::module_tile_kind::{Chevron, DiscMotion, ModuleState, TileSpan};
 use crate::components::press::{Press, PressListeners, Propagation};
-use crate::components::spinner::{Spinner, SpinnerKind};
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Expanded};
-use crate::detail::{FirstShow, Touch, use_detail, use_operation};
+use crate::detail::{FirstShow, Touch, use_armed};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::external::IconSource;
@@ -30,6 +29,11 @@ use dioxus::prelude::*;
 /// status glyph in the disc (the Wi-Fi and Bluetooth modules, sill Q391), which plays its own
 /// moments as the state changes, the Wi-Fi fan filling as it joins. `first` is the glyph's first
 /// frame: `FirstShow::Animate` when the control center was just opened.
+///
+/// `disc` is how the disc's glyph answers the module coming on (design/26 G14, G23): `Still`
+/// (the default), `Fill` (the glyph's layers fill once, the Wi-Fi fan) or `Morph(icon)` (the
+/// glyph grows into `icon`, the Focus moon into `Icon::MoonFilled`). A press on the tile is kept
+/// for the change it causes, so that change springs and one from elsewhere does not (R5).
 #[component]
 pub fn ModuleTile(
     #[props(into)] glyph: IconSource,
@@ -43,10 +47,10 @@ pub fn ModuleTile(
     #[props(default)] expanded: Expanded,
     #[props(default)] availability: Availability,
     #[props(default)] first: FirstShow,
+    #[props(default)] disc: DiscMotion,
 ) -> Element {
     let live = availability == Availability::Enabled;
-    // Busy is an operation the tile's own state starts: its ring is bounded by the cap (R4).
-    let operation = use_operation(use_detail(state, FirstShow::Still, Touch::Remote).cue());
+    let armed = use_armed();
     let listen = PressListeners::new(onclick);
     let detail = match chevron {
         Chevron::Detail => Some(chevron_button(&title, on_detail, expanded, availability)),
@@ -64,21 +68,18 @@ pub fn ModuleTile(
             "aria-disabled": availability.aria_disabled(),
             onclick: move |event| {
                 if live {
+                    armed.arm(Touch::from_event(&event));
                     listen.click(&event);
                 }
             },
             onkeydown: move |event| {
                 if live && toggles(&event.key()) {
                     event.prevent_default();
+                    armed.arm(Touch::from_event(&event));
                     onclick.call(Press::primary());
                 }
             },
-            span { class: "ds-module-disc",
-                IconView { source: glyph, size: IconSize::Base, first }
-                if state == ModuleState::Busy {
-                    Spinner { kind: SpinnerKind::Breathe, operation }
-                }
-            }
+            ModuleDisc { glyph, state, motion: disc, first, armed }
             span { class: "ds-module-words",
                 span { class: "ds-module-title", {text(&title)} }
                 if let Some(status) = status {

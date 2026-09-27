@@ -17,8 +17,17 @@
 //!   the track, so the knob is drawn as Lucide draws its dots (a stroked point).
 //! - Top knob left (off), bottom knob right (on): the pair reads as switches, not as one toggle
 //!   drawn twice.
+//!
+//! `MoonFilled` (design/26 G23): Lucide `moon`'s own outline, filled as well as stroked
+//! (`Shape::Solid`), so it has exactly the outline moon's silhouette and a Focus disc can morph
+//! from one to the other with nothing but the fill arriving.
 
 use super::shape::Shape;
+
+/// Lucide `moon`, filled.
+pub(super) const MOON_FILLED: &[Shape] = &[Shape::Solid(
+    "M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401",
+)];
 
 /// Two toggles, knobs at opposite ends.
 pub(super) const SWITCHES: &[Shape] = &[

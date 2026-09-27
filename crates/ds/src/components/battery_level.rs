@@ -35,7 +35,7 @@ pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
 }
 
 /// The charging bolt, in its own 10 x 16 box.
-const BOLT: &str = "M7 0 0 9.6h4.6L3.2 16 10 6.4H5.4L7 0Z";
+pub(crate) const BOLT: &str = "M7 0 0 9.6h4.6L3.2 16 10 6.4H5.4L7 0Z";
 
 /// Whether the battery is filling.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -49,7 +49,7 @@ pub enum RingMark {
 
 impl RingMark {
     /// `data-mark`: written only while charging.
-    fn slug(self) -> Option<&'static str> {
+    pub(crate) fn slug(self) -> Option<&'static str> {
         match self {
             RingMark::Plain => None,
             RingMark::Charging => Some("charging"),
@@ -80,7 +80,7 @@ impl RingTone {
     }
 
     /// The `data-tone` word.
-    fn slug(self) -> &'static str {
+    pub(crate) fn slug(self) -> &'static str {
         match self {
             RingTone::Ok => "ok",
             RingTone::Low => "low",
@@ -162,7 +162,7 @@ fn fading(tail: Fraction) -> Option<String> {
 
 /// One of the ring's two strokes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-enum RingLayer {
+pub(crate) enum RingLayer {
     /// The full circle under the level.
     Track,
     /// The level.
@@ -179,7 +179,7 @@ impl RingLayer {
 }
 
 /// `layer` along `path`, or nothing for an empty arc.
-fn ring(layer: RingLayer, path: Option<String>) -> Element {
+pub(crate) fn ring(layer: RingLayer, path: Option<String>) -> Element {
     let Some(d) = path else {
         return rsx! {};
     };
@@ -198,7 +198,7 @@ fn ring(layer: RingLayer, path: Option<String>) -> Element {
 
 /// `children`, or `None` when the caller passed none: an omitted `children` is the shared
 /// placeholder node.
-fn given(children: Element) -> Option<Element> {
+pub(crate) fn given(children: Element) -> Option<Element> {
     match &children {
         Ok(node) if *node == VNode::placeholder() => None,
         _ => Some(children),

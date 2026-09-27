@@ -1962,6 +1962,57 @@ whatever that description wants) and `dock/icon_tests.rs` (the test's `describe`
 | A focus write, a rect read or a scroll that finds the document borrowed by the renderer tries again as soon as that render ends (a dioxus effect wakes it), the first four times, then a `FRAME_SLACK` apart as before | `ds::focus_soon` from `onmounted` or a handler that also re-renders lands in the same frame, every run, on both clocks. Assert the boundary: focused right after the ask, no `FRAME_SLACK` |
 | `CommandPalette`'s `on_select_rect` reports an already laid-out row in the frame it was selected, and again a frame later if a scroll or new results moved it | An actions key right after a selection anchors to the row just selected. The second report fires only when the rect changed |
 
+### Control center details (2026-09-27): the tile disc, row phases, Now Playing, device batteries
+
+design/26-DETAILS.md wave D2 (quire lane), 5.2: G14, G16-G18, G20, G21, G23, G25-G30; design/04
+section 52; FINDINGS.md "Details D2". Every new prop is defaulted, and a tile or row that passes
+none of them renders exactly the markup it did (the control center goldens are unchanged).
+
+**Enums that grew a variant** (breaking only for an exhaustive `match`; sill at `e276242` has
+none: it constructs `RowTrailing` in `control_center/rows.rs` and `LevelGlyph` in
+`osd/reading.rs` and `modules/display.rs`, and matches over neither, nor over `Icon`, `Shape` or
+`Anim`):
+
+| Enum | New variant | Why |
+| --- | --- | --- |
+| `RowTrailing` | `Battery(Fraction)` | a connected device's battery at the row's end (G21) |
+| `LevelGlyph` | `KeyboardBrightness` | the keyboard-brightness module (G25) |
+| `Icon` | `MoonFilled` (end of `Icon::SHELL` and `Icon::ALL`) | the Focus disc's "on" glyph (G23) |
+| `Shape` | `Solid(&'static str)` | a path filled as well as stroked: `MoonFilled` |
+| `Anim` | `MorphInSpring` (`Anim::ALL` is 78) | a morph the person's own press caused (R5) |
+
+**New and changed API.**
+
+| Where | Prop, type or component | What it does |
+| --- | --- | --- |
+| `ModuleTile` | `disc: DiscMotion` (default `Still`) | `DiscMotion::Fill`: coming on (from Off, or Busy landing) fills an `IconSource::Glyph`'s layers once from the inside out (`Settle{Fill}`; a status glyph plays its own). `DiscMotion::Morph(icon)`: on shows `icon`, grown in over the glyph (`MorphGlyph{DownUp}`), and back on turning off. A press on the tile is kept for the change it causes, so that change springs and one from elsewhere does not |
+| `SettingsRow` | `phase: RowPhase` (`Rest`), `work: RowWork` (`Glyph`), `disc: RowDisc` (`None`), `first: FirstShow` (`Still`) | `RowPhase::{Rest, Pending(EventStamp), Succeeded(EventStamp), Failed(EventStamp)}`, a `Detailed` table. Pending, after `PendingGrace`: the glyph breathes (`RowWork::Glyph`) or a spinner takes the trailing slot (`RowWork::Trailing`); still at `PendingCap`; `aria-busy`. Pending to Succeeded: a `RowTrailing::Check(Switch::On)` draws on (`Settle{Check}`), any other row seals its glyph (`Settle{LockIn}`, springing when the row's own press started the operation, however long it ran). Failed: one shake per new stamp. `RowDisc::{Off, On}` puts the glyph on a paper or accent disc. `first: Animate` on a pane just opened lets a battery trailing sweep in (R1: a pane re-mounted in place keeps `Still`) |
+| `RowTrailing::Battery(level)` | new variant | The device's battery glyph and `84%`: sweeps in from empty with the figure counting in step when it arrives on a row already showing (the device just connected) or with a row whose `first` is `Animate`; then moves from where it is |
+| `PlayPauseButton` | new: `playback: Playback`, `onclick: EventHandler<Press>`, `availability` | An `IconButton { Tool }` whose glyph is the next action (Play when paused, Pause when playing or buffering), named for it, morphing off-up; springs only under its own press |
+| `Playback` | new: `Paused` (default), `Playing`, `Buffering(EventStamp)` | Where the player is; `Buffering` is the one pending moment (the art breathes, bounded) |
+| `NowPlayingTrack` | new: `art: Option<IconSource>`, `title` (`Text`), `by: Option<Text>`, `playback` | The art (48 px, or the Now Playing glyph on a plain well) beside the title and `by` line; a new track cross-fades over `--t-quick`, the same one restated plays nothing |
+| `TrackPosition` | new: `at: Duration`, `length: Duration`, `playback` | The position bar and its times (`1:05`, `-3:56`). While `Playing` it advances by itself from the last `at`, repainting once a second on the second; otherwise it holds, 0 frames. Pass the player's position whenever it reports one (a seek, a poll); the same `at` again changes nothing |
+| `DeviceBattery` | new: `level: Fraction`, `mark: RingMark`, `label` (`Text`), `first: FirstShow`, `children` (the device's glyph) | `BatteryLevel`'s ring with its percentage under it, on `Sweep` + `CountUp::InStep`: `first: Animate` sweeps in from empty over `--t-sweep` counting in step; a change sweeps from where it is; the bolt fades in once the sweep lands. `BatteryLevel` and `BatteryFigure` (the widgets') are unchanged |
+| `MorphGlyph` | `touch: Touch` (default `Remote`) | `Touch::Contact` grows a DownUp or OffUp glyph in with `--e-spring` (`Anim::MorphInSpring`) |
+| `LevelControl` | `glyph: LevelGlyph::KeyboardBrightness` | A keyboard under a rising sun whose rays follow the level |
+
+**What sill passes (D2's sill lane).**
+
+| Module | From the service | quire |
+| --- | --- | --- |
+| Focus tile | `FocusMode` | `ModuleTile { glyph: Icon::Moon, disc: DiscMotion::Morph(Icon::MoonFilled), .. }`. The tile's own press springs the morph; a schedule turning Focus on does not |
+| Wi-Fi, Bluetooth tiles | as today (Q391) | keep `glyph: StatusState::Wifi(..)` / `StatusState::Bluetooth(..)`: the status glyph fills on its own join (`Joining` to `Joined`), which is G14 for these tiles; `DiscMotion::Fill` is for a tile whose glyph is a plain `Icon` |
+| Wi-Fi networks pane (`pages/wifi_networks.rs`, `rows.rs`) | the join's op stamp (the one `WifiState::Joining` carries), the activation's result | Each row: `phase: RowPhase::Pending(EventStamp(op))` while that SSID joins, `Succeeded(EventStamp(op))` when it lands (the same stamp), `Failed(EventStamp(n))` with a new stamp per failure and the reason in `detail` ("Wrong password"); `work: RowWork::Trailing`; `disc: RowDisc::On` for the network in use and `RowDisc::Off` for the others. **Drop the in-use check** on these rows (`RowMark::InUse`): the accent disc says it, and a `Check(On)` trailing turns the success into a drawn check instead of the disc's seal. Keep the lock on a secured network (the spinner takes its place while joining) |
+| Bluetooth devices pane (`pages/bluetooth_devices.rs`) | the connect op's stamp, the device's battery percentage | `phase` as for networks (`work` left at `Glyph`: the device glyph breathes); `disc: RowDisc::On` connected, `Off` otherwise; `trailing: RowTrailing::Battery(Fraction(percent * 10))` for a connected device that reports a battery (in place of today's check), `RowTrailing::None` otherwise; `first: FirstShow::Animate` on the rows when the pane has just been opened (the chevron's `on_detail`), `Still` when it is re-mounted in place. Today the row drops its check while connecting (`RowMark::Nothing`); `Pending` now says it |
+| Sound output list (not built in sill yet: `modules/sound.rs` has no sink list) | the sink switch's stamp, the sink's report | `trailing: RowTrailing::Check(Switch::On)` on the chosen output; `phase: Pending(stamp)` on the output being switched to until the sink reports, then `Succeeded(stamp)`: its glyph breathes, then its check draws on |
+| Now Playing (`modules/now_playing.rs`, and the Now Playing widget if it wants the same) | `player.playback`, the track, `Position` and `mpris:length` | `PlayPauseButton { playback, availability: available(abilities.play_pause), onclick: press(MediaVerb::PlayPause) }` in place of the toggle `IconButton` (`Playback::Playing` → `Playing`, `Paused \| Stopped` → `Paused`; `Buffering` only if the service learns a wait). `NowPlayingTrack { art: Some(IconSource::Image(..)) or None, title, by, playback }` in place of `ArtView` and the two text spans (drop `.sill-cc-art`, `.sill-cc-media-text`). `TrackPosition { at, length, playback }` under it when the player reports both; omit it when it does not |
+| Battery module (`modules/battery.rs`) | `use_battery`, and any peripherals' batteries | One `DeviceBattery { level, mark, label, first: FirstShow::Animate, Glyph { icon } }` per device (this computer, then peripherals), `RingMark::Charging` while charging. The center was just opened, so the rings sweep in with their percentages counting (the user's ask). The header's glyph and `93%` can stay |
+| Keyboard brightness (new module) | a keyboard backlight (UPower `KbdBacklight`, or `/sys/class/leds/*::kbd_backlight`) | `LevelModule { glyph: Icon::Keyboard, level_glyph: LevelGlyph::KeyboardBrightness, title: "Keyboard Brightness", level, on_change }`, shown only where the machine has one |
+
+Stamps follow the Status glyphs rules: one stamp per operation, unchanged while it runs (a new
+stamp restarts the grace), a new one per failure. A row that never saw its `Pending` (the pane
+opened after the join) gets `Succeeded` as a plain Change: no seal.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive
