@@ -143,7 +143,7 @@ fn ShotCard(
             },
             onpointerdown: move |event| swiper.down(&event),
             onpointermove: move |event| swiper.moved(&event),
-            onpointerup: move |_| swiper.up(),
+            onpointerup: move |event| swiper.released(&event),
             onwheel: move |event| swiper.wheel(&event),
             div {
                 class: "ds-shot-plate",

@@ -8,11 +8,13 @@ use crate::components::icon_view::IconView;
 use crate::components::switcher_fit::{SwitcherMetrics, fit};
 use crate::components::tooltip::{Shown, Tooltip, TooltipKind};
 use crate::components::vocab::{PulseKey, Selection};
+use crate::detail::Touch;
 use crate::geometry::Px;
 use crate::icon::external::IconSource;
 use crate::icon::family::PlateFamily;
 use crate::icon::render::{IconPx, IconSize};
 use crate::motion::Anim;
+use crate::motion::{PxPerUnit, SpringResponse, SpringSpec, use_spring};
 use dioxus::prelude::*;
 
 /// An application in the switcher, by the shell's own id for it (its app id).
@@ -81,9 +83,19 @@ pub fn AppSwitcher(
         .position(|app| app.key == selected)
         .unwrap_or_default();
     let row = fit(apps.len(), at, metrics, output);
+    // Driven motion (design/05 section 14, H1): the selection ring springs from cell to cell,
+    // redirecting from where it is when the selection moves on mid-slide.
+    let pitch = PxPerUnit(row.cell.0 + metrics.gap.0);
+    let spec = SpringSpec::for_touch(Touch::Remote).response(SpringResponse::Quick);
+    let ring = use_spring(at as f32, spec, pitch);
     let style = format!(
-        "--switcher-cell:{}px;--switcher-icon:{}px;--switcher-gap:{}px;--switcher-view:{}px;--switcher-shift:{}px;--switcher-at:{at}",
-        row.cell.0, row.icon.0, metrics.gap.0, row.view.0, row.shift.0
+        "--switcher-cell:{}px;--switcher-icon:{}px;--switcher-gap:{}px;--switcher-view:{}px;--switcher-shift:{}px;--switcher-at:{}",
+        row.cell.0,
+        row.icon.0,
+        metrics.gap.0,
+        row.view.0,
+        row.shift.0,
+        ring.css()
     );
     let size = IconSize::Px(IconPx(row.icon.0.clamp(0.0, 255.0) as u8));
     rsx! {

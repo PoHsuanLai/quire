@@ -126,7 +126,8 @@ impl Anim {
 }
 
 /// Whether a keyframes body moves anything: a transform other than `none`, or a box property.
-pub(crate) fn moves(body: &str) -> bool {
+#[cfg(test)]
+fn moves(body: &str) -> bool {
     const BOX: &[&str] = &[
         "left:", "top:", "right:", "bottom:", "width:", "height:", "margin", "inset:",
     ];

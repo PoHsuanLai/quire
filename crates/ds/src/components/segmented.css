@@ -1,19 +1,29 @@
 /* SegmentedControl (design/04-COMPONENTS.md section 3): Regular is S's `.seg` (`S:265-268`),
    Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
    Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
-   The pressed fill jumps between segments; there is no sliding thumb.
+   Driven motion (design/05 section 14, H1; design/27 section 5.15): the segments are equal, as
+   the Mac's are, and the pressed fill is one thumb behind them, `--seg-x` segments from the
+   start, written by a spring in Rust (`--seg-n` segments in all); nothing here transitions it.
    TODO(O-1): disabled is not specified. */
 
-.ds-segmented{ display:inline-flex; gap:var(--s-2); border:var(--hair) solid var(--line); border-radius:var(--r-pill); }
-.ds-segmented[*|data-size=regular]{ padding:var(--s-3); background:var(--surface-2); }
-.ds-segmented[*|data-size=small]{ padding:var(--s-2); background:var(--surface); }
+.ds-segmented{ --seg-n:1; --seg-x:0; position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
+  border:var(--hair) solid var(--line); border-radius:var(--r-pill); --seg-pad:var(--s-3); padding:var(--seg-pad); }
+.ds-segmented[*|data-size=regular]{ --seg-pad:var(--s-3); background:var(--surface-2); }
+.ds-segmented[*|data-size=small]{ --seg-pad:var(--s-2); background:var(--surface); }
+
+/* One segment's width: the inside less the gaps, shared equally. */
+.ds-segment-thumb{
+  position:absolute; top:var(--seg-pad); bottom:var(--seg-pad); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
+  width:calc((100% - 2 * var(--seg-pad) - (var(--seg-n) - 1) * var(--s-2)) / var(--seg-n));
+  left:calc(var(--seg-pad) + var(--seg-x) * ((100% - 2 * var(--seg-pad) - (var(--seg-n) - 1) * var(--s-2)) / var(--seg-n) + var(--s-2)));
+}
 
 .ds-segment{
-  font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  position:relative; font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
+  transition:color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-segmented[*|data-size=regular] .ds-segment{ padding:var(--s-5) var(--s-11); font-size:var(--fs-small); }
 .ds-segmented[*|data-size=small] .ds-segment{ padding:var(--s-3) var(--s-10); font-size:var(--fs-help); }
 .ds-segment:hover{ color:var(--ink); }
 .ds-segment:active{ transform:scale(var(--squish)); }
-.ds-segment[*|aria-pressed=true]{ background:var(--ink); color:var(--paper); }
+.ds-segment[*|aria-pressed=true]{ color:var(--paper); }
