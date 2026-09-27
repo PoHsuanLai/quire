@@ -2488,6 +2488,7 @@ motion-lab), with a toolbar for theme, accent, motion, material, blur and Space 
 cargo run -p ds-gallery                              # opens the gallery interactively
 cargo run -p ds-gallery -- --page controls            # opens directly on one page
 cargo run -p ds-gallery --release -- --snapshot DIR   # renders every page x state to DIR as PNGs, then exits
+                                                      # (only to DIR; --progress also refreshes the progress page's tracked shots)
 ```
 
 Render your own surface at the same viewport and Appearance/Material combination and diff it
