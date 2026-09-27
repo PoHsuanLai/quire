@@ -12,6 +12,7 @@
 //! no host measurer the read is guarded so the same collision is `Busy` too, never a panic.
 
 use super::units::{Point, Px, Rect, Size};
+use crate::busy::{after_render, wait_out_busy};
 use crate::guarded::Guarded;
 use crate::time::{FRAME_SLACK, sleep};
 use dioxus::html::geometry::PixelsRect;
@@ -43,14 +44,14 @@ pub(crate) const BUSY_ATTEMPTS: usize = 8;
 /// renderer cannot measure it. Call it from a task, never from inside a handler or render.
 pub(crate) async fn client_rect(element: &MountedData) -> Option<Rect> {
     let host = try_consume_context::<HostMeasure>();
-    for _ in 0..BUSY_ATTEMPTS {
+    for attempt in 0..BUSY_ATTEMPTS {
         let read = match host {
             Some(HostMeasure(read)) => read(element),
             None => unhosted(element).await,
         };
         match read {
             Measured::At(rect) => return Some(rect),
-            Measured::Busy => sleep(FRAME_SLACK).await,
+            Measured::Busy => wait_out_busy(attempt).await,
             Measured::Unknown => return None,
         }
     }
@@ -195,6 +196,15 @@ pub(crate) async fn laid_out_rect(element: &MountedData) -> Option<Rect> {
         sleep(layout_retry(attempt)?).await;
     }
     None
+}
+
+/// `element`'s rect as the last layout left it, if it has an area: a row that was already on
+/// screen, read in the frame that asked, once the render that asked has ended (so after that
+/// render's own effects, such as a palette's selection report). `None` for an element not laid
+/// out yet.
+pub(crate) async fn laid_out_now(element: &MountedData) -> Option<Rect> {
+    after_render().await;
+    client_rect(element).await.filter(|read| laid_out(*read))
 }
 
 /// A renderer rect in logical pixels.

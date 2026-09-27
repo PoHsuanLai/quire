@@ -3,6 +3,8 @@
 //! `mask-image` over `currentColor` when symbolic (spike S7), `background-image` when an image
 //! (spike S8). Both URLs load through the document's net provider, one frame late.
 
+use crate::components::status::StatusGlyph;
+use crate::detail::FirstShow;
 use crate::icon::external::{ExternalIcon, IconSource};
 use crate::icon::family::PlateFamily;
 use crate::icon::plate_tint::{PlateTint, tint_style};
@@ -46,12 +48,17 @@ impl Paint {
 /// plate's stops and glyph colour are re-coloured by the same rule as the icon's raster, so a
 /// Muted or Monochrome dock is one hue, plate included (sill FINDINGS Q72). Without one, or
 /// without a plate, it changes nothing.
+///
+/// A status glyph (`IconSource::Status`) is drawn at `size` too; `first` is its first frame
+/// (`FirstShow::Animate` sweeps a battery's fill in on a surface just opened). Other sources
+/// have no Appear and ignore it.
 #[component]
 pub fn IconView(
     source: IconSource,
     #[props(default)] size: IconSize,
     #[props(default)] plate: Option<PlateFamily>,
     #[props(default)] plate_tint: Option<PlateTint>,
+    #[props(default)] first: FirstShow,
 ) -> Element {
     match plate {
         Some(family) => rsx! {
@@ -62,10 +69,10 @@ pub fn IconView(
                 "data-size": "{size.px()}",
                 style: plate_style(size, family, plate_tint),
                 span { class: "ds-plate-face", "aria-hidden": "true" }
-                {bare(source, size)}
+                {bare(source, size, first)}
             }
         },
-        None => bare(source, size),
+        None => bare(source, size, first),
     }
 }
 
@@ -79,13 +86,16 @@ fn plate_style(size: IconSize, family: PlateFamily, tint: Option<PlateTint>) -> 
 }
 
 /// The icon alone, as a slot draws it.
-fn bare(source: IconSource, size: IconSize) -> Element {
+fn bare(source: IconSource, size: IconSize, first: FirstShow) -> Element {
     match source {
         IconSource::Glyph(icon) => rsx! {
             Glyph { icon, size }
         },
         IconSource::Symbolic(external) => external_icon(&external, Paint::Mask),
         IconSource::Image(external) => external_icon(&external, Paint::Picture),
+        IconSource::Status(status) => rsx! {
+            StatusGlyph { status, size, first }
+        },
     }
 }
 

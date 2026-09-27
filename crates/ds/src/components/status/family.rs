@@ -8,6 +8,7 @@ use super::bluetooth_state::BluetoothState;
 use super::volume::{VolumeGlyph, VolumeState};
 use super::wifi::WifiGlyph;
 use super::wifi_state::WifiState;
+use crate::detail::FirstShow;
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;
 
@@ -37,15 +38,18 @@ impl StatusState {
 }
 
 /// The glyph for `status` at `size`. Each kind keeps its own moments; a status that changes kind
-/// is a new glyph, mounted still.
+/// is a new glyph, mounted still. `first` reaches the glyphs that have an Appear (the battery's
+/// fill sweeping in from empty): `Animate` on a surface the person just opened, `Still` (the
+/// default) on bar chrome (R1).
 #[component]
 pub fn StatusGlyph(
     status: StatusState,
     #[props(default = IconSize::Bar)] size: IconSize,
+    #[props(default)] first: FirstShow,
 ) -> Element {
     match status {
         StatusState::Wifi(state) => rsx! { WifiGlyph { state, size } },
-        StatusState::Battery(state) => rsx! { BatteryGlyph { state, size } },
+        StatusState::Battery(state) => rsx! { BatteryGlyph { state, size, first } },
         StatusState::Bluetooth(state) => rsx! { BluetoothGlyph { state, size } },
         StatusState::Volume(state) => rsx! { VolumeGlyph { state, size } },
     }

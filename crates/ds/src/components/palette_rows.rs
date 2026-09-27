@@ -8,7 +8,7 @@
 //! The row is measured again whenever the selection, the element under it, or the results
 //! change; a read still waiting for layout is dropped when a newer one starts.
 
-use crate::geometry::measure::laid_out_rect;
+use crate::geometry::measure::{laid_out_now, laid_out_rect};
 use crate::geometry::{MountedRef, Rect};
 use crate::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};
@@ -109,6 +109,12 @@ impl RowRects {
         }
         let reported = self.reported;
         reading.set(Some(spawn_in(self.scope, async move {
+            // A row already laid out is reported in the frame it was selected, so a key that
+            // anchors to it at once (Ctrl+K) finds this row, not the last (sill G310); the read
+            // a frame later catches a scroll or new results moving it.
+            if let Some(rect) = laid_out_now(&element.0).await {
+                report(reported, rect, on_rect);
+            }
             if let Some(rect) = laid_out_rect(&element.0).await {
                 report(reported, rect, on_rect);
             }

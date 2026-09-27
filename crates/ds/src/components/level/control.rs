@@ -11,7 +11,7 @@
 use super::glyph::LevelGlyphView;
 use super::look::{Drawn, body};
 use super::machine::{Hold, KeyStep, LevelInput, LevelState, Nudge, Rubber, step};
-use super::vocab::{LevelGlyph, LevelLook, LevelMode, Tick};
+use super::vocab::{LevelLook, LevelMode, LevelSource, Tick};
 use crate::appearance::MotionLevel;
 use crate::components::vocab::{Availability, Fraction};
 use crate::geometry::measure::client_rect;
@@ -25,11 +25,13 @@ use std::rc::Rc;
 
 /// A level: the glyph that follows it and the capsule, knob or segments that show it.
 /// `onchange` is never called in `LevelMode::ReadOnly`, so a read-only level may leave it out.
+/// `glyph` is a `LevelGlyph` that follows `value`, or a `VolumeState` (both convert): then the
+/// speaker draws that state's waves and slash, as the bar's volume item does (sill Q392).
 #[component]
 pub fn LevelControl(
     label: String,
     value: Fraction,
-    glyph: LevelGlyph,
+    #[props(into)] glyph: LevelSource,
     #[props(default)] mode: LevelMode,
     #[props(default)] look: LevelLook,
     #[props(default)] tick: Tick,
@@ -37,6 +39,7 @@ pub fn LevelControl(
     #[props(default)] onchange: EventHandler<Fraction>,
 ) -> Element {
     let value = value.clamped();
+    let (glyph, glyph_level) = glyph.drawn(value);
     let rubber = match use_env().resolved.motion {
         MotionLevel::Reduced => Rubber::Off,
         MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Rubber::On,
@@ -65,6 +68,7 @@ pub fn LevelControl(
         value,
         before,
         glyph,
+        glyph_level,
         tick: tick_attrs(tick, pulse.attrs()),
     };
     let lead = match look {
@@ -138,7 +142,7 @@ pub fn LevelControl(
             },
             if let Some(glyph) = lead {
                 span { class: "ds-level-lead",
-                    LevelGlyphView { glyph, value, size: IconSize::Bar }
+                    LevelGlyphView { glyph, value: glyph_level, size: IconSize::Bar }
                 }
             }
             div {

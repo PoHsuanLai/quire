@@ -89,11 +89,17 @@ impl HarnessClock {
     }
 }
 
-/// Let `time` pass on `clock`: stop at each timer due before the end, then at the end, moving
-/// the clock and resolving `harness` at every stop, so each timer sees the renders the one
-/// before it caused and the CSS resolves at the instant the timer fired.
+/// Let `time` pass on `clock`: first run what was woken since the last call (a test's `watch`
+/// send, a link ask) at the current instant, then stop at each timer due before the end, then at
+/// the end, moving the clock and resolving `harness` at every stop, so each timer sees the
+/// renders the one before it caused and the CSS resolves at the instant the timer fired.
+///
+/// The first stop is what keeps an ask between two advances at the instant it was made (sill
+/// G311): without it the woken task ran only at the next timer or at the end of the advance, and
+/// every time measured from it slid by the whole advance.
 pub(crate) fn advance(harness: &mut Harness, clock: &VirtualClock, time: Duration) {
     let end = clock.elapsed().saturating_add(time);
+    harness.resolve_at(clock.elapsed());
     loop {
         let stop = next_stop(clock, end);
         let (Stop::Timer(at) | Stop::End(at)) = stop;

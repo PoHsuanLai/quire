@@ -5,6 +5,7 @@
 use super::Icon;
 use super::render::IconSize;
 use crate::components::space_editor::png::base64;
+use crate::components::status::StatusState;
 use crate::error::DsError;
 use std::path::Path;
 
@@ -81,6 +82,17 @@ pub enum IconSource {
     Symbolic(ExternalIcon),
     /// An external icon drawn as it is: a coloured tray icon states a fact about its app.
     Image(ExternalIcon),
+    /// A layered status glyph (Wi-Fi, battery, Bluetooth, volume) in its state, drawn by
+    /// [`StatusGlyph`](crate::StatusGlyph) in the text colour at the slot's size, playing its
+    /// own moments as the state changes (design/26-DETAILS.md 5.1; sill Q390, Q391). Hand the
+    /// slot the state every render; put its `words()` in the slot's label (R8).
+    Status(StatusState),
+}
+
+impl From<StatusState> for IconSource {
+    fn from(state: StatusState) -> Self {
+        IconSource::Status(state)
+    }
 }
 
 impl From<Icon> for IconSource {
