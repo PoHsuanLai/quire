@@ -465,7 +465,7 @@ let mut harness = Harness::with_config(YourApp, config);
 | Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall` (unchanged). `Harness::clock() -> Clock` |
 | "Now" in a test | `Harness::now() -> Instant` | The virtual clock's now (or the wall clock's); `settle_until` returns instants on the same clock, and its 3 s bound is the harness's time. On the virtual clock, time a window from `harness.now()`, never `Instant::now()` |
 | Read the time in your own component | `ds::time::now()`, `ds::time::since(instant)`, `ds::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
-| Install a virtual clock yourself (another harness) | `ds::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
+| Install a virtual clock yourself (another harness) | `ds::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()`, `.due_times()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
 
 Not on the virtual clock: work off the harness's thread (a Tokio task such as `ds_settings`'
 file watch, a D-Bus reply, a resource fetched by a custom `AppNet` on another thread).
@@ -475,6 +475,15 @@ count (a press within 500 ms and 2 px of the last) and scrollbar fade read `Inst
 host cannot set, so on the virtual clock two clicks at one spot are always a double click, however
 far apart the test advanced them; click a second spot in between, or keep that test on the wall
 clock.
+
+**`assert_settles_to_zero_frames` is only a strict check on `Clock::Virtual`.** It drains
+`VirtualClock::next_due` — advancing straight to each pending sleep's due instant, earliest
+first, until none remain — then asserts a quiet window right after, so "at rest" means exactly
+design/26 R3: no CSS animation, no pending `ds` timer, nothing woke the document. On
+`Clock::Wall` it cannot see what is pending, only what just happened, so it instead polls in
+`QUIET` windows and returns as soon as *one* window is quiet; a timer that started later in the
+same test (a 900 ms hold begun at the top of a window shorter than 900 ms) can still be pending
+when it returns. Use `Clock::Virtual` for any test that needs the strict guarantee, not the poll.
 
 ## 6. The component catalogue
 
