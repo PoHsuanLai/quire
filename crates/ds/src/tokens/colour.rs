@@ -61,6 +61,10 @@ pub enum ColourToken {
     /// `--accent-text`: the accent as text or a thin mark on the card (a link, the month's title,
     /// a check, a caret, an unread dot, a selection border).
     AccentText,
+    /// `--accent-text-material`: the same on a translucent material, where it must also read
+    /// over a black or white backdrop; a Popover, Sheet or Toast root points `--accent-text` at
+    /// it (design/03-COLOR.md section 20.6).
+    AccentTextMaterial,
     /// `--seal`: defined, unused in the Spaces prototype (design/03-COLOR.md open decision 7).
     Seal,
     /// `--ok`: saved, live.
@@ -129,7 +133,7 @@ pub enum ColourToken {
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 37] = [
+    pub const ALL: [ColourToken; 38] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -143,6 +147,7 @@ impl ColourToken {
         ColourToken::AccentInk,
         ColourToken::AccentSoft,
         ColourToken::AccentText,
+        ColourToken::AccentTextMaterial,
         ColourToken::Seal,
         ColourToken::Ok,
         ColourToken::Warn,
@@ -185,6 +190,7 @@ impl ColourToken {
             ColourToken::AccentInk => "--accent-ink",
             ColourToken::AccentSoft => "--accent-soft",
             ColourToken::AccentText => "--accent-text",
+            ColourToken::AccentTextMaterial => "--accent-text-material",
             ColourToken::Seal => "--seal",
             ColourToken::Ok => "--ok",
             ColourToken::Warn => "--warn",
@@ -222,6 +228,7 @@ impl ColourToken {
             ColourToken::AccentInk => return Colour::Solid(postmark().ink),
             ColourToken::AccentSoft => return postmark().wash_colour(),
             ColourToken::AccentText => return Colour::Solid(postmark().text),
+            ColourToken::AccentTextMaterial => return Colour::Solid(postmark().text_material),
             ColourToken::AccentRing => return postmark().ring_colour(),
             other => other.post(),
         };
@@ -289,6 +296,7 @@ impl ColourToken {
             | ColourToken::AccentInk
             | ColourToken::AccentSoft
             | ColourToken::AccentText
+            | ColourToken::AccentTextMaterial
             | ColourToken::Seal
             | ColourToken::AccentRing => {
                 let light = accent_of(Accent::Postmark, Scheme::Light);

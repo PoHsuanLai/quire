@@ -45,6 +45,18 @@ fn gate_failures(case: &str, roles: &AccentRoles, scheme: Scheme) -> Vec<String>
     let gates = [
         ("ink on fill", measured.ink_on_fill, floors::TEXT),
         ("text on card", measured.text_on_card, floors::TEXT),
+        ("text on wash", measured.text_on_wash, floors::TEXT),
+        (
+            "material text on card",
+            measured.material_text_on_card,
+            floors::TEXT,
+        ),
+        ("text on material", measured.text_on_material, floors::TEXT),
+        (
+            "text on washed material",
+            measured.text_on_washed_material,
+            floors::TEXT,
+        ),
         ("ink on wash", measured.ink_on_wash, floors::TEXT),
         ("wash shows", measured.wash_shows, floors::WASH_SHOWS),
         ("focus ring", measured.ring, floors::RING),
@@ -54,10 +66,11 @@ fn gate_failures(case: &str, roles: &AccentRoles, scheme: Scheme) -> Vec<String>
         .filter(|(_, got, floor)| got < floor)
         .map(|(gate, got, floor)| {
             format!(
-                "{case}: {gate} {got:.2} < {floor} (fill {}, ink {}, text {}, wash {}, ring {})",
+                "{case}: {gate} {got:.2} < {floor} (fill {}, ink {}, text {}, material text {}, wash {}, ring {})",
                 roles.fill.css(),
                 roles.ink.css(),
                 roles.text.css(),
+                roles.text_material.css(),
                 roles.wash_colour().css(),
                 roles.ring_colour().css()
             )
@@ -121,7 +134,8 @@ fn every_built_in_swatch_is_distinct() {
     }
 }
 
-/// The numbers design/03-COLOR.md section 20 quotes for Postmark's hue.
+/// The numbers design/03-COLOR.md section 20 quotes for Postmark's hue: fill, ink, the card's
+/// text, the material's text, wash and ring, light then dark.
 #[test]
 fn postmark_is_the_settled_airy_blue() {
     let pick = AccentPick {
@@ -134,25 +148,29 @@ fn postmark_is_the_settled_airy_blue() {
         light.fill.css(),
         light.ink.css(),
         light.text.css(),
+        light.text_material.css(),
         light.wash_colour().css(),
         light.ring_colour().css(),
         dark.fill.css(),
         dark.ink.css(),
         dark.text.css(),
+        dark.text_material.css(),
         dark.wash_colour().css(),
         dark.ring_colour().css(),
     ];
     let want = [
         "#94c0fe",
         "#111b28",
-        "#426aa2",
+        "#396198",
+        "#295086",
         "rgba(148,192,254,.32)",
-        "rgba(66,106,162,.8)",
+        "rgba(57,97,152,.75)",
         "#8ebaf7",
         "#111b28",
-        "#88b3f0",
+        "#8ebaf7",
+        "#d5e6fe",
         "rgba(142,186,247,.2)",
-        "rgba(136,179,240,.6)",
+        "rgba(142,186,247,.55)",
     ];
     assert_eq!(got, want.map(str::to_owned));
 }
@@ -165,4 +183,58 @@ fn over_blends_per_channel() {
     assert_eq!(over(red, Alpha(1000), white), red);
     assert_eq!(over(red, Alpha(0), white), white);
     assert_eq!(over(red, Alpha(500), white), Hex([255, 128, 128]));
+}
+
+/// Every ground the material's text is measured on is kept but one: the dark Popover's wash over
+/// a white backdrop, where the card's own ink reaches only 4.1:1 (a material shortfall, not the
+/// accent's; design/03-COLOR.md section 20.6). A new ground the ink misses fails here first.
+#[test]
+fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
+    use crate::material::Material;
+    use crate::material::recipe::tint;
+    let all = 4 + 4 + 2 * TEXT_MATERIALS.len() * 2;
+    for scheme in Scheme::ALL {
+        for hue in (0..360).step_by(5) {
+            for tenth in 0..=10 {
+                let roles = roles(hue, Weight(tenth * 100), scheme);
+                let kept = text_grounds(TextOn::Material, scheme, roles.fill, roles.wash);
+                let missed = match scheme {
+                    Scheme::Light => 0,
+                    Scheme::Dark => 1,
+                };
+                assert_eq!(kept.len(), all - missed, "{scheme:?} h={hue} w=.{tenth}");
+                assert_eq!(
+                    text_grounds(TextOn::Card, scheme, roles.fill, roles.wash).len(),
+                    8,
+                    "{scheme:?} h={hue} w=.{tenth}"
+                );
+            }
+        }
+    }
+    let roles = roles(257, Weight::FULL, Scheme::Dark);
+    let (hex, alpha) = tint(Material::Popover, Scheme::Dark).expect("a tint");
+    let ground = over(roles.fill, roles.wash, over(hex, alpha, BACKDROPS[1]));
+    let kept = text_grounds(TextOn::Material, Scheme::Dark, roles.fill, roles.wash);
+    assert!(
+        kept.iter().all(|kept| kept.hex != ground),
+        "{}",
+        ground.css()
+    );
+}
+
+/// Only the Popover, the Sheet and the Toast point `--accent-text` at the material's text.
+#[test]
+fn the_text_carrying_materials_take_the_material_text() {
+    use crate::material::Material;
+    for material in Material::ALL {
+        let want = match material {
+            Material::Popover | Material::Sheet | Material::Toast => TextOn::Material,
+            Material::Window
+            | Material::Bar
+            | Material::Dock
+            | Material::Osd
+            | Material::Widget => TextOn::Card,
+        };
+        assert_eq!(text_on(material), want, "{material:?}");
+    }
 }

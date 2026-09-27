@@ -76,6 +76,11 @@
    pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
    dropped handlers keep a press from firing. */
 .ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
+/* A disabled default button stays the default (sill Q413): the Mac keeps its shape and edge at
+   the reduced opacity. Band B's pastel fill at .35 is barely apart from a disabled Secondary
+   beside it (design/03-COLOR.md section 20.4: no state on the fill's colour alone), so it keeps
+   an `--accent-text` edge, the pressed Mini's and the armed toast tab's. */
+.ds-button[*|data-variant=primary][*|aria-disabled=true]{ border-color:var(--accent-text); }
 
 /* A trailing mark (mailo gaps 4): a dropdown's caret after its value, in the label's colour a
    step quieter; `line-height:0` so the glyph does not stretch the line. */

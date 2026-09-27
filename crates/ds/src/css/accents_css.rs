@@ -2,9 +2,9 @@
 //!
 //! The dark blocks carry `data-theme=dark` as well, one attribute more specific than both the
 //! light accent blocks and the dark token block, so a dark root takes its accent's dark quad
-//! whatever the source order. Each block sets exactly the six accent properties (design/03-COLOR.md
-//! section 20). A Space that lends the card its hue writes the same six inline on the root, which
-//! beats all of these.
+//! whatever the source order. Each block sets exactly the seven accent properties (design/03-COLOR.md
+//! section 20). A Space that lends the card its hue writes the same seven inline on the root,
+//! which beats all of these.
 //!
 //! The `--swatch-<accent>` properties on `.ds` are every accent's own `--accent`, for a picker
 //! that has to paint all six at once: a swatch written `var(--accent)` would show the selected
@@ -24,7 +24,7 @@ pub fn accents_css() -> String {
         for accent in Accent::ALL {
             css.push_str(&rule(
                 &selector(accent, scheme),
-                &six(accent_of(accent, scheme)),
+                &seven(accent_of(accent, scheme)),
             ));
         }
     }
@@ -64,12 +64,16 @@ fn selector(accent: Accent, scheme: Scheme) -> String {
     format!(".ds{theme}{}", attr_selector("data-accent", accent.slug()))
 }
 
-fn six(roles: AccentRoles) -> Vec<String> {
+fn seven(roles: AccentRoles) -> Vec<String> {
     vec![
         declaration(ColourToken::Accent.var(), &roles.fill.css()),
         declaration(ColourToken::AccentInk.var(), &roles.ink.css()),
         declaration(ColourToken::AccentSoft.var(), &roles.wash_colour().css()),
         declaration(ColourToken::AccentText.var(), &roles.text.css()),
+        declaration(
+            ColourToken::AccentTextMaterial.var(),
+            &roles.text_material.css(),
+        ),
         declaration(ColourToken::AccentRing.var(), &roles.ring_colour().css()),
         declaration(ColourToken::Seal.var(), &roles.fill.css()),
     ]

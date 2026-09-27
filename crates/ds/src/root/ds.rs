@@ -123,8 +123,9 @@ pub fn Ds(
     let stack = stack.map(|stack| stack.style_attr()).unwrap_or_default();
     let pixels = PixelToken::style_attr(scale);
     let style = format!(
-        "{}--m-tint-alpha:{};{corner}{stack}{pixels}",
+        "{}{}--m-tint-alpha:{};{corner}{stack}{pixels}",
         frame.style_attr(),
+        super::surface::accent_text_style(material),
         tint.css()
     );
     let framing = window.attribute();
