@@ -26,7 +26,7 @@ impl SpinnerKind {
     }
 
     /// The pending loop it plays.
-    fn spec(self) -> PendingSpec {
+    pub(crate) fn spec(self) -> PendingSpec {
         let style = match self {
             SpinnerKind::Spin => PendingStyle::Spin,
             SpinnerKind::Breathe => PendingStyle::Breathe,
@@ -44,7 +44,12 @@ impl SpinnerKind {
 /// specified (TODO(O-9)).
 #[component]
 pub fn Spinner(kind: SpinnerKind, operation: Operation) -> Element {
-    let frame = use_pending(operation, kind.spec());
+    ring(kind, use_pending(operation, kind.spec()))
+}
+
+/// The ring `kind` draws at `frame`: for a part that reads the frame itself (the preview pane,
+/// which also swaps its media for the pending look while the loop shows).
+pub(crate) fn ring(kind: SpinnerKind, frame: PendingFrame) -> Element {
     let (beat, turn) = match frame {
         PendingFrame::Step(n) => (
             Some(beat(n)),

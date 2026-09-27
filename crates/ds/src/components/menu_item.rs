@@ -11,7 +11,7 @@ use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::row_action::{RowAction, trailing};
 use crate::components::row_shape::RowShape;
 use crate::components::text_runs::{Text, text};
-use crate::components::vocab::{Availability, Check, Selection, Switch};
+use crate::components::vocab::{Availability, Check, Selection, StaggerIndex, Switch};
 use crate::geometry::{Point, Px};
 use crate::icon::Icon;
 use crate::icon::IconSource;
@@ -57,6 +57,30 @@ pub(crate) enum Branch {
     Parent(Switch),
 }
 
+/// A row's own part in a motion of its list's rows (the command palette's Show More and Show
+/// Less, design/26-DETAILS.md section 5.6): rising in as an added row, at its place in the
+/// stagger, or the last row kept, after which everything heals up.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RowMotion {
+    /// No part.
+    Still,
+    /// An added row rising, `--i` its place among the added (capped at 12).
+    Rise(StaggerIndex),
+    /// The row everything after heals up to.
+    HealFrom,
+}
+
+impl RowMotion {
+    /// The `data-row-motion` word, and the row's inline `--i`.
+    fn attrs(self) -> (Option<&'static str>, Option<String>) {
+        match self {
+            RowMotion::Still => (None, None),
+            RowMotion::Rise(index) => (Some("rise"), Some(format!("--i:{}", index.get()))),
+            RowMotion::HealFrom => (Some("heal-from"), None),
+        }
+    }
+}
+
 /// One item as a menu draws it: its words, which characters of the title matched the query,
 /// and whether it is the keyboard selection.
 pub(crate) struct ItemView<'a> {
@@ -82,6 +106,8 @@ pub(crate) struct ItemView<'a> {
     pub trailing: Option<&'a RowAction>,
     /// How it draws beyond its words (a file, a clipboard entry).
     pub shape: &'a RowShape,
+    /// Its part in a motion of the list's rows.
+    pub motion: RowMotion,
 }
 
 /// What a row reports: a click of a live row (`pick`; a parent opens its submenu), the
@@ -129,6 +155,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
         Row::Checked => None,
     };
     let words = menu_shape::words(view.shape, title, detail);
+    let (moving, place) = view.motion.attrs();
     rsx! {
         div {
             class: "ds-menu-item",
@@ -140,6 +167,8 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
             "aria-expanded": expanded,
             "data-trailing": view.trailing.map(|_| "action"),
             "data-shape": menu_shape::slug(view.shape),
+            "data-row-motion": moving,
+            style: place,
             onmousedown: move |event| event.prevent_default(),
             onmousemove: move |event| {
                 event.stop_propagation();

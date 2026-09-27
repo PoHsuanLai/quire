@@ -2,12 +2,14 @@
 //! a pointer move and its mount by its choice number (`menu_lines`).
 
 use crate::components::menu_entry::{MenuEntry, Trail};
-use crate::components::menu_item::{Branch, ItemView, Row, RowEvents, Words, info, item};
+use crate::components::menu_item::{
+    Branch, ItemView, Row, RowEvents, RowMotion, Words, info, item,
+};
 use crate::components::menu_lines::Line;
 use crate::components::menu_shape::PLAIN;
 use crate::components::press::Press;
 use crate::components::section_header::{HeaderKind, SectionHeader};
-use crate::components::vocab::{Selection, Switch};
+use crate::components::vocab::{Selection, StaggerIndex, Switch};
 use crate::geometry::Point;
 use dioxus::prelude::*;
 
@@ -28,6 +30,40 @@ pub(crate) struct Drawn {
     /// A button released over a choice, where the panel listens for it (a menu's root panel,
     /// for press-drag-release).
     pub onrelease: Option<EventHandler<(usize, Press)>>,
+    /// Which choices take part in a motion of the rows (a palette group's Show More or Less).
+    pub motion: RowsMotion,
+}
+
+/// A motion of some of the drawn rows, by choice number.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RowsMotion {
+    /// None.
+    Still,
+    /// The choices from `from` on rise in turn.
+    Rise {
+        /// The first added choice.
+        from: usize,
+    },
+    /// Everything after choice `at` heals up to it.
+    HealAfter {
+        /// The last choice kept.
+        at: usize,
+    },
+}
+
+impl RowsMotion {
+    /// Choice `index`'s part.
+    fn of(self, index: usize) -> RowMotion {
+        match self {
+            RowsMotion::Rise { from } if index >= from => {
+                RowMotion::Rise(StaggerIndex::new(index - from))
+            }
+            RowsMotion::HealAfter { at } if index == at => RowMotion::HealFrom,
+            RowsMotion::Still | RowsMotion::Rise { .. } | RowsMotion::HealAfter { .. } => {
+                RowMotion::Still
+            }
+        }
+    }
 }
 
 /// Draw `lines` as `row`s.
@@ -71,6 +107,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         branch: Branch::Leaf,
                         trailing: None,
                         shape: PLAIN,
+                        motion: drawn.motion.of(index),
                     },
                     index,
                 ),
@@ -87,6 +124,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         branch: Branch::Leaf,
                         trailing: row.trailing.as_ref(),
                         shape: &row.shape,
+                        motion: drawn.motion.of(index),
                     },
                     index,
                 ),
@@ -112,6 +150,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         }),
                         trailing: None,
                         shape: PLAIN,
+                        motion: drawn.motion.of(index),
                     },
                     index,
                 ),

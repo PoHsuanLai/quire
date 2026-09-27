@@ -6,12 +6,21 @@
 //! The pane never takes the keyboard: the launcher's field keeps it, and `focused` draws which
 //! action the caller's keys have reached, with the focus ring (design/27 section 6.4), so Tab
 //! and Enter stay the caller's. A click on an action calls `onaction` with its number.
+//!
+//! Its moments (sill Q370, Q371) come from the caller's cue (`preview_cue`): the entrance
+//! springs only on contact, an in-place change cross-fades the media, and a load past its grace
+//! shows the pending look in the media box.
 
+use crate::components::bump_on::bump_attrs;
 use crate::components::kbd::{Kbd, KbdSize};
 use crate::components::preview_content::{PaneContent, caption, media};
+use crate::components::preview_cue::{
+    PaneCue, pane_pending_spec, pending_look, touch_slug, use_entrance_touch,
+};
 use crate::components::shown_phase::use_shown_phase;
 use crate::components::tooltip::Shown;
 use crate::components::vocab::Shortcut;
+use crate::detail::{Operation, PendingFrame, Touch, use_cross_fade, use_pending};
 use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 
@@ -29,9 +38,20 @@ pub struct PaneAction {
 /// rest on (drawn with the focus ring); `onaction` hears a click on action `i`.
 ///
 /// `shown` plays the pane in and out: it slides in from the right as it mounts shown or turns
-/// `Visible` (`Anim::PaneInR`, `slide-r` at `--t-move --e-spring`), and out to the right as it
-/// turns `Hidden` (`Anim::PaneOutR`), calling `on_hidden` when that settles, which is when the
-/// caller drops it (and the palette's `aside`). Hidden and settled, nothing is laid out.
+/// `Visible` (`slide-r` over `--t-move`: `Anim::PaneInR` on contact, `Anim::PaneInROut` else),
+/// and out to the right as it turns `Hidden` (`Anim::PaneOutR`), calling `on_hidden` when that
+/// settles, which is when the caller drops it (and the palette's `aside`). Hidden and settled,
+/// nothing is laid out.
+///
+/// `cue` says what caused the latest change ([`PaneCue`]: the caller's `use_detail` cue for the
+/// pane's state, or a bare `Touch`). The entrance springs (`--e-spring`) only when a contact
+/// caused the showing and settles at `--e-out` otherwise (design/26 R5); a Preview, Change or
+/// Failure cue swaps the media with a `fade` at `--t-quick`, never replaying the entrance.
+///
+/// `operation` is the load the media waits on (a text file's head, a PDF's page): drawn with
+/// `use_pending`, nothing for `PendingGrace`, then the pending look in place of the media (a
+/// dashed ring stepping a quarter per `--t-pending-step` over the words "Loading…"), held still
+/// from the token's deadline or at once under Reduced; the media comes back when it is `Idle`.
 #[component]
 pub fn PreviewPane(
     content: PaneContent,
@@ -40,8 +60,25 @@ pub fn PreviewPane(
     #[props(default)] onaction: EventHandler<usize>,
     #[props(default = Shown::Visible)] shown: Shown,
     #[props(default)] on_hidden: EventHandler<()>,
+    #[props(into, default)] cue: PaneCue,
+    #[props(default)] operation: Operation,
 ) -> Element {
-    let (phase, alias) = use_shown_phase(shown, on_hidden, Anim::PaneInR, Anim::PaneOutR);
+    let enter = match cue.touch() {
+        Touch::Contact(_) => Anim::PaneInR,
+        Touch::Remote => Anim::PaneInROut,
+    };
+    let (phase, alias) = use_shown_phase(shown, on_hidden, enter, Anim::PaneOutR);
+    let entrance = use_entrance_touch(alias, cue.touch());
+    let frame = use_pending(operation, pane_pending_spec());
+    let (media_class, fading) = bump_attrs("ds-preview-media", use_cross_fade(cue.cue()));
+    let busy = match operation {
+        Operation::Running(_) => Some("true"),
+        Operation::Idle => None,
+    };
+    let shows = match frame {
+        PendingFrame::Idle => media(&content),
+        PendingFrame::Step(_) | PendingFrame::Stalled => pending_look(frame),
+    };
     let label = content.label();
     rsx! {
         div {
@@ -52,7 +89,9 @@ pub fn PreviewPane(
             "data-shown": phase.shown().slug(),
             "data-presence": phase.presence(),
             "data-pulse": alias.slug(),
-            div { class: "ds-preview-media", {media(&content)} }
+            "data-touch": touch_slug(entrance),
+            "aria-busy": busy,
+            div { class: media_class, "data-pulse": fading, "data-pending": frame.slug(), {shows} }
             {caption(&content)}
             if !actions.is_empty() {
                 div { class: "ds-preview-actions",

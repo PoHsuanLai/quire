@@ -10,7 +10,7 @@ use crate::components::menu_keys::{Child, Decision, Level, decide};
 use crate::components::menu_lines::{
     Act, Choice, Filter, KeyAct, Line, choices, key_act, lines, liveness,
 };
-use crate::components::menu_rows::{Drawn, render_lines};
+use crate::components::menu_rows::{Drawn, RowsMotion, render_lines};
 use crate::components::menu_tracker::{Tracker, Via, target, use_tracker};
 use crate::components::popover::{Stacking, layer_slug, position_style, use_float};
 use crate::components::press::Press;
@@ -103,6 +103,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                     tracker.row_mounted(index, MountedRef(event.data()));
                 }),
                 onrelease: self.onrelease,
+                motion: RowsMotion::Still,
             },
         )
     }
