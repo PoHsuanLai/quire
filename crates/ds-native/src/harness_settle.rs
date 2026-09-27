@@ -6,6 +6,7 @@
 //! `coherence.rs` each once did).
 
 use crate::harness::Harness;
+use ds::VirtualClock;
 use std::time::{Duration, Instant};
 
 /// How long a settled document must stay quiet for [`assert_settles_to_zero_frames`]: longer
@@ -14,8 +15,16 @@ use std::time::{Duration, Instant};
 pub const QUIET: Duration = Duration::from_millis(500);
 
 /// The most a settle may be stretched by a loaded machine before a test gives up: generous
-/// against contention, short enough that a genuinely broken settle still fails promptly.
+/// against contention, short enough that a genuinely broken settle still fails promptly. Only
+/// bounds the [`Clock::Wall`](crate::Clock::Wall) check; see [`VIRTUAL_DRAIN_BOUND`] for
+/// [`Clock::Virtual`](crate::Clock::Virtual).
 pub const SETTLE_BOUND: Duration = Duration::from_secs(3);
+
+/// How far [`assert_settles_to_zero_frames`] may drain the virtual clock's pending sleeps,
+/// earliest due first, before it gives up: generous against a long chain of holds, short enough
+/// that a component that keeps rescheduling itself (a retrigger loop) still fails promptly rather
+/// than hanging the test.
+pub const VIRTUAL_DRAIN_BOUND: Duration = Duration::from_secs(30);
 
 /// Advance `harness` in 10 ms steps until `done` holds, for at most [`SETTLE_BOUND`] on the
 /// harness's clock (wall or virtual, `Harness::now`). Returns the instant `done` first held, read
@@ -39,12 +48,37 @@ pub fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) -> I
     );
 }
 
-/// Assert the idle-frame rule (design/26-DETAILS.md R3) on whatever `harness` shows now: within
-/// [`SETTLE_BOUND`] of wall clock the document reaches a state where no CSS animation or transition
-/// runs (`is_animating() == false`) and no Rust timer wakes it for a whole [`QUIET`] window, and
-/// it stays that way. Every component with a `Detailed` state calls it at the end of each
-/// moment's test. Panics with the document's HTML if it never goes quiet.
+/// Assert the idle-frame rule (design/26-DETAILS.md R3) on whatever `harness` shows now: the
+/// document reaches a state where no CSS animation or transition runs (`is_animating() ==
+/// false`) and no Rust timer wakes it for a whole [`QUIET`] window, and it stays that way. Every
+/// component with a `Detailed` state calls it at the end of each moment's test. Panics with the
+/// document's HTML if it never goes quiet.
+///
+/// **[`Clock::Virtual`](crate::Clock::Virtual) is exact.** `ds::VirtualClock` knows the due
+/// instant of every sleep still waiting (`next_due`), so this drains them: it advances to each
+/// pending due instant in turn, earliest first, until none remain (bounded by
+/// [`VIRTUAL_DRAIN_BOUND`] of virtual time — a component that keeps rescheduling itself fails
+/// with every still-pending due time rather than hanging), then asserts a [`QUIET`] window with
+/// no wake and no animation right after. "At rest" here means exactly design/26 R3: no CSS
+/// animation, no pending `ds` timer, and nothing woke the document — not "quiet for one window",
+/// which a later timer could still slip past.
+///
+/// **[`Clock::Wall`](crate::Clock::Wall) is a poll, not a drain.** A real harness cannot see what
+/// is pending, only what just happened, so this instead advances in [`QUIET`] windows for up to
+/// [`SETTLE_BOUND`] and returns as soon as *one* window shows no wake and no animation. That
+/// window can pass quiet while a later timer is still asleep (e.g. a 900 ms hold started at the
+/// top of a 500 ms window: the first window sees no wake yet and the check returns, even though
+/// the hold is still pending) — found in the check mark's `SettleHold` (FINDINGS "Details D2").
+/// Use `Clock::Virtual` (CONSUMING Rule 4) whenever the check must be strict about "nothing is
+/// pending", not just "nothing fired in the window that happened to run".
 pub fn assert_settles_to_zero_frames(harness: &mut Harness) {
+    match harness.virtual_clock() {
+        Some(clock) => assert_settles_virtual(harness, &clock),
+        None => assert_settles_wall(harness),
+    }
+}
+
+fn assert_settles_wall(harness: &mut Harness) {
     let started = harness.now();
     while harness.now().saturating_duration_since(started) < SETTLE_BOUND {
         let wakes = harness.wakes();
@@ -59,4 +93,34 @@ pub fn assert_settles_to_zero_frames(harness: &mut Harness) {
         harness.is_animating(),
         harness.html()
     );
+}
+
+/// Drain every sleep pending on `clock`, advancing straight to each one's due instant (earliest
+/// first, so an earlier timer's renders run before a later one is even looked for), then assert a
+/// [`QUIET`] window with no wake and no animation right after the last one drains.
+fn assert_settles_virtual(harness: &mut Harness, clock: &VirtualClock) {
+    let started = clock.elapsed();
+    while let Some(due) = clock.next_due() {
+        if due.saturating_sub(started) > VIRTUAL_DRAIN_BOUND {
+            panic!(
+                "assert_settles_to_zero_frames: {} timer(s) still pending after \
+                 {VIRTUAL_DRAIN_BOUND:?} of virtual time (due at {:?}, started at {started:?}) \
+                 — a component may be rescheduling itself forever:\n{}",
+                clock.waiting(),
+                clock.due_times(),
+                harness.html()
+            );
+        }
+        harness.advance(due.saturating_sub(clock.elapsed()));
+    }
+    let wakes = harness.wakes();
+    harness.advance(QUIET);
+    if harness.wakes() != wakes || harness.is_animating() {
+        panic!(
+            "assert_settles_to_zero_frames: a timer or animation started during the {QUIET:?} \
+             quiet window right after every pending sleep drained (animating: {}):\n{}",
+            harness.is_animating(),
+            harness.html()
+        );
+    }
 }

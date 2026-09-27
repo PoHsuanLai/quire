@@ -20,7 +20,9 @@ use crate::frame_view::FrameView;
 use crate::harness_clock::{Clock, HarnessClock};
 use crate::harness_config::HarnessConfig;
 use crate::harness_input::{HeldButtons, blitz_button, keyboard, modifier, pointer};
-pub use crate::harness_settle::{QUIET, SETTLE_BOUND, assert_settles_to_zero_frames, settle_until};
+pub use crate::harness_settle::{
+    QUIET, SETTLE_BOUND, VIRTUAL_DRAIN_BOUND, assert_settles_to_zero_frames, settle_until,
+};
 use crate::headless::{Backdrop, Headless, Layout};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
@@ -274,6 +276,12 @@ impl Harness {
     /// harness, e.g. the one [`settle_until`] returns.
     pub fn now(&self) -> Instant {
         self.time.now()
+    }
+
+    /// The virtual clock this harness's timers run on, if [`Clock::Virtual`]: for a settle check
+    /// that needs to see every sleep still pending, not just poll the harness for silence.
+    pub(crate) fn virtual_clock(&self) -> Option<ds::VirtualClock> {
+        self.time.virtual_clock()
     }
 
     /// Resolve the document at animation time `at` after running what is queued: one step of a

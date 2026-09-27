@@ -104,6 +104,12 @@ impl VirtualClock {
         self.timeline.waiting()
     }
 
+    /// The due instant of every sleep still waiting, earliest first: for a diagnostic when a
+    /// settle check gives up on this clock (`ds_native::assert_settles_to_zero_frames`).
+    pub fn due_times(&self) -> Vec<Duration> {
+        self.timeline.due_times()
+    }
+
     /// Move the clock to `at` after it was made (never backwards) and wake every sleep due by
     /// then, earliest first. The woken tasks run when their executor is next polled; a caller
     /// that wants each timer to see the state the previous one left steps through
