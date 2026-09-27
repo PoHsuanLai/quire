@@ -3,10 +3,12 @@
 //! button, a toggle that is on, the segmented control, a chip, a link, the focus ring, a menu's
 //! highlight, a selected row, the control center's tiles, the compact calendar (month title,
 //! today disc) and the launcher's selected row; under them the six built-in hues. Writes
-//! `accent-b-final-{light,dark}.png` in DIR and in the progress page's `shots/accent`.
+//! `accent-b-final-{light,dark}.png` in DIR, and with `--progress` in the progress page's
+//! `shots/accent`.
 
 use crate::accent_specimens::Specimens;
 use crate::error::GalleryError;
+use crate::progress_copy::ProgressCopy;
 use crate::style;
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Scheme, Theme};
@@ -70,9 +72,15 @@ fn progress_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tools/progress/shots/accent")
 }
 
-/// Write `picture` as `name` in `dir` and in the progress page's `shots/accent`.
-fn keep(picture: &RgbaImage, dir: &Path, name: &str) -> Result<(), GalleryError> {
-    for place in [dir.to_path_buf(), progress_dir()] {
+/// Write `picture` as `name` in `dir`, and in the progress page's `shots/accent` when
+/// `progress` asks.
+fn keep(
+    picture: &RgbaImage,
+    dir: &Path,
+    name: &str,
+    progress: ProgressCopy,
+) -> Result<(), GalleryError> {
+    for place in progress.places(dir, progress_dir()) {
         std::fs::create_dir_all(&place).map_err(|source| GalleryError::Write {
             path: place.clone(),
             source,
@@ -86,14 +94,15 @@ fn keep(picture: &RgbaImage, dir: &Path, name: &str) -> Result<(), GalleryError>
     Ok(())
 }
 
-/// Render both schemes into `dir`.
-pub fn run(dir: &Path) -> Result<(), GalleryError> {
+/// Render both schemes into `dir` (and the progress page's shots when `progress` asks).
+pub fn run(dir: &Path, progress: ProgressCopy) -> Result<(), GalleryError> {
     for scheme in Scheme::ALL {
         let picture = sheet_at(scheme)?;
         keep(
             &picture,
             dir,
             &format!("accent-b-final-{}.png", scheme.slug()),
+            progress,
         )?;
     }
     Ok(())

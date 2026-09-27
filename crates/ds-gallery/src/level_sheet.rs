@@ -3,10 +3,11 @@
 //! and dark, over the Work Space's tint and over a light ground, for volume at 0, 40 and 100 %,
 //! muted, and brightness at 30 %, at 1x and at 2x. `level-motion.png`: headless frames through a
 //! level set from outside, a press, a drag past the end and the release (`level_motion.rs`).
-//! Both are written to DIR and copied to the progress page's shots.
+//! Both are written to DIR, and with `--progress` copied to the progress page's shots.
 
 use crate::error::GalleryError;
 use crate::pages::level_tile::{Ground, LevelTile, STATES};
+use crate::progress_copy::ProgressCopy;
 use crate::snapshot::progress_dir;
 use crate::style;
 use dioxus::prelude::*;
@@ -104,30 +105,32 @@ pub(crate) fn stacked(pictures: &[RgbaImage], gap: u32) -> RgbaImage {
     sheet
 }
 
-/// Write `picture` as `name` in `dir` and copy it to the progress page's shots.
-pub(crate) fn keep(picture: &RgbaImage, dir: &Path, name: &str) -> Result<(), GalleryError> {
-    let made = |path: &Path| {
-        let path = path.to_path_buf();
-        move |source| GalleryError::Write { path, source }
-    };
-    std::fs::create_dir_all(dir).map_err(made(dir))?;
-    let path = dir.join(name);
-    picture.save(&path).map_err(|source| GalleryError::Encode {
-        path: path.clone(),
-        source,
-    })?;
-    let progress = progress_dir();
-    std::fs::create_dir_all(&progress).map_err(made(&progress))?;
-    let copy = progress.join(name);
-    std::fs::copy(&path, &copy).map_err(made(&copy))?;
-    eprintln!("{} (and {})", path.display(), copy.display());
+/// Write `picture` as `name` in `dir`, and in the progress page's shots when `progress` asks.
+pub(crate) fn keep(
+    picture: &RgbaImage,
+    dir: &Path,
+    name: &str,
+    progress: ProgressCopy,
+) -> Result<(), GalleryError> {
+    for place in progress.places(dir, progress_dir()) {
+        std::fs::create_dir_all(&place).map_err(|source| GalleryError::Write {
+            path: place.clone(),
+            source,
+        })?;
+        let path = place.join(name);
+        picture.save(&path).map_err(|source| GalleryError::Encode {
+            path: path.clone(),
+            source,
+        })?;
+        eprintln!("{}", path.display());
+    }
     Ok(())
 }
 
-/// Render both sheets into `dir`.
-pub fn run(dir: &Path) -> Result<(), GalleryError> {
+/// Render both sheets into `dir` (and the progress page's shots when `progress` asks).
+pub fn run(dir: &Path, progress: ProgressCopy) -> Result<(), GalleryError> {
     let variants = stacked(&[variants_at(100)?, variants_at(200)?], GAP);
-    keep(&variants, dir, "level-variants.png")?;
+    keep(&variants, dir, "level-variants.png", progress)?;
     let motion = crate::level_motion::strip()?;
-    keep(&motion, dir, "level-motion.png")
+    keep(&motion, dir, "level-motion.png", progress)
 }

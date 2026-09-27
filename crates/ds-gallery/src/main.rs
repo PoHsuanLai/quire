@@ -17,6 +17,7 @@ mod level_sheet;
 mod page;
 mod pages;
 mod portrait;
+mod progress_copy;
 mod registry;
 mod sheet;
 mod snapshot;
@@ -41,14 +42,14 @@ fn main() {
         }
     };
     if let Some(dir) = args.accent_sheet {
-        if let Err(error) = accent_sheet::run(&dir) {
+        if let Err(error) = accent_sheet::run(&dir, args.progress) {
             eprintln!("ds-gallery: {error}");
             std::process::exit(1);
         }
         return;
     }
     if let Some(dir) = args.level_sheet {
-        if let Err(error) = level_sheet::run(&dir) {
+        if let Err(error) = level_sheet::run(&dir, args.progress) {
             eprintln!("ds-gallery: {error}");
             std::process::exit(1);
         }
@@ -64,8 +65,13 @@ fn main() {
     match args.snapshot {
         Some(dir) => {
             let typeface = args.typeface.unwrap_or_default();
-            if let Err(error) = snapshot::run(&dir, args.page, args.scale.unwrap_or(100), typeface)
-            {
+            if let Err(error) = snapshot::run(
+                &dir,
+                args.page,
+                args.scale.unwrap_or(100),
+                typeface,
+                args.progress,
+            ) {
                 eprintln!("ds-gallery: {error}");
                 std::process::exit(1);
             }

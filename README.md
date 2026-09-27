@@ -69,6 +69,7 @@ cd examples/consumer && cargo test
 cargo run -p ds-gallery                              # opens interactively, on the tokens page
 cargo run -p ds-gallery -- --page controls            # opens directly on one page
 cargo run -p ds-gallery --release -- --snapshot DIR    # renders every page x state to DIR, then exits
+cargo run -p ds-gallery --release -- --snapshot DIR --progress  # also refreshes tools/progress/shots/gallery
 ```
 
 Compare your own surface against the matching gallery page at the same Appearance/Material —

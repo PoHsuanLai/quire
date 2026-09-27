@@ -1,8 +1,10 @@
 //! The gallery's command line: `ds-gallery [--page PAGE] [--typeface system|editorial]
 //! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]
-//! [--accent-sheet DIR]`.
+//! [--accent-sheet DIR] [--progress]`. A sheet is written only to its DIR; `--progress` also
+//! copies it into the progress page's tracked shots.
 
 use crate::page::Page;
+use crate::progress_copy::ProgressCopy;
 use ds::Typeface;
 use std::path::PathBuf;
 
@@ -25,6 +27,9 @@ pub struct Args {
     pub scale: Option<u16>,
     /// The typeface the root speaks in (the settings default when absent).
     pub typeface: Option<Typeface>,
+    /// Whether `--snapshot`, `--level-sheet` and `--accent-sheet` also refresh the progress
+    /// page's tracked pictures (`--progress`; skipped when absent).
+    pub progress: ProgressCopy,
 }
 
 /// A command line that is not one the gallery understands.
@@ -35,7 +40,7 @@ impl std::fmt::Display for ArgsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR] [--accent-sheet DIR]",
+            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR] [--accent-sheet DIR] [--progress]",
             self.0,
             slugs()
         )
@@ -114,6 +119,15 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                 })?;
                 parsed.typeface = once(parsed.typeface, typeface, "--typeface")?;
             }
+            "--progress" => {
+                if inline.is_some() {
+                    return Err(ArgsError("--progress takes no value".into()));
+                }
+                if parsed.progress == ProgressCopy::Refresh {
+                    return Err(ArgsError("--progress given twice".into()));
+                }
+                parsed.progress = ProgressCopy::Refresh;
+            }
             _ => return Err(ArgsError(format!("unknown argument {flag:?}"))),
         }
     }
@@ -146,6 +160,7 @@ fn slugs() -> String {
 mod tests {
     use super::{Args, parse};
     use crate::page::Page;
+    use crate::progress_copy::ProgressCopy;
     use std::path::PathBuf;
 
     /// A command line and what it parses to: the arguments, or the start of the error.
@@ -160,6 +175,7 @@ mod tests {
             detail_frames: None,
             scale: None,
             typeface: None,
+            progress: ProgressCopy::Skip,
         }
     }
 
@@ -173,6 +189,23 @@ mod tests {
                 Ok(args(Some(Page::MotionLab), None)),
             ),
             (&["--snapshot", "out"], Ok(args(None, Some("out")))),
+            (
+                &["--snapshot", "out", "--progress"],
+                Ok(Args {
+                    progress: ProgressCopy::Refresh,
+                    ..args(None, Some("out"))
+                }),
+            ),
+            (
+                &["--level-sheet", "out", "--progress"],
+                Ok(Args {
+                    level_sheet: Some(PathBuf::from("out")),
+                    progress: ProgressCopy::Refresh,
+                    ..args(None, None)
+                }),
+            ),
+            (&["--progress=yes"], Err("--progress takes no value")),
+            (&["--progress", "--progress"], Err("--progress given twice")),
             (
                 &["--accent-sheet", "shots"],
                 Ok(Args {

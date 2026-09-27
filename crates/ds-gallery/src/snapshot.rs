@@ -1,11 +1,12 @@
 //! `--snapshot DIR`: every page in both schemes and two accents at the standard motion level,
-//! rendered headless on the CPU (deterministic), written as PNGs with a contact sheet, and the
-//! PNGs copied to the progress page's shots.
+//! rendered headless on the CPU (deterministic), written as PNGs with a contact sheet; with
+//! `--progress`, the PNGs are also copied to the progress page's shots.
 
 use crate::app::App;
 use crate::axes::{Axes, Showcase, start_with};
 use crate::error::GalleryError;
 use crate::page::Page;
+use crate::progress_copy::ProgressCopy;
 use crate::registry;
 use crate::sheet;
 use ds::{Accent, Motion, Scheme, Theme, Typeface};
@@ -129,21 +130,23 @@ pub fn progress_dir() -> PathBuf {
 }
 
 /// Render every shot into `dir` (only `page`'s when one is named, at `scale` percent, in
-/// `typeface`), write
-/// `dir/index.html`, and copy the pictures to [`progress_dir`]. Returns the pictures written.
+/// `typeface`), write `dir/index.html`, and, when `progress` asks, copy the pictures to
+/// [`progress_dir`]. Returns the pictures written.
 pub fn run(
     dir: &Path,
     page: Option<Page>,
     scale: u16,
     typeface: Typeface,
+    progress: ProgressCopy,
 ) -> Result<Vec<Shot>, GalleryError> {
     let made = |path: &Path| {
         let path = path.to_path_buf();
         move |source| GalleryError::Write { path, source }
     };
-    std::fs::create_dir_all(dir).map_err(made(dir))?;
-    let progress = progress_dir();
-    std::fs::create_dir_all(&progress).map_err(made(&progress))?;
+    let places = progress.places(dir, progress_dir());
+    for place in &places {
+        std::fs::create_dir_all(place).map_err(made(place))?;
+    }
     let shots = match page {
         Some(page) => shots_of(&[page]),
         None => shots(),
@@ -162,8 +165,9 @@ pub fn run(
             path: path.clone(),
             source,
         })?;
-        let copy = progress.join(shot.file());
-        std::fs::copy(&path, &copy).map_err(made(&copy))?;
+        for copy in places.iter().skip(1).map(|place| place.join(shot.file())) {
+            std::fs::copy(&path, &copy).map_err(made(&copy))?;
+        }
         eprintln!("[{}/{}] {}", done + 1, shots.len(), path.display());
     }
     let index = dir.join("index.html");
