@@ -1,0 +1,20 @@
+.ds-toggle               38.0 x  26.0
+.ds-toggle-knob          18.0 x  18.0
+.ds-slider              160.0 x  22.0
+.ds-slider-thumb         22.0 x  22.0
+.ds-slider-track        160.0 x   4.0
+#seg-small              196.0 x  29.8
+#seg-regular            210.0 x  36.6
+#btn-mini                47.0 x  24.0
+#btn-regular             79.0 x  38.2
+.ds-level-rail          270.0 x  26.0
+.ds-module-tile         144.0 x  52.0
+.ds-module-disc          28.0 x  28.0
+.ds-module-panel        296.0 x  73.8
+.ds-bar-item             49.0 x  24.0
+.ds-icon-button          22.0 x  22.0
+.ds-plate                48.0 x  48.0
+wrote audit/current/specimens-light-1x.png
+wrote audit/current/specimens-light-2x.png
+wrote audit/current/specimens-dark-1x.png
+wrote audit/current/specimens-dark-2x.png

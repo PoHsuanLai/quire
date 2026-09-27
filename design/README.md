@@ -31,6 +31,7 @@ against them.
 | `26-DETAILS.md` | The grammar of small state details: the moments every stateful element passes through, the primitives that play them, and a per-element catalogue with the reference, today and the gap. |
 | `27-HIG-PARITY.md` | Audit against the pre-2025 (macOS 14/15) HIG: archived snapshots, gaps ranked, a verdict and rule per HIG page, proposed waves H0-H7. |
 | `28-CUSTOMIZATION.md` | What the person chooses and places: every surface where the reference lets people pick items, order and place (widgets, launcher categories, control center and bar, dock, toolbars, share, previewers, actions, sidebars, notifications), the shared Registry/Placement/Picker pattern, D-Bus registration, order of work. |
+| `29-SIZING.md` | Draft: an audit of control heights, spacing and radii (quire and sill's bar and control center), the reference numbers with confidence, three principled systems with mockups, a recommendation, and the dark Monochrome/Muted plate fix. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
 ## 2. Reading order

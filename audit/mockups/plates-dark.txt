@@ -1,0 +1,4 @@
+Before: lightness kept: plate #222C42 (1.00:1 on the dark dock #2A2C30), glyph ink #E5E9F2 (11.46:1 on the plate), raster dark ink #1B212D
+F1: plate floor L >= .50: plate #5B6375 (2.32:1 on the dark dock #2A2C30), glyph ink #E5E9F2 (4.95:1 on the plate), raster dark ink #1B212D
+F2: the light plate in both schemes: plate #FFFFFF (13.99:1 on the dark dock #2A2C30), glyph ink #151C2D (16.99:1 on the plate), raster dark ink #1B212D
+F3: tone band (plate .46-.56, raster lifted into .62-.96): plate #6B7486 (2.98:1 on the dark dock #2A2C30), glyph ink #E5E9F2 (3.87:1 on the plate), raster dark ink #98A0B0
