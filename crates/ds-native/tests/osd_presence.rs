@@ -9,8 +9,8 @@ use ds::{
     RootChrome, Shown, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
 static HIDDEN: GlobalSignal<u32> = Signal::global(|| 0);
@@ -54,15 +54,15 @@ fn show(harness: &mut Harness, shown: Shown) {
 
 #[test]
 fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness =
+        Harness::with_config(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
     harness.advance(ms(300));
     assert_eq!(presence(&harness).as_deref(), Some("present"));
     let out = settle(Anim::OsdOut, MotionLevel::Standard, StaggerIndex::default());
-    // Marked before the state write that starts the settle timer, so nothing but real overhead
-    // is spent before this instant: the comparison against `out` below stays a true lower
-    // bound.
-    let hiding = Instant::now();
+    // Marked on the harness's own (virtual) clock, sill Q380, so the comparison against `out`
+    // below is exact, not merely a true lower bound.
+    let hiding = harness.now();
     show(&mut harness, Shown::Hidden);
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));
 

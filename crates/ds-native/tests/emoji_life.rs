@@ -11,7 +11,7 @@ use ds::{
     Theme, UserPicture, UserPortrait,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -57,9 +57,12 @@ fn inked(image: &image::RgbaImage) -> usize {
 
 #[test]
 fn the_frame_advances_while_awake_and_rests_twenty_one_seconds_after_the_wake() {
-    let woke = Instant::now();
     // Attentive plays loop after loop, so it is still moving at 9 s.
-    let mut harness = Harness::new(AttentiveStage, VIEW);
+    let mut harness = Harness::with_config(
+        AttentiveStage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    let woke = harness.now();
     let first = frame(&harness);
     let before = harness.render().expect("render");
     let moved = settle_until(&mut harness, |h| frame(h) != first);
@@ -83,7 +86,8 @@ fn the_frame_advances_while_awake_and_rests_twenty_one_seconds_after_the_wake() 
     }
     assert!(seen.len() >= 5, "only frames {seen:?} in a second");
     // Still awake at 9 s, under half the window: the loop is still playing.
-    harness.advance(Duration::from_secs(9).saturating_sub(woke.elapsed()));
+    let so_far = harness.now().duration_since(woke);
+    harness.advance(Duration::from_secs(9).saturating_sub(so_far));
     let mut playing = std::collections::BTreeSet::new();
     for _ in 0..10 {
         harness.advance(Duration::from_millis(50));
@@ -91,7 +95,8 @@ fn the_frame_advances_while_awake_and_rests_twenty_one_seconds_after_the_wake() 
     }
     assert!(playing.len() >= 3, "stopped before the window: {playing:?}");
     // The window is 20 s; at 21 s it rests on frame 0 and nothing moves or paints.
-    harness.advance(Duration::from_secs(21).saturating_sub(woke.elapsed()));
+    let so_far = harness.now().duration_since(woke);
+    harness.advance(Duration::from_secs(21).saturating_sub(so_far));
     assert_eq!(frame(&harness).as_deref(), Some("0"), "not at rest at 21 s");
     assert_eq!(face(&harness).as_deref(), Some("wink"));
     assert!(!harness.is_animating(), "asks for frames at rest");
@@ -108,14 +113,15 @@ fn the_frame_advances_while_awake_and_rests_twenty_one_seconds_after_the_wake() 
 
 #[test]
 fn a_wince_shows_the_reaction_then_the_users_own_emoji() {
-    let mut harness = Harness::new(Stage, VIEW);
+    let mut harness =
+        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(200));
     assert_eq!(
         face(&harness).as_deref(),
         Some("wink"),
         "a reaction on mount"
     );
-    let asked = Instant::now();
+    let asked = harness.now();
     harness.within(|| *MOOD.write() = Mood::Wince);
     let swapped = settle_until(&mut harness, |h| face(h).as_deref() == Some("confounded"));
     let reaction_frames = settle_until(&mut harness, |h| {
@@ -186,17 +192,18 @@ fn a_still_picture_never_leaves_its_rest_frame() {
     assert!(!harness.is_animating());
 }
 
-/// Advance until `done` holds, for at most `bound` of wall clock; the instant it first held.
+/// Advance until `done` holds, for at most `bound` of the harness's own clock; the instant it
+/// first held.
 fn within(harness: &mut Harness, bound: Duration, done: impl Fn(&Harness) -> bool) -> Instant {
-    let started = Instant::now();
-    while started.elapsed() < bound {
+    let started = harness.now();
+    while harness.now().duration_since(started) < bound {
         if done(harness) {
-            return Instant::now();
+            return harness.now();
         }
         harness.advance(Duration::from_millis(10));
     }
     assert!(done(harness), "no state held within {bound:?}");
-    Instant::now()
+    harness.now()
 }
 
 fn moving(harness: &Harness) -> bool {
@@ -206,7 +213,8 @@ fn moving(harness: &Harness) -> bool {
 /// Idle is slow: one loop, then the rest frame for 4 s, then the next loop.
 #[test]
 fn idle_rests_between_its_loops() {
-    let mut harness = Harness::new(Stage, VIEW);
+    let mut harness =
+        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, moving);
     let ended = settle_until(&mut harness, |h| !moving(h));
     let again = within(&mut harness, Duration::from_secs(10), moving);
@@ -237,7 +245,10 @@ fn accepting(harness: &Harness) -> bool {
 /// whole picture once. 21 s after the last wake, it is at rest and asks for no frame.
 #[test]
 fn as_a_user_picture_each_mood_shows_its_emoji() {
-    let mut harness = Harness::new(PortraitStage, VIEW);
+    let mut harness = Harness::with_config(
+        PortraitStage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     assert_eq!(face(&harness).as_deref(), Some("wink"));
     assert!(!accepting(&harness));
     let rows = [
@@ -262,8 +273,9 @@ fn as_a_user_picture_each_mood_shows_its_emoji() {
     }
     // Back to idle, then 21 s later at rest with nothing asked for.
     harness.within(|| *PICTURE_MOOD.write() = Mood::Idle);
-    let woke = Instant::now();
-    harness.advance(Duration::from_secs(21).saturating_sub(woke.elapsed()));
+    let woke = harness.now();
+    let so_far = harness.now().duration_since(woke);
+    harness.advance(Duration::from_secs(21).saturating_sub(so_far));
     assert_eq!(frame(&harness).as_deref(), Some("0"), "not at rest at 21 s");
     assert_eq!(face(&harness).as_deref(), Some("wink"));
     assert!(!harness.is_animating(), "asks for frames at rest");

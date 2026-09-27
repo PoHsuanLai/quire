@@ -5,8 +5,8 @@ use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{Appearance, Ds, Material, Motion, WifiBars, WifiGlyph, WifiReach, WifiState};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 120,
@@ -69,10 +69,11 @@ fn at_rest_a_joined_glyph_is_whole_and_a_repeat_plays_nothing() {
 
 #[test]
 fn joining_searches_after_its_grace_then_a_join_fills_once_to_the_real_bars() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness =
+        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Idle);
     assert_settles_to_zero_frames(&mut harness);
-    let asked = Instant::now();
+    let asked = harness.now();
     set(&mut harness, WifiState::Joining(EventStamp(1)));
     harness.advance(Duration::from_millis(20));
     assert_eq!(
@@ -109,11 +110,12 @@ fn joining_searches_after_its_grace_then_a_join_fills_once_to_the_real_bars() {
 
 #[test]
 fn a_join_that_outlives_the_cap_holds_its_still_frame_at_zero_frames() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness =
+        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Joining(EventStamp(7)));
     let cap = Duration::from_secs(10);
-    let started = Instant::now();
-    while started.elapsed() < cap {
+    let started = harness.now();
+    while harness.now().duration_since(started) < cap {
         harness.advance(Duration::from_millis(250));
     }
     settle_until(&mut harness, |h| {

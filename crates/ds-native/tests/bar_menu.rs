@@ -11,8 +11,8 @@ use ds::{
     StaggerIndex, Trail, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -234,9 +234,12 @@ fn fade() -> Duration {
 /// settled, not before.
 #[test]
 fn escape_fades_the_menu_out_before_it_closes() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::with_config(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
-    let escaped = Instant::now();
+    let escaped = harness.now();
     harness.key(Key::Escape);
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),

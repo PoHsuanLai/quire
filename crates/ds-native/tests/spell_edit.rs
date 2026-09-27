@@ -156,6 +156,10 @@ fn on_mark(harness: &Harness) -> Point {
 
 #[test]
 fn a_misspelling_is_marked_after_the_debounce_under_its_word() {
+    // Kept on Wall: the mark lands only once the process's spell worker (a real thread, a
+    // `tokio::sync::oneshot` reply) answers, which needs real wall time to run; `Clock::Virtual`
+    // never sleeps real time on `advance`, so the poll below could exhaust `SETTLE_BOUND`
+    // without the worker ever getting to reply.
     let mut harness = fresh("marked");
     type_text(&mut harness, "the teh ");
     let typed = Instant::now();

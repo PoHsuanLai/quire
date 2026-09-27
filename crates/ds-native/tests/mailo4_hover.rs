@@ -13,9 +13,9 @@ use ds::{
     Measured, MountedRef, Point, Px, Rect, Size, use_hover_intent,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use probe::rect;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 720,
@@ -162,9 +162,12 @@ fn pin(n: usize) -> String {
 
 #[test]
 fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
-    let mut harness = Harness::new(ByElement, VIEW);
+    let mut harness = Harness::with_config(
+        ByElement,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
-    let entered = Instant::now();
+    let entered = harness.now();
     harness.pointer_move(centre(&harness, &pin(2)));
     // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
@@ -214,9 +217,12 @@ fn a_card_keyed_on_a_rect_the_caller_has_opens_below_it() {
 
 #[test]
 fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
-    let mut harness = Harness::new(Unplaced, VIEW);
+    let mut harness = Harness::with_config(
+        Unplaced,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
-    let entered = Instant::now();
+    let entered = harness.now();
     harness.pointer_move(centre(&harness, &pin(1)));
     // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
@@ -246,7 +252,7 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     );
     assert_eq!(harness.attr(".ds-hovercard", "style"), None);
     // Out: 150 ms to close, then `hc-out` plays before the card goes.
-    let left = Instant::now();
+    let left = harness.now();
     harness.pointer_move(AWAY);
     // Well under half the 150 ms close delay, same reasoning as the open check above.
     harness.advance(ms(60));
