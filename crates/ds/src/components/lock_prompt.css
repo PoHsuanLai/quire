@@ -22,6 +22,10 @@
 .ds-lock-field .ds-input-mask,
 .ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
 .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
+/* The field draws its caret among the dots in their ink (Q360b); the input's own stays hidden. */
+.ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
+/* Half the pill's .14em tracking back, so the caret stays centred in the gap (Q360b). */
+.ds-lock-field .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
 .ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
 .ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
 
@@ -41,6 +45,8 @@
 /* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
 .ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-caret::before{ background:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
 .ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }

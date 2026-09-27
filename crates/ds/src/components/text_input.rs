@@ -1,5 +1,6 @@
 //! TextInput: the one field every text input uses (design/04-COMPONENTS.md section 6).
 
+use crate::components::text_input_mask::MaskCaret;
 use crate::components::text_input_parts::{Field, Handlers, area, file, line};
 use crate::components::vocab::Availability;
 use dioxus::prelude::*;
@@ -85,6 +86,7 @@ pub fn TextInput(
     #[props(default)] handle: Option<FieldHandle>,
 ) -> Element {
     let focuser = FieldFocus::use_new(handle);
+    let caret = MaskCaret::use_new();
     let mut typed = use_signal(String::new);
     if let Focus::Controlled(request) = focus {
         focuser.follow(request, onfocus);
@@ -93,8 +95,12 @@ pub fn TextInput(
     let committed = text.clone();
     let blurred = text.clone();
     let told = Told {
-        focus: use_callback(move |()| onfocus.call(())),
+        focus: use_callback(move |()| {
+            caret.refresh();
+            onfocus.call(())
+        }),
         blur: use_callback(move |()| {
+            caret.refresh();
             onchange.call(blurred.clone());
             onblur.call(());
         }),
@@ -106,6 +112,7 @@ pub fn TextInput(
         availability,
         focus,
         focuser,
+        caret,
         handlers: Handlers {
             oninput: EventHandler::new(move |next: String| {
                 typed.set(next.clone());

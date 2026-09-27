@@ -14,7 +14,10 @@ pub mod select;
 pub mod selector;
 pub(crate) mod targets;
 
-pub use caret::{Caret, Collapsed, HostCaret, HostPlaceCaret, InitialCaret, caret_at};
+pub use caret::{
+    Caret, Collapsed, FieldSelection, HostCaret, HostPlaceCaret, HostSelection, InitialCaret,
+    caret_at,
+};
 pub use click::{Fallback, HostClickFocus, HostPressFocus};
 pub use field::{FieldHandle, use_field_handle};
 pub use hand_back::HostHandBack;

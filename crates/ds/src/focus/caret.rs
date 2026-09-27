@@ -42,6 +42,31 @@ pub enum InitialCaret {
 #[derive(Debug, Clone, Copy)]
 pub struct HostPlaceCaret(pub fn(&MountedData, InitialCaret) -> crate::focus::host::Focused);
 
+/// A field's caret and selection as the host reads them (sill Q360b): a masked field draws its
+/// own caret over its dots, since Blitz measures the hidden text in another face than the dots.
+/// Offsets count characters (`char`s) of the field's text, as the mask draws one dot for each.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum FieldSelection {
+    /// The field has the keyboard; its selection runs from `anchor` to `focus` (where the caret
+    /// is), equal when it is a bare caret.
+    Focused {
+        /// Where the selection began, in characters.
+        anchor: usize,
+        /// Where the caret is, in characters.
+        focus: usize,
+    },
+    /// The field does not have the keyboard.
+    Unfocused,
+    /// No host could read it now: the document busy, or the element not a laid-out field.
+    Unknown,
+}
+
+/// The host's selection read, provided as root context by ds-native beside [`HostCaret`]
+/// (`launch`, its harness and `ds_native::focus::provide`). Without one (a webview) a masked
+/// field leaves the caret to the renderer.
+#[derive(Debug, Clone, Copy)]
+pub struct HostSelection(pub fn(&MountedData) -> FieldSelection);
+
 /// Where a caret at byte `focus` of `text`, with the selection `collapsed` or not, sits.
 pub fn caret_at(text: &str, focus: usize, collapsed: Collapsed) -> Caret {
     match collapsed {
