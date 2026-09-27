@@ -10,32 +10,33 @@
    "status": "done",
    "lede": "Every accent now comes from one function that keeps it inside band B: light fills carrying dark ink, translucent washes for selections, menus and chips, a deeper blue for text and thin marks, and a focus ring drawn from it. The Space accents come from the same function, so mailo's frame and the shell match. Every hue is checked for legibility in both themes. Blue moved to a sky blue so it no longer duplicates Postmark. Landed in quire and sill on 2026-09-27; the candidate sheets stay below as the record.",
    "notes": [
-    "A · System: the Mac-like bright blue, white text on it; washes at 16%.",
-    "B · Airy: the lightest; buttons and today's date get dark text because white can't be read on a fill that light. The fill itself stands out less from white, so it relies on shape too.",
-    "C · Calm: a softer blue than A with white text in light mode, dark text in dark mode.",
-    "Also asked: Postmark and Blue come out nearly the same inside one band, so one of the two accents in the picker should go.",
-    "Calendar: the compact month now fills its widget; rows spread over the height (taller rows in a five-week month), margins balanced."
+    "Being fixed: the launcher's match highlight on a selected row, the password prompt's Details link and the desktop calendar's month label came out just under 4.5:1 on their real backgrounds; the band's checks now also measure against the translucent tints and materials.",
+    "Being fixed: the notification center's large calendar tile leaves empty space under the month."
    ],
    "images": [
     {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent-b/launcher.png",
+     "caption": "The launcher on accent B (sill, nested)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent-b/control-center.png",
+     "caption": "Control center: the accent swatches and the Space-derived selections."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent-b/notification-center.png",
+     "caption": "Notification center; the large calendar tile's empty space is being fixed."
+    },
+    {
      "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-b-final-light.png",
-     "caption": "Band B, light: the final look."
+     "caption": "Band B, light: every accented part."
     },
     {
      "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-b-final-dark.png",
      "caption": "Band B, dark."
     },
     {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/accent-candidates-light.png",
-     "caption": "Light: today's Postmark, then A, B, C."
-    },
-    {
-     "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-before-5wk-light-4x.png",
-     "caption": "Calendar before (4x): packed at the top."
-    },
-    {
      "path": "/home/pohsuanlai/quire/tools/progress/shots/accent/calendar-compact-after-5wk-light-4x.png",
-     "caption": "Calendar after (4x): fills the tile."
+     "caption": "The compact calendar after its spacing fix (4x)."
     }
    ]
   },
