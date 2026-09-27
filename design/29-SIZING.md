@@ -1,7 +1,7 @@
 # 29 Sizing: control heights, spacing and radii from rules
 
-Status: **draft, proposed** (2026-09-28). Nothing here is settled and nothing has been built:
-this is a research and proposal pass. The audit material is in `audit/` (section 2). Confidence
+Status: **settled and built** (2026-09-28; decisions in section 13, what landed in section 15).
+It began as a research and proposal pass. The audit material is in `audit/` (section 2). Confidence
 legend as in `23-WIDGETS.md`: **H** primary source (Apple's own design templates, HIG or
 Support pages), **M** reliable secondary source or a careful measurement, **L** estimate. The
 reference is the pre-Liquid-Glass Mac (macOS 14 Sonoma and 15 Sequoia;
@@ -413,3 +413,26 @@ lint (`Rule::RawControlHeight`).
   `crates/ds/src/icon/{family,plate_tint,retint}.rs`; sill (read only):
   `crates/sill-settings/src/{bar,control_center}.rs`,
   `crates/sill-surfaces/src/surfaces/{bar,control_center}/`, `crates/sill-surfaces/src/style/`.
+
+## 15. Built (branch `sizing-audit`, 2026-09-28)
+
+- `ds::SizeScale` and `ds::ControlSize {Small, Regular, Large}` (`tokens/{size_scale,
+  control_size,size_vars}.rs`), one table test over R1-R8 (`tokens/size_rules_tests.rs`); the
+  stylesheet emits `--ctl-{h,r,cap-r,glyph,pad,fs,fw}-{s,m,l}`, `--knob-*`, `--switch-{w,h,r,knob}-*`,
+  `--slider-{track,knob}-*`, `--seg-{well-r,h,r}-*`, `--knob-inset`; `ShellScale` (`--shell-bar-h`
+  24, `--bar-status-w` 30, `--r-shell-menu` 8, `--shell-menu-inset` 5) and `ControlCenterScale`
+  (`--cc-width` 320, `--cc-pad` 10, `--cc-gap` 10, `--cc-module-r` 8, `--cc-panel-r` 18,
+  `--cc-tile-h` 56, `--cc-head` 16, `--cc-head-gap` 6, `--cc-level-h` 64) are the Rust values
+  sill's size estimates should read (R9).
+- Where the build departs from section 7's table: the Small slider knob is 14 (the rule
+  `h - 2`; the table said 16); push buttons keep radius 5 at Large as the reference's templates do
+  (the ladder's Large radius 6 is for other rounded rectangles); Mini is the ladder's Small (16)
+  with its 12 px label; the Strip icon button keeps mailo's 26 (decision 9); the level's press
+  swell is `scaleY(1.1)` so it stays about a pixel each side on 22; the segmented control and the
+  appearance picker are not yet moved (a separate branch owns them).
+- F3: `icon/tone_band.rs`; `retint_in` and `PlateStops::tinted_in` take the scheme, `retint`
+  keeps the light rule for existing callers.
+- `ds-gallery --snapshot/--level-sheet/--accent-sheet` write only to DIR; `--progress` asks for
+  the progress page's copy.
+- Still open: R7's sweep of the off-grid spacing steps (section 12 step 6), the
+  `Rule::RawControlHeight` lint, sill reading these sizes (R9), mailo's own density step.
