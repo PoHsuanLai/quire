@@ -3,12 +3,15 @@
    clipped, an icon or an emoji centred), the caption, the facts, then the actions at the foot.
    It slides in from the right (`slide-r`, `--t-move --e-spring`, restarted under its other name
    on each showing) and out the same way (`pane-out-r`, held); hidden, nothing is laid out.
+   Present keeps the entrance declared and plays `hold` after a taken-back hide (`data-pulse=held`),
+   so no settle or take-back drops an animation without starting another (sill G295).
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
 .ds-preview{ display:flex; flex-direction:column; gap:var(--s-12); box-sizing:border-box; width:100%; height:100%; min-height:0; padding:var(--s-16); overflow:hidden; color:var(--ink); }
 .ds-preview[*|data-shown=hidden]{ display:none; }
-.ds-preview[*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
-.ds-preview[*|data-presence=entering][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-preview[*|data-presence=entering],.ds-preview[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-spring); }
+.ds-preview[*|data-presence=entering][*|data-pulse=b],.ds-preview[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-preview[*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
 .ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; }

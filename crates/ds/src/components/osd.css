@@ -9,14 +9,18 @@
    Motion. `osd-in` at `--t-quick --e-out` while entering, restarted under its other name on each
    showing (`data-pulse`); `osd-out` at `--t-move --e-exit`, held, while leaving. Both move by
    `--osd-dy`, which follows the anchor: from above at the top right, from below at the bottom
-   centre. Hidden, nothing is laid out. */
+   centre. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
+   timer never cancels an entrance the frame clock is still playing; present again after a hide
+   was taken back (`data-pulse=held`), it plays `hold`, so dropping `osd-out` starts an animation
+   in the same restyle (sill G295). */
 
 .ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
   width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
 .ds-osd[*|data-position=top-right]{ --osd-dy:-8px; margin:var(--osd-margin) var(--s-12) 0 auto; }
 .ds-osd[*|data-position=bottom-centre]{ --osd-dy:8px; margin:0 auto var(--osd-margin); }
 .ds-osd[*|data-shown=hidden]{ display:none; }
-.ds-osd[*|data-presence=entering]{ animation:osd-in var(--t-quick) var(--e-out); }
-.ds-osd[*|data-presence=entering][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:osd-in var(--t-quick) var(--e-out); }
+.ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }

@@ -442,6 +442,7 @@ impl Anim {
             Anim::RollOut => detail::ROLL_OUT,
             Anim::SealOut => detail::SEAL_OUT,
             Anim::NudgeUp => detail::NUDGE_UP,
+            Anim::Hold => own::HOLD,
         }
     }
 }

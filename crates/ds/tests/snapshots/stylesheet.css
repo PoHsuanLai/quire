@@ -378,6 +378,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* nudge-up: attention, once (design/26 Attention): the element lifts and settles. `nudge` is
    the centred outbox pill's and carries its translateX(-50%). */
 @keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
+
+/* hold (quire's, sill G295): a keyframe that moves nothing. A resting state that follows an
+   animated one (a surface present again after a hide was taken back, a row or a pane at rest)
+   plays it at `--t-tap --e-linear`, so the restyle that drops the running animation starts
+   another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until
+   something restyles it again; a starting animation is that restyle, in the same frame. */
+@keyframes hold{ from{ } to{ } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
@@ -470,6 +477,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes roll-in--b{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
 @keyframes roll-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
 @keyframes nudge-up--b{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
+@keyframes hold--b{ from{ } to{ } }
 .a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
 .a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
 .a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
@@ -620,6 +628,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-seal-out[*|data-pulse=b]{animation:gulp--b var(--t-big) var(--e-out);}
 .a-nudge-up[*|data-pulse=a]{animation:nudge-up var(--t-nudge) var(--e-out);}
 .a-nudge-up[*|data-pulse=b]{animation:nudge-up--b var(--t-nudge) var(--e-out);}
+.a-hold[*|data-pulse=a]{animation:hold var(--t-tap) var(--e-linear);}
+.a-hold[*|data-pulse=b]{animation:hold--b var(--t-tap) var(--e-linear);}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -776,7 +786,9 @@ html,body{margin:0;padding:0;background:transparent}
    element, not on `data-presence=entering`: Blitz keeps the last animated value when an
    animation is taken off, so a presence turned `present` early would freeze it mid-slide), and
    the row leaves with `banner-out` (both `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
-   the position) with the heal ripple. A card swiped away inside a row holds its offset while the
+   the position) with the heal ripple. A row at rest plays `hold`, which moves nothing, so a
+   heal settled or an exit taken back never drops an animation without starting another (sill
+   G295). A card swiped away inside a row holds its offset while the
    row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
    (spike S2).
    The entry edge (`data-entry`, `notifications.banner_entry_direction`) sets the vector
@@ -792,6 +804,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-banner{ display:flex; justify-content:flex-end; padding-bottom:var(--notifications-stack-gap); }
 .ds-banner-stack[*|data-position=bottom-right] > .ds-banner{ padding-bottom:0; padding-top:var(--notifications-stack-gap); }
 .ds-banner-card{ display:flex; justify-content:flex-end; animation:banner-in var(--t-move) var(--e-spring); }
+.ds-banner[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-banner[*|data-presence=leaving]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 .ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal)); }
 .ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }
@@ -1514,6 +1527,11 @@ html,body{margin:0;padding:0;background:transparent}
   animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
 }
 
+/* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
+   rest timer (wall clock) that turns a row present never drops a running animation without
+   starting another; Blitz at the pinned rev keeps a dropped animation's last value (sill G295). */
+.ds-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+
 /* Leaving (`S:326-329`, `C:714`). */
 .ds-row[*|data-presence=leaving]{ pointer-events:none; }
 .ds-row[*|data-presence=leaving][*|data-exit=fold]{ animation:fold var(--t-big) var(--e-exit) forwards; }
@@ -1864,15 +1882,19 @@ html,body{margin:0;padding:0;background:transparent}
    Motion. `osd-in` at `--t-quick --e-out` while entering, restarted under its other name on each
    showing (`data-pulse`); `osd-out` at `--t-move --e-exit`, held, while leaving. Both move by
    `--osd-dy`, which follows the anchor: from above at the top right, from below at the bottom
-   centre. Hidden, nothing is laid out. */
+   centre. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
+   timer never cancels an entrance the frame clock is still playing; present again after a hide
+   was taken back (`data-pulse=held`), it plays `hold`, so dropping `osd-out` starts an animation
+   in the same restyle (sill G295). */
 
 .ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
   width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
 .ds-osd[*|data-position=top-right]{ --osd-dy:-8px; margin:var(--osd-margin) var(--s-12) 0 auto; }
 .ds-osd[*|data-position=bottom-centre]{ --osd-dy:8px; margin:0 auto var(--osd-margin); }
 .ds-osd[*|data-shown=hidden]{ display:none; }
-.ds-osd[*|data-presence=entering]{ animation:osd-in var(--t-quick) var(--e-out); }
-.ds-osd[*|data-presence=entering][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:osd-in var(--t-quick) var(--e-out); }
+.ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
 /* -- module_tile -- */
@@ -2041,10 +2063,13 @@ html,body{margin:0;padding:0;background:transparent}
    and the outgoing one leaves the other way (`pane-out-l`, `pane-out-r`) at `--t-move
    --e-exit`, held at its last frame until it is dropped. The leaving pane is out of the flow,
    pinned to the top, so the switcher is as tall as the pane arriving; what it overhangs is
-   clipped. */
+   clipped. A pane at rest plays `hold`, which moves nothing, so the settle timer (wall clock)
+   never drops a slide without starting another animation: Blitz at the pinned rev keeps a
+   dropped animation's last value (sill G295). */
 
 .ds-panes{ position:relative; overflow:hidden; }
 .ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
+.ds-pane[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-pane[*|data-pane=detail][*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
 .ds-pane[*|data-pane=root][*|data-presence=entering]{ animation:slide-l var(--t-move) var(--e-spring); }
 .ds-pane[*|data-pane=root][*|data-presence=leaving]{ animation:pane-out-l var(--t-move) var(--e-exit) forwards; }
@@ -2055,7 +2080,10 @@ html,body{margin:0;padding:0;background:transparent}
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
    rule paints it) at the material's radius, and scrolls its own content. It slides in with
    `panel-in` (`--t-move --e-out`, restarted under its other name on each showing) and out with
-   `panel-out` (`--t-move --e-exit`, held); hidden, nothing is laid out. An optional scrim covers
+   `panel-out` (`--t-move --e-exit`, held); hidden, nothing is laid out. Present keeps the
+   entrance declared, so the settle timer never cancels a slide the frame clock is still playing;
+   present again after a hide was taken back (`data-pulse=held`), it plays `hold`, so dropping
+   `panel-out` starts an animation in the same restyle (sill G295). An optional scrim covers
    the stage behind it. The panel's material scope fills the root too: Blitz places an absolutely
    positioned box against its parent, so a scope of no height would give the panel none.
    Attribute selectors carry `*|` (spike S2). */
@@ -2066,8 +2094,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-panel{ position:absolute; top:var(--s-8); bottom:var(--s-8); box-sizing:border-box; max-width:calc(100% - var(--s-16));
   display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; scrollbar-width:none; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
 .ds-panel-stage[*|data-edge=right] > .ds-panel{ right:var(--s-8); }
-.ds-panel[*|data-presence=entering]{ animation:panel-in var(--t-move) var(--e-out); }
-.ds-panel[*|data-presence=entering][*|data-pulse=b]{ animation-name:panel-in--b; }
+.ds-panel[*|data-presence=entering],.ds-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
+.ds-panel[*|data-presence=entering][*|data-pulse=b],.ds-panel[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
+.ds-panel[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-panel[*|data-presence=leaving]{ animation:panel-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
@@ -2185,12 +2214,15 @@ html,body{margin:0;padding:0;background:transparent}
    clipped, an icon or an emoji centred), the caption, the facts, then the actions at the foot.
    It slides in from the right (`slide-r`, `--t-move --e-spring`, restarted under its other name
    on each showing) and out the same way (`pane-out-r`, held); hidden, nothing is laid out.
+   Present keeps the entrance declared and plays `hold` after a taken-back hide (`data-pulse=held`),
+   so no settle or take-back drops an animation without starting another (sill G295).
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
 .ds-preview{ display:flex; flex-direction:column; gap:var(--s-12); box-sizing:border-box; width:100%; height:100%; min-height:0; padding:var(--s-16); overflow:hidden; color:var(--ink); }
 .ds-preview[*|data-shown=hidden]{ display:none; }
-.ds-preview[*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
-.ds-preview[*|data-presence=entering][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-preview[*|data-presence=entering],.ds-preview[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-spring); }
+.ds-preview[*|data-presence=entering][*|data-pulse=b],.ds-preview[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-preview[*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
 .ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; }
@@ -2427,7 +2459,9 @@ html,body{margin:0;padding:0;background:transparent}
 
    Motion. Entering, `rise` at `--t-big --e-spring` (`Anim::ShotIn`), restarted under its other
    name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
-   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out.
+   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
+   declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
+   take-back drops an animation without starting another (sill G295).
 
    Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
    actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in
@@ -2436,8 +2470,9 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
 .ds-shot[*|data-shown=hidden]{ display:none; }
-.ds-shot[*|data-presence=entering]{ animation:rise var(--t-big) var(--e-spring); }
-.ds-shot[*|data-presence=entering][*|data-pulse=b]{ animation-name:rise--b; }
+.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:rise var(--t-big) var(--e-spring); }
+.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:rise--b; }
+.ds-shot[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-shot[*|data-presence=leaving]{ animation:shot-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
 .ds-shot-plate{ position:relative; box-sizing:border-box; width:100%; border-radius:var(--m-radius); overflow:hidden; }
@@ -2468,8 +2503,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-shot[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 .ds-shot[*|data-swipe=gone][*|data-presence=leaving]{ animation:none; opacity:0; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-swipe]{ transition:none; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering]{ animation-name:fade; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b]{ animation-name:fade--b; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present]{ animation-name:fade; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=held]{ animation-name:hold; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=leaving]{ animation-name:menu-out; }
 /* -- sidebar_item -- */
 /* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
@@ -2534,6 +2570,9 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
+/* At rest, `hold` (moves nothing), so turning present never drops `tab-in` without starting
+   another animation (sill G295); an item wearing a pulse plays the pulse instead. */
+.ds-sidebar-item[*|data-kind=today][*|data-presence=present]:not([*|data-pulse]){ animation:hold var(--t-tap) var(--e-linear); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:tab-out var(--t-move) var(--e-exit) forwards; overflow:hidden; }
 /* -- slider -- */
 /* Slider (design/04-COMPONENTS.md section 5, derived): the editor's `.handle` (`S:255-257`) as the

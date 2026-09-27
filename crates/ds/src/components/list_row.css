@@ -36,6 +36,11 @@
   animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
 }
 
+/* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
+   rest timer (wall clock) that turns a row present never drops a running animation without
+   starting another; Blitz at the pinned rev keeps a dropped animation's last value (sill G295). */
+.ds-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+
 /* Leaving (`S:326-329`, `C:714`). */
 .ds-row[*|data-presence=leaving]{ pointer-events:none; }
 .ds-row[*|data-presence=leaving][*|data-exit=fold]{ animation:fold var(--t-big) var(--e-exit) forwards; }
