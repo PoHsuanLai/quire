@@ -222,3 +222,36 @@ fn todays_compact_disc_is_a_circle_twice_its_number() {
         "the disc {disc:?} stays inside its column {cell:?}"
     );
 }
+
+/// The small widget with the month inside a row flex wrapper that does not stretch it, as sill's
+/// `.sill-cal` places it: unstretched, the month's own height must still fit the content box.
+#[allow(non_snake_case)]
+fn WrappedSmallCalendar() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+            div { style: WidgetMetrics::default().style_attr(),
+                WidgetFrame { size: WidgetSize::Small,
+                    div { style: "display:flex; justify-content:center;",
+                        MonthGrid {
+                            data: sample(AUGUST, First::Monday),
+                            weeks: WeekNumbers::Show,
+                            onstep: move |_: Step| {},
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn an_unstretched_six_week_month_still_fits_the_small_widget() {
+    let harness = Harness::new(WrappedSmallCalendar, VIEW);
+    let body = rect(&harness, ".ds-widget-body");
+    let month = rect(&harness, ".ds-month");
+    assert!(
+        within(month, body),
+        "a six-week month in a wrapper that does not stretch it overflows the content box: \
+         month {month:?}, body {body:?}"
+    );
+}

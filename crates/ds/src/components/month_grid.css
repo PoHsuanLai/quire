@@ -84,8 +84,9 @@
 .ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,minmax(calc(2 * var(--fs-caption)),1fr)); }
 .ds-month[*|data-density=compact] .ds-month-head{ height:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-nano); line-height:1; }
 .ds-month[*|data-density=compact] .ds-month-weeks{ flex:1; min-height:0; margin-bottom:calc(-1 * var(--s-4)); }
+/* Basis 19, one under the disc: unstretched (a wrapper that does not fill the frame, sill's `.sill-cal`), six weeks come to 14 + 12 + 6 x 19 - 4 = 136 and still fit 140. */
 .ds-month[*|data-density=compact] .ds-month-weeks > .ds-month-row{
-  flex:1 1 calc(2 * var(--fs-caption)); min-height:0; grid-template-rows:minmax(0,1fr);
+  flex:1 1 calc(2 * var(--fs-caption) - var(--s-1)); min-height:0; grid-template-rows:minmax(0,1fr);
 }
 .ds-month[*|data-density=compact] .ds-month-day{ height:auto; min-height:0; gap:0; justify-content:center; }
 .ds-month[*|data-density=compact] .ds-month-num{
