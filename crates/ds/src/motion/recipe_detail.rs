@@ -14,6 +14,16 @@ pub(super) const MORPH_IN: Recipe = recipe(
     Iteration::Once,
 );
 
+/// `morph-in` at `--t-quick --e-spring`: the incoming glyph of a morph the person's press caused
+/// (design/26 R5); Calm and Reduced flatten the spring to `--e-out` through the token.
+pub(super) const MORPH_IN_SPRING: Recipe = recipe(
+    "morph-in",
+    DurationToken::Quick,
+    EasingToken::Spring,
+    Fill::Backwards,
+    Iteration::Once,
+);
+
 /// `morph-out` at `--t-quick --e-out`: the outgoing glyph of a DownUp morph, held gone until
 /// its layer is removed.
 pub(super) const MORPH_OUT: Recipe = recipe(

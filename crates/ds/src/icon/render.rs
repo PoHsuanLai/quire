@@ -68,6 +68,7 @@ impl IconSize {
 fn child(shape: &Shape) -> Element {
     match shape {
         Shape::Path(d) => rsx! { path { d: "{d}" } },
+        Shape::Solid(d) => rsx! { path { d: "{d}", fill: "currentColor" } },
         Shape::Circle { cx, cy, r } => rsx! { circle { cx: "{cx}", cy: "{cy}", r: "{r}" } },
         Shape::Rect {
             x,

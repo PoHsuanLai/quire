@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 77 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 78 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -24,7 +24,9 @@
 //! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`, `RollIn`, `RollOut`,
 //! `SealOut` and `NudgeUp`, plus `Hold`, a keyframe that moves nothing, which a resting state
 //! plays so the restyle that drops a running animation starts another (sill G295), plus
-//! `PaneInROut`, the preview pane's entrance nobody touched (design/26 R5, sill Q370).
+//! `PaneInROut`, the preview pane's entrance nobody touched (design/26 R5, sill Q370), plus
+//! `MorphInSpring`, `morph-in` on the glyph the person pressed (design/26 R5, D2: play/pause, a
+//! Focus disc).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -221,6 +223,10 @@ pub enum Anim {
     /// `slide-r` at `--t-move --e-out`: a preview pane shown by something other than the
     /// person's contact (design/26 R5; sill Q370), where `PaneInR` springs.
     PaneInROut,
+    /// `morph-in` at `--t-quick --e-spring`: the incoming glyph of a DownUp or OffUp morph the
+    /// person's own press caused (design/26 R5, D2: play/pause, the Focus disc); `MorphIn` is the
+    /// same growth at `--e-out` for a change from elsewhere.
+    MorphInSpring,
 }
 
 impl Anim {
@@ -231,7 +237,7 @@ impl Anim {
     pub const PersonaHop: Anim = Anim::PictureAccept;
 
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 77] = [
+    pub const ALL: [Anim; 78] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -309,6 +315,7 @@ impl Anim {
         Anim::NudgeUp,
         Anim::Hold,
         Anim::PaneInROut,
+        Anim::MorphInSpring,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -391,6 +398,7 @@ impl Anim {
             Anim::NudgeUp => "a-nudge-up",
             Anim::Hold => "a-hold",
             Anim::PaneInROut => "a-pane-in-r-out",
+            Anim::MorphInSpring => "a-morph-in-spring",
         }
     }
 }

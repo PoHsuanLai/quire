@@ -95,6 +95,7 @@ impl Icon {
         Icon::Gauge,
         Icon::Brightness,
         Icon::Switches,
+        Icon::MoonFilled,
     ];
 
     /// Glyphs for a consumer's actions beyond the two sets (Lucide, `geometry_actions`).
@@ -213,6 +214,7 @@ impl Icon {
         Icon::Gauge,
         Icon::Brightness,
         Icon::Switches,
+        Icon::MoonFilled,
         Icon::Printer,
         Icon::FolderInput,
         // mailo gaps 6.
