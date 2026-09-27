@@ -2188,6 +2188,43 @@ keyed by what the row *is*, not how it looks: a header by its `AppKey`, a card b
 `notifications.center_width_px` and the card spacing stay yours: put the gap between cards as
 padding or margin inside your row content, never between the list's rows.
 
+### Alert (2026-09-28): a question with Cancel and one action (sill Q490)
+
+design/04-COMPONENTS.md section 55; design/06-INTERACTIONS.md sections 17 and 18. Additive:
+`Alert`, `AlertEmphasis`, `AlertButton`. Nothing existing changed; new goldens under
+`tests/snapshots/alert/`, and the stylesheet golden moved (`alert.css`).
+
+```rust
+use ds::{Alert, Flow, Text};
+
+// Inside the control center's panel body, which must be positioned (`position:relative`):
+if confirming() {
+    Alert {
+        title: "Turn Bluetooth off?",
+        message: Some(Text::from("Bluetooth devices such as keyboards and mice will be disconnected.")),
+        action: "Turn Off",
+        flow: Flow::Inline,
+        onaction: move |_| { bluetooth.power_off(); confirming.set(false) },
+        oncancel: move |_| confirming.set(false),
+    }
+}
+```
+
+| Prop, type or method | What it does |
+| --- | --- |
+| `Alert { title, message: Option<Text>, action, cancel ("Cancel"), emphasis: AlertEmphasis (Default), onaction, oncancel, icon: Option<IconSource>, flow: Flow (Floating), shown: Option<Shown>, on_hidden, panel_id }` | The Mac's two-button alert in the narrow sheet (340, or 88 % of a smaller container) over the modal scrim, entering with `peek-in`. Cancel on the left, the action on the right; the default button is filled and takes the keyboard as it opens. Return presses the default wherever the keyboard is, Space the focused button, Tab moves between the two and never out, Escape or a press on the scrim calls `oncancel`. `onaction`/`oncancel` only report: closing it is yours (unmount it, or pass `shown: Some(Shown::Hidden)` and unmount at `on_hidden` for the exit) |
+| `AlertEmphasis::{Default, Destructive}`, `default_button() -> AlertButton::{Cancel, Action}` | `Destructive` draws the action's label red and makes **Cancel** the default (filled, Return, first focus), per the HIG: never give the primary role to a destructive button. "Turn Off" for Bluetooth is not destructive: it is `Default`, so Return turns it off, as macOS does |
+| `flow: Flow::Inline` | Drawn where you render it, covering the nearest positioned ancestor (scrim included) on the peek layer, with no overlay layer of its own: the control center's popover. Render it last in that container. A 320 px popover gets a 281 px panel; two short labels fit side by side |
+| `flow: Flow::Floating` | A centred `Sheet` in the root's overlay: a full window or a full-screen dialog surface. The root needs a height (`RootExtent::Viewport`) |
+
+**What sill changes.** In the control center, when Bluetooth is switched off while an input
+device is connected, set a `confirming` signal instead of switching at once and render the
+`Alert` above with `flow: Flow::Inline` as the last child of the panel's positioned body
+(`control_center.rs`'s panel, whose root is the bar popup's `Ds`); switch Bluetooth off in
+`onaction`. Nothing else in the popover needs to change: the alert's own keys stop at it, so the
+panel's Escape (close the control center) runs only when no alert is up. A full-window use (a
+shell dialog surface) keeps `Flow::Floating` in a root with `RootExtent::Viewport`.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive

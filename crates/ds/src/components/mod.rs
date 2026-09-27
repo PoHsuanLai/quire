@@ -1,6 +1,8 @@
 //! Every component, one `<name>.rs` and `<name>.css` pair each (design/04-COMPONENTS.md).
 
 pub mod account_tile;
+pub mod alert;
+pub mod alert_vocab;
 pub mod animated_list;
 pub mod app_switcher;
 pub mod appearance_picker;
@@ -185,6 +187,8 @@ pub mod window_frame;
 pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
+pub use alert::Alert;
+pub use alert_vocab::{AlertButton, AlertEmphasis};
 pub use animated_list::AnimatedList;
 pub use app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence};
 pub use appearance_picker::{AppearancePicker, PickerLayout};
@@ -340,6 +344,7 @@ pub use workspace_pills::{WorkspacePill, WorkspacePills};
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.
 pub const CSS: &[(&str, &str)] = &[
     ("account_tile", include_str!("account_tile.css")),
+    ("alert", include_str!("alert.css")),
     ("animated_list", include_str!("animated_list.css")),
     ("appearance_picker", include_str!("appearance_picker.css")),
     ("app_switcher", include_str!("app_switcher.css")),

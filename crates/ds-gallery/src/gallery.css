@@ -113,6 +113,10 @@
 /* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-modal-stage{height:300px}
+.g-alert-row{align-items:flex-start;gap:var(--s-22)}
+.g-alert-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
+.g-alert-cc-body{position:relative;padding:var(--s-12);min-height:300px}
+.g-alert-stage{height:360px;padding:var(--s-14)}
 .g-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
 .g-cc-body{padding:var(--s-12)}
 /* The notifications specimen (sill Q120-Q125): per scheme, the Work tint holding the banners

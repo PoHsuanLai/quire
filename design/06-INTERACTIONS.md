@@ -580,6 +580,7 @@ outbox pill (C:2118-2186).
 | hover card, link pill, toast | never take focus | |
 | focus ring | `:focus-visible` 2.5 px accent outline, offset 2, radius 4 | S:55 |
 | desktop launcher | keyboard-first: never depends on hover for its initial state (cosmic-comp #2230) | plan, shell risks |
+| an alert opens (`Alert`, sill Q490) | the default button takes focus: the action, or Cancel when the action is destructive (the HIG: never give the primary role to a destructive button); Tab and Shift+Tab move between its two buttons and never leave it (it is modal); Return presses the default wherever the focus is, Space the focused button | design/04 section 55 |
 
 ## 18. Escape by context
 
@@ -598,6 +599,7 @@ One Escape dismisses exactly one layer: the innermost. The table is the port's r
 | 8 | C: an open view menu | close it | C:2260 |
 | 9 | a hover card | not specified (proposed: close without warm) | |
 | 10 | desktop launcher | close | plan sill |
+| 11 | an alert (`Alert`) | Cancel (as a press on its scrim) | quire, sill Q490 |
 
 ## 19. Other list behaviours
 
