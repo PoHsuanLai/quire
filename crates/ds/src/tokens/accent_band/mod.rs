@@ -22,6 +22,7 @@ mod legibility;
 mod oklab;
 mod picked;
 mod roles;
+mod text_grounds;
 
 pub use band::{AccentBand, AccentPick, ChromaSpan, Hue, InkRule, Milli, SchemeBand, Weight};
 pub use derive::accent_roles;
@@ -30,6 +31,10 @@ pub use legibility::{Legibility, legibility};
 pub use oklab::distance;
 pub use picked::{BAND, hue_of};
 pub use roles::AccentRoles;
+pub use text_grounds::{
+    BACKDROPS, Ground, GroundKind, TEXT_MATERIALS, TextOn, least_on, material_grounds,
+    text_grounds, text_on,
+};
 
 #[cfg(test)]
 mod tests;

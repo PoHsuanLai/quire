@@ -38,7 +38,8 @@ pub struct FrameVars {
     /// `--f-grain`: the grain tile's opacity, `grain / 100 x .20` light, `x .16` dark.
     pub grain_opacity: String,
     /// The accent roles when the card borrows the Space's hue; written as `--accent`,
-    /// `--accent-ink`, `--accent-soft`, `--accent-text`, `--accent-ring` and `--seal`.
+    /// `--accent-ink`, `--accent-soft`, `--accent-text`, `--accent-text-material`,
+    /// `--accent-ring` and `--seal`.
     pub accent: Option<AccentRoles>,
 }
 
@@ -104,6 +105,7 @@ impl FrameVars {
                 ("--accent-ink", roles.ink.css()),
                 ("--accent-soft", roles.wash_colour().css()),
                 ("--accent-text", roles.text.css()),
+                ("--accent-text-material", roles.text_material.css()),
                 ("--accent-ring", roles.ring_colour().css()),
                 ("--seal", roles.fill.css()),
             ]);
@@ -195,6 +197,7 @@ mod tests {
                 "--accent-ink",
                 "--accent-soft",
                 "--accent-text",
+                "--accent-text-material",
                 "--accent-ring",
                 "--seal"
             ]
