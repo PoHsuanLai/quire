@@ -176,7 +176,7 @@ fn KeyboardCell() -> Element {
                         value: level(),
                         glyph: LevelGlyph::KeyboardBrightness,
                         mode: LevelMode::Interactive,
-                        look: LevelLook::Capsule,
+                        look: LevelLook::CapsuleKnob,
                         tick: Tick::Quiet,
                         onchange: move |next| level.set(next),
                     }

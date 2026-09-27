@@ -7,11 +7,10 @@
 use dioxus::prelude::*;
 use ds::icon::{IconStyle, Tint};
 use ds::{
-    Appearance, Button, ButtonVariant, Chevron, Ds, Fraction, Icon, IconButton,
-    IconButtonVariant, IconSize, IconSource, IconView, LevelControl, LevelGlyph,
-    LevelLook, Material, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile, Muting,
-    PlateFamily, PlateTint, Px, Scheme, SegSize, SegmentedControl, Slider, StatusMetrics,
-    Surface, Switch, Theme, Toggle,
+    Appearance, Button, ButtonVariant, Chevron, Ds, Fraction, Icon, IconButton, IconButtonVariant,
+    IconSize, IconSource, IconView, LevelControl, LevelGlyph, LevelLook, Material, MenuBarItem,
+    ModuleGrid, ModulePanel, ModuleState, ModuleTile, Muting, PlateFamily, PlateTint, Px, Scheme,
+    SegSize, SegmentedControl, Slider, StatusMetrics, Surface, Switch, Theme, Toggle,
 };
 use ds_native::{Harness, Viewport};
 use std::path::PathBuf;
@@ -37,17 +36,28 @@ const PARTS: [&str; 16] = [
 ];
 
 fn main() {
-    let dir = PathBuf::from(std::env::args().nth(1).unwrap_or_else(|| "audit/current".into()));
+    let dir = PathBuf::from(
+        std::env::args()
+            .nth(1)
+            .unwrap_or_else(|| "audit/current".into()),
+    );
     std::fs::create_dir_all(&dir).expect("out dir");
     for (theme, app) in [("light", Light as fn() -> Element), ("dark", Dark)] {
         for scale in [100u16, 200] {
-            let viewport = Viewport { width: 720, height: 520, scale_percent: scale };
+            let viewport = Viewport {
+                width: 720,
+                height: 520,
+                scale_percent: scale,
+            };
             let mut harness = Harness::new(app, viewport);
             harness.advance(Duration::from_millis(400));
             if scale == 100 && theme == "light" {
                 for part in PARTS {
                     match harness.rect(part) {
-                        Some(r) => println!("{part:22} {:>6.1} x {:>5.1}", r.size.width.0, r.size.height.0),
+                        Some(r) => println!(
+                            "{part:22} {:>6.1} x {:>5.1}",
+                            r.size.width.0, r.size.height.0
+                        ),
                         None => println!("{part:22} (absent)"),
                     }
                 }
@@ -76,7 +86,10 @@ fn Sheet(theme: Theme) -> Element {
         Theme::Dark => Scheme::Dark,
         _ => Scheme::Light,
     };
-    let metrics = StatusMetrics { box_size: Px(22.0), glyph: Px(16.0) };
+    let metrics = StatusMetrics {
+        box_size: Px(22.0),
+        glyph: Px(16.0),
+    };
     let row = "display:flex;align-items:center;gap:12px;padding:10px 14px;";
     rsx! {
         Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Window,

@@ -4,9 +4,10 @@
    `placeholder` and has no `::placeholder` (O-23's fallback). (It was `.ds-field`, which is the
    Space editor's colour field: the two sheets styled each other's element, gallery fix A.)
    One line: Blitz gives an `input` no intrinsic size, so it took the replaced-element default of
-   300 x 150. The height is the line (`1.55em`, the base line height the field inherits in S) plus
-   the padding and the 1 px border, in `em` so a consumer's font size (the search row's 16, the
-   bubble's 12.5) keeps it one line; the width fills the wrapper, whose width is the consumer's.
+   300 x 150. Boxed is a Regular control (22, design/29-SIZING.md R1) whose line fills the box
+   inside its hairlines; Inline's height is its line (`1.55em`) plus the padding and the border,
+   in `em` so a consumer's font size (the search row's 16, the bubble's 12.5) keeps it one line;
+   the width fills the wrapper, whose width is the consumer's.
    Font and colour are on `.ds-input` itself: the reset's element rules are `:where(.ds) input`,
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
@@ -20,8 +21,8 @@
 
 .ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=boxed]{
-  height:calc(1.55em + 16px);
-  background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--r-field); padding:var(--s-7) var(--s-10);
+  height:var(--ctl-h-m); line-height:calc(var(--ctl-h-m) - 2 * var(--hair));
+  background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--ctl-r-m); padding:0 var(--s-8);
   transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
@@ -39,7 +40,7 @@
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--s-8) var(--s-11); }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }
 
 /* A password (`data-kind=password`): Blitz draws a password field's characters as typed, so the
@@ -73,7 +74,10 @@
    reaches, stays under it and only the dots' highlight shows. An Inline field's ground is its
    container's (the lock pill's glass), which the mask cannot repeat: there Blitz's highlight
    shows beside the dots' when a range is selected (FINDINGS Q360b). */
-.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); background:var(--surface); background-clip:content-box; }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); background:var(--surface); background-clip:content-box; }
+/* Boxed, the caret spans the field's line, hung from its top: the ascent plus the line's
+   half-leading over Inter's 1.21em. */
+.ds-input-wrap[*|data-variant=boxed] .ds-input-caret::before{ top:calc(-.969em - (var(--ctl-h-m) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 
 /* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
@@ -104,6 +108,9 @@
    `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
    component's. */
 .ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; scrollbar-width:none; display:block; }
+/* A boxed multiline field reads at the reading line, with the Regular field's inset above and
+   below its lines. */
+.ds-input[*|data-variant=boxed][*|data-kind=multiline]{ line-height:1.55; padding:var(--s-4) var(--s-8); }
 .ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
 
 /* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The

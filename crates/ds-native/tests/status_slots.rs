@@ -86,7 +86,11 @@ fn a_status_glyph_fills_the_status_items_glyph_square_with_its_label() {
     let mut harness = virtual_harness(Bar);
     let glyph = format!("{ITEM_SEL} > .ds-status-glyph[*|data-kind=wifi]");
     assert_eq!(harness.count(&glyph), 1, "{}", harness.html());
-    assert_eq!(side(&harness, ITEM_SEL), (26.0, 26.0), "the item's box");
+    assert_eq!(
+        side(&harness, ITEM_SEL),
+        (30.0, 26.0),
+        "the item's box: the bar's 30 wide slot"
+    );
     assert_eq!(side(&harness, &glyph), (18.0, 18.0), "the setting's glyph");
     let part = format!("{glyph} > .ds-status-part[*|data-part=arc-3]");
     assert_eq!(side(&harness, &part), (18.0, 18.0), "each part fills it");

@@ -11,6 +11,7 @@ use crate::detail::{CheckMark, FirstShow, Settling};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
+use crate::tokens::ControlSize;
 use dioxus::prelude::*;
 
 /// A settings row's trailing mark.
@@ -108,7 +109,8 @@ pub(crate) fn trailing(
     }
 }
 
-/// The row's switch, fenced so its click and keys are its own.
+/// The row's switch, fenced so its click and keys are its own: the Small switch (26 x 15), the
+/// reference's mini switch in form rows (design/29-SIZING.md section 13 decision 4).
 fn toggle(
     value: Switch,
     on_toggle: EventHandler<Switch>,
@@ -125,7 +127,7 @@ fn toggle(
                 kept_click(&event);
             },
             onkeydown: move |event| event.stop_propagation(),
-            Toggle { label, value, availability, onchange: on_toggle }
+            Toggle { label, value, size: ControlSize::Small, availability, onchange: on_toggle }
         }
     }
 }

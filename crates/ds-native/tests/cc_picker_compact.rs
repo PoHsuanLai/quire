@@ -1,5 +1,5 @@
-//! AppearancePicker at the control center's width (sill FINDINGS Q101): in a 296 px
-//! `ModulePanel` (a 320 px panel's grid, padding 12) the Full Motion row runs past the panel's
+//! AppearancePicker at the control center's width (sill FINDINGS Q101): in a 300 px
+//! `ModulePanel` (a 320 px panel's grid, padding 10, design/29-SIZING.md) the Full Motion row runs past the panel's
 //! content box and clips "Reduced"; `PickerLayout::Compact` keeps every row inside it, and no
 //! segment is narrower than its words. Measured on the laid-out rects.
 
@@ -22,7 +22,7 @@ const VIEW: Viewport = Viewport {
     scale_percent: 100,
 };
 
-/// The control center's panel: 320 wide, the grid's padding 12, so the module is 296.
+/// The control center's panel: 320 wide, the grid's padding 10, so the module is 300.
 #[allow(non_snake_case)]
 fn Panel() -> Element {
     rsx! {
@@ -67,9 +67,9 @@ const ROWS: [&str; 3] = [
 ];
 
 #[test]
-fn the_module_is_296_and_the_full_motion_row_overflows_it() {
+fn the_module_is_300_and_the_full_motion_row_overflows_it() {
     let harness = laid_out(PickerLayout::Full);
-    assert_eq!(rect(&harness, ".ds-module-panel").size.width.0, 296.0);
+    assert_eq!(rect(&harness, ".ds-module-panel").size.width.0, 300.0);
     let content = right(rect(&harness, ".ds-appearance"));
     let motion = right(rect(&harness, ROWS[2]));
     assert!(
@@ -82,8 +82,8 @@ fn the_module_is_296_and_the_full_motion_row_overflows_it() {
 fn every_compact_row_fits_the_module_and_no_segment_is_squeezed() {
     let harness = laid_out(PickerLayout::Compact);
     let content = rect(&harness, ".ds-appearance");
-    // The panel's content box: 296 less the padding 12 and the hairline each side.
-    assert!(content.size.width.0 <= 272.0, "{content:?}");
+    // The panel's content box: 300 less the padding 10 each side (its hairline is drawn inset).
+    assert!(content.size.width.0 <= 280.0, "{content:?}");
     for row in ROWS {
         let end = right(rect(&harness, row));
         eprintln!("{row}: ends at {end}, content ends at {}", right(content));

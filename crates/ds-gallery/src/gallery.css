@@ -111,8 +111,8 @@
 /* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-modal-stage{height:300px}
-.g-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
-.g-cc-body{padding:var(--s-12)}
+.g-cc{width:var(--cc-width);border-radius:var(--cc-panel-r);overflow:hidden}
+.g-cc-body{padding:var(--cc-pad)}
 /* The notifications specimen (sill Q120-Q125): per scheme, the Work tint holding the banners
    and a posed mid-drag card on the left, and the center's edge panel on the right, in a stage the
    height of a small screen (the panel is absolutely placed, so the stage gives its root a height). */

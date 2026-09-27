@@ -5,6 +5,7 @@
 //! column.
 
 use crate::geometry::Px;
+use crate::tokens::CONTROL_CENTER;
 use dioxus::prelude::*;
 
 /// How many equal columns the grid has; at least one (a zero is read as one).
@@ -44,12 +45,13 @@ impl GridMetrics {
 }
 
 /// `children` (`ModuleTile`s and `ModulePanel`s) in `columns` equal columns, `gap` apart, with
-/// `padding` inside the grid. The defaults are the keys' (2, 8, 12).
+/// `padding` inside the grid. The defaults are the control center's sizes (2, 10, 10;
+/// `CONTROL_CENTER`, design/29-SIZING.md).
 #[component]
 pub fn ModuleGrid(
     #[props(default)] columns: GridColumns,
-    #[props(default = Px(8.0))] gap: Px,
-    #[props(default = Px(12.0))] padding: Px,
+    #[props(default = Px(f32::from(CONTROL_CENTER.gap.0)))] gap: Px,
+    #[props(default = Px(f32::from(CONTROL_CENTER.padding.0)))] padding: Px,
     children: Element,
 ) -> Element {
     let style = GridMetrics {

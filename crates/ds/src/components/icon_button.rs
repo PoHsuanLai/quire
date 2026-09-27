@@ -15,16 +15,16 @@ use dioxus::prelude::*;
 /// Which icon button.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum IconButtonVariant {
-    /// Reader and composer tools, 28 x 26.
+    /// Reader and composer tools, 28 x 28 (a Large control).
     Tool,
-    /// Sidebar foot, 24 x 24, on the frame.
+    /// Sidebar foot, 22 x 22 (a Regular control), on the frame.
     Foot,
-    /// A row's hover strip, 26 x 26 round.
+    /// A row's hover strip, 26 x 26 round (mailo's, off the ladder until the app side is audited).
     Strip,
     /// A square tile on the frame (account tiles).
     Pin,
     /// A bar status item on the frame (design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
-    /// a square of `--bar-status-box` holding a glyph of `--bar-status-glyph`, both set by the
+    /// a slot `--bar-status-w` (30) wide and `--bar-status-box` tall holding a glyph of `--bar-status-glyph`, both set by the
     /// consumer from its settings ([`StatusMetrics`]); `--f-ink-soft` at rest, `--f-ink` on
     /// `--f-pill-hover` under the pointer, on `--f-pill` pressed or while its menu is open.
     Status,
@@ -182,7 +182,8 @@ fn Nudged(cue: Cue, children: Element) -> Element {
 /// two custom properties `IconButton { Status }` reads, on any element around the items.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct StatusMetrics {
-    /// The item's square box (`bar.status_icon_box_px`, default 22).
+    /// The item's height (`bar.status_icon_box_px`, default 22); its slot is `--bar-status-w`
+    /// (30) wide (design/29-SIZING.md).
     pub box_size: Px,
     /// The glyph inside it (`bar.status_glyph_px`, 16 by default; the box itself under the
     /// `IconSizeBar22` glyph policy).

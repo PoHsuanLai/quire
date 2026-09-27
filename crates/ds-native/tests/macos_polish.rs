@@ -194,15 +194,15 @@ fn Bar() -> Element {
     }
 }
 
-/// An open bar item paints the frame's pressed pill behind its text at the shell scale's 24 px
-/// height and 13 px text; a closed one paints nothing.
+/// An open bar item paints the frame's pressed pill behind its text at the shell scale's 22 px
+/// height (a Regular control, design/29-SIZING.md) and 13 px text; a closed one paints nothing.
 #[test]
 fn an_open_bar_item_draws_its_pill() {
     let mut harness = Harness::new(Bar, VIEW);
     harness.advance(ms(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "bar-item");
-    assert_eq!(rect(&harness, "#open").size.height, Px(24.0));
+    assert_eq!(rect(&harness, "#open").size.height, Px(22.0));
     // The frame's grain speckles single pixels, so compare the padding's mean.
     let padding = |selector: &str| {
         let item = rect(&harness, selector);

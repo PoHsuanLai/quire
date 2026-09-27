@@ -54,11 +54,11 @@ fn FieldsApp() -> Element {
 #[test]
 fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
     let harness = Harness::new(FieldsApp, VIEW);
-    // design/04-COMPONENTS.md section 6: one 13.5 px line at the base line height 1.55, plus the
-    // padding (7 + 7 boxed, 3 + 3 inline) and the 1 px border; the search row's is 16 px with no
-    // padding or border (section 7).
+    // design/04-COMPONENTS.md section 6: Boxed is a Regular control, 22 (design/29-SIZING.md);
+    // Inline is one 13.5 px line at the base line height 1.55, plus its 3 + 3 padding and the
+    // 1 px border; the search row's is 16 px with no padding or border (section 7).
     const CASES: &[(&str, f32)] = &[
-        (".probe-boxed .ds-input", 13.5 * 1.55 + 16.0),
+        (".probe-boxed .ds-input", 22.0),
         (".probe-inline .ds-input", 13.5 * 1.55 + 8.0),
         (".probe-search .ds-input", 16.0 * 1.55),
     ];

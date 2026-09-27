@@ -9,11 +9,15 @@ use crate::components::vocab::Availability;
 /// section 1), so no existing button changes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum ButtonSize {
-    /// Primary's geometry: 8 x 14 padding, `--fs-control` at 700. `data-size="regular"`.
+    /// Primary's geometry: the ladder's Regular height (22, design/29-SIZING.md), `--fs-control`
+    /// at 700. `data-size="regular"`.
     #[default]
     Regular,
-    /// Mini's geometry: 5 x 10 padding, `--fs-small` at 600, one line. `data-size="mini"`.
+    /// Mini's geometry: the ladder's Small height (16, radius 4), `--fs-small` at 600, one line.
+    /// `data-size="mini"`.
     Mini,
+    /// The ladder's Large height, 28, at Primary's label. `data-size="large"`.
+    Large,
 }
 
 impl ButtonSize {
@@ -22,6 +26,7 @@ impl ButtonSize {
         match self {
             ButtonSize::Regular => "regular",
             ButtonSize::Mini => "mini",
+            ButtonSize::Large => "large",
         }
     }
 }
@@ -47,6 +52,7 @@ mod tests {
     fn each_size_has_its_word() {
         assert_eq!(ButtonSize::default().slug(), "regular");
         assert_eq!(ButtonSize::Mini.slug(), "mini");
+        assert_eq!(ButtonSize::Large.slug(), "large");
     }
 
     #[test]

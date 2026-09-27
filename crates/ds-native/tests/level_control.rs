@@ -70,16 +70,18 @@ fn painted(harness: &mut Harness, name: &str) -> u32 {
     let track = rect(harness, ".ds-level-track");
     let frame = harness.render().expect("renders");
     keep(&frame, name);
-    let row = (track.origin.y.0 + 20.0) as u32;
+    // Below the glyph's ink (the volume glyph's spans about 6 to 16 in the 22 capsule), where the
+    // round end cuts about 3 px off the run.
+    let row = (track.origin.y.0 + 18.0) as u32;
     run_from(&frame, track.origin.x.0 as u32, row)
 }
 
 fn run_from(frame: &RgbaImage, left: u32, row: u32) -> u32 {
-    let fill = frame.get_pixel(left + 3, row).0;
-    (left + 3..frame.width())
+    let fill = frame.get_pixel(left + 6, row).0;
+    (left + 6..frame.width())
         .take_while(|&x| distance(frame.get_pixel(x, row).0, fill) <= 16)
         .count() as u32
-        + 3
+        + 6
 }
 
 /// The level the control last reported, read inside the app's runtime.
@@ -138,7 +140,7 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
     let rail = rect(&harness, ".ds-level-rail");
     let at = |share: f32| Point {
         x: Px(rail.origin.x.0 + rail.size.width.0 * share),
-        y: Px(rail.origin.y.0 + 13.0),
+        y: Px(rail.origin.y.0 + 11.0),
     };
     harness.pointer_down(at(0.3));
     // The track is measured once per press, after layout; then the fill is the pointer's.
@@ -177,13 +179,13 @@ fn painted_height(frame: &RgbaImage, x: u32, around: u32) -> u32 {
 fn a_press_swells_and_a_drag_past_the_end_stretches_then_springs_back() {
     let mut harness = start(500, Motion::Standard);
     let rail = rect(&harness, ".ds-level-rail");
-    let middle = (rail.origin.y.0 + 13.0) as u32;
+    let middle = (rail.origin.y.0 + 11.0) as u32;
     // On the fill (the press lands at 50 %), past the glyph: white against the card.
     let probe_x = (rail.origin.x.0 + 60.0) as u32;
     let rest = painted_height(&harness.render().expect("renders"), probe_x, middle);
     let at = |x: f32| Point {
         x: Px(x),
-        y: Px(rail.origin.y.0 + 13.0),
+        y: Px(rail.origin.y.0 + 11.0),
     };
     harness.pointer_down(at(rail.origin.x.0 + 100.0));
     harness.advance(ms(300));
@@ -200,7 +202,7 @@ fn a_press_swells_and_a_drag_past_the_end_stretches_then_springs_back() {
         "height at rest {rest}, pressed {swollen}; width {} -> stretched {stretched:.1} -> released {released:.1}",
         rail.size.width.0
     );
-    // scaleY(1.08) on 26 px: a pixel above and below.
+    // scaleY(1.1) on 22 px: a pixel above and below.
     assert!(
         swollen >= rest + 2,
         "the press swells the track: {rest} -> {swollen}"
@@ -242,7 +244,7 @@ fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
     let rail = rect(&harness, ".ds-level-rail");
     let at = Point {
         x: Px(rail.origin.x.0 + 100.0),
-        y: Px(rail.origin.y.0 + 13.0),
+        y: Px(rail.origin.y.0 + 11.0),
     };
     harness.click(at);
     harness.advance(ms(120));
