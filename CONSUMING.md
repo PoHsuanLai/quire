@@ -1928,6 +1928,48 @@ item 4). A consumer sheet that plays one of those keyframes `infinite` itself no
 `InfiniteLoop`: rebuild it on `use_pending`, or name it in your `LintConfig::exceptions` with its
 reason.
 
+### Driven motion (2026-09-27, wave H1): springs, release velocity, throws
+
+design/05 section 14, design/27 section 3.12. A motion a hand drives or can interrupt is a spring
+in Rust on the frame clock (`ds::time`), not a keyframe: it retargets from where it is at the
+speed it has, and stops asking for frames when it rests. Nothing you already call changed its
+signature; every new item is in `ds::motion` (and `ds::detail` for the contact).
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| A spring that follows a value | `use_spring(target: f32, SpringSpec, PxPerUnit) -> SpringFrame` | `.position()`, `.velocity()`, `.phase()` (`SpringPhase::{Moving, Rest}`), `.css()` (`0.125`). Write the position into a custom property on your quire component's wrapper; never a transition |
+| A spring you move yourself | `use_spring_motion(at, PxPerUnit) -> SpringMotion` | `.go(target, spec)` (from where it is; a contact's velocity starts the leg at that speed), `.track(at)` (1:1 under a hand, no frames), `.snap(at)`, `.frame()`, `.peek()`, `.state()` |
+| Choose the spring | `SpringSpec::for_touch(touch)`, `.response(SpringResponse::{Quick, Move})` | The only way to a `Spring`: damping 1.0 for a remote change, a tap or a key; 0.8 when the contact was released at ≥ 50 px/s toward the target; 1.0 and no thrown velocity under Reduced. Quick 300 ms, Move 450 ms (proposed) |
+| The hand's release velocity | `Contact::from_event(&event).with_velocity(v)`, `contact.velocity()`, `touch.velocity()` | `Velocity(i32)` px/s along the motion's axis. `Contact::from_event` alone carries `Velocity::ZERO`, so every existing caller is unchanged |
+| Measure a release | `VelocityMeter::default().moved(x, ds::time::now())` in `onpointermove`, `.released(ds::time::now())` in `onpointerup` | Zero when the pointer stopped more than 100 ms before letting go |
+| Where a throw lands | `Throw { from, velocity }.projected()`, `.landing(&[ends])` | `from + v·r/(1-r)`, `r = 0.998` per ms (about half a second of the speed); the end nearest the projection |
+| A point that glides (a widget into its snap cell, others aside; sill Q432) | `use_spring_point(target: Point, SpringSpec) -> PointFrame` (`.at`, `.phase`); `use_spring_point_motion(at) -> SpringPointMotion` with `.go(target, touch, Release { x, y }, SpringResponse)`, `.track(at)`, `.snap(at)`, `.frame()`, `.peek()` | One spring per axis: each keeps its position and velocity on a retarget; a contact hands each axis its release velocity; critical and no thrown velocity under Reduced; 0 frames at rest |
+| Which cell a throw lands in | `PointThrow { from, release }.projected()`, `.landing(&[cells])` | Each axis projected at `r = 0.998`/ms; the cell nearest the projection |
+| A dragged thing going home | `use_drag_return() -> DragReturn`; `.follow(offset)` while dragged, `.home(touch, Release { x, y })` when let go where nothing took it, `.settle()` when it dropped; draw it inside `DragReturnFrame { drag, children }` | A `SpringPointMotion` homing to its place |
+| What an animation becomes under Reduced | `Anim::reduced() -> ReducedForm::{Same, CrossFade(FadeWay), Still}` | The pulse classes play it under `data-motion=reduced`: a moving arrival fades in, a moving departure fades out, an emphasis plays `hold` |
+
+**What moves differently under you (no signature changed):**
+
+- `Toggle`: the knob is `--knob-x` from a spring; a second click mid-slide turns it back.
+- `SegmentedControl`: the segments are now equal width, as the Mac's, and the pressed fill is one
+  thumb (`.ds-segment-thumb`) that slides; the pressed segment's text is `--paper` over it. The
+  control is as wide as its widest segment times the count, so a row that fitted a narrow
+  segmented control may need to be checked.
+- `Slider`: the thumb is drawn from a spring (still 1:1 under a drag); a release faster than
+  600 px/s throws the value to the projection, held to the ends, calling `onchange` once with it.
+- `AppSwitcher`: the ring springs between cells (`--switcher-at` is now fractional while it moves).
+- `NotificationCard` / `ShotThumbnail` with `Swipe::Dismiss`: a card let go under both thresholds
+  springs home from the release with its velocity; the dismissal rules are unchanged.
+- `PaneSwitcher`: one spring (`--pane-p`) carries both panes; a reversal turns back from where
+  they are. `on_settled` still hears the pane each time the switcher comes to rest after a switch;
+  the time to rest is the spring's (about 0.5 s), not `settle(Anim::PaneInR)`.
+- `Sheet` and `Panel`: the first entrance on mount is still `peek-in` / `panel-in`; hiding, and
+  any later showing, is a spring (`data-drive="spring"`, `--present-p`). A show while leaving
+  now reads `data-presence="entering"` until the spring rests, then `present` (it was `present`
+  at once with `data-pulse="held"`; the Panel no longer writes `data-pulse`). `on_hidden` runs
+  when the spring rests at 0, about 0.4 s after the hide, not at `settle(SheetOut)` /
+  `settle(PanelOut)`: a test that waited exactly that long should `settle_until` the surface is gone.
+
 ### Status glyphs (2026-09-27): the bar's Wi-Fi, battery, Bluetooth and volume as layers
 
 design/26-DETAILS.md wave D1 (quire lane), design/04 section 51, FINDINGS.md "Details D1".

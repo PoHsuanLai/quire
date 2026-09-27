@@ -781,7 +781,7 @@ the token table, not in sill); the lint also rejects literal sizes below 10 in a
 `FocusRingShape` and `UnnamedControl` run as warnings over sill's surface markup tests and the
 list goes to sill before they turn Strict.
 
-**H1: Driven motion (quire).** `Spring { damping, response }`, `use_spring`, `Touch::Contact(Velocity)`
+**H1: Driven motion (quire). Built on `hig-h1` (2026-09-27): design/05 section 14; `ds::motion::{Spring, SpringSpec, use_spring, use_spring_motion, Throw, VelocityMeter, DragReturn, ReducedForm}`, the velocity inside `Contact`; converted as 05 section 14.6 lists.** `Spring { damping, response }`, `use_spring`, `Touch::Contact(Velocity)`
 extending 26's `Touch`, `SpringSpec::for_touch`, projection with the .998 rate, retargeting;
 Reduced forms per keyframe (cross-fade) and critically damped springs under Reduced. Convert the
 contact motions listed in 3.12 (sheet, panel slide, notification swipe return, toggle knob,

@@ -4,6 +4,7 @@
 pub mod anim;
 pub mod curve;
 pub mod drag;
+pub mod drag_return;
 pub mod entrance;
 pub mod hover_intent;
 pub mod level_run;
@@ -20,6 +21,7 @@ pub(crate) mod roster_exits;
 mod roster_rest;
 pub mod settle;
 pub mod spring;
+pub mod spring_point;
 pub mod spring_spec;
 pub mod swipe;
 pub mod timer;
@@ -32,6 +34,7 @@ pub mod wake;
 
 pub use anim::{Anim, Fill, Iteration, Recipe};
 pub use drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag};
+pub use drag_return::{DragReturn, use_drag_return};
 pub use entrance::use_entrance;
 pub use hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};
 pub use level_run::{LevelRun, RunFrame, RunPhase, RunTail, RunTiming, RunTokens};
@@ -43,6 +46,9 @@ pub use reduced::{FadeWay, ReducedForm};
 pub use roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 pub use settle::settle;
 pub use spring::{Leg, Millis, Ratio, Spring, SpringPhase, State as SpringState};
+pub use spring_point::{
+    PointFrame, PointThrow, Release, SpringPointMotion, use_spring_point, use_spring_point_motion,
+};
 pub use spring_spec::{SpringResponse, SpringSpec};
 pub use swipe::{
     Click, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,

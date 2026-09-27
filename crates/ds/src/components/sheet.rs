@@ -10,19 +10,22 @@ use crate::components::popover::{Dismiss, Stacking, escape_closes, use_float};
 use crate::components::scrim::{ScrimLook, scrim_button_as};
 use crate::components::scrim_strength::ScrimStrength;
 pub use crate::components::sheet_placement::SheetPlacement;
-use crate::components::sheet_presence::{SheetShowing, Step, use_sheet_showing};
 pub use crate::components::sheet_width::SheetWidth;
+use crate::components::spring_presence::{SpringPresence, Step, use_spring_presence};
 use crate::components::tooltip::Shown;
+use crate::motion::anim::Anim;
 use crate::tokens::ZLayer;
 use dioxus::prelude::*;
 
 /// A modal panel.
 ///
 /// `shown` hands its showing to the host (`None`, the default: shown for as long as it is
-/// mounted, as before). Hidden, it plays `sheet-out` (`--t-move --e-exit`), its scrim fades,
-/// it leaves the layer stack at once, and `on_hidden` runs at `settle(SheetOut)`, not before, so
-/// the host can unmap its surface then. Shown again while leaving, it enters again and
-/// `on_hidden` does not run. Mounted hidden, it draws nothing until shown.
+/// mounted, as before). Mounted shown, it enters with `peek-in`. Hidden, it springs out (driven
+/// motion, design/05 section 14: a spring in Rust fades and lowers it), its scrim fades, it
+/// leaves the layer stack at once, and `on_hidden` runs once the spring has come to rest, not
+/// before, so the host can unmap its surface then. Shown again while leaving, it springs back
+/// from where it is and `on_hidden` does not run. Mounted hidden, it draws nothing until shown,
+/// then springs in.
 ///
 /// `placement` says where it stands: [`SheetPlacement::Top`] (the default) 36 px from the top,
 /// [`SheetPlacement::Centre`] centred in its root both ways. A centred sheet needs a root that
@@ -47,7 +50,7 @@ pub fn Sheet(
     children: Element,
 ) -> Element {
     let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
-    let showing = use_sheet_showing(shown, on_hidden);
+    let showing = use_spring_presence(shown, on_hidden, Anim::PeekIn);
     // Mounted hidden: off the stack (after `use_float`'s own push) until first shown.
     use_hook(move || {
         if shown == Some(Shown::Hidden) {
@@ -69,6 +72,8 @@ pub fn Sheet(
             class: "ds-sheet",
             id,
             "data-presence": showing.slug(),
+            "data-drive": showing.drive(),
+            style: showing.style(),
             "data-placement": placement.attribute(),
             "data-width": width.attribute(),
             "data-overscroll": "band",
@@ -91,7 +96,7 @@ pub fn Sheet(
 /// Leave the layer stack as the sheet starts to leave, so Escape and its scrim reach whatever
 /// is under it; join it again, on top, as it is shown again.
 fn follow_stack(
-    showing: SheetShowing,
+    showing: SpringPresence,
     withdraw: impl FnOnce() + 'static,
     rejoin: impl FnOnce() + 'static,
 ) {
