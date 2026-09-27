@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 75 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 76 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
@@ -22,7 +22,8 @@
 //! plus `ShotIn` and `ShotOut`, the screenshot thumbnail's pair (sill Q181), plus
 //! `PictureAccept`, the user picture's accept beat on unlock (design/25-EMOJI.md section 7), plus the small-state details' eight (design/26-DETAILS.md
 //! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`, `RollIn`, `RollOut`,
-//! `SealOut` and `NudgeUp`.
+//! `SealOut` and `NudgeUp`, plus `Hold`, a keyframe that moves nothing, which a resting state
+//! plays so the restyle that drops a running animation starts another (sill G295).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -210,6 +211,12 @@ pub enum Anim {
     SealOut,
     /// `nudge-up`: attention, once (design/26 `use_nudge`).
     NudgeUp,
+    /// `hold`: moves nothing, for `--t-tap`. A state that comes after an animated one (a
+    /// surface present after its entrance, a hide taken back, a row at rest) plays it, so the
+    /// restyle that drops the running animation always starts another one. Blitz at the pinned
+    /// rev keeps a cancelled animation's last value on the element until something restyles it
+    /// again, and a new animation is that restyle (sill G295).
+    Hold,
 }
 
 impl Anim {
@@ -220,7 +227,7 @@ impl Anim {
     pub const PersonaHop: Anim = Anim::PictureAccept;
 
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 75] = [
+    pub const ALL: [Anim; 76] = [
         Anim::SealPop,
         Anim::Gulp,
         Anim::PopIn,
@@ -296,6 +303,7 @@ impl Anim {
         Anim::RollOut,
         Anim::SealOut,
         Anim::NudgeUp,
+        Anim::Hold,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -376,6 +384,7 @@ impl Anim {
             Anim::RollOut => "a-roll-out",
             Anim::SealOut => "a-seal-out",
             Anim::NudgeUp => "a-nudge-up",
+            Anim::Hold => "a-hold",
         }
     }
 }

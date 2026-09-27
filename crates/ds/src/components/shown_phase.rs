@@ -2,7 +2,10 @@
 //! sill Q123): entering, present, leaving, then hidden with `on_hidden` at the exit's settle, and
 //! a show while it leaves taking the hide back. The OSD card and the notification center's panel
 //! both run it, each with its own pair of animations; the rules are the pure machine in
-//! `osd_phase`.
+//! `osd_phase`. Present keeps the entrance declared in each surface's CSS, so the entrance's
+//! settle timer (wall clock) never cancels an entrance the frame clock is still playing, and a
+//! taken-back hide plays `hold` (sill G295: Blitz at the pin keeps a cancelled animation's last
+//! value).
 
 use crate::components::osd_phase::{OsdEffect, OsdInput, OsdPhase, input, step};
 use crate::components::tooltip::Shown;
@@ -12,18 +15,21 @@ use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
 /// Which of its entrance's two names a surface plays: flipped on each showing, so the entrance
-/// restarts even where the engine kept the element's styles (design/05 section 9 rule 2).
+/// restarts even where the engine kept the element's styles (design/05 section 9 rule 2). A
+/// surface present again after its hide was taken back plays `hold` instead (`Held`): the exit
+/// it drops is replaced by an animation that moves nothing, not by a second entrance (sill G295).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Alias {
     A,
     B,
+    Held,
 }
 
 impl Alias {
     fn flipped(self) -> Self {
         match self {
             Alias::A => Alias::B,
-            Alias::B => Alias::A,
+            Alias::B | Alias::Held => Alias::A,
         }
     }
 
@@ -31,6 +37,7 @@ impl Alias {
         match self {
             Alias::A => "a",
             Alias::B => "b",
+            Alias::Held => "held",
         }
     }
 }
@@ -73,9 +80,13 @@ pub(crate) fn use_shown_phase(
     if let Some(change) = change {
         let (next, effect) = step(*phase.peek(), change);
         phase.set(next);
-        if effect == OsdEffect::PlayIn {
-            let flipped = alias.peek().flipped();
-            alias.set(flipped);
+        match effect {
+            OsdEffect::PlayIn => {
+                let flipped = alias.peek().flipped();
+                alias.set(flipped);
+            }
+            OsdEffect::CancelOut => alias.set(Alias::Held),
+            OsdEffect::None | OsdEffect::PlayOut | OsdEffect::Gone => {}
         }
         run(
             effect,
