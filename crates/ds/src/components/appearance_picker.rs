@@ -1,7 +1,9 @@
-//! AppearancePicker: THE one picker for Theme, Accent and Motion, in mailo, the control center
-//! and settings (design/04-COMPONENTS.md section 26).
+//! AppearancePicker: THE one picker for Theme and Accent, in mailo, the control center and
+//! settings (design/04-COMPONENTS.md section 26). Motion is not offered: the user decided the
+//! motion level need not be a choice (2026-09-28), so [`Appearance::motion`] rides through a
+//! change untouched and the system's reduced-motion preference still maps into it.
 
-use crate::appearance::{Accent, Appearance, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
+use crate::appearance::{Accent, Appearance, Scheme, SystemPrefs, Theme};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::segmented::{SegSize, SegmentedControl};
 use crate::components::vocab::Switch;
@@ -18,15 +20,6 @@ fn theme_hint(theme: Theme, system: SystemPrefs) -> Option<String> {
     }
 }
 
-/// What "System" answers to for motion: Reduced when the desktop asks for it, else Standard.
-fn motion_hint(motion: Motion, system: SystemPrefs) -> Option<String> {
-    match (motion, system.motion) {
-        (Motion::System, ReducedMotion::Reduce) => Some("Reduced".to_string()),
-        (Motion::System, ReducedMotion::NoPreference) => Some("Standard".to_string()),
-        (_, _) => None,
-    }
-}
-
 /// How the picker lays its rows out for the width it has.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PickerLayout {
@@ -34,8 +27,8 @@ pub enum PickerLayout {
     #[default]
     Full,
     /// The rows fill the width they are given and no more, at the small size, with narrow
-    /// segments that grow to fill it: the control center's 296 px module, where the Full
-    /// Motion row (331 px) clips "Reduced" (sill FINDINGS Q101).
+    /// sides on equal segments that share it: the control center's 296 px module (sill
+    /// FINDINGS Q101).
     Compact,
 }
 
@@ -66,11 +59,10 @@ fn pressed(accent: Accent, value: Accent) -> Switch {
     }
 }
 
-/// Theme, accent and motion rows. Every change is emitted at once as a whole [`Appearance`];
-/// the consumer persists it. The swatches are the accent table's six (O-17), each painted with
-/// its `--swatch-*` token; the Motion row offers `System` as well as the four levels, because
-/// [`Motion`] defaults to it (the doc's markup lists only the four). `layout` fits it to a narrow
-/// host ([`PickerLayout::Compact`]).
+/// Theme and accent rows. Every change is emitted at once as a whole [`Appearance`], its
+/// `motion` as it came in; the consumer persists it. The swatches are the accent table's six
+/// (O-17), each painted with its `--swatch-*` token. `layout` fits it to a narrow host
+/// ([`PickerLayout::Compact`]).
 #[component]
 pub fn AppearancePicker(
     value: Appearance,
@@ -82,10 +74,6 @@ pub fn AppearancePicker(
     let themes: Vec<(Theme, String)> = Theme::ALL
         .into_iter()
         .map(|theme| (theme, theme.label().to_string()))
-        .collect();
-    let motions: Vec<(Motion, String)> = Motion::ALL
-        .into_iter()
-        .map(|motion| (motion, motion.label().to_string()))
         .collect();
     rsx! {
         div { class: "ds-appearance", role: "group", "aria-label": "Appearance", "data-layout": layout.slug(),
@@ -114,24 +102,14 @@ pub fn AppearancePicker(
                     }
                 }
             }
-            div { class: "ds-appearance-row",
-                SectionHeader { kind: HeaderKind::Field, text: "Motion", value: motion_hint(value.motion, system) }
-                SegmentedControl::<Motion> {
-                    label: "Motion",
-                    options: motions,
-                    value: value.motion,
-                    size,
-                    onchange: move |motion| onchange.call(Appearance { motion, ..value }),
-                }
-            }
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{motion_hint, theme_hint};
-    use crate::appearance::{Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
+    use super::theme_hint;
+    use crate::appearance::{ReducedMotion, Scheme, SystemPrefs, Theme};
 
     #[test]
     fn system_names_what_it_follows() {
@@ -142,14 +120,5 @@ mod tests {
         };
         assert_eq!(theme_hint(Theme::System, dark).as_deref(), Some("Dark"));
         assert_eq!(theme_hint(Theme::Light, dark), None);
-        assert_eq!(
-            motion_hint(Motion::System, dark).as_deref(),
-            Some("Reduced")
-        );
-        assert_eq!(
-            motion_hint(Motion::System, SystemPrefs::default()).as_deref(),
-            Some("Standard")
-        );
-        assert_eq!(motion_hint(Motion::Calm, dark), None);
     }
 }
