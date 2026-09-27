@@ -1,4 +1,5 @@
-//! Lists: a live `AnimatedList` whose rows leave by each exit, heal, and come back on undo;
+//! Lists: a live `AnimatedList` whose rows leave by each exit, heal, and come back on undo; a
+//! `LeavingList` of notification groups (sill Q510);
 //! sidebar items; account tiles; the hover strip; the appearance picker.
 
 use super::scheduled::Scheduled;
@@ -95,6 +96,7 @@ const PITCH: RowPitch = RowPitch(Px(79.0));
 pub fn ListsPage() -> Element {
     rsx! {
         LiveList {}
+        super::lists_leaving::LeavingColumn {}
         super::lists_search::SearchRows {}
         super::lists_mailo4::StripPress {}
         Sidebar {}

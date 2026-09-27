@@ -1,6 +1,8 @@
 //! Every component, one `<name>.rs` and `<name>.css` pair each (design/04-COMPONENTS.md).
 
 pub mod account_tile;
+pub mod alert;
+pub mod alert_vocab;
 pub mod animated_list;
 pub mod app_switcher;
 pub mod appearance_picker;
@@ -15,6 +17,7 @@ pub mod button;
 pub mod button_face;
 pub mod button_size;
 pub mod chip;
+pub mod chord;
 pub mod clock_angles;
 pub(crate) mod clock_dial;
 pub mod clock_face;
@@ -48,6 +51,8 @@ pub mod icon_view;
 pub mod idle_dim;
 pub mod image_source;
 pub mod kbd;
+pub mod leaving_list;
+pub(crate) mod leaving_row;
 pub mod level;
 pub(crate) mod light_mark;
 pub mod link_pill;
@@ -125,6 +130,7 @@ pub(crate) mod resize_edges;
 pub mod rich_text;
 pub mod row_action;
 pub(crate) mod row_battery;
+pub mod row_chord;
 pub(crate) mod row_click;
 pub mod row_hooks;
 pub mod row_shape;
@@ -183,6 +189,8 @@ pub mod window_frame;
 pub mod workspace_pills;
 
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
+pub use alert::Alert;
+pub use alert_vocab::{AlertButton, AlertEmphasis};
 pub use animated_list::AnimatedList;
 pub use app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence};
 pub use appearance_picker::{AppearancePicker, PickerLayout};
@@ -199,6 +207,7 @@ pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use button_size::ButtonSize;
 pub use chip::{Chip, ChipVariant};
+pub use chord::Chord;
 pub use clock_angles::{Hands, Tenths, hands};
 pub use clock_face::ClockFace;
 pub use clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
@@ -230,6 +239,7 @@ pub use icon_view::IconView;
 pub use idle_dim::IdleDim;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
+pub use leaving_list::{LeavingItem, LeavingList};
 pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
@@ -279,6 +289,7 @@ pub use preview_pane::{PaneAction, PreviewPane};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
 pub use rich_text::{Rich, RichRun, RichText};
 pub use row_action::RowAction;
+pub use row_chord::{ChordShown, RowChord};
 pub use row_hooks::PartHooks;
 pub use row_shape::{ClipBody, RowShape};
 pub use scrim::Scrim;
@@ -337,6 +348,7 @@ pub use workspace_pills::{WorkspacePill, WorkspacePills};
 /// Every component stylesheet, in the cascade's fixed order: `(component, css)`.
 pub const CSS: &[(&str, &str)] = &[
     ("account_tile", include_str!("account_tile.css")),
+    ("alert", include_str!("alert.css")),
     ("animated_list", include_str!("animated_list.css")),
     ("appearance_picker", include_str!("appearance_picker.css")),
     ("app_switcher", include_str!("app_switcher.css")),
@@ -363,8 +375,10 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_view", include_str!("icon_view.css")),
     ("idle_dim", include_str!("idle_dim.css")),
     ("kbd", include_str!("kbd.css")),
+    ("chord", include_str!("chord.css")),
     ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
+    ("leaving_list", include_str!("leaving_list.css")),
     ("list_row", include_str!("list_row.css")),
     ("lock_screen", include_str!("lock_screen.css")),
     ("lock_clock", include_str!("lock_clock.css")),

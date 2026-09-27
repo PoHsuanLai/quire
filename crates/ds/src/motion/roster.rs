@@ -191,6 +191,77 @@ impl<K: Clone + PartialEq> RosterState<K> {
         }
     }
 
+    /// Start the exits of every key in `keys` together, as one batch (a Clear, a group
+    /// collapsing): each row plays `exit`, delayed by its place among the batch in list order
+    /// (its `index`, capped at 12), so they fold one after another. Returns each leaving row's
+    /// animation and stagger: the batch is done at the longest of their settles, and
+    /// [`Self::settled_batch`] then drops them together. A key the roster does not hold, or one
+    /// already leaving, is left as it is.
+    pub fn leave_batch(
+        self,
+        keys: &[K],
+        exit: Exit,
+        emphasis: Emphasis,
+    ) -> (Self, Vec<(Anim, StaggerIndex)>) {
+        let anim = exit_anim(exit, emphasis);
+        let RosterState { entries, pitch } = self;
+        let mut running = Vec::new();
+        let entries = entries
+            .into_iter()
+            .map(|entry| {
+                if !keys.contains(&entry.key) || matches!(entry.presence, Presence::Leaving(_)) {
+                    return entry;
+                }
+                let index = StaggerIndex::new(running.len());
+                running.push((anim, index));
+                RosterEntry {
+                    presence: Presence::Leaving(exit),
+                    index,
+                    ..entry
+                }
+            })
+            .collect();
+        (RosterState { entries, pitch }, running)
+    }
+
+    /// A batch's exits have settled: drop every key in `keys` that is still leaving, at once,
+    /// and heal the rows below. Each row below the first dropped one that is not itself leaving
+    /// heals by the sum of `pitch` over the dropped rows above it (each leaving row's measured
+    /// height), so it starts exactly where it stood and ends in its new place; heal indices
+    /// count from the first row below the first dropped one. A key taken back meanwhile
+    /// ([`Self::stay`]) is present, not leaving, and stays.
+    pub fn settled_batch(self, keys: &[K], pitch: impl Fn(&K) -> RowPitch) -> Self {
+        let RosterState {
+            entries,
+            pitch: own,
+        } = self;
+        let mut gap: Option<Px> = None;
+        let mut below = 0;
+        let mut kept = Vec::with_capacity(entries.len());
+        for entry in entries {
+            let leaving = matches!(entry.presence, Presence::Leaving(_));
+            if leaving && keys.contains(&entry.key) {
+                gap = Some(gap.unwrap_or(Px(0.0)) + pitch(&entry.key).0);
+                continue;
+            }
+            match gap {
+                Some(dy) if !leaving => {
+                    let d = StaggerIndex::new(below);
+                    below += 1;
+                    kept.push(RosterEntry {
+                        presence: Presence::Healing { dy, d },
+                        ..entry
+                    });
+                }
+                Some(_) | None => kept.push(entry),
+            }
+        }
+        RosterState {
+            entries: kept,
+            pitch: own,
+        }
+    }
+
     /// Every entering and healing row has settled: mark them present.
     pub fn rest(self) -> Self {
         let entries = self

@@ -48,6 +48,8 @@
 .g-stage{position:relative;min-height:120px;border-radius:var(--r-panel);background:var(--surface-2);overflow:hidden}
 .g-stage-tall{min-height:200px}
 .g-stage-pad{padding:var(--s-14)}
+.g-leave{width:360px;border-radius:var(--r-panel);overflow:hidden}
+.g-leave-row{padding:var(--s-4) var(--s-8)}
 .g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--line-soft);padding:var(--s-4) 0}
 /* A title a bare field edits in place (mailo gaps 4). */
 .g-bare-title{display:flex;font-size:var(--fs-title);color:var(--ink)}
@@ -68,6 +70,7 @@
    pill's specimen box. A grid item stretches both ways, so the Surface inside fills the box; the
    pill, a flex item, is as wide as its tiles. */
 .g-launcher{display:grid;align-items:start;width:540px;height:330px}
+.g-launcher-wide{display:grid;align-items:start;width:860px;height:400px}
 .g-dock{display:flex;padding-top:var(--s-36)}
 .g-dock-tiles{display:flex;align-items:center;gap:var(--s-12);padding:var(--s-8) var(--s-12)}
 
@@ -111,6 +114,10 @@
 /* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-modal-stage{height:300px}
+.g-alert-row{align-items:flex-start;gap:var(--s-22)}
+.g-alert-cc{width:var(--cc-width);border-radius:var(--cc-panel-r);overflow:hidden}
+.g-alert-cc-body{position:relative;padding:var(--cc-pad);min-height:300px}
+.g-alert-stage{height:360px;padding:var(--s-14)}
 .g-cc{width:var(--cc-width);border-radius:var(--cc-panel-r);overflow:hidden}
 .g-cc-body{padding:var(--cc-pad)}
 /* The notifications specimen (sill Q120-Q125): per scheme, the Work tint holding the banners
