@@ -10,7 +10,7 @@ use ds::detail::{Detailed, FirstShow, Moment, Touch, use_detail, use_operation};
 use ds::{Appearance, Ds, Material, Motion, PaneContent, PreviewPane, Shown};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -182,12 +182,15 @@ fn another_kind_cross_fades_the_media_and_never_replays_the_entrance() {
 
 #[test]
 fn a_slow_load_shows_the_pending_look_and_its_landing_cross_fades() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::with_config(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     shown_remotely(&mut harness);
-    let asked = Instant::now();
+    let asked = harness.now();
     remote(&mut harness, Pane::Pending);
     assert_eq!(attr(&harness, ".ds-preview", "aria-busy"), "true");
-    if asked.elapsed() < ms(200) {
+    if harness.now().duration_since(asked) < ms(200) {
         assert_eq!(
             harness.count(".ds-preview-pending"),
             0,
@@ -195,7 +198,10 @@ fn a_slow_load_shows_the_pending_look_and_its_landing_cross_fades() {
         );
     }
     settle_until(&mut harness, |h| h.count(".ds-preview-pending") == 1);
-    assert!(asked.elapsed() >= ms(400), "not before PendingGrace");
+    assert!(
+        harness.now().duration_since(asked) >= ms(400),
+        "not before PendingGrace"
+    );
     assert_eq!(
         harness.text_of(".ds-preview-pending-words").as_deref(),
         Some("Loading\u{2026}")

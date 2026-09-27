@@ -9,8 +9,8 @@ use ds::{
     MotionLevel, RootChrome, StaggerIndex, WidgetFrame, WidgetMetrics, WidgetSize, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -53,11 +53,12 @@ fn text_bumping(harness: &Harness) -> bool {
 /// are at rest again, the text no sooner than `settle(Bump)` after the change, and stay at rest.
 #[test]
 fn a_change_bumps_once_and_settles() {
-    let mut harness = Harness::new(Battery, VIEW);
+    let mut harness =
+        Harness::with_config(Battery, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, |h| !battery_moving(h));
     assert!(!text_bumping(&harness), "nothing bumps on mount");
 
-    let changed = Instant::now();
+    let changed = harness.now();
     harness.click(harness.centre("#drain").expect("the drain button"));
     settle_until(&mut harness, |h| battery_moving(h) && text_bumping(h));
     assert!(

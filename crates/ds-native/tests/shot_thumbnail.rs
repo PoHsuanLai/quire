@@ -13,7 +13,7 @@ use ds::{
     MotionLevel, Point, Px, ShotThumbnail, Shown, StaggerIndex, ThumbAction, settle,
 };
 use ds_native::harness::{SETTLE_BOUND, settle_until};
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
@@ -111,7 +111,8 @@ fn offset(at: Point, dx: f32, dy: f32) -> Point {
 
 #[test]
 fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
-    let mut harness = Harness::new(Thumb, VIEW);
+    let mut harness =
+        Harness::with_config(Thumb, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     let card = harness.rect(".ds-shot").expect("the card is laid out");
@@ -122,7 +123,7 @@ fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
         MotionLevel::Standard,
         StaggerIndex::default(),
     );
-    let hiding = Instant::now();
+    let hiding = harness.now();
     harness.within(|| *SHOWN.write() = Shown::Hidden);
     harness.advance(Duration::from_millis(1));
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));
@@ -212,14 +213,17 @@ fn slow_drag(harness: &mut Harness, from: Point, dx: f32) -> Instant {
         harness.advance(Duration::from_millis(100));
         harness.pointer_move(offset(from, dx * f32::from(step) / 4.0, 0.0));
     }
-    let released = Instant::now();
+    let released = harness.now();
     harness.pointer_up(offset(from, dx, 0.0));
     released
 }
 
 #[test]
 fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
-    let mut harness = Harness::new(Swipeable, VIEW);
+    let mut harness = Harness::with_config(
+        Swipeable,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     let from = picture_centre(&harness);
     // Left: a drag out, which the swipe follows only damped and springs back from.
@@ -266,12 +270,13 @@ fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
     );
 }
 
-/// Advance in 10 ms steps until the swipe has been reported, up to `bound` on the wall clock
-/// (`settle_until` reads only the document, and the report is a signal); the instant it landed.
+/// Advance in 10 ms steps until the swipe has been reported, up to `bound` on the harness's own
+/// clock (`settle_until` reads only the document, and the report is a signal); the instant it
+/// landed.
 fn swiped_by(harness: &mut Harness, bound: Instant) -> Instant {
-    while Instant::now() < bound {
+    while harness.now() < bound {
         if read(harness, &SWIPED) == 1 {
-            return Instant::now();
+            return harness.now();
         }
         harness.advance(Duration::from_millis(10));
     }

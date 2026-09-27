@@ -11,9 +11,9 @@ use ds::{
     TargetElement, use_hover_hub,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use probe::rect;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 720,
@@ -79,7 +79,8 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 
 #[test]
 fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
-    let mut harness = Harness::new(App, VIEW);
+    let mut harness =
+        Harness::with_config(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(
         harness.count("ul.pins > li.ds-hover-target"),
@@ -88,7 +89,7 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
         harness.html()
     );
     let second = "ul.pins > li:nth-child(2)";
-    let entered = Instant::now();
+    let entered = harness.now();
     harness.pointer_move(centre(&harness, second));
     // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time

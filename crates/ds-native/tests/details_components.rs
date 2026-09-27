@@ -10,7 +10,7 @@ use ds::{
 };
 use ds::{ModuleTile, Text};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -44,7 +44,9 @@ fn pending(harness: &Harness) -> Option<String> {
 /// than the cap after `busy` and paints nothing after.
 fn steps_then_holds(harness: &mut Harness, busy: Instant) {
     settle_until(harness, |h| pending(h).as_deref() == Some("step"));
-    while busy.elapsed() < PAST_CAP && pending(harness).as_deref() != Some("still") {
+    while harness.now().duration_since(busy) < PAST_CAP
+        && pending(harness).as_deref() != Some("still")
+    {
         harness.advance(Duration::from_millis(250));
     }
     assert_eq!(
@@ -54,7 +56,7 @@ fn steps_then_holds(harness: &mut Harness, busy: Instant) {
         harness.html()
     );
     assert!(
-        busy.elapsed() >= Duration::from_secs(10),
+        harness.now().duration_since(busy) >= Duration::from_secs(10),
         "held before the cap"
     );
     assert_settles_to_zero_frames(harness);
@@ -62,9 +64,10 @@ fn steps_then_holds(harness: &mut Harness, busy: Instant) {
 
 #[test]
 fn a_busy_module_tile_stops_at_the_cap() {
-    let mut harness = Harness::new(Tile, VIEW);
+    let mut harness =
+        Harness::with_config(Tile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MODULE.write() = ModuleState::Busy);
-    let busy = Instant::now();
+    let busy = harness.now();
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         pending(&harness).as_deref(),
@@ -101,9 +104,10 @@ fn Lock() -> Element {
 
 #[test]
 fn a_checking_lock_prompt_stops_at_the_cap() {
-    let mut harness = Harness::new(Lock, VIEW);
+    let mut harness =
+        Harness::with_config(Lock, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *PROMPT.write() = PromptState::Checking);
-    let checking = Instant::now();
+    let checking = harness.now();
     steps_then_holds(&mut harness, checking);
     // The try fails: the ring goes, the field shakes once, and the prompt rests.
     harness.within(|| *PROMPT.write() = PromptState::Wrong);
