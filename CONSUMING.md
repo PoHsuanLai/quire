@@ -2093,6 +2093,56 @@ Stamps follow the Status glyphs rules: one stamp per operation, unchanged while 
 stamp restarts the grace), a new one per failure. A row that never saw its `Pending` (the pane
 opened after the join) gets `Succeeded` as a plain Change: no seal.
 
+### Idle dim (2026-09-27): the pre-screen-off dim overlay
+
+design/22-SETTINGS.md section 3.24 (`idle.dim_level_pct`, `idle.dim_s`); design/03-COLOR.md
+section 17.3.3 (`--scrim-idle`); design/05-MOTION.md section 3.4 (`--t-idle-dim`);
+design/04-COMPONENTS.md section 53. sill's own idle service dims the screen with a full-screen
+overlay before it goes off, never real brightness (sill FINDINGS "sill idle (Q420 B)"); `IdleDim`
+is that overlay.
+
+```rust
+use ds::{IdleDim, Percent};
+use ds::detail::IdleDimPhase;
+
+rsx! {
+    IdleDim { level: Percent(dim_level_pct), phase: if dimming { IdleDimPhase::Dimmed } else { IdleDimPhase::Awake } }
+}
+```
+
+Put it alone inside its own root, above everything else: `Ds { extent: RootExtent::Viewport,
+chrome: Some(RootChrome::Transparent), .. }` — the same "a document's frame must have a height"
+rule every all-positioned root follows (section 2 above). `IdleDim` itself ignores every pointer
+and key event; waking the display on input is sill's idle service's job, not this component's.
+
+**Why not `ds::detail`'s `Detailed`/`Cue`.** That machinery classifies an arbitrary state change
+into one of the grammar's moments so a primitive knows what to play. `IdleDimPhase::{Awake,
+Dimmed}` is already exactly what it means — dim, or wake — so there is nothing left to classify;
+`ds::detail::use_idle_dim(level, phase) -> Fraction` reads the phase directly.
+
+**Why a Rust tween, not a keyframe.** Every other quire entrance is a CSS `@keyframes` an `Anim`
+plays. This one is Rust-driven instead (like `Sweep`, design/26 section 4.1), because waking must
+retarget the share to zero mid-fade, and a CSS `animation` cannot do that without a restyle. The
+component reads the share back as a plain `Fraction` and writes it into the element's own
+`opacity` — no custom property, nothing else in the stylesheet reads it.
+
+| Want | Behaviour |
+| --- | --- |
+| Dim | `phase: Dimmed` fades the share from wherever it is to `level` over `--t-idle-dim --e-out` (~2s, proposed) |
+| Wake | `phase: Awake` snaps the share to 0 at once, whatever the fade was doing — there is no exit animation to wait for |
+| A live settings edit | `level` changing while still `Dimmed` snaps to the new value at once (design/22-SETTINGS.md section 2: "no surface animates from a settings change") |
+| Reduced motion | Dimming snaps straight to `level` too, the way `Sweep`'s own `Stand` plan does for Reduced (R7) — no fade at all, not even a shortened one |
+
+**Tests.** `ds::detail::idle_dim`'s own unit tests are the plan table (`plan`, pure: which of
+waking, dimming, Reduced and a settings-only change fades versus snaps), run with `cargo test -p
+ds`. Prove it end to end with `ds_native::Harness` on `Clock::Virtual` (CONSUMING.md section 5,
+"the virtual clock"): advance to just under `settle`-equivalent time and the share has not
+reached `level`; advance past it and it has, then `assert_settles_to_zero_frames` (0 CSS
+animations, no Rust timer wakes for 500 ms — there is none here to wake, since the tween itself
+stops asking for frames once it lands); flip `phase` back to `Awake` mid-fade and the very next
+frame reads 0; build the harness at `MotionLevel::Reduced` and the first frame after `Dimmed` is
+already `level`.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive

@@ -98,11 +98,19 @@ pub enum DurationToken {
     /// `--t-pending-step` 300 ms (Calm 360): one step of a bounded pending loop, linear
     /// (design/26 section 3.4); a four-layer Wi-Fi cycle is 1200 ms.
     PendingStep,
+    /// `--t-idle-dim` 2000 ms: the pre-screen-off idle overlay's fade in to its own level
+    /// (`idle.dim_level_pct`), Rust-driven like a `Sweep` rather than a keyframe, because waking
+    /// must snap mid-fade and a CSS animation cannot retarget that way without a restyle
+    /// (design/22-SETTINGS.md section 3.24 `idle.dim_s`/`idle.dim_level_pct`;
+    /// `ds::detail::idle_dim`). Reduced: 60 ms like every other transition by this table, but the
+    /// primitive itself never plays it that long — Reduced jumps straight to the level, the way
+    /// `Sweep`'s own `Stand` plan does (R7, design/26 section 3.3).
+    IdleDim,
 }
 
 impl DurationToken {
     /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 28] = [
+    pub const ALL: [DurationToken; 29] = [
         DurationToken::Tap,
         DurationToken::Quick,
         DurationToken::Move,
@@ -131,6 +139,7 @@ impl DurationToken {
         DurationToken::Sweep,
         DurationToken::CountStep,
         DurationToken::PendingStep,
+        DurationToken::IdleDim,
     ];
 
     /// The custom property: `--t-tap`, `--t-big-heavy`, …
@@ -164,6 +173,7 @@ impl DurationToken {
             DurationToken::Sweep => "--t-sweep",
             DurationToken::CountStep => "--t-count-step",
             DurationToken::PendingStep => "--t-pending-step",
+            DurationToken::IdleDim => "--t-idle-dim",
         })
     }
 
@@ -231,6 +241,7 @@ impl DurationToken {
             (DurationToken::Sweep, _) => 700,
             (DurationToken::CountStep, _) => 33,
             (DurationToken::PendingStep, _) => 300,
+            (DurationToken::IdleDim, _) => 2000,
         }
     }
 }
