@@ -2143,6 +2143,114 @@ stops asking for frames once it lands); flip `phase` back to `Awake` mid-fade an
 frame reads 0; build the harness at `MotionLevel::Reduced` and the first frame after `Dimmed` is
 already `level`.
 
+### Launcher chords (2026-09-28): Spotlight's hints, a plain `Chord` and a row's `chord`
+
+Additive: one component, one field, one enum. Nothing that compiled stops compiling: `MenuRow`
+gains a field that `..MenuRow::new(..)` fills, and `Trail::Shortcut` draws exactly as before.
+
+| Item | Surface | Meaning |
+|---|---|---|
+| `Chord` | new component: `shortcut: Shortcut` | A shortcut as one run of glyphs (`⌘R`, `⇧⌘D`, modifiers in the Mac's order) in `--ink-soft`, in the face and size around it, no key caps and no border (`span.ds-chord`); an empty shortcut draws nothing. `Kbd` is unchanged for a keyboard legend |
+| `PreviewPane` | `actions` | Each action is now its label in the ink, then its `shortcut` as a `Chord` at the label's size ("Reveal in Files ⌘R"), where it was one small `Kbd` per key. `PaneAction` is unchanged: nothing to do |
+| `MenuRow` | `chord: RowChord` (`RowChord::default()`: none) | The row's action keys, drawn as a `Chord` at the end of the trail (after a file's or clip's time and after `trail`), 6 px from what precedes it |
+| `RowChord` | `{ shortcut: Shortcut, shown: ChordShown }`; `RowChord::on_selected(keys)`, `RowChord::always(keys)` | When the chord shows. `ChordShown::Selected` (the default): only on the row that is the selection (`aria-selected=true`), so it moves with the palette's own arrows or your `selected`, as Spotlight's hint does; unselected rows show only their other trailing text. `ChordShown::Always`: on every row |
+
+**What sill changes (launcher rows, `sections_view.rs`).** Today every file row trails its first
+action's chord (`Trail::Shortcut(chord)`, "13:00 ⌘R") and the cursor's row trails `↵` because the
+view computes `Enter::Runs` itself. Switch to:
+
+- the row's first action chord (or `⌃K` when it has actions but no chord) in
+  `chord: RowChord::on_selected(chord)` on every row, `MenuEntry::Row(MenuRow { .. })` for plain
+  rows too (a `MenuEntry::Item` has no `chord`);
+- `trail` keeps only the data: `Trail::Note(kind)` in a mixed section, else `Trail::None` (a file's
+  or clip's time stays in its `RowShape`); drop `Trail::Shortcut(chord)` and the `↵` on the
+  cursor's row, or keep `↵` in the chord (`Shortcut(vec![Key::Enter])`) if Enter should still be
+  hinted, since quire now moves the hint with the selection and sill need not track the cursor
+  for it;
+- `PaneAction { label, shortcut }` needs no change: the pane draws the new look.
+
+### Leaving list (2026-09-28): the notification center's rows (sill Q510)
+
+design/04-COMPONENTS.md section 54; design/05-MOTION.md section 7.2. Additive: `LeavingList`,
+`LeavingItem`, and two methods on `RosterState` (`leave_batch`, `settled_batch`). Nothing
+existing changed; the stylesheet golden moved (`leaving_list.css`).
+
+```rust
+use ds::{Exit, LeavingItem, LeavingList, ListPresence};
+
+let items: Vec<LeavingItem<CenterKey>> = rows_of(&views)
+    .into_iter()
+    .map(|row| LeavingItem { key: key_of(&row), row: draw(&row) })
+    .collect();
+rsx! {
+    LeavingList::<CenterKey> { label: "Notifications", items, on_settled: move |key| forget(key) }
+}
+```
+
+| Prop, type or method | What it does |
+| --- | --- |
+| `LeavingList { label, items: Vec<LeavingItem<K>>, exit: Exit (Fold), first: ListPresence (Present), on_settled: Option<EventHandler<K>> }` | Your whole column on every render, `K: Clone + PartialEq + Hash`. A key you stop listing plays `exit` and stays drawn (with the last content you gave it) until it settles. Every key that goes missing in one render is one batch: its rows fold one after another (`--i` x `--stagger`, capped at 12) and are dropped together once the last has settled; each row below then heals by the summed height of the dropped rows above it, measured, so it starts where it stood and ends exactly in its new place. A key you list again while it leaves stays. A new key enters with `row-in` (`--t-big --e-spring`). `first: Entering` lets the first render's rows rise, staggered; `Present` (default) shows them at rest. `on_settled` hears each dropped key. Reduced: rows fade out and in and the rows below snap into place; a Clear settles at 94 ms |
+| `LeavingItem { key: K, row: Element }` | One row: a stable key and its content. The content sits in a `div.ds-leaving-row` (a flow root), so your content's own margins count in its height |
+| `RosterState::leave_batch(keys, exit, emphasis) -> (Self, Vec<(Anim, StaggerIndex)>)`, `RosterState::settled_batch(keys, pitch: impl Fn(&K) -> RowPitch)` | The pure batch, table-tested, for a list of your own |
+
+**What sill changes.** Draw the center's column as one `LeavingList`, one item per `CenterRow`,
+keyed by what the row *is*, not how it looks: a header by its `AppKey`, a card by its
+`NotificationId` (not by `Stack`, which changes when the group folds). Then:
+
+- **Clear** (a header's Clear, Delete on a stack): remove the group's notifications from your
+  model in one handler, so the header and every card drop off `items` in one render; they fold
+  staggered and the groups below heal by the group's height. Do not delay the removal yourself.
+- **Clear all**: empty the model in one handler; every row folds, staggered (capped at 12).
+- **Dismiss** one card: remove its id; the rows below heal by that card's measured height.
+- **Collapse** a group ("Show less"): the cards it hides drop off `items` in one render and
+  leave as one batch; the rows below heal by their summed height. The newest card stays listed
+  under the same key, so it does not move or re-enter.
+- **Arrival** while the center is open: a new id enters with `row-in`.
+- `on_settled` is where to drop a row's last trace (a history entry, a focus index); the model
+  itself was already updated when you removed the key.
+- Keyboard focus on a row that leaves: move it in the same handler that removes the key (to the
+  next listed row); a leaving row takes no pointer and should not keep the ring.
+
+`notifications.center_width_px` and the card spacing stay yours: put the gap between cards as
+padding or margin inside your row content, never between the list's rows.
+
+### Alert (2026-09-28): a question with Cancel and one action (sill Q490)
+
+design/04-COMPONENTS.md section 55; design/06-INTERACTIONS.md sections 17 and 18. Additive:
+`Alert`, `AlertEmphasis`, `AlertButton`. Nothing existing changed; new goldens under
+`tests/snapshots/alert/`, and the stylesheet golden moved (`alert.css`).
+
+```rust
+use ds::{Alert, Flow, Text};
+
+// Inside the control center's panel body, which must be positioned (`position:relative`):
+if confirming() {
+    Alert {
+        title: "Turn Bluetooth off?",
+        message: Some(Text::from("Bluetooth devices such as keyboards and mice will be disconnected.")),
+        action: "Turn Off",
+        flow: Flow::Inline,
+        onaction: move |_| { bluetooth.power_off(); confirming.set(false) },
+        oncancel: move |_| confirming.set(false),
+    }
+}
+```
+
+| Prop, type or method | What it does |
+| --- | --- |
+| `Alert { title, message: Option<Text>, action, cancel ("Cancel"), emphasis: AlertEmphasis (Default), onaction, oncancel, icon: Option<IconSource>, flow: Flow (Floating), shown: Option<Shown>, on_hidden, panel_id }` | The Mac's two-button alert in the narrow sheet (340, or 88 % of a smaller container) over the modal scrim, entering with `peek-in`. Cancel on the left, the action on the right; the default button is filled and takes the keyboard as it opens. Return presses the default wherever the keyboard is, Space the focused button, Tab moves between the two and never out, Escape or a press on the scrim calls `oncancel`. `onaction`/`oncancel` only report: closing it is yours (unmount it, or pass `shown: Some(Shown::Hidden)` and unmount at `on_hidden` for the exit) |
+| `AlertEmphasis::{Default, Destructive}`, `default_button() -> AlertButton::{Cancel, Action}` | `Destructive` draws the action's label red and makes **Cancel** the default (filled, Return, first focus), per the HIG: never give the primary role to a destructive button. "Turn Off" for Bluetooth is not destructive: it is `Default`, so Return turns it off, as macOS does |
+| `flow: Flow::Inline` | Drawn where you render it, covering the nearest positioned ancestor (scrim included) on the peek layer, with no overlay layer of its own: the control center's popover. Render it last in that container. A 320 px popover gets a 281 px panel; two short labels fit side by side |
+| `flow: Flow::Floating` | A centred `Sheet` in the root's overlay: a full window or a full-screen dialog surface. The root needs a height (`RootExtent::Viewport`) |
+
+**What sill changes.** In the control center, when Bluetooth is switched off while an input
+device is connected, set a `confirming` signal instead of switching at once and render the
+`Alert` above with `flow: Flow::Inline` as the last child of the panel's positioned body
+(`control_center.rs`'s panel, whose root is the bar popup's `Ds`); switch Bluetooth off in
+`onaction`. Nothing else in the popover needs to change: the alert's own keys stop at it, so the
+panel's Escape (close the control center) runs only when no alert is up. A full-window use (a
+shell dialog surface) keeps `Flow::Floating` in a root with `RootExtent::Viewport`.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive

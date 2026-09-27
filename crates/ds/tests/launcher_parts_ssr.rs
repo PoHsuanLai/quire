@@ -15,7 +15,7 @@ use ds::{
     Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EMOJI_COLUMNS,
     EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource, Inject, Key,
     Material, MenuEntry, MenuRow, Mono, PaletteGroup, PaletteGroups, PaneAction, PaneContent,
-    PdfPage, PreviewPane, Px, RowShape, Shortcut, Tile, Trail,
+    PdfPage, PreviewPane, Px, RowChord, RowShape, Shortcut, Tile, Trail,
 };
 
 fn root(body: Element) -> Element {
@@ -91,6 +91,45 @@ fn file_with_keys() -> Element {
         ..MenuRow::new(1, "Invoice.pdf")
     });
     palette(vec![PaletteGroup::list("Documents", vec![row])], 0)
+}
+
+/// Two file rows whose action chord waits for the selection (Spotlight's hint) and a plain row
+/// whose chord shows always: on `selected`, only that file row ends in `⌘R`.
+fn chord_rows(selected: usize) -> Element {
+    let reveal = Shortcut(vec![Key::Super, Key::Char('r')]);
+    let chorded = |value: u8, title: &str| {
+        MenuEntry::Row(MenuRow {
+            tile: Some(Tile::Icon(Icon::File)),
+            shape: RowShape::File {
+                thumb: None,
+                location: "~/Documents".to_owned(),
+                modified: "13:00".to_owned(),
+            },
+            chord: RowChord::on_selected(reveal.clone()),
+            ..MenuRow::new(value, title)
+        })
+    };
+    let always = MenuEntry::Row(MenuRow {
+        tile: Some(Tile::Icon(Icon::Settings)),
+        trail: Trail::Note("Setting".to_owned()),
+        chord: RowChord::always(Shortcut(vec![Key::Super, Key::Shift, Key::Char('d')])),
+        ..MenuRow::new(3, "Displays")
+    });
+    palette(
+        vec![PaletteGroup::list(
+            "Documents",
+            vec![chorded(1, "Invoice.pdf"), chorded(2, "Receipt.pdf"), always],
+        )],
+        selected,
+    )
+}
+
+fn chord_first() -> Element {
+    chord_rows(0)
+}
+
+fn chord_second() -> Element {
+    chord_rows(1)
 }
 
 fn clips() -> Element {
@@ -329,6 +368,8 @@ const SPECIMENS: &[Specimen] = &[
     ("row-file", files),
     ("row-file-keys", file_with_keys),
     ("row-clip", clips),
+    ("row-chord-first", chord_first),
+    ("row-chord-second", chord_second),
     ("show-more", show_more),
     ("show-more-selected", show_more_selected),
     ("grid-in-palette", grid_in_palette),
@@ -451,4 +492,48 @@ fn the_markup_carries_the_states() {
         aside.contains("ds-palette-aside") && aside.contains("width:360px"),
         "{aside}"
     );
+}
+
+/// Each row's markup, in order: the text from one `ds-menu-item` to the next.
+fn rows_of(html: &str) -> Vec<&str> {
+    html.split("class=\"ds-menu-item\"").skip(1).collect()
+}
+
+/// A chord case: its name, the palette, and the chord each of the three rows draws.
+type ChordCase = (&'static str, fn() -> Element, [&'static str; 3]);
+
+/// A row's chord waits for the selection: the selected file row ends in `⌘R` after its time,
+/// the other file row shows its time alone, and the always-row shows its chord either way.
+#[test]
+fn a_rows_chord_follows_the_selection() {
+    const CASES: &[ChordCase] = &[
+        ("first selected", chord_first, ["⌘R", "", "⇧⌘D"]),
+        ("second selected", chord_second, ["", "⌘R", "⇧⌘D"]),
+    ];
+    for (name, make, chords) in CASES {
+        let html = render(*make);
+        let rows = rows_of(&html);
+        assert_eq!(rows.len(), 3, "{name}: {html}");
+        for (at, (row, chord)) in rows.iter().zip(chords).enumerate() {
+            let drawn = row
+                .split("class=\"ds-chord\">")
+                .nth(1)
+                .and_then(|rest| rest.split('<').next())
+                .unwrap_or("");
+            assert_eq!(drawn, *chord, "{name}: row {at}: {row}");
+        }
+        assert_eq!(html.matches("ds-menu-when\">13:00").count(), 2, "{name}");
+    }
+}
+
+/// A pane action is its label then its keys as one plain chord: no key caps.
+#[test]
+fn a_pane_action_ends_in_a_plain_chord() {
+    let html = render(pane_pdf);
+    assert!(!html.contains("ds-kbd"), "{html}");
+    assert!(
+        html.contains("Reveal in Files</span><span class=\"ds-chord\">⌘R</span>"),
+        "{html}"
+    );
+    assert!(html.contains("<span class=\"ds-chord\">↵</span>"), "{html}");
 }

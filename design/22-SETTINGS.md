@@ -163,7 +163,7 @@ that registration is not done yet (see FINDINGS "Tune wave").
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `bar.height_px` | `Px` | `32` | alt 24-28 (macOS 24pt) | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `01-LAYOUT.md#13-shell-surface-layout`; Open decisions in both | proposed — **flagged for review** |
+| `bar.height_px` | `Px` | `24` | 24-32 (macOS 24pt; items 22, status slots 30x22) | `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28`; `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | settled 2026-09-28 (user: 24) |
 | `bar.title_hit_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
 | `bar.title_padding_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
 | `bar.open_title_pill_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
@@ -224,7 +224,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.pill_padding_px` | `Px` | `6` | `0..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `dock.running_dot_gap_px` | `Px` | `3` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `dock.floor` | `DockFloor::{Off,On}` | `Off` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `dock.shipped_icons` | `ShippedIcons::{On,Off}` | `On` | Advanced. Show quire's own app icons (`assets/icons/apps`, design/08 §2.11) for the apps in the shell's mapping table, in the dock and the launcher rows, instead of the app's hicolor icon | `08-ICONS.md#2-11-the-shipped-set`; sill FINDINGS "Icon style" | proposed (2026-09-25) |
 
 ### 3.6 `launcher` (sill/settings.toml)
 
@@ -1096,11 +1095,7 @@ contacts register their account pages this way (`20-SURFACES.md`).
    `PlateGlyphPolicy` may be over-built as an enum where a single fixed table would do; kept as
    an enum per the "no bool, enums for closed sets" rule, not because a real alternative exists
    yet.
-6. **Bar height's macOS alternative range (24-28) is not a single number** — `bar.height_px`'s
-   Range/Alt column names a range, not a variant; whichever wins per
-   `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 2 and
-   `01-LAYOUT.md#open-decisions` item 1 replaces the default, it does not become an enum (unlike
-   the other flagged items, this one is a genuine tunable number, not a closed choice).
+6. **Bar height** — settled 2026-09-28: 24, per `29-SIZING.md` §13 (the user picked the reference height; items 22). It stays a tunable number, not an enum.
 
 ## 8. Sources
 

@@ -84,6 +84,8 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 47 | PreviewPane | macOS Quick Look / Spotlight preview (reference) | none | launcher preview pane, Quick Look |
 | 48 | RowShape (palette rows: File, Clip) | Spotlight file and clipboard rows (reference) | none | launcher file and clipboard results |
 | 49 | PaletteGroup ("Show More") and the key claim | Spotlight sections (reference) | Ctrl T / Ctrl K (unchanged) | launcher sections, Space and Right for the preview |
+| 54 | LeavingList | S `.row.going` + `.healing` (`S:326-333`), C `.row.is-entering` (`C:373`) | none | notification center column |
+| 55 | Alert | none (the Mac's `NSAlert`, Sonoma/Sequoia) | none | control-center confirmations, shell dialogs |
 
 ## Shared vocabulary
 
@@ -523,7 +525,7 @@ S has no hover or active rule. C does (verbatim, `C:236-237`); adopt both:
 | hover | `--ink` text (from C) |
 | active | scale(`--squish`) (from C) |
 | focus-visible | global ring on the segment |
-| pressed (current) | `--ink` bg, `--paper` text |
+| pressed (current) | `--ink` bg (the thumb), `--paper` text |
 | disabled | not specified (O-1) |
 | entering / leaving | none |
 
@@ -532,6 +534,13 @@ places it.
 
 **Motion.** Background and colour `--t-quick --e-out`; transform `--t-tap --e-out`. The pressed
 fill jumps from one segment to the next; there is no sliding thumb in either prototype.
+
+As built (design/27 section 5.15, design/05 section 14): the pressed fill is one thumb, placed in
+the selected segment's own grid cell (so at rest it covers exactly that segment's laid-out box, at
+every scale) and shifted from there by a spring while it slides. A label's ink is not
+transitioned: it is `--paper` while the thumb covers most of it (`data-thumb="under"`) and
+`--ink-soft` otherwise, so the words change colour where the thumb is. A colour transition ran on
+its own clock and left labels in the thumb's light ink on the light track (2026-09-28).
 
 **Behaviour.** Click selects. Keyboard: not specified in the prototypes (each segment is a plain
 button, Tab moves between them). 06-INTERACTIONS decides whether Left/Right move the selection.
@@ -2449,8 +2458,10 @@ S's Space editor rows (field label + SegmentedControl: Appearance System/Light/D
 hint of the Space"/"Postmark", `S:877-888`) and C's controls row (label + segmented control
 for Look, Warmth, Motion, Theme, `C:1131-1157`).
 
-**Purpose.** Pick Theme, Accent and Motion for an app or the whole shell (`Appearance` in
-`resolve(app, look_theme, system)`).
+**Purpose.** Pick Theme and Accent for an app or the whole shell (`Appearance` in
+`resolve(app, look_theme, system)`). Motion is not offered (the user's decision, 2026-09-28: the
+motion level need not be user-configurable): the picker passes `Appearance::motion` through
+unchanged, and the system's reduced-motion preference still maps into it.
 
 **Markup.**
 
@@ -2467,10 +2478,6 @@ for Look, Warmth, Motion, Theme, `C:1131-1157`).
       …one per accent…
     </div>
   </div>
-  <div class="ds-appearance-row">
-    <div class="ds-section-header" data-kind="field">Motion</div>
-    <div class="ds-segmented" role="group" aria-label="Motion">…Calm | Standard | Extra | Reduced…</div>
-  </div>
 </div>
 ```
 
@@ -2484,8 +2491,7 @@ for Look, Warmth, Motion, Theme, `C:1131-1157`).
 **Geometry.** Rows stacked; the Space editor's stack gap is 14 (`S:247`); a row is a Field
 SectionHeader (margin-bottom 6) over its control. Swatches reuse the Space dot (§32: 22 px
 circle, 2px border, gap 5 as in the sidebar foot `S:845`). Overall width not specified (O-16).
-Labels: Theme uses S's words (System, Light, Dark; C says Auto); Motion uses C's (Calm,
-Standard, Extra) plus the plan's Reduced.
+Labels: Theme uses S's words (System, Light, Dark; C says Auto).
 
 **States.** Inherited from SegmentedControl (§3) and Space dot (§32). No states of its own.
 
@@ -4251,6 +4257,127 @@ dimming fades except under Reduced); `ds-native/tests/idle_dim.rs` on `Clock::Vi
 lands on the level at `--t-idle-dim`, an input mid-fade snaps to zero at once, Reduced motion
 shows the level from its first frame, `assert_settles_to_zero_frames` once landed). CONSUMING.md
 "Idle dim".
+
+### 54. LeavingList: rows that leave in batches and heal by measured heights (sill Q510, 2026-09-28)
+
+**Purpose.** The notification center's column. `AnimatedList` + `use_roster` heals by one fixed
+pitch and is driven by `Roster::leave`, so a Clear there had no exit and rows of different
+heights healed by the wrong distance. `LeavingList` takes the whole list on every render, the way
+`BannerStack` does: a key the caller stops listing plays its exit and stays drawn until it
+settles, and the rows below heal by the height the leaving row measured.
+
+**Batches.** Every key that goes missing in one render is one batch. Its rows play the exit
+together, each delayed by its place among the batch in list order (`--i` x `--stagger`, index
+capped at 12, design/05 section 9 rule 3), so a Clear folds its rows one after another. The batch
+settles at the longest of its rows' `settle(exit, level, i)`; then its rows are dropped at once and
+every row below heals by the sum of the measured heights of the dropped rows above it
+(`RosterState::settled_batch`), heal index counting from the first row below the first dropped
+one. So a row starts its heal exactly where it stood and ends exactly in its new place, whatever
+the rows' heights. A single dismissal is a batch of one; a group collapsing is the batch of the
+rows it hides. A key listed again while its batch plays stays where it is, is not dropped and is
+not reported; the rest of its batch goes on (a batch is its own timer, not one per row). The
+caller hears each dropped key on `on_settled`.
+
+**Markup.** `div.ds-leaving-list[role=list][aria-label][data-presence=entering|present]` holding
+one `div.ds-leaving-row[role=listitem][data-presence][data-exit]` per key, leaving rows included,
+each around the caller's content. The row is `display:flow-root`, so the content's margins stay
+inside it and its measured height (`client_rect`, taken as it mounts and again as it starts to
+leave) is the whole distance the rows below move. Style: `--i` while entering or leaving, `--dy`
+and `--d` while healing.
+
+**Props.**
+
+```rust
+pub struct LeavingItem<K> { pub key: K, pub row: Element }
+#[component] pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(label: String,
+    items: Vec<LeavingItem<K>>, exit: Exit /* Fold */, first: ListPresence /* Present */,
+    on_settled: Option<EventHandler<K>>) -> Element
+```
+
+`exit` is read on the render that starts a batch. `first: Present` shows the first render's rows
+at rest (a panel that slides in carries its rows); `Entering` lets them rise, staggered
+(principle 8: rows rise only when a list is first shown).
+
+**Motion.** As `ListRow` (section 16), on the row wrapper: first show `rise --t-move --e-out`
+staggered; an arrival into a list at rest `row-in --t-big --e-spring` (`C:373`); leaving `fold`
+(`--t-big`), `curl` (`--t-curl`), `crumple` (`--t-big`) or `banner-out` (`--t-move`), all
+`--e-exit` forwards with the batch stagger; healing `heal --t-move --e-spring` with `--d` x
+`--d-heal`; at rest `hold`. `tab-out` collapses its own height and is not played here (a heal on
+top of it would move the rows twice). Reduced (design/05 section 14.4): entering `fade`, leaving
+`menu-out`, healing `hold`, all at Reduced's 60 ms with no stagger, so the rows below take their
+places without sliding and a whole Clear settles at `settle(Fold, Reduced)` = 94 ms.
+
+**Not covered.** Heals that overlap: a batch that settles while the rows below are still healing
+from an earlier one restarts their heal from its own distance (the remaining part of the earlier
+heal is not carried over), as `use_roster` does. A row whose own height changes in place (a
+group's head gaining its stacked plates) moves the rows below it without a heal.
+
+**Tests.** `ds/tests/motion_machines.rs` (the batch as a table: stagger in list order, summed
+heal distances, a row taken back not dropped); `ds-native/tests/leaving_list.rs` on
+`Clock::Virtual` (rows of five different heights: one leaves and the rows below heal by its
+height and end exactly one row higher; a Clear of two non-adjacent rows is dropped together at
+the second row's settle and heals by 40 then 95; clearing everything settles at the fourth row's
+stagger; an arrival plays `row-in` until `settle(RowIn)`; a row listed again stays; Reduced).
+
+### 55. Alert: a question with Cancel and one action (sill Q490, 2026-09-28; values as the polkit sheet's)
+
+**Purpose.** The Mac's alert before Liquid Glass (Sonoma/Sequoia `NSAlert`, design/27): a short
+question the shell asks before an action with consequences, "Turn Bluetooth off?" from the
+control center being the first. It is the polkit sheet (section 42) without the field: a narrow
+panel over the modal scrim, everything centred in one column.
+
+**Props.**
+
+```rust
+pub enum AlertEmphasis { Default /* default */, Destructive }
+pub enum AlertButton { Cancel, Action }            // AlertEmphasis::default_button(self) -> AlertButton
+#[component] pub fn Alert(title: String, message: Option<Text>, action: String,
+    cancel: String /* "Cancel" */, emphasis: AlertEmphasis, onaction: EventHandler<()>,
+    oncancel: EventHandler<()>, icon: Option<IconSource>, flow: Flow /* Floating */,
+    shown: Option<Shown>, on_hidden: Option<EventHandler<()>>, panel_id: Option<String>) -> Element
+```
+
+**Markup.** `Flow::Floating`: a `Sheet { placement: Centre, scrim: Modal, width: Narrow }` in the
+overlay holding `div.ds-alert[data-emphasis]`. `Flow::Inline`: `div.ds-alert-stage[data-flow=inline]`
+where the caller renders it (absolute, inset 0, on `--z-peek`) holding the modal `button.ds-scrim`
+and `div.ds-sheet-stage > div.ds-sheet[data-placement=centre][data-width=narrow][role=alertdialog]`
+around the same `div.ds-alert`. Inside: `div.ds-alert-icon` (optional, `IconView` at 48),
+`div.ds-alert-title`, `div.ds-alert-message`, `div.ds-alert-actions` with two
+`span.ds-alert-slot`s, Cancel then the action.
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Panel | the narrow sheet: `min(340px, 88%)`, so 281 px in a 320 px popover; `--surface-2`, `--r-panel`, `--shadow-sheet` | section 24, `SheetWidth::Narrow` |
+| Column | padding 22/22/18, centred | the polkit sheet (section 42) |
+| Icon | 48 (`IconSize::Tile48`), 12 above the title; none by default | the Mac draws the app icon; 48 is the polkit picture's size |
+| Title | display face `--fs-title` (16) 700, `--ink` | as the polkit title |
+| Message | `--fs-control`, line-height 1.45, `--ink-soft`, 6 below | as the polkit message |
+| Buttons | two equal columns 8 apart, 18 below, full width each; Cancel left, the action right | the Mac's two-button alert |
+| Default | `Primary` (accent fill) | the Mac's default button |
+| Other | `Secondary`; a destructive action is `Danger` at `ButtonSize::Regular` with its label in `--danger` at rest | the Mac's destructive style (red label) |
+
+**Behaviour.** The default button is the action; when `emphasis` is `Destructive` it is Cancel
+(HIG, buttons: don't assign the primary role to a button that performs a destructive action, since
+people press the primary button without reading it). The default button takes the keyboard as the
+alert opens. Return presses the default button wherever the keyboard is; Space presses the button
+that has the keyboard; Tab and Shift+Tab move between the two buttons and never out (the alert is
+modal); Escape, or a press on the scrim, is Cancel. Every key it takes is prevented and stops
+there, so neither the sheet's own Escape nor a browser's synthesised click presses anything twice.
+Inline it has no layer on the stack: its keys are its own, and it covers exactly the nearest
+positioned ancestor, so render it last in that container.
+
+**Motion.** The sheet's: `peek-in --t-big --e-spring` as it mounts (scrim `fade --t-move
+--e-out`); with `shown`, hidden, the driven spring fades and lowers it, the scrim plays `menu-out
+--t-quick --e-exit`, and `on_hidden` runs once the spring rests. Reduced: it only fades.
+
+**Tests.** `ds/src/components/alert.rs` and `alert_vocab.rs` (the default button and faces, the
+keys, as tables); `ds/tests/alert_ssr.rs` (goldens under `tests/snapshots/alert/`: floating light
+and dark, inline in a 320 px popover, destructive, destructive with an icon, hidden both ways; lint
+clean; every class styled; the default is the filled button); `ds-native/tests/alert.rs` on
+`Clock::Virtual` (focus starts on the default, Cancel when destructive; Return presses the
+default wherever the focus is; Escape and the scrim cancel in both flows; Space presses the
+focused button; Tab stays inside; inline it fits inside a 320 px popover, floating it is centred in
+the window).
 
 ## Open decisions
 

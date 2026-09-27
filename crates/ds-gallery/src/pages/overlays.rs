@@ -122,6 +122,7 @@ pub fn OverlaysPage() -> Element {
         Bubble {}
         Pills { showcase }
         super::launcher::EmbeddedPalette {}
+        super::launcher_hints::SpotlightHints {}
         super::overlays_mailo::RecentPalette {}
         super::overlays_mailo::FieldMenu {}
         super::overlays_mailo4::HookKeyedCards {}
@@ -131,6 +132,7 @@ pub fn OverlaysPage() -> Element {
         super::overlays_mailo5::FieldFilterMenu {}
         super::control_center::ControlCenter {}
         super::overlays_sheet::PowerMenu {}
+        super::overlays_alert::Alerts {}
         super::overlays_notifications::Notifications {}
         super::calendar::Calendar {}
         super::widgets::Widgets {}
