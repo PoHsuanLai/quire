@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::detail::{Detailed, FirstShow, Moment, Touch, use_detail, use_operation};
 use ds::{Appearance, Ds, Material, Motion, PaneContent, PreviewPane, Shown};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -229,20 +229,24 @@ fn a_failed_load_cross_fades_to_its_still_words() {
 
 #[test]
 fn a_stuck_load_holds_its_still_frame_from_the_cap() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    // On the virtual clock: the cap is 10 s, and a wall-clock bound of 10.5 s raced it.
+    let mut harness = Harness::with_config(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     shown_remotely(&mut harness);
     remote(&mut harness, Pane::Pending);
-    let asked = Instant::now();
+    let asked = harness.now();
     let ring = ".ds-preview-pending .ds-spinner";
     settle_until(&mut harness, |h| attr(h, ring, "data-pending") == "step");
-    while asked.elapsed() < Duration::from_millis(10_500)
+    while harness.now().duration_since(asked) < Duration::from_millis(10_500)
         && attr(&harness, ring, "data-pending") != "still"
     {
         harness.advance(ms(250));
     }
     assert_eq!(attr(&harness, ring, "data-pending"), "still");
     assert!(
-        asked.elapsed() >= Duration::from_secs(10),
+        harness.now().duration_since(asked) >= Duration::from_secs(10),
         "held before the cap"
     );
     assert_eq!(
