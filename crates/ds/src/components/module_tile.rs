@@ -9,6 +9,7 @@
 //! chevron prevents the default of the keys it takes, so a browser's synthesised click cannot
 //! run the same press twice.
 
+use crate::components::icon_view::IconView;
 use crate::components::module_tile_kind::{Chevron, ModuleState, TileSpan};
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::spinner::{Spinner, SpinnerKind};
@@ -17,15 +18,21 @@ use crate::components::vocab::{Availability, Expanded};
 use crate::detail::{FirstShow, Touch, use_detail, use_operation};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
+use crate::icon::external::IconSource;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 
 /// A control-center module. `onclick` toggles it (a press on the tile, Enter or Space);
 /// `on_detail` opens its detail pane (a press on the chevron, Enter or Right on the chevron).
 /// `expanded` is the chevron's `aria-expanded`: whether that pane is showing.
+///
+/// `glyph` is an `Icon` (it converts) or any [`IconSource`]: `IconSource::Status` puts a layered
+/// status glyph in the disc (the Wi-Fi and Bluetooth modules, sill Q391), which plays its own
+/// moments as the state changes, the Wi-Fi fan filling as it joins. `first` is the glyph's first
+/// frame: `FirstShow::Animate` when the control center was just opened.
 #[component]
 pub fn ModuleTile(
-    glyph: Icon,
+    #[props(into)] glyph: IconSource,
     #[props(into)] title: Text,
     status: Option<Text>,
     state: ModuleState,
@@ -35,6 +42,7 @@ pub fn ModuleTile(
     #[props(default)] on_detail: Option<EventHandler<Press>>,
     #[props(default)] expanded: Expanded,
     #[props(default)] availability: Availability,
+    #[props(default)] first: FirstShow,
 ) -> Element {
     let live = availability == Availability::Enabled;
     // Busy is an operation the tile's own state starts: its ring is bounded by the cap (R4).
@@ -66,7 +74,7 @@ pub fn ModuleTile(
                 }
             },
             span { class: "ds-module-disc",
-                Glyph { icon: glyph, size: IconSize::Base }
+                IconView { source: glyph, size: IconSize::Base, first }
                 if state == ModuleState::Busy {
                     Spinner { kind: SpinnerKind::Breathe, operation }
                 }

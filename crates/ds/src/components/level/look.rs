@@ -20,6 +20,8 @@ pub(crate) struct Drawn {
     /// The level the previous render showed: where the segments' stagger starts.
     pub before: Fraction,
     pub glyph: LevelGlyph,
+    /// The level the glyph's parts follow: the value, or a volume state's band.
+    pub glyph_level: Fraction,
     /// The tick's pulse class and alias, when it ticks.
     pub tick: Option<(String, &'static str)>,
 }
@@ -47,7 +49,7 @@ fn capsule(drawn: &Drawn, inside: Inside) -> Element {
     let glyph = || match inside {
         Inside::Glyph => rsx! {
             span { class: "ds-level-in",
-                LevelGlyphView { glyph: drawn.glyph, value: drawn.value, size: IconSize::Base }
+                LevelGlyphView { glyph: drawn.glyph, value: drawn.glyph_level, size: IconSize::Base }
             }
         },
         Inside::Nothing => rsx! {},

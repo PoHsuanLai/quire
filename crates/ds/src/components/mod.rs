@@ -212,7 +212,7 @@ pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
-pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, Muting, Tick};
+pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use lock_clock::LockClock;

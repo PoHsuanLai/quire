@@ -9,6 +9,7 @@ pub mod controls_mailo5;
 pub mod controls_mailo6;
 pub mod details;
 pub mod details_status;
+pub mod details_status_items;
 pub mod dock_tiles;
 pub mod edit_surface;
 pub mod emoji;
