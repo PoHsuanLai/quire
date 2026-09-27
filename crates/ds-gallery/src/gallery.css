@@ -68,6 +68,7 @@
    pill's specimen box. A grid item stretches both ways, so the Surface inside fills the box; the
    pill, a flex item, is as wide as its tiles. */
 .g-launcher{display:grid;align-items:start;width:540px;height:330px}
+.g-launcher-wide{display:grid;align-items:start;width:860px;height:400px}
 .g-dock{display:flex;padding-top:var(--s-36)}
 .g-dock-tiles{display:flex;align-items:center;gap:var(--s-12);padding:var(--s-8) var(--s-12)}
 

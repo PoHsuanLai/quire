@@ -1,6 +1,6 @@
 //! PreviewPane: a Quick-Look-style pane for one thing (sill Q292; design/04-COMPONENTS.md
 //! section 47): its picture, page, text, icon or facts over a caption, and its actions as
-//! buttons with their keys. The launcher sets it beside its results as `CommandPalette
+//! buttons with their keys as a plain chord. The launcher sets it beside its results as `CommandPalette
 //! { aside }`; the Quick Look app (design/20 section 2.4) is to reuse it.
 //!
 //! The pane never takes the keyboard: the launcher's field keeps it, and `focused` draws which
@@ -12,7 +12,7 @@
 //! shows the pending look in the media box.
 
 use crate::components::bump_on::bump_attrs;
-use crate::components::kbd::{Kbd, KbdSize};
+use crate::components::chord::Chord;
 use crate::components::preview_content::{PaneContent, caption, media};
 use crate::components::preview_cue::{
     PaneCue, pane_pending_spec, pending_look, touch_slug, use_entrance_touch,
@@ -24,7 +24,8 @@ use crate::detail::{Operation, PendingFrame, Touch, use_cross_fade, use_pending}
 use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 
-/// One action under the preview: its words and its keys (drawn as `Kbd`; an empty shortcut
+/// One action under the preview: its words in the ink, then its keys as a plain [`Chord`] in
+/// the secondary ink at the words' size (Spotlight's "Reveal in Files ⌘R"; an empty shortcut
 /// draws none).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PaneAction {
@@ -105,7 +106,7 @@ pub fn PreviewPane(
                             onmousedown: move |event| event.prevent_default(),
                             onclick: move |_| onaction.call(index),
                             span { class: "ds-preview-action-label", "{action.label}" }
-                            Kbd { shortcut: action.shortcut.clone(), size: KbdSize::Small }
+                            Chord { shortcut: action.shortcut.clone() }
                         }
                     }
                 }

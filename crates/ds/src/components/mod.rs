@@ -15,6 +15,7 @@ pub mod button;
 pub mod button_face;
 pub mod button_size;
 pub mod chip;
+pub mod chord;
 pub mod clock_angles;
 pub(crate) mod clock_dial;
 pub mod clock_face;
@@ -125,6 +126,7 @@ pub(crate) mod resize_edges;
 pub mod rich_text;
 pub mod row_action;
 pub(crate) mod row_battery;
+pub mod row_chord;
 pub(crate) mod row_click;
 pub mod row_hooks;
 pub mod row_shape;
@@ -199,6 +201,7 @@ pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
 pub use button_size::ButtonSize;
 pub use chip::{Chip, ChipVariant};
+pub use chord::Chord;
 pub use clock_angles::{Hands, Tenths, hands};
 pub use clock_face::ClockFace;
 pub use clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
@@ -279,6 +282,7 @@ pub use preview_pane::{PaneAction, PreviewPane};
 pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
 pub use rich_text::{Rich, RichRun, RichText};
 pub use row_action::RowAction;
+pub use row_chord::{ChordShown, RowChord};
 pub use row_hooks::PartHooks;
 pub use row_shape::{ClipBody, RowShape};
 pub use scrim::Scrim;
@@ -363,6 +367,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("icon_view", include_str!("icon_view.css")),
     ("idle_dim", include_str!("idle_dim.css")),
     ("kbd", include_str!("kbd.css")),
+    ("chord", include_str!("chord.css")),
     ("level", include_str!("level.css")),
     ("link_pill", include_str!("link_pill.css")),
     ("list_row", include_str!("list_row.css")),

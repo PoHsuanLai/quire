@@ -2143,6 +2143,32 @@ stops asking for frames once it lands); flip `phase` back to `Awake` mid-fade an
 frame reads 0; build the harness at `MotionLevel::Reduced` and the first frame after `Dimmed` is
 already `level`.
 
+### Launcher chords (2026-09-28): Spotlight's hints, a plain `Chord` and a row's `chord`
+
+Additive: one component, one field, one enum. Nothing that compiled stops compiling: `MenuRow`
+gains a field that `..MenuRow::new(..)` fills, and `Trail::Shortcut` draws exactly as before.
+
+| Item | Surface | Meaning |
+|---|---|---|
+| `Chord` | new component: `shortcut: Shortcut` | A shortcut as one run of glyphs (`⌘R`, `⇧⌘D`, modifiers in the Mac's order) in `--ink-soft`, in the face and size around it, no key caps and no border (`span.ds-chord`); an empty shortcut draws nothing. `Kbd` is unchanged for a keyboard legend |
+| `PreviewPane` | `actions` | Each action is now its label in the ink, then its `shortcut` as a `Chord` at the label's size ("Reveal in Files ⌘R"), where it was one small `Kbd` per key. `PaneAction` is unchanged: nothing to do |
+| `MenuRow` | `chord: RowChord` (`RowChord::default()`: none) | The row's action keys, drawn as a `Chord` at the end of the trail (after a file's or clip's time and after `trail`), 6 px from what precedes it |
+| `RowChord` | `{ shortcut: Shortcut, shown: ChordShown }`; `RowChord::on_selected(keys)`, `RowChord::always(keys)` | When the chord shows. `ChordShown::Selected` (the default): only on the row that is the selection (`aria-selected=true`), so it moves with the palette's own arrows or your `selected`, as Spotlight's hint does; unselected rows show only their other trailing text. `ChordShown::Always`: on every row |
+
+**What sill changes (launcher rows, `sections_view.rs`).** Today every file row trails its first
+action's chord (`Trail::Shortcut(chord)`, "13:00 ⌘R") and the cursor's row trails `↵` because the
+view computes `Enter::Runs` itself. Switch to:
+
+- the row's first action chord (or `⌃K` when it has actions but no chord) in
+  `chord: RowChord::on_selected(chord)` on every row, `MenuEntry::Row(MenuRow { .. })` for plain
+  rows too (a `MenuEntry::Item` has no `chord`);
+- `trail` keeps only the data: `Trail::Note(kind)` in a mixed section, else `Trail::None` (a file's
+  or clip's time stays in its `RowShape`); drop `Trail::Shortcut(chord)` and the `↵` on the
+  cursor's row, or keep `↵` in the chord (`Shortcut(vec![Key::Enter])`) if Enter should still be
+  hinted, since quire now moves the hint with the selection and sill need not track the cursor
+  for it;
+- `PaneAction { label, shortcut }` needs no change: the pane draws the new look.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive
