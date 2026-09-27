@@ -11,6 +11,7 @@
 
 use super::family::{NEUTRAL_DARK, PlateFamily};
 use super::retint::{IconStyle, Tint, recolour};
+use super::tone_band::Tone;
 use crate::appearance::Scheme;
 use crate::tokens::{Hex, VarName};
 
@@ -42,13 +43,14 @@ impl PlateTint {
         }
     }
 
-    /// One opaque colour re-coloured as `retint` re-colours an opaque pixel.
-    fn recolour(self, colour: Hex) -> Hex {
+    /// One opaque colour, part of `tone` in `scheme`, re-coloured as `retint_in` re-colours an
+    /// opaque pixel.
+    fn recolour(self, colour: Hex, scheme: Scheme, tone: Tone) -> Hex {
         let (style, tint) = match self {
             PlateTint::Muted => (IconStyle::Muted, Tint::NEUTRAL),
             PlateTint::Monochrome(tint) => (IconStyle::Monochrome, tint),
         };
-        Hex(recolour(colour.0, u8::MAX, style, tint))
+        Hex(recolour(colour.0, u8::MAX, style, tint, (scheme, tone)))
     }
 }
 
@@ -83,12 +85,18 @@ impl PlateStops {
         }
     }
 
-    /// These stops and ink re-coloured by `tint`.
+    /// These stops and ink re-coloured by `tint`, lightness kept (the light scheme's rule).
     pub fn tinted(self, tint: PlateTint) -> PlateStops {
+        self.tinted_in(tint, Scheme::Light)
+    }
+
+    /// These stops and ink re-coloured by `tint` for `scheme`: in the dark the stops are lifted
+    /// into the plate's tone band and the ink into the art's (design/29-SIZING.md fix F3).
+    pub fn tinted_in(self, tint: PlateTint, scheme: Scheme) -> PlateStops {
         PlateStops {
-            base: tint.recolour(self.base),
-            deep: tint.recolour(self.deep),
-            ink: tint.recolour(self.ink),
+            base: tint.recolour(self.base, scheme, Tone::Plate),
+            deep: tint.recolour(self.deep, scheme, Tone::Plate),
+            ink: tint.recolour(self.ink, scheme, Tone::Art),
         }
     }
 }
@@ -114,7 +122,7 @@ pub(crate) fn tint_style(family: PlateFamily, tint: PlateTint) -> String {
         .into_iter()
         .zip(PLATE_TINT_VARS)
         .flat_map(|(scheme, names)| {
-            let stops = PlateStops::of(family, scheme).tinted(tint);
+            let stops = PlateStops::of(family, scheme).tinted_in(tint, scheme);
             names.into_iter().zip([stops.base, stops.deep, stops.ink])
         })
         .map(|(name, colour)| format!("{}:{};", name.as_str(), colour.css()))
@@ -159,7 +167,7 @@ mod tests {
         for preset in [0, 1] {
             let tint = Tint::space(PRESETS[preset].dots);
             let dark = PlateStops::of(PlateFamily::Neutral, Scheme::Dark)
-                .tinted(PlateTint::Monochrome(tint));
+                .tinted_in(PlateTint::Monochrome(tint), Scheme::Dark);
             // The ink is near white, where the tint eases off.
             for (colour, least) in [(dark.base, 0.03), (dark.deep, 0.03), (dark.ink, 0.01)] {
                 let got = hue_and_chroma(colour);
@@ -212,7 +220,7 @@ mod tests {
                 "--plate-ink-d"
             ]
         );
-        let dark = PlateStops::of(PlateFamily::Neutral, Scheme::Dark).tinted(tint);
+        let dark = PlateStops::of(PlateFamily::Neutral, Scheme::Dark).tinted_in(tint, Scheme::Dark);
         assert!(style.contains(&format!("--plate-base-d:{};", dark.base.css())));
     }
 }
