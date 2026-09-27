@@ -512,6 +512,7 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 | `session.polkit_agent` | `String` | `"auto"` | `auto` (polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, then cosmic-osd last: running cosmic-osd only for polkit would add its own volume popup beside sill's OSD), `sill` (the shell's own agent and prompt, M11), `off`, one of those names, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-10-polkit-prompt-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
 | `session.lock_clock` | `LockClock::{H24,H12}` | `H24` | `14:05`, or `2:05` without AM/PM as the reference lock screen shows it | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS F553 | proposed (M11 freeze, 2026-09-26) |
 | `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | proposed (2026-09-27) |
+| `session.lock_grace_s` | `Count` (s) | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
 
 ### 3.20 `widgets` (sill/settings.toml)
 
@@ -566,6 +567,22 @@ One invisible square per enabled corner (design/20 §1.16; design/13 §13.3.12 f
 | `hot_corners.dwell_ms` | `Ms` | `150` | `0..=2000`; how long the pointer rests before the corner acts | `20-SURFACES.md#3-open-decisions` item 7; F409 | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.rearm_ms` | `Ms` | `500` | `0..=5000`; acts again only after the pointer has left and this long | same | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.size_px` | `Px` | `2` | `1..=8`; the invisible square's side | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience` (2 x 2 px) | proposed (M10 freeze, 2026-09-26) |
+
+### 3.24 `idle` (sill/settings.toml)
+
+sill's own idle service, replacing cosmic-idle in a sill session (the user's pick, 2026-09-27): dim with an overlay (never real brightness), screen off through output power, lock as the displays go off, suspend through logind; `org.freedesktop.ScreenSaver.Inhibit`, Wayland idle-inhibit and logind inhibitors are honoured (sill FINDINGS "sill idle (Q420 B)", F900-F913). Page Accounts for now (no Power page yet).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `idle.times` | `IdleTimesFrom::{Cosmic,Sill}` | `Cosmic` | `Cosmic` reads COSMIC's Power settings (`com.system76.CosmicIdle`, read-only), so COSMIC Settings' Power page keeps working; `Sill` uses the keys below | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.screen_off_ac_min` | `Count` (min) | `15` | `0..=240`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.screen_off_battery_min` | `Count` (min) | `15` | `0..=240`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.suspend_ac_min` | `Count` (min) | `30` | `0..=480`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.suspend_battery_min` | `Count` (min) | `15` | `0..=480`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.dim_s` | `Count` (s) | `5` | `0..=60`, 0 no dim; seconds before screen-off that the overlay dims | sill FINDINGS "sill idle (Q420 B)", F902 | proposed (Q441, 2026-09-27) |
+| `idle.dim_level_pct` | `Percent` | `50` | `10..=90` | sill FINDINGS "sill idle (Q420 B)", F902 | proposed (Q441, 2026-09-27) |
+| `idle.lock` | `IdleLockAt::{ScreenOff,Never}` | `ScreenOff` |  | sill FINDINGS "sill idle (Q420 B)", F904 | proposed (Q441, 2026-09-27) |
+| `idle.locked_screen_off_s` | `Count` (s) | `60` | `0..=600`, 0 means the normal time; how soon a locked screen goes dark again | sill FINDINGS "sill idle (Q420 B)", F903 | proposed (Q441, 2026-09-27) |
 
 ## 4. Rust shape
 
