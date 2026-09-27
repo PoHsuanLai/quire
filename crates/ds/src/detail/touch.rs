@@ -2,6 +2,7 @@
 //! overshoot. A [`Contact`] is proof of that contact, and the only public way to get one is from
 //! the event a pointer or key handler receives, so a remote change cannot claim it.
 
+use crate::motion::Velocity;
 use dioxus::prelude::{Event, KeyboardData, MouseData, PointerData};
 
 mod sealed {
@@ -33,20 +34,49 @@ impl Handled for PointerData {}
 /// (Error codes in these blocks are documentation: stable rustdoc checks only that each fails.)
 ///
 /// ```compile_fail,E0451
-/// // A contact cannot be written by hand: its field is private.
+/// // A contact cannot be written by hand: its fields are private.
 /// let forged = ds::detail::Contact { proof: () };
 /// ```
+///
+/// A contact also carries the velocity the hand had when it let go (design/27 section 3.12,
+/// wave H1): zero for a click or a key, the drag's release velocity for a throw
+/// ([`Contact::with_velocity`]). A spring moved by it starts at that speed
+/// (`ds::motion::SpringSpec::for_touch`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Contact {
     proof: (),
+    velocity: Velocity,
 }
 
 impl Contact {
     /// The contact a handler's event is: call it inside `onclick`, `onpointerdown` or
-    /// `onkeydown` and keep it with the state change that event caused.
+    /// `onkeydown` and keep it with the state change that event caused. It carries no velocity.
     pub fn from_event<T: Handled>(event: &Event<T>) -> Contact {
         let _ = event;
-        Contact { proof: () }
+        Contact {
+            proof: (),
+            velocity: Velocity::ZERO,
+        }
+    }
+
+    /// The same contact, released at `velocity`: what a drag's `onpointerup` hands on, from its
+    /// own measure of the pointer's speed.
+    pub fn with_velocity(self, velocity: Velocity) -> Contact {
+        Contact { velocity, ..self }
+    }
+
+    /// The velocity the hand had when it let go (zero for a tap or a key).
+    pub fn velocity(self) -> Velocity {
+        self.velocity
+    }
+
+    /// A contact for a unit test that has no event to hand.
+    #[cfg(test)]
+    pub(crate) fn for_tests() -> Contact {
+        Contact {
+            proof: (),
+            velocity: Velocity::ZERO,
+        }
     }
 }
 
@@ -65,5 +95,13 @@ impl Touch {
     /// `Touch::Contact` from a handler's event.
     pub fn from_event<T: Handled>(event: &Event<T>) -> Touch {
         Touch::Contact(Contact::from_event(event))
+    }
+
+    /// The release velocity a contact carries; zero for a remote change.
+    pub fn velocity(self) -> Velocity {
+        match self {
+            Touch::Contact(contact) => contact.velocity(),
+            Touch::Remote => Velocity::ZERO,
+        }
     }
 }
