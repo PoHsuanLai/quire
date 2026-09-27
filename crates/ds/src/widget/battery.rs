@@ -10,7 +10,7 @@ use crate::components::battery_level::{BatteryLevel, RingMark};
 use crate::components::device_glyph::{Device, DeviceGlyph};
 use crate::components::text_runs::Text;
 use crate::components::vocab::Fraction;
-use crate::components::widget_kind::WidgetSize;
+use crate::components::widget_kind::{WidgetHost, WidgetSize};
 use crate::icon::render::IconSize;
 use crate::motion::WakeStamp;
 use crate::widget::contract::{NoIntent, Widget, WidgetContext, WidgetKind};
@@ -94,6 +94,15 @@ impl Widget for BatteryWidget {
 
     fn sizes() -> &'static [WidgetSize] {
         &[WidgetSize::Small, WidgetSize::Medium]
+    }
+
+    /// Small on the desktop (the ring and the hero figure, or the grid); Medium in the
+    /// notification center, whose tiles span the column.
+    fn size_in(host: WidgetHost) -> WidgetSize {
+        match host {
+            WidgetHost::Desktop => WidgetSize::Small,
+            WidgetHost::Tile => WidgetSize::Medium,
+        }
     }
 
     fn description() -> Text {

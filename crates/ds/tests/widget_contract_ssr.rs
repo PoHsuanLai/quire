@@ -664,10 +664,9 @@ fn the_gallery_browses_the_registry_and_lists_the_layout() {
         gallery.contains(">See the charge of this computer and your devices.<"),
         "{gallery}"
     );
-    assert_eq!(
-        gallery.matches("class=\"ds-widget-gallery-size\"").count(),
-        2,
-        "Small and Medium"
+    assert!(
+        gallery.contains("class=\"ds-widget-gallery-preview\" data-size=\"small\""),
+        "the batteries at their one desktop size: {gallery}"
     );
     assert!(
         gallery.contains(">82%<") || gallery.contains("aria-valuenow=\"82\""),
@@ -679,4 +678,26 @@ fn the_gallery_browses_the_registry_and_lists_the_layout() {
         "{gallery}"
     );
     assert!(gallery.contains(">Batteries<"), "{gallery}");
+}
+
+/// Edit Widgets draws each widget once, at the one size it takes (sill Q520): one preview, no
+/// size control on it or on a placed row, and every class it writes styled.
+#[test]
+fn the_gallery_offers_one_size_per_widget() {
+    let gallery = html("gallery");
+    assert_eq!(
+        gallery
+            .matches("class=\"ds-widget-gallery-preview\"")
+            .count(),
+        1,
+        "{gallery}"
+    );
+    assert_eq!(
+        gallery.matches("class=\"ds-widget\"").count(),
+        1,
+        "one card: {gallery}"
+    );
+    assert!(!gallery.contains("ds-segmented"), "{gallery}");
+    assert!(!gallery.contains("data-lift=\"lifted\""), "{gallery}");
+    assert!(gallery.contains(">Batteries<"), "the placed row: {gallery}");
 }

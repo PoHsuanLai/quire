@@ -3572,15 +3572,19 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget[*|data-host=desktop] .ds-month-weekday{ color:var(--ink-soft); }
 /* -- widget_gallery -- */
 /* WidgetGallery, "Edit Widgets" (design/23-WIDGETS.md section 9.7): the reference's widget
-   gallery in three bands. At the left, the registry's widgets as a list, each its name (UI face
-   600) over its description (`--ink-soft`), the one looked at on `--accent-soft`. Beside it, that
-   widget at each size it offers, drawn with its preview entry on the real card at the real size
-   over `--surface-2`, the size's name under each; the picked one lifts (`Lift`, the dragged
-   widget's own), and the two buttons add it. Under both, what is placed on the desktop and in
-   the notification center, one row each: the name, the size, Remove. */
+   gallery in three columns, laid out for a wide sheet at the bottom of the desktop. At the left,
+   the registry's widgets as a list, each its name (UI face 600) over its description
+   (`--ink-soft`), the one looked at on `--accent-soft`. In the middle, that widget drawn once, at
+   the one size it takes, with its preview entry on the real card over `--surface-2`, and the two
+   buttons that add it. At the right, what is placed on the desktop and in the notification
+   center, one row each: the name and Remove. The gallery fills the height it is given
+   (`flex:1` in a column, or its grid row), and the placed column scrolls on its own, so a new
+   row can be brought into view without moving the rest. Attribute selectors carry `*|`
+   (spike S2). */
 
-.ds-widget-gallery{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr); gap:var(--s-16); color:var(--ink); }
-.ds-widget-gallery-kinds{ display:flex; flex-direction:column; gap:var(--s-2); }
+.ds-widget-gallery{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr) minmax(0,280px); grid-template-rows:minmax(0,1fr);
+  flex:1; min-height:0; gap:var(--s-16); color:var(--ink); }
+.ds-widget-gallery-kinds{ display:flex; flex-direction:column; gap:var(--s-2); min-height:0; overflow-y:auto; scrollbar-width:none; }
 .ds-widget-gallery-kind{ font:inherit; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-2); padding:var(--s-8) var(--s-10);
   border:0; border-radius:var(--r-tile); background:transparent; color:var(--ink); text-align:left; cursor:default;
   transition:background-color var(--t-quick) var(--e-out); }
@@ -3589,16 +3593,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-name{ font-family:var(--font-ui); font-size:var(--fs-body); font-weight:600; }
 .ds-widget-gallery-description{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-soft); }
 
-.ds-widget-gallery-detail{ display:flex; flex-direction:column; gap:var(--s-16); min-width:0; }
-.ds-widget-gallery-sizes{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s-22); padding:var(--s-16); border-radius:var(--r-panel);
-  background:var(--surface-2); }
-.ds-widget-gallery-size{ display:flex; flex-direction:column; align-items:center; gap:var(--s-8); cursor:default; }
-.ds-widget-gallery-size-name{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft); }
-.ds-widget-gallery-size[*|aria-pressed=true] .ds-widget-gallery-size-name{ color:var(--accent-text); }
-.ds-widget-gallery-actions{ display:flex; flex-wrap:wrap; gap:var(--s-8); }
+.ds-widget-gallery-detail{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--s-16); min-width:0; min-height:0;
+  padding:var(--s-16); border-radius:var(--r-panel); background:var(--surface-2); }
+.ds-widget-gallery-preview{ display:flex; justify-content:center; }
+.ds-widget-gallery-actions{ display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s-8); }
 .ds-widget-gallery-actions > .ds-button{ flex:none; white-space:nowrap; }
 
-.ds-widget-gallery-placed{ grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s-16); }
+.ds-widget-gallery-placed{ display:flex; flex-direction:column; gap:var(--s-16); min-height:0; overflow-y:auto; scrollbar-width:none; }
 .ds-widget-gallery-surface{ display:flex; flex-direction:column; gap:var(--s-6); }
 .ds-widget-gallery-heading{ font-family:var(--font-ui); font-size:var(--fs-caption); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps);
   text-transform:uppercase; color:var(--ink-faint); }
