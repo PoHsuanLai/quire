@@ -20,9 +20,11 @@ use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
+use crate::tokens::size_vars::size_tokens;
 use crate::tokens::type_voice::VoiceToken;
 use crate::tokens::widget_paint::WidgetPaint;
 use crate::tokens::widgets::WIDGET_TOKENS;
+use crate::tokens::{CONTROL_CENTER, SHELL_SCALE};
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
@@ -65,6 +67,7 @@ fn collect() -> HashSet<String> {
         .chain(LEVEL_VARS)
         .chain(SQUIRCLE_VARS)
         .chain(SHAPE_VARS)
+        .chain(ladder_vars())
         .collect();
     let hues = LabelHue::ALL
         .into_iter()
@@ -103,6 +106,16 @@ fn tuned_vars() -> impl Iterator<Item = VarName> {
         .chain([PLATE_GLYPH, PLATE_INSET])
         .chain(PixelToken::ALL.map(PixelToken::tuned))
         .flat_map(|token| [token.token, token.input])
+}
+
+/// The size ladder's tokens (design/29-SIZING.md): the control sizes, the bar's, the menus' and
+/// the control center's.
+fn ladder_vars() -> impl Iterator<Item = VarName> {
+    size_tokens()
+        .into_iter()
+        .chain(SHELL_SCALE.tokens())
+        .chain(CONTROL_CENTER.tokens())
+        .map(|(var, _)| var)
 }
 
 /// Whether `name` (an `animation-name` value, its `X--b` restart alias included) is a
@@ -167,6 +180,10 @@ mod tests {
             "--font-data",
             "--s-1",
             "--s-36",
+            "--ctl-h-m",
+            "--switch-knob-s",
+            "--cc-panel-r",
+            "--bar-status-w",
         ];
         for name in CASES {
             assert!(declared_vars().contains(*name), "{name}");

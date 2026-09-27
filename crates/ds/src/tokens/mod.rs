@@ -6,6 +6,8 @@
 pub mod accent_band;
 pub mod accent_table;
 pub mod colour;
+pub mod control_center;
+pub mod control_size;
 pub mod delay;
 pub mod dock;
 pub mod easing;
@@ -23,6 +25,9 @@ pub mod pixel;
 pub mod scalar;
 pub mod shape;
 pub mod shell;
+pub mod shell_scale;
+pub mod size_scale;
+pub mod size_vars;
 pub mod spacing;
 pub mod timing;
 pub mod tuned;
@@ -31,9 +36,14 @@ pub mod type_voice;
 pub mod widget_paint;
 pub mod widgets;
 
+#[cfg(test)]
+mod size_rules_tests;
+
 pub use accent_band::AccentRoles;
 pub use accent_table::accent_of;
 pub use colour::ColourToken;
+pub use control_center::{CONTROL_CENTER, ControlCenterScale};
+pub use control_size::ControlSize;
 pub use delay::DelayToken;
 pub use dock::{DockFloorSetting, DockMetrics};
 pub use easing::{CubicBezier, Easing, EasingToken};
@@ -51,6 +61,9 @@ pub use pixel::PixelToken;
 pub use scalar::{ScalarToken, ScalarValue};
 pub use shape::{Corner, Radius};
 pub use shell::{BarType, FontWeight, LauncherType, MenuType, ShellMetrics};
+pub use shell_scale::{SHELL_SCALE, ShellScale};
+pub use size_scale::{HalfPx, KNOB_INSET, SPACING_GRID, SizeScale, WholePx, on_grid};
+pub use size_vars::SizeVar;
 pub use spacing::SpacingToken;
 pub use timing::{DurationKind, DurationToken};
 pub use tuned::Tuned;

@@ -103,12 +103,13 @@ pub use spell::{
 pub use text::clip_chars;
 pub use time::{ClockGuard, FRAME_SLACK, FRAME_TICK, VirtualClock, sleep};
 pub use tokens::{
-    AccentRoles, Alpha, BarType, Colour, ColourToken, Corner, CubicBezier, DelayToken,
-    DockFloorSetting, DockMetrics, DurationKind, DurationToken, Easing, EasingToken, Family,
-    FontSize, FontWeight, Hex, HueMember, LabelHue, LauncherType, MenuType, NotificationMetrics,
-    OpacityToken, OsdMetrics, PersonSwatch, PixelToken, Radius, ScalarToken, ScalarValue, Shadow,
-    ShellMetrics, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WidgetMetrics, ZLayer,
-    accent_of,
+    AccentRoles, Alpha, BarType, CONTROL_CENTER, Colour, ColourToken, ControlCenterScale,
+    ControlSize, Corner, CubicBezier, DelayToken, DockFloorSetting, DockMetrics, DurationKind,
+    DurationToken, Easing, EasingToken, Family, FontSize, FontWeight, HalfPx, Hex, HueMember,
+    LabelHue, LauncherType, MenuType, NotificationMetrics, OpacityToken, OsdMetrics, PersonSwatch,
+    PixelToken, Radius, SHELL_SCALE, ScalarToken, ScalarValue, Shadow, ShellMetrics, ShellScale,
+    SizeScale, SizeVar, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WholePx, WidgetMetrics,
+    ZLayer, accent_of,
 };
 pub use widget::{
     BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, Dated, DesktopGrid, EntryDate,
