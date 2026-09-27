@@ -445,6 +445,7 @@ impl Anim {
             Anim::Hold => own::HOLD,
             Anim::PaneInROut => detail::PANE_IN_R_OUT,
             Anim::MorphInSpring => detail::MORPH_IN_SPRING,
+            Anim::WidgetOut => own::WIDGET_OUT,
         }
     }
 }
