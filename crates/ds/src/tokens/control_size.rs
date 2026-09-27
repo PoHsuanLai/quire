@@ -1,0 +1,71 @@
+//! A control's size on the shell's ladder (design/29-SIZING.md sections 7, 10 and 13): Small 16,
+//! Regular 22, Large 28, the reference's numbers. Each size's whole geometry comes from
+//! [`SizeScale`], computed from its height by the section 6 rules.
+
+use super::size_scale::{SizeScale, WholePx};
+
+/// How big a control is drawn: its height and everything derived from it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum ControlSize {
+    /// 16 tall: a settings row's switch, a dense toolbar.
+    Small,
+    /// 22 tall: the default push button, field, menu row and bar item.
+    #[default]
+    Regular,
+    /// 28 tall: a prominent button, a module disc.
+    Large,
+}
+
+impl ControlSize {
+    /// Every size, smallest first.
+    pub const ALL: [ControlSize; 3] =
+        [ControlSize::Small, ControlSize::Regular, ControlSize::Large];
+
+    /// The `data-size` word: `small`, `regular`, `large`.
+    pub fn slug(self) -> &'static str {
+        match self {
+            ControlSize::Small => "small",
+            ControlSize::Regular => "regular",
+            ControlSize::Large => "large",
+        }
+    }
+
+    /// This size's geometry.
+    pub fn scale(self) -> SizeScale {
+        match self {
+            ControlSize::Small => SizeScale {
+                height: WholePx(16),
+                radius: WholePx(4),
+                well_radius: WholePx(4),
+                glyph: WholePx(12),
+                pad_x: WholePx(6),
+                switch_height: WholePx(15),
+                slider_track: WholePx(4),
+                font: WholePx(11),
+                weight: 600,
+            },
+            ControlSize::Regular => SizeScale {
+                height: WholePx(22),
+                radius: WholePx(5),
+                well_radius: WholePx(6),
+                glyph: WholePx(16),
+                pad_x: WholePx(10),
+                switch_height: WholePx(22),
+                slider_track: WholePx(4),
+                font: WholePx(13),
+                weight: 500,
+            },
+            ControlSize::Large => SizeScale {
+                height: WholePx(28),
+                radius: WholePx(6),
+                well_radius: WholePx(7),
+                glyph: WholePx(18),
+                pad_x: WholePx(12),
+                switch_height: WholePx(28),
+                slider_track: WholePx(6),
+                font: WholePx(13),
+                weight: 600,
+            },
+        }
+    }
+}

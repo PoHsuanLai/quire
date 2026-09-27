@@ -13,7 +13,9 @@ use crate::tokens::emoji_face::{FONT_EMOJI, FONT_EMOJI_STACK};
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
+use crate::tokens::size_vars::size_tokens;
 use crate::tokens::widgets::WIDGET_TOKENS;
+use crate::tokens::{CONTROL_CENTER, SHELL_SCALE};
 use crate::tokens::{
     ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
     OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
@@ -123,7 +125,15 @@ fn fixed_tokens() -> Vec<String> {
     let people = PersonSwatch::ALL
         .into_iter()
         .map(|swatch| format!("{}:{};", swatch.var(), swatch.hex().css()));
+    // The size ladder (design/29-SIZING.md): every control size's geometry, and the bar's, the
+    // menus' and the control center's sizes on it, computed by `SizeScale`.
+    let ladder = size_tokens()
+        .into_iter()
+        .chain(SHELL_SCALE.tokens())
+        .chain(CONTROL_CENTER.tokens())
+        .map(|(var, value)| declaration(var, &value));
     radii
+        .chain(ladder)
         .chain(people)
         .chain(spacing)
         .chain(sizes)
