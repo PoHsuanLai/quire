@@ -2143,6 +2143,51 @@ stops asking for frames once it lands); flip `phase` back to `Awake` mid-fade an
 frame reads 0; build the harness at `MotionLevel::Reduced` and the first frame after `Dimmed` is
 already `level`.
 
+### Leaving list (2026-09-28): the notification center's rows (sill Q510)
+
+design/04-COMPONENTS.md section 54; design/05-MOTION.md section 7.2. Additive: `LeavingList`,
+`LeavingItem`, and two methods on `RosterState` (`leave_batch`, `settled_batch`). Nothing
+existing changed; the stylesheet golden moved (`leaving_list.css`).
+
+```rust
+use ds::{Exit, LeavingItem, LeavingList, ListPresence};
+
+let items: Vec<LeavingItem<CenterKey>> = rows_of(&views)
+    .into_iter()
+    .map(|row| LeavingItem { key: key_of(&row), row: draw(&row) })
+    .collect();
+rsx! {
+    LeavingList::<CenterKey> { label: "Notifications", items, on_settled: move |key| forget(key) }
+}
+```
+
+| Prop, type or method | What it does |
+| --- | --- |
+| `LeavingList { label, items: Vec<LeavingItem<K>>, exit: Exit (Fold), first: ListPresence (Present), on_settled: Option<EventHandler<K>> }` | Your whole column on every render, `K: Clone + PartialEq + Hash`. A key you stop listing plays `exit` and stays drawn (with the last content you gave it) until it settles. Every key that goes missing in one render is one batch: its rows fold one after another (`--i` x `--stagger`, capped at 12) and are dropped together once the last has settled; each row below then heals by the summed height of the dropped rows above it, measured, so it starts where it stood and ends exactly in its new place. A key you list again while it leaves stays. A new key enters with `row-in` (`--t-big --e-spring`). `first: Entering` lets the first render's rows rise, staggered; `Present` (default) shows them at rest. `on_settled` hears each dropped key. Reduced: rows fade out and in and the rows below snap into place; a Clear settles at 94 ms |
+| `LeavingItem { key: K, row: Element }` | One row: a stable key and its content. The content sits in a `div.ds-leaving-row` (a flow root), so your content's own margins count in its height |
+| `RosterState::leave_batch(keys, exit, emphasis) -> (Self, Vec<(Anim, StaggerIndex)>)`, `RosterState::settled_batch(keys, pitch: impl Fn(&K) -> RowPitch)` | The pure batch, table-tested, for a list of your own |
+
+**What sill changes.** Draw the center's column as one `LeavingList`, one item per `CenterRow`,
+keyed by what the row *is*, not how it looks: a header by its `AppKey`, a card by its
+`NotificationId` (not by `Stack`, which changes when the group folds). Then:
+
+- **Clear** (a header's Clear, Delete on a stack): remove the group's notifications from your
+  model in one handler, so the header and every card drop off `items` in one render; they fold
+  staggered and the groups below heal by the group's height. Do not delay the removal yourself.
+- **Clear all**: empty the model in one handler; every row folds, staggered (capped at 12).
+- **Dismiss** one card: remove its id; the rows below heal by that card's measured height.
+- **Collapse** a group ("Show less"): the cards it hides drop off `items` in one render and
+  leave as one batch; the rows below heal by their summed height. The newest card stays listed
+  under the same key, so it does not move or re-enter.
+- **Arrival** while the center is open: a new id enters with `row-in`.
+- `on_settled` is where to drop a row's last trace (a history entry, a focus index); the model
+  itself was already updated when you removed the key.
+- Keyboard focus on a row that leaves: move it in the same handler that removes the key (to the
+  next listed row); a leaving row takes no pointer and should not keep the ring.
+
+`notifications.center_width_px` and the card spacing stay yours: put the gap between cards as
+padding or margin inside your row content, never between the list's rows.
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive

@@ -84,6 +84,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 47 | PreviewPane | macOS Quick Look / Spotlight preview (reference) | none | launcher preview pane, Quick Look |
 | 48 | RowShape (palette rows: File, Clip) | Spotlight file and clipboard rows (reference) | none | launcher file and clipboard results |
 | 49 | PaletteGroup ("Show More") and the key claim | Spotlight sections (reference) | Ctrl T / Ctrl K (unchanged) | launcher sections, Space and Right for the preview |
+| 54 | LeavingList | S `.row.going` + `.healing` (`S:326-333`), C `.row.is-entering` (`C:373`) | none | notification center column |
 
 ## Shared vocabulary
 
@@ -4251,6 +4252,67 @@ dimming fades except under Reduced); `ds-native/tests/idle_dim.rs` on `Clock::Vi
 lands on the level at `--t-idle-dim`, an input mid-fade snaps to zero at once, Reduced motion
 shows the level from its first frame, `assert_settles_to_zero_frames` once landed). CONSUMING.md
 "Idle dim".
+
+### 54. LeavingList: rows that leave in batches and heal by measured heights (sill Q510, 2026-09-28)
+
+**Purpose.** The notification center's column. `AnimatedList` + `use_roster` heals by one fixed
+pitch and is driven by `Roster::leave`, so a Clear there had no exit and rows of different
+heights healed by the wrong distance. `LeavingList` takes the whole list on every render, the way
+`BannerStack` does: a key the caller stops listing plays its exit and stays drawn until it
+settles, and the rows below heal by the height the leaving row measured.
+
+**Batches.** Every key that goes missing in one render is one batch. Its rows play the exit
+together, each delayed by its place among the batch in list order (`--i` x `--stagger`, index
+capped at 12, design/05 section 9 rule 3), so a Clear folds its rows one after another. The batch
+settles at the longest of its rows' `settle(exit, level, i)`; then its rows are dropped at once and
+every row below heals by the sum of the measured heights of the dropped rows above it
+(`RosterState::settled_batch`), heal index counting from the first row below the first dropped
+one. So a row starts its heal exactly where it stood and ends exactly in its new place, whatever
+the rows' heights. A single dismissal is a batch of one; a group collapsing is the batch of the
+rows it hides. A key listed again while its batch plays stays where it is, is not dropped and is
+not reported; the rest of its batch goes on (a batch is its own timer, not one per row). The
+caller hears each dropped key on `on_settled`.
+
+**Markup.** `div.ds-leaving-list[role=list][aria-label][data-presence=entering|present]` holding
+one `div.ds-leaving-row[role=listitem][data-presence][data-exit]` per key, leaving rows included,
+each around the caller's content. The row is `display:flow-root`, so the content's margins stay
+inside it and its measured height (`client_rect`, taken as it mounts and again as it starts to
+leave) is the whole distance the rows below move. Style: `--i` while entering or leaving, `--dy`
+and `--d` while healing.
+
+**Props.**
+
+```rust
+pub struct LeavingItem<K> { pub key: K, pub row: Element }
+#[component] pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(label: String,
+    items: Vec<LeavingItem<K>>, exit: Exit /* Fold */, first: ListPresence /* Present */,
+    on_settled: Option<EventHandler<K>>) -> Element
+```
+
+`exit` is read on the render that starts a batch. `first: Present` shows the first render's rows
+at rest (a panel that slides in carries its rows); `Entering` lets them rise, staggered
+(principle 8: rows rise only when a list is first shown).
+
+**Motion.** As `ListRow` (section 16), on the row wrapper: first show `rise --t-move --e-out`
+staggered; an arrival into a list at rest `row-in --t-big --e-spring` (`C:373`); leaving `fold`
+(`--t-big`), `curl` (`--t-curl`), `crumple` (`--t-big`) or `banner-out` (`--t-move`), all
+`--e-exit` forwards with the batch stagger; healing `heal --t-move --e-spring` with `--d` x
+`--d-heal`; at rest `hold`. `tab-out` collapses its own height and is not played here (a heal on
+top of it would move the rows twice). Reduced (design/05 section 14.4): entering `fade`, leaving
+`menu-out`, healing `hold`, all at Reduced's 60 ms with no stagger, so the rows below take their
+places without sliding and a whole Clear settles at `settle(Fold, Reduced)` = 94 ms.
+
+**Not covered.** Heals that overlap: a batch that settles while the rows below are still healing
+from an earlier one restarts their heal from its own distance (the remaining part of the earlier
+heal is not carried over), as `use_roster` does. A row whose own height changes in place (a
+group's head gaining its stacked plates) moves the rows below it without a heal.
+
+**Tests.** `ds/tests/motion_machines.rs` (the batch as a table: stagger in list order, summed
+heal distances, a row taken back not dropped); `ds-native/tests/leaving_list.rs` on
+`Clock::Virtual` (rows of five different heights: one leaves and the rows below heal by its
+height and end exactly one row higher; a Clear of two non-adjacent rows is dropped together at
+the second row's settle and heals by 40 then 95; clearing everything settles at the fourth row's
+stagger; an arrival plays `row-in` until `settle(RowIn)`; a row listed again stays; Reduced).
 
 ## Open decisions
 
