@@ -85,6 +85,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 48 | RowShape (palette rows: File, Clip) | Spotlight file and clipboard rows (reference) | none | launcher file and clipboard results |
 | 49 | PaletteGroup ("Show More") and the key claim | Spotlight sections (reference) | Ctrl T / Ctrl K (unchanged) | launcher sections, Space and Right for the preview |
 | 54 | LeavingList | S `.row.going` + `.healing` (`S:326-333`), C `.row.is-entering` (`C:373`) | none | notification center column |
+| 55 | Alert | none (the Mac's `NSAlert`, Sonoma/Sequoia) | none | control-center confirmations, shell dialogs |
 
 ## Shared vocabulary
 
@@ -4313,6 +4314,66 @@ heal distances, a row taken back not dropped); `ds-native/tests/leaving_list.rs`
 height and end exactly one row higher; a Clear of two non-adjacent rows is dropped together at
 the second row's settle and heals by 40 then 95; clearing everything settles at the fourth row's
 stagger; an arrival plays `row-in` until `settle(RowIn)`; a row listed again stays; Reduced).
+
+### 55. Alert: a question with Cancel and one action (sill Q490, 2026-09-28; values as the polkit sheet's)
+
+**Purpose.** The Mac's alert before Liquid Glass (Sonoma/Sequoia `NSAlert`, design/27): a short
+question the shell asks before an action with consequences, "Turn Bluetooth off?" from the
+control center being the first. It is the polkit sheet (section 42) without the field: a narrow
+panel over the modal scrim, everything centred in one column.
+
+**Props.**
+
+```rust
+pub enum AlertEmphasis { Default /* default */, Destructive }
+pub enum AlertButton { Cancel, Action }            // AlertEmphasis::default_button(self) -> AlertButton
+#[component] pub fn Alert(title: String, message: Option<Text>, action: String,
+    cancel: String /* "Cancel" */, emphasis: AlertEmphasis, onaction: EventHandler<()>,
+    oncancel: EventHandler<()>, icon: Option<IconSource>, flow: Flow /* Floating */,
+    shown: Option<Shown>, on_hidden: Option<EventHandler<()>>, panel_id: Option<String>) -> Element
+```
+
+**Markup.** `Flow::Floating`: a `Sheet { placement: Centre, scrim: Modal, width: Narrow }` in the
+overlay holding `div.ds-alert[data-emphasis]`. `Flow::Inline`: `div.ds-alert-stage[data-flow=inline]`
+where the caller renders it (absolute, inset 0, on `--z-peek`) holding the modal `button.ds-scrim`
+and `div.ds-sheet-stage > div.ds-sheet[data-placement=centre][data-width=narrow][role=alertdialog]`
+around the same `div.ds-alert`. Inside: `div.ds-alert-icon` (optional, `IconView` at 48),
+`div.ds-alert-title`, `div.ds-alert-message`, `div.ds-alert-actions` with two
+`span.ds-alert-slot`s, Cancel then the action.
+
+| Part | Value | Basis |
+| --- | --- | --- |
+| Panel | the narrow sheet: `min(340px, 88%)`, so 281 px in a 320 px popover; `--surface-2`, `--r-panel`, `--shadow-sheet` | section 24, `SheetWidth::Narrow` |
+| Column | padding 22/22/18, centred | the polkit sheet (section 42) |
+| Icon | 48 (`IconSize::Tile48`), 12 above the title; none by default | the Mac draws the app icon; 48 is the polkit picture's size |
+| Title | display face `--fs-title` (16) 700, `--ink` | as the polkit title |
+| Message | `--fs-control`, line-height 1.45, `--ink-soft`, 6 below | as the polkit message |
+| Buttons | two equal columns 8 apart, 18 below, full width each; Cancel left, the action right | the Mac's two-button alert |
+| Default | `Primary` (accent fill) | the Mac's default button |
+| Other | `Secondary`; a destructive action is `Danger` at `ButtonSize::Regular` with its label in `--danger` at rest | the Mac's destructive style (red label) |
+
+**Behaviour.** The default button is the action; when `emphasis` is `Destructive` it is Cancel
+(HIG, buttons: don't assign the primary role to a button that performs a destructive action, since
+people press the primary button without reading it). The default button takes the keyboard as the
+alert opens. Return presses the default button wherever the keyboard is; Space presses the button
+that has the keyboard; Tab and Shift+Tab move between the two buttons and never out (the alert is
+modal); Escape, or a press on the scrim, is Cancel. Every key it takes is prevented and stops
+there, so neither the sheet's own Escape nor a browser's synthesised click presses anything twice.
+Inline it has no layer on the stack: its keys are its own, and it covers exactly the nearest
+positioned ancestor, so render it last in that container.
+
+**Motion.** The sheet's: `peek-in --t-big --e-spring` as it mounts (scrim `fade --t-move
+--e-out`); with `shown`, hidden, the driven spring fades and lowers it, the scrim plays `menu-out
+--t-quick --e-exit`, and `on_hidden` runs once the spring rests. Reduced: it only fades.
+
+**Tests.** `ds/src/components/alert.rs` and `alert_vocab.rs` (the default button and faces, the
+keys, as tables); `ds/tests/alert_ssr.rs` (goldens under `tests/snapshots/alert/`: floating light
+and dark, inline in a 320 px popover, destructive, destructive with an icon, hidden both ways; lint
+clean; every class styled; the default is the filled button); `ds-native/tests/alert.rs` on
+`Clock::Virtual` (focus starts on the default, Cancel when destructive; Return presses the
+default wherever the focus is; Escape and the scrim cancel in both flows; Space presses the
+focused button; Tab stays inside; inline it fits inside a 320 px popover, floating it is centred in
+the window).
 
 ## Open decisions
 
