@@ -1821,6 +1821,35 @@ What to change:
 - **Blue** (`Accent::Blue`, slug `blue`) now generates from hue 215, a sky blue, so it no longer
   duplicates Postmark in the picker.
 
+### Accent text on the wash and on materials (2026-09-27): `--accent-text-material`
+
+sill Q410, Q411, Q413; design/03-COLOR.md section 20.6. The text accent now reads at 4.5:1 on
+the wash over the card and, on a translucent material, over a black or white backdrop too. One
+value could not do both and stay band B, so there are two. Additive for CSS; one new field on a
+public struct.
+
+| Token | `ColourToken` | Role | Light / dark, Postmark |
+| --- | --- | --- | --- |
+| `--accent-text` | `AccentText` | the card's text accent: now also 4.5:1 on `--accent-soft` over every card ground | `#396198` / `#8ebaf7` (was `#426aa2` / `#88b3f0`) |
+| `--accent-text-material` | `AccentTextMaterial` (new) | the same on a Popover, Sheet or Toast: 4.5:1 on those materials over black and white and on the wash over them | `#295086` / `#d5e6fe` |
+| `--accent-ring` | `AccentRing` | unchanged role; follows the card's text | `rgba(57,97,152,.75)` / `rgba(142,186,247,.55)` |
+
+What to change:
+
+- **Nothing, in CSS that reads `var(--accent-text)`.** A `Ds` root or `Surface` whose material
+  is Popover, Sheet or Toast writes `--accent-text:var(--accent-text-material)` inline, so
+  everything inside it takes the material's value. Don't read `--accent-text-material` yourself.
+- **If you write the accent properties inline yourself** (a Space swatch, a specimen), write
+  `--accent-text-material` too, and inside a Popover, Sheet or Toast write `--accent-text` as
+  the material's value: your inline `--accent-text` beats the root's.
+- **Rust:** `AccentRoles` gains `text_material: Hex` (a struct literal must name it);
+  `FrameVars::style_attr` writes seven accent properties (`--accent-text-material`
+  after `--accent-text`); `accent_band` exports `TextOn`, `text_on(material)`,
+  `text_grounds`, `TEXT_MATERIALS`, `BACKDROPS`, `Ground`, `GroundKind`, `least_on`,
+  `material_grounds`. `ColourToken::ALL` has 38 entries.
+- **A disabled Primary** keeps an `--accent-text` edge at the disabled .35 (Q413): the power
+  menu's default Shut Down reads as the default, unavailable. No call-site change.
+
 ### Details (2026-09-27): small state details through `ds::detail`
 
 design/26-DETAILS.md, wave D0. FINDINGS.md "Details D0". Everything is in `ds::detail`; `Spinner`

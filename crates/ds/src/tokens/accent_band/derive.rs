@@ -4,6 +4,7 @@ use super::band::{AccentBand, AccentPick, InkRule, SchemeBand};
 use super::floors;
 use super::grounds::{card_grounds, contrast, least, over};
 use super::roles::AccentRoles;
+use super::text_grounds::{Ground, TextOn, text_grounds};
 use crate::appearance::Scheme;
 use crate::space::palette::oklch_bytes;
 use crate::tokens::{Alpha, Hex};
@@ -26,10 +27,12 @@ impl Tone {
 /// The roles `pick` paints in `scheme` inside `band`.
 ///
 /// The fill starts at the band's lightness and steps (0.01) toward its ink until the ink reads
-/// on it; the text accent starts at the band's text lightness and steps away from the card
-/// until it reads on every ground; the wash's alpha rises (0.01) only until it shows on every
-/// ground; the ring's alpha rises (0.05) until the ring stands off every ground. Chroma is the
-/// band's at `pick.weight`, fitted to sRGB at each lightness.
+/// on it; the wash's alpha rises (0.01) only until it shows on every card ground; each text
+/// accent starts at the band's text lightness and steps away from the card until it reads on
+/// every ground in its [`text_grounds`] (the card's text on the card and the wash over it, the
+/// material's on those and on the text-carrying materials over black and white and the wash
+/// over them); the ring's alpha rises (0.05) until the card's text at it stands off every card
+/// ground. Chroma is the band's at `pick.weight`, fitted to sRGB at each lightness.
 pub fn accent_roles(band: &AccentBand, pick: AccentPick, scheme: Scheme) -> AccentRoles {
     let bounds = band.scheme(scheme);
     let tone = Tone {
@@ -38,12 +41,15 @@ pub fn accent_roles(band: &AccentBand, pick: AccentPick, scheme: Scheme) -> Acce
     };
     let grounds = card_grounds(scheme);
     let (fill, ink) = solid_fill(bounds, tone);
-    let text = text_accent(bounds, tone, scheme, &grounds);
+    let wash = wash_alpha(bounds.wash, fill, &grounds);
+    let text_on = |on| text_accent(bounds, tone, scheme, &text_grounds(on, scheme, fill, wash));
+    let text = text_on(TextOn::Card);
     AccentRoles {
         fill,
         ink,
         text,
-        wash: wash_alpha(bounds.wash, fill, &grounds),
+        text_material: text_on(TextOn::Material),
+        wash,
         ring: ring_alpha(bounds.ring, text, &grounds),
     }
 }
@@ -65,14 +71,18 @@ fn tone_ink(tone: Tone) -> Hex {
     Hex(oklch_bytes(0.22, 0.03, tone.hue))
 }
 
-/// The text accent: darker than the band's start in light, lighter in dark, until it reads.
-fn text_accent(bounds: &SchemeBand, tone: Tone, scheme: Scheme, grounds: &[Hex]) -> Hex {
+/// The text accent: darker than the band's start in light, lighter in dark, until it reads on
+/// every one of `grounds`.
+fn text_accent(bounds: &SchemeBand, tone: Tone, scheme: Scheme, grounds: &[Ground]) -> Hex {
     let step = match scheme {
         Scheme::Light => -floors::LIGHTNESS_STEP,
         Scheme::Dark => floors::LIGHTNESS_STEP,
     };
     let lightness = walk(bounds.text.fraction(), step, |lightness| {
-        least(|_| tone.at(lightness), grounds) >= floors::TEXT
+        let text = tone.at(lightness);
+        grounds
+            .iter()
+            .all(|ground| contrast(text, ground.hex) >= floors::TEXT)
     });
     tone.at(lightness)
 }

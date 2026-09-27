@@ -122,12 +122,13 @@ fn AccentRoles(accent: Accent) -> Element {
 }
 
 /// The accent's roles as `(name, value)`.
-fn role_parts(accent: Accent, scheme: Scheme) -> [(&'static str, String); 5] {
+fn role_parts(accent: Accent, scheme: Scheme) -> [(&'static str, String); 6] {
     let roles = accent_of(accent, scheme);
     [
         ("--accent", roles.fill.css()),
         ("--accent-soft", roles.wash_colour().css()),
         ("--accent-text", roles.text.css()),
+        ("--accent-text-material", roles.text_material.css()),
         ("--accent-ring", roles.ring_colour().css()),
         ("--accent-ink", roles.ink.css()),
     ]
