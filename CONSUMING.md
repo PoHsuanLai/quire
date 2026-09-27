@@ -1745,6 +1745,31 @@ design/27-HIG-PARITY.md section 7, wave H0. Nothing here fails a consumer's test
 | `Shortcut::glyphs` and `Kbd` draw modifiers in the Mac's order ⌃⌥⇧⌘ whatever order they were given in | A golden with `⌘⇧…` becomes `⇧⌘…` |
 | quire's controls use `cursor:default` (the arrow); only `.ds-run-link` keeps the hand | A consumer rule that restored `pointer` on a control now warns |
 
+### Launcher cues (2026-09-27): the pane and the palette take `ds::detail` cues
+
+sill Q370-Q373 (FINDINGS "Launcher details (Q297)"); design/26-DETAILS.md section 5.6 (the new
+rows). Additive: every new prop is defaulted, so no call site changes to compile. What moves
+without a change on your side: the pane's entrance now eases (`--e-out`) unless you say a contact
+caused it (R5), and a group's Show More / Show Less now plays its expand and collapse.
+
+| Where | Prop, type or function | What it does |
+| --- | --- | --- |
+| `PreviewPane` | `cue: PaneCue` (`#[props(into)]`, default `PaneCue::Touch(Touch::Remote)`) | Pass `detail.cue()` from your `use_pane_detail` (or a bare `Touch`). Entrance: `slide-r` at `--e-spring` only when the cue's touch is `Touch::Contact` (`data-touch=contact`, `Anim::PaneInR`), else `--e-out` (`Anim::PaneInROut`, new). A Preview, Change or Failure cue fades the media in at `--t-quick` in place (`.ds-preview-media.a-morph-fade-in`), never replaying the entrance; Rest, Pending, Dismiss add nothing; Reduced snaps. `shown` still drives showing and hiding |
+| `PreviewPane` | `operation: Operation` (default `Idle`) | Pass `use_operation(detail.cue())`. Nothing for `PendingGrace`; then the media box shows `.ds-preview-pending` (a dashed `.ds-spinner` stepping a quarter per `--t-pending-step` over "Loading…") instead of the media; still from the token's deadline (`PendingCap`) and at once under Reduced; `aria-busy=true` on the pane while it runs; the media is back the render it goes `Idle` |
+| `PaneCue` | `enum { Cue(Cue), Touch(Touch) }`, `From<Cue>`, `From<Touch>`, `.touch()`, `.cue()` | `ds::PaneCue` |
+| `CommandPalette` | `reveal: RevealCue` (`#[props(into)]`, default `RevealCue::First(FirstShow::Still)`) | Pass `results.cue()` from your `use_list_detail`: each new Appear rises the list's children (headers, rows, a grid) with `--stagger`, capped at 12 (`.ds-menu[data-reveal=play]` while it plays); a Change replays nothing. `FirstShow::Animate` rises on mount and on each showing instead |
+| `ds::detail::RevealCue` | `enum { First(FirstShow), Cue(Cue) }`, `From<FirstShow>`, `From<Cue>` | The palette's; `Reveal { first }` is unchanged |
+| `CommandPalette` groups | nothing new | Show More / Show Less (Q373): when the person runs a group's action (Enter or click) and the next `groups` differ only by that group's rows growing or shrinking at the end, the added rows rise in (`data-row-motion=rise`), or everything after the last row kept heals up by the removed rows' measured height (`data-row-motion=heal-from`, `--dy` on the list). Anything else is a new result set: no motion. Your table can keep calling it a Change |
+| `Anim` | `PaneInROut` (77 variants now, with G295's `Hold`) | A `match` of yours over `Anim` needs the arm |
+| `PdfThumb` | nothing new | Its grace now runs on `use_pending` (a token whose deadline is `PDF_THUMB_GRACE`): same look, same 400 ms, one wake per read |
+
+**What sill changes:** `LauncherPane` passes `cue: pane.cue()` and `operation:
+use_operation(pane.cue())` to `PreviewPane` (drop `_pane`); the panel passes `reveal:
+results.cue()` to `CommandPalette` (drop `_results`); F803's "nothing plays" becomes the table
+above. A `match` over `ds::Anim` needs `PaneInROut`. Keep one `PreviewPane` mounted across content
+kinds as before (the cross-fade needs it). Never style `.ds-preview-pending*`,
+`[data-touch]`, `[data-row-motion]` or `[data-reveal]`.
+
 ### Details (2026-09-27): small state details through `ds::detail`
 
 design/26-DETAILS.md, wave D0. FINDINGS.md "Details D0". Everything is in `ds::detail`; `Spinner`

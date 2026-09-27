@@ -85,7 +85,8 @@ impl Reveal {
         shown.set(None);
     }
 
-    fn element(self, index: usize) -> Option<MountedRef> {
+    /// Stop `index`'s element, if it has mounted.
+    pub(crate) fn element(self, index: usize) -> Option<MountedRef> {
         self.stops.peek().get(index).cloned().flatten()
     }
 

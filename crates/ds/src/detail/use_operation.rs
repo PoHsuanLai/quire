@@ -11,6 +11,12 @@ use dioxus::prelude::*;
 /// moment arrived with the cap as its deadline; `Operation::Idle` otherwise. A later Pending
 /// moment (a new change into a busy state) is a new operation.
 pub fn use_operation(cue: Cue) -> Operation {
+    use_operation_within(cue, Deadline::cap())
+}
+
+/// [`use_operation`] with its tokens' deadline at `deadline`: a still pending look (a PDF
+/// sheet's) passes its grace, so its loop has no steps and holds still once the grace is over.
+pub(crate) fn use_operation_within(cue: Cue, deadline: Deadline) -> Operation {
     let mut minted = use_hook(|| CopyValue::new(None::<(u32, PendingToken)>));
     if cue.moment() != Moment::Pending {
         return Operation::Idle;
@@ -19,7 +25,7 @@ pub fn use_operation(cue: Cue) -> Operation {
     match current {
         Some((serial, token)) if serial == cue.serial() => Operation::Running(token),
         Some(_) | None => {
-            let token = PendingToken::start(Deadline::cap());
+            let token = PendingToken::start(deadline);
             minted.set(Some((cue.serial(), token)));
             Operation::Running(token)
         }

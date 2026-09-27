@@ -6,6 +6,7 @@ use crate::components::emoji_grid::{CellEvents, draw_cells, grid_style};
 use crate::components::menu::MenuKind;
 use crate::components::menu_lines::choices_len;
 use crate::components::menu_rows::{Drawn, render_lines};
+use crate::components::palette_motion::ListMotion;
 use crate::components::palette_stops::{Body, ShownGroup};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::Selection;
@@ -23,17 +24,21 @@ pub(crate) struct StopEvents {
     pub mounted: EventHandler<(usize, MountedEvent)>,
     /// A header action's element mounted (it reports no rect, but is kept in view).
     pub action_mounted: EventHandler<(usize, MountedEvent)>,
+    /// A header action was clicked (before it runs).
+    pub action_ran: EventHandler<()>,
 }
 
-/// Every drawn group, the stop `current` highlighted.
+/// Every drawn group, the stop `current` highlighted, each group's rows playing their part in
+/// `motion`.
 pub(crate) fn draw_groups<T>(
     shown: &[ShownGroup<'_, T>],
     current: usize,
     events: StopEvents,
+    motion: &ListMotion,
 ) -> Element {
     let drawn: Vec<Element> = shown
         .iter()
-        .map(|group| draw_group(group, current, events))
+        .map(|group| draw_group(group, current, events, motion))
         .collect();
     rsx! {
         for (key , group) in drawn.into_iter().enumerate() {
@@ -43,7 +48,12 @@ pub(crate) fn draw_groups<T>(
 }
 
 /// One group: its header, then its rows or its grid.
-fn draw_group<T>(shown: &ShownGroup<'_, T>, current: usize, events: StopEvents) -> Element {
+fn draw_group<T>(
+    shown: &ShownGroup<'_, T>,
+    current: usize,
+    events: StopEvents,
+    motion: &ListMotion,
+) -> Element {
     let first = shown.first;
     let local = current.checked_sub(first);
     let (body, size) = match &shown.body {
@@ -63,6 +73,7 @@ fn draw_group<T>(shown: &ShownGroup<'_, T>, current: usize, events: StopEvents) 
                         events.mounted.call((first + at, event))
                     }),
                     onrelease: None,
+                    motion: motion.rows_of(&shown.group.title),
                 },
             );
             (body, size)
@@ -98,7 +109,13 @@ fn draw_group<T>(shown: &ShownGroup<'_, T>, current: usize, events: StopEvents) 
         SectionHeader {
             kind: HeaderKind::Menu,
             text: shown.group.title.clone(),
-            action: shown.group.action.clone(),
+            action: shown.group.action.clone().map(|(label, run)| {
+                let booked = EventHandler::new(move |()| {
+                    events.action_ran.call(());
+                    run.call(());
+                });
+                (label, booked)
+            }),
             action_selection: match shown.group.action {
                 Some(_) => action_selection,
                 None => Selection::Unselected,

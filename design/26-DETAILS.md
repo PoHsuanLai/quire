@@ -686,10 +686,16 @@ States: Hidden, Shown(level, glyph), Muted.
 | Element / moment | Our detail | Reference | Today | Gap |
 | --- | --- | --- | --- | --- |
 | Open / close | `peek-in` / `fade` (built) | appears quickly (L) | built | none |
-| Results (Appear) | `Reveal` on the first result set after the panel opens; later result sets replace in place with **no** stagger (R1, R12: typing is frequent) | results update in place as you type (L) | no rise | **G41** |
+| Results (Appear) | `Reveal` on the first result set after the panel opens; later result sets replace in place with **no** stagger (R1, R12: typing is frequent) | results update in place as you type (L) | quire side built (`CommandPalette { reveal: RevealCue }`, sill Q372); sill passes its cue | **G41** (sill adoption) |
 | Calculator result | the result row's value `RollDigits` as the expression grows; an invalid expression shows no row (no error motion) | inline answer as you type (L) | a calculator provider exists? (sill M9 providers) | **G42** |
 | No results | a still "No results" line (`fade` `--t-quick`); no shake (typing is not a failure) | a "no results" state (L) | none | **G43** (words and fade) |
 | Selection (Select) | moves instantly (13.3.9, settled) | instant (L) | built | none |
+| Show More (a group's action) | the added rows `Reveal` downward from the last row kept, `rise` `--t-move --e-out`, `--stagger` from the first added (capped at 12); the rows already there do not move (section 5.4's group expand; decided 2026-09-27, sill Q373) | section "Show More" expands in place (L, sill F806) | built (`CommandPalette`, the palette plays it itself from its own action) | none |
+| Show Less (a group's action) | the removed rows go and everything after the last row kept `heal`s up by their measured height (`--dy`, `--t-move --e-spring`: the person ran the action, R5); with no height measured this opening, it closes up at once | collapses in place (L) | built | none |
+| Preview pane: showing (Appear) | `slide-r` `--t-move`, `--e-spring` only when the person's key or press showed it, else `--e-out` (R5) | the preview appears beside the results (L) | built (`PreviewPane { cue }`, sill Q370) | none |
+| Preview pane: another kind (Preview), a load landing (Change), a load failing (Failure) | the media `fade`s in at `--t-quick` in place; the entrance never replays; a failure does not shake (its still words carry it, R8: nobody asked for the load) | changes with the selection at once, the thumbnail replacing a generic icon when ready (L, sill F806) | built | none |
+| Preview pane: waiting on a load (Pending) | nothing for `PendingGrace`, then the media box shows a dashed ring stepping a quarter per `--t-pending-step` over "Loading…", still from `PendingCap` and at once under Reduced | a generic icon until ready (L) | built (`PreviewPane { operation }`, Q371) | none |
+| Preview pane: hides (Dismiss) | `pane-out-r` (built) | goes (L) | built | none |
 
 ### 5.7 Lock screen and polkit
 
