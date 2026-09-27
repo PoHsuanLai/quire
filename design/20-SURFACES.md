@@ -154,7 +154,7 @@ look: LevelLook::Capsule }` (the level with its glyph inside), `ds::OsdPosition`
 | Motion | password error `shake-x` 420 ms `(.36,.07,.19,.97)` once; unlock `fade` `--t-move` `--e-exit` | S / P |
 | Behaviours | lock before sleep on logind `PrepareForSleep` (SPEC); 06 (Escape clears field) | S |
 | Keyboard | lock surfaces always receive keyboard | S |
-| Milestone | borrowed at M7 (`session.locker`, design/22 §3.19: cosmic-greeter, else swaylock, else hyprlock); own at M11 | S |
+| Milestone | borrowed at M7 (`session.locker`, design/22 §3.19: cosmic-greeter, else swaylock, else hyprlock); own at M11, and sill's own lock is the default since the user's pick of 2026-09-27 (`auto` keeps the borrowed order) | S |
 
 ### 1.10 Polkit prompt (SPEC Tier 1)
 
