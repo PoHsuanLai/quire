@@ -1,0 +1,146 @@
+//! Moving and choosing widgets on a real Blitz document and the virtual clock (design/23
+//! section 9.7-9.8; sill Q430, Q431): a card picked up says so and settles to zero frames, lifted
+//! and put down; the drop-slot guide fades in and then asks for nothing; the Edit Widgets gallery
+//! lifts the size picked, hands the host an edit for each button, and shows the layout the host
+//! hands back.
+
+use dioxus::prelude::*;
+use ds::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
+use ds::{
+    Appearance, BatteryWidget, Ds, Lift, Material, RootChrome, Timeline, Widget, WidgetCard,
+    WidgetGallery, WidgetMetrics, WidgetSize, WidgetSlotGuide,
+};
+use ds_native::harness::assert_settles_to_zero_frames;
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
+
+const VIEW: Viewport = Viewport {
+    width: 1200,
+    height: 1000,
+    scale_percent: 100,
+};
+
+static LIFT: GlobalSignal<Lift> = Signal::global(Lift::default);
+
+const GRID: DesktopGrid = DesktopGrid {
+    columns: 4,
+    rows: 3,
+};
+
+fn desktop(body: Element) -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+            div { style: WidgetMetrics::default().style_attr(), {body} }
+        }
+    }
+}
+
+#[allow(non_snake_case)]
+fn Card() -> Element {
+    desktop(rsx! {
+        WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(WidgetSize::Small)), size: WidgetSize::Small, lift: LIFT() }
+    })
+}
+
+#[allow(non_snake_case)]
+fn Guide() -> Element {
+    desktop(rsx! { WidgetSlotGuide { size: WidgetSize::Medium } })
+}
+
+#[allow(non_snake_case)]
+fn Gallery() -> Element {
+    let mut layout = use_signal(WidgetLayout::default);
+    desktop(rsx! {
+        WidgetGallery {
+            layout: layout(),
+            onedit: move |edit: WidgetEdit| {
+                if let Ok(next) = apply(layout(), edit, GRID) {
+                    layout.set(next);
+                }
+            },
+        }
+    })
+}
+
+fn harness(app: fn() -> Element) -> Harness {
+    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+}
+
+#[test]
+fn a_card_lifts_and_settles_both_ways() {
+    let mut harness = harness(Card);
+    assert_eq!(harness.attr(".ds-widget", "data-lift"), None);
+    assert_settles_to_zero_frames(&mut harness);
+    harness.within(|| *LIFT.write() = Lift::Lifted);
+    harness.advance(Duration::ZERO);
+    assert_eq!(
+        harness.attr(".ds-widget", "data-lift").as_deref(),
+        Some("lifted")
+    );
+    assert_settles_to_zero_frames(&mut harness);
+    harness.within(|| *LIFT.write() = Lift::Rest);
+    harness.advance(Duration::ZERO);
+    assert_eq!(harness.attr(".ds-widget", "data-lift"), None);
+    assert_settles_to_zero_frames(&mut harness);
+}
+
+#[test]
+fn the_slot_guide_fades_in_then_asks_for_nothing() {
+    let mut harness = harness(Guide);
+    assert_eq!(harness.count(".ds-widget-slot[*|data-size=medium]"), 1);
+    assert_eq!(
+        harness.attr(".ds-widget-slot", "aria-hidden").as_deref(),
+        Some("true")
+    );
+    assert_settles_to_zero_frames(&mut harness);
+}
+
+#[test]
+fn the_gallery_lifts_the_size_picked_and_edits_the_layout() {
+    let mut harness = harness(Gallery);
+    assert_eq!(harness.count(".ds-widget-gallery-kind"), 3);
+    assert_eq!(
+        harness.count(".ds-widget-gallery-size .ds-widget[*|data-lift=lifted]"),
+        0
+    );
+    let medium = harness
+        .centre(".ds-widget-gallery-size[*|data-size=medium] .ds-widget-gallery-size-name")
+        .expect("the medium preview");
+    harness.click(medium);
+    harness.advance(Duration::ZERO);
+    assert_eq!(
+        harness
+            .attr(
+                ".ds-widget-gallery-size[*|data-size=medium]",
+                "aria-pressed"
+            )
+            .as_deref(),
+        Some("true")
+    );
+    assert_eq!(
+        harness.count(".ds-widget-gallery-size[*|data-size=medium] .ds-widget[*|data-lift=lifted]"),
+        1,
+        "the picked size lifts"
+    );
+    assert_eq!(harness.count(".ds-widget-gallery-row"), 0);
+    let add = harness
+        .centre(".ds-widget-gallery-actions .ds-button")
+        .expect("Add to Desktop");
+    harness.click(add);
+    harness.advance(Duration::ZERO);
+    assert_eq!(
+        harness.count(".ds-widget-gallery-surface[*|data-host=desktop] .ds-widget-gallery-row"),
+        1
+    );
+    assert_eq!(
+        harness.text_of(".ds-widget-gallery-row-name").as_deref(),
+        Some("Batteries")
+    );
+    let remove = harness
+        .centre(".ds-widget-gallery-row .ds-button")
+        .expect("Remove");
+    harness.click(remove);
+    harness.advance(Duration::ZERO);
+    assert_eq!(harness.count(".ds-widget-gallery-row"), 0);
+    assert_settles_to_zero_frames(&mut harness);
+}

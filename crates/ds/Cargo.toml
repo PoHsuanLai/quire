@@ -67,6 +67,11 @@ required-features = ["lint"]
 name = "widgets_ssr"
 required-features = ["lint"]
 
+# The widget contract's cards, linted (design/23 section 9).
+[[test]]
+name = "widget_contract_ssr"
+required-features = ["lint"]
+
 # The notification parts, linted (sill Q120-Q125).
 [[test]]
 name = "notifications_ssr"

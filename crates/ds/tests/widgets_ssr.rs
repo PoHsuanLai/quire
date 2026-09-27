@@ -110,6 +110,12 @@ const CASES: &[Case] = &[
             rsx! { WidgetFrame { size: WidgetSize::Medium, tint: CardTint::Space, "84%" } },
         )
     }),
+    ("frame-medium-desktop-material", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetFrame { size: WidgetSize::Medium, tint: CardTint::Material, "84%" } },
+        )
+    }),
     ("frame-small-tile", || {
         center(rsx! { WidgetFrame { size: WidgetSize::Small, host: WidgetHost::Tile, "84%" } })
     }),
@@ -227,7 +233,9 @@ fn every_part_lints_clean_and_every_class_is_styled() {
 }
 
 /// The desktop card is in a Widget scope and the tile in none of its own; both say their size
-/// and host, and the title row is drawn only when asked for.
+/// and host, and the title row is drawn only when asked for. Every desktop card is tinted by
+/// the Space unless a host asks for the bare material (design/23 section 6, settled
+/// 2026-09-27); a tile never is.
 #[test]
 fn a_frame_says_its_size_and_host_and_only_the_desktop_has_a_material() {
     let desktop = html("frame-medium-desktop-titled");
@@ -250,8 +258,17 @@ fn a_frame_says_its_size_and_host_and_only_the_desktop_has_a_material() {
     );
     assert!(!html("frame-small-tile").contains("ds-widget-title"));
     assert!(
-        !desktop.contains("data-tint"),
-        "the material's own tint is unmarked"
+        desktop.contains("data-tint=\"space\""),
+        "every desktop card takes the Space's tint by default: {desktop}"
+    );
+    let material = html("frame-medium-desktop-material");
+    assert!(
+        !material.contains("data-tint") && !material.contains("class=\"ds-frame\""),
+        "the bare material is unmarked: {material}"
+    );
+    assert!(
+        !tile.contains("data-tint") && !tile.contains("class=\"ds-frame\""),
+        "a tile lays no second gradient on the center's tinted popover: {tile}"
     );
     let space = html("frame-medium-desktop-space");
     assert!(space.contains("data-tint=\"space\""), "{space}");

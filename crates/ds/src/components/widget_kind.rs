@@ -3,9 +3,11 @@
 
 use crate::components::text_runs::Text;
 use crate::icon::Icon;
+use serde::{Deserialize, Serialize};
 
 /// A widget's footprint on the grid unit (`widgets.desktop_cell_px`, `desktop_gap_px`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum WidgetSize {
     /// One cell.
     #[default]
@@ -28,7 +30,8 @@ impl WidgetSize {
 }
 
 /// Where a widget is drawn, which decides what its card is made of.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum WidgetHost {
     /// On the desktop layer: a card of the `Widget` material, over the wallpaper.
     #[default]
@@ -49,15 +52,17 @@ impl WidgetHost {
     }
 }
 
-/// What a desktop widget's card is tinted with (design/23-WIDGETS.md section 4.3).
+/// What a desktop widget's card is tinted with (design/23-WIDGETS.md section 4.3). Every card
+/// takes the Space's tint (settled 2026-09-27, Arc's contribution); `Material` stays for a host
+/// that must show the bare material (a comparison page).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum CardTint {
     /// The `Widget` material's own tint.
-    #[default]
     Material,
     /// The material with the Space's gradient over it at the material's frame alpha, as the
     /// tinted chrome carries it (design/03-COLOR.md section 17.2), so the Space's colour reaches
     /// the card.
+    #[default]
     Space,
 }
 
@@ -67,6 +72,38 @@ impl CardTint {
         match self {
             CardTint::Material => None,
             CardTint::Space => Some("space"),
+        }
+    }
+
+    /// The tint a card in `host` draws: a tile sits on the notification center's Popover, which
+    /// already carries the Space, so it lays no second gradient.
+    pub fn on(self, host: WidgetHost) -> CardTint {
+        match host {
+            WidgetHost::Desktop => self,
+            WidgetHost::Tile => CardTint::Material,
+        }
+    }
+}
+
+/// Whether a widget's card is picked up (sill Q430, design/23 section 9.8): a host moving a
+/// desktop widget, or the widget gallery holding one, lifts it; quire owns the scale
+/// (`--pickup`), the shadow (`--shadow-drag`, in place of the resting drop), the layer
+/// (`--z-drag`) and the timing (`--t-quick` at `--e-out`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Lift {
+    /// Where it lies.
+    #[default]
+    Rest,
+    /// Picked up.
+    Lifted,
+}
+
+impl Lift {
+    /// `data-lift`: written only while lifted.
+    pub fn slug(self) -> Option<&'static str> {
+        match self {
+            Lift::Rest => None,
+            Lift::Lifted => Some("lifted"),
         }
     }
 }

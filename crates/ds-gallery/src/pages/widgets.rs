@@ -1,17 +1,19 @@
-//! The Overlays page's widgets (sill Q182, Q183): over the wallpaper, the three sizes of
-//! `WidgetFrame` on the desktop (the Widget material's card, light) and as tiles in the
-//! notification center (a Popover panel, dark), holding the world clock in both looks and
-//! phases and the battery `BatteryLevel` at three levels and charging. Live, a button drains the
-//! battery a tenth at a time so its fill and percentage bump once each.
+//! The Overlays page's widgets (sill Q182, Q183; design/23 section 9): over the wallpaper, widget
+//! cards on the desktop (the Widget material's card, light, tinted by the Space) and as tiles in
+//! the notification center (a Popover panel, dark), every one a `WidgetCard`: the world clock
+//! (analog dials on the desktop, digits in the tile) and the batteries at four levels, one
+//! charging. Live, a button drains the small battery a tenth at a time: its provider sends a new
+//! timeline, and the arc sweeps down as its percentage counts with it.
 
 use super::Section;
+use super::widget_reference::cell;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BatteryFigure, BatteryLevel, Button, ButtonVariant, ClockFace, ClockLook,
-    ClockTime, DayPhase, Ds, Fraction, Glyph, Icon, IconSize, Inject, Material, RingMark,
-    RootChrome, Seconds, Theme, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle,
+    Appearance, BatteryEntry, BatteryWidget, Button, ButtonVariant, ClockCity, ClockEntry,
+    ClockTime, DayPhase, Device, Ds, Fraction, Inject, Material, RingMark, RootChrome, Seconds,
+    Theme, Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
 };
 
 const TAIPEI: ClockTime = ClockTime {
@@ -26,11 +28,36 @@ const LONDON: ClockTime = ClockTime {
     second: Seconds::Shown(42),
 };
 
+fn city(name: &str, time: ClockTime, phase: DayPhase, note: &str) -> ClockCity {
+    ClockCity {
+        name: name.to_owned(),
+        time,
+        phase,
+        notes: vec![note.to_owned()],
+    }
+}
+
+fn cities() -> ClockEntry {
+    ClockEntry::Cities(vec![
+        city("Taipei", TAIPEI, DayPhase::Day, "Today"),
+        city("London", LONDON, DayPhase::Night, "-7HRS"),
+    ])
+}
+
+fn batteries() -> BatteryEntry {
+    BatteryEntry::Devices(vec![
+        cell("Mouse", Device::Mouse, 80, RingMark::Plain),
+        cell("Headphones", Device::Headphones, 450, RingMark::Plain),
+        cell("Keyboard", Device::Keyboard, 1000, RingMark::Plain),
+        cell("This computer", Device::Laptop, 150, RingMark::Charging),
+    ])
+}
+
 /// The widgets section.
 #[component]
 pub fn Widgets() -> Element {
     rsx! {
-        Section { title: "Widgets", note: "WidgetFrame on the grid unit WidgetMetrics writes (widgets.desktop_cell_px 164, desktop_gap_px 16): Small one cell, Medium 2x1, Large 2x2. Left, the desktop: the Widget material's card (its own 20 corner, padded 16) over the wallpaper, light. Right, the notification center: tiles on the Popover (--surface-2, a hairline, --r-tile 12, padded 12), dark. Inside: ClockFace analog (a flat pale dial by day, an ink dial by night, whatever the scheme; the second hand in --accent) and digital (the display face, bumping on each new minute, a sun or moon beside the city), and BatteryLevel at 8 % (--danger), 45 % and 100 % (--ink), and charging at 15 % (--ok and the bolt; never low while charging). Live: Drain lowers the battery a tenth, and its arc sweeps down from the old level as its percentage counts down with it.",
+        Section { title: "Widgets", note: "WidgetCard on the grid unit WidgetMetrics writes (widgets.desktop_cell_px 164, desktop_gap_px 16): Small one cell, Medium 2x1. Left, the desktop: the Widget material's card (its own 20 corner, padded 12) tinted by the Space, over the wallpaper, light. Right, the notification center: tiles on the Popover (--surface-2, a hairline, --r-tile 12, padded 12), no second tint, dark. Inside: WorldClockWidget (analog dials on the desktop, digits in the tile, bumping on each new minute) and BatteryWidget at 8 % (one red for low and critical), 45 %, 100 % and 15 % charging (never low while charging). Live: Drain sends a new timeline a tenth lower, and the arc sweeps down from the old level as its percentage counts down with it.",
             div { class: "g-wall g-widgets", style: "background-image:url(\"{wallpaper::uri()}\")",
                 Host { theme: Theme::Light, host: WidgetHost::Desktop }
                 Host { theme: Theme::Dark, host: WidgetHost::Tile }
@@ -39,7 +66,7 @@ pub fn Widgets() -> Element {
     }
 }
 
-/// The three sizes for `host`, in `theme`.
+/// The cards for `host`, in `theme`.
 #[component]
 fn Host(theme: Theme, host: WidgetHost) -> Element {
     let axes = use_context::<Signal<Axes>>();
@@ -61,44 +88,27 @@ fn Host(theme: Theme, host: WidgetHost) -> Element {
                 stylesheet: Inject::Host,
                 div { class: "g-widgets-grid", style: WidgetMetrics::default().style_attr(),
                     Battery { host }
-                    WidgetFrame { size: WidgetSize::Medium, host, title: Some(WidgetTitle::new(Icon::Clock, "World Clock")),
-                        div { class: "g-widgets-clocks",
-                            ClockFace { time: TAIPEI, label: "Taipei" }
-                            ClockFace { time: LONDON, phase: DayPhase::Night, label: "London" }
-                            ClockFace { time: TAIPEI, look: ClockLook::Digital, label: "Taipei" }
-                            ClockFace { time: LONDON, phase: DayPhase::Night, look: ClockLook::Digital, label: "London" }
-                        }
-                    }
-                    WidgetFrame { size: WidgetSize::Large, host, title: Some(WidgetTitle::new(Icon::BatteryFull, "Batteries")),
-                        div { class: "g-widgets-batteries",
-                            BatteryLevel { level: Fraction(80), label: "Mouse", Glyph { icon: Icon::Mouse, size: IconSize::Base } }
-                            BatteryLevel { level: Fraction(450), label: "Headphones", Glyph { icon: Icon::Headphones, size: IconSize::Base } }
-                            BatteryLevel { level: Fraction(1000), label: "Keyboard" }
-                            BatteryLevel { level: Fraction(150), mark: RingMark::Charging, label: "This computer" }
-                        }
-                        div { class: "g-widgets-clocks",
-                            ClockFace { time: TAIPEI, phase: DayPhase::Day, label: "Taipei" }
-                            ClockFace { time: LONDON, phase: DayPhase::Night, label: "London" }
-                        }
-                    }
+                    WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(cities()), size: WidgetSize::Medium, host }
+                    WidgetCard { widget: BatteryWidget, timeline: Timeline::now(batteries()), size: WidgetSize::Medium, host }
                 }
             }
         }
     }
 }
 
-/// The small battery widget, drained a tenth at a time by its button.
+/// The small battery widget, its provider drained a tenth at a time by its button.
 #[component]
 fn Battery(host: WidgetHost) -> Element {
     let mut level = use_signal(|| Fraction(840));
+    let entry = BatteryEntry::Devices(vec![cell(
+        "This computer",
+        Device::Laptop,
+        level().0,
+        RingMark::Plain,
+    )]);
     rsx! {
         div { class: "g-col",
-            WidgetFrame { size: WidgetSize::Small, host, title: Some(WidgetTitle::new(Icon::BatteryFull, "Battery")),
-                div { class: "g-widgets-battery",
-                    BatteryLevel { level: level(), label: "This computer" }
-                    span { class: "g-widgets-percent", BatteryFigure { level: level() } }
-                }
-            }
+            WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Small, host }
             Button { variant: ButtonVariant::Mini, label: "Drain",
                 onclick: move |_| level.set(Fraction(level().0.saturating_sub(100))) }
         }
