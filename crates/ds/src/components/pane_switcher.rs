@@ -1,20 +1,32 @@
 //! PaneSwitcher: a pane and its detail in one place, switched by a push (sill FINDINGS Q80;
 //! design/13-BEHAVIOUR-menus-windows.md section 13.3.7: a tile's chevron opens its detail pane
-//! in place, `slide-l` / `slide-r` at `--t-move --e-spring`).
+//! in place).
 //!
 //! The arriving pane slides in and the outgoing one leaves the other way at the same time; the
 //! leaving pane is drawn out of the flow, so the switcher's height is the arriving pane's from
-//! the first frame. Both settle at one `settle()`, timed by a `MotionTimer` rather than an
-//! `animationend` Blitz never sends. A switch asked for mid-slide reverses: a new round starts,
-//! each pane takes the other animation from its start, and the reversed round's settle is
-//! ignored (`PaneSlide`).
-
-use crate::motion::anim::Anim;
+//! the first frame. Driven motion (design/05 section 14, wave H1): one spring in Rust carries
+//! the switch, `--pane-p` from 0 (the root) to 1 (the detail), and both panes are drawn from it.
+//! A switch asked for mid-slide redirects that spring from where it is at the speed it has, so
+//! the panes turn back without a jump, and the switcher rests (and `on_settled` hears the pane)
+//! when the spring does. Under Reduced the spring is critically damped and the panes only
+//! cross-fade.
+use crate::detail::Touch;
 use crate::motion::pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
-use crate::motion::timer::use_motion_timer;
-use crate::task::try_set;
+use crate::motion::{PxPerUnit, SpringFrame, SpringPhase, SpringSpec, use_spring};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+
+/// How many pixels the whole switch spans for the spring's rest: the panes move 26 px and fade,
+/// so a hundredth of the switch is well under a visible step.
+const SWITCH_PX: f32 = 100.0;
+
+/// Where the spring stands for `pane`: 0 the root, 1 the detail.
+fn place(pane: Pane) -> f32 {
+    match pane {
+        Pane::Root => 0.0,
+        Pane::Detail => 1.0,
+    }
+}
 
 /// Two panes, `shown` the one asked for. `on_settled` hears the pane a switch came to rest on.
 #[component]
@@ -24,7 +36,7 @@ pub fn PaneSwitcher(
     detail: Element,
     #[props(default)] on_settled: Option<EventHandler<Pane>>,
 ) -> Element {
-    let slide = use_pane_slide(shown, on_settled);
+    let (slide, frame) = use_pane_slide(shown, on_settled);
     let drawn: Vec<(Pane, PaneRole, Element)> = [(Pane::Root, root), (Pane::Detail, detail)]
         .into_iter()
         .map(|(pane, body)| (pane, slide.role(pane), body))
@@ -35,7 +47,11 @@ pub fn PaneSwitcher(
         PaneSlide::Rest(_) => None,
     };
     rsx! {
-        div { class: "ds-panes", "data-shown": slide.target().slug(), "data-moving": moving,
+        div {
+            class: "ds-panes",
+            "data-shown": slide.target().slug(),
+            "data-moving": moving,
+            style: "--pane-p:{frame.css()}",
             for (pane , role , body) in drawn {
                 div {
                     key: "{pane.slug()}",
@@ -67,35 +83,34 @@ fn hidden(role: PaneRole) -> Option<&'static str> {
     }
 }
 
-/// The switch's state for this render: `shown` fed to the machine, and each round's settle
-/// fed back from its timer. The machine lives in a plain value (it changes while rendering);
-/// only the timer writes a signal, the round that settled, which this render reads.
-fn use_pane_slide(shown: Pane, on_settled: Option<EventHandler<Pane>>) -> PaneSlide {
-    let mut slide = use_hook(|| CopyValue::new(PaneSlide::rest(shown)));
-    let mut last = use_hook(|| CopyValue::new(PaneRound::default()));
-    let settled = use_signal(PaneRound::default);
-    // Both panes play at `--t-move` (`PaneInR`/`PaneInL`/`PaneOutL`/`PaneOutR`, tested equal),
-    // so one timer settles the pair.
-    let timer = use_motion_timer(Anim::PaneInR);
-    let (before, latest) = (*slide.peek(), *last.peek());
-    if let Some(next) = before.show(shown, latest) {
-        slide.set(next);
-        if let PaneSlide::Moving { to, round } = next {
-            last.set(round);
-            // The handler is made here, in the component's scope; the timer starts after the
-            // render, from an effect (design/05 section 7). Restarting it cancels a reversed
-            // round's timer, so that settle never arrives.
-            let done = EventHandler::new(move |()| {
-                if try_set(settled, round).is_ok()
-                    && let Some(on_settled) = on_settled
-                {
-                    on_settled.call(to);
-                }
-            });
-            queue_effect(move || timer.start(done));
+/// The switch's state for this render and the spring's frame. The switcher is moving until the
+/// spring rests on the pane asked for; a round counts each switch asked (a reversal is a new
+/// one), and `on_settled` hears the pane each time the spring comes to rest on a switch.
+fn use_pane_slide(shown: Pane, on_settled: Option<EventHandler<Pane>>) -> (PaneSlide, SpringFrame) {
+    let spec = SpringSpec::for_touch(Touch::Remote);
+    let frame = use_spring(place(shown), spec, PxPerUnit(SWITCH_PX));
+    let mut asked = use_hook(|| CopyValue::new(shown));
+    let mut round = use_hook(|| CopyValue::new(PaneRound::default()));
+    let mut unreported = use_hook(|| CopyValue::new(None::<Pane>));
+    if *asked.peek() != shown {
+        asked.set(shown);
+        let next = PaneRound(round.peek().0.wrapping_add(1));
+        round.set(next);
+        unreported.set(Some(shown));
+    }
+    let resting = frame.phase() == SpringPhase::Rest && frame.position() == place(shown);
+    if !resting {
+        let moving = PaneSlide::Moving {
+            to: shown,
+            round: *round.peek(),
+        };
+        return (moving, frame);
+    }
+    if *unreported.peek() == Some(shown) {
+        unreported.set(None);
+        if let Some(on_settled) = on_settled {
+            queue_effect(move || on_settled.call(shown));
         }
     }
-    let now = (*slide.peek()).settle(settled());
-    slide.set(now);
-    now
+    (PaneSlide::rest(shown), frame)
 }

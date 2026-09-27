@@ -1,5 +1,6 @@
-//! Sheet and modal parts, Q90 and Q91, on a real Blitz document: a sheet its host hides plays
-//! `sheet-out` and reports `on_hidden` at `settle(SheetOut)`, not before; shown again while
+//! Sheet and modal parts, Q90 and Q91, on a real Blitz document: a sheet its host hides springs
+//! out (H1, design/05 section 14) and reports `on_hidden` once the spring rests, never before
+//! `settle(SheetOut)`; shown again while
 //! leaving, it enters again and never reports; and a centred sheet in a viewport root stands in
 //! the middle of it.
 
@@ -8,6 +9,7 @@ use ds::{
     Anim, Appearance, Ds, Material, MotionLevel, RootExtent, Sheet, SheetPlacement, Shown,
     StaggerIndex, settle,
 };
+use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -82,8 +84,11 @@ fn a_hidden_sheet_leaves_then_reports_at_its_settle() {
         "not before the settle"
     );
     assert_eq!(harness.count(".ds-sheet"), 1, "still drawn while it leaves");
-    harness.advance(Duration::from_millis(80));
-    assert_eq!(harness.text_of(".log").as_deref(), Some("hidden"));
+    // Driven motion (design/05 section 14): it reports when its spring rests, not at a fixed
+    // settle.
+    settle_until(&mut harness, |h| {
+        h.text_of(".log").as_deref() == Some("hidden")
+    });
     assert_eq!(harness.count(".ds-sheet"), 0, "gone once settled");
 }
 
@@ -98,7 +103,9 @@ fn shown_again_while_leaving_it_enters_and_never_reports() {
         harness.attr(".ds-sheet", "data-presence").as_deref(),
         Some("entering")
     );
-    harness.advance(exit() + Duration::from_millis(600));
+    settle_until(&mut harness, |h| {
+        h.attr(".ds-sheet", "data-presence").as_deref() == Some("present")
+    });
     assert_eq!(harness.text_of(".log").as_deref(), Some(""));
     assert_eq!(
         harness.attr(".ds-sheet", "data-presence").as_deref(),
@@ -106,7 +113,9 @@ fn shown_again_while_leaving_it_enters_and_never_reports() {
     );
     // Hidden again, it reports once, at its own settle.
     set(&mut harness, Shown::Hidden);
-    harness.advance(exit() + Duration::from_millis(40));
+    settle_until(&mut harness, |h| {
+        h.text_of(".log").as_deref() == Some("hidden")
+    });
     assert_eq!(harness.text_of(".log").as_deref(), Some("hidden"));
 }
 

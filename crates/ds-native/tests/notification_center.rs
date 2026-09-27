@@ -99,7 +99,9 @@ fn a_show_while_it_leaves_takes_the_hide_back() {
     show(&mut harness, Shown::Hidden);
     harness.advance(Duration::from_millis(60));
     show(&mut harness, Shown::Visible);
-    assert_eq!(presence(&harness).as_deref(), Some("present"));
+    // Driven motion (design/05 section 14): the spring turns back from where the panel is.
+    assert_eq!(presence(&harness).as_deref(), Some("entering"));
+    settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     harness.advance(Duration::from_millis(500));
     assert_eq!(hidden(&mut harness), 0);
 }

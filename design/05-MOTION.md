@@ -1152,3 +1152,99 @@ Source C:739-743. Look-scoped: Riso's archive exit (C:738).
   settle, use_pulse, Roster, HoverIntent, placement, token model, risk table), "Findings:
   Blitz / Dioxus Native", "Design: `<shell>` repo" (dock, launcher, wallpaper), "UX decisions
   settled with the user", Appendix A5 (motion), A8 (bugs), Appendix C-A and C-D.
+
+## 14. Driven motion (wave H1, 2026-09-27)
+
+design/27-HIG-PARITY.md section 3.12 and [FLUID] (WWDC 2018 session 803): a motion a hand drives,
+or can interrupt, is a spring integrated in Rust on the frame clock, not a keyframe of fixed
+length. Keyframes stay for arrivals no hand touched (`rise`, `fold`, `curl`, `gulp`, `bump`,
+`seal-pop`, `shake-x`, `pop-in`, a sheet's or a panel's first entrance on mount).
+
+### 14.1 The spring
+
+`ds::motion::Spring { damping: Ratio, response: Millis }`, SwiftUI's parameters: `damping` is
+the damping ratio in thousandths (1000 critical; below it, it overshoots), `response` the period
+it would swing at undamped, which reads as how quick it feels. It has no duration; it ends when
+it rests (within 0.25 px of its target and slower than 4 px/s, measured through the caller's
+`PxPerUnit`). Each leg (`Leg`) is solved in closed form (critically damped `(A + Bt)e^(-wt)`,
+under-damped `e^(-zwt)(A cos + B sin)`), so the state at any instant is exact however frames fall.
+
+Only `SpringSpec::for_touch(Touch)` makes a spring, so no caller writes a raw damping:
+
+| Touch | Damping | Velocity handed on |
+| --- | --- | --- |
+| `Touch::Remote` (a service, a timer, another window) | 1.0 | none |
+| `Touch::Contact` with no velocity (a click, a key) | 1.0 | none |
+| `Touch::Contact` released at ≥ 50 px/s toward the target | 0.8 | the release velocity |
+| `Touch::Contact` released away from the target | 1.0 | the release velocity |
+| any, under Reduced | 1.0 | none |
+
+### 14.2 Tokens (proposed; to be tuned beside macOS)
+
+| Token | Response | For |
+| --- | --- | --- |
+| `--spring-quick` (`SpringResponse::Quick`) | 300 ms | a toggle knob, a selection thumb or ring, a slider release, a leaving sheet or panel |
+| `--spring-move` (`SpringResponse::Move`) | 450 ms | a pane switch, a sheet or panel arriving, a swiped card or dragged tile returning |
+
+They are Rust values (`SpringResponse::millis`), not stylesheet variables: no stylesheet reads a
+spring.
+
+### 14.3 The driver
+
+`use_spring(target, SpringSpec, PxPerUnit) -> SpringFrame` follows a target: it stands there on
+mount and, each time the target changes, starts a new leg from the exact position and velocity
+the old leg has at that instant (retargeting; nothing restarts, nothing waits). A contact that
+carries a velocity (`Contact::with_velocity`, from a drag's `onpointerup`) starts the leg at that
+velocity instead. `use_spring_motion(at, PxPerUnit) -> SpringMotion` is the imperative form:
+`go(target, spec)`, `track(at)` (1:1 under a hand, no frames of its own), `snap(at)`. Two dimensions (sill Q432, a widget springing into
+its snap cell): `use_spring_point(target: Point, spec)` and `use_spring_point_motion(at)`, one
+spring per axis, `go(target, touch, Release { x, y }, response)` handing each axis the hand's
+velocity along it; `PointThrow::landing` picks the cell nearest the projection. The frame
+task sleeps `FRAME_TICK` (16 ms) on `ds::time`, so a harness on `Clock::Virtual` drives it
+exactly; it ends the moment the spring rests, and asks for nothing after (design/26 R3). A
+component writes the position into a custom property on its own element (`--knob-x`, `--seg-x`,
+`--switcher-at`, `--pane-p`, `--present-p`, `--swipe-dx`, `--drag-dx`/`--drag-dy`, the slider's
+`--f`), and its stylesheet draws from it with no transition.
+
+### 14.4 Throws
+
+A release projects to where the scroll view's deceleration would stop it:
+`p + v·r/(1-r)` with `r = 0.998` per ms, about `p + 0.5 s × v` (`Throw::projected`), and lands
+on the endpoint nearest the projection, not nearest the release (`Throw::landing`). The slider
+throws its value (a release at ≥ 600 px/s, the swipe's fling speed) and springs its thumb there
+at the hand's velocity. `VelocityMeter` measures a release from a drag's last two moves (nothing
+when the pointer stopped more than 100 ms before letting go).
+
+### 14.5 Reduced
+
+Every `Anim` declares its form under Reduced (`Anim::reduced() -> ReducedForm`): `Same` for a
+keyframe that moves nothing (a fade, a colour, a ring draining), `CrossFade(In)` (`fade`) for an
+arrival, `CrossFade(Out)` (`menu-out`) for a departure, `Still` (`hold`) for an emphasis (a bump,
+a shake, a pop). The pulse classes play the form under `.ds[data-motion=reduced]`, and a data
+test (`every_moving_keyframe_has_a_still_reduced_form`) fails any moving keyframe without a still
+form. Springs under Reduced are critically damped and take no thrown velocity; tracking stays
+1:1. The sheet, the edge panel and the pane switcher only cross-fade under Reduced (their
+transforms are dropped); the knob, the thumb and the ring still move, critically damped.
+
+A component that writes a moving keyframe in its own stylesheet (not through a pulse class) is
+not reached by the table yet; those keep 60 ms under Reduced (section 3.2) until each is given a
+Reduced rule.
+
+### 14.6 What converted in H1
+
+| Part | Spring | Touch | Was |
+| --- | --- | --- | --- |
+| Toggle knob | `--knob-x` px, Quick | the click (1.0) | `transform` transition `--t-move --e-spring` |
+| Segmented thumb (new: equal segments, one sliding thumb) | `--seg-x` segments, Quick | the click (1.0) | the pressed fill jumped |
+| App switcher ring | `--switcher-at` cells, Quick | remote (the shell's keys, 1.0) | transition `--t-quick --e-spring` |
+| Slider | `--f`, Quick | the release (0.8 when thrown toward) | 1:1 only; the release dropped its speed |
+| Notification card (and screenshot thumbnail) swipe return | `--swipe-dx` px, Move | the release, with its velocity | transition `--t-move --e-spring` |
+| Pane switcher | `--pane-p` 0..1, Move | remote (1.0) | `slide-r`/`slide-l`, `pane-out-*`, restarted on reversal |
+| Sheet hide, show again | `--present-p` 0..1, Quick out, Move in | remote (1.0) | `sheet-out`; a re-show restarted `peek-in` |
+| Edge panel hide, show again | `--present-p` 0..1, Quick out, Move in | remote (1.0) | `panel-out`, `hold` on a taken-back hide |
+| Dock tile drag return (`DragReturnFrame`, sill wires the drag) | `--drag-dx`/`--drag-dy` px, Move | the release, per axis | none (sill had no return) |
+
+Not converted: the launcher's open and close (27 section 3.12 lists it last; it keeps its
+keyframes), the dock's bounce and magnification (27 section 8 decision 4), sheet and panel drag
+(neither takes a drag yet), workspace swipe (12 section 12.3.7, sill's). The swipe's dismiss
+decision keeps its settings-backed thresholds (80 px, 600 px/s) rather than the projection.
