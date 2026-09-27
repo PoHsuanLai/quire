@@ -78,7 +78,10 @@ Apple Support (Mac User Guide), user-facing settings, macOS 14 or 15 editions wh
 Our own: `20-SURFACES.md`, `22-SETTINGS.md` (sections 2, 3, 9), `23-WIDGETS.md`,
 `13-BEHAVIOUR-menus-windows.md`, `27-HIG-PARITY.md`. Code read (read-only): sill
 `crates/sill-launcher/src/{provider,ids,preview}.rs`, `sill-settings/src/{control_center,widgets,notifications}.rs`,
-`sill-surfaces/src/surfaces/{bar,control_center,desktop_widgets,dock}/`, `sill-services/src/pins/model.rs`,
+`sill-surfaces/src/surfaces/{bar,control_center,desktop_widgets,dock}/` (at master `0096872`:
+`desktop_widgets/{saved,placement,drag,arrange,view}.rs`, `widgets/mod.rs` `size_of`),
+`sill-services/src/{pins,tray,notifications}/`, `sill-launcher/src/rank/sections.rs`,
+`sill-settings/tests/keys.rs`,
 sill `FINDINGS.md` F270-F271; quire `crates/ds-settings/src/schema/key.rs`, and the in-progress
 `crates/ds/src/widget/{contract,registry,wire}.rs` in the `widget-interface` worktree.
 
@@ -89,17 +92,17 @@ add items. "Before/during" = before the app pass or during it (section 6).
 
 | § | Surface | What the person picks | Reference picker | Third party | Exists in sill | Priority | When |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 4.1 | Widgets (desktop, notification center) | which widgets, size, place (grid cell or list order), per-widget config | widget gallery (Edit Widgets): app list, search, live previews per size, Add; drag to place; Edit "<widget>" | yes (WidgetKit) | fixed kinds as `widgets.center`/`widgets.desktop_widgets` keys, grid cells in `desktop-widgets.json`; no gallery | must (in progress) | first |
+| 4.1 | Widgets (desktop, notification center) | which widgets, size, place (grid cell or list order), per-widget config | widget gallery (Edit Widgets): app list, search, live previews per size, Add; drag to place; Edit "<widget>" | yes (WidgetKit) | fixed kinds as `widgets.center`/`widgets.desktop_widgets` keys, one size per kind and host (`size_of`); cells per output in the state file `desktop-widgets.json`, dragged any time (F880-F892); no gallery | must (in progress) | first |
 | 4.2 | Launcher result categories and providers | which categories show; (ours: their order); folders excluded | Settings › Spotlight › Search results checklist; Search Privacy list | yes (Core Spotlight, importers) | 9 providers, closed `ProviderKind` enum, fixed Tab order; per-provider on/off only for web, clipboard, files backend | must | before |
-| 4.3 | Control center modules | which optional modules join; per module: show in the bar Always / When Active / Never | Settings › Control Center: three groups, a pop-up per row | no (controls not on macOS before 26) | 8 modules fixed; `InMenuBar::{Show,Hide}` per module, fixed bar order | must | before |
-| 4.4 | Menu bar status items | order, remove, add back | Command-drag in the bar; each app's own setting to show its extra | yes (status items) | tray (SNI) in arrival order, module items in `MENU_BAR_ORDER`; no reorder, no hide | must | before |
+| 4.3 | Control center modules | which optional modules join; per module: show in the bar Always / When Active / Never | Settings › Control Center: three groups, a pop-up per row | no (controls not on macOS before 26) | 8 modules, reorderable today through `control_center.modules` (membership-only removes that); `InMenuBar::{Show,Hide}` per module, no Focus key, fixed bar order | must | before |
+| 4.4 | Menu bar status items | order, remove, add back | Command-drag in the bar; each app's own setting to show its extra | yes (status items) | tray (SNI) in arrival order keyed by bus address, SNI `Id` not read; module items in `MENU_BAR_ORDER`; no reorder, no hide | must | before |
 | 4.5 | Dock items and stacks | pinned apps and their order, folders/files as stacks, recent apps on/off | drag in, drag out ("Remove"), Options › Keep in Dock; Settings › Desktop & Dock | apps are items; no plug-ins | pins with order (`dock.json`, `PinEvent`), Keep in Dock, drag reorder; no stacks, no recents section | must (exists), stacks nice | before (migrate), stacks later |
 | 4.6 | App toolbars | which items, order, spaces, icon/text | View › Customize Toolbar sheet; Command-drag | per app; extensions add Quick Action items | no toolbars yet | must for apps with toolbars | during |
 | 4.7 | Share destinations | which extensions show in the Share menu | Settings › Login Items & Extensions › Sharing checklist | yes (share and action extensions) | none | nice | during |
 | 4.8 | Quick Look and preview-pane previewers, Quick Actions | which extensions are on; per type, which preview fields | Extensions settings (Quick Look, Finder); View › Show Preview Options; Customize Quick Actions | yes (Quick Look and Finder extensions) | launcher preview pane with a closed `Preview` enum | nice | during |
-| 4.9 | Hot corners | an action per corner, with an optional modifier | Settings › Desktop & Dock › Hot Corners: a pop-up per corner | no | `hot_corners.*` keys, closed `CornerAction` | must (exists) | before (fold into actions) |
+| 4.9 | Hot corners | an action per corner (the reference's modifier waits on the compositor fork, G121) | Settings › Desktop & Dock › Hot Corners: a pop-up per corner | no | `hot_corners.*` keys, closed `CornerAction` | must (exists) | before (fold into actions) |
 | 4.10 | Gestures | an action per gesture | Settings › Trackpad / Mouse pop-ups | no | `gestures.gesture_action_map` | must (exists) | before (fold into actions) |
-| 4.11 | Keyboard shortcuts | on/off and a chord per system shortcut; per-app menu shortcuts | Settings › Keyboard › Keyboard Shortcuts: list, checkboxes, capture; App Shortcuts "+" | apps add their own menu commands | COSMIC's shortcut files; no page | must (system list), nice (app shortcuts) | before (system), during (app) |
+| 4.11 | Keyboard shortcuts | on/off and a chord per system shortcut; per-app menu shortcuts | Settings › Keyboard › Keyboard Shortcuts: list, checkboxes, capture; App Shortcuts "+" | apps add their own menu commands | sill writes COSMIC's `custom` and `system_actions` files; no page | must (system list), nice (app shortcuts) | before (system), during (app) |
 | 4.12 | Sidebars in our apps | which built-in items show, favourites and their order | Finder Settings › Sidebar checklist; drag into Favorites, out to remove | apps add locations (file providers) | none (apps not built) | must for Files, nice elsewhere | during |
 | 4.13 | Lock screen | large clock, message, user list (no widgets on the Mac) | Settings › Lock Screen | no | `session.lock_clock`, `session.user_picture` | nice (scalar keys only) | before, small |
 | 4.14 | Notifications per app | allow, style, lock screen, center, badge, sound, previews, grouping | Settings › Notifications: app list, one page per app | every app is a row | one global `banner_style`; per-app deferred (F270) | must | before |
@@ -112,9 +115,12 @@ The pattern holds everywhere a row says "which" and "order": a **registry** of c
 ## 4. Per surface
 
 Each subsection has the same fields: **Reference** (what the person picks, the picker, third
-party, source), **Today**, **Mapping** (owner, trait, picker, keys) and **Priority**. Keys are
-design/22 rows, all **proposed (design/28, 2026-09-27)**; the file column follows open decision
-7.1's recommendation (`sill/layout.toml` for placements, `sill/settings.toml` for scalars).
+party, source), **Today**, **Mapping** (owner, trait, picker, keys) and **Priority**. Every row
+here is **proposed (design/28, 2026-09-27)** and is not yet a design/22 row. Two kinds of table:
+**Layout entry** tables are `layout.toml` contents (decision 1, settled B) and land in design/22's
+new `## 10. Layouts`, outside §3 (5.6); **Key** tables are `settings.toml` keys and land in
+design/22 §3 only in the order of 6.0. Positions on a surface are state and have no row. Where a
+setting belongs to an app not yet named, it is described in prose, never as a placeholder key.
 
 ### 4.1 Widgets (desktop and notification center)
 
@@ -125,30 +131,78 @@ previews grouped by size with one description ("Group your widget's sizes togeth
 single description", HIG widgets). On the desktop a click places the widget automatically or a drag
 places it; in Notification Center widgets are "reordered by dragging up or down". Control-click
 a widget for its sizes; "Edit <widget>" edits its configuration, whose form "the system
-automatically generates" (HIG widgets); Remove deletes it. Settings › Desktop & Dock: Show
-Widgets (On Desktop, In Stage Manager), Widget style (Automatic, Monochrome, Full-color), Use
-iPhone widgets (mchlp1119). Third party: any app, through WidgetKit.
+automatically generates" (HIG widgets); Remove deletes it. Since Sonoma a desktop widget is moved
+by pressing and dragging it, no edit mode needed, and it snaps to an invisible grid, pushing
+others aside (sill F880, from MacMost and Intego). Settings › Desktop & Dock: Show Widgets (On
+Desktop, In Stage Manager), Widget style (Automatic, Monochrome, Full-color), Use iPhone widgets
+(mchlp1119). Third party: any app, through WidgetKit.
 
-**Today.** sill: `WidgetKind` closed enum in `sill-settings` (Calendar, UpNext, Battery,
-NowPlaying, WorldClock), `widgets.center` and `widgets.desktop_widgets` as keys,
-`desktop-widgets.json` of `{kind, column, row}` in `$XDG_STATE_HOME/sill` (`desktop_widgets/saved.rs`),
-grid filled from the top right. quire (`widget-interface`, in progress): `ds::widget::Widget`
-trait (`Entry`, `Intent`, `kind`, `name`, `sizes`, `placeholder`, `view`, `title`),
-`WidgetKind` as a reverse-DNS string, `WidgetRegistry` with `WidgetInfo::of::<W>()` and a
-type-erased `preview`, `wire.rs` for timelines from another process.
+**Today (sill master 0096872, "Widget drag", F880-F892).**
+- Kinds: `WidgetKind` closed enum in `sill-settings` (Calendar, UpNext, Battery, NowPlaying,
+  WorldClock). Membership and order: the keys `widgets.center` and `widgets.desktop_widgets`
+  (22 §3.20). The size is not chosen: `sill-surfaces/src/widgets/mod.rs` `size_of(kind, host)`
+  fixes one size per kind and host (every notification center tile Medium, the month Large there;
+  on the desktop Calendar and Battery Small, Up Next, Now Playing and World Clock Medium).
+- Positions: **state**, `$XDG_STATE_HOME/sill/desktop-widgets.json`, no settings key (F881, and
+  22 §1 rule 3). Each entry is a `saved::SavedEntry { output: OutputKey, placement: Placement {
+  kind, slot: GridSlot { column, row } } }`; `OutputKey::{Any, Named(connector)}`. An output with
+  entries of its own reads only those; one with none reads the `Any` entries, so a pre-F881 file
+  carries over; saving an output replaces its own entries and keeps the others (`with_output`).
+- Output changes: a saved place is clamped into the grid (`placement::clamp`, `nearest_free`),
+  and a clamped place is **never written back** (`view::recorded`): only a widget seen for the
+  first time is recorded, and a drop records the arrangement dropped, so the place comes back
+  with the output (F882).
+- Drag, always on: `desktop_widgets/drag.rs` `Hold::{Idle, Pressed, Live}`; only Manhattan travel
+  past `window.move_threshold_px` (4) makes a press `Live`, so a click still reaches a widget's
+  control (F883, F887); `arrange.rs` `snap` and `make_room` push covered widgets to their nearest
+  free spot and back (F884); the motion is quire's `use_tween` in `placed.rs` (F885).
+- Scalars: `widgets.desktop` (the layer on or off), `widgets.desktop_cell_px`,
+  `widgets.desktop_gap_px`, `widgets.world_clocks` (the zones, `;`-separated, read by
+  `widgets/world_clock.rs`).
+
+quire (`widget-interface`, in progress): `ds::widget::Widget` trait (`Entry`, `Intent`, `kind`,
+`name`, `sizes`, `placeholder`, `view`, `title`), `WidgetKind` as a reverse-DNS string,
+`WidgetRegistry` with `WidgetInfo::of::<W>()` and a type-erased `preview`, `wire.rs` for
+timelines from another process.
 
 **Mapping.** Owner: quire (the trait, the card, the registry, the gallery), sill (the hosts:
-desktop layer and notification center; the providers that feed entries). Trait: `Widget` as
-built; add `type Config: Default + Serialize + DeserializeOwned + SettingsSchema` so the edit
-form is generated from the config struct by the same derive the Settings app uses (22 §9.1),
-matching "the system automatically generates it". Picker: `KindGallery` (5.4) in a panel from
-the desktop's context menu and the notification center's "Edit Widgets" button; the in-place
-`EditMode` on the desktop grid (drag to move, a remove badge, size in the context menu).
+desktop layer and notification center; the providers that feed entries; the state file).
+
+- Trait: `Widget` as built; add `type Config: Default + Serialize + DeserializeOwned +
+  SettingsSchema` so the edit form is generated from the config struct by the same derive the
+  Settings app uses (22 §9.1), matching "the system automatically generates it".
+- **Membership, order and config** are `layout.toml` (5.6): `layout.center_widgets` (ordered)
+  and `layout.desktop_widgets` (membership only). Desktop membership is **global**: one list for
+  every output, as `widgets.desktop_widgets` is today.
+- **Cells stay state**, in `desktop-widgets.json`, per output, unchanged in meaning; the entry
+  gains the placement's `instance` (5.2) so two widgets of one kind keep separate cells; an
+  entry whose instance is no longer in `layout.desktop_widgets` is ignored and dropped on the
+  next save of that output. F882's rule stands: a clamped place is never written back.
+- **Size**: `Placement.shape` is `None` by default, meaning the host's size for the kind
+  (`size_of(kind, host)`, which moves with the kinds into the registry as `KindInfo::size_in(host)`).
+  A shape is written only when the person picks one from the widget's context menu, and only a
+  shape the kind lists for that host is offered; a stored shape the kind no longer offers falls
+  back to `size_in(host)`. Today every kind has one size per host, so no shape is ever written
+  until a kind offers two.
+- **Instances**: two Batteries (one showing this computer, one the headphones) are two
+  placements of `quire.battery` with different `instance` ids and configs.
+- What becomes of today's keys: `widgets.desktop` stays a scalar key (the reference's "Show
+  Widgets"); `widgets.desktop_cell_px` and `widgets.desktop_gap_px` stay scalar keys (the grid's
+  geometry, not a placement); `widgets.world_clocks` becomes the World Clock instance's config
+  (`zones: Vec<Zone>`), migrated once from the key into every World Clock placement, after which
+  sill drops the key (row order, section 6.0); `widgets.center` and `widgets.desktop_widgets`
+  move to the layout and are dropped the same way.
+- Picker: `KindGallery` (5.4) in a panel from the desktop's context menu and the notification
+  center's "Edit Widgets" button. Dragging on the desktop needs no mode (F883); `EditMode` only
+  adds the remove badges and the size choices.
+
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `layout.center_widgets` | `Vec<Placement>`, ordered | Calendar, Up Next, Batteries (today's `widgets.center`) | order is the list's; shape `None` = `size_in(Tile)` | 4.1; 22 §3.20 | proposed (design/28) |
+| `layout.desktop_widgets` | `Vec<Placement>`, membership | Calendar, Batteries (today's `widgets.desktop_widgets`) | global; cells per output stay in `desktop-widgets.json` (state) | 4.1; F881 | proposed (design/28) |
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.center_widgets` | `Vec<Placement<Ordered>>` | Calendar M, Up Next M, Batteries S (today's `widgets.center`) | replaces `widgets.center`; order is the list's | 4.1; 22 §3.20 | proposed (design/28) |
-| `layout.desktop_widgets` | `Vec<Placement<GridCell>>` | Calendar, Batteries at their first free cells | replaces `widgets.desktop_widgets` and `desktop-widgets.json`; the cell is per output (`output` field, by connector name) | 4.1; 22 §3.20 | proposed (design/28) |
 | `widgets.style` | `WidgetStyle::{Automatic,Monochrome,FullColor}` | `Automatic` | the reference's Widget style; Automatic recedes while an app is active | mchlp1119 | proposed (design/28) |
 
 **Priority.** must; first (it is the pattern's first instance and is being built).
@@ -168,26 +222,48 @@ Suggestions, Spreadsheets, System Settings, Tips, Websites. Third party (H, HIG 
 plug-in" for custom file types; their items then show under the matching category or the app's
 own heading.
 
-**Today.** sill: `sill_launcher::Provider` (`kind`, `query(&Query, &mut dyn ResultSink)`,
-`activate(&Item, &Choice) -> Activation`), nine providers in the closed `ProviderKind` enum
-whose order is the Tab order and the tie-break (`ids.rs`); per-provider switches exist only as
-scattered keys (`launcher.web_search`, `launcher.clipboard_history`, `launcher.files_backend`).
-The user named this surface.
+**Today (sill master 0096872).** `sill_launcher::Provider` (`kind`, `query(&Query, &mut dyn
+ResultSink)`, `activate(&Item, &Choice) -> Activation`), nine providers in the closed
+`ProviderKind` enum whose order is the Tab order and the tie-break (`ids.rs`). The results are
+placed in sections by `rank/sections.rs`: Top Hit first (typed text; with nothing typed, Actions
+and Recent), then one section per kind, Web "always last". Three providers already have a
+switch the user settled (22 §3.6): `launcher.web_search` (On/Off), `launcher.clipboard_history`
+(Memory/Off; Off watches nothing), `launcher.files_backend` (Auto/Tracker/Baloo/Fd/Off). The user
+named this surface.
 
 **Mapping.** Owner: sill (`sill-launcher` keeps the trait; the registry of providers is sill's,
 non-UI); quire owns the `OrderedChecklist` picker and the `KindId` type. Trait change:
 `fn kind(&self) -> ProviderKind` becomes `fn info(&self) -> ProviderInfo { id: KindId, name,
 icon, section: SectionTitle, default_shown: Shown }`, so a provider from another process
 (section 5.7) is a row like ours; `ProviderKind` stays as the ids of the built-in nine
-(`quire.launcher.apps`, ...). The launcher reads `layout.launcher_categories` for which
-providers run and the section order; a provider absent from the list and new since the last
-write is appended with its `default_shown` (so a new app's provider appears, as a new category
-does on the reference). Picker: `OrderedChecklist` on the Settings app's Spotlight page (22 §5
-already names the page), plus a "Search Privacy" `List` of folders.
+(`quire.launcher.apps`, ...). Picker: `OrderedChecklist` on the Settings app's Spotlight page (22
+§5 already names the page), plus a "Search Privacy" `List` of folders.
+
+What the person orders (settled 2026-09-27, decision 2 B), and what stays fixed:
+- **Reorderable**: the kind sections between Top Hit and Web (Applications, Documents, Windows,
+  Calculator, Settings, Clipboard, Emoji, System, and any app's provider); their order is the
+  section order and the Tab order.
+- **Fixed**: Top Hit (and, with nothing typed, Actions and Recent) stays first; **Web stays pinned
+  last** as the fallback row and has no drag handle; the ranking inside a section, the frecency
+  tie-break and how rows compete for Top Hit (`SectionPlan` weights) do not follow the list.
+- A provider absent from the list and new since the last write is appended before Web with its
+  `default_shown` (so a new app's provider appears, as a new category does on the reference).
+
+**One switch per provider, and which one is the source.** For Web, Files and Clipboard the
+settled key **is the source** and the checklist row is a view of it: the layout entry for those
+three carries no `shown`. Unchecking Web sets `launcher.web_search = Off`; unchecking Clipboard
+sets `launcher.clipboard_history = Off`, which also stops the clipboard watcher; unchecking Files
+sets `launcher.files_backend = Off`, which stops asking any index; checking Files again sets
+`Auto` (a named backend is chosen in the Advanced list, not by the checkbox). For every other
+provider the layout entry's `shown` is the source; Off means the provider's `query` is never
+called.
+
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `layout.launcher_categories` | `Vec<Placement>`, ordered, with `shown` | the eight non-Web providers in `ProviderKind::ALL` order, all On | Web is not listed (pinned last); Web, Files and Clipboard take `shown` from their keys | 4.2; mchl54d95e8a | proposed (design/28) |
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.launcher_categories` | `Vec<Placement<Ordered>>` with `shown: Shown::{On,Off}` | the nine in `ProviderKind::ALL` order, all On | order = section order and Tab order; subsumes `launcher.web_search` (the Web row's `shown`) | 4.2; mchl54d95e8a | proposed (design/28) |
 | `launcher.excluded_folders` | `Text` | `""` | folders separated by `;` (as `calendar.sources`); the Files provider and its index skip them | Search Privacy, mchlp2811 | proposed (design/28) |
 
 **Priority.** must; before the app pass (a checklist over the nine), with third-party providers
@@ -210,27 +286,47 @@ The grid's arrangement is fixed; the person picks membership and bar presence, n
 Third party: none; HIG controls: "Not supported in macOS" in this era (Tahoe's editable Control
 Center is the Liquid Glass era and out of scope, `27-HIG-PARITY.md#04-what-the-june-2025-redesign-changed-which-we-do-not-adopt`).
 
-**Today.** sill: `ControlCenterModule` (Wifi, Bluetooth, Focus, Display, Sound, NowPlaying,
-Appearance, Battery), `control_center.modules` order key, `control_center.menu_bar_*` as
-`InMenuBar::{Show,Hide}`, `MENU_BAR_ORDER` fixed in `control_center/menu_bar.rs`; module files
-also exist for power profile and wired network.
+**Today (sill master 0096872).** `ControlCenterModule` has eight variants (Wifi, Bluetooth,
+Focus, Display, Sound, NowPlaying, Appearance, Battery); `control_center.modules` is
+`Vec<ControlCenterModule>` ("Which modules show, in order"), so the person can reorder the
+modules today by editing it. `control_center.menu_bar_{wifi,bluetooth,sound,display,battery,now_playing}`
+are `InMenuBar::{Show,Hide}`; there is no Focus key (`in_menu_bar` returns `Hide` for Focus and
+Appearance); `MENU_BAR_ORDER` is fixed in `control_center/menu_bar.rs`. In `control_center/modules/`,
+`wired.rs` is not a module: it wires the Sound and Display modules to their services (and feeds
+the bar's Sound and Display dropdowns); `power_profile.rs` is `PowerProfileControl`, a
+`SegmentedControl` drawn inside the Battery module, not a module of its own. A keyboard-brightness
+module does not exist yet: it arrives with design/26's wave D2 (G25).
 
 **Mapping.** Owner: quire (the `ModuleTile`/`ModulePanel` contract as a trait, so a module's
 tile, panel and bar glyph come from one implementation), sill (the modules, which need
 services). Trait (quire, UI side): `ControlModule { type State; fn info() -> ModuleInfo { id,
-name, glyph, span: TileSpan, group: ModuleGroup::{Core,Other,BarOnly}, bar: BarPresence
+name, glyph, span: TileSpan, group: Option<ModuleGroup::{Core,Other}>, bar: BarPresence
 capabilities }; fn tile(state) -> Element; fn panel(state) -> Option<Element>; fn bar_glyph(state)
--> Glyph; fn active(state) -> Active }` (`active` drives "When Active"). Picker: the Settings
-app's Control Center page, one `SettingsRow` per module with a pop-up for the bar presence and a
-toggle for "Show in Control Center" on Other modules: the reference's exact shape, no gallery.
+-> Glyph; fn active(state) -> Active }` (`active` drives "When Active"). Groups: Core = Wi-Fi,
+Bluetooth, Focus, Display, Sound, Now Playing (always shown); Other = Battery and, from D2,
+Keyboard brightness (the person adds or removes them); **Appearance has no group**: it is ours,
+not a reference module, always shown, never a bar item. Picker: the Settings app's Control
+Center page, one `SettingsRow` per module with a pop-up for the bar presence and a toggle for
+"Show in Control Center" on Other modules: the reference's exact shape, no gallery.
+
+**Membership only (settled 2026-09-27, decision 5 A).** This removes a freedom sill has today:
+reordering the modules through `control_center.modules`. The order becomes the design's, fixed
+in code (design/13 §13.3.7's order); the person picks only whether each Other module shows. sill
+drops `control_center.modules` (row order, section 6.0) when `layout.control_center` lands.
+
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `layout.control_center` | `Vec<Placement>`, membership | Battery shown | holds only Other modules (Battery; Keyboard brightness from D2) with `shown`; Core modules and Appearance are always shown and not listed; order is not the person's | 4.3; 22 §3.13 | proposed (design/28) |
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.control_center` | `Vec<Placement<Ordered>>` with `shown` | today's `control_center.modules` | Core modules are always shown; Other modules (Battery, Power profile, Keyboard brightness, Wired) carry `shown`; order stays the design's (not user-reorderable, as the reference) | 4.3; 22 §3.13 | proposed (design/28) |
-| `control_center.menu_bar_<module>` | `InMenuBar::{Show,WhenActive,Hide}` | as 22 §3.13 today; Focus `WhenActive`, Now Playing `WhenActive` | `WhenActive` is new and only offered where the module reports `Active` | mchlad96d366 | proposed (design/28), amends 22 §3.13 |
+| `control_center.menu_bar_focus` | `InMenuBar::{Show,WhenActive,Hide}` | `WhenActive` | new: Focus as its own bar item while a Focus (Do Not Disturb) is on | mchlad96d366 | proposed (design/28) |
+| `control_center.menu_bar_now_playing` | `InMenuBar::{Show,WhenActive,Hide}` | `WhenActive` | was `Hide` with two variants | mchlad96d366; 22 §3.13 | proposed (design/28), amends 22 §3.13 |
 
-The per-module `menu_bar_*` keys stay scalar keys (they are a closed choice per known module);
-their bar **order** moves to 4.4.
+`InMenuBar` gains `WhenActive` for every existing `menu_bar_*` key; it is offered in the picker
+only where the module reports `Active` (Focus, Display, Sound, Now Playing), and the other keys'
+defaults are unchanged. The keys stay scalar keys (a closed choice per known module); their bar
+**order** moves to 4.4.
 
 **Priority.** must; before the app pass.
 
@@ -242,23 +338,28 @@ out of the menu bar" (mchlp1446). HIG the-menu-bar: "Let people — not your app
 to put your menu bar extra in the menu bar"; the system may hide extras when space is short;
 Clock is essential and fixed. Third party: yes, any app's status item.
 
-**Today.** sill: tray items (StatusNotifierItem) in arrival order; control center module items in
-`MENU_BAR_ORDER`; the control center item and the clock at the right end. Workspace pills
-already have a drag reorder (`bar/reorder.rs`), a reusable press-drop-threshold machine.
+**Today (sill master 0096872).** Tray items (StatusNotifierItem) in arrival order, each keyed by
+`TrayItemId`, which is the item's **bus address** (`<unique name><object path>`,
+`sill-services/src/tray/model.rs`): it changes every time the app restarts. sill does not read
+the SNI `Id` property today. Control center module items follow `MENU_BAR_ORDER`; the control
+center item and the clock sit at the right end.
 
-**Mapping.** Owner: sill (the bar and its item kinds), quire (the reorder interaction and the
-drag ghost). Trait: none new; a bar item is `BarItem { id: KindId, source: BarSource::{Module(ControlCenterModule), Tray(TrayItemId → app id), Fixed(ControlCenter | Clock)} }`.
-Tray items are keyed by the SNI `Id` (the app's stable id), not the bus name, so order survives a
-restart. Picker: in place, **Command-drag** (Super on our keyboards through the Mod layer, 27 §6.2)
-reorders; dropping outside the bar hides a module item (sets its `menu_bar_*` to `Hide`) or
-hides a tray item (adds it to `layout.bar_hidden`); the control center item and the clock do not
-move (the reference's Control Center and Clock are fixed at the right end). Hidden tray items come
-back from the Settings app's Control Center page, "Menu Bar Only"-style list.
+**Mapping.** Owner: sill (the bar and its item kinds), quire (the reorder machine, 5.8, and the
+drag ghost). Trait: none new; a bar item is `BarItem { id: KindId, source: BarSource::{Module(ControlCenterModule),
+Tray(sni_id), Fixed(ControlCenter | Clock)} }`. **Order and hiding are keyed by the SNI `Id`**
+(the app's own stable name, e.g. `nm-applet`), prefixed `sni.`, never by `TrayItemId`; two items
+with the same `Id` fall back to arrival order among themselves. P4 adds reading `Id` to the tray
+service (`TrayItem.sni_id`). Picker: in place, **Command-drag** (Super on our keyboards through
+the Mod layer, 27 §6.2) past `window.move_threshold_px` reorders; dropping outside the bar hides
+a module item (sets its `menu_bar_*` key to `Hide`) or hides a tray item (adds its id to
+`layout.bar_hidden`); the control center item and the clock do not move (the reference's
+Control Center and Clock are fixed at the right end). Hidden tray items come back from the
+Settings app's Control Center page, a "Menu Bar Only"-style list.
 
-| Key | Type | Default | Range / Alt | Source | Status |
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.bar_items` | `Vec<Placement<Ordered>>` | `[]` (empty = today's order: tray, then `MENU_BAR_ORDER`) | items not in the list take their default place, left of the listed ones (new items appear at the left end, as the reference adds new extras) | mchlp1446 | proposed (design/28) |
-| `layout.bar_hidden` | `Vec<KindId>` | `[]` | tray items the person dragged out | mchlp1446 | proposed (design/28) |
+| `layout.bar_items` | `Vec<Placement>`, ordered | `[]` (empty = today's order: tray, then `MENU_BAR_ORDER`) | items not in the list take their default place, left of the listed ones (new items appear at the left end, as the reference adds new extras) | mchlp1446 | proposed (design/28) |
+| `layout.bar_hidden` | `Vec<KindId>` | `[]` | `sni.<Id>` of the tray items the person dragged out | mchlp1446 | proposed (design/28) |
 
 **Priority.** must; before the app pass.
 
@@ -273,18 +374,24 @@ Fan/Grid/List/Automatic, Sort by: L, from its context menu). Third party: apps a
 plug-ins; an app adds items to its own Dock menu (HIG dock-menus).
 
 **Today.** sill: `DockPins { version, pinned: Vec<AppId> }` in `dock.json`, `PinEvent::Pin {
-app, at: PinAt::{End,Index} }` and unpin, drag reorder and drag-out remove in the dock machine;
-stacks deferred (`10-BEHAVIOUR-dock.md` R25).
+app, at: PinAt::{End,Index} }` and unpin, applied by one writer task (`pins::run`: load once,
+reduce, save atomically, watch for outside edits); `sill dock pin` and Keep in Dock send it
+events. Drag reorder and drag-out remove live in the dock machine (`dock/machine/press.rs`),
+always on, no mode. Stacks deferred (`10-BEHAVIOUR-dock.md` R25).
 
 **Mapping.** Owner: sill (pins service, dock), quire (`DockParts`, drag ghost). It already is the
-pattern with a fixed kind (an app). Change: pins become `Vec<Placement<Ordered>>` whose `kind`
+pattern with a fixed kind (an app). Change: pins become an ordered `Vec<Placement>` whose `kind`
 is `quire.dock.app` or `quire.dock.stack` and whose `config` carries the `AppId` or the folder
 path and the stack's view options; `dock.json` migrates once (read old, write new, leave the old
-file, as the mailo appearance migration in 22 §2). Picker: in place (drag), no gallery.
+file, as the mailo appearance migration in 22 §2); `pins::run` stays its one writer (rule
+5.2.4). Picker: in place (drag), no gallery.
+
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `layout.dock` | `Vec<Placement>`, ordered | today's `dock.json` pins | kinds `quire.dock.app` (config `app`), `quire.dock.stack` (config `path`, `display: StackDisplay::{Stack,Folder}`, `view: StackView::{Automatic,Fan,Grid,List}`, `sort: StackSort::{Name,Added,Modified,Created,Kind}`) | mh35859; 10 §10.6 | proposed (design/28) |
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.dock` | `Vec<Placement<Ordered>>` | today's `dock.json` pins | kinds `quire.dock.app` (config `app`), `quire.dock.stack` (config `path`, `display: StackDisplay::{Stack,Folder}`, `view: StackView::{Automatic,Fan,Grid,List}`, `sort: StackSort::{Name,Added,Modified,Created,Kind}`) | mh35859; 10 §10.6 | proposed (design/28) |
 | `dock.recent_apps` | `RecentApps::{Show,Hide}` | `Hide` | the reference's section between apps and stacks | mchlp1119 | proposed (design/28) |
 
 **Priority.** must (exists; migrate to the shared shape before the app pass); stacks nice,
@@ -308,13 +415,11 @@ sheet); each app registers its items. Trait: `ToolbarItem { fn id() -> KindId; f
 Text; fn palette_label() -> Text; fn glyph() -> Icon; fn command() -> CommandId; fn width() ->
 ItemWidth::{Fixed,Flexible} }` plus built-ins `Space`, `FlexibleSpace`, `Separator`. Picker:
 `CustomizePalette` sheet (the reference's sheet: a grid of every item, "or drag the default set",
-Show: Icon and Text / Icon Only / Text Only) and Command-drag in place. The layout is per app, in
-the app's own settings file.
-
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `<app>.toolbar` (in the app's file, e.g. `files/layout.toml`) | `Vec<Placement<Ordered>>` | the app's default set | kinds from that app's registry | mchlp3011; HIG toolbars | proposed (design/28) |
-| `<app>.toolbar_display` | `ToolbarDisplay::{IconAndText,IconOnly,TextOnly}` | `IconOnly` | | mchlp3011 | proposed (design/28) |
+Show: Icon and Text / Icon Only / Text Only) and Command-drag in place. The layout is per app:
+each app with a toolbar keeps a `[[toolbar]]` array (an ordered `Vec<Placement>`, kinds from that
+app's registry, default the app's default set) in its own `layout.toml`, and a `toolbar_display`
+key (`ToolbarDisplay::{IconAndText,IconOnly,TextOnly}`, default `IconOnly`) in its own settings
+file; the concrete rows are written with the app (Files first), not before.
 
 **Priority.** must for apps with toolbars (Files, Mail, Photos); during the app pass, after H4.
 
@@ -339,9 +444,11 @@ process register through the manifest (5.7). Picker: `OrderedChecklist` (on/off 
 system rows first) on the Settings app's Extensions page, and "Edit Extensions…" at the end of
 every Share menu.
 
-| Key | Type | Default | Range / Alt | Source | Status |
+In `quire/layout.toml` (every app reads it):
+
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.share_menu` (in `quire/layout.toml`: every app reads it) | `Vec<Placement<Ordered>>` with `shown` | built-ins On, others On when installed | Mail and Copy cannot be turned off | mtusr003 | proposed (design/28) |
+| `layout.share_menu` | `Vec<Placement>`, ordered, with `shown` | built-ins On, others On when installed | Mail and Copy cannot be turned off | mtusr003 | proposed (design/28) |
 
 **Priority.** nice; during the app pass (Files, Mail, Photos have the Share button).
 
@@ -368,10 +475,15 @@ the pane's own "Show Preview Options" checklist per type. Out of process: the fr
 **Thumbnail Managing Standard** (`.thumbnailer` files under `$XDG_DATA_DIRS/thumbnailers`) is
 read for thumbnails, which gives many file types without our own code.
 
-| Key | Type | Default | Range / Alt | Source | Status |
+In `quire/layout.toml`:
+
+| Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.previewers` (`quire/layout.toml`) | `Vec<Placement<Ordered>>` with `shown` | all On | order breaks ties between two previewers of one type | mtusr003 | proposed (design/28) |
-| `preview.fields_<type>` | `Vec<PreviewField>` | per type (image: dimensions, colour space, created; document: pages, created, modified) | | mchl1e4644c2 | proposed (design/28), nice |
+| `layout.previewers` | `Vec<Placement>`, ordered, with `shown` | all On | order breaks ties between two previewers of one type | mtusr003 | proposed (design/28) |
+
+The per-type preview options (nice) would be one key per file type naming the fields shown
+(`Vec<PreviewField>`; image: dimensions, colour space, created; document: pages, created,
+modified); their names are written when the Quick Look app lands.
 
 **Priority.** nice; the trait during the app pass (Files, Quick Look app); the options per type
 skip until someone asks.
@@ -384,23 +496,24 @@ actions (L): Mission Control, Application Windows, Desktop, Notification Center,
 Quick Note, Start Screen Saver, Disable Screen Saver, Put Display to Sleep, Lock Screen, none.
 
 **Today.** `hot_corners.*` keys with the closed `CornerAction` enum and `*_command` text keys
-(22 §3.23); design/13 §13.3.12.
+(22 §3.23); design/13 §13.3.12. The modifier key was retired on 2026-09-26 (sill FINDINGS
+"hot_corners.modifier retired"): a keyboard-less layer surface is never sent
+`wl_keyboard.modifiers`, so a corner cannot know what is held (shell-host F61, sill G121); the
+wish is a fork item in `sill/docs/cosmic-gaps.md`.
 
 **Mapping.** Owner: sill (actions are shell actions). It is the pattern with one slot per corner
 and a registry of **actions**; the action registry is shared with 4.10 and 4.11 (one
 `ShellAction` registry: `id`, `name`, `glyph`, `run`), so an app's action (Quick Note from Notes,
 a Mail "New Message") can be a corner, a gesture or a shortcut without three lists. Picker: a
-pop-up per slot (`KeyKind::Menu`, 22 §9.1), holding Option/Command/... while choosing sets the
-modifier as on the reference.
-
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `hot_corners.<corner>_modifier` | `CornerModifier::{None,Command,Shift,Option,Control}` | `None` | the corner acts only while this is held | mchlp1119 | proposed (design/28), nice |
+pop-up per slot (`KeyKind::Menu`, 22 §9.1). No settings row changes. **The modifier waits on the
+compositor fork** (cosmic-gaps, G121): when the compositor can report held modifiers to a
+keyboard-less surface, a per-corner modifier returns as a key; until then none is proposed.
 
 `CornerAction` stays the closed set until the action registry exists; then its variants become
 the built-in action ids and `Command` stays as the escape hatch.
 
-**Priority.** must (exists); fold into the action registry before the app pass (small).
+**Priority.** must (exists); fold into the action registry before the app pass (small); the
+modifier waits on the fork.
 
 ### 4.10 Gestures
 
@@ -427,20 +540,34 @@ with a checkbox and a captured chord. App Shortcuts: "+", pick an app, type the 
 create keyboard shortcuts only for existing menu commands" (mchlp2271). HIG keyboards: respect
 standard shortcuts, custom ones only for frequent commands.
 
-**Today.** COSMIC keeps the shortcut files (22 §5 "Keyboard / Shortcuts" out of scope); quire
-has `StandardAction` and `Shortcut::custom` refusing reserved chords (27 §6.2, H0).
+**Today.** Global keys belong to cosmic-comp. sill ships and writes COSMIC's shortcut files,
+`com.system76.CosmicSettings.Shortcuts/v1/custom` and `.../system_actions` (under `dist/cosmic`;
+sill FINDINGS: the launcher, screenshots, the switcher, brightness and lock are bound there).
+quire has `StandardAction` and `Shortcut::custom` refusing reserved chords (27 §6.2, H0).
 
-**Mapping.** Owner: sill (system shortcuts are `ShellAction` bindings), quire (`MenuModel`
-commands for App Shortcuts, `KeyKind::Shortcut` capture field). The registry is the action
-registry of 4.9 plus every app's `MenuModel` commands. Picker: the Settings app's Keyboard
-Shortcuts page, a `SettingsRow` list per group with a toggle and a capture field; App Shortcuts
-as a `List` of `{app, menu_path, chord}` rows. Writing COSMIC's shortcut file stays the backend
-while cosmic-comp owns global keys (`sill/docs/cosmic-gaps.md`).
+**Mapping.** Owner: sill (system shortcuts are `ShellAction` bindings, written to COSMIC's two
+files), quire (`MenuModel` commands for App Shortcuts, `KeyKind::Shortcut` capture field). The
+registry is the action registry of 4.9 plus every app's `MenuModel` commands. Picker: the
+Settings app's Keyboard Shortcuts page, a `SettingsRow` list per group with a toggle and a
+capture field; App Shortcuts as a `List` of `{app, menu_path, chord}` rows.
+
+**Who wins a conflict (proposed, open decision 10).** COSMIC's files are the live truth for
+global keys, and the person or COSMIC Settings may edit them behind sill's back. So: **the chord
+COSMIC holds wins**. sill writes a binding only to a chord COSMIC does not already hold for
+another action; when `shortcuts.bindings` asks for a chord COSMIC holds (a clash), sill leaves
+COSMIC's binding, keeps its own row, and the Settings app shows the clash on that row (a
+warning glyph and "Used by <action> in COSMIC") until the person picks another chord or frees it.
+sill rereads both files on change (directory watch, 22 §2) so the page never shows a stale
+chord.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `shortcuts.bindings` | `Vec<Placement<Chord>>` (kind = action id, slot = chord, `shown` = enabled) | the reference's bindings for the actions we have | `Shortcut::custom` rules apply | mchlp2271; 27 §6.2 | proposed (design/28) |
+| `shortcuts.bindings` | `Vec<Binding { action: KindId, chord: Shortcut, shown: Shown }>` | the reference's bindings for the actions we have | `Shortcut::custom` rules apply; a clash with COSMIC is shown, not written | mchlp2271; 27 §6.2 | proposed (design/28) |
 | `shortcuts.app_shortcuts` | `Vec<AppShortcut { app: AppId, menu_path: Text, chord: Shortcut }>` | `[]` | the menu path in `File->Export as PDF…` form | mchlp2271 | proposed (design/28), nice |
+
+Both are behaviour, not placement: they are `sill/settings.toml` keys (a new §3 domain in design/22,
+added after sill registers them or lists them in `AWAITING_ROWS`, section 6.0), and they need the
+record list kind of P5.
 
 **Priority.** must for the system list (before the app pass), nice for App Shortcuts (during,
 after H4 `MenuModel`).
@@ -464,9 +591,10 @@ Trait: `SidebarSource { fn id() -> KindId; fn section() -> SectionTitle; fn item
 Vec<SidebarEntry> }` so a file provider or an account adds a section. Picker: the app's Settings
 › Sidebar `OrderedChecklist` (built-ins), plus drag in place for favourites.
 
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `<app>.sidebar` (app's `layout.toml`) | `Vec<Placement<Ordered>>` with `shown` | the app's default items | kinds `builtin.<name>`, `favourite` (config `path` or `mailbox`) | mchl83c9e8b8; HIG sidebars | proposed (design/28) |
+Each app with a sidebar keeps a `[[sidebar]]` array in its own `layout.toml`: an ordered
+`Vec<Placement>` with `shown`, default the app's items; kinds are the app's built-in items (one
+id each) and `favourite` (config `path` or `mailbox`). The concrete rows are written with the
+app (Files first).
 
 **Priority.** must for Files, nice elsewhere; during the app pass.
 
@@ -508,11 +636,17 @@ notification so the Settings page lists them. No trait. Picker: the Settings app
 page, `SettingsRow` list of apps (icon, name, current style as the trailing value), each opening a
 pane of the per-app keys.
 
+**The seen apps are state, not a key**: `$XDG_STATE_HOME/sill/notifying-apps.json`, a list of
+`{app, name, first_seen}`, written by the notifications task. It has no design/22 row. It does
+not reuse the history file (`notifications.json`, `history_file.rs`) because the history is
+capped (`notifications.history_cap`, which may be 0), is emptied when the person clears the
+notification center, and holds the notifications' content; the app list must outlive all three
+and must not keep content only to remember that an app exists.
+
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `notifications.apps` | `Vec<AppNotify>`; each `{ app: AppId, allow: Allow::{On,Off}, style: BannerStyle::{None,Banner,Alert}, lock_screen: Shown, center: Shown, badge: Shown, sound: Shown, previews: Previews::{Default,Always,WhenUnlocked,Never}, grouping: Grouping::{Automatic,ByApp,Off} }` | `[]` (an app without a row uses the defaults: allow, `banner_style`, all Shown, `Default`, `Automatic`) | an array of tables in `sill/settings.toml` (a choice about behaviour, not a placement) | mh40583; F270 | proposed (design/28) |
+| `notifications.apps` | `Vec<AppNotify>`; each `{ app: AppId, allow: Allow::{On,Off}, style: BannerStyle::{None,Banner,Alert}, lock_screen: Shown, center: Shown, badge: Shown, sound: Shown, previews: Previews::{Default,Always,WhenUnlocked,Never}, grouping: Grouping::{Automatic,ByApp,Off} }` | `[]` (an app without a row uses the defaults: allow, `banner_style`, all Shown, `Default`, `Automatic`) | an array of tables in `sill/settings.toml` (behaviour, not placement); needs P5's record list kind | mh40583; F270 | proposed (design/28) |
 | `notifications.previews` | `Previews::{Always,WhenUnlocked,Never}` | `Always` | the global default the per-app `Default` follows | mh40583 | proposed (design/28) |
-| `notifications.apps_seen` | state, `$XDG_STATE_HOME/sill/notifying-apps.json` | | the apps the page lists | | proposed (design/28) |
 
 **Priority.** must; before the app pass.
 
@@ -552,38 +686,52 @@ placement list per Focus). Recorded, not specified: it needs Focus modes first.
 | **KindId** | a reverse-DNS string, unique across all apps: `quire.battery`, `quire.launcher.apps`, `org.example.weather.today`. Today's `ds::widget::WidgetKind`, generalised. |
 | **Host** | a surface that shows placed kinds: the desktop, the notification center, the bar, a toolbar. One host has one layout. |
 | **Registry** | every kind a host can place, with what a picker needs to show it without knowing its type. |
-| **Placement** | one placed kind in a host: kind, shape, slot, shown, config. Data. |
-| **Layout** | a host's ordered list of placements, persisted. |
+| **Placement** | one placed instance of a kind in a host: kind, instance, shape (optional), shown, config. Membership, order and config; never a position. Data. |
+| **Layout** | a host's ordered list of placements, in `layout.toml`. |
+| **Cell** | where one instance sits on one output (or on every output); state, in `$XDG_STATE_HOME`. |
 | **Picker** | the UI that adds, removes, orders and configures placements. |
 
-### 5.2 `KindId`, `Shape`, `Placement`, `Layout` (data; crate `ds-settings`, no UI)
+### 5.2 `KindId`, `Shape`, `Placement`, `Layout`, `Cell` (data; crate `ds-settings`, no UI)
 
 Non-UI crates (sill-launcher, sill-services, palmrest) need these, so they live beside the
-settings loader and schema in `ds-settings` (open decision 7.6).
+settings loader and schema in `ds-settings` (decision 6, settled A). `AppId` moves there too
+(from `sill_launcher::ids`), so layouts, `notifications.apps` and the launcher share one type.
 
 ```rust
-pub struct KindId(Cow<'static, str>);                // serde transparent; fixed() / named()
+pub struct KindId(Cow<'static, str>);        // serde transparent; fixed() / named()
+pub struct InstanceId(Cow<'static, str>);    // unique within one layout
+pub struct AppId(pub String);                // moved from sill_launcher::ids
 
 pub enum Shape { One, Small, Medium, Large, ExtraLarge } // One: a list item; the rest: widget sizes
+pub enum Shown { On, Off }                    // checklist state; no bool (CONVENTIONS §11)
 
-pub enum Shown { On, Off }                            // checklist state; no bool (CONVENTIONS §11)
-
-pub struct Placement<S> {
+/// One placed kind in a layout: membership, order (its index in the list) and its config.
+/// No position: where a thing sits on a surface is state (below).
+pub struct Placement {
     pub kind: KindId,
-    #[serde(default)] pub shape: Shape,
-    #[serde(default)] pub shown: Shown,
-    pub slot: S,                                      // where, in the host's own terms
-    #[serde(default)] pub config: toml::Table,        // the kind's own Config, checked by the kind
-    #[serde(flatten)] pub extra: toml::Table,         // unknown keys preserved (22 §2)
+    #[serde(default)] pub instance: InstanceId,   // default: the kind id; a second one gets "<kind>#2"
+    #[serde(default)] pub shape: Option<Shape>,   // None: the host's size for the kind (KindInfo::size_in)
+    #[serde(default)] pub shown: Shown,           // checklists; gallery layouts are always On
+    #[serde(default)] pub config: toml::Table,    // the kind's own Config, checked by the kind
+    #[serde(flatten)] pub extra: toml::Table,     // unknown keys preserved (22 §2)
 }
+pub struct Layout { pub version: u16, pub items: Vec<Placement> }
 
-pub struct Ordered;                                   // position = index in the list
-pub struct GridCell { pub output: OutputName, pub column: u16, pub row: u16 }
-pub struct Chord(pub Shortcut);
-pub struct Corner(pub ScreenCorner);
-
-pub struct Layout<S> { pub version: u16, pub items: Vec<Placement<S>> }
+/// State, not layout.toml: where one instance sits on one output. Today's sill
+/// `desktop_widgets::saved::SavedEntry { output: OutputKey, placement }`, generalised.
+pub struct Cell {
+    pub instance: InstanceId,
+    pub output: Option<OutputName>,   // None = the fallback for every output (sill's OutputKey::Any)
+    pub column: u16,
+    pub row: u16,
+}
 ```
+
+`output: Option<OutputName>` keeps sill's rule exactly (F881): `Some(name)` is sill's
+`OutputKey::Named`, `None` is `OutputKey::Any`; an output with cells of its own reads only those,
+one with none reads the `None` cells; saving an output replaces its own cells and keeps the rest.
+**Membership is global, cells are per output**: the layout says *which* widgets are on the desktop,
+once; the state file says *where* each instance sits on each output.
 
 Rules (all layouts):
 
@@ -595,9 +743,20 @@ Rules (all layouts):
    layouts (widgets) never auto-add.
 3. **Config is the kind's.** `config` is parsed into the kind's `type Config` leniently (22 §2:
    an unknown value falls back to the field's default); the host never reads inside it.
-4. **One writer per layout file** (its owning program), atomic write, directory watch, 30 ms
-   debounce, all as 22 §2. The Settings app writes through the same writer, as for keys.
+4. **One writer task per program, in its services.** Each program's layout file (and each state
+   file) is written by exactly one task in that program's services crate (sill:
+   `sill-services`, the way `pins::run` owns `dock.json` today): it loads once, applies events
+   through a pure reducer, saves atomically (temp file and rename), and picks up an outside edit
+   through the directory watch (30 ms debounce, 22 §2). Surfaces and CLI commands never write:
+   they send the task events (`sill dock pin` sends `PinEvent::Pin` today; a widget drop sends
+   the dropped arrangement; the Settings app's picker writes the file like an outside editor
+   does, and the task's watch picks it up).
 5. **Order is list order.** No `index` field; a reorder rewrites the list.
+6. **A derived place is never written back.** A cell clamped to fit a smaller output, or a
+   default place computed for an unplaced item, is drawn but not saved; only a person's drop or
+   a first placement records one (sill F882, `view::recorded`).
+7. **Hosts with a slot per entry** (hot corners, gesture maps, shortcut bindings) do not use
+   `Placement`: each slot is its own key naming an action id (4.9-4.11).
 
 ### 5.3 `Registry<I>` and the per-surface traits (quire `ds::place`, UI)
 
@@ -608,6 +767,7 @@ pub trait KindInfo: Clone + PartialEq {
     fn summary(&self) -> Option<&Text>;              // gallery description, begins with a verb (HIG widgets)
     fn provider(&self) -> &ProviderApp;              // app id, name, icon: the gallery's grouping
     fn shapes(&self) -> &'static [Shape];            // [One] for list kinds
+    fn size_in(&self, host: HostId) -> Shape;        // the host's size for it (sill's size_of); Placement.shape None = this
     fn default_shown(&self) -> Shown;
     fn preview(&self, shape: Shape, host: HostId) -> Element; // placeholder data, live component
 }
@@ -618,7 +778,7 @@ impl<I: KindInfo> Registry<I> {
     pub fn get(&self, id: &KindId) -> Option<&I>;
     pub fn all(&self) -> &[I];
     pub fn by_provider(&self) -> Vec<(ProviderApp, Vec<&I>)>; // the gallery's sidebar
-    pub fn resolve<S>(&self, layout: &Layout<S>) -> Vec<(&Placement<S>, &I)>; // rule 5.2.1
+    pub fn resolve(&self, layout: &Layout) -> Vec<(&Placement, &I)>; // rule 5.2.1
 }
 pub fn provide_registry<I>(r: Registry<I>) -> Registry<I>;   // context, as provide_widget_registry
 pub fn use_registry<I>() -> Registry<I>;
@@ -651,7 +811,7 @@ Launcher providers and actions live in non-UI crates; for them `preview` is not 
 | `SlotMenu` | one pop-up button per slot, the registry's actions as items, grouped by provider | hot corners (4.9), gestures (4.10), bar presence (4.3) | `Menu{Dropdown}`, the Settings app's `KeyKind::Menu` widget |
 | `ChordList` | `SettingsRow`s: toggle, name, captured chord | shortcuts (4.11) | `KeyKind::Shortcut` capture field |
 | `CustomizePalette` | a sheet: grid of every item, the default set as one draggable row, a display pop-up, Done | toolbars (4.6) | `Sheet`, `KindGallery`'s grid at `Shape::One` |
-| `EditMode` | in place on the host: items take a remove badge, drag moves them, Command-drag outside edit mode does the same for bars and toolbars; Done or Escape leaves | desktop widgets (4.1), bar (4.4), toolbars (4.6), dock (always on) | `bar/reorder.rs`'s press-drop-threshold machine, moved to quire as `ds::motion::reorder` |
+| `EditMode` | in place on the host: items take a remove badge and, where the kind offers more than one, a size choice; Done or Escape leaves. It does **not** gate dragging: moving is always on, past `window.move_threshold_px` (desktop widgets, dock), or with Command held (bar, toolbars), in or out of the mode | desktop widgets (4.1), bar (4.4), toolbars (4.6) | `ds::motion::reorder` (5.8) for the drag; `Chip`/`IconButton` for the badge |
 | `ConfigForm` | the kind's `Config` rendered by the Settings app's widget table (22 §9.1) inside a popover on the placed item ("Edit Batteries") | widgets, stacks | `SettingsSchema` derive on `Config` |
 
 ### 5.5 Motion and detail (26 applies)
@@ -663,18 +823,30 @@ appear motion once when it scrolls into view (the wake stamp), never on a loop.
 
 ### 5.6 Persistence
 
-- **Placements** live in a layout file per program, `$XDG_CONFIG_HOME/<program>/layout.toml`,
-  one `[[<host>]]` array of tables per host (`[[center_widgets]]`, `[[launcher_categories]]`,
-  ...): `sill/layout.toml`, `quire/layout.toml` (shared by every app: share menu, previewers),
-  `<app>/layout.toml` (toolbar, sidebar). The keys above are named `layout.<host>` in the design/22
-  catalogue style.
-- **Scalars** stay in `settings.toml` (22 §2); per-app notification rules stay there too (they
-  are behaviour, not placement).
+- **Placements** (membership, order, per-instance config) live in a layout file per program,
+  `$XDG_CONFIG_HOME/<program>/layout.toml` (decision 1, settled B), one `[[<host>]]` array of
+  tables per host (`[[center_widgets]]`, `[[launcher_categories]]`, ...): `sill/layout.toml`,
+  `quire/layout.toml` (shared by every app: share menu, previewers), `<app>/layout.toml`
+  (toolbar, sidebar).
+- **Positions stay state** under `$XDG_STATE_HOME`: `sill/desktop-widgets.json` (cells per
+  output, F881; 22 §1 rule 3), and any later host whose items sit at coordinates. A position is
+  where the person dropped something on one output; it is not a preference to sync or to show in
+  Settings.
+- **Scalars and behaviour** stay in `settings.toml` (22 §2): the `menu_bar_*` presences,
+  `widgets.desktop`, the grid geometry, per-app notification rules, shortcut bindings.
+- **design/22 gets a section for layouts outside §3**: a new `## 10. Layouts (layout.toml)`,
+  after §9 and after `## 4. Rust shape`, so sill's keys test (`sill-settings/tests/keys.rs`,
+  which reads §3.4-3.8 and §3.11 through `## 4. Rust shape` in both directions) never parses a
+  `layout.*` entry as a `settings.toml` key. Its tables use the `Layout entry` column head.
 - The layout structs derive `SettingsSchema` with `page` and `exposure = Advanced` except where
   the page shows a picker (the picker is the UI; the schema lets the launcher deep link "widgets"
   or "spotlight categories" to it, 22 §9.3).
-- **Migration** (once, at first read, old file left in place): `widgets.center` and
-  `widgets.desktop_widgets` keys, `desktop-widgets.json`, `dock.json`, `control_center.modules`.
+- **Migration** (once, at first read, old value left in place, as 22 §2's mailo rule):
+  `widgets.center`, `widgets.desktop_widgets` and `widgets.world_clocks` into the layout,
+  `dock.json` into `layout.dock`, `control_center.modules` into `layout.control_center`
+  (its Other modules only; the order is dropped). `desktop-widgets.json` is **not** migrated:
+  it stays the state file and gains the `instance` field (an entry without one means the kind's
+  first instance).
 - HIG settings: a system-wide choice (share menu, previewers, shortcuts) is made in the Settings
   app, not in each app; an app's own toolbar and sidebar are the app's.
 
@@ -725,45 +897,83 @@ running it (the widget gallery shows apps that are closed), and a **live interfa
 | Today | Becomes | Where |
 | --- | --- | --- |
 | `ds::widget::WidgetKind` (`widget-interface`) | `KindId` | `ds-settings` (data) |
+| `sill_launcher::ids::AppId` | `AppId`, shared by launcher, layouts and `notifications.apps` | `ds-settings` |
 | `ds::widget::WidgetRegistry`, `WidgetInfo::of`, `TakenKind`, `provide_/use_widget_registry` | `Registry<I>`, `KindInfo`, `provide_/use_registry` | `ds::place` |
 | the widget gallery page (`ds-gallery` pages `widgets`, the picker being built) | `KindGallery` | `ds::components::kind_gallery` |
-| `ds::components::widget_kind::WidgetSize` | `Shape` (widget sizes plus `One`) | `ds-settings` |
-| sill `desktop_widgets::{placement,saved}` (`GridSlot`, `Placement`, `PlacementFile`, hand-written JSON) | `Placement<GridCell>`, `Layout`, the layout file | `ds-settings`; sill keeps `grid_size` and the fill rule |
-| sill `pins::model::{DockPins, PinEvent, PinAt}` | `Layout<Ordered>` plus the dock's own events | sill, over the shared data |
-| sill `bar/reorder.rs` press-drop-threshold machine | `ds::motion::reorder` (one reorder machine for bar, workspace pills, toolbars, checklists) | quire |
-| sill `ControlCenterModule`, `MENU_BAR_ORDER`, `in_menu_bar` | `ModuleInfo` in a registry; order and presence from the layout | sill, contract in quire |
-| sill `ProviderKind` closed enum and its `ALL` order | built-in `KindId`s; order from `layout.launcher_categories` | sill-launcher |
+| `ds::components::widget_kind::WidgetSize`; sill `widgets::size_of(kind, host)` | `Shape`; `KindInfo::size_in(host)` | `ds-settings`; `ds::place` |
+| sill `desktop_widgets::saved::{SavedEntry, OutputKey}` | `Cell { instance, output: Option<OutputName>, column, row }` (`OutputKey::Any` is `None`) | `ds-settings`; sill keeps the file and `with_output` |
+| sill `desktop_widgets::placement::{GridSlot, clamp, nearest_free}` | stay sill's (the desktop grid is sill's); `clamp` keeps rule 5.2.6 | sill |
+| sill `desktop_widgets/drag.rs` (`Hold::{Idle,Pressed,Live}`, threshold, grab offset) with `arrange.rs` (`snap`, `make_room`), and sill `dock/machine/press.rs` (press, threshold, drag reorder, drag-out) | `ds::motion::reorder`: one press-travel-lift-drop machine and the make-room rule for a grid and for a row, used by the desktop, the dock, the bar's Command-drag, toolbars and checklists | quire |
+| sill `pins::model::{DockPins, PinEvent, PinAt}` and `pins::run` | `Layout` plus the dock's own events; `pins::run` is the model for rule 5.2.4's writer task | sill, over the shared data |
+| sill `ControlCenterModule`, `MENU_BAR_ORDER`, `in_menu_bar` | `ModuleInfo` in a registry; presence from the `menu_bar_*` keys, bar order from `layout.bar_items` | sill, contract in quire |
+| sill `ProviderKind` closed enum and its `ALL` order | built-in `KindId`s; order from `layout.launcher_categories` (Web pinned last) | sill-launcher |
 | sill `CornerAction` closed enum; palmrest `Action` | `ShellAction` ids in one action registry | sill (palmrest reads ids) |
-| `ds-settings` `KeyKind::List` ("a rows editor") | its widget is `OrderedChecklist` | ds-settings + Settings app |
-| `SettingsRow`, `ds::motion::roster`, `DragGhost`, `DropPlace` | reused unchanged by the pickers | quire |
+| `ds-settings` `KeyKind::List` ("a rows editor") | its widget is `OrderedChecklist`; `KeyKind::Record` (P5) makes `List(Record)` a table editor | ds-settings + Settings app |
+| `SettingsRow`, `ds::motion::roster`, `DragGhost`, `DropPlace`, `ds::detail::use_tween` | reused unchanged by the pickers and the reorder machine | quire |
 | `AppearancePicker`, `UserPicture` picker | stay single-value pickers (one choice, no placement) | unchanged |
 
 ## 6. Order of work
 
-Before the app pass (shell; each a quire lane plus a sill lane where named):
+### 6.0 Row order (sill's keys test)
+
+sill's `sill-settings/tests/keys.rs` checks design/22 against sill's registered `KeySpec`s in
+both directions over §3.4-3.8 and §3.11 through `## 4. Rust shape` (that is, §3.4-3.23 less
+palmrest's §3.9-3.10), reading quire's doc by path from sill's own checkout. A row with no spec,
+or a spec with no row, fails sill master at once. So every change to those sections goes in this
+order:
+
+1. **sill first.** A new key: sill registers it and lists its path in `AWAITING_ROWS`. A retired
+   key (`widgets.center`, `widgets.desktop_widgets`, `widgets.world_clocks`,
+   `control_center.modules`): sill drops it (keeping the old value readable for the one-time
+   migration, as `extra`).
+2. **Then quire** adds, changes or removes the design/22 row, and tells sill.
+3. **Then sill** removes the `AWAITING_ROWS` entry once the row has landed.
+
+This document's own tables are proposals, not design/22 rows; nothing in sill reads them. Layout
+entries (`layout.*`) never enter §3: they go to design/22's new `## 10. Layouts (layout.toml)`
+(5.6), which the test skips. State files (`desktop-widgets.json`, `notifying-apps.json`) get no
+row anywhere. No placeholder path (a `<module>` or `<app>` in a key name) is written in a first
+table cell anywhere in design/22 or here, since the parse takes any backticked first cell.
+
+### 6.1 Before the app pass
+
+Shell; each a quire lane plus a sill lane where named.
 
 1. **P0 Land the widget interface** (in progress on `widget-interface`) as the reference
    implementation. No generalisation inside that lane.
-2. **P1 Extract the pattern** (quire): `KindId`, `Shape`, `Shown`, `Placement`, `Layout` in
-   `ds-settings` with the lenient loader and the layout file writer; `Registry<I>`/`KindInfo` in
-   `ds::place`; `WidgetRegistry` becomes `Registry<WidgetInfo>`; `ds::motion::reorder`;
-   `OrderedChecklist`; `KindGallery` from the widget gallery. Warn sill before any rename lands
-   (the memory rule on sill reading quire by path).
+2. **P1 Extract the pattern** (quire): `KindId`, `InstanceId`, `Shape`, `Shown`, `Placement`,
+   `Layout`, `Cell` and `AppId` in `ds-settings` with the lenient loader and the atomic writer;
+   `Registry<I>`/`KindInfo` (with `size_in`) in `ds::place`; `WidgetRegistry` becomes
+   `Registry<WidgetInfo>`; `ds::motion::reorder` from sill's `desktop_widgets/drag.rs`,
+   `arrange.rs` and `dock/machine/press.rs`; `OrderedChecklist`; `KindGallery` from the widget
+   gallery; design/22 `## 10. Layouts`. Warn sill before any rename lands (sill reads quire by
+   path).
 3. **P2 Widgets on the shared shape** (sill): the hosts read `layout.center_widgets` and
-   `layout.desktop_widgets`; migrate the old keys and `desktop-widgets.json`; the gallery opens
-   from the desktop menu and the notification center; `EditMode` on the desktop.
-4. **P3 Launcher categories** (sill + Settings page): `ProviderInfo`, `layout.launcher_categories`
-   checklist with order, `launcher.excluded_folders`.
-5. **P4 Control center and bar** (sill): `layout.control_center` (Other modules),
-   `InMenuBar::WhenActive`, `layout.bar_items` / `layout.bar_hidden`, Command-drag in the bar.
-6. **P5 Notifications per app** (sill): `notifications.apps`, the seen-apps state, the Settings
-   page.
+   `layout.desktop_widgets` (membership) through one writer task in `sill-services`; cells stay
+   in `desktop-widgets.json` with the new `instance` field; World Clock's zones move to its
+   instance config; the gallery opens from the desktop menu and the notification center;
+   `EditMode` adds remove badges and size choices (dragging stays always on). Row order 6.0 for
+   the three retired `widgets.*` keys.
+4. **P3 Launcher categories** (sill + Settings page): `ProviderInfo`,
+   `layout.launcher_categories` with Web pinned last and Web/Files/Clipboard reading their keys,
+   `launcher.excluded_folders` (AWAITING first).
+5. **P4 Control center and bar** (sill): `layout.control_center` (Other modules; the order leaves
+   the person's hands), `InMenuBar::WhenActive`, the new `control_center.menu_bar_focus` key;
+   the tray service reads the SNI `Id` property (`TrayItem.sni_id`), and `layout.bar_items` /
+   `layout.bar_hidden` are keyed by it; Command-drag in the bar on `ds::motion::reorder`.
+6. **P5 Notifications per app** (quire + sill): quire adds a record kind to ds-settings'
+   `KeyKind` (`Record { fields: Vec<FieldSpec> }`, so `List(Box<Record>)` describes a
+   `Vec<struct>` key and the Settings app draws it as a table editor; today `List` holds only
+   scalar kinds); sill adds `notifications.apps` and `notifications.previews` (AWAITING first),
+   the `notifying-apps.json` state file written by the notifications task, and the Settings page.
 7. **P6 Actions** (sill, palmrest): the `ShellAction` registry; hot corners, gestures and the
-   system shortcuts list read ids; `shortcuts.bindings`.
-8. **P7 Dock on the shared shape** (sill): `layout.dock`, migration of `dock.json`; stacks stay
-   deferred.
+   system shortcuts list read ids; `shortcuts.bindings` written to COSMIC's `custom` and
+   `system_actions` with COSMIC winning a clash (4.11); design/22 §5's Keyboard / Shortcuts line
+   now points here.
+8. **P7 Dock on the shared shape** (sill): `layout.dock`, migration of `dock.json`, `pins::run`
+   as its writer task; stacks stay deferred.
 
-During the app pass (with each app):
+### 6.2 During the app pass (with each app)
 
 9. **A1 Toolbars** (quire, after H4 `MenuModel`): `Toolbar`, `ToolbarItem`, `CustomizePalette`;
    first in Files and Mail.
@@ -775,8 +985,11 @@ During the app pass (with each app):
 13. **A5 Share menu**: `ShareTarget`, `ShareMenu`, the Extensions page.
 14. **A6 App Shortcuts**: after `MenuModel`.
 
-After: Focus modes and filters (4.15), stacks (4.5), out-of-process widgets over
-`org.quire.Kinds1` with templates (5.7.3), preview options per type (4.8).
+### 6.3 After
+
+Focus modes and filters (4.15), stacks (4.5), out-of-process widgets over `org.quire.Kinds1`
+with templates (5.7.3), preview options per type (4.8), the hot-corner modifier once the
+compositor fork reports held modifiers (4.9).
 
 ## 7. Open decisions (for the user; each has a recommendation)
 
@@ -810,11 +1023,21 @@ After: Focus modes and filters (4.15), stacks (4.5), out-of-process widgets over
    providers during the app pass (cheap, many apps exist), or only our own interface later.
    **Recommend consume both** during A4, marked as foreign rows with the app's icon.
 8. **One gallery or two for widgets.** The notification center and the desktop share one
-   registry and one `KindGallery`, with two layouts (ordered list, grid per output), as the
-   reference; or one layout with a host field. **Recommend two layouts, one registry.**
+   registry and one `KindGallery`, with two layouts (an ordered list; a desktop membership list
+   whose cells per output are state), as the reference; or one layout with a host field. **Recommend two layouts, one registry.**
 9. **Bar order key when the person never reorders.** Keep `layout.bar_items` empty (default
    order computed) or write the full order on first run. **Recommend empty until the first
    Command-drag**, so a new default order can still ship to people who never touched it.
+10. **Shortcut clashes with COSMIC** (new in the revision, 4.11). (A) the chord COSMIC holds
+    wins: sill writes only chords COSMIC does not hold for another action, and the Settings app
+    shows the clash on the row; (B) sill's `shortcuts.bindings` wins and overwrites COSMIC's
+    binding; (C) refuse to save a clashing chord. **Recommend A**: COSMIC's files are the live
+    truth for global keys and may be edited outside sill (COSMIC Settings, by hand); overwriting
+    silently breaks a binding the person made there, and refusing hides why.
+
+Note on decision 1 (revision): `layout.toml` holds only membership, order and per-instance
+config. Positions and cells stay state (`$XDG_STATE_HOME/sill/desktop-widgets.json`, sill F881,
+22 §1 rule 3); the settled choice is unchanged by this.
 
 ## 8. Sources
 
@@ -839,5 +1062,6 @@ After: Focus modes and filters (4.15), stacks (4.5), out-of-process widgets over
 - Our docs: 10, 12, 13 (13.3.7, 13.3.9, 13.3.12), 20 (1.1-1.6, 1.9, 1.14, 1.16, 2.2-2.4), 22
   (2, 3.4-3.6, 3.12-3.13, 3.19-3.23, 5, 9), 23 (4.3, 6; section 9 on `widget-interface`), 27
   (0.2, 4.16, 5.2, 5.11, 5.12, 6.2).
-- Code (read-only): sill at `45f9af0`; quire `master` at `a2cbcb7a` and the `widget-interface`
+- Code (read-only): sill at `45f9af0`, re-read at master `0096872` for this revision (widget drag
+  F880-F892, `saved.rs`, `size_of`, the tray model, `rank/sections.rs`, the keys test); quire `master` at `a2cbcb7a` and the `widget-interface`
   worktree's uncommitted `crates/ds/src/widget/`.
