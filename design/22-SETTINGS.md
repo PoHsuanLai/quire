@@ -82,10 +82,13 @@ non-destructive. This is the "adopt old json" step in PLAN "mailo consumption. P
 
 Types used below (see section 4 for the full list): `Px(u16)` logical pixels, `Ms(u16)`
 milliseconds, `Percent(u8)` 0..100, `Fraction(u16)` per-mille (1000 = 1.0; used for ratios,
-gains and constants like `c = 0.55` -> `550`), `Count(u16)` a plain quantity, `Scalar(f32)` a
-dimensionless physics constant that does not fit the above (momentum model exponents), `Units`
-a signed raw touchpad/report unit (device space, not px). Every enum is named; **no key is a
-`bool`** (`CONVENTIONS.md#11-quire-addenda-2026-09-24`).
+gains and constants like `c = 0.55` -> `550`), `Count(u16)` a plain quantity, `Secs(u16)`
+seconds and `Mins(u16)` minutes (added Q445: before this, a seconds or minutes key had no unit
+of its own and used `Count` with a unit label in prose; `Ms` is milliseconds and does not reach
+the tens-of-seconds to hours range idle timeouts need), `Scalar(f32)` a dimensionless physics
+constant that does not fit the above (momentum model exponents), `Units` a signed raw
+touchpad/report unit (device space, not px). Every enum is named; **no key is a `bool`**
+(`CONVENTIONS.md#11-quire-addenda-2026-09-24`).
 
 Status column values: **proposed** = doc marks the value proposed, this is the "make it a key"
 case; **settled (preference)** = doc marks it settled but it is a user-facing choice, so it is
@@ -504,7 +507,7 @@ The client-decorated window frame (design/13 §13.3.11, design/04 "Window frame"
 
 ### 3.19 `session` (sill/settings.toml)
 
-The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock screen, §1.10 polkit prompt; sill FINDINGS "M7"): which lock screen and which polkit agent `dist/sill-session` starts. Both are a name from a fixed vocabulary or a command line, so a user can point at a program this list does not know. Page Accounts, all Advanced (§5). Idle timeouts are not sill's: cosmic-idle keeps them in COSMIC's own config.
+The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock screen, §1.10 polkit prompt; sill FINDINGS "M7"): which lock screen and which polkit agent `dist/sill-session` starts. Both are a name from a fixed vocabulary or a command line, so a user can point at a program this list does not know. Page Accounts, all Advanced (§5), except `session.lock_grace_s`: it answers sill's own idle service (F863, F908), not the locker or the polkit agent, so it moved to the new Power page (§5) alongside `idle.*` (Q445). Idle timeouts are not sill's: cosmic-idle keeps them in COSMIC's own config.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -512,7 +515,7 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 | `session.polkit_agent` | `String` | `"auto"` | `auto` (polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, then cosmic-osd last: running cosmic-osd only for polkit would add its own volume popup beside sill's OSD), `sill` (the shell's own agent and prompt, M11), `off`, one of those names, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-10-polkit-prompt-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
 | `session.lock_clock` | `LockClock::{H24,H12}` | `H24` | `14:05`, or `2:05` without AM/PM as the reference lock screen shows it | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS F553 | proposed (M11 freeze, 2026-09-26) |
 | `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | proposed (2026-09-27) |
-| `session.lock_grace_s` | `Count` (s) | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
+| `session.lock_grace_s` | `Secs` | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
 
 ### 3.20 `widgets` (sill/settings.toml)
 
@@ -570,19 +573,19 @@ One invisible square per enabled corner (design/20 §1.16; design/13 §13.3.12 f
 
 ### 3.24 `idle` (sill/settings.toml)
 
-sill's own idle service, replacing cosmic-idle in a sill session (the user's pick, 2026-09-27): dim with an overlay (never real brightness), screen off through output power, lock as the displays go off, suspend through logind; `org.freedesktop.ScreenSaver.Inhibit`, Wayland idle-inhibit and logind inhibitors are honoured (sill FINDINGS "sill idle (Q420 B)", F900-F913). Page Accounts for now (no Power page yet).
+sill's own idle service, replacing cosmic-idle in a sill session (the user's pick, 2026-09-27): dim with an overlay (never real brightness), screen off through output power, lock as the displays go off, suspend through logind; `org.freedesktop.ScreenSaver.Inhibit`, Wayland idle-inhibit and logind inhibitors are honoured (sill FINDINGS "sill idle (Q420 B)", F900-F913). Page Power (§5, Q445; before that landed, "Page Accounts for now").
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `idle.times` | `IdleTimesFrom::{Cosmic,Sill}` | `Cosmic` | `Cosmic` reads COSMIC's Power settings (`com.system76.CosmicIdle`, read-only), so COSMIC Settings' Power page keeps working; `Sill` uses the keys below | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
-| `idle.screen_off_ac_min` | `Count` (min) | `15` | `0..=240`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
-| `idle.screen_off_battery_min` | `Count` (min) | `15` | `0..=240`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
-| `idle.suspend_ac_min` | `Count` (min) | `30` | `0..=480`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
-| `idle.suspend_battery_min` | `Count` (min) | `15` | `0..=480`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
-| `idle.dim_s` | `Count` (s) | `5` | `0..=60`, 0 no dim; seconds before screen-off that the overlay dims | sill FINDINGS "sill idle (Q420 B)", F902 | proposed (Q441, 2026-09-27) |
+| `idle.screen_off_ac_min` | `Mins` | `15` | `0..=240`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.screen_off_battery_min` | `Mins` | `15` | `0..=240`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.suspend_ac_min` | `Mins` | `30` | `0..=480`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.suspend_battery_min` | `Mins` | `15` | `0..=480`, 0 never | sill FINDINGS "sill idle (Q420 B)", F901 | proposed (Q441, 2026-09-27) |
+| `idle.dim_s` | `Secs` | `5` | `0..=60`, 0 no dim; seconds before screen-off that the overlay dims | sill FINDINGS "sill idle (Q420 B)", F902 | proposed (Q441, 2026-09-27) |
 | `idle.dim_level_pct` | `Percent` | `50` | `10..=90` | sill FINDINGS "sill idle (Q420 B)", F902 | proposed (Q441, 2026-09-27) |
 | `idle.lock` | `IdleLockAt::{ScreenOff,Never}` | `ScreenOff` |  | sill FINDINGS "sill idle (Q420 B)", F904 | proposed (Q441, 2026-09-27) |
-| `idle.locked_screen_off_s` | `Count` (s) | `60` | `0..=600`, 0 means the normal time; how soon a locked screen goes dark again | sill FINDINGS "sill idle (Q420 B)", F903 | proposed (Q441, 2026-09-27) |
+| `idle.locked_screen_off_s` | `Secs` | `60` | `0..=600`, 0 means the normal time; how soon a locked screen goes dark again | sill FINDINGS "sill idle (Q420 B)", F903 | proposed (Q441, 2026-09-27) |
 
 ## 4. Rust shape
 
@@ -600,9 +603,18 @@ pub struct Ms(pub u16);
 pub struct Percent(pub u8);           // 0..=100, clamped on construction
 pub struct Fraction(pub u16);         // permille: 1000 = 1.0; not clamped (gains exceed 1.0)
 pub struct Count(pub u16);
+pub struct Secs(pub u16);             // seconds (Q445: idle.dim_s, idle.locked_screen_off_s, session.lock_grace_s)
+pub struct Mins(pub u16);             // minutes (Q445: idle.screen_off_*_min, idle.suspend_*_min)
 pub struct Scalar(pub f32);           // dimensionless physics constant, no natural unit above
 pub struct Units(pub i32);            // raw touchpad/report units, signed
 ```
+
+`Secs` and `Mins` are schema-rendered exactly like `Count`, `Px` and `Ms`: the field's own
+`#[settings(range = "...", unit = "s")]` (or `"min"`) attribute gives the derive its
+`KeyKind::Bounded` floor, ceiling and unit label (section 9.1) — the newtype itself carries no
+range, so construction never fails and a lenient parse falls back to the field's default exactly
+as `Count` does (section 6 acceptance item 2's "negative where `Px` (`u16`) expected" row, read
+for `Secs`/`Mins` too).
 
 Every domain is one small struct, one field per key, `#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]`,
 `#[serde(default)]` on every field (`CONVENTIONS.md#3-serde`: "every field added after the
@@ -923,7 +935,8 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app), `sound.ui_sounds`, `sound.volume_feedback` |
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
 | **Spaces** | `spaces.mail_frame_policy`, `spaces.wallpaper_follows_space`; the per-workspace dots/grain/theme/accent editor writes `spaces.json` (state), not these defaults |
-| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source` |
+| **Power** (added Q445; sill's own idle service, section 3.24) | `idle.times`, `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Cosmic` they still render, disabled, so the row explains itself) |
+| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
 ## 6. Acceptance
 
@@ -1017,7 +1030,7 @@ install. A schema without a program (a stale file) is skipped with a warning.
 1. Discover every `*.settings.toml` under `$XDG_DATA_DIRS/quire/settings/` (and
    `$XDG_DATA_HOME`), parse, group keys by `page` then `section`, render with the widget table
    above; pages come from a fixed `Page` enum (Appearance, Dock, Mouse and Gestures, Keyboard
-   and Shortcuts, Notifications, Spaces, Accounts, Apps, plus one page per third-party app
+   and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, plus one page per third-party app
    id). "Advanced" keys render under a disclosure at the end of their section.
 2. Read the current value from the key's `file` through the shared lenient loader; write with
    the atomic writer; the owning program's directory watch applies it live (section 2).

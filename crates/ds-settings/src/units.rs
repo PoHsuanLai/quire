@@ -47,6 +47,23 @@ impl From<Percent> for u8 {
 #[serde(transparent)]
 pub struct Count(pub u16);
 
+/// Seconds, as a key stores them (design/22-SETTINGS.md section 3.24 `idle.dim_s`,
+/// `idle.locked_screen_off_s`; section 3.19 `session.lock_grace_s`). Lenient like every other
+/// unit here: an out-of-range or malformed value is caught by the field's own type at
+/// deserialization (a negative `Secs` fails to parse as `u16` and falls back to the field's
+/// default, `lenient.rs`), not clamped by the newtype the way [`Percent`] is — the schema's own
+/// `range` attribute is what draws the slider's floor and ceiling (`ds-settings-derive`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Secs(pub u16);
+
+/// Minutes, as a key stores them (design/22-SETTINGS.md section 3.24 `idle.screen_off_ac_min`,
+/// `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`). Same
+/// lenient shape as [`Secs`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Mins(pub u16);
+
 /// A dimensionless physics constant that fits no unit above (momentum model exponents).
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Serialize, Deserialize)]
 #[serde(transparent)]

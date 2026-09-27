@@ -48,5 +48,5 @@ pub use settings::{
     PlateGlyphPolicy,
 };
 pub use spaces::{SPACES, SpacesWatch};
-pub use units::{Count, Fraction, Ms, Percent, Px, Scalar, Units};
+pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{AppearanceWatch, DEBOUNCE, FileWatch, watch, watch_file};

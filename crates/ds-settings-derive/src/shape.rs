@@ -57,7 +57,7 @@ impl fmt::Display for ShapeError {
 /// time instead, by `SchemaVariants`' `on_unimplemented` message.
 const NUMBERS: &[&str] = &[
     "u8", "u16", "u32", "u64", "u128", "usize", "i8", "i16", "i32", "i64", "i128", "isize", "f32",
-    "f64", "Px", "Ms", "Percent", "Count", "Fraction", "Scalar", "Units",
+    "f64", "Px", "Ms", "Percent", "Count", "Fraction", "Scalar", "Units", "Secs", "Mins",
 ];
 
 /// The [`Shape`] of `field`'s type `ty`, given what its attributes asked for.
@@ -175,7 +175,16 @@ mod tests {
 
     #[test]
     fn a_number_without_a_range_is_missing_range() {
-        const CASES: &[&str] = &["u8", "i64", "f32", "Px", "ds_settings::Ms", "Percent"];
+        const CASES: &[&str] = &[
+            "u8",
+            "i64",
+            "f32",
+            "Px",
+            "ds_settings::Ms",
+            "Percent",
+            "Secs",
+            "Mins",
+        ];
         for text in CASES {
             assert_eq!(
                 shape_of("size", &ty(text), KindHint::Infer).err(),
