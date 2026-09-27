@@ -8,7 +8,8 @@
 //! would have carried the layer stack, the centring stage and the modal scrim into a surface
 //! that wants none of them by default.
 //!
-//! Mounted shown, it slides in from past the right edge (`Anim::PanelIn`, `--t-move --e-out`).
+//! Mounted shown, it slides in from past the right edge (`Anim::PanelIn`, `--t-move --e-out`);
+//! at the bottom edge (Edit Widgets, sill Q521) it arrives as a sheet does (`peek-in`).
 //! Every change after that is driven motion (design/05 section 14, wave H1): hidden, a spring in
 //! Rust slides it back out past the edge and `on_hidden` runs once the spring rests, when the
 //! host unmaps the surface; shown again while it leaves, it turns back from where it is.
@@ -29,9 +30,14 @@ use dioxus::prelude::*;
 /// Which edge a panel stands at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PanelEdge {
-    /// The right edge, where macOS keeps Notification Center.
+    /// The right edge, where macOS keeps Notification Center: full height, `width` wide.
     #[default]
     Right,
+    /// The bottom edge, as the reference's Edit Widgets sheet (sill Q521): centred, `width` wide
+    /// at most (less `--s-8` at each side), `height` tall but never more than half the root, so
+    /// the top of the desktop, where widgets land, stays in view. It arrives and leaves as a
+    /// sheet does (`peek-in`, then the sheet's spring), not by sliding off an edge.
+    Bottom,
 }
 
 impl PanelEdge {
@@ -39,6 +45,25 @@ impl PanelEdge {
     fn slug(self) -> &'static str {
         match self {
             PanelEdge::Right => "right",
+            PanelEdge::Bottom => "bottom",
+        }
+    }
+
+    /// The keyframe its first showing plays: the edge panel's slide, or the sheet's `peek-in`
+    /// at `--t-move --e-out` (no spring: opening is not contact, design/05 principle 2).
+    fn entrance(self) -> Anim {
+        match self {
+            PanelEdge::Right => Anim::PanelIn,
+            PanelEdge::Bottom => Anim::PeekFullIn,
+        }
+    }
+
+    /// Its extent as an inline style: the width at the right; the width and the height at the
+    /// bottom.
+    fn extent(self, width: Px, height: Px) -> String {
+        match self {
+            PanelEdge::Right => format!("width:{}px;", width.0),
+            PanelEdge::Bottom => format!("width:{}px;height:{}px;", width.0, height.0),
         }
     }
 }
@@ -55,7 +80,8 @@ pub enum PanelScrim {
 }
 
 /// A panel at `edge`, `width` wide (`notifications.center_width_px`, 384), in `material`
-/// (Popover, design/20 section 1.6). `onclose` hears Escape inside the panel and a press on its
+/// (Popover, design/20 section 1.6). At `PanelEdge::Bottom` it is `height` tall (440 by
+/// default), capped at half the root. `onclose` hears Escape inside the panel and a press on its
 /// scrim.
 #[component]
 pub fn Panel(
@@ -65,11 +91,12 @@ pub fn Panel(
     #[props(default)] onclose: Option<EventHandler<()>>,
     #[props(default = Px(384.0))] width: Px,
     #[props(default)] edge: PanelEdge,
+    #[props(default = Px(440.0))] height: Px,
     #[props(default = Material::Popover)] material: Material,
     #[props(default)] scrim: PanelScrim,
     children: Element,
 ) -> Element {
-    let showing = use_spring_presence(Some(shown), Some(on_hidden), Anim::PanelIn);
+    let showing = use_spring_presence(Some(shown), Some(on_hidden), edge.entrance());
     let close = onclose.unwrap_or_default();
     let dim = match scrim {
         PanelScrim::Dim(strength) => Some(ScrimLook {
@@ -99,7 +126,7 @@ pub fn Panel(
                     "data-presence": showing.drawn().then(|| showing.slug()),
                     "data-drive": showing.drive(),
                     "data-overscroll": "band",
-                    style: "width:{width.0}px;{showing.style()}",
+                    style: "{edge.extent(width, height)}{showing.style()}",
                     onkeydown: move |event| {
                         if event.key() == Key::Escape {
                             event.stop_propagation();

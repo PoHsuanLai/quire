@@ -3,6 +3,7 @@
 //! (`use_widget`), and draws it through the widget's own `view` inside a `WidgetFrame`, whose
 //! corner, inset, material, Space tint and title row are quire's alone.
 
+use crate::components::widget_exit::CardPresence;
 use crate::components::widget_frame::WidgetFrame;
 use crate::components::widget_kind::{Lift, WidgetHost, WidgetSize};
 use crate::motion::WakeStamp;
@@ -15,8 +16,9 @@ use dioxus::prelude::*;
 /// now. `wake` replays the widget's appear motion when it changes (a host passes a new stamp as
 /// its widgets come into view); `onrefresh` hears the timeline's refresh policy come due;
 /// `onintent` hears the widget's controls; `id` names the card for the layer's input and blur
-/// regions; `lift` picks the card up while a host moves it (sill Q430). The card writes
-/// `data-widget` with the kind.
+/// regions; `lift` picks the card up while a host moves it (sill Q430); `presence:
+/// CardPresence::Leaving` plays the card's exit and `on_gone` runs once it has settled, when the
+/// host drops the card (sill G423). The card writes `data-widget` with the kind.
 #[component]
 pub fn WidgetCard<W: Widget>(
     widget: W,
@@ -28,6 +30,8 @@ pub fn WidgetCard<W: Widget>(
     #[props(default)] onrefresh: Option<EventHandler<RefreshAsk>>,
     #[props(default)] onintent: Option<EventHandler<W::Intent>>,
     #[props(default)] lift: Lift,
+    #[props(default)] presence: CardPresence,
+    #[props(default)] on_gone: Option<EventHandler<()>>,
 ) -> Element {
     let _ = widget;
     let size = fit::<W>(size);
@@ -39,7 +43,7 @@ pub fn WidgetCard<W: Widget>(
         act: onintent,
     };
     rsx! {
-        WidgetFrame { size, host, title: W::title(), id, kind: Some(W::kind()), lift,
+        WidgetFrame { size, host, title: W::title(), id, kind: Some(W::kind()), lift, presence, on_gone,
             {W::view(&entry, cx)}
         }
     }

@@ -12,7 +12,7 @@ use crate::components::month_grid_data::{
     Step, WeekNumbers,
 };
 use crate::components::text_runs::Text;
-use crate::components::widget_kind::WidgetSize;
+use crate::components::widget_kind::{WidgetHost, WidgetSize};
 use crate::tokens::LabelHue;
 use crate::widget::contract::{Widget, WidgetContext, WidgetKind};
 use dioxus::prelude::*;
@@ -107,6 +107,15 @@ impl Widget for MonthWidget {
 
     fn sizes() -> &'static [WidgetSize] {
         &[WidgetSize::Small, WidgetSize::Medium, WidgetSize::Large]
+    }
+
+    /// Small on the desktop (the compact month); Large in the notification center (the month
+    /// over the day's events, the column's width and two cells tall).
+    fn size_in(host: WidgetHost) -> WidgetSize {
+        match host {
+            WidgetHost::Desktop => WidgetSize::Small,
+            WidgetHost::Tile => WidgetSize::Large,
+        }
     }
 
     fn description() -> Text {

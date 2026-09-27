@@ -178,7 +178,9 @@ desktop layer and notification center; the providers that feed entries; the stat
   gains the placement's `instance` (5.2) so two widgets of one kind keep separate cells; an
   entry whose instance is no longer in `layout.desktop_widgets` is ignored and dropped on the
   next save of that output. F882's rule stands: a clamped place is never written back.
-- **Size**: `Placement.shape` is `None` by default, meaning the host's size for the kind
+- **Size**: one size per widget per host (the user, 2026-09-28: "no different sizes, just one";
+  built as `Widget::size_in` / `WidgetInfo::size_in` / `WidgetRegistry::sized`, design/23 section
+  9.4; the gallery offers no size, sill Q520). `Placement.shape` is `None` by default, meaning the host's size for the kind
   (`size_of(kind, host)`, which moves with the kinds into the registry as `KindInfo::size_in(host)`).
   A shape is written only when the person picks one from the widget's context menu, and only a
   shape the kind lists for that host is offered; a stored shape the kind no longer offers falls

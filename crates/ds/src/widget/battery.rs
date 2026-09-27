@@ -10,7 +10,7 @@ use crate::components::battery_level::{BatteryLevel, RingMark};
 use crate::components::device_glyph::{Device, DeviceGlyph};
 use crate::components::text_runs::Text;
 use crate::components::vocab::Fraction;
-use crate::components::widget_kind::WidgetSize;
+use crate::components::widget_kind::{WidgetHost, WidgetSize};
 use crate::icon::render::IconSize;
 use crate::motion::WakeStamp;
 use crate::widget::contract::{NoIntent, Widget, WidgetContext, WidgetKind};
@@ -94,6 +94,15 @@ impl Widget for BatteryWidget {
 
     fn sizes() -> &'static [WidgetSize] {
         &[WidgetSize::Small, WidgetSize::Medium]
+    }
+
+    /// Small on the desktop (the ring and the hero figure, or the grid); Medium in the
+    /// notification center, whose tiles span the column.
+    fn size_in(host: WidgetHost) -> WidgetSize {
+        match host {
+            WidgetHost::Desktop => WidgetSize::Small,
+            WidgetHost::Tile => WidgetSize::Medium,
+        }
     }
 
     fn description() -> Text {
@@ -182,6 +191,9 @@ fn grid(cells: &[BatteryCell], wake: WakeStamp) -> Element {
     }
 }
 
+/// The Medium row: four places at the reference's fixed 80 pitch (M15), the batteries in the
+/// first and a bare track, with no number, in each place left over, so one battery sits at the
+/// left of the row rather than alone in the middle, and two never spread to the card's ends.
 fn row(cells: &[BatteryCell], wake: WakeStamp) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": BatteryLayout::Row.slug(),
@@ -191,6 +203,20 @@ fn row(cells: &[BatteryCell], wake: WakeStamp) -> Element {
                     span { class: "ds-batteries-figure", BatteryFigure { level: cell.level, wake } }
                 }
             }
+            for place in cells.len()..MAX_RINGS {
+                {empty_cell(place)}
+            }
+        }
+    }
+}
+
+/// A row's place with no battery: the bare track over an empty figure line, so it keeps the
+/// pitch and the height of a place with one.
+fn empty_cell(place: usize) -> Element {
+    rsx! {
+        div { key: "empty-{place}", class: "ds-batteries-cell", "data-place": "empty",
+            {empty(place)}
+            span { class: "ds-batteries-figure" }
         }
     }
 }
@@ -200,7 +226,12 @@ fn waiting(layout: BatteryLayout) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": layout.slug(), "data-waiting": "",
             for place in 0..MAX_RINGS {
-                {empty(place)}
+                {
+                    match layout {
+                        BatteryLayout::Row => empty_cell(place),
+                        BatteryLayout::Solo | BatteryLayout::Grid => empty(place),
+                    }
+                }
             }
         }
     }

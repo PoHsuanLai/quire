@@ -181,6 +181,7 @@ pub mod tree_item;
 pub(crate) mod tree_item_parts;
 pub mod user_picture;
 pub mod vocab;
+pub mod widget_exit;
 pub mod widget_frame;
 pub mod widget_kind;
 pub(crate) mod widget_scope;
@@ -339,6 +340,7 @@ pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent, PulseKey,
     PulsePhase, Selection, Shortcut, StaggerIndex, Switch,
 };
+pub use widget_exit::CardPresence;
 pub use widget_frame::WidgetFrame;
 pub use widget_kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 pub use widget_slot::WidgetSlotGuide;
