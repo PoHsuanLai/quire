@@ -20,6 +20,7 @@ pub mod fields;
 pub mod gaps;
 pub mod glyphs;
 pub mod launcher;
+pub mod launcher_hints;
 pub mod level;
 pub mod level_tile;
 pub mod lists;

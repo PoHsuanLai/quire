@@ -5,6 +5,7 @@
 
 use crate::components::avatar::AvatarFace;
 use crate::components::row_action::RowAction;
+use crate::components::row_chord::RowChord;
 use crate::components::row_shape::RowShape;
 use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Check, Shortcut};
@@ -107,6 +108,9 @@ pub struct MenuRow<T> {
     pub tile: Option<Tile>,
     /// Its trail.
     pub trail: Trail,
+    /// The keys of its action, as a plain chord after the trail: by default only while it is
+    /// the selection (Spotlight's hint, [`RowChord::on_selected`]); none when empty.
+    pub chord: RowChord,
     /// Its check mark, for a menu of toggles.
     pub check: Option<Check>,
     /// Whether it can be picked.
@@ -127,6 +131,7 @@ impl<T> MenuRow<T> {
             detail: None,
             tile: None,
             trail: Trail::None,
+            chord: RowChord::default(),
             check: None,
             availability: Availability::Enabled,
             trailing: None,
