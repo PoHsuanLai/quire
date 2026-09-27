@@ -328,6 +328,12 @@ html,body{margin:0;padding:0;background:transparent}
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
+/* widget-out (quire's, sill G423): a widget's card leaving as the person removes it: it shrinks
+   to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
+   accelerate), holding its transparent last frame until the host drops the card. Under Reduced
+   it only fades (`menu-out`). */
+@keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
+
 /* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
    swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
    `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
@@ -465,6 +471,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
 @keyframes level-tick--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+@keyframes widget-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 @keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 @keyframes banner-in--b{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
@@ -634,6 +641,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-pane-in-r-out[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
 .a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-spring) backwards;}
 .a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-spring) backwards;}
+.a-widget-out[*|data-pulse=a]{animation:widget-out var(--t-move) var(--e-exit) forwards;}
+.a-widget-out[*|data-pulse=b]{animation:widget-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 .ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=b]{animation-name:hold--b;}
@@ -767,6 +776,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=b]{animation-name:menu-out--b;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
    design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which
@@ -3374,6 +3385,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget{ transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out); }
 .ds-widget[*|data-lift=lifted]{ transform:scale(var(--pickup)); z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
+
+/* Leaving (sill G423): a card its host removed plays `widget-out` on its pulse class (shrinks to
+   .85 and fades at `--t-move --e-exit`; a fade alone under Reduced) and takes no pointer while
+   it goes; the host drops it at `settle(WidgetOut)`. */
+.ds-widget[*|data-presence=leaving]{ pointer-events:none; }
 
 /* WidgetSlotGuide (sill Q431, design/23 section 9.8): where a dragged widget will land, the
    card's footprint at the snap cell, a quiet translucent plate in the card's corner with no

@@ -806,6 +806,14 @@ use, no frame-accurate recording found).
 
 Both settle to zero frames (`ds-native/tests/widget_edit.rs`, on the virtual clock).
 
+**Leaving (sill G423, 2026-09-28).** A desktop widget removed in Edit Widgets used to vanish in a
+frame. `WidgetCard { presence: CardPresence::Leaving, on_gone }` (and `WidgetFrame`) plays the
+card's exit, `widget-out` (design/05 section 4.14: shrinks to .85 and fades at `--t-move
+--e-exit`; a fade alone under Reduced), takes no pointer (`data-presence="leaving"`), and calls
+`on_gone` once at `settle(WidgetOut)`. The host keeps drawing the removed card until then and
+drops it there; passing `Placed` again before then takes the exit back and `on_gone` never runs
+(`ds-native/tests/widget_card_exit.rs`).
+
 ### 9.9 What sill changes
 
 See CONSUMING.md, "Widget interface (2026-09-27)", for the full list with call sites.
