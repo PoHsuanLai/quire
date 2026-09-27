@@ -1,0 +1,250 @@
+app_switcher.css	.ds-switcher	--switcher-cell: 112px
+app_switcher.css	.ds-switcher	--switcher-icon: 96px
+app_switcher.css	.ds-switcher	--switcher-gap: 8px
+app_switcher.css	.ds-switcher	--switcher-view: 592px
+app_switcher.css	.ds-switcher	--switcher-shift: 0px
+avatar.css	.ds-avatar[*|data-size="16"]	width: 16px
+avatar.css	.ds-avatar[*|data-size="16"]	height: 16px
+avatar.css	.ds-avatar[*|data-size="18"]	width: 18px
+avatar.css	.ds-avatar[*|data-size="18"]	height: 18px
+avatar.css	.ds-avatar[*|data-size="20"]	width: 20px
+avatar.css	.ds-avatar[*|data-size="20"]	height: 20px
+avatar.css	.ds-avatar[*|data-size="22"]	width: 22px
+avatar.css	.ds-avatar[*|data-size="22"]	height: 22px
+avatar.css	.ds-avatar[*|data-size="26"]	width: 26px
+avatar.css	.ds-avatar[*|data-size="26"]	height: 26px
+avatar.css	.ds-avatar[*|data-size="28"]	width: 28px
+avatar.css	.ds-avatar[*|data-size="28"]	height: 28px
+avatar.css	.ds-avatar[*|data-size="30"]	width: 30px
+avatar.css	.ds-avatar[*|data-size="30"]	height: 30px
+avatar.css	.ds-avatar[*|data-size="34"]	width: 34px
+avatar.css	.ds-avatar[*|data-size="34"]	height: 34px
+avatar.css	.ds-avatar[*|data-size="48"]	width: 48px
+avatar.css	.ds-avatar[*|data-size="48"]	height: 48px
+avatar.css	.ds-avatar[*|data-size="64"]	width: 64px
+avatar.css	.ds-avatar[*|data-size="64"]	height: 64px
+avatar.css	.ds-avatar[*|data-tone=stack]	border: 2px solid var(--surface)
+banner_stack.css	.ds-banner-stack[*|data-entry=right]	--banner-dy: 0px
+banner_stack.css	.ds-banner-stack[*|data-entry=below]	--banner-dx: 0px
+banner_stack.css	.ds-banner[*|data-flight=swipe]	--banner-dy: 0px
+battery_level.css	.ds-battery	width: 64px
+battery_level.css	.ds-battery	height: 64px
+clock_face.css	.ds-clock-dial	width: 62px
+clock_face.css	.ds-clock-dial	height: 62px
+clock_face.css	.ds-clock-sun	width: 12px
+clock_face.css	.ds-clock-sun	height: 12px
+command_palette.css	.ds-palette	width: min(540px, 88%)
+command_palette.css	.ds-palette	--aside: 0px
+command_palette.css	.ds-palette[*|data-host=overlay][*|data-aside=shown]	width: min(calc(540px + var(--aside)), 96%)
+count.css	.ds-count[*|data-place=tile]	top: 4px
+count.css	.ds-count[*|data-place=tile]	right: 5px
+drag_ghost.css	.ds-drag-ghost	width: 250px
+drag_ghost.css	.ds-grip	top: 6px
+drag_ghost.css	.ds-grip	width: 20px
+drag_ghost.css	.ds-grip	height: 24px
+drag_ghost.css	.ds-drop-line	height: 3px
+drag_ghost.css	.ds-drag-return	--drag-dx: 0px
+drag_ghost.css	.ds-drag-return	--drag-dy: 0px
+edge_strip.css	.ds-edge	width: 10px
+edge_strip.css	.ds-side[*|data-side=peek]	left: 8px
+edge_strip.css	.ds-side[*|data-side=peek]	top: 8px
+edge_strip.css	.ds-side[*|data-side=peek]	bottom: 8px
+edge_strip.css	.ds-side[*|data-side=peek]	width: 226px
+emoji.css	.ds-emoji[*|data-size="28"]	width: 28px
+emoji.css	.ds-emoji[*|data-size="28"]	height: 28px
+emoji.css	.ds-emoji[*|data-size="64"]	width: 64px
+emoji.css	.ds-emoji[*|data-size="64"]	height: 64px
+emoji.css	.ds-emoji[*|data-size="128"]	width: 128px
+emoji.css	.ds-emoji[*|data-size="128"]	height: 128px
+hover_card.css	.ds-popover.ds-hovercard	width: 300px
+hover_card.css	.ds-popover.ds-hovercard[*|data-kind=account]	width: 260px
+hover_card.css	.ds-hovercard-msg	grid-template-columns: 22px 1fr
+hover_card.css	.ds-hovercard-live	width: 6px
+hover_card.css	.ds-hovercard-live	height: 6px
+hover_card.css	.ds-popover.ds-hovercard[*|data-kind=tip]	max-width: 260px
+hover_strip.css	.ds-strip	right: 8px
+hover_strip.css	.ds-strip .ds-fly	bottom: calc(100% + 7px)
+icon_button.css	.ds-icon-button[*|data-variant=tool]	width: 28px
+icon_button.css	.ds-icon-button[*|data-variant=tool]	height: 26px
+icon_button.css	.ds-icon-button[*|data-variant=foot]	width: 24px
+icon_button.css	.ds-icon-button[*|data-variant=foot]	height: 24px
+icon_button.css	.ds-icon-button[*|data-variant=strip]	width: 26px
+icon_button.css	.ds-icon-button[*|data-variant=strip]	height: 26px
+icon_button.css	.ds-icon-button[*|data-variant=status]	width: var(--bar-status-box,22px)
+icon_button.css	.ds-icon-button[*|data-variant=status]	height: var(--bar-status-box,22px)
+icon_button.css	.ds-icon-button[*|data-variant=status] > .ds-ic	width: var(--bar-status-glyph,16px)
+icon_button.css	.ds-icon-button[*|data-variant=status] > .ds-ic	height: var(--bar-status-glyph,16px)
+kbd.css	.ds-kbd	border-bottom-width: 2px
+level.css	.ds-level	--level-h: 26px
+level.css	.ds-level-glyph[*|data-size="16"]	width: 16px
+level.css	.ds-level-glyph[*|data-size="16"]	height: 16px
+level.css	.ds-level-glyph[*|data-size="22"]	width: 22px
+level.css	.ds-level-glyph[*|data-size="22"]	height: 22px
+level.css	.ds-level-edge	width: 3px
+link_pill.css	.ds-link-pill	left: 12px
+link_pill.css	.ds-link-pill	bottom: 12px
+link_pill.css	.ds-link-pill	max-width: calc(100% - 24px)
+list_row.css	.ds-row	grid-template-columns: 10px minmax(0,1fr) auto
+list_row.css	.ds-dot	width: 8px
+list_row.css	.ds-dot	height: 8px
+list_row.css	.ds-star	left: 6px
+list_row.css	.ds-star	bottom: 7px
+list_row.css	.ds-star	width: 22px
+list_row.css	.ds-star	height: 22px
+list_row.css	.ds-sparks i	width: 3px
+list_row.css	.ds-sparks i	height: 3px
+lock_prompt.css	.ds-lock-field	width: 260px
+lock_prompt.css	.ds-lock-field	height: 38px
+lock_prompt.css	.ds-lock-field .ds-input-caret::before	left: calc(-.07em - .75px)
+lock_prompt.css	.ds-lock-go	width: 28px
+lock_prompt.css	.ds-lock-go	height: 28px
+lock_prompt.css	.ds-lock-busy	width: 14px
+lock_prompt.css	.ds-lock-busy	height: 14px
+menu.css	.ds-menu	width: 280px
+menu.css	.ds-menu	max-height: 320px
+menu.css	.ds-menu[*|data-kind=slim]	width: 220px
+menu.css	.ds-popover.ds-menu[*|data-kind=dropdown]	min-width: 186px
+menu.css	.ds-menu[*|data-embed=palette]	max-height: 360px
+menu.css	.ds-menu-filter	min-height: calc(1.55em + 8px)
+menu_entry.css	.ds-menu-item	grid-template-columns: 34px 1fr auto
+menu_entry.css	.ds-menu-tile	width: 34px
+menu_entry.css	.ds-menu-tile	height: 34px
+menu_entry.css	.ds-menu[*|data-kind=slim] .ds-menu-item	grid-template-columns: 22px 1fr auto
+menu_entry.css	.ds-menu[*|data-kind=slim] .ds-menu-tile	width: 22px
+menu_entry.css	.ds-menu[*|data-kind=slim] .ds-menu-tile	height: 22px
+menu_entry.css	.ds-menu[*|data-embed=palette] .ds-menu-detail	max-width: 380px
+menu_entry.css	.ds-menu-item[*|data-trailing=action]	grid-template-columns: 34px 1fr auto auto
+menu_entry.css	.ds-menu[*|data-kind=slim] .ds-menu-item[*|data-trailing=act	grid-template-columns: 22px 1fr auto auto
+menu_entry.css	.ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button	width: 22px
+menu_entry.css	.ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button	height: 22px
+module_tile.css	.ds-module-tile	min-height: 52px
+module_tile.css	.ds-module-disc	width: 28px
+module_tile.css	.ds-module-disc	height: 28px
+module_tile.css	.ds-module-chevron	width: 18px
+module_tile.css	.ds-module-chevron	height: 28px
+month_grid.css	.ds-month-header	min-height: 28px
+month_grid.css	.ds-month-row	grid-template-columns: repeat(7,32px)
+month_grid.css	.ds-month[*|data-weeks=show] .ds-month-row	grid-template-columns: 24px repeat(7,32px)
+month_grid.css	.ds-month-head	height: 18px
+month_grid.css	.ds-month-week	height: 24px
+month_grid.css	.ds-month-day	height: 30px
+month_grid.css	.ds-month-num	width: 24px
+month_grid.css	.ds-month-num	height: 24px
+month_grid.css	.ds-month-dot	width: 4px
+month_grid.css	.ds-month-dot	height: 4px
+month_grid.css	.ds-month-step	width: 14px
+month_grid.css	.ds-month-step	height: 14px
+now_playing.css	.ds-track-art	width: 48px
+now_playing.css	.ds-track-art	height: 48px
+now_playing.css	.ds-track-bar	height: 4px
+osd.css	.ds-osd	width: 296px
+osd.css	.ds-osd[*|data-position=bottom-centre]	--osd-dy: 8px
+peek.css	.ds-peek	inset: 36px 12% 36px 12%
+polkit_prompt.css	.ds-polkit .ds-emoji[*|data-size]	width: 48px
+polkit_prompt.css	.ds-polkit .ds-emoji[*|data-size]	height: 48px
+preview_pane.css	.ds-preview-media	height: 220px
+preview_pane.css	.ds-preview-pending-mark	width: 20px
+preview_pane.css	.ds-preview-pending-mark	height: 20px
+provider_mark.css	.ds-provider	width: 13px
+provider_mark.css	.ds-provider	height: 13px
+provider_mark.css	.ds-provider[*|data-size=tile]	right: 7px
+provider_mark.css	.ds-provider[*|data-size=tile]	bottom: 7px
+provider_mark.css	.ds-provider[*|data-size=tile]	width: 14px
+provider_mark.css	.ds-provider[*|data-size=tile]	height: 14px
+provider_mark.css	.ds-provider[*|data-size=row]	width: 11px
+provider_mark.css	.ds-provider[*|data-size=row]	height: 11px
+selection_bubble.css	.ds-bubble-button	height: 28px
+selection_bubble.css	.ds-bubble-button	min-width: 28px
+selection_bubble.css	.ds-bubble-sep	height: 18px
+selection_bubble.css	.ds-bubble .ds-input	width: 220px
+send_pill.css	.ds-send-pill	bottom: 14px
+send_pill.css	.ds-send-pill-why	max-width: 280px
+settings_row.css	.ds-settings-row	min-height: 44px
+settings_row.css	.ds-settings-row-glyph	width: 22px
+settings_row.css	.ds-settings-row-trail[*|data-mark=check]	width: 14px
+settings_row.css	.ds-settings-row-glyph[*|data-disc]	width: 26px
+settings_row.css	.ds-settings-row-glyph[*|data-disc]	height: 26px
+settings_row.css	.ds-settings-row-trail[*|data-mark=pending]	width: 14px
+settings_row.css	.ds-settings-row-trail[*|data-mark=pending]	height: 14px
+settings_row.css	.ds-settings-row-spin	width: 6px
+settings_row.css	.ds-settings-row-spin	height: 6px
+sheet.css	.ds-sheet	top: 36px
+sheet.css	.ds-sheet	width: min(560px, 88%)
+sheet.css	.ds-sheet	max-height: calc(100% - 72px)
+sheet.css	.ds-sheet[*|data-width=narrow]	width: min(340px, 88%)
+sidebar_item.css	.ds-sidebar-item-seal	width: 5px
+sidebar_item.css	.ds-sidebar-item-seal	height: 5px
+slider.css	.ds-slider	height: 22px
+slider.css	.ds-slider-track	top: 9px
+slider.css	.ds-slider-track	height: 4px
+slider.css	.ds-slider-thumb	width: 22px
+slider.css	.ds-slider-thumb	height: 22px
+slider.css	.ds-slider-thumb	border: 3px solid var(--handle-ring)
+space_editor.css	.ds-space-swatch	width: 14px
+space_editor.css	.ds-space-swatch	height: 14px
+space_editor.css	.ds-field	height: 176px
+space_editor.css	.ds-field-dots	background-size: 9px 9px
+space_editor.css	.ds-handle	width: 22px
+space_editor.css	.ds-handle	height: 22px
+space_editor.css	.ds-handle	border: 3px solid var(--mark-ground)
+space_editor.css	.ds-stop-disc	width: 14px
+space_editor.css	.ds-stop-disc	height: 14px
+space_editor.css	.ds-presets	grid-template-columns: repeat(8, 22px)
+space_editor.css	.ds-preset	width: 22px
+space_editor.css	.ds-preset	height: 22px
+space_editor.css	.ds-space-dot	width: 22px
+space_editor.css	.ds-space-dot	height: 22px
+space_editor.css	.ds-space-dot	border: 2px solid transparent
+spinner.css	.ds-spinner	border: 2px solid var(--accent-text)
+sync_halo.css	.ds-account-ring	width: 30px
+sync_halo.css	.ds-account-ring	height: 30px
+tabs.css	.ds-tab-underline	left: 10px
+tabs.css	.ds-tab-underline	right: 10px
+tabs.css	.ds-tab-underline	height: 3px
+text_input.css	.ds-input-wrap[*|data-variant=inline]	min-width: 120px
+text_input.css	.ds-input[*|data-variant=boxed]	height: calc(1.55em + 16px)
+text_input.css	.ds-input[*|data-variant=inline]	height: calc(1.55em + 8px)
+text_input.css	.ds-input-caret::before	left: calc(-.05em - .75px)
+text_input.css	.ds-input-caret::before	width: 1.5px
+text_input.css	.ds-input-wrap[*|data-variant=bare] .ds-input-caret::before	left: -.75px
+toast.css	.ds-toast	bottom: 14px
+toggle.css	.ds-toggle	width: 30px
+toggle.css	.ds-toggle	height: 18px
+toggle.css	.ds-toggle-knob	width: 18px
+toggle.css	.ds-toggle-knob	height: 18px
+tooltip.css	.ds-fly	bottom: calc(100% + 7px)
+tooltip.css	.ds-popover.ds-tip	max-width: 260px
+user_picture.css	.ds-user-photo[*|data-size="28"]	width: 28px
+user_picture.css	.ds-user-photo[*|data-size="28"]	height: 28px
+user_picture.css	.ds-user-photo[*|data-size="48"]	width: 48px
+user_picture.css	.ds-user-photo[*|data-size="48"]	height: 48px
+user_picture.css	.ds-user-photo[*|data-size="64"]	width: 64px
+user_picture.css	.ds-user-photo[*|data-size="64"]	height: 64px
+user_picture.css	.ds-user-photo[*|data-size="128"]	width: 128px
+user_picture.css	.ds-user-photo[*|data-size="128"]	height: 128px
+window_frame.css	.ds-titlebar	height: 28px
+window_frame.css	.ds-titlebar-title	left: 84px
+window_frame.css	.ds-titlebar-title	right: 84px
+window_frame.css	.ds-titlebar-title	line-height: 28px
+window_frame.css	.ds-light	width: 12px
+window_frame.css	.ds-light	height: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=top]	left: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=top]	right: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=top]	height: 4px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom]	left: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom]	right: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom]	height: 4px
+window_frame.css	.ds-resize-edge[*|data-edge=left]	top: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=left]	bottom: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=left]	width: 4px
+window_frame.css	.ds-resize-edge[*|data-edge=right]	top: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=right]	bottom: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=right]	width: 4px
+window_frame.css	.ds-resize-edge[*|data-edge=top-left]	width: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=top-left]	height: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=top-right]	width: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=top-right]	height: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom-left]	width: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom-left]	height: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom-right]	width: 12px
+window_frame.css	.ds-resize-edge[*|data-edge=bottom-right]	height: 12px
