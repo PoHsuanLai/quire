@@ -165,15 +165,15 @@ that registration is not done yet (see FINDINGS "Tune wave").
 | --- | --- | --- | --- | --- | --- |
 | `bar.height_px` | `Px` | `24` | 24-32 (macOS 24pt; items 22, status slots 30x22) | `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28`; `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | settled 2026-09-28 (user: 24) |
 | `bar.title_hit_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
-| `bar.title_padding_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
-| `bar.open_title_pill_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.title_padding_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
+| `bar.open_title_pill_height_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `bar.status_icon_box_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `20-SURFACES.md#1-1-bar-spec-tier-1` (`IconSize::Bar`) | proposed |
 | `bar.status_glyph_px` | `Px` | `16` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
-| `bar.status_gap_px` | `Px` | `4` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.status_gap_px` | `Px` | `0` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `bar.glyph_size_policy` | `BarGlyphSize::{StatusIcon16,IconSizeBar22}` | `StatusIcon16` | alt = use the full `IconSize::Bar` box | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 8 | proposed |
 | `bar.item_font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `bar.item_font_weight` | `Count` | `500` | `100..=900`; the app name is always bold | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `bar.item_radius_px` | `Px` | `4` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `bar.item_radius_px` | `Px` | `5` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `bar.battery_low_percent` | `Percent` | `20` | `5..=50`; at or under this charge, on battery, the fill turns `--battery-low` and the item nudges once per discharge | `26-DETAILS.md` §5.1.3 G10, G11; sill FINDINGS F822 | proposed (D1, 2026-09-27) |
 
 ### 3.5 `dock` (sill/settings.toml)
@@ -367,7 +367,7 @@ found elsewhere in the file that are not yet in that table.
 | `menus.pick_feedback` | `PickFeedback::{None,BlinkOnce}` | `None` | alt `BlinkOnce` (macOS blinks the chosen item once before closing) | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 3 | proposed |
 | `menus.first_mouse_window_ms` | `Ms` | `100` | activation-vs-click window on an inactive window's first click | `13-BEHAVIOUR-menus-windows.md#13-3-8-focus-and-raise-rules`; `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.4) | proposed |
 | `menus.font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `menus.highlight_radius_px` | `Px` | `6` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `menus.highlight_radius_px` | `Px` | `5` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `menus.tooltip_font_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `switcher.show_delay_ms` | `Ms` | `150` | `0..500`; a chord released within the delay switches with no UI (the quick tap) | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `switcher.icon_size_px` | `Px` | `96` | alt macOS ~128 | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 6 | proposed |
@@ -426,8 +426,8 @@ until that comparison happens (see handback report).
 | --- | --- | --- | --- | --- | --- |
 | `control_center.width_px` | `Px` | `320` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
 | `control_center.grid_columns` | `Count` | `2` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
-| `control_center.grid_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
-| `control_center.grid_padding_px` | `Px` | `12` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
+| `control_center.grid_gap_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
+| `control_center.grid_padding_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `control_center.modules` | `Vec<ControlCenterModule>` | `[Wifi, Bluetooth, Focus, Display, KeyboardBrightness, Sound, NowPlaying, Appearance, Battery]` | KeyboardBrightness is drawn only where UPower reports a keyboard backlight | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center`; design/26 D2 (G25) | proposed (D2, 2026-09-27) |
 | `control_center.bottom_margin_px` | `Px` | `16` | `0..=64`; the panel scrolls past `output_h - bar_h - this` | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed (M5 freeze, 2026-09-25) |
 | `control_center.menu_bar_wifi` | `InMenuBar::{Show,Hide}` | `Show` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
