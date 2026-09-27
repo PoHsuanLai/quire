@@ -118,11 +118,14 @@ fn a_drag_released_under_the_threshold_springs_back() {
     let (mut harness, at) = start(Motion::Standard);
     let _ = drag(&mut harness, at, 40.0);
     assert_eq!(swipe(&harness).as_deref(), Some("rest"));
+    // Driven motion (design/05 section 14): it springs home from where it was let go.
     assert!(
-        !style(&harness).contains("--swipe-dx"),
-        "back at its place: {}",
+        style(&harness).contains("--swipe-dx:40px"),
+        "it starts home from the release: {}",
         style(&harness)
     );
+    settle_until(&mut harness, |h| !style(h).contains("--swipe-dx"));
+    ds_native::harness::assert_settles_to_zero_frames(&mut harness);
     harness.advance(ms(400));
     let entries = log(&mut harness);
     assert!(

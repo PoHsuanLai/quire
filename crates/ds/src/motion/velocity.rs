@@ -43,11 +43,15 @@ pub struct VelocityMeter {
 }
 
 impl VelocityMeter {
-    /// The pointer is at `at` at `when`.
+    /// The pointer is at `at` at `when`. A move in the same instant as the last (a host that
+    /// repeats the position with the release) updates the last position and keeps the one
+    /// before, so the speed is still measured over time that passed.
     pub fn moved(self, at: crate::geometry::Px, when: std::time::Instant) -> VelocityMeter {
+        let same_instant = self.last.is_some_and(|last| last.when >= when);
+        let before = if same_instant { self.before } else { self.last };
         VelocityMeter {
             last: Some(Sample { at, when }),
-            before: self.last,
+            before,
         }
     }
 
@@ -86,6 +90,11 @@ mod tests {
             .moved(Px(10.0), ms(16))
             .moved(Px(30.0), ms(32));
         assert_eq!(meter.released(ms(40)), Velocity(1250));
+        assert_eq!(
+            meter.moved(Px(30.0), ms(32)).released(ms(40)),
+            Velocity(1250),
+            "a repeat"
+        );
         assert_eq!(
             meter.released(ms(200)),
             Velocity::ZERO,

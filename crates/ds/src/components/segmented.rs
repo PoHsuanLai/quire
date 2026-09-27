@@ -75,7 +75,6 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
             role: "group",
             "aria-label": "{label}",
             style: "--seg-n:{count};--seg-x:{thumb.css()}",
-            span { class: "ds-segment-thumb", "aria-hidden": "true" }
             for (index , (option , text)) in options.into_iter().enumerate() {
                 button {
                     r#type: "button",
@@ -88,6 +87,7 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
                     "{text}"
                 }
             }
+            span { class: "ds-segment-thumb", "aria-hidden": "true" }
         }
     }
 }

@@ -22,3 +22,7 @@
 .ds-grip:hover{ background:var(--surface); color:var(--ink); }
 
 .ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent-text); margin:var(--s-2) 0; }
+
+/* DragReturnFrame (design/05 section 14, H1): what a hand drags, drawn `--drag-dx`/`--drag-dy`
+   off its place, written by two springs in Rust; nothing here transitions it. */
+.ds-drag-return{ --drag-dx:0px; --drag-dy:0px; transform:translate(var(--drag-dx), var(--drag-dy)); }

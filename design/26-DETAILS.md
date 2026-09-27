@@ -229,10 +229,13 @@ pub enum Moment {
     Dismiss,
 }
 
-/// Who caused a moment: only `Contact` may spend an overshoot (R5).
+/// Who caused a moment: only `Contact` may spend an overshoot (R5). Built (D0, H1) as
+/// `Contact(Contact)`, where `Contact` has private fields (only an event handler makes one) and
+/// carries the hand's release velocity (`Contact::with_velocity`, design/05 section 14), which
+/// `SpringSpec::for_touch` hands to a spring.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Touch {
-    Contact,
+    Contact(Contact),
     #[default]
     Remote,
 }

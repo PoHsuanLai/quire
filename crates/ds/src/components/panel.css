@@ -1,12 +1,9 @@
 /* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel. A stage fills
    the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
-   rule paints it) at the material's radius, and scrolls its own content. It slides in with
-   `panel-in` (`--t-move --e-out`, restarted under its other name on each showing) and out with
-   `panel-out` (`--t-move --e-exit`, held); hidden, nothing is laid out. Present keeps the
-   entrance declared, so the settle timer never cancels a slide the frame clock is still playing;
-   present again after a hide was taken back (`data-pulse=held`), it plays `hold`, so dropping
-   `panel-out` starts an animation in the same restyle (sill G295). An optional scrim covers
+   rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
+   in with `panel-in` (`--t-move --e-out`); present keeps the entrance declared, so the settle
+   timer never cancels a slide the frame clock is still playing. Hidden, nothing is laid out. An optional scrim covers
    the stage behind it. The panel's material scope fills the root too: Blitz places an absolutely
    positioned box against its parent, so a scope of no height would give the panel none.
    Attribute selectors carry `*|` (spike S2). */
@@ -18,6 +15,11 @@
   display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; scrollbar-width:none; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
 .ds-panel-stage[*|data-edge=right] > .ds-panel{ right:var(--s-8); }
 .ds-panel[*|data-presence=entering],.ds-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
-.ds-panel[*|data-presence=entering][*|data-pulse=b],.ds-panel[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
-.ds-panel[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-panel[*|data-presence=leaving]{ animation:panel-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+/* Driven (design/05 section 14, H1): after its first entrance the panel is drawn from a spring in
+   Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
+   leaves no value behind (sill G295); a show while it leaves turns it back from where it is.
+   Under Reduced it fades in place instead. */
+.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear);
+  transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
+.ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
+.ds-panel[*|data-presence=leaving]{ pointer-events:none; }
