@@ -4131,6 +4131,35 @@ moment on a real Blitz document ending in `assert_settles_to_zero_frames`, the j
 its cap, a repeated stamp that does not shake, and Reduced: the still frame at once, the slash and
 the fill jumping, no shake). Gallery: Details, "Status glyphs".
 
+### 52. Control center details: the tile disc, row phases, Now Playing, device batteries (design/26 wave D2, 2026-09-27; motion settled by 26, drawing proposed)
+
+**Purpose.** The control center modules' state details of design/26 section 5.2 (G14, G16-G18,
+G20, G21, G23, G25-G30), each on the grammar's primitives and each ending at 0 frames. Every new
+prop is defaulted; the still states carry every meaning in words (R8).
+
+| Component | New | Moments |
+| --- | --- | --- |
+| `ModuleTile` | `disc: DiscMotion::{Still, Fill, Morph(Icon)}` (default `Still`); the disc is `span.ds-module-disc[data-motion]` | The disc reads Off/Busy to On as its Success (`Lighting`'s table): `Fill` lights the glyph's layers once from the inside out (`Settle{Fill}`, one layer per `--t-pending-step`; the Wi-Fi dot, then each arc); `Morph(on)` grows `on` in over the glyph (`MorphGlyph{DownUp}`), back on turning off, with `--e-spring` only when the tile's own press caused it (R5). Busy keeps the bounded Spinner |
+| `SettingsRow` | `phase: RowPhase::{Rest, Pending(EventStamp), Succeeded(EventStamp), Failed(EventStamp)}`, `work: RowWork::{Glyph, Trailing}`, `disc: RowDisc::{None, Off, On}`, `first: FirstShow` (all defaulted); `RowTrailing::Battery(Fraction)` | Pending, after `PendingGrace`: the glyph breathes (`Pending{Breathe}`, `data-pending`/`data-beat` on `.ds-settings-row-glyph`) or, with `RowWork::Trailing`, a `Spin` ring takes the trailing slot (`data-mark=pending`); both hold still at `PendingCap`. Pending to Succeeded: a `Check(On)` trailing draws on (`Settle{Check}`, `CheckMark`, then the plain check), otherwise the glyph seals (`Settle{LockIn}`: `gulp` when the row's own press started the operation, however long it ran, `seal-out` else). Failed: the row shakes once per stamp. A success nobody watched start is a plain Change |
+| `RowTrailing::Battery` | the device's `BatteryGlyph` (Compact) and `span.ds-settings-row-figure` | Appear (the battery arrives on a row already showing, or the row's `first` is `Animate`: the pane was just opened): the fill sweeps from empty over `--t-sweep` and the figure counts up in step; later levels sweep from where they are, a one-point step printed at once (R12) |
+| `PlayPauseButton` | new: `playback: Playback`, `onclick`, `availability` | An `IconButton { Tool }`'s markup with a `MorphGlyph{OffUp}` of the next action (Play paused, Pause playing or buffering), named for it; springs only under its own press |
+| `NowPlayingTrack` | new: `art: Option<IconSource>`, `title`, `by`, `playback` | A new track cross-fades art and words (`a-morph-fade-out` over `a-morph-fade-in`, `--t-quick`); a restated one plays nothing; `Buffering` breathes the art (bounded) |
+| `TrackPosition` | new: `at`, `length` (`Duration`), `playback` | A clock-paced report steps: while `Playing` the bar (`--f`) and the times repaint on each whole second from the last report, never between (1 frame a second while mounted); held otherwise, 0 frames |
+| `DeviceBattery` | new: `level`, `mark: RingMark`, `label`, `first: FirstShow`, `children` | `BatteryLevel`'s ring over its percentage on `Sweep` + `CountUp::InStep`: Appear (`first: Animate`) sweeps from empty over `--t-sweep` counting in step; a change sweeps from where it is over `--t-quick`; the bolt fades in once the sweep has landed |
+| `LevelControl` | `LevelGlyph::KeyboardBrightness` | A keyboard (Lucide `keyboard`'s body on the grid's lower half) under a rising sun whose five rays scale with the level, as the display sun's do |
+
+**Values (proposed).** Row disc 26 px (the tile disc's look: paper, or `--accent` with
+`--accent-ink` and an inset `--accent-text` hairline); the trailing spinner a 14 px ring; the
+position bar 4 px on `--m-level-well` with the played share in `--ink-soft`; the art well 48 px at
+`--r-media`; the device figure `--fs-help` in `--ink-soft`. `Icon::MoonFilled` is Lucide `moon`'s
+outline drawn with `Shape::Solid` (filled and stroked, so its silhouette is the outline's).
+
+**Tests.** `ds/tests/center_tables.rs` (the row and playback tables, the filled moon, the spring
+recipe); unit tables beside `Lighting`, `Percent`, `Reading` and `Playback`;
+`ds-native/tests/details_center_{tile,rows,player,battery}.rs`, all on `Clock::Virtual`, every
+moment ending in `assert_settles_to_zero_frames`, each with a Reduced case. Gallery: Details,
+"Control center modules".
+
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 
 **Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)

@@ -682,7 +682,7 @@ sweep at all (not a 60 ms one): the first frame is the final state. This replace
 
 ### 4.13 Added by quire (small-state details, 2026-09-26)
 
-The primitives of design/26-DETAILS.md section 4. Six keyframes and eight `Anim` rows, each
+The primitives of design/26-DETAILS.md section 4. Six keyframes and nine `Anim` rows, each
 played once on an HTML wrapper (Blitz's stylesheet cannot reach inside an SVG) and taken off at
 its `settle`. Nothing here loops: the bounded pending loop is a Rust step timer over CSS
 transitions (`--t-pending-step`), not a keyframe.
@@ -704,6 +704,9 @@ transitions (`--t-pending-step`), not a keyframe.
 - `slide-r` at `--t-move --e-out` (`Anim::PaneInROut`, sill Q370): the preview pane's entrance
   when nothing the person touched showed it; `Anim::PaneInR` (the spring) plays only when a key
   or press did (design/26 R5).
+- `morph-in` at `--t-quick --e-spring` (`Anim::MorphInSpring`, design/26 D2): `MorphGlyph`'s
+  incoming glyph when the person's own press caused the change (play/pause, a Focus disc); every
+  other morph grows in at `--e-out` (`Anim::MorphIn`, design/26 R5).
 
 ## 5. Assignments
 

@@ -38,6 +38,8 @@
 .ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
 .ds-level-part[*|data-on=off]{ opacity:0; }
 .ds-level-part[*|data-part=rays]{ transform:scale(calc(.6 + .4 * var(--f))); }
+/* The keyboard light's rays grow from the rising sun's centre, (12, 9) on the 24 grid. */
+.ds-level-part[*|data-part=key-rays]{ transform-origin:50% 37.5%; transform:scale(calc(.6 + .4 * var(--f))); }
 
 /* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
 .ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }

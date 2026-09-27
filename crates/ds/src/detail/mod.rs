@@ -8,6 +8,7 @@
 //! key handler's event can give; Reduced motion is inside every primitive, and every primitive's
 //! clock stops when its moment ends.
 
+mod armed;
 mod check_mark;
 mod count_up;
 mod cue;
@@ -36,12 +37,14 @@ mod use_operation;
 mod use_pending;
 mod use_settle;
 
+pub(crate) use armed::{Armed, use_armed};
 pub use check_mark::CheckMark;
 pub use count_up::{CountPace, CountUp, use_count_up};
 pub use cue::Cue;
 pub use detailed::{Detailed, first_table, moment_table};
 pub use first_show::FirstShow;
 pub use layer_glyph::{LayerGlyph, Layering};
+pub(crate) use level::use_level;
 pub use moment::Moment;
 pub use morph::{MorphStyle, Slashed};
 pub use morph_glyph::MorphGlyph;

@@ -84,6 +84,9 @@ pub enum LevelGlyph {
     Volume(Muting),
     /// A sun whose rays grow with the brightness.
     Brightness,
+    /// A keyboard under a rising sun whose rays grow with the keyboard's backlight (design/26
+    /// 5.2.7, G25): the keyboard-brightness module.
+    KeyboardBrightness,
 }
 
 /// Where a level's glyph takes its state from.

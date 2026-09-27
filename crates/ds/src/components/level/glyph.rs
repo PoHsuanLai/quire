@@ -22,6 +22,33 @@ const WAVE_2: &[Shape] = &[Shape::Path("M16.32 6.7a8.25 8.25 0 0 1 0 10.6")];
 const WAVE_3: &[Shape] = &[Shape::Path("M18.81 4.61a11.5 11.5 0 0 1 0 14.78")];
 const SLASH: &[Shape] = &[Shape::Path("M2 2l20 20")];
 
+// The keyboard-brightness glyph (design/26 G25), on Lucide's grid: Lucide `keyboard`'s body
+// lowered and shortened to the grid's bottom half (y 12 to 22), a row of keys and the space bar,
+// and above it a sun rising from behind (a half disc of radius 3 on (12, 9)) with five rays at
+// 4.5 to 6 units out, which grow with the level as the display sun's do.
+const KEYBOARD_BODY: &[Shape] = &[
+    Shape::Rect {
+        x: "2",
+        y: "12",
+        width: "20",
+        height: "10",
+        rx: "2",
+    },
+    Shape::Path("M6 16h.01"),
+    Shape::Path("M10 16h.01"),
+    Shape::Path("M14 16h.01"),
+    Shape::Path("M18 16h.01"),
+    Shape::Path("M8 19h8"),
+];
+const KEYBOARD_CORE: &[Shape] = &[Shape::Path("M9 9a3 3 0 0 1 6 0")];
+const KEYBOARD_RAYS: &[Shape] = &[
+    Shape::Path("M12 4.5V3"),
+    Shape::Path("m15.18 5.82 1.06-1.06"),
+    Shape::Path("m8.82 5.82-1.06-1.06"),
+    Shape::Path("M16.5 9H18"),
+    Shape::Path("M7.5 9H6"),
+];
+
 /// One layer of a level glyph.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum Part {
@@ -32,6 +59,9 @@ pub(crate) enum Part {
     Slash,
     Core,
     Rays,
+    KeyBody,
+    KeyCore,
+    KeyRays,
 }
 
 impl Part {
@@ -44,6 +74,9 @@ impl Part {
             Part::Slash => "slash",
             Part::Core => "core",
             Part::Rays => "rays",
+            Part::KeyBody => "key-body",
+            Part::KeyCore => "key-core",
+            Part::KeyRays => "key-rays",
         }
     }
 
@@ -57,6 +90,9 @@ impl Part {
             Part::Slash => SLASH,
             Part::Core => &sun[..1],
             Part::Rays => &sun[1..],
+            Part::KeyBody => KEYBOARD_BODY,
+            Part::KeyCore => KEYBOARD_CORE,
+            Part::KeyRays => KEYBOARD_RAYS,
         }
     }
 }
@@ -88,6 +124,7 @@ pub(crate) fn parts(glyph: LevelGlyph) -> &'static [Part] {
             Part::Slash,
         ],
         LevelGlyph::Brightness => &[Part::Core, Part::Rays],
+        LevelGlyph::KeyboardBrightness => &[Part::KeyBody, Part::KeyCore, Part::KeyRays],
     }
 }
 
@@ -105,13 +142,19 @@ pub(crate) fn waves(value: Fraction) -> u8 {
 /// Whether `part` of `glyph` shows at `value`.
 pub(crate) fn showing(part: Part, glyph: LevelGlyph, value: Fraction) -> Showing {
     let on = match (part, glyph) {
-        (Part::Body | Part::Core | Part::Rays, _) => true,
+        (
+            Part::Body | Part::Core | Part::Rays | Part::KeyBody | Part::KeyCore | Part::KeyRays,
+            _,
+        ) => true,
         (Part::Slash, LevelGlyph::Volume(muting)) => muting == Muting::Muted,
         (Part::Wave1 | Part::Wave2 | Part::Wave3, LevelGlyph::Volume(Muting::Muted)) => false,
         (Part::Wave1, LevelGlyph::Volume(Muting::Audible)) => waves(value) >= 1,
         (Part::Wave2, LevelGlyph::Volume(Muting::Audible)) => waves(value) >= 2,
         (Part::Wave3, LevelGlyph::Volume(Muting::Audible)) => waves(value) >= 3,
-        (Part::Slash | Part::Wave1 | Part::Wave2 | Part::Wave3, LevelGlyph::Brightness) => false,
+        (
+            Part::Slash | Part::Wave1 | Part::Wave2 | Part::Wave3,
+            LevelGlyph::Brightness | LevelGlyph::KeyboardBrightness,
+        ) => false,
     };
     if on { Showing::On } else { Showing::Off }
 }
@@ -149,6 +192,7 @@ pub(crate) fn LevelGlyphView(glyph: LevelGlyph, value: Fraction, size: IconSize)
 fn shape_child(shape: &Shape) -> Element {
     match shape {
         Shape::Path(d) => rsx! { path { d: "{d}" } },
+        Shape::Solid(d) => rsx! { path { d: "{d}", fill: "currentColor" } },
         Shape::Circle { cx, cy, r } => rsx! { circle { cx: "{cx}", cy: "{cy}", r: "{r}" } },
         Shape::Rect {
             x,
@@ -185,6 +229,19 @@ mod tests {
             showing(Part::Rays, LevelGlyph::Brightness, Fraction(0)),
             Showing::On
         );
+    }
+
+    #[test]
+    fn the_keyboard_light_is_a_keyboard_under_a_rising_sun_whose_rays_follow() {
+        let glyph = LevelGlyph::KeyboardBrightness;
+        assert_eq!(
+            super::parts(glyph),
+            &[Part::KeyBody, Part::KeyCore, Part::KeyRays][..]
+        );
+        assert_eq!(Part::KeyRays.shapes().len(), 5);
+        for part in super::parts(glyph) {
+            assert_eq!(showing(*part, glyph, Fraction(0)), Showing::On, "{part:?}");
+        }
     }
 
     #[test]

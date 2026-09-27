@@ -23,3 +23,11 @@
 /* BatteryFigure: the percentage counting with the ring's fill; the caller sets its size and
    face, tabular so its width holds while it counts. */
 .ds-battery-figure{ font-variant-numeric:tabular-nums; }
+
+/* DeviceBattery (design/26-DETAILS.md 5.2.9, wave D2): the ring over its percentage, centred, the
+   control center's Battery module's one device. The arc sweeps and the number counts from Rust;
+   the bolt waits hidden until the sweep lands, then fades in over `--t-quick`. */
+.ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
+.ds-device-battery .ds-battery-figure{ font-size:var(--fs-help); color:var(--ink-soft); }
+.ds-battery-bolt[*|data-show]{ transition:opacity var(--t-quick) var(--e-out); }
+.ds-battery-bolt[*|data-show=off]{ opacity:0; }
