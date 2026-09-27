@@ -4,12 +4,17 @@
    at once (`S:2052`, `C:1744`).
    TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--s-5); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-menu[*|data-kind=slim],
 .ds-menu[*|data-kind=context]{ width:220px; }
-.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; padding:var(--s-6); border-radius:var(--r-panel); box-shadow:var(--shadow-2);
+.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; box-shadow:var(--shadow-2);
   transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-spring); }
+
+/* A menu's surface is the reference's menu (design/29-SIZING.md section 5.4): radius 8 with its
+   rows inset 5 (`--r-shell-menu`, `--shell-menu-inset`); the rows' highlight is 5, not concentric,
+   as the reference draws it. */
+.ds-popover.ds-menu{ border-radius:var(--r-shell-menu); }
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
@@ -35,10 +40,10 @@
 
 /* The query line of `filter: Filter::Field` (mailo gaps 5): the typed text in a row at the top of
    the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
-   line, 3/2 padding, no box of its own) over a hairline that sets it apart from the rows. The
+   line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
    menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
    the field's caret colour, and the placeholder takes the field's `--ink-faint`. */
-.ds-menu-filter{ display:flex; align-items:center; min-height:calc(1.55em + 8px); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
+.ds-menu-filter{ display:flex; align-items:center; min-height:var(--ctl-h-l); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
   border-bottom:var(--hair) solid var(--line-soft); font-size:var(--fs-body); line-height:1.55; color:var(--ink); white-space:nowrap; overflow:hidden; }
 .ds-menu-filter-placeholder{ color:var(--ink-faint); }
 .ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent-text); flex:none; }

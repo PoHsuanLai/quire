@@ -25,20 +25,22 @@ const fn tuned(token: &'static str, input: &'static str, default: &'static str) 
 pub const BAR_FONT: Tuned = tuned("--fs-shell-bar", "--shell-bar-font", "13px");
 /// `--fw-shell-bar`: its weight (`bar.item_font_weight`, 500).
 pub const BAR_WEIGHT: Tuned = tuned("--fw-shell-bar", "--shell-bar-weight", "500");
-/// `--shell-bar-item`: the hover and open pill's height (`bar.open_title_pill_height_px`, 24).
-pub const BAR_ITEM: Tuned = tuned("--shell-bar-item", "--shell-bar-item-h", "24px");
-/// `--shell-bar-pad`: the pill's side padding around a text item (`bar.title_padding_px`, 10).
-pub const BAR_PAD: Tuned = tuned("--shell-bar-pad", "--shell-bar-pad-x", "10px");
-/// `--r-shell-bar-item`: the pill's radius (`bar.item_radius_px`, 4).
-pub const BAR_RADIUS: Tuned = tuned("--r-shell-bar-item", "--shell-bar-radius", "4px");
+/// `--shell-bar-item`: the hover and open pill's height (`bar.open_title_pill_height_px`, 22: a
+/// Regular control, design/29-SIZING.md).
+pub const BAR_ITEM: Tuned = tuned("--shell-bar-item", "--shell-bar-item-h", "22px");
+/// `--shell-bar-pad`: the pill's side padding around a text item (`bar.title_padding_px`, 8).
+pub const BAR_PAD: Tuned = tuned("--shell-bar-pad", "--shell-bar-pad-x", "8px");
+/// `--r-shell-bar-item`: the pill's radius (`bar.item_radius_px`, 5: a Regular control's).
+pub const BAR_RADIUS: Tuned = tuned("--r-shell-bar-item", "--shell-bar-radius", "5px");
 /// `--fs-shell-menu`: a text menu's items (`menus.font_px`, 13).
 pub const MENU_FONT: Tuned = tuned("--fs-shell-menu", "--shell-menu-font", "13px");
 /// `--shell-menu-row`: a text menu row's height (`menus.item_height_px`, 22).
 pub const MENU_ROW: Tuned = tuned("--shell-menu-row", "--shell-menu-row-h", "22px");
 /// `--shell-menu-sep`: the margin above and below a separator (`menus.separator_margin_px`, 5).
 pub const MENU_SEPARATOR: Tuned = tuned("--shell-menu-sep", "--shell-menu-sep-m", "5px");
-/// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 6).
-pub const HIGHLIGHT_RADIUS: Tuned = tuned("--r-shell-highlight", "--shell-highlight-radius", "6px");
+/// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 5: the
+/// reference's, design/29-SIZING.md section 5.4).
+pub const HIGHLIGHT_RADIUS: Tuned = tuned("--r-shell-highlight", "--shell-highlight-radius", "5px");
 /// `--fs-shell-field`: the launcher's query (`launcher.field_font_px`, 22).
 pub const FIELD_FONT: Tuned = tuned("--fs-shell-field", "--shell-field-font", "22px");
 /// `--fw-shell-field`: its weight (`launcher.field_font_weight`, 500).
@@ -78,11 +80,11 @@ pub struct BarType {
     pub font: Px,
     /// Text weight, 500.
     pub weight: FontWeight,
-    /// The hover and open pill's height, 24.
+    /// The hover and open pill's height, 22.
     pub item_height: Px,
-    /// The pill's side padding around a text item, 10.
+    /// The pill's side padding around a text item, 8.
     pub item_padding: Px,
-    /// The pill's radius, 4.
+    /// The pill's radius, 5.
     pub item_radius: Px,
 }
 
@@ -95,7 +97,7 @@ pub struct MenuType {
     pub row: Px,
     /// Separator margin above and below, 5.
     pub separator_margin: Px,
-    /// The selected row's highlight radius, 6.
+    /// The selected row's highlight radius, 5.
     pub highlight_radius: Px,
 }
 
@@ -129,21 +131,22 @@ pub struct ShellMetrics {
 }
 
 impl Default for ShellMetrics {
-    /// The keys' defaults (settled 2026-09-24, design/13 sections 13.3.1, 13.3.3, 13.3.9).
+    /// The keys' defaults (settled 2026-09-24, design/13 sections 13.3.1, 13.3.3, 13.3.9; the bar
+    /// item and highlight on the size ladder, design/29-SIZING.md section 13).
     fn default() -> Self {
         ShellMetrics {
             bar: BarType {
                 font: Px(13.0),
                 weight: FontWeight(500),
-                item_height: Px(24.0),
-                item_padding: Px(10.0),
-                item_radius: Px(4.0),
+                item_height: Px(22.0),
+                item_padding: Px(8.0),
+                item_radius: Px(5.0),
             },
             menu: MenuType {
                 font: Px(13.0),
                 row: Px(22.0),
                 separator_margin: Px(5.0),
-                highlight_radius: Px(6.0),
+                highlight_radius: Px(5.0),
             },
             launcher: LauncherType {
                 field_font: Px(22.0),

@@ -174,6 +174,12 @@ fn Choosers() -> Element {
                 Specimen { name: "off, disabled",
                     Toggle { label: "Off, disabled", value: Switch::Off, availability: Availability::Disabled, onchange: |_| {} }
                 }
+                Specimen { name: "Small (settings row), on", code: "26 x 15, knob 13".to_string(),
+                    Toggle { label: "Small on", value: Switch::On, size: ds::ControlSize::Small, onchange: |_| {} }
+                }
+                Specimen { name: "Large, on", code: "48 x 28, knob 26".to_string(),
+                    Toggle { label: "Large on", value: Switch::On, size: ds::ControlSize::Large, onchange: |_| {} }
+                }
             }
             div { class: "g-grid4",
                 Specimen { name: "live", code: format!("{} / 1000", level().0),

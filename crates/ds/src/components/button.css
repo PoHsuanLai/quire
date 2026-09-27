@@ -5,7 +5,11 @@
 
 .ds-button{ font:inherit; }
 
-/* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
+/* Heights come from the size ladder (design/29-SIZING.md R1): a Regular button is 22 tall with
+   the reference push button's radius 5 (`--ctl-r-m`) and its label centred on `line-height:1`;
+   padding sets only the side inset. Mini is the ladder's Small, 16 tall at radius 4.
+
+   Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
    `--hair` border (sill Q110): Primary's is transparent, so it draws exactly as it did with
    `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
    the box model gains the same border width Secondary and Danger already have, so all three
@@ -13,7 +17,8 @@
    bottom. */
 .ds-button[*|data-variant=primary],
 .ds-button[*|data-variant=secondary]{
-  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
+  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--ctl-r-m);
+  height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); line-height:1; white-space:nowrap;
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
   transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
@@ -28,7 +33,7 @@
 .ds-button[*|data-variant=danger]{
   display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
   border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
-  border-radius:var(--r-btn); padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
+  border-radius:var(--ctl-r-s); height:var(--ctl-h-s); padding:0 var(--ctl-pad-s); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=mini]:hover,
@@ -47,7 +52,7 @@
 /* Quiet: `S:601-602`. S's link-button has no icon, so no gap; with one it takes the gap every
    other variant has (6), laid out as they are (polish pass: the glyph touched the label).
    TODO(O-3): its icon size and active state are not specified. */
-.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); color:var(--ink-faint); padding:var(--s-2) var(--s-4); border-radius:var(--r-small); }
+.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); line-height:1; color:var(--ink-faint); height:var(--ctl-h-m); padding:0 var(--s-4); border-radius:var(--ctl-r-m); }
 .ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
 
 /* Frame (mailo gaps 4): words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
@@ -67,10 +72,12 @@
 
 /* Size (sill Q92), after the variants so it wins at equal weight: `data-size` is written only
    when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
-   Primary's box (`S:386-391`) at the variant's colours, so a Danger Restart stands level with a
-   Primary Shut Down beside it; Mini is Mini's (`S:165-173`). Quiet and Frame keep their own. */
-.ds-button[*|data-size=regular]{ padding:var(--s-8) var(--s-14); font-size:var(--fs-control); font-weight:700; line-height:inherit; }
-.ds-button[*|data-size=mini]{ padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+   Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
+   a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
+.ds-button[*|data-size=regular]{ height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border-radius:var(--ctl-r-m); font-size:var(--fs-control); font-weight:700; line-height:1; }
+.ds-button[*|data-size=mini]{ height:var(--ctl-h-s); padding:0 var(--ctl-pad-s); border-radius:var(--ctl-r-s); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+/* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
+.ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
 
 /* Disabled (sill Q93; design/13 section 13.3.3's disabled item): .35, the default cursor, and no
    pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the

@@ -9,24 +9,25 @@
 use crate::components::vocab::{Availability, Switch};
 use crate::detail::Touch;
 use crate::motion::{PxPerUnit, SpringResponse, SpringSpec, use_spring};
+use crate::tokens::ControlSize;
 use dioxus::prelude::*;
 
-/// The knob's travel, in pixels: the track's 30 px inside its padding less the 18 px knob.
-const TRAVEL: f32 = 12.0;
-
-/// Where the knob stands for `value`.
-fn knob_at(value: Switch) -> f32 {
+/// Where the knob stands for `value` on a switch of `size`: off at the start, on at the end of
+/// its travel (the track less its two knob insets and the knob, design/29-SIZING.md R3).
+fn knob_at(value: Switch, size: ControlSize) -> f32 {
     match value {
-        Switch::On => TRAVEL,
+        Switch::On => f32::from(size.scale().switch_travel().0),
         Switch::Off => 0.0,
     }
 }
 
-/// An on/off switch.
+/// An on/off switch, `size` on the ladder (Regular 38 x 22 when absent; Small 26 x 15 in a
+/// settings row).
 #[component]
 pub fn Toggle(
     label: String,
     value: Switch,
+    #[props(default)] size: ControlSize,
     #[props(default)] availability: Availability,
     onchange: EventHandler<Switch>,
 ) -> Element {
@@ -38,13 +39,14 @@ pub fn Toggle(
         Some(_) | None => Touch::Remote,
     };
     let spec = SpringSpec::for_touch(touch).response(SpringResponse::Quick);
-    let knob = use_spring(knob_at(value), spec, PxPerUnit(1.0));
+    let knob = use_spring(knob_at(value, size), spec, PxPerUnit(1.0));
     rsx! {
         button {
             r#type: "button",
             class: "ds-toggle",
             role: "switch",
             "aria-checked": value.aria(),
+            "data-size": size.slug(),
             "aria-label": "{label}",
             "aria-disabled": availability.aria_disabled(),
             style: "--knob-x:{knob.css()}",
@@ -56,6 +58,26 @@ pub fn Toggle(
                 }
             },
             span { class: "ds-toggle-knob" }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::knob_at;
+    use crate::components::vocab::Switch;
+    use crate::tokens::ControlSize;
+
+    #[test]
+    fn the_knob_travels_the_track_less_the_knob_and_its_insets() {
+        const CASES: &[(ControlSize, f32)] = &[
+            (ControlSize::Small, 11.0),
+            (ControlSize::Regular, 16.0),
+            (ControlSize::Large, 20.0),
+        ];
+        for (size, travel) in CASES {
+            assert_eq!(knob_at(Switch::On, *size), *travel, "{size:?}");
+            assert_eq!(knob_at(Switch::Off, *size), 0.0, "{size:?}");
         }
     }
 }

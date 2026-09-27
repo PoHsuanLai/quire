@@ -22,7 +22,7 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent-ring);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.32);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--ctl-h-s:16px;--ctl-r-s:4px;--ctl-cap-r-s:8px;--ctl-glyph-s:12px;--ctl-pad-s:6px;--ctl-fs-s:11px;--ctl-fw-s:600;--knob-s:14px;--switch-w-s:26px;--switch-h-s:15px;--switch-r-s:7.5px;--switch-knob-s:13px;--slider-track-s:4px;--slider-knob-s:14px;--seg-well-r-s:4px;--seg-h-s:14px;--seg-r-s:3px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:6px;--ctl-cap-r-l:14px;--ctl-glyph-l:18px;--ctl-pad-l:12px;--ctl-fs-l:13px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:48px;--switch-h-l:28px;--switch-r-l:14px;--switch-knob-l:26px;--slider-track-l:6px;--slider-knob-l:26px;--seg-well-r-l:7px;--seg-h-l:26px;--seg-r-l:6px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,24px);--shell-bar-pad:var(--shell-bar-pad-x,10px);--r-shell-bar-item:var(--shell-bar-radius,4px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,6px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--t-awake:20000ms;--t-fill:800ms;--t-sweep:700ms;--t-count-step:33ms;--t-pending-step:300ms;--t-idle-dim:2000ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;--pickup:1.04;color-scheme:light;}
+.ds{--paper:#e9ece6;--surface:#f8f9f6;--surface-2:#f1f3ee;--raise:#ffffff;--ink:#1a1e1a;--ink-soft:#586057;--ink-faint:#676e65;--line:#d6dbd0;--line-soft:#e3e7de;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.32);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#ede6d9;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:14px;--r-card:12px 12px 12px 4px;--r-btn:9px;--r-chip:6px 6px 6px 2px;--r-pill:999px;--r-field:10px;--r-menu:12px;--r-item:9px;--r-tile:12px;--r-window:18px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px 10px 10px 3px;--ctl-h-s:16px;--ctl-r-s:4px;--ctl-cap-r-s:8px;--ctl-glyph-s:12px;--ctl-pad-s:6px;--ctl-fs-s:11px;--ctl-fw-s:600;--knob-s:14px;--switch-w-s:26px;--switch-h-s:15px;--switch-r-s:7.5px;--switch-knob-s:13px;--slider-track-s:4px;--slider-knob-s:14px;--seg-well-r-s:4px;--seg-h-s:14px;--seg-r-s:3px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:6px;--ctl-cap-r-l:14px;--ctl-glyph-l:18px;--ctl-pad-l:12px;--ctl-fs-l:13px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:48px;--switch-h-l:28px;--switch-r-l:14px;--switch-knob-l:26px;--slider-track-l:6px;--slider-knob-l:26px;--seg-well-r-l:7px;--seg-h-l:26px;--seg-r-l:6px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-tap:90ms;--t-quick:170ms;--t-move:250ms;--t-big:420ms;--t-ambient:5000ms;--t-big-heavy:483ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:483ms;--t-send:620ms;--t-float:900ms;--t-hc-out:120ms;--t-scene:380ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-shake-long:560ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--t-awake:20000ms;--t-fill:800ms;--t-sweep:700ms;--t-count-step:33ms;--t-pending-step:300ms;--t-idle-dim:2000ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;--pickup:1.04;color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#151814;--surface:#1d211b;--surface-2:#232722;--raise:#2a2f28;--ink:#e7ebe3;--ink-soft:#a0a79b;--ink-faint:#8a9284;--line:#333a30;--line-soft:#282e26;--accent:#8ebaf7;--accent-soft:rgba(142,186,247,.2);--accent-text:#8ebaf7;--accent-text-material:#d5e6fe;--seal:#8ebaf7;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#333123;--danger-wash:rgba(224,112,90,.16);--accent-ring:rgba(142,186,247,.55);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--spell-mark:#e0705a;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-typeface=editorial]{--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.015em;--tracking-lock-clock:-.035em;--tracking-lock-date:.01em;--tracking-caps:.14em;--tracking-caps-narrow:.12em;--fw-caps:400;--fs-caps:var(--fs-eyebrow);--tracking-mono:-.02em;--fs-mono:.78em;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-widget-hero:47px;--fs-lock-clock:140px;}
 .ds[*|data-motion=calm]{--t-big:300ms;--t-big-heavy:345ms;--t-crumple-heavy:345ms;--t-sweep:500ms;--t-pending-step:360ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--tilt:0deg;--stagger:0ms;--pickup:1.02;}
@@ -987,7 +987,11 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-button{ font:inherit; }
 
-/* Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
+/* Heights come from the size ladder (design/29-SIZING.md R1): a Regular button is 22 tall with
+   the reference push button's radius 5 (`--ctl-r-m`) and its label centred on `line-height:1`;
+   padding sets only the side inset. Mini is the ladder's Small, 16 tall at radius 4.
+
+   Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
    `--hair` border (sill Q110): Primary's is transparent, so it draws exactly as it did with
    `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
    the box model gains the same border width Secondary and Danger already have, so all three
@@ -995,7 +999,8 @@ html,body{margin:0;padding:0;background:transparent}
    bottom. */
 .ds-button[*|data-variant=primary],
 .ds-button[*|data-variant=secondary]{
-  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--r-btn); padding:var(--s-8) var(--s-14);
+  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--ctl-r-m);
+  height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); line-height:1; white-space:nowrap;
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
   transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
@@ -1010,7 +1015,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|data-variant=danger]{
   display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
   border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
-  border-radius:var(--r-btn); padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
+  border-radius:var(--ctl-r-s); height:var(--ctl-h-s); padding:0 var(--ctl-pad-s); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=mini]:hover,
@@ -1029,7 +1034,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Quiet: `S:601-602`. S's link-button has no icon, so no gap; with one it takes the gap every
    other variant has (6), laid out as they are (polish pass: the glyph touched the label).
    TODO(O-3): its icon size and active state are not specified. */
-.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); color:var(--ink-faint); padding:var(--s-2) var(--s-4); border-radius:var(--r-small); }
+.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); line-height:1; color:var(--ink-faint); height:var(--ctl-h-m); padding:0 var(--s-4); border-radius:var(--ctl-r-m); }
 .ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
 
 /* Frame (mailo gaps 4): words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
@@ -1049,10 +1054,12 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Size (sill Q92), after the variants so it wins at equal weight: `data-size` is written only
    when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
-   Primary's box (`S:386-391`) at the variant's colours, so a Danger Restart stands level with a
-   Primary Shut Down beside it; Mini is Mini's (`S:165-173`). Quiet and Frame keep their own. */
-.ds-button[*|data-size=regular]{ padding:var(--s-8) var(--s-14); font-size:var(--fs-control); font-weight:700; line-height:inherit; }
-.ds-button[*|data-size=mini]{ padding:var(--s-5) var(--s-10); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+   Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
+   a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
+.ds-button[*|data-size=regular]{ height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border-radius:var(--ctl-r-m); font-size:var(--fs-control); font-weight:700; line-height:1; }
+.ds-button[*|data-size=mini]{ height:var(--ctl-h-s); padding:0 var(--ctl-pad-s); border-radius:var(--ctl-r-s); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+/* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
+.ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
 
 /* Disabled (sill Q93; design/13 section 13.3.3's disabled item): .35, the default cursor, and no
    pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
@@ -1495,9 +1502,13 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-icon-button{ font:inherit; }
 
-/* Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
+/* Every box is square on the size ladder (design/29-SIZING.md): Tool is Large (28), Foot is
+   Regular (22); Status is the bar's 30 x 22 slot. Strip keeps mailo's 26 round box (its rows are
+   the app side, one density step larger until audited, design/29 section 13 decision 9).
+
+   Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
 .ds-icon-button[*|data-variant=tool]{
-  display:inline-grid; place-items:center; width:28px; height:26px; border:var(--hair) solid transparent; border-radius:var(--r-btn);
+  display:inline-grid; place-items:center; width:var(--ctl-h-l); height:var(--ctl-h-l); border:var(--hair) solid transparent; border-radius:var(--ctl-r-l);
   background:transparent; color:var(--ink-faint); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -1507,7 +1518,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Foot: `S:151-153`. Active: not specified. */
 .ds-icon-button[*|data-variant=foot]{
-  width:24px; height:24px; border-radius:var(--r-menu-item); border:0; background:transparent; cursor:default;
+  width:var(--ctl-h-m); height:var(--ctl-h-m); border-radius:var(--ctl-r-m); border:0; background:transparent; cursor:default;
   display:grid; place-items:center; color:var(--f-ink-soft);
 }
 .ds-icon-button[*|data-variant=foot]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
@@ -1533,14 +1544,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
 
 /* Status (bar gaps; design/13-BEHAVIOUR-menus-windows.md section 13.3.1): a bar status item on
-   the frame. The box and the glyph come from the consumer's settings through `--bar-status-box`
-   and `--bar-status-glyph` (`ds::StatusMetrics`); the fallbacks are the keys' defaults, 22 and
-   16. The glyph is sized here, not by its attributes, because the size is a setting: Blitz and
+   the frame. The slot is the bar's 30 wide (`--bar-status-w`, design/29-SIZING.md section 5.1:
+   the glyph 7 in from each side) by the box's height; the box and the glyph come from the
+   consumer's settings through `--bar-status-box` and `--bar-status-glyph` (`ds::StatusMetrics`);
+   the fallbacks are the keys' defaults, 22 and 16. The glyph is sized here, not by its attributes, because the size is a setting: Blitz and
    browsers let a CSS width override an `svg`'s presentation width. Inks on the frame as the Foot
    button's; pressed and open on `--f-pill`, the open title's pill. The pill's radius is the
-   shell scale's 4 px bar-item radius (`--r-shell-bar-item`, the macOS polish pass). */
+   shell scale's bar-item radius (`--r-shell-bar-item`, 5, a Regular control's). */
 .ds-icon-button[*|data-variant=status]{
-  display:inline-grid; place-items:center; width:var(--bar-status-box,22px); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
+  display:inline-grid; place-items:center; width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
   background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -1609,16 +1621,18 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- level -- */
 /* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
    follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
-   `material/level.rs`); `--f` is the level and `--rb` the rubber band's stretch, both written
+   `material/level.rs`); the capsule is a Regular control, 22 (`--ctl-h-m`, design/29-SIZING.md);
+   `--f` is the level and `--rb` the rubber band's stretch, both written
    inline by the component. Attribute selectors carry `*|` (spike S2).
 
    Motion. A level set from outside slides over `--t-quick --e-out`; under the pointer
    (`data-drag=live`) the fill follows it with no transition. A press swells the track
-   (`scaleY(1.08)`, `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
+   (`scaleY(1.1)`, about a pixel above and below the 22 capsule, as 1.08 was on the 26 one;
+   `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
    stretches by `--rb` along that end and springs back over `--t-move --e-spring` when released.
    Glyph parts cross-fade over `--t-quick`; the sun's rays scale with `--f`. */
 
-.ds-level{ --level-h:26px; display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
+.ds-level{ --level-h:var(--ctl-h-m); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
 .ds-level-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
 /* Where a press and a drag land: the rail and a margin round it, so a drag a little past an end
    still reaches the control. Last in the rail, so it is over everything drawn there. */
@@ -1631,7 +1645,7 @@ html,body{margin:0;padding:0;background:transparent}
   transition:transform var(--t-quick) var(--e-spring), left var(--t-move) var(--e-spring), right var(--t-move) var(--e-spring); }
 .ds-level-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
   background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out); }
-.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.08); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.1); transition:transform var(--t-quick) var(--e-spring); }
 .ds-level[*|data-drag=live] .ds-level-fill{ transition:none; }
 .ds-level[*|data-over=end] .ds-level-track{ right:calc(var(--rb) * -1); }
 .ds-level[*|data-over=start] .ds-level-track{ left:calc(var(--rb) * -1); }
@@ -1653,9 +1667,10 @@ html,body{margin:0;padding:0;background:transparent}
 /* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
 .ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }
 
-/* The knob: a round disc of the fill's ink riding the fill's end; the fill ends at its centre. */
+/* The knob: a round disc of the fill's ink riding the fill's end, the capsule less the 1 px knob
+   inset (design/29-SIZING.md R3: 20 in the Regular 22); the fill ends at its centre. */
 .ds-level[*|data-look=capsule-knob] .ds-level-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
-.ds-level-knob{ position:absolute; top:0; left:calc(var(--f) * (100% - var(--level-h))); width:var(--level-h); height:var(--level-h);
+.ds-level-knob{ position:absolute; top:var(--knob-inset); left:calc(var(--knob-inset) + var(--f) * (100% - var(--level-h))); width:calc(var(--level-h) - 2 * var(--knob-inset)); height:calc(var(--level-h) - 2 * var(--knob-inset));
   border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
   transition:left var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring), margin-left var(--t-move) var(--e-spring); }
 .ds-level[*|data-drag=live] .ds-level-knob{ transform:scale(1.08); transition:transform var(--t-quick) var(--e-spring); }
@@ -1868,12 +1883,17 @@ html,body{margin:0;padding:0;background:transparent}
    at once (`S:2052`, `C:1744`).
    TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--s-5); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-menu[*|data-kind=slim],
 .ds-menu[*|data-kind=context]{ width:220px; }
-.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; padding:var(--s-6); border-radius:var(--r-panel); box-shadow:var(--shadow-2);
+.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; box-shadow:var(--shadow-2);
   transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-spring); }
+
+/* A menu's surface is the reference's menu (design/29-SIZING.md section 5.4): radius 8 with its
+   rows inset 5 (`--r-shell-menu`, `--shell-menu-inset`); the rows' highlight is 5, not concentric,
+   as the reference draws it. */
+.ds-popover.ds-menu{ border-radius:var(--r-shell-menu); }
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
@@ -1899,17 +1919,17 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The query line of `filter: Filter::Field` (mailo gaps 5): the typed text in a row at the top of
    the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
-   line, 3/2 padding, no box of its own) over a hairline that sets it apart from the rows. The
+   line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
    menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
    the field's caret colour, and the placeholder takes the field's `--ink-faint`. */
-.ds-menu-filter{ display:flex; align-items:center; min-height:calc(1.55em + 8px); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
+.ds-menu-filter{ display:flex; align-items:center; min-height:var(--ctl-h-l); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
   border-bottom:var(--hair) solid var(--line-soft); font-size:var(--fs-body); line-height:1.55; color:var(--ink); white-space:nowrap; overflow:hidden; }
 .ds-menu-filter-placeholder{ color:var(--ink-faint); }
 .ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent-text); flex:none; }
 /* -- menu_bar_item -- */
 /* MenuBarItem (the macOS polish pass; design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
-   a bar item's text at the shell scale, and the 4 px pill behind it on hover and while its menu
-   is open. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
+   a bar item's text at the shell scale, and the pill behind it on hover and while its menu is
+   open: a Regular control, 22 tall at radius 5 (design/29-SIZING.md), centred in the 24 bar. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
 
 .ds-bar-item{ display:inline-flex; align-items:center; height:var(--shell-bar-item); padding:0 var(--shell-bar-pad); border-radius:var(--r-shell-bar-item);
   font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); color:var(--ink); white-space:nowrap; cursor:default; }
@@ -2102,7 +2122,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
 /* -- module_tile -- */
 /* ModuleTile (sill FINDINGS Q78; design/20 section 1.5, design/13 section 13.3.7): a module on
-   the control center's grid, `--r-tile` 12. Off: the Mini button's plate (`--surface-2` and a
+   the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
+   (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
    with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
    pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`) and by `--lift`; pressed it
@@ -2110,8 +2131,8 @@ html,body{margin:0;padding:0;background:transparent}
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
 
 .ds-module-tile{
-  position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:52px; box-sizing:border-box;
-  padding:var(--s-8) var(--s-4) var(--s-8) var(--s-10); border:var(--hair) solid var(--line); border-radius:var(--r-tile);
+  position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:var(--cc-tile-h); box-sizing:border-box;
+  padding:0 var(--s-4) 0 var(--cc-pad); border:var(--hair) solid var(--line); border-radius:var(--cc-module-r);
   background:var(--surface-2); color:var(--ink); cursor:default; user-select:none;
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
@@ -2124,7 +2145,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-tile[*|aria-disabled=true]:hover{ background:var(--surface-2); box-shadow:none; transform:none; }
 
 .ds-module-disc{
-  position:relative; display:grid; place-items:center; flex:none; width:28px; height:28px; border-radius:var(--r-pill);
+  position:relative; display:grid; place-items:center; flex:none; width:var(--ctl-h-l); height:var(--ctl-h-l); border-radius:var(--r-pill);
   background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
@@ -2135,11 +2156,11 @@ html,body{margin:0;padding:0;background:transparent}
    words reach it or not, and a half tile's column is about as wide as "Bluetooth". */
 .ds-module-title,
 .ds-module-status{ white-space:nowrap; overflow:hidden; }
-.ds-module-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
-.ds-module-status{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+.ds-module-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:var(--cc-head); }
+.ds-module-status{ font-size:var(--fs-help); color:var(--ink-faint); line-height:var(--s-14); }
 
 .ds-module-chevron{
-  font:inherit; display:grid; place-items:center; flex:none; width:18px; height:28px; padding:0; border:0; border-radius:var(--r-btn);
+  font:inherit; display:grid; place-items:center; flex:none; width:18px; height:var(--ctl-h-l); padding:0; border:0; border-radius:var(--ctl-r-m);
   background:transparent; color:var(--ink-faint); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -2149,32 +2170,35 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
 
 /* ModuleGrid (design/13 section 13.3.7; sill FINDINGS Q102): `--grid-columns` equal columns
-   (2), `--grid-gap` apart (8), `--grid-padding` inside (12); the component writes all three
-   inline from `control_center.grid_*`, and these are the keys' defaults. */
-.ds-module-grid{ --grid-columns:2; --grid-gap:var(--s-8); --grid-padding:var(--s-12); display:grid;
+   (2), `--grid-gap` apart (10), `--grid-padding` inside (10); the component writes all three
+   inline from `control_center.grid_*`, and these are the control center's sizes
+   (`--cc-gap`, `--cc-pad`, design/29-SIZING.md). */
+.ds-module-grid{ --grid-columns:2; --grid-gap:var(--cc-gap); --grid-padding:var(--cc-pad); display:grid;
   grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr)); gap:var(--grid-gap); padding:var(--grid-padding); }
 /* -- module_panel -- */
-/* ModulePanel (sill FINDINGS Q100; design/13 section 13.3.7): a module with content of its own on
-   the tile's frame: `--r-tile` 12, the Off tile's plate (`--surface-2`, a hairline) and the
-   module's padding of 10 / 12. Not pressable, so no hover lift: its content takes the presses.
-   The header row: a 16 px glyph in `--ink-soft`, the title in the tile's type (13/600), the
-   trailing slot at the far end in the tile's status type (`--fs-help`, `--ink-faint`, tabular
-   figures, for a level's percentage). Full by default: it spans every grid column. `Bare`
-   drops the plate where a popover card already is the module's. Attribute selectors carry `*|`
-   (spike S2). */
+/* ModulePanel (sill FINDINGS Q100; design/13 section 13.3.7; sized by design/29-SIZING.md): a
+   module with content of its own on the tile's frame: the control center's module radius 8
+   (`--cc-module-r`), the Off tile's plate (`--surface-2`, a hairline drawn inset so it takes no
+   room) and the control center's padding of 10 (`--cc-pad`). A level module is then its padding,
+   a 16 header, a 6 gap and the Regular 22 capsule: 64 (`--cc-level-h`). Not pressable, so no
+   hover lift: its content takes the presses. The header row: a 16 px glyph in `--ink-soft`, the
+   title in the tile's type (13/600), the trailing slot at the far end in the tile's status type
+   (`--fs-help`, `--ink-faint`, tabular figures, for a level's percentage). Full by default: it
+   spans every grid column. `Bare` drops the plate where a popover card already is the module's.
+   Attribute selectors carry `*|` (spike S2). */
 
 .ds-module-panel{
-  display:flex; flex-direction:column; gap:var(--s-8); min-width:0; box-sizing:border-box;
-  padding:var(--s-10) var(--s-12); border:var(--hair) solid var(--line); border-radius:var(--r-tile);
+  display:flex; flex-direction:column; gap:var(--cc-head-gap); min-width:0; box-sizing:border-box;
+  padding:var(--cc-pad); border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); border-radius:var(--cc-module-r);
   background:var(--surface-2); color:var(--ink);
 }
 .ds-module-panel[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-panel[*|data-plate=bare]{ padding:0; border:0; background:none; }
+.ds-module-panel[*|data-plate=bare]{ padding:0; box-shadow:none; background:none; }
 
-.ds-module-panel-head{ display:flex; align-items:center; gap:var(--s-6); min-width:0; }
+.ds-module-panel-head{ display:flex; align-items:center; gap:var(--s-6); min-width:0; height:var(--cc-head); }
 .ds-module-panel-glyph{ display:flex; align-items:center; flex:none; color:var(--ink-soft); }
 .ds-module-panel-title{ flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden;
-  font-size:var(--fs-shell-menu); font-weight:600; line-height:1.25; }
+  font-size:var(--fs-shell-menu); font-weight:600; line-height:var(--cc-head); }
 .ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
   font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 /* -- month_grid -- */
@@ -2881,24 +2905,24 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-sidebar-item[*|data-kind=today][*|data-presence=present]:not([*|data-pulse]){ animation:hold var(--t-tap) var(--e-linear); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:tab-out var(--t-move) var(--e-exit) forwards; overflow:hidden; }
 /* -- slider -- */
-/* Slider (design/04-COMPONENTS.md section 5, derived): the editor's `.handle` (`S:255-257`) as the
-   thumb, a DragTracker in Rust writing `--f`. Attribute selectors carry `*|` (spike S2); the focus
-   ring is the global one, on `.ds-slider` (spike S12). The thumb follows the pointer 1:1: nothing
-   here transitions `left`.
-   TODO(O-5): the track's 4px height and `--line` unfilled colour are the doc's candidate.
-   The thumb's border is `--handle-ring` (O-3, proposed).
+/* Slider (design/04-COMPONENTS.md section 5, derived; sized by design/29-SIZING.md): the
+   reference's regular slider, a 4 px capsule track under a plain white round knob of 20 (the
+   Regular knob, `--slider-knob-m`) with the handle's shadow and no ring. A DragTracker in Rust
+   writes `--f`. Attribute selectors carry `*|` (spike S2); the focus ring is the global one, on
+   `.ds-slider` (spike S12). The thumb follows the pointer 1:1: nothing here transitions `left`.
+   TODO(O-5): the track's `--line` unfilled colour is the doc's candidate.
    TODO(O-3): the live scale 1.15 (`S:257`) has no scalar token.
-   The thumb's fill, the hover state and disabled (O-1) are not specified. */
+   The hover state and disabled (O-1) are not specified. */
 
-.ds-slider{ position:relative; display:block; width:100%; height:22px; cursor:default; }
+.ds-slider{ position:relative; display:block; width:100%; height:var(--slider-knob-m); cursor:default; }
 .ds-slider-track{
-  position:absolute; left:0; right:0; top:9px; height:4px; overflow:hidden;
+  position:absolute; left:0; right:0; top:calc((var(--slider-knob-m) - var(--slider-track-m)) / 2); height:var(--slider-track-m); overflow:hidden;
   border-radius:var(--r-pill); background:var(--line);
 }
 .ds-slider-fill{ height:100%; width:calc(var(--f) * 100%); background:var(--accent); }
 .ds-slider-thumb{
-  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:22px; height:22px; margin-left:calc(var(--s-11) * -1);
-  border-radius:var(--r-pill); border:3px solid var(--handle-ring); box-shadow:var(--shadow-handle); cursor:grab;
+  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:var(--slider-knob-m); height:var(--slider-knob-m); margin-left:calc(var(--slider-knob-m) / -2);
+  border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-handle); cursor:grab;
 }
 .ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }
 /* -- space_editor -- */
@@ -3073,9 +3097,10 @@ html,body{margin:0;padding:0;background:transparent}
    `placeholder` and has no `::placeholder` (O-23's fallback). (It was `.ds-field`, which is the
    Space editor's colour field: the two sheets styled each other's element, gallery fix A.)
    One line: Blitz gives an `input` no intrinsic size, so it took the replaced-element default of
-   300 x 150. The height is the line (`1.55em`, the base line height the field inherits in S) plus
-   the padding and the 1 px border, in `em` so a consumer's font size (the search row's 16, the
-   bubble's 12.5) keeps it one line; the width fills the wrapper, whose width is the consumer's.
+   300 x 150. Boxed is a Regular control (22, design/29-SIZING.md R1) whose line fills the box
+   inside its hairlines; Inline's height is its line (`1.55em`) plus the padding and the border,
+   in `em` so a consumer's font size (the search row's 16, the bubble's 12.5) keeps it one line;
+   the width fills the wrapper, whose width is the consumer's.
    Font and colour are on `.ds-input` itself: the reset's element rules are `:where(.ds) input`,
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
@@ -3089,8 +3114,8 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=boxed]{
-  height:calc(1.55em + 16px);
-  background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--r-field); padding:var(--s-7) var(--s-10);
+  height:var(--ctl-h-m); line-height:calc(var(--ctl-h-m) - 2 * var(--hair));
+  background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--ctl-r-m); padding:0 var(--s-8);
   transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
@@ -3108,7 +3133,7 @@ html,body{margin:0;padding:0;background:transparent}
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
   font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--s-8) var(--s-11); }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }
 
 /* A password (`data-kind=password`): Blitz draws a password field's characters as typed, so the
@@ -3142,7 +3167,10 @@ html,body{margin:0;padding:0;background:transparent}
    reaches, stays under it and only the dots' highlight shows. An Inline field's ground is its
    container's (the lock pill's glass), which the mask cannot repeat: there Blitz's highlight
    shows beside the dots' when a range is selected (FINDINGS Q360b). */
-.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--s-8) var(--s-11); background:var(--surface); background-clip:content-box; }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); background:var(--surface); background-clip:content-box; }
+/* Boxed, the caret spans the field's line, hung from its top: the ascent plus the line's
+   half-leading over Inter's 1.21em. */
+.ds-input-wrap[*|data-variant=boxed] .ds-input-caret::before{ top:calc(-.969em - (var(--ctl-h-m) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 
 /* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
@@ -3173,6 +3201,9 @@ html,body{margin:0;padding:0;background:transparent}
    `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
    component's. */
 .ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; scrollbar-width:none; display:block; }
+/* A boxed multiline field reads at the reading line, with the Regular field's inset above and
+   below its lines. */
+.ds-input[*|data-variant=boxed][*|data-kind=multiline]{ line-height:1.55; padding:var(--s-4) var(--s-8); }
 .ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
 
 /* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The
@@ -3225,26 +3256,32 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toast-tab[*|data-drag=live]{ transition:none; }
 .ds-toast-tab[*|data-armed=armed]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
 /* -- toggle -- */
-/* Toggle (design/04-COMPONENTS.md section 4, derived): the `.seg` track, the pressed Mini's
-   accent fill, the Space dot's spring. Attribute selectors carry `*|` (spike S2); the focus
-   ring is the global one, on the track (spike S12).
-   TODO(O-4): the knob and track sizes are the doc's candidate (knob 18, track 36 x 24 with
-   3px padding), not signed off. The knob's travel is a fixed 12px (36 - 2 x 3 - 18).
+/* Toggle (design/04-COMPONENTS.md section 4; sized by design/29-SIZING.md): the switch on the
+   size ladder. The track is `round_even(1.73 h)` wide and a capsule (R2, R4); the knob fills it
+   less the 1 px knob inset (R3): Regular 38 x 22 with a 20 knob, Small 26 x 15 with a 13 knob
+   (the reference's mini switch, in settings rows), Large 48 x 28 with a 26 knob. The off track's
+   hairline is an inset shadow, so it takes no room from the inset. Attribute selectors carry `*|`
+   (spike S2); the focus ring is the global one, on the track (spike S12).
    Driven motion (design/05 section 14, H1): the knob's offset is `--knob-x`, written in pixels by a
-   spring in Rust on the button, so nothing here transitions the knob's transform.
+   spring in Rust on the button (its travel is `SizeScale::switch_travel`), so nothing here
+   transitions the knob's transform.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
 .ds-toggle{ --knob-x:0;
-  display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:var(--s-3);
-  border:var(--hair) solid var(--line); border-radius:var(--r-pill); background:var(--surface-2); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+  display:inline-flex; align-items:center; flex:none; box-sizing:border-box; width:var(--switch-w-m); height:var(--switch-h-m); padding:0 var(--knob-inset);
+  border:0; border-radius:var(--switch-r-m); background:var(--surface-2); box-shadow:inset 0 0 0 var(--hair) var(--line); cursor:default;
+  transition:background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-toggle-knob{
-  display:block; flex:none; width:18px; height:18px;
-  border-radius:var(--r-pill); background:var(--raise); box-shadow:var(--shadow-1);
+  display:block; flex:none; width:var(--switch-knob-m); height:var(--switch-knob-m);
+  border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-1);
   transform:translateX(calc(var(--knob-x) * 1px));
 }
-.ds-toggle[*|aria-checked=true]{ background:var(--accent); border-color:transparent; }
+.ds-toggle[*|data-size=small]{ width:var(--switch-w-s); height:var(--switch-h-s); border-radius:var(--switch-r-s); }
+.ds-toggle[*|data-size=small] .ds-toggle-knob{ width:var(--switch-knob-s); height:var(--switch-knob-s); }
+.ds-toggle[*|data-size=large]{ width:var(--switch-w-l); height:var(--switch-h-l); border-radius:var(--switch-r-l); }
+.ds-toggle[*|data-size=large] .ds-toggle-knob{ width:var(--switch-knob-l); height:var(--switch-knob-l); }
+.ds-toggle[*|aria-checked=true]{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
 .ds-toggle:active .ds-toggle-knob{ transform:translateX(calc(var(--knob-x) * 1px)) scale(var(--squish)); }
 /* -- tooltip -- */
 /* Tooltip (design/04-COMPONENTS.md section 18). Fly `S:442-446`: a dark label above its
@@ -3433,11 +3470,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* WorkspacePills (the macOS polish pass): one segmented group on the frame, not a row of
    buttons. The track is the frame's hover fill; the current workspace is the raised pressed
    fill with the current-item shadow (`S:118`); the others are soft ink, hovered to full ink.
-   Text is the bar's shell size. Inks are the paper names the frame ground redirects. */
+   Text is the bar's shell size. Inks are the paper names the frame ground redirects. The track is
+   a bar item (22, radius 5); each pill sits 2 inside it at the concentric radius, 5 - 2 = 3
+   (design/29-SIZING.md R6). */
 
 .ds-ws-pills{ display:inline-flex; align-items:center; gap:var(--s-2); padding:var(--s-2); height:var(--shell-bar-item); box-sizing:border-box;
   border-radius:var(--r-shell-bar-item); background:var(--surface); }
-.ds-ws-pill{ font:inherit; display:inline-grid; place-items:center; min-width:var(--s-22); height:100%; padding:0 var(--s-7); border:0; border-radius:var(--r-tiny);
+.ds-ws-pill{ font:inherit; display:inline-grid; place-items:center; min-width:var(--s-22); height:100%; padding:0 var(--s-7); border:0; border-radius:calc(var(--r-shell-bar-item) - var(--s-2));
   background:transparent; color:var(--ink-soft); font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-ws-pill:hover{ color:var(--ink); }

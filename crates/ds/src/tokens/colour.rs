@@ -135,11 +135,14 @@ pub enum ColourToken {
     /// (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle (Q420 B)": dim with an
     /// overlay, never real brightness), so the token carries no alpha of its own.
     ScrimIdle,
+    /// `--knob-fill`: a switch's and a slider's knob, a plain white disc in either scheme (the
+    /// reference's; design/29-SIZING.md section 4 rows 4 and 15), set off by its shadow.
+    Knob,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 39] = [
+    pub const ALL: [ColourToken; 40] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -179,6 +182,7 @@ impl ColourToken {
         ColourToken::LockVeil,
         ColourToken::SpellMark,
         ColourToken::ScrimIdle,
+        ColourToken::Knob,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -223,6 +227,7 @@ impl ColourToken {
             ColourToken::LockVeil => "--lock-veil",
             ColourToken::SpellMark => "--spell-mark",
             ColourToken::ScrimIdle => "--scrim-idle",
+            ColourToken::Knob => "--knob-fill",
         })
     }
 
@@ -272,6 +277,7 @@ impl ColourToken {
             // `idle.dim_level_pct`, so the token itself carries no alpha (design/03-COLOR.md
             // section 17.3.3).
             ColourToken::ScrimIdle => (solid(0x000000), solid(0x000000)),
+            ColourToken::Knob => (WHITE, WHITE),
             // The sender's page stays white in a dark window (section 12, mailo's `--frame`).
             ColourToken::ForeignGround => (WHITE, WHITE),
             ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),

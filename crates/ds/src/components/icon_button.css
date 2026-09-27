@@ -5,9 +5,13 @@
 
 .ds-icon-button{ font:inherit; }
 
-/* Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
+/* Every box is square on the size ladder (design/29-SIZING.md): Tool is Large (28), Foot is
+   Regular (22); Status is the bar's 30 x 22 slot. Strip keeps mailo's 26 round box (its rows are
+   the app side, one density step larger until audited, design/29 section 13 decision 9).
+
+   Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
 .ds-icon-button[*|data-variant=tool]{
-  display:inline-grid; place-items:center; width:28px; height:26px; border:var(--hair) solid transparent; border-radius:var(--r-btn);
+  display:inline-grid; place-items:center; width:var(--ctl-h-l); height:var(--ctl-h-l); border:var(--hair) solid transparent; border-radius:var(--ctl-r-l);
   background:transparent; color:var(--ink-faint); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
@@ -17,7 +21,7 @@
 
 /* Foot: `S:151-153`. Active: not specified. */
 .ds-icon-button[*|data-variant=foot]{
-  width:24px; height:24px; border-radius:var(--r-menu-item); border:0; background:transparent; cursor:default;
+  width:var(--ctl-h-m); height:var(--ctl-h-m); border-radius:var(--ctl-r-m); border:0; background:transparent; cursor:default;
   display:grid; place-items:center; color:var(--f-ink-soft);
 }
 .ds-icon-button[*|data-variant=foot]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
@@ -43,14 +47,15 @@
 .ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
 
 /* Status (bar gaps; design/13-BEHAVIOUR-menus-windows.md section 13.3.1): a bar status item on
-   the frame. The box and the glyph come from the consumer's settings through `--bar-status-box`
-   and `--bar-status-glyph` (`ds::StatusMetrics`); the fallbacks are the keys' defaults, 22 and
-   16. The glyph is sized here, not by its attributes, because the size is a setting: Blitz and
+   the frame. The slot is the bar's 30 wide (`--bar-status-w`, design/29-SIZING.md section 5.1:
+   the glyph 7 in from each side) by the box's height; the box and the glyph come from the
+   consumer's settings through `--bar-status-box` and `--bar-status-glyph` (`ds::StatusMetrics`);
+   the fallbacks are the keys' defaults, 22 and 16. The glyph is sized here, not by its attributes, because the size is a setting: Blitz and
    browsers let a CSS width override an `svg`'s presentation width. Inks on the frame as the Foot
    button's; pressed and open on `--f-pill`, the open title's pill. The pill's radius is the
-   shell scale's 4 px bar-item radius (`--r-shell-bar-item`, the macOS polish pass). */
+   shell scale's bar-item radius (`--r-shell-bar-item`, 5, a Regular control's). */
 .ds-icon-button[*|data-variant=status]{
-  display:inline-grid; place-items:center; width:var(--bar-status-box,22px); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
+  display:inline-grid; place-items:center; width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
   background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }

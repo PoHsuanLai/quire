@@ -1,15 +1,17 @@
 /* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
    follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
-   `material/level.rs`); `--f` is the level and `--rb` the rubber band's stretch, both written
+   `material/level.rs`); the capsule is a Regular control, 22 (`--ctl-h-m`, design/29-SIZING.md);
+   `--f` is the level and `--rb` the rubber band's stretch, both written
    inline by the component. Attribute selectors carry `*|` (spike S2).
 
    Motion. A level set from outside slides over `--t-quick --e-out`; under the pointer
    (`data-drag=live`) the fill follows it with no transition. A press swells the track
-   (`scaleY(1.08)`, `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
+   (`scaleY(1.1)`, about a pixel above and below the 22 capsule, as 1.08 was on the 26 one;
+   `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
    stretches by `--rb` along that end and springs back over `--t-move --e-spring` when released.
    Glyph parts cross-fade over `--t-quick`; the sun's rays scale with `--f`. */
 
-.ds-level{ --level-h:26px; display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
+.ds-level{ --level-h:var(--ctl-h-m); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
 .ds-level-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
 /* Where a press and a drag land: the rail and a margin round it, so a drag a little past an end
    still reaches the control. Last in the rail, so it is over everything drawn there. */
@@ -22,7 +24,7 @@
   transition:transform var(--t-quick) var(--e-spring), left var(--t-move) var(--e-spring), right var(--t-move) var(--e-spring); }
 .ds-level-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
   background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out); }
-.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.08); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.1); transition:transform var(--t-quick) var(--e-spring); }
 .ds-level[*|data-drag=live] .ds-level-fill{ transition:none; }
 .ds-level[*|data-over=end] .ds-level-track{ right:calc(var(--rb) * -1); }
 .ds-level[*|data-over=start] .ds-level-track{ left:calc(var(--rb) * -1); }
@@ -44,9 +46,10 @@
 /* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
 .ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }
 
-/* The knob: a round disc of the fill's ink riding the fill's end; the fill ends at its centre. */
+/* The knob: a round disc of the fill's ink riding the fill's end, the capsule less the 1 px knob
+   inset (design/29-SIZING.md R3: 20 in the Regular 22); the fill ends at its centre. */
 .ds-level[*|data-look=capsule-knob] .ds-level-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
-.ds-level-knob{ position:absolute; top:0; left:calc(var(--f) * (100% - var(--level-h))); width:var(--level-h); height:var(--level-h);
+.ds-level-knob{ position:absolute; top:var(--knob-inset); left:calc(var(--knob-inset) + var(--f) * (100% - var(--level-h))); width:calc(var(--level-h) - 2 * var(--knob-inset)); height:calc(var(--level-h) - 2 * var(--knob-inset));
   border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
   transition:left var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring), margin-left var(--t-move) var(--e-spring); }
 .ds-level[*|data-drag=live] .ds-level-knob{ transform:scale(1.08); transition:transform var(--t-quick) var(--e-spring); }

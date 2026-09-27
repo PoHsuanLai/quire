@@ -186,9 +186,7 @@ fn a_bare_field_is_one_line_of_its_parents_text() {
     // The title's own line, 24 x 1.25: no padding, no border, no size of its own.
     assert!((bare.size.height.0 - 30.0).abs() < 0.5, "{bare:?}");
     let boxed = harness.rect("#boxed input").expect("the boxed field");
-    // A boxed field keeps its own face whatever the parent's: 13.5 x 1.55 and its padding.
-    assert!(
-        (boxed.size.height.0 - (13.5 * 1.55 + 16.0)).abs() < 0.5,
-        "{boxed:?}"
-    );
+    // A boxed field keeps its own face whatever the parent's: a Regular control, 22
+    // (design/29-SIZING.md).
+    assert!((boxed.size.height.0 - 22.0).abs() < 0.5, "{boxed:?}");
 }

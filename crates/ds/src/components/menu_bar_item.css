@@ -1,6 +1,6 @@
 /* MenuBarItem (the macOS polish pass; design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
-   a bar item's text at the shell scale, and the 4 px pill behind it on hover and while its menu
-   is open. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
+   a bar item's text at the shell scale, and the pill behind it on hover and while its menu is
+   open: a Regular control, 22 tall at radius 5 (design/29-SIZING.md), centred in the 24 bar. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
 
 .ds-bar-item{ display:inline-flex; align-items:center; height:var(--shell-bar-item); padding:0 var(--shell-bar-pad); border-radius:var(--r-shell-bar-item);
   font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); color:var(--ink); white-space:nowrap; cursor:default; }

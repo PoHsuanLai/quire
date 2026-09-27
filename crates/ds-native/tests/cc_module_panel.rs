@@ -65,8 +65,8 @@ fn a_level_inside_a_panel_on_the_grid_takes_a_press_and_a_drag() {
     let panel = rect(&harness, ".ds-module-panel");
     assert_eq!(
         (panel.origin.x.0, panel.size.width.0),
-        (12.0, 296.0),
-        "the panel spans both columns inside the grid's padding"
+        (10.0, 300.0),
+        "the panel spans both columns inside the grid's padding (10, design/29-SIZING.md)"
     );
     let rail = rect(&harness, ".ds-level-rail");
     let at = |share: f32| Point {

@@ -352,8 +352,9 @@ fn inked_width(frame: &RgbaImage, box_rect: ds::Rect) -> u32 {
     }
 }
 
-/// A status item is a square of `--bar-status-box` holding a glyph drawn at
-/// `--bar-status-glyph`; without the properties, the keys' defaults 22 and 16.
+/// A status item is a slot `--bar-status-box` tall and at least the bar's 30 wide
+/// (`--bar-status-w`, design/29-SIZING.md) holding a glyph drawn at `--bar-status-glyph`; without
+/// the properties, the keys' defaults 22 and 16.
 #[test]
 fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
     let mut harness = Harness::new(StatusItems, BAR_VIEW);
@@ -366,7 +367,7 @@ fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
         let button = rect(&harness, &format!("{scope} .ds-icon-button"));
         assert_eq!(
             (button.size.width, button.size.height),
-            (Px(side), Px(side)),
+            (Px(side.max(30.0)), Px(side)),
             "{scope}"
         );
         let svg = rect(&harness, &format!("{scope} .ds-ic"));

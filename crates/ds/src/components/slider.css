@@ -1,20 +1,20 @@
-/* Slider (design/04-COMPONENTS.md section 5, derived): the editor's `.handle` (`S:255-257`) as the
-   thumb, a DragTracker in Rust writing `--f`. Attribute selectors carry `*|` (spike S2); the focus
-   ring is the global one, on `.ds-slider` (spike S12). The thumb follows the pointer 1:1: nothing
-   here transitions `left`.
-   TODO(O-5): the track's 4px height and `--line` unfilled colour are the doc's candidate.
-   The thumb's border is `--handle-ring` (O-3, proposed).
+/* Slider (design/04-COMPONENTS.md section 5, derived; sized by design/29-SIZING.md): the
+   reference's regular slider, a 4 px capsule track under a plain white round knob of 20 (the
+   Regular knob, `--slider-knob-m`) with the handle's shadow and no ring. A DragTracker in Rust
+   writes `--f`. Attribute selectors carry `*|` (spike S2); the focus ring is the global one, on
+   `.ds-slider` (spike S12). The thumb follows the pointer 1:1: nothing here transitions `left`.
+   TODO(O-5): the track's `--line` unfilled colour is the doc's candidate.
    TODO(O-3): the live scale 1.15 (`S:257`) has no scalar token.
-   The thumb's fill, the hover state and disabled (O-1) are not specified. */
+   The hover state and disabled (O-1) are not specified. */
 
-.ds-slider{ position:relative; display:block; width:100%; height:22px; cursor:default; }
+.ds-slider{ position:relative; display:block; width:100%; height:var(--slider-knob-m); cursor:default; }
 .ds-slider-track{
-  position:absolute; left:0; right:0; top:9px; height:4px; overflow:hidden;
+  position:absolute; left:0; right:0; top:calc((var(--slider-knob-m) - var(--slider-track-m)) / 2); height:var(--slider-track-m); overflow:hidden;
   border-radius:var(--r-pill); background:var(--line);
 }
 .ds-slider-fill{ height:100%; width:calc(var(--f) * 100%); background:var(--accent); }
 .ds-slider-thumb{
-  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:22px; height:22px; margin-left:calc(var(--s-11) * -1);
-  border-radius:var(--r-pill); border:3px solid var(--handle-ring); box-shadow:var(--shadow-handle); cursor:grab;
+  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:var(--slider-knob-m); height:var(--slider-knob-m); margin-left:calc(var(--slider-knob-m) / -2);
+  border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-handle); cursor:grab;
 }
 .ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }
