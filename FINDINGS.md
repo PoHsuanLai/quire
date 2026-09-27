@@ -4889,3 +4889,32 @@ section 52 the components.
 - **Not here (sill's lane).** The stamps from the network, Bluetooth and sink services, the
   device batteries, the keyboard backlight service and its module, and moving Now Playing and the
   Battery module onto the new parts.
+
+## The widget interface (sill Q412, Q430, Q431, 2026-09-27)
+
+design/23-WIDGETS.md sections 4.3, 4.4, 5.2, 6 and 9; CONSUMING "Widget interface".
+
+- **One trait, the card quire's.** `ds::widget::Widget` (kind, name, description, sizes,
+  placeholder, preview, view, serde `Entry` and `Intent`) and `WidgetCard`, the only way a widget
+  is drawn. quire's battery, world clock and month are ported; their layouts, which sill and the
+  gallery each laid out with their own CSS, are quire's views now. A trait and not an enum: the
+  set is open (other apps) and each kind has its own entry type.
+- **Timelines on the design system's clock.** `use_widget` sleeps to each entry's date on
+  `ds::time`, so on `Clock::Virtual` a test sees an entry exactly at its date; a refresh asks
+  once, never within 1 s of arrival. Between dates nothing wakes (`widget_timeline.rs`).
+- **Placements as data**, generic in `ds::catalog`, and `WidgetGallery` ("Edit Widgets") emitting
+  `WidgetEdit`s the host applies with `apply`. The same pattern will serve other surfaces.
+- **Q412: the month title on a see-through card.** `--accent-text` measured 3.3-3.9:1 on the
+  .48 Space-tinted card over the wallpaper. Stepping the accent until it read gave near-black
+  (`#001d48`) and was withdrawn in review. Two options rendered (`title-options-*.png`): (a) the
+  light card's tint at .96 (4.53:1), (b) `--ink-soft` for the title (3.90:1 worst light, 5.19
+  dark). Branch default (b), the simpler; the user picks. Gated: (b)'s floor, the dots at 3:1.
+- **The month at each size takes the reference's layout**: Small the compact month; Medium today
+  (weekday, date, next event) beside the compact month; Large the regular month at 32 px pitch,
+  centred, over the day's events. Stretching the grid over the card (the first answer to the
+  empty Large tile) read sparse.
+- **Q430, Q431:** `Lift` on the frame (`--pickup`, a new motion scalar, and `--shadow-drag`
+  replacing the resting drop via a selector that restates the card rule's) and
+  `WidgetSlotGuide`; both settle to zero frames on the virtual clock (`widget_edit.rs`).
+- Not done: the D-Bus transport and view templates for out-of-process widgets (section 9.5,
+  documented only); the Large calendar's events (queued for the Calendar app).

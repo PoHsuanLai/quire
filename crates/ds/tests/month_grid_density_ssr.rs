@@ -27,12 +27,14 @@ enum Case {
     SmallFrame,
     /// `Auto` in a medium desktop frame.
     MediumFrame,
+    LargeFrame,
 }
 
-const CASES: [(Case, &str); 3] = [
+const CASES: [(Case, &str); 4] = [
     (Case::Compact, "compact"),
     (Case::SmallFrame, "auto-small-frame"),
     (Case::MediumFrame, "auto-medium-frame"),
+    (Case::LargeFrame, "auto-large-frame"),
 ];
 
 #[derive(Props, Clone, PartialEq)]
@@ -73,6 +75,7 @@ fn Specimen(props: CaseProps) -> Element {
         },
         Case::SmallFrame => framed(WidgetSize::Small),
         Case::MediumFrame => framed(WidgetSize::Medium),
+        Case::LargeFrame => framed(WidgetSize::Large),
     }
 }
 
@@ -124,11 +127,12 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
 }
 
 /// Compact wherever it resolves so: `data-density=compact`, no week column though the caller
-/// asked for one, and the plain step buttons in place of the Tool buttons; the medium frame
-/// keeps the regular grid, its week numbers and its Tool buttons.
+/// asked for one, and the plain step buttons in place of the Tool buttons (a medium card's 140
+/// of height is too short for six regular weeks, design/23 section 5.2); the large frame keeps
+/// the regular grid, its week numbers and its Tool buttons, and fills the card.
 #[test]
 fn the_density_resolves_and_says_so() {
-    for case in [Case::Compact, Case::SmallFrame] {
+    for case in [Case::Compact, Case::SmallFrame, Case::MediumFrame] {
         let html = render(case);
         assert!(html.contains("data-density=\"compact\""), "{case:?}");
         assert!(html.contains("data-weeks=\"hide\""), "{case:?}");
@@ -149,10 +153,18 @@ fn the_density_resolves_and_says_so() {
             "{case:?}"
         );
     }
-    let medium = render(Case::MediumFrame);
-    assert!(medium.contains("data-density=\"regular\""));
-    assert!(medium.contains("data-weeks=\"show\""));
-    assert_eq!(medium.matches("class=\"ds-month-week\"").count(), 1 + 6);
-    assert_eq!(medium.matches("data-variant=\"tool\"").count(), 2);
-    assert!(!medium.contains("ds-month-step"));
+    let large = render(Case::LargeFrame);
+    assert!(large.contains("data-density=\"regular\""));
+    assert!(
+        large.contains("data-fit=\"frame\""),
+        "a framed month fills its card"
+    );
+    assert!(large.contains("data-weeks=\"show\""));
+    assert_eq!(large.matches("class=\"ds-month-week\"").count(), 1 + 6);
+    assert_eq!(large.matches("data-variant=\"tool\"").count(), 2);
+    assert!(!large.contains("ds-month-step"));
+    assert!(
+        !render(Case::Compact).contains("data-fit"),
+        "outside a frame it keeps its size"
+    );
 }

@@ -135,3 +135,20 @@ PaletteEntrance{PeekIn, CmdkIn}`, `id`, `focus`, `selected`, `on_select`, `on_se
 
 The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`, `Settings`,
 `SettingsWatch`, `apply`) belong to sill and palmrest, not to this workspace.
+
+## `ds`: the widget interface and placements
+
+| Module | Implements | Notes |
+| --- | --- | --- |
+| `widget/contract.rs` | 23-WIDGETS §9.2 | `Widget` (one trait per kind), `WidgetKind`, `WidgetContext`, `NoIntent`, `fit` |
+| `widget/timeline.rs`, `widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::time` (virtual in tests) |
+| `widget/card.rs` | 23-WIDGETS §9.3 | `WidgetCard`: the only way a widget is drawn; the card is `WidgetFrame`'s |
+| `widget/registry.rs` | 23-WIDGETS §9.4 | `WidgetRegistry`, `WidgetInfo` (type-erased preview) |
+| `widget/wire.rs` | 23-WIDGETS §9.5 | `WireTimeline`: the out-of-process format (the transport is not built) |
+| `widget/{battery,clock,calendar}.rs`, `widget/views.css` | 23-WIDGETS §4.1, §4.2, §5.2, §9.6 | quire's three widgets and their compositions |
+| `widget/layout.rs` | 23-WIDGETS §9.7 | `WidgetLayout`, `WidgetAt`, `WidgetEdit`, `apply`, `first_free` |
+| `widget/gallery.rs`, `widget/gallery.css` | 23-WIDGETS §9.7 | `WidgetGallery` ("Edit Widgets"), `GalleryWords` |
+| `catalog/placement.rs` | 23-WIDGETS §9.1 | `Placement`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
+| `components/device_glyph.rs`, `components/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
+| `components/widget_slot.rs`, `components/widget_frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |
+| `tokens/accent_band/widget_grounds.rs` | 23-WIDGETS §4.3 (sill Q412) | `WALLPAPERS`, `widget_grounds`: the see-through card's grounds the widget legibility gates use |

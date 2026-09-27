@@ -17,7 +17,8 @@ measured"), how our widgets apply it (section 3), the battery, the world clock a
 this pass does not restyle `MonthGrid`). The frame's footprint stays `04-COMPONENTS.md` section
 40; the surface row stays `20-SURFACES.md` section 1.14; the material stays `03-COLOR.md`
 section 17. The reference survey behind all of it is section 8; the measurements behind the
-drawing are section 1.1.
+drawing are section 1.1. How a widget plugs in, how the person chooses and places widgets, and
+the pattern other placeable surfaces reuse are section 9.
 
 **Why this file exists.** The user's verdicts, in order (2026-09-26):
 1. First widgets (a flat stroked ring, a plain paper dial): "too ugly"; "this battery circle
@@ -173,7 +174,7 @@ The widget style's name is **Flat, bright, measured** (proposed 2026-09-26, the 
 6. **Crisp at small size.** Fine ticks and thin hands at the measured widths, high contrast
    against the face; hands end in round caps; numerals are text, not paths.
 
-### 2.1 Tokens (`ds::tokens::WidgetPaint`; proposed 2026-09-26)
+### 2.1 Tokens (`ds::tokens::WidgetPaint`; proposed 2026-09-26, settled 2026-09-27)
 
 | Token | Light | Dark | Role | From |
 | --- | --- | --- | --- | --- |
@@ -235,7 +236,8 @@ draws its own text, `use_battery_figure(level, wake) -> u16`.
 | Device | the caller's glyph centred at .47 of the ring, `--ink` | M12 |
 | Bolt | while charging: a bolt .16 of the ring tall and .10 wide, `--ink`, centred on the stroke at twelve; the track and the arc leave a 29 degree gap between their ends' centres (17 between the caps) and the arc fills the rest | M11 |
 
-**Composition** (the shell composes, quire provides the ring):
+**Composition** (quire composes it since the widget interface, `BatteryWidget`, section 9.6;
+the shell passes the batteries):
 - **Small, one device**: the ring at the top left; the percentage at the bottom left in the
   display face 500 at `--fs-widget-hero`, its baseline about 15 above the card's bottom.
 - **Small, several**: a 2 x 2 grid of rings, no numbers; an empty place a ring at 0.
@@ -282,8 +284,11 @@ where it knows the zone, else 06:00-18:00).
 
 ### 4.3 The frame (`WidgetFrame`)
 
-`WidgetFrame { size, host, tint: CardTint::{Material, Space}, title, id, children }`: `tint`
-is new, default `Material`. The desktop card is the `Widget` material's plate, corner
+`WidgetFrame { size, host, tint: CardTint::{Material, Space}, title, id, kind, lift, children }`:
+`tint` defaults to `Space` (settled 2026-09-27, section 6 item 6; it was `Material`), and a
+tile ignores it (`CardTint::on`: the center's popover already carries the Space); `kind`
+writes `data-widget`; `lift` is section 9.8's. A widget never names any of these: `WidgetCard`
+passes them (section 9.3). The desktop card is the `Widget` material's plate, corner
 `--m-radius` 20 (M3), padding 12 (M4); the tile is unchanged (12 padding, `--r-tile`).
 `CardTint::Space` writes `data-tint="space"` and lays the Space's gradient (`.ds-frame`, the
 tinted chrome's layer) over the plate at the material's frame alpha, under the content, so the
@@ -301,8 +306,32 @@ ink below the small-text 4.5:1 gate over black (3.86:1); the trade is accepted b
 widget's own text is large or bold (design/03-COLOR.md section 17), where the guideline is 3:1.
 The dark card keeps its tint colour and takes the smallest alpha the relaxed 3:1 floor needs
 across every gate, **.55** (was .67); it is unchanged but for the alpha and the 1 pt rim. The
-World Clock card of the reference is opaque `#1c1c1e` (M31); ours stays the material's (open
-decision 4).
+World Clock card of the reference is opaque `#1c1c1e` (M31); ours stays the material's and
+follows the scheme (settled, section 6 item 4).
+
+**The month's title over a see-through card (sill Q412, 2026-09-27; open, two options).**
+The band's `--accent-text` (design/03-COLOR.md section 20) is derived against the opaque card
+grounds; on the desktop card, the .48 near-white over the wallpaper, sill measured the small
+Calendar's month title at 3.7-3.9:1 over the default wallpaper's warm sand (5.3-5.7 before accent
+B). A first answer stepped the accent until it read (Postmark `#001d48`): nearly black, the
+accent lost, heavier than band B; withdrawn. The two options, measured on the Space-tinted card
+(the tint over seven reference wallpapers, `accent_band::WALLPAPERS`: the default wallpaper's
+sand, warm sand, coral, teal, blue and violet as sill's capture shows them, and a near-black;
+under both stops of preset 1's gradient at the frame alpha .70), Postmark, worst case:
+
+| Option | Light | Dark |
+| --- | --- | --- |
+| Now: band `--accent-text` on the card as shipped | `#426aa2`, alpha .48: 3.30:1 | `#88b3f0`, alpha .55: 5.96:1 |
+| (a) raise the desktop card's tint until the band's `--accent-text` reads | alpha **.96** (every accent: .93-.96; bare material .92): 4.53:1 | unchanged at .55 (already 5.96:1; bare material would need .76) |
+| (b) `--ink-soft` for the title (and the Medium card's weekday); the accent kept for today's disc and the dots | `#586057` at .48: 3.90:1 (4.05-5.23 over the default wallpaper's colours) | `#a0a79b` at .55: 5.19:1 |
+
+Neither reaches 4.5:1 in light without giving up the see-through the user chose: (a) makes the
+light card nearly opaque. Rendered side by side: `tools/progress/shots/widgets-final/
+title-options-{light,dark}.png`. **Branch default: (b)**, the simpler (one stylesheet rule, no
+change to the card or the accent band): `.ds-widget[data-host=desktop] .ds-month-title,
+.ds-month-weekday { color: var(--ink-soft) }`. The busy dots keep `--accent-text`, a non-text
+mark gated at 3:1 (3.30:1 worst). `tests/legibility.rs` guards (b)'s measured floor (3.8 light,
+4.5 dark, every preset) and the dots at 3:1; the user picks.
 
 **Small text over a see-through card.** Not every widget element clears the WCAG large-text
 size (18.66 px bold or 24 px regular) that justifies the relaxed 3:1 floor above, even though
@@ -332,6 +361,20 @@ should carry "saturation x1.8 inside the widget's blur region". Blur on the desk
 choice the shell may skip: the reference's desktop card in its editing mode shows no blur at all
 (M30), and the gallery's "Compositor blur" wall (the Widget reference page) shows the tint over
 the blur the fit implies.
+
+### 4.4 Filled device glyphs (`DeviceGlyph`, settled 2026-09-27)
+
+The reference draws each device in its Batteries ring as a filled symbol (M12); our outline
+glyphs (Lucide, 2 units) read thin and grey at 16 px inside a bright ring. `DeviceGlyph {
+device: Device, size }` draws a device as one filled path in `currentColor` on the Lucide 24
+grid, the same `svg.ds-ic` box as every glyph: abstract solids (a slab for a screen, a capsule
+for a mouse), holes cut by the even-odd rule (a keyboard's keys, a speaker's cones, a phone's
+slot), a unit of margin inside the 24 box like Lucide's own, no outline and no stroke anywhere,
+and no traced copy of the reference's symbols (`08-ICONS.md` rules: abstract, not realistic).
+The set: `Laptop`, `Desktop`, `Phone`, `Tablet`, `Watch`, `Headphones`, `Earbuds`, `Mouse`,
+`Keyboard`, `Speaker`, `Gamepad`, `Other` (a cell with its terminal). The geometry is data
+(`components/device_forms.rs`) and a test keeps every piece on the grid. In a ring the glyph is
+.47 of the ring, `--ink` (M12). Small glyphs elsewhere (16-24 px in lists) keep Lucide's stroke.
 
 ## 5. Calendar widget (research and specification only; queued)
 
@@ -380,7 +423,38 @@ leave 20 for header and heads together, less than the pass started from (24), so
 rows stay a third of a pixel under the columns. Snapshots before and after, light and dark, 1x
 and 4x: `tools/progress/shots/gallery/calendar-compact-*.png`.
 
-## 6. Open decisions (for the user; the gallery's "Widget looks" and "Widget reference" pages render the proposal)
+### 5.2 The month at each size: the reference's layouts (2026-09-27)
+
+sill's notification-center capture (`notification-center-open-cosmic.png`, the right-hand
+column): the Large tile drew the regular month at the top and left about 40 % of it empty under
+the last week, the fault section 5.1 fixed for the Small card. A first answer stretched the grid
+over the Medium and Large cards; reviewed, it read sparse (wide gaps between the days), the same
+"weird spacing" the user rejected. The widget now follows the reference's calendar widgets
+(W15, W16; section 5's table), each at its own pitch:
+
+- **Small**: the compact month filling the 140 x 140 content box (section 5.1): 20 px columns,
+  19.67-23.6 px rows.
+- **Medium** (`data-layout="split"`): on the left a today column, the weekday (UI face 700,
+  upper, `--fs-small`, in `--accent-text`; `--ink-soft` on the desktop card, section 4.3), the
+  date in the display face 500 at `--fs-widget-hero`, then the next event (its calendar's 3 px
+  bar, the title in the UI face 600 `--fs-help`, the time `--fs-nano` `--ink-soft`) or the
+  provider's quiet line ("No events today", `--ink-faint`); on the right the compact month in a
+  140 x 140 box, the Small card's own metrics. `MonthDensity::Auto` draws compact in a Medium
+  frame for this.
+- **Large** (`data-layout="stack"`): the regular month at its own pitch (32 px columns, 30 px
+  rows; the reference sits near 28-32), centred in the card, never spread; under it the day's
+  events, at most three (`LARGE_EVENTS`), or the quiet line.
+- The pitch is capped rather than stretched: where the month has room left, it is centred in it
+  (`data-fit="frame"` on a framed month: the compact grid fills its box, the regular grid keeps
+  its size and centres).
+
+The entry carries what these need: `MonthEntry::Month(Box<MonthFace { grid, weeks, today:
+Option<TodayLine { weekday, day }>, events: Vec<EventLine { time, title, hue: LabelHue }>,
+no_events }>)`, the new fields serde-defaulted. The Calendar app fills the events later; sill's
+Up Next can feed them now. Snapshots before and after:
+`tools/progress/shots/widgets-final/{before,after}-calendar-{light,dark}.png`.
+
+## 6. Decisions (settled 2026-09-27)
 
 **Settled 2026-09-26, "relax the contrast then":** the card's translucency against its own
 legibility gate is no longer open. The card fits the reference's measured see-through exactly
@@ -388,25 +462,37 @@ legibility gate is no longer open. The card fits the reference's measured see-th
 whatever alpha clears 4.5:1; the widget's own text is gated at 3:1 (the large-text floor)
 instead, since it is large or bold. See section 4.3 and design/03-COLOR.md section 17.
 
-1. **Battery percentage weight:** 500, the display face's lightest, as the reference measures
-   (Regular to Medium, M13; proposed), or 800 as the fourth-pass brief asked ("heaviest weight
-   for numerals")? The clock's numerals are 800 either way.
-2. **Battery track:** the plate darkened (`rgba(0,0,0,.12)`, as measured, M8; proposed) or a
-   light tint of the ring's green, as the brief's diagnosis described it?
-3. **Low colour:** one red for low (20 % or less) and critical (10 % or less), as the reference
-   shows at 13 % (proposed), or amber for low and red for critical?
-4. **World Clock card:** the reference's medium World Clock card is dark in the light scheme too
-   (M23); ours follows the scheme (proposed). A dark card by force would need the shell to scope
-   the widget dark.
-5. **The laptop glyph:** our icon set has no laptop; this computer shows `Monitor`, and the
-   devices' glyphs are outline where the reference's are filled. A filled device set is an icon
-   task (`08-ICONS.md`).
-6. **Space tint by default:** `CardTint::Material` (proposed) or `Space` for every widget?
-7. **The battery fill's timing** (section 1.1, F4-F6): 800 ms at `--e-out`, the figure counting
-   through every percent, the bolt after the fill, all our choices where the reference could
-   not be measured. A recording of the reference widget appearing would settle them.
-8. **Calendar** (section 5, unchanged): month load as dots (proposed) or a heat tint; the Small
-   calendar as the date face with the next event (proposed) or the compact month grid.
+**Settled 2026-09-27 (the user's picks on the "Widgets matched to the reference" progress
+entry).** Each was a proposal here; each is now the rule, and the gallery's "Widget looks" page
+draws it.
+
+1. **Battery percentage weight: 500**, the display face's lightest, as the reference measures
+   (Regular to Medium, M13). The clock's numerals stay 800.
+2. **Battery track: the plate darkened** (`rgba(0,0,0,.12)` light, `rgba(255,255,255,.14)`
+   dark), as measured (M8), never a tint of the green.
+3. **One red for low and critical** (20 % or less and 10 % or less), as the reference shows at
+   13 % (M9). `data-tone` still tells `low` from `critical` for assistive text; both paint
+   `--battery-low`.
+4. **The World Clock card follows the scheme**: light in the light scheme, dark in the dark
+   (the reference's is dark in both, M23; we do not force it). The dials keep their own day and
+   night faces in either.
+5. **Filled device glyphs**: a new filled set, abstract and on the Lucide grid, not copies of the
+   reference's symbols (section 4.4, `DeviceGlyph`).
+6. **Every widget card is tinted by the Space** (Arc's contribution): `CardTint::Space` is the
+   default, laid by quire's card and never by a widget; a notification-center tile lays no
+   second gradient on the center's already tinted popover. The widget's own accent text takes a
+   title colour chosen for the see-through card (section 4.3, sill Q412: two options rendered,
+   the user picks). `CardTint::Material` stays for a comparison page.
+7. **The battery fill's timing** (section 1.1, F4-F6): unchanged, 800 ms at `--e-out`, the figure
+   counting, the bolt after the fill; still our choice until a recording of the reference turns
+   up.
+8. **Calendar**: each size takes the reference's layout (section 5.2): Small the compact month,
+   Medium today beside the month, Large the month over the day's events; load dots and a heat
+   tint stay queued for the Calendar app.
+
+And the card became an interface (section 9): every widget, ours and other apps', plugs in
+through one trait and is drawn only on quire's card; the person chooses which widgets go where
+through a gallery, and the choice is data.
 
 ## 7. Sources
 
@@ -503,3 +589,179 @@ Common to all five: **(a)** an event is a pill of its calendar's colour at low a
 shows load, not titles, at widget size: dots (one per event, max three) or a heat tint; bars
 belong to the app's month view; **(d)** hierarchy from size and weight (the date large and
 heavy, labels small caps) with one accent colour; **(e)** hairline grids or none, never boxes.
+
+## 9. The widget interface (settled 2026-09-27)
+
+The user, 2026-09-27: "make the widget card an interface", so that the person chooses which
+widgets go where, and so that other apps' widgets plug in later the way ours do. Until now the
+shell hand-built each widget: it picked the parts (`BatteryLevel`, `ClockFace`, `MonthGrid`),
+laid them out with its own CSS inside `WidgetFrame`, and kept a closed enum of five kinds.
+Section 9 replaces that with one contract, modelled on the reference platform's WidgetKit
+(a widget declares its kind, families and placeholder; a timeline provider hands dated entries
+and a reload policy; the system draws the container), in our own terms.
+
+### 9.1 The pattern: a registry, one trait, a picker, placements as data
+
+Named generally because the same shape will serve the other surfaces a person arranges
+(Spotlight's categories, the control center's modules, the menu bar's items); a later design
+pass reuses it.
+
+1. **A registry** of the kinds that can be placed, each with its sizes, a name, a description and
+   a preview, keyed by a stable kind name (`WidgetRegistry`).
+2. **One trait** every kind implements (`Widget`), so the host draws any kind the same way and
+   the chrome is the host's, never the kind's.
+3. **A picker** over the registry that shows each kind as it will look and turns each choice
+   into an edit (`WidgetGallery`, "Edit Widgets").
+4. **Placements as data**: what the person placed is a list of (kind, size, place, position) the
+   host keeps in its settings, never in code (`WidgetLayout`), changed only by pure edits
+   (`WidgetEdit`, `apply`).
+
+The data half is generic in `ds::catalog` (`Placement<K, S, A>`, `Placements<K, S, A>`,
+`PlacementId`: add, remove, change, stable identities, serde); the rule for where a position is
+legal is each surface's (a free grid cell here). The registry and picker are widget-specific
+today; they are small, and a second surface lifts them into `catalog` when it arrives.
+
+### 9.2 The contract (`ds::widget`)
+
+```rust
+pub trait Widget: Clone + PartialEq + Default + 'static {
+    type Entry: Clone + PartialEq + Serialize + DeserializeOwned + 'static;
+    type Intent: Clone + PartialEq + Serialize + DeserializeOwned + 'static; // NoIntent if none
+    fn kind() -> WidgetKind;                  // "quire.battery": reverse-DNS, unique
+    fn name() -> Text;                        // "Batteries"
+    fn description() -> Text;                 // one line in the gallery
+    fn sizes() -> &'static [WidgetSize];      // the first is the size it is added at
+    fn placeholder(size: WidgetSize) -> Self::Entry; // before the first entry: honest, no data
+    fn preview(size: WidgetSize) -> Self::Entry;     // sample data for the gallery
+    fn view(entry: &Self::Entry, cx: WidgetContext<Self::Intent>) -> Element;
+    fn title() -> Option<WidgetTitle> { None }       // the card's title row, rarely
+}
+pub struct WidgetContext<I> { pub size: WidgetSize, pub host: WidgetHost, pub wake: WakeStamp,
+                              pub act: Option<EventHandler<I>> }
+```
+
+- **An entry is one moment**, plain data: the batteries and their levels, the cities and their
+  times, the month. `view` is a pure function of the entry and the context; it may mount
+  components (which keep their own motion state: the battery's fill sweeps on each new `wake`
+  and each new level) but calls no hook itself.
+- **Intents are the widget's controls**, data too (the reference's App Intents): the month's step
+  buttons send `MonthIntent::Step`, the provider answers with the next month's timeline. A
+  passive widget's `Intent` is `NoIntent`, an empty enum, so its `act` can never be called.
+- **The timeline** is the provider's: `Timeline { entries: Vec<Dated<E>>, refresh: Refresh }`,
+  each entry shown from its `EntryDate` (`Start`, or an instant on the design system's clock),
+  and `Refresh::{Never, AtEnd, After(instant)}`. `Timeline::now(entry)` is a live widget's
+  (one entry, no refresh: the provider pushes the next when its data changes). `use_widget`
+  picks the entry for now (the placeholder before the first), sleeps on `ds::time` to the next
+  entry's date and redraws, and at the refresh asks `onrefresh(RefreshAsk::{Ended, Due})` once,
+  never sooner than `REFRESH_FLOOR` (1 s) after the timeline arrived, so a provider answering
+  with a timeline already due cannot spin the host. It wakes for nothing else: a pushed widget
+  costs no frame between pushes (the idle-frame rule). A new timeline (by value) replaces the
+  old at once; an equal one passed again changes nothing. Proven on the virtual clock
+  (`ds-native/tests/widget_timeline.rs`).
+- **A size a widget does not draw** is never asked of it: `fit::<W>(size)` holds it to the first
+  of `W::sizes()`.
+
+### 9.3 The card is quire's (`WidgetCard`)
+
+`WidgetCard { widget, timeline, size, host, wake, id, onrefresh, onintent, lift }` is the only
+way a widget is drawn. It owns the `WidgetFrame`: the footprint on the grid unit, the corner
+(`--m-radius`, M3), the inset (12, M4), the `Widget` material (desktop) or the tile (the
+center), the Space's tint (section 6 item 6), the title row (`W::title`), `data-widget` (the
+kind), and the lift (9.8). A widget draws only its content inside the body; it writes no CSS
+for the card and cannot reach it. The compositions the shell used to lay out (the batteries'
+solo, grid and row; the clocks' row with its notes) are quire's views now (`widget/views.css`).
+
+### 9.4 The registry (`WidgetRegistry`)
+
+`WidgetRegistry::quire()` holds quire's three; a host adds its own and the apps' with
+`.with::<W>()` (a kind registered twice is `TakenKind`) and provides it with
+`provide_widget_registry`; `use_widget_registry` reads it (quire's own when none is provided).
+Each `WidgetInfo` carries the kind, name, description and sizes, and draws the widget's card
+with its preview entry at any size, lifted or not, without its type: what the gallery shows.
+
+### 9.5 Widgets from another process (documented; the transport is not built)
+
+An app that is not linked into the shell provides a widget the same way, across D-Bus:
+
+1. **Announce.** The app owns a bus name and exports `org.quire.Widgets1` at `/org/quire/Widgets`
+   with a property `Kinds`, an array of `(kind, name, description, sizes)`
+   (`("org.example.weather.today", "Weather", "…", ["small", "medium"])`), and emits
+   `KindsChanged`. The shell adds each to its registry as a remote kind.
+2. **Views.** A remote kind's `view` cannot be Rust in the shell, so a remote kind is drawn by a
+   **view template** it names from a closed set quire provides (a number with a label, a list of
+   rows, a gauge, a grid of rings: each a quire `Widget` whose `Entry` is the template's data).
+   The app's entries are those templates' entries. Arbitrary markup never crosses the bus.
+3. **Timelines.** The app emits `TimelineChanged(kind, json)`, the JSON a `WireTimeline<E>`:
+   `{"entries":[{"after_ms":0,"entry":{…}}],"refresh":"never"|"at_end"|{"after_ms":n}}`. Dates are
+   milliseconds after sending (an `Instant` cannot cross a process, and a test's clock is
+   virtual); the shell dates them from arrival (`WireTimeline::received(now)`), so clock skew
+   between processes cannot misplace an entry. `WireTimeline::sent(timeline, now)` writes one.
+4. **Refresh and intents.** The shell calls `Refresh(kind, size, reason)` when the policy comes
+   due, and `Perform(kind, placement_id, json)` with a serialised `Intent` when a control is
+   used; the app answers with a new timeline.
+5. **Trust.** The shell validates every payload against the template's schema (serde does) and
+   drops a kind whose payloads fail; a widget's text is text, never markup.
+
+`ds::widget::wire` is the format, with a round-trip test; the bus, the templates and the
+remote-kind registry are the pass that builds out-of-process widgets.
+
+### 9.6 quire's own widgets on the contract
+
+| Widget | Kind | Sizes | Entry | Intent |
+| --- | --- | --- | --- | --- |
+| `BatteryWidget` "Batteries" | `quire.battery` | Small, Medium | `BatteryEntry::{Waiting, Devices(Vec<BatteryCell { name, device, level, mark }>), Absent(words)}` | none |
+| `WorldClockWidget` "World Clock" | `quire.world-clock` | Medium, Small | `ClockEntry::{Waiting, Cities(Vec<ClockCity { name, time, phase, notes }>), Absent(words)}` | none |
+| `MonthWidget` "Calendar" | `quire.month` | Small, Medium, Large | `MonthEntry::{Waiting, Month(Box<MonthFace { grid, weeks, today, events, no_events }>)}` | `MonthIntent::Step(Step)` |
+
+Batteries: Small with one battery the ring and the hero figure; Small with several the 2 x 2 grid,
+empty places bare tracks; Medium the row with the figure under each; `Waiting` is four bare
+tracks and no number. World Clock: Small the large dial alone; Medium four dials with the notes
+(the day, the offset) under each; digits in the tile. Month: the reference's layout per size
+(section 5.2); the steps only when the host listens (`onintent`).
+
+Up Next and Now Playing are sill's widgets: they move onto the same trait in sill (9.9).
+
+### 9.7 Edit Widgets (`WidgetGallery`) and the layout as data
+
+The reference's widget gallery: the person browses every registered widget (name and
+description), sees it drawn at each size it offers from its preview entry, picks a size (the
+card lifts, 9.8), and adds it to the desktop or the notification center; below, what is placed
+on each surface, a size picker per widget, and Remove. The gallery keeps no layout: each choice
+is a `WidgetEdit` (`Add { kind, size, host }`, `Remove(id)`, `Resize(id, size)`,
+`Move(id, at)`) to `onedit`; the host applies it with `apply(layout, edit, DesktopGrid)` and
+passes the new layout back. Words are the host's (`GalleryWords`, English by default).
+
+`WidgetLayout` is `Placements<WidgetKind, WidgetSize, WidgetAt>`, `WidgetAt::{Desktop(GridCell
+{ column, row }), Center(Order)}`: a desktop widget always has a cell and a center widget an
+order, never the other. It serialises as
+`{"items":[{"id":1,"kind":"quire.battery","size":"small","at":{"desktop":{"column":3,"row":0}}}],"next":2}`.
+`apply` adds a desktop widget at the first free cell scanning the columns from the right, each
+from the top (the widgets gather at the top right, as sill places them); refuses a move onto
+another widget or off the grid (`LayoutError::Taken`), a desktop with no room (`Full`), and an
+unknown identity; keeps a resized widget's cell when the new footprint fits there and moves it
+to the first free cell when not. sill's `widgets.center` and `widgets.desktop_widgets` become
+this list (9.9).
+
+### 9.8 Picking a widget up and dropping it (sill Q430, Q431)
+
+The reference, on the desktop in edit mode: a widget pressed and dragged grows slightly and its
+shadow deepens as it leaves the desktop; the others hold still; while it moves, a quiet rounded
+plate shows the cell it will snap to; on release it settles into that cell (confidence L: from
+use, no frame-accurate recording found).
+
+- **`Lift::{Rest, Lifted}`** on `WidgetFrame` and `WidgetCard` (`lift`, default `Rest`,
+  `data-lift="lifted"`): the card scales by `--pickup` (a new motion scalar: 1.04 Standard and
+  Extra, 1.02 Calm, 1 Reduced; sill used 1.04), its resting drop is **replaced** by
+  `--shadow-drag` (the lifted rule restates the transparent root's card selector, so it wins
+  over `--m-box` instead of stacking under it), and it rises to `--z-drag`; both ways over
+  `--t-quick` at `--e-out` (no spring: the pick-up is a pointer press but the card is not
+  thrown). At rest nothing runs. The gallery lifts the size picked with the same `Lift`.
+- **`WidgetSlotGuide { size, host }`**: the footprint of a `size` widget, a quiet plate
+  (`--line` fill and hairline) in the card's corner, faded in (`a-fade`) as the drag reaches the
+  cell, `aria-hidden`. The host places it at the snap cell; quire draws it.
+
+Both settle to zero frames (`ds-native/tests/widget_edit.rs`, on the virtual clock).
+
+### 9.9 What sill changes
+
+See CONSUMING.md, "Widget interface (2026-09-27)", for the full list with call sites.

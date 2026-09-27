@@ -1,64 +1,35 @@
 //! The Widget looks page (design/23-WIDGETS.md): the widgets drawn flat, bright and measured
-//! (section 2), in the page's scheme over a calm wallpaper: the battery as rings with the device
-//! glyph in them and the percentage under each, and the world clock as four flat dials with an
-//! orange seconds hand; each once on the `Widget` material's plate and once with the Space's
-//! tint on the card (`CardTint::Space`). The Widget reference page poses them as the reference
-//! screenshots.
+//! (section 2), in the page's scheme over a calm wallpaper, every card through the widget
+//! contract (section 9) and tinted by the Space (settled 2026-09-27): the batteries with the
+//! filled device glyphs, the world clock following the scheme, the month; one card on the bare
+//! material beside its tinted twin for comparison; the filled device set on its own; and the
+//! registry's placeholders, what a widget picker shows before any provider speaks.
 
 use super::Section;
+use super::calendar::month_sample::{First, SEPTEMBER, sample, shift};
+use super::widget_reference::cell;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::tokens::LabelHue;
+use ds::widget::apply;
 use ds::{
-    Appearance, BatteryFigure, BatteryLevel, CardTint, ClockFace, ClockTime, DayPhase, Ds,
-    Fraction, Glyph, Icon, IconSize, Inject, Material, RingMark, RootChrome, Seconds, SpaceLook,
-    WidgetFrame, WidgetMetrics, WidgetSize, use_env,
+    Appearance, BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase,
+    DesktopGrid, Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry,
+    MonthIntent, MonthWidget, RingMark, RootChrome, Seconds, SpaceLook, Timeline, WeekNumbers,
+    Widget, WidgetCard, WidgetContext, WidgetEdit, WidgetFrame, WidgetGallery, WidgetHost,
+    WidgetLayout, WidgetMetrics, WidgetSize, WidgetSlotGuide, WorldClockWidget, use_env,
 };
-
-/// One device on the battery widgets.
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct Device {
-    name: &'static str,
-    icon: Icon,
-    level: u16,
-    mark: RingMark,
-}
+use ds::{EventLine, MonthFace, TodayLine};
 
 /// The medium widget's four: critical, half, full, and low but charging.
-const DEVICES: [Device; 4] = [
-    Device {
-        name: "Mouse",
-        icon: Icon::Mouse,
-        level: 80,
-        mark: RingMark::Plain,
-    },
-    Device {
-        name: "Headphones",
-        icon: Icon::Headphones,
-        level: 450,
-        mark: RingMark::Plain,
-    },
-    Device {
-        name: "Keyboard",
-        icon: Icon::Keyboard,
-        level: 1000,
-        mark: RingMark::Plain,
-    },
-    Device {
-        name: "This computer",
-        icon: Icon::Monitor,
-        level: 150,
-        mark: RingMark::Charging,
-    },
-];
-
-/// A city on the clock widgets: its time, its phase and its offset from here.
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct City {
-    name: &'static str,
-    time: ClockTime,
-    phase: DayPhase,
-    offset: &'static str,
+fn devices() -> BatteryEntry {
+    BatteryEntry::Devices(vec![
+        cell("Mouse", Device::Mouse, 80, RingMark::Plain),
+        cell("Headphones", Device::Headphones, 450, RingMark::Plain),
+        cell("Keyboard", Device::Keyboard, 1000, RingMark::Plain),
+        cell("This computer", Device::Laptop, 150, RingMark::Charging),
+    ])
 }
 
 const fn at(hour: u8, minute: u8) -> ClockTime {
@@ -69,49 +40,166 @@ const fn at(hour: u8, minute: u8) -> ClockTime {
     }
 }
 
-const CITIES: [City; 4] = [
-    City {
-        name: "Taipei",
-        time: at(10, 9),
-        phase: DayPhase::Day,
-        offset: "Today",
-    },
-    City {
-        name: "London",
-        time: at(3, 9),
-        phase: DayPhase::Night,
-        offset: "-7HRS",
-    },
-    City {
-        name: "New York",
-        time: at(22, 9),
-        phase: DayPhase::Night,
-        offset: "-12HRS",
-    },
-    City {
-        name: "Tokyo",
-        time: at(11, 9),
-        phase: DayPhase::Day,
-        offset: "+1HRS",
-    },
-];
+fn city(name: &str, time: ClockTime, phase: DayPhase, offset: &str) -> ClockCity {
+    ClockCity {
+        name: name.to_owned(),
+        time,
+        phase,
+        notes: vec![offset.to_owned()],
+    }
+}
+
+fn cities() -> ClockEntry {
+    ClockEntry::Cities(vec![
+        city("Taipei", at(10, 9), DayPhase::Day, "Today"),
+        city("London", at(3, 9), DayPhase::Night, "-7HRS"),
+        city("New York", at(22, 9), DayPhase::Night, "-12HRS"),
+        city("Tokyo", at(11, 9), DayPhase::Day, "+1HRS"),
+    ])
+}
 
 /// The page.
 #[component]
 pub fn WidgetLooksPage() -> Element {
+    let small = BatteryEntry::Devices(vec![cell(
+        "This computer",
+        Device::Laptop,
+        840,
+        RingMark::Plain,
+    )]);
+    let taipei = ClockEntry::Cities(vec![city("Taipei", at(10, 9), DayPhase::Day, "Today")]);
     rsx! {
-        Section { title: "Battery", note: "BatteryLevel: a bright ring on a track of the plate darkened, the device glyph in it, the percentage under it. Small: this computer at 84 %. Medium: 8 % (red), 45 %, 100 % and 15 % charging (the bolt in the ring's gap). The second medium card carries the Space's tint.",
+        Section { title: "Battery", note: "BatteryWidget on WidgetCard: a bright ring on a track of the plate darkened, the device's filled glyph in it, the percentage (display face 500) under it. Small: this computer at 84 %. Medium: 8 % and 15 % charging share one red for low and critical except while charging (the bolt in the ring's gap). Every card carries the Space's tint.",
             Wall {
-                BatterySmall {}
-                BatteryMedium { tint: CardTint::Material }
-                BatteryMedium { tint: CardTint::Space }
+                WidgetCard { widget: BatteryWidget, timeline: Timeline::now(small), size: WidgetSize::Small }
+                WidgetCard { widget: BatteryWidget, timeline: Timeline::now(devices()), size: WidgetSize::Medium }
             }
         }
-        Section { title: "World clock", note: "ClockFace: Small, one large dial with sixty ticks; Medium, four dials, Taipei and Tokyo by day (white), London and New York by night (dark), each with an orange seconds hand. The second medium card carries the Space's tint.",
+        Section { title: "World clock", note: "WorldClockWidget on WidgetCard: Small, one large dial with sixty ticks; Medium, four dials, Taipei and Tokyo by day (white), London and New York by night (dark), each with an orange seconds hand. The card follows the scheme: light here in the light scheme, dark in the dark.",
             Wall {
-                ClockSmall {}
-                ClockMedium { tint: CardTint::Material }
-                ClockMedium { tint: CardTint::Space }
+                WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(taipei), size: WidgetSize::Small }
+                WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(cities()), size: WidgetSize::Medium }
+            }
+        }
+        Section { title: "Calendar", note: "MonthWidget on WidgetCard in the reference's layouts (design/23 section 5.2): Small, the compact month filling the card at its own pitch; Medium, the today column (weekday, date, the next event, or No events today) beside the compact month at the small card's metrics; Large, the regular month at its own 32 px pitch, centred, over the day's events; last, the Large card as the notification center's tile with no events. On the desktop card the month title is --ink-soft (option (b), pending the user's pick); today's disc and the dots keep the accent. The steps send MonthIntent::Step to the provider.",
+            Wall {
+                MonthCard { size: WidgetSize::Small, host: WidgetHost::Desktop, busy: Busy::Events }
+                MonthCard { size: WidgetSize::Medium, host: WidgetHost::Desktop, busy: Busy::Events }
+                MonthCard { size: WidgetSize::Medium, host: WidgetHost::Desktop, busy: Busy::Free }
+                MonthCard { size: WidgetSize::Large, host: WidgetHost::Desktop, busy: Busy::Events }
+                MonthCard { size: WidgetSize::Large, host: WidgetHost::Tile, busy: Busy::Free }
+            }
+        }
+        Section { title: "Space tint against the bare material", note: "The same entry twice: left, the card every widget gets (the Space's gradient over the Widget material at its frame alpha); right, the bare material, drawn by WidgetFrame with the tint CardTint::Material, for this comparison only.",
+            Wall {
+                WidgetCard { widget: BatteryWidget, timeline: Timeline::now(devices()), size: WidgetSize::Medium }
+                WidgetFrame { size: WidgetSize::Medium, tint: CardTint::Material,
+                    {BatteryWidget::view(&devices(), WidgetContext { size: WidgetSize::Medium, host: WidgetHost::Desktop, wake: Default::default(), act: None })}
+                }
+            }
+        }
+        Section { title: "Device glyphs", note: "DeviceGlyph: the filled device set for the battery rings (design/23 section 4.4), abstract solids on the Lucide 24 grid, one path each, holes cut by the even-odd rule; at 16 (the ring's) and 32.",
+            div { class: "g-wl-devices",
+                for device in Device::ALL {
+                    div { key: "{device.slug()}", class: "g-wl-device",
+                        DeviceGlyph { device, size: IconSize::Base }
+                        DeviceGlyph { device, size: IconSize::Px(ds::IconPx(32)) }
+                        span { class: "g-wl-device-name", "{device.slug()}" }
+                    }
+                }
+            }
+        }
+        Section { title: "Pick up and drop", note: "Lift (sill Q430): a desktop widget picked up grows by --pickup (1.04) and trades its resting drop for --shadow-drag on --z-drag, over --t-quick at --e-out, and settles back the same way. WidgetSlotGuide (sill Q431): the footprint of the size at the snap cell, a quiet plate faded in, where the widget will land.",
+            Wall {
+                WidgetCard { widget: BatteryWidget, timeline: Timeline::now(devices()), size: WidgetSize::Medium, lift: Lift::Lifted }
+                WidgetSlotGuide { size: WidgetSize::Small }
+                WidgetSlotGuide { size: WidgetSize::Medium }
+            }
+        }
+        Section { title: "Edit Widgets", note: "WidgetGallery over the registry (WidgetRegistry::quire()): the widgets listed with their descriptions; the one looked at drawn at each of its sizes from its preview entry, the picked size lifted; Add to Desktop and Add to Notification Center hand the host a WidgetEdit, which it applies to the layout it keeps as data (kind, size, place, position) and passes back; below, what is placed on each surface, its size and Remove. Live.",
+            EditWidgets {}
+        }
+    }
+}
+
+/// Whether the sample day has events.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Busy {
+    Events,
+    Free,
+}
+
+/// The month widget at `size` in `host`, its provider stepping the month on each intent.
+#[component]
+fn MonthCard(size: WidgetSize, host: WidgetHost, busy: Busy) -> Element {
+    let mut month = use_signal(|| SEPTEMBER);
+    let event = |time: &str, title: &str, hue| EventLine {
+        time: time.to_owned(),
+        title: title.to_owned(),
+        hue,
+    };
+    let events = match busy {
+        Busy::Events => vec![
+            event("10:00", "Design review", LabelHue::Blue),
+            event("13:30", "Lunch with Mei", LabelHue::Green),
+            event("17:00", "Climbing", LabelHue::Amber),
+        ],
+        Busy::Free => Vec::new(),
+    };
+    let entry = MonthEntry::Month(Box::new(MonthFace {
+        today: Some(TodayLine {
+            weekday: "Saturday".to_owned(),
+            day: 26,
+        }),
+        events,
+        no_events: "No events today".to_owned(),
+        ..MonthFace::of(sample(month(), First::Monday), WeekNumbers::Hide)
+    }));
+    rsx! {
+        WidgetCard { widget: MonthWidget, timeline: Timeline::now(entry), size, host,
+            onintent: move |intent: MonthIntent| match intent {
+                MonthIntent::Step(step) => month.set(shift(month(), step)),
+            }
+        }
+    }
+}
+
+/// The gallery on a panel, a layout of three widgets already placed, live.
+#[component]
+fn EditWidgets() -> Element {
+    const GRID: DesktopGrid = DesktopGrid {
+        columns: 6,
+        rows: 4,
+    };
+    let start = || {
+        [
+            (
+                BatteryWidget::kind(),
+                WidgetSize::Small,
+                WidgetHost::Desktop,
+            ),
+            (
+                WorldClockWidget::kind(),
+                WidgetSize::Medium,
+                WidgetHost::Desktop,
+            ),
+            (MonthWidget::kind(), WidgetSize::Large, WidgetHost::Tile),
+        ]
+        .into_iter()
+        .fold(WidgetLayout::default(), |layout, (kind, size, host)| {
+            apply(layout.clone(), WidgetEdit::Add { kind, size, host }, GRID).unwrap_or(layout)
+        })
+    };
+    let mut layout = use_signal(start);
+    rsx! {
+        div { class: "g-wl-gallery", style: WidgetMetrics::default().style_attr(),
+            WidgetGallery {
+                layout: layout(),
+                onedit: move |edit: WidgetEdit| {
+                    if let Ok(next) = apply(layout(), edit, GRID) {
+                        layout.set(next);
+                    }
+                },
             }
         }
     }
@@ -142,74 +230,6 @@ pub(super) fn Wall(children: Element) -> Element {
                 chrome: Some(RootChrome::Transparent),
                 stylesheet: Inject::Host,
                 div { class: "g-wl-cards", style: WidgetMetrics::default().style_attr(), {children} }
-            }
-        }
-    }
-}
-
-fn ring(device: Device) -> Element {
-    rsx! {
-        BatteryLevel { level: Fraction(device.level), mark: device.mark, label: device.name,
-            Glyph { icon: device.icon, size: IconSize::Base }
-        }
-    }
-}
-
-#[component]
-fn BatterySmall() -> Element {
-    let computer = Device {
-        name: "This computer",
-        icon: Icon::Monitor,
-        level: 840,
-        mark: RingMark::Plain,
-    };
-    rsx! {
-        WidgetFrame { size: WidgetSize::Small,
-            div { class: "g-wr-solo",
-                {ring(computer)}
-                span { class: "g-wr-hero", BatteryFigure { level: Fraction(computer.level) } }
-            }
-        }
-    }
-}
-
-#[component]
-fn BatteryMedium(tint: CardTint) -> Element {
-    rsx! {
-        WidgetFrame { size: WidgetSize::Medium, tint,
-            div { class: "g-wr-row",
-                for device in DEVICES {
-                    div { key: "{device.name}", class: "g-wr-cell",
-                        {ring(device)}
-                        span { class: "g-wr-figure", BatteryFigure { level: Fraction(device.level) } }
-                    }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn ClockSmall() -> Element {
-    let [city, ..] = CITIES;
-    rsx! {
-        WidgetFrame { size: WidgetSize::Small,
-            ClockFace { time: city.time, phase: city.phase, label: city.name }
-        }
-    }
-}
-
-#[component]
-fn ClockMedium(tint: CardTint) -> Element {
-    rsx! {
-        WidgetFrame { size: WidgetSize::Medium, tint,
-            div { class: "g-wr-dials",
-                for city in CITIES {
-                    div { key: "{city.name}", class: "g-wr-dial",
-                        ClockFace { time: city.time, phase: city.phase, label: city.name }
-                        span { class: "g-wr-offset", "{city.offset}" }
-                    }
-                }
             }
         }
     }

@@ -1,8 +1,10 @@
 //! The words a `ClockFace` is described in (design/04-COMPONENTS.md "Widgets"; sill FINDINGS
 //! Q183): the time it shows, whether it is day or night there, and how it is drawn.
 
+use serde::{Deserialize, Serialize};
+
 /// Whether a clock shows its seconds, and which second it is.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum Seconds {
     /// Shown: the second, taken modulo 60. An analog face draws a second hand, a digital one
     /// `hh:mm:ss`.
@@ -24,7 +26,7 @@ impl Seconds {
 }
 
 /// A wall-clock time in some zone. The caller reads the zone; the face only draws it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct ClockTime {
     /// 0 to 23, taken modulo 24.
     pub hour: u8,
@@ -51,7 +53,7 @@ impl ClockTime {
 }
 
 /// Whether it is day or night where the clock is, which tints the analog face.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum DayPhase {
     /// A paper face with ink hands.
     #[default]
@@ -71,7 +73,7 @@ impl DayPhase {
 }
 
 /// How a clock is drawn.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum ClockLook {
     /// A dial with hands: the medium and large widgets.
     #[default]

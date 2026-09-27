@@ -10,15 +10,19 @@
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
 use crate::components::text_runs::text;
-use crate::components::widget_kind::{CardTint, WidgetHost, WidgetSize, WidgetTitle};
+use crate::components::widget_kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
 use crate::material::Material;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
+use crate::widget::WidgetKind;
 use dioxus::prelude::*;
 
-/// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint`.
+/// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint` (the
+/// Space's by default; a tile never lays a second gradient, `CardTint::on`). `kind` writes
+/// `data-widget` (a `WidgetCard` passes its widget's kind). `lift` picks the card up while a
+/// host moves it (sill Q430).
 /// `title` draws a glyph and a name above the content (the Batteries and Clock widgets take
 /// none: their content fills the card). `id` names the card for the layer's input and blur
 /// regions.
@@ -32,9 +36,13 @@ pub fn WidgetFrame(
     #[props(default)] tint: CardTint,
     #[props(default)] title: Option<WidgetTitle>,
     #[props(default)] id: Option<String>,
+    #[props(default)] kind: Option<WidgetKind>,
+    #[props(default)] lift: Lift,
     children: Element,
 ) -> Element {
     use_frame_provider(size);
+    let tint = tint.on(host);
+    let kind = kind.map(|kind| kind.as_str().to_owned());
     let card = rsx! {
         div {
             class: "ds-widget",
@@ -42,6 +50,8 @@ pub fn WidgetFrame(
             "data-size": size.slug(),
             "data-host": host.slug(),
             "data-tint": tint.slug(),
+            "data-widget": kind,
+            "data-lift": lift.slug(),
             if tint == CardTint::Space {
                 div { class: "ds-frame" }
             }

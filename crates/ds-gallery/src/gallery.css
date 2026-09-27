@@ -129,26 +129,17 @@
 .g-widgets-desk{width:560px}
 .g-widgets-center{width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-widgets-grid{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--s-16);padding:var(--s-12)}
-.g-widgets-clocks{display:flex;justify-content:space-between;gap:var(--s-8)}
-.g-widgets-batteries{display:flex;justify-content:space-between;gap:var(--s-8);margin-bottom:var(--s-16)}
-.g-widgets-battery{display:flex;flex-direction:column;align-items:center;gap:var(--s-6)}
-.g-widgets-percent{font-family:var(--font-data);font-size:var(--fs-title);font-weight:600}
 .g-shot-row{display:flex;flex-wrap:wrap;gap:var(--s-22)}
 .g-shot{width:680px;border-radius:var(--r-panel);overflow:hidden}
 .g-shot-ground{display:flex;align-items:flex-end;gap:var(--s-16);padding:var(--s-16) var(--s-16) var(--s-26)}
 .g-wl-wall{padding:var(--s-22)}
 .g-wl-cards{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--s-16)}
+.g-wl-devices{display:flex;flex-wrap:wrap;gap:var(--s-16)}
+.g-wl-device{display:flex;flex-direction:column;align-items:center;gap:var(--s-6);width:72px;color:var(--ink)}
+.g-wl-device-name{font-family:var(--font-ui);font-size:var(--fs-small);color:var(--ink-soft)}
+.g-wl-gallery{padding:var(--s-16);border-radius:var(--r-panel);background:var(--surface)}
 .g-wb-wall{position:relative;padding:0}
 .g-wb-slot{position:absolute;border-radius:var(--m-radius)}
-.g-wr-solo{display:flex;flex-direction:column;justify-content:space-between;flex:1;min-width:0}
-.g-wr-hero{margin-bottom:calc(-1 * var(--s-6));font-family:var(--font-display);font-size:var(--fs-widget-hero);font-weight:500;line-height:1;letter-spacing:-.01em;color:var(--ink)}
-.g-wr-grid{display:flex;flex-wrap:wrap;justify-content:space-between;align-content:space-between;flex:1}
-.g-wr-row{display:flex;justify-content:space-between;align-items:center;flex:1;padding:0 var(--s-8)}
-.g-wr-cell{display:flex;flex-direction:column;align-items:center;gap:var(--s-18)}
-.g-wr-figure{font-family:var(--font-display);font-size:var(--fs-widget-figure);font-weight:500;line-height:1;color:var(--ink)}
-.g-wr-dials{display:flex;justify-content:space-between;align-items:center;flex:1;padding:0 var(--s-6)}
-.g-wr-dial{display:flex;flex-direction:column;align-items:center}
-.g-wr-offset{font-family:var(--font-ui);font-size:var(--fs-small);font-weight:700;line-height:1.2;color:var(--ink-faint)}
 /* The Lock and switcher page (M11): a lock screen at a 16:10 output's proportions, and two at
    half scale (a transform, so the lock screen lays itself out at full size); a wrong password
    posed at shake-x's 20 % frame; the polkit sheet's stage; the switcher on the calm wallpaper. */

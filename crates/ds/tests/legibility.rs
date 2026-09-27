@@ -495,3 +495,89 @@ fn the_modal_scrim_sets_the_sheet_apart_and_keeps_its_ink() {
     }
     assert!(failures.is_empty(), "{failures:#?}");
 }
+
+/// The desktop widget card as it composites over `wallpaper` in `scheme`: the `Widget`
+/// material's tint at its alpha over blur, then, when the card is Space-tinted (every card since
+/// 2026-09-27), the Space's `stop` at the material's frame alpha (.70 at the key's default).
+fn widget_card_over(wallpaper: Hex, scheme: Scheme, stop: Option<&str>) -> Hex {
+    let tint = recipe(Material::Widget, scheme, DEFAULT_TINT_ALPHA).tint;
+    let plate = over(&tint, wallpaper.0);
+    let plate = Hex::parse(&plate).expect("hex plate");
+    match stop {
+        Some(stop) => {
+            let stop = Hex::parse(stop).expect("hex stop");
+            wash_over(stop, Alpha(700), plate)
+        }
+        None => plate,
+    }
+}
+
+/// The Space-tinted desktop card over every reference wallpaper, under every preset's
+/// gradient stops, in `scheme`.
+fn widget_grounds_of_every_space(scheme: Scheme) -> Vec<(String, Hex)> {
+    let mut grounds = Vec::new();
+    for (index, preset) in PRESETS.iter().enumerate() {
+        for stop in derive(preset.dots, scheme).stops {
+            for &wallpaper in ds::tokens::accent_band::WALLPAPERS.iter() {
+                let ground = widget_card_over(wallpaper, scheme, Some(&stop));
+                grounds.push((
+                    format!("preset {} stop {stop} over {}", index + 1, wallpaper.css()),
+                    ground,
+                ));
+            }
+        }
+    }
+    grounds
+}
+
+/// sill Q412, option (b), the branch default until the user picks (design/23 section 4.3; the
+/// two options are `tools/progress/shots/widgets-final/title-options-*.png`): on a desktop
+/// card the month's title and the Medium card's weekday are `--ink-soft`, measured on the card
+/// as it composites (the see-through tint over each reference wallpaper, under every preset's
+/// gradient). Dark holds 4.5:1. Light holds only the floor below: a .48 near-white over the
+/// darker wallpapers cannot carry small text at 4.5:1, which is the open decision (option (a)
+/// raises the light tint to .96 instead). The floor is a regression guard, not a pass.
+#[test]
+fn the_desktop_month_title_holds_its_floor_on_the_card() {
+    let mut failures = Vec::new();
+    for (scheme, floor) in [(Scheme::Light, 3.8), (Scheme::Dark, 4.5)] {
+        let title = colour(ColourToken::InkSoft, scheme);
+        for (name, ground) in widget_grounds_of_every_space(scheme) {
+            let got = measured(&title, &ground.css());
+            if got < floor {
+                failures.push(format!(
+                    "{scheme:?} {title} on {name} is {got:.2}, floor {floor}"
+                ));
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} failures: {failures:#?}",
+        failures.len()
+    );
+}
+
+/// The busy dots keep the accent (`--accent-text`) on the desktop card: a non-text mark,
+/// gated at 3:1 (WCAG 1.4.11) on the card over every reference wallpaper and every preset's
+/// gradient, for every built-in accent, in both schemes.
+#[test]
+fn the_busy_dots_keep_the_accent_on_the_card() {
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL {
+        for accent in Accent::ALL {
+            let dot = accent_of(accent, scheme).text.css();
+            for (name, ground) in widget_grounds_of_every_space(scheme) {
+                let got = measured(&dot, &ground.css());
+                if got < 3.0 {
+                    failures.push(format!("{scheme:?} {accent:?} {dot} on {name} is {got:.2}"));
+                }
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} failures: {failures:#?}",
+        failures.len()
+    );
+}

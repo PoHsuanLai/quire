@@ -6,9 +6,11 @@
 
 use super::hex::Hex;
 use crate::appearance::Scheme;
+use serde::{Deserialize, Serialize};
 
 /// One label hue.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum LabelHue {
     /// Red.
     Red,
