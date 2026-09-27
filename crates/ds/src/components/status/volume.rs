@@ -66,7 +66,8 @@ impl VolumeState {
         }
     }
 
-    fn glyph(self) -> (LevelGlyph, Fraction) {
+    /// The level glyph this state draws, and the level its waves follow.
+    pub(crate) fn glyph(self) -> (LevelGlyph, Fraction) {
         match self {
             VolumeState::Heard(waves) => (LevelGlyph::Volume(Muting::Audible), waves.level()),
             VolumeState::Muted | VolumeState::NoDevice => {
@@ -105,7 +106,7 @@ pub fn VolumeGlyph(
     let px = size.px();
     rsx! {
         span { class: "ds-status-glyph", "data-kind": "volume", "aria-hidden": "true",
-            style: "width:{px}px;height:{px}px",
+            style: "--ic-size:{px}px",
             LevelGlyphView { glyph, value, size }
         }
     }

@@ -1,6 +1,9 @@
 //! The level control's vocabulary: what it is for, how it looks, whether it ticks, and which
 //! glyph it carries. Every choice is a named variant (no `bool`, CONVENTIONS section 11).
 
+use crate::components::status::VolumeState;
+use crate::components::vocab::Fraction;
+
 /// Whether the control takes input.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum LevelMode {
@@ -81,4 +84,38 @@ pub enum LevelGlyph {
     Volume(Muting),
     /// A sun whose rays grow with the brightness.
     Brightness,
+}
+
+/// Where a level's glyph takes its state from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum LevelSource {
+    /// A glyph that follows the control's own value (a `LevelGlyph` converts).
+    Glyph(LevelGlyph),
+    /// The volume item's state: the speaker shows the waves and the slash that the bar's
+    /// `VolumeGlyph` shows for the same state, so the Sound module and the bar read one source
+    /// (sill Q392). The capsule still shows the control's value; a level of 0 with `Muted`
+    /// keeps the slash.
+    Volume(VolumeState),
+}
+
+impl LevelSource {
+    /// The glyph drawn, and the level its parts follow, with the control at `value`.
+    pub(crate) fn drawn(self, value: Fraction) -> (LevelGlyph, Fraction) {
+        match self {
+            LevelSource::Glyph(glyph) => (glyph, value),
+            LevelSource::Volume(state) => state.glyph(),
+        }
+    }
+}
+
+impl From<LevelGlyph> for LevelSource {
+    fn from(glyph: LevelGlyph) -> Self {
+        LevelSource::Glyph(glyph)
+    }
+}
+
+impl From<VolumeState> for LevelSource {
+    fn from(state: VolumeState) -> Self {
+        LevelSource::Volume(state)
+    }
 }

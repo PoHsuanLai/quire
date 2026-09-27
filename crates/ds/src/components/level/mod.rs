@@ -8,4 +8,4 @@ pub(crate) mod machine;
 pub mod vocab;
 
 pub use control::LevelControl;
-pub use vocab::{LevelGlyph, LevelLook, LevelMode, Muting, Tick};
+pub use vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};

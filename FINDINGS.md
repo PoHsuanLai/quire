@@ -4780,3 +4780,46 @@ sill Q360b, the follow-up to Q360. Branch `q360b`.
   `data-caret=drawn` on a masked `input.ds-input`; `.ds-input-mask`'s text is still one dot per
   character. `lock_prompt.css` keeps its `caret-color` for the empty field and adds a
   `data-caret=drawn` rule so the drawn caret wins there too.
+
+## Status slots (sill Q390-Q392, G310-G312, 2026-09-27)
+
+- **Q390, the bar item.** `IconSource::Status(StatusState)` draws `StatusGlyph` in any icon slot
+  (`IconView`), so `IconButton { Status }` holds it with the same box, ink, pill and label. The
+  status rule sizes a `.ds-status-glyph` (and each of its parts, and the volume glyph's level
+  parts) to `--bar-status-glyph`, as it sized an icon; `VolumeGlyph` wrote its size as an inline
+  `width`/`height`, which no sheet rule can override, so it writes `--ic-size` and the status
+  glyph sheet sizes it from that. An enum variant rather than an element slot: the slot keeps its
+  sizing and label guarantees, and a consumer cannot put arbitrary markup in the bar's box.
+- **G11, where the nudge lives: inside the button.** `IconButton { nudge: Option<Cue> }` wraps the
+  glyph in `span.ds-icon-nudge` carrying `use_nudge`'s pulse. Inside, because (a) the attention
+  belongs to the glyph that carries the fact (the low fill, R8), and the pill is only the hover
+  and open state, so lifting the pill with it would move a background the person may be pointing
+  at; (b) it removes sill's `span.sill-bar-status` wrapper, a consumer element around a quire
+  control; (c) the cue comes from the consumer's
+  own `Detailed` table (sill's `LowWatch`), so quire decides nothing about batteries. The wrapper
+  is rendered only with a cue, so no other `IconButton` gains hooks or markup; the cost is that
+  switching `None` to `Some` remounts the glyph, so a consumer passes it for the item's life.
+- **Q391.** `ModuleTile { glyph }` is `#[props(into)] IconSource` and `ModulePanel { glyph }` is
+  `Option<IconSource>` (`Icon` converts either way, through the `GlyphSlot` conversions for the
+  option), both with `first: FirstShow` passed down to the glyph, so the Battery header sweeps its
+  fill in when the center opens.
+- **Q392.** `LevelControl { glyph }` is `#[props(into)] LevelSource`: a `LevelGlyph` (follows the
+  value, as before) or a `VolumeState` (draws `VolumeState`'s own `(LevelGlyph, band)`, the pair
+  `VolumeGlyph` draws), so the module and the bar cannot disagree.
+- **G311.** A virtual `advance` stopped first at the next timer or at its end, so work woken
+  between two calls (a `watch` send) ran only there. It now resolves at the current instant first.
+- **G312.** The host's focus write answers Busy when dioxus polls the asking task inside
+  `render_immediate` (a task woken in a turn with a dirty scope is popped with the scopes, by
+  height), and the retry waited `FRAME_SLACK`. Whether an ask lands there depends on what else was
+  dirty that turn, which is why sill saw 9 of 20. dioxus runs effects only outside the render, so
+  `ds::busy::after_render` queues an effect that wakes the task; the first four Busy retries of a
+  focus write, a rect read and a list scroll wait for it and land in the same frame at the same
+  instant, the rest a `FRAME_SLACK` apart as before. `onmounted` focusing while the same mount
+  re-renders hit Busy on every run here (50 of 50 landed at 34 ms before the change, 50 of 50 at
+  0 ms after).
+- **G310.** The palette read the selected row's rect only after `laid_out_rect`'s first
+  `FRAME_SLACK`. It now reads an already laid-out row at once (through the same busy retry, so in
+  the frame of the selection) and again after the frame, reporting only a changed rect.
+- **Proofs.** `ds-native/tests/status_slots.rs` and `virtual_clock_asks.rs`, all on
+  `Clock::Virtual`, each motion ending in `assert_settles_to_zero_frames`; each of the four
+  G310-G312 tests fails with its fix reverted. Gallery: Details, "Status glyphs", cell "In the bar".

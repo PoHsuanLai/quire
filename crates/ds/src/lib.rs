@@ -5,6 +5,7 @@
 //! module to the design doc section it implements.
 
 pub mod appearance;
+mod busy;
 pub mod components;
 pub mod css;
 pub mod delays;
