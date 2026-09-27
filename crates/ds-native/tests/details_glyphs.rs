@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::detail::{MorphGlyph, MorphStyle, RollDigits, Slashed};
 use ds::{Appearance, Ds, Icon, IconSize, Material, Motion};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -55,7 +55,12 @@ fn a_down_up_morph_stacks_two_layers_only_while_it_plays() {
 
 #[test]
 fn a_slash_draws_on_and_off() {
-    let mut harness = Harness::new(Glyphs, VIEW);
+    // On `Clock::Virtual` (sill Q380): a known flaker under load, since the CSS stroke-dashoffset
+    // resolved at the harness's frame clock could drift from the settle timer's real wall clock,
+    // so `settle_until`'s poll for a mid-draw offset (`> 0.0`) could land after the draw had
+    // already settled to 0.
+    let mut harness =
+        Harness::with_config(Glyphs, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.count("#slash .ds-morph-slash"), 0);
     harness.within(|| *SLASHED.write() = Slashed::On);
     let offset = |h: &Harness| {

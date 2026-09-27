@@ -111,6 +111,11 @@ fn standard(anim: Anim) -> Duration {
 /// frame that stalls): the panel turns present about a millisecond into its slide.
 #[test]
 fn a_panel_present_before_its_slide_has_played_still_comes_to_rest() {
+    // Kept on Wall: this reproduces G295's split clock on purpose (a real futures-timer
+    // settling while the harness's frame clock has barely advanced past the first frame),
+    // which Virtual's unified clock cannot produce (its `advance` only fires a timer once the
+    // frame clock reaches it, so this same scenario is proven inert there in
+    // virtual_clock.rs::a_stalled_first_frame_cannot_end_the_entrance_early).
     let mut h = Harness::new(Center, PANEL_VIEW);
     assert_eq!(presence(&h).as_deref(), Some("entering"));
     std::thread::sleep(standard(Anim::PanelIn) + ms(50));

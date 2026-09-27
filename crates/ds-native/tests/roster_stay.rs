@@ -9,8 +9,8 @@ use ds::{
     use_roster,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -135,7 +135,8 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
 
 #[test]
 fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
-    let mut harness = Harness::new(StayApp, VIEW);
+    let mut harness =
+        Harness::with_config(StayApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(1500));
     harness.click(centre(&harness, &row(2)));
     harness.advance(ms(200));
@@ -143,7 +144,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
     // Fold it again 150 ms later: the first fold's timer, had it survived the stay, would drop
     // the row about 100 ms into the second fold.
     harness.advance(ms(150));
-    let refolded = Instant::now();
+    let refolded = harness.now();
     harness.click(centre(&harness, &row(2)));
     // Well under half the second fold's own settle(Fold) (~454 ms), and comfortably past the
     // ~104 ms mark where the first fold's stale timer would have dropped the row had it

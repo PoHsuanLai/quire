@@ -10,7 +10,7 @@ use ds::{
     MotionLevel, RingMark, RootChrome, WakeStamp,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::RefCell;
 use std::time::{Duration, Instant};
 
@@ -113,8 +113,9 @@ fn assert_rests(harness: &mut Harness) {
 
 #[test]
 fn a_ring_fills_from_empty_and_its_figure_counts_to_the_level() {
-    let mounted = Instant::now();
-    let mut harness = Harness::new(Stage, VIEW);
+    let mut harness =
+        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mounted = harness.now();
     assert_eq!(
         harness.attr(".ds-battery", "aria-valuenow").as_deref(),
         Some("93"),
@@ -187,8 +188,11 @@ fn a_new_level_sweeps_from_the_old_and_a_new_wake_replays() {
 
 #[test]
 fn a_charging_bolt_arrives_after_the_fill() {
-    let mounted = Instant::now();
-    let mut harness = Harness::new(ChargingStage, VIEW);
+    let mut harness = Harness::with_config(
+        ChargingStage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    let mounted = harness.now();
     assert_eq!(
         harness.count(".ds-battery-bolt"),
         0,

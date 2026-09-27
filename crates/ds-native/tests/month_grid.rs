@@ -11,14 +11,13 @@ use dioxus::prelude::*;
 use ds::{Anim, Appearance, DayKey, Ds, Material, MonthGrid, MotionLevel, StaggerIndex, Step};
 use ds::{WeekNumbers, settle};
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use month_sample::{First, SEPTEMBER, sample, shift};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
-// `Harness::advance` lets real (wall-clock) time pass (its module documentation), so these
-// tests never assert a state at one fixed instant near the slide's settle: the "still sliding"
-// check comes within a millisecond of the press and is guarded to be well under half the slide;
-// the settle itself is polled with `settle_until` and compared on the wall clock.
+// `a_step_slides_the_new_month_in_once` runs on `Clock::Virtual` (sill Q380), so the "still
+// sliding" check within a millisecond of the press and the settle bound below (via
+// `settle_until`) hold exactly, not merely well under half the slide.
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -75,10 +74,10 @@ fn sliding(harness: &Harness, class: &str) -> bool {
 
 /// Press a step button and watch its slide: present at once, gone only after a full slide.
 fn step_and_watch(harness: &mut Harness, label: &str, class: &str) {
-    let pressed = Instant::now();
+    let pressed = harness.now();
     press(harness, &format!(".ds-icon-button[*|aria-label='{label}']"));
     harness.advance(ms(1));
-    let looked = Instant::now();
+    let looked = harness.now();
     assert!(
         looked.duration_since(pressed) < slide() / 2,
         "the first look came well inside the slide"
@@ -103,7 +102,10 @@ fn step_and_watch(harness: &mut Harness, label: &str, class: &str) {
 
 #[test]
 fn a_step_slides_the_new_month_in_once() {
-    let mut harness = Harness::new(MonthApp, VIEW);
+    let mut harness = Harness::with_config(
+        MonthApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     assert!(!harness.has_class(".ds-month-weeks", "a-slide-r"));
     assert!(!harness.has_class(".ds-month-weeks", "a-slide-l"));

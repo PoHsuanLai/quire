@@ -11,9 +11,9 @@ use ds::{
     SendPhase, SendPill, SendRing, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use probe::pixels;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -50,7 +50,8 @@ fn pulsing(harness: &Harness) -> bool {
 /// stays up throughout.
 #[test]
 fn a_nudge_plays_once_settles_and_the_pill_stays() {
-    let mut harness = Harness::new(Moods, VIEW);
+    let mut harness =
+        Harness::with_config(Moods, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(
         harness.attr(".ds-send-pill", "data-shown").as_deref(),
@@ -58,10 +59,9 @@ fn a_nudge_plays_once_settles_and_the_pill_stays() {
     );
     assert!(!pulsing(&harness), "no one-shot on mount");
 
-    // Marked before the click that starts the pulse's settle timer, so nothing but real
-    // overhead is spent before this instant: the comparison against `settles` below stays a
-    // true lower bound.
-    let pulsed = Instant::now();
+    // Marked on the harness's own (virtual) clock, sill Q380, so the comparison against
+    // `settles` below is exact.
+    let pulsed = harness.now();
     harness.click(harness.centre("#nudge").expect("the nudge button"));
     harness.advance(ms(16));
     assert!(pulsing(&harness), "{}", harness.html());

@@ -9,7 +9,7 @@ use ds::{
     EmojiCell, EmojiCells, FieldKey, Key, Material, MenuEntry, PaletteGroup, PaletteGroups,
     PaneContent, PreviewPane, Trail,
 };
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -530,7 +530,10 @@ fn LeavingPane() -> Element {
 /// that has settled (`settle(PaneOutR)`, 284 ms at Standard), so the caller drops it then.
 #[test]
 fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {
-    let mut harness = Harness::new(LeavingPane, VIEW);
+    let mut harness = Harness::with_config(
+        LeavingPane,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(400));
     assert_eq!(
         harness.attr(".ds-preview", "data-presence").as_deref(),
@@ -538,7 +541,7 @@ fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {
     );
     let at = harness.centre(".hide").expect("the button");
     harness.click(at);
-    let asked = std::time::Instant::now();
+    let asked = harness.now();
     harness.advance(ms(20));
     assert_eq!(
         harness.attr(".ds-preview", "data-presence").as_deref(),

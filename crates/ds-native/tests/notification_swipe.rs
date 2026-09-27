@@ -10,7 +10,7 @@ use ds::{
     NotificationCard, Point, Px, StaggerIndex, Swipe, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::Cell;
 use std::time::{Duration, Instant};
 
@@ -51,8 +51,13 @@ fn ms(n: u64) -> Duration {
 }
 
 fn start(motion: Motion) -> (Harness, Point) {
+    start_on(motion, Clock::Wall)
+}
+
+/// `start`, on `clock`.
+fn start_on(motion: Motion, clock: Clock) -> (Harness, Point) {
     MOTION.with(|cell| cell.set(motion));
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness = Harness::with_config(Card, HarnessConfig::new(VIEW).with_clock(clock));
     harness.within(|| LOG.write().clear());
     harness.advance(ms(1));
     let at = harness
@@ -103,7 +108,7 @@ fn drag(harness: &mut Harness, at: Point, dx: f32) -> Instant {
         "the card follows the pointer 1:1: {}",
         style(harness)
     );
-    let released = Instant::now();
+    let released = harness.now();
     harness.pointer_up(right(at, dx));
     released
 }
@@ -128,7 +133,7 @@ fn a_drag_released_under_the_threshold_springs_back() {
 
 #[test]
 fn a_drag_released_past_the_threshold_flies_out_and_reports_at_settle() {
-    let (mut harness, at) = start(Motion::Standard);
+    let (mut harness, at) = start_on(Motion::Standard, Clock::Virtual);
     let flight = settle(
         Anim::BannerOut,
         MotionLevel::Standard,
@@ -185,7 +190,7 @@ fn a_horizontal_scroll_is_summed_and_decided_when_it_stops() {
 
 #[test]
 fn under_reduced_the_flight_settles_at_reduceds_length() {
-    let (mut harness, at) = start(Motion::Reduced);
+    let (mut harness, at) = start_on(Motion::Reduced, Clock::Virtual);
     let reduced = settle(
         Anim::BannerOut,
         MotionLevel::Reduced,

@@ -9,8 +9,8 @@ use ds::{
     MotionLevel, NotificationCard, Point, Px, StaggerIndex, Swipe, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 420,
@@ -72,7 +72,12 @@ fn show(harness: &mut Harness, keys: &[u32]) {
 
 /// A stack showing `keys`, every banner at rest (it mounts empty, and they arrive).
 fn start(keys: &[u32]) -> Harness {
-    let mut harness = Harness::new(Stack, VIEW);
+    start_on(keys, Clock::Wall)
+}
+
+/// `start`, on `clock`.
+fn start_on(keys: &[u32], clock: Clock) -> Harness {
+    let mut harness = Harness::with_config(Stack, HarnessConfig::new(VIEW).with_clock(clock));
     show(&mut harness, keys);
     for &n in keys {
         settle_until(&mut harness, |h| {
@@ -95,14 +100,14 @@ fn a_banner_listed_slides_in_and_comes_to_rest() {
 
 #[test]
 fn one_removed_from_the_middle_leaves_and_those_after_it_heal() {
-    let mut harness = start(&[3, 2, 1]);
+    let mut harness = start_on(&[3, 2, 1], Clock::Virtual);
     let pitch = harness.rect(&row(2)).expect("row 2").size.height.0;
     let out = settle(
         Anim::BannerOut,
         MotionLevel::Standard,
         StaggerIndex::default(),
     );
-    let removed = Instant::now();
+    let removed = harness.now();
     show(&mut harness, &[3, 1]);
     assert_eq!(presence(&harness, 2).as_deref(), Some("leaving"));
     assert_eq!(presence(&harness, 1).as_deref(), Some("present"));

@@ -13,7 +13,7 @@ use ds::{
     PolkitPrompt, PromptState, Px, RootChrome, StaggerIndex, SwitcherApp, person_hue, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -100,8 +100,13 @@ fn type_text(harness: &mut Harness, text: &str) {
     }
 }
 
+// On `Clock::Virtual` so `set_state`'s 1 ms advances between successive state writes cannot
+// drift: on `Clock::Wall` a loaded machine's overshoot on such a short `advance` could let a
+// mood or shake timer settle inside a step meant to hold it (sill Q380; the emoji glances test
+// flaked this way).
 fn mounted(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness =
+        Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| {
         *STATE.write() = PromptState::Idle;
         HEARD.write().clear();
@@ -141,7 +146,7 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     let shake = settle(Anim::ShakeX, MotionLevel::Standard, StaggerIndex::new(0));
     // Marked before the state write that starts the settle timer, so the comparison below is a
     // true lower bound.
-    let wrong = Instant::now();
+    let wrong = harness.now();
     set_state(&mut harness, PromptState::Wrong);
     assert!(shaking(&harness), "{}", harness.html());
     assert_eq!(
@@ -285,7 +290,7 @@ fn a_letter_plays_the_accept_beat_once_accepted() {
     assert!(!accepting(&harness), "no beat at rest");
     type_text(&mut harness, "abc");
     set_state(&mut harness, PromptState::Checking);
-    let asked = Instant::now();
+    let asked = harness.now();
     set_state(&mut harness, PromptState::Accepted);
     settle_until(&mut harness, accepting);
     let rested = settle_until(&mut harness, |h| !accepting(h));
