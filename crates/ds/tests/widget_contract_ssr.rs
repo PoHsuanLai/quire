@@ -194,6 +194,30 @@ const CASES: &[Case] = &[
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium } },
         )
     }),
+    ("battery-row-one", || {
+        let entry =
+            BatteryEntry::Devices(vec![cell("MacBook", Device::Laptop, 930, RingMark::Plain)]);
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Medium } },
+        )
+    }),
+    ("battery-row-two", || {
+        let entry = BatteryEntry::Devices(vec![
+            cell("MacBook", Device::Laptop, 930, RingMark::Plain),
+            cell("Headphones", Device::Headphones, 800, RingMark::Plain),
+        ]);
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Medium } },
+        )
+    }),
+    ("battery-row-waiting", || {
+        desktop(
+            Theme::Light,
+            rsx! { WidgetCard { widget: BatteryWidget, size: WidgetSize::Medium } },
+        )
+    }),
     ("battery-row-tile", || {
         center(
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, host: WidgetHost::Tile } },
@@ -410,6 +434,32 @@ fn the_batteries_lay_out_as_the_reference() {
         "the watch at 13 %: {row}"
     );
     assert!(row.contains("data-mark=\"charging\""), "{row}");
+    for (name, batteries) in [
+        ("battery-row-one", 1),
+        ("battery-row-two", 2),
+        ("battery-row", 4),
+    ] {
+        let row = html(name);
+        assert_eq!(
+            row.matches("class=\"ds-batteries-cell\"").count(),
+            4,
+            "{name}: four places at the fixed pitch (M15): {row}"
+        );
+        assert_eq!(
+            row.matches("data-place=\"empty\"").count(),
+            4 - batteries,
+            "{name}: a bare track in each place left over: {row}"
+        );
+        assert_eq!(row.matches('%').count(), batteries, "{name}: {row}");
+    }
+    let row_waiting = html("battery-row-waiting");
+    assert_eq!(row_waiting.matches("data-place=\"empty\"").count(), 4);
+    let sheet = ds::stylesheet();
+    assert!(
+        sheet.contains(".ds-batteries[*|data-layout=row]{ justify-content:center;")
+            && !sheet.contains(".ds-batteries[*|data-layout=row]{ justify-content:space-between"),
+        "the row keeps its pitch rather than spreading to the ends"
+    );
     let waiting = html("battery-waiting");
     assert!(waiting.contains("data-waiting"), "{waiting}");
     assert!(!waiting.contains("ds-battery-arc"), "{waiting}");

@@ -241,8 +241,11 @@ the shell passes the batteries):
 - **Small, one device**: the ring at the top left; the percentage at the bottom left in the
   display face 500 at `--fs-widget-hero`, its baseline about 15 above the card's bottom.
 - **Small, several**: a 2 x 2 grid of rings, no numbers; an empty place a ring at 0.
-- **Medium**: four rings across from 20 in, the percentage 18 under each in the display face 500
-  at `--fs-widget-figure`, the block centred vertically.
+- **Medium**: four places on a fixed 80 pitch (a 64 ring and a 16 gap) from 20 in, the percentage
+  18 under each in the display face 500 at `--fs-widget-figure`, the block centred vertically.
+  Fewer than four batteries take the first places and each place left over is a bare track over
+  an empty figure line, so the pitch never stretches (sill Q522: one battery used to sit alone in
+  the middle and two at the card's ends).
 
 Motion, the fill (section 1.1, F1-F6): on mount and on each new `wake` (a host passes
 `WakeStamp::next` when its widgets come into view) the arc sweeps from empty to the level over
@@ -714,7 +717,7 @@ remote-kind registry are the pass that builds out-of-process widgets.
 | `MonthWidget` "Calendar" | `quire.month` | Small, Medium, Large | `MonthEntry::{Waiting, Month(Box<MonthFace { grid, weeks, today, events, no_events }>)}` | `MonthIntent::Step(Step)` |
 
 Batteries: Small with one battery the ring and the hero figure; Small with several the 2 x 2 grid,
-empty places bare tracks; Medium the row with the figure under each; `Waiting` is four bare
+empty places bare tracks; Medium the row of four fixed places with the figure under each, empty places bare tracks (Q522); `Waiting` is four bare
 tracks and no number. World Clock: Small the large dial alone; Medium four dials with the notes
 (the day, the offset) under each; digits in the tile. Month: the reference's layout per size
 (section 5.2); the steps only when the host listens (`onintent`).
