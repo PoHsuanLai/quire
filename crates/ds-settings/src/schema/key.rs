@@ -36,6 +36,9 @@ pub enum Page {
     Notifications,
     Spaces,
     Accounts,
+    /// sill's idle service (design/22-SETTINGS.md section 3.24 `idle.*`, section 3.19
+    /// `session.lock_grace_s`); added Q445, replacing those domains' "Page Accounts for now".
+    Power,
     Apps,
     /// A third-party program's own page, named by its app id.
     App(String),
