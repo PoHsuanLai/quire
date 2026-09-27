@@ -96,3 +96,9 @@
   width:var(--s-3); height:var(--s-3); margin:calc(-1 * var(--s-4)) 0 var(--s-1);
 }
 .ds-month[*|data-density=compact] .ds-month-day[*|aria-current=date] .ds-month-dot{ background:var(--accent-ink); }
+
+/* In a widget's card (`data-fit=frame`, design/23-WIDGETS.md section 5.2): the compact month
+   fills its box as above (the Small card's, or the Medium card's 140 x 140 right half); the
+   regular month keeps its own pitch (32 px columns, 30 px rows: the reference's large calendar
+   sits near 28-32) and is centred in the room left, never spread over it. */
+.ds-month[*|data-fit=frame][*|data-density=regular]{ flex:none; align-self:center; }

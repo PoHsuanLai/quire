@@ -9,8 +9,9 @@ use crate::components::widget_kind::WidgetSize;
 /// The density a caller asks for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum MonthDensity {
-    /// Follow the enclosing `WidgetFrame`: compact in a `Small` one, regular in a `Medium` or
-    /// `Large` one and outside any frame.
+    /// Follow the enclosing `WidgetFrame`: compact in a `Small` or `Medium` one (a medium card's
+    /// content box is 140 tall, too short for six regular weeks), regular in a `Large` one and
+    /// outside any frame.
     #[default]
     Auto,
     /// Seven 32 px columns, whatever encloses it.
@@ -34,12 +35,9 @@ impl MonthDensity {
     pub(crate) fn resolve(self, frame: Option<WidgetSize>) -> Drawn {
         match (self, frame) {
             (MonthDensity::Regular, _) => Drawn::Regular,
-            (MonthDensity::Compact, _) | (MonthDensity::Auto, Some(WidgetSize::Small)) => {
-                Drawn::Compact
-            }
-            (MonthDensity::Auto, Some(WidgetSize::Medium | WidgetSize::Large) | None) => {
-                Drawn::Regular
-            }
+            (MonthDensity::Compact, _)
+            | (MonthDensity::Auto, Some(WidgetSize::Small | WidgetSize::Medium)) => Drawn::Compact,
+            (MonthDensity::Auto, Some(WidgetSize::Large) | None) => Drawn::Regular,
         }
     }
 }
@@ -64,7 +62,7 @@ mod tests {
         let cases = [
             (MonthDensity::Auto, None, Drawn::Regular),
             (MonthDensity::Auto, Some(WidgetSize::Small), Drawn::Compact),
-            (MonthDensity::Auto, Some(WidgetSize::Medium), Drawn::Regular),
+            (MonthDensity::Auto, Some(WidgetSize::Medium), Drawn::Compact),
             (MonthDensity::Auto, Some(WidgetSize::Large), Drawn::Regular),
             (
                 MonthDensity::Regular,

@@ -23,6 +23,8 @@ pub mod command_palette;
 pub mod command_pill;
 pub mod count;
 pub mod device_battery;
+pub(crate) mod device_forms;
+pub mod device_glyph;
 pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
@@ -175,6 +177,7 @@ pub mod vocab;
 pub mod widget_frame;
 pub mod widget_kind;
 pub(crate) mod widget_scope;
+pub mod widget_slot;
 pub mod window_frame;
 pub mod workspace_pills;
 
@@ -205,6 +208,7 @@ pub use command_palette::{
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
 pub use device_battery::DeviceBattery;
+pub use device_glyph::{Device, DeviceGlyph};
 pub use dock_parts::{DockFloor, RunningDot};
 pub use drag_ghost::{DragGhost, DragReturnFrame, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
@@ -323,7 +327,8 @@ pub use vocab::{
     Selection, Shortcut, StaggerIndex, Switch,
 };
 pub use widget_frame::WidgetFrame;
-pub use widget_kind::{CardTint, WidgetHost, WidgetSize, WidgetTitle};
+pub use widget_kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
+pub use widget_slot::WidgetSlotGuide;
 pub use window_frame::{TrafficLights, WindowFrame, WindowTitlebar};
 pub use workspace_pills::{WorkspacePill, WorkspacePills};
 
@@ -342,6 +347,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("command_palette", include_str!("command_palette.css")),
     ("command_pill", include_str!("command_pill.css")),
     ("count", include_str!("count.css")),
+    ("device_glyph", include_str!("device_glyph.css")),
     ("dock_parts", include_str!("dock_parts.css")),
     ("drag_ghost", include_str!("drag_ghost.css")),
     ("edge_strip", include_str!("edge_strip.css")),

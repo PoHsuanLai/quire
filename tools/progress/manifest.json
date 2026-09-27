@@ -4,6 +4,53 @@
  "main_url": "https://claude.ai/artifact/6q66NrcfZ1zQjXEE7mN2Rd",
  "entries": [
   {
+   "id": "widgets-final",
+   "date": "2026-09-27 · gate",
+   "title": "Widgets: your picks applied, and the card became an interface",
+   "status": "done",
+   "lede": "Your picks are in: the battery percentage at weight 500, the ring's track as the plate darkened, one red for low and critical, the World Clock card following light and dark, new filled device glyphs (abstract, on the Lucide grid), and every widget card tinted by the Space. The card is now an interface: every widget, ours now and other apps' later, plugs in through one Rust trait and is drawn only on quire's card, so the corner, inset, material and tint can never drift. You choose which widgets go where in a new Edit Widgets gallery (browse, preview each size, add to the desktop or the notification center, resize, remove), and the choice is saved as data. Also fixed: the calendar takes the reference's layout at each size (Medium shows today beside the month, Large lists the day's events under it), and a widget picked up on the desktop lifts with a drop-slot guide. One question is for you: the month's title in the accent colour cannot stay readable on the see-through card, so there are two options side by side below.",
+   "notes": [
+    "Your pick (title-options pictures): (a) make the light desktop card nearly opaque (tint .96) so the title stays in the accent colour, or (b) keep the see-through card and draw the title in soft grey, with the accent kept for today's disc and the event dots. The branch uses (b) for now.",
+    "The pattern is named for reuse: a registry, one trait, a picker, placements as data. Spotlight categories, control center modules and menu bar items can follow it.",
+    "Other apps' widgets across processes are designed (a timeline sent as JSON over D-Bus, drawn with quire's view templates) but the transport is not built.",
+    "sill has to adopt it: its widgets become providers, its two widget settings become one layout, and its drag uses quire's lift and slot guide (listed in CONSUMING)."
+   ],
+   "images": [
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/after-widget-looks-light.png",
+     "caption": "After: every card on the widget interface, Space-tinted; filled device glyphs; the calendar at each size; pick up and drop; Edit Widgets (light)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/after-widget-looks-dark.png",
+     "caption": "After, dark: the World Clock card follows the scheme."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/before-calendar-light.png",
+     "caption": "Before: the month did not fit its card (Medium overflowed, Large left 40 % empty)."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/after-calendar-light.png",
+     "caption": "After: Small the month; Medium today beside the month; Large the month over the day's events, or No events today."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/before-widget-reference-light.png",
+     "caption": "Before: outline device glyphs, bare material cards."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/after-widget-reference-light.png",
+     "caption": "After: filled device glyphs, Space-tinted cards, the same measured layout."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/title-options-light.png",
+     "caption": "Your pick, light: the title now, (a) the card at .96, (b) the title in soft grey; the ratios on each card over seven wallpapers."
+    },
+    {
+     "path": "/home/pohsuanlai/quire/tools/progress/shots/widgets-final/title-options-dark.png",
+     "caption": "Your pick, dark: the dark card already holds the accent title; (b) for consistency."
+    }
+   ]
+  },
+  {
    "id": "accent-band",
    "date": "2026-09-27 · decision",
    "title": "A lighter accent, kept in bounds: you picked B (Airy)",

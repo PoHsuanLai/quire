@@ -4,9 +4,10 @@
 //! `From` and quire needs no calendar of its own.
 
 use crate::components::text_runs::Text;
+use serde::{Deserialize, Serialize};
 
 /// A calendar month: which month a grid shows. Ordered, so a change of month knows its way.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct MonthKey {
     /// The year.
     pub year: i16,
@@ -22,7 +23,7 @@ impl MonthKey {
 }
 
 /// A civil date: which day a cell is, handed back to `onpick`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct DayKey {
     /// The year.
     pub year: i16,
@@ -33,11 +34,11 @@ pub struct DayKey {
 }
 
 /// An ISO 8601 week number, 1-53: the week of the row's Thursday.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct IsoWeek(pub i8);
 
 /// Whether a cell's day is in the month shown or pads the first or last week.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum DayPlace {
     /// The previous month's, before the first: drawn quieter.
     Before,
@@ -59,7 +60,7 @@ impl DayPlace {
 }
 
 /// Whether a cell is today: today sits on the accent disc.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum DayMark {
     /// Today: `aria-current="date"`.
     Today,
@@ -78,7 +79,7 @@ impl DayMark {
 }
 
 /// Whether a day has an event: a busy day carries a dot.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Eventful {
     /// At least one event.
     Busy,
@@ -97,7 +98,7 @@ impl Eventful {
 }
 
 /// One cell.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct MonthDay {
     /// The date; its day is the label.
     pub key: DayKey,
@@ -110,7 +111,7 @@ pub struct MonthDay {
 }
 
 /// One row: its ISO week and its seven days, from the first weekday.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct MonthWeek {
     /// The row's ISO week, drawn only with `WeekNumbers::Show`.
     pub number: IsoWeek,
@@ -119,7 +120,7 @@ pub struct MonthWeek {
 }
 
 /// A month laid out in weeks, with the words the shell formatted for it.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct MonthGridData {
     /// Which month: the grid's identity, and the order a change slides by.
     pub month: MonthKey,
@@ -133,7 +134,7 @@ pub struct MonthGridData {
 
 /// Whether the grid leads each row with its ISO week (`calendar.week_numbers`, design/22
 /// section 3.21).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum WeekNumbers {
     /// Seven columns only.
     #[default]
@@ -153,7 +154,7 @@ impl WeekNumbers {
 }
 
 /// Which way the header's buttons step the month.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Step {
     /// The month before.
     Previous,

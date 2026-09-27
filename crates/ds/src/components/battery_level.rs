@@ -18,6 +18,7 @@ use crate::components::vocab::Fraction;
 use crate::motion::{RunFrame, RunTokens, WakeStamp, use_level_run};
 use crate::tokens::{DurationToken, EasingToken};
 use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// The fill's timing: `--t-fill` at `--e-out`, then the bolt's fade over `--t-quick`.
 pub const FILL: RunTokens = RunTokens {
@@ -38,7 +39,7 @@ pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
 pub(crate) const BOLT: &str = "M7 0 0 9.6h4.6L3.2 16 10 6.4H5.4L7 0Z";
 
 /// Whether the battery is filling.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum RingMark {
     /// Just the level.
     #[default]
