@@ -7,9 +7,9 @@
 //! layout and sets the list's scroll offset. Without one (a webview) the item's own
 //! `scrollIntoView` with the nearest block is used, which is the same rule.
 
+use crate::busy::wait_out_busy;
 use crate::geometry::measure::{BUSY_ATTEMPTS, laid_out_rect};
 use crate::guarded::guarded_call;
-use crate::time::{FRAME_SLACK, sleep};
 use dioxus::html::{ScrollBehavior, ScrollLogicalPosition, ScrollToOptions};
 use dioxus::prelude::*;
 
@@ -67,9 +67,9 @@ pub(crate) async fn reveal(scroller: &MountedData, item: &MountedData) -> Scroll
     }
     match try_consume_context::<HostReveal>() {
         Some(HostReveal(write)) => {
-            for _ in 0..BUSY_ATTEMPTS {
+            for attempt in 0..BUSY_ATTEMPTS {
                 match write(scroller, item) {
-                    Scrolled::Busy => sleep(FRAME_SLACK).await,
+                    Scrolled::Busy => wait_out_busy(attempt).await,
                     done => return done,
                 }
             }

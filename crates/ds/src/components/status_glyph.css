@@ -17,4 +17,5 @@
 .ds-status-glyph[*|data-pending=still]{ opacity:.45; }
 .ds-status-glyph[*|data-pending=high], .ds-status-glyph[*|data-pending=low]{ transition:opacity var(--t-pending-step) var(--e-linear); }
 .ds-status-glyph[*|data-pending=low]{ opacity:.45; }
+.ds-status-glyph[*|data-kind=volume]{ width:var(--ic-size); height:var(--ic-size); }
 .ds-status-glyph > .ds-level-glyph{ width:100%; height:100%; }

@@ -1885,6 +1885,32 @@ list that holds any of them. On a surface the person just opened (the control ce
 key (in `AWAITING_ROWS`), then the row lands in quire, so sill's keys test never sees a row with no
 key.
 
+### Status slots (2026-09-27): a status glyph in the bar item, the tile disc and the panel header
+
+sill Q390-Q392, G310-G312, FINDINGS.md "Status slots". Every new prop is defaulted; one enum grew a
+variant (below).
+
+| Want | Call | Notes |
+| --- | --- | --- |
+| A status glyph in the bar's status item (Q390) | `IconButton { variant: Status, icon: StatusState::Wifi(state), label: state.words(), .. }` | `IconSource::Status(StatusState)`; a `StatusState` converts. Same box (`--bar-status-box`), ink, pill and label as an `Icon`; the glyph fills the `--bar-status-glyph` square whatever size it was written at (every part, and the volume glyph's level parts). Hand it the state every render; it plays its own table |
+| The low-battery nudge (G11) | `IconButton { .., nudge: Some(detail.cue()) }` | `nudge: Option<Cue>`, default `None`. Each new `Moment::Attention` cue lifts the glyph once (`nudge-up` on a `span.ds-icon-nudge` inside the button), never the pill; nothing under Reduced; the same cue never replays. Feed it sill's `use_detail(LowWatch, FirstShow::Still, Touch::Remote).cue()` and drop the `span.sill-bar-status` wrapper. Pass it for the item's whole life: going `None` to `Some` remounts the glyph |
+| A first frame for the glyph | `IconButton { first: FirstShow }`, `IconView { first }`, `StatusGlyph { first }` | Default `Still`. Only the battery has an Appear (the fill sweeps in from empty) |
+| The Battery module's header (Q391) | `ModulePanel { glyph: IconSource::Status(StatusState::Battery(state)), first: FirstShow::Animate, .. }` | `glyph: Option<IconSource>` (was `Option<Icon>`; `Icon::Battery`, `Some(Icon::X)` and `None` still compile). `first` on a center just opened sweeps the fill in over `--t-sweep` |
+| The Wi-Fi and Bluetooth tiles' disc (Q391) | `ModuleTile { glyph: StatusState::Wifi(state), first, .. }` | `#[props(into)] glyph: IconSource` (was `Icon`; an `Icon` converts). The disc's ink carries it: accent ink when On. Joining shows the searching loop in the disc; joined fills to its bars (G14's fill on enable) |
+| The Sound module and the bar on one source (Q392) | `LevelControl { glyph: volume_state, value, .. }` | `#[props(into)] glyph: LevelSource` (was `LevelGlyph`, which converts): `LevelSource::{Glyph(LevelGlyph), Volume(VolumeState)}`. With a `VolumeState` the speaker draws that state's waves and slash (exactly what `VolumeGlyph` draws for it) while the capsule shows `value`; `Muted` at level 0 keeps the slash |
+
+**Breaking, in one place: `IconSource` has a fourth variant, `Status(StatusState)`.** An exhaustive
+`match` on it needs the arm. In sill: `bar/tray_input.rs` (`IconSource::Status(_) => "status"`, or
+whatever that description wants) and `dock/icon_tests.rs` (the test's `describe`).
+
+**The harness on the virtual clock (G311, G312) and the palette's row (G310).**
+
+| Change | What you do |
+| --- | --- |
+| `advance(d)` on `Clock::Virtual` first runs what was woken since the last call at the current instant (a `watch` send, a link ask), then steps timers | Drop the `advance(Duration::ZERO)` after each send in your helpers (`ask`, `show`, `shot`, `cleared`); they are harmless if kept. A test that asserted the old drift (the answer at the end of the advance after the ask) now sees it at the ask plus its timer |
+| A focus write, a rect read or a scroll that finds the document borrowed by the renderer tries again as soon as that render ends (a dioxus effect wakes it), the first four times, then a `FRAME_SLACK` apart as before | `ds::focus_soon` from `onmounted` or a handler that also re-renders lands in the same frame, every run, on both clocks. Assert the boundary: focused right after the ask, no `FRAME_SLACK` |
+| `CommandPalette`'s `on_select_rect` reports an already laid-out row in the frame it was selected, and again a frame later if a scroll or new results moved it | An actions key right after a selection anchors to the row just selected. The second report fires only when the rect changed |
+
 ### Launcher v2 parts (2026-09-26): row shapes, the emoji grid, the preview pane, "Show More", the key claim
 
 sill M9 lane d (Q290-Q292, Q294, Q296, Q299); design/04-COMPONENTS.md sections 46-49. Additive
