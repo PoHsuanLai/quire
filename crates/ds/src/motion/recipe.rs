@@ -444,6 +444,7 @@ impl Anim {
             Anim::NudgeUp => detail::NUDGE_UP,
             Anim::Hold => own::HOLD,
             Anim::PaneInROut => detail::PANE_IN_R_OUT,
+            Anim::MorphInSpring => detail::MORPH_IN_SPRING,
         }
     }
 }

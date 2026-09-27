@@ -175,6 +175,10 @@
 .g-status-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s-14);padding:var(--s-10) var(--s-12);border-radius:var(--r-small);background:var(--surface);color:var(--ink)}
 .g-status-still{display:flex;flex-direction:column;align-items:center;gap:var(--s-6);min-width:56px}
 .g-status-words{font-size:var(--fs-caption);color:var(--ink-soft);text-align:center}
+.g-center-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-center-tiles{flex:1;min-width:0}
+.g-center-player{display:flex;align-items:center;gap:var(--s-4)}
+.g-center-track{flex:1;min-width:0}
 .g-detail-word{font-size:var(--fs-small);color:var(--ink-soft);min-width:84px}
 .g-bar{position:relative;width:160px;height:10px;border-radius:var(--r-pill);background:var(--line);overflow:hidden}
 .g-bar-fill{height:100%;border-radius:var(--r-pill);background:var(--accent)}

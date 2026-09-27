@@ -632,6 +632,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-hold[*|data-pulse=b]{animation:hold--b var(--t-tap) var(--e-linear);}
 .a-pane-in-r-out[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
 .a-pane-in-r-out[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
+.a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-spring) backwards;}
+.a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-spring) backwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
@@ -836,6 +838,14 @@ html,body{margin:0;padding:0;background:transparent}
 /* BatteryFigure: the percentage counting with the ring's fill; the caller sets its size and
    face, tabular so its width holds while it counts. */
 .ds-battery-figure{ font-variant-numeric:tabular-nums; }
+
+/* DeviceBattery (design/26-DETAILS.md 5.2.9, wave D2): the ring over its percentage, centred, the
+   control center's Battery module's one device. The arc sweeps and the number counts from Rust;
+   the bolt waits hidden until the sweep lands, then fades in over `--t-quick`. */
+.ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
+.ds-device-battery .ds-battery-figure{ font-size:var(--fs-help); color:var(--ink-soft); }
+.ds-battery-bolt[*|data-show]{ transition:opacity var(--t-quick) var(--e-out); }
+.ds-battery-bolt[*|data-show=off]{ opacity:0; }
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -1480,6 +1490,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
 .ds-level-part[*|data-on=off]{ opacity:0; }
 .ds-level-part[*|data-part=rays]{ transform:scale(calc(.6 + .4 * var(--f))); }
+/* The keyboard light's rays grow from the rising sun's centre, (12, 9) on the 24 grid. */
+.ds-level-part[*|data-part=key-rays]{ transform-origin:50% 37.5%; transform:scale(calc(.6 + .4 * var(--f))); }
 
 /* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
 .ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }
@@ -2486,6 +2498,58 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-settings-row-trail{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); }
 .ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-settings-row-value{ font-size:var(--fs-help); }
+
+/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8; wave D2). The glyph may sit
+   on a 26 px disc: paper with ink for an item not in use, `--accent` with `--accent-ink` and an
+   inset `--accent-text` hairline for the item in use (the tile disc's look), the colour
+   cross-fading over `--t-quick`. While a pending loop steps on the glyph (`data-pending=step`, set
+   from Rust) it breathes between 1 and .45 over `--t-pending-step`; held still at the cap it stays
+   at .45. A spinner in the trailing slot turns in a 14 px well. A success seals the glyph with
+   `gulp` once; a failure shakes the row once. Nothing here loops. */
+.ds-settings-row-glyph{ transition:opacity var(--t-quick) var(--e-out); }
+.ds-settings-row-glyph[*|data-disc]{
+  width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
+  transition:opacity var(--t-quick) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-settings-row-glyph[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
+.ds-settings-row-glyph[*|data-pending=step]{ transition:opacity var(--t-pending-step) var(--e-in-out); }
+.ds-settings-row-glyph[*|data-beat=low],
+.ds-settings-row-glyph[*|data-pending=still]{ opacity:.45; }
+.ds-settings-row-trail[*|data-mark=pending]{ width:14px; height:14px; justify-content:center; }
+.ds-settings-row-spin{ position:relative; display:block; width:6px; height:6px; }
+.ds-settings-row-trail[*|data-mark=battery]{ gap:var(--s-4); }
+.ds-settings-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
+/* -- now_playing -- */
+/* Now Playing (design/26-DETAILS.md 5.2.10, wave D2). NowPlayingTrack: the art in a 48 px well at
+   `--r-media` beside the title (`--fs-shell-menu` 600) over the `by` line (`--fs-help`,
+   `--ink-faint`). A new track cross-fades: the outgoing layer sits over the incoming one and each
+   plays its fade once (`a-morph-fade-out`, `a-morph-fade-in`, `--t-quick`). While buffering the
+   art breathes between 1 and .45 a step at a time (`data-pending=step`, set from Rust over
+   `--t-pending-step`) and holds at .45 once still. TrackPosition: a 4 px bar, the played share
+   (`--f`, written each whole second from Rust, no transition: a clock-paced report steps) in
+   `--ink-soft` over `--m-level-well`, the times under it in tabular figures. Nothing loops. */
+
+.ds-track{ display:flex; align-items:center; gap:var(--s-12); min-width:0; }
+.ds-track-art{
+  position:relative; display:grid; place-items:center; flex:none; width:48px; height:48px; overflow:hidden;
+  border-radius:var(--r-media); transition:opacity var(--t-quick) var(--e-out);
+}
+.ds-track-art[*|data-pending=step]{ transition:opacity var(--t-pending-step) var(--e-in-out); }
+.ds-track-art[*|data-beat=low],
+.ds-track-art[*|data-pending=still]{ opacity:.45; }
+.ds-track-words{ position:relative; display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
+.ds-track-layer{ display:flex; flex-direction:column; min-width:0; }
+.ds-track-art > .ds-track-layer{ display:grid; place-items:center; width:100%; height:100%; }
+.ds-track-layer[*|data-morph=out]{ position:absolute; left:0; top:0; right:0; }
+.ds-track-none{ display:grid; place-items:center; width:100%; height:100%; background:var(--surface); color:var(--ink-faint); }
+.ds-track-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:1.3; }
+.ds-track-by{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+.ds-track-position{ display:flex; flex-direction:column; gap:var(--s-4); min-width:0; }
+.ds-track-bar{ position:relative; display:block; height:4px; border-radius:var(--r-pill); background:var(--m-level-well); overflow:hidden; }
+.ds-track-bar-fill{ position:absolute; left:0; top:0; bottom:0; width:calc(var(--f) * 100%); border-radius:var(--r-pill); background:var(--ink-soft); }
+.ds-track-time{ white-space:nowrap; }
+.ds-track-times{ display:flex; justify-content:space-between; font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 /* -- sheet -- */
 /* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
    centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.

@@ -258,6 +258,9 @@ pub enum Icon {
     Smile,
     /// Lucide `globe`: the web.
     Globe,
+    // Details D2 (design/26 G23): quire's own glyph on Lucide's grid.
+    /// Lucide `moon`'s outline, filled: the Focus module when it is on (`geometry_own`).
+    MoonFilled,
 }
 
 impl Icon {
@@ -314,6 +317,7 @@ impl Icon {
             Icon::Ellipsis => geometry_actions::ELLIPSIS,
             Icon::EllipsisVertical => geometry_actions::ELLIPSIS_VERTICAL,
             Icon::Switches => geometry_own::SWITCHES,
+            Icon::MoonFilled => geometry_own::MOON_FILLED,
             Icon::ArrowRight => geometry_actions::ARROW_RIGHT,
             Icon::CapsLock => geometry_actions::CAPS_LOCK,
             Icon::Clipboard => geometry_actions::CLIPBOARD,

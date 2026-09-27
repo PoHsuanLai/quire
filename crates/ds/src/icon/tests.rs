@@ -41,7 +41,7 @@ fn element_names(html: &str) -> Vec<&str> {
 
 fn shape_tag(shape: &Shape) -> &'static str {
     match shape {
-        Shape::Path(_) => "path",
+        Shape::Path(_) | Shape::Solid(_) => "path",
         Shape::Circle { .. } => "circle",
         Shape::Rect { .. } => "rect",
     }
@@ -221,7 +221,11 @@ fn switches_is_two_tracks_with_knobs_at_opposite_ends() {
         "left on top, right below"
     );
     assert!(Icon::SHELL.contains(&Icon::Switches));
-    assert_eq!(Icon::SHELL.last(), Some(&Icon::Switches));
+    // The shell set ends with quire's own glyphs: Switches, then the filled moon (design/26 G23).
+    assert_eq!(
+        &Icon::SHELL[Icon::SHELL.len() - 2..],
+        &[Icon::Switches, Icon::MoonFilled][..]
+    );
 }
 
 /// The launcher's provider glyphs as Lucide 1.47.0 publishes them (sill Q296): `clipboard` is a
