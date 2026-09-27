@@ -31,7 +31,8 @@ pub mod type_voice;
 pub mod widget_paint;
 pub mod widgets;
 
-pub use accent_table::{AccentQuad, quad};
+pub use accent_band::AccentRoles;
+pub use accent_table::accent_of;
 pub use colour::ColourToken;
 pub use delay::DelayToken;
 pub use dock::{DockFloorSetting, DockMetrics};

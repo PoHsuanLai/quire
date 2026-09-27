@@ -37,7 +37,9 @@
 .ds-button[*|data-variant=danger]:active{ transform:scale(var(--squish)) translateY(1px); }
 
 /* Mini pressed: `S:523`, the RSVP row. */
-.ds-button[*|data-variant=mini][*|aria-pressed=true]{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+/* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
+   state also draws its edge in the text accent (3:1 or better on every ground). */
+.ds-button[*|data-variant=mini][*|aria-pressed=true]{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent-text); }
 
 /* Danger (derived from `C:958-963`): red only on hover. */
 .ds-button[*|data-variant=danger]:hover{ background:var(--danger-wash); color:var(--danger); }

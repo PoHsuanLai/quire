@@ -35,7 +35,7 @@
   background:var(--danger-wash); color:var(--ink); font-size:var(--fs-small); line-height:1.4; }
 .ds-hovercard-flag .ds-ic{ color:var(--danger); margin-top:var(--s-1); }
 .ds-hovercard-flag[*|data-tone=info]{ background:var(--accent-soft); }
-.ds-hovercard-flag[*|data-tone=info] .ds-ic{ color:var(--accent); }
+.ds-hovercard-flag[*|data-tone=info] .ds-ic{ color:var(--accent-text); }
 .ds-hovercard-actions{ margin-top:var(--s-10); display:flex; gap:var(--s-6); flex-wrap:wrap; }
 .ds-hovercard-live{ display:inline-block; width:6px; height:6px; border-radius:var(--r-pill); background:var(--ok); }
 
