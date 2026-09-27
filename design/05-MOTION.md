@@ -712,6 +712,11 @@ transitions (`--t-pending-step`), not a keyframe.
 - `morph-in` at `--t-quick --e-spring` (`Anim::MorphInSpring`, design/26 D2): `MorphGlyph`'s
   incoming glyph when the person's own press caused the change (play/pause, a Focus disc); every
   other morph grows in at `--e-out` (`Anim::MorphIn`, design/26 R5).
+- Edit Widgets' "Added" (sill Q523, design/23 section 9.7) is built from these, with no new
+  keyframe: the Add button's check draws on (`SettleStyle::Check`) and grows in with
+  `Anim::MorphInSpring` for the person's press (`Anim::MorphIn` otherwise); the placed row that
+  arrives plays `Anim::RowIn` (`row-in`, `--t-big --e-spring`) for the press, `Anim::Rise`
+  otherwise, taken off at its `settle`.
 
 ## 5. Assignments
 

@@ -147,6 +147,8 @@ fn the_gallery_draws_one_size_and_edits_the_layout() {
         0,
         "a placed row has no size control"
     );
+    // The new row rises in (sill Q523); press Remove once it has landed.
+    harness.advance(Duration::from_millis(600));
     let remove = harness
         .centre(".ds-widget-gallery-row .ds-button")
         .expect("Remove");

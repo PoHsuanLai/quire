@@ -755,7 +755,22 @@ desktop, two rows of cells and more, stays uncovered. It arrives as a sheet does
 `--t-move --e-out` (`Anim::PeekFullIn`'s recipe; no spring, opening is not contact), and after
 that follows the sheet's spring (`--present-p`: fades and settles 12 px down at 95 % as it goes;
 only a fade under Reduced). The gallery inside fills it when it sits in a flex column
-(`flex:1; min-height:0`). The gallery keeps no layout: each choice
+(`flex:1; min-height:0`).
+
+**"Added" (sill Q523, 2026-09-28).** The user: "show that the thing is added". The gallery keeps
+no layout, so it learns an Add landed by finding the new placement in the next layout the host
+hands back (a refused Add, a full desktop, lands nothing and shows nothing). Then:
+- the button that asked settles to a check (design/26's Success, `SettleStyle::Check`): its
+  label gives way to a check and `GalleryWords::added` ("Added"); the check is drawn on over
+  `--t-move --e-out` and held `SettleHold` (900 ms), then the button is itself again. The check
+  grows in with `morph-in`, on the spring (`Anim::MorphInSpring`) because the person's own press
+  caused it (design/05 principle 2; a placement from elsewhere grows at `--e-out`). Reduced: the
+  whole check for its hold, no draw, no growth. Each button is keyed to its widget, so a check
+  never follows the person to another widget;
+- the new row in the placed column rises in (`row-in`, `--t-big --e-spring`, for the person's
+  Add; `rise`, `--t-move --e-out`, otherwise) and is brought into view in the column, moving it
+  the least that shows the row (`geometry::reveal`, the palette's rule). Rows already placed when
+  the gallery opened sit still (design/05 principle 8). The gallery keeps no layout: each choice
 is a `WidgetEdit` (`Add { kind, size, host }`, `Remove(id)`, `Resize(id, size)`,
 `Move(id, at)`) to `onedit`; the host applies it with `apply(layout, edit, DesktopGrid)` and
 passes the new layout back. Words are the host's (`GalleryWords`, English by default).

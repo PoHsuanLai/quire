@@ -70,6 +70,18 @@ impl Contact {
         self.velocity
     }
 
+    /// The contact a quire button's press is, for a part of quire's own that hears a `Button`'s
+    /// `onclick` (which hands a [`crate::Press`], not the event): a press reaches it only from the
+    /// person's click or key on that button. Crate-private, so a caller outside quire still
+    /// proves contact with an event.
+    pub(crate) fn pressed(press: &crate::components::press::Press) -> Contact {
+        let _ = press;
+        Contact {
+            proof: (),
+            velocity: Velocity::ZERO,
+        }
+    }
+
     /// A contact for a unit test that has no event to hand.
     #[cfg(test)]
     pub(crate) fn for_tests() -> Contact {
