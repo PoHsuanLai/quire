@@ -8,8 +8,8 @@ use ds::detail::{
 };
 use ds::{Appearance, Ds, Fraction, Material, Motion};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 240,
@@ -79,14 +79,17 @@ fn watch(harness: &mut Harness, want: i64) -> Vec<(i64, i64)> {
 
 #[test]
 fn appear_sweeps_from_zero_and_the_count_lands_with_it() {
-    let mut harness = Harness::new(Ring, VIEW);
-    let started = Instant::now();
+    let mut harness =
+        Harness::with_config(Ring, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let started = harness.now();
     let mut samples = Vec::new();
-    while started.elapsed() < Duration::from_secs(3) && read(&harness, "#share") != 800 {
+    while harness.now().duration_since(started) < Duration::from_secs(3)
+        && read(&harness, "#share") != 800
+    {
         samples.push((read(&harness, "#share"), read(&harness, "#count")));
         harness.advance(Duration::from_millis(20));
     }
-    let landed = started.elapsed();
+    let landed = harness.now().duration_since(started);
     assert_eq!(read(&harness, "#share"), 800, "{samples:?}");
     assert_eq!(
         read(&harness, "#count"),

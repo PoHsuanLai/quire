@@ -13,11 +13,11 @@ use ds::{
     MenuKind, Point, PointerButton, Press, Px, Theme, Trail,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// Wide enough for a menu and its submenu side by side.
 const VIEW: Viewport = Viewport {
@@ -296,10 +296,11 @@ fn a_disabled_item_is_skipped_by_down_and_ignores_a_click() {
 
 #[test]
 fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
-    let mut harness = Harness::new(MenuApp, VIEW);
+    let mut harness =
+        Harness::with_config(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
     let parent = centre(&harness, PARENT);
-    let armed = Instant::now();
+    let armed = harness.now();
     harness.pointer_move(parent);
     assert_eq!(
         selected(&harness),

@@ -17,9 +17,9 @@ use ds::{
     DotIndex, Focus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput, Theme,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use ds_settings::{AppName, use_environment};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -179,10 +179,13 @@ fn ToastHubProbe() -> Element {
 
 #[test]
 fn the_toast_hub_hides_after_its_hold_and_not_before() {
-    let mut harness = Harness::new(ToastHubApp, VIEW);
+    let mut harness = Harness::with_config(
+        ToastHubApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let state = |harness: &Harness| harness.text_of(".probe-toast");
     assert_eq!(state(&harness).as_deref(), Some("hidden"));
-    let pushed = Instant::now();
+    let pushed = harness.now();
     harness.click(centre(&harness, ".ds-button"));
     assert_eq!(state(&harness).as_deref(), Some("shown"));
     // Half the 5200 ms hold, not 5000 ms (fixed 2026-09-25, FINDINGS "Timing tests"): the old
@@ -231,9 +234,12 @@ fn HoverHubProbe() -> Element {
 
 #[test]
 fn the_hover_hub_opens_after_450_ms_and_not_before() {
-    let mut harness = Harness::new(HoverHubApp, VIEW);
+    let mut harness = Harness::with_config(
+        HoverHubApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let state = |harness: &Harness| harness.text_of(".probe-hover");
-    let rested = Instant::now();
+    let rested = harness.now();
     harness.pointer_move(centre(&harness, ".probe-target"));
     assert_eq!(state(&harness).as_deref(), Some("closed"));
     // Under half the 450 ms open delay, not 400 ms (fixed 2026-09-25, FINDINGS "Timing tests"):
@@ -330,8 +336,11 @@ fn HoverCardDemo() -> Element {
 
 #[test]
 fn a_hover_card_appears_after_450_ms_and_not_before() {
-    let mut harness = Harness::new(HoverCardApp, VIEW);
-    let rested = Instant::now();
+    let mut harness = Harness::with_config(
+        HoverCardApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    let rested = harness.now();
     harness.pointer_move(centre(&harness, ".ds-hover-target"));
     // Under half the 450 ms open delay, not 400 ms (fixed 2026-09-25, FINDINGS "Timing tests"):
     // the old check left only 50 ms of margin (11 % of the window).
@@ -366,9 +375,12 @@ fn ToastDemo() -> Element {
 
 #[test]
 fn a_toast_hides_after_5200_ms() {
-    let mut harness = Harness::new(ToastApp, VIEW);
+    let mut harness = Harness::with_config(
+        ToastApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let shown = |harness: &Harness| harness.attr(".ds-toast", "data-shown");
-    let pushed = Instant::now();
+    let pushed = harness.now();
     harness.click(centre(&harness, ".ds-button"));
     // It mounts below the edge for a frame, so the spring rises from there (gallery fix A).
     assert_eq!(shown(&harness).as_deref(), Some("hidden"));

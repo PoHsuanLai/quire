@@ -11,7 +11,7 @@ use ds::detail::{
 };
 use ds::{Appearance, Ds, Material, Motion};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -99,15 +99,16 @@ fn set(harness: &mut Harness, net: Net) {
 
 fn start(harness: &mut Harness, deadline: Deadline) -> Instant {
     harness.within(|| *OP.write() = Operation::Running(PendingToken::start(deadline)));
-    Instant::now()
+    harness.now()
 }
 
 #[test]
 fn a_pending_loop_waits_steps_holds_and_goes_quiet() {
-    let mut harness = Harness::new(Item, VIEW);
+    let mut harness =
+        Harness::with_config(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let asked = start(&mut harness, Deadline::within(Duration::from_millis(1600)));
     harness.advance(Duration::from_millis(100));
-    if asked.elapsed() <= Duration::from_millis(200) {
+    if harness.now().duration_since(asked) <= Duration::from_millis(200) {
         assert_eq!(frame(&harness), "Idle", "nothing shows inside the grace");
     }
     let shown = settle_until(&mut harness, |h| frame(h).starts_with("Step"));
@@ -132,11 +133,12 @@ fn a_pending_loop_waits_steps_holds_and_goes_quiet() {
 
 #[test]
 fn a_fast_operation_shows_no_loop_at_all() {
-    let mut harness = Harness::new(Item, VIEW);
+    let mut harness =
+        Harness::with_config(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let asked = start(&mut harness, Deadline::cap());
     harness.advance(Duration::from_millis(100));
     harness.within(|| *OP.write() = Operation::Idle);
-    if asked.elapsed() < Duration::from_millis(400) {
+    if harness.now().duration_since(asked) < Duration::from_millis(400) {
         harness.advance(Duration::from_millis(600));
         assert_eq!(frame(&harness), "Idle");
     }

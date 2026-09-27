@@ -11,15 +11,15 @@ use ds::{
 };
 use ds::{MotionLevel, StaggerIndex, settle};
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
-// `Harness::advance` lets real (wall-clock) time pass: quire's settle timers are `futures-timer`
-// sleeps, which a harness cannot fake (its module documentation). Under a loaded parallel
+// `Harness::advance` on `Clock::Wall` lets real time pass: quire's settle timers are
+// `futures-timer` sleeps, which such a harness cannot fake. Under a loaded parallel
 // `cargo test --workspace` an `advance(ms(170))` can stretch past a settle it meant to stop short
-// of, so these tests never assert a state at one fixed instant around a settle: they poll with
-// `ds_native::harness::settle_until` up to a bound, time the settle on the wall clock, and
-// assert the order.
+// of, so a test racing an instant against a bound (sill Q380) runs on `Clock::Virtual` instead,
+// whose `advance` fires every ds timer at its exact due instant; a test that only polls with
+// `ds_native::harness::settle_until` up to a bound and asserts order stays on the default `Wall`.
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -137,9 +137,12 @@ fn a_switch_plays_both_panes_and_settles_on_the_new_one() {
 
 #[test]
 fn a_switch_during_a_slide_reverses_cleanly() {
-    let mut harness = Harness::new(PanesApp, VIEW);
+    let mut harness = Harness::with_config(
+        PanesApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
-    let first = Instant::now();
+    let first = harness.now();
     ask(&mut harness, "to-detail");
     harness.advance(ms(60));
     // The precondition: the first round is still moving when the reversal is asked for. It has
@@ -151,7 +154,7 @@ fn a_switch_during_a_slide_reverses_cleanly() {
     );
     assert_eq!(presence(&harness, "detail").as_deref(), Some("entering"));
 
-    let reversal = Instant::now();
+    let reversal = harness.now();
     ask(&mut harness, "to-root");
     harness.advance(ms(1));
     assert!(

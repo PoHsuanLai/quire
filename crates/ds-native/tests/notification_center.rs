@@ -8,8 +8,8 @@ use ds::{
     Anim, Appearance, Ds, Material, MotionLevel, Panel, Px, RootExtent, Shown, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Harness, Viewport};
-use std::time::{Duration, Instant};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use std::time::Duration;
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
 static HIDDEN: GlobalSignal<u32> = Signal::global(|| 0);
@@ -63,14 +63,15 @@ fn shown_it_comes_to_rest_at_the_right_edge() {
 
 #[test]
 fn hidden_it_slides_out_and_on_hidden_runs_at_settle_and_not_before() {
-    let mut harness = Harness::new(Center, VIEW);
+    let mut harness =
+        Harness::with_config(Center, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     let out = settle(
         Anim::PanelOut,
         MotionLevel::Standard,
         StaggerIndex::default(),
     );
-    let hiding = Instant::now();
+    let hiding = harness.now();
     show(&mut harness, Shown::Hidden);
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));
     harness.advance(out / 2);

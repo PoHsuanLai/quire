@@ -152,6 +152,8 @@ fn scroll(label: &str, mut harness: Harness) {
     // the pixels.
     let before = harness.render().expect("paints");
     for _ in 0..FRAMES {
+        // Kept on Wall: a real wall-clock timing, this is the benchmark's own measurement of
+        // how long the wheel event's style/layout actually took, not a correctness bound.
         let started = Instant::now();
         harness.wheel(at, Px(0.0), Px(-STEP));
         layouts.push(started.elapsed());
