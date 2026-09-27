@@ -52,5 +52,5 @@ pub use use_level_run::use_level_run;
 pub use use_roster::{Roster, use_roster};
 pub use use_spring::{PxPerUnit, SpringFrame, SpringMotion, use_spring, use_spring_motion};
 pub use use_swipe::{Held, Swiper, use_swipe};
-pub use velocity::Velocity;
+pub use velocity::{Velocity, VelocityMeter};
 pub use wake::WakeStamp;

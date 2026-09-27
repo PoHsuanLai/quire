@@ -6,13 +6,20 @@
 //! unmounts it there never cuts the flight short. Inside a `BannerStack` the stack's row carries
 //! the flight: the card holds its offset, reports at once, and the caller's removal of it makes
 //! the row slide out from that offset (the two transforms compose), then the rows below heal.
+//!
+//! Driven motion (design/05 section 14, wave H1): a card let go under both thresholds springs
+//! back from where it is, carrying the hand's release velocity, instead of easing on a CSS
+//! transition; a new drag mid-return picks it up where it is.
 
 use crate::components::press::{PointerButton, button_of};
+use crate::detail::{Contact, Touch};
 use crate::geometry::Px;
 use crate::motion::anim::Anim;
-use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics};
+use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
 use crate::motion::timer::use_motion_timer;
 use crate::motion::use_swipe::{Held, Swiper, use_swipe};
+use crate::motion::{PxPerUnit, SpringMotion, SpringSpec, VelocityMeter, use_spring_motion};
+use dioxus::core::queue_effect;
 use dioxus::html::geometry::WheelDelta;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
@@ -56,11 +63,51 @@ impl Flight {
 /// Pixels per line of a line-based wheel delta: what Blitz scrolls a line by.
 const LINE_PX: f64 = 20.0;
 
-/// The card's swipe for one render: the machine and whether it is on.
+/// The card's swipe for one render: the machine and whether it is on, and the spring that
+/// carries it back to its place.
 #[derive(Clone, Copy)]
 pub(crate) struct CardSwipe {
     swiper: Swiper,
     on: SwipeOn,
+    back: ReturnSpring,
+}
+
+/// The spring a card returns on, the pointer's speed as it goes, and the last look the render
+/// followed.
+#[derive(Clone, Copy)]
+struct ReturnSpring {
+    spring: SpringMotion,
+    meter: Signal<VelocityMeter>,
+    released: CopyValue<Touch>,
+    followed: CopyValue<SwipeLook>,
+}
+
+impl ReturnSpring {
+    /// The offset to draw for `state`, moving the spring to follow it: 1:1 while a hand or a
+    /// scroll holds the card, springing home once it lets go under both thresholds.
+    fn drawn(self, state: SwipeState) -> Px {
+        let (spring, mut followed) = (self.spring, self.followed);
+        let look = state.look();
+        let before = *followed.peek();
+        followed.set(look);
+        match look {
+            SwipeLook::Live => {
+                let at = state.offset().0;
+                queue_effect(move || spring.track(at));
+                state.offset()
+            }
+            SwipeLook::Gone => state.offset(),
+            SwipeLook::Rest => {
+                if before != SwipeLook::Rest {
+                    let mut released = self.released;
+                    let touch = *released.peek();
+                    released.set(Touch::Remote);
+                    queue_effect(move || spring.go(0.0, SpringSpec::for_touch(touch)));
+                }
+                Px(spring.frame().position())
+            }
+        }
+    }
 }
 
 /// Whether the card listens for a swipe at all.
@@ -92,6 +139,12 @@ pub(crate) fn use_card_swipe(swipe: &Swipe, metrics: SwipeMetrics) -> CardSwipe 
     CardSwipe {
         swiper: use_swipe(metrics, on_dismiss),
         on: heard.map_or(SwipeOn::No, |_| SwipeOn::Yes),
+        back: ReturnSpring {
+            spring: use_spring_motion(0.0, PxPerUnit(1.0)),
+            meter: use_signal(VelocityMeter::default),
+            released: use_hook(|| CopyValue::new(Touch::Remote)),
+            followed: use_hook(|| CopyValue::new(SwipeLook::Rest)),
+        },
     }
 }
 
@@ -101,11 +154,14 @@ impl CardSwipe {
         self.live().map(|swiper| swiper.state().look().slug())
     }
 
-    /// The card's inline offset, `--swipe-dx`, while it is off its place.
+    /// The card's inline offset, `--swipe-dx`, while it is off its place (on its way back
+    /// too). Call once per render: it moves the return spring.
     pub(crate) fn style(&self) -> Option<String> {
         let state = self.live()?.state();
-        let off = state.offset().0 != 0.0 || state.look() == SwipeLook::Gone;
-        off.then(|| format!("--swipe-dx:{}px", state.offset().0))
+        let drawn = self.back.drawn(state);
+        let off = drawn.0 != 0.0 || state.look() == SwipeLook::Gone;
+        let rounded = (drawn.0 * 100.0).round() / 100.0;
+        off.then(|| format!("--swipe-dx:{rounded}px"))
     }
 
     /// Whether a click on the card is a press (not the end of a drag).
@@ -119,6 +175,8 @@ impl CardSwipe {
         let primary = button_of(event.trigger_button()) == Some(PointerButton::Primary);
         if let (Some(swiper), true) = (self.live(), primary) {
             let x = Px(event.client_coordinates().x as f32);
+            let mut meter = self.back.meter;
+            meter.set(VelocityMeter::default().moved(x, crate::time::now()));
             swiper.feed(SwipeInput::Down {
                 x,
                 at: swiper.now(),
@@ -134,13 +192,30 @@ impl CardSwipe {
             } else {
                 Held::Nothing
             };
-            swiper.pointer_moved(Px(event.client_coordinates().x as f32), held);
+            let x = Px(event.client_coordinates().x as f32);
+            let mut meter = self.back.meter;
+            let measured = meter.peek().moved(x, crate::time::now());
+            meter.set(measured);
+            swiper.pointer_moved(x, held);
         }
     }
 
-    /// The pointer was released over the card, or left it.
+    /// The pointer left the card: a release it could not hear, so no contact goes with it.
     pub(crate) fn up(&self) {
         if let Some(swiper) = self.live() {
+            swiper.feed(SwipeInput::Up { at: swiper.now() });
+        }
+    }
+
+    /// The pointer was released over the card: the release is the hand's contact, carrying the
+    /// pointer's velocity into the return (design/27 section 3.12).
+    pub(crate) fn released(&self, event: &PointerEvent) {
+        if let Some(swiper) = self.live() {
+            let velocity = self.back.meter.peek().released(crate::time::now());
+            let mut released = self.back.released;
+            released.set(Touch::Contact(
+                Contact::from_event(event).with_velocity(velocity),
+            ));
             swiper.feed(SwipeInput::Up { at: swiper.now() });
         }
     }

@@ -1,14 +1,66 @@
 //! Slider: a continuous value, divs and a drag tracker, because Blitz has no native range
 //! (design/04-COMPONENTS.md section 5).
+//!
+//! Driven motion (design/05 section 14, wave H1): the thumb is drawn from a spring. A drag moves
+//! it 1:1; a release with speed throws the value to where the throw projects (`Throw`, about half
+//! a second of its speed on), and the thumb springs there carrying the hand's velocity; a key or a
+//! value from elsewhere springs it critically from where it is.
 
 use crate::components::track::fraction_at;
 use crate::components::vocab::{Availability, Fraction};
+use crate::detail::{Contact, Touch};
 use crate::geometry::measure::client_rect;
 use crate::geometry::units::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
+use crate::motion::{
+    PxPerUnit, SpringMotion, SpringResponse, SpringSpec, Throw, Velocity, VelocityMeter,
+    use_spring_motion,
+};
+use dioxus::core::queue_effect;
 use dioxus::html::geometry::ClientPoint;
 use dioxus::prelude::*;
 use std::rc::Rc;
+
+/// A release slower than this, in pixels per second, sets the value where the thumb was let go;
+/// faster, it throws (the swipe's fling speed, `notifications.swipe_dismiss_velocity_px_s`).
+const THROW_PX_PER_S: i32 = 600;
+
+/// The track's width before it has been measured: the thumb's units are thousandths of it.
+const UNMEASURED_WIDTH: f32 = 200.0;
+
+/// Where a release at `value` moving at `velocity` over a track `width` wide lands: the
+/// projection, held to the ends, or `None` when it was too slow to throw.
+fn thrown_to(value: Fraction, velocity: Velocity, width: f32) -> Option<Fraction> {
+    if velocity.0.abs() < THROW_PX_PER_S || width <= 0.0 {
+        return None;
+    }
+    let from = Px(f32::from(value.clamped().0) * width / 1000.0);
+    let landed = Throw { from, velocity }.projected().0 / width * 1000.0;
+    Some(Fraction(landed.clamp(0.0, 1000.0).round() as u16))
+}
+
+/// The thumb's spring for this render: it follows `value`, 1:1 while a drag holds it.
+fn follow(
+    knob: SpringMotion,
+    mut seen: CopyValue<Fraction>,
+    value: Fraction,
+    phase: DragPhase<()>,
+) {
+    if *seen.peek() == value {
+        return;
+    }
+    seen.set(value);
+    let at = f32::from(value.0);
+    match phase {
+        DragPhase::Idle => queue_effect(move || {
+            knob.go(
+                at,
+                SpringSpec::for_touch(Touch::Remote).response(SpringResponse::Quick),
+            )
+        }),
+        DragPhase::Pending { .. } | DragPhase::Live { .. } => queue_effect(move || knob.track(at)),
+    }
+}
 
 /// The keyboard step when the consumer leaves `step` at its default of zero: the editor
 /// handle's `.05` (`S:1455-1456`), the step design/04-COMPONENTS.md cites for keys.
@@ -81,9 +133,17 @@ pub fn Slider(
     let drag = use_drag::<()>(NO_THRESHOLD);
     let mut element = use_signal(|| None::<Rc<MountedData>>);
     let mut track = use_signal(|| None::<Rect>);
+    let mut meter = use_signal(VelocityMeter::default);
     let value = value.clamped();
     let step = keyboard_step(step);
-    let fill = value.css();
+    let width = track
+        .peek()
+        .map_or(UNMEASURED_WIDTH, |rect| rect.size.width.0);
+    let knob = use_spring_motion(f32::from(value.0), PxPerUnit(width / 1000.0));
+    let mut seen = use_hook(|| CopyValue::new(value));
+    follow(knob, seen, value, drag.phase());
+    let shown = knob.frame().position().clamp(0.0, 1000.0);
+    let fill = Fraction(shown.round() as u16).css();
     let now = percent(value);
     let thumb = match drag.phase() {
         DragPhase::Idle => "idle",
@@ -109,6 +169,7 @@ pub fn Slider(
                 }
                 let at = point(event.client_coordinates());
                 drag.down((), at);
+                meter.set(VelocityMeter::default().moved(at.x, crate::time::now()));
                 if let Some(mounted) = element() {
                     spawn(async move {
                         // Focus is best-effort: a renderer without it still slides.
@@ -126,12 +187,25 @@ pub fn Slider(
                 }
                 let at = point(event.client_coordinates());
                 drag.moved(at);
+                let measured_now = meter.peek().moved(at.x, crate::time::now());
+                meter.set(measured_now);
                 if let Some(measured) = track() {
                     onchange.call(fraction_at(measured, at.x));
                 }
             },
-            onpointerup: move |_| {
+            onpointerup: move |event| {
                 drag.up();
+                let velocity = meter.peek().released(crate::time::now());
+                meter.set(VelocityMeter::default());
+                let width = track.peek().map_or(0.0, |rect| rect.size.width.0);
+                if let (true, Some(to)) = (enabled, thrown_to(value, velocity, width)) {
+                    let contact = Contact::from_event(&event).with_velocity(velocity);
+                    let spec = SpringSpec::for_touch(Touch::Contact(contact))
+                        .response(SpringResponse::Quick);
+                    knob.go(f32::from(to.0), spec);
+                    seen.set(to);
+                    onchange.call(to);
+                }
             },
             onkeydown: move |event| {
                 if let (true, Some(nudge)) = (enabled, nudge(&event.key())) {
@@ -216,6 +290,22 @@ mod tests {
         assert_eq!(nudge(&Key::ArrowRight), Some(Nudge::Up));
         assert_eq!(nudge(&Key::ArrowUp), Some(Nudge::Up));
         assert_eq!(nudge(&Key::Enter), None);
+    }
+
+    #[test]
+    fn a_fast_release_throws_the_value_and_a_slow_one_leaves_it() {
+        const CASES: &[(u16, i32, f32, Option<u16>)] = &[
+            (300, 0, 200.0, None),
+            (300, 400, 200.0, None),
+            (300, 800, 400.0, Some(1000)),
+            (300, 700, 1000.0, Some(649)),
+            (500, -1500, 200.0, Some(0)),
+            (500, 900, 0.0, None),
+        ];
+        for &(value, v, width, want) in CASES {
+            let got = thrown_to(Fraction(value), Velocity(v), width).map(|f| f.0);
+            assert_eq!(got, want, "{value} at {v} px/s over {width}");
+        }
     }
 
     #[test]
