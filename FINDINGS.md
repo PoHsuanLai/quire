@@ -4673,6 +4673,12 @@ drawing in design/04 section 51.
   moment runs on a real Blitz document and ends in `assert_settles_to_zero_frames`
   (`ds-native/tests/status_*.rs`), including a join held past `PendingCap` (a ten-second test:
   the loop holds its dimmed still frame and stops asking for frames) and Reduced for each glyph.
+- **A row's battery appears once, and never on a remount.** `RowTrailing::Battery` sweeps in
+  when it arrives on a row that is already showing (the device connected while the person
+  watched) or when the row mounts with `first: FirstShow::Animate` (the pane was just opened);
+  a pane re-mounted in place passes `Still` (R1). This also keeps the gallery's picture
+  deterministic: a snapshot runs no Rust timers to the end, and an Appear caught mid-count read
+  78 % in one scheme and 84 % in the other.
 - **Not here (sill's lane).** The bar wiring, the network service's join stamp, the Bluetooth bar
   item, `bar.battery_low_percent` and its design/22 row, and the critical-battery nudge (G11).
 
@@ -4823,3 +4829,63 @@ sill Q360b, the follow-up to Q360. Branch `q360b`.
 - **Proofs.** `ds-native/tests/status_slots.rs` and `virtual_clock_asks.rs`, all on
   `Clock::Virtual`, each motion ending in `assert_settles_to_zero_frames`; each of the four
   G310-G312 tests fails with its fix reverted. Gallery: Details, "Status glyphs", cell "In the bar".
+
+## Details D2 (2026-09-27)
+
+design/26 wave D2, the quire lane: the control center modules' details (G14, G16-G18, G20, G21,
+G23, G25-G30). CONSUMING.md "Control center details" has the API and sill's lane; design/04
+section 52 the components.
+
+- **The disc reads "coming on" as its success.** `ModuleState`'s own table calls Off to On a
+  Change (the tile's plate only cross-fades). The disc needs the press that turned it on to be a
+  Success, so it has its own `Detailed` state (`Lighting`, private): Off or Busy to On is Success,
+  the rest as `ModuleState`'s. The tile's table is unchanged; the disc plays `Settle{Fill}` or the
+  morph on its own reading.
+- **A press is kept for the change it causes.** A control's press and the state it asks for
+  arrive in different renders (the handler, then the service's answer), so `Touch::from_event`
+  in the handler cannot be handed to `use_detail` directly. `detail::Armed` (crate-private) keeps
+  the `Contact` until the next change spends it; a Pending change passes it on to the operation's
+  end, so the success of a join the person clicked springs however long the join ran (tested past
+  `PendingCap`); a press that changes nothing goes stale after `PendingCap`; a change from
+  elsewhere after that is `Remote`. Used by `ModuleTile`, `SettingsRow` and `PlayPauseButton`.
+- **A row's success style follows its trailing mark.** A row that ends in `Check(On)` draws the
+  check on (`Settle{Check}`, then the plain check stays); any other row seals its glyph
+  (`Settle{LockIn}`). One `use_settle` per row, no extra prop, and a network row cannot seal and
+  draw a check at once. So sill drops the in-use check from network and device rows (the accent
+  disc says it, as the reference's does) and keeps it on the output list.
+- **Rest markup is unchanged.** `data-motion` on the disc and `data-pending` on a row's glyph are
+  written only while they say something, so every existing control center golden (28 tiles,
+  rows and panes) is byte for byte the same, and so is sill's markup until it opts in.
+- **A filled glyph is `Shape::Solid`.** The icon style is stroke-only; the Focus moon's "on"
+  variant (the reference's `.fill` symbol) needs a fill. `Shape::Solid(d)` fills the path and
+  still strokes it, so `Icon::MoonFilled` (Lucide `moon`'s own outline) has exactly the outline
+  moon's silhouette and the DownUp morph reads as the fill arriving. Four `match`es over `Shape`
+  in quire gained the arm.
+- **`MorphInSpring`.** `MorphGlyph` played `morph-in` at `--e-out` whoever caused the change. The
+  spring for a pressed glyph (R5) is a new `Anim` row, `morph-in` at `--t-quick --e-spring`, with
+  the same settle, chosen by `MorphGlyph { touch }`; Calm and Reduced flatten it through the token.
+- **The position bar ticks itself.** A player reports its position on a seek or a poll, not every
+  second, so `TrackPosition` advances from the last report while `Playing`: one wake on each whole
+  second of the track (the first after the report lands on the next whole second, not a second
+  later), never a tween, and none paused. Tested as at most one wake a second on the virtual
+  clock.
+- **`DeviceBattery` beside `BatteryLevel`, not instead of it.** `BatteryLevel` and
+  `BatteryFigure` (the Batteries widget) run on `use_level_run` over `--t-fill` with a `WakeStamp`
+  contract sill's widgets use; rebuilding them on `Sweep` would change that contract under the
+  widgets. `DeviceBattery` draws the same ring (the drawing helpers are shared) on `Sweep` +
+  `CountUp::InStep` for the control center, where design/26 5.2.9 asks for them. Moving the
+  widget onto the primitives is left for the widgets' own pass.
+- **`assert_settles_to_zero_frames` passes during a `SettleHold`.** The helper waits for 500 ms
+  with no wake; the check's hold is one 900 ms sleep, so the document reads as settled while the
+  drawn check still shows and a timer is pending. The rows test advances past the hold before
+  asserting the plain check and settling again. Worth closing in the helper (a pending ds timer
+  due within the window, or any at all, is not rest); not done here, the virtual-tests branch owns
+  the harness.
+- **Tests.** Tables as data (`ds/tests/center_tables.rs`, and unit tables beside `Lighting`,
+  `Percent`, `Reading`, `Playback`); every moment on a real Blitz document on `Clock::Virtual`
+  (`ds-native/tests/details_center_{tile,rows,player,battery}.rs`, 20 tests), each ending in
+  `assert_settles_to_zero_frames`, with exact boundaries (the spinner not at 399 ms, there at 400;
+  the first position step at 600 ms, not 599) and a Reduced case per file.
+- **Not here (sill's lane).** The stamps from the network, Bluetooth and sink services, the
+  device batteries, the keyboard backlight service and its module, and moving Now Playing and the
+  Battery module onto the new parts.
