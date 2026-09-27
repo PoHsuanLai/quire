@@ -8,16 +8,17 @@
 //! would have carried the layer stack, the centring stage and the modal scrim into a surface
 //! that wants none of them by default.
 //!
-//! Shown, it slides in from past the right edge (`Anim::PanelIn`, `--t-move --e-out`); hidden,
-//! it slides back out (`Anim::PanelOut`, `--t-move --e-exit`) and `on_hidden` runs at
-//! `settle(PanelOut)`, when the host unmaps the surface; shown again while it leaves, it stays.
+//! Mounted shown, it slides in from past the right edge (`Anim::PanelIn`, `--t-move --e-out`).
+//! Every change after that is driven motion (design/05 section 14, wave H1): hidden, a spring in
+//! Rust slides it back out past the edge and `on_hidden` runs once the spring rests, when the
+//! host unmaps the surface; shown again while it leaves, it turns back from where it is.
 //! It paints its material from inside a transparent scope of that material, so the root it sits
 //! in may be any; the scope fills the root, since Blitz places an absolutely positioned box
 //! against its parent. It needs a root with a height (`Ds { extent: RootExtent::Viewport }`).
 
 use crate::components::scrim::{ScrimLook, scrim_button_as};
 use crate::components::scrim_strength::ScrimStrength;
-use crate::components::shown_phase::use_shown_phase;
+use crate::components::spring_presence::use_spring_presence;
 use crate::components::tooltip::Shown;
 use crate::geometry::Px;
 use crate::material::Material;
@@ -68,20 +69,25 @@ pub fn Panel(
     #[props(default)] scrim: PanelScrim,
     children: Element,
 ) -> Element {
-    let (phase, alias) = use_shown_phase(shown, on_hidden, Anim::PanelIn, Anim::PanelOut);
+    let showing = use_spring_presence(Some(shown), Some(on_hidden), Anim::PanelIn);
     let close = onclose.unwrap_or_default();
     let dim = match scrim {
         PanelScrim::Dim(strength) => Some(ScrimLook {
-            presence: (phase.presence() == Some("leaving")).then_some("leaving"),
+            presence: showing.leaving().then_some("leaving"),
             strength,
         }),
         PanelScrim::None => None,
+    };
+    let drawn = if showing.drawn() {
+        Shown::Visible
+    } else {
+        Shown::Hidden
     };
     rsx! {
         ClassedScope { material, class: "ds-panel-scope",
             div {
                 class: "ds-panel-stage",
-                "data-shown": phase.shown().slug(),
+                "data-shown": drawn.slug(),
                 "data-edge": edge.slug(),
                 if let Some(look) = dim {
                     {scrim_button_as(&format!("Close {label}"), look, || true, close)}
@@ -90,10 +96,10 @@ pub fn Panel(
                     class: "ds-panel",
                     role: "complementary",
                     "aria-label": "{label}",
-                    "data-presence": phase.presence(),
-                    "data-pulse": alias.slug(),
+                    "data-presence": showing.drawn().then(|| showing.slug()),
+                    "data-drive": showing.drive(),
                     "data-overscroll": "band",
-                    style: "width:{width.0}px",
+                    style: "width:{width.0}px;{showing.style()}",
                     onkeydown: move |event| {
                         if event.key() == Key::Escape {
                             event.stop_propagation();

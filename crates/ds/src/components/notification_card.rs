@@ -96,7 +96,7 @@ pub fn NotificationCard(
                 },
                 onpointerdown: move |event| swiper.down(&event),
                 onpointermove: move |event| swiper.moved(&event),
-                onpointerup: move |_| swiper.up(),
+                onpointerup: move |event| swiper.released(&event),
                 onwheel: move |event| swiper.wheel(&event),
                 for n in (1..=layers).rev() {
                     div { key: "{n}", class: "ds-notification-layer", "aria-hidden": "true", style: "--i:{n}" }

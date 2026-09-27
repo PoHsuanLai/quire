@@ -134,8 +134,9 @@ fn a_panel_present_before_its_slide_has_played_still_comes_to_rest() {
     );
 }
 
-/// Shown again halfway through its slide out: present at once, at rest, with nothing left of
-/// `panel-out`.
+/// Shown again halfway through its slide out: since H1 (design/05 section 14) the slide out is
+/// a spring, so the panel turns back from where it is (entering), comes to rest in place, and
+/// nothing is left of the exit.
 #[test]
 fn a_hide_taken_back_midway_leaves_the_panel_at_rest() {
     let mut h = Harness::new(Center, PANEL_VIEW);
@@ -147,11 +148,11 @@ fn a_hide_taken_back_midway_leaves_the_panel_at_rest() {
     h.advance(ms(1));
     assert_eq!(
         presence(&h).as_deref(),
-        Some("present"),
-        "taken back at once"
+        Some("entering"),
+        "taken back at once: it turns round from where it is"
     );
-    assert_eq!(h.attr(".ds-panel", "data-pulse").as_deref(), Some("held"));
-    h.advance(ms(600));
+    assert_eq!(h.attr(".ds-panel", "data-drive").as_deref(), Some("spring"));
+    settle_until(&mut h, |h| presence(h).as_deref() == Some("present"));
     assert!(!h.is_animating());
     let point = inside_resting_panel(&h);
     assert!(

@@ -3,6 +3,7 @@
 
 use crate::geometry::measure::client_rect;
 use crate::geometry::{Point, Rect};
+use crate::motion::DragReturn;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -28,6 +29,21 @@ pub fn DragGhost(title: String, sub: String, at: Point) -> Element {
         div { class: "ds-drag-ghost", style: ghost_style(at),
             "{title}"
             div { class: "ds-drag-ghost-sub ds-truncate", "{sub}" }
+        }
+    }
+}
+
+/// A dragged thing drawn off its place by `drag` (design/05 section 14, wave H1): 1:1 while a
+/// hand holds it, springing home when it is let go where nothing took it (the dock's tile
+/// return). Put it inside the thing's own box, around what moves.
+#[component]
+pub fn DragReturnFrame(drag: DragReturn, children: Element) -> Element {
+    let offset = drag.offset();
+    rsx! {
+        div {
+            class: "ds-drag-return",
+            style: "--drag-dx:{offset.x.0:.2}px;--drag-dy:{offset.y.0:.2}px",
+            {children}
         }
     }
 }

@@ -55,10 +55,10 @@
 .ds-notification .ds-notification-close:hover{ color:var(--ink); }
 
 /* Swipe to dismiss (sill Q122, `data-swipe` on a card that can be swiped). The card is drawn
-   `--swipe-dx` off its place: following a drag or a scroll with no transition (`live`), easing
-   back with a spring at rest (`rest`, --t-move --e-spring; no spring under Reduced, where it
-   snaps back), and flying out to the right from where it was (`gone`, `banner-out`). */
-.ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); transition:transform var(--t-move) var(--e-spring); touch-action:none; }
-.ds-notification[*|data-swipe=live]{ transition:none; }
+   `--swipe-dx` off its place: following a drag or a scroll 1:1 (`live`), springing back home
+   (`rest`), and flying out to the right from where it was (`gone`, `banner-out`). The way back
+   is driven motion (design/05 section 14, H1): a spring in Rust writes `--swipe-dx` frame by
+   frame from the release's position and velocity (critically damped under Reduced), so nothing
+   here transitions the transform. */
+.ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
 .ds-notification[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-.ds[*|data-motion=reduced] .ds-notification[*|data-swipe]{ transition:none; }

@@ -38,6 +38,25 @@ pub fn motion_css() -> String {
         &format!("{reduced},{reduced} *"),
         &[property("animation-iteration-count", "1")],
     ));
+    // Under Reduced a pulse that moves plays its still form instead (design/05 section 14.4).
+    for anim in Anim::ALL {
+        let recipe = anim.recipe();
+        let still = anim.reduced().keyframes(recipe.keyframes);
+        if still == recipe.keyframes {
+            continue;
+        }
+        for (phase, name) in [("a", String::new()), ("b", ALIAS.to_owned())] {
+            let selector = format!(
+                "{reduced} .{}{}",
+                anim.class(),
+                attr_selector("data-pulse", phase)
+            );
+            css.push_str(&rule(
+                &selector,
+                &[property("animation-name", &format!("{still}{name}"))],
+            ));
+        }
+    }
     css
 }
 

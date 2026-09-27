@@ -635,6 +635,138 @@ html,body{margin:0;padding:0;background:transparent}
 .a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-spring) backwards;}
 .a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-spring) backwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
+.ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-gulp[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-gulp[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-pop-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-pop-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-row-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-row-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-rise[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-rise[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-star-pop[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-star-pop[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-spark[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-spark[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-chip-land[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-chip-land[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-chip-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-chip-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-fold[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-fold[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-fold-heavy[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-fold-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-crumple[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-crumple[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-crumple-heavy[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-crumple-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-curl[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-curl[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-curl-heavy[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-curl-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-heal[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-heal[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-bump[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-bump[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-tab-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-tab-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-tab-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-tab-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-slide-r[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-slide-r[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-slide-l[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-slide-l[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-menu-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-menu-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-menu-pop[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-menu-pop[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-bubble-pop[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-bubble-pop[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-cmdk-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-cmdk-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-cmdk-rise[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-cmdk-rise[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-peek-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-peek-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-hc-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-hc-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-link-pill-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-link-pill-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-hc-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-hc-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-page-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-page-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-park[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-park[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-nudge[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-nudge[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-shake[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-shake[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-compose-rise[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-compose-rise[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-compose-send[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-compose-send[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-floatup[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-floatup[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-sail[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-sail[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-boat-return[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-boat-return[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-breathe[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-breathe[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-spin[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-spin[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-pill-up[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-pill-up[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-pane-in-r[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-pane-in-r[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-pane-in-l[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-pane-in-l[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-pane-out-l[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-pane-out-l[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-pane-out-r[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-pane-out-r[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-osd-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-osd-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-osd-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-osd-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-sheet-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-sheet-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-banner-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-banner-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-banner-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-banner-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-panel-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-panel-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-panel-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-panel-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-shot-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-shot-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-shot-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-shot-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-picture-accept[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-picture-accept[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-morph-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-morph-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-roll-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-roll-in[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-roll-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-roll-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-seal-out[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-seal-out[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-nudge-up[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-nudge-up[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=b]{animation-name:fade--b;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
    design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which
@@ -727,8 +859,9 @@ html,body{margin:0;padding:0;background:transparent}
    frame alpha, the material's hairline and drop, `--m-radius` 18), padding 16, cells `--switcher-cell` (112) with icons
    `--switcher-icon` (96) and `--switcher-gap` (8) between them, all written inline from
    `SwitcherMetrics` and the output's width. The selection is one rounded square of `--f-pill`
-   (`--r-tile`, 12) behind the row that moves to the selected cell by `--switcher-at` with a
-   `--t-quick --e-spring` transition. The selected app's name is its Fly, drawn under the tile in
+   (`--r-tile`, 12) behind the row that moves to the selected cell by `--switcher-at`, a
+   fractional cell index a spring in Rust writes (design/05 section 14, H1); nothing here
+   transitions it. The selected app's name is its Fly, drawn under the tile in
    the UI face at 13/600 (not the Fly's usual dark label above). A row wider than its view is
    scrolled by `--switcher-shift`, at once (a transition there played on the panel's first
    frame on Blitz, sliding the row in as it appeared). It appears with `fade` at `--t-quick`, no pop; a quitting
@@ -744,7 +877,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-switcher-view{ width:var(--switcher-view); overflow:hidden; padding-bottom:var(--s-26); }
 .ds-switcher-row{ position:relative; display:flex; gap:var(--switcher-gap); width:max-content; margin-left:calc(-1 * var(--switcher-shift)); }
 .ds-switcher-ring{ position:absolute; left:0; top:0; width:var(--switcher-cell); height:var(--switcher-cell); border-radius:var(--r-tile); background:var(--f-pill);
-  transform:translateX(calc(var(--switcher-at) * (var(--switcher-cell) + var(--switcher-gap)))); transition:transform var(--t-quick) var(--e-spring); }
+  transform:translateX(calc(var(--switcher-at) * (var(--switcher-cell) + var(--switcher-gap)))); }
 .ds-switcher-cell{ position:relative; display:grid; place-items:center; flex:none; width:var(--switcher-cell); height:var(--switcher-cell); cursor:default; }
 .ds-switcher-icon{ display:grid; place-items:center; width:var(--switcher-icon); height:var(--switcher-icon); }
 .ds-switcher-icon .ds-ext-icon{ width:var(--switcher-icon); height:var(--switcher-icon); }
@@ -1167,6 +1300,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-grip:hover{ background:var(--surface); color:var(--ink); }
 
 .ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent-text); margin:var(--s-2) 0; }
+
+/* DragReturnFrame (design/05 section 14, H1): what a hand drags, drawn `--drag-dx`/`--drag-dy`
+   off its place, written by two springs in Rust; nothing here transitions it. */
+.ds-drag-return{ --drag-dx:0px; --drag-dy:0px; transform:translate(var(--drag-dx), var(--drag-dy)); }
 /* -- edge_strip -- */
 /* EdgeStrip (design/04-COMPONENTS.md section 33): `S:85`, `S:91`, `S:451-454`. The strip is
    rendered only while the sidebar is hidden, so it needs no display toggle. The sidebar
@@ -1914,13 +2051,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-notification .ds-notification-close:hover{ color:var(--ink); }
 
 /* Swipe to dismiss (sill Q122, `data-swipe` on a card that can be swiped). The card is drawn
-   `--swipe-dx` off its place: following a drag or a scroll with no transition (`live`), easing
-   back with a spring at rest (`rest`, --t-move --e-spring; no spring under Reduced, where it
-   snaps back), and flying out to the right from where it was (`gone`, `banner-out`). */
-.ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); transition:transform var(--t-move) var(--e-spring); touch-action:none; }
-.ds-notification[*|data-swipe=live]{ transition:none; }
+   `--swipe-dx` off its place: following a drag or a scroll 1:1 (`live`), springing back home
+   (`rest`), and flying out to the right from where it was (`gone`, `banner-out`). The way back
+   is driven motion (design/05 section 14, H1): a spring in Rust writes `--swipe-dx` frame by
+   frame from the release's position and velocity (critically damped under Reduced), so nothing
+   here transitions the transform. */
+.ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
 .ds-notification[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-.ds[*|data-motion=reduced] .ds-notification[*|data-swipe]{ transition:none; }
 /* -- osd -- */
 /* Osd (design/20 section 1.7; sill FINDINGS Q76): the on-screen display's card inside a
    transparent Osd root. It paints what a tinted root paints on its own box: the material's box
@@ -2125,32 +2262,31 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-month[*|data-density=compact] .ds-month-day[*|aria-current=date] .ds-month-dot{ background:var(--accent-ink); }
 /* -- pane_switcher -- */
-/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane plays `slide-r`
-   (the detail, from the right) or `slide-l` (the root, from the left) at `--t-move --e-spring`,
-   and the outgoing one leaves the other way (`pane-out-l`, `pane-out-r`) at `--t-move
-   --e-exit`, held at its last frame until it is dropped. The leaving pane is out of the flow,
-   pinned to the top, so the switcher is as tall as the pane arriving; what it overhangs is
-   clipped. A pane at rest plays `hold`, which moves nothing, so the settle timer (wall clock)
-   never drops a slide without starting another animation: Blitz at the pinned rev keeps a
-   dropped animation's last value (sill G295). */
+/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane slides in (the
+   detail from the right, the root from the left) and the outgoing one leaves the other way,
+   26 px and a fade, as `slide-r`/`slide-l` and `pane-out-l`/`pane-out-r` drew it. Driven motion
+   (design/05 section 14, H1): both are drawn from one spring in Rust, `--pane-p` (0 the root, 1
+   the detail), so a reversal turns back from where the panes are; nothing here animates them.
+   The leaving pane is out of the flow, pinned to the top, so the switcher is as tall as the pane
+   arriving; what it overhangs is clipped. A pane at rest plays `hold`, which moves nothing
+   (sill G295: Blitz at the pinned rev keeps a dropped animation's last value). Under Reduced the
+   panes only cross-fade. */
 
-.ds-panes{ position:relative; overflow:hidden; }
+.ds-panes{ --pane-p:0; position:relative; overflow:hidden; }
 .ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
 .ds-pane[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-pane[*|data-pane=detail][*|data-presence=entering]{ animation:slide-r var(--t-move) var(--e-spring); }
-.ds-pane[*|data-pane=root][*|data-presence=entering]{ animation:slide-l var(--t-move) var(--e-spring); }
-.ds-pane[*|data-pane=root][*|data-presence=leaving]{ animation:pane-out-l var(--t-move) var(--e-exit) forwards; }
-.ds-pane[*|data-pane=detail][*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; }
+.ds-pane[*|data-pane=detail][*|data-presence=entering],.ds-pane[*|data-pane=detail][*|data-presence=leaving]{
+  transform:translateX(calc((1 - var(--pane-p)) * var(--s-26))); opacity:var(--pane-p); }
+.ds-pane[*|data-pane=root][*|data-presence=entering],.ds-pane[*|data-pane=root][*|data-presence=leaving]{
+  transform:translateX(calc(var(--pane-p) * -1 * var(--s-26))); opacity:calc(1 - var(--pane-p)); }
+.ds[*|data-motion=reduced] .ds-pane{ transform:none; }
 /* -- panel -- */
 /* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel. A stage fills
    the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
-   rule paints it) at the material's radius, and scrolls its own content. It slides in with
-   `panel-in` (`--t-move --e-out`, restarted under its other name on each showing) and out with
-   `panel-out` (`--t-move --e-exit`, held); hidden, nothing is laid out. Present keeps the
-   entrance declared, so the settle timer never cancels a slide the frame clock is still playing;
-   present again after a hide was taken back (`data-pulse=held`), it plays `hold`, so dropping
-   `panel-out` starts an animation in the same restyle (sill G295). An optional scrim covers
+   rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
+   in with `panel-in` (`--t-move --e-out`); present keeps the entrance declared, so the settle
+   timer never cancels a slide the frame clock is still playing. Hidden, nothing is laid out. An optional scrim covers
    the stage behind it. The panel's material scope fills the root too: Blitz places an absolutely
    positioned box against its parent, so a scope of no height would give the panel none.
    Attribute selectors carry `*|` (spike S2). */
@@ -2162,9 +2298,14 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; scrollbar-width:none; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
 .ds-panel-stage[*|data-edge=right] > .ds-panel{ right:var(--s-8); }
 .ds-panel[*|data-presence=entering],.ds-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
-.ds-panel[*|data-presence=entering][*|data-pulse=b],.ds-panel[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
-.ds-panel[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-panel[*|data-presence=leaving]{ animation:panel-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+/* Driven (design/05 section 14, H1): after its first entrance the panel is drawn from a spring in
+   Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
+   leaves no value behind (sill G295); a show while it leaves turns it back from where it is.
+   Under Reduced it fades in place instead. */
+.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear);
+  transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
+.ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
+.ds-panel[*|data-presence=leaving]{ pointer-events:none; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
@@ -2423,22 +2564,33 @@ html,body{margin:0;padding:0;background:transparent}
 /* SegmentedControl (design/04-COMPONENTS.md section 3): Regular is S's `.seg` (`S:265-268`),
    Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
    Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
-   The pressed fill jumps between segments; there is no sliding thumb.
+   Driven motion (design/05 section 14, H1; design/27 section 5.15): the segments are equal, as
+   the Mac's are, and the pressed fill is one thumb behind them (the control's `::before`, so every child is still
+   a segment; the segments stack above it by `--z-raise`), `--seg-x` segments from the
+   start, written by a spring in Rust (`--seg-n` segments in all); nothing here transitions it.
    TODO(O-1): disabled is not specified. */
 
-.ds-segmented{ display:inline-flex; gap:var(--s-2); border:var(--hair) solid var(--line); border-radius:var(--r-pill); }
-.ds-segmented[*|data-size=regular]{ padding:var(--s-3); background:var(--surface-2); }
-.ds-segmented[*|data-size=small]{ padding:var(--s-2); background:var(--surface); }
+.ds-segmented{ --seg-n:1; --seg-x:0; position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
+  border:var(--hair) solid var(--line); border-radius:var(--r-pill); --seg-pad:var(--s-3); padding:var(--seg-pad); }
+.ds-segmented[*|data-size=regular]{ --seg-pad:var(--s-3); background:var(--surface-2); }
+.ds-segmented[*|data-size=small]{ --seg-pad:var(--s-2); background:var(--surface); }
+
+/* One segment's width: the inside less the gaps, shared equally. */
+.ds-segmented::before{
+  content:""; position:absolute; top:var(--seg-pad); bottom:var(--seg-pad); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
+  width:calc((100% - 2 * var(--seg-pad) - (var(--seg-n) - 1) * var(--s-2)) / var(--seg-n));
+  left:calc(var(--seg-pad) + var(--seg-x) * ((100% - 2 * var(--seg-pad) - (var(--seg-n) - 1) * var(--s-2)) / var(--seg-n) + var(--s-2)));
+}
 
 .ds-segment{
-  font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  position:relative; z-index:var(--z-raise); font:inherit; border:0; background:transparent; border-radius:var(--r-pill); font-weight:600; cursor:default; color:var(--ink-soft);
+  transition:color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
 .ds-segmented[*|data-size=regular] .ds-segment{ padding:var(--s-5) var(--s-11); font-size:var(--fs-small); }
 .ds-segmented[*|data-size=small] .ds-segment{ padding:var(--s-3) var(--s-10); font-size:var(--fs-help); }
 .ds-segment:hover{ color:var(--ink); }
 .ds-segment:active{ transform:scale(var(--squish)); }
-.ds-segment[*|aria-pressed=true]{ background:var(--ink); color:var(--paper); }
+.ds-segment[*|aria-pressed=true]{ color:var(--paper); }
 /* -- selection_bubble -- */
 /* SelectionBubble (design/04-COMPONENTS.md section 30), verbatim `S:683-691`, over the
    `.ds-popover` Bubble surface: formatting buttons, or the link field. Italic's Georgia face is
@@ -2564,9 +2716,15 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
 
-/* Leaving (sill Q90): `sheet-out` at `--t-move --e-exit`, holding its transparent last frame,
-   and no longer a target for the pointer while it goes. */
-.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+/* Driven (design/05 section 14, H1; sill Q90): after its first entrance the sheet is drawn from
+   a spring in Rust, `--present-p` (0 gone, 1 shown): it fades and settles 12 px down at 95 % as
+   it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
+   nothing, so the entrance it drops leaves no value behind (sill G295). Leaving, it is no longer
+   a target for the pointer. Under Reduced it only fades. */
+.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+  transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
+.ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
+.ds-sheet[*|data-presence=leaving]{ pointer-events:none; }
 
 /* Centred (sill Q91): a stage filling the overlay centres the sheet by flex, inside the same
    36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
@@ -2620,18 +2778,16 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Swipe to dismiss (`data-swipe` on a card that can be swiped; `notification_swipe`, as a
    notification card's). The card is drawn `--swipe-dx` off its place: following a drag or a
-   scroll with no transition (`live`), springing back at rest (`--t-move --e-spring`), and flying
+   scroll 1:1 (`live`), springing back home on a spring in Rust (design/05 section 14), and flying
    out to the right from where it was (`gone`, `banner-out`). A card that flew out is already
    gone when its caller hides it, so its leaving plays nothing and stays invisible, rather than
    `shot-out` starting over from its place.
-   Reduced motion is decided here, never by a caller: no spring back (it snaps), and the entrance
+   Reduced motion is decided here, never by a caller: the spring back is critically damped, and the entrance
    neither lifts nor leaves by sliding; it fades in and out (the motion tokens already shorten
    both to Reduced's length). */
-.ds-shot[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); transition:transform var(--t-move) var(--e-spring); touch-action:none; }
-.ds-shot[*|data-swipe=live]{ transition:none; }
+.ds-shot[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
 .ds-shot[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 .ds-shot[*|data-swipe=gone][*|data-presence=leaving]{ animation:none; opacity:0; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-swipe]{ transition:none; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present]{ animation-name:fade; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=held]{ animation-name:hold; }
@@ -3052,11 +3208,12 @@ html,body{margin:0;padding:0;background:transparent}
    accent fill, the Space dot's spring. Attribute selectors carry `*|` (spike S2); the focus
    ring is the global one, on the track (spike S12).
    TODO(O-4): the knob and track sizes are the doc's candidate (knob 18, track 36 x 24 with
-   3px padding), not signed off. The knob's travel is a fixed 12px (36 - 2 x 3 - 18), since a
-   transition against the track's own width is not guaranteed in Blitz.
+   3px padding), not signed off. The knob's travel is a fixed 12px (36 - 2 x 3 - 18).
+   Driven motion (design/05 section 14, H1): the knob's offset is `--knob-x`, written in pixels by a
+   spring in Rust on the button, so nothing here transitions the knob's transform.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
-.ds-toggle{
+.ds-toggle{ --knob-x:0;
   display:inline-flex; box-sizing:content-box; width:30px; height:18px; padding:var(--s-3);
   border:var(--hair) solid var(--line); border-radius:var(--r-pill); background:var(--surface-2); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
@@ -3064,13 +3221,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toggle-knob{
   display:block; flex:none; width:18px; height:18px;
   border-radius:var(--r-pill); background:var(--raise); box-shadow:var(--shadow-1);
-  transition:transform var(--t-move) var(--e-spring);
+  transform:translateX(calc(var(--knob-x) * 1px));
 }
 .ds-toggle[*|aria-checked=true]{ background:var(--accent); border-color:transparent; }
-.ds-toggle[*|aria-checked=true] .ds-toggle-knob{ transform:translateX(12px); }
-.ds-toggle:active .ds-toggle-knob{ transform:scale(var(--squish)); }
-/* The doc's active rule alone would snap an On knob back to the left while pressed. */
-.ds-toggle[*|aria-checked=true]:active .ds-toggle-knob{ transform:translateX(12px) scale(var(--squish)); }
+.ds-toggle:active .ds-toggle-knob{ transform:translateX(calc(var(--knob-x) * 1px)) scale(var(--squish)); }
 /* -- tooltip -- */
 /* Tooltip (design/04-COMPONENTS.md section 18). Fly `S:442-446`: a dark label above its
    target, shown on hover after `--d-fly`, at once while the hover hub is warm (O-11: `HoverHub`

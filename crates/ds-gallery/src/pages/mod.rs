@@ -30,6 +30,7 @@ pub mod lock_switcher;
 pub mod materials;
 pub mod matrix;
 pub mod motion;
+pub mod motion_driven;
 pub mod motion_lab;
 pub mod outbox;
 pub mod overlays;
