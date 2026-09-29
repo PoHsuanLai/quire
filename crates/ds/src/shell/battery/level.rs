@@ -97,7 +97,7 @@ pub fn BatteryLevel(
     children: Element,
 ) -> Element {
     let level = level.clamped();
-    let percent = percent_of(level);
+    let percent = level.whole_percent();
     let frame = use_battery_fill(level, wake);
     let alias = moving(frame, level);
     let span = match mark {
@@ -128,12 +128,6 @@ pub fn BatteryLevel(
             }
         }
     }
-}
-
-/// A level in whole percent, rounded: what `aria-valuenow` reads, and the count a figure shows
-/// for the level drawn in a frame (the fill's count-at-progress: `percent_of(level_at(run, p))`).
-pub fn percent_of(level: Fraction) -> u16 {
-    (level.clamped().0 + 5) / 10
 }
 
 /// `data-pulse` while the fill moves (`a`), absent at rest: kept for hosts that select a

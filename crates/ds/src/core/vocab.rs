@@ -403,6 +403,12 @@ impl Fraction {
         Fraction(self.0.min(Self::ONE.0))
     }
 
+    /// The value in whole percent, rounded: what a battery's figure prints and its
+    /// `aria-valuenow` reads.
+    pub(crate) fn whole_percent(self) -> u16 {
+        (self.clamped().0 + 5) / 10
+    }
+
     /// The clamped value as a CSS number for `--f`: `0.35`, `0`, `1`.
     pub(crate) fn css(self) -> String {
         let permille = self.clamped().0;
@@ -421,6 +427,27 @@ mod percent_tests {
         for &(given, want) in CASES {
             assert_eq!(Percent::new(given), Percent(want), "{given}");
             assert_eq!(Percent::from(given), Percent(want), "from {given}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod fraction_tests {
+    use super::Fraction;
+
+    #[test]
+    fn a_fraction_reads_as_whole_percent_rounded_and_clamped() {
+        const CASES: &[(u16, u16)] = &[
+            (0, 0),
+            (4, 0),
+            (5, 1),
+            (844, 84),
+            (845, 85),
+            (1000, 100),
+            (1200, 100),
+        ];
+        for &(given, want) in CASES {
+            assert_eq!(Fraction(given).whole_percent(), want, "{given}");
         }
     }
 }
