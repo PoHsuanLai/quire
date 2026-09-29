@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{
     AppMark, Appearance, CardAction, Ds, Hover, Icon, IconSource, Material, NotificationCard,
-    Point, Rich, RichRun, Run, RunTone,
+    Point, Rich, RichRun, RunTone, TextRun,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -30,7 +30,10 @@ fn body() -> Rich {
                  memoir itself, so there is much more here than two lines can hold. ";
     Rich(vec![
         RichRun::link("Read the notes", "https://example.org/notes"),
-        RichRun::Run(Run::new(format!(": {}", words.repeat(2)), RunTone::Plain)),
+        RichRun::Run(TextRun::new(
+            format!(": {}", words.repeat(2)),
+            RunTone::Plain,
+        )),
     ])
 }
 

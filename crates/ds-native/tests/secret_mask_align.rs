@@ -12,8 +12,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Key, LockUser, Material,
-    PolkitPrompt, Rect, person_hue,
+    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, LockUser, Material,
+    PolkitPrompt, Rect, ShortcutKey, person_hue,
 };
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
@@ -186,11 +186,11 @@ struct Dot {
 }
 
 /// A polkit prompt with `typed` in its field and the keys `after` pressed, settled.
-fn typed_into(typed: &str, after: &[Key]) -> Harness {
+fn typed_into(typed: &str, after: &[ShortcutKey]) -> Harness {
     let mut harness = Harness::new(Polkit, VIEW);
     harness.advance(Duration::from_millis(600));
     for c in typed.chars() {
-        harness.key(Key::Char(c));
+        harness.key(ShortcutKey::Char(c));
         harness.advance(Duration::from_millis(20));
     }
     for &key in after {
@@ -204,7 +204,7 @@ fn typed_into(typed: &str, after: &[Key]) -> Harness {
 /// Where the field's dots are once it has lost the keyboard (and whether a caret still paints):
 /// the dots unfocused are where they were, with no caret among them.
 fn blurred_dots(harness: &mut Harness, field: Rect) -> (Vec<Dot>, Option<f32>) {
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     harness.advance(Duration::from_millis(300));
     assert!(
         !harness.is_focused(".ds-polkit input"),
@@ -271,7 +271,10 @@ fn the_drawn_caret_sits_at_the_end_of_the_last_dot() {
 fn after_left_three_times_the_caret_stands_clear_between_the_eighth_and_ninth_dots() {
     let n = 11;
     let typed: String = "hunter2xWq".chars().cycle().take(n).collect();
-    let mut harness = typed_into(&typed, &[Key::Left, Key::Left, Key::Left]);
+    let mut harness = typed_into(
+        &typed,
+        &[ShortcutKey::Left, ShortcutKey::Left, ShortcutKey::Left],
+    );
     let field = harness
         .rect(".ds-polkit input")
         .expect("the password field");
@@ -302,7 +305,7 @@ fn a_typed_secret_draws_its_dots_from_the_leading_edge_in_a_centred_card() {
     let mut harness = Harness::new(Polkit, VIEW);
     harness.advance(Duration::from_millis(600));
     for c in TYPED.chars() {
-        harness.key(Key::Char(c));
+        harness.key(ShortcutKey::Char(c));
         harness.advance(Duration::from_millis(20));
     }
     assert_eq!(

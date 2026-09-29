@@ -11,7 +11,7 @@ use crate::motion::detail::{
     first_show::FirstShow,
     morph::Slashed,
     once::use_shake,
-    pending::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle},
+    pending::{Lit, PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     settle::{SettleStyle, Settling},
     touch::Touch,
     use_detail::use_detail,
@@ -28,7 +28,7 @@ use dioxus::prelude::*;
 /// The connecting loop: the whole rune's opacity, high then low.
 pub(crate) const BREATHING: PendingSpec = PendingSpec {
     style: PendingStyle::Breathe,
-    layers: Layers(1),
+    layers: PendingLayers(1),
 };
 
 /// Lucide `bluetooth`'s rune.

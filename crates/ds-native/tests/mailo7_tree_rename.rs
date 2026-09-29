@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Disclosure, Ds, Focus, Icon, InputVariant, Key, Material, PlaceId, TextInput,
-    TreeItem, TreeShape, use_focus_request,
+    Appearance, Disclosure, Ds, FieldFocus, Icon, InputVariant, Material, PlaceId, ShortcutKey,
+    TextInput, TreeItem, TreeShape, use_focus_request,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -42,7 +42,7 @@ fn Page(start: Start) -> Element {
     let editing = renaming().then(|| {
         rsx! {
             TextInput { variant: InputVariant::Bare, label: "Rename folder", value: name(),
-                focus: Focus::Controlled(request),
+                focus: FieldFocus::Controlled(request),
                 oninput: move |next: String| name.set(next),
                 onkey: move |event: KeyboardEvent| match event.key() {
                     dioxus::prelude::Key::Enter => {
@@ -157,10 +157,10 @@ fn a_press_and_typing_in_the_field_neither_toggle_nor_select_the_row() {
     edit.click(at);
     edit.advance(ms(50));
     for c in "Work".chars() {
-        edit.key(Key::Char(c));
+        edit.key(ShortcutKey::Char(c));
         edit.advance(ms(20));
     }
-    edit.key(Key::Char(' '));
+    edit.key(ShortcutKey::Char(' '));
     edit.advance(ms(20));
     assert!(edit.is_focused(FIELD), "the field kept the keyboard");
     assert_eq!(log(&edit), "", "no toggle, no select");
@@ -178,10 +178,10 @@ fn enter_reaches_the_fields_handler_and_ends_the_rename() {
     let mut edit = harness(renaming);
     settle_until(&mut edit, |harness| harness.is_focused(FIELD));
     for c in "Work".chars() {
-        edit.key(Key::Char(c));
+        edit.key(ShortcutKey::Char(c));
         edit.advance(ms(20));
     }
-    edit.key(Key::Enter);
+    edit.key(ShortcutKey::Enter);
     settle_until(&mut edit, |harness| harness.count(FIELD) == 0);
     assert_eq!(log(&edit), "enter:Work");
     assert_eq!(edit.text_of(".ds-tree-item-label").as_deref(), Some("Work"));
@@ -192,7 +192,7 @@ fn enter_reaches_the_fields_handler_and_ends_the_rename() {
 fn escape_reaches_the_fields_handler_and_ends_the_rename() {
     let mut edit = harness(renaming);
     settle_until(&mut edit, |harness| harness.is_focused(FIELD));
-    edit.key(Key::Escape);
+    edit.key(ShortcutKey::Escape);
     settle_until(&mut edit, |harness| harness.count(FIELD) == 0);
     assert_eq!(log(&edit), "escape");
     assert_eq!(edit.attr(ROW, "aria-expanded").as_deref(), Some("true"));

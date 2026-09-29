@@ -19,7 +19,7 @@ mod tests;
 
 use crate::motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::{Mood, PictureSize};
-use crate::style::env::use_env;
+use crate::style::scope::use_scope;
 use dioxus::prelude::*;
 use sheet::{SheetPx, position, timing, uri};
 
@@ -45,7 +45,7 @@ pub fn AnimatedEmoji(
     #[props(default)] disc: EmojiDisc,
     #[props(default)] playback: EmojiPlayback,
 ) -> Element {
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let shown = life::use_frames(emoji, mood, wake, playback);
     let px = SheetPx::for_size(size);
     let (at, fit) = position(timing(shown.emoji), shown.frame);

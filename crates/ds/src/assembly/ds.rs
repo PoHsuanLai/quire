@@ -1,7 +1,7 @@
 //! The root: `div.ds` carrying `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
 //! `data-material`, `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
 //! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
-//! overlay host and the toast host. It provides `Env`, `HoverHub`, `ToastHub`, `LayerStack`
+//! overlay host and the toast host. It provides `Scope`, `HoverHub`, `ToastHub`, `LayerStack`
 //! and `Overlays` as context. Its click handler, the last to hear a click, hands a click that
 //! landed on nothing focusable to the host's `HostClickFocus` (FINDINGS "Native focus"), and it
 //! provides the same seams to the controls inside it, which hand over a click they keep to
@@ -57,10 +57,10 @@ use crate::style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
 use crate::style::appearance::{blur::BlurState, material::Material};
-use crate::style::env::{Env, HostModality, InputModality, use_env_provider};
 use crate::style::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::style::material::stack::MaterialStack;
 use crate::style::scale::use_root_scale;
+use crate::style::scope::{HostModality, InputModality, Scope, use_scope_provider};
 use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::style::tokens::hex::Alpha;
 use crate::style::tokens::{pixel::PixelToken, shape::Corner};
@@ -109,7 +109,7 @@ pub fn Ds(
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let click_root = use_context_provider(|| ClickRoot::of(element));
     let modality = host.map_or(InputModality::default(), |HostModality(current)| current());
-    let env = use_env_provider(Env {
+    let env = use_scope_provider(Scope {
         resolved,
         scheme: resolved.scheme,
         material,

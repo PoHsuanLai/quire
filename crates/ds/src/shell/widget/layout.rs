@@ -4,7 +4,7 @@
 //! settings; the widget gallery and the desktop's drag hand it [`WidgetEdit`]s, and [`apply`]
 //! turns an edit into the next layout or says why it cannot (pure: no clock, no I/O).
 
-use crate::shell::catalog::placement::{Placement, PlacementId, Placements};
+use crate::shell::catalog::placement::{Placed, PlacementId, Placements};
 use crate::shell::widget::contract::WidgetKind;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
 use serde::{Deserialize, Serialize};
@@ -45,7 +45,7 @@ impl WidgetAt {
 }
 
 /// One placed widget.
-pub type WidgetPlacement = Placement<WidgetKind, WidgetSize, WidgetAt>;
+pub type WidgetPlacement = Placed<WidgetKind, WidgetSize, WidgetAt>;
 
 /// Every placed widget, on both surfaces.
 pub type WidgetLayout = Placements<WidgetKind, WidgetSize, WidgetAt>;
@@ -222,7 +222,7 @@ pub fn apply(
                 }
                 center @ WidgetAt::Center(_) => center,
             };
-            Ok(layout.changed(id, |item| Placement { size, at, ..item }))
+            Ok(layout.changed(id, |item| Placed { size, at, ..item }))
         }
         WidgetEdit::Move(id, at) => {
             let item = layout.get(id).ok_or(LayoutError::Unknown(id))?;
@@ -235,7 +235,7 @@ pub fn apply(
                     return Err(LayoutError::Taken);
                 }
             }
-            Ok(layout.changed(id, |item| Placement { at, ..item }))
+            Ok(layout.changed(id, |item| Placed { at, ..item }))
         }
     }
 }

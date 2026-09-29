@@ -13,7 +13,7 @@ use ds::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacemen
 use ds::{
     Appearance, BatteryWidget, CardPresence, Ds, Inject, Material, MonthWidget, Panel, PanelEdge,
     Px, RootChrome, Shown, SpaceLook, Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost,
-    WidgetMetrics, WidgetSize, WorldClockWidget, use_env,
+    WidgetMetrics, WidgetSize, WorldClockWidget, use_scope,
 };
 
 /// The desktop's grid: six columns of the 164 cell and 16 gap in the stage's 1120.
@@ -62,7 +62,7 @@ pub(super) fn EditWidgetsStage() -> Element {
             axes.look.clone(),
         )
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let mut layout = use_signal(opening);
     let mut leaving = use_signal(Vec::<WidgetPlacement>::new);
     let metrics = WidgetMetrics::default().style_attr();

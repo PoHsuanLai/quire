@@ -7,9 +7,9 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant,
-    Check, CommandPalette, Elevation, Filter, Icon, Key, Menu, MenuEntrance, MenuEntry, MenuKind,
-    MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet, Shortcut,
-    Side, Switch, Tile, Trail, use_toast_hub,
+    Check, CommandPalette, Elevation, Icon, Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind,
+    MenuTile, MenuTrail, MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px,
+    Scrim, Sheet, Shortcut, ShortcutKey, Side, Switch, use_toast_hub,
 };
 
 /// Everything the page can open, one at a time.
@@ -162,7 +162,7 @@ pub fn OverlaysPage() -> Element {
                     kind,
                     anchor: at.clone(),
                     entries: entries(kind),
-                    filter: if kind == MenuKind::Dropdown { Filter::Typing } else { Filter::None },
+                    filter: if kind == MenuKind::Dropdown { MenuFilter::Typing } else { MenuFilter::None },
                     onpick: move |_| {},
                     onclose: close,
                 }
@@ -233,7 +233,7 @@ fn status() -> Vec<MenuEntry<u8>> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
     };
     vec![
@@ -263,47 +263,48 @@ fn face(name: &str) -> AvatarFace {
 
 /// What each kind lists: tiles for the rich and slim kinds, checks for the dropdown.
 fn entries(kind: MenuKind) -> Vec<MenuEntry<u8>> {
-    let item = |value: u8, title: &str, detail: Option<&str>, tile: Option<Tile>, trail: Trail| {
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value,
-            title: title.to_string(),
-            detail: detail.map(str::to_string),
-            tile,
-            trail,
-            check: match kind {
-                MenuKind::Dropdown => Some(if value == 1 {
-                    Check::Checked
-                } else {
-                    Check::Unchecked
-                }),
-                MenuKind::Rich | MenuKind::Slim | MenuKind::Context => None,
-            },
-        }
-    };
-    let shortcut = |c| Trail::Shortcut(Shortcut(vec![Key::Ctrl, Key::Char(c)]));
+    let item =
+        |value: u8, title: &str, detail: Option<&str>, tile: Option<MenuTile>, trail: MenuTrail| {
+            MenuEntry::Item {
+                availability: Availability::Enabled,
+                value,
+                title: title.to_string(),
+                detail: detail.map(str::to_string),
+                tile,
+                trail,
+                check: match kind {
+                    MenuKind::Dropdown => Some(if value == 1 {
+                        Check::Checked
+                    } else {
+                        Check::Unchecked
+                    }),
+                    MenuKind::Rich | MenuKind::Slim | MenuKind::Context => None,
+                },
+            }
+        };
+    let shortcut = |c| MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char(c)]));
     vec![
         MenuEntry::Header("Snooze".to_string()),
         item(
             0,
             "Later today",
             Some("18:00"),
-            Some(Tile::Icon(Icon::Clock)),
+            Some(MenuTile::Icon(Icon::Clock)),
             shortcut('l'),
         ),
         item(
             1,
             "Tomorrow",
             Some("Friday 08:00"),
-            Some(Tile::Icon(Icon::Sun)),
+            Some(MenuTile::Icon(Icon::Sun)),
             shortcut('t'),
         ),
         item(
             2,
             "Next week",
             None,
-            Some(Tile::Text("Mo".to_string())),
-            Trail::Note("Mon".to_string()),
+            Some(MenuTile::Text("Mo".to_string())),
+            MenuTrail::Note("Mon".to_string()),
         ),
         MenuEntry::Separator,
         MenuEntry::Header("Send to".to_string()),
@@ -311,15 +312,15 @@ fn entries(kind: MenuKind) -> Vec<MenuEntry<u8>> {
             3,
             "Dana Okafor",
             Some("dana@example.org"),
-            Some(Tile::Avatar(face("Dana Okafor"))),
-            Trail::None,
+            Some(MenuTile::Avatar(face("Dana Okafor"))),
+            MenuTrail::None,
         ),
         item(
             4,
             "Priya Raman",
             Some("priya@example.org"),
-            Some(Tile::Avatar(face("Priya Raman"))),
-            Trail::None,
+            Some(MenuTile::Avatar(face("Priya Raman"))),
+            MenuTrail::None,
         ),
     ]
 }
@@ -330,8 +331,8 @@ fn nested() -> Vec<MenuEntry<u8>> {
         value,
         title: title.to_string(),
         detail: None,
-        tile: icon.map(Tile::Icon),
-        trail: Trail::None,
+        tile: icon.map(MenuTile::Icon),
+        trail: MenuTrail::None,
         check: None,
         availability,
     };
@@ -352,7 +353,7 @@ fn nested() -> Vec<MenuEntry<u8>> {
         MenuEntry::Separator,
         MenuEntry::Submenu {
             title: "Keyboard type".to_string(),
-            tile: Some(Tile::Icon(Icon::Command)),
+            tile: Some(MenuTile::Icon(Icon::Command)),
             availability: Availability::Enabled,
             children: vec![
                 item(10, "Automatic", None, Availability::Enabled),
@@ -363,7 +364,7 @@ fn nested() -> Vec<MenuEntry<u8>> {
         },
         MenuEntry::Submenu {
             title: "Services".to_string(),
-            tile: Some(Tile::Icon(Icon::Refresh)),
+            tile: Some(MenuTile::Icon(Icon::Refresh)),
             availability: Availability::Disabled,
             children: vec![item(20, "Restart", None, Availability::Enabled)],
         },
@@ -375,23 +376,28 @@ fn nested() -> Vec<MenuEntry<u8>> {
 #[component]
 fn Palette(onclose: EventHandler<()>) -> Element {
     let mut query = use_signal(String::new);
-    let item = |value: u8, title: &str, icon: Icon, keys: Vec<Key>| MenuEntry::Item {
+    let item = |value: u8, title: &str, icon: Icon, keys: Vec<ShortcutKey>| MenuEntry::Item {
         availability: Availability::Enabled,
         value,
         title: title.to_string(),
         detail: None,
-        tile: Some(Tile::Icon(icon)),
-        trail: Trail::Shortcut(Shortcut(keys)),
+        tile: Some(MenuTile::Icon(icon)),
+        trail: MenuTrail::Shortcut(Shortcut(keys)),
         check: None,
     };
     let actions = vec![
-        item(0, "Compose a message", Icon::Pen, vec![Key::Char('c')]),
-        item(1, "Archive", Icon::Archive, vec![Key::Char('e')]),
+        item(
+            0,
+            "Compose a message",
+            Icon::Pen,
+            vec![ShortcutKey::Char('c')],
+        ),
+        item(1, "Archive", Icon::Archive, vec![ShortcutKey::Char('e')]),
         item(
             2,
             "Snooze until tomorrow",
             Icon::Clock,
-            vec![Key::Char('h')],
+            vec![ShortcutKey::Char('h')],
         ),
     ];
     let places = vec![
@@ -399,13 +405,13 @@ fn Palette(onclose: EventHandler<()>) -> Element {
             3,
             "Go to Inbox",
             Icon::Inbox,
-            vec![Key::Char('g'), Key::Char('i')],
+            vec![ShortcutKey::Char('g'), ShortcutKey::Char('i')],
         ),
         item(
             4,
             "Go to Starred",
             Icon::Star,
-            vec![Key::Char('g'), Key::Char('s')],
+            vec![ShortcutKey::Char('g'), ShortcutKey::Char('s')],
         ),
     ];
     let typed = query();

@@ -7,7 +7,7 @@
 
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::tokens::accent_band::{
-    band::{AccentPick, Weight},
+    band::{AccentPick, BandWeight},
     derive::accent_roles,
     picked::{BAND, hue_of},
     roles::AccentRoles,
@@ -18,7 +18,7 @@ use crate::style::tokens::accent_band::{
 pub fn accent_of(accent: Accent, scheme: Scheme) -> AccentRoles {
     let pick = AccentPick {
         hue: hue_of(accent),
-        weight: Weight::FULL,
+        weight: BandWeight::FULL,
     };
     accent_roles(&BAND, pick, scheme)
 }

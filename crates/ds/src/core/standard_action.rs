@@ -1,12 +1,12 @@
 //! The standard shortcuts as data (design/27-HIG-PARITY.md section 6.2; design/06-INTERACTIONS.md
 //! section 2): every combination the Mac reserves, and the few this desktop reserves for
 //! itself, each bound to what it does. A binding is written in Mac terms (Command is
-//! [`Key::Super`], drawn `⌘`); the platform layer resolves Command (Toshy maps it to Ctrl).
+//! [`ShortcutKey::Super`], drawn `⌘`); the platform layer resolves Command (Toshy maps it to Ctrl).
 //!
 //! [`Shortcut::standard`] binds one of these; [`Shortcut::custom`] refuses any combination in
 //! the table, so an app cannot repurpose Cmd+S for a sidebar again.
 
-use crate::core::vocab::{Key, Shortcut};
+use crate::core::vocab::{Shortcut, ShortcutKey};
 
 /// A standard action and its reserved keys.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -239,73 +239,73 @@ impl StandardAction {
     ];
 
     /// The keys, modifiers in the Mac's order (⌃⌥⇧⌘) then the key.
-    pub fn keys(self) -> Vec<Key> {
-        use Key::{Alt as Opt, Ctrl, Shift, Super as Cmd};
-        let (mods, key): (&[Key], Key) = match self {
-            StandardAction::Launcher => (&[Cmd], Key::Space),
-            StandardAction::NextInputSource => (&[Ctrl], Key::Space),
-            StandardAction::EmojiAndSymbols => (&[Ctrl, Cmd], Key::Space),
-            StandardAction::NextApp => (&[Cmd], Key::Tab),
-            StandardAction::PreviousApp => (&[Shift, Cmd], Key::Tab),
-            StandardAction::NextWindow => (&[Cmd], Key::Char('`')),
-            StandardAction::Settings => (&[Cmd], Key::Char(',')),
-            StandardAction::Cancel => (&[Cmd], Key::Char('.')),
-            StandardAction::Help => (&[Cmd], Key::Char('?')),
-            StandardAction::SelectAll => (&[Cmd], Key::Char('a')),
-            StandardAction::Copy => (&[Cmd], Key::Char('c')),
-            StandardAction::Cut => (&[Cmd], Key::Char('x')),
-            StandardAction::Paste => (&[Cmd], Key::Char('v')),
-            StandardAction::PasteAndMatchStyle => (&[Opt, Shift, Cmd], Key::Char('v')),
-            StandardAction::Undo => (&[Cmd], Key::Char('z')),
-            StandardAction::Redo => (&[Shift, Cmd], Key::Char('z')),
-            StandardAction::Find => (&[Cmd], Key::Char('f')),
-            StandardAction::FindNext => (&[Cmd], Key::Char('g')),
-            StandardAction::FindPrevious => (&[Shift, Cmd], Key::Char('g')),
-            StandardAction::UseSelectionForFind => (&[Cmd], Key::Char('e')),
-            StandardAction::JumpToSelection => (&[Cmd], Key::Char('j')),
-            StandardAction::Bold => (&[Cmd], Key::Char('b')),
-            StandardAction::Italic => (&[Cmd], Key::Char('i')),
-            StandardAction::Underline => (&[Cmd], Key::Char('u')),
-            StandardAction::ShowFonts => (&[Cmd], Key::Char('t')),
-            StandardAction::ShowColors => (&[Shift, Cmd], Key::Char('c')),
-            StandardAction::Bigger => (&[Cmd], Key::Char('+')),
-            StandardAction::Smaller => (&[Cmd], Key::Char('-')),
-            StandardAction::Hide => (&[Cmd], Key::Char('h')),
-            StandardAction::HideOthers => (&[Opt, Cmd], Key::Char('h')),
-            StandardAction::Minimize => (&[Cmd], Key::Char('m')),
-            StandardAction::MinimizeAll => (&[Opt, Cmd], Key::Char('m')),
-            StandardAction::New => (&[Cmd], Key::Char('n')),
-            StandardAction::Open => (&[Cmd], Key::Char('o')),
-            StandardAction::Save => (&[Cmd], Key::Char('s')),
-            StandardAction::SaveAs => (&[Shift, Cmd], Key::Char('s')),
-            StandardAction::Print => (&[Cmd], Key::Char('p')),
-            StandardAction::PageSetup => (&[Shift, Cmd], Key::Char('p')),
-            StandardAction::Close => (&[Cmd], Key::Char('w')),
-            StandardAction::CloseAll => (&[Opt, Cmd], Key::Char('w')),
-            StandardAction::Quit => (&[Cmd], Key::Char('q')),
-            StandardAction::ToggleToolbar => (&[Opt, Cmd], Key::Char('t')),
-            StandardAction::ToggleSidebar => (&[Ctrl, Cmd], Key::Char('s')),
-            StandardAction::FullScreen => (&[Ctrl, Cmd], Key::Char('f')),
-            StandardAction::ToggleDock => (&[Opt, Cmd], Key::Char('d')),
-            StandardAction::QuickLook => (&[Cmd], Key::Char('y')),
-            StandardAction::Reveal => (&[Cmd], Key::Char('r')),
-            StandardAction::ScreenshotScreen => (&[Shift, Cmd], Key::Char('3')),
-            StandardAction::ScreenshotSelection => (&[Shift, Cmd], Key::Char('4')),
-            StandardAction::ScreenshotTools => (&[Shift, Cmd], Key::Char('5')),
-            StandardAction::ForceQuit => (&[Opt, Cmd], Key::Escape),
-            StandardAction::LockScreen => (&[Ctrl, Cmd], Key::Char('q')),
-            StandardAction::LogOut => (&[Shift, Cmd], Key::Char('q')),
-            StandardAction::MissionControl => (&[Ctrl], Key::Up),
-            StandardAction::AppWindows => (&[Ctrl], Key::Down),
-            StandardAction::SpaceLeft => (&[Ctrl], Key::Left),
-            StandardAction::SpaceRight => (&[Ctrl], Key::Right),
-            StandardAction::SwitchToSpace(n) => (&[Ctrl], Key::Char(n.digit())),
+    pub fn keys(self) -> Vec<ShortcutKey> {
+        use ShortcutKey::{Alt as Opt, Ctrl, Shift, Super as Cmd};
+        let (mods, key): (&[ShortcutKey], ShortcutKey) = match self {
+            StandardAction::Launcher => (&[Cmd], ShortcutKey::Space),
+            StandardAction::NextInputSource => (&[Ctrl], ShortcutKey::Space),
+            StandardAction::EmojiAndSymbols => (&[Ctrl, Cmd], ShortcutKey::Space),
+            StandardAction::NextApp => (&[Cmd], ShortcutKey::Tab),
+            StandardAction::PreviousApp => (&[Shift, Cmd], ShortcutKey::Tab),
+            StandardAction::NextWindow => (&[Cmd], ShortcutKey::Char('`')),
+            StandardAction::Settings => (&[Cmd], ShortcutKey::Char(',')),
+            StandardAction::Cancel => (&[Cmd], ShortcutKey::Char('.')),
+            StandardAction::Help => (&[Cmd], ShortcutKey::Char('?')),
+            StandardAction::SelectAll => (&[Cmd], ShortcutKey::Char('a')),
+            StandardAction::Copy => (&[Cmd], ShortcutKey::Char('c')),
+            StandardAction::Cut => (&[Cmd], ShortcutKey::Char('x')),
+            StandardAction::Paste => (&[Cmd], ShortcutKey::Char('v')),
+            StandardAction::PasteAndMatchStyle => (&[Opt, Shift, Cmd], ShortcutKey::Char('v')),
+            StandardAction::Undo => (&[Cmd], ShortcutKey::Char('z')),
+            StandardAction::Redo => (&[Shift, Cmd], ShortcutKey::Char('z')),
+            StandardAction::Find => (&[Cmd], ShortcutKey::Char('f')),
+            StandardAction::FindNext => (&[Cmd], ShortcutKey::Char('g')),
+            StandardAction::FindPrevious => (&[Shift, Cmd], ShortcutKey::Char('g')),
+            StandardAction::UseSelectionForFind => (&[Cmd], ShortcutKey::Char('e')),
+            StandardAction::JumpToSelection => (&[Cmd], ShortcutKey::Char('j')),
+            StandardAction::Bold => (&[Cmd], ShortcutKey::Char('b')),
+            StandardAction::Italic => (&[Cmd], ShortcutKey::Char('i')),
+            StandardAction::Underline => (&[Cmd], ShortcutKey::Char('u')),
+            StandardAction::ShowFonts => (&[Cmd], ShortcutKey::Char('t')),
+            StandardAction::ShowColors => (&[Shift, Cmd], ShortcutKey::Char('c')),
+            StandardAction::Bigger => (&[Cmd], ShortcutKey::Char('+')),
+            StandardAction::Smaller => (&[Cmd], ShortcutKey::Char('-')),
+            StandardAction::Hide => (&[Cmd], ShortcutKey::Char('h')),
+            StandardAction::HideOthers => (&[Opt, Cmd], ShortcutKey::Char('h')),
+            StandardAction::Minimize => (&[Cmd], ShortcutKey::Char('m')),
+            StandardAction::MinimizeAll => (&[Opt, Cmd], ShortcutKey::Char('m')),
+            StandardAction::New => (&[Cmd], ShortcutKey::Char('n')),
+            StandardAction::Open => (&[Cmd], ShortcutKey::Char('o')),
+            StandardAction::Save => (&[Cmd], ShortcutKey::Char('s')),
+            StandardAction::SaveAs => (&[Shift, Cmd], ShortcutKey::Char('s')),
+            StandardAction::Print => (&[Cmd], ShortcutKey::Char('p')),
+            StandardAction::PageSetup => (&[Shift, Cmd], ShortcutKey::Char('p')),
+            StandardAction::Close => (&[Cmd], ShortcutKey::Char('w')),
+            StandardAction::CloseAll => (&[Opt, Cmd], ShortcutKey::Char('w')),
+            StandardAction::Quit => (&[Cmd], ShortcutKey::Char('q')),
+            StandardAction::ToggleToolbar => (&[Opt, Cmd], ShortcutKey::Char('t')),
+            StandardAction::ToggleSidebar => (&[Ctrl, Cmd], ShortcutKey::Char('s')),
+            StandardAction::FullScreen => (&[Ctrl, Cmd], ShortcutKey::Char('f')),
+            StandardAction::ToggleDock => (&[Opt, Cmd], ShortcutKey::Char('d')),
+            StandardAction::QuickLook => (&[Cmd], ShortcutKey::Char('y')),
+            StandardAction::Reveal => (&[Cmd], ShortcutKey::Char('r')),
+            StandardAction::ScreenshotScreen => (&[Shift, Cmd], ShortcutKey::Char('3')),
+            StandardAction::ScreenshotSelection => (&[Shift, Cmd], ShortcutKey::Char('4')),
+            StandardAction::ScreenshotTools => (&[Shift, Cmd], ShortcutKey::Char('5')),
+            StandardAction::ForceQuit => (&[Opt, Cmd], ShortcutKey::Escape),
+            StandardAction::LockScreen => (&[Ctrl, Cmd], ShortcutKey::Char('q')),
+            StandardAction::LogOut => (&[Shift, Cmd], ShortcutKey::Char('q')),
+            StandardAction::MissionControl => (&[Ctrl], ShortcutKey::Up),
+            StandardAction::AppWindows => (&[Ctrl], ShortcutKey::Down),
+            StandardAction::SpaceLeft => (&[Ctrl], ShortcutKey::Left),
+            StandardAction::SpaceRight => (&[Ctrl], ShortcutKey::Right),
+            StandardAction::SwitchToSpace(n) => (&[Ctrl], ShortcutKey::Char(n.digit())),
         };
         mods.iter().copied().chain([key]).collect()
     }
 
     /// The standard action that owns `keys`, in any order and any letter case.
-    pub fn owning(keys: &[Key]) -> Option<StandardAction> {
+    pub fn owning(keys: &[ShortcutKey]) -> Option<StandardAction> {
         let wanted = normalized(keys.iter().copied());
         StandardAction::ALL
             .into_iter()
@@ -321,7 +321,7 @@ impl Shortcut {
 
     /// A shortcut of the app's own, modifiers put in the Mac's order; refused with the owner
     /// when the combination is a standard one (design/27 section 6.2: never repurpose one).
-    pub fn custom(keys: impl IntoIterator<Item = Key>) -> Result<Shortcut, Reserved> {
+    pub fn custom(keys: impl IntoIterator<Item = ShortcutKey>) -> Result<Shortcut, Reserved> {
         let keys = normalized(keys);
         match StandardAction::owning(&keys) {
             Some(action) => Err(Reserved(action)),
@@ -332,15 +332,15 @@ impl Shortcut {
 
 /// `keys` with its modifiers first, deduplicated, in the Mac's order (⌃⌥⇧⌘), then the rest in
 /// the order given, letters lower-cased.
-pub(crate) fn normalized(keys: impl IntoIterator<Item = Key>) -> Vec<Key> {
-    let keys: Vec<Key> = keys
+pub(crate) fn normalized(keys: impl IntoIterator<Item = ShortcutKey>) -> Vec<ShortcutKey> {
+    let keys: Vec<ShortcutKey> = keys
         .into_iter()
         .map(|key| match key {
-            Key::Char(c) => Key::Char(c.to_ascii_lowercase()),
+            ShortcutKey::Char(c) => ShortcutKey::Char(c.to_ascii_lowercase()),
             other => other,
         })
         .collect();
-    let mut mods: Vec<(u8, Key)> = keys
+    let mut mods: Vec<(u8, ShortcutKey)> = keys
         .iter()
         .filter_map(|key| key.modifier_rank().map(|rank| (rank, *key)))
         .collect();

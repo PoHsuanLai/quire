@@ -6,7 +6,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Alert, AlertEmphasis, Appearance, Ds, Flow, Key, Material, Motion, Point, Px, RootExtent, Text,
+    Alert, AlertEmphasis, Appearance, Ds, Flow, Material, Motion, Point, Px, RootExtent,
+    ShortcutKey, TextLine,
 };
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::Cell;
@@ -30,7 +31,7 @@ fn Page() -> Element {
     let alert = rsx! {
         Alert {
             title: "Turn Bluetooth off?",
-            message: Some(Text::from("Bluetooth devices such as keyboards and mice will be disconnected.")),
+            message: Some(TextLine::from("Bluetooth devices such as keyboards and mice will be disconnected.")),
             action: "Turn Off",
             emphasis: EMPHASIS.with(Cell::get),
             flow,
@@ -74,7 +75,7 @@ fn log(harness: &Harness) -> String {
 const ACTION: &str = ".ds-alert-slot:nth-child(2) > .ds-button";
 const CANCEL: &str = ".ds-alert-slot:nth-child(1) > .ds-button";
 
-fn press(harness: &mut Harness, key: Key) {
+fn press(harness: &mut Harness, key: ShortcutKey) {
     harness.key(key);
     harness.advance(Duration::from_millis(20));
 }
@@ -93,19 +94,19 @@ fn it_opens_with_the_keyboard_on_the_default_button() {
 #[test]
 fn return_presses_the_default_wherever_the_keyboard_is() {
     let mut harness = start(AlertEmphasis::Default, Flow::Floating);
-    press(&mut harness, Key::Enter);
+    press(&mut harness, ShortcutKey::Enter);
     assert_eq!(log(&harness), "action");
 
     let mut harness = start(AlertEmphasis::Default, Flow::Floating);
-    press(&mut harness, Key::Tab);
+    press(&mut harness, ShortcutKey::Tab);
     assert!(harness.is_focused(CANCEL), "Tab moves to Cancel");
-    press(&mut harness, Key::Tab);
+    press(&mut harness, ShortcutKey::Tab);
     assert!(
         harness.is_focused(ACTION),
         "and back: the keyboard stays in the alert"
     );
-    press(&mut harness, Key::Tab);
-    press(&mut harness, Key::Enter);
+    press(&mut harness, ShortcutKey::Tab);
+    press(&mut harness, ShortcutKey::Enter);
     assert_eq!(
         log(&harness),
         "action",
@@ -113,7 +114,7 @@ fn return_presses_the_default_wherever_the_keyboard_is() {
     );
 
     let mut harness = start(AlertEmphasis::Destructive, Flow::Floating);
-    press(&mut harness, Key::Enter);
+    press(&mut harness, ShortcutKey::Enter);
     assert_eq!(log(&harness), "cancel", "a reflexive Return never destroys");
 }
 
@@ -121,7 +122,7 @@ fn return_presses_the_default_wherever_the_keyboard_is() {
 fn escape_cancels() {
     for flow in [Flow::Floating, Flow::Inline] {
         let mut harness = start(AlertEmphasis::Default, flow);
-        press(&mut harness, Key::Escape);
+        press(&mut harness, ShortcutKey::Escape);
         assert_eq!(log(&harness), "cancel", "{flow:?}");
     }
 }
@@ -129,10 +130,10 @@ fn escape_cancels() {
 #[test]
 fn space_presses_the_button_with_the_keyboard() {
     let mut harness = start(AlertEmphasis::Destructive, Flow::Floating);
-    press(&mut harness, Key::Space);
+    press(&mut harness, ShortcutKey::Space);
     assert_eq!(log(&harness), "cancel");
     let mut harness = start(AlertEmphasis::Default, Flow::Floating);
-    press(&mut harness, Key::Space);
+    press(&mut harness, ShortcutKey::Space);
     assert_eq!(log(&harness), "action");
 }
 

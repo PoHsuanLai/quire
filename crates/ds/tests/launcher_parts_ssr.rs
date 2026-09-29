@@ -13,9 +13,9 @@ use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EMOJI_COLUMNS,
-    EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource, Inject, Key,
-    Material, MenuEntry, MenuRow, Mono, PaletteGroup, PaletteGroups, PaneAction, PaneContent,
-    PdfPage, PreviewPane, Px, RowChord, RowShape, Shortcut, Tile, Trail,
+    EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource, Inject, Material,
+    MenuEntry, MenuRow, MenuTile, MenuTrail, PaletteGroup, PaletteGroups, PaneAction, PaneContent,
+    PaneMono, PdfPage, PreviewPane, Px, RowChord, RowShape, Shortcut, ShortcutKey,
 };
 
 fn root(body: Element) -> Element {
@@ -51,7 +51,7 @@ fn palette_with(groups: Vec<PaletteGroup<u8>>, selected: usize, aside: Option<El
 
 fn row(value: u8, title: &str, shape: RowShape) -> MenuEntry<u8> {
     MenuEntry::Row(MenuRow {
-        tile: Some(Tile::Icon(Icon::File)),
+        tile: Some(MenuTile::Icon(Icon::File)),
         shape,
         ..MenuRow::new(value, title)
     })
@@ -85,9 +85,9 @@ fn files() -> Element {
 /// A file row with a shortcut after its time: the two in boxes of their own.
 fn file_with_keys() -> Element {
     let row = MenuEntry::Row(MenuRow {
-        tile: Some(Tile::Icon(Icon::File)),
+        tile: Some(MenuTile::Icon(Icon::File)),
         shape: file(None),
-        trail: Trail::Shortcut(Shortcut(vec![Key::Enter])),
+        trail: MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Enter])),
         ..MenuRow::new(1, "Invoice.pdf")
     });
     palette(vec![PaletteGroup::list("Documents", vec![row])], 0)
@@ -96,10 +96,10 @@ fn file_with_keys() -> Element {
 /// Two file rows whose action chord waits for the selection (Spotlight's hint) and a plain row
 /// whose chord shows always: on `selected`, only that file row ends in `⌘R`.
 fn chord_rows(selected: usize) -> Element {
-    let reveal = Shortcut(vec![Key::Super, Key::Char('r')]);
+    let reveal = Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')]);
     let chorded = |value: u8, title: &str| {
         MenuEntry::Row(MenuRow {
-            tile: Some(Tile::Icon(Icon::File)),
+            tile: Some(MenuTile::Icon(Icon::File)),
             shape: RowShape::File {
                 thumb: None,
                 location: "~/Documents".to_owned(),
@@ -110,9 +110,13 @@ fn chord_rows(selected: usize) -> Element {
         })
     };
     let always = MenuEntry::Row(MenuRow {
-        tile: Some(Tile::Icon(Icon::Settings)),
-        trail: Trail::Note("Setting".to_owned()),
-        chord: RowChord::always(Shortcut(vec![Key::Super, Key::Shift, Key::Char('d')])),
+        tile: Some(MenuTile::Icon(Icon::Settings)),
+        trail: MenuTrail::Note("Setting".to_owned()),
+        chord: RowChord::always(Shortcut(vec![
+            ShortcutKey::Super,
+            ShortcutKey::Shift,
+            ShortcutKey::Char('d'),
+        ])),
         ..MenuRow::new(3, "Displays")
     });
     palette(
@@ -235,11 +239,11 @@ fn actions() -> Vec<PaneAction> {
     vec![
         PaneAction {
             label: "Open".to_owned(),
-            shortcut: Shortcut(vec![Key::Enter]),
+            shortcut: Shortcut(vec![ShortcutKey::Enter]),
         },
         PaneAction {
             label: "Reveal in Files".to_owned(),
-            shortcut: Shortcut(vec![Key::Super, Key::Char('r')]),
+            shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')]),
         },
     ]
 }
@@ -267,7 +271,7 @@ fn pane_text_mono() -> Element {
     pane(
         PaneContent::Text {
             excerpt: "let x = 1;".to_owned(),
-            mono: Mono::Monospace,
+            mono: PaneMono::Monospace,
         },
         Some(1),
     )
@@ -277,7 +281,7 @@ fn pane_text_prose() -> Element {
     pane(
         PaneContent::Text {
             excerpt: "Pick up the keys.".to_owned(),
-            mono: Mono::Proportional,
+            mono: PaneMono::Proportional,
         },
         None,
     )

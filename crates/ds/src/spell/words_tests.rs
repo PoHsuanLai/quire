@@ -1,7 +1,7 @@
-use super::{Span, word_at, words};
+use super::{WordSpan, word_at, words};
 
 /// The words `words` hands a dictionary, as text.
-fn checked<'a>(text: &'a str, skips: &[Span]) -> Vec<&'a str> {
+fn checked<'a>(text: &'a str, skips: &[WordSpan]) -> Vec<&'a str> {
     words(text, skips)
         .into_iter()
         .map(|span| &text[span.start..span.end])
@@ -57,19 +57,19 @@ fn a_paragraph_cuts_into_the_words_a_dictionary_checks() {
 #[test]
 fn a_host_code_stretch_is_skipped() {
     let text = "call frobnicate here";
-    let code = Span::new(5, 15);
+    let code = WordSpan::new(5, 15);
     assert_eq!(checked(text, &[code]), vec!["call", "here"]);
 }
 
 #[test]
 fn the_caret_touches_a_word_at_either_end_or_inside() {
     let text = "teh cat";
-    let cases: &[(usize, Option<Span>)] = &[
-        (0, Some(Span::new(0, 3))),
-        (2, Some(Span::new(0, 3))),
-        (3, Some(Span::new(0, 3))),
-        (4, Some(Span::new(4, 7))),
-        (7, Some(Span::new(4, 7))),
+    let cases: &[(usize, Option<WordSpan>)] = &[
+        (0, Some(WordSpan::new(0, 3))),
+        (2, Some(WordSpan::new(0, 3))),
+        (3, Some(WordSpan::new(0, 3))),
+        (4, Some(WordSpan::new(4, 7))),
+        (7, Some(WordSpan::new(4, 7))),
     ];
     for (offset, expected) in cases {
         assert_eq!(word_at(text, *offset), *expected, "offset {offset}");

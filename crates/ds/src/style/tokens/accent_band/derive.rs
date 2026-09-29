@@ -4,7 +4,7 @@ use super::band::{AccentBand, AccentPick, InkRule, SchemeBand};
 use super::floors;
 use super::grounds::{card_grounds, contrast, least};
 use super::roles::AccentRoles;
-use super::text_grounds::{Ground, TextOn, text_grounds};
+use super::text_grounds::{TextGround, TextOn, text_grounds};
 use crate::core::colour::fit::oklch_bytes;
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::hex::{Alpha, Hex};
@@ -70,7 +70,7 @@ fn tone_ink(tone: Tone) -> Hex {
 
 /// The text accent: darker than the band's start in light, lighter in dark, until it reads on
 /// every one of `grounds`.
-fn text_accent(bounds: &SchemeBand, tone: Tone, scheme: Scheme, grounds: &[Ground]) -> Hex {
+fn text_accent(bounds: &SchemeBand, tone: Tone, scheme: Scheme, grounds: &[TextGround]) -> Hex {
     let step = match scheme {
         Scheme::Light => -floors::LIGHTNESS_STEP,
         Scheme::Dark => floors::LIGHTNESS_STEP,

@@ -9,11 +9,17 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Availability, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Icon,
-    IconSize, Key, Material, MenuEntry, PaletteEntrance, Radius, Retain, Shortcut, Shown, Surface,
-    Switch, Tile, Trail,
+    IconSize, Material, MenuEntry, MenuTile, MenuTrail, PaletteEntrance, Radius, Retain, Shortcut,
+    ShortcutKey, Shown, Surface, Switch,
 };
 
-fn row(value: u8, title: &str, detail: Option<&str>, tile: Tile, trail: Trail) -> MenuEntry<u8> {
+fn row(
+    value: u8,
+    title: &str,
+    detail: Option<&str>,
+    tile: MenuTile,
+    trail: MenuTrail,
+) -> MenuEntry<u8> {
     MenuEntry::Item {
         value,
         title: title.to_string(),
@@ -32,11 +38,11 @@ fn apps(typed: &str) -> Vec<MenuEntry<u8>> {
         .filter(|(name, _)| name.to_lowercase().contains(typed))
         .zip(1u8..)
         .map(|(&(name, hue), value)| {
-            let tile =
-                app_icon(hue, IconSize::Tile48).map_or(Tile::Icon(Icon::Window), Tile::Source);
+            let tile = app_icon(hue, IconSize::Tile48)
+                .map_or(MenuTile::Icon(Icon::Window), MenuTile::Source);
             let trail = match (typed.is_empty(), value) {
-                (false, 1) => Trail::Shortcut(Shortcut(vec![Key::Enter])),
-                _ => Trail::None,
+                (false, 1) => MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Enter])),
+                _ => MenuTrail::None,
             };
             row(value, name, None, tile, trail)
         })
@@ -46,13 +52,19 @@ fn apps(typed: &str) -> Vec<MenuEntry<u8>> {
 /// What an empty query lists: system actions and recent apps.
 fn actions() -> Vec<MenuEntry<u8>> {
     vec![
-        row(10, "Lock", None, Tile::Icon(Icon::Lock), Trail::None),
+        row(
+            10,
+            "Lock",
+            None,
+            MenuTile::Icon(Icon::Lock),
+            MenuTrail::None,
+        ),
         row(
             11,
             "Log Out",
             Some("Closes every app"),
-            Tile::Icon(Icon::Power),
-            Trail::None,
+            MenuTile::Icon(Icon::Power),
+            MenuTrail::None,
         ),
     ]
 }

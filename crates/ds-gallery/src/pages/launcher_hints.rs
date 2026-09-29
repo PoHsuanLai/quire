@@ -5,18 +5,18 @@
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Key, Material,
-    MenuEntry, MenuRow, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, Radius,
-    RowChord, RowShape, Shortcut, Surface, Tile,
+    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Material, MenuEntry,
+    MenuRow, MenuTile, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, Radius,
+    RowChord, RowShape, Shortcut, ShortcutKey, Surface,
 };
 
 fn reveal() -> Shortcut {
-    Shortcut(vec![Key::Super, Key::Char('r')])
+    Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])
 }
 
 fn file(value: u8, title: &str, modified: &str) -> MenuEntry<u8> {
     MenuEntry::Row(MenuRow {
-        tile: Some(Tile::Icon(Icon::File)),
+        tile: Some(MenuTile::Icon(Icon::File)),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_owned(),
@@ -46,7 +46,11 @@ fn actions() -> Vec<PaneAction> {
         },
         PaneAction {
             label: "Copy Path".to_owned(),
-            shortcut: Shortcut(vec![Key::Super, Key::Shift, Key::Char('c')]),
+            shortcut: Shortcut(vec![
+                ShortcutKey::Super,
+                ShortcutKey::Shift,
+                ShortcutKey::Char('c'),
+            ]),
         },
     ]
 }

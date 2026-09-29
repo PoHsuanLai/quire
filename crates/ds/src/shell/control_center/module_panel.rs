@@ -8,7 +8,7 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::core::vocab::Availability;
 use crate::motion::detail::first_show::FirstShow;
 use crate::shell::control_center::module_tile_kind::TileSpan;
@@ -48,7 +48,7 @@ impl PanelPlate {
 #[component]
 pub fn ModulePanel(
     #[props(default)] glyph: Option<IconSource>,
-    #[props(default)] title: Option<Text>,
+    #[props(default)] title: Option<TextLine>,
     #[props(default)] trailing: Option<Element>,
     #[props(default = TileSpan::Full)] span: TileSpan,
     #[props(default)] plate: PanelPlate,
@@ -70,7 +70,7 @@ pub fn ModulePanel(
 fn header(
     glyph: Option<IconSource>,
     first: FirstShow,
-    title: Option<Text>,
+    title: Option<TextLine>,
     trailing: Option<Element>,
 ) -> Element {
     if glyph.is_none() && title.is_none() && trailing.is_none() {

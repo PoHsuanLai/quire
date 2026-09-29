@@ -10,9 +10,9 @@ use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
 use ds::{
     AppKey, AppMark, AppSwitcher, Appearance, DragReturnFrame, Ds, Fraction, Icon, IconSource,
-    Inject, Material, NotificationCard, Pane, PaneSwitcher, Panel, PlateFamily, Point, Px,
-    RootChrome, SegmentedControl, Sheet, SheetPlacement, Shown, Slider, Swipe, Switch, SwitcherApp,
-    Toggle,
+    Inject, Material, NotificationCard, NotificationSwipe, Pane, PaneSwitcher, Panel, PlateFamily,
+    Point, Px, RootChrome, SegmentedControl, Sheet, SheetPlacement, Shown, Slider, Switch,
+    SwitcherApp, Toggle,
 };
 
 /// The section on the Motion page.
@@ -158,7 +158,7 @@ fn SwipeCell() -> Element {
                         age: "now",
                         summary: "Drag me right, let go short",
                         body: "Under 80 px it springs home at your release speed.",
-                        swipe: Swipe::Dismiss(EventHandler::new(|()| {})),
+                        swipe: NotificationSwipe::Dismiss(EventHandler::new(|()| {})),
                         on_close: |_| {},
                         on_open: |_| {},
                     }

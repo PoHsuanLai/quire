@@ -2,17 +2,18 @@
 //! caller's cursor the pointer only asks, and under the menu's own the caller hears each move
 //! after the render that made it. Split from `menu`; `menu_cursor` holds the pure rules.
 
-use crate::components::menus::menu_cursor::Cursor;
+use crate::components::menus::menu_cursor::MenuCursor;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
 /// Under a caller's cursor, the pointer over another choice asks for it.
 pub(crate) fn asks(
-    active: Cursor,
+    active: MenuCursor,
     pointed: Option<usize>,
     on_active: Option<EventHandler<Option<usize>>>,
 ) {
-    if let (Cursor::Controlled(shown), Some(index), Some(on_active)) = (active, pointed, on_active)
+    if let (MenuCursor::Controlled(shown), Some(index), Some(on_active)) =
+        (active, pointed, on_active)
         && shown != Some(index)
     {
         on_active.call(Some(index));
@@ -21,12 +22,12 @@ pub(crate) fn asks(
 
 /// Under the menu's own cursor, tell the caller after this render when the highlight moved.
 pub(crate) fn follow_active(
-    active: Cursor,
+    active: MenuCursor,
     current: Option<usize>,
     reported: CopyValue<Option<Option<usize>>>,
     on_active: Option<EventHandler<Option<usize>>>,
 ) {
-    let (Cursor::Auto, Some(on_active)) = (active, on_active) else {
+    let (MenuCursor::Auto, Some(on_active)) = (active, on_active) else {
         return;
     };
     let mut reported = reported;

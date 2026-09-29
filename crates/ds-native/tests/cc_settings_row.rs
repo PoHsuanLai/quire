@@ -4,7 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Ds, Icon, Key, Material, Point, RowTrailing, SettingsRow, Switch,
+    Appearance, Availability, Ds, Icon, Material, Point, RowTrailing, SettingsRow, ShortcutKey,
+    Switch,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -95,7 +96,7 @@ fn a_toggle_rows_switch_is_its_own_and_the_row_is_the_rows() {
 
     // The press left the keyboard on the row (FocusFallback::Ancestor): Enter runs it.
     assert!(harness.is_focused(FIRST), "the pressed row holds the focus");
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(TICK);
     assert_eq!(log(&harness), "toggle:On,row:headphones,row:headphones");
 

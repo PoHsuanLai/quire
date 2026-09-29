@@ -9,12 +9,13 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Count, Ds,
-    Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Key, ListPresence,
-    ListRow, Material, Menu, MenuEntry, MenuKind, Point, PulseKey, Px, RowPitch, Selection, Switch,
-    Toggle, Trail, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListPresence, ListRow,
+    Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, PulseKey, Px, RowPitch, Selection,
+    ShortcutKey, Switch, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
-    DotIndex, Focus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput, Theme,
+    DotIndex, FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput,
+    Theme,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -87,7 +88,7 @@ fn the_root_stamps_the_last_input_modality() {
     let mut harness = Harness::new(PressApp, VIEW);
     let modality = |harness: &Harness| harness.attr(".ds", "data-modality");
     assert_eq!(modality(&harness).as_deref(), Some("pointer"));
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     assert_eq!(modality(&harness).as_deref(), Some("keyboard"));
     harness.click(centre(&harness, ".ds-button"));
     assert_eq!(modality(&harness).as_deref(), Some("pointer"));
@@ -279,7 +280,7 @@ fn MenuDemo() -> Element {
             title: title.into(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
         })
         .collect::<Vec<_>>();
@@ -308,7 +309,7 @@ fn a_menu_opens_on_click_and_closes_on_escape() {
     harness.click(centre(&harness, ".ds-button"));
     assert_eq!(harness.count(".ds-menu"), 1, "{}", harness.html());
     assert_eq!(harness.count(".ds-menu-item"), 3);
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     // Long enough for any exit the menu plays.
     harness.advance(ms(600));
     assert_eq!(harness.count(".ds-menu"), 0, "{}", harness.html());
@@ -495,7 +496,7 @@ fn a_row_leaves_and_the_rows_below_heal() {
 fn FocusApp() -> Element {
     rsx! {
         Root {
-            Field { focus: Focus::OnMount }
+            Field { focus: FieldFocus::OnMount }
         }
     }
 }
@@ -504,13 +505,13 @@ fn FocusApp() -> Element {
 fn ManualApp() -> Element {
     rsx! {
         Root {
-            Field { focus: Focus::Manual }
+            Field { focus: FieldFocus::Manual }
         }
     }
 }
 
 #[component]
-fn Field(focus: Focus) -> Element {
+fn Field(focus: FieldFocus) -> Element {
     let mut text = use_signal(String::new);
     rsx! {
         TextInput {
@@ -533,7 +534,7 @@ fn a_field_focused_on_mount_takes_typing_without_a_click() {
         let mut harness = Harness::new(app, VIEW);
         harness.advance(ms(100));
         assert_eq!(harness.text_of(".probe-text").as_deref(), Some("[]"));
-        harness.key(Key::Char('a'));
+        harness.key(ShortcutKey::Char('a'));
         assert_eq!(
             harness.text_of(".probe-text").as_deref(),
             Some(want),

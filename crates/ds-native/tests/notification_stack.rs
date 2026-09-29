@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AppMark, Appearance, Banner, BannerKey, BannerStack, Ds, Icon, IconSource, Material,
-    MotionLevel, NotificationCard, Point, Px, StaggerIndex, Swipe, settle,
+    MotionLevel, NotificationCard, NotificationSwipe, Point, Px, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -35,7 +35,7 @@ fn Stack() -> Element {
                     body: "Two lines of body, or thereabouts, to give the banner some height.",
                     on_close: |_| {},
                     on_open: |_| {},
-                    swipe: Swipe::Dismiss(EventHandler::new(move |()| SHOWN.write().retain(|k| *k != n))),
+                    swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| SHOWN.write().retain(|k| *k != n))),
                 }
             },
         })

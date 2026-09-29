@@ -3,29 +3,38 @@
 //! that alone is taller than the compact grid can spare in a small widget's 140 px,
 //! so the compact grid draws plain 14 px glyph buttons (`ds-month-step`, an 11 px glyph).
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
-use crate::shell::month_grid::data::Step;
+use crate::shell::month_grid::data::MonthStep;
 use crate::shell::month_grid::density::Drawn;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 
 /// The header row at `density`.
-pub(crate) fn header(title: &Text, density: Drawn, onstep: Option<EventHandler<Step>>) -> Element {
+pub(crate) fn header(
+    title: &TextLine,
+    density: Drawn,
+    onstep: Option<EventHandler<MonthStep>>,
+) -> Element {
     rsx! {
         div { class: "ds-month-header",
             span { class: "ds-month-title", {text(title)} }
             if let Some(onstep) = onstep {
-                {step_button(Step::Previous, Icon::ChevronLeft, density, onstep)}
-                {step_button(Step::Next, Icon::ChevronRight, density, onstep)}
+                {step_button(MonthStep::Previous, Icon::ChevronLeft, density, onstep)}
+                {step_button(MonthStep::Next, Icon::ChevronRight, density, onstep)}
             }
         }
     }
 }
 
 /// One of the header's step buttons, sized for `density`.
-fn step_button(step: Step, icon: Icon, density: Drawn, onstep: EventHandler<Step>) -> Element {
+fn step_button(
+    step: MonthStep,
+    icon: Icon,
+    density: Drawn,
+    onstep: EventHandler<MonthStep>,
+) -> Element {
     match density {
         Drawn::Regular => rsx! {
             IconButton {

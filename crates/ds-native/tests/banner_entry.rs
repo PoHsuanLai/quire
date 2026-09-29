@@ -10,7 +10,7 @@
 use dioxus::prelude::*;
 use ds::{
     AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerStack, Ds, Icon, IconSource,
-    Material, NotificationCard, Point, Px, Rect, Swipe,
+    Material, NotificationCard, NotificationSwipe, Point, Px, Rect,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -40,7 +40,7 @@ fn Stack() -> Element {
                     summary: "Banner {n}",
                     on_close: |_| {},
                     on_open: |_| {},
-                    swipe: Swipe::Dismiss(EventHandler::new(move |()| SHOWN.write().retain(|k| *k != n))),
+                    swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| SHOWN.write().retain(|k| *k != n))),
                 }
             },
         })

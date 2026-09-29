@@ -10,7 +10,7 @@ use ds::Alpha;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BlurState, Button, ButtonVariant, Chip, ChipVariant, Fraction,
     Glyph, Icon, IconButton, IconButtonVariant, IconSize, Material, Slider, StatusMetrics, Surface,
-    use_env,
+    use_scope,
 };
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
@@ -68,7 +68,7 @@ pub fn MaterialsPage() -> Element {
 fn Chrome(material: Material) -> Element {
     let axes = use_context::<Signal<Axes>>();
     let accent = axes.read().accent;
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let tint = use_context::<Signal<Alpha>>()();
     let measured = floors(material, scheme, tint);
     rsx! {
@@ -105,7 +105,7 @@ fn Chrome(material: Material) -> Element {
 /// What sits in the chrome: the specimen that surface draws.
 #[component]
 fn Panel(material: Material) -> Element {
-    let blur = use_env().blur;
+    let blur = use_scope().blur;
     let state = match (material, blur) {
         (Material::Window, _) => "no blur, ever",
         (_, BlurState::Available) => "data-blur=on",

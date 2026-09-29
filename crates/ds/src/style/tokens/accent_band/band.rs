@@ -27,14 +27,14 @@ impl Hue {
 
 /// How far between the band's quiet and full chroma an accent sits, in thousandths.
 ///
-/// A built-in accent is [`Weight::FULL`]; a Space lends its first dot's chroma (0 to 1 on the
+/// A built-in accent is [`BandWeight::FULL`]; a Space lends its first dot's chroma (0 to 1 on the
 /// editor's field), so a grey Space lends a grey-blue, never a vivid one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Weight(pub u16);
+pub struct BandWeight(pub u16);
 
-impl Weight {
+impl BandWeight {
     /// The whole of the band's chroma.
-    pub const FULL: Weight = Weight(1000);
+    pub const FULL: BandWeight = BandWeight(1000);
 
     /// The weight as a fraction, clamped to 0..=1.
     pub fn fraction(self) -> f64 {
@@ -48,7 +48,7 @@ pub struct AccentPick {
     /// The hue.
     pub hue: Hue,
     /// How much of the band's chroma it takes.
-    pub weight: Weight,
+    pub weight: BandWeight,
 }
 
 /// Which ink sits on the solid fill; the fill's lightness steps until that ink reads on it.
@@ -69,7 +69,7 @@ pub struct ChromaSpan {
 
 impl ChromaSpan {
     /// The chroma `weight` asks for.
-    pub fn at(self, weight: Weight) -> f64 {
+    pub fn at(self, weight: BandWeight) -> f64 {
         let quiet = self.quiet.fraction();
         quiet + (self.full.fraction() - quiet) * weight.fraction()
     }

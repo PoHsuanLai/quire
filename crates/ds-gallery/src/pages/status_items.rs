@@ -9,7 +9,7 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
     BlurState, Button, ButtonVariant, Count, CountPlace, Icon, IconButton, IconButtonVariant,
-    Material, Px, StatusMetrics, Switch, use_env,
+    Material, Px, StatusMetrics, Switch, use_scope,
 };
 
 /// The two metrics a shell writes from its settings: the keys' defaults (a 22 px box, a 16 px
@@ -36,7 +36,7 @@ const METRICS: [(&str, StatusMetrics); 2] = [
 pub fn StatusItems() -> Element {
     let axes = use_context::<Signal<Axes>>();
     let accent = axes.read().accent;
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     rsx! {
         Section { title: "Status items on the frame", note: "IconButton {{ Status }} on a Bar root over the wallpaper, blur on and off: the Space gradient at the bar's tint, and the frame ground, so every item, the app name and the clock draw in --f-ink*. Each row: rest, open (its menu showing, --f-pill), pressed, disabled. The box and glyph come from StatusMetrics, which a shell fills from bar.status_icon_box_px, bar.status_glyph_px and bar.glyph_size_policy.",
             div { class: "g-wall", style: "background-image:url(\"{wallpaper::uri()}\")",

@@ -5,7 +5,7 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::components::controls::button_face::{
     ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
     trailing as trailing_mark,
@@ -105,7 +105,7 @@ impl ButtonVariant {
 pub fn Button(
     variant: ButtonVariant,
     #[props(default)] size: Option<ButtonSize>,
-    #[props(into)] label: Text,
+    #[props(into)] label: TextLine,
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] pressed: Option<Switch>,
     #[props(default)] availability: Availability,

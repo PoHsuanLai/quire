@@ -1,6 +1,6 @@
 //! ListRow: one item in a list, the thread row (design/04-COMPONENTS.md section 16).
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::lists::row_click::snapshot;
 use crate::components::lists::row_hooks::{PartHooks, relay, use_back};
 use crate::components::lists::row_star::star_button;
@@ -100,8 +100,8 @@ pub fn ListRow(
     presence: Presence,
     name: String,
     via: Option<Element>,
-    #[props(into)] subject: Text,
-    snippet: Option<Text>,
+    #[props(into)] subject: TextLine,
+    snippet: Option<TextLine>,
     time: String,
     tags: Element,
     star: Option<(Switch, EventHandler<Switch>)>,

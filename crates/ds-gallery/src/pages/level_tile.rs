@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, Level, LevelGlyph, LevelLook, Material, Muting,
-    Osd, PRESETS, RootChrome, Scheme, Shown, SpaceLook, Theme,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelLook, Material, Muting, Osd,
+    OsdLevel, PRESETS, RootChrome, Scheme, Shown, SpaceLook, Theme,
 };
 
 /// What the card sits on.
@@ -124,7 +124,7 @@ pub fn LevelTile(look: LevelLook, scheme: Scheme, ground: Ground, state: State) 
                             shown: Shown::Visible,
                             label: state.title,
                             look,
-                            level: Level { value: state.value, glyph: state.glyph },
+                            level: OsdLevel { value: state.value, glyph: state.glyph },
                         }
                     }
                 }

@@ -5,7 +5,7 @@
 //! focuses, and falls to the next focusable ancestor (`.app[tabindex]`).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Ds, Key, Material, Press};
+use ds::{Appearance, Button, ButtonVariant, Ds, Material, Press, ShortcutKey};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -81,7 +81,7 @@ fn a_button_that_removes_itself_leaves_the_keyboard_on_its_focusable_ancestor() 
     press_show(&mut harness);
     ds_native::harness::settle_until(&mut harness, |harness| harness.is_focused(".app"));
     assert_eq!(harness.count(".banner .ds-button"), 0, "the button left");
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(harness.text_of(".log").as_deref(), Some("show,key:j"));
 }
 
@@ -92,6 +92,6 @@ fn a_button_that_stays_keeps_the_keyboard() {
     ds_native::harness::settle_until(&mut harness, |harness| {
         harness.is_focused(".banner .ds-button")
     });
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(harness.text_of(".log").as_deref(), Some("show,key:j"));
 }

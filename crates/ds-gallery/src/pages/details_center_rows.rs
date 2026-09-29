@@ -4,7 +4,7 @@
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
-use ds::{Fraction, Icon, RowDisc, RowPhase, RowTrailing, RowWork, SettingsRow, Switch, Text};
+use ds::{Fraction, Icon, RowDisc, RowPhase, RowTrailing, RowWork, SettingsRow, Switch, TextLine};
 
 /// A row's operation over a run of stamps: each press mints the next.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,12 +54,12 @@ impl Run {
 }
 
 /// The words under a row's title (R8: the still state carries the moment).
-fn detail(run: Run, done: &str) -> Option<Text> {
+fn detail(run: Run, done: &str) -> Option<TextLine> {
     match run.phase {
         RowPhase::Rest => None,
-        RowPhase::Pending(_) => Some(Text::from("Connecting…")),
-        RowPhase::Succeeded(_) => Some(Text::from(done)),
-        RowPhase::Failed(_) => Some(Text::from("Couldn't connect")),
+        RowPhase::Pending(_) => Some(TextLine::from("Connecting…")),
+        RowPhase::Succeeded(_) => Some(TextLine::from(done)),
+        RowPhase::Failed(_) => Some(TextLine::from("Couldn't connect")),
     }
 }
 

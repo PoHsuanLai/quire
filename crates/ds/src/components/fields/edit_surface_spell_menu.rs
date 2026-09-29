@@ -311,13 +311,13 @@ mod tests {
     use crate::core::geometry::units::{Point, Px};
     use crate::edit::position::EditNode;
     use crate::spell::marks::Misspelt;
-    use crate::spell::words::Span;
+    use crate::spell::words::WordSpan;
 
     fn opened(suggestions: &[&str]) -> Opened {
         Opened {
             mark: Misspelt {
                 node: EditNode("p".to_owned()),
-                span: Span::new(0, 3),
+                span: WordSpan::new(0, 3),
                 word: "teh".to_owned(),
             },
             at: Point {

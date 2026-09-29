@@ -9,7 +9,7 @@ use crate::core::colour::contrast::ratio;
 use crate::core::colour::fit::{js_round, oklch_hex as hex};
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::accent_band::{
-    band::{AccentPick, Hue, Weight},
+    band::{AccentPick, BandWeight, Hue},
     derive::accent_roles,
     picked::BAND,
     roles::AccentRoles,
@@ -232,7 +232,7 @@ fn space_accent(hue: f64, chroma: f64, scheme: Scheme) -> AccentRoles {
     let weight = (chroma.clamp(0.0, 1.0) * 1000.0).round() as u16;
     let pick = AccentPick {
         hue: Hue(degrees),
-        weight: Weight(weight),
+        weight: BandWeight(weight),
     };
     accent_roles(&BAND, pick, scheme)
 }

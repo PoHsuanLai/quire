@@ -6,8 +6,8 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, Composition, DataAttr, DataName, Ds, EditFocus, EditHandle, EditInput, EditPointer,
-    EditSurface, Extend, ExtraClass, ImeSwitch, Key, KeyInput, Material, Point, PointerPhase,
-    Probe, Px, TextPosition, use_edit_handle,
+    EditSurface, Extend, ExtraClass, ImeSwitch, KeyInput, Material, Point, PointerPhase, Probe, Px,
+    ShortcutKey, TextPosition, use_edit_handle,
 };
 use ds_native::{Harness, Viewport};
 use std::cell::RefCell;
@@ -214,7 +214,12 @@ fn home_end_and_delete_reach_the_app() {
     let mut harness = fresh();
     harness.click(centre(&harness, "#one"));
     drain(&INPUT);
-    for key in [Key::Home, Key::End, Key::Delete, Key::PageDown] {
+    for key in [
+        ShortcutKey::Home,
+        ShortcutKey::End,
+        ShortcutKey::Delete,
+        ShortcutKey::PageDown,
+    ] {
         harness.key(key);
     }
     let keys: Vec<dioxus::prelude::Key> = drain(&INPUT)
@@ -226,7 +231,7 @@ fn home_end_and_delete_reach_the_app() {
         .collect();
     use dioxus::prelude::Key as K;
     assert_eq!(keys, vec![K::Home, K::End, K::Delete, K::PageDown]);
-    harness.chord(&[Key::Shift], Key::Insert);
+    harness.chord(&[ShortcutKey::Shift], ShortcutKey::Insert);
     assert!(matches!(
         drain(&INPUT).as_slice(),
         [] | [EditInput::Paste(_)]

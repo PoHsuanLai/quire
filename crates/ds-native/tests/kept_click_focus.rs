@@ -9,9 +9,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Disclosure, Ds, Focus, HoverStrip, Icon, IconButton, IconButtonVariant,
-    InputVariant, Key, Material, Press, Shown, StripAction, TextInput, TreeItem, TreeShape,
-    use_focus_request,
+    ActionId, Appearance, Disclosure, Ds, FieldFocus, HoverStrip, Icon, IconButton,
+    IconButtonVariant, InputVariant, Material, Press, ShortcutKey, Shown, StripAction, TextInput,
+    TreeItem, TreeShape, use_focus_request,
 };
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
@@ -108,7 +108,7 @@ fn pressed_focuses(selector: &str, logged: &str, focused: &str) {
     assert!(!harness.is_focused("html"), "the keyboard is not on html");
     harness.advance(Duration::from_millis(100));
     assert!(harness.is_focused(focused), "{focused} kept the keyboard");
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(
         harness.text_of(".log").as_deref(),
         Some(format!("{logged},key:j").as_str()),
@@ -181,7 +181,7 @@ fn Renaming() -> Element {
                         on_toggle: move |_| note("toggle:projects"),
                         editing: rsx! {
                             TextInput { variant: InputVariant::Bare, label: "Rename folder", value: "Projects",
-                                focus: Focus::Controlled(request),
+                                focus: FieldFocus::Controlled(request),
                                 oninput: |_: String| {},
                             }
                         },

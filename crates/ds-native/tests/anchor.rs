@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, Button, ButtonVariant, Ds, Material, Menu, MenuEntry,
-    MenuKind, MountedRef, Rect, Switch, Trail,
+    MenuKind, MenuTrail, MountedRef, Rect, Switch,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -44,7 +44,7 @@ fn Anchored() -> Element {
             title: title.into(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
         })
         .collect::<Vec<_>>();

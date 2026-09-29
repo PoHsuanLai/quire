@@ -8,7 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, HostWindow, Key, Material, Maximized, Point, Px, ResizeEdge, Support,
+    Appearance, Ds, HostWindow, Material, Maximized, Point, Px, ResizeEdge, ShortcutKey, Support,
     TileError, TrafficLights, WindowFrame, WindowState, WindowTile, Zoom, use_window_host_provider,
 };
 use ds_native::{Harness, Viewport};
@@ -319,19 +319,19 @@ fn a_maximized_window_neither_moves_nor_resizes_and_its_green_light_restores() {
 #[test]
 fn the_lights_take_tab_arrow_down_opens_the_menu_and_escape_closes_it() {
     let mut harness = start(Normal);
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     assert!(
         harness.is_focused(".ds-light[*|data-light=close]"),
         "{}",
         harness.html()
     );
-    harness.key(Key::Tab);
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
+    harness.key(ShortcutKey::Tab);
     assert!(harness.is_focused(".ds-light[*|data-light=zoom]"));
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(60));
     assert_eq!(harness.count(".ds-menu"), 1);
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-menu"), 0);
     assert_eq!(log(&harness), "");

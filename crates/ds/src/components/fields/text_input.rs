@@ -5,8 +5,8 @@ use crate::components::fields::text_input_parts::{Field, Handlers, area, file, l
 use crate::core::vocab::Availability;
 use dioxus::prelude::*;
 
-use crate::components::fields::text_input_focus::FieldFocus;
-use crate::components::fields::{text_input_focus::Focus, text_input_kind::TextInputKind};
+use crate::components::fields::text_input_focus::FieldFocuser;
+use crate::components::fields::{text_input_focus::FieldFocus, text_input_kind::TextInputKind};
 use crate::focus::field::FieldHandle;
 use crate::focus::targets::Told;
 
@@ -71,7 +71,7 @@ pub fn TextInput(
     #[props(default)] availability: Availability,
     oninput: EventHandler<String>,
     #[props(default)] onkey: EventHandler<KeyboardEvent>,
-    #[props(default)] focus: Focus,
+    #[props(default)] focus: FieldFocus,
     #[props(default)] kind: TextInputKind,
     #[props(default)] onfocus: EventHandler<()>,
     #[props(default)] onblur: EventHandler<()>,
@@ -79,10 +79,10 @@ pub fn TextInput(
     #[props(default)] on_pick: EventHandler<()>,
     #[props(default)] handle: Option<FieldHandle>,
 ) -> Element {
-    let focuser = FieldFocus::use_new(handle);
+    let focuser = FieldFocuser::use_new(handle);
     let caret = MaskCaret::use_new();
     let mut typed = use_signal(String::new);
-    if let Focus::Controlled(request) = focus {
+    if let FieldFocus::Controlled(request) = focus {
         focuser.follow(request, onfocus);
     }
     let text = held(kind, value, typed);

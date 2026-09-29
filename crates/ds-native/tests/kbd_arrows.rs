@@ -1,6 +1,6 @@
 //! A Small key cap's Left and Right arrows are arrows, not dashes.
 //! The arrows the font subset now draws are real arrows but only ~4 px
-//! of ink, still close to a dash. `data-glyph="arrow"` (`Key::glyph_kind`) draws Up, Down, Left
+//! of ink, still close to a dash. `data-glyph="arrow"` (`ShortcutKey::glyph_kind`) draws Up, Down, Left
 //! and Right at `--fs-control` with a tighter line-height, so the ink is at least 7 px wide
 //! while the cap's own box (padding and border drive its height, not the glyph) stays the
 //! height every other Small cap already has.
@@ -15,7 +15,7 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Kbd, KbdSize, Key, Material, Shortcut};
+use ds::{Appearance, Ds, Kbd, KbdSize, Material, Shortcut, ShortcutKey};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, modal, rect};
@@ -32,11 +32,11 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)]
 fn Page() -> Element {
     let keys = [
-        ("left", Key::Left),
-        ("right", Key::Right),
-        ("up", Key::Up),
-        ("down", Key::Down),
-        ("plain", Key::Char('t')),
+        ("left", ShortcutKey::Left),
+        ("right", ShortcutKey::Right),
+        ("up", ShortcutKey::Up),
+        ("down", ShortcutKey::Down),
+        ("plain", ShortcutKey::Char('t')),
     ];
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,

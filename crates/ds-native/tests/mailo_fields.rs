@@ -3,7 +3,9 @@
 //! field gains a row per line typed (a fixed one does not); a file field asks the host to pick.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Grow, InputVariant, Key, Material, Rows, TextInput, TextInputKind};
+use ds::{
+    Appearance, Ds, Grow, InputVariant, Material, Rows, ShortcutKey, TextInput, TextInputKind,
+};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -21,8 +23,8 @@ fn ms(n: u64) -> Duration {
 fn type_text(harness: &mut Harness, text: &str) {
     for c in text.chars() {
         let key = match c {
-            '\n' => Key::Enter,
-            c => Key::Char(c),
+            '\n' => ShortcutKey::Enter,
+            c => ShortcutKey::Char(c),
         };
         harness.key(key);
         harness.advance(ms(20));
@@ -74,7 +76,7 @@ fn a_secret_is_typed_and_heard_but_never_written_into_the_markup() {
     assert!(!field_markup.contains("abc"), "{field_markup}");
 
     assert_eq!(harness.text_of(".changed").as_deref(), Some(""));
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(30));
     assert_eq!(
         harness.text_of(".changed").as_deref(),

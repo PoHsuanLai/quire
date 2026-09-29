@@ -11,7 +11,7 @@ mod month_sample;
 
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
-use ds::{Appearance, DayKey, Ds, Inject, Material, MonthGrid, Step, Theme, WeekNumbers};
+use ds::{Appearance, DayKey, Ds, Inject, Material, MonthGrid, MonthStep, Theme, WeekNumbers};
 use month_sample::{First, SEPTEMBER, sample};
 
 /// One specimen.
@@ -44,7 +44,7 @@ fn Specimen(props: CaseProps) -> Element {
     };
     let onstep = match props.case {
         Case::Plain => None,
-        Case::WeekNumbers | Case::Pressable => Some(EventHandler::new(|_: Step| {})),
+        Case::WeekNumbers | Case::Pressable => Some(EventHandler::new(|_: MonthStep| {})),
     };
     let onpick = match props.case {
         Case::Plain | Case::WeekNumbers => None,

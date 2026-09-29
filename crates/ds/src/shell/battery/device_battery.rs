@@ -6,7 +6,7 @@
 //! percentage restated is no moment (R2); Reduced shows the level at once (R7). While charging,
 //! the bolt fades in once the sweep has landed.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
 use crate::motion::detail::{
     count_up::{CountPace, use_count_up},
@@ -18,7 +18,7 @@ use crate::motion::detail::{
     use_detail::use_detail,
 };
 use crate::shell::battery::level::{BOLT, RingLayer, RingMark, RingTone, given, percent_of, ring};
-use crate::shell::battery::ring::{Span, arc_path};
+use crate::shell::battery::ring::{RingSpan, arc_path};
 use dioxus::prelude::*;
 
 /// What a device's battery shows: the whole percent and the mark (R2).
@@ -50,7 +50,7 @@ impl Detailed for Reading {
 pub fn DeviceBattery(
     level: Fraction,
     #[props(default)] mark: RingMark,
-    #[props(into)] label: Text,
+    #[props(into)] label: TextLine,
     #[props(default)] first: FirstShow,
     children: Element,
 ) -> Element {
@@ -68,8 +68,8 @@ pub fn DeviceBattery(
     )
     .shown();
     let span = match mark {
-        RingMark::Plain => Span::FULL,
-        RingMark::Charging => Span::GAPPED,
+        RingMark::Plain => RingSpan::FULL,
+        RingMark::Charging => RingSpan::GAPPED,
     };
     let landed = sweep.tween().landed();
     rsx! {

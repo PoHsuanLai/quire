@@ -6,8 +6,8 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    Anchor, Appearance, Ds, Flow, Key, Material, Menu, MenuEntry, MenuKind, MenuRow, PickDismiss,
-    Point, Px,
+    Anchor, Appearance, Ds, Flow, Material, Menu, MenuEntry, MenuKind, MenuRow, PickDismiss, Point,
+    Px, ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -139,13 +139,13 @@ fn a_stay_pick_toggles_the_check_and_keeps_the_menu_and_its_cursor() {
     // Blitz clears the focus at the end of a click; the menu takes it back, for the keys.
     assert!(harness.is_focused(".ds-menu"), "the menu kept the keyboard");
     // Enter picks the row under the cursor, which stayed on Travel.
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(100));
     assert_eq!(log(&harness), "pick:1,pick:1,pick:1");
     assert_eq!(checked(&harness, 2).as_deref(), Some("true"));
     assert_eq!(harness.count(".ds-menu"), 1);
     // Escape still closes, after its fade.
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     harness.advance(ms(300));
     assert_eq!(log(&harness), "pick:1,pick:1,pick:1,close");
     assert_eq!(harness.count(".ds-menu"), 0);
@@ -195,7 +195,7 @@ fn an_inline_menu_stands_in_its_card_off_the_overlay() {
         "{first:?} in {card:?}"
     );
     // Escape is the caller's: nothing closes.
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     harness.advance(ms(300));
     assert_eq!(log(&harness), "");
     harness.click(row(&harness, 3));

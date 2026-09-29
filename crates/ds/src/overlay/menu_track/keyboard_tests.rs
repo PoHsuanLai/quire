@@ -2,7 +2,7 @@
 //! open (`MenuTrack::open`), where the Menu's submenus are driven by this machine.
 
 use crate::overlay::menu_track::types::{
-    Held, ItemPath, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent,
+    ItemPath, MenuHold, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent,
     Submenu,
 };
 use std::sync::LazyLock;
@@ -50,7 +50,7 @@ fn an_open_tracker_is_in_click_mode() {
     let MenuPhase::Tracking(session) = &track.phase else {
         panic!("expected an open menu");
     };
-    assert_eq!(session.held, Held::Released);
+    assert_eq!(session.held, MenuHold::Released);
 }
 
 #[test]

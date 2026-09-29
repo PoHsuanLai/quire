@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AppMark, Appearance, Ds, Icon, IconSource, Material, Motion, MotionLevel,
-    NotificationCard, Point, Px, StaggerIndex, Swipe, settle,
+    NotificationCard, NotificationSwipe, Point, Px, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -38,7 +38,7 @@ fn Card() -> Element {
                     body: "The notes run longer than the memoir.",
                     on_close: |_| LOG.write().push("close".to_owned()),
                     on_open: |_| LOG.write().push("open".to_owned()),
-                    swipe: Swipe::Dismiss(EventHandler::new(|()| LOG.write().push("dismiss".to_owned()))),
+                    swipe: NotificationSwipe::Dismiss(EventHandler::new(|()| LOG.write().push("dismiss".to_owned()))),
                 }
             }
             p { class: "log", {LOG().join(",")} }

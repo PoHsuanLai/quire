@@ -10,9 +10,9 @@ pub struct ItemPath(pub Vec<u16>);
 
 /// Whether the button that opened the menu is still down.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Held {
+pub enum MenuHold {
     /// Down: a release picks, or closes (press-drag-release).
-    Held,
+    MenuHold,
     /// Released on the title: click mode, the menu stays open.
     Released,
 }
@@ -106,7 +106,7 @@ pub struct Session<K> {
     /// The open menu.
     pub menu: K,
     /// Whether the opening press is still down.
-    pub held: Held,
+    pub held: MenuHold,
     /// Whether the pointer has been inside the menu.
     pub entered: Entered,
     /// The highlighted item (always a pickable one).

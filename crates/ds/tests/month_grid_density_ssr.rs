@@ -13,7 +13,7 @@ mod month_sample;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
-    Appearance, Ds, Inject, Material, MonthDensity, MonthGrid, RootChrome, Step, WeekNumbers,
+    Appearance, Ds, Inject, Material, MonthDensity, MonthGrid, MonthStep, RootChrome, WeekNumbers,
     WidgetFrame, WidgetMetrics, WidgetSize,
 };
 use month_sample::{AUGUST, First, sample};
@@ -49,7 +49,7 @@ fn grid(density: MonthDensity) -> Element {
             data: sample(AUGUST, First::Monday),
             weeks: WeekNumbers::Show,
             density,
-            onstep: EventHandler::new(|_: Step| {}),
+            onstep: EventHandler::new(|_: MonthStep| {}),
         }
     }
 }

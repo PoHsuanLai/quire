@@ -9,8 +9,8 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, Button, ButtonVariant, Ds, ExternalIcon, IconButton,
-    IconButtonVariant, IconSize, IconSource, IconUrl, IconView, Key, Material, Menu, MenuEntry,
-    MenuKind, Point, PointerButton, Press, Px, Theme, Trail,
+    IconButtonVariant, IconSize, IconSource, IconUrl, IconView, Material, Menu, MenuEntry,
+    MenuKind, MenuTrail, Point, PointerButton, Press, Px, ShortcutKey, Theme,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -208,7 +208,7 @@ fn item(value: u8, title: &str, availability: Availability) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability,
     }
@@ -276,13 +276,13 @@ fn a_disabled_item_is_skipped_by_down_and_ignores_a_click() {
         Some("true")
     );
     assert_eq!(selected(&harness), "Open");
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     assert_eq!(
         selected(&harness),
         "Quit",
         "Down skipped the disabled Pause"
     );
-    harness.key(Key::Up);
+    harness.key(ShortcutKey::Up);
     assert_eq!(selected(&harness), "Open", "Up skipped it too");
     let disabled = centre(&harness, ".ds-menu-item[*|aria-disabled=true]");
     harness.click(disabled);
@@ -341,7 +341,7 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
         (sub.origin.y.0 - (row.origin.y.0 - 5.0)).abs() <= 1.0,
         "the submenu's top is the parent row's top less 5: {sub:?} for {row:?}"
     );
-    harness.key(Key::Left);
+    harness.key(ShortcutKey::Left);
     assert_eq!(harness.count(SUBMENU), 0, "Left closed the submenu");
     assert_eq!(harness.count(".ds-menu"), 1, "and only the submenu");
 }
@@ -351,10 +351,10 @@ fn right_opens_the_submenu_at_once_and_its_item_picks() {
     let mut harness = Harness::new(MenuApp, VIEW);
     harness.advance(ms(80));
     for _ in 0..2 {
-        harness.key(Key::Down);
+        harness.key(ShortcutKey::Down);
     }
     assert_eq!(selected(&harness), "More");
-    harness.key(Key::Right);
+    harness.key(ShortcutKey::Right);
     harness.advance(ms(120));
     assert_eq!(
         harness.count(SUBMENU),
@@ -362,8 +362,8 @@ fn right_opens_the_submenu_at_once_and_its_item_picks() {
         "Right opened it without the delay"
     );
     // The keyboard opened it, so it has the focus: Down moves inside it, Enter picks.
-    harness.key(Key::Down);
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Down);
+    harness.key(ShortcutKey::Enter);
     assert_eq!(harness.text_of(".picked").as_deref(), Some("11"));
     assert_eq!(
         harness.count(".ds-menu"),
@@ -377,21 +377,21 @@ fn escape_in_a_keyboard_submenu_closes_one_level() {
     let mut harness = Harness::new(MenuApp, VIEW);
     harness.advance(ms(80));
     for _ in 0..2 {
-        harness.key(Key::Down);
+        harness.key(ShortcutKey::Down);
     }
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(120));
     assert_eq!(
         harness.count(SUBMENU),
         1,
         "Enter on a parent opens its submenu"
     );
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     assert_eq!(harness.count(SUBMENU), 0, "Escape closed the submenu");
     assert_eq!(harness.count(".ds-menu"), 1, "the menu stays");
     // The menu takes the focus back a frame later.
     harness.advance(ms(80));
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     // It fades out first (`Anim::MenuOut`, bar gaps), then closes.
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),

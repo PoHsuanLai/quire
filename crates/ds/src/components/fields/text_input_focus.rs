@@ -10,7 +10,7 @@ use std::rc::Rc;
 
 /// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
-pub enum Focus {
+pub enum FieldFocus {
     /// As soon as it is mounted: the palette's input, the bubble's link field.
     OnMount,
     /// Only when the user or the consumer puts it there.
@@ -21,25 +21,25 @@ pub enum Focus {
     Controlled(FocusRequest),
 }
 
-impl Focus {
+impl FieldFocus {
     /// What the field does with its text when the focus lands: a controlled request's choice.
     fn landing(self) -> Landing {
         match self {
-            Focus::Controlled(request) => request.landing(),
-            Focus::OnMount | Focus::Manual => Landing::Leave,
+            FieldFocus::Controlled(request) => request.landing(),
+            FieldFocus::OnMount | FieldFocus::Manual => Landing::Leave,
         }
     }
 
     /// Whether the field takes the focus as it mounts.
     pub(crate) fn on_mount(self) -> bool {
-        matches!(self, Focus::OnMount | Focus::Controlled(_))
+        matches!(self, FieldFocus::OnMount | FieldFocus::Controlled(_))
     }
 }
 
 /// The field's element, the last focus ticket it served, and where a focus from outside finds
 /// it (its caller's [`FieldHandle`] and the document's [`FocusTargets`]).
 #[derive(Clone)]
-pub(crate) struct FieldFocus {
+pub(crate) struct FieldFocuser {
     element: CopyValue<Option<Rc<MountedData>>>,
     served: CopyValue<FocusTicket>,
     handle: Option<FieldHandle>,
@@ -47,7 +47,7 @@ pub(crate) struct FieldFocus {
     owner: ScopeId,
 }
 
-impl FieldFocus {
+impl FieldFocuser {
     /// The hook: one per field, kept across renders; the field leaves the document's targets as
     /// it unmounts.
     pub(crate) fn use_new(handle: Option<FieldHandle>) -> Self {
@@ -55,7 +55,7 @@ impl FieldFocus {
         let owner = use_hook(dioxus::core::current_scope_id);
         let leaving = targets.clone();
         use_drop(move || leaving.leave(owner));
-        FieldFocus {
+        FieldFocuser {
             element: use_hook(|| CopyValue::new(None)),
             served: use_hook(|| CopyValue::new(FocusTicket::default())),
             handle,
@@ -67,7 +67,7 @@ impl FieldFocus {
     /// Keep the element, hand it to the caller's handle and the document's targets, and take
     /// the focus if the field asks for it on mount. Focus goes through `focus_soon`, which waits
     /// out a document the renderer holds.
-    pub(crate) fn mounted(&self, focus: Focus, event: &MountedEvent, told: Told) {
+    pub(crate) fn mounted(&self, focus: FieldFocus, event: &MountedEvent, told: Told) {
         let mut element = self.element;
         let mut served = self.served;
         element.set(Some(event.data()));
@@ -80,7 +80,7 @@ impl FieldFocus {
             handle.fill(target.clone());
         }
         self.targets.enter(target);
-        if let Focus::Controlled(request) = focus {
+        if let FieldFocus::Controlled(request) = focus {
             served.set(request.peek());
         }
         if focus.on_mount() {

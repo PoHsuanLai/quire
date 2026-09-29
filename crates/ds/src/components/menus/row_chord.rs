@@ -61,11 +61,11 @@ pub(crate) fn shown_chord(chord: &RowChord, selection: Selection) -> Option<&Sho
 #[cfg(test)]
 mod tests {
     use super::{RowChord, shown_chord};
-    use crate::core::vocab::{Key, Selection, Shortcut};
+    use crate::core::vocab::{Selection, Shortcut, ShortcutKey};
 
     #[test]
     fn a_chord_shows_by_its_rule() {
-        let keys = Shortcut(vec![Key::Super, Key::Char('r')]);
+        let keys = Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')]);
         let cases = [
             (
                 "selected rule, selected",

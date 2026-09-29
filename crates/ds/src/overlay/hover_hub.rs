@@ -14,7 +14,7 @@ use crate::motion::hover_intent::{
     HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase,
 };
 use crate::motion::settle::settle;
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
@@ -52,7 +52,7 @@ pub struct HoverHub {
     open_timer: Signal<Option<Task>>,
     close_timer: Signal<Option<Task>>,
     warm_tick: Signal<u32>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     scope: ScopeId,
 }
 
@@ -174,7 +174,7 @@ fn stop(timer: Signal<Option<Task>>) -> Result<(), Gone> {
 }
 
 /// A new hub for `Ds` to provide, timing `hc-out` at the root's motion level.
-pub(crate) fn use_hover_hub_provider(env: Signal<Env>) -> HoverHub {
+pub(crate) fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
     let scope = use_hook(current_scope_id);
     use_context_provider(|| HoverHub {
         intent: Signal::new(HoverIntent::default()),

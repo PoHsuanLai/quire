@@ -17,8 +17,8 @@ use crate::core::vocab::{Availability, Fraction};
 use crate::host::measure::client_rect;
 use crate::motion::{anim::Anim, pulse::use_pulse};
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::use_env;
 use crate::style::icon::render::IconSize;
+use crate::style::scope::use_scope;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -43,7 +43,7 @@ pub fn LevelControl(
 ) -> Element {
     let value = value.clamped();
     let (glyph, glyph_level) = glyph.drawn(value);
-    let rubber = match use_env().resolved.motion {
+    let rubber = match use_scope().resolved.motion {
         MotionLevel::Reduced => Rubber::Off,
         MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Rubber::On,
     };

@@ -8,7 +8,7 @@
 //! [`Widget::size_in`], which a host narrows per kind with [`WidgetRegistry::sized`] (sill's
 //! `size_of`, `widgets.sizes`), so Edit Widgets previews and adds that one size.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::shell::widget::battery::BatteryWidget;
 use crate::shell::widget::calendar::MonthWidget;
 use crate::shell::widget::card::WidgetCard;
@@ -24,9 +24,9 @@ pub struct WidgetInfo {
     /// Its kind.
     pub kind: WidgetKind,
     /// Its name in a picker.
-    pub name: Text,
+    pub name: TextLine,
     /// Its one line in a picker.
-    pub description: Text,
+    pub description: TextLine,
     /// The sizes it draws.
     pub sizes: &'static [WidgetSize],
     hosts: HostSizes,

@@ -14,8 +14,8 @@ pub(crate) mod density;
 pub(crate) mod header;
 pub(crate) mod weeks;
 
-use crate::components::content::text_runs::{Text, text};
-use crate::shell::month_grid::data::{DayKey, MonthGridData, MonthKey, Step, WeekNumbers};
+use crate::components::content::text_runs::{TextLine, text};
+use crate::shell::month_grid::data::{DayKey, MonthGridData, MonthKey, MonthStep, WeekNumbers};
 use crate::shell::month_grid::density::{Drawn, MonthDensity};
 use crate::shell::month_grid::header::header;
 use crate::shell::month_grid::weeks::{MonthSlide, MonthWeeks};
@@ -24,7 +24,7 @@ use dioxus::prelude::*;
 
 /// A month. `data` is the month as the shell laid it out; `weeks` whether each row leads with
 /// its ISO week. With `onstep` the header ends in the previous and next buttons, which call it
-/// with their `Step`; without it the header is the title alone. With `onpick` every day is a
+/// with their `MonthStep`; without it the header is the title alone. With `onpick` every day is a
 /// `button` that calls it with the day's key; without it the days are plain text.
 ///
 /// Changing `data.month` slides the new month's weeks in once: from the right for a later
@@ -45,7 +45,7 @@ pub fn MonthGrid(
     data: MonthGridData,
     #[props(default)] weeks: WeekNumbers,
     #[props(default)] density: MonthDensity,
-    #[props(default)] onstep: Option<EventHandler<Step>>,
+    #[props(default)] onstep: Option<EventHandler<MonthStep>>,
     #[props(default)] onpick: Option<EventHandler<DayKey>>,
 ) -> Element {
     let slide = use_month_slide(data.month);
@@ -76,7 +76,7 @@ pub fn MonthGrid(
 }
 
 /// The weekday heads, behind an empty week-number cell when the numbers show.
-fn heads(heads: &[Text; 7], weeks: WeekNumbers) -> Element {
+fn heads(heads: &[TextLine; 7], weeks: WeekNumbers) -> Element {
     rsx! {
         div { class: "ds-month-row", "data-row": "heads",
             if weeks == WeekNumbers::Show {

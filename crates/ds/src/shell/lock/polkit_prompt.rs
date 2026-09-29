@@ -4,11 +4,11 @@
 //! card, the password in a boxed `Secret` field that shakes once when it was wrong, then Cancel
 //! and Authenticate.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::fields::{
     text_input::{InputVariant, TextInput},
-    text_input_focus::Focus,
+    text_input_focus::FieldFocus,
     text_input_kind::TextInputKind,
 };
 use crate::components::overlays::scrim_strength::ScrimStrength;
@@ -39,8 +39,8 @@ const AUTHENTICATE: &str = "Authentication Required";
 /// sheet's panel, for a host whose blur region resolves an element id.
 #[component]
 pub fn PolkitPrompt(
-    #[props(into)] action: Text,
-    #[props(default)] detail: Option<Text>,
+    #[props(into)] action: TextLine,
+    #[props(default)] detail: Option<TextLine>,
     #[props(default)] title: Option<String>,
     user: LockUser,
     #[props(default)] state: PromptState,
@@ -137,7 +137,7 @@ fn field(
                     value: "",
                     placeholder: "Password",
                     availability,
-                    focus: Focus::OnMount,
+                    focus: FieldFocus::OnMount,
                     oninput: move |next: String| entry.input(next),
                     onkey: move |event: KeyboardEvent| {
                         if event.key() == Key::Enter {

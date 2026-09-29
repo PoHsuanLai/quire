@@ -9,8 +9,8 @@ mod spell_dict;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, EditInput, EditSurface, Key, KeyInput, Lang, Material, Point, PointerButton,
-    Px, RootExtent, Spell, SpellReplace, TextPosition,
+    Appearance, Ds, EditInput, EditSurface, KeyInput, Lang, Material, Point, PointerButton, Px,
+    RootExtent, ShortcutKey, Spell, SpellReplace, TextPosition,
 };
 use ds_native::harness::settle_until;
 use ds_native::spell::{SpellConfig, provide_with};
@@ -125,8 +125,8 @@ fn fresh(name: &str) -> Harness {
 fn type_text(harness: &mut Harness, text: &str) {
     for c in text.chars() {
         match c {
-            ' ' => harness.key(Key::Space),
-            c => harness.key(Key::Char(c)),
+            ' ' => harness.key(ShortcutKey::Space),
+            c => harness.key(ShortcutKey::Char(c)),
         }
     }
 }
@@ -223,7 +223,7 @@ fn a_picked_suggestion_replaces_the_word_and_undo_restores_it() {
     harness.click(first);
     settle_until(&mut harness, |h| paragraph(h) == "the cat");
     settle_until(&mut harness, |h| marks(h) == 0 && h.is_focused("#editor"));
-    harness.chord(&[Key::Ctrl], Key::Char('z'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('z'));
     settle_until(&mut harness, |h| paragraph(h) == "teh cat");
     settle_until(&mut harness, |h| marks(h) == 1);
 }
@@ -252,9 +252,9 @@ fn the_context_menu_key_on_a_marked_word_learns_it() {
     type_text(&mut harness, "teh cat");
     settle_until(&mut harness, |h| marks(h) == 1);
     for _ in 0..5 {
-        harness.key(Key::Left);
+        harness.key(ShortcutKey::Left);
     }
-    harness.key(Key::ContextMenu);
+    harness.key(ShortcutKey::ContextMenu);
     menu_open(&mut harness);
     let learn = menu_row(&harness, "Learn Spelling");
     harness.click(learn);

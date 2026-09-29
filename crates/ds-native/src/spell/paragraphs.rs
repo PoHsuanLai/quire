@@ -4,7 +4,7 @@
 
 use crate::edit_tree::{is_hidden, mark_of};
 use blitz_dom::{BaseDocument, NodeId};
-use ds::{EditKind, Paragraph, Span};
+use ds::{EditKind, Paragraph, WordSpan};
 
 /// Elements whose text is code, not prose.
 const CODE: &[&str] = &["code", "pre", "kbd", "samp", "tt", "var"];
@@ -60,7 +60,9 @@ fn own(doc: &BaseDocument, parent: NodeId, prose: Prose, paragraph: &mut Paragra
             let start = paragraph.text.len();
             paragraph.text.push_str(&text.content);
             if prose == Prose::Code {
-                paragraph.skips.push(Span::new(start, paragraph.text.len()));
+                paragraph
+                    .skips
+                    .push(WordSpan::new(start, paragraph.text.len()));
             }
         } else if mark_of(child_node).is_none() && !is_hidden(child_node) {
             let inner = match prose {

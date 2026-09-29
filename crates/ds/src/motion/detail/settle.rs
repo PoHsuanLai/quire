@@ -7,7 +7,7 @@ use crate::motion::pulse_key::PulseKey;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SettleStyle {
     /// A level glyph fills cumulatively once to its true value, one layer per `--t-pending-step`.
-    Fill(super::pending::Layers),
+    Fill(super::pending::PendingLayers),
     /// A check draws on over `--t-move`, holds `SettleHold`, and goes.
     Check,
     /// The element seals: `gulp`'s shape once, the spring only on `Touch::Contact` (R5).

@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Fraction, Level, LevelGlyph, Material, MotionLevel, Muting, Osd,
+    Anim, Appearance, Ds, Fraction, LevelGlyph, Material, MotionLevel, Muting, Osd, OsdLevel,
     RootChrome, Shown, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
@@ -28,7 +28,7 @@ fn Card() -> Element {
             Osd {
                 shown: SHOWN(),
                 label: "Sound",
-                level: Level { value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible) },
+                level: OsdLevel { value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible) },
                 on_hidden: move |()| *HIDDEN.write() += 1,
             }
         }

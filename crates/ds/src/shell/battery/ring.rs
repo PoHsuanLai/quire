@@ -21,30 +21,30 @@ pub const GAP: f32 = 29.0;
 /// Where the ring may be drawn: all the way round, or round from the gap's far side to its
 /// near side while charging.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Span {
+pub struct RingSpan {
     /// The start, in degrees clockwise from twelve.
     pub from: f32,
     /// How far round it goes, in degrees.
     pub sweep: f32,
 }
 
-impl Span {
+impl RingSpan {
     /// The whole circle.
-    pub const FULL: Span = Span {
+    pub const FULL: RingSpan = RingSpan {
         from: 0.0,
         sweep: 360.0,
     };
 
     /// The circle less the bolt's gap at twelve.
-    pub const GAPPED: Span = Span {
+    pub const GAPPED: RingSpan = RingSpan {
         from: GAP / 2.0,
         sweep: 360.0 - GAP,
     };
 
     /// The part of this span a `level` fills, from its start.
-    pub fn filled(self, level: Fraction) -> Span {
+    pub fn filled(self, level: Fraction) -> RingSpan {
         let share = f32::from(level.clamped().0) / 1000.0;
-        Span {
+        RingSpan {
             from: self.from,
             sweep: self.sweep * share,
         }
@@ -61,7 +61,7 @@ fn point(degrees: f32) -> String {
 
 /// The SVG path of `span` on the ring's circle. A whole circle is two half arcs (one arc cannot
 /// end where it starts); an empty span is no path.
-pub fn arc_path(span: Span) -> Option<String> {
+pub fn arc_path(span: RingSpan) -> Option<String> {
     if span.sweep <= 0.0 {
         return None;
     }
@@ -83,49 +83,49 @@ pub fn arc_path(span: Span) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Span, arc_path};
+    use super::{RingSpan, arc_path};
     use crate::core::vocab::Fraction;
 
     #[test]
     fn an_arc_fills_its_share_of_the_span() {
         let cases = [
-            (Span::FULL, 0, 0.0),
-            (Span::FULL, 500, 180.0),
-            (Span::FULL, 1000, 360.0),
-            (Span::FULL, 1500, 360.0),
-            (Span::GAPPED, 1000, 331.0),
-            (Span::GAPPED, 0, 0.0),
+            (RingSpan::FULL, 0, 0.0),
+            (RingSpan::FULL, 500, 180.0),
+            (RingSpan::FULL, 1000, 360.0),
+            (RingSpan::FULL, 1500, 360.0),
+            (RingSpan::GAPPED, 1000, 331.0),
+            (RingSpan::GAPPED, 0, 0.0),
         ];
         for (span, permille, want) in cases {
             let got = span.filled(Fraction(permille)).sweep;
             assert!((got - want).abs() < 0.01, "{permille}: {got} != {want}");
         }
-        assert_eq!(Span::GAPPED.filled(Fraction(400)).from, 14.5);
+        assert_eq!(RingSpan::GAPPED.filled(Fraction(400)).from, 14.5);
     }
 
     #[test]
     fn paths_start_at_twelve_and_turn_clockwise() {
         let cases = [
             (
-                Span {
+                RingSpan {
                     from: 0.0,
                     sweep: 90.0,
                 },
                 Some("M50.00 4.65A45.35 45.35 0 0 1 95.35 50.00"),
             ),
             (
-                Span {
+                RingSpan {
                     from: 0.0,
                     sweep: 270.0,
                 },
                 Some("M50.00 4.65A45.35 45.35 0 1 1 4.65 50.00"),
             ),
             (
-                Span::FULL,
+                RingSpan::FULL,
                 Some("M50.00 4.65A45.35 45.35 0 0 1 50.00 95.35A45.35 45.35 0 0 1 50.00 4.65Z"),
             ),
             (
-                Span {
+                RingSpan {
                     from: 0.0,
                     sweep: 0.0,
                 },

@@ -11,8 +11,8 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
     FrameVars, Grain, Hex, Icon, IconButton, IconButtonVariant, Material, Menu, MenuEntrance,
-    MenuEntry, MenuKind, MotionLevel, PRESETS, Placement, Point, Popover, Px, RootChrome, Scheme,
-    Side, SpaceLook, StatusMetrics, Theme, Tile, Trail, derive,
+    MenuEntry, MenuKind, MenuTile, MenuTrail, MotionLevel, PRESETS, Placement, Point, Popover, Px,
+    RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
 use ds_native::{Backdrop, Harness, Viewport};
 use image::RgbaImage;
@@ -209,8 +209,8 @@ fn entries() -> Vec<MenuEntry<u8>> {
             value: value as u8,
             title: title.to_owned(),
             detail: None,
-            tile: None::<Tile>,
-            trail: Trail::None,
+            tile: None::<MenuTile>,
+            trail: MenuTrail::None,
             check: None,
             availability: ds::Availability::Enabled,
         })

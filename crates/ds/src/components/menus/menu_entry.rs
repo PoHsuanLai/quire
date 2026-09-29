@@ -5,7 +5,7 @@
 
 use crate::components::content::avatar::AvatarFace;
 use crate::components::content::icon_source::IconSource;
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::components::menus::row_action::RowAction;
 use crate::components::menus::row_chord::RowChord;
 use crate::components::menus::row_shape::RowShape;
@@ -14,7 +14,7 @@ use crate::style::icon::Icon;
 
 /// The tile at an item's start.
 #[derive(Debug, Clone, PartialEq)]
-pub enum Tile {
+pub enum MenuTile {
     /// A glyph.
     Icon(Icon),
     /// Any icon source: an app's icon file (drawn as it is, filling the tile, with no plate of
@@ -28,7 +28,7 @@ pub enum Tile {
 
 /// What trails an item.
 #[derive(Debug, Clone, PartialEq, Default)]
-pub enum Trail {
+pub enum MenuTrail {
     /// Nothing.
     #[default]
     None,
@@ -50,9 +50,9 @@ pub enum MenuEntry<T> {
         /// One line of help.
         detail: Option<String>,
         /// Its tile.
-        tile: Option<Tile>,
+        tile: Option<MenuTile>,
         /// Its trail.
-        trail: Trail,
+        trail: MenuTrail,
         /// Its check mark, for a menu of toggles.
         check: Option<Check>,
         /// Whether it can be picked. A disabled item is drawn at .35 opacity, skipped by the
@@ -66,7 +66,7 @@ pub enum MenuEntry<T> {
         /// Its name.
         title: String,
         /// Its tile.
-        tile: Option<Tile>,
+        tile: Option<MenuTile>,
         /// Whether it opens. A disabled one is drawn and skipped as a disabled item is.
         availability: Availability,
         /// What the submenu lists; a picked child's value reaches the menu's `onpick`.
@@ -84,7 +84,7 @@ pub enum MenuEntry<T> {
     },
     /// A rule between groups.
     Separator,
-    /// A choice whose title and detail are [`Text`] runs the caller computed (a search's
+    /// A choice whose title and detail are [`TextLine`] runs the caller computed (a search's
     /// marks, a name stronger than its path) and which may end in its own action. Picked, navigated
     /// and filtered exactly as an [`MenuEntry::Item`].
     Row(MenuRow<T>),
@@ -99,13 +99,13 @@ pub struct MenuRow<T> {
     pub value: T,
     /// Its name. A plain title is marked where a palette's query or a menu's filter matches
     /// it; runs are drawn as given (the caller's marks win).
-    pub title: Text,
+    pub title: TextLine,
     /// One line of help.
-    pub detail: Option<Text>,
+    pub detail: Option<TextLine>,
     /// Its tile.
-    pub tile: Option<Tile>,
+    pub tile: Option<MenuTile>,
     /// Its trail.
-    pub trail: Trail,
+    pub trail: MenuTrail,
     /// The keys of its action, as a plain chord after the trail: by default only while it is
     /// the selection (Spotlight's hint, [`RowChord::on_selected`]); none when empty.
     pub chord: RowChord,
@@ -122,13 +122,13 @@ pub struct MenuRow<T> {
 
 impl<T> MenuRow<T> {
     /// An enabled row yielding `value`, named `title`, with nothing else.
-    pub fn new(value: T, title: impl Into<Text>) -> Self {
+    pub fn new(value: T, title: impl Into<TextLine>) -> Self {
         MenuRow {
             value,
             title: title.into(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             chord: RowChord::default(),
             check: None,
             availability: Availability::Enabled,
@@ -159,7 +159,7 @@ impl<T> MenuEntry<T> {
     pub(crate) fn takes_marks(&self) -> bool {
         match self {
             MenuEntry::Item { .. } | MenuEntry::Submenu { .. } => true,
-            MenuEntry::Row(row) => matches!(row.title, Text::Plain(_)),
+            MenuEntry::Row(row) => matches!(row.title, TextLine::Plain(_)),
             MenuEntry::Header(_) | MenuEntry::Info { .. } | MenuEntry::Separator => false,
         }
     }

@@ -8,9 +8,9 @@ use dioxus::prelude::*;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, ButtonVariant,
     DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
-    Key, LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
-    Switch, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_env, use_hover_hub,
-    use_toast_hub,
+    LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
+    ShortcutKey, Switch, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
+    use_scope, use_toast_hub,
 };
 
 /// The hover targets, one per card kind.
@@ -90,7 +90,7 @@ pub fn Cards() -> Element {
                     div { class: "ds-hovercard-foot",
                         "stays unread while you look"
                         span { class: "ds-hovercard-keys",
-                            Kbd { shortcut: Shortcut(vec![Key::Space]) }
+                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Space]) }
                             " peek"
                         }
                     }
@@ -216,7 +216,7 @@ pub fn Pills(showcase: Showcase) -> Element {
 /// Undo send: five one-second ticks, then Sent.
 #[component]
 fn Countdown(showcase: Showcase) -> Element {
-    let level = use_env().resolved.motion;
+    let level = use_scope().resolved.motion;
     let mut elapsed = use_signal(|| match showcase {
         Showcase::Posed => Fraction(400),
         Showcase::Live => Fraction(0),

@@ -6,9 +6,9 @@
 use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
-    Anchor, CommandPalette, Cursor, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Icon,
-    Menu, MenuEntry, MenuKind, MenuRow, PaletteEntrance, Point, Px, RowAction, Run, RunTone,
-    TargetElement, Text, Tile, use_hover_hub,
+    Anchor, CommandPalette, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Icon, Menu,
+    MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, PaletteEntrance, Point, Px, RowAction,
+    RunTone, TargetElement, TextLine, TextRun, use_hover_hub,
 };
 use std::time::Duration;
 
@@ -30,22 +30,22 @@ pub fn remove() -> RowAction {
 pub fn recent_rows() -> Vec<MenuEntry<u8>> {
     vec![
         MenuEntry::Row(MenuRow {
-            detail: Some(Text::Runs(vec![
-                Run::new("in ", RunTone::Faint),
-                Run::new("Inbox", RunTone::Plain),
+            detail: Some(TextLine::Runs(vec![
+                TextRun::new("in ", RunTone::Faint),
+                TextRun::new("Inbox", RunTone::Plain),
             ])),
-            tile: Some(Tile::Icon(Icon::Clock)),
+            tile: Some(MenuTile::Icon(Icon::Clock)),
             trailing: Some(remove()),
             ..MenuRow::new(
                 1,
-                Text::Runs(vec![
-                    Run::new("from:dana ", RunTone::Strong),
-                    Run::new("uidl", RunTone::Mark),
+                TextLine::Runs(vec![
+                    TextRun::new("from:dana ", RunTone::Strong),
+                    TextRun::new("uidl", RunTone::Mark),
                 ]),
             )
         }),
         MenuEntry::Row(MenuRow {
-            tile: Some(Tile::Icon(Icon::Clock)),
+            tile: Some(MenuTile::Icon(Icon::Clock)),
             trailing: Some(remove()),
             ..MenuRow::new(2, "invoice september")
         }),
@@ -73,13 +73,13 @@ pub const MAILO_CASES: &[Case] = &[
     Case {
         component: "menu",
         state: "cursor-controlled",
-        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {}, active: Cursor::Controlled(Some(2)) } },
+        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {}, active: MenuCursor::Controlled(Some(2)) } },
         wait: NOW,
     },
     Case {
         component: "menu",
         state: "cursor-none",
-        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {}, active: Cursor::Controlled(None) } },
+        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: at(), entries: recent_rows(), onpick: |_: u8| {}, onclose: |_| {}, active: MenuCursor::Controlled(None) } },
         wait: NOW,
     },
     Case {

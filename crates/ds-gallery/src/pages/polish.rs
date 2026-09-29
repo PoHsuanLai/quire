@@ -13,10 +13,10 @@ use ds::Alpha;
 use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, DockFloor,
     DockFloorSetting, DockMetrics, Ds, Emphasis, Here, Icon, IconButton, IconButtonVariant,
-    IconSize, IconSource, IconView, Inject, Key, Material, MaterialStack, MenuBarItem,
-    MenuEntrance, MenuEntry, MenuKind, PlateFamily, Point, Px, RootChrome, RunningDot, Scheme,
-    Shortcut, Shown, SpaceLook, Surface, Switch, Theme, Tile, Tooltip, TooltipKind, Trail,
-    WorkspacePill, WorkspacePills, use_env,
+    IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuBarItem, MenuEntrance,
+    MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, RunningDot,
+    Scheme, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Switch, Theme, Tooltip, TooltipKind,
+    WorkspacePill, WorkspacePills, use_scope,
 };
 
 /// A nested root in `material` with the page's look and blur state, as a shell surface's root: its chrome is
@@ -35,7 +35,7 @@ pub(super) fn Root(
         let axes = axes.read();
         (axes.motion, axes.look.clone(), axes.accent, axes.blur)
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let theme = match scheme {
         Scheme::Light => Theme::Light,
         Scheme::Dark => Theme::Dark,
@@ -91,7 +91,7 @@ fn target(ours: &str, macos: &str) -> String {
 }
 
 fn menu_entries() -> Vec<MenuEntry<u8>> {
-    let item = |value: u8, title: &str, check: Option<Check>, trail: Trail, availability| {
+    let item = |value: u8, title: &str, check: Option<Check>, trail: MenuTrail, availability| {
         MenuEntry::Item {
             value,
             title: title.to_owned(),
@@ -102,24 +102,31 @@ fn menu_entries() -> Vec<MenuEntry<u8>> {
             availability,
         }
     };
-    let keys = |key: char| Trail::Shortcut(Shortcut(vec![Key::Super, Key::Char(key)]));
+    let keys =
+        |key: char| MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char(key)]));
     vec![
         item(1, "New Window", None, keys('N'), Availability::Enabled),
         item(2, "New Tab", None, keys('T'), Availability::Enabled),
-        item(3, "Open Recent", None, Trail::None, Availability::Disabled),
+        item(
+            3,
+            "Open Recent",
+            None,
+            MenuTrail::None,
+            Availability::Disabled,
+        ),
         MenuEntry::Separator,
         item(
             4,
             "Show Sidebar",
             Some(Check::Checked),
-            Trail::None,
+            MenuTrail::None,
             Availability::Enabled,
         ),
         item(
             5,
             "Show Path Bar",
             Some(Check::Unchecked),
-            Trail::None,
+            MenuTrail::None,
             Availability::Enabled,
         ),
         MenuEntry::Separator,
@@ -342,9 +349,10 @@ fn LauncherSection() -> Element {
             title: name.to_owned(),
             detail: Some("Application".to_owned()),
             tile: Some(
-                app_icon(hue, IconSize::Tile48).map_or(Tile::Icon(Icon::Window), Tile::Source),
+                app_icon(hue, IconSize::Tile48)
+                    .map_or(MenuTile::Icon(Icon::Window), MenuTile::Source),
             ),
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
             availability: Availability::Enabled,
         })

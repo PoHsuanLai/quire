@@ -11,7 +11,7 @@ use crate::motion::detail::{
     first_show::FirstShow,
     moment::Moment,
     operation::Deadline,
-    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     touch::Touch,
     use_detail::use_detail,
     use_operation::use_operation_within,
@@ -56,7 +56,7 @@ pub(crate) enum Grace {
 /// The sheet's pending look: one still layer (the look never steps).
 const SHEET: PendingSpec = PendingSpec {
     style: PendingStyle::Breathe,
-    layers: Layers(1),
+    layers: PendingLayers(1),
 };
 
 /// The grace of the current read, restarted each time `reading` turns to `Yes`.

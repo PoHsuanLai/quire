@@ -9,7 +9,7 @@
 //! choice is a [`WidgetEdit`] handed to the host, which applies it to the layout it keeps in its
 //! settings ([`crate::shell::widget::layout::apply`]) and passes the new layout back.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::ButtonVariant;
 use crate::core::press::Press;
 use crate::host::measure::MountedRef;
@@ -27,25 +27,25 @@ use dioxus::prelude::*;
 #[derive(Debug, Clone, PartialEq)]
 pub struct GalleryWords {
     /// The button that adds the widget to the desktop.
-    pub add_desktop: Text,
+    pub add_desktop: TextLine,
     /// The button that adds it to the notification center.
-    pub add_center: Text,
+    pub add_center: TextLine,
     /// What an Add button says, beside its check, while the widget it added settles in
     ///.
-    pub added: Text,
+    pub added: TextLine,
     /// The button that takes a placed widget away.
-    pub remove: Text,
+    pub remove: TextLine,
     /// The desktop's heading over its placed widgets.
-    pub desktop: Text,
+    pub desktop: TextLine,
     /// The notification center's heading.
-    pub center: Text,
+    pub center: TextLine,
     /// A surface with nothing placed.
-    pub none: Text,
+    pub none: TextLine,
     /// The size picker's label. Unused since the gallery offers one size per widget
     /// (2026-09-28); kept so a host's words still build.
-    pub size: Text,
+    pub size: TextLine,
     /// Each size's name: Small, Medium, Large. Unused since 2026-09-28, as `size` is.
-    pub sizes: [Text; 3],
+    pub sizes: [TextLine; 3],
 }
 
 impl Default for GalleryWords {

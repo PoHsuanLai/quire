@@ -14,7 +14,7 @@ use crate::motion::detail::{
     moment::Moment,
     morph::MorphStyle,
     morph_glyph::MorphGlyph,
-    pending::Layers,
+    pending::PendingLayers,
     settle::{SettleStyle, Settling},
     use_detail::use_detail,
     use_operation::use_operation,
@@ -79,10 +79,12 @@ pub(crate) fn ModuleDisc(
 }
 
 /// How many layers a glyph fills through: one per shape (a Wi-Fi glyph's dot and three arcs).
-fn layers(glyph: &IconSource) -> Layers {
+fn layers(glyph: &IconSource) -> PendingLayers {
     match glyph {
-        IconSource::Glyph(icon) => Layers(u8::try_from(icon.shapes().len()).unwrap_or(u8::MAX)),
-        IconSource::Symbolic(_) | IconSource::Image(_) | IconSource::Status(_) => Layers(1),
+        IconSource::Glyph(icon) => {
+            PendingLayers(u8::try_from(icon.shapes().len()).unwrap_or(u8::MAX))
+        }
+        IconSource::Symbolic(_) | IconSource::Image(_) | IconSource::Status(_) => PendingLayers(1),
     }
 }
 

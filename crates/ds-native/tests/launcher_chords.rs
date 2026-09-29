@@ -4,9 +4,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Ds, Icon, Key, Material, MenuEntry, MenuRow,
-    PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, RowChord, RowShape,
-    Shortcut, Tile,
+    Appearance, CommandPalette, CommandPaletteHost, Ds, Icon, Material, MenuEntry, MenuRow,
+    MenuTile, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, RowChord,
+    RowShape, Shortcut, ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -22,12 +22,12 @@ fn ms(n: u64) -> Duration {
 }
 
 fn reveal() -> Shortcut {
-    Shortcut(vec![Key::Super, Key::Char('r')])
+    Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])
 }
 
 fn file(value: u8, title: &str) -> MenuEntry<u8> {
     MenuEntry::Row(MenuRow {
-        tile: Some(Tile::Icon(Icon::File)),
+        tile: Some(MenuTile::Icon(Icon::File)),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_string(),
@@ -96,14 +96,14 @@ fn moving_the_selection_moves_the_chord() {
         3,
         "every row keeps its time"
     );
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(100));
     assert_eq!(harness.count("#card .ds-chord"), 1, "still one chord");
     assert_eq!(
         where_the_chord_is(&harness),
         (Some("Two.pdf".into()), Some("Two.pdf".into()))
     );
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(100));
     assert_eq!(
         where_the_chord_is(&harness),

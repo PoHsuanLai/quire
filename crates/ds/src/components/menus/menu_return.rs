@@ -9,7 +9,7 @@
 //! at a point or a rect names no element: ds-native then hands the keyboard to the element
 //! focused before the menu took it, or to where the pointer pressed to open it.
 
-use crate::components::menus::menu_cursor::Cursor;
+use crate::components::menus::menu_cursor::MenuCursor;
 use crate::components::overlays::flow::Flow;
 use crate::focus::hand_back::HostHandBack;
 use crate::host::measure::{Anchor, MountedRef};
@@ -18,7 +18,7 @@ use std::rc::Rc;
 
 /// Record, for the host, that `panel` gives the keyboard back to `anchor`'s element: only for a
 /// floating menu that takes the keyboard, anchored to an element, under a host that hands back.
-pub(crate) fn hand_back(panel: &MountedData, anchor: &Anchor, flow: Flow, active: Cursor) {
+pub(crate) fn hand_back(panel: &MountedData, anchor: &Anchor, flow: Flow, active: MenuCursor) {
     let Anchor::Mounted(MountedRef(opener)) = anchor else {
         return;
     };

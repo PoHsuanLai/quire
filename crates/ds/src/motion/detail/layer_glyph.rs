@@ -105,7 +105,9 @@ fn shape_child(shape: &Shape) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{Layering, layer_of};
-    use crate::motion::detail::pending::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle};
+    use crate::motion::detail::pending::{
+        Lit, PendingFrame, PendingLayers, PendingSpec, PendingStyle,
+    };
     use crate::style::icon::Icon;
 
     #[test]
@@ -119,7 +121,7 @@ mod tests {
     fn each_layering_lights_its_layers() {
         let spec = PendingSpec {
             style: PendingStyle::Iterate,
-            layers: Layers(4),
+            layers: PendingLayers(4),
         };
         let lit = |layering: Layering| (0..4).map(|l| layering.lit(l)).collect::<Vec<_>>();
         use Lit::{Off, On};

@@ -17,7 +17,7 @@ use ds::{
     Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry, MonthIntent,
     MonthWidget, RingMark, RootChrome, Seconds, SpaceLook, Timeline, WeekNumbers, Widget,
     WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetSlotGuide,
-    WorldClockWidget, use_env,
+    WorldClockWidget, use_scope,
 };
 use ds::{EventLine, MonthFace, TodayLine};
 
@@ -177,7 +177,7 @@ pub(super) fn Wall(children: Element) -> Element {
             axes.look.clone(),
         )
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     rsx! {
         div { class: "g-wall g-wl-wall", style: "background-image:url(\"{wallpaper::calm_uri(scheme)}\")",
             Ds {

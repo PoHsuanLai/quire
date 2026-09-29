@@ -7,7 +7,8 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{
     Button, ButtonVariant, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon,
-    Menu, MenuEntry, MenuKind, MenuRow, MountedRef, PickDismiss, Tile, use_hover_intent, use_rect,
+    Menu, MenuEntry, MenuKind, MenuRow, MenuTile, MountedRef, PickDismiss, use_hover_intent,
+    use_rect,
 };
 
 /// The prefix of this section's hover keys: the page's other card section skips them.
@@ -158,7 +159,7 @@ pub fn InlineActions() -> Element {
     .into_iter()
     .map(|(icon, title)| {
         MenuEntry::Row(MenuRow {
-            tile: Some(Tile::Icon(icon)),
+            tile: Some(MenuTile::Icon(icon)),
             ..MenuRow::new(title, title)
         })
     })

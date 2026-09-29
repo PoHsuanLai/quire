@@ -1,7 +1,7 @@
 //! What a `Button` shows besides its icon: its face, a word or a mark drawn in
 //! its own style, and a trailing glyph after it.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -28,10 +28,10 @@ pub enum ButtonFace {
 /// label's characters when a mark face hides them, or when runs split them into pieces (so the
 /// name is one string, whatever spans the tones need); nothing for a plain label, which names
 /// the button by its own text.
-pub(crate) fn spoken_label(face: ButtonFace, label: &Text) -> Option<String> {
+pub(crate) fn spoken_label(face: ButtonFace, label: &TextLine) -> Option<String> {
     match (face.is_mark(), label) {
-        (true, _) | (false, Text::Runs(_)) => Some(label.plain_text()),
-        (false, Text::Plain(_)) => None,
+        (true, _) | (false, TextLine::Runs(_)) => Some(label.plain_text()),
+        (false, TextLine::Plain(_)) => None,
     }
 }
 
@@ -106,7 +106,7 @@ pub(crate) fn leading(mark: Leading, icon_size: IconSize) -> Element {
 /// label. Usable on its own as a `BubbleButton`'s `label`, so the bubble's marks need no raw
 /// `b`, `i`, `u` or `s`.
 #[component]
-pub fn FaceMark(face: ButtonFace, #[props(into)] label: Text) -> Element {
+pub fn FaceMark(face: ButtonFace, #[props(into)] label: TextLine) -> Element {
     match face.mark() {
         None => rsx! {
             span { {text(&label)} }
@@ -130,17 +130,17 @@ pub(crate) fn trailing(mark: Trailing, icon_size: IconSize) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{ButtonFace, spoken_label};
-    use crate::components::content::text_runs::{Run, RunTone, Text};
+    use crate::components::content::text_runs::{RunTone, TextLine, TextRun};
 
     #[test]
     fn a_hidden_or_split_label_is_spoken_whole() {
-        let runs = Text::Runs(vec![
-            Run::new("Dana Okafor", RunTone::Strong),
-            Run::new(" wrote on Tue 22 Sep", RunTone::Faint),
+        let runs = TextLine::Runs(vec![
+            TextRun::new("Dana Okafor", RunTone::Strong),
+            TextRun::new(" wrote on Tue 22 Sep", RunTone::Faint),
         ]);
         let cases = [
-            (ButtonFace::Label, Text::from("Send"), None),
-            (ButtonFace::Bold, Text::from("Bold"), Some("Bold")),
+            (ButtonFace::Label, TextLine::from("Send"), None),
+            (ButtonFace::Bold, TextLine::from("Bold"), Some("Bold")),
             (
                 ButtonFace::Label,
                 runs,

@@ -9,7 +9,7 @@ use super::settle::settle;
 use crate::core::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use crate::core::vocab::{Emphasis, StaggerIndex};
-use crate::style::env::{Env, use_env_signal};
+use crate::style::scope::{Scope, use_scope_signal};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -17,7 +17,7 @@ use dioxus::prelude::*;
 #[derive(Debug, PartialEq)]
 pub struct Roster<K: 'static> {
     pub(super) state: Signal<RosterState<K>>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     pub(super) scope: ScopeId,
     pub(super) rest: Signal<Option<RestTimer>>,
     pub(super) rest_queue: CopyValue<RestQueue>,
@@ -147,7 +147,7 @@ pub(super) fn use_roster_parts<K: Clone + PartialEq + 'static>(
 ) -> Roster<K> {
     Roster {
         state: use_signal(|| RosterState::first_show(keys, pitch)),
-        env: use_env_signal(),
+        env: use_scope_signal(),
         scope: use_hook(current_scope_id),
         rest: use_signal(|| None),
         rest_queue: use_hook(|| CopyValue::new(RestQueue::Idle)),

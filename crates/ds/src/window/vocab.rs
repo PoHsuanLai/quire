@@ -66,7 +66,7 @@ pub enum Zoom {
 }
 
 /// A placement the tiling menu offers (macOS Sequoia's Window > Move & Resize). Named
-/// `WindowTile` because `ds::Tile` is a menu row's leading tile.
+/// `WindowTile` because `ds::MenuTile` is a menu row's leading tile.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum WindowTile {
     /// The whole work area: the same as `Zoom::Maximize`.

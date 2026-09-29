@@ -34,7 +34,7 @@ use crate::components::menus::palette::palette_stops::{
 };
 
 use crate::components::fields::search_field::SearchField;
-use crate::components::fields::text_input_focus::Focus;
+use crate::components::fields::text_input_focus::FieldFocus;
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
 use crate::components::menus::palette::{
     palette_host::{CommandPaletteHost, PaletteEntrance},
@@ -277,8 +277,8 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
         )
     };
     let field = match showing.seen {
-        Seen::Yes => Focus::Controlled(request),
-        Seen::Not => Focus::Manual,
+        Seen::Yes => FieldFocus::Controlled(request),
+        Seen::Not => FieldFocus::Manual,
     };
     let side = aside.map(|pane| {
         rsx! {

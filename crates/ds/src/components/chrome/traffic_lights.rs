@@ -7,7 +7,7 @@
 //! a light never starts the titlebar's move, and a double-click on one never zooms.
 
 use crate::components::chrome::light_mark::{LightMark, Mark};
-use crate::components::menus::menu_entry::{MenuEntry, Tile, Trail};
+use crate::components::menus::menu_entry::{MenuEntry, MenuTile, MenuTrail};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
 use crate::core::time::clock::sleep;
 use crate::core::vocab::{Availability, Expanded};
@@ -219,8 +219,8 @@ fn entries(support: [Support; 4]) -> Vec<MenuEntry<WindowTile>> {
             value: tile,
             title: tile.title().to_owned(),
             detail: None,
-            tile: Some(Tile::Icon(glyph(tile))),
-            trail: Trail::None,
+            tile: Some(MenuTile::Icon(glyph(tile))),
+            trail: MenuTrail::None,
             check: None,
             availability: match support {
                 Support::Yes => Availability::Enabled,

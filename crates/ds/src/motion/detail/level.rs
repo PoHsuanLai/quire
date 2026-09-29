@@ -1,13 +1,13 @@
 //! The motion level a detail plays at, read when it starts (R7 lives inside every primitive).
 
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use dioxus::prelude::*;
 
 /// The enclosing root's motion level, if there is a root; Standard outside one (a golden render
 /// of a bare component).
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) struct Level(Option<Signal<Env>>);
+pub(crate) struct Level(Option<Signal<Scope>>);
 
 impl Level {
     /// The level now, read without subscribing.
@@ -20,5 +20,5 @@ impl Level {
 
 /// The level of the enclosing `Ds` or `Surface`.
 pub(crate) fn use_level() -> Level {
-    Level(try_use_context::<Signal<Env>>())
+    Level(try_use_context::<Signal<Scope>>())
 }

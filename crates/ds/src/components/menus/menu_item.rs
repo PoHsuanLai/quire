@@ -5,9 +5,9 @@
 use crate::components::content::avatar::face;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{button_of, press_of};
-use crate::components::menus::menu_entry::{Tile, Trail};
+use crate::components::menus::menu_entry::{MenuTile, MenuTrail};
 use crate::components::menus::menu_match::marked;
 use crate::components::menus::menu_shape;
 use crate::components::menus::row_action::{RowAction, trailing};
@@ -26,7 +26,7 @@ pub(crate) enum Words<'a> {
     /// A plain string.
     Str(&'a str),
     /// Runs, or a plain `Text`.
-    Text(&'a Text),
+    Text(&'a TextLine),
 }
 
 impl Words<'_> {
@@ -34,7 +34,7 @@ impl Words<'_> {
     fn draw(self, marks: &[usize]) -> Element {
         match self {
             Words::Str(plain) => marked(plain, marks),
-            Words::Text(Text::Plain(plain)) => marked(plain, marks),
+            Words::Text(TextLine::Plain(plain)) => marked(plain, marks),
             Words::Text(runs) => text(runs),
         }
     }
@@ -91,9 +91,9 @@ pub(crate) struct ItemView<'a> {
     /// One line of help.
     pub detail: Option<Words<'a>>,
     /// The tile.
-    pub tile: Option<&'a Tile>,
+    pub tile: Option<&'a MenuTile>,
     /// The trail.
-    pub trail: &'a Trail,
+    pub trail: &'a MenuTrail,
     /// The action's chord, after the trail when its rule shows it.
     pub chord: &'a RowChord,
     /// The check mark.
@@ -237,14 +237,14 @@ fn chevron() -> Element {
 }
 
 /// The tile column: a glyph, a letter, an avatar, or an empty square that keeps the grid.
-fn tile(tile: Option<&Tile>) -> Element {
+fn tile(tile: Option<&MenuTile>) -> Element {
     match tile {
-        Some(Tile::Icon(icon)) => rsx! {
+        Some(MenuTile::Icon(icon)) => rsx! {
             span { class: "ds-menu-tile",
                 Glyph { icon: *icon, size: IconSize::Tile }
             }
         },
-        Some(Tile::Source(source)) => {
+        Some(MenuTile::Source(source)) => {
             let image = matches!(source, IconSource::Image(_)).then_some("image");
             rsx! {
                 span { class: "ds-menu-tile", "data-tile": image,
@@ -252,10 +252,10 @@ fn tile(tile: Option<&Tile>) -> Element {
                 }
             }
         }
-        Some(Tile::Text(text)) => rsx! {
+        Some(MenuTile::Text(text)) => rsx! {
             span { class: "ds-menu-tile", "{text}" }
         },
-        Some(Tile::Avatar(avatar)) => rsx! {
+        Some(MenuTile::Avatar(avatar)) => rsx! {
             span { class: "ds-menu-tile", "data-tile": "avatar", {face(*avatar)} }
         },
         None => rsx! {
@@ -267,7 +267,7 @@ fn tile(tile: Option<&Tile>) -> Element {
 /// The trail: a checked item in a tiled menu shows the check instead of its shortcut; a shaped
 /// row leads it with its time; a shown chord ends it.
 fn trail(
-    trail: &Trail,
+    trail: &MenuTrail,
     check: Option<Check>,
     row: Row,
     shape: &RowShape,
@@ -281,9 +281,9 @@ fn trail(
         };
     }
     let text = match trail {
-        Trail::None => String::new(),
-        Trail::Shortcut(shortcut) => shortcut.glyphs(),
-        Trail::Note(note) => note.clone(),
+        MenuTrail::None => String::new(),
+        MenuTrail::Shortcut(shortcut) => shortcut.glyphs(),
+        MenuTrail::Note(note) => note.clone(),
     };
     if *shape != RowShape::Plain || chord.is_some() {
         return menu_shape::trail(shape, text, chord);

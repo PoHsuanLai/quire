@@ -16,7 +16,7 @@ use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::{Anim, Count, CountPlace, Glyph, Icon, IconSize};
-use ds::{Key, PulseKey, Shortcut, StaggerIndex};
+use ds::{PulseKey, Shortcut, ShortcutKey, StaggerIndex};
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -221,10 +221,19 @@ fn every_shell_glyph_has_geometry() {
 
 #[test]
 fn a_shortcut_is_glyphs_without_separators() {
-    let shortcut = Shortcut(vec![Key::Ctrl, Key::Shift, Key::Char('t')]);
+    let shortcut = Shortcut(vec![
+        ShortcutKey::Ctrl,
+        ShortcutKey::Shift,
+        ShortcutKey::Char('t'),
+    ]);
     assert_eq!(shortcut.glyphs(), "⌃⇧T");
     assert_eq!(
-        Shortcut(vec![Key::Super, Key::Alt, Key::Enter]).glyphs(),
+        Shortcut(vec![
+            ShortcutKey::Super,
+            ShortcutKey::Alt,
+            ShortcutKey::Enter
+        ])
+        .glyphs(),
         "⌥⌘↵",
         "the Mac's order, whatever order the keys were given in"
     );

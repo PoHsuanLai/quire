@@ -5,7 +5,7 @@
 use crate::motion::detail::{
     detailed::Detailed,
     moment::Moment,
-    pending::{Layers, PendingSpec, PendingStyle},
+    pending::{PendingLayers, PendingSpec, PendingStyle},
     stamp::EventStamp,
 };
 
@@ -89,7 +89,7 @@ impl RowWork {
         };
         PendingSpec {
             style,
-            layers: Layers(1),
+            layers: PendingLayers(1),
         }
     }
 }

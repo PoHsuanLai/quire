@@ -80,7 +80,7 @@ public surface, one path per item.
 | `overlay/{host,stack}.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
 | `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
-| `assembly/ds.rs`, `root/surface.rs`, `style/env.rs` | `Surface` overrides material and, optionally, scheme, accent, blur and ground; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
+| `assembly/ds.rs`, `root/surface.rs`, `style/scope.rs` | `Surface` overrides material and, optionally, scheme, accent, blur and ground; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
 | `root/chrome.rs` | 21-SPACES §3, §5; 03-COLOR §17.1: `RootChrome::{Painted, Transparent}` (a Popover, Sheet or Toast root hosts cards and paints nothing), `FrameTint::{Opaque, Tinted, None}` (the window's loose layers; the bar, dock, popover panel, OSD and widget's `.ds-frame` group at the tint alpha), `Ground::{Paper, Frame}` (the bar and dock draw on the frame); each derived from the material with an override prop (FINDINGS "Bar gaps") |
 | `core/text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `style/icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (stroke as attributes) |
@@ -164,6 +164,6 @@ The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`,
 | `shell/widget/{battery,clock,calendar}.rs`, `shell/widget/views.css` | 23-WIDGETS §4.1, §4.2, §5.2, §9.6 | quire's three widgets and their compositions |
 | `shell/widget/layout.rs` | 23-WIDGETS §9.7 | `WidgetLayout`, `WidgetAt`, `WidgetEdit`, `apply`, `first_free` |
 | `shell/widget/gallery.rs`, `shell/widget/gallery.css` | 23-WIDGETS §9.7 | `WidgetGallery` ("Edit Widgets"), `GalleryWords` |
-| `shell/catalog/placement.rs` | 23-WIDGETS §9.1 | `Placement`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
+| `shell/catalog/placement.rs` | 23-WIDGETS §9.1 | `Placed`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
 | `shell/battery/device_glyph.rs`, `shell/battery/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
 | `shell/widget/slot.rs`, `shell/widget/frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |

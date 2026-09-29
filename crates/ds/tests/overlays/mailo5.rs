@@ -5,8 +5,8 @@
 use crate::cases::{Case, PartsCard};
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Filter, FlagTone, Flow, HoverCardPart, Icon, Menu, MenuEntry, MenuKind, MenuRow, Point,
-    Px, Run, RunTone, Scrim, Text,
+    Anchor, FlagTone, Flow, HoverCardPart, Icon, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow,
+    Point, Px, RunTone, Scrim, TextLine, TextRun,
 };
 use std::time::Duration;
 
@@ -19,12 +19,12 @@ fn spoof(tone: FlagTone) -> HoverCardPart {
     HoverCardPart::flag(
         tone,
         Icon::OctagonAlert,
-        Text::Runs(vec![
-            Run::new("Not ", RunTone::Plain),
-            Run::new("Acme", RunTone::Strong),
-            Run::new(": this was sent from ", RunTone::Plain),
-            Run::new("acme-billing.example", RunTone::Strong),
-            Run::new(".", RunTone::Plain),
+        TextLine::Runs(vec![
+            TextRun::new("Not ", RunTone::Plain),
+            TextRun::new("Acme", RunTone::Strong),
+            TextRun::new(": this was sent from ", RunTone::Plain),
+            TextRun::new("acme-billing.example", RunTone::Strong),
+            TextRun::new(".", RunTone::Plain),
         ]),
     )
 }
@@ -39,8 +39,8 @@ fn labels() -> Vec<MenuEntry<u8>> {
 }
 
 /// A label picker whose filter is a drawn field.
-fn field() -> Filter {
-    Filter::Field {
+fn field() -> MenuFilter {
+    MenuFilter::Field {
         placeholder: "Filter labels…".to_string(),
     }
 }

@@ -5,15 +5,15 @@ use super::{Caption, Section};
 use crate::axes::{Axes, PresetIndex};
 use dioxus::prelude::*;
 use ds::{
-    Chip, ChipVariant, DotIndex, FrameVars, Here, Key, MeasuredIn, MotionChoice, Shortcut,
-    SpaceDot, SpaceEditor, readout, use_env,
+    Chip, ChipVariant, DotIndex, FrameVars, Here, MeasuredIn, MotionChoice, Shortcut, ShortcutKey,
+    SpaceDot, SpaceEditor, readout, use_scope,
 };
 
 /// The Space page.
 #[component]
 pub fn SpacePage() -> Element {
     let mut axes = use_context::<Signal<Axes>>();
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let (look, preset) = {
         let axes = axes.read();
         (axes.look.clone(), axes.preset)
@@ -32,7 +32,7 @@ pub fn SpacePage() -> Element {
                         name: candidate.label(),
                         frame: FrameVars::of(&candidate.look(), scheme),
                         here: if candidate == preset { Here::Current } else { Here::Elsewhere },
-                        shortcut: Shortcut(vec![Key::Ctrl, Key::Char(char::from(b'1' + candidate.0))]),
+                        shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char(char::from(b'1' + candidate.0))]),
                         onclick: move |_| axes.with_mut(|axes| *axes = axes.clone().with_preset(candidate)),
                     }
                 }

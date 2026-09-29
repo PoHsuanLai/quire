@@ -12,7 +12,7 @@ use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
     Alert, AlertEmphasis, Appearance, Ds, Flow, Icon, IconSource, Inject, Material, RootExtent,
-    Shown, Text, Theme,
+    Shown, TextLine, Theme,
 };
 
 const TITLE: &str = "Turn Bluetooth off?";
@@ -29,7 +29,7 @@ fn root(theme: Theme, body: Element) -> Element {
 
 fn bluetooth(emphasis: AlertEmphasis, flow: Flow, theme: Theme) -> Element {
     let alert = rsx! {
-        Alert { title: TITLE, message: Some(Text::from(MESSAGE)), action: "Turn Off", emphasis, flow,
+        Alert { title: TITLE, message: Some(TextLine::from(MESSAGE)), action: "Turn Off", emphasis, flow,
             onaction: |_| {}, oncancel: |_| {} }
     };
     match flow {
@@ -48,7 +48,7 @@ fn erase() -> Element {
     root(
         Theme::Light,
         rsx! {
-            Alert { title: "Erase this disk?", message: Some(Text::from("Everything on it will be lost.")),
+            Alert { title: "Erase this disk?", message: Some(TextLine::from("Everything on it will be lost.")),
                 action: "Erase", emphasis: AlertEmphasis::Destructive, icon: Some(IconSource::Glyph(Icon::Trash)),
                 onaction: |_| {}, oncancel: |_| {} }
         },

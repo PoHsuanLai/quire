@@ -3,8 +3,8 @@
 use dioxus::prelude::*;
 use ds::Switch;
 use ds::{
-    AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkSize,
-    MarkStyle, Provider, ProviderMark, Trailing,
+    AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkProvider,
+    MarkSize, MarkStyle, ProviderMark, Trailing,
 };
 use ds::{DotIndex, Motion, MotionChoice, MotionLevels, Scheme, SpaceEditor, SpaceLook};
 use ds::{Grow, InputVariant, Rows, TextInput, TextInputKind};
@@ -17,7 +17,7 @@ fn local() -> AccountFace {
     AccountFace::One {
         initial: 'L',
         colour: SLATE,
-        provider: Provider::Local,
+        provider: MarkProvider::Local,
         address: None,
     }
 }
@@ -35,11 +35,11 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/provider_mark/local-row.html",
-        make: || rsx! { ProviderMark { provider: Provider::Local, size: MarkSize::Row, style: MarkStyle::Letter } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: MarkSize::Row, style: MarkStyle::Letter } },
     },
     Case {
         golden: "lists/provider_mark/local-image-ignored.html",
-        make: || rsx! { ProviderMark { provider: Provider::Local, size: MarkSize::Inline, style: MarkStyle::Image(ds::ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: MarkSize::Inline, style: MarkStyle::Image(ds::ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
     },
     Case {
         golden: "controls/button/frame.html",

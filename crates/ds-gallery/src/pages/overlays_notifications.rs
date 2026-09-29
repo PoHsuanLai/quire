@@ -12,9 +12,9 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerStack, Button, ButtonVariant,
-    CardAction, Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Layers, Material,
-    NotificationCard, NotificationMetrics, Panel, Px, Rich, RichRun, Run, RunTone, Shown, Swipe,
-    Theme,
+    CardAction, Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Material,
+    NotificationCard, NotificationMetrics, NotificationSwipe, Panel, Px, Rich, RichRun, RunTone,
+    Shown, StackLayers, TextRun, Theme,
 };
 
 /// The notifications section.
@@ -67,7 +67,7 @@ fn Scene(theme: Theme) -> Element {
                                     body: "All 1,204 tests passed.",
                                     on_close: |_| {},
                                     on_open: |_| {},
-                                    swipe: Swipe::Dismiss(EventHandler::new(|()| {})),
+                                    swipe: NotificationSwipe::Dismiss(EventHandler::new(|()| {})),
                                 }
                             }
                         }
@@ -166,10 +166,10 @@ fn banner(key: u32, keys: Signal<Vec<u32>>) -> Banner {
                 age: "now",
                 summary: "Grace Hopper",
                 body: "Three new messages about Thursday's review.",
-                count: GroupCount { count: 3, layers: Layers(2) },
+                count: GroupCount { count: 3, layers: StackLayers(2) },
                 on_close: move |_| dismiss(),
                 on_open: |_| {},
-                swipe: Swipe::Dismiss(EventHandler::new(move |()| dismiss())),
+                swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| dismiss())),
             }
         },
         2 => rsx! {
@@ -178,11 +178,11 @@ fn banner(key: u32, keys: Signal<Vec<u32>>) -> Banner {
                 age: "2m",
                 summary: "main is green",
                 body: Rich(vec![
-                    RichRun::Run(Run::new("Build ", RunTone::Plain)),
-                    RichRun::Run(Run::new("#42", RunTone::Strong)),
-                    RichRun::Run(Run::new(" passed in ", RunTone::Plain)),
-                    RichRun::Run(Run::new("4 min", RunTone::Italic)),
-                    RichRun::Run(Run::new(". ", RunTone::Plain)),
+                    RichRun::Run(TextRun::new("Build ", RunTone::Plain)),
+                    RichRun::Run(TextRun::new("#42", RunTone::Strong)),
+                    RichRun::Run(TextRun::new(" passed in ", RunTone::Plain)),
+                    RichRun::Run(TextRun::new("4 min", RunTone::Italic)),
+                    RichRun::Run(TextRun::new(". ", RunTone::Plain)),
                     RichRun::link("Open the run", "https://ci.example/runs/42"),
                 ]),
                 actions: vec![
@@ -192,7 +192,7 @@ fn banner(key: u32, keys: Signal<Vec<u32>>) -> Banner {
                 on_close: move |_| dismiss(),
                 on_open: |_| {},
                 on_link: |_| {},
-                swipe: Swipe::Dismiss(EventHandler::new(move |()| dismiss())),
+                swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| dismiss())),
             }
         },
         n => rsx! {
@@ -203,7 +203,7 @@ fn banner(key: u32, keys: Signal<Vec<u32>>) -> Banner {
                 body: "Water the plants on the balcony.",
                 on_close: move |_| dismiss(),
                 on_open: |_| {},
-                swipe: Swipe::Dismiss(EventHandler::new(move |()| dismiss())),
+                swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| dismiss())),
             }
         },
     };

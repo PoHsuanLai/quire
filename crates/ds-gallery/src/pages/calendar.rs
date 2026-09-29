@@ -14,8 +14,8 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, CardAccent, DayKey, Ds, FrameTint, Grain, Inject, Material, MonthGrid, RootChrome,
-    Step, Theme, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize, default_look,
+    Appearance, CardAccent, DayKey, Ds, FrameTint, Grain, Inject, Material, MonthGrid, MonthStep,
+    RootChrome, Theme, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize, default_look,
 };
 use month_sample::{AUGUST, First, SEPTEMBER, month as lay_out, sample, shift};
 
@@ -82,7 +82,7 @@ fn Month(theme: Theme, weeks: WeekNumbers) -> Element {
                     MonthGrid {
                         data: sample(month(), First::Monday),
                         weeks,
-                        onstep: move |step: Step| month.set(shift(month(), step)),
+                        onstep: move |step: MonthStep| month.set(shift(month(), step)),
                         onpick,
                     }
                     if let Some(note) = note {
@@ -115,7 +115,7 @@ fn SmallWidget() -> Element {
                     WidgetFrame { size: WidgetSize::Small,
                         MonthGrid {
                             data: lay_out(month(), First::Monday, AUGUST_TODAY, &AUGUST_BUSY),
-                            onstep: move |step: Step| month.set(shift(month(), step)),
+                            onstep: move |step: MonthStep| month.set(shift(month(), step)),
                         }
                     }
                 }

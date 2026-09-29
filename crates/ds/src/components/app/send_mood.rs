@@ -8,7 +8,7 @@ use crate::core::vocab::StaggerIndex;
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use dioxus::prelude::*;
 
 /// How a send is going, as the pill wears it.
@@ -72,7 +72,7 @@ struct Played {
 /// does): a signal written during render would schedule a render for nothing. Only the settle
 /// timer writes a signal, the round that has finished, which this render reads.
 pub(crate) fn use_mood_pulse(mood: SendMood) -> PulseKey {
-    let env = use_hook(try_consume_context::<Signal<Env>>);
+    let env = use_hook(try_consume_context::<Signal<Scope>>);
     let mut played = use_hook(|| {
         CopyValue::new(Played {
             mood,

@@ -6,9 +6,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, Appearance, Availability, Ds, Icon, IconButton, IconButtonVariant, Key, Material,
-    Menu, MenuEntrance, MenuEntry, MenuKind, MotionLevel, Point, PointerButton, Press, Px,
-    StaggerIndex, Trail, settle,
+    Anchor, Anim, Appearance, Availability, Ds, Icon, IconButton, IconButtonVariant, Material,
+    Menu, MenuEntrance, MenuEntry, MenuKind, MenuTrail, MotionLevel, Point, PointerButton, Press,
+    Px, ShortcutKey, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -33,7 +33,7 @@ fn item(value: u8, title: &str, availability: Availability) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability,
     }
@@ -162,14 +162,14 @@ fn a_status_line_is_drawn_and_never_selected() {
         "a status line is no item"
     );
     // Up from the first choice wraps to the last, past the status line.
-    harness.key(Key::Up);
+    harness.key(ShortcutKey::Up);
     assert_eq!(
         harness
             .text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
             .as_deref(),
         Some("Quit")
     );
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     assert_eq!(
         harness
             .text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
@@ -240,7 +240,7 @@ fn escape_fades_the_menu_out_before_it_closes() {
     );
     settle_in(&mut harness);
     let escaped = harness.now();
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),
         Some("leaving")

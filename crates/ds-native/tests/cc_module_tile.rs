@@ -3,7 +3,9 @@
 //! (Enter or Space on the tile toggles; Enter or Right on the chevron opens the detail).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Chevron, Ds, Icon, Key, Material, ModuleState, ModuleTile, Point, TileSpan};
+use ds::{
+    Appearance, Chevron, Ds, Icon, Material, ModuleState, ModuleTile, Point, ShortcutKey, TileSpan,
+};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -84,26 +86,26 @@ fn the_chevron_opens_the_detail_and_does_not_toggle() {
 fn the_keys_toggle_on_the_tile_and_open_on_the_chevron() {
     let mut harness = Harness::new(TileApp, VIEW);
     harness.advance(TICK);
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     assert!(
         harness.is_focused(".ds-module-tile"),
         "Tab reaches the tile"
     );
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(TICK);
     assert_eq!(log(&harness), "toggle");
-    harness.key(Key::Space);
+    harness.key(ShortcutKey::Space);
     harness.advance(TICK);
     assert_eq!(log(&harness), "toggle,toggle");
     assert_eq!(state(&harness), "off");
 
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     assert!(
         harness.is_focused(".ds-module-chevron"),
         "Tab reaches the chevron"
     );
-    harness.key(Key::Enter);
-    harness.key(Key::Right);
+    harness.key(ShortcutKey::Enter);
+    harness.key(ShortcutKey::Right);
     harness.advance(TICK);
     assert_eq!(
         log(&harness),

@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{
     Anchor, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
-    MenuEntry, MenuKind, MenuRow, PickDismiss, Point, Px, Rect, Size, Tile, use_hover_intent,
+    MenuEntry, MenuKind, MenuRow, MenuTile, PickDismiss, Point, Px, Rect, Size, use_hover_intent,
 };
 use std::time::Duration;
 
@@ -86,11 +86,11 @@ fn labels() -> Vec<MenuEntry<u8>> {
 fn sender_actions() -> Vec<MenuEntry<u8>> {
     vec![
         MenuEntry::Row(MenuRow {
-            tile: Some(Tile::Icon(Icon::Pin)),
+            tile: Some(MenuTile::Icon(Icon::Pin)),
             ..MenuRow::new(0, "Pin Dana")
         }),
         MenuEntry::Row(MenuRow {
-            tile: Some(Tile::Icon(Icon::Search)),
+            tile: Some(MenuTile::Icon(Icon::Search)),
             ..MenuRow::new(1, "Every thread from Dana")
         }),
     ]

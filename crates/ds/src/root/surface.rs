@@ -5,7 +5,7 @@ use super::chrome::{Ground, RootChrome};
 use super::typeface::use_typeface;
 use crate::style::appearance::{accent::Accent, resolve::Resolved, theme::Scheme};
 use crate::style::appearance::{blur::BlurState, material::Material};
-use crate::style::env::{Env, use_env, use_env_provider};
+use crate::style::scope::{Scope, use_scope, use_scope_provider};
 use crate::style::tokens::accent_band::text_grounds::{TextOn, text_on};
 use crate::style::tokens::shape::Corner;
 use dioxus::prelude::*;
@@ -35,10 +35,10 @@ pub fn Surface(
     #[props(default)] chrome: Option<RootChrome>,
     children: Element,
 ) -> Element {
-    let env = scope(use_env(), material, theme, accent, blur);
+    let env = scope(use_scope(), material, theme, accent, blur);
     let ground = on.unwrap_or(Ground::of(material));
     let typeface = use_typeface();
-    use_env_provider(env);
+    use_scope_provider(env);
     rsx! {
         div {
             class: "ds",
@@ -63,9 +63,9 @@ pub fn Surface(
 /// the root for the panel inside it to (notification parts).
 #[component]
 pub(crate) fn ClassedScope(material: Material, class: &'static str, children: Element) -> Element {
-    let env = scope(use_env(), material, None, None, None);
+    let env = scope(use_scope(), material, None, None, None);
     let typeface = use_typeface();
-    use_env_provider(env);
+    use_scope_provider(env);
     rsx! {
         div {
             class: "ds {class}",
@@ -110,13 +110,13 @@ pub(crate) fn radius_style(radius: Corner) -> String {
 
 /// The scope a `Surface` provides: the parent's, with each given override applied.
 fn scope(
-    parent: Env,
+    parent: Scope,
     material: Material,
     theme: Option<Scheme>,
     accent: Option<Accent>,
     blur: Option<BlurState>,
-) -> Env {
-    Env {
+) -> Scope {
+    Scope {
         scheme: theme.unwrap_or(parent.scheme),
         material,
         blur: blur.unwrap_or(parent.blur),

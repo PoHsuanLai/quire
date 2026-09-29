@@ -63,9 +63,9 @@ pub use crate::components::{
         image_source::{ImageSize, ImageSource},
         pane_switcher::PaneSwitcher,
         pdf_thumb::{PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble},
-        preview_content::{Mono, PANE_MEDIA, PaneContent},
+        preview_content::{PANE_MEDIA, PaneContent, PaneMono},
         preview_pane::{PaneAction, PreviewPane},
-        provider_mark::{MarkSize, MarkStyle, Provider, ProviderMark},
+        provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark},
         rich_text::{Rich, RichRun, RichText},
         status::{
             battery::BatteryGlyph,
@@ -77,7 +77,7 @@ pub use crate::components::{
             wifi::WifiGlyph,
             wifi_state::{WifiBars, WifiReach, WifiState},
         },
-        text_runs::{Run, RunTone, Text},
+        text_runs::{RunTone, TextLine, TextRun},
     },
     controls::{
         appearance_picker::{AppearancePicker, PickerLayout},
@@ -107,7 +107,7 @@ pub use crate::components::{
         search_field::SearchField,
         selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble},
         text_input::{InputVariant, TextInput},
-        text_input_focus::Focus,
+        text_input_focus::FieldFocus,
         text_input_kind::{Grow, Rows, TextInputKind},
     },
     lists::{
@@ -122,9 +122,9 @@ pub use crate::components::{
     },
     menus::{
         menu::Menu,
-        menu_cursor::Cursor,
-        menu_entry::{MenuEntry, MenuRow, Tile, Trail},
-        menu_filter::Filter,
+        menu_cursor::MenuCursor,
+        menu_entry::{MenuEntry, MenuRow, MenuTile, MenuTrail},
+        menu_filter::MenuFilter,
         menu_kind::{MenuEntrance, MenuKind},
         menu_pick::PickDismiss,
         palette::{
@@ -175,8 +175,8 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent,
-        Selection, Shortcut, StaggerIndex, Switch,
+        Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Percent, Selection,
+        Shortcut, ShortcutKey, StaggerIndex, Switch,
     },
 };
 pub use crate::edit::{
@@ -280,7 +280,7 @@ pub use crate::shell::{
         MonthGrid,
         data::{
             DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey,
-            MonthWeek, Step, WeekNumbers,
+            MonthStep, MonthWeek, WeekNumbers,
         },
         density::MonthDensity,
     },
@@ -288,13 +288,13 @@ pub use crate::shell::{
         banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack},
         card::NotificationCard,
         group_header::GroupHeader,
-        parts::{AppMark, CardAction, GroupCount, Hover, Layers},
-        swipe::Swipe,
+        parts::{AppMark, CardAction, GroupCount, Hover, StackLayers},
+        swipe::NotificationSwipe,
     },
     now_playing::{
         NowPlayingTrack, kind::Playback, play_pause::PlayPauseButton, track_position::TrackPosition,
     },
-    osd::{Level, Osd, OsdPosition},
+    osd::{Osd, OsdLevel, OsdPosition},
     space_editor::{
         DotIndex, SpaceEditor,
         dot::SpaceDot,
@@ -335,7 +335,7 @@ pub use crate::spell::{
     host::{HostSpell, Learned, Paragraph, SpellFuture, SpellService},
     lang::{Lang, Spell},
     marks::SpellReplace,
-    words::Span,
+    words::WordSpan,
 };
 pub use crate::style::{
     appearance::{
@@ -351,7 +351,6 @@ pub use crate::style::{
         theme::{Scheme, Theme},
         typeface::Typeface,
     },
-    env::{Env, HostModality, InputModality, use_env},
     fonts::{FACES, Face, FaceStyle, Subset},
     icon::{
         Icon,
@@ -364,6 +363,7 @@ pub use crate::style::{
     },
     material::{recipe::recipe, stack::MaterialStack},
     scale::{HostScale, use_scale},
+    scope::{HostModality, InputModality, Scope, use_scope},
     space::{
         frame_vars::FrameVars,
         look::{CardAccent, Grain, SpaceLook},

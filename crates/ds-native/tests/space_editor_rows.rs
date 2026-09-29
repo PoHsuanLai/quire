@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DotIndex, Ds, Key, Material, MeasuredIn, Motion, MotionChoice, Scheme, SpaceEditor,
-    SpaceLook,
+    Appearance, DotIndex, Ds, Material, MeasuredIn, Motion, MotionChoice, Scheme, ShortcutKey,
+    SpaceEditor, SpaceLook,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -53,7 +53,7 @@ fn typing_in_the_title_renames_the_space() {
     harness.click(harness.centre(field).expect("the name field"));
     harness.advance(ms(30));
     assert!(harness.is_focused(field));
-    harness.key(Key::Char('s'));
+    harness.key(ShortcutKey::Char('s'));
     harness.advance(ms(30));
     assert_eq!(harness.text_of(".name").as_deref(), Some("Works"));
     assert_eq!(harness.attr(field, "value").as_deref(), Some("Works"));

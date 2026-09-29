@@ -3,7 +3,7 @@
 //! it, so flipping a device's switch never also runs the row. A check that arrives with a success
 //! draws on (`Settle{Check}`, design/26).
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::toggle::Toggle;
 use crate::components::lists::row_battery::RowBattery;
 use crate::core::vocab::{Availability, Fraction, Switch};
@@ -32,7 +32,7 @@ pub enum RowTrailing {
     /// A chevron: the row opens something further.
     Chevron,
     /// A value in the faint detail type: "Connected", "84%".
-    Text(Text),
+    Text(TextLine),
     /// A glyph in the faint ink: a lock on a secured network.
     Glyph(Icon),
     /// A connected device's battery: its glyph and percentage, sweeping in from empty with the
@@ -68,7 +68,7 @@ impl RowTrailing {
 /// battery sweeps in as `first` says.
 pub(crate) fn trailing(
     mark: &RowTrailing,
-    title: &Text,
+    title: &TextLine,
     availability: Availability,
     settling: Settling,
     first: FirstShow,
@@ -114,7 +114,7 @@ pub(crate) fn trailing(
 fn toggle(
     value: Switch,
     on_toggle: EventHandler<Switch>,
-    title: &Text,
+    title: &TextLine,
     availability: Availability,
 ) -> Element {
     let label = title.plain_text();

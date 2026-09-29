@@ -8,7 +8,7 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
     Alert, AlertEmphasis, Appearance, Button, ButtonVariant, Chevron, Ds, Flow, Icon, IconSource,
-    Inject, Material, ModuleGrid, ModuleState, ModuleTile, Px, Text, Theme,
+    Inject, Material, ModuleGrid, ModuleState, ModuleTile, Px, TextLine, Theme,
 };
 
 const TITLE: &str = "Turn Bluetooth off?";
@@ -62,7 +62,7 @@ fn InPopover(theme: Theme) -> Element {
                     if open() {
                         Alert {
                             title: TITLE,
-                            message: Some(Text::from(MESSAGE)),
+                            message: Some(TextLine::from(MESSAGE)),
                             action: "Turn Off",
                             flow: Flow::Inline,
                             onaction: move |_| open.set(false),
@@ -98,7 +98,7 @@ fn Windowed(theme: Theme, emphasis: AlertEmphasis) -> Element {
                 if open() {
                     Alert {
                         title,
-                        message: Some(Text::from(message)),
+                        message: Some(TextLine::from(message)),
                         action,
                         emphasis,
                         icon,

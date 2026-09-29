@@ -9,7 +9,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, Anim, Appearance, Availability, CommandPalette, Ds, Material, Menu, MenuEntry,
-    MenuKind, Motion, MotionLevel, Point, Px, StaggerIndex, Trail, settle, sleep,
+    MenuKind, MenuTrail, Motion, MotionLevel, Point, Px, StaggerIndex, settle, sleep,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -30,7 +30,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }

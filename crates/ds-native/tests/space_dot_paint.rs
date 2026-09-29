@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, CardAccent, Ds, FrameVars, Grain, Here, Key, Material, PRESETS, Scheme, Shortcut,
-    SpaceDot, SpaceLook, Theme,
+    Appearance, CardAccent, Ds, FrameVars, Grain, Here, Material, PRESETS, Scheme, Shortcut,
+    ShortcutKey, SpaceDot, SpaceLook, Theme,
 };
 use ds_native::{Harness, Viewport};
 
@@ -46,7 +46,7 @@ fn Dots() -> Element {
                         name: "Dot",
                         frame: frame(index),
                         here: Here::Elsewhere,
-                        shortcut: Shortcut(vec![Key::Ctrl, Key::Char('1')]),
+                        shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]),
                         onclick: |_| {},
                     }
                 }

@@ -2,11 +2,11 @@
 //! design/04-COMPONENTS.md section 42). The person's picture, the name, a pill field of flat
 //! white glass with an enter arrow inside it, a caps-lock mark, and a hint line under it.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::spinner::{Spinner, SpinnerKind};
 use crate::components::fields::{
     text_input::{InputVariant, TextInput},
-    text_input_focus::Focus,
+    text_input_focus::FieldFocus,
     text_input_kind::TextInputKind,
 };
 use crate::core::vocab::Availability;
@@ -47,7 +47,7 @@ pub fn LockPrompt(
     #[props(default)] caps: CapsLock,
     #[props(default)] look: LockLook,
     #[props(default)] placeholder: Option<String>,
-    #[props(default)] hint: Option<Text>,
+    #[props(default)] hint: Option<TextLine>,
     #[props(default)] wake: Option<WakeStamp>,
     oninput: EventHandler<String>,
     onsubmit: EventHandler<String>,
@@ -94,9 +94,9 @@ pub fn LockPrompt(
 }
 
 /// The line under the field: the lock-out's time while locked out, else the caller's hint.
-fn hint_line(state: &PromptState, hint: Option<Text>) -> Option<Text> {
+fn hint_line(state: &PromptState, hint: Option<TextLine>) -> Option<TextLine> {
     match state {
-        PromptState::LockedOut { until } => Some(Text::from(format!("Try again at {until}"))),
+        PromptState::LockedOut { until } => Some(TextLine::from(format!("Try again at {until}"))),
         _ => hint,
     }
 }
@@ -173,7 +173,7 @@ fn lock_field(field: Field, state: &PromptState) -> Element {
                     value: "",
                     placeholder: placeholder.clone(),
                     availability,
-                    focus: Focus::OnMount,
+                    focus: FieldFocus::OnMount,
                     onfocus: move |()| oncaret.call(Caret::In),
                     onblur: move |()| oncaret.call(Caret::Out),
                     oninput: move |next: String| {
@@ -232,12 +232,12 @@ fn go_button(
 #[cfg(test)]
 mod tests {
     use super::hint_line;
-    use crate::components::content::text_runs::Text;
+    use crate::components::content::text_runs::TextLine;
     use crate::shell::lock::vocab::PromptState;
 
     #[test]
     fn a_lock_out_speaks_over_the_hint() {
-        let hint = || Some(Text::from("Enter your password"));
+        let hint = || Some(TextLine::from("Enter your password"));
         let out = PromptState::LockedOut {
             until: "9:52".into(),
         };

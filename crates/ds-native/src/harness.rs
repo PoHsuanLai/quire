@@ -28,7 +28,7 @@ use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
 use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
 use dioxus::prelude::*;
-use ds::{InputModality, Key, Point, PointerButton, Px, Rect, Size};
+use ds::{InputModality, Point, PointerButton, Px, Rect, ShortcutKey, Size};
 use keyboard_types::{Location, Modifiers};
 use std::time::{Duration, Instant};
 
@@ -223,14 +223,14 @@ impl Harness {
     }
 
     /// Press and release `key` with the focus where it is. A key makes the modality `keyboard`.
-    pub fn key(&mut self, key: Key) {
+    pub fn key(&mut self, key: ShortcutKey) {
         self.chord(&[], key);
     }
 
-    /// Press and release `key` while `held` modifiers (`Key::Ctrl`, `Shift`, `Alt`, `Super`) are
-    /// down: `chord(&[Key::Ctrl], Key::Char('k'))` is Ctrl+K. A key that is not a modifier in
+    /// Press and release `key` while `held` modifiers (`ShortcutKey::Ctrl`, `Shift`, `Alt`, `Super`) are
+    /// down: `chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'))` is Ctrl+K. A key that is not a modifier in
     /// `held` adds nothing.
-    pub fn chord(&mut self, held: &[Key], key: Key) {
+    pub fn chord(&mut self, held: &[ShortcutKey], key: ShortcutKey) {
         self.doc.set_modality(InputModality::Keyboard);
         let modifiers = held
             .iter()

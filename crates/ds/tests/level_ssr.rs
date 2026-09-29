@@ -10,8 +10,8 @@ mod golden;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Fraction, Inject, Level, LevelControl, LevelGlyph, LevelLook, LevelMode,
-    Material, Muting, Osd, OsdPosition, RootChrome, Shown, Tick,
+    Appearance, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook, LevelMode, Material,
+    Muting, Osd, OsdLevel, OsdPosition, RootChrome, Shown, Tick,
 };
 
 #[derive(Props, Clone)]
@@ -79,17 +79,17 @@ const CASES: &[Case] = &[
     }),
     ("osd-top-right", || {
         osd_root(rsx! {
-            Osd { shown: Shown::Visible, label: "MA270U", level: Level { value: Fraction(620), glyph: HEARD } }
+            Osd { shown: Shown::Visible, label: "MA270U", level: OsdLevel { value: Fraction(620), glyph: HEARD } }
         })
     }),
     ("osd-bottom-centre", || {
         osd_root(rsx! {
-            Osd { shown: Shown::Visible, label: "Display", position: OsdPosition::BottomCentre, level: Level { value: Fraction(300), glyph: LevelGlyph::Brightness } }
+            Osd { shown: Shown::Visible, label: "Display", position: OsdPosition::BottomCentre, level: OsdLevel { value: Fraction(300), glyph: LevelGlyph::Brightness } }
         })
     }),
     ("osd-hidden", || {
         osd_root(rsx! {
-            Osd { shown: Shown::Hidden, label: "Sound", level: Level { value: Fraction(500), glyph: HEARD } }
+            Osd { shown: Shown::Hidden, label: "Sound", level: OsdLevel { value: Fraction(500), glyph: HEARD } }
         })
     }),
 ];

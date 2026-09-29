@@ -12,7 +12,7 @@ use dioxus::prelude::*;
 use ds::{
     Appearance, Button, ButtonVariant, CardAccent, Chevron, Ds, FrameTint, Grain, Icon, Inject,
     Material, ModuleGrid, ModuleState, ModuleTile, Pane, PaneSwitcher, RootChrome, RowTrailing,
-    SettingsRow, Switch, Text, Theme, TileSpan, default_look,
+    SettingsRow, Switch, TextLine, Theme, TileSpan, default_look,
 };
 use ds::{
     AppearancePicker, Fraction, LevelControl, LevelGlyph, LevelLook, ModulePanel, Muting,
@@ -149,7 +149,7 @@ fn Detail(module: Module, on_back: EventHandler<ds::Press>) -> Element {
         Module::WiFi => rsx! {
             SettingsRow { glyph: Icon::Wifi, title: "Home", detail: "Connected", trailing: check(0), onclick: move |_| chosen.set(0) }
             SettingsRow { glyph: Icon::WifiHigh, title: "Studio 5G", detail: "Secured", trailing: check(1), onclick: move |_| chosen.set(1) }
-            SettingsRow { glyph: Icon::WifiLow, title: Text::from("Café Guest"), trailing: check(2), onclick: move |_| chosen.set(2) }
+            SettingsRow { glyph: Icon::WifiLow, title: TextLine::from("Café Guest"), trailing: check(2), onclick: move |_| chosen.set(2) }
         },
         Module::Bluetooth => rsx! {
             SettingsRow {
@@ -158,7 +158,7 @@ fn Detail(module: Module, on_back: EventHandler<ds::Press>) -> Element {
                 onclick: |_| {},
             }
             SettingsRow { glyph: Icon::Mouse, title: "Mouse", detail: "Not connected", trailing: RowTrailing::Chevron, onclick: |_| {} }
-            SettingsRow { glyph: Icon::Phone, title: "Phone", trailing: RowTrailing::Text(Text::from("Paired")), onclick: |_| {} }
+            SettingsRow { glyph: Icon::Phone, title: "Phone", trailing: RowTrailing::Text(TextLine::from("Paired")), onclick: |_| {} }
         },
     };
     rsx! {

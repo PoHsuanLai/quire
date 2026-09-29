@@ -5,7 +5,7 @@
 //! in the placed column, moving the column the least that shows it. Rows already placed when
 //! the gallery opened sit still.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::core::task::spawn_in;
 use crate::host::measure::MountedRef;
@@ -115,7 +115,7 @@ fn entrance(touch: Touch) -> Anim {
 fn PlacedRow(
     id: PlacementId,
     name: String,
-    remove: Text,
+    remove: TextLine,
     arrival: Option<Touch>,
     list: CopyValue<Option<MountedRef>>,
     onedit: EventHandler<WidgetEdit>,

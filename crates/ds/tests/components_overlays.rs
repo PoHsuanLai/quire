@@ -26,7 +26,7 @@ use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::{
     Alpha, Anchor, Appearance, Availability, Ds, Inject, LayerStack, Material, Menu, MenuEntry,
-    MenuKind, Peek, PeekMode, Point, Px, Trail,
+    MenuKind, MenuTrail, Peek, PeekMode, Point, Px,
 };
 use std::cell::Cell;
 use std::future::Future;
@@ -147,7 +147,7 @@ fn floating_surfaces_render_through_the_overlay_host() {
                 Menu {
                     kind: MenuKind::Slim,
                     anchor: Anchor::Point(Point { x: Px(10.0), y: Px(10.0) }),
-                    entries: vec![MenuEntry::Item { availability: Availability::Enabled, value: 1u8, title: "One".to_string(), detail: None, tile: None, trail: Trail::None, check: None }],
+                    entries: vec![MenuEntry::Item { availability: Availability::Enabled, value: 1u8, title: "One".to_string(), detail: None, tile: None, trail: MenuTrail::None, check: None }],
                     onpick: |_| {},
                     onclose: |_| {},
                 }

@@ -10,7 +10,7 @@ use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::shell::lock::vocab::PromptState;
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use dioxus::prelude::*;
 
 /// Whether the field holds anything: the enter button shows only once it does.
@@ -125,7 +125,7 @@ fn clear(
 /// the other alias if it is already playing) and, `settle(ShakeX)` later, the field empties and
 /// the shake is at rest again. Mounted in `Wrong`, it shakes as it arrives.
 pub(crate) fn use_secret_entry(state: &PromptState, oninput: EventHandler<String>) -> SecretEntry {
-    let env = use_hook(try_consume_context::<Signal<Env>>);
+    let env = use_hook(try_consume_context::<Signal<Scope>>);
     let typed = use_hook(|| CopyValue::new(String::new()));
     let generation = use_signal(|| 0u32);
     let filled = use_signal(Filled::default);

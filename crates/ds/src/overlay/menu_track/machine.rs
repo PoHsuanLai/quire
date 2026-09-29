@@ -2,7 +2,7 @@
 
 use super::triangle::shielded;
 use super::types::{
-    Branch, Entered, Held, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget,
+    Branch, Entered, ItemPath, MenuAnim, MenuDirection, MenuHold, MenuKey, MenuPhase, MenuTarget,
     MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
     Submenu,
 };
@@ -26,7 +26,7 @@ impl<K: Clone + PartialEq> MenuTrack<K> {
     pub fn open(timing: MenuTiming, menu: K) -> Self {
         MenuTrack {
             timing,
-            phase: opened(menu, Held::Released),
+            phase: opened(menu, MenuHold::Released),
         }
     }
 
@@ -54,14 +54,14 @@ fn closed<K: Clone>(event: MenuTrackEvent<K>) -> (MenuPhase<K>, Effects<K>) {
     match event {
         MenuTrackEvent::PressTitle(menu) => {
             let effects = vec![MenuTrackEffect::Open(menu.clone(), MenuAnim::Pop)];
-            (opened(menu, Held::Held), effects)
+            (opened(menu, MenuHold::MenuHold), effects)
         }
         _ => (MenuPhase::Closed, Vec::new()),
     }
 }
 
 /// A fresh session on `menu`.
-fn opened<K>(menu: K, held: Held) -> MenuPhase<K> {
+fn opened<K>(menu: K, held: MenuHold) -> MenuPhase<K> {
     MenuPhase::Tracking(Session {
         menu,
         held,
@@ -95,7 +95,7 @@ fn tracking<K: Clone + PartialEq>(
         MenuTrackEvent::PressTitle(other) if other == session.menu => close(Vec::new()),
         MenuTrackEvent::PressTitle(other) => {
             let effects = vec![MenuTrackEffect::Switch(other.clone())];
-            (opened(other, Held::Held), effects)
+            (opened(other, MenuHold::MenuHold), effects)
         }
         MenuTrackEvent::OutsidePress => close(Vec::new()),
         MenuTrackEvent::Release(target) => released(session, target),
@@ -173,14 +173,16 @@ fn released<K: PartialEq>(
             pick: Pickable::Enabled,
             ..
         } => close(vec![MenuTrackEffect::Pick(path)]),
-        MenuTarget::Title(title) if title == session.menu && session.held == Held::Held => keep(
-            Session {
-                held: Held::Released,
-                ..session
-            },
-            Vec::new(),
-        ),
-        _ if session.held == Held::Held => close(Vec::new()),
+        MenuTarget::Title(title) if title == session.menu && session.held == MenuHold::MenuHold => {
+            keep(
+                Session {
+                    held: MenuHold::Released,
+                    ..session
+                },
+                Vec::new(),
+            )
+        }
+        _ if session.held == MenuHold::MenuHold => close(Vec::new()),
         _ => keep(session, Vec::new()),
     }
 }

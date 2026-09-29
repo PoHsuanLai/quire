@@ -6,7 +6,7 @@ use super::swipe::{Click, Stamp, SwipeEffect, SwipeInput, SwipeMetrics, SwipeSta
 use crate::core::geometry::units::Px;
 use crate::core::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
-use crate::style::env::{Env, use_env_signal};
+use crate::style::scope::{Scope, use_scope_signal};
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
@@ -17,7 +17,7 @@ use std::time::Instant;
 pub struct Swiper {
     state: Signal<SwipeState>,
     quiet: Signal<Option<Task>>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     scope: ScopeId,
     origin: Instant,
     metrics: SwipeMetrics,
@@ -37,10 +37,10 @@ impl Swiper {
 
     /// The input a pointer move makes: a move while the primary button is down, or the release
     /// Blitz never delivered (the button came up outside the card; it has no pointer capture).
-    pub fn pointer_moved(&self, x: Px, held: Held) {
+    pub fn pointer_moved(&self, x: Px, held: SwipeHold) {
         match held {
-            Held::Primary => self.feed(SwipeInput::Move { x, at: self.now() }),
-            Held::Nothing => self.feed(SwipeInput::Up { at: self.now() }),
+            SwipeHold::Primary => self.feed(SwipeInput::Move { x, at: self.now() }),
+            SwipeHold::Nothing => self.feed(SwipeInput::Up { at: self.now() }),
         }
     }
 
@@ -91,7 +91,7 @@ impl Swiper {
 
 /// Whether the primary button is down during a pointer move.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Held {
+pub enum SwipeHold {
     /// It is down: the drag goes on.
     Primary,
     /// It is not: the release happened where the card could not hear it.
@@ -103,7 +103,7 @@ pub fn use_swipe(metrics: SwipeMetrics, on_dismiss: EventHandler<()>) -> Swiper 
     Swiper {
         state: use_signal(SwipeState::default),
         quiet: use_signal(|| None),
-        env: use_env_signal(),
+        env: use_scope_signal(),
         scope: use_hook(current_scope_id),
         origin: use_hook(crate::core::time::clock::now),
         metrics,

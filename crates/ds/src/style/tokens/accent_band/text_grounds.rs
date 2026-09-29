@@ -40,7 +40,7 @@ pub enum TextOn {
     Material,
 }
 
-/// What kind of ground a [`Ground`] is, so a failure can say which.
+/// What kind of ground a [`TextGround`] is, so a failure can say which.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum GroundKind {
     /// `--paper`, `--surface`, `--surface-2` or `--raise`.
@@ -55,7 +55,7 @@ pub enum GroundKind {
 
 /// One opaque colour the text accent may be read on.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Ground {
+pub struct TextGround {
     /// Where it comes from.
     pub kind: GroundKind,
     /// The colour a screen shows there.
@@ -78,12 +78,13 @@ pub fn material_grounds(scheme: Scheme) -> Vec<Hex> {
 /// cannot be asked to read where the ink does not, and such a ground is the material's
 /// shortfall (in the band as settled, one: the dark Popover's wash over a white backdrop, where
 /// the ink reaches 4.1:1; `tests::the_only_ground_the_ink_misses_is_the_dark_popover_wash`).
-pub fn text_grounds(on: TextOn, scheme: Scheme, fill: Hex, wash: Alpha) -> Vec<Ground> {
+pub fn text_grounds(on: TextOn, scheme: Scheme, fill: Hex, wash: Alpha) -> Vec<TextGround> {
     let ink = card_ink(scheme);
-    let plain =
-        |kind: GroundKind, hexes: Vec<Hex>| hexes.into_iter().map(move |hex| Ground { kind, hex });
+    let plain = |kind: GroundKind, hexes: Vec<Hex>| {
+        hexes.into_iter().map(move |hex| TextGround { kind, hex })
+    };
     let washed = |kind: GroundKind, hexes: Vec<Hex>| {
-        hexes.into_iter().map(move |hex| Ground {
+        hexes.into_iter().map(move |hex| TextGround {
             kind,
             hex: fill.over(wash, hex),
         })

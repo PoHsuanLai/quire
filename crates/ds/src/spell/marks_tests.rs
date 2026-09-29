@@ -1,6 +1,6 @@
 use super::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
 use crate::edit::position::{EditNode, TextPosition};
-use crate::spell::words::{Span, words};
+use crate::spell::words::{WordSpan, words};
 use std::collections::HashSet;
 
 fn node() -> EditNode {
@@ -10,7 +10,7 @@ fn node() -> EditNode {
 fn mark(start: usize, word: &str) -> Misspelt {
     Misspelt {
         node: node(),
-        span: Span::new(start, start + word.len()),
+        span: WordSpan::new(start, start + word.len()),
         word: word.to_owned(),
     }
 }
@@ -59,7 +59,7 @@ fn the_word_being_typed_is_held_until_the_caret_leaves_it() {
     let caret = |offset| TextPosition::new("p0", offset);
     let typing = |start, end| Typing {
         node: node(),
-        span: Span::new(start, end),
+        span: WordSpan::new(start, end),
     };
     // Typed "teh": the caret is at its end, so it is being typed.
     let held = typing_after(None, Some(&caret(3)), Some("teh"), Edit::Changed);
@@ -96,7 +96,7 @@ fn every_mark_but_the_typed_word_is_shown() {
     let marks = vec![mark(0, "teh"), mark(4, "sat")];
     let held = Typing {
         node: node(),
-        span: Span::new(4, 7),
+        span: WordSpan::new(4, 7),
     };
     let drawn: Vec<&Misspelt> = shown(&marks, Some(&held)).collect();
     assert_eq!(drawn, vec![&marks[0]]);

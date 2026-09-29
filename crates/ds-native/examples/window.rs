@@ -9,7 +9,7 @@ use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key, NamedKey};
 use ds::{
     Anchor, Appearance, Availability, Button, ButtonVariant, Ds, Material, Menu, MenuEntry,
-    MenuKind, Point, Px, Switch, Trail, use_toast_hub,
+    MenuKind, MenuTrail, Point, Px, Switch, use_toast_hub,
 };
 use ds_native::{AppConfig, AppId, launch};
 use std::time::Duration;
@@ -83,7 +83,7 @@ fn entries() -> Vec<MenuEntry<u8>> {
             title: title.into(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
         })
         .collect()

@@ -14,7 +14,7 @@ pub use crate::motion::detail::{
     morph_glyph::MorphGlyph,
     once::{use_nudge, use_shake},
     operation::{Deadline, Operation, PendingToken},
-    pending::{Layers, PendingSpec, PendingStyle},
+    pending::{PendingLayers, PendingSpec, PendingStyle},
     reveal::{Reveal, RevealCue},
     roll_digits::RollDigits,
     settle::{SettleStyle, Settling},

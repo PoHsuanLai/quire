@@ -2,8 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkSize, MarkStyle, PlaceId, Presence,
-    Provider, ProviderMark, Run, RunTone, SidebarItem, Text, Trailing,
+    Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle,
+    PlaceId, Presence, ProviderMark, RunTone, SidebarItem, TextLine, TextRun, Trailing,
 };
 use ds::{DropState, Here, PulseKey};
 
@@ -14,10 +14,10 @@ pub struct Case {
 }
 
 /// The composer's quoted-message head: who in the strong tone, when in the faint one.
-fn quoted_head() -> Text {
-    Text::Runs(vec![
-        Run::new("Dana Okafor", RunTone::Strong),
-        Run::new(" wrote on Tue 22 Sep, 09:41", RunTone::Faint),
+fn quoted_head() -> TextLine {
+    TextLine::Runs(vec![
+        TextRun::new("Dana Okafor", RunTone::Strong),
+        TextRun::new(" wrote on Tue 22 Sep, 09:41", RunTone::Faint),
     ])
 }
 
@@ -43,7 +43,7 @@ fn archive(drop: DropState) -> Element {
 /// The From dropdown's provider, drawn inline.
 fn google() -> Leading {
     Leading::Mark(
-        rsx! { ProviderMark { provider: Provider::Google, size: MarkSize::Inline, style: MarkStyle::Letter } },
+        rsx! { ProviderMark { provider: MarkProvider::Google, size: MarkSize::Inline, style: MarkStyle::Letter } },
     )
 }
 

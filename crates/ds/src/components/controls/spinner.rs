@@ -6,7 +6,7 @@
 
 use crate::motion::detail::{
     operation::Operation,
-    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     use_pending::use_pending,
 };
 use dioxus::prelude::*;
@@ -37,7 +37,7 @@ impl SpinnerKind {
         };
         PendingSpec {
             style,
-            layers: Layers(1),
+            layers: PendingLayers(1),
         }
     }
 }

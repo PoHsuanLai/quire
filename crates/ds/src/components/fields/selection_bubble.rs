@@ -6,7 +6,7 @@
 
 use crate::components::fields::{
     text_input::{InputVariant, TextInput},
-    text_input_focus::Focus,
+    text_input_focus::FieldFocus,
 };
 use crate::components::overlays::popover::{
     Dismiss, Stacking, escape_closes, position_style, use_float,
@@ -99,7 +99,7 @@ pub fn SelectionBubble(
                 label: "Link",
                 value: link(),
                 placeholder: "Paste a link, then Enter",
-                focus: Focus::OnMount,
+                focus: FieldFocus::OnMount,
                 oninput: move |text| link.set(text),
                 onkey: move |key: KeyboardEvent| {
                     if key.key() == Key::Enter {

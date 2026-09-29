@@ -8,7 +8,7 @@ use super::spring::{Leg, Spring, SpringPhase, State};
 use super::spring_spec::SpringSpec;
 use crate::core::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::{FRAME_TICK, clock::sleep};
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use std::time::Instant;
@@ -82,7 +82,7 @@ pub struct SpringMotion {
     run: Signal<Run>,
     frame: Signal<SpringFrame>,
     task: Signal<Option<Task>>,
-    env: Option<Signal<Env>>,
+    env: Option<Signal<Scope>>,
     scope: ScopeId,
     scale: PxPerUnit,
 }
@@ -230,7 +230,7 @@ pub fn use_spring_motion(at: f32, scale: PxPerUnit) -> SpringMotion {
         }),
         frame: use_signal(|| SpringFrame::of(resting.start, SpringPhase::Rest)),
         task: use_signal(|| None),
-        env: try_use_context::<Signal<Env>>(),
+        env: try_use_context::<Signal<Scope>>(),
         scope: use_hook(current_scope_id),
         scale,
     }

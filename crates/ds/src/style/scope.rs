@@ -36,7 +36,7 @@ pub struct HostModality(pub Signal<InputModality>);
 
 /// The enclosing scope, as `Ds` and `Surface` provide it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Env {
+pub struct Scope {
     /// The root's resolved scheme, accent and motion level.
     pub resolved: Resolved,
     /// The scheme of the nearest `Surface` that overrides it, else the root's.
@@ -50,19 +50,19 @@ pub struct Env {
 }
 
 /// The enclosing scope. Panics outside a `Ds`: every quire component is drawn inside one.
-pub fn use_env() -> Env {
-    use_env_signal()()
+pub fn use_scope() -> Scope {
+    use_scope_signal()()
 }
 
 /// The enclosing scope as the signal `Ds` and `Surface` provide, for hooks that read the
 /// motion level when a timer starts rather than when they were created.
-pub(crate) fn use_env_signal() -> Signal<Env> {
-    use_context::<Signal<Env>>()
+pub(crate) fn use_scope_signal() -> Signal<Scope> {
+    use_context::<Signal<Scope>>()
 }
 
 /// Provide `env` to the subtree, updating the provided value when it changes. Nothing here
 /// reads the signal, so the write does not re-render the caller.
-pub(crate) fn use_env_provider(env: Env) -> Signal<Env> {
+pub(crate) fn use_scope_provider(env: Scope) -> Signal<Scope> {
     let mut provided = use_context_provider(|| Signal::new(env));
     if *provided.peek() != env {
         provided.set(env);

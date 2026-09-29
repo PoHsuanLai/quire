@@ -5,7 +5,9 @@
 use crate::edit_hit::hit;
 use crate::harness::{Harness, first};
 use blitz_traits::events::{MouseEventButton, UiEvent};
-use ds::{CapturedPointer, ImeEvent, ImeSwitch, Key, Point, PointerPhase, Px, Rect, TextPosition};
+use ds::{
+    CapturedPointer, ImeEvent, ImeSwitch, Point, PointerPhase, Px, Rect, ShortcutKey, TextPosition,
+};
 
 impl Harness {
     /// The IME attaches to the focused surface (winit's `Ime::Enabled`); a composition starts
@@ -40,7 +42,7 @@ impl Harness {
     /// Ctrl+V where the focus is.
     pub fn paste_html(&mut self, html: &str, text: &str) {
         self.doc.shell.put_html(html.to_owned(), text.to_owned());
-        self.chord(&[Key::Ctrl], Key::Char('v'));
+        self.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v'));
     }
 
     /// The text position the host resolves at `at` inside the first edit surface matching
