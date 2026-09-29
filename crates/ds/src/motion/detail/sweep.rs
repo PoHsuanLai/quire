@@ -14,11 +14,11 @@ use dioxus::prelude::*;
 
 /// An arc's or a bar's share this frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Sweep {
+pub struct SweepShare {
     tween: Tween,
 }
 
-impl Sweep {
+impl SweepShare {
     /// The share to draw now: an SVG arc's span or a bar's `--f`.
     pub fn share(self) -> Fraction {
         self.tween.now()
@@ -65,7 +65,7 @@ pub(crate) fn plan(moment: Moment, level: MotionLevel) -> SweepPlan {
 /// Sweep to `level` as `cue` says: Appear sweeps from zero over `--t-sweep`, Change and Progress
 /// from the current share over `--t-quick`, anything else stands at the level with no frames.
 /// A level that changes with no new cue stands there too. Retargets from where it is (R10).
-pub fn use_sweep(level: Fraction, cue: Cue) -> Sweep {
+pub fn use_sweep(level: Fraction, cue: Cue) -> SweepShare {
     let env = use_level();
     let motion = env.now();
     let start = match plan(cue.moment(), motion) {
@@ -84,7 +84,7 @@ pub fn use_sweep(level: Fraction, cue: Cue) -> Sweep {
             sweep(playback, plan(moment, motion), level, motion);
         });
     }
-    Sweep {
+    SweepShare {
         tween: Tween::of(playback),
     }
 }

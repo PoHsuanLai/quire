@@ -4,7 +4,7 @@
 use super::cue::Cue;
 use super::level::use_level;
 use super::moment::Moment;
-use super::sweep::Sweep;
+use super::sweep::SweepShare;
 use super::tween::Tween;
 use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::playback::use_playback;
@@ -18,7 +18,7 @@ use std::time::Duration;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CountPace {
     /// In step with a sweep: the number reads the arc's own progress, so it lands with it.
-    InStep(Sweep),
+    InStep(SweepShare),
     /// On its own clock (a readout with no arc), over this token with `--e-out`.
     Own(DurationToken),
 }

@@ -6,6 +6,7 @@
 //! A sweep's time is the sweep itself, eased, then a tail in which what waits for the level to
 //! arrive (the charging bolt) fades in, linearly.
 
+use super::Timeline;
 use crate::core::vocab::Fraction;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{
@@ -17,15 +18,17 @@ use std::time::Duration;
 /// Whole, in the thousandths [`Fraction`] counts.
 const WHOLE: u16 = 1000;
 
-/// From where to where a level runs.
+/// A level sweeping from one value to another, and what follows it fading in after.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct LevelRun {
+pub struct Sweep {
     /// Where it starts: empty on a wake, the last level drawn on a change.
     pub from: Fraction,
     /// Where it ends: the true level.
     pub to: Fraction,
     /// Whether what follows the level waits for it (a wake) or is already there (a change).
     pub tail: RunTail,
+    /// How long each part takes at the motion level it plays at.
+    pub timing: RunTiming,
 }
 
 /// What a sweep's tail does.
@@ -94,54 +97,59 @@ impl RunFrame {
             tail: Fraction(WHOLE),
         }
     }
+}
 
-    /// The first frame of `run`.
-    pub fn start(run: LevelRun) -> Self {
-        RunFrame {
-            shown: run.from,
-            tail: match run.tail {
-                RunTail::Follows => Fraction(0),
-                RunTail::Stays => Fraction(WHOLE),
+impl Sweep {
+    /// A sweep that is already at `level`: a level standing still, as under Reduced motion.
+    pub fn at_rest(level: Fraction) -> Sweep {
+        Sweep {
+            from: level,
+            to: level,
+            tail: RunTail::Stays,
+            timing: RunTiming {
+                length: Duration::ZERO,
+                easing: Easing::Linear,
+                tail: Duration::ZERO,
             },
         }
     }
-}
 
-/// Whether a sweep still has frames to draw.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum RunPhase {
-    /// The level or the tail is still moving.
-    Running,
-    /// Both have arrived: nothing more to draw.
-    Done,
-}
-
-/// Where `run` is at `elapsed`: a tail that stays adds no time.
-pub fn phase_at(run: LevelRun, timing: RunTiming, elapsed: Duration) -> RunPhase {
-    let length = match run.tail {
-        RunTail::Follows => timing.total(),
-        RunTail::Stays => timing.length,
-    };
-    if elapsed >= length {
-        RunPhase::Done
-    } else {
-        RunPhase::Running
+    /// The level `progress` (thousandths, a spring may pass 1000) of the way from `from` to `to`.
+    fn level_at(&self, progress: Fraction) -> Fraction {
+        if progress.0 >= WHOLE {
+            return self.to;
+        }
+        let (from, to) = (i32::from(self.from.0), i32::from(self.to.0));
+        let at = from + (to - from) * i32::from(progress.0) / i32::from(WHOLE);
+        Fraction(u16::try_from(at.max(0)).unwrap_or(u16::MAX))
     }
 }
 
-/// What `run` draws `elapsed` into it: the level eased from `from` to `to` across the sweep,
-/// exactly `to` from its end on; a following tail 0 across the sweep, then linear to whole, a
-/// staying one whole throughout.
-pub fn frame_at(run: LevelRun, timing: RunTiming, elapsed: Duration) -> RunFrame {
-    let progress = timing.easing.at(share(elapsed, timing.length));
-    let tail = match (run.tail, elapsed.checked_sub(timing.length)) {
-        (RunTail::Stays, _) => Fraction(WHOLE),
-        (RunTail::Follows, None) => Fraction(0),
-        (RunTail::Follows, Some(after)) => share(after, timing.tail),
-    };
-    RunFrame {
-        shown: level_at(run, progress),
-        tail,
+impl Timeline for Sweep {
+    type Frame = RunFrame;
+
+    /// The sweep and, when what follows it waits, its tail: a tail that stays adds no time.
+    fn total(&self) -> Duration {
+        match self.tail {
+            RunTail::Follows => self.timing.total(),
+            RunTail::Stays => self.timing.length,
+        }
+    }
+
+    /// The level eased from `from` to `to` across the sweep, exactly `to` from its end on; a
+    /// following tail 0 across the sweep, then linear to whole, a staying one whole throughout.
+    fn at(&self, elapsed: Duration) -> RunFrame {
+        let timing = self.timing;
+        let progress = timing.easing.at(share(elapsed, timing.length));
+        let tail = match (self.tail, elapsed.checked_sub(timing.length)) {
+            (RunTail::Stays, _) => Fraction(WHOLE),
+            (RunTail::Follows, None) => Fraction(0),
+            (RunTail::Follows, Some(after)) => share(after, timing.tail),
+        };
+        RunFrame {
+            shown: self.level_at(progress),
+            tail,
+        }
     }
 }
 
@@ -153,21 +161,11 @@ fn share(part: Duration, whole: Duration) -> Fraction {
     let ratio = part.as_micros().saturating_mul(u128::from(WHOLE)) / whole.as_micros().max(1);
     Fraction(u16::try_from(ratio.min(u128::from(WHOLE))).unwrap_or(WHOLE))
 }
-
-/// The level `progress` (thousandths, a spring may pass 1000) of the way from `from` to `to`.
-pub fn level_at(run: LevelRun, progress: Fraction) -> Fraction {
-    if progress.0 >= WHOLE {
-        return run.to;
-    }
-    let (from, to) = (i32::from(run.from.0), i32::from(run.to.0));
-    let at = from + (to - from) * i32::from(progress.0) / i32::from(WHOLE);
-    Fraction(u16::try_from(at.max(0)).unwrap_or(u16::MAX))
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{LevelRun, RunFrame, RunPhase, RunTail, RunTokens, frame_at, phase_at};
+    use super::{RunFrame, RunTail, RunTokens, Sweep};
     use crate::core::vocab::Fraction;
+    use crate::motion::timeline::Timeline;
     use crate::style::appearance::motion::MotionLevel;
     use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
     use std::time::Duration;
@@ -178,21 +176,17 @@ mod tests {
         tail: DurationToken::Quick,
     };
 
-    fn run_of(from: u16, to: u16, tail: RunTail) -> LevelRun {
-        LevelRun {
+    fn sweep_of(from: u16, to: u16, tail: RunTail) -> Sweep {
+        Sweep {
             from: Fraction(from),
             to: Fraction(to),
             tail,
+            timing: TOKENS.timing(MotionLevel::Standard),
         }
     }
 
     fn at(from: u16, to: u16, ms: u64) -> RunFrame {
-        let timing = TOKENS.timing(MotionLevel::Standard);
-        frame_at(
-            run_of(from, to, RunTail::Follows),
-            timing,
-            Duration::from_millis(ms),
-        )
+        sweep_of(from, to, RunTail::Follows).at(Duration::from_millis(ms))
     }
 
     #[test]
@@ -216,29 +210,53 @@ mod tests {
 
     #[test]
     fn a_change_sweeps_down_as_well_as_up_and_keeps_its_tail() {
-        let timing = TOKENS.timing(MotionLevel::Standard);
-        let down = run_of(800, 300, RunTail::Stays);
-        let frame = |ms| frame_at(down, timing, Duration::from_millis(ms));
-        assert_eq!(frame(0), RunFrame::start(down));
-        assert_eq!(frame(0).tail, Fraction(1000));
+        let down = sweep_of(800, 300, RunTail::Stays);
+        let frame = |ms| down.at(Duration::from_millis(ms));
+        let standing = RunFrame {
+            shown: Fraction(800),
+            tail: Fraction(1000),
+        };
+        assert_eq!(frame(0), standing);
         let mid = frame(200).shown.0;
         assert!((301..800).contains(&mid), "{mid}");
         assert_eq!(frame(800), RunFrame::rest(Fraction(300)));
     }
 
     #[test]
-    fn a_sweep_is_done_only_after_its_tail() {
+    fn a_sweep_is_settled_only_after_its_tail() {
         let timing = TOKENS.timing(MotionLevel::Standard);
         assert_eq!(timing.total(), Duration::from_millis(970));
         let cases = [
-            (RunTail::Follows, 969, RunPhase::Running),
-            (RunTail::Follows, 970, RunPhase::Done),
-            (RunTail::Stays, 799, RunPhase::Running),
-            (RunTail::Stays, 800, RunPhase::Done),
+            (RunTail::Follows, 969, false),
+            (RunTail::Follows, 970, true),
+            (RunTail::Stays, 799, false),
+            (RunTail::Stays, 800, true),
         ];
         for (tail, ms, want) in cases {
-            let got = phase_at(run_of(0, 500, tail), timing, Duration::from_millis(ms));
+            let got = sweep_of(0, 500, tail).settled(Duration::from_millis(ms));
             assert_eq!(got, want, "{tail:?} {ms}");
         }
+    }
+
+    #[test]
+    fn a_sweep_at_rest_draws_its_level_whole_at_once() {
+        let rest = Sweep::at_rest(Fraction(640));
+        assert_eq!(rest.total(), Duration::ZERO);
+        assert_eq!(rest.at(Duration::ZERO), RunFrame::rest(Fraction(640)));
+    }
+
+    #[test]
+    fn a_sweep_is_at_its_start_inside_its_sweep_at_half_and_at_rest_at_total() {
+        let sweep = sweep_of(0, 800, RunTail::Follows);
+        let total = sweep.total();
+        let empty = RunFrame {
+            shown: Fraction(0),
+            tail: Fraction(0),
+        };
+        assert_eq!(sweep.at(Duration::ZERO), empty);
+        let half = sweep.at(total / 2);
+        assert_eq!(half.tail, Fraction(0), "half of 970 ms is inside the sweep");
+        assert!((1..800).contains(&half.shown.0), "{half:?}");
+        assert_eq!(sweep.at(total), RunFrame::rest(Fraction(800)));
     }
 }

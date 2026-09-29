@@ -8,6 +8,7 @@
 pub(crate) mod ease;
 pub(crate) mod glide;
 pub(crate) mod playback;
+pub(crate) mod sweep;
 
 use std::time::Duration;
 
