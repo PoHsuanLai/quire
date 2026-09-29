@@ -1,7 +1,7 @@
 //! design/26 D0b on the two components whose spinners looped forever (section 6): a module tile
-//! that stays Busy, and a lock prompt that stays Checking, now step after the grace, hold their
-//! still frame at `PendingCap` and paint 0 frames from then on, with nothing new from the caller
-//! (the operation is derived from the state's own Pending moment).
+//! that stays Busy, and a lock prompt that stays Checking, spin at once and keep turning for as
+//! long as the state holds, then go and paint 0 frames, with nothing new from the caller (the
+//! operation is derived from the state's own Pending moment).
 
 use dioxus::prelude::*;
 use ds::{
@@ -9,9 +9,9 @@ use ds::{
     Material, ModuleState, PromptState, person_hue,
 };
 use ds::{ModuleTile, TextLine};
-use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
+use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 360,
@@ -19,7 +19,7 @@ const VIEW: Viewport = Viewport {
     scale_percent: 100,
 };
 
-/// `PendingCap` and a little: the spinner holds still by then.
+/// Long past where a cap used to hold a still frame.
 const PAST_CAP: Duration = Duration::from_millis(10_500);
 
 static MODULE: GlobalSignal<ModuleState> = Signal::global(|| ModuleState::Off);
@@ -40,41 +40,28 @@ fn pending(harness: &Harness) -> Option<String> {
     harness.attr(".ds-spinner", "data-pending")
 }
 
-/// Wait until the spinner steps, then until it holds still, and check it holds still no sooner
-/// than the cap after `busy` and paints nothing after.
-fn steps_then_holds(harness: &mut Harness, busy: Instant) {
-    settle_until(harness, |h| pending(h).as_deref() == Some("step"));
-    while harness.now().duration_since(busy) < PAST_CAP
-        && pending(harness).as_deref() != Some("still")
-    {
-        harness.advance(Duration::from_millis(250));
-    }
+/// The spinner turns at once and is still turning well past where a cap used to stop it.
+fn spins_and_keeps_spinning(harness: &mut Harness) {
+    harness.advance(Duration::from_millis(50));
+    assert_eq!(pending(harness).as_deref(), Some("step"), "no grace");
+    harness.advance(PAST_CAP);
+    let turn = harness.attr(".ds-spinner", "style");
     assert_eq!(
         pending(harness).as_deref(),
-        Some("still"),
+        Some("step"),
         "{}",
         harness.html()
     );
-    assert!(
-        harness.now().duration_since(busy) >= Duration::from_secs(10),
-        "held before the cap"
-    );
-    assert_settles_to_zero_frames(harness);
+    harness.advance(Duration::from_millis(83));
+    assert_ne!(harness.attr(".ds-spinner", "style"), turn, "still turning");
 }
 
 #[test]
-fn a_busy_module_tile_stops_at_the_cap() {
+fn a_busy_module_tile_spins_until_it_lands() {
     let mut harness =
         Harness::with_config(Tile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MODULE.write() = ModuleState::Busy);
-    let busy = harness.now();
-    harness.advance(Duration::from_millis(50));
-    assert_eq!(
-        pending(&harness).as_deref(),
-        Some("idle"),
-        "no ring inside the grace"
-    );
-    steps_then_holds(&mut harness, busy);
+    spins_and_keeps_spinning(&mut harness);
     harness.within(|| *MODULE.write() = ModuleState::On);
     harness.advance(Duration::from_millis(30));
     assert_eq!(harness.count(".ds-spinner"), 0);
@@ -103,12 +90,11 @@ fn Lock() -> Element {
 }
 
 #[test]
-fn a_checking_lock_prompt_stops_at_the_cap() {
+fn a_checking_lock_prompt_spins_until_the_try_ends() {
     let mut harness =
         Harness::with_config(Lock, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *PROMPT.write() = PromptState::Checking);
-    let checking = harness.now();
-    steps_then_holds(&mut harness, checking);
+    spins_and_keeps_spinning(&mut harness);
     // The try fails: the ring goes, the field shakes once, and the prompt rests.
     harness.within(|| *PROMPT.write() = PromptState::Wrong);
     harness.advance(Duration::from_millis(30));

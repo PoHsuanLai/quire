@@ -3,24 +3,18 @@
 //! the shell's volume and brightness control and the OSD's level.
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set
-//! from outside (a key, the OSD, the service) slides over `--t-quick --e-out`. A press swells the
-//! track (`scaleY(1.08)`, `--e-spring`: contact); dragging past either end stretches the capsule
-//! a few pixels (the rubber band, off under Reduced) and it springs back on release. Keys step by
-//! a sixteenth, Shift by a sixty-fourth. The machine is `machine.rs`; the drawing `look.rs`.
+//! from outside (a key, the OSD, the service) slides over `--t-quick --e-out`. Keys step by a
+//! sixteenth, Shift by a sixty-fourth. The machine is `machine.rs`; the drawing `look.rs`.
 
 use super::look::{Drawn, body};
-use super::machine::{KeyStep, LevelInput, LevelState, Nudge, Rubber, step};
+use super::machine::{Hold, KeyStep, LevelInput, Nudge, step};
 use crate::components::content::level_glyph::glyph::LevelGlyphView;
-use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource, Tick};
+use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource};
 use crate::core::geometry::units::{Px, Rect, Size};
 use crate::core::vocab::{Availability, Fraction, PressPhase};
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
-use crate::motion::{anim::Anim, pulse::use_pulse};
-use crate::style::appearance::motion::MotionLevel;
 use crate::style::icon::render::IconSize;
-use crate::style::scope::use_scope;
-use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -38,30 +32,18 @@ pub fn LevelControl(
     #[props(into)] glyph: LevelSource,
     #[props(default)] mode: LevelMode,
     #[props(default)] look: LevelLook,
-    #[props(default)] tick: Tick,
     #[props(default)] availability: Availability,
     #[props(default)] onchange: EventHandler<Fraction>,
 ) -> Element {
     let value = value.clamped();
     let (glyph, glyph_level) = glyph.drawn(value);
-    let rubber = match use_scope().resolved.motion {
-        MotionLevel::Reduced => Rubber::Off,
-        MotionLevel::Standard => Rubber::On,
-    };
-    let mut state = use_signal(|| LevelState::IDLE);
+    let mut state = use_signal(|| Hold::Idle);
     let mut rail = use_signal(|| None::<Rc<MountedData>>);
     let mut root = use_signal(|| None::<Rc<MountedData>>);
-    let pulse = use_pulse(Anim::LevelTick);
-    let before = use_before(value);
-    if tick == Tick::Quiet
-        && super::machine::crossing(before, value) == super::machine::Crossing::Crossed
-    {
-        queue_effect(move || pulse.fire());
-    }
     let now = state();
     let takes_input = mode == LevelMode::Interactive && availability == Availability::Enabled;
     let mut apply = move |input: LevelInput, at: Fraction| {
-        let stepped = step(*state.peek(), at, input, rubber);
+        let stepped = step(*state.peek(), at, input);
         state.set(stepped.state);
         if let Some(next) = stepped.value {
             onchange.call(next);
@@ -70,17 +52,14 @@ pub fn LevelControl(
     let drawn = Drawn {
         look,
         value,
-        before,
         glyph,
         glyph_level,
-        tick: tick_attrs(tick, pulse.attrs()),
     };
     let lead = match look {
         LevelLook::Capsule => None,
         LevelLook::CapsuleKnob | LevelLook::Segments => Some(glyph),
     };
-    let (over, stretch) = now.stretch.attrs().unzip();
-    let live = match now.hold.phase() {
+    let live = match now.phase() {
         PressPhase::Idle => "idle",
         PressPhase::Pressed | PressPhase::Held => "live",
     };
@@ -91,16 +70,12 @@ pub fn LevelControl(
         (LevelMode::ReadOnly, _) => ("progressbar", None),
     };
     let fill = value.css();
-    let rb = stretch
-        .map(|by| format!(";--rb:{by:.2}px"))
-        .unwrap_or_default();
     rsx! {
         div {
             class: "ds-level",
             "data-look": look.slug(),
             "data-mode": mode.slug(),
             "data-drag": live,
-            "data-over": over,
             role,
             tabindex,
             "aria-label": "{label}",
@@ -109,7 +84,7 @@ pub fn LevelControl(
             "aria-valuenow": "{percent(value)}",
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
-            style: "--f:{fill}{rb}",
+            style: "--f:{fill}",
             onmounted: move |event| root.set(Some(event.data())),
             onpointerdown: move |event| {
                 if !takes_input {
@@ -161,23 +136,6 @@ pub fn LevelControl(
                 }
             }
         }
-    }
-}
-
-/// The level the control showed before this render, kept across renders: what the tick and the
-/// segments' stagger compare the new level with.
-fn use_before(value: Fraction) -> Fraction {
-    let mut last = use_hook(|| CopyValue::new(value));
-    let before = *last.peek();
-    last.set(value);
-    before
-}
-
-/// The tick's class and alias when `Tick::Quiet`.
-fn tick_attrs(tick: Tick, attrs: Option<(String, &'static str)>) -> Option<(String, &'static str)> {
-    match tick {
-        Tick::Off => None,
-        Tick::Quiet => Some(attrs.unwrap_or_else(|| (String::new(), "rest"))),
     }
 }
 

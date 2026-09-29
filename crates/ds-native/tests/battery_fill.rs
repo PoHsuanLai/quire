@@ -1,17 +1,15 @@
-//! design/23-WIDGETS.md section 4.1 on a real Blitz document: a battery ring fills from empty
-//! to its level on mount, its percentage counting alongside and ending on the true value; a new
-//! level sweeps from the old one; a new `WakeStamp` replays the fill; a charging bolt arrives
-//! only once the fill has; once settled nothing moves and nothing asks for a frame (the
-//! idle-frame rule); under Reduced motion the ring is at its level from the first frame.
+//! design/23-WIDGETS.md section 4.1 on a real Blitz document, with design/30 section 1.3: a battery
+//! ring stands at its level on mount, its percentage showing the true value at once; a new level
+//! moves the arc linearly over `--t-move` while the number changes instantly; a charging bolt is
+//! there from the first frame; once settled nothing moves and nothing asks for a frame (the
+//! idle-frame rule); under Reduced motion the ring is at its level at once.
 
 use dioxus::prelude::*;
 use ds::{
     Appearance, BatteryFigure, BatteryLevel, Ds, DurationToken, Fraction, Material, Motion,
-    MotionLevel, RingMark, RootChrome, WakeStamp,
+    MotionLevel, RingMark, RootChrome,
 };
-use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
-use std::cell::RefCell;
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -21,13 +19,12 @@ const VIEW: Viewport = Viewport {
 };
 
 static LEVEL: GlobalSignal<Fraction> = Signal::global(|| Fraction(930));
-static WAKE: GlobalSignal<WakeStamp> = Signal::global(WakeStamp::default);
-/// A ring and its figure at `LEVEL` and `WAKE`.
+/// A ring and its figure at `LEVEL`.
 fn stage(motion: Motion, mark: RingMark) -> Element {
     rsx! {
         Ds { appearance: Appearance { motion, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
-            BatteryLevel { level: LEVEL(), mark, wake: WAKE(), label: "This computer" }
-            span { id: "figure", BatteryFigure { level: LEVEL(), wake: WAKE() } }
+            BatteryLevel { level: LEVEL(), mark, label: "This computer" }
+            span { id: "figure", BatteryFigure { level: LEVEL() } }
         }
     }
 }
@@ -68,69 +65,48 @@ fn drawn(harness: &Harness) -> u16 {
     (degrees / 360.0 * 1000.0).round() as u16
 }
 
-fn moving(harness: &Harness) -> bool {
-    harness.attr(".ds-battery", "data-pulse").is_some()
-}
-
 fn figure(harness: &Harness) -> String {
     harness.text_of("#figure").unwrap_or_default()
 }
 
-/// Poll until the ring is at rest, recording every arc and figure seen on the way.
-fn samples(harness: &mut Harness) -> (Vec<u16>, Vec<String>, Instant) {
-    let seen = RefCell::new((Vec::new(), Vec::new()));
-    let rested = settle_until(harness, |h| {
-        let mut seen = seen.borrow_mut();
-        seen.0.push(drawn(h));
-        seen.1.push(figure(h));
-        !moving(h)
-    });
-    let (arcs, figures) = seen.into_inner();
-    (arcs, figures, rested)
+/// Step 10 ms at a time until the arc has been `target` for three frames running, recording every
+/// arc seen on the way and when the last step landed.
+fn samples(harness: &mut Harness, target: u16) -> (Vec<u16>, Instant) {
+    let mut arcs: Vec<u16> = Vec::new();
+    while arcs.len() < 3
+        || arcs[arcs.len() - 3..]
+            .iter()
+            .any(|&arc| arc.abs_diff(target) > 1)
+    {
+        assert!(arcs.len() < 200, "the arc never reached {target}: {arcs:?}");
+        arcs.push(drawn(harness));
+        harness.advance(Duration::from_millis(10));
+    }
+    (arcs, harness.now())
 }
 
-fn fill() -> Duration {
-    DurationToken::Fill.duration(MotionLevel::Standard)
+fn travel() -> Duration {
+    DurationToken::Move.duration(MotionLevel::Standard)
 }
 
-fn assert_climbs(arcs: &[u16]) {
-    assert!(
-        arcs.windows(2).all(|pair| pair[0] <= pair[1]),
-        "the arc went back: {arcs:?}"
-    );
-    let distinct = arcs.windows(2).filter(|pair| pair[0] < pair[1]).count();
-    assert!(distinct >= 3, "hardly moved through the fill: {arcs:?}");
-}
-
-/// Settled for good: the same arc after a while, no pulse, no frame asked for.
+/// Settled for good: the same arc after a while, and nothing woke the document (no Rust timer
+/// asked for a frame).
 fn assert_rests(harness: &mut Harness) {
-    let before = harness.attr(".ds-battery-arc path", "d");
+    let before = (harness.attr(".ds-battery-arc path", "d"), harness.wakes());
     harness.advance(Duration::from_millis(300));
-    assert_eq!(harness.attr(".ds-battery-arc path", "d"), before);
-    assert!(!moving(harness), "{}", harness.html());
-    assert!(!harness.is_animating(), "a settled ring asks for frames");
+    assert_eq!(
+        (harness.attr(".ds-battery-arc path", "d"), harness.wakes()),
+        before,
+        "a settled ring asks for frames"
+    );
 }
 
 #[test]
-fn a_ring_fills_from_empty_and_its_figure_counts_to_the_level() {
-    let mut harness =
-        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    let mounted = harness.now();
+fn a_ring_stands_at_its_level_and_shows_its_figure_at_once() {
+    let mut harness = Harness::new(Stage, VIEW);
     assert_eq!(
         harness.attr(".ds-battery", "aria-valuenow").as_deref(),
-        Some("93"),
-        "the true level from the first frame"
-    );
-    let (arcs, figures, rested) = samples(&mut harness);
-    assert!(
-        arcs[0] < 930,
-        "the fill starts short of the level: {arcs:?}"
-    );
-    assert_climbs(&arcs);
-    assert!(
-        rested.duration_since(mounted) >= fill(),
-        "at rest only after the whole fill: {:?}",
-        rested.duration_since(mounted)
+        Some("93")
     );
     assert!(
         (929..=931).contains(&drawn(&harness)),
@@ -138,32 +114,22 @@ fn a_ring_fills_from_empty_and_its_figure_counts_to_the_level() {
         drawn(&harness)
     );
     assert_eq!(figure(&harness), "93%");
-    let counts: Vec<u16> = figures
-        .iter()
-        .filter_map(|f| f.trim_end_matches('%').parse().ok())
-        .collect();
-    assert!(
-        counts.windows(2).all(|pair| pair[0] <= pair[1]) && counts.first() < Some(&93),
-        "the figure counts up: {figures:?}"
-    );
-    assert!(
-        counts.iter().any(|&n| n > 0 && n < 93),
-        "the figure passes through the numbers between: {figures:?}"
-    );
     assert_rests(&mut harness);
 }
 
 #[test]
-fn a_new_level_sweeps_from_the_old_and_a_new_wake_replays() {
-    let mut harness = Harness::new(Stage, VIEW);
-    settle_until(&mut harness, |h| !moving(h));
+fn a_new_level_moves_the_arc_linearly_and_the_figure_changes_at_once() {
+    let mut harness =
+        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let changed = harness.now();
     harness.within(|| *LEVEL.write() = Fraction(400));
-    settle_until(&mut harness, moving);
+    harness.advance(Duration::from_millis(1));
+    assert_eq!(figure(&harness), "40%", "a number changes instantly");
     assert_eq!(
         harness.attr(".ds-battery", "aria-valuenow").as_deref(),
         Some("40")
     );
-    let (arcs, figures, _) = samples(&mut harness);
+    let (arcs, rested) = samples(&mut harness, 400);
     assert!(
         arcs.windows(2).all(|pair| pair[0] >= pair[1]),
         "the arc went back up: {arcs:?}"
@@ -172,46 +138,25 @@ fn a_new_level_sweeps_from_the_old_and_a_new_wake_replays() {
         arcs.iter().any(|&a| a > 410 && a < 920),
         "no frame between the old level and the new: {arcs:?}"
     );
+    assert!(
+        rested.duration_since(changed) >= travel(),
+        "at rest only after the whole move: {:?}",
+        rested.duration_since(changed)
+    );
     assert!((399..=401).contains(&drawn(&harness)));
-    assert_eq!(figure(&harness), "40%", "{figures:?}");
-    assert_rests(&mut harness);
-
-    harness.within(|| *WAKE.write() = WAKE().next());
-    settle_until(&mut harness, moving);
-    let (arcs, _, _) = samples(&mut harness);
-    assert!(arcs[0] < 200, "a wake starts from empty: {arcs:?}");
-    assert_climbs(&arcs);
-    assert!((399..=401).contains(&drawn(&harness)));
-    assert_eq!(figure(&harness), "40%");
     assert_rests(&mut harness);
 }
 
 #[test]
-fn a_charging_bolt_arrives_after_the_fill() {
-    let mut harness = Harness::with_config(
-        ChargingStage,
-        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
-    );
-    let mounted = harness.now();
-    assert_eq!(
-        harness.count(".ds-battery-bolt"),
-        0,
-        "no bolt while filling"
-    );
-    let bolted = settle_until(&mut harness, |h| h.count(".ds-battery-bolt") == 1);
-    assert!(
-        bolted.duration_since(mounted) >= fill(),
-        "the bolt came before the fill ended: {:?}",
-        bolted.duration_since(mounted)
-    );
-    settle_until(&mut harness, |h| !moving(h));
+fn a_charging_bolt_is_there_from_the_first_frame() {
+    let mut harness = Harness::new(ChargingStage, VIEW);
+    assert_eq!(harness.count(".ds-battery-bolt"), 1);
     assert_eq!(harness.attr(".ds-battery-bolt", "style"), None, "fully in");
     assert_rests(&mut harness);
     // A change while charging keeps the bolt.
     harness.within(|| *LEVEL.write() = Fraction(950));
-    settle_until(&mut harness, moving);
-    assert_eq!(harness.count(".ds-battery-bolt"), 1);
-    settle_until(&mut harness, |h| !moving(h));
+    // A charging ring leaves a gap at twelve for the bolt, so a full one ends at 914.
+    samples(&mut harness, 914);
     assert_eq!(harness.count(".ds-battery-bolt"), 1);
 }
 
@@ -220,11 +165,9 @@ fn under_reduced_motion_the_ring_is_at_its_level_at_once() {
     let mut harness = Harness::new(ReducedStage, VIEW);
     assert!((929..=931).contains(&drawn(&harness)), "{}", harness.html());
     assert_eq!(figure(&harness), "93%");
-    assert!(!moving(&harness));
     harness.within(|| *LEVEL.write() = Fraction(400));
     harness.advance(Duration::from_millis(30));
     assert!((399..=401).contains(&drawn(&harness)), "{}", harness.html());
     assert_eq!(figure(&harness), "40%");
-    assert!(!moving(&harness));
     assert!(!harness.is_animating());
 }

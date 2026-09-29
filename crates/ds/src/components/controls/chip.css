@@ -1,8 +1,5 @@
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
-   washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate.
-   `chip-land` plays through the pulse classes (`a-chip-land`), not from here, and so does the
-   Person chip's flash (`a-chip-flash`: `0 0 0 3px var(--accent-soft)` held for `--t-flash`,
-   `S:2119`). */
+   washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate. */
 
 .ds-chip{ font-family:var(--font-data); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
@@ -32,12 +29,10 @@
 .ds-chip[*|data-variant=status][*|data-status=ok]{ background:var(--ok-wash); color:var(--ok); }
 .ds-chip[*|data-variant=status][*|data-status=bad]{ background:var(--danger-wash); color:var(--danger); }
 
-/* Person: `S:592-598`, entering with `chip-in` on mount. The avatar is an 18 Avatar. The entry
-   steps aside while the flash plays, or this rule would outrank the pulse class. */
+/* Person: `S:592-598`. The avatar is an 18 Avatar. */
 .ds-chip[*|data-variant=person]{
   display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-8) var(--s-2) var(--s-3); border-radius:var(--r-pill);
   background:var(--surface); border:var(--hair) solid var(--line);
   font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
 }
-.ds-chip[*|data-variant=person]:not(.a-chip-flash){ animation:chip-in var(--t-move) var(--e-spring); }
 .ds-chip-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }

@@ -1,69 +1,23 @@
 //! A share driven frame by frame from Rust, for what the stylesheet cannot reach inside an SVG
-//! (design/26-DETAILS.md section 4.1): a follower of a target, and the frame a sweep or a count
-//! reads, on the easing tokens' own curves (`CubicBezier::at`).
+//! (design/26-DETAILS.md section 4.1): a follower of a target on the easing tokens' own curves
+//! (`CubicBezier::at`). A determinate value that changes (a battery ring's arc, a slash drawn
+//! on) moves to its new value and nothing sweeps in on first show (design/30 section 1.3).
 
 use super::level::use_level;
 use crate::core::vocab::Fraction;
-use crate::motion::timeline::ease::Ease;
-use crate::motion::timeline::glide::{Glide, Pose};
-use crate::motion::timeline::playback::Playback;
+use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::use_timeline::use_timeline;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
-use std::time::Duration;
 
-/// How a tween moves: a duration token, along `--e-out` (a tween never overshoots: an
-/// overshoot needs the person's contact, R5, and nothing a tween draws is touched).
+/// How a tween moves: a duration token along an easing token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TweenSpec {
     /// How long, as the level says.
     pub duration: DurationToken,
-}
-
-/// A tween's frame: the share to draw now and how far through its move it is.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Tween {
-    pose: Pose,
-    run: u32,
-    ease: Ease,
-}
-
-impl Tween {
-    /// The frame `playback` draws now, subscribing the caller's render to it.
-    pub(crate) fn of(playback: Playback<Glide>) -> Tween {
-        Tween {
-            pose: playback.frame(),
-            run: playback.serial(),
-            ease: playback.timeline().unwrap_or_else(|| Glide::still(0)).ease,
-        }
-    }
-
-    /// The share now, in thousandths (a spring may read past its target on the way; never
-    /// below 0).
-    pub fn now(self) -> Fraction {
-        Fraction(u16::try_from(self.pose.value.max(0)).unwrap_or(u16::MAX))
-    }
-
-    /// The curve the move follows, for a count that must land with it.
-    pub(crate) fn ease(self) -> Ease {
-        self.ease
-    }
-
-    /// Time since the current move started.
-    pub fn elapsed(self) -> Duration {
-        self.pose.elapsed
-    }
-
-    /// Whether the move has landed.
-    pub fn landed(self) -> bool {
-        self.pose.through.0 >= 1000
-    }
-
-    /// Which move this frame belongs to: every start, retarget or jump is a new run.
-    pub(crate) fn run(self) -> u32 {
-        self.run
-    }
+    /// The curve: `--e-linear` for a value a person reads as it moves.
+    pub easing: EasingToken,
 }
 
 /// The share of a tween that follows `target`: it stands there on mount, and each time `target`
@@ -83,7 +37,7 @@ pub fn use_tween(target: Fraction, spec: TweenSpec) -> Fraction {
                 *drawn.peek(),
                 to,
                 spec.duration.duration(level),
-                EasingToken::Out.easing(level),
+                spec.easing.easing(level),
             ),
         };
         plan.set((target, glide));

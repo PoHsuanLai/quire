@@ -1,5 +1,4 @@
-//! The PDF thumbnail as markup (sill M9's launcher preview): each state, loading (inside the
-//! grace), pending (past it), a portrait and a landscape page, an empty document, and the two
+//! The PDF thumbnail as markup (sill M9's launcher preview): each state, pending, a portrait and a landscape page, an empty document, and the two
 //! failures, matches its golden under `tests/snapshots/pdf_thumb/`, lints clean, and uses only
 //! `ds-` classes the stylesheet styles.
 //!
@@ -12,8 +11,8 @@ use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
-    Appearance, Ds, ImageSize, ImageSource, Inject, Material, PDF_THUMB_GRACE, PdfPage, PdfThumb,
-    PdfTrouble, Px, Size, Theme,
+    Appearance, Ds, ImageSize, ImageSource, Inject, Material, PdfPage, PdfThumb, PdfTrouble, Px,
+    Size, Theme,
 };
 use std::pin::pin;
 use std::sync::Arc;
@@ -89,8 +88,7 @@ type Specimen = (&'static str, fn() -> Element, Duration);
 const NOW: Duration = Duration::ZERO;
 
 const SPECIMENS: &[Specimen] = &[
-    ("loading", loading, NOW),
-    ("pending", loading, PDF_THUMB_GRACE.saturating_mul(2)),
+    ("pending", loading, NOW),
     ("letter", letter, NOW),
     ("landscape-dark", landscape_dark, NOW),
     ("empty", empty, NOW),
@@ -184,10 +182,8 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
 #[test]
 fn the_markup_carries_the_state() {
     let fresh = render(loading, NOW);
-    assert!(fresh.contains("data-state=\"loading\""), "{fresh}");
+    assert!(fresh.contains("data-state=\"pending\""), "{fresh}");
     assert!(fresh.contains("aria-busy=\"true\""), "{fresh}");
-    let later = render(loading, PDF_THUMB_GRACE.saturating_mul(2));
-    assert!(later.contains("data-state=\"pending\""), "{later}");
     let ready = render(letter, NOW);
     assert!(ready.contains("data-state=\"ready\""), "{ready}");
     assert!(

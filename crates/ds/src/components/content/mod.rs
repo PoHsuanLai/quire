@@ -8,7 +8,6 @@ pub mod image_source;
 pub mod level_glyph;
 pub(crate) mod muted;
 pub(crate) mod pdf_thumb;
-pub(crate) mod pdf_thumb_grace;
 pub mod picture_fit;
 pub(crate) mod provider_mark;
 pub mod rich_text;

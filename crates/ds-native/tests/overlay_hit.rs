@@ -7,9 +7,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, ListRow, Material,
-    OverlayId, PartHooks, Point, Presence, PulseKey, Px, Rect, RowState, Selection, Size,
-    StaggerIndex, ZLayer, use_hover_intent, use_overlays,
+    Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, ListRow, Material,
+    OverlayId, PartHooks, Point, Presence, Px, Rect, RowState, Selection, Size, StaggerIndex,
+    ZLayer, use_hover_intent, use_overlays,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -242,7 +242,6 @@ fn MailRow(i: usize, log: Signal<Vec<String>>) -> Element {
                 time: "09:41",
                 tags: rsx! {},
                 star: None,
-                star_pulse: PulseKey::rest(Anim::StarPop),
                 strip: None,
                 onclick: move |_| log.write().push(format!("click m{i}")),
                 on_sender: Some(sender),

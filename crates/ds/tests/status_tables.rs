@@ -134,30 +134,6 @@ fn the_low_threshold_is_the_callers() {
 }
 
 #[test]
-fn the_bluetooth_table() {
-    use BluetoothState::{Connected, Connecting, Failed, Off, On};
-    moment_table(&[
-        (On, On, Moment::Rest),
-        (Off, On, Moment::Change),
-        (On, Off, Moment::Unavailable),
-        (Connected, Off, Moment::Unavailable),
-        (On, Connecting(ONE), Moment::Pending),
-        (Connecting(ONE), Connecting(TWO), Moment::Pending),
-        (Connecting(ONE), Connected, Moment::Success),
-        (On, Connected, Moment::Change),
-        (Connected, On, Moment::Change),
-        (Connecting(ONE), Failed(ONE), Moment::Failure),
-        (Failed(ONE), Failed(ONE), Moment::Rest),
-        (Failed(ONE), Failed(TWO), Moment::Failure),
-    ]);
-    first_table(&[
-        (Connecting(ONE), Moment::Pending),
-        (Connected, Moment::Rest),
-        (Off, Moment::Rest),
-    ]);
-}
-
-#[test]
 fn the_volume_table() {
     use VolumeState::{Heard, Muted, NoDevice};
     moment_table(&[

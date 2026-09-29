@@ -1,23 +1,18 @@
 //! WifiGlyph: the Wi-Fi fan as layers, the dot and three arcs from the inside out, a "!" badge
-//! and a slash (design/26-DETAILS.md 5.1.1). Joining searches one layer at a time after
-//! `PendingGrace` and holds a dimmed still frame at `PendingCap` (R4); a join that lands fills the
-//! layers once up to the real bars; a strength change cross-fades the arcs; no internet grows the
-//! badge in; a failed join shakes once; turning the radio off draws the slash on.
+//! and a slash (design/26-DETAILS.md 5.1.1). Joining lights one layer at a time, a step every
+//! `--t-spin-step`, from the moment the join starts; a strength change cross-fades the arcs; no
+//! internet grows the badge in; turning the radio off draws the slash on.
 
 use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use super::wifi_state::{WifiReach, WifiState};
 use crate::motion::detail::{
-    first_show::FirstShow,
     morph::Slashed,
-    once::use_shake,
     pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
-    settle::{SettleStyle, Settling},
     touch::Touch,
     use_detail::use_detail,
     use_operation::use_operation,
     use_pending::use_pending,
-    use_settle::use_settle,
 };
 use crate::style::icon::render::IconSize;
 use crate::style::icon::shape::Shape;
@@ -25,7 +20,7 @@ use crate::style::icon::stroke::stroke_width;
 use crate::style::scale::use_scale;
 use dioxus::prelude::*;
 
-/// The searching loop: the dot and the three arcs, one at a time (1200 ms a cycle).
+/// The searching loop: the dot and the three arcs, one at a time (a step every `--t-spin-step`).
 pub(crate) const SEARCHING: PendingSpec = PendingSpec {
     style: PendingStyle::Iterate,
     layers: PendingLayers(4),
@@ -47,18 +42,14 @@ const LAYERS: [(&str, &[Shape]); 4] = [
     ("arc-3", ARC_3),
 ];
 
-/// How each layer shows: the state as it is, a pending frame over it, or a success filling.
-pub(crate) fn layer_shows(state: WifiState, frame: PendingFrame, settling: Settling) -> [Show; 4] {
+/// How each layer shows: the state as it is, or a pending frame over it.
+pub(crate) fn layer_shows(state: WifiState, frame: PendingFrame) -> [Show; 4] {
     let each = |show: &dyn Fn(u8) -> Show| [0, 1, 2, 3].map(show);
-    if let Settling::Filling(upto) = settling {
-        return each(&|layer| lit_upto(layer, upto));
-    }
     match (state, frame) {
         (WifiState::Joined { bars, .. }, _) => each(&|layer| lit_upto(layer, bars.top())),
         (WifiState::Joining(_), PendingFrame::Step(_)) => {
             each(&|layer| Show::of(frame.lit(SEARCHING, layer)))
         }
-        (WifiState::Joining(_), PendingFrame::Stalled) => [Show::Lit; 4],
         (WifiState::Joining(_), PendingFrame::Idle)
         | (WifiState::Off | WifiState::Idle | WifiState::Failed(_), _) => [Show::Faint; 4],
     }
@@ -101,41 +92,21 @@ fn slashed(state: WifiState) -> Slashed {
     }
 }
 
-/// How many layers a success fills: up to the real bars.
-fn fill_layers(state: WifiState) -> PendingLayers {
-    match state {
-        WifiState::Joined { bars, .. } => PendingLayers(bars.top() + 1),
-        WifiState::Off | WifiState::Idle | WifiState::Joining(_) | WifiState::Failed(_) => {
-            PendingLayers(4)
-        }
-    }
-}
-
 /// `span.ds-status-glyph[data-kind=wifi]`: the fan in `state` at `size`, in `currentColor`.
 /// Decorative (`aria-hidden`); put [`WifiState::words`] beside it or in its label (R8). Bar
 /// chrome is always there, so the first frame is still unless it is already joining (R1).
 #[component]
 pub fn WifiGlyph(state: WifiState, #[props(default = IconSize::Bar)] size: IconSize) -> Element {
-    let detail = use_detail(state, FirstShow::Still, Touch::Remote);
+    let detail = use_detail(state, Touch::Remote);
     let frame = use_pending(use_operation(detail.cue()), SEARCHING);
-    let settling = use_settle(detail.cue(), SettleStyle::Fill(fill_layers(state)));
-    let shake = use_shake(detail.cue()).attrs();
     let drawn = use_slash(slashed(state));
     let pen = Pen {
         px: size.px(),
         stroke: stroke_width(size, use_scale()),
     };
-    let shows = layer_shows(state, frame, settling);
-    let (class, alias) = match shake {
-        Some((anim, alias)) => (format!("ds-status-glyph {anim}"), Some(alias)),
-        None => ("ds-status-glyph".to_owned(), None),
-    };
-    let still = match frame {
-        PendingFrame::Stalled => "still",
-        PendingFrame::Idle | PendingFrame::Step(_) => "idle",
-    };
+    let shows = layer_shows(state, frame);
     rsx! {
-        span { class, "data-pulse": alias, "data-kind": "wifi", "data-pending": still,
+        span { class: "ds-status-glyph", "data-kind": "wifi",
             "data-state": slug(state), "aria-hidden": "true",
             for (index, (name, shapes)) in LAYERS.iter().enumerate() {
                 {part_svg(Part { name, shapes, paint: Paint::Stroke, show: shows[index] }, &pen)}
@@ -169,50 +140,31 @@ mod tests {
     use super::layer_shows;
     use crate::components::content::status::part::Show;
     use crate::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
-    use crate::motion::detail::{pending::PendingFrame, settle::Settling, stamp::EventStamp};
+    use crate::motion::detail::{pending::PendingFrame, stamp::EventStamp};
 
     #[test]
-    fn each_state_frame_and_fill_shows_its_layers() {
+    fn each_state_and_frame_shows_its_layers() {
         use Show::{Faint, Lit};
         let joined = |bars| WifiState::Joined {
             bars,
             reach: WifiReach::Internet,
         };
         let joining = WifiState::Joining(EventStamp(1));
-        let rest = Settling::Rest;
-        let cases: [(WifiState, PendingFrame, Settling, [Show; 4]); 8] = [
+        let cases: [(WifiState, PendingFrame, [Show; 4]); 6] = [
             (
                 joined(WifiBars::One),
                 PendingFrame::Idle,
-                rest,
                 [Lit, Lit, Faint, Faint],
             ),
-            (joined(WifiBars::Three), PendingFrame::Idle, rest, [Lit; 4]),
-            (WifiState::Off, PendingFrame::Idle, rest, [Faint; 4]),
-            (WifiState::Idle, PendingFrame::Idle, rest, [Faint; 4]),
-            // Inside the grace the join shows nothing yet; then one layer a step; held, whole.
-            (joining, PendingFrame::Idle, rest, [Faint; 4]),
-            (
-                joining,
-                PendingFrame::Step(2),
-                rest,
-                [Faint, Faint, Lit, Faint],
-            ),
-            (joining, PendingFrame::Stalled, rest, [Lit; 4]),
-            // A success fills from the dot out, whatever the state says.
-            (
-                joined(WifiBars::Two),
-                PendingFrame::Idle,
-                Settling::Filling(1),
-                [Lit, Lit, Faint, Faint],
-            ),
+            (joined(WifiBars::Three), PendingFrame::Idle, [Lit; 4]),
+            (WifiState::Off, PendingFrame::Idle, [Faint; 4]),
+            (WifiState::Idle, PendingFrame::Idle, [Faint; 4]),
+            // A join lights one layer a step, from the dot out, and starts at once.
+            (joining, PendingFrame::Step(0), [Lit, Faint, Faint, Faint]),
+            (joining, PendingFrame::Step(2), [Faint, Faint, Lit, Faint]),
         ];
-        for (state, frame, settling, want) in cases {
-            assert_eq!(
-                layer_shows(state, frame, settling),
-                want,
-                "{state:?} {frame:?} {settling:?}"
-            );
+        for (state, frame, want) in cases {
+            assert_eq!(layer_shows(state, frame), want, "{state:?} {frame:?}");
         }
     }
 }

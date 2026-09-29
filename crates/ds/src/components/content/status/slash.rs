@@ -6,11 +6,12 @@ use crate::motion::detail::{
     morph::Slashed,
     tween::{TweenSpec, use_tween},
 };
-use crate::style::tokens::timing::DurationToken;
+use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// How the slash moves.
 const DRAW: TweenSpec = TweenSpec {
     duration: DurationToken::Quick,
+    easing: EasingToken::Out,
 };
 
 /// How much of the slash is drawn this frame, in thousandths.

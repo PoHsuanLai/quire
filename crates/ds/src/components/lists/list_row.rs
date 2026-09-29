@@ -8,7 +8,6 @@ use crate::core::text::clip::clip_chars;
 use crate::core::vocab::{Availability, Check, Emphasis, RowState, StaggerIndex};
 use crate::core::word::Word;
 use crate::motion::presence::Presence;
-use crate::motion::pulse_key::PulseKey;
 use crate::motion::roster::{Heal, presence_slug};
 use dioxus::prelude::*;
 
@@ -81,8 +80,7 @@ fn exit(presence: Presence) -> Option<&'static str> {
 /// `presence` comes from `use_roster`: an entering row rises staggered by `index` when its
 /// list is first shown and plays `row-in` when it arrives later; a leaving row plays its exit
 /// (an unread fold is the heavy one, as the roster settles it); a healing row (`heal`, present
-/// meanwhile) slides up from `dy`, delayed by `d` heal steps. `star_pulse` is a `use_pulse(Anim::StarPop)` key, fired on
-/// every toggle. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
+/// meanwhile) slides up from `dy`, delayed by `d` heal steps. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
 /// `state` is the row's [`RowState`]: whether it is selected, unread, working or disabled, and
 /// its part in a drag (`drop`: `Source` while it is the thread being dragged (dimmed), `Target`
 /// while something dragged over it would land on it).
@@ -108,7 +106,6 @@ pub fn ListRow(
     time: String,
     tags: Element,
     star: Option<(Check, EventHandler<Check>)>,
-    star_pulse: PulseKey,
     strip: Option<Element>,
     onclick: EventHandler<MouseData>,
     #[props(default)] on_sender: Option<PartHooks>,
@@ -179,7 +176,7 @@ pub fn ListRow(
                 span { class: "ds-row-tags", {tags} }
             }
             if let Some((state, onchange)) = star {
-                {star_button(state, onchange, star_pulse)}
+                {star_button(state, onchange)}
             }
             if let Some(strip) = strip {
                 {strip}

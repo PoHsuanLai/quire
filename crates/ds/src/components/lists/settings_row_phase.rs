@@ -3,12 +3,7 @@
 //! sound output.
 
 use crate::core::word::Word;
-use crate::motion::detail::{
-    detailed::Detailed,
-    moment::Moment,
-    pending::{PendingLayers, PendingSpec, PendingStyle},
-    stamp::EventStamp,
-};
+use crate::motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 
 /// An operation on the row's item, stamped by the service that runs it: the same stamp is the
 /// same event, so a re-poll plays nothing and a repeated failure never shakes again (R6).
@@ -17,13 +12,11 @@ pub enum RowPhase {
     /// Nothing running: the row as its trailing mark and disc say.
     #[default]
     Rest,
-    /// Joining, connecting or switching to this row's item: a bounded pending loop after
-    /// `PendingGrace` (where [`RowWork`] says), held still at `PendingCap` (R4).
+    /// Joining, connecting or switching to this row's item: a spinner takes the trailing slot.
     Pending(EventStamp),
-    /// The operation ended as asked: the disc seals (`Settle{LockIn}`) or the check draws on
-    /// (`Settle{Check}`) once, if the pending loop was watched; then the row rests as it is.
+    /// The operation ended as asked: the row is drawn as its trailing mark and disc say.
     Succeeded(EventStamp),
-    /// It did not happen: the row shakes once; put the reason in its detail line (R8).
+    /// It did not happen: put the reason in its detail line (R8).
     Failed(EventStamp),
 }
 
@@ -66,31 +59,6 @@ impl Detailed for RowPhase {
         match state {
             RowPhase::Pending(_) => Moment::Pending,
             RowPhase::Rest | RowPhase::Succeeded(_) | RowPhase::Failed(_) => Moment::Rest,
-        }
-    }
-}
-
-/// Where a row's pending loop shows.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum RowWork {
-    /// The glyph breathes (`Pending{Breathe}`): a device connecting, an output switching.
-    #[default]
-    Glyph,
-    /// A small spinner in the trailing slot, in place of the mark (`Pending{Spin}`): the network
-    /// being joined, where the lock was.
-    Trailing,
-}
-
-impl RowWork {
-    /// The loop it plays.
-    pub(crate) fn spec(self) -> PendingSpec {
-        let style = match self {
-            RowWork::Glyph => PendingStyle::Breathe,
-            RowWork::Trailing => PendingStyle::Spin,
-        };
-        PendingSpec {
-            style,
-            layers: PendingLayers(1),
         }
     }
 }

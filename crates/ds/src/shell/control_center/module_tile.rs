@@ -16,9 +16,8 @@ use crate::core::press::Press;
 use crate::core::vocab::{Availability, Shown};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
-use crate::motion::detail::{armed::use_armed, first_show::FirstShow, touch::Touch};
 use crate::shell::control_center::module_disc::ModuleDisc;
-use crate::shell::control_center::module_tile_kind::{Chevron, DiscMotion, ModuleState, TileSpan};
+use crate::shell::control_center::module_tile_kind::{Chevron, ModuleState, TileSpan};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -29,13 +28,7 @@ use dioxus::prelude::*;
 ///
 /// `glyph` is an `Icon` (it converts) or any [`IconSource`]: `IconSource::Status` puts a layered
 /// status glyph in the disc (the Wi-Fi and Bluetooth modules), which plays its own
-/// moments as the state changes, the Wi-Fi fan filling as it joins. `first` is the glyph's first
-/// frame: `FirstShow::Animate` when the control center was just opened.
-///
-/// `disc` is how the disc's glyph answers the module coming on (design/26): `Still`
-/// (the default), `Fill` (the glyph's layers fill once, the Wi-Fi fan) or `Morph(icon)` (the
-/// glyph grows into `icon`, the Focus moon into `Icon::MoonFilled`). A press on the tile is kept
-/// for the change it causes, so that change springs and one from elsewhere does not (R5).
+/// moments as the state changes.
 #[component]
 pub fn ModuleTile(
     #[props(into)] glyph: IconSource,
@@ -48,11 +41,8 @@ pub fn ModuleTile(
     #[props(default)] on_detail: Option<EventHandler<Press>>,
     #[props(default)] expanded: Shown,
     #[props(default)] availability: Availability,
-    #[props(default)] first: FirstShow,
-    #[props(default)] disc: DiscMotion,
 ) -> Element {
     let live = availability == Availability::Enabled;
-    let armed = use_armed();
     let listen = PressListeners::new(onclick);
     let detail = match chevron {
         Chevron::Detail => Some(chevron_button(&title, on_detail, expanded, availability)),
@@ -70,18 +60,16 @@ pub fn ModuleTile(
             "aria-disabled": availability.aria_disabled(),
             onclick: move |event| {
                 if live {
-                    armed.arm(Touch::from_event(&event));
                     listen.click(&event);
                 }
             },
             onkeydown: move |event| {
                 if live && toggles(&event.key()) {
                     event.prevent_default();
-                    armed.arm(Touch::from_event(&event));
                     onclick.call(Press::primary());
                 }
             },
-            ModuleDisc { glyph, state, motion: disc, first, armed }
+            ModuleDisc { glyph, state }
             span { class: "ds-module-words",
                 span { class: "ds-module-title", {text(&title)} }
                 if let Some(status) = status {

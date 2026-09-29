@@ -1,7 +1,6 @@
 //! NowPlayingTrack: the Now Playing module's art and titles (design/26-DETAILS.md 5.2.10).
 //! A new track cross-fades in over `--t-quick` (the old art and titles fade out over the
-//! new, which fade in); the same track restated plays nothing (R2); Reduced snaps (R7). While the
-//! player buffers, the art breathes after `PendingGrace` and holds still at `PendingCap` (R4).
+//! new, which fade in); the same track restated plays nothing (R2); Reduced snaps (R7).
 
 pub(crate) mod kind;
 pub(crate) mod play_pause;
@@ -11,19 +10,10 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::motion::detail::level::use_level;
-use crate::motion::detail::{
-    first_show::FirstShow,
-    pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
-    touch::Touch,
-    use_detail::use_detail,
-    use_operation::use_operation,
-    use_pending::use_pending,
-};
 use crate::motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
 };
-use crate::shell::now_playing::kind::Playback;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
@@ -46,12 +36,6 @@ struct Faces {
     round: u32,
 }
 
-/// The art's breath: one step a half, as the Spinner's Breathe.
-const BREATHE: PendingSpec = PendingSpec {
-    style: PendingStyle::Breathe,
-    layers: PendingLayers(1),
-};
-
 /// The track's art (48 px, or the Now Playing glyph on a plain well when there is none), its
 /// `title` and `by` line. Hand it the track every render; a new one cross-fades in.
 #[component]
@@ -59,7 +43,6 @@ pub fn NowPlayingTrack(
     #[props(default)] art: Option<IconSource>,
     #[props(into)] title: TextLine,
     #[props(default)] by: Option<TextLine>,
-    #[props(default)] playback: Playback,
 ) -> Element {
     let face = Face { art, title, by };
     let timer = use_motion_timer(Anim::MorphFadeIn);
@@ -92,8 +75,6 @@ pub fn NowPlayingTrack(
         (TimerPhase::Running, Some(before)) => Some(before.clone()),
         (TimerPhase::Running | TimerPhase::Idle | TimerPhase::Settled, _) => None,
     };
-    let wait = use_detail(playback, FirstShow::Still, Touch::Remote);
-    let frame = use_pending(use_operation(wait.cue()), BREATHE);
     let alias = if faces.round.is_multiple_of(2) {
         "b"
     } else {
@@ -102,10 +83,7 @@ pub fn NowPlayingTrack(
     let round = faces.round;
     rsx! {
         div { class: "ds-track",
-            span {
-                class: "ds-track-art",
-                "data-pending": frame.slug(),
-                "data-beat": beat(frame),
+            span { class: "ds-track-art",
                 if let Some(before) = &fading {
                     span { key: "art-out-{round}", class: "ds-track-layer a-morph-fade-out", "data-morph": "out", "data-pulse": alias,
                         {art_view(before.art.clone())}
@@ -143,15 +121,6 @@ fn layer_class(fading: bool) -> &'static str {
         "ds-track-layer a-morph-fade-in"
     } else {
         "ds-track-layer"
-    }
-}
-
-/// The half of a breath step `n` is.
-fn beat(frame: PendingFrame) -> Option<&'static str> {
-    match frame {
-        PendingFrame::Step(n) if n.is_multiple_of(2) => Some("high"),
-        PendingFrame::Step(_) => Some("low"),
-        PendingFrame::Idle | PendingFrame::Stalled => None,
     }
 }
 

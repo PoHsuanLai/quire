@@ -6,39 +6,29 @@
 //! charging, a bolt in a gap cut at twelve. The widget puts the percentage under it.
 //!
 //! The arcs are SVG paths Rust computes (`battery_ring.rs`), each on `currentColor` from its own
-//! element (spike S6), with no CSS transition (O-20). The arc fills from Rust instead
-//! ([`use_battery_fill`]): on mount and on each new `wake` it sweeps from empty to the level, on
-//! each new level from the old one to the new, recomputing its path each frame while it moves
-//! and never at rest; a charging bolt fades in once the sweep has arrived. The low red and
-//! `aria-valuenow` follow the true level from the first frame.
+//! element (spike S6), with no CSS transition (O-20). The arc follows its level from Rust
+//! ([`use_ring_share`]): it stands at the level on mount and moves to each new one linearly over
+//! `--t-move` (design/30 section 1.3), recomputing its path each frame while it moves and never
+//! at rest. The low red and `aria-valuenow` follow the true level from the first frame.
 
 use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
 use crate::core::word::Word;
-use crate::motion::{
-    timeline::sweep::{RunFrame, RunTokens},
-    use_level_run::use_level_run,
-    wake::WakeStamp,
-};
+use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::shell::battery::ring::{RingSpan, arc_path};
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
-/// The fill's timing: `--t-fill` at `--e-out`, then the bolt's fade over `--t-quick`.
-pub const FILL: RunTokens = RunTokens {
-    duration: DurationToken::Fill,
-    easing: EasingToken::Out,
-    tail: DurationToken::Quick,
+/// How the arc follows its level: linearly over `--t-move`.
+const ARC: TweenSpec = TweenSpec {
+    duration: DurationToken::Move,
+    easing: EasingToken::Linear,
 };
 
-/// The frame of a battery ring's fill toward `level`: from empty on mount and on each new
-/// `wake`, from the last level drawn on each new `level`, at once under Reduced motion.
-/// [`BatteryLevel`] draws its arc from it and [`crate::shell::battery::figure::use_battery_figure`]
-/// its count, so a ring
-/// and a percentage given the same `level` and `wake` move in step.
-pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
-    use_level_run(level.clamped(), wake, FILL)
+/// The share of a battery ring's arc drawn now, following `level` (clamped).
+pub(crate) fn use_ring_share(level: Fraction) -> Fraction {
+    use_tween(level.clamped(), ARC)
 }
 
 /// The charging bolt, in its own 10 x 16 box.
@@ -85,21 +75,18 @@ impl RingTone {
 }
 
 /// A battery ring at `level` (permille), charging or not, named `label` for assistive
-/// technology. `children` (a device's glyph, optional) sit in the ring's middle. The arc fills
-/// on mount and again on each new `wake` (a host passes `WakeStamp::next` when its widgets come
-/// into view), and sweeps to each new level; `data-pulse` is `a` while it moves.
+/// technology. `children` (a device's glyph, optional) sit in the ring's middle. The arc stands
+/// at its level on mount and moves to each new one.
 #[component]
 pub fn BatteryLevel(
     level: Fraction,
     #[props(default)] mark: RingMark,
     #[props(into)] label: TextLine,
-    #[props(default)] wake: WakeStamp,
     children: Element,
 ) -> Element {
     let level = level.clamped();
     let percent = level.whole_percent();
-    let frame = use_battery_fill(level, wake);
-    let alias = moving(frame, level);
+    let share = use_ring_share(level);
     let span = match mark {
         RingMark::Plain => RingSpan::FULL,
         RingMark::Charging => RingSpan::GAPPED,
@@ -107,7 +94,6 @@ pub fn BatteryLevel(
     rsx! {
         div {
             class: "ds-battery",
-            "data-pulse": alias,
             "data-tone": RingTone::of(level, mark).slug(),
             "data-mark": mark.attr(),
             role: "progressbar",
@@ -116,36 +102,16 @@ pub fn BatteryLevel(
             "aria-valuemax": "100",
             "aria-valuenow": "{percent}",
             {ring(RingLayer::Track, arc_path(span))}
-            {ring(RingLayer::Arc, arc_path(span.filled(frame.shown)))}
+            {ring(RingLayer::Arc, arc_path(span.filled(share)))}
             if let Some(device) = given(children) {
                 span { class: "ds-battery-device", {device} }
             }
-            if mark == RingMark::Charging && frame.tail.0 > 0 {
+            if mark == RingMark::Charging {
                 svg { class: "ds-battery-bolt", "data-ds-svg": "battery", view_box: "0 0 10 16", "aria-hidden": "true",
-                    style: fading(frame.tail),
                     path { d: BOLT, fill: "currentColor" }
                 }
             }
         }
-    }
-}
-
-/// `data-pulse` while the fill moves (`a`), absent at rest: kept for hosts that select a
-/// moving ring by it, as they did its bump.
-fn moving(frame: RunFrame, level: Fraction) -> Option<&'static str> {
-    if frame == RunFrame::rest(level) {
-        None
-    } else {
-        Some("a")
-    }
-}
-
-/// The bolt's opacity while it fades in; nothing once it is whole.
-fn fading(tail: Fraction) -> Option<String> {
-    if tail.0 >= 1000 {
-        None
-    } else {
-        Some(format!("opacity:{:.3}", f32::from(tail.0) / 1000.0))
     }
 }
 

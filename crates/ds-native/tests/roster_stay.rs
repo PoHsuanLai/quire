@@ -5,8 +5,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AnimatedList, Appearance, Button, ButtonVariant, Ds, Emphasis, Exit, ListRow, Material,
-    Point, Presence, PulseKey, Px, RowPitch, RowState, Selection, StaggerIndex, Stayed, settle,
-    use_roster,
+    Point, Presence, Px, RowPitch, RowState, Selection, StaggerIndex, Stayed, settle, use_roster,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -62,7 +61,7 @@ fn StayList() -> Element {
                     time: "09:41",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: PulseKey::rest(Anim::Bump),
+
                     strip: None,
                     onclick: move |_| {
                         roster.leave(entry.key, Exit::Fold, Emphasis::Plain);

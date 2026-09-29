@@ -1,29 +1,15 @@
-//! A battery's percentage counting up with its ring (design/23-WIDGETS.md section 4.1): the
-//! widget draws the number itself (the ring draws none), so the count the ring's fill reaches
-//! each frame is offered as a hook, [`use_battery_figure`], and as a small component,
-//! [`BatteryFigure`], that writes it as `93%` in tabular figures.
-//!
-//! Given the same `level` and `wake` as its [`crate::BatteryLevel`], the count moves in step with
-//! the arc: both read [`use_battery_fill`], whose frames are a pure function of the time since
-//! the same effect started. It is always a whole percent and ends exactly on the true one.
+//! A battery's percentage (design/23-WIDGETS.md section 4.1): the widget draws the number itself
+//! (the ring draws none), so it is offered as a small component, [`BatteryFigure`], that writes
+//! it as `93%` in tabular figures. A number changes instantly (design/30 section 1.3).
 
 use crate::core::vocab::Fraction;
-use crate::motion::wake::WakeStamp;
-use crate::shell::battery::level::use_battery_fill;
 use dioxus::prelude::*;
 
-/// The percentage a battery at `level` shows this frame: counting from 0 on mount and on each
-/// new `wake`, from the old percentage on each new `level`, at once under Reduced motion.
-pub fn use_battery_figure(level: Fraction, wake: WakeStamp) -> u16 {
-    use_battery_fill(level, wake).shown.whole_percent()
-}
-
-/// `span.ds-battery-figure`: the counting percentage, `{n}%`, in tabular figures so the width
-/// holds while it counts. Its size and face are the caller's (a hero figure or a row's).
+/// `span.ds-battery-figure`: the percentage, `{n}%`, in tabular figures. Its size and face are
+/// the caller's (a hero figure or a row's).
 #[component]
-pub fn BatteryFigure(level: Fraction, #[props(default)] wake: WakeStamp) -> Element {
-    let figure = use_battery_figure(level, wake);
+pub fn BatteryFigure(level: Fraction) -> Element {
     rsx! {
-        span { class: "ds-battery-figure", "{figure}%" }
+        span { class: "ds-battery-figure", "{level.clamped().whole_percent()}%" }
     }
 }

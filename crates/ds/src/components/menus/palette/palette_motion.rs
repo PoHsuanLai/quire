@@ -1,10 +1,8 @@
-//! The command palette's list motions (design/26-DETAILS.md section 5.6): the rows' first-show
-//! rise from the caller's [`RevealCue`], and a group's Show More and Show Less
-//! (section 5.4's group-expand grammar): the added rows rise in downward (`rise` with
-//! `--stagger`, capped at 12), and on Show Less everything after the rows kept heals up by the
-//! height the removed rows took (`heal`, which springs: the person ran the action). The palette
-//! owns its rows and outlives its result sets, so it plays these itself; a later result set
-//! replaces in place with no motion (R1, R12).
+//! The command palette's list motions (design/26-DETAILS.md section 5.4's group-expand grammar):
+//! a group's Show More and Show Less. The added rows come in as a roster row does (`row-in`),
+//! and on Show Less everything after the rows kept heals up by the height the removed rows took
+//! (`heal`). The palette owns its rows and outlives its result sets, so it plays these itself; a
+//! later result set replaces in place with no motion (R1, R12).
 //!
 //! The person's own Enter or click is not the only way a group's action runs: a
 //! caller may run it itself (`sill debug launcher-key enter` stepping the keyboard machine
@@ -18,14 +16,12 @@ use crate::components::menus::menu_rows::RowsMotion;
 use crate::components::menus::palette::palette_expand::{GroupResize, Resize, resized};
 use crate::components::menus::palette::palette_group::GroupsKey;
 use crate::components::menus::palette::palette_reveal::Reveal as Stops;
-use crate::components::menus::palette::palette_shown::Change;
 use crate::components::menus::palette::palette_stops::ShownGroup;
 use crate::core::geometry::units::Px;
 use crate::core::task::spawn_in;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::core::vocab::StaggerIndex;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
-use crate::motion::detail::reveal::{RevealCue, Revealing, use_rise_on};
 use crate::motion::{
     anim::Anim,
     timer::{MotionTimer, TimerPhase, use_motion_timer},
@@ -128,21 +124,11 @@ pub(crate) struct GroupMotion {
 /// What the list plays this render.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct ListMotion {
-    /// The rows' first-show rise.
-    pub reveal: Revealing,
     /// A group's Show More or Show Less.
     pub group: Option<GroupMotion>,
 }
 
 impl ListMotion {
-    /// The `data-reveal` word while the rise plays (nothing otherwise).
-    pub(crate) fn reveal_slug(&self) -> Option<&'static str> {
-        match self.reveal {
-            Revealing::Play => Some("play"),
-            Revealing::Still => None,
-        }
-    }
-
     /// The list's inline `--dy` while what follows the rows kept heals.
     pub(crate) fn heal_style(&self) -> Option<String> {
         let dy = self.group.as_ref()?.dy?;
@@ -158,21 +144,15 @@ impl ListMotion {
     }
 }
 
-/// The palette's list motions: the rise `reveal` asks for (counting each opening `change`
-/// reports), and a group's resize after the person ran its action (`book`), measured through
-/// `stops`, the stops' mounted elements.
+/// The palette's list motions: a group's resize after the person ran its action (`book`),
+/// measured through `stops`, the stops' mounted elements.
 pub(crate) fn use_list_motion<T: Clone + PartialEq + 'static>(
-    reveal: RevealCue,
-    change: Change,
     key: &GroupsKey<T>,
     shown: &[ShownGroup<'_, T>],
     motion: Book,
 ) -> ListMotion {
-    let openings = use_openings(change);
-    let reveal = use_rise_on(reveal.key(openings));
     let resize = use_resize(key, motion.actions);
     ListMotion {
-        reveal,
         group: use_group_motion(resize, shown, motion.stops),
     }
 }
@@ -184,16 +164,6 @@ pub(crate) struct Book {
     pub actions: ActionBook,
     /// The stops' mounted elements.
     pub stops: Stops,
-}
-
-/// How many times the palette has been shown again since it mounted.
-fn use_openings(change: Change) -> u32 {
-    let mut openings = use_hook(|| CopyValue::new(0u32));
-    if change == Change::Show {
-        let next = openings.peek().wrapping_add(1);
-        openings.set(next);
-    }
-    *openings.peek()
 }
 
 /// A change of the results this render: the group resize it is, when the person ran an action.

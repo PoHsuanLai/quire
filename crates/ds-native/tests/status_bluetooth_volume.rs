@@ -1,6 +1,5 @@
-//! design/26 on a real Blitz document: the Bluetooth status glyph (the slash, the
-//! bounded breath while connecting, the seal and dots on connecting, the shake) and the volume
-//! glyph on `LevelGlyph`; each ends at 0 frames (R3).
+//! design/26 on a real Blitz document: the Bluetooth status glyph (the slash and the dots when
+//! connected) and the volume glyph on `LevelGlyph`; each ends at 0 frames (R3).
 
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
@@ -37,41 +36,28 @@ fn set(harness: &mut Harness, state: BluetoothState) {
     harness.within(|| *BLUETOOTH.write() = state);
 }
 
-fn pending(harness: &Harness) -> Option<String> {
-    harness.attr("#bt .ds-status-glyph", "data-pending")
-}
-
 fn dots(harness: &Harness) -> Option<String> {
     harness.attr("#bt [*|data-part=dots]", "data-show")
 }
 
 #[test]
-fn connecting_breathes_after_its_grace_and_a_connection_seals_once_with_its_dots() {
+fn a_connection_shows_its_dots() {
     let mut harness = Harness::new(Page, VIEW);
     assert_eq!(dots(&harness).as_deref(), Some("hidden"));
     set(&mut harness, BluetoothState::Connecting(EventStamp(1)));
     harness.advance(Duration::from_millis(20));
-    assert_eq!(pending(&harness).as_deref(), Some("idle"));
-    settle_until(&mut harness, |h| pending(h).as_deref() == Some("high"));
-    settle_until(&mut harness, |h| pending(h).as_deref() == Some("low"));
-    set(&mut harness, BluetoothState::Connected);
-    settle_until(&mut harness, |h| {
-        h.has_class("#bt .ds-status-glyph", "a-seal-out")
-    });
-    assert!(
-        !harness.has_class("#bt .ds-status-glyph", "a-gulp"),
-        "a connection the service made sprang (R5)"
+    assert_eq!(
+        dots(&harness).as_deref(),
+        Some("hidden"),
+        "nothing breathes"
     );
-    assert_eq!(pending(&harness).as_deref(), Some("idle"));
+    set(&mut harness, BluetoothState::Connected);
     settle_until(&mut harness, |h| dots(h).as_deref() == Some("lit"));
-    settle_until(&mut harness, |h| {
-        !h.has_class("#bt .ds-status-glyph", "a-seal-out")
-    });
     assert_settles_to_zero_frames(&mut harness);
 }
 
 #[test]
-fn bluetooth_off_draws_the_slash_and_a_failure_shakes_once() {
+fn bluetooth_off_draws_the_slash_and_a_failure_shakes_nothing() {
     let mut harness = Harness::new(Page, VIEW);
     set(&mut harness, BluetoothState::Off);
     settle_until(&mut harness, |h| h.count("#bt [*|data-part=slash]") == 1);
@@ -83,20 +69,8 @@ fn bluetooth_off_draws_the_slash_and_a_failure_shakes_once() {
     );
     assert_settles_to_zero_frames(&mut harness);
     set(&mut harness, BluetoothState::Failed(EventStamp(1)));
-    settle_until(&mut harness, |h| {
-        h.has_class("#bt .ds-status-glyph", "a-shake-x")
-    });
     settle_until(&mut harness, |h| h.count("#bt [*|data-part=slash]") == 0);
-    assert_settles_to_zero_frames(&mut harness);
-}
-
-#[test]
-fn reduced_holds_the_breath_still() {
-    let mut harness = Harness::new(Page, VIEW);
-    harness.within(|| *MOTION.write() = Motion::Reduced);
-    harness.advance(Duration::from_millis(20));
-    set(&mut harness, BluetoothState::Connecting(EventStamp(2)));
-    settle_until(&mut harness, |h| pending(h).as_deref() == Some("still"));
+    assert!(!harness.has_class("#bt .ds-status-glyph", "a-shake-x"));
     assert_settles_to_zero_frames(&mut harness);
 }
 

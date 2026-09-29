@@ -1,5 +1,5 @@
-//! design/26 on a real Blitz document: the Wi-Fi status glyph through every moment of its
-//! table, each ending at 0 frames (R3), and under Reduced motion (R7).
+//! design/26 on a real Blitz document: the Wi-Fi status glyph through every moment it plays, each
+//! ending at 0 frames (R3), and under Reduced motion (R7).
 
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
@@ -68,29 +68,25 @@ fn at_rest_a_joined_glyph_is_whole_and_a_repeat_plays_nothing() {
 }
 
 #[test]
-fn joining_searches_after_its_grace_then_a_join_fills_once_to_the_real_bars() {
+fn joining_searches_at_once_and_a_join_lands_on_the_real_bars() {
     let mut harness =
         Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Idle);
     assert_settles_to_zero_frames(&mut harness);
-    let asked = harness.now();
     set(&mut harness, WifiState::Joining(EventStamp(1)));
-    harness.advance(Duration::from_millis(20));
-    assert_eq!(
-        lit(&harness),
-        0,
-        "a join younger than PendingGrace shows no loop"
-    );
-    let searching = settle_until(&mut harness, |h| lit(h) == 1);
-    assert!(
-        searching - asked >= Duration::from_millis(400),
-        "the loop ignored its grace"
-    );
-    // One layer at a time: the lit layer moves.
+    harness.advance(Duration::from_millis(0));
+    assert_eq!(lit(&harness), 1, "no grace: the loop shows at once");
+    // One layer at a time, a step every --t-spin-step: the lit layer moves.
     let first = ["dot", "arc-1", "arc-2", "arc-3"].map(|part| show(&harness, part));
-    settle_until(&mut harness, |h| {
-        lit(h) == 1 && ["dot", "arc-1", "arc-2", "arc-3"].map(|part| show(h, part)) != first
-    });
+    harness.advance(Duration::from_millis(83));
+    assert_eq!(lit(&harness), 1);
+    assert_ne!(
+        ["dot", "arc-1", "arc-2", "arc-3"].map(|part| show(&harness, part)),
+        first
+    );
+    // Ten seconds in it is still searching: there is no cap.
+    harness.advance(Duration::from_secs(10));
+    assert_eq!(lit(&harness), 1);
     set(
         &mut harness,
         WifiState::Joined {
@@ -98,35 +94,10 @@ fn joining_searches_after_its_grace_then_a_join_fills_once_to_the_real_bars() {
             reach: WifiReach::Internet,
         },
     );
-    // Settle(Fill): the dot alone first, then out to the second arc, and it stays there.
-    settle_until(&mut harness, |h| {
-        lit(h) == 1 && show(h, "dot").as_deref() == Some("lit")
-    });
+    // The join lands on the real bars, at once: no fill.
     settle_until(&mut harness, |h| lit(h) == 3);
     assert_settles_to_zero_frames(&mut harness);
     assert_eq!(show(&harness, "arc-3").as_deref(), Some("faint"));
-    assert_eq!(lit(&harness), 3);
-}
-
-#[test]
-fn a_join_that_outlives_the_cap_holds_its_still_frame_at_zero_frames() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    set(&mut harness, WifiState::Joining(EventStamp(7)));
-    let cap = Duration::from_secs(10);
-    let started = harness.now();
-    while harness.now().duration_since(started) < cap {
-        harness.advance(Duration::from_millis(250));
-    }
-    settle_until(&mut harness, |h| {
-        h.attr("#wifi .ds-status-glyph", "data-pending").as_deref() == Some("still")
-    });
-    assert_eq!(
-        lit(&harness),
-        4,
-        "the still frame is the whole glyph, dimmed"
-    );
-    assert_settles_to_zero_frames(&mut harness);
 }
 
 #[test]
@@ -154,27 +125,13 @@ fn bars_cross_fade_and_no_internet_grows_the_badge() {
 }
 
 #[test]
-fn a_failed_join_shakes_once_per_stamp() {
+fn a_failed_join_leaves_the_fan_faint_and_shakes_nothing() {
     let mut harness = Harness::new(Page, VIEW);
-    set(&mut harness, WifiState::Failed(EventStamp(1)));
-    settle_until(&mut harness, |h| {
-        h.has_class("#wifi .ds-status-glyph", "a-shake-x")
-    });
-    settle_until(&mut harness, |h| {
-        !h.has_class("#wifi .ds-status-glyph", "a-shake-x")
-    });
-    assert_settles_to_zero_frames(&mut harness);
-    assert_eq!(lit(&harness), 0, "after the shake the fan is faint");
-    // The same failure again is no moment (R6).
     set(&mut harness, WifiState::Failed(EventStamp(1)));
     harness.advance(Duration::from_millis(60));
     assert!(!harness.has_class("#wifi .ds-status-glyph", "a-shake-x"));
-    // A new one shakes the same way.
-    set(&mut harness, WifiState::Failed(EventStamp(2)));
-    settle_until(&mut harness, |h| {
-        h.has_class("#wifi .ds-status-glyph", "a-shake-x")
-    });
     assert_settles_to_zero_frames(&mut harness);
+    assert_eq!(lit(&harness), 0, "the fan is faint");
 }
 
 #[test]
@@ -192,18 +149,20 @@ fn the_radio_off_draws_the_slash_on_and_back_off() {
 }
 
 #[test]
-fn reduced_holds_the_still_frame_snaps_the_slash_and_does_not_shake() {
-    let mut harness = Harness::new(Page, VIEW);
+fn reduced_keeps_the_search_turning_and_snaps_the_slash() {
+    let mut harness =
+        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(20));
     set(&mut harness, WifiState::Joining(EventStamp(3)));
-    settle_until(&mut harness, |h| {
-        h.attr("#wifi .ds-status-glyph", "data-pending").as_deref() == Some("still")
-    });
-    assert_settles_to_zero_frames(&mut harness);
-    set(&mut harness, WifiState::Failed(EventStamp(3)));
-    harness.advance(Duration::from_millis(60));
-    assert!(!harness.has_class("#wifi .ds-status-glyph", "a-shake-x"));
+    harness.advance(Duration::from_millis(0));
+    let first = ["dot", "arc-1", "arc-2", "arc-3"].map(|part| show(&harness, part));
+    harness.advance(Duration::from_millis(83));
+    assert_ne!(
+        ["dot", "arc-1", "arc-2", "arc-3"].map(|part| show(&harness, part)),
+        first,
+        "the search keeps turning under Reduced"
+    );
     set(&mut harness, WifiState::Off);
     harness.advance(Duration::from_millis(40));
     assert_eq!(

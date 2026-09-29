@@ -1,5 +1,5 @@
-//! A keyframe played once per new cue of one moment: Shake for a Failure, Nudge for Attention
-//! (design/26-DETAILS.md R6), and a content cross-fade for a part's in-place change. The same
+//! A keyframe played once per new cue of one moment: Shake for a Failure (design/26-DETAILS.md
+//! R6), and a content cross-fade for a part's in-place change. The same
 //! cue never replays; a new one replays the identical motion, never a bigger one; Reduced plays
 //! nothing (R7), the still state carries it (R8).
 
@@ -45,11 +45,6 @@ fn use_once(anim: Anim, moments: &'static [Moment], cue: Option<Cue>) -> PulseKe
 /// `shake-x` once per new Failure cue (R6); the same amplitude every time; nothing under Reduced.
 pub fn use_shake(cue: Cue) -> PulseKey {
     use_once(Anim::ShakeX, &[Moment::Failure], Some(cue))
-}
-
-/// `nudge-up` once per new Attention cue (R6); nothing under Reduced.
-pub fn use_nudge(cue: Cue) -> PulseKey {
-    use_once(Anim::NudgeUp, &[Moment::Attention], Some(cue))
 }
 
 /// The incoming content's `fade` at `--t-quick` once per new Preview, Change or Failure cue: what

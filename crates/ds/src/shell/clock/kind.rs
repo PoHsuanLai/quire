@@ -46,11 +46,6 @@ impl ClockTime {
             Seconds::Hidden => format!("{hour:02}:{minute:02}"),
         }
     }
-
-    /// What a digital face bumps on: the hour and minute, so a ticking second does not bump.
-    pub fn minute_key(self) -> (u8, u8) {
-        (self.hour % 24, self.minute % 60)
-    }
 }
 
 /// Whether it is day or night where the clock is, which tints the analog face.

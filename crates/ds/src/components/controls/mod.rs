@@ -1,7 +1,6 @@
 //! Controls: buttons, toggles, segmented controls, sliders, the level control, chips, key caps and
 //! the other things a person presses or drags.
 
-pub mod bump_on;
 pub mod button;
 pub mod button_face;
 pub mod button_size;

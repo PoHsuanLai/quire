@@ -8,12 +8,12 @@ use ds::{
     ReducedMotion, RowState, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
 };
 use ds::{
-    AccountFace, AccountTile, Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Colour,
-    CommandPill, DragGhost, DropLine, EdgeStrip, Exit, Grip, Hex, HoverStrip, Icon, ImageSource,
-    ItemKind, MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark,
-    Px, SidebarItem, SyncHalo, SyncState,
+    AccountFace, AccountTile, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Colour, CommandPill,
+    DragGhost, DropLine, EdgeStrip, Exit, Grip, Hex, HoverStrip, Icon, ImageSource, ItemKind,
+    MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
+    SidebarItem,
 };
-use ds::{Check, DropState, PulseKey, Selection, Shortcut, ShortcutKey};
+use ds::{Check, DropState, Selection, Shortcut, ShortcutKey};
 
 /// One component in one state.
 pub struct Case {
@@ -31,13 +31,7 @@ pub const DANA: AvatarFace = AvatarFace {
 
 const VIOLET: Colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
 
-fn item(
-    kind: ItemKind,
-    here: Selection,
-    presence: Presence,
-    preview: Option<Preview>,
-    pulse: PulseKey,
-) -> Element {
+fn item(kind: ItemKind, here: Selection, presence: Presence, preview: Option<Preview>) -> Element {
     let onclose = match kind {
         ItemKind::Today { .. } => Some(EventHandler::new(|_| {})),
         ItemKind::Place { .. } | ItemKind::Pinned { .. } => None,
@@ -55,7 +49,6 @@ fn item(
             count: Some(4),
             presence,
             preview,
-            pulse,
             onclick: |_| {},
             onclose,
         }
@@ -74,13 +67,11 @@ fn dropped_item(drop: DropState) -> Element {
             count: None,
             presence: Presence::Present,
             preview: None,
-            pulse: GULP(),
             onclick: |_| {},
             onclose: None,
         }
     }
 }
-const GULP: fn() -> PulseKey = || PulseKey::rest(Anim::Gulp);
 
 fn mark(provider: MarkProvider, size: MarkSize) -> Element {
     rsx! { ProviderMark { provider, size, style: MarkStyle::Letter } }
@@ -150,17 +141,6 @@ pub const CASES: &[Case] = &[
         state: "none-unread",
         make: || rsx! { AccountTile { account: AccountFace::All, pressed: Check::Off, unread: 0, onclick: |_| {} } },
     },
-    // SyncHalo.
-    Case {
-        component: "sync_halo",
-        state: "idle",
-        make: || rsx! { SyncHalo { initial: 'P', tone: AvatarTone::Ink, state: SyncState::Idle } },
-    },
-    Case {
-        component: "sync_halo",
-        state: "busy",
-        make: || rsx! { SyncHalo { initial: 'P', tone: AvatarTone::Account(VIOLET), state: SyncState::Busy } },
-    },
     // EdgeStrip.
     Case {
         component: "edge_strip",
@@ -189,24 +169,16 @@ pub const CASES: &[Case] = &[
         state: "default",
         make: || rsx! { HoverStrip { actions: strip_actions() } },
     },
-    // SidebarItem: the three kinds, current with its seal, the previews and pulses.
+    // SidebarItem: the three kinds, current with its seal, the previews.
     Case {
         component: "sidebar_item",
         state: "place",
-        make: || {
-            item(
-                INBOX,
-                Selection::Unselected,
-                Presence::Present,
-                None,
-                GULP(),
-            )
-        },
+        make: || item(INBOX, Selection::Unselected, Presence::Present, None),
     },
     Case {
         component: "sidebar_item",
         state: "place-current",
-        make: || item(INBOX, Selection::Selected, Presence::Present, None, GULP()),
+        make: || item(INBOX, Selection::Selected, Presence::Present, None),
     },
     Case {
         component: "sidebar_item",
@@ -219,33 +191,6 @@ pub const CASES: &[Case] = &[
                 Selection::Unselected,
                 Presence::Present,
                 Some(Preview::Destination),
-                GULP(),
-            )
-        },
-    },
-    Case {
-        component: "sidebar_item",
-        state: "place-gulp-a",
-        make: || {
-            item(
-                INBOX,
-                Selection::Unselected,
-                Presence::Present,
-                None,
-                GULP().fired(),
-            )
-        },
-    },
-    Case {
-        component: "sidebar_item",
-        state: "place-gulp-b",
-        make: || {
-            item(
-                INBOX,
-                Selection::Unselected,
-                Presence::Present,
-                None,
-                GULP().fired().fired(),
             )
         },
     },
@@ -258,7 +203,6 @@ pub const CASES: &[Case] = &[
                 Selection::Unselected,
                 Presence::Present,
                 None,
-                GULP(),
             )
         },
     },
@@ -271,7 +215,6 @@ pub const CASES: &[Case] = &[
                 Selection::Unselected,
                 Presence::Entering,
                 None,
-                GULP(),
             )
         },
     },
@@ -284,7 +227,6 @@ pub const CASES: &[Case] = &[
                 Selection::Selected,
                 Presence::Present,
                 None,
-                GULP(),
             )
         },
     },
@@ -297,7 +239,6 @@ pub const CASES: &[Case] = &[
                 Selection::Unselected,
                 Presence::Leaving(Exit::TabOut),
                 None,
-                GULP(),
             )
         },
     },

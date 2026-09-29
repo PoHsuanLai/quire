@@ -1,76 +1,21 @@
 //! A connected device's battery at the end of its settings row (design/26-DETAILS.md 5.2.3):
-//! the battery glyph and its percentage. When it first shows on a pane just opened, or arrives on
-//! a row already showing (the device just connected), the fill sweeps in from empty over
-//! `--t-sweep` with the number counting in step; a pane re-mounted in place shows it still (R1); a
-//! later level sweeps from where it is, counting only a change of more than a point (R12);
-//! Reduced shows the level at once (R7).
+//! the battery glyph and its percentage, as text (design/30 section 1.3: a number changes
+//! instantly).
 
 use crate::components::content::status::{battery::BatteryGlyph, battery_state::BatteryState};
 use crate::core::vocab::Fraction;
-use crate::motion::detail::{
-    count_up::{CountPace, use_count_up},
-    detailed::Detailed,
-    first_show::FirstShow,
-    moment::Moment,
-    sweep::use_sweep,
-    touch::Touch,
-    use_detail::use_detail,
-};
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
-/// A battery's level as the row prints it: whole percent (R2).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) struct Percent(pub(crate) u16);
-
-impl Detailed for Percent {
-    fn moment(from: &Self, to: &Self) -> Moment {
-        if from == to {
-            Moment::Rest
-        } else {
-            Moment::Change
-        }
-    }
-
-    /// A value shown for the first time on a surface just opened (design/26 3.1 Appear).
-    fn first(_: &Self) -> Moment {
-        Moment::Appear
-    }
-}
-
-/// The glyph and the counting percentage, `84%` in tabular figures; `first` is `Animate` when
-/// the battery arrives with a surface just opened or after the row was already showing.
+/// The glyph and the percentage, `84%` in tabular figures.
 #[component]
-pub(crate) fn RowBattery(level: Fraction, first: FirstShow) -> Element {
-    let percent = Percent(level.whole_percent());
-    let detail = use_detail(percent, first, Touch::Remote);
-    // The glyph's own fill runs the same sweep; this one only paces the count, so it lands with it.
-    let sweep = use_sweep(level.clamped(), detail.cue());
-    let shown = use_count_up(i64::from(percent.0), detail.cue(), CountPace::InStep(sweep)).shown();
+pub(crate) fn RowBattery(level: Fraction) -> Element {
     let state = BatteryState {
         level: level.clamped(),
         ..BatteryState::default()
     };
     rsx! {
-        BatteryGlyph { state, size: IconSize::Compact, first }
-        span { class: "ds-settings-row-figure", "{shown}%" }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::Percent;
-    use crate::motion::detail::{
-        detailed::{first_table, moment_table},
-        moment::Moment,
-    };
-
-    #[test]
-    fn the_battery_counts_what_it_prints() {
-        moment_table(&[
-            (Percent(84), Percent(84), Moment::Rest),
-            (Percent(84), Percent(60), Moment::Change),
-        ]);
-        first_table(&[(Percent(84), Moment::Appear)]);
+        BatteryGlyph { state, size: IconSize::Compact }
+        span { class: "ds-settings-row-figure", "{level.whole_percent()}%" }
     }
 }

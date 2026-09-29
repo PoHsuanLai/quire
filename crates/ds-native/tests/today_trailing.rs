@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, ItemKind, Material,
-    PersonHue, Presence, PulseKey, RowState, Selection, SidebarItem, TodayTrailing,
+    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, ItemKind, Material, PersonHue,
+    Presence, RowState, Selection, SidebarItem, TodayTrailing,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -37,7 +37,7 @@ fn Row() -> Element {
                     count: None,
                     presence: Presence::Present,
                     preview: None,
-                    pulse: PulseKey::rest(Anim::Gulp),
+
                     onclick: move |()| log.with_mut(|log| log.push("open")),
                     onclose: move |()| log.with_mut(|log| log.push("close")),
                     trailing: TodayTrailing {

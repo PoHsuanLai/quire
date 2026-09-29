@@ -19,38 +19,7 @@ const ALLOWED: &[(&str, Rule, &str)] = &[
         "motion",
         Rule::OffGrammarTiming,
         "the keyframe table's own pulse classes, each at its recipe's token (an animated \
-         emoji's awake window, the loops above, the send ring and the chip flash)",
-    ),
-    (
-        "sync_halo",
-        Rule::InfiniteLoop,
-        "mail's account halo: breathes while idle and spins while syncing (design/05 section 12 \
-         item 4: mailo decides)",
-    ),
-    (
-        "sync_halo",
-        Rule::OffGrammarTiming,
-        "the halo's loops run at `--t-ambient` and `--t-spin`",
-    ),
-    (
-        "send_pill",
-        Rule::InfiniteLoop,
-        "mail's send pill spins its ring while the outbox has no answer",
-    ),
-    (
-        "send_pill",
-        Rule::OffGrammarTiming,
-        "the send pill's ring spins at `--t-spin` and drains over `--t-send-ring`",
-    ),
-    (
-        "sidebar_item",
-        Rule::InfiniteLoop,
-        "mail's drop destination pulses (`dest`) while a drag hovers it",
-    ),
-    (
-        "sidebar_item",
-        Rule::OffGrammarTiming,
-        "the drop destination's pulse period is `--t-float`",
+         emoji's awake window, the loops above and the send ring)",
     ),
 ];
 

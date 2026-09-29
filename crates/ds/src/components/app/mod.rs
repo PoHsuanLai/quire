@@ -10,6 +10,5 @@ pub(crate) mod peek;
 pub(crate) mod send_mood;
 pub(crate) mod send_pill;
 pub(crate) mod sidebar_item;
-pub(crate) mod sync_halo;
 pub(crate) mod tree_item;
 pub(crate) mod tree_item_parts;

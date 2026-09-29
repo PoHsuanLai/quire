@@ -51,7 +51,6 @@ use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::host::caret::{Caret, InitialCaret};
 use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::measure::MountedRef;
-use crate::motion::detail::reveal::RevealCue;
 use crate::style::tokens::{layer::ZLayer, shape::Corner};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
@@ -105,13 +104,9 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// that shows it, aligning it with the nearer edge, never centring it, and does not animate the
 /// scroll. A stop the pointer selected is left where it is.
 ///
-/// `reveal` plays the rows' first-show rise (design/26 R13): each row, header and
-/// grid `rise`s at `--t-move --e-out`, `--stagger` after the one before (capped at 12), on each
-/// opening with `FirstShow::Animate`, or on each new Appear of the caller's own `use_detail` cue
-/// (the first result set after an opening); a Change (a later result set) replaces in place with
-/// no stagger. The default, `FirstShow::Still`, never rises. A group's own action (Show More,
-/// Show Less) plays section 5.4's group expand whoever passes a cue: the rows it adds
-/// rise in downward; the rows it removes go and what follows heals up by their height.
+/// A group's own action (Show More, Show Less) plays section 5.4's group expand: the rows it adds
+/// come in as roster rows do; the rows it removes go and what follows heals up by their height.
+/// A result set replaces the last one in place, with no motion.
 ///
 /// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
 /// radius; absent, it keeps `--r-panel`.
@@ -147,7 +142,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] aside: Option<Element>,
     #[props(default = ASIDE_WIDTH)] aside_width: Px,
     #[props(default)] initial_caret: InitialCaret,
-    #[props(into, default)] reveal: RevealCue,
     #[props(default)] handle: Option<PaletteHandle>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::Semitransient));
@@ -165,8 +159,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let request = landing(focus.unwrap_or(own_focus), initial_caret);
     let shown_groups = shown_groups(&groups.0, &query);
     let motion = use_list_motion(
-        reveal,
-        showing.change,
         &key,
         &shown_groups,
         Book {
@@ -325,7 +317,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 "data-embed": "palette",
                 role: "listbox",
                 onmousedown: move |event| event.prevent_default(),
-                "data-reveal": motion.reveal_slug(),
                 style: motion.heal_style(),
                 onmounted: move |event| in_view.list_mounted(MountedRef(event.data())),
                 {body}

@@ -4,8 +4,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, DropState, Emphasis, HoverStrip, Icon, ItemKind, ListRow, PlaceId, Presence,
-    PulseKey, RowState, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
+    ActionId, DropState, Emphasis, HoverStrip, Icon, ItemKind, ListRow, PlaceId, Presence,
+    RowState, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
 };
 
 /// Archive and snooze, each doing nothing on its measured click: the press says what happened.
@@ -52,7 +52,6 @@ pub fn StripPress() -> Element {
                     time: "09:41",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: ds::PulseKey::rest(Anim::StarPop),
                     strip: rsx! {
                         HoverStrip {
                             actions: actions(),
@@ -95,7 +94,6 @@ pub fn DropPlaces() -> Element {
                         count: None,
                         presence: Presence::Present,
                         preview: None,
-                        pulse: PulseKey::rest(Anim::Gulp),
                         onclick: |_| {},
                         onclose: None,
                         place: PlaceId(id.to_string()),

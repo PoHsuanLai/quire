@@ -7,7 +7,7 @@ use ds::motion::fraction_along;
 use ds::{
     Anim, Drag, DragPhase, Emphasis, Exit, Fraction, Heal, HoverEvent, HoverIntent, HoverWarmth,
     IntentEffect, IntentPhase, MotionLevel, Point, Presence, Px, Rect, RosterState, RowPitch, Size,
-    StayError, Stayed, settle, use_pulse,
+    StayError, Stayed, settle,
 };
 use ds::{Pull, PullTab, TabArm};
 use std::time::{Duration, Instant};
@@ -967,41 +967,6 @@ fn slider_fraction_along_the_track() {
         Fraction(0),
         "a zero-width track"
     );
-}
-
-// ---- pulse ---------------------------------------------------------------------------------
-
-#[test]
-fn pulse_alternates_aliases() {
-    use dioxus::core::VirtualDom;
-    use dioxus::prelude::*;
-    use std::cell::Cell;
-
-    thread_local! {
-        static PULSE: Cell<Option<ds::Pulse>> = const { Cell::new(None) };
-    }
-
-    #[allow(non_snake_case)]
-    fn App() -> Element {
-        let pulse = use_pulse(Anim::Gulp);
-        PULSE.set(Some(pulse));
-        rsx! { div {} }
-    }
-
-    let mut dom = VirtualDom::new(App);
-    dom.rebuild_in_place();
-    let pulse = PULSE.get().expect("the component ran");
-    dom.in_runtime(|| {
-        assert_eq!(pulse.attrs(), None, "at rest until fired");
-        let mut seen = Vec::new();
-        for _ in 0..4 {
-            pulse.fire();
-            seen.push(pulse.attrs());
-        }
-        let a = Some(("a-gulp".to_owned(), "a"));
-        let b = Some(("a-gulp".to_owned(), "b"));
-        assert_eq!(seen, vec![a.clone(), b.clone(), a, b]);
-    });
 }
 
 // ---- the roster hook's timers --------------------------------------------------------------

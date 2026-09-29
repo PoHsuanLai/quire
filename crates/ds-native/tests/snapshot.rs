@@ -3,8 +3,8 @@
 //! rasteriser changes with Blitz revisions).
 
 use dioxus::prelude::*;
-use ds::detail::{Deadline, FirstShow, Operation, PendingToken, Reveal};
-use ds::{Appearance, Button, ButtonVariant, Ds, Material, Spinner, SpinnerKind};
+use ds::detail::{Operation, PendingToken};
+use ds::{Anim, Appearance, Button, ButtonVariant, Ds, Material, PulseKey, Spinner};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport, snapshot, snapshot_at};
 use image::RgbaImage;
@@ -20,10 +20,8 @@ const VIEW: Viewport = Viewport {
 fn ButtonApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            Reveal { first: FirstShow::Animate,
-                Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
-            }
-            Spinner { kind: SpinnerKind::Breathe, operation: Operation::Idle }
+            Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
+            Spinner { operation: Operation::Idle }
         }
     }
 }
@@ -49,27 +47,44 @@ fn a_snapshot_has_the_viewport_size_in_device_pixels() {
     assert!(colours(&frame) > 16, "the frame is blank");
 }
 
+/// An ink square playing `fade`: a CSS motion that `snapshot_at` measures exactly.
+#[allow(non_snake_case)]
+fn FadeApp() -> Element {
+    let (class, alias) = PulseKey::rest(Anim::Fade)
+        .fired()
+        .attrs()
+        .expect("a fired pulse plays");
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div {
+                class: "{class}",
+                "data-pulse": alias,
+                style: "width:60px; height:60px; margin:20px; background:var(--ink)",
+            }
+        }
+    }
+}
+
 #[test]
-fn a_button_root_at_two_motion_moments() {
-    let moments = [Duration::ZERO, Duration::from_millis(250)];
-    let frames = snapshot_at(ButtonApp, VIEW, &moments).expect("renders");
+fn a_fade_at_two_motion_moments() {
+    let moments = [Duration::ZERO, Duration::from_millis(125)];
+    let frames = snapshot_at(FadeApp, VIEW, &moments).expect("renders");
     assert_eq!(frames.len(), 2);
     for (frame, moment) in frames.iter().zip(moments) {
-        keep(frame, &format!("button-t{:03}", moment.as_millis()));
+        keep(frame, &format!("fade-t{:03}", moment.as_millis()));
         assert_eq!(frame.dimensions(), (480, 240));
-        assert!(colours(frame) > 16, "the frame at {moment:?} is blank");
     }
-    // The revealed button rises between the two moments, so time reached the document.
-    assert_ne!(frames[0], frames[1], "nothing moved between 0 and 250 ms");
+    // The square fades in between the two moments, so time reached the document.
+    assert_ne!(frames[0], frames[1], "nothing moved between 0 and 125 ms");
 }
 
 #[allow(non_snake_case)]
 fn SpinApp() -> Element {
-    let operation = use_hook(|| Operation::Running(PendingToken::start(Deadline::cap())));
+    let operation = use_hook(|| Operation::Running(PendingToken::start()));
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "position:relative; width:40px; height:40px; margin:20px",
-                Spinner { kind: SpinnerKind::Spin, operation }
+                Spinner { operation }
             }
         }
     }
@@ -77,10 +92,10 @@ fn SpinApp() -> Element {
 
 #[test]
 fn the_spinner_turns() {
-    // Two steps apart the dashed ring has turned a further 180 degrees (a quarter per
-    // `--t-pending-step`), so its dashes sit elsewhere. With a base `transform:scale(1)` a turn
-    // interpolated between two identity matrices and the ring never moved; the ring's angle only
-    // grows while it steps.
+    // Three steps apart the dashed ring has turned a further 90 degrees (a twelfth per
+    // `--t-spin-step`), so its dashes sit elsewhere. With a base `transform:scale(1)` a turn
+    // interpolated between two identity matrices and the ring never moved; the ring's angle is
+    // written as it is, a step at a time.
     let mut harness = Harness::new(SpinApp, VIEW);
     let step = |h: &Harness| {
         h.attr(".ds-spinner", "style").and_then(|style| {
@@ -95,7 +110,7 @@ fn the_spinner_turns() {
     let first = harness.render().expect("renders");
     let at = step(&harness).unwrap_or(0);
     settle_until(&mut harness, |h| {
-        step(h).is_some_and(|turn| turn >= at + 180)
+        step(h).is_some_and(|turn| (turn + 360 - at) % 360 >= 90)
     });
     let later = harness.render().expect("renders");
     for (frame, name) in [(&first, "spin-first"), (&later, "spin-later")] {

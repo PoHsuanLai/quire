@@ -5,13 +5,13 @@ use ds::Check;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Common, Fraction, Hex,
     ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase,
-    SendPill, SendRing, Shown, TextInput, TextInputKind,
-};
-use ds::{
-    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, PulseKey,
-    Selection, SidebarItem, TodayTrailing,
+    SendPill, Shown, TextInput, TextInputKind,
 };
 use ds::{Avatar, Muting};
+use ds::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, Selection,
+    SidebarItem, TodayTrailing,
+};
 use ds::{
     CardAccent, DotIndex, MeasuredIn, Motion, MotionChoice, PRESETS, Scheme, SpaceEditor,
     SpaceLook, Theme,
@@ -35,7 +35,6 @@ fn scheduled() -> Element {
             count: None,
             presence: Presence::Present,
             preview: None,
-            pulse: PulseKey::rest(Anim::Gulp),
             onclick: |_| {},
             onclose: None,
             trailing: TodayTrailing { time: "Mon 9:00".to_string(), cancel: "Cancel sending Q3 notes".to_string(), on_cancel: EventHandler::new(|()| {}) },
@@ -120,19 +119,10 @@ pub const CASES: &[Case] = &[
         golden: "lists/account_tile/add-named.html",
         make: || rsx! { AddAccountTile { label: "Add an account to Work", onclick: |_| {} } },
     },
-    // SendPill: Cancel for a held send, a spinning ring with no button, a nudge on mount (at
-    // rest: a mood plays only when it changes), and a fatal refusal on two lines.
+    // SendPill: Cancel for a held send, and a fatal refusal on two lines.
     Case {
         golden: "overlays/send_pill/cancel.html",
         make: || rsx! { SendPill { text: "Scheduled for 9:00", progress: Fraction(0), phase: SendPhase::Counting, action: PillAction::Cancel, onundo: |_| {} } },
-    },
-    Case {
-        golden: "overlays/send_pill/spin-nothing.html",
-        make: || rsx! { SendPill { text: "Sending…", progress: Fraction(0), phase: SendPhase::Counting, ring: SendRing::Spin, action: PillAction::Nothing, onundo: |_| {} } },
-    },
-    Case {
-        golden: "overlays/send_pill/nudge-mounted.html",
-        make: || rsx! { SendPill { text: "Not sent yet · will try again", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Nudge, action: PillAction::Nothing, onundo: |_| {} } },
     },
     Case {
         golden: "overlays/send_pill/fatal-refused.html",

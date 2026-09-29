@@ -3,8 +3,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Check, ItemKind, PersonHue, Presence,
-    PulseKey, RowState, Selection, SidebarItem, TodayTrailing,
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, Check, ItemKind, PersonHue, Presence,
+    RowState, Selection, SidebarItem, TodayTrailing,
 };
 
 /// A draft waiting for Monday morning, cancelled with its trailing button.
@@ -26,7 +26,6 @@ pub fn Scheduled() -> Element {
                 count: None,
                 presence: Presence::Present,
                 preview: None,
-                pulse: PulseKey::rest(Anim::Gulp),
                 onclick: |_| {},
                 onclose: None,
                 trailing: TodayTrailing {

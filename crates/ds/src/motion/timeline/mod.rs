@@ -6,13 +6,11 @@
 //! frame clock: it asks for a frame every `FRAME_TICK` while a timeline runs and never at rest
 //! (design/26 R3).
 
-pub(crate) mod count_up;
 pub(crate) mod ease;
 pub mod glide;
 pub(crate) mod pending;
 pub mod playback;
 pub mod spring;
-pub mod sweep;
 pub(crate) mod use_timeline;
 
 use std::time::Duration;

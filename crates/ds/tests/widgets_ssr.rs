@@ -369,10 +369,10 @@ fn the_battery_draws_its_level_and_tone() {
     assert!(!html("battery-45").contains("ds-battery-bolt"));
 }
 
-/// At full motion a ring's first frame is the start of its fill: no arc and no bolt yet, but
-/// the true level to assistive technology and the low red already chosen from it.
+/// A ring's first frame is its level: the arc and the bolt are drawn, and the true level is
+/// given to assistive technology, with the low red already chosen from it.
 #[test]
-fn a_battery_first_draws_empty_and_true() {
+fn a_battery_first_draws_at_its_level() {
     let first = render(|| {
         desktop(
             Theme::Light,
@@ -383,10 +383,13 @@ fn a_battery_first_draws_empty_and_true() {
             },
         )
     });
-    assert!(!first.contains("ds-battery-arc"), "{first}");
-    assert!(!first.contains("ds-battery-bolt"), "{first}");
+    assert!(first.contains("ds-battery-arc"), "{first}");
+    assert!(first.contains("ds-battery-bolt"), "{first}");
     assert!(first.contains("aria-valuenow=\"8\""), "{first}");
     assert!(first.contains("aria-valuenow=\"15\""), "{first}");
     assert!(first.contains("data-tone=\"critical\""), "{first}");
-    assert!(first.contains(">0%<"), "the figure counts from 0: {first}");
+    assert!(
+        first.contains(">93%<"),
+        "the figure shows the level: {first}"
+    );
 }

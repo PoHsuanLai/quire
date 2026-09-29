@@ -236,13 +236,9 @@ fn PortraitStage() -> Element {
     }
 }
 
-fn accepting(harness: &Harness) -> bool {
-    harness.has_class(".ds-user-picture", "a-picture-accept")
-}
-
 /// The mapping as a user picture: each mood's change swaps in its emoji (the eyes, the
-/// confounded face, the partying face) and the sleeping face holds still; Happy also lifts the
-/// whole picture once. 21 s after the last wake, it is at rest and asks for no frame.
+/// confounded face, the partying face) and the sleeping face holds still. 21 s after the last
+/// wake, it is at rest and asks for no frame.
 #[test]
 fn as_a_user_picture_each_mood_shows_its_emoji() {
     let mut harness = Harness::with_config(
@@ -250,7 +246,6 @@ fn as_a_user_picture_each_mood_shows_its_emoji() {
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     assert_eq!(face(&harness).as_deref(), Some("wink"));
-    assert!(!accepting(&harness));
     let rows = [
         (Mood::Attentive, "eyes"),
         (Mood::Wince, "confounded"),
@@ -259,12 +254,8 @@ fn as_a_user_picture_each_mood_shows_its_emoji() {
     for (mood, swapped) in rows {
         harness.within(|| *PICTURE_MOOD.write() = mood);
         settle_until(&mut harness, |h| face(h).as_deref() == Some(swapped));
-        if mood == Mood::Happy {
-            assert!(accepting(&harness), "Happy lifts: {}", harness.html());
-        }
         settle_until(&mut harness, |h| face(h).as_deref() == Some("wink"));
     }
-    assert!(!accepting(&harness), "the beat is at rest after it plays");
     harness.within(|| *PICTURE_MOOD.write() = Mood::Asleep);
     settle_until(&mut harness, |h| face(h).as_deref() == Some("sleeping"));
     for _ in 0..10 {
@@ -281,9 +272,9 @@ fn as_a_user_picture_each_mood_shows_its_emoji() {
     assert!(!harness.is_animating(), "asks for frames at rest");
 }
 
-/// Under Reduced motion a picture's accept beat is not played, and its frames stay still.
+/// Under Reduced motion a picture's frames stay still.
 #[test]
-fn under_reduced_motion_the_accept_beat_does_not_play() {
+fn under_reduced_motion_the_frames_stay_still() {
     let mut harness = Harness::new(PortraitStage, VIEW);
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(100));
@@ -291,7 +282,6 @@ fn under_reduced_motion_the_accept_beat_does_not_play() {
     settle_until(&mut harness, |h| face(h).as_deref() == Some("partying"));
     for _ in 0..10 {
         harness.advance(Duration::from_millis(50));
-        assert!(!accepting(&harness), "a beat under Reduced");
         assert_eq!(frame(&harness).as_deref(), Some("0"));
     }
 }

@@ -138,7 +138,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "keyframes: none passes",
-        css: ".chip { animation-name: gulp; }",
+        css: ".chip { animation-name: fade; }",
         profile: Profile::Strict,
         rule: Rule::Keyframes,
         expect: false,
@@ -153,7 +153,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "unknown animation: a real Anim passes",
-        css: ".chip { animation-name: gulp; }",
+        css: ".chip { animation-name: fade; }",
         profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
@@ -175,7 +175,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "unknown animation: the second of two shorthand animations is read too",
-        css: ".chip { animation: gulp var(--t-big) var(--e-spring), sparkle var(--t-move) var(--e-out); }",
+        css: ".chip { animation: fade var(--t-big) var(--e-out), sparkle var(--t-move) var(--e-out); }",
         profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: true,
@@ -591,7 +591,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "infinite loop: a keyframe played once passes",
-        css: ".chip { animation: gulp var(--t-big) var(--e-spring); animation-iteration-count: 1; }",
+        css: ".chip { animation: fade var(--t-big) var(--e-out); animation-iteration-count: 1; }",
         profile: Profile::Strict,
         rule: Rule::InfiniteLoop,
         expect: false,
@@ -606,7 +606,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "off-grammar timing: the spin token in an animation fails under Details",
-        css: ".chip { animation: gulp var(--t-spin) var(--e-linear); }",
+        css: ".chip { animation: fade var(--t-spin) var(--e-linear); }",
         profile: Profile::Details,
         rule: Rule::OffGrammarTiming,
         expect: true,

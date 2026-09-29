@@ -1,18 +1,17 @@
-//! Details, the control center's modules (design/26-DETAILS.md 5.2): the tile disc's
-//! fill and morph, the settings rows' pending, success and failure, Now Playing's play/pause,
-//! track cross-fade and position, the Battery module's rings, and the keyboard-brightness level.
-//! Each cell opens at rest (a snapshot runs no Rust timer); its buttons play the moments.
+//! Details, the control center's modules (design/26-DETAILS.md 5.2): the tile disc's busy ring,
+//! the settings rows' pending, Now Playing's play/pause, track cross-fade and position, the
+//! Battery module's rings, and the keyboard-brightness level. Each cell opens at rest (a
+//! snapshot runs no Rust timer); its buttons play the moments.
 
 use super::Section;
 use super::details::{Cell, mini};
 use super::details_center_rows::{DeviceRows, NetworkRows, OutputRows};
 use dioxus::prelude::*;
-use ds::detail::{EventStamp, FirstShow};
+use ds::detail::EventStamp;
 use ds::{
-    DeviceBattery, DiscMotion, Fraction, Glyph, Icon, IconButton, IconButtonVariant, IconSize,
-    LevelControl, LevelGlyph, LevelLook, LevelMode, ModuleGrid, ModulePanel, ModuleState,
-    ModuleTile, NowPlayingTrack, PlayPauseButton, Playback, Px, RingMark, TextLine, Tick,
-    TrackPosition,
+    DeviceBattery, Fraction, Glyph, Icon, IconButton, IconButtonVariant, IconSize, LevelControl,
+    LevelGlyph, LevelLook, LevelMode, ModuleGrid, ModulePanel, ModuleState, ModuleTile,
+    NowPlayingTrack, PlayPauseButton, Playback, Px, RingMark, TextLine, TrackPosition,
 };
 use std::time::Duration;
 
@@ -20,7 +19,7 @@ use std::time::Duration;
 #[component]
 pub fn CenterSection() -> Element {
     rsx! {
-        Section { title: "Control center modules", note: "The control center's details (D2). A tile's disc fills its glyph once as the module comes on (Wi-Fi) or morphs into its on glyph (Focus, springing only under a press). A row joining shows a spinner where its lock was, a device connecting or an output switching breathes its glyph; success seals the disc or draws the check once; failure shakes the row once. Play/pause offers the next action off-up; a new track cross-fades; the position steps once a second while playing. The Battery module's rings sweep in with their percentages counting in step. Keyboard brightness is a level whose rays follow it. Nothing loops; each settles to 0 frames.",
+        Section { title: "Control center modules", note: "The control center's details (D2). A busy tile shows the spinner ring on its disc. A row joining shows a spinner where its lock was. Play/pause cross-fades to the next action; a new track cross-fades; the position steps once a second while playing. The Battery module's rings follow their levels. Keyboard brightness is a level whose rays follow it.",
             div { class: "g-detail-grid g-center-grid",
                 TilesCell {}
                 NetworkRows {}
@@ -47,7 +46,7 @@ fn TilesCell() -> Element {
     let mut wifi = use_signal(|| ModuleState::On);
     let mut focus = use_signal(|| ModuleState::Off);
     rsx! {
-        Cell { name: "Tile disc", code: "ModuleTile {{ disc: DiscMotion::Fill | Morph(icon) }}",
+        Cell { name: "Tile disc", code: "ModuleTile {{ state }}",
             controls: rsx! {
                 {mini("Wi-Fi busy", move |_| wifi.set(ModuleState::Busy))}
                 {mini("Wi-Fi on", move |_| wifi.set(ModuleState::On))}
@@ -61,7 +60,6 @@ fn TilesCell() -> Element {
                         title: "Wi-Fi",
                         status: Some(TextLine::from(words(wifi()))),
                         state: wifi(),
-                        disc: DiscMotion::Fill,
                         onclick: move |_| wifi.set(flip(wifi())),
                     }
                     ModuleTile {
@@ -69,7 +67,6 @@ fn TilesCell() -> Element {
                         title: "Focus",
                         status: Some(TextLine::from(words(focus()))),
                         state: focus(),
-                        disc: DiscMotion::Morph(Icon::MoonFilled),
                         onclick: move |_| focus.set(flip(focus())),
                     }
                 }
@@ -110,7 +107,7 @@ fn PlayerCell() -> Element {
             div { class: "g-detail g-detail-list",
                 div { class: "g-center-player",
                     div { class: "g-center-track",
-                        NowPlayingTrack { title: TextLine::from(title), by: Some(TextLine::from(by)), playback: playback() }
+                        NowPlayingTrack { title: TextLine::from(title), by: Some(TextLine::from(by)) }
                     }
                     IconButton { variant: IconButtonVariant::Tool, icon: Icon::SkipBack, label: "Previous".to_owned(), onclick: move |_| *track.write() += 1 }
                     PlayPauseButton {
@@ -130,30 +127,22 @@ fn PlayerCell() -> Element {
 
 #[component]
 fn BatteryCell() -> Element {
-    let mut appear = use_signal(|| 0u32);
     let mut mouse = use_signal(|| Fraction(640));
-    let first = match appear() {
-        0 => FirstShow::Still,
-        _ => FirstShow::Animate,
-    };
     rsx! {
-        Cell { name: "Battery module", code: "DeviceBattery {{ level, mark, first }}",
+        Cell { name: "Battery module", code: "DeviceBattery {{ level, mark }}",
             controls: rsx! {
-                {mini("Open the center", move |_| *appear.write() += 1)}
                 {mini("Mouse 64 %", move |_| mouse.set(Fraction(640)))}
                 {mini("Mouse 31 %", move |_| mouse.set(Fraction(310)))}
             },
-            for round in [appear()] {
-                div { key: "{round}", class: "g-detail",
-                    DeviceBattery { level: Fraction(930), mark: RingMark::Charging, label: "This computer", first,
-                        Glyph { icon: Icon::Monitor, size: IconSize::Base }
-                    }
-                    DeviceBattery { level: mouse(), label: "Mouse", first,
-                        Glyph { icon: Icon::Mouse, size: IconSize::Base }
-                    }
-                    DeviceBattery { level: Fraction(150), label: "Headphones", first,
-                        Glyph { icon: Icon::Headphones, size: IconSize::Base }
-                    }
+            div { class: "g-detail",
+                DeviceBattery { level: Fraction(930), mark: RingMark::Charging, label: "This computer",
+                    Glyph { icon: Icon::Monitor, size: IconSize::Base }
+                }
+                DeviceBattery { level: mouse(), label: "Mouse",
+                    Glyph { icon: Icon::Mouse, size: IconSize::Base }
+                }
+                DeviceBattery { level: Fraction(150), label: "Headphones",
+                    Glyph { icon: Icon::Headphones, size: IconSize::Base }
                 }
             }
         }
@@ -177,7 +166,6 @@ fn KeyboardCell() -> Element {
                         glyph: LevelGlyph::KeyboardBrightness,
                         mode: LevelMode::Interactive,
                         look: LevelLook::CapsuleKnob,
-                        tick: Tick::Quiet,
                         onchange: move |next| level.set(next),
                     }
                 }

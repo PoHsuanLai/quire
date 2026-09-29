@@ -25,7 +25,6 @@ use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::controls::press::Propagation;
 use crate::core::geometry::units::{Point, Px};
 use crate::core::vocab::Shown;
-use crate::core::vocab::StaggerIndex;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spec::PresenceSpec;
@@ -244,12 +243,12 @@ fn client(event: &PointerEvent) -> Point {
     }
 }
 
-/// The hover row: strip buttons that pop in one after another (`--j`), each keeping its press.
+/// The hover row: strip buttons, each keeping its press.
 fn action_row(actions: Vec<ThumbAction>) -> Element {
     rsx! {
         div { class: "ds-shot-actions", role: "toolbar", "aria-label": "Screenshot actions",
             for (j , action) in actions.into_iter().enumerate() {
-                span { key: "{j}", class: "ds-shot-action", style: "--j:{StaggerIndex::new(j).get()}",
+                span { key: "{j}", class: "ds-shot-action",
                     IconButton {
                         variant: IconButtonVariant::Strip,
                         icon: action.icon,

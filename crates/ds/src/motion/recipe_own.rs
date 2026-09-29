@@ -4,15 +4,6 @@
 use super::recipe::{Fill, Iteration, Recipe, recipe};
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
-/// `chip-flash` (`S:2119`): the flash is a hold, so it runs linear and leaves nothing behind.
-pub(super) const CHIP_FLASH: Recipe = recipe(
-    "chip-flash",
-    DurationToken::Flash,
-    EasingToken::Linear,
-    Fill::None,
-    Iteration::Once,
-);
-
 /// `menu-out` (design/13 section 13.3.2): "fade over `--t-quick` with `--e-exit`".
 pub(super) const MENU_OUT: Recipe = recipe(
     "menu-out",
@@ -133,16 +124,6 @@ pub(super) const OSD_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `level-tick`: the level control's fill edge shows its mark and lets it go at `--t-tap
-/// --e-out`, the shortest motion token, so a step crossed under a drag is felt, not watched.
-pub(super) const LEVEL_TICK: Recipe = recipe(
-    "level-tick",
-    DurationToken::Tap,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
 /// `sheet-out`: a sheet's exit at `--t-move --e-exit`, the exit design/05
 /// section 10 gives shell chrome. It holds its last, transparent frame until the host unmaps
 /// the surface at `settle(SheetOut)`, so the sheet never flashes back between the two.
@@ -230,17 +211,6 @@ pub(super) const SHOT_OUT: Recipe = recipe(
     DurationToken::Move,
     EasingToken::Exit,
     Fill::Forwards,
-    Iteration::Once,
-);
-
-/// `picture-accept` (design/25-EMOJI.md section 7): the user's picture lifts once and lands at
-/// `--t-big --e-spring`; the unlock answers the user's own
-/// contact (principle 2). A lock screen unlocks at its settle.
-pub(super) const PICTURE_ACCEPT: Recipe = recipe(
-    "picture-accept",
-    DurationToken::Big,
-    EasingToken::Spring,
-    Fill::None,
     Iteration::Once,
 );
 

@@ -2,11 +2,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Button, ButtonVariant, Common, Icon, ItemKind, Leading, MarkProvider, MarkSize,
-    MarkStyle, PlaceId, Presence, ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun,
-    Trailing,
+    Button, ButtonVariant, Common, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle,
+    PlaceId, Presence, ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun, Trailing,
 };
-use ds::{DropState, PulseKey, Selection};
+use ds::{DropState, Selection};
 
 /// One state and its golden.
 pub struct Case {
@@ -32,7 +31,6 @@ fn archive(drop: DropState) -> Element {
             count: None,
             presence: Presence::Present,
             preview: None,
-            pulse: PulseKey::rest(Anim::Gulp),
             onclick: |_| {},
             onclose: None,
             place: PlaceId("archive".to_string()),

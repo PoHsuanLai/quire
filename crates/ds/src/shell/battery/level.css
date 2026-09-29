@@ -5,9 +5,8 @@
    (low and critical alike); the stroke is .093 of the ring's diameter. The device's glyph sits
    in the middle at .47 of the ring in `--ink`. While charging, a bolt in `--ink`, .16 of the
    ring tall, sits on the stroke at twelve in the gap the ring leaves for it. Each vector takes
-   its colour from its own element (spike S6). The arc's fill sweeps from Rust (the path changes
-   each frame while it moves; no keyframe, no transition), and the bolt's fade-in is an inline
-   opacity it writes for the same few frames. */
+   its colour from its own element (spike S6). The arc follows its level from Rust (the path
+   changes each frame while it moves; no keyframe, no transition). */
 
 .ds-battery{ position:relative; display:block; flex:none; width:64px; height:64px; color:var(--ink); }
 .ds-battery-track,
@@ -20,14 +19,11 @@
 .ds-battery-device .ds-ic{ width:47%; height:47%; }
 .ds-battery-bolt{ position:absolute; left:45%; top:-3.35%; display:block; width:10%; height:16%; color:var(--ink); }
 
-/* BatteryFigure: the percentage counting with the ring's fill; the caller sets its size and
-   face, tabular so its width holds while it counts. */
+/* BatteryFigure: the percentage; the caller sets its size and face, tabular so its width holds
+   as the number changes. */
 .ds-battery-figure{ font-variant-numeric:tabular-nums; }
 
 /* DeviceBattery (design/26-DETAILS.md 5.2.9): the ring over its percentage, centred, the
-   control center's Battery module's one device. The arc sweeps and the number counts from Rust;
-   the bolt waits hidden until the sweep lands, then fades in over `--t-quick`. */
+   control center's Battery module's one device. */
 .ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
 .ds-device-battery .ds-battery-figure{ font-size:var(--fs-help); color:var(--ink-soft); }
-.ds-battery-bolt[*|data-show]{ transition:opacity var(--t-quick) var(--e-out); }
-.ds-battery-bolt[*|data-show=off]{ opacity:0; }

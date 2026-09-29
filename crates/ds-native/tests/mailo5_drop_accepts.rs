@@ -3,10 +3,8 @@
 //! item keeps its size and its label stays where it was as a drag starts.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, Ds, Icon, ItemKind, Material, PlaceId, Presence, RowState, SidebarItem,
-};
-use ds::{DropState, PulseKey, Selection};
+use ds::{Appearance, Ds, Icon, ItemKind, Material, PlaceId, Presence, RowState, SidebarItem};
+use ds::{DropState, Selection};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -36,7 +34,7 @@ fn Page() -> Element {
                         count: None,
                         presence: Presence::Present,
                         preview: None,
-                        pulse: PulseKey::rest(Anim::Gulp),
+
                         onclick: |_| {},
                         onclose: None,
                         place: PlaceId(label.to_lowercase()),

@@ -5,7 +5,7 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState,
+    ActionId, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState,
     RunTone, Selection, Shown, StaggerIndex, StripAction, TextLine, TextRun, Titles,
 };
 
@@ -87,7 +87,6 @@ pub fn SearchRows() -> Element {
                         time,
                         tags: rsx! {},
                         star: None,
-                        star_pulse: ds::PulseKey::rest(Anim::StarPop),
                         strip: rsx! {
                             HoverStrip {
                                 actions: actions(),

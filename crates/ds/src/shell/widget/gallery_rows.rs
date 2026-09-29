@@ -1,9 +1,7 @@
 //! Edit Widgets' placed lists: what is on the desktop and in the notification
 //! center, a row each with the widget's name and Remove. A row that arrives while the gallery is
-//! open rises in (`row-in`, `--t-big --e-spring`, when the person's own Add placed it; `rise`,
-//! `--t-move --e-out`, when something else did: design/05 principle 2) and is brought into view
-//! in the placed column, moving the column the least that shows it. Rows already placed when
-//! the gallery opened sit still.
+//! open is brought into view in the placed column, moving the column the least that shows it.
+//! Rows already placed when the gallery opened sit still.
 
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
@@ -11,11 +9,6 @@ use crate::core::task::spawn_in;
 use crate::core::word::Word;
 use crate::host::measure::MountedRef;
 use crate::host::reveal::reveal;
-use crate::motion::detail::touch::Touch;
-use crate::motion::{
-    anim::Anim,
-    timer::{TimerPhase, use_motion_timer},
-};
 use crate::shell::catalog::placement::PlacementId;
 use crate::shell::widget::gallery::GalleryWords;
 use crate::shell::widget::kind::WidgetHost;
@@ -23,7 +16,7 @@ use crate::shell::widget::layout::{WidgetAt, WidgetEdit, WidgetLayout, WidgetPla
 use crate::shell::widget::registry::WidgetRegistry;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 
 /// The placements on `host`, in their order there.
 pub(crate) fn on_host(layout: &WidgetLayout, host: WidgetHost) -> Vec<WidgetPlacement> {
@@ -46,11 +39,11 @@ fn at_key(item: &WidgetPlacement) -> (u16, u16) {
 }
 
 /// What the placed column needs from the gallery: the registry for names, the layout, the rows
-/// that arrived with this layout and who caused each, and the edit handler.
+/// that arrived with this layout, and the edit handler.
 pub(crate) struct Placed<'a> {
     pub(crate) registry: &'a WidgetRegistry,
     pub(crate) layout: &'a WidgetLayout,
-    pub(crate) arrived: &'a BTreeMap<PlacementId, Touch>,
+    pub(crate) arrived: &'a BTreeSet<PlacementId>,
     pub(crate) onedit: EventHandler<WidgetEdit>,
     pub(crate) words: &'a GalleryWords,
 }
@@ -83,7 +76,7 @@ pub(crate) fn placed(placed: Placed<'_>, mut list: CopyValue<Option<MountedRef>>
                             id: item.id,
                             name: name_of(registry, &item),
                             remove: words.remove.clone(),
-                            arrival: arrived.get(&item.id).copied(),
+                            arrived: arrived.contains(&item.id),
                             list,
                             onedit,
                         }
@@ -102,45 +95,24 @@ fn name_of(registry: &WidgetRegistry, item: &WidgetPlacement) -> String {
     )
 }
 
-/// How a row that arrived rises: the spring only for the person's own press.
-fn entrance(touch: Touch) -> Anim {
-    match touch {
-        Touch::Contact(_) => Anim::RowIn,
-        Touch::Remote => Anim::Rise,
-    }
-}
-
-/// One placed widget's row: its name and Remove. `arrival` is read once, as the row mounts: a
-/// row that arrived rises and is brought into view in `list`; later renders never replay it.
+/// One placed widget's row: its name and Remove. `arrived` is read once, as the row mounts: a
+/// row that arrived is brought into view in `list`; later renders never replay it.
 #[component]
 fn PlacedRow(
     id: PlacementId,
     name: String,
     remove: TextLine,
-    arrival: Option<Touch>,
+    arrived: bool,
     list: CopyValue<Option<MountedRef>>,
     onedit: EventHandler<WidgetEdit>,
 ) -> Element {
-    let arrived = use_hook(|| arrival);
-    let anim = arrived.map(entrance);
-    let timer = use_motion_timer(anim.unwrap_or(Anim::Rise));
-    use_hook(|| {
-        if arrived.is_some() {
-            timer.start(EventHandler::new(|()| {}));
-        }
-    });
-    let rising = anim.filter(|_| timer.phase() != TimerPhase::Settled);
-    let class = match rising {
-        Some(anim) => format!("ds-widget-gallery-row {}", anim.class()),
-        None => "ds-widget-gallery-row".to_owned(),
-    };
+    let arrived = use_hook(|| arrived);
     let scope = use_hook(current_scope_id);
     rsx! {
         div {
-            class,
-            "data-pulse": rising.map(|_| "a"),
+            class: "ds-widget-gallery-row",
             onmounted: move |event: MountedEvent| {
-                let (Some(_), Some(scroller)) = (arrived, list.peek().clone()) else {
+                let (true, Some(scroller)) = (arrived, list.peek().clone()) else {
                     return;
                 };
                 let row = MountedRef(event.data());
@@ -157,9 +129,7 @@ fn PlacedRow(
 
 #[cfg(test)]
 mod tests {
-    use super::{at_key, entrance, on_host};
-    use crate::motion::anim::Anim;
-    use crate::motion::detail::touch::{Contact, Touch};
+    use super::{at_key, on_host};
     use crate::shell::widget::kind::{WidgetHost, WidgetSize};
     use crate::shell::widget::layout::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
     use crate::shell::widget::{
@@ -195,11 +165,5 @@ mod tests {
                 .all(|pair| at_key(&pair[0]) <= at_key(&pair[1]))
         );
         assert_eq!(on_host(&layout, WidgetHost::Tile).len(), 1);
-    }
-
-    #[test]
-    fn only_the_persons_add_springs_its_row_in() {
-        assert_eq!(entrance(Touch::Contact(Contact::for_tests())), Anim::RowIn);
-        assert_eq!(entrance(Touch::Remote), Anim::Rise);
     }
 }

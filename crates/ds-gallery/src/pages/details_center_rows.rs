@@ -4,7 +4,7 @@
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
-use ds::{Check, Fraction, Icon, RowDisc, RowPhase, RowTrailing, RowWork, SettingsRow, TextLine};
+use ds::{Check, Fraction, Icon, RowDisc, RowPhase, RowTrailing, SettingsRow, TextLine};
 
 /// A row's operation over a run of stamps: each press mints the next.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,15 +72,15 @@ pub fn NetworkRows() -> Element {
         Check::Off | Check::Mixed => RowDisc::Off,
     };
     rsx! {
-        Cell { name: "Network rows", code: "SettingsRow {{ phase, work: RowWork::Trailing, disc }}",
+        Cell { name: "Network rows", code: "SettingsRow {{ phase, disc }}",
             controls: rsx! {
                 {mini("Join Café", move |_| cafe.set(cafe().pending()))}
                 {mini("Joined", move |_| cafe.set(cafe().succeeded()))}
                 {mini("Wrong password", move |_| cafe.set(cafe().failed()))}
             },
             div { class: "g-detail g-detail-list",
-                SettingsRow { glyph: Some(Icon::Wifi), title: "Home", detail: detail(home(), "Connected"), phase: home().phase, work: RowWork::Trailing, disc: disc(home()), trailing: RowTrailing::Glyph(Icon::Lock), onclick: move |_| home.set(home().pending()) }
-                SettingsRow { glyph: Some(Icon::Wifi), title: "Café", detail: detail(cafe(), "Connected"), phase: cafe().phase, work: RowWork::Trailing, disc: disc(cafe()), trailing: RowTrailing::Glyph(Icon::Lock), onclick: move |_| cafe.set(cafe().pending()) }
+                SettingsRow { glyph: Some(Icon::Wifi), title: "Home", detail: detail(home(), "Connected"), phase: home().phase, disc: disc(home()), trailing: RowTrailing::Glyph(Icon::Lock), onclick: move |_| home.set(home().pending()) }
+                SettingsRow { glyph: Some(Icon::Wifi), title: "Café", detail: detail(cafe(), "Connected"), phase: cafe().phase, disc: disc(cafe()), trailing: RowTrailing::Glyph(Icon::Lock), onclick: move |_| cafe.set(cafe().pending()) }
             }
         }
     }
