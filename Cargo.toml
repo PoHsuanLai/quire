@@ -153,6 +153,3 @@ latchkey = { git = "https://github.com/PoHsuanLai/mailo", rev = "43ebf45f244a23c
 unsafe_code = "deny"
 missing_debug_implementations = "warn"
 
-[workspace.lints.clippy]
-todo = "allow"
-
