@@ -33,6 +33,7 @@ pub mod time;
 pub mod widget;
 mod window;
 
+pub use crate::assembly::selectors;
 pub use crate::assembly::{
     ds::{Ds, Inject},
     kit::kits,
