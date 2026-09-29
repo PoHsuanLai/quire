@@ -8,10 +8,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Count, Ds,
-    Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListRow, Material,
-    Menu, MenuEntry, MenuKind, MenuTrail, Point, Presence, PulseKey, Px, RowPitch, RowState,
-    Selection, ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Anchor, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Ds, Emphasis,
+    Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListRow, Material, Menu,
+    MenuEntry, MenuKind, MenuTrail, Point, Presence, Px, RowPitch, RowState, Selection,
+    ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
     DotIndex, FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput,
@@ -111,43 +111,6 @@ fn a_toggle_switches() {
     assert_eq!(checked(&harness).as_deref(), Some("true"));
     harness.click(centre(&harness, ".ds-toggle"));
     assert_eq!(checked(&harness).as_deref(), Some("false"));
-}
-
-#[allow(non_snake_case)]
-fn CountApp() -> Element {
-    let mut unread = use_signal(|| 0u32);
-    rsx! {
-        Root {
-            Button {
-                variant: ButtonVariant::Mini,
-                label: "More",
-                onclick: move |_| unread += 1,
-            }
-            Count { value: unread() }
-        }
-    }
-}
-
-#[test]
-fn a_count_bumps_after_its_value_changes() {
-    let mut harness = Harness::new(CountApp, VIEW);
-    let bump = Anim::Bump.class();
-    assert_eq!(harness.text_of(".ds-count").as_deref(), Some(""));
-    assert!(!harness.has_class(".ds-count", bump), "bumped on mount");
-    assert_eq!(harness.attr(".ds-count", "data-pulse"), None);
-
-    harness.click(centre(&harness, ".ds-button"));
-    assert_eq!(harness.text_of(".ds-count").as_deref(), Some("1"));
-    assert!(harness.has_class(".ds-count", bump));
-    let first = harness.attr(".ds-count", "data-pulse");
-    assert!(first.is_some());
-
-    // The next change swaps the alias, which is what restarts the animation (spike S5).
-    harness.click(centre(&harness, ".ds-button"));
-    assert_eq!(harness.text_of(".ds-count").as_deref(), Some("2"));
-    let second = harness.attr(".ds-count", "data-pulse");
-    assert!(second.is_some());
-    assert_ne!(first, second);
 }
 
 // ---- The hubs' timings, through the root that owns them ----------------------------------
@@ -434,7 +397,7 @@ fn ListDemo() -> Element {
                     time: "09:41",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: PulseKey::rest(Anim::Bump),
+
                     strip: None,
                     onclick: move |_| {
                         roster.leave(entry.key, Exit::Fold, Emphasis::Plain);

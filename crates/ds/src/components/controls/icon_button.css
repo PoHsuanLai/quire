@@ -59,25 +59,17 @@
   background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
-/* A status glyph takes the same square as an icon, whether or not the nudge wraps it;
-   its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
+/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
    setting as a single icon does. */
 .ds-icon-button[*|data-variant=status] > .ds-ic,
 .ds-icon-button[*|data-variant=status] > .ds-ext-icon,
-.ds-icon-button[*|data-variant=status] > .ds-status-glyph,
-.ds-icon-button[*|data-variant=status] > .ds-icon-nudge > .ds-ic,
-.ds-icon-button[*|data-variant=status] > .ds-icon-nudge > .ds-ext-icon,
-.ds-icon-button[*|data-variant=status] > .ds-icon-nudge > .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
+.ds-icon-button[*|data-variant=status] > .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
 .ds-icon-button[*|data-variant=status] .ds-status-glyph > .ds-status-part,
 .ds-icon-button[*|data-variant=status] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
 .ds-icon-button[*|data-variant=status]:hover{ color:var(--f-ink); background:var(--f-pill-hover); }
 .ds-icon-button[*|data-variant=status]:active,
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
-
-/* The nudge's wrapper (design/26): the glyph alone lifts once on a new attention
-   cue, the pill stays; the keyframe is the motion sheet's `nudge-up`. */
-.ds-icon-nudge{ display:inline-grid; place-items:center; }
 
 /* Disabled: .35, the default cursor, and no pointer, so no hover or press matches;
    `disabled` and the dropped handlers keep a press from firing. */

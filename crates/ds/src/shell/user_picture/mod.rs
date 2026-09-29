@@ -3,7 +3,6 @@
 //! stored choice ([`PictureChoice`]) and the rule that resolves it ([`resolve_picture`]); and
 //! [`UserPicturePicker`], where a person picks one.
 
-pub(crate) mod accept;
 pub(crate) mod choice;
 pub(crate) mod mood;
 pub(crate) mod picker;

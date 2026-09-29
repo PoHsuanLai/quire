@@ -10,7 +10,6 @@
 //! `clock_dial.rs`.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::bump_on::{bump_attrs, use_bump_on};
 use crate::core::word::Word;
 use crate::shell::clock::angles::hands;
 use crate::shell::clock::dial::{hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg};
@@ -18,7 +17,7 @@ use crate::shell::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use dioxus::prelude::*;
 
 /// A clock showing `time`, for `phase`, drawn as `look`, with `label` (the city) under it. A
-/// digital face bumps once on each new minute; an analog one moves its hands.
+/// digital face shows the digits; an analog one moves its hands.
 #[component]
 pub fn ClockFace(
     time: ClockTime,
@@ -68,11 +67,10 @@ fn AnalogDial(time: ClockTime) -> Element {
     }
 }
 
-/// The time as digits, bumping on each new minute.
+/// The time as digits.
 #[component]
 fn Digits(time: ClockTime) -> Element {
-    let (class, alias) = bump_attrs("ds-clock-digits", use_bump_on(time.minute_key()));
     rsx! {
-        span { class, "data-pulse": alias, "{time.digits()}" }
+        span { class: "ds-clock-digits", "{time.digits()}" }
     }
 }

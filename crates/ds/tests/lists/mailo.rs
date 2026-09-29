@@ -6,10 +6,9 @@ use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, HoverStrip, ListRow, Presence, RowState, RunTone, Shown, TextLine, TextRun,
-    Titles,
+    ActionId, HoverStrip, ListRow, Presence, RowState, RunTone, Shown, TextLine, TextRun, Titles,
 };
-use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
+use ds::{Emphasis, Selection, StaggerIndex};
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
 fn marked_subject() -> TextLine {
@@ -39,7 +38,6 @@ fn row_with(strip: Option<Element>) -> Element {
             time: "09:41",
             tags: rsx! {},
             star: None,
-            star_pulse: PulseKey::rest(Anim::StarPop),
             strip,
             onclick: |_| {},
             aria_label: "Open Re: UIDL stability across servers".to_string(),

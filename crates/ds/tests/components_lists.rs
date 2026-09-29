@@ -133,7 +133,6 @@ fn sheets(component: &str) -> Vec<&'static str> {
             "icon_button",
             "text_input",
         ],
-        "sync_halo" => &["sync_halo", "spinner", "avatar"],
         "hover_strip" => &["hover_strip", "icon_button"],
         "appearance_picker" => &[
             "appearance_picker",
@@ -208,7 +207,6 @@ const OWN: &[&str] = &[
     "command_pill",
     "account_tile",
     "provider_mark",
-    "sync_halo",
     "drag_ghost",
     "edge_strip",
     "space_editor",

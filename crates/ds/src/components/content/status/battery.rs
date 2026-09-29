@@ -1,19 +1,18 @@
 //! BatteryGlyph: a battery outline with a continuous fill layer, a bolt and a plug as their own
-//! layers (design/26-DETAILS.md 5.1.3). The fill sweeps from where it is over
-//! `--t-quick` only when its drawn width changes a step (R2); plugging in grows the bolt in (the
-//! plug when the charger holds it), the fill dimming under the mark; crossing the low threshold
+//! layers (design/26-DETAILS.md 5.1.3). The fill follows its level linearly over `--t-move`
+//! (design/30 section 1.3), and stands at its level on mount; plugging in shows the bolt (the plug
+//! when the charger holds it), the fill dimming under the mark; crossing the low threshold
 //! cross-fades the fill to `--battery-low` (R15). No count, no pulse (R12).
 
 use super::battery_state::{BatteryPower, BatteryState, Tone};
 use super::part::{Paint, Part, Pen, Show, part_svg};
 use crate::core::word::Word;
-use crate::motion::detail::{
-    first_show::FirstShow, sweep::use_sweep, touch::Touch, use_detail::use_detail,
-};
+use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::style::icon::render::IconSize;
 use crate::style::icon::shape::Shape;
 use crate::style::icon::stroke::stroke_width;
 use crate::style::scale::use_scale;
+use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
 
 /// Lucide `battery`'s outline: the body and the terminal.
@@ -57,6 +56,12 @@ const PLUG: &[Shape] = &[
     },
 ];
 
+/// How the fill follows its level: a determinate value moves linearly over `--t-move`.
+const FILL: TweenSpec = TweenSpec {
+    duration: DurationToken::Move,
+    easing: EasingToken::Linear,
+};
+
 /// The fill's box inside the body, on the 24 grid: a unit of air inside the stroke.
 const FILL_X: f32 = 4.5;
 const FILL_Y: f32 = 8.5;
@@ -81,24 +86,20 @@ fn tone_slug(tone: Tone) -> &'static str {
 
 /// `span.ds-status-glyph[data-kind=battery]`: the battery in `state` at `size`, in
 /// `currentColor` (the fill in `--battery-low` when low). Decorative; put
-/// [`BatteryState::words`] beside it or in its label (R8). On bar chrome leave `first` at
-/// `Still`; a surface just opened passes `Animate` and the fill sweeps in from empty over
-/// `--t-sweep`.
+/// [`BatteryState::words`] beside it or in its label (R8).
 #[component]
 pub fn BatteryGlyph(
     state: BatteryState,
     #[props(default = IconSize::Bar)] size: IconSize,
-    #[props(default)] first: FirstShow,
 ) -> Element {
-    let detail = use_detail(state, first, Touch::Remote);
-    let sweep = use_sweep(state.drawn(), detail.cue());
+    let share = use_tween(state.drawn(), FILL);
     let look = state.look();
     let pen = Pen {
         px: size.px(),
         stroke: stroke_width(size, use_scale()),
     };
     let (bolt, plug, under) = marks(look.power);
-    let width = FILL_WIDTH * f32::from(sweep.share().0.min(1000)) / 1000.0;
+    let width = FILL_WIDTH * f32::from(share.0.min(1000)) / 1000.0;
     rsx! {
         span { class: "ds-status-glyph", "data-kind": "battery", "aria-hidden": "true",
             {part_svg(Part { name: "outline", shapes: OUTLINE, paint: Paint::Stroke, show: Show::Lit }, &pen)}

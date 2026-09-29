@@ -151,36 +151,6 @@ mod tests {
                 "@keyframes {name} has no Anim"
             );
         }
-        assert_eq!(names.len(), 65);
-    }
-
-    #[test]
-    fn every_contact_keyframe_follows_the_motion_level() {
-        // Calm and Reduced set `--overshoot` to 1, which flattens a keyframe only if it reads
-        // it: the springs that answer a touch or a change all do. The painted
-        // shapes at each level are measured in ds-native's `contact_motion` test.
-        let bodies = keyframes(MOTION);
-        for anim in [
-            Anim::PopIn,
-            Anim::RowIn,
-            Anim::ComposeRise,
-            Anim::ChipIn,
-            Anim::CmdkIn,
-            Anim::Gulp,
-            Anim::Bump,
-            Anim::SealPop,
-        ] {
-            let name = anim.recipe().keyframes;
-            let body = bodies
-                .iter()
-                .find(|(found, _)| *found == name)
-                .map(|(_, body)| *body)
-                .unwrap_or_default();
-            assert!(
-                body.contains("var(--overshoot)"),
-                "{anim:?}: @keyframes {name} ignores the motion level"
-            );
-        }
     }
 
     #[test]
@@ -214,23 +184,13 @@ mod tests {
     #[test]
     fn the_shorthand_is_the_recipe() {
         const CASES: &[(Anim, &str, &str)] = &[
-            (Anim::Gulp, "", "gulp var(--t-big) var(--e-spring)"),
+            (Anim::Fade, "", "fade var(--t-move) var(--e-out)"),
             (
-                Anim::FoldHeavy,
+                Anim::MenuOut,
                 "--b",
-                "fold--b var(--t-big-heavy) var(--e-exit) forwards",
+                "menu-out--b var(--t-quick) var(--e-exit) forwards",
             ),
             (Anim::Rise, "", "rise var(--t-move) var(--e-out) backwards"),
-            (
-                Anim::Dest,
-                "",
-                "dest var(--t-float) var(--e-out) infinite alternate",
-            ),
-            (
-                Anim::Spin,
-                "",
-                "spin var(--t-spin) var(--e-linear) infinite",
-            ),
         ];
         for &(anim, suffix, want) in CASES {
             assert_eq!(animation(anim.recipe(), suffix), want, "{anim:?}");

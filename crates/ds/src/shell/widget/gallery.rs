@@ -10,14 +10,12 @@
 //! settings ([`crate::shell::widget::layout::apply`]) and passes the new layout back.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::button::ButtonVariant;
+use crate::components::controls::button::{Button, ButtonVariant};
 use crate::core::press::Press;
 use crate::core::word::Word;
 use crate::host::measure::MountedRef;
-use crate::motion::detail::touch::{Contact, Touch};
 use crate::shell::widget::contract::WidgetKind;
-use crate::shell::widget::gallery_add::AddButton;
-use crate::shell::widget::gallery_book::{Asked, Book};
+use crate::shell::widget::gallery_book::Book;
 use crate::shell::widget::gallery_rows::{Placed, placed};
 use crate::shell::widget::kind::{Lift, WidgetHost, WidgetSize};
 use crate::shell::widget::layout::{WidgetEdit, WidgetLayout};
@@ -31,9 +29,6 @@ pub struct GalleryWords {
     pub add_desktop: TextLine,
     /// The button that adds it to the notification center.
     pub add_center: TextLine,
-    /// What an Add button says, beside its check, while the widget it added settles in
-    ///.
-    pub added: TextLine,
     /// The button that takes a placed widget away.
     pub remove: TextLine,
     /// The desktop's heading over its placed widgets.
@@ -54,7 +49,6 @@ impl Default for GalleryWords {
         GalleryWords {
             add_desktop: "Add to Desktop".into(),
             add_center: "Add to Notification Center".into(),
-            added: "Added".into(),
             remove: "Remove".into(),
             desktop: "Desktop".into(),
             center: "Notification Center".into(),
@@ -67,8 +61,7 @@ impl Default for GalleryWords {
 
 /// The registry's widgets (an ancestor's `provide_widget_registry`, else quire's), `layout` as
 /// placed, each choice sent as a `WidgetEdit` to `onedit`. When the layout the host hands back
-/// holds the widget an Add asked for, that button settles to a check and the new row rises in
-/// and is brought into view.
+/// holds a new widget, its row is brought into view.
 #[component]
 pub fn WidgetGallery(
     layout: WidgetLayout,
@@ -109,7 +102,7 @@ pub fn WidgetGallery(
                 }
             }
             if let Some(info) = shown {
-                {detail(info, book, onedit, &words)}
+                {detail(info, onedit, &words)}
             }
             {placed(rows, list)}
         }
@@ -117,13 +110,8 @@ pub fn WidgetGallery(
 }
 
 /// The widget looked at, drawn once at its desktop size, and the two ways to add it, each
-/// keyed to the widget so a check never follows the person to another widget.
-fn detail(
-    info: WidgetInfo,
-    book: CopyValue<Book>,
-    onedit: EventHandler<WidgetEdit>,
-    words: &GalleryWords,
-) -> Element {
+/// keyed to the widget.
+fn detail(info: WidgetInfo, onedit: EventHandler<WidgetEdit>, words: &GalleryWords) -> Element {
     let size = info.size_in(WidgetHost::Desktop);
     let buttons = [
         (
@@ -138,13 +126,7 @@ fn detail(
         ),
     ];
     let add = move |kind: WidgetKind, host: WidgetHost, size: WidgetSize| {
-        let mut book = book;
-        move |press: Press| {
-            book.write().ask(Asked {
-                kind: kind.clone(),
-                host,
-                touch: Touch::Contact(Contact::pressed(&press)),
-            });
+        move |_: Press| {
             onedit.call(WidgetEdit::Add {
                 kind: kind.clone(),
                 size,
@@ -159,12 +141,10 @@ fn detail(
             }
             div { class: "ds-widget-gallery-actions",
                 for (host, variant, label) in buttons {
-                    AddButton {
+                    Button {
                         key: "{info.kind.as_str()}-{host.slug()}",
                         variant,
                         label,
-                        added: words.added.clone(),
-                        landing: book.peek().landing(&info.kind, host),
                         onclick: add(info.kind.clone(), host, info.size_in(host)),
                     }
                 }

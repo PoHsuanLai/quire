@@ -3,12 +3,11 @@
 //! device: the ring at the top left, the percentage as the card's hero figure. Small with
 //! several: a 2 x 2 grid of rings, no numbers, an empty place a bare track. Medium: a row of up
 //! to four rings, the percentage under each. Each ring holds the device's filled glyph
-//! ([`crate::DeviceGlyph`]) and fills on the host's wake stamp.
+//! ([`crate::DeviceGlyph`]).
 
 use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
 use crate::core::word::Word;
-use crate::motion::wake::WakeStamp;
 use crate::shell::battery::device_glyph::{Device, DeviceGlyph};
 use crate::shell::battery::figure::BatteryFigure;
 use crate::shell::battery::level::{BatteryLevel, RingMark};
@@ -126,7 +125,6 @@ impl Widget for BatteryWidget {
     }
 
     fn view(entry: &BatteryEntry, cx: WidgetContext<NoIntent>) -> Element {
-        let wake = cx.wake;
         match entry {
             BatteryEntry::Waiting => waiting(BatteryLayout::of(cx.size, MAX_RINGS)),
             BatteryEntry::Absent(words) => rsx! {
@@ -137,9 +135,9 @@ impl Widget for BatteryWidget {
             BatteryEntry::Devices(cells) => {
                 let shown = &cells[..cells.len().min(MAX_RINGS)];
                 match BatteryLayout::of(cx.size, shown.len()) {
-                    BatteryLayout::Solo => solo(&shown[0], wake),
-                    BatteryLayout::Grid => grid(shown, wake),
-                    BatteryLayout::Row => row(shown, wake),
+                    BatteryLayout::Solo => solo(&shown[0]),
+                    BatteryLayout::Grid => grid(shown),
+                    BatteryLayout::Row => row(shown),
                 }
             }
         }
@@ -147,9 +145,9 @@ impl Widget for BatteryWidget {
 }
 
 /// One battery's ring, its device's glyph inside.
-fn ring(cell: &BatteryCell, wake: WakeStamp) -> Element {
+fn ring(cell: &BatteryCell) -> Element {
     rsx! {
-        BatteryLevel { key: "{cell.name}", level: cell.level, mark: cell.mark, label: cell.name.clone(), wake,
+        BatteryLevel { key: "{cell.name}", level: cell.level, mark: cell.mark, label: cell.name.clone(),
             DeviceGlyph { device: cell.device, size: IconSize::Base }
         }
     }
@@ -162,20 +160,20 @@ fn empty(key: usize) -> Element {
     }
 }
 
-fn solo(cell: &BatteryCell, wake: WakeStamp) -> Element {
+fn solo(cell: &BatteryCell) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": BatteryLayout::Solo.slug(),
-            {ring(cell, wake)}
-            span { class: "ds-batteries-hero", BatteryFigure { level: cell.level, wake } }
+            {ring(cell)}
+            span { class: "ds-batteries-hero", BatteryFigure { level: cell.level } }
         }
     }
 }
 
-fn grid(cells: &[BatteryCell], wake: WakeStamp) -> Element {
+fn grid(cells: &[BatteryCell]) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": BatteryLayout::Grid.slug(),
             for cell in cells {
-                {ring(cell, wake)}
+                {ring(cell)}
             }
             for place in cells.len()..MAX_RINGS {
                 {empty(place)}
@@ -187,13 +185,13 @@ fn grid(cells: &[BatteryCell], wake: WakeStamp) -> Element {
 /// The Medium row: four places at the reference's fixed 80 pitch (M15), the batteries in the
 /// first and a bare track, with no number, in each place left over, so one battery sits at the
 /// left of the row rather than alone in the middle, and two never spread to the card's ends.
-fn row(cells: &[BatteryCell], wake: WakeStamp) -> Element {
+fn row(cells: &[BatteryCell]) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": BatteryLayout::Row.slug(),
             for cell in cells {
                 div { key: "{cell.name}", class: "ds-batteries-cell",
-                    {ring(cell, wake)}
-                    span { class: "ds-batteries-figure", BatteryFigure { level: cell.level, wake } }
+                    {ring(cell)}
+                    span { class: "ds-batteries-figure", BatteryFigure { level: cell.level } }
                 }
             }
             for place in cells.len()..MAX_RINGS {

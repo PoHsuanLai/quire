@@ -1,32 +1,11 @@
-//! A thread row's star (design/04-COMPONENTS.md section 16): the button that pops on every
-//! toggle and the sparks that fly only when starring. Split from `list_row` so the row's own
-//! file holds the row.
+//! A thread row's star (design/04-COMPONENTS.md section 16): the button that toggles it. Split
+//! from `list_row` so the row's own file holds the row.
 
 use crate::core::vocab::Check;
 use crate::focus::click::kept_click;
-use crate::motion::anim::Anim;
-use crate::motion::pulse_key::{PulseKey, PulsePhase};
 use crate::style::icon::Icon;
 use crate::style::icon::shape::Shape;
 use dioxus::prelude::*;
-
-/// The six spark angles, 0 to 300 degrees in steps of 60 (`S:1285`).
-const SPARK_ANGLES: [u16; 6] = [0, 60, 120, 180, 240, 300];
-
-/// The sparks play the star's pulse alias, but only when starring (`S:1526`): the `spark`
-/// pulse in the same phase as `star`, or nothing.
-fn sparks(state: Check, star: PulseKey) -> Option<(String, &'static str)> {
-    let rest = PulseKey::rest(Anim::Spark);
-    let spark = match star.phase() {
-        PulsePhase::Rest => rest,
-        PulsePhase::A => rest.fired(),
-        PulsePhase::B => rest.fired().fired(),
-    };
-    match state {
-        Check::On => spark.attrs(),
-        Check::Off | Check::Mixed => None,
-    }
-}
 
 /// The star's glyph: the outline, filled with its own colour once starred. `Glyph` only
 /// strokes, and a CSS `fill` never reaches SVG on Blitz (spike S6), so the fill is written as an
@@ -58,19 +37,11 @@ fn star_glyph(state: Check) -> Element {
     }
 }
 
-/// The star button: pops on every toggle, sparks only when starring.
-pub(crate) fn star_button(state: Check, onchange: EventHandler<Check>, pulse: PulseKey) -> Element {
+/// The star button.
+pub(crate) fn star_button(state: Check, onchange: EventHandler<Check>) -> Element {
     let label = match state {
         Check::On => "Unstar this thread",
         Check::Off | Check::Mixed => "Star this thread",
-    };
-    let (pop_class, pop_alias) = match pulse.attrs() {
-        Some((anim, alias)) => (format!("ds-star-glyph {anim}"), Some(alias)),
-        None => ("ds-star-glyph".to_string(), None),
-    };
-    let (spark_class, spark_alias) = match sparks(state, pulse) {
-        Some((anim, alias)) => (Some(anim), Some(alias)),
-        None => (None, None),
     };
     rsx! {
         button {
@@ -84,39 +55,7 @@ pub(crate) fn star_button(state: Check, onchange: EventHandler<Check>, pulse: Pu
                 onchange.call(state.flipped());
                 kept_click(&event);
             },
-            span { class: pop_class, "data-pulse": pop_alias, {star_glyph(state)} }
-            span { class: "ds-sparks",
-                for angle in SPARK_ANGLES {
-                    i {
-                        class: spark_class.clone(),
-                        "data-pulse": spark_alias,
-                        style: "--a:{angle}deg",
-                    }
-                }
-            }
+            span { class: "ds-star-glyph", {star_glyph(state)} }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::sparks;
-    use crate::core::vocab::Check;
-    use crate::motion::anim::Anim;
-    use crate::motion::pulse_key::PulseKey;
-
-    #[test]
-    fn sparks_follow_the_pop_only_when_starring() {
-        let rest = PulseKey::rest(Anim::StarPop);
-        assert_eq!(sparks(Check::On, rest), None, "at rest nothing plays");
-        assert_eq!(
-            sparks(Check::On, rest.fired()),
-            Some(("a-spark".to_string(), "a"))
-        );
-        assert_eq!(
-            sparks(Check::On, rest.fired().fired()),
-            Some(("a-spark".to_string(), "b"))
-        );
-        assert_eq!(sparks(Check::Off, rest.fired()), None, "unstarring");
     }
 }

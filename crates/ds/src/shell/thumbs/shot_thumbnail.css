@@ -13,9 +13,7 @@
    take-back drops an animation without starting another. 
 
    Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
-   actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in
-   staggered by `--j` as HoverStrip's do (`pop-in`, backwards fill, so the `:active` scale applies
-   once it ends). The ghost is the plate at 120 wide and .8 opaque, with no motion. */
+   actions row fades in at the bottom right over `--t-quick --e-out`. The ghost is the plate at 120 wide and .8 opaque, with no motion. */
 
 .ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
 .ds-shot[*|data-shown=hidden]{ display:none; }
@@ -32,9 +30,7 @@
   border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out); }
 .ds-shot[*|data-hover=on] .ds-shot-actions{ opacity:1; pointer-events:auto; }
-.ds-shot-action{ --j:0; display:flex; transform:scale(.7); opacity:0; }
-.ds-shot[*|data-hover=on] .ds-shot-action{ transform:none; opacity:1;
-  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger)); }
+.ds-shot-action{ display:flex; }
 
 .ds-shot-ghost{ position:relative; box-sizing:border-box; opacity:.8; pointer-events:none; }
 

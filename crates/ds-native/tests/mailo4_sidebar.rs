@@ -5,10 +5,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Icon, ItemKind, Material, PlaceId, Point, Presence, Px, RowState,
-    SidebarItem,
+    Appearance, Ds, Icon, ItemKind, Material, PlaceId, Point, Presence, Px, RowState, SidebarItem,
 };
-use ds::{DropState, PulseKey, Selection};
+use ds::{DropState, Selection};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -42,7 +41,7 @@ fn Page() -> Element {
                         count: None,
                         presence: Presence::Present,
                         preview: None,
-                        pulse: PulseKey::rest(Anim::Gulp),
+
                         onclick: |_| {},
                         onclose: None,
                         place: PlaceId(id.to_string()),

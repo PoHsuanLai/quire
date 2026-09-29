@@ -3,13 +3,13 @@
 //! frame is `DIR/<strip>-<n>.png`, cropped to the specimen at 3x; a script stitches them into
 //! strips. It takes a few seconds of wall clock: the moments play in real time.
 
-use crate::details_states::{Charge, Net};
-use crate::details_views::{CheckView, NetView, ShakeView, SlashView, SweepCountView};
+use crate::details_states::Net;
+use crate::details_views::{NetView, ShakeView, SlashView};
 use crate::error::GalleryError;
 use crate::style;
 use dioxus::prelude::*;
 use ds::Word;
-use ds::detail::{EventStamp, FirstShow, Slashed};
+use ds::detail::{EventStamp, Slashed};
 use ds::{Appearance, Ds, Inject, Material, Theme};
 use ds_native::{Harness, Viewport};
 use image::{RgbaImage, imageops};
@@ -19,11 +19,8 @@ use std::time::Duration;
 /// Which strip a stage draws.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 enum Strip {
-    SweepCount,
     #[word(slug = "pending-iterate")]
     Pending,
-    #[word(slug = "settle-check")]
-    Check,
     Shake,
     #[word(slug = "morph-slash")]
     Slash,
@@ -34,17 +31,15 @@ impl Strip {
     fn timing(self) -> (Duration, Duration) {
         let ms = Duration::from_millis;
         match self {
-            Strip::SweepCount => (ms(1), ms(100)),
-            // After the grace, a little into each step (a layer fades over --t-quick).
-            Strip::Pending => (ms(580), ms(300)),
-            Strip::Check => (ms(1), ms(40)),
+            // A little into each step (a layer fades over --t-quick).
+            Strip::Pending => (ms(40), ms(83)),
             Strip::Shake => (ms(1), ms(55)),
             Strip::Slash => (ms(1), ms(25)),
         }
     }
 }
 
-static STRIP: GlobalSignal<Strip> = Signal::global(|| Strip::SweepCount);
+static STRIP: GlobalSignal<Strip> = Signal::global(|| Strip::Pending);
 static NET: GlobalSignal<Net> = Signal::global(|| Net::Off);
 static SLASHED: GlobalSignal<Slashed> = Signal::global(|| Slashed::Off);
 
@@ -57,11 +52,7 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)] // A component: the harness names it like a type.
 fn Stage() -> Element {
     let body = match STRIP() {
-        Strip::SweepCount => {
-            rsx! { SweepCountView { charge: Charge::Level(93), first: FirstShow::Animate } }
-        }
         Strip::Pending => rsx! { NetView { net: NET() } },
-        Strip::Check => rsx! { CheckView { net: NET() } },
         Strip::Shake => rsx! { ShakeView { net: NET() } },
         Strip::Slash => rsx! { SlashView { slashed: SLASHED() } },
     };
@@ -77,28 +68,19 @@ fn Stage() -> Element {
 fn begin(harness: &mut Harness, strip: Strip) {
     let set = |harness: &mut Harness, net: Net| harness.within(|| *NET.write() = net);
     match strip {
-        Strip::SweepCount => {}
         Strip::Pending => set(harness, Net::Joining),
-        Strip::Check => {
-            set(harness, Net::Joining);
-            harness.advance(Duration::from_millis(50));
-            set(harness, Net::Joined);
-        }
         Strip::Shake => set(harness, Net::Failed(EventStamp(1))),
         Strip::Slash => harness.within(|| *SLASHED.write() = Slashed::On),
     }
 }
 
-/// Eight frames of `strip`'s moment. A fresh stage shows the sweep, so its Appear starts as the
-/// harness does; every other strip is switched to, settled, then started.
+/// Eight frames of `strip`'s moment: the stage is switched to the strip, settled, then started.
 fn frames(strip: Strip) -> Vec<RgbaImage> {
     let mut harness = Harness::new(Stage, VIEW);
     let (wait, step) = strip.timing();
-    if strip != Strip::SweepCount {
-        harness.within(|| *STRIP.write() = strip);
-        harness.advance(Duration::from_millis(200));
-        begin(&mut harness, strip);
-    }
+    harness.within(|| *STRIP.write() = strip);
+    harness.advance(Duration::from_millis(200));
+    begin(&mut harness, strip);
     harness.advance(wait);
     let scale = f32::from(VIEW.scale_percent) / 100.0;
     let rect = harness.rect(".g-detail");

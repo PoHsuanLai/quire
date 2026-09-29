@@ -1,11 +1,9 @@
 //! design/26 on a real Blitz document, on the virtual clock: Now Playing. Play/pause offers
-//! the next action off-up, springing only under its own press; the position steps once a
-//! second while playing and costs 0 frames paused; buffering breathes the art, bounded
-//!; a new track cross-fades its art and titles, a restated one plays nothing; Reduced
-//! (R7).
+//! the next action, cross-faded; the position steps once a second while playing and costs 0
+//! frames paused; a new track cross-fades its art and titles, a restated one plays nothing;
+//! Reduced (R7).
 
 use dioxus::prelude::*;
-use ds::detail::EventStamp;
 use ds::{
     Appearance, Ds, Material, Motion, NowPlayingTrack, PlayPauseButton, Playback, TextLine,
     TrackPosition,
@@ -38,7 +36,7 @@ fn Player() -> Element {
     rsx! {
         Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "width:340px",
-                div { id: "track", NowPlayingTrack { title: TextLine::from(TITLE()), by: Some(TextLine::from("Claude Debussy")), playback: PLAYBACK() } }
+                div { id: "track", NowPlayingTrack { title: TextLine::from(TITLE()), by: Some(TextLine::from("Claude Debussy")) } }
                 div { id: "toggle",
                     PlayPauseButton {
                         playback: PLAYBACK(),
@@ -65,14 +63,13 @@ fn incoming(harness: &Harness) -> String {
 }
 
 #[test]
-fn play_pause_offers_the_next_action_springing_only_under_its_press() {
+fn play_pause_offers_the_next_action_cross_faded() {
     let mut harness = virtual_harness(Player);
     assert_eq!(
         harness.attr("#toggle button", "aria-label").as_deref(),
         Some("Play")
     );
     assert_settles_to_zero_frames(&mut harness);
-    // A media key elsewhere: Pause grows in at --e-out, the old glyph gone at once (OffUp).
     set(&mut harness, Playback::Playing);
     harness.advance(ms(0));
     assert_eq!(
@@ -80,36 +77,30 @@ fn play_pause_offers_the_next_action_springing_only_under_its_press() {
         Some("Pause")
     );
     let class = incoming(&harness);
-    assert!(
-        class.contains("a-morph-in") && !class.contains("spring"),
-        "{class}"
-    );
+    assert!(class.contains("a-morph-fade-in"), "{class}");
     assert_eq!(
         harness.count("#toggle [*|data-morph=out]"),
-        0,
-        "OffUp: the old glyph goes at once"
+        1,
+        "the old glyph fades out over the new"
     );
     // Not `assert_settles_to_zero_frames`: the track is still `Playing` here (61.4 s into 200 s),
     // so `TrackPosition`'s own per-second ticker (`track_position.rs`) keeps a Rust timer
-    // legitimately pending until the track ends or it is paused — the documented R3 exception
-    // for a live position/clock display (design/26-DETAILS.md R3, "Clock second hand"), not a
-    // settle bug. Check only the half this moment is really about: the glyph's own CSS morph
-    // runs its course and stops.
+    // legitimately pending until the track ends or it is paused, the documented R3 exception for
+    // a live position/clock display (design/26-DETAILS.md R3, "Clock second hand"). Check only
+    // the half this moment is really about: the glyph's own CSS fade runs its course and stops.
     settle_until(&mut harness, |h| !h.is_animating());
     assert!(
         !harness.is_animating(),
         "the glyph's own transition should be done: {}",
         harness.html()
     );
-    // The button's own press: the change it causes springs.
     let at = harness.centre("#toggle button").expect("the button");
     harness.click(at);
     harness.advance(ms(0));
     assert_eq!(harness.within(|| *PLAYBACK.read()), Playback::Paused);
-    assert!(
-        incoming(&harness).contains("a-morph-in-spring"),
-        "{}",
-        incoming(&harness)
+    assert_eq!(
+        harness.attr("#toggle button", "aria-label").as_deref(),
+        Some("Play")
     );
     assert_settles_to_zero_frames(&mut harness);
 }
@@ -154,47 +145,6 @@ fn the_position_steps_on_the_second_while_playing_and_holds_paused() {
 }
 
 #[test]
-fn buffering_breathes_the_art_then_holds_it_still() {
-    let mut harness = virtual_harness(Player);
-    set(&mut harness, Playback::Buffering(EventStamp(1)));
-    harness.advance(ms(399));
-    assert_eq!(
-        harness
-            .attr("#track .ds-track-art", "data-pending")
-            .as_deref(),
-        Some("idle")
-    );
-    harness.advance(ms(1));
-    assert_eq!(
-        harness
-            .attr("#track .ds-track-art", "data-pending")
-            .as_deref(),
-        Some("step")
-    );
-    assert_eq!(
-        harness.attr("#toggle button", "aria-label").as_deref(),
-        Some("Pause")
-    );
-    harness.advance(ms(10_000));
-    assert_eq!(
-        harness
-            .attr("#track .ds-track-art", "data-pending")
-            .as_deref(),
-        Some("still")
-    );
-    assert_settles_to_zero_frames(&mut harness);
-    set(&mut harness, Playback::Paused);
-    harness.advance(ms(0));
-    assert_eq!(
-        harness
-            .attr("#track .ds-track-art", "data-pending")
-            .as_deref(),
-        Some("idle")
-    );
-    assert_settles_to_zero_frames(&mut harness);
-}
-
-#[test]
 fn a_new_track_cross_fades_and_a_restated_one_plays_nothing() {
     let mut harness = virtual_harness(Player);
     harness.within(|| *TITLE.write() = "Clair de lune");
@@ -231,15 +181,15 @@ fn a_new_track_cross_fades_and_a_restated_one_plays_nothing() {
 }
 
 #[test]
-fn reduced_snaps_the_glyph_and_the_track_and_holds_the_art_still() {
+fn reduced_snaps_the_glyph_and_the_track() {
     let mut harness = virtual_harness(Player);
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(ms(20));
-    set(&mut harness, Playback::Buffering(EventStamp(2)));
+    set(&mut harness, Playback::Playing);
     harness.within(|| *TITLE.write() = "Trois Gnossiennes");
     harness.advance(ms(0));
     assert_eq!(
-        harness.count("#toggle [*|data-morph=in]"),
+        harness.count("#toggle [*|data-morph=out]"),
         0,
         "the glyph snaps"
     );
@@ -248,12 +198,4 @@ fn reduced_snaps_the_glyph_and_the_track_and_holds_the_art_still() {
         0,
         "the track snaps"
     );
-    harness.advance(ms(450));
-    assert_eq!(
-        harness
-            .attr("#track .ds-track-art", "data-pending")
-            .as_deref(),
-        Some("still")
-    );
-    assert_settles_to_zero_frames(&mut harness);
 }

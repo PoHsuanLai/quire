@@ -70,25 +70,6 @@ pub(super) const ROLL_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `gulp` at `--t-big --e-out`: a success seal that nobody touched (R5: the spring is spent only
-/// on contact, where `Anim::Gulp` plays).
-pub(super) const SEAL_OUT: Recipe = recipe(
-    "gulp",
-    DurationToken::Big,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `nudge-up` at `--t-nudge --e-out`: attention, once per request (R6).
-pub(super) const NUDGE_UP: Recipe = recipe(
-    "nudge-up",
-    DurationToken::Nudge,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
 /// `slide-r` at `--t-move --e-out`: the preview pane's entrance when nothing the person touched
 /// showed it (R5: `Anim::PaneInR` springs, on contact only).
 pub(super) const PANE_IN_R_OUT: Recipe = recipe(

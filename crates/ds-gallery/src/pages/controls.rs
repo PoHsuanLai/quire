@@ -11,12 +11,12 @@ use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape,
+    AccountFace, AccountTile, AddAccountTile, Availability, Avatar, AvatarFace, AvatarShape,
     AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour, CommandPill,
     Common, Count, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource,
     Kbd, KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, ProviderMark,
-    SectionHeader, SegSize, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, Spinner,
-    SpinnerKind, SyncHalo, SyncState, Tabs, Toggle, Verdict, use_pulse,
+    SectionHeader, SegSize, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, Spinner, Tabs,
+    Toggle, Verdict,
 };
 
 const BUTTONS: [(ButtonVariant, &str); 5] = [
@@ -138,11 +138,9 @@ fn Choosers() -> Element {
     let mut level = use_signal(|| Fraction(350));
     let mut tab = use_signal(|| 0u8);
     let mut count = use_signal(|| 3u32);
-    // The spinners run a bounded operation started as the page opens (design/26 R4): they step
-    // after the grace and hold still at the cap; the Details page replays one.
-    let busy = use_hook(|| {
-        ds::detail::Operation::Running(ds::detail::PendingToken::start(ds::detail::Deadline::cap()))
-    });
+    // The spinner runs an operation started as the page opens (design/26 R4); the Details page
+    // replays one.
+    let busy = use_hook(|| ds::detail::Operation::Running(ds::detail::PendingToken::start()));
     let views: Vec<(u8, String)> = ["List", "Columns", "Cards"]
         .into_iter()
         .zip(0..)
@@ -200,21 +198,14 @@ fn Choosers() -> Element {
                 }
             }
         }
-        Section { title: "Count, Spinner, SyncHalo, SectionHeader", note: "Change the count to see its bump.",
+        Section { title: "Count, Spinner, SectionHeader", note: "Change the count to see it.",
             div { class: "g-row",
                 Button { variant: ButtonVariant::Mini, label: "+1", onclick: move |_| *count.write() += 1 }
                 Button { variant: ButtonVariant::Mini, label: "0", onclick: move |_| count.set(0) }
                 Specimen { name: "item",
                     Count { value: count() }
                 }
-                Specimen { name: "spin", Spinner { kind: SpinnerKind::Spin, operation: busy } }
-                Specimen { name: "breathe", Spinner { kind: SpinnerKind::Breathe, operation: busy } }
-                Specimen { name: "halo idle",
-                    SyncHalo { initial: 'P', tone: AvatarTone::Ink, state: SyncState::Idle }
-                }
-                Specimen { name: "halo busy",
-                    SyncHalo { initial: 'P', tone: AvatarTone::Ink, state: SyncState::Busy }
-                }
+                Specimen { name: "spin", Spinner { operation: busy } }
             }
             div { class: "g-grid4",
                 SectionHeader { kind: HeaderKind::Frame, text: "Frame" }
@@ -228,7 +219,6 @@ fn Choosers() -> Element {
 
 #[component]
 fn Chips() -> Element {
-    let flash = use_pulse(Anim::ChipFlash);
     let person = AvatarFace {
         initial: 'D',
         size: AvatarSize::Size18,
@@ -236,7 +226,7 @@ fn Chips() -> Element {
         shape: AvatarShape::Round,
     };
     rsx! {
-        Section { title: "Chip", note: "Every variant; the person chip with its remove button, and its flash ring on demand.",
+        Section { title: "Chip", note: "Every variant; the person chip with its remove button.",
             div { class: "g-row",
                 Chip { variant: ChipVariant::Accent, text: "Accent" }
                 Chip { variant: ChipVariant::Neutral, text: "Neutral" }
@@ -248,9 +238,8 @@ fn Chips() -> Element {
                 }
             }
             div { class: "g-row",
-                Chip { variant: ChipVariant::Person(person), text: "Dana Okafor", onremove: Some(EventHandler::new(|()| {})), pulse: Some(flash.key()) }
+                Chip { variant: ChipVariant::Person(person), text: "Dana Okafor", onremove: Some(EventHandler::new(|()| {})) }
                 Chip { variant: ChipVariant::Person(person), text: "No remove" }
-                Button { variant: ButtonVariant::Mini, label: "Flash the person chip", onclick: move |_| flash.fire() }
             }
         }
     }

@@ -10,7 +10,7 @@ use ds::Word;
 use ds::{
     Appearance, BlurState, Button, ButtonVariant, Ds, Fraction, Inject, LevelControl, LevelGlyph,
     LevelLook, Material, Muting, Osd, OsdLevel, OsdMetrics, OsdPosition, RootChrome, Scheme, Shown,
-    Tick, use_scope,
+    use_scope,
 };
 
 /// The Level page.
@@ -52,8 +52,8 @@ fn LiveSection() -> Element {
                     Specimen { name: look.slug().to_owned(), code: describe(look).to_owned(),
                         OsdCard { scheme, title: "Sound",
                             div { class: "g-level-live",
-                                LevelControl { label: "Volume", value: volume(), glyph, look, tick: Tick::Quiet, onchange: move |next| volume.set(next) }
-                                LevelControl { label: "Brightness", value: brightness(), glyph: LevelGlyph::Brightness, look, tick: Tick::Quiet, onchange: move |next| brightness.set(next) }
+                                LevelControl { label: "Volume", value: volume(), glyph, look, onchange: move |next| volume.set(next) }
+                                LevelControl { label: "Brightness", value: brightness(), glyph: LevelGlyph::Brightness, look, onchange: move |next| brightness.set(next) }
                             }
                         }
                     }

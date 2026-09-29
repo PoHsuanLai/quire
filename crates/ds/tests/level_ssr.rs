@@ -11,7 +11,7 @@ mod golden;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook, LevelMode, Material,
-    Muting, Osd, OsdLevel, OsdPosition, RootChrome, Shown, Tick,
+    Muting, Osd, OsdLevel, OsdPosition, RootChrome, Shown,
 };
 
 #[derive(Props, Clone)]
@@ -70,11 +70,6 @@ const CASES: &[Case] = &[
     ("capsule-brightness-30-read-only", || {
         osd_root(
             rsx! { LevelControl { label: "Brightness", value: Fraction(300), glyph: LevelGlyph::Brightness, mode: LevelMode::ReadOnly } },
-        )
-    }),
-    ("capsule-tick", || {
-        osd_root(
-            rsx! { LevelControl { label: "Volume", value: Fraction(1000), glyph: HEARD, tick: Tick::Quiet } },
         )
     }),
     ("osd-top-right", || {

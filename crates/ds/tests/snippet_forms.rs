@@ -3,8 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Emphasis, ListRow, Presence, PulseKey, RowState, RunTone, Selection, StaggerIndex,
-    TextLine, TextRun,
+    Emphasis, ListRow, Presence, RowState, RunTone, Selection, StaggerIndex, TextLine, TextRun,
 };
 
 /// A `ListRow` with everything fixed but its snippet, written as the expression given.
@@ -22,7 +21,6 @@ macro_rules! row {
                 time: "09:41",
                 tags: rsx! {},
                 star: None,
-                star_pulse: PulseKey::rest(Anim::StarPop),
                 strip: None,
                 onclick: |_| {},
             }
@@ -54,7 +52,6 @@ fn forms() -> Element {
             time: "09:41",
             tags: rsx! {},
             star: None,
-            star_pulse: PulseKey::rest(Anim::StarPop),
             strip: None,
             onclick: |_| {},
         }

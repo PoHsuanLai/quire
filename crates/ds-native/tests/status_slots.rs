@@ -1,12 +1,10 @@
 //! On a real Blitz document, on the virtual clock: a status glyph in the bar's
-//! status item (same box, ink, pill and label as an icon, sized by the setting), the low-battery
-//! nudge inside the item lifting the glyph alone (design/26), the control center's panel
-//! header and tile disc holding a status glyph (the battery's fill sweeping in on a surface just
-//! opened), and the Sound module's level reading the bar's `VolumeState`. Each motion ends at 0
-//! frames.
+//! status item (same box, ink, pill and label as an icon, sized by the setting), the control
+//! center's panel header and tile disc holding a status glyph, and the Sound module's level
+//! reading the bar's `VolumeState`. Each motion ends at 0 frames.
 
 use dioxus::prelude::*;
-use ds::detail::{Detailed, EventStamp, FirstShow, Moment, Touch, use_detail};
+use ds::detail::EventStamp;
 use ds::{
     Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconButton, IconButtonVariant,
     IconSource, LevelControl, LevelGlyph, LowAt, Material, ModulePanel, ModuleState, ModuleTile,
@@ -124,7 +122,7 @@ fn the_status_item_plays_the_glyphs_own_moments() {
     };
     assert_eq!(arc(&harness).as_deref(), Some("faint"));
     assert_settles_to_zero_frames(&mut harness);
-    // Joining runs the searching loop after its grace, one layer lit at a time.
+    // Joining runs the searching loop at once, one layer lit at a time.
     harness.within(|| *ITEM.write() = StatusState::Wifi(WifiState::Joining(EventStamp(1))));
     harness.advance(ms(1_000));
     let lit = harness.count(&format!("{ITEM_SEL} .ds-status-part[*|data-show=lit]"));
@@ -136,98 +134,6 @@ fn the_status_item_plays_the_glyphs_own_moments() {
         })
     });
     settle_until(&mut harness, |h| arc(h).as_deref() == Some("lit"));
-    assert_settles_to_zero_frames(&mut harness);
-}
-
-// ---- the nudge inside the item ----------------------------------------------------------
-
-/// A test's own low-battery watch: crossing into Low is the Attention (sill's `LowWatch`).
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum Watch {
-    Clear,
-    Low,
-}
-
-impl Detailed for Watch {
-    fn moment(from: &Self, to: &Self) -> Moment {
-        match (from, to) {
-            (Watch::Clear, Watch::Low) => Moment::Attention,
-            (Watch::Clear | Watch::Low, Watch::Clear) | (Watch::Low, Watch::Low) => Moment::Rest,
-        }
-    }
-
-    fn first(state: &Self) -> Moment {
-        match state {
-            Watch::Clear | Watch::Low => Moment::Rest,
-        }
-    }
-}
-
-static WATCH: GlobalSignal<Watch> = Signal::global(|| Watch::Clear);
-
-#[allow(non_snake_case)]
-fn NudgedBar() -> Element {
-    let watch = WATCH();
-    let cue = use_detail(watch, FirstShow::Still, Touch::Remote).cue();
-    let state = match watch {
-        Watch::Clear => battery(400, BatteryPower::Battery),
-        Watch::Low => battery(190, BatteryPower::Battery),
-    };
-    rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
-            div { id: "bar", style: METRICS.style_attr(),
-                IconButton {
-                    variant: IconButtonVariant::Status,
-                    icon: StatusState::Battery(state),
-                    label: state.words(),
-                    onclick: |_| {},
-                    nudge: Some(cue),
-                }
-            }
-        }
-    }
-}
-
-const NUDGE: &str = "#bar .ds-icon-button > .ds-icon-nudge";
-
-fn nudging(harness: &Harness) -> bool {
-    harness.has_class(NUDGE, "a-nudge-up")
-}
-
-#[test]
-fn a_new_attention_cue_lifts_the_glyph_once_and_never_the_pill() {
-    let mut harness = virtual_harness(NudgedBar);
-    let glyph = format!("{NUDGE} > .ds-status-glyph[*|data-kind=battery]");
-    assert_eq!(harness.count(&glyph), 1, "{}", harness.html());
-    assert_eq!(
-        side(&harness, &glyph),
-        (18.0, 18.0),
-        "the nudge keeps the square"
-    );
-    assert!(!nudging(&harness), "no nudge on the first frame (R1)");
-    harness.within(|| *WATCH.write() = Watch::Low);
-    harness.advance(ms(0));
-    assert!(
-        nudging(&harness),
-        "crossing into low nudges: {}",
-        harness.html()
-    );
-    assert!(
-        !harness.has_class("#bar .ds-icon-button", "a-nudge-up"),
-        "the pill stays"
-    );
-    assert_settles_to_zero_frames(&mut harness);
-    assert!(!nudging(&harness), "the nudge ends");
-    // The same state rendered again replays nothing; a new crossing nudges once more.
-    harness.within(|| *WATCH.write() = Watch::Low);
-    harness.advance(ms(0));
-    assert!(!nudging(&harness));
-    harness.within(|| *WATCH.write() = Watch::Clear);
-    harness.advance(ms(0));
-    assert!(!nudging(&harness), "leaving low is no attention");
-    harness.within(|| *WATCH.write() = Watch::Low);
-    harness.advance(ms(0));
-    assert!(nudging(&harness), "a second crossing nudges again");
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -243,7 +149,7 @@ fn Center() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { id: "panel",
-                ModulePanel { glyph: IconSource::Status(status), title: "Battery", first: FirstShow::Animate,
+                ModulePanel { glyph: IconSource::Status(status), title: "Battery",
                     p { "93 %" }
                 }
             }
@@ -254,7 +160,6 @@ fn Center() -> Element {
                     status: Some(wifi.words().into()),
                     state: ModuleState::On,
                     onclick: |_| {},
-                    first: FirstShow::Animate,
                 }
             }
             div { id: "plain",
@@ -273,7 +178,7 @@ fn fill(harness: &Harness) -> f32 {
 }
 
 #[test]
-fn the_panel_header_sweeps_the_battery_in_and_the_disc_holds_the_wifi_glyph() {
+fn the_panel_header_holds_the_battery_and_the_disc_holds_the_wifi_glyph() {
     let mut harness = virtual_harness(Center);
     assert_eq!(
         harness.count("#panel .ds-module-panel-glyph > .ds-status-glyph[*|data-kind=battery]"),
@@ -281,13 +186,7 @@ fn the_panel_header_sweeps_the_battery_in_and_the_disc_holds_the_wifi_glyph() {
         "{}",
         harness.html()
     );
-    // An Appear sweeps the fill in from empty over `--t-sweep`, not all at once.
-    let start = fill(&harness);
-    assert!(start < 1.0, "the fill starts empty: {start}");
-    harness.advance(ms(200));
-    let midway = fill(&harness);
-    assert!(midway > start && midway < 9.5, "midway: {midway}");
-    harness.advance(ms(1_000));
+    // The fill stands at its level on first show: nothing sweeps in.
     assert!(
         (fill(&harness) - 10.0).abs() < 0.6,
         "full: {}",

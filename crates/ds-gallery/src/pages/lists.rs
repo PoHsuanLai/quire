@@ -12,7 +12,7 @@ use ds::{
     DragGhost, DropLine, Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, ListRow,
     MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
     RowPitch, RowState, Selection, SidebarItem, StaggerIndex, StripAction, SystemPrefs, TimerPhase,
-    UndoToken, use_motion_timer, use_pulse, use_roster, use_toast_hub,
+    UndoToken, use_motion_timer, use_roster, use_toast_hub,
 };
 
 /// One sample thread: sender, subject, snippet, time.
@@ -117,7 +117,6 @@ fn LiveList() -> Element {
     let mut removed = use_signal(Removed::new);
     let mut selected = use_signal(|| None::<ThreadId>);
     let mut starred = use_signal(Vec::<ThreadId>::new);
-    let star_pulse = use_pulse(Anim::StarPop);
     let toasts = use_toast_hub();
     let roster = use_roster(keys(), PITCH);
     let entrance = use_motion_timer(Anim::RowIn);
@@ -187,7 +186,6 @@ fn LiveList() -> Element {
                             index: entry.index,
                             selection: if selected() == Some(entry.key) { Selection::Selected } else { Selection::Unselected },
                             star: if starred().contains(&entry.key) { Check::On } else { Check::Off },
-                            star_pulse: star_pulse.key(),
                             onselect: move |id| selected.set(Some(id)),
                             onstar: move |(id, state)| {
                                 starred.with_mut(|starred| {
@@ -196,7 +194,6 @@ fn LiveList() -> Element {
                                         starred.push(id);
                                     }
                                 });
-                                star_pulse.fire();
                             },
                         }
                     }
@@ -214,7 +211,6 @@ fn ThreadRow(
     index: StaggerIndex,
     selection: Selection,
     star: Check,
-    star_pulse: ds::PulseKey,
     onselect: EventHandler<ThreadId>,
     onstar: EventHandler<(ThreadId, Check)>,
 ) -> Element {
@@ -239,7 +235,6 @@ fn ThreadRow(
                 }
             },
             star: (star, EventHandler::new(move |state| onstar.call((id, state)))),
-            star_pulse,
             strip: rsx! { HoverStrip { actions: strip_actions() } },
             onclick: move |_| onselect.call(id),
         }
@@ -282,8 +277,6 @@ const PLACES: [(Icon, &str, Option<u32>); 4] = [
 #[component]
 fn Sidebar() -> Element {
     let mut here = use_signal(|| 0usize);
-    let seal = use_pulse(Anim::SealPop);
-    let gulp = use_pulse(Anim::Gulp);
     let mut today = use_signal(|| vec!["Dana Okafor", "Priya Raman"]);
     let person = |name: &str| AvatarFace {
         initial: name.chars().next().unwrap_or('?'),
@@ -294,7 +287,7 @@ fn Sidebar() -> Element {
     rsx! {
         Section {
             title: "SidebarItem",
-            note: "On the Space's frame colour. Click a place to move the seal; drop on Snoozed plays the gulp; Today items close (each close is named for its row); the scheduled draft shows its time and cancels.",
+            note: "On the Space's frame colour. Click a place to move the seal; Today items close (each close is named for its row); the scheduled draft shows its time and cancels.",
             div { class: "g-row g-row-top",
                 div { class: "g-side",
                     for (index , (icon , label , count)) in PLACES.into_iter().enumerate() {
@@ -306,10 +299,8 @@ fn Sidebar() -> Element {
                             count,
                             presence: Presence::Present,
                             preview: None,
-                            pulse: if here() == index { seal.key() } else if index == 2 { gulp.key() } else { ds::PulseKey::rest(Anim::SealPop) },
                             onclick: move |_| {
                                 here.set(index);
-                                seal.fire();
                             },
                             onclose: None,
                         }
@@ -321,7 +312,6 @@ fn Sidebar() -> Element {
                         count: Some(1),
                         presence: Presence::Present,
                         preview: Some(Preview::Destination),
-                        pulse: ds::PulseKey::rest(Anim::Gulp),
                         onclick: |_| {},
                         onclose: None,
                     }
@@ -334,7 +324,6 @@ fn Sidebar() -> Element {
                             count: None,
                             presence: Presence::Present,
                             preview: None,
-                            pulse: ds::PulseKey::rest(Anim::Gulp),
                             onclick: |_| {},
                             onclose: Some(EventHandler::new(move |()| today.with_mut(|today| today.retain(|seen| *seen != name)))),
                         }
@@ -342,7 +331,6 @@ fn Sidebar() -> Element {
                     Scheduled { key: "{today().len()}" }
                 }
                 div { class: "g-col",
-                    Button { variant: ButtonVariant::Mini, label: "Drop on Snoozed (gulp)", onclick: move |_| gulp.fire() }
                     Button { variant: ButtonVariant::Mini, label: "Bring Today back", onclick: move |_| today.set(vec!["Dana Okafor", "Priya Raman"]) }
                     Specimen { name: "DropLine",
                         div { class: "g-list g-stage-pad", DropLine {} }

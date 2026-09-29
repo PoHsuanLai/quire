@@ -70,8 +70,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-panel,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-shot-plate{background:var(--m-tint);}
 .ds-osd > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
 .ds[*|data-blur=off] .ds-osd > .ds-frame{opacity:.94;}
-.ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.18);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);--m-level-tick:rgba(0,0,0,.16);}
-.ds[*|data-theme=dark]{--m-level-fill:rgba(255,255,255,.94);--m-level-well:rgba(255,255,255,.14);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.35);--m-level-glyph:rgba(255,255,255,.86);--m-level-glyph-fill:rgba(0,0,0,.7);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.45);--m-level-tick:rgba(0,0,0,.2);}
+.ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.18);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);}
+.ds[*|data-theme=dark]{--m-level-fill:rgba(255,255,255,.94);--m-level-well:rgba(255,255,255,.14);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.35);--m-level-glyph:rgba(255,255,255,.86);--m-level-glyph-fill:rgba(0,0,0,.7);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.45);}
 /* == shapes == */
 .ds[*|data-material][*|data-corner=squircle]{background:transparent;position:relative;z-index:var(--z-raise);border-radius:var(--r-squircle,var(--m-radius));}
 .ds[*|data-material][*|data-corner=squircle]::before{content:"";position:absolute;inset:0;z-index:var(--z-scene);border-radius:0;pointer-events:none;mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0.00%20100.00L0.02%2074.54L0.09%2066.41L0.19%2060.51L0.34%2055.71L0.54%2051.61L0.77%2047.99L1.05%2044.73L1.38%2041.76L1.75%2039.03L2.16%2036.49L2.61%2034.12L3.12%2031.90L3.67%2029.81L4.26%2027.84L4.90%2025.98L5.59%2024.21L6.33%2022.54L7.12%2020.95L7.95%2019.44L8.84%2018.01L9.79%2016.64L10.78%2015.35L11.83%2014.11L12.94%2012.94L14.11%2011.83L15.35%2010.78L16.64%209.79L18.01%208.84L19.44%207.95L20.95%207.12L22.54%206.33L24.21%205.59L25.98%204.90L27.84%204.26L29.81%203.67L31.90%203.12L34.12%202.61L36.49%202.16L39.03%201.75L41.76%201.38L44.73%201.05L47.99%200.77L51.61%200.54L55.71%200.34L60.51%200.19L66.41%200.09L74.54%200.02L100.00%200.00L100.00%20100.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M100.00%20100.00L99.98%2074.54L99.91%2066.41L99.81%2060.51L99.66%2055.71L99.46%2051.61L99.23%2047.99L98.95%2044.73L98.62%2041.76L98.25%2039.03L97.84%2036.49L97.39%2034.12L96.88%2031.90L96.33%2029.81L95.74%2027.84L95.10%2025.98L94.41%2024.21L93.67%2022.54L92.88%2020.95L92.05%2019.44L91.16%2018.01L90.21%2016.64L89.22%2015.35L88.17%2014.11L87.06%2012.94L85.89%2011.83L84.65%2010.78L83.36%209.79L81.99%208.84L80.56%207.95L79.05%207.12L77.46%206.33L75.79%205.59L74.02%204.90L72.16%204.26L70.19%203.67L68.10%203.12L65.88%202.61L63.51%202.16L60.97%201.75L58.24%201.38L55.27%201.05L52.01%200.77L48.39%200.54L44.29%200.34L39.49%200.19L33.59%200.09L25.46%200.02L0.00%200.00L0.00%20100.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0.00%200.00L0.02%2025.46L0.09%2033.59L0.19%2039.49L0.34%2044.29L0.54%2048.39L0.77%2052.01L1.05%2055.27L1.38%2058.24L1.75%2060.97L2.16%2063.51L2.61%2065.88L3.12%2068.10L3.67%2070.19L4.26%2072.16L4.90%2074.02L5.59%2075.79L6.33%2077.46L7.12%2079.05L7.95%2080.56L8.84%2081.99L9.79%2083.36L10.78%2084.65L11.83%2085.89L12.94%2087.06L14.11%2088.17L15.35%2089.22L16.64%2090.21L18.01%2091.16L19.44%2092.05L20.95%2092.88L22.54%2093.67L24.21%2094.41L25.98%2095.10L27.84%2095.74L29.81%2096.33L31.90%2096.88L34.12%2097.39L36.49%2097.84L39.03%2098.25L41.76%2098.62L44.73%2098.95L47.99%2099.23L51.61%2099.46L55.71%2099.66L60.51%2099.81L66.41%2099.91L74.54%2099.98L100.00%20100.00L100.00%200.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M100.00%200.00L99.98%2025.46L99.91%2033.59L99.81%2039.49L99.66%2044.29L99.46%2048.39L99.23%2052.01L98.95%2055.27L98.62%2058.24L98.25%2060.97L97.84%2063.51L97.39%2065.88L96.88%2068.10L96.33%2070.19L95.74%2072.16L95.10%2074.02L94.41%2075.79L93.67%2077.46L92.88%2079.05L92.05%2080.56L91.16%2081.99L90.21%2083.36L89.22%2084.65L88.17%2085.89L87.06%2087.06L85.89%2088.17L84.65%2089.22L83.36%2090.21L81.99%2091.16L80.56%2092.05L79.05%2092.88L77.46%2093.67L75.79%2094.41L74.02%2095.10L72.16%2095.74L70.19%2096.33L68.10%2096.88L65.88%2097.39L63.51%2097.84L60.97%2098.25L58.24%2098.62L55.27%2098.95L52.01%2099.23L48.39%2099.46L44.29%2099.66L39.49%2099.81L33.59%2099.91L25.46%2099.98L0.00%20100.00L0.00%200.00Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0%200H100V100H0Z'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0%200H100V100H0Z'/%3E%3C/svg%3E");mask-position:left top,right top,left bottom,right bottom,center,center;mask-size:min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),100% calc(100% - 2*min(var(--sq-k,28px),50%)),calc(100% - 2*min(var(--sq-k,28px),50%)) 100%;mask-repeat:no-repeat;}
@@ -123,13 +123,10 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes rise{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* 4.2.2 star-pop */
-@keyframes star-pop{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
 
 /* 4.2.3 spark */
-@keyframes spark{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
 
 /* 4.2.4 pop-in */
-@keyframes pop-in{ 0%{ transform:scale(.55); opacity:0; } 68%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:scale(1); opacity:1; } }
 
 /* 4.2.5 fold */
 @keyframes fold{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
@@ -147,15 +144,8 @@ html,body{margin:0;padding:0;background:transparent}
    and Standard is the catalogue's text: 34% of gulp is still scale(1.07,.84). */
 
 /* 4.2.8 gulp */
-@keyframes gulp{ 0%{ transform:scale(1,1); }
-  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
-  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
-  100%{ transform:scale(1,1); } }
 
 /* 4.2.9 seal-pop */
-@keyframes seal-pop{ 0%{ transform:translateY(-50%) scale(0); }
-  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
-  100%{ transform:translateY(-50%) scale(1); } }
 
 /* 4.2.10 compose-rise */
 @keyframes compose-rise{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
@@ -179,9 +169,6 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
 
 /* 4.3.5 bump */
-@keyframes bump{ 0%{ transform:translateY(0) scale(1); }
-  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
-  100%{ transform:none; } }
 
 /* 4.3.6 tab-in */
 @keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
@@ -208,12 +195,10 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes shake-x{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
 
 /* 4.3.14 chip-in */
-@keyframes chip-in{ 0%{ transform:scale(.6); opacity:0; } 70%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:none; } }
 
 /* chip-flash (quire's, not the catalogue's): the mentioned person chip holds `chip-in`'s last
    frame with the `--accent-soft` ring for `--t-flash` (design/04-COMPONENTS.md section 10,
    `S:2119` `.pchip.flash`; the prototype's class-and-timeout becomes one keyframe). */
-@keyframes chip-flash{ 0%,100%{ transform:none; box-shadow:0 0 0 var(--ring) var(--accent-soft); } }
 
 /* 4.3.15 menu-pop */
 @keyframes menu-pop{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
@@ -236,7 +221,6 @@ html,body{margin:0;padding:0;background:transparent}
 }
 
 /* 4.4.5 chip-land */
-@keyframes chip-land{ 0%{ transform:scale(0) rotate(-12deg); } 62%{ transform:scale(1.22) rotate(4deg); } 100%{ transform:scale(1) rotate(0); } }
 
 /* 4.4.6 sail */
 @keyframes sail{
@@ -320,7 +304,6 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
-@keyframes level-tick{ from{ opacity:1; } to{ opacity:0; } }
 /* sheet-out (quire's): a sheet's exit, `peek-in` reversed and quieter: it fades and
    settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
    accelerate), holding its transparent last frame until the host unmaps the surface. */
@@ -360,7 +343,6 @@ html,body{margin:0;padding:0;background:transparent}
    lifts a little and lands when the password was right; the spring curve on each leg gives the
    lift and the landing. In shares of the picture's own box, so every size moves alike. Played
    once and at rest after, so a picture paints nothing once it has landed. */
-@keyframes picture-accept{ 0%{ transform:none; } 35%{ transform:translateY(-8%) scale(1.03); } 100%{ transform:none; } }
 
 /* The small-state details' own (quire's, design/26-DETAILS.md section 3.2). Each plays once on
    an HTML wrapper and ends at rest; nothing here loops. */
@@ -381,7 +363,6 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* nudge-up: attention, once (design/26 Attention): the element lifts and settles. `nudge` is
    the centred outbox pill's and carries its translateX(-50%). */
-@keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
 
 /* hold (quire's): a keyframe that moves nothing. A resting state that follows an
    animated one (a surface present again after a hide was taken back, a row or a pane at rest)
@@ -390,19 +371,9 @@ html,body{margin:0;padding:0;background:transparent}
    something restyles it again; a starting animation is that restyle, in the same frame. */
 @keyframes hold{ from{ } to{ } }
 @keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
-@keyframes star-pop--b{ 0%{ transform:scale(1) rotate(0); } 30%{ transform:scale(1.5) rotate(-14deg); } 55%{ transform:scale(.88) rotate(9deg); } 78%{ transform:scale(1.1) rotate(-3deg); } 100%{ transform:scale(1) rotate(0); } }
-@keyframes spark--b{ 0%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--a)) translateY(0) scale(1); } 100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateY(-17px) scale(.3); } }
-@keyframes pop-in--b{ 0%{ transform:scale(.55); opacity:0; } 68%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:scale(1); opacity:1; } }
 @keyframes fold--b{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
 @keyframes curl--b{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
 @keyframes floatup--b{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
-@keyframes gulp--b{ 0%{ transform:scale(1,1); }
-  34%{ transform:scale(calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25)), calc(1 - .16 * min(1, (var(--overshoot) - 1) * 25))); }
-  62%{ transform:scale(calc(1 - .03 * min(1, (var(--overshoot) - 1) * 25)), calc(1 + .07 * min(1, (var(--overshoot) - 1) * 25))); }
-  100%{ transform:scale(1,1); } }
-@keyframes seal-pop--b{ 0%{ transform:translateY(-50%) scale(0); }
-  60%{ transform:translateY(-50%) scale(calc(1 + .5 * min(1, (var(--overshoot) - 1) * 25))); }
-  100%{ transform:translateY(-50%) scale(1); } }
 @keyframes compose-rise--b{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
 @keyframes compose-send--b{ 0%{ transform:none; opacity:1; } 35%{ transform:translate(0,4px) scale(.97,.94); opacity:1; } 100%{ transform:translate(-40px,-120px) scale(.06) rotate(-8deg); opacity:0; } }
 @keyframes peek-in--b{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
@@ -410,9 +381,6 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes fade--b{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes heal--b{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
-@keyframes bump--b{ 0%{ transform:translateY(0) scale(1); }
-  40%{ transform:translateY(calc(-3px * min(1, (var(--overshoot) - 1) * 25))) scale(calc(1 + .25 * min(1, (var(--overshoot) - 1) * 25))); }
-  100%{ transform:none; } }
 @keyframes tab-in--b{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
 @keyframes tab-out--b{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
 @keyframes hc-in--b{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
@@ -421,8 +389,6 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes page-in--b{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
 @keyframes park--b{ to{ opacity:0; transform:translateX(-60%) scale(.35); } }
 @keyframes shake-x--b{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
-@keyframes chip-in--b{ 0%{ transform:scale(.6); opacity:0; } 70%{ transform:scale(var(--overshoot)); opacity:1; } 100%{ transform:none; } }
-@keyframes chip-flash--b{ 0%,100%{ transform:none; box-shadow:0 0 0 var(--ring) var(--accent-soft); } }
 @keyframes menu-pop--b{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
 @keyframes menu-out--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes breathe--b{ 0%,100%{ opacity:0; transform:scale(.85); } 50%{ opacity:.45; transform:scale(1.06); } }
@@ -432,7 +398,6 @@ html,body{margin:0;padding:0;background:transparent}
   58%{ transform:translateY(3px) scale(var(--overshoot)); opacity:1; }
   100%{ transform:translateY(0) scale(1); opacity:1; }
 }
-@keyframes chip-land--b{ 0%{ transform:scale(0) rotate(-12deg); } 62%{ transform:scale(1.22) rotate(4deg); } 100%{ transform:scale(1) rotate(0); } }
 @keyframes sail--b{
   0%{ transform:translate(0,0) rotate(0) scale(1); opacity:0; }
   12%{ opacity:1; }
@@ -467,7 +432,6 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 @keyframes osd-in--b{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
 @keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
-@keyframes level-tick--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 @keyframes widget-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 @keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
@@ -475,34 +439,16 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out--b{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes shot-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
-@keyframes picture-accept--b{ 0%{ transform:none; } 35%{ transform:translateY(-8%) scale(1.03); } 100%{ transform:none; } }
 @keyframes morph-in--b{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
 @keyframes morph-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
 @keyframes morph-fade-out--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes roll-in--b{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
 @keyframes roll-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
-@keyframes nudge-up--b{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
 @keyframes hold--b{ from{ } to{ } }
-.a-seal-pop[*|data-pulse=a]{animation:seal-pop var(--t-big) var(--e-spring) forwards;}
-.a-seal-pop[*|data-pulse=b]{animation:seal-pop--b var(--t-big) var(--e-spring) forwards;}
-.a-gulp[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-spring);}
-.a-gulp[*|data-pulse=b]{animation:gulp--b var(--t-big) var(--e-spring);}
-.a-pop-in[*|data-pulse=a]{animation:pop-in var(--t-move) var(--e-spring) forwards;}
-.a-pop-in[*|data-pulse=b]{animation:pop-in--b var(--t-move) var(--e-spring) forwards;}
 .a-row-in[*|data-pulse=a]{animation:row-in var(--t-big) var(--e-spring) backwards;}
 .a-row-in[*|data-pulse=b]{animation:row-in--b var(--t-big) var(--e-spring) backwards;}
 .a-rise[*|data-pulse=a]{animation:rise var(--t-move) var(--e-out) backwards;}
 .a-rise[*|data-pulse=b]{animation:rise--b var(--t-move) var(--e-out) backwards;}
-.a-star-pop[*|data-pulse=a]{animation:star-pop var(--t-big) var(--e-spring);}
-.a-star-pop[*|data-pulse=b]{animation:star-pop--b var(--t-big) var(--e-spring);}
-.a-spark[*|data-pulse=a]{animation:spark var(--t-spark) var(--e-out) forwards;}
-.a-spark[*|data-pulse=b]{animation:spark--b var(--t-spark) var(--e-out) forwards;}
-.a-chip-land[*|data-pulse=a]{animation:chip-land var(--t-big) var(--e-spring);}
-.a-chip-land[*|data-pulse=b]{animation:chip-land--b var(--t-big) var(--e-spring);}
-.a-chip-in[*|data-pulse=a]{animation:chip-in var(--t-move) var(--e-spring);}
-.a-chip-in[*|data-pulse=b]{animation:chip-in--b var(--t-move) var(--e-spring);}
-.a-chip-flash[*|data-pulse=a]{animation:chip-flash var(--t-flash) var(--e-linear);}
-.a-chip-flash[*|data-pulse=b]{animation:chip-flash--b var(--t-flash) var(--e-linear);}
 .a-fold[*|data-pulse=a]{animation:fold var(--t-big) var(--e-exit) forwards;}
 .a-fold[*|data-pulse=b]{animation:fold--b var(--t-big) var(--e-exit) forwards;}
 .a-fold-heavy[*|data-pulse=a]{animation:fold var(--t-big-heavy) var(--e-exit) forwards;}
@@ -517,8 +463,6 @@ html,body{margin:0;padding:0;background:transparent}
 .a-curl-heavy[*|data-pulse=b]{animation:curl--b var(--t-curl-heavy) var(--e-exit) forwards;}
 .a-heal[*|data-pulse=a]{animation:heal var(--t-move) var(--e-spring) backwards;}
 .a-heal[*|data-pulse=b]{animation:heal--b var(--t-move) var(--e-spring) backwards;}
-.a-bump[*|data-pulse=a]{animation:bump var(--t-move) var(--e-spring);}
-.a-bump[*|data-pulse=b]{animation:bump--b var(--t-move) var(--e-spring);}
 .a-tab-in[*|data-pulse=a]{animation:tab-in var(--t-big) var(--e-spring);}
 .a-tab-in[*|data-pulse=b]{animation:tab-in--b var(--t-big) var(--e-spring);}
 .a-tab-out[*|data-pulse=a]{animation:tab-out var(--t-move) var(--e-exit) forwards;}
@@ -599,8 +543,6 @@ html,body{margin:0;padding:0;background:transparent}
 .a-osd-in[*|data-pulse=b]{animation:osd-in--b var(--t-quick) var(--e-out);}
 .a-osd-out[*|data-pulse=a]{animation:osd-out var(--t-move) var(--e-exit) forwards;}
 .a-osd-out[*|data-pulse=b]{animation:osd-out--b var(--t-move) var(--e-exit) forwards;}
-.a-level-tick[*|data-pulse=a]{animation:level-tick var(--t-tap) var(--e-out);}
-.a-level-tick[*|data-pulse=b]{animation:level-tick--b var(--t-tap) var(--e-out);}
 .a-sheet-out[*|data-pulse=a]{animation:sheet-out var(--t-move) var(--e-exit) forwards;}
 .a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
 .a-banner-out[*|data-pulse=a]{animation:banner-out var(--t-move) var(--e-exit) forwards;}
@@ -615,8 +557,6 @@ html,body{margin:0;padding:0;background:transparent}
 .a-shot-in[*|data-pulse=b]{animation:rise--b var(--t-big) var(--e-spring);}
 .a-shot-out[*|data-pulse=a]{animation:shot-out var(--t-move) var(--e-exit) forwards;}
 .a-shot-out[*|data-pulse=b]{animation:shot-out--b var(--t-move) var(--e-exit) forwards;}
-.a-picture-accept[*|data-pulse=a]{animation:picture-accept var(--t-big) var(--e-spring);}
-.a-picture-accept[*|data-pulse=b]{animation:picture-accept--b var(--t-big) var(--e-spring);}
 .a-morph-in[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-out) backwards;}
 .a-morph-in[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-out) backwards;}
 .a-morph-out[*|data-pulse=a]{animation:morph-out var(--t-quick) var(--e-out) forwards;}
@@ -629,10 +569,6 @@ html,body{margin:0;padding:0;background:transparent}
 .a-roll-in[*|data-pulse=b]{animation:roll-in--b var(--t-quick) var(--e-out) backwards;}
 .a-roll-out[*|data-pulse=a]{animation:roll-out var(--t-quick) var(--e-out) forwards;}
 .a-roll-out[*|data-pulse=b]{animation:roll-out--b var(--t-quick) var(--e-out) forwards;}
-.a-seal-out[*|data-pulse=a]{animation:gulp var(--t-big) var(--e-out);}
-.a-seal-out[*|data-pulse=b]{animation:gulp--b var(--t-big) var(--e-out);}
-.a-nudge-up[*|data-pulse=a]{animation:nudge-up var(--t-nudge) var(--e-out);}
-.a-nudge-up[*|data-pulse=b]{animation:nudge-up--b var(--t-nudge) var(--e-out);}
 .a-hold[*|data-pulse=a]{animation:hold var(--t-tap) var(--e-linear);}
 .a-hold[*|data-pulse=b]{animation:hold--b var(--t-tap) var(--e-linear);}
 .a-pane-in-r-out[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
@@ -642,24 +578,10 @@ html,body{margin:0;padding:0;background:transparent}
 .a-widget-out[*|data-pulse=a]{animation:widget-out var(--t-move) var(--e-exit) forwards;}
 .a-widget-out[*|data-pulse=b]{animation:widget-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
-.ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-seal-pop[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-gulp[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-gulp[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-pop-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-pop-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-rise[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-rise[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-star-pop[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-star-pop[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-spark[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-spark[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-chip-land[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-chip-land[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-chip-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-chip-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-fold[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-fold[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-fold-heavy[*|data-pulse=a]{animation-name:menu-out;}
@@ -674,8 +596,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-curl-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-heal[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-heal[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-bump[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-bump[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-tab-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-tab-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-tab-out[*|data-pulse=a]{animation-name:menu-out;}
@@ -756,8 +676,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-shot-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-shot-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-shot-out[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-picture-accept[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-picture-accept[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-out[*|data-pulse=a]{animation-name:menu-out;}
@@ -766,10 +684,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-roll-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-roll-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-roll-out[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-seal-out[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-seal-out[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-nudge-up[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-nudge-up[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=a]{animation-name:fade;}
@@ -984,9 +898,8 @@ html,body{margin:0;padding:0;background:transparent}
    (low and critical alike); the stroke is .093 of the ring's diameter. The device's glyph sits
    in the middle at .47 of the ring in `--ink`. While charging, a bolt in `--ink`, .16 of the
    ring tall, sits on the stroke at twelve in the gap the ring leaves for it. Each vector takes
-   its colour from its own element (spike S6). The arc's fill sweeps from Rust (the path changes
-   each frame while it moves; no keyframe, no transition), and the bolt's fade-in is an inline
-   opacity it writes for the same few frames. */
+   its colour from its own element (spike S6). The arc follows its level from Rust (the path
+   changes each frame while it moves; no keyframe, no transition). */
 
 .ds-battery{ position:relative; display:block; flex:none; width:64px; height:64px; color:var(--ink); }
 .ds-battery-track,
@@ -999,17 +912,14 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-battery-device .ds-ic{ width:47%; height:47%; }
 .ds-battery-bolt{ position:absolute; left:45%; top:-3.35%; display:block; width:10%; height:16%; color:var(--ink); }
 
-/* BatteryFigure: the percentage counting with the ring's fill; the caller sets its size and
-   face, tabular so its width holds while it counts. */
+/* BatteryFigure: the percentage; the caller sets its size and face, tabular so its width holds
+   as the number changes. */
 .ds-battery-figure{ font-variant-numeric:tabular-nums; }
 
 /* DeviceBattery (design/26-DETAILS.md 5.2.9): the ring over its percentage, centred, the
-   control center's Battery module's one device. The arc sweeps and the number counts from Rust;
-   the bolt waits hidden until the sweep lands, then fades in over `--t-quick`. */
+   control center's Battery module's one device. */
 .ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
 .ds-device-battery .ds-battery-figure{ font-size:var(--fs-help); color:var(--ink-soft); }
-.ds-battery-bolt[*|data-show]{ transition:opacity var(--t-quick) var(--e-out); }
-.ds-battery-bolt[*|data-show=off]{ opacity:0; }
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -1119,10 +1029,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 /* -- chip -- */
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
-   washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate.
-   `chip-land` plays through the pulse classes (`a-chip-land`), not from here, and so does the
-   Person chip's flash (`a-chip-flash`: `0 0 0 3px var(--accent-soft)` held for `--t-flash`,
-   `S:2119`). */
+   washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate. */
 
 .ds-chip{ font-family:var(--font-data); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
@@ -1152,14 +1059,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-chip[*|data-variant=status][*|data-status=ok]{ background:var(--ok-wash); color:var(--ok); }
 .ds-chip[*|data-variant=status][*|data-status=bad]{ background:var(--danger-wash); color:var(--danger); }
 
-/* Person: `S:592-598`, entering with `chip-in` on mount. The avatar is an 18 Avatar. The entry
-   steps aside while the flash plays, or this rule would outrank the pulse class. */
+/* Person: `S:592-598`. The avatar is an 18 Avatar. */
 .ds-chip[*|data-variant=person]{
   display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-8) var(--s-2) var(--s-3); border-radius:var(--r-pill);
   background:var(--surface); border:var(--hair) solid var(--line);
   font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
 }
-.ds-chip[*|data-variant=person]:not(.a-chip-flash){ animation:chip-in var(--t-move) var(--e-spring); }
 .ds-chip-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
 /* -- clock_face -- */
 /* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"). 
@@ -1298,14 +1203,11 @@ html,body{margin:0;padding:0;background:transparent}
 }
 /* -- count -- */
 /* Count (design/04-COMPONENTS.md section 14): `S:136`, `S:117`, `S:341-342`, tabular from C
-   (`C:308-311`). Empty at zero. The bump is the pulse class `a-bump` with its `data-pulse`
-   alias swap (the motion stylesheet's); this file only makes the count transformable while it
-   plays. Attribute selectors carry `*|` (spike S2). */
+   (`C:308-311`). Empty at zero. Attribute selectors carry `*|` (spike S2). */
 
 .ds-count{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
 .ds-count[*|data-place=item]{ margin-left:auto; font-size:var(--fs-note); color:var(--f-ink-faint); }
 .ds-count[*|data-place=tile]{ position:absolute; top:4px; right:5px; font-size:var(--fs-nano); color:var(--f-ink-soft); }
-.ds-count.a-bump{ display:inline-block; }
 /* -- device_glyph -- */
 /* DeviceGlyph (design/23-WIDGETS.md section 4.4): a filled device solid in `currentColor`, the
    same `svg.ds-ic` box as every glyph (its size from its attributes), so a battery ring's
@@ -1474,14 +1376,10 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-item); white-space:nowrap; }
 /* -- hover_strip -- */
 /* HoverStrip (design/04-COMPONENTS.md section 17): `S:312-323`, `S:441-446`. The buttons are
-   IconButton's Strip variant (their box, hover and `:active` scale are icon_button.css); this
-   file reveals the strip on row hover, pops the buttons in staggered by `--j`, and places each
-   button's Fly label (section 18's Fly, scoped to the strip as S scopes it).
-   O-10 without `!important`: `pop-in` plays with `backwards` fill instead of `forwards`. Its last
-   frame is the shown state the rule below already declares, so once it ends nothing holds the
-   transform and the `:active` scale applies.
-   The Fly waits `--d-fly` before it appears and not at all while hover is warm
-   (`.ds[data-hover=warm]`, O-11); `calc(var(--d-fly) * 0)` is a zero delay made of the token.
+   IconButton's Strip variant (their box and hover are icon_button.css); this file reveals the
+   strip on row hover, fading the buttons in, and places each button's Fly label (section 18's
+   Fly, scoped to the strip as S scopes it). The Fly fades in over `--t-quick` as the pointer
+   rests on its button.
    O-24: C also reveals the strip on `:focus-within`, which Blitz never matches (spike S12); the
    caller reveals it instead through `shown` (`data-shown`, below).
    Centred with `top:0; bottom:0; margin:auto 0` rather than S's `top:50%;
@@ -1490,41 +1388,31 @@ html,body{margin:0;padding:0;background:transparent}
    out, so the translated strip read half its height low there (FINDINGS "Native focus"). */
 
 .ds-strip{
-  --j:0;
   position:absolute; right:8px; top:0; bottom:0; margin:auto 0; height:max-content; display:flex; gap:var(--s-3); padding:var(--s-3);
   border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out);
 }
 .ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }
 
-.ds-strip .ds-icon-button{ transform:scale(.7); opacity:0; }
-.ds-row:hover .ds-strip .ds-icon-button{
-  transform:none; opacity:1;
-  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger));
-}
-.ds-row:hover .ds-strip .ds-icon-button:active{ transform:scale(.88); }
+.ds-strip .ds-icon-button{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-row:hover .ds-strip .ds-icon-button{ opacity:1; }
 
 .ds-strip .ds-fly{
   position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
   background:var(--ink); color:var(--paper); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption);
   padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0; pointer-events:none;
-  transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
+  transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
-.ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
-.ds[*|data-hover=warm] .ds-strip .ds-icon-button:hover .ds-fly{ transition-delay:calc(var(--d-fly) * 0); }
+.ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* Caller-driven: `data-shown=visible` shows the strip with no pointer on its row
    (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
-   S12, so the caller says so), the buttons popping in as on hover; `data-shown=hidden` keeps it
+   S12, so the caller says so), the buttons fading in as on hover; `data-shown=hidden` keeps it
    down under the pointer. */
 .ds-strip[*|data-shown=visible]{ opacity:1; pointer-events:auto; }
-.ds-strip[*|data-shown=visible] .ds-icon-button{
-  transform:none; opacity:1;
-  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger));
-}
-.ds-strip[*|data-shown=visible] .ds-icon-button:active{ transform:scale(.88); }
+.ds-strip[*|data-shown=visible] .ds-icon-button{ opacity:1; }
 .ds-row:hover .ds-strip[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
-.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-icon-button{ transform:scale(.7); opacity:0; animation:none; }
+.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-icon-button{ opacity:0; }
 /* -- icon_button -- */
 /* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -1587,25 +1475,17 @@ html,body{margin:0;padding:0;background:transparent}
   background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
-/* A status glyph takes the same square as an icon, whether or not the nudge wraps it;
-   its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
+/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
    setting as a single icon does. */
 .ds-icon-button[*|data-variant=status] > .ds-ic,
 .ds-icon-button[*|data-variant=status] > .ds-ext-icon,
-.ds-icon-button[*|data-variant=status] > .ds-status-glyph,
-.ds-icon-button[*|data-variant=status] > .ds-icon-nudge > .ds-ic,
-.ds-icon-button[*|data-variant=status] > .ds-icon-nudge > .ds-ext-icon,
-.ds-icon-button[*|data-variant=status] > .ds-icon-nudge > .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
+.ds-icon-button[*|data-variant=status] > .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
 .ds-icon-button[*|data-variant=status] .ds-status-glyph > .ds-status-part,
 .ds-icon-button[*|data-variant=status] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
 .ds-icon-button[*|data-variant=status]:hover{ color:var(--f-ink); background:var(--f-pill-hover); }
 .ds-icon-button[*|data-variant=status]:active,
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
-
-/* The nudge's wrapper (design/26): the glyph alone lifts once on a new attention
-   cue, the pill stays; the keyframe is the motion sheet's `nudge-up`. */
-.ds-icon-nudge{ display:inline-grid; place-items:center; }
 
 /* Disabled: .35, the default cursor, and no pointer, so no hover or press matches;
    `disabled` and the dropped handlers keep a press from firing. */
@@ -1658,15 +1538,12 @@ html,body{margin:0;padding:0;background:transparent}
 /* LevelControl (the user's brief of 2026-09-25): a level with a glyph that
    follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
    `material/level.rs`); the capsule is a Regular control, 22 (`--ctl-h-m`, design/29-SIZING.md);
-   `--f` is the level and `--rb` the rubber band's stretch, both written
-   inline by the component. Attribute selectors carry `*|` (spike S2).
+   `--f` is the level, written inline by the component. Attribute selectors carry `*|`
+   (spike S2).
 
    Motion. A level set from outside slides over `--t-quick --e-out`; under the pointer
-   (`data-drag=live`) the fill follows it with no transition. A press swells the track
-   (`scaleY(1.1)`, about a pixel above and below the 22 capsule, as 1.08 was on the 26 one;
-   `--t-quick --e-spring`: contact, design/05 principle 2); past an end the capsule
-   stretches by `--rb` along that end and springs back over `--t-move --e-spring` when released.
-   Glyph parts cross-fade over `--t-quick`; the sun's rays scale with `--f`. */
+   (`data-drag=live`) the fill follows it with no transition. Glyph parts cross-fade over
+   `--t-quick`; the sun's rays scale with `--f`. */
 
 .ds-level{ --level-h:var(--ctl-h-m); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
 .ds-level-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
@@ -1678,13 +1555,10 @@ html,body{margin:0;padding:0;background:transparent}
 /* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
 .ds-level-track{ position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
   background:var(--m-level-well); box-shadow:var(--m-level-shade);
-  transition:transform var(--t-quick) var(--e-spring), left var(--t-move) var(--e-spring), right var(--t-move) var(--e-spring); }
+}
 .ds-level-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
   background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out); }
-.ds-level[*|data-drag=live] .ds-level-track{ transform:scaleY(1.1); transition:transform var(--t-quick) var(--e-spring); }
 .ds-level[*|data-drag=live] .ds-level-fill{ transition:none; }
-.ds-level[*|data-over=end] .ds-level-track{ right:calc(var(--rb) * -1); }
-.ds-level[*|data-over=start] .ds-level-track{ left:calc(var(--rb) * -1); }
 
 /* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
    the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
@@ -1700,37 +1574,30 @@ html,body{margin:0;padding:0;background:transparent}
 /* The keyboard light's rays grow from the rising sun's centre, (12, 9) on the 24 grid. */
 .ds-level-part[*|data-part=key-rays]{ transform-origin:50% 37.5%; transform:scale(calc(.6 + .4 * var(--f))); }
 
-/* The tick: the fill's edge shows a quiet mark for `--t-tap` when the level crosses a step. */
-.ds-level-edge{ position:absolute; top:0; bottom:0; right:0; width:3px; border-radius:var(--r-pill); background:var(--m-level-tick); opacity:0; }
-
 /* The knob: a round disc of the fill's ink riding the fill's end, the capsule less the 1 px knob
    inset (design/29-SIZING.md R3: 20 in the Regular 22); the fill ends at its centre. */
 .ds-level[*|data-look=capsule-knob] .ds-level-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
 .ds-level-knob{ position:absolute; top:var(--knob-inset); left:calc(var(--knob-inset) + var(--f) * (100% - var(--level-h))); width:calc(var(--level-h) - 2 * var(--knob-inset)); height:calc(var(--level-h) - 2 * var(--knob-inset));
   border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
-  transition:left var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring), margin-left var(--t-move) var(--e-spring); }
-.ds-level[*|data-drag=live] .ds-level-knob{ transform:scale(1.08); transition:transform var(--t-quick) var(--e-spring); }
-.ds-level[*|data-over=end] .ds-level-knob{ margin-left:var(--rb); }
-.ds-level[*|data-over=start] .ds-level-knob{ margin-left:calc(var(--rb) * -1); }
+  transition:left var(--t-quick) var(--e-out); }
+.ds-level[*|data-drag=live] .ds-level-knob{ transition:none; }
 
-/* Sixteen squares: the ones that change fill in (or empty) one `--stagger` after another. */
+/* Sixteen squares. */
 .ds-level[*|data-look=segments] .ds-level-rail{ height:auto; }
-.ds-level-segments{ display:flex; gap:var(--s-2); transition:transform var(--t-quick) var(--e-spring); }
+.ds-level-segments{ display:flex; gap:var(--s-2); }
 .ds-level-seg{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
-  transition:background-color var(--t-quick) var(--e-out) calc(var(--i) * var(--stagger)); }
+  transition:background-color var(--t-quick) var(--e-out); }
 .ds-level-seg[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
-.ds-level[*|data-drag=live] .ds-level-segments{ transform:scaleY(1.08); }
 .ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }
 
 /* Disabled: a level that cannot be moved says so. The rail and the lead glyph drop to the
    disabled .35 (design/13 section 13.3.3's disabled item), the knob is not drawn (nothing to
    grab), and the pointer is the not-allowed cursor; no press registers (the component takes no
-   input), so nothing swells or stretches. */
+   input). */
 .ds-level[*|aria-disabled=true]{ cursor:not-allowed; }
 .ds-level[*|aria-disabled=true] .ds-level-rail,
 .ds-level[*|aria-disabled=true] .ds-level-lead{ opacity:.35; }
 .ds-level[*|aria-disabled=true] .ds-level-knob{ display:none; }
-.ds-level[*|aria-disabled=true] .ds-level-track{ transform:none; }
 /* -- link_pill -- */
 /* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
    reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
@@ -1875,7 +1742,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row-time{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 .ds-row-tags{ display:flex; gap:var(--s-4); align-items:center; }
 
-/* Star and sparks (`S:299-307`). */
+/* Star (`S:299-307`). */
 .ds-star{
   position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
   cursor:default; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
@@ -1884,11 +1751,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row:hover .ds-star, .ds-star[*|aria-pressed=true]{ opacity:1; }
 .ds-star[*|aria-pressed=true]{ color:var(--warn); }
 .ds-star-glyph{ display:grid; place-items:center; }
-.ds-sparks{ position:absolute; inset:0; pointer-events:none; }
-.ds-sparks i{
-  position:absolute; left:50%; top:50%; width:3px; height:3px; border-radius:var(--r-pill);
-  background:var(--warn); opacity:0;
-}
 /* -- lock_screen -- */
 /* LockScreen (design/04-COMPONENTS.md section 42; design/20 section 1.9): the wallpaper covering
    the stage under `--lock-veil`, the clock 7 % of the width from the top and the prompt 6 % from
@@ -2485,10 +2347,8 @@ html,body{margin:0;padding:0;background:transparent}
    schemes: a PDF page is white whatever the desktop's scheme), with a hairline edge in `--line`
    and the resting lift `--shadow-1`; the page's pixels fill it.
 
-   States (`data-state`): `loading`, the sheet laid out but transparent (nothing shows for the
-   grace, 400 ms); `pending`, the blank sheet at half strength, faded in over `--t-quick`
-   (the pending look's still frame: no loop, so it costs no frames however long the read);
-   `ready`, the page; `empty`, the blank sheet; `failed`, no sheet, the file-type glyph on a
+   States (`data-state`): `pending`, the blank sheet at half strength, faded in over `--t-quick`
+   (no loop, so it costs no frames however long the read); `ready`, the page; `empty`, the blank sheet; `failed`, no sheet, the file-type glyph on a
    red app-icon plate (`data-trouble=unreadable|locked`), centred. Attribute selectors carry
    `*|` (spike S2). */
 
@@ -2496,7 +2356,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-pdf-thumb-sheet{ position:absolute; box-sizing:border-box; overflow:hidden;
   background:var(--foreign-ground); border:var(--hairline) solid var(--line); border-radius:var(--r-micro);
   box-shadow:var(--shadow-1); transition:opacity var(--t-quick) var(--e-out); }
-.ds-pdf-thumb[*|data-state=loading] .ds-pdf-thumb-sheet{ opacity:0; }
 .ds-pdf-thumb[*|data-state=pending] .ds-pdf-thumb-sheet{ opacity:.5; }
 .ds-pdf-thumb-page{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; }
 .ds-pdf-thumb-plate{ position:absolute; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; }
@@ -2589,22 +2448,18 @@ html,body{margin:0;padding:0;background:transparent}
    aside, 16 px in: the media box (220 tall; a picture or page fitted at its aspect, text
    clipped, an icon or an emoji centred), the caption, the facts, then the actions at the foot.
    It slides in from the right (`slide-r` over `--t-move`, restarted under its other name on each
-   showing) at `--e-out` (`Anim::PaneInROut`), springing (`--e-spring`, `Anim::PaneInR`) only when
-   the person's own contact showed it (`data-touch=contact`, design/26 R5; the touch is taken when
-   the entrance starts and kept while present), and out the same way (`pane-out-r`, held);
-   hidden, nothing is laid out. Present keeps the entrance declared and plays `hold` after a
+   showing) at `--e-out` (`Anim::PaneInR`), and out the same way (`pane-out-r`, held); hidden,
+   nothing is laid out. Present keeps the entrance declared and plays `hold` after a
    taken-back hide (`data-pulse=held`), so no settle or take-back drops an animation without
    starting another. An in-place change fades the media in (`a-morph-fade-in`,
    `--t-quick`); at rest the media box plays `hold` (moves nothing), so the fade's
-   settle never drops it midway. A load past its grace swaps the media for the pending look:
-   the dashed ring (`.ds-spinner`, stepping or held still) over the words "Loading…", in
-   `--ink-faint`.
+   settle never drops it midway. A running load swaps the media for the pending look:
+   the dashed ring (`.ds-spinner`, stepping) over the words "Loading…", in `--ink-faint`.
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
 .ds-preview{ display:flex; flex-direction:column; gap:var(--s-12); box-sizing:border-box; width:100%; height:100%; min-height:0; padding:var(--s-16); overflow:hidden; color:var(--ink); }
 .ds-preview[*|data-shown=hidden]{ display:none; }
 .ds-preview[*|data-presence=entering],.ds-preview[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-out); }
-.ds-preview[*|data-presence=entering][*|data-touch=contact],.ds-preview[*|data-presence=present][*|data-touch=contact]{ animation:slide-r var(--t-move) var(--e-spring); }
 .ds-preview[*|data-presence=entering][*|data-pulse=b],.ds-preview[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
 .ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-preview[*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; pointer-events:none; }
@@ -2788,25 +2643,20 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-bubble .ds-input{ border:0; outline:none; background:transparent; font-size:var(--fs-meta); width:220px; padding:0 var(--s-8); color:var(--ink); }
 /* -- send_pill -- */
 /* SendPill (design/04-COMPONENTS.md section 31), verbatim `S:706-715`: a dark pill at the
-   bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
+   bottom centre that slides up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
    Undo hover is not specified. The Undo rule names the pill, as S's `.sendpill button` does.
-   C's outbox states: a failed mood plays `nudge` or `shake` once through the
-   pulse classes (`a-nudge`, `a-shake`, the motion sheet's), both keyframes baking in the
-   pill's `translateX(-50%)`; `data-mood=fatal` turns the pill `--danger` with its ink. A
-   spinning ring (`data-ring=spin`) turns the whole ring at the Spinner's `spin` (the arc is an
-   attribute, S6). The refusal is a second, lighter line under the text, and may wrap. C's Fix
+   C's outbox states: `data-mood=fatal` turns the pill `--danger` with its ink. The refusal is a second, lighter line under the text, and may wrap. C's Fix
    button is the consumer's `PillAction`, not drawn here. */
 
 .ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:var(--s-10);
   background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-6) var(--s-6) var(--s-6) var(--s-12); font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
-  transition:transform var(--t-big) var(--e-spring); white-space:nowrap; }
+  transition:transform var(--t-move) var(--e-out); white-space:nowrap; }
 .ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-send-ring{ display:block; flex:none; }
 .ds-send-pill .ds-send-pill-undo{ border:0; cursor:default; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }
 
 .ds-send-pill[*|data-mood=fatal]{ background:var(--danger); color:var(--danger-ink); }
-.ds-send-ring[*|data-ring=spin]{ animation:spin var(--t-spin) var(--e-linear) infinite; }
 .ds-send-pill-text{ display:flex; flex-direction:column; gap:var(--s-2); }
 .ds-send-pill-why{ font-weight:500; opacity:.8; white-space:normal; max-width:280px; }
 .ds-send-pill[*|data-mood=fatal] .ds-send-pill-undo{ background:var(--danger-ink); color:var(--danger); }
@@ -2840,19 +2690,12 @@ html,body{margin:0;padding:0;background:transparent}
 /* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8). The glyph may sit
    on a 26 px disc: paper with ink for an item not in use, `--accent` with `--accent-ink` and an
    inset `--accent-text` hairline for the item in use (the tile disc's look), the colour
-   cross-fading over `--t-quick`. While a pending loop steps on the glyph (`data-pending=step`, set
-   from Rust) it breathes between 1 and .45 over `--t-pending-step`; held still at the cap it stays
-   at .45. A spinner in the trailing slot turns in a 14 px well. A success seals the glyph with
-   `gulp` once; a failure shakes the row once. Nothing here loops. */
-.ds-settings-row-glyph{ transition:opacity var(--t-quick) var(--e-out); }
+   cross-fading over `--t-quick`. A spinner in the trailing slot turns in a 14 px well. */
 .ds-settings-row-glyph[*|data-disc]{
   width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
-  transition:opacity var(--t-quick) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-settings-row-glyph[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
-.ds-settings-row-glyph[*|data-pending=step]{ transition:opacity var(--t-pending-step) var(--e-in-out); }
-.ds-settings-row-glyph[*|data-beat=low],
-.ds-settings-row-glyph[*|data-pending=still]{ opacity:.45; }
 .ds-settings-row-trail[*|data-mark=pending]{ width:14px; height:14px; justify-content:center; }
 .ds-settings-row-spin{ position:relative; display:block; width:6px; height:6px; }
 .ds-settings-row-trail[*|data-mark=battery]{ gap:var(--s-4); }
@@ -2861,20 +2704,15 @@ html,body{margin:0;padding:0;background:transparent}
 /* Now Playing (design/26-DETAILS.md 5.2.10). NowPlayingTrack: the art in a 48 px well at
    `--r-media` beside the title (`--fs-shell-menu` 600) over the `by` line (`--fs-help`,
    `--ink-faint`). A new track cross-fades: the outgoing layer sits over the incoming one and each
-   plays its fade once (`a-morph-fade-out`, `a-morph-fade-in`, `--t-quick`). While buffering the
-   art breathes between 1 and .45 a step at a time (`data-pending=step`, set from Rust over
-   `--t-pending-step`) and holds at .45 once still. TrackPosition: a 4 px bar, the played share
+   plays its fade once (`a-morph-fade-out`, `a-morph-fade-in`, `--t-quick`). TrackPosition: a 4 px bar, the played share
    (`--f`, written each whole second from Rust, no transition: a clock-paced report steps) in
    `--ink-soft` over `--m-level-well`, the times under it in tabular figures. Nothing loops. */
 
 .ds-track{ display:flex; align-items:center; gap:var(--s-12); min-width:0; }
 .ds-track-art{
   position:relative; display:grid; place-items:center; flex:none; width:48px; height:48px; overflow:hidden;
-  border-radius:var(--r-media); transition:opacity var(--t-quick) var(--e-out);
+  border-radius:var(--r-media);
 }
-.ds-track-art[*|data-pending=step]{ transition:opacity var(--t-pending-step) var(--e-in-out); }
-.ds-track-art[*|data-beat=low],
-.ds-track-art[*|data-pending=still]{ opacity:.45; }
 .ds-track-words{ position:relative; display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
 .ds-track-layer{ display:flex; flex-direction:column; min-width:0; }
 .ds-track-art > .ds-track-layer{ display:grid; place-items:center; width:100%; height:100%; }
@@ -2932,9 +2770,7 @@ html,body{margin:0;padding:0;background:transparent}
    take-back drops an animation without starting another. 
 
    Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
-   actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in
-   staggered by `--j` as HoverStrip's do (`pop-in`, backwards fill, so the `:active` scale applies
-   once it ends). The ghost is the plate at 120 wide and .8 opaque, with no motion. */
+   actions row fades in at the bottom right over `--t-quick --e-out`. The ghost is the plate at 120 wide and .8 opaque, with no motion. */
 
 .ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
 .ds-shot[*|data-shown=hidden]{ display:none; }
@@ -2951,9 +2787,7 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
   opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out); }
 .ds-shot[*|data-hover=on] .ds-shot-actions{ opacity:1; pointer-events:auto; }
-.ds-shot-action{ --j:0; display:flex; transform:scale(.7); opacity:0; }
-.ds-shot[*|data-hover=on] .ds-shot-action{ transform:none; opacity:1;
-  animation:pop-in var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--j) * var(--stagger)); }
+.ds-shot-action{ display:flex; }
 
 .ds-shot-ghost{ position:relative; box-sizing:border-box; opacity:.8; pointer-events:none; }
 
@@ -2977,10 +2811,9 @@ html,body{margin:0;padding:0;background:transparent}
 /* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
    drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span
    (O-22's fallback for `::before`). The current-item shadow is `--shadow-current` (O-3); `dest`
-   ends on the precomputed `--accent-ring` (no `color-mix`) and loops only while the preview
-   holds (O-9). `--f-hover` in S is a bug (A8 #1): the destination ground is `--f-pill-hover`.
-   The gulp plays through the pulse classes (`a-gulp`). A Today entry enters with `tab-in` and
-   leaves with `tab-out`, which animate `max-height` (05-MOTION rule 7, unverified on Blitz).
+   is a static ring. `--f-hover` in S is a bug (A8 #1): the destination ground is
+   `--f-pill-hover`. A Today entry is a roster row: it enters with `row-in` and leaves with
+   `row-out`.
    `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
    `[data-drag=source]` (.35, section 34), drawn by `.ds-drop-place`. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
    not specified here. Disabled: not specified (O-1).
@@ -2994,10 +2827,9 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; align-items:center; justify-content:flex-start; gap:var(--s-9); width:100%; box-sizing:border-box; text-align:left; cursor:default; border:0;
   background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
   color:var(--f-ink-soft); position:relative;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-sidebar-item:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-sidebar-item:active{ transform:scale(var(--squish)); }
 .ds-sidebar-item[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 .ds-sidebar-item-text{ flex:1 1 0; min-width:0; }
 .ds-sidebar-item-text[*|data-emphasis=plain]{ font-weight:500; }
@@ -3005,7 +2837,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* The seal (`S:345-346`): Place items only. */
 .ds-sidebar-item-seal{
   position:absolute; left:-7px; top:50%; width:5px; height:5px; border-radius:var(--r-pill); background:var(--f-ink);
-  transform:translateY(-50%) scale(0); animation:seal-pop var(--t-big) var(--e-spring) forwards;
+  transform:translateY(-50%);
 }
 
 /* Today's close button (`S:140-143`). */
@@ -3028,7 +2860,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* Destination preview (`S:447-448`). */
 .ds-sidebar-item[*|data-preview=destination]{
   background:var(--f-pill-hover); color:var(--f-ink); box-shadow:0 0 0 1.5px var(--accent-text) inset;
-  animation:dest var(--t-float) var(--e-out) infinite alternate;
 }
 
 /* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
@@ -3148,25 +2979,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15; design/26-DETAILS.md R4): C's sync halo
-   (`C:284-292`), a ring at `inset:-4px` around a positioned parent, played as a bounded pending
-   loop. A Rust step timer (`use_pending`) writes `data-pending` and, while it steps, `data-beat`
-   (Breathe) or `--turn` (Spin); each step is a transition of `--t-pending-step`, and the timer
-   stops at the operation's deadline, so nothing here loops and the ring costs 0 frames once it
-   holds its still frame. Attribute selectors carry `*|` (spike S2).
-   Idle: not shown. Breathe steps between 1 and .45 (the `busy` keyframe's floor) and holds at .45.
-   Spin turns a quarter per step (the angle only grows while it steps, so it never runs back) and
-   holds its dashed ring. TODO(O-9): standalone size not specified. */
+   (`C:284-292`), a ring at `inset:-4px` around a positioned parent, played as a pending loop.
+   A Rust step timer (`use_pending`) writes `data-pending` and, while it steps, `--turn`: a
+   twelfth of a turn a step, in steps of `--t-spin-step`, so the ring turns once a second. The
+   angle is drawn as it is written, with no transition, so the ring steps as a spoked spinner
+   does. Attribute selectors carry `*|` (spike S2). Idle: not shown. TODO(O-9): standalone size
+   not specified. */
 
 .ds-spinner{
-  position:absolute; inset:-4px; border-radius:var(--r-pill); border:2px solid var(--accent-text);
+  position:absolute; inset:-4px; border-radius:var(--r-pill); border:2px dashed var(--accent-text);
   opacity:0; transform:scale(.85);
 }
-.ds-spinner[*|data-kind=breathe][*|data-pending=step]{ opacity:1; transform:none; transition:opacity var(--t-pending-step) var(--e-in-out), transform var(--t-pending-step) var(--e-in-out); }
-.ds-spinner[*|data-kind=breathe][*|data-pending=step][*|data-beat=low]{ opacity:.45; }
-.ds-spinner[*|data-kind=breathe][*|data-pending=still]{ opacity:.45; transform:none; }
-.ds-spinner[*|data-kind=spin]{ border-style:dashed; }
-.ds-spinner[*|data-kind=spin][*|data-pending=step]{ opacity:.9; transform:rotate(var(--turn)); transition:transform var(--t-pending-step) var(--e-linear); }
-.ds-spinner[*|data-kind=spin][*|data-pending=still]{ opacity:.9; transform:none; }
+.ds-spinner[*|data-pending=step]{ opacity:.9; transform:rotate(var(--turn)); }
 /* -- status_glyph -- */
 /* The status glyphs (design/26-DETAILS.md 5.1): each glyph a stack of parts, one `svg`
    per part, so the stylesheet can move each part (it cannot reach inside an SVG on Blitz, spike
@@ -3189,22 +3013,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-status-glyph[*|data-pending=low]{ opacity:.45; }
 .ds-status-glyph[*|data-kind=volume]{ width:var(--ic-size); height:var(--ic-size); }
 .ds-status-glyph > .ds-level-glyph{ width:100%; height:100%; }
-/* -- sync_halo -- */
-/* SyncHalo (design/04-COMPONENTS.md section 35): `C:278-292`. The ring and its two loops are
-   the Spinner's (section 15); this file places the ring box and the avatar inside it, which is
-   round and display 800 13 (`--fs-control`). Not interactive: hover, focus and disabled are not
-   specified. TODO(O-9, O-25): both kinds loop, so the surface never idles while one shows. */
-
-.ds-account-ring{ position:relative; width:30px; height:30px; flex:none; }
-.ds-account-ring .ds-avatar{ position:absolute; inset:0; border-radius:var(--r-pill); font-size:var(--fs-control); }
-
-/* The halo's two rings, which loop (mail's, unchanged by design/26: the Spinner component is a
-   bounded pending loop now, and this is the one place the old loops remain, TODO(O-9, O-25)). */
-.ds-account-ring > .ds-spinner[*|data-kind=breathe]{ animation:breathe var(--t-ambient) var(--e-in-out) infinite; }
-.ds-account-ring > .ds-spinner[*|data-kind=spin]{
-  opacity:.9; transform:none; border-style:dashed;
-  animation:spin var(--t-spin) var(--e-linear) infinite;
-}
 /* -- tabs -- */
 /* Tabs (design/04-COMPONENTS.md section 12): C's `.tabs` (`C:243-257`); the bar's margins are
    page layout. The underline is a real span (O-22's fallback for `::after`) that grows in
@@ -3556,8 +3364,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-title-text{ white-space:nowrap; overflow:hidden; }
 .ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 
-/* Bumped: a run of text a widget bumps on change (`use_bump_on`); transformable while it plays. */
-.ds-bumped{ display:inline-block; }
 
 /* Picked up (`data-lift=lifted`, design/23 section 9.8): the card grows by `--pickup`
    and its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
@@ -3672,39 +3478,6 @@ html,body{margin:0;padding:0;background:transparent}
    width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
    border (not a dashed outline, which it draws solid). */
 .ds-drop-place[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent-text); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
-/* -- detail_reveal -- */
-/* Reveal (design/26-DETAILS.md R13): a list's children rise in turn on first show only. The
-   wrapper is `data-reveal=play` for exactly the first settle of the twelfth row, then `still`, so
-   nothing replays. Each child's index is its place, capped at 12. The rule is on the attribute, not
-   the class, so a part that owns its list plays the same rise on it (the command palette's
-   `.ds-menu`, from a `RevealCue`). */
-
-.ds-reveal{ display:block; }
-[*|data-reveal=play] > :nth-child(n){ --i:12; animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
-[*|data-reveal=play] > :nth-child(1){ --i:0; }
-[*|data-reveal=play] > :nth-child(2){ --i:1; }
-[*|data-reveal=play] > :nth-child(3){ --i:2; }
-[*|data-reveal=play] > :nth-child(4){ --i:3; }
-[*|data-reveal=play] > :nth-child(5){ --i:4; }
-[*|data-reveal=play] > :nth-child(6){ --i:5; }
-[*|data-reveal=play] > :nth-child(7){ --i:6; }
-[*|data-reveal=play] > :nth-child(8){ --i:7; }
-[*|data-reveal=play] > :nth-child(9){ --i:8; }
-[*|data-reveal=play] > :nth-child(10){ --i:9; }
-[*|data-reveal=play] > :nth-child(11){ --i:10; }
-[*|data-reveal=play] > :nth-child(12){ --i:11; }
-/* -- detail_layer -- */
-/* LayerGlyph (design/26-DETAILS.md section 3.2): an icon as stacked layers, each its own `svg`
-   so the stylesheet can fade it (it cannot reach inside an SVG on Blitz). The first layer is in
-   flow and sizes the box. Unlit layers are faint; a stalled pending loop dims the glyph. Each
-   change is a `--t-quick` fade: the step timer, not a keyframe, paces the loop. */
-
-.ds-layer-glyph{ position:relative; display:inline-block; flex:none; line-height:0; transition:opacity var(--t-quick) var(--e-out); }
-.ds-layer-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out); }
-.ds-layer-part:first-child{ position:relative; }
-.ds-layer-part[*|data-lit=off]{ opacity:.18; }
-.ds-layer-glyph[*|data-pending=still]{ opacity:.45; }
-.ds-check-mark{ display:block; flex:none; }
 /* -- detail_morph -- */
 /* MorphGlyph (design/26-DETAILS.md section 3.2): two stacked layers, each an `svg` in an HTML
    wrapper the stylesheet can move (Blitz's stylesheet does not reach inside an SVG). The incoming
@@ -3715,15 +3488,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-morph-layer{ display:block; }
 .ds-morph-layer[*|data-morph=out]{ position:absolute; left:0; top:0; }
 .ds-morph-slash{ position:absolute; left:0; top:0; }
-/* -- detail_roll -- */
-/* RollDigits (design/26-DETAILS.md A7): a changed character rolls up into its place as the old
-   one rolls out above it, each once (`a-roll-in`, `a-roll-out`); unchanged ones stand. The column
-   clips the two so only its own place shows. */
-
-.ds-roll-digits{ display:inline-flex; white-space:pre; }
-.ds-roll-digit{ display:inline-block; }
-.ds-roll-col{ position:relative; display:inline-block; overflow:hidden; }
-.ds-roll-col > .ds-roll-old{ position:absolute; left:0; top:0; }
 /* -- widget_views -- */
 /* The widgets' content on the card (design/23-WIDGETS.md sections 3.3, 4.1, 4.2 and 9.6): the
    compositions the reference measures, moved into quire with the widget contract so no host
@@ -3793,8 +3557,7 @@ html,body{margin:0;padding:0;background:transparent}
    buttons that add it. At the right, what is placed on the desktop and in the notification
    center, one row each: the name and Remove. The gallery fills the height it is given
    (`flex:1` in a column, or its grid row), and the placed column scrolls on its own, so a new
-   row can be brought into view without moving the rest; it is inset 6 at each side so a row
-   rising in on the spring (`row-in`'s 1.04) is not clipped by it. Attribute selectors carry `*|`
+   row can be brought into view without moving the rest. Attribute selectors carry `*|`
    (spike S2). */
 
 .ds-widget-gallery{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr) minmax(0,280px); grid-template-rows:minmax(0,1fr);
@@ -3821,8 +3584,3 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-none{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
-
-/* "Added": while the widget an Add button placed settles in, the button leads with a
-   check (`CheckMark`, drawn on) in its own box, which grows in with `morph-in` (the spring only
-   for the person's own press). A row that arrives rises in on its own pulse class. */
-.ds-widget-gallery-added{ display:inline-flex; align-items:center; }

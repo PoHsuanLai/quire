@@ -24,11 +24,9 @@ pub(crate) const GLYPH: VarName = VarName("--m-level-glyph");
 pub(crate) const GLYPH_FILL: VarName = VarName("--m-level-glyph-fill");
 /// `--m-level-knob`: the knob's hairline and drop, a `box-shadow`.
 pub(crate) const KNOB: VarName = VarName("--m-level-knob");
-/// `--m-level-tick`: the fill edge's quiet mark when the level crosses a step.
-pub(crate) const TICK: VarName = VarName("--m-level-tick");
 
 /// Every level variable, for the lint's registry.
-pub(crate) const LEVEL_VARS: [VarName; 7] = [FILL, WELL, SHADE, GLYPH, GLYPH_FILL, KNOB, TICK];
+pub(crate) const LEVEL_VARS: [VarName; 6] = [FILL, WELL, SHADE, GLYPH, GLYPH_FILL, KNOB];
 
 const WHITE: Hex = Hex([255, 255, 255]);
 const BLACK: Hex = Hex([0, 0, 0]);
@@ -44,7 +42,6 @@ pub(crate) struct LevelInks {
     glyph_fill: Colour,
     /// The knob's outline and drop black alphas.
     knob: (Alpha, Alpha),
-    tick: Colour,
 }
 
 /// The inks for `scheme`. Light: a near-white fill over a black .18 well, so the fill reads as the
@@ -62,7 +59,6 @@ pub(crate) fn inks(scheme: Scheme) -> LevelInks {
             glyph: Colour::Alpha(BLACK, Alpha(620)),
             glyph_fill: Colour::Alpha(BLACK, Alpha(720)),
             knob: (Alpha(120), Alpha(220)),
-            tick: Colour::Alpha(BLACK, Alpha(160)),
         },
         Scheme::Dark => LevelInks {
             fill: Colour::Alpha(WHITE, Alpha(940)),
@@ -71,7 +67,6 @@ pub(crate) fn inks(scheme: Scheme) -> LevelInks {
             glyph: Colour::Alpha(WHITE, Alpha(860)),
             glyph_fill: Colour::Alpha(BLACK, Alpha(700)),
             knob: (Alpha(350), Alpha(450)),
-            tick: Colour::Alpha(BLACK, Alpha(200)),
         },
     }
 }
@@ -108,7 +103,6 @@ fn declarations(inks: LevelInks) -> Vec<String> {
                 black(drop)
             ),
         ),
-        declaration(TICK, &inks.tick.css()),
     ]
 }
 

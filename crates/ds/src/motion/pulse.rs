@@ -25,11 +25,6 @@ impl Pulse {
     pub fn key(&self) -> PulseKey {
         (self.key)()
     }
-
-    /// The class and `data-pulse` value to render (`a-gulp`, `a`|`b`), or `None` at rest.
-    pub fn attrs(&self) -> Option<(String, &'static str)> {
-        self.key().attrs()
-    }
 }
 
 /// A pulse of `anim`, at rest until fired.

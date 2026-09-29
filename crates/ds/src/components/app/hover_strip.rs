@@ -2,8 +2,8 @@
 //! result through a Fly tooltip (design/04-COMPONENTS.md section 17).
 
 use crate::core::geometry::units::Rect;
+use crate::core::vocab::Selection;
 use crate::core::vocab::Shown;
-use crate::core::vocab::{Selection, StaggerIndex};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
@@ -45,9 +45,8 @@ pub enum Titles {
     FromLabel,
 }
 
-/// A row's action strip. It shows while its row is hovered; the buttons pop in staggered by
-/// `--j` (capped like every stagger), and each one's Fly label appears after `--d-fly`, at once
-/// while hover is warm.
+/// A row's action strip. It shows while its row is hovered, the buttons fading in, and each one's
+/// Fly label appears as the pointer rests on its button.
 ///
 /// `shown` hands the reveal to the caller: `Some(Shown::Visible)` shows the strip on a row the
 /// keyboard selected or one holding the focus (Blitz never matches `:focus-within`, spike S12),
@@ -71,7 +70,7 @@ pub fn HoverStrip(
 ) -> Element {
     rsx! {
         div { class: "ds-strip", "data-shown": shown.map(Shown::slug),
-            for (j, action) in actions.into_iter().enumerate() {
+            for action in actions {
                 StripButton {
                     key: "{action.id.0}",
                     expanded: expanded
@@ -79,7 +78,6 @@ pub fn HoverStrip(
                         .find(|(id, _)| *id == action.id)
                         .map(|(_, state)| *state),
                     action,
-                    j: StaggerIndex::new(j),
                     titles,
                     on_press,
                 }
@@ -92,7 +90,6 @@ pub fn HoverStrip(
 #[component]
 fn StripButton(
     action: StripAction,
-    j: StaggerIndex,
     titles: Titles,
     expanded: Option<Shown>,
     on_press: Option<EventHandler<ActionId>>,
@@ -106,7 +103,6 @@ fn StripButton(
         onhover,
         onclick,
     } = action;
-    let j = j.get();
     let pressed = id.clone();
     let title = match titles {
         Titles::Omitted => None,
@@ -118,7 +114,6 @@ fn StripButton(
             class: "ds-icon-button",
             "data-variant": "strip",
             "data-op": "{id.0}",
-            style: "--j:{j}",
             "aria-label": "{label}",
             title,
             "aria-haspopup": expanded.map(|_| "menu"),

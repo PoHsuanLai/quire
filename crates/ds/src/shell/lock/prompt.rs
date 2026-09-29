@@ -3,7 +3,7 @@
 //! white glass with an enter arrow inside it, a caps-lock mark, and a hint line under it.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::spinner::{Spinner, SpinnerKind};
+use crate::components::controls::spinner::Spinner;
 use crate::components::fields::{
     text_input::{InputVariant, TextInput},
     text_input_focus::FieldFocus,
@@ -12,8 +12,7 @@ use crate::components::fields::{
 use crate::core::vocab::Availability;
 use crate::core::word::Word;
 use crate::motion::detail::{
-    first_show::FirstShow, operation::Operation, touch::Touch, use_detail::use_detail,
-    use_operation::use_operation,
+    operation::Operation, touch::Touch, use_detail::use_detail, use_operation::use_operation,
 };
 use crate::motion::wake::WakeStamp;
 use crate::shell::lock::mood::{Caret, Stir, prompt_mood, use_stir};
@@ -62,8 +61,8 @@ pub fn LockPrompt(
         wake: stir.stamp(wake),
     };
     let line = hint_line(&state, hint);
-    // Checking is an operation the prompt's own state starts: its arrow's spin is bounded (R4).
-    let operation = use_operation(use_detail(state.clone(), FirstShow::Still, Touch::Remote).cue());
+    // Checking is an operation the prompt's own state starts.
+    let operation = use_operation(use_detail(state.clone(), Touch::Remote).cue());
     let field = Field {
         entry,
         caps,
@@ -221,7 +220,7 @@ fn go_button(
             onclick: move |_| onpress.call(()),
             if checking {
                 span { class: "ds-lock-busy",
-                    Spinner { kind: SpinnerKind::Spin, operation }
+                    Spinner { operation }
                 }
             } else {
                 Glyph { icon: Icon::ArrowRight, size: IconSize::Small }

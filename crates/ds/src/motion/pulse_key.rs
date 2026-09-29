@@ -51,10 +51,12 @@ impl PulseKey {
         PulseKey { phase, ..self }
     }
 
-    /// `anim` fired on the alias after this key's: a restartable pulse that may play a different
-    /// keyframe each time (a seal with or without its spring, design/26 R5).
-    pub(crate) fn fired_as(self, anim: Anim) -> Self {
-        PulseKey { anim, ..self }.fired()
+    /// `base` with this pulse's class added while it plays, and its `data-pulse` alias.
+    pub fn wear(self, base: &str) -> (String, Option<&'static str>) {
+        match self.attrs() {
+            Some((anim, alias)) => (format!("{base} {anim}"), Some(alias)),
+            None => (base.to_string(), None),
+        }
     }
 
     /// The class and `data-pulse` value to render, or `None` while at rest.

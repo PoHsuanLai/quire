@@ -7,7 +7,6 @@ use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Check, Shown};
 use crate::core::word::Word;
-use crate::motion::detail::{cue::Cue, first_show::FirstShow, once::use_nudge};
 use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
@@ -61,12 +60,7 @@ impl IconButtonVariant {
 /// A status item's glyph can be a layered status glyph: `icon: IconSource::Status(state)` (a
 /// `StatusState` converts) draws `StatusGlyph` in the same box, ink, pill and label as an `Icon`,
 /// sized by `--bar-status-glyph`; hand it the state every render and it plays its own
-/// moments. `first` is the glyph's first frame (`Still`, the default, on bar chrome).
-///
-/// `nudge` is an attention cue (`use_detail(..).cue()` of a state whose table names
-/// `Moment::Attention`, such as a low battery crossing into its threshold, design/26): each
-/// new Attention cue lifts the glyph once (`nudge-up`, `use_nudge`), never the pill, and nothing
-/// under Reduced. Pass it for the button's whole life (`None` to `Some` remounts the glyph).
+/// moments.
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,
@@ -79,11 +73,9 @@ pub fn IconButton(
     onclick: EventHandler<Press>,
     #[props(default)] propagation: Propagation,
     #[props(default)] common: Common,
-    #[props(default)] first: FirstShow,
-    #[props(default)] nudge: Option<Cue>,
 ) -> Element {
     let class = common.class("ds-icon-button");
-    let glyph = glyph_slot(icon, variant.icon_size(), first, nudge);
+    let size = variant.icon_size();
     let data = common.data_attributes();
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(|state| state.aria());
@@ -123,33 +115,7 @@ pub fn IconButton(
             // The consumer's own `data-*`, last: a spread follows the named
             // attributes.
             ..data,
-            {glyph}
+            IconView { source: icon, size }
         }
-    }
-}
-
-/// The button's glyph, inside the nudge's lifting wrapper when it has an attention cue.
-fn glyph_slot(source: IconSource, size: IconSize, first: FirstShow, nudge: Option<Cue>) -> Element {
-    match nudge {
-        None => rsx! {
-            IconView { source, size, first }
-        },
-        Some(cue) => rsx! {
-            Nudged { cue,
-                IconView { source, size, first }
-            }
-        },
-    }
-}
-
-/// `span.ds-icon-nudge` around a glyph: `nudge-up` once per new Attention cue (R6).
-#[component]
-fn Nudged(cue: Cue, children: Element) -> Element {
-    let (class, alias) = match use_nudge(cue).attrs() {
-        Some((anim, alias)) => (format!("ds-icon-nudge {anim}"), Some(alias)),
-        None => ("ds-icon-nudge".to_owned(), None),
-    };
-    rsx! {
-        span { class, "data-pulse": alias, {children} }
     }
 }

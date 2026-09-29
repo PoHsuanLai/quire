@@ -168,7 +168,6 @@ fn the_markup_carries_the_props() {
         "left:4px;top:4px;width:232px;height:130.5px",
         "aria-label=\"Delete\"",
         "aria-label=\"Copy Text\"",
-        "style=\"--j:1\"",
     ] {
         assert!(html.contains(want), "{want} in {html}");
     }

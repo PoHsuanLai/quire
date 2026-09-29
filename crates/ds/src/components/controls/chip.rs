@@ -3,7 +3,6 @@
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::core::colour::contrast::Verdict;
 use crate::core::word::Word;
-use crate::motion::pulse_key::PulseKey;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use crate::style::tokens::label_hue::LabelHue;
@@ -57,31 +56,23 @@ impl ChipVariant {
     }
 }
 
-/// A small label. `pulse` plays `chip-land` or `chip-in` again, or, on a Person chip,
-/// `Anim::ChipFlash`: the 1200 ms `--accent-soft` ring a mentioned person gets
-/// (design/04-COMPONENTS.md section 10, `S:2119`).
+/// A small label (design/04-COMPONENTS.md section 10).
 #[component]
 pub fn Chip(
     variant: ChipVariant,
     text: String,
     #[props(default)] onremove: Option<EventHandler<()>>,
-    #[props(default)] pulse: Option<PulseKey>,
 ) -> Element {
-    let (class, alias) = match pulse.and_then(PulseKey::attrs) {
-        Some((anim, alias)) => (format!("ds-chip {anim}"), Some(alias)),
-        None => ("ds-chip".to_string(), None),
-    };
     let avatar = match &variant {
         ChipVariant::Person(avatar) => Some(*avatar),
         _ => None,
     };
     rsx! {
         span {
-            class,
+            class: "ds-chip",
             "data-variant": variant.slug(),
             "data-hue": variant.hue(),
             "data-status": variant.status(),
-            "data-pulse": alias,
             if let Some(avatar) = avatar {
                 {face(avatar)}
             }

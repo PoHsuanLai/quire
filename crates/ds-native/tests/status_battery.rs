@@ -1,9 +1,8 @@
-//! design/26 on a real Blitz document: the battery status glyph. The fill sweeps
-//! from where it is only when its drawn step changes, the bolt and the plug grow in, the low
-//! tone is a colour claim, an Appear sweeps from empty, and Reduced jumps; each ends at 0 frames.
+//! design/26 on a real Blitz document: the battery status glyph. The fill follows its level
+//! linearly over `--t-move` only when its drawn step changes, the bolt and the plug grow in, the
+//! low tone is a colour claim, and Reduced jumps; each ends at 0 frames.
 
 use dioxus::prelude::*;
-use ds::detail::FirstShow;
 use ds::{
     Appearance, BatteryGlyph, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, Motion,
 };
@@ -54,7 +53,7 @@ fn attr(harness: &Harness, part: &str, name: &str) -> Option<String> {
 }
 
 #[test]
-fn the_fill_sweeps_to_a_new_step_and_ignores_a_finer_change() {
+fn the_fill_follows_a_new_step_and_ignores_a_finer_change() {
     let mut harness = Harness::new(Page, VIEW);
     let full = width(&harness);
     // 80 % is step 18 of 22: 9 of the fill's 11 units.
@@ -125,26 +124,6 @@ fn the_fill_turns_low_at_the_threshold_but_never_while_charging() {
     settle_until(&mut harness, |h| {
         attr(h, "fill", "data-tone").as_deref() == Some("normal")
     });
-    assert_settles_to_zero_frames(&mut harness);
-}
-
-/// A surface just opened: the glyph's first frame is an Appear.
-#[allow(non_snake_case)]
-fn Opened() -> Element {
-    rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
-            div { id: "battery",
-                BatteryGlyph { state: battery(930, BatteryPower::Battery), first: FirstShow::Animate }
-            }
-        }
-    }
-}
-
-#[test]
-fn a_surface_just_opened_sweeps_the_fill_in_from_empty() {
-    let mut harness = Harness::new(Opened, VIEW);
-    settle_until(&mut harness, |h| width(h) > 0.5 && width(h) < 9.0);
-    settle_until(&mut harness, |h| (width(h) - 10.0).abs() < 0.6);
     assert_settles_to_zero_frames(&mut harness);
 }
 

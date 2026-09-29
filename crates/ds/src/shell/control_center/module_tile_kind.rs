@@ -3,7 +3,6 @@
 
 use crate::core::word::Word;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
-use crate::style::icon::Icon;
 
 /// Where a module is: off, on, or on its way (connecting, scanning).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
@@ -80,20 +79,4 @@ pub enum TileSpan {
     Half,
     /// Every column (`grid-column:1 / -1`), as a slider module.
     Full,
-}
-
-/// How a tile's disc glyph answers the module turning on (design/26-DETAILS.md 5.2.2,
-/// 5.2.5). The disc's colour cross-fades whatever this is.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum DiscMotion {
-    /// The glyph stays as it is.
-    #[default]
-    Still,
-    /// Turning on fills the glyph's layers once from the inside out (`Settle{Fill}`), as the
-    /// Wi-Fi fan fills when the radio comes on. A glyph (`IconSource::Glyph`) only: a status
-    /// glyph plays its own moments.
-    Fill,
-    /// Turning on morphs the glyph into this one (`MorphGlyph{DownUp}`), springing when the
-    /// person pressed the tile; turning off morphs back. The Focus moon into `Icon::MoonFilled`.
-    Morph(Icon),
 }

@@ -17,13 +17,9 @@ pub(crate) const SEGMENTS: u16 = 16;
 pub(crate) struct Drawn {
     pub look: LevelLook,
     pub value: Fraction,
-    /// The level the previous render showed: where the segments' stagger starts.
-    pub before: Fraction,
     pub glyph: LevelGlyph,
     /// The level the glyph's parts follow: the value, or a volume state's band.
     pub glyph_level: Fraction,
-    /// The tick's pulse class and alias, when it ticks.
-    pub tick: Option<(String, &'static str)>,
 }
 
 /// The rail's contents for `drawn.look`.
@@ -34,7 +30,7 @@ pub(crate) fn body(drawn: Drawn) -> Element {
             {capsule(&drawn, Inside::Nothing)}
             div { class: "ds-level-knob" }
         },
-        LevelLook::Segments => segments(drawn.value, drawn.before),
+        LevelLook::Segments => segments(drawn.value),
     }
 }
 
@@ -54,16 +50,10 @@ fn capsule(drawn: &Drawn, inside: Inside) -> Element {
         },
         Inside::Nothing => rsx! {},
     };
-    let edge = drawn.tick.clone().map(|(class, alias)| {
-        rsx! { div { class: "ds-level-edge {class}", "data-pulse": alias } }
-    });
     rsx! {
         div { class: "ds-level-track",
             {glyph()}
-            div { class: "ds-level-fill",
-                {glyph()}
-                {edge}
-            }
+            div { class: "ds-level-fill", {glyph()} }
         }
     }
 }
@@ -73,15 +63,9 @@ pub(crate) fn filled(value: Fraction) -> u16 {
     (value.clamped().0 * SEGMENTS + 500) / 1000
 }
 
-/// The squares, each `data-on` when filled; the ones that change fill in (or empty) one
-/// `--stagger` after another, counted from where the level was.
-fn segments(value: Fraction, before: Fraction) -> Element {
-    let (now, was) = (filled(value), filled(before));
-    let order = move |index: u16| match now.cmp(&was) {
-        std::cmp::Ordering::Greater if (was..now).contains(&index) => index - was,
-        std::cmp::Ordering::Less if (now..was).contains(&index) => was - 1 - index,
-        _ => 0,
-    };
+/// The squares, each `data-on` when filled.
+fn segments(value: Fraction) -> Element {
+    let now = filled(value);
     rsx! {
         div { class: "ds-level-segments",
             for index in 0..SEGMENTS {
@@ -89,7 +73,6 @@ fn segments(value: Fraction, before: Fraction) -> Element {
                     key: "{index}",
                     class: "ds-level-seg",
                     "data-on": if index < now { "on" } else { "off" },
-                    style: "--i:{order(index)}",
                 }
             }
         }

@@ -7,7 +7,7 @@ use super::motion::{millis, recipe_text};
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Anim, Button, ButtonVariant, StaggerIndex, TimerPhase, settle, use_motion_timer, use_pulse,
+    Anim, Button, ButtonVariant, PulseKey, StaggerIndex, TimerPhase, settle, use_motion_timer,
     use_scope,
 };
 
@@ -32,9 +32,9 @@ pub fn MotionLabPage() -> Element {
 #[component]
 fn LabCell(anim: Anim) -> Element {
     let level = use_scope().resolved.motion;
-    let pulse = use_pulse(anim);
+    let mut pulse = use_signal(|| PulseKey::rest(anim));
     let timer = use_motion_timer(anim);
-    let (class, alias) = match pulse.attrs() {
+    let (class, alias) = match pulse().attrs() {
         Some((class, alias)) => (format!("g-sample {class}"), Some(alias)),
         None => ("g-sample".to_string(), None),
     };
@@ -54,7 +54,7 @@ fn LabCell(anim: Anim) -> Element {
                     variant: ButtonVariant::Mini,
                     label: format!("{anim:?}"),
                     onclick: move |_| {
-                        pulse.fire();
+                        pulse.set(pulse().fired());
                         timer.start(EventHandler::new(|()| {}));
                     },
                 }

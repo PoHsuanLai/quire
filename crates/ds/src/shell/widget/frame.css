@@ -25,8 +25,6 @@
 .ds-widget-title-text{ white-space:nowrap; overflow:hidden; }
 .ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 
-/* Bumped: a run of text a widget bumps on change (`use_bump_on`); transformable while it plays. */
-.ds-bumped{ display:inline-block; }
 
 /* Picked up (`data-lift=lifted`, design/23 section 9.8): the card grows by `--pickup`
    and its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates

@@ -4,10 +4,10 @@
 use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow,
-    MarkProvider, MarkSize, MarkStyle, Presence, ProviderMark, Px, RowState, StripAction,
+    ActionId, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow, MarkProvider,
+    MarkSize, MarkStyle, Presence, ProviderMark, Px, RowState, StripAction,
 };
-use ds::{Check, DropState, Emphasis, PulseKey, Selection, StaggerIndex};
+use ds::{Check, DropState, Emphasis, Selection, StaggerIndex};
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -40,18 +40,9 @@ pub fn row(
     emphasis: Emphasis,
     selection: Selection,
     star: Check,
-    pulse: PulseKey,
     index: usize,
 ) -> Element {
-    row_in_drag(
-        presence,
-        emphasis,
-        selection,
-        star,
-        pulse,
-        index,
-        DropState::Idle,
-    )
+    row_in_drag(presence, emphasis, selection, star, index, DropState::Idle)
 }
 
 /// A present read row playing `drop` in a drag.
@@ -61,7 +52,6 @@ fn dragged_row(drop: DropState) -> Element {
         Emphasis::Plain,
         Selection::Unselected,
         Check::Off,
-        PulseKey::rest(Anim::StarPop),
         3,
         drop,
     )
@@ -73,7 +63,6 @@ fn row_in_drag(
     emphasis: Emphasis,
     selection: Selection,
     star: Check,
-    pulse: PulseKey,
     index: usize,
     drop: DropState,
 ) -> Element {
@@ -92,7 +81,6 @@ fn row_in_drag(
             time: "09:41",
             tags: rsx! { Chip { variant: ChipVariant::Accent, text: "spec" } },
             star: (star, EventHandler::new(|_| {})),
-            star_pulse: pulse,
             strip: rsx! { HoverStrip { actions: strip_actions() } },
             onclick: |_| {},
         }
@@ -110,26 +98,12 @@ pub fn Row(
     let index = usize::from(index.get());
     match heal {
         Some(heal) => healed_row(heal, emphasis, index),
-        None => row(
-            presence,
-            emphasis,
-            Selection::Unselected,
-            Check::Off,
-            PulseKey::rest(Anim::StarPop),
-            index,
-        ),
+        None => row(presence, emphasis, Selection::Unselected, Check::Off, index),
     }
 }
 
 fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
-    row(
-        presence,
-        emphasis,
-        Selection::Unselected,
-        Check::Off,
-        PulseKey::rest(Anim::StarPop),
-        3,
-    )
+    row(presence, emphasis, Selection::Unselected, Check::Off, 3)
 }
 
 /// A read row sliding into a gap by `heal`.
@@ -150,7 +124,6 @@ fn healed_row(heal: Heal, emphasis: Emphasis, index: usize) -> Element {
             time: "09:41",
             tags: rsx! { Chip { variant: ChipVariant::Accent, text: "spec" } },
             star: (Check::Off, EventHandler::new(|_| {})),
-            star_pulse: PulseKey::rest(Anim::StarPop),
             strip: rsx! { HoverStrip { actions: strip_actions() } },
             onclick: |_| {},
         }
@@ -190,7 +163,6 @@ pub const ROW_CASES: &[Case] = &[
                 Emphasis::Plain,
                 Selection::Selected,
                 Check::Off,
-                PulseKey::rest(Anim::StarPop),
                 0,
             )
         },
@@ -204,49 +176,6 @@ pub const ROW_CASES: &[Case] = &[
                 Emphasis::Plain,
                 Selection::Unselected,
                 Check::On,
-                PulseKey::rest(Anim::StarPop),
-                0,
-            )
-        },
-    },
-    Case {
-        component: "list_row",
-        state: "starring-pop-a",
-        make: || {
-            row(
-                Presence::Present,
-                Emphasis::Plain,
-                Selection::Unselected,
-                Check::On,
-                PulseKey::rest(Anim::StarPop).fired(),
-                0,
-            )
-        },
-    },
-    Case {
-        component: "list_row",
-        state: "starring-pop-b",
-        make: || {
-            row(
-                Presence::Present,
-                Emphasis::Plain,
-                Selection::Unselected,
-                Check::On,
-                PulseKey::rest(Anim::StarPop).fired().fired(),
-                0,
-            )
-        },
-    },
-    Case {
-        component: "list_row",
-        state: "unstarring-pop",
-        make: || {
-            row(
-                Presence::Present,
-                Emphasis::Plain,
-                Selection::Unselected,
-                Check::Off,
-                PulseKey::rest(Anim::StarPop).fired(),
                 0,
             )
         },
@@ -317,7 +246,6 @@ pub const ROW_CASES: &[Case] = &[
                     time: "Tue",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: PulseKey::rest(Anim::StarPop),
                     strip: None,
                     onclick: |_| {},
                 }
@@ -342,7 +270,6 @@ pub const ROW_CASES: &[Case] = &[
                     time: "Tue",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: PulseKey::rest(Anim::StarPop),
                     strip: None,
                     onclick: |_| {},
                 }

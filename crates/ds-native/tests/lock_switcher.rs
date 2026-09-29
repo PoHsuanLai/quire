@@ -193,10 +193,6 @@ fn face(harness: &Harness) -> Option<String> {
     harness.attr(".ds-lock-prompt .ds-emoji-face", "data-emoji")
 }
 
-fn accepting(harness: &Harness) -> bool {
-    harness.has_class(".ds-lock-prompt .ds-user-picture", "a-picture-accept")
-}
-
 /// Poll until the picture's mood is `want`, and say whether it got there.
 fn mood_becomes(harness: &mut Harness, want: &str) -> Option<String> {
     settle_until(harness, |h| mood(h).as_deref() == Some(want));
@@ -270,45 +266,10 @@ fn the_emoji_glances_winces_once_per_wrong_password_and_is_happy_when_accepted()
         mood_becomes(&mut harness, "happy").as_deref(),
         Some("happy")
     );
-    assert!(
-        accepting(&harness),
-        "accepted lifts once: {}",
-        harness.html()
-    );
     face_becomes(&mut harness, "partying");
     assert_eq!(
         harness.attr(".ds-lock-prompt", "data-state").as_deref(),
         Some("accepted")
-    );
-    // The beat is at rest again by its settle: nothing stays on the element.
-    settle_until(&mut harness, |h| !accepting(h));
-}
-
-/// A letter has no moods, but it answers the unlock with the same beat, once.
-#[test]
-fn a_letter_plays_the_accept_beat_once_accepted() {
-    let mut harness = mounted(Lock);
-    assert!(!accepting(&harness), "no beat at rest");
-    type_text(&mut harness, "abc");
-    set_state(&mut harness, PromptState::Checking);
-    let asked = harness.now();
-    set_state(&mut harness, PromptState::Accepted);
-    settle_until(&mut harness, accepting);
-    let rested = settle_until(&mut harness, |h| !accepting(h));
-    let beat = settle(
-        Anim::PictureAccept,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
-    assert!(
-        rested.duration_since(asked) >= beat,
-        "at rest after {:?}, before the beat's {beat:?}",
-        rested.duration_since(asked)
-    );
-    assert!(
-        harness
-            .attr(".ds-lock-prompt .ds-avatar", "data-size")
-            .is_some()
     );
 }
 

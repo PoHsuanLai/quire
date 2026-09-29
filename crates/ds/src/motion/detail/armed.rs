@@ -3,20 +3,22 @@
 //! when the service answers. An [`Armed`] keeps the press's [`Contact`] until a change spends it,
 //! so that change (and only that one) may spring. A Pending change passes the press on to the
 //! operation's end, so the success of a join the person clicked springs however long it took; a
-//! press that changes nothing goes stale after `PendingCap`, and a later change from elsewhere is
+//! press that changes nothing goes stale after [`STALE`], and a later change from elsewhere is
 //! `Touch::Remote`.
 
 use super::cue::Cue;
 use super::moment::Moment;
-use super::operation::Deadline;
 use super::touch::{Contact, Touch};
 use dioxus::prelude::*;
-use std::time::Instant;
+use std::time::{Duration, Instant};
+
+/// How long a press that changed nothing is kept.
+const STALE: Duration = Duration::from_secs(10);
 
 /// How long a kept press lasts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Hold {
-    /// Pressed at this instant and nothing has changed since: stale after `PendingCap`.
+    /// Pressed at this instant and nothing has changed since: stale after [`STALE`].
     Since(Instant),
     /// The press started an operation that is still pending: kept until it ends.
     Operation,
@@ -53,9 +55,7 @@ impl Armed {
     pub fn touch(self) -> Touch {
         match *self.press.peek() {
             Some((contact, Hold::Operation)) => Touch::Contact(contact),
-            Some((contact, Hold::Since(at)))
-                if crate::core::time::clock::since(at) <= Deadline::cap().length() =>
-            {
+            Some((contact, Hold::Since(at))) if crate::core::time::clock::since(at) <= STALE => {
                 Touch::Contact(contact)
             }
             Some(_) | None => Touch::Remote,

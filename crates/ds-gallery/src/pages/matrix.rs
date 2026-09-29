@@ -6,10 +6,10 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
-    Emphasis, Fraction, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence,
-    PulseKey, RowState, Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider,
-    StaggerIndex, Surface, Tabs, TextInput, Toggle, Verdict,
+    Accent, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant, Emphasis,
+    Fraction, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, RowState,
+    Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex, Surface, Tabs,
+    TextInput, Toggle, Verdict,
 };
 
 /// What the matrix can show.
@@ -102,7 +102,6 @@ fn Cell(subject: Subject) -> Element {
                     time: "09:41",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: PulseKey::rest(Anim::StarPop),
                     strip: None,
                     onclick: |_| {},
                 }
@@ -116,7 +115,6 @@ fn Cell(subject: Subject) -> Element {
                 count: Some(12),
                 presence: Presence::Present,
                 preview: None,
-                pulse: PulseKey::rest(Anim::SealPop),
                 onclick: |_| {},
                 onclose: None,
             }
@@ -127,7 +125,6 @@ fn Cell(subject: Subject) -> Element {
                 count: None,
                 presence: Presence::Present,
                 preview: None,
-                pulse: PulseKey::rest(Anim::SealPop),
                 onclick: |_| {},
                 onclose: None,
             }

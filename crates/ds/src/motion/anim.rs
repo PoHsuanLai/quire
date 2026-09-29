@@ -34,27 +34,10 @@
 /// One animation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Anim {
-    /// `seal-pop`: the current place's dot.
-    SealPop,
-    /// `gulp`: the place that received something.
-    Gulp,
-    /// `pop-in`: strip buttons.
-    PopIn,
     /// `row-in`: an arriving or restored row (C).
     RowIn,
     /// `rise`: rows when a list is first shown; reader blocks.
     Rise,
-    /// `star-pop`: the star.
-    StarPop,
-    /// `spark`: the star's sparks, starring only.
-    Spark,
-    /// `chip-land`: a label chip after a drop (C).
-    ChipLand,
-    /// `chip-in`: a person chip.
-    ChipIn,
-    /// `chip-flash`: a mentioned person chip's ring, held for `--t-flash` (design/04-COMPONENTS.md
-    /// section 10, design/06-INTERACTIONS.md section 2.5).
-    ChipFlash,
     /// `fold`: archive.
     Fold,
     /// `fold` at `--t-big-heavy`: an unread row's archive.
@@ -69,8 +52,6 @@ pub enum Anim {
     CurlHeavy,
     /// `heal`: rows below a removed row close the gap.
     Heal,
-    /// `bump`: a count that changed.
-    Bump,
     /// `tab-in`: a Today entry opens.
     TabIn,
     /// `tab-out`: a Today entry closes.
@@ -160,9 +141,6 @@ pub enum Anim {
     /// lift at the top right, a drop at the bottom centre) over `--t-move --e-exit`, the exit
     /// design/05 section 10 gives shell chrome, once its hold ends.
     OsdOut,
-    /// `level-tick`: the level control's fill edge marks a step crossed, once, at `--t-tap`
-    /// (`Tick::Quiet`; the sound is the shell's).
-    LevelTick,
     /// `sheet-out`: a sheet leaving fades and settles 8 px back down, from a .98 scale's worth
     /// of shrink, over `--t-move --e-exit` (design/05 section 10: exits accelerate), the way it
     /// came in by `peek-in` reversed and quieter.
@@ -191,10 +169,6 @@ pub enum Anim {
     /// fades, over `--t-move --e-exit`, holding its last frame until the host unmaps it at
     /// `settle(ShotOut)` (design/20 section 1.13: "slide-r out").
     ShotOut,
-    /// `picture-accept`: the user's picture, whatever its kind, lifts once and lands at
-    /// `--t-big --e-spring` when the password was right (the answer to the user's own contact, so
-    /// it may spring; design/25 section 7). A lock screen unlocks at its `settle`.
-    PictureAccept,
     /// `morph-in`: a glyph growing into a new state (design/26 `MorphGlyph`).
     MorphIn,
     /// `morph-out`: the glyph it replaces shrinking away.
@@ -207,10 +181,6 @@ pub enum Anim {
     RollIn,
     /// `roll-out`: the digit it replaces rolling away.
     RollOut,
-    /// `gulp` at `--e-out`: a success seal nobody touched (design/26 R5).
-    SealOut,
-    /// `nudge-up`: attention, once (design/26 `use_nudge`).
-    NudgeUp,
     /// `hold`: moves nothing, for `--t-tap`. A state that comes after an animated one (a
     /// surface present after its entrance, a hide taken back, a row at rest) plays it, so the
     /// restyle that drops the running animation always starts another one. Blitz at the pinned
@@ -232,17 +202,9 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 79] = [
-        Anim::SealPop,
-        Anim::Gulp,
-        Anim::PopIn,
+    pub const ALL: [Anim; 66] = [
         Anim::RowIn,
         Anim::Rise,
-        Anim::StarPop,
-        Anim::Spark,
-        Anim::ChipLand,
-        Anim::ChipIn,
-        Anim::ChipFlash,
         Anim::Fold,
         Anim::FoldHeavy,
         Anim::Crumple,
@@ -250,7 +212,6 @@ impl Anim {
         Anim::Curl,
         Anim::CurlHeavy,
         Anim::Heal,
-        Anim::Bump,
         Anim::TabIn,
         Anim::TabOut,
         Anim::SlideR,
@@ -291,7 +252,6 @@ impl Anim {
         Anim::PaneOutR,
         Anim::OsdIn,
         Anim::OsdOut,
-        Anim::LevelTick,
         Anim::SheetOut,
         Anim::BannerOut,
         Anim::BannerIn,
@@ -299,15 +259,12 @@ impl Anim {
         Anim::PanelOut,
         Anim::ShotIn,
         Anim::ShotOut,
-        Anim::PictureAccept,
         Anim::MorphIn,
         Anim::MorphOut,
         Anim::MorphFadeIn,
         Anim::MorphFadeOut,
         Anim::RollIn,
         Anim::RollOut,
-        Anim::SealOut,
-        Anim::NudgeUp,
         Anim::Hold,
         Anim::PaneInROut,
         Anim::MorphInSpring,
@@ -317,16 +274,8 @@ impl Anim {
     /// The utility class a pulse renders: `a-gulp`.
     pub fn class(self) -> &'static str {
         match self {
-            Anim::SealPop => "a-seal-pop",
-            Anim::Gulp => "a-gulp",
-            Anim::PopIn => "a-pop-in",
             Anim::RowIn => "a-row-in",
             Anim::Rise => "a-rise",
-            Anim::StarPop => "a-star-pop",
-            Anim::Spark => "a-spark",
-            Anim::ChipLand => "a-chip-land",
-            Anim::ChipIn => "a-chip-in",
-            Anim::ChipFlash => "a-chip-flash",
             Anim::Fold => "a-fold",
             Anim::FoldHeavy => "a-fold-heavy",
             Anim::Crumple => "a-crumple",
@@ -334,7 +283,6 @@ impl Anim {
             Anim::Curl => "a-curl",
             Anim::CurlHeavy => "a-curl-heavy",
             Anim::Heal => "a-heal",
-            Anim::Bump => "a-bump",
             Anim::TabIn => "a-tab-in",
             Anim::TabOut => "a-tab-out",
             Anim::SlideR => "a-slide-r",
@@ -375,7 +323,6 @@ impl Anim {
             Anim::PaneOutR => "a-pane-out-r",
             Anim::OsdIn => "a-osd-in",
             Anim::OsdOut => "a-osd-out",
-            Anim::LevelTick => "a-level-tick",
             Anim::SheetOut => "a-sheet-out",
             Anim::BannerOut => "a-banner-out",
             Anim::BannerIn => "a-banner-in",
@@ -383,15 +330,12 @@ impl Anim {
             Anim::PanelOut => "a-panel-out",
             Anim::ShotIn => "a-shot-in",
             Anim::ShotOut => "a-shot-out",
-            Anim::PictureAccept => "a-picture-accept",
             Anim::MorphIn => "a-morph-in",
             Anim::MorphOut => "a-morph-out",
             Anim::MorphFadeIn => "a-morph-fade-in",
             Anim::MorphFadeOut => "a-morph-fade-out",
             Anim::RollIn => "a-roll-in",
             Anim::RollOut => "a-roll-out",
-            Anim::SealOut => "a-seal-out",
-            Anim::NudgeUp => "a-nudge-up",
             Anim::Hold => "a-hold",
             Anim::PaneInROut => "a-pane-in-r-out",
             Anim::MorphInSpring => "a-morph-in-spring",

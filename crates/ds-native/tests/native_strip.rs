@@ -6,10 +6,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, Appearance, Ds, HoverStrip, Icon, ListRow, Material, Point, Presence, Px, Rect,
+    ActionId, Appearance, Ds, HoverStrip, Icon, ListRow, Material, Point, Presence, Px, Rect,
     RowState, Shown, StripAction,
 };
-use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
+use ds::{Emphasis, Selection, StaggerIndex};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -73,7 +73,6 @@ fn Page(shown: Option<Shown>, width: Width) -> Element {
                     time: "09:41",
                     tags: rsx! {},
                     star: None,
-                    star_pulse: PulseKey::rest(Anim::StarPop),
                     strip: rsx! {
                         HoverStrip {
                             actions,

@@ -1,8 +1,7 @@
 //! The level control on a real Blitz document (the user's brief of 2026-09-25):
 //! a level set from outside slides over `--t-quick --e-out`, while under the pointer the
-//! fill follows it with no easing; a press swells the track; a drag past the end stretches the
-//! capsule and it springs back on release (not under Reduced); keys step by sixteenths, Shift by
-//! sixty-fourths. Measured on the painted pixels and the laid-out rects.
+//! fill follows it with no easing; a drag past the end never stretches the track; keys step by
+//! sixteenths, Shift by sixty-fourths. Measured on the painted pixels and the laid-out rects.
 
 #[path = "support/probe.rs"]
 mod probe;
@@ -167,61 +166,9 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
     assert!(followed.abs_diff(140) <= 4, "painted {followed}");
 }
 
-/// Painted rows of the fill's colour down the column at `x`: the fill's painted height.
-fn painted_height(frame: &RgbaImage, x: u32, around: u32) -> u32 {
-    let fill = frame.get_pixel(x, around).0;
-    (around.saturating_sub(24)..around + 24)
-        .filter(|&y| distance(frame.get_pixel(x, y).0, fill) <= 2)
-        .count() as u32
-}
-
 #[test]
-fn a_press_swells_and_a_drag_past_the_end_stretches_then_springs_back() {
+fn a_drag_past_the_end_never_stretches_the_track() {
     let mut harness = start(500, Motion::Standard);
-    let rail = rect(&harness, ".ds-level-rail");
-    let middle = (rail.origin.y.0 + 11.0) as u32;
-    // On the fill (the press lands at 50 %), past the glyph: white against the card.
-    let probe_x = (rail.origin.x.0 + 60.0) as u32;
-    let rest = painted_height(&harness.render().expect("renders"), probe_x, middle);
-    let at = |x: f32| Point {
-        x: Px(x),
-        y: Px(rail.origin.y.0 + 11.0),
-    };
-    harness.pointer_down(at(rail.origin.x.0 + 100.0));
-    harness.advance(ms(300));
-    let swollen = painted_height(&harness.render().expect("renders"), probe_x, middle);
-    let right = rail.origin.x.0 + rail.size.width.0;
-    harness.pointer_move(at(right + 12.0));
-    harness.advance(ms(16));
-    let stretched = width(&harness, ".ds-level-track");
-    keep(&harness.render().expect("renders"), "level-stretched");
-    harness.pointer_up(at(right + 12.0));
-    harness.advance(ms(600));
-    let released = width(&harness, ".ds-level-track");
-    println!(
-        "height at rest {rest}, pressed {swollen}; width {} -> stretched {stretched:.1} -> released {released:.1}",
-        rail.size.width.0
-    );
-    // scaleY(1.1) on 22 px: a pixel above and below.
-    assert!(
-        swollen >= rest + 2,
-        "the press swells the track: {rest} -> {swollen}"
-    );
-    // 12 px past the end: 6 x 12 / (12 + 12) = 3 px.
-    assert!(
-        (stretched - rail.size.width.0 - 3.0).abs() <= 0.5,
-        "{stretched}"
-    );
-    assert!(
-        (released - rail.size.width.0).abs() <= 0.5,
-        "springs back: {released}"
-    );
-    assert_eq!(level(&mut harness), 1000, "the level stays at the end");
-}
-
-#[test]
-fn reduced_motion_has_no_rubber_band() {
-    let mut harness = start(500, Motion::Reduced);
     let rail = rect(&harness, ".ds-level-rail");
     let y = Px(rail.origin.y.0 + 13.0);
     harness.pointer_down(Point {

@@ -8,7 +8,6 @@ use crate::core::vocab::{RowState, Selection};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::presence::Presence;
-use crate::motion::pulse_key::PulseKey;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -73,14 +72,6 @@ impl ItemKind {
 /// `TreeItem`).
 const CLASS: &str = "ds-sidebar-item ds-drop-place";
 
-/// The class list and `data-pulse` for an item playing `pulse` (the gulp).
-fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
-    match pulse.attrs() {
-        Some((anim, alias)) => (format!("{CLASS} {anim}"), Some(alias)),
-        None => (CLASS.to_string(), None),
-    }
-}
-
 /// A place in the sidebar.
 ///
 /// Place and Pinned are buttons; Today is a `div[role=button]` because it holds its own close
@@ -89,8 +80,7 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// out (`Presence::Leaving(Exit::TabOut)` plays `tab-out`; the consumer drops it at
 /// `settle(Anim::TabOut)`, which is what `RosterState::leave` returns for that exit); the other
 /// kinds do not move.
-/// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something. `state` is the
-/// item's [`RowState`]: it reads `selection` (`aria-current`) and `drop`, the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
+/// `state` is the item's [`RowState`]: it reads `selection` (`aria-current`) and `drop`, the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
 /// `Source` while the item itself is dragged. A Today item's close button is named "Close
 /// {label}", so each row's close says whose it is; `trailing` puts a scheduled row's time and
 /// its cancel button after the label (Today only; other kinds ignore it).
@@ -109,7 +99,6 @@ pub fn SidebarItem(
     count: Option<u32>,
     presence: Presence,
     preview: Option<Preview>,
-    pulse: PulseKey,
     onclick: EventHandler<()>,
     onclose: Option<EventHandler<()>>,
     #[props(default)] trailing: Option<TodayTrailing>,
@@ -124,7 +113,6 @@ pub fn SidebarItem(
         drop,
         ..
     } = state;
-    let (class, alias) = pulse_attrs(pulse);
     let place = place.map(|PlaceId(name)| name);
     let slug = kind.slug();
     let current = here.aria_current();
@@ -134,11 +122,10 @@ pub fn SidebarItem(
         ItemKind::Place { icon } => rsx! {
             button {
                 r#type: "button",
-                class,
+                class: CLASS,
                 "data-kind": slug,
                 "aria-current": current,
                 "data-preview": preview,
-                "data-pulse": alias,
                 "data-drop": drop.drop_attr(),
                 "data-drag": drop.drag_attr(),
                 "data-place": place,
@@ -158,11 +145,10 @@ pub fn SidebarItem(
         ItemKind::Pinned { avatar } => rsx! {
             button {
                 r#type: "button",
-                class,
+                class: CLASS,
                 "data-kind": slug,
                 "aria-current": current,
                 "data-preview": preview,
-                "data-pulse": alias,
                 "data-drop": drop.drop_attr(),
                 "data-drag": drop.drag_attr(),
                 "data-place": place,
@@ -178,14 +164,13 @@ pub fn SidebarItem(
         },
         ItemKind::Today { avatar } => rsx! {
             div {
-                class,
+                class: CLASS,
                 "data-kind": slug,
                 role: "button",
                 tabindex: "0",
                 "aria-current": current,
                 "data-presence": presence.slug(),
                 "data-preview": preview,
-                "data-pulse": alias,
                 "data-drop": drop.drop_attr(),
                 "data-drag": drop.drag_attr(),
                 "data-place": place,

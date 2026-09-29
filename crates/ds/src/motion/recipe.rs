@@ -52,30 +52,6 @@ impl Anim {
     /// The canonical declaration.
     pub fn recipe(self) -> Recipe {
         match self {
-            // `S:346`.
-            Anim::SealPop => recipe(
-                "seal-pop",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:339`.
-            Anim::Gulp => recipe(
-                "gulp",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:319`.
-            Anim::PopIn => recipe(
-                "pop-in",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
             // `C:373`.
             Anim::RowIn => recipe(
                 "row-in",
@@ -92,39 +68,6 @@ impl Anim {
                 Fill::Backwards,
                 Iteration::Once,
             ),
-            // `S:304`.
-            Anim::StarPop => recipe(
-                "star-pop",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:307`.
-            Anim::Spark => recipe(
-                "spark",
-                DurationToken::Spark,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:402`.
-            Anim::ChipLand => recipe(
-                "chip-land",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:593`.
-            Anim::ChipIn => recipe(
-                "chip-in",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            Anim::ChipFlash => own::CHIP_FLASH,
             // `S:327`.
             Anim::Fold => recipe(
                 "fold",
@@ -179,14 +122,6 @@ impl Anim {
                 DurationToken::Move,
                 EasingToken::Spring,
                 Fill::Backwards,
-                Iteration::Once,
-            ),
-            // `S:341`.
-            Anim::Bump => recipe(
-                "bump",
-                DurationToken::Move,
-                EasingToken::Spring,
-                Fill::None,
                 Iteration::Once,
             ),
             // `S:350`.
@@ -425,7 +360,6 @@ impl Anim {
             Anim::PaneOutR => own::PANE_OUT_R,
             Anim::OsdIn => own::OSD_IN,
             Anim::OsdOut => own::OSD_OUT,
-            Anim::LevelTick => own::LEVEL_TICK,
             Anim::SheetOut => own::SHEET_OUT,
             Anim::BannerOut => own::BANNER_OUT,
             Anim::BannerIn => own::BANNER_IN,
@@ -433,15 +367,12 @@ impl Anim {
             Anim::PanelOut => own::PANEL_OUT,
             Anim::ShotIn => own::SHOT_IN,
             Anim::ShotOut => own::SHOT_OUT,
-            Anim::PictureAccept => own::PICTURE_ACCEPT,
             Anim::MorphIn => detail::MORPH_IN,
             Anim::MorphOut => detail::MORPH_OUT,
             Anim::MorphFadeIn => detail::MORPH_FADE_IN,
             Anim::MorphFadeOut => detail::MORPH_FADE_OUT,
             Anim::RollIn => detail::ROLL_IN,
             Anim::RollOut => detail::ROLL_OUT,
-            Anim::SealOut => detail::SEAL_OUT,
-            Anim::NudgeUp => detail::NUDGE_UP,
             Anim::Hold => own::HOLD,
             Anim::PaneInROut => detail::PANE_IN_R_OUT,
             Anim::MorphInSpring => detail::MORPH_IN_SPRING,

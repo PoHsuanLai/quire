@@ -5,8 +5,8 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, DotIndex, Ds, Fraction, Grain, HeaderKind, Icon, InputVariant, ItemKind, Material,
-    PRESETS, Presence, PulseKey, Rect, RowState, Scheme, SearchField, SectionHeader, Selection,
-    SendPhase, SendPill, SidebarItem, SpaceEditor, SpaceLook, TextInput, Theme, use_toasts,
+    PRESETS, Presence, Rect, RowState, Scheme, SearchField, SectionHeader, Selection, SendPhase,
+    SendPill, SidebarItem, SpaceEditor, SpaceLook, TextInput, Theme, use_toasts,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -234,10 +234,10 @@ fn ItemsApp() -> Element {
         Root {
             div { style: "width:220px",
                 div { class: "probe-counted",
-                    SidebarItem { state: RowState { selection: Selection::Unselected, ..RowState::default() }, kind: ItemKind::Place { icon: Icon::Inbox }, label: "Inbox", count: Some(12), presence: Presence::Present, preview: None, pulse: PulseKey::rest(ds::Anim::Gulp), onclick: |_| {}, onclose: None }
+                    SidebarItem { state: RowState { selection: Selection::Unselected, ..RowState::default() }, kind: ItemKind::Place { icon: Icon::Inbox }, label: "Inbox", count: Some(12), presence: Presence::Present, preview: None, onclick: |_| {}, onclose: None }
                 }
                 div { class: "probe-bare",
-                    SidebarItem { state: RowState { selection: Selection::Unselected, ..RowState::default() }, kind: ItemKind::Place { icon: Icon::Star }, label: "Starred", count: None, presence: Presence::Present, preview: None, pulse: PulseKey::rest(ds::Anim::Gulp), onclick: |_| {}, onclose: None }
+                    SidebarItem { state: RowState { selection: Selection::Unselected, ..RowState::default() }, kind: ItemKind::Place { icon: Icon::Star }, label: "Starred", count: None, presence: Presence::Present, preview: None, onclick: |_| {}, onclose: None }
                 }
             }
         }

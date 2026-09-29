@@ -50,7 +50,6 @@ mod tests {
             (Anim::Rise, MotionLevel::Reduced, 0),
             (Anim::Heal, MotionLevel::Standard, 18),
             (Anim::Heal, MotionLevel::Reduced, 0),
-            (Anim::PopIn, MotionLevel::Reduced, 0),
         ];
         for &(anim, level, ms) in CASES {
             assert_eq!(

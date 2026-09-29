@@ -215,11 +215,9 @@ fn the_settle_table() {
         (Anim::Rise, MotionLevel::Standard, 284),
         (Anim::HcOut, MotionLevel::Standard, 184),
         (Anim::TabOut, MotionLevel::Standard, 284),
-        (Anim::Gulp, MotionLevel::Standard, 434),
         (Anim::Floatup, MotionLevel::Standard, 934),
         (Anim::ComposeSend, MotionLevel::Standard, 654),
         (Anim::Park, MotionLevel::Standard, 454),
-        (Anim::Spark, MotionLevel::Standard, 554),
         (Anim::RowIn, MotionLevel::Standard, 434),
         (Anim::Nudge, MotionLevel::Standard, 554),
         (Anim::Shake, MotionLevel::Standard, 454),
@@ -245,8 +243,6 @@ fn the_settle_table() {
         // with the look's level but under Reduced).
         (Anim::OsdIn, MotionLevel::Standard, 184),
         (Anim::OsdOut, MotionLevel::Standard, 284),
-        // The level control's step mark, at --t-tap.
-        (Anim::LevelTick, MotionLevel::Standard, 124),
         // The sheet's exit at --t-move, which only Reduced shortens.
         (Anim::SheetOut, MotionLevel::Standard, 284),
         // The banner's exit at --t-move, which only Reduced shortens.
@@ -266,12 +262,11 @@ fn the_settle_table() {
             "{anim:?} {level:?}"
         );
     }
-    // Every anim settles to 184 ms (`--t-quick` and a frame's slack) under Reduced, except a hold (`DurationToken::kind`):
-    // `ChipFlash` times `--t-flash`, which keeps its Standard 1200 ms so the mentioned-person
-    // ring is still visible under Reduced.
+    // Every anim settles to 184 ms (`--t-quick` and a frame's slack) under Reduced, except a hold
+    // (`DurationToken::kind`): the send ring is the undo window.
     for anim in Anim::ALL
         .into_iter()
-        .filter(|anim| !matches!(anim, Anim::ChipFlash | Anim::RingDrain))
+        .filter(|anim| !matches!(anim, Anim::RingDrain))
     {
         assert_eq!(
             settle(anim, MotionLevel::Reduced, StaggerIndex::default()),
@@ -279,15 +274,6 @@ fn the_settle_table() {
             "{anim:?} Reduced"
         );
     }
-    assert_eq!(
-        settle(
-            Anim::ChipFlash,
-            MotionLevel::Reduced,
-            StaggerIndex::default()
-        ),
-        Duration::from_millis(1234),
-        "ChipFlash Reduced (a hold, unaffected by Reduced)"
-    );
     // The send ring is the undo window: a hold too.
     assert_eq!(
         settle(

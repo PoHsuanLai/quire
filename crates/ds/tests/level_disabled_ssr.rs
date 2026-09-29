@@ -126,7 +126,6 @@ fn the_stylesheet_draws_the_disabled_level_apart() {
         ".ds-level[*|aria-disabled=true]{ cursor:not-allowed; }",
         ".ds-level[*|aria-disabled=true] .ds-level-lead{ opacity:.35; }",
         ".ds-level[*|aria-disabled=true] .ds-level-knob{ display:none; }",
-        ".ds-level[*|aria-disabled=true] .ds-level-track{ transform:none; }",
         ".ds-module-panel[*|aria-disabled=true] .ds-module-panel-trailing{ opacity:.35; }",
     ];
     for rule in RULES {

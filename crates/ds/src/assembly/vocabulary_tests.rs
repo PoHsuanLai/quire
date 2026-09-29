@@ -69,10 +69,10 @@ fn the_kits_reach_the_vocabulary() {
 #[test]
 fn a_keyframes_name_and_its_alias_are_known() {
     let known = kits().vocabulary().keyframes;
-    for name in ["gulp", "gulp--b", "chip-flash"] {
+    for name in ["fade", "fade--b", "menu-out"] {
         assert!(known.contains(name), "{name}");
     }
-    for name in ["wobble", "gulp--c"] {
+    for name in ["wobble", "fade--c"] {
         assert!(!known.contains(name), "{name}");
     }
 }

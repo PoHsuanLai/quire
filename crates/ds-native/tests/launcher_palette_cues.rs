@@ -1,12 +1,11 @@
-//! On a real Blitz document: the command palette plays its rows' first-show
-//! rise from the launcher's cue (the first result set after an opening rises with a stagger; a
-//! later set replaces in place), and a group's Show More rises the added rows in downward while
-//! its Show Less heals what follows up by their height (design/26 section 5.6, section 5.4's
-//! group expand). A group growing without its action is a new result set: nothing moves.
-//! Reduced keeps the level's tokens. Every moment ends at 0 frames (R3).
+//! On a real Blitz document: the command palette replaces a result set in place, and a group's
+//! Show More brings the added rows in downward while its Show Less heals what follows up by
+//! their height (design/26 section 5.4's group expand). A group growing without its action is a
+//! new result set: nothing moves. Reduced keeps the level's tokens. Every moment ends at 0
+//! frames (R3).
 
 use dioxus::prelude::*;
-use ds::detail::{Detailed, FirstShow, Moment, Touch, use_detail};
+use ds::detail::{Detailed, Moment};
 use ds::{
     Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
     MenuTrail, Motion, PaletteGroup, PaletteGroups, ShortcutKey,
@@ -98,7 +97,6 @@ fn groups(list: List, wider: u8) -> PaletteGroups<u8> {
 #[allow(non_snake_case)]
 fn Launcher() -> Element {
     let list = LIST();
-    let detail = use_detail(list, FirstShow::Animate, Touch::Remote);
     rsx! {
         Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Sheet,
             div { style: "width:600px;height:600px",
@@ -114,7 +112,6 @@ fn Launcher() -> Element {
                     onclose: move |()| {},
                     host: CommandPaletteHost::Surface,
                     id: "card".to_string(),
-                    reveal: detail.cue(),
                 }
             }
         }
@@ -128,10 +125,6 @@ fn ms(n: u64) -> Duration {
 fn set(harness: &mut Harness, list: List) {
     harness.within(|| *LIST.write() = list);
     harness.advance(ms(20));
-}
-
-fn rising(harness: &Harness) -> usize {
-    harness.count("#card .ds-menu[*|data-reveal=play]")
 }
 
 fn rows(answer: u8) -> List {
@@ -156,22 +149,15 @@ fn run_action(harness: &mut Harness) {
 
 fn open_quietly(harness: &mut Harness) {
     set(harness, rows(1));
-    settle_until(harness, |h| rising(h) == 0);
     assert_settles_to_zero_frames(harness);
 }
 
 #[test]
-fn the_first_result_set_rises_and_a_later_one_replaces_in_place() {
+fn a_result_set_replaces_the_last_in_place() {
     let mut harness = Harness::new(Launcher, VIEW);
     harness.advance(ms(50));
-    assert_eq!(rising(&harness), 0, "nothing to rise while waiting");
     set(&mut harness, rows(1));
-    assert_eq!(
-        rising(&harness),
-        1,
-        "the first set is an Appear: the rows rise"
-    );
-    settle_until(&mut harness, |h| rising(h) == 0);
+    assert_eq!(harness.count("[*|data-row-motion]"), 0);
     assert_settles_to_zero_frames(&mut harness);
     set(&mut harness, rows(2));
     assert_eq!(
@@ -180,7 +166,6 @@ fn the_first_result_set_rises_and_a_later_one_replaces_in_place() {
             .as_deref(),
         Some("App 2.0")
     );
-    assert_eq!(rising(&harness), 0, "a later set is a Change: no stagger");
     assert_eq!(harness.count("[*|data-row-motion]"), 0);
     assert_settles_to_zero_frames(&mut harness);
 }
@@ -199,11 +184,6 @@ fn show_more_rises_the_added_rows_and_show_less_heals_by_their_height() {
     assert_eq!(
         harness.attr("[*|data-row-motion=rise]", "style").as_deref(),
         Some("--i:0")
-    );
-    assert_eq!(
-        rising(&harness),
-        0,
-        "the rows already there do not rise again"
     );
     settle_until(&mut harness, |h| h.count("[*|data-row-motion]") == 0);
     assert_settles_to_zero_frames(&mut harness);
@@ -255,11 +235,10 @@ fn a_group_growing_without_its_action_is_a_new_result_set() {
 }
 
 #[test]
-fn reduced_plays_the_rise_and_the_expand_at_its_own_tokens_and_settles() {
+fn reduced_plays_the_expand_at_its_own_tokens_and_settles() {
     let mut harness = Harness::new(Launcher, VIEW);
     harness.within(|| *MOTION.write() = Motion::Reduced);
     set(&mut harness, rows(1));
-    settle_until(&mut harness, |h| rising(h) == 0);
     assert_settles_to_zero_frames(&mut harness);
     run_action(&mut harness);
     settle_until(&mut harness, |h| h.count("[*|data-row-motion]") == 0);

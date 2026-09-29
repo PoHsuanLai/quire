@@ -1,5 +1,5 @@
-//! The level control's vocabulary: what it is for, how it looks, whether it ticks, and which
-//! glyph it carries. Every choice is a named variant (no `bool`, CONVENTIONS section 4).
+//! The level control's vocabulary: what it is for, how it looks, and which glyph it
+//! carries. Every choice is a named variant (no `bool`, CONVENTIONS section 4).
 
 use crate::components::content::status::volume::VolumeState;
 use crate::core::vocab::{Fraction, Muting};
@@ -27,17 +27,6 @@ pub enum LevelLook {
     CapsuleKnob,
     /// Sixteen rounded squares that fill in one by one, the glyph before them.
     Segments,
-}
-
-/// Whether the fill's edge marks each step it crosses.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Tick {
-    /// No mark.
-    #[default]
-    Off,
-    /// A quiet mark at the fill's edge (`Anim::LevelTick`) each time the level crosses one of
-    /// the sixteen steps. The sound, where there is one, is the shell's.
-    Quiet,
 }
 
 /// The glyph a level carries, which follows the level.

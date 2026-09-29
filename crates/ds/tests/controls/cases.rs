@@ -1,15 +1,15 @@
 //! Every control in every state, as data: the table the golden test walks.
 
 use dioxus::prelude::*;
-use ds::detail::{Deadline, Operation, PendingToken};
+use ds::detail::{Operation, PendingToken};
+use ds::{Availability, Check, Fraction, Shortcut, ShortcutKey, Shown};
 use ds::{
-    Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize,
-    ButtonVariant, Chip, ChipVariant, Colour, Common, Count, CountPlace, ExternalIcon, FieldFocus,
-    HeaderKind, Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl,
-    IconView, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
-    SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
+    Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize, ButtonVariant,
+    Chip, ChipVariant, Colour, Common, Count, CountPlace, ExternalIcon, FieldFocus, HeaderKind,
+    Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView,
+    InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
+    SegmentedControl, Slider, Spinner, Tabs, TextInput, Toggle, Verdict,
 };
-use ds::{Availability, Check, Fraction, PulseKey, Shortcut, ShortcutKey, Shown};
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {
@@ -352,11 +352,6 @@ pub const CASES: &[Case] = &[
         state: "person-removable",
         make: || rsx! { Chip { variant: ChipVariant::Person(DANA), text: "Dana Okafor", onremove: |_| {} } },
     },
-    Case {
-        component: "chip",
-        state: "pulse-rest",
-        make: || rsx! { Chip { variant: ChipVariant::Accent, text: "spec", pulse: PulseKey::rest(Anim::ChipLand) } },
-    },
     // Avatar: every tone, both shapes, the sizes with special rules.
     Case {
         component: "avatar",
@@ -441,26 +436,21 @@ pub const CASES: &[Case] = &[
         state: "zero",
         make: || rsx! { Count { value: 0 } },
     },
-    // Spinner: both kinds.
+    // Spinner.
     Case {
         component: "spinner",
         state: "spin",
-        make: || rsx! { Spinner { kind: SpinnerKind::Spin, operation: running() } },
-    },
-    Case {
-        component: "spinner",
-        state: "breathe",
-        make: || rsx! { Spinner { kind: SpinnerKind::Breathe, operation: running() } },
+        make: || rsx! { Spinner { operation: running() } },
     },
 ];
 
-/// An operation that has just started: a spinner's first frame is its grace, so it draws idle.
+/// An operation that has just started: a spinner's first frame is drawn before its timer runs, so
+/// it draws idle.
 fn running() -> Operation {
-    Operation::Running(PendingToken::start(Deadline::cap()))
+    Operation::Running(PendingToken::start())
 }
 
-/// Cases driven by the motion module: the slider's drag tracker and the pulse classes. The
-/// count's bump needs a second render, so it is `components_controls::a_count_bumps_on_change`.
+/// Cases driven by the motion module: the slider's drag tracker.
 pub const MOTION_CASES: &[Case] = &[
     Case {
         component: "slider",
@@ -486,15 +476,5 @@ pub const MOTION_CASES: &[Case] = &[
         component: "slider",
         state: "disabled",
         make: || rsx! { Slider { label: "Brightness", value: Fraction(500), availability: Availability::Disabled, onchange: |_| {} } },
-    },
-    Case {
-        component: "chip",
-        state: "landing",
-        make: || rsx! { Chip { variant: ChipVariant::Label(LabelHue::Amber), text: "rust", pulse: PulseKey::rest(Anim::ChipLand).fired() } },
-    },
-    Case {
-        component: "chip",
-        state: "person-flash",
-        make: || rsx! { Chip { variant: ChipVariant::Person(DANA), text: "Dana Okafor", pulse: PulseKey::rest(Anim::ChipFlash).fired() } },
     },
 ];

@@ -72,12 +72,6 @@ impl<T: Timeline> Playback<T> {
             .map_or(Duration::ZERO, |run| clock::since(run.started))
     }
 
-    /// Which run this is: every [`Self::play`] is a new one, so a reader can tell a move it
-    /// armed for from an earlier one.
-    pub(crate) fn serial(self) -> u32 {
-        self.run.try_peek().map_or(0, |run| run.serial)
-    }
-
     /// Play `timeline` from its start; a run already going stops where it is. Call from an
     /// effect or a handler.
     pub fn play(self, timeline: T) {

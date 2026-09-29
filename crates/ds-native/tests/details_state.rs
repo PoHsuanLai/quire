@@ -1,18 +1,17 @@
-//! design/26 D0b on a real Blitz document: a pending loop waits out its grace, steps, holds its
-//! still frame at its deadline and ends at 0 frames; a success check draws and rests; a failure
-//! shakes once per stamp and never for the same stamp; attention nudges once; Reduced plays no
-//! loop and no shake (R3, R4, R6, R7).
+//! design/26 D0b on a real Blitz document: a pending loop spins at once, a step every
+//! `--t-spin-step`, for as long as its operation runs and goes quiet the moment it ends; a
+//! failure shakes once per stamp and never for the same stamp; Reduced keeps the loop turning and
+//! plays no shake (R3, R4, R6, R7).
 
 use dioxus::prelude::*;
 use ds::detail::{
-    Deadline, Detailed, EventStamp, FirstShow, Moment, Operation, PendingLayers, PendingSpec,
-    PendingStyle, PendingToken, SettleStyle, Settling, Touch, use_detail, use_nudge, use_pending,
-    use_settle, use_shake,
+    Detailed, EventStamp, Moment, Operation, PendingLayers, PendingSpec, PendingStyle,
+    PendingToken, Touch, use_detail, use_pending, use_shake,
 };
 use ds::{Appearance, Ds, Material, Motion};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 240,
@@ -24,29 +23,19 @@ const VIEW: Viewport = Viewport {
 #[derive(Debug, Clone, PartialEq)]
 enum Net {
     Off,
-    Joining,
-    Joined,
     Failed(EventStamp),
-    Asking(EventStamp),
 }
 
 impl Detailed for Net {
     fn moment(from: &Self, to: &Self) -> Moment {
         match (from, to) {
-            (_, Net::Joining) => Moment::Pending,
-            (Net::Joining, Net::Joined) => Moment::Success,
-            (Net::Off | Net::Joined | Net::Failed(_) | Net::Asking(_), Net::Joined) => {
-                Moment::Change
-            }
             (_, Net::Failed(_)) => Moment::Failure,
-            (_, Net::Asking(_)) => Moment::Attention,
             (_, Net::Off) => Moment::Unavailable,
         }
     }
     fn first(state: &Self) -> Moment {
         match state {
-            Net::Joining => Moment::Pending,
-            Net::Off | Net::Joined | Net::Failed(_) | Net::Asking(_) => Moment::Rest,
+            Net::Off | Net::Failed(_) => Moment::Rest,
         }
     }
 }
@@ -72,20 +61,12 @@ fn Item() -> Element {
 #[allow(non_snake_case)]
 #[component]
 fn ItemBody() -> Element {
-    let detail = use_detail(NET(), FirstShow::Still, Touch::Remote);
+    let detail = use_detail(NET(), Touch::Remote);
     let frame = use_pending(OP(), WIFI);
-    let settling = use_settle(detail.cue(), SettleStyle::Check);
     let shake = use_shake(detail.cue()).attrs();
-    let nudge = use_nudge(detail.cue()).attrs();
-    let settle_word = match settling {
-        Settling::Drawing(drawn) => format!("check {}", drawn.0),
-        other => other.slug().to_owned(),
-    };
     rsx! {
         div { id: "frame", "{frame:?}" }
-        div { id: "settle", "{settle_word}" }
         div { id: "shake", class: shake.as_ref().map(|(class, _)| class.clone()), "data-pulse": shake.map(|(_, alias)| alias) }
-        div { id: "nudge", class: nudge.as_ref().map(|(class, _)| class.clone()), "data-pulse": nudge.map(|(_, alias)| alias) }
     }
 }
 
@@ -97,34 +78,22 @@ fn set(harness: &mut Harness, net: Net) {
     harness.within(|| *NET.write() = net);
 }
 
-fn start(harness: &mut Harness, deadline: Deadline) -> Instant {
-    harness.within(|| *OP.write() = Operation::Running(PendingToken::start(deadline)));
-    harness.now()
+fn start(harness: &mut Harness) {
+    harness.within(|| *OP.write() = Operation::Running(PendingToken::start()));
 }
 
 #[test]
-fn a_pending_loop_waits_steps_holds_and_goes_quiet() {
+fn a_pending_loop_spins_at_once_steps_until_it_ends_and_goes_quiet() {
     let mut harness =
         Harness::with_config(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    let asked = start(&mut harness, Deadline::within(Duration::from_millis(1600)));
-    harness.advance(Duration::from_millis(100));
-    if harness.now().duration_since(asked) <= Duration::from_millis(200) {
-        assert_eq!(frame(&harness), "Idle", "nothing shows inside the grace");
-    }
-    let shown = settle_until(&mut harness, |h| frame(h).starts_with("Step"));
-    assert!(shown.duration_since(asked) >= Duration::from_millis(400));
-    let first = frame(&harness);
-    settle_until(&mut harness, |h| {
-        frame(h).starts_with("Step") && frame(h) != first
-    });
-    let held = settle_until(&mut harness, |h| frame(h) == "Stalled");
-    assert!(held.duration_since(asked) >= Duration::from_millis(1600));
-    assert_settles_to_zero_frames(&mut harness);
-    assert_eq!(
-        frame(&harness),
-        "Stalled",
-        "it holds still while the operation runs"
-    );
+    start(&mut harness);
+    harness.advance(Duration::from_millis(0));
+    assert_eq!(frame(&harness), "Step(0)", "no grace: it shows at once");
+    harness.advance(Duration::from_millis(83));
+    assert_eq!(frame(&harness), "Step(1)");
+    // It goes round a turn a second, and keeps going: there is no cap.
+    harness.advance(Duration::from_millis(30_000));
+    assert!(frame(&harness).starts_with("Step"), "{}", frame(&harness));
     harness.within(|| *OP.write() = Operation::Idle);
     harness.advance(Duration::from_millis(20));
     assert_eq!(frame(&harness), "Idle", "the moment it ends, it is gone");
@@ -132,46 +101,15 @@ fn a_pending_loop_waits_steps_holds_and_goes_quiet() {
 }
 
 #[test]
-fn a_fast_operation_shows_no_loop_at_all() {
+fn reduced_keeps_the_loop_turning() {
     let mut harness =
         Harness::with_config(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    let asked = start(&mut harness, Deadline::cap());
-    harness.advance(Duration::from_millis(100));
-    harness.within(|| *OP.write() = Operation::Idle);
-    if harness.now().duration_since(asked) < Duration::from_millis(400) {
-        harness.advance(Duration::from_millis(600));
-        assert_eq!(frame(&harness), "Idle");
-    }
-    assert_settles_to_zero_frames(&mut harness);
-}
-
-#[test]
-fn reduced_holds_the_still_frame_after_the_grace() {
-    let mut harness = Harness::new(Item, VIEW);
     harness.within(|| *MOTION.write() = Motion::Reduced);
-    start(&mut harness, Deadline::cap());
-    settle_until(&mut harness, |h| frame(h) != "Idle");
-    assert_eq!(frame(&harness), "Stalled");
-    assert_settles_to_zero_frames(&mut harness);
-}
-
-#[test]
-fn a_success_draws_its_check_holds_and_rests() {
-    let mut harness = Harness::new(Item, VIEW);
-    set(&mut harness, Net::Joining);
-    harness.advance(Duration::from_millis(20));
-    set(&mut harness, Net::Joined);
-    settle_until(&mut harness, |h| {
-        h.text_of("#settle")
-            .is_some_and(|word| word.starts_with("check") && word != "check 1000")
-    });
-    settle_until(&mut harness, |h| {
-        h.text_of("#settle").as_deref() == Some("check 1000")
-    });
-    settle_until(&mut harness, |h| {
-        h.text_of("#settle").as_deref() == Some("rest")
-    });
-    assert_settles_to_zero_frames(&mut harness);
+    start(&mut harness);
+    harness.advance(Duration::from_millis(0));
+    let first = frame(&harness);
+    harness.advance(Duration::from_millis(166));
+    assert!(frame(&harness).starts_with("Step") && frame(&harness) != first);
 }
 
 fn shaking(harness: &Harness) -> bool {
@@ -198,15 +136,6 @@ fn a_failure_shakes_once_per_stamp_and_never_escalates() {
     );
     assert_settles_to_zero_frames(&mut harness);
     assert!(!shaking(&harness));
-}
-
-#[test]
-fn attention_nudges_once() {
-    let mut harness = Harness::new(Item, VIEW);
-    set(&mut harness, Net::Asking(EventStamp(7)));
-    settle_until(&mut harness, |h| h.has_class("#nudge", "a-nudge-up"));
-    settle_until(&mut harness, |h| !h.has_class("#nudge", "a-nudge-up"));
-    assert_settles_to_zero_frames(&mut harness);
 }
 
 #[test]

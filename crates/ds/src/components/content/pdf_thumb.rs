@@ -6,15 +6,13 @@
 //! which takes a path, rasterises off the UI thread and caches, and feeds this component. The
 //! page is a paper sheet (`--foreign-ground`, white in both schemes) with a hairline edge, fitted
 //! into `size` at the page's own aspect and centred ([`sheet_rect`]). While the page is being read
-//! nothing shows until [`PDF_THUMB_GRACE`] has passed, so a fast read never flashes a
-//! placeholder; after it, the dimmed blank sheet (the pending look's still frame). A document
+//! the blank sheet shows dimmed. A document
 //! with no pages is a blank sheet; one that cannot be read, or is locked, is a file-type glyph on
 //! an app-icon plate.
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::image_source::{ImageSize, ImageSource};
-use crate::components::content::pdf_thumb_grace::{Grace, Reading, use_grace};
 use crate::components::content::picture_fit::picture_style;
 use crate::core::geometry::units::{Point, Px, Rect, Size};
 use crate::core::word::Word;
@@ -22,13 +20,6 @@ use crate::style::icon::Icon;
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::render::{IconPx, IconSize};
 use dioxus::prelude::*;
-use std::time::Duration;
-
-/// How long a page may take to arrive before the pending look shows: design/26's
-/// `PendingGrace` (400 ms, Rust-only, not following the motion level: it measures the read, not
-/// motion). The read is played on `ds::detail`'s pending primitive (`use_pending`) with this as
-/// its token's deadline, so the look holds still from the grace on and never steps.
-pub const PDF_THUMB_GRACE: Duration = Duration::from_millis(400);
 
 /// A sheet whose page is not known yet (loading, or no pages): A4 portrait, in points.
 pub const PDF_DEFAULT_SHEET: ImageSize = ImageSize {
@@ -39,7 +30,7 @@ pub const PDF_DEFAULT_SHEET: ImageSize = ImageSize {
 /// What a thumbnail shows.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum PdfPage {
-    /// Being read: nothing, then the pending look once [`PDF_THUMB_GRACE`] has passed.
+    /// Being read: the blank sheet, dimmed.
     #[default]
     Loading,
     /// The first page, rasterised.
@@ -76,14 +67,13 @@ impl PdfTrouble {
 }
 
 impl PdfPage {
-    /// The `data-state` word, the grace deciding between `loading` and `pending`.
-    fn slug(&self, grace: Grace) -> &'static str {
-        match (self, grace) {
-            (PdfPage::Loading, Grace::Within) => "loading",
-            (PdfPage::Loading, Grace::Over) => "pending",
-            (PdfPage::Ready { .. }, _) => "ready",
-            (PdfPage::Empty, _) => "empty",
-            (PdfPage::Failed(_), _) => "failed",
+    /// The `data-state` word.
+    fn slug(&self) -> &'static str {
+        match self {
+            PdfPage::Loading => "pending",
+            PdfPage::Ready { .. } => "ready",
+            PdfPage::Empty => "empty",
+            PdfPage::Failed(_) => "failed",
         }
     }
 
@@ -100,12 +90,7 @@ impl PdfPage {
 /// screen reader reads for it (the file's name, say); "PDF preview" by default.
 #[component]
 pub fn PdfThumb(page: PdfPage, size: Size, #[props(default)] label: Option<String>) -> Element {
-    let reading = match page {
-        PdfPage::Loading => Reading::Yes,
-        PdfPage::Ready { .. } | PdfPage::Empty | PdfPage::Failed(_) => Reading::No,
-    };
-    let grace = use_grace(reading);
-    let state = page.slug(grace);
+    let state = page.slug();
     let room = format!("width:{}px;height:{}px", size.width.0, size.height.0);
     let label = match (&page, label) {
         (PdfPage::Failed(trouble), None) => trouble.label().to_owned(),

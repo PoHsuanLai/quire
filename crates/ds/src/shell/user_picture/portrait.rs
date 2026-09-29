@@ -1,13 +1,11 @@
-//! Drawing a [`UserPicture`]: one wrapper (`div.ds-user-picture`, which plays the accept beat)
-//! around a face, a photo or an animated emoji. [`UserPortrait`] is the public form; the lock and
-//! polkit prompts draw through [`Drawn`] at their own sizes.
+//! Drawing a [`UserPicture`]: one wrapper (`div.ds-user-picture`) around a face, a photo or an
+//! animated emoji. [`UserPortrait`] is the public form; the lock and polkit prompts draw through
+//! [`Drawn`] at their own sizes.
 
-use super::accept::use_accept;
 use super::mood::{Mood, PictureSize};
 use super::picture::UserPicture;
 use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::content::image_source::ImageSource;
-use crate::components::controls::bump_on::bump_attrs;
 use crate::core::word::Word;
 use crate::motion::wake::WakeStamp;
 use crate::shell::emoji::AnimatedEmoji;
@@ -48,12 +46,11 @@ pub(crate) struct Liveliness {
     pub(crate) wake: WakeStamp,
 }
 
-/// `picture` at `sizes`, in the wrapper that plays the accept beat when `life` turns Happy.
+/// `picture` at `sizes`, in its wrapper.
 #[component]
 pub(crate) fn Drawn(picture: UserPicture, sizes: Sizes, life: Liveliness) -> Element {
-    let (class, alias) = bump_attrs("ds-user-picture", use_accept(life.mood));
     rsx! {
-        div { class, "data-pulse": alias, "data-mood": life.mood.slug(),
+        div { class: "ds-user-picture", "data-mood": life.mood.slug(),
             {body(picture, sizes, life)}
         }
     }

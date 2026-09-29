@@ -44,10 +44,8 @@ impl Anim {
         use crate::motion::reduced::ReducedForm::{CrossFade, Same, Still};
         use FadeWay::{In, Out};
         match self {
-            Anim::PopIn
-            | Anim::RowIn
+            Anim::RowIn
             | Anim::Rise
-            | Anim::ChipIn
             | Anim::TabIn
             | Anim::SlideR
             | Anim::SlideL
@@ -86,7 +84,6 @@ impl Anim {
             | Anim::ComposeSend
             | Anim::Floatup
             | Anim::Sail
-            | Anim::Spark
             | Anim::PaneOutL
             | Anim::PaneOutR
             | Anim::OsdOut
@@ -97,29 +94,16 @@ impl Anim {
             | Anim::MorphOut
             | Anim::RollOut
             | Anim::WidgetOut => CrossFade(Out),
-            Anim::SealPop
-            | Anim::Gulp
-            | Anim::StarPop
-            | Anim::ChipLand
-            | Anim::Heal
-            | Anim::Bump
-            | Anim::ShakeX
-            | Anim::Nudge
-            | Anim::Shake
-            | Anim::Breathe
-            | Anim::Spin
-            | Anim::PictureAccept
-            | Anim::SealOut
-            | Anim::NudgeUp => Still,
-            Anim::ChipFlash
-            | Anim::MenuOut
+            Anim::Heal | Anim::ShakeX | Anim::Nudge | Anim::Shake | Anim::Breathe | Anim::Spin => {
+                Still
+            }
+            Anim::MenuOut
             | Anim::Fade
             | Anim::PaletteFade
             | Anim::Dest
             | Anim::RingDrain
             | Anim::FadeIn
             | Anim::Busy
-            | Anim::LevelTick
             | Anim::MorphFadeIn
             | Anim::MorphFadeOut
             | Anim::Hold => Same,
