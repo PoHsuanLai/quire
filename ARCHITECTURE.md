@@ -17,7 +17,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 
 | Crate | Purpose |
 | --- | --- |
-| `ds-core-derive` | proc macro: `#[derive(Word)]` |
+| `ds-core-derive` | proc macros: `#[derive(Word)]`, `#[derive(Token)]` |
 | `ds-core` | pure base: vocabulary, geometry units, colour, time, the `Spawner` trait, errors, text clip, PNG/base64, the `Word` trait |
 | `ds-style` | appearance, tokens and the `Token` trait, material, Space palettes, fonts (bytes), icons, CSS emission, the `Kit` seam |
 | `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar |
@@ -290,6 +290,11 @@ pub trait Token: Word {
 }
 pub struct TokenSet { ... }
 impl TokenSet { pub const fn of<T: Token>() -> TokenSet; }
+// #[derive(Word, Token)] is the only way to write a token family: the enum-level
+// #[token(prefix = "dur-", kind = fixed | tuned)] and per-variant values
+// #[token(value = "90ms")] or #[token(calm = "..", standard = "..", extra = "..", reduced = "..")]
+// or #[token(light = "..", dark = "..")] generate `var`, `css_value` and the `TokenSet`, so a
+// token cannot reach CSS without also reaching the linter's vocabulary.
 
 // ds-style::kit
 pub struct Section { pub name: &'static str, pub css: fn() -> std::borrow::Cow<'static, str> }
@@ -708,8 +713,10 @@ path each, until step 12 replaces them with the prelude.
 2. **`Word`**: `ds-core-derive`, `ds_core::word` in-crate, then convert the 111 hand-written
    `slug`s in batches by module; `SchemaVariants` and `schema/foreign.rs` go with the settings
    derive (step 6).
-3. **`Token`, `TokenSet`, `Kit`, `Kits`**: shell metric tokens move to `shell/tokens/`, the
-   stylesheet and `lint::registry` read `Kits`; `lint` stops naming `motion`.
+3. **`Token`, `TokenSet`, `Kit`, `Kits`**: `#[derive(Token)]` in `ds-core-derive`; every token
+   family converted to it (the hand-written `var`/`css` fns and hand-kept lint lists go); shell
+   metric tokens move to `shell/tokens/`, the stylesheet and `lint::registry` read `Kits`;
+   `lint` stops naming `motion`.
 4. **`Presence`, `Timeline`, `Shown`**: one `Presence` and `use_presence`, delete `osd_phase`,
    `shown_phase`, `ListPresence`; one `use_timeline` with the six implementors; `Shown` to core;
    `idle_dim` driver into `shell/`; `shot_frame` split; one battery drawing.
