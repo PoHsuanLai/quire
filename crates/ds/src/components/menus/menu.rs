@@ -33,7 +33,7 @@ use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::motion::presence::Presence;
 use crate::motion::timer::use_motion_timer;
-use crate::overlay::menu_track::types::MenuTiming;
+use crate::stack::menu_track::types::MenuTiming;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 

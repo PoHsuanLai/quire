@@ -2,7 +2,7 @@
 //! sill's `bar/menu_track/tests.rs`).
 
 use crate::core::geometry::units::{Point, Px};
-use crate::overlay::menu_track::{
+use crate::stack::menu_track::{
     triangle::{inside, shielded},
     types::{
         Branch, ItemPath, MenuAnim, MenuDirection, MenuHold, MenuKey, MenuPhase, MenuTarget,

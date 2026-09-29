@@ -8,9 +8,7 @@ use crate::components::fields::{
     text_input::{InputVariant, TextInput},
     text_input_focus::FieldFocus,
 };
-use crate::components::overlays::popover::{
-    Dismiss, Stacking, escape_closes, position_style, use_float,
-};
+use crate::components::overlays::popover::{Stacking, escape_closes, position_style, use_float};
 use crate::core::geometry::{
     placement::{Align, Placement, Side},
     units::{Px, Rect},
@@ -18,6 +16,7 @@ use crate::core::geometry::{
 use crate::core::vocab::Switch;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
+use crate::stack::layer_stack::Dismiss;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 

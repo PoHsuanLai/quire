@@ -14,10 +14,8 @@
 //! written by [`crate::OsdMetrics::style_attr`] on any element around it); a host sizes its
 //! surface to the card, its margins and the material's shadow, anchored to that edge.
 
-use crate::components::controls::level::{
-    control::LevelControl,
-    vocab::{LevelGlyph, LevelLook, LevelMode},
-};
+use crate::components::content::level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode};
+use crate::components::controls::level::control::LevelControl;
 use crate::components::overlays::shown_phase::use_shown_phase;
 use crate::components::overlays::tooltip::Shown;
 use crate::core::vocab::Fraction;

@@ -17,8 +17,8 @@ use crate::host::measure::client_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
 use crate::motion::anim::Anim;
 use crate::motion::timer::use_motion_timer;
-use crate::overlay::host::{OverlayId, Overlays, use_overlays};
-use crate::overlay::stack::{Dismissal, LayerId, LayerStack};
+use crate::stack::host::{OverlayId, Overlays, use_overlays};
+use crate::stack::layer_stack::{Dismiss, Dismissal, LayerId, LayerStack};
 use crate::style::tokens::layer::ZLayer;
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
@@ -54,18 +54,6 @@ impl Elevation {
             Elevation::Sheet => ZLayer::Palette,
         }
     }
-}
-
-/// What closes a popover.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Dismiss {
-    /// Escape, or a click outside.
-    #[default]
-    EscAndOutside,
-    /// Escape only.
-    EscOnly,
-    /// Only its owner.
-    None,
 }
 
 /// Whether a floating surface joins the layer stack: hover cards and tooltips never take

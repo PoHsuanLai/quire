@@ -3,8 +3,8 @@
 //! [`focused_out`]: the app hears `on_focus`, the IME is switched and pointed, and the surface
 //! is the IME's target while it has the keyboard (FINDINGS "Edit surface").
 
-use crate::components::fields::edit_surface_ctx::SurfaceCtx;
-use crate::components::fields::edit_surface_state::write_soon;
+use crate::components::editor::ctx::SurfaceCtx;
+use crate::components::editor::state::write_soon;
 use crate::core::geometry::units::Rect;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::edit::composition::settle;

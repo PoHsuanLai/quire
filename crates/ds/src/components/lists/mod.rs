@@ -2,9 +2,12 @@
 //! headers and settings rows.
 
 pub(crate) mod animated_list;
+pub(crate) mod appearance_picker;
+pub(crate) mod emoji_grid;
 pub(crate) mod leaving_list;
 pub(crate) mod leaving_row;
 pub(crate) mod list_row;
+pub(crate) mod preview;
 pub(crate) mod row_battery;
 pub(crate) mod row_click;
 pub(crate) mod row_hooks;

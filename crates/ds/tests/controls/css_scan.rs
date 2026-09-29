@@ -81,7 +81,7 @@ pub const STYLES: &[(&str, &[&str])] = &[
     ),
     (
         "edit_surface",
-        &[include_str!("../../src/components/fields/edit_surface.css")],
+        &[include_str!("../../src/components/editor/surface.css")],
     ),
     (
         "spinner",

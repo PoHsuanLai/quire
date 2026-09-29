@@ -1040,7 +1040,7 @@ missing `Surface`, an icon at the wrong `IconSize`).
 Three pure pieces a shell needs beside the components, and the generic settings file API they
 sit on.
 
-**Menu tracking** (`ds::MenuTrack<K>`, `crates/ds/src/overlay/menu_track.rs`; design/13
+**Menu tracking** (`ds::MenuTrack<K>`, `crates/ds/src/stack/menu_track.rs`; design/13
 §13.3.2-13.5). One machine drives bar menus and every ds `Menu`: open on press, click mode,
 press-drag-release, hover switch between open menus, the submenu delay and the safe triangle.
 `K` is your menu key (a bar title id). Feed it events with the time; perform what it returns,

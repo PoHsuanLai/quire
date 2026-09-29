@@ -21,10 +21,10 @@ pub mod icon;
 #[cfg(feature = "lint")]
 pub mod lint;
 pub mod motion;
-mod overlay;
 mod root;
 mod shell;
 mod spell;
+mod stack;
 mod style;
 pub mod time;
 pub mod widget;
@@ -57,14 +57,11 @@ pub use crate::components::{
             Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue,
             person_hue,
         },
-        emoji_grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid},
         icon_source::{ExternalIcon, IconSource},
         icon_view::IconView,
         image_source::{ImageSize, ImageSource},
-        pane_switcher::PaneSwitcher,
+        level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick},
         pdf_thumb::{PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble},
-        preview_content::{PANE_MEDIA, PaneContent, PaneMono},
-        preview_pane::{PaneAction, PreviewPane},
         provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark},
         rich_text::{Rich, RichRun, RichText},
         status::{
@@ -80,7 +77,6 @@ pub use crate::components::{
         text_runs::{RunTone, TextLine, TextRun},
     },
     controls::{
-        appearance_picker::{AppearancePicker, PickerLayout},
         bump_on::Bumped,
         button::{Button, ButtonVariant},
         button_face::{ButtonFace, Leading, Trailing},
@@ -89,10 +85,7 @@ pub use crate::components::{
         count::{Count, CountPlace},
         icon_button::{IconButton, IconButtonVariant},
         kbd::{Kbd, KbdSize},
-        level::{
-            control::LevelControl,
-            vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick},
-        },
+        level::control::LevelControl,
         pass_through::{DataAttr, DataName, ExtraClass, PassThroughError},
         press::Propagation,
         segmented::{SegSize, SegmentedControl},
@@ -101,9 +94,8 @@ pub use crate::components::{
         tabs::Tabs,
         toggle::Toggle,
     },
+    editor::{spell_menu::SpellMarks, surface::EditSurface},
     fields::{
-        edit_surface::EditSurface,
-        edit_surface_spell_menu::SpellMarks,
         search_field::SearchField,
         selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble},
         text_input::{InputVariant, TextInput},
@@ -112,8 +104,15 @@ pub use crate::components::{
     },
     lists::{
         animated_list::AnimatedList,
+        appearance_picker::{AppearancePicker, PickerLayout},
+        emoji_grid::grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid},
         leaving_list::{LeavingItem, LeavingList},
         list_row::ListRow,
+        preview::{
+            content::{PANE_MEDIA, PaneContent, PaneMono},
+            pane::{PaneAction, PreviewPane},
+            switcher::PaneSwitcher,
+        },
         row_hooks::PartHooks,
         section_header::{HeaderKind, SectionHeader},
         settings_row::SettingsRow,
@@ -151,7 +150,7 @@ pub use crate::components::{
             target::{HoverTarget, TargetElement},
         },
         panel::{Panel, PanelEdge, PanelScrim},
-        popover::{Dismiss, Elevation, Popover},
+        popover::{Elevation, Popover},
         scrim::Scrim,
         scrim_strength::ScrimStrength,
         sheet::Sheet,
@@ -223,17 +222,6 @@ pub use crate::motion::{
     timer::{TimerPhase, use_motion_timer},
     use_roster::{Roster, use_roster},
     wake::WakeStamp,
-};
-pub use crate::overlay::{
-    host::{OverlayId, use_overlays},
-    hover_hub::{HoverKey, HoverKind, use_hover_hub},
-    menu_track::types::{
-        ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
-        MenuTrackEffect, MenuTrackEvent,
-    },
-    pull_tab::{Pull, PullTab, TabArm},
-    stack::{Dismissal, LayerId, LayerStack},
-    toast_hub::{ToastState, UndoToken, use_toast_hub},
 };
 pub use crate::root::{
     chrome::{FrameTint, Ground, RootChrome},
@@ -336,6 +324,17 @@ pub use crate::spell::{
     lang::{Lang, Spell},
     marks::SpellReplace,
     words::WordSpan,
+};
+pub use crate::stack::{
+    host::{OverlayId, use_overlays},
+    hover_hub::{HoverKey, HoverKind, use_hover_hub},
+    layer_stack::{Dismiss, Dismissal, LayerId, LayerStack},
+    menu_track::types::{
+        ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
+        MenuTrackEffect, MenuTrackEvent,
+    },
+    pull_tab::{Pull, PullTab, TabArm},
+    toast_hub::{ToastState, UndoToken, use_toast_hub},
 };
 pub use crate::style::{
     appearance::{

@@ -1,7 +1,7 @@
 //! A key on an [`EditSurface`](crate::EditSurface): nothing while the IME composes (it owns the
 //! keys), else end a cleared composition, then hand over what the key means.
 
-use crate::components::fields::edit_surface_ctx::SurfaceCtx;
+use crate::components::editor::ctx::SurfaceCtx;
 use crate::edit::composition::{Composing, settle};
 use crate::edit::input::EditInput;
 use crate::edit::keys::{KeyAction, classify};

@@ -82,7 +82,7 @@ fn choice_count<T>(entries: &[MenuEntry<T>]) -> usize {
 #[cfg(test)]
 mod tests {
     use super::{GroupResize, Resize, resized};
-    use crate::components::content::emoji_grid::{EMOJI_CELL, EmojiCells};
+    use crate::components::lists::emoji_grid::grid::{EMOJI_CELL, EmojiCells};
     use crate::components::menus::menu_entry::{MenuEntry, MenuTrail};
     use crate::components::menus::palette::palette_group::{GroupEntries, GroupsKey};
     use crate::core::vocab::Availability;

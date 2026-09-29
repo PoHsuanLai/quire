@@ -1,7 +1,7 @@
 //! What every handler of an [`EditSurface`](crate::EditSurface) works with: its memory, the
 //! host, and the app's handlers. One value, cloned into each closure.
 
-use crate::components::fields::edit_surface_state::SurfaceState;
+use crate::components::editor::state::SurfaceState;
 use crate::edit::host::HostEdit;
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{EditFocus, EditPointer};

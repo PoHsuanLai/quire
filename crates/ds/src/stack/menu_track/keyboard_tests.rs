@@ -1,7 +1,7 @@
 //! The two keyboard events a ds `Menu` feeds (`Select`, `Expand`) and the tracker that starts
 //! open (`MenuTrack::open`), where the Menu's submenus are driven by this machine.
 
-use crate::overlay::menu_track::types::{
+use crate::stack::menu_track::types::{
     ItemPath, MenuHold, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent,
     Submenu,
 };

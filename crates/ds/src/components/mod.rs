@@ -5,6 +5,7 @@ pub(crate) mod app;
 pub(crate) mod chrome;
 pub(crate) mod content;
 pub(crate) mod controls;
+pub(crate) mod editor;
 pub(crate) mod fields;
 pub(crate) mod lists;
 pub(crate) mod menus;

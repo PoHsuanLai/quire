@@ -14,7 +14,7 @@ use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::core::vocab::Availability;
 use crate::host::measure::MountedRef;
 use crate::host::measure::client_rect;
-use crate::overlay::menu_track::types::{
+use crate::stack::menu_track::types::{
     Branch, ItemPath, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
     MenuTrackEvent, Pickable, Submenu,
 };

@@ -4,7 +4,7 @@
 //! `Vec<(String, Vec<MenuEntry<T>>)>`: every call site written before groups had actions still
 //! compiles as it was.
 
-use crate::components::content::emoji_grid::EmojiCells;
+use crate::components::lists::emoji_grid::grid::EmojiCells;
 use crate::components::menus::menu_entry::MenuEntry;
 use dioxus::prelude::*;
 

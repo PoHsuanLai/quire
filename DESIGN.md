@@ -9,7 +9,7 @@ back. Paths are under `crates/ds/src/` unless another crate is named.
 colour, PNG and base64), `style/` (appearance, tokens, materials, Space palettes, fonts, icons,
 the stylesheet's sections, the scope a component draws in), `motion/` (animation data, timers,
 machines, the keyframes, and `motion/detail/`), `lint/`, then the host seams (`host/`, `focus/`,
-`edit/`, `file_drop/`, `spell/`, `window/`), `overlay/`, `root/` and `components/`, then
+`edit/`, `file_drop/`, `spell/`, `window/`), `stack/`, `root/` and `components/`, then
 `shell/` (the shell surfaces' parts, the widgets and their catalog), and `assembly/` on top (the
 stylesheet's order, the one registration of every component sheet, and `Ds`). `lib.rs` and the
 public module files (`detail.rs`, `icon.rs`, `time.rs`, `widget.rs`, `catalog.rs`) name the
@@ -77,9 +77,9 @@ public surface, one path per item.
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |
 | `host/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds); with none, the read's poll is guarded (`core/guarded.rs`) so a held document is `Busy`, not a panic (FINDINGS "Bar gaps") |
-| `overlay/{host,stack}.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
-| `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
-| `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
+| `stack/{host,layer_stack}.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
+| `stack/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
+| `stack/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
 | `assembly/ds.rs`, `root/surface.rs`, `style/scope.rs` | `Surface` overrides material and, optionally, scheme, accent, blur and ground; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
 | `root/chrome.rs` | 21-SPACES §3, §5; 03-COLOR §17.1: `RootChrome::{Painted, Transparent}` (a Popover, Sheet or Toast root hosts cards and paints nothing), `FrameTint::{Opaque, Tinted, None}` (the window's loose layers; the bar, dock, popover panel, OSD and widget's `.ds-frame` group at the tint alpha), `Ground::{Paper, Frame}` (the bar and dock draw on the frame); each derived from the material with an override prop (FINDINGS "Bar gaps") |
 | `core/text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |

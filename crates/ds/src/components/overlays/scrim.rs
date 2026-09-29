@@ -2,8 +2,9 @@
 //! section 24).
 
 use crate::components::overlays::flow::Flow;
-use crate::components::overlays::popover::{Dismiss, Stacking, use_float};
+use crate::components::overlays::popover::{Stacking, use_float};
 use crate::components::overlays::scrim_strength::ScrimStrength;
+use crate::stack::layer_stack::Dismiss;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 

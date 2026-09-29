@@ -8,10 +8,10 @@
 //! a few pixels (the rubber band, off under Reduced) and it springs back on release. Keys step by
 //! a sixteenth, Shift by a sixty-fourth. The machine is `machine.rs`; the drawing `look.rs`.
 
-use super::glyph::LevelGlyphView;
 use super::look::{Drawn, body};
 use super::machine::{Hold, KeyStep, LevelInput, LevelState, Nudge, Rubber, step};
-use super::vocab::{LevelLook, LevelMode, LevelSource, Tick};
+use crate::components::content::level_glyph::glyph::LevelGlyphView;
+use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource, Tick};
 use crate::core::geometry::units::{Px, Rect, Size};
 use crate::core::vocab::{Availability, Fraction};
 use crate::host::measure::client_rect;

@@ -3,8 +3,8 @@
 //! fill's copy clipped by the fill, which is how the glyph is knocked out without a blend mode),
 //! the knob riding the fill's end, or sixteen squares.
 
-use super::glyph::LevelGlyphView;
-use super::vocab::{LevelGlyph, LevelLook};
+use crate::components::content::level_glyph::glyph::LevelGlyphView;
+use crate::components::content::level_glyph::vocab::{LevelGlyph, LevelLook};
 use crate::core::vocab::Fraction;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;

@@ -6,7 +6,7 @@
 //! The glyphs paint in colour through `.ds-emoji-text` (the `--font-emoji` stack). A cell's name
 //! is its accessible label and its Fly tooltip, never a caption under the cell.
 
-use crate::components::content::emoji_grid_nav::{GridMove, GridStep, grid_step};
+use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
 use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
 use crate::core::geometry::units::Px;
 use crate::core::vocab::Selection;
