@@ -53,7 +53,7 @@ mod tests {
             expect: true,
         },
         Case {
-            name: "filter passes here (its functions are FilterNotPainted's)",
+            name: "filter passes (every function paints on both renderers)",
             property: "filter",
             value: "saturate(2)",
             expect: false,

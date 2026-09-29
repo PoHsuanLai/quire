@@ -22,8 +22,8 @@ pub const ORB_SIZE: Px = Px(192.0);
 /// The turn is driven from Rust (a frame timer that runs only while `activity` is `Active`, and
 /// not under Reduced motion), because Blitz cannot animate a registered custom property. On
 /// Blitz the dots are a plain layer at reduced opacity under the mask, where a browser
-/// overlay-blends and backdrop-blurs them; `filter: blur()` paints on the GPU renderer only and
-/// `contrast()` on none (FINDINGS "CSS filter"). Decorative, so it is hidden from assistive
+/// overlay-blends and backdrop-blurs them; `filter: blur() contrast()` paints on both renderers
+/// (FINDINGS "CSS filter"). Decorative, so it is hidden from assistive
 /// technology unless `aria_label` names it.
 #[component]
 pub fn VoiceOrb(

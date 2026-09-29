@@ -16,10 +16,8 @@ pub enum Severity {
     Warning,
 }
 
-/// The rules that are warnings today: the HIG guardrails (design/27 section 7, H0), and the
-/// `filter` functions a pinned backend does not paint.
-pub const WARNINGS: [Rule; 6] = [
-    Rule::FilterNotPainted,
+/// The rules that are warnings today: the HIG guardrails (design/27 section 7, H0).
+pub const WARNINGS: [Rule; 5] = [
     Rule::PointerCursor,
     Rule::MinFontSize,
     Rule::FocusRingShape,
