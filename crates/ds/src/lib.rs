@@ -9,7 +9,6 @@ mod busy;
 pub mod catalog;
 pub mod components;
 pub mod css;
-pub mod delays;
 pub mod detail;
 pub mod edit;
 pub mod error;
