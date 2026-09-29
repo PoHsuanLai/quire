@@ -6,6 +6,8 @@ use super::level::use_level;
 use super::moment::Moment;
 use super::sweep::SweepShare;
 use super::tween::Tween;
+use crate::motion::timeline::Timeline;
+use crate::motion::timeline::count_up::CountUp;
 use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::playback::use_playback;
 use crate::style::appearance::motion::MotionLevel;
@@ -25,11 +27,11 @@ pub enum CountPace {
 
 /// The number to print this frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct CountUp {
+pub struct Counted {
     shown: i64,
 }
 
-impl CountUp {
+impl Counted {
     /// The number to print: never past the target, its text repainted at most every
     /// `--t-count-step`.
     pub fn shown(self) -> i64 {
@@ -52,7 +54,7 @@ struct Counting {
 /// Count to `value` as `cue` says: Appear counts up from zero, Change and Progress from the number
 /// shown; any other moment, a one-step change (R12) and Reduced (R7) show the value at once. The
 /// displayed number is what is compared (R2): a cue whose value prints the same counts nothing.
-pub fn use_count_up(value: i64, cue: Cue, pace: CountPace) -> CountUp {
+pub fn use_count_up(value: i64, cue: Cue, pace: CountPace) -> Counted {
     let env = use_level();
     let motion = env.now();
     let own = use_playback(Glide::still(value));
@@ -97,7 +99,7 @@ pub fn use_count_up(value: i64, cue: Cue, pace: CountPace) -> CountUp {
     if now != before {
         state.set(now);
     }
-    CountUp { shown: number }
+    Counted { shown: number }
 }
 
 /// Where a new count starts: zero on Appear, the number shown on Change or Progress, and the
@@ -131,16 +133,12 @@ fn shown(count: Counting, tween: Tween) -> i64 {
     if tween.run() == count.armed {
         return count.from;
     }
-    if tween.landed() {
-        return count.to;
+    CountUp {
+        from: count.from,
+        to: count.to,
+        ease: tween.ease(),
     }
-    let span = count.to - count.from;
-    let along = count.from + (span * i64::from(tween.progress().0) + span.signum() * 500) / 1000;
-    if span >= 0 {
-        along.min(count.to)
-    } else {
-        along.max(count.to)
-    }
+    .at(tween.elapsed())
 }
 
 /// Which `--t-count-step` window `elapsed` falls in.

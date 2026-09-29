@@ -45,10 +45,9 @@ impl Tween {
         Fraction(u16::try_from(self.pose.value.max(0)).unwrap_or(u16::MAX))
     }
 
-    /// How far along its curve the current move is, in thousandths: what a count in step with it
-    /// reads, so it lands with it.
-    pub fn progress(self) -> Fraction {
-        self.pose.eased
+    /// The curve the move follows, for a count that must land with it.
+    pub(crate) fn ease(self) -> Ease {
+        self.ease
     }
 
     /// Time since the current move started.
