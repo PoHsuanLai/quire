@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 # Turn the vendored WOFF2 faces into the subset TTFs `ds::FACES` ships (design/02-TYPE.md
-# section 2; FINDINGS F14): fontique, which Blitz registers faces through, reads sfnt, not WOFF2.
+# section 2): fontique, which Blitz registers faces through, reads sfnt, not WOFF2.
 #
 # Each `<stem>-<subset>.woff2` becomes `<stem>-<subset>.ttf` with the same unicode range
-# (Google Fonts' own `latin` / `latin-ext` split, the ranges build.rs writes for the webview),
-# every layout feature, every name record and the variable axes kept. The WOFF2 files stay:
-# they are this script's input and the webview's `@font-face` source.
+# (Google Fonts' own `latin` / `latin-ext` split), every layout feature, every name record and
+# the variable axes kept. The WOFF2 files stay: they are this script's input.
 #
 # Run from anywhere; needs `uv` (fonttools and brotli are fetched into a throwaway tool env).
 # With no arguments every WOFF2 is converted; name files to convert only those:
