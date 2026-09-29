@@ -87,8 +87,8 @@ public surface, one path per item.
 | `style/icon/geometry_shell.rs` | 08-ICONS §1.6 |
 | `components/content/icon_source.rs`, `style/icon/url.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`; `IconUrl` (`data:`/`file:` only) |
 | `style/icon/classify.rs` | 08-ICONS §1.5 step 2: `classify_with(png, limit) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
-| `core/error.rs` | CONVENTIONS §5: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
-| `lint/*` | CONVENTIONS §11 coherence rules; spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
+| `core/error.rs` | CONVENTIONS §7: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
+| `lint/*` | the coherence rules (ARCHITECTURE.md "Repo rules"); spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
 

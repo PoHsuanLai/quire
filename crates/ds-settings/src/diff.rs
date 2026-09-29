@@ -8,7 +8,7 @@
 use crate::settings::AppearanceFile;
 
 /// One variant per domain `ds-settings` owns. Pure: no I/O, no clock
-/// (`CONVENTIONS.md#6-time` — this is comparison, not a timed effect).
+/// (`CONVENTIONS.md#6-state-effects-and-dependencies` — this is comparison, not a timed effect).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettingsChange {
     /// `[appearance]`.

@@ -401,7 +401,7 @@ hiding:  y_off(t) = D * e_exit(t / 500 ms)
 ## 10.6 Configuration
 
 Settings app keys, stored in `~/.config/sill/settings.json` under `dock` (pinned items stay in
-`~/.config/sill/dock.json`, plan). Two-state values are enums, not bools (CONVENTIONS §0).
+`~/.config/sill/dock.json`, plan). Two-state values are enums, not bools (CONVENTIONS §4).
 
 | Key | Type | Default | Range | Status |
 | --- | --- | --- | --- | --- |

@@ -33,7 +33,7 @@ fn runtime() -> &'static Runtime {
             .worker_threads(2)
             .enable_all()
             .build()
-            // A broken invariant in our own code, not malformed input (CONVENTIONS.md #5): the
+            // A broken invariant in our own code, not malformed input (CONVENTIONS.md §7): the
             // OS refused to start the two worker threads a launched app or a test harness needs.
             .expect("ds-native's process-wide tokio runtime could not be started")
     })

@@ -705,7 +705,7 @@ pub struct InstanceId(Cow<'static, str>);    // unique within one layout
 pub struct AppId(pub String);                // moved from sill_launcher::ids
 
 pub enum Shape { One, Small, Medium, Large, ExtraLarge } // One: a list item; the rest: widget sizes
-pub enum Shown { On, Off }                    // checklist state; no bool (CONVENTIONS §11)
+pub enum Shown { On, Off }                    // checklist state; no bool (CONVENTIONS §4)
 
 /// One placed kind in a layout: membership, order (its index in the list) and its config.
 /// No position: where a thing sits on a surface is state (below).

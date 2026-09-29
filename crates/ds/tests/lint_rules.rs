@@ -1,6 +1,6 @@
 //! Table-driven coverage of every `ds::lint::Rule`: one passing and one failing case each, on
-//! the `cssparser` token stream (never a substring search — CONVENTIONS "Substrings are not
-//! tokens"). `mailo_cases` ports the case tables from
+//! the `cssparser` token stream (never a substring search — CONVENTIONS §14 "Substrings are
+//! not tokens"). `mailo_cases` ports the case tables from
 //! `mail-app/src/ui/style/mod.rs`'s `every_var_is_declared`, `no_colour_outside_the_palette`,
 //! `current_color_is_only_a_stroke_or_fill_value` and `a_class_with_no_rule_is_named`.
 

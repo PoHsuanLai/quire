@@ -4,7 +4,7 @@
    browser, so this file works unchanged on the webview and on Blitz.
 
    `.page`, `.actions`, `.sent-badge` are this app's own classes; none is prefixed `ds-`, which
-   quire's own classes reserve (CONVENTIONS §11: "consumers never style .ds-*"). */
+   quire's own classes reserve (ARCHITECTURE.md "Repo rules": consumers never style .ds-*). */
 
 .page {
   display: flex;

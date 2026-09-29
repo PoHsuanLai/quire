@@ -1,7 +1,8 @@
 //! Logical pixels, and the points, sizes and rects built from them.
 //!
-//! `f32`, like the renderer's own layout: a rect from `onmounted` is fractional. That makes
-//! these `PartialEq` without `Eq`, the one deliberate exception to CONVENTIONS section 2.
+//! `f32`, like the renderer's own layout: a rect from `onmounted` is fractional. That makes these
+//! `PartialEq` without `Eq`, the one deliberate exception to CONVENTIONS section 12
+//! (ARCHITECTURE.md "Repo rules").
 
 use std::ops::{Add, Sub};
 

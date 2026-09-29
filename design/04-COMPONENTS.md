@@ -4442,6 +4442,6 @@ suggestion.
   (component list, props vocabulary, §11 addenda, Blitz risk table), "Findings: Blitz / Dioxus
   Native", "UX decisions settled with the user", Appendix A (A1 layout, A3 colour usage, A4
   components, A5 motion, A6 interactions, A7 looks, A8 bugs).
-- House style: `~/quire/CONVENTIONS.md` §0.
+- House style: `~/quire/CONVENTIONS.md`.
 - Sibling docs referenced: `01-LAYOUT.md`, `02-TYPE.md`, `03-COLOR.md`, `05-MOTION.md`,
   `06-INTERACTIONS.md`, `07-LOOKS.md`, `20-SURFACES.md`, `21-SPACES.md`.

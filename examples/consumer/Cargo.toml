@@ -19,7 +19,7 @@ ds = { path = "../../crates/ds", features = ["lint"] }
 ds-settings = { path = "../../crates/ds-settings" }
 ds-native = { path = "../../crates/ds-native" }
 
-# ---- lines copied from quire/docs/workspace-deps.toml (pinned block, CONVENTIONS.md §11) ----
+# ---- lines copied from quire/docs/workspace-deps.toml (pinned block, CONVENTIONS.md §10) ----
 # ds's own dependency tree (dioxus-native, blitz-*, anyrender, ...) resolves against quire's own
 # workspace (crates/ds/Cargo.toml has no [workspace] of its own, so it joins whichever ancestor
 # has one: quire's root, not this one) — this package only needs to name what it writes rsx!

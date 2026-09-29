@@ -16,7 +16,7 @@ destination preview, peek modes, the composer's lifecycle, focus, and what Escap
 context; and, in section 20, what the desktop shell must do (dock clicks and menus, launcher
 keys, menu bar, click-through, notifications, Magic Mouse gestures). Each behaviour is written
 as a state machine or a rule table so that it can be implemented as a pure `step(state, event)
--> (state, effect)` function (CONVENTIONS §0) and tested with a table. Motion values live in
+-> (state, effect)` function (CONVENTIONS §6) and tested with a table. Motion values live in
 `05-MOTION.md`; colours in `07-LOOKS.md`.
 
 ## 2. Keyboard maps

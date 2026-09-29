@@ -20,7 +20,7 @@ use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
 /// What the caller wants: the full-brightness screen, or the overlay dimmed to its level. Two
-/// states, not a `bool` (`CONVENTIONS.md#11-quire-addenda-2026-09-24`).
+/// states, not a `bool` (`CONVENTIONS.md#4-types`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum IdleDimPhase {
     /// Nothing drawn: full brightness.
