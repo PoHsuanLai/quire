@@ -131,7 +131,7 @@ pub enum SwipeEffect {
 /// How the offset is drawn: following the input with no transition, or easing to where it is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum SwipeLook {
-    /// At rest or springing back to rest: the offset eases (`--t-move --e-spring`).
+    /// At rest or springing back to rest: the offset eases (`--t-move --e-out`).
     Rest,
     /// Following a pointer or a scroll: no transition.
     Live,

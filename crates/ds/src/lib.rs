@@ -232,9 +232,11 @@ pub use crate::motion::{
     pulse_key::{PulseKey, PulsePhase},
     recipe::{Fill, Iteration},
     roster::{Heal, RosterState, RowPitch, StayError, Stayed},
+    rubber::{RUBBER_SHARE, resist},
     settle::settle,
     swipe::{Speed, SwipeMetrics},
     timer::{TimerPhase, use_motion_timer},
+    use_collapse::{Collapse, use_collapse},
     use_roster::{LeaveBy, Pitches, Roster, RosterSpec, use_roster},
     wake::WakeStamp,
 };
