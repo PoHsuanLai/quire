@@ -10,6 +10,7 @@ use crate::components::fields::{
     text_input_kind::TextInputKind,
 };
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 use crate::motion::detail::{
     first_show::FirstShow, operation::Operation, touch::Touch, use_detail::use_detail,
     use_operation::use_operation,

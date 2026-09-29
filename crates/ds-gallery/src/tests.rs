@@ -6,6 +6,7 @@ use crate::axes::{Axes, Showcase, start_with};
 use crate::page::Page;
 use crate::style;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::lint::{Exception, LintConfig, Profile, markup};
 use ds_native::{Viewport, snapshot_at};
 use std::time::Duration;
@@ -39,7 +40,7 @@ fn every_page_renders_quire_markup_only() {
         ..LintConfig::default()
     };
     let mut failures = Vec::new();
-    for page in Page::ALL {
+    for page in Page::ALL.iter().copied() {
         let html = rendered(page);
         assert!(
             html.contains("class=\"g-card\""),
@@ -84,7 +85,8 @@ fn every_exception_still_suppresses_something() {
         ..LintConfig::default()
     };
     let offences: Vec<_> = Page::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .flat_map(|page| markup(&rendered(page), &css, &bare))
         .collect();
     let stale: Vec<&str> = EXCEPTIONS

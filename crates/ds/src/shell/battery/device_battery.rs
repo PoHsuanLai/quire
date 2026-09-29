@@ -8,6 +8,7 @@
 
 use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::motion::detail::{
     count_up::{CountPace, use_count_up},
     detailed::Detailed,

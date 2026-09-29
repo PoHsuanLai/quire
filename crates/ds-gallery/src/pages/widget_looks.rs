@@ -12,6 +12,7 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::LabelHue;
+use ds::Word;
 use ds::{
     Appearance, BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase,
     Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry, MonthIntent,
@@ -99,7 +100,7 @@ pub fn WidgetLooksPage() -> Element {
         }
         Section { title: "Device glyphs", note: "DeviceGlyph: the filled device set for the battery rings (design/23 section 4.4), abstract solids on the Lucide 24 grid, one path each, holes cut by the even-odd rule; at 16 (the ring's) and 32.",
             div { class: "g-wl-devices",
-                for device in Device::ALL {
+                for device in Device::ALL.iter().copied() {
                     div { key: "{device.slug()}", class: "g-wl-device",
                         DeviceGlyph { device, size: IconSize::Base }
                         DeviceGlyph { device, size: IconSize::Px(ds::IconPx(32)) }

@@ -1,11 +1,12 @@
 //! The words a `ModuleTile` is described in: whether the module is on, whether it has a detail
 //! pane, and how many grid columns it takes.
 
+use crate::core::word::Word;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
 use crate::style::icon::Icon;
 
 /// Where a module is: off, on, or on its way (connecting, scanning).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum ModuleState {
     /// Off: a paper disc with ink.
     #[default]
@@ -17,15 +18,6 @@ pub enum ModuleState {
 }
 
 impl ModuleState {
-    /// The `data-state` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            ModuleState::Off => "off",
-            ModuleState::On => "on",
-            ModuleState::Busy => "busy",
-        }
-    }
-
     /// `aria-pressed`: a busy module is neither on nor off yet, which ARIA calls mixed.
     pub(crate) fn aria_pressed(self) -> &'static str {
         match self {
@@ -81,23 +73,13 @@ pub enum Chevron {
 }
 
 /// How many of the control center's grid columns a tile takes (design/13 section 13.3.7).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum TileSpan {
     /// One column.
     #[default]
     Half,
     /// Every column (`grid-column:1 / -1`), as a slider module.
     Full,
-}
-
-impl TileSpan {
-    /// The `data-span` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            TileSpan::Half => "half",
-            TileSpan::Full => "full",
-        }
-    }
 }
 
 /// How a tile's disc glyph answers the module turning on (design/26-DETAILS.md 5.2.2,

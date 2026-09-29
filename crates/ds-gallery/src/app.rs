@@ -6,6 +6,7 @@ use crate::registry;
 use crate::style;
 use crate::toolbar::Toolbar;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{Ds, Ground, HeaderKind, RootChrome, SectionHeader};
 
 /// The gallery, starting from the axes this thread was handed (`crate::axes::start_with`).

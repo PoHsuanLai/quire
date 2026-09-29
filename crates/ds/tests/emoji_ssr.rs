@@ -9,6 +9,7 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::lint::{LintConfig, markup};
 use ds::{
     AnimatedEmoji, Appearance, DiscHue, Ds, EmojiDisc, EmojiId, Inject, Material, Mood,
@@ -145,7 +146,7 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
 /// first render, before any timer).
 #[test]
 fn a_mood_picks_the_face_at_rest() {
-    for mood in Mood::ALL {
+    for mood in Mood::ALL.iter().copied() {
         let html = render(large(EmojiId::Wink, mood));
         let face = if mood == Mood::Asleep {
             "sleeping"

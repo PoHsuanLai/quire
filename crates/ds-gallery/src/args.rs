@@ -145,7 +145,7 @@ fn once<T>(seen: Option<T>, value: T, flag: &str) -> Result<Option<T>, ArgsError
 
 /// The page whose `--page` word is `word`, compared whole.
 pub fn page_named(word: &str) -> Option<Page> {
-    Page::ALL.into_iter().find(|page| page.slug() == word)
+    Page::ALL.iter().copied().find(|page| page.slug() == word)
 }
 
 /// Every page word, for the usage line.
@@ -162,6 +162,7 @@ mod tests {
     use super::{Args, parse};
     use crate::page::Page;
     use crate::progress_copy::ProgressCopy;
+    use ds::Word;
     use std::path::PathBuf;
 
     /// A command line and what it parses to: the arguments, or the start of the error.
@@ -279,7 +280,7 @@ mod tests {
 
     #[test]
     fn every_page_word_parses_back_to_its_page() {
-        for page in Page::ALL {
+        for page in Page::ALL.iter().copied() {
             let got = parse(["--page".to_string(), page.slug().to_string()].into_iter());
             assert_eq!(got, Ok(args(Some(page), None)), "{page:?}");
         }

@@ -8,6 +8,7 @@ use super::picture::UserPicture;
 use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::content::image_source::ImageSource;
 use crate::components::controls::bump_on::bump_attrs;
+use crate::core::word::Word;
 use crate::motion::wake::WakeStamp;
 use crate::shell::emoji::AnimatedEmoji;
 use dioxus::prelude::*;

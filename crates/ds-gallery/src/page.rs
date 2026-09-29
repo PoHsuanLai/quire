@@ -1,7 +1,9 @@
 //! The gallery's pages.
 
+use ds::Word;
+
 /// One gallery page.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Page {
     /// Every token: colours, radii, shadows, z, durations, easings.
     Tokens,
@@ -37,59 +39,10 @@ pub enum Page {
     /// The widgets posed as the reference screenshots, at their size, for side-by-side proof.
     WidgetReference,
     /// The shell's own lock screen, polkit prompt and app switcher (M11).
+    #[word(slug = "lock")]
     LockSwitcher,
     /// Animated emoji: the set, the reactions, sizes and discs.
     Emoji,
     /// The small-state details: every primitive of design/26 with a replay button.
     Details,
-}
-
-impl Page {
-    /// Every page, in the gallery's order.
-    pub const ALL: [Page; 19] = [
-        Page::Tokens,
-        Page::Type,
-        Page::Controls,
-        Page::Lists,
-        Page::Overlays,
-        Page::Materials,
-        Page::Motion,
-        Page::Space,
-        Page::Gaps,
-        Page::Matrix,
-        Page::MotionLab,
-        Page::Polish,
-        Page::Edit,
-        Page::Level,
-        Page::WidgetLooks,
-        Page::WidgetReference,
-        Page::LockSwitcher,
-        Page::Emoji,
-        Page::Details,
-    ];
-
-    /// The `--page` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Page::Tokens => "tokens",
-            Page::Type => "type",
-            Page::Controls => "controls",
-            Page::Lists => "lists",
-            Page::Overlays => "overlays",
-            Page::Materials => "materials",
-            Page::Motion => "motion",
-            Page::Space => "space",
-            Page::Gaps => "gaps",
-            Page::Matrix => "matrix",
-            Page::MotionLab => "motion-lab",
-            Page::Polish => "polish",
-            Page::Edit => "edit",
-            Page::Level => "level",
-            Page::WidgetLooks => "widget-looks",
-            Page::WidgetReference => "widget-reference",
-            Page::LockSwitcher => "lock",
-            Page::Emoji => "emoji",
-            Page::Details => "details",
-        }
-    }
 }

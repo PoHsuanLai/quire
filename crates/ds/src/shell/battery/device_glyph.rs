@@ -4,13 +4,14 @@
 //! grid (`device_forms.rs`), one path in `currentColor`, no stroke, so they sit in the same
 //! `svg.ds-ic` box as every other glyph and size the same way.
 
+use crate::core::word::Word;
 use crate::shell::battery::device_forms::{form_of, path_of};
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
 /// A device that reports a battery.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Device {
     /// A laptop: this computer, when it has a battery.
@@ -38,42 +39,6 @@ pub enum Device {
     Gamepad,
     /// Anything else with a battery.
     Other,
-}
-
-impl Device {
-    /// Every device, in the order the gallery shows them.
-    pub const ALL: [Device; 12] = [
-        Device::Laptop,
-        Device::Desktop,
-        Device::Phone,
-        Device::Tablet,
-        Device::Watch,
-        Device::Headphones,
-        Device::Earbuds,
-        Device::Mouse,
-        Device::Keyboard,
-        Device::Speaker,
-        Device::Gamepad,
-        Device::Other,
-    ];
-
-    /// The `data-device` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Device::Laptop => "laptop",
-            Device::Desktop => "desktop",
-            Device::Phone => "phone",
-            Device::Tablet => "tablet",
-            Device::Watch => "watch",
-            Device::Headphones => "headphones",
-            Device::Earbuds => "earbuds",
-            Device::Mouse => "mouse",
-            Device::Keyboard => "keyboard",
-            Device::Speaker => "speaker",
-            Device::Gamepad => "gamepad",
-            Device::Other => "other",
-        }
-    }
 }
 
 /// `svg.ds-ic.ds-device-glyph[data-device]`: `device` filled in `currentColor` at `size`.

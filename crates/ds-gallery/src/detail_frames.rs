@@ -8,6 +8,7 @@ use crate::details_views::{CheckView, NetView, ShakeView, SlashView, SweepCountV
 use crate::error::GalleryError;
 use crate::style;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::detail::{EventStamp, FirstShow, Slashed};
 use ds::{Appearance, Ds, Inject, Material, Theme};
 use ds_native::{Harness, Viewport};
@@ -16,34 +17,19 @@ use std::path::Path;
 use std::time::Duration;
 
 /// Which strip a stage draws.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 enum Strip {
     SweepCount,
+    #[word(slug = "pending-iterate")]
     Pending,
+    #[word(slug = "settle-check")]
     Check,
     Shake,
+    #[word(slug = "morph-slash")]
     Slash,
 }
 
 impl Strip {
-    const ALL: [Strip; 5] = [
-        Strip::SweepCount,
-        Strip::Pending,
-        Strip::Check,
-        Strip::Shake,
-        Strip::Slash,
-    ];
-
-    fn slug(self) -> &'static str {
-        match self {
-            Strip::SweepCount => "sweep-count",
-            Strip::Pending => "pending-iterate",
-            Strip::Check => "settle-check",
-            Strip::Shake => "shake",
-            Strip::Slash => "morph-slash",
-        }
-    }
-
     /// How long after the moment starts the first frame is taken, and the step between frames.
     fn timing(self) -> (Duration, Duration) {
         let ms = Duration::from_millis;
@@ -152,7 +138,7 @@ pub fn run(dir: &Path) -> Result<(), GalleryError> {
         path: dir.to_path_buf(),
         source,
     })?;
-    for strip in Strip::ALL {
+    for strip in Strip::ALL.iter().copied() {
         for (index, frame) in frames(strip).iter().enumerate() {
             let path = dir.join(format!("{}-{index}.png", strip.slug()));
             frame.save(&path).map_err(|source| GalleryError::Encode {

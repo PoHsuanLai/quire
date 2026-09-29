@@ -4,6 +4,7 @@
 //! as the drag reaches the cell. The host places it; quire draws it, so a shell draws nothing of
 //! its own for the guide.
 
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
 use dioxus::prelude::*;

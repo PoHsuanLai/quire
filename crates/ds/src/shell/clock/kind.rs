@@ -1,6 +1,7 @@
 //! The words a `ClockFace` is described in (design/04-COMPONENTS.md "Widgets"):
 //! the time it shows, whether it is day or night there, and how it is drawn.
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Whether a clock shows its seconds, and which second it is.
@@ -53,7 +54,7 @@ impl ClockTime {
 }
 
 /// Whether it is day or night where the clock is, which tints the analog face.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 pub enum DayPhase {
     /// A paper face with ink hands.
     #[default]
@@ -62,34 +63,14 @@ pub enum DayPhase {
     Night,
 }
 
-impl DayPhase {
-    /// The `data-phase` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            DayPhase::Day => "day",
-            DayPhase::Night => "night",
-        }
-    }
-}
-
 /// How a clock is drawn.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 pub enum ClockLook {
     /// A dial with hands: the medium and large widgets.
     #[default]
     Analog,
     /// The time as digits in the data face: a small widget's row.
     Digital,
-}
-
-impl ClockLook {
-    /// The `data-look` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            ClockLook::Analog => "analog",
-            ClockLook::Digital => "digital",
-        }
-    }
 }
 
 #[cfg(test)]

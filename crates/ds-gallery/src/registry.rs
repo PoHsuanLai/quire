@@ -169,14 +169,15 @@ pub fn entry(page: Page) -> &'static Entry {
 mod tests {
     use super::REGISTRY;
     use crate::page::Page;
+    use ds::Word;
 
     #[test]
     fn every_page_has_exactly_one_entry_in_the_page_order() {
         assert_eq!(REGISTRY.len(), Page::ALL.len());
-        for (entry, page) in REGISTRY.iter().zip(Page::ALL) {
+        for (entry, page) in REGISTRY.iter().zip(Page::ALL.iter().copied()) {
             assert_eq!(entry.page, page, "{} is out of order", entry.title);
         }
-        for page in Page::ALL {
+        for page in Page::ALL.iter().copied() {
             let count = REGISTRY.iter().filter(|entry| entry.page == page).count();
             assert_eq!(count, 1, "{page:?}");
         }

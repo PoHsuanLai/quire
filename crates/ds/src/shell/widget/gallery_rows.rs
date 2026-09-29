@@ -8,6 +8,7 @@
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::core::task::spawn_in;
+use crate::core::word::Word;
 use crate::host::measure::MountedRef;
 use crate::host::reveal::reveal;
 use crate::motion::detail::touch::Touch;
