@@ -2,14 +2,14 @@
 //! every component sheet from the one ordered registration (`assembly::sheets`).
 
 use crate::assembly::sheets::SHEETS;
-use crate::css::RESET;
-use crate::css::accents_css::accents_css;
-use crate::css::document::{document, sheets, utilities_css};
-use crate::css::ground_css::ground_css;
-use crate::css::materials_css::materials_css;
-use crate::css::motion_css::motion_css;
-use crate::css::shape_css::shape_css;
-use crate::css::tokens_css::tokens_css;
+use crate::motion::css::motion_css;
+use crate::style::css::RESET;
+use crate::style::css::accents_css::accents_css;
+use crate::style::css::document::{document, sheets, utilities_css};
+use crate::style::css::ground_css::ground_css;
+use crate::style::css::materials_css::materials_css;
+use crate::style::css::shape_css::shape_css;
+use crate::style::css::tokens_css::tokens_css;
 use std::sync::LazyLock;
 
 /// Every rule the design system draws with, in cascade order. Built once, on first use.

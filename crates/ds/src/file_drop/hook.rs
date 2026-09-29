@@ -1,6 +1,6 @@
 //! A drop target in the app: an element that takes files dragged in from outside the window.
 
-use crate::components::vocab::DropState;
+use crate::core::vocab::DropState;
 use crate::file_drop::drag::{FileDrag, FileDrop};
 use crate::file_drop::host::{DropTarget, HostFileDrop};
 use crate::file_drop::track::TargetView;

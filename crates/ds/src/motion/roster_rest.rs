@@ -5,15 +5,15 @@
 //! that lists them), but the timer it needs is never spawned there: a task spawned from a render
 //! may never be polled, so the body only queues an
 //! effect, and the effect, which dioxus runs after the render on every renderer, spawns the
-//! timer as a task of the roster's owner (`crate::task::spawn_in`). Two
+//! timer as a task of the roster's owner (`crate::core::task::spawn_in`). Two
 //! reconciles before the effect runs queue it once, and a timer already due later than the new
 //! one is kept rather than joined by a second task.
 
 use super::roster::RosterState;
 use super::settle::settle;
 use super::use_roster::Roster;
-use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::clock::sleep;
+use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::core::time::clock::sleep;
 use dioxus::core::{Task, queue_effect};
 use dioxus::prelude::*;
 use std::time::Instant;
@@ -73,7 +73,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         else {
             return Ok(());
         };
-        let due = crate::time::clock::now() + length;
+        let due = crate::core::time::clock::now() + length;
         if let Some(pending) = try_get(self.rest)? {
             if pending.due >= due {
                 return Ok(());
@@ -82,7 +82,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         }
         let roster = *self;
         let task = spawn_in(self.scope, async move {
-            sleep(due.saturating_duration_since(crate::time::clock::now())).await;
+            sleep(due.saturating_duration_since(crate::core::time::clock::now())).await;
             if try_set(roster.rest, None).is_ok() {
                 let _ = roster.update(RosterState::rest);
             }

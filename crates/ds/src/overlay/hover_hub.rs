@@ -4,18 +4,18 @@
 //!
 //! Its timers are tasks of the root that provides it and drop with it; every write a timer makes
 //! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
-//! (`crate::task`).
+//! (`crate::core::task`).
 
-use crate::components::vocab::StaggerIndex;
+use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
+use crate::core::time::clock::sleep;
+use crate::core::vocab::StaggerIndex;
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::{
     HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase,
 };
 use crate::motion::settle::settle;
-use crate::root::env::Env;
-use crate::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::time::clock::sleep;
-use crate::tokens::delay::DelayToken;
+use crate::style::env::Env;
+use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use std::time::Duration;
@@ -63,7 +63,7 @@ impl HoverHub {
     }
 
     fn try_feed(&self, event: HoverEvent<Card>) -> Result<(), Gone> {
-        let (next, effect) = try_get(self.intent)?.step(event, crate::time::clock::now());
+        let (next, effect) = try_get(self.intent)?.step(event, crate::core::time::clock::now());
         try_set_if_changed(self.intent, next)?;
         self.apply(effect)
     }
@@ -91,7 +91,7 @@ impl HoverHub {
     /// Whether cards open at once right now.
     pub fn warmth(&self) -> HoverWarmth {
         let _expiry = self.warm_tick.read();
-        self.intent.read().warmth(crate::time::clock::now())
+        self.intent.read().warmth(crate::core::time::clock::now())
     }
 
     fn apply(&self, effect: IntentEffect<Card>) -> Result<(), Gone> {

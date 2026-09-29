@@ -2,7 +2,7 @@
 //! pointer has travelled past the threshold, and asks for it exactly once; a press that never
 //! travels is a click (the second of two is the double-click that zooms).
 
-use crate::geometry::units::{Point, Px};
+use crate::core::geometry::units::{Point, Px};
 
 /// Where a titlebar press is.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
@@ -53,7 +53,7 @@ fn travelled(from: Point, at: Point) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::{Grab, GrabEffect};
-    use crate::geometry::units::{Point, Px};
+    use crate::core::geometry::units::{Point, Px};
 
     fn at(x: f32, y: f32) -> Point {
         Point { x: Px(x), y: Px(y) }

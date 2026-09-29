@@ -143,9 +143,9 @@ fn moves(body: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{ReducedForm, moves};
-    use crate::css::MOTION;
-    use crate::css::motion_css::keyframes as motion_keyframes;
     use crate::motion::anim::Anim;
+    use crate::motion::css::MOTION;
+    use crate::motion::css::keyframes as motion_keyframes;
 
     fn body(name: &str) -> &'static str {
         motion_keyframes(MOTION)

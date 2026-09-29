@@ -1,6 +1,6 @@
 //! Which dictionary a surface checks against, and whether it checks at all.
 
-use crate::error::DsError;
+use crate::core::error::DsError;
 use serde::{Deserialize, Serialize};
 
 /// A dictionary's language, as Hunspell names its files: `en_US` for `en_US.aff`/`en_US.dic`,
@@ -54,7 +54,7 @@ fn region_code(region: &str) -> bool {
     region.len() == 2 && region.chars().all(|c| c.is_ascii_uppercase())
 }
 
-/// Whether an [`EditSurface`](crate::components::edit_surface::EditSurface) checks its spelling. Off by default: a surface
+/// Whether an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) checks its spelling. Off by default: a surface
 /// that says nothing checks nothing and draws exactly what it drew before.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 #[serde(tag = "kind", content = "v", rename_all = "snake_case")]

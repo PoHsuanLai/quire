@@ -2,7 +2,7 @@
 //! without moving, to undo (design/06-INTERACTIONS.md section 9.2, design/04-COMPONENTS.md
 //! section 23).
 
-use crate::geometry::units::Px;
+use crate::core::geometry::units::Px;
 
 /// How far left the tab may be pulled.
 const PULL_MIN: Px = Px(-6.0);

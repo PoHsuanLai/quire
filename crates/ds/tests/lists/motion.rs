@@ -103,7 +103,7 @@ fn the_row_stylesheet_plays_what_the_roster_settles() {
         (Exit::Crumple, Emphasis::Plain),
         (Exit::Crumple, Emphasis::Strong),
     ];
-    let css = include_str!("../../src/components/list_row.css");
+    let css = include_str!("../../src/components/lists/list_row.css");
     let mut failures = Vec::new();
     for &(exit, emphasis) in CASES {
         let (_, anim) = RosterState::first_show(&KEYS, PITCH)

@@ -3,7 +3,9 @@
 
 pub mod anim;
 pub(crate) mod batch_roster;
+pub(crate) mod css;
 pub mod curve;
+pub(crate) mod detail;
 pub mod drag;
 pub mod drag_return;
 pub mod entrance;

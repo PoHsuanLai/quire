@@ -4,55 +4,52 @@
 //! The linter stays a module (`ds::lint`), behind the `lint` feature. DESIGN.md maps each
 //! module to the design doc section it implements.
 
-pub mod appearance;
 pub(crate) mod assembly;
-pub(crate) mod busy;
-pub mod catalog;
 pub mod components;
 pub(crate) mod core;
-pub mod css;
-pub mod detail;
 pub mod edit;
-pub mod error;
 pub mod file_drop;
 pub mod focus;
-pub mod fonts;
-pub mod geometry;
-pub(crate) mod guarded;
-pub mod icon;
+pub(crate) mod host;
 #[cfg(feature = "lint")]
 pub mod lint;
-pub mod material;
 pub mod motion;
 pub mod overlay;
 pub mod root;
-pub mod space;
+pub(crate) mod shell;
 pub mod spell;
-pub(crate) mod task;
-pub mod text;
-pub mod time;
-pub mod tokens;
-pub mod widget;
+pub(crate) mod style;
 pub mod window;
 
-pub use crate::appearance::{
-    accent::Accent,
-    appearance::Appearance,
-    look::{Look, Warmth},
-    motion::{Motion, MotionLevel},
-    peek::PeekMode,
-    resolve::{Resolved, resolve},
-    system::{Contrast, ReducedMotion, SystemPrefs},
-    theme::{Scheme, Theme},
-    typeface::Typeface,
-};
-pub use crate::appearance::{
-    blur::{Blur, BlurState},
-    material::Material,
-};
+pub mod detail {
+    pub use crate::motion::detail::*;
+}
+pub mod icon {
+    pub use crate::style::icon::*;
+}
+pub mod time {
+    pub use crate::core::time::*;
+}
+pub mod widget {
+    pub use crate::shell::widget::*;
+}
+pub mod catalog {
+    pub use crate::shell::catalog::*;
+}
+
 pub use crate::assembly::ds::{Ds, Inject};
 pub use crate::assembly::stylesheet::{component_sheets, stylesheet};
+pub use crate::components::content::icon_source::{ExternalIcon, IconSource, IconUrl};
 pub use crate::core::colour::contrast::{Verdict, ratio};
+pub use crate::core::error::DsError;
+pub use crate::core::geometry::{
+    placement::{Align, Flip, Placed, Placement, PopoverRequest, Side, place},
+    scale::{Grid, Scale},
+    units::{Point, Px, Rect, Size},
+};
+pub use crate::core::text::clip::clip_chars;
+pub use crate::core::time::clock::{ClockGuard, VirtualClock, sleep};
+pub use crate::core::time::{FRAME_SLACK, FRAME_TICK};
 pub use crate::edit::{
     clicks::Clicks,
     handle::{EditHandle, use_edit_handle},
@@ -81,23 +78,9 @@ pub use crate::focus::{
     select::{HostSelect, Select},
     selector::{FocusError, Found, HostFind, focus_by_selector},
 };
-pub use crate::geometry::{
+pub use crate::host::{
     measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect},
-    placement::{Align, Flip, Placed, Placement, PopoverRequest, Side, place},
     reveal::{HostReveal, ScrollSpan, Scrolled, nearest_scroll},
-    scale::{Grid, Scale},
-    units::{Point, Px, Rect, Size},
-};
-pub use crate::icon::{
-    classify::{ChromaLimit, IconKind},
-    external::{ExternalIcon, IconSource, IconUrl},
-    family::PlateFamily,
-    plate_tint::PlateTint,
-    shape::Shape,
-};
-pub use crate::material::{
-    recipe::{MaterialRecipe, recipe},
-    stack::MaterialStack,
 };
 pub use crate::motion::hover_intent::HoverWarmth;
 pub use crate::motion::{
@@ -134,13 +117,59 @@ pub use crate::overlay::{
 };
 pub use crate::root::{
     chrome::{FrameTint, Ground, RootChrome},
-    env::{Env, HostModality, InputModality, use_env},
     extent::RootExtent,
-    scale::{HostScale, use_scale},
     surface::Surface,
     typeface::use_typeface,
 };
-pub use crate::space::{
+pub use crate::shell::widget::{
+    battery::{BatteryCell, BatteryEntry, BatteryWidget},
+    calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
+    card::WidgetCard,
+    clock::{ClockCity, ClockEntry, WorldClockWidget},
+    contract::{NoIntent, Widget, WidgetContext, WidgetKind},
+    gallery::{GalleryWords, WidgetGallery},
+    layout::{DesktopGrid, GridCell, WidgetAt, WidgetEdit, WidgetLayout},
+    registry::{WidgetInfo, WidgetRegistry, provide_widget_registry, use_widget_registry},
+    timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
+    use_widget::use_widget,
+    wire::WireTimeline,
+};
+pub use crate::spell::{
+    host::{HostSpell, Learned, Paragraph, SpellFuture, SpellService},
+    lang::{Lang, Spell},
+    marks::{Misspelt, SpellReplace, Typing},
+    script::is_cjk,
+    words::Span,
+};
+pub use crate::style::appearance::{
+    accent::Accent,
+    appearance::Appearance,
+    look::{Look, Warmth},
+    motion::{Motion, MotionLevel},
+    peek::PeekMode,
+    resolve::{Resolved, resolve},
+    system::{Contrast, ReducedMotion, SystemPrefs},
+    theme::{Scheme, Theme},
+    typeface::Typeface,
+};
+pub use crate::style::appearance::{
+    blur::{Blur, BlurState},
+    material::Material,
+};
+pub use crate::style::fonts::{FACES, Face, FaceStyle, Subset, Weight};
+pub use crate::style::icon::Icon;
+pub use crate::style::icon::render::{Glyph, IconPx, IconSize};
+pub use crate::style::icon::{
+    classify::{ChromaLimit, IconKind},
+    family::PlateFamily,
+    plate_tint::PlateTint,
+    shape::Shape,
+};
+pub use crate::style::material::{
+    recipe::{MaterialRecipe, recipe},
+    stack::MaterialStack,
+};
+pub use crate::style::space::{
     frame_vars::FrameVars,
     look::{CardAccent, Grain, SpaceLook},
     palette::{
@@ -153,16 +182,7 @@ pub use crate::space::{
     presets::{PRESETS, Preset, default_look},
     store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex},
 };
-pub use crate::spell::{
-    host::{HostSpell, Learned, Paragraph, SpellFuture, SpellService},
-    lang::{Lang, Spell},
-    marks::{Misspelt, SpellReplace, Typing},
-    script::is_cjk,
-    words::Span,
-};
-pub use crate::text::clip::clip_chars;
-pub use crate::time::clock::{ClockGuard, VirtualClock, sleep};
-pub use crate::tokens::{
+pub use crate::style::tokens::{
     accent_band::roles::AccentRoles,
     accent_table::accent_of,
     colour::ColourToken,
@@ -194,18 +214,9 @@ pub use crate::tokens::{
     type_voice::VoiceToken,
     widgets::WidgetMetrics,
 };
-pub use crate::widget::{
-    battery::{BatteryCell, BatteryEntry, BatteryWidget},
-    calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
-    card::WidgetCard,
-    clock::{ClockCity, ClockEntry, WorldClockWidget},
-    contract::{NoIntent, Widget, WidgetContext, WidgetKind},
-    gallery::{GalleryWords, WidgetGallery},
-    layout::{DesktopGrid, GridCell, WidgetAt, WidgetEdit, WidgetLayout},
-    registry::{WidgetInfo, WidgetRegistry, provide_widget_registry, use_widget_registry},
-    timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
-    use_widget::use_widget,
-    wire::WireTimeline,
+pub use crate::style::{
+    env::{Env, HostModality, InputModality, use_env},
+    scale::{HostScale, use_scale},
 };
 pub use crate::window::{
     host::{HostWindow, WindowHost, use_window_host, use_window_host_provider, use_window_state},
@@ -216,18 +227,13 @@ pub use crate::window::{
     },
 };
 pub use components::*;
-pub use error::DsError;
-pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
-pub use icon::Icon;
-pub use icon::render::{Glyph, IconPx, IconSize};
-pub use time::{FRAME_SLACK, FRAME_TICK};
 
 use futures_timer as _;
 use serde_json as _;
 use thiserror as _;
 
-pub use crate::icon::render::GlyphProps;
 pub use crate::overlay::pull_tab::{Pull, PullTab, TabArm};
-pub use crate::tokens::widget_paint::WidgetPaint;
+pub use crate::style::icon::render::GlyphProps;
+pub use crate::style::tokens::widget_paint::WidgetPaint;
 #[cfg(feature = "lint")]
 use cssparser as _;

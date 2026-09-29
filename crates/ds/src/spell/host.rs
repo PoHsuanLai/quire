@@ -1,4 +1,4 @@
-//! The host seam an [`EditSurface`](crate::components::edit_surface::EditSurface) checks spelling through. `ds` stays
+//! The host seam an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) checks spelling through. `ds` stays
 //! effect-free: reading dictionaries, checking on a worker thread and writing the user's
 //! dictionary are `ds_native::spell`'s (its `spellcheck` feature), which provides
 //! [`HostSpell`]. Without one a surface with [`Spell::On`](super::Spell) checks nothing and

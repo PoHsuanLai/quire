@@ -1,17 +1,15 @@
 //! The app's handle on its surface: the geometry reads it needs to draw its own caret and
 //! selection, and to place its `/` and `@` menus at the caret.
 
+use crate::core::geometry::units::{Point, Rect};
 use crate::edit::host::{HostEdit, Probe};
 use crate::edit::position::{TextPosition, TextRange};
 use crate::focus::host::focus_soon;
-use crate::geometry::{
-    measure::{HostMeasure, Measured},
-    units::{Point, Rect},
-};
+use crate::host::measure::{HostMeasure, Measured};
 use dioxus::prelude::*;
 use std::rc::Rc;
 
-/// A handle on one [`EditSurface`](crate::components::edit_surface::EditSurface): pass it as the surface's `handle`, then
+/// A handle on one [`EditSurface`](crate::components::fields::edit_surface::EditSurface): pass it as the surface's `handle`, then
 /// read geometry from a handler or a task. Each read answers [`Probe::Busy`] while the renderer
 /// holds the document (ask again next frame) and [`Probe::Unknown`] before the surface mounts,
 /// with no host, or where nothing addressable is. Geometry is the last layout's: after a change

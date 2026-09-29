@@ -75,8 +75,11 @@ fn click_handlers(text: &str) -> Vec<(usize, String)> {
 
 #[test]
 fn every_click_a_component_stops_is_handed_to_the_click_focus() {
-    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/components");
-    let broken: Vec<String> = sources(&dir)
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let broken: Vec<String> = ["src/components", "src/shell"]
+        .iter()
+        .flat_map(|dir| sources(&root.join(dir)))
+        .collect::<Vec<_>>()
         .iter()
         .flat_map(|path| {
             let text = std::fs::read_to_string(path).unwrap_or_default();

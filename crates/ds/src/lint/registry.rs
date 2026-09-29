@@ -6,28 +6,28 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::appearance::{accent::Accent, theme::Scheme};
-use crate::css::accents_css::swatch_var;
-use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
-use crate::css::shape_css::{SHAPE_VARS, SQUIRCLE_VARS};
-use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
-use crate::material::level::LEVEL_VARS;
-use crate::material::stack::STACK_INPUTS;
 use crate::motion::anim::Anim;
-use crate::space::{
+use crate::style::appearance::{accent::Accent, theme::Scheme};
+use crate::style::css::accents_css::swatch_var;
+use crate::style::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
+use crate::style::css::shape_css::{SHAPE_VARS, SQUIRCLE_VARS};
+use crate::style::icon::family::{PLATE_GLYPH, PLATE_INSET};
+use crate::style::material::level::LEVEL_VARS;
+use crate::style::material::stack::STACK_INPUTS;
+use crate::style::space::{
     frame_vars::FrameVars,
     look::{CardAccent, SpaceLook},
 };
-use crate::tokens::dock::DOCK_TOKENS;
-use crate::tokens::notifications::NOTIFICATION_TOKENS;
-use crate::tokens::osd::OSD_TOKENS;
-use crate::tokens::shell::SHELL_TOKENS;
-use crate::tokens::size_vars::size_tokens;
-use crate::tokens::status::StatusMetrics;
-use crate::tokens::type_voice::VoiceToken;
-use crate::tokens::widget_paint::WidgetPaint;
-use crate::tokens::widgets::WIDGET_TOKENS;
-use crate::tokens::{
+use crate::style::tokens::dock::DOCK_TOKENS;
+use crate::style::tokens::notifications::NOTIFICATION_TOKENS;
+use crate::style::tokens::osd::OSD_TOKENS;
+use crate::style::tokens::shell::SHELL_TOKENS;
+use crate::style::tokens::size_vars::size_tokens;
+use crate::style::tokens::status::StatusMetrics;
+use crate::style::tokens::type_voice::VoiceToken;
+use crate::style::tokens::widget_paint::WidgetPaint;
+use crate::style::tokens::widgets::WIDGET_TOKENS;
+use crate::style::tokens::{
     colour::ColourToken,
     delay::DelayToken,
     easing::EasingToken,
@@ -44,7 +44,7 @@ use crate::tokens::{
     timing::DurationToken,
     type_scale::{Family, FontSize},
 };
-use crate::tokens::{control_center::CONTROL_CENTER, shell_scale::SHELL_SCALE};
+use crate::style::tokens::{control_center::CONTROL_CENTER, shell_scale::SHELL_SCALE};
 
 /// Every custom property the design system declares, `--` included: the token table's
 /// (colours, label hues, durations, the CSS delays, easings, scalars, radii, spacing steps,
@@ -72,7 +72,7 @@ fn collect() -> HashSet<String> {
         .chain(ZLayer::ALL.map(ZLayer::var))
         .chain(OpacityToken::ALL.map(OpacityToken::var))
         .chain(Family::ALL.map(Family::var))
-        .chain([crate::tokens::emoji_face::FONT_EMOJI])
+        .chain([crate::style::tokens::emoji_face::FONT_EMOJI])
         .chain(VoiceToken::ALL.map(VoiceToken::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
@@ -148,17 +148,17 @@ pub fn is_known_anim(name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{declared_vars, is_known_anim};
-    use crate::css::{
+    use crate::lint::{tokenize, walk};
+    use crate::style::css::{
         accents_css::accents_css, ground_css::ground_css, materials_css::materials_css,
         shape_css::shape_css, tokens_css::tokens_css,
     };
-    use crate::lint::{tokenize, walk};
 
     /// Every custom property the generated sections declare on a `.ds` root block (the token,
     /// accent and material sections), asked of the generated CSS itself.
     fn root_declarations() -> Vec<String> {
         let sections = [
-            crate::css::RESET.to_owned(),
+            crate::style::css::RESET.to_owned(),
             tokens_css(),
             accents_css(),
             materials_css(),

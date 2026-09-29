@@ -1,7 +1,7 @@
 //! The values a file drag is made of: what the host hears, what a target sees, what it is
 //! handed when the files are let go.
 
-use crate::geometry::units::Point;
+use crate::core::geometry::units::Point;
 use std::path::PathBuf;
 
 /// A drag of files from outside the window, as one drop target sees it.

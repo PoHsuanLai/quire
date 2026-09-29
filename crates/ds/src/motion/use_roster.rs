@@ -1,15 +1,15 @@
 //! The roster as a hook: [`RosterState`] in a signal, with the settle timers started for it.
 //! The timers belong to the hook's owner and drop with it; a timer that finds the roster gone
-//! stops (`crate::task`).
+//! stops (`crate::core::task`).
 
 use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 use super::roster_rest::{RestQueue, RestTimer};
 use super::settle::settle;
-use crate::components::vocab::{Emphasis, StaggerIndex};
-use crate::root::env::{Env, use_env_signal};
-use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::clock::sleep;
+use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::core::time::clock::sleep;
+use crate::core::vocab::{Emphasis, StaggerIndex};
+use crate::style::env::{Env, use_env_signal};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -115,7 +115,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         try_set(self.state, next)
     }
 
-    pub(super) fn level(&self) -> Result<crate::appearance::motion::MotionLevel, Gone> {
+    pub(super) fn level(&self) -> Result<crate::style::appearance::motion::MotionLevel, Gone> {
         Ok(try_get(self.env)?.resolved.motion)
     }
 }

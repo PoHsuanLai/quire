@@ -310,29 +310,50 @@ fn overlay_stylesheets_use_tokens_only() {
     const SHEETS: &[(&str, &str)] = &[
         (
             "command_palette",
-            include_str!("../src/components/command_palette.css"),
+            include_str!("../src/components/menus/palette/command_palette.css"),
         ),
         (
             "hover_card",
-            include_str!("../src/components/hover_card.css"),
+            include_str!("../src/components/overlays/hover_card.css"),
         ),
-        ("link_pill", include_str!("../src/components/link_pill.css")),
-        ("menu", include_str!("../src/components/menu.css")),
+        (
+            "link_pill",
+            include_str!("../src/components/app/link_pill.css"),
+        ),
+        ("menu", include_str!("../src/components/menus/menu.css")),
         (
             "menu_entry",
-            include_str!("../src/components/menu_entry.css"),
+            include_str!("../src/components/menus/menu_entry.css"),
         ),
-        ("peek", include_str!("../src/components/peek.css")),
-        ("popover", include_str!("../src/components/popover.css")),
-        ("scrim", include_str!("../src/components/scrim.css")),
+        ("peek", include_str!("../src/components/app/peek.css")),
+        (
+            "popover",
+            include_str!("../src/components/overlays/popover.css"),
+        ),
+        (
+            "scrim",
+            include_str!("../src/components/overlays/scrim.css"),
+        ),
         (
             "selection_bubble",
-            include_str!("../src/components/selection_bubble.css"),
+            include_str!("../src/components/fields/selection_bubble.css"),
         ),
-        ("send_pill", include_str!("../src/components/send_pill.css")),
-        ("sheet", include_str!("../src/components/sheet.css")),
-        ("toast", include_str!("../src/components/toast.css")),
-        ("tooltip", include_str!("../src/components/tooltip.css")),
+        (
+            "send_pill",
+            include_str!("../src/components/app/send_pill.css"),
+        ),
+        (
+            "sheet",
+            include_str!("../src/components/overlays/sheet.css"),
+        ),
+        (
+            "toast",
+            include_str!("../src/components/overlays/toast.css"),
+        ),
+        (
+            "tooltip",
+            include_str!("../src/components/overlays/tooltip.css"),
+        ),
     ];
     let failures: Vec<String> = SHEETS
         .iter()

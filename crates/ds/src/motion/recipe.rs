@@ -8,7 +8,7 @@
 use super::anim::Anim;
 use super::recipe_detail as detail;
 use super::recipe_own as own;
-use crate::tokens::{easing::EasingToken, timing::DurationToken};
+use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// `animation-fill-mode`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

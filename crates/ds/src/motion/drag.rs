@@ -1,8 +1,8 @@
 //! Dragging without HTML5 drag events: a Rust tracker owns the pointer, the 8 px Manhattan
 //! threshold and the drop-target hit test (design/06-INTERACTIONS.md section 6).
 
-use crate::components::vocab::Fraction;
-use crate::geometry::units::{Point, Px, Rect};
+use crate::core::geometry::units::{Point, Px, Rect};
+use crate::core::vocab::Fraction;
 use dioxus::prelude::*;
 
 /// How far a press travels, `|dx| + |dy|`, before it is a drag rather than a click: 8 px, the
