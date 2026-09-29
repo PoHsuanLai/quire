@@ -159,7 +159,7 @@ pub const AXES: &[Axis] = &[
     },
     Axis {
         attribute: "data-activity",
-        meaning: "`Activity`, on `.ds`: active, inactive (the window's focus)",
+        meaning: "`Activity`, on `.ds`: written as `inactive` while the window is not the one focused, absent while it is",
     },
     Axis {
         attribute: "aria-*",

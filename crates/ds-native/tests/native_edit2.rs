@@ -51,7 +51,7 @@ fn Editor() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "padding:20px; width:300px; font-size:16px; line-height:20px",
                 EditSurface {
-                    common: Common { id: Some("editor".to_string()), extra_class: ExtraClass::parse("c-body").ok(), data: data, ..Common::default() },
+                    common: Common { id: Some("editor".to_string()), extra_class: ExtraClass::parse("c-body").ok(), data, ..Common::default() },
                     handle,
                     on_input: |input| INPUT.with(|log| log.borrow_mut().push(input)),
                     on_pointer: |pointer| POINTER.with(|log| log.borrow_mut().push(pointer)),

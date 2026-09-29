@@ -61,7 +61,7 @@ const CASES: &[Case] = &[
             .map(|name| vec![DataAttr::new(name, "42")])
             .unwrap_or_default();
         rsx! {
-            EditSurface { common: Common { extra_class: ExtraClass::parse("c-body").ok(), data: data, ..Common::default() }, on_input: |_| {},
+            EditSurface { common: Common { extra_class: ExtraClass::parse("c-body").ok(), data, ..Common::default() }, on_input: |_| {},
                 p { "data-edit-node": "0", "Hi" }
             }
         }

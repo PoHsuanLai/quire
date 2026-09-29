@@ -12,7 +12,7 @@ use dioxus::prelude::*;
 pub struct HostModality(pub Signal<InputModality>);
 
 /// The host's window activity, provided as root context by `ds-native` (which sees the window's
-/// focus); `Ds` stamps it on `.ds` as `data-activity`. Without one, `Ds` stamps `active`.
+/// focus); `Ds` stamps `data-activity="inactive"` on `.ds` while the window is inactive and nothing while it is active. Without one, the window is active.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct HostActivity(pub Signal<Activity>);
 

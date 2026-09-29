@@ -17,7 +17,7 @@ fn Page() -> Element {
         .map(|name| vec![DataAttr::new(name, "INBOX")])
         .unwrap_or_default();
     rsx! {
-        Button { common: Common { extra_class: class, data: data, ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
+        Button { common: Common { extra_class: class, data, ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
     }
 }
 

@@ -26,7 +26,7 @@ fn every_listed_class_is_in_the_stylesheet() {
         let classes = std::iter::once(component.root_selector()).chain(component.part_selectors());
         for selector in classes {
             let class = selector.trim_start_matches('.');
-            if !styled(&sheet, class) {
+            if !styled(sheet, class) {
                 missing.push(format!("{}: {selector}", component.component));
             }
         }
