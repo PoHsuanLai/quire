@@ -26,6 +26,14 @@ fn knob_at(value: Check, size: ControlSize) -> f32 {
     }
 }
 
+/// A switch has no mixed look: `Mixed` is drawn, read out and flipped as `Off`.
+fn refuse_mixed(value: Check) -> Check {
+    match value {
+        Check::Mixed => Check::Off,
+        Check::On | Check::Off => value,
+    }
+}
+
 /// An on/off switch, `size` on the ladder (Regular 38 x 22 when absent; Mini 26 x 15 in a
 /// settings row).
 #[component]
@@ -36,6 +44,7 @@ pub fn Toggle(
     #[props(default)] availability: Availability,
     onchange: EventHandler<Check>,
 ) -> Element {
+    let value = refuse_mixed(value);
     // The contact behind the change this toggle asked for, spent only when the value it asked
     // for arrives; a value that changed from elsewhere moves remotely.
     let mut asked = use_signal(|| None::<(Check, Touch)>);
@@ -70,7 +79,7 @@ pub fn Toggle(
 
 #[cfg(test)]
 mod tests {
-    use super::knob_at;
+    use super::{knob_at, refuse_mixed};
     use crate::core::vocab::Check;
     use crate::style::tokens::control_size::ControlSize;
 
@@ -85,6 +94,18 @@ mod tests {
         for (size, travel) in CASES {
             assert_eq!(knob_at(Check::On, *size), *travel, "{size:?}");
             assert_eq!(knob_at(Check::Off, *size), 0.0, "{size:?}");
+        }
+    }
+
+    #[test]
+    fn a_switch_refuses_mixed_and_draws_it_as_off() {
+        const CASES: &[(Check, Check)] = &[
+            (Check::On, Check::On),
+            (Check::Off, Check::Off),
+            (Check::Mixed, Check::Off),
+        ];
+        for &(given, drawn) in CASES {
+            assert_eq!(refuse_mixed(given), drawn, "{given:?}");
         }
     }
 }

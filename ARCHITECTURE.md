@@ -729,7 +729,7 @@ path each, until step 12 replaces them with the prelude.
     1. tokens: (done) the pruned duration, delay and easing tables (30 section 1.2), `ControlSize {Mini,
        Small, Regular, Large}` and `SizeScale` (1.6), `ds-style::look::Look` with the Mac values,
        Motion levels reduced to Standard and Reduced;
-    2. vocabulary (1.5): `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
+    2. vocabulary: (done) (1.5) `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
        `RowState`, `Activity`, `FocusStyle`; the `Common` props; `ds::selectors`;
     3. motion primitives (1.3): `Roster` (one hook), `use_collapse`, `rubber`, spring only, drop the
        deleted keyframes, scalars and tokens; then interaction primitives (1.4): `LongPress`,
