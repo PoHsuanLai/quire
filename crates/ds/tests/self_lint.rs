@@ -73,7 +73,6 @@ fn config() -> LintConfig {
         profile: Profile::Strict,
         own_vars: INLINE_VARS.iter().map(|name| (*name).to_owned()).collect(),
         exceptions: EXCEPTIONS,
-        ..LintConfig::default()
     }
 }
 
