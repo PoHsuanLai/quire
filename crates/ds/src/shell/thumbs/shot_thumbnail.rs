@@ -28,6 +28,7 @@ use crate::components::overlays::shown_phase::{Alias, use_shown_phase};
 use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::{Point, Px};
 use crate::core::vocab::StaggerIndex;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;

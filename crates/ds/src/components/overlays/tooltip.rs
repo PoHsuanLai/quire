@@ -10,6 +10,7 @@
 //! its say alone, at once, with no hover and no delay of its own.
 
 use crate::components::overlays::hover_card::{target::HoverTarget, use_card};
+use crate::core::word::Word;
 use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use dioxus::prelude::*;
 
@@ -23,22 +24,12 @@ pub enum TooltipKind {
 }
 
 /// Whether a caller-driven tooltip is up: `data-shown` on the Fly's target.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Shown {
     /// Up, at once.
     Visible,
     /// Down, even under the pointer.
     Hidden,
-}
-
-impl Shown {
-    /// The `data-shown` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Shown::Visible => "visible",
-            Shown::Hidden => "hidden",
-        }
-    }
 }
 
 /// The hover key a Card tooltip files its target under: its own text, so two tips on the same

@@ -14,6 +14,7 @@
 use crate::components::app::send_mood::{SendMood, use_mood_pulse};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::prelude::*;
@@ -30,16 +31,6 @@ enum Shown {
     Shown,
 }
 
-impl SendPhase {
-    /// The `data-phase` word.
-    fn slug(self) -> &'static str {
-        match self {
-            SendPhase::Counting => "counting",
-            SendPhase::Done => "done",
-        }
-    }
-}
-
 /// The run circle's `stroke-dashoffset`: 0 at the start, the whole ring once `progress` is all
 /// of it.
 fn drained(progress: Fraction) -> String {
@@ -50,7 +41,7 @@ fn drained(progress: Fraction) -> String {
 }
 
 /// Where the send is.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum SendPhase {
     /// Counting down; Undo is offered.
     Counting,

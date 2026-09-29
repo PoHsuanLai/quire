@@ -5,6 +5,7 @@ use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::core::vocab::{DropState, Here};
+use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::presence::Presence;
 use crate::motion::pulse_key::PulseKey;
@@ -51,7 +52,7 @@ pub struct TodayTrailing {
 pub struct PlaceId(pub String);
 
 /// A preview the item is showing.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Preview {
     /// A strip button would send the thread here: the `dest` ring pulses.
     Destination,
@@ -64,15 +65,6 @@ impl ItemKind {
             ItemKind::Place { .. } => "place",
             ItemKind::Pinned { .. } => "pinned",
             ItemKind::Today { .. } => "today",
-        }
-    }
-}
-
-impl Preview {
-    /// The `data-preview` word.
-    fn slug(self) -> &'static str {
-        match self {
-            Preview::Destination => "destination",
         }
     }
 }

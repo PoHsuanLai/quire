@@ -4,6 +4,7 @@
 use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::Rect;
 use crate::core::vocab::{Expanded, Here, StaggerIndex};
+use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
 use crate::style::icon::Icon;

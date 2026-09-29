@@ -8,10 +8,11 @@
 //! one stylesheet the details lint lets loop for this reason.
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
+use crate::core::word::Word;
 use dioxus::prelude::*;
 
 /// Whether the account is syncing.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum SyncState {
     /// Live and listening.
     #[default]
@@ -21,14 +22,6 @@ pub enum SyncState {
 }
 
 impl SyncState {
-    /// The `data-sync` word.
-    fn slug(self) -> &'static str {
-        match self {
-            SyncState::Idle => "idle",
-            SyncState::Busy => "busy",
-        }
-    }
-
     /// The ring it wears, as the Spinner's `data-kind`: Breathe while idle, Spin while busy
     /// (`C:288-292`).
     fn ring(self) -> &'static str {

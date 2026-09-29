@@ -3,10 +3,11 @@
 //! lights' own marks at a third of a glyph's size, with no Lucide equivalent for the pairs of
 //! corners, and they are drawn in the light's deep ink rather than the text colour's weight.
 
+use crate::core::word::Word;
 use dioxus::prelude::*;
 
 /// Which mark a light shows.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Mark {
     /// The red light's cross.
     Close,
@@ -15,29 +16,11 @@ pub(crate) enum Mark {
     /// The green light's outward corners: the window is its own size.
     Zoom,
     /// The green light's inward corners: the window is maximized.
+    #[word(slug = "zoom")]
     Restore,
 }
 
 impl Mark {
-    /// The light's `data-light` word (the green light is `zoom` in either state).
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Mark::Close => "close",
-            Mark::Minimize => "minimize",
-            Mark::Zoom | Mark::Restore => "zoom",
-        }
-    }
-
-    /// The light's accessible name.
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            Mark::Close => "Close",
-            Mark::Minimize => "Minimize",
-            Mark::Zoom => "Zoom",
-            Mark::Restore => "Restore",
-        }
-    }
-
     /// The path, and whether it is stroked or filled.
     fn shape(self) -> (&'static str, Paint) {
         match self {

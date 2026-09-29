@@ -7,6 +7,7 @@ use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::text_runs::{TextLine, text as runs};
 use crate::components::controls::kbd::Kbd;
 use crate::core::vocab::Shortcut;
+use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -79,22 +80,12 @@ impl HoverCardPart {
 }
 
 /// A flag's tone: `data-tone` on `.ds-hovercard-flag`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum FlagTone {
     /// A spoof or a failure: the danger wash, a danger glyph.
     Danger,
     /// A note: the accent's soft fill, an accent glyph.
     Info,
-}
-
-impl FlagTone {
-    /// The `data-tone` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            FlagTone::Danger => "danger",
-            FlagTone::Info => "info",
-        }
-    }
 }
 
 /// One figure in [`HoverCardPart::Stats`].

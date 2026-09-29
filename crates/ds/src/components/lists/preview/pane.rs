@@ -20,6 +20,7 @@ use crate::components::lists::preview::cue::{
 use crate::components::overlays::shown_phase::use_shown_phase;
 use crate::components::overlays::tooltip::Shown;
 use crate::core::vocab::Shortcut;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::detail::{
     once::use_cross_fade, operation::Operation, pending::PendingFrame, touch::Touch,

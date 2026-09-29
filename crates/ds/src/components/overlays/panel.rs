@@ -22,13 +22,14 @@ use crate::components::overlays::scrim_strength::ScrimStrength;
 use crate::components::overlays::spring_presence::use_spring_presence;
 use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::root::surface::ClassedScope;
 use crate::style::appearance::material::Material;
 use dioxus::prelude::*;
 
 /// Which edge a panel stands at.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum PanelEdge {
     /// The right edge, where macOS keeps Notification Center: full height, `width` wide.
     #[default]
@@ -41,14 +42,6 @@ pub enum PanelEdge {
 }
 
 impl PanelEdge {
-    /// The `data-edge` word.
-    fn slug(self) -> &'static str {
-        match self {
-            PanelEdge::Right => "right",
-            PanelEdge::Bottom => "bottom",
-        }
-    }
-
     /// The keyframe its first showing plays: the edge panel's slide, or the sheet's `peek-in`
     /// at `--t-move --e-out` (no spring: opening is not contact, design/05 principle 2).
     fn entrance(self) -> Anim {
