@@ -9,8 +9,8 @@ use crate::components::menus::menu_entry::{MenuEntry, MenuRow};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
 use crate::core::geometry::units::{Point, Rect};
 use crate::core::task::{spawn_in, try_set};
-use crate::edit::host::Probe;
 use crate::host::measure::Anchor;
+use crate::host::probe::Probe;
 use crate::spell::host::{HostSpell, Learned};
 use crate::spell::marks::{Misspelt, SpellReplace};
 use dioxus::prelude::*;
@@ -309,7 +309,7 @@ mod tests {
     use super::{Opened, Replaces, SpellPick, entries};
     use crate::components::menus::menu_entry::MenuEntry;
     use crate::core::geometry::units::{Point, Px};
-    use crate::edit::position::EditNode;
+    use crate::host::position::EditNode;
     use crate::spell::marks::Misspelt;
     use crate::spell::words::WordSpan;
 

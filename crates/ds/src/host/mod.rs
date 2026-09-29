@@ -1,5 +1,15 @@
 //! What a component asks of the document it is drawn in: measuring an element's rect and scrolling
-//! one into view, through the seams a host provides.
+//! one into view, and the vocabulary the host seams speak, through the seams a host provides.
 
+pub mod captured;
+pub mod caret;
+pub mod drop_hit;
+pub mod fallback;
+pub mod focused;
+pub mod found;
+pub mod ime;
 pub mod measure;
+pub mod pasted;
+pub mod position;
+pub mod probe;
 pub mod reveal;

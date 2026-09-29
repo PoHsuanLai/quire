@@ -8,11 +8,13 @@ use crate::components::editor::state::write_soon;
 use crate::core::geometry::units::Rect;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::edit::composition::settle;
-use crate::edit::host::{HostEdit, ImeEvent, ImeSwitch, Probe};
+use crate::edit::host::HostEdit;
 use crate::edit::pointer::EditFocus;
 use crate::focus::host::{blur_element, focus_soon_told};
 use crate::focus::select::Select;
+use crate::host::ime::{ImeEvent, ImeSwitch};
 use crate::host::measure::BUSY_ATTEMPTS;
+use crate::host::probe::Probe;
 use dioxus::prelude::*;
 use std::rc::Rc;
 

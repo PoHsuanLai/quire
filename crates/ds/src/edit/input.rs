@@ -2,6 +2,7 @@
 //! and clipboard gestures, in the order they happened. An app's adapter maps each to its editor
 //! core's input (mailo builds `editor::InputEvent`s from them).
 
+use crate::host::pasted::Pasted;
 use dioxus::prelude::{Key, Modifiers};
 
 /// One piece of input for the app's editor.
@@ -58,18 +59,4 @@ pub struct PreeditCursor {
     pub start: usize,
     /// Where it ends.
     pub end: usize,
-}
-
-/// What a paste carried.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Pasted {
-    /// Plain text only.
-    Text(String),
-    /// HTML (untrusted: the app sanitises it) and its plain-text form.
-    Html {
-        /// The clipboard's `text/html`.
-        html: String,
-        /// The clipboard's `text/plain`, empty when it had none.
-        text: String,
-    },
 }

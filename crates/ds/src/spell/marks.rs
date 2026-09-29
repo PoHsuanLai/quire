@@ -7,7 +7,7 @@
 //! moves with its word until the next check replaces it.
 
 use super::words::{WordSpan, joined_at, word_at};
-use crate::edit::position::{EditNode, TextPosition, TextRange};
+use crate::host::position::{EditNode, TextPosition, TextRange};
 use std::collections::HashSet;
 
 /// A word no dictionary accepted, where it is.

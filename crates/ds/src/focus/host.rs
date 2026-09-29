@@ -12,22 +12,13 @@
 
 use crate::core::busy::wait_out_busy;
 use crate::core::guarded::guarded_call;
-use crate::focus::caret::{HostPlaceCaret, InitialCaret};
+use crate::focus::caret::HostPlaceCaret;
 use crate::focus::select::{HostSelect, Landing, Select};
+use crate::host::caret::InitialCaret;
+use crate::host::focused::Focused;
 use crate::host::measure::BUSY_ATTEMPTS;
 use dioxus::prelude::*;
 use std::rc::Rc;
-
-/// One attempt at moving the focus through the host.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Focused {
-    /// The element has the focus.
-    Done,
-    /// The document is busy (rendering); try again next frame.
-    Busy,
-    /// The host cannot focus this element (not its node, or gone).
-    Unknown,
-}
 
 /// The host's own focus write, provided as root context by `ds-native` (`ds_native::launch`,
 /// its harness, and `ds_native::focus::provide` for any other Blitz host); without one, focus

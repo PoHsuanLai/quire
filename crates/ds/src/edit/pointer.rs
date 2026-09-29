@@ -4,8 +4,8 @@
 
 use crate::core::geometry::units::Point;
 use crate::edit::clicks::Clicks;
-use crate::edit::position::TextPosition;
-use dioxus::prelude::Modifiers;
+use crate::host::captured::PointerPhase;
+use crate::host::position::TextPosition;
 
 /// A pointer event over the surface.
 #[derive(Debug, Clone, PartialEq)]
@@ -21,17 +21,6 @@ pub struct EditPointer {
     pub extend: Extend,
     /// Which click of a quick run this press is: 2 selects a word, 3 a line.
     pub clicks: Clicks,
-}
-
-/// The part of a press-drag-release gesture.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PointerPhase {
-    /// The primary button went down over the surface.
-    Press,
-    /// The pointer moved with the button still down after a press on the surface.
-    Drag,
-    /// The button came up after a press on the surface.
-    Release,
 }
 
 /// Whether a press starts a new selection or extends the current one.
@@ -51,17 +40,4 @@ pub enum EditFocus {
     In,
     /// It lost it.
     Out,
-}
-
-/// A pointer event the host routes to the surface that captured the pointer at a press: every
-/// move and the release until the button comes up, wherever the pointer is, so a drag selection
-/// keeps following it outside the surface's box.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct CapturedPointer {
-    /// [`PointerPhase::Drag`] for a move, [`PointerPhase::Release`] for the release.
-    pub phase: PointerPhase,
-    /// Where, in the window's logical pixels.
-    pub at: Point,
-    /// The modifiers held.
-    pub modifiers: Modifiers,
 }
