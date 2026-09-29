@@ -5,8 +5,9 @@
 //! it takes when a colour would leave sRGB or fail its contrast floor
 //! (design/03-COLOR.md section 4).
 
-use super::contrast::ratio;
 use crate::appearance::theme::Scheme;
+use crate::core::colour::contrast::ratio;
+use crate::core::colour::fit::{js_round, oklch_hex as hex};
 use crate::tokens::accent_band::{
     band::{AccentPick, Hue, Weight},
     derive::accent_roles,
@@ -131,20 +132,12 @@ const PICK_L_DARK: f64 = 0.66;
 /// Chroma of a fully saturated pick. See [`PICK_L`].
 const PICK_C: f64 = 0.15;
 
-/// How far `fit` drops chroma when the colour is outside sRGB. See [`FRAME_LIGHT`].
-const GAMUT_STEP: f64 = 0.002;
 /// How far the contrast cap drops chroma when text would fail. See [`FRAME_LIGHT`].
 const CAP_STEP: f64 = 0.003;
 
 const HOVER_DARK: &str = "rgba(255,255,255,.06)";
 const PILL_DARK: &str = "rgba(255,255,255,.10)";
 const PILL_LIGHT: &str = "rgba(255,255,255,.72)";
-
-/// `Math.round`: halves go up, including for negatives. Rust's `round` sends
-/// halves away from zero, which disagrees at -1.5.
-fn js_round(value: f64) -> f64 {
-    (value + 0.5).floor()
-}
 
 /// Build a palette from a Space's dots.
 ///
@@ -294,87 +287,6 @@ fn below(fore: &str, back: &str, need: f64) -> bool {
         // Not a hex pair: treat it as failing, the same as a ratio under the floor.
         None => true,
     }
-}
-
-fn oklch_to_rgb(lightness: f64, chroma: f64, hue: f64) -> [f64; 3] {
-    let radians = hue * std::f64::consts::PI / 180.0;
-    let a = chroma * radians.cos();
-    let b = chroma * radians.sin();
-    let l_ = lightness + 0.3963377774 * a + 0.2158037573 * b;
-    let m_ = lightness - 0.1055613458 * a - 0.0638541728 * b;
-    let s_ = lightness - 0.0894841775 * a - 1.2914855480 * b;
-    let l3 = l_ * l_ * l_;
-    let m3 = m_ * m_ * m_;
-    let s3 = s_ * s_ * s_;
-    [
-        4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3,
-        -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3,
-        -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3,
-    ]
-}
-
-fn in_gamut(rgb: [f64; 3]) -> bool {
-    rgb.iter()
-        .all(|channel| (-0.0005..=1.0005).contains(channel))
-}
-
-fn fit(lightness: f64, chroma: f64, hue: f64) -> f64 {
-    let mut chroma = chroma;
-    while chroma > 0.0 && !in_gamut(oklch_to_rgb(lightness, chroma, hue)) {
-        chroma -= GAMUT_STEP;
-    }
-    chroma.max(0.0)
-}
-
-fn encode(channel: f64) -> f64 {
-    let channel = channel.clamp(0.0, 1.0);
-    if channel <= 0.0031308 {
-        12.92 * channel
-    } else {
-        1.055 * channel.powf(1.0 / 2.4) - 0.055
-    }
-}
-
-/// `oklch(lightness chroma hue)` as `#rrggbb`, its chroma reduced until it fits sRGB: the
-/// derived colours a component computes in Rust rather than naming a token (an animated emoji's
-/// tinted disc, design/25-EMOJI.md).
-pub(crate) fn oklch_hex(lightness: f64, chroma: f64, hue: f64) -> String {
-    hex(lightness, chroma, hue)
-}
-
-/// `oklch(lightness chroma hue)` as 8-bit sRGB channels, its chroma reduced until it fits sRGB:
-/// the bytes [`oklch_hex`] writes, for the accent band (`tokens::accent_band`), which keeps
-/// colours as `Hex`.
-pub(crate) fn oklch_bytes(lightness: f64, chroma: f64, hue: f64) -> [u8; 3] {
-    oklch_to_rgb(lightness, fit(lightness, chroma, hue), hue)
-        .map(|channel| channel_byte(encode(channel)))
-}
-
-fn hex(lightness: f64, chroma: f64, hue: f64) -> String {
-    let mut out = String::with_capacity(7);
-    out.push('#');
-    for byte in oklch_bytes(lightness, chroma, hue) {
-        push_byte(&mut out, byte);
-    }
-    out
-}
-
-fn channel_byte(encoded: f64) -> u8 {
-    let rounded = js_round(encoded * 255.0);
-    if (0.0..=255.0).contains(&rounded) {
-        // `js_round` produced a whole number in range.
-        rounded as u8
-    } else if rounded < 0.0 {
-        0
-    } else {
-        255
-    }
-}
-
-fn push_byte(out: &mut String, byte: u8) {
-    const HEX: &[u8; 16] = b"0123456789abcdef";
-    out.push(char::from(HEX[usize::from(byte >> 4)]));
-    out.push(char::from(HEX[usize::from(byte & 0x0f)]));
 }
 
 #[cfg(test)]

@@ -19,7 +19,7 @@ pub(crate) mod derive;
 pub mod floors;
 pub(crate) mod grounds;
 pub(crate) mod legibility;
-pub(crate) mod oklab;
+
 pub(crate) mod picked;
 pub(crate) mod roles;
 pub(crate) mod text_grounds;
@@ -29,7 +29,7 @@ pub use band::{AccentBand, AccentPick, ChromaSpan, Hue, InkRule, Milli, SchemeBa
 pub use derive::accent_roles;
 pub use grounds::{card_grounds, card_ink, over};
 pub use legibility::{Legibility, legibility};
-pub use oklab::distance;
+
 pub use picked::{BAND, hue_of};
 pub use roles::AccentRoles;
 pub use text_grounds::{

@@ -2,7 +2,7 @@
 //! over one.
 
 use crate::appearance::theme::Scheme;
-use crate::space::contrast::ratio;
+use crate::core::colour::contrast::ratio;
 use crate::tokens::{
     colour::ColourToken,
     hex::{Alpha, Colour, Hex},

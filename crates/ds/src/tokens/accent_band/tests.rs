@@ -3,6 +3,7 @@
 use super::floors;
 use super::*;
 use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::core::colour::{oklab::Oklab, srgb::Srgb};
 use crate::tokens::hex::{Alpha, Hex};
 
 fn roles(hue: u16, weight: Weight, scheme: Scheme) -> AccentRoles {
@@ -122,7 +123,8 @@ fn every_built_in_swatch_is_distinct() {
             .collect();
         for (index, &(one, first)) in fills.iter().enumerate() {
             for &(other, second) in &fills[index + 1..] {
-                let apart = distance(first, second);
+                let apart =
+                    Oklab::from(Srgb::from(first)).distance(Oklab::from(Srgb::from(second)));
                 assert!(
                     apart >= 0.06,
                     "{scheme:?}: {one:?} {} and {other:?} {} are {apart:.3} apart",

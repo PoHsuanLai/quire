@@ -21,6 +21,8 @@
 
 use super::tone_band::Tone;
 use crate::appearance::theme::Scheme;
+use crate::core::colour::oklab::{Oklab, Oklch};
+use crate::core::colour::srgb::{LinearRgb, Srgb};
 use crate::space::palette::{Dot, derive};
 
 /// The style an app icon is drawn in: `icons.style`, which `sill` maps onto this.
@@ -69,10 +71,14 @@ impl Tint {
             return None;
         }
         let v = u32::from_str_radix(digits, 16).ok()?;
-        let lab = oklab([(v >> 16) as u8, (v >> 8) as u8, v as u8]);
+        let lch = Oklch::from(Oklab::from(Srgb([
+            (v >> 16) as u8,
+            (v >> 8) as u8,
+            v as u8,
+        ])));
         Some(Tint {
-            hue: lab[2].atan2(lab[1]).to_degrees().rem_euclid(360.0) as f32,
-            chroma: (lab[1].hypot(lab[2]) as f32).min(TINT_CHROMA_MAX),
+            hue: lch.h.to_degrees().rem_euclid(360.0) as f32,
+            chroma: (lch.c as f32).min(TINT_CHROMA_MAX),
         })
     }
 }
@@ -116,7 +122,7 @@ pub(crate) fn recolour(
     tint: Tint,
     (scheme, tone): (Scheme, Tone),
 ) -> [u8; 3] {
-    let [l, a, b] = oklab(rgb);
+    let Oklab { l, a, b } = Oklab::from(Srgb(rgb));
     let l = tone.lightness(l, scheme);
     let (chroma, hue) = match style {
         IconStyle::Colour => return rgb,
@@ -136,56 +142,16 @@ pub(crate) fn recolour(
 /// The sRGB bytes of an OKLCh colour, chroma lowered until it fits.
 fn in_gamut(l: f64, mut chroma: f64, hue: f64) -> [u8; 3] {
     loop {
-        let rgb = linear_rgb([l, chroma * hue.cos(), chroma * hue.sin()]);
-        if rgb.iter().all(|c| (-1e-6..=1.0 + 1e-6).contains(c)) || chroma <= 0.0 {
-            return rgb.map(encode);
+        let linear = LinearRgb::from(Oklab::from(Oklch {
+            l,
+            c: chroma,
+            h: hue,
+        }));
+        if linear.0.iter().all(|c| (-1e-6..=1.0 + 1e-6).contains(c)) || chroma <= 0.0 {
+            return Srgb::from(linear).0;
         }
         chroma = (chroma - 0.004).max(0.0);
     }
-}
-
-fn linear(channel: u8) -> f64 {
-    let c = f64::from(channel) / 255.0;
-    if c <= 0.040_45 {
-        c / 12.92
-    } else {
-        ((c + 0.055) / 1.055).powf(2.4)
-    }
-}
-
-fn encode(c: f64) -> u8 {
-    let c = c.clamp(0.0, 1.0);
-    let e = if c <= 0.003_130_8 {
-        c * 12.92
-    } else {
-        1.055 * c.powf(1.0 / 2.4) - 0.055
-    };
-    (e * 255.0).round() as u8
-}
-
-/// OKLab (Björn Ottosson, 2020) of sRGB bytes: `[L, a, b]`.
-pub(crate) fn oklab([r, g, b]: [u8; 3]) -> [f64; 3] {
-    let [r, g, b] = [r, g, b].map(linear);
-    let l = (0.412_221_470_8 * r + 0.536_332_536_3 * g + 0.051_445_992_9 * b).cbrt();
-    let m = (0.211_903_498_2 * r + 0.680_699_545_1 * g + 0.107_396_956_6 * b).cbrt();
-    let s = (0.088_302_461_9 * r + 0.281_718_837_6 * g + 0.629_978_700_5 * b).cbrt();
-    [
-        0.210_454_255_3 * l + 0.793_617_785_0 * m - 0.004_072_046_8 * s,
-        1.977_998_495_1 * l - 2.428_592_205_0 * m + 0.450_593_709_9 * s,
-        0.025_904_037_1 * l + 0.782_771_766_2 * m - 0.808_675_766_0 * s,
-    ]
-}
-
-/// Linear sRGB of OKLab, unclamped.
-fn linear_rgb([l, a, b]: [f64; 3]) -> [f64; 3] {
-    let l_ = (l + 0.396_337_777_4 * a + 0.215_803_757_3 * b).powi(3);
-    let m_ = (l - 0.105_561_345_8 * a - 0.063_854_172_8 * b).powi(3);
-    let s_ = (l - 0.089_484_177_5 * a - 1.291_485_548_0 * b).powi(3);
-    [
-        4.076_741_662_1 * l_ - 3.307_711_591_3 * m_ + 0.230_969_929_2 * s_,
-        -1.268_438_004_6 * l_ + 2.609_757_401_1 * m_ - 0.341_319_396_5 * s_,
-        -0.004_196_086_3 * l_ - 0.703_418_614_7 * m_ + 1.707_614_701_0 * s_,
-    ]
 }
 
 #[cfg(test)]
@@ -194,7 +160,7 @@ mod tests {
     use crate::space::presets::PRESETS;
 
     fn lch(px: &[u8]) -> (f64, f64, f64) {
-        let [l, a, b] = oklab([px[0], px[1], px[2]]);
+        let Oklab { l, a, b } = Oklab::from(Srgb([px[0], px[1], px[2]]));
         (l, a.hypot(b), b.atan2(a).to_degrees().rem_euclid(360.0))
     }
 

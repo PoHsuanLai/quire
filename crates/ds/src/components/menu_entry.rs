@@ -11,7 +11,6 @@ use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Check, Shortcut};
 use crate::icon::{Icon, external::IconSource};
 
-
 /// The tile at an item's start.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Tile {
