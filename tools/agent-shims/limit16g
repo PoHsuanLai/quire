@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run a command inside a transient cgroup capped at 16 GB (no swap).
-# Only for tools that must map model weights (ComfyUI, LoRA training); builds use limit4g.
+# Only for tools that must map model weights (ComfyUI, LoRA training).
 set -u
 if [[ $# -eq 0 ]]; then
   echo "usage: limit16g <command> [args...]" >&2

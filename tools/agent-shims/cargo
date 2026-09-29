@@ -3,7 +3,7 @@
 #
 # Two rules, enforced here so no brief has to ask for them:
 #   1. Only one compilation runs at a time on this machine (a global flock).
-#   2. Every compilation runs inside a transient cgroup capped at 4 GB.
+#   2. Every compilation runs inside a transient cgroup (no memory cap unless AGENT_MEM_MAX).
 #
 # Cheap, read-only subcommands skip the lock. Everything else queues.
 # If the capped build is OOM-killed, retry once with a single job, then fail loudly.
@@ -21,7 +21,7 @@ fi
 lock_dir="${XDG_RUNTIME_DIR:-/tmp}"
 lock_file="$lock_dir/agent-build.lock"
 holder_file="$lock_dir/agent-build.holder"
-mem_max="${AGENT_MEM_MAX:-infinity}"  # the 4 GB gate was dropped on 2026-09-25 (memory pressure gone)
+mem_max="${AGENT_MEM_MAX:-infinity}"
 jobs="${CARGO_BUILD_JOBS:-8}"
 
 sub="${1:-}"

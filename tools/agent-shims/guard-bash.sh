@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Bash (this session and every agent it spawns).
 #
-# 1. Refuses commands that bypass the cargo shim or its memory cap (exit 2 = blocked).
+# 1. Refuses commands that bypass the cargo shim or its build knobs (exit 2 = blocked).
 # 2. For commands that build, rewrites the command so the shim directory is first on
-#    PATH, which routes cargo through the build lock and the 4 GB cgroup cap.
+#    PATH, which routes cargo through the build lock and its cgroup.
 #
 # Reads the tool-call JSON on stdin. Prints a JSON `updatedInput` when it rewrites.
 set -u
@@ -14,7 +14,7 @@ cmd="$(printf '%s' "$input" | python3 -c 'import json,sys; print(json.load(sys.s
 shims="$HOME/.local/bin/agent-shims"
 
 deny() {
-  echo "blocked: $1. Use plain 'cargo' (the shim serialises builds and caps memory at 4 GB); never set CARGO_BUILD_JOBS or RUSTFLAGS inline." >&2
+  echo "blocked: $1. Use plain 'cargo' (the shim serialises builds); never set CARGO_BUILD_JOBS or RUSTFLAGS inline." >&2
   exit 2
 }
 
@@ -25,7 +25,7 @@ abs_cargo="${sep}[^[:space:]]*(\\.cargo/bin/cargo|/usr/bin/cargo|/usr/local/bin/
 rustc_direct="${sep}rustc[[:space:]]"
 toolchain="${sep}cargo[[:space:]]+\\+"
 override="${sep}(CARGO_BUILD_JOBS|RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|AGENT_MEM_MAX|AGENT_SHIM_REAL_CARGO)="
-routed="${sep}(cargo|limit4g|limit16g|rustup)([[:space:]]|\$)"
+routed="${sep}(cargo|limit16g|rustup)([[:space:]]|\$)"
 
 [[ "$cmd" =~ $abs_cargo ]]    && deny "cargo called by absolute path"
 [[ "$cmd" =~ $rustc_direct ]] && deny "rustc called directly"
