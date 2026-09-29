@@ -16,6 +16,24 @@ that rev.
 
 ## Open items
 
+- **Timing tokens that design/30 section 1.2 deletes still have users.** `--t-tap`,
+  `--t-ambient`, `--t-big-heavy`, `--t-crumple-heavy`, `--t-spark`, `--t-curl`,
+  `--t-curl-heavy`, `--t-send`, `--t-float`, `--t-sail`, `--t-boat-return`, `--t-spin`,
+  `--t-nudge`, `--t-park`, `--t-fill`, `--t-sweep`, `--t-flash`, `--t-count-step`,
+  `--t-pending-step`, `--t-send-ring`, `--e-spring`, the scalars (`--overshoot`, `--squish`,
+  `--lift`, `--tilt`, `--stagger`, `--pickup`), `StyleDelay` (`--d-fly`, `--d-heal`) and the
+  delays `PendingGrace`, `PendingCap`, `SettleHold`, `SendCountdown`, `SendTick` are read by
+  keyframes and components that the motion primitives of step 4a.3 replace; each goes with its
+  last user. `--t-spin-step` and the interaction delays (`LongPress`, `SubmenuOpen`,
+  `TriangleTimeout`, `TypeaheadReset`) have no reader until then.
+- **The Mac Look applies part of design/30 section 3.2.** `Look::Mac` carries the neutral
+  colours (paper, surface, raise, ink, lines) and the radii the table names; the ink levels
+  are firmer than macOS's 85, 55 and 25 % because the legibility gates hold them (design/03
+  section 6). The accent (system blue #007AFF / #0A84FF), the materials' tints and edges, the
+  shadows, the card's flap corner on the icon plate and the accent band's grounds
+  (`accent_band::grounds`, `css::ground_css`, which read `Look::default()`) are not yet a
+  Look's values; the second Look (step 4a.8) threads `TokenScope::look` to them and adds
+  `Look::Arc` from the Post values recorded in design/30 section 3.2.
 - **ds-settings still keeps unknown keys** (design/22 section 2 and the `extra` tables). The
   rule is to report and drop them, as sill does; the settings step of the restructure changes
   both.
@@ -157,9 +175,9 @@ Not built, or limited, in quire:
 - **`app_icon_path` probes the disk per call** (cache the answer with the decoded icon), and a
   partly installed set is not merged with a later lookup step.
 - **Reduced motion and holds** (unsure whether settled since): `--t-flash` (the
-  mentioned-person ring, 1200 ms) is shortened to 60 ms under Reduced like every duration token,
-  while `--t-send-ring` is exempt as a hold. Whether every hold should be exempt is an open
-  design question.
+  mentioned-person ring, 1200 ms) is shortened to `--t-quick` under Reduced like every moving
+  duration token, while `--t-send-ring` and `--t-spin-step` are exempt as holds. Whether every
+  hold should be exempt is an open design question.
 - **Modal focus** (design/04 O-15, unsure; check design/04 before acting): focus on mount
   exists; Peek and Sheet neither move nor trap focus.
 - **design/08 section 1.4's size table** lacks `IconSize::Tile48`, `Tile96` and `Px(IconPx)`.
@@ -836,7 +854,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 
 - **Stylo and CSS motion.** `calc()` with `min()` and `var()` resolves inside a keyframe's
   `scale()` and `translateY()` (the contact keyframes scale their departure by
-  `min(1, (var(--overshoot) - 1) * 25)`: full at Standard and Extra, flat at Calm and Reduced).
+  `min(1, (var(--overshoot) - 1) * 25)`: full at Standard, flat at Reduced).
   Five `box-shadow` layers paint; `calc()` inside an `rgba()` alpha and a `color-mix` percentage
   from `calc(var() * 100%)` paint.
 - **Transform lists of different functions interpolate as matrices**: `scale(1)` to
@@ -1064,9 +1082,9 @@ What Blitz at the pinned rev paints (48 px, headless):
   the Spaces store costs only its own position.
 - **The portal's colour scheme** has three values (0 no preference, 1 dark, 2 light); no
   preference maps to Light.
-- **Types.** `Motion` is the preference (five values, default System, with a `label()`);
-  `MotionLevel` is the resolved four (Calm, Standard, Extra, Reduced), so a picker offers
-  `Motion`. `ds::Px(f32)` is for layout, `ds_settings::Px(u16)` for stored keys; `ds::Percent`
+- **Types.** `Motion` is the preference (Standard or Reduced, default Standard, with a `label()`; the
+  desktop's reduce-motion preference makes Standard resolve to Reduced); `MotionLevel` is the
+  resolved pair, so a picker offers `Motion`. `ds::Px(f32)` is for layout, `ds_settings::Px(u16)` for stored keys; `ds::Percent`
   and `ds_settings::Percent` agree by shape because `ds` may not depend on `ds-settings`. There
   is one unclamped `Fraction`; components clamp. `Secs(u16)` and `Mins(u16)` are unit newtypes
   like `Px`/`Ms`/`Count`, rendered as sliders from the field's own `#[settings(range, unit)]`.

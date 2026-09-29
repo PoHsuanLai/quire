@@ -82,7 +82,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | Crate | Modules, lowest first |
 | --- | --- |
 | `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
-| `ds-style` | `appearance` (theme, accent, motion, look, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
+| `ds-style` | `look` (`Look`), `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
@@ -287,13 +287,13 @@ pub trait Token: Word {
     const PREFIX: &'static str;               // "dur-", "s-", "shell-"
     const KIND: TokenKind;                    // Fixed | Tuned (default declared, override written inline)
     fn var(self) -> VarName { ... }           // "--" + PREFIX + slug
-    fn css_value(self, scope: TokenScope) -> CssValue;   // TokenScope { scheme: Scheme, motion: MotionLevel }
+    fn css_value(self, scope: TokenScope) -> CssValue;   // TokenScope { look: Look, scheme: Scheme, motion: MotionLevel, typeface: Typeface }
 }
 pub struct TokenSet { ... }
 impl TokenSet { pub const fn of<T: Token>() -> TokenSet; }
 // #[derive(Word, Token)] is the only way to write a token family: the enum-level
 // #[token(prefix = "dur-", kind = fixed | tuned)] and per-variant values
-// #[token(value = "90ms")] or #[token(calm = "..", standard = "..", extra = "..", reduced = "..")]
+// #[token(value = "90ms")] or #[token(standard = "..", reduced = "..")]
 // or #[token(light = "..", dark = "..")] generate `var`, `css_value` and the `TokenSet`, so a
 // token cannot reach CSS without also reaching the linter's vocabulary.
 

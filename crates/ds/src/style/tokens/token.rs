@@ -8,6 +8,7 @@
 use super::name::VarName;
 use crate::core::word::Word;
 use crate::style::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
+use crate::style::look::Look;
 use std::borrow::Cow;
 
 pub use ds_core_derive::Token;
@@ -22,9 +23,11 @@ pub enum TokenKind {
     Tuned,
 }
 
-/// What a token's value can follow: the colour scheme, the motion level, the typeface.
+/// What a token's value can follow: the Look, the colour scheme, the motion level, the typeface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TokenScope {
+    /// The value set: colours, radii and the rest a Look varies.
+    pub look: Look,
     /// Light or dark.
     pub scheme: Scheme,
     /// The motion level.
@@ -34,8 +37,10 @@ pub struct TokenScope {
 }
 
 impl TokenScope {
-    /// The scope `.ds` itself is declared in: light, Standard motion, the system typeface.
+    /// The scope `.ds` itself is declared in: the Mac Look, light, Standard motion, the system
+    /// typeface.
     pub const BASE: TokenScope = TokenScope {
+        look: Look::Mac,
         scheme: Scheme::Light,
         motion: MotionLevel::Standard,
         typeface: Typeface::System,

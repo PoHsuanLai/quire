@@ -37,12 +37,6 @@ impl SchemaVariants for ds::Look {
     }
 }
 
-impl SchemaVariants for ds::Warmth {
-    fn variants() -> Vec<String> {
-        variants_of(ds::Warmth::ALL)
-    }
-}
-
 impl SchemaVariants for ds::Accent {
     fn variants() -> Vec<String> {
         variants_of(ds::Accent::ALL)
@@ -96,12 +90,7 @@ mod tests {
     }
 
     #[test]
-    fn look_is_four_words() {
-        assert_eq!(ds::Look::variants().len(), 4);
-    }
-
-    #[test]
-    fn warmth_is_four_words() {
-        assert_eq!(ds::Warmth::variants().len(), 4);
+    fn look_is_one_word() {
+        assert_eq!(ds::Look::variants(), vec!["mac".to_owned()]);
     }
 }

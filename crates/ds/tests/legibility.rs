@@ -4,6 +4,7 @@
 
 use ds::Alpha;
 use ds::Hex;
+use ds::Look;
 use ds::Word;
 use ds::{
     Accent, CardAccent, ColourToken, Dot, FrameVars, Grain, Material, PRESETS, Scheme, SpaceLook,
@@ -18,7 +19,7 @@ fn measured(fore: &str, back: &str) -> f64 {
 }
 
 fn colour(token: ColourToken, scheme: Scheme) -> String {
-    token.value(scheme).css()
+    token.value(Look::Mac, scheme).css()
 }
 
 #[test]

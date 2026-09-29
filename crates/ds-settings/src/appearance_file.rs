@@ -33,7 +33,7 @@ mod tests {
     use crate::settings::{AppearanceFile, IconDarkVariant, PlateGlyphPolicy};
     use crate::test_dir::TempDir;
     use crate::units::Percent;
-    use ds::{Accent, Look, Motion, Theme, Warmth};
+    use ds::{Accent, Motion, Theme};
     use std::path::Path;
 
     fn entries(dir: &Path) -> Vec<String> {
@@ -69,8 +69,6 @@ mod tests {
                 f.appearance.motion_level = Motion::Reduced;
             }),
             with(|f| {
-                f.appearance.look = Look::Candy;
-                f.appearance.warmth = Warmth::Paper;
                 f.appearance.material_tint_alpha = Percent(64);
                 f.icons.plate_glyph_colour_policy = PlateGlyphPolicy::ForceInk;
                 f.icons.dark_mode_variant = IconDarkVariant::Adaptive;

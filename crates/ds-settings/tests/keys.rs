@@ -26,7 +26,6 @@ const SILL_OWNED: &[&str] = &[
 const APPEARANCE_SETTINGS_FIELDS: &[&str] = &[
     "theme",
     "look",
-    "warmth",
     "accent",
     "motion_level",
     "typeface",

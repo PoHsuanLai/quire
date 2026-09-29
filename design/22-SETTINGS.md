@@ -94,8 +94,7 @@ control in v1.
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `07-LOOKS.md#2-the-look-model` | settled (preference) |
-| `appearance.look` | `Look::{Post,Riso,Tide,Candy}` | `Post` | Riso/Tide/Candy reachable, not default | `07-LOOKS.md#11-desktop-default` | settled (preference) |
-| `appearance.warmth` | `Warmth::{Cool,Neutral,Warm,Paper}` (Candy only) | `Neutral` | applies only when `look = Candy` | `07-LOOKS.md#7-warmth-candy-only` | settled (preference) |
+| `appearance.look` | `Look::{Mac}` (Arc joins with the second Look) | `Mac` | a Look is values only | `30-CATALOGUE.md` part 3 | settled (user, 2026-09-29) |
 | `appearance.accent` | `Accent` (6 variants) | `Postmark` | other 5 not named in any doc (03-COLOR open decision 6) — **could not find full default set**, see handback | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | `MotionLevel::{System,Calm,Standard,Extra,Reduced}` | `System` | `System` follows the portal's `prefers-reduced-motion` | `07-LOOKS.md#11-desktop-default` ("Motion levels ... apply on top of whichever look is active | proposed") | proposed |
 | `appearance.typeface` | `Typeface::{System,Editorial}` | `System` | `System`: Inter for UI and data (tabular), Inter Display for display; `Editorial`: Bricolage Grotesque, Karla and Space Mono, mail's voice, as an opt-in for an app. Written as `data-typeface` on `.ds`. Code and `Kbd` stay in Space Mono (`--font-code`) either way | `02-TYPE.md#2-the-faces` | settled (user, 2026-09-26: "make this desktop use mostly inter") |
@@ -773,7 +772,7 @@ impl Default for ScrollSettings {
 
 ### 4.3 The rest, by name
 
-`AppearanceSettings` (theme, look, warmth, accent, motion_level, material_tint_alpha),
+`AppearanceSettings` (theme, look, accent, motion_level, material_tint_alpha),
 `IconsSettings`, `BarSettings`, `LauncherSettings`, `GesturesSettings` (palmrest crate:
 `scroll_speed`/`lock_*`/`swipe_*`/`tap_*`/`foreign_output`/`g4_*`/`live_workspace_*`/
 `gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` as the nested
@@ -880,7 +879,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.look`, `appearance.warmth` (only when look=Candy), `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
+| **Appearance** | `appearance.theme`, `appearance.look`, `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.position`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into COSMIC's `system_actions` and `custom` shortcut files, and the chord COSMIC already holds wins a clash, shown on the row (28 §7 decision 10) |
