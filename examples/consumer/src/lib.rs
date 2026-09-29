@@ -8,9 +8,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, Availability, Button, ButtonVariant, Ds, Focus, Icon, InputVariant, Material,
-    Menu, MenuEntry, MenuKind, MountedRef, TextInput, Tile, Trail, use_focus_request,
-    use_motion_timer, use_toasts,
+    Anchor, Anim, Availability, Button, ButtonVariant, Common, Ds, FieldFocus, Icon, InputVariant,
+    Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput,
+    use_focus_request, use_motion_timer, use_toasts,
 };
 use ds_settings::{AppName, use_environment};
 
@@ -54,8 +54,8 @@ fn entries() -> Vec<MenuEntry<Action>> {
             value: Action::Duplicate,
             title: "Duplicate".to_owned(),
             detail: None,
-            tile: Some(Tile::Icon(Icon::Mail)),
-            trail: Trail::None,
+            tile: Some(MenuTile::Icon(Icon::Mail)),
+            trail: MenuTrail::None,
             check: None,
         },
         MenuEntry::Item {
@@ -63,8 +63,8 @@ fn entries() -> Vec<MenuEntry<Action>> {
             value: Action::Discard,
             title: "Discard".to_owned(),
             detail: None,
-            tile: Some(Tile::Icon(Icon::Trash)),
-            trail: Trail::None,
+            tile: Some(MenuTile::Icon(Icon::Trash)),
+            trail: MenuTrail::None,
             check: None,
         },
     ]
@@ -72,10 +72,10 @@ fn entries() -> Vec<MenuEntry<Action>> {
 
 /// A subject field, a `Send` button whose "Sent" confirmation is timed by
 /// `ds::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`
-/// anchored to the button itself: `Button`'s `mounted` hands over its element and the menu
+/// anchored to the button itself: `Button`'s `common.mounted` hands over its element and the menu
 /// takes it as `Anchor::Mounted`, measured when placing (`CONSUMING.md` §4, "Overlays"). No
 /// wrapper element is measured in its place. The subject field has the keyboard as the page
-/// mounts and gets it back whenever the menu closes (`Focus::Controlled`, `CONSUMING.md` §6).
+/// mounts and gets it back whenever the menu closes (`FieldFocus::Controlled`, `CONSUMING.md` §6).
 #[component]
 fn Page() -> Element {
     let mut subject = use_signal(String::new);
@@ -93,7 +93,7 @@ fn Page() -> Element {
                 label: "Subject".to_owned(),
                 value: subject(),
                 oninput: move |value| subject.set(value),
-                focus: Focus::Controlled(field),
+                focus: FieldFocus::Controlled(field),
             }
             div { class: "actions",
                 Button {
@@ -110,7 +110,12 @@ fn Page() -> Element {
                     variant: ButtonVariant::Secondary,
                     label: "More".to_owned(),
                     onclick: move |_| menu_open.set(true),
-                    mounted: move |event: MountedEvent| more.set(Some(MountedRef(event.data()))),
+                    common: Common {
+                        mounted: Some(EventHandler::new(move |event: MountedEvent| {
+                            more.set(Some(MountedRef(event.data())));
+                        })),
+                        ..Common::default()
+                    },
                 }
             }
             span {
