@@ -2,14 +2,14 @@
 //! desktop says (system preferences), and what the two resolve to on a `.ds` root; and which
 //! typeface the root's type speaks in.
 
-pub(crate) mod accent;
+pub mod accent;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
-pub(crate) mod appearance;
-pub(crate) mod blur;
-pub(crate) mod material;
-pub(crate) mod motion;
-pub(crate) mod peek;
-pub(crate) mod resolve;
-pub(crate) mod system;
-pub(crate) mod theme;
-pub(crate) mod typeface;
+pub mod appearance;
+pub mod blur;
+pub mod material;
+pub mod motion;
+pub mod peek;
+pub mod resolve;
+pub mod system;
+pub mod theme;
+pub mod typeface;

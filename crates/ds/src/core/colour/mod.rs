@@ -2,7 +2,7 @@
 //! them, WCAG contrast, and the prototype's gamut fit. Every colour computation in the crate
 //! converts through these.
 
-pub(crate) mod contrast;
-pub(crate) mod fit;
-pub(crate) mod oklab;
-pub(crate) mod srgb;
+pub mod contrast;
+pub mod fit;
+pub mod oklab;
+pub mod srgb;

@@ -8,17 +8,17 @@
 
 pub(crate) mod count_up;
 pub(crate) mod ease;
-pub(crate) mod glide;
+pub mod glide;
 pub(crate) mod pending;
-pub(crate) mod playback;
-pub(crate) mod spring;
-pub(crate) mod sweep;
+pub mod playback;
+pub mod spring;
+pub mod sweep;
 pub(crate) mod use_timeline;
 
 use std::time::Duration;
 
 /// A motion as data.
-pub(crate) trait Timeline: Clone + PartialEq + 'static {
+pub trait Timeline: Clone + PartialEq + 'static {
     /// What one frame draws.
     type Frame: Clone + PartialEq + 'static;
 

@@ -2,8 +2,8 @@
 
 pub(crate) mod search_field;
 pub(crate) mod selection_bubble;
-pub(crate) mod text_input;
-pub(crate) mod text_input_focus;
-pub(crate) mod text_input_kind;
+pub mod text_input;
+pub mod text_input_focus;
+pub mod text_input_kind;
 pub(crate) mod text_input_mask;
 pub(crate) mod text_input_parts;

@@ -3,7 +3,7 @@
 
 pub(crate) mod animated_list;
 pub(crate) mod appearance_picker;
-pub(crate) mod emoji_grid;
+pub mod emoji_grid;
 pub(crate) mod leaving_list;
 pub(crate) mod leaving_row;
 pub(crate) mod list_row;
@@ -12,7 +12,7 @@ pub(crate) mod row_battery;
 pub(crate) mod row_click;
 pub(crate) mod row_hooks;
 pub(crate) mod row_star;
-pub(crate) mod section_header;
+pub mod section_header;
 pub(crate) mod settings_row;
 pub(crate) mod settings_row_phase;
 pub(crate) mod settings_row_trailing;

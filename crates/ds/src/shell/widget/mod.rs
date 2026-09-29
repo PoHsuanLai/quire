@@ -19,7 +19,7 @@ pub(crate) mod gallery;
 pub(crate) mod gallery_add;
 pub(crate) mod gallery_book;
 pub(crate) mod gallery_rows;
-pub(crate) mod kind;
+pub mod kind;
 pub(crate) mod layout;
 pub(crate) mod registry;
 pub(crate) mod scope;

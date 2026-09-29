@@ -35,7 +35,7 @@ use crate::style::tokens::{
 
 /// The settings key's default, `appearance.material_tint_alpha = 80` (design/22-SETTINGS.md
 /// section 3.1, proposed): the alpha at which every tint is section 17.2's own.
-pub(crate) const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
+pub const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
 
 /// The solid fallback's alpha when blur is unavailable (section 17.1, settled: "alpha at least
 /// 0.94"). The key does not move it: it is the floor that keeps text legible on any backdrop.

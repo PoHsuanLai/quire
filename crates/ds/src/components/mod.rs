@@ -2,11 +2,11 @@
 //! (design/04-COMPONENTS.md); mail's own are in `app`, the shell's in the shell layer.
 
 pub(crate) mod app;
-pub(crate) mod chrome;
-pub(crate) mod content;
-pub(crate) mod controls;
+pub mod chrome;
+pub mod content;
+pub mod controls;
 pub(crate) mod editor;
-pub(crate) mod fields;
-pub(crate) mod lists;
+pub mod fields;
+pub mod lists;
 pub(crate) mod menus;
-pub(crate) mod overlays;
+pub mod overlays;

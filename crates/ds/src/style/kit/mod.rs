@@ -12,4 +12,4 @@ mod tests;
 pub use kits::{Kits, KnownNames};
 pub use model::{Kit, KitRank, Section, Vocabulary};
 
-pub(crate) use style_kit::KIT as STYLE_KIT;
+pub use style_kit::KIT as STYLE_KIT;

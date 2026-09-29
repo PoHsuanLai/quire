@@ -40,7 +40,7 @@ pub(crate) enum Stage {
 
 /// What one render's `shown` does to a surface at `stage`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Step {
+pub enum Step {
     /// Nothing changes.
     Stay,
     /// Shown after leaving or gone: spring in again (and rejoin the layer stack).
@@ -76,24 +76,24 @@ fn place(shown: Shown) -> f32 {
 }
 
 /// The surface's showing for one render.
-#[derive(Clone, Copy)]
-pub(crate) struct SpringPresence {
+#[derive(Clone, Copy, Debug)]
+pub struct SpringPresence {
     stage: CopyValue<Stage>,
     drive: CopyValue<Drive>,
     entrance: MotionTimer,
     spring: SpringMotion,
     /// What this render's `shown` changed, for the caller to act on the layer stack.
-    pub(crate) step: Step,
+    pub step: Step,
 }
 
 impl SpringPresence {
     /// Whether the surface is drawn at all: not once gone.
-    pub(crate) fn drawn(&self) -> bool {
+    pub fn drawn(&self) -> bool {
         *self.stage.peek() != Stage::Gone
     }
 
     /// `data-presence`: entering, present, or leaving.
-    pub(crate) fn slug(&self) -> &'static str {
+    pub fn slug(&self) -> &'static str {
         match (*self.stage.peek(), *self.drive.peek()) {
             (Stage::Up, Drive::Keyframe) => match self.entrance.phase() {
                 TimerPhase::Settled => "present",
@@ -111,12 +111,12 @@ impl SpringPresence {
     }
 
     /// Whether the surface is on its way out: its scrim fades with it.
-    pub(crate) fn leaving(&self) -> bool {
+    pub fn leaving(&self) -> bool {
         *self.stage.peek() == Stage::Leaving
     }
 
     /// `data-drive`: `spring` once the spring draws it, nothing while its first entrance plays.
-    pub(crate) fn drive(&self) -> Option<&'static str> {
+    pub fn drive(&self) -> Option<&'static str> {
         match *self.drive.peek() {
             Drive::Keyframe => None,
             Drive::Spring => Some("spring"),
@@ -124,14 +124,14 @@ impl SpringPresence {
     }
 
     /// The spring's place for the stylesheet, `--present-p:0.500`.
-    pub(crate) fn style(&self) -> String {
+    pub fn style(&self) -> String {
         format!("--present-p:{}", self.spring.peek().css())
     }
 }
 
 /// The showing hook. `shown` is the caller's (`None`: always shown); `entrance` is the keyframe
 /// its first showing plays; `on_hidden` runs when a hidden surface's spring comes to rest.
-pub(crate) fn use_spring_presence(
+pub fn use_spring_presence(
     shown: Option<Shown>,
     on_hidden: Option<EventHandler<()>>,
     entrance: Anim,

@@ -12,7 +12,7 @@ struct RootTypeface(Signal<Typeface>);
 /// Provide `typeface` to the subtree, updating it when it changes.
 ///
 /// A nested root provides its own context rather than writing to the enclosing one.
-pub(crate) fn use_typeface_provider(typeface: Typeface) {
+pub fn use_typeface_provider(typeface: Typeface) {
     let RootTypeface(mut provided) = use_context_provider(|| RootTypeface(Signal::new(typeface)));
     if *provided.peek() != typeface {
         provided.set(typeface);

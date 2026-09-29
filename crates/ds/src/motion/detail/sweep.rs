@@ -32,7 +32,7 @@ impl SweepShare {
 
 /// How a sweep answers a moment: from where, over which token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum SweepPlan {
+pub enum SweepPlan {
     /// From zero over `--t-sweep` (Appear).
     FromZero,
     /// From the current share over `--t-quick` (Change, Progress).
@@ -42,7 +42,7 @@ pub(crate) enum SweepPlan {
 }
 
 /// Which plan a moment at `level` asks for: Reduced jumps (R7).
-pub(crate) fn plan(moment: Moment, level: MotionLevel) -> SweepPlan {
+pub fn plan(moment: Moment, level: MotionLevel) -> SweepPlan {
     match (moment, level) {
         (_, MotionLevel::Reduced) => SweepPlan::Stand,
         (Moment::Appear, _) => SweepPlan::FromZero,

@@ -24,13 +24,13 @@ enum Hold {
 
 /// A kept press and the last change it was offered to.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) struct Armed {
+pub struct Armed {
     press: CopyValue<Option<(Contact, Hold)>>,
     seen: CopyValue<Option<u32>>,
 }
 
 /// A place to keep a press for the change it causes.
-pub(crate) fn use_armed() -> Armed {
+pub fn use_armed() -> Armed {
     Armed {
         press: use_hook(|| CopyValue::new(None)),
         seen: use_hook(|| CopyValue::new(None)),
@@ -39,7 +39,7 @@ pub(crate) fn use_armed() -> Armed {
 
 impl Armed {
     /// Keep `touch` (from a handler) for the next change; a remote touch keeps nothing.
-    pub(crate) fn arm(mut self, touch: Touch) {
+    pub fn arm(mut self, touch: Touch) {
         match touch {
             Touch::Contact(contact) => self.press.set(Some((
                 contact,
@@ -50,7 +50,7 @@ impl Armed {
     }
 
     /// Who is causing a change made now: the kept press while it holds.
-    pub(crate) fn touch(self) -> Touch {
+    pub fn touch(self) -> Touch {
         match *self.press.peek() {
             Some((contact, Hold::Operation)) => Touch::Contact(contact),
             Some((contact, Hold::Since(at)))
@@ -64,7 +64,7 @@ impl Armed {
 
     /// `cue` is the change being drawn: the first render of a new change spends the press, or,
     /// for a Pending change the press caused, hands it to the operation's end.
-    pub(crate) fn spend(mut self, cue: Cue) {
+    pub fn spend(mut self, cue: Cue) {
         let serial = Some(cue.serial());
         if *self.seen.peek() == serial {
             return;

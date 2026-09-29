@@ -190,7 +190,7 @@ impl AvatarMuting {
 }
 
 /// An avatar's description, drawn.
-pub(crate) fn face(face: AvatarFace) -> Element {
+pub fn face(face: AvatarFace) -> Element {
     rsx! {
         Avatar {
             initial: face.initial,

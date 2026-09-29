@@ -7,7 +7,7 @@
 //! `#[token(kind = tuned)]`; its variants name the `input` and the default `value`.
 
 /// A length in whole logical pixels, as a settings key stores it.
-pub(crate) fn px(value: u16) -> String {
+pub fn px(value: u16) -> String {
     format!("{value}px")
 }
 

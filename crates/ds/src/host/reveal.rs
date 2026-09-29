@@ -61,7 +61,7 @@ pub fn nearest_scroll(current: f32, view: f32, item: ScrollSpan) -> f32 {
 
 /// Show `item` inside `scroller`, once the item has been laid out: through the host's
 /// [`HostReveal`], else the renderer's own nearest-edge `scrollIntoView`. Call it from a task.
-pub(crate) async fn reveal(scroller: &MountedData, item: &MountedData) -> Scrolled {
+pub async fn reveal(scroller: &MountedData, item: &MountedData) -> Scrolled {
     if laid_out_rect(item).await.is_none() {
         return Scrolled::Unknown;
     }

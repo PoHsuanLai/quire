@@ -22,7 +22,7 @@ const AFTER_RENDER_RETRIES: usize = 4;
 
 /// Wait before retry `attempt` (from 0) of a write or read the renderer refused: until the
 /// current render has ended for the first few, a frame for the rest.
-pub(crate) async fn wait_out_busy(attempt: usize) {
+pub async fn wait_out_busy(attempt: usize) {
     match attempt {
         0..AFTER_RENDER_RETRIES => after_render().await,
         _ => sleep(FRAME_SLACK).await,
@@ -31,7 +31,7 @@ pub(crate) async fn wait_out_busy(attempt: usize) {
 
 /// Ready once the render in progress has ended: an effect of the polling task's scope wakes it,
 /// and dioxus runs effects after the renderer has let go of the document. Call it from a task.
-pub(crate) fn after_render() -> AfterRender {
+pub fn after_render() -> AfterRender {
     AfterRender {
         stage: Stage::Unqueued,
     }

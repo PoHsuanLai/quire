@@ -74,7 +74,7 @@ impl Contact {
     /// `onclick` (which hands a [`crate::Press`], not the event): a press reaches it only from the
     /// person's click or key on that button. Crate-private, so a caller outside quire still
     /// proves contact with an event.
-    pub(crate) fn pressed(press: &crate::core::press::Press) -> Contact {
+    pub fn pressed(press: &crate::core::press::Press) -> Contact {
         let _ = press;
         Contact {
             proof: (),
@@ -84,7 +84,7 @@ impl Contact {
 
     /// A contact for a unit test that has no event to hand.
     #[cfg(test)]
-    pub(crate) fn for_tests() -> Contact {
+    pub fn for_tests() -> Contact {
         Contact {
             proof: (),
             velocity: Velocity::ZERO,

@@ -72,7 +72,7 @@ pub struct HostPressFocus(pub fn(&MountedData) -> Focused);
 /// What a `Ds` root gives the controls inside it for a click they keep: the host's seams, if the
 /// host provided them, and the root's own element, through which they read the document.
 #[derive(Clone, Copy)]
-pub(crate) struct ClickRoot {
+pub struct ClickRoot {
     host: Option<HostClickFocus>,
     press: Option<HostPressFocus>,
     element: CopyValue<Option<Rc<MountedData>>>,
@@ -80,7 +80,7 @@ pub(crate) struct ClickRoot {
 
 impl ClickRoot {
     /// The root's seams, read from the host's context, and its element, once mounted.
-    pub(crate) fn of(element: CopyValue<Option<Rc<MountedData>>>) -> ClickRoot {
+    pub fn of(element: CopyValue<Option<Rc<MountedData>>>) -> ClickRoot {
         ClickRoot {
             host: try_consume_context::<HostClickFocus>(),
             press: try_consume_context::<HostPressFocus>(),
@@ -89,7 +89,7 @@ impl ClickRoot {
     }
 
     /// The root's own click handler: hand a click nothing inside has taken to the host.
-    pub(crate) fn clicked(&self, event: &MouseEvent) {
+    pub fn clicked(&self, event: &MouseEvent) {
         after_click(self.host, self.element.peek().clone(), event);
     }
 }
@@ -99,7 +99,7 @@ impl ClickRoot {
 /// Call it last in the click handler, after the control's own work, as the root is the last to
 /// hear a click. Outside a `Ds` root, or without the host's seams (`FocusFallback::BlitzDefault`,
 /// a server render, the web), it does nothing.
-pub(crate) fn kept_click(event: &MouseEvent) {
+pub fn kept_click(event: &MouseEvent) {
     let Some(root) = try_consume_context::<ClickRoot>() else {
         return;
     };

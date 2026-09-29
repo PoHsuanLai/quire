@@ -60,7 +60,7 @@ impl WindowFrame {
     }
 
     /// The root's `data-window-frame` word, absent with no frame.
-    pub(crate) fn attribute(&self) -> Option<&'static str> {
+    pub fn attribute(&self) -> Option<&'static str> {
         match self {
             WindowFrame::None => None,
             WindowFrame::Titlebar { .. } => Some("titlebar"),
@@ -70,7 +70,7 @@ impl WindowFrame {
 
 /// The root's content under `frame`: the children alone, or the titlebar, the children in the
 /// window body, and the resize edges.
-pub(crate) fn framed(frame: WindowFrame, children: Element) -> Element {
+pub fn framed(frame: WindowFrame, children: Element) -> Element {
     match frame {
         WindowFrame::None => children,
         WindowFrame::Titlebar {

@@ -10,7 +10,7 @@ use crate::style::kit::{Kit, KitRank, Kits, Section, Vocabulary};
 use std::borrow::Cow;
 
 /// The motion layer's contribution to the stylesheet and the linter.
-pub(crate) static KIT: Kit = Kit {
+pub static KIT: Kit = Kit {
     rank: KitRank::Motion,
     tokens: &[],
     sections: &[Section {

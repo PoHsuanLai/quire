@@ -3,7 +3,7 @@
 
 pub(crate) mod device_battery;
 pub(crate) mod device_forms;
-pub(crate) mod device_glyph;
+pub mod device_glyph;
 pub(crate) mod figure;
 pub(crate) mod level;
 pub(crate) mod ring;

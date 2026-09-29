@@ -1,3 +1,3 @@
 //! Text that has to fit: Blitz has no `text-overflow: ellipsis` or `line-clamp`.
 
-pub(crate) mod clip;
+pub mod clip;

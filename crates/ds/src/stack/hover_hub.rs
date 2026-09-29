@@ -174,7 +174,7 @@ fn stop(timer: Signal<Option<Task>>) -> Result<(), Gone> {
 }
 
 /// A new hub for `Ds` to provide, timing `hc-out` at the root's motion level.
-pub(crate) fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
+pub fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
     let scope = use_hook(current_scope_id);
     use_context_provider(|| HoverHub {
         intent: Signal::new(HoverIntent::default()),

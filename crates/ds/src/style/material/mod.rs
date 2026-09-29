@@ -6,5 +6,5 @@
 
 pub(crate) mod layer;
 pub(crate) mod level;
-pub(crate) mod recipe;
-pub(crate) mod stack;
+pub mod recipe;
+pub mod stack;

@@ -50,7 +50,7 @@ fn worn(key: PulseKey, phase: TimerPhase) -> PulseKey {
 }
 
 /// `base` with the pulse's class added while it plays, and its `data-pulse` alias.
-pub(crate) fn bump_attrs(base: &str, key: PulseKey) -> (String, Option<&'static str>) {
+pub fn bump_attrs(base: &str, key: PulseKey) -> (String, Option<&'static str>) {
     match key.attrs() {
         Some((anim, alias)) => (format!("{base} {anim}"), Some(alias)),
         None => (base.to_string(), None),

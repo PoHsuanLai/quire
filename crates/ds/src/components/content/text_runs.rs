@@ -128,7 +128,7 @@ impl<'a> SuperFrom<&'a str, OptionalText> for Option<TextLine> {
 }
 
 /// `text` drawn: a bare text node when plain, else each run in its tone.
-pub(crate) fn text(text: &TextLine) -> Element {
+pub fn text(text: &TextLine) -> Element {
     match text {
         TextLine::Plain(plain) => rsx! { "{plain}" },
         TextLine::Runs(runs) => {

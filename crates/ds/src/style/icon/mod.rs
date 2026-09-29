@@ -19,25 +19,25 @@
 use shape::Shape;
 
 pub(crate) mod classify;
-pub(crate) mod family;
+pub mod family;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;
 pub(crate) mod geometry_control;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
 pub(crate) mod plate;
-pub(crate) mod plate_tint;
-pub(crate) mod render;
+pub mod plate_tint;
+pub mod render;
 pub(crate) mod retint;
 pub(crate) mod sets;
-pub(crate) mod shape;
-pub(crate) mod stroke;
+pub mod shape;
+pub mod stroke;
 #[cfg(test)]
 mod tests;
 pub(crate) mod tone_band;
 #[cfg(test)]
 mod tone_band_tests;
-pub(crate) mod url;
+pub mod url;
 
 use geometry::*;
 

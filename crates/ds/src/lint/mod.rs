@@ -34,8 +34,8 @@ pub(crate) mod selector;
 pub(crate) mod severity;
 pub(crate) mod stylesheet;
 pub(crate) mod text;
-pub(crate) mod tokenize;
-pub(crate) mod walk;
+pub mod tokenize;
+pub mod walk;
 
 pub use assert::assert_clean;
 pub use markup::{markup, markup_warnings};

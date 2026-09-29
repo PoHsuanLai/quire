@@ -24,7 +24,7 @@ pub(crate) fn press_of(event: &MouseEvent, button: PointerButton) -> Press {
 
 /// The pointer button a mouse event's trigger names. No trigger is a keyboard activation,
 /// which reports primary; the back and forward buttons (and unknown ones) are not presses.
-pub(crate) fn button_of(trigger: Option<MouseButton>) -> Option<PointerButton> {
+pub fn button_of(trigger: Option<MouseButton>) -> Option<PointerButton> {
     match trigger {
         None | Some(MouseButton::Primary) => Some(PointerButton::Primary),
         Some(MouseButton::Secondary) => Some(PointerButton::Secondary),
@@ -70,14 +70,14 @@ impl Propagation {
 /// for the middle button, which neither fires as a click on Blitz. Under
 /// [`Propagation::Stop`] each of them keeps its event at the control before reporting.
 #[derive(Clone, Copy)]
-pub(crate) struct PressListeners {
+pub struct PressListeners {
     press: EventHandler<Press>,
     propagation: Propagation,
 }
 
 impl PressListeners {
     /// Listeners that report to `press` and let the event bubble on.
-    pub(crate) fn new(press: EventHandler<Press>) -> Self {
+    pub fn new(press: EventHandler<Press>) -> Self {
         PressListeners {
             press,
             propagation: Propagation::Bubble,
@@ -85,7 +85,7 @@ impl PressListeners {
     }
 
     /// The same listeners, keeping or passing on the event as `propagation` says.
-    pub(crate) fn with_propagation(self, propagation: Propagation) -> Self {
+    pub fn with_propagation(self, propagation: Propagation) -> Self {
         PressListeners {
             propagation,
             ..self
@@ -95,7 +95,7 @@ impl PressListeners {
     /// A `click`: primary, or whatever button the event names. A click kept at the control
     /// ([`Propagation::Stop`]) is handed to the host's click focus last, as the root would have
     /// (`focus::click::kept_click`): the control has the keyboard afterwards.
-    pub(crate) fn click(&self, event: &MouseEvent) {
+    pub fn click(&self, event: &MouseEvent) {
         self.propagation.apply(event);
         if let Some(button) = button_of(event.trigger_button()) {
             self.press.call(press_of(event, button));
@@ -106,14 +106,14 @@ impl PressListeners {
     }
 
     /// A `contextmenu`: a secondary press. The page's own menu is the app's to open.
-    pub(crate) fn context_menu(&self, event: &MouseEvent) {
+    pub fn context_menu(&self, event: &MouseEvent) {
         event.prevent_default();
         self.propagation.apply(event);
         self.press.call(press_of(event, PointerButton::Secondary));
     }
 
     /// A `mouseup`: only the middle button counts (the primary one arrives as `click`).
-    pub(crate) fn mouse_up(&self, event: &MouseEvent) {
+    pub fn mouse_up(&self, event: &MouseEvent) {
         if event.trigger_button() == Some(MouseButton::Auxiliary) {
             self.propagation.apply(event);
             self.press.call(press_of(event, PointerButton::Middle));

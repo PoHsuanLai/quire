@@ -32,7 +32,7 @@ pub(crate) fn presence_selector(attribute: &str) -> String {
 
 /// A plain (non-custom) declaration, `animation:gulp …;`, for the few rules the generators
 /// write that are not token blocks.
-pub(crate) fn property(name: &str, value: &str) -> String {
+pub fn property(name: &str, value: &str) -> String {
     format!("{name}:{value};")
 }
 

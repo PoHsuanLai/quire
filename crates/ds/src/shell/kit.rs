@@ -9,7 +9,7 @@ use crate::style::kit::{Kit, KitRank, Vocabulary};
 use crate::style::tokens::set::{Place, TokenSet};
 
 /// The shell's contribution to the stylesheet and the linter.
-pub(crate) static KIT: Kit = Kit {
+pub static KIT: Kit = Kit {
     rank: KitRank::Shell,
     tokens: &[
         TokenSet::of::<WidgetPaint>().at(Place::Scheme),

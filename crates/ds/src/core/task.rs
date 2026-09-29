@@ -17,16 +17,16 @@ use std::future::Future;
 
 /// A signal whose owner has dropped: the task that wanted it has nothing left to do.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Gone;
+pub struct Gone;
 
 /// Run `future` as a task of `scope`: dioxus drops it, mid-wait or not, when `scope` drops.
 /// `scope` must still be mounted; callers read a signal it owns with [`try_get`] first.
-pub(crate) fn spawn_in(scope: ScopeId, future: impl Future<Output = ()> + 'static) -> Task {
+pub fn spawn_in(scope: ScopeId, future: impl Future<Output = ()> + 'static) -> Task {
     Runtime::current().in_scope(scope, || spawn(future))
 }
 
 /// Set `signal` to `value`, or report that its owner is gone.
-pub(crate) fn try_set<T: 'static>(signal: Signal<T>, value: T) -> Result<(), Gone> {
+pub fn try_set<T: 'static>(signal: Signal<T>, value: T) -> Result<(), Gone> {
     let mut signal = signal;
     signal
         .try_write()
@@ -35,10 +35,7 @@ pub(crate) fn try_set<T: 'static>(signal: Signal<T>, value: T) -> Result<(), Gon
 }
 
 /// Set `signal` to `value` when it differs, or report that its owner is gone.
-pub(crate) fn try_set_if_changed<T: PartialEq + 'static>(
-    signal: Signal<T>,
-    value: T,
-) -> Result<(), Gone> {
+pub fn try_set_if_changed<T: PartialEq + 'static>(signal: Signal<T>, value: T) -> Result<(), Gone> {
     if *signal.try_peek().map_err(|_| Gone)? == value {
         return Ok(());
     }
@@ -46,7 +43,7 @@ pub(crate) fn try_set_if_changed<T: PartialEq + 'static>(
 }
 
 /// A copy of `signal`'s value, or [`Gone`].
-pub(crate) fn try_get<T: Clone + 'static>(signal: Signal<T>) -> Result<T, Gone> {
+pub fn try_get<T: Clone + 'static>(signal: Signal<T>) -> Result<T, Gone> {
     signal
         .try_peek()
         .map(|value| value.clone())

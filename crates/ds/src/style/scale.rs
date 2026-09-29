@@ -18,7 +18,7 @@ pub struct HostScale(pub Signal<Scale>);
 struct DeviceScale(Scale);
 
 /// The scale a root draws for: `given`, else the host's, else [`Scale::ONE`].
-pub(crate) fn use_root_scale(given: Option<Scale>) -> Scale {
+pub fn use_root_scale(given: Option<Scale>) -> Scale {
     let host = use_hook(try_consume_context::<HostScale>);
     let scale = given
         .or(host.map(|HostScale(current)| current()))

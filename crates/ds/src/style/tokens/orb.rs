@@ -6,19 +6,19 @@
 use super::name::VarName;
 
 /// The orb's width and height.
-pub(crate) const SIZE: VarName = VarName("--orb-size");
+pub const SIZE: VarName = VarName("--orb-size");
 /// The glow layer's blur radius.
-pub(crate) const BLUR: VarName = VarName("--orb-blur");
+pub const BLUR: VarName = VarName("--orb-blur");
 /// The glow layer's contrast.
-pub(crate) const CONTRAST: VarName = VarName("--orb-contrast");
+pub const CONTRAST: VarName = VarName("--orb-contrast");
 /// The radius of a dot in the dot grid.
-pub(crate) const DOT: VarName = VarName("--orb-dot");
+pub const DOT: VarName = VarName("--orb-dot");
 /// The rim's soft shadow spread.
-pub(crate) const SHADOW: VarName = VarName("--orb-shadow");
+pub const SHADOW: VarName = VarName("--orb-shadow");
 /// The share of the radius inside which the dots are fully there.
-pub(crate) const MASK: VarName = VarName("--orb-mask");
+pub const MASK: VarName = VarName("--orb-mask");
 /// How far round the glows have turned, as an angle.
-pub(crate) const TURN: VarName = VarName("--orb-turn");
+pub const TURN: VarName = VarName("--orb-turn");
 
 /// Every one, for the lint's list of declared properties.
 pub(crate) const ORB_VARS: [VarName; 7] = [SIZE, BLUR, CONTRAST, DOT, SHADOW, MASK, TURN];

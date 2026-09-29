@@ -228,7 +228,7 @@ pub enum ShortcutKey {
 /// draws Up, Down, Left and Right larger than the rest of the small face (at 9.5 px
 /// an arrow's stroke reads as a dash).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub(crate) enum GlyphKind {
+pub enum GlyphKind {
     /// Up, Down, Left, Right.
     Arrow,
 }
@@ -270,7 +270,7 @@ impl ShortcutKey {
     /// doc's; the rest are not specified in design/04-COMPONENTS.md (O-2 names only the
     /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace, the arrows and Home, End, Delete, PageUp,
     /// PageDown, Insert and ContextMenu need sign-off.
-    pub(crate) fn glyph(self) -> String {
+    pub fn glyph(self) -> String {
         match self {
             ShortcutKey::Ctrl => "⌃".to_string(),
             ShortcutKey::Shift => "⇧".to_string(),
@@ -298,7 +298,7 @@ impl ShortcutKey {
 
     /// The `data-glyph` shape `Kbd` writes for this key, or `None` for every key whose glyph
     /// needs no face rule of its own.
-    pub(crate) fn glyph_kind(self) -> Option<GlyphKind> {
+    pub fn glyph_kind(self) -> Option<GlyphKind> {
         match self {
             ShortcutKey::Up | ShortcutKey::Down | ShortcutKey::Left | ShortcutKey::Right => {
                 Some(GlyphKind::Arrow)
@@ -310,7 +310,7 @@ impl ShortcutKey {
 
 impl Availability {
     /// `aria-disabled`: present only when disabled.
-    pub(crate) fn aria_disabled(self) -> Option<&'static str> {
+    pub fn aria_disabled(self) -> Option<&'static str> {
         match self {
             Availability::Enabled => None,
             Availability::Disabled => Some("true"),
@@ -339,7 +339,7 @@ impl DropState {
 
 impl Switch {
     /// The `aria-pressed` / `aria-checked` word.
-    pub(crate) fn aria(self) -> &'static str {
+    pub fn aria(self) -> &'static str {
         match self {
             Switch::On => "true",
             Switch::Off => "false",
@@ -347,7 +347,7 @@ impl Switch {
     }
 
     /// The other state.
-    pub(crate) fn flipped(self) -> Self {
+    pub fn flipped(self) -> Self {
         match self {
             Switch::On => Switch::Off,
             Switch::Off => Switch::On,
@@ -357,7 +357,7 @@ impl Switch {
 
 impl Here {
     /// The `aria-current` word.
-    pub(crate) fn aria_current(self) -> &'static str {
+    pub fn aria_current(self) -> &'static str {
         match self {
             Here::Current => "true",
             Here::Elsewhere => "false",
@@ -367,7 +367,7 @@ impl Here {
 
 impl Expanded {
     /// The `aria-expanded` word.
-    pub(crate) fn aria(self) -> &'static str {
+    pub fn aria(self) -> &'static str {
         match self {
             Expanded::Open => "true",
             Expanded::Closed => "false",
@@ -377,7 +377,7 @@ impl Expanded {
 
 impl Selection {
     /// The `aria-selected` word.
-    pub(crate) fn aria(self) -> &'static str {
+    pub fn aria(self) -> &'static str {
         match self {
             Selection::Selected => "true",
             Selection::Unselected => "false",
@@ -385,7 +385,7 @@ impl Selection {
     }
 
     /// `Selected` when `a == b`.
-    pub(crate) fn of<T: PartialEq>(a: &T, b: &T) -> Self {
+    pub fn of<T: PartialEq>(a: &T, b: &T) -> Self {
         if a == b {
             Selection::Selected
         } else {
@@ -399,18 +399,18 @@ impl Fraction {
     pub(crate) const ONE: Fraction = Fraction(1000);
 
     /// The value a component draws: clamped to 0..=1000.
-    pub(crate) fn clamped(self) -> Self {
+    pub fn clamped(self) -> Self {
         Fraction(self.0.min(Self::ONE.0))
     }
 
     /// The value in whole percent, rounded: what a battery's figure prints and its
     /// `aria-valuenow` reads.
-    pub(crate) fn whole_percent(self) -> u16 {
+    pub fn whole_percent(self) -> u16 {
         (self.clamped().0 + 5) / 10
     }
 
     /// The clamped value as a CSS number for `--f`: `0.35`, `0`, `1`.
-    pub(crate) fn css(self) -> String {
+    pub fn css(self) -> String {
         let permille = self.clamped().0;
         let text = format!("{}.{:03}", permille / 1000, permille % 1000);
         text.trim_end_matches('0').trim_end_matches('.').to_string()
