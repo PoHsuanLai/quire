@@ -158,7 +158,7 @@ fn the_trailing_button_keeps_its_press_and_the_row_asks_the_app() {
     press(&mut harness, archive);
     assert_eq!(
         log(&harness),
-        "more:projects,more:archive,select:projects,toggle:projects:Closed,toggle:archive:Open"
+        "more:projects,more:archive,select:projects,toggle:projects:Hidden,toggle:archive:Visible"
     );
     assert!(!is_open(&harness, "projects", "archive") && is_open(&harness, "archive", "receipts"));
     assert_eq!(
