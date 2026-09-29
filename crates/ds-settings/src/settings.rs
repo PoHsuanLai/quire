@@ -42,7 +42,7 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub accent: Accent,
-    /// `appearance.motion_level` (alias `motion.level`): System follows the portal.
+    /// `appearance.motion_level`: System follows the portal.
     #[settings(
         label = "Motion",
         help = "How much the window moves: Calm, Standard, Extra, or reduce motion to a \
