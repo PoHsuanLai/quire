@@ -1,7 +1,9 @@
 //! How one glyph gives way to the next (design/26-DETAILS.md section 3.2, A5).
 
+use crate::core::word::Word;
+
 /// How a glyph morphs into the next.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum MorphStyle {
     /// The old glyph shrinks to .7 and fades as the new one grows from .7: a change of state.
     DownUp,
@@ -11,18 +13,6 @@ pub enum MorphStyle {
     CrossFade,
     /// The base stays (cross-fading if it changes); a slash draws on or off (mute, radio off).
     Slash,
-}
-
-impl MorphStyle {
-    /// The `data-style` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            MorphStyle::DownUp => "down-up",
-            MorphStyle::OffUp => "off-up",
-            MorphStyle::CrossFade => "cross-fade",
-            MorphStyle::Slash => "slash",
-        }
-    }
 }
 
 /// Whether a `MorphStyle::Slash` glyph wears its slash.

@@ -3,6 +3,7 @@
 //! No `bool` props: every two-state prop is one of these enums, so a call site reads
 //! `Availability::Disabled`, never `true`.
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Whether a control takes input. `Disabled` adds `aria-disabled="true"` and drops the handler.
@@ -79,7 +80,7 @@ pub enum Switch {
 ///
 /// Its own type rather than a [`Switch`]: a toggle's pressed state and a trigger's open state
 /// are different facts, and a control can carry both.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Expanded {
     /// What it controls is showing.
     Open,
@@ -206,19 +207,10 @@ pub enum ShortcutKey {
 /// some glyphs need. `Arrow` is the only member today — a Small cap's `data-glyph="arrow"`
 /// draws Up, Down, Left and Right larger than the rest of the small face (at 9.5 px
 /// an arrow's stroke reads as a dash).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum GlyphKind {
     /// Up, Down, Left, Right.
     Arrow,
-}
-
-impl GlyphKind {
-    /// The `data-glyph` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            GlyphKind::Arrow => "arrow",
-        }
-    }
 }
 
 /// A key combination, modifiers first, rendered as glyphs with no separator: `⌃T`
@@ -359,14 +351,6 @@ impl Expanded {
         match self {
             Expanded::Open => "true",
             Expanded::Closed => "false",
-        }
-    }
-
-    /// The `data-expanded` word, for a part styled by whether what it heads is open.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Expanded::Open => "open",
-            Expanded::Closed => "closed",
         }
     }
 }

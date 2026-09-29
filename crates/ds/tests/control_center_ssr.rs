@@ -17,6 +17,7 @@ mod tiles;
 
 use dioxus::prelude::*;
 use ds::GlyphProps;
+use ds::Word;
 use ds::lint::{LintConfig, Profile, markup};
 use ds::{Glyph, Icon, IconSize};
 

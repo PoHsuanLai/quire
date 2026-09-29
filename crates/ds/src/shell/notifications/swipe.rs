@@ -14,6 +14,7 @@
 use crate::components::controls::press::button_of;
 use crate::core::geometry::units::Px;
 use crate::core::press::PointerButton;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::detail::touch::{Contact, Touch};
 use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};

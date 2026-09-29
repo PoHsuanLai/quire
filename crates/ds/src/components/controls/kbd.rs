@@ -1,6 +1,7 @@
 //! Kbd: key caps, one `kbd.ds-kbd` per key (design/04-COMPONENTS.md section 9).
 
 use crate::core::vocab::{GlyphKind, Shortcut};
+use crate::core::word::Word;
 use dioxus::prelude::*;
 
 /// A key cap's size.

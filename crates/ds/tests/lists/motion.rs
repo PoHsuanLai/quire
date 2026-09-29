@@ -2,6 +2,7 @@
 //! of a row's exit, and the ghost at each moment of a drag.
 
 use super::*;
+use ds::Word;
 
 const KEYS: [&str; 4] = ["a", "b", "c", "d"];
 const PITCH: RowPitch = RowPitch(Px(79.0));

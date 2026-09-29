@@ -6,6 +6,7 @@ use crate::components::lists::row_hooks::{PartHooks, relay, use_back};
 use crate::components::lists::row_star::star_button;
 use crate::core::text::clip::clip_chars;
 use crate::core::vocab::{DropState, Emphasis, Selection, StaggerIndex, Switch};
+use crate::core::word::Word;
 use crate::motion::presence::Presence;
 use crate::motion::pulse_key::PulseKey;
 use dioxus::prelude::*;

@@ -3,9 +3,10 @@
 
 use crate::core::geometry::units::Px;
 use crate::core::vocab::StaggerIndex;
+use crate::core::word::Word;
 
 /// How a row leaves: `data-exit`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Exit {
     /// Archive, restore, wake: `fold`.
     Fold,
@@ -17,19 +18,6 @@ pub enum Exit {
     TabOut,
     /// A notification banner leaving: `banner-out`, a slide to the right.
     BannerOut,
-}
-
-impl Exit {
-    /// The `data-exit` value.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Exit::Fold => "fold",
-            Exit::Curl => "curl",
-            Exit::Crumple => "crumple",
-            Exit::TabOut => "tab-out",
-            Exit::BannerOut => "banner-out",
-        }
-    }
 }
 
 /// An item's motion state: `data-presence`.

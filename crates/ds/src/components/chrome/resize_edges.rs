@@ -4,6 +4,7 @@
 //! compositor takes the pointer from the press. Not drawn while the window is maximized or
 //! fullscreen, where resizing is the compositor's.
 
+use crate::core::word::Word;
 use crate::window::{
     host::{use_window_host, use_window_state},
     vocab::ResizeEdge,
@@ -19,7 +20,7 @@ pub(crate) fn ResizeEdges() -> Element {
         return rsx! {};
     }
     rsx! {
-        for edge in ResizeEdge::ALL {
+        for edge in ResizeEdge::ALL.iter().copied() {
             div {
                 key: "{edge.slug()}",
                 class: "ds-resize-edge",
