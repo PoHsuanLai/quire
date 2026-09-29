@@ -15,7 +15,6 @@ use crate::components::app::send_mood::{SendMood, use_mood_pulse};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::core::vocab::Fraction;
 use crate::core::word::Word;
-use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::prelude::*;
 
@@ -140,14 +139,10 @@ pub fn SendPill(
         })
     });
     // Done: "Sent" stays up for SentHold, then the pill slides away (S:2342).
-    let env = use_hook(try_consume_context::<Signal<Scope>>);
     let mut held = use_hook(|| CopyValue::new(SendPhase::Counting));
     if phase == SendPhase::Done && *held.peek() == SendPhase::Counting {
         held.set(SendPhase::Done);
-        let level = env
-            .map(|env| env.peek().resolved.motion)
-            .unwrap_or_default();
-        let hold = DelayToken::SentHold.delay(level);
+        let hold = DelayToken::SentHold.delay();
         spawn(async move {
             sleep(hold).await;
             shown.set(Shown::Hidden);

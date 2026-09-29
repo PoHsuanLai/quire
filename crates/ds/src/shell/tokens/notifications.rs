@@ -1,74 +1,76 @@
 //! The notification parts' geometry tokens (design/22-SETTINGS.md section 3.12,
 //! design/13 section 13.3.6): the banner's width, floor, padding and icon, the close button, the
 //! gap between stacked banners, the offset of a group's layers and the notification center's
-//! width, each a [`Tuned`] token its `notifications.*` key moves through one inline write
+//! width, each a tuned token its `notifications.*` key moves through one inline write
 //! ([`NotificationMetrics::style_attr`]) on any element around the banners or the center.
 
-use super::name::VarName;
-use super::tuned::{Tuned, px};
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
+use crate::style::tokens::token::Token;
+use crate::style::tokens::tuned::px;
 
-const fn tuned(token: &'static str, input: &'static str, default: &'static str) -> Tuned {
-    Tuned {
-        token: VarName(token),
-        input: VarName(input),
-        default,
-    }
+/// One notification geometry token, each a tuned token its `notifications.*` key moves.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = tuned)]
+pub enum NotificationToken {
+    /// `--notifications-banner-width` (`notifications.banner_width_px`, 360).
+    #[token(
+        name = "notifications-banner-width",
+        input = "--notifications-banner-width-px",
+        value = "360px"
+    )]
+    BannerWidth,
+    /// `--notifications-banner-min-height` (`notifications.banner_min_height_px`, 64).
+    #[token(
+        name = "notifications-banner-min-height",
+        input = "--notifications-banner-min-height-px",
+        value = "64px"
+    )]
+    BannerMinHeight,
+    /// `--notifications-banner-padding` (`notifications.banner_padding_px`, 12).
+    #[token(
+        name = "notifications-banner-padding",
+        input = "--notifications-banner-padding-px",
+        value = "12px"
+    )]
+    BannerPadding,
+    /// `--notifications-icon` (`notifications.icon_px`, 32): the app icon's side.
+    #[token(
+        name = "notifications-icon",
+        input = "--notifications-icon-px",
+        value = "32px"
+    )]
+    Icon,
+    /// `--notifications-close` (`notifications.close_button_px`, 18): the close button's diameter.
+    #[token(
+        name = "notifications-close",
+        input = "--notifications-close-px",
+        value = "18px"
+    )]
+    Close,
+    /// `--notifications-stack-gap` (`notifications.stack_gap_px`, 8): between two banners.
+    #[token(
+        name = "notifications-stack-gap",
+        input = "--notifications-stack-gap-px",
+        value = "8px"
+    )]
+    StackGap,
+    /// `--notifications-group-offset` (`notifications.group_offset_px`, 4): how far each of a
+    /// group's layers shows below the one above it.
+    #[token(
+        name = "notifications-group-offset",
+        input = "--notifications-group-offset-px",
+        value = "4px"
+    )]
+    GroupOffset,
+    /// `--notifications-center-width` (`notifications.center_width_px`, 384).
+    #[token(
+        name = "notifications-center-width",
+        input = "--notifications-center-width-px",
+        value = "384px"
+    )]
+    CenterWidth,
 }
-
-/// `--notifications-banner-width` (`notifications.banner_width_px`, 360).
-pub const BANNER_WIDTH: Tuned = tuned(
-    "--notifications-banner-width",
-    "--notifications-banner-width-px",
-    "360px",
-);
-/// `--notifications-banner-min-height` (`notifications.banner_min_height_px`, 64).
-pub const BANNER_MIN_HEIGHT: Tuned = tuned(
-    "--notifications-banner-min-height",
-    "--notifications-banner-min-height-px",
-    "64px",
-);
-/// `--notifications-banner-padding` (`notifications.banner_padding_px`, 12).
-pub const BANNER_PADDING: Tuned = tuned(
-    "--notifications-banner-padding",
-    "--notifications-banner-padding-px",
-    "12px",
-);
-/// `--notifications-icon` (`notifications.icon_px`, 32): the app icon's side.
-pub const ICON: Tuned = tuned("--notifications-icon", "--notifications-icon-px", "32px");
-/// `--notifications-close` (`notifications.close_button_px`, 18): the close button's diameter.
-pub const CLOSE: Tuned = tuned("--notifications-close", "--notifications-close-px", "18px");
-/// `--notifications-stack-gap` (`notifications.stack_gap_px`, 8): between two banners.
-pub const STACK_GAP: Tuned = tuned(
-    "--notifications-stack-gap",
-    "--notifications-stack-gap-px",
-    "8px",
-);
-/// `--notifications-group-offset` (`notifications.group_offset_px`, 4): how far each of a
-/// group's layers shows below the one above it.
-pub const GROUP_OFFSET: Tuned = tuned(
-    "--notifications-group-offset",
-    "--notifications-group-offset-px",
-    "4px",
-);
-/// `--notifications-center-width` (`notifications.center_width_px`, 384).
-pub const CENTER_WIDTH: Tuned = tuned(
-    "--notifications-center-width",
-    "--notifications-center-width-px",
-    "384px",
-);
-
-/// Every notification token, in stylesheet order.
-pub const NOTIFICATION_TOKENS: [Tuned; 8] = [
-    BANNER_WIDTH,
-    BANNER_MIN_HEIGHT,
-    BANNER_PADDING,
-    ICON,
-    CLOSE,
-    STACK_GAP,
-    GROUP_OFFSET,
-    CENTER_WIDTH,
-];
 
 /// The notification geometry from the settings, written as the tokens' inputs on any element
 /// around the banners or the center.
@@ -114,14 +116,15 @@ impl NotificationMetrics {
     pub fn style_attr(&self) -> String {
         let length = |value: Px| px(value.0.round().clamp(0.0, 999.0) as u16);
         [
-            BANNER_WIDTH.write(&length(self.banner_width)),
-            BANNER_MIN_HEIGHT.write(&length(self.banner_min_height)),
-            BANNER_PADDING.write(&length(self.banner_padding)),
-            ICON.write(&length(self.icon)),
-            CLOSE.write(&length(self.close)),
-            STACK_GAP.write(&length(self.stack_gap)),
-            GROUP_OFFSET.write(&length(self.group_offset)),
-            CENTER_WIDTH.write(&length(Px(self.center_width.0.clamp(280.0, 600.0)))),
+            NotificationToken::BannerWidth.write(&length(self.banner_width)),
+            NotificationToken::BannerMinHeight.write(&length(self.banner_min_height)),
+            NotificationToken::BannerPadding.write(&length(self.banner_padding)),
+            NotificationToken::Icon.write(&length(self.icon)),
+            NotificationToken::Close.write(&length(self.close)),
+            NotificationToken::StackGap.write(&length(self.stack_gap)),
+            NotificationToken::GroupOffset.write(&length(self.group_offset)),
+            NotificationToken::CenterWidth
+                .write(&length(Px(self.center_width.0.clamp(280.0, 600.0)))),
         ]
         .concat()
     }
@@ -129,15 +132,17 @@ impl NotificationMetrics {
 
 #[cfg(test)]
 mod tests {
-    use super::{NOTIFICATION_TOKENS, NotificationMetrics};
+    use super::{NotificationMetrics, NotificationToken};
     use crate::core::geometry::units::Px;
+    use crate::core::word::Word;
+    use crate::style::tokens::token::TokenScope;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {
         let written = NotificationMetrics::default().style_attr();
-        let want: String = NOTIFICATION_TOKENS
+        let want: String = NotificationToken::ALL
             .iter()
-            .map(|token| token.write(token.default))
+            .map(|token| token.write(token.fallback(TokenScope::BASE)))
             .collect();
         assert_eq!(written, want);
     }

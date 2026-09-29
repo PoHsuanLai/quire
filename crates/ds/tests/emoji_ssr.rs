@@ -118,7 +118,7 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
     let mut failures = Vec::new();
     for (name, props) in specimens() {
         let html = render(props);
-        for offence in markup(&html, sheet, &LintConfig::default()) {
+        for offence in markup(&html, sheet, &LintConfig::new(&ds::kits())) {
             failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
         }
         for class in html

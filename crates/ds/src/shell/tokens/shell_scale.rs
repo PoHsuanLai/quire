@@ -4,9 +4,10 @@
 //! concentric with the menu). The item heights, paddings and highlight a settings key can move
 //! stay [`ShellMetrics`](super::ShellMetrics) tokens; these are the fixed ones.
 
-use super::control_size::ControlSize;
-use super::name::VarName;
-use super::size_scale::WholePx;
+use crate::core::word::Word;
+use crate::style::tokens::control_size::ControlSize;
+use crate::style::tokens::size_scale::WholePx;
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
 /// The bar and text menus' fixed sizes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -34,14 +35,33 @@ impl ShellScale {
     pub fn item(self) -> WholePx {
         ControlSize::Regular.scale().height
     }
+}
 
-    /// Every token and its value: `(--shell-bar-h, 24px)`, …
-    pub fn tokens(self) -> [(VarName, String); 4] {
-        [
-            (VarName("--shell-bar-h"), self.bar.css()),
-            (VarName("--bar-status-w"), self.status_width.css()),
-            (VarName("--r-shell-menu"), self.menu_radius.css()),
-            (VarName("--shell-menu-inset"), self.menu_inset.css()),
-        ]
-    }
+/// One of the shell's sizes on the ladder, as a token.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = fixed, css = shell_size_css)]
+pub enum ShellSize {
+    /// `--shell-bar-h`: the bar's height.
+    #[token(name = "shell-bar-h")]
+    Bar,
+    /// `--bar-status-w`: a status item's width.
+    #[token(name = "bar-status-w")]
+    StatusWidth,
+    /// `--r-shell-menu`: a text menu's radius.
+    #[token(name = "r-shell-menu")]
+    MenuRadius,
+    /// `--shell-menu-inset`: how far a menu row is inset from the menu's edge.
+    #[token(name = "shell-menu-inset")]
+    MenuInset,
+}
+
+/// The size a shell token holds, as the stylesheet writes it.
+fn shell_size_css(token: ShellSize, _scope: TokenScope) -> CssValue {
+    let size = match token {
+        ShellSize::Bar => SHELL_SCALE.bar,
+        ShellSize::StatusWidth => SHELL_SCALE.status_width,
+        ShellSize::MenuRadius => SHELL_SCALE.menu_radius,
+        ShellSize::MenuInset => SHELL_SCALE.menu_inset,
+    };
+    CssValue::computed(size.css())
 }

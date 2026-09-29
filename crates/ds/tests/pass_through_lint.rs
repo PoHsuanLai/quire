@@ -35,9 +35,9 @@ fn a_consumer_class_on_a_quire_button_lints_clean() {
         "{html}"
     );
     let css = format!("{}\n{CONSUMER_CSS}", ds::stylesheet());
-    let offences = markup(&html, &css, &LintConfig::default());
+    let offences = markup(&html, &css, &LintConfig::new(&ds::kits()));
     assert!(offences.is_empty(), "{offences:#?}");
-    let own = stylesheet(CONSUMER_CSS, &LintConfig::default());
+    let own = stylesheet(CONSUMER_CSS, &LintConfig::new(&ds::kits()));
     assert!(own.is_empty(), "{own:#?}");
 }
 
@@ -45,7 +45,7 @@ fn a_consumer_class_on_a_quire_button_lints_clean() {
 fn the_class_is_unstyled_without_the_consumers_rule() {
     // The check above is not vacuous: the same markup against quire's sheet alone names the
     // consumer's class as unstyled.
-    let offences = markup(&render(), ds::stylesheet(), &LintConfig::default());
+    let offences = markup(&render(), ds::stylesheet(), &LintConfig::new(&ds::kits()));
     assert!(
         offences
             .iter()
@@ -80,7 +80,7 @@ fn a_ds_class_or_name_is_refused_before_it_reaches_a_button() {
     // And a consumer rule that did reach for quire's class is the stylesheet lint's to catch.
     let reaching = stylesheet(
         ".ds-button.row-reveal { opacity: 0; }",
-        &LintConfig::default(),
+        &LintConfig::new(&ds::kits()),
     );
     assert!(
         reaching

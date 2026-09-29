@@ -386,7 +386,7 @@ fn every_overlay_golden_lints_clean() {
     ];
     let config = LintConfig {
         exceptions: EXCEPTIONS,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let goldens = golden::all_in("overlays");
     assert!(

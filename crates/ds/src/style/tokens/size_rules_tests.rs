@@ -1,18 +1,16 @@
 //! One table over every control size checking the ladder's rules (design/29-SIZING.md section 6,
 //! R1-R8) and the settled numbers of option A (section 7).
 
-use super::control_center::CONTROL_CENTER;
 use super::control_size::ControlSize;
-use super::shell_scale::SHELL_SCALE;
 use super::size_scale::{HalfPx, KNOB_INSET, SizeScale, WholePx};
-use super::size_vars::{SizeVar, size_tokens};
+use super::size_vars::{SizeToken, SizeVar};
 use crate::core::word::Word;
 
 /// The spacing steps new sizes are drawn from (R7): a 4 px grid with a 2 px half step.
-const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];
+pub(crate) const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];
 
 /// Whether `px` is a step of [`SPACING_GRID`].
-fn on_grid(px: u16) -> bool {
+pub(crate) fn on_grid(px: u16) -> bool {
     SPACING_GRID.contains(&px)
 }
 
@@ -146,8 +144,7 @@ fn every_height_token_is_whole() {
             let css = var.css(size.scale());
             assert!(
                 css.ends_with("px") && !css.contains('.'),
-                "{}: {css}",
-                var.var(size).as_str()
+                "{var:?} at {size:?}: {css}"
             );
         }
     }
@@ -155,20 +152,5 @@ fn every_height_token_is_whole() {
         SizeVar::SwitchRadius.css(ControlSize::Small.scale()),
         "7.5px"
     );
-    assert_eq!(size_tokens().len(), SizeVar::ALL.len() * 3 + 1);
-}
-
-#[test]
-fn the_shell_surfaces_nest_concentrically() {
-    let cc = CONTROL_CENTER;
-    // R6: the panel is its modules' radius plus the padding round them.
-    assert_eq!(cc.panel_radius(), WholePx(18));
-    assert_eq!(cc.level_module(), WholePx(64));
-    assert_eq!(cc.tile.0, 2 * ControlSize::Large.scale().height.0);
-    for step in [cc.padding, cc.gap, cc.module_radius, cc.head_gap] {
-        assert!(on_grid(step.0), "{step:?} R7");
-    }
-    // The bar's items centre in it with the same space above and below.
-    assert_eq!(SHELL_SCALE.item(), WholePx(22));
-    assert_eq!((SHELL_SCALE.bar.0 - SHELL_SCALE.item().0) % 2, 0);
+    assert_eq!(SizeToken::ALL.len(), SizeVar::ALL.len() * 3 + 1);
 }

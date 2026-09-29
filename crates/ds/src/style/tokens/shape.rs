@@ -3,114 +3,64 @@
 //!
 //! The names between the plan's are proposed; the values are `S`'s.
 
-use super::name::VarName;
+use crate::core::word::Word;
+use crate::style::tokens::token::Token;
 
 /// One radius token.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "r-", kind = fixed)]
 pub enum Radius {
     /// `--r-panel` 14: peek, command menu, hover card, editor.
+    #[token(value = "14px")]
     Panel,
     /// `--r-card` `12px 12px 12px 4px`: card and rows, the flap corner.
+    #[token(value = "12px 12px 12px 4px")]
     Card,
     /// `--r-btn` 9: mini, button, tool.
+    #[token(value = "9px")]
     Btn,
     /// `--r-chip` `6px 6px 6px 2px`.
+    #[token(value = "6px 6px 6px 2px")]
     Chip,
     /// `--r-pill` 999.
+    #[token(value = "999px")]
     Pill,
     /// `--r-field` 10: inputs, command pill, bubble.
+    #[token(value = "10px")]
     Field,
     /// `--r-menu` 12.
+    #[token(value = "12px")]
     Menu,
     /// `--r-item` 9: sidebar item, tooltip.
+    #[token(value = "9px")]
     Item,
     /// `--r-tile` 12: account tiles, editor field.
+    #[token(value = "12px")]
     Tile,
     /// `--r-window` 18.
+    #[token(value = "18px")]
     Window,
     /// `--r-menu-item` 8: menu item, prop row, foot button.
+    #[token(value = "8px")]
     MenuItem,
     /// `--r-bubble-button` 7.
+    #[token(value = "7px")]
     BubbleButton,
     /// `--r-small` 6: fly, gutter, quiet button.
+    #[token(value = "6px")]
     Small,
     /// `--r-kbd` 5: key cap, favicon.
+    #[token(value = "5px")]
     Kbd,
     /// `--r-tiny` 4: focus ring, provider mark.
+    #[token(value = "4px")]
     Tiny,
     /// `--r-micro` 3: in-row provider mark.
+    #[token(value = "3px")]
     Micro,
     /// `--r-media` `10px 10px 10px 3px`: images, code blocks, attachments.
+    #[token(value = "10px 10px 10px 3px")]
     Media,
-}
-
-impl Radius {
-    /// Every radius, in stylesheet order.
-    pub const ALL: [Radius; 17] = [
-        Radius::Panel,
-        Radius::Card,
-        Radius::Btn,
-        Radius::Chip,
-        Radius::Pill,
-        Radius::Field,
-        Radius::Menu,
-        Radius::Item,
-        Radius::Tile,
-        Radius::Window,
-        Radius::MenuItem,
-        Radius::BubbleButton,
-        Radius::Small,
-        Radius::Kbd,
-        Radius::Tiny,
-        Radius::Micro,
-        Radius::Media,
-    ];
-
-    /// The custom property: `--r-panel`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            Radius::Panel => "--r-panel",
-            Radius::Card => "--r-card",
-            Radius::Btn => "--r-btn",
-            Radius::Chip => "--r-chip",
-            Radius::Pill => "--r-pill",
-            Radius::Field => "--r-field",
-            Radius::Menu => "--r-menu",
-            Radius::Item => "--r-item",
-            Radius::Tile => "--r-tile",
-            Radius::Window => "--r-window",
-            Radius::MenuItem => "--r-menu-item",
-            Radius::BubbleButton => "--r-bubble-button",
-            Radius::Small => "--r-small",
-            Radius::Kbd => "--r-kbd",
-            Radius::Tiny => "--r-tiny",
-            Radius::Micro => "--r-micro",
-            Radius::Media => "--r-media",
-        })
-    }
-
-    /// The CSS value: `14px`, `12px 12px 12px 4px`.
-    pub fn css(self) -> &'static str {
-        match self {
-            Radius::Panel => "14px",
-            Radius::Card => "12px 12px 12px 4px",
-            Radius::Btn => "9px",
-            Radius::Chip => "6px 6px 6px 2px",
-            Radius::Pill => "999px",
-            Radius::Field => "10px",
-            Radius::Menu => "12px",
-            Radius::Item => "9px",
-            Radius::Tile => "12px",
-            Radius::Window => "18px",
-            Radius::MenuItem => "8px",
-            Radius::BubbleButton => "7px",
-            Radius::Small => "6px",
-            Radius::Kbd => "5px",
-            Radius::Tiny => "4px",
-            Radius::Micro => "3px",
-            Radius::Media => "10px 10px 10px 3px",
-        }
-    }
 }
 
 /// A material's corner, overriding the radius its recipe gives it (`--m-radius`): a radius

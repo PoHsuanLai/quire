@@ -76,7 +76,7 @@ impl ToastHub {
         try_set(self.on_undo, on_undo)?;
         try_set(self.state, ToastState::Shown { text, undo })?;
         self.stop_hold()?;
-        let hold = DelayToken::ToastHold.delay(try_get(self.env)?.resolved.motion);
+        let hold = DelayToken::ToastHold.delay();
         let hub = *self;
         let started = spawn_in(self.scope, async move {
             sleep(hold).await;

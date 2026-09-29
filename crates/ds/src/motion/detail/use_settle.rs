@@ -94,7 +94,7 @@ impl Lander {
     }
 
     async fn check(self, level: MotionLevel) -> Result<(), Gone> {
-        let hold = DelayToken::SettleHold.delay(level);
+        let hold = DelayToken::SettleHold.delay();
         if level != MotionLevel::Reduced {
             let draw = Glide {
                 from: 0,

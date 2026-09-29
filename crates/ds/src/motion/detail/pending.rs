@@ -96,7 +96,7 @@ impl PendingFrame {
 
 /// The frame an operation `elapsed` into its run shows at `level`, stopping at `deadline`.
 pub(crate) fn frame_at(elapsed: Duration, deadline: Deadline, level: MotionLevel) -> PendingFrame {
-    let grace = DelayToken::PendingGrace.delay(level);
+    let grace = DelayToken::PendingGrace.delay();
     if elapsed < grace {
         return PendingFrame::Idle;
     }
@@ -118,7 +118,7 @@ pub(crate) fn next_due(
     deadline: Deadline,
     level: MotionLevel,
 ) -> Option<Duration> {
-    let grace = DelayToken::PendingGrace.delay(level);
+    let grace = DelayToken::PendingGrace.delay();
     if elapsed < grace {
         return Some(grace - elapsed);
     }

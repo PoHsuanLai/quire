@@ -717,7 +717,7 @@ path each, until step 12 replaces them with the prelude.
 2. **`Word`** (done): `ds-core-derive`, `ds_core::word` in-crate, then convert the 111 hand-written
    `slug`s in batches by module; `SchemaVariants` and `schema/foreign.rs` go with the settings
    derive (step 6).
-3. **`Token`, `TokenSet`, `Kit`, `Kits`**: `#[derive(Token)]` in `ds-core-derive`; every token
+3. **`Token`, `TokenSet`, `Kit`, `Kits`** (done): `#[derive(Token)]` in `ds-core-derive`; every token
    family converted to it (the hand-written `var`/`css` fns and hand-kept lint lists go); shell
    metric tokens move to `shell/tokens/`, the stylesheet and `lint::registry` read `Kits`;
    `lint` stops naming `motion`.

@@ -285,7 +285,7 @@ fn every_list_golden_lints_clean() {
     use ds::lint::{LintConfig, markup};
     let config = LintConfig {
         exceptions: MARKUP_EXCEPTIONS,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let goldens = golden::all_in("lists");
     assert!(

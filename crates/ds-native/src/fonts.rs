@@ -59,24 +59,25 @@ mod tests {
 
     /// Every family name a token's `font-family` stack leads with, in either typeface: Inter,
     /// Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.
-    fn names() -> Vec<(Family, &'static str)> {
-        let mut names: Vec<(Family, &'static str)> = Typeface::ALL
+    fn names() -> Vec<(Family, String)> {
+        let mut names: Vec<(Family, String)> = Typeface::ALL
             .iter()
             .copied()
             .flat_map(|typeface| {
                 Family::ALL
-                    .into_iter()
+                    .iter()
+                    .copied()
                     .map(move |family| (family, family.face_name(typeface)))
             })
             .collect();
-        names.sort_by_key(|(_, name)| *name);
-        names.dedup_by_key(|(_, name)| *name);
+        names.sort_by_key(|(_, name)| name.clone());
+        names.dedup_by_key(|(_, name)| name.clone());
         names
     }
 
     #[test]
     fn both_typefaces_name_six_faces() {
-        let mut got: Vec<&str> = names().into_iter().map(|(_, name)| name).collect();
+        let mut got: Vec<String> = names().into_iter().map(|(_, name)| name).collect();
         got.sort_unstable();
         assert_eq!(
             got,
@@ -102,14 +103,14 @@ mod tests {
         };
         for (family, name) in names() {
             assert!(
-                fonts.collection.family_by_name(name).is_none(),
+                fonts.collection.family_by_name(&name).is_none(),
                 "{family:?}: {name} before registering"
             );
         }
         register_fonts(&mut fonts);
         for (family, name) in names() {
             assert!(
-                fonts.collection.family_by_name(name).is_some(),
+                fonts.collection.family_by_name(&name).is_some(),
                 "{family:?}: {name} is not registered"
             );
         }
@@ -120,7 +121,7 @@ mod tests {
         let mut fonts = font_context();
         for (family, name) in names() {
             assert!(
-                fonts.collection.family_by_name(name).is_some(),
+                fonts.collection.family_by_name(&name).is_some(),
                 "{family:?}: {name} missing from font_context()"
             );
         }

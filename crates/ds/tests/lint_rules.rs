@@ -11,7 +11,7 @@ fn lint(css: &str, profile: Profile) -> Vec<Offence> {
         css,
         &LintConfig {
             profile,
-            ..LintConfig::default()
+            ..LintConfig::new(&ds::kits())
         },
     )
 }
@@ -756,7 +756,7 @@ fn every_rule_case_matches() {
     }
     for case in MARKUP_CASES {
         let got = has(
-            &markup(case.html, case.css, &LintConfig::default()),
+            &markup(case.html, case.css, &LintConfig::new(&ds::kits())),
             case.rule,
         );
         if got != case.expect {
@@ -917,7 +917,7 @@ mod mailo_cases {
         let offences = markup(
             "<div class=\"zz-missing\"></div>",
             "",
-            &LintConfig::default(),
+            &LintConfig::new(&ds::kits()),
         );
         assert_eq!(
             offences

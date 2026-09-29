@@ -9,6 +9,7 @@ pub(crate) mod drag;
 pub(crate) mod drag_return;
 pub(crate) mod entrance;
 pub(crate) mod hover_intent;
+pub(crate) mod kit;
 pub(crate) mod level_run;
 pub(crate) mod pane_slide;
 pub(crate) mod presence;

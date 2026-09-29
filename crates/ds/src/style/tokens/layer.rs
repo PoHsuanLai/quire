@@ -1,107 +1,59 @@
 //! Z-order inside a window (design/01-LAYOUT.md section 12). The plan names the ends,
 //! `--z-raise` 1 and `--z-drag` 50; the layers between are named after what sits on them.
 
-use super::name::VarName;
+use crate::core::word::Word;
+use crate::style::tokens::token::Token;
 
 /// One stacking layer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "z-", kind = fixed)]
 pub enum ZLayer {
     /// `--z-scene` -2: the frame's gradient layers.
+    #[token(value = "-2")]
     Scene,
     /// `--z-grain` -1: the grain tile.
+    #[token(value = "-1")]
     Grain,
     /// `--z-raise` 1: a lifted row or control.
+    #[token(value = "1")]
     Raise,
     /// `--z-link-pill` 7.
+    #[token(value = "7")]
     LinkPill,
     /// `--z-toast` 8.
+    #[token(value = "8")]
     Toast,
     /// `--z-send-pill` 9: also the floating composer.
+    #[token(value = "9")]
     SendPill,
     /// `--z-scrim` 10.
+    #[token(value = "10")]
     Scrim,
     /// `--z-peek` 11.
+    #[token(value = "11")]
     Peek,
     /// `--z-focus-page` 12: the focus-mode composer page.
+    #[token(value = "12")]
     FocusPage,
     /// `--z-edge` 14: the left edge strip.
+    #[token(value = "14")]
     Edge,
     /// `--z-side-peek` 15.
+    #[token(value = "15")]
     SidePeek,
     /// `--z-palette` 20: the command menu.
+    #[token(value = "20")]
     Palette,
     /// `--z-card` 30: hover cards.
+    #[token(value = "30")]
     Card,
     /// `--z-menu` 40: floating menus and the zZ floater.
+    #[token(value = "40")]
     Menu,
     /// `--z-bubble` 41: the selection bubble.
+    #[token(value = "41")]
     Bubble,
     /// `--z-drag` 50: the drag ghost.
+    #[token(value = "50")]
     Drag,
-}
-
-impl ZLayer {
-    /// Every layer, lowest first.
-    pub const ALL: [ZLayer; 16] = [
-        ZLayer::Scene,
-        ZLayer::Grain,
-        ZLayer::Raise,
-        ZLayer::LinkPill,
-        ZLayer::Toast,
-        ZLayer::SendPill,
-        ZLayer::Scrim,
-        ZLayer::Peek,
-        ZLayer::FocusPage,
-        ZLayer::Edge,
-        ZLayer::SidePeek,
-        ZLayer::Palette,
-        ZLayer::Card,
-        ZLayer::Menu,
-        ZLayer::Bubble,
-        ZLayer::Drag,
-    ];
-
-    /// The custom property: `--z-menu`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            ZLayer::Scene => "--z-scene",
-            ZLayer::Grain => "--z-grain",
-            ZLayer::Raise => "--z-raise",
-            ZLayer::LinkPill => "--z-link-pill",
-            ZLayer::Toast => "--z-toast",
-            ZLayer::SendPill => "--z-send-pill",
-            ZLayer::Scrim => "--z-scrim",
-            ZLayer::Peek => "--z-peek",
-            ZLayer::FocusPage => "--z-focus-page",
-            ZLayer::Edge => "--z-edge",
-            ZLayer::SidePeek => "--z-side-peek",
-            ZLayer::Palette => "--z-palette",
-            ZLayer::Card => "--z-card",
-            ZLayer::Menu => "--z-menu",
-            ZLayer::Bubble => "--z-bubble",
-            ZLayer::Drag => "--z-drag",
-        })
-    }
-
-    /// The `z-index`.
-    pub fn z(self) -> i16 {
-        match self {
-            ZLayer::Scene => -2,
-            ZLayer::Grain => -1,
-            ZLayer::Raise => 1,
-            ZLayer::LinkPill => 7,
-            ZLayer::Toast => 8,
-            ZLayer::SendPill => 9,
-            ZLayer::Scrim => 10,
-            ZLayer::Peek => 11,
-            ZLayer::FocusPage => 12,
-            ZLayer::Edge => 14,
-            ZLayer::SidePeek => 15,
-            ZLayer::Palette => 20,
-            ZLayer::Card => 30,
-            ZLayer::Menu => 40,
-            ZLayer::Bubble => 41,
-            ZLayer::Drag => 50,
-        }
-    }
 }

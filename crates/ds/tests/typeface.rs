@@ -7,8 +7,8 @@ use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Appearance, Ds, Family, Inject, Material, Surface, Typeface, VoiceToken, stylesheet,
-    use_typeface,
+    Appearance, Ds, Family, Inject, Material, Surface, Token, TokenScope, Typeface, VoiceToken,
+    stylesheet, use_typeface,
 };
 
 #[derive(Props, Clone, PartialEq)]
@@ -75,14 +75,14 @@ fn the_ds_block_names_inter_and_the_editorial_block_the_prototype_faces() {
     let css = stylesheet();
     let system = block(css, ".ds");
     let editorial = block(css, ".ds[*|data-typeface=editorial]");
-    for family in Family::ALL {
+    for family in Family::ALL.iter().copied() {
         let name = family.var().as_str();
-        let system_value = family.stack_in(Typeface::System);
+        let system_value = family.css_value(TokenScope::BASE.in_typeface(Typeface::System));
         assert!(
             system.contains(&format!("{name}:{system_value};")),
             "{name}"
         );
-        let editorial_value = family.stack_in(Typeface::Editorial);
+        let editorial_value = family.css_value(TokenScope::BASE.in_typeface(Typeface::Editorial));
         let expect = format!("{name}:{editorial_value};");
         // The editorial block writes only what differs.
         assert_eq!(
@@ -91,10 +91,11 @@ fn the_ds_block_names_inter_and_the_editorial_block_the_prototype_faces() {
             "{name}"
         );
     }
-    for token in VoiceToken::ALL {
+    for token in VoiceToken::ALL.iter().copied() {
         let name = token.var().as_str();
-        assert!(system.contains(&format!("{name}:{};", token.css(Typeface::System))));
-        assert!(editorial.contains(&format!("{name}:{};", token.css(Typeface::Editorial))));
+        let value = |typeface| token.css_value(TokenScope::BASE.in_typeface(typeface));
+        assert!(system.contains(&format!("{name}:{};", value(Typeface::System))));
+        assert!(editorial.contains(&format!("{name}:{};", value(Typeface::Editorial))));
     }
     assert!(system.contains("--font-ui:\"Inter\""));
     assert!(system.contains("--font-display:\"Inter Display\""));
@@ -120,7 +121,13 @@ fn editorial_restores_the_values_the_rules_carried() {
     ];
     assert_eq!(before.len(), VoiceToken::ALL.len());
     for (token, value) in before {
-        assert_eq!(token.css(Typeface::Editorial), value, "{token:?}");
+        assert_eq!(
+            token
+                .css_value(TokenScope::BASE.in_typeface(Typeface::Editorial))
+                .as_str(),
+            value,
+            "{token:?}"
+        );
     }
 }
 
@@ -199,8 +206,8 @@ fn the_cap_fitted_sizes_keep_the_measured_caps() {
         .into_iter()
         .filter(|size| !ds::FontSize::FLOORED.contains(size));
     for size in fitted {
-        let editorial = px(size.css_in(Typeface::Editorial));
-        let system = px(size.css_in(Typeface::System));
+        let editorial = px(&size.css_in(Typeface::Editorial));
+        let system = px(&size.css_in(Typeface::System));
         let want = editorial * BRICOLAGE / INTER_DISPLAY;
         assert!(
             (system - want).abs() <= 0.25,
@@ -212,7 +219,7 @@ fn the_cap_fitted_sizes_keep_the_measured_caps() {
             "{size:?} on the .5 px grid"
         );
     }
-    for size in ds::FontSize::ALL {
+    for size in ds::FontSize::ALL.iter().copied() {
         if !ds::FontSize::CAP_FITTED.contains(&size) && !ds::FontSize::FLOORED.contains(&size) {
             assert_eq!(
                 size.css_in(Typeface::System),

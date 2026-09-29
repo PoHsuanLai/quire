@@ -17,7 +17,7 @@ fn an_exception_suppresses_exactly_its_rule_and_selector() {
                .fade { color: red; }";
     let config = LintConfig {
         exceptions: TRUNCATE_MASK,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let kept: Vec<(Rule, String)> = stylesheet(css, &config)
         .into_iter()
@@ -31,7 +31,7 @@ fn an_exception_suppresses_exactly_its_rule_and_selector() {
         ],
         "the other selector and the other rule are not suppressed"
     );
-    let bare = stylesheet(css, &LintConfig::default());
+    let bare = stylesheet(css, &LintConfig::new(&ds::kits()));
     assert_eq!(bare.len(), kept.len() + 1, "without it, it fires");
 }
 
@@ -43,12 +43,12 @@ fn a_markup_exception_names_the_element() {
         reason: "the editor's swatch paints its picked colour inline",
     }];
     let html = "<span class=\"ds-space-swatch\" style=\"background:#944242\"></span>";
-    let bare = markup(html, ".ds-space-swatch{}", &LintConfig::default());
+    let bare = markup(html, ".ds-space-swatch{}", &LintConfig::new(&ds::kits()));
     assert_eq!(bare.len(), 1, "{bare:?}");
     assert_eq!(bare[0].selector, "span.ds-space-swatch");
     let config = LintConfig {
         exceptions: INLINE,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     assert!(markup(html, ".ds-space-swatch{}", &config).is_empty());
 }
@@ -57,7 +57,7 @@ fn a_markup_exception_names_the_element() {
 fn assert_clean_passes_when_exceptions_cover_everything() {
     let config = LintConfig {
         exceptions: TRUNCATE_MASK,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     assert_clean(
         ".fade { mask-image: linear-gradient(#000, transparent); }",
@@ -70,7 +70,7 @@ fn assert_clean_passes_when_exceptions_cover_everything() {
 fn assert_clean_counts_what_each_exception_suppressed() {
     let config = LintConfig {
         exceptions: TRUNCATE_MASK,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     assert_clean(
         ".fade { mask-image: linear-gradient(#000, transparent); color: red; }",
@@ -88,7 +88,7 @@ const CLEAN_FADE: &str = ".fade { mask-image: linear-gradient(var(--ink), transp
 fn a_stale_exception_fails() {
     let config = LintConfig {
         exceptions: TRUNCATE_MASK,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     assert_clean(CLEAN_FADE, &config);
 }
@@ -110,7 +110,7 @@ fn an_offence_and_a_stale_exception_are_both_named() {
     ];
     let config = LintConfig {
         exceptions: TWO,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     assert_clean(
         ".fade { mask-image: linear-gradient(#000, transparent); color: red; }",

@@ -8,7 +8,7 @@ use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
     ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of, stylesheet,
 };
-use ds::{DelayToken, HueMember};
+use ds::{HueMember, StyleDelay, Token, TokenScope};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Every rule outside `@keyframes`, as its selector and its declarations in order.
@@ -202,9 +202,9 @@ fn each_swatch_is_its_accents_own_colour() {
 fn the_token_block_holds_the_rust_table() {
     let light = token_block();
     let dark = block(".ds[*|data-theme=dark]");
-    for token in ColourToken::ALL {
+    for token in ColourToken::ALL.iter().copied() {
         if token == ColourToken::AccentRing {
-            continue; // Mixed from the resolved --accent; see `each_var_…` and tokens_css.
+            continue; // Mixed from the resolved --accent; see `each_var_…` and `ds::kits()`.
         }
         for (scheme, over) in [(Scheme::Light, None), (Scheme::Dark, Some(&dark))] {
             let name = token.var().as_str();
@@ -216,14 +216,14 @@ fn the_token_block_holds_the_rust_table() {
     }
     for hue in LabelHue::ALL.iter().copied() {
         for member in [HueMember::Base, HueMember::Deep, HueMember::Soft] {
-            let name = hue.var(member);
+            let name = hue.colour(member).var().as_str();
             assert_eq!(
-                light.get(&name),
+                light.get(name),
                 Some(&hue.value(member, Scheme::Light).css()),
                 "{name}"
             );
             assert_eq!(
-                dark.get(&name),
+                dark.get(name),
                 Some(&hue.value(member, Scheme::Dark).css()),
                 "{name} dark"
             );
@@ -237,10 +237,10 @@ fn the_token_block_holds_the_rust_table() {
 fn the_person_swatches_are_declared_in_both_schemes_alike() {
     let light = token_block();
     let dark = block(".ds[*|data-theme=dark]");
-    for swatch in ds::PersonSwatch::ALL {
-        let name = swatch.var();
-        assert_eq!(light.get(&name), Some(&swatch.hex().css()), "{name}");
-        assert_eq!(dark.get(&name), None, "{name} is redeclared in dark");
+    for swatch in ds::PersonSwatch::ALL.iter().copied() {
+        let name = swatch.var().as_str();
+        assert_eq!(light.get(name), Some(&swatch.hex().css()), "{name}");
+        assert_eq!(dark.get(name), None, "{name} is redeclared in dark");
     }
 }
 
@@ -248,19 +248,19 @@ fn the_person_swatches_are_declared_in_both_schemes_alike() {
 fn every_table_name_is_declared_on_the_root() {
     let light = token_block();
     let names = ColourToken::ALL
+        .iter()
         .map(|t| t.var())
-        .into_iter()
-        .chain(DurationToken::ALL.map(|t| t.var()))
-        .chain(DelayToken::ALL.into_iter().filter_map(|t| t.var()))
-        .chain(EasingToken::ALL.map(|t| t.var()))
-        .chain(ScalarToken::ALL.map(|t| t.var()))
-        .chain(Radius::ALL.map(|t| t.var()))
-        .chain(SpacingToken::ALL.map(|t| t.var()))
-        .chain(Shadow::ALL.map(|t| t.var()))
-        .chain(ds::WidgetPaint::ALL.map(|t| t.var()))
-        .chain(FontSize::ALL.map(|t| t.var()))
-        .chain(ZLayer::ALL.map(|t| t.var()))
-        .chain(Family::ALL.map(|t| t.var()));
+        .chain(DurationToken::ALL.iter().map(|t| t.var()))
+        .chain(StyleDelay::ALL.iter().map(|t| t.var()))
+        .chain(EasingToken::ALL.iter().map(|t| t.var()))
+        .chain(ScalarToken::ALL.iter().map(|t| t.var()))
+        .chain(Radius::ALL.iter().map(|t| t.var()))
+        .chain(SpacingToken::ALL.iter().map(|t| t.var()))
+        .chain(Shadow::ALL.iter().map(|t| t.var()))
+        .chain(ds::WidgetPaint::ALL.iter().map(|t| t.var()))
+        .chain(FontSize::ALL.iter().map(|t| t.var()))
+        .chain(ZLayer::ALL.iter().map(|t| t.var()))
+        .chain(Family::ALL.iter().map(|t| t.var()));
     for name in names {
         assert!(
             light.contains_key(name.as_str()),
@@ -365,10 +365,11 @@ fn the_spacing_scale_is_the_layout_docs() {
         "1", "1.5", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
         "16", "18", "22", "26", "36",
     ];
-    assert_eq!(
-        SpacingToken::ALL.map(SpacingToken::css),
-        STEPS.map(|step| format!("{step}px"))
-    );
+    let written: Vec<String> = SpacingToken::ALL
+        .iter()
+        .map(|step| step.css_value(TokenScope::BASE).to_string())
+        .collect();
+    assert_eq!(written, STEPS.map(|step| format!("{step}px")));
     let light = token_block();
     for step in STEPS {
         let name = format!("--s-{}", step.replace('.', "-"));

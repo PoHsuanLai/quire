@@ -57,7 +57,7 @@ LAYERS=(
   "core: style motion lint host focus edit file_drop spell window stack root components shell assembly"
   "style: motion lint host focus edit file_drop spell window stack root components shell assembly"
   "motion: lint host focus edit file_drop spell window stack root components shell assembly"
-  "lint: host focus edit file_drop spell window stack root components shell assembly"
+  "lint: motion host focus edit file_drop spell window stack root components shell assembly"
   "host: focus edit file_drop spell window stack root components lint shell assembly"
   "focus edit file_drop spell window: stack root components lint shell assembly"
   "stack: root components lint shell assembly"

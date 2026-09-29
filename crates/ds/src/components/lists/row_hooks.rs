@@ -4,7 +4,6 @@
 //! thread card on entry. quire draws the parts, so it attaches the caller's handlers to them.
 
 use crate::core::time::clock::sleep;
-use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::prelude::*;
 
@@ -124,7 +123,7 @@ impl Back {
             let crossings = self.crossings;
             let left = *crossings.peek();
             spawn(async move {
-                sleep(DelayToken::HoverClose.delay(MotionLevel::Standard)).await;
+                sleep(DelayToken::HoverClose.delay()).await;
                 let now = *crossings.peek();
                 if now == left && now.on_row == OnRow::On {
                     back.call(event);

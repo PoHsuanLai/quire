@@ -73,6 +73,7 @@ fn config() -> LintConfig {
         profile: Profile::Strict,
         own_vars: INLINE_VARS.iter().map(|name| (*name).to_owned()).collect(),
         exceptions: EXCEPTIONS,
+        ..LintConfig::new(&ds::kits())
     }
 }
 
@@ -133,7 +134,7 @@ const CONSUMER_CSS: &str = ".row-reveal{opacity:0}\n.quiet-until-hover{opacity:0
 /// the markup lint allows on a `ds-*` element without an exception.
 #[test]
 fn every_control_golden_lints_clean() {
-    let config = LintConfig::default();
+    let config = LintConfig::new(&ds::kits());
     let css = format!("{}\n{CONSUMER_CSS}", ds::stylesheet());
     let goldens = golden::all_in("controls");
     assert!(goldens.len() > 60, "only {} goldens", goldens.len());

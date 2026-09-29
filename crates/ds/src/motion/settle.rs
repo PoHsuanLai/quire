@@ -6,7 +6,7 @@ use crate::core::time::FRAME_SLACK;
 use crate::core::vocab::StaggerIndex;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{
-    delay::DelayToken,
+    delay::StyleDelay,
     scalar::{ScalarToken, ScalarValue},
 };
 use std::time::Duration;
@@ -24,7 +24,7 @@ pub fn settle(anim: Anim, level: MotionLevel, index: StaggerIndex) -> Duration {
 /// The delay one index adds: the heal step for `Heal`, `--stagger` for everything else.
 fn step(anim: Anim, level: MotionLevel) -> Duration {
     match (anim, ScalarToken::Stagger.value(level)) {
-        (Anim::Heal, _) => DelayToken::HealStep.delay(level),
+        (Anim::Heal, _) => StyleDelay::HealStep.delay(level),
         (_, ScalarValue::Time(stagger)) => stagger,
         // `--stagger` is a time at every level; a table that said otherwise staggers nothing.
         (_, ScalarValue::Factor(_) | ScalarValue::Length(_) | ScalarValue::Angle(_)) => {

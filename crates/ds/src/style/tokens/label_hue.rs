@@ -5,6 +5,7 @@
 //! (design/07-LOOKS.md section 11).
 
 use super::hex::Hex;
+use super::token::{CssValue, Token, TokenScope};
 use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use serde::{Deserialize, Serialize};
@@ -36,17 +37,79 @@ pub enum HueMember {
     Soft,
 }
 
-impl LabelHue {
-    /// The custom property for one member: `--c-red-deep`.
-    pub fn var(self, member: HueMember) -> String {
-        let suffix = match member {
-            HueMember::Base => "",
-            HueMember::Deep => "-deep",
-            HueMember::Soft => "-soft",
-        };
-        format!("--c-{}{suffix}", self.slug())
-    }
+/// One label hue's member as a token: `--c-red`, `--c-red-deep`, `--c-red-soft`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "c-", kind = fixed, css = hue_css)]
+pub enum HueColour {
+    /// `--c-red`.
+    Red,
+    /// `--c-red-deep`.
+    RedDeep,
+    /// `--c-red-soft`.
+    RedSoft,
+    /// `--c-amber`.
+    Amber,
+    /// `--c-amber-deep`.
+    AmberDeep,
+    /// `--c-amber-soft`.
+    AmberSoft,
+    /// `--c-green`.
+    Green,
+    /// `--c-green-deep`.
+    GreenDeep,
+    /// `--c-green-soft`.
+    GreenSoft,
+    /// `--c-blue`.
+    Blue,
+    /// `--c-blue-deep`.
+    BlueDeep,
+    /// `--c-blue-soft`.
+    BlueSoft,
+    /// `--c-violet`.
+    Violet,
+    /// `--c-violet-deep`.
+    VioletDeep,
+    /// `--c-violet-soft`.
+    VioletSoft,
+}
 
+impl HueColour {
+    /// The hue and member this token is: the family in its order, each hue's three members.
+    pub fn parts(self) -> (LabelHue, HueMember) {
+        let index = Self::ALL
+            .iter()
+            .position(|token| *token == self)
+            .unwrap_or(0);
+        let members = HueMember::ALL.len();
+        (
+            LabelHue::ALL[index / members],
+            HueMember::ALL[index % members],
+        )
+    }
+}
+
+impl LabelHue {
+    /// The token for one member: `--c-red-deep`.
+    pub fn colour(self, member: HueMember) -> HueColour {
+        let hue = LabelHue::ALL
+            .iter()
+            .position(|hue| *hue == self)
+            .unwrap_or(0);
+        let member = HueMember::ALL
+            .iter()
+            .position(|m| *m == member)
+            .unwrap_or(0);
+        HueColour::ALL[hue * HueMember::ALL.len() + member]
+    }
+}
+
+/// A hue member as the stylesheet writes it, in the scope's scheme.
+fn hue_css(token: HueColour, scope: TokenScope) -> CssValue {
+    let (hue, member) = token.parts();
+    CssValue::computed(hue.value(member, scope.scheme).css())
+}
+
+impl LabelHue {
     /// The member's value in `scheme`.
     pub fn value(self, member: HueMember, scheme: Scheme) -> Hex {
         let [base, deep, soft] = self.family(scheme);

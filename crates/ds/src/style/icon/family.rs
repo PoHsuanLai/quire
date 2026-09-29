@@ -5,8 +5,7 @@
 
 use crate::core::word::Word;
 use crate::style::tokens::hex::Hex;
-use crate::style::tokens::name::VarName;
-use crate::style::tokens::tuned::Tuned;
+use crate::style::tokens::token::Token;
 
 /// One plate gradient family.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
@@ -56,19 +55,17 @@ pub const NEUTRAL_DARK: (Hex, Hex, Hex) = (
     Hex([0xE8, 0xEA, 0xE4]),
 );
 
-/// `--plate-glyph`: a glyph's share of the plate (`icons.symbolic_fallback_glyph_percent`, 56).
-pub const PLATE_GLYPH: Tuned = Tuned {
-    token: VarName("--plate-glyph"),
-    input: VarName("--icons-glyph-share"),
-    default: "56%",
-};
-
-/// `--plate-inset`: a third-party icon's share of the plate (`icons.plate_inset_percent`, 72).
-pub const PLATE_INSET: Tuned = Tuned {
-    token: VarName("--plate-inset"),
-    input: VarName("--icons-inset-share"),
-    default: "72%",
-};
+/// The plate's tuned shares.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "plate-", kind = tuned)]
+pub enum PlateShare {
+    /// `--plate-glyph`: a glyph's share of the plate (`icons.symbolic_fallback_glyph_percent`, 56).
+    #[token(input = "--icons-glyph-share", value = "56%")]
+    Glyph,
+    /// `--plate-inset`: a third-party icon's share of the plate (`icons.plate_inset_percent`, 72).
+    #[token(input = "--icons-inset-share", value = "72%")]
+    Inset,
+}
 
 #[cfg(test)]
 mod tests {

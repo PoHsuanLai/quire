@@ -3,8 +3,11 @@
 //! toast hosts and the window frame around a surface.
 
 pub(crate) mod ds;
+pub(crate) mod kit;
 pub(crate) mod sheets;
 pub(crate) mod stylesheet;
 
 #[cfg(test)]
 mod stored_words;
+#[cfg(all(test, feature = "lint"))]
+mod vocabulary_tests;

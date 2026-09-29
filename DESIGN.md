@@ -44,7 +44,9 @@ public surface, one path per item.
 | `style/tokens/accent_table.rs` | 03-COLOR §5 and open decision 6 (6 accents x 4 props) |
 | `style/tokens/label_hue.rs` | 03-COLOR §15; 07-LOOKS §6.2 (`--c-*`) |
 | `style/tokens/hex.rs`, `style/tokens/name.rs` | the value and name types every table uses |
-| `style/tokens/timing.rs`, `style/tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (23 `DurationToken`s; 13 `DelayToken`s) |
+| `style/tokens/{token,set}.rs`, `ds-core-derive` | `Token` (`#[derive(Word, Token)]`: a family's custom properties and values from its variants' attributes), `TokenScope`, `CssValue`, `TokenSet` (a family as data, placed in the `.ds` block) |
+| `style/kit/`, `style/kit/style_kit.rs`, `motion/kit.rs`, `assembly/kit.rs`, `shell/kit.rs` | `Kit` (a layer's token families, stylesheet sections and lint vocabulary), `KitRank`, `Kits` (`stylesheet`, `vocabulary`, `token_blocks`); `ds::kits()` is all four; `LintConfig::new(&ds::kits())` |
+| `style/tokens/timing.rs`, `style/tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (`DurationToken`; `StyleDelay`, the two delays the stylesheet reads; `DelayToken`, the Rust-only timer lengths) |
 | `style/tokens/easing.rs`, `style/tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `style/tokens/shape.rs` | 01-LAYOUT §10 |
 | `style/tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
@@ -52,9 +54,10 @@ public surface, one path per item.
 | `style/tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `style/tokens/layer.rs` | 01-LAYOUT §12 |
-| `style/tokens/{tuned,shell,dock}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
+| `style/tokens/tuned.rs`, `shell/tokens/{shell_type,dock,osd,notifications,widgets}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token (`kind = tuned`) is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
+| `shell/tokens/{shell_scale,control_center,widget_paint}.rs` | 29-SIZING §5, §7 (the bar's, menus' and control center's sizes on the ladder); 23-WIDGETS §2 (the widget paints) | the shell's fixed tokens, listed in `shell/kit.rs` |
 | `style/css/shape_css.rs`, `style/icon/{plate,family}.rs`, `style/tokens/plate.rs` | 08-ICONS §2.1-2.5, §4.1 | `Corner::Squircle` (a six-layer mask; the shadow on the unmasked box), the plate (`PlateFamily` on `IconView`), the dock floor |
-| `style/css/{tokens_css,accents_css,materials_css}.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
+| `style/kit/blocks.rs`, `style/css/{accents_css,materials_css}.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
 | `style/css/ground_css.rs` | 03-COLOR §4 (the frame inks); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
 | `motion/css.rs`, `motion/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `style/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
@@ -89,7 +92,7 @@ public surface, one path per item.
 | `components/content/icon_source.rs`, `style/icon/url.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`; `IconUrl` (`data:`/`file:` only) |
 | `style/icon/classify.rs` | 08-ICONS §1.5 step 2: `classify_with(png, limit) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
 | `core/error.rs` | CONVENTIONS §7: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
-| `lint/*` | the coherence rules (ARCHITECTURE.md "Repo rules"); spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
+| `lint/*` | the coherence rules (ARCHITECTURE.md "Repo rules"); spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the vocabulary (variables, keyframes, grammar timing) is `Kits::vocabulary()`, read into `LintConfig::new(&kits)`, and `lint` names no motion module |
 
 ## `ds`: components
 

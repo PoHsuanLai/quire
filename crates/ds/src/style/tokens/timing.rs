@@ -11,8 +11,9 @@
 //! state, not something that moves, so shortening it to 60 ms would make it unreadable rather
 //! than calmer). `--t-big-heavy` is `--t-big` x 1.15 at each level.
 
-use super::name::VarName;
+use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 use std::time::Duration;
 
 /// Whether Reduced motion shortens a [`DurationToken`] to 60 ms, or the token times a held
@@ -28,7 +29,8 @@ pub enum DurationKind {
 }
 
 /// One duration token.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "t-", kind = fixed, css = duration_css)]
 pub enum DurationToken {
     /// `--t-tap` 90 ms: press feedback.
     Tap,
@@ -109,74 +111,6 @@ pub enum DurationToken {
 }
 
 impl DurationToken {
-    /// Every duration token, in stylesheet order.
-    pub const ALL: [DurationToken; 29] = [
-        DurationToken::Tap,
-        DurationToken::Quick,
-        DurationToken::Move,
-        DurationToken::Big,
-        DurationToken::Ambient,
-        DurationToken::BigHeavy,
-        DurationToken::Spark,
-        DurationToken::Curl,
-        DurationToken::CurlHeavy,
-        DurationToken::CrumpleHeavy,
-        DurationToken::Send,
-        DurationToken::Float,
-        DurationToken::HcOut,
-        DurationToken::Scene,
-        DurationToken::Shake,
-        DurationToken::Park,
-        DurationToken::Nudge,
-        DurationToken::ShakeLong,
-        DurationToken::Sail,
-        DurationToken::BoatReturn,
-        DurationToken::Spin,
-        DurationToken::SendRing,
-        DurationToken::Flash,
-        DurationToken::Awake,
-        DurationToken::Fill,
-        DurationToken::Sweep,
-        DurationToken::CountStep,
-        DurationToken::PendingStep,
-        DurationToken::IdleDim,
-    ];
-
-    /// The custom property: `--t-tap`, `--t-big-heavy`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            DurationToken::Tap => "--t-tap",
-            DurationToken::Quick => "--t-quick",
-            DurationToken::Move => "--t-move",
-            DurationToken::Big => "--t-big",
-            DurationToken::Ambient => "--t-ambient",
-            DurationToken::BigHeavy => "--t-big-heavy",
-            DurationToken::Spark => "--t-spark",
-            DurationToken::Curl => "--t-curl",
-            DurationToken::CurlHeavy => "--t-curl-heavy",
-            DurationToken::CrumpleHeavy => "--t-crumple-heavy",
-            DurationToken::Send => "--t-send",
-            DurationToken::Float => "--t-float",
-            DurationToken::HcOut => "--t-hc-out",
-            DurationToken::Scene => "--t-scene",
-            DurationToken::Shake => "--t-shake",
-            DurationToken::Park => "--t-park",
-            DurationToken::Nudge => "--t-nudge",
-            DurationToken::ShakeLong => "--t-shake-long",
-            DurationToken::Sail => "--t-sail",
-            DurationToken::BoatReturn => "--t-boat-return",
-            DurationToken::Spin => "--t-spin",
-            DurationToken::SendRing => "--t-send-ring",
-            DurationToken::Flash => "--t-flash",
-            DurationToken::Awake => "--t-awake",
-            DurationToken::Fill => "--t-fill",
-            DurationToken::Sweep => "--t-sweep",
-            DurationToken::CountStep => "--t-count-step",
-            DurationToken::PendingStep => "--t-pending-step",
-            DurationToken::IdleDim => "--t-idle-dim",
-        })
-    }
-
     /// How long it lasts at `level`.
     pub fn duration(self, level: MotionLevel) -> Duration {
         Duration::from_millis(self.millis(level))
@@ -242,4 +176,9 @@ impl DurationToken {
             (DurationToken::IdleDim, _) => 2000,
         }
     }
+}
+
+/// A duration as the stylesheet writes it: whole milliseconds at the scope's motion level.
+fn duration_css(token: DurationToken, scope: TokenScope) -> CssValue {
+    CssValue::computed(format!("{}ms", token.duration(scope.motion).as_millis()))
 }

@@ -81,7 +81,6 @@ impl FrameVars {
     }
 
     /// The variable names the attribute writes, in order (the lint registers them).
-    #[cfg(feature = "lint")]
     pub(crate) fn names(&self) -> Vec<&'static str> {
         self.pairs().into_iter().map(|(name, _)| name).collect()
     }

@@ -2,7 +2,6 @@
 //! (design/06-INTERACTIONS.md section 3). Pure: an event and the time in, the next state and
 //! one effect out.
 
-use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
 
@@ -127,7 +126,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
                 to(IntentPhase::Idle, warm_until, IntentEffect::CancelOpen)
             }
             (IntentPhase::Open { key }, HoverEvent::Out | HoverEvent::LeaveCard) => {
-                let after = delay(DelayToken::HoverClose);
+                let after = DelayToken::HoverClose.delay();
                 let due = now + after;
                 to(
                     IntentPhase::Closing { key, due },
@@ -147,7 +146,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
             ),
             (IntentPhase::Closing { key, due }, HoverEvent::CloseDue) if now >= due => to(
                 IntentPhase::Idle,
-                Some(now + delay(DelayToken::HoverWarm)),
+                Some(now + DelayToken::HoverWarm.delay()),
                 IntentEffect::Close(key),
             ),
             (
@@ -159,7 +158,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
             }
             (IntentPhase::Open { key }, HoverEvent::SpaceKey) => to(
                 IntentPhase::Idle,
-                Some(now + delay(DelayToken::HoverWarm)),
+                Some(now + DelayToken::HoverWarm.delay()),
                 IntentEffect::Peek(key),
             ),
             (phase, _) => keep(phase),
@@ -214,7 +213,7 @@ fn over<K: Clone + PartialEq>(
         _ => {
             let after = match warm {
                 HoverWarmth::Warm => Duration::ZERO,
-                HoverWarmth::Cold => delay(DelayToken::HoverOpen),
+                HoverWarmth::Cold => DelayToken::HoverOpen.delay(),
             };
             to(
                 IntentPhase::Pending {
@@ -234,10 +233,4 @@ fn to<K>(
     effect: IntentEffect<K>,
 ) -> (HoverIntent<K>, IntentEffect<K>) {
     (HoverIntent { phase, warm_until }, effect)
-}
-
-/// A hover delay. They measure intent, not motion, so every level reads the same value
-/// (design/05-MOTION.md open decision 2); Standard is read for definiteness.
-fn delay(token: DelayToken) -> Duration {
-    token.delay(MotionLevel::Standard)
 }

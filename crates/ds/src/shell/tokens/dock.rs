@@ -1,37 +1,38 @@
 //! The dock's geometry tokens (the macOS polish pass, 2026-09-24; design/10-BEHAVIOUR-dock.md
 //! sections 10.3.1 and 10.3.2): the tile, the gap between tiles, the pill's padding, the running
-//! dot and the optional reflective floor, each a [`Tuned`] token its settings key moves. The
+//! dot and the optional reflective floor, each a tuned token its settings key moves. The
 //! shell lays the dock out itself; these are the numbers it and quire's dock pieces
 //! (`RunningDot`, `DockFloor`, an `IconView` plate) share.
 
-use super::name::VarName;
-use super::tuned::{Tuned, px};
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
+use crate::style::tokens::token::Token;
+use crate::style::tokens::tuned::px;
 
-const fn tuned(token: &'static str, input: &'static str, default: &'static str) -> Tuned {
-    Tuned {
-        token: VarName(token),
-        input: VarName(input),
-        default,
-    }
+/// One dock geometry token, each a tuned token its settings key moves.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = tuned)]
+pub enum DockToken {
+    /// `--dock-tile`: a tile at rest (`dock.tile_size_px`, 48; macOS `tilesize` 48, H).
+    #[token(name = "dock-tile", input = "--dock-tile-px", value = "48px")]
+    Tile,
+    /// `--dock-gap`: between two tiles (`dock.tile_gap_px`, 8).
+    #[token(name = "dock-gap", input = "--dock-gap-px", value = "8px")]
+    Gap,
+    /// `--dock-pad`: the pill's padding on every side (`dock.pill_padding_px`, 6).
+    #[token(name = "dock-pad", input = "--dock-pad-px", value = "6px")]
+    Pad,
+    /// `--dock-dot`: the running dot's diameter (`dock.running_dot_diameter_px`, 4).
+    #[token(name = "dock-dot", input = "--dock-dot-px", value = "4px")]
+    Dot,
+    /// `--dock-dot-gap`: from the tile's bottom edge to the dot's centre (`dock.running_dot_gap_px`,
+    /// 3), inside the pill's 6 px padding.
+    #[token(name = "dock-dot-gap", input = "--dock-dot-gap-px", value = "3px")]
+    DotGap,
+    /// `--dock-floor`: the reflective floor's opacity, 0 or 1 (`dock.floor`, `Off`).
+    #[token(name = "dock-floor", input = "--dock-floor-on", value = "0")]
+    Floor,
 }
-
-/// `--dock-tile`: a tile at rest (`dock.tile_size_px`, 48; macOS `tilesize` 48, H).
-pub const TILE: Tuned = tuned("--dock-tile", "--dock-tile-px", "48px");
-/// `--dock-gap`: between two tiles (`dock.tile_gap_px`, 8).
-pub const GAP: Tuned = tuned("--dock-gap", "--dock-gap-px", "8px");
-/// `--dock-pad`: the pill's padding on every side (`dock.pill_padding_px`, 6).
-pub const PAD: Tuned = tuned("--dock-pad", "--dock-pad-px", "6px");
-/// `--dock-dot`: the running dot's diameter (`dock.running_dot_diameter_px`, 4).
-pub const DOT: Tuned = tuned("--dock-dot", "--dock-dot-px", "4px");
-/// `--dock-dot-gap`: from the tile's bottom edge to the dot's centre (`dock.running_dot_gap_px`,
-/// 3), inside the pill's 6 px padding.
-pub const DOT_GAP: Tuned = tuned("--dock-dot-gap", "--dock-dot-gap-px", "3px");
-/// `--dock-floor`: the reflective floor's opacity, 0 or 1 (`dock.floor`, `Off`).
-pub const FLOOR: Tuned = tuned("--dock-floor", "--dock-floor-on", "0");
-
-/// Every dock token, in stylesheet order.
-pub const DOCK_TOKENS: [Tuned; 6] = [TILE, GAP, PAD, DOT, DOT_GAP, FLOOR];
 
 /// Whether the dock draws its reflective floor (`dock.floor`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -84,12 +85,12 @@ impl DockMetrics {
             DockFloorSetting::On => "1",
         };
         [
-            TILE.write(&length(self.tile)),
-            GAP.write(&length(self.gap)),
-            PAD.write(&length(self.pad)),
-            DOT.write(&length(self.dot)),
-            DOT_GAP.write(&length(self.dot_gap)),
-            FLOOR.write(floor),
+            DockToken::Tile.write(&length(self.tile)),
+            DockToken::Gap.write(&length(self.gap)),
+            DockToken::Pad.write(&length(self.pad)),
+            DockToken::Dot.write(&length(self.dot)),
+            DockToken::DotGap.write(&length(self.dot_gap)),
+            DockToken::Floor.write(floor),
         ]
         .concat()
     }
@@ -111,14 +112,16 @@ impl DockMetrics {
 
 #[cfg(test)]
 mod tests {
-    use super::{DOCK_TOKENS, DockFloorSetting, DockMetrics};
+    use super::{DockFloorSetting, DockMetrics, DockToken};
     use crate::core::geometry::units::Px;
+    use crate::core::word::Word;
+    use crate::style::tokens::token::TokenScope;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {
         let written = DockMetrics::default().style_attr();
-        for token in DOCK_TOKENS {
-            let want = token.write(token.default);
+        for token in DockToken::ALL.iter().copied() {
+            let want = token.write(token.fallback(TokenScope::BASE));
             assert!(written.contains(&want), "{want} not in {written}");
         }
     }
