@@ -5,7 +5,6 @@
 
 use crate::focus::click::kept_click;
 use crate::geometry::{Point, Px};
-use dioxus::core::SuperFrom;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 
@@ -154,20 +153,6 @@ impl PressListeners {
             self.propagation.apply(event);
             self.press.call(Press::of(event, PointerButton::Middle));
         }
-    }
-}
-
-/// Marks the conversion below, so it does not collide with dioxus's own.
-#[doc(hidden)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct IgnorePress;
-
-/// The compatibility path: an `EventHandler<()>` the caller already holds (a prop passed
-/// through, a stored handler) still works as an `onclick`, ignoring which button pressed. A
-/// closure written `move |_| …` needs nothing: it takes the `Press` and drops it.
-impl SuperFrom<EventHandler<()>, IgnorePress> for EventHandler<Press> {
-    fn super_from(handler: EventHandler<()>) -> Self {
-        EventHandler::new(move |_: Press| handler.call(()))
     }
 }
 
