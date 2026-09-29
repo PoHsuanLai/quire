@@ -26,13 +26,13 @@ use crate::components::overlays::alert_vocab::{AlertButton, AlertEmphasis};
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
 use crate::components::overlays::scrim_strength::ScrimStrength;
-use crate::components::overlays::spring_presence::use_spring_presence;
 use crate::components::overlays::{
     sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
 };
 use crate::core::vocab::Shown;
 use crate::focus::host::focus_soon;
 use crate::motion::anim::Anim;
+use crate::motion::presence::spring::use_spring_presence;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use std::rc::Rc;

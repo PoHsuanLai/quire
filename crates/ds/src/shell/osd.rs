@@ -16,11 +16,13 @@
 
 use crate::components::content::level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode};
 use crate::components::controls::level::control::LevelControl;
-use crate::components::overlays::shown_phase::use_shown_phase;
 use crate::core::vocab::Fraction;
 use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
+use crate::motion::presence::Exit;
+use crate::motion::presence::spec::PresenceSpec;
+use crate::motion::presence::use_presence::{Presented, use_presence};
 use dioxus::prelude::*;
 
 /// The level an OSD shows: the value and the glyph that follows it.
@@ -57,8 +59,14 @@ pub fn Osd(
     #[props(default)] id: Option<String>,
     children: Element,
 ) -> Element {
-    let phase = use_shown_phase(shown, on_hidden, Anim::OsdIn, Anim::OsdOut);
-    let (now, alias) = phase;
+    let spec = PresenceSpec {
+        enter: Anim::OsdIn,
+        exit: Exit::OsdOut,
+    };
+    let Presented {
+        presence: now,
+        alias,
+    } = use_presence(shown, spec, Some(on_hidden));
     let level_label = label.clone().unwrap_or_else(|| "Level".to_owned());
     let named = label.clone();
     rsx! {
@@ -69,7 +77,7 @@ pub fn Osd(
             "aria-label": named,
             "data-position": position.slug(),
             "data-shown": now.shown().slug(),
-            "data-presence": now.presence(),
+            "data-presence": now.drawn_slug(),
             "data-pulse": alias.slug(),
             div { class: "ds-frame",
                 div { class: "ds-grain" }

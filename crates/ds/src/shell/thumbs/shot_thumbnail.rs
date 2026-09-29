@@ -23,13 +23,14 @@ use crate::components::content::shot_frame::{picture_style, shot_frame};
 use crate::components::content::text_runs::TextLine;
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::controls::press::Propagation;
-use crate::components::overlays::osd_phase::OsdPhase;
-use crate::components::overlays::shown_phase::{Alias, use_shown_phase};
 use crate::core::geometry::units::{Point, Px};
 use crate::core::vocab::Shown;
 use crate::core::vocab::StaggerIndex;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
+use crate::motion::presence::spec::PresenceSpec;
+use crate::motion::presence::use_presence::{EntranceAlias, Presented, use_presence};
+use crate::motion::presence::{Exit, Presence};
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
@@ -71,7 +72,11 @@ pub fn ShotThumbnail(
     #[props(default)] swipe: NotificationSwipe,
     #[props(default)] swipe_metrics: SwipeMetrics,
 ) -> Element {
-    let (phase, alias) = use_shown_phase(shown, on_hidden, Anim::ShotIn, Anim::ShotOut);
+    let spec = PresenceSpec {
+        enter: Anim::ShotIn,
+        exit: Exit::ShotOut,
+    };
+    let Presented { presence, alias } = use_presence(shown, spec, Some(on_hidden));
     rsx! {
         Surface { material: Material::Toast, chrome: RootChrome::Transparent,
             // Keyed by the entrance's alias, which flips on each fresh showing: a card shown
@@ -79,7 +84,7 @@ pub fn ShotThumbnail(
             // final, as a notification is dropped after it), a new press and no hover.
             ShotCard {
                 key: "{alias.slug()}",
-                phase,
+                presence,
                 alias,
                 image,
                 size,
@@ -99,8 +104,8 @@ pub fn ShotThumbnail(
 /// One showing's card: its swipe, its press and its hover.
 #[component]
 fn ShotCard(
-    phase: OsdPhase,
-    alias: Alias,
+    presence: Presence,
+    alias: EntranceAlias,
     image: ImageSource,
     size: ImageSize,
     width: Px,
@@ -131,8 +136,8 @@ fn ShotCard(
     rsx! {
         div {
             class: "ds-shot",
-            "data-shown": phase.shown().slug(),
-            "data-presence": phase.presence(),
+            "data-shown": presence.shown().slug(),
+            "data-presence": presence.drawn_slug(),
             "data-pulse": alias.slug(),
             "data-hover": hover().slug(),
             "data-swipe": swiper.look(),

@@ -140,7 +140,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 entries,
                 pitch: self.pitch,
             },
-            exit_anim(exit, emphasis),
+            exit.anim(emphasis),
         )
     }
 
@@ -226,7 +226,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
         exit: Exit,
         emphasis: Emphasis,
     ) -> (Self, Vec<(Anim, StaggerIndex)>) {
-        let anim = exit_anim(exit, emphasis);
+        let anim = exit.anim(emphasis);
         let RosterState { entries, pitch } = self;
         let mut running = Vec::new();
         let entries = entries
@@ -349,20 +349,4 @@ pub enum StayError {
     UnknownKey,
     /// The roster's owner is gone (the list unmounted); only the hook reports this.
     Unmounted,
-}
-
-/// The animation an exit plays: an unread (`Emphasis::Strong`) row plays the heavy variant of
-/// every row exit, 15 % slower (design/05-MOTION.md principle 6, section 8). A Today entry's
-/// `tab-out` and a banner's `banner-out` have no heavy variant.
-pub(crate) fn exit_anim(exit: Exit, emphasis: Emphasis) -> Anim {
-    match (exit, emphasis) {
-        (Exit::Fold, Emphasis::Strong) => Anim::FoldHeavy,
-        (Exit::Fold, Emphasis::Plain) => Anim::Fold,
-        (Exit::Curl, Emphasis::Strong) => Anim::CurlHeavy,
-        (Exit::Curl, Emphasis::Plain) => Anim::Curl,
-        (Exit::Crumple, Emphasis::Strong) => Anim::CrumpleHeavy,
-        (Exit::Crumple, Emphasis::Plain) => Anim::Crumple,
-        (Exit::TabOut, _) => Anim::TabOut,
-        (Exit::BannerOut, _) => Anim::BannerOut,
-    }
 }

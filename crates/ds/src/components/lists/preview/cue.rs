@@ -9,12 +9,12 @@
 //! `--t-quick` instead of replaying the entrance; under Reduced it snaps (R7).
 
 use crate::components::controls::spinner::{SpinnerKind, ring};
-use crate::components::overlays::shown_phase::Alias;
 use crate::motion::detail::{
     cue::Cue,
     pending::{PendingFrame, PendingSpec},
     touch::Touch,
 };
+use crate::motion::presence::use_presence::EntranceAlias;
 use dioxus::prelude::*;
 
 /// What a [`PreviewPane`](crate::PreviewPane) knows of its latest change: the cue the caller's
@@ -77,8 +77,8 @@ pub(crate) fn touch_slug(touch: Touch) -> &'static str {
 /// The touch the entrance now playing was caused by: taken when an entrance starts (the shown
 /// phase's alias flips) and kept until the next, so a later remote change cannot swap the easing
 /// of an entrance a contact started, nor the other way round.
-pub(crate) fn use_entrance_touch(alias: Alias, touch: Touch) -> Touch {
-    let mut latched = use_hook(|| CopyValue::new((Alias::A, Touch::Remote)));
+pub(crate) fn use_entrance_touch(alias: EntranceAlias, touch: Touch) -> Touch {
+    let mut latched = use_hook(|| CopyValue::new((EntranceAlias::A, Touch::Remote)));
     let (seen, kept) = *latched.peek();
     if seen == alias {
         return kept;

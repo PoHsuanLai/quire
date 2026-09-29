@@ -17,7 +17,6 @@ use crate::components::lists::preview::content::{PaneContent, caption, media};
 use crate::components::lists::preview::cue::{
     PaneCue, pane_pending_spec, pending_look, touch_slug, use_entrance_touch,
 };
-use crate::components::overlays::shown_phase::use_shown_phase;
 use crate::core::vocab::Shortcut;
 use crate::core::vocab::Shown;
 use crate::core::word::Word;
@@ -26,6 +25,9 @@ use crate::motion::detail::{
     once::use_cross_fade, operation::Operation, pending::PendingFrame, touch::Touch,
     use_pending::use_pending,
 };
+use crate::motion::presence::Exit;
+use crate::motion::presence::spec::PresenceSpec;
+use crate::motion::presence::use_presence::{Presented, use_presence};
 use dioxus::prelude::*;
 
 /// One action under the preview: its words in the ink, then its keys as a plain [`Chord`] in
@@ -72,7 +74,14 @@ pub fn PreviewPane(
         Touch::Contact(_) => Anim::PaneInR,
         Touch::Remote => Anim::PaneInROut,
     };
-    let (phase, alias) = use_shown_phase(shown, on_hidden, enter, Anim::PaneOutR);
+    let spec = PresenceSpec {
+        enter,
+        exit: Exit::PaneOut,
+    };
+    let Presented {
+        presence: phase,
+        alias,
+    } = use_presence(shown, spec, Some(on_hidden));
     let entrance = use_entrance_touch(alias, cue.touch());
     let frame = use_pending(operation, pane_pending_spec());
     let (media_class, fading) = bump_attrs("ds-preview-media", use_cross_fade(cue.cue()));
@@ -92,7 +101,7 @@ pub fn PreviewPane(
             "aria-label": "{label}",
             "data-content": content.slug(),
             "data-shown": phase.shown().slug(),
-            "data-presence": phase.presence(),
+            "data-presence": phase.drawn_slug(),
             "data-pulse": alias.slug(),
             "data-touch": touch_slug(entrance),
             "aria-busy": busy,
