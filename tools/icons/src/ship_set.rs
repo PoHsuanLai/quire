@@ -1,5 +1,5 @@
 //! `icons ship` (design/08-ICONS.md 2.11): export the shipped set in its three styles and build
-//! the round-six sheet from the exported files. File handling only.
+//! its contact sheet from the exported files. File handling only.
 
 use std::path::Path;
 
@@ -56,7 +56,7 @@ fn tinted(path: &Path, tint: DsTint) -> Result<Rgba32FImage, IconsError> {
     Ok(DynamicImage::ImageRgba8(rgba).to_rgba32f())
 }
 
-/// The round-six sheet from the exported files: the shipped (Colour) set, the Muted set, and the
+/// The contact sheet from the exported files: the shipped (Colour) set, the Muted set, and the
 /// neutral Monochrome set tinted by `ds::icon::retint` for the Work and Home Spaces.
 pub fn sheet(manifest_path: &Path, out_dir: &Path, sheet: &Path) -> Result<(), IconsError> {
     let m: Manifest = toml::from_str(&std::fs::read_to_string(manifest_path)?)?;
@@ -102,7 +102,7 @@ pub fn sheet(manifest_path: &Path, out_dir: &Path, sheet: &Path) -> Result<(), I
         })
         .collect::<Result<Vec<_>, IconsError>>()?;
     let s = Sheet {
-        title: "ROUND SIX - THE SHIPPED SET FROM ASSETS/ICONS/APPS - 512, THEN 16 32 48 ON LIGHT AND DARK"
+        title: "THE SHIPPED SET FROM ASSETS/ICONS/APPS - 512, THEN 16 32 48 ON LIGHT AND DARK"
             .to_owned(),
         rows,
     };
