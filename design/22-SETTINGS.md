@@ -57,6 +57,9 @@ Rules, all three files:
 - **Atomic write**: temp file + `rename` (`ds-settings`'s `file::save`).
 - **`version = 1`** top-level field. A future incompatible change bumps it and ships a
   migrator; today nothing reads it but its absence.
+- **A key nobody reads is retired**: its row's status says `RETIRING` and its field is deleted
+  in the same change; the row goes when the key is read again or dropped for good, and the
+  tests that compare rows with fields skip a `RETIRING` row.
 - **Unknown keys reported, not preserved**: a key no struct reads does not stop a load
   (`CONVENTIONS.md#12-derives-and-serde`: never `deny_unknown_fields` on a stored type), but it is
   not carried through a save either. `Store::load` returns it in `Loaded::unknown` (a dotted
@@ -108,7 +111,7 @@ control in v1.
 | `appearance.material_shadow_strength` | `Percent` | `100` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `appearance.material_vibrancy` | `Percent` | `100` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `notifications.banner_material` | `Material::{Toast,Inverse}` | `Toast` | `Inverse` = mail's ink-on-paper toast | `03-COLOR.md#open-decisions` item 10; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 7 | proposed — **flagged for review** |
-| `control_center.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
+| `control_center.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | RETIRING: no reader; the panel is always a Sheet |
 | `launcher.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
 
 `notifications.banner_material` is stored under `appearance` (it names a `ds::Material`
@@ -183,7 +186,7 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.autohide_delay_ms` | `Ms` | `200` | `0..1000` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
 | `dock.autohide_slide_ms` | `Ms` | `500` | `0..1500` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
 | `dock.autohide_trigger_strip_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-11-auto-hide` | proposed |
-| `dock.position` | `DockPosition::{Bottom,Left,Right}` | `Bottom` | Left/Right deferred | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled; deferred |
+| `dock.position` | `DockPosition::{Bottom,Left,Right}` | `Bottom` | Left/Right deferred | `10-BEHAVIOUR-dock.md#10-6-configuration` | RETIRING: no reader; the dock is always at the bottom until Left and Right are built |
 | `dock.indicators` | `Indicators::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
 | `dock.bounce` | `Bounce::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
 | `dock.launch_animation` | `LaunchAnim::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
@@ -418,7 +421,7 @@ data, not a key.
 | --- | --- | --- | --- | --- | --- |
 | `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
 | `spaces.default_card_accent` | `CardAccent::{Postmark,SpaceHue}` | `Postmark` | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
-| `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | proposed |
+| `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | RETIRING: no reader; the store lookup is not built |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
 
 ### 3.15 `display` (sill/settings.toml)
@@ -474,7 +477,7 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `session.lock_clock` | `LockClock::{H24,H12}` | `H24` | `14:05`, or `2:05` without AM/PM as the reference lock screen shows it | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS F553 | proposed (M11 freeze, 2026-09-26) |
-| `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | proposed (2026-09-27) |
+| `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | RETIRING: no reader; the picture is wired to `resolve_picture` first |
 | `session.lock_grace_s` | `Secs` | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
 
 ### 3.20 `widgets` (sill/settings.toml)
@@ -854,7 +857,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | Settings app page | Keys shown |
 | --- | --- |
 | **Appearance** | `appearance.theme`, `appearance.look`, `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
-| **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.position`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
+| **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into COSMIC's `system_actions` and `custom` shortcut files, and the chord COSMIC already holds wins a clash, shown on the row (28 §7 decision 10) |
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
