@@ -257,10 +257,12 @@ fn released<T: Clone + 'static>(
             Some(Choice {
                 act: Act::Pick(value),
                 availability: Availability::Enabled,
+                ..
             }) => pick.call(value.clone()),
             Some(Choice {
                 act: Act::Open(_),
                 availability: Availability::Enabled,
+                ..
             }) => {}
             _ => fade_out.call(()),
         }

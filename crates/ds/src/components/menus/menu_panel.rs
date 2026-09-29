@@ -19,6 +19,7 @@ use crate::core::geometry::{
     units::{Point, Px, Rect},
 };
 use crate::core::press::Press;
+use crate::core::vocab::Availability;
 use crate::core::word::Word;
 use crate::host::measure::MountedRef;
 use crate::stack::menu_track::types::{MenuTarget, MenuTiming};
@@ -137,7 +138,10 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         let Some(act) = key_act(&event.key(), event.modifiers(), filter) else {
             return Decision::Nothing;
         };
-        let decision = self.decision(&act);
+        let decision = match &act {
+            KeyAct::Jump(text) => self.jump(text),
+            _ => self.decision(&act),
+        };
         let own = matches!(
             decision,
             Decision::Select(_) | Decision::Pick(_) | Decision::Expand(_) | Decision::CloseSub
@@ -156,6 +160,23 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         decision
     }
 
+    /// Letters typed with no query: the highlight goes to the next enabled choice whose title
+    /// starts with them.
+    fn jump(&self, text: &str) -> Decision<T> {
+        let labels: Vec<&str> = self
+            .choices
+            .iter()
+            .map(|choice| match choice.availability {
+                Availability::Enabled => choice.title.as_str(),
+                Availability::Disabled | Availability::Busy => "",
+            })
+            .collect();
+        let from = self.current().unwrap_or(labels.len().saturating_sub(1));
+        self.tracker
+            .typed(text, &labels, from)
+            .map_or(Decision::Nothing, Decision::Select)
+    }
+
     /// What `act` means from the highlighted choice. With nothing highlighted a move starts
     /// from an end and a pick or an open does nothing.
     fn decision(&self, act: &KeyAct) -> Decision<T> {
@@ -165,9 +186,11 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
             (None, None) => match act {
                 KeyAct::Pick | KeyAct::Open => Decision::Nothing,
                 KeyAct::Move(_)
+                | KeyAct::Edge(_)
                 | KeyAct::Back
                 | KeyAct::Close
                 | KeyAct::Type(_)
+                | KeyAct::Jump(_)
                 | KeyAct::Erase => decide(act, 0, &self.choices, child, level),
             },
         }

@@ -3,8 +3,9 @@
 //! menu lists the matches, so the field says which choice is highlighted and the menu only
 //! reports what the keys and the pointer asked for. Pure, beside `menu` and `menu_panel`.
 
-use crate::components::menus::menu_lines::{KeyAct, Step, settled};
+use crate::components::menus::menu_lines::KeyAct;
 use crate::core::vocab::Availability;
+use crate::stack::roving::{Step, settled};
 
 /// Whose highlight a menu shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -39,12 +40,13 @@ pub(crate) fn seed(act: &KeyAct, count: usize) -> Option<usize> {
     let last = count.checked_sub(1)?;
     match act {
         KeyAct::Move(Step::Down) => Some(last),
-        KeyAct::Move(Step::Up) => Some(0),
+        KeyAct::Move(Step::Up) | KeyAct::Edge(_) => Some(0),
         KeyAct::Pick
         | KeyAct::Open
         | KeyAct::Back
         | KeyAct::Close
         | KeyAct::Type(_)
+        | KeyAct::Jump(_)
         | KeyAct::Erase => None,
     }
 }
@@ -59,8 +61,9 @@ impl MenuCursor {
 #[cfg(test)]
 mod tests {
     use super::{MenuCursor, highlighted, seed};
-    use crate::components::menus::menu_lines::{KeyAct, Step};
+    use crate::components::menus::menu_lines::KeyAct;
     use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
+    use crate::stack::roving::Step;
 
     #[test]
     fn the_highlight_is_the_menus_own_or_the_callers() {
