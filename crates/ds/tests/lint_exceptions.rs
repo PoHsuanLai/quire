@@ -1,8 +1,8 @@
 //! `LintConfig.exceptions`: an exception silences exactly its (rule, selector) pair, in a
 //! stylesheet and in markup, and `assert_clean` says how much each one silenced and fails on
-//! one that silenced nothing unless `LintConfig.stale` is `Stale::Report`.
+//! one that silenced nothing.
 
-use ds::lint::{Exception, LintConfig, Rule, Stale, assert_clean, markup, stylesheet};
+use ds::lint::{Exception, LintConfig, Rule, assert_clean, markup, stylesheet};
 
 const TRUNCATE_MASK: &[Exception] = &[Exception {
     rule: Rule::HexColour,
@@ -85,20 +85,9 @@ const CLEAN_FADE: &str = ".fade { mask-image: linear-gradient(var(--ink), transp
 #[should_panic(
     expected = "1 stale exception(s), which suppressed nothing:\n  HexColour on .fade (mask alpha only)"
 )]
-fn a_stale_exception_fails_by_default() {
+fn a_stale_exception_fails() {
     let config = LintConfig {
         exceptions: TRUNCATE_MASK,
-        ..LintConfig::default()
-    };
-    assert_eq!(config.stale, Stale::Fail, "failing is the default");
-    assert_clean(CLEAN_FADE, &config);
-}
-
-#[test]
-fn a_stale_exception_is_only_reported_when_asked() {
-    let config = LintConfig {
-        exceptions: TRUNCATE_MASK,
-        stale: Stale::Report,
         ..LintConfig::default()
     };
     assert_clean(CLEAN_FADE, &config);

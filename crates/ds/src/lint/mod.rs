@@ -41,6 +41,6 @@ mod walk;
 
 pub use assert::assert_clean;
 pub use markup::{markup, markup_warnings};
-pub use rule::{Exception, LintConfig, Offence, Profile, Rule, Stale};
+pub use rule::{Exception, LintConfig, Offence, Profile, Rule};
 pub use severity::{Severity, WARNINGS};
 pub use stylesheet::{stylesheet, warnings};
