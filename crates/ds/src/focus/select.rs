@@ -5,8 +5,8 @@
 
 use dioxus::prelude::MountedData;
 
-use crate::focus::caret::InitialCaret;
-use crate::focus::host::Focused;
+use crate::host::caret::InitialCaret;
+use crate::host::focused::Focused;
 
 /// The field's text after the focus lands in it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

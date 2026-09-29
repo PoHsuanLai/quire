@@ -2,10 +2,11 @@
 //! selection, and to place its `/` and `@` menus at the caret.
 
 use crate::core::geometry::units::{Point, Rect};
-use crate::edit::host::{HostEdit, Probe};
-use crate::edit::position::{TextPosition, TextRange};
+use crate::edit::host::HostEdit;
 use crate::focus::host::focus_soon;
 use crate::host::measure::{HostMeasure, Measured};
+use crate::host::position::{TextPosition, TextRange};
+use crate::host::probe::Probe;
 use dioxus::prelude::*;
 use std::rc::Rc;
 

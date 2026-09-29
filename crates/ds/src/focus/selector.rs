@@ -6,28 +6,17 @@
 //! `Focus::OnMount`.
 
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::focus::host::{Focused, focus_selecting};
+use crate::focus::host::focus_selecting;
 use crate::focus::select::Select;
 use crate::focus::targets::FocusTargets;
+use crate::host::focused::Focused;
+use crate::host::found::Found;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
 /// Frames a selector waits for its element to be drawn: a field asked for in the handler that
 /// opens its panel mounts a frame or two later.
 const FIND_FRAMES: usize = 20;
-
-/// One attempt at finding an element.
-#[derive(Clone)]
-pub enum Found {
-    /// The first element that matches, as a handle the host's focus writes accept.
-    Element(Rc<MountedData>),
-    /// Nothing matches (yet).
-    Missing,
-    /// The document is busy (rendering); try again next frame.
-    Busy,
-    /// Not a selector the host's document can read.
-    BadSelector,
-}
 
 /// The host's selector lookup, provided as root context by `ds-native` (`ds_native::launch` and
 /// its harness). `same` says whether two handles are the same node, since an element found by
@@ -38,17 +27,6 @@ pub struct HostFind {
     pub find: Rc<dyn Fn(&str) -> Found>,
     /// Whether two mounted handles name the same node.
     pub same: fn(&MountedData, &MountedData) -> bool,
-}
-
-impl std::fmt::Debug for Found {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self {
-            Found::Element(_) => "Element",
-            Found::Missing => "Missing",
-            Found::Busy => "Busy",
-            Found::BadSelector => "BadSelector",
-        })
-    }
 }
 
 impl std::fmt::Debug for HostFind {

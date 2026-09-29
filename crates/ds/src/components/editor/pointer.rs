@@ -10,8 +10,9 @@ use crate::components::editor::state::Capture;
 use crate::core::geometry::units::{Point, Px};
 use crate::core::vocab::PressPhase;
 use crate::edit::clicks::Clicks;
-use crate::edit::host::Probe;
-use crate::edit::pointer::{CapturedPointer, EditPointer, Extend, PointerPhase};
+use crate::edit::pointer::{EditPointer, Extend};
+use crate::host::captured::{CapturedPointer, PointerPhase};
+use crate::host::probe::Probe;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 

@@ -4,63 +4,12 @@
 //! [`Probe::Unknown`], and the surface still delivers keys, text and clipboard shortcuts.
 
 use crate::core::geometry::units::{Point, Rect};
-use crate::edit::input::Pasted;
-use crate::edit::pointer::CapturedPointer;
-use crate::edit::position::{TextPosition, TextRange};
+use crate::host::captured::CapturedPointer;
+use crate::host::ime::{ImeEvent, ImeListener, ImeSwitch};
+use crate::host::pasted::Pasted;
+use crate::host::position::{TextPosition, TextRange};
+use crate::host::probe::Probe;
 use dioxus::prelude::{EventHandler, MountedData};
-
-/// One read or write through the host.
-#[derive(Debug, Clone, PartialEq)]
-pub enum Probe<T> {
-    /// The answer.
-    Found(T),
-    /// The document is busy (rendering); ask again next frame.
-    Busy,
-    /// The host cannot answer: no host, the surface is not its node or is gone, nothing
-    /// addressable is there, or the document has not been laid out yet.
-    Unknown,
-}
-
-impl<T> Probe<T> {
-    /// The answer, if there was one.
-    pub fn found(self) -> Option<T> {
-        match self {
-            Probe::Found(value) => Some(value),
-            Probe::Busy | Probe::Unknown => None,
-        }
-    }
-}
-
-/// What the IME tells the focused surface, as the host receives it (winit's `Ime`).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ImeEvent {
-    /// The IME attached to the window.
-    Enabled,
-    /// The preedit is now `text` (empty: cleared), with the IME's cursor as UTF-8 byte offsets.
-    Preedit {
-        /// The text being composed.
-        text: String,
-        /// The IME's cursor or highlight in it.
-        cursor: Option<(usize, usize)>,
-    },
-    /// Insert `text`.
-    Commit(String),
-    /// The IME detached.
-    Disabled,
-}
-
-/// Whether the window's IME is on for the surface.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ImeSwitch {
-    /// On: the surface has the keyboard.
-    On,
-    /// Off: it lost it.
-    Off,
-}
-
-/// A surface's registration for IME events, to cancel as it unmounts.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ImeListener(pub u64);
 
 /// The host's edit operations, provided as root context. Each takes the surface's element, so
 /// the host searches only its subtree. Points and rects are the window's logical pixels.

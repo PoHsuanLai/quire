@@ -6,8 +6,8 @@
 
 use super::lang::Lang;
 use super::words::WordSpan;
-use crate::edit::host::Probe;
-use crate::edit::position::EditNode;
+use crate::host::position::EditNode;
+use crate::host::probe::Probe;
 use dioxus::prelude::MountedData;
 use std::future::Future;
 use std::pin::Pin;

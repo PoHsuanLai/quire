@@ -6,8 +6,8 @@
 //! (`Update` with empty text: the app stops drawing it), and the composition ends at the commit,
 //! or at the next key, blur or IME detach with nothing committed.
 
-use crate::edit::host::ImeEvent;
 use crate::edit::input::{Composition, EditInput, PreeditCursor};
+use crate::host::ime::ImeEvent;
 
 /// Where the surface is in a composition.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -75,8 +75,8 @@ fn update(text: String, cursor: Option<(usize, usize)>) -> EditInput {
 #[cfg(test)]
 mod tests {
     use super::{Composing, on_ime, settle};
-    use crate::edit::host::ImeEvent;
     use crate::edit::input::{Composition, EditInput, PreeditCursor};
+    use crate::host::ime::ImeEvent;
 
     fn preedit(text: &str) -> ImeEvent {
         ImeEvent::Preedit {

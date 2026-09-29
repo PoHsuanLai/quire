@@ -15,4 +15,3 @@ pub(crate) mod host;
 pub(crate) mod input;
 pub(crate) mod keys;
 pub(crate) mod pointer;
-pub(crate) mod position;

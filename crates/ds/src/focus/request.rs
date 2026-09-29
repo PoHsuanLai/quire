@@ -3,8 +3,8 @@
 //! palette's entrance).
 
 use crate::core::task::{try_get, try_set};
-use crate::focus::caret::InitialCaret;
 use crate::focus::select::{Landing, Select};
+use crate::host::caret::InitialCaret;
 use dioxus::prelude::*;
 
 /// How many times focus has been asked for: a field serves each new ticket once.

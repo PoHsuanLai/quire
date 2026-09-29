@@ -191,31 +191,37 @@ pub use crate::core::{
 };
 pub use crate::edit::{
     handle::{EditHandle, use_edit_handle},
-    host::{HostEdit, ImeEvent, ImeListener, ImeSwitch, Probe},
-    input::{Composition, EditInput, KeyInput, Pasted, PreeditCursor},
-    pointer::{CapturedPointer, EditFocus, EditPointer, Extend, PointerPhase},
-    position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextPosition, TextRange},
+    host::HostEdit,
+    input::{Composition, EditInput, KeyInput, PreeditCursor},
+    pointer::{EditFocus, EditPointer, Extend},
 };
 pub use crate::file_drop::{
-    drag::{DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop, Offer},
+    drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer},
     hook::use_file_drop,
     host::HostFileDrop,
 };
 pub use crate::focus::{
-    caret::{
-        Caret, Collapsed, FieldSelection, HostCaret, HostPlaceCaret, HostSelection, InitialCaret,
-        caret_at,
-    },
-    click::{Fallback, HostClickFocus, HostPressFocus},
+    caret::{HostCaret, HostPlaceCaret, HostSelection},
+    click::{HostClickFocus, HostPressFocus},
     field::{FieldHandle, use_field_handle},
     hand_back::HostHandBack,
-    host::{Focused, HostBlur, HostFocus, focus_soon},
+    host::{HostBlur, HostFocus, focus_soon},
     request::{FocusRequest, use_focus_request},
     select::{HostSelect, Select},
-    selector::{FocusError, Found, HostFind, focus_by_selector},
+    selector::{FocusError, HostFind, focus_by_selector},
 };
 pub use crate::host::{
+    captured::{CapturedPointer, PointerPhase},
+    caret::{Caret, Collapsed, FieldSelection, InitialCaret, caret_at},
+    drop_hit::DropHit,
+    fallback::Fallback,
+    focused::Focused,
+    found::Found,
+    ime::{ImeEvent, ImeListener, ImeSwitch},
     measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect},
+    pasted::Pasted,
+    position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextPosition, TextRange},
+    probe::Probe,
     reveal::{HostReveal, ScrollSpan, Scrolled, nearest_scroll},
 };
 pub use crate::motion::{

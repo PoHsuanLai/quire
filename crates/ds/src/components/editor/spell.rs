@@ -8,9 +8,10 @@
 use crate::core::geometry::units::{Point, Rect};
 use crate::core::task::{spawn_in, try_set_if_changed};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::edit::host::{HostEdit, Probe};
-use crate::edit::position::{EditNode, TextPosition};
+use crate::edit::host::HostEdit;
 use crate::host::measure::{BUSY_ATTEMPTS, client_rect};
+use crate::host::position::{EditNode, TextPosition};
+use crate::host::probe::Probe;
 use crate::spell::host::{HostSpell, Paragraph};
 use crate::spell::lang::{Lang, Spell};
 use crate::spell::marks::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};

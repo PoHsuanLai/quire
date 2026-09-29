@@ -1,5 +1,5 @@
 use super::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
-use crate::edit::position::{EditNode, TextPosition};
+use crate::host::position::{EditNode, TextPosition};
 use crate::spell::words::{WordSpan, words};
 use std::collections::HashSet;
 

@@ -5,7 +5,7 @@
 //! browsing (to toggle its preview pane) and Right with the caret at the end of the query (to
 //! show it); a Space typed while searching is left to the field.
 
-use crate::focus::caret::Caret;
+use crate::host::caret::Caret;
 use dioxus::prelude::*;
 
 /// A key the palette's field got, before anything acted on it.
