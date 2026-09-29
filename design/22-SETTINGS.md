@@ -54,8 +54,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 
 Rules, all three files:
 
-- **Atomic write**: temp file + `rename` (same mechanism as `ds-settings`'s `appearance.json`
-  writer, PLAN "Design: `<ds>`": "atomic write").
+- **Atomic write**: temp file + `rename` (`ds-settings`'s `file::save`).
 - **`version = 1`** top-level field. A future incompatible change bumps it and ships a
   migrator; today nothing reads it but its absence.
 - **Unknown keys preserved**: a round-trip through a newer binary must not drop a key an older
@@ -71,12 +70,6 @@ Rules, all three files:
   "Design: `<ds>`" `ds-settings`: "`notify` directory watch (rename replaces inode; debounce
   30 ms)"). A change is diffed (section 4's `apply`) and applied without restart; no surface
   animates from a settings change (it just repaints with new values on its next frame).
-
-**Mailo migration**: `appearance.rs`'s old `~/.config/mailo/appearance.json` (or wherever mailo
-currently writes it) is read **once**, on first run of the new `ds-settings` loader if
-`appearance.toml` does not yet exist, mapped field-for-field into `Appearance`, and written out
-as `appearance.toml`; the json file is left in place (not deleted), so a downgrade is
-non-destructive. This is the "adopt old json" step in PLAN "mailo consumption. Phase A".
 
 ## 3. The key catalogue
 

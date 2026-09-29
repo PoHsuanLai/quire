@@ -1,7 +1,6 @@
 //! Settings I/O: any settings file through one generic API (`file::{Settings, load, save}`,
-//! lenient read, atomic write, a debounced directory watch), with `appearance.toml` (plus a
-//! one-time import of mailo's `appearance.json`) and `spaces.json` as its two instances, and
-//! the settings portal (design/22-SETTINGS.md sections 2 and 4, design/21-SPACES.md section 10).
+//! lenient read, atomic write, a debounced directory watch), with `appearance.toml` as its instance, and
+//! the settings portal (design/22-SETTINGS.md sections 2 and 4).
 //!
 //! `ds` stays effect-free; everything here touches the disk or the bus.
 
@@ -30,7 +29,7 @@ mod test_dir;
 pub mod units;
 pub mod watch;
 
-pub use appearance_file::{APPEARANCE, FILE_NAME, load, load_or_import, save};
+pub use appearance_file::{APPEARANCE, FILE_NAME, load, save};
 pub use diff::{SettingsChange, apply};
 pub use dirs::{AppName, cache_dir, config_dir, state_dir};
 pub use ds_settings_derive::SettingsSchema;

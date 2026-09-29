@@ -9,7 +9,6 @@ use crate::units::Percent;
 use crate::watch::{self, AppearanceWatch};
 use dioxus::prelude::*;
 use ds::SystemPrefs;
-use std::path::Path;
 
 /// The inputs to [`ds::resolve`], as they are now.
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -66,36 +65,14 @@ impl Environment {
     }
 }
 
-/// mailo's legacy settings file name, inside its own config directory.
-const LEGACY_FILE_NAME: &str = "appearance.json";
-
-/// `app`'s settings, importing mailo's legacy `appearance.json` once for every app, mailo
-/// included, the first time the app's own `appearance.toml` does not exist; else the defaults
-/// for a program with no config directory at all. There is one legacy file, mailo's, so every app
-/// imports the same one; for mailo it sits beside its own `appearance.toml` (FINDINGS "mailo
-/// gaps": mailo used to be skipped, so `use_environment(AppName::MAILO)` never imported it).
+/// `app`'s settings, or the defaults for a program with no config directory at all.
 fn load_initial(app: AppName) -> AppearanceFile {
-    initial_from(
-        dirs::config_dir(app).as_deref(),
-        dirs::config_dir(AppName::MAILO).as_deref(),
-    )
+    dirs::config_dir(app)
+        .map(|dir| file::load(&dir))
+        .unwrap_or_default()
 }
 
-/// [`load_initial`] over explicit directories: `dir` is the app's config directory, `mailo_dir`
-/// mailo's (the same directory when the app is mailo).
-fn initial_from(dir: Option<&Path>, mailo_dir: Option<&Path>) -> AppearanceFile {
-    let Some(dir) = dir else {
-        return AppearanceFile::default();
-    };
-    match mailo_dir {
-        Some(mailo_dir) => {
-            file::load_or_import(dir, &mailo_dir.join(LEGACY_FILE_NAME)).unwrap_or_default()
-        }
-        None => file::load(dir),
-    }
-}
-
-/// Load `app`'s settings (importing mailo's JSON once), read the portal, and keep both live.
+/// Load `app`'s settings, read the portal, and keep both live.
 pub fn use_environment(app: AppName) -> ReadSignal<Environment> {
     let mut env = use_signal(Environment::default);
 
@@ -155,34 +132,8 @@ async fn watch_portal(mut env: Signal<Environment>, mut portal: SystemPrefsWatch
 
 #[cfg(test)]
 mod tests {
-    use super::{Environment, LEGACY_FILE_NAME, initial_from};
-    use crate::test_dir::TempDir;
+    use super::Environment;
     use crate::units::Percent;
-    use ds::Theme;
-
-    /// mailo's own first run imports its own `appearance.json`, which sits in the directory its
-    /// `appearance.toml` will be written to; a shell app imports the same file from mailo's
-    /// directory. Both leave the JSON in place and write their TOML.
-    #[test]
-    fn every_app_mailo_included_imports_mailos_json_once() {
-        let root = TempDir::new();
-        let mailo = root.path().join("mailo");
-        let shell = root.path().join("quire");
-        std::fs::create_dir_all(&mailo).unwrap_or_else(|e| panic!("{e}"));
-        let json = r#"{"theme":"dark","motion":"calm","marks":"letters"}"#;
-        std::fs::write(mailo.join(LEGACY_FILE_NAME), json).unwrap_or_else(|e| panic!("{e}"));
-        for (name, dir) in [("mailo", &mailo), ("a shell app", &shell)] {
-            let got = initial_from(Some(dir), Some(&mailo));
-            assert_eq!(got.appearance.theme, Theme::Dark, "{name}");
-            assert!(dir.join("appearance.toml").exists(), "{name} wrote no TOML");
-        }
-        assert_eq!(
-            std::fs::read_to_string(mailo.join(LEGACY_FILE_NAME)).unwrap_or_else(|e| panic!("{e}")),
-            json,
-            "the JSON is left as it was"
-        );
-        assert_eq!(initial_from(None, Some(&mailo)), Default::default());
-    }
 
     #[test]
     fn the_tint_key_becomes_the_roots_thousandths() {
