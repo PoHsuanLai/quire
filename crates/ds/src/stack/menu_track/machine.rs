@@ -4,7 +4,7 @@ use super::triangle::shielded;
 use super::types::{
     Branch, Entered, ItemPath, MenuAnim, MenuDirection, MenuHold, MenuKey, MenuPhase, MenuTarget,
     MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
-    Submenu,
+    ShownBy, Submenu,
 };
 use crate::core::geometry::units::Point;
 use std::time::Instant;
@@ -26,7 +26,7 @@ impl<K: Clone + PartialEq> MenuTrack<K> {
     pub fn open(timing: MenuTiming, menu: K) -> Self {
         MenuTrack {
             timing,
-            phase: opened(menu, MenuHold::Released),
+            phase: opened(menu, ShownBy::Press, MenuHold::Released),
         }
     }
 
@@ -54,16 +54,17 @@ fn closed<K: Clone>(event: MenuTrackEvent<K>) -> (MenuPhase<K>, Effects<K>) {
     match event {
         MenuTrackEvent::PressTitle(menu) => {
             let effects = vec![MenuTrackEffect::Open(menu.clone(), MenuAnim::Pop)];
-            (opened(menu, MenuHold::Held), effects)
+            (opened(menu, ShownBy::Press, MenuHold::Held), effects)
         }
         _ => (MenuPhase::Closed, Vec::new()),
     }
 }
 
 /// A fresh session on `menu`.
-fn opened<K>(menu: K, held: MenuHold) -> MenuPhase<K> {
+fn opened<K>(menu: K, shown: ShownBy, held: MenuHold) -> MenuPhase<K> {
     MenuPhase::Tracking(Session {
         menu,
+        shown,
         held,
         entered: Entered::NotYet,
         hot: None,
@@ -92,16 +93,28 @@ fn tracking<K: Clone + PartialEq>(
     timing: MenuTiming,
 ) -> (MenuPhase<K>, Effects<K>) {
     match event {
-        MenuTrackEvent::PressTitle(other) if other == session.menu => close(Vec::new()),
+        MenuTrackEvent::PressTitle(other) if other == session.menu => match session.shown {
+            ShownBy::Press => close(Vec::new()),
+            // The pointer switched to this menu on its way to the press: the press is the click
+            // that opens it, held as a fresh press on the title is.
+            ShownBy::Hover => keep(
+                Session {
+                    shown: ShownBy::Press,
+                    held: MenuHold::Held,
+                    ..session
+                },
+                Vec::new(),
+            ),
+        },
         MenuTrackEvent::PressTitle(other) => {
             let effects = vec![MenuTrackEffect::Check(other.clone())];
-            (opened(other, MenuHold::Held), effects)
+            (opened(other, ShownBy::Press, MenuHold::Held), effects)
         }
         MenuTrackEvent::OutsidePress => close(Vec::new()),
         MenuTrackEvent::Release(target) => released(session, target),
         MenuTrackEvent::Move(_, MenuTarget::Title(other)) if other != session.menu => {
             let effects = vec![MenuTrackEffect::Check(other.clone())];
-            (opened(other, session.held), effects)
+            (opened(other, ShownBy::Hover, session.held), effects)
         }
         MenuTrackEvent::Move(at, target) => moved(session, at, target, now, timing),
         MenuTrackEvent::SubPlaced { top, bottom } => {
@@ -174,8 +187,11 @@ fn released<K: PartialEq>(
             ..
         } => close(vec![MenuTrackEffect::Pick(path)]),
         MenuTarget::Title(title) if title == session.menu && session.held == MenuHold::Held => {
+            // A release on the title, even after dragging onto it, makes the menu the person's
+            // own.
             keep(
                 Session {
+                    shown: ShownBy::Press,
                     held: MenuHold::Released,
                     ..session
                 },
