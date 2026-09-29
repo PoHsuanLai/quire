@@ -6,6 +6,7 @@ use std::collections::HashSet;
 use super::animation::{Naming, unknown_animation};
 use super::blitz;
 use super::colours;
+use super::filter;
 use super::kind;
 use super::rule::{Offence, Profile, Rule};
 use super::text::render;
@@ -124,6 +125,17 @@ pub fn offences(
             &decl.property,
             selector,
             &format!("{}: {value_text} ({reason})", decl.property.text),
+        );
+    }
+    if property == "filter"
+        && let Some(reason) = filter::not_painted(&value_text)
+    {
+        push(
+            &mut out,
+            Rule::FilterNotPainted,
+            &decl.property,
+            selector,
+            &format!("filter: {value_text} ({reason})"),
         );
     }
 
