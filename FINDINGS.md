@@ -194,7 +194,7 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 | S13 | `text-overflow: ellipsis`; a `mask-image` end fade | NO for ellipsis, YES for the fade |
 | S14 | `color-mix()` in a background | YES |
 | S15 | `backdrop-filter: blur()` | NO on cpu and on hybrid |
-| S16 | `filter: saturate()` / `blur()` | NO on cpu as pinned; hybrid does `blur()` but not `saturate()` (see "CSS `filter`") |
+| S16 | `filter: saturate()` / `blur()` | NO on stock anyrender/vello; YES on cpu and hybrid with the local forks (see "CSS `filter`") |
 
 - **S1.** A `style` element under `<main>` applies; `Ds { stylesheet: Inject::Inline }` works.
 - **S2.** Custom properties, `var()`, inheritance and nested scopes all work; attribute selectors
@@ -245,41 +245,51 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 - **S15.** Both anyrender backends take `backdrop-filter` as `_backdrop_filter` and ignore it.
   Behind-surface blur comes from the compositor (ext-background-effect-v1); a material uses
   `data-blur=on` with `--m-tint` or `data-blur=off` with `--m-tint-solid`.
-- **S16.** anyrender_vello_cpu 0.17 drops every filter when `multithreading` is on (the pinned
-  feature). anyrender_vello_hybrid 0.10 applies `blur()` and `drop-shadow()` and returns `None` for
-  every colour function, one filter node at most. `filter` is no longer banned: the lint warns per
-  function and backend (`Rule::FilterNotPainted`), and the table under "CSS `filter`" says what
-  paints. The vibrancy saturation boost stays precomputed into the tint colours.
+- **S16.** Stock anyrender_vello_cpu 0.17 drops every filter when `multithreading` is on (the
+  pinned feature), and stock anyrender_vello_hybrid 0.10 applies `blur()` and `drop-shadow()` only
+  and one filter node at most. Quire builds against forks of vello and anyrender that paint every
+  `filter` function and filter list on both (see "CSS `filter`"); `filter` is no longer linted.
+  The vibrancy saturation boost stays precomputed into the tint colours.
 - **Offscreen GPU rendering works**: `wgpu_context::BufferRenderer`, `vello_hybrid::Renderer::
   render` to its texture view, then `copy_texture_to_buffer` ("Hybrid harness backend").
 
 ## CSS `filter`
 
-Measured by `ds-native/tests/css_filter.rs`: one swatch per function beside an unfiltered control,
-read back from the pixels of each backend (the hybrid cases skip where no GPU adapter opens).
+Measured by `ds-native/tests/css_filter.rs`: one swatch per function, and per filter list, beside an
+unfiltered control, read back from the pixels of each backend (the hybrid cases skip where no GPU
+adapter opens).
 
-| function | vello_cpu as pinned (`multithreading`) | vello_hybrid |
-|----------|-----------------------------------------|--------------|
-| `blur()` | dropped | paints |
-| `drop-shadow()` | dropped | paints |
-| `brightness()`, `contrast()`, `invert()`, `opacity()` | dropped | dropped (a component transfer; converts to nothing) |
-| `grayscale()`, `hue-rotate()`, `saturate()`, `sepia()` | dropped | dropped (a colour matrix; converts to nothing) |
+| function | vello_cpu (`multithreading`) | vello_hybrid |
+|----------|------------------------------|--------------|
+| `blur()`, `drop-shadow()` | paints | paints |
+| `brightness()`, `contrast()`, `invert()`, `opacity()` | paints | paints |
+| `grayscale()`, `hue-rotate()`, `saturate()`, `sepia()` | paints | paints |
+| lists: `brightness() invert()`, `brightness() blur()`, `blur() contrast()` | paints, first function first | paints, first function first |
 
-- **Why.** anyrender hands a backend only the first node of a filter list, so `blur() contrast()`
-  paints the blur alone on hybrid and `contrast() blur()` paints nothing. vello_cpu 0.1 and
-  vello_hybrid 0.1 implement four primitives (flood, gaussian blur, offset, drop shadow); a colour
-  matrix panics vello_common (`unimplemented!`), which is why anyrender_vello_hybrid converts it to
-  `None`. vello_cpu's multi-threaded dispatcher has no filter support at all, so anyrender_vello_cpu
-  hands it none.
-- **Configuration cannot fix it.** `anyrender_vello_cpu`'s `filters` feature with `multithreading`
-  off paints `blur()` and `drop-shadow()` on the CPU, but forwards `grayscale()`, `hue-rotate()`,
-  `saturate()` and `sepia()` into the panic above, and costs the snapshot tests 2.7 times their wall
-  time (nine pixel-heavy test binaries: 12.2 s with, 33.2 s without, debug profile). shell-host's
-  `wl_shm` fallback runs on vello_cpu, so a user stylesheet with `filter: sepia(1)` would take the
-  shell down. The pin stays as it is.
-- **The lint** (`Rule::FilterNotPainted`, a warning) names each function and backend that drops
-  it; `Rule::BlitzUnsupported` no longer covers `filter`. `backdrop-filter` and `mix-blend-mode`
-  stay banned.
+- **How.** Stock anyrender and vello cannot do this, so the workspace patches them
+  (`[patch.crates-io]`, the "TEMP: build against local vello and anyrender" commit) with the
+  `quire-filters` branches of two local clones, and enables anyrender_vello_cpu's `filters` feature
+  in the pinned block. vello: a colour matrix filter (`vello_common`, the CPU pass in `vello_cpu`,
+  a `PASS_COLOR_MATRIX` in `vello_hybrid`'s `filter.wesl` with the GPU filter struct grown from 48
+  to 96 bytes), the CSS functions' matrices (`vello_common::filter_effects::matrices`), and filter
+  layers in the multi-threaded CPU dispatcher (recorded on the main thread through a
+  `ViewportState`, so `multithreading` and filters coexist). anyrender: `FilterEffect::
+  as_color_matrix` (a colour matrix, or an affine component transfer, which is what CSS
+  `brightness()`, `contrast()`, `invert()` and `opacity()` are), and a filter list as one nested
+  filter layer per function. A function vello cannot draw (a blend or a lighting effect) is skipped,
+  never a panic.
+- **Cost.** None measurable. `multithreading` stays on and filters run on the threaded dispatcher
+  (a scene with a filter layer syncs the workers once when the layer opens). The whole workspace
+  suite, debug profile, sums to 259.7 s of test time across 219 binaries with the forks against
+  271.5 s before (1489 tests against 1485; the heaviest snapshot binaries, `components_overlays`
+  12.4 s and `segmented_thumb` 14.8 s, are unchanged). Turning `multithreading` off, the old way to
+  get a filter on the CPU, cost 2.7 times the wall time of the pixel-heavy binaries.
+- **The lint.** There is none: `Rule::FilterNotPainted` is gone because nothing is left unpainted,
+  and `Rule::BlitzUnsupported` never covered `filter`. `backdrop-filter` and `mix-blend-mode` stay
+  banned.
+- **Colour maths.** A colour function is a 4x5 matrix on the non-premultiplied colour, clamped after
+  (un-premultiply, apply, clamp, re-premultiply), per the Filter Effects spec; the swatches'
+  browser values (`hue-rotate(180deg)` of red is (0, 108, 108)) agree within the harness tolerance.
 
 ## Conic gradients, masks and registered properties
 
