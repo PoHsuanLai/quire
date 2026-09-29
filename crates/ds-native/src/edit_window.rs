@@ -1,4 +1,4 @@
-//! The window's side of an edit surface's pointer capture (FINDINGS "Edit surface 2"): the
+//! The window's side of an edit surface's pointer capture (FINDINGS "Edit surface"): the
 //! window hook hears every winit pointer event before the document, wherever the pointer is,
 //! so a move or the primary release goes to the surface a press captured it for even outside
 //! the surface's box. Blitz dispatches a move only to the element under the pointer.

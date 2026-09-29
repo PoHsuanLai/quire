@@ -1,6 +1,4 @@
-//! Where `Harness::click` reaches a Button (FINDINGS "Gallery fixes B" observed a Button
-//! followed only by an `if` placeholder never receiving the click; FINDINGS "Polish pass" has
-//! the reproduction's outcome).
+//! Where `Harness::click` reaches a Button (FINDINGS "Polish pass: the inline-context click").
 //!
 //! The placeholder is not the cause. A Button is `display:inline-flex`, an atomic inline: when
 //! its parent holds nothing but inline content (the Button alone, the Button and an `if`

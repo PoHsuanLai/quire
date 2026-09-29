@@ -1,7 +1,7 @@
 //! An [`EditSurface`](crate::EditSurface)'s press, drag and release. A press on the surface
 //! captures the pointer through the host: every move and the release until the button comes up
 //! reach the surface, wherever the pointer is, so a drag selection keeps following it outside
-//! the surface's box (FINDINGS "Edit surface 2"). With no host (or before the capture lands) the
+//! the surface's box (FINDINGS "Edit surface"). With no host (or before the capture lands) the
 //! surface's own `pointermove` and `pointerup` serve instead.
 
 use crate::components::edit_surface_ctx::SurfaceCtx;

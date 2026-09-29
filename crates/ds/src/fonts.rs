@@ -11,7 +11,7 @@
 //! Space Mono's latin files are the exception: they are subset from the Space Mono 1.003 release
 //! with the latin file's own code points plus U+2190-2193, because Google's latin range keeps
 //! `↑` and `↓` but drops `←` and `→`, and a Small key cap's fallback arrows read as dashes
-//! (FINDINGS "Sheet and modal parts"). Every other glyph is the same outline.
+//! (FINDINGS "Text, fonts and editing"). Every other glyph is the same outline.
 //! Inter is cut from the official Inter 4.1 release by `scripts/cut-inter.sh` (version and
 //! SHA-256 recorded there): its variable font pinned to `opsz` 14 for Inter (400-700, italic
 //! 400) and to `opsz` 32 for Inter Display (500-800), since the renderer sets no optical size.

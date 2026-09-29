@@ -146,7 +146,7 @@ rim and highlight are `--hair`.
   2026-09-24: default 0.04, range 0.0..=0.2, Advanced). `ChromaLimit` gains a `Default` (the same
   0.04) and `TryFrom<f32>`, which takes the key's plain chroma value and refuses anything outside
   the range (`DsError::ChromaLimitRange`); `sill` still needs to register the key in its own
-  settings crate and pass the parsed value into `classify_with` (FINDINGS "Tune wave"). The
+  settings crate and pass the parsed value into `classify_with` (FINDINGS "Settings and schema"). The
   caller maps `IconKind` to `IconSource`.
 
 ### 1.6 Initial shell glyph list

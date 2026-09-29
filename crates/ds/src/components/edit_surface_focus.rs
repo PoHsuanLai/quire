@@ -1,7 +1,7 @@
 //! An [`EditSurface`](crate::EditSurface) taking and giving up the keyboard. A press, Tab and
 //! `EditHandle::focus` all end in [`focused_in`]; a blur event and `EditHandle::blur` in
 //! [`focused_out`]: the app hears `on_focus`, the IME is switched and pointed, and the surface
-//! is the IME's target while it has the keyboard (FINDINGS "Edit surface 2").
+//! is the IME's target while it has the keyboard (FINDINGS "Edit surface").
 
 use crate::components::edit_surface_ctx::SurfaceCtx;
 use crate::components::edit_surface_state::write_soon;

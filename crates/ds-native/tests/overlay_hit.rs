@@ -424,7 +424,7 @@ fn NestedAutoApp() -> Element {
 
 #[test]
 fn blitz_orders_auto_positioned_boxes_among_siblings_only() {
-    // A known Blitz deviation (FINDINGS "A part's leave is not the row's enter", Blitz
+    // A known Blitz deviation (FINDINGS "Pointer events", Blitz
     // `layout/damage.rs` `node_to_paint_order`): CSS 2.1 Appendix E step 8 paints every
     // `z-index: auto` positioned box of a stacking context in tree order, so this card, last in
     // the tree, is above the rows in a browser. Blitz sorts positioned boxes above in-flow ones

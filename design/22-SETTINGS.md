@@ -146,7 +146,7 @@ pixels all sit below this OKLCH chroma is drawn as a symbolic mask in the ink co
 than shown in its own colour. Advanced (file only, section 5); shown on the **Appearance** or
 **Dock** page if a later wave promotes it — both read icons live. `sill` registers the key in
 its own settings crate (`ds-settings`'s `IconsSettings`, `crates/ds-settings/src/settings.rs`);
-that registration is not done yet (see FINDINGS "Tune wave").
+that registration is not done yet (see FINDINGS "Settings and schema").
 
 ### 3.4 `bar` (sill/settings.toml)
 

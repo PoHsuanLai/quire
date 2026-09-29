@@ -56,7 +56,7 @@ fn Anchored() -> Element {
             mounted: move |event: MountedEvent| element.set(Some(MountedRef(event.data()))),
         }
         // Something after the button: with only the `if` placeholder after it, the harness's
-        // click never reached the button (FINDINGS "Gallery fixes B").
+        // click never reached the button (FINDINGS "Polish pass").
         p { "Snooze this thread" }
         if let (Switch::On, Some(button)) = (open(), element()) {
             Menu {

@@ -1,4 +1,4 @@
-//! The macOS polish pass as markup (FINDINGS "macOS polish"): a plate, a squircle surface and
+//! The macOS polish pass as markup (FINDINGS "Materials, blur and colour"): a plate, a squircle surface and
 //! root, the bar item, the workspace pills, the dock's dot and floor, the palette's squircle
 //! card. Each golden is `tests/snapshots/polish/<name>.html`, and every `ds-` class in it must
 //! be styled by the stylesheet.
