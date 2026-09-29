@@ -39,17 +39,14 @@ fn rows(on: &[Check; 3]) -> Vec<MenuEntry<usize>> {
 }
 
 fn flip(check: Check) -> Check {
-    match check {
-        Check::Checked => Check::Unchecked,
-        Check::Unchecked => Check::Checked,
-    }
+    check.flipped()
 }
 
 /// A label picker, floating or drawn in its card, with its picks' dismissal.
 #[component]
 fn Page(dismiss: PickDismiss, flow: Flow) -> Element {
     let mut log = use_signal(Vec::<String>::new);
-    let mut on = use_signal(|| [Check::Checked, Check::Unchecked, Check::Unchecked]);
+    let mut on = use_signal(|| [Check::On, Check::Off, Check::Off]);
     let mut open = use_signal(|| true);
     let menu = rsx! {
         Menu::<usize> {

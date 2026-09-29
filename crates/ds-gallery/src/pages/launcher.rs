@@ -8,9 +8,9 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Availability, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Icon,
+    Availability, Button, ButtonVariant, Check, CommandPalette, CommandPaletteHost, Corner, Icon,
     IconSize, Material, MenuEntry, MenuTile, MenuTrail, PaletteEntrance, Radius, Retain, Shortcut,
-    ShortcutKey, Shown, Surface, Switch,
+    ShortcutKey, Shown, Surface,
 };
 
 fn row(
@@ -152,7 +152,7 @@ fn WarmPalette() -> Element {
             Button {
                 variant: ButtonVariant::Secondary,
                 label: "Launcher",
-                pressed: Some(if shown() == Shown::Visible { Switch::On } else { Switch::Off }),
+                pressed: Some(if shown() == Shown::Visible { Check::On } else { Check::Off }),
                 onclick: move |_| shown.set(flipped),
             }
             div { class: "g-launcher",

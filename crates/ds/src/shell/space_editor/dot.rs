@@ -1,7 +1,7 @@
 //! One Space's dot in the sidebar foot, the switch between Spaces (design/04-COMPONENTS.md
 //! section 32, `S:147-150`).
 
-use crate::core::vocab::{Here, Shortcut, Switch};
+use crate::core::vocab::{Check, Here, Shortcut};
 use crate::style::space::dot_paint::DotPaint;
 use crate::style::space::frame_vars::FrameVars;
 use dioxus::prelude::*;
@@ -16,8 +16,8 @@ pub fn SpaceDot(
     onclick: EventHandler<()>,
 ) -> Element {
     let pressed = match here {
-        Here::Current => Switch::On,
-        Here::Elsewhere => Switch::Off,
+        Here::Current => Check::On,
+        Here::Elsewhere => Check::Off,
     };
     let keys = shortcut.glyphs();
     let paint = DotPaint::gradient(&frame.stops);

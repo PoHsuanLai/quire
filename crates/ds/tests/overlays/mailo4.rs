@@ -67,9 +67,9 @@ fn at() -> Anchor {
 /// A label checklist: two labels on, one off.
 fn labels() -> Vec<MenuEntry<u8>> {
     [
-        ("Invoices", Check::Checked),
-        ("Travel", Check::Unchecked),
-        ("Family", Check::Checked),
+        ("Invoices", Check::On),
+        ("Travel", Check::Off),
+        ("Family", Check::On),
     ]
     .into_iter()
     .zip(0u8..)

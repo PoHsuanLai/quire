@@ -3,8 +3,8 @@
 use dioxus::prelude::*;
 use ds::{
     AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerPosition, BannerStack, CardAction,
-    Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Material, NotificationCard,
-    Panel, PanelScrim, Px, Rich, RichRun, RichText, RootExtent, RunTone, ScrimStrength, Shown,
+    Ds, GroupCount, GroupHeader, Icon, IconSource, Inject, Material, NotificationCard, Panel,
+    PanelScrim, Px, Rich, RichRun, RichText, RootExtent, RunTone, ScrimStrength, Shown,
     StackLayers, TextRun, Theme,
 };
 
@@ -70,7 +70,7 @@ pub fn group_header_open_dark() -> Element {
     toast(
         Theme::Dark,
         rsx! {
-            GroupHeader { icon: IconSource::Glyph(Icon::Terminal), name: "Terminal", count: 2, expanded: Expanded::Open, on_toggle: |_| {}, on_clear: |_| {} }
+            GroupHeader { icon: IconSource::Glyph(Icon::Terminal), name: "Terminal", count: 2, expanded: Shown::Visible, on_toggle: |_| {}, on_clear: |_| {} }
         },
     )
 }
@@ -195,7 +195,7 @@ fn center(theme: Theme, scrim: PanelScrim) -> Element {
     rsx! {
         Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Popover, stylesheet: Inject::Host, extent: RootExtent::Viewport,
             Panel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0), scrim, onclose: |_| {},
-                GroupHeader { icon: IconSource::Glyph(Icon::Mail), name: "Mail", count: 2, expanded: Expanded::Open, on_toggle: |_| {}, on_clear: |_| {} }
+                GroupHeader { icon: IconSource::Glyph(Icon::Mail), name: "Mail", count: 2, expanded: Shown::Visible, on_toggle: |_| {}, on_clear: |_| {} }
                 NotificationCard { app: mail(), age: "9:41", summary: "Grace Hopper", body: "Are we still on for Thursday?", on_close: |_| {}, on_open: |_| {} }
                 NotificationCard { app: mail(), age: "9:12", summary: "Ada Lovelace", on_close: |_| {}, on_open: |_| {} }
             }

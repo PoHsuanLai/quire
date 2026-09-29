@@ -2,8 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Chevron, Ds, Icon, Inject, Material, ModuleGrid, ModuleState, ModuleTile, Pane,
-    PaneSwitcher, RowTrailing, SettingsRow, Switch, TileSpan,
+    Appearance, Check, Chevron, Ds, Icon, Inject, Material, ModuleGrid, ModuleState, ModuleTile,
+    Pane, PaneSwitcher, RowTrailing, SettingsRow, TileSpan,
 };
 
 #[derive(Props, Clone, PartialEq)]
@@ -27,7 +27,7 @@ pub fn panes(props: PaneProps) -> Element {
                     }
                 },
                 detail: rsx! {
-                    SettingsRow { glyph: Icon::Wifi, title: "Home", trailing: RowTrailing::Check(Switch::On), onclick: |_| {} }
+                    SettingsRow { glyph: Icon::Wifi, title: "Home", trailing: RowTrailing::Check(Check::On), onclick: |_| {} }
                 },
             }
         }

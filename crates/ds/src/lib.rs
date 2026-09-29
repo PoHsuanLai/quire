@@ -50,7 +50,7 @@ pub use crate::components::{
         send_pill::{PillAction, SendPhase, SendPill, SendRing},
         sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing},
         sync_halo::{SyncHalo, SyncState},
-        tree_item::{Disclosure, TreeItem, TreeShape},
+        tree_item::{TreeItem, TreeShape},
     },
     chrome::{
         traffic_lights::TilePose,
@@ -183,8 +183,8 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Activity, Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Percent,
-        Selection, Shortcut, ShortcutKey, Shown, StaggerIndex, Switch,
+        Activity, Availability, Check, DropState, Emphasis, Fraction, Here, Percent, Selection,
+        Shortcut, ShortcutKey, Shown, StaggerIndex,
     },
 };
 pub use crate::edit::{

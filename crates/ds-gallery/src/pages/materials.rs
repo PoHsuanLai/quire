@@ -120,7 +120,7 @@ fn Panel(material: Material) -> Element {
                 span { class: "g-code", "{state}" }
                 span { class: "g-spacer" }
                 IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryFull, label: "Battery", expanded: Some(ds::Switch::On), onclick: |_| {} }
+                IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryFull, label: "Battery", expanded: Some(ds::Shown::Visible), onclick: |_| {} }
                 span { class: "ds-tabular", "09:41" }
             }
         },

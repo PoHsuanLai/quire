@@ -6,7 +6,7 @@ use crate::components::controls::button_size::disabled;
 use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
-use crate::core::vocab::{Availability, Switch};
+use crate::core::vocab::{Availability, Check, Shown};
 use crate::core::word::Word;
 use crate::motion::detail::{cue::Cue, first_show::FirstShow, once::use_nudge};
 use crate::style::icon::render::IconSize;
@@ -79,8 +79,8 @@ pub fn IconButton(
     #[props(into)] icon: IconSource,
     label: String,
     #[props(default)] tooltip: Option<String>,
-    #[props(default)] pressed: Option<Switch>,
-    #[props(default)] expanded: Option<Switch>,
+    #[props(default)] pressed: Option<Check>,
+    #[props(default)] expanded: Option<Shown>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<Press>,
     #[props(default)] id: Option<String>,

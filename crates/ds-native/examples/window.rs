@@ -8,8 +8,8 @@ use dioxus_native::use_window_event;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key, NamedKey};
 use ds::{
-    Anchor, Appearance, Availability, Button, ButtonVariant, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, Point, Px, Switch, use_toast_hub,
+    Anchor, Appearance, Availability, Button, ButtonVariant, Check, Ds, Material, Menu, MenuEntry,
+    MenuKind, MenuTrail, Point, Px, use_toast_hub,
 };
 use ds_native::{AppConfig, AppId, launch};
 use std::time::Duration;
@@ -49,7 +49,7 @@ fn App() -> Element {
 /// The controls, inside the root so they can reach its toast hub.
 #[allow(non_snake_case)]
 fn Demo() -> Element {
-    let mut open = use_signal(|| Switch::Off);
+    let mut open = use_signal(|| Check::Off);
     let toasts = use_toast_hub();
     rsx! {
         Button {
@@ -57,17 +57,17 @@ fn Demo() -> Element {
             label: "Snooze…",
             pressed: Some(open()),
             onclick: move |_| {
-                open.set(Switch::On);
+                open.set(Check::On);
                 toasts.push("Snoozed until tomorrow".into(), None);
             },
         }
-        if open() == Switch::On {
+        if open() == Check::On {
             Menu {
                 kind: MenuKind::Slim,
                 anchor: Anchor::Point(Point { x: Px(24.0), y: Px(72.0) }),
                 entries: entries(),
-                onpick: move |_: u8| open.set(Switch::Off),
-                onclose: move |_| open.set(Switch::Off),
+                onpick: move |_: u8| open.set(Check::Off),
+                onclose: move |_| open.set(Check::Off),
             }
         }
     }

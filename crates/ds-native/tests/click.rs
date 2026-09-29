@@ -10,7 +10,7 @@
 //! nor routes clicks itself.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Ds, Material, Switch};
+use ds::{Appearance, Button, ButtonVariant, Check, Ds, Material};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -23,14 +23,14 @@ const VIEW: Viewport = Viewport {
 /// A Button that shows whether it was clicked, and nothing after it but an `if` placeholder.
 #[component]
 fn Clickable() -> Element {
-    let mut state = use_signal(|| Switch::Off);
+    let mut state = use_signal(|| Check::Off);
     rsx! {
         Button {
             variant: ButtonVariant::Secondary,
             label: format!("{:?}", state()),
-            onclick: move |_| state.set(Switch::On),
+            onclick: move |_| state.set(Check::On),
         }
-        if state() == Switch::On {
+        if state() == Check::On {
             span { "Opened" }
         }
     }

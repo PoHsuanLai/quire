@@ -16,12 +16,15 @@ pub enum Availability {
     Disabled,
 }
 
-/// Whether a surface or a tooltip its caller drives is up: `data-shown`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+/// Whether what a control shows or opens is up (design/30 section 1.5): a surface or a tooltip
+/// its caller drives, a menu, popover or disclosure a trigger opens (`aria-expanded`), a
+/// notification group's expansion.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Shown {
     /// Up, at once.
     Visible,
     /// Down, even under the pointer.
+    #[default]
     Hidden,
 }
 
@@ -75,37 +78,20 @@ pub enum DropState {
     Source,
 }
 
-/// A toggle's state: `aria-pressed` on buttons, `aria-checked` on a Toggle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Switch {
-    /// Pressed or on.
+/// On, off or mixed (`NSControl.StateValue`, design/30 section 1.5): a toggle's value, a
+/// toggle button's pressed state, a menu item's check mark. `aria-pressed` on a button,
+/// `aria-checked` on a toggle or a menu item; `Mixed` writes `"mixed"`.
+///
+/// `Toggle` has no mixed look: it refuses `Mixed` and draws it as `Off`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Check {
+    /// Pressed, checked, on.
     On,
-    /// Not pressed, off.
+    /// Not pressed, unchecked, off.
     #[default]
     Off,
-}
-
-/// Whether the menu, popover or disclosure a control opens is showing: `aria-expanded`.
-///
-/// Its own type rather than a [`Switch`]: a toggle's pressed state and a trigger's open state
-/// are different facts, and a control can carry both.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum Expanded {
-    /// What it controls is showing.
-    Open,
-    /// What it controls is hidden.
-    #[default]
-    Closed,
-}
-
-/// A menu item's check mark: `aria-checked`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Check {
-    /// Checked.
-    Checked,
-    /// Not checked.
-    #[default]
-    Unchecked,
+    /// Some of what it covers is on and some is off.
+    Mixed,
 }
 
 /// Whether a thing is taking part right now (`data-activity`, design/30 section 1.5): an
@@ -337,20 +323,21 @@ impl DropState {
     }
 }
 
-impl Switch {
+impl Check {
     /// The `aria-pressed` / `aria-checked` word.
     pub fn aria(self) -> &'static str {
         match self {
-            Switch::On => "true",
-            Switch::Off => "false",
+            Check::On => "true",
+            Check::Off => "false",
+            Check::Mixed => "mixed",
         }
     }
 
-    /// The other state.
+    /// The other state: `Mixed` resolves to `On`, as a mixed checkbox does when clicked.
     pub fn flipped(self) -> Self {
         match self {
-            Switch::On => Switch::Off,
-            Switch::Off => Switch::On,
+            Check::On => Check::Off,
+            Check::Off | Check::Mixed => Check::On,
         }
     }
 }
@@ -365,12 +352,20 @@ impl Here {
     }
 }
 
-impl Expanded {
+impl Shown {
+    /// The other state: what a press on a trigger asks for.
+    pub fn flipped(self) -> Self {
+        match self {
+            Shown::Visible => Shown::Hidden,
+            Shown::Hidden => Shown::Visible,
+        }
+    }
+
     /// The `aria-expanded` word.
     pub fn aria(self) -> &'static str {
         match self {
-            Expanded::Open => "true",
-            Expanded::Closed => "false",
+            Shown::Visible => "true",
+            Shown::Hidden => "false",
         }
     }
 }

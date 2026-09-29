@@ -224,7 +224,7 @@ pub enum MenuTrackEffect<K> {
     /// Show `K`'s menu with this animation.
     Open(K, MenuAnim),
     /// Swap the open menu for `K`'s in the same frame, no animation (hover switch).
-    Switch(K),
+    Check(K),
     /// Close the menu (and any submenu).
     Close(MenuAnim),
     /// Open this item's submenu, no animation.

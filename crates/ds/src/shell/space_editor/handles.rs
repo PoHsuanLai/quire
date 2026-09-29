@@ -4,7 +4,7 @@
 
 use super::{Picker, dot_index, edit, field};
 use crate::core::geometry::units::{Point, Px, Rect};
-use crate::core::vocab::Switch;
+use crate::core::vocab::Check;
 use crate::host::measure::client_rect;
 use crate::motion::drag::{DragPhase, use_drag};
 use crate::style::appearance::theme::Scheme;
@@ -116,7 +116,7 @@ pub(super) fn Field(
                     top: percent(field::place(dot).1),
                     fill: palette.picked.get(index).cloned().unwrap_or_default(),
                     text: format!("{}°, {}%", dot.hue.round(), (dot.chroma * 100.0).round()),
-                    on: if index == current { Switch::On } else { Switch::Off },
+                    on: if index == current { Check::On } else { Check::Off },
                     onkey: {
                         let look = look.clone();
                         move |nudge: Nudge| {
@@ -138,7 +138,7 @@ fn Handle(
     top: String,
     fill: String,
     text: String,
-    on: Switch,
+    on: Check,
     onkey: EventHandler<Nudge>,
 ) -> Element {
     let number = index + 1;

@@ -5,7 +5,7 @@ use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::muted::muted;
 use crate::components::content::provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark};
 use crate::components::controls::count::{Count, CountPlace};
-use crate::core::vocab::Switch;
+use crate::core::vocab::Check;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use crate::style::tokens::hex::Colour;
@@ -32,10 +32,10 @@ pub enum AccountFace {
 
 /// The avatar colour a tile shows: the account's own when pressed, muted when not (S's
 /// `saturate(.55)`, the same as `Avatar { muting: AvatarMuting::Muted }`).
-fn tile_colour(colour: Colour, pressed: Switch) -> Colour {
+fn tile_colour(colour: Colour, pressed: Check) -> Colour {
     match pressed {
-        Switch::On => colour,
-        Switch::Off => muted(colour),
+        Check::On => colour,
+        Check::Off | Check::Mixed => muted(colour),
     }
 }
 
@@ -65,7 +65,7 @@ fn label(account: &AccountFace) -> String {
 #[component]
 pub fn AccountTile(
     account: AccountFace,
-    pressed: Switch,
+    pressed: Check,
     unread: u32,
     onclick: EventHandler<()>,
     #[props(default = MarkStyle::Letter)] mark: MarkStyle,
@@ -134,13 +134,13 @@ pub fn AddAccountTile(
 #[cfg(test)]
 mod tests {
     use super::tile_colour;
-    use crate::core::vocab::Switch;
+    use crate::core::vocab::Check;
     use crate::style::tokens::hex::{Colour, Hex};
 
     #[test]
     fn only_an_unpressed_tile_is_desaturated() {
         let colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
-        assert_eq!(tile_colour(colour, Switch::On), colour);
-        assert_ne!(tile_colour(colour, Switch::Off), colour);
+        assert_eq!(tile_colour(colour, Check::On), colour);
+        assert_ne!(tile_colour(colour, Check::Off), colour);
     }
 }

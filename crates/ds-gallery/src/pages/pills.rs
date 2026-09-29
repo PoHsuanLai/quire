@@ -7,9 +7,9 @@ use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, ButtonVariant,
-    DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
-    LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
-    ShortcutKey, Switch, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
+    Check, DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon,
+    IconSize, Kbd, LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill,
+    Shortcut, ShortcutKey, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
     use_toast_hub,
 };
 
@@ -104,9 +104,9 @@ pub fn Cards() -> Element {
 #[component]
 pub fn Bubble() -> Element {
     let mut text = use_signal(|| None::<MountedRef>);
-    let mut shown = use_signal(|| None::<(Rect, Switch)>);
-    let mut bold = use_signal(|| Switch::Off);
-    let open = move |link: Switch| {
+    let mut shown = use_signal(|| None::<(Rect, Check)>);
+    let mut bold = use_signal(|| Check::Off);
+    let open = move |link: Check| {
         if let Some(MountedRef(element)) = text() {
             spawn(async move {
                 if let Ok(rect) = element.get_client_rect().await {
@@ -120,19 +120,14 @@ pub fn Bubble() -> Element {
             label: rsx! { b { "B" } },
             title: "Bold".to_string(),
             pressed: Some(bold()),
-            onclick: EventHandler::new(move |()| {
-                bold.set(match bold() {
-                    Switch::On => Switch::Off,
-                    Switch::Off => Switch::On,
-                })
-            }),
+            onclick: EventHandler::new(move |()| bold.set(bold().flipped())),
         }),
         BubbleAction::Separator,
         BubbleAction::Button(BubbleButton {
             label: rsx! { Glyph { icon: Icon::Link, size: IconSize::Compact } },
             title: "Link".to_string(),
             pressed: None,
-            onclick: EventHandler::new(move |()| open(Switch::On)),
+            onclick: EventHandler::new(move |()| open(Check::On)),
         }),
     ];
     rsx! {
@@ -143,14 +138,14 @@ pub fn Bubble() -> Element {
                     onmounted: move |event| text.set(Some(MountedRef(event.data()))),
                     "Pretend this sentence is selected."
                 }
-                Button { variant: ButtonVariant::Mini, label: "Actions", onclick: move |_| open(Switch::Off) }
-                Button { variant: ButtonVariant::Mini, label: "Link field", onclick: move |_| open(Switch::On) }
+                Button { variant: ButtonVariant::Mini, label: "Actions", onclick: move |_| open(Check::Off) }
+                Button { variant: ButtonVariant::Mini, label: "Link field", onclick: move |_| open(Check::On) }
             }
             if let Some((anchor, link)) = shown() {
                 SelectionBubble {
                     key: "{link:?}",
                     anchor,
-                    mode: match link { Switch::On => BubbleMode::Link, Switch::Off => BubbleMode::Actions(actions) },
+                    mode: match link { Check::On => BubbleMode::Link, Check::Off | Check::Mixed => BubbleMode::Actions(actions) },
                     onlink: |_| {},
                     onclose: move |_| shown.set(None),
                 }

@@ -2,8 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, DataAttr, DataName, Disclosure, DropState, ExtraClass, Here, Icon,
-    IconButton, IconButtonVariant, PlaceId, Propagation, TreeItem, TreeShape,
+    Button, ButtonVariant, DataAttr, DataName, DropState, ExtraClass, Here, Icon, IconButton,
+    IconButtonVariant, PlaceId, Propagation, Shown, TreeItem, TreeShape,
 };
 
 /// One state and its golden.
@@ -36,7 +36,7 @@ fn more(name: &str) -> Element {
 }
 
 /// mailo's Projects folder with one subfolder, `open`, in `drop` state.
-fn projects(open: Disclosure, drop: DropState) -> Element {
+fn projects(open: Shown, drop: DropState) -> Element {
     rsx! {
         TreeItem {
             label: "Projects",
@@ -48,7 +48,7 @@ fn projects(open: Disclosure, drop: DropState) -> Element {
             drop,
             place: PlaceId("INBOX/Projects".to_string()),
             onselect: |_| {},
-            TreeItem { label: "Quire", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, place: PlaceId("INBOX/Projects/Quire".to_string()) }
+            TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, place: PlaceId("INBOX/Projects/Quire".to_string()) }
         }
     }
 }
@@ -68,38 +68,38 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/tree_item/open-idle.html",
-        make: || projects(Disclosure::Open, DropState::Idle),
+        make: || projects(Shown::Visible, DropState::Idle),
     },
     Case {
         golden: "lists/tree_item/open-accepts.html",
-        make: || projects(Disclosure::Open, DropState::Accepts),
+        make: || projects(Shown::Visible, DropState::Accepts),
     },
     Case {
         golden: "lists/tree_item/open-target.html",
-        make: || projects(Disclosure::Open, DropState::Target),
+        make: || projects(Shown::Visible, DropState::Target),
     },
     Case {
         golden: "lists/tree_item/open-source.html",
-        make: || projects(Disclosure::Open, DropState::Source),
+        make: || projects(Shown::Visible, DropState::Source),
     },
     Case {
         golden: "lists/tree_item/closed-idle.html",
-        make: || projects(Disclosure::Closed, DropState::Idle),
+        make: || projects(Shown::Hidden, DropState::Idle),
     },
     Case {
         golden: "lists/tree_item/closed-accepts.html",
-        make: || projects(Disclosure::Closed, DropState::Accepts),
+        make: || projects(Shown::Hidden, DropState::Accepts),
     },
     Case {
         golden: "lists/tree_item/closed-target.html",
-        make: || projects(Disclosure::Closed, DropState::Target),
+        make: || projects(Shown::Hidden, DropState::Target),
     },
     Case {
         golden: "lists/tree_item/closed-source.html",
-        make: || projects(Disclosure::Closed, DropState::Source),
+        make: || projects(Shown::Hidden, DropState::Source),
     },
     Case {
         golden: "lists/tree_item/leaf-current.html",
-        make: || rsx! { TreeItem { label: "Receipts", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, here: Here::Current, count: 0, trailing: more("Receipts") } },
+        make: || rsx! { TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, here: Here::Current, count: 0, trailing: more("Receipts") } },
     },
 ];

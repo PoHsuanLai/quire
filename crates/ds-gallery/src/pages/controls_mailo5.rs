@@ -5,8 +5,8 @@
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, Expanded, Icon, Leading, MarkProvider, MarkSize, MarkStyle,
-    ProviderMark, RunTone, TextLine, TextRun, Trailing,
+    Button, ButtonVariant, Icon, Leading, MarkProvider, MarkSize, MarkStyle, ProviderMark, RunTone,
+    Shown, TextLine, TextRun, Trailing,
 };
 
 /// A provider's inline mark, for a From value.
@@ -26,7 +26,7 @@ fn quoted_head() -> TextLine {
 
 #[component]
 pub fn ButtonsMailo5() -> Element {
-    let mut open = use_signal(|| Expanded::Closed);
+    let mut open = use_signal(|| Shown::Hidden);
     rsx! {
         Section { title: "Button: a leading mark", note: "leading: Leading::Mark(element) puts a quire mark before the label: the From dropdown shows the account's provider inside its value. Leading::Glyph(icon) takes a glyph.",
             div { class: "g-row g-row-top",
@@ -44,7 +44,7 @@ pub fn ButtonsMailo5() -> Element {
                 Specimen { name: "runs",
                     div { class: "g-row",
                         Button { variant: ButtonVariant::Quiet, label: quoted_head(), trailing: Trailing::Caret, expanded: open(),
-                            onclick: move |_| open.set(match open() { Expanded::Open => Expanded::Closed, Expanded::Closed => Expanded::Open }) }
+                            onclick: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }) }
                         Button { variant: ButtonVariant::Mini, label: quoted_head(), onclick: |_| {} }
                     }
                 }

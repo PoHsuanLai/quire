@@ -3,7 +3,7 @@
 
 use crate::core::geometry::units::Rect;
 use crate::core::vocab::Shown;
-use crate::core::vocab::{Expanded, Here, StaggerIndex};
+use crate::core::vocab::{Here, StaggerIndex};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
@@ -66,7 +66,7 @@ pub fn HoverStrip(
     actions: Vec<StripAction>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] titles: Titles,
-    #[props(default)] expanded: Vec<(ActionId, Expanded)>,
+    #[props(default)] expanded: Vec<(ActionId, Shown)>,
     #[props(default)] on_press: Option<EventHandler<ActionId>>,
 ) -> Element {
     rsx! {
@@ -94,7 +94,7 @@ fn StripButton(
     action: StripAction,
     j: StaggerIndex,
     titles: Titles,
-    expanded: Option<Expanded>,
+    expanded: Option<Shown>,
     on_press: Option<EventHandler<ActionId>>,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
@@ -122,7 +122,7 @@ fn StripButton(
             "aria-label": "{label}",
             title,
             "aria-haspopup": expanded.map(|_| "menu"),
-            "aria-expanded": expanded.map(Expanded::aria),
+            "aria-expanded": expanded.map(Shown::aria),
             onmounted: move |event| element.set(Some(event.data())),
             onpointerenter: move |_| {
                 if let Some(onhover) = onhover {

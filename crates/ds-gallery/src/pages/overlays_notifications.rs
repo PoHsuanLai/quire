@@ -12,9 +12,9 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerStack, Button, ButtonVariant,
-    CardAction, Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Material,
-    NotificationCard, NotificationMetrics, NotificationSwipe, Panel, Px, Rich, RichRun, RunTone,
-    Shown, StackLayers, TextRun, Theme,
+    CardAction, Ds, GroupCount, GroupHeader, Icon, IconSource, Inject, Material, NotificationCard,
+    NotificationMetrics, NotificationSwipe, Panel, Px, Rich, RichRun, RunTone, Shown, StackLayers,
+    TextRun, Theme,
 };
 
 /// The notifications section.
@@ -120,18 +120,18 @@ fn entry_label(entry: BannerEntry) -> &'static str {
 /// The center's rows: one app's group under its header, and another app's card.
 #[component]
 fn CenterRows() -> Element {
-    let mut open = use_signal(|| Expanded::Open);
+    let mut open = use_signal(|| Shown::Visible);
     rsx! {
         GroupHeader {
             icon: IconSource::Glyph(Icon::Mail),
             name: "Mail",
             count: 2,
             expanded: open(),
-            on_toggle: move |_| open.set(match open() { Expanded::Open => Expanded::Closed, Expanded::Closed => Expanded::Open }),
+            on_toggle: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }),
             on_clear: |_| {},
         }
         NotificationCard { app: mail(), age: "9:41", summary: "Grace Hopper", body: "Are we still on for Thursday? I booked the room by the harbour.", on_close: |_| {}, on_open: |_| {} }
-        if open() == Expanded::Open {
+        if open() == Shown::Visible {
             NotificationCard { app: mail(), age: "9:12", summary: "Ada Lovelace", body: "The notes are longer than the memoir.", on_close: |_| {}, on_open: |_| {} }
         }
         NotificationCard {

@@ -9,8 +9,8 @@
 use dioxus::prelude::*;
 use ds::detail::{EventStamp, FirstShow};
 use ds::{
-    Appearance, Ds, Fraction, Icon, Material, Motion, RowDisc, RowPhase, RowTrailing, RowWork,
-    SettingsRow, Switch,
+    Appearance, Check, Ds, Fraction, Icon, Material, Motion, RowDisc, RowPhase, RowTrailing,
+    RowWork, SettingsRow,
 };
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -35,10 +35,10 @@ static DEVICE: GlobalSignal<RowPhase> = Signal::global(|| RowPhase::Rest);
 static OUTPUT: GlobalSignal<RowPhase> = Signal::global(|| RowPhase::Rest);
 static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 
-fn joined(phase: RowPhase) -> Switch {
+fn joined(phase: RowPhase) -> Check {
     match phase {
-        RowPhase::Succeeded(_) => Switch::On,
-        RowPhase::Rest | RowPhase::Pending(_) | RowPhase::Failed(_) => Switch::Off,
+        RowPhase::Succeeded(_) => Check::On,
+        RowPhase::Rest | RowPhase::Pending(_) | RowPhase::Failed(_) => Check::Off,
     }
 }
 
@@ -48,12 +48,12 @@ fn Rows() -> Element {
     let device = DEVICE();
     let output = OUTPUT();
     let disc = match joined(net) {
-        Switch::On => RowDisc::On,
-        Switch::Off => RowDisc::Off,
+        Check::On => RowDisc::On,
+        Check::Off | Check::Mixed => RowDisc::Off,
     };
     let battery = match joined(device) {
-        Switch::On => RowTrailing::Battery(Fraction(840)),
-        Switch::Off => RowTrailing::None,
+        Check::On => RowTrailing::Battery(Fraction(840)),
+        Check::Off | Check::Mixed => RowTrailing::None,
     };
     rsx! {
         Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,

@@ -98,14 +98,7 @@ const LABELS: [&str; 4] = ["Invoices", "Travel", "Family", "Receipts"];
 #[component]
 pub fn LabelChecklist() -> Element {
     let mut open = use_signal(|| false);
-    let mut on = use_signal(|| {
-        [
-            Check::Checked,
-            Check::Unchecked,
-            Check::Unchecked,
-            Check::Checked,
-        ]
-    });
+    let mut on = use_signal(|| [Check::On, Check::Off, Check::Off, Check::On]);
     let trigger = use_rect();
     let rows: Vec<MenuEntry<usize>> = LABELS
         .into_iter()
@@ -133,10 +126,7 @@ pub fn LabelChecklist() -> Element {
                     entries: rows,
                     onpick: move |value: usize| {
                         on.with_mut(|on| {
-                            on[value] = match on[value] {
-                                Check::Checked => Check::Unchecked,
-                                Check::Unchecked => Check::Checked,
-                            }
+                            on[value] = on[value].flipped()
                         })
                     },
                     onclose: move |()| open.set(false),

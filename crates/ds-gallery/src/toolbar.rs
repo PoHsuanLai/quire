@@ -9,8 +9,8 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     Accent, Anchor, Availability, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu,
-    MenuEntry, MenuKind, MenuTrail, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch,
-    Tabs, Theme, Toggle, Typeface,
+    MenuEntry, MenuKind, MenuTrail, MotionLevel, MountedRef, SegSize, SegmentedControl, Tabs,
+    Theme, Toggle, Typeface,
 };
 
 /// The toolbar.
@@ -51,8 +51,8 @@ pub fn Toolbar() -> Element {
         .map(|preset| (preset, preset.label()))
         .collect::<Vec<_>>();
     let blur = match now.blur {
-        BlurState::Available => Switch::On,
-        BlurState::Unavailable => Switch::Off,
+        BlurState::Available => Check::On,
+        BlurState::Unavailable => Check::Off,
     };
     rsx! {
         div { class: "g-toolbar",
@@ -89,8 +89,8 @@ pub fn Toolbar() -> Element {
                     label: "Compositor blur (data-blur)",
                     value: blur,
                     onchange: move |next| axes.with_mut(|axes| axes.blur = match next {
-                        Switch::On => BlurState::Available,
-                        Switch::Off => BlurState::Unavailable,
+                        Check::On => BlurState::Available,
+                        Check::Off | Check::Mixed => BlurState::Unavailable,
                     }),
                 }
             }
@@ -130,7 +130,7 @@ fn Choice<T: Clone + PartialEq + 'static>(
     value: T,
     onpick: EventHandler<T>,
 ) -> Element {
-    let mut open = use_signal(|| Switch::Off);
+    let mut open = use_signal(|| Check::Off);
     let mut anchor = use_signal(|| None::<MountedRef>);
     let current = options
         .iter()
@@ -146,9 +146,9 @@ fn Choice<T: Clone + PartialEq + 'static>(
             tile: None,
             trail: MenuTrail::None,
             check: Some(if *option == value {
-                Check::Checked
+                Check::On
             } else {
-                Check::Unchecked
+                Check::Off
             }),
         })
         .collect::<Vec<_>>();
@@ -162,16 +162,16 @@ fn Choice<T: Clone + PartialEq + 'static>(
                 label: current,
                 icon: Some(Icon::ChevronDown),
                 pressed: Some(open()),
-                onclick: move |_| open.set(Switch::On),
+                onclick: move |_| open.set(Check::On),
             }
         }
-        if let (Switch::On, Some(mounted)) = (open(), anchor()) {
+        if let (Check::On, Some(mounted)) = (open(), anchor()) {
             Menu::<T> {
                 kind: MenuKind::Dropdown,
                 anchor: Anchor::Mounted(mounted),
                 entries,
                 onpick: move |choice| onpick.call(choice),
-                onclose: move |_| open.set(Switch::Off),
+                onclose: move |_| open.set(Check::Off),
             }
         }
     }

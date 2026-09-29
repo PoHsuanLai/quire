@@ -8,10 +8,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Count, Ds,
+    Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Count, Ds,
     Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListRow, Material,
     Menu, MenuEntry, MenuKind, MenuTrail, Point, Presence, PulseKey, Px, RowPitch, Selection,
-    ShortcutKey, Switch, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
     DotIndex, FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput,
@@ -36,11 +36,8 @@ fn Root(children: Element) -> Element {
     }
 }
 
-fn flip(switch: Switch) -> Switch {
-    match switch {
-        Switch::On => Switch::Off,
-        Switch::Off => Switch::On,
-    }
+fn flip(switch: Check) -> Check {
+    switch.flipped()
 }
 
 /// The centre of `selector`, which the test expects to be on screen.
@@ -58,7 +55,7 @@ fn ms(n: u64) -> Duration {
 
 #[allow(non_snake_case)]
 fn PressApp() -> Element {
-    let mut pinned = use_signal(|| Switch::Off);
+    let mut pinned = use_signal(|| Check::Off);
     rsx! {
         Root {
             Button {
@@ -96,7 +93,7 @@ fn the_root_stamps_the_last_input_modality() {
 
 #[allow(non_snake_case)]
 fn ToggleApp() -> Element {
-    let mut wifi = use_signal(|| Switch::Off);
+    let mut wifi = use_signal(|| Check::Off);
     rsx! {
         Root {
             Toggle { label: "Wi-Fi", value: wifi(), onchange: move |next| wifi.set(next) }
@@ -269,7 +266,7 @@ fn MenuApp() -> Element {
 
 #[allow(non_snake_case)]
 fn MenuDemo() -> Element {
-    let mut open = use_signal(|| Switch::Off);
+    let mut open = use_signal(|| Check::Off);
     let entries = ["Later today", "Tomorrow", "Next week"]
         .into_iter()
         .zip(0u8..)
@@ -287,15 +284,15 @@ fn MenuDemo() -> Element {
         Button {
             variant: ButtonVariant::Secondary,
             label: "Snooze",
-            onclick: move |_| open.set(Switch::On),
+            onclick: move |_| open.set(Check::On),
         }
-        if open() == Switch::On {
+        if open() == Check::On {
             Menu {
                 kind: MenuKind::Slim,
                 anchor: Anchor::Point(Point { x: Px(24.0), y: Px(64.0) }),
                 entries,
-                onpick: move |_: u8| open.set(Switch::Off),
-                onclose: move |_| open.set(Switch::Off),
+                onpick: move |_: u8| open.set(Check::Off),
+                onclose: move |_| open.set(Check::Off),
             }
         }
     }

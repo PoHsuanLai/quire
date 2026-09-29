@@ -181,7 +181,7 @@ fn hover_switch_swaps_menus_in_one_step_without_animation() {
     .concat());
     assert_eq!(
         effects,
-        vec![Effect::Open(A, MenuAnim::Pop), Effect::Switch(B)]
+        vec![Effect::Open(A, MenuAnim::Pop), Effect::Check(B)]
     );
     let session = session(&phase);
     assert_eq!((session.menu, session.held), (B, MenuHold::Released));

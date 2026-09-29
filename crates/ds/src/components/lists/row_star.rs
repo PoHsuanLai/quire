@@ -2,7 +2,7 @@
 //! toggle and the sparks that fly only when starring. Split from `list_row` so the row's own
 //! file holds the row.
 
-use crate::core::vocab::Switch;
+use crate::core::vocab::Check;
 use crate::focus::click::kept_click;
 use crate::motion::anim::Anim;
 use crate::motion::pulse_key::{PulseKey, PulsePhase};
@@ -15,7 +15,7 @@ const SPARK_ANGLES: [u16; 6] = [0, 60, 120, 180, 240, 300];
 
 /// The sparks play the star's pulse alias, but only when starring (`S:1526`): the `spark`
 /// pulse in the same phase as `star`, or nothing.
-fn sparks(state: Switch, star: PulseKey) -> Option<(String, &'static str)> {
+fn sparks(state: Check, star: PulseKey) -> Option<(String, &'static str)> {
     let rest = PulseKey::rest(Anim::Spark);
     let spark = match star.phase() {
         PulsePhase::Rest => rest,
@@ -23,18 +23,18 @@ fn sparks(state: Switch, star: PulseKey) -> Option<(String, &'static str)> {
         PulsePhase::B => rest.fired().fired(),
     };
     match state {
-        Switch::On => spark.attrs(),
-        Switch::Off => None,
+        Check::On => spark.attrs(),
+        Check::Off | Check::Mixed => None,
     }
 }
 
 /// The star's glyph: the outline, filled with its own colour once starred. `Glyph` only
 /// strokes, and a CSS `fill` never reaches SVG on Blitz (spike S6), so the fill is written as an
 /// attribute here.
-fn star_glyph(state: Switch) -> Element {
+fn star_glyph(state: Check) -> Element {
     let fill = match state {
-        Switch::On => "currentColor",
-        Switch::Off => "none",
+        Check::On => "currentColor",
+        Check::Off | Check::Mixed => "none",
     };
     rsx! {
         svg {
@@ -59,14 +59,10 @@ fn star_glyph(state: Switch) -> Element {
 }
 
 /// The star button: pops on every toggle, sparks only when starring.
-pub(crate) fn star_button(
-    state: Switch,
-    onchange: EventHandler<Switch>,
-    pulse: PulseKey,
-) -> Element {
+pub(crate) fn star_button(state: Check, onchange: EventHandler<Check>, pulse: PulseKey) -> Element {
     let label = match state {
-        Switch::On => "Unstar this thread",
-        Switch::Off => "Star this thread",
+        Check::On => "Unstar this thread",
+        Check::Off | Check::Mixed => "Star this thread",
     };
     let (pop_class, pop_alias) = match pulse.attrs() {
         Some((anim, alias)) => (format!("ds-star-glyph {anim}"), Some(alias)),
@@ -105,22 +101,22 @@ pub(crate) fn star_button(
 #[cfg(test)]
 mod tests {
     use super::sparks;
-    use crate::core::vocab::Switch;
+    use crate::core::vocab::Check;
     use crate::motion::anim::Anim;
     use crate::motion::pulse_key::PulseKey;
 
     #[test]
     fn sparks_follow_the_pop_only_when_starring() {
         let rest = PulseKey::rest(Anim::StarPop);
-        assert_eq!(sparks(Switch::On, rest), None, "at rest nothing plays");
+        assert_eq!(sparks(Check::On, rest), None, "at rest nothing plays");
         assert_eq!(
-            sparks(Switch::On, rest.fired()),
+            sparks(Check::On, rest.fired()),
             Some(("a-spark".to_string(), "a"))
         );
         assert_eq!(
-            sparks(Switch::On, rest.fired().fired()),
+            sparks(Check::On, rest.fired().fired()),
             Some(("a-spark".to_string(), "b"))
         );
-        assert_eq!(sparks(Switch::Off, rest.fired()), None, "unstarring");
+        assert_eq!(sparks(Check::Off, rest.fired()), None, "unstarring");
     }
 }

@@ -4,8 +4,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    DataAttr, DataName, Disclosure, DropState, Here, Icon, IconButton, IconButtonVariant, PlaceId,
-    Propagation, TreeItem, TreeShape,
+    DataAttr, DataName, DropState, Here, Icon, IconButton, IconButtonVariant, PlaceId, Propagation,
+    Shown, TreeItem, TreeShape,
 };
 
 /// `data-folder="<path>"`.
@@ -30,8 +30,8 @@ pub fn FolderTree() -> Element {
     let mut over = use_signal(|| Some("Archive"));
     let mut said = use_signal(|| "nothing yet".to_string());
     let mut current = use_signal(|| "INBOX/Projects/Quire");
-    let mut projects = use_signal(|| Disclosure::Open);
-    let mut archive = use_signal(|| Disclosure::Closed);
+    let mut projects = use_signal(|| Shown::Visible);
+    let mut archive = use_signal(|| Shown::Hidden);
     let more = move |path: &'static str| {
         rsx! {
             IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for {path}",
@@ -48,7 +48,7 @@ pub fn FolderTree() -> Element {
     };
     let leaf = move |path: &'static str, label: &'static str| {
         rsx! {
-            TreeItem { label, open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf,
+            TreeItem { label, open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf,
                 glyph: Icon::Folder, here: here(path), drop: drop_on(over(), path), place: PlaceId(path.to_string()),
                 onselect: move |_| current.set(path),
                 onpointerenter: move |_| over.set(Some(path)),

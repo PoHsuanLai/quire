@@ -13,7 +13,7 @@ use ds::icon::{IconStyle, Tint};
 use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Corner, DockFloor, Ds, Emphasis, Here, Icon,
     IconSize, IconSource, IconView, Inject, Material, MenuBarItem, PRESETS, PlateFamily, PlateTint,
-    Px, RunningDot, Surface, Switch, Theme, WorkspacePill, WorkspacePills,
+    Px, RunningDot, Shown, Surface, Theme, WorkspacePill, WorkspacePills,
 };
 
 /// The Work Space's Monochrome plate tint.
@@ -102,7 +102,7 @@ const CASES: &[Case] = &[
     ("bar-items", || {
         rsx! {
             MenuBarItem { emphasis: Emphasis::Strong, span { "Files" } }
-            MenuBarItem { open: Switch::On, id: "file", span { "File" } }
+            MenuBarItem { open: Shown::Visible, id: "file", span { "File" } }
             MenuBarItem { span { "Edit" } }
         }
     }),

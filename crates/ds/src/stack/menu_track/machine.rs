@@ -94,13 +94,13 @@ fn tracking<K: Clone + PartialEq>(
     match event {
         MenuTrackEvent::PressTitle(other) if other == session.menu => close(Vec::new()),
         MenuTrackEvent::PressTitle(other) => {
-            let effects = vec![MenuTrackEffect::Switch(other.clone())];
+            let effects = vec![MenuTrackEffect::Check(other.clone())];
             (opened(other, MenuHold::Held), effects)
         }
         MenuTrackEvent::OutsidePress => close(Vec::new()),
         MenuTrackEvent::Release(target) => released(session, target),
         MenuTrackEvent::Move(_, MenuTarget::Title(other)) if other != session.menu => {
-            let effects = vec![MenuTrackEffect::Switch(other.clone())];
+            let effects = vec![MenuTrackEffect::Check(other.clone())];
             (opened(other, session.held), effects)
         }
         MenuTrackEvent::Move(at, target) => moved(session, at, target, now, timing),

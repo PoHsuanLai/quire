@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, Button, ButtonVariant, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, MountedRef, Rect, Switch,
+    Anchor, Appearance, Availability, Button, ButtonVariant, Check, Ds, Material, Menu, MenuEntry,
+    MenuKind, MenuTrail, MountedRef, Rect,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -33,7 +33,7 @@ fn AnchorApp() -> Element {
 
 #[allow(non_snake_case)]
 fn Anchored() -> Element {
-    let mut open = use_signal(|| Switch::Off);
+    let mut open = use_signal(|| Check::Off);
     let mut element = use_signal(|| None::<MountedRef>);
     let entries = ["Later today", "Tomorrow"]
         .into_iter()
@@ -52,19 +52,19 @@ fn Anchored() -> Element {
         Button {
             variant: ButtonVariant::Secondary,
             label: "Snooze",
-            onclick: move |_| open.set(Switch::On),
+            onclick: move |_| open.set(Check::On),
             mounted: move |event: MountedEvent| element.set(Some(MountedRef(event.data()))),
         }
         // Something after the button: with only the `if` placeholder after it, the harness's
         // click never reached the button (FINDINGS "Polish pass").
         p { "Snooze this thread" }
-        if let (Switch::On, Some(button)) = (open(), element()) {
+        if let (Check::On, Some(button)) = (open(), element()) {
             Menu {
                 kind: MenuKind::Slim,
                 anchor: Anchor::Mounted(button),
                 entries,
-                onpick: move |_: u8| open.set(Switch::Off),
-                onclose: move |_| open.set(Switch::Off),
+                onpick: move |_: u8| open.set(Check::Off),
+                onclose: move |_| open.set(Check::Off),
             }
         }
     }

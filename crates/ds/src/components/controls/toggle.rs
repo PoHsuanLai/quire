@@ -6,7 +6,7 @@
 //! the speed it has, instead of restarting a transition. A click is a contact with no velocity:
 //! critically damped, no bounce.
 
-use crate::core::vocab::{Availability, Switch};
+use crate::core::vocab::{Availability, Check};
 use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
@@ -19,10 +19,10 @@ use dioxus::prelude::*;
 
 /// Where the knob stands for `value` on a switch of `size`: off at the start, on at the end of
 /// its travel (the track less its two knob insets and the knob, design/29-SIZING.md R3).
-fn knob_at(value: Switch, size: ControlSize) -> f32 {
+fn knob_at(value: Check, size: ControlSize) -> f32 {
     match value {
-        Switch::On => f32::from(size.scale().switch_travel().0),
-        Switch::Off => 0.0,
+        Check::On => f32::from(size.scale().switch_travel().0),
+        Check::Off | Check::Mixed => 0.0,
     }
 }
 
@@ -31,14 +31,14 @@ fn knob_at(value: Switch, size: ControlSize) -> f32 {
 #[component]
 pub fn Toggle(
     label: String,
-    value: Switch,
+    value: Check,
     #[props(default)] size: ControlSize,
     #[props(default)] availability: Availability,
-    onchange: EventHandler<Switch>,
+    onchange: EventHandler<Check>,
 ) -> Element {
     // The contact behind the change this toggle asked for, spent only when the value it asked
     // for arrives; a value that changed from elsewhere moves remotely.
-    let mut asked = use_signal(|| None::<(Switch, Touch)>);
+    let mut asked = use_signal(|| None::<(Check, Touch)>);
     let touch = match *asked.peek() {
         Some((wanted, touch)) if wanted == value => touch,
         Some(_) | None => Touch::Remote,
@@ -70,7 +70,7 @@ pub fn Toggle(
 #[cfg(test)]
 mod tests {
     use super::knob_at;
-    use crate::core::vocab::Switch;
+    use crate::core::vocab::Check;
     use crate::style::tokens::control_size::ControlSize;
 
     #[test]
@@ -82,8 +82,8 @@ mod tests {
             (ControlSize::Large, 16.0),
         ];
         for (size, travel) in CASES {
-            assert_eq!(knob_at(Switch::On, *size), *travel, "{size:?}");
-            assert_eq!(knob_at(Switch::Off, *size), 0.0, "{size:?}");
+            assert_eq!(knob_at(Check::On, *size), *travel, "{size:?}");
+            assert_eq!(knob_at(Check::Off, *size), 0.0, "{size:?}");
         }
     }
 }

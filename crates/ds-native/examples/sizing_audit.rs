@@ -7,10 +7,11 @@
 use dioxus::prelude::*;
 use ds::icon::{IconStyle, Tint};
 use ds::{
-    Appearance, Button, ButtonVariant, Chevron, Ds, Fraction, Icon, IconButton, IconButtonVariant,
-    IconSize, IconSource, IconView, LevelControl, LevelGlyph, LevelLook, Material, MenuBarItem,
-    ModuleGrid, ModulePanel, ModuleState, ModuleTile, Muting, PlateFamily, PlateTint, Px, Scheme,
-    SegSize, SegmentedControl, Slider, StatusMetrics, Surface, Switch, Theme, Toggle,
+    Appearance, Button, ButtonVariant, Check, Chevron, Ds, Fraction, Icon, IconButton,
+    IconButtonVariant, IconSize, IconSource, IconView, LevelControl, LevelGlyph, LevelLook,
+    Material, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile, Muting, PlateFamily,
+    PlateTint, Px, Scheme, SegSize, SegmentedControl, Shown, Slider, StatusMetrics, Surface, Theme,
+    Toggle,
 };
 use ds_native::{Harness, Viewport};
 use std::path::PathBuf;
@@ -97,19 +98,19 @@ fn Sheet(theme: Theme) -> Element {
                 // The bar: 32 tall as sill's default, a title pill, three status items, the clock.
                 Surface { material: Material::Bar, theme: Some(scheme),
                     div { style: "display:flex;align-items:center;gap:4px;height:32px;padding:0 8px;{metrics.style_attr()}",
-                        MenuBarItem { open: Switch::On, "Files" }
+                        MenuBarItem { open: Shown::Visible, "Files" }
                         MenuBarItem { "Edit" }
                         span { style: "flex:1" }
                         IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", expanded: Some(Switch::On), onclick: |_| {} }
+                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", expanded: Some(Shown::Visible), onclick: |_| {} }
                         IconButton { variant: IconButtonVariant::Status, icon: Icon::Switches, label: "Control center", onclick: |_| {} }
                         MenuBarItem { "Sun 27 Sep 12:48" }
                     }
                 }
                 Surface { material: Material::Popover, theme: Some(scheme),
                     div { style: "{row}",
-                        Toggle { label: "On", value: Switch::On, onchange: |_| {} }
-                        Toggle { label: "Off", value: Switch::Off, onchange: |_| {} }
+                        Toggle { label: "On", value: Check::On, onchange: |_| {} }
+                        Toggle { label: "Off", value: Check::Off, onchange: |_| {} }
                         div { style: "width:160px", Slider { label: "Level", value: Fraction(600), onchange: |_| {} } }
                         span { id: "btn-mini", Button { variant: ButtonVariant::Mini, label: "Mini", onclick: |_| {} } }
                         span { id: "btn-regular", Button { variant: ButtonVariant::Primary, label: "Regular", onclick: |_| {} } }

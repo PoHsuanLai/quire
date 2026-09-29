@@ -8,8 +8,8 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    BlurState, Button, ButtonVariant, Count, CountPlace, Icon, IconButton, IconButtonVariant,
-    Material, Px, StatusMetrics, Switch, use_scope,
+    BlurState, Button, ButtonVariant, Check, Count, CountPlace, Icon, IconButton,
+    IconButtonVariant, Material, Px, Shown, StatusMetrics, use_scope,
 };
 
 /// The two metrics a shell writes from its settings: the keys' defaults (a 22 px box, a 16 px
@@ -48,8 +48,8 @@ pub fn StatusItems() -> Element {
                                     Button { variant: ButtonVariant::Quiet, label: "Files", onclick: |_| {} }
                                     span { class: "g-spacer" }
                                     IconButton { variant: IconButtonVariant::Status, icon: Icon::Ethernet, label: "Wired network", onclick: |_| {} }
-                                    IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", expanded: Some(Switch::On), onclick: |_| {} }
-                                    IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", pressed: Some(Switch::On), onclick: |_| {} }
+                                    IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", expanded: Some(Shown::Visible), onclick: |_| {} }
+                                    IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", pressed: Some(Check::On), onclick: |_| {} }
                                     IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryCharging, label: "Battery", availability: ds::Availability::Disabled, onclick: |_| {} }
                                     Count { value: 3, place: CountPlace::Item }
                                     span { class: "ds-tabular", "09:41" }

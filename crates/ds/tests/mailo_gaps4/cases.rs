@@ -1,7 +1,7 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::Switch;
+use ds::Check;
 use ds::{
     AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkProvider,
     MarkSize, MarkStyle, ProviderMark, Trailing,
@@ -31,7 +31,7 @@ pub struct Case {
 pub const CASES: &[Case] = &[
     Case {
         golden: "lists/account_tile/one-local.html",
-        make: || rsx! { AccountTile { account: local(), pressed: Switch::On, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: local(), pressed: Check::On, unread: 2, onclick: |_| {} } },
     },
     Case {
         golden: "lists/provider_mark/local-row.html",
@@ -47,11 +47,11 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/frame-pressed.html",
-        make: || rsx! { Button { variant: ButtonVariant::Frame, label: "Today", pressed: Some(Switch::On), onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Frame, label: "Today", pressed: Some(Check::On), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/quiet-caret.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", trailing: Trailing::Caret, expanded: ds::Expanded::Closed, onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", trailing: Trailing::Caret, expanded: ds::Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/mini-trailing-glyph.html",
@@ -59,7 +59,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/face-bold.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Bold", face: ButtonFace::Bold, title: "Bold (Ctrl B)", pressed: Some(Switch::On), onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Bold", face: ButtonFace::Bold, title: "Bold (Ctrl B)", pressed: Some(Check::On), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/face-italic.html",

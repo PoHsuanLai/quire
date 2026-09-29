@@ -1,10 +1,10 @@
 //! The pieces of a `TreeItem` row: its attributes, its label, the leaf's chevron space and the
 //! fenced trailing slot. Apart from the component so each stays short.
 
-use crate::components::app::tree_item::Disclosure;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
+use crate::core::vocab::Shown;
 use crate::focus::click::kept_click;
 use dioxus::core::{Attribute, AttributeValue};
 use dioxus::prelude::*;
@@ -118,10 +118,10 @@ fn fence(event: MouseEvent) {
 /// text "false", which is an `open` attribute all the same. An empty namespace is the null one,
 /// and a `None` value removes the attribute. The value is "true" rather than empty because
 /// dioxus-ssr, which writes `open` only when truthy, would drop an empty one.
-pub(crate) fn open_attribute(open: Disclosure) -> Vec<Attribute> {
+pub(crate) fn open_attribute(open: Shown) -> Vec<Attribute> {
     let value = match open {
-        Disclosure::Open => AttributeValue::Text("true".to_string()),
-        Disclosure::Closed => AttributeValue::None,
+        Shown::Visible => AttributeValue::Text("true".to_string()),
+        Shown::Hidden => AttributeValue::None,
     };
     vec![Attribute::new("open", value, Some(""), false)]
 }

@@ -11,18 +11,18 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::Propagation;
 use crate::core::press::Press;
-use crate::core::vocab::Expanded;
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
 /// The toggle's words: "Show less" while the group is open; while folded to its newest, how
 /// many are hidden ("2 more"), or nothing when there is nothing to show.
-fn toggle_label(expanded: Expanded, count: u32) -> Option<String> {
+fn toggle_label(expanded: Shown, count: u32) -> Option<String> {
     match (expanded, count) {
-        (Expanded::Open, _) => Some("Show less".to_owned()),
-        (Expanded::Closed, 0 | 1) => None,
-        (Expanded::Closed, n) => Some(format!("{} more", n - 1)),
+        (Shown::Visible, _) => Some("Show less".to_owned()),
+        (Shown::Hidden, 0 | 1) => None,
+        (Shown::Hidden, n) => Some(format!("{} more", n - 1)),
     }
 }
 
@@ -34,7 +34,7 @@ pub fn GroupHeader(
     icon: IconSource,
     #[props(into)] name: TextLine,
     count: u32,
-    #[props(default)] expanded: Expanded,
+    #[props(default)] expanded: Shown,
     on_toggle: EventHandler<Press>,
     on_clear: EventHandler<Press>,
 ) -> Element {
@@ -73,17 +73,17 @@ pub fn GroupHeader(
 #[cfg(test)]
 mod tests {
     use super::toggle_label;
-    use crate::core::vocab::Expanded;
+    use crate::core::vocab::Shown;
 
     #[test]
     fn the_toggle_names_what_it_will_do() {
         let cases = [
-            (Expanded::Open, 4, Some("Show less")),
-            (Expanded::Open, 1, Some("Show less")),
-            (Expanded::Closed, 4, Some("3 more")),
-            (Expanded::Closed, 2, Some("1 more")),
-            (Expanded::Closed, 1, None),
-            (Expanded::Closed, 0, None),
+            (Shown::Visible, 4, Some("Show less")),
+            (Shown::Visible, 1, Some("Show less")),
+            (Shown::Hidden, 4, Some("3 more")),
+            (Shown::Hidden, 2, Some("1 more")),
+            (Shown::Hidden, 1, None),
+            (Shown::Hidden, 0, None),
         ];
         for (expanded, count, want) in cases {
             assert_eq!(

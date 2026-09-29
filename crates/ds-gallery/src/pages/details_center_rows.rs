@@ -4,7 +4,7 @@
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
-use ds::{Fraction, Icon, RowDisc, RowPhase, RowTrailing, RowWork, SettingsRow, Switch, TextLine};
+use ds::{Check, Fraction, Icon, RowDisc, RowPhase, RowTrailing, RowWork, SettingsRow, TextLine};
 
 /// A row's operation over a run of stamps: each press mints the next.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,10 +45,10 @@ impl Run {
     }
 
     /// Whether the item ended in use.
-    fn in_use(self) -> Switch {
+    fn in_use(self) -> Check {
         match self.phase {
-            RowPhase::Succeeded(_) => Switch::On,
-            RowPhase::Rest | RowPhase::Pending(_) | RowPhase::Failed(_) => Switch::Off,
+            RowPhase::Succeeded(_) => Check::On,
+            RowPhase::Rest | RowPhase::Pending(_) | RowPhase::Failed(_) => Check::Off,
         }
     }
 }
@@ -68,8 +68,8 @@ pub fn NetworkRows() -> Element {
     let mut home = use_signal(|| Run::start().pending().succeeded());
     let mut cafe = use_signal(Run::start);
     let disc = |run: Run| match run.in_use() {
-        Switch::On => RowDisc::On,
-        Switch::Off => RowDisc::Off,
+        Check::On => RowDisc::On,
+        Check::Off | Check::Mixed => RowDisc::Off,
     };
     rsx! {
         Cell { name: "Network rows", code: "SettingsRow {{ phase, work: RowWork::Trailing, disc }}",
@@ -91,8 +91,8 @@ pub fn DeviceRows() -> Element {
     let mut phones = use_signal(|| Run::start().pending().succeeded());
     let mut mouse = use_signal(Run::start);
     let row = |run: Run, level: u16| match run.in_use() {
-        Switch::On => (RowDisc::On, RowTrailing::Battery(Fraction(level))),
-        Switch::Off => (RowDisc::Off, RowTrailing::None),
+        Check::On => (RowDisc::On, RowTrailing::Battery(Fraction(level))),
+        Check::Off | Check::Mixed => (RowDisc::Off, RowTrailing::None),
     };
     let (phones_disc, phones_trail) = row(phones(), 840);
     let (mouse_disc, mouse_trail) = row(mouse(), 420);
@@ -115,10 +115,7 @@ pub fn DeviceRows() -> Element {
 pub fn OutputRows() -> Element {
     let mut speakers = use_signal(Run::start);
     let chosen = move || speakers().in_use();
-    let other = move || match chosen() {
-        Switch::On => Switch::Off,
-        Switch::Off => Switch::On,
-    };
+    let other = move || chosen().flipped();
     rsx! {
         Cell { name: "Output rows", code: "SettingsRow {{ phase, trailing: RowTrailing::Check }}",
             controls: rsx! {

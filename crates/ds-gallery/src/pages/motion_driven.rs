@@ -9,9 +9,9 @@ use dioxus::prelude::*;
 use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
 use ds::{
-    AppKey, AppMark, AppSwitcher, Appearance, DragReturnFrame, Ds, Fraction, Icon, IconSource,
-    Inject, Material, NotificationCard, NotificationSwipe, Pane, PaneSwitcher, Panel, PlateFamily,
-    Point, Px, RootChrome, SegmentedControl, Sheet, SheetPlacement, Shown, Slider, Switch,
+    AppKey, AppMark, AppSwitcher, Appearance, Check, DragReturnFrame, Ds, Fraction, Icon,
+    IconSource, Inject, Material, NotificationCard, NotificationSwipe, Pane, PaneSwitcher, Panel,
+    PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet, SheetPlacement, Shown, Slider,
     SwitcherApp, Toggle,
 };
 
@@ -37,10 +37,10 @@ pub fn DrivenSection() -> Element {
 
 #[component]
 fn ToggleCell() -> Element {
-    let mut on = use_signal(|| Switch::On);
+    let mut on = use_signal(|| Check::On);
     rsx! {
         Cell { name: "Toggle knob", code: "use_spring(--knob-x), Quick",
-            controls: rsx! { {mini("Flip (remote)", move |_| on.set(match on() { Switch::On => Switch::Off, Switch::Off => Switch::On }))} },
+            controls: rsx! { {mini("Flip (remote)", move |_| on.set(on().flipped()))} },
             div { class: "g-detail",
                 Toggle { label: "Wi-Fi", value: on(), onchange: move |to| on.set(to) }
             }
