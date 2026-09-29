@@ -15,7 +15,7 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::pdf_thumb_grace::{Grace, Reading, use_grace};
-use crate::components::content::shot_frame::picture_style;
+use crate::components::content::picture_fit::picture_style;
 use crate::core::geometry::units::{Point, Px, Rect, Size};
 use crate::core::word::Word;
 use crate::style::icon::Icon;
