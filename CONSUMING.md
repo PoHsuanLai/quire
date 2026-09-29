@@ -526,7 +526,7 @@ rsx! {
 ### Overlays
 
 ```rust
-use ds::{Anchor, Button, ButtonVariant, Menu, MenuKind, MountedRef, Switch, UndoToken, use_toasts};
+use ds::{Anchor, Button, ButtonVariant, Common, Menu, MenuKind, MountedRef, Shown, UndoToken, use_toasts};
 
 let toasts = use_toasts();
 toasts.push("Sent".to_owned(), None);   // ToastHost is already rendered by Ds â€” nothing else to mount
@@ -534,17 +534,20 @@ toasts.push("Sent".to_owned(), None);   // ToastHost is already rendered by Ds â
 toasts.push_undoable("Archived".to_owned(), UndoToken(7), EventHandler::new(move |token| restore(token)));
 
 // A menu anchored to the button that opens it: the button hands over its own element.
-let mut open = use_signal(|| Switch::Off);
+let mut open = use_signal(|| Shown::Hidden);
 let mut more = use_signal(|| None::<MountedRef>);
 rsx! {
     Button {
         variant: ButtonVariant::Secondary,
         label: "More".to_owned(),
-        onclick: move |_| open.set(Switch::On),
-        mounted: move |event: MountedEvent| more.set(Some(MountedRef(event.data()))),
+        onclick: move |_| open.set(Shown::Visible),
+        common: Common {
+            mounted: Some(EventHandler::new(move |event: MountedEvent| more.set(Some(MountedRef(event.data()))))),
+            ..Common::default()
+        },
     }
-    if let (Switch::On, Some(button)) = (open(), more()) {
-        Menu { kind: MenuKind::Rich, anchor: Anchor::Mounted(button), entries, onpick, onclose: move |()| open.set(Switch::Off) }
+    if let (Shown::Visible, Some(button)) = (open(), more()) {
+        Menu { kind: MenuKind::Rich, anchor: Anchor::Mounted(button), entries, onpick, onclose: move |()| open.set(Shown::Hidden) }
     }
 }
 ```

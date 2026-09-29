@@ -4,6 +4,7 @@
 
 pub(crate) mod ds;
 pub(crate) mod kit;
+pub mod selectors;
 pub(crate) mod sheets;
 pub(crate) mod stylesheet;
 
