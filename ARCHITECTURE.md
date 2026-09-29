@@ -726,7 +726,7 @@ path each, until step 12 replaces them with the prelude.
    `idle_dim` driver into `shell/`; `shot_frame` split; one battery drawing.
 4a. **Catalogue**: build design/30's merges and additions, foundations first, each sub-step through
     the gate worktree:
-    1. tokens: the pruned duration, delay and easing tables (30 section 1.2), `ControlSize {Mini,
+    1. tokens: (done) the pruned duration, delay and easing tables (30 section 1.2), `ControlSize {Mini,
        Small, Regular, Large}` and `SizeScale` (1.6), `ds-style::look::Look` with the Mac values,
        Motion levels reduced to Standard and Reduced;
     2. vocabulary (1.5): `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
