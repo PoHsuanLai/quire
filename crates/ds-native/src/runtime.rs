@@ -61,6 +61,11 @@ impl TokioSpawner {
     pub fn current() -> Self {
         TokioSpawner(Handle::current())
     }
+
+    /// The runtime `handle` belongs to, for a program that owns its own (a daemon's).
+    pub fn on(handle: Handle) -> Self {
+        TokioSpawner(handle)
+    }
 }
 
 impl Spawner for TokioSpawner {
