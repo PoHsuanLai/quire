@@ -17,7 +17,7 @@ pub(crate) fn document(sections: &[(&str, String)]) -> String {
 }
 
 /// Component sheets, each under its marker, in the order given.
-pub(crate) fn sheets(sheets: &[(&str, &str)]) -> String {
+pub fn sheets(sheets: &[(&str, &str)]) -> String {
     sheets
         .iter()
         .map(|(name, css)| format!("/* -- {name} -- */\n{}\n", css.trim_end()))
@@ -25,7 +25,7 @@ pub(crate) fn sheets(sheets: &[(&str, &str)]) -> String {
 }
 
 /// `.ds-truncate` and the other utilities, then the grain tile on `.ds-grain`.
-pub(crate) fn utilities_css() -> String {
+pub fn utilities_css() -> String {
     let grain = rule(
         ".ds-grain",
         &[property(

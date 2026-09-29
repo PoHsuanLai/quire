@@ -44,7 +44,7 @@ use crate::style::tokens::{
 use std::borrow::Cow;
 
 /// The style layer's contribution to the stylesheet and the linter.
-pub(crate) static KIT: Kit = Kit {
+pub static KIT: Kit = Kit {
     rank: KitRank::Style,
     tokens: &[
         TokenSet::of::<ColourToken>().at(Place::Scheme),

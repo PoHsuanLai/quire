@@ -48,7 +48,7 @@ impl From<Cue> for RevealCue {
 impl RevealCue {
     /// The key a rise starts on, given how many times the surface has opened: a new key is a
     /// new rise, `None` none.
-    pub(crate) fn key(self, openings: u32) -> Option<u32> {
+    pub fn key(self, openings: u32) -> Option<u32> {
         match self {
             RevealCue::First(FirstShow::Animate) => Some(openings),
             RevealCue::First(FirstShow::Still) => None,
@@ -59,7 +59,7 @@ impl RevealCue {
 
 /// Whether a list's rise is playing.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub(crate) enum Revealing {
+pub enum Revealing {
     /// Its children rise (`data-reveal=play`).
     Play,
     /// They sit still.
@@ -69,7 +69,7 @@ pub(crate) enum Revealing {
 /// `Play` from the render that first sees a new `key` until the twelfth child's rise settles
 /// (`settle(Rise, level, 12)`), `Still` otherwise: each key plays once, and a re-render, or the
 /// same key again, replays nothing (R1).
-pub(crate) fn use_rise_on(key: Option<u32>) -> Revealing {
+pub fn use_rise_on(key: Option<u32>) -> Revealing {
     let timer = use_motion_timer(Anim::Rise);
     let mut seen = use_hook(|| CopyValue::new(None::<u32>));
     let fresh = key.is_some() && *seen.peek() != key;

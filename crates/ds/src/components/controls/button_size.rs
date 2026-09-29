@@ -26,7 +26,7 @@ pub enum ButtonSize {
 /// an attribute string: a `bool` attribute reaches dioxus-native as `disabled="false"` on every
 /// enabled button, which Blitz reads as disabled (a click then no longer toggles an enclosing
 /// `<details>`).
-pub(crate) fn disabled(availability: Availability) -> Option<&'static str> {
+pub fn disabled(availability: Availability) -> Option<&'static str> {
     match availability {
         Availability::Enabled => None,
         Availability::Disabled => Some("true"),

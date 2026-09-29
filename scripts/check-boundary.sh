@@ -106,4 +106,8 @@ if [ "$layered" -eq 0 ]; then
   echo "layers hold: core < style < motion < lint, ds < shell < assembly; component groups in order"
 fi
 
+# No `pub(crate)` module or item may be named from another layer: it becomes `pub` at its home
+# module, because `pub(crate)` stops at the crate boundary the layers will become.
+python3 scripts/check-crossers.py || fail=1
+
 exit "$fail"

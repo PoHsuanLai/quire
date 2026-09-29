@@ -67,7 +67,7 @@ pub struct Alpha(pub u16);
 
 impl Alpha {
     /// The alpha as CSS writes it: `.22`, `.8`, `1`, `0`.
-    pub(crate) fn css(self) -> String {
+    pub fn css(self) -> String {
         thousandths(i64::from(self.0))
     }
 }

@@ -56,7 +56,7 @@ fn swatches(scheme: Scheme) -> Vec<String> {
 }
 
 /// `--swatch-<accent>`: that accent's own `--accent`, whatever the root selects.
-pub(crate) fn swatch_var(accent: Accent) -> String {
+pub fn swatch_var(accent: Accent) -> String {
     format!("--swatch-{}", accent.slug())
 }
 

@@ -27,13 +27,13 @@ enum Stops {
 
 /// One dot's colours, ready for its `style` and `data-stops` attributes.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct DotPaint(Stops);
+pub struct DotPaint(Stops);
 
 impl DotPaint {
     /// The gradient over `stops`, one colour per Space dot. A Space holds at most three dots
     /// (the editor's limit); a longer list, which only a hand-edited file could hold, keeps its
     /// first, middle and last stop.
-    pub(crate) fn gradient(stops: &[String]) -> Self {
+    pub fn gradient(stops: &[String]) -> Self {
         let stop = |at: usize| stops.get(at).cloned().unwrap_or_default();
         DotPaint(match stops.len() {
             0 | 1 => Stops::One(stop(0)),
@@ -43,12 +43,12 @@ impl DotPaint {
     }
 
     /// One flat colour.
-    pub(crate) fn solid(colour: &str) -> Self {
+    pub fn solid(colour: &str) -> Self {
         DotPaint(Stops::One(colour.to_owned()))
     }
 
     /// `data-stops`: `1`, `2` or `3`.
-    pub(crate) fn count(&self) -> &'static str {
+    pub fn count(&self) -> &'static str {
         match self.0 {
             Stops::One(_) => "1",
             Stops::Two(..) => "2",
@@ -57,7 +57,7 @@ impl DotPaint {
     }
 
     /// The custom properties, `--dot-c1:#…;…`, one per stop.
-    pub(crate) fn style_attr(&self) -> String {
+    pub fn style_attr(&self) -> String {
         let colours: Vec<&str> = match &self.0 {
             Stops::One(one) => vec![one],
             Stops::Two(first, last) => vec![first, last],

@@ -7,7 +7,7 @@
 //! system moves only when the test advances it. A loaded machine then changes how
 //! long a test takes, never what it sees.
 
-pub(crate) mod clock;
+pub mod clock;
 #[cfg(test)]
 mod tests;
 pub(crate) mod virtual_queue;

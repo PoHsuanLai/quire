@@ -16,7 +16,7 @@ pub fn use_operation(cue: Cue) -> Operation {
 
 /// [`use_operation`] with its tokens' deadline at `deadline`: a still pending look (a PDF
 /// sheet's) passes its grace, so its loop has no steps and holds still once the grace is over.
-pub(crate) fn use_operation_within(cue: Cue, deadline: Deadline) -> Operation {
+pub fn use_operation_within(cue: Cue, deadline: Deadline) -> Operation {
     let mut minted = use_hook(|| CopyValue::new(None::<(u32, PendingToken)>));
     if cue.moment() != Moment::Pending {
         return Operation::Idle;

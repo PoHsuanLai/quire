@@ -11,6 +11,7 @@ use super::text::render;
 use super::tokenize::Located;
 
 /// One property/value pair inside a rule's body.
+#[derive(Debug)]
 pub struct Decl {
     /// The property name token (`color`, `--my-gap`, `-webkit-line-clamp`).
     pub property: Located,
@@ -22,6 +23,7 @@ pub struct Decl {
 /// One qualified rule or at-rule-as-declarations block (`@font-face { ... }`), flattened out of
 /// whatever `@media`/`@supports` nesting held it, with one `@keyframes` step counted as its own
 /// rule (its "selector" is `0%`, `from`, `to`, ...).
+#[derive(Debug)]
 pub struct CollectedRule {
     /// The selector (or at-rule name), rendered for offence text.
     pub selector: String,

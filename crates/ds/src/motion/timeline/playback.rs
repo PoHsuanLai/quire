@@ -18,7 +18,7 @@ struct Run<T> {
 }
 
 /// A timeline and the task that advances it.
-pub(crate) struct Playback<T: Timeline> {
+pub struct Playback<T: Timeline> {
     run: Signal<Run<T>>,
     frame: Signal<T::Frame>,
     task: Signal<Option<Task>>,
@@ -50,12 +50,12 @@ impl<T: Timeline> std::fmt::Debug for Playback<T> {
 
 impl<T: Timeline> Playback<T> {
     /// The frame now, subscribing the caller's render to the run's frames.
-    pub(crate) fn frame(self) -> T::Frame {
+    pub fn frame(self) -> T::Frame {
         (self.frame)()
     }
 
     /// The frame last drawn, without subscribing; `None` once the owner has gone.
-    pub(crate) fn peek(self) -> Option<T::Frame> {
+    pub fn peek(self) -> Option<T::Frame> {
         self.frame.try_peek().ok().map(|frame| frame.clone())
     }
 
@@ -80,7 +80,7 @@ impl<T: Timeline> Playback<T> {
 
     /// Play `timeline` from its start; a run already going stops where it is. Call from an
     /// effect or a handler.
-    pub(crate) fn play(self, timeline: T) {
+    pub fn play(self, timeline: T) {
         self.play_from(timeline, Duration::ZERO);
     }
 
@@ -125,7 +125,7 @@ impl<T: Timeline> Playback<T> {
 }
 
 /// A playback standing at the frame `timeline` starts with, not yet running.
-pub(crate) fn use_playback<T: Timeline>(timeline: T) -> Playback<T> {
+pub fn use_playback<T: Timeline>(timeline: T) -> Playback<T> {
     let first = timeline.at(Duration::ZERO);
     Playback {
         run: use_signal(|| Run {

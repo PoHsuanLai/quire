@@ -23,7 +23,7 @@ pub enum RootExtent {
 impl RootExtent {
     /// The `data-extent` value, written only for a viewport root, so a content root's markup is
     /// what it was.
-    pub(crate) fn attribute(self) -> Option<&'static str> {
+    pub fn attribute(self) -> Option<&'static str> {
         match self {
             RootExtent::Content => None,
             RootExtent::Viewport => Some("viewport"),

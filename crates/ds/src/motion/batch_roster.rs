@@ -23,7 +23,8 @@ use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
 /// How a batch roster's rows come and go.
-pub(crate) struct Departures<K: 'static> {
+#[derive(Debug)]
+pub struct Departures<K: 'static> {
     /// The exit a batch plays, read on the render that starts it.
     pub(crate) exit: Exit,
     /// Whether the rows listed on the first render rise in (`Entering`) or are simply there.
@@ -66,7 +67,7 @@ impl<K: Clone + PartialEq> Claims<K> {
 
 /// A roster over `keys` whose missing keys leave in batches, and whether the list is still
 /// playing its first show (`Presence::Entering` until the keys first change).
-pub(crate) fn use_batch_roster<K: Clone + PartialEq + 'static>(
+pub fn use_batch_roster<K: Clone + PartialEq + 'static>(
     keys: Vec<K>,
     departures: Departures<K>,
 ) -> (Roster<K>, Presence) {

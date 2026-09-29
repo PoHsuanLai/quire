@@ -23,7 +23,7 @@ mod legibility;
 
 pub(crate) mod picked;
 pub(crate) mod roles;
-pub(crate) mod text_grounds;
+pub mod text_grounds;
 
 #[cfg(test)]
 mod tests;

@@ -19,7 +19,7 @@ use dioxus::prelude::*;
 /// surface present again after its hide was taken back plays `hold` instead (`Held`): the exit
 /// it drops is replaced by an animation that moves nothing, not by a second entrance.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub(crate) enum EntranceAlias {
+pub enum EntranceAlias {
     A,
     B,
     Held,
@@ -36,7 +36,7 @@ impl EntranceAlias {
 
 /// What a surface draws this render: where it is in its life and which entrance name it plays.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Presented {
+pub struct Presented {
     /// Its life: `data-presence` and `data-shown`.
     pub(crate) presence: Presence,
     /// Its entrance's name: `data-pulse`.
@@ -47,7 +47,7 @@ pub(crate) struct Presented {
 /// `shown` steps the machine at once (so the render draws the new phase), and its timers, the
 /// entrance's and the exit's settles, start in an effect after it. `on_hidden` runs when the
 /// exit has settled.
-pub(crate) fn use_presence(
+pub fn use_presence(
     shown: Shown,
     spec: PresenceSpec,
     on_hidden: Option<EventHandler<()>>,

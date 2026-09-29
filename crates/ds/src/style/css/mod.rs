@@ -4,8 +4,8 @@
 //! order is the assembly's. Fonts are not in it: they are registered with the renderer
 //! (`crate::style::fonts`).
 
-pub(crate) mod accents_css;
-pub(crate) mod document;
+pub mod accents_css;
+pub mod document;
 pub(crate) mod grain;
 pub(crate) mod ground_css;
 pub(crate) mod materials_css;

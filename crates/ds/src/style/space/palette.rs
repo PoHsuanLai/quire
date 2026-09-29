@@ -17,7 +17,7 @@ use crate::style::tokens::accent_band::{
 use serde::{Deserialize, Serialize};
 
 pub(crate) mod card;
-pub(crate) mod readout;
+pub mod readout;
 
 /// Whether deriving a palette had to lower a stop's chroma to keep the frame's text legible.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

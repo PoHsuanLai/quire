@@ -52,7 +52,7 @@ pub(crate) struct CellEvents {
 }
 
 /// The grid's inline style: its columns and rows at the cell's side.
-pub(crate) fn grid_style(columns: u8, cell: Px) -> String {
+pub fn grid_style(columns: u8, cell: Px) -> String {
     let side = cell.0;
     format!(
         "grid-template-columns:repeat({},{side}px);grid-auto-rows:{side}px",

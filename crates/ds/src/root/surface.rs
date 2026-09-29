@@ -87,7 +87,7 @@ pub(crate) fn ClassedScope(material: Material, class: &'static str, children: El
 /// The inline declaration that points `--accent-text` at `--accent-text-material` on a root of a
 /// translucent material that carries accent text (design/03-COLOR.md section 20.6), or nothing.
 /// Inline, so it follows a Space's own inline accent and beats the `data-accent` blocks.
-pub(crate) fn accent_text_style(material: Material) -> &'static str {
+pub fn accent_text_style(material: Material) -> &'static str {
     match text_on(material) {
         TextOn::Card => "",
         TextOn::Material => "--accent-text:var(--accent-text-material);",
@@ -105,7 +105,7 @@ fn scope_style(material: Material, radius: Option<Corner>) -> Option<String> {
 }
 
 /// The inline declaration that overrides a material's corner.
-pub(crate) fn radius_style(radius: Corner) -> String {
+pub fn radius_style(radius: Corner) -> String {
     format!("--m-radius:{};{}", radius.css(), radius.squircle_style())
 }
 

@@ -10,7 +10,7 @@ use crate::core::word::Word;
 pub(crate) const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];
 
 /// Whether `px` is a step of [`SPACING_GRID`].
-pub(crate) fn on_grid(px: u16) -> bool {
+pub fn on_grid(px: u16) -> bool {
     SPACING_GRID.contains(&px)
 }
 

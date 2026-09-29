@@ -5,7 +5,7 @@
 //! where it goes when a surface that took it leaves.
 
 pub(crate) mod caret;
-pub(crate) mod click;
+pub mod click;
 pub(crate) mod field;
 pub(crate) mod hand_back;
 pub(crate) mod host;

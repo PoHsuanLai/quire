@@ -3,10 +3,10 @@
 //! roster carry one; a surface its caller shows and hides gets one from [`use_presence`].
 
 pub(crate) mod exit;
-pub(crate) mod spec;
-pub(crate) mod spring;
+pub mod spec;
+pub mod spring;
 pub(crate) mod step;
-pub(crate) mod use_presence;
+pub mod use_presence;
 
 pub use exit::Exit;
 
@@ -37,7 +37,7 @@ impl Presence {
     }
 
     /// The `data-presence` value of something drawn, or `None` while it is hidden.
-    pub(crate) fn drawn_slug(self) -> Option<&'static str> {
+    pub fn drawn_slug(self) -> Option<&'static str> {
         match self {
             Presence::Hidden => None,
             Presence::Entering | Presence::Present | Presence::Leaving(_) => Some(self.slug()),
@@ -45,7 +45,7 @@ impl Presence {
     }
 
     /// The `data-shown` value: whether anything is drawn.
-    pub(crate) fn shown(self) -> Shown {
+    pub fn shown(self) -> Shown {
         match self {
             Presence::Hidden => Shown::Hidden,
             Presence::Entering | Presence::Present | Presence::Leaving(_) => Shown::Visible,

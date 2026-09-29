@@ -42,7 +42,7 @@ impl RootChrome {
     }
 
     /// The `data-chrome` value, written only for a transparent root.
-    pub(crate) fn attribute(self) -> Option<&'static str> {
+    pub fn attribute(self) -> Option<&'static str> {
         match self {
             RootChrome::Painted => None,
             RootChrome::Transparent => Some("transparent"),
@@ -88,7 +88,7 @@ impl FrameTint {
     /// The `data-frame` value: `opaque` on a window's root, `tinted` on shell chrome, absent
     /// where the root draws no gradient. Both roots that draw one are their own stacking
     /// context, so the layers' negative z-index paints over the root's own background.
-    pub(crate) fn attribute(self) -> Option<&'static str> {
+    pub fn attribute(self) -> Option<&'static str> {
         match self {
             FrameTint::Opaque => Some("opaque"),
             FrameTint::Tinted => Some("tinted"),
@@ -125,7 +125,7 @@ impl Ground {
     }
 
     /// The `data-ground` value, written only on the frame.
-    pub(crate) fn attribute(self) -> Option<&'static str> {
+    pub fn attribute(self) -> Option<&'static str> {
         match self {
             Ground::Paper => None,
             Ground::Frame => Some("frame"),

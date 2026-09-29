@@ -46,7 +46,7 @@ impl MotionTimer {
     /// Start (or restart) the timer for a stagger whose last member is at `index`: it settles at
     /// `settle(anim, level, index)` (a `Reveal`'s twelfth row, design/26 R13). It calls nothing
     /// when it settles, so it may be started from an effect, outside any scope.
-    pub(crate) fn start_staggered(&self, index: StaggerIndex) {
+    pub fn start_staggered(&self, index: StaggerIndex) {
         let _ = self.try_start(None, index);
     }
 

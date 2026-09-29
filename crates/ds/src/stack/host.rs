@@ -55,7 +55,7 @@ fn stack_order(layer: ZLayer) -> usize {
 }
 
 /// A new, empty registry, owned by the calling scope (`Ds`).
-pub(crate) fn use_overlays_provider() -> Overlays {
+pub fn use_overlays_provider() -> Overlays {
     use_context_provider(|| Overlays {
         entries: Signal::new(Vec::new()),
     })

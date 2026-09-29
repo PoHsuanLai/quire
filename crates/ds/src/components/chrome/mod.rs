@@ -3,4 +3,4 @@
 pub(crate) mod light_mark;
 pub(crate) mod resize_edges;
 pub(crate) mod traffic_lights;
-pub(crate) mod window_frame;
+pub mod window_frame;

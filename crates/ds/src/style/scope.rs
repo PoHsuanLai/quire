@@ -47,13 +47,13 @@ pub fn use_scope() -> Scope {
 
 /// The enclosing scope as the signal `Ds` and `Surface` provide, for hooks that read the
 /// motion level when a timer starts rather than when they were created.
-pub(crate) fn use_scope_signal() -> Signal<Scope> {
+pub fn use_scope_signal() -> Signal<Scope> {
     use_context::<Signal<Scope>>()
 }
 
 /// Provide `env` to the subtree, updating the provided value when it changes. Nothing here
 /// reads the signal, so the write does not re-render the caller.
-pub(crate) fn use_scope_provider(env: Scope) -> Signal<Scope> {
+pub fn use_scope_provider(env: Scope) -> Signal<Scope> {
     let mut provided = use_context_provider(|| Signal::new(env));
     if *provided.peek() != env {
         provided.set(env);

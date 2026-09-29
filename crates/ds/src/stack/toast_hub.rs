@@ -136,7 +136,7 @@ impl ToastHub {
 }
 
 /// A new hub for `Ds` to provide, timing its hold at the root's motion level.
-pub(crate) fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
+pub fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
     let scope = use_hook(current_scope_id);
     use_context_provider(|| ToastHub {
         state: Signal::new(ToastState::Hidden),

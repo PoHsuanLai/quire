@@ -11,7 +11,7 @@ use {
 };
 
 pub(crate) mod disc;
-pub(crate) mod id;
+pub mod id;
 pub(crate) mod life;
 pub(crate) mod script;
 pub(crate) mod sheet;

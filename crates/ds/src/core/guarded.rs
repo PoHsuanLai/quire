@@ -13,7 +13,7 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 
 /// A future whose poll may panic, polled so that a panic ends it with `None`.
-pub(crate) struct Guarded<F: Future>(pub(crate) Pin<Box<F>>);
+pub struct Guarded<F: Future>(pub(crate) Pin<Box<F>>);
 
 impl<F: Future> Future for Guarded<F> {
     type Output = Option<F::Output>;
@@ -31,7 +31,7 @@ impl<F: Future> Future for Guarded<F> {
 /// `start()`, then its future, each guarded: `None` when either panicked. For a call that
 /// borrows the document when it is made rather than when it is polled (dioxus-native-dom's
 /// `set_focus`).
-pub(crate) async fn guarded_call<F: Future>(start: impl FnOnce() -> F) -> Option<F::Output> {
+pub async fn guarded_call<F: Future>(start: impl FnOnce() -> F) -> Option<F::Output> {
     let future = catch_unwind(AssertUnwindSafe(start)).ok()?;
     Guarded(Box::pin(future)).await
 }

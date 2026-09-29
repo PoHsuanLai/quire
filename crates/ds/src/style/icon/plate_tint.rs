@@ -113,7 +113,7 @@ pub(crate) const PLATE_TINT_VARS: [[VarName; 3]; 2] = [
 
 /// The inline declarations of `family` tinted by `tint`, both schemes:
 /// `--plate-base-l:#…;…;--plate-ink-d:#…;`.
-pub(crate) fn tint_style(family: PlateFamily, tint: PlateTint) -> String {
+pub fn tint_style(family: PlateFamily, tint: PlateTint) -> String {
     Scheme::ALL
         .iter()
         .copied()

@@ -18,7 +18,7 @@ use dioxus::prelude::*;
 
 /// The heights rows measured, by key: how far the rows below heal when one leaves.
 #[derive(Debug, PartialEq)]
-pub(crate) struct Pitches<K: 'static>(CopyValue<Vec<(K, RowPitch)>>);
+pub struct Pitches<K: 'static>(CopyValue<Vec<(K, RowPitch)>>);
 
 impl<K: 'static> Clone for Pitches<K> {
     fn clone(&self) -> Self {
@@ -30,7 +30,7 @@ impl<K: 'static> Copy for Pitches<K> {}
 
 impl<K: Clone + PartialEq + 'static> Pitches<K> {
     /// Record `key`'s pitch.
-    pub(crate) fn set(&self, key: K, pitch: RowPitch) {
+    pub fn set(&self, key: K, pitch: RowPitch) {
         let mut book = self.0;
         let _ = book.try_write().map(|mut book| {
             book.retain(|(held, _)| *held != key);
@@ -57,13 +57,14 @@ impl<K: Clone + PartialEq + 'static> Pitches<K> {
 }
 
 /// An empty book of pitches.
-pub(crate) fn use_pitches<K: 'static>() -> Pitches<K> {
+pub fn use_pitches<K: 'static>() -> Pitches<K> {
     Pitches(use_hook(|| CopyValue::new(Vec::new())))
 }
 
 /// How a leaving roster behaves: the exit its rows play, the pitch a row that measured none
 /// heals by, the book of measured pitches, and who hears a row's exit settle.
-pub(crate) struct Leaving<K: 'static> {
+#[derive(Debug)]
+pub struct Leaving<K: 'static> {
     pub(crate) exit: Exit,
     pub(crate) pitch: RowPitch,
     pub(crate) pitches: Pitches<K>,
@@ -71,7 +72,7 @@ pub(crate) struct Leaving<K: 'static> {
 }
 
 /// A roster over `keys` whose missing keys leave by `leaving.exit`.
-pub(crate) fn use_leaving_roster<K: Clone + PartialEq + 'static>(
+pub fn use_leaving_roster<K: Clone + PartialEq + 'static>(
     keys: Vec<K>,
     leaving: Leaving<K>,
 ) -> Roster<K> {

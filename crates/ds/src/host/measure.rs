@@ -41,7 +41,7 @@ pub(crate) const BUSY_ATTEMPTS: usize = 8;
 
 /// `element`'s rect now, through the host's [`HostMeasure`] when there is one. `None` when the
 /// renderer cannot measure it. Call it from a task, never from inside a handler or render.
-pub(crate) async fn client_rect(element: &MountedData) -> Option<Rect> {
+pub async fn client_rect(element: &MountedData) -> Option<Rect> {
     let host = try_consume_context::<HostMeasure>();
     for attempt in 0..BUSY_ATTEMPTS {
         let read = match host {

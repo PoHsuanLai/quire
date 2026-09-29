@@ -10,7 +10,7 @@ use std::time::Duration;
 /// A value gliding from `from` to `to` along `ease`. Values are in whatever unit the caller
 /// glides (thousandths of a share, a count); a spring curve may overshoot `to` on the way.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Glide {
+pub struct Glide {
     pub(crate) from: i64,
     pub(crate) to: i64,
     pub(crate) ease: Ease,
@@ -18,7 +18,7 @@ pub(crate) struct Glide {
 
 /// Where a glide is at one instant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) struct Pose {
+pub struct Pose {
     /// The value now.
     pub(crate) value: i64,
     /// How far along the curve, in thousandths (a spring curve reads past 1000 on the way).
@@ -31,7 +31,7 @@ pub(crate) struct Pose {
 
 impl Glide {
     /// From `from` to `to` over `length` along `easing`.
-    pub(crate) fn between(from: i64, to: i64, length: Duration, easing: Easing) -> Glide {
+    pub fn between(from: i64, to: i64, length: Duration, easing: Easing) -> Glide {
         Glide {
             from,
             to,
@@ -40,7 +40,7 @@ impl Glide {
     }
 
     /// A glide that is already where it is going.
-    pub(crate) fn still(at: i64) -> Glide {
+    pub fn still(at: i64) -> Glide {
         Glide::between(at, at, Duration::ZERO, Easing::Linear)
     }
 }

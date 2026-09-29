@@ -55,7 +55,7 @@ pub fn use_nudge(cue: Cue) -> PulseKey {
 /// The incoming content's `fade` at `--t-quick` once per new Preview, Change or Failure cue: what
 /// a part that swaps its content in place (the preview pane's media) plays instead of its
 /// entrance. Nothing under Reduced: the content snaps (R7).
-pub(crate) fn use_cross_fade(cue: Option<Cue>) -> PulseKey {
+pub fn use_cross_fade(cue: Option<Cue>) -> PulseKey {
     use_once(
         Anim::MorphFadeIn,
         &[Moment::Preview, Moment::Change, Moment::Failure],
