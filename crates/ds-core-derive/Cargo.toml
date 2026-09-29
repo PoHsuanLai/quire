@@ -1,6 +1,6 @@
 [package]
 name = "ds-core-derive"
-description = "#[derive(Word)]: a closed vocabulary enum's ALL, slug, label and parse."
+description = "#[derive(Word)] and #[derive(Token)]: a closed vocabulary enum's ALL, slug, label and parse, and a token family's custom property and value."
 version.workspace = true
 edition.workspace = true
 license.workspace = true

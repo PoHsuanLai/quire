@@ -1,4 +1,4 @@
-//! `#[derive(Word)]`, re-exported next to the `Word` trait it implements.
+//! `#[derive(Word)]` and `#[derive(Token)]`, re-exported next to the traits they implement.
 //!
 //! On a fieldless enum it emits `impl Word for X`: `ALL` in declaration order, `slug` (the
 //! variant in kebab-case, or the enum's `#[word(case = snake)]`, or a variant's
@@ -9,6 +9,8 @@
 mod attrs;
 mod case;
 mod expand;
+mod token;
+mod token_attrs;
 
 use proc_macro::TokenStream;
 use syn::{DeriveInput, parse_macro_input};
@@ -18,6 +20,19 @@ use syn::{DeriveInput, parse_macro_input};
 pub fn derive_word(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     match expand::expand(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(err) => err.to_compile_error().into(),
+    }
+}
+
+/// Implements `Token` for a fieldless enum that is also a `Word`: the custom property
+/// `--<prefix><slug>` (or a variant's `name`), the value the variant's attributes name, and, for
+/// `kind = tuned`, the `input` a consumer writes. `css = path` names a function that computes
+/// every variant's value where a table is not a literal.
+#[proc_macro_derive(Token, attributes(token))]
+pub fn derive_token(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    match token::expand(&input) {
         Ok(tokens) => tokens.into(),
         Err(err) => err.to_compile_error().into(),
     }
