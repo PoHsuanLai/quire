@@ -6,7 +6,7 @@ the user picks, and it should move, as the reference desktop's animated emoji do
 proprietary; we use Google's open **Noto Animated Emoji** instead. Code, classes and assets say
 **emoji**.
 
-2026-09-26 (branch `user-picture-emoji`): the persona is removed (design/24 is a note now), and
+2026-09-26 (branch `user-picture-emoji`): the persona is removed, and
 the emoji is one kind of user picture beside the letter and the photo (section 7).
 
 ## 1. What this governs
@@ -143,7 +143,7 @@ would have played, then the pick's.
 
 ## 7. The emoji as the user's picture (2026-09-26)
 
-The user dropped the persona (design/24). A user's picture is one of three kinds:
+The user dropped the persona. A user's picture is one of three kinds:
 
 ```rust
 pub enum UserPicture {

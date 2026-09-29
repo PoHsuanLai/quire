@@ -70,7 +70,7 @@ use them. That is the principle the user is asking about.
 brevity and cancelability (A8) and the determinate-first rule (A9). We refuse the indefinite
 playback where it runs without a bound: the reference animates the Wi-Fi bars "like searching"
 even while connected, as it roams (A4; [WIFI-BLINK] M), and escalates its lock-screen
-character's annoyance (design/24 §2). Our rules (design/00 §4, design/05 §2 principle 7, the
+character's annoyance. Our rules (design/00 §4, design/05 §2 principle 7, the
 idle-frame rule) keep a loop only while a real operation runs, and bound even that (3.3 R4).
 
 ## 3. The grammar
@@ -115,7 +115,7 @@ retraction"; concessions are dull, design/00 §4 rule 10), and Escalation (R6).
 | Exit | the element | the existing `Presence`/`Roster` exits | (built: `motion::presence`, `use_roster`) |
 
 Why Rust tweens: Blitz's stylesheet does not reach inside an SVG (spike S6; FINDINGS "Glyph
-follows the level"; design/24 §6), and a CSS transition on `stroke-dashoffset` does not run
+follows the level"), and a CSS transition on `stroke-dashoffset` does not run
 (design/05 §9 rule 8). So a part *inside* a glyph either is its own stacked `svg` whose HTML
 wrapper CSS can move (layers: Pending, glyph Morph, Shake), or is recomputed per frame in Rust
 (shapes: Sweep, Check). The tween reads the easing tokens through `CubicBezier::at`
@@ -155,7 +155,7 @@ Each rule is testable; the test named is the one the primitive or the component 
 - **R6. One reaction per failure, never escalating.** A failure shakes once and holds its still
   state (design/05 principle 7: "A looping error animation is something you learn to ignore
   inside a day"). The same failure (same stamp) never replays; a new failure replays the
-  identical shake: no growing amplitude, no second effect for the third try (design/24 §5).
+  identical shake: no growing amplitude, no second effect for the third try.
   Attention is the same: one nudge per request, except the dock's bounces, which design/10 owns
   and section 8 item 1 bounds.
 - **R7. Reduced motion = the final state at once.** Rust tweens (Sweep, Count, Check) jump to the
@@ -709,7 +709,7 @@ States: Hidden, Shown(level, glyph), Muted.
 | --- | --- | --- | --- | --- |
 | Typing | each dot appears `pop-in` at `--t-tap` `--e-out` (typing is contact, but frequent: no overshoot, R12); the user's picture goes Attentive (built, design/25 §7) | dots appear per key (L) | dots snap | **G44** (small) |
 | Checking (Pending) | the enter arrow `Pending{Spin}` bounded (replaces the `Spinner`'s infinite spin) | a spinner while authenticating (L) | `Checking` spins (unbounded) | **G45** |
-| Wrong password (Failure) | `Shake` once, empty the field on settle; the picture winces once (built); same every time (R6) | the login window shakes (M, [SHAKE]: about three shakes in 0.3 s); the character escalates (M, design/24) | built | none (we refuse escalation) |
+| Wrong password (Failure) | `Shake` once, empty the field on settle; the picture winces once (built); same every time (R6) | the login window shakes (M, [SHAKE]: about three shakes in 0.3 s); the character escalates (M) | built | none (we refuse escalation) |
 | Unlock (Success) | the picture's accept beat, `picture-accept` (built), then the lock surface `fade` `--t-move --e-exit` | fade to the desktop (L) | built (20 §1.9) | none |
 | Caps lock | the mark `pop-in` / fade `--t-quick` | caps-lock glyph in the field (L) | snaps | **G46** (small) |
 | Locked out | the field dims (Unavailable), the time in the hint | "try again in" (L) | built (words) | none |
@@ -893,7 +893,7 @@ D0a and D0b can run in parallel; D1's quire lane needs both.
 - [CMDTAB] How-To Geek, "Quit and Hide macOS Apps from the Command+Tab Interface". M.
 - [CLOCK] MacRumors Forums, "Interesting Clock icon behavior" (the second hand moves smoothly). L.
 - Our docs: design/00 §3-4, design/05 (§2, §3, §7, §9, §10, §12), design/10 §10.3.2 and §10.3.5,
-  design/13 §13.2-13.3, design/20 §1, design/22 §3.2, design/23 §1.1, design/24 §5.
+  design/13 §13.2-13.3, design/20 §1, design/22 §3.2, design/23 §1.1.
 - Code read: quire `crates/ds/src/motion/*`, `components/{battery_level,battery_ring,count,bump_on,
   spinner,sync_halo,module_tile*,level/*,osd*,lock_*,app_switcher,shot_thumbnail,toggle,segmented,
   traffic_lights,notification_card,banner_stack,menu}*`; sill `crates/sill-surfaces/src/surfaces/

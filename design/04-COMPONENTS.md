@@ -3625,7 +3625,7 @@ advance, rest at 21 s, idle's rests, the wince swap, each mood as a `UserPortrai
 ### 44a. UserPicture, UserPortrait and UserPicturePicker (2026-09-26; design/25 section 7)
 
 **Purpose.** The user's picture as one of three kinds, drawn the same way everywhere, and the
-grid where the user picks it (Settings' Users page, first run). Replaces the persona (design/24).
+grid where the user picks it (Settings' Users page, first run).
 
 **Props.**
 
