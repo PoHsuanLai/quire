@@ -44,7 +44,7 @@ pub enum Selection {
 }
 
 /// Unread weight versus read weight: `data-emphasis="strong|plain"`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Emphasis {
     /// Heavier: unread.
     Strong,
@@ -57,7 +57,7 @@ pub enum Emphasis {
 /// pointer that would take the drop writes `data-drop="target"`, every other place that could
 /// take it `data-drop="accepts"`, the thing being dragged `data-drag="source"`, and every
 /// other item neither.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum DropState {
     /// Not part of the drag.
     #[default]
@@ -531,6 +531,61 @@ mod fraction_tests {
         ];
         for &(given, want) in CASES {
             assert_eq!(Fraction(given).whole_percent(), want, "{given}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod word_tests {
+    use super::{
+        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, InputModality,
+        Muting, PressPhase, Selection, Shown,
+    };
+    use crate::core::word::Word;
+
+    /// Every member of `T` parses back from its own slug, and no two share one.
+    fn round_trips<T: Word + std::fmt::Debug>() {
+        for &word in T::ALL {
+            assert_eq!(T::parse(word.slug()), Some(word), "{word:?}");
+        }
+        let slugs: std::collections::HashSet<_> = T::ALL.iter().map(|word| word.slug()).collect();
+        assert_eq!(slugs.len(), T::ALL.len(), "{:?}", T::ALL);
+    }
+
+    #[test]
+    fn every_vocabulary_word_parses_back_from_its_slug() {
+        round_trips::<Activity>();
+        round_trips::<Availability>();
+        round_trips::<Check>();
+        round_trips::<Dismiss>();
+        round_trips::<DropState>();
+        round_trips::<Emphasis>();
+        round_trips::<FocusStyle>();
+        round_trips::<InputModality>();
+        round_trips::<Muting>();
+        round_trips::<PressPhase>();
+        round_trips::<Selection>();
+        round_trips::<Shown>();
+    }
+
+    #[test]
+    fn check_and_shown_write_their_aria_words_and_flip() {
+        const CHECKS: &[(Check, &str, Check)] = &[
+            (Check::On, "true", Check::Off),
+            (Check::Off, "false", Check::On),
+            (Check::Mixed, "mixed", Check::On),
+        ];
+        for &(check, aria, flipped) in CHECKS {
+            assert_eq!(check.aria(), aria, "{check:?}");
+            assert_eq!(check.flipped(), flipped, "{check:?}");
+        }
+        const SHOWN: &[(Shown, &str, Shown)] = &[
+            (Shown::Visible, "true", Shown::Hidden),
+            (Shown::Hidden, "false", Shown::Visible),
+        ];
+        for &(shown, aria, flipped) in SHOWN {
+            assert_eq!(shown.aria(), aria, "{shown:?}");
+            assert_eq!(shown.flipped(), flipped, "{shown:?}");
         }
     }
 }
