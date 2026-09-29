@@ -11,6 +11,7 @@ use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::lists::emoji_grid::grid::grid_style;
 use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
 use crate::shell::emoji::{AnimatedEmoji, disc::EmojiPlayback, id::EmojiId};
 use crate::shell::user_picture::mood::PictureSize;
 use dioxus::prelude::*;
@@ -40,7 +41,7 @@ impl Cell {
 /// Every cell in order: the letter, then the set in `EmojiId::ALL`'s order.
 fn cells() -> Vec<Cell> {
     std::iter::once(Cell::Letter)
-        .chain(EmojiId::ALL.into_iter().map(Cell::Emoji))
+        .chain(EmojiId::ALL.iter().copied().map(Cell::Emoji))
         .collect()
 }
 
@@ -130,7 +131,7 @@ pub fn UserPicturePicker(
 fn cell_name(cell: Cell, initial: char) -> String {
     match cell {
         Cell::Letter => format!("Letter {initial}"),
-        Cell::Emoji(emoji) => emoji.name().to_owned(),
+        Cell::Emoji(emoji) => emoji.label().to_owned(),
     }
 }
 
@@ -149,6 +150,7 @@ fn cell_body(cell: Cell, letter: AvatarFace) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{cells, marked};
+    use crate::core::word::Word;
     use crate::shell::emoji::id::EmojiId;
     use crate::shell::user_picture::choice::PictureChoice;
 

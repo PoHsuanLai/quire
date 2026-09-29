@@ -48,7 +48,7 @@ pub enum NotificationSwipe {
 pub(crate) struct Carried(pub(crate) Signal<Flight>);
 
 /// Which way a leaving `BannerStack` row flies out.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Flight {
     /// Back past the edge it entered by (the caller dropped it: a timeout, a close).
     Edge,
@@ -58,11 +58,8 @@ pub(crate) enum Flight {
 
 impl Flight {
     /// `data-flight`, written only for a swipe: an edge flight reads the stack's own vector.
-    pub(crate) fn slug(self) -> Option<&'static str> {
-        match self {
-            Flight::Edge => None,
-            Flight::Swipe => Some("swipe"),
-        }
+    pub(crate) fn attr(self) -> Option<&'static str> {
+        (self != Flight::Edge).then(|| self.slug())
     }
 }
 

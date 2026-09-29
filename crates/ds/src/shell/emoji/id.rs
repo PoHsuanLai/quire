@@ -1,43 +1,28 @@
 //! [`EmojiId`]: which emoji a user picked for their picture (user data), one of the shipped set
 //! (design/25-EMOJI.md section 3). The slugs are the sheet files' stems and the serde names.
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 macro_rules! emoji_set {
     ($(($variant:ident, $slug:literal, $text:literal, $name:literal)),+ $(,)?) => {
         /// One emoji of the shipped animated set. Serialised as its slug (`"heart-eyes"`), so a
         /// stored choice survives the set being reordered.
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Word)]
         #[serde(rename_all = "kebab-case")]
         pub enum EmojiId {
             $(
                 #[doc = $name]
+                #[word(slug = $slug, label = $name)]
                 $variant,
             )+
         }
 
         impl EmojiId {
-            /// Every emoji, in the order the picker and the gallery show them.
-            pub const ALL: [EmojiId; [$($slug),+].len()] = [$(EmojiId::$variant),+];
-
-            /// The file stem and serde name: `heart-eyes`.
-            pub fn slug(self) -> &'static str {
-                match self {
-                    $(EmojiId::$variant => $slug,)+
-                }
-            }
-
             /// The emoji as text, for a picker's search or a plain-text fallback.
             pub fn text(self) -> &'static str {
                 match self {
                     $(EmojiId::$variant => $text,)+
-                }
-            }
-
-            /// Its CLDR-style English name.
-            pub fn name(self) -> &'static str {
-                match self {
-                    $(EmojiId::$variant => $name,)+
                 }
             }
 

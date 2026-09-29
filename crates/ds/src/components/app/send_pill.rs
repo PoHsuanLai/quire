@@ -73,7 +73,7 @@ impl PillAction {
 }
 
 /// What the ring does.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum SendRing {
     /// Drains by `progress`: the countdown, or held where it stopped.
     #[default]
@@ -87,11 +87,8 @@ const SPIN_DASH: &str = "20 37";
 
 impl SendRing {
     /// `data-ring`: written only while spinning, so a draining pill's markup is as it was.
-    fn slug(self) -> Option<&'static str> {
-        match self {
-            SendRing::Drain => None,
-            SendRing::Spin => Some("spin"),
-        }
+    fn attr(self) -> Option<&'static str> {
+        (self != SendRing::Drain).then(|| self.slug())
     }
 }
 
@@ -165,7 +162,7 @@ pub fn SendPill(
             class,
             "data-shown": shown,
             "data-phase": phase.slug(),
-            "data-mood": mood.slug(),
+            "data-mood": mood.attr(),
             "data-pulse": alias,
             role: "status",
             style: "--f:{progress.css()}",
@@ -174,7 +171,7 @@ pub fn SendPill(
             svg {
                 class: "ds-send-ring",
                 "data-ds-svg": "ring",
-                "data-ring": ring.slug(),
+                "data-ring": ring.attr(),
                 view_box: "0 0 24 24",
                 width: "20",
                 height: "20",

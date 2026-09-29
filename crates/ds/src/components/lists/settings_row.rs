@@ -197,7 +197,7 @@ fn glyph_slot(icon: Icon, disc: RowDisc, frame: PendingFrame, settling: Settling
         span {
             class,
             "data-pulse": alias,
-            "data-disc": disc.slug(),
+            "data-disc": disc.attr(),
             "data-pending": pending_slug(frame),
             "data-beat": beat,
             Glyph { icon, size: IconSize::Base }

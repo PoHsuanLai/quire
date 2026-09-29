@@ -2,6 +2,7 @@
 //! 5.2.2, 5.2.3, 5.2.8): joining a network, connecting a device, switching the
 //! sound output.
 
+use crate::core::word::Word;
 use crate::motion::detail::{
     detailed::Detailed,
     moment::Moment,
@@ -96,7 +97,7 @@ impl RowWork {
 
 /// The disc a row's glyph sits on: none (the bare glyph), the paper disc, or the accent disc of
 /// the item in use (the connected network or device, design/26).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum RowDisc {
     /// The bare glyph.
     #[default]
@@ -109,11 +110,7 @@ pub enum RowDisc {
 
 impl RowDisc {
     /// The `data-disc` word.
-    pub(crate) fn slug(self) -> Option<&'static str> {
-        match self {
-            RowDisc::None => None,
-            RowDisc::Off => Some("off"),
-            RowDisc::On => Some("on"),
-        }
+    pub(crate) fn attr(self) -> Option<&'static str> {
+        (self != RowDisc::None).then(|| self.slug())
     }
 }

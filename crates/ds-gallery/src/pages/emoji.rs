@@ -43,7 +43,7 @@ pub fn EmojiPage() -> Element {
     rsx! {
         Section { title: "The set", note: "EmojiId::ALL at Large, EmojiPlayback::Still, each at its rest frame: 42 Noto Animated Emoji the user can pick for their picture. The default is Blush.",
             div { class: "g-emoji-grid",
-                for emoji in EmojiId::ALL {
+                for emoji in EmojiId::ALL.iter().copied() {
                     div { key: "{emoji.slug()}", class: "g-col g-emoji-cell",
                         AnimatedEmoji { emoji, size: PictureSize::Large, playback: STILL }
                         Caption { name: emoji.slug().to_string() }

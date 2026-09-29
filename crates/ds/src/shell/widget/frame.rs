@@ -62,9 +62,9 @@ pub fn WidgetFrame(
             id,
             "data-size": size.slug(),
             "data-host": host.slug(),
-            "data-tint": tint.slug(),
+            "data-tint": tint.attr(),
             "data-widget": kind,
-            "data-lift": lift.slug(),
+            "data-lift": lift.attr(),
             "data-presence": motion.presence(),
             "data-pulse": motion.pulse().map(|_| "a"),
             if tint == CardTint::Space {

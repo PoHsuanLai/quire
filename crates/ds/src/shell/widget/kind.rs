@@ -35,7 +35,7 @@ pub enum WidgetHost {
 /// What a desktop widget's card is tinted with (design/23-WIDGETS.md section 4.3). Every card
 /// takes the Space's tint (settled 2026-09-27, Arc's contribution); `Material` stays for a host
 /// that must show the bare material (a comparison page).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum CardTint {
     /// The `Widget` material's own tint.
     Material,
@@ -48,11 +48,8 @@ pub enum CardTint {
 
 impl CardTint {
     /// `data-tint`: written only for a Space tint.
-    pub fn slug(self) -> Option<&'static str> {
-        match self {
-            CardTint::Material => None,
-            CardTint::Space => Some("space"),
-        }
+    pub fn attr(self) -> Option<&'static str> {
+        (self != CardTint::Material).then(|| self.slug())
     }
 
     /// The tint a card in `host` draws: a tile sits on the notification center's Popover, which
@@ -69,7 +66,7 @@ impl CardTint {
 /// desktop widget, or the widget gallery holding one, lifts it; quire owns the scale
 /// (`--pickup`), the shadow (`--shadow-drag`, in place of the resting drop), the layer
 /// (`--z-drag`) and the timing (`--t-quick` at `--e-out`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Lift {
     /// Where it lies.
     #[default]
@@ -80,11 +77,8 @@ pub enum Lift {
 
 impl Lift {
     /// `data-lift`: written only while lifted.
-    pub fn slug(self) -> Option<&'static str> {
-        match self {
-            Lift::Rest => None,
-            Lift::Lifted => Some("lifted"),
-        }
+    pub fn attr(self) -> Option<&'static str> {
+        (self != Lift::Rest).then(|| self.slug())
     }
 }
 

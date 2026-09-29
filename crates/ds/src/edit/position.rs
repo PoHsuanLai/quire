@@ -2,6 +2,8 @@
 //! text. The app renders `data-edit-node="{key}"` on every paragraph and object it can address
 //! (mailo's `data-n`), so a position is in the app's vocabulary, not the renderer's.
 
+use crate::core::word::Word;
+
 /// The attribute that makes an element addressable; its value is the element's [`EditNode`].
 pub const EDIT_NODE_ATTR: &str = "data-edit-node";
 
@@ -47,7 +49,7 @@ pub struct TextRange {
 }
 
 /// What an addressable element is, written as its `data-edit-kind`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum EditKind {
     /// Text: offsets are bytes into its text (the attribute may be left off).
     #[default]
@@ -58,26 +60,16 @@ pub enum EditKind {
 }
 
 impl EditKind {
-    /// The `data-edit-kind` value.
-    pub fn slug(self) -> &'static str {
-        match self {
-            EditKind::Text => "text",
-            EditKind::Atom => "atom",
-        }
-    }
-
-    /// The kind a `data-edit-kind` value names; anything but `atom` is text.
+    /// The kind a `data-edit-kind` value names; anything but a kind's slug is text.
     pub fn from_slug(slug: Option<&str>) -> Self {
-        match slug {
-            Some("atom") => EditKind::Atom,
-            _ => EditKind::Text,
-        }
+        slug.and_then(Self::parse).unwrap_or_default()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::EditKind;
+    use crate::core::word::Word;
 
     #[test]
     fn a_kind_round_trips_through_its_slug() {

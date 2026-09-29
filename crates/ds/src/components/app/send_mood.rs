@@ -5,6 +5,7 @@
 
 use crate::core::time::clock::sleep;
 use crate::core::vocab::StaggerIndex;
+use crate::core::word::Word;
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::style::appearance::motion::MotionLevel;
@@ -12,7 +13,7 @@ use crate::style::scope::Scope;
 use dioxus::prelude::*;
 
 /// How a send is going, as the pill wears it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum SendMood {
     /// Nothing wrong: counting, sending or sent.
     #[default]
@@ -36,13 +37,8 @@ impl SendMood {
     }
 
     /// `data-mood`: written only when something is wrong, so a calm pill's markup is as it was.
-    pub(crate) fn slug(self) -> Option<&'static str> {
-        match self {
-            SendMood::Calm => None,
-            SendMood::Nudge => Some("nudge"),
-            SendMood::Shake => Some("shake"),
-            SendMood::Fatal => Some("fatal"),
-        }
+    pub(crate) fn attr(self) -> Option<&'static str> {
+        (self != SendMood::Calm).then(|| self.slug())
     }
 }
 

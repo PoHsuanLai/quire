@@ -1,6 +1,7 @@
 use super::id::EmojiId;
 use super::script::{IDLE_REST, MoodChange, Pace, Playing, Shown, Step, pace, reaction, script};
 use super::sheet::{MANIFEST_JSON, SheetPx, durations, png, position, timing};
+use crate::core::word::Word;
 use crate::shell::user_picture::mood::Mood;
 use std::time::Duration;
 
@@ -22,7 +23,7 @@ fn the_manifest_lists_every_emoji_in_order() {
 
 #[test]
 fn every_sheet_is_its_grid_of_frames() {
-    for emoji in EmojiId::ALL {
+    for emoji in EmojiId::ALL.iter().copied() {
         let grid = timing(emoji);
         assert!(grid.frames > 1, "{emoji:?} is still");
         assert!(grid.frames <= grid.columns * grid.rows, "{emoji:?}");
@@ -48,7 +49,7 @@ fn every_sheet_is_its_grid_of_frames() {
 
 #[test]
 fn the_id_is_stored_as_its_slug() {
-    for emoji in EmojiId::ALL {
+    for emoji in EmojiId::ALL.iter().copied() {
         let json = serde_json::to_string(&emoji).expect("serialise");
         assert_eq!(json, format!("\"{}\"", emoji.slug()));
         let back: EmojiId = serde_json::from_str(&json).expect("deserialise");
@@ -97,7 +98,7 @@ fn every_script_rests_inside_the_window() {
         Mood::Happy,
         Mood::Asleep,
     ];
-    for user in EmojiId::ALL {
+    for user in EmojiId::ALL.iter().copied() {
         for mood in moods {
             for change in [MoodChange::Changed, MoodChange::Same] {
                 for playing in [Playing::Frames, Playing::Stills] {

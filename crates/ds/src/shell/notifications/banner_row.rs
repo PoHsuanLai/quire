@@ -60,7 +60,7 @@ pub(crate) fn BannerRow(
             "data-banner": "{banner.0}",
             "data-presence": presence.slug(),
             "data-exit": exit_slug(presence),
-            "data-flight": flight().slug(),
+            "data-flight": flight().attr(),
             style: heal_style(presence, position),
             onmounted: move |event| {
                 element.set(Some(event.data()));

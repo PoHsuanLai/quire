@@ -7,6 +7,7 @@
 //! fades; one of four fades at rest and not on hover; one of nine fades on both.
 
 use crate::components::content::rich_text::{Rich, rich};
+use crate::core::word::Word;
 use crate::host::measure::use_rect;
 use dioxus::prelude::*;
 
@@ -16,7 +17,7 @@ const REST_LINES: u8 = 2;
 const HOVER_LINES: u8 = 6;
 
 /// Where a body of some number of lines is cut: `data-clip`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Clip {
     /// It fits at rest: nothing is cut, nothing fades.
     Never,
@@ -37,12 +38,8 @@ impl Clip {
     }
 
     /// The `data-clip` word, or nothing when nothing is cut.
-    fn slug(self) -> Option<&'static str> {
-        match self {
-            Clip::Never => None,
-            Clip::Rest => Some("rest"),
-            Clip::Always => Some("always"),
-        }
+    fn attr(self) -> Option<&'static str> {
+        (self != Clip::Never).then(|| self.slug())
     }
 }
 
@@ -65,7 +62,7 @@ pub(crate) fn NotificationBody(body: Rich, on_link: Option<EventHandler<String>>
         _ => Clip::Never,
     };
     rsx! {
-        div { class: "ds-notification-body", "data-clip": clip.slug(),
+        div { class: "ds-notification-body", "data-clip": clip.attr(),
             div {
                 class: "ds-notification-body-text",
                 onmounted: move |event| text.on_mounted(event),
