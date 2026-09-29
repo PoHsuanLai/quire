@@ -92,8 +92,7 @@ pub fn offences(
 
     super::details::offences(selector, &property, decl, profile, &mut out);
 
-    let strict = matches!(profile, Profile::Strict | Profile::Details);
-    if strict && !is_custom_property {
+    if !is_custom_property {
         raw_geometry(selector, &property, decl, &mut out);
         super::hairline::raw_hairline(selector, &property, decl, &mut out);
     }

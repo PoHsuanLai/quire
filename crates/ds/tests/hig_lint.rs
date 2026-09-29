@@ -251,19 +251,16 @@ fn every_warning_rule_has_both_cases() {
     }
 }
 
-/// A warning never reaches `stylesheet` or `markup`, never fails `assert_clean`, and Standard
-/// does not run the guardrails at all.
+/// A warning never reaches `stylesheet` or `markup` and never fails `assert_clean`.
 #[test]
 fn a_warning_does_not_fail() {
     let css = ".row { cursor: pointer; font-size: var(--fs-pico); }";
     assert!(stylesheet(css, &strict()).is_empty());
     assert_eq!(warnings(css, &strict()).len(), 2);
-    assert!(warnings(css, &LintConfig::default()).is_empty());
     assert_clean(css, &strict());
     let html = "<button class=\"ds-button\"></button>";
     assert!(markup(html, ".ds-button{}", &strict()).is_empty());
     assert_eq!(markup_warnings(html, &strict()).len(), 1);
-    assert!(markup_warnings(html, &LintConfig::default()).is_empty());
 }
 
 /// An exception silences a warning, and one that silences only a warning is not stale.

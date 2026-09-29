@@ -4,7 +4,7 @@
 //! (design/27-HIG-PARITY.md section 7, H0). [`super::stylesheet`] and [`super::markup`] return
 //! errors only, so a consumer's `assert!(offences.is_empty())` is unmoved by a warning.
 
-use super::rule::{Offence, Profile, Rule};
+use super::rule::{Offence, Rule};
 
 /// Whether an offence fails a run.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -41,23 +41,6 @@ impl Offence {
     pub fn severity(&self) -> Severity {
         self.rule.severity()
     }
-}
-
-/// Whether the warning rules run under `profile`: Strict and Details, never Standard.
-pub(super) fn warnings_run(profile: Profile) -> WarningsRun {
-    match profile {
-        Profile::Standard => WarningsRun::Off,
-        Profile::Strict | Profile::Details => WarningsRun::On,
-    }
-}
-
-/// Whether a run checks the warning rules.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum WarningsRun {
-    /// It does.
-    On,
-    /// It does not.
-    Off,
 }
 
 /// `offences` split into errors and warnings, order kept.
