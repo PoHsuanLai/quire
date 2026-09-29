@@ -1040,8 +1040,8 @@ contacts register their account pages this way (`20-SURFACES.md`).
 
 - A settings key exists only if a `KeySpec` describes it: a struct field without the derive is
   a bug, caught by the test in 9.6.
-- Schema `version` follows the file `version` (section 2); a key removed from a struct stays
-  in the schema for one version, marked `deprecated`, so the Settings app can offer to clean it.
+- Schema `version` follows the file `version` (section 2); a key removed from a struct leaves
+  the schema with it.
 - No program renders its own settings UI for keys the schema covers (mailo's appearance
   picker becomes the `AppearancePicker` component bound to `quire/appearance.toml`); an app
   may still embed the Settings app's rendering of its own schema in-app via the shared
