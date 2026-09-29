@@ -16,6 +16,10 @@ that rev.
 
 ## Open items
 
+- **ds-settings still keeps unknown keys** (design/22 section 2 and the `extra` tables). The
+  rule is to report and drop them, as sill does; the settings step of the restructure changes
+  both.
+
 Upstream (pinned around; re-check at every toolchain bump):
 
 - **Blitz fork patch.** The restyle-on-cancelled-animation patch (`bf588142`) is not upstream.

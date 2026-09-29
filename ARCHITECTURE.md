@@ -64,8 +64,8 @@ has the full list).
   `HarnessConfig::with_clock(Clock::Virtual)` is exempt: there `advance` moves one clock for CSS
   and every ds timer, and a boundary assertion (`advance(window - 1ms)` not yet, `advance(1ms)`
   now) is the better test.
-- **Settings files keep keys they do not know** (design/22-SETTINGS.md section 2). A new
-  settings key is a design/22 row first.
+- **A settings key nobody reads is reported on load and not preserved.** A new settings key is
+  a design/22 row first.
 - **`Px` and the geometry built on it are `f32`**, like the renderer's own layout, and so
   `PartialEq` without `Eq`: the one float type in the data.
 - **The pinned dependency block's source of truth is `docs/workspace-deps.toml`**; the root
