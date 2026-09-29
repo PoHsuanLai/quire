@@ -13,6 +13,7 @@ use crate::core::geometry::{
     units::{Point, Px, Rect, Size},
 };
 use crate::core::time::{FRAME_SLACK, clock::sleep};
+use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
 use crate::motion::anim::Anim;
@@ -24,7 +25,7 @@ use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 
 /// Which surface a popover draws.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Elevation {
     /// Menus, hover cards: `--shadow-pop`.
     #[default]
@@ -36,15 +37,6 @@ pub enum Elevation {
 }
 
 impl Elevation {
-    /// The `data-elevation` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Elevation::Pop => "pop",
-            Elevation::Bubble => "bubble",
-            Elevation::Sheet => "sheet",
-        }
-    }
-
     /// The layer a bare popover of this elevation floats on: menus pop, the bubble is the
     /// bubble, a sheet-elevated surface is the palette's.
     fn layer(self) -> ZLayer {

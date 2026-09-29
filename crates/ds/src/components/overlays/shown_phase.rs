@@ -9,6 +9,7 @@
 
 use crate::components::overlays::osd_phase::{OsdEffect, OsdInput, OsdPhase, input, step};
 use crate::components::overlays::tooltip::Shown;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::timer::{MotionTimer, use_motion_timer};
 use dioxus::core::queue_effect;
@@ -18,7 +19,7 @@ use dioxus::prelude::*;
 /// restarts even where the engine kept the element's styles (design/05 section 9 rule 2). A
 /// surface present again after its hide was taken back plays `hold` instead (`Held`): the exit
 /// it drops is replaced by an animation that moves nothing, not by a second entrance.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Alias {
     A,
     B,
@@ -30,14 +31,6 @@ impl Alias {
         match self {
             Alias::A => Alias::B,
             Alias::B | Alias::Held => Alias::A,
-        }
-    }
-
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Alias::A => "a",
-            Alias::B => "b",
-            Alias::Held => "held",
         }
     }
 }

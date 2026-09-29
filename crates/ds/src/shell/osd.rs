@@ -19,6 +19,7 @@ use crate::components::controls::level::control::LevelControl;
 use crate::components::overlays::shown_phase::use_shown_phase;
 use crate::components::overlays::tooltip::Shown;
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 
