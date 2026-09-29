@@ -61,7 +61,7 @@ use dioxus_native::winit::keyboard::{Key as WinitKey, NamedKey};
 use dioxus_native::winit::window::Theme;
 use dioxus_native::{use_window, use_window_event};
 use dioxus_native_dom::NodeHandle;
-use ds::{HostModality, HostScale, InputModality, Scale};
+use ds::{Activity, HostActivity, HostModality, HostScale, InputModality, Scale};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -115,6 +115,7 @@ fn Rooted(root: SharedRoot) -> Element {
 #[allow(non_snake_case)] // A component: rsx and launch name it like a type.
 pub(crate) fn Host(props: HostProps) -> Element {
     let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
+    let activity = use_context_provider(|| HostActivity(Signal::new(Activity::Active)));
     use_context_provider(|| crate::measure::MEASURE);
     use_context_provider(|| crate::focus::FOCUS);
     use_context_provider(|| crate::focus::BLUR);
@@ -193,6 +194,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
         }
         if let Some(next) = modality_after(event) {
             let HostModality(mut current) = modality;
+            if *current.peek() != next {
+                current.set(next);
+            }
+        }
+        if let WindowEvent::Focused(focused) = event {
+            let HostActivity(mut current) = activity;
+            let next = activity_of(*focused);
             if *current.peek() != next {
                 current.set(next);
             }
@@ -295,6 +303,14 @@ fn find_frames(document: &Option<NodeHandle>, book: &FrameBook) {
 /// A winit scale factor in 120ths, the unit `ds::Scale` shares with the Wayland protocol.
 fn scale_of(factor: f64) -> Scale {
     Scale((factor * f64::from(Scale::DENOMINATOR)).round().max(1.0) as u32)
+}
+
+/// The activity of a window that just gained or lost the keyboard focus.
+fn activity_of(focused: bool) -> Activity {
+    match focused {
+        true => Activity::Active,
+        false => Activity::Inactive,
+    }
 }
 
 /// The modality a window event implies, if it implies one.

@@ -2,7 +2,7 @@
 //! runs start one timer.
 
 use crate::core::geometry::units::Px;
-use crate::core::vocab::InputModality;
+use crate::core::vocab::{Activity, InputModality};
 use crate::motion::{presence::Presence, roster::RowPitch, use_roster::use_roster};
 use crate::style::appearance::{
     accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
@@ -34,6 +34,7 @@ fn List() -> Element {
             material: Material::Window,
             blur: BlurState::Unavailable,
             modality: InputModality::Pointer,
+            activity: Activity::Active,
         })
     });
     let keys = use_signal(|| vec!["a", "b"]);

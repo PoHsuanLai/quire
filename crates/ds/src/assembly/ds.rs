@@ -44,7 +44,7 @@
 use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
 use crate::core::geometry::scale::Scale;
-use crate::core::vocab::InputModality;
+use crate::core::vocab::{Activity, InputModality};
 use crate::core::word::Word;
 use crate::focus::click::ClickRoot;
 use crate::motion::hover_intent::HoverWarmth;
@@ -62,7 +62,7 @@ use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::style::material::stack::MaterialStack;
 use crate::style::scale::use_root_scale;
-use crate::style::scope::{HostModality, Scope, use_scope_provider};
+use crate::style::scope::{HostActivity, HostModality, Scope, use_scope_provider};
 use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::style::tokens::hex::Alpha;
 use crate::style::tokens::{pixel::PixelToken, shape::Corner};
@@ -108,15 +108,18 @@ pub fn Ds(
     let ground = ground.unwrap_or(Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
     let host = use_hook(try_consume_context::<HostModality>);
+    let host_activity = use_hook(try_consume_context::<HostActivity>);
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let click_root = use_context_provider(|| ClickRoot::of(element));
     let modality = host.map_or(InputModality::default(), |HostModality(current)| current());
+    let activity = host_activity.map_or(Activity::Active, |HostActivity(current)| current());
     let env = use_scope_provider(Scope {
         resolved,
         scheme: resolved.scheme,
         material,
         blur,
         modality,
+        activity,
     });
     let hover = use_hover_hub_provider(env);
     use_toast_hub_provider(env);
@@ -151,6 +154,7 @@ pub fn Ds(
             "data-material": material.slug(),
             "data-blur": blur.slug(),
             "data-modality": modality.slug(),
+            "data-activity": activity.slug(),
             "data-hover": hover,
             "data-chrome": chrome.attribute(),
             "data-frame": frame_tint.attribute(),
