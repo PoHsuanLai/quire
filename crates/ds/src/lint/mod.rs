@@ -17,12 +17,12 @@
 //! assert_clean(OUR_CSS, &LintConfig { exceptions: EXCEPTIONS, ..LintConfig::default() });
 //! ```
 
-pub mod assert;
-pub mod blitz;
-pub mod markup;
-pub mod rule;
-pub mod stylesheet;
-pub mod tokenize;
+pub(crate) mod assert;
+pub(crate) mod blitz;
+pub(crate) mod markup;
+pub(crate) mod rule;
+pub(crate) mod stylesheet;
+pub(crate) mod tokenize;
 
 pub(crate) mod animation;
 pub(crate) mod colours;

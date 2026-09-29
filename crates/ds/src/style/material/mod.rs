@@ -7,10 +7,5 @@
 pub(crate) mod layer;
 pub(crate) mod level;
 
-pub mod recipe;
-pub mod stack;
-
-pub use crate::style::appearance::blur::{Blur, BlurState};
-pub use crate::style::appearance::material::Material;
-pub use recipe::{MaterialRecipe, recipe};
-pub use stack::MaterialStack;
+pub(crate) mod recipe;
+pub(crate) mod stack;

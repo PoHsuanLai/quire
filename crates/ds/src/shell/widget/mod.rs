@@ -27,23 +27,3 @@ pub(crate) mod slot;
 pub(crate) mod timeline;
 pub(crate) mod use_widget;
 pub(crate) mod wire;
-
-pub use battery::{BatteryCell, BatteryEntry, BatteryWidget, MAX_RINGS};
-pub use calendar::{
-    EventLine, LARGE_EVENTS, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine,
-};
-pub use card::WidgetCard;
-pub use clock::{ClockCity, ClockEntry, MAX_CITIES, WorldClockWidget};
-pub use contract::{NoIntent, Widget, WidgetContext, WidgetKind, fit};
-pub use gallery::{GalleryWords, WidgetGallery};
-pub use layout::{
-    DesktopGrid, GridCell, LayoutError, Order, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement,
-    apply, cells, first_free,
-};
-pub use registry::{
-    TakenKind, UnsizedKind, WidgetInfo, WidgetRegistry, provide_widget_registry,
-    use_widget_registry,
-};
-pub use timeline::{Dated, EntryDate, REFRESH_FLOOR, Refresh, RefreshAsk, Timeline, Wake};
-pub use use_widget::use_widget;
-pub use wire::{WireEntry, WireRefresh, WireTimeline};

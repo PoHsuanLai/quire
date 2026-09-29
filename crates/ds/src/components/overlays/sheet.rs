@@ -9,10 +9,9 @@
 use crate::components::overlays::popover::{Dismiss, Stacking, escape_closes, use_float};
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
 use crate::components::overlays::scrim_strength::ScrimStrength;
-pub use crate::components::overlays::sheet_placement::SheetPlacement;
-pub use crate::components::overlays::sheet_width::SheetWidth;
 use crate::components::overlays::spring_presence::{SpringPresence, Step, use_spring_presence};
 use crate::components::overlays::tooltip::Shown;
+use crate::components::overlays::{sheet_placement::SheetPlacement, sheet_width::SheetWidth};
 use crate::motion::anim::Anim;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;

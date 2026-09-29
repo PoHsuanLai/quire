@@ -6,8 +6,8 @@
 //! document fetches nothing.
 
 use super::id::EmojiId;
-use crate::components::content::icon_source::IconUrl;
 use crate::shell::user_picture::mood::PictureSize;
+use crate::style::icon::url::IconUrl;
 use serde::Deserialize;
 use std::sync::{LazyLock, OnceLock};
 use std::time::Duration;

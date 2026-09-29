@@ -4,14 +4,13 @@
 use crate::core::vocab::Fraction;
 use crate::motion::detail::{
     morph::Slashed,
-    tween::{Ease, TweenSpec, use_tween},
+    tween::{TweenSpec, use_tween},
 };
 use crate::style::tokens::timing::DurationToken;
 
 /// How the slash moves.
 const DRAW: TweenSpec = TweenSpec {
     duration: DurationToken::Quick,
-    ease: Ease::Out,
 };
 
 /// How much of the slash is drawn this frame, in thousandths.

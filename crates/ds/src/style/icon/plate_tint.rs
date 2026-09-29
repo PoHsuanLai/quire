@@ -85,11 +85,6 @@ impl PlateStops {
         }
     }
 
-    /// These stops and ink re-coloured by `tint`, lightness kept (the light scheme's rule).
-    pub fn tinted(self, tint: PlateTint) -> PlateStops {
-        self.tinted_in(tint, Scheme::Light)
-    }
-
     /// These stops and ink re-coloured by `tint` for `scheme`: in the dark the stops are lifted
     /// into the plate's tone band and the ink into the art's (design/29-SIZING.md fix F3).
     pub fn tinted_in(self, tint: PlateTint, scheme: Scheme) -> PlateStops {
@@ -178,7 +173,7 @@ mod tests {
                 );
             }
             let light = PlateStops::of(PlateFamily::Neutral, Scheme::Light)
-                .tinted(PlateTint::Monochrome(tint));
+                .tinted_in(PlateTint::Monochrome(tint), Scheme::Light);
             assert_eq!(light.base, Hex([255, 255, 255]), "white has no room");
             assert!(hue_gap(hue_and_chroma(light.deep).hue, tint.hue) < 20.0);
         }
@@ -188,7 +183,7 @@ mod tests {
     fn muted_lowers_a_familys_chroma_and_keeps_its_hue() {
         // The dark paper: under `from_hex`'s 0.07 cap, so the drop is measurable.
         let paper = PlateStops::of(PlateFamily::Neutral, Scheme::Dark);
-        let muted = paper.tinted(PlateTint::Muted);
+        let muted = paper.tinted_in(PlateTint::Muted, Scheme::Light);
         let (before, after) = (hue_and_chroma(paper.base), hue_and_chroma(muted.base));
         assert!(after.chroma < before.chroma, "{before:?} -> {after:?}");
         assert!(

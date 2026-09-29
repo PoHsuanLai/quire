@@ -9,9 +9,8 @@
 //! (`mask-composite: add`), so a squircle is drawn as a mask: four quadrant images at the
 //! corners and two rectangles for the cross between them. The shapes are sampled here, as data.
 
-use crate::components::content::icon_source::IconUrl;
+use crate::style::icon::url::IconUrl;
 use crate::style::tokens::plate::EXPONENT;
-pub use crate::style::tokens::plate::shadow_radius_share;
 use std::f64::consts::FRAC_PI_2;
 
 /// Samples per quadrant for a corner mask, and for each quadrant of the plate.
@@ -125,21 +124,21 @@ pub fn plate_mask() -> IconUrl {
     IconUrl::svg(&document(&path(&points)))
 }
 
-/// Whether `(x, y)`, measured from a corner of a squircle corner of extent `k`, lies inside the
-/// shape: the analytic test the pixel proofs compare against.
-pub fn inside_corner(k: f64, x: f64, y: f64) -> bool {
-    if x >= k || y >= k {
-        return true;
-    }
-    let u = (k - x) / k;
-    let v = (k - y) / k;
-    u.powf(EXPONENT) + v.powf(EXPONENT) <= 1.0
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{Quadrant, fill_mask, inside_corner, plate_mask, point, quadrant_mask};
+    use super::{Quadrant, fill_mask, plate_mask, point, quadrant_mask};
     use crate::style::tokens::plate::{EXPONENT, shadow_radius_share};
+
+    /// Whether `(x, y)`, measured from a corner of a squircle corner of extent `k`, lies inside the
+    /// shape: the analytic test the pixel proofs compare against.
+    fn inside_corner(k: f64, x: f64, y: f64) -> bool {
+        if x >= k || y >= k {
+            return true;
+        }
+        let u = (k - x) / k;
+        let v = (k - y) / k;
+        u.powf(EXPONENT) + v.powf(EXPONENT) <= 1.0
+    }
 
     #[test]
     fn every_sample_lies_on_the_superellipse() {

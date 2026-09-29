@@ -12,10 +12,6 @@ pub(crate) mod intent;
 pub(crate) mod parts;
 pub(crate) mod target;
 
-pub use intent::{HoverAnchor, HoverDriver, use_hover_intent};
-pub use parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint};
-pub use target::{HoverTarget, TargetElement};
-
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, position_style, use_float};
 use crate::core::geometry::{
@@ -33,6 +29,7 @@ use crate::style::tokens::layer::ZLayer;
 use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
 use std::collections::BTreeMap;
+use {intent::HoverAnchor, parts::HoverCardPart};
 
 /// Where each hover target was when the pointer last came over it, shared by every target
 /// and card under the root.

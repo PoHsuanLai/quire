@@ -4,7 +4,7 @@
 //! hand had along it. Picked up again on the way, it follows from where it is.
 //!
 //! The dock's tile return is the first user (sill wires the drag; quire draws the offset with
-//! [`crate::components::overlays::drag_ghost::DragReturnFrame`]).
+//! `DragReturnFrame`).
 
 use super::spring::SpringPhase;
 use super::spring_point::{Release, SpringPointMotion, use_spring_point_motion};

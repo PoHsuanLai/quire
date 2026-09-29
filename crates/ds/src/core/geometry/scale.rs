@@ -1,7 +1,7 @@
 //! The device scale: how many device pixels one logical pixel covers.
 //!
 //! At a fractional scale (1.25, 1.5, 1.75) a one logical pixel line covers a fractional number of
-//! device pixels and blurs into two half-alpha rows; the pixel tokens (`crate::style::tokens::pixel`)
+//! device pixels and blurs into two half-alpha rows; the pixel tokens (`pixel`)
 //! and the host's layout snap (`ds_native::snap`) are computed from this value so it does not.
 
 /// Device pixels per logical pixel, in 120ths: `Scale(120)` is 1x, `Scale(180)` is 1.5x.

@@ -6,7 +6,7 @@
 //! not. A header, a status line and a rule are not choices. Choices are numbered in order; the selection, a click and the menu tracker's item path
 //! all name a choice by that number. Up and Down skip disabled choices.
 
-pub use crate::components::menus::menu_filter::Filter;
+use crate::components::menus::menu_filter::Filter;
 use crate::components::menus::menu_filter::Typed;
 use crate::components::menus::{menu_entry::MenuEntry, menu_match::fuzzy};
 use crate::core::vocab::Availability;

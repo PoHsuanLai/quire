@@ -4,13 +4,13 @@
 //! order is the assembly's. Fonts are not in it: they are registered with the renderer
 //! (`crate::style::fonts`).
 
-pub mod accents_css;
+pub(crate) mod accents_css;
 pub(crate) mod document;
 pub(crate) mod grain;
-pub mod ground_css;
-pub mod materials_css;
-pub mod shape_css;
-pub mod tokens_css;
+pub(crate) mod ground_css;
+pub(crate) mod materials_css;
+pub(crate) mod shape_css;
+pub(crate) mod tokens_css;
 
 /// `html, body` transparent; `.ds` carries paper, ink and the UI font.
 pub const RESET: &str = include_str!("reset.css");

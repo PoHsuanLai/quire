@@ -5,7 +5,6 @@
 use super::glide::{Glide, Pose};
 use super::level::use_level;
 use super::motor::use_motor;
-use super::touch::Contact;
 use crate::core::vocab::Fraction;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
@@ -13,61 +12,12 @@ use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use std::time::Duration;
 
-/// The curve a tween follows. An overshoot needs the person's [`Contact`] (R5): a remote change
-/// cannot ask for one.
-///
-/// ```
-/// use dioxus::prelude::{Event, MouseData};
-/// use ds::DurationToken;
-/// use ds::detail::{Contact, Ease, TweenSpec};
-///
-/// fn flicked(event: &Event<MouseData>) -> TweenSpec {
-///     TweenSpec { duration: DurationToken::Quick, ease: Ease::Spring(Contact::from_event(event)) }
-/// }
-/// ```
-///
-/// A spring with no contact does not compile:
-///
-/// ```compile_fail,E0308
-/// use ds::DurationToken;
-/// use ds::detail::{Ease, TweenSpec};
-///
-/// let remote = TweenSpec { duration: DurationToken::Quick, ease: Ease::Spring };
-/// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Ease {
-    /// `--e-out`.
-    Out,
-    /// `--e-in-out`.
-    InOut,
-    /// `--e-linear`.
-    Linear,
-    /// `--e-exit`.
-    Exit,
-    /// `--e-spring`, on the element the person touched.
-    Spring(Contact),
-}
-
-impl Ease {
-    /// The token this curve is.
-    pub fn token(self) -> EasingToken {
-        match self {
-            Ease::Out => EasingToken::Out,
-            Ease::InOut => EasingToken::InOut,
-            Ease::Linear => EasingToken::Linear,
-            Ease::Exit => EasingToken::Exit,
-            Ease::Spring(_) => EasingToken::Spring,
-        }
-    }
-}
-
-/// How a tween moves: a duration token and a curve.
+/// How a tween moves: a duration token, along `--e-out` (a tween never overshoots: an
+/// overshoot needs the person's contact, R5, and nothing a tween draws is touched).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TweenSpec {
     /// How long, as the level says.
     pub duration: DurationToken,
-    /// Along which curve.
-    pub ease: Ease,
 }
 
 /// A tween's frame: the share to draw now and how far through its move it is.
@@ -128,7 +78,7 @@ pub fn use_tween(target: Fraction, spec: TweenSpec) -> Tween {
                         from: motor.peek().value,
                         to,
                         length: spec.duration.duration(level),
-                        easing: spec.ease.token().easing(level),
+                        easing: EasingToken::Out.easing(level),
                     })
                 }
             }

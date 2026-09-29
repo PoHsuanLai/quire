@@ -95,25 +95,6 @@ impl PaneSlide {
         }
     }
 
-    /// The caller asked for `pane`, `last` being the latest round started. Asking for the pane
-    /// already shown or arriving changes nothing (`None`); anything else starts a new round:
-    /// from rest a plain switch, mid-switch a reversal, the arriving pane turning back.
-    pub fn show(self, pane: Pane, last: PaneRound) -> Option<Self> {
-        (self.target() != pane).then(|| PaneSlide::Moving {
-            to: pane,
-            round: PaneRound(last.0.wrapping_add(1)),
-        })
-    }
-
-    /// `round`'s animations have settled: a switch still in that round comes to rest; a
-    /// settle from a round since reversed is stale and changes nothing.
-    pub fn settle(self, round: PaneRound) -> Self {
-        match self {
-            PaneSlide::Moving { to, round: now } if now == round => PaneSlide::Rest(to),
-            other => other,
-        }
-    }
-
     /// What `pane` is doing now.
     pub fn role(self, pane: Pane) -> PaneRole {
         match self {
@@ -127,56 +108,8 @@ impl PaneSlide {
 
 #[cfg(test)]
 mod tests {
-    use super::{Pane, PaneRole, PaneRound, PaneSlide};
+    use super::Pane;
     use crate::motion::anim::Anim;
-
-    #[test]
-    fn a_switch_moves_both_panes_and_settles_on_the_new_one() {
-        let rest = PaneSlide::rest(Pane::Root);
-        assert_eq!(
-            rest.show(Pane::Root, PaneRound(0)),
-            None,
-            "the shown pane is no switch"
-        );
-        let moving = rest.show(Pane::Detail, PaneRound(0)).expect("a switch");
-        assert_eq!(
-            moving,
-            PaneSlide::Moving {
-                to: Pane::Detail,
-                round: PaneRound(1)
-            }
-        );
-        assert_eq!(moving.role(Pane::Detail), PaneRole::Arriving);
-        assert_eq!(moving.role(Pane::Root), PaneRole::Leaving);
-        assert_eq!(
-            moving.show(Pane::Detail, PaneRound(1)),
-            None,
-            "asking again changes nothing"
-        );
-        let settled = moving.settle(PaneRound(1));
-        assert_eq!(settled, PaneSlide::Rest(Pane::Detail));
-        assert_eq!(settled.role(Pane::Root), PaneRole::Absent);
-        assert_eq!(settled.role(Pane::Detail), PaneRole::Shown);
-    }
-
-    #[test]
-    fn a_reversal_is_a_new_round_and_the_old_settle_is_stale() {
-        let moving = PaneSlide::rest(Pane::Root)
-            .show(Pane::Detail, PaneRound(0))
-            .expect("a switch");
-        let back = moving.show(Pane::Root, PaneRound(1)).expect("a reversal");
-        assert_eq!(
-            back,
-            PaneSlide::Moving {
-                to: Pane::Root,
-                round: PaneRound(2)
-            }
-        );
-        assert_eq!(back.role(Pane::Root), PaneRole::Arriving);
-        assert_eq!(back.role(Pane::Detail), PaneRole::Leaving);
-        assert_eq!(back.settle(PaneRound(1)), back, "round 1 was reversed");
-        assert_eq!(back.settle(PaneRound(2)), PaneSlide::Rest(Pane::Root));
-    }
 
     #[test]
     fn each_pane_arrives_and_leaves_its_own_way() {

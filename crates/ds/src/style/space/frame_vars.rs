@@ -32,7 +32,7 @@ pub struct FrameVars {
     pub solid: String,
     /// `--f-grad`: the frame's `linear-gradient`.
     pub gradient: String,
-    /// The gradient's stops, one colour per dot, left to right: what a [`crate::shell::space_editor::dot::SpaceDot`]
+    /// The gradient's stops, one colour per dot, left to right: what a `SpaceDot`
     /// hands its stylesheet as `--dot-c1..3`. Not written on the root.
     pub stops: Vec<String>,
     /// `--f-grain`: the grain tile's opacity, `grain / 100 x .20` light, `x .16` dark.

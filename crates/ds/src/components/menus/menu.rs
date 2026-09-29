@@ -8,14 +8,13 @@
 //! beside it, driven by the menu-tracking machine (design/13-BEHAVIOUR-menus-windows.md section
 //! 13.3.4): `menu_panel` holds what the menu and its submenus share.
 
-pub use crate::components::menus::menu_kind::{MenuEntrance, MenuKind};
-
 use crate::components::controls::press::{button_of, press_of};
 use crate::components::menus::menu_active::{asks, follow_active};
 use crate::components::menus::menu_cursor::Cursor;
 use crate::components::menus::menu_entry::MenuEntry;
 use crate::components::menus::menu_filter::filter_row;
 use crate::components::menus::menu_keys::{Decision, Level};
+use crate::components::menus::menu_kind::{MenuEntrance, MenuKind};
 use crate::components::menus::menu_panel::Panel;
 use crate::components::menus::menu_pick::{Closing, Gesture, PickDismiss, kept_focus, picker};
 use crate::components::menus::menu_return::hand_back;

@@ -3,7 +3,7 @@
 //! them. From the outside in: a 0.5 px dark outer hairline (`--m-hairline`), the tight contact
 //! shadow (`--m-shadow-contact`) and the wide ambient one (`--m-shadow-ambient`), then inside
 //! the 1 px top highlight (`--m-highlight`) over the tint, whose colour carries the vibrancy
-//! boost (`vibrancy.rs`). Each is written as an input on the root ([`crate::assembly::ds::Ds`]'s `stack`) or
+//! boost (`vibrancy.rs`). Each is written as an input on the root (`Ds`'s `stack`) or
 //! on any element around a surface.
 
 use super::layer::fraction;

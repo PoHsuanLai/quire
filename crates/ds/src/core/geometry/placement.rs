@@ -178,15 +178,3 @@ fn clamp_axis(at: Px, extent: Px, lo: Px, hi: Px) -> Px {
     let low = (lo + MARGIN).0;
     Px(at.0.min(high).max(low))
 }
-
-/// What a floating component asks the host for when it must be its own surface: shell-host
-/// maps it to an `xdg_positioner` (anchor rect, gravity, flip and slide constraints).
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct PopoverRequest {
-    /// The anchor, in the parent surface's coordinates.
-    pub anchor: Rect,
-    /// Where the popup wants to be.
-    pub placement: Placement,
-    /// The popup's size.
-    pub size: Size,
-}

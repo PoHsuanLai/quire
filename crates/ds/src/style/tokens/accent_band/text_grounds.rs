@@ -109,12 +109,3 @@ pub fn text_on(material: Material) -> TextOn {
         TextOn::Card
     }
 }
-
-/// The least ratio `text` reaches on the grounds of `kind` among `grounds`.
-pub fn least_on(text: Hex, kind: GroundKind, grounds: &[Ground]) -> f64 {
-    grounds
-        .iter()
-        .filter(|ground| ground.kind == kind)
-        .map(|ground| contrast(text, ground.hex))
-        .fold(f64::INFINITY, f64::min)
-}

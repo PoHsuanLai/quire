@@ -2,6 +2,7 @@
 //! or the favicon the app supplies (design/04-COMPONENTS.md section 28). A local-folders
 //! account, which has no provider, shows a neutral folder instead of a letter.
 
+use crate::components::content::image_source::ImageSource;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconPx, IconSize};
 use dioxus::prelude::*;
@@ -36,8 +37,6 @@ pub enum MarkSize {
     /// 13, inline.
     Inline,
 }
-
-pub use crate::components::content::image_source::ImageSource;
 
 /// Letter or image.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

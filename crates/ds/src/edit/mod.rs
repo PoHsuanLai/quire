@@ -8,20 +8,11 @@
 //! selection rects through the host (`ds_native::edit`). Positions name the app's elements by
 //! their `data-edit-node` value, so the app never sees a renderer's node ids.
 
-pub mod clicks;
-pub mod composition;
-pub mod handle;
-pub mod host;
-pub mod input;
-pub mod keys;
-pub mod pointer;
-pub mod position;
-
-pub use clicks::Clicks;
-pub use handle::{EditHandle, use_edit_handle};
-pub use host::{HostEdit, ImeEvent, ImeListener, ImeSwitch, Probe};
-pub use input::{Composition, EditInput, KeyInput, Pasted, PreeditCursor};
-pub use pointer::{CapturedPointer, EditFocus, EditPointer, Extend, PointerPhase};
-pub use position::{
-    EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextOffset, TextPosition, TextRange,
-};
+pub(crate) mod clicks;
+pub(crate) mod composition;
+pub(crate) mod handle;
+pub(crate) mod host;
+pub(crate) mod input;
+pub(crate) mod keys;
+pub(crate) mod pointer;
+pub(crate) mod position;

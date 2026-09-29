@@ -15,11 +15,10 @@ use crate::components::lists::section_header::{HeaderKind, SectionHeader};
 use crate::style::appearance::theme::{Scheme, Theme};
 use crate::style::space::look::{CardAccent, SpaceLook};
 use dioxus::prelude::*;
-pub use dot::SpaceDot;
 use handles::Field;
 use parts::{Checks, GrainRow, Presets, Stops};
 use rows::{EachScheme, MotionRow, Title};
-pub use rows::{MeasuredIn, MotionChoice, MotionLevels};
+use rows::{MeasuredIn, MotionChoice, MotionLevels};
 
 /// Which of a Space's dots is being edited: 0, 1 or 2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]

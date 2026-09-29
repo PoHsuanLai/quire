@@ -4,6 +4,11 @@
 //! image and plays no Lottie; quire plays them by moving the sheet's `background-position`
 //! from a Rust timer, only inside the 20 s awake window.
 
+use {
+    disc::{EmojiDisc, EmojiPlayback},
+    id::EmojiId,
+};
+
 pub(crate) mod disc;
 pub(crate) mod id;
 pub(crate) mod life;
@@ -11,9 +16,6 @@ pub(crate) mod script;
 pub(crate) mod sheet;
 #[cfg(test)]
 mod tests;
-
-pub use disc::{DiscHue, EmojiDisc, EmojiPlayback};
-pub use id::EmojiId;
 
 use crate::motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::{Mood, PictureSize};

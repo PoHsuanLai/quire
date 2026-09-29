@@ -21,4 +21,3 @@ pub(crate) mod palette;
 pub(crate) mod row_action;
 pub(crate) mod row_chord;
 pub(crate) mod row_shape;
-pub(crate) mod standard_action;
