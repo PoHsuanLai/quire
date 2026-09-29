@@ -48,10 +48,6 @@ pub enum Rule {
     /// `backdrop-filter`, `mix-blend-mode`, `position: sticky`, `text-overflow`, `line-clamp`,
     /// `text-shadow`, `scroll-behavior: smooth` (design/11-BEHAVIOUR-scroll.md#11-3-1-ownership).
     BlitzUnsupported,
-    /// A `filter` function a pinned backend does not paint (`ds-native/tests/css_filter.rs` is
-    /// the table): the offence names the function and the backend. A
-    /// [`super::Severity::Warning`] under Strict.
-    FilterNotPainted,
     /// An attribute selector without the `*|` namespace: `[data-theme=dark]` never matches on
     /// Blitz, `[*|data-theme=dark]` matches there and in browsers (spike S2).
     UnprefixedAttributeSelector,
@@ -100,7 +96,7 @@ pub enum Rule {
 
 impl Rule {
     /// Every rule, in declaration order.
-    pub const ALL: [Rule; 32] = [
+    pub const ALL: [Rule; 31] = [
         Rule::HexColour,
         Rule::ColourFunction,
         Rule::NamedColour,
@@ -120,7 +116,6 @@ impl Rule {
         Rule::UndeclaredVar,
         Rule::Important,
         Rule::BlitzUnsupported,
-        Rule::FilterNotPainted,
         Rule::UnprefixedAttributeSelector,
         Rule::FocusPseudoClass,
         Rule::SvgPaintInCss,

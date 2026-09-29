@@ -29,7 +29,7 @@ pub fn VoiceOrbPage() -> Element {
         Activity::Inactive => Activity::Active,
     };
     rsx! {
-        Section { title: "Variants", note: "The three demo orbs. While active the glows turn once per period (20 s, 15 s for the custom one); at rest they hold where they stand and nothing runs. Reduced motion holds them still. Blitz paints the blur on the GPU renderer only and never the contrast; the dot grid is a plain layer at reduced opacity, where a browser overlay-blends it.",
+        Section { title: "Variants", note: "The three demo orbs. While active the glows turn once per period (20 s, 15 s for the custom one); at rest they hold where they stand and nothing runs. Reduced motion holds them still. Blitz paints the blur and the contrast on both renderers; the dot grid is a plain layer at reduced opacity, where a browser overlay-blends it.",
             div { class: "g-row",
                 Button {
                     variant: ButtonVariant::Mini,

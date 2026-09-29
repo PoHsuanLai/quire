@@ -37,18 +37,6 @@ struct CssCase {
 
 const CSS_CASES: &[CssCase] = &[
     CssCase {
-        name: "a blur, which vello_cpu drops",
-        css: ".orb { filter: blur(4px); }",
-        rule: Rule::FilterNotPainted,
-        expect: Fired::Yes,
-    },
-    CssCase {
-        name: "a filter of none",
-        css: ".orb { filter: none; }",
-        rule: Rule::FilterNotPainted,
-        expect: Fired::No,
-    },
-    CssCase {
         name: "pointer on a control",
         css: ".row { cursor: pointer; }",
         rule: Rule::PointerCursor,
@@ -296,11 +284,6 @@ fn an_exception_covers_a_warning() {
 #[test]
 fn quires_own_sheet_warns_only_where_reviewed() {
     const REVIEWED: &[(Rule, &str, &str)] = &[
-        (
-            Rule::FilterNotPainted,
-            ".ds-voice-orb-glow",
-            "the orb's blur softens its glows on the GPU renderer; vello_cpu and the contrast() step draw them sharp (FINDINGS \"CSS filter\")",
-        ),
         (
             Rule::MinFontSize,
             ".ds-provider[*|data-size=row]",

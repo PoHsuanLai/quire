@@ -23,7 +23,6 @@ pub(crate) mod blitz;
 pub(crate) mod colours;
 pub(crate) mod declaration;
 pub(crate) mod details;
-pub(crate) mod filter;
 pub(crate) mod hairline;
 pub(crate) mod hig;
 pub(crate) mod inline_style;
