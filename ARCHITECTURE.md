@@ -721,7 +721,7 @@ path each, until step 12 replaces them with the prelude.
    family converted to it (the hand-written `var`/`css` fns and hand-kept lint lists go); shell
    metric tokens move to `shell/tokens/`, the stylesheet and `lint::registry` read `Kits`;
    `lint` stops naming `motion`.
-4. **`Presence`, `Timeline`, `Shown`**: one `Presence` and `use_presence`, delete `osd_phase`,
+4. **`Presence`, `Timeline`, `Shown`** (done): one `Presence` and `use_presence`, delete `osd_phase`,
    `shown_phase`, `ListPresence`; one `use_timeline` with the six implementors; `Shown` to core;
    `idle_dim` driver into `shell/`; `shot_frame` split; one battery drawing.
 4a. **Catalogue**: build design/30's merges and additions, foundations first, each sub-step through
