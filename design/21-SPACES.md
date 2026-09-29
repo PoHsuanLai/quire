@@ -1,6 +1,6 @@
 # 21 Spaces on the desktop
 
-> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3.3 replaces where the Space colour goes: in the Mac Look it sits behind the material (backdrop), in the Arc Look it is painted on the chrome as `--f-*` frame tokens; section 1's frame-token model and section 3 apply to the Arc Look. The 380 ms cross-fade is `--t-big` (400 ms). The palette derivation (section 2), presets, storage and the editor stand. Where this file and 30 disagree, 30 wins.
+> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3.3 replaces where the Space colour goes: in the Mac Look it sits behind the material (backdrop), in the Arc Look it is painted on the chrome as `--f-*` frame tokens; the frame-token parts of section 1, 3 and 5 describe the Arc Look. The workspace cross-fade is `--t-big`. The palette derivation (section 2), presets, storage and the editor stand. Where this file and 30 disagree, 30 wins.
 
 
 "A Space colours the frame; the mail stays on paper." (S:816). On the desktop, a Space is a
@@ -14,10 +14,11 @@ S = `~/mailo-design/mailo-spaces.html`; palette.rs = `~/mailo/crates/mail-app/sr
 ## 1. The model (settled)
 
 - Each COSMIC workspace owns one `SpaceLook`.
-- Bar, dock, launcher and control-center chrome use the `--f-*` frame tokens derived from
-  the active workspace's `SpaceLook`, drawn over compositor blur.
-- Apps stay on paper (Post surface tokens: paper, surface, surface-2, raise, ink).
-- Switching workspace cross-fades the tint over 380 ms.
+- Bar, dock, launcher and control-center chrome take their colour from the active workspace's
+  `SpaceLook`: in the Mac Look it sits in the backdrop layer behind each material; in the Arc Look
+  the chrome uses the `--f-*` frame tokens derived from it, drawn over compositor blur.
+- Apps stay on paper (tokens: paper, surface, surface-2, raise, ink).
+- Switching workspace cross-fades the colour over `--t-big`.
 
 ```rust
 pub struct SpaceLook { dots: Vec<Dot>, grain: Grain(u8), theme: Theme, card_accent: CardAccent }
@@ -74,16 +75,19 @@ Port notes (settled finding, fix in quire): palette.rs:177 hard-codes the card s
 
 ## 3. Where the tokens apply
 
+The table is the Arc Look's. In the Mac Look the same surfaces get the Space colour behind their
+material and take their ink from the material (design/30 §3.3).
+
 | Surface | Frame tokens? | Background | Text |
 | --- | --- | --- | --- |
 | Bar | yes | Space gradient at material tint alpha over blur | `--f-ink-soft`, current/hover `--f-ink` |
 | Dock pill | yes | Space gradient at material tint alpha over blur | `--f-ink` labels |
 | Launcher panel chrome (field row, group headers) | yes | Space gradient | `--f-ink*` |
-| Launcher result list | no | `--raise` | Post ink |
+| Launcher result list | no | `--raise` | `--ink` |
 | Control center chrome | yes | Space gradient | `--f-ink*`; controls inside on `--f-pill` |
 | OSD | yes (settled 2026-09-24) | Space gradient at material tint alpha over blur | `--f-ink*` |
-| Notifications, power menu, lock, polkit | no (proposed) | their Material over Post tokens | Post ink |
-| Apps | no (paper) | Post tokens | Post ink |
+| Notifications, power menu, lock, polkit | no (proposed) | their Material over paper tokens | `--ink` |
+| Apps | no (paper) | paper tokens | `--ink` |
 | Mail window frame | yes (opt-in, §9) | Space gradient + grain | `--f-ink*` |
 
 Settled: bar, dock, launcher, control center and OSD (PLAN "UX decisions settled", this doc's
@@ -95,19 +99,15 @@ Material and blur (settled mechanism, proposed alpha): `Material::{Bar,Dock,Popo
 `--m-tint-solid` (alpha ≥ .94, settled) when blur is unavailable. The contrast tests in §7
 run against both.
 
-Settled implementation (bar gaps, sill Q9): a `Ds` root in Bar, Dock, Osd or Widget, or a
-Popover root that is itself a panel (`chrome: Painted`, the launcher), stamps
-`data-frame="tinted"` and draws §5's two layers and the grain as one `.ds-frame` group at
-the material's own tint alpha from 03-COLOR §17.2 scaled by `appearance.material_tint_alpha`
-(`--m-frame-alpha`: the bar .70 light, .68 dark at the default) with blur, and at .94 without.
-This row used to read "no (proposed)" for OSD; the implementation tinted it as the bar-gaps
-brief asked (coherence across chrome wins), and that is now the settled call — confirmed in the
-goldens (`crates/ds/tests/snapshots/root/chrome/osd.html`) and the Materials gallery sheet,
-where every tinted material including the OSD specimen shows the gradient. Over a pure black or
-white backdrop, at wave 1's alphas, six material/scheme pairs fell short of 4.5; settled
-(2026-09-24), the smallest further .02 raises close all six (03-COLOR §17.2 lists them;
-`crates/ds/tests/legibility.rs`'s `the_tinted_chrome_holds_its_ink_over_blur` now holds for
-every pair, with and without blur).
+Settled implementation: a `Ds` root in Bar, Dock, Osd or Widget, or a Popover root that is itself
+a panel (`chrome: Painted`, the launcher), stamps `data-frame="tinted"` and draws §5's two layers
+and the grain as one `.ds-frame` group at the material's own tint alpha from 03-COLOR §17.2
+scaled by `appearance.material_tint_alpha` (`--m-frame-alpha`: the bar .70 light, .68 dark at the
+default) with blur, and at .94 without. The OSD is tinted like the bar (coherence across chrome
+wins), as the goldens (`crates/ds/tests/snapshots/root/chrome/osd.html`) and the Materials gallery
+sheet show. Over a pure black or white backdrop six material/scheme pairs need a further .02 tint
+alpha to reach 4.5 (03-COLOR §17.2 lists them; `crates/ds/tests/legibility.rs`'s
+`the_tinted_chrome_holds_its_ink_over_blur` holds for every pair, with and without blur).
 
 ## 4. Presets and defaults per workspace index
 
@@ -146,15 +146,15 @@ The layer A/B model from S (Appendix A6 "Space switch"; S:1180-1187):
    (settled, mailo gaps 2026-09-24; before, they painted beneath it and the switch was an
    instant swap). Neither layer takes the pointer.
 2. On switch, the hidden layer gets the new gradient and opacity 1; the front goes to
-   opacity 0; the roles swap. Transition `opacity --t-scene (380 ms) --e-out`.
-3. Grain opacity transitions over the same 380 ms (proposed).
+   opacity 0; the roles swap. Transition `opacity` over `--t-big`.
+3. Grain opacity transitions over the same `--t-big` (proposed).
 4. Text colours (`--f-ink*`) change as values on `.ds`: if spike S4 (transition on
-   var-driven values) passes, `color` transitions over `--t-scene`; if not, they swap at
-   190 ms, the cross-fade's midpoint (proposed).
-5. No-op when the target is the current workspace. Counts do not bump.
+   var-driven values) passes, `color` transitions over `--t-big`; if not, they swap at
+   the cross-fade's midpoint (200 ms, proposed).
+5. No-op when the target is the current workspace.
 6. Per output: each output's bar follows that output's active workspace. The dock and
    launcher follow the workspace of the output they are on (proposed).
-7. Reduced motion: the cross-fade uses the Reduced level (60 ms).
+7. Reduced motion keeps the cross-fade (design/30 §1.1: cross-fades stay under Reduced).
 
 Trigger: cctk `WorkspaceState` activation events on the `cosmic_wl` thread → `use_workspaces`
 → each surface's `Ds { look }` (PLAN "Design: `<shell>`" hooks).
@@ -173,11 +173,11 @@ Pieces (settled, Appendix A4 "Space editor", from 04-COMPONENTS):
 | panel | pad 14, gap 14, r-panel, surface, shadow-1 |
 | title | h3 15 + 14 px gradient swatch |
 | field | h 176, r 12, crosshair; canvas 540 x 352, bg `#f3f4f1` / `#1b1d1a`, dot step 18, r 5.2, colour `oklch(dark .66 : .74, (1 - y/H)·.15, x/W·360)` |
-| handle | 22 circle, border 3 white, shadow `0 0 0 1px rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.35)`, `role=slider`, `.on` scale 1.15; keys left/right hue 5deg, up/down chroma .05 |
+| handle | 22 circle, border 3 white, shadow `0 0 0 1px rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.35)`, `role=slider`, keys left/right hue 5deg, up/down chroma .05 |
 | stops | pill chips pad `3 5 3 4`, 14 disc + degrees + x 11; up to 3 dots |
-| grain | range slider 0-100 (`Slider`) |
-| segments | Appearance (System/Light/Dark), Accent (Space hue vs Postmark) |
-| presets | 8 cols gap 6, round, border line, hover scale 1.1 |
+| grain | `Slider` 0-100 |
+| segments | `SegmentedControl`s: Appearance (System/Light/Dark), Accent (Space hue vs Postmark) |
+| presets | 8 cols gap 6, round, border line |
 | checks | pills ok/bad at 16 % wash: the four guarantees of §7 |
 | capnote | 11.5 px, shown when `capped` |
 
