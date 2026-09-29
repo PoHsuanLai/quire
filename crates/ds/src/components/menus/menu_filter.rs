@@ -19,7 +19,7 @@ pub enum MenuFilter {
     /// (`div.ds-menu-filter`), `placeholder` while nothing is typed. The row is not a choice:
     /// the cursor stays on the rows below it.
     Field {
-        /// What the empty row says: "MenuFilter labels…".
+        /// What the empty row says: "Filter labels…".
         placeholder: String,
     },
     /// The entries are fixed.

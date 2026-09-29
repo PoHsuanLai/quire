@@ -116,7 +116,7 @@ pub(crate) fn modifier(key: ShortcutKey) -> Modifiers {
 
 /// The physical key a US layout types `c` with, where it is a letter or a digit.
 fn letter(c: char) -> Code {
-    format!("ShortcutKey{}", c.to_ascii_uppercase())
+    format!("Key{}", c.to_ascii_uppercase())
         .parse()
         .or_else(|_| format!("Digit{c}").parse())
         .unwrap_or(Code::Unidentified)

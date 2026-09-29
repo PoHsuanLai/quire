@@ -12,7 +12,7 @@ pub struct ItemPath(pub Vec<u16>);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MenuHold {
     /// Down: a release picks, or closes (press-drag-release).
-    MenuHold,
+    Held,
     /// Released on the title: click mode, the menu stays open.
     Released,
 }

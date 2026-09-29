@@ -54,7 +54,7 @@ fn closed<K: Clone>(event: MenuTrackEvent<K>) -> (MenuPhase<K>, Effects<K>) {
     match event {
         MenuTrackEvent::PressTitle(menu) => {
             let effects = vec![MenuTrackEffect::Open(menu.clone(), MenuAnim::Pop)];
-            (opened(menu, MenuHold::MenuHold), effects)
+            (opened(menu, MenuHold::Held), effects)
         }
         _ => (MenuPhase::Closed, Vec::new()),
     }
@@ -95,7 +95,7 @@ fn tracking<K: Clone + PartialEq>(
         MenuTrackEvent::PressTitle(other) if other == session.menu => close(Vec::new()),
         MenuTrackEvent::PressTitle(other) => {
             let effects = vec![MenuTrackEffect::Switch(other.clone())];
-            (opened(other, MenuHold::MenuHold), effects)
+            (opened(other, MenuHold::Held), effects)
         }
         MenuTrackEvent::OutsidePress => close(Vec::new()),
         MenuTrackEvent::Release(target) => released(session, target),
@@ -173,7 +173,7 @@ fn released<K: PartialEq>(
             pick: Pickable::Enabled,
             ..
         } => close(vec![MenuTrackEffect::Pick(path)]),
-        MenuTarget::Title(title) if title == session.menu && session.held == MenuHold::MenuHold => {
+        MenuTarget::Title(title) if title == session.menu && session.held == MenuHold::Held => {
             keep(
                 Session {
                     held: MenuHold::Released,
@@ -182,7 +182,7 @@ fn released<K: PartialEq>(
                 Vec::new(),
             )
         }
-        _ if session.held == MenuHold::MenuHold => close(Vec::new()),
+        _ if session.held == MenuHold::Held => close(Vec::new()),
         _ => keep(session, Vec::new()),
     }
 }
