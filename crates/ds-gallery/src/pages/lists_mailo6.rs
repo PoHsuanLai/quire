@@ -4,8 +4,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    DataAttr, DataName, DropState, Icon, IconButton, IconButtonVariant, PlaceId, Propagation,
-    RowState, Selection, Shown, TreeItem, TreeShape,
+    Common, DataAttr, DataName, DropState, Icon, IconButton, IconButtonVariant, PlaceId,
+    Propagation, RowState, Selection, Shown, TreeItem, TreeShape,
 };
 
 /// `data-folder="<path>"`.
@@ -34,8 +34,7 @@ pub fn FolderTree() -> Element {
     let mut archive = use_signal(|| Shown::Hidden);
     let more = move |path: &'static str| {
         rsx! {
-            IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for {path}",
-                data: folder(path), propagation: Propagation::Stop,
+            IconButton { common: Common { data: folder(path), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for {path}", propagation: Propagation::Stop,
                 onclick: move |_| said.set(format!("the menu for {path}")) }
         }
     };

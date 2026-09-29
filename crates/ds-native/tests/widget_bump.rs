@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, BatteryLevel, Bumped, Button, ButtonVariant, Ds, Fraction, Material,
+    Anim, Appearance, BatteryLevel, Bumped, Button, ButtonVariant, Common, Ds, Fraction, Material,
     MotionLevel, RootChrome, StaggerIndex, WidgetFrame, WidgetMetrics, WidgetSize, settle,
 };
 use ds_native::harness::settle_until;
@@ -26,7 +26,7 @@ fn Battery() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: WidgetMetrics::default().style_attr(),
-                Button { id: "drain", variant: ButtonVariant::Mini, label: "Drain",
+                Button { common: Common { id: Some("drain".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Drain",
                     onclick: move |_| level.set(Fraction(level().0.saturating_sub(100))) }
                 WidgetFrame { size: WidgetSize::Small,
                     BatteryLevel { level: level(), label: "This computer" }

@@ -33,6 +33,7 @@ use crate::core::vocab::Shown;
 use crate::focus::host::focus_soon;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spring::use_spring_presence;
+use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -251,16 +252,16 @@ fn slot(slot: Slot<'_>) -> Element {
                 }
             },
             Button {
-                variant,
-                size,
-                label: label.to_owned(),
-                onclick: move |_| press.call(button),
-                mounted: move |event: MountedEvent| {
+                common: Common { mounted: Some(EventHandler::new(move |event: MountedEvent| {
                     buttons.write().keep(button, event.data());
                     if starts {
                         focus_soon(event.data());
                     }
-                },
+                })), ..Common::default() },
+                variant,
+                size,
+                label: label.to_owned(),
+                onclick: move |_| press.call(button),
             }
         }
     }

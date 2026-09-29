@@ -8,7 +8,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, Button, ButtonVariant, Ds, ExternalIcon, IconButton,
+    Anchor, Appearance, Availability, Button, ButtonVariant, Common, Ds, ExternalIcon, IconButton,
     IconButtonVariant, IconSize, IconSource, IconUrl, IconView, Material, Menu, MenuEntry,
     MenuKind, MenuTrail, Point, PointerButton, Press, Px, ShortcutKey, Theme,
 };
@@ -163,13 +163,13 @@ fn PressApp() -> Element {
         Root {
             div { style: "display:flex; gap:12px; padding:20px",
                 IconButton {
+                    common: Common { id: Some("tray-0".to_string()), ..Common::default() },
                     variant: IconButtonVariant::Tool,
                     icon: ds::Icon::Star,
                     label: "Tray item",
-                    id: "tray-0",
                     onclick: record,
                 }
-                Button { variant: ButtonVariant::Mini, label: "Mini", id: "mini", onclick: record }
+                Button { common: Common { id: Some("mini".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Mini", onclick: record }
             }
             p { class: "seen", "{seen}" }
         }

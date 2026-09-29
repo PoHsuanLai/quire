@@ -13,10 +13,10 @@ use ds::Word;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape,
     AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour, CommandPill,
-    Count, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource, Kbd,
-    KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, ProviderMark, SectionHeader,
-    SegSize, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, Spinner, SpinnerKind,
-    SyncHalo, SyncState, Tabs, Toggle, Verdict, use_pulse,
+    Common, Count, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource,
+    Kbd, KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, ProviderMark,
+    SectionHeader, SegSize, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, Spinner,
+    SpinnerKind, SyncHalo, SyncState, Tabs, Toggle, Verdict, use_pulse,
 };
 
 const BUTTONS: [(ButtonVariant, &str); 5] = [
@@ -101,7 +101,7 @@ fn Buttons() -> Element {
             }
             div { class: "g-row",
                 span { class: "g-name g-type-name", "Named" }
-                Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", onclick: |_| {} }
+                Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "+", title: "Add account…", onclick: |_| {} }
                 Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Shown::Visible, onclick: |_| {} }
                 Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Shown::Hidden, onclick: |_| {} }
             }

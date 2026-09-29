@@ -94,7 +94,6 @@ pub use crate::components::{
         icon_button::{IconButton, IconButtonVariant},
         kbd::{Kbd, KbdSize},
         level::control::LevelControl,
-        pass_through::{DataAttr, DataName, ExtraClass, PassThroughError},
         press::Propagation,
         segmented::{SegSize, SegmentedControl},
         slider::Slider,
@@ -235,7 +234,9 @@ pub use crate::motion::{
 };
 pub use crate::root::{
     chrome::{FrameTint, Ground, RootChrome},
+    common::Common,
     extent::RootExtent,
+    pass_through::{DataAttr, DataName, ExtraClass, PassThroughError},
     surface::Surface,
     typeface::use_typeface,
 };

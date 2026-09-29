@@ -3,12 +3,12 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::button_size::disabled;
-use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Check, Shown};
 use crate::core::word::Word;
 use crate::motion::detail::{cue::Cue, first_show::FirstShow, once::use_nudge};
+use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
@@ -48,18 +48,15 @@ impl IconButtonVariant {
 /// An icon-only action. `icon` is a glyph or an external icon (an `Icon` converts). `id` is
 /// written as the element's `id`, so a popup can anchor to it by id. `onclick` hears the
 /// primary, secondary (right-click) and middle buttons, and the keyboard as primary.
-/// `mounted` hands over the element once it is in the document, so a floating component can
-/// anchor to it (`Anchor::Mounted`). `propagation: Propagation::Stop` keeps the press at the
+/// `common.mounted` hands over the element once it is in the document, so a floating component
+/// can anchor to it (`Anchor::Mounted`). `propagation: Propagation::Stop` keeps the press at the
 /// button, so a glyph inside a `<summary>` does not toggle its `<details>`.
 /// `availability: Availability::Disabled` writes `aria-disabled` and `disabled` and draws the
 /// button at .35 with no hover and no press; `onclick` never runs.
 ///
-/// `data` and `extra_class` put the consumer's own `data-*` attributes and
-/// classes on the button itself, as on a `Button`, so it needs no wrapping `span`: `data-folder` for a drag that
-/// reads the place off the element under the pointer, a class for the consumer's own reveal or
-/// layout rule. Both are checked when built ([`DataName::parse`], [`ExtraClass::parse`]): a
-/// `ds-` name or class, or a `data-*` name quire writes itself, is refused, so nothing added
-/// here can restyle the button through quire's rules.
+/// `common` puts the consumer's own `id`, `data-*` attributes and classes on the button itself,
+/// as on a `Button`, so it needs no wrapping `span` (see [`Common`]); its `aria_label` replaces
+/// `label` as the accessible name.
 ///
 /// A status item's glyph can be a layered status glyph: `icon: IconSource::Status(state)` (a
 /// `StatusState` converts) draws `StatusGlyph` in the same box, ink, pill and label as an `Icon`,
@@ -70,9 +67,6 @@ impl IconButtonVariant {
 /// `Moment::Attention`, such as a low battery crossing into its threshold, design/26): each
 /// new Attention cue lifts the glyph once (`nudge-up`, `use_nudge`), never the pill, and nothing
 /// under Reduced. Pass it for the button's whole life (`None` to `Some` remounts the glyph).
-///
-/// [`DataName::parse`]: crate::DataName::parse
-/// [`ExtraClass::parse`]: crate::ExtraClass::parse
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,
@@ -83,17 +77,14 @@ pub fn IconButton(
     #[props(default)] expanded: Option<Shown>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<Press>,
-    #[props(default)] id: Option<String>,
-    #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
     #[props(default)] propagation: Propagation,
-    #[props(default)] data: Vec<DataAttr>,
-    #[props(default)] extra_class: Option<ExtraClass>,
+    #[props(default)] common: Common,
     #[props(default)] first: FirstShow,
     #[props(default)] nudge: Option<Cue>,
 ) -> Element {
-    let class = class_list("ds-icon-button", extra_class.as_ref());
+    let class = common.class("ds-icon-button");
     let glyph = glyph_slot(icon, variant.icon_size(), first, nudge);
-    let data = attributes(&data);
+    let data = common.data_attributes();
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(|state| state.aria());
     let listen = PressListeners::new(onclick).with_propagation(propagation);
@@ -101,10 +92,10 @@ pub fn IconButton(
     rsx! {
         button {
             r#type: "button",
-            id,
+            id: common.id.clone(),
             class,
             "data-variant": variant.slug(),
-            "aria-label": "{label}",
+            "aria-label": common.aria_label.clone().unwrap_or(label.clone()),
             title: tooltip,
             "aria-pressed": pressed,
             "aria-expanded": expanded,
@@ -128,11 +119,7 @@ pub fn IconButton(
             },
             // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
             // attribute: the markup is the same with or without a handler.
-            onmounted: move |event| {
-                if let Some(mounted) = mounted {
-                    mounted.call(event);
-                }
-            },
+            onmounted: move |event| common.mounted(event),
             // The consumer's own `data-*`, last: a spread follows the named
             // attributes.
             ..data,

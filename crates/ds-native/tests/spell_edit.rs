@@ -9,8 +9,8 @@ mod spell_dict;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, EditInput, EditSurface, KeyInput, Lang, Material, Point, PointerButton, Px,
-    RootExtent, ShortcutKey, Spell, SpellReplace, TextPosition,
+    Appearance, Common, Ds, EditInput, EditSurface, KeyInput, Lang, Material, Point, PointerButton,
+    Px, RootExtent, ShortcutKey, Spell, SpellReplace, TextPosition,
 };
 use ds_native::harness::settle_until;
 use ds_native::spell::{SpellConfig, provide_with};
@@ -99,7 +99,7 @@ fn Editor() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet, extent: RootExtent::Viewport,
             div { style: "padding:20px; width:360px; font-size:16px; line-height:20px",
                 EditSurface {
-                    id: "editor",
+                    common: Common { id: Some("editor".to_string()), ..Common::default() },
                     spell: Spell::On { lang: None },
                     caret: Some(TextPosition::new("p0", caret)),
                     on_input: move |input| model.write().input(input),

@@ -11,11 +11,11 @@ use crate::components::controls::button_face::{
     trailing as trailing_mark,
 };
 use crate::components::controls::button_size::{ButtonSize, disabled};
-use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Check, Shown};
 use crate::core::word::Word;
+use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
@@ -62,7 +62,7 @@ impl ButtonVariant {
 /// or a glyph. `leading` puts one before it: `Leading::Mark` holds an element
 /// such as a `ProviderMark`, for a From dropdown whose value shows the account's provider;
 /// `Leading::Glyph` a glyph (for a lone glyph, `icon` is the same thing). `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
-/// and then names the button by `label` through `aria-label`, unless `aria_label` says
+/// and then names the button by `label` through `aria-label`, unless `common.aria_label` says
 /// otherwise.
 ///
 /// `label` is a [`Text`]: a `String` or `&str` as before, or runs in their tones (a quoted
@@ -73,15 +73,11 @@ impl ButtonVariant {
 /// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
 /// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
 ///
-/// `data` and `extra_class` put the consumer's own `data-*` attributes and
-/// classes on the button itself, so it needs no wrapping `span`: `data-folder` for a drag that
-/// reads the place off the element under the pointer, a class for the consumer's own reveal or
-/// layout rule. Both are checked when built ([`DataName::parse`], [`ExtraClass::parse`]): a
-/// `ds-` name or class, or a `data-*` name quire writes itself, is refused, so nothing added
-/// here can restyle the button through quire's rules.
-///
-/// [`DataName::parse`]: crate::DataName::parse
-/// [`ExtraClass::parse`]: crate::ExtraClass::parse
+/// `common` puts the consumer's own `id`, `data-*` attributes and classes on the button itself,
+/// so it needs no wrapping `span`: `data-folder` for a drag that reads the place off the element
+/// under the pointer, a class for the consumer's own reveal or layout rule (see [`Common`]); its
+/// `aria_label` names the button where `label` does not, and `mounted` hands over the element for
+/// a menu or popover anchored to it.
 ///
 /// `size` draws the variant at another size: `Some(ButtonSize::Regular)` gives a
 /// Danger the Primary's geometry, so Restart sits level with Shut Down and Cancel beside it.
@@ -99,21 +95,20 @@ pub fn Button(
     #[props(default)] pressed: Option<Check>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<Press>,
-    #[props(default)] id: Option<String>,
-    #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
     #[props(default)] title: Option<String>,
-    #[props(default)] aria_label: Option<String>,
     #[props(default)] expanded: Option<Shown>,
     #[props(default)] trailing: Option<Trailing>,
     #[props(default)] leading: Option<Leading>,
     #[props(default)] face: ButtonFace,
     #[props(default)] propagation: Propagation,
-    #[props(default)] data: Vec<DataAttr>,
-    #[props(default)] extra_class: Option<ExtraClass>,
+    #[props(default)] common: Common,
 ) -> Element {
-    let class = class_list("ds-button", extra_class.as_ref());
-    let data = attributes(&data);
-    let aria_label = aria_label.or_else(|| spoken_label(face, &label));
+    let class = common.class("ds-button");
+    let data = common.data_attributes();
+    let aria_label = common
+        .aria_label
+        .clone()
+        .or_else(|| spoken_label(face, &label));
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(Shown::aria);
     let listen = PressListeners::new(onclick).with_propagation(propagation);
@@ -121,7 +116,7 @@ pub fn Button(
     rsx! {
         button {
             r#type: "button",
-            id,
+            id: common.id.clone(),
             class,
             "data-variant": variant.slug(),
             title,
@@ -149,11 +144,7 @@ pub fn Button(
             },
             // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
             // attribute: the markup is the same with or without a handler.
-            onmounted: move |event| {
-                if let Some(mounted) = mounted {
-                    mounted.call(event);
-                }
-            },
+            onmounted: move |event| common.mounted(event),
             // The consumer's own `data-*`, last: a spread follows the named
             // attributes.
             ..data,

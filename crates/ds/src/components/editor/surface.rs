@@ -5,7 +5,6 @@
 //! [`TextPosition`](crate::TextPosition)s through the host, and never draws a caret or a
 //! selection: the app does, from its [`EditHandle`]'s rects.
 
-use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::editor::ctx::SurfaceCtx;
 use crate::components::editor::focus::{
     blur_surface, focus_surface, focused_in, focused_out, listen_soon,
@@ -24,6 +23,7 @@ use crate::edit::host::{HostEdit, ImeEvent};
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{CapturedPointer, EditFocus, EditPointer};
 use crate::edit::position::TextPosition;
+use crate::root::common::Common;
 use crate::spell::lang::Spell;
 use crate::spell::marks::SpellReplace;
 use dioxus::prelude::*;
@@ -39,8 +39,9 @@ use std::rc::Rc;
 /// - `handle`: the app's handle for caret and selection rects and focus (`use_edit_handle`).
 /// - `ime_area`: where the IME's candidate window should sit (the caret's rect); applied while
 ///   the surface has the keyboard, and again each time it takes it.
-/// - `extra_class`, `data`: the app's own class and `data-*` on the surface's element, so the
-///   surface can be the app's styled body itself (`ExtraClass` and `DataAttr` refuse `ds-`).
+/// - `common`: the app's own `id`, class, `data-*` and accessible name on the surface's element,
+///   so the surface can be the app's styled body itself (`ExtraClass` and `DataAttr` refuse
+///   `ds-`); its `mounted` hears the element once it is in the document.
 /// - `spell`: [`Spell::On`] checks the spelling through the host's `HostSpell` and marks each
 ///   misspelt word with a dotted underline; `Off` (the default) changes nothing. `caret` is the
 ///   app's caret, so the word being typed stays unmarked until the caret leaves it and the
@@ -53,10 +54,7 @@ pub fn EditSurface(
     #[props(default)] on_focus: Option<EventHandler<EditFocus>>,
     #[props(default)] handle: Option<EditHandle>,
     #[props(default)] ime_area: Option<Rect>,
-    #[props(into, default)] label: Option<String>,
-    #[props(into, default)] id: Option<String>,
-    #[props(default)] extra_class: Option<ExtraClass>,
-    #[props(default)] data: Vec<DataAttr>,
+    #[props(default)] common: Common,
     #[props(default)] spell: Spell,
     #[props(default)] caret: Option<TextPosition>,
     #[props(default)] on_replace: Option<EventHandler<SpellReplace>>,
@@ -139,7 +137,9 @@ pub fn EditSurface(
     let mounted = {
         let ctx = ctx.clone();
         let checker = checker.clone();
+        let announce = common.clone();
         move |event: MountedEvent| {
+            announce.mounted(event.clone());
             let element = event.data();
             ctx.state.element.replace(Some(Rc::clone(&element)));
             checker.state.surface.replace(Some(Rc::clone(&element)));
@@ -158,8 +158,10 @@ pub fn EditSurface(
         on_replace,
         refocus: hooks.focus,
     });
-    let class = class_list("ds-edit", extra_class.as_ref());
-    let data = attributes(&data);
+    let class = common.class("ds-edit");
+    let data = common.data_attributes();
+    let label = common.aria_label.clone();
+    let id = common.id.clone();
     rsx! {
         div {
             class,

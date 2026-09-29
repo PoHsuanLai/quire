@@ -2,8 +2,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle,
-    PlaceId, Presence, ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun, Trailing,
+    Anim, Button, ButtonVariant, Common, Icon, ItemKind, Leading, MarkProvider, MarkSize,
+    MarkStyle, PlaceId, Presence, ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun,
+    Trailing,
 };
 use ds::{DropState, PulseKey, Selection};
 
@@ -65,6 +66,6 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/label-runs-named.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: quoted_head(), aria_label: "Show the quoted message", onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Show the quoted message".to_string()), ..Common::default() }, variant: ButtonVariant::Quiet, label: quoted_head(), onclick: |_| {} } },
     },
 ];

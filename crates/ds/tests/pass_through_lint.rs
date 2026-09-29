@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, Rule, markup, stylesheet};
-use ds::{Button, ButtonVariant, DataAttr, DataName, ExtraClass, PassThroughError};
+use ds::{Button, ButtonVariant, Common, DataAttr, DataName, ExtraClass, PassThroughError};
 
 /// The consumer's own rule for its class: a reveal on the row's hover.
 const CONSUMER_CSS: &str = ".row-reveal { opacity: 0; transition: opacity var(--t-quick) var(--e-out); }\n.row:hover .row-reveal { opacity: 1; }";
@@ -17,7 +17,7 @@ fn Page() -> Element {
         .map(|name| vec![DataAttr::new(name, "INBOX")])
         .unwrap_or_default();
     rsx! {
-        Button { variant: ButtonVariant::Mini, label: "Reply", extra_class: class, data, onclick: |_| {} }
+        Button { common: Common { extra_class: class, data: data, ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
     }
 }
 

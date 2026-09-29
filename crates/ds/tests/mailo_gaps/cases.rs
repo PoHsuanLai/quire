@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Fraction, Hex,
+    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Common, Fraction, Hex,
     ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase,
     SendPill, SendRing, Shown, TextInput, TextInputKind,
 };
@@ -92,7 +92,7 @@ pub const CASES: &[Case] = &[
     // Button: a hint, a name for assistive technology, and the open state of what it opens.
     Case {
         golden: "controls/button/mini-titled-open.html",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", expanded: Shown::Visible, onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "+", title: "Add account…", expanded: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/quiet-closed.html",

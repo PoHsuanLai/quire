@@ -3,8 +3,8 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkProvider,
-    MarkSize, MarkStyle, ProviderMark, Trailing,
+    AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Common, Hex, Icon,
+    MarkProvider, MarkSize, MarkStyle, ProviderMark, Trailing,
 };
 use ds::{DotIndex, Motion, MotionChoice, Scheme, SpaceEditor, SpaceLook};
 use ds::{Grow, InputVariant, Rows, TextInput, TextInputKind};
@@ -71,7 +71,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/face-strike-named.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Strike", face: ButtonFace::Strike, aria_label: "Strikethrough", onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Strikethrough".to_string()), ..Common::default() }, variant: ButtonVariant::Quiet, label: "Strike", face: ButtonFace::Strike, onclick: |_| {} } },
     },
     Case {
         golden: "controls/text_input/secret-value-unwritten.html",

@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, Button, ButtonVariant, Check, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, MountedRef, Rect,
+    Anchor, Appearance, Availability, Button, ButtonVariant, Check, Common, Ds, Material, Menu,
+    MenuEntry, MenuKind, MenuTrail, MountedRef, Rect,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -50,10 +50,10 @@ fn Anchored() -> Element {
         .collect::<Vec<_>>();
     rsx! {
         Button {
+            common: Common { mounted: Some(EventHandler::new(move |event: MountedEvent| element.set(Some(MountedRef(event.data()))))), ..Common::default() },
             variant: ButtonVariant::Secondary,
             label: "Snooze",
             onclick: move |_| open.set(Check::On),
-            mounted: move |event: MountedEvent| element.set(Some(MountedRef(event.data()))),
         }
         // Something after the button: with only the `if` placeholder after it, the harness's
         // click never reached the button (FINDINGS "Polish pass").

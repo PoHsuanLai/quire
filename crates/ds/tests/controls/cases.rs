@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use ds::detail::{Deadline, Operation, PendingToken};
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize,
-    ButtonVariant, Chip, ChipVariant, Colour, Count, CountPlace, ExternalIcon, FieldFocus,
+    ButtonVariant, Chip, ChipVariant, Colour, Common, Count, CountPlace, ExternalIcon, FieldFocus,
     HeaderKind, Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl,
     IconView, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
     SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
@@ -154,7 +154,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "icon_button",
         state: "status",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Status, icon: Icon::Ethernet, label: "Wired network", id: "net".to_string(), onclick: |_| {} } },
+        make: || rsx! { IconButton { common: Common { id: Some("net".to_string()), ..Common::default() }, variant: IconButtonVariant::Status, icon: Icon::Ethernet, label: "Wired network", onclick: |_| {} } },
     },
     Case {
         component: "icon_button",
@@ -180,12 +180,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "icon_button",
         state: "with-id",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Star, label: "Tray item", id: "tray-0", onclick: |_| {} } },
+        make: || rsx! { IconButton { common: Common { id: Some("tray-0".to_string()), ..Common::default() }, variant: IconButtonVariant::Tool, icon: Icon::Star, label: "Tray item", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "with-id-symbolic",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Updates", icon: symbolic(), id: "updates", onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { id: Some("updates".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Updates", icon: symbolic(), onclick: |_| {} } },
     },
     // IconView: a glyph, a symbolic icon, an image.
     Case {

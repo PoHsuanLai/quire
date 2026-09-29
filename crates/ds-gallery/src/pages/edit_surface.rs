@@ -8,8 +8,8 @@ use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Chip, ChipVariant, EditHandle, EditInput, EditKind, EditPointer, EditSurface, FRAME_SLACK,
-    PointerPhase, Probe, Rect, Spell, TextPosition, sleep, use_edit_handle,
+    Chip, ChipVariant, Common, EditHandle, EditInput, EditKind, EditPointer, EditSurface,
+    FRAME_SLACK, PointerPhase, Probe, Rect, Spell, TextPosition, sleep, use_edit_handle,
 };
 
 /// How many frames the caret waits for a layout before giving up.
@@ -36,8 +36,8 @@ pub fn EditPage() -> Element {
             Specimen { name: "caret {at.node.0}:{at.offset.0}, last input {last}",
                 div { class: "g-edit",
                     EditSurface {
+                        common: Common { aria_label: Some("Message".to_string()), ..Common::default() },
                         handle,
-                        label: "Message",
                         spell: Spell::On { lang: None },
                         caret: Some(caret()),
                         on_input: move |input: EditInput| last.set(format!("{input:?}")),
