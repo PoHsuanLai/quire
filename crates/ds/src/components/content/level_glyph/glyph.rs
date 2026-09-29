@@ -10,6 +10,7 @@
 
 use super::vocab::{LevelGlyph, Muting};
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::IconSize;
 use crate::style::icon::shape::Shape;
@@ -50,11 +51,14 @@ const KEYBOARD_RAYS: &[Shape] = &[
 ];
 
 /// One layer of a level glyph.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Part {
     Body,
+    #[word(slug = "wave-1")]
     Wave1,
+    #[word(slug = "wave-2")]
     Wave2,
+    #[word(slug = "wave-3")]
     Wave3,
     Slash,
     Core,
@@ -65,21 +69,6 @@ pub(crate) enum Part {
 }
 
 impl Part {
-    fn slug(self) -> &'static str {
-        match self {
-            Part::Body => "body",
-            Part::Wave1 => "wave-1",
-            Part::Wave2 => "wave-2",
-            Part::Wave3 => "wave-3",
-            Part::Slash => "slash",
-            Part::Core => "core",
-            Part::Rays => "rays",
-            Part::KeyBody => "key-body",
-            Part::KeyCore => "key-core",
-            Part::KeyRays => "key-rays",
-        }
-    }
-
     fn shapes(self) -> &'static [Shape] {
         let sun = Icon::Sun.shapes();
         match self {
@@ -98,19 +87,10 @@ impl Part {
 }
 
 /// Whether a part is showing: `data-on`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Showing {
     On,
     Off,
-}
-
-impl Showing {
-    fn slug(self) -> &'static str {
-        match self {
-            Showing::On => "on",
-            Showing::Off => "off",
-        }
-    }
 }
 
 /// The parts `glyph` draws, in paint order.

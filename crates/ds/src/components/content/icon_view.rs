@@ -14,20 +14,15 @@ use dioxus::prelude::*;
 
 /// Which way an external icon is painted: the `data-kind` word and the property its URL is
 /// written into.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 enum Paint {
+    #[word(slug = "symbolic")]
     Mask,
+    #[word(slug = "image")]
     Picture,
 }
 
 impl Paint {
-    fn slug(self) -> &'static str {
-        match self {
-            Paint::Mask => "symbolic",
-            Paint::Picture => "image",
-        }
-    }
-
     fn property(self) -> &'static str {
         match self {
             Paint::Mask => "mask-image",

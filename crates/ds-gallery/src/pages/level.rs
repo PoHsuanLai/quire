@@ -6,6 +6,7 @@
 use super::level_tile::{Ground, LevelTile, STATES, theme, work};
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, BlurState, Button, ButtonVariant, Ds, Fraction, Inject, LevelControl, LevelGlyph,
     LevelLook, Material, Muting, Osd, OsdLevel, OsdMetrics, OsdPosition, RootChrome, Scheme, Shown,
@@ -47,7 +48,7 @@ fn LiveSection() -> Element {
     rsx! {
         Section { title: "Live", note: "Drag, or focus and use the arrows (Shift for fine steps). Under the pointer the fill follows with no easing; a press swells the track; past either end the capsule stretches and springs back on release. The buttons set the level from outside, which slides over --t-quick --e-out. Each control ticks as it crosses a sixteenth.",
             div { class: "g-row g-row-top",
-                for look in LevelLook::ALL {
+                for look in LevelLook::ALL.iter().copied() {
                     Specimen { name: look.slug().to_owned(), code: describe(look).to_owned(),
                         OsdCard { scheme, title: "Sound",
                             div { class: "g-level-live",
@@ -101,7 +102,7 @@ fn LooksSection() -> Element {
     let scheme = use_scope().scheme;
     rsx! {
         Section { title: "Looks", note: "Each look at volume 0, 40 and 100 %, muted, and brightness 30 %, on the OSD card over the Work Space's frame and over a light ground. The speaker shows a wave per third of the range and a slash when muted; the sun's rays grow with the level.",
-            for look in LevelLook::ALL {
+            for look in LevelLook::ALL.iter().copied() {
                 Specimen { name: look.slug().to_owned(), code: describe(look).to_owned(),
                     div { class: "g-level-grid",
                         for ground in Ground::ALL {

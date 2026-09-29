@@ -7,12 +7,13 @@ use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Switch};
+use crate::core::word::Word;
 use crate::motion::detail::{cue::Cue, first_show::FirstShow, once::use_nudge};
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
 /// Which icon button.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum IconButtonVariant {
     /// Reader and composer tools, 28 x 28 (a Large control).
     Tool,
@@ -30,17 +31,6 @@ pub enum IconButtonVariant {
 }
 
 impl IconButtonVariant {
-    /// The `data-variant` word.
-    fn slug(self) -> &'static str {
-        match self {
-            IconButtonVariant::Tool => "tool",
-            IconButtonVariant::Foot => "foot",
-            IconButtonVariant::Strip => "strip",
-            IconButtonVariant::Pin => "pin",
-            IconButtonVariant::Status => "status",
-        }
-    }
-
     /// The glyph size from the section's geometry table: Tool and Foot 16, Strip 14. The Pin's
     /// content is the account tile's (section 27); a bare glyph on a Pin takes the base 16. A
     /// Status glyph is written at the base 16 and sized by `--bar-status-glyph` in the sheet.

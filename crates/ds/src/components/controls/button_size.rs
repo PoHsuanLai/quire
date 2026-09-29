@@ -3,11 +3,12 @@
 //! row action's, which sat a size smaller than its neighbours.
 
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 
 /// How big a button is drawn. A button given no size keeps its variant's own: Regular for
 /// Primary, Secondary, Quiet and Frame, Mini for Mini and Danger (design/04-COMPONENTS.md
 /// section 1), so no existing button changes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum ButtonSize {
     /// Primary's geometry: the ladder's Regular height (22, design/29-SIZING.md), `--fs-control`
     /// at 700. `data-size="regular"`.
@@ -18,17 +19,6 @@ pub enum ButtonSize {
     Mini,
     /// The ladder's Large height, 28, at Primary's label. `data-size="large"`.
     Large,
-}
-
-impl ButtonSize {
-    /// The `data-size` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            ButtonSize::Regular => "regular",
-            ButtonSize::Mini => "mini",
-            ButtonSize::Large => "large",
-        }
-    }
 }
 
 /// What a button's availability writes on the element besides `aria-disabled`: `disabled`,
@@ -47,6 +37,7 @@ pub(crate) fn disabled(availability: Availability) -> Option<&'static str> {
 mod tests {
     use super::{ButtonSize, disabled};
     use crate::core::vocab::Availability;
+    use crate::core::word::Word;
 
     #[test]
     fn each_size_has_its_word() {

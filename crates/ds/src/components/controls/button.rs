@@ -15,11 +15,12 @@ use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Expanded, Switch};
+use crate::core::word::Word;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
 /// Which button.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum ButtonVariant {
     /// Accent fill: Send, Compose.
     Primary,
@@ -39,18 +40,6 @@ pub enum ButtonVariant {
 }
 
 impl ButtonVariant {
-    /// The `data-variant` word.
-    fn slug(self) -> &'static str {
-        match self {
-            ButtonVariant::Primary => "primary",
-            ButtonVariant::Secondary => "secondary",
-            ButtonVariant::Mini => "mini",
-            ButtonVariant::Quiet => "quiet",
-            ButtonVariant::Danger => "danger",
-            ButtonVariant::Frame => "frame",
-        }
-    }
-
     /// The icon size: 14 for every variant that the doc sizes. TODO(O-3): the Quiet icon is
     /// "not specified" in design/04-COMPONENTS.md section 1; it takes the same 14.
     fn icon_size(self) -> IconSize {

@@ -10,6 +10,7 @@
 //! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
 
 use crate::core::vocab::{Selection, Switch};
+use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
     spring_spec::{SpringResponse, SpringSpec},
@@ -22,23 +23,13 @@ use dioxus::prelude::*;
 const SEGMENT_PX: f32 = 64.0;
 
 /// The control's size: `.seg` or the reader's `.view-switch`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum SegSize {
     /// `data-size="regular"`.
     #[default]
     Regular,
     /// `data-size="small"`.
     Small,
-}
-
-impl SegSize {
-    /// The `data-size` word.
-    fn slug(self) -> &'static str {
-        match self {
-            SegSize::Regular => "regular",
-            SegSize::Small => "small",
-        }
-    }
 }
 
 /// `aria-pressed` for a segment: the pressed fill marks the current choice.
@@ -54,7 +45,7 @@ fn pressed(selection: Selection) -> Switch {
 const IN_CELL: f32 = 0.01;
 
 /// Whether the thumb is over a segment: `data-thumb`, which picks the label's ink.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 enum ThumbOver {
     /// The thumb covers more than half of this segment: the label takes the thumb's ink.
     Under,
@@ -69,14 +60,6 @@ impl ThumbOver {
             ThumbOver::Under
         } else {
             ThumbOver::Clear
-        }
-    }
-
-    /// The `data-thumb` word.
-    fn slug(self) -> &'static str {
-        match self {
-            ThumbOver::Under => "under",
-            ThumbOver::Clear => "clear",
         }
     }
 }

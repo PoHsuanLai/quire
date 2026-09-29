@@ -4,6 +4,7 @@
 //! then its still frame from the operation's deadline (at most `PendingCap`) or at once under
 //! Reduced. It never loops without an [`Operation`], and never past its deadline.
 
+use crate::core::word::Word;
 use crate::motion::detail::{
     operation::Operation,
     pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
@@ -12,7 +13,7 @@ use crate::motion::detail::{
 use dioxus::prelude::*;
 
 /// Which activity.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum SpinnerKind {
     /// Work in progress: a dashed ring turning a quarter per step.
     Spin,
@@ -21,14 +22,6 @@ pub enum SpinnerKind {
 }
 
 impl SpinnerKind {
-    /// The `data-kind` word.
-    fn slug(self) -> &'static str {
-        match self {
-            SpinnerKind::Spin => "spin",
-            SpinnerKind::Breathe => "breathe",
-        }
-    }
-
     /// The pending loop it plays.
     pub(crate) fn spec(self) -> PendingSpec {
         let style = match self {

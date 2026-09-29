@@ -5,23 +5,13 @@ use crate::core::word::Word;
 use dioxus::prelude::*;
 
 /// A key cap's size.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum KbdSize {
     /// Data 10.5.
     #[default]
     Regular,
     /// Data 9.5, inside hints.
     Small,
-}
-
-impl KbdSize {
-    /// The `data-size` word.
-    fn slug(self) -> &'static str {
-        match self {
-            KbdSize::Regular => "regular",
-            KbdSize::Small => "small",
-        }
-    }
 }
 
 /// A shortcut as key caps, one per key and nothing between them (O-2: glyphs, no separator).
