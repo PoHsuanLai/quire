@@ -747,7 +747,7 @@ path each, until step 12 replaces them with the prelude.
 5. **Crate-private crossers** (done): every `pub(crate)` item that crosses a layer (33 today) becomes
    `pub` at its home module or moves to its only consumer; the boundary script keeps the list
    empty.
-6. **`ds-settings`**: `SettingsDoc`, `Store`, `ConfigRoot`, `SystemPrefsSource`, `Spawner` in
+6. **`ds-settings`** (done): `SettingsDoc`, `Store`, `ConfigRoot`, `SystemPrefsSource`, `Spawner` in
    `ds-core::spawner`, `dioxus` as a feature, delete `diff.rs` and `test_dir.rs`; sill's settings
    follow (unknown keys are reported).
 7. **`DocumentHost`**: the part traits and `NoHost` in `ds::host`, `ds_native::provide_host`
