@@ -17,6 +17,8 @@ RULES=(
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-settings: blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-native: zbus memfd"
+  "ds-core-derive: dioxus zbus tokio"
+  "ds-settings-derive: dioxus zbus tokio"
   "anyrender_pdfrum: blitz blitz-dom blitz-paint blitz-traits blitz-html parley stylo_taffy dioxus dioxus-native"
 )
 fail=0

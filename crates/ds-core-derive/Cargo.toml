@@ -1,0 +1,20 @@
+[package]
+name = "ds-core-derive"
+description = "#[derive(Word)]: a closed vocabulary enum's ALL, slug, label and parse."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { workspace = true }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }
+
+[lints]
+workspace = true
