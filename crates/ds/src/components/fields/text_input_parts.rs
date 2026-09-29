@@ -7,6 +7,7 @@ use crate::components::fields::text_input_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_input_kind::{Rows, TextInputKind};
 use crate::components::fields::text_input_mask::{CaretMark, MaskCaret, MaskParts};
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 use crate::focus::targets::Told;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;

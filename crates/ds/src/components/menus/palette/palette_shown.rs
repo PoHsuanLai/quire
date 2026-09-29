@@ -8,6 +8,7 @@
 //! says otherwise, and takes the keyboard.
 
 use crate::components::overlays::tooltip::Shown;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
 use crate::motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
@@ -47,7 +48,7 @@ pub(crate) fn change(last: Option<Shown>, now: Shown) -> Change {
 
 /// Which of the entrance keyframe's two names the card plays: flipping it restarts the
 /// animation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 enum Alias {
     A,
     B,
@@ -58,13 +59,6 @@ impl Alias {
         match self {
             Alias::A => Alias::B,
             Alias::B => Alias::A,
-        }
-    }
-
-    fn slug(self) -> &'static str {
-        match self {
-            Alias::A => "a",
-            Alias::B => "b",
         }
     }
 }

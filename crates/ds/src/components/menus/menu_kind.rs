@@ -6,10 +6,11 @@ use crate::core::geometry::{
     placement::{Align, Placement, Side},
     units::{Point, Px, Rect},
 };
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 
 /// Which menu shape.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum MenuKind {
     /// 280 wide, 34 px tiles, title and help and shortcut.
     Rich,
@@ -22,16 +23,6 @@ pub enum MenuKind {
 }
 
 impl MenuKind {
-    /// The `data-kind` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            MenuKind::Rich => "rich",
-            MenuKind::Slim => "slim",
-            MenuKind::Dropdown => "dropdown",
-            MenuKind::Context => "context",
-        }
-    }
-
     /// Where the menu goes against its anchor: S's floating menus at `left - 8`, 6 below
     /// (`S:2060-2065`); C's dropdown under the trigger's right edge, 7 below; a context menu
     /// at the pointer (design/06-INTERACTIONS.md section 4).
