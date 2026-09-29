@@ -42,5 +42,5 @@ re-theme every surface consistently, and every token variable
 | `data-busy` | `Availability::Busy` |
 | `data-availability` | `Availability`: enabled, disabled, busy |
 | `data-focus` | `FocusStyle`: ring, highlight |
-| `data-activity` | `Activity`, on `.ds`: active, inactive (the window's focus) |
+| `data-activity` | `Activity`, on `.ds`: written as `inactive` while the window is not the one focused, absent while it is |
 | `aria-*` | the state an element exposes to assistive technology |
