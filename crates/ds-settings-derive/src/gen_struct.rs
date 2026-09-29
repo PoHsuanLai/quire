@@ -66,7 +66,6 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                 page: #page,
                 section: ::ds_settings::schema::Section(#section.to_owned()),
                 exposure: #exposure,
-                deprecated: ::ds_settings::schema::Deprecated::No,
             });
         });
     }

@@ -31,17 +31,6 @@ pub struct Schema {
     pub key: Vec<KeySpec>,
 }
 
-/// Why a candidate `*.settings.toml` file under a discovery directory was not returned by
-/// [`discover`]. Not an error the caller must handle: discovery logs it and moves on (section
-/// 9.2, "a schema without a program... is skipped with a warning").
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Stale {
-    /// The file could not be read at all.
-    Unreadable(String),
-    /// The file's bytes are not this schema's TOML shape.
-    Malformed(String),
-}
-
 impl Schema {
     /// The TOML text this schema writes as `<app-id>.settings.toml`.
     pub fn to_toml(&self) -> String {
@@ -72,27 +61,8 @@ impl Schema {
 /// file name order within a directory. A directory that does not exist is skipped silently (a
 /// normal `$XDG_DATA_DIRS` entry with nothing installed yet); a file that exists but will not
 /// parse is skipped with a warning on stderr (section 9.2, "a schema without a program... is
-/// skipped with a warning") — [`discover_reporting`] returns the same list plus the reasons,
-/// for a caller (or a test) that wants them instead of a print.
+/// skipped with a warning").
 pub fn discover(dirs: &[PathBuf]) -> Vec<Schema> {
-    discover_reporting(dirs)
-        .into_iter()
-        .filter_map(|(path, result)| match result {
-            Ok(schema) => Some(schema),
-            Err(stale) => {
-                eprintln!(
-                    "quire settings: skipping stale schema {}: {stale:?}",
-                    path.display()
-                );
-                None
-            }
-        })
-        .collect()
-}
-
-/// [`discover`]'s work, without the printing: every candidate file under `dirs`, and whether it
-/// parsed.
-pub fn discover_reporting(dirs: &[PathBuf]) -> Vec<(PathBuf, Result<Schema, Stale>)> {
     let mut found = Vec::new();
     for dir in dirs {
         let Ok(mut entries) = std::fs::read_dir(dir).map(|entries| {
@@ -112,11 +82,16 @@ pub fn discover_reporting(dirs: &[PathBuf]) -> Vec<(PathBuf, Result<Schema, Stal
         };
         entries.sort();
         for path in entries {
-            let parsed = match std::fs::read_to_string(&path) {
-                Ok(text) => Schema::from_toml(&text).map_err(Stale::Malformed),
-                Err(e) => Err(Stale::Unreadable(e.to_string())),
-            };
-            found.push((path, parsed));
+            let parsed = std::fs::read_to_string(&path)
+                .map_err(|e| e.to_string())
+                .and_then(|text| Schema::from_toml(&text));
+            match parsed {
+                Ok(schema) => found.push(schema),
+                Err(why) => eprintln!(
+                    "quire settings: skipping stale schema {}: {why}",
+                    path.display()
+                ),
+            }
         }
     }
     found
@@ -178,7 +153,7 @@ pub fn maybe_write_schema(schema: &Schema, args: &[String]) -> io::Result<bool> 
 
 #[cfg(test)]
 mod tests {
-    use super::{Stale, data_dirs_from, discover, discover_reporting, maybe_write_schema};
+    use super::{data_dirs_from, discover, maybe_write_schema};
     use crate::schema::{AppId, Exposure, FilePath, KeyKind, KeyPath, Label, Page, Schema};
     use std::ffi::OsString;
 
@@ -198,7 +173,6 @@ mod tests {
                 page: Page::Appearance,
                 section: crate::schema::Section("Appearance".to_owned()),
                 exposure: Exposure::Basic,
-                deprecated: crate::schema::Deprecated::No,
             }],
         }
     }
@@ -233,7 +207,7 @@ mod tests {
     }
 
     #[test]
-    fn a_malformed_file_is_reported_stale_not_returned() {
+    fn a_malformed_file_is_skipped() {
         let dir = std::env::temp_dir().join(format!(
             "ds-settings-schema-test-{}-{}",
             std::process::id(),
@@ -243,9 +217,6 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("broken.settings.toml"), "not = [valid").unwrap();
         assert_eq!(discover(std::slice::from_ref(&dir)), Vec::new());
-        let reported = discover_reporting(std::slice::from_ref(&dir));
-        assert_eq!(reported.len(), 1);
-        assert!(matches!(reported[0].1, Err(Stale::Malformed(_))));
         std::fs::remove_dir_all(&dir).unwrap();
     }
 

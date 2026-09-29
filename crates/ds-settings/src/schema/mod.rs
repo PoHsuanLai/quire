@@ -14,10 +14,7 @@ mod traits;
 
 pub use deep_link::{deep_link, deep_link_path};
 pub use key::{
-    Deprecated, Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Version, Widget,
-    kind_from_variants,
+    Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget, kind_from_variants,
 };
-pub use program::{
-    AppId, FilePath, Schema, Stale, data_dirs, discover, discover_reporting, maybe_write_schema,
-};
+pub use program::{AppId, FilePath, Schema, data_dirs, discover, maybe_write_schema};
 pub use traits::{SchemaVariants, SettingsSchema, kind_of, to_value};

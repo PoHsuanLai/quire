@@ -31,8 +31,7 @@ pub fn deep_link_path(schemas: &[Schema], query: &str) -> Option<KeyPath> {
 mod tests {
     use super::{deep_link, deep_link_path};
     use crate::schema::{
-        AppId, Deprecated, Exposure, FilePath, Help, KeyKind, KeyPath, KeySpec, Label, Page,
-        Schema, Section,
+        AppId, Exposure, FilePath, Help, KeyKind, KeyPath, KeySpec, Label, Page, Schema, Section,
     };
 
     fn key(path: &str, label: &str, help: &str) -> KeySpec {
@@ -45,7 +44,6 @@ mod tests {
             page: Page::Appearance,
             section: Section(String::new()),
             exposure: Exposure::Basic,
-            deprecated: Deprecated::No,
         }
     }
 

@@ -55,24 +55,6 @@ pub enum Exposure {
     Advanced,
 }
 
-/// A schema version number (section 2's file `version`, section 9.5's "stays in the schema for
-/// one version").
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct Version(pub u16);
-
-/// Whether a key is still live, or was removed from its struct and is kept one version for a
-/// clean-up offer (section 9.5). The derive always emits `No`: it only ever sees the struct's
-/// current fields, never a field that used to exist.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "kind", content = "v", rename_all = "snake_case")]
-pub enum Deprecated {
-    /// Still a live field.
-    No,
-    /// Removed after this version; the Settings app may offer to clean it up.
-    Since(Version),
-}
-
 /// The widget table is fixed (section 9.1): one component per [`KeyKind`], never chosen by the
 /// Settings app itself.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -156,7 +138,6 @@ pub struct KeySpec {
     pub page: Page,
     pub section: Section,
     pub exposure: Exposure,
-    pub deprecated: Deprecated,
 }
 
 /// Every variant count from 1 up, mapped to the [`KeyKind`] it picks (section 9.1: "a two-
