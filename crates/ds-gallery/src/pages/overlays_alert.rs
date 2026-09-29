@@ -1,4 +1,4 @@
-//! The Overlays page's alerts (sill Q490): the Mac's pre-Liquid-Glass alert, "Turn Bluetooth
+//! The Overlays page's alerts: the Mac's pre-Liquid-Glass alert, "Turn Bluetooth
 //! off?", drawn in place inside a 320 px control-center popover (`Flow::Inline`) and centred in a
 //! whole window (`Flow::Floating`), in light and dark, and a destructive one whose default is
 //! Cancel. Live, Cancel, Escape, the scrim and the action close it and the button opens it again.

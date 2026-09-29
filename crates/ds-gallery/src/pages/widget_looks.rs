@@ -108,14 +108,14 @@ pub fn WidgetLooksPage() -> Element {
                 }
             }
         }
-        Section { title: "Pick up and drop", note: "Lift (sill Q430): a desktop widget picked up grows by --pickup (1.04) and trades its resting drop for --shadow-drag on --z-drag, over --t-quick at --e-out, and settles back the same way. WidgetSlotGuide (sill Q431): the footprint of the size at the snap cell, a quiet plate faded in, where the widget will land.",
+        Section { title: "Pick up and drop", note: "Lift: a desktop widget picked up grows by --pickup (1.04) and trades its resting drop for --shadow-drag on --z-drag, over --t-quick at --e-out, and settles back the same way. WidgetSlotGuide: the footprint of the size at the snap cell, a quiet plate faded in, where the widget will land.",
             Wall {
                 WidgetCard { widget: BatteryWidget, timeline: Timeline::now(devices()), size: WidgetSize::Medium, lift: Lift::Lifted }
                 WidgetSlotGuide { size: WidgetSize::Small }
                 WidgetSlotGuide { size: WidgetSize::Medium }
             }
         }
-        Section { title: "Edit Widgets", note: "The desktop with its widgets placed from the right and Edit Widgets as a sheet at the bottom (Panel with PanelEdge::Bottom, sill Q521), never taller than half the desktop, so the top rows where a new widget lands stay in view. WidgetGallery over the registry: the widgets listed with their descriptions; the one looked at drawn once, at the one size it takes (sill Q520: no size picker); Add to Desktop and Add to Notification Center hand the host a WidgetEdit at the size the widget takes on that surface, which it applies to the layout it keeps as data and passes back; at the right, what is placed on each surface and Remove. Live.",
+        Section { title: "Edit Widgets", note: "The desktop with its widgets placed from the right and Edit Widgets as a sheet at the bottom (Panel with PanelEdge::Bottom), never taller than half the desktop, so the top rows where a new widget lands stay in view. WidgetGallery over the registry: the widgets listed with their descriptions; the one looked at drawn once, at the one size it takes (no size picker); Add to Desktop and Add to Notification Center hand the host a WidgetEdit at the size the widget takes on that surface, which it applies to the layout it keeps as data and passes back; at the right, what is placed on each surface and Remove. Live.",
             super::widget_edit::EditWidgetsStage {}
         }
     }

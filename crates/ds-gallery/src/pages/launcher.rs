@@ -1,7 +1,7 @@
 //! The Overlays page's embedded palette: `CommandPalette` hosted in a surface of its own, as
-//! sill's launcher panel draws it (sill FINDINGS Q40-Q42): no scrim, the card filling its
+//! sill's launcher panel draws it: no scrim, the card filling its
 //! container and carrying the id a blur region names, `cmdk-in`, app icons in the rows; and a
-//! warm palette kept mounted while hidden and shown by a button (sill FINDINGS Q63).
+//! warm palette kept mounted while hidden and shown by a button.
 
 use super::app_icons::{APPS, app_icon};
 use super::{Section, Specimen};

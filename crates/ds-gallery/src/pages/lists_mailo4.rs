@@ -1,4 +1,4 @@
-//! Lists, mailo gaps 4: a strip whose press acts before any measurement, and sidebar places
+//! Lists, for mail: a strip whose press acts before any measurement, and sidebar places
 //! that name themselves and hand over their pointer, lit as the drop target under it.
 
 use super::Section;

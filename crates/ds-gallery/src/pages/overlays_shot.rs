@@ -1,4 +1,4 @@
-//! The Overlays page's screenshot thumbnail (sill Q181): in each scheme, over the Work Space's
+//! The Overlays page's screenshot thumbnail: in each scheme, over the Work Space's
 //! tint, a `ShotThumbnail` at its default 240 px (with its Delete action, shown on hover), a
 //! portrait picture pillarboxed at 16:10, and the `ShotGhost` a host draws as its drag icon.
 //! Live, a button hides the thumbnail (it slides out to the right) and shows it again (it rises

@@ -1,4 +1,4 @@
-//! A scheduled Today row for the lists page's SidebarItem section (mailo gaps 2): its time and
+//! A scheduled Today row for the lists page's SidebarItem section: its time and
 //! its cancel, which hides it here until the section brings it back.
 
 use dioxus::prelude::*;

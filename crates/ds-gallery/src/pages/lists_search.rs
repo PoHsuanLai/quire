@@ -1,4 +1,4 @@
-//! Lists, mailo gaps 2: rows as a search draws them, the hits marked by the caller, and the
+//! Lists, for mail: rows as a search draws them, the hits marked by the caller, and the
 //! strip revealed on the keyboard's row (Up and Down here are the two buttons) rather than on
 //! hover, titled, with its label button's menu open.
 

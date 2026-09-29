@@ -1,5 +1,5 @@
-//! The Controls page's mailo gaps 5 buttons: a label of two runs (the composer's quoted-message
-//! head) and a leading mark (the From dropdown's provider). Split from `controls.rs` to keep
+//! The Controls page's mail-app buttons, continued: a label of two runs (the composer's
+//! quoted-message head) and a leading mark (the From dropdown's provider). Split from `controls.rs` to keep
 //! that page under its size.
 
 use super::{Section, Specimen};

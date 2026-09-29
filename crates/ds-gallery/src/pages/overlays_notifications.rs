@@ -1,4 +1,4 @@
-//! The Overlays page's notifications (sill Q120-Q125): in each scheme, over the Work Space's
+//! The Overlays page's notifications: in each scheme, over the Work Space's
 //! tint, a `BannerStack` of three banners in a Toast root (one grouped, with its count chip and
 //! two layers behind it; one with a link and actions), a card posed as if dragged 56 px to the
 //! right, and the notification center, a `Panel` at the right edge whose first group has a

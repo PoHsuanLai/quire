@@ -1,4 +1,4 @@
-//! The Controls page's mailo gaps 4 buttons: words on the Space frame, a dropdown value with
+//! The Controls page's mail-app buttons: words on the Space frame, a dropdown value with
 //! its caret, and the selection bubble's B, i, U and S faces. Split from `controls.rs` to keep
 //! that page under its size.
 

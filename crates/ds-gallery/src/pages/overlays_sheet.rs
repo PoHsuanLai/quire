@@ -1,4 +1,4 @@
-//! The Overlays page's power menu (sheet and modal parts, sill Q90-Q95): a centred Sheet over a
+//! The Overlays page's power menu (sheet and modal parts): a centred Sheet over a
 //! modal scrim, in light and dark, each in a Sheet root of its own over the wallpaper. Cancel,
 //! a Danger Restart and a Primary Shut Down at the Regular size, an unavailable Suspend drawn
 //! disabled, and the key hints with the arrow caps at the Small size.

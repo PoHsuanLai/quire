@@ -1,6 +1,6 @@
-//! Details, the status glyphs in their slots (sill Q390-Q392): the bar's four status items as
+//! Details, the status glyphs in their slots: the bar's four status items as
 //! `IconButton { Status }` holding a status glyph, the battery item nudging once as it crosses
-//! into low on battery (G11), at the bar's metrics.
+//! into low on battery, at the bar's metrics.
 
 use super::details::{Cell, mini};
 use dioxus::prelude::*;

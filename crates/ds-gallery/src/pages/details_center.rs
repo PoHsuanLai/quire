@@ -1,4 +1,4 @@
-//! Details, the control center's modules (design/26-DETAILS.md 5.2, wave D2): the tile disc's
+//! Details, the control center's modules (design/26-DETAILS.md 5.2): the tile disc's
 //! fill and morph, the settings rows' pending, success and failure, Now Playing's play/pause,
 //! track cross-fade and position, the Battery module's rings, and the keyboard-brightness level.
 //! Each cell opens at rest (a snapshot runs no Rust timer); its buttons play the moments.
