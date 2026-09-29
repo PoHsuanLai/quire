@@ -10,7 +10,7 @@
 pub(crate) mod clock;
 #[cfg(test)]
 mod tests;
-pub(crate) mod timeline;
+pub(crate) mod virtual_queue;
 
 use std::time::Duration;
 

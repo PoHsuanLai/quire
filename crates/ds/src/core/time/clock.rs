@@ -1,6 +1,6 @@
 //! Which clock this thread reads: the wall clock unless a [`VirtualClock`] is installed.
 
-use super::timeline::{Timeline, VirtualSleep};
+use super::virtual_queue::{VirtualQueue, VirtualSleep};
 use std::cell::RefCell;
 use std::future::Future;
 use std::pin::Pin;
@@ -9,18 +9,18 @@ use std::task::{Context, Poll};
 use std::time::{Duration, Instant};
 
 thread_local! {
-    /// The virtual timeline installed on this thread; `None` is the wall clock.
-    static INSTALLED: RefCell<Option<Rc<Timeline>>> = const { RefCell::new(None) };
+    /// The virtual queue installed on this thread; `None` is the wall clock.
+    static INSTALLED: RefCell<Option<Rc<VirtualQueue>>> = const { RefCell::new(None) };
 }
 
-fn installed() -> Option<Rc<Timeline>> {
+fn installed() -> Option<Rc<VirtualQueue>> {
     INSTALLED.with(|slot| slot.borrow().clone())
 }
 
 /// Now, on this thread's clock: `Instant::now()` on the wall clock, or the virtual clock's
 /// origin plus every advance so far.
 pub fn now() -> Instant {
-    installed().map_or_else(Instant::now, |timeline| timeline.now())
+    installed().map_or_else(Instant::now, |queue| queue.now())
 }
 
 /// How long since `then`, on this thread's clock (zero if `then` is later): what
@@ -33,7 +33,7 @@ pub fn since(then: Instant) -> Duration {
 /// handler, not from render.
 pub fn sleep(duration: Duration) -> impl Future<Output = ()> {
     match installed() {
-        Some(timeline) => Wait::Virtual(VirtualSleep::new(timeline, duration)),
+        Some(queue) => Wait::Virtual(VirtualSleep::new(queue, duration)),
         None => Wait::Wall(futures_timer::Delay::new(duration)),
     }
 }
@@ -65,49 +65,49 @@ impl Future for Wait {
 /// them, which is the thread a Dioxus document polls its tasks on.
 #[derive(Debug, Clone)]
 pub struct VirtualClock {
-    timeline: Rc<Timeline>,
+    queue: Rc<VirtualQueue>,
 }
 
 impl VirtualClock {
     /// A clock standing at the wall clock's now.
     pub fn new() -> Self {
         VirtualClock {
-            timeline: Rc::new(Timeline::new(Instant::now())),
+            queue: Rc::new(VirtualQueue::new(Instant::now())),
         }
     }
 
     /// Make this the clock [`now`] and [`sleep`] read on this thread until the guard drops,
     /// which puts back whatever was installed before (so harnesses nest).
     pub fn install(&self) -> ClockGuard {
-        let previous = INSTALLED.with(|slot| slot.replace(Some(Rc::clone(&self.timeline))));
+        let previous = INSTALLED.with(|slot| slot.replace(Some(Rc::clone(&self.queue))));
         ClockGuard { previous }
     }
 
     /// Now on this clock.
     pub fn now(&self) -> Instant {
-        self.timeline.now()
+        self.queue.now()
     }
 
     /// How far the clock has been advanced since it was made.
     pub fn elapsed(&self) -> Duration {
-        self.timeline.elapsed()
+        self.queue.elapsed()
     }
 
     /// When the next sleep on this clock is due, as time since it was made; `None` when
     /// nothing is waiting.
     pub fn next_due(&self) -> Option<Duration> {
-        self.timeline.next_due()
+        self.queue.next_due()
     }
 
     /// How many sleeps on this clock have not finished.
     pub fn waiting(&self) -> usize {
-        self.timeline.waiting()
+        self.queue.waiting()
     }
 
     /// The due instant of every sleep still waiting, earliest first: for a diagnostic when a
     /// settle check gives up on this clock (`ds_native::assert_settles_to_zero_frames`).
     pub fn due_times(&self) -> Vec<Duration> {
-        self.timeline.due_times()
+        self.queue.due_times()
     }
 
     /// Move the clock to `at` after it was made (never backwards) and wake every sleep due by
@@ -115,7 +115,7 @@ impl VirtualClock {
     /// that wants each timer to see the state the previous one left steps through
     /// [`VirtualClock::next_due`] one instant at a time, polling in between.
     pub fn advance_to(&self, at: Duration) {
-        self.timeline.advance_to(at);
+        self.queue.advance_to(at);
     }
 }
 
@@ -130,7 +130,7 @@ impl Default for VirtualClock {
 #[derive(Debug)]
 #[must_use = "the clock is uninstalled as soon as the guard drops"]
 pub struct ClockGuard {
-    previous: Option<Rc<Timeline>>,
+    previous: Option<Rc<VirtualQueue>>,
 }
 
 impl Drop for ClockGuard {
