@@ -1,65 +1,84 @@
 //! Live reload: a `notify` watch on the config directory, not the file, because editors and the
-//! atomic writer both replace the inode by rename (design/22-SETTINGS.md section 2). Generic over
-//! the file: [`watch_file`] watches any [`SettingsFile`]; [`watch`] is `appearance.toml`'s.
+//! atomic writer both replace the inode by rename (design/22-SETTINGS.md section 2). A burst of
+//! events settles for [`DEBOUNCE`], then the whole file is re-read.
 
-use crate::appearance_file::APPEARANCE;
+use crate::doc::{FileName, SettingsDoc};
 use crate::error::SettingsError;
-use crate::file::{self, FileName, Settings, SettingsFile};
-use crate::settings::AppearanceFile;
+use crate::latest::{self, Receiver, Sender};
+use crate::lenient::{Loaded, Read, read};
+use crate::store::Store;
+use ds::Spawner;
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
-use serde::Serialize;
-use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
-use std::path::Path;
+use std::path::PathBuf;
 use std::time::Duration;
 
 /// How long the watch waits for a burst of events to settle before re-reading.
 pub const DEBOUNCE: Duration = Duration::from_millis(30);
 
-/// A running watch on one directory's settings file. Needs a Tokio runtime.
-#[derive(Debug)]
-pub struct FileWatch<T> {
-    changes: tokio::sync::watch::Receiver<T>,
-    _watcher: RecommendedWatcher,
+/// Whether a [`Watch`] is looking at the disk.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum WatchState {
+    /// Every settled change arrives through [`Watch::changed`].
+    Live,
+    /// The directory could not be watched: the value stays as first read and `changed` ends.
+    Blind {
+        /// Why the watch could not start.
+        reason: String,
+    },
 }
 
-/// A running watch on one directory's `appearance.toml`.
-pub type AppearanceWatch = FileWatch<AppearanceFile>;
+/// A running watch on one settings file. Dropping it stops the watch.
+#[derive(Debug)]
+pub struct Watch<D> {
+    changes: Receiver<Loaded<D>>,
+    state: WatchState,
+    _watcher: Option<RecommendedWatcher>,
+}
 
-impl<T: Clone> FileWatch<T> {
-    /// Wait for the next settled change and return the whole re-read file, never a partial one.
-    /// `None` once the watch has stopped.
-    pub async fn changed(&mut self) -> Option<T> {
-        if self.changes.changed().await.is_err() {
-            return None;
-        }
-        Some(self.changes.borrow_and_update().clone())
+impl<D: SettingsDoc> Watch<D> {
+    /// Wait for the next settled change: the whole re-read file, never a partial one, with what
+    /// was refused or dropped in it. A file that is not valid text keeps the last good value and
+    /// reports itself invalid. `None` once the watch has stopped.
+    pub async fn changed(&mut self) -> Option<Loaded<D>> {
+        self.changes.changed().await
     }
 
     /// The file as last read.
-    pub fn current(&self) -> T {
-        self.changes.borrow().clone()
+    pub fn current(&self) -> D {
+        self.changes.latest().value
     }
 
-    /// A receiver of every settled read, for a consumer that fans the file out itself.
-    pub fn receiver(&self) -> tokio::sync::watch::Receiver<T> {
-        self.changes.clone()
+    /// Whether the directory is being watched.
+    pub fn state(&self) -> &WatchState {
+        &self.state
     }
 }
 
-impl<T> Settings<T>
-where
-    T: Serialize + DeserializeOwned + Default + Clone + Send + Sync + 'static,
-{
-    /// [`watch_file`] this file in `dir`.
-    pub fn watch(&self, dir: &Path) -> Result<FileWatch<T>, SettingsError> {
-        watch_file(self.at(dir))
+impl<D: SettingsDoc + Send> Watch<D> {
+    pub(crate) fn start(store: &Store, spawn: &dyn Spawner) -> Watch<D> {
+        let initial = store.load::<D>();
+        let (out, changes) = latest::channel(initial.clone());
+        match begin::<D>(store, spawn, initial, out) {
+            Ok(watcher) => Watch {
+                changes,
+                state: WatchState::Live,
+                _watcher: Some(watcher),
+            },
+            Err(error) => Watch {
+                changes,
+                state: WatchState::Blind {
+                    reason: error.to_string(),
+                },
+                _watcher: None,
+            },
+        }
     }
 }
 
 /// Whether `event` is a write to the file `name` itself: not the temp file the atomic writer
 /// (or an editor) writes and renames away, not an unrelated file in the same directory (another
-/// watched settings file included), and not an `Access` event — opening the file to read it
+/// watched settings file included), and not an `Access` event: opening the file to read it
 /// (which every re-read this watch does, and every editor's own load, triggers) is not a change
 /// and must not re-arm the debounce, or a watcher re-reading the file becomes a change that
 /// makes it re-read the file forever.
@@ -71,116 +90,68 @@ fn touches_the_file(event: &notify::Event, name: FileName) -> bool {
             .any(|path| path.file_name() == Some(OsStr::new(name.0)))
 }
 
-/// Start watching `dir` for changes to `appearance.toml`.
-pub fn watch(dir: &Path) -> Result<AppearanceWatch, SettingsError> {
-    APPEARANCE.watch(dir)
-}
-
-/// Start watching `file`'s directory (created if missing) for changes to `file`, on the current
-/// Tokio runtime. Every settled burst re-reads the whole file.
-pub fn watch_file<T>(file: SettingsFile) -> Result<FileWatch<T>, SettingsError>
-where
-    T: Serialize + DeserializeOwned + Default + Clone + Send + Sync + 'static,
-{
-    std::fs::create_dir_all(&file.dir).map_err(|source| SettingsError::Io {
-        path: file.dir.clone(),
+/// Start the directory watch and the task that settles its events; the watcher is the caller's
+/// to keep alive.
+fn begin<D: SettingsDoc + Send>(
+    store: &Store,
+    spawn: &dyn Spawner,
+    initial: Loaded<D>,
+    out: Sender<Loaded<D>>,
+) -> Result<RecommendedWatcher, SettingsError> {
+    let dir = store.require_dir()?;
+    std::fs::create_dir_all(&dir).map_err(|source| SettingsError::Io {
+        path: dir.clone(),
         source,
     })?;
-
-    let initial: T = file::load(&file);
-    let name = file.name;
-    let (settled_tx, mut settled_rx) = tokio::sync::mpsc::unbounded_channel::<()>();
+    let (signal, signals) = latest::channel(());
     let mut watcher = notify::recommended_watcher(move |res: notify::Result<notify::Event>| {
         if let Ok(event) = res
-            && touches_the_file(&event, name)
+            && touches_the_file(&event, D::FILE)
         {
-            // The receiver may already be gone if the watch task ended; a dropped signal is
-            // fine, there is nobody left to re-read for.
-            let _ = settled_tx.send(());
+            // The receiver is gone once the watch task ended; there is nobody left to signal.
+            let _ = signal.send(());
         }
     })?;
-    watcher.watch(&file.dir, RecursiveMode::NonRecursive)?;
-
-    let (changes_tx, changes_rx) = tokio::sync::watch::channel(initial);
-    tokio::spawn(async move {
-        loop {
-            if settled_rx.recv().await.is_none() {
-                return;
-            }
-            // Coalesce the rest of the burst: a rename can fire more than one raw event, and
-            // this crate's own atomic writer plus a watching editor can both touch the file in
-            // quick succession. Reset the debounce window on every further signal.
-            loop {
-                match tokio::time::timeout(DEBOUNCE, settled_rx.recv()).await {
-                    Ok(Some(())) => continue,
-                    Ok(None) => return,
-                    Err(_timed_out) => break,
-                }
-            }
-            if changes_tx.send(file::load(&file)).is_err() {
-                return;
-            }
-        }
-    });
-
-    Ok(FileWatch {
-        changes: changes_rx,
-        _watcher: watcher,
-    })
+    watcher.watch(&dir, RecursiveMode::NonRecursive)?;
+    let path = dir.join(D::FILE.0);
+    spawn.spawn(Box::pin(settle(path, initial.value, signals, out)));
+    Ok(watcher)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{DEBOUNCE, watch};
-    use crate::settings::AppearanceFile;
-    use crate::test_dir::TempDir;
-    use ds::Theme;
-    use std::time::Duration;
-
-    /// Generous slack over the 30 ms debounce for a test runner under load, without being so
-    /// long the test hangs if the watch is broken.
-    const MARGIN: Duration = Duration::from_millis(2_000);
-
-    #[tokio::test]
-    async fn a_renamed_write_fires_exactly_one_change() {
-        let dir = TempDir::new();
-        let initial = AppearanceFile::default();
-        crate::appearance_file::save(dir.path(), &initial).unwrap_or_else(|e| panic!("{e}"));
-
-        let mut appearance_watch = watch(dir.path()).unwrap_or_else(|e| panic!("{e}"));
-        assert_eq!(appearance_watch.current(), initial);
-
-        let mut changed = AppearanceFile::default();
-        changed.appearance.theme = Theme::Dark;
-        // The same atomic temp-and-rename write the real writer does, not an in-place write.
-        crate::appearance_file::save(dir.path(), &changed).unwrap_or_else(|e| panic!("{e}"));
-
-        let got = tokio::time::timeout(MARGIN, appearance_watch.changed())
-            .await
-            .unwrap_or_else(|_| panic!("no change observed within the debounce plus margin"))
-            .unwrap_or_else(|| panic!("the watch stopped"));
-        assert_eq!(got, changed);
-        assert_eq!(appearance_watch.current(), changed);
-
-        // Exactly one: nothing further arrives once the burst from the rename has settled.
-        let extra = tokio::time::timeout(DEBOUNCE * 4, appearance_watch.changed()).await;
-        assert!(extra.is_err(), "expected no further change, got {extra:?}");
-    }
-
-    #[tokio::test]
-    async fn a_watch_started_before_the_file_exists_sees_its_first_write() {
-        let dir = TempDir::new();
-        let mut appearance_watch = watch(dir.path()).unwrap_or_else(|e| panic!("{e}"));
-        assert_eq!(appearance_watch.current(), AppearanceFile::default());
-
-        let mut written = AppearanceFile::default();
-        written.appearance.theme = Theme::Light;
-        crate::appearance_file::save(dir.path(), &written).unwrap_or_else(|e| panic!("{e}"));
-
-        let got = tokio::time::timeout(MARGIN, appearance_watch.changed())
-            .await
-            .unwrap_or_else(|_| panic!("no change observed within the debounce plus margin"))
-            .unwrap_or_else(|| panic!("the watch stopped"));
-        assert_eq!(got, written);
+/// Re-read `path` after every settled burst of events and publish it, until the watcher or the
+/// receiver is dropped. `good` is the last value that read cleanly.
+// The debounce is a wall-clock wait on the spawner's own thread: `ds::sleep` follows the clock
+// installed on its caller's thread and is not `Send`, and a task on a runtime has neither.
+async fn settle<D: SettingsDoc + Send>(
+    path: PathBuf,
+    mut good: D,
+    mut signals: Receiver<()>,
+    out: Sender<Loaded<D>>,
+) {
+    while signals.changed().await.is_some() {
+        // Coalesce the rest of the burst: a rename can fire more than one raw event, and this
+        // crate's own atomic writer plus a watching editor can both touch the file in quick
+        // succession. Every further event restarts the window.
+        loop {
+            futures_timer::Delay::new(DEBOUNCE).await;
+            if !signals.has_changed() {
+                break;
+            }
+            signals.catch_up();
+        }
+        let loaded = match std::fs::read_to_string(&path).map(|text| read::<D>(&text, D::FORMAT)) {
+            Ok(Read::Garbled { reason }) => Loaded::garbled(good.clone(), reason),
+            Ok(Read::Loaded(loaded)) => {
+                good = loaded.value.clone();
+                loaded
+            }
+            Err(_) => {
+                good = D::default();
+                Loaded::default()
+            }
+        };
+        if out.send(loaded).is_err() {
+            return;
+        }
     }
 }

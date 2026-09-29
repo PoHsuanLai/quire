@@ -80,7 +80,7 @@ pdfrum-common = { workspace = true }
 # Glyph ids from the cmap, for the colour-emoji and font-stack tests.
 skrifa = { workspace = true }
 # The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
-ds-settings = { workspace = true }
+ds-settings = { workspace = true, features = ["dioxus"] }
 
 [[example]]
 name = "window"

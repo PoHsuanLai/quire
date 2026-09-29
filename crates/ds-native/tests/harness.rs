@@ -18,8 +18,9 @@ use ds::{
     Theme,
 };
 use ds_native::harness::settle_until;
-use ds_native::{Clock, Harness, HarnessConfig, Viewport};
-use ds_settings::{AppName, use_environment};
+use ds_native::{Clock, Harness, HarnessConfig, TokioSpawner, Viewport};
+use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
+use std::sync::Arc;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -588,11 +589,16 @@ fn the_space_editor_reports_the_dot_picked_inside_it() {
 
 #[allow(non_snake_case)]
 fn EnvironmentApp() -> Element {
-    // `ds_settings::use_environment` spawns the portal watch (zbus's `tokio` feature) and the
-    // file-watch debounce with `tokio::spawn`, which panics ("there is no reactor running")
-    // unless a runtime is entered on this thread. `Harness` enters one before this component's
-    // first render (`ds_native::runtime`), so this must not panic.
-    let env = use_environment(AppName("consumer-test"));
+    // `ds_settings::use_environment` runs the file watch on the spawner it is given, and
+    // `TokioSpawner::current` needs a runtime entered on this thread. `Harness` enters one before
+    // this component's first render (`ds_native::runtime`), so this must not panic. The store is
+    // a scratch directory and the preferences are fixed: no real config, no session bus.
+    let store = Store::new(
+        ConfigRoot::Scratch(std::env::temp_dir().join("ds-native-harness-environment")),
+        AppName("consumer-test"),
+    );
+    let system = SystemPrefsSource::Fixed(ds::SystemPrefs::default());
+    let env = use_environment(store, system, Arc::new(TokioSpawner::current()));
     let now = env();
     rsx! {
         Root {
@@ -614,4 +620,5 @@ fn use_environment_does_not_panic_under_the_harness() {
         "the environment-reading component rendered past its first frame: {}",
         harness.html()
     );
+    let _ = std::fs::remove_dir_all(std::env::temp_dir().join("ds-native-harness-environment"));
 }

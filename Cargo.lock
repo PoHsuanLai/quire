@@ -1710,9 +1710,9 @@ name = "ds-settings"
 version = "0.1.0"
 dependencies = [
  "dioxus",
- "dirs",
  "ds",
  "ds-settings-derive",
+ "futures-timer",
  "notify",
  "serde",
  "serde_json",

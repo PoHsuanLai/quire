@@ -2,7 +2,7 @@
 //! (design/22-SETTINGS.md section 9.1): a `range` attribute means `Bounded`; `text` means
 //! `Text`; failing both, the type's own name decides `Text`, `Colour` or `List`, a known
 //! numeric type without a range is an error, and anything else is assumed to be a closed enum
-//! resolved at run time through `SchemaVariants` (`crate::gen_struct`).
+//! resolved at run time through its `Word` (`crate::gen_struct`).
 
 use crate::attrs::KindHint;
 use std::fmt;
@@ -25,7 +25,7 @@ pub(crate) enum Shape {
     /// The field's type is `Vec<T>`: a list of `T`'s own kind. Boxed: `syn::Type` is large
     /// enough on its own to blow up every other, data-less variant's size (`clippy::large_enum_variant`).
     List(Box<syn::Type>),
-    /// Anything else: a closed enum, resolved through `SchemaVariants` at run time.
+    /// Anything else: a closed enum, read through its `Word` at run time.
     EnumType,
 }
 
@@ -54,7 +54,7 @@ impl fmt::Display for ShapeError {
 
 /// The numeric types a field is recognised by: the primitives and ds-settings' own units
 /// (`crates/ds-settings/src/units.rs`). A caller's own numeric newtype is caught at compile
-/// time instead, by `SchemaVariants`' `on_unimplemented` message.
+/// time instead: it is not a `Word`, and `kind_of` asks for one.
 const NUMBERS: &[&str] = &[
     "u8", "u16", "u32", "u64", "u128", "usize", "i8", "i16", "i32", "i64", "i128", "isize", "f32",
     "f64", "Px", "Ms", "Percent", "Count", "Fraction", "Scalar", "Units", "Secs", "Mins",

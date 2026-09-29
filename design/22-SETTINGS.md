@@ -57,9 +57,11 @@ Rules, all three files:
 - **Atomic write**: temp file + `rename` (`ds-settings`'s `file::save`).
 - **`version = 1`** top-level field. A future incompatible change bumps it and ships a
   migrator; today nothing reads it but its absence.
-- **Unknown keys preserved**: a round-trip through a newer binary must not drop a key an older or
-  newer version wrote (mirrors `CONVENTIONS.md#12-derives-and-serde` "never `deny_unknown_fields` on
-  a stored type"; `#[serde(flatten)]` extra: `Table` catches the rest per struct).
+- **Unknown keys reported, not preserved**: a key no struct reads does not stop a load
+  (`CONVENTIONS.md#12-derives-and-serde`: never `deny_unknown_fields` on a stored type), but it is
+  not carried through a save either. `Store::load` returns it in `Loaded::unknown` (a dotted
+  path, cut at the first table the struct has no key for) and the owning program prints it to its
+  log; the next write drops it. There is no `extra` table and no compatibility for retired keys.
 - **Unknown *values* fall back to the field's default**, lenient, matching mailo's `Appearance`
   loader (PLAN "moves verbatim from mailo... `appearance.rs` load/save/dirs"): a bad enum
   string or an out-of-range number logs once and uses `Default::default()` for that field only,
@@ -144,7 +146,7 @@ per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICO
 pixels all sit below this OKLCH chroma is drawn as a symbolic mask in the ink colour, rather
 than shown in its own colour. Advanced (file only, section 5); shown on the **Appearance** or
 **Dock** page if a later wave promotes it — both read icons live. `sill` registers the key in
-its own settings crate (`ds-settings`'s `IconsSettings`, `crates/ds-settings/src/settings.rs`);
+its own settings crate (`ds-settings`'s `IconsSettings`, `crates/ds-settings/src/appearance/settings.rs`);
 that registration is not done yet (see FINDINGS "Settings and schema").
 
 ### 3.4 `bar` (sill/settings.toml)
@@ -835,42 +837,14 @@ impl SettingsWatch {
     pub fn shell(&self) -> impl Stream<Item = ShellFile>;
     pub fn gestures(&self) -> impl Stream<Item = GesturesFile>;
 }
-
-/// One variant per domain, so a surface subscribes to only the domains it draws.
-/// Pure: no I/O, no clock (`CONVENTIONS.md#6-state-effects-and-dependencies` — this is
-/// comparison, not a timed effect).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum SettingsChange {
-    Appearance, Icons, Bar, Dock, Launcher, Scroll, Scrollbar, Menus, Notifications,
-    ControlCenter, Spaces, Gestures, PalmRejection,
-}
-
-pub fn apply(old: &Settings, new: &Settings) -> Vec<SettingsChange> {
-    let mut out = Vec::new();
-    if old.appearance.appearance != new.appearance.appearance { out.push(SettingsChange::Appearance); }
-    if old.appearance.icons != new.appearance.icons { out.push(SettingsChange::Icons); }
-    if old.shell.bar != new.shell.bar { out.push(SettingsChange::Bar); }
-    if old.shell.dock != new.shell.dock { out.push(SettingsChange::Dock); }
-    if old.shell.launcher != new.shell.launcher { out.push(SettingsChange::Launcher); }
-    if old.shell.scroll != new.shell.scroll { out.push(SettingsChange::Scroll); }
-    if old.shell.scrollbar != new.shell.scrollbar { out.push(SettingsChange::Scrollbar); }
-    if old.shell.menus != new.shell.menus { out.push(SettingsChange::Menus); }
-    if old.shell.notifications != new.shell.notifications { out.push(SettingsChange::Notifications); }
-    if old.shell.control_center != new.shell.control_center { out.push(SettingsChange::ControlCenter); }
-    if old.shell.osd != new.shell.osd { out.push(SettingsChange::Osd); }
-    if old.shell.power_menu != new.shell.power_menu { out.push(SettingsChange::PowerMenu); }
-    if old.shell.display != new.shell.display { out.push(SettingsChange::Display); }
-    if old.shell.spaces != new.shell.spaces { out.push(SettingsChange::Spaces); }
-    if old.gestures.gestures != new.gestures.gestures { out.push(SettingsChange::Gestures); }
-    if old.gestures.palm_rejection != new.gestures.palm_rejection { out.push(SettingsChange::PalmRejection); }
-    out
-}
 ```
 
-`apply` is deliberately whole-struct `PartialEq`, not per-field: a domain is small enough
-(largest is `dock` at 35 fields) that "one field changed" and "recompute the domain" cost the
-same, and per-field diffing would need a second hand-written table per domain that section 6's
-"every key appears in the Rust schema" test would have to check twice.
+There is no change enum and no `apply`: each domain struct is `PartialEq`, and a surface or a
+policy compares the one domain it draws between two reads (sill's `Section`). Whole-struct
+equality, not per-field: a domain is small enough (largest is `dock` at 35 fields) that "one
+field changed" and "recompute the domain" cost the same, and per-field diffing would need a
+second hand-written table per domain that section 6's "every key appears in the Rust schema"
+test would have to check twice.
 
 ## 5. Settings UI mapping
 
@@ -903,16 +877,14 @@ only in v1, no widget; a later wave may promote one if the user asks.
    | out-of-range `Percent` (`255`) | `icons.plate_inset_percent` | clamped to `100` at construction (the newtype's constructor, not serde) |
    | negative where `Px` (`u16`) expected | any `Px` field | parse error on that field only -> default |
    | missing table entirely (`[dock]` absent) | whole `DockSettings` | `#[serde(default)]` on the struct produces `DockSettings::default()` |
-   | unknown top-level key (`[dock].puppy = true`) | n/a | preserved verbatim on next write (round-trip through a generic `toml::Value` side channel, or `#[serde(flatten)] extra: toml::Table`) |
+   | unknown key (`[dock].puppy = true`) | n/a | listed in `Loaded::unknown` as `dock.puppy`, absent from the next write; every other key is read as usual |
 3. **Watch-fires-on-rename**: a tempdir test writes `settings.toml`, starts `SettingsWatch`,
    then does the same atomic temp+rename the real writer does (not an in-place write), and
    asserts exactly one `ShellFile` is yielded within the 30 ms debounce + a slack margin — same
    pattern PLAN "Design: `<ds>`" already names for `ds-settings`: "round-trip, watch-fires-on-rename
    tempdir, portal mapping tables".
-4. **Diff-yields-only-changed-domains**: property test — construct two `Settings` differing in
-   exactly one domain (proptest over `SettingsChange`'s variants), assert `apply` returns a
-   `Vec` of length 1 containing that variant; construct two identical `Settings`, assert `apply`
-   returns empty.
+4. **Unknown-key report**: a file with a key no struct reads loads every other key as usual,
+   lists the key in `Loaded::unknown`, and a save of the loaded value leaves it out.
 5. **Every key in this doc appears in the Rust schema**: a test that parses this file's section
    3 tables (the dotted key column) and asserts, for each one, that the corresponding
    `Domain::default()` struct has a field of that name reachable by splitting on `.` and
