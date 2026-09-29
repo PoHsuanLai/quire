@@ -15,7 +15,8 @@ use crate::motion::drag::{DragPhase, use_drag};
 use crate::motion::{
     projection::Throw,
     spring_spec::{SpringResponse, SpringSpec},
-    use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
+    timeline::spring::PxPerUnit,
+    use_spring::{SpringMotion, use_spring_motion},
     velocity::{Velocity, VelocityMeter},
 };
 use dioxus::core::queue_effect;

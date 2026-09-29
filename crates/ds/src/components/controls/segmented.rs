@@ -14,7 +14,8 @@ use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
     spring_spec::{SpringResponse, SpringSpec},
-    use_spring::{PxPerUnit, use_spring},
+    timeline::spring::PxPerUnit,
+    use_spring::use_spring,
 };
 use dioxus::prelude::*;
 

@@ -15,7 +15,8 @@ use crate::motion::detail::touch::Touch;
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{
     spring_spec::{SpringResponse, SpringSpec},
-    use_spring::{PxPerUnit, use_spring},
+    timeline::spring::PxPerUnit,
+    use_spring::use_spring,
 };
 use crate::shell::switcher::switcher_fit::{SwitcherMetrics, fit};
 use crate::style::icon::family::PlateFamily;

@@ -45,6 +45,7 @@ pub use crate::motion::{
         PointThrow, Release, SpringPointMotion, use_spring_point, use_spring_point_motion,
     },
     spring_spec::{SpringResponse, SpringSpec},
-    use_spring::{PxPerUnit, use_spring},
+    timeline::spring::PxPerUnit,
+    use_spring::use_spring,
     velocity::{Velocity, VelocityMeter},
 };

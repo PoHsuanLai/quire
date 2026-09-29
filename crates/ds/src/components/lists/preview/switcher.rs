@@ -16,7 +16,8 @@ use crate::motion::pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
 use crate::motion::{
     spring::SpringPhase,
     spring_spec::SpringSpec,
-    use_spring::{PxPerUnit, SpringFrame, use_spring},
+    timeline::spring::{PxPerUnit, SpringFrame},
+    use_spring::use_spring,
 };
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;

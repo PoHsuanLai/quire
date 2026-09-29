@@ -3,7 +3,7 @@
 //! with momentum toward the target. [`SpringSpec::for_touch`] is the only way to a spring, so no
 //! caller writes a raw damping.
 
-use super::spring::{Millis, Ratio, Spring};
+use super::spring::{Millis, Ratio, SpringTuning};
 use super::velocity::Velocity;
 use crate::motion::detail::touch::Touch;
 use crate::style::appearance::motion::MotionLevel;
@@ -88,7 +88,7 @@ impl SpringSpec {
     /// The spring for a leg that has `travel` (target minus where it is, in pixels) to go:
     /// 0.8 when the release carried momentum toward the target, else critical; always critical
     /// under Reduced.
-    pub fn spring(self, travel: f64, level: MotionLevel) -> Spring {
+    pub fn spring(self, travel: f64, level: MotionLevel) -> SpringTuning {
         let v = self.thrown(level).0;
         let toward = v.abs() >= MOMENTUM_PX_PER_S && (f64::from(v) * travel) > 0.0;
         let damping = if toward {
@@ -96,7 +96,7 @@ impl SpringSpec {
         } else {
             Ratio::CRITICAL
         };
-        Spring::new(damping, self.response.millis())
+        SpringTuning::new(damping, self.response.millis())
     }
 }
 
