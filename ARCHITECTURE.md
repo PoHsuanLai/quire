@@ -739,8 +739,7 @@ path each, until step 12 replaces them with the prelude.
     feature depends on it there.
 15. **Docs**: `CONSUMING.md` for the new crate names, `DESIGN.md` paths, delete this section.
 16. **User styles** (section 11): `KitRank::User`, `UserStyle` + its watch in `ds-settings`, the
-    `user_style` prop on `Ds`, `ds::selectors`, `lint::user_stylesheet`; the Blitz reload check
-    decides between the `<style>` path and the host path.
+    `user_style` prop on `Ds`, `ds::selectors`, `lint::user_stylesheet`.
 
 ## 11. User styles
 
@@ -765,10 +764,9 @@ Rules:
 - **Renaming anything on the public selector surface is a breaking change** for the person's
   file: it updates `ds::selectors`, and the consumer's release notes name it. Everything off the
   table stays freely renamable.
-- **The reload path is verified in Blitz**: a changed `<style>` text must restyle the document.
-  If Blitz does not re-parse it, the root instead hands the text to the host
-  (`shell_host::HostCtx::set_user_stylesheet(SurfaceId, &str)` in sill; the same call in
-  `ds-blitz` for apps), which replaces the document's author stylesheet.
+- **The reload path is the `<style>` element**: Blitz re-parses a `<style>` whose text changes
+  and restyles the document (`ds-native/tests/user_style_reload.rs` proves colours, custom
+  property overrides and an emptied sheet), so no host call is involved.
 - **Recipe, expose a new public part**: add the part's class to the component, add its row to
   `ds::selectors`, add a gallery example that restyles it, and add a `lint::user_stylesheet`
   case that accepts it.
