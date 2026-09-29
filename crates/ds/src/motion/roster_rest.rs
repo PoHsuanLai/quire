@@ -2,8 +2,8 @@
 //! rows are marked present.
 //!
 //! A reconcile happens in the component body (the rows to draw must be right in the render
-//! that lists them), but the timer it needs is never spawned there: under the webview a task
-//! spawned from a render may never be polled (mailo FINDINGS F140), so the body only queues an
+//! that lists them), but the timer it needs is never spawned there: a task spawned from a render
+//! may never be polled, so the body only queues an
 //! effect, and the effect, which dioxus runs after the render on every renderer, spawns the
 //! timer as a task of the roster's owner (`crate::task::spawn_in`, sill FINDINGS Q45). Two
 //! reconciles before the effect runs queue it once, and a timer already due later than the new

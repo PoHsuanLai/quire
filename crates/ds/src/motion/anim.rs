@@ -139,8 +139,7 @@ pub enum Anim {
     /// own) springs up from below (mailo gaps 3).
     PillUp,
     /// `ring-drain`: a countdown ring's `stroke-dashoffset` drains over the send's grace
-    /// period, linear, where CSS reaches the ring (the webview; on Blitz the SendPill writes
-    /// the offset as an attribute, spike S6) (mailo gaps 3).
+    /// period, linear (on Blitz the SendPill writes the offset as an attribute) (mailo gaps 3).
     RingDrain,
     /// `fade-in`: an ink veil fades in to `--veil` rather than to 1 (C:1055; mailo gaps 3).
     FadeIn,

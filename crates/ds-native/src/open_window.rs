@@ -114,7 +114,7 @@ impl WindowHandle {
 
 /// Open another window of this app, rendering `root` in a VirtualDom of its own. Call it from a
 /// component or a handler inside a window `launch` opened (or one this opened); anywhere else
-/// (the harness, a snapshot, a webview) there is no event loop to ask and it answers
+/// (the harness, a snapshot) there is no event loop to ask and it answers
 /// [`OpenWindowError::NoHost`].
 pub fn open_window(
     spec: WindowSpec,

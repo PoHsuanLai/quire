@@ -13,7 +13,7 @@ use dioxus::prelude::*;
 use std::rc::Rc;
 
 /// Frames a selector waits for its element to be drawn: a field asked for in the handler that
-/// opens its panel mounts a frame or two later (mailo's webview scripts waited twenty).
+/// opens its panel mounts a frame or two later.
 const FIND_FRAMES: usize = 20;
 
 /// One attempt at finding an element.
@@ -60,8 +60,7 @@ impl std::fmt::Debug for HostFind {
 /// Why [`focus_by_selector`] did not move the focus.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum FocusError {
-    /// No host can find elements here: a webview has no [`HostFind`] (its app focuses by
-    /// script).
+    /// No host can find elements here: no [`HostFind`] was provided.
     #[error("no host finds elements by selector here")]
     NoHost,
     /// The host's document cannot parse the selector.

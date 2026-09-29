@@ -44,8 +44,7 @@ fn held(kind: TextInputKind, value: String, typed: Signal<String>) -> String {
     }
 }
 
-/// A text field. `focus: Focus::OnMount` puts the caret in it when it mounts (and writes
-/// `autofocus` for a webview); `Focus::Controlled(request)` does too, and again at each
+/// A text field. `focus: Focus::OnMount` puts the caret in it when it mounts; `Focus::Controlled(request)` does too, and again at each
 /// `request.request()`. `onkey` hears each key as the event itself, so a caller that takes a
 /// key can `prevent_default` it (sill FINDINGS Q61).
 ///

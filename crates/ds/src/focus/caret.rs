@@ -1,7 +1,7 @@
 //! Where a field's caret is when a key arrives (sill Q299): the launcher's Right shows the
 //! preview pane only with the caret at the end of the query. Blitz keeps the caret in the
 //! document, so the host reads it: ds-native provides [`HostCaret`] beside its focus writes, and
-//! without one (a webview) the caret is [`Caret::Unknown`].
+//! without one the caret is [`Caret::Unknown`].
 
 use dioxus::prelude::MountedData;
 
@@ -37,8 +37,7 @@ pub enum InitialCaret {
 
 /// The host's caret write, provided as root context by ds-native beside [`HostCaret`]
 /// (`launch`, its harness and `ds_native::focus::provide`): put the caret of the field `element`
-/// at an [`InitialCaret`] place. Without one (a webview) the caret stays where the renderer put
-/// it. `Focused::Busy` asks to be tried again a frame later.
+/// at an [`InitialCaret`] place. Without one the caret stays where the renderer put it. `Focused::Busy` asks to be tried again a frame later.
 #[derive(Debug, Clone, Copy)]
 pub struct HostPlaceCaret(pub fn(&MountedData, InitialCaret) -> crate::focus::host::Focused);
 
@@ -62,8 +61,8 @@ pub enum FieldSelection {
 }
 
 /// The host's selection read, provided as root context by ds-native beside [`HostCaret`]
-/// (`launch`, its harness and `ds_native::focus::provide`). Without one (a webview) a masked
-/// field leaves the caret to the renderer.
+/// (`launch`, its harness and `ds_native::focus::provide`). Without one a masked field
+/// leaves the caret to the renderer.
 #[derive(Debug, Clone, Copy)]
 pub struct HostSelection(pub fn(&MountedData) -> FieldSelection);
 

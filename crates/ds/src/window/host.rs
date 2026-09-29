@@ -92,7 +92,7 @@ pub fn use_window_host_provider(host: impl FnOnce() -> Rc<dyn HostWindow>) -> Wi
     use_context_provider(|| WindowHost::new(host()))
 }
 
-/// The enclosing host's window, if there is one (none in a webview, an SSR render or a shell
+/// The enclosing host's window, if there is one (none in an SSR render or a shell
 /// surface that has not provided one).
 pub fn use_window_host() -> Option<WindowHost> {
     try_use_context::<WindowHost>()
