@@ -15,7 +15,7 @@
 //! What the virtual clock does not reach: work off the harness's thread (a Tokio task such as
 //! `ds_settings`' file watch, a D-Bus reply), which still runs on real time. `advance` on the
 //! virtual clock never sleeps, so a test waiting for such work needs the wall clock. And Blitz's
-//! own clock reads (rev e99fbdbd, `pub(crate)` fields a host cannot set): a press within 500 ms
+//! own clock reads (rev bf588142, `pub(crate)` fields a host cannot set): a press within 500 ms
 //! of wall time after the last one at the same spot is a double click, and a scrollbar's fade,
 //! both on the wall clock. On the virtual clock `advance` takes no wall time, so two clicks at
 //! one spot are always a double click, however far apart the test advanced them.

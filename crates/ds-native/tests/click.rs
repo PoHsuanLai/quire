@@ -96,7 +96,7 @@ fn a_click_reaches_a_button_in_a_flex_row_with_only_a_placeholder_after_it() {
 }
 
 #[test]
-#[ignore = "blitz-dom at e99fbdbd hits the parent of an atomic inline in an inline formatting \
+#[ignore = "blitz-dom at bf588142 (the quire-pin fork) hits the parent of an atomic inline in an inline formatting \
             context, not the inline-flex Button: the click never reaches it (FINDINGS Polish pass)"]
 fn a_click_reaches_a_button_in_an_inline_formatting_context() {
     assert_eq!(
