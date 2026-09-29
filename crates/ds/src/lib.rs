@@ -176,6 +176,7 @@ pub use crate::core::{
         units::{Point, Px, Rect, Size},
     },
     press::{PointerButton, Press},
+    spawner::Spawner,
     standard_action::{Reserved, SpaceNumber, StandardAction},
     text::clip::clip_chars,
     time::{
