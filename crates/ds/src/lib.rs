@@ -361,7 +361,7 @@ pub use crate::stack::{
     layer_stack::{Dismissal, LayerId, LayerStack},
     menu_track::types::{
         ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
-        MenuTrackEffect, MenuTrackEvent,
+        MenuTrackEffect, MenuTrackEvent, ShownBy,
     },
     pull_tab::{Pull, PullTab, TabArm},
     toast_hub::{ToastState, UndoToken, use_toast_hub},

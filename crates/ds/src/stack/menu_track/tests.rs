@@ -7,7 +7,7 @@ use crate::stack::menu_track::{
     types::{
         Branch, ItemPath, MenuAnim, MenuDirection, MenuHold, MenuKey, MenuPhase, MenuTarget,
         MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
-        Submenu,
+        ShownBy, Submenu,
     },
 };
 use std::sync::LazyLock;
@@ -185,6 +185,104 @@ fn hover_switch_swaps_menus_in_one_step_without_animation() {
     );
     let session = session(&phase);
     assert_eq!((session.menu, session.held), (B, MenuHold::Released));
+}
+
+/// One row of the click-after-switch table: its name, the script, and the open menu with how it
+/// was shown and whether its press is still down (`None` when the tracker closed).
+type SwitchCase = (&'static str, Script, Option<(Key, ShownBy, MenuHold)>);
+
+/// With A open in click mode and the pointer switched to B (its title shows B, hover-shown).
+fn switched_to_b() -> Script {
+    [
+        click_open(),
+        vec![(300, Event::Move(pt(120.0, 10.0), MenuTarget::Title(B)))],
+    ]
+    .concat()
+}
+
+#[test]
+fn a_press_on_a_title_the_pointer_switched_to_keeps_its_menu() {
+    // With A open, the pointer enters B (the hover switch shows B), then presses B. That press
+    // is the click that opens B; only a press on a title already pressed closes.
+    let cases: Vec<SwitchCase> = vec![
+        (
+            "switched to by hover",
+            switched_to_b(),
+            Some((B, ShownBy::Hover, MenuHold::Released)),
+        ),
+        (
+            "a press on the switched title keeps it, held",
+            [switched_to_b(), vec![(400, Event::PressTitle(B))]].concat(),
+            Some((B, ShownBy::Press, MenuHold::Held)),
+        ),
+        (
+            "released there: click mode",
+            [
+                switched_to_b(),
+                vec![
+                    (400, Event::PressTitle(B)),
+                    (460, Event::Release(MenuTarget::Title(B))),
+                ],
+            ]
+            .concat(),
+            Some((B, ShownBy::Press, MenuHold::Released)),
+        ),
+        (
+            "a second press closes it",
+            [
+                switched_to_b(),
+                vec![
+                    (400, Event::PressTitle(B)),
+                    (460, Event::Release(MenuTarget::Title(B))),
+                    (900, Event::PressTitle(B)),
+                ],
+            ]
+            .concat(),
+            None,
+        ),
+        (
+            "moving inside B's menu keeps it hover-shown",
+            [
+                switched_to_b(),
+                vec![(400, Event::Move(pt(130.0, 60.0), item(1)))],
+            ]
+            .concat(),
+            Some((B, ShownBy::Hover, MenuHold::Released)),
+        ),
+        (
+            "a press-drag onto B released on its title makes it B's own",
+            vec![
+                (0, Event::PressTitle(A)),
+                (100, Event::Move(pt(120.0, 10.0), MenuTarget::Title(B))),
+                (200, Event::Release(MenuTarget::Title(B))),
+            ],
+            Some((B, ShownBy::Press, MenuHold::Released)),
+        ),
+        (
+            "a press on A's own title still closes A",
+            [click_open(), vec![(500, Event::PressTitle(A))]].concat(),
+            None,
+        ),
+        (
+            "a press on another title opens it as pressed",
+            [click_open(), vec![(300, Event::PressTitle(B))]].concat(),
+            Some((B, ShownBy::Press, MenuHold::Held)),
+        ),
+    ];
+    for (name, script, want) in cases {
+        let (phase, effects) = run(script);
+        let got = match &phase {
+            MenuPhase::Closed => None,
+            MenuPhase::Tracking(session) => Some((session.menu, session.shown, session.held)),
+        };
+        assert_eq!(got, want, "{name}");
+        assert!(
+            !effects
+                .iter()
+                .any(|effect| matches!(effect, Effect::Open(menu, _) if *menu == B)),
+            "{name}: B is swapped in, never opened afresh"
+        );
+    }
 }
 
 #[test]

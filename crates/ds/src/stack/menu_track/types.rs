@@ -17,6 +17,19 @@ pub enum MenuHold {
     Released,
 }
 
+/// How the open menu came to show: by a press on its own title, or by the pointer entering its
+/// title while another menu was open (the hover switch). A press on the title of a menu the
+/// pointer switched to keeps it open, as the click the person meant (macOS: with one menu open,
+/// a click on another title shows that one); only a press on a title the person already pressed
+/// (or dragged to and released on) closes it (design/13 section 13.3.2 "Click toggles").
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ShownBy {
+    /// A press on its title, or a release there after a press-drag.
+    Press,
+    /// The pointer switched to it from another open menu.
+    Hover,
+}
+
 /// Whether the pointer has been inside the menu since it opened.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Entered {
@@ -105,6 +118,8 @@ pub enum Submenu {
 pub struct Session<K> {
     /// The open menu.
     pub menu: K,
+    /// How it came to show.
+    pub shown: ShownBy,
     /// Whether the opening press is still down.
     pub held: MenuHold,
     /// Whether the pointer has been inside the menu.
