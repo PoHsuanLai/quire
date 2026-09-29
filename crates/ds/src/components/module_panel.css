@@ -1,4 +1,4 @@
-/* ModulePanel (sill FINDINGS Q100; design/13 section 13.3.7; sized by design/29-SIZING.md): a
+/* ModulePanel (design/13 section 13.3.7; sized by design/29-SIZING.md): a
    module with content of its own on the tile's frame: the control center's module radius 8
    (`--cc-module-r`), the Off tile's plate (`--surface-2`, a hairline drawn inset so it takes no
    room) and the control center's padding of 10 (`--cc-pad`). A level module is then its padding,
@@ -24,7 +24,7 @@
 .ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
   font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 
-/* A module whose content is unavailable (Q491, `availability: Disabled`): the header's glyph and
+/* A module whose content is unavailable (`availability: Disabled`): the header's glyph and
    trailing figure (a level's percentage) at the disabled .35 beside the dimmed level; the title
    stays legible so the module is still named. */
 .ds-module-panel[*|aria-disabled=true] .ds-module-panel-glyph,

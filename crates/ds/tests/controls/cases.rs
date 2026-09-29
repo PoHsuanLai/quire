@@ -98,7 +98,7 @@ pub const CASES: &[Case] = &[
         state: "disabled",
         make: || rsx! { Button { variant: ButtonVariant::Primary, label: "Send", availability: Availability::Disabled, onclick: |_| {} } },
     },
-    // Sheet and modal parts (sill Q92, Q93): a size apart from the variant, and a disabled
+    // Sheet and modal parts: a size apart from the variant, and a disabled
     // Danger at Regular (a power menu's unavailable Suspend).
     Case {
         component: "button",
@@ -166,7 +166,7 @@ pub const CASES: &[Case] = &[
         state: "disabled",
         make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
     },
-    // IconButton with an external icon (quire gap Q6) and an element id (Q8).
+    // IconButton with an external icon and an element id.
     Case {
         component: "icon_button",
         state: "symbolic",
@@ -193,7 +193,7 @@ pub const CASES: &[Case] = &[
         state: "glyph",
         make: || rsx! { IconView { source: Icon::Bell.into(), size: IconSize::Bar } },
     },
-    // The action glyphs (FINDINGS "mailo gaps"): Lucide printer and folder-input.
+    // The action glyphs: Lucide printer and folder-input.
     Case {
         component: "icon_view",
         state: "printer",
@@ -214,7 +214,7 @@ pub const CASES: &[Case] = &[
         state: "image",
         make: || rsx! { IconView { source: image() } },
     },
-    // The dock's sizes (sill FINDINGS Q16): a glyph at a tile's full magnification, an image at
+    // The dock's sizes: a glyph at a tile's full magnification, an image at
     // a size the caller resolved.
     Case {
         component: "icon_view",

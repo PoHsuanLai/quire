@@ -1,7 +1,7 @@
 //! Pictures the app supplies: where the pixels come from ([`ImageSource`]) and how big they are
 //! ([`ImageSize`]). quire never fetches: a source is a `data:` URI or a `file:` URL, the two
 //! schemes a quire document's net provider answers. ProviderMark's favicon and the screenshot
-//! thumbnail (sill Q181) both take one.
+//! thumbnail both take one.
 
 use crate::error::DsError;
 use crate::icon::IconUrl;

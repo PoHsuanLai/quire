@@ -1,4 +1,4 @@
-//! The words a `MonthGrid` is drawn from (design/04-COMPONENTS.md section 39; sill Q180). The
+//! The words a `MonthGrid` is drawn from (design/04-COMPONENTS.md section 39). The
 //! shell computes the month; these mirror its grid field for field, with the civil dates as its
 //! calendar library gives them (`i16` year, `i8` month and day), so its mapping is a plain
 //! `From` and quire needs no calendar of its own.

@@ -6,7 +6,7 @@
 //! card through the hover hub, placed below the target like a sender card.
 //!
 //! A caller that runs its own machine (the dock's label rules: hide on press, while a menu is
-//! open, while dragging; sill FINDINGS Q17) passes `shown`, and the tooltip shows or hides on
+//! open, while dragging) passes `shown`, and the tooltip shows or hides on
 //! its say alone, at once, with no hover and no delay of its own.
 
 use crate::components::hover_card::{HoverTarget, use_card};

@@ -1,4 +1,4 @@
-//! LeavingList: a column of the consumer's rows that come and go with motion (sill Q510, the
+//! LeavingList: a column of the consumer's rows that come and go with motion (the
 //! notification center). The consumer lists its rows; a row it stops listing plays its exit
 //! (`Fold` by default) and stays drawn until the exit settles; every row dropped in the same
 //! render leaves as one batch, staggered in list order (a Clear folds the rows one after

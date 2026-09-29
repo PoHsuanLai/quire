@@ -1,4 +1,4 @@
-/* NotificationCard (sill Q120; design/20 section 1.6, design/13 section 13.3.6). The card is a
+/* NotificationCard (design/20 section 1.6, design/13 section 13.3.6). The card is a
    plate in its material, inside a transparent scope of that material, so the plate and its
    group's layers paint the material's tint, edge and drop (the transparent-root card rule in the
    materials section). Geometry is the `--notifications-*` tokens `NotificationMetrics` writes:
@@ -54,7 +54,7 @@
 .ds[*|data-modality=keyboard] .ds-notification-close:focus{ opacity:1; pointer-events:auto; }
 .ds-notification .ds-notification-close:hover{ color:var(--ink); }
 
-/* Swipe to dismiss (sill Q122, `data-swipe` on a card that can be swiped). The card is drawn
+/* Swipe to dismiss (`data-swipe` on a card that can be swiped). The card is drawn
    `--swipe-dx` off its place: following a drag or a scroll 1:1 (`live`), springing back home
    (`rest`), and flying out to the right from where it was (`gone`, `banner-out`). The way back
    is driven motion (design/05 section 14, H1): a spring in Rust writes `--swipe-dx` frame by

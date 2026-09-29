@@ -1,5 +1,5 @@
-//! Lucide geometry for glyphs a consumer's actions need beyond the mailo and shell sets
-//! (FINDINGS "mailo gaps"), transcribed from `lucide-static` 1.47.0
+//! Lucide geometry for glyphs a consumer's actions need beyond the mailo and shell sets,
+//! transcribed from `lucide-static` 1.47.0
 //! (<https://unpkg.com/lucide-static@1.47.0/icons/>), ISC licence; see `super`. Each child is as
 //! published, stroke by attribute like every other glyph.
 
@@ -27,7 +27,7 @@ pub(super) const FOLDER_INPUT: &[Shape] = &[
     Shape::Path("m9 16 3-3-3-3"),
 ];
 
-// mailo gaps 6: the "more" glyphs, for a row's or a header's overflow menu (mailo's folder rows
+// The "more" glyphs, for a row's or a header's overflow menu (mailo's folder rows
 // drew a literal `⋯`, which takes the font's weight and baseline rather than the glyph grid's).
 
 /// Lucide `ellipsis`: three dots across.
@@ -80,7 +80,7 @@ pub(super) const CAPS_LOCK: &[Shape] = &[
     Shape::Path("M9 15v-3H5l7-7 7 7h-4v3H9z"),
 ];
 
-// Launcher v2 (sill Q296): the clipboard, emoji and web providers' glyphs.
+// Launcher v2: the clipboard, emoji and web providers' glyphs.
 
 /// Lucide `clipboard` (its clip's `ry` equals its `rx`, so the rect is as published).
 pub(super) const CLIPBOARD: &[Shape] = &[

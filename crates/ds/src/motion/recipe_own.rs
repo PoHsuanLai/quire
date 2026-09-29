@@ -22,7 +22,7 @@ pub(super) const MENU_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `cmdk-rise`: `cmdk-in`'s row with its fade taken out (mailo gaps 2).
+/// `cmdk-rise`: `cmdk-in`'s row with its fade taken out.
 pub(super) const CMDK_RISE: Recipe = recipe(
     "cmdk-rise",
     DurationToken::Big,
@@ -31,7 +31,7 @@ pub(super) const CMDK_RISE: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `pill-up` (mailo gaps 3): a pill centred by `translateX(-50%)` springs up from below the
+/// `pill-up`: a pill centred by `translateX(-50%)` springs up from below the
 /// edge, at the send pill's own `--t-big --e-spring` (`S:706`). An entrance, so it holds nothing.
 pub(super) const PILL_UP: Recipe = recipe(
     "pill-up",
@@ -41,7 +41,7 @@ pub(super) const PILL_UP: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `ring-drain` (mailo gaps 3): the undo-send ring's dash drains over the send's grace period,
+/// `ring-drain`: the undo-send ring's dash drains over the send's grace period,
 /// linear (`S:2339`), and holds empty. `--t-send-ring` is a hold: Reduced does not shorten the
 /// time a person has to take a send back.
 pub(super) const RING_DRAIN: Recipe = recipe(
@@ -52,7 +52,7 @@ pub(super) const RING_DRAIN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `fade-in` (C:1055, mailo gaps 3): an ink veil fades to its resting `--veil` at `--t-move
+/// `fade-in` (C:1055): an ink veil fades to its resting `--veil` at `--t-move
 /// --e-out`, where `fade` runs to 1.
 pub(super) const FADE_IN: Recipe = recipe(
     "fade-in",
@@ -62,7 +62,7 @@ pub(super) const FADE_IN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `busy` (mailo gaps 3): a busy word pulses at `--t-ambient --e-in-out` and never drops below
+/// `busy`: a busy word pulses at `--t-ambient --e-in-out` and never drops below
 /// .45, so it stays legible where `breathe` fades the sync halo to nothing. It loops for as long
 /// as the work does; Reduced plays it once, as every loop.
 pub(super) const BUSY: Recipe = recipe(
@@ -73,7 +73,7 @@ pub(super) const BUSY: Recipe = recipe(
     Iteration::Infinite,
 );
 
-/// `slide-r` at the detail pane's `--t-move --e-spring` (design/13 section 13.3.7; sill Q80):
+/// `slide-r` at the detail pane's `--t-move --e-spring` (design/13 section 13.3.7):
 /// the catalogue's row plays it at `--t-big` for a Space switch, too slow inside a popover.
 pub(super) const PANE_IN_R: Recipe = recipe(
     "slide-r",
@@ -92,7 +92,7 @@ pub(super) const PANE_IN_L: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `pane-out-l` (sill Q80): the outgoing root leaves the way the detail pushes it, over the
+/// `pane-out-l`: the outgoing root leaves the way the detail pushes it, over the
 /// same `--t-move` so both panes settle together, at `--e-exit` since an exit does not spring
 /// (design/05 principle 2). It holds its last frame until the pane is dropped.
 pub(super) const PANE_OUT_L: Recipe = recipe(
@@ -103,7 +103,7 @@ pub(super) const PANE_OUT_L: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `pane-out-r` (sill Q80): the outgoing detail leaves to the right as the root comes back.
+/// `pane-out-r`: the outgoing detail leaves to the right as the root comes back.
 pub(super) const PANE_OUT_R: Recipe = recipe(
     "pane-out-r",
     DurationToken::Move,
@@ -112,7 +112,7 @@ pub(super) const PANE_OUT_R: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `osd-in` (sill FINDINGS Q75): the OSD card's entrance at design/20 section 1.7's `--t-quick
+/// `osd-in`: the OSD card's entrance at design/20 section 1.7's `--t-quick
 /// --e-out`. An entrance, so it holds nothing; the card is at rest when it ends.
 pub(super) const OSD_IN: Recipe = recipe(
     "osd-in",
@@ -122,7 +122,7 @@ pub(super) const OSD_IN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `osd-out` (sill FINDINGS Q75): the OSD card's exit at `--t-move --e-exit` (design/20 section
+/// `osd-out`: the OSD card's exit at `--t-move --e-exit` (design/20 section
 /// 1.7, design/05 section 10). It holds its last, transparent frame until the host unmaps the
 /// surface at `settle(OsdOut)`, so the card never flashes back between the two.
 pub(super) const OSD_OUT: Recipe = recipe(
@@ -143,7 +143,7 @@ pub(super) const LEVEL_TICK: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `sheet-out` (sill FINDINGS Q90): a sheet's exit at `--t-move --e-exit`, the exit design/05
+/// `sheet-out`: a sheet's exit at `--t-move --e-exit`, the exit design/05
 /// section 10 gives shell chrome. It holds its last, transparent frame until the host unmaps
 /// the surface at `settle(SheetOut)`, so the sheet never flashes back between the two.
 pub(super) const SHEET_OUT: Recipe = recipe(
@@ -154,7 +154,7 @@ pub(super) const SHEET_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `widget-out` (sill G423): a widget's card leaving when the person removes it, at `--t-move
+/// `widget-out`: a widget's card leaving when the person removes it, at `--t-move
 /// --e-exit` (design/05 principle 3: exits accelerate), holding its last, transparent frame
 /// until the host drops the card at `settle(WidgetOut)`.
 pub(super) const WIDGET_OUT: Recipe = recipe(
@@ -165,7 +165,7 @@ pub(super) const WIDGET_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `banner-out` (sill Q121, Q122): a banner's exit at `--t-move --e-exit` (design/13 section
+/// `banner-out`: a banner's exit at `--t-move --e-exit` (design/13 section
 /// 13.3.6: "timeout and dismiss both slide right, `--t-move --e-exit`"), from the offset a swipe
 /// left it at. It holds its last, transparent frame until the stack drops the row at
 /// `settle(BannerOut)` and the rows below heal.
@@ -177,7 +177,7 @@ pub(super) const BANNER_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `banner-in` (sill Q121): a banner's entrance at `--t-move --e-spring`. design/13 section
+/// `banner-in`: a banner's entrance at `--t-move --e-spring`. design/13 section
 /// 13.3.6 proposed `--t-big` (the design toast's); the stack plays it at `--t-move`, the length
 /// of the exit and the heal it may arrive beside, so the stack moves as one. An entrance, so it
 /// holds nothing.
@@ -189,7 +189,7 @@ pub(super) const BANNER_IN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `panel-in` (sill Q123): the notification center's edge panel slides in at `--t-move --e-out`.
+/// `panel-in`: the notification center's edge panel slides in at `--t-move --e-out`.
 /// Opening it is not contact with the panel, and a spring's overshoot would lift it off the edge
 /// it is anchored to, so it decelerates in (design/05 principle 2). An entrance; it holds
 /// nothing.
@@ -201,7 +201,7 @@ pub(super) const PANEL_IN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `panel-out` (sill Q123): the edge panel slides back out at `--t-move --e-exit` (design/05
+/// `panel-out`: the edge panel slides back out at `--t-move --e-exit` (design/05
 /// section 10), holding its last frame until the host unmaps it at `settle(PanelOut)`.
 pub(super) const PANEL_OUT: Recipe = recipe(
     "panel-out",
@@ -211,7 +211,7 @@ pub(super) const PANEL_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `rise` at `--t-big --e-spring` (sill Q181): the screenshot thumbnail's entrance. A surface
+/// `rise` at `--t-big --e-spring`: the screenshot thumbnail's entrance. A surface
 /// arriving, so it springs at the toast's length (design/20 section 1.13) where a row's `rise`
 /// decelerates at `--t-move`. An entrance; it holds nothing.
 pub(super) const SHOT_IN: Recipe = recipe(
@@ -222,7 +222,7 @@ pub(super) const SHOT_IN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `shot-out` (sill Q181): the thumbnail slides out to the right at `--t-move --e-exit`
+/// `shot-out`: the thumbnail slides out to the right at `--t-move --e-exit`
 /// (design/05 section 10: exits accelerate), holding its last frame until the host unmaps it at
 /// `settle(ShotOut)`.
 pub(super) const SHOT_OUT: Recipe = recipe(
@@ -244,7 +244,7 @@ pub(super) const PICTURE_ACCEPT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `hold` (sill G295): moves nothing, at `--t-tap --e-linear`. A resting state that follows an
+/// `hold`: moves nothing, at `--t-tap --e-linear`. A resting state that follows an
 /// animated one plays it, so the restyle that drops the running animation starts another and
 /// the element is restyled from its resting style, not left at the dropped animation's value.
 pub(super) const HOLD: Recipe = recipe(

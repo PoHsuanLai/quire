@@ -1,4 +1,4 @@
-/* GroupHeader (sill Q125; design/20 section 1.6, design/13 section 13.3.6): one app's head in
+/* GroupHeader (design/20 section 1.6, design/13 section 13.3.6): one app's head in
    the notification center. The words are `SectionHeader`'s group type (the data face in
    capitals, `--fs-caption`, .12em apart, `--ink-faint`) with the app's name a step stronger in
    `--ink-soft`; the icon is 16 in its own column; the count is tabular; the trailing pair (the

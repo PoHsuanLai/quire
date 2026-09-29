@@ -1,5 +1,5 @@
 //! DeviceBattery: one device's battery in the control center's Battery module (design/26-DETAILS.md
-//! 5.2.9, G27): the battery ring with its percentage under it, on the grammar's own primitives.
+//! 5.2.9): the battery ring with its percentage under it, on the grammar's own primitives.
 //! On a center just opened (`FirstShow::Animate`) the arc sweeps from empty over `--t-sweep` and
 //! the number counts up in step with it (the user's ask of 2026-09-26); a later level sweeps from
 //! where the arc is over `--t-quick`, counting only a change of more than a point (R12); the same

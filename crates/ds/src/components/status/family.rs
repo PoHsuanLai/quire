@@ -1,5 +1,5 @@
 //! StatusGlyph: the bar's status glyphs as one family, for a caller that holds any of them
-//! (design/26-DETAILS.md section 7, wave D1).
+//! (design/26-DETAILS.md section 7).
 
 use super::battery::BatteryGlyph;
 use super::battery_state::BatteryState;

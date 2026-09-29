@@ -17,8 +17,8 @@ use ds::lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet
 /// Custom properties a component writes inline per element, which no stylesheet block declares:
 /// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the
 /// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
-/// Space dot's stops (`SpaceDot` and the Space editor's dots, mailo gaps 3), and a tinted plate's
-/// stops and ink per scheme (`IconView { plate_tint }`, sill FINDINGS Q72), and the level
+/// Space dot's stops (`SpaceDot` and the Space editor's dots), and a tinted plate's
+/// stops and ink per scheme (`IconView { plate_tint }`), and the level
 /// control's rubber band and segment stagger (`LevelControl`).
 const INLINE_VARS: &[&str] = &[
     "--av-bg",
@@ -39,9 +39,9 @@ const INLINE_VARS: &[&str] = &[
     // The level control's rubber band and a segment's place in the fill's stagger.
     "--rb",
     "--i",
-    // A notification group's layer count (`NotificationCard`, sill Q120).
+    // A notification group's layer count (`NotificationCard`).
     "--layers",
-    // A swiped card's offset (`NotificationCard { swipe }`, sill Q122).
+    // A swiped card's offset (`NotificationCard { swipe }`).
     "--swipe-dx",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
@@ -121,7 +121,7 @@ fn every_exception_still_suppresses_something() {
     assert!(stale.is_empty(), "exceptions that match nothing: {stale:?}");
 }
 
-/// The consumer classes the mailo gaps 6 goldens put on a button through `extra_class`, and
+/// The consumer classes the mail-app goldens put on a button through `extra_class`, and
 /// the edit surface 2 golden on the surface (mailo's `.c-body`, positioned so its text stacks
 /// over a selection layer): a consumer's own sheet styles them, as it would in the app, so they
 /// are in scope here and nowhere in quire's sheet.

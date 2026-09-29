@@ -1,4 +1,4 @@
-/* IdleDim (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle (Q420 B)"): a full-
+/* IdleDim (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle"): a full-
    screen scrim, black at the level (`--scrim-idle`), never real brightness. Its own share is
    driven from Rust (`ds::detail::idle_dim`, a Sweep-style tween, never a keyframe: it must snap
    on input, which a CSS animation cannot do mid-flight without a restyle), written as a plain

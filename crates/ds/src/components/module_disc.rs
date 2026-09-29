@@ -1,6 +1,6 @@
 //! A module tile's disc: the glyph on its paper or accent disc, the bounded ring while the module
-//! is busy, and the glyph's answer to the module turning on (design/26-DETAILS.md 5.2.2 G14,
-//! 5.2.5 G23): a fill once through its layers, or a morph into its "on" glyph.
+//! is busy, and the glyph's answer to the module turning on (design/26-DETAILS.md 5.2.2,
+//! 5.2.5): a fill once through its layers, or a morph into its "on" glyph.
 
 use crate::components::icon_view::IconView;
 use crate::components::module_tile_kind::{DiscMotion, ModuleState};

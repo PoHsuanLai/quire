@@ -1,11 +1,11 @@
-//! Whether a surface that normally floats is drawn in the overlay or in place (mailo gaps 4).
+//! Whether a surface that normally floats is drawn in the overlay or in place.
 //!
 //! A menu or a hover card floats by default: it renders at the end of `.ds`, placed against its
 //! anchor, and joins the layer stack where it takes Escape. Some callers want the same rows or
 //! the same card inside a container of their own: mailo's sender card lists its actions as a
 //! menu inside the card, and a test with no layout asserts a card's content where it put it.
 //! One type serves both components, since the choice is the same fact about either. The scrim
-//! took it too (mailo gaps 5): a reader peeked inside a pane dims the pane beneath it with an
+//! took it too: a reader peeked inside a pane dims the pane beneath it with an
 //! inline scrim, which the overlay's scrim layer would have drawn above the reader.
 
 /// Where a menu, a hover card or a scrim is drawn.

@@ -1,4 +1,4 @@
-//! What the preview pane is told about its latest change (sill Q370, Q371; design/26-DETAILS.md
+//! What the preview pane is told about its latest change (design/26-DETAILS.md
 //! section 5.6): the caller's [`Cue`] from its own `use_detail`, or only who caused the showing,
 //! and the pending look drawn over the media box while a load runs. Split from `preview_pane`,
 //! which frames the content with the actions.

@@ -1,5 +1,5 @@
 //! A Space's colours handed to one of quire's own dots as custom properties, so the stylesheet
-//! paints them (mailo gaps 3). Writing `background:linear-gradient(…#hex…)` inline was a literal
+//! paints them. Writing `background:linear-gradient(…#hex…)` inline was a literal
 //! colour past the stylesheet, which quire's own markup lint flags (`Rule::HexColour`); a
 //! custom property on a `ds-*` element is how quire hands a per-instance value to its sheet,
 //! as `FrameVars` does for `--f-*`.

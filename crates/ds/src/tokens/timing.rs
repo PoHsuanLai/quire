@@ -7,7 +7,7 @@
 //!
 //! `Reduced` is 60 ms for every token of [`DurationKind::Motion`], the named ones included
 //! (design/05-MOTION.md section 3.2, "named durations (3.4) ... 60ms each"); a
-//! [`DurationKind::Hold`] token keeps its Standard value instead (wave 1 amendment: a held
+//! [`DurationKind::Hold`] token keeps its Standard value instead (a held
 //! state, not something that moves, so shortening it to 60 ms would make it unreadable rather
 //! than calmer). `--t-big-heavy` is `--t-big` x 1.15 at each level.
 
@@ -48,7 +48,7 @@ pub enum DurationToken {
     Curl,
     /// `--t-curl-heavy` = 560 x 1.15 = 644 ms: an unread snooze (proposed, 05-MOTION open decision 3).
     CurlHeavy,
-    /// `--t-crumple-heavy` = `--t-big` x 1.15: an unread row's trash (freeze amendment, wave 1).
+    /// `--t-crumple-heavy` = `--t-big` x 1.15: an unread row's trash (freeze amendment).
     CrumpleHeavy,
     /// `--t-send` 620 ms: compose-send.
     Send,
@@ -78,7 +78,7 @@ pub enum DurationToken {
     /// `--t-flash` 1200 ms: a mentioned person chip's ring, held (design/04-COMPONENTS.md
     /// section 10, design/06-INTERACTIONS.md section 2.5, `S:2119`; proposed).
     /// [`DurationKind::Hold`]: keeps 1200 ms under Reduced instead of shortening to 60 ms, so
-    /// the ring is still visible (FINDINGS.md "W1 integration" left this open; resolved here).
+    /// the ring is still visible.
     Flash,
     /// `--t-awake` 20 s: how long an animated emoji stays awake (playing its loop) after a wake
     /// or a mood change (design/25-EMOJI.md section 5).
@@ -184,12 +184,10 @@ impl DurationToken {
 
     /// Whether Reduced shortens this token to 60 ms like every other transition, or the token
     /// is a held state a person must still be able to register and so keeps its Standard value
-    /// (wave 1 amendment, FINDINGS.md "W1 integration": "whether holds should be exempt is an
-    /// open design question" — resolved here by making it data on the token rather than a
-    /// special case in [`Self::millis`]).
+    /// (data on the token rather than a special case in [`Self::millis`]).
     pub fn kind(self) -> DurationKind {
         match self {
-            // The undo window is time a person has to act, not motion (mailo gaps 3).
+            // The undo window is time a person has to act, not motion.
             DurationToken::Flash | DurationToken::SendRing => DurationKind::Hold,
             // A repaint floor for a counting number: it paces text, it does not move anything.
             DurationToken::CountStep => DurationKind::Hold,

@@ -19,7 +19,7 @@ pub enum ScalarToken {
     Tilt,
     /// `--stagger`: the delay per list index.
     Stagger,
-    /// `--pickup`: the scale of a desktop widget picked up to be moved (sill Q430, design/23
+    /// `--pickup`: the scale of a desktop widget picked up to be moved (design/23
     /// section 9.8), and of a card lifted in the widget gallery.
     Pickup,
 }

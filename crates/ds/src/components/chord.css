@@ -1,4 +1,4 @@
 /* Chord (launcher chords): a shortcut as plain text beside the words it belongs to, Spotlight's
    hint. The secondary ink, the face and size of its surroundings (no code face, no cap), so ⌘ ⇧
-   ⌥ ⌃ draw at a letter's size. A block of its own so a gap before it holds in Blitz (sill Q343). */
+   ⌥ ⌃ draw at a letter's size. A block of its own so a gap before it holds in Blitz. */
 .ds-chord{ display:inline-block; color:var(--ink-soft); white-space:nowrap; }

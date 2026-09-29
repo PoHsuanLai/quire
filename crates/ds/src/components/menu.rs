@@ -55,14 +55,14 @@ use dioxus::prelude::*;
 /// pick with the value it knows. `onquery` hears the typed filter's text on every change
 /// ([`Filter::Typing`] or [`Filter::Field`]), for an entry that names it ("Create label '…'").
 ///
-/// `flow: Flow::Inline` draws the same rows where the caller renders the menu (mailo gaps 4: a
+/// `flow: Flow::Inline` draws the same rows where the caller renders the menu (a
 /// sender card's actions): no overlay, no surface, no entrance, no layer on the stack (so no
 /// Escape or outside press of its own, and no press-drag-release), and no focus taken; its
 /// keys are handled when the focus is inside it, and a caller that keeps the focus elsewhere
 /// drives it with [`Cursor::Controlled`]. The flow is fixed for the menu's life: key the menu
 /// by it to switch.
 ///
-/// A floating menu that took the keyboard gives it back when it closes (mailo gaps 7): to the
+/// A floating menu that took the keyboard gives it back when it closes: to the
 /// anchor's element when `anchor` is [`Anchor::Mounted`] (or its nearest focusable ancestor),
 /// if it is still there, through the host's `HostHandBack`; anchored at a point or a rect,
 /// ds-native gives it to the element focused before the menu opened.

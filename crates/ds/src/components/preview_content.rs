@@ -1,4 +1,4 @@
-//! What a preview pane shows (sill Q292): the content as data, and how each kind draws its
+//! What a preview pane shows: the content as data, and how each kind draws its
 //! media and its caption. Split from `preview_pane`, which frames them with the actions.
 
 use crate::components::icon_view::IconView;

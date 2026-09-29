@@ -1,4 +1,4 @@
-//! The mailo gaps 4 overlay cases: hover cards keyed on the caller's own hooks through
+//! The mail-app overlay cases: hover cards keyed on the caller's own hooks through
 //! `use_hover_intent`, drawn in place with no anchor or floating against a rect the caller
 //! already had; a label checklist whose picks keep it open, and a menu's rows drawn inline in
 //! a sender card.

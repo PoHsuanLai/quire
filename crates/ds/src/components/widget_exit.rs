@@ -1,11 +1,11 @@
-//! A widget card's exit (sill G423; design/05 principle 3 and section 8, "acting gets an exit"):
+//! A widget card's exit (design/05 principle 3 and section 8, "acting gets an exit"):
 //! a desktop widget the person removes in Edit Widgets used to vanish between one frame and the
 //! next. Its host now says the card is leaving (`CardPresence::Leaving`) and keeps it drawn;
 //! the card shrinks and fades with `widget-out` (`--t-move --e-exit`, a fade alone under
 //! Reduced), holds its last, transparent frame, and calls the host's `on_gone` once at
 //! `settle(WidgetOut)`, when the host drops it. Taken back before then (`Placed` again), it stops
 //! and plays `hold`, so the restyle that drops the exit leaves no half-faded value behind
-//! (sill G295). Independent of any list: a card on the desktop is not a row.
+//!. Independent of any list: a card on the desktop is not a row.
 
 use crate::motion::anim::Anim;
 use crate::motion::timer::use_motion_timer;

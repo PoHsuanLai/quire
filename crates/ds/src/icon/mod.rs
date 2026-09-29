@@ -10,8 +10,8 @@
 //! The icons are data and not markup strings, so nothing here needs a raw HTML sink.
 //! The mailo set's geometry is in `geometry`, transcribed from the design's `ICON` table; the
 //! shell set's is in `geometry_shell` (design/08-ICONS.md section 1.6), the control center's in
-//! `geometry_control` (sill FINDINGS Q81), quire's own marks on Lucide's grid in `geometry_own`
-//! (sill FINDINGS Q103); the named sets are in `sets`.
+//! `geometry_control`, quire's own marks on Lucide's grid in `geometry_own`
+//!; the named sets are in `sets`.
 //!
 //! No serde: an icon is never stored, and a derive would make it a persisted schema
 //! (`CONVENTIONS.md` section 3).
@@ -237,13 +237,13 @@ pub enum Icon {
     Gamepad,
     /// Lucide `smartphone`: a Bluetooth device.
     Phone,
-    // mailo gaps 6: the "more" glyphs. Kept at the end so the control set (sill Q81) and these
+    // The "more" glyphs. Kept at the end so the control set and these
     // merge without touching each other's lines.
     /// Lucide `ellipsis`: a row's or a header's overflow menu, laid across.
     Ellipsis,
     /// Lucide `ellipsis-vertical`: the same menu where the row is narrow and tall.
     EllipsisVertical,
-    // Control center parts 2 (sill FINDINGS Q103): quire's own glyphs on Lucide's grid.
+    // Control center parts 2: quire's own glyphs on Lucide's grid.
     /// Two toggles with their knobs at opposite ends: the control center's bar item
     /// (`geometry_own`, which documents the geometry).
     Switches,
@@ -252,14 +252,14 @@ pub enum Icon {
     ArrowRight,
     /// Lucide `arrow-big-up-dash`: caps lock is on.
     CapsLock,
-    // Launcher v2 (sill Q296): the clipboard, emoji and web providers.
+    // Launcher v2: the clipboard, emoji and web providers.
     /// Lucide `clipboard`: the clipboard history.
     Clipboard,
     /// Lucide `smile`: emoji.
     Smile,
     /// Lucide `globe`: the web.
     Globe,
-    // Details D2 (design/26 G23): quire's own glyph on Lucide's grid.
+    // design/26: quire's own glyph on Lucide's grid.
     /// Lucide `moon`'s outline, filled: the Focus module when it is on (`geometry_own`).
     MoonFilled,
 }
@@ -314,7 +314,6 @@ impl Icon {
             | Icon::Mouse
             | Icon::Gamepad
             | Icon::Phone => geometry_control::shapes(self),
-            // mailo gaps 6.
             Icon::Ellipsis => geometry_actions::ELLIPSIS,
             Icon::EllipsisVertical => geometry_actions::ELLIPSIS_VERTICAL,
             Icon::Switches => geometry_own::SWITCHES,

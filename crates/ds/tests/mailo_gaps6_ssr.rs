@@ -1,4 +1,4 @@
-//! The mailo gaps 6 states: each new prop, variant or component rendered through dioxus-ssr and
+//! The mail-app states: each new prop, variant or component rendered through dioxus-ssr and
 //! compared with a golden under its component's directory, so the controls' and lists' class
 //! scans cover them too. The props are additive; SidebarItem's class list gained `ds-drop-place`
 //! (the drop styling it now shares with TreeItem), which the existing sidebar goldens show.

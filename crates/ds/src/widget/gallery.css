@@ -35,7 +35,7 @@
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
 
-/* "Added" (sill Q523): while the widget an Add button placed settles in, the button leads with a
+/* "Added": while the widget an Add button placed settles in, the button leads with a
    check (`CheckMark`, drawn on) in its own box, which grows in with `morph-in` (the spring only
    for the person's own press). A row that arrives rises in on its own pulse class. */
 .ds-widget-gallery-added{ display:inline-flex; align-items:center; }

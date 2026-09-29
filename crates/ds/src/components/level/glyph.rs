@@ -22,7 +22,7 @@ const WAVE_2: &[Shape] = &[Shape::Path("M16.32 6.7a8.25 8.25 0 0 1 0 10.6")];
 const WAVE_3: &[Shape] = &[Shape::Path("M18.81 4.61a11.5 11.5 0 0 1 0 14.78")];
 const SLASH: &[Shape] = &[Shape::Path("M2 2l20 20")];
 
-// The keyboard-brightness glyph (design/26 G25), on Lucide's grid: Lucide `keyboard`'s body
+// The keyboard-brightness glyph (design/26), on Lucide's grid: Lucide `keyboard`'s body
 // lowered and shortened to the grid's bottom half (y 12 to 22), a row of keys and the space bar,
 // and above it a sun rising from behind (a half disc of radius 3 on (12, 9)) with five rays at
 // 4.5 to 6 units out, which grow with the level as the display sun's do.

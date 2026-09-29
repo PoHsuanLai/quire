@@ -1,4 +1,4 @@
-//! BannerStack: the notification banners on screen, newest first (sill Q121; design/20 section
+//! BannerStack: the notification banners on screen, newest first (design/20 section
 //! 1.6, design/13 section 13.3.6). The caller lists the banners it shows; the stack plays each
 //! arrival in from its `entry` edge (`Anim::BannerIn`, `--t-move --e-spring`), and each banner
 //! the caller stops listing back out past it (`Anim::BannerOut`, `--t-move --e-exit`), keeping

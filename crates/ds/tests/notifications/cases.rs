@@ -1,4 +1,4 @@
-//! The notification parts' specimens (sill Q120-Q125), each in a Toast root of its scheme.
+//! The notification parts' specimens, each in a Toast root of its scheme.
 
 use dioxus::prelude::*;
 use ds::{
@@ -36,7 +36,7 @@ fn toast(theme: Theme, body: Element) -> Element {
     }
 }
 
-/// A body with every tone and a link (Q124).
+/// A body with every tone and a link.
 pub fn rich_runs() -> Element {
     let body = Rich(vec![
         RichRun::Run(Run::new("Build ", RunTone::Plain)),
@@ -55,7 +55,7 @@ pub fn rich_runs() -> Element {
     )
 }
 
-/// A folded group of four from Mail (Q125).
+/// A folded group of four from Mail.
 pub fn group_header_closed() -> Element {
     toast(
         Theme::Light,
@@ -65,7 +65,7 @@ pub fn group_header_closed() -> Element {
     )
 }
 
-/// An open group, in the dark scheme (Q125).
+/// An open group, in the dark scheme.
 pub fn group_header_open_dark() -> Element {
     toast(
         Theme::Dark,
@@ -83,7 +83,7 @@ fn mail() -> AppMark {
     }
 }
 
-/// A plain card with a body that runs past two lines (Q120).
+/// A plain card with a body that runs past two lines.
 fn card(theme: Theme) -> Element {
     toast(
         theme,
@@ -100,17 +100,17 @@ fn card(theme: Theme) -> Element {
     )
 }
 
-/// Light (Q120).
+/// Light.
 pub fn card_light() -> Element {
     card(Theme::Light)
 }
 
-/// Dark (Q120).
+/// Dark.
 pub fn card_dark() -> Element {
     card(Theme::Dark)
 }
 
-/// A group of three with two layers behind it, two actions and a link in the body (Q120, Q124).
+/// A group of three with two layers behind it, two actions and a link in the body.
 pub fn card_group() -> Element {
     let body = Rich(vec![
         RichRun::Run(Run::new("Build ", RunTone::Plain)),
@@ -149,7 +149,7 @@ pub fn card_popover_root() -> Element {
     }
 }
 
-/// Two banners in a stack at `position` in `theme`, entering from `entry` (Q121).
+/// Two banners in a stack at `position` in `theme`, entering from `entry`.
 fn stack(theme: Theme, position: BannerPosition, entry: BannerEntry) -> Element {
     let banners = [(2, "Grace Hopper", "9:41"), (1, "Ada Lovelace", "now")]
         .into_iter()
@@ -163,7 +163,7 @@ fn stack(theme: Theme, position: BannerPosition, entry: BannerEntry) -> Element 
     toast(theme, rsx! { BannerStack { banners, position, entry } })
 }
 
-/// Top right, light (Q121).
+/// Top right, light.
 pub fn stack_top_right() -> Element {
     stack(
         Theme::Light,
@@ -172,7 +172,7 @@ pub fn stack_top_right() -> Element {
     )
 }
 
-/// Bottom right, dark (Q121).
+/// Bottom right, dark.
 pub fn stack_bottom_right_dark() -> Element {
     stack(
         Theme::Dark,
@@ -190,7 +190,7 @@ pub fn stack_entry_below() -> Element {
     )
 }
 
-/// The center in `theme`: a group header over two cards, in a Popover root (Q123).
+/// The center in `theme`: a group header over two cards, in a Popover root.
 fn center(theme: Theme, scrim: PanelScrim) -> Element {
     rsx! {
         Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Popover, stylesheet: Inject::Host, extent: RootExtent::Viewport,
@@ -203,12 +203,12 @@ fn center(theme: Theme, scrim: PanelScrim) -> Element {
     }
 }
 
-/// Light, no scrim (Q123).
+/// Light, no scrim.
 pub fn center_light() -> Element {
     center(Theme::Light, PanelScrim::None)
 }
 
-/// Dark, over a standard scrim (Q123).
+/// Dark, over a standard scrim.
 pub fn center_dark_scrim() -> Element {
     center(Theme::Dark, PanelScrim::Dim(ScrimStrength::Standard))
 }

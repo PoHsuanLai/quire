@@ -1,4 +1,4 @@
-//! The mailo gaps 2 and 3 states, as data: the golden each renders to and how to make it.
+//! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
 use ds::components::vocab::Switch;
@@ -66,7 +66,7 @@ fn look(index: usize, theme: Theme) -> SpaceLook {
     }
 }
 
-/// The editor with every mailo gaps 2 row switched on, for a Space whose theme is `theme`.
+/// The editor with every mail-app row switched on, for a Space whose theme is `theme`.
 fn editor_rows(theme: Theme) -> Element {
     rsx! {
         SpaceEditor {
@@ -157,7 +157,7 @@ pub const CASES: &[Case] = &[
         golden: "lists/space_editor/rename-unnamed.html",
         make: || rsx! { SpaceEditor { look: look(2, Theme::Light), scheme: Scheme::Light, active_dot: DotIndex(0), onchange: |_| {}, on_rename: EventHandler::new(|_: String| {}) } },
     },
-    // mailo gaps 3. Avatar: an account's colour muted (chroma .55, hue and lightness kept),
+    // Avatar: an account's colour muted (chroma .55, hue and lightness kept),
     // and a person's; a muted ink avatar is greyscale already and keeps its colours.
     Case {
         golden: "controls/avatar/account-28-muted.html",

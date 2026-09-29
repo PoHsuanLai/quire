@@ -1,7 +1,7 @@
 //! The frame ground (`data-ground="frame"`, `crate::Ground::Frame`): under it the paper inks and
 //! fills are the frame's, so every component (Button, IconButton, Chip, Count, a menu's
 //! trigger, plain text) draws in the `--f-*` inks without a variant of its own
-//! (design/03-COLOR.md section 4, design/04-COMPONENTS.md's sidebar item; sill FINDINGS F49).
+//! (design/03-COLOR.md section 4, design/04-COMPONENTS.md's sidebar item).
 //!
 //! Overlays opened from the frame (`.ds-overlay`, rendered at the end of the root) are paper
 //! cards, so they take the paper values back, per scheme, from the token table.

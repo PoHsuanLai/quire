@@ -1,4 +1,4 @@
-//! One row of a `LeavingList` (sill Q510): the consumer's content in a `div.ds-leaving-row`
+//! One row of a `LeavingList`: the consumer's content in a `div.ds-leaving-row`
 //! that plays the row's entrance, exit and heal, and measures its height, which is how far the
 //! rows below it heal when it leaves.
 

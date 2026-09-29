@@ -1,4 +1,4 @@
-//! An alert's vocabulary (sill Q490): how its action reads, and which button is the default.
+//! An alert's vocabulary: how its action reads, and which button is the default.
 
 /// How an alert's action button reads.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

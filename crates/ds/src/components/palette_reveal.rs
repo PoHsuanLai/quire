@@ -1,4 +1,4 @@
-//! Keeping the command palette's selected stop in view (sill Q340): whoever moved the selection
+//! Keeping the command palette's selected stop in view: whoever moved the selection
 //! (a key the palette read, a key the caller claimed, the caller's own `selected`, a new query's
 //! reset), the list scrolls the least that shows the selected row, cell or header action
 //! (`geometry::reveal`), with no animation of its own. A stop the pointer selected is under the

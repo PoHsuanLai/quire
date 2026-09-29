@@ -1,5 +1,5 @@
 //! Where the command palette's card draws and how it enters (design/04-COMPONENTS.md section
-//! 25): over the window on a scrim, or in a surface of its own (sill FINDINGS Q40), with S's
+//! 25): over the window on a scrim, or in a surface of its own, with S's
 //! `peek-in`, C's `cmdk-in`, or an opaque spring. Split from `command_palette`.
 
 use crate::components::popover::Float;
@@ -37,7 +37,7 @@ pub enum PaletteEntrance {
     /// `cmdk-in`, C's command menu.
     CmdkIn,
     /// `cmdk-rise`: `cmdk-in`'s spring with no fade, so the card is opaque from its first
-    /// frame (mailo gaps 2); over a window the scrim then appears at once too, since a fading
+    /// frame; over a window the scrim then appears at once too, since a fading
     /// scrim would hold the card inside it at its own opacity.
     Opaque,
 }

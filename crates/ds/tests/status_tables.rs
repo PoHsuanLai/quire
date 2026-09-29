@@ -1,4 +1,4 @@
-//! design/26 D1: the status glyphs' moment tables as data, and the quantising each compares on
+//! design/26: the status glyphs' moment tables as data, and the quantising each compares on
 //! (R2). Every (from, to) row of the catalogue's section 5.1 is here.
 
 use ds::detail::{EventStamp, Moment, first_table, moment_table};
@@ -30,24 +30,24 @@ fn the_wifi_table() {
     use WifiState::{Failed, Idle, Joining, Off};
     moment_table(&[
         (joined(Two), joined(Two), Moment::Rest),
-        // G1: joining searches, from anywhere, and a new join is a new operation.
+        // Joining searches, from anywhere, and a new join is a new operation.
         (Off, Joining(ONE), Moment::Pending),
         (Idle, Joining(ONE), Moment::Pending),
         (joined(Three), Joining(ONE), Moment::Pending),
         (Failed(ONE), Joining(TWO), Moment::Pending),
         (Joining(ONE), Joining(TWO), Moment::Pending),
         (Joining(ONE), Joining(ONE), Moment::Rest),
-        // G2: a join that lands fills once.
+        // A join that lands fills once.
         (Joining(ONE), joined(Two), Moment::Success),
         (Joining(ONE), no_internet(One), Moment::Success),
-        // G3: strength changes cross-fade; a join nobody watched (auto-join) is a change.
+        // Strength changes cross-fade; a join nobody watched (auto-join) is a change.
         (joined(Three), joined(One), Moment::Change),
         (Idle, joined(Three), Moment::Change),
         (Off, joined(Three), Moment::Change),
-        // G4: the badge.
+        // The badge.
         (joined(Two), no_internet(Two), Moment::Change),
         (no_internet(Two), joined(Two), Moment::Change),
-        // G5: a failed join shakes, once per stamp.
+        // A failed join shakes, once per stamp.
         (Joining(ONE), Failed(ONE), Moment::Failure),
         (Failed(ONE), Failed(TWO), Moment::Failure),
         (Failed(ONE), Failed(ONE), Moment::Rest),
@@ -101,9 +101,9 @@ fn the_battery_table() {
     moment_table(&[
         // R2: a change finer than a drawn step is none.
         (battery(804, Battery), battery(801, Battery), Moment::Rest),
-        // G8: a step of the fill.
+        // A step of the fill.
         (battery(800, Battery), battery(300, Battery), Moment::Change),
-        // G9: the bolt and the plug.
+        // The bolt and the plug.
         (
             battery(600, Battery),
             battery(600, Charging),
@@ -111,7 +111,7 @@ fn the_battery_table() {
         ),
         (battery(1000, Charging), battery(1000, Held), Moment::Change),
         (battery(1000, Held), battery(1000, Battery), Moment::Change),
-        // G10: crossing the threshold is a change of tone even inside one step.
+        // Crossing the threshold is a change of tone even inside one step.
         (battery(201, Battery), battery(195, Battery), Moment::Change),
         // Charging is never low: no tone change there.
         (battery(201, Charging), battery(195, Charging), Moment::Rest),

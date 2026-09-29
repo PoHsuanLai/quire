@@ -1,4 +1,4 @@
-//! Where the command palette's cursor can rest, and how the keys move it (sill Q291, Q294):
+//! Where the command palette's cursor can rest, and how the keys move it:
 //! pure, beside `command_palette`.
 //!
 //! A *stop* is a row (an item or a submenu parent, as a menu's choice), an emoji cell, or a

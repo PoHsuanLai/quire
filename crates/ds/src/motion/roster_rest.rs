@@ -5,7 +5,7 @@
 //! that lists them), but the timer it needs is never spawned there: a task spawned from a render
 //! may never be polled, so the body only queues an
 //! effect, and the effect, which dioxus runs after the render on every renderer, spawns the
-//! timer as a task of the roster's owner (`crate::task::spawn_in`, sill FINDINGS Q45). Two
+//! timer as a task of the roster's owner (`crate::task::spawn_in`). Two
 //! reconciles before the effect runs queue it once, and a timer already due later than the new
 //! one is kept rather than joined by a second task.
 

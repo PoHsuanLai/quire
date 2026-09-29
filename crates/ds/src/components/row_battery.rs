@@ -1,4 +1,4 @@
-//! A connected device's battery at the end of its settings row (design/26-DETAILS.md 5.2.3 G21):
+//! A connected device's battery at the end of its settings row (design/26-DETAILS.md 5.2.3):
 //! the battery glyph and its percentage. When it first shows on a pane just opened, or arrives on
 //! a row already showing (the device just connected), the fill sweeps in from empty over
 //! `--t-sweep` with the number counting in step; a pane re-mounted in place shows it still (R1); a

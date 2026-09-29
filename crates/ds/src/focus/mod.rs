@@ -1,8 +1,8 @@
-//! Keyboard focus: moving it into an element without colliding with the renderer (sill
-//! FINDINGS Q43), a caller's handle for giving a field the keyboard again (Q44), selecting a
-//! field's text as the focus lands (mailo Phase B, G6), and reaching a field by handle or any
-//! element by selector (G8), where the keyboard goes after a click on nothing focusable, and
-//! where it goes when a surface that took it leaves (mailo gaps 7).
+//! Keyboard focus: moving it into an element without colliding with the renderer,
+//! a caller's handle for giving a field the keyboard again, selecting a
+//! field's text as the focus lands, and reaching a field by handle or any
+//! element by selector, where the keyboard goes after a click on nothing focusable, and
+//! where it goes when a surface that took it leaves.
 
 pub mod caret;
 pub mod click;

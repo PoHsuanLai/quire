@@ -1,4 +1,4 @@
-//! Waiting out a renderer that holds the document (sill G312).
+//! Waiting out a renderer that holds the document.
 //!
 //! A host's focus write or rect read answers "busy" when dioxus polls the asking task inside
 //! `render_immediate`, while the mutation writer holds the Blitz document: a task woken in the

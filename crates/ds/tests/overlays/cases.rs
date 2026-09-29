@@ -141,7 +141,7 @@ fn group_by() -> Vec<MenuEntry<u8>> {
     ]
 }
 
-/// A disabled item, a submenu parent and a disabled submenu parent (quire gap Q7).
+/// A disabled item, a submenu parent and a disabled submenu parent.
 fn nested() -> Vec<MenuEntry<u8>> {
     let off = |value: u8, title: &str| MenuEntry::Item {
         availability: Availability::Disabled,
@@ -582,7 +582,7 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Snooze until…", ds::IconButton { variant: ds::IconButtonVariant::Strip, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
         wait: NOW,
     },
-    // Caller-driven (sill FINDINGS Q17): shown with no pointer, hidden under one.
+    // Caller-driven: shown with no pointer, hidden under one.
     Case {
         component: "tooltip",
         state: "fly-shown",
@@ -657,7 +657,7 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Sheet { label: "Accounts", onclose: |_| {}, p { "Settings." } } },
         wait: NOW,
     },
-    // Sheet and modal parts (sill Q90, Q91): centred, shown by its host, and mounted hidden.
+    // Sheet and modal parts: centred, shown by its host, and mounted hidden.
     Case {
         component: "sheet",
         state: "centre",
@@ -695,8 +695,8 @@ pub const CASES: &[Case] = &[
         make: || rsx! { CommandPalette::<u8> { label: "Search and commands", placeholder: "Search mail, people, actions", query: "zz", tokens: Vec::new(), groups: ds::PaletteGroups::default(), empty: "Nothing in this Space matches. Search checks subjects, names, addresses and the text of every message.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
-    // Embedded in a launcher surface (sill FINDINGS Q40): no scrim, `cmdk-in`, the card's id;
-    // and a row whose tile is an app's icon (Q42).
+    // Embedded in a launcher surface: no scrim, `cmdk-in`, the card's id;
+    // and a row whose tile is an app's icon.
     Case {
         component: "command_palette",
         state: "surface-cmdk",

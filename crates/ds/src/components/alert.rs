@@ -1,5 +1,5 @@
 //! Alert: a short question with Cancel and one action, as the Mac draws an `NSAlert` before
-//! Liquid Glass (sill Q490; design/04-COMPONENTS.md section 55): a narrow panel over a modal
+//! Liquid Glass (design/04-COMPONENTS.md section 55): a narrow panel over a modal
 //! scrim, everything centred in one column (an optional icon at 48, a bold title, the message
 //! in the soft ink), then Cancel and the action side by side at equal width, the action on the
 //! right. It enters with the sheet's `peek-in` and, hidden by its host, springs out as a sheet

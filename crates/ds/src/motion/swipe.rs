@@ -1,4 +1,4 @@
-//! Swipe to dismiss as a pure machine (sill Q122; design/13 section 13.3.6 "Swipe right to
+//! Swipe to dismiss as a pure machine (design/13 section 13.3.6 "Swipe right to
 //! dismiss"): a pointer drag moves the card 1:1 to the right and a quarter of the distance to
 //! the left; released past the distance or the speed threshold it flies out to the right from
 //! where it is, and under both it springs back. A horizontal scroll (a touchpad, a mouse's

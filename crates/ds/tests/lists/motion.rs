@@ -91,8 +91,8 @@ fn a_roster_renders_each_moment_of_an_exit() {
 }
 
 /// The row stylesheet and the roster agree on every exit: the rule a leaving row of each
-/// emphasis matches plays exactly the animation `RosterState::leave` settles (wave 2
-/// integration: the heavy curl and crumple were missing from both).
+/// emphasis matches plays exactly the animation `RosterState::leave` settles, the heavy curl and
+/// crumple included.
 #[test]
 fn the_row_stylesheet_plays_what_the_roster_settles() {
     const CASES: &[(Exit, Emphasis)] = &[

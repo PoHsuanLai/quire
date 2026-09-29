@@ -132,7 +132,7 @@ pub fn token_violations(css: &str) -> Vec<String> {
         }
     }
     // The `filter` and `backdrop-filter` properties, not a class that names a filter
-    // (`.ds-menu-filter`, mailo gaps 5).
+    // (`.ds-menu-filter`).
     if css
         .match_indices("filter")
         .any(|(at, word)| css[at + word.len()..].trim_start().starts_with(':'))

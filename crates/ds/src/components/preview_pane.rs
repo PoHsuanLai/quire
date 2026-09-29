@@ -1,4 +1,4 @@
-//! PreviewPane: a Quick-Look-style pane for one thing (sill Q292; design/04-COMPONENTS.md
+//! PreviewPane: a Quick-Look-style pane for one thing (design/04-COMPONENTS.md
 //! section 47): its picture, page, text, icon or facts over a caption, and its actions as
 //! buttons with their keys as a plain chord. The launcher sets it beside its results as `CommandPalette
 //! { aside }`; the Quick Look app (design/20 section 2.4) is to reuse it.
@@ -7,7 +7,7 @@
 //! action the caller's keys have reached, with the focus ring (design/27 section 6.4), so Tab
 //! and Enter stay the caller's. A click on an action calls `onaction` with its number.
 //!
-//! Its moments (sill Q370, Q371) come from the caller's cue (`preview_cue`): the entrance
+//! Its moments come from the caller's cue (`preview_cue`): the entrance
 //! springs only on contact, an in-place change cross-fades the media, and a load past its grace
 //! shows the pending look in the media box.
 

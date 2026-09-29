@@ -1,4 +1,4 @@
-//! The mailo gaps 5 overlay cases: a scrim drawn inline in the pane it dims, under the reader
+//! The mail-app overlay cases: a scrim drawn inline in the pane it dims, under the reader
 //! the pane draws after it; a menu whose filter draws its query line; a hover card's flag whose
 //! words are runs.
 

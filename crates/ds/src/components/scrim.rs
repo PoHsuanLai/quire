@@ -21,7 +21,7 @@ pub(crate) fn scrim_button(
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub(crate) struct ScrimLook {
     /// `data-presence="leaving"` while its modal plays its exit, so the scrim fades out with it
-    /// and stops catching the pointer (sill Q90); `None` otherwise.
+    /// and stops catching the pointer; `None` otherwise.
     pub(crate) presence: Option<&'static str>,
     /// How hard it dims.
     pub(crate) strength: ScrimStrength,
@@ -54,7 +54,7 @@ pub(crate) fn scrim_button_as(
 ///
 /// `flow` says which layer it dims. [`Flow::Floating`] (the default) is the overlay's scrim:
 /// drawn at the end of `.ds` on the scrim layer (`--z-scrim`), above everything the page draws,
-/// a layer on the stack that Escape closes. [`Flow::Inline`] (mailo gaps 5) is drawn where the
+/// a layer on the stack that Escape closes. [`Flow::Inline`] is drawn where the
 /// caller renders it, at the caller's stacking level: `position:absolute; inset:0` inside the
 /// nearest positioned ancestor, with no overlay, no layer and no Escape of its own, so whatever
 /// the caller draws after it in the same container (a peeked reader) sits above it. The
@@ -63,7 +63,7 @@ pub(crate) fn scrim_button_as(
 /// scrim in the same positioned container. A press closes it either way (`onclose`), an inline
 /// one at once since no other layer can be above it in the overlay's sense.
 ///
-/// `layer` (mailo gaps 6) gives an inline scrim a stacking layer of its own, written as
+/// `layer` gives an inline scrim a stacking layer of its own, written as
 /// `z-index: var(--z-…)` on it. Without one it sets no z-index, so a positioned row the caller
 /// draws after it in the same container (a list row that is `position:relative` for its hover
 /// strip) paints over it. The caller picks the layer: above its own rows (`ZLayer::Raise` over

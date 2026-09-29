@@ -1,5 +1,5 @@
 //! ShotThumbnail: the floating thumbnail after a screenshot (design/04-COMPONENTS.md section 39,
-//! design/20 section 1.13; sill Q181).
+//! design/20 section 1.13).
 //!
 //! The picture sits letterboxed in a card of the Toast material ([`shot_frame`]), inside a
 //! transparent Toast scope, so the card paints the material wherever its root is (as

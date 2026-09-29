@@ -46,8 +46,8 @@ enum Rule {
 /// A group's name. The visual order is text, value, rule, action (S puts the rule between the
 /// text and the Frame's action button, `S:120-125`). `action_selection: Selected` draws the
 /// action as a keyboard selection (`data-selected`): a command palette's cursor resting on a
-/// group's "Show More" (sill Q294). `on_action_mounted` hears the action's element as it mounts:
-/// the palette keeps it in view when its cursor rests there (sill Q340).
+/// group's "Show More". `on_action_mounted` hears the action's element as it mounts:
+/// the palette keeps it in view when its cursor rests there.
 #[component]
 pub fn SectionHeader(
     kind: HeaderKind,

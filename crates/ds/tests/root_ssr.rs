@@ -238,7 +238,7 @@ fn the_stylesheet_is_inlined_only_when_asked() {
 
 /// Which materials draw the Space gradient's two layers and grain, and how: opaque and loose on
 /// a window, grouped in `.ds-frame` (at the tint alpha) on shell chrome, not at all on a sheet,
-/// a toast, or a transparent root (design/21-SPACES.md sections 3 and 5; bar gaps Q9, Q13).
+/// a toast, or a transparent root (design/21-SPACES.md sections 3 and 5).
 #[test]
 fn chrome_materials_draw_the_layers_in_a_tinted_frame() {
     // (material, layers, grain, frame groups)

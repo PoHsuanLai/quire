@@ -1,4 +1,4 @@
-//! WidgetSlotGuide: where a dragged widget will land (sill Q431; design/23-WIDGETS.md section
+//! WidgetSlotGuide: where a dragged widget will land (design/23-WIDGETS.md section
 //! 9.8). While a host drags a desktop widget, it draws this at the snap cell under the pointer:
 //! the card's footprint for `size`, a quiet translucent plate in the card's own corner, faded in
 //! as the drag reaches the cell. The host places it; quire draws it, so a shell draws nothing of

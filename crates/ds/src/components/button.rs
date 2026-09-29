@@ -1,7 +1,7 @@
 //! Button: a labelled action in six variants (design/04-COMPONENTS.md section 1).
 //! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini; `title`,
 //! `aria-label` and `aria-expanded` only when the caller gives them (or a mark face names it);
-//! the consumer's own `data-*` and classes after quire's (mailo gaps 6).
+//! the consumer's own `data-*` and classes after quire's.
 
 use crate::components::button_face::{
     ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
@@ -30,7 +30,7 @@ pub enum ButtonVariant {
     Quiet,
     /// As Mini at rest; red only on hover.
     Danger,
-    /// Words on the Space frame (mailo gaps 4): the sidebar item's chrome, `--f-ink-soft` on
+    /// Words on the Space frame: the sidebar item's chrome, `--f-ink-soft` on
     /// nothing at rest, `--f-ink` on `--f-pill-hover` under the pointer, on `--f-pill` while
     /// pressed or held down. A frame word's contrast is the frame's, which no surface token
     /// guarantees, so the other variants' `--ink` family does not belong there.
@@ -69,21 +69,21 @@ impl ButtonVariant {
 /// leave it `None` on a button that opens nothing.
 ///
 /// `trailing` puts a mark after the label: `Trailing::Caret` for a dropdown showing its value,
-/// or a glyph. `leading` puts one before it (mailo gaps 5): `Leading::Mark` holds an element
+/// or a glyph. `leading` puts one before it: `Leading::Mark` holds an element
 /// such as a `ProviderMark`, for a From dropdown whose value shows the account's provider;
 /// `Leading::Glyph` a glyph (for a lone glyph, `icon` is the same thing). `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
 /// and then names the button by `label` through `aria-label`, unless `aria_label` says
 /// otherwise.
 ///
-/// `label` is a [`Text`]: a `String` or `&str` as before, or runs in their tones (mailo gaps 5:
-/// a quoted message's head, "who" strong and "when" faint), drawn inside the label's span. A
+/// `label` is a [`Text`]: a `String` or `&str` as before, or runs in their tones (a quoted
+/// message's head, "who" strong and "when" faint), drawn inside the label's span. A
 /// label of runs names the button by its characters (`Text::plain_text`) through `aria-label`,
 /// unless `aria_label` says otherwise.
 ///
 /// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
 /// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
 ///
-/// `data` and `extra_class` (mailo gaps 6) put the consumer's own `data-*` attributes and
+/// `data` and `extra_class` put the consumer's own `data-*` attributes and
 /// classes on the button itself, so it needs no wrapping `span`: `data-folder` for a drag that
 /// reads the place off the element under the pointer, a class for the consumer's own reveal or
 /// layout rule. Both are checked when built ([`DataName::parse`], [`ExtraClass::parse`]): a
@@ -93,11 +93,11 @@ impl ButtonVariant {
 /// [`DataName::parse`]: crate::DataName::parse
 /// [`ExtraClass::parse`]: crate::ExtraClass::parse
 ///
-/// `size` (sill Q92) draws the variant at another size: `Some(ButtonSize::Regular)` gives a
+/// `size` draws the variant at another size: `Some(ButtonSize::Regular)` gives a
 /// Danger the Primary's geometry, so Restart sits level with Shut Down and Cancel beside it.
 /// `None` keeps the variant's own size (Danger and Mini are Mini-sized) and writes nothing.
 ///
-/// `availability: Availability::Disabled` (sill Q93) writes `aria-disabled` and `disabled`,
+/// `availability: Availability::Disabled` writes `aria-disabled` and `disabled`,
 /// draws the button at .35 with no hover and no press (design/13 section 13.3.3's disabled
 /// item), and drops every press: `onclick` never runs.
 #[component]
@@ -163,7 +163,7 @@ pub fn Button(
                     mounted.call(event);
                 }
             },
-            // The consumer's own `data-*` (mailo gaps 6), last: a spread follows the named
+            // The consumer's own `data-*`, last: a spread follows the named
             // attributes.
             ..data,
             if let Some(mark) = leading {

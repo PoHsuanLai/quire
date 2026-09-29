@@ -1,4 +1,4 @@
-//! Q491: a disabled `LevelControl` looked exactly like an enabled capsule at 0 %, so a brightness
+//! A disabled `LevelControl` looked exactly like an enabled capsule at 0 %, so a brightness
 //! level that could not move read as broken. Each state as markup, and the stylesheet rules that
 //! draw the disabled one: the rail and lead glyph at .35, no knob, the not-allowed cursor, no
 //! swell; a `ModulePanel` whose content is disabled dims its header glyph and percentage.

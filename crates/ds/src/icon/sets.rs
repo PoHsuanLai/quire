@@ -44,7 +44,7 @@ impl Icon {
     ];
 
     /// The shell set, in design/08-ICONS.md section 1.6's order, then the control center's own
-    /// `Switches` (sill FINDINGS Q103).
+    /// `Switches`.
     pub const SHELL: &[Icon] = &[
         Icon::Wifi,
         Icon::WifiLow,
@@ -102,20 +102,19 @@ impl Icon {
     pub const ACTIONS: &[Icon] = &[
         Icon::Printer,
         Icon::FolderInput,
-        // mailo gaps 6.
         Icon::Ellipsis,
         Icon::EllipsisVertical,
         // Lock and switcher parts (M11).
         Icon::ArrowRight,
         Icon::CapsLock,
-        // Launcher v2 (sill Q296).
+        // Launcher v2.
         Icon::Clipboard,
         Icon::Smile,
         Icon::Globe,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
-    /// `geometry_control`; sill FINDINGS Q81). `Power` is in the shell set.
+    /// `geometry_control`). `Power` is in the shell set.
     pub const CONTROL: &[Icon] = &[
         Icon::Play,
         Icon::Pause,
@@ -217,7 +216,6 @@ impl Icon {
         Icon::MoonFilled,
         Icon::Printer,
         Icon::FolderInput,
-        // mailo gaps 6.
         Icon::Ellipsis,
         Icon::EllipsisVertical,
         Icon::ArrowRight,

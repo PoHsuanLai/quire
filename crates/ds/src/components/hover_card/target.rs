@@ -1,7 +1,7 @@
 //! HoverTarget: what a card hooks, feeding the hover hub (design/06-INTERACTIONS.md section 3).
 //!
 //! The target wraps its children in an element of its own, carrying the hub's handlers. A
-//! `span` cannot hold a list item, so the caller picks the element (mailo gaps 2): a `span`
+//! `span` cannot hold a list item, so the caller picks the element: a `span`
 //! (the default, inline), a `div`, or an `li` that is itself the list's item. The handlers are
 //! the same on each, so the hover-intent machine sees one kind of target whatever it is drawn
 //! as. A wrapper with no box of its own (`display:contents`) is not offered: the card is placed

@@ -7,7 +7,7 @@
 //! Every read goes through [`client_rect`]. On dioxus-native, `get_client_rect` borrows the
 //! document mutably, and a task woken in the same turn as a dirty scope is polled inside
 //! `render_immediate` while the renderer already holds that borrow: the read panics ("RefCell
-//! already borrowed", wave 2 integration). A host that knows its document provides
+//! already borrowed"). A host that knows its document provides
 //! [`HostMeasure`], which answers [`Measured::Busy`] instead, and the read waits a frame. With
 //! no host measurer the read is guarded so the same collision is `Busy` too, never a panic.
 
@@ -59,7 +59,7 @@ pub(crate) async fn client_rect(element: &MountedData) -> Option<Rect> {
 
 /// A read with no host measurer. dioxus-native-dom's rect read borrows its document when the
 /// read is first polled, and panics ("RefCell already borrowed") when a task polled inside the
-/// renderer's own pass makes it (sill FINDINGS Q10: a shell-host root with no measurer). `ds`
+/// renderer's own pass makes it (a shell-host root with no measurer). `ds`
 /// cannot name the Blitz node to `try_borrow` it, so the poll is guarded instead: a panic there
 /// left nothing half-written (the borrow failed before anything was read) and reads as
 /// [`Measured::Busy`], and the caller asks again next frame. The default panic hook still
@@ -183,7 +183,7 @@ pub(crate) fn laid_out(rect: Rect) -> bool {
 
 /// `element`'s rect once it has been laid out: read a frame from now and again on
 /// [`layout_retry`]'s schedule while it is still empty (a surface mapped again reads its rows
-/// before its first layout, sill FINDINGS Q60). `None` when the renderer cannot measure it or it
+/// before its first layout). `None` when the renderer cannot measure it or it
 /// never gains an area; never an empty rect.
 pub(crate) async fn laid_out_rect(element: &MountedData) -> Option<Rect> {
     sleep(FRAME_SLACK).await;

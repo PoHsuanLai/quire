@@ -1,4 +1,4 @@
-//! The root chrome as markup (bar gaps, sill Q9, Q12, Q13): what each material's root stamps
+//! The root chrome as markup (bar gaps): what each material's root stamps
 //! and draws (the window's loose layers and grain; shell chrome's `.ds-frame` group; nothing on
 //! a transparent root), the explicit overrides, and a `Surface` on the frame ground. One golden
 //! per material and per override, under `snapshots/root/chrome/`.

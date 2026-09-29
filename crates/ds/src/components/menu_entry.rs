@@ -19,8 +19,7 @@ pub enum Tile {
     /// A glyph.
     Icon(Icon),
     /// Any icon source: an app's icon file (drawn as it is, filling the tile, with no plate of
-    /// its own under it), a symbolic icon (on the plate, in the text colour) or a glyph (sill
-    /// FINDINGS Q42).
+    /// its own under it), a symbolic icon (on the plate, in the text colour) or a glyph.
     Source(IconSource),
     /// A letter or two.
     Text(String),
@@ -87,8 +86,8 @@ pub enum MenuEntry<T> {
     /// A rule between groups.
     Separator,
     /// A choice whose title and detail are [`Text`] runs the caller computed (a search's
-    /// marks, a name stronger than its path) and which may end in its own action (mailo gaps
-    /// 2). Picked, navigated and filtered exactly as an [`MenuEntry::Item`].
+    /// marks, a name stronger than its path) and which may end in its own action. Picked, navigated
+    /// and filtered exactly as an [`MenuEntry::Item`].
     Row(MenuRow<T>),
 }
 
@@ -118,7 +117,7 @@ pub struct MenuRow<T> {
     /// A button at its end that acts without picking it.
     pub trailing: Option<RowAction>,
     /// How it draws beyond its title and detail: `Plain`, or a file's or a clipboard entry's
-    /// shape (sill Q290). Picked, navigated and matched on its title whatever its shape.
+    /// shape. Picked, navigated and matched on its title whatever its shape.
     pub shape: RowShape,
 }
 

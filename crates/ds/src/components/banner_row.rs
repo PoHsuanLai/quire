@@ -1,4 +1,4 @@
-//! One row of a `BannerStack` (sill Q121): the card in a `div.ds-banner` that plays the row's
+//! One row of a `BannerStack`: the card in a `div.ds-banner` that plays the row's
 //! exit and heal (`banner-out`, `heal`), with the entrance (`banner-in`) on the `div.ds-banner-card`
 //! inside it, and the height it measures, which is how far the rows after it heal when it
 //! leaves. The gap to the next banner is the row's own padding, so the measured height is the

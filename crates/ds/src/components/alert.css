@@ -1,4 +1,4 @@
-/* Alert (sill Q490; design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
+/* Alert (design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
    narrow sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred over a modal
    scrim: one centred column as the polkit prompt's, the optional icon at 48, the title in the
    display face 16/700, the message in `--fs-control` in the soft ink, then Cancel and the action

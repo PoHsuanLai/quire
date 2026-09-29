@@ -1,4 +1,4 @@
-//! What each layout the host hands Edit Widgets added (sill Q523): the gallery keeps no layout,
+//! What each layout the host hands Edit Widgets added: the gallery keeps no layout,
 //! so it learns that an Add landed by seeing the new placement in the next layout, never from
 //! the click itself (a refused edit, a full desktop, lands nothing and shows no check). The book
 //! remembers the identities it saw last, the Add the person asked for, and, per widget and

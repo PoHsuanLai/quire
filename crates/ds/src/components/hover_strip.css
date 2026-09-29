@@ -38,7 +38,7 @@
 .ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-strip .ds-icon-button:hover .ds-fly{ transition-delay:calc(var(--d-fly) * 0); }
 
-/* Caller-driven (mailo gaps 2): `data-shown=visible` shows the strip with no pointer on its row
+/* Caller-driven: `data-shown=visible` shows the strip with no pointer on its row
    (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
    S12, so the caller says so), the buttons popping in as on hover; `data-shown=hidden` keeps it
    down under the pointer. */

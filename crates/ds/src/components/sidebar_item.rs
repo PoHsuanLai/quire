@@ -44,8 +44,8 @@ pub struct TodayTrailing {
 }
 
 /// Which place an item is, by the consumer's own name (`inbox`, `label:7`), written as
-/// `data-place` so a drag in progress can tell which place is under the pointer (mailo gaps 4:
-/// design/06-INTERACTIONS.md section 6.1 reads the drop target off the element).
+/// `data-place` so a drag in progress can tell which place is under the pointer
+/// (design/06-INTERACTIONS.md section 6.1 reads the drop target off the element).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct PlaceId(pub String);
 
@@ -77,7 +77,7 @@ impl Preview {
 }
 
 /// The item's classes: its own and the drop place's, whose rules draw `drop` (shared with
-/// `TreeItem`, mailo gaps 6).
+/// `TreeItem`).
 const CLASS: &str = "ds-sidebar-item ds-drop-place";
 
 /// The class list and `data-pulse` for an item playing `pulse` (the gulp).
@@ -102,7 +102,7 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// {label}", so each row's close says whose it is; `trailing` puts a scheduled row's time and
 /// its cancel button after the label (Today only; other kinds ignore it).
 ///
-/// A drag over the sidebar (mailo gaps 4, design/06 section 6.1) needs each place to say which
+/// A drag over the sidebar (design/06 section 6.1) needs each place to say which
 /// it is and to hear the pointer: `place` is written as `data-place`, and `onpointerenter`,
 /// `onpointerleave`, `onpointermove` and `onpointerup` hand the item's pointer events to the
 /// caller, who sets `drop: DropState::Target` on the place under a dragged thread (lit with

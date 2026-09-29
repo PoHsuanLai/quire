@@ -2,7 +2,7 @@
 //! section 3).
 //!
 //! The selection is one thumb that slides between equal segments (design/27 section 5.15),
-//! driven motion (design/05 section 14, wave H1): a spring in Rust writes its place, so a second
+//! driven motion (design/05 section 14): a spring in Rust writes its place, so a second
 //! pick mid-slide redirects the thumb from where it is. The thumb stands in the selected
 //! segment's own grid cell (`--seg-col`) and is shifted from there by `--seg-dx` segments while
 //! it moves, so at rest it covers that segment exactly, whatever the layout rounded the cells

@@ -1,4 +1,4 @@
-//! Where a sheet stands in its root (sill Q91): at the top, as a settings sheet drops from the
+//! Where a sheet stands in its root: at the top, as a settings sheet drops from the
 //! title, or centred, as macOS centres its shutdown dialog.
 
 use dioxus::prelude::*;

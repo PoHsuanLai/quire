@@ -1,4 +1,4 @@
-//! A command palette's groups (sill Q294): a titled run of rows or an emoji grid, with an
+//! A command palette's groups: a titled run of rows or an emoji grid, with an
 //! optional action on its header ("Show More"). `CommandPalette { groups }` takes
 //! [`PaletteGroups`], which a `Vec` of groups converts into, and so does the older
 //! `Vec<(String, Vec<MenuEntry<T>>)>`: every call site written before groups had actions still

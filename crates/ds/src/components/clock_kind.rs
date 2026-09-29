@@ -1,5 +1,5 @@
-//! The words a `ClockFace` is described in (design/04-COMPONENTS.md "Widgets"; sill FINDINGS
-//! Q183): the time it shows, whether it is day or night there, and how it is drawn.
+//! The words a `ClockFace` is described in (design/04-COMPONENTS.md "Widgets"):
+//! the time it shows, whether it is day or night there, and how it is drawn.
 
 use serde::{Deserialize, Serialize};
 

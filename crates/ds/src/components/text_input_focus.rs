@@ -17,7 +17,7 @@ pub enum Focus {
     #[default]
     Manual,
     /// As it mounts, and again each time the caller calls [`FocusRequest::request`]: a menu
-    /// that took the keyboard hands it back to the field when it closes (sill FINDINGS Q44).
+    /// that took the keyboard hands it back to the field when it closes.
     Controlled(FocusRequest),
 }
 
@@ -66,7 +66,7 @@ impl FieldFocus {
 
     /// Keep the element, hand it to the caller's handle and the document's targets, and take
     /// the focus if the field asks for it on mount. Focus goes through `focus_soon`, which waits
-    /// out a document the renderer holds (sill Q43).
+    /// out a document the renderer holds.
     pub(crate) fn mounted(&self, focus: Focus, event: &MountedEvent, told: Told) {
         let mut element = self.element;
         let mut served = self.served;

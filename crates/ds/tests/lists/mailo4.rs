@@ -1,4 +1,4 @@
-//! The mailo gaps 4 list cases: a strip whose press is heard before any measurement (its markup
+//! The mail-app list cases: a strip whose press is heard before any measurement (its markup
 //! is the strip's own: the press is a listener, which a server render does not write), and
 //! sidebar places that name themselves for a drag, one lit as its target.
 

@@ -33,7 +33,7 @@ pub fn DragGhost(title: String, sub: String, at: Point) -> Element {
     }
 }
 
-/// A dragged thing drawn off its place by `drag` (design/05 section 14, wave H1): 1:1 while a
+/// A dragged thing drawn off its place by `drag` (design/05 section 14): 1:1 while a
 /// hand holds it, springing home when it is let go where nothing took it (the dock's tile
 /// return). Put it inside the thing's own box, around what moves.
 #[component]

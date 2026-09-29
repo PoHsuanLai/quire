@@ -1,4 +1,4 @@
-//! Driving the hover-intent machine from a caller's own pointer hooks (mailo gaps 4).
+//! Driving the hover-intent machine from a caller's own pointer hooks.
 //!
 //! [`HoverTarget`](super::HoverTarget) wraps what it hooks in an element of its own. A caller
 //! that already has the pointer (a row's `PartHooks`, a pin, a Today item) keys the card on its

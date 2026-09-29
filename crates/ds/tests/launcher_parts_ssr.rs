@@ -1,4 +1,4 @@
-//! The launcher v2 parts as markup (sill Q290-Q292, Q294): each row shape, a palette group with
+//! The launcher v2 parts as markup: each row shape, a palette group with
 //! a "Show More" action at rest and under the cursor, an emoji grid in the palette and on its
 //! own, the preview pane with each kind of content, and the palette widened by a pane. Each
 //! matches its golden under `tests/snapshots/launcher/`, lints clean, and uses only `ds-`
@@ -82,7 +82,7 @@ fn files() -> Element {
     )
 }
 
-/// A file row with a shortcut after its time (sill Q343): the two in boxes of their own.
+/// A file row with a shortcut after its time: the two in boxes of their own.
 fn file_with_keys() -> Element {
     let row = MenuEntry::Row(MenuRow {
         tile: Some(Tile::Icon(Icon::File)),

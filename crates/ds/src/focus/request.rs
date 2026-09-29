@@ -1,4 +1,4 @@
-//! Giving a field the keyboard again (sill FINDINGS Q44): a menu that took the keyboard closes,
+//! Giving a field the keyboard again: a menu that took the keyboard closes,
 //! and the palette's field should have it back without being remounted (which replays the
 //! palette's entrance).
 
@@ -32,7 +32,7 @@ impl FocusRequest {
     }
 
     /// This request, putting the field's caret at `caret` each time it lands (and as the field
-    /// mounts): a command palette opened on a query puts it at the end (sill Q341). Needs the
+    /// mounts): a command palette opened on a query puts it at the end. Needs the
     /// host's [`HostPlaceCaret`](crate::HostPlaceCaret) for `End` and `Start`; without one the
     /// caret stays where the renderer put it.
     pub fn with_caret(self, caret: InitialCaret) -> Self {

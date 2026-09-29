@@ -63,9 +63,9 @@ impl IconButtonVariant {
 /// anchor to it (`Anchor::Mounted`). `propagation: Propagation::Stop` keeps the press at the
 /// button, so a glyph inside a `<summary>` does not toggle its `<details>`.
 /// `availability: Availability::Disabled` writes `aria-disabled` and `disabled` and draws the
-/// button at .35 with no hover and no press; `onclick` never runs (sill Q93).
+/// button at .35 with no hover and no press; `onclick` never runs.
 ///
-/// `data` and `extra_class` (mailo gaps 6) put the consumer's own `data-*` attributes and
+/// `data` and `extra_class` put the consumer's own `data-*` attributes and
 /// classes on the button itself, as on a `Button`, so it needs no wrapping `span`: `data-folder` for a drag that
 /// reads the place off the element under the pointer, a class for the consumer's own reveal or
 /// layout rule. Both are checked when built ([`DataName::parse`], [`ExtraClass::parse`]): a
@@ -74,11 +74,11 @@ impl IconButtonVariant {
 ///
 /// A status item's glyph can be a layered status glyph: `icon: IconSource::Status(state)` (a
 /// `StatusState` converts) draws `StatusGlyph` in the same box, ink, pill and label as an `Icon`,
-/// sized by `--bar-status-glyph` (sill Q390); hand it the state every render and it plays its own
+/// sized by `--bar-status-glyph`; hand it the state every render and it plays its own
 /// moments. `first` is the glyph's first frame (`Still`, the default, on bar chrome).
 ///
 /// `nudge` is an attention cue (`use_detail(..).cue()` of a state whose table names
-/// `Moment::Attention`, such as a low battery crossing into its threshold, design/26 G11): each
+/// `Moment::Attention`, such as a low battery crossing into its threshold, design/26): each
 /// new Attention cue lifts the glyph once (`nudge-up`, `use_nudge`), never the pill, and nothing
 /// under Reduced. Pass it for the button's whole life (`None` to `Some` remounts the glyph).
 ///
@@ -143,7 +143,7 @@ pub fn IconButton(
                     mounted.call(event);
                 }
             },
-            // The consumer's own `data-*` (mailo gaps 6), last: a spread follows the named
+            // The consumer's own `data-*`, last: a spread follows the named
             // attributes.
             ..data,
             {glyph}

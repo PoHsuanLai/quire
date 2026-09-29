@@ -1,4 +1,4 @@
-//! The level control's inks (sill FINDINGS Q74, the user's brief of 2026-09-25): what a level
+//! The level control's inks (the user's brief of 2026-09-25): what a level
 //! capsule paints on a chrome material. The filled part is the material's bright ink (white on
 //! the dark vibrancy, a near-white on the light one), the unfilled part a translucent well with
 //! an inner shade, and the glyph inside is two-toned: the well's ink on the well, a dark ink on
@@ -47,7 +47,7 @@ pub(crate) struct LevelInks {
 /// The inks for `scheme`. Light: a near-white fill over a black .18 well, so the fill reads as the
 /// brighter of the two on the light tint: at .10 the fill stood off the well by only 1.37:1 on
 /// the control center's module plate (1.55 on the paper, 1.64 over the Work tint); .18 holds it
-/// at 1.6:1 or more on all three (1.66, 1.85, 1.93; sill FINDINGS Q105,
+/// at 1.6:1 or more on all three (1.66, 1.85, 1.93;
 /// `ds-native/tests/level_contrast.rs`); dark: a white fill over a white .14 well on the dark
 /// tint. The glyph on the fill is a dark ink in both, which is what makes it read as knocked out.
 pub(crate) fn inks(scheme: Scheme) -> LevelInks {

@@ -1,4 +1,4 @@
-//! The palette's key claim (sill Q299): a caller hears each key its field gets before the palette
+//! The palette's key claim: a caller hears each key its field gets before the palette
 //! or the field does, with where the caret is, and may take it. A taken key is the caller's
 //! alone: the palette does not read it, the field does not type or move its caret (its default
 //! is prevented), and `onkey` does not hear it. The launcher takes Space while the person is

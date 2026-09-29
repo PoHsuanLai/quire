@@ -1,4 +1,4 @@
-//! Telling a menu's caller where its highlight is or should go (mailo gaps 2): under a
+//! Telling a menu's caller where its highlight is or should go: under a
 //! caller's cursor the pointer only asks, and under the menu's own the caller hears each move
 //! after the render that made it. Split from `menu`; `menu_cursor` holds the pure rules.
 

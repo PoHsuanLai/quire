@@ -1,4 +1,4 @@
-//! The battery item's state and what each change of it means (design/26-DETAILS.md 5.1.3, G8-G10).
+//! The battery item's state and what each change of it means (design/26-DETAILS.md 5.1.3).
 
 use crate::components::vocab::Fraction;
 use crate::detail::{Detailed, Moment};
@@ -17,7 +17,7 @@ pub enum BatteryPower {
 
 /// The level at or under which a discharging battery's fill turns `--battery-low` (R15). The
 /// reference turns it at about a fifth; the shell reads it from `bar.battery_low_percent`
-/// (proposed, design/26 G10), so it is the caller's.
+/// (proposed, design/26), so it is the caller's.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct LowAt(pub Fraction);
 

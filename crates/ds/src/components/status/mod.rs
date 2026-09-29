@@ -1,4 +1,4 @@
-//! The bar's status glyphs as layers (design/26-DETAILS.md section 5.1, wave D1): Wi-Fi, battery,
+//! The bar's status glyphs as layers (design/26-DETAILS.md section 5.1): Wi-Fi, battery,
 //! Bluetooth and volume, each drawn from stacked parts on the Lucide grid and each with its own
 //! `Detailed` state, so every change plays the moment its table names and then paints 0 frames.
 

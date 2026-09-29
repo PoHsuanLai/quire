@@ -8,15 +8,15 @@
 //! palette lists what it is given flat: a submenu parent is drawn with its chevron but runs
 //! nothing, and a disabled item is drawn and skipped as in a menu.
 //!
-//! Groups (sill Q291, Q294) are rows or an emoji grid, each under its `SectionHeader`, whose
+//! Groups are rows or an emoji grid, each under its `SectionHeader`, whose
 //! trailing action ("Show More") is a stop of the cursor after the group's last row
 //! (`palette_stops`). A caller may claim a key before anything else reads it, knowing where the
-//! caret is (`claim`, sill Q299), and may set a pane beside the results (`aside`, Q292).
+//! caret is (`claim`), and may set a pane beside the results (`aside`).
 //!
 //! It is hosted two ways ([`CommandPaletteHost`]): over the window on a scrim that closes on a
 //! pointer down outside the card, or embedded in a surface of its own (a shell launcher's
-//! panel, sill FINDINGS Q40), where it draws no scrim and its card fills its container. A
-//! caller may keep it mounted and say whether it is `shown` (`palette_shown`, sill Q63).
+//! panel), where it draws no scrim and its card fills its container. A
+//! caller may keep it mounted and say whether it is `shown` (`palette_shown`).
 
 use crate::components::palette_body::{StopEvents, draw_groups};
 use crate::components::palette_claim::{Claim, FieldKey};
@@ -89,27 +89,27 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 ///
 /// `initial_caret` is where the field's caret goes each time the palette gives it the keyboard
 /// (as it mounts, as it is shown again, and when `focus` asks): after the query by default, as
-/// Spotlight does, so a palette opened on a query reads Right as [`Caret::AtEnd`] at once (sill
-/// Q341). A `focus` request that places the caret itself (`with_select_all`, `with_caret`) keeps
+/// Spotlight does, so a palette opened on a query reads Right as [`Caret::AtEnd`] at once.
+/// A `focus` request that places the caret itself (`with_select_all`, `with_caret`) keeps
 /// its own placement.
 ///
-/// The list keeps the selected stop in view whoever moved it (sill Q340): it scrolls the least
+/// The list keeps the selected stop in view whoever moved it: it scrolls the least
 /// that shows it, aligning it with the nearer edge, never centring it, and does not animate the
 /// scroll. A stop the pointer selected is left where it is.
 ///
-/// `reveal` plays the rows' first-show rise (design/26 R13, sill Q372): each row, header and
+/// `reveal` plays the rows' first-show rise (design/26 R13): each row, header and
 /// grid `rise`s at `--t-move --e-out`, `--stagger` after the one before (capped at 12), on each
 /// opening with `FirstShow::Animate`, or on each new Appear of the caller's own `use_detail` cue
 /// (the first result set after an opening); a Change (a later result set) replaces in place with
 /// no stagger. The default, `FirstShow::Still`, never rises. A group's own action (Show More,
-/// Show Less) plays section 5.4's group expand whoever passes a cue (Q373): the rows it adds
+/// Show Less) plays section 5.4's group expand whoever passes a cue: the rows it adds
 /// rise in downward; the rows it removes go and what follows heals up by their height.
 ///
 /// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
 /// radius; absent, it keeps `--r-panel`.
 ///
-/// `handle` ([`use_palette_handle`]) lets a caller that runs a group's action itself (sill Q400:
-/// `sill debug launcher-key enter`, a demo's own button — never the palette's own Enter or
+/// `handle` ([`use_palette_handle`]) lets a caller that runs a group's action itself (`sill debug
+/// launcher-key enter`, a demo's own button — never the palette's own Enter or
 /// click) still get Show More's rise or Show Less's heal: call its `mark_group_action(group)`
 /// before making the change that follows. Absent, or the change turns out not to be that
 /// group's, the change plays nothing, same as any other new result set.

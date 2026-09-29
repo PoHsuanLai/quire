@@ -1,11 +1,11 @@
 //! MonthGrid: a month of days in seven columns, the calendar widget's month (design/04-COMPONENTS.md
-//! section 39; design/20-SURFACES.md section 1.12; sill Q180). The shell computes the month;
+//! section 39; design/20-SURFACES.md section 1.12). The shell computes the month;
 //! this draws it: a header with the month's title and, when the caller steps months, the
 //! previous and next `IconButton { Tool }`; the weekday heads; then the weeks, optionally led by
 //! their ISO week numbers, the neighbours' days quieter, today on the accent disc and a busy
 //! day's dot. A change of month slides the weeks in once (`month_grid_weeks`).
 //!
-//! Two densities (sill Q190): the regular grid, and a compact one that fits a small desktop
+//! Two densities: the regular grid, and a compact one that fits a small desktop
 //! widget's 140 x 140 content box, which the regular grid (224 x 254 for six weeks) overflows.
 //! `MonthDensity::Auto` picks between them by the enclosing `WidgetFrame`.
 
@@ -32,7 +32,7 @@ use dioxus::prelude::*;
 /// 140 x 140 content box): a 14 px header of `--fs-micro` title and 14 px glyph buttons, 12 px
 /// heads, then the weeks sharing the rest evenly, seven columns across (20 each) and the rows
 /// down (19.67 for six weeks, 23.6 for five, the weeks running 4 past the box's foot as an
-/// optical inset), today on a 20 px disc (twice `--fs-caption`, sill Q361) in the middle of its
+/// optical inset), today on a 20 px disc (twice `--fs-caption`) in the middle of its
 /// row and a 3 px dot, measured on Blitz (the `month_grid_density` harness test). It never draws
 /// week numbers, whatever `weeks` says: a week column would not fit.
 #[component]

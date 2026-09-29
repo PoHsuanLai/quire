@@ -1,7 +1,7 @@
 //! quire's own glyphs: composed on Lucide's grid (24, a 2 px round stroke, no fills) where Lucide
 //! has no mark for the thing, so they sit in a row of Lucide glyphs without standing out.
 //!
-//! `Switches`, the control center's (sill FINDINGS Q103): two toggle tracks with their knobs at
+//! `Switches`, the control center's: two toggle tracks with their knobs at
 //! opposite ends, the mark of a panel of switches (macOS draws its control center the same way;
 //! nothing here is copied from its symbol). Built from Lucide `toggle-left`/`toggle-right`'s
 //! parts (a pill track and a round knob inside it), stacked as `sliders-horizontal` stacks its
@@ -18,7 +18,7 @@
 //! - Top knob left (off), bottom knob right (on): the pair reads as switches, not as one toggle
 //!   drawn twice.
 //!
-//! `MoonFilled` (design/26 G23): Lucide `moon`'s own outline, filled as well as stroked
+//! `MoonFilled` (design/26): Lucide `moon`'s own outline, filled as well as stroked
 //! (`Shape::Solid`), so it has exactly the outline moon's silhouette and a Focus disc can morph
 //! from one to the other with nothing but the fill arriving.
 

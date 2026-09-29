@@ -1,4 +1,4 @@
-//! A spring in two dimensions (sill Q432; design/05 section 14.3): two springs, one per axis,
+//! A spring in two dimensions (design/05 section 14.3): two springs, one per axis,
 //! moved together. A dragged widget springs into its snap cell and the others glide aside;
 //! retargeting mid-glide keeps each axis's position and velocity, a hand's release hands each
 //! axis the velocity along it, Reduced is critically damped with no thrown velocity, and nothing

@@ -1,4 +1,4 @@
-//! Where a menu's element is drawn (mailo gaps 4): a placed popover surface in the overlay,
+//! Where a menu's element is drawn: a placed popover surface in the overlay,
 //! on the layer stack, or bare rows in its caller's flow. Split from `menu`.
 
 use crate::components::flow::Flow;

@@ -1,4 +1,4 @@
-//! TrackPosition: the Now Playing position bar (design/26-DETAILS.md 5.2.10, G29). A clock-paced
+//! TrackPosition: the Now Playing position bar (design/26-DETAILS.md 5.2.10). A clock-paced
 //! report steps, it does not tween (3.1 Progress): while playing, the bar and the times repaint
 //! once a second, on the second, from the last position reported, and never between; paused or
 //! buffering, the bar holds at 0 frames. Mounted only while the panel is open, so it costs one

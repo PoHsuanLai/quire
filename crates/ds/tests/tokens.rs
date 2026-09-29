@@ -274,8 +274,8 @@ fn every_table_name_is_declared_on_the_root() {
 /// (design/05-MOTION.md section 5, rows 3, 10, 11 and 15), a `Fraction`'s `--f` and the
 /// avatar's computed colours (design/04-COMPONENTS.md "Shared vocabulary" and section 11), and
 /// an external icon's size (`IconView`, design/08-ICONS.md section 1.5), and a Space dot's
-/// stops (`SpaceDot`, the editor's presets, handles, discs and swatch; mailo gaps 3), and a
-/// tinted plate's per-scheme stops and ink (`IconView { plate_tint }`, sill FINDINGS Q72).
+/// stops (`SpaceDot`, the editor's presets, handles, discs and swatch), and a
+/// tinted plate's per-scheme stops and ink (`IconView { plate_tint }`).
 const PER_ELEMENT: &[&str] = &[
     "--a",
     "--dy",
@@ -297,7 +297,7 @@ const PER_ELEMENT: &[&str] = &[
     "--plate-base-d",
     "--plate-deep-d",
     "--plate-ink-d",
-    // A notification group's layer count (`NotificationCard`, sill Q120).
+    // A notification group's layer count (`NotificationCard`).
     "--layers",
     "--swipe-dx",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).

@@ -1,5 +1,5 @@
 //! The two keyboard events a ds `Menu` feeds (`Select`, `Expand`) and the tracker that starts
-//! open (`MenuTrack::open`): quire gap Q7, where the Menu's submenus are driven by this machine.
+//! open (`MenuTrack::open`), where the Menu's submenus are driven by this machine.
 
 use super::{
     Held, ItemPath, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent,

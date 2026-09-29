@@ -648,7 +648,7 @@ fn a_timeline_crosses_the_wire_as_offsets() {
 
 /// A card picked up says so, and the stylesheet's lifted rule restates the transparent root's
 /// card selector, so `--shadow-drag` replaces the resting drop instead of stacking under it
-/// (sill Q430); the slot guide is the footprint of its size, hidden from assistive technology.
+///; the slot guide is the footprint of its size, hidden from assistive technology.
 #[test]
 fn a_lifted_card_swaps_its_shadow_and_the_guide_is_a_footprint() {
     let lifted = html("battery-lifted");
@@ -698,7 +698,7 @@ fn the_gallery_browses_the_registry_and_lists_the_layout() {
     assert!(gallery.contains(">Batteries<"), "{gallery}");
 }
 
-/// Edit Widgets draws each widget once, at the one size it takes (sill Q520): one preview, no
+/// Edit Widgets draws each widget once, at the one size it takes: one preview, no
 /// size control on it or on a placed row, and every class it writes styled.
 #[test]
 fn the_gallery_offers_one_size_per_widget() {
@@ -720,7 +720,7 @@ fn the_gallery_offers_one_size_per_widget() {
     assert!(gallery.contains(">Batteries<"), "the placed row: {gallery}");
 }
 
-/// Edit Widgets' sheet at the bottom edge (sill Q521): the panel says its edge and carries the
+/// Edit Widgets' sheet at the bottom edge: the panel says its edge and carries the
 /// width and the height it was given; the stylesheet holds it under half the root and plays the
 /// sheet's `peek-in` on its first showing.
 #[test]
@@ -739,7 +739,7 @@ fn the_bottom_sheet_says_its_edge_and_its_extent() {
     ));
 }
 
-/// A card its host removed says it is leaving and plays its exit on its pulse class (sill G423);
+/// A card its host removed says it is leaving and plays its exit on its pulse class;
 /// a placed card says nothing.
 #[test]
 fn a_leaving_card_plays_its_exit() {

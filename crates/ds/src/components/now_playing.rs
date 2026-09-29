@@ -1,5 +1,5 @@
-//! NowPlayingTrack: the Now Playing module's art and titles (design/26-DETAILS.md 5.2.10, G29,
-//! G30). A new track cross-fades in over `--t-quick` (the old art and titles fade out over the
+//! NowPlayingTrack: the Now Playing module's art and titles (design/26-DETAILS.md 5.2.10).
+//! A new track cross-fades in over `--t-quick` (the old art and titles fade out over the
 //! new, which fade in); the same track restated plays nothing (R2); Reduced snaps (R7). While the
 //! player buffers, the art breathes after `PendingGrace` and holds still at `PendingCap` (R4).
 

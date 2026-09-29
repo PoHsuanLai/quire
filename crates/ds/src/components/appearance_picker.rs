@@ -28,7 +28,7 @@ pub enum PickerLayout {
     Full,
     /// The rows fill the width they are given and no more, at the control center's Regular
     /// size (22, design/29-SIZING.md), with narrow sides on equal segments that share it: the
-    /// control center's 300 px module (sill FINDINGS Q101).
+    /// control center's 300 px module.
     Compact,
 }
 

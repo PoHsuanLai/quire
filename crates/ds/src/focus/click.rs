@@ -55,7 +55,7 @@ pub struct HostClickFocus {
     /// Called a frame later with the ancestor `fallback` found. It checks that the ancestor is
     /// still in the document when it focuses, not when the click asked: a click whose handler
     /// removed it (a "Show images" button that goes once pressed) sends the keyboard to the
-    /// next focusable ancestor instead (mailo gaps 7).
+    /// next focusable ancestor instead.
     pub restore: fn(&MountedData) -> Focused,
 }
 

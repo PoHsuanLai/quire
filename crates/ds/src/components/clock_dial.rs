@@ -1,5 +1,5 @@
 //! The analog clock's parts (design/23-WIDGETS.md sections 2 and 4.2; design/04-COMPONENTS.md
-//! "Widgets"; sill FINDINGS Q183), at the reference dial's measured proportions on a 100-unit
+//! "Widgets"), at the reference dial's measured proportions on a 100-unit
 //! dial: sixty fine ticks (every fifth in full ink, the rest at .3), twelve numerals, the hour
 //! hand to .56 of the radius and the minute hand to .9, each a thin neck from the hub that
 //! widens a seventh of the way out, a black hub, and the seconds hand in its own colour from a

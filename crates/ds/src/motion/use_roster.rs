@@ -1,6 +1,6 @@
 //! The roster as a hook: [`RosterState`] in a signal, with the settle timers started for it.
 //! The timers belong to the hook's owner and drop with it; a timer that finds the roster gone
-//! stops (`crate::task`, sill FINDINGS Q45).
+//! stops (`crate::task`).
 
 use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};

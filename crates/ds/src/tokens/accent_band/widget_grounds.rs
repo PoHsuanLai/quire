@@ -1,4 +1,4 @@
-//! What the accent's text lies on inside a desktop widget card (sill Q412; design/23-WIDGETS.md
+//! What the accent's text lies on inside a desktop widget card (design/23-WIDGETS.md
 //! section 4.3; the accent band, design/03-COLOR.md section 20): the `Widget` material's tint at its alpha over
 //! blur, composited over the wallpapers the widget gates measure. The card is see-through
 //! (alpha .48 light, .55 dark, measured from the reference), so a text accent that reads on the

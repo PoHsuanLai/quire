@@ -1,4 +1,4 @@
-//! The OSD card's presence as a pure machine (sill FINDINGS Q76): what a change of `shown` or a
+//! The OSD card's presence as a pure machine: what a change of `shown` or a
 //! settled animation does to the card, and what the component must do about it. The component
 //! (`osd.rs`) owns the timers and runs the effects; everything that decides is here, so the rules
 //! are a table.

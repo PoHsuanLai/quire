@@ -1,5 +1,5 @@
 //! The command palette's selection: its own, kept per query (every keystroke puts it back on
-//! the first choice, `S:1651`), or the caller's (sill FINDINGS Q41), and what the caller hears.
+//! the first choice, `S:1651`), or the caller's, and what the caller hears.
 
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;

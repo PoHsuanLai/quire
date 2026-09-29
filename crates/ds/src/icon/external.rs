@@ -84,7 +84,7 @@ pub enum IconSource {
     Image(ExternalIcon),
     /// A layered status glyph (Wi-Fi, battery, Bluetooth, volume) in its state, drawn by
     /// [`StatusGlyph`](crate::StatusGlyph) in the text colour at the slot's size, playing its
-    /// own moments as the state changes (design/26-DETAILS.md 5.1; sill Q390, Q391). Hand the
+    /// own moments as the state changes (design/26-DETAILS.md 5.1). Hand the
     /// slot the state every render; put its `words()` in the slot's label (R8).
     Status(StatusState),
 }

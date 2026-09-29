@@ -1,4 +1,4 @@
-//! The mailo gaps 6 overlay case: an inline scrim with a layer of its own, above the positioned
+//! The mail-app overlay case: an inline scrim with a layer of its own, above the positioned
 //! rows its pane draws after it.
 
 use crate::cases::Case;

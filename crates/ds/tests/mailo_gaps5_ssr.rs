@@ -1,4 +1,4 @@
-//! The mailo gaps 5 states (controls and lists): each new prop or variant rendered through dioxus-ssr
+//! The mail-app states (controls and lists): each new prop or variant rendered through dioxus-ssr
 //! and compared with a golden under its component's directory, so the controls' and lists'
 //! class scans cover them too. Every state here is additive; the goldens of the states that
 //! existed before are in `components_controls.rs`, `components_lists.rs` and

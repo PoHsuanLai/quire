@@ -57,7 +57,7 @@ pub enum DropState {
     Idle,
     /// Under the pointer and accepting: lit and grown.
     Target,
-    /// Able to take what is being dragged, while the pointer is elsewhere (mailo gaps 5): every
+    /// Able to take what is being dragged, while the pointer is elsewhere: every
     /// place a dragged thread could land is outlined as the drag starts, before the pointer is
     /// over any, so the reader sees where it may go. A quiet dashed accent hairline, weaker
     /// than `Target`'s fill, scale and shadow; written `data-drop="accepts"`.
@@ -270,7 +270,7 @@ pub enum Key {
 
 /// A shape a key's glyph draws as, for `Kbd`'s `data-glyph`: a hook for a face rule that only
 /// some glyphs need. `Arrow` is the only member today — a Small cap's `data-glyph="arrow"`
-/// draws Up, Down, Left and Right larger than the rest of the small face (sill Q111: at 9.5 px
+/// draws Up, Down, Left and Right larger than the rest of the small face (at 9.5 px
 /// an arrow's stroke reads as a dash).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum GlyphKind {
@@ -351,7 +351,7 @@ impl Key {
     }
 
     /// The `data-glyph` shape `Kbd` writes for this key, or `None` for every key whose glyph
-    /// needs no face rule of its own (sill Q111).
+    /// needs no face rule of its own.
     pub(crate) fn glyph_kind(self) -> Option<GlyphKind> {
         match self {
             Key::Up | Key::Down | Key::Left | Key::Right => Some(GlyphKind::Arrow),
@@ -458,7 +458,7 @@ impl Fraction {
     /// All of it.
     pub(crate) const ONE: Fraction = Fraction(1000);
 
-    /// The value a component draws: clamped to 0..=1000 (FINDINGS F18).
+    /// The value a component draws: clamped to 0..=1000.
     pub(crate) fn clamped(self) -> Self {
         Fraction(self.0.min(Self::ONE.0))
     }

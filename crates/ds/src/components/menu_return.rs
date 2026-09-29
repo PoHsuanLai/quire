@@ -1,5 +1,5 @@
 //! A floating menu that took the keyboard gives it back to the element that opened it when it
-//! closes (mailo gaps 7), as a web menu button does: on Blitz the panel's removal otherwise
+//! closes, as a web menu button does: on Blitz the panel's removal otherwise
 //! left the focus nowhere, and an app whose keys are handled on `.app[tabindex]` heard nothing
 //! after Escape.
 //!

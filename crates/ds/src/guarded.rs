@@ -1,7 +1,7 @@
 //! Reaching into a document a renderer may be holding. On dioxus-native, a task woken in the
 //! same turn as a dirty scope is polled inside `render_immediate`, while the mutation writer
 //! holds the document; a rect read or a focus change made then borrows it again and panics
-//! ("RefCell already borrowed", wave 2 integration; sill FINDINGS Q10 and Q43). `ds` cannot name
+//! ("RefCell already borrowed"). `ds` cannot name
 //! the Blitz node to `try_borrow` it, so both the call and the poll are guarded instead: a
 //! panic there left nothing half-written (the borrow failed before anything changed) and reads
 //! as "busy", and the caller tries again a frame later. Hosts provide `HostMeasure` and

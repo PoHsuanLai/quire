@@ -1,6 +1,6 @@
 //! Evaluating an easing token at a point in time, for motion driven from a frame clock rather
 //! than by CSS: a dock's magnification progress, an auto-hide slide (design/05-MOTION.md
-//! section 3, sill FINDINGS Q2).
+//! section 3).
 //!
 //! Integer arithmetic throughout, so the same token at the same time is the same value on every
 //! machine and the result is `Eq`: the curve parameter is found by bisection on x in 1/2^24

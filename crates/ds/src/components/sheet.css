@@ -6,17 +6,17 @@
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
 
-/* Driven (design/05 section 14, H1; sill Q90): after its first entrance the sheet is drawn from
+/* Driven (design/05 section 14, H1): after its first entrance the sheet is drawn from
    a spring in Rust, `--present-p` (0 gone, 1 shown): it fades and settles 12 px down at 95 % as
    it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
-   nothing, so the entrance it drops leaves no value behind (sill G295). Leaving, it is no longer
+   nothing, so the entrance it drops leaves no value behind. Leaving, it is no longer
    a target for the pointer. Under Reduced it only fades. */
 .ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
   transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
 .ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
 .ds-sheet[*|data-presence=leaving]{ pointer-events:none; }
 
-/* Centred (sill Q91): a stage filling the overlay centres the sheet by flex, inside the same
+/* Centred: a stage filling the overlay centres the sheet by flex, inside the same
    36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }

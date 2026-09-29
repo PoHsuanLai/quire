@@ -24,7 +24,7 @@ impl KbdSize {
 }
 
 /// A shortcut as key caps, one per key and nothing between them (O-2: glyphs, no separator).
-/// `data-glyph="arrow"` (sill Q111) marks Up, Down, Left and Right: at `KbdSize::Small` the
+/// `data-glyph="arrow"` marks Up, Down, Left and Right: at `KbdSize::Small` the
 /// face rule draws them larger than the rest of the small face, so the arrow reads as an arrow
 /// rather than a dash.
 #[component]

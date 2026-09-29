@@ -111,12 +111,12 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
     let (hex, alpha) = match material {
         Material::Window => return None,
         Material::Bar if light => (SURFACE, 700),
-        // .58 -> .66 (wave 1, over an opaque ground) -> .68 (settled 2026-09-24, over blur:
+        // .58 -> .66 (over an opaque ground) -> .68 (settled 2026-09-24, over blur:
         // held the dark ink at 4.36:1 over white at .66, short of 4.5).
         Material::Bar => (PAPER_DARK, 680),
         // .55 -> .59 (settled 2026-09-24, over blur: held 4.11:1 over black at .55).
         Material::Dock if light => (SURFACE, 590),
-        // .50 -> .66 (wave 1, as the dark bar) -> .68 (settled 2026-09-24, over blur).
+        // .50 -> .66 (as the dark bar) -> .68 (settled 2026-09-24, over blur).
         Material::Dock => (PAPER_DARK, 680),
         Material::Popover if light => (WHITE, 780),
         Material::Popover => (RAISE_DARK, 780),
@@ -128,7 +128,7 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
         // .66 -> .68 (settled 2026-09-24, over blur, as the dark bar and dock).
         Material::Osd => (PAPER_DARK, 680),
         // The widget adds grain over its tint; the grain is the component's, not the recipe's.
-        // .50 -> .54 (wave 1, light, over black) -> .60 (settled 2026-09-24, over blur: held
+        // .50 -> .54 (light, over black) -> .60 (settled 2026-09-24, over blur: held
         // 3.91:1 over black at .54, the worst of the six) -> **.48** (the user's decision,
         // 2026-09-26, "relax the contrast then": design/23-WIDGETS.md section 1.1 M27-M28 fit
         // the reference exactly, the card's own measured near-white at its own measured alpha).
@@ -137,7 +137,7 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
         // hero and figure numerals, bold city names; large-text guideline is 3:1), which the
         // relaxed gate in `tests/legibility.rs` checks instead (design/03-COLOR.md section 17).
         Material::Widget if light => (WIDGET_NEAR_WHITE, 480),
-        // .45 -> .65 (wave 1, dark, over white) -> .67 (settled 2026-09-24, over blur) -> .55
+        // .45 -> .65 (dark, over white) -> .67 (settled 2026-09-24, over blur) -> .55
         // (the contrast-relax pass, 2026-09-26): the dark tint was not measured against the
         // reference, so it takes the smallest alpha that clears the 3:1 large-text floor for
         // every gate `tests/legibility.rs` runs against it, not only the flat tint over black

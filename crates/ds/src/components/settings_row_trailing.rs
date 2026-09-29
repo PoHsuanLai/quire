@@ -1,7 +1,7 @@
-//! What a `SettingsRow` ends in (sill FINDINGS Q79): nothing, a check, a toggle, a chevron, a
+//! What a `SettingsRow` ends in: nothing, a check, a toggle, a chevron, a
 //! value, a glyph, or a device's battery. The toggle is fenced: its press and its keys stay inside
 //! it, so flipping a device's switch never also runs the row. A check that arrives with a success
-//! draws on (`Settle{Check}`, design/26 G26).
+//! draws on (`Settle{Check}`, design/26).
 
 use crate::components::row_battery::RowBattery;
 use crate::components::text_runs::{Text, text};
@@ -36,7 +36,7 @@ pub enum RowTrailing {
     /// A glyph in the faint ink: a lock on a secured network.
     Glyph(Icon),
     /// A connected device's battery: its glyph and percentage, sweeping in from empty with the
-    /// count in step when it first shows (design/26 G21), then moving from where it is.
+    /// count in step when it first shows (design/26), then moving from where it is.
     Battery(Fraction),
 }
 

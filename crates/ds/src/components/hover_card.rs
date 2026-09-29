@@ -152,7 +152,7 @@ pub(crate) fn use_card(kind: HoverKind) -> (Float, String, &'static str) {
 ///
 /// `flow` is where it is drawn: [`Flow::Floating`] (the default) in the overlay, placed against
 /// its key's anchor; [`Flow::Inline`] where the caller renders it, static in the caller's
-/// container, with the same markup, entrance and card hooks (mailo gaps 4: a card whose key has
+/// container, with the same markup, entrance and card hooks (a card whose key has
 /// no layout to place against, in a test or a server render, is asserted where it stands).
 #[component]
 pub fn HoverCard(

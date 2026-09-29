@@ -1,5 +1,5 @@
 //! Resting opacities a keyframe ends on, named so a keyframe and the element that rests there
-//! agree (mailo gaps 3).
+//! agree.
 
 use super::name::VarName;
 

@@ -151,7 +151,7 @@ mod tests {
     #[test]
     fn every_contact_keyframe_follows_the_motion_level() {
         // Calm and Reduced set `--overshoot` to 1, which flattens a keyframe only if it reads
-        // it (mailo gaps 3): the springs that answer a touch or a change all do. The painted
+        // it: the springs that answer a touch or a change all do. The painted
         // shapes at each level are measured in ds-native's `contact_motion` test.
         let bodies = keyframes(MOTION);
         for anim in [
@@ -179,7 +179,7 @@ mod tests {
 
     #[test]
     fn the_osd_pair_follows_the_cards_anchor() {
-        // One pair for both positions (sill Q75): each keyframe moves by `--osd-dy`, which the
+        // One pair for both positions: each keyframe moves by `--osd-dy`, which the
         // card declares per position, so the top right drops in and the bottom centre rises.
         let bodies = keyframes(MOTION);
         for anim in [Anim::OsdIn, Anim::OsdOut] {

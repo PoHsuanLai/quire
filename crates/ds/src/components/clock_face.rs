@@ -1,5 +1,5 @@
 //! ClockFace: a world clock's face (design/23-WIDGETS.md section 4.2; design/04-COMPONENTS.md
-//! "Widgets"; sill FINDINGS Q183), an analog dial for the medium and large widgets or the time
+//! "Widgets"), an analog dial for the medium and large widgets or the time
 //! as digits for the small one, with the zone's name under it.
 //!
 //! The analog dial is flat and bright, as the reference measures (design/23 section 2): a white

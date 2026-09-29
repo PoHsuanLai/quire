@@ -1,4 +1,4 @@
-/* The status glyphs (design/26-DETAILS.md 5.1, wave D1): each glyph a stack of parts, one `svg`
+/* The status glyphs (design/26-DETAILS.md 5.1): each glyph a stack of parts, one `svg`
    per part, so the stylesheet can move each part (it cannot reach inside an SVG on Blitz, spike
    S6). The first part is in flow and sizes the box. A part fades between lit, faint and hidden
    over `--t-quick`, a hidden one shrunk to .7 so it grows in (the badge, the bolt, the plug, the

@@ -290,7 +290,7 @@ fn heal_index_saturates_at_12() {
     assert_eq!(ds, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12]);
 }
 
-/// A batch (sill Q510): its rows leave staggered in list order, and once it settles they drop
+/// A batch: its rows leave staggered in list order, and once it settles they drop
 /// together and each row below heals by the measured heights of the dropped rows above it.
 #[test]
 fn a_batch_leaves_staggered_and_heals_by_the_heights_above() {

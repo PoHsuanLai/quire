@@ -1,5 +1,5 @@
-//! Lucide geometry for the control center, the power menu and Now Playing (sill FINDINGS
-//! Q81), transcribed from `lucide-static` 1.47.0
+//! Lucide geometry for the control center, the power menu and Now Playing,
+//! transcribed from `lucide-static` 1.47.0
 //! (<https://unpkg.com/lucide-static@1.47.0/icons/>), ISC licence; see `super`. A Lucide
 //! `<line>` is written as the equivalent path `M x1 y1 L x2 y2`, since [`Shape`] has no line;
 //! every other child is as published. `Power` was already in the shell set and is not repeated.

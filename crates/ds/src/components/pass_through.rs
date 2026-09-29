@@ -1,4 +1,4 @@
-//! What a consumer may add to a quire control's own element (mailo gaps 6): `data-*`
+//! What a consumer may add to a quire control's own element: `data-*`
 //! attributes of its own and classes of its own.
 //!
 //! mailo wrapped its buttons in a `span` to carry `data-folder` (its drag reads the drop place
@@ -45,7 +45,7 @@ pub enum PassThroughError {
 
 /// `data-*` names quire writes on its controls or reads on the root: a consumer attribute of
 /// the same name would change how quire's stylesheet draws the element. `slot` is quire's seam
-/// name (`[data-slot=trailing]` on a tree row's trailing slot, mailo gaps 7): a consumer button
+/// name (`[data-slot=trailing]` on a tree row's trailing slot): a consumer button
 /// carrying it would be taken for the slot by the consumer's own seam rules.
 const RESERVED_DATA: &[&str] = &[
     "variant", "size", "theme", "accent", "motion", "material", "slot",

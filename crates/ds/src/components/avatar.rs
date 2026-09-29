@@ -103,7 +103,7 @@ pub enum AvatarTone {
     Stack,
 }
 
-/// Whether an avatar's colour is at full strength or muted (mailo gaps 3): an account that is
+/// Whether an avatar's colour is at full strength or muted: an account that is
 /// not the one in view keeps its hue at .55 of its chroma, so it is still that account but
 /// states nothing about the list (S's `saturate(.55)`, as an unpressed `AccountTile` shows it).
 /// The greyscale tones (`Ink`, `Stack`) are unchanged; the letter stays `--on-hue`.

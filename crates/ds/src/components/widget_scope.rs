@@ -1,5 +1,5 @@
 //! The size of the `WidgetFrame` a component is drawn in, for content that fits itself to the
-//! frame without the caller saying so (a `MonthGrid`'s `Auto` density, sill Q190). The frame
+//! frame without the caller saying so (a `MonthGrid`'s `Auto` density). The frame
 //! provides it once; a descendant reads it, and reads nothing outside a frame.
 
 use crate::components::widget_kind::WidgetSize;

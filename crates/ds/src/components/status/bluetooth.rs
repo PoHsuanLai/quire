@@ -1,5 +1,5 @@
 //! BluetoothGlyph: the rune, two connected dots and a slash as layers (design/26-DETAILS.md
-//! 5.1.2; G6, G7). Connecting breathes the rune after `PendingGrace`, one step per
+//! 5.1.2). Connecting breathes the rune after `PendingGrace`, one step per
 //! `--t-pending-step`, and holds it dimmed at `PendingCap` (R4); a connection that lands seals
 //! once (`seal-out`: the service did it, not a press, R5) as the dots grow in; a failure shakes
 //! once; turning the radio off draws the slash on.

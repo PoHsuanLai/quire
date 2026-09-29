@@ -1,4 +1,4 @@
-//! Focusing an element named by a CSS selector (mailo gaps, G8): an app's panel opens and its
+//! Focusing an element named by a CSS selector: an app's panel opens and its
 //! field, or the window's own `.app`, should have the keyboard, and the caller holds no mounted
 //! handle for it. The host finds the element in its document ([`HostFind`], ds-native's), the
 //! focus and the select-all go through the same `HostFocus`/`HostSelect` writes a field's own

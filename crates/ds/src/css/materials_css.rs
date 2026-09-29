@@ -14,7 +14,7 @@
 //! frame (`data-frame=tinted`) paints no tint of its own, and its `.ds-frame` group shows the
 //! Space gradient at `--m-frame-alpha` over blur and at the solid floor without it; a
 //! transparent root (`data-chrome=transparent`) paints nothing, and its `.ds-popover` and
-//! `.ds-sheet` cards paint the material's tint, edge and drop instead (sill FINDINGS Q9, Q13).
+//! `.ds-sheet` cards paint the material's tint, edge and drop instead.
 
 use super::emit::{attr_selector, declaration, presence_selector, property, rule};
 use crate::appearance::Scheme;
@@ -76,7 +76,7 @@ pub fn materials_css() -> String {
     css
 }
 
-/// The OSD card (`crate::Osd`, sill FINDINGS Q76): a card inside a transparent Osd root that
+/// The OSD card (`crate::Osd`): a card inside a transparent Osd root that
 /// paints what a tinted root paints on its own box (its `.ds-frame` group at the frame alpha, the
 /// solid floor without blur, the inner pair redrawn over it), so one root serves both the fade and
 /// the card's tokens.
@@ -103,8 +103,8 @@ fn osd_card_css() -> String {
 
 /// The cards a transparent root's material is painted on: a popover, a sheet, a notification's
 /// plate and the layers of its group behind it, an edge panel (notification parts), a
-/// desktop widget's card (sill FINDINGS Q182; a widget tile has no material of its own), and
-/// the screenshot thumbnail's plate (sill Q181).
+/// desktop widget's card (a widget tile has no material of its own), and
+/// the screenshot thumbnail's plate.
 const CARDS: [&str; 7] = [
     ".ds-popover",
     ".ds-sheet",
@@ -132,7 +132,7 @@ fn chrome_css(material: &str) -> String {
         // A window's root keeps its gradient as its own background, under both layers, so the
         // window stays opaque through a cross-fade; as its own stacking context the layers
         // (z -2) and the grain (z -1) paint over that background instead of beneath it, where
-        // the switch was an instant swap and the grain never showed (FINDINGS "mailo gaps").
+        // the switch was an instant swap and the grain never showed.
         rule(
             &opaque,
             &[

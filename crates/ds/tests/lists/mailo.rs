@@ -1,4 +1,4 @@
-//! The mailo gaps 2 row cases: a search hit's runs in the subject and snippet, a row named for
+//! The mail-app row cases: a search hit's runs in the subject and snippet, a row named for
 //! a screen reader, and the strip revealed or held down by its caller, titled, with a button
 //! whose menu is open.
 

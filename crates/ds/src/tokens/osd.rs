@@ -1,4 +1,4 @@
-//! The OSD card's margin token (sill FINDINGS Q76; design/22-SETTINGS.md section 3.16
+//! The OSD card's margin token (design/22-SETTINGS.md section 3.16
 //! `osd.margin_px`): the gap from the bar's reserve to the card at the top right, or from the
 //! dock's at the bottom centre. A [`Tuned`] token so the setting reaches the card through one
 //! inline write ([`OsdMetrics::style_attr`]) on any element around it, as the dock's geometry.

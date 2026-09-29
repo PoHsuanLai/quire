@@ -1,4 +1,4 @@
-//! The mailo gaps 2 overlay cases: the command panel's opaque entrance, palette rows whose title
+//! The mail-app overlay cases: the command panel's opaque entrance, palette rows whose title
 //! and detail are runs with a trailing remove, the same rows in a menu, and a menu whose
 //! highlight a field beside it drives; a hover target drawn as a list item or a block, and a
 //! row time's tip.

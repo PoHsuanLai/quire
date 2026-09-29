@@ -1,4 +1,4 @@
-//! Where playback is, and what each change of it means (design/26-DETAILS.md 5.2.10, G28-G30).
+//! Where playback is, and what each change of it means (design/26-DETAILS.md 5.2.10).
 
 use crate::detail::{Detailed, EventStamp, Moment};
 use crate::icon::Icon;

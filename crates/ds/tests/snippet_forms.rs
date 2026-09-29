@@ -1,6 +1,5 @@
-//! What `ListRow`'s `snippet: Option<Text>` accepts, compiled and rendered (CONSUMING.md, the
-//! mailo gaps 2 lists row, corrected in mailo gaps 4). Each form draws the snippet it was given,
-//! or none.
+//! What `ListRow`'s `snippet: Option<Text>` accepts, compiled and rendered (CONSUMING.md). Each
+//! form draws the snippet it was given, or none.
 
 use dioxus::prelude::*;
 use ds::{

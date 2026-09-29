@@ -1,4 +1,4 @@
-/* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
+/* LevelControl (the user's brief of 2026-09-25): a level with a glyph that
    follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
    `material/level.rs`); the capsule is a Regular control, 22 (`--ctl-h-m`, design/29-SIZING.md);
    `--f` is the level and `--rb` the rubber band's stretch, both written
@@ -65,7 +65,7 @@
 .ds-level[*|data-drag=live] .ds-level-segments{ transform:scaleY(1.08); }
 .ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }
 
-/* Disabled (Q491): a level that cannot be moved says so. The rail and the lead glyph drop to the
+/* Disabled: a level that cannot be moved says so. The rail and the lead glyph drop to the
    disabled .35 (design/13 section 13.3.3's disabled item), the knob is not drawn (nothing to
    grab), and the pointer is the not-allowed cursor; no press registers (the component takes no
    input), so nothing swells or stretches. */

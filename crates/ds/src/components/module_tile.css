@@ -1,4 +1,4 @@
-/* ModuleTile (sill FINDINGS Q78; design/20 section 1.5, design/13 section 13.3.7): a module on
+/* ModuleTile (design/20 section 1.5, design/13 section 13.3.7): a module on
    the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
    (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
@@ -46,7 +46,7 @@
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
 
-/* ModuleGrid (design/13 section 13.3.7; sill FINDINGS Q102): `--grid-columns` equal columns
+/* ModuleGrid (design/13 section 13.3.7): `--grid-columns` equal columns
    (2), `--grid-gap` apart (10), `--grid-padding` inside (10); the component writes all three
    inline from `control_center.grid_*`, and these are the control center's sizes
    (`--cc-gap`, `--cc-pad`, design/29-SIZING.md). */

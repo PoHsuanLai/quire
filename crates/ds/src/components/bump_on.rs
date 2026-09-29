@@ -1,6 +1,6 @@
 //! Bump on change: a value a widget shows (a battery's percentage, a clock's minute) plays
 //! `bump` once each time it changes, and is at rest again once the bump has settled (design/20
-//! section 1.14: "none in steady state; value change `bump`"; sill FINDINGS Q182).
+//! section 1.14: "none in steady state; value change `bump`").
 //!
 //! `Count` decides its bump while rendering and never returns to rest; a widget cannot, because
 //! nothing may keep a pulse class on a surface that should idle. So the pulse is fired through

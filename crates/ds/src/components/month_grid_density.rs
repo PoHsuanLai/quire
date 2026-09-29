@@ -1,4 +1,4 @@
-//! How dense a `MonthGrid` is drawn (design/04-COMPONENTS.md section 39; sill Q190). A small
+//! How dense a `MonthGrid` is drawn (design/04-COMPONENTS.md section 39). A small
 //! desktop widget is one 164 px cell padded 12, so 140 px of content, and the regular grid
 //! (seven 32 px columns, 224 wide) does not fit it; the compact density does. A caller cannot
 //! restyle the grid (its classes are quire's), so the density is a prop, and by default it

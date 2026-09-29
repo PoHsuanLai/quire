@@ -85,7 +85,7 @@ pub enum LevelGlyph {
     /// A sun whose rays grow with the brightness.
     Brightness,
     /// A keyboard under a rising sun whose rays grow with the keyboard's backlight (design/26
-    /// 5.2.7, G25): the keyboard-brightness module.
+    /// 5.2.7): the keyboard-brightness module.
     KeyboardBrightness,
 }
 
@@ -96,7 +96,7 @@ pub enum LevelSource {
     Glyph(LevelGlyph),
     /// The volume item's state: the speaker shows the waves and the slash that the bar's
     /// `VolumeGlyph` shows for the same state, so the Sound module and the bar read one source
-    /// (sill Q392). The capsule still shows the control's value; a level of 0 with `Muted`
+    ///. The capsule still shows the control's value; a level of 0 with `Muted`
     /// keeps the slash.
     Volume(VolumeState),
 }

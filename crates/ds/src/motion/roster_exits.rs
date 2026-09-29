@@ -1,4 +1,4 @@
-//! A roster whose rows leave when the consumer stops listing them (sill Q121): the banner
+//! A roster whose rows leave when the consumer stops listing them: the banner
 //! stack's lifecycle. `use_roster` drops a key the consumer no longer lists at once, because a
 //! mail row's exit is started by the action that removes it (`Roster::leave`); a notification
 //! banner is simply taken off the caller's list when it times out or is dismissed, so here a

@@ -1,4 +1,4 @@
-//! How a shaped row draws (sill Q290, `row_shape`): a file's thumbnail in the tile and its folder
+//! How a shaped row draws (`row_shape`): a file's thumbnail in the tile and its folder
 //! under its name, a clipboard entry's text in the code face or its picture, and either one's
 //! time as trailing data. Split from `menu_item`, which calls these for a row whose shape is not
 //! `Plain`.
@@ -93,7 +93,7 @@ pub(crate) fn words(shape: &RowShape, title: Element, detail: Option<Element>) -
 }
 
 /// The trail column: a shaped row's time before the row's own trail, then a shown chord, each
-/// in a box of its own so the gap between them holds (sill Q343: Blitz drops a plain inline
+/// in a box of its own so the gap between them holds (Blitz drops a plain inline
 /// span's margin, and "00:33" ran into "↵").
 pub(crate) fn trail(shape: &RowShape, text: String, chord: Option<Shortcut>) -> Element {
     let when = match shape {
