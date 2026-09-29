@@ -53,11 +53,6 @@ pub enum Anim {
     MenuOut,
     /// `menu-pop` at `--t-quick`: the selection bubble (section 5 row 37).
     BubblePop,
-    /// `cmdk-in`: C's command menu.
-    CmdkIn,
-    /// `cmdk-rise`: `cmdk-in`'s scale and lift with no fade, so the panel is opaque from its
-    /// first frame (a command panel is never drawn invisible).
-    CmdkRise,
     /// `peek-in`: peek and the command menu.
     PeekIn,
     /// `peek-in` at `--t-move --e-out`: the reader entering Full peek (section 5 row 64, C).
@@ -74,30 +69,10 @@ pub enum Anim {
     HcOut,
     /// `page-in`: composer page, inline reply.
     PageIn,
-    /// `park`: the composer page parking.
-    Park,
     /// `shake-x`: the To row with no recipient.
     ShakeX,
-    /// `nudge`: outbox retry (C).
-    Nudge,
     /// `shake`: outbox needs sign-in (C).
     Shake,
-    /// `compose-rise`: the floating composer (C).
-    ComposeRise,
-    /// `compose-send`: the composer sending.
-    ComposeSend,
-    /// `floatup`: the snooze zZ.
-    Floatup,
-    /// `sail`: the orphaned boat (C).
-    Sail,
-    /// `boat-return`: the orphaned boat returning (C).
-    BoatReturn,
-    /// `dest`: the destination preview, alternating while hovered.
-    Dest,
-    /// `breathe`: the idle sync halo, looping.
-    Breathe,
-    /// `spin`: the busy sync halo, looping.
-    Spin,
     /// `pill-up`: a pill centred by `translateX(-50%)` (a consumer's toast, a send pill of its
     /// own) springs up from below.
     PillUp,
@@ -106,8 +81,6 @@ pub enum Anim {
     RingDrain,
     /// `fade-in`: an ink veil fades in to `--veil` rather than to 1 (C:1055).
     FadeIn,
-    /// `busy`: a busy word pulses, never below .45, looping.
-    Busy,
     /// `slide-r` at `--t-move --e-spring`: a detail pane arriving from the right.
     PaneInR,
     /// `slide-l` at `--t-move --e-spring`: the root pane coming back from the left.
@@ -186,7 +159,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 58] = [
+    pub const ALL: [Anim; 45] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -196,8 +169,6 @@ impl Anim {
         Anim::MenuPop,
         Anim::MenuOut,
         Anim::BubblePop,
-        Anim::CmdkIn,
-        Anim::CmdkRise,
         Anim::PeekIn,
         Anim::PeekFullIn,
         Anim::Fade,
@@ -206,22 +177,11 @@ impl Anim {
         Anim::LinkPillIn,
         Anim::HcOut,
         Anim::PageIn,
-        Anim::Park,
         Anim::ShakeX,
-        Anim::Nudge,
         Anim::Shake,
-        Anim::ComposeRise,
-        Anim::ComposeSend,
-        Anim::Floatup,
-        Anim::Sail,
-        Anim::BoatReturn,
-        Anim::Dest,
-        Anim::Breathe,
-        Anim::Spin,
         Anim::PillUp,
         Anim::RingDrain,
         Anim::FadeIn,
-        Anim::Busy,
         Anim::PaneInR,
         Anim::PaneInL,
         Anim::PaneOutL,
@@ -259,8 +219,6 @@ impl Anim {
             Anim::MenuPop => "a-menu-pop",
             Anim::MenuOut => "a-menu-out",
             Anim::BubblePop => "a-bubble-pop",
-            Anim::CmdkIn => "a-cmdk-in",
-            Anim::CmdkRise => "a-cmdk-rise",
             Anim::PeekIn => "a-peek-in",
             Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",
@@ -269,22 +227,11 @@ impl Anim {
             Anim::LinkPillIn => "a-link-pill-in",
             Anim::HcOut => "a-hc-out",
             Anim::PageIn => "a-page-in",
-            Anim::Park => "a-park",
             Anim::ShakeX => "a-shake-x",
-            Anim::Nudge => "a-nudge",
             Anim::Shake => "a-shake",
-            Anim::ComposeRise => "a-compose-rise",
-            Anim::ComposeSend => "a-compose-send",
-            Anim::Floatup => "a-floatup",
-            Anim::Sail => "a-sail",
-            Anim::BoatReturn => "a-boat-return",
-            Anim::Dest => "a-dest",
-            Anim::Breathe => "a-breathe",
-            Anim::Spin => "a-spin",
             Anim::PillUp => "a-pill-up",
             Anim::RingDrain => "a-ring-drain",
             Anim::FadeIn => "a-fade-in",
-            Anim::Busy => "a-busy",
             Anim::PaneInR => "a-pane-in-r",
             Anim::PaneInL => "a-pane-in-l",
             Anim::PaneOutL => "a-pane-out-l",

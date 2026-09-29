@@ -4,10 +4,7 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::Word;
-use ds::{
-    Anim, DelayToken, DurationToken, EasingToken, Fill, Iteration, MotionLevel, ScalarToken,
-    StyleDelay, settle,
-};
+use ds::{Anim, DelayToken, DurationToken, EasingToken, Fill, Iteration, MotionLevel, settle};
 use std::time::Duration;
 
 /// `170ms`, `5.2s`.
@@ -30,26 +27,17 @@ pub fn MotionPage() -> Element {
                 }).collect::<Vec<_>>(),
             }
         }
-        Section { title: "Delays and holds", note: "Rust-timed delays; the two the stylesheet also reads carry their --d name.",
+        Section { title: "Delays and holds", note: "Rust-timed delays, never scaled by the level.",
             LevelTable {
-                rows: StyleDelay::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| millis(token.delay(level))).collect::<Vec<_>>())
-                }).chain(DelayToken::ALL.iter().map(|token| {
+                rows: DelayToken::ALL.iter().map(|token| {
                     (format!("{token:?}"), MotionLevel::ALL.iter().map(|_| millis(token.delay())).collect::<Vec<_>>())
-                })).collect::<Vec<_>>(),
-            }
-        }
-        Section { title: "Easings", note: "Only the spring follows the level.",
-            LevelTable {
-                rows: EasingToken::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| token.easing(level).css()).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }
-        Section { title: "Scalars",
+        Section { title: "Easings", note: "No easing follows the level.",
             LevelTable {
-                rows: ScalarToken::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| token.value(level).css()).collect::<Vec<_>>())
+                rows: EasingToken::ALL.iter().map(|token| {
+                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| token.easing(level).css()).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }

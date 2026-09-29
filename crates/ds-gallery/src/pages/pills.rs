@@ -7,9 +7,9 @@ use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, ButtonVariant,
-    Check, DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon,
-    IconSize, Kbd, LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill,
-    Shortcut, ShortcutKey, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
+    Check, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
+    LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
+    ShortcutKey, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
     use_toast_hub,
 };
 
@@ -223,11 +223,10 @@ fn Countdown(showcase: Showcase) -> Element {
         run += 1;
         let this = run();
         spawn(async move {
-            let ticks = DelayToken::SendCountdown.delay().as_millis()
-                / DelayToken::SendTick.delay().as_millis().max(1);
+            let ticks = ds::SEND_COUNTDOWN.as_millis() / ds::SEND_TICK.as_millis().max(1);
             let ticks = u16::try_from(ticks).unwrap_or(5).max(1);
             for tick in 1..=ticks {
-                sleep(DelayToken::SendTick.delay()).await;
+                sleep(ds::SEND_TICK).await;
                 if run() != this || phase() == SendPhase::Done {
                     return;
                 }

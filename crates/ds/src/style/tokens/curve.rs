@@ -91,18 +91,6 @@ mod tests {
             [0, 748, 949, 993, 1000],
         ),
         (
-            "spring",
-            EasingToken::Spring,
-            MotionLevel::Standard,
-            [0, 793, 1051, 1031, 1000],
-        ),
-        (
-            "spring reduced is out",
-            EasingToken::Spring,
-            MotionLevel::Reduced,
-            [0, 748, 949, 993, 1000],
-        ),
-        (
             "exit",
             EasingToken::Exit,
             MotionLevel::Standard,
@@ -154,14 +142,6 @@ mod tests {
                 }
             }
         }
-    }
-
-    #[test]
-    fn a_spring_overshoots_and_settles_on_one() {
-        let spring = EasingToken::Spring.easing(MotionLevel::Standard);
-        let peak = (0..=1000).map(|t| spring.at(Fraction(t)).0).max();
-        assert!(peak.is_some_and(|p| p > 1000), "{peak:?}");
-        assert_eq!(spring.at(Fraction(1000)), Fraction(1000));
     }
 
     #[test]

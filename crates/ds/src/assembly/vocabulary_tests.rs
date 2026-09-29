@@ -39,9 +39,7 @@ fn the_kits_reach_the_vocabulary() {
     const CASES: &[&str] = &[
         "--paper",
         "--handle-ring",
-        "--t-flash",
-        "--d-heal",
-        "--d-fly",
+        "--t-quick",
         "--c-violet-soft",
         "--swatch-postmark",
         "--f-grad",
@@ -63,7 +61,9 @@ fn the_kits_reach_the_vocabulary() {
     for name in CASES {
         assert!(known.contains(*name), "{name}");
     }
-    assert!(!known.contains("--d-heal-step"));
+    for gone in ["--t-tap", "--d-heal", "--d-fly", "--e-spring", "--squish"] {
+        assert!(!known.contains(gone), "{gone}");
+    }
 }
 
 #[test]

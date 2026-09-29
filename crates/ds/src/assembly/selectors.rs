@@ -174,7 +174,7 @@ pub fn markdown() -> String {
          What a user stylesheet (`~/.config/<app>/style.css`) may rely on. Anything not listed\n\
          here is internal and may change without notice; renaming anything listed here is a\n\
          breaking change for the person's file.\n\n\
-         Prefer token overrides (`.ds { --accent: ...; --t-tap: 120ms }`) to selectors: they\n\
+         Prefer token overrides (`.ds { --accent: ...; --t-quick: 120ms }`) to selectors: they\n\
          re-theme every surface consistently, and every token variable\n\
          (`--<prefix><slug>`) is public.\n\n",
     );

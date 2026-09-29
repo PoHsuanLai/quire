@@ -20,7 +20,6 @@ use crate::style::space::{
 };
 use crate::style::tokens::{
     colour::ColourToken,
-    delay::StyleDelay,
     easing::EasingToken,
     elevation::Shadow,
     emoji_face::EmojiFace,
@@ -31,7 +30,6 @@ use crate::style::tokens::{
     orb::ORB_VARS,
     person::PersonSwatch,
     pixel::PixelToken,
-    scalar::ScalarToken,
     set::{Only, Place, TokenSet},
     shape::Radius,
     size_vars::SizeToken,
@@ -68,9 +66,7 @@ pub static KIT: Kit = Kit {
             .at(Place::Typeface)
             .only(Only::TypefaceVarying),
         TokenSet::of::<DurationToken>().at(Place::Motion),
-        TokenSet::of::<StyleDelay>().at(Place::Motion),
         TokenSet::of::<EasingToken>().at(Place::Motion),
-        TokenSet::of::<ScalarToken>().at(Place::Motion),
     ],
     sections: &[
         Section {

@@ -27,7 +27,7 @@ pub mod spring_spec;
 pub mod swipe;
 pub mod timeline;
 pub mod timer;
-pub(crate) mod use_roster;
+pub mod use_roster;
 pub mod use_spring;
 pub mod use_swipe;
 pub mod velocity;

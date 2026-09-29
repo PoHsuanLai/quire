@@ -26,13 +26,13 @@
 .ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 
 
-/* Picked up (`data-lift=lifted`, design/23 section 9.8): the card grows by `--pickup`
-   and its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
+/* Picked up (`data-lift=lifted`, design/23 section 9.8): the card
+   trades its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
    the transparent root's card selector so it wins over `--m-box`), above the other widgets on
    `--z-drag`. Put down, it settles back over the same `--t-quick` at `--e-out`; at rest nothing
    runs. */
-.ds-widget{ transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out); }
-.ds-widget[*|data-lift=lifted]{ transform:scale(var(--pickup)); z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
+.ds-widget{ transition:box-shadow var(--t-quick) var(--e-out); }
+.ds-widget[*|data-lift=lifted]{ z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
 
 /* Leaving: a card its host removed plays `widget-out` on its pulse class (shrinks to

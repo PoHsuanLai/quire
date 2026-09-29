@@ -1,7 +1,7 @@
 //! Tooltip: text that names an action (Fly) or a value (Card) (design/04-COMPONENTS.md
 //! section 18).
 //!
-//! Fly is pure CSS: the label sits in the target's wrapper and shows on hover after `--d-fly`,
+//! Fly is pure CSS: the label sits in the target's wrapper and shows on hover after the Tip profile's open delay (1 s),
 //! at once while `.ds[data-hover=warm]` (the hover hub stamps it, O-11). Card is a small hover
 //! card through the hover hub, placed below the target like a sender card.
 //!
@@ -18,7 +18,7 @@ use dioxus::prelude::*;
 /// Which tooltip.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TooltipKind {
-    /// A small dark label above a strip button, after `--d-fly` (0 when warm).
+    /// A small dark label above a strip button, after the Tip open delay (0 when warm).
     Fly,
     /// A small hover card for a value, through the hover hub.
     Card,
@@ -31,7 +31,7 @@ fn tip_key(text: &str) -> HoverKey {
 }
 
 /// A tooltip on `children`. `shown` hands it to the caller: `None` follows the pointer (the
-/// Fly's `:hover` and `--d-fly`, the Card's hover hub), `Some` shows or hides it at once.
+/// Fly's `:hover` and its delay, the Card's hover hub), `Some` shows or hides it at once.
 #[component]
 pub fn Tooltip(
     kind: TooltipKind,

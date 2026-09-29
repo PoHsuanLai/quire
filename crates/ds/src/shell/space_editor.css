@@ -48,7 +48,7 @@
 .ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 .ds-preset{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:default; padding:0;
-  transition:transform var(--t-quick) var(--e-spring);
+  transition:transform var(--t-quick) var(--e-out);
 }
 .ds-preset:hover{ transform:scale(1.1); }
 
@@ -59,7 +59,7 @@
 
 .ds-space-dot{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:2px solid transparent; cursor:default; padding:0;
-  transition:transform var(--t-quick) var(--e-spring), border-color var(--t-quick) var(--e-out);
+  transition:transform var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }

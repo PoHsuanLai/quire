@@ -20,12 +20,10 @@
   display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--ctl-r-m);
   height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); line-height:1; white-space:nowrap;
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
-  transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
+  transition:box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=primary]:hover,
 .ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
-.ds-button[*|data-variant=primary]:active,
-.ds-button[*|data-variant=secondary]:active{ transform:translateY(1px) scale(var(--squish)); }
 .ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
 
 /* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
@@ -34,12 +32,10 @@
   display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
   border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
   border-radius:var(--ctl-r-xs); height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
-  transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=mini]:hover,
 .ds-button[*|data-variant=danger]:hover{ color:var(--ink); background:var(--raise); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=mini]:active,
-.ds-button[*|data-variant=danger]:active{ transform:scale(var(--squish)) translateY(1px); }
 
 /* Mini pressed: `S:523`, the RSVP row. */
 /* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
@@ -64,10 +60,10 @@
 .ds-button[*|data-variant=frame]{
   display:inline-flex; align-items:center; justify-content:flex-start; text-align:left; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:default;
   padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); transform:scale(var(--squish)); }
+.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
 /* Size, after the variants so it wins at equal weight: `data-size` is written only

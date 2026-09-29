@@ -1,6 +1,6 @@
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
-   `S:793-799`: a scrim that centres the panel near the top, the panel springing in with
-   `peek-in` (or C's `cmdk-in`, `C:1064`), a SearchField over an embedded Rich menu (menu.css).
+   `S:793-799`: a scrim that centres the panel near the top, the panel entering with
+   `peek-in`, a SearchField over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
    Hosted in a surface of its own there is no wrap: the card fills its
@@ -12,8 +12,7 @@
   background:var(--scrim); pointer-events:auto; animation:fade var(--t-quick) var(--e-out); }
 .ds-palette{ width:min(540px, 88%); background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
-  animation:peek-in var(--t-big) var(--e-spring); }
-.ds-palette[*|data-entrance=cmdk-in]{ animation:cmdk-in var(--t-big) var(--e-spring); }
+  animation:peek-in var(--t-big) var(--e-out); }
 .ds-palette[*|data-host=surface]{ width:100%; height:auto; max-height:100%; box-sizing:border-box; display:flex; flex-direction:column;
   background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
 .ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }

@@ -3,9 +3,7 @@
    the rest; the resize edges lie over both. The titlebar is on the frame colour, so its inks are
    the `--f-*` ones. The lights are 12 px discs 8 px apart, the first 13 px from the window's
    left edge (macOS). Coloured in the active window, `--f-pill` with a hairline in an inactive
-   one; any light under the pointer colours the group and shows the marks, as on macOS. A press
-   springs back from `--squish` (design/05-MOTION.md principle 2: the spring is spent on
-   contact). */
+   one; any light under the pointer colours the group and shows the marks, as on macOS. */
 
 .ds[*|data-window-frame=titlebar]{ position:relative; display:flex; flex-direction:column; height:100vh; }
 .ds[*|data-window-frame=titlebar] > .ds-window-body{ position:relative; flex:1 1 auto; min-height:0; }
@@ -25,9 +23,8 @@
 .ds-light{
   display:grid; place-items:center; width:12px; height:12px; padding:0; border:0; border-radius:var(--r-pill);
   background:var(--f-pill); box-shadow:inset 0 0 0 var(--hair) var(--f-line); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring);
+  transition:background-color var(--t-quick) var(--e-out);
 }
-.ds-light:active{ transform:scale(var(--squish)); }
 .ds-light[*|data-light=close]{ color:var(--c-red-deep); }
 .ds-light[*|data-light=minimize]{ color:var(--c-amber-deep); }
 .ds-light[*|data-light=zoom]{ color:var(--c-green-deep); }

@@ -1,4 +1,4 @@
-//! The token table: every colour, duration, delay, easing, scalar, radius, spacing step,
+//! The token table: every colour, duration, delay, easing, radius, spacing step,
 //! shadow, type size, layer and device-pixel line width, as Rust data. Each family is a `Token`
 //! (`#[derive(Word, Token)]`) listed in a kit, and the stylesheet's `.ds` blocks and the linter's
 //! vocabulary are written from those lists (`crate::style::kit`), so CSS and the Rust timers
@@ -22,7 +22,6 @@ pub mod orb;
 pub(crate) mod person;
 pub mod pixel;
 pub(crate) mod plate;
-pub mod scalar;
 pub mod set;
 pub mod shape;
 #[cfg(test)]

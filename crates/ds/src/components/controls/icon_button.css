@@ -13,10 +13,9 @@
 .ds-icon-button[*|data-variant=tool]{
   display:inline-grid; place-items:center; width:var(--ctl-h-l); height:var(--ctl-h-l); border:var(--hair) solid transparent; border-radius:var(--ctl-r-l);
   background:transparent; color:var(--ink-faint); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-icon-button[*|data-variant=tool]:hover{ color:var(--ink); background:var(--surface); }
-.ds-icon-button[*|data-variant=tool]:active{ transform:scale(var(--squish)); }
 .ds-icon-button[*|data-variant=tool][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); border-color:var(--line); }
 
 /* Foot: `S:151-153`. Active: not specified. */
@@ -40,10 +39,9 @@
 .ds-icon-button[*|data-variant=pin]{
   aspect-ratio:1; border:0; border-radius:var(--r-tile); cursor:default; background:var(--f-pill-hover);
   display:grid; place-items:center; position:relative; color:var(--f-ink);
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-icon-button[*|data-variant=pin]:hover{ background:var(--f-pill); }
-.ds-icon-button[*|data-variant=pin]:active{ transform:scale(var(--squish)); }
 .ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
 
 /* Status (bar gaps; design/13-BEHAVIOUR-menus-windows.md section 13.3.1): a bar status item on
@@ -57,7 +55,7 @@
 .ds-icon-button[*|data-variant=status]{
   display:inline-grid; place-items:center; width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
   background:transparent; color:var(--f-ink-soft); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 /* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
    setting as a single icon does. */

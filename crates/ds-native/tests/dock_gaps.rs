@@ -163,7 +163,7 @@ fn a_caller_shows_and_hides_a_fly_label() {
         .centre(".hidden .ds-fly-target")
         .expect("the hidden tile");
     harness.pointer_move(hidden_target);
-    harness.advance(ms(700));
+    harness.advance(ms(1300));
     let hovered_hidden = harness.render().expect("a frame");
     let hidden = label(&hovered_hidden, &harness, ".hidden");
     assert!(
@@ -172,7 +172,7 @@ fn a_caller_shows_and_hides_a_fly_label() {
     );
     let target = harness.centre(".hovered .ds-fly-target").expect("the tile");
     harness.pointer_move(target);
-    harness.advance(ms(700));
+    harness.advance(ms(1300));
     let hovered = harness.render().expect("a frame");
     let up = label(&hovered, &harness, ".hovered");
     assert!(

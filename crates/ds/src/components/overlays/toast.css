@@ -10,13 +10,13 @@
 .ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
   display:flex; align-items:center; gap:var(--s-2); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
   padding:var(--s-5) var(--s-5) var(--s-5) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
-  transition:transform var(--t-big) var(--e-spring); }
+  transition:transform var(--t-big) var(--e-out); }
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
 .ds-toast-hint{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
 .ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
   border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
-  transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }
+  transition:transform var(--t-move) var(--e-out), background-color var(--t-quick) var(--e-out); }
 .ds-toast-tab:active{ cursor:grabbing; }
 .ds-toast-tab[*|data-drag=live]{ transition:none; }
 .ds-toast-tab[*|data-armed=armed]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }

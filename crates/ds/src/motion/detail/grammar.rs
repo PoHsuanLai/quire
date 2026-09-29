@@ -5,27 +5,14 @@
 use crate::core::word::Word;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
-/// Durations a moment may play for. Left out on purpose: the loops and ambient life
-/// (`--t-ambient`, `--t-spin`, `--t-float`, `--t-awake`), the orphaned boat (`--t-sail`,
-/// `--t-boat-return`), the holds that are not motion (`--t-send-ring`, `--t-flash`), the Rust-only
-/// repaint floor (`--t-count-step`) and the battery ring's Rust-driven fill (`--t-fill`, which
-/// predates `--t-sweep`; design/05 section 4.12).
-pub const GRAMMAR_DURATIONS: [DurationToken; 15] = [
-    DurationToken::Tap,
+/// Durations a moment may play for. Left out on purpose: the loops (`--t-awake`), the spinner's
+/// step (`--t-spin-step`), the holds that are not motion (`--t-send-ring`) and the idle overlay's
+/// Rust-driven fade (`--t-idle-dim`).
+pub const GRAMMAR_DURATIONS: [DurationToken; 4] = [
     DurationToken::Quick,
     DurationToken::Move,
     DurationToken::Big,
-    DurationToken::BigHeavy,
-    DurationToken::Spark,
-    DurationToken::Curl,
-    DurationToken::CurlHeavy,
-    DurationToken::CrumpleHeavy,
-    DurationToken::Send,
     DurationToken::Shake,
-    DurationToken::Park,
-    DurationToken::Nudge,
-    DurationToken::Sweep,
-    DurationToken::PendingStep,
 ];
 
 /// Easings a moment may play along: every easing token names one (the spring only on contact,

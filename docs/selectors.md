@@ -4,7 +4,7 @@ What a user stylesheet (`~/.config/<app>/style.css`) may rely on. Anything not l
 here is internal and may change without notice; renaming anything listed here is a
 breaking change for the person's file.
 
-Prefer token overrides (`.ds { --accent: ...; --t-tap: 120ms }`) to selectors: they
+Prefer token overrides (`.ds { --accent: ...; --t-quick: 120ms }`) to selectors: they
 re-theme every surface consistently, and every token variable
 (`--<prefix><slug>`) is public.
 

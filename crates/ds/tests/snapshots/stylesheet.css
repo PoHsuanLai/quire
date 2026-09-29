@@ -22,10 +22,10 @@ html,body{margin:0;padding:0;background:transparent}
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent-ring);outline-offset:2px;border-radius:var(--r-tiny)}
 /* == tokens == */
-.ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-tap:90ms;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-ambient:5000ms;--t-big-heavy:460ms;--t-spark:520ms;--t-curl:560ms;--t-curl-heavy:644ms;--t-crumple-heavy:460ms;--t-send:620ms;--t-float:900ms;--t-spin-step:83ms;--t-shake:420ms;--t-park:420ms;--t-nudge:520ms;--t-sail:1150ms;--t-boat-return:900ms;--t-spin:1100ms;--t-send-ring:5000ms;--t-flash:1200ms;--t-awake:20000ms;--t-fill:800ms;--t-sweep:700ms;--t-count-step:33ms;--t-pending-step:300ms;--t-idle-dim:2000ms;--d-fly:350ms;--d-heal:18ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-spring:cubic-bezier(.34,1.42,.52,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);--overshoot:1.04;--squish:.955;--lift:-2px;--tilt:2.2deg;--stagger:26ms;--pickup:1.04;color-scheme:light;}
+.ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-spin-step:83ms;--t-shake:420ms;--t-send-ring:5000ms;--t-awake:20000ms;--t-idle-dim:2000ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#1e1e1e;--surface:#2a2a2a;--surface-2:#242424;--raise:#323232;--ink:#e8e8e8;--ink-soft:#a3a3a3;--line:#444444;--line-soft:#383838;--accent:#8ebaf7;--accent-soft:rgba(142,186,247,.2);--accent-text:#94c0fe;--accent-text-material:#d5e6fe;--seal:#8ebaf7;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#3f3930;--danger-wash:rgba(224,112,90,.16);--accent-ring:rgba(148,192,254,.55);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--spell-mark:#e0705a;--orb-bg:#1b1f29;--orb-c1:#df6aa6;--orb-c2:#04bbc3;--orb-c3:#8d92f9;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-typeface=editorial]{--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.015em;--tracking-lock-clock:-.035em;--tracking-lock-date:.01em;--tracking-caps:.14em;--tracking-caps-narrow:.12em;--fw-caps:400;--fs-caps:var(--fs-eyebrow);--tracking-mono:-.02em;--fs-mono:.78em;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-widget-hero:47px;--fs-lock-clock:140px;}
-.ds[*|data-motion=reduced]{--t-tap:150ms;--t-move:150ms;--t-big:150ms;--t-ambient:150ms;--t-big-heavy:150ms;--t-spark:150ms;--t-curl:150ms;--t-curl-heavy:150ms;--t-crumple-heavy:150ms;--t-send:150ms;--t-float:150ms;--t-shake:150ms;--t-park:150ms;--t-nudge:150ms;--t-sail:150ms;--t-boat-return:150ms;--t-spin:150ms;--t-awake:150ms;--t-fill:150ms;--t-sweep:150ms;--t-pending-step:150ms;--t-idle-dim:150ms;--d-heal:0ms;--e-spring:cubic-bezier(.22,.9,.3,1);--overshoot:1;--squish:1;--lift:0px;--tilt:0deg;--stagger:0ms;--pickup:1;}
+.ds[*|data-motion=reduced]{--t-move:150ms;--t-big:150ms;--t-shake:150ms;--t-awake:150ms;--t-idle-dim:150ms;}
 /* == accents == */
 .ds{--swatch-postmark:#94c0fe;--swatch-red:#f8a59a;--swatch-amber:#e3b572;--swatch-green:#92d098;--swatch-blue:#69cee6;--swatch-violet:#c1b1f8;}
 .ds[*|data-theme=dark]{--swatch-postmark:#8ebaf7;--swatch-red:#f19f94;--swatch-amber:#dcaf6c;--swatch-green:#8cc992;--swatch-blue:#62c8df;--swatch-violet:#bbabf2;}
@@ -105,53 +105,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-ground=frame] .ds-overlay{--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--line:#d9d9d9;--line-soft:#e6e6e6;}
 .ds[*|data-theme=dark][*|data-ground=frame] .ds-overlay{--ink:#e8e8e8;--ink-soft:#a3a3a3;--ink-faint:#858585;--surface:#2a2a2a;--surface-2:#242424;--raise:#323232;--line:#444444;--line-soft:#383838;}
 /* == motion == */
-/* The canonical keyframes, verbatim from design/05-MOTION.md section 4 (S's text where S and C
-   both define a name). Four departures, three required by section 9 and one added by quire:
-   - `curl` drops its final saturate(.2) filter (rule 4: Blitz paints no filters);
-   - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
-   - `part` is left out: no `Anim` plays it;
-   - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
-     so are `menu-out` (bar gaps), `cmdk-rise`, and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy`, `pane-out-l`
-     and `pane-out-r`, the OSD's `osd-in` and `osd-out`, `level-tick`
-     (the level control), the sheet's `sheet-out`, and the screenshot thumbnail's
-     `shot-out`, and the user picture's `picture-accept` (design/25-EMOJI.md
-     section 7), below.
-   ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
-
-/* 4.2.1 rise */
-@keyframes rise{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
-
-/* 4.2.2 star-pop */
-
-/* 4.2.3 spark */
-
-/* 4.2.4 pop-in */
-
-/* 4.2.5 fold */
-@keyframes fold{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
-
-/* 4.2.6 curl */
-@keyframes curl{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
-
-/* 4.2.7 floatup */
-@keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
-
-/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level: each
-   departure from rest is the catalogue's value times min(1, (--overshoot - 1) x 25), which is 1
-   at Standard (1.04) and Extra (1.14, whose spring curve already overshoots more) and 0 at Calm
-   and Reduced (1). So Calm flattens them, as it flattens pop-in's `scale(var(--overshoot))`,
-   and Standard is the catalogue's text: 34% of gulp is still scale(1.07,.84). */
-
-/* 4.2.8 gulp */
-
-/* 4.2.9 seal-pop */
-
-/* 4.2.10 compose-rise */
-@keyframes compose-rise{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
-
-/* 4.2.11 compose-send */
-@keyframes compose-send{ 0%{ transform:none; opacity:1; } 35%{ transform:translate(0,4px) scale(.97,.94); opacity:1; } 100%{ transform:translate(-40px,-120px) scale(.06) rotate(-8deg); opacity:0; } }
+/* The keyframes an `Anim` plays (design/30-CATALOGUE.md section 1.3): arrivals nobody touches,
+   each one keyframe. Blitz paints no filters and no `color-mix()` (rule 4, rule 6).
+   `ds::css::motion_css` adds the identical `X--b` alias of each. */
 
 /* 4.2.12 peek-in */
 @keyframes peek-in{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
@@ -165,40 +121,17 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.3.3 fade */
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
 
-/* 4.3.4 heal */
-@keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
-
-/* 4.3.5 bump */
-
-/* 4.3.6 tab-in */
-@keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
-
-/* 4.3.7 tab-out */
-@keyframes tab-out{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
-
 /* 4.3.8 hc-in */
 @keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 
 /* 4.3.9 hc-out */
 @keyframes hc-out{ to{ opacity:0; transform:translateY(2px); } }
 
-/* 4.3.10 dest */
-@keyframes dest{ from{ box-shadow:0 0 0 1.5px var(--accent-text) inset; } to{ box-shadow:0 0 0 var(--ring) var(--accent-ring) inset; } }
-
 /* 4.3.11 page-in */
 @keyframes page-in{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
 
-/* 4.3.12 park */
-@keyframes park{ to{ opacity:0; transform:translateX(-60%) scale(.35); } }
-
 /* 4.3.13 shake-x */
 @keyframes shake-x{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
-
-/* 4.3.14 chip-in */
-
-/* chip-flash (quire's, not the catalogue's): the mentioned person chip holds `chip-in`'s last
-   frame with the `--accent-soft` ring for `--t-flash` (design/04-COMPONENTS.md section 10,
-   `S:2119` `.pchip.flash`; the prototype's class-and-timeout becomes one keyframe). */
 
 /* 4.3.15 menu-pop */
 @keyframes menu-pop{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
@@ -207,62 +140,11 @@ html,body{margin:0;padding:0;background:transparent}
    out before it goes (design/13-BEHAVIOUR-menus-windows.md section 13.3.2; bar gaps). */
 @keyframes menu-out{ from{ opacity:1; } to{ opacity:0; } }
 
-/* 4.4.1 breathe */
-@keyframes breathe{ 0%,100%{ opacity:0; transform:scale(.85); } 50%{ opacity:.45; transform:scale(1.06); } }
-
-/* 4.4.2 spin */
-@keyframes spin{ to{ transform:rotate(360deg); } }
-
-/* 4.4.3 row-in */
-@keyframes row-in{
-  0%{ transform:translateY(-14px) scale(.94); opacity:0; }
-  58%{ transform:translateY(3px) scale(var(--overshoot)); opacity:1; }
-  100%{ transform:translateY(0) scale(1); opacity:1; }
-}
-
-/* 4.4.5 chip-land */
-
-/* 4.4.6 sail */
-@keyframes sail{
-  0%{ transform:translate(0,0) rotate(0) scale(1); opacity:0; }
-  12%{ opacity:1; }
-  45%{ transform:translate(-90px,-70px) rotate(-7deg) scale(1.05); }
-  100%{ transform:translate(-210px,-190px) rotate(-14deg) scale(.4); opacity:0; }
-}
-
-/* 4.4.7 boat-return */
-@keyframes boat-return{
-  0%{ transform:translate(-150px,-140px) scale(.5) rotate(-10deg); opacity:0; }
-  25%{ opacity:1; }
-  100%{ transform:translate(0,0) scale(1) rotate(6deg); opacity:0; }
-}
-
-/* 4.4.8 nudge */
-@keyframes nudge{ 0%,100%{ transform:translateX(-50%) translateY(0); } 40%{ transform:translateX(-50%) translateY(-6px); } 70%{ transform:translateX(-50%) translateY(1px); } }
-
 /* 4.4.9 shake */
 @keyframes shake{ 0%,100%{ transform:translateX(-50%); } 20%{ transform:translateX(calc(-50% - 7px)); } 40%{ transform:translateX(calc(-50% + 6px)); } 60%{ transform:translateX(calc(-50% - 4px)); } 80%{ transform:translateX(calc(-50% + 2px)); } }
 
-/* 4.4.10 crumple */
-@keyframes crumple{
-  0%{ transform:scale(1) rotate(0) skewX(0); opacity:1; }
-  40%{ transform:scale(.88) rotate(-4deg) skewX(-6deg); }
-  100%{ transform:scale(.12) rotate(16deg) skewX(10deg) translateY(16px); opacity:0; }
-}
-
 /* 4.4.11 menu-in */
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
-  100%{ opacity:1; transform:scale(1) translateY(0); } }
-
-/* cmdk-rise (quire's): cmdk-in's scale and lift with no fade, so a command panel is
-   opaque on its first frame; only its geometry springs. */
-@keyframes cmdk-rise{ 0%{ transform:scale(.93) translateY(-12px); }
-  62%{ transform:scale(var(--overshoot)) translateY(2px); }
-  100%{ transform:scale(1) translateY(0); } }
-
-/* 4.4.13 cmdk-in */
-@keyframes cmdk-in{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
-  62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 
 /* pill-up (quire's): a pill centred by `translateX(-50%)` (a toast, a send pill a
@@ -279,10 +161,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.4.12 fade-in (C's): an ink veil fades to its resting `--veil` (.16), the
    opacity the veil itself rests at, so nothing snaps when the animation ends. */
 @keyframes fade-in{ from{ opacity:0; } to{ opacity:var(--veil); } }
-
-/* busy (quire's): a busy word's pulse. It never drops below .45, so the word stays
-   legible; `breathe` is the sync halo's and fades to nothing. */
-@keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 
 /* pane-out-l, pane-out-r (quire's): a pane switcher's outgoing pane leaves the other
    way from the one arriving, the mirror of `slide-l` and `slide-r` (26 px and a fade), so the
@@ -339,14 +217,6 @@ html,body{margin:0;padding:0;background:transparent}
    --e-spring`. */
 @keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 
-/* picture-accept (quire's, design/25-EMOJI.md section 7): the user's picture, whatever its kind,
-   lifts a little and lands when the password was right; the spring curve on each leg gives the
-   lift and the landing. In shares of the picture's own box, so every size moves alike. Played
-   once and at rest after, so a picture paints nothing once it has landed. */
-
-/* The small-state details' own (quire's, design/26-DETAILS.md section 3.2). Each plays once on
-   an HTML wrapper and ends at rest; nothing here loops. */
-
 /* morph-in, morph-out: a glyph that changes state grows in from .7 as the old one shrinks to .7
    and fades (MorphStyle::DownUp; OffUp plays only morph-in). */
 @keyframes morph-in{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
@@ -361,73 +231,35 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes roll-in{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
 @keyframes roll-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
 
-/* nudge-up: attention, once (design/26 Attention): the element lifts and settles. `nudge` is
-   the centred outbox pill's and carries its translateX(-50%). */
-
 /* hold (quire's): a keyframe that moves nothing. A resting state that follows an
    animated one (a surface present again after a hide was taken back, a row or a pane at rest)
    plays it at `--t-tap --e-linear`, so the restyle that drops the running animation starts
    another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until
    something restyles it again; a starting animation is that restyle, in the same frame. */
 @keyframes hold{ from{ } to{ } }
-@keyframes rise--b{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
-@keyframes fold--b{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
-@keyframes curl--b{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
-@keyframes floatup--b{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
-@keyframes compose-rise--b{ 0%{ transform:translateY(26px) scale(.9); opacity:0; } 62%{ transform:translateY(-4px) scale(var(--overshoot)); opacity:1; } 100%{ transform:none; opacity:1; } }
-@keyframes compose-send--b{ 0%{ transform:none; opacity:1; } 35%{ transform:translate(0,4px) scale(.97,.94); opacity:1; } 100%{ transform:translate(-40px,-120px) scale(.06) rotate(-8deg); opacity:0; } }
+
+/* row-in, row-out and heal (design/30 section 1.3, macOS `NSTableView` `effectFade` + `slideUp`):
+   an inserted row fades and slides down into place, a removed one fades and slides up, and the
+   rows below close the gap. */
+@keyframes row-in{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
+@keyframes row-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
+@keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
 @keyframes peek-in--b{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
 @keyframes slide-r--b{ from{ transform:translateX(26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes fade--b{ from{ opacity:0; } to{ opacity:1; } }
-@keyframes heal--b{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
-@keyframes tab-in--b{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
-@keyframes tab-out--b{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
 @keyframes hc-in--b{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 @keyframes hc-out--b{ to{ opacity:0; transform:translateY(2px); } }
-@keyframes dest--b{ from{ box-shadow:0 0 0 1.5px var(--accent-text) inset; } to{ box-shadow:0 0 0 var(--ring) var(--accent-ring) inset; } }
 @keyframes page-in--b{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
-@keyframes park--b{ to{ opacity:0; transform:translateX(-60%) scale(.35); } }
 @keyframes shake-x--b{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
 @keyframes menu-pop--b{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
 @keyframes menu-out--b{ from{ opacity:1; } to{ opacity:0; } }
-@keyframes breathe--b{ 0%,100%{ opacity:0; transform:scale(.85); } 50%{ opacity:.45; transform:scale(1.06); } }
-@keyframes spin--b{ to{ transform:rotate(360deg); } }
-@keyframes row-in--b{
-  0%{ transform:translateY(-14px) scale(.94); opacity:0; }
-  58%{ transform:translateY(3px) scale(var(--overshoot)); opacity:1; }
-  100%{ transform:translateY(0) scale(1); opacity:1; }
-}
-@keyframes sail--b{
-  0%{ transform:translate(0,0) rotate(0) scale(1); opacity:0; }
-  12%{ opacity:1; }
-  45%{ transform:translate(-90px,-70px) rotate(-7deg) scale(1.05); }
-  100%{ transform:translate(-210px,-190px) rotate(-14deg) scale(.4); opacity:0; }
-}
-@keyframes boat-return--b{
-  0%{ transform:translate(-150px,-140px) scale(.5) rotate(-10deg); opacity:0; }
-  25%{ opacity:1; }
-  100%{ transform:translate(0,0) scale(1) rotate(6deg); opacity:0; }
-}
-@keyframes nudge--b{ 0%,100%{ transform:translateX(-50%) translateY(0); } 40%{ transform:translateX(-50%) translateY(-6px); } 70%{ transform:translateX(-50%) translateY(1px); } }
 @keyframes shake--b{ 0%,100%{ transform:translateX(-50%); } 20%{ transform:translateX(calc(-50% - 7px)); } 40%{ transform:translateX(calc(-50% + 6px)); } 60%{ transform:translateX(calc(-50% - 4px)); } 80%{ transform:translateX(calc(-50% + 2px)); } }
-@keyframes crumple--b{
-  0%{ transform:scale(1) rotate(0) skewX(0); opacity:1; }
-  40%{ transform:scale(.88) rotate(-4deg) skewX(-6deg); }
-  100%{ transform:scale(.12) rotate(16deg) skewX(10deg) translateY(16px); opacity:0; }
-}
 @keyframes menu-in--b{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
-  100%{ opacity:1; transform:scale(1) translateY(0); } }
-@keyframes cmdk-rise--b{ 0%{ transform:scale(.93) translateY(-12px); }
-  62%{ transform:scale(var(--overshoot)) translateY(2px); }
-  100%{ transform:scale(1) translateY(0); } }
-@keyframes cmdk-in--b{ 0%{ opacity:0; transform:scale(.93) translateY(-12px); }
-  62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 @keyframes pill-up--b{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
 @keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
-@keyframes busy--b{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 @keyframes pane-out-l--b{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 @keyframes osd-in--b{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
@@ -445,96 +277,57 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes roll-in--b{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
 @keyframes roll-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
 @keyframes hold--b{ from{ } to{ } }
-.a-row-in[*|data-pulse=a]{animation:row-in var(--t-big) var(--e-spring) backwards;}
-.a-row-in[*|data-pulse=b]{animation:row-in--b var(--t-big) var(--e-spring) backwards;}
-.a-rise[*|data-pulse=a]{animation:rise var(--t-move) var(--e-out) backwards;}
-.a-rise[*|data-pulse=b]{animation:rise--b var(--t-move) var(--e-out) backwards;}
-.a-fold[*|data-pulse=a]{animation:fold var(--t-big) var(--e-exit) forwards;}
-.a-fold[*|data-pulse=b]{animation:fold--b var(--t-big) var(--e-exit) forwards;}
-.a-fold-heavy[*|data-pulse=a]{animation:fold var(--t-big-heavy) var(--e-exit) forwards;}
-.a-fold-heavy[*|data-pulse=b]{animation:fold--b var(--t-big-heavy) var(--e-exit) forwards;}
-.a-crumple[*|data-pulse=a]{animation:crumple var(--t-big) var(--e-exit) forwards;}
-.a-crumple[*|data-pulse=b]{animation:crumple--b var(--t-big) var(--e-exit) forwards;}
-.a-crumple-heavy[*|data-pulse=a]{animation:crumple var(--t-crumple-heavy) var(--e-exit) forwards;}
-.a-crumple-heavy[*|data-pulse=b]{animation:crumple--b var(--t-crumple-heavy) var(--e-exit) forwards;}
-.a-curl[*|data-pulse=a]{animation:curl var(--t-curl) var(--e-exit) forwards;}
-.a-curl[*|data-pulse=b]{animation:curl--b var(--t-curl) var(--e-exit) forwards;}
-.a-curl-heavy[*|data-pulse=a]{animation:curl var(--t-curl-heavy) var(--e-exit) forwards;}
-.a-curl-heavy[*|data-pulse=b]{animation:curl--b var(--t-curl-heavy) var(--e-exit) forwards;}
-.a-heal[*|data-pulse=a]{animation:heal var(--t-move) var(--e-spring) backwards;}
-.a-heal[*|data-pulse=b]{animation:heal--b var(--t-move) var(--e-spring) backwards;}
-.a-tab-in[*|data-pulse=a]{animation:tab-in var(--t-big) var(--e-spring);}
-.a-tab-in[*|data-pulse=b]{animation:tab-in--b var(--t-big) var(--e-spring);}
-.a-tab-out[*|data-pulse=a]{animation:tab-out var(--t-move) var(--e-exit) forwards;}
-.a-tab-out[*|data-pulse=b]{animation:tab-out--b var(--t-move) var(--e-exit) forwards;}
-.a-slide-r[*|data-pulse=a]{animation:slide-r var(--t-big) var(--e-spring);}
-.a-slide-r[*|data-pulse=b]{animation:slide-r--b var(--t-big) var(--e-spring);}
-.a-slide-l[*|data-pulse=a]{animation:slide-l var(--t-big) var(--e-spring);}
-.a-slide-l[*|data-pulse=b]{animation:slide-l--b var(--t-big) var(--e-spring);}
-.a-menu-in[*|data-pulse=a]{animation:menu-in var(--t-move) var(--e-spring);}
-.a-menu-in[*|data-pulse=b]{animation:menu-in--b var(--t-move) var(--e-spring);}
-.a-menu-pop[*|data-pulse=a]{animation:menu-pop var(--t-move) var(--e-spring);}
-.a-menu-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-move) var(--e-spring);}
+@keyframes row-in--b{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
+@keyframes row-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
+@keyframes heal--b{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
+.a-row-in[*|data-pulse=a]{animation:row-in var(--t-move) var(--e-out) backwards;}
+.a-row-in[*|data-pulse=b]{animation:row-in--b var(--t-move) var(--e-out) backwards;}
+.a-row-out[*|data-pulse=a]{animation:row-out var(--t-quick) var(--e-exit) forwards;}
+.a-row-out[*|data-pulse=b]{animation:row-out--b var(--t-quick) var(--e-exit) forwards;}
+.a-heal[*|data-pulse=a]{animation:heal var(--t-move) var(--e-in-out) backwards;}
+.a-heal[*|data-pulse=b]{animation:heal--b var(--t-move) var(--e-in-out) backwards;}
+.a-slide-r[*|data-pulse=a]{animation:slide-r var(--t-big) var(--e-out);}
+.a-slide-r[*|data-pulse=b]{animation:slide-r--b var(--t-big) var(--e-out);}
+.a-slide-l[*|data-pulse=a]{animation:slide-l var(--t-big) var(--e-out);}
+.a-slide-l[*|data-pulse=b]{animation:slide-l--b var(--t-big) var(--e-out);}
+.a-menu-in[*|data-pulse=a]{animation:menu-in var(--t-move) var(--e-out);}
+.a-menu-in[*|data-pulse=b]{animation:menu-in--b var(--t-move) var(--e-out);}
+.a-menu-pop[*|data-pulse=a]{animation:menu-pop var(--t-move) var(--e-out);}
+.a-menu-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-move) var(--e-out);}
 .a-menu-out[*|data-pulse=a]{animation:menu-out var(--t-quick) var(--e-exit) forwards;}
 .a-menu-out[*|data-pulse=b]{animation:menu-out--b var(--t-quick) var(--e-exit) forwards;}
-.a-bubble-pop[*|data-pulse=a]{animation:menu-pop var(--t-quick) var(--e-spring);}
-.a-bubble-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-quick) var(--e-spring);}
-.a-cmdk-in[*|data-pulse=a]{animation:cmdk-in var(--t-big) var(--e-spring);}
-.a-cmdk-in[*|data-pulse=b]{animation:cmdk-in--b var(--t-big) var(--e-spring);}
-.a-cmdk-rise[*|data-pulse=a]{animation:cmdk-rise var(--t-big) var(--e-spring);}
-.a-cmdk-rise[*|data-pulse=b]{animation:cmdk-rise--b var(--t-big) var(--e-spring);}
-.a-peek-in[*|data-pulse=a]{animation:peek-in var(--t-big) var(--e-spring);}
-.a-peek-in[*|data-pulse=b]{animation:peek-in--b var(--t-big) var(--e-spring);}
+.a-bubble-pop[*|data-pulse=a]{animation:menu-pop var(--t-quick) var(--e-out);}
+.a-bubble-pop[*|data-pulse=b]{animation:menu-pop--b var(--t-quick) var(--e-out);}
+.a-peek-in[*|data-pulse=a]{animation:peek-in var(--t-big) var(--e-out);}
+.a-peek-in[*|data-pulse=b]{animation:peek-in--b var(--t-big) var(--e-out);}
 .a-peek-full-in[*|data-pulse=a]{animation:peek-in var(--t-move) var(--e-out);}
 .a-peek-full-in[*|data-pulse=b]{animation:peek-in--b var(--t-move) var(--e-out);}
 .a-fade[*|data-pulse=a]{animation:fade var(--t-move) var(--e-out);}
 .a-fade[*|data-pulse=b]{animation:fade--b var(--t-move) var(--e-out);}
 .a-palette-fade[*|data-pulse=a]{animation:fade var(--t-quick) var(--e-out);}
 .a-palette-fade[*|data-pulse=b]{animation:fade--b var(--t-quick) var(--e-out);}
-.a-hc-in[*|data-pulse=a]{animation:hc-in var(--t-move) var(--e-spring);}
-.a-hc-in[*|data-pulse=b]{animation:hc-in--b var(--t-move) var(--e-spring);}
+.a-hc-in[*|data-pulse=a]{animation:hc-in var(--t-move) var(--e-out);}
+.a-hc-in[*|data-pulse=b]{animation:hc-in--b var(--t-move) var(--e-out);}
 .a-link-pill-in[*|data-pulse=a]{animation:hc-in var(--t-quick) var(--e-out);}
 .a-link-pill-in[*|data-pulse=b]{animation:hc-in--b var(--t-quick) var(--e-out);}
 .a-hc-out[*|data-pulse=a]{animation:hc-out var(--t-quick) var(--e-out) forwards;}
 .a-hc-out[*|data-pulse=b]{animation:hc-out--b var(--t-quick) var(--e-out) forwards;}
-.a-page-in[*|data-pulse=a]{animation:page-in var(--t-big) var(--e-spring);}
-.a-page-in[*|data-pulse=b]{animation:page-in--b var(--t-big) var(--e-spring);}
-.a-park[*|data-pulse=a]{animation:park var(--t-park) var(--e-exit) forwards;}
-.a-park[*|data-pulse=b]{animation:park--b var(--t-park) var(--e-exit) forwards;}
+.a-page-in[*|data-pulse=a]{animation:page-in var(--t-big) var(--e-out);}
+.a-page-in[*|data-pulse=b]{animation:page-in--b var(--t-big) var(--e-out);}
 .a-shake-x[*|data-pulse=a]{animation:shake-x var(--t-shake) var(--e-shake);}
 .a-shake-x[*|data-pulse=b]{animation:shake-x--b var(--t-shake) var(--e-shake);}
-.a-nudge[*|data-pulse=a]{animation:nudge var(--t-nudge) var(--e-out);}
-.a-nudge[*|data-pulse=b]{animation:nudge--b var(--t-nudge) var(--e-out);}
 .a-shake[*|data-pulse=a]{animation:shake var(--t-shake) var(--e-shake);}
 .a-shake[*|data-pulse=b]{animation:shake--b var(--t-shake) var(--e-shake);}
-.a-compose-rise[*|data-pulse=a]{animation:compose-rise var(--t-big) var(--e-spring);}
-.a-compose-rise[*|data-pulse=b]{animation:compose-rise--b var(--t-big) var(--e-spring);}
-.a-compose-send[*|data-pulse=a]{animation:compose-send var(--t-send) var(--e-exit) forwards;}
-.a-compose-send[*|data-pulse=b]{animation:compose-send--b var(--t-send) var(--e-exit) forwards;}
-.a-floatup[*|data-pulse=a]{animation:floatup var(--t-float) var(--e-out) forwards;}
-.a-floatup[*|data-pulse=b]{animation:floatup--b var(--t-float) var(--e-out) forwards;}
-.a-sail[*|data-pulse=a]{animation:sail var(--t-sail) var(--e-out) forwards;}
-.a-sail[*|data-pulse=b]{animation:sail--b var(--t-sail) var(--e-out) forwards;}
-.a-boat-return[*|data-pulse=a]{animation:boat-return var(--t-boat-return) var(--e-out) forwards;}
-.a-boat-return[*|data-pulse=b]{animation:boat-return--b var(--t-boat-return) var(--e-out) forwards;}
-.a-dest[*|data-pulse=a]{animation:dest var(--t-float) var(--e-out) infinite alternate;}
-.a-dest[*|data-pulse=b]{animation:dest--b var(--t-float) var(--e-out) infinite alternate;}
-.a-breathe[*|data-pulse=a]{animation:breathe var(--t-ambient) var(--e-in-out) infinite;}
-.a-breathe[*|data-pulse=b]{animation:breathe--b var(--t-ambient) var(--e-in-out) infinite;}
-.a-spin[*|data-pulse=a]{animation:spin var(--t-spin) var(--e-linear) infinite;}
-.a-spin[*|data-pulse=b]{animation:spin--b var(--t-spin) var(--e-linear) infinite;}
-.a-pill-up[*|data-pulse=a]{animation:pill-up var(--t-big) var(--e-spring);}
-.a-pill-up[*|data-pulse=b]{animation:pill-up--b var(--t-big) var(--e-spring);}
+.a-pill-up[*|data-pulse=a]{animation:pill-up var(--t-big) var(--e-out);}
+.a-pill-up[*|data-pulse=b]{animation:pill-up--b var(--t-big) var(--e-out);}
 .a-ring-drain[*|data-pulse=a]{animation:ring-drain var(--t-send-ring) var(--e-linear) forwards;}
 .a-ring-drain[*|data-pulse=b]{animation:ring-drain--b var(--t-send-ring) var(--e-linear) forwards;}
 .a-fade-in[*|data-pulse=a]{animation:fade-in var(--t-move) var(--e-out);}
 .a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
-.a-busy[*|data-pulse=a]{animation:busy var(--t-ambient) var(--e-in-out) infinite;}
-.a-busy[*|data-pulse=b]{animation:busy--b var(--t-ambient) var(--e-in-out) infinite;}
-.a-pane-in-r[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-spring);}
-.a-pane-in-r[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-spring);}
-.a-pane-in-l[*|data-pulse=a]{animation:slide-l var(--t-move) var(--e-spring);}
-.a-pane-in-l[*|data-pulse=b]{animation:slide-l--b var(--t-move) var(--e-spring);}
+.a-pane-in-r[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
+.a-pane-in-r[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
+.a-pane-in-l[*|data-pulse=a]{animation:slide-l var(--t-move) var(--e-out);}
+.a-pane-in-l[*|data-pulse=b]{animation:slide-l--b var(--t-move) var(--e-out);}
 .a-pane-out-l[*|data-pulse=a]{animation:pane-out-l var(--t-move) var(--e-exit) forwards;}
 .a-pane-out-l[*|data-pulse=b]{animation:pane-out-l--b var(--t-move) var(--e-exit) forwards;}
 .a-pane-out-r[*|data-pulse=a]{animation:pane-out-r var(--t-move) var(--e-exit) forwards;}
@@ -547,14 +340,14 @@ html,body{margin:0;padding:0;background:transparent}
 .a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
 .a-banner-out[*|data-pulse=a]{animation:banner-out var(--t-move) var(--e-exit) forwards;}
 .a-banner-out[*|data-pulse=b]{animation:banner-out--b var(--t-move) var(--e-exit) forwards;}
-.a-banner-in[*|data-pulse=a]{animation:banner-in var(--t-move) var(--e-spring);}
-.a-banner-in[*|data-pulse=b]{animation:banner-in--b var(--t-move) var(--e-spring);}
+.a-banner-in[*|data-pulse=a]{animation:banner-in var(--t-move) var(--e-out);}
+.a-banner-in[*|data-pulse=b]{animation:banner-in--b var(--t-move) var(--e-out);}
 .a-panel-in[*|data-pulse=a]{animation:panel-in var(--t-move) var(--e-out);}
 .a-panel-in[*|data-pulse=b]{animation:panel-in--b var(--t-move) var(--e-out);}
 .a-panel-out[*|data-pulse=a]{animation:panel-out var(--t-move) var(--e-exit) forwards;}
 .a-panel-out[*|data-pulse=b]{animation:panel-out--b var(--t-move) var(--e-exit) forwards;}
-.a-shot-in[*|data-pulse=a]{animation:rise var(--t-big) var(--e-spring);}
-.a-shot-in[*|data-pulse=b]{animation:rise--b var(--t-big) var(--e-spring);}
+.a-shot-in[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
+.a-shot-in[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
 .a-shot-out[*|data-pulse=a]{animation:shot-out var(--t-move) var(--e-exit) forwards;}
 .a-shot-out[*|data-pulse=b]{animation:shot-out--b var(--t-move) var(--e-exit) forwards;}
 .a-morph-in[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-out) backwards;}
@@ -569,37 +362,21 @@ html,body{margin:0;padding:0;background:transparent}
 .a-roll-in[*|data-pulse=b]{animation:roll-in--b var(--t-quick) var(--e-out) backwards;}
 .a-roll-out[*|data-pulse=a]{animation:roll-out var(--t-quick) var(--e-out) forwards;}
 .a-roll-out[*|data-pulse=b]{animation:roll-out--b var(--t-quick) var(--e-out) forwards;}
-.a-hold[*|data-pulse=a]{animation:hold var(--t-tap) var(--e-linear);}
-.a-hold[*|data-pulse=b]{animation:hold--b var(--t-tap) var(--e-linear);}
+.a-hold[*|data-pulse=a]{animation:hold var(--t-quick) var(--e-linear);}
+.a-hold[*|data-pulse=b]{animation:hold--b var(--t-quick) var(--e-linear);}
 .a-pane-in-r-out[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
 .a-pane-in-r-out[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
-.a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-spring) backwards;}
-.a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-spring) backwards;}
+.a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-out) backwards;}
+.a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-out) backwards;}
 .a-widget-out[*|data-pulse=a]{animation:widget-out var(--t-move) var(--e-exit) forwards;}
 .a-widget-out[*|data-pulse=b]{animation:widget-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-rise[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-rise[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-fold[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-fold[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-fold-heavy[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-fold-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-crumple[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-crumple[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-crumple-heavy[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-crumple-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-curl[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-curl[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-curl-heavy[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-curl-heavy[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-row-out[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-row-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-heal[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-heal[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-tab-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-tab-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-tab-out[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-tab-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-slide-r[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-slide-r[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-slide-l[*|data-pulse=a]{animation-name:fade;}
@@ -610,10 +387,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-menu-pop[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-bubble-pop[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-bubble-pop[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-cmdk-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-cmdk-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-cmdk-rise[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-cmdk-rise[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-peek-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-peek-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=a]{animation-name:fade;}
@@ -626,28 +399,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-hc-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-page-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-page-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-park[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-park[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-nudge[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-nudge[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-shake[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-shake[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-compose-rise[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-compose-rise[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-compose-send[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-compose-send[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-floatup[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-floatup[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-sail[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-sail[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-boat-return[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-boat-return[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-breathe[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-breathe[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-spin[*|data-pulse=a]{animation-name:hold;}
-.ds[*|data-motion=reduced] .a-spin[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-pill-up[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-pill-up[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-pane-in-r[*|data-pulse=a]{animation-name:fade;}
@@ -738,7 +493,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); margin-top:var(--s-12); }
 
-.ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-spring); }
+.ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-out); }
 .ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }
 .ds-account-tile .ds-avatar[*|data-tone=all]{ background:transparent; color:var(--f-ink); }
 .ds-account-tile[*|aria-pressed=false] .ds-avatar[*|data-tone=account]{ opacity:.85; }
@@ -751,7 +506,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
 .ds-account-tile .ds-avatar[*|data-tone=add]{
   box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
-  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
+  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
 .ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }
 /* -- alert -- */
@@ -810,7 +565,7 @@ html,body{margin:0;padding:0;background:transparent}
    the UI face at 13/600 (not the Fly's usual dark label above). A row wider than its view is
    scrolled by `--switcher-shift`, at once (a transition there played on the panel's first
    frame on Blitz, sliding the row in as it appeared). It appears with `fade` at `--t-quick`, no pop; a quitting
-   tile plays `fold` (`a-fold`). Flat: no gloss on the panel or the selection. */
+   tile plays `row-out` (`a-row-out`). Flat: no gloss on the panel or the selection. */
 
 .ds-switcher{ --switcher-cell:112px; --switcher-icon:96px; --switcher-gap:8px; --switcher-view:592px; --switcher-shift:0px; --switcher-at:0;
   position:relative; z-index:var(--z-raise); display:inline-flex; box-sizing:border-box; max-width:100%; padding:var(--s-16) var(--s-16) var(--s-10);
@@ -885,10 +640,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-banner[*|data-flight=swipe]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
 .ds-banner{ display:flex; justify-content:flex-end; padding-bottom:var(--notifications-stack-gap); }
 .ds-banner-stack[*|data-position=bottom-right] > .ds-banner{ padding-bottom:0; padding-top:var(--notifications-stack-gap); }
-.ds-banner-card{ display:flex; justify-content:flex-end; animation:banner-in var(--t-move) var(--e-spring); }
-.ds-banner[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-banner-card{ display:flex; justify-content:flex-end; animation:banner-in var(--t-move) var(--e-out); }
+.ds-banner[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-banner[*|data-presence=leaving]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-.ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal)); }
+.ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 .ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }
 /* -- battery_level -- */
 /* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"):
@@ -943,12 +698,10 @@ html,body{margin:0;padding:0;background:transparent}
   display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--ctl-r-m);
   height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); line-height:1; white-space:nowrap;
   font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
-  transition:transform var(--t-tap) var(--e-out), box-shadow var(--t-quick) var(--e-out);
+  transition:box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=primary]:hover,
 .ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
-.ds-button[*|data-variant=primary]:active,
-.ds-button[*|data-variant=secondary]:active{ transform:translateY(1px) scale(var(--squish)); }
 .ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
 
 /* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
@@ -957,12 +710,10 @@ html,body{margin:0;padding:0;background:transparent}
   display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
   border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
   border-radius:var(--ctl-r-xs); height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
-  transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=mini]:hover,
 .ds-button[*|data-variant=danger]:hover{ color:var(--ink); background:var(--raise); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=mini]:active,
-.ds-button[*|data-variant=danger]:active{ transform:scale(var(--squish)) translateY(1px); }
 
 /* Mini pressed: `S:523`, the RSVP row. */
 /* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
@@ -987,10 +738,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|data-variant=frame]{
   display:inline-flex; align-items:center; justify-content:flex-start; text-align:left; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:default;
   padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); transform:scale(var(--squish)); }
+.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
 /* Size, after the variants so it wins at equal weight: `data-size` is written only
@@ -1118,8 +869,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-clock-moon{ color:var(--ink-faint); }
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
-   `S:793-799`: a scrim that centres the panel near the top, the panel springing in with
-   `peek-in` (or C's `cmdk-in`, `C:1064`), a SearchField over an embedded Rich menu (menu.css).
+   `S:793-799`: a scrim that centres the panel near the top, the panel entering with
+   `peek-in`, a SearchField over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
    Hosted in a surface of its own there is no wrap: the card fills its
@@ -1131,8 +882,7 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--scrim); pointer-events:auto; animation:fade var(--t-quick) var(--e-out); }
 .ds-palette{ width:min(540px, 88%); background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
-  animation:peek-in var(--t-big) var(--e-spring); }
-.ds-palette[*|data-entrance=cmdk-in]{ animation:cmdk-in var(--t-big) var(--e-spring); }
+  animation:peek-in var(--t-big) var(--e-out); }
 .ds-palette[*|data-host=surface]{ width:100%; height:auto; max-height:100%; box-sizing:border-box; display:flex; flex-direction:column;
   background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
 .ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }
@@ -1154,13 +904,6 @@ html,body{margin:0;padding:0;background:transparent}
    rule 2), so the animation starts over even where the engine kept the element's styles. */
 .ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
 .ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
-.ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
-/* An opaque entrance: `cmdk-rise` springs the card's scale and lift with no fade,
-   so its first frame is already opaque; over a window its scrim does not fade either, since the
-   wrap's opacity would hold the card at its own. */
-.ds-palette[*|data-entrance=cmdk-rise]{ animation:cmdk-rise var(--t-big) var(--e-spring); }
-.ds-palette[*|data-entrance=cmdk-rise][*|data-pulse=b]{ animation-name:cmdk-rise--b; }
-.ds-palette-wrap[*|data-entrance=cmdk-rise]{ animation:none; }
 /* A pane beside the results (`aside`): the card turns into a grid, the field (and
    its tokens) across the top, the results under it on the left, the pane on the right past a
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
@@ -1172,17 +915,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-aside=shown] > .ds-search-tokens{ grid-row:2; grid-column:1 / -1; }
 .ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
 .ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
-/* The results' motions (design/26-DETAILS.md section 5.6): the first-show rise is
-   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More rises
-   the rows it added in downward, each `--stagger` after the one before (`--i`, capped at 12);
-   its Show Less heals everything after the last row kept up from `--dy`, the height the removed
-   rows took, set on the list while it plays. At rest the list's children play `hold` (moves
-   nothing), below every motion here and the reveal's (which come later in the cascade): a rise
-   or heal whose settle timer (wall clock) ends it before the frame clock does is replaced by
-   another animation, never dropped midway. */
-.ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-menu-item[*|data-row-motion=rise]{ animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
-.ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-spring) backwards; }
+/* The results' motions (design/26-DETAILS.md section 5.4): a group's Show More brings the rows
+   it added in as inserted rows come (`row-in`); its Show Less heals everything after the last
+   row kept up from `--dy`, the height the removed rows took, set on the list while it plays. At
+   rest the list's children play `hold` (moves nothing), below every motion here (which come
+   later in the cascade): an entrance or heal whose settle timer (wall clock) ends it before the
+   frame clock does is replaced by another animation, never dropped midway. */
+.ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-menu-item[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+.ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 /* -- command_pill -- */
 /* CommandPill (design/04-COMPONENTS.md section 8): `S:92-100`. The inset highlight is
    `--shadow-pill-inset` (O-3); the label truncates with `.ds-truncate` (no ellipsis on Blitz).
@@ -1192,10 +933,9 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; align-items:center; gap:var(--s-8); width:100%; border:0; cursor:default; text-align:left;
   padding:var(--s-8) var(--s-10); border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
   font:inherit; font-size:var(--fs-control); box-shadow:var(--shadow-pill-inset);
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-command-pill:hover{ color:var(--f-ink); }
-.ds-command-pill:active{ transform:scale(var(--squish)); }
 .ds-command-pill-label{ min-width:0; }
 .ds-command-pill-keys{
   margin-left:auto; white-space:nowrap; flex:none;
@@ -1224,7 +964,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- drag_ghost -- */
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
-   `.ds-truncate`. No enter or exit animation; `--tilt` is 0 under Calm. The dragged source is
+   `.ds-truncate`. No enter or exit animation. The dragged source is
    `[data-drag=source]` at .35 and a hovered drop target `[data-drop=target]`, both written from
    `DropState` by ListRow and SidebarItem, whose stylesheets carry the rules. */
 
@@ -1232,7 +972,7 @@ html,body{margin:0;padding:0;background:transparent}
   position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:var(--s-9) var(--s-11);
   border-radius:var(--r-card); background:var(--raise); border:var(--hair) solid var(--line);
   box-shadow:var(--shadow-drag); font-size:var(--fs-control); font-weight:700; color:var(--ink);
-  transform:rotate(var(--tilt)) scale(1.02);
+  transform:scale(1.02);
 }
 .ds-drag-ghost-sub{ font-weight:500; color:var(--ink-faint); font-size:var(--fs-small); }
 
@@ -1267,7 +1007,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-side[*|data-side=peek]{
   visibility:visible; position:absolute; left:8px; top:8px; bottom:8px; width:226px; z-index:var(--z-side-peek);
   background:var(--f-solid); border-radius:var(--r-panel); box-shadow:var(--shadow-pop);
-  animation:slide-r var(--t-big) var(--e-spring);
+  animation:slide-r var(--t-big) var(--e-out);
 }
 /* -- edit_surface -- */
 /* EditSurface (FINDINGS "Edit surface"): a block the app's own text lives in. The app draws the
@@ -1341,7 +1081,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-hover-target[*|data-as=div], .ds-hover-target[*|data-as=li]{ display:block; }
 
 .ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
-  animation:hc-in var(--t-move) var(--e-spring); }
+  animation:hc-in var(--t-move) var(--e-out); }
 .ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-quick) var(--e-out) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }
@@ -1429,10 +1169,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=tool]{
   display:inline-grid; place-items:center; width:var(--ctl-h-l); height:var(--ctl-h-l); border:var(--hair) solid transparent; border-radius:var(--ctl-r-l);
   background:transparent; color:var(--ink-faint); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-icon-button[*|data-variant=tool]:hover{ color:var(--ink); background:var(--surface); }
-.ds-icon-button[*|data-variant=tool]:active{ transform:scale(var(--squish)); }
 .ds-icon-button[*|data-variant=tool][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); border-color:var(--line); }
 
 /* Foot: `S:151-153`. Active: not specified. */
@@ -1456,10 +1195,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=pin]{
   aspect-ratio:1; border:0; border-radius:var(--r-tile); cursor:default; background:var(--f-pill-hover);
   display:grid; place-items:center; position:relative; color:var(--f-ink);
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-icon-button[*|data-variant=pin]:hover{ background:var(--f-pill); }
-.ds-icon-button[*|data-variant=pin]:active{ transform:scale(var(--squish)); }
 .ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
 
 /* Status (bar gaps; design/13-BEHAVIOUR-menus-windows.md section 13.3.1): a bar status item on
@@ -1473,7 +1211,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=status]{
   display:inline-grid; place-items:center; width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
   background:transparent; color:var(--f-ink-soft); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 /* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
    setting as a single icon does. */
@@ -1618,68 +1356,43 @@ html,body{margin:0;padding:0;background:transparent}
    each in a `div.ds-leaving-row` that carries the roster's motion state, as ListRow does
    (`data-presence=entering|present|leaving|healing`, `data-exit`). The row is a flow root, so
    its content's margins stay inside it and its measured height is the whole distance the rows
-   below heal. Rows listed on a first show rise, staggered by `--i` (`S:294`); a row arriving
-   into a list at rest plays `row-in` (`C:373`). A leaving row plays its exit forwards, delayed
-   by its place in its batch (`--i` x `--stagger`), and takes no pointer. The rows below a
-   settled batch heal from `--dy` (the dropped rows' summed height) with the heal ripple
-   (`--d` x `--d-heal`). At rest a row plays `hold`, which moves nothing. The Today
-   entry's `tab-out` collapses its own height and is not played here. Under Reduced motion
-   (design/05 section 14.4) an entrance is `fade`, an exit `menu-out`, and a heal `hold`: the
-   rows below take their places without sliding. Attribute selectors carry `*|` (spike S2). */
+   below heal. An arriving row plays `row-in` (fades and slides down over `--t-move`); a leaving
+   row plays its exit forwards and takes no pointer (`row-out`, fades and slides up over
+   `--t-quick`; a notification banner's `banner-out`). The rows below a settled batch heal from
+   `--dy` (the dropped rows' summed height) over `--t-move`. At rest a row plays `hold`, which
+   moves nothing. Under Reduced motion (design/05 section 14.4) an entrance is `fade`, an exit
+   `menu-out`, and a heal `hold`: the rows below take their places without sliding. Attribute
+   selectors carry `*|` (spike S2). */
 
 .ds-leaving-list{ display:flex; flex-direction:column; }
-.ds-leaving-row{ --i:0; --d:0; display:flow-root; animation:none; }
+.ds-leaving-row{ display:flow-root; animation:none; }
 
-.ds-leaving-list[*|data-presence=entering] .ds-leaving-row[*|data-presence=entering]{
-  animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-leaving-list[*|data-presence=present] .ds-leaving-row[*|data-presence=entering]{
-  animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-leaving-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-leaving-row[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+.ds-leaving-row[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 
 .ds-leaving-row[*|data-presence=leaving]{ pointer-events:none; }
-.ds-leaving-row[*|data-presence=leaving][*|data-exit=fold]{
-  animation:fold var(--t-big) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-leaving-row[*|data-presence=leaving][*|data-exit=curl]{
-  animation:curl var(--t-curl) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-leaving-row[*|data-presence=leaving][*|data-exit=crumple]{
-  animation:crumple var(--t-big) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-leaving-row[*|data-presence=leaving][*|data-exit=banner-out]{
-  animation:banner-out var(--t-move) var(--e-exit) forwards; animation-delay:calc(var(--i) * var(--stagger));
-}
+.ds-leaving-row[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
+.ds-leaving-row[*|data-presence=leaving][*|data-exit=banner-out]{ animation:banner-out var(--t-move) var(--e-exit) forwards; }
 
-.ds-leaving-row[*|data-presence=healing]{
-  animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal));
-}
+.ds-leaving-row[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 
 .ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=entering]{ animation-name:fade; }
 .ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=leaving]{ animation-name:menu-out; }
 .ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=healing]{ animation-name:hold; }
 /* -- list_row -- */
-/* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`, `S:326-333`, C's
-   crumple (`C:714`) and arrival (`C:373`). Attribute selectors carry `*|` (spike S2).
-   Motion state is the roster's: `data-presence=entering|present|leaving|healing` with
-   `data-exit=fold|curl|crumple`. An entering row rises (staggered by `--i`) when its list is
-   first shown and plays `row-in` when it arrives into a list at rest. An unread leaving row
-   plays the heavy variant of its exit (`--t-big-heavy`, `--t-curl-heavy`, `--t-crumple-heavy`),
-   the one `Roster::leave` settles. `tab-out` is a Today entry's exit, not a row's. A healing
-   row slides from `--dy`, delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate
-   filter (05-MOTION rule 4). Subject and snippet truncate with `.ds-truncate`; the name only
-   when `ListRow` finds it longer than its column's character budget (`NameFit`), since a fade
-   on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The star's fill is an SVG attribute
-   (spike S6), so this file colours it with `color`.
-   Not specified: the row's active state, disabled. The undo restore (`rise --t-big
-   --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
-   The snooze floater "zZ" is the consumer's, through OverlayHost. `drop: DropState` writes the
-   dragged source `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]`
-   (section 34's drop-target look, `C:320-323`). */
+/* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`. Attribute selectors
+   carry `*|` (spike S2). Motion state is the roster's: `data-presence=entering|present|leaving|
+   healing` with `data-exit=row`. An entering row plays `row-in` (fades and slides down over
+   `--t-move`), a leaving row `row-out` (fades and slides up over `--t-quick`), and a healing row
+   slides from `--dy` over `--t-move`. Subject and snippet truncate with `.ds-truncate`; the name
+   only when `ListRow` finds it longer than its column's character budget (`NameFit`), since a
+   fade on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The
+   star's fill is an SVG attribute (spike S6), so this file colours it with `color`.
+   Not specified: the row's active state, disabled. `drop: DropState` writes the dragged source
+   `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]` (section 34's
+   drop-target look, `C:320-323`). */
 
 .ds-row{
-  --i:0; --d:0;
   position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
   padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
   border:var(--hair) solid transparent; cursor:default; user-select:none; list-style:none;
@@ -1687,45 +1400,33 @@ html,body{margin:0;padding:0;background:transparent}
              background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
   animation:none;
 }
-.ds-row:hover{ transform:translateY(var(--lift)); box-shadow:var(--shadow-2); border-color:var(--line); }
+.ds-row:hover{ box-shadow:var(--shadow-2); border-color:var(--line); }
 .ds-row[*|aria-selected=true]{ background:var(--raise); border-color:var(--accent-text); box-shadow:var(--shadow-1); }
 
-/* Entering: first show (`S:294`) or an arrival (`C:373`). */
-.ds-list[*|data-presence=entering] .ds-row[*|data-presence=entering]{
-  animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-list[*|data-presence=present] .ds-row[*|data-presence=entering]{
-  animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
-}
+/* Entering: an arrival. */
+.ds-row[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
 
 /* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
    rest timer (wall clock) that turns a row present never drops a running animation without
    starting another; Blitz at the pinned rev keeps a dropped animation's last value. */
-.ds-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-row[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 
-/* Leaving (`S:326-329`, `C:714`). */
+/* Leaving. */
 .ds-row[*|data-presence=leaving]{ pointer-events:none; }
-.ds-row[*|data-presence=leaving][*|data-exit=fold]{ animation:fold var(--t-big) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=fold][*|data-emphasis=strong]{ animation:fold var(--t-big-heavy) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=curl]{ animation:curl var(--t-curl) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=curl][*|data-emphasis=strong]{ animation:curl var(--t-curl-heavy) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=crumple]{ animation:crumple var(--t-big) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=crumple][*|data-emphasis=strong]{ animation:crumple var(--t-crumple-heavy) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
 
 /* Drag (section 34). */
 .ds-row[*|data-drag=source]{ opacity:.35; }
 .ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 
 /* Healing (`S:330`). */
-.ds-row[*|data-presence=healing]{
-  animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal));
-}
+.ds-row[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 
 /* Dot (`S:185-187`, `S:295-296`). */
 .ds-row-dot{ padding-top:var(--s-6); }
 .ds-dot{
   display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
-  transition:transform var(--t-quick) var(--e-spring), opacity var(--t-quick) var(--e-out);
+  transition:transform var(--t-quick) var(--e-out), opacity var(--t-quick) var(--e-out);
 }
 .ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
 
@@ -1811,10 +1512,9 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
   background:var(--lock-glass-strong); color:var(--lock-ink); cursor:default;
-  transition:opacity var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring); }
+  transition:opacity var(--t-quick) var(--e-out); }
 .ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
 .ds-lock-go[*|aria-busy=true]{ opacity:1; }
-.ds-lock-go:active{ transform:scale(var(--squish)); }
 .ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
 .ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
 
@@ -1837,12 +1537,12 @@ html,body{margin:0;padding:0;background:transparent}
    at once (`S:2052`, `C:1744`).
    TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; animation:menu-pop var(--t-move) var(--e-spring); }
+.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; animation:menu-pop var(--t-move) var(--e-out); }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-menu[*|data-kind=slim],
 .ds-menu[*|data-kind=context]{ width:220px; }
 .ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; box-shadow:var(--shadow-2);
-  transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-spring); }
+  transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-out); }
 
 /* A menu's surface is the reference's menu (design/29-SIZING.md section 5.4): radius 8 with its
    rows inset 5 (`--r-shell-menu`, `--shell-menu-inset`); the rows' highlight is 5, not concentric,
@@ -2074,7 +1774,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-osd[*|data-shown=hidden]{ display:none; }
 .ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:osd-in var(--t-quick) var(--e-out); }
 .ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:osd-in--b; }
-.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
 /* -- module_tile -- */
@@ -2083,19 +1783,18 @@ html,body{margin:0;padding:0;background:transparent}
    (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
    with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
-   pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`) and by `--lift`; pressed it
-   squishes. A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
+   pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`).
+   A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
 
 .ds-module-tile{
   position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:var(--cc-tile-h); box-sizing:border-box;
   padding:0 var(--s-4) 0 var(--cc-pad); border:var(--hair) solid var(--line); border-radius:var(--cc-module-r);
   background:var(--surface-2); color:var(--ink); cursor:default; user-select:none;
-  transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-module-tile[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-tile:hover{ background:var(--raise); box-shadow:var(--shadow-1); transform:translateY(var(--lift)); }
-.ds-module-tile:active{ transform:scale(var(--squish)) translateY(1px); }
+.ds-module-tile:hover{ background:var(--raise); box-shadow:var(--shadow-1); }
 .ds-module-tile[*|data-state=on]{ background:var(--accent-soft); border-color:transparent; }
 .ds-module-tile[*|data-state=on]:hover{ background:var(--accent-soft); }
 .ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
@@ -2119,10 +1818,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-chevron{
   font:inherit; display:grid; place-items:center; flex:none; width:18px; height:var(--ctl-h-l); padding:0; border:0; border-radius:var(--ctl-r-m);
   background:transparent; color:var(--ink-faint); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-module-chevron:hover{ color:var(--ink); background:var(--surface); }
-.ds-module-chevron:active{ transform:scale(var(--squish)); }
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
 
@@ -2172,8 +1870,8 @@ html,body{margin:0;padding:0;background:transparent}
    24 px week-number column under `data-weeks=show`. A day is its number on a 24 px disc: the
    neighbours' days in `--ink-faint`, today on `--accent` in `--accent-ink`, a busy day with a
    4 px dot under it (`--accent`; `--ink-soft` on a neighbour's day). A pressable day
-   (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer and squishes
-   pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
+   (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer.
+   The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
 
    Compact (`data-density=compact`, the compact-spacing pass of 2026-09-27): a
    small desktop widget's content box is 140 x 140, which the regular grid (224 wide, 254 tall
@@ -2219,14 +1917,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-month-num{
   display:grid; place-items:center; width:24px; height:24px; border-radius:var(--r-pill);
   font-size:var(--fs-help); font-weight:500; line-height:1.3; font-variant-numeric:tabular-nums;
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-month-day[*|aria-current=date] .ds-month-num{ background:var(--accent); color:var(--accent-ink); font-weight:700; }
 
 .ds-month-day[*|data-kind=pressable]{ cursor:default; }
 .ds-month-day[*|data-kind=pressable]:hover .ds-month-num{ background:var(--surface-2); }
 .ds-month-day[*|data-kind=pressable][*|aria-current=date]:hover .ds-month-num{ background:var(--accent); }
-.ds-month-day[*|data-kind=pressable]:active .ds-month-num{ transform:scale(var(--squish)); }
 
 .ds-month-dot{ flex:none; width:4px; height:4px; border-radius:var(--r-pill); background:var(--accent-text); }
 .ds-month-day[*|data-place=before] .ds-month-dot,
@@ -2235,10 +1932,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-month-step{
   font:inherit; display:grid; place-items:center; width:14px; height:14px; padding:0; border:0; border-radius:var(--r-pill);
   background:transparent; color:var(--ink-faint); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-month-step:hover{ color:var(--ink); background:var(--surface-2); }
-.ds-month-step:active{ transform:scale(var(--squish)); }
 
 /* Compact: the month fills the small frame's content box (flex:1 in `.ds-widget-body`); the
    header and heads keep their heights and the weeks share the rest, so a five-week month's rows
@@ -2282,7 +1978,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-panes{ --pane-p:0; position:relative; overflow:hidden; }
 .ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
-.ds-pane[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-pane[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-pane[*|data-pane=detail][*|data-presence=entering],.ds-pane[*|data-pane=detail][*|data-presence=leaving]{
   transform:translateX(calc((1 - var(--pane-p)) * var(--s-26))); opacity:var(--pane-p); }
 .ds-pane[*|data-pane=root][*|data-presence=entering],.ds-pane[*|data-pane=root][*|data-presence=leaving]{
@@ -2311,7 +2007,7 @@ html,body{margin:0;padding:0;background:transparent}
    Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
    leaves no value behind; a show while it leaves turns it back from where it is.
    Under Reduced it fades in place instead. */
-.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear);
+.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-quick) var(--e-linear);
   transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
 .ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
 .ds-panel[*|data-presence=leaving]{ pointer-events:none; }
@@ -2325,7 +2021,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-panel-stage[*|data-edge=bottom] > .ds-panel{ top:auto; left:0; right:0; margin:0 auto; max-height:calc(50% - var(--s-8)); }
 .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=entering],
 .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }
-.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-quick) var(--e-linear); opacity:var(--present-p);
   transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
 .ds[*|data-motion=reduced] .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ transform:none; }
 /* -- peek -- */
@@ -2337,7 +2033,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-peek{ position:absolute; inset:36px 12% 36px 12%; background:var(--surface-2); border-radius:var(--r-panel);
   box-shadow:var(--shadow-sheet); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto;
-  animation:peek-in var(--t-big) var(--e-spring); }
+  animation:peek-in var(--t-big) var(--e-out); }
 .ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
 .ds-peek-tools{ display:flex; justify-content:flex-end; padding:var(--s-8) var(--s-10) 0; }
 /* -- pdf_thumb -- */
@@ -2461,10 +2157,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-preview[*|data-shown=hidden]{ display:none; }
 .ds-preview[*|data-presence=entering],.ds-preview[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-out); }
 .ds-preview[*|data-presence=entering][*|data-pulse=b],.ds-preview[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
-.ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-preview[*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
-.ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; animation:hold var(--t-tap) var(--e-linear); }
+.ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; animation:hold var(--t-quick) var(--e-linear); }
 .ds-preview-image{ position:absolute; display:block; object-fit:contain; border-radius:var(--r-tiny); }
 .ds-preview-text{ align-self:stretch; width:100%; box-sizing:border-box; padding:var(--s-10); overflow:hidden; white-space:pre-wrap; font-size:var(--fs-meta); line-height:1.45;
   background:var(--surface); border:var(--hair) solid var(--line-soft); border-radius:var(--r-small); color:var(--ink-soft); }
@@ -2620,12 +2316,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-segment{
   position:relative; z-index:var(--z-raise); font:inherit; border:0; background:transparent; border-radius:var(--seg-r); font-weight:600; cursor:default; color:var(--ink-soft);
   height:100%; line-height:1; white-space:nowrap;
-  transition:transform var(--t-tap) var(--e-out);
 }
 .ds-segmented[*|data-size=regular] .ds-segment{ padding:0 var(--ctl-pad-m); font-size:var(--fs-small); }
 .ds-segmented[*|data-size=small] .ds-segment{ padding:0 var(--ctl-pad-xs); font-size:var(--fs-help); }
 .ds-segment:hover{ color:var(--ink); }
-.ds-segment:active{ transform:scale(var(--squish)); }
 .ds-segment[*|data-thumb=under]{ color:var(--paper); }
 /* -- selection_bubble -- */
 /* SelectionBubble (design/04-COMPONENTS.md section 30), verbatim `S:683-691`, over the
@@ -2634,7 +2328,7 @@ html,body{margin:0;padding:0;background:transparent}
    `BubbleAction::Separator` draws `ds-bubble-sep` between groups. It enters with `menu-pop` at
    `--t-quick` (`S:684`, `Anim::BubblePop`). */
 
-.ds-popover.ds-bubble{ display:flex; align-items:center; gap:var(--s-1); padding:var(--s-3); animation:menu-pop var(--t-quick) var(--e-spring); }
+.ds-popover.ds-bubble{ display:flex; align-items:center; gap:var(--s-1); padding:var(--s-3); animation:menu-pop var(--t-quick) var(--e-out); }
 .ds-bubble-button{ border:0; background:transparent; cursor:default; height:28px; min-width:28px; padding:0 var(--s-7); border-radius:var(--r-bubble-button);
   color:var(--ink-soft); font-size:var(--fs-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
 .ds-bubble-button:hover{ background:var(--surface-2); color:var(--ink); }
@@ -2733,14 +2427,14 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-sheet{ position:absolute; top:36px; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - 72px); overflow-y:auto; scrollbar-width:none;
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
-  animation:peek-in var(--t-big) var(--e-spring); }
+  animation:peek-in var(--t-big) var(--e-out); }
 
 /* Driven (design/05 section 14, H1): after its first entrance the sheet is drawn from
    a spring in Rust, `--present-p` (0 gone, 1 shown): it fades and settles 12 px down at 95 % as
    it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
    nothing, so the entrance it drops leaves no value behind. Leaving, it is no longer
    a target for the pointer. Under Reduced it only fades. */
-.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-quick) var(--e-linear); opacity:var(--present-p);
   transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
 .ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
 .ds-sheet[*|data-presence=leaving]{ pointer-events:none; }
@@ -2763,7 +2457,7 @@ html,body{margin:0;padding:0;background:transparent}
    corners follow the card's less the 4 px mat (`--s-4`, the same number as `shot_frame::MAT`).
    Attribute selectors carry `*|` (spike S2).
 
-   Motion. Entering, `rise` at `--t-big --e-spring` (`Anim::ShotIn`), restarted under its other
+   Motion. Entering, `slide-r` at `--t-move --e-out` (`Anim::ShotIn`), restarted under its other
    name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
    (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
    declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
@@ -2774,9 +2468,9 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
 .ds-shot[*|data-shown=hidden]{ display:none; }
-.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:rise var(--t-big) var(--e-spring); }
-.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:rise--b; }
-.ds-shot[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-out); }
+.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-shot[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-shot[*|data-presence=leaving]{ animation:shot-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
 .ds-shot-plate{ position:relative; box-sizing:border-box; width:100%; border-radius:var(--m-radius); overflow:hidden; }
@@ -2865,12 +2559,12 @@ html,body{margin:0;padding:0;background:transparent}
 /* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
    (drop_place.css). */
 
-/* Today presence (`S:350-351`). */
-.ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
-/* At rest, `hold` (moves nothing), so turning present never drops `tab-in` without starting
-   another animation; an item wearing a pulse plays the pulse instead. */
-.ds-sidebar-item[*|data-kind=today][*|data-presence=present]:not([*|data-pulse]){ animation:hold var(--t-tap) var(--e-linear); }
-.ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:tab-out var(--t-move) var(--e-exit) forwards; overflow:hidden; }
+/* Today presence (`S:350-351`): a roster row. It enters with `row-in` and leaves with `row-out`;
+   at rest, `hold` (moves nothing), so turning present never drops `row-in` without starting
+   another animation. */
+.ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out); }
+.ds-sidebar-item[*|data-kind=today][*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 /* -- slider -- */
 /* Slider (design/04-COMPONENTS.md section 5, derived; sized by design/29-SIZING.md): the
    reference's regular slider, a 4 px capsule track under a plain white round knob of 20 (the
@@ -2943,7 +2637,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 .ds-preset{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:default; padding:0;
-  transition:transform var(--t-quick) var(--e-spring);
+  transition:transform var(--t-quick) var(--e-out);
 }
 .ds-preset:hover{ transform:scale(1.1); }
 
@@ -2954,7 +2648,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-space-dot{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:2px solid transparent; cursor:default; padding:0;
-  transition:transform var(--t-quick) var(--e-spring), border-color var(--t-quick) var(--e-out);
+  transition:transform var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
@@ -3009,7 +2703,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-status-part[*|data-tone=low]{ color:var(--battery-low); }
 .ds-status-part[*|data-under=mark]{ opacity:.35; }
 .ds-status-glyph[*|data-pending=still]{ opacity:.45; }
-.ds-status-glyph[*|data-pending=high], .ds-status-glyph[*|data-pending=low]{ transition:opacity var(--t-pending-step) var(--e-linear); }
+.ds-status-glyph[*|data-pending=high], .ds-status-glyph[*|data-pending=low]{ transition:opacity var(--t-quick) var(--e-linear); }
 .ds-status-glyph[*|data-pending=low]{ opacity:.45; }
 .ds-status-glyph[*|data-kind=volume]{ width:var(--ic-size); height:var(--ic-size); }
 .ds-status-glyph > .ds-level-glyph{ width:100%; height:100%; }
@@ -3031,7 +2725,7 @@ html,body{margin:0;padding:0;background:transparent}
   position:absolute; left:10px; right:10px; bottom:-1px; height:3px;
   border-radius:var(--r-pill) var(--r-pill) 0 0; background:var(--accent-text);
   transform:scaleX(0); transform-origin:50% 100%;
-  transition:transform var(--t-move) var(--e-spring);
+  transition:transform var(--t-move) var(--e-out);
 }
 .ds-tab[*|aria-selected=true] .ds-tab-underline{ transform:scaleX(1); }
 /* -- text_input -- */
@@ -3189,13 +2883,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
   display:flex; align-items:center; gap:var(--s-2); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
   padding:var(--s-5) var(--s-5) var(--s-5) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
-  transition:transform var(--t-big) var(--e-spring); }
+  transition:transform var(--t-big) var(--e-out); }
 .ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
 .ds-toast-text{ min-width:0; overflow:hidden; }
 .ds-toast-hint{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
 .ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
   border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
-  transition:transform var(--t-move) var(--e-spring), background-color var(--t-quick) var(--e-out); }
+  transition:transform var(--t-move) var(--e-out), background-color var(--t-quick) var(--e-out); }
 .ds-toast-tab:active{ cursor:grabbing; }
 .ds-toast-tab[*|data-drag=live]{ transition:none; }
 .ds-toast-tab[*|data-armed=armed]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
@@ -3228,10 +2922,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toggle[*|data-size=large]{ width:var(--switch-w-l); height:var(--switch-h-l); border-radius:var(--switch-r-l); }
 .ds-toggle[*|data-size=large] .ds-toggle-knob{ width:var(--switch-knob-l); height:var(--switch-knob-l); }
 .ds-toggle[*|aria-checked=true]{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
-.ds-toggle:active .ds-toggle-knob{ transform:translateX(calc(var(--knob-x) * 1px)) scale(var(--squish)); }
 /* -- tooltip -- */
 /* Tooltip (design/04-COMPONENTS.md section 18). Fly `S:442-446`: a dark label above its
-   target, shown on hover after `--d-fly`, at once while the hover hub is warm (O-11: `HoverHub`
+   target, shown on hover after the Tip profile's open delay (1 s: 2.5 x `--t-big`, until the Fly is driven by the Tip profile), at once while the hover hub is warm (O-11: `HoverHub`
    stamps `data-hover` on `.ds`); it leaves at once. Both labels are 12 px, the shell scale's
    `--fs-shell-tip` (the macOS polish pass; the Fly was 10). Card `S:426-427`: the small hover card for
    a value, over the hover card's surface, entering with `hc-in` and leaving with `hc-out`. */
@@ -3239,8 +2932,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-fly-target{ position:relative; display:inline-flex; }
 .ds-fly{ position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
   background:var(--ink); color:var(--paper); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-shell-tip); padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0;
-  pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring); }
-.ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
+  pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
+.ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:calc(var(--t-big) * 2.5); }
 .ds[*|data-hover=warm] .ds-fly-target:hover .ds-fly{ transition-delay:initial; }
 /* Caller-driven: up or down on the caller's say, whatever the pointer does,
    at once (the caller's machine has already waited). */
@@ -3248,7 +2941,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-fly-target[*|data-shown=hidden]:hover .ds-fly{ opacity:0; transform:translateX(-50%) translateY(3px); transition-delay:initial; }
 
 .ds-popover.ds-tip{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip); border-radius:var(--r-item);
-  animation:hc-in var(--t-move) var(--e-spring); }
+  animation:hc-in var(--t-move) var(--e-out); }
 .ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-quick) var(--e-out) forwards; }
 .ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-note); color:var(--ink-faint); }
 /* -- tree_item -- */
@@ -3267,7 +2960,7 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; align-items:center; justify-content:flex-start; gap:var(--s-6); width:100%; box-sizing:border-box; min-width:0;
   list-style:none; cursor:default; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
   font:inherit; font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft); position:relative;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-tree-item[*|data-shape=leaf] > .ds-tree-item-row{ cursor:default; }
 .ds-tree-item-row:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
@@ -3365,13 +3058,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 
 
-/* Picked up (`data-lift=lifted`, design/23 section 9.8): the card grows by `--pickup`
-   and its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
+/* Picked up (`data-lift=lifted`, design/23 section 9.8): the card
+   trades its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
    the transparent root's card selector so it wins over `--m-box`), above the other widgets on
    `--z-drag`. Put down, it settles back over the same `--t-quick` at `--e-out`; at rest nothing
    runs. */
-.ds-widget{ transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out); }
-.ds-widget[*|data-lift=lifted]{ transform:scale(var(--pickup)); z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
+.ds-widget{ transition:box-shadow var(--t-quick) var(--e-out); }
+.ds-widget[*|data-lift=lifted]{ z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
 
 /* Leaving: a card its host removed plays `widget-out` on its pulse class (shrinks to
@@ -3393,9 +3086,7 @@ html,body{margin:0;padding:0;background:transparent}
    the rest; the resize edges lie over both. The titlebar is on the frame colour, so its inks are
    the `--f-*` ones. The lights are 12 px discs 8 px apart, the first 13 px from the window's
    left edge (macOS). Coloured in the active window, `--f-pill` with a hairline in an inactive
-   one; any light under the pointer colours the group and shows the marks, as on macOS. A press
-   springs back from `--squish` (design/05-MOTION.md principle 2: the spring is spent on
-   contact). */
+   one; any light under the pointer colours the group and shows the marks, as on macOS. */
 
 .ds[*|data-window-frame=titlebar]{ position:relative; display:flex; flex-direction:column; height:100vh; }
 .ds[*|data-window-frame=titlebar] > .ds-window-body{ position:relative; flex:1 1 auto; min-height:0; }
@@ -3415,9 +3106,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-light{
   display:grid; place-items:center; width:12px; height:12px; padding:0; border:0; border-radius:var(--r-pill);
   background:var(--f-pill); box-shadow:inset 0 0 0 var(--hair) var(--f-line); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring);
+  transition:background-color var(--t-quick) var(--e-out);
 }
-.ds-light:active{ transform:scale(var(--squish)); }
 .ds-light[*|data-light=close]{ color:var(--c-red-deep); }
 .ds-light[*|data-light=minimize]{ color:var(--c-amber-deep); }
 .ds-light[*|data-light=zoom]{ color:var(--c-green-deep); }
