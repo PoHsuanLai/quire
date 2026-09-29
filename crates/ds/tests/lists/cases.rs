@@ -13,7 +13,7 @@ use ds::{
     ItemKind, MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark,
     Px, SidebarItem, SyncHalo, SyncState,
 };
-use ds::{Check, DropState, Here, PulseKey, Shortcut, ShortcutKey};
+use ds::{Check, DropState, PulseKey, Selection, Shortcut, ShortcutKey};
 
 /// One component in one state.
 pub struct Case {
@@ -33,7 +33,7 @@ const VIOLET: Colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
 
 fn item(
     kind: ItemKind,
-    here: Here,
+    here: Selection,
     presence: Presence,
     preview: Option<Preview>,
     pulse: PulseKey,
@@ -70,7 +70,7 @@ fn dropped_item(drop: DropState) -> Element {
         SidebarItem {
             kind: INBOX,
             label: "Inbox",
-            here: Here::Elsewhere,
+            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,
@@ -194,12 +194,20 @@ pub const CASES: &[Case] = &[
     Case {
         component: "sidebar_item",
         state: "place",
-        make: || item(INBOX, Here::Elsewhere, Presence::Present, None, GULP()),
+        make: || {
+            item(
+                INBOX,
+                Selection::Unselected,
+                Presence::Present,
+                None,
+                GULP(),
+            )
+        },
     },
     Case {
         component: "sidebar_item",
         state: "place-current",
-        make: || item(INBOX, Here::Current, Presence::Present, None, GULP()),
+        make: || item(INBOX, Selection::Selected, Presence::Present, None, GULP()),
     },
     Case {
         component: "sidebar_item",
@@ -209,7 +217,7 @@ pub const CASES: &[Case] = &[
                 ItemKind::Place {
                     icon: Icon::Archive,
                 },
-                Here::Elsewhere,
+                Selection::Unselected,
                 Presence::Present,
                 Some(Preview::Destination),
                 GULP(),
@@ -222,7 +230,7 @@ pub const CASES: &[Case] = &[
         make: || {
             item(
                 INBOX,
-                Here::Elsewhere,
+                Selection::Unselected,
                 Presence::Present,
                 None,
                 GULP().fired(),
@@ -235,7 +243,7 @@ pub const CASES: &[Case] = &[
         make: || {
             item(
                 INBOX,
-                Here::Elsewhere,
+                Selection::Unselected,
                 Presence::Present,
                 None,
                 GULP().fired().fired(),
@@ -248,7 +256,7 @@ pub const CASES: &[Case] = &[
         make: || {
             item(
                 ItemKind::Pinned { avatar: DANA },
-                Here::Elsewhere,
+                Selection::Unselected,
                 Presence::Present,
                 None,
                 GULP(),
@@ -261,7 +269,7 @@ pub const CASES: &[Case] = &[
         make: || {
             item(
                 ItemKind::Today { avatar: DANA },
-                Here::Elsewhere,
+                Selection::Unselected,
                 Presence::Entering,
                 None,
                 GULP(),
@@ -274,7 +282,7 @@ pub const CASES: &[Case] = &[
         make: || {
             item(
                 ItemKind::Today { avatar: DANA },
-                Here::Current,
+                Selection::Selected,
                 Presence::Present,
                 None,
                 GULP(),
@@ -287,7 +295,7 @@ pub const CASES: &[Case] = &[
         make: || {
             item(
                 ItemKind::Today { avatar: DANA },
-                Here::Elsewhere,
+                Selection::Unselected,
                 Presence::Leaving(Exit::TabOut),
                 None,
                 GULP(),
@@ -375,12 +383,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "space_editor",
         state: "space-dot-current",
-        make: || rsx! { SpaceDot { name: "Work", frame: FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), here: Here::Current, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Work", frame: FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), here: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
     },
     Case {
         component: "space_editor",
         state: "space-dot-elsewhere",
-        make: || rsx! { SpaceDot { name: "Home", frame: FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), here: Here::Elsewhere, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Home", frame: FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), here: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
     },
 ];
 

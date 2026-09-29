@@ -4,8 +4,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    DataAttr, DataName, DropState, Here, Icon, IconButton, IconButtonVariant, PlaceId, Propagation,
-    Shown, TreeItem, TreeShape,
+    DataAttr, DataName, DropState, Icon, IconButton, IconButtonVariant, PlaceId, Propagation,
+    Selection, Shown, TreeItem, TreeShape,
 };
 
 /// `data-folder="<path>"`.
@@ -41,9 +41,9 @@ pub fn FolderTree() -> Element {
     };
     let here = move |path: &'static str| {
         if current() == path {
-            Here::Current
+            Selection::Selected
         } else {
-            Here::Elsewhere
+            Selection::Unselected
         }
     };
     let leaf = move |path: &'static str, label: &'static str| {

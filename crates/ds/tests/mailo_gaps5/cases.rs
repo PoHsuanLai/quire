@@ -5,7 +5,7 @@ use ds::{
     Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle,
     PlaceId, Presence, ProviderMark, RunTone, SidebarItem, TextLine, TextRun, Trailing,
 };
-use ds::{DropState, Here, PulseKey};
+use ds::{DropState, PulseKey, Selection};
 
 /// One state and its golden.
 pub struct Case {
@@ -27,7 +27,7 @@ fn archive(drop: DropState) -> Element {
         SidebarItem {
             kind: ItemKind::Place { icon: Icon::Archive },
             label: "Archive",
-            here: Here::Elsewhere,
+            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,

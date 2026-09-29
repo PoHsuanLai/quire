@@ -3,8 +3,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Check, Here, ItemKind, PersonHue,
-    Presence, PulseKey, SidebarItem, TodayTrailing,
+    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Check, ItemKind, PersonHue, Presence,
+    PulseKey, Selection, SidebarItem, TodayTrailing,
 };
 
 /// A draft waiting for Monday morning, cancelled with its trailing button.
@@ -22,7 +22,7 @@ pub fn Scheduled() -> Element {
             SidebarItem {
                 kind: ItemKind::Today { avatar },
                 label: "Q3 notes",
-                here: Here::Elsewhere,
+                here: Selection::Unselected,
                 count: None,
                 presence: Presence::Present,
                 preview: None,

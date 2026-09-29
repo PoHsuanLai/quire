@@ -11,9 +11,9 @@ mod golden;
 use dioxus::prelude::*;
 use ds::icon::{IconStyle, Tint};
 use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Corner, DockFloor, Ds, Emphasis, Here, Icon,
+    Appearance, CommandPalette, CommandPaletteHost, Corner, DockFloor, Ds, Emphasis, Icon,
     IconSize, IconSource, IconView, Inject, Material, MenuBarItem, PRESETS, PlateFamily, PlateTint,
-    Px, RunningDot, Shown, Surface, Theme, WorkspacePill, WorkspacePills,
+    Px, RunningDot, Selection, Shown, Surface, Theme, WorkspacePill, WorkspacePills,
 };
 
 /// The Work Space's Monochrome plate tint.
@@ -109,7 +109,7 @@ const CASES: &[Case] = &[
     ("workspace-pills", || {
         rsx! {
             WorkspacePills { label: "Workspaces",
-                WorkspacePill { label: "1", current: Here::Current, onclick: |_| {} }
+                WorkspacePill { label: "1", current: Selection::Selected, onclick: |_| {} }
                 WorkspacePill { label: "2", onclick: |_| {} }
             }
         }

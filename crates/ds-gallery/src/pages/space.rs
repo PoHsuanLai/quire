@@ -5,8 +5,8 @@ use super::{Caption, Section};
 use crate::axes::{Axes, PresetIndex};
 use dioxus::prelude::*;
 use ds::{
-    Chip, ChipVariant, DotIndex, FrameVars, Here, MeasuredIn, MotionChoice, Shortcut, ShortcutKey,
-    SpaceDot, SpaceEditor, readout, use_scope,
+    Chip, ChipVariant, DotIndex, FrameVars, MeasuredIn, MotionChoice, Selection, Shortcut,
+    ShortcutKey, SpaceDot, SpaceEditor, readout, use_scope,
 };
 
 /// The Space page.
@@ -31,7 +31,7 @@ pub fn SpacePage() -> Element {
                         key: "{index}",
                         name: candidate.label(),
                         frame: FrameVars::of(&candidate.look(), scheme),
-                        here: if candidate == preset { Here::Current } else { Here::Elsewhere },
+                        here: if candidate == preset { Selection::Selected } else { Selection::Unselected },
                         shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char(char::from(b'1' + candidate.0))]),
                         onclick: move |_| axes.with_mut(|axes| *axes = axes.clone().with_preset(candidate)),
                     }

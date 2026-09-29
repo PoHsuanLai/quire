@@ -3,7 +3,7 @@
 
 use crate::core::geometry::units::Rect;
 use crate::core::vocab::Shown;
-use crate::core::vocab::{Here, StaggerIndex};
+use crate::core::vocab::{Selection, StaggerIndex};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
@@ -28,7 +28,7 @@ pub struct StripAction {
     /// What the Fly preview says: "Archive → out of Inbox".
     pub fly: String,
     /// Destination preview: `Current` while hovered, `Elsewhere` on leave.
-    pub onhover: Option<EventHandler<Here>>,
+    pub onhover: Option<EventHandler<Selection>>,
     /// Pressed; the button's rect anchors the snooze and label menus.
     pub onclick: EventHandler<Rect>,
 }
@@ -126,12 +126,12 @@ fn StripButton(
             onmounted: move |event| element.set(Some(event.data())),
             onpointerenter: move |_| {
                 if let Some(onhover) = onhover {
-                    onhover.call(Here::Current);
+                    onhover.call(Selection::Selected);
                 }
             },
             onpointerleave: move |_| {
                 if let Some(onhover) = onhover {
-                    onhover.call(Here::Elsewhere);
+                    onhover.call(Selection::Unselected);
                 }
             },
             onclick: move |event| {
@@ -140,7 +140,7 @@ fn StripButton(
                 // Any click clears the destination preview (design/06-INTERACTIONS.md
                 // section 14).
                 if let Some(onhover) = onhover {
-                    onhover.call(Here::Elsewhere);
+                    onhover.call(Selection::Unselected);
                 }
                 // The press acts now; the placement follows only if a rect arrives.
                 if let Some(on_press) = on_press {

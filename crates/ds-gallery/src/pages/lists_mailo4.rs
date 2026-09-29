@@ -4,8 +4,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, DropState, Emphasis, Here, HoverStrip, Icon, ItemKind, ListRow, PlaceId,
-    Presence, PulseKey, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
+    ActionId, Anim, DropState, Emphasis, HoverStrip, Icon, ItemKind, ListRow, PlaceId, Presence,
+    PulseKey, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
 };
 
 /// Archive and snooze, each doing nothing on its measured click: the press says what happened.
@@ -92,7 +92,7 @@ pub fn DropPlaces() -> Element {
                         key: "{id}",
                         kind: ItemKind::Place { icon },
                         label,
-                        here: Here::Elsewhere,
+                        here: Selection::Unselected,
                         count: None,
                         presence: Presence::Present,
                         preview: None,

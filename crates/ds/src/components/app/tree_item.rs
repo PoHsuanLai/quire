@@ -16,7 +16,7 @@ use crate::components::content::text_runs::TextLine;
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::core::press::Press;
-use crate::core::vocab::{DropState, Here, Shown};
+use crate::core::vocab::{DropState, Selection, Shown};
 use crate::focus::click::kept_click;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
@@ -69,7 +69,7 @@ pub fn TreeItem(
     #[props(default)] shape: TreeShape,
     #[props(default)] glyph: Option<Icon>,
     #[props(default)] count: Option<u32>,
-    #[props(default)] here: Here,
+    #[props(default)] here: Selection,
     #[props(default)] onselect: Option<EventHandler<Press>>,
     #[props(default)] trailing: Option<Element>,
     #[props(default)] editing: Option<Element>,

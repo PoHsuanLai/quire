@@ -2,8 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, DataAttr, DataName, DropState, ExtraClass, Here, Icon, IconButton,
-    IconButtonVariant, PlaceId, Propagation, Shown, TreeItem, TreeShape,
+    Button, ButtonVariant, DataAttr, DataName, DropState, ExtraClass, Icon, IconButton,
+    IconButtonVariant, PlaceId, Propagation, Selection, Shown, TreeItem, TreeShape,
 };
 
 /// One state and its golden.
@@ -100,6 +100,6 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/tree_item/leaf-current.html",
-        make: || rsx! { TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, here: Here::Current, count: 0, trailing: more("Receipts") } },
+        make: || rsx! { TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, here: Selection::Selected, count: 0, trailing: more("Receipts") } },
     },
 ];

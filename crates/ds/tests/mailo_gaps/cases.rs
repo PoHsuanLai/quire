@@ -8,8 +8,8 @@ use ds::{
     SendRing, Shown, TextInput, TextInputKind,
 };
 use ds::{
-    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Here, ItemKind, PersonHue, Presence,
-    PulseKey, SidebarItem, TodayTrailing,
+    Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, PulseKey,
+    Selection, SidebarItem, TodayTrailing,
 };
 use ds::{Avatar, AvatarMuting};
 use ds::{
@@ -31,7 +31,7 @@ fn scheduled() -> Element {
         SidebarItem {
             kind: ItemKind::Today { avatar: CLOCKED },
             label: "Q3 notes",
-            here: Here::Elsewhere,
+            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,
