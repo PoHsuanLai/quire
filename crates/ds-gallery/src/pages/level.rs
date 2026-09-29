@@ -105,7 +105,7 @@ fn LooksSection() -> Element {
             for look in LevelLook::ALL.iter().copied() {
                 Specimen { name: look.slug().to_owned(), code: describe(look).to_owned(),
                     div { class: "g-level-grid",
-                        for ground in Ground::ALL {
+                        for ground in Ground::ALL.iter().copied() {
                             div { class: "g-row g-row-top",
                                 for state in STATES {
                                     LevelTile { look, scheme, ground, state }

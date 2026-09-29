@@ -23,7 +23,8 @@ pub fn Toolbar() -> Element {
         .map(|entry| (entry.page, entry.title.to_string()))
         .collect::<Vec<_>>();
     let themes = Theme::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|theme| (theme, theme.label().to_string()))
         .collect::<Vec<_>>();
     let typefaces = Typeface::ALL

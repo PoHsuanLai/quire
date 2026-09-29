@@ -187,7 +187,11 @@ fn place(host: &WindowHost, tile: WindowTile) {
 
 /// What the host can do, per placement in the menu's order; nothing without a host.
 fn support(host: Option<&WindowHost>) -> [Support; 4] {
-    WindowTile::ALL.map(|tile| host.map_or(Support::No, |host| host.host().supports(tile)))
+    std::array::from_fn(|index| {
+        host.map_or(Support::No, |host| {
+            host.host().supports(WindowTile::ALL[index])
+        })
+    })
 }
 
 /// Start waiting for `what`, and open the menu after `delay` unless the wait went stale.
@@ -214,11 +218,12 @@ fn cancel(mut hold: CopyValue<Hold>) {
 /// said it cannot.
 fn entries(support: [Support; 4]) -> Vec<MenuEntry<WindowTile>> {
     let rows = WindowTile::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .zip(support)
         .map(|(tile, support)| MenuEntry::Item {
             value: tile,
-            title: tile.title().to_owned(),
+            title: tile.label().to_owned(),
             detail: None,
             tile: Some(MenuTile::Icon(glyph(tile))),
             trail: MenuTrail::None,

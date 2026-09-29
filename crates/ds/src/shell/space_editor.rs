@@ -11,6 +11,7 @@ pub(crate) mod rows;
 
 use crate::components::controls::segmented::SegmentedControl;
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
+use crate::core::word::Word;
 use crate::style::appearance::theme::{Scheme, Theme};
 use crate::style::space::look::{CardAccent, SpaceLook};
 use dioxus::prelude::*;
@@ -111,7 +112,7 @@ pub fn SpaceEditor(
                 SectionHeader { kind: HeaderKind::Field, text: "Appearance" }
                 SegmentedControl::<Theme> {
                     label: "Appearance",
-                    options: Theme::ALL.into_iter().map(|theme| (theme, theme.label().to_string())).collect::<Vec<_>>(),
+                    options: Theme::ALL.iter().copied().map(|theme| (theme, theme.label().to_string())).collect::<Vec<_>>(),
                     value: look.theme,
                     onchange: {
                         let look = look.clone();

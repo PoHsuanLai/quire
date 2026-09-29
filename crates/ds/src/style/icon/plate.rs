@@ -9,6 +9,7 @@
 //! (`mask-composite: add`), so a squircle is drawn as a mask: four quadrant images at the
 //! corners and two rectangles for the cross between them. The shapes are sampled here, as data.
 
+use crate::core::word::Word;
 use crate::style::icon::url::IconUrl;
 use crate::style::tokens::plate::EXPONENT;
 use std::f64::consts::FRAC_PI_2;
@@ -17,7 +18,7 @@ use std::f64::consts::FRAC_PI_2;
 const SAMPLES: u32 = 48;
 
 /// One of the four corners.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Quadrant {
     /// Top left.
     TopLeft,
@@ -30,14 +31,6 @@ pub enum Quadrant {
 }
 
 impl Quadrant {
-    /// In mask-layer order.
-    pub const ALL: [Quadrant; 4] = [
-        Quadrant::TopLeft,
-        Quadrant::TopRight,
-        Quadrant::BottomLeft,
-        Quadrant::BottomRight,
-    ];
-
     /// The `mask-position` keywords.
     pub fn position(self) -> &'static str {
         match self {
@@ -127,6 +120,7 @@ pub fn plate_mask() -> IconUrl {
 #[cfg(test)]
 mod tests {
     use super::{Quadrant, fill_mask, plate_mask, point, quadrant_mask};
+    use crate::core::word::Word;
     use crate::style::tokens::plate::{EXPONENT, shadow_radius_share};
 
     /// Whether `(x, y)`, measured from a corner of a squircle corner of extent `k`, lies inside the
@@ -166,7 +160,7 @@ mod tests {
 
     #[test]
     fn the_masks_are_svg_data_urls() {
-        for quadrant in Quadrant::ALL {
+        for quadrant in Quadrant::ALL.iter().copied() {
             let url = quadrant_mask(quadrant);
             assert!(url.as_str().starts_with("data:image/svg+xml,"));
             assert!(!url.as_str().contains('"'));

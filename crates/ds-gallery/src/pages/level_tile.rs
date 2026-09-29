@@ -3,32 +3,22 @@
 //! the Work Space's frame or a light, wallpaper-like ground.
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelLook, Material, Muting, Osd,
     OsdLevel, PRESETS, RootChrome, Scheme, Shown, SpaceLook, Theme,
 };
 
 /// What the card sits on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Ground {
     /// The Work Space's frame, in the card's scheme; the card takes the same Space's tint.
+    #[word(label = "Work tint")]
     Work,
     /// A light ground like a pale wallpaper, whatever the card's scheme: the Home Space's frame
     /// in the light scheme.
+    #[word(label = "light ground (Home)")]
     Light,
-}
-
-impl Ground {
-    /// Both grounds, in the sheet's order.
-    pub const ALL: [Ground; 2] = [Ground::Work, Ground::Light];
-
-    /// Its caption word.
-    pub fn label(self) -> &'static str {
-        match self {
-            Ground::Work => "Work tint",
-            Ground::Light => "light ground (Home)",
-        }
-    }
 }
 
 /// One level state a specimen shows.

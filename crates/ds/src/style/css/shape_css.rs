@@ -46,13 +46,17 @@ pub fn shape_css() -> String {
 /// The six mask layers for a squircle whose extent is `--sq-k`, capped at half the box.
 fn squircle_mask() -> Vec<String> {
     let extent = format!("min(var(--sq-k,{DEFAULT_EXTENT}),50%)");
-    let corners =
-        Quadrant::ALL.map(|quadrant| format!("url(\"{}\")", quadrant_mask(quadrant).as_str()));
+    let corners = Quadrant::ALL
+        .iter()
+        .copied()
+        .map(|quadrant| format!("url(\"{}\")", quadrant_mask(quadrant).as_str()))
+        .collect::<Vec<_>>();
     let fill = format!("url(\"{}\")", fill_mask().as_str());
     let images = [corners.join(","), fill.clone(), fill].join(",");
     let positions = Quadrant::ALL
+        .iter()
+        .copied()
         .map(Quadrant::position)
-        .into_iter()
         .chain(["center", "center"])
         .collect::<Vec<_>>()
         .join(",");
