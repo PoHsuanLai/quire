@@ -1,4 +1,4 @@
-//! Who moves a menu's highlight (mailo gaps 2): the menu itself, or a field beside it. The
+//! Who moves a menu's highlight: the menu itself, or a field beside it. The
 //! composer's `/` and `@` menus and a people input keep the keyboard in their own field while a
 //! menu lists the matches, so the field says which choice is highlighted and the menu only
 //! reports what the keys and the pointer asked for. Pure, beside `menu` and `menu_panel`.

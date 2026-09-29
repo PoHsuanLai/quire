@@ -1,7 +1,7 @@
-//! The mailo gaps 7 states: a tree item renamed in place (its editing slot in the label's place)
+//! The mail-app states: a tree item renamed in place (its editing slot in the label's place)
 //! rendered through dioxus-ssr and compared with a golden under the lists' directory, so the
 //! lists' class scans cover the new class too. The trailing slot's `data-slot="trailing"` shows
-//! in these and in the mailo gaps 6 tree goldens.
+//! in these and in the mail-app tree goldens.
 //!
 //! `DS_BLESS=1 cargo test -p ds --test mailo_gaps7_ssr` rewrites these goldens.
 

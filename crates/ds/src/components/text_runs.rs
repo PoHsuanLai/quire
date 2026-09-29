@@ -1,6 +1,6 @@
 //! Text: a line a caller hands a component either whole or as runs in several tones, so a
 //! search hit can mark the words it matched and a palette row can set a name in a stronger
-//! tone than its path (mailo gaps 2). The caller computes the runs; quire only draws them, as
+//! tone than its path. The caller computes the runs; quire only draws them, as
 //! `<mark class="ds-mark">` for a hit and `span.ds-run[data-tone]` for a weight, never as markup
 //! from strings.
 //!
@@ -149,7 +149,7 @@ pub(crate) fn text(text: &Text) -> Element {
 
 /// One run in its tone. The spaces at either end of a marked or toned run are drawn outside its
 /// element: Blitz drops the whitespace at the end of an inline box, so `Re: ` in a faint span
-/// before a mark would draw as `Re:UIDL` (seen in the gallery, mailo gaps 2).
+/// before a mark would draw as `Re:UIDL` (seen in the gallery).
 pub(crate) fn run(run: &Run) -> Element {
     let (lead, core, trail) = edges(&run.text);
     let core = core.to_owned();

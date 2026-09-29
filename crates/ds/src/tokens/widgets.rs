@@ -1,4 +1,4 @@
-//! The widget grid's unit (sill FINDINGS Q182; design/22-SETTINGS.md section 3.20,
+//! The widget grid's unit (design/22-SETTINGS.md section 3.20,
 //! design/20-SURFACES.md section 1.14): a cell's side and the gap between cells, each a
 //! [`Tuned`] token its `widgets.*` key moves through one inline write
 //! ([`WidgetMetrics::style_attr`]) on any element around the widgets. A `WidgetFrame` sizes

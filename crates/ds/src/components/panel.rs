@@ -1,5 +1,6 @@
-//! Panel: a full-height panel at an edge of its root, for the notification center (sill Q123;
-//! design/20 section 1.6: "center: `Overlay` panel anchored right", material `Popover`).
+//! Panel: a full-height panel at an edge of its root, for the notification center (design/20
+//! section 1.6: "center: `Overlay` panel anchored right", material `Popover`).
+//!
 //!
 //! Its own component rather than a `Sheet` placement: a sheet is a modal dialog in the Sheet
 //! material that joins the overlay's layer stack over a scrim, while the center is a
@@ -7,10 +8,9 @@
 //! its exit handed to the host exactly as the OSD's are (`shown`, `on_hidden`). Sharing Sheet
 //! would have carried the layer stack, the centring stage and the modal scrim into a surface
 //! that wants none of them by default.
-//!
 //! Mounted shown, it slides in from past the right edge (`Anim::PanelIn`, `--t-move --e-out`);
-//! at the bottom edge (Edit Widgets, sill Q521) it arrives as a sheet does (`peek-in`).
-//! Every change after that is driven motion (design/05 section 14, wave H1): hidden, a spring in
+//! at the bottom edge (Edit Widgets) it arrives as a sheet does (`peek-in`).
+//! Every change after that is driven motion (design/05 section 14): hidden, a spring in
 //! Rust slides it back out past the edge and `on_hidden` runs once the spring rests, when the
 //! host unmaps the surface; shown again while it leaves, it turns back from where it is.
 //! It paints its material from inside a transparent scope of that material, so the root it sits
@@ -33,7 +33,7 @@ pub enum PanelEdge {
     /// The right edge, where macOS keeps Notification Center: full height, `width` wide.
     #[default]
     Right,
-    /// The bottom edge, as the reference's Edit Widgets sheet (sill Q521): centred, `width` wide
+    /// The bottom edge, as the reference's Edit Widgets sheet: centred, `width` wide
     /// at most (less `--s-8` at each side), `height` tall but never more than half the root, so
     /// the top of the desktop, where widgets land, stays in view. It arrives and leaves as a
     /// sheet does (`peek-in`, then the sheet's spring), not by sliding off an edge.

@@ -2,7 +2,7 @@
 //! (design/04-COMPONENTS.md section 24): Peek Center's surface, over a scrim, sized by its
 //! content up to Peek Center's inset (O-14's proposal).
 //!
-//! Sheet and modal parts (sill Q90, Q91): a host that maps and unmaps its surface passes
+//! Sheet and modal parts: a host that maps and unmaps its surface passes
 //! `shown` and `on_hidden`, and the sheet plays its exit before it is gone; `placement` centres
 //! it in its root, as a shutdown dialog is.
 

@@ -4,7 +4,7 @@
 //!
 //! Both read the clock installed on this thread: the wall clock by default, or a
 //! [`VirtualClock`] a test harness installs so that every timer and every "now" in the design
-//! system moves only when the test advances it (sill Q380). A loaded machine then changes how
+//! system moves only when the test advances it. A loaded machine then changes how
 //! long a test takes, never what it sees.
 
 mod clock;

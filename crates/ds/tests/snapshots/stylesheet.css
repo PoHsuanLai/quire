@@ -14,7 +14,7 @@ html,body{margin:0;padding:0;background:transparent}
 :where(.ds) h4,:where(.ds) h5{font-family:var(--font-display);font-weight:700;margin:0}
 :where(.ds) p{margin:0}
 :where(.ds) button,:where(.ds) input,:where(.ds) textarea,:where(.ds) select{font:inherit;color:inherit}
-/* An overlay root (`RootExtent::Viewport`, sill Q94): at least the viewport, since a root of
+/* An overlay root (`RootExtent::Viewport`): at least the viewport, since a root of
    positioned content lays out nothing and Taffy places a fixed box against its parent. */
 .ds[*|data-extent=viewport]{min-height:100vh;min-width:100vw}
 /* The focus ring (`S:55`) on keyboard focus only. Blitz never matches the visible-focus pseudo
@@ -113,11 +113,11 @@ html,body{margin:0;padding:0;background:transparent}
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
-     so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
-     and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
-     (the level control), the sheet's `sheet-out` (sill Q90), and the screenshot thumbnail's
-     `shot-out` (sill Q181), and the user picture's `picture-accept` (design/25-EMOJI.md
+     so are `menu-out` (bar gaps), `cmdk-rise`, and `pill-up`, `ring-drain`,
+     `fade-in` (C's, which S's `fade` had replaced) and `busy`, `pane-out-l`
+     and `pane-out-r`, the OSD's `osd-in` and `osd-out`, `level-tick`
+     (the level control), the sheet's `sheet-out`, and the screenshot thumbnail's
+     `shot-out`, and the user picture's `picture-accept` (design/25-EMOJI.md
      section 7), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
@@ -142,7 +142,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.2.7 floatup */
 @keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
 
-/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level (mailo gaps 3): each
+/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level: each
    departure from rest is the catalogue's value times min(1, (--overshoot - 1) x 25), which is 1
    at Standard (1.04) and Extra (1.14, whose spring curve already overshoots more) and 0 at Calm
    and Reduced (1). So Calm flattens them, as it flattens pop-in's `scale(var(--overshoot))`,
@@ -272,7 +272,7 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 
-/* cmdk-rise (quire's, mailo gaps 2): cmdk-in's scale and lift with no fade, so a command panel is
+/* cmdk-rise (quire's): cmdk-in's scale and lift with no fade, so a command panel is
    opaque on its first frame; only its geometry springs. */
 @keyframes cmdk-rise{ 0%{ transform:scale(.93) translateY(-12px); }
   62%{ transform:scale(var(--overshoot)) translateY(2px); }
@@ -283,32 +283,32 @@ html,body{margin:0;padding:0;background:transparent}
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 
-/* pill-up (quire's, mailo gaps 3): a pill centred by `translateX(-50%)` (a toast, a send pill a
+/* pill-up (quire's): a pill centred by `translateX(-50%)` (a toast, a send pill a
    consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
    `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
    also carries them back down, and keep it. */
 @keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
 
-/* ring-drain (quire's, mailo gaps 3): the undo-send ring's dash drains, linear, over
+/* ring-drain (quire's): the undo-send ring's dash drains, linear, over
    `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
    dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
 @keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 
-/* 4.4.12 fade-in (C's, mailo gaps 3): an ink veil fades to its resting `--veil` (.16), the
+/* 4.4.12 fade-in (C's): an ink veil fades to its resting `--veil` (.16), the
    opacity the veil itself rests at, so nothing snaps when the animation ends. */
 @keyframes fade-in{ from{ opacity:0; } to{ opacity:var(--veil); } }
 
-/* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
+/* busy (quire's): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 
-/* pane-out-l, pane-out-r (quire's, sill Q80): a pane switcher's outgoing pane leaves the other
+/* pane-out-l, pane-out-r (quire's): a pane switcher's outgoing pane leaves the other
    way from the one arriving, the mirror of `slide-l` and `slide-r` (26 px and a fade), so the
    two read as one push. */
 @keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 
-/* osd-in and osd-out (quire's, sill Q75): the OSD card's pair, following its anchor through
+/* osd-in and osd-out (quire's): the OSD card's pair, following its anchor through
    `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at
    the top right, so the card drops in from above and lifts back up as it goes; 8px at the bottom
    centre, so it rises in and drops away. In: from `--osd-dy` at a .96 scale and transparent, to
@@ -323,36 +323,36 @@ html,body{margin:0;padding:0;background:transparent}
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
 @keyframes level-tick{ from{ opacity:1; } to{ opacity:0; } }
-/* sheet-out (quire's, sill Q90): a sheet's exit, `peek-in` reversed and quieter: it fades and
+/* sheet-out (quire's): a sheet's exit, `peek-in` reversed and quieter: it fades and
    settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
-/* widget-out (quire's, sill G423): a widget's card leaving as the person removes it: it shrinks
+/* widget-out (quire's): a widget's card leaving as the person removes it: it shrinks
    to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
    accelerate), holding its transparent last frame until the host drops the card. Under Reduced
    it only fades (`menu-out`). */
 @keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 
-/* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
+/* banner-out (quire's): a notification banner slides out, from the offset a
    swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
    `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
    edge when unset), fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
    frame until the stack drops the row and the rows below heal. */
 @keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 
-/* banner-in (quire's, sill Q121): a notification banner slides in from its entry edge's vector
+/* banner-in (quire's): a notification banner slides in from its entry edge's vector
    (`--banner-dx`, `--banner-dy`; past the surface's right edge when unset) to its place at
    `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first frame. */
 @keyframes banner-in{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 
-/* panel-in and panel-out (quire's, sill Q123): the notification center's edge panel slides in
+/* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
    back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
-/* shot-out (quire's, sill Q181): the screenshot thumbnail slides out to the right, past its own
+/* shot-out (quire's): the screenshot thumbnail slides out to the right, past its own
    width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
    out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
    --e-spring`. */
@@ -385,7 +385,7 @@ html,body{margin:0;padding:0;background:transparent}
    the centred outbox pill's and carries its translateX(-50%). */
 @keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
 
-/* hold (quire's, sill G295): a keyframe that moves nothing. A resting state that follows an
+/* hold (quire's): a keyframe that moves nothing. A resting state that follows an
    animated one (a surface present again after a hide was taken back, a row or a pane at rest)
    plays it at `--t-tap --e-linear`, so the restyle that drops the running animation starts
    another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until
@@ -843,7 +843,7 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }
 /* -- alert -- */
-/* Alert (sill Q490; design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
+/* Alert (design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
    narrow sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred over a modal
    scrim: one centred column as the polkit prompt's, the optional icon at 48, the title in the
    display face 16/700, the message in `--fs-control` in the soft ink, then Cancel and the action
@@ -879,7 +879,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-appearance-row{ min-width:0; }
 .ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }
 
-/* Compact (sill FINDINGS Q101): for a narrow host, such as the control center's 300 px module.
+/* Compact: for a narrow host, such as the control center's 300 px module.
    The segmented row fills the row and never passes it: Regular (22) segments with 4 px sides, still
    equal columns sharing the width (a grid, as every segmented control is: a flex row here once
    grew each segment from its own words, so the segments were unequal and the thumb, a
@@ -949,7 +949,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-avatar[*|data-tone=stack]{ font-size:var(--fs-micro); border:2px solid var(--surface); }
 .ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:calc(var(--s-6) * -1); }
 /* -- banner_stack -- */
-/* BannerStack (sill Q121; design/13 section 13.3.6): the banners in a column at the right edge,
+/* BannerStack (design/13 section 13.3.6): the banners in a column at the right edge,
    newest first; at the bottom right the column runs upwards. Each row pads itself by the stack's
    gap (`--notifications-stack-gap`) on the side away from the edge it grows from, so its measured
    height is its whole pitch. A row's card enters with `banner-in` as it mounts (on the inner
@@ -957,8 +957,8 @@ html,body{margin:0;padding:0;background:transparent}
    animation is taken off, so a presence turned `present` early would freeze it mid-slide), and
    the row leaves with `banner-out` (both `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
    the position) with the heal ripple. A row at rest plays `hold`, which moves nothing, so a
-   heal settled or an exit taken back never drops an animation without starting another (sill
-   G295). A card swiped away inside a row holds its offset while the
+   heal settled or an exit taken back never drops an animation without starting another.
+   A card swiped away inside a row holds its offset while the
    row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
    (spike S2).
    The entry edge (`data-entry`, `notifications.banner_entry_direction`) sets the vector
@@ -979,8 +979,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal)); }
 .ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }
 /* -- battery_level -- */
-/* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"; sill FINDINGS
-   Q183): a flat, bright ring, 64 across (the reference's ring in a small and a medium widget).
+/* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"):
+   a flat, bright ring, 64 across (the reference's ring in a small and a medium widget).
    The track is a full circle in `--battery-track`, the plate darkened; over it the level's arc
    from twelve, clockwise, round-capped, in `--battery-fill`, `--battery-low` at a fifth or less
    (low and critical alike); the stroke is .093 of the ring's diameter. The device's glyph sits
@@ -1005,7 +1005,7 @@ html,body{margin:0;padding:0;background:transparent}
    face, tabular so its width holds while it counts. */
 .ds-battery-figure{ font-variant-numeric:tabular-nums; }
 
-/* DeviceBattery (design/26-DETAILS.md 5.2.9, wave D2): the ring over its percentage, centred, the
+/* DeviceBattery (design/26-DETAILS.md 5.2.9): the ring over its percentage, centred, the
    control center's Battery module's one device. The arc sweeps and the number counts from Rust;
    the bolt waits hidden until the sweep lands, then fades in over `--t-quick`. */
 .ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
@@ -1015,7 +1015,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
-   Disabled (sill Q93) takes design/13 section 13.3.3's settled disabled item, .35, rather than
+   Disabled takes design/13 section 13.3.3's settled disabled item, .35, rather than
    O-1's unsigned .45 candidate: below. */
 
 .ds-button{ font:inherit; }
@@ -1025,7 +1025,7 @@ html,body{margin:0;padding:0;background:transparent}
    padding sets only the side inset. Mini is the ladder's Small, 16 tall at radius 4.
 
    Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
-   `--hair` border (sill Q110): Primary's is transparent, so it draws exactly as it did with
+   `--hair` border: Primary's is transparent, so it draws exactly as it did with
    `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
    the box model gains the same border width Secondary and Danger already have, so all three
    stand the same height at a given size instead of Primary sitting one `--hair` short top and
@@ -1070,7 +1070,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); line-height:1; color:var(--ink-faint); height:var(--ctl-h-m); padding:0 var(--s-4); border-radius:var(--ctl-r-m); }
 .ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
 
-/* Frame (mailo gaps 4): words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
+/* Frame: words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
    the foot button's colours (`S:151-153`): `--f-ink-soft` on nothing, `--f-ink` on
    `--f-pill-hover` under the pointer, `--f-pill` while held or pressed (a pressed one carries the
    current item's `--shadow-current`, as `aria-current` does on an item). It starts at its left
@@ -1085,7 +1085,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); transform:scale(var(--squish)); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
-/* Size (sill Q92), after the variants so it wins at equal weight: `data-size` is written only
+/* Size, after the variants so it wins at equal weight: `data-size` is written only
    when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
    Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
    a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
@@ -1094,21 +1094,21 @@ html,body{margin:0;padding:0;background:transparent}
 /* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
 .ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
 
-/* Disabled (sill Q93; design/13 section 13.3.3's disabled item): .35, the default cursor, and no
+/* Disabled (design/13 section 13.3.3's disabled item): .35, the default cursor, and no
    pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
    dropped handlers keep a press from firing. */
 .ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
-/* A disabled default button stays the default (sill Q413): the Mac keeps its shape and edge at
+/* A disabled default button stays the default: the Mac keeps its shape and edge at
    the reduced opacity. Band B's pastel fill at .35 is barely apart from a disabled Secondary
    beside it (design/03-COLOR.md section 20.4: no state on the fill's colour alone), so it keeps
    an `--accent-text` edge, the pressed Mini's and the armed toast tab's. */
 .ds-button[*|data-variant=primary][*|aria-disabled=true]{ border-color:var(--accent-text); }
 
-/* A trailing mark (mailo gaps 4): a dropdown's caret after its value, in the label's colour a
+/* A trailing mark: a dropdown's caret after its value, in the label's colour a
    step quieter; `line-height:0` so the glyph does not stretch the line. */
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
 
-/* A mark face (mailo gaps 4): the bubble's B, i, U and S (design/04 section 30), each in its own
+/* A mark face: the bubble's B, i, U and S (design/04 section 30), each in its own
    style. S's italic is Georgia; the serif here is `--font-serif` (design/02). */
 .ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
 .ds-button-face[*|data-face=bold]{ font-weight:700; }
@@ -1116,7 +1116,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button-face[*|data-face=underline]{ text-decoration:underline; }
 .ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 
-/* A leading mark (mailo gaps 5): a glyph or a caller's mark (a provider's inline chip) before the
+/* A leading mark: a glyph or a caller's mark (a provider's inline chip) before the
    label, sitting on the line as the trailing mark does; the button's own gap spaces it. */
 .ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 /* -- chip -- */
@@ -1164,7 +1164,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-chip[*|data-variant=person]:not(.a-chip-flash){ animation:chip-in var(--t-move) var(--e-spring); }
 .ds-chip-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
 /* -- clock_face -- */
-/* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"; sill FINDINGS Q183).
+/* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"). 
    The analog dial is flat, as the reference measures: 62 across in a row (four fit a medium
    widget), and in a small widget as large as the card less 8 at each side, with the city
    dropped (the reference's small clock has none). The face is `--clock-face-day` or
@@ -1219,7 +1219,7 @@ html,body{margin:0;padding:0;background:transparent}
    `peek-in` (or C's `cmdk-in`, `C:1064`), a SearchField over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
-   Hosted in a surface of its own (sill FINDINGS Q40) there is no wrap: the card fills its
+   Hosted in a surface of its own there is no wrap: the card fills its
    container, its list takes the height left under the field, and it paints the enclosing
    material (a shell panel's Sheet, over blur or not) with the material's edge, as the cards of
    a transparent root do. */
@@ -1246,19 +1246,19 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
 .ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
 .ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
-/* Kept mounted while hidden (sill FINDINGS Q63): nothing is laid out, and each showing replays
+/* Kept mounted while hidden: nothing is laid out, and each showing replays
    the entrance under the keyframe's other name (`data-pulse`, design/05-MOTION.md section 9
    rule 2), so the animation starts over even where the engine kept the element's styles. */
 .ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
 .ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
 .ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
-/* An opaque entrance (mailo gaps 2): `cmdk-rise` springs the card's scale and lift with no fade,
+/* An opaque entrance: `cmdk-rise` springs the card's scale and lift with no fade,
    so its first frame is already opaque; over a window its scrim does not fade either, since the
    wrap's opacity would hold the card at its own. */
 .ds-palette[*|data-entrance=cmdk-rise]{ animation:cmdk-rise var(--t-big) var(--e-spring); }
 .ds-palette[*|data-entrance=cmdk-rise][*|data-pulse=b]{ animation-name:cmdk-rise--b; }
 .ds-palette-wrap[*|data-entrance=cmdk-rise]{ animation:none; }
-/* A pane beside the results (sill Q292, `aside`): the card turns into a grid, the field (and
+/* A pane beside the results (`aside`): the card turns into a grid, the field (and
    its tokens) across the top, the results under it on the left, the pane on the right past a
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
    pane; in a surface it still fills its container, which the host widens. */
@@ -1270,13 +1270,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
 .ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
 /* The results' motions (design/26-DETAILS.md section 5.6): the first-show rise is
-   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More (sill Q373) rises
+   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More rises
    the rows it added in downward, each `--stagger` after the one before (`--i`, capped at 12);
    its Show Less heals everything after the last row kept up from `--dy`, the height the removed
    rows took, set on the list while it plays. At rest the list's children play `hold` (moves
    nothing), below every motion here and the reveal's (which come later in the cascade): a rise
    or heal whose settle timer (wall clock) ends it before the frame clock does is replaced by
-   another animation, never dropped midway (sill G295). */
+   another animation, never dropped midway. */
 .ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-menu-item[*|data-row-motion=rise]{ animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
 .ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-spring) backwards; }
@@ -1403,7 +1403,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-emoji-face{ position:absolute; inset:0; background-repeat:no-repeat; }
 .ds-emoji[*|data-disc=tinted] .ds-emoji-face{ inset:14%; }
 /* -- emoji_grid -- */
-/* EmojiGrid (sill Q291; design/04-COMPONENTS.md section 46): cells at the caller's side in the
+/* EmojiGrid (design/04-COMPONENTS.md section 46): cells at the caller's side in the
    caller's columns (inline `grid-template-columns` and `grid-auto-rows`), each emoji centred at
    `--fs-emoji-cell` (30, for the launcher's 56 px cell) in the colour face (`.ds-emoji-text`). The selected cell takes the rows' selection
    look, `--accent-soft` on the item radius; the pointer is the arrow (design/27 section 6.3), and
@@ -1414,7 +1414,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-emoji-cell[*|aria-selected=true]{ background:var(--accent-soft); }
 .ds-emoji-glyph{ display:block; font-size:var(--fs-emoji-cell); line-height:1; }
 /* -- group_header -- */
-/* GroupHeader (sill Q125; design/20 section 1.6, design/13 section 13.3.6): one app's head in
+/* GroupHeader (design/20 section 1.6, design/13 section 13.3.6): one app's head in
    the notification center. The words are `SectionHeader`'s group type (the data face in
    capitals, `--fs-caption`, .12em apart, `--ink-faint`) with the app's name a step stronger in
    `--ink-soft`; the icon is 16 in its own column; the count is tabular; the trailing pair (the
@@ -1437,7 +1437,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-hover-target{ display:inline; }
 .ds-hover-target[*|data-kind=thread]{ display:block; }
-/* A target drawn as a `div` or as the list's own `li` (mailo gaps 2, `data-as`) is a block. */
+/* A target drawn as a `div` or as the list's own `li` (`data-as`) is a block. */
 .ds-hover-target[*|data-as=div], .ds-hover-target[*|data-as=li]{ display:block; }
 
 .ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
@@ -1445,7 +1445,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }
-/* Drawn in place (mailo gaps 4, `flow: Flow::Inline`): static in the caller's container, the
+/* Drawn in place (`flow: Flow::Inline`): static in the caller's container, the
    same card otherwise; the caller's box decides where it stands. */
 .ds-popover.ds-hovercard[*|data-flow=inline]{ position:static; }
 
@@ -1469,7 +1469,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-hovercard-actions{ margin-top:var(--s-10); display:flex; gap:var(--s-6); flex-wrap:wrap; }
 .ds-hovercard-live{ display:inline-block; width:6px; height:6px; border-radius:var(--r-pill); background:var(--ok); }
 
-/* A tip (mailo gaps 2, design/06 section 3 `time`): the Card tooltip's size (tooltip.css
+/* A tip (design/06 section 3 `time`): the Card tooltip's size (tooltip.css
    `.ds-tip`) on the hover card's surface, one line, placed below its target like a sender card
    and opened on the same hub timing. */
 .ds-popover.ds-hovercard[*|data-kind=tip]{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip);
@@ -1515,7 +1515,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-strip .ds-icon-button:hover .ds-fly{ transition-delay:calc(var(--d-fly) * 0); }
 
-/* Caller-driven (mailo gaps 2): `data-shown=visible` shows the strip with no pointer on its row
+/* Caller-driven: `data-shown=visible` shows the strip with no pointer on its row
    (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
    S12, so the caller says so), the buttons popping in as on hover; `data-shown=hidden` keeps it
    down under the pointer. */
@@ -1531,7 +1531,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
    The glyph is sized by `Glyph` itself; no rule here sizes or strokes an icon (spike S6).
-   Disabled (sill Q93): .35, as a disabled menu item (design/13 section 13.3.3), at the end. */
+   Disabled: .35, as a disabled menu item (design/13 section 13.3.3), at the end. */
 
 .ds-icon-button{ font:inherit; }
 
@@ -1589,7 +1589,7 @@ html,body{margin:0;padding:0;background:transparent}
   background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
-/* A status glyph (sill Q390) takes the same square as an icon, whether or not the nudge wraps it;
+/* A status glyph takes the same square as an icon, whether or not the nudge wraps it;
    its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
    setting as a single icon does. */
 .ds-icon-button[*|data-variant=status] > .ds-ic,
@@ -1605,11 +1605,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
 
-/* The nudge's wrapper (sill Q390, design/26 G11): the glyph alone lifts once on a new attention
+/* The nudge's wrapper (design/26 G11): the glyph alone lifts once on a new attention
    cue, the pill stays; the keyframe is the motion sheet's `nudge-up`. */
 .ds-icon-nudge{ display:inline-grid; place-items:center; }
 
-/* Disabled (sill Q93): .35, the default cursor, and no pointer, so no hover or press matches;
+/* Disabled: .35, the default cursor, and no pointer, so no hover or press matches;
    `disabled` and the dropped handlers keep a press from firing. */
 .ds-icon-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
 /* -- icon_view -- */
@@ -1623,7 +1623,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-ext-icon[*|data-kind=symbolic]{ background-color:currentColor; mask-size:100% 100%; mask-repeat:no-repeat; mask-position:center; }
 .ds-ext-icon[*|data-kind=image]{ background-size:100% 100%; background-repeat:no-repeat; background-position:center; }
 /* -- idle_dim -- */
-/* IdleDim (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle (Q420 B)"): a full-
+/* IdleDim (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle"): a full-
    screen scrim, black at the level (`--scrim-idle`), never real brightness. Its own share is
    driven from Rust (`ds::detail::idle_dim`, a Sweep-style tween, never a keyframe: it must snap
    on input, which a CSS animation cannot do mid-flight without a restyle), written as a plain
@@ -1635,7 +1635,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Kbd (design/04-COMPONENTS.md section 9): `S:67-68`; Small is the hint row's 9.5 (`S:662`).
    In the code face (`--font-code`, Space Mono in either typeface): a key cap is fixed pitch.
    Static: no hover, active, focus or motion. Attribute selectors carry `*|` (spike S2).
-   `inline-block` (sheet and modal parts, sill Q95): Blitz lays out an inline box's text but not
+   `inline-block` (sheet and modal parts): Blitz lays out an inline box's text but not
    its padding or border, so an inline cap was its glyph on a patch of `--surface-2`, caps run
    together; a block-level box keeps the rim and the 5 px sides the browser gave S's `kbd`. */
 
@@ -1645,7 +1645,7 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }
 
-/* Small's arrow glyphs (sill Q111): at 9.5 px an arrow's stroke reads as a dash. Drawn at
+/* Small's arrow glyphs: at 9.5 px an arrow's stroke reads as a dash. Drawn at
    `--fs-control` (13) with a tighter line-height so the extra line-box the bigger face would
    ask for is absorbed instead of growing the cap: the cap's height comes from its padding and
    border, not the glyph, as long as the line box the glyph sits in is no taller than the one
@@ -1654,10 +1654,10 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- chord -- */
 /* Chord (launcher chords): a shortcut as plain text beside the words it belongs to, Spotlight's
    hint. The secondary ink, the face and size of its surroundings (no code face, no cap), so ⌘ ⇧
-   ⌥ ⌃ draw at a letter's size. A block of its own so a gap before it holds in Blitz (sill Q343). */
+   ⌥ ⌃ draw at a letter's size. A block of its own so a gap before it holds in Blitz. */
 .ds-chord{ display:inline-block; color:var(--ink-soft); white-space:nowrap; }
 /* -- level -- */
-/* LevelControl (the user's brief of 2026-09-25; sill FINDINGS Q74): a level with a glyph that
+/* LevelControl (the user's brief of 2026-09-25): a level with a glyph that
    follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
    `material/level.rs`); the capsule is a Regular control, 22 (`--ctl-h-m`, design/29-SIZING.md);
    `--f` is the level and `--rb` the rubber band's stretch, both written
@@ -1724,7 +1724,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-level[*|data-drag=live] .ds-level-segments{ transform:scaleY(1.08); }
 .ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }
 
-/* Disabled (Q491): a level that cannot be moved says so. The rail and the lead glyph drop to the
+/* Disabled: a level that cannot be moved says so. The rail and the lead glyph drop to the
    disabled .35 (design/13 section 13.3.3's disabled item), the knob is not drawn (nothing to
    grab), and the pointer is the not-allowed cursor; no press registers (the component takes no
    input), so nothing swells or stretches. */
@@ -1749,7 +1749,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-link-pill[*|data-truth=lying]{ background:var(--danger); color:var(--danger-ink); }
 .ds-link-pill[*|data-truth=lying] b{ color:var(--danger-ink); }
 /* -- leaving_list -- */
-/* LeavingList (sill Q510; design/04-COMPONENTS.md section 54): the consumer's rows in a column,
+/* LeavingList (design/04-COMPONENTS.md section 54): the consumer's rows in a column,
    each in a `div.ds-leaving-row` that carries the roster's motion state, as ListRow does
    (`data-presence=entering|present|leaving|healing`, `data-exit`). The row is a flow root, so
    its content's margins stay inside it and its measured height is the whole distance the rows
@@ -1757,7 +1757,7 @@ html,body{margin:0;padding:0;background:transparent}
    into a list at rest plays `row-in` (`C:373`). A leaving row plays its exit forwards, delayed
    by its place in its batch (`--i` x `--stagger`), and takes no pointer. The rows below a
    settled batch heal from `--dy` (the dropped rows' summed height) with the heal ripple
-   (`--d` x `--d-heal`). At rest a row plays `hold`, which moves nothing (sill G295). The Today
+   (`--d` x `--d-heal`). At rest a row plays `hold`, which moves nothing. The Today
    entry's `tab-out` collapses its own height and is not played here. Under Reduced motion
    (design/05 section 14.4) an entrance is `fade`, an exit `menu-out`, and a heal `hold`: the
    rows below take their places without sliding. Attribute selectors carry `*|` (spike S2). */
@@ -1835,7 +1835,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
    rest timer (wall clock) that turns a row present never drops a running animation without
-   starting another; Blitz at the pinned rev keeps a dropped animation's last value (sill G295). */
+   starting another; Blitz at the pinned rev keeps a dropped animation's last value. */
 .ds-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
 
 /* Leaving (`S:326-329`, `C:714`). */
@@ -1940,9 +1940,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-field .ds-input-mask,
 .ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
 .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
-/* The field draws its caret among the dots in their ink (Q360b); the input's own stays hidden. */
+/* The field draws its caret among the dots in their ink; the input's own stays hidden. */
 .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-/* Half the pill's .14em tracking back, so the caret stays centred in the gap (Q360b). */
+/* Half the pill's .14em tracking back, so the caret stays centred in the gap. */
 .ds-lock-field .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
 .ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
 .ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
@@ -1991,7 +1991,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
 .ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
-/* Drawn inline in its caller's card (mailo gaps 4, `flow: Flow::Inline`): the same rows, with no
+/* Drawn inline in its caller's card (`flow: Flow::Inline`): the same rows, with no
    surface (no `.ds-popover`), no entrance and no padding of its own; the card's box sizes it. */
 .ds-menu[*|data-flow=inline]{ width:auto; max-height:none; overflow:visible; padding:0; animation:none; }
 
@@ -2011,7 +2011,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-menu[*|data-entrance=instant]{ animation:none; }
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
-/* The query line of `filter: Filter::Field` (mailo gaps 5): the typed text in a row at the top of
+/* The query line of `filter: Filter::Field`: the typed text in a row at the top of
    the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
    line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
    menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
@@ -2044,7 +2044,7 @@ html,body{margin:0;padding:0;background:transparent}
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
 .ds-menu-tile[*|data-tile=none]{ border:0; background:transparent; }
-/* An app's icon is its own plate (sill FINDINGS Q42): no border or ground under it, and it fills
+/* An app's icon is its own plate: no border or ground under it, and it fills
    the tile whatever size its caller resolved it at. */
 .ds-menu-tile[*|data-tile=image]{ border:0; background:transparent; }
 .ds-menu-tile[*|data-tile=image] > .ds-ext-icon{ width:100%; height:100%; }
@@ -2098,7 +2098,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-info-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); }
 .ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
 
-/* A row's trailing action (mailo gaps 2): a fourth column holding a Strip icon button (26 round,
+/* A row's trailing action: a fourth column holding a Strip icon button (26 round,
    `--ink-soft`, the accent-soft hover), at 22 in the shell's text menus so the row keeps its
    height. The button hears its own click; the row neither picks nor takes the selection. */
 .ds-menu-item[*|data-trailing=action]{ grid-template-columns:34px 1fr auto auto; }
@@ -2109,7 +2109,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
 
-/* Shaped rows (sill Q290, `RowShape`): a file's thumbnail fills its tile with no plate; a
+/* Shaped rows (`RowShape`): a file's thumbnail fills its tile with no plate; a
    clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4) since Blitz has
    no line clamp; a clipboard picture sits under its title at its own aspect; the time leads the
    trail. */
@@ -2118,15 +2118,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
   max-height:calc(var(--lines) * 1.35em); }
 .ds-menu-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
-/* Each part of a shaped trail is its own box, the time's gap before the shortcut included (sill
-   Q343): Blitz lays a plain inline span's horizontal margin out as nothing. */
+/* Each part of a shaped trail is its own box, the time's gap before the shortcut included:
+   Blitz lays a plain inline span's horizontal margin out as nothing. */
 .ds-menu-when, .ds-menu-keys{ display:inline-block; }
 .ds-menu-when{ margin-right:var(--s-6); }
 /* A row's chord (launcher chords, `RowChord`): after the trail's data in the secondary ink, at
    the trail's size; shown on the selected row only unless the row asks for every row. */
 .ds-menu-keys + .ds-chord{ margin-left:var(--s-6); }
 /* -- notification_card -- */
-/* NotificationCard (sill Q120; design/20 section 1.6, design/13 section 13.3.6). The card is a
+/* NotificationCard (design/20 section 1.6, design/13 section 13.3.6). The card is a
    plate in its material, inside a transparent scope of that material, so the plate and its
    group's layers paint the material's tint, edge and drop (the transparent-root card rule in the
    materials section). Geometry is the `--notifications-*` tokens `NotificationMetrics` writes:
@@ -2182,7 +2182,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-modality=keyboard] .ds-notification-close:focus{ opacity:1; pointer-events:auto; }
 .ds-notification .ds-notification-close:hover{ color:var(--ink); }
 
-/* Swipe to dismiss (sill Q122, `data-swipe` on a card that can be swiped). The card is drawn
+/* Swipe to dismiss (`data-swipe` on a card that can be swiped). The card is drawn
    `--swipe-dx` off its place: following a drag or a scroll 1:1 (`live`), springing back home
    (`rest`), and flying out to the right from where it was (`gone`, `banner-out`). The way back
    is driven motion (design/05 section 14, H1): a spring in Rust writes `--swipe-dx` frame by
@@ -2191,7 +2191,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
 .ds-notification[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 /* -- osd -- */
-/* Osd (design/20 section 1.7; sill FINDINGS Q76): the on-screen display's card inside a
+/* Osd (design/20 section 1.7): the on-screen display's card inside a
    transparent Osd root. It paints what a tinted root paints on its own box: the material's box
    shadow, and a `.ds-frame` group of the Space gradient at the frame alpha (the solid floor
    without blur and the inner pair over it are in the materials section). Its shape and padding
@@ -2205,7 +2205,7 @@ html,body{margin:0;padding:0;background:transparent}
    centre. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
    timer never cancels an entrance the frame clock is still playing; present again after a hide
    was taken back (`data-pulse=held`), it plays `hold`, so dropping `osd-out` starts an animation
-   in the same restyle (sill G295). */
+   in the same restyle. */
 
 .ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
   width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
@@ -2218,7 +2218,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
 /* -- module_tile -- */
-/* ModuleTile (sill FINDINGS Q78; design/20 section 1.5, design/13 section 13.3.7): a module on
+/* ModuleTile (design/20 section 1.5, design/13 section 13.3.7): a module on
    the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
    (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
@@ -2266,14 +2266,14 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
 
-/* ModuleGrid (design/13 section 13.3.7; sill FINDINGS Q102): `--grid-columns` equal columns
+/* ModuleGrid (design/13 section 13.3.7): `--grid-columns` equal columns
    (2), `--grid-gap` apart (10), `--grid-padding` inside (10); the component writes all three
    inline from `control_center.grid_*`, and these are the control center's sizes
    (`--cc-gap`, `--cc-pad`, design/29-SIZING.md). */
 .ds-module-grid{ --grid-columns:2; --grid-gap:var(--cc-gap); --grid-padding:var(--cc-pad); display:grid;
   grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr)); gap:var(--grid-gap); padding:var(--grid-padding); }
 /* -- module_panel -- */
-/* ModulePanel (sill FINDINGS Q100; design/13 section 13.3.7; sized by design/29-SIZING.md): a
+/* ModulePanel (design/13 section 13.3.7; sized by design/29-SIZING.md): a
    module with content of its own on the tile's frame: the control center's module radius 8
    (`--cc-module-r`), the Off tile's plate (`--surface-2`, a hairline drawn inset so it takes no
    room) and the control center's padding of 10 (`--cc-pad`). A level module is then its padding,
@@ -2299,13 +2299,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
   font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 
-/* A module whose content is unavailable (Q491, `availability: Disabled`): the header's glyph and
+/* A module whose content is unavailable (`availability: Disabled`): the header's glyph and
    trailing figure (a level's percentage) at the disabled .35 beside the dimmed level; the title
    stays legible so the module is still named. */
 .ds-module-panel[*|aria-disabled=true] .ds-module-panel-glyph,
 .ds-module-panel[*|aria-disabled=true] .ds-module-panel-trailing{ opacity:.35; }
 /* -- month_grid -- */
-/* MonthGrid (design/04-COMPONENTS.md section 39; design/20 section 1.12; sill Q180): the
+/* MonthGrid (design/04-COMPONENTS.md section 39; design/20 section 1.12): the
    calendar widget's month. The title in the data face, upper and tracked .12em, in `--accent`
    (design/02 sections 4-5, "calendar month"); the weekday heads in the data face at
    `--fs-micro`, upper and tracked as a menu's section header. Seven 32 px columns, led by a
@@ -2315,7 +2315,7 @@ html,body{margin:0;padding:0;background:transparent}
    (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer and squishes
    pressed. The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
 
-   Compact (`data-density=compact`, sill Q190, Q361, the compact-spacing pass of 2026-09-27): a
+   Compact (`data-density=compact`, the compact-spacing pass of 2026-09-27): a
    small desktop widget's content box is 140 x 140, which the regular grid (224 wide, 254 tall
    for six weeks) overflows. The month fills that box as the reference's small Month widget
    does (design/23 section 5.1): a 14 px header (the title in the UI face at `--fs-micro`,
@@ -2326,7 +2326,7 @@ html,body{margin:0;padding:0;background:transparent}
    The weeks run 4 past the box's foot so the last row's numbers end as far from the card's
    foot as the title's caps start from its top (about 15 and 17: an optical inset, the 12 of
    padding measured to ink, not to line boxes). The number at `--fs-caption` on a disc of twice
-   its size (20, Q361) sits in the middle of its row; a 3 px dot inside the disc's foot (tucked
+   its size (20) sits in the middle of its row; a 3 px dot inside the disc's foot (tucked
    4, with 1 under it so a busy day's stack is the disc's 20 and centres alike), `--accent-ink`
    on today's disc. The compact grid never draws week numbers. */
 
@@ -2410,14 +2410,14 @@ html,body{margin:0;padding:0;background:transparent}
    sits near 28-32) and is centred in the room left, never spread over it. */
 .ds-month[*|data-fit=frame][*|data-density=regular]{ flex:none; align-self:center; }
 /* -- pane_switcher -- */
-/* PaneSwitcher (sill FINDINGS Q80; design/13 section 13.3.7): the arriving pane slides in (the
+/* PaneSwitcher (design/13 section 13.3.7): the arriving pane slides in (the
    detail from the right, the root from the left) and the outgoing one leaves the other way,
    26 px and a fade, as `slide-r`/`slide-l` and `pane-out-l`/`pane-out-r` drew it. Driven motion
    (design/05 section 14, H1): both are drawn from one spring in Rust, `--pane-p` (0 the root, 1
    the detail), so a reversal turns back from where the panes are; nothing here animates them.
    The leaving pane is out of the flow, pinned to the top, so the switcher is as tall as the pane
    arriving; what it overhangs is clipped. A pane at rest plays `hold`, which moves nothing
-   (sill G295: Blitz at the pinned rev keeps a dropped animation's last value). Under Reduced the
+   (Blitz at the pinned rev keeps a dropped animation's last value). Under Reduced the
    panes only cross-fade. */
 
 .ds-panes{ --pane-p:0; position:relative; overflow:hidden; }
@@ -2429,8 +2429,8 @@ html,body{margin:0;padding:0;background:transparent}
   transform:translateX(calc(var(--pane-p) * -1 * var(--s-26))); opacity:calc(1 - var(--pane-p)); }
 .ds[*|data-motion=reduced] .ds-pane{ transform:none; }
 /* -- panel -- */
-/* Panel (sill Q123; design/20 section 1.6): the notification center's edge panel, and Edit
-   Widgets' bottom sheet (sill Q521, below). A stage fills
+/* Panel (design/20 section 1.6): the notification center's edge panel, and Edit
+   Widgets' bottom sheet (below). A stage fills
    the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
    bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
    rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
@@ -2449,14 +2449,14 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-panel[*|data-presence=entering],.ds-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
 /* Driven (design/05 section 14, H1): after its first entrance the panel is drawn from a spring in
    Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
-   leaves no value behind (sill G295); a show while it leaves turns it back from where it is.
+   leaves no value behind; a show while it leaves turns it back from where it is.
    Under Reduced it fades in place instead. */
 .ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear);
   transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
 .ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
 .ds-panel[*|data-presence=leaving]{ pointer-events:none; }
 
-/* At the bottom (sill Q521, the reference's Edit Widgets sheet): centred `--s-8` above the root's
+/* At the bottom (the reference's Edit Widgets sheet): centred `--s-8` above the root's
    bottom, as wide as the host asks less `--s-8` at each side, as tall as it asks but never more
    than half the root, so the top of the desktop, where widgets land, stays in view. It arrives as
    a sheet does, `peek-in` at `--t-move --e-out` (no spring: opening is not contact), and after
@@ -2579,7 +2579,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-polkit-actions{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
 .ds-polkit-actions .ds-button{ width:100%; justify-content:center; }
 /* -- preview_pane -- */
-/* PreviewPane (sill Q292; design/04-COMPONENTS.md section 47): a column filling the palette's
+/* PreviewPane (design/04-COMPONENTS.md section 47): a column filling the palette's
    aside, 16 px in: the media box (220 tall; a picture or page fitted at its aspect, text
    clipped, an icon or an emoji centred), the caption, the facts, then the actions at the foot.
    It slides in from the right (`slide-r` over `--t-move`, restarted under its other name on each
@@ -2588,10 +2588,10 @@ html,body{margin:0;padding:0;background:transparent}
    the entrance starts and kept while present), and out the same way (`pane-out-r`, held);
    hidden, nothing is laid out. Present keeps the entrance declared and plays `hold` after a
    taken-back hide (`data-pulse=held`), so no settle or take-back drops an animation without
-   starting another (sill G295). An in-place change fades the media in (`a-morph-fade-in`,
-   `--t-quick`, sill Q370); at rest the media box plays `hold` (moves nothing), so the fade's
-   settle never drops it midway. A load past its grace swaps the media for the pending look (sill
-   Q371): the dashed ring (`.ds-spinner`, stepping or held still) over the words "Loading…", in
+   starting another. An in-place change fades the media in (`a-morph-fade-in`,
+   `--t-quick`); at rest the media box plays `hold` (moves nothing), so the fade's
+   settle never drops it midway. A load past its grace swaps the media for the pending look:
+   the dashed ring (`.ds-spinner`, stepping or held still) over the words "Loading…", in
    `--ink-faint`.
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
@@ -2648,7 +2648,7 @@ html,body{margin:0;padding:0;background:transparent}
   width:11px; height:11px; font-size:var(--fs-pico); border-radius:var(--r-micro);
   margin-right:var(--s-4); vertical-align:-1px; box-shadow:0 0 0 var(--hair) var(--line);
 }
-/* A local-folders account (mailo gaps 4): the folder glyph, stroked in `--pc` (the neutral grey)
+/* A local-folders account: the folder glyph, stroked in `--pc` (the neutral grey)
    through `currentColor`, centred on the same chip. */
 .ds-provider[*|data-kind=local] .ds-ic{ display:block; }
 .ds-provider[*|data-kind=image]{ padding:var(--s-1-5); }
@@ -2661,7 +2661,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
 
-/* Inline (mailo gaps 5, `flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the
+/* Inline (`flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
@@ -2673,7 +2673,7 @@ html,body{margin:0;padding:0;background:transparent}
    asks for a decision; design/03 section 17. */
 .ds-scrim[*|data-strength=modal]{ background:var(--scrim-modal); }
 
-/* Leaving with its sheet (sill Q90): `menu-out`, the fade a closing menu plays, at `--t-quick
+/* Leaving with its sheet: `menu-out`, the fade a closing menu plays, at `--t-quick
    --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
    pointer while it goes. */
 .ds-scrim[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
@@ -2719,7 +2719,7 @@ html,body{margin:0;padding:0;background:transparent}
   color:var(--f-ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }
-/* A palette's cursor on a group's action (sill Q294, "Show More"): the rows' selection look,
+/* A palette's cursor on a group's action ("Show More"): the rows' selection look,
    `--accent-soft` behind the words, which take the ink. */
 .ds-section-header .ds-section-header-action[*|data-selected=true]{ background:var(--accent-soft); color:var(--ink); border-radius:var(--r-tiny); }
 /* -- segmented -- */
@@ -2785,7 +2785,7 @@ html,body{margin:0;padding:0;background:transparent}
    bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
    Undo hover is not specified. The Undo rule names the pill, as S's `.sendpill button` does.
-   C's outbox states (mailo gaps 2): a failed mood plays `nudge` or `shake` once through the
+   C's outbox states: a failed mood plays `nudge` or `shake` once through the
    pulse classes (`a-nudge`, `a-shake`, the motion sheet's), both keyframes baking in the
    pill's `translateX(-50%)`; `data-mood=fatal` turns the pill `--danger` with its ink. A
    spinning ring (`data-ring=spin`) turns the whole ring at the Spinner's `spin` (the arc is an
@@ -2805,7 +2805,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-send-pill-why{ font-weight:500; opacity:.8; white-space:normal; max-width:280px; }
 .ds-send-pill[*|data-mood=fatal] .ds-send-pill-undo{ background:var(--danger-ink); color:var(--danger); }
 /* -- settings_row -- */
-/* SettingsRow (sill FINDINGS Q79): a 44 px row with a hairline (`--hair`, `--line`) above every
+/* SettingsRow: a 44 px row with a hairline (`--hair`, `--line`) above every
    row after the first, the words in the shell text menu's type (title `--fs-shell-menu` at 400,
    detail `--fs-help` in `--ink-faint`, as `MenuEntry::Row` in a Slim menu, design/13 section
    13.3.3), a 16 px glyph in a 22 px column, and the trailing mark at the end. Under the pointer
@@ -2831,7 +2831,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-settings-row-value{ font-size:var(--fs-help); }
 
-/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8; wave D2). The glyph may sit
+/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8). The glyph may sit
    on a 26 px disc: paper with ink for an item not in use, `--accent` with `--accent-ink` and an
    inset `--accent-text` hairline for the item in use (the tile disc's look), the colour
    cross-fading over `--t-quick`. While a pending loop steps on the glyph (`data-pending=step`, set
@@ -2852,7 +2852,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-settings-row-trail[*|data-mark=battery]{ gap:var(--s-4); }
 .ds-settings-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
 /* -- now_playing -- */
-/* Now Playing (design/26-DETAILS.md 5.2.10, wave D2). NowPlayingTrack: the art in a 48 px well at
+/* Now Playing (design/26-DETAILS.md 5.2.10). NowPlayingTrack: the art in a 48 px well at
    `--r-media` beside the title (`--fs-shell-menu` 600) over the `by` line (`--fs-help`,
    `--ink-faint`). A new track cross-fades: the outgoing layer sits over the incoming one and each
    plays its fade once (`a-morph-fade-out`, `a-morph-fade-in`, `--t-quick`). While buffering the
@@ -2891,17 +2891,17 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
   animation:peek-in var(--t-big) var(--e-spring); }
 
-/* Driven (design/05 section 14, H1; sill Q90): after its first entrance the sheet is drawn from
+/* Driven (design/05 section 14, H1): after its first entrance the sheet is drawn from
    a spring in Rust, `--present-p` (0 gone, 1 shown): it fades and settles 12 px down at 95 % as
    it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
-   nothing, so the entrance it drops leaves no value behind (sill G295). Leaving, it is no longer
+   nothing, so the entrance it drops leaves no value behind. Leaving, it is no longer
    a target for the pointer. Under Reduced it only fades. */
 .ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
   transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
 .ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
 .ds-sheet[*|data-presence=leaving]{ pointer-events:none; }
 
-/* Centred (sill Q91): a stage filling the overlay centres the sheet by flex, inside the same
+/* Centred: a stage filling the overlay centres the sheet by flex, inside the same
    36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
@@ -2911,8 +2911,8 @@ html,body{margin:0;padding:0;background:transparent}
    prompt; the rest of the sheet is as above. */
 .ds-sheet[*|data-width=narrow]{ width:min(340px, 88%); }
 /* -- shot_thumbnail -- */
-/* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13; sill
-   Q181). The card is a plate in the Toast material inside a transparent Toast scope (the
+/* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13).
+   The card is a plate in the Toast material inside a transparent Toast scope (the
    transparent-root card rule in the materials section paints its tint, edge and drop); its
    width and height are written inline from `shot_frame`, and so is the picture's letterboxed
    rect inside it, so the bars round a picture outside 2:1..16:10 are the material. The picture's
@@ -2923,7 +2923,7 @@ html,body{margin:0;padding:0;background:transparent}
    name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
    (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
    declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
-   take-back drops an animation without starting another (sill G295).
+   take-back drops an animation without starting another. 
 
    Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
    actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in
@@ -3026,12 +3026,12 @@ html,body{margin:0;padding:0;background:transparent}
 }
 
 /* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
-   (drop_place.css, mailo gaps 6). */
+   (drop_place.css). */
 
 /* Today presence (`S:350-351`). */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
 /* At rest, `hold` (moves nothing), so turning present never drops `tab-in` without starting
-   another animation (sill G295); an item wearing a pulse plays the pulse instead. */
+   another animation; an item wearing a pulse plays the pulse instead. */
 .ds-sidebar-item[*|data-kind=today][*|data-presence=present]:not([*|data-pulse]){ animation:hold var(--t-tap) var(--e-linear); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:tab-out var(--t-move) var(--e-exit) forwards; overflow:hidden; }
 /* -- slider -- */
@@ -3162,7 +3162,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-spinner[*|data-kind=spin][*|data-pending=step]{ opacity:.9; transform:rotate(var(--turn)); transition:transform var(--t-pending-step) var(--e-linear); }
 .ds-spinner[*|data-kind=spin][*|data-pending=still]{ opacity:.9; transform:none; }
 /* -- status_glyph -- */
-/* The status glyphs (design/26-DETAILS.md 5.1, wave D1): each glyph a stack of parts, one `svg`
+/* The status glyphs (design/26-DETAILS.md 5.1): each glyph a stack of parts, one `svg`
    per part, so the stylesheet can move each part (it cannot reach inside an SVG on Blitz, spike
    S6). The first part is in flow and sizes the box. A part fades between lit, faint and hidden
    over `--t-quick`, a hidden one shrunk to .7 so it grows in (the badge, the bolt, the plug, the
@@ -3235,7 +3235,7 @@ html,body{margin:0;padding:0;background:transparent}
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
-/* A field reads from its leading edge wherever it sits (Q360): a centred container (the polkit
+/* A field reads from its leading edge wherever it sits: a centred container (the polkit
    card's `text-align:center`) would centre the mask and the placeholder, which span the field,
    while Blitz lays the input's own text and caret out from the start whatever `text-align` says,
    so the dots drew mid-field with the caret before them. */
@@ -3271,7 +3271,7 @@ html,body{margin:0;padding:0;background:transparent}
    per character over it, where the placeholder would sit; the secret itself never paints.
    Blitz measures the hidden text in its editor's own face, untracked, so its caret drifts off
    the Inter dots tracked .1em (two dots short at eleven). Where the host reads the selection
-   (ds-native) the field draws its own caret among the dots (Q360b): the input's is transparent
+   (ds-native) the field draws its own caret among the dots: the input's is transparent
    (`data-caret=drawn`) and `.ds-input-caret` is Blitz's caret redrawn, 1.5 px wide, the height of
    the line, in the dots' ink (`--ink`; the lock pill repeats its own), not blinking (Blitz's does not blink either), shown only while the
    field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
@@ -3296,17 +3296,17 @@ html,body{margin:0;padding:0;background:transparent}
    so Blitz's own selection, which it paints over the hidden text in a fixed colour no style
    reaches, stays under it and only the dots' highlight shows. An Inline field's ground is its
    container's (the lock pill's glass), which the mask cannot repeat: there Blitz's highlight
-   shows beside the dots' when a range is selected (FINDINGS Q360b). */
+   shows beside the dots' when a range is selected. */
 .ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); background:var(--surface); background-clip:content-box; }
 /* Boxed, the caret spans the field's line, hung from its top: the ascent plus the line's
    half-leading over Inter's 1.21em. */
 .ds-input-wrap[*|data-variant=boxed] .ds-input-caret::before{ top:calc(-.969em - (var(--ctl-h-m) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 
-/* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
+/* A secret (`data-kind=secret`) is drawn as a password is; it differs only in its
    markup, which never carries a `value`. */
 
-/* Bare (mailo gaps 4): the field takes the face of the text it edits. No box, border, padding or
+/* Bare: the field takes the face of the text it edits. No box, border, padding or
    ground; font, size, weight, tracking, line height and colour are inherited, so a title or a
    property row's value is edited in place. Only the caret and the selection are the field's.
    Blitz sizes a one-line input by its line height, so the height is left to it. */
@@ -3326,7 +3326,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* A bare field's tracking is its parent's, usually none: the bar is centred on the point. */
 .ds-input-wrap[*|data-variant=bare] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
 
-/* Multiline (mailo gaps 4): a `textarea`. Blitz gives it `rows` line heights of content (two when
+/* Multiline: a `textarea`. Blitz gives it `rows` line heights of content (two when
    `rows` is absent) plus its padding, so the one-line height above is undone and the field's
    `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
    component's. */
@@ -3336,7 +3336,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-input[*|data-variant=boxed][*|data-kind=multiline]{ line-height:1.55; padding:var(--s-4) var(--s-8); }
 .ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
 
-/* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The
+/* File: the chosen name, read-only, and the Tool "Choose…" button after it. The
    name is a span drawn as the field (no input: nothing is typed here), cut at its end. The wrap
    takes its container's width: a span has no 300 px intrinsic width as an input has, so without
    it the name collapsed to its padding on Blitz. */
@@ -3344,7 +3344,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:default; flex:1 1 0; width:auto; }
 .ds-input-wrap[*|data-kind=file] .ds-input-placeholder{ right:auto; }
 /* -- text_runs -- */
-/* Text runs (mailo gaps 2): a caller's search hit is `mark.ds-mark`, a soft accent ground under
+/* Text runs: a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
    `data-tone=strong|faint`. Inside a menu the menu's own `mark` rule wins (accent ink, no
    ground), so a caller's marks there look like the fuzzy matcher's. */
@@ -3353,7 +3353,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-run[*|data-tone=strong]{ font-weight:700; color:var(--ink); }
 .ds-run[*|data-tone=faint]{ color:var(--ink-faint); }
 
-/* Notification parts (sill Q124): a body's `<i>` and `<u>` as tones, and its `<a href>` as
+/* Notification parts: a body's `<i>` and `<u>` as tones, and its `<a href>` as
    `a.ds-run-link`. A link keeps the line's ink and weight a step up, underlined in the accent
    so it reads as a link on any material without an accent-on-tint contrast to check; under the
    pointer the words take the accent too. The link keeps its press (the component stops it), so
@@ -3426,7 +3426,7 @@ html,body{margin:0;padding:0;background:transparent}
   pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring); }
 .ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:var(--d-fly); }
 .ds[*|data-hover=warm] .ds-fly-target:hover .ds-fly{ transition-delay:initial; }
-/* Caller-driven (sill FINDINGS Q17): up or down on the caller's say, whatever the pointer does,
+/* Caller-driven: up or down on the caller's say, whatever the pointer does,
    at once (the caller's machine has already waited). */
 .ds-fly-target[*|data-shown=visible] .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:initial; }
 .ds-fly-target[*|data-shown=hidden]:hover .ds-fly{ opacity:0; transform:translateX(-50%) translateY(3px); transition-delay:initial; }
@@ -3436,7 +3436,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
 .ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-note); color:var(--ink-faint); }
 /* -- tree_item -- */
-/* TreeItem (mailo gaps 6): a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
+/* TreeItem: a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
    (design/04-COMPONENTS.md section 19: padding --s-6 --s-8, --r-item, ui 13.5/600 --f-ink-soft,
    --f-pill-hover under the pointer, --f-pill and the current shadow when current). The drop
    states are `.ds-drop-place`'s (drop_place.css), shared with SidebarItem. Attribute selectors
@@ -3472,7 +3472,7 @@ html,body{margin:0;padding:0;background:transparent}
   border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:default;
 }
 
-/* The editing slot (mailo gaps 7): the caller's field in the label's place and box, so a rename
+/* The editing slot: the caller's field in the label's place and box, so a rename
    moves nothing on the row; a Bare field inherits the row's face. */
 .ds-tree-item-edit{ display:flex; align-items:center; cursor:text; }
 .ds-tree-item-edit > *{ flex:1 1 0; min-width:0; }
@@ -3489,8 +3489,8 @@ html,body{margin:0;padding:0;background:transparent}
 /* The children, one indent step in, the same rhythm as the sidebar's items. */
 .ds-tree-item-children{ display:flex; flex-direction:column; gap:var(--s-2); padding-left:var(--s-12); }
 /* -- widget_frame -- */
-/* WidgetFrame (design/04 "Widgets"; design/20 section 1.14, design/22 section 3.20; sill
-   FINDINGS Q182). A small widget is one `--widget-cell` square (164), a medium two cells and a
+/* WidgetFrame (design/04 "Widgets"; design/20 section 1.14, design/22 section 3.20).
+   A small widget is one `--widget-cell` square (164), a medium two cells and a
    gap wide (344 x 164), a large two by two (344 square); `WidgetMetrics` writes both tokens from
    `widgets.desktop_cell_px` and `desktop_gap_px`. The desktop card is the Widget material's
    plate (its tint, hairline and drop come from the transparent-root card rule in the materials
@@ -3519,7 +3519,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Bumped: a run of text a widget bumps on change (`use_bump_on`); transformable while it plays. */
 .ds-bumped{ display:inline-block; }
 
-/* Picked up (`data-lift=lifted`, sill Q430, design/23 section 9.8): the card grows by `--pickup`
+/* Picked up (`data-lift=lifted`, design/23 section 9.8): the card grows by `--pickup`
    and its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
    the transparent root's card selector so it wins over `--m-box`), above the other widgets on
    `--z-drag`. Put down, it settles back over the same `--t-quick` at `--e-out`; at rest nothing
@@ -3528,12 +3528,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget[*|data-lift=lifted]{ transform:scale(var(--pickup)); z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
 .ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
 
-/* Leaving (sill G423): a card its host removed plays `widget-out` on its pulse class (shrinks to
+/* Leaving: a card its host removed plays `widget-out` on its pulse class (shrinks to
    .85 and fades at `--t-move --e-exit`; a fade alone under Reduced) and takes no pointer while
    it goes; the host drops it at `settle(WidgetOut)`. */
 .ds-widget[*|data-presence=leaving]{ pointer-events:none; }
 
-/* WidgetSlotGuide (sill Q431, design/23 section 9.8): where a dragged widget will land, the
+/* WidgetSlotGuide (design/23 section 9.8): where a dragged widget will land, the
    card's footprint at the snap cell, a quiet translucent plate in the card's corner with no
    content, faded in (`a-fade`) as the drag reaches the cell. */
 .ds-widget-slot{ box-sizing:border-box; width:var(--widget-cell); height:var(--widget-cell); border-radius:var(--m-radius);
@@ -3617,7 +3617,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-ws-pill:hover{ color:var(--ink); }
 .ds-ws-pill[*|aria-current=true]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
 /* -- drop_place -- */
-/* A drop place (mailo gaps 6): the drop states SidebarItem and TreeItem share, one rule set for
+/* A drop place: the drop states SidebarItem and TreeItem share, one rule set for
    both (design/04-COMPONENTS.md section 34, C's drop target `C:320-323`). Last in the component
    order so each state wins over either item's hover and current rules, which have the same
    specificity. Both items have the sidebar item's padding (--s-6 --s-8), which the Accepts
@@ -3627,7 +3627,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-drop-place[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 /* Source: the item itself is being dragged (.35, section 34). */
 .ds-drop-place[*|data-drag=source]{ opacity:.35; }
-/* Accepts (mailo gaps 5): a place that can take the drag while the pointer is elsewhere: a dashed
+/* Accepts: a place that can take the drag while the pointer is elsewhere: a dashed
    `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes its
    width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
    border (not a dashed outline, which it draws solid). */
@@ -3782,7 +3782,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
 
-/* "Added" (sill Q523): while the widget an Add button placed settles in, the button leads with a
+/* "Added": while the widget an Add button placed settles in, the button leads with a
    check (`CheckMark`, drawn on) in its own box, which grows in with `morph-in` (the spring only
    for the person's own press). A row that arrives rises in on its own pulse class. */
 .ds-widget-gallery-added{ display:inline-flex; align-items:center; }

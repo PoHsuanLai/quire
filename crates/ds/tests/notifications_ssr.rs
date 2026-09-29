@@ -1,4 +1,4 @@
-//! The notification parts as markup (sill Q120-Q125): every specimen matches its golden under
+//! The notification parts as markup: every specimen matches its golden under
 //! `tests/snapshots/notifications/`, lints clean, and uses only `ds-` classes the stylesheet
 //! styles.
 //!

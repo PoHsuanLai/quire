@@ -431,7 +431,7 @@ fn polkit_named() -> Element {
     )
 }
 
-/// The shell resolves the polkit sheet's blur region by the panel's id (sill Q260).
+/// The shell resolves the polkit sheet's blur region by the panel's id.
 #[test]
 fn the_polkit_sheet_carries_the_panel_id() {
     let html = render(polkit_named);

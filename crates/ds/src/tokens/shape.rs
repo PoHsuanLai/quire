@@ -1,7 +1,7 @@
 //! Radii (design/01-LAYOUT.md section 10). The first nine are the plan's names; the rest name
 //! the literals design/04-COMPONENTS.md O-3 says the table must absorb.
 //!
-//! The names between the plan's are proposed (FINDINGS F13); the values are `S`'s.
+//! The names between the plan's are proposed; the values are `S`'s.
 
 use super::name::VarName;
 
@@ -114,7 +114,7 @@ impl Radius {
 }
 
 /// A material's corner, overriding the radius its recipe gives it (`--m-radius`): a radius
-/// token, a length a settings key names (`dock.pill_radius_px`, sill FINDINGS Q15), or a
+/// token, a length a settings key names (`dock.pill_radius_px`), or a
 /// continuous-curvature squircle corner of that nominal radius (the macOS polish pass).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Corner {

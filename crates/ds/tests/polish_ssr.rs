@@ -16,7 +16,7 @@ use ds::{
     Px, RunningDot, Surface, Switch, Theme, WorkspacePill, WorkspacePills,
 };
 
-/// The Work Space's Monochrome plate tint (sill FINDINGS Q72).
+/// The Work Space's Monochrome plate tint.
 fn work() -> Option<PlateTint> {
     PlateTint::of(IconStyle::Monochrome, Tint::space(PRESETS[0].dots))
 }

@@ -1,7 +1,7 @@
 //! Toggle: a setting that is on or off and applies at once; a div track and knob, because
 //! Blitz has no native checkbox (design/04-COMPONENTS.md section 4).
 //!
-//! The knob is driven motion (design/05 section 14, wave H1): a spring in Rust writes its
+//! The knob is driven motion (design/05 section 14): a spring in Rust writes its
 //! offset, `--knob-x` in pixels, so a second click mid-slide turns the knob back from where it is at
 //! the speed it has, instead of restarting a transition. A click is a contact with no velocity:
 //! critically damped, no bounce.

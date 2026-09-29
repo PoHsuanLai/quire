@@ -1,5 +1,5 @@
 //! TreeItem: a place in a sidebar tree, a `details`/`summary` row in the sidebar item's chrome
-//! (mailo gaps 6; design/04-COMPONENTS.md sections 19 and 34).
+//! (design/04-COMPONENTS.md sections 19 and 34).
 //!
 //! mailo's folder tree is folders inside folders: each folder a `details` whose `summary` is
 //! the row and whose body holds the subfolders. `SidebarItem` is a single `button` and cannot
@@ -73,7 +73,7 @@ pub enum TreeShape {
 /// `Propagation::Stop` as well; it costs nothing). `here` marks the current place
 /// (`aria-current`, the sidebar item's current look).
 ///
-/// `editing` is an in-place rename (mailo gaps 7): given, it is drawn in the label's place (in
+/// `editing` is an in-place rename: given, it is drawn in the label's place (in
 /// `span.ds-tree-item-edit[data-slot=editing]`, at the label's metrics, so nothing on the row
 /// moves) instead of the label and its select button. Give it a `TextInput` with
 /// `variant: InputVariant::Bare` (it takes the row's face) and `focus: Focus::Controlled(request)`

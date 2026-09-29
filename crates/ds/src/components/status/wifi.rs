@@ -1,5 +1,5 @@
 //! WifiGlyph: the Wi-Fi fan as layers, the dot and three arcs from the inside out, a "!" badge
-//! and a slash (design/26-DETAILS.md 5.1.1; G1-G5). Joining searches one layer at a time after
+//! and a slash (design/26-DETAILS.md 5.1.1). Joining searches one layer at a time after
 //! `PendingGrace` and holds a dimmed still frame at `PendingCap` (R4); a join that lands fills the
 //! layers once up to the real bars; a strength change cross-fades the arcs; no internet grows the
 //! badge in; a failed join shakes once; turning the radio off draws the slash on.

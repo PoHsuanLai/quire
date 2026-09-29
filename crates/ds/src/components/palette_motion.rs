@@ -1,12 +1,12 @@
 //! The command palette's list motions (design/26-DETAILS.md section 5.6): the rows' first-show
-//! rise from the caller's [`RevealCue`] (sill Q372), and a group's Show More and Show Less
-//! (Q373, section 5.4's group-expand grammar): the added rows rise in downward (`rise` with
+//! rise from the caller's [`RevealCue`], and a group's Show More and Show Less
+//! (section 5.4's group-expand grammar): the added rows rise in downward (`rise` with
 //! `--stagger`, capped at 12), and on Show Less everything after the rows kept heals up by the
 //! height the removed rows took (`heal`, which springs: the person ran the action). The palette
 //! owns its rows and outlives its result sets, so it plays these itself; a later result set
 //! replaces in place with no motion (R1, R12).
 //!
-//! The person's own Enter or click is not the only way a group's action runs (sill Q400): a
+//! The person's own Enter or click is not the only way a group's action runs: a
 //! caller may run it itself (`sill debug launcher-key enter` stepping the keyboard machine
 //! directly, a demo's own button) and just hand the palette the next `groups`, with no Enter or
 //! click of its own for the palette to have seen. [`PaletteHandle::mark_group_action`] books that
@@ -31,7 +31,7 @@ use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 
 /// Whether a group's action ran since the results last changed: through the palette itself, or
-/// (sill Q400) marked by the caller.
+/// marked by the caller.
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Ran {
     Nothing,
@@ -76,7 +76,7 @@ impl ActionBook {
     }
 }
 
-/// A caller's mark on a `CommandPalette`'s next change of results (sill Q400): pass it as
+/// A caller's mark on a `CommandPalette`'s next change of results: pass it as
 /// `CommandPalette { handle: Some(handle) }`, then call [`mark_group_action`](Self::mark_group_action)
 /// before making the change yourself (running a group's action without going through the
 /// palette's own Enter or click, e.g. `sill debug launcher-key enter`, a demo's own button). The

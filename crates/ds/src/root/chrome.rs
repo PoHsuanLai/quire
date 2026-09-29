@@ -3,14 +3,14 @@
 //!
 //! - [`RootChrome`]: whether the root box paints its material (tint, edge, shadow) at all. A
 //!   root that only hosts overlays (a shell popup holding a menu) is a zero-height, full-width
-//!   box; painting the material there drew a shadow band across the popup (sill FINDINGS F53,
-//!   Q13). The card paints itself instead.
+//!   box; painting the material there drew a shadow band across the popup.
+//! The card paints itself instead.
 //! - [`FrameTint`]: whether the root draws the Space gradient, and how: opaque with its grain
 //!   on a window, at the material's tint alpha on shell chrome (design/21-SPACES.md sections 3
-//!   and 5; sill FINDINGS F48, Q9).
+//!   and 5).
 //! - [`Ground`]: whether components are drawn on paper (the Post inks) or on the frame colour
 //!   (the `--f-*` inks, design/03-COLOR.md section 4 and design/04-COMPONENTS.md's sidebar
-//!   item; sill FINDINGS F49, Q12).
+//!   item).
 
 use crate::material::Material;
 

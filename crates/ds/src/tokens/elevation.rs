@@ -4,7 +4,7 @@
 //!
 //! Values are design/03-COLOR.md section 10 (`S`) and C's `--shadow-drag` (section 16);
 //! `--shadow-pop` and `--shadow-sheet` take section 17.2's proposed values, and the names past
-//! the plan's four are proposed (FINDINGS F13).
+//! the plan's four are proposed.
 
 use super::name::VarName;
 use crate::appearance::Scheme;

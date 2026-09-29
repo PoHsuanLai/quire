@@ -19,7 +19,7 @@ pub enum InputVariant {
     Boxed,
     /// `.inp.inline`: transparent; the container shows focus.
     Inline,
-    /// No box, no padding and no face of its own (mailo gaps 4): font, size, weight, tracking
+    /// No box, no padding and no face of its own: font, size, weight, tracking
     /// and colour are the parent's, so a property row's value or a title is edited where it
     /// reads. Only the caret (`--accent`) and the selection are styled.
     Bare,
@@ -46,7 +46,7 @@ fn held(kind: TextInputKind, value: String, typed: Signal<String>) -> String {
 
 /// A text field. `focus: Focus::OnMount` puts the caret in it when it mounts; `Focus::Controlled(request)` does too, and again at each
 /// `request.request()`. `onkey` hears each key as the event itself, so a caller that takes a
-/// key can `prevent_default` it (sill FINDINGS Q61).
+/// key can `prevent_default` it.
 ///
 /// `onfocus` and `onblur` hear the caret arrive and leave, so a caller can tell "the person is
 /// typing in a field" from "a key for the window". They fire for a click or Tab (the renderer's

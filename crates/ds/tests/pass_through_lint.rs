@@ -1,4 +1,4 @@
-//! mailo gaps 6, a consumer's own class on a quire button: the markup lint takes it when the
+//! A consumer's own class on a quire button: the markup lint takes it when the
 //! consumer's sheet styles it, the stylesheet lint takes the consumer's rule for it, and a `ds-`
 //! class never gets that far, since `ExtraClass` refuses it when it is built. The same for a
 //! `data-*` name: `DataName` refuses `ds-…` and the names quire writes itself.

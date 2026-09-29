@@ -1,10 +1,10 @@
-//! A surface's presence driven by the caller's `shown` (sill FINDINGS Q76; notification parts,
-//! sill Q123): entering, present, leaving, then hidden with `on_hidden` at the exit's settle, and
+//! A surface's presence driven by the caller's `shown` (notification parts):
+//! entering, present, leaving, then hidden with `on_hidden` at the exit's settle, and
 //! a show while it leaves taking the hide back. The OSD card and the notification center's panel
 //! both run it, each with its own pair of animations; the rules are the pure machine in
 //! `osd_phase`. Present keeps the entrance declared in each surface's CSS, so the entrance's
 //! settle timer (wall clock) never cancels an entrance the frame clock is still playing, and a
-//! taken-back hide plays `hold` (sill G295: Blitz at the pin keeps a cancelled animation's last
+//! taken-back hide plays `hold` (Blitz at the pin keeps a cancelled animation's last
 //! value).
 
 use crate::components::osd_phase::{OsdEffect, OsdInput, OsdPhase, input, step};
@@ -17,7 +17,7 @@ use dioxus::prelude::*;
 /// Which of its entrance's two names a surface plays: flipped on each showing, so the entrance
 /// restarts even where the engine kept the element's styles (design/05 section 9 rule 2). A
 /// surface present again after its hide was taken back plays `hold` instead (`Held`): the exit
-/// it drops is replaced by an animation that moves nothing, not by a second entrance (sill G295).
+/// it drops is replaced by an animation that moves nothing, not by a second entrance.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Alias {
     A,

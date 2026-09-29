@@ -21,7 +21,7 @@ pub enum Provider {
     Yahoo,
     /// `@` #5D6660.
     Imap,
-    /// No provider: mail kept in local folders (mailo gaps 4). Not a brand, so no letter: a
+    /// No provider: mail kept in local folders. Not a brand, so no letter: a
     /// folder glyph in the neutral IMAP grey, and no favicon even under `MarkStyle::Image`.
     Local,
 }

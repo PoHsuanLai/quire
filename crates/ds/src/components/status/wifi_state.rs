@@ -1,4 +1,4 @@
-//! The Wi-Fi item's state and what each change of it means (design/26-DETAILS.md 5.1.1, G1-G5).
+//! The Wi-Fi item's state and what each change of it means (design/26-DETAILS.md 5.1.1).
 
 use crate::components::vocab::Fraction;
 use crate::detail::{Detailed, EventStamp, Moment};

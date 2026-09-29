@@ -3,8 +3,8 @@
 //! O-11).
 //!
 //! Its timers are tasks of the root that provides it and drop with it; every write a timer makes
-//! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking (sill
-//! FINDINGS Q45, `crate::task`).
+//! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
+//! (`crate::task`).
 
 use crate::components::vocab::StaggerIndex;
 use crate::motion::anim::Anim;

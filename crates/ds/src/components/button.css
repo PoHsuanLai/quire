@@ -1,6 +1,6 @@
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
-   Disabled (sill Q93) takes design/13 section 13.3.3's settled disabled item, .35, rather than
+   Disabled takes design/13 section 13.3.3's settled disabled item, .35, rather than
    O-1's unsigned .45 candidate: below. */
 
 .ds-button{ font:inherit; }
@@ -10,7 +10,7 @@
    padding sets only the side inset. Mini is the ladder's Small, 16 tall at radius 4.
 
    Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
-   `--hair` border (sill Q110): Primary's is transparent, so it draws exactly as it did with
+   `--hair` border: Primary's is transparent, so it draws exactly as it did with
    `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
    the box model gains the same border width Secondary and Danger already have, so all three
    stand the same height at a given size instead of Primary sitting one `--hair` short top and
@@ -55,7 +55,7 @@
 .ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); line-height:1; color:var(--ink-faint); height:var(--ctl-h-m); padding:0 var(--s-4); border-radius:var(--ctl-r-m); }
 .ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
 
-/* Frame (mailo gaps 4): words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
+/* Frame: words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
    the foot button's colours (`S:151-153`): `--f-ink-soft` on nothing, `--f-ink` on
    `--f-pill-hover` under the pointer, `--f-pill` while held or pressed (a pressed one carries the
    current item's `--shadow-current`, as `aria-current` does on an item). It starts at its left
@@ -70,7 +70,7 @@
 .ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); transform:scale(var(--squish)); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
-/* Size (sill Q92), after the variants so it wins at equal weight: `data-size` is written only
+/* Size, after the variants so it wins at equal weight: `data-size` is written only
    when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
    Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
    a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
@@ -79,21 +79,21 @@
 /* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
 .ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
 
-/* Disabled (sill Q93; design/13 section 13.3.3's disabled item): .35, the default cursor, and no
+/* Disabled (design/13 section 13.3.3's disabled item): .35, the default cursor, and no
    pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
    dropped handlers keep a press from firing. */
 .ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
-/* A disabled default button stays the default (sill Q413): the Mac keeps its shape and edge at
+/* A disabled default button stays the default: the Mac keeps its shape and edge at
    the reduced opacity. Band B's pastel fill at .35 is barely apart from a disabled Secondary
    beside it (design/03-COLOR.md section 20.4: no state on the fill's colour alone), so it keeps
    an `--accent-text` edge, the pressed Mini's and the armed toast tab's. */
 .ds-button[*|data-variant=primary][*|aria-disabled=true]{ border-color:var(--accent-text); }
 
-/* A trailing mark (mailo gaps 4): a dropdown's caret after its value, in the label's colour a
+/* A trailing mark: a dropdown's caret after its value, in the label's colour a
    step quieter; `line-height:0` so the glyph does not stretch the line. */
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
 
-/* A mark face (mailo gaps 4): the bubble's B, i, U and S (design/04 section 30), each in its own
+/* A mark face: the bubble's B, i, U and S (design/04 section 30), each in its own
    style. S's italic is Georgia; the serif here is `--font-serif` (design/02). */
 .ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
 .ds-button-face[*|data-face=bold]{ font-weight:700; }
@@ -101,6 +101,6 @@
 .ds-button-face[*|data-face=underline]{ text-decoration:underline; }
 .ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 
-/* A leading mark (mailo gaps 5): a glyph or a caller's mark (a provider's inline chip) before the
+/* A leading mark: a glyph or a caller's mark (a provider's inline chip) before the
    label, sitting on the line as the trailing mark does; the button's own gap spaces it. */
 .ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }

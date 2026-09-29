@@ -1,4 +1,4 @@
-//! The control center's parts as markup (sill FINDINGS Q78-Q81, Q100-Q102): every control glyph renders and
+//! The control center's parts as markup: every control glyph renders and
 //! lints clean; the goldens are `tests/snapshots/control_center/<name>.html`, each linted and
 //! every `ds-` class in it styled by the stylesheet.
 //!

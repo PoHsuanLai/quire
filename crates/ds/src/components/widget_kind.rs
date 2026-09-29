@@ -1,5 +1,5 @@
-//! The words a `WidgetFrame` is described in (design/22-SETTINGS.md section 3.20; sill FINDINGS
-//! Q182): its footprint on the grid, where it is drawn, and its title row.
+//! The words a `WidgetFrame` is described in (design/22-SETTINGS.md section 3.20):
+//! its footprint on the grid, where it is drawn, and its title row.
 
 use crate::components::text_runs::Text;
 use crate::icon::Icon;
@@ -85,7 +85,7 @@ impl CardTint {
     }
 }
 
-/// Whether a widget's card is picked up (sill Q430, design/23 section 9.8): a host moving a
+/// Whether a widget's card is picked up (design/23 section 9.8): a host moving a
 /// desktop widget, or the widget gallery holding one, lifts it; quire owns the scale
 /// (`--pickup`), the shadow (`--shadow-drag`, in place of the resting drop), the layer
 /// (`--z-drag`) and the timing (`--t-quick` at `--e-out`).

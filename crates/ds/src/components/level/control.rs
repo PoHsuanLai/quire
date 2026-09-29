@@ -1,5 +1,5 @@
 //! `LevelControl`: a level with a glyph that follows it, in one of three looks (the user's brief
-//! of 2026-09-25; sill FINDINGS Q74). The form [`crate::Slider`] stays for settings rows; this is
+//! of 2026-09-25). The form [`crate::Slider`] stays for settings rows; this is
 //! the shell's volume and brightness control and the OSD's level.
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set
@@ -25,11 +25,11 @@ use std::rc::Rc;
 
 /// A level: the glyph that follows it and the capsule, knob or segments that show it.
 /// `onchange` is never called in `LevelMode::ReadOnly`, so a read-only level may leave it out.
-/// `Availability::Disabled` draws it plainly unavailable (Q491: a disabled level used to look like
+/// `Availability::Disabled` draws it plainly unavailable (a disabled level used to look like
 /// an enabled one at 0 %): the capsule and glyph at the disabled .35, no knob, the not-allowed
 /// cursor, no press, drag, key or swell, and out of the tab order.
 /// `glyph` is a `LevelGlyph` that follows `value`, or a `VolumeState` (both convert): then the
-/// speaker draws that state's waves and slash, as the bar's volume item does (sill Q392).
+/// speaker draws that state's waves and slash, as the bar's volume item does.
 #[component]
 pub fn LevelControl(
     label: String,
@@ -83,7 +83,7 @@ pub fn LevelControl(
         Hold::Idle => "idle",
         Hold::Pressing { .. } | Hold::Held { .. } => "live",
     };
-    // A disabled level (Q491) is not a stop in the tab order: it takes no key and no press.
+    // A disabled level is not a stop in the tab order: it takes no key and no press.
     let (role, tabindex) = match (mode, availability) {
         (LevelMode::Interactive, Availability::Enabled) => ("slider", Some("0")),
         (LevelMode::Interactive, Availability::Disabled) => ("slider", None),

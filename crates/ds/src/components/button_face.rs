@@ -1,4 +1,4 @@
-//! What a `Button` shows besides its icon (mailo gaps 4): its face, a word or a mark drawn in
+//! What a `Button` shows besides its icon: its face, a word or a mark drawn in
 //! its own style, and a trailing glyph after it.
 
 use crate::components::text_runs::{Text, text};
@@ -73,7 +73,7 @@ impl Trailing {
     }
 }
 
-/// A mark before the label (mailo gaps 5), the counterpart of [`Trailing`]: a glyph, or an
+/// A mark before the label, the counterpart of [`Trailing`]: a glyph, or an
 /// element the caller draws with quire's own components. The From dropdown shows the chosen
 /// account's provider as `Leading::Mark(rsx! { ProviderMark { size: MarkSize::Inline, .. } })`
 /// inside its value. The slot takes an `Element` rather than a `Provider` so any quire mark (an
@@ -101,7 +101,7 @@ pub(crate) fn leading(mark: Leading, icon_size: IconSize) -> Element {
     }
 }
 
-/// The label drawn in `face`: a span of words (runs in their tones, mailo gaps 5), or the
+/// The label drawn in `face`: a span of words (runs in their tones), or the
 /// face's letter in its style. The mark is `aria-hidden`, since the button is named by its
 /// label. Usable on its own as a `BubbleButton`'s `label`, so the bubble's marks need no raw
 /// `b`, `i`, `u` or `s`.

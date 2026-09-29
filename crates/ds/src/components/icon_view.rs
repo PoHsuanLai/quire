@@ -46,7 +46,7 @@ impl Paint {
 ///
 /// With a `plate_tint` (`PlateTint::of(style, tint)`, the pair a consumer hands `retint`), the
 /// plate's stops and glyph colour are re-coloured by the same rule as the icon's raster, so a
-/// Muted or Monochrome dock is one hue, plate included (sill FINDINGS Q72). Without one, or
+/// Muted or Monochrome dock is one hue, plate included. Without one, or
 /// without a plate, it changes nothing.
 ///
 /// A status glyph (`IconSource::Status`) is drawn at `size` too; `first` is its first frame

@@ -1,5 +1,5 @@
 //! SettingsRow: a settings-style list row for networks, devices and outputs, usable outside a
-//! Menu (sill FINDINGS Q79): a glyph, a title and a detail line in `MenuEntry::Row`'s type (the
+//! Menu: a glyph, a title and a detail line in `MenuEntry::Row`'s type (the
 //! shell text menu's, design/13 section 13.3.3), and a trailing mark; 44 px high, a hairline
 //! between rows. A control-center list and a menu then read alike.
 //!

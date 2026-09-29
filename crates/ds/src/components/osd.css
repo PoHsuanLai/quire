@@ -1,4 +1,4 @@
-/* Osd (design/20 section 1.7; sill FINDINGS Q76): the on-screen display's card inside a
+/* Osd (design/20 section 1.7): the on-screen display's card inside a
    transparent Osd root. It paints what a tinted root paints on its own box: the material's box
    shadow, and a `.ds-frame` group of the Space gradient at the frame alpha (the solid floor
    without blur and the inner pair over it are in the materials section). Its shape and padding
@@ -12,7 +12,7 @@
    centre. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
    timer never cancels an entrance the frame clock is still playing; present again after a hide
    was taken back (`data-pulse=held`), it plays `hold`, so dropping `osd-out` starts an animation
-   in the same restyle (sill G295). */
+   in the same restyle. */
 
 .ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
   width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }

@@ -1,4 +1,4 @@
-//! The notification parts' geometry tokens (sill Q120-Q123; design/22-SETTINGS.md section 3.12,
+//! The notification parts' geometry tokens (design/22-SETTINGS.md section 3.12,
 //! design/13 section 13.3.6): the banner's width, floor, padding and icon, the close button, the
 //! gap between stacked banners, the offset of a group's layers and the notification center's
 //! width, each a [`Tuned`] token its `notifications.*` key moves through one inline write

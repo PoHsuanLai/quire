@@ -1,5 +1,5 @@
 //! BatteryLevel: a battery's charge as a ring, for the Batteries widget (design/23-WIDGETS.md
-//! section 4.1; design/04-COMPONENTS.md "Widgets"; sill FINDINGS Q183), drawn flat and bright as
+//! section 4.1; design/04-COMPONENTS.md "Widgets"), drawn flat and bright as
 //! the reference widget measures: a thick round-capped arc from twelve, clockwise as far as the
 //! level, in `--battery-fill` (`--battery-low` at a fifth or less), over a full track in
 //! `--battery-track` (the plate darkened); the device's glyph centred in the ring; while

@@ -11,7 +11,7 @@ use super::tokenize::Located;
 /// Attributes quire writes as documented seams a consumer may select on, and so never
 /// `DsInternals`, unlike the internal ones below: `data-slot` names a component's slot for the
 /// consumer's element (`[*|data-slot=trailing] .fold-more` on a `TreeItem`'s hover-revealed
-/// trailing slot, mailo gaps 7), as `--dot-c*` are the custom properties a Space's colours reach
+/// trailing slot), as `--dot-c*` are the custom properties a Space's colours reach
 /// its dots by. Styling inside a slot through quire's own class (`.ds-tree-item-trail`) is still
 /// `DsInternals`.
 pub(crate) const CONSUMER_SEAMS: &[&str] = &["data-slot"];
@@ -19,7 +19,7 @@ pub(crate) const CONSUMER_SEAMS: &[&str] = &["data-slot"];
 /// The twelve attributes a `.ds` root carries that a consumer must never select on
 /// (design/22-SETTINGS.md, CONVENTIONS §11, design/04-COMPONENTS.md "Shared vocabulary"): the
 /// scope's, the root chrome's `data-chrome`, `data-frame` and `data-ground` (bar gaps), and its
-/// `data-extent` (sheet and modal parts, sill Q94), and its `data-typeface`.
+/// `data-extent` (sheet and modal parts), and its `data-typeface`.
 const INTERNAL_ATTRS: &[&str] = &[
     "data-theme",
     "data-accent",

@@ -36,7 +36,7 @@ pub enum IconSize {
     /// 96 px: a dock tile at full magnification.
     Tile96,
     /// Any other size a caller resolved for itself: a dock tile between rest and full
-    /// magnification, an icon a settings key sizes (sill FINDINGS Q16).
+    /// magnification, an icon a settings key sizes.
     Px(IconPx),
 }
 

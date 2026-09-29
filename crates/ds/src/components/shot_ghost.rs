@@ -1,5 +1,5 @@
 //! ShotGhost: the screenshot thumbnail drawn small and translucent, for the host's drag icon
-//! (design/04-COMPONENTS.md section 39; sill Q181). The host draws it on its own drag-icon
+//! (design/04-COMPONENTS.md section 39). The host draws it on its own drag-icon
 //! surface while it carries the file; quire only paints it. Smaller than the card so the drop
 //! target under it stays readable, and translucent so what it is dropped on shows through. No
 //! motion: a drag icon follows the pointer, it does not arrive.

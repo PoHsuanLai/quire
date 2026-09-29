@@ -8,7 +8,7 @@ pub enum Shape {
     /// An outline, the path `d`.
     Path(&'static str),
     /// A path filled in the ink as well as stroked, so its silhouette is the outline's: a
-    /// symbol's filled variant (the moon of a Focus that is on, design/26 G23).
+    /// symbol's filled variant (the moon of a Focus that is on, design/26).
     Solid(&'static str),
     /// A circle on the 24 grid.
     Circle {

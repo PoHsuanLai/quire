@@ -1,4 +1,4 @@
-/* SettingsRow (sill FINDINGS Q79): a 44 px row with a hairline (`--hair`, `--line`) above every
+/* SettingsRow: a 44 px row with a hairline (`--hair`, `--line`) above every
    row after the first, the words in the shell text menu's type (title `--fs-shell-menu` at 400,
    detail `--fs-help` in `--ink-faint`, as `MenuEntry::Row` in a Slim menu, design/13 section
    13.3.3), a 16 px glyph in a 22 px column, and the trailing mark at the end. Under the pointer
@@ -24,7 +24,7 @@
 .ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-settings-row-value{ font-size:var(--fs-help); }
 
-/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8; wave D2). The glyph may sit
+/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8). The glyph may sit
    on a 26 px disc: paper with ink for an item not in use, `--accent` with `--accent-ink` and an
    inset `--accent-text` hairline for the item in use (the tile disc's look), the colour
    cross-fading over `--t-quick`. While a pending loop steps on the glyph (`data-pending=step`, set

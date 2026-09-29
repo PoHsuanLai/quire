@@ -1,4 +1,4 @@
-//! The widget parts as markup (sill FINDINGS Q182, Q183; design/04-COMPONENTS.md "Widgets"):
+//! The widget parts as markup (design/04-COMPONENTS.md "Widgets"):
 //! the frame in each size on the desktop and as a tile, the clock face in both looks and
 //! phases, and the battery at three levels and charging. Each golden is
 //! `tests/snapshots/widgets/<name>.html`; each lints clean and every `ds-` class in it is

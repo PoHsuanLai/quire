@@ -1,4 +1,4 @@
-/* PreviewPane (sill Q292; design/04-COMPONENTS.md section 47): a column filling the palette's
+/* PreviewPane (design/04-COMPONENTS.md section 47): a column filling the palette's
    aside, 16 px in: the media box (220 tall; a picture or page fitted at its aspect, text
    clipped, an icon or an emoji centred), the caption, the facts, then the actions at the foot.
    It slides in from the right (`slide-r` over `--t-move`, restarted under its other name on each
@@ -7,10 +7,10 @@
    the entrance starts and kept while present), and out the same way (`pane-out-r`, held);
    hidden, nothing is laid out. Present keeps the entrance declared and plays `hold` after a
    taken-back hide (`data-pulse=held`), so no settle or take-back drops an animation without
-   starting another (sill G295). An in-place change fades the media in (`a-morph-fade-in`,
-   `--t-quick`, sill Q370); at rest the media box plays `hold` (moves nothing), so the fade's
-   settle never drops it midway. A load past its grace swaps the media for the pending look (sill
-   Q371): the dashed ring (`.ds-spinner`, stepping or held still) over the words "Loading…", in
+   starting another. An in-place change fades the media in (`a-morph-fade-in`,
+   `--t-quick`); at rest the media box plays `hold` (moves nothing), so the fade's
+   settle never drops it midway. A load past its grace swaps the media for the pending look:
+   the dashed ring (`.ds-spinner`, stepping or held still) over the words "Loading…", in
    `--ink-faint`.
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */

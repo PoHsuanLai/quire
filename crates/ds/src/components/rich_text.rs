@@ -1,4 +1,4 @@
-//! Rich: a body of runs that may hold links (notification parts, sill Q124). The Notifications
+//! Rich: a body of runs that may hold links (notification parts). The Notifications
 //! spec lets a body carry `<b>`, `<i>`, `<u>` and `<a href>`; the server parses that markup into
 //! runs once, and quire draws them: a toned run as [`Text`] draws it, a link as
 //! `a.ds-run-link`. A link keeps its press ([`Propagation::Stop`](crate::Propagation)'s rule:

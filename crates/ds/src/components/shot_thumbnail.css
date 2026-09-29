@@ -1,5 +1,5 @@
-/* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13; sill
-   Q181). The card is a plate in the Toast material inside a transparent Toast scope (the
+/* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13).
+   The card is a plate in the Toast material inside a transparent Toast scope (the
    transparent-root card rule in the materials section paints its tint, edge and drop); its
    width and height are written inline from `shot_frame`, and so is the picture's letterboxed
    rect inside it, so the bars round a picture outside 2:1..16:10 are the material. The picture's
@@ -10,7 +10,7 @@
    name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
    (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
    declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
-   take-back drops an animation without starting another (sill G295).
+   take-back drops an animation without starting another. 
 
    Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
    actions row fades in at the bottom right over `--t-quick --e-out`, its strip buttons popping in

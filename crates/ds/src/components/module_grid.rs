@@ -1,7 +1,7 @@
 //! ModuleGrid: the control center's grid of modules (design/13 section 13.3.7). Its columns, gap
 //! and padding are props, so `control_center.grid_columns`, `grid_gap_px` and `grid_padding_px`
 //! (design/22-SETTINGS.md section 3.13) reach the grid and not only the popup's size estimate
-//! (sill FINDINGS Q102). A `ModuleTile { span: TileSpan::Full }` or a `ModulePanel` spans every
+//!. A `ModuleTile { span: TileSpan::Full }` or a `ModulePanel` spans every
 //! column.
 
 use crate::geometry::Px;

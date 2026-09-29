@@ -3,7 +3,7 @@
    `peek-in` (or C's `cmdk-in`, `C:1064`), a SearchField over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
-   Hosted in a surface of its own (sill FINDINGS Q40) there is no wrap: the card fills its
+   Hosted in a surface of its own there is no wrap: the card fills its
    container, its list takes the height left under the field, and it paints the enclosing
    material (a shell panel's Sheet, over blur or not) with the material's edge, as the cards of
    a transparent root do. */
@@ -30,19 +30,19 @@
 .ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
 .ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
 .ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
-/* Kept mounted while hidden (sill FINDINGS Q63): nothing is laid out, and each showing replays
+/* Kept mounted while hidden: nothing is laid out, and each showing replays
    the entrance under the keyframe's other name (`data-pulse`, design/05-MOTION.md section 9
    rule 2), so the animation starts over even where the engine kept the element's styles. */
 .ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
 .ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
 .ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
-/* An opaque entrance (mailo gaps 2): `cmdk-rise` springs the card's scale and lift with no fade,
+/* An opaque entrance: `cmdk-rise` springs the card's scale and lift with no fade,
    so its first frame is already opaque; over a window its scrim does not fade either, since the
    wrap's opacity would hold the card at its own. */
 .ds-palette[*|data-entrance=cmdk-rise]{ animation:cmdk-rise var(--t-big) var(--e-spring); }
 .ds-palette[*|data-entrance=cmdk-rise][*|data-pulse=b]{ animation-name:cmdk-rise--b; }
 .ds-palette-wrap[*|data-entrance=cmdk-rise]{ animation:none; }
-/* A pane beside the results (sill Q292, `aside`): the card turns into a grid, the field (and
+/* A pane beside the results (`aside`): the card turns into a grid, the field (and
    its tokens) across the top, the results under it on the left, the pane on the right past a
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
    pane; in a surface it still fills its container, which the host widens. */
@@ -54,13 +54,13 @@
 .ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
 .ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
 /* The results' motions (design/26-DETAILS.md section 5.6): the first-show rise is
-   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More (sill Q373) rises
+   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More rises
    the rows it added in downward, each `--stagger` after the one before (`--i`, capped at 12);
    its Show Less heals everything after the last row kept up from `--dy`, the height the removed
    rows took, set on the list while it plays. At rest the list's children play `hold` (moves
    nothing), below every motion here and the reveal's (which come later in the cascade): a rise
    or heal whose settle timer (wall clock) ends it before the frame clock does is replaced by
-   another animation, never dropped midway (sill G295). */
+   another animation, never dropped midway. */
 .ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-tap) var(--e-linear); }
 .ds-menu-item[*|data-row-motion=rise]{ animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
 .ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-spring) backwards; }

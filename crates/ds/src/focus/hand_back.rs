@@ -1,4 +1,4 @@
-//! Where the keyboard goes when a surface that took it leaves (mailo gaps 7).
+//! Where the keyboard goes when a surface that took it leaves.
 //!
 //! On Blitz the focus goes nowhere when the focused element is removed, so ds-native hands it to
 //! a focusable ancestor of what was removed. A floating menu's panel has none of its own (it

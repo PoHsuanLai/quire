@@ -1,4 +1,4 @@
-//! A plate re-coloured for the icon style (sill FINDINGS Q72; design/08-ICONS.md section 4).
+//! A plate re-coloured for the icon style (design/08-ICONS.md section 4).
 //!
 //! Under Muted or Monochrome a third-party icon's raster goes through [`super::retint`], but its
 //! plate is drawn by the stylesheet from the family's stops: in dark mode a Monochrome dock
@@ -7,7 +7,7 @@
 //! the style itself: its two stops and its ink go through the same OKLCh rule as the raster
 //! ([`super::retint::recolour`], one implementation), for both schemes, and are handed to the
 //! stylesheet as custom properties on the plate (`--plate-base-l` ... `--plate-ink-d`), which the
-//! sheet reads under the root's `data-theme`, as a Space dot's `--dot-c*` are (mailo gaps 3).
+//! sheet reads under the root's `data-theme`, as a Space dot's `--dot-c*` are.
 
 use super::family::{NEUTRAL_DARK, PlateFamily};
 use super::retint::{IconStyle, Tint, recolour};
@@ -160,7 +160,7 @@ mod tests {
         );
     }
 
-    /// The dark neutral plate, the case Q72 reported, takes the Work and the Home tint's hue in
+    /// The dark neutral plate takes the Work and the Home tint's hue in
     /// both stops and its ink; the light paper keeps its white stop white.
     #[test]
     fn a_monochrome_neutral_plate_takes_the_tints_hue() {

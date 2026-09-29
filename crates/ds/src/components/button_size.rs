@@ -1,4 +1,4 @@
-//! A button's size, apart from its variant (sill Q92): a power menu sets Cancel (Secondary),
+//! A button's size, apart from its variant: a power menu sets Cancel (Secondary),
 //! Shut Down (Primary) and Restart (Danger) side by side, and Danger's own size is the Mini's, a
 //! row action's, which sat a size smaller than its neighbours.
 
@@ -32,7 +32,7 @@ impl ButtonSize {
 }
 
 /// What a button's availability writes on the element besides `aria-disabled`: `disabled`,
-/// so the platform neither focuses nor activates it (sill Q93). Present only when disabled, as
+/// so the platform neither focuses nor activates it. Present only when disabled, as
 /// an attribute string: a `bool` attribute reaches dioxus-native as `disabled="false"` on every
 /// enabled button, which Blitz reads as disabled (a click then no longer toggles an enclosing
 /// `<details>`).

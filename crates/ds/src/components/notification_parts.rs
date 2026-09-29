@@ -1,4 +1,4 @@
-//! The words a `NotificationCard` is described in (sill Q120): which app sent it, how many a
+//! The words a `NotificationCard` is described in: which app sent it, how many a
 //! group holds and how many layers show behind it, the actions it offers, and whether the
 //! pointer is over it.
 

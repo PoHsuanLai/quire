@@ -1,4 +1,4 @@
-//! A notification card's swipe to dismiss (sill Q122): whether the card takes one, and the
+//! A notification card's swipe to dismiss: whether the card takes one, and the
 //! glue between its pointer and wheel events and the pure machine (`motion::swipe`).
 //!
 //! When a swipe ends past a threshold the card flies out to the right from where it is. Alone,
@@ -7,7 +7,7 @@
 //! the flight: the card holds its offset, reports at once, and the caller's removal of it makes
 //! the row slide out from that offset (the two transforms compose), then the rows below heal.
 //!
-//! Driven motion (design/05 section 14, wave H1): a card let go under both thresholds springs
+//! Driven motion (design/05 section 14): a card let go under both thresholds springs
 //! back from where it is, carrying the hand's release velocity, instead of easing on a CSS
 //! transition; a new drag mid-return picks it up where it is.
 

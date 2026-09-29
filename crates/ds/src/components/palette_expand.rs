@@ -1,4 +1,4 @@
-//! A palette group growing or shrinking in place (design/26-DETAILS.md section 5.6, sill Q373):
+//! A palette group growing or shrinking in place (design/26-DETAILS.md section 5.6):
 //! pure, beside `palette_motion`. Between two result sets, one group of rows either kept its
 //! first rows and gained more after them (Show More) or kept its first rows and lost the rest
 //! (Show Less), with every other group as it was. Anything else is a new result set, which

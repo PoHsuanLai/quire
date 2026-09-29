@@ -1,4 +1,4 @@
-//! The pane switch as a pure machine (sill FINDINGS Q80): which of two panes is shown, and while
+//! The pane switch as a pure machine: which of two panes is shown, and while
 //! a switch plays, which one is arriving. The component feeds it the pane its caller asks for
 //! and the settle of each round; every decision about what is drawn and what plays is here.
 

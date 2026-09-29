@@ -1,4 +1,4 @@
-//! The swipe machine as a hook (sill Q122): [`SwipeState`] in a signal, fed from a card's
+//! The swipe machine as a hook: [`SwipeState`] in a signal, fed from a card's
 //! pointer and wheel events, with the clock and the quiet timer a scroll needs. The machine is
 //! pure (`swipe.rs`); this owns the time.
 

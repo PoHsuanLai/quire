@@ -13,9 +13,9 @@ pub enum Exit {
     Curl,
     /// Trash, delete: `crumple`.
     Crumple,
-    /// A Today entry closing: `tab-out` (wave 2 integration amendment).
+    /// A Today entry closing: `tab-out`.
     TabOut,
-    /// A notification banner leaving: `banner-out`, a slide to the right (sill Q121).
+    /// A notification banner leaving: `banner-out`, a slide to the right.
     BannerOut,
 }
 

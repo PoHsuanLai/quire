@@ -1,4 +1,4 @@
-//! The editor's rows a consumer switches on (mailo gaps 2): the title as a name field, the
+//! The editor's rows a consumer switches on: the title as a name field, the
 //! Motion row, and the contrast measured in each scheme under its own heading.
 
 use super::parts::CheckRows;
@@ -26,7 +26,7 @@ pub enum MotionLevels {
     /// All five choices a person has: System, Calm, Standard, Extra, Reduced.
     #[default]
     All,
-    /// The three a Space itself sets (mailo gaps 4): Calm, Standard, Extra. Following the
+    /// The three a Space itself sets: Calm, Standard, Extra. Following the
     /// desktop and reducing motion are the person's, not a Space's, so they are not offered;
     /// a `level` outside the three shows no segment pressed.
     Contact,

@@ -247,7 +247,7 @@ fn plate_css() -> String {
 }
 
 /// A plate with `data-icon-style` (a `PlateTint`) reads the stops it wrote inline for each
-/// scheme (sill FINDINGS Q72). After the family rules, at their specificity, so it wins in both.
+/// scheme. After the family rules, at their specificity, so it wins in both.
 fn tinted_plate_css(plate: &str) -> String {
     let tinted = format!("{plate}{}", presence_selector("data-icon-style"));
     let dark = format!(

@@ -1,4 +1,4 @@
-//! Drawing the command palette's groups (sill Q291, Q294): each group's `SectionHeader` with its
+//! Drawing the command palette's groups: each group's `SectionHeader` with its
 //! action, then its rows as menu rows or its emoji grid, every row, cell and action reporting by
 //! its stop number (`palette_stops`). Split from `command_palette`.
 

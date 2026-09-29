@@ -1,10 +1,10 @@
-//! PaneSwitcher: a pane and its detail in one place, switched by a push (sill FINDINGS Q80;
-//! design/13-BEHAVIOUR-menus-windows.md section 13.3.7: a tile's chevron opens its detail pane
+//! PaneSwitcher: a pane and its detail in one place, switched by a push
+//! (design/13-BEHAVIOUR-menus-windows.md section 13.3.7: a tile's chevron opens its detail pane
 //! in place).
 //!
 //! The arriving pane slides in and the outgoing one leaves the other way at the same time; the
 //! leaving pane is drawn out of the flow, so the switcher's height is the arriving pane's from
-//! the first frame. Driven motion (design/05 section 14, wave H1): one spring in Rust carries
+//! the first frame. Driven motion (design/05 section 14): one spring in Rust carries
 //! the switch, `--pane-p` from 0 (the root) to 1 (the detail), and both panes are drawn from it.
 //! A switch asked for mid-slide redirects that spring from where it is at the speed it has, so
 //! the panes turn back without a jump, and the switcher rests (and `on_settled` hears the pane)

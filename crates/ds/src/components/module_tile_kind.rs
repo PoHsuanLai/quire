@@ -1,5 +1,5 @@
 //! The words a `ModuleTile` is described in: whether the module is on, whether it has a detail
-//! pane, and how many grid columns it takes (sill FINDINGS Q78).
+//! pane, and how many grid columns it takes.
 
 use crate::detail::{Detailed, Moment};
 use crate::icon::Icon;
@@ -100,8 +100,8 @@ impl TileSpan {
     }
 }
 
-/// How a tile's disc glyph answers the module turning on (design/26-DETAILS.md 5.2.2 G14, 5.2.5
-/// G23). The disc's colour cross-fades whatever this is.
+/// How a tile's disc glyph answers the module turning on (design/26-DETAILS.md 5.2.2,
+/// 5.2.5). The disc's colour cross-fades whatever this is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum DiscMotion {
     /// The glyph stays as it is.

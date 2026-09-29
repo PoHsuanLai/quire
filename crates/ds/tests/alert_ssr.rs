@@ -1,4 +1,4 @@
-//! The alert as markup (sill Q490): every state matches its golden under
+//! The alert as markup: every state matches its golden under
 //! `tests/snapshots/alert/`, lints clean and uses only `ds-` classes the stylesheet styles; the
 //! markup says which button is the default (Primary) and how a destructive action reads.
 //!

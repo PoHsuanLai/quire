@@ -1,6 +1,6 @@
 //! ModulePanel: a control-center module that holds content of its own (the Sound and Display
 //! levels, Now Playing, Appearance, Battery) on a `ModuleTile`'s frame, so a consumer draws no
-//! plate of its own (sill FINDINGS Q100; design/13-BEHAVIOUR-menus-windows.md section 13.3.7).
+//! plate of its own (design/13-BEHAVIOUR-menus-windows.md section 13.3.7).
 //!
 //! A tile is a toggle with a glyph, a title and a status; a panel is not pressable at all: its
 //! content (a `LevelControl`, a picker, buttons) takes every press, so the panel is a plain
@@ -41,10 +41,10 @@ impl PanelPlate {
 /// is given.
 ///
 /// `glyph` is an `Icon` (it converts) or any [`IconSource`]: `IconSource::Status` draws a layered
-/// status glyph (the Battery module's, sill Q391). `first` is its first frame: pass
+/// status glyph (the Battery module's). `first` is its first frame: pass
 /// `FirstShow::Animate` when the control center was just opened, and the battery's fill sweeps in
 /// from empty over `--t-sweep`. `availability` is its content's: a module whose level is disabled
-/// passes `Availability::Disabled` and its header glyph and trailing figure dim with it (Q491).
+/// passes `Availability::Disabled` and its header glyph and trailing figure dim with it.
 #[component]
 pub fn ModulePanel(
     #[props(default)] glyph: Option<IconSource>,

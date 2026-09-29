@@ -18,11 +18,11 @@
 //!
 //! The root also writes `--m-tint-alpha` inline: the materials' tint over blur scales by the
 //! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
-//! 80; FINDINGS "W1 tokens"). A host passes the key as the `tint_alpha` prop (thousandths: 800
+//! 80). A host passes the key as the `tint_alpha` prop (thousandths: 800
 //! is .8), which `ds_settings::Environment::tint_alpha` converts from the settings file; without
 //! one the root writes the key's default. A `radius` overrides the material's corner the same way
 //! (`--m-radius` inline): the dock's pill is its root, and its radius is `dock.pill_radius_px`
-//! (sill FINDINGS Q15). A `stack` writes the material stack's settings (`MaterialStack`: the
+//!. A `stack` writes the material stack's settings (`MaterialStack`: the
 //! highlight, hairline, shadow strength and vibrancy keys) the same way.
 //!
 //! The root also writes the pixel tokens' inputs for its device scale (`scale`, else the host's
@@ -39,7 +39,7 @@
 //! The host reads it from `appearance.typeface` (`ds_settings::AppearanceSettings::typeface`), or
 //! an app that keeps its own voice passes Editorial outright.
 //! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
-//! positioned content (a centred sheet) is otherwise 0 px tall (sill FINDINGS Q94).
+//! positioned content (a centred sheet) is otherwise 0 px tall.
 
 use super::chrome::{FrameTint, Ground, RootChrome};
 use super::env::{Env, HostModality, InputModality, use_env_provider};

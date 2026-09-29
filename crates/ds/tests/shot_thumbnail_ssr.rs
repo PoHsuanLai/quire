@@ -1,4 +1,4 @@
-//! The screenshot thumbnail as markup (sill Q181): the card shown, the card with its actions, a
+//! The screenshot thumbnail as markup: the card shown, the card with its actions, a
 //! portrait picture pillarboxed in a dark root, and the drag ghost each match their golden under
 //! `tests/snapshots/shot_thumbnail/`, lint clean, and use only `ds-` classes the stylesheet
 //! styles.

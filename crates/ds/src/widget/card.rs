@@ -16,9 +16,9 @@ use dioxus::prelude::*;
 /// now. `wake` replays the widget's appear motion when it changes (a host passes a new stamp as
 /// its widgets come into view); `onrefresh` hears the timeline's refresh policy come due;
 /// `onintent` hears the widget's controls; `id` names the card for the layer's input and blur
-/// regions; `lift` picks the card up while a host moves it (sill Q430); `presence:
+/// regions; `lift` picks the card up while a host moves it; `presence:
 /// CardPresence::Leaving` plays the card's exit and `on_gone` runs once it has settled, when the
-/// host drops the card (sill G423). The card writes `data-widget` with the kind.
+/// host drops the card. The card writes `data-widget` with the kind.
 #[component]
 pub fn WidgetCard<W: Widget>(
     widget: W,

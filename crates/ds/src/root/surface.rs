@@ -60,7 +60,7 @@ pub fn Surface(
 /// A transparent scope of `material` that also carries a quire class of its own (`class`), for a
 /// component whose scope must be laid out itself: Blitz places an absolutely positioned box
 /// against its parent, not its nearest positioned ancestor, so an edge panel's scope has to fill
-/// the root for the panel inside it to (notification parts, sill Q123).
+/// the root for the panel inside it to (notification parts).
 #[component]
 pub(crate) fn ClassedScope(material: Material, class: &'static str, children: Element) -> Element {
     let env = scope(use_env(), material, None, None, None);

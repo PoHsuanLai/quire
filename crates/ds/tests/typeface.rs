@@ -124,7 +124,7 @@ fn editorial_restores_the_values_the_rules_carried() {
 }
 
 /// Besides `code` and `kbd`, only copied text asks for the code face: a clipboard row's excerpt
-/// (sill Q290) and a preview pane's monospace text (Q292), both the words as they were copied.
+/// and a preview pane's monospace text, both the words as they were copied.
 const COPIED_TEXT: &[&str] = &[".ds-menu-clip{", ".ds-preview-text[*|data-face=mono]{"];
 
 #[test]

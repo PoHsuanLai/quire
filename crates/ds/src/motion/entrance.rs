@@ -1,7 +1,7 @@
 //! An entrance played once as a surface mounts: `Entering` until the animation settles, then
 //! `Present` (design/05-MOTION.md section 7, timers instead of `animationend`). Every floating
 //! surface quire draws enters this way, and a consumer's own surface (a control-center pane, a
-//! card of its own) can too without restating the timer (sill FINDINGS Q80).
+//! card of its own) can too without restating the timer.
 
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;

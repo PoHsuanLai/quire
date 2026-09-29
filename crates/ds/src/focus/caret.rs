@@ -1,4 +1,4 @@
-//! Where a field's caret is when a key arrives (sill Q299): the launcher's Right shows the
+//! Where a field's caret is when a key arrives: the launcher's Right shows the
 //! preview pane only with the caret at the end of the query. Blitz keeps the caret in the
 //! document, so the host reads it: ds-native provides [`HostCaret`] beside its focus writes, and
 //! without one the caret is [`Caret::Unknown`].
@@ -21,7 +21,7 @@ pub enum Caret {
 #[derive(Debug, Clone, Copy)]
 pub struct HostCaret(pub fn(&MountedData) -> Caret);
 
-/// Where a field's caret goes when the keyboard lands in it (sill Q341): a command palette
+/// Where a field's caret goes when the keyboard lands in it: a command palette
 /// opened on a query puts it after the last character, as Spotlight does, so Right at once
 /// reads [`Caret::AtEnd`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -41,7 +41,7 @@ pub enum InitialCaret {
 #[derive(Debug, Clone, Copy)]
 pub struct HostPlaceCaret(pub fn(&MountedData, InitialCaret) -> crate::focus::host::Focused);
 
-/// A field's caret and selection as the host reads them (sill Q360b): a masked field draws its
+/// A field's caret and selection as the host reads them: a masked field draws its
 /// own caret over its dots, since Blitz measures the hidden text in another face than the dots.
 /// Offsets count characters (`char`s) of the field's text, as the mask draws one dot for each.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

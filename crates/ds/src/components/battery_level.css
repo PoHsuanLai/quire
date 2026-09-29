@@ -1,5 +1,5 @@
-/* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"; sill FINDINGS
-   Q183): a flat, bright ring, 64 across (the reference's ring in a small and a medium widget).
+/* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"):
+   a flat, bright ring, 64 across (the reference's ring in a small and a medium widget).
    The track is a full circle in `--battery-track`, the plate darkened; over it the level's arc
    from twelve, clockwise, round-capped, in `--battery-fill`, `--battery-low` at a fifth or less
    (low and critical alike); the stroke is .093 of the ring's diameter. The device's glyph sits
@@ -24,7 +24,7 @@
    face, tabular so its width holds while it counts. */
 .ds-battery-figure{ font-variant-numeric:tabular-nums; }
 
-/* DeviceBattery (design/26-DETAILS.md 5.2.9, wave D2): the ring over its percentage, centred, the
+/* DeviceBattery (design/26-DETAILS.md 5.2.9): the ring over its percentage, centred, the
    control center's Battery module's one device. The arc sweeps and the number counts from Rust;
    the bolt waits hidden until the sweep lands, then fades in over `--t-quick`. */
 .ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }

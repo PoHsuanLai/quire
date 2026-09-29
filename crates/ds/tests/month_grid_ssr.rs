@@ -1,4 +1,4 @@
-//! MonthGrid as markup (design/04-COMPONENTS.md section 39; sill Q180): the goldens are
+//! MonthGrid as markup (design/04-COMPONENTS.md section 39): the goldens are
 //! `tests/snapshots/month_grid/<name>.html` (plain, week numbers, pressable), each linted and
 //! every `ds-` class in it styled by the stylesheet; and the markup says what the data says.
 //!

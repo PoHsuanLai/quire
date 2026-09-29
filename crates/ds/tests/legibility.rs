@@ -56,7 +56,7 @@ fn every_accent_is_legible_in_both_schemes() {
 
 /// Every `X` / `X-ink` pair: text on the accent, on `--ok`, on `--warn` and on `--danger`, in
 /// both schemes (the accent here is Postmark; `every_accent_is_legible_in_both_schemes` covers
-/// the other five). Dark `--danger-ink` was white on `#E0705A`, 3.17:1 (FINDINGS "mailo gaps").
+/// the other five). Dark `--danger-ink` was white on `#E0705A`, 3.17:1.
 #[test]
 fn every_ink_on_its_colour_is_legible_in_both_schemes() {
     const PAIRS: [(ColourToken, ColourToken); 4] = [
@@ -234,8 +234,8 @@ fn the_solid_tints_hold_text_over_black_and_white() {
 /// Section 17.2's translucent tints at the key's default hold the card's ink at 4.5:1 over a
 /// pure black and a pure white backdrop, the two worst a blur can show. The contrast gates
 /// assume an opaque ground; how they hold over blur is design/03-COLOR.md open decision 11, so
-/// this is the floor, measured on what `recipe` paints. Four alphas were raised to meet it in
-/// wave 1 (the dark bar and dock .66, the widget .54 light and .65 dark).
+/// this is the floor, measured on what `recipe` paints. Four alphas are raised to meet it (the
+/// dark bar and dock .66, the widget .54 light and .65 dark).
 ///
 /// `Material::Widget` alone is gated at 3:1 instead (the user's decision, 2026-09-26, "relax
 /// the contrast then": design/03-COLOR.md section 17, design/23-WIDGETS.md section 4.3). The
@@ -404,7 +404,7 @@ fn the_tinted_chrome_holds_its_ink_over_blur() {
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
-/// A muted avatar (`AvatarMuting::Muted`, mailo gaps 3) keeps its letter legible and stands off
+/// A muted avatar (`AvatarMuting::Muted`) keeps its letter legible and stands off
 /// its ground no worse than the plain discs do, in both schemes: muting keeps lightness and
 /// takes chroma, so it withdraws the claim without dimming the account. Every stored swatch and
 /// a person hue every 5 degrees; the letter is `--on-hue`, the grounds a tile or chip sits on.
@@ -530,8 +530,7 @@ fn widget_grounds_of_every_space(scheme: Scheme) -> Vec<(String, Hex)> {
     grounds
 }
 
-/// sill Q412, option (b), the branch default until the user picks (design/23 section 4.3; the
-/// two options are `tools/progress/shots/widgets-final/title-options-*.png`): on a desktop
+/// Option (b), the default until the user picks (design/23 section 4.3): on a desktop
 /// card the month's title and the Medium card's weekday are `--ink-soft`, measured on the card
 /// as it composites (the see-through tint over each reference wallpaper, under every preset's
 /// gradient). Dark holds 4.5:1. Light holds only the floor below: a .48 near-white over the

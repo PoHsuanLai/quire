@@ -157,7 +157,7 @@ fn printer_and_folder_input_are_lucides() {
     );
 }
 
-/// The "more" glyphs as Lucide 1.47.0 publishes them (mailo gaps 6): three unit circles on the
+/// The "more" glyphs as Lucide 1.47.0 publishes them: three unit circles on the
 /// middle row for `ellipsis`, on the middle column for `ellipsis-vertical`, centre first.
 #[test]
 fn the_ellipses_are_lucides() {
@@ -178,7 +178,7 @@ fn the_ellipses_are_lucides() {
     }
 }
 
-/// The control set as Lucide 1.47.0 publishes it (sill FINDINGS Q81): eleven glyphs, Restart
+/// The control set as Lucide 1.47.0 publishes it: eleven glyphs, Restart
 /// is `rotate-ccw`, Phone is `smartphone`, and `Power` stays in the shell set.
 #[test]
 fn the_control_set_is_lucides() {
@@ -198,7 +198,7 @@ fn the_control_set_is_lucides() {
     assert_eq!(Icon::Gamepad.shapes().len(), 5);
 }
 
-/// The control center's own `Switches` (sill FINDINGS Q103): two 20 x 8 pill tracks 4 px apart
+/// The control center's own `Switches`: two 20 x 8 pill tracks 4 px apart
 /// with a dot knob each at opposite ends, inside Lucide's reach, in the shell set.
 #[test]
 fn switches_is_two_tracks_with_knobs_at_opposite_ends() {
@@ -221,14 +221,14 @@ fn switches_is_two_tracks_with_knobs_at_opposite_ends() {
         "left on top, right below"
     );
     assert!(Icon::SHELL.contains(&Icon::Switches));
-    // The shell set ends with quire's own glyphs: Switches, then the filled moon (design/26 G23).
+    // The shell set ends with quire's own glyphs: Switches, then the filled moon (design/26).
     assert_eq!(
         &Icon::SHELL[Icon::SHELL.len() - 2..],
         &[Icon::Switches, Icon::MoonFilled][..]
     );
 }
 
-/// The launcher's provider glyphs as Lucide 1.47.0 publishes them (sill Q296): `clipboard` is a
+/// The launcher's provider glyphs as Lucide 1.47.0 publishes them: `clipboard` is a
 /// clip over a board, `smile` a face of three paths in a circle, `globe` a circle, a meridian
 /// and the equator; all three in the actions set.
 #[test]

@@ -1,5 +1,5 @@
 //! `IdleDim`: the pre-screen-off dim overlay (design/22-SETTINGS.md section 3.24; sill FINDINGS
-//! "sill idle (Q420 B)"). A full-screen scrim, black at `level` (`--scrim-idle`), never real
+//! "sill idle"). A full-screen scrim, black at `level` (`--scrim-idle`), never real
 //! brightness, that ignores every pointer and key event: sill's idle service owns waking the
 //! display, this draws the dim and nothing else. It fades in over `--t-idle-dim --e-out`
 //! towards `level` and snaps to nothing the instant `phase` goes back to

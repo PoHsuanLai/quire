@@ -1,4 +1,4 @@
-//! Scrolling a scroller the least that shows one of its items (sill Q340): a command palette's
+//! Scrolling a scroller the least that shows one of its items: a command palette's
 //! selected row, cell or header action, moved by a key the caller claimed or by the caller's own
 //! `selected`, is brought to the nearest edge of the list, never centred.
 //!

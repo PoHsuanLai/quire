@@ -132,7 +132,7 @@ pub enum ColourToken {
     /// `--scrim-idle`: the pre-screen-off idle overlay's colour, black, the same in both
     /// schemes — not `--scrim` or `--scrim-modal`, whose alphas are fixed. This one's opacity is
     /// the person's own `idle.dim_level_pct` (10..90), set inline by `IdleDim` itself
-    /// (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle (Q420 B)": dim with an
+    /// (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle": dim with an
     /// overlay, never real brightness), so the token carries no alpha of its own.
     ScrimIdle,
     /// `--knob-fill`: a switch's and a slider's knob, a plain white disc in either scheme (the

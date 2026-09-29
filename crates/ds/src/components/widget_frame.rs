@@ -1,5 +1,5 @@
 //! WidgetFrame: the card a widget is drawn on (design/04-COMPONENTS.md "Widgets"; design/20
-//! section 1.14, design/22 section 3.20; sill FINDINGS Q182). The frame owns the corner, the
+//! section 1.14, design/22 section 3.20). The frame owns the corner, the
 //! padding, the footprint and the title row, so a widget draws only its content and writes no
 //! CSS for any of them.
 //!
@@ -23,7 +23,7 @@ use dioxus::prelude::*;
 /// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint` (the
 /// Space's by default; a tile never lays a second gradient, `CardTint::on`). `kind` writes
 /// `data-widget` (a `WidgetCard` passes its widget's kind). `lift` picks the card up while a
-/// host moves it (sill Q430).
+/// host moves it.
 /// `title` draws a glyph and a name above the content (the Batteries and Clock widgets take
 /// none: their content fills the card). `id` names the card for the layer's input and blur
 /// regions.
@@ -31,7 +31,7 @@ use dioxus::prelude::*;
 /// The frame provides its `size` to its content (`widget_scope`), so content that must fit
 /// the frame, a `MonthGrid` at `MonthDensity::Auto`, fits itself without being told.
 ///
-/// `presence: CardPresence::Leaving` plays the card's exit (sill G423): it shrinks and fades
+/// `presence: CardPresence::Leaving` plays the card's exit: it shrinks and fades
 /// (`widget-out`, a fade alone under Reduced) and `on_gone` runs once at `settle(WidgetOut)`,
 /// when the host stops drawing it. The host keeps the card until then.
 #[component]

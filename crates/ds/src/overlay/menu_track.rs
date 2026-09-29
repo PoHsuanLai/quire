@@ -8,7 +8,7 @@
 //! skipping and type-to-filter stay with the `Menu` component (design/06 section 21 decision
 //! 3); this machine takes Escape, Left, Right and Enter, the keys that cross menus.
 //!
-//! Ported from sill's `bar/menu_track` (sill FINDINGS F15, quire gap Q1), with its tests.
+//! Ported from sill's `bar/menu_track`, with its tests.
 
 mod machine;
 mod triangle;

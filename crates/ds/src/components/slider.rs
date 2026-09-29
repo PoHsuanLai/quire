@@ -1,7 +1,7 @@
 //! Slider: a continuous value, divs and a drag tracker, because Blitz has no native range
 //! (design/04-COMPONENTS.md section 5).
 //!
-//! Driven motion (design/05 section 14, wave H1): the thumb is drawn from a spring. A drag moves
+//! Driven motion (design/05 section 14): the thumb is drawn from a spring. A drag moves
 //! it 1:1; a release with speed throws the value to where the throw projects (`Throw`, about half
 //! a second of its speed on), and the thumb springs there carrying the hand's velocity; a key or a
 //! value from elsewhere springs it critically from where it is.

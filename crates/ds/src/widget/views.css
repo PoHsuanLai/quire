@@ -51,7 +51,7 @@
 .ds-month-event-time{ font-family:var(--font-ui); font-size:var(--fs-nano); line-height:1.25; color:var(--ink-soft); }
 .ds-month-quiet{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 
-/* The month's title on a desktop card (sill Q412, option (b), the branch default pending the
+/* The month's title on a desktop card (option (b), the default pending the
    user's pick, design/23 section 4.3): `--ink-soft`, not the accent as text, which the
    see-through card cannot hold at 4.5:1 over the wallpaper. Today's disc and the busy dots keep
    the accent. */

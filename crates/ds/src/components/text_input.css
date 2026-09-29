@@ -12,7 +12,7 @@
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
    TODO(O-1): disabled is not specified; hover is not specified. */
 
-/* A field reads from its leading edge wherever it sits (Q360): a centred container (the polkit
+/* A field reads from its leading edge wherever it sits: a centred container (the polkit
    card's `text-align:center`) would centre the mask and the placeholder, which span the field,
    while Blitz lays the input's own text and caret out from the start whatever `text-align` says,
    so the dots drew mid-field with the caret before them. */
@@ -48,7 +48,7 @@
    per character over it, where the placeholder would sit; the secret itself never paints.
    Blitz measures the hidden text in its editor's own face, untracked, so its caret drifts off
    the Inter dots tracked .1em (two dots short at eleven). Where the host reads the selection
-   (ds-native) the field draws its own caret among the dots (Q360b): the input's is transparent
+   (ds-native) the field draws its own caret among the dots: the input's is transparent
    (`data-caret=drawn`) and `.ds-input-caret` is Blitz's caret redrawn, 1.5 px wide, the height of
    the line, in the dots' ink (`--ink`; the lock pill repeats its own), not blinking (Blitz's does not blink either), shown only while the
    field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
@@ -73,17 +73,17 @@
    so Blitz's own selection, which it paints over the hidden text in a fixed colour no style
    reaches, stays under it and only the dots' highlight shows. An Inline field's ground is its
    container's (the lock pill's glass), which the mask cannot repeat: there Blitz's highlight
-   shows beside the dots' when a range is selected (FINDINGS Q360b). */
+   shows beside the dots' when a range is selected. */
 .ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); background:var(--surface); background-clip:content-box; }
 /* Boxed, the caret spans the field's line, hung from its top: the ascent plus the line's
    half-leading over Inter's 1.21em. */
 .ds-input-wrap[*|data-variant=boxed] .ds-input-caret::before{ top:calc(-.969em - (var(--ctl-h-m) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
 .ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 
-/* A secret (`data-kind=secret`, mailo gaps 4) is drawn as a password is; it differs only in its
+/* A secret (`data-kind=secret`) is drawn as a password is; it differs only in its
    markup, which never carries a `value`. */
 
-/* Bare (mailo gaps 4): the field takes the face of the text it edits. No box, border, padding or
+/* Bare: the field takes the face of the text it edits. No box, border, padding or
    ground; font, size, weight, tracking, line height and colour are inherited, so a title or a
    property row's value is edited in place. Only the caret and the selection are the field's.
    Blitz sizes a one-line input by its line height, so the height is left to it. */
@@ -103,7 +103,7 @@
 /* A bare field's tracking is its parent's, usually none: the bar is centred on the point. */
 .ds-input-wrap[*|data-variant=bare] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
 
-/* Multiline (mailo gaps 4): a `textarea`. Blitz gives it `rows` line heights of content (two when
+/* Multiline: a `textarea`. Blitz gives it `rows` line heights of content (two when
    `rows` is absent) plus its padding, so the one-line height above is undone and the field's
    `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
    component's. */
@@ -113,7 +113,7 @@
 .ds-input[*|data-variant=boxed][*|data-kind=multiline]{ line-height:1.55; padding:var(--s-4) var(--s-8); }
 .ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
 
-/* File (mailo gaps 4): the chosen name, read-only, and the Tool "Choose…" button after it. The
+/* File: the chosen name, read-only, and the Tool "Choose…" button after it. The
    name is a span drawn as the field (no input: nothing is typed here), cut at its end. The wrap
    takes its container's width: a span has no 300 px intrinsic width as an input has, so without
    it the name collapsed to its padding on Blitz. */

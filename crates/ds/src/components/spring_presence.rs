@@ -1,7 +1,7 @@
-//! A surface's life when its host says whether it is shown (sill FINDINGS Q90, Q123), for the
+//! A surface's life when its host says whether it is shown, for the
 //! sheet and the edge panel. Its first showing on mount is an arrival no hand touched, so it
 //! plays its entrance keyframe (`peek-in`, `panel-in`). Every change after that is driven motion
-//! (design/05 section 14, wave H1): one spring in Rust, `--present-p` from 0 (gone) to 1
+//! (design/05 section 14): one spring in Rust, `--present-p` from 0 (gone) to 1
 //! (shown), carries the exit and any later entrance, so a show while it leaves turns it back from
 //! where it is at the speed it has instead of starting over, and `on_hidden` runs once the spring
 //! has come to rest at 0, so a host that unmaps its surface never cuts the exit short.

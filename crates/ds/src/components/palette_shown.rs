@@ -1,4 +1,4 @@
-//! A command palette kept mounted while hidden (sill FINDINGS Q63): a launcher that mounts a
+//! A command palette kept mounted while hidden: a launcher that mounts a
 //! palette per opening pays 15-20 ms for it, so it keeps one and says whether it is shown.
 //!
 //! Hidden, the card is `display:none` (nothing laid out or painted, as an empty `ToastHost`) and

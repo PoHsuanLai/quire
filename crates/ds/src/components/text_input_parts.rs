@@ -29,7 +29,7 @@ pub(crate) struct Field {
     pub availability: Availability,
     pub focus: Focus,
     pub focuser: FieldFocus,
-    /// A masked field's own caret over its dots (sill Q360b).
+    /// A masked field's own caret over its dots.
     pub caret: MaskCaret,
     pub handlers: Handlers,
     /// What a host's focus write tells the field, which no renderer event will.

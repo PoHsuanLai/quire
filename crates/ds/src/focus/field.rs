@@ -1,4 +1,4 @@
-//! A caller's handle on one `TextInput` (mailo gaps, G8): give it the keyboard (selecting its
+//! A caller's handle on one `TextInput`: give it the keyboard (selecting its
 //! text), take the keyboard from it, or read its mounted element, from any handler. The
 //! `TextInput`'s own `Focus::Controlled` asks for the focus by re-rendering; a handle acts at
 //! once, and hands out the element, which a request never did.

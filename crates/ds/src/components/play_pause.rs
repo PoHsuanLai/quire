@@ -1,4 +1,4 @@
-//! The Now Playing play/pause button (design/26-DETAILS.md 5.2.10, G28): an `IconButton { Tool }`
+//! The Now Playing play/pause button (design/26-DETAILS.md 5.2.10): an `IconButton { Tool }`
 //! whose glyph is the next action, replaced off-up (the old glyph goes at once, the next grows
 //! in: "emphasizes the next available state or action", A5), springing when the person's own
 //! press caused the change (R5).

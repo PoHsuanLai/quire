@@ -1,4 +1,4 @@
-/* TreeItem (mailo gaps 6): a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
+/* TreeItem: a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
    (design/04-COMPONENTS.md section 19: padding --s-6 --s-8, --r-item, ui 13.5/600 --f-ink-soft,
    --f-pill-hover under the pointer, --f-pill and the current shadow when current). The drop
    states are `.ds-drop-place`'s (drop_place.css), shared with SidebarItem. Attribute selectors
@@ -34,7 +34,7 @@
   border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:default;
 }
 
-/* The editing slot (mailo gaps 7): the caller's field in the label's place and box, so a rename
+/* The editing slot: the caller's field in the label's place and box, so a rename
    moves nothing on the row; a Bare field inherits the row's face. */
 .ds-tree-item-edit{ display:flex; align-items:center; cursor:text; }
 .ds-tree-item-edit > *{ flex:1 1 0; min-width:0; }

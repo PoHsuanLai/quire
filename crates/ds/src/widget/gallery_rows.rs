@@ -1,4 +1,4 @@
-//! Edit Widgets' placed lists (sill Q523): what is on the desktop and in the notification
+//! Edit Widgets' placed lists: what is on the desktop and in the notification
 //! center, a row each with the widget's name and Remove. A row that arrives while the gallery is
 //! open rises in (`row-in`, `--t-big --e-spring`, when the person's own Add placed it; `rise`,
 //! `--t-move --e-out`, when something else did: design/05 principle 2) and is brought into view

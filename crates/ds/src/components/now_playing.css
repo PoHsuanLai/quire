@@ -1,4 +1,4 @@
-/* Now Playing (design/26-DETAILS.md 5.2.10, wave D2). NowPlayingTrack: the art in a 48 px well at
+/* Now Playing (design/26-DETAILS.md 5.2.10). NowPlayingTrack: the art in a 48 px well at
    `--r-media` beside the title (`--fs-shell-menu` 600) over the `by` line (`--fs-help`,
    `--ink-faint`). A new track cross-fades: the outgoing layer sits over the incoming one and each
    plays its fade once (`a-morph-fade-out`, `a-morph-fade-in`, `--t-quick`). While buffering the

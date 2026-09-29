@@ -4,7 +4,8 @@
 //! size per widget, no size picker), and adds it to the desktop or the notification center, each
 //! at the size the widget takes there ([`WidgetInfo::size_in`]); beside it, what is placed on
 //! each surface, by name, with a way to take it away. An Add that lands says so: its button
-//! settles to a check and the new row rises in and is brought into view (sill Q523). The gallery changes nothing itself: every
+//! settles to a check and the new row rises in and is brought into view. The gallery changes
+//! nothing itself: every
 //! choice is a [`WidgetEdit`] handed to the host, which applies it to the layout it keeps in its
 //! settings ([`crate::widget::apply`]) and passes the new layout back.
 
@@ -30,7 +31,7 @@ pub struct GalleryWords {
     /// The button that adds it to the notification center.
     pub add_center: Text,
     /// What an Add button says, beside its check, while the widget it added settles in
-    /// (sill Q523).
+    ///.
     pub added: Text,
     /// The button that takes a placed widget away.
     pub remove: Text,
@@ -66,7 +67,7 @@ impl Default for GalleryWords {
 /// The registry's widgets (an ancestor's `provide_widget_registry`, else quire's), `layout` as
 /// placed, each choice sent as a `WidgetEdit` to `onedit`. When the layout the host hands back
 /// holds the widget an Add asked for, that button settles to a check and the new row rises in
-/// and is brought into view (sill Q523).
+/// and is brought into view.
 #[component]
 pub fn WidgetGallery(
     layout: WidgetLayout,

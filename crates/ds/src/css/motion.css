@@ -4,11 +4,11 @@
    - `dest` ends on the precomputed `--accent-ring` instead of `color-mix()` (rule 6);
    - `part` is left out: no `Anim` plays it;
    - `chip-flash` is added: the person chip's 1200 ms ring as a keyframe, not a class and timer;
-     so are `menu-out` (bar gaps), `cmdk-rise` (mailo gaps 2), and `pill-up`, `ring-drain`,
-     `fade-in` (C's, which S's `fade` had replaced) and `busy` (mailo gaps 3), `pane-out-l`
-     and `pane-out-r` (sill Q80), the OSD's `osd-in` and `osd-out` (sill Q75), `level-tick`
-     (the level control), the sheet's `sheet-out` (sill Q90), and the screenshot thumbnail's
-     `shot-out` (sill Q181), and the user picture's `picture-accept` (design/25-EMOJI.md
+     so are `menu-out` (bar gaps), `cmdk-rise`, and `pill-up`, `ring-drain`,
+     `fade-in` (C's, which S's `fade` had replaced) and `busy`, `pane-out-l`
+     and `pane-out-r`, the OSD's `osd-in` and `osd-out`, `level-tick`
+     (the level control), the sheet's `sheet-out`, and the screenshot thumbnail's
+     `shot-out`, and the user picture's `picture-accept` (design/25-EMOJI.md
      section 7), below.
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
@@ -33,7 +33,7 @@
 /* 4.2.7 floatup */
 @keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
 
-/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level (mailo gaps 3): each
+/* 4.2.8 gulp, 4.2.9 seal-pop and 4.3.5 bump follow the motion level: each
    departure from rest is the catalogue's value times min(1, (--overshoot - 1) x 25), which is 1
    at Standard (1.04) and Extra (1.14, whose spring curve already overshoots more) and 0 at Calm
    and Reduced (1). So Calm flattens them, as it flattens pop-in's `scale(var(--overshoot))`,
@@ -163,7 +163,7 @@
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 
-/* cmdk-rise (quire's, mailo gaps 2): cmdk-in's scale and lift with no fade, so a command panel is
+/* cmdk-rise (quire's): cmdk-in's scale and lift with no fade, so a command panel is
    opaque on its first frame; only its geometry springs. */
 @keyframes cmdk-rise{ 0%{ transform:scale(.93) translateY(-12px); }
   62%{ transform:scale(var(--overshoot)) translateY(2px); }
@@ -174,32 +174,32 @@
   62%{ opacity:1; transform:scale(var(--overshoot)) translateY(2px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
 
-/* pill-up (quire's, mailo gaps 3): a pill centred by `translateX(-50%)` (a toast, a send pill a
+/* pill-up (quire's): a pill centred by `translateX(-50%)` (a toast, a send pill a
    consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
    `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
    also carries them back down, and keep it. */
 @keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
 
-/* ring-drain (quire's, mailo gaps 3): the undo-send ring's dash drains, linear, over
+/* ring-drain (quire's): the undo-send ring's dash drains, linear, over
    `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
    dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
 @keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 
-/* 4.4.12 fade-in (C's, mailo gaps 3): an ink veil fades to its resting `--veil` (.16), the
+/* 4.4.12 fade-in (C's): an ink veil fades to its resting `--veil` (.16), the
    opacity the veil itself rests at, so nothing snaps when the animation ends. */
 @keyframes fade-in{ from{ opacity:0; } to{ opacity:var(--veil); } }
 
-/* busy (quire's, mailo gaps 3): a busy word's pulse. It never drops below .45, so the word stays
+/* busy (quire's): a busy word's pulse. It never drops below .45, so the word stays
    legible; `breathe` is the sync halo's and fades to nothing. */
 @keyframes busy{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 
-/* pane-out-l, pane-out-r (quire's, sill Q80): a pane switcher's outgoing pane leaves the other
+/* pane-out-l, pane-out-r (quire's): a pane switcher's outgoing pane leaves the other
    way from the one arriving, the mirror of `slide-l` and `slide-r` (26 px and a fade), so the
    two read as one push. */
 @keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 
-/* osd-in and osd-out (quire's, sill Q75): the OSD card's pair, following its anchor through
+/* osd-in and osd-out (quire's): the OSD card's pair, following its anchor through
    `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at
    the top right, so the card drops in from above and lifts back up as it goes; 8px at the bottom
    centre, so it rises in and drops away. In: from `--osd-dy` at a .96 scale and transparent, to
@@ -214,36 +214,36 @@
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
 @keyframes level-tick{ from{ opacity:1; } to{ opacity:0; } }
-/* sheet-out (quire's, sill Q90): a sheet's exit, `peek-in` reversed and quieter: it fades and
+/* sheet-out (quire's): a sheet's exit, `peek-in` reversed and quieter: it fades and
    settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
    accelerate), holding its transparent last frame until the host unmaps the surface. */
 @keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
 
-/* widget-out (quire's, sill G423): a widget's card leaving as the person removes it: it shrinks
+/* widget-out (quire's): a widget's card leaving as the person removes it: it shrinks
    to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
    accelerate), holding its transparent last frame until the host drops the card. Under Reduced
    it only fades (`menu-out`). */
 @keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 
-/* banner-out (quire's, sill Q121, Q122): a notification banner slides out, from the offset a
+/* banner-out (quire's): a notification banner slides out, from the offset a
    swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
    `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
    edge when unset), fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
    frame until the stack drops the row and the rows below heal. */
 @keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 
-/* banner-in (quire's, sill Q121): a notification banner slides in from its entry edge's vector
+/* banner-in (quire's): a notification banner slides in from its entry edge's vector
    (`--banner-dx`, `--banner-dy`; past the surface's right edge when unset) to its place at
    `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first frame. */
 @keyframes banner-in{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 
-/* panel-in and panel-out (quire's, sill Q123): the notification center's edge panel slides in
+/* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
    back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
-/* shot-out (quire's, sill Q181): the screenshot thumbnail slides out to the right, past its own
+/* shot-out (quire's): the screenshot thumbnail slides out to the right, past its own
    width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
    out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
    --e-spring`. */
@@ -276,7 +276,7 @@
    the centred outbox pill's and carries its translateX(-50%). */
 @keyframes nudge-up{ 0%,100%{ transform:none; } 40%{ transform:translateY(-6px); } 70%{ transform:translateY(1px); } }
 
-/* hold (quire's, sill G295): a keyframe that moves nothing. A resting state that follows an
+/* hold (quire's): a keyframe that moves nothing. A resting state that follows an
    animated one (a surface present again after a hide was taken back, a row or a pane at rest)
    plays it at `--t-tap --e-linear`, so the restyle that drops the running animation starts
    another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until

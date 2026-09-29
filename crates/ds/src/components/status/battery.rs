@@ -1,5 +1,5 @@
 //! BatteryGlyph: a battery outline with a continuous fill layer, a bolt and a plug as their own
-//! layers (design/26-DETAILS.md 5.1.3; G8-G10). The fill sweeps from where it is over
+//! layers (design/26-DETAILS.md 5.1.3). The fill sweeps from where it is over
 //! `--t-quick` only when its drawn width changes a step (R2); plugging in grows the bolt in (the
 //! plug when the charger holds it), the fill dimming under the mark; crossing the low threshold
 //! cross-fades the fill to `--battery-low` (R15). No count, no pulse (R12).

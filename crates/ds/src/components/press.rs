@@ -1,5 +1,5 @@
 //! Press: what a Button or IconButton hands its `onclick`: which pointer button activated it,
-//! the modifiers held and where it happened (sill FINDINGS F32, quire gaps Q8 and bar gaps). A
+//! the modifiers held and where it happened. A
 //! tray icon's right-click has to reach the app as a secondary press, its middle click as a
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 

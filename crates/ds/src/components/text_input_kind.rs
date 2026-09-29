@@ -1,5 +1,4 @@
-//! What a `TextInput` holds: a line of text, a secret, a file's name, or several lines
-//! (mailo gaps 4 added `Secret`, `File` and `Multiline`).
+//! What a `TextInput` holds: a line of text, a secret, a file's name, or several lines.
 
 /// How many lines a multiline field shows: its `rows`, and its least height when it grows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

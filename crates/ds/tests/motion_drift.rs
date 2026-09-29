@@ -236,7 +236,7 @@ fn the_settle_table() {
         (Anim::LinkPillIn, MotionLevel::Standard, 204),
         (Anim::BubblePop, MotionLevel::Standard, 204),
         (Anim::PeekFullIn, MotionLevel::Standard, 284),
-        // mailo gaps 3: the four keyframes the catalogue had no motion for.
+        // The four keyframes the catalogue had no motion for.
         (Anim::PillUp, MotionLevel::Standard, 454),
         (Anim::PillUp, MotionLevel::Calm, 334),
         (Anim::PillUp, MotionLevel::Extra, 594),
@@ -244,12 +244,12 @@ fn the_settle_table() {
         (Anim::RingDrain, MotionLevel::Calm, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
-        // sill Q80: the pane switch, both panes at `--t-move`, so one timer settles the pair.
+        // The pane switch, both panes at `--t-move`, so one timer settles the pair.
         (Anim::PaneInR, MotionLevel::Standard, 284),
         (Anim::PaneInL, MotionLevel::Standard, 284),
         (Anim::PaneOutL, MotionLevel::Standard, 284),
         (Anim::PaneOutR, MotionLevel::Standard, 284),
-        // sill Q75: the OSD's entrance at --t-quick, its exit at --t-move (neither token moves
+        // The OSD's entrance at --t-quick, its exit at --t-move (neither token moves
         // with the look's level but under Reduced).
         (Anim::OsdIn, MotionLevel::Standard, 204),
         (Anim::OsdIn, MotionLevel::Extra, 204),
@@ -257,18 +257,18 @@ fn the_settle_table() {
         (Anim::OsdOut, MotionLevel::Calm, 284),
         // The level control's step mark, at --t-tap.
         (Anim::LevelTick, MotionLevel::Standard, 124),
-        // sill Q90: the sheet's exit at --t-move, which only Reduced shortens.
+        // The sheet's exit at --t-move, which only Reduced shortens.
         (Anim::SheetOut, MotionLevel::Standard, 284),
         (Anim::SheetOut, MotionLevel::Calm, 284),
-        // sill Q121, Q122: the banner's exit at --t-move, which only Reduced shortens.
+        // The banner's exit at --t-move, which only Reduced shortens.
         (Anim::BannerOut, MotionLevel::Standard, 284),
         (Anim::BannerOut, MotionLevel::Extra, 284),
         (Anim::BannerIn, MotionLevel::Standard, 284),
         (Anim::BannerIn, MotionLevel::Calm, 284),
-        // sill Q123: the center's edge panel, in and out at --t-move.
+        // The center's edge panel, in and out at --t-move.
         (Anim::PanelIn, MotionLevel::Standard, 284),
         (Anim::PanelOut, MotionLevel::Standard, 284),
-        // sill Q181: the screenshot thumbnail rises in at --t-big and slides out at --t-move.
+        // The screenshot thumbnail rises in at --t-big and slides out at --t-move.
         (Anim::ShotIn, MotionLevel::Standard, 454),
         (Anim::ShotIn, MotionLevel::Calm, 334),
         (Anim::ShotOut, MotionLevel::Standard, 284),
@@ -282,8 +282,7 @@ fn the_settle_table() {
     }
     // Every anim settles to 94 ms under Reduced, except a hold (`DurationToken::kind`):
     // `ChipFlash` times `--t-flash`, which keeps its Standard 1200 ms so the mentioned-person
-    // ring is still visible under Reduced (wave 2's timing tweak; FINDINGS.md "W1 integration"
-    // left this as an open question, resolved here).
+    // ring is still visible under Reduced.
     for anim in Anim::ALL
         .into_iter()
         .filter(|anim| !matches!(anim, Anim::ChipFlash | Anim::RingDrain))
@@ -303,7 +302,7 @@ fn the_settle_table() {
         Duration::from_millis(1234),
         "ChipFlash Reduced (a hold, unaffected by Reduced)"
     );
-    // The send ring is the undo window: a hold too (mailo gaps 3).
+    // The send ring is the undo window: a hold too.
     assert_eq!(
         settle(
             Anim::RingDrain,

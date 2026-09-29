@@ -1,4 +1,4 @@
-//! A roster whose rows leave in batches when the consumer stops listing them (sill Q510): the
+//! A roster whose rows leave in batches when the consumer stops listing them: the
 //! `LeavingList` lifecycle. Every key that drops off the list in one render is one batch: its
 //! rows play the exit together, staggered in list order (capped at 12), and when the last of
 //! them has settled they are dropped at once and the rows below heal by the sum of the heights

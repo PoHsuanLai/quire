@@ -1,4 +1,4 @@
-//! How the arrow keys move through an emoji grid (sill Q291): pure, beside `emoji_grid`.
+//! How the arrow keys move through an emoji grid: pure, beside `emoji_grid`.
 //!
 //! Left and Right walk the cells in reading order, so they wrap from a row's end to the next
 //! row's start and back, as the reference's character viewer does; they stop at the first and

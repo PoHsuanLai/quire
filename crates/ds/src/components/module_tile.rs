@@ -1,5 +1,5 @@
 //! ModuleTile: one control-center module, a glyph disc with its title and status on a tile, and
-//! the chevron that opens the module's detail pane (sill FINDINGS Q78; design/20-SURFACES.md
+//! the chevron that opens the module's detail pane (design/20-SURFACES.md
 //! section 1.5, design/13-BEHAVIOUR-menus-windows.md section 13.3.7).
 //!
 //! The tile is a `div[role=button]` rather than a `button`, because the chevron inside it is a
@@ -26,11 +26,11 @@ use dioxus::prelude::*;
 /// `expanded` is the chevron's `aria-expanded`: whether that pane is showing.
 ///
 /// `glyph` is an `Icon` (it converts) or any [`IconSource`]: `IconSource::Status` puts a layered
-/// status glyph in the disc (the Wi-Fi and Bluetooth modules, sill Q391), which plays its own
+/// status glyph in the disc (the Wi-Fi and Bluetooth modules), which plays its own
 /// moments as the state changes, the Wi-Fi fan filling as it joins. `first` is the glyph's first
 /// frame: `FirstShow::Animate` when the control center was just opened.
 ///
-/// `disc` is how the disc's glyph answers the module coming on (design/26 G14, G23): `Still`
+/// `disc` is how the disc's glyph answers the module coming on (design/26): `Still`
 /// (the default), `Fill` (the glyph's layers fill once, the Wi-Fi fan) or `Morph(icon)` (the
 /// glyph grows into `icon`, the Focus moon into `Icon::MoonFilled`). A press on the tile is kept
 /// for the change it causes, so that change springs and one from elsewhere does not (R5).

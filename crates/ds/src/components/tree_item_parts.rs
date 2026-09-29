@@ -63,7 +63,7 @@ pub(crate) fn leaf_chevron() -> Element {
 /// forgot `Propagation::Stop` still does not toggle the folder. The button hears its press
 /// first (the event starts at the target), then the slot ends it.
 ///
-/// `data-slot="trailing"` is the documented seam a consumer may select on (mailo gaps 7): its
+/// `data-slot="trailing"` is the documented seam a consumer may select on: its
 /// own class inside the hover-revealed slot is styled as `[*|data-slot=trailing] .fold-more`,
 /// which the stylesheet lint's `DsInternals` rule leaves alone, where `.ds-tree-item-trail
 /// .fold-more` reaches into quire's internals.
@@ -78,7 +78,7 @@ pub(crate) fn trailing_slot(element: Element) -> Element {
     }
 }
 
-/// The editing slot (mailo gaps 7): the caller's field (a Bare `TextInput` focused on mount,
+/// The editing slot: the caller's field (a Bare `TextInput` focused on mount,
 /// its text selected) drawn where the label is, taking the label's free space so nothing on the
 /// row moves. A click in it never reaches the summary, so it neither toggles nor selects the
 /// row; the press's own pointer-down still puts the caret in the field (Blitz focuses a text

@@ -38,8 +38,8 @@ impl Handled for PointerData {}
 /// let forged = ds::detail::Contact { proof: () };
 /// ```
 ///
-/// A contact also carries the velocity the hand had when it let go (design/27 section 3.12,
-/// wave H1): zero for a click or a key, the drag's release velocity for a throw
+/// A contact also carries the velocity the hand had when it let go (design/27 section 3.12):
+/// zero for a click or a key, the drag's release velocity for a throw
 /// ([`Contact::with_velocity`]). A spring moved by it starts at that speed
 /// (`ds::motion::SpringSpec::for_touch`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

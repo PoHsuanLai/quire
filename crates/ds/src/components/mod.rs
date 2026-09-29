@@ -426,7 +426,7 @@ pub const CSS: &[(&str, &str)] = &[
     ("widget_frame", include_str!("widget_frame.css")),
     ("window_frame", include_str!("window_frame.css")),
     ("workspace_pills", include_str!("workspace_pills.css")),
-    // Last: the drop states SidebarItem and TreeItem share (mailo gaps 6) must win over either
+    // Last: the drop states SidebarItem and TreeItem share must win over either
     // item's hover and current rules, which have the same specificity.
     ("drop_place", include_str!("drop_place.css")),
 ];

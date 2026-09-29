@@ -1,4 +1,4 @@
-//! The clock rule, held over the design system's sources (sill Q380): ds reads time only through
+//! The clock rule, held over the design system's sources: ds reads time only through
 //! `ds::time` (`now`, `since`, `sleep`), so a harness's virtual clock reaches every timer and
 //! every "now". A direct `Instant::now()` (or `.elapsed()` on an `Instant`, which this scan
 //! cannot tell from a tween's own `elapsed`, so review catches it) or a

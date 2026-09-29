@@ -1,4 +1,4 @@
-/* BannerStack (sill Q121; design/13 section 13.3.6): the banners in a column at the right edge,
+/* BannerStack (design/13 section 13.3.6): the banners in a column at the right edge,
    newest first; at the bottom right the column runs upwards. Each row pads itself by the stack's
    gap (`--notifications-stack-gap`) on the side away from the edge it grows from, so its measured
    height is its whole pitch. A row's card enters with `banner-in` as it mounts (on the inner
@@ -6,8 +6,8 @@
    animation is taken off, so a presence turned `present` early would freeze it mid-slide), and
    the row leaves with `banner-out` (both `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
    the position) with the heal ripple. A row at rest plays `hold`, which moves nothing, so a
-   heal settled or an exit taken back never drops an animation without starting another (sill
-   G295). A card swiped away inside a row holds its offset while the
+   heal settled or an exit taken back never drops an animation without starting another.
+   A card swiped away inside a row holds its offset while the
    row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
    (spike S2).
    The entry edge (`data-entry`, `notifications.banner_entry_direction`) sets the vector

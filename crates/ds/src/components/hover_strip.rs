@@ -55,7 +55,7 @@ pub enum Titles {
 /// `aria-expanded`). A click on a strip button never reaches the row: it does not open it.
 ///
 /// `on_press` hears which button was pressed, synchronously, inside the click and before any
-/// measurement (mailo gaps 4): an archive must never wait on a layout read, and a renderer with
+/// measurement: an archive must never wait on a layout read, and a renderer with
 /// no layout (a server render, a host that cannot measure) never answers one, so the action's
 /// own `onclick` would never come. When the button's rect does resolve, its `onclick` follows,
 /// for the menus it anchors. A strip-level prop rather than a field of [`StripAction`], so

@@ -158,7 +158,7 @@ const CASES: &[Case] = &[
         rule: Rule::UnknownAnimation,
         expect: false,
     },
-    // The `animation` shorthand names its keyframes too (mailo gaps 3).
+    // The `animation` shorthand names its keyframes too.
     Case {
         name: "unknown animation: a made-up name in the shorthand fails",
         css: ".chip { animation: sparkle-explosion var(--t-big) var(--e-spring); }",
@@ -238,7 +238,7 @@ const CASES: &[Case] = &[
         expect: false,
     },
     Case {
-        name: "font-family: the serif face token passes (mailo gaps 3)",
+        name: "font-family: the serif face token passes",
         css: ".serif { font-family: var(--font-serif); }",
         profile: Profile::Strict,
         rule: Rule::FontFamily,
@@ -948,7 +948,7 @@ mod mailo_cases {
 }
 
 /// The person swatches and the status inks are declared tokens: a consumer's own CSS may paint
-/// with them at the strict profile (FINDINGS "mailo gaps", items 4 and 5).
+/// with them at the strict profile.
 #[test]
 fn the_person_swatches_and_status_inks_lint_clean() {
     let css = ".pin { background: var(--c-person-3); color: var(--on-hue); }\

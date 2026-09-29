@@ -1,4 +1,4 @@
-//! Tasks the design system spawns, and how they end (sill FINDINGS Q45).
+//! Tasks the design system spawns, and how they end.
 //!
 //! Every task quire spawns is owned by a scope, and dioxus drops it when that scope drops. A
 //! task spawned for a hook's owner rather than for the component whose handler started it

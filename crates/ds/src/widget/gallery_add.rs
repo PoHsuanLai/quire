@@ -1,5 +1,5 @@
-//! Edit Widgets' Add buttons settle to a check when the widget they added lands (sill Q523;
-//! design/26-DETAILS.md's Success, `SettleStyle::Check`): the label gives way to a check and the
+//! Edit Widgets' Add buttons settle to a check when the widget they added lands
+//! (design/26-DETAILS.md's Success, `SettleStyle::Check`): the label gives way to a check and the
 //! gallery's word for it ("Added"), the check drawn on over `--t-move --e-out` and held
 //! `SettleHold`, then the button is itself again. The check grows in with `morph-in`, on the
 //! spring only when the person's own press added it (design/05 principle 2, design/26 R5).

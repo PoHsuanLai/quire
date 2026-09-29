@@ -1,10 +1,10 @@
 //! The command palette's row rects: the element each line is drawn as, and the selected row's
 //! rect reported to a caller that anchors to it, an actions menu opened on the selected row
-//! (sill FINDINGS Q41).
+//!.
 //!
 //! The read goes through the measurer a frame after layout (spike S9) and is tried again while
 //! the row has no area yet: a palette on a surface that is mapped again reads its first row
-//! before the surface's first layout, and a 0 x 0 rect is never reported (sill FINDINGS Q60).
+//! before the surface's first layout, and a 0 x 0 rect is never reported.
 //! The row is measured again whenever the selection, the element under it, or the results
 //! change; a read still waiting for layout is dropped when a newer one starts.
 
@@ -110,7 +110,7 @@ impl RowRects {
         let reported = self.reported;
         reading.set(Some(spawn_in(self.scope, async move {
             // A row already laid out is reported in the frame it was selected, so a key that
-            // anchors to it at once (Ctrl+K) finds this row, not the last (sill G310); the read
+            // anchors to it at once (Ctrl+K) finds this row, not the last; the read
             // a frame later catches a scroll or new results moving it.
             if let Some(rect) = laid_out_now(&element.0).await {
                 report(reported, rect, on_rect);

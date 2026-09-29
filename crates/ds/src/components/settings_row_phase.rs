@@ -1,5 +1,5 @@
 //! What an operation on a settings row is doing, and where the row shows it (design/26-DETAILS.md
-//! 5.2.2 G16-G18, 5.2.3 G20-G21, 5.2.8 G26): joining a network, connecting a device, switching the
+//! 5.2.2, 5.2.3, 5.2.8): joining a network, connecting a device, switching the
 //! sound output.
 
 use crate::detail::{Detailed, EventStamp, Layers, Moment, PendingSpec, PendingStyle};
@@ -90,7 +90,7 @@ impl RowWork {
 }
 
 /// The disc a row's glyph sits on: none (the bare glyph), the paper disc, or the accent disc of
-/// the item in use (the connected network or device, design/26 G17, G21).
+/// the item in use (the connected network or device, design/26).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum RowDisc {
     /// The bare glyph.

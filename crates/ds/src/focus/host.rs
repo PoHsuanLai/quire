@@ -3,7 +3,7 @@
 //! dioxus-native-dom's `set_focus` borrows its document mutably *when it is called*. A task
 //! woken in the same turn as a dirty scope is polled inside `render_immediate`, while the
 //! mutation writer holds that borrow, so a focus change made from such a task panicked
-//! ("RefCell already borrowed", sill FINDINGS Q43: a palette's field focusing on mount while
+//! ("RefCell already borrowed", a palette's field focusing on mount while
 //! its results re-rendered). Every focus change goes through [`focus_soon`]: the host's
 //! [`HostFocus`] answers [`Focused::Busy`] instead, and with no host the call is guarded
 //! (`crate::guarded`) so the collision is `Busy` too; the change is tried again once that render
@@ -147,7 +147,7 @@ async fn write(
 
 /// Try a host write until the document is free, for up to `BUSY_ATTEMPTS` tries: the first few
 /// as soon as the render that holds it ends, so the write lands in the frame it was asked in
-/// (`crate::busy`, sill G312), the rest a frame apart.
+/// (`crate::busy`), the rest a frame apart.
 pub(crate) async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
     for attempt in 0..BUSY_ATTEMPTS {
         match write() {

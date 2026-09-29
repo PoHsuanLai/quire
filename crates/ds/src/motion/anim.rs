@@ -2,31 +2,31 @@
 //!
 //! 79 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
-//! heavy duration (freeze amendment from wave 1, so `settle()` never drops a node before its
-//! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring (wave 1
-//! integration amendment), plus four assignment rows that play a catalogue keyframe at another
-//! recipe (wave 2 integration amendment, section 5 rows 7, 26, 37 and 64): `PaletteFade`,
+//! heavy duration (so `settle()` never drops a node before its
+//! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring, plus four
+//! assignment rows that play a catalogue keyframe at another
+//! recipe (section 5 rows 7, 26, 37 and 64): `PaletteFade`,
 //! `LinkPillIn`, `BubblePop` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
 //! closed by Escape or an outside click (bar gaps), plus `CmdkRise`, `cmdk-in` without its fade,
-//! for a command panel that must be opaque on its first frame (mailo gaps 2), plus four for
-//! states the catalogue has no motion for (mailo gaps 3): `PillUp` (a centred pill's entrance),
+//! for a command panel that must be opaque on its first frame, plus four for
+//! states the catalogue has no motion for: `PillUp` (a centred pill's entrance),
 //! `RingDrain` (the send ring's countdown), `FadeIn` (C's veil, to `--veil`, where S's `fade`
 //! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing), plus four for the
-//! control center's pane switch (sill Q80): `PaneInR` and `PaneInL` play `slide-r` and
+//! control center's pane switch: `PaneInR` and `PaneInL` play `slide-r` and
 //! `slide-l` at `--t-move` (design/13 section 13.3.7) where the catalogue's rows are `--t-big`,
-//! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair (sill FINDINGS Q75):
+//! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair:
 //! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
-//! step, plus `SheetOut`, the sheet's exit (sill FINDINGS Q90), plus `BannerOut`, a
-//! notification banner's slide out by its entry edge (sill Q121, Q122), and `BannerIn`, its
-//! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel (sill Q123),
-//! plus `ShotIn` and `ShotOut`, the screenshot thumbnail's pair (sill Q181), plus
+//! step, plus `SheetOut`, the sheet's exit, plus `BannerOut`, a
+//! notification banner's slide out by its entry edge, and `BannerIn`, its
+//! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel,
+//! plus `ShotIn` and `ShotOut`, the screenshot thumbnail's pair, plus
 //! `PictureAccept`, the user picture's accept beat on unlock (design/25-EMOJI.md section 7), plus the small-state details' eight (design/26-DETAILS.md
 //! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`, `RollIn`, `RollOut`,
 //! `SealOut` and `NudgeUp`, plus `Hold`, a keyframe that moves nothing, which a resting state
-//! plays so the restyle that drops a running animation starts another (sill G295), plus
-//! `PaneInROut`, the preview pane's entrance nobody touched (design/26 R5, sill Q370), plus
-//! `MorphInSpring`, `morph-in` on the glyph the person pressed (design/26 R5, D2: play/pause, a
-//! Focus disc), plus `WidgetOut`, a widget's card leaving when the person removes it (sill G423).
+//! plays so the restyle that drops a running animation starts another, plus
+//! `PaneInROut`, the preview pane's entrance nobody touched (design/26 R5), plus
+//! `MorphInSpring`, `morph-in` on the glyph the person pressed (design/26 R5, play/pause, a
+//! Focus disc), plus `WidgetOut`, a widget's card leaving when the person removes it.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -55,7 +55,7 @@ pub enum Anim {
     /// `chip-in`: a person chip.
     ChipIn,
     /// `chip-flash`: a mentioned person chip's ring, held for `--t-flash` (design/04-COMPONENTS.md
-    /// section 10, design/06-INTERACTIONS.md section 2.5; wave 1 amendment).
+    /// section 10, design/06-INTERACTIONS.md section 2.5).
     ChipFlash,
     /// `fold`: archive.
     Fold,
@@ -93,7 +93,7 @@ pub enum Anim {
     /// `cmdk-in`: C's command menu.
     CmdkIn,
     /// `cmdk-rise`: `cmdk-in`'s scale and lift with no fade, so the panel is opaque from its
-    /// first frame (mailo gaps 2: a command panel is never drawn invisible).
+    /// first frame (a command panel is never drawn invisible).
     CmdkRise,
     /// `peek-in`: peek and the command menu.
     PeekIn,
@@ -136,62 +136,62 @@ pub enum Anim {
     /// `spin`: the busy sync halo, looping.
     Spin,
     /// `pill-up`: a pill centred by `translateX(-50%)` (a consumer's toast, a send pill of its
-    /// own) springs up from below (mailo gaps 3).
+    /// own) springs up from below.
     PillUp,
     /// `ring-drain`: a countdown ring's `stroke-dashoffset` drains over the send's grace
-    /// period, linear (on Blitz the SendPill writes the offset as an attribute) (mailo gaps 3).
+    /// period, linear (on Blitz the SendPill writes the offset as an attribute).
     RingDrain,
-    /// `fade-in`: an ink veil fades in to `--veil` rather than to 1 (C:1055; mailo gaps 3).
+    /// `fade-in`: an ink veil fades in to `--veil` rather than to 1 (C:1055).
     FadeIn,
-    /// `busy`: a busy word pulses, never below .45, looping (mailo gaps 3).
+    /// `busy`: a busy word pulses, never below .45, looping.
     Busy,
-    /// `slide-r` at `--t-move --e-spring`: a detail pane arriving from the right (sill Q80).
+    /// `slide-r` at `--t-move --e-spring`: a detail pane arriving from the right.
     PaneInR,
-    /// `slide-l` at `--t-move --e-spring`: the root pane coming back from the left (sill Q80).
+    /// `slide-l` at `--t-move --e-spring`: the root pane coming back from the left.
     PaneInL,
-    /// `pane-out-l`: the root pane leaving to the left as its detail arrives (sill Q80).
+    /// `pane-out-l`: the root pane leaving to the left as its detail arrives.
     PaneOutL,
-    /// `pane-out-r`: a detail pane leaving to the right as the root comes back (sill Q80).
+    /// `pane-out-r`: a detail pane leaving to the right as the root comes back.
     PaneOutR,
     /// `osd-in`: the OSD card comes in from `--osd-dy` (8 px above it at the top right, below
     /// it at the bottom centre) and fades in, from a .96 scale, over `--t-quick --e-out`:
     /// `pop-in`'s entrance without its overshoot, since a level shown under a key press must not
-    /// bounce (design/20 section 1.7; sill FINDINGS Q75).
+    /// bounce (design/20 section 1.7).
     OsdIn,
     /// `osd-out`: the OSD card fades out and moves half of `--osd-dy` back the way it came (a
     /// lift at the top right, a drop at the bottom centre) over `--t-move --e-exit`, the exit
-    /// design/05 section 10 gives shell chrome, once its hold ends (sill FINDINGS Q75).
+    /// design/05 section 10 gives shell chrome, once its hold ends.
     OsdOut,
     /// `level-tick`: the level control's fill edge marks a step crossed, once, at `--t-tap`
     /// (`Tick::Quiet`; the sound is the shell's).
     LevelTick,
     /// `sheet-out`: a sheet leaving fades and settles 8 px back down, from a .98 scale's worth
     /// of shrink, over `--t-move --e-exit` (design/05 section 10: exits accelerate), the way it
-    /// came in by `peek-in` reversed and quieter (sill FINDINGS Q90).
+    /// came in by `peek-in` reversed and quieter.
     SheetOut,
     /// `banner-out`: a notification banner slides out by its stack's entry edge (to the right
     /// by default, `--banner-dx`/`--banner-dy`) from wherever a swipe left it (`--swipe-dx`)
     /// and fades, over `--t-move --e-exit`, the exit design/05 section 10
-    /// gives shell chrome; the rows below it then heal (sill Q121, Q122).
+    /// gives shell chrome; the rows below it then heal.
     BannerOut,
     /// `banner-in`: a notification banner slides in from its stack's entry edge (past the right
     /// edge by default, or from below; `--banner-dx`/`--banner-dy`) to its place,
-    /// over `--t-move --e-spring` (sill Q121; design/13 section 13.3.6's entrance, at the
+    /// over `--t-move --e-spring` (design/13 section 13.3.6's entrance, at the
     /// stack's `--t-move` so a banner that arrives as another leaves moves with it).
     BannerIn,
     /// `panel-in`: an edge panel (the notification center) slides in from past the right edge
     /// over `--t-move --e-out`: a large surface decelerates in, since a spring's overshoot would
-    /// pull it off the edge it is anchored to (sill Q123).
+    /// pull it off the edge it is anchored to.
     PanelIn,
     /// `panel-out`: the edge panel slides back out past the edge over `--t-move --e-exit`,
-    /// holding its last frame until the host unmaps it at `settle(PanelOut)` (sill Q123).
+    /// holding its last frame until the host unmaps it at `settle(PanelOut)`.
     PanelOut,
     /// `rise` at `--t-big --e-spring`: the screenshot thumbnail arrives as a surface, at the
-    /// toast's spring rather than a row's `--t-move --e-out` (design/20 section 1.13; sill Q181).
+    /// toast's spring rather than a row's `--t-move --e-out` (design/20 section 1.13).
     ShotIn,
     /// `shot-out`: the screenshot thumbnail slides out to the right past its own width and
     /// fades, over `--t-move --e-exit`, holding its last frame until the host unmaps it at
-    /// `settle(ShotOut)` (design/20 section 1.13: "slide-r out"; sill Q181).
+    /// `settle(ShotOut)` (design/20 section 1.13: "slide-r out").
     ShotOut,
     /// `picture-accept`: the user's picture, whatever its kind, lifts once and lands at
     /// `--t-big --e-spring` when the password was right (the answer to the user's own contact, so
@@ -217,17 +217,17 @@ pub enum Anim {
     /// surface present after its entrance, a hide taken back, a row at rest) plays it, so the
     /// restyle that drops the running animation always starts another one. Blitz at the pinned
     /// rev keeps a cancelled animation's last value on the element until something restyles it
-    /// again, and a new animation is that restyle (sill G295).
+    /// again, and a new animation is that restyle.
     Hold,
     /// `slide-r` at `--t-move --e-out`: a preview pane shown by something other than the
-    /// person's contact (design/26 R5; sill Q370), where `PaneInR` springs.
+    /// person's contact (design/26 R5), where `PaneInR` springs.
     PaneInROut,
     /// `morph-in` at `--t-quick --e-spring`: the incoming glyph of a DownUp or OffUp morph the
-    /// person's own press caused (design/26 R5, D2: play/pause, the Focus disc); `MorphIn` is the
+    /// person's own press caused (design/26 R5, play/pause, the Focus disc); `MorphIn` is the
     /// same growth at `--e-out` for a change from elsewhere.
     MorphInSpring,
     /// `widget-out` at `--t-move --e-exit`, forwards: a widget's card shrinking and fading as
-    /// the person removes it from the desktop (sill G423), held gone until the host drops it at
+    /// the person removes it from the desktop, held gone until the host drops it at
     /// `settle(WidgetOut)`.
     WidgetOut,
 }

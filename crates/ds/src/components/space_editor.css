@@ -64,7 +64,7 @@
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
 
-/* mailo gaps 2. The title as a name field (`on_rename`): the inline TextInput takes the title's
+/* The title as a name field (`on_rename`): the inline TextInput takes the title's
    display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
    scheme's rows under a heading in the data face, upper case, as the field headers are. */
 .ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
@@ -72,7 +72,7 @@
 .ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
 .ds-checks-heading{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; color:var(--ink-faint); }
 
-/* mailo gaps 3. A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
+/* A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
    `data-stops` counting them) and are painted here, never inline: the same 135deg gradient
    `space::gradient` writes for the frame, flat for one stop, 0/100 % for two, 0/50/100 % for
    three. A handle and a stop disc are one picked colour. */

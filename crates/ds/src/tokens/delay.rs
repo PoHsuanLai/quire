@@ -38,7 +38,7 @@ pub enum DelayToken {
     /// 1200 ms: a mentioned person chip's flash (proposed).
     FlashHold,
     /// 120 ms: a horizontal scroll over a notification has ended once no delta has come for this
-    /// long, and the swipe decides (proposed, sill Q122). Blitz forwards no scroll phase, so the
+    /// long, and the swipe decides (proposed). Blitz forwards no scroll phase, so the
     /// end of a touchpad gesture is a quiet spell, not an event.
     SwipeQuiet,
     /// 300 ms: an `EditSurface` checks the paragraphs that changed once the typing has paused

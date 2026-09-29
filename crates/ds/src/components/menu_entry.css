@@ -9,7 +9,7 @@
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
 .ds-menu-tile[*|data-tile=none]{ border:0; background:transparent; }
-/* An app's icon is its own plate (sill FINDINGS Q42): no border or ground under it, and it fills
+/* An app's icon is its own plate: no border or ground under it, and it fills
    the tile whatever size its caller resolved it at. */
 .ds-menu-tile[*|data-tile=image]{ border:0; background:transparent; }
 .ds-menu-tile[*|data-tile=image] > .ds-ext-icon{ width:100%; height:100%; }
@@ -63,7 +63,7 @@
 .ds-menu-info-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); }
 .ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
 
-/* A row's trailing action (mailo gaps 2): a fourth column holding a Strip icon button (26 round,
+/* A row's trailing action: a fourth column holding a Strip icon button (26 round,
    `--ink-soft`, the accent-soft hover), at 22 in the shell's text menus so the row keeps its
    height. The button hears its own click; the row neither picks nor takes the selection. */
 .ds-menu-item[*|data-trailing=action]{ grid-template-columns:34px 1fr auto auto; }
@@ -74,7 +74,7 @@
 .ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
 .ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
 
-/* Shaped rows (sill Q290, `RowShape`): a file's thumbnail fills its tile with no plate; a
+/* Shaped rows (`RowShape`): a file's thumbnail fills its tile with no plate; a
    clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4) since Blitz has
    no line clamp; a clipboard picture sits under its title at its own aspect; the time leads the
    trail. */
@@ -83,8 +83,8 @@
 .ds-menu-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
   max-height:calc(var(--lines) * 1.35em); }
 .ds-menu-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
-/* Each part of a shaped trail is its own box, the time's gap before the shortcut included (sill
-   Q343): Blitz lays a plain inline span's horizontal margin out as nothing. */
+/* Each part of a shaped trail is its own box, the time's gap before the shortcut included:
+   Blitz lays a plain inline span's horizontal margin out as nothing. */
 .ds-menu-when, .ds-menu-keys{ display:inline-block; }
 .ds-menu-when{ margin-right:var(--s-6); }
 /* A row's chord (launcher chords, `RowChord`): after the trail's data in the secondary ink, at

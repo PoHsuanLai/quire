@@ -1,4 +1,4 @@
-//! The mailo gaps 5 states, as data: the golden each renders to and how to make it.
+//! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
 use ds::components::vocab::{DropState, Here, PulseKey};

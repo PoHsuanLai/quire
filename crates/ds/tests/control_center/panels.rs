@@ -1,4 +1,4 @@
-//! The control center parts 2 specimens (sill FINDINGS Q100-Q102): a `ModulePanel` holding a
+//! The control center parts 2 specimens: a `ModulePanel` holding a
 //! level in each scheme, a bare one, a three-column `ModuleGrid`, and the compact picker.
 
 use dioxus::prelude::*;

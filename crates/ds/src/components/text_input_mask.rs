@@ -1,6 +1,6 @@
-//! A masked field's own caret and selection over its dots (sill Q360b).
+//! A masked field's own caret and selection over its dots.
 //!
-//! Blitz's text editor ignores `font-family` and `letter-spacing` (FINDINGS Q360), so the hidden
+//! Blitz's text editor ignores `font-family` and `letter-spacing`, so the hidden
 //! text of a `Password` or `Secret` field is measured in another face than its Inter dots tracked
 //! .1em, and Blitz's caret drifted off the last dot as the text grew (two dots short at eleven).
 //! Where the host reads the field's selection ([`HostSelection`], ds-native), the field hides

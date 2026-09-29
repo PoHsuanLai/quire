@@ -20,7 +20,7 @@ pub enum Family {
     /// machine-shaped: times, counts, chips, eyebrows, section headers.
     Data,
     /// `--font-serif`: Noto Serif. A message a person writes in a serif, and the control that
-    /// offers it (mailo gaps 3); never the interface's own text.
+    /// offers it; never the interface's own text.
     Serif,
     /// `--font-code`: Space Mono in either typeface. Only where a fixed pitch carries meaning:
     /// code, `Kbd`, aligned logs.
@@ -144,11 +144,11 @@ pub enum FontSize {
     Day,
     /// `--fs-display` 26: composer subject.
     Display,
-    /// `--fs-emoji-cell` 30: an emoji in an emoji grid's 56 px cell (sill Q291).
+    /// `--fs-emoji-cell` 30: an emoji in an emoji grid's 56 px cell.
     EmojiCell,
     /// `--fs-widget-hero` 47: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
     WidgetHero,
-    /// `--fs-emoji-preview` 96: one emoji in a preview pane (sill Q292).
+    /// `--fs-emoji-preview` 96: one emoji in a preview pane.
     EmojiPreview,
     /// `--fs-lock-clock` 140: the lock screen's time, the largest type the shell draws
     /// (design/20-SURFACES.md section 1.9; design/04-COMPONENTS.md section 42).

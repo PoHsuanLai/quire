@@ -73,7 +73,7 @@ fn custom_refuses_a_reserved_combination_in_any_order_or_case() {
     }
 }
 
-/// sill's launcher row chords (Q298) are standard: Quick Look, Reveal and Copy.
+/// sill's launcher row chords are standard: Quick Look, Reveal and Copy.
 #[test]
 fn the_launcher_row_chords_are_standard() {
     let cases = [

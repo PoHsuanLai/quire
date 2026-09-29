@@ -2,7 +2,7 @@
    bottom centre that springs up on `data-shown`, a draining ring, and Undo while counting. The
    ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
    Undo hover is not specified. The Undo rule names the pill, as S's `.sendpill button` does.
-   C's outbox states (mailo gaps 2): a failed mood plays `nudge` or `shake` once through the
+   C's outbox states: a failed mood plays `nudge` or `shake` once through the
    pulse classes (`a-nudge`, `a-shake`, the motion sheet's), both keyframes baking in the
    pill's `translateX(-50%)`; `data-mood=fatal` turns the pill `--danger` with its ink. A
    spinning ring (`data-ring=spin`) turns the whole ring at the Spinner's `spin` (the arc is an

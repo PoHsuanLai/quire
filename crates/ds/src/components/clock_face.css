@@ -1,4 +1,4 @@
-/* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"; sill FINDINGS Q183).
+/* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"). 
    The analog dial is flat, as the reference measures: 62 across in a row (four fit a medium
    widget), and in a small widget as large as the card less 8 at each side, with the city
    dropped (the reference's small clock has none). The face is `--clock-face-day` or

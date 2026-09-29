@@ -1,5 +1,6 @@
-//! NotificationCard: one notification, as a banner or a row of the notification center (sill
-//! Q120; design/20 section 1.6, design/13 section 13.3.6).
+//! NotificationCard: one notification, as a banner or a row of the notification center (design/20
+//! section 1.6, design/13 section 13.3.6).
+//!
 //!
 //! The card is a plate in its material (Toast by default) inside a scope of that material whose
 //! own box paints nothing (`Surface { chrome: Some(RootChrome::Transparent) }`), so the same card
@@ -16,9 +17,8 @@
 //!
 //! A group (`count`) shows its count in a chip and draws `layers` offset plates behind the card,
 //! each `--notifications-group-offset` lower and a little narrower.
-//!
 //! `swipe: Swipe::Dismiss(on_dismiss)` lets a drag or a horizontal scroll to the right dismiss
-//! the card (sill Q122, `notification_swipe`); the click that ends a drag never opens it.
+//! the card (`notification_swipe`); the click that ends a drag never opens it.
 
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::icon_view::IconView;

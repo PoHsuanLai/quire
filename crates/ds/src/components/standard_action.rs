@@ -31,7 +31,7 @@ pub enum StandardAction {
     Help,
     /// ⌘A: select all.
     SelectAll,
-    /// ⌘C: copy (a launcher row's copy action too, sill Q298).
+    /// ⌘C: copy (a launcher row's copy action too).
     Copy,
     /// ⌘X: cut.
     Cut,
@@ -101,9 +101,9 @@ pub enum StandardAction {
     FullScreen,
     /// ⌥⌘D: show or hide the dock.
     ToggleDock,
-    /// ⌘Y: Quick Look, the preview (sill Q298, Q302).
+    /// ⌘Y: Quick Look, the preview.
     QuickLook,
-    /// ⌘R: reveal the item in Files (Spotlight's; sill Q298).
+    /// ⌘R: reveal the item in Files (Spotlight's).
     Reveal,
     /// ⇧⌘3: a screenshot of the screen.
     ScreenshotScreen,

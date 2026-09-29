@@ -1,5 +1,5 @@
-//! A notification's body, clamped to two lines at rest and six under the pointer (sill Q120;
-//! design/13 section 13.3.6). Blitz has no `-webkit-line-clamp` (the risk table; CONSUMING
+//! A notification's body, clamped to two lines at rest and six under the pointer (design/13 section
+//! 13.3.6). Blitz has no `-webkit-line-clamp` (the risk table; CONSUMING
 //! section 8), so the clamp is a `max-height` of whole lines (`calc(2 * 1.35em)`, `6 *` on
 //! hover) with a `--t-move --e-out` transition, and the fade that marks cut text is decided in
 //! Rust: the body measures its text and one line once laid out, counts its lines, and writes

@@ -38,7 +38,7 @@
 
 /* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
    rest timer (wall clock) that turns a row present never drops a running animation without
-   starting another; Blitz at the pinned rev keeps a dropped animation's last value (sill G295). */
+   starting another; Blitz at the pinned rev keeps a dropped animation's last value. */
 .ds-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
 
 /* Leaving (`S:326-329`, `C:714`). */

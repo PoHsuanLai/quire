@@ -40,7 +40,7 @@ pub enum HoverCardPart {
         /// What it says.
         text: String,
     },
-    /// A flag whose words are runs (mailo gaps 5): the spoof warning sets the brand and the
+    /// A flag whose words are runs: the spoof warning sets the brand and the
     /// domain in the strong tone ("Not **Acme**: sent from **acme-billing.example**"). The
     /// same block as [`HoverCardPart::Flag`], either tone; build it with
     /// [`HoverCardPart::flag`], which takes a `String`, a `&str` or a [`Text`]. A variant of its

@@ -2,7 +2,7 @@
 //! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
 //!
 //! The hold is a task of the root that provides the hub and drops with it; it writes through
-//! `try_set`, so a hold that finds the hub gone stops (sill FINDINGS Q45, `crate::task`).
+//! `try_set`, so a hold that finds the hub gone stops (`crate::task`).
 
 use crate::root::env::Env;
 use crate::task::{Gone, spawn_in, try_get, try_set};

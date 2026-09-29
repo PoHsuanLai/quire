@@ -1,6 +1,6 @@
 //! `Surface` as markup: a nested scope re-stamps the attributes it overrides and inherits the
 //! rest, and the `Env` its children read agrees with what it stamped. One golden per override,
-//! the corner (`radius`, sill FINDINGS Q15) included.
+//! the corner (`radius`) included.
 
 #[path = "support/golden.rs"]
 #[allow(dead_code)] // Only `check` is used here.

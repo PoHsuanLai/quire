@@ -1,5 +1,5 @@
-//! The level control and the OSD card as markup (the user's brief of 2026-09-25; sill FINDINGS
-//! Q74 to Q76): each look, each glyph state, read-only and interactive, and the OSD card shown at
+//! The level control and the OSD card as markup (the user's brief of 2026-09-25):
+//! each look, each glyph state, read-only and interactive, and the OSD card shown at
 //! either anchor and hidden. Each golden is `tests/snapshots/level/<name>.html`, and every `ds-`
 //! class in it must be styled by the stylesheet.
 //!

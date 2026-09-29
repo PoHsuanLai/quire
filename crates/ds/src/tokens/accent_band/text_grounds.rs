@@ -1,7 +1,7 @@
 //! Everything the text accent lies on: the card's grounds, the translucent materials over their
 //! reference backdrops, and the wash laid over either (design/03-COLOR.md section 20.6).
 //!
-//! The card's four grounds alone were not enough (sill Q410, Q411): a menu's match highlight
+//! The card's four grounds alone were not enough: a menu's match highlight
 //! sits on a selected row's wash, and PolkitPrompt's "Details" on a Sheet that is 82 % tint over
 //! whatever lies behind it. Each is measured here as a screen composites it.
 //!
@@ -27,7 +27,7 @@ pub const BACKDROPS: [Hex; 2] = [Hex([0, 0, 0]), Hex([0xFF, 0xFF, 0xFF])];
 ///
 /// The bar, the dock and the OSD draw no accent text. The widget's tint is gated at the
 /// large-text 3:1 (design/23-WIDGETS.md section 4.3) and its accent text is the widget card's
-/// own concern (sill Q412), so it is not here.
+/// own concern, so it is not here.
 pub const TEXT_MATERIALS: [Material; 3] = [Material::Popover, Material::Sheet, Material::Toast];
 
 /// Which text accent a set of grounds is for.

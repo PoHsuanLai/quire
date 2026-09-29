@@ -1,7 +1,7 @@
 /* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
    The glyph is sized by `Glyph` itself; no rule here sizes or strokes an icon (spike S6).
-   Disabled (sill Q93): .35, as a disabled menu item (design/13 section 13.3.3), at the end. */
+   Disabled: .35, as a disabled menu item (design/13 section 13.3.3), at the end. */
 
 .ds-icon-button{ font:inherit; }
 
@@ -59,7 +59,7 @@
   background:transparent; color:var(--f-ink-soft); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
 }
-/* A status glyph (sill Q390) takes the same square as an icon, whether or not the nudge wraps it;
+/* A status glyph takes the same square as an icon, whether or not the nudge wraps it;
    its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
    setting as a single icon does. */
 .ds-icon-button[*|data-variant=status] > .ds-ic,
@@ -75,10 +75,10 @@
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
 
-/* The nudge's wrapper (sill Q390, design/26 G11): the glyph alone lifts once on a new attention
+/* The nudge's wrapper (design/26): the glyph alone lifts once on a new attention
    cue, the pill stays; the keyframe is the motion sheet's `nudge-up`. */
 .ds-icon-nudge{ display:inline-grid; place-items:center; }
 
-/* Disabled (sill Q93): .35, the default cursor, and no pointer, so no hover or press matches;
+/* Disabled: .35, the default cursor, and no pointer, so no hover or press matches;
    `disabled` and the dropped handlers keep a press from firing. */
 .ds-icon-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
