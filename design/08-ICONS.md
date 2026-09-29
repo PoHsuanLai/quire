@@ -330,7 +330,7 @@ For the bar, tray and any place that shows the app in one colour:
 
 ### 2.8 The language: abstract, paper and ink (proposed, round two, 2026-09-24)
 
-Round one (docs/icons-bakeoff.md) produced 3D clay objects in front of a plate. The user's
+Round one produced 3D clay objects in front of a plate. The user's
 verdict: "too realistic, I want it to be more abstract, and try to make it speak our design
 language." What the language says, applied to an app icon:
 
@@ -347,7 +347,7 @@ Cut-outs may carry a lift: Post `--shadow-1`'s drop (`0 1px 2px`) read in the gr
 dock size, 0.5 unit down and 1 unit soft, ink at alpha .16 (alpha proposed). The plate itself
 keeps 2.3-2.5 unchanged (gradient, highlight, rim, baked shadow).
 
-Two routes produce icons in this language; the user picks (docs/icons-bakeoff.md, round two):
+Two routes produce icons in this language; the user picks (round two):
 
 - **Procedural** (the `icons` crate in `tools/icons`): an icon is a TOML spec in `tools/icons/specs/`: the
   family, the grain and a list of layers from a five-shape vocabulary: `rect` (per-corner radii),
@@ -483,11 +483,9 @@ Settled route: LOCAL FIRST (PLAN "Icons", "Route").
 
 - ComfyUI in its own uv venv (`uv init`, `uv add`, `uv run`; never system pip), on the RTX
   5070 Ti (16 GB).
-- Run through `limit4g` like every heavy tool (PLAN "Memory and build enforcement" item 5).
-  Proposed: the ComfyUI server itself gets a separate `limit16g` cgroup, because model
-  weights exceed 4 GB of host RAM while loading; open decision 4.
-- Driven from the orchestrating session through ComfyUI's HTTP API by a small Python client
-  in `~/quire/tools/icongen/` (uv project, proposed path), so every run is a script.
+- The ComfyUI server runs under `limit16g`, because model weights exceed 4 GB of host RAM while
+  loading.
+- Driven through ComfyUI's HTTP API by a small Python client, so every run is a script.
 
 ### 3.2 Models (settled candidates)
 
@@ -502,8 +500,7 @@ Settled route: LOCAL FIRST (PLAN "Icons", "Route").
 Written once, used verbatim for every icon; only `{subject}` and `{palette}` change.
 Never say "iOS", "macOS", "Apple", "app icon" or "icon" in the prompt (settled).
 
-Round one's brief (a 3D clay object under studio light, `tools/icongen/icongen/brief.py`
-`BRIEF`, style `3d`) is kept only to reproduce round one. The brief below replaces it (2.8).
+Round one's brief was a 3D clay object under studio light. The brief below replaces it (2.8).
 
 Positive prompt (proposed, `FLAT_BRIEF`, style `flat`):
 
@@ -545,8 +542,7 @@ FLUX.2 Klein (distilled, cfg 1) takes no negative prompt; it applies to Qwen-Ima
 
 Fixed parameters per model are recorded in the recipe (3.8), not in prose.
 
-Round three (2.9; `tools/icongen/icongen/brief.py` `EMBOSS_*`, styles `emboss` and
-`emboss-tile`):
+Round three (2.9):
 
 ```
 A single abstract geometric symbol: {subject}. The symbol is crafted into the surface, not drawn
@@ -734,7 +730,7 @@ A third-party tile passes 1 and 3 (plate vs its icon's mean edge colour) only.
    `io.github.<user>.*`.
 2. Do our app icons get a dark variant (dimmer plate, like macOS 26 tinted/dark icons)? Proposed: no.
 3. SPEC "App integration" requires an SVG icon; we propose PNG set + optional vtracer SVG.
-4. ComfyUI memory cap: 4 GB `limit4g` cannot load the weights; proposed a separate 16 GB cap.
+4. ComfyUI memory cap: settled, `limit16g`.
 5. LoRA trainer (candidates: ostris ai-toolkit, kohya musubi-tuner); pick after the bake-off
    picks the base model.
 6. Superellipse exponent n = 5 and plate 824/1024: confirm by gallery comparison.
