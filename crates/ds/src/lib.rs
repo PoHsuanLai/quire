@@ -57,8 +57,6 @@ pub use focus::{
     HostPlaceCaret, HostPressFocus, HostSelect, HostSelection, InitialCaret, Select, caret_at,
     focus_by_selector, focus_soon, focus_soon_selecting, use_field_handle, use_focus_request,
 };
-#[cfg(feature = "webview-fonts")]
-pub use fonts::font_face_css;
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
 pub use geometry::{
     Align, Anchor, Flip, Grid, HostMeasure, HostReveal, Measured, MountedRef, Placed, Placement,

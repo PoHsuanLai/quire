@@ -27,9 +27,6 @@ dioxus-ssr = { workspace = true }
 [features]
 # The stylesheet linter; downstream crates enable it in their tests.
 lint = ["dep:cssparser"]
-# `@font-face` rules with the faces as base64 `data:` URIs (`fonts::font_face_css`), for a
-# consumer still on the webview. Blitz consumers register `fonts::FACES` instead.
-webview-fonts = []
 
 # root_ssr's frame-layer case lints an SSR render, so it needs the linter too.
 [[test]]

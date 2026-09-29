@@ -48,7 +48,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `css/motion_css.rs`, `css/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `css/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
 | `css/reset.css`, `utilities.css`, `stylesheet.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
-| `fonts.rs`, `build.rs` | 02-TYPE §2 (faces as bytes; `webview-fonts` keeps the base64 path) |
+| `fonts.rs`, `build.rs` | 02-TYPE §2 (faces as bytes) |
 
 ## `ds`: motion, geometry, overlays, root
 
