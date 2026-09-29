@@ -3,8 +3,8 @@
 //!
 //! - [`RootChrome`]: whether the root box paints its material (tint, edge, shadow) at all. A
 //!   root that only hosts overlays (a shell popup holding a menu) is a zero-height, full-width
-//!   box; painting the material there drew a shadow band across the popup.
-//! The card paints itself instead.
+//!   box; painting the material there drew a shadow band across the popup. The card paints
+//!   itself instead.
 //! - [`FrameTint`]: whether the root draws the Space gradient, and how: opaque with its grain
 //!   on a window, at the material's tint alpha on shell chrome (design/21-SPACES.md sections 3
 //!   and 5).
