@@ -1,13 +1,14 @@
 //! The root's device scale as markup (design/01-LAYOUT.md section 2.1): a `Ds` with a
 //! fractional `scale` writes every pixel token's input inline, one given through the host's
-//! `HostScale` does the same, a nested `Surface` writes nothing of its own (it inherits the
+//! the host's `HostSignals` scale does the same, a nested `Surface` writes nothing of its own (it inherits the
 //! root's inputs), a root at 1x or with no scale writes nothing, and a `Glyph` under a 1.25 root
 //! snaps its stroke.
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Glyph, HostScale, Icon, IconSize, Inject, Material, PixelToken, Scale, Surface,
+    Activity, Appearance, Ds, Glyph, HostSignals, Icon, IconSize, Inject, InputModality, Material,
+    PixelToken, Scale, Surface,
 };
 
 #[derive(Props, Clone, PartialEq)]
@@ -19,7 +20,11 @@ struct Setup {
 #[allow(non_snake_case)]
 fn Root(setup: Setup) -> Element {
     if let Some(scale) = setup.host {
-        use_context_provider(|| HostScale(Signal::new(scale)));
+        use_context_provider(|| HostSignals {
+            modality: Signal::new(InputModality::default()),
+            scale: Signal::new(scale),
+            activity: Signal::new(Activity::Active),
+        });
     }
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, stylesheet: Inject::Host,

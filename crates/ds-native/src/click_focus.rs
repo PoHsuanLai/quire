@@ -1,7 +1,7 @@
 //! A click on nothing focusable, on Blitz (Native focus): the nearest focusable ancestor keeps
 //! or takes the keyboard, as in a browser, where Blitz would clear it (`handle_click`'s "nothing
-//! matched"). `ds::Ds`'s root hands every click nothing inside took to [`CLICK_FOCUS`], after
-//! the app's handlers and before Blitz's default action.
+//! matched"). `ds::Ds`'s root hands every click nothing inside took to the host's
+//! `ds::ClickFocusHost`, after the app's handlers and before Blitz's default action.
 //!
 //! The default is never prevented: it also dispatches `dblclick` and the `blur` of a field the
 //! click leaves. So when the ancestor already has the focus, it is cleared here without events
@@ -14,16 +14,16 @@
 //! runs.
 //!
 //! A click a quire control keeps to itself never reaches the root, and quire's control hands it
-//! over itself (`ds::focus::click::kept_click`): through [`CLICK_FOCUS`] when the click's default
-//! still runs, and through [`PRESS_FOCUS`] when the control prevented it. Blitz then leaves the
-//! focus where it was, so `PRESS_FOCUS` moves it at once to the nearest focusable element from
+//! over itself (`ds::focus::click::kept_click`): through `ClickFocusHost::fallback` when the click's
+//! default still runs, and through `ClickFocusHost::press` when the control prevented it. Blitz
+//! then leaves the focus where it was, so `press` moves it at once to the nearest focusable element from
 //! the pressed one up, unless a field has the keyboard (no `blur` could tell it so).
 
 use crate::focus_chain::{Candidates, ChainNode, Target};
 use crate::node_ref::{NodeRef, Written};
 use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
-use ds::{Fallback, Focused, HostClickFocus, HostPressFocus};
+use ds::{Fallback, Focused};
 use std::rc::Rc;
 
 /// Where the keyboard goes after a click on nothing focusable, for a window or a harness.
@@ -37,17 +37,9 @@ pub enum FocusFallback {
     BlitzDefault,
 }
 
-/// ds-native's click-focus seam, provided under [`FocusFallback::Ancestor`].
-pub const CLICK_FOCUS: HostClickFocus = HostClickFocus { fallback, restore };
-
-/// ds-native's press-focus seam, provided beside [`CLICK_FOCUS`] under
-/// [`FocusFallback::Ancestor`]: a click a quire control kept with its default prevented gives
-/// the pressed control the keyboard.
-pub const PRESS_FOCUS: HostPressFocus = HostPressFocus(take);
-
 /// Give the element pressed at the document's hover node (or its nearest focusable ancestor)
 /// the keyboard now, read and written through `root`.
-fn take(root: &MountedData) -> Focused {
+pub(crate) fn take(root: &MountedData) -> Focused {
     let Some(root) = NodeRef::of(root) else {
         return Focused::Unknown;
     };
@@ -103,7 +95,7 @@ fn disabled(node: &Node) -> bool {
 }
 
 /// What a click at the document's hover node will do to the focus, read through `root`.
-fn fallback(root: &MountedData) -> Fallback {
+pub(crate) fn fallback(root: &MountedData) -> Fallback {
     let Some(root) = NodeRef::of(root) else {
         return Fallback::Renderer;
     };
@@ -126,7 +118,7 @@ fn fallback(root: &MountedData) -> Fallback {
 /// Focus the first candidate still in the document if the focus is nowhere: a handler that
 /// moved it during the click wins, and one that removed the ancestor sends it further up.
 /// Liveness is read now, as the focus is written, not when the click asked.
-fn restore(target: &MountedData) -> Focused {
+pub(crate) fn restore(target: &MountedData) -> Focused {
     let Some(target) = Target::of(target) else {
         return Focused::Unknown;
     };

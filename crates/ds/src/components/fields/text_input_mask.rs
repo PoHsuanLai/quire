@@ -3,7 +3,7 @@
 //! Blitz's text editor ignores `font-family` and `letter-spacing`, so the hidden
 //! text of a `Password` or `Secret` field is measured in another face than its Inter dots tracked
 //! .1em, and Blitz's caret drifted off the last dot as the text grew (two dots short at eleven).
-//! Where the host reads the field's selection ([`HostSelection`], ds-native), the field hides
+//! Where the host reads the field's selection ([`CaretHost::selection`](crate::CaretHost::selection), ds-native), the field hides
 //! Blitz's caret (`caret-color: transparent`) and the mask draws its own: a 1.5 px bar the height
 //! of the line, as Blitz's is, placed between the dots at the caret's character. A selected
 //! range is a highlight over its dots and shows no caret. Without the host the renderer's
@@ -12,8 +12,8 @@
 use crate::components::fields::text_input_kind::MASK_DOT;
 use crate::core::task::{spawn_in, try_set_if_changed};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::focus::caret::HostSelection;
 use crate::host::caret::FieldSelection;
+use crate::host::document::DocumentHost;
 use dioxus::core::ScopeId;
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -97,7 +97,8 @@ impl MaskParts {
 pub(crate) struct MaskCaret {
     selection: Signal<FieldSelection>,
     element: CopyValue<Option<Rc<MountedData>>>,
-    host: Option<HostSelection>,
+    /// The document's host, when one was provided: it reads the selection.
+    host: CopyValue<Option<Rc<dyn DocumentHost>>>,
     owner: ScopeId,
 }
 
@@ -107,14 +108,14 @@ impl MaskCaret {
         MaskCaret {
             selection: use_signal(|| FieldSelection::Unfocused),
             element: use_hook(|| CopyValue::new(None)),
-            host: use_hook(try_consume_context::<HostSelection>),
+            host: use_hook(|| CopyValue::new(try_consume_context::<Rc<dyn DocumentHost>>())),
             owner: use_hook(dioxus::core::current_scope_id),
         }
     }
 
     /// Who draws the caret of a field with `count` masked characters.
     pub(crate) fn owner(&self, count: usize) -> CaretOwner {
-        match (self.host, count) {
+        match (self.host.peek().as_ref(), count) {
             (Some(_), 1..) => CaretOwner::Mask,
             (None, _) | (_, 0) => CaretOwner::Renderer,
         }
@@ -134,14 +135,14 @@ impl MaskCaret {
     /// Read the selection again once the event that may have moved it is done: Blitz moves the
     /// caret after the handlers ran, and a task runs after that.
     pub(crate) fn refresh(&self) {
-        let (Some(HostSelection(read)), Some(element)) = (self.host, self.element.peek().clone())
+        let (Some(host), Some(element)) = (self.host.peek().clone(), self.element.peek().clone())
         else {
             return;
         };
         let selection = self.selection;
         spawn_in(self.owner, async move {
             for _ in 0..READ_ATTEMPTS {
-                match read(&element) {
+                match host.caret().selection(&element) {
                     FieldSelection::Unknown => sleep(FRAME_SLACK).await,
                     seen => {
                         let _ = try_set_if_changed(selection, seen);

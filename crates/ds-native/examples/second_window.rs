@@ -16,8 +16,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, HostCaret, HostClickFocus, HostFileDrop, HostFind,
-    HostModality, HostScale, Material,
+    Appearance, Button, ButtonVariant, Ds, FileDropBoard, Found, HostSignals, Material,
+    use_document_host,
 };
 use ds_native::{AppConfig, AppId, WindowHandle, WindowSpec, launch, open_window_with};
 use std::sync::Arc;
@@ -44,21 +44,21 @@ fn autopilot() -> bool {
 
 /// Which host seams this window's document was given.
 fn seams(window: &str) -> String {
+    let host = use_document_host();
     let seen = [
         (
-            "HostModality",
-            try_consume_context::<HostModality>().is_some(),
+            "HostSignals",
+            try_consume_context::<HostSignals>().is_some(),
         ),
-        ("HostScale", try_consume_context::<HostScale>().is_some()),
-        ("HostCaret", try_consume_context::<HostCaret>().is_some()),
+        ("ClickFocusHost", host.click_focus().is_some()),
         (
-            "HostClickFocus",
-            try_consume_context::<HostClickFocus>().is_some(),
+            "GeometryHost::find",
+            !matches!(host.geometry().find("body"), Found::Unreachable),
         ),
-        ("HostFind", try_consume_context::<HostFind>().is_some()),
+        ("EditHost", host.edit().is_some()),
         (
-            "HostFileDrop",
-            try_consume_context::<HostFileDrop>().is_some(),
+            "FileDropBoard",
+            try_consume_context::<FileDropBoard>().is_some(),
         ),
         (
             "WindowHost",

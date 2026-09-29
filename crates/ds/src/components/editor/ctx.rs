@@ -2,9 +2,9 @@
 //! host, and the app's handlers. One value, cloned into each closure.
 
 use crate::components::editor::state::SurfaceState;
-use crate::edit::host::HostEdit;
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{EditFocus, EditPointer};
+use crate::host::document::DocumentHost;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -12,7 +12,7 @@ use std::rc::Rc;
 #[derive(Clone)]
 pub(crate) struct SurfaceCtx {
     pub(crate) state: Rc<SurfaceState>,
-    pub(crate) host: Option<HostEdit>,
+    pub(crate) host: Rc<dyn DocumentHost>,
     pub(crate) on_input: EventHandler<EditInput>,
     pub(crate) on_pointer: Option<EventHandler<EditPointer>>,
     pub(crate) on_focus: Option<EventHandler<EditFocus>>,

@@ -9,12 +9,13 @@
 //! portal and file-watch tasks on.
 
 mod app_id;
+mod blitz_host;
 mod click_focus;
 pub mod clipboard;
 mod contexts;
 mod data_url;
 mod drop_hit;
-pub mod edit;
+mod edit;
 mod edit_align;
 mod edit_geometry;
 mod edit_hit;
@@ -23,7 +24,7 @@ mod edit_locate;
 mod edit_tree;
 mod edit_window;
 pub mod error;
-pub mod focus;
+mod focus;
 mod focus_chain;
 mod focus_keep;
 pub mod fonts;
@@ -55,7 +56,7 @@ mod hover_replay;
 mod hover_sync;
 mod install;
 pub mod launch;
-pub mod measure;
+mod measure;
 mod memory_shell;
 mod native_providers;
 mod net;
@@ -69,7 +70,7 @@ mod pdf;
 mod pdf_thumb;
 #[cfg(feature = "print")]
 mod print;
-pub mod reveal;
+mod reveal;
 mod route;
 mod runtime;
 mod scheme;
@@ -90,7 +91,8 @@ mod window_requests;
 mod window_shell;
 
 pub use app_id::AppId;
-pub use click_focus::{CLICK_FOCUS, FocusFallback, PRESS_FOCUS};
+pub use blitz_host::provide_host;
+pub use click_focus::FocusFallback;
 pub use contexts::RootContexts;
 pub use error::{NativeError, OpenWindowError};
 pub use fonts::{font_context, register_fonts};

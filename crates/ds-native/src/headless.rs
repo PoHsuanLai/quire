@@ -5,11 +5,12 @@
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
+use crate::blitz_host::{Provided, Wiring};
 use crate::click_focus::FocusFallback;
-use crate::clipboard::{Clipboard, Memory};
+use crate::clipboard::Memory;
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
-use crate::focus_keep::{FocusKeeper, Kept, hand_back_seam, keep};
+use crate::focus_keep::{FocusKeeper, Kept, keep};
 use crate::fonts::font_context;
 use crate::frame_book::FrameBook;
 use crate::frame_hover::{FrameHover, HoverTracker};
@@ -31,7 +32,7 @@ use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
-use ds::{HostModality, HostScale, InputModality, Scale};
+use ds::{Activity, FileDropBoard, HostSignals, InputModality, Scale};
 use peniko::Color;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -120,43 +121,37 @@ impl Headless {
         let mut vdom = VirtualDom::new(app);
         // The app's own first, so a quire context of the same type (none today) would win.
         setup.contexts.install(&mut vdom);
-        let modality =
-            vdom.in_runtime(|| Signal::new_in_scope(InputModality::default(), ScopeId::ROOT));
-        vdom.provide_root_context(HostModality(modality));
-        let scale = vdom.in_runtime(|| {
-            Signal::new_in_scope(Scale::from_percent(viewport.scale_percent), ScopeId::ROOT)
+        let signals = vdom.in_runtime(|| HostSignals {
+            modality: Signal::new_in_scope(InputModality::default(), ScopeId::ROOT),
+            scale: Signal::new_in_scope(Scale::from_percent(viewport.scale_percent), ScopeId::ROOT),
+            activity: Signal::new_in_scope(Activity::Active, ScopeId::ROOT),
         });
-        vdom.provide_root_context(HostScale(scale));
-        vdom.provide_root_context(crate::measure::MEASURE);
-        vdom.provide_root_context(crate::focus::FOCUS);
-        vdom.provide_root_context(crate::focus::BLUR);
-        vdom.provide_root_context(crate::focus::SELECT);
-        vdom.provide_root_context(crate::focus::CARET);
-        vdom.provide_root_context(crate::focus::SELECTION);
-        vdom.provide_root_context(crate::focus::PLACE_CARET);
-        vdom.provide_root_context(crate::reveal::REVEAL);
+        vdom.provide_root_context(signals);
         let keeper = match setup.focus_fallback {
             FocusFallback::Ancestor => {
-                vdom.provide_root_context(crate::click_focus::CLICK_FOCUS);
-                vdom.provide_root_context(crate::click_focus::PRESS_FOCUS);
-                let keeper = Rc::new(RefCell::new(FocusKeeper::default()));
-                vdom.provide_root_context(hand_back_seam(Rc::clone(&keeper)));
-                Keeper::Ancestor(keeper)
+                Keeper::Ancestor(Rc::new(RefCell::new(FocusKeeper::default())))
             }
             FocusFallback::BlitzDefault => Keeper::Off,
         };
-        vdom.provide_root_context(Rc::new(Memory(Arc::clone(&shell))) as Rc<dyn Clipboard>);
-        vdom.provide_root_context(crate::edit::EDIT);
-        vdom.provide_root_context(listeners.clone());
-        vdom.provide_root_context(crate::drop_hit::drop_seam());
         let mut doc = DioxusDocument::new(vdom, config);
         let found = DocRef::Cell(Rc::clone(&doc.inner));
+        let provided = Provided::of(Wiring {
+            keeper: match &keeper {
+                Keeper::Ancestor(shared) => Some(Rc::clone(shared)),
+                Keeper::Off => None,
+            },
+            find: Some(crate::focus::finder(move || Some(found.clone()))),
+            clipboard: Rc::new(Memory(Arc::clone(&shell))),
+            listeners: listeners.clone(),
+        });
+        doc.vdom.provide_root_context(provided.clipboard);
         doc.vdom
-            .provide_root_context(crate::focus::finder(move || Some(found.clone())));
+            .provide_root_context(FileDropBoard::new(Rc::clone(&provided.host)));
+        doc.vdom.provide_root_context(provided.host);
         doc.initial_build();
         Headless {
             doc,
-            modality,
+            modality: signals.modality,
             wakeup,
             viewport,
             layout: Layout::Running,

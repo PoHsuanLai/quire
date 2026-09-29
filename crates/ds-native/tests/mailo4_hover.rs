@@ -9,12 +9,13 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Flow, HostMeasure, HoverAnchor, HoverCard, HoverKey, HoverKind, Material,
-    Measured, MountedRef, Point, Px, Rect, Size, use_hover_intent,
+    Appearance, DocumentHost, Ds, Flow, HoverAnchor, HoverCard, HoverKey, HoverKind, Material,
+    MountedRef, NoHost, Point, Px, Rect, Size, use_hover_intent,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use probe::rect;
+use std::rc::Rc;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -38,11 +39,6 @@ enum Placing {
     Point,
     /// Nothing, under a measurer that answers nothing; the card is drawn in place.
     Unplaced,
-}
-
-/// A measurer with no layout to read.
-fn unknown(_: &MountedData) -> Measured {
-    Measured::Unknown
 }
 
 /// The pointer's client point as a zero-size rect.
@@ -90,7 +86,7 @@ fn Pin(index: usize, name: &'static str, placing: Placing) -> Element {
 #[component]
 fn Page(placing: Placing) -> Element {
     if placing == Placing::Unplaced {
-        use_context_provider(|| HostMeasure(unknown));
+        use_context_provider(|| Rc::new(NoHost::default()) as Rc<dyn DocumentHost>);
     }
     let hub = use_hover_intent().hub();
     let open = hub.open().or(hub.leaving());

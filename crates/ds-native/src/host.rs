@@ -1,20 +1,18 @@
 //! The root `launch` runs: the app, plus what a window host owes quire.
 //!
 //! - The input modality (spike S12): every key press (other than a lone modifier) makes it
-//!   `keyboard`, every pointer press makes it `pointer`; `Ds` reads it through `HostModality`
+//!   `keyboard`, every pointer press makes it `pointer`; `Ds` reads it through `ds::HostSignals`
 //!   and stamps `data-modality`.
 //! - The document's providers become the app's (`crate::install`): the net policy, for the
 //!   document and every frame it builds, waking the shell to paint when a resource lands
 //!   (S7/S8). The app renders once they are in place, a frame after the host.
-//! - Rect reads go through `ds::HostMeasure`, which waits out a document the renderer is
-//!   holding instead of panicking (`crate::measure`); focus changes go through `ds::HostFocus`
-//!   and `ds::HostBlur` the same way, and an element named by selector is found through
-//!   `ds::HostFind` (`crate::focus`); an edit surface's geometry and IME through `ds::HostEdit`
-//!   (`crate::edit`).
-//! - Under `FocusFallback::Ancestor` (the default), `ds::HostClickFocus` and
-//!   `ds::HostPressFocus`: a click on nothing focusable leaves the keyboard on the nearest
-//!   focusable ancestor, and a click a quire control kept to itself on the pressed control
-//!   (`crate::click_focus`),
+//! - The document host (`crate::blitz_host`): rect reads wait out a document the renderer is
+//!   holding instead of panicking (`crate::measure`); focus changes go through it the same way,
+//!   and an element named by selector is found through it (`crate::focus`); an edit surface's
+//!   geometry and IME through its edit part (`crate::edit`).
+//! - Under `FocusFallback::Ancestor` (the default), the host's click-focus part: a click on
+//!   nothing focusable leaves the keyboard on the nearest focusable ancestor, and a click a
+//!   quire control kept to itself on the pressed control (`crate::click_focus`),
 //!   and so does the removal of the focused element (`crate::focus_keep`), looked at on every
 //!   window event before the document hears it, so a key after a menu closed reaches the app.
 //! - IME events: dioxus-native-dom drops them, but this window hook hears each winit event
@@ -26,9 +24,9 @@
 //!   titlebar moves, resizes, zooms, minimizes and closes it; its state is re-read on every
 //!   resize and focus change, so the frame redraws when the window is zoomed or deactivated.
 //! - Files dragged in from outside (winit's data-transfer events, which blitz-shell ignores), as
-//!   `ds::HostFileDrop`: the drag is hit-tested through the document and the target under a
+//!   `ds::FileDropBoard`: the drag is hit-tested through the document and the target under a
 //!   release hears its `ondrop` (`crate::window_drop`, `crate::drop_hit`).
-//! - The window's scale factor, as `ds::HostScale`, so `Ds` writes the pixel tokens for it and a
+//! - The window's scale factor, in `ds::HostSignals`, so `Ds` writes the pixel tokens for it and a
 //!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
 //!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
 //!   fractional scale a line may still start half-way through a device pixel here.
@@ -36,11 +34,12 @@
 //! The document is reached through a hidden element's `onmounted` handle: dioxus-native builds
 //! the document itself and hands the app nothing else that can see it.
 
+use crate::blitz_host::{Provided, Wiring};
 use crate::click_focus::FocusFallback;
 use crate::clipboard::{Clipboard, System};
 use crate::edit_ime::{EditListeners, ime_of};
 use crate::edit_window::{captured_of, modifiers_of};
-use crate::focus_keep::{FocusKeeper, hand_back_seam, keep};
+use crate::focus_keep::{FocusKeeper, keep};
 use crate::frame_book::FrameBook;
 use crate::frame_hover::report;
 use crate::frame_links::{frame_links, read_link};
@@ -61,7 +60,7 @@ use dioxus_native::winit::keyboard::{Key as WinitKey, NamedKey};
 use dioxus_native::winit::window::Theme;
 use dioxus_native::{use_window, use_window_event};
 use dioxus_native_dom::NodeHandle;
-use ds::{Activity, HostActivity, HostModality, HostScale, InputModality, Scale};
+use ds::{Activity, FileDropBoard, HostSignals, InputModality, Scale};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -114,40 +113,36 @@ fn Rooted(root: SharedRoot) -> Element {
 /// The app with the host's modality, net provider and scheme around it.
 #[allow(non_snake_case)] // A component: rsx and launch name it like a type.
 pub(crate) fn Host(props: HostProps) -> Element {
-    let modality = use_context_provider(|| HostModality(Signal::new(InputModality::default())));
-    let activity = use_context_provider(|| HostActivity(Signal::new(Activity::Active)));
-    use_context_provider(|| crate::measure::MEASURE);
-    use_context_provider(|| crate::focus::FOCUS);
-    use_context_provider(|| crate::focus::BLUR);
-    use_context_provider(|| crate::focus::SELECT);
-    use_context_provider(|| crate::focus::CARET);
-    use_context_provider(|| crate::focus::SELECTION);
-    use_context_provider(|| crate::focus::PLACE_CARET);
-    use_context_provider(|| crate::reveal::REVEAL);
+    let window = use_window();
+    let signals = use_context_provider(|| HostSignals {
+        modality: Signal::new(InputModality::default()),
+        scale: Signal::new(scale_of(window.scale_factor())),
+        activity: Signal::new(Activity::Active),
+    });
     let fallback = props.setup.focus_fallback;
     let keeper = use_hook(|| match fallback {
-        FocusFallback::Ancestor => {
-            provide_context(crate::click_focus::CLICK_FOCUS);
-            provide_context(crate::click_focus::PRESS_FOCUS);
-            let keeper = Rc::new(RefCell::new(FocusKeeper::default()));
-            provide_context(hand_back_seam(Rc::clone(&keeper)));
-            Some(keeper)
-        }
+        FocusFallback::Ancestor => Some(Rc::new(RefCell::new(FocusKeeper::default()))),
         FocusFallback::BlitzDefault => None,
     });
-    use_context_provider(|| crate::edit::EDIT);
+    let listeners = use_hook(EditListeners::default);
+    let clipboard = use_hook(|| Rc::new(System::default()));
+    let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
+    let host = use_hook(|| {
+        let found = Rc::clone(&document);
+        let provided = Provided::of(Wiring {
+            keeper: keeper.clone(),
+            find: Some(crate::focus::finder(move || {
+                found.borrow().clone().map(DocRef::Handle)
+            })),
+            clipboard: Rc::clone(&clipboard) as Rc<dyn Clipboard>,
+            listeners: listeners.clone(),
+        });
+        provide_context(provided.clipboard);
+        provide_context(provided.host)
+    });
     // An `EditSurface { spell: Spell::On {..} }` checks through the system's dictionaries.
     #[cfg(feature = "spellcheck")]
     crate::spell::provide();
-    let listeners = use_context_provider(EditListeners::default);
-    let clipboard = use_hook(|| Rc::new(System::default()));
-    use_context_provider(|| Rc::clone(&clipboard) as Rc<dyn Clipboard>);
-    let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
-    let found = Rc::clone(&document);
-    use_context_provider(move || {
-        crate::focus::finder(move || found.borrow().clone().map(DocRef::Handle))
-    });
-    let window = use_window();
     use_hook(|| {
         if let Some(slot) = try_consume_context::<WindowSlot>() {
             slot.fill(Arc::clone(&window));
@@ -158,15 +153,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
         let window = Arc::clone(&window);
         ds::use_window_host_provider(move || Rc::new(WinitWindow::new(window, shell)))
     };
-    let factor = window.scale_factor();
-    let scale = use_context_provider(|| HostScale(Signal::new(scale_of(factor))));
     let seen = Rc::clone(&document);
     let held = use_hook(|| Rc::new(std::cell::Cell::new(keyboard_types::Modifiers::empty())));
     let book = use_hook(FrameBook::new);
     let found = book.clone();
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
-    let file_drop = use_context_provider(crate::drop_hit::drop_seam);
+    let file_drop = use_context_provider(|| FileDropBoard::new(Rc::clone(&host)));
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
@@ -181,7 +174,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             report(&hover, crossings);
         }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
-            let HostScale(mut current) = scale;
+            let mut current = signals.scale;
             let next = scale_of(*scale_factor);
             if *current.peek() != next {
                 current.set(next);
@@ -194,13 +187,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
             framed.refresh();
         }
         if let Some(next) = modality_after(event) {
-            let HostModality(mut current) = modality;
+            let mut current = signals.modality;
             if *current.peek() != next {
                 current.set(next);
             }
         }
         if let WindowEvent::Focused(focused) = event {
-            let HostActivity(mut current) = activity;
+            let mut current = signals.activity;
             let next = activity_of(*focused);
             if *current.peek() != next {
                 current.set(next);

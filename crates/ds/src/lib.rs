@@ -191,24 +191,20 @@ pub use crate::core::{
 };
 pub use crate::edit::{
     handle::{EditHandle, use_edit_handle},
-    host::HostEdit,
     input::{Composition, EditInput, KeyInput, PreeditCursor},
     pointer::{EditFocus, EditPointer, Extend},
 };
 pub use crate::file_drop::{
+    board::FileDropBoard,
     drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer},
     hook::use_file_drop,
-    host::HostFileDrop,
 };
 pub use crate::focus::{
-    caret::{HostCaret, HostPlaceCaret, HostSelection},
-    click::{HostClickFocus, HostPressFocus},
     field::{FieldHandle, use_field_handle},
-    hand_back::HostHandBack,
-    host::{HostBlur, HostFocus, focus_soon},
     request::{FocusRequest, use_focus_request},
-    select::{HostSelect, Select},
-    selector::{FocusError, HostFind, focus_by_selector},
+    select::Select,
+    selector::{FocusError, focus_by_selector},
+    soon::focus_soon,
 };
 pub use crate::host::{
     captured::{CapturedPointer, PointerPhase},
@@ -220,13 +216,13 @@ pub use crate::host::{
     found::{Found, SameNode},
     hand_back::{HandBack, Record},
     ime::{ImeEvent, ImeListener, ImeSwitch},
-    measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect},
+    measure::{Anchor, Measured, MountedRef, RectProbe, use_rect},
     no_host::NoHost,
     parts::{CaretHost, ClickFocusHost, EditHost, FileDropHost, FocusHost, GeometryHost, ImeHost},
     pasted::Pasted,
     position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextPosition, TextRange},
     probe::Probe,
-    reveal::{HostReveal, ScrollSpan, Scrolled, nearest_scroll},
+    reveal::{ScrollSpan, Scrolled, nearest_scroll},
     signals::HostSignals,
 };
 pub use crate::motion::{
@@ -354,9 +350,9 @@ pub use crate::shell::{
     },
 };
 pub use crate::spell::{
-    host::{HostSpell, Learned, Paragraph, SpellFuture, SpellService},
     lang::{Lang, Spell},
     marks::SpellReplace,
+    service::{Learned, Paragraph, SpellFuture, SpellService},
     words::WordSpan,
 };
 pub use crate::stack::{
@@ -396,8 +392,8 @@ pub use crate::style::{
     kit::{Kit, KitRank, Kits, KnownNames, Section, Vocabulary},
     look::Look,
     material::{recipe::recipe, stack::MaterialStack},
-    scale::{HostScale, use_scale},
-    scope::{HostActivity, HostModality, Scope, use_scope},
+    scale::use_scale,
+    scope::{Scope, use_scope},
     space::{
         frame_vars::FrameVars,
         look::{CardAccent, Grain, SpaceLook},

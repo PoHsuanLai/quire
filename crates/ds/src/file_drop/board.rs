@@ -1,31 +1,29 @@
 //! The host's side of a file drag: the targets the app registered, the drag the host feeds in,
-//! and the host's own hit test through the document.
+//! and the host's own hit test through the document ([`FileDropHost`](crate::FileDropHost)).
 
 use crate::core::geometry::units::Point;
 use crate::core::vocab::DropState;
 use crate::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop};
 use crate::file_drop::track::{DragTrack, Over, Step, TargetView, acceptance, step, target_view};
+use crate::host::document::DocumentHost;
 use crate::host::drop_hit::DropHit;
 use dioxus::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-/// Finds the innermost of `targets` under `point`: the element there, or its nearest ancestor
-/// that is one of them.
-pub type DropHitTest = fn(targets: &[Rc<MountedData>], point: Point) -> DropHit;
-
-/// The host's file-drag seam, provided as root context by ds-native (`launch`'s window and the
-/// harness): every mounted [`use_file_drop`](crate::use_file_drop) target enters it, and the host
-/// feeds it the drag as the platform reports it.
+/// The file drags of one window, provided as root context by whatever feeds them (`launch`'s
+/// window and the harness): every mounted [`use_file_drop`](crate::use_file_drop) target enters
+/// it, and the host feeds it the drag as the platform reports it, finding targets through its
+/// [`FileDropHost`](crate::FileDropHost).
 #[derive(Clone)]
-pub struct HostFileDrop {
+pub struct FileDropBoard {
     board: Rc<RefCell<Board>>,
-    hit: DropHitTest,
+    host: Rc<dyn DocumentHost>,
 }
 
-impl std::fmt::Debug for HostFileDrop {
+impl std::fmt::Debug for FileDropBoard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("HostFileDrop").finish_non_exhaustive()
+        f.debug_struct("FileDropBoard").finish_non_exhaustive()
     }
 }
 
@@ -48,12 +46,12 @@ pub(crate) struct DropTarget {
     pub(crate) ondrop: Callback<FileDrop>,
 }
 
-impl HostFileDrop {
-    /// A seam that finds targets with `hit`.
-    pub fn new(hit: DropHitTest) -> Self {
-        HostFileDrop {
+impl FileDropBoard {
+    /// A board that finds targets through `host`.
+    pub fn new(host: Rc<dyn DocumentHost>) -> Self {
+        FileDropBoard {
             board: Rc::new(RefCell::new(Board::default())),
-            hit,
+            host,
         }
     }
 
@@ -74,11 +72,11 @@ impl HostFileDrop {
                 .map(|t| Rc::clone(&t.element))
                 .collect();
             board.under = match track.point() {
-                Some(point) => found(self.hit, &elements, point, board.under),
+                Some(point) => found(self.host.as_ref(), &elements, point, board.under),
                 None => None,
             };
             let landed = landed.and_then(|files| {
-                let at = found(self.hit, &elements, files.point, None)?;
+                let at = found(self.host.as_ref(), &elements, files.point, None)?;
                 Some((board.targets.get(at)?.clone(), files))
             });
             show(&board, &track, turn, landed.as_ref());
@@ -110,7 +108,7 @@ impl HostFileDrop {
 
 /// The target under `point`, or `before` while the document is busy.
 fn found(
-    hit: DropHitTest,
+    host: &dyn DocumentHost,
     elements: &[Rc<MountedData>],
     point: Point,
     before: Option<usize>,
@@ -118,7 +116,10 @@ fn found(
     if elements.is_empty() {
         return None;
     }
-    match hit(elements, point) {
+    let hit = host
+        .file_drop()
+        .map_or(DropHit::Nothing, |part| part.hit(elements, point));
+    match hit {
         DropHit::Target(at) => Some(at),
         DropHit::Nothing => None,
         DropHit::Busy => before,

@@ -3,14 +3,12 @@
 //! `selected`, is brought to the nearest edge of the list, never centred.
 //!
 //! Blitz's own `scroll_into_view` scrolls the document's viewport only, never the list, so the
-//! host does it: ds-native provides [`HostReveal`], which reads the item's place in the list's
-//! layout and sets the list's scroll offset. Without one the item's own
-//! `scrollIntoView` with the nearest block is used, which is the same rule.
+//! host does it: [`GeometryHost::reveal`](crate::GeometryHost::reveal) reads the item's place in
+//! the list's layout and sets the list's scroll offset.
 
 use crate::core::busy::wait_out_busy;
-use crate::core::guarded::guarded_call;
+use crate::host::document::use_document_host;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
-use dioxus::html::{ScrollBehavior, ScrollLogicalPosition, ScrollToOptions};
 use dioxus::prelude::*;
 
 /// One attempt at scrolling a scroller.
@@ -23,12 +21,6 @@ pub enum Scrolled {
     /// The host cannot scroll these elements (not its nodes, gone, or not nested).
     Unknown,
 }
-
-/// The host's reveal write, provided as root context by ds-native (`launch`, its harness and
-/// `ds_native::focus::provide`): scroll the scroller `.0`'s own content the least that shows the
-/// item `.1` inside it, with no animation.
-#[derive(Debug, Clone, Copy)]
-pub struct HostReveal(pub fn(&MountedData, &MountedData) -> Scrolled);
 
 /// An item's extent along the scroll axis, in the scroller's content coordinates (0 is the top of
 /// its content at no scroll), and the scroller's.
@@ -59,38 +51,20 @@ pub fn nearest_scroll(current: f32, view: f32, item: ScrollSpan) -> f32 {
     }
 }
 
-/// Show `item` inside `scroller`, once the item has been laid out: through the host's
-/// [`HostReveal`], else the renderer's own nearest-edge `scrollIntoView`. Call it from a task.
+/// Show `item` inside `scroller`, once the item has been laid out, through the host. Call it from
+/// a task.
 pub async fn reveal(scroller: &MountedData, item: &MountedData) -> Scrolled {
     if laid_out_rect(item).await.is_none() {
         return Scrolled::Unknown;
     }
-    match try_consume_context::<HostReveal>() {
-        Some(HostReveal(write)) => {
-            for attempt in 0..BUSY_ATTEMPTS {
-                match write(scroller, item) {
-                    Scrolled::Busy => wait_out_busy(attempt).await,
-                    done => return done,
-                }
-            }
-            Scrolled::Busy
+    let host = use_document_host();
+    for attempt in 0..BUSY_ATTEMPTS {
+        match host.geometry().reveal(scroller, item) {
+            Scrolled::Busy => wait_out_busy(attempt).await,
+            done => return done,
         }
-        None => unhosted(item).await,
     }
-}
-
-/// The renderer's own nearest-edge scroll, guarded as a focus write is (`crate::core::guarded`).
-async fn unhosted(item: &MountedData) -> Scrolled {
-    let options = ScrollToOptions {
-        behavior: ScrollBehavior::Instant,
-        vertical: ScrollLogicalPosition::Nearest,
-        horizontal: ScrollLogicalPosition::Nearest,
-    };
-    match guarded_call(|| item.scroll_to_with_options(options)).await {
-        Some(Ok(())) => Scrolled::Done,
-        Some(Err(_)) => Scrolled::Unknown,
-        None => Scrolled::Busy,
-    }
+    Scrolled::Busy
 }
 
 #[cfg(test)]

@@ -4,14 +4,14 @@
 //! after Escape.
 //!
 //! The opener is the anchor when it is a mounted element (`Anchor::Mounted`). The panel tells
-//! the host as it mounts ([`HostHandBack`]); the host gives the keyboard to the opener (or its
+//! the host as it mounts ([`HandBack`](crate::HandBack)); the host gives the keyboard to the opener (or its
 //! nearest focusable ancestor) when the panel is removed while it still has it. A menu anchored
 //! at a point or a rect names no element: ds-native then hands the keyboard to the element
 //! focused before the menu took it, or to where the pointer pressed to open it.
 
 use crate::components::menus::menu_cursor::MenuCursor;
 use crate::components::overlays::flow::Flow;
-use crate::focus::hand_back::HostHandBack;
+use crate::host::document::use_document_host;
 use crate::host::measure::{Anchor, MountedRef};
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -25,7 +25,8 @@ pub(crate) fn hand_back(panel: &MountedData, anchor: &Anchor, flow: Flow, active
     if !active.takes_focus() || flow != Flow::Floating {
         return;
     }
-    if let Some(HostHandBack(record)) = try_consume_context::<HostHandBack>() {
-        record(panel, Rc::as_ref(opener));
-    }
+    use_document_host()
+        .focus()
+        .hand_back()
+        .record(panel, Rc::as_ref(opener));
 }

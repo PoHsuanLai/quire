@@ -1,8 +1,8 @@
-//! The host seam an [`EditSurface`](crate::EditSurface) checks spelling through. `ds` stays
+//! The service an [`EditSurface`](crate::EditSurface) checks spelling through. `ds` stays
 //! effect-free: reading dictionaries, checking on a worker thread and writing the user's
-//! dictionary are `ds_native::spell`'s (its `spellcheck` feature), which provides
-//! [`HostSpell`]. Without one a surface with [`Spell::On`](super::Spell) checks nothing and
-//! draws nothing.
+//! dictionary are `ds_native::spell`'s (its `spellcheck` feature), which provides an
+//! `Rc<dyn SpellService>` as root context. Without one a surface with
+//! [`Spell::On`](super::Spell) checks nothing and draws nothing.
 
 use super::lang::Lang;
 use super::words::WordSpan;
@@ -11,7 +11,6 @@ use crate::host::probe::Probe;
 use dioxus::prelude::MountedData;
 use std::future::Future;
 use std::pin::Pin;
-use std::rc::Rc;
 
 /// An answer the host gives later, off the UI thread. Awaited from the surface's own tasks.
 pub type SpellFuture<T> = Pin<Box<dyn Future<Output = T>>>;
@@ -57,14 +56,4 @@ pub trait SpellService {
 
     /// Accept `word` in `lang` from now on, and remember it ("Learn Spelling").
     fn learn(&self, lang: Lang, word: String) -> SpellFuture<Learned>;
-}
-
-/// The spellchecker a root provides as context (`ds_native::spell::provide`).
-#[derive(Clone)]
-pub struct HostSpell(pub Rc<dyn SpellService>);
-
-impl std::fmt::Debug for HostSpell {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("HostSpell(..)")
-    }
 }

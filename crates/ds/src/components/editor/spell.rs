@@ -8,13 +8,14 @@
 use crate::core::geometry::units::{Point, Rect};
 use crate::core::task::{spawn_in, try_set_if_changed};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::edit::host::HostEdit;
+use crate::host::document::DocumentHost;
 use crate::host::measure::{BUSY_ATTEMPTS, client_rect};
+use crate::host::parts::EditHost;
 use crate::host::position::{EditNode, TextPosition};
 use crate::host::probe::Probe;
-use crate::spell::host::{HostSpell, Paragraph};
 use crate::spell::lang::{Lang, Spell};
 use crate::spell::marks::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
+use crate::spell::service::{Paragraph, SpellService};
 use crate::spell::words::words;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{ScopeId, Task, current_scope_id};
@@ -42,8 +43,8 @@ pub(crate) struct SpellState {
 #[derive(Clone)]
 pub(crate) struct SpellCtx {
     pub(crate) state: Rc<SpellState>,
-    pub(crate) host: Option<HostSpell>,
-    pub(crate) edit: Option<HostEdit>,
+    pub(crate) service: Option<Rc<dyn SpellService>>,
+    pub(crate) host: Rc<dyn DocumentHost>,
     /// The marks' boxes, from the layer's corner.
     pub(crate) boxes: Signal<Vec<Rect>>,
     /// The surface's scope: every task the checker starts is the surface's, so a menu that
@@ -53,29 +54,29 @@ pub(crate) struct SpellCtx {
 
 impl SpellCtx {
     /// The checker for the calling surface.
-    pub(crate) fn use_new(edit: Option<HostEdit>) -> SpellCtx {
+    pub(crate) fn use_new(host: Rc<dyn DocumentHost>) -> SpellCtx {
         SpellCtx {
             state: use_hook(|| Rc::new(SpellState::default())),
-            host: use_hook(try_consume_context::<HostSpell>),
-            edit,
+            service: use_hook(try_consume_context::<Rc<dyn SpellService>>),
+            host,
             boxes: use_signal(Vec::new),
             scope: current_scope_id(),
         }
     }
 
-    /// The host, when checking is on and there is one.
-    pub(crate) fn live(&self) -> Option<&HostSpell> {
+    /// The spell service, when checking is on and there is one.
+    pub(crate) fn live(&self) -> Option<&Rc<dyn SpellService>> {
         match *self.state.spell.borrow() {
-            Spell::On { .. } => self.host.as_ref(),
+            Spell::On { .. } => self.service.as_ref(),
             Spell::Off => None,
         }
     }
 
     /// The languages this surface checks in: its own, else the host's.
     pub(crate) fn langs(&self) -> Vec<Lang> {
-        match (&*self.state.spell.borrow(), &self.host) {
+        match (&*self.state.spell.borrow(), &self.service) {
             (Spell::On { lang: Some(lang) }, _) => vec![lang.clone()],
-            (Spell::On { lang: None }, Some(HostSpell(service))) => service.languages(),
+            (Spell::On { lang: None }, Some(service)) => service.languages(),
             (Spell::On { lang: None }, None) | (Spell::Off, _) => Vec::new(),
         }
     }
@@ -123,7 +124,7 @@ pub(crate) fn touch(ctx: &SpellCtx) {
 
 /// The surface's paragraphs, a frame later while the document is busy.
 async fn read(ctx: &SpellCtx) -> Option<Vec<Paragraph>> {
-    let HostSpell(service) = ctx.live()?.clone();
+    let service = Rc::clone(ctx.live()?);
     for _ in 0..BUSY_ATTEMPTS {
         let surface = ctx.state.surface.borrow().clone();
         match surface.map(|surface| service.paragraphs(&surface)) {
@@ -183,7 +184,7 @@ fn refresh(ctx: &SpellCtx, paragraphs: &[Paragraph]) {
 
 /// Check the paragraphs whose text changed since their last check, on the host's worker.
 async fn check(ctx: &SpellCtx, paragraphs: &[Paragraph]) {
-    let Some(HostSpell(service)) = ctx.live().cloned() else {
+    let Some(service) = ctx.live().cloned() else {
         return;
     };
     let changed: Vec<&Paragraph> = {
@@ -222,7 +223,7 @@ async fn check(ctx: &SpellCtx, paragraphs: &[Paragraph]) {
 /// Measure the shown marks from the layer's corner and hand the boxes to the layer.
 pub(crate) async fn draw(ctx: &SpellCtx) {
     let (Some(edit), Some(surface), Some(layer)) = (
-        ctx.edit,
+        ctx.host.edit(),
         ctx.state.surface.borrow().clone(),
         ctx.state.layer.borrow().clone(),
     ) else {
@@ -249,9 +250,9 @@ pub(crate) async fn draw(ctx: &SpellCtx) {
 }
 
 /// A mark's boxes, one per line it spans.
-async fn rects(edit: HostEdit, surface: &MountedData, mark: &Misspelt) -> Vec<Rect> {
+async fn rects(edit: &dyn EditHost, surface: &MountedData, mark: &Misspelt) -> Vec<Rect> {
     for _ in 0..BUSY_ATTEMPTS {
-        match (edit.selection_rects)(surface, &mark.range()) {
+        match edit.selection_rects(surface, &mark.range()) {
             Probe::Found(rects) => return rects,
             Probe::Busy => sleep(FRAME_SLACK).await,
             Probe::Unknown => return Vec::new(),

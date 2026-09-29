@@ -46,10 +46,10 @@ use crate::components::overlays::popover::{Float, Stacking, use_float};
 use crate::core::geometry::units::{Px, Rect};
 use crate::core::vocab::Availability;
 use crate::core::vocab::Shown;
-use crate::focus::caret::HostCaret;
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::host::caret::{Caret, InitialCaret};
+use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::measure::MountedRef;
 use crate::motion::detail::reveal::RevealCue;
 use crate::style::tokens::{layer::ZLayer, shape::Corner};
@@ -161,7 +161,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let revision = use_revision(&(tokens.clone(), key.clone()));
     let own_focus = use_focus_request();
     let handle = use_field_handle();
-    let host_caret = try_use_context::<HostCaret>();
+    let document = use_hook(use_document_host);
     let request = landing(focus.unwrap_or(own_focus), initial_caret);
     let shown_groups = shown_groups(&groups.0, &query);
     let motion = use_list_motion(
@@ -218,7 +218,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
         let selection = selection.clone();
         move |event: KeyboardEvent| {
             if let Some(claim) = claim {
-                let caret = caret_of(host_caret, handle);
+                let caret = caret_of(document.as_ref(), handle);
                 let key = FieldKey {
                     event: event.clone(),
                     caret,
@@ -363,11 +363,11 @@ fn card_style(corner: Option<Corner>, aside: Option<Px>) -> Option<String> {
     }
 }
 
-/// Where the field's caret is, through the host's read; `Unknown` without a host or a field.
-fn caret_of(host: Option<HostCaret>, handle: FieldHandle) -> Caret {
-    match (host, handle.element()) {
-        (Some(HostCaret(read)), Some(element)) => read(&element),
-        (None, _) | (_, None) => Caret::Unknown,
+/// Where the field's caret is, through the host's read; `Unknown` without a field.
+fn caret_of(host: &dyn DocumentHost, handle: FieldHandle) -> Caret {
+    match handle.element() {
+        Some(element) => host.caret().caret(&element),
+        None => Caret::Unknown,
     }
 }
 

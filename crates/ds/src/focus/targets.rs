@@ -7,6 +7,8 @@
 //! `TextInput` enters itself here with its own handlers; a focus that lands on it through a host
 //! calls them, the same told-path its `Focus::OnMount` takes.
 
+use crate::host::found::SameNode;
+use crate::host::parts::GeometryHost;
 use dioxus::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -51,17 +53,13 @@ impl FocusTargets {
         self.0.borrow_mut().retain(|held| held.owner != owner);
     }
 
-    /// What the field at `element` says, if `element` is one: `same` is the host's node
-    /// identity, since an element found by selector is a different handle on the same node.
-    pub(crate) fn told_at(
-        &self,
-        element: &MountedData,
-        same: fn(&MountedData, &MountedData) -> bool,
-    ) -> Option<Told> {
+    /// What the field at `element` says, if `element` is one: the host's node identity decides,
+    /// since an element found by selector is a different handle on the same node.
+    pub(crate) fn told_at(&self, element: &MountedData, host: &dyn GeometryHost) -> Option<Told> {
         self.0
             .borrow()
             .iter()
-            .find(|held| same(&held.element, element))
+            .find(|held| host.same(&held.element, element) == SameNode::Same)
             .map(|held| held.told)
     }
 }

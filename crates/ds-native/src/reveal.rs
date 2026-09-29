@@ -1,4 +1,4 @@
-//! The host's reveal write (`ds::HostReveal`): scroll a list's own content the least
+//! The host's reveal write (`ds::GeometryHost::reveal`): scroll a list's own content the least
 //! that shows one of its items. Blitz's `scroll_into_view` only ever scrolls the document's
 //! viewport, so a palette row below a 360 px list stayed below it; this reads the item's place in
 //! the list's content from the layout and sets the list's offset, nearest edge first
@@ -7,13 +7,10 @@
 use crate::node_ref::{NodeRef, Written};
 use blitz_dom::{BaseDocument, NodeId, ScrollBehavior};
 use dioxus::prelude::MountedData;
-use ds::{HostReveal, ScrollSpan, Scrolled, nearest_scroll};
-
-/// The Blitz reveal write, as the `ds::HostReveal` a root provides beside `crate::focus::FOCUS`.
-pub const REVEAL: HostReveal = HostReveal(reveal);
+use ds::{ScrollSpan, Scrolled, nearest_scroll};
 
 /// Show `item` inside `scroller` (both Blitz nodes of one document, the item inside the list).
-fn reveal(scroller: &MountedData, item: &MountedData) -> Scrolled {
+pub(crate) fn reveal(scroller: &MountedData, item: &MountedData) -> Scrolled {
     let (Some(list), Some(stop)) = (NodeRef::of(scroller), NodeRef::of(item)) else {
         return Scrolled::Unknown;
     };

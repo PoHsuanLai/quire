@@ -19,10 +19,10 @@ use crate::components::editor::state::{SurfaceState, write_soon};
 use crate::core::geometry::units::Rect;
 use crate::edit::composition::on_ime;
 use crate::edit::handle::{EditHandle, SurfaceHooks};
-use crate::edit::host::HostEdit;
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{EditFocus, EditPointer};
 use crate::host::captured::CapturedPointer;
+use crate::host::document::use_document_host;
 use crate::host::ime::ImeEvent;
 use crate::host::position::TextPosition;
 use crate::root::common::Common;
@@ -44,7 +44,7 @@ use std::rc::Rc;
 /// - `common`: the app's own `id`, class, `data-*` and accessible name on the surface's element,
 ///   so the surface can be the app's styled body itself (`ExtraClass` and `DataAttr` refuse
 ///   `ds-`); its `mounted` hears the element once it is in the document.
-/// - `spell`: [`Spell::On`] checks the spelling through the host's `HostSpell` and marks each
+/// - `spell`: [`Spell::On`] checks the spelling through the document's `SpellService` and marks each
 ///   misspelt word with a dotted underline; `Off` (the default) changes nothing. `caret` is the
 ///   app's caret, so the word being typed stays unmarked until the caret leaves it and the
 ///   context-menu key knows which word it is on; `on_replace` hears a suggestion picked from the
@@ -62,9 +62,9 @@ pub fn EditSurface(
     #[props(default)] on_replace: Option<EventHandler<SpellReplace>>,
     children: Element,
 ) -> Element {
-    let host = use_hook(try_consume_context::<HostEdit>);
+    let host = use_hook(use_document_host);
     let state = use_hook(|| Rc::new(SurfaceState::default()));
-    let checker = SpellCtx::use_new(host);
+    let checker = SpellCtx::use_new(Rc::clone(&host));
     let menu = use_signal(|| None::<Opened>);
     let on_input = {
         let checker = checker.clone();
@@ -75,7 +75,7 @@ pub fn EditSurface(
     };
     let ctx = SurfaceCtx {
         state: Rc::clone(&state),
-        host,
+        host: Rc::clone(&host),
         on_input,
         on_pointer,
         on_focus,
@@ -105,13 +105,14 @@ pub fn EditSurface(
     };
     {
         let state = Rc::clone(&state);
+        let host = Rc::clone(&host);
         use_effect(use_reactive!(|ime_area| {
             state.ime_area.set(ime_area);
-            if let (Some(host), Some(element), Some(area), EditFocus::In) =
-                (host, state.element(), ime_area, state.focus.get())
+            if let (Some(element), Some(area), EditFocus::In) =
+                (state.element(), ime_area, state.focus.get())
             {
-                write_soon(host, element, move |host, element| {
-                    (host.set_ime_cursor_area)(element, area)
+                write_soon(Rc::clone(&host), element, move |edit, element| {
+                    edit.ime().cursor_area(element, area)
                 });
             }
         }));
@@ -130,8 +131,8 @@ pub fn EditSurface(
     {
         let state = Rc::clone(&state);
         use_drop(move || {
-            if let (Some(host), Some(listener)) = (host, state.listener.take()) {
-                (host.forget)(listener);
+            if let (Some(edit), Some(listener)) = (host.edit(), state.listener.take()) {
+                edit.ime().forget(listener);
             }
         });
     }
