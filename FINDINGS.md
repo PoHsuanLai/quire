@@ -336,7 +336,7 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 - **Plate tint.** `IconView { plate_tint }` sends the plate's two stops and its ink through the
   same `retint::recolour` as the raster, per scheme, written as `--plate-{base,deep,ink}-{l,d}`;
   a white stop has no room to take a tint (as a white icon does not).
-- **The Space tint for Monochrome** is the accent `ds::space::derive` returns, already at a muted
+- **The Space tint for Monochrome** is the accent `ds::derive` returns, already at a muted
   chroma (0.045 + 0.035 x dot chroma), so it matches the frame.
 
 ## Text, fonts and editing
