@@ -77,7 +77,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `icon/external.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`, `IconUrl` (`data:`/`file:` only) |
 | `icon/classify.rs` | 08-ICONS §1.5 step 2: `classify(png) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
 | `error.rs` | CONVENTIONS §5: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
-| `lint/*` | ORCHESTRATION coherence rules 1-2; spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
+| `lint/*` | CONVENTIONS §11 coherence rules; spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the registry is derived from the token and `Anim` tables |
 
 ## `ds`: components
 
@@ -97,8 +97,7 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1), `workspace_pills` §37 and `dock_parts` §38 (`RunningDot`, `DockFloor`; 10 §10.3.2).
 `user_picture` is a directory and 25-EMOJI section 7: `UserPicture`/`UserPortrait`, `Mood`,
-`PictureSize`, the accept beat, `PictureChoice`/`resolve_picture` and `UserPicturePicker`
-(24-PERSONA is a note: the persona was dropped 2026-09-26).
+`PictureSize`, the accept beat, `PictureChoice`/`resolve_picture` and `UserPicturePicker`.
 `emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
 manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that plays it (`life.rs`).
 

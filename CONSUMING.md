@@ -294,7 +294,7 @@ has a golden per override; FINDINGS "Gallery fixes B").
 
 ## 5. The four coherence rules
 
-`ORCHESTRATION.md#coherence-rules-in-every-brief` states four rules every downstream crate
+`CONVENTIONS.md#11-quire-addenda-2026-09-24` states the coherence rules every downstream crate
 enforces on itself. Each one below is the exact test a consumer adds — `examples/consumer/
 tests/coherence.rs` is these four, verbatim, run against a real app.
 

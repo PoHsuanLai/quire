@@ -605,9 +605,7 @@ as `Count` does (section 6 acceptance item 2's "negative where `Px` (`u16`) expe
 for `Secs`/`Mins` too).
 
 Every domain is one small struct, one field per key, `#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]`,
-`#[serde(default)]` on every field (`CONVENTIONS.md#3-serde`: "every field added after the
-first release carries `#[serde(default)]`, unless no safe default exists" — every field here
-has one, by construction, since the whole point is a shipped default). Enums use
+`#[serde(default)]` on every field (every field has a shipped default, by construction). Enums use
 `#[serde(rename_all = "snake_case")]` and a lenient `Deserialize` that falls back to
 `Default::default()` on an unknown variant rather than erroring (section 2's "lenient" rule),
 via a small `#[serde(deserialize_with = "lenient")]` helper rather than hand-rolled `Visitor`

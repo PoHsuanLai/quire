@@ -1,5 +1,5 @@
-//! The stylesheet and markup linter every consumer runs in one test (ORCHESTRATION coherence
-//! rules 1 and 2). It tokenizes with `cssparser`, never with substrings (CONVENTIONS
+//! The stylesheet and markup linter every consumer runs in one test (CONVENTIONS §11
+//! coherence rules). It tokenizes with `cssparser`, never with substrings (CONVENTIONS
 //! "Substrings are not tokens").
 //!
 //! A consumer's test, with one reviewed exception:
