@@ -1,7 +1,8 @@
-//! The size ladder's geometry (design/29-SIZING.md section 6): one [`SizeScale`] per
-//! [`ControlSize`](super::ControlSize) holds the few numbers the reference gives (height,
-//! rounded-rectangle radius, glyph, label, inset), and every other size is derived here by the
-//! rules, so the stylesheet cannot disagree with them:
+//! The size ladder's geometry (design/29-SIZING.md section 6, the numbers of design/30 section
+//! 1.6): one [`SizeScale`] per [`ControlSize`](super::ControlSize) holds the numbers the
+//! reference gives (height, rounded-rectangle radius, glyph, label, inset, the slider's knob, the
+//! checkbox, spinner and progress bar), and every other size is derived here by the rules, so the
+//! stylesheet cannot disagree with them:
 //!
 //! - R1 heights are whole pixels and come from the ladder, never from padding;
 //! - R2 a capsule's radius is half its height;
@@ -57,10 +58,18 @@ pub struct SizeScale {
     pub glyph: WholePx,
     /// The horizontal inset of a label from the control's edge.
     pub pad_x: WholePx,
-    /// The switch's track height (the reference's mini switch is 15 at Small).
+    /// The switch's track height (the reference's mini switch is 15).
     pub switch_height: WholePx,
     /// The slider's track thickness.
     pub slider_track: WholePx,
+    /// The slider's round knob.
+    pub slider_knob: WholePx,
+    /// A checkbox or radio button's box.
+    pub checkbox: WholePx,
+    /// The spinner's box.
+    pub spinner: WholePx,
+    /// A progress bar's thickness.
+    pub progress_bar: WholePx,
     /// The label's size.
     pub font: WholePx,
     /// The label's weight.
@@ -75,11 +84,6 @@ impl SizeScale {
 
     /// A knob riding a track of this height (R3): the level capsule's knob.
     pub fn knob(self) -> WholePx {
-        inside(self.height)
-    }
-
-    /// The slider's round knob, as tall as the level's (R3).
-    pub fn slider_knob(self) -> WholePx {
         inside(self.height)
     }
 

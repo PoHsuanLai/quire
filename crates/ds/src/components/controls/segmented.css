@@ -20,7 +20,7 @@
   box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset);
   height:var(--ctl-h-m); border-radius:var(--seg-well-r-m); --seg-r:var(--seg-r-m); }
 .ds-segmented[*|data-size=regular]{ background:var(--surface-2); }
-.ds-segmented[*|data-size=small]{ height:var(--ctl-h-s); border-radius:var(--seg-well-r-s); --seg-r:var(--seg-r-s); background:var(--surface); }
+.ds-segmented[*|data-size=small]{ height:var(--ctl-h-xs); border-radius:var(--seg-well-r-xs); --seg-r:var(--seg-r-xs); background:var(--surface); }
 
 /* The thumb: out of flow in the selected segment's cell, which is its containing block (both
    ends named: an abspos item's `auto` end line is the padding edge, not span 1), and one
@@ -37,7 +37,7 @@
   transition:transform var(--t-tap) var(--e-out);
 }
 .ds-segmented[*|data-size=regular] .ds-segment{ padding:0 var(--ctl-pad-m); font-size:var(--fs-small); }
-.ds-segmented[*|data-size=small] .ds-segment{ padding:0 var(--ctl-pad-s); font-size:var(--fs-help); }
+.ds-segmented[*|data-size=small] .ds-segment{ padding:0 var(--ctl-pad-xs); font-size:var(--fs-help); }
 .ds-segment:hover{ color:var(--ink); }
 .ds-segment:active{ transform:scale(var(--squish)); }
 .ds-segment[*|data-thumb=under]{ color:var(--paper); }

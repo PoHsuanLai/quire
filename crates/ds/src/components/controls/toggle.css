@@ -1,7 +1,7 @@
 /* Toggle (design/04-COMPONENTS.md section 4; sized by design/29-SIZING.md): the switch on the
    size ladder. The track is `round_even(1.73 h)` wide and a capsule (R2, R4); the knob fills it
-   less the 1 px knob inset (R3): Regular 38 x 22 with a 20 knob, Small 26 x 15 with a 13 knob
-   (the reference's mini switch, in settings rows), Large 48 x 28 with a 26 knob. The off track's
+   less the 1 px knob inset (R3): Regular and Large 38 x 22 with a 20 knob, Small 32 x 18 with a
+   16 knob, Mini 26 x 15 with a 13 knob (the reference's mini switch, in settings rows). The off track's
    hairline is an inset shadow, so it takes no room from the inset. Attribute selectors carry `*|`
    (spike S2); the focus ring is the global one, on the track (spike S12).
    Driven motion (design/05 section 14, H1): the knob's offset is `--knob-x`, written in pixels by a
@@ -19,6 +19,8 @@
   border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-1);
   transform:translateX(calc(var(--knob-x) * 1px));
 }
+.ds-toggle[*|data-size=mini]{ width:var(--switch-w-xs); height:var(--switch-h-xs); border-radius:var(--switch-r-xs); }
+.ds-toggle[*|data-size=mini] .ds-toggle-knob{ width:var(--switch-knob-xs); height:var(--switch-knob-xs); }
 .ds-toggle[*|data-size=small]{ width:var(--switch-w-s); height:var(--switch-h-s); border-radius:var(--switch-r-s); }
 .ds-toggle[*|data-size=small] .ds-toggle-knob{ width:var(--switch-knob-s); height:var(--switch-knob-s); }
 .ds-toggle[*|data-size=large]{ width:var(--switch-w-l); height:var(--switch-h-l); border-radius:var(--switch-r-l); }
