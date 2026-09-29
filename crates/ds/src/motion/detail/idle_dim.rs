@@ -10,10 +10,10 @@
 //! means (dim, or wake), so the extra layer would only translate one two-state enum into
 //! another. [`plan`] plays the same role [`super::sweep::plan`] does for `Sweep`.
 
-use super::glide::Glide;
 use super::level::use_level;
-use super::motor::use_motor;
 use crate::core::vocab::{Fraction, Percent};
+use crate::motion::timeline::glide::Glide;
+use crate::motion::timeline::playback::use_playback;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
@@ -79,7 +79,7 @@ fn target(phase: IdleDimPhase, level: Percent) -> i64 {
 /// (R3).
 pub fn use_idle_dim(level: Percent, phase: IdleDimPhase) -> Fraction {
     let env = use_level();
-    let motor = use_motor(target(phase, level));
+    let playback = use_playback(Glide::still(target(phase, level)));
     let mut seen = use_hook(|| CopyValue::new((IdleDimPhase::Awake, level)));
     let now = (phase, level);
     if *seen.peek() != now {
@@ -94,17 +94,17 @@ pub fn use_idle_dim(level: Percent, phase: IdleDimPhase) -> Fraction {
             let motion = env.now();
             let to = target(phase, level);
             match plan(change, phase, motion) {
-                IdleDimPlan::Snap => motor.snap(to),
-                IdleDimPlan::Fade => motor.play(Glide {
-                    from: motor.peek().value,
+                IdleDimPlan::Snap => playback.play(Glide::still(to)),
+                IdleDimPlan::Fade => playback.play(Glide::between(
+                    playback.peek().map_or(to, |pose| pose.value),
                     to,
-                    length: DurationToken::IdleDim.duration(motion),
-                    easing: EasingToken::Out.easing(motion),
-                }),
+                    DurationToken::IdleDim.duration(motion),
+                    EasingToken::Out.easing(motion),
+                )),
             }
         });
     }
-    let pose = motor.pose();
+    let pose = playback.frame();
     Fraction(u16::try_from(pose.value.max(0)).unwrap_or(u16::MAX))
 }
 

@@ -1,7 +1,6 @@
 //! Settle as a hook: a success lands once per new Success cue, then rests (design/26 R3, R14).
 
 use super::cue::Cue;
-use super::glide::{FRAME, Glide};
 use super::level::{Level, use_level};
 use super::moment::Moment;
 use super::settle::{SettleStyle, Settling};
@@ -11,12 +10,13 @@ use crate::core::time::clock::sleep;
 use crate::core::vocab::Fraction;
 use crate::core::vocab::StaggerIndex;
 use crate::motion::pulse_key::PulseKey;
+use crate::motion::timeline::glide::Glide;
+use crate::motion::timeline::playback::tick;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{delay::DelayToken, easing::EasingToken, timing::DurationToken};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
-use std::time::Duration;
 
 /// What a success cue settles as this frame: `Rest` until a new Success cue, then the style's
 /// landing once (Fill steps its layers, Check draws and holds `SettleHold`, LockIn seals with the
@@ -96,20 +96,17 @@ impl Lander {
     async fn check(self, level: MotionLevel) -> Result<(), Gone> {
         let hold = DelayToken::SettleHold.delay();
         if level != MotionLevel::Reduced {
-            let draw = Glide {
-                from: 0,
-                to: 1000,
-                length: DurationToken::Move.duration(level),
-                easing: EasingToken::Out.easing(level),
-            };
+            let draw = Glide::between(
+                0,
+                1000,
+                DurationToken::Move.duration(level),
+                EasingToken::Out.easing(level),
+            );
             let started = crate::core::time::clock::now();
-            while !draw.done(crate::core::time::clock::since(started)) {
-                try_set(
-                    self.now,
-                    Settling::Drawing(drawn(draw, crate::core::time::clock::since(started))),
-                )?;
-                sleep(FRAME).await;
-            }
+            tick(&draw, started, |pose| {
+                try_set(self.now, Settling::Drawing(drawn(pose.value)))
+            })
+            .await?;
         }
         try_set(self.now, Settling::Drawing(Fraction(1000)))?;
         sleep(hold).await;
@@ -131,7 +128,7 @@ impl Lander {
     }
 }
 
-/// The share of a check drawn `elapsed` into `draw`.
-fn drawn(draw: Glide, elapsed: Duration) -> Fraction {
-    Fraction(u16::try_from(draw.at(elapsed).value.clamp(0, 1000)).unwrap_or(1000))
+/// The share of a check drawn at a pose's `value`.
+fn drawn(value: i64) -> Fraction {
+    Fraction(u16::try_from(value.clamp(0, 1000)).unwrap_or(1000))
 }

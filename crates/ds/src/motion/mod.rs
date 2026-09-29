@@ -28,6 +28,7 @@ pub(crate) mod spring;
 pub(crate) mod spring_point;
 pub(crate) mod spring_spec;
 pub(crate) mod swipe;
+pub(crate) mod timeline;
 pub(crate) mod timer;
 pub(crate) mod use_level_run;
 pub(crate) mod use_roster;
