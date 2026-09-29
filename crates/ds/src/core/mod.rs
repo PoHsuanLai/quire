@@ -9,6 +9,7 @@ pub mod geometry;
 pub mod guarded;
 pub mod png;
 pub mod press;
+pub mod spawner;
 pub(crate) mod standard_action;
 pub mod task;
 pub mod text;

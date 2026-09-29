@@ -5,8 +5,8 @@
 //!
 //! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
 //! forbids it to `ds`): `launch` and `Harness` each enter a process-wide runtime (`crate::
-//! runtime`) so `ds_settings::use_environment` can spawn its portal and file-watch tasks without
-//! panicking.
+//! runtime`) so the `TokioSpawner` it hands `ds_settings::use_environment` has a runtime to run its
+//! portal and file-watch tasks on.
 
 mod app_id;
 mod click_focus;
@@ -119,6 +119,7 @@ pub use pdf_thumb::{
 };
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
+pub use runtime::TokioSpawner;
 pub use snap::snap_to_device;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
 pub use window::{Decorations, WinitWindow};

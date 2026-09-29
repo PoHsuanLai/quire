@@ -21,8 +21,11 @@
 //! threads) without leaking an ever-growing stack of entries: each `Harness` enters once and
 //! exits when it is dropped.
 
+use ds::Spawner;
+use std::future::Future;
+use std::pin::Pin;
 use std::sync::OnceLock;
-use tokio::runtime::{EnterGuard, Runtime};
+use tokio::runtime::{EnterGuard, Handle, Runtime};
 
 static RUNTIME: OnceLock<Runtime> = OnceLock::new();
 
@@ -43,4 +46,25 @@ fn runtime() -> &'static Runtime {
 /// for as long as a spawned task must keep working there.
 pub(crate) fn enter() -> EnterGuard<'static> {
     runtime().enter()
+}
+
+/// The [`Spawner`] every library below `ds-native` is given: it starts tasks on a Tokio runtime.
+#[derive(Debug, Clone)]
+pub struct TokioSpawner(Handle);
+
+impl TokioSpawner {
+    /// The runtime entered on the calling thread: inside `launch`, a `Harness`, or a test's own
+    /// `#[tokio::test]`.
+    ///
+    /// # Panics
+    /// When no runtime is entered on this thread, a caller contract like Tokio's own.
+    pub fn current() -> Self {
+        TokioSpawner(Handle::current())
+    }
+}
+
+impl Spawner for TokioSpawner {
+    fn spawn(&self, task: Pin<Box<dyn Future<Output = ()> + Send>>) {
+        self.0.spawn(task);
+    }
 }
