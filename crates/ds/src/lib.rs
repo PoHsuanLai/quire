@@ -9,12 +9,15 @@
 //! of the modules below. DESIGN.md maps each module to the design doc section it implements.
 
 mod assembly;
+pub mod catalog;
 mod components;
 mod core;
+pub mod detail;
 mod edit;
 mod file_drop;
 mod focus;
 mod host;
+pub mod icon;
 #[cfg(feature = "lint")]
 pub mod lint;
 pub mod motion;
@@ -23,77 +26,9 @@ mod root;
 mod shell;
 mod spell;
 mod style;
+pub mod time;
+pub mod widget;
 mod window;
-
-/// The small-state details (design/26-DETAILS.md): moments, their grammar and the hooks that
-/// play them.
-pub mod detail {
-    pub use crate::motion::detail::{
-        check_mark::CheckMark,
-        count_up::{CountPace, use_count_up},
-        cue::Cue,
-        detailed::{Detailed, first_table, moment_table},
-        first_show::FirstShow,
-        idle_dim::{IdleDimPhase, use_idle_dim},
-        layer_glyph::{LayerGlyph, Layering},
-        moment::Moment,
-        morph::{MorphStyle, Slashed},
-        morph_glyph::MorphGlyph,
-        once::{use_nudge, use_shake},
-        operation::{Deadline, Operation, PendingToken},
-        pending::{Layers, PendingSpec, PendingStyle},
-        reveal::{Reveal, RevealCue},
-        roll_digits::RollDigits,
-        settle::{SettleStyle, Settling},
-        stamp::EventStamp,
-        sweep::use_sweep,
-        touch::{Contact, Handled, Touch},
-        use_detail::{Detail, use_detail},
-        use_operation::use_operation,
-        use_pending::use_pending,
-        use_settle::use_settle,
-    };
-}
-
-/// What a host needs to decide how an icon it did not draw is shown, and to recolour one.
-pub mod icon {
-    pub use crate::style::icon::{
-        classify::{IconKind, classify_with},
-        retint::{IconStyle, Tint, retint, retint_in},
-        stroke::stroke_device_pixels,
-    };
-
-    /// The squircle plate's geometry a host sizes its own shadows from.
-    pub mod plate {
-        pub use crate::style::tokens::plate::shadow_radius_share;
-    }
-}
-
-/// The clock every timer reads, virtual under a test's `VirtualClock`.
-pub mod time {
-    pub use crate::core::time::clock::{now, since};
-}
-
-/// The desktop widgets' layout: the grid, placing and moving a widget, and the wire form of a
-/// widget's timeline.
-pub mod widget {
-    pub use crate::shell::widget::{
-        calendar::LARGE_EVENTS,
-        contract::fit,
-        layout::{
-            DesktopGrid, GridCell, LayoutError, Order, WidgetAt, WidgetEdit, WidgetLayout,
-            WidgetPlacement, apply, cells,
-        },
-        registry::{TakenKind, UnsizedKind},
-        timeline::REFRESH_FLOOR,
-        wire::{WireRefresh, WireTimeline},
-    };
-}
-
-/// Where a widget sits in the catalog.
-pub mod catalog {
-    pub use crate::shell::catalog::placement::PlacementId;
-}
 
 pub use crate::assembly::{
     ds::{Ds, Inject},
