@@ -1,6 +1,7 @@
 //! The size ladder as custom properties (design/29-SIZING.md section 10): each
 //! [`ControlSize`]'s [`SizeScale`] written as `--ctl-*`, `--knob-*`, `--switch-*`, `--slider-*`
-//! and `--seg-*` tokens with an `-s`, `-m` or `-l` suffix, so the sheets read the ladder and never
+//! `--check-*`, `--spinner-*`, `--progress-*` and `--seg-*` tokens with an `-xs`, `-s`, `-m` or `-l`
+//! suffix (Mini, Small, Regular, Large), so the sheets read the ladder and never
 //! restate a number. The values come from `SizeScale`, so the rules hold in CSS as in Rust.
 
 use super::control_size::ControlSize;
@@ -39,6 +40,12 @@ pub enum SizeVar {
     SliderTrack,
     /// `--slider-knob-*`: the slider's round knob.
     SliderKnob,
+    /// `--check-*`: a checkbox or radio button's box.
+    CheckboxBox,
+    /// `--spinner-*`: the spinner's box.
+    Spinner,
+    /// `--progress-*`: a progress bar's thickness.
+    ProgressBar,
     /// `--seg-well-r-*`: the segmented well's radius.
     WellRadius,
     /// `--seg-h-*`: a selected segment's height.
@@ -64,7 +71,10 @@ impl SizeVar {
             SizeVar::SwitchRadius => scale.switch_radius().css(),
             SizeVar::SwitchKnob => scale.switch_knob().css(),
             SizeVar::SliderTrack => scale.slider_track.css(),
-            SizeVar::SliderKnob => scale.slider_knob().css(),
+            SizeVar::SliderKnob => scale.slider_knob.css(),
+            SizeVar::CheckboxBox => scale.checkbox.css(),
+            SizeVar::Spinner => scale.spinner.css(),
+            SizeVar::ProgressBar => scale.progress_bar.css(),
             SizeVar::WellRadius => scale.well_radius.css(),
             SizeVar::Segment => scale.segment().css(),
             SizeVar::SegmentRadius => scale.segment_radius().css(),
@@ -77,6 +87,66 @@ impl SizeVar {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "", kind = fixed, css = size_css)]
 pub enum SizeToken {
+    /// `--ctl-h-xs`: Height at Mini.
+    #[token(name = "ctl-h-xs")]
+    MiniHeight,
+    /// `--ctl-r-xs`: Radius at Mini.
+    #[token(name = "ctl-r-xs")]
+    MiniRadius,
+    /// `--ctl-cap-r-xs`: CapsuleRadius at Mini.
+    #[token(name = "ctl-cap-r-xs")]
+    MiniCapsuleRadius,
+    /// `--ctl-glyph-xs`: Glyph at Mini.
+    #[token(name = "ctl-glyph-xs")]
+    MiniGlyph,
+    /// `--ctl-pad-xs`: PadX at Mini.
+    #[token(name = "ctl-pad-xs")]
+    MiniPadX,
+    /// `--ctl-fs-xs`: Font at Mini.
+    #[token(name = "ctl-fs-xs")]
+    MiniFont,
+    /// `--ctl-fw-xs`: Weight at Mini.
+    #[token(name = "ctl-fw-xs")]
+    MiniWeight,
+    /// `--knob-xs`: Knob at Mini.
+    #[token(name = "knob-xs")]
+    MiniKnob,
+    /// `--switch-w-xs`: SwitchWidth at Mini.
+    #[token(name = "switch-w-xs")]
+    MiniSwitchWidth,
+    /// `--switch-h-xs`: SwitchHeight at Mini.
+    #[token(name = "switch-h-xs")]
+    MiniSwitchHeight,
+    /// `--switch-r-xs`: SwitchRadius at Mini.
+    #[token(name = "switch-r-xs")]
+    MiniSwitchRadius,
+    /// `--switch-knob-xs`: SwitchKnob at Mini.
+    #[token(name = "switch-knob-xs")]
+    MiniSwitchKnob,
+    /// `--slider-track-xs`: SliderTrack at Mini.
+    #[token(name = "slider-track-xs")]
+    MiniSliderTrack,
+    /// `--slider-knob-xs`: SliderKnob at Mini.
+    #[token(name = "slider-knob-xs")]
+    MiniSliderKnob,
+    /// `--check-xs`: CheckboxBox at Mini.
+    #[token(name = "check-xs")]
+    MiniCheckboxBox,
+    /// `--spinner-xs`: Spinner at Mini.
+    #[token(name = "spinner-xs")]
+    MiniSpinner,
+    /// `--progress-xs`: ProgressBar at Mini.
+    #[token(name = "progress-xs")]
+    MiniProgressBar,
+    /// `--seg-well-r-xs`: WellRadius at Mini.
+    #[token(name = "seg-well-r-xs")]
+    MiniWellRadius,
+    /// `--seg-h-xs`: Segment at Mini.
+    #[token(name = "seg-h-xs")]
+    MiniSegment,
+    /// `--seg-r-xs`: SegmentRadius at Mini.
+    #[token(name = "seg-r-xs")]
+    MiniSegmentRadius,
     /// `--ctl-h-s`: Height at Small.
     #[token(name = "ctl-h-s")]
     SmallHeight,
@@ -119,6 +189,15 @@ pub enum SizeToken {
     /// `--slider-knob-s`: SliderKnob at Small.
     #[token(name = "slider-knob-s")]
     SmallSliderKnob,
+    /// `--check-s`: CheckboxBox at Small.
+    #[token(name = "check-s")]
+    SmallCheckboxBox,
+    /// `--spinner-s`: Spinner at Small.
+    #[token(name = "spinner-s")]
+    SmallSpinner,
+    /// `--progress-s`: ProgressBar at Small.
+    #[token(name = "progress-s")]
+    SmallProgressBar,
     /// `--seg-well-r-s`: WellRadius at Small.
     #[token(name = "seg-well-r-s")]
     SmallWellRadius,
@@ -170,6 +249,15 @@ pub enum SizeToken {
     /// `--slider-knob-m`: SliderKnob at Regular.
     #[token(name = "slider-knob-m")]
     RegularSliderKnob,
+    /// `--check-m`: CheckboxBox at Regular.
+    #[token(name = "check-m")]
+    RegularCheckboxBox,
+    /// `--spinner-m`: Spinner at Regular.
+    #[token(name = "spinner-m")]
+    RegularSpinner,
+    /// `--progress-m`: ProgressBar at Regular.
+    #[token(name = "progress-m")]
+    RegularProgressBar,
     /// `--seg-well-r-m`: WellRadius at Regular.
     #[token(name = "seg-well-r-m")]
     RegularWellRadius,
@@ -221,6 +309,15 @@ pub enum SizeToken {
     /// `--slider-knob-l`: SliderKnob at Large.
     #[token(name = "slider-knob-l")]
     LargeSliderKnob,
+    /// `--check-l`: CheckboxBox at Large.
+    #[token(name = "check-l")]
+    LargeCheckboxBox,
+    /// `--spinner-l`: Spinner at Large.
+    #[token(name = "spinner-l")]
+    LargeSpinner,
+    /// `--progress-l`: ProgressBar at Large.
+    #[token(name = "progress-l")]
+    LargeProgressBar,
     /// `--seg-well-r-l`: WellRadius at Large.
     #[token(name = "seg-well-r-l")]
     LargeWellRadius,

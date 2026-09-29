@@ -175,10 +175,13 @@ fn Choosers() -> Element {
                 Specimen { name: "off, disabled",
                     Toggle { label: "Off, disabled", value: Switch::Off, availability: Availability::Disabled, onchange: |_| {} }
                 }
-                Specimen { name: "Small (settings row), on", code: "26 x 15, knob 13".to_string(),
+                Specimen { name: "Mini (settings row), on", code: "26 x 15, knob 13".to_string(),
+                    Toggle { label: "Mini on", value: Switch::On, size: ds::ControlSize::Mini, onchange: |_| {} }
+                }
+                Specimen { name: "Small, on", code: "32 x 18, knob 16".to_string(),
                     Toggle { label: "Small on", value: Switch::On, size: ds::ControlSize::Small, onchange: |_| {} }
                 }
-                Specimen { name: "Large, on", code: "48 x 28, knob 26".to_string(),
+                Specimen { name: "Large, on", code: "38 x 22, knob 20".to_string(),
                     Toggle { label: "Large on", value: Switch::On, size: ds::ControlSize::Large, onchange: |_| {} }
                 }
             }

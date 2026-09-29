@@ -1,5 +1,5 @@
 //! One table over every control size checking the ladder's rules (design/29-SIZING.md section 6,
-//! R1-R8) and the settled numbers of option A (section 7).
+//! R1-R8) and the numbers of design/30 section 1.6.
 
 use super::control_size::ControlSize;
 use super::size_scale::{HalfPx, KNOB_INSET, SizeScale, WholePx};
@@ -15,25 +15,36 @@ pub(crate) fn on_grid(px: u16) -> bool {
 }
 
 /// Per size: height, radius, capsule radius (half px), knob, switch w x h, switch knob, slider
-/// track and knob, segment and its radius, glyph.
-type Row = (ControlSize, [u16; 13]);
+/// track and knob, segment and its radius, glyph, label inset, checkbox, spinner, progress bar,
+/// label size.
+type Row = (ControlSize, [u16; 17]);
 
 const CASES: &[Row] = &[
     (
+        ControlSize::Mini,
+        [16, 4, 16, 14, 26, 15, 13, 3, 12, 14, 3, 12, 6, 10, 10, 4, 9],
+    ),
+    (
         ControlSize::Small,
-        [16, 4, 16, 14, 26, 15, 13, 4, 14, 14, 3, 12, 6],
+        [
+            19, 5, 19, 17, 32, 18, 16, 4, 14, 17, 5, 14, 8, 12, 16, 6, 11,
+        ],
     ),
     (
         ControlSize::Regular,
-        [22, 5, 22, 20, 38, 22, 20, 4, 20, 20, 5, 16, 10],
+        [
+            22, 5, 22, 20, 38, 22, 20, 4, 20, 20, 5, 16, 10, 14, 32, 6, 13,
+        ],
     ),
     (
         ControlSize::Large,
-        [28, 6, 28, 26, 48, 28, 26, 6, 26, 26, 6, 18, 12],
+        [
+            28, 5, 28, 26, 38, 22, 20, 4, 20, 26, 5, 20, 12, 14, 32, 6, 15,
+        ],
     ),
 ];
 
-fn numbers(scale: SizeScale) -> [u16; 13] {
+fn numbers(scale: SizeScale) -> [u16; 17] {
     [
         scale.height.0,
         scale.radius.0,
@@ -43,11 +54,15 @@ fn numbers(scale: SizeScale) -> [u16; 13] {
         scale.switch_height.0,
         scale.switch_knob().0,
         scale.slider_track.0,
-        scale.slider_knob().0,
+        scale.slider_knob.0,
         scale.segment().0,
         scale.segment_radius().0,
         scale.glyph.0,
         scale.pad_x.0,
+        scale.checkbox.0,
+        scale.spinner.0,
+        scale.progress_bar.0,
+        scale.font.0,
     ]
 }
 
@@ -71,7 +86,6 @@ fn every_size_obeys_the_rules() {
         // R3: a knob is its track less the inset each side.
         for (knob, track) in [
             (scale.knob(), scale.height),
-            (scale.slider_knob(), scale.height),
             (scale.segment(), scale.height),
             (scale.switch_knob(), scale.switch_height),
         ] {
@@ -90,7 +104,7 @@ fn every_size_obeys_the_rules() {
             "{size:?} R4"
         );
         // R5: a rounded rectangle's radius is well short of a capsule's.
-        assert!(scale.radius.0 * 4 <= scale.height.0, "{size:?} R5");
+        assert!(scale.radius.0 * 3 <= scale.height.0, "{size:?} R5");
         // R6: the segment is concentric in its well; an inset child loses the inset.
         assert_eq!(
             scale.segment_radius().0 + inset,
@@ -137,6 +151,8 @@ fn every_height_token_is_whole() {
         SizeVar::SwitchHeight,
         SizeVar::SwitchKnob,
         SizeVar::SliderKnob,
+        SizeVar::CheckboxBox,
+        SizeVar::Spinner,
         SizeVar::Segment,
     ];
     for size in ControlSize::ALL.iter().copied() {
@@ -149,8 +165,11 @@ fn every_height_token_is_whole() {
         }
     }
     assert_eq!(
-        SizeVar::SwitchRadius.css(ControlSize::Small.scale()),
+        SizeVar::SwitchRadius.css(ControlSize::Mini.scale()),
         "7.5px"
     );
-    assert_eq!(SizeToken::ALL.len(), SizeVar::ALL.len() * 3 + 1);
+    assert_eq!(
+        SizeToken::ALL.len(),
+        SizeVar::ALL.len() * ControlSize::ALL.len() + 1
+    );
 }

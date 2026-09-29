@@ -127,7 +127,7 @@ fn toggle(
                 kept_click(&event);
             },
             onkeydown: move |event| event.stop_propagation(),
-            Toggle { label, value, size: ControlSize::Small, availability, onchange: on_toggle }
+            Toggle { label, value, size: ControlSize::Mini, availability, onchange: on_toggle }
         }
     }
 }

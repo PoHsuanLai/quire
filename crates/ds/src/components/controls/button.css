@@ -33,7 +33,7 @@
 .ds-button[*|data-variant=danger]{
   display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
   border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
-  border-radius:var(--ctl-r-s); height:var(--ctl-h-s); padding:0 var(--ctl-pad-s); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
+  border-radius:var(--ctl-r-xs); height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
   transition:transform var(--t-tap) var(--e-out), background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=mini]:hover,
@@ -75,7 +75,7 @@
    Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
    a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
 .ds-button[*|data-size=regular]{ height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border-radius:var(--ctl-r-m); font-size:var(--fs-control); font-weight:700; line-height:1; }
-.ds-button[*|data-size=mini]{ height:var(--ctl-h-s); padding:0 var(--ctl-pad-s); border-radius:var(--ctl-r-s); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+.ds-button[*|data-size=mini]{ height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); border-radius:var(--ctl-r-xs); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
 /* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
 .ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
 
