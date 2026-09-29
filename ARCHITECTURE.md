@@ -395,8 +395,8 @@ pub trait ImeHost {
 pub trait FileDropHost { fn hit(&self, targets: &[Rc<MountedData>], at: Point) -> DropHit; }
 // The host provides one `Rc<dyn DocumentHost>` as root context (`ds_blitz::provide_host`
 // installs every part, so a root can never install a subset) and one `HostSignals
-// { modality: Signal<InputModality>, scale: Signal<Scale> }`; components read
-// `use_document_host()` and get `NoHost` (every method answers `Busy`/absent) under SSR.
+// { modality: Signal<InputModality>, scale: Signal<Scale>, activity: Signal<Activity> }`;
+// components read `use_document_host()` and get `NoHost` (every method answers `Busy`/absent) under SSR.
 
 // ds::spell, ds::window (kept)
 pub trait SpellService { fn languages(&self) -> Vec<Lang>;

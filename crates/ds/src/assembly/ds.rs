@@ -39,7 +39,9 @@
 //! The host reads it from `appearance.typeface` (`ds_settings::AppearanceSettings::typeface`), or
 //! an app that keeps its own voice passes Editorial outright.
 //! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
-//! positioned content (a centred sheet) is otherwise 0 px tall.
+//! positioned content (a centred sheet) is otherwise 0 px tall. A popup document, whose host
+//! fits the surface to its content, passes `RootExtent::Popup`: the floating card lies in flow
+//! at the origin and no outside catcher covers the surface.
 
 use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
