@@ -10,12 +10,13 @@
 //! pending, the glyph breathes or a spinner takes the trailing slot ([`RowWork`]); a success
 //! seals the glyph's disc once or draws the check on; a failure shakes the row once.
 
-use crate::components::press::{Press, PressListeners};
+use crate::components::press::PressListeners;
 use crate::components::settings_row_phase::{RowDisc, RowPhase, RowWork};
 use crate::components::settings_row_trailing::{RowTrailing, trailing as trailing_mark};
 use crate::components::spinner::{SpinnerKind, ring};
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Switch};
+use crate::core::press::Press;
 use crate::detail::first_show::FirstShow;
 use crate::detail::{
     armed::use_armed,

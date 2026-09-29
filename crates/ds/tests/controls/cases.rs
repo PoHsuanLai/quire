@@ -1,7 +1,6 @@
 //! Every control in every state, as data: the table the golden test walks.
 
 use dioxus::prelude::*;
-use ds::components::vocab::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
 use ds::detail::{Deadline, Operation, PendingToken};
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize,
@@ -10,6 +9,7 @@ use ds::{
     InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
     SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
+use ds::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {

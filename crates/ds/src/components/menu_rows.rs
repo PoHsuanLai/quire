@@ -7,10 +7,10 @@ use crate::components::menu_item::{
 };
 use crate::components::menu_lines::Line;
 use crate::components::menu_shape::PLAIN;
-use crate::components::press::Press;
 use crate::components::row_chord::NO_CHORD;
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::{Selection, StaggerIndex, Switch};
+use crate::core::press::Press;
 use crate::geometry::units::Point;
 use dioxus::prelude::*;
 

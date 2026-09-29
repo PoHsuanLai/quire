@@ -3,3 +3,4 @@
 pub(crate) mod base64;
 pub(crate) mod colour;
 pub(crate) mod png;
+pub(crate) mod press;

@@ -3,9 +3,18 @@
 //! one effect out.
 
 use crate::appearance::motion::MotionLevel;
-use crate::overlay::hover_hub::HoverWarmth;
 use crate::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
+
+/// Whether cards and fly labels open at once.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum HoverWarmth {
+    /// A card is open or closed less than HoverWarm ago: no wait.
+    Warm,
+    /// Wait for intent.
+    #[default]
+    Cold,
+}
 
 /// Where the machine is.
 #[derive(Debug, Clone, PartialEq, Eq)]

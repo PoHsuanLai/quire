@@ -7,7 +7,7 @@
 use crate::components::lock_vocab::PromptState;
 use crate::components::secret_entry::Filled;
 use crate::components::user_picture::mood::Mood;
-use crate::components::vocab::PulsePhase;
+use crate::motion::pulse_key::PulsePhase;
 use crate::motion::wake::WakeStamp;
 use dioxus::prelude::*;
 use std::time::{Duration, Instant};
@@ -93,7 +93,7 @@ mod tests {
     use crate::components::lock_vocab::PromptState;
     use crate::components::secret_entry::Filled;
     use crate::components::user_picture::mood::Mood;
-    use crate::components::vocab::PulsePhase;
+    use crate::motion::pulse_key::PulsePhase;
 
     #[test]
     fn the_prompt_s_state_picks_the_mood() {

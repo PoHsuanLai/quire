@@ -11,7 +11,8 @@
 //! back from where it is, carrying the hand's release velocity, instead of easing on a CSS
 //! transition; a new drag mid-return picks it up where it is.
 
-use crate::components::press::{PointerButton, button_of};
+use crate::components::press::button_of;
+use crate::core::press::PointerButton;
 use crate::detail::touch::{Contact, Touch};
 use crate::geometry::units::Px;
 use crate::motion::anim::Anim;

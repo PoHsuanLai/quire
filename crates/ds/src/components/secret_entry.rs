@@ -6,7 +6,8 @@
 
 use crate::appearance::motion::MotionLevel;
 use crate::components::lock_vocab::PromptState;
-use crate::components::vocab::{PulseKey, StaggerIndex};
+use crate::components::vocab::StaggerIndex;
+use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::root::env::Env;
 use crate::time::clock::sleep;

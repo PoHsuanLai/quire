@@ -2,11 +2,12 @@
 //! toggle and the sparks that fly only when starring. Split from `list_row` so the row's own
 //! file holds the row.
 
-use crate::components::vocab::{PulseKey, PulsePhase, Switch};
+use crate::components::vocab::Switch;
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::shape::Shape;
 use crate::motion::anim::Anim;
+use crate::motion::pulse_key::{PulseKey, PulsePhase};
 use dioxus::prelude::*;
 
 /// The six spark angles, 0 to 300 degrees in steps of 60 (`S:1285`).
@@ -104,8 +105,9 @@ pub(crate) fn star_button(
 #[cfg(test)]
 mod tests {
     use super::sparks;
-    use crate::components::vocab::{PulseKey, Switch};
+    use crate::components::vocab::Switch;
     use crate::motion::anim::Anim;
+    use crate::motion::pulse_key::PulseKey;
 
     #[test]
     fn sparks_follow_the_pop_only_when_starring() {

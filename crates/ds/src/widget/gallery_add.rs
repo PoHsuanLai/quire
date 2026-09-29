@@ -7,8 +7,8 @@
 
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::button_face::Leading;
-use crate::components::press::Press;
 use crate::components::text_runs::Text;
+use crate::core::press::Press;
 use crate::detail::{
     check_mark::CheckMark,
     detailed::Detailed,

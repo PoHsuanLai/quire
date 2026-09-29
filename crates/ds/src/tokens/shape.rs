@@ -152,7 +152,7 @@ impl Corner {
     pub fn squircle_style(self) -> String {
         match self {
             Corner::Squircle(length) => {
-                let extent = f64::from(length.0) * crate::icon::plate::EXTENT_PER_RADIUS;
+                let extent = f64::from(length.0) * crate::tokens::plate::EXTENT_PER_RADIUS;
                 format!(
                     "--sq-k:{}px;--r-squircle:{}px;",
                     round2(extent),
@@ -166,7 +166,7 @@ impl Corner {
 
 /// The circle a squircle of nominal radius `length` is inscribed in at 45 degrees.
 fn squircle_shadow_radius(length: crate::geometry::units::Px) -> f64 {
-    round2(f64::from(length.0) * crate::icon::plate::shadow_radius_share())
+    round2(f64::from(length.0) * crate::tokens::plate::shadow_radius_share())
 }
 
 fn round2(value: f64) -> f64 {

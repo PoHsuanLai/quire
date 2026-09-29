@@ -3,11 +3,11 @@
 
 use crate::cases::Case;
 use dioxus::prelude::*;
-use ds::components::vocab::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
 use ds::{
     ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, HoverStrip, Icon, ListPresence, ListRow,
     MarkSize, MarkStyle, Presence, Provider, ProviderMark, Px, StripAction,
 };
+use ds::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {

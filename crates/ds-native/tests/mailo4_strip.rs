@@ -3,11 +3,11 @@
 //! acts; where the rect resolves, the measured `onclick` follows it.
 
 use dioxus::prelude::*;
-use ds::components::vocab::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds::{
     ActionId, Anim, Appearance, Ds, HostMeasure, HoverStrip, Icon, ListRow, Material, Measured,
     Presence, Shown, StripAction,
 };
+use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 

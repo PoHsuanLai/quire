@@ -7,12 +7,13 @@ use crate::components::icon_view::IconView;
 use crate::components::menu_entry::{Tile, Trail};
 use crate::components::menu_match::marked;
 use crate::components::menu_shape;
-use crate::components::press::{PointerButton, Press, button_of};
+use crate::components::press::{button_of, press_of};
 use crate::components::row_action::{RowAction, trailing};
 use crate::components::row_chord::{RowChord, shown_chord};
 use crate::components::row_shape::RowShape;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Check, Selection, Shortcut, StaggerIndex, Switch};
+use crate::core::press::{PointerButton, Press};
 use crate::geometry::units::{Point, Px};
 use crate::icon::Icon;
 use crate::icon::external::IconSource;
@@ -189,7 +190,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
                 if let Some(onrelease) = onrelease {
                     event.stop_propagation();
                     let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
-                    onrelease.call(Press::of(&event, button));
+                    onrelease.call(press_of(&event, button));
                 }
             },
             onmounted: move |event| onmounted.call(event),

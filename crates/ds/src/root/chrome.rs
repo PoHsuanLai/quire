@@ -12,7 +12,7 @@
 //!   (the `--f-*` inks, design/03-COLOR.md section 4 and design/04-COMPONENTS.md's sidebar
 //!   item).
 
-use crate::material::material::Material;
+use crate::appearance::material::Material;
 
 /// Whether a root paints its material on its own box.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -136,7 +136,7 @@ impl Ground {
 #[cfg(test)]
 mod tests {
     use super::{FrameTint, Ground, RootChrome};
-    use crate::material::material::Material;
+    use crate::appearance::material::Material;
 
     #[test]
     fn each_material_has_its_chrome_tint_and_ground() {

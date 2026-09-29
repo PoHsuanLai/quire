@@ -4,7 +4,7 @@
 //! card, off the overlay and the layer stack, and picks as a menu does.
 
 use dioxus::prelude::*;
-use ds::components::vocab::Check;
+use ds::Check;
 use ds::{
     Anchor, Appearance, Ds, Flow, Key, Material, Menu, MenuEntry, MenuKind, MenuRow, PickDismiss,
     Point, Px,

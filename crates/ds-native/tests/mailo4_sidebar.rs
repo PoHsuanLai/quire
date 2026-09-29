@@ -4,10 +4,10 @@
 //! 6.1).
 
 use dioxus::prelude::*;
-use ds::components::vocab::{DropState, Here, PulseKey};
 use ds::{
     Anim, Appearance, Ds, Icon, ItemKind, Material, PlaceId, Point, Presence, Px, SidebarItem,
 };
+use ds::{DropState, Here, PulseKey};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 

@@ -8,7 +8,7 @@
 //! it back at rest at `settle(Bump)`. A change while one bump plays restarts it on the other
 //! alias; nothing loops.
 
-use crate::components::vocab::PulseKey;
+use crate::motion::pulse_key::PulseKey;
 use crate::motion::{
     anim::Anim,
     pulse::use_pulse,
@@ -71,7 +71,7 @@ pub fn Bumped<T: PartialEq + Clone + 'static>(on: T, children: Element) -> Eleme
 #[cfg(test)]
 mod tests {
     use super::{bump_attrs, worn};
-    use crate::components::vocab::{PulseKey, PulsePhase};
+    use crate::motion::pulse_key::{PulseKey, PulsePhase};
     use crate::motion::{anim::Anim, timer::TimerPhase};
 
     #[test]

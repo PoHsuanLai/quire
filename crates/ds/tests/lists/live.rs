@@ -4,7 +4,7 @@
 
 use super::rows::Row;
 use dioxus::prelude::*;
-use ds::components::vocab::Emphasis;
+use ds::Emphasis;
 use ds::{
     Accent, AnimatedList, BlurState, Env, Exit, InputModality, ListPresence, Material, MotionLevel,
     Px, Resolved, Roster, RowPitch, Scheme, use_roster,

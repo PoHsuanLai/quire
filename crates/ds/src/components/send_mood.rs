@@ -4,7 +4,8 @@
 //! hold still", design/05 principle 7).
 
 use crate::appearance::motion::MotionLevel;
-use crate::components::vocab::{PulseKey, StaggerIndex};
+use crate::components::vocab::StaggerIndex;
+use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::root::env::Env;
 use crate::time::clock::sleep;
@@ -121,8 +122,8 @@ fn settle_later(settled: Signal<u32>, anim: Anim, level: MotionLevel, round: u32
 #[cfg(test)]
 mod tests {
     use super::{SendMood, next_pulse};
-    use crate::components::vocab::{PulseKey, PulsePhase};
     use crate::motion::anim::Anim;
+    use crate::motion::pulse_key::{PulseKey, PulsePhase};
 
     #[test]
     fn each_failed_mood_plays_its_one_shot() {

@@ -5,8 +5,8 @@
 use crate::cases::{Case, DANA};
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::components::vocab::{DropState, Here, PulseKey};
 use ds::{ActionId, Anim, HoverStrip, Icon, ItemKind, PlaceId, Presence, Shown, SidebarItem};
+use ds::{DropState, Here, PulseKey};
 
 /// A place named `place`, in `drop` state, with every pointer hook attached.
 fn place(kind: ItemKind, label: &str, place: &str, drop: DropState) -> Element {

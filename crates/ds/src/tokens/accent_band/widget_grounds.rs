@@ -7,10 +7,10 @@
 //! these grounds.
 
 use super::grounds::over;
+use crate::appearance::material::Material;
 use crate::appearance::theme::Scheme;
-use crate::material::material::Material;
-use crate::material::recipe::tint;
 use crate::tokens::hex::Hex;
+use crate::tokens::tint::tint;
 
 /// The wallpaper backdrops a desktop widget is gated over: the default wallpaper's colours as
 /// sill's desktop capture shows them (2026-09-27, `widgets-desktop-cosmic.png`: a light warm

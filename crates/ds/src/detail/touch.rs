@@ -71,10 +71,10 @@ impl Contact {
     }
 
     /// The contact a quire button's press is, for a part of quire's own that hears a `Button`'s
-    /// `onclick` (which hands a [`crate::components::press::Press`], not the event): a press reaches it only from the
+    /// `onclick` (which hands a [`crate::core::press::Press`], not the event): a press reaches it only from the
     /// person's click or key on that button. Crate-private, so a caller outside quire still
     /// proves contact with an event.
-    pub(crate) fn pressed(press: &crate::components::press::Press) -> Contact {
+    pub(crate) fn pressed(press: &crate::core::press::Press) -> Contact {
         let _ = press;
         Contact {
             proof: (),

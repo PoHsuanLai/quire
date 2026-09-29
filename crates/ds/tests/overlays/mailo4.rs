@@ -5,7 +5,7 @@
 
 use crate::cases::Case;
 use dioxus::prelude::*;
-use ds::components::vocab::Check;
+use ds::Check;
 use ds::{
     Anchor, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
     MenuEntry, MenuKind, MenuRow, PickDismiss, Point, Px, Rect, Size, Tile, use_hover_intent,

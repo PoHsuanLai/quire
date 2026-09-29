@@ -1,11 +1,11 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::components::vocab::{DropState, Here, PulseKey};
 use ds::{
     Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkSize, MarkStyle, PlaceId, Presence,
     Provider, ProviderMark, Run, RunTone, SidebarItem, Text, Trailing,
 };
+use ds::{DropState, Here, PulseKey};
 
 /// One state and its golden.
 pub struct Case {

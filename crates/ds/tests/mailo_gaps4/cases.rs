@@ -1,7 +1,7 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::components::vocab::Switch;
+use ds::Switch;
 use ds::{
     AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkSize,
     MarkStyle, Provider, ProviderMark, Trailing,

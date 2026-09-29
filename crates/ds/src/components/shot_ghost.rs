@@ -4,10 +4,10 @@
 //! target under it stays readable, and translucent so what it is dropped on shows through. No
 //! motion: a drag icon follows the pointer, it does not arrive.
 
+use crate::appearance::material::Material;
 use crate::components::image_source::{ImageSize, ImageSource};
 use crate::components::shot_frame::{picture_style, shot_frame};
 use crate::geometry::units::Px;
-use crate::material::material::Material;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use dioxus::prelude::*;

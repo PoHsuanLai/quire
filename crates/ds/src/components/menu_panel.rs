@@ -10,11 +10,11 @@ use crate::components::menu_kind::MenuKind;
 use crate::components::menu_rows::{Drawn, RowsMotion, render_lines};
 use crate::components::menu_tracker::{Tracker, Via, target, use_tracker};
 use crate::components::popover::{Stacking, layer_slug, position_style, use_float};
-use crate::components::press::Press;
 use crate::components::{
     menu_filter::Filter,
     menu_lines::{Act, Choice, KeyAct, Line, choices, key_act, lines, liveness},
 };
+use crate::core::press::Press;
 use crate::geometry::{
     measure::MountedRef,
     placement::{Align, Placement, Side},

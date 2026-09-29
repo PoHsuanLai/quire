@@ -1,9 +1,10 @@
 //! The pieces of a `TreeItem` row: its attributes, its label, the leaf's chevron space and the
 //! fenced trailing slot. Apart from the component so each stays short.
 
-use crate::components::press::{Press, PressListeners, Propagation};
+use crate::components::press::{PressListeners, Propagation};
 use crate::components::text_runs::{Text, text};
 use crate::components::tree_item::Disclosure;
+use crate::core::press::Press;
 use crate::focus::click::kept_click;
 use dioxus::core::{Attribute, AttributeValue};
 use dioxus::prelude::*;

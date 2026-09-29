@@ -4,7 +4,7 @@
 //! nor takes the selection while the pointer is on the button.
 
 use crate::components::icon_button::{IconButton, IconButtonVariant};
-use crate::components::press::Press;
+use crate::core::press::Press;
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use dioxus::prelude::*;

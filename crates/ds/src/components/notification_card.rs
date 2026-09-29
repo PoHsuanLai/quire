@@ -20,17 +20,18 @@
 //! `swipe: Swipe::Dismiss(on_dismiss)` lets a drag or a horizontal scroll to the right dismiss
 //! the card (`notification_swipe`); the click that ends a drag never opens it.
 
+use crate::appearance::material::Material;
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::icon_view::IconView;
 use crate::components::notification_body::NotificationBody;
 use crate::components::notification_parts::{AppMark, CardAction, GroupCount, Hover};
 use crate::components::notification_swipe::{Swipe, use_card_swipe};
-use crate::components::press::{Press, PressListeners, Propagation};
+use crate::components::press::{PressListeners, Propagation};
 use crate::components::rich_text::Rich;
 use crate::components::text_runs::{Text, text};
+use crate::core::press::Press;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconPx, IconSize};
-use crate::material::material::Material;
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
