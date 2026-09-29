@@ -52,6 +52,7 @@ pub mod space;
 pub mod status_items;
 pub mod tokens;
 pub mod type_ramp;
+pub mod voice_orb;
 pub mod widget_blur;
 pub mod widget_edit;
 pub mod widget_looks;
