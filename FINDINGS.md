@@ -267,8 +267,8 @@ adapter opens).
 | lists: `brightness() invert()`, `brightness() blur()`, `blur() contrast()` | paints, first function first | paints, first function first |
 
 - **How.** Stock anyrender and vello cannot do this, so the workspace patches them
-  (`[patch.crates-io]`, the "TEMP: build against local vello and anyrender" commit) with the
-  `quire-filters` branches of two local clones, and enables anyrender_vello_cpu's `filters` feature
+  (`[patch.crates-io]` in the root `Cargo.toml`) with the `quire-filters` branches of our forks,
+  github.com/PoHsuanLai/vello and github.com/PoHsuanLai/anyrender, and enables anyrender_vello_cpu's `filters` feature
   in the pinned block. vello: a colour matrix filter (`vello_common`, the CPU pass in `vello_cpu`,
   a `PASS_COLOR_MATRIX` in `vello_hybrid`'s `filter.wesl` with the GPU filter struct grown from 48
   to 96 bytes), the CSS functions' matrices (`vello_common::filter_effects::matrices`), and filter
