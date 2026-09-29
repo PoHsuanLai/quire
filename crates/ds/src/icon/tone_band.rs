@@ -10,7 +10,7 @@
 //!
 //! One hue, tone on tone, as Monochrome exists for; the same rule for the raster and the plate.
 
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 
 /// The lightness a dark plate's stops are lifted into.
 pub const PLATE_BAND: (f64, f64) = (0.46, 0.56);
@@ -56,7 +56,7 @@ fn art(l: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::{ART_BAND, PLATE_BAND, Tone};
-    use crate::appearance::Scheme;
+    use crate::appearance::theme::Scheme;
 
     #[test]
     fn the_light_scheme_keeps_lightness_and_the_dark_one_bands_it() {

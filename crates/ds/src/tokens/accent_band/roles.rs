@@ -1,6 +1,6 @@
 //! What an accent paints: the roles one hue becomes.
 
-use crate::tokens::{Alpha, Colour, Hex};
+use crate::tokens::hex::{Alpha, Colour, Hex};
 
 /// The roles [`super::accent_roles`] returns for one hue in one scheme.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

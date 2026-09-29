@@ -7,16 +7,17 @@
 //! a light never starts the titlebar's move, and a double-click on one never zooms.
 
 use crate::components::light_mark::{LightMark, Mark};
-use crate::components::menu::{Menu, MenuKind};
 use crate::components::menu_entry::{MenuEntry, Tile, Trail};
 use crate::components::vocab::{Availability, Expanded};
-use crate::geometry::{Anchor, MountedRef};
+use crate::components::{menu::Menu, menu_kind::MenuKind};
+use crate::geometry::measure::{Anchor, MountedRef};
 use crate::icon::Icon;
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use crate::window::hold::{Click, Hold, Opens, Waiting};
 use crate::window::{
-    FrameTiming, Maximized, Support, WindowHost, WindowTile, Zoom, use_window_host,
-    use_window_state,
+    host::{WindowHost, use_window_host, use_window_state},
+    timing::FrameTiming,
+    vocab::{Maximized, Support, WindowTile, Zoom},
 };
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;

@@ -6,16 +6,19 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::appearance::{Accent, Scheme};
-use crate::components::StatusMetrics;
+use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::components::icon_button::StatusMetrics;
 use crate::css::accents_css::swatch_var;
 use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
 use crate::css::shape_css::{SHAPE_VARS, SQUIRCLE_VARS};
 use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
 use crate::material::level::LEVEL_VARS;
 use crate::material::stack::STACK_INPUTS;
-use crate::motion::Anim;
-use crate::space::{CardAccent, FrameVars, SpaceLook};
+use crate::motion::anim::Anim;
+use crate::space::{
+    frame_vars::FrameVars,
+    look::{CardAccent, SpaceLook},
+};
 use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
@@ -24,12 +27,24 @@ use crate::tokens::size_vars::size_tokens;
 use crate::tokens::type_voice::VoiceToken;
 use crate::tokens::widget_paint::WidgetPaint;
 use crate::tokens::widgets::WIDGET_TOKENS;
-use crate::tokens::{CONTROL_CENTER, SHELL_SCALE};
 use crate::tokens::{
-    ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
-    ZLayer,
+    colour::ColourToken,
+    delay::DelayToken,
+    easing::EasingToken,
+    elevation::Shadow,
+    label_hue::{HueMember, LabelHue},
+    layer::ZLayer,
+    name::VarName,
+    opacity::OpacityToken,
+    person::PersonSwatch,
+    pixel::PixelToken,
+    scalar::ScalarToken,
+    shape::Radius,
+    spacing::SpacingToken,
+    timing::DurationToken,
+    type_scale::{Family, FontSize},
 };
+use crate::tokens::{control_center::CONTROL_CENTER, shell_scale::SHELL_SCALE};
 
 /// Every custom property the design system declares, `--` included: the token table's
 /// (colours, label hues, durations, the CSS delays, easings, scalars, radii, spacing steps,
@@ -57,7 +72,7 @@ fn collect() -> HashSet<String> {
         .chain(ZLayer::ALL.map(ZLayer::var))
         .chain(OpacityToken::ALL.map(OpacityToken::var))
         .chain(Family::ALL.map(Family::var))
-        .chain([crate::tokens::FONT_EMOJI])
+        .chain([crate::tokens::emoji_face::FONT_EMOJI])
         .chain(VoiceToken::ALL.map(VoiceToken::var))
         .chain(MATERIAL_VARS)
         .chain([TINT_ALPHA])
@@ -138,7 +153,7 @@ mod tests {
     /// Every custom property the generated stylesheet declares on a `.ds` root block (the token,
     /// accent and material sections), asked of the stylesheet itself.
     fn root_declarations() -> Vec<String> {
-        let (rules, _) = walk::walk(&tokenize::tokens(crate::stylesheet()));
+        let (rules, _) = walk::walk(&tokenize::tokens(crate::css::stylesheet::stylesheet()));
         rules
             .into_iter()
             .filter(|rule| {

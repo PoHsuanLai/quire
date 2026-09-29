@@ -36,15 +36,18 @@ use crate::components::palette_stops::{
 use crate::components::palette_host::{card_corner, hosted};
 use crate::components::popover::{Dismiss, Float, Stacking, use_float};
 use crate::components::search_field::SearchField;
-use crate::components::text_input::Focus;
+use crate::components::text_input_focus::Focus;
 use crate::components::tooltip::Shown;
 use crate::components::vocab::Availability;
-use crate::detail::RevealCue;
+use crate::detail::reveal::RevealCue;
 use crate::focus::caret::{Caret, HostCaret, InitialCaret};
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
-use crate::geometry::{MountedRef, Px, Rect};
-use crate::tokens::{Corner, ZLayer};
+use crate::geometry::{
+    measure::MountedRef,
+    units::{Px, Rect},
+};
+use crate::tokens::{layer::ZLayer, shape::Corner};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -80,7 +83,7 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// `aside` is drawn beside the results, under the field, past a hairline divider, `aside_width`
 /// wide: over the window the card widens by that much; in a surface the card still fills its
 /// container, so the host widens the surface (sill's launcher panel) and the results column
-/// narrows by it otherwise. Use it for a [`PreviewPane`](crate::PreviewPane).
+/// narrows by it otherwise. Use it for a [`PreviewPane`](crate::components::preview_pane::PreviewPane).
 ///
 /// `shown` keeps the palette mounted while hidden: `Some(Shown::Hidden)` lays out nothing and
 /// leaves the layer stack, and each change to `Some(Shown::Visible)` replays the entrance,

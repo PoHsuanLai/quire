@@ -6,12 +6,17 @@
 //! (design/03-COLOR.md section 4).
 
 use super::contrast::ratio;
-use crate::appearance::Scheme;
-use crate::tokens::accent_band::{AccentPick, AccentRoles, BAND, Hue, Weight, accent_roles};
+use crate::appearance::theme::Scheme;
+use crate::tokens::accent_band::{
+    band::{AccentPick, Hue, Weight},
+    derive::accent_roles,
+    picked::BAND,
+    roles::AccentRoles,
+};
 use serde::{Deserialize, Serialize};
 
-mod card;
-mod readout;
+pub(crate) mod card;
+pub(crate) mod readout;
 
 pub use card::{Card, POST_DARK, POST_LIGHT, card};
 pub use readout::{ContrastCheck, readout};

@@ -8,7 +8,7 @@ use super::bluetooth_state::BluetoothState;
 use super::volume::{VolumeGlyph, VolumeState};
 use super::wifi::WifiGlyph;
 use super::wifi_state::WifiState;
-use crate::detail::FirstShow;
+use crate::detail::first_show::FirstShow;
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;
 

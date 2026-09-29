@@ -14,7 +14,7 @@
 use super::units::{Point, Px, Rect, Size};
 use crate::busy::{after_render, wait_out_busy};
 use crate::guarded::Guarded;
-use crate::time::{FRAME_SLACK, sleep};
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::html::geometry::PixelsRect;
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -222,8 +222,9 @@ pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
 
 #[cfg(test)]
 mod tests {
-    use super::{FRAME_SLACK, SLOW_RETRY, laid_out, layout_retry};
+    use super::{SLOW_RETRY, laid_out, layout_retry};
     use crate::geometry::units::{Point, Px, Rect, Size};
+    use crate::time::FRAME_SLACK;
 
     #[test]
     fn a_read_before_layout_is_tried_again_frame_paced_then_slower_then_not() {

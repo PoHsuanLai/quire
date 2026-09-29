@@ -11,8 +11,10 @@
 //! hue on every button.
 
 use super::emit::{attr_selector, declaration, rule};
-use crate::appearance::{Accent, Scheme};
-use crate::tokens::{AccentRoles, ColourToken, accent_of};
+use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::tokens::{
+    accent_band::roles::AccentRoles, accent_table::accent_of, colour::ColourToken,
+};
 
 /// The accent quads, light and dark.
 pub fn accents_css() -> String {

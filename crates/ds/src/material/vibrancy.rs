@@ -8,8 +8,8 @@
 //! time by the `appearance.material_vibrancy` key (percent, default 100) through the
 //! `--m-vibrancy` input the root writes: 0 is the flat section 17.2 tint.
 
-use crate::appearance::Scheme;
-use crate::tokens::Hex;
+use crate::appearance::theme::Scheme;
+use crate::tokens::hex::Hex;
 
 /// Chroma multiplier at full vibrancy: 1.4.
 pub const CHROMA_GAIN: f64 = 1.4;
@@ -74,8 +74,8 @@ fn byte(linear: f64) -> u8 {
 #[cfg(test)]
 mod tests {
     use super::{boosted, oklab, srgb};
-    use crate::appearance::Scheme;
-    use crate::tokens::Hex;
+    use crate::appearance::theme::Scheme;
+    use crate::tokens::hex::Hex;
 
     #[test]
     fn oklab_round_trips_every_tint() {

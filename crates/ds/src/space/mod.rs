@@ -10,12 +10,13 @@ pub mod palette;
 pub mod presets;
 pub mod store;
 
+pub use crate::space::palette::{
+    card::{Card, POST_DARK, POST_LIGHT, card},
+    readout::{ContrastCheck, readout},
+};
 pub use contrast::{Verdict, ratio};
 pub use frame_vars::FrameVars;
 pub use look::{CardAccent, Grain, SpaceLook};
-pub use palette::{
-    Capping, Card, ContrastCheck, Dot, NEUTRAL_DOT, POST_DARK, POST_LIGHT, Palette, card, derive,
-    gradient, readout, swatch,
-};
+pub use palette::{Capping, Dot, NEUTRAL_DOT, Palette, derive, gradient, swatch};
 pub use presets::{PRESETS, Preset, default_look};
 pub use store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex};

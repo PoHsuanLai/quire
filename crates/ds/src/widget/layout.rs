@@ -4,7 +4,7 @@
 //! settings; the widget gallery and the desktop's drag hand it [`WidgetEdit`]s, and [`apply`]
 //! turns an edit into the next layout or says why it cannot (pure: no clock, no I/O).
 
-use crate::catalog::{Placement, PlacementId, Placements};
+use crate::catalog::placement::{Placement, PlacementId, Placements};
 use crate::components::widget_kind::{WidgetHost, WidgetSize};
 use crate::widget::contract::WidgetKind;
 use serde::{Deserialize, Serialize};
@@ -245,7 +245,7 @@ mod tests {
     use super::{
         DesktopGrid, GridCell, LayoutError, Order, WidgetAt, WidgetEdit, WidgetLayout, apply,
     };
-    use crate::catalog::PlacementId;
+    use crate::catalog::placement::PlacementId;
     use crate::components::widget_kind::{WidgetHost, WidgetSize};
     use crate::widget::contract::WidgetKind;
 

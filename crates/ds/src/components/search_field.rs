@@ -2,7 +2,10 @@
 //! tokens under it (design/04-COMPONENTS.md section 7).
 
 use crate::components::chip::{Chip, ChipVariant};
-use crate::components::text_input::{Focus, InputVariant, TextInput};
+use crate::components::{
+    text_input::{InputVariant, TextInput},
+    text_input_focus::Focus,
+};
 use crate::focus::field::FieldHandle;
 use crate::icon::Icon;
 use crate::icon::render::Glyph;

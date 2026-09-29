@@ -8,13 +8,21 @@ use super::bluetooth_state::BluetoothState;
 use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use crate::detail::{
-    FirstShow, Layers, Lit, PendingFrame, PendingSpec, PendingStyle, SettleStyle, Settling,
-    Slashed, Touch, use_detail, use_operation, use_pending, use_settle, use_shake,
+    first_show::FirstShow,
+    morph::Slashed,
+    once::use_shake,
+    pending::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle},
+    settle::{SettleStyle, Settling},
+    touch::Touch,
+    use_detail::use_detail,
+    use_operation::use_operation,
+    use_pending::use_pending,
+    use_settle::use_settle,
 };
 use crate::icon::render::IconSize;
 use crate::icon::shape::Shape;
 use crate::icon::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 /// The connecting loop: the whole rune's opacity, high then low.

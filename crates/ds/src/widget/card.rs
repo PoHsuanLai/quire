@@ -6,7 +6,7 @@
 use crate::components::widget_exit::CardPresence;
 use crate::components::widget_frame::WidgetFrame;
 use crate::components::widget_kind::{Lift, WidgetHost, WidgetSize};
-use crate::motion::WakeStamp;
+use crate::motion::wake::WakeStamp;
 use crate::widget::contract::{Widget, WidgetContext, fit};
 use crate::widget::timeline::{RefreshAsk, Timeline};
 use crate::widget::use_widget::use_widget;

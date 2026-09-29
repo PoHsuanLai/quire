@@ -2,7 +2,7 @@
 //! overshoot. A [`Contact`] is proof of that contact, and the only public way to get one is from
 //! the event a pointer or key handler receives, so a remote change cannot claim it.
 
-use crate::motion::Velocity;
+use crate::motion::velocity::Velocity;
 use dioxus::prelude::{Event, KeyboardData, MouseData, PointerData};
 
 mod sealed {
@@ -71,7 +71,7 @@ impl Contact {
     }
 
     /// The contact a quire button's press is, for a part of quire's own that hears a `Button`'s
-    /// `onclick` (which hands a [`crate::Press`], not the event): a press reaches it only from the
+    /// `onclick` (which hands a [`crate::components::press::Press`], not the event): a press reaches it only from the
     /// person's click or key on that button. Crate-private, so a caller outside quire still
     /// proves contact with an event.
     pub(crate) fn pressed(press: &crate::components::press::Press) -> Contact {

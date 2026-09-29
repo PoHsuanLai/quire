@@ -6,9 +6,13 @@
 use super::cue::Cue;
 use super::level::use_level;
 use super::moment::Moment;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::PulseKey;
-use crate::motion::{Anim, TimerPhase, use_motion_timer, use_pulse};
+use crate::motion::{
+    anim::Anim,
+    pulse::use_pulse,
+    timer::{TimerPhase, use_motion_timer},
+};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

@@ -6,8 +6,8 @@
 
 use crate::components::image_source::{ImageSize, ImageSource};
 use crate::components::shot_frame::{picture_style, shot_frame};
-use crate::geometry::Px;
-use crate::material::Material;
+use crate::geometry::units::Px;
+use crate::material::material::Material;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use dioxus::prelude::*;

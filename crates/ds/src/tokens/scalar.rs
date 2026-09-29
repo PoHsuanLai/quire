@@ -3,7 +3,7 @@
 
 use super::hex::thousandths;
 use super::name::VarName;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use std::time::Duration;
 
 /// One motion scalar.

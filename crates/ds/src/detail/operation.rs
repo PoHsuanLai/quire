@@ -3,8 +3,8 @@
 //! deadline no later than `PendingCap`, and the loop holds its still frame at that deadline. There
 //! is no way to write a pending loop without one.
 
-use crate::appearance::MotionLevel;
-use crate::tokens::DelayToken;
+use crate::appearance::motion::MotionLevel;
+use crate::tokens::delay::DelayToken;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
@@ -65,7 +65,7 @@ impl PendingToken {
     pub fn start(deadline: Deadline) -> PendingToken {
         PendingToken {
             serial: STARTED.fetch_add(1, Ordering::Relaxed) + 1,
-            started: crate::time::now(),
+            started: crate::time::clock::now(),
             deadline,
         }
     }
@@ -82,7 +82,7 @@ impl PendingToken {
 
     /// How long it has been running.
     pub fn elapsed(self) -> Duration {
-        crate::time::since(self.started)
+        crate::time::clock::since(self.started)
     }
 }
 

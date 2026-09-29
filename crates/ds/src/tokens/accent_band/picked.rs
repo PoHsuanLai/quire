@@ -6,8 +6,8 @@
 //! not pick (A System, C Calm) are recorded with their numbers in section 20.
 
 use super::band::{AccentBand, ChromaSpan, Hue, InkRule, Milli, SchemeBand};
-use crate::appearance::Accent;
-use crate::tokens::Alpha;
+use crate::appearance::accent::Accent;
+use crate::tokens::hex::Alpha;
 
 /// The band every accent is generated in.
 pub const BAND: AccentBand = AccentBand {

@@ -8,7 +8,7 @@
 //! so the sheet draws the same `135deg` gradient [`super::gradient`] writes: one colour flat,
 //! two at 0 % and 100 %, three at 0 %, 50 % and 100 %.
 
-use crate::tokens::VarName;
+use crate::tokens::name::VarName;
 
 /// The custom properties a dot's paint writes, in order.
 pub(crate) const DOT_VARS: [VarName; 3] = [

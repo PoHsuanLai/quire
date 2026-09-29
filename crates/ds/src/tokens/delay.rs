@@ -5,7 +5,7 @@
 //! (design/05-MOTION.md open decision 2, proposed: hover-intent delays unchanged under Reduced).
 
 use super::name::VarName;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use std::time::Duration;
 
 /// One delay or hold.

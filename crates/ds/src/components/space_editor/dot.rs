@@ -2,8 +2,8 @@
 //! section 32, `S:147-150`).
 
 use crate::components::vocab::{Here, Shortcut, Switch};
-use crate::space::FrameVars;
 use crate::space::dot_paint::DotPaint;
+use crate::space::frame_vars::FrameVars;
 use dioxus::prelude::*;
 
 /// One Space's dot in the sidebar foot.

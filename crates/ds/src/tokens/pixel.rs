@@ -13,7 +13,7 @@
 
 use super::name::VarName;
 use super::tuned::Tuned;
-use crate::geometry::{Px, Scale};
+use crate::geometry::{scale::Scale, units::Px};
 
 /// One pixel token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -185,7 +185,7 @@ fn decimal(numerator: u64, denominator: u64) -> String {
 #[cfg(test)]
 mod tests {
     use super::PixelToken;
-    use crate::geometry::{Px, Scale};
+    use crate::geometry::{scale::Scale, units::Px};
 
     /// Each token's CSS at 1.25, 1.5, 1.75 and 2.
     const TABLE: &[(PixelToken, [&str; 4])] = &[

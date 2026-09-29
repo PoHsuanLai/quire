@@ -15,8 +15,12 @@
 use crate::components::battery_ring::{Span, arc_path};
 use crate::components::text_runs::Text;
 use crate::components::vocab::Fraction;
-use crate::motion::{RunFrame, RunTokens, WakeStamp, use_level_run};
-use crate::tokens::{DurationToken, EasingToken};
+use crate::motion::{
+    level_run::{RunFrame, RunTokens},
+    use_level_run::use_level_run,
+    wake::WakeStamp,
+};
+use crate::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +33,7 @@ pub const FILL: RunTokens = RunTokens {
 
 /// The frame of a battery ring's fill toward `level`: from empty on mount and on each new
 /// `wake`, from the last level drawn on each new `level`, at once under Reduced motion.
-/// [`BatteryLevel`] draws its arc from it and [`crate::use_battery_figure`] its count, so a ring
+/// [`BatteryLevel`] draws its arc from it and [`crate::components::battery_figure::use_battery_figure`] its count, so a ring
 /// and a percentage given the same `level` and `wake` move in step.
 pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
     use_level_run(level.clamped(), wake, FILL)

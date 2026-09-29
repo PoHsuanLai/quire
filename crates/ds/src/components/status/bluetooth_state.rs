@@ -1,6 +1,6 @@
 //! The Bluetooth item's state and what each change of it means (design/26-DETAILS.md 5.1.2).
 
-use crate::detail::{Detailed, EventStamp, Moment};
+use crate::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 
 /// What the Bluetooth item shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

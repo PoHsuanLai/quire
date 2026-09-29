@@ -5,12 +5,15 @@
 //! `@keyframes X--b`, identical; the pulse class plays `X` under `data-pulse=a` and `X--b`
 //! under `data-pulse=b`, so flipping the attribute changes the animation name and Stylo starts
 //! it over (spike S5). Each class's declaration is the [`Anim`]'s recipe, written from the same
-//! table [`crate::settle`] times.
+//! table [`crate::motion::settle::settle`] times.
 
 use super::MOTION;
 use super::emit::{attr_selector, property, rule};
-use crate::appearance::MotionLevel;
-use crate::motion::{Anim, Fill, Iteration, Recipe};
+use crate::appearance::motion::MotionLevel;
+use crate::motion::{
+    anim::Anim,
+    recipe::{Fill, Iteration, Recipe},
+};
 
 /// The suffix of every keyframe's second name.
 pub(crate) const ALIAS: &str = "--b";
@@ -125,7 +128,7 @@ fn matching(text: &str) -> Option<usize> {
 mod tests {
     use super::{animation, keyframes, motion_css};
     use crate::css::MOTION;
-    use crate::motion::Anim;
+    use crate::motion::anim::Anim;
 
     #[test]
     fn every_anim_has_its_keyframes_and_every_keyframe_an_anim() {

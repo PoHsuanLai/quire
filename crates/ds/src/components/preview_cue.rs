@@ -10,10 +10,14 @@
 
 use crate::components::shown_phase::Alias;
 use crate::components::spinner::{SpinnerKind, ring};
-use crate::detail::{Cue, PendingFrame, PendingSpec, Touch};
+use crate::detail::{
+    cue::Cue,
+    pending::{PendingFrame, PendingSpec},
+    touch::Touch,
+};
 use dioxus::prelude::*;
 
-/// What a [`PreviewPane`](crate::PreviewPane) knows of its latest change: the cue the caller's
+/// What a [`PreviewPane`](crate::components::preview_pane::PreviewPane) knows of its latest change: the cue the caller's
 /// own `use_detail` made for the pane's state (its entrance's touch, and the in-place changes it
 /// cross-fades), or only the touch that showed it (no cross-fades). Either converts in with
 /// `.into()`; the default is a remote showing.

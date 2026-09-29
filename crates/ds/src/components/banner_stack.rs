@@ -17,7 +17,7 @@
 //! since it leaves along the swipe (`NotificationCard`'s swipe, the row's `data-flight`).
 
 use crate::components::banner_row::BannerRow;
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 use crate::motion::presence::Exit;
 use crate::motion::roster::RowPitch;
 use crate::motion::roster_exits::{Leaving, use_leaving_roster, use_pitches};

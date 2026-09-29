@@ -1,6 +1,6 @@
 //! EmojiGrid: emoji as a grid of cells, moved through with the arrow keys in two dimensions
 //! (design/04-COMPONENTS.md section 46). On its own it takes the keyboard itself; in
-//! a command palette it is one group ([`GroupEntries::Grid`](crate::GroupEntries)) and the
+//! a command palette it is one group ([`GroupEntries::Grid`](crate::components::palette_group::GroupEntries)) and the
 //! palette's field keeps the keyboard, moving through it with the palette's cursor.
 //!
 //! The glyphs paint in colour through `.ds-emoji-text` (the `--font-emoji` stack). A cell's name
@@ -9,7 +9,7 @@
 use crate::components::emoji_grid_nav::{GridMove, GridStep, grid_step};
 use crate::components::tooltip::{Tooltip, TooltipKind};
 use crate::components::vocab::Selection;
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 use dioxus::prelude::*;
 
 /// One emoji: what picking it yields, the characters drawn, and its name.
@@ -189,7 +189,7 @@ fn is_pick(key: &Key) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{grid_style, is_pick};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
     use dioxus::prelude::Key;
 
     #[test]

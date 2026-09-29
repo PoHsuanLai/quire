@@ -1,5 +1,5 @@
 //! A palette or menu row's action chord (launcher chords): the keys that run the row's first
-//! action, drawn as a plain [`Chord`](crate::Chord) at the end of its trail. Spotlight shows it
+//! action, drawn as a plain [`Chord`](crate::components::chord::Chord) at the end of its trail. Spotlight shows it
 //! only on the highlighted row, so the list reads as its data (a file's time) and the hint
 //! follows the selection; `Always` keeps it on every row, as a menu's shortcuts are.
 

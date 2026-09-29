@@ -2,7 +2,10 @@
 //! each goes against its anchor, its entrance and its item layout. Split from `menu`.
 
 use crate::components::menu_item::Row;
-use crate::geometry::{Align, Placement, Point, Px, Rect, Side};
+use crate::geometry::{
+    placement::{Align, Placement, Side},
+    units::{Point, Px, Rect},
+};
 use crate::motion::anim::Anim;
 
 /// Which menu shape.

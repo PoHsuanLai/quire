@@ -1,4 +1,4 @@
-//! The frame ground (`data-ground="frame"`, `crate::Ground::Frame`): under it the paper inks and
+//! The frame ground (`data-ground="frame"`, `crate::root::chrome::Ground::Frame`): under it the paper inks and
 //! fills are the frame's, so every component (Button, IconButton, Chip, Count, a menu's
 //! trigger, plain text) draws in the `--f-*` inks without a variant of its own
 //! (design/03-COLOR.md section 4, design/04-COMPONENTS.md's sidebar item).
@@ -7,8 +7,8 @@
 //! cards, so they take the paper values back, per scheme, from the token table.
 
 use super::emit::{attr_selector, declaration, rule};
-use crate::appearance::Scheme;
-use crate::tokens::{ColourToken, VarName};
+use crate::appearance::theme::Scheme;
+use crate::tokens::{colour::ColourToken, name::VarName};
 
 /// Each paper token a frame ground redirects, and the frame variable it reads instead: the text
 /// inks to the frame inks, the hover fill (`--surface`, Tool's hover) to `--f-pill-hover`, the

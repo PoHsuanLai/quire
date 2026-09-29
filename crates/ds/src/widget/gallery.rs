@@ -7,14 +7,14 @@
 //! settles to a check and the new row rises in and is brought into view. The gallery changes
 //! nothing itself: every
 //! choice is a [`WidgetEdit`] handed to the host, which applies it to the layout it keeps in its
-//! settings ([`crate::widget::apply`]) and passes the new layout back.
+//! settings ([`crate::widget::layout::apply`]) and passes the new layout back.
 
 use crate::components::button::ButtonVariant;
 use crate::components::press::Press;
 use crate::components::text_runs::{Text, text};
 use crate::components::widget_kind::{Lift, WidgetHost, WidgetSize};
-use crate::detail::{Contact, Touch};
-use crate::geometry::MountedRef;
+use crate::detail::touch::{Contact, Touch};
+use crate::geometry::measure::MountedRef;
 use crate::widget::contract::WidgetKind;
 use crate::widget::gallery_add::AddButton;
 use crate::widget::gallery_book::{Asked, Book};

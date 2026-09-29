@@ -26,9 +26,9 @@ use super::stack::{
     HAIRLINE_DARK, HAIRLINE_LIGHT, HIGHLIGHT_DARK, HIGHLIGHT_LIGHT, SHADOW_STRENGTH,
 };
 use super::vibrancy::boosted;
-use crate::appearance::Scheme;
-use crate::tokens::Radius;
+use crate::appearance::theme::Scheme;
 use crate::tokens::hex::{Alpha, Colour, Hex};
+use crate::tokens::shape::Radius;
 
 /// The settings key's default, `appearance.material_tint_alpha = 80` (design/22-SETTINGS.md
 /// section 3.1, proposed): the alpha at which every tint is section 17.2's own.
@@ -286,8 +286,8 @@ fn radius(material: Material) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{DEFAULT_TINT_ALPHA, flat_tint, recipe};
-    use crate::appearance::Scheme;
-    use crate::material::Material;
+    use crate::appearance::theme::Scheme;
+    use crate::material::material::Material;
     use crate::tokens::hex::{Alpha, Hex};
 
     #[test]

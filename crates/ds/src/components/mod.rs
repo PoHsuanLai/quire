@@ -32,13 +32,13 @@ pub mod dock_parts;
 pub mod drag_ghost;
 pub mod edge_strip;
 pub mod edit_surface;
-mod edit_surface_ctx;
-mod edit_surface_focus;
-mod edit_surface_keys;
-mod edit_surface_pointer;
-mod edit_surface_spell;
-mod edit_surface_spell_menu;
-mod edit_surface_state;
+pub(crate) mod edit_surface_ctx;
+pub(crate) mod edit_surface_focus;
+pub(crate) mod edit_surface_keys;
+pub(crate) mod edit_surface_pointer;
+pub(crate) mod edit_surface_spell;
+pub(crate) mod edit_surface_spell_menu;
+pub(crate) mod edit_surface_state;
 pub mod emoji;
 pub mod emoji_grid;
 pub mod emoji_grid_nav;
@@ -78,7 +78,7 @@ pub(crate) mod menu_panel;
 pub mod menu_pick;
 pub(crate) mod menu_return;
 pub(crate) mod menu_rows;
-mod menu_shape;
+pub(crate) mod menu_shape;
 pub(crate) mod menu_surface;
 pub(crate) mod menu_tracker;
 pub(crate) mod module_disc;
@@ -116,7 +116,7 @@ pub mod pane_switcher;
 pub mod panel;
 pub mod pass_through;
 pub mod pdf_thumb;
-mod pdf_thumb_grace;
+pub(crate) mod pdf_thumb_grace;
 pub mod peek;
 pub mod play_pause;
 pub mod polkit_prompt;
@@ -189,6 +189,52 @@ pub mod widget_slot;
 pub mod window_frame;
 pub mod workspace_pills;
 
+pub use crate::components::emoji::{
+    disc::{DiscHue, EmojiDisc, EmojiPlayback},
+    id::EmojiId,
+};
+pub use crate::components::hover_card::{
+    intent::{HoverAnchor, HoverDriver, use_hover_intent},
+    parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint},
+    target::{HoverTarget, TargetElement},
+};
+pub use crate::components::image_source::ImageSource;
+pub use crate::components::level::{
+    control::LevelControl,
+    vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick},
+};
+pub use crate::components::menu_kind::{MenuEntrance, MenuKind};
+pub use crate::components::space_editor::{
+    dot::SpaceDot,
+    rows::{MeasuredIn, MotionChoice, MotionLevels},
+};
+pub use crate::components::status::{
+    battery::BatteryGlyph,
+    battery_state::{BatteryPower, BatteryState, LowAt},
+    bluetooth::BluetoothGlyph,
+    bluetooth_state::BluetoothState,
+    family::{StatusGlyph, StatusState},
+    volume::{VolumeGlyph, VolumeState, VolumeWaves},
+    wifi::WifiGlyph,
+    wifi_state::{WifiBars, WifiReach, WifiState},
+};
+pub use crate::components::user_picture::{
+    choice::{FaceFile, PictureChoice, resolve_picture},
+    mood::{Mood, PictureSize},
+    picker::{PICTURE_CELL, PICTURE_COLUMNS, UserPicturePicker},
+    picture::UserPicture,
+    portrait::UserPortrait,
+};
+pub use crate::components::{
+    palette_host::{CommandPaletteHost, PaletteEntrance},
+    palette_motion::{PaletteHandle, use_palette_handle},
+};
+pub use crate::components::{sheet_placement::SheetPlacement, sheet_width::SheetWidth};
+pub use crate::components::{
+    text_input_focus::Focus,
+    text_input_kind::{Grow, Rows, TextInputKind},
+};
+pub use crate::motion::wake::WakeStamp;
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use alert::Alert;
 pub use alert_vocab::{AlertButton, AlertEmphasis};
@@ -210,10 +256,7 @@ pub use chord::Chord;
 pub use clock_angles::{Hands, Tenths, hands};
 pub use clock_face::ClockFace;
 pub use clock_kind::{ClockLook, ClockTime, DayPhase, Seconds};
-pub use command_palette::{
-    ASIDE_WIDTH, CommandPalette, CommandPaletteHost, PaletteEntrance, PaletteHandle,
-    use_palette_handle,
-};
+pub use command_palette::{ASIDE_WIDTH, CommandPalette};
 pub use command_pill::CommandPill;
 pub use count::{Count, CountPlace};
 pub use device_battery::DeviceBattery;
@@ -223,15 +266,12 @@ pub use drag_ghost::{DragGhost, DragReturnFrame, DropLine, Grip};
 pub use edge_strip::{EdgeStrip, SideState};
 pub use edit_surface::EditSurface;
 pub use edit_surface_spell_menu::{SPELL_SUGGESTIONS, SpellMarks};
-pub use emoji::{AnimatedEmoji, DiscHue, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback};
+pub use emoji::{AnimatedEmoji, EMOJI_ATTRIBUTION};
 pub use emoji_grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid};
 pub use emoji_grid_nav::{GridEdge, GridMove, GridStep, grid_step};
 pub use flow::Flow;
 pub use group_header::GroupHeader;
-pub use hover_card::{
-    FlagTone, HoverAnchor, HoverCard, HoverCardPart, HoverDriver, HoverMessage, HoverStat,
-    HoverTarget, KeyHint, TargetElement, use_hover_intent,
-};
+pub use hover_card::HoverCard;
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
 pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
 pub use icon_view::IconView;
@@ -239,14 +279,13 @@ pub use idle_dim::IdleDim;
 pub use image_source::ImageSize;
 pub use kbd::{Kbd, KbdSize};
 pub use leaving_list::{LeavingItem, LeavingList};
-pub use level::{LevelControl, LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick};
 pub use link_pill::{LinkPill, LinkTarget};
 pub use list_row::ListRow;
 pub use lock_clock::LockClock;
 pub use lock_prompt::LockPrompt;
 pub use lock_screen::LockScreen;
 pub use lock_vocab::{CapsLock, LockLook, LockUser, PromptState};
-pub use menu::{Menu, MenuEntrance, MenuKind};
+pub use menu::Menu;
 pub use menu_bar_item::MenuBarItem;
 pub use menu_cursor::Cursor;
 pub use menu_entry::{MenuEntry, MenuRow, Tile, Trail};
@@ -285,7 +324,7 @@ pub use press::{PointerButton, Press, Propagation};
 pub use preview_content::{Mono, PANE_MEDIA, PaneContent};
 pub use preview_cue::PaneCue;
 pub use preview_pane::{PaneAction, PreviewPane};
-pub use provider_mark::{ImageSource, MarkSize, MarkStyle, Provider, ProviderMark};
+pub use provider_mark::{MarkSize, MarkStyle, Provider, ProviderMark};
 pub use rich_text::{Rich, RichRun, RichText};
 pub use row_action::RowAction;
 pub use row_chord::{ChordShown, RowChord};
@@ -302,27 +341,21 @@ pub use send_pill::{PillAction, SendPhase, SendPill, SendRing};
 pub use settings_row::SettingsRow;
 pub use settings_row_phase::{RowDisc, RowPhase, RowWork};
 pub use settings_row_trailing::RowTrailing;
-pub use sheet::{Sheet, SheetPlacement, SheetWidth};
+pub use sheet::Sheet;
 pub use shot_ghost::ShotGhost;
 pub use shot_press::DragStart;
 pub use shot_thumbnail::{ShotThumbnail, ThumbAction};
 pub use sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing};
 pub use slider::Slider;
-pub use space_editor::{
-    ActiveDot, DotIndex, MeasuredIn, MotionChoice, MotionLevels, SpaceDot, SpaceEditor,
-};
+pub use space_editor::{ActiveDot, DotIndex, SpaceEditor};
 pub use spinner::{Spinner, SpinnerKind};
 pub use standard_action::{Reserved, SpaceNumber, StandardAction};
-pub use status::{
-    BatteryGlyph, BatteryPower, BatteryState, BluetoothGlyph, BluetoothState, LowAt, StatusGlyph,
-    StatusState, VolumeGlyph, VolumeState, VolumeWaves, WifiBars, WifiGlyph, WifiReach, WifiState,
-};
 pub use switcher_fit::{
     SWITCHER_MARGIN, SWITCHER_PADDING, SwitcherFit, SwitcherMetrics, fit as switcher_fit,
 };
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
-pub use text_input::{Focus, Grow, InputVariant, Rows, TextInput, TextInputKind};
+pub use text_input::{InputVariant, TextInput};
 pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;
@@ -330,10 +363,6 @@ pub use tooltip::{Shown, Tooltip, TooltipKind};
 pub use track_position::TrackPosition;
 pub use traffic_lights::TilePose;
 pub use tree_item::{Disclosure, TreeItem, TreeShape};
-pub use user_picture::{
-    FaceFile, Mood, PICTURE_CELL, PICTURE_COLUMNS, PictureChoice, PictureSize, UserPicture,
-    UserPicturePicker, UserPortrait, WakeStamp, resolve_picture,
-};
 pub use vocab::{
     Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent, PulseKey,
     PulsePhase, Selection, Shortcut, StaggerIndex, Switch,

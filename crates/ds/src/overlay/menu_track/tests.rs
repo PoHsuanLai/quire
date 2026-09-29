@@ -1,12 +1,15 @@
 //! design/13 section 13.4's table and section 13.8 tests 1-5 as input sequences (ported from
 //! sill's `bar/menu_track/tests.rs`).
 
-use super::{
-    Branch, Held, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming,
-    MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session, Submenu, inside,
-    shielded,
+use crate::geometry::units::{Point, Px};
+use crate::overlay::menu_track::{
+    triangle::{inside, shielded},
+    types::{
+        Branch, Held, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget,
+        MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
+        Submenu,
+    },
 };
-use crate::geometry::{Point, Px};
 use std::sync::LazyLock;
 use std::time::{Duration, Instant};
 

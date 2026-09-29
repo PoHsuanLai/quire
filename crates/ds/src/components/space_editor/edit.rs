@@ -2,7 +2,7 @@
 //! (design/04-COMPONENTS.md section 32 behaviour, design/06-INTERACTIONS.md section 2.8).
 
 use crate::components::vocab::Fraction;
-use crate::space::{Dot, PRESETS, SpaceLook};
+use crate::space::{look::SpaceLook, palette::Dot, presets::PRESETS};
 use dioxus::prelude::Key;
 
 /// A Space holds at most three dots (`S:1425`).
@@ -138,7 +138,7 @@ pub(super) fn grain_of(fraction: Fraction) -> u8 {
 mod tests {
     use super::{Nudge, added, grain_of, nudged, preset, removed};
     use crate::components::vocab::Fraction;
-    use crate::space::{Dot, PRESETS, SpaceLook};
+    use crate::space::{look::SpaceLook, palette::Dot, presets::PRESETS};
 
     fn look(dots: &[(f32, f32)]) -> SpaceLook {
         SpaceLook {
@@ -198,7 +198,7 @@ mod tests {
     #[test]
     fn a_preset_replaces_only_the_dots() {
         let before = SpaceLook {
-            grain: crate::space::Grain(80),
+            grain: crate::space::look::Grain(80),
             ..look(&[(10.0, 0.5)])
         };
         let after = preset(&before, 1);

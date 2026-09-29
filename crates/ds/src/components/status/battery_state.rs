@@ -1,7 +1,7 @@
 //! The battery item's state and what each change of it means (design/26-DETAILS.md 5.1.3).
 
 use crate::components::vocab::Fraction;
-use crate::detail::{Detailed, Moment};
+use crate::detail::{detailed::Detailed, moment::Moment};
 
 /// Where the power comes from.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

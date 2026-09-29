@@ -4,7 +4,7 @@
 use crate::components::flow::Flow;
 use crate::components::menu_kind::MenuKind;
 use crate::components::popover::{Dismiss, Float, Stacking, position_style};
-use crate::geometry::{Anchor, Point};
+use crate::geometry::{measure::Anchor, units::Point};
 
 /// A floating menu is a layer that Escape and an outside press close; an inline one is part of
 /// its caller's card and stays off the stack.

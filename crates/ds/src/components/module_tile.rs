@@ -14,7 +14,7 @@ use crate::components::module_tile_kind::{Chevron, DiscMotion, ModuleState, Tile
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Expanded};
-use crate::detail::{FirstShow, Touch, use_armed};
+use crate::detail::{armed::use_armed, first_show::FirstShow, touch::Touch};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::external::IconSource;

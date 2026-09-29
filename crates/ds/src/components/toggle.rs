@@ -7,9 +7,12 @@
 //! critically damped, no bounce.
 
 use crate::components::vocab::{Availability, Switch};
-use crate::detail::Touch;
-use crate::motion::{PxPerUnit, SpringResponse, SpringSpec, use_spring};
-use crate::tokens::ControlSize;
+use crate::detail::touch::Touch;
+use crate::motion::{
+    spring_spec::{SpringResponse, SpringSpec},
+    use_spring::{PxPerUnit, use_spring},
+};
+use crate::tokens::control_size::ControlSize;
 use dioxus::prelude::*;
 
 /// Where the knob stands for `value` on a switch of `size`: off at the start, on at the end of
@@ -66,7 +69,7 @@ pub fn Toggle(
 mod tests {
     use super::knob_at;
     use crate::components::vocab::Switch;
-    use crate::tokens::ControlSize;
+    use crate::tokens::control_size::ControlSize;
 
     #[test]
     fn the_knob_travels_the_track_less_the_knob_and_its_insets() {

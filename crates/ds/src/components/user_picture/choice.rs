@@ -3,7 +3,7 @@
 
 use super::picture::UserPicture;
 use crate::components::avatar::AvatarFace;
-use crate::components::emoji::EmojiId;
+use crate::components::emoji::id::EmojiId;
 use crate::components::image_source::ImageSource;
 use serde::{Deserialize, Serialize};
 

@@ -3,7 +3,10 @@
 //! stack's tuning input (what the stylesheet declares), so a settings key moves it live.
 
 use crate::tokens::hex::thousandths;
-use crate::tokens::{Alpha, Hex, VarName};
+use crate::tokens::{
+    hex::{Alpha, Hex},
+    name::VarName,
+};
 
 /// Drawn inside the box or outside it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -89,7 +92,10 @@ pub(crate) fn fraction(alpha: Alpha) -> String {
 #[cfg(test)]
 mod tests {
     use super::{Layer, LayerAlpha, Side};
-    use crate::tokens::{Alpha, Hex, VarName};
+    use crate::tokens::{
+        hex::{Alpha, Hex},
+        name::VarName,
+    };
 
     #[test]
     fn a_layer_writes_its_default_and_its_tuned_form() {

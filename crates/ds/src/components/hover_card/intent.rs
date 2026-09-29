@@ -10,7 +10,7 @@
 //! `flow: Flow::Inline`.
 
 use super::{Anchors, use_anchors};
-use crate::geometry::{MountedRef, Rect};
+use crate::geometry::{measure::MountedRef, units::Rect};
 use crate::motion::hover_intent::HoverEvent;
 use crate::overlay::hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub};
 use crate::overlay::stack::LayerStack;

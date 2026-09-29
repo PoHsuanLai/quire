@@ -9,7 +9,7 @@
 //! change; a read still waiting for layout is dropped when a newer one starts.
 
 use crate::geometry::measure::{laid_out_now, laid_out_rect};
-use crate::geometry::{MountedRef, Rect};
+use crate::geometry::{measure::MountedRef, units::Rect};
 use crate::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;

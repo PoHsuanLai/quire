@@ -5,7 +5,7 @@
 //! its own for the guide.
 
 use crate::components::widget_kind::{WidgetHost, WidgetSize};
-use crate::motion::Anim;
+use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 
 /// `div.ds-widget-slot[data-size][data-host]`: the footprint of a `size` widget in `host`.

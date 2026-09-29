@@ -2,9 +2,9 @@
 //! (design/20-SURFACES.md sections 1.9 and 1.10; design/04-COMPONENTS.md section 42): whose it
 //! is, how the asking is going, whether caps lock is on, and where the Space's colour reaches.
 
-use crate::components::user_picture::UserPicture;
+use crate::components::user_picture::picture::UserPicture;
 use crate::components::vocab::Availability;
-use crate::detail::{Detailed, Moment};
+use crate::detail::{detailed::Detailed, moment::Moment};
 
 /// Where the current Space's colour reaches on the lock screen. The reference lock screen is
 /// white type and a white glass field over the wallpaper; Arc's colour may take the field.

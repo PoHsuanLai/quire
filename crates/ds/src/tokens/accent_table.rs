@@ -5,8 +5,13 @@
 //! band's (`accent_band::floors`) and hold at every hue, so they hold here too
 //! (`tests/legibility.rs`).
 
-use super::accent_band::{AccentPick, AccentRoles, BAND, Weight, accent_roles, hue_of};
-use crate::appearance::{Accent, Scheme};
+use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::tokens::accent_band::{
+    band::{AccentPick, Weight},
+    derive::accent_roles,
+    picked::{BAND, hue_of},
+    roles::AccentRoles,
+};
 
 /// The roles `accent` paints in `scheme`: `--accent` (the fill), `--accent-ink`, `--accent-text`,
 /// `--accent-soft` (the wash), `--accent-ring`, `--seal` (the fill).

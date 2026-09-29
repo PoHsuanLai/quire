@@ -5,10 +5,16 @@
 //! later level sweeps from where it is, counting only a change of more than a point (R12);
 //! Reduced shows the level at once (R7).
 
-use crate::components::status::{BatteryGlyph, BatteryState};
+use crate::components::status::{battery::BatteryGlyph, battery_state::BatteryState};
 use crate::components::vocab::Fraction;
 use crate::detail::{
-    CountPace, Detailed, FirstShow, Moment, Touch, use_count_up, use_detail, use_sweep,
+    count_up::{CountPace, use_count_up},
+    detailed::Detailed,
+    first_show::FirstShow,
+    moment::Moment,
+    sweep::use_sweep,
+    touch::Touch,
+    use_detail::use_detail,
 };
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;
@@ -62,7 +68,10 @@ pub(crate) fn RowBattery(level: Fraction, first: FirstShow) -> Element {
 mod tests {
     use super::Percent;
     use crate::components::vocab::Fraction;
-    use crate::detail::{Moment, first_table, moment_table};
+    use crate::detail::{
+        detailed::{first_table, moment_table},
+        moment::Moment,
+    };
 
     #[test]
     fn the_battery_counts_what_it_prints() {

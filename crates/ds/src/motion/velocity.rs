@@ -1,6 +1,6 @@
 //! How fast a person's hand was moving when it let go (design/27 section 3.12 rule 2): logical
 //! pixels per second along the axis the motion runs, signed (right and down are positive). A
-//! whole number, so [`crate::detail::Contact`] that carries one keeps `Eq` and `Hash`.
+//! whole number, so [`crate::detail::touch::Contact`] that carries one keeps `Eq` and `Hash`.
 
 use super::swipe::Speed;
 
@@ -30,7 +30,7 @@ const THROW_WINDOW: std::time::Duration = std::time::Duration::from_millis(100);
 /// One pointer position along a drag axis, and when.
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Sample {
-    at: crate::geometry::Px,
+    at: crate::geometry::units::Px,
     when: std::time::Instant,
 }
 
@@ -46,7 +46,7 @@ impl VelocityMeter {
     /// The pointer is at `at` at `when`. A move in the same instant as the last (a host that
     /// repeats the position with the release) updates the last position and keeps the one
     /// before, so the speed is still measured over time that passed.
-    pub fn moved(self, at: crate::geometry::Px, when: std::time::Instant) -> VelocityMeter {
+    pub fn moved(self, at: crate::geometry::units::Px, when: std::time::Instant) -> VelocityMeter {
         let same_instant = self.last.is_some_and(|last| last.when >= when);
         let before = if same_instant { self.before } else { self.last };
         VelocityMeter {
@@ -78,7 +78,7 @@ impl VelocityMeter {
 #[cfg(test)]
 mod tests {
     use super::{Velocity, VelocityMeter};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
     use std::time::{Duration, Instant};
 
     #[test]

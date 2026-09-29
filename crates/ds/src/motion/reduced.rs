@@ -41,8 +41,8 @@ impl ReducedForm {
 impl Anim {
     /// Its form under Reduced motion.
     pub fn reduced(self) -> ReducedForm {
+        use crate::motion::reduced::ReducedForm::{CrossFade, Same, Still};
         use FadeWay::{In, Out};
-        use ReducedForm::{CrossFade, Same, Still};
         match self {
             Anim::PopIn
             | Anim::RowIn
@@ -145,7 +145,7 @@ mod tests {
     use super::{ReducedForm, moves};
     use crate::css::MOTION;
     use crate::css::motion_css::keyframes as motion_keyframes;
-    use crate::motion::Anim;
+    use crate::motion::anim::Anim;
 
     fn body(name: &str) -> &'static str {
         motion_keyframes(MOTION)

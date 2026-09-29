@@ -3,7 +3,7 @@
 
 use super::look::SpaceLook;
 use super::palette::Dot;
-use crate::appearance::Theme;
+use crate::appearance::theme::Theme;
 
 /// One preset: its name, its dots, and the grain it ships with when the prototype names one.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -88,7 +88,7 @@ pub fn default_look(
 #[cfg(test)]
 mod tests {
     use super::{PRESETS, default_look};
-    use crate::appearance::Theme;
+    use crate::appearance::theme::Theme;
     use crate::space::look::{CardAccent, Grain};
 
     #[test]

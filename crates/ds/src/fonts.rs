@@ -17,7 +17,7 @@
 //! 400) and to `opsz` 32 for Inter Display (500-800), since the renderer sets no optical size.
 //! Licences are in `assets/fonts/OFL-*.txt`.
 
-use crate::tokens::Family;
+use crate::tokens::type_scale::Family;
 
 /// Upright or italic.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -267,8 +267,8 @@ pub static FACES: &[Face] = &[
 #[cfg(test)]
 mod tests {
     use super::{FACES, FaceStyle, Subset};
-    use crate::appearance::Typeface;
-    use crate::tokens::Family;
+    use crate::appearance::typeface::Typeface;
+    use crate::tokens::type_scale::Family;
 
     #[test]
     fn every_family_ships_both_subsets() {

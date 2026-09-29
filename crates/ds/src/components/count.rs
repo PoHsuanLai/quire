@@ -2,7 +2,7 @@
 //! (design/04-COMPONENTS.md section 14).
 
 use crate::components::vocab::PulseKey;
-use crate::motion::Anim;
+use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 use std::cell::Cell;
 use std::rc::Rc;

@@ -1,6 +1,6 @@
 //! Where playback is, and what each change of it means (design/26-DETAILS.md 5.2.10).
 
-use crate::detail::{Detailed, EventStamp, Moment};
+use crate::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 use crate::icon::Icon;
 
 /// Where the player is.
@@ -78,7 +78,11 @@ pub(crate) enum PositionClock {
 #[cfg(test)]
 mod tests {
     use super::Playback;
-    use crate::detail::{EventStamp, Moment, first_table, moment_table};
+    use crate::detail::{
+        detailed::{first_table, moment_table},
+        moment::Moment,
+        stamp::EventStamp,
+    };
     use crate::icon::Icon;
 
     #[test]

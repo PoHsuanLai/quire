@@ -3,12 +3,15 @@
 
 use crate::edit::host::{HostEdit, Probe};
 use crate::edit::position::{TextPosition, TextRange};
-use crate::focus::focus_soon;
-use crate::geometry::{HostMeasure, Measured, Point, Rect};
+use crate::focus::host::focus_soon;
+use crate::geometry::{
+    measure::{HostMeasure, Measured},
+    units::{Point, Rect},
+};
 use dioxus::prelude::*;
 use std::rc::Rc;
 
-/// A handle on one [`EditSurface`](crate::EditSurface): pass it as the surface's `handle`, then
+/// A handle on one [`EditSurface`](crate::components::edit_surface::EditSurface): pass it as the surface's `handle`, then
 /// read geometry from a handler or a task. Each read answers [`Probe::Busy`] while the renderer
 /// holds the document (ask again next frame) and [`Probe::Unknown`] before the surface mounts,
 /// with no host, or where nothing addressable is. Geometry is the last layout's: after a change
@@ -98,7 +101,7 @@ impl EditHandle {
     }
 
     /// Give the surface the keyboard, a frame later if the document is busy, exactly as a press
-    /// does: `on_focus` hears [`EditFocus::In`](crate::EditFocus), the IME is switched on and
+    /// does: `on_focus` hears [`EditFocus::In`](crate::edit::pointer::EditFocus), the IME is switched on and
     /// the surface becomes its target.
     pub fn focus(&self) {
         match self.hooks.try_peek().ok().and_then(|hooks| *hooks) {
@@ -112,7 +115,7 @@ impl EditHandle {
     }
 
     /// Take the keyboard away from the surface: `on_focus` hears
-    /// [`EditFocus::Out`](crate::EditFocus), an open composition ends and the IME is switched
+    /// [`EditFocus::Out`](crate::edit::pointer::EditFocus), an open composition ends and the IME is switched
     /// off, as at a real blur.
     pub fn blur(&self) {
         if let Some(hooks) = self.hooks.try_peek().ok().and_then(|hooks| *hooks) {

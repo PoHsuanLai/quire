@@ -2,16 +2,16 @@
 //! Bluetooth and volume, each drawn from stacked parts on the Lucide grid and each with its own
 //! `Detailed` state, so every change plays the moment its table names and then paints 0 frames.
 
-mod battery;
-mod battery_state;
-mod bluetooth;
-mod bluetooth_state;
-mod family;
-mod part;
-mod slash;
-mod volume;
-mod wifi;
-mod wifi_state;
+pub(crate) mod battery;
+pub(crate) mod battery_state;
+pub(crate) mod bluetooth;
+pub(crate) mod bluetooth_state;
+pub(crate) mod family;
+pub(crate) mod part;
+pub(crate) mod slash;
+pub(crate) mod volume;
+pub(crate) mod wifi;
+pub(crate) mod wifi_state;
 
 pub use battery::BatteryGlyph;
 pub use battery_state::{BatteryPower, BatteryState, LowAt};

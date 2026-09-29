@@ -6,13 +6,16 @@ use super::level::use_level;
 use super::morph::{MorphStyle, Slashed};
 use super::motor::use_motor;
 use super::touch::Touch;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::icon::stroke::stroke_width;
-use crate::motion::{Anim, TimerPhase, use_motion_timer};
-use crate::root::use_scale;
-use crate::tokens::{DurationToken, EasingToken};
+use crate::motion::{
+    anim::Anim,
+    timer::{TimerPhase, use_motion_timer},
+};
+use crate::root::scale::use_scale;
+use crate::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -176,8 +179,8 @@ fn slide_slash(slash: super::motor::Motor, slashed: Slashed, reduced: bool) {
 #[cfg(test)]
 mod tests {
     use super::anims;
-    use crate::detail::MorphStyle;
-    use crate::motion::Anim;
+    use crate::detail::morph::MorphStyle;
+    use crate::motion::anim::Anim;
 
     #[test]
     fn each_style_plays_its_own_pair() {

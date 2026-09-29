@@ -1,14 +1,17 @@
-//! The spelling menu and the marks' layer of an [`EditSurface`](crate::EditSurface)
+//! The spelling menu and the marks' layer of an [`EditSurface`](crate::components::edit_surface::EditSurface)
 //! (design/04-COMPONENTS.md section 50). A right-click, or the context-menu key with the caret
 //! on a marked word, opens quire's context [`Menu`] with up to five suggestions, then "Ignore
 //! Spelling" (this session) and "Learn Spelling" (the user's dictionary). A suggestion reaches
 //! the app as one [`SpellReplace`], which it applies as one undoable edit.
 
 use crate::components::edit_surface_spell::{SpellCtx, draw, touch};
-use crate::components::menu::{Menu, MenuKind};
 use crate::components::menu_entry::{MenuEntry, MenuRow};
+use crate::components::{menu::Menu, menu_kind::MenuKind};
 use crate::edit::host::Probe;
-use crate::geometry::{Anchor, Point, Rect};
+use crate::geometry::{
+    measure::Anchor,
+    units::{Point, Rect},
+};
 use crate::spell::host::{HostSpell, Learned};
 use crate::spell::marks::{Misspelt, SpellReplace};
 use crate::task::{spawn_in, try_set};
@@ -306,9 +309,9 @@ impl PartialEq for SpellLink {
 #[cfg(test)]
 mod tests {
     use super::{Opened, Replaces, SpellPick, entries};
-    use crate::EditNode;
     use crate::components::menu_entry::MenuEntry;
-    use crate::geometry::{Point, Px};
+    use crate::edit::position::EditNode;
+    use crate::geometry::units::{Point, Px};
     use crate::spell::marks::Misspelt;
     use crate::spell::words::Span;
 

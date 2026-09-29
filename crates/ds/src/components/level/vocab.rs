@@ -1,7 +1,7 @@
 //! The level control's vocabulary: what it is for, how it looks, whether it ticks, and which
 //! glyph it carries. Every choice is a named variant (no `bool`, CONVENTIONS section 11).
 
-use crate::components::status::VolumeState;
+use crate::components::status::volume::VolumeState;
 use crate::components::vocab::Fraction;
 
 /// Whether the control takes input.

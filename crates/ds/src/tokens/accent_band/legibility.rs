@@ -4,7 +4,7 @@
 use super::grounds::{card_grounds, card_ink, contrast, least, over};
 use super::roles::AccentRoles;
 use super::text_grounds::{GroundKind, TextOn, least_on, text_grounds};
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 
 /// The least ratio each role reaches over the card's grounds.
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -8,13 +8,16 @@ use crate::components::icon_view::IconView;
 use crate::components::switcher_fit::{SwitcherMetrics, fit};
 use crate::components::tooltip::{Shown, Tooltip, TooltipKind};
 use crate::components::vocab::{PulseKey, Selection};
-use crate::detail::Touch;
-use crate::geometry::Px;
+use crate::detail::touch::Touch;
+use crate::geometry::units::Px;
 use crate::icon::external::IconSource;
 use crate::icon::family::PlateFamily;
 use crate::icon::render::{IconPx, IconSize};
-use crate::motion::Anim;
-use crate::motion::{PxPerUnit, SpringResponse, SpringSpec, use_spring};
+use crate::motion::anim::Anim;
+use crate::motion::{
+    spring_spec::{SpringResponse, SpringSpec},
+    use_spring::{PxPerUnit, use_spring},
+};
 use dioxus::prelude::*;
 
 /// An application in the switcher, by the shell's own id for it (its app id).

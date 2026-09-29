@@ -14,7 +14,7 @@ use crate::icon::Icon;
 use crate::icon::render::IconSize;
 use crate::icon::shape::Shape;
 use crate::icon::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 const WAVE_1: &[Shape] = &[Shape::Path("M13.83 8.79a5 5 0 0 1 0 6.42")];

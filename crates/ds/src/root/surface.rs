@@ -4,10 +4,10 @@
 use super::chrome::{Ground, RootChrome};
 use super::env::{Env, use_env, use_env_provider};
 use super::typeface::use_typeface;
-use crate::appearance::{Accent, Resolved, Scheme};
-use crate::material::{BlurState, Material};
-use crate::tokens::Corner;
-use crate::tokens::accent_band::{TextOn, text_on};
+use crate::appearance::{accent::Accent, resolve::Resolved, theme::Scheme};
+use crate::material::{blur::BlurState, material::Material};
+use crate::tokens::accent_band::text_grounds::{TextOn, text_on};
+use crate::tokens::shape::Corner;
 use dioxus::prelude::*;
 
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`

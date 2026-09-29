@@ -36,7 +36,7 @@ impl Millis {
 
 /// A spring: how much it is damped (1.0 critical, below that it overshoots) and its response,
 /// the period it would swing at undamped, which reads as how quick it feels. Only
-/// [`crate::motion::SpringSpec`] makes one, so no caller picks a raw damping.
+/// [`crate::motion::spring_spec::SpringSpec`] makes one, so no caller picks a raw damping.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Spring {
     damping: Ratio,

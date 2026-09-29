@@ -1,7 +1,7 @@
 use super::{Capping, Dot, derive, gradient, js_round};
-use crate::appearance::Scheme;
-use crate::tokens::Hex;
-use crate::tokens::accent_band::over;
+use crate::appearance::theme::Scheme;
+use crate::tokens::accent_band::grounds::over;
+use crate::tokens::hex::Hex;
 
 const WORK: &[Dot] = &[
     Dot {
@@ -287,8 +287,8 @@ fn gradient_matches_the_mockup() {
             accent_ink: String::new(),
             accent_text: String::new(),
             accent_ring: String::new(),
-            accent_roles: crate::tokens::accent_of(
-                crate::appearance::Accent::Postmark,
+            accent_roles: crate::tokens::accent_table::accent_of(
+                crate::appearance::accent::Accent::Postmark,
                 Scheme::Light,
             ),
             capped: Capping::Uncapped,
@@ -315,16 +315,19 @@ fn half_rounds_the_way_javascript_does() {
 fn the_readout_is_the_ratio_of_the_derived_tokens() {
     // A fixed pick, measured here the long way from `derive` and `ratio`. The readout must say
     // exactly these numbers: the editor shows nothing it computed on its own.
-    use super::{POST_DARK, POST_LIGHT, readout};
     use crate::space::contrast::{Verdict, ratio};
     use crate::space::look::{CardAccent, Grain, SpaceLook};
+    use crate::space::palette::{
+        card::{POST_DARK, POST_LIGHT},
+        readout::readout,
+    };
     for scheme in [Scheme::Light, Scheme::Dark] {
         let dark = scheme == Scheme::Dark;
         for accent in [CardAccent::SpaceHue, CardAccent::Postmark] {
             let space = SpaceLook {
                 dots: HOME.to_vec(),
                 grain: Grain(35),
-                theme: crate::appearance::Theme::System,
+                theme: crate::appearance::theme::Theme::System,
                 card_accent: accent,
             };
             let palette = derive(HOME, scheme);
@@ -338,9 +341,10 @@ fn the_readout_is_the_ratio_of_the_derived_tokens() {
             };
             let roles = match accent {
                 CardAccent::SpaceHue => palette.accent_roles,
-                CardAccent::Postmark => {
-                    crate::tokens::accent_of(crate::appearance::Accent::Postmark, scheme)
-                }
+                CardAccent::Postmark => crate::tokens::accent_table::accent_of(
+                    crate::appearance::accent::Accent::Postmark,
+                    scheme,
+                ),
             };
             let ground = Hex::parse(post.surface).expect("hex");
             let tint = over(roles.fill, roles.wash, ground).css();

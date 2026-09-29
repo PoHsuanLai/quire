@@ -3,16 +3,16 @@
 //! stored choice ([`PictureChoice`]) and the rule that resolves it ([`resolve_picture`]); and
 //! [`UserPicturePicker`], where a person picks one.
 
-mod accept;
-mod choice;
+pub(crate) mod accept;
+pub(crate) mod choice;
 pub mod mood;
-mod picker;
-mod picture;
-mod portrait;
+pub(crate) mod picker;
+pub(crate) mod picture;
+pub(crate) mod portrait;
 
+pub use crate::motion::wake::WakeStamp;
 pub use choice::{FaceFile, PictureChoice, resolve_picture};
-pub use mood::{Mood, PictureSize, WakeStamp};
+pub use mood::{Mood, PictureSize};
 pub use picker::{PICTURE_CELL, PICTURE_COLUMNS, UserPicturePicker};
 pub use picture::UserPicture;
 pub use portrait::UserPortrait;
-pub(crate) use portrait::{Drawn, FaceAt, Liveliness, Sizes};

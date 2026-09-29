@@ -4,7 +4,7 @@
 //! thumbnail both take one.
 
 use crate::error::DsError;
-use crate::icon::IconUrl;
+use crate::icon::external::IconUrl;
 use std::path::Path;
 
 /// An image the app supplies, as a `data:` URI or a `file:` URL, written as an `<img>`'s `src`.

@@ -7,8 +7,15 @@
 
 use super::pdf_thumb::PDF_THUMB_GRACE;
 use crate::detail::{
-    Deadline, Detailed, FirstShow, Layers, Moment, PendingFrame, PendingSpec, PendingStyle, Touch,
-    use_detail, use_operation_within, use_pending,
+    detailed::Detailed,
+    first_show::FirstShow,
+    moment::Moment,
+    operation::Deadline,
+    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    touch::Touch,
+    use_detail::use_detail,
+    use_operation::use_operation_within,
+    use_pending::use_pending,
 };
 
 /// Whether the page is being read.
@@ -65,7 +72,10 @@ pub(crate) fn use_grace(reading: Reading) -> Grace {
 #[cfg(test)]
 mod tests {
     use super::Reading::{No, Yes};
-    use crate::detail::{Moment, first_table, moment_table};
+    use crate::detail::{
+        detailed::{first_table, moment_table},
+        moment::Moment,
+    };
 
     #[test]
     fn a_read_is_pending_and_its_end_a_change() {

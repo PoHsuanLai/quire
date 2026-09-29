@@ -8,13 +8,15 @@
 
 use crate::components::track::fraction_at;
 use crate::components::vocab::{Availability, Fraction};
-use crate::detail::{Contact, Touch};
+use crate::detail::touch::{Contact, Touch};
 use crate::geometry::measure::client_rect;
 use crate::geometry::units::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
 use crate::motion::{
-    PxPerUnit, SpringMotion, SpringResponse, SpringSpec, Throw, Velocity, VelocityMeter,
-    use_spring_motion,
+    projection::Throw,
+    spring_spec::{SpringResponse, SpringSpec},
+    use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
+    velocity::{Velocity, VelocityMeter},
 };
 use dioxus::core::queue_effect;
 use dioxus::html::geometry::ClientPoint;
@@ -169,7 +171,7 @@ pub fn Slider(
                 }
                 let at = point(event.client_coordinates());
                 drag.down((), at);
-                meter.set(VelocityMeter::default().moved(at.x, crate::time::now()));
+                meter.set(VelocityMeter::default().moved(at.x, crate::time::clock::now()));
                 if let Some(mounted) = element() {
                     spawn(async move {
                         // Focus is best-effort: a renderer without it still slides.
@@ -187,7 +189,7 @@ pub fn Slider(
                 }
                 let at = point(event.client_coordinates());
                 drag.moved(at);
-                let measured_now = meter.peek().moved(at.x, crate::time::now());
+                let measured_now = meter.peek().moved(at.x, crate::time::clock::now());
                 meter.set(measured_now);
                 if let Some(measured) = track() {
                     onchange.call(fraction_at(measured, at.x));
@@ -195,7 +197,7 @@ pub fn Slider(
             },
             onpointerup: move |event| {
                 drag.up();
-                let velocity = meter.peek().released(crate::time::now());
+                let velocity = meter.peek().released(crate::time::clock::now());
                 meter.set(VelocityMeter::default());
                 let width = track.peek().map_or(0.0, |rect| rect.size.width.0);
                 if let (true, Some(to)) = (enabled, thrown_to(value, velocity, width)) {

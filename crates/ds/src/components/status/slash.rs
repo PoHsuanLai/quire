@@ -2,8 +2,11 @@
 //! is `MorphGlyph{Slash}`), standing still on the first frame and jumping under Reduced (R7).
 
 use crate::components::vocab::Fraction;
-use crate::detail::{Ease, Slashed, TweenSpec, use_tween};
-use crate::tokens::DurationToken;
+use crate::detail::{
+    morph::Slashed,
+    tween::{Ease, TweenSpec, use_tween},
+};
+use crate::tokens::timing::DurationToken;
 
 /// How the slash moves.
 const DRAW: TweenSpec = TweenSpec {

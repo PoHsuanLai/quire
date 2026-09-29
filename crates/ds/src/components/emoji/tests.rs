@@ -1,7 +1,7 @@
 use super::id::EmojiId;
 use super::script::{IDLE_REST, MoodChange, Pace, Playing, Shown, Step, pace, reaction, script};
 use super::sheet::{MANIFEST_JSON, SheetPx, durations, png, position, timing};
-use crate::components::user_picture::Mood;
+use crate::components::user_picture::mood::Mood;
 use std::time::Duration;
 
 const WINDOW: Duration = Duration::from_secs(20);

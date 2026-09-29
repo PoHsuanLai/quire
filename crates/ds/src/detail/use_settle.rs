@@ -6,13 +6,13 @@ use super::level::{Level, use_level};
 use super::moment::Moment;
 use super::settle::{SettleStyle, Settling};
 use super::touch::Touch;
-use crate::appearance::MotionLevel;
-use crate::components::Fraction;
+use crate::appearance::motion::MotionLevel;
+use crate::components::vocab::Fraction;
 use crate::components::vocab::{PulseKey, StaggerIndex};
-use crate::motion::{Anim, settle};
+use crate::motion::{anim::Anim, settle::settle};
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
-use crate::tokens::{DelayToken, DurationToken, EasingToken};
+use crate::time::clock::sleep;
+use crate::tokens::{delay::DelayToken, easing::EasingToken, timing::DurationToken};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use std::time::Duration;
@@ -101,11 +101,11 @@ impl Lander {
                 length: DurationToken::Move.duration(level),
                 easing: EasingToken::Out.easing(level),
             };
-            let started = crate::time::now();
-            while !draw.done(crate::time::since(started)) {
+            let started = crate::time::clock::now();
+            while !draw.done(crate::time::clock::since(started)) {
                 try_set(
                     self.now,
-                    Settling::Drawing(drawn(draw, crate::time::since(started))),
+                    Settling::Drawing(drawn(draw, crate::time::clock::since(started))),
                 )?;
                 sleep(FRAME).await;
             }

@@ -9,7 +9,7 @@ use crate::motion::anim::Anim;
 use crate::motion::settle::settle;
 use crate::root::env::{Env, use_env_signal};
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 

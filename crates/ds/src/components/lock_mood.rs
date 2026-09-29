@@ -6,8 +6,9 @@
 
 use crate::components::lock_vocab::PromptState;
 use crate::components::secret_entry::Filled;
-use crate::components::user_picture::{Mood, WakeStamp};
+use crate::components::user_picture::mood::Mood;
 use crate::components::vocab::PulsePhase;
+use crate::motion::wake::WakeStamp;
 use dioxus::prelude::*;
 use std::time::{Duration, Instant};
 
@@ -57,7 +58,7 @@ impl Stir {
     /// Something happened in the prompt: advance the stamp, unless it advanced under
     /// [`GRAIN`] ago.
     pub(crate) fn stirred(self) {
-        let now = crate::time::now();
+        let now = crate::time::clock::now();
         let mut last = self.last;
         let due = last
             .peek()
@@ -91,7 +92,7 @@ mod tests {
     use super::{Caret, prompt_mood};
     use crate::components::lock_vocab::PromptState;
     use crate::components::secret_entry::Filled;
-    use crate::components::user_picture::Mood;
+    use crate::components::user_picture::mood::Mood;
     use crate::components::vocab::PulsePhase;
 
     #[test]

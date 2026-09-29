@@ -5,7 +5,7 @@
 use crate::components::level::glyph::{LevelGlyphView, waves};
 use crate::components::level::vocab::{LevelGlyph, Muting};
 use crate::components::vocab::Fraction;
-use crate::detail::{Detailed, Moment};
+use crate::detail::{detailed::Detailed, moment::Moment};
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;
 

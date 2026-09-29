@@ -9,14 +9,14 @@
 //! [`crate::overlay::pull_tab::PullTab`]: pulled right past 46 px it arms, and a release while
 //! armed, or a tap that moved under 3 px, undoes.
 
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::overlay::pull_tab::{Pull, PullPhase, PullTab};
 use crate::overlay::toast_hub::{ToastHub, ToastState, use_toast_hub};
 use crate::root::env::use_env_signal;
-use crate::time::{FRAME_SLACK, sleep};
-use crate::tokens::DurationToken;
+use crate::time::{FRAME_SLACK, clock::sleep};
+use crate::tokens::timing::DurationToken;
 use dioxus::prelude::*;
 
 /// The enclosing `Ds`'s toast manager: `push(text, undo)`, one visible at a time.

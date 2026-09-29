@@ -4,8 +4,8 @@ use crate::components::avatar::{AvatarFace, face};
 use crate::components::vocab::PulseKey;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use crate::space::Verdict;
-use crate::tokens::LabelHue;
+use crate::space::contrast::Verdict;
+use crate::tokens::label_hue::LabelHue;
 use dioxus::prelude::*;
 
 /// Which chip.

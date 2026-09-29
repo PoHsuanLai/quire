@@ -8,7 +8,7 @@ use crate::components::provider_mark::{MarkSize, MarkStyle, Provider, ProviderMa
 use crate::components::vocab::Switch;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use crate::tokens::Colour;
+use crate::tokens::hex::Colour;
 use dioxus::prelude::*;
 
 /// Whose tile.
@@ -135,7 +135,7 @@ pub fn AddAccountTile(
 mod tests {
     use super::tile_colour;
     use crate::components::vocab::Switch;
-    use crate::tokens::{Colour, Hex};
+    use crate::tokens::hex::{Colour, Hex};
 
     #[test]
     fn only_an_unpressed_tile_is_desaturated() {

@@ -9,6 +9,6 @@
 //! edits (add, remove, resize, move) are pure. Where a position is legal (a free grid cell, an
 //! order in a column) is each surface's own rule, applied before an edit reaches the list.
 
-mod placement;
+pub(crate) mod placement;
 
 pub use placement::{Placement, PlacementId, Placements};

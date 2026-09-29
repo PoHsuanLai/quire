@@ -4,7 +4,7 @@
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 
 use crate::focus::click::kept_click;
-use crate::geometry::{Point, Px};
+use crate::geometry::units::{Point, Px};
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 

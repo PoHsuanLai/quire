@@ -7,7 +7,7 @@
 //! the plan's four are proposed.
 
 use super::name::VarName;
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 
 /// One shadow token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

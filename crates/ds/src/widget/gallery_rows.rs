@@ -5,14 +5,17 @@
 //! in the placed column, moving the column the least that shows it. Rows already placed when
 //! the gallery opened sit still.
 
-use crate::catalog::PlacementId;
+use crate::catalog::placement::PlacementId;
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::text_runs::{Text, text};
 use crate::components::widget_kind::WidgetHost;
-use crate::detail::Touch;
-use crate::geometry::MountedRef;
+use crate::detail::touch::Touch;
+use crate::geometry::measure::MountedRef;
 use crate::geometry::reveal::reveal;
-use crate::motion::{Anim, TimerPhase, use_motion_timer};
+use crate::motion::{
+    anim::Anim,
+    timer::{TimerPhase, use_motion_timer},
+};
 use crate::task::spawn_in;
 use crate::widget::gallery::GalleryWords;
 use crate::widget::layout::{WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement};
@@ -155,10 +158,12 @@ fn PlacedRow(
 mod tests {
     use super::{at_key, entrance, on_host};
     use crate::components::widget_kind::{WidgetHost, WidgetSize};
-    use crate::detail::{Contact, Touch};
-    use crate::motion::Anim;
+    use crate::detail::touch::{Contact, Touch};
+    use crate::motion::anim::Anim;
     use crate::widget::layout::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-    use crate::widget::{BatteryWidget, MonthWidget, Widget, WorldClockWidget};
+    use crate::widget::{
+        battery::BatteryWidget, calendar::MonthWidget, clock::WorldClockWidget, contract::Widget,
+    };
 
     #[test]
     fn each_surface_lists_only_its_own_in_their_order() {

@@ -2,7 +2,7 @@
 //! input (FINDINGS "Edit surface"). mailo's composer renders its paragraphs and objects as the
 //! children, marked with `data-edit-node`; the surface owns the focus and the IME, turns keys,
 //! IME composition and clipboard gestures into [`EditInput`]s, resolves pointer presses to
-//! [`TextPosition`](crate::TextPosition)s through the host, and never draws a caret or a
+//! [`TextPosition`](crate::edit::position::TextPosition)s through the host, and never draws a caret or a
 //! selection: the app does, from its [`EditHandle`]'s rects.
 
 use crate::components::edit_surface_ctx::SurfaceCtx;
@@ -23,7 +23,7 @@ use crate::edit::host::{HostEdit, ImeEvent};
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{CapturedPointer, EditFocus, EditPointer};
 use crate::edit::position::TextPosition;
-use crate::geometry::Rect;
+use crate::geometry::units::Rect;
 use crate::spell::lang::Spell;
 use crate::spell::marks::SpellReplace;
 use dioxus::prelude::*;

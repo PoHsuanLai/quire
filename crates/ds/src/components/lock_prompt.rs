@@ -7,13 +7,21 @@ use crate::components::lock_picture::{AT_LOCK, prompt_picture};
 use crate::components::lock_vocab::{CapsLock, LockLook, LockUser, PromptState};
 use crate::components::secret_entry::{Filled, SecretEntry, use_secret_entry};
 use crate::components::spinner::{Spinner, SpinnerKind};
-use crate::components::text_input::{Focus, InputVariant, TextInput, TextInputKind};
 use crate::components::text_runs::{Text, text};
-use crate::components::user_picture::{Liveliness, UserPicture, WakeStamp};
+use crate::components::user_picture::{picture::UserPicture, portrait::Liveliness};
 use crate::components::vocab::Availability;
-use crate::detail::{FirstShow, Operation, Touch, use_detail, use_operation};
+use crate::components::{
+    text_input::{InputVariant, TextInput},
+    text_input_focus::Focus,
+    text_input_kind::TextInputKind,
+};
+use crate::detail::{
+    first_show::FirstShow, operation::Operation, touch::Touch, use_detail::use_detail,
+    use_operation::use_operation,
+};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
+use crate::motion::wake::WakeStamp;
 use dioxus::prelude::*;
 
 /// The placeholder when the caller gives none.

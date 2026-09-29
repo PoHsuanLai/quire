@@ -1,7 +1,7 @@
 //! What a band is: the bounds, per scheme, inside which [`super::accent_roles`] builds an accent.
 
-use crate::appearance::Scheme;
-use crate::tokens::Alpha;
+use crate::appearance::theme::Scheme;
+use crate::tokens::hex::Alpha;
 
 /// An OKLCH lightness or chroma in thousandths: `Milli(560)` is 0.56.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

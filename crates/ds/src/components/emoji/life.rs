@@ -7,12 +7,13 @@
 use super::disc::EmojiPlayback;
 use super::id::EmojiId;
 use super::script::{MoodChange, Playing, Shown, Step, resting, script};
-use crate::appearance::MotionLevel;
-use crate::components::user_picture::{Mood, WakeStamp};
+use crate::appearance::motion::MotionLevel;
+use crate::components::user_picture::mood::Mood;
+use crate::motion::wake::WakeStamp;
 use crate::root::env::{Env, use_env_signal};
 use crate::task::{spawn_in, try_get, try_set};
-use crate::time::sleep;
-use crate::tokens::DurationToken;
+use crate::time::clock::sleep;
+use crate::tokens::timing::DurationToken;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 

@@ -10,7 +10,7 @@ use crate::components::icon_view::IconView;
 use crate::components::module_tile_kind::TileSpan;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::Availability;
-use crate::detail::FirstShow;
+use crate::detail::first_show::FirstShow;
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;

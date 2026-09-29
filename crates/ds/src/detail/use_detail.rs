@@ -61,7 +61,7 @@ fn opening(moment: Moment, first: FirstShow) -> Moment {
 #[cfg(test)]
 mod tests {
     use super::opening;
-    use crate::detail::{FirstShow, Moment};
+    use crate::detail::{first_show::FirstShow, moment::Moment};
 
     #[test]
     fn still_holds_back_only_an_appear() {

@@ -4,7 +4,11 @@
 //! then its still frame from the operation's deadline (at most `PendingCap`) or at once under
 //! Reduced. It never loops without an [`Operation`], and never past its deadline.
 
-use crate::detail::{Layers, Operation, PendingFrame, PendingSpec, PendingStyle, use_pending};
+use crate::detail::{
+    operation::Operation,
+    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    use_pending::use_pending,
+};
 use dioxus::prelude::*;
 
 /// Which activity.

@@ -7,7 +7,7 @@
 
 use super::name::VarName;
 use super::tuned::{Tuned, px};
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 
 /// A CSS font weight: 400, 500, 700.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -208,7 +208,7 @@ mod tests {
     #[test]
     fn a_changed_key_moves_only_its_input() {
         let mut metrics = ShellMetrics::default();
-        metrics.menu.row = crate::geometry::Px(24.0);
+        metrics.menu.row = crate::geometry::units::Px(24.0);
         let written = metrics.style_attr();
         assert!(written.contains("--shell-menu-row-h:24px;"));
         assert!(written.contains("--shell-menu-font:13px;"));

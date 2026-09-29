@@ -11,9 +11,9 @@
 //! shows the colour of its own place on the field.
 
 use super::png;
-use crate::appearance::Scheme;
-use crate::space::{Dot, swatch};
-use crate::tokens::Hex;
+use crate::appearance::theme::Scheme;
+use crate::space::palette::{Dot, swatch};
+use crate::tokens::hex::Hex;
 use std::sync::LazyLock;
 
 /// The colour plane's size: one sample per grid cell of S's 540 x 352 drawing, stretched to the
@@ -131,7 +131,7 @@ fn uri(png: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::{coverage, dot_at, place};
-    use crate::space::Dot;
+    use crate::space::palette::Dot;
 
     #[test]
     fn a_dot_and_its_place_round_trip() {

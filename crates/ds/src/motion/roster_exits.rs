@@ -12,7 +12,7 @@ use super::settle::settle;
 use super::use_roster::{ExitTimer, Roster, use_roster_parts};
 use crate::components::vocab::{Emphasis, StaggerIndex};
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

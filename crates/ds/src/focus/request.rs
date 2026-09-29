@@ -33,7 +33,7 @@ impl FocusRequest {
 
     /// This request, putting the field's caret at `caret` each time it lands (and as the field
     /// mounts): a command palette opened on a query puts it at the end. Needs the
-    /// host's [`HostPlaceCaret`](crate::HostPlaceCaret) for `End` and `Start`; without one the
+    /// host's [`HostPlaceCaret`](crate::focus::caret::HostPlaceCaret) for `End` and `Start`; without one the
     /// caret stays where the renderer put it.
     pub fn with_caret(self, caret: InitialCaret) -> Self {
         FocusRequest {

@@ -121,12 +121,12 @@ pub enum Corner {
     /// One of the radius tokens.
     Token(Radius),
     /// A length in logical pixels.
-    Px(crate::geometry::Px),
+    Px(crate::geometry::units::Px),
     /// A squircle corner (design/08-ICONS.md section 2.1's `n = 5` superellipse) of this nominal
     /// radius: it reaches `2 r` along each edge and, at 45 degrees, sits nearer the box's corner
     /// than a circle of radius `r` does. Drawn as a `mask-image` (`data-corner="squircle"`);
     /// the element's shadows and hairline follow the circle that touches it at 45 degrees.
-    Squircle(crate::geometry::Px),
+    Squircle(crate::geometry::units::Px),
 }
 
 impl Corner {
@@ -165,7 +165,7 @@ impl Corner {
 }
 
 /// The circle a squircle of nominal radius `length` is inscribed in at 45 degrees.
-fn squircle_shadow_radius(length: crate::geometry::Px) -> f64 {
+fn squircle_shadow_radius(length: crate::geometry::units::Px) -> f64 {
     round2(f64::from(length.0) * crate::icon::plate::shadow_radius_share())
 }
 

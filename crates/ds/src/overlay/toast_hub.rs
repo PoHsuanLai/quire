@@ -6,8 +6,8 @@
 
 use crate::root::env::Env;
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
-use crate::tokens::DelayToken;
+use crate::time::clock::sleep;
+use crate::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -156,8 +156,10 @@ pub fn use_toast_hub() -> ToastHub {
 #[cfg(test)]
 mod tests {
     use super::{ToastHub, UndoToken, use_toast_hub_provider};
-    use crate::appearance::{Accent, MotionLevel, Resolved, Scheme};
-    use crate::material::{BlurState, Material};
+    use crate::appearance::{
+        accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
+    };
+    use crate::material::{blur::BlurState, material::Material};
     use crate::root::env::{Env, InputModality};
     use dioxus::prelude::*;
     use std::cell::RefCell;

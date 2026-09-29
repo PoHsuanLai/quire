@@ -1,4 +1,4 @@
-//! The one hover manager every card goes through: it owns the [`crate::HoverIntent`] machine
+//! The one hover manager every card goes through: it owns the [`crate::motion::hover_intent::HoverIntent`] machine
 //! and its timers, and stamps `data-hover="warm|cold"` on `.ds` (design/04-COMPONENTS.md
 //! O-11).
 //!
@@ -12,8 +12,8 @@ use crate::motion::hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentP
 use crate::motion::settle::settle;
 use crate::root::env::Env;
 use crate::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::time::sleep;
-use crate::tokens::DelayToken;
+use crate::time::clock::sleep;
+use crate::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use std::time::Duration;
@@ -71,7 +71,7 @@ impl HoverHub {
     }
 
     fn try_feed(&self, event: HoverEvent<Card>) -> Result<(), Gone> {
-        let (next, effect) = try_get(self.intent)?.step(event, crate::time::now());
+        let (next, effect) = try_get(self.intent)?.step(event, crate::time::clock::now());
         try_set_if_changed(self.intent, next)?;
         self.apply(effect)
     }
@@ -99,7 +99,7 @@ impl HoverHub {
     /// Whether cards open at once right now.
     pub fn warmth(&self) -> HoverWarmth {
         let _expiry = self.warm_tick.read();
-        self.intent.read().warmth(crate::time::now())
+        self.intent.read().warmth(crate::time::clock::now())
     }
 
     fn apply(&self, effect: IntentEffect<Card>) -> Result<(), Gone> {

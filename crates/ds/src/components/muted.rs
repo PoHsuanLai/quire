@@ -6,7 +6,7 @@
 //! claim); taking chroma away says it is not the one in view. A grey would drop the first fact,
 //! and every muted account would look alike.
 
-use crate::tokens::{Colour, Hex};
+use crate::tokens::hex::{Colour, Hex};
 
 /// How much of its chroma a muted colour keeps: S's `saturate(.55)`.
 pub(crate) const MUTED_CHROMA: f64 = 0.55;
@@ -74,7 +74,7 @@ fn encode(channel: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::{desaturated, muted, oklab};
-    use crate::tokens::{Alpha, Colour, Hex};
+    use crate::tokens::hex::{Alpha, Colour, Hex};
 
     #[test]
     fn a_grey_stays_grey_and_a_hue_loses_chroma() {

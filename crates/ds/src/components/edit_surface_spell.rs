@@ -1,23 +1,23 @@
-//! An [`EditSurface`](crate::EditSurface)'s spellchecking (design/04-COMPONENTS.md section 50):
+//! An [`EditSurface`](crate::components::edit_surface::EditSurface)'s spellchecking (design/04-COMPONENTS.md section 50):
 //! after each input and each caret move, a frame later the paragraphs are read again and the
 //! marks follow the edit ([`refresh`]); once typing has paused for `DelayToken::SpellDebounce`
 //! the paragraphs whose text changed since their last check are checked on the host's worker
 //! ([`check`]); then the marks' boxes are measured and drawn ([`draw`]). None of it re-renders
 //! the app's content: the state is in cells, and only the layer reads the boxes.
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::edit::host::{HostEdit, Probe};
 use crate::edit::position::{EditNode, TextPosition};
 use crate::geometry::measure::{BUSY_ATTEMPTS, client_rect};
-use crate::geometry::{Point, Rect};
-use crate::root::Env;
+use crate::geometry::units::{Point, Rect};
+use crate::root::env::Env;
 use crate::spell::host::{HostSpell, Paragraph};
 use crate::spell::lang::{Lang, Spell};
 use crate::spell::marks::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
 use crate::spell::words::words;
 use crate::task::{spawn_in, try_set_if_changed};
-use crate::time::{FRAME_SLACK, sleep};
-use crate::tokens::DelayToken;
+use crate::time::{FRAME_SLACK, clock::sleep};
+use crate::tokens::delay::DelayToken;
 use dioxus::core::{ScopeId, Task, current_scope_id};
 use dioxus::prelude::*;
 use std::cell::{Cell, RefCell};

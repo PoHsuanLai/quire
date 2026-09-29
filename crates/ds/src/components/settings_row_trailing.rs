@@ -7,11 +7,11 @@ use crate::components::row_battery::RowBattery;
 use crate::components::text_runs::{Text, text};
 use crate::components::toggle::Toggle;
 use crate::components::vocab::{Availability, Fraction, Switch};
-use crate::detail::{CheckMark, FirstShow, Settling};
+use crate::detail::{check_mark::CheckMark, first_show::FirstShow, settle::Settling};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use crate::tokens::ControlSize;
+use crate::tokens::control_size::ControlSize;
 use dioxus::prelude::*;
 
 /// A settings row's trailing mark.

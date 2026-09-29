@@ -1,6 +1,6 @@
 //! Shapes the stylesheet draws itself (the macOS polish pass, 2026-09-24): the squircle corner
-//! (`data-corner="squircle"`, [`crate::Corner::Squircle`]), the app-icon plate
-//! ([`crate::PlateFamily`] on an `IconView`) and the dock's reflective floor.
+//! (`data-corner="squircle"`, [`crate::tokens::shape::Corner::Squircle`]), the app-icon plate
+//! ([`crate::icon::family::PlateFamily`] on an `IconView`) and the dock's reflective floor.
 //!
 //! A squircle is a `mask-image` of six layers (four corner quadrants and the cross between
 //! them, `icon/plate.rs`), and a mask clips the element's own `box-shadow` too, so the mask never
@@ -11,11 +11,11 @@
 //! declared here, as the materials' do.
 
 use super::emit::{attr_selector, presence_selector, property, rule};
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::icon::family::{NEUTRAL_DARK, PlateFamily};
 use crate::icon::plate::{Quadrant, fill_mask, plate_mask, quadrant_mask};
 use crate::icon::plate_tint::PLATE_TINT_VARS;
-use crate::tokens::{Hex, VarName, ZLayer};
+use crate::tokens::{hex::Hex, layer::ZLayer, name::VarName};
 
 /// What a squircle element writes inline (`Corner::squircle_style`): its extent and the circle
 /// its shadows follow.

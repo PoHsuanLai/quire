@@ -12,7 +12,7 @@
 //! gives an all-positioned root one).
 
 use crate::components::vocab::Percent;
-use crate::detail::{IdleDimPhase, use_idle_dim};
+use crate::detail::idle_dim::{IdleDimPhase, use_idle_dim};
 use dioxus::prelude::*;
 
 /// The idle dim overlay. `level` is `idle.dim_level_pct` (10..90); `phase` is the caller's own

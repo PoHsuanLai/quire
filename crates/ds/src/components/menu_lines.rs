@@ -6,10 +6,10 @@
 //! not. A header, a status line and a rule are not choices. Choices are numbered in order; the selection, a click and the menu tracker's item path
 //! all name a choice by that number. Up and Down skip disabled choices.
 
-use crate::components::menu_entry::{MenuEntry, fuzzy};
 pub use crate::components::menu_filter::Filter;
 use crate::components::menu_filter::Typed;
 use crate::components::vocab::Availability;
+use crate::components::{menu_entry::MenuEntry, menu_match::fuzzy};
 use dioxus::prelude::*;
 
 /// How Up and Down move past the ends: a floating menu wraps, the command palette clamps
@@ -222,7 +222,8 @@ pub(crate) fn liveness<T>(choices: &[Choice<T>]) -> Vec<Availability> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Filter, KeyAct, Nav, Step, key_act, moved, moved_live, settled};
+    use super::{KeyAct, Nav, Step, key_act, moved, moved_live, settled};
+    use crate::components::menu_filter::Filter;
     use crate::components::vocab::Availability::{Disabled as D, Enabled as E};
     use dioxus::prelude::{Key, Modifiers};
 

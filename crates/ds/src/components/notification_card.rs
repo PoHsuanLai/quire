@@ -30,7 +30,7 @@ use crate::components::rich_text::Rich;
 use crate::components::text_runs::{Text, text};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconPx, IconSize};
-use crate::material::Material;
+use crate::material::material::Material;
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;

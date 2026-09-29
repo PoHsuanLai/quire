@@ -5,7 +5,7 @@ use crate::components::icon_view::IconView;
 use crate::components::image_source::{ImageSize, ImageSource};
 use crate::components::pdf_thumb::{PdfPage, PdfThumb, sheet_rect};
 use crate::components::shot_frame::picture_style;
-use crate::geometry::{Px, Size};
+use crate::geometry::units::{Px, Size};
 use crate::icon::Icon;
 use crate::icon::external::IconSource;
 use crate::icon::family::PlateFamily;

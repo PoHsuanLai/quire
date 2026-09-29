@@ -10,10 +10,17 @@ use crate::components::button_face::Leading;
 use crate::components::press::Press;
 use crate::components::text_runs::Text;
 use crate::detail::{
-    CheckMark, Detailed, FirstShow, Moment, SettleStyle, Settling, Touch, use_detail, use_settle,
+    check_mark::CheckMark,
+    detailed::Detailed,
+    first_show::FirstShow,
+    moment::Moment,
+    settle::{SettleStyle, Settling},
+    touch::Touch,
+    use_detail::use_detail,
+    use_settle::use_settle,
 };
 use crate::icon::render::IconSize;
-use crate::motion::Anim;
+use crate::motion::anim::Anim;
 use crate::widget::gallery_book::Landing;
 use dioxus::prelude::*;
 
@@ -89,8 +96,12 @@ pub(crate) fn AddButton(
 #[cfg(test)]
 mod tests {
     use super::{Landed, growth};
-    use crate::detail::{Contact, Moment, Touch, first_table, moment_table};
-    use crate::motion::Anim;
+    use crate::detail::{
+        detailed::{first_table, moment_table},
+        moment::Moment,
+        touch::{Contact, Touch},
+    };
+    use crate::motion::anim::Anim;
 
     #[test]
     fn a_new_landing_is_a_success_and_nothing_else_is() {

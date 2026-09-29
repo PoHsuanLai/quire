@@ -1,5 +1,5 @@
 //! Editing through an app's own editor core (mailo's composer, FINDINGS "Edit surface"): the
-//! vocabulary [`EditSurface`](crate::EditSurface) speaks, and the host seam it reads geometry
+//! vocabulary [`EditSurface`](crate::components::edit_surface::EditSurface) speaks, and the host seam it reads geometry
 //! and IME through.
 //!
 //! The app keeps its document model and draws its own caret and selection. The surface only

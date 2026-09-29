@@ -6,7 +6,7 @@
 use super::Icon;
 use super::shape::Shape;
 use super::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 /// How big a glyph is drawn. Consumers pick a size; none writes an icon `width` in CSS.

@@ -3,13 +3,13 @@
 //! each frame is offered as a hook, [`use_battery_figure`], and as a small component,
 //! [`BatteryFigure`], that writes it as `93%` in tabular figures.
 //!
-//! Given the same `level` and `wake` as its [`crate::BatteryLevel`], the count moves in step with
+//! Given the same `level` and `wake` as its [`crate::components::battery_level::BatteryLevel`], the count moves in step with
 //! the arc: both read [`use_battery_fill`], whose frames are a pure function of the time since
 //! the same effect started. It is always a whole percent and ends exactly on the true one.
 
 use crate::components::battery_level::{percent_of, use_battery_fill};
 use crate::components::vocab::Fraction;
-use crate::motion::WakeStamp;
+use crate::motion::wake::WakeStamp;
 use dioxus::prelude::*;
 
 /// The percentage a battery at `level` shows this frame: counting from 0 on mount and on each

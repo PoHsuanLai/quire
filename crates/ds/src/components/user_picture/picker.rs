@@ -1,18 +1,18 @@
 //! UserPicturePicker: the letter and the 42 animated emoji as a grid of discs, the current
 //! choice marked, for Settings' Users page and first run (design/25-EMOJI.md section 7).
 //!
-//! Not an [`crate::EmojiGrid`]: that grid draws text glyphs in the colour font and yields a
+//! Not an [`crate::components::emoji_grid::EmojiGrid`]: that grid draws text glyphs in the colour font and yields a
 //! caller's value per glyph, while this one draws each choice as the picture itself (the letter
 //! disc and `AnimatedEmoji` still frames, 64 px) and behaves as one radio group. It shares the
 //! grid's arrow-key rule ([`grid_step`]) and its inline column style.
 
 use super::choice::PictureChoice;
 use crate::components::avatar::{AvatarFace, AvatarSize, face};
-use crate::components::emoji::{AnimatedEmoji, EmojiId, EmojiPlayback};
+use crate::components::emoji::{AnimatedEmoji, disc::EmojiPlayback, id::EmojiId};
 use crate::components::emoji_grid::grid_style;
 use crate::components::emoji_grid_nav::{GridMove, GridStep, grid_step};
-use crate::components::user_picture::PictureSize;
-use crate::geometry::Px;
+use crate::components::user_picture::mood::PictureSize;
+use crate::geometry::units::Px;
 use dioxus::prelude::*;
 
 /// A picker cell's side: the 64 px disc and 6 px around it.
@@ -149,8 +149,8 @@ fn cell_body(cell: Cell, letter: AvatarFace) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{cells, marked};
-    use crate::components::emoji::EmojiId;
-    use crate::components::user_picture::PictureChoice;
+    use crate::components::emoji::id::EmojiId;
+    use crate::components::user_picture::choice::PictureChoice;
 
     #[test]
     fn the_letter_comes_first_then_the_whole_set() {

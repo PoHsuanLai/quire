@@ -5,7 +5,7 @@
 
 use super::id::EmojiId;
 use super::sheet::durations;
-use crate::components::user_picture::Mood;
+use crate::components::user_picture::mood::Mood;
 use std::time::Duration;
 
 /// What the picture shows: which emoji, at which frame of its loop.

@@ -4,7 +4,7 @@
 use crate::components::flow::Flow;
 use crate::components::popover::{Dismiss, Stacking, use_float};
 use crate::components::scrim_strength::ScrimStrength;
-use crate::tokens::ZLayer;
+use crate::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
 /// The scrim button itself, for a modal that draws its own (`Peek`, `Sheet`): a click closes
@@ -122,7 +122,7 @@ fn layer_style(layer: ZLayer) -> String {
 #[cfg(test)]
 mod tests {
     use super::layer_style;
-    use crate::tokens::ZLayer;
+    use crate::tokens::layer::ZLayer;
 
     #[test]
     fn a_layer_is_written_as_its_token() {

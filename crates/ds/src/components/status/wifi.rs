@@ -8,13 +8,21 @@ use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use super::wifi_state::{WifiReach, WifiState};
 use crate::detail::{
-    FirstShow, Layers, PendingFrame, PendingSpec, PendingStyle, SettleStyle, Settling, Slashed,
-    Touch, use_detail, use_operation, use_pending, use_settle, use_shake,
+    first_show::FirstShow,
+    morph::Slashed,
+    once::use_shake,
+    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    settle::{SettleStyle, Settling},
+    touch::Touch,
+    use_detail::use_detail,
+    use_operation::use_operation,
+    use_pending::use_pending,
+    use_settle::use_settle,
 };
 use crate::icon::render::IconSize;
 use crate::icon::shape::Shape;
 use crate::icon::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 /// The searching loop: the dot and the three arcs, one at a time (1200 ms a cycle).
@@ -158,9 +166,10 @@ fn slug(state: WifiState) -> &'static str {
 
 #[cfg(test)]
 mod tests {
-    use super::{Show, layer_shows};
+    use super::layer_shows;
+    use crate::components::status::part::Show;
     use crate::components::status::wifi_state::{WifiBars, WifiReach, WifiState};
-    use crate::detail::{EventStamp, PendingFrame, Settling};
+    use crate::detail::{pending::PendingFrame, settle::Settling, stamp::EventStamp};
 
     #[test]
     fn each_state_frame_and_fill_shows_its_layers() {

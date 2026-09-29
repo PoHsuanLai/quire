@@ -1,4 +1,4 @@
-//! What an [`EditSurface`](crate::EditSurface) remembers between events, none of it drawn: the
+//! What an [`EditSurface`](crate::components::edit_surface::EditSurface) remembers between events, none of it drawn: the
 //! composition, the press in progress, the last press (for double clicks), whether it holds the
 //! keyboard, its element and its IME registration. Kept in cells, not signals: changing any of it
 //! must not re-render the app's content.
@@ -8,8 +8,8 @@ use crate::edit::composition::Composing;
 use crate::edit::host::{HostEdit, ImeListener, Probe};
 use crate::edit::pointer::EditFocus;
 use crate::geometry::measure::BUSY_ATTEMPTS;
-use crate::geometry::{Point, Rect};
-use crate::time::{FRAME_SLACK, sleep};
+use crate::geometry::units::{Point, Rect};
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::prelude::*;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -65,7 +65,7 @@ impl Default for SurfaceState {
 impl SurfaceState {
     /// Count a press at `at` now, remembering it for the next.
     pub(crate) fn press(&self, at: Point) -> Clicks {
-        let when = crate::time::now();
+        let when = crate::time::clock::now();
         let clicks = clicks_after(self.last_press.get(), at, when);
         self.last_press.set(Some(LastPress { at, when, clicks }));
         self.pressing.set(Pressing::Down);

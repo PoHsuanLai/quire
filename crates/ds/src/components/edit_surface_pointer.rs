@@ -1,4 +1,4 @@
-//! An [`EditSurface`](crate::EditSurface)'s press, drag and release. A press on the surface
+//! An [`EditSurface`](crate::components::edit_surface::EditSurface)'s press, drag and release. A press on the surface
 //! captures the pointer through the host: every move and the release until the button comes up
 //! reach the surface, wherever the pointer is, so a drag selection keeps following it outside
 //! the surface's box (FINDINGS "Edit surface"). With no host (or before the capture lands) the
@@ -10,7 +10,7 @@ use crate::components::edit_surface_state::{Capture, Pressing};
 use crate::edit::clicks::Clicks;
 use crate::edit::host::Probe;
 use crate::edit::pointer::{CapturedPointer, EditPointer, Extend, PointerPhase};
-use crate::geometry::{Point, Px};
+use crate::geometry::units::{Point, Px};
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 

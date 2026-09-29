@@ -6,7 +6,7 @@
 //! practice `ds::stylesheet()` and the consumer's own component CSS concatenated, the same way
 //! a consumer's own compiled stylesheet already is (mirroring how `mail-app`'s
 //! `a_class_with_no_rule_is_named` test passed its whole `STYLE` constant, tokens and
-//! components together, to `unstyled_classes`). `markup` does not add `crate::stylesheet()`
+//! components together, to `unstyled_classes`). `markup` does not add `crate::css::stylesheet::stylesheet()`
 //! itself, so a page that forgets to inject quire's sheet is caught too.
 //!
 //! A class no rule styles is [`Rule::UnstyledClass`]; an element quire draws for you written by

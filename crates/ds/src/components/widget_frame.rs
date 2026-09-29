@@ -14,10 +14,10 @@ use crate::components::widget_exit::{CardPresence, use_card_exit};
 use crate::components::widget_kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
-use crate::material::Material;
+use crate::material::material::Material;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
-use crate::widget::WidgetKind;
+use crate::widget::contract::WidgetKind;
 use dioxus::prelude::*;
 
 /// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint` (the
