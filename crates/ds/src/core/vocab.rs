@@ -99,6 +99,17 @@ pub enum Check {
     Unchecked,
 }
 
+/// Whether a thing is taking part right now (`data-activity`, design/30 section 1.5): an
+/// `Active` orb listens and turns; an `Inactive` one is held still, and nothing runs for it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Activity {
+    /// Taking part.
+    Active,
+    /// At rest.
+    #[default]
+    Inactive,
+}
+
 /// A proportion in thousandths: 0 is none, 1000 is all. Written inline as `--f`.
 ///
 /// Not clamped by the type: a settings gain may exceed 1000 (design/22-SETTINGS.md section 4
