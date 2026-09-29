@@ -2,25 +2,24 @@
 
 Which design doc section each module implements. The docs in `design/` are canonical; this file
 only says where in the code a section lives, so a reviewer can go from a paragraph to a file and
-back. Paths are under `crates/ds/src/` unless another crate is named. "Moved" means the code came
-from mailo with its tests; everything else is a frozen signature until its wave fills it.
+back. Paths are under `crates/ds/src/` unless another crate is named.
 
 ## `ds`: appearance, space, material
 
 | Module | Implements | Notes |
 | --- | --- | --- |
-| `appearance/theme.rs` | 07-LOOKS §2 (Theme axis); 03-COLOR §3 (two schemes) | `Theme` moved from mailo `view.rs`; `Scheme` is the resolved light/dark |
+| `appearance/theme.rs` | 07-LOOKS §2 (Theme axis); 03-COLOR §3 (two schemes) | `Theme` (the choice); `Scheme` is the resolved light/dark |
 | `appearance/accent.rs` | 03-COLOR §5, open decision 6; 22-SETTINGS §3.1 `appearance.accent` | Postmark plus the five Candy hues (FINDINGS) |
-| `appearance/motion.rs` | 05-MOTION §3.2; 22-SETTINGS §3.1-3.2 `motion_level` | `Motion` (the preference, moved and extended) and `MotionLevel` (resolved) |
+| `appearance/motion.rs` | 05-MOTION §3.2; 22-SETTINGS §3.1-3.2 `motion_level` | `Motion` (the preference) and `MotionLevel` (resolved) |
 | `appearance/look.rs` | 07-LOOKS §2, §7, §11 | `Look`, `Warmth` |
-| `appearance/appearance.rs` | 04-COMPONENTS §26 (O-16: Theme, Accent, Motion) | moved from mailo `view.rs`, lenient read kept |
+| `appearance/appearance.rs` | 04-COMPONENTS §26 (O-16: Theme, Accent, Motion) | lenient read |
 | `appearance/system.rs` | plan "ds-settings" portal mapping | `SystemPrefs{scheme, motion, contrast}` |
 | `appearance/resolve.rs` | 05-MOTION §9 rule 11 (explicit `data-motion`); 03-COLOR open decision 13 | `resolve()`, `Resolved::attrs()` |
-| `appearance/peek.rs` | 04-COMPONENTS §24 `PeekMode` | moved from mailo `view::Peek`, `Side` left in mailo |
-| `space/contrast.rs` | 03-COLOR §4.4 (WCAG ratio), §6 | moved with its tests; `Verdict` |
-| `space/palette.rs` (+`card.rs`, `readout.rs`, `tests.rs`) | 03-COLOR §4.2-4.4, §5, §6, §9; 21-SPACES §2 | moved with its tests; `bool` parameters became `Scheme`/`Capping` |
+| `appearance/peek.rs` | 04-COMPONENTS §24 `PeekMode` | Center or Full |
+| `space/contrast.rs` | 03-COLOR §4.4 (WCAG ratio), §6 | `Verdict` |
+| `space/palette.rs` (+`card.rs`, `readout.rs`, `tests.rs`) | 03-COLOR §4.2-4.4, §5, §6, §9; 21-SPACES §2 | `Scheme`/`Capping` |
 | `space/look.rs` | 03-COLOR §18; 21-SPACES §1 | `SpaceLook`, `Grain`, `CardAccent` |
-| `space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | replaces mailo `ui/paint.rs` `push_palette`/`grain_opacity` |
+| `space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | the frame's custom properties and grain opacity |
 | `space/presets.rs` | 03-COLOR §7; 21-SPACES §4 | the eight presets as data; `default_look` |
 | `material/{material,blur,recipe}.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
 | `material/{stack,layer,vibrancy}.rs` | 03-COLOR §17.4 (material stack v2, the macOS polish pass) | `MaterialStack` (the highlight, hairline, shadow-strength and vibrancy keys, written inline by `Ds { stack }`); each layer written with its alpha read from its input; the vibrancy boost baked into the tint in OKLab |
@@ -33,7 +32,7 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `tokens/accent_table.rs` | 03-COLOR §5 and open decision 6 (6 accents x 4 props) |
 | `tokens/label_hue.rs` | 03-COLOR §15; 07-LOOKS §6.2 (`--c-*`) |
 | `tokens/hex.rs`, `tokens/name.rs` | the value and name types every table uses |
-| `tokens/timing.rs`, `tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (23 `DurationToken`s, `--t-flash` the wave 1 amendment; 13 `DelayToken`s) |
+| `tokens/timing.rs`, `tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (23 `DurationToken`s; 13 `DelayToken`s) |
 | `tokens/easing.rs`, `tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `tokens/shape.rs` | 01-LAYOUT §10 |
 | `tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
@@ -65,14 +64,14 @@ from mailo with its tests; everything else is a frozen signature until its wave 
 | `motion/hover_intent.rs` | 06-INTERACTIONS §3 |
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 (incl. §4.4 `PopoverRequest`) |
-| `geometry/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds; FINDINGS "W2 integration"); with none, the read's poll is guarded (`guarded.rs`) so a held document is `Busy`, not a panic (FINDINGS "Bar gaps") |
+| `geometry/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `HostMeasure` (ds-native's waits out a document the renderer holds); with none, the read's poll is guarded (`guarded.rs`) so a held document is `Busy`, not a panic (FINDINGS "Bar gaps") |
 | `overlay/host.rs`, `stack.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `overlay/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
 | `overlay/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
 | `root/ds.rs`, `root/surface.rs`, `root/env.rs` | `Surface` overrides material and, optionally, scheme, accent, blur and ground; 03-COLOR §17.1 (root attributes: `data-theme`, `data-accent`, `data-motion`, `data-material`, `data-blur`, `data-modality`, `data-hover`; 04-COMPONENTS "Shared vocabulary"); spike S12 (`data-modality`) |
 | `root/chrome.rs` | 21-SPACES §3, §5; 03-COLOR §17.1: `RootChrome::{Painted, Transparent}` (a Popover, Sheet or Toast root hosts cards and paints nothing), `FrameTint::{Opaque, Tinted, None}` (the window's loose layers; the bar, dock, popover panel, OSD and widget's `.ds-frame` group at the tint alpha), `Ground::{Paper, Frame}` (the bar and dock draw on the frame); each derived from the material with an override prop (FINDINGS "Bar gaps") |
 | `text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
-| `icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (moved with tests; stroke as attributes) |
+| `icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (stroke as attributes) |
 | `icon/geometry_shell.rs` | 08-ICONS §1.6 |
 | `icon/external.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`, `IconUrl` (`data:`/`file:` only) |
 | `icon/classify.rs` | 08-ICONS §1.5 step 2: `classify(png) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
@@ -107,7 +106,7 @@ manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that play
 built once per scheme, and the mapping between a dot and its place on it, O-19),
 `space_editor/png.rs` (the RGB/RGBA PNG encoder they use) and `space_editor/parts.rs` (stops, grain, presets, contrast checks).
 
-Props added at the wave 2 integration (FINDINGS "W2 integration"): `TextInput` and
+Props worth knowing: `TextInput` and
 `SearchField` `focus: Focus{OnMount, Manual}`; `ListRow` and `SidebarItem` `drop:
 DropState{Idle, Target, Source}` (`vocab.rs`, §34); `BubbleAction::{Button(BubbleButton),
 Separator}`; `AccountFace::One{address}`; `SpaceEditor` `name` and `on_active_dot:
@@ -125,7 +124,7 @@ PaletteEntrance{PeekIn, CmdkIn}`, `id`, `focus`, `selected`, `on_select`, `on_se
 
 | Crate / module | Implements |
 | --- | --- |
-| `ds-settings/src/{file,dirs}.rs` | 22-SETTINGS §2 (TOML, atomic write, one-time mailo JSON import); moved from mailo `appearance.rs` with its tests |
+| `ds-settings/src/{file,dirs}.rs` | 22-SETTINGS §2 (TOML, atomic write) |
 | `ds-settings/src/{settings,units,lenient}.rs` | 22-SETTINGS §3.1-3.3, §4 (`AppearanceFile`, `AppearanceSettings`, `IconsSettings`, the unit newtypes, lenient read) |
 | `ds-settings/src/watch.rs` | 22-SETTINGS §2 "Live reload", §6.3 |
 | `ds-settings/src/{portal,environment}.rs` | the plan's `ds-settings` design (portal, `use_environment`); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
