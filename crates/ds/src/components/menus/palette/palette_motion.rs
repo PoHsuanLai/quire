@@ -94,7 +94,7 @@ impl std::fmt::Debug for PaletteHandle {
     }
 }
 
-/// A handle a caller keeps across renders, like [`use_field_handle`](crate::focus::field::use_field_handle)'s.
+/// A handle a caller keeps across renders, like [`use_field_handle`](crate::use_field_handle)'s.
 pub fn use_palette_handle() -> PaletteHandle {
     PaletteHandle(use_action_book())
 }

@@ -1,7 +1,7 @@
 //! The card's colour tokens, light and dark (design/03-COLOR.md sections 3, 10-12).
 //!
 //! `color-mix()` is replaced by precomputed washes. The frame's `--f-*` are not here: they are
-//! derived per Space ([`crate::style::space::frame_vars::FrameVars`]).
+//! derived per Space ([`crate::FrameVars`]).
 //!
 //! Precomputed washes (section 11 and open decisions 3-4; every value here is proposed):
 //! `--ok-wash` is `--ok` at .16 over transparent, exactly what `color-mix(in oklab, var(--ok)

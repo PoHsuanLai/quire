@@ -19,7 +19,6 @@
 use shape::Shape;
 
 pub(crate) mod classify;
-
 pub(crate) mod family;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;

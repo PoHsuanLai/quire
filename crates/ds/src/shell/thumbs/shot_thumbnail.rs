@@ -9,7 +9,7 @@
 //! exit has settled, so the host can unmap the surface. The pointer's arrival and departure go
 //! to `onhover`, so the caller's hold can pause while the card is looked at, and show the
 //! actions. A press on the picture opens it on its click, or, once it has travelled
-//! [`crate::motion::drag::DRAG_THRESHOLD`], asks the host to start a drag ([`DragStart`]) and does not open.
+//! [`crate::DRAG_THRESHOLD`], asks the host to start a drag ([`DragStart`]) and does not open.
 //!
 //! `swipe: Swipe::Dismiss(..)` lets a drag or a horizontal scroll to the right dismiss the card
 //! exactly as it dismisses a `NotificationCard` (`notification_swipe`, with the same

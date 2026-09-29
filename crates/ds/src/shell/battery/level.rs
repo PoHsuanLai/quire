@@ -33,7 +33,8 @@ pub const FILL: RunTokens = RunTokens {
 
 /// The frame of a battery ring's fill toward `level`: from empty on mount and on each new
 /// `wake`, from the last level drawn on each new `level`, at once under Reduced motion.
-/// [`BatteryLevel`] draws its arc from it and [`crate::shell::battery::figure::use_battery_figure`] its count, so a ring
+/// [`BatteryLevel`] draws its arc from it and [`crate::shell::battery::figure::use_battery_figure`]
+/// its count, so a ring
 /// and a percentage given the same `level` and `wake` move in step.
 pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
     use_level_run(level.clamped(), wake, FILL)

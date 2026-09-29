@@ -6,7 +6,8 @@ use std::fmt::Debug;
 /// A component's own state, which knows what each of its transitions means.
 ///
 /// Write both functions as exhaustive `match`es over the variants, never with a `_` arm, so a
-/// new state variant fails to compile until its moments are decided. [`crate::motion::detail::use_detail::use_detail`]
+/// new state variant fails to compile until its moments are decided.
+/// [`crate::motion::detail::use_detail::use_detail`]
 /// calls `moment` only when the state changed, and quantises nothing itself: compare what the
 /// person sees (three bars, 80 %), not the raw value (R2).
 ///

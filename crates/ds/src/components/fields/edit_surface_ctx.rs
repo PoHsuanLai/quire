@@ -1,4 +1,4 @@
-//! What every handler of an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) works with: its memory, the
+//! What every handler of an [`EditSurface`](crate::EditSurface) works with: its memory, the
 //! host, and the app's handlers. One value, cloned into each closure.
 
 use crate::components::fields::edit_surface_state::SurfaceState;

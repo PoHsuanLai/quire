@@ -1,7 +1,7 @@
 //! UserPicturePicker: the letter and the 42 animated emoji as a grid of discs, the current
 //! choice marked, for Settings' Users page and first run (design/25-EMOJI.md section 7).
 //!
-//! Not an [`crate::components::content::emoji_grid::EmojiGrid`]: that grid draws text glyphs in the colour font and yields a
+//! Not an [`crate::EmojiGrid`]: that grid draws text glyphs in the colour font and yields a
 //! caller's value per glyph, while this one draws each choice as the picture itself (the letter
 //! disc and `AnimatedEmoji` still frames, 64 px) and behaves as one radio group. It shares the
 //! grid's arrow-key rule ([`grid_step`]) and its inline column style.

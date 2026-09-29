@@ -1,6 +1,6 @@
 //! EmojiGrid: emoji as a grid of cells, moved through with the arrow keys in two dimensions
 //! (design/04-COMPONENTS.md section 46). On its own it takes the keyboard itself; in
-//! a command palette it is one group ([`GroupEntries::Grid`](crate::components::menus::palette::palette_group::GroupEntries)) and the
+//! a command palette it is one group ([`GroupEntries::Grid`](crate::GroupEntries)) and the
 //! palette's field keeps the keyboard, moving through it with the palette's cursor.
 //!
 //! The glyphs paint in colour through `.ds-emoji-text` (the `--font-emoji` stack). A cell's name

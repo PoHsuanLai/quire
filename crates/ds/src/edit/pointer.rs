@@ -1,4 +1,4 @@
-//! What a press and drag over an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) tell the app: where, and the
+//! What a press and drag over an [`EditSurface`](crate::EditSurface) tell the app: where, and the
 //! text position the host resolved there, so the app moves its own caret or extends its own
 //! selection.
 

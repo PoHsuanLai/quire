@@ -2,6 +2,5 @@
 //! design/06-INTERACTIONS.md section 4).
 
 pub(crate) mod placement;
-
 pub(crate) mod scale;
 pub(crate) mod units;

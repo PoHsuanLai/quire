@@ -2,7 +2,7 @@
 //! design/13-BEHAVIOUR-menus-windows.md section 13.3.11): a titlebar across the top that moves
 //! the window when dragged and zooms it on a double-click, the three traffic lights at its start
 //! (`traffic_lights`), and grab zones along every edge that resize it (`resize_edges`). Every
-//! request goes to the host's [`HostWindow`](crate::window::host::HostWindow); without one the frame draws and
+//! request goes to the host's [`HostWindow`](crate::HostWindow); without one the frame draws and
 //! does nothing.
 //!
 //! `Ds { window: WindowFrame::Titlebar { .. } }` draws it: the root becomes a column of the

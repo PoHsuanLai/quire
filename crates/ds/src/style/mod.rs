@@ -1,4 +1,5 @@
-//! The style layer: appearance, the token table, materials, Space palettes, fonts, icons and the stylesheet's own sections, over `core` and nothing else.
+//! The style layer: appearance, the token table, materials, Space palettes, fonts, icons and the
+//! stylesheet's own sections, over `core` and nothing else.
 
 pub(crate) mod appearance;
 pub(crate) mod css;

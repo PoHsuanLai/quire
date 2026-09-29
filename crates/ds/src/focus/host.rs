@@ -6,7 +6,8 @@
 //! ("RefCell already borrowed", a palette's field focusing on mount while
 //! its results re-rendered). Every focus change goes through [`focus_soon`]: the host's
 //! [`HostFocus`] answers [`Focused::Busy`] instead, and with no host the call is guarded
-//! (`crate::core::guarded`) so the collision is `Busy` too; the change is tried again once that render
+//! (`crate::core::guarded`) so the collision is `Busy` too; the change is tried again once that
+//! render
 //! has ended (`crate::core::busy`), then a frame later.
 
 use crate::core::busy::wait_out_busy;

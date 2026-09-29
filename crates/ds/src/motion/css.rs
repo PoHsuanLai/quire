@@ -5,7 +5,7 @@
 //! `@keyframes X--b`, identical; the pulse class plays `X` under `data-pulse=a` and `X--b`
 //! under `data-pulse=b`, so flipping the attribute changes the animation name and Stylo starts
 //! it over (spike S5). Each class's declaration is the [`Anim`]'s recipe, written from the same
-//! table [`crate::motion::settle::settle`] times.
+//! table [`crate::settle`] times.
 
 use crate::motion::{
     anim::Anim,

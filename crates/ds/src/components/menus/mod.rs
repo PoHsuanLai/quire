@@ -1,4 +1,5 @@
-//! Menus: the one menu and everything it shares with the command palette (entries, rows, keys, tracking), and the standard shortcuts.
+//! Menus: the one menu and everything it shares with the command palette (entries, rows, keys,
+//! tracking), and the standard shortcuts.
 
 pub(crate) mod menu;
 pub(crate) mod menu_active;

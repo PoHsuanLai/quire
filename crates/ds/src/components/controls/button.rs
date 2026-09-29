@@ -91,8 +91,8 @@ impl ButtonVariant {
 /// `ds-` name or class, or a `data-*` name quire writes itself, is refused, so nothing added
 /// here can restyle the button through quire's rules.
 ///
-/// [`DataName::parse`]: crate::components::controls::pass_through::DataName::parse
-/// [`ExtraClass::parse`]: crate::components::controls::pass_through::ExtraClass::parse
+/// [`DataName::parse`]: crate::DataName::parse
+/// [`ExtraClass::parse`]: crate::ExtraClass::parse
 ///
 /// `size` draws the variant at another size: `Some(ButtonSize::Regular)` gives a
 /// Danger the Primary's geometry, so Restart sits level with Shut Down and Cancel beside it.

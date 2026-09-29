@@ -1,4 +1,4 @@
-//! The one hover manager every card goes through: it owns the [`crate::motion::hover_intent::HoverIntent`] machine
+//! The one hover manager every card goes through: it owns the [`crate::HoverIntent`] machine
 //! and its timers, and stamps `data-hover="warm|cold"` on `.ds` (design/04-COMPONENTS.md
 //! O-11).
 //!

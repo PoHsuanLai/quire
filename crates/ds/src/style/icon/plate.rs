@@ -1,6 +1,6 @@
 //! The continuous-curvature squircle (design/08-ICONS.md sections 2.1 and 4.1): the Lamé
 //! superellipse `|x/a|^n + |y/a|^n = 1` with `n = 5`. One module owns the shape: the app-icon
-//! plate is the whole superellipse, and a [`crate::style::tokens::shape::Corner::Squircle`] corner is one quadrant of
+//! plate is the whole superellipse, and a [`crate::Corner::Squircle`] corner is one quadrant of
 //! it spanning `2 r` along each edge, joined to the straight sides. At `n > 2` the curve's
 //! curvature falls to zero where it meets the axis, so the join is continuous in curvature, which
 //! a CSS `border-radius` (a circle) is not.

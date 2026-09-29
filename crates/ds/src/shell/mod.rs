@@ -1,4 +1,7 @@
-//! Shell surfaces' parts: the lock and polkit prompts, the app switcher, the bar and dock pieces, the OSD, control-center modules, notifications, thumbnails, now playing, the idle dim, the Space editor, the user's picture, animated emoji, the month grid, clocks, batteries, and the desktop widgets with their catalog.
+//! Shell surfaces' parts: the lock and polkit prompts, the app switcher, the bar and dock pieces,
+//! the OSD, control-center modules, notifications, thumbnails, now playing, the idle dim, the Space
+//! editor, the user's picture, animated emoji, the month grid, clocks, batteries, and the desktop
+//! widgets with their catalog.
 
 pub(crate) mod bar;
 pub(crate) mod battery;

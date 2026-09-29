@@ -1,5 +1,5 @@
 //! `LevelControl`: a level with a glyph that follows it, in one of three looks (the user's brief
-//! of 2026-09-25). The form [`crate::components::controls::slider::Slider`] stays for settings rows; this is
+//! of 2026-09-25). The form [`crate::Slider`] stays for settings rows; this is
 //! the shell's volume and brightness control and the OSD's level.
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set

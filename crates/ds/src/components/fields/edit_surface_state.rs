@@ -1,4 +1,4 @@
-//! What an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) remembers between events, none of it drawn: the
+//! What an [`EditSurface`](crate::EditSurface) remembers between events, none of it drawn: the
 //! composition, the press in progress, the last press (for double clicks), whether it holds the
 //! keyboard, its element and its IME registration. Kept in cells, not signals: changing any of it
 //! must not re-render the app's content.

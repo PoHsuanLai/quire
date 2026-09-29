@@ -1,4 +1,5 @@
-//! The command palette: the same menu, bigger and centred, with its groups, stops, reveal and motion.
+//! The command palette: the same menu, bigger and centred, with its groups, stops, reveal and
+//! motion.
 
 pub(crate) mod command_palette;
 pub(crate) mod palette_body;

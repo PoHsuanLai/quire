@@ -13,7 +13,7 @@
 use super::script::{is_apostrophe, is_word_char};
 
 /// A stretch of a paragraph's text, as UTF-8 byte offsets (the same offsets as a
-/// [`TextPosition`](crate::edit::position::TextPosition)).
+/// [`TextPosition`](crate::TextPosition)).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Span {
     /// Where it starts.

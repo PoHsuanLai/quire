@@ -1,4 +1,5 @@
-//! Fields: the one text input, the search field, the editable surface an app draws its own text in, and the bubble over a selection.
+//! Fields: the one text input, the search field, the editable surface an app draws its own text in,
+//! and the bubble over a selection.
 
 pub(crate) mod edit_surface;
 pub(crate) mod edit_surface_ctx;

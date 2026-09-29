@@ -47,7 +47,7 @@ pub enum AvatarShape {
 /// The hue for a person with no stored colour, hashed from their address or name (design/03-COLOR.md
 /// section 13): the same as [`PersonHue::of`], so a consumer never keeps its own hash or hex
 /// table. Paint it with `AvatarTone::Person`, or [`PersonHue::colour`] where a component takes
-/// a [`Colour`]; the eight stored-colour swatches are [`crate::style::tokens::person::PersonSwatch`].
+/// a [`Colour`]; the eight stored-colour swatches are [`crate::PersonSwatch`].
 pub fn person_hue(name: &str) -> PersonHue {
     PersonHue::of(name)
 }

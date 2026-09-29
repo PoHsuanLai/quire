@@ -1,4 +1,5 @@
-//! Lists: rows and what rows share (clicks, hooks, stars), the animated and leaving lists, section headers and settings rows.
+//! Lists: rows and what rows share (clicks, hooks, stars), the animated and leaving lists, section
+//! headers and settings rows.
 
 pub(crate) mod animated_list;
 pub(crate) mod leaving_list;

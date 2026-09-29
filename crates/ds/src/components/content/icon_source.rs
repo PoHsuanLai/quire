@@ -28,7 +28,8 @@ pub enum IconSource {
     /// An external icon drawn as it is: a coloured tray icon states a fact about its app.
     Image(ExternalIcon),
     /// A layered status glyph (Wi-Fi, battery, Bluetooth, volume) in its state, drawn by
-    /// [`StatusGlyph`](crate::components::content::status::family::StatusGlyph) in the text colour at the slot's size, playing its
+    /// [`StatusGlyph`](crate::components::content::status::family::StatusGlyph) in the text colour
+    /// at the slot's size, playing its
     /// own moments as the state changes (design/26-DETAILS.md 5.1). Hand the
     /// slot the state every render; put its `words()` in the slot's label (R8).
     Status(StatusState),
