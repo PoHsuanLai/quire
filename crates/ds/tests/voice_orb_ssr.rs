@@ -55,7 +55,10 @@ fn named() -> Element {
     root(rsx! { VoiceOrb { aria_label: "Listening" } })
 }
 
-const SPECIMENS: &[(&str, fn() -> Element)] = &[
+/// A specimen: its golden name and how it is made.
+type Specimen = (&'static str, fn() -> Element);
+
+const SPECIMENS: &[Specimen] = &[
     ("idle-192", idle),
     ("active-192", active),
     ("active-96", small),
