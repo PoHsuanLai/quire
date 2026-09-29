@@ -7,6 +7,7 @@ pub(crate) mod emit;
 pub(crate) mod fonts;
 pub(crate) mod icon;
 pub(crate) mod kit;
+pub(crate) mod look;
 pub(crate) mod material;
 pub(crate) mod scale;
 pub(crate) mod scope;

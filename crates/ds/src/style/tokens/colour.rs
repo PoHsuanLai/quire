@@ -16,6 +16,7 @@ use super::accent_table::accent_of;
 use super::hex::{Alpha, Colour, Hex};
 use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
+use crate::style::look::Look;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
 const fn solid(rgb: u32) -> Colour {
@@ -155,8 +156,9 @@ pub enum ColourToken {
 }
 
 impl ColourToken {
-    /// The value in `scheme`, with Postmark as the accent (the band's roles, section 20).
-    pub fn value(self, scheme: Scheme) -> Colour {
+    /// The value in `look` and `scheme`, with Postmark as the accent (the band's roles,
+    /// section 20).
+    pub fn value(self, look: Look, scheme: Scheme) -> Colour {
         // Only the accent family asks the band: the band measures against the card's grounds,
         // which are this table's too.
         let postmark = || accent_of(Accent::Postmark, scheme);
@@ -167,7 +169,7 @@ impl ColourToken {
             ColourToken::AccentText => return Colour::Solid(postmark().text),
             ColourToken::AccentTextMaterial => return Colour::Solid(postmark().text_material),
             ColourToken::AccentRing => return postmark().ring_colour(),
-            other => other.post(),
+            other => other.palette(look),
         };
         match scheme {
             Scheme::Light => light,
@@ -175,21 +177,32 @@ impl ColourToken {
         }
     }
 
-    /// The Post palette, light and dark (design/03-COLOR.md section 3, `S:7-15`, `S:25-36`),
-    /// with the washes and literals of sections 11-12. The accent family is the accent
-    /// table's and is answered by [`Self::value`] before this is asked.
-    fn post(self) -> (Colour, Colour) {
+    /// `look`'s palette, light and dark, with the washes and literals of design/03-COLOR.md
+    /// sections 11-12. The accent family is the accent table's and is answered by
+    /// [`Self::value`] before this is asked.
+    fn palette(self, look: Look) -> (Colour, Colour) {
+        match look {
+            Look::Mac => self.mac(),
+        }
+    }
+
+    /// The Mac Look (design/30-CATALOGUE.md section 3.2): the system window paper, white
+    /// controls and content, and the label colours as solid greys. The label, secondary and
+    /// tertiary levels sit at about 87, 64 and 48 % (dark: 91, 64 and 52 %), a little firmer than
+    /// macOS's 85, 55 and 25 %, because the legibility gates (design/03-COLOR.md section 6)
+    /// hold them to 4.5:1 over a blurred backdrop and the faint metadata to 3:1.
+    fn mac(self) -> (Colour, Colour) {
         const WHITE: Colour = solid(0xFFFFFF);
         match self {
-            ColourToken::Paper => (solid(0xE9ECE6), solid(0x151814)),
-            ColourToken::Surface => (solid(0xF8F9F6), solid(0x1D211B)),
-            ColourToken::Surface2 => (solid(0xF1F3EE), solid(0x232722)),
-            ColourToken::Raise => (WHITE, solid(0x2A2F28)),
-            ColourToken::Ink => (solid(0x1A1E1A), solid(0xE7EBE3)),
-            ColourToken::InkSoft => (solid(0x586057), solid(0xA0A79B)),
-            ColourToken::InkFaint => (solid(0x676E65), solid(0x8A9284)),
-            ColourToken::Line => (solid(0xD6DBD0), solid(0x333A30)),
-            ColourToken::LineSoft => (solid(0xE3E7DE), solid(0x282E26)),
+            ColourToken::Paper => (solid(0xECECEC), solid(0x1E1E1E)),
+            ColourToken::Surface => (WHITE, solid(0x2A2A2A)),
+            ColourToken::Surface2 => (solid(0xF5F5F5), solid(0x242424)),
+            ColourToken::Raise => (WHITE, solid(0x323232)),
+            ColourToken::Ink => (solid(0x202020), solid(0xE8E8E8)),
+            ColourToken::InkSoft => (solid(0x5C5C5C), solid(0xA3A3A3)),
+            ColourToken::InkFaint => (solid(0x858585), solid(0x858585)),
+            ColourToken::Line => (solid(0xD9D9D9), solid(0x444444)),
+            ColourToken::LineSoft => (solid(0xE6E6E6), solid(0x383838)),
             ColourToken::Ok => (solid(0x2C7A57), solid(0x5EB489)),
             ColourToken::Warn => (solid(0xA5761A), solid(0xD2A249)),
             ColourToken::Danger => (solid(0xB03A2A), solid(0xE0705A)),
@@ -212,7 +225,7 @@ impl ColourToken {
             // The sender's page stays white in a dark window (section 12).
             ColourToken::ForeignGround => (WHITE, WHITE),
             ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),
-            ColourToken::WarnWash => (solid(0xEDE6D9), solid(0x333123)),
+            ColourToken::WarnWash => (solid(0xF2EBE1), solid(0x3F3930)),
             ColourToken::DangerWash => (alpha(0xB03A2A, 160), alpha(0xE0705A, 160)),
             // `#fff` on the lying link pill in light (`S:436`); in dark `--danger` is lifted to
             // `#E0705A`, where white measures 3.17:1, so the ink turns dark (mailo's `#1A0B08`,
@@ -256,9 +269,9 @@ impl ColourToken {
     }
 }
 
-/// A colour token as the stylesheet writes it: the table's value in the scope's scheme.
+/// A colour token as the stylesheet writes it: the table's value in the scope's Look and scheme.
 fn colour_css(token: ColourToken, scope: TokenScope) -> CssValue {
-    CssValue::computed(token.value(scope.scheme).css())
+    CssValue::computed(token.value(scope.look, scope.scheme).css())
 }
 
 #[cfg(test)]
@@ -266,6 +279,7 @@ mod tests {
     use super::{Colour, ColourToken, Hex};
     use crate::core::colour::fit::oklch_bytes;
     use crate::style::appearance::theme::Scheme;
+    use crate::style::look::Look;
 
     /// `(token, scheme, oklch lightness, chroma, hue)`: what each orb colour names.
     const ORB: &[(ColourToken, Scheme, f64, f64, f64)] = &[
@@ -283,7 +297,11 @@ mod tests {
     fn orb_colours_are_the_oklch_values_they_name() {
         for (token, scheme, l, c, h) in ORB {
             let want = Colour::Solid(Hex(oklch_bytes(*l, *c, *h)));
-            assert_eq!(token.value(*scheme), want, "{token:?} {scheme:?}");
+            assert_eq!(
+                token.value(Look::Mac, *scheme),
+                want,
+                "{token:?} {scheme:?}"
+            );
         }
     }
 }

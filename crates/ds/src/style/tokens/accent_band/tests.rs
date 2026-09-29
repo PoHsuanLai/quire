@@ -172,14 +172,14 @@ fn postmark_is_the_settled_airy_blue() {
         "#111b28",
         "#396198",
         "#295086",
-        "rgba(148,192,254,.32)",
+        "rgba(148,192,254,.31)",
         "rgba(57,97,152,.75)",
         "#8ebaf7",
         "#111b28",
-        "#8ebaf7",
+        "#94c0fe",
         "#d5e6fe",
         "rgba(142,186,247,.2)",
-        "rgba(142,186,247,.55)",
+        "rgba(148,192,254,.55)",
     ];
     assert_eq!(got, want.map(str::to_owned));
 }

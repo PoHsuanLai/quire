@@ -9,6 +9,7 @@
 use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, declaration, rule};
+use crate::style::look::Look;
 use crate::style::tokens::{colour::ColourToken, name::VarName};
 
 /// Each paper token a frame ground redirects, and the frame variable it reads instead: the text
@@ -42,7 +43,7 @@ pub fn ground_css() -> String {
         };
         let paper = REMAP
             .iter()
-            .map(|(token, _)| declaration(token.var(), &token.value(scheme).css()))
+            .map(|(token, _)| declaration(token.var(), &token.value(Look::default(), scheme).css()))
             .collect::<Vec<_>>();
         css.push_str(&rule(
             &format!(

@@ -1,66 +1,75 @@
-//! Radii (design/01-LAYOUT.md section 10). The first nine are the plan's names; the rest name
-//! the literals design/04-COMPONENTS.md O-3 says the table must absorb.
-//!
-//! The names between the plan's are proposed; the values are `S`'s.
+//! Radii, per Look (design/30-CATALOGUE.md section 3.2). The first nine are the plan's names
+//! (design/01-LAYOUT.md section 10); the rest name the literals design/04-COMPONENTS.md O-3 says
+//! the table must absorb.
 
 use crate::core::word::Word;
-use crate::style::tokens::token::Token;
+use crate::style::look::Look;
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
 /// One radius token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
-#[token(prefix = "r-", kind = fixed)]
+#[token(prefix = "r-", kind = fixed, css = radius_css)]
 pub enum Radius {
-    /// `--r-panel` 14: peek, command menu, hover card, editor.
-    #[token(value = "14px")]
+    /// `--r-panel` 10: peek, command menu, hover card, editor.
     Panel,
-    /// `--r-card` `12px 12px 12px 4px`: card and rows, the flap corner.
-    #[token(value = "12px 12px 12px 4px")]
+    /// `--r-card` 10: card and rows.
     Card,
-    /// `--r-btn` 9: mini, button, tool.
-    #[token(value = "9px")]
+    /// `--r-btn` 5: mini, button, tool.
     Btn,
-    /// `--r-chip` `6px 6px 6px 2px`.
-    #[token(value = "6px 6px 6px 2px")]
+    /// `--r-chip` 6.
     Chip,
     /// `--r-pill` 999.
-    #[token(value = "999px")]
     Pill,
-    /// `--r-field` 10: inputs, command pill, bubble.
-    #[token(value = "10px")]
+    /// `--r-field` 5: inputs, command pill, bubble.
     Field,
-    /// `--r-menu` 12.
-    #[token(value = "12px")]
+    /// `--r-menu` 8.
     Menu,
-    /// `--r-item` 9: sidebar item, tooltip.
-    #[token(value = "9px")]
+    /// `--r-item` 6: sidebar item, tooltip.
     Item,
-    /// `--r-tile` 12: account tiles, editor field.
-    #[token(value = "12px")]
+    /// `--r-tile` 10: account tiles, editor field.
     Tile,
-    /// `--r-window` 18.
-    #[token(value = "18px")]
+    /// `--r-window` 10.
     Window,
     /// `--r-menu-item` 8: menu item, prop row, foot button.
-    #[token(value = "8px")]
     MenuItem,
     /// `--r-bubble-button` 7.
-    #[token(value = "7px")]
     BubbleButton,
     /// `--r-small` 6: fly, gutter, quiet button.
-    #[token(value = "6px")]
     Small,
     /// `--r-kbd` 5: key cap, favicon.
-    #[token(value = "5px")]
     Kbd,
     /// `--r-tiny` 4: focus ring, provider mark.
-    #[token(value = "4px")]
     Tiny,
     /// `--r-micro` 3: in-row provider mark.
-    #[token(value = "3px")]
     Micro,
-    /// `--r-media` `10px 10px 10px 3px`: images, code blocks, attachments.
-    #[token(value = "10px 10px 10px 3px")]
+    /// `--r-media` 10: images, code blocks, attachments.
     Media,
+}
+
+impl Radius {
+    /// The radius in `look`, as CSS. The Mac Look (design/30-CATALOGUE.md section 3.2) has
+    /// small, uniform radii: control and field 5, menu 8, popover, card and window 10.
+    pub fn value(self, look: Look) -> &'static str {
+        match look {
+            Look::Mac => match self {
+                Radius::Panel | Radius::Card | Radius::Tile | Radius::Window | Radius::Media => {
+                    "10px"
+                }
+                Radius::Btn | Radius::Field | Radius::Kbd => "5px",
+                Radius::Chip | Radius::Item | Radius::Small => "6px",
+                Radius::Pill => "999px",
+                Radius::Menu | Radius::MenuItem => "8px",
+                Radius::BubbleButton => "7px",
+                Radius::Tiny => "4px",
+                Radius::Micro => "3px",
+            },
+        }
+    }
+}
+
+/// A radius token as the stylesheet writes it, in the scope's Look.
+fn radius_css(token: Radius, scope: TokenScope) -> CssValue {
+    CssValue::fixed(token.value(scope.look))
 }
 
 /// A material's corner, overriding the radius its recipe gives it (`--m-radius`): a radius

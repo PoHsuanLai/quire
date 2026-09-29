@@ -7,13 +7,13 @@ use crate::shell::emoji::id::EmojiId;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
 use crate::style::appearance::{
     accent::Accent,
-    look::{Look, Warmth},
     material::Material,
     motion::{Motion, MotionLevel},
     peek::PeekMode,
     theme::{Scheme, Theme},
     typeface::Typeface,
 };
+use crate::style::look::Look;
 use crate::style::tokens::label_hue::LabelHue;
 
 #[test]
@@ -30,7 +30,6 @@ fn stored_vocabularies_serialise_as_their_slugs() {
     word_matches_serde::<Scheme>();
     word_matches_serde::<Theme>();
     word_matches_serde::<Typeface>();
-    word_matches_serde::<Warmth>();
     word_matches_serde::<WidgetHost>();
     word_matches_serde::<WidgetSize>();
 }

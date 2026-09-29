@@ -5,8 +5,8 @@ use super::{Caption, Scope, Section, Specimen};
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, ColourToken, HueMember, LabelHue, Material, Radius, Scheme, Shadow, Surface, Token,
-    TokenScope, ZLayer, accent_of,
+    Accent, ColourToken, HueMember, LabelHue, Look, Material, Radius, Scheme, Shadow, Surface,
+    Token, TokenScope, ZLayer, accent_of,
 };
 
 /// design/01-LAYOUT.md section 2's common steps. The design names these values and quire has no
@@ -27,7 +27,7 @@ pub fn TokensPage() -> Element {
                             for token in ColourToken::ALL {
                                 Specimen {
                                     name: token.var().as_str(),
-                                    code: token.value(scheme).css(),
+                                    code: token.value(Look::Mac, scheme).css(),
                                     div { class: "g-swatch", style: "background:{token.var().reference()}" }
                                 }
                             }

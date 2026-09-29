@@ -6,7 +6,7 @@
 
 use crate::schema::Page;
 use crate::units::{Fraction, Percent};
-use ds::{Accent, Appearance, Look, Motion, Theme, Typeface, Warmth};
+use ds::{Accent, Appearance, Look, Motion, Theme, Typeface};
 use serde::{Deserialize, Serialize};
 
 /// `appearance.*`: what every surface resolves its look from.
@@ -21,20 +21,13 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub theme: Theme,
-    /// `appearance.look`: Post unless the person picks another.
+    /// `appearance.look`: the value set the tokens are written in.
     #[settings(
         label = "Look",
-        help = "The card's whole visual language: Post, Riso, Tide or Candy.",
+        help = "The visual language: the values colours, radii and shadows take.",
         section = "Appearance"
     )]
     pub look: Look,
-    /// `appearance.warmth`: applies only when the look is Candy.
-    #[settings(
-        label = "Warmth",
-        help = "How warm Candy's neutrals run. Applies only when Look is Candy.",
-        section = "Appearance"
-    )]
-    pub warmth: Warmth,
     /// `appearance.accent`: one of six.
     #[settings(
         label = "Accent",
@@ -138,8 +131,7 @@ impl Default for AppearanceSettings {
     fn default() -> Self {
         AppearanceSettings {
             theme: Theme::System,
-            look: Look::Post,
-            warmth: Warmth::Neutral,
+            look: Look::Mac,
             accent: Accent::Postmark,
             motion_level: Motion::Standard,
             typeface: Typeface::System,

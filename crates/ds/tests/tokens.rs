@@ -3,6 +3,7 @@
 //! exactly its four, each picker swatch is its accent's own colour, and every variable the
 //! stylesheet reads is declared by it or written inline by the root.
 
+use ds::Look;
 use ds::Word;
 use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
@@ -206,7 +207,11 @@ fn the_token_block_holds_the_rust_table() {
             let got = over
                 .and_then(|over| over.get(name))
                 .or_else(|| light.get(name));
-            assert_eq!(got, Some(&token.value(scheme).css()), "{name} {scheme:?}");
+            assert_eq!(
+                got,
+                Some(&token.value(Look::Mac, scheme).css()),
+                "{name} {scheme:?}"
+            );
         }
     }
     for hue in LabelHue::ALL.iter().copied() {
