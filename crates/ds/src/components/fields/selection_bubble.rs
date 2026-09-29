@@ -14,9 +14,9 @@ use crate::core::geometry::{
     units::{Px, Rect},
 };
 use crate::core::vocab::Check;
+use crate::core::vocab::Dismiss;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::stack::layer_stack::Dismiss;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
@@ -81,7 +81,7 @@ pub fn SelectionBubble(
     onlink: EventHandler<String>,
     onclose: EventHandler<()>,
 ) -> Element {
-    let float = use_float(ZLayer::Bubble, Stacking::Layer(Dismiss::EscOnly));
+    let float = use_float(ZLayer::Bubble, Stacking::Layer(Dismiss::Semitransient));
     let presence = use_entrance(Anim::BubblePop);
     let mut link = use_signal(String::new);
     let want = Placement::new(Side::Top, Align::Center).no_flip();

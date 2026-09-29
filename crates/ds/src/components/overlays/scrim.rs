@@ -4,7 +4,7 @@
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Stacking, use_float};
 use crate::components::overlays::scrim_strength::ScrimStrength;
-use crate::stack::layer_stack::Dismiss;
+use crate::core::vocab::Dismiss;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
@@ -89,7 +89,7 @@ pub fn Scrim(
         ..ScrimLook::default()
     };
     let stacking = match flow {
-        Flow::Floating => Stacking::Layer(Dismiss::EscOnly),
+        Flow::Floating => Stacking::Layer(Dismiss::Semitransient),
         Flow::Inline => Stacking::Passive,
     };
     let float = use_float(ZLayer::Scrim, stacking);

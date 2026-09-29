@@ -183,8 +183,8 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Activity, Availability, Check, DropState, Emphasis, Fraction, Muting, Percent, Selection,
-        Shortcut, ShortcutKey, Shown, StaggerIndex,
+        Activity, Availability, Check, Dismiss, DropState, Emphasis, Fraction, Muting, Percent,
+        Selection, Shortcut, ShortcutKey, Shown, StaggerIndex,
     },
 };
 pub use crate::edit::{
@@ -347,7 +347,7 @@ pub use crate::spell::{
 pub use crate::stack::{
     host::{OverlayId, use_overlays},
     hover_hub::{HoverKey, HoverKind, use_hover_hub},
-    layer_stack::{Dismiss, Dismissal, LayerId, LayerStack},
+    layer_stack::{Dismissal, LayerId, LayerStack},
     menu_track::types::{
         ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
         MenuTrackEffect, MenuTrackEvent,

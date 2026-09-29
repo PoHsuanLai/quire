@@ -482,13 +482,13 @@ pub const CASES: &[Case] = &[
     Case {
         component: "popover",
         state: "bubble-esc-only",
-        make: || rsx! { Popover { anchor: Anchor::Rect(button_rect()), placement: Placement::new(Side::Top, Align::Center), gap: Px(8.0), elevation: Elevation::Bubble, dismiss: Dismiss::EscOnly, onclose: |_| {}, "Anything" } },
+        make: || rsx! { Popover { anchor: Anchor::Rect(button_rect()), placement: Placement::new(Side::Top, Align::Center), gap: Px(8.0), elevation: Elevation::Bubble, dismiss: Dismiss::Semitransient, onclose: |_| {}, "Anything" } },
         wait: NOW,
     },
     Case {
         component: "popover",
         state: "sheet-owner-closes",
-        make: || rsx! { Popover { anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), placement: Placement::new(Side::Right, Align::End), gap: Px(0.0), elevation: Elevation::Sheet, dismiss: Dismiss::None, onclose: |_| {}, "Anything" } },
+        make: || rsx! { Popover { anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), placement: Placement::new(Side::Right, Align::End), gap: Px(0.0), elevation: Elevation::Sheet, dismiss: Dismiss::Manual, onclose: |_| {}, "Anything" } },
         wait: NOW,
     },
     // HoverCard: the target at rest, then each kind of card open after the intent.

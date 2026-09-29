@@ -1,17 +1,7 @@
 //! Which floating layer Escape and an outside click close: the topmost only
 //! (design/04-COMPONENTS.md section 21, design/06-INTERACTIONS.md sections 5 and 18).
 
-/// What closes a floating layer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Dismiss {
-    /// Escape, or a click outside.
-    #[default]
-    EscAndOutside,
-    /// Escape only.
-    EscOnly,
-    /// Only its owner.
-    None,
-}
+use crate::core::vocab::Dismiss;
 
 /// One open layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -60,7 +50,7 @@ impl LayerStack {
     /// owner closes it), the key passes through to that owner and nothing below closes
     /// (design/06-INTERACTIONS.md section 18).
     pub fn escape(&self) -> Dismissal {
-        self.top_if(|dismiss| matches!(dismiss, Dismiss::EscAndOutside | Dismiss::EscOnly))
+        self.top_if(|dismiss| matches!(dismiss, Dismiss::Transient | Dismiss::Semitransient))
     }
 
     /// A click landed outside every layer.
@@ -68,7 +58,7 @@ impl LayerStack {
     /// Only the topmost layer is asked; a click outside it that lands on a lower layer is
     /// that layer's own click.
     pub fn outside_click(&self) -> Dismissal {
-        self.top_if(|dismiss| dismiss == Dismiss::EscAndOutside)
+        self.top_if(|dismiss| dismiss == Dismiss::Transient)
     }
 
     /// The topmost open layer.
