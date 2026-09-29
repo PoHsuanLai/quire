@@ -74,7 +74,7 @@ fn deep_link_resolves() {
 // every_key_in_catalogue_has_a_spec
 
 /// `appearance.*` keys the doc assigns to `sill`, not `AppearanceSettings`
-/// (FINDINGS.md F15, mirrored from `crates/ds-settings/tests/keys.rs`'s `SILL_OWNED`).
+/// (mirrored from `crates/ds-settings/tests/keys.rs`'s `SILL_OWNED`).
 const SILL_OWNED: &[&str] = &[
     "notifications.banner_material",
     "control_center.material",
