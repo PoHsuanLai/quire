@@ -75,7 +75,8 @@ public surface, one path per item.
 | `core/guarded.rs` | the guard around a call or poll into a document the renderer may hold: a panic there is "busy" (`Guarded`, `guarded_call`; FINDINGS "Bar gaps", "Launcher gaps") |
 | `focus/{host,request}.rs` | 06-INTERACTIONS §17: `HostFocus`/`Focused` (every focus change waits out a busy document) and `FocusRequest`/`use_focus_request` (`Focus::Controlled`, giving a field the keyboard back) |
 | `motion/{pulse,pulse_key}.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
-| `motion/{presence,roster,use_roster}.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Exit::{Fold, Curl, Crumple, TabOut}`; an unread (`Emphasis::Strong`) row plays each row exit's heavy variant |
+| `motion/presence/`, `motion/{roster,use_roster}.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Presence::{Hidden, Entering, Present, Leaving(Exit)}` and `use_presence` for a surface its caller shows and hides, `roster::Heal` for a row sliding into a gap, `Exit::{Fold, Curl, Crumple, TabOut, BannerOut, OsdOut, ShotOut, PaneOut}`; an unread (`Emphasis::Strong`) row plays each row exit's heavy variant |
+| `motion/timeline/` | 26-DETAILS §3.2, §4.1 (Rust-driven values): `Timeline` (`total`, `at`, `settled`) with the implementors `Ease`, `Glide`, `Sweep`, `Spring`, `CountUp` and `Pending`; `Playback` is the one frame driver (a frame every `FRAME_TICK` while a run moves, the last at exactly its total, none at rest) and `use_timeline` follows a timeline its caller recomputes |
 | `motion/hover_intent.rs` | 06-INTERACTIONS §3 |
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |
