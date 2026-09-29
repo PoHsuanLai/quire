@@ -1,7 +1,7 @@
 //! Tuned tokens: a token whose value a settings key can move. The stylesheet declares the token
 //! on `.ds` as its *input* property with the key's default as the fallback
 //! (`--fs-shell-menu:var(--shell-menu-font,13px)`), and a consumer writes the input on any
-//! element around its surface ([`crate::style::tokens::shell::ShellMetrics`], [`crate::style::tokens::dock::DockMetrics`]). Every nested
+//! element around its surface ([`crate::ShellMetrics`], [`crate::DockMetrics`]). Every nested
 //! `.ds` re-declares the token from the inherited input, so one inline write reaches every
 //! scope under it, where writing the token itself would be undone by the next nested scope.
 

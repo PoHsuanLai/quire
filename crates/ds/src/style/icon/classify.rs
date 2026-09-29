@@ -6,7 +6,8 @@
 //! Near-grey is OKLCH chroma below a threshold (design/08 section 1.5 proposes 0.04). The
 //! settings key is `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3, default
 //! 0.04, range 0.0..=0.2); [`classify_with`] takes the default
-//! ([`ChromaLimit::default`]) or one built with [`ChromaLimit::try_from`]. `sill` still has to register the key in its own
+//! ([`ChromaLimit::default`]) or one built with [`ChromaLimit::try_from`]. `sill` still has to
+//! register the key in its own
 //! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
 
 use crate::core::colour::oklab::{Oklab, Oklch};

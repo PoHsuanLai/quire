@@ -1,4 +1,4 @@
-//! An [`EditSurface`](crate::components::fields::edit_surface::EditSurface)'s spellchecking (design/04-COMPONENTS.md section 50):
+//! An [`EditSurface`](crate::EditSurface)'s spellchecking (design/04-COMPONENTS.md section 50):
 //! after each input and each caret move, a frame later the paragraphs are read again and the
 //! marks follow the edit ([`refresh`]); once typing has paused for `DelayToken::SpellDebounce`
 //! the paragraphs whose text changed since their last check are checked on the host's worker

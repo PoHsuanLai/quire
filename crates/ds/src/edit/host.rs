@@ -1,4 +1,4 @@
-//! The host seam an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) reads geometry and IME through. `ds`
+//! The host seam an [`EditSurface`](crate::EditSurface) reads geometry and IME through. `ds`
 //! stays renderer-free: `ds_native::edit::EDIT` fills it in on Blitz (provided by `launch`, the
 //! harness and `ds_native::edit::provide`). Without a host every read answers
 //! [`Probe::Unknown`], and the surface still delivers keys, text and clipboard shortcuts.

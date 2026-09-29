@@ -85,7 +85,7 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// `aside` is drawn beside the results, under the field, past a hairline divider, `aside_width`
 /// wide: over the window the card widens by that much; in a surface the card still fills its
 /// container, so the host widens the surface (sill's launcher panel) and the results column
-/// narrows by it otherwise. Use it for a [`PreviewPane`](crate::components::content::preview_pane::PreviewPane).
+/// narrows by it otherwise. Use it for a [`PreviewPane`](crate::PreviewPane).
 ///
 /// `shown` keeps the palette mounted while hidden: `Some(Shown::Hidden)` lays out nothing and
 /// leaves the layer stack, and each change to `Some(Shown::Visible)` replays the entrance,

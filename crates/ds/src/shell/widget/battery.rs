@@ -3,7 +3,7 @@
 //! device: the ring at the top left, the percentage as the card's hero figure. Small with
 //! several: a 2 x 2 grid of rings, no numbers, an empty place a bare track. Medium: a row of up
 //! to four rings, the percentage under each. Each ring holds the device's filled glyph
-//! ([`crate::shell::battery::device_glyph::DeviceGlyph`]) and fills on the host's wake stamp.
+//! ([`crate::DeviceGlyph`]) and fills on the host's wake stamp.
 
 use crate::components::content::text_runs::Text;
 use crate::core::vocab::Fraction;

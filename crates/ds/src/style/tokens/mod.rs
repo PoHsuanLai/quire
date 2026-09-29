@@ -8,6 +8,7 @@ pub(crate) mod accent_table;
 pub(crate) mod colour;
 pub(crate) mod control_center;
 pub(crate) mod control_size;
+pub(crate) mod curve;
 pub(crate) mod delay;
 pub(crate) mod dock;
 pub(crate) mod easing;
@@ -27,6 +28,8 @@ pub(crate) mod scalar;
 pub(crate) mod shape;
 pub(crate) mod shell;
 pub(crate) mod shell_scale;
+#[cfg(test)]
+mod size_rules_tests;
 pub(crate) mod size_scale;
 pub(crate) mod size_vars;
 pub(crate) mod spacing;
@@ -36,10 +39,6 @@ pub(crate) mod tint;
 pub(crate) mod tuned;
 pub(crate) mod type_scale;
 pub(crate) mod type_voice;
+pub(crate) mod vibrancy;
 pub(crate) mod widget_paint;
 pub(crate) mod widgets;
-
-pub(crate) mod curve;
-#[cfg(test)]
-mod size_rules_tests;
-pub(crate) mod vibrancy;

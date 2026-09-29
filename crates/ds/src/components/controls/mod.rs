@@ -1,4 +1,5 @@
-//! Controls: buttons, toggles, segmented controls, sliders, the level control, chips, key caps and the other things a person presses or drags.
+//! Controls: buttons, toggles, segmented controls, sliders, the level control, chips, key caps and
+//! the other things a person presses or drags.
 
 pub(crate) mod appearance_picker;
 pub(crate) mod bump_on;

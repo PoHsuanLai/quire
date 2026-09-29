@@ -1,5 +1,5 @@
 //! The drag itself, as a pure state machine: what it carries, where the pointer is, and when
-//! the files land. The host feeds it through [`HostFileDrop`](crate::file_drop::host::HostFileDrop); a target's
+//! the files land. The host feeds it through [`HostFileDrop`](crate::HostFileDrop); a target's
 //! view and the window's acceptance follow from it and from the target under the pointer.
 
 use crate::core::geometry::units::Point;

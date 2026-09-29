@@ -1,6 +1,7 @@
 //! What a state change means to the person looking (design/26-DETAILS.md section 3.1).
 
-/// The meaning of one state change. A component's [`crate::motion::detail::detailed::Detailed`] table names one for
+/// The meaning of one state change. A component's [`crate::motion::detail::detailed::Detailed`]
+/// table names one for
 /// every transition of its own state; the primitives play what it names and nothing else.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Moment {

@@ -1,5 +1,5 @@
 //! Each [`Anim`]'s canonical declaration: the keyframes, duration and easing tokens, fill and
-//! iteration that the stylesheet writes and [`crate::motion::settle::settle`] times (design/05-MOTION.md
+//! iteration that the stylesheet writes and [`crate::settle`] times (design/05-MOTION.md
 //! section 5).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
@@ -33,7 +33,7 @@ pub enum Iteration {
 }
 
 /// The canonical declaration of one animation: what the stylesheet writes and what
-/// [`crate::motion::settle::settle`] times.
+/// [`crate::settle`] times.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Recipe {
     /// The `@keyframes` name.

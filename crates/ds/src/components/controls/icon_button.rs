@@ -81,8 +81,8 @@ impl IconButtonVariant {
 /// new Attention cue lifts the glyph once (`nudge-up`, `use_nudge`), never the pill, and nothing
 /// under Reduced. Pass it for the button's whole life (`None` to `Some` remounts the glyph).
 ///
-/// [`DataName::parse`]: crate::components::controls::pass_through::DataName::parse
-/// [`ExtraClass::parse`]: crate::components::controls::pass_through::ExtraClass::parse
+/// [`DataName::parse`]: crate::DataName::parse
+/// [`ExtraClass::parse`]: crate::ExtraClass::parse
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,

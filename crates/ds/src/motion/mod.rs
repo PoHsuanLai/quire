@@ -4,7 +4,6 @@
 pub(crate) mod anim;
 pub(crate) mod batch_roster;
 pub(crate) mod css;
-
 pub(crate) mod detail;
 pub(crate) mod drag;
 pub(crate) mod drag_return;

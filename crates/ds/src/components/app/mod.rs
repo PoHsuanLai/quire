@@ -1,4 +1,5 @@
-//! Mail-only components: account tiles, the send pill, the sync halo, link pills, the sidebar and its tree, and the row's hover strip.
+//! Mail-only components: account tiles, the send pill, the sync halo, link pills, the sidebar and
+//! its tree, and the row's hover strip.
 
 pub(crate) mod account_tile;
 pub(crate) mod command_pill;

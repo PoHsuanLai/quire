@@ -1,4 +1,5 @@
-//! Content: text runs, rich text, icons and pictures, avatars, the status glyphs, previews and thumbnails a component shows.
+//! Content: text runs, rich text, icons and pictures, avatars, the status glyphs, previews and
+//! thumbnails a component shows.
 
 pub(crate) mod avatar;
 pub(crate) mod emoji_grid;

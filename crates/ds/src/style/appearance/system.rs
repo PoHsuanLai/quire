@@ -26,7 +26,7 @@ pub enum Contrast {
     High,
 }
 
-/// Everything the desktop contributes to resolving an [`crate::style::appearance::appearance::Appearance`].
+/// Everything the desktop contributes to resolving an [`crate::Appearance`].
 ///
 /// The default is what a desktop with no portal answers: light, no motion preference, normal
 /// contrast.

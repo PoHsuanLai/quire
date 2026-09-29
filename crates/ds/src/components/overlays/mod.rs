@@ -1,4 +1,5 @@
-//! Overlays: the popover every floating surface shares, sheets, alerts, scrims, panels, tooltips, hover cards, toasts and the drag ghost.
+//! Overlays: the popover every floating surface shares, sheets, alerts, scrims, panels, tooltips,
+//! hover cards, toasts and the drag ghost.
 
 pub(crate) mod alert;
 pub(crate) mod alert_vocab;

@@ -34,7 +34,7 @@ impl Resolved {
 
 /// Resolve `app`'s choices against the Space's own theme and the desktop's preferences.
 ///
-/// `look_theme` is the active [`crate::style::space::look::SpaceLook`]'s theme; `System` in either place defers to
+/// `look_theme` is the active [`crate::SpaceLook`]'s theme; `System` in either place defers to
 /// `system`, and `Motion::System` becomes `Reduced` when the desktop asks for reduced motion.
 ///
 /// A Space that names its own theme wins over the app's: a Space's mode is `S`'s per-Space

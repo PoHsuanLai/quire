@@ -6,7 +6,7 @@
 //! toast mounts below the edge for a frame, rises, and after it sinks again is dropped (gallery
 //! fix A: a laid-out hidden toast showed as a pill at the bottom of every root). It drives the
 //! pull tab with
-//! [`crate::overlay::pull_tab::PullTab`]: pulled right past 46 px it arms, and a release while
+//! [`crate::PullTab`]: pulled right past 46 px it arms, and a release while
 //! armed, or a tap that moved under 3 px, undoes.
 
 use crate::core::geometry::units::Px;

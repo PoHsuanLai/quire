@@ -17,14 +17,9 @@
 //! assert_clean(OUR_CSS, &LintConfig { exceptions: EXCEPTIONS, ..LintConfig::default() });
 //! ```
 
+pub(crate) mod animation;
 pub(crate) mod assert;
 pub(crate) mod blitz;
-pub(crate) mod markup;
-pub(crate) mod rule;
-pub(crate) mod stylesheet;
-pub(crate) mod tokenize;
-
-pub(crate) mod animation;
 pub(crate) mod colours;
 pub(crate) mod declaration;
 pub(crate) mod details;
@@ -32,11 +27,15 @@ pub(crate) mod hairline;
 pub(crate) mod hig;
 pub(crate) mod inline_style;
 pub(crate) mod kind;
+pub(crate) mod markup;
 pub(crate) mod markup_hig;
 pub(crate) mod registry;
+pub(crate) mod rule;
 pub(crate) mod selector;
 pub(crate) mod severity;
+pub(crate) mod stylesheet;
 pub(crate) mod text;
+pub(crate) mod tokenize;
 pub(crate) mod walk;
 
 pub use assert::assert_clean;

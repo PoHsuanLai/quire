@@ -1,4 +1,4 @@
-//! A palette row's shape: what a [`MenuRow`](crate::components::menus::menu_entry::MenuRow) draws beyond its title,
+//! A palette row's shape: what a [`MenuRow`](crate::MenuRow) draws beyond its title,
 //! detail and trail. `Plain` is the row every menu and palette drew before; `File` and `Clip`
 //! are the launcher's file and clipboard results. Drawn by `menu_shape`.
 

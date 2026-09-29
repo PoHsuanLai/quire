@@ -1,6 +1,7 @@
 //! How fast a person's hand was moving when it let go (design/27 section 3.12 rule 2): logical
 //! pixels per second along the axis the motion runs, signed (right and down are positive). A
-//! whole number, so [`crate::motion::detail::touch::Contact`] that carries one keeps `Eq` and `Hash`.
+//! whole number, so [`crate::motion::detail::touch::Contact`] that carries one keeps `Eq` and
+//! `Hash`.
 
 use super::swipe::Speed;
 
