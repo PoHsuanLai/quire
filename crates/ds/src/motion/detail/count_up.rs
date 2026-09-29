@@ -2,12 +2,12 @@
 //! (design/26-DETAILS.md section 3.2). Named so because `ds::Count` is the count badge.
 
 use super::cue::Cue;
-use super::glide::Glide;
 use super::level::use_level;
 use super::moment::Moment;
-use super::motor::use_motor;
 use super::sweep::Sweep;
 use super::tween::Tween;
+use crate::motion::timeline::glide::Glide;
+use crate::motion::timeline::playback::use_playback;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
@@ -55,10 +55,10 @@ struct Counting {
 pub fn use_count_up(value: i64, cue: Cue, pace: CountPace) -> CountUp {
     let env = use_level();
     let motion = env.now();
-    let own = use_motor(value);
+    let own = use_playback(Glide::still(value));
     let tween = match pace {
         CountPace::InStep(sweep) => sweep.tween(),
-        CountPace::Own(_) => Tween::from_pose(own.pose()),
+        CountPace::Own(_) => Tween::of(own),
     };
     let mut state = use_hook(|| {
         CopyValue::new(Counting {
@@ -83,12 +83,12 @@ pub fn use_count_up(value: i64, cue: Cue, pace: CountPace) -> CountUp {
         };
         if let (CountPace::Own(token), true) = (pace, from != value) {
             queue_effect(move || {
-                own.play(Glide {
-                    from: 0,
-                    to: 1000,
-                    length: token.duration(motion),
-                    easing: EasingToken::Out.easing(motion),
-                });
+                own.play(Glide::between(
+                    0,
+                    1000,
+                    token.duration(motion),
+                    EasingToken::Out.easing(motion),
+                ));
             });
         }
     }

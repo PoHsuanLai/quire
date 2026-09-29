@@ -1,12 +1,12 @@
 //! MorphGlyph: a glyph that morphs into the next one it is given, as two stacked layers, each its
 //! own `svg` in an HTML wrapper the stylesheet can move (design/26-DETAILS.md section 3.2).
 
-use super::glide::Glide;
 use super::level::use_level;
 use super::morph::{MorphStyle, Slashed};
-use super::motor::use_motor;
 use super::touch::Touch;
 use crate::core::word::Word;
+use crate::motion::timeline::glide::Glide;
+use crate::motion::timeline::playback::{Playback, use_playback};
 use crate::motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
@@ -56,7 +56,7 @@ pub fn MorphGlyph(
     let timer = use_motion_timer(incoming);
     let settled = use_hook(|| EventHandler::new(|()| {}));
     let env = use_level();
-    let slash = use_motor(slash_target(slashed));
+    let slash = use_playback(Glide::still(slash_target(slashed)));
     let mut seen = use_hook(|| {
         CopyValue::new(Shown {
             icon,
@@ -92,7 +92,7 @@ pub fn MorphGlyph(
     let playing = timer.phase() == TimerPhase::Running && shown.before.is_some();
     let px = size.px();
     let stroke = stroke_width(size, use_scale());
-    let drawn = slash.pose().value.clamp(0, 1000);
+    let drawn = slash.frame().value.clamp(0, 1000);
     let offset = SLASH_LENGTH * (1.0 - drawn as f32 / 1000.0);
     let alias = if shown.round.is_multiple_of(2) {
         "b"
@@ -164,17 +164,17 @@ fn slash_target(slashed: Slashed) -> i64 {
 }
 
 /// Draw the slash on or off over `--t-quick --e-out`, or at once under Reduced.
-fn slide_slash(slash: super::motor::Motor, slashed: Slashed, reduced: bool) {
+fn slide_slash(slash: Playback<Glide>, slashed: Slashed, reduced: bool) {
     let to = slash_target(slashed);
     if reduced {
-        return slash.snap(to);
+        return slash.play(Glide::still(to));
     }
-    slash.play(Glide {
-        from: slash.peek().value,
+    slash.play(Glide::between(
+        slash.peek().map_or(to, |pose| pose.value),
         to,
-        length: DurationToken::Quick.duration(MotionLevel::Standard),
-        easing: EasingToken::Out.easing(MotionLevel::Standard),
-    });
+        DurationToken::Quick.duration(MotionLevel::Standard),
+        EasingToken::Out.easing(MotionLevel::Standard),
+    ));
 }
 
 #[cfg(test)]

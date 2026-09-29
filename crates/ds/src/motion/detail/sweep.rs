@@ -1,12 +1,12 @@
 //! Sweep: an arc or a bar from one share to another (design/26-DETAILS.md section 3.2).
 
 use super::cue::Cue;
-use super::glide::Glide;
 use super::level::use_level;
 use super::moment::Moment;
-use super::motor::{Motor, use_motor};
 use super::tween::Tween;
 use crate::core::vocab::Fraction;
+use crate::motion::timeline::glide::Glide;
+use crate::motion::timeline::playback::{Playback, use_playback};
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
@@ -72,7 +72,7 @@ pub fn use_sweep(level: Fraction, cue: Cue) -> Sweep {
         SweepPlan::FromZero => 0,
         SweepPlan::FromHere | SweepPlan::Stand => i64::from(level.0),
     };
-    let motor = use_motor(start);
+    let playback = use_playback(Glide::still(start));
     let mut seen = use_hook(|| CopyValue::new(None::<(u32, Fraction)>));
     let now = Some((cue.serial(), level));
     if *seen.peek() != now {
@@ -81,28 +81,31 @@ pub fn use_sweep(level: Fraction, cue: Cue) -> Sweep {
         queue_effect(move || {
             let motion = env.now();
             let moment = if fresh { cue.moment() } else { Moment::Rest };
-            sweep(motor, plan(moment, motion), level, motion);
+            sweep(playback, plan(moment, motion), level, motion);
         });
     }
     Sweep {
-        tween: Tween::from_pose(motor.pose()),
+        tween: Tween::of(playback),
     }
 }
 
 /// Start `plan` towards `level` at motion level `motion`.
-fn sweep(motor: Motor, plan: SweepPlan, level: Fraction, motion: MotionLevel) {
+fn sweep(playback: Playback<Glide>, plan: SweepPlan, level: Fraction, motion: MotionLevel) {
     let to = i64::from(level.0);
     let (from, token) = match plan {
-        SweepPlan::Stand => return motor.snap(to),
+        SweepPlan::Stand => return playback.play(Glide::still(to)),
         SweepPlan::FromZero => (0, DurationToken::Sweep),
-        SweepPlan::FromHere => (motor.peek().value, DurationToken::Quick),
+        SweepPlan::FromHere => (
+            playback.peek().map_or(to, |pose| pose.value),
+            DurationToken::Quick,
+        ),
     };
-    motor.play(Glide {
+    playback.play(Glide::between(
         from,
         to,
-        length: token.duration(motion),
-        easing: EasingToken::Out.easing(motion),
-    });
+        token.duration(motion),
+        EasingToken::Out.easing(motion),
+    ));
 }
 
 #[cfg(test)]

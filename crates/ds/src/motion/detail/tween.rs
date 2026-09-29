@@ -2,10 +2,11 @@
 //! (design/26-DETAILS.md section 4.1): the frame driver under Sweep, CountUp and the success
 //! check, on the easing tokens' own curves (`CubicBezier::at`).
 
-use super::glide::{Glide, Pose};
 use super::level::use_level;
-use super::motor::use_motor;
 use crate::core::vocab::Fraction;
+use crate::motion::timeline::ease::Ease;
+use crate::motion::timeline::glide::{Glide, Pose};
+use crate::motion::timeline::playback::{Playback, use_playback};
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
@@ -24,11 +25,18 @@ pub struct TweenSpec {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Tween {
     pose: Pose,
+    run: u32,
+    ease: Ease,
 }
 
 impl Tween {
-    pub(crate) fn from_pose(pose: Pose) -> Tween {
-        Tween { pose }
+    /// The frame `playback` draws now, subscribing the caller's render to it.
+    pub(crate) fn of(playback: Playback<Glide>) -> Tween {
+        Tween {
+            pose: playback.frame(),
+            run: playback.serial(),
+            ease: playback.timeline().unwrap_or_else(|| Glide::still(0)).ease,
+        }
     }
 
     /// The share now, in thousandths (a spring may read past its target on the way; never
@@ -55,7 +63,7 @@ impl Tween {
 
     /// Which move this frame belongs to: every start, retarget or jump is a new run.
     pub(crate) fn run(self) -> u32 {
-        self.pose.run
+        self.run
     }
 }
 
@@ -63,7 +71,7 @@ impl Tween {
 /// moves there from wherever it is now, over `spec`. Under Reduced it jumps (R7). Asks for frames
 /// only while it moves (R3).
 pub fn use_tween(target: Fraction, spec: TweenSpec) -> Tween {
-    let motor = use_motor(i64::from(target.0));
+    let playback = use_playback(Glide::still(i64::from(target.0)));
     let env = use_level();
     let mut seen = use_hook(|| CopyValue::new(target));
     if *seen.peek() != target {
@@ -72,17 +80,17 @@ pub fn use_tween(target: Fraction, spec: TweenSpec) -> Tween {
             let level = env.now();
             let to = i64::from(target.0);
             match level {
-                MotionLevel::Reduced => motor.snap(to),
+                MotionLevel::Reduced => playback.play(Glide::still(to)),
                 MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => {
-                    motor.play(Glide {
-                        from: motor.peek().value,
+                    playback.play(Glide::between(
+                        playback.peek().map_or(to, |pose| pose.value),
                         to,
-                        length: spec.duration.duration(level),
-                        easing: EasingToken::Out.easing(level),
-                    })
+                        spec.duration.duration(level),
+                        EasingToken::Out.easing(level),
+                    ))
                 }
             }
         });
     }
-    Tween::from_pose(motor.pose())
+    Tween::of(playback)
 }
