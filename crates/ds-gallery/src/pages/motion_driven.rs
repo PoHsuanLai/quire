@@ -1,4 +1,4 @@
-//! Driven motion (design/05 section 14, wave H1): each part that runs on a spring, in its own
+//! Driven motion (design/05 section 14): each part that runs on a spring, in its own
 //! cell with the buttons that move it. Each settles to 0 frames; a second press mid-flight
 //! redirects from where it is.
 

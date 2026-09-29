@@ -1,5 +1,5 @@
 //! Lists: a live `AnimatedList` whose rows leave by each exit, heal, and come back on undo; a
-//! `LeavingList` of notification groups (sill Q510);
+//! `LeavingList` of notification groups;
 //! sidebar items; account tiles; the hover strip; the appearance picker.
 
 use super::scheduled::Scheduled;

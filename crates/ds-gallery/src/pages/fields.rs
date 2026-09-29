@@ -53,7 +53,7 @@ pub fn Fields() -> Element {
     }
 }
 
-/// mailo gaps 4's kinds and the bare face, each live.
+/// The field kinds and the bare face, each live.
 #[component]
 pub fn FieldKinds() -> Element {
     let mut heard = use_signal(|| 0usize);

@@ -1,4 +1,4 @@
-//! The send pill's outbox states (mailo gaps 2): Cancel for a held send, the busy ring, the
+//! The send pill's outbox states: Cancel for a held send, the busy ring, the
 //! failed moods played on demand, and a refusal under the text. Beside the live countdown on
 //! the pills page.
 

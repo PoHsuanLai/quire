@@ -1,4 +1,4 @@
-//! The Overlays page's widgets (sill Q182, Q183; design/23 section 9): over the wallpaper, widget
+//! The Overlays page's widgets (design/23 section 9): over the wallpaper, widget
 //! cards on the desktop (the Widget material's card, light, tinted by the Space) and as tiles in
 //! the notification center (a Popover panel, dark), every one a `WidgetCard`: the world clock
 //! (analog dials on the desktop, digits in the tile) and the batteries at four levels, one

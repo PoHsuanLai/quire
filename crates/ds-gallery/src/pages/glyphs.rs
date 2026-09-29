@@ -1,5 +1,5 @@
 //! The Controls page's glyphs: every `Icon` at the bar's 22 px, set by set, named by its variant,
-//! so a new glyph (sill FINDINGS Q81's control set) is seen beside the ones it must match.
+//! so a new glyph (the control set) is seen beside the ones it must match.
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;

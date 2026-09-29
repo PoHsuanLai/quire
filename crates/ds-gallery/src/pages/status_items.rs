@@ -1,5 +1,5 @@
 //! The Controls page's status items on the frame: `IconButton { Status }` on a Bar root, as
-//! sill's bar draws them (bar gaps, sill Q9 and Q12). The root draws the Space gradient at the
+//! sill's bar draws them (bar gaps). The root draws the Space gradient at the
 //! bar's tint alpha (`data-frame=tinted`) and stamps the frame ground (`data-ground=frame`), so
 //! the items, the app name and the clock take the `--f-*` inks with no variant of their own.
 

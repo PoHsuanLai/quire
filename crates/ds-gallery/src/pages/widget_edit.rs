@@ -1,10 +1,10 @@
-//! Edit Widgets as the person meets it (sill Q520-Q523, G423): a desktop over the calm
+//! Edit Widgets as the person meets it: a desktop over the calm
 //! wallpaper with the widgets placed on it, each at its grid cell from the right, and quire's
 //! `Panel` at the bottom edge holding `WidgetGallery`, no taller than half the desktop, so the
 //! top rows where a new widget lands stay in view. Live: Add places the widget on the desktop
 //! above the sheet at the size it takes there, and the gallery's own list shows it; Remove takes
-//! it away, the card on the desktop shrinking and fading out (`CardPresence::Leaving`, sill
-//! G423) before the page drops it.
+//! it away, the card on the desktop shrinking and fading out (`CardPresence::Leaving`)
+//! before the page drops it.
 
 use crate::axes::Axes;
 use crate::wallpaper;

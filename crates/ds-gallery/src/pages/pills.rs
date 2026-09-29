@@ -30,7 +30,7 @@ const TARGETS: [(HoverKind, &str, &str); 5] = [
     (HoverKind::Tip, "time:88", "09:41 (time tip)"),
 ];
 
-/// Pinned people drawn as list items that are hover targets themselves (mailo gaps 2).
+/// Pinned people drawn as list items that are hover targets themselves.
 const PINNED: [(&str, &str); 2] = [("side:4", "Sam Lindqvist"), ("side:5", "Priya Raman")];
 
 /// Hover targets for every card kind, and both tooltip kinds.

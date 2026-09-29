@@ -1,4 +1,4 @@
-//! The Controls page's mailo gaps 6 specimens: the "more" glyphs, and buttons carrying a
+//! The Controls page's mail-app specimens: the "more" glyphs, and buttons carrying a
 //! consumer's `data-*` and class. Split from `controls.rs` to
 //! keep that page under its size.
 

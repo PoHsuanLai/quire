@@ -1,4 +1,4 @@
-//! Overlays, mailo gaps 4: hover cards keyed on the caller's own pointer hooks, one floating
+//! Overlays, for mail: hover cards keyed on the caller's own pointer hooks, one floating
 //! beside the element it measured and one drawn in place with no anchor at all; a label
 //! checklist whose picks keep it open, and a menu's rows inline in a sender card.
 

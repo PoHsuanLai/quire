@@ -1,4 +1,4 @@
-//! The Lists page's mailo gaps 6 specimen: a folder tree of `TreeItem`s during a drag, each
+//! The Lists page's mail-app specimen: a folder tree of `TreeItem`s during a drag, each
 //! folder's ⋯ carrying `data-folder`. Split from `lists.rs` to keep that page under its size.
 
 use super::Section;

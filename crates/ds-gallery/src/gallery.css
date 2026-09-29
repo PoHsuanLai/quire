@@ -51,7 +51,7 @@
 .g-leave{width:360px;border-radius:var(--r-panel);overflow:hidden}
 .g-leave-row{padding:var(--s-4) var(--s-8)}
 .g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--line-soft);padding:var(--s-4) 0}
-/* A title a bare field edits in place (mailo gaps 4). */
+/* A title a bare field edits in place. */
 .g-bare-title{display:flex;font-size:var(--fs-title);color:var(--ink)}
 .g-side{display:flex;flex-direction:column;gap:var(--s-2);width:232px;padding:var(--s-10);border-radius:var(--r-panel);background:var(--f-solid);color:var(--f-ink)}
 
@@ -95,11 +95,11 @@
 .g-edit p{margin:0}
 .g-edit-chip{display:inline-block}
 .g-edit-caret{position:absolute;width:var(--caret-w);background:var(--accent-text);pointer-events:none}
-/* mailo gaps 5: the reader a pane peeks over its inline scrim. */
+/* The reader a pane peeks over its inline scrim. */
 .g-peeked{position:absolute;top:var(--s-10);right:var(--s-10);bottom:var(--s-10);width:45%;padding:var(--s-12);border-radius:var(--r-panel);background:var(--surface);box-shadow:var(--shadow-2)}
-/* mailo gaps 5: a card holding an inline menu with its query field. */
+/* A card holding an inline menu with its query field. */
 .g-menu-card{width:260px;padding:var(--s-6);border-radius:var(--r-panel);background:var(--surface);box-shadow:var(--shadow-2)}
-/* A consumer's own reveal on a quire button (mailo gaps 6, `extra_class`): faint until its row is
+/* A consumer's own reveal on a quire button (`extra_class`): faint until its row is
    hovered. The gallery's class, never a `ds-` one. */
 .g-reveal-row .g-reveal{opacity:.35;transition:opacity var(--t-quick) var(--e-out)}
 .g-reveal-row:hover .g-reveal{opacity:1}
@@ -111,7 +111,7 @@
 .g-level-screen{display:block;height:150px;border-radius:var(--r-panel);overflow:hidden}
 .g-level-sheet{display:flex;flex-direction:column;padding:var(--s-6) var(--s-16)}
 .g-level-label{width:150px}
-/* The control center specimen (sill Q78-Q80): the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
+/* The control center specimen: the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-modal-stage{height:300px}
 .g-alert-row{align-items:flex-start;gap:var(--s-22)}
@@ -120,7 +120,7 @@
 .g-alert-stage{height:360px;padding:var(--s-14)}
 .g-cc{width:var(--cc-width);border-radius:var(--cc-panel-r);overflow:hidden}
 .g-cc-body{padding:var(--cc-pad)}
-/* The notifications specimen (sill Q120-Q125): per scheme, the Work tint holding the banners
+/* The notifications specimen: per scheme, the Work tint holding the banners
    and a posed mid-drag card on the left, and the center's edge panel on the right, in a stage the
    height of a small screen (the panel is absolutely placed, so the stage gives its root a height). */
 .g-notif-row{display:flex;flex-wrap:wrap;gap:var(--s-22)}
@@ -130,7 +130,7 @@
 .g-notif-swiped{transform:translateX(56px)}
 .g-notif-center{position:relative;width:380px}
 .g-notif-stage{height:540px}
-/* The widgets specimen (sill Q182, Q183): the desktop's cards and the center's tiles side by
+/* The widgets specimen: the desktop's cards and the center's tiles side by
    side over the wallpaper, each host's three sizes wrapping in its own column. */
 .g-widgets{flex-direction:row;flex-wrap:wrap;gap:var(--s-22)}
 .g-widgets-desk{width:560px}
@@ -144,7 +144,7 @@
 .g-wl-devices{display:flex;flex-wrap:wrap;gap:var(--s-16)}
 .g-wl-device{display:flex;flex-direction:column;align-items:center;gap:var(--s-6);width:72px;color:var(--ink)}
 .g-wl-device-name{font-family:var(--font-ui);font-size:var(--fs-small);color:var(--ink-soft)}
-/* Edit Widgets as met (sill Q521): a 1120 x 720 desktop, its widgets at their cells, the sheet
+/* Edit Widgets as met: a 1120 x 720 desktop, its widgets at their cells, the sheet
    at the bottom edge holding the gallery, which fills it. */
 .g-we-stage{position:relative;width:1120px;border-radius:var(--r-panel);overflow:hidden;background-size:cover}
 .g-we-desk{position:relative;height:720px}

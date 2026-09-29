@@ -1,4 +1,4 @@
-//! Overlays, mailo gaps 5: a scrim drawn inline in the pane it dims, under the reader the pane
+//! Overlays, for mail: a scrim drawn inline in the pane it dims, under the reader the pane
 //! peeks over it; a menu whose filter draws the typed query in a field row.
 
 use super::Section;

@@ -1,4 +1,4 @@
-//! Details, the status glyphs (design/26-DETAILS.md 5.1, wave D1): one cell per glyph, a live
+//! Details, the status glyphs (design/26-DETAILS.md 5.1): one cell per glyph, a live
 //! specimen moved by its buttons over a strip of every state it draws, at the bar's 22 px.
 
 use super::Section;

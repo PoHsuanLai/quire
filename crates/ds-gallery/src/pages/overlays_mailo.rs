@@ -1,4 +1,4 @@
-//! Overlays, mailo gaps 2: a command panel that is opaque from its first frame, rows whose title
+//! Overlays, for mail: a command panel that is opaque from its first frame, rows whose title
 //! and detail are the caller's runs with a trailing remove, and a people menu whose highlight
 //! the field beside it drives.
 

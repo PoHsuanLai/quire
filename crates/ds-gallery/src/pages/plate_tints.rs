@@ -1,4 +1,4 @@
-//! The Controls page's tinted plates (sill FINDINGS Q72): a neutral plate under
+//! The Controls page's tinted plates: a neutral plate under
 //! `IconView { plate_tint }` in the Work and the Home Space's Monochrome tint and in Muted, beside
 //! the untinted plate, in the light scheme and the dark. The third-party raster on each is
 //! re-coloured by `ds::icon::retint` with the same style and tint, so plate and icon read as one

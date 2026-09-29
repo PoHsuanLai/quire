@@ -1,10 +1,10 @@
-//! The Overlays page's calendar (design/04-COMPONENTS.md section 39; design/20 section 1.12;
-//! sill Q180): a `MonthGrid` on a Popover panel of the Work Space over the wallpaper, light
+//! The Overlays page's calendar (design/04-COMPONENTS.md section 39; design/20 section 1.12):
+//! a `MonthGrid` on a Popover panel of the Work Space over the wallpaper, light
 //! without week numbers and dark with them. The month is laid out by the same stand-in for the
 //! shell's grid the tests use (September 2026, today the 26th, three busy days and one on the
 //! next month's padding); the header's buttons step it live, sliding each new month in, and the
-//! dark panel's days are pressable and report the day picked. Last, the compact grid (sill
-//! Q190): `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week August.
+//! dark panel's days are pressable and report the day picked. Last, the compact grid:
+//! `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week August.
 
 #[path = "../../../ds/tests/support/month_sample.rs"]
 pub(crate) mod month_sample;
@@ -43,7 +43,7 @@ const AUGUST_BUSY: [DayKey; 3] = [
 #[component]
 pub fn Calendar() -> Element {
     rsx! {
-        Section { title: "Calendar", note: "A MonthGrid on a Popover panel, light and dark: the month's title in the data face, upper, in --accent; the previous and next Tool IconButtons (live: a later month slides in from the right, an earlier one from the left, slide-r/slide-l at --t-big --e-spring, once per change); weekday initials in the data face at --fs-micro, tracked; seven 32 px columns of days, the neighbours' days in --ink-faint, today on an --accent disc in --accent-ink, a busy day's 4 px dot (--ink-soft on a neighbour's day). Right: week numbers shown (WeekNumbers::Show, a quieter 24 px column) and pressable days (onpick) that report the day picked. Last: MonthDensity::Auto inside a Small desktop WidgetFrame resolves to the compact grid (sill Q190): a six-week August filling the frame's 140 x 140: a 14 px header (the title in the UI face at --fs-micro, 14 px glyph step buttons), 12 px heads, then the weeks sharing the rest, seven 20 px columns and 19.67 px rows (23.6 for a five-week month), the 20 px today disc centred in its row, 3 px dots, no week column.",
+        Section { title: "Calendar", note: "A MonthGrid on a Popover panel, light and dark: the month's title in the data face, upper, in --accent; the previous and next Tool IconButtons (live: a later month slides in from the right, an earlier one from the left, slide-r/slide-l at --t-big --e-spring, once per change); weekday initials in the data face at --fs-micro, tracked; seven 32 px columns of days, the neighbours' days in --ink-faint, today on an --accent disc in --accent-ink, a busy day's 4 px dot (--ink-soft on a neighbour's day). Right: week numbers shown (WeekNumbers::Show, a quieter 24 px column) and pressable days (onpick) that report the day picked. Last: MonthDensity::Auto inside a Small desktop WidgetFrame resolves to the compact grid: a six-week August filling the frame's 140 x 140: a 14 px header (the title in the UI face at --fs-micro, 14 px glyph step buttons), 12 px heads, then the weeks sharing the rest, seven 20 px columns and 19.67 px rows (23.6 for a five-week month), the 20 px today disc centred in its row, 3 px dots, no week column.",
             div { class: "g-wall g-polish-cards", style: "background-image:url(\"{wallpaper::uri()}\")",
                 Month { theme: Theme::Light, weeks: WeekNumbers::Hide }
                 Month { theme: Theme::Dark, weeks: WeekNumbers::Show }

@@ -59,7 +59,8 @@ pub(super) fn Root(
     }
 }
 
-/// The stack off: no highlight, no hairline, no shadows, no vibrancy (wave 1's look, nearly).
+/// The stack off: no highlight, no hairline, no shadows, no vibrancy (the look before the
+/// material stack, nearly).
 const FLAT: MaterialStack = MaterialStack {
     highlight_light: Alpha(0),
     highlight_dark: Alpha(0),

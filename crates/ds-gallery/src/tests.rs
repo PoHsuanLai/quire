@@ -14,7 +14,7 @@ use std::time::Duration;
 /// quire component, not by the gallery, and a gap reported to quire (the Gaps page lists them).
 /// The computed custom properties quire writes inline on its own elements (the `--f-*` frame,
 /// `--f-grad`, `--av-bg`, `--pc`, a Space dot's `--dot-c*`) and the SendPill's marked ring are
-/// not offences. The Space editor's five inline gradients and fills were the last (mailo gaps 3).
+/// not offences. The Space editor's five inline gradients and fills were the last.
 const EXCEPTIONS: &[Exception] = &[];
 
 /// The page's markup after its first render, posed.
@@ -58,7 +58,7 @@ fn every_page_renders_quire_markup_only() {
 }
 
 /// The Space page, SpaceDot and the whole Space editor on it, lints clean under Strict with no
-/// exception: every Space colour is a custom property its stylesheet paints (mailo gaps 3).
+/// exception: every Space colour is a custom property its stylesheet paints.
 #[test]
 fn the_space_page_is_clean_under_strict() {
     let css = format!("{}\n{}", ds::stylesheet(), style::CSS);

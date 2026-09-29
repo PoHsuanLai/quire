@@ -1,6 +1,6 @@
-//! The Controls page's dock tiles: app icons at the dock's own sizes (sill FINDINGS Q16), a pill
-//! whose corner is a setting (`Surface { radius }`, Q15), and a label the dock's machine shows
-//! and hides (`Tooltip { shown }`, Q17).
+//! The Controls page's dock tiles: app icons at the dock's own sizes, a pill
+//! whose corner is a setting (`Surface { radius }`), and a label the dock's machine shows
+//! and hides (`Tooltip { shown }`).
 
 use super::app_icons::{APPS, app_icon};
 use super::{Section, Specimen};
