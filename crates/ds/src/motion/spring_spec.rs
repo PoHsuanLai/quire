@@ -121,7 +121,7 @@ mod tests {
             (thrown(0), 100.0, MotionLevel::Standard, Ratio::CRITICAL),
             (thrown(900), 100.0, MotionLevel::Standard, Ratio::MOMENTUM),
             (thrown(-900), 100.0, MotionLevel::Standard, Ratio::CRITICAL),
-            (thrown(-900), -100.0, MotionLevel::Extra, Ratio::MOMENTUM),
+            (thrown(-900), -100.0, MotionLevel::Standard, Ratio::MOMENTUM),
             (thrown(30), 100.0, MotionLevel::Standard, Ratio::CRITICAL),
             (thrown(900), 100.0, MotionLevel::Reduced, Ratio::CRITICAL),
         ];

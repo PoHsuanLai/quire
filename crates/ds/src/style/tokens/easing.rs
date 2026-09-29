@@ -40,15 +40,13 @@ pub enum EasingToken {
 impl EasingToken {
     /// The curve at `level`.
     ///
-    /// Only the spring follows the level (section 3.2): Calm uses `--e-out`, Extra
-    /// `(.34,2.0,.5,1)`, and Reduced `--e-out` as Calm does (proposed, open decision 2).
+    /// Only the spring follows the level: Reduced uses `--e-out`, so nothing overshoots.
     pub fn easing(self, level: MotionLevel) -> Easing {
         const OUT: CubicBezier = CubicBezier([220, 900, 300, 1000]);
         Easing::Cubic(match (self, level) {
             (EasingToken::Out, _) => OUT,
-            (EasingToken::Spring, MotionLevel::Calm | MotionLevel::Reduced) => OUT,
+            (EasingToken::Spring, MotionLevel::Reduced) => OUT,
             (EasingToken::Spring, MotionLevel::Standard) => CubicBezier([340, 1420, 520, 1000]),
-            (EasingToken::Spring, MotionLevel::Extra) => CubicBezier([340, 2000, 500, 1000]),
             (EasingToken::Exit, _) => CubicBezier([550, 0, 750, 200]),
             (EasingToken::Shake, _) => CubicBezier([360, 70, 190, 970]),
             (EasingToken::Linear, _) => return Easing::Linear,

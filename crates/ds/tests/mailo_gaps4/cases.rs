@@ -6,7 +6,7 @@ use ds::{
     AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Hex, Icon, MarkProvider,
     MarkSize, MarkStyle, ProviderMark, Trailing,
 };
-use ds::{DotIndex, Motion, MotionChoice, MotionLevels, Scheme, SpaceEditor, SpaceLook};
+use ds::{DotIndex, Motion, MotionChoice, Scheme, SpaceEditor, SpaceLook};
 use ds::{Grow, InputVariant, Rows, TextInput, TextInputKind};
 
 /// An account colour.
@@ -98,7 +98,7 @@ pub const CASES: &[Case] = &[
         make: || rsx! { TextInput { variant: InputVariant::Bare, label: "Name", value: "Work", placeholder: "Name this Space", oninput: |_| {} } },
     },
     Case {
-        golden: "lists/space_editor/motion-contact.html",
+        golden: "lists/space_editor/motion-row.html",
         make: || {
             rsx! {
                 SpaceEditor {
@@ -106,8 +106,7 @@ pub const CASES: &[Case] = &[
                     scheme: Scheme::Light,
                     active_dot: DotIndex(0),
                     onchange: |_| {},
-                    motion: MotionChoice { level: Motion::Extra, on_motion: EventHandler::new(|_: Motion| {}) },
-                    motion_levels: MotionLevels::Contact,
+                    motion: MotionChoice { level: Motion::Reduced, on_motion: EventHandler::new(|_: Motion| {}) },
                 }
             }
         },

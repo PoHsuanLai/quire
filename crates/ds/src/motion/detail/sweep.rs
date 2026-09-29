@@ -118,9 +118,8 @@ mod tests {
     fn each_moment_sweeps_its_own_way_and_reduced_stands() {
         const CASES: &[(Moment, MotionLevel, SweepPlan)] = &[
             (Moment::Appear, MotionLevel::Standard, SweepPlan::FromZero),
-            (Moment::Appear, MotionLevel::Calm, SweepPlan::FromZero),
             (Moment::Change, MotionLevel::Standard, SweepPlan::FromHere),
-            (Moment::Progress, MotionLevel::Extra, SweepPlan::FromHere),
+            (Moment::Progress, MotionLevel::Standard, SweepPlan::FromHere),
             (Moment::Rest, MotionLevel::Standard, SweepPlan::Stand),
             (Moment::Success, MotionLevel::Standard, SweepPlan::Stand),
             (Moment::Appear, MotionLevel::Reduced, SweepPlan::Stand),

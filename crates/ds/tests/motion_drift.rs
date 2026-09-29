@@ -223,14 +223,8 @@ fn the_settle_table() {
         (Anim::RowIn, MotionLevel::Standard, 454),
         (Anim::Nudge, MotionLevel::Standard, 554),
         (Anim::Shake, MotionLevel::Standard, 594),
-        (Anim::Fold, MotionLevel::Calm, 334),
-        (Anim::Fold, MotionLevel::Extra, 594),
-        (Anim::FoldHeavy, MotionLevel::Calm, 379),
-        (Anim::FoldHeavy, MotionLevel::Extra, 678),
         (Anim::CrumpleHeavy, MotionLevel::Standard, 517),
-        (Anim::CrumpleHeavy, MotionLevel::Calm, 379),
         (Anim::CurlHeavy, MotionLevel::Standard, 678),
-        (Anim::CurlHeavy, MotionLevel::Extra, 678),
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
         // 37 and 64).
         (Anim::PaletteFade, MotionLevel::Standard, 204),
@@ -239,10 +233,7 @@ fn the_settle_table() {
         (Anim::PeekFullIn, MotionLevel::Standard, 284),
         // The four keyframes the catalogue had no motion for.
         (Anim::PillUp, MotionLevel::Standard, 454),
-        (Anim::PillUp, MotionLevel::Calm, 334),
-        (Anim::PillUp, MotionLevel::Extra, 594),
         (Anim::RingDrain, MotionLevel::Standard, 5034),
-        (Anim::RingDrain, MotionLevel::Calm, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
         // The pane switch, both panes at `--t-move`, so one timer settles the pair.
@@ -253,25 +244,19 @@ fn the_settle_table() {
         // The OSD's entrance at --t-quick, its exit at --t-move (neither token moves
         // with the look's level but under Reduced).
         (Anim::OsdIn, MotionLevel::Standard, 204),
-        (Anim::OsdIn, MotionLevel::Extra, 204),
         (Anim::OsdOut, MotionLevel::Standard, 284),
-        (Anim::OsdOut, MotionLevel::Calm, 284),
         // The level control's step mark, at --t-tap.
         (Anim::LevelTick, MotionLevel::Standard, 124),
         // The sheet's exit at --t-move, which only Reduced shortens.
         (Anim::SheetOut, MotionLevel::Standard, 284),
-        (Anim::SheetOut, MotionLevel::Calm, 284),
         // The banner's exit at --t-move, which only Reduced shortens.
         (Anim::BannerOut, MotionLevel::Standard, 284),
-        (Anim::BannerOut, MotionLevel::Extra, 284),
         (Anim::BannerIn, MotionLevel::Standard, 284),
-        (Anim::BannerIn, MotionLevel::Calm, 284),
         // The center's edge panel, in and out at --t-move.
         (Anim::PanelIn, MotionLevel::Standard, 284),
         (Anim::PanelOut, MotionLevel::Standard, 284),
         // The screenshot thumbnail rises in at --t-big and slides out at --t-move.
         (Anim::ShotIn, MotionLevel::Standard, 454),
-        (Anim::ShotIn, MotionLevel::Calm, 334),
         (Anim::ShotOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {

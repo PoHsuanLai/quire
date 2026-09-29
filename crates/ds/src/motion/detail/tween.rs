@@ -79,7 +79,7 @@ pub fn use_tween(target: Fraction, spec: TweenSpec) -> Fraction {
         let to = i64::from(target.0);
         let glide = match level {
             MotionLevel::Reduced => Glide::still(to),
-            MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Glide::between(
+            MotionLevel::Standard => Glide::between(
                 *drawn.peek(),
                 to,
                 spec.duration.duration(level),

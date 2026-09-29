@@ -25,7 +25,7 @@ fn ms(n: u64) -> Duration {
 #[allow(non_snake_case)]
 fn Editor() -> Element {
     let mut name = use_signal(|| "Work".to_string());
-    let mut motion = use_signal(|| Motion::System);
+    let mut motion = use_signal(|| Motion::Standard);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             p { class: "name", "{name}" }
@@ -63,8 +63,8 @@ fn typing_in_the_title_renames_the_space() {
 #[test]
 fn the_motion_row_reports_a_pick() {
     let mut harness = Harness::new(Editor, VIEW);
-    assert_eq!(harness.text_of(".motion").as_deref(), Some("system"));
-    let reduced = "[*|aria-label=Motion] .ds-segment:nth-child(5)";
+    assert_eq!(harness.text_of(".motion").as_deref(), Some("standard"));
+    let reduced = "[*|aria-label=Motion] .ds-segment:nth-child(2)";
     assert_eq!(harness.text_of(reduced).as_deref(), Some("Reduced"));
     harness.click(harness.centre(reduced).expect("Reduced"));
     harness.advance(ms(30));

@@ -38,7 +38,7 @@ pub enum DurationToken {
     Quick,
     /// `--t-move` 250 ms: small movement.
     Move,
-    /// `--t-big` 420 ms: entrances and exits (Calm 300, Extra 560).
+    /// `--t-big` 420 ms: entrances and exits.
     Big,
     /// `--t-ambient` 5 s: the breathing halo.
     Ambient,
@@ -89,7 +89,7 @@ pub enum DurationToken {
     /// its percentage counting alongside (design/23-WIDGETS.md sections 1.1 and 4.1). Driven
     /// frame by frame from Rust at `--e-out`; no keyframe plays it.
     Fill,
-    /// `--t-sweep` 700 ms (Calm 500, Extra 900): an arc or bar sweeping in from zero, and the
+    /// `--t-sweep` 700 ms: an arc or bar sweeping in from zero, and the
     /// count in step with it, on Appear (design/26-DETAILS.md section 3.4). Reduced plays no
     /// sweep at all: the primitive shows the target at once.
     Sweep,
@@ -97,7 +97,7 @@ pub enum DurationToken {
     /// 0 to 93 over `--t-sweep` is at most 21 text frames (design/26 section 3.4). A
     /// [`DurationKind::Hold`]: a repaint floor, not motion.
     CountStep,
-    /// `--t-pending-step` 300 ms (Calm 360): one step of a bounded pending loop, linear
+    /// `--t-pending-step` 300 ms: one step of a bounded pending loop, linear
     /// (design/26 section 3.4); a four-layer Wi-Fi cycle is 1200 ms.
     PendingStep,
     /// `--t-idle-dim` 2000 ms: the pre-screen-off idle overlay's fade in to its own level
@@ -136,13 +136,8 @@ impl DurationToken {
             return REDUCED;
         }
         match (self, level) {
-            (DurationToken::Big, MotionLevel::Calm) => 300,
-            (DurationToken::Big, MotionLevel::Extra) => 560,
-            (DurationToken::Sweep, MotionLevel::Calm) => 500,
-            (DurationToken::Sweep, MotionLevel::Extra) => 900,
-            (DurationToken::PendingStep, MotionLevel::Calm) => 360,
-            // `calc(var(--t-big) * 1.15)`, rounded as section 3.4 lists it: Calm 345,
-            // Standard 483, Extra 644. Crumple runs at `--t-big`, so its heavy form is the same.
+            // `calc(var(--t-big) * 1.15)`. Crumple runs at `--t-big`, so its heavy form is the
+            // same.
             (DurationToken::BigHeavy | DurationToken::CrumpleHeavy, level) => {
                 (DurationToken::Big.millis(level) * 115).div_ceil(100)
             }

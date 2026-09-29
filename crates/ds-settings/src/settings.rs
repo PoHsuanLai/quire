@@ -42,11 +42,11 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub accent: Accent,
-    /// `appearance.motion_level`: System follows the portal.
+    /// `appearance.motion_level`: Standard, which the desktop's reduce-motion preference still
+    /// overrides, or Reduced.
     #[settings(
         label = "Motion",
-        help = "How much the window moves: Calm, Standard, Extra, or reduce motion to a \
-                single frame.",
+        help = "How much the window moves: Standard, or reduce motion to cross-fades.",
         section = "Appearance"
     )]
     pub motion_level: Motion,
@@ -141,7 +141,7 @@ impl Default for AppearanceSettings {
             look: Look::Post,
             warmth: Warmth::Neutral,
             accent: Accent::Postmark,
-            motion_level: Motion::System,
+            motion_level: Motion::Standard,
             typeface: Typeface::System,
             material_tint_alpha: Percent(80),
             material_highlight_light: Percent(30),

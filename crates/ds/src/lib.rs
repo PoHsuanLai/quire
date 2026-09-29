@@ -295,7 +295,7 @@ pub use crate::shell::{
     space_editor::{
         DotIndex, SpaceEditor,
         dot::SpaceDot,
-        rows::{MeasuredIn, MotionChoice, MotionLevels},
+        rows::{MeasuredIn, MotionChoice},
     },
     switcher::{
         app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence},

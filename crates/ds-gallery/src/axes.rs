@@ -121,9 +121,7 @@ impl Axes {
 /// The preference that names `level` outright.
 pub fn motion_of(level: MotionLevel) -> Motion {
     match level {
-        MotionLevel::Calm => Motion::Calm,
         MotionLevel::Standard => Motion::Standard,
-        MotionLevel::Extra => Motion::Extra,
         MotionLevel::Reduced => Motion::Reduced,
     }
 }

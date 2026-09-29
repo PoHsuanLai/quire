@@ -1,7 +1,6 @@
 //! The contact keyframes (`gulp`, `bump`, `seal-pop`) follow the motion level like `pop-in`
-//! does: their squash and overshoot scale by `--overshoot`, so Calm
-//! (and Reduced), where `--overshoot` is 1, flattens them to no change of shape, while Standard
-//! and Extra keep the catalogue's shape. Measured on the painted pixels of a 100 px ink square
+//! does: their squash and overshoot scale by `--overshoot`, so Reduced, where `--overshoot` is
+//! 1, flattens them to no change of shape, while Standard keeps the catalogue's shape. Measured on the painted pixels of a 100 px ink square
 //! at the keyframe's own offset, where the animation sits exactly on that keyframe.
 
 use dioxus::prelude::*;
@@ -70,7 +69,7 @@ fn close(got: u32, want: u32) -> bool {
 }
 
 #[test]
-fn calm_flattens_the_contact_keyframes_and_standard_keeps_their_shape() {
+fn reduced_flattens_the_contact_keyframes_and_standard_keeps_their_shape() {
     // (anim, the keyframe's offset, Standard's size there): gulp 34% scale(1.07, .84),
     // bump 40% scale(1.25), seal-pop 60% scale(1.5).
     const CASES: &[(Anim, u32, (u32, u32))] = &[
@@ -88,25 +87,14 @@ fn calm_flattens_the_contact_keyframes_and_standard_keeps_their_shape() {
         if !(close(got.0, standard.0) && close(got.1, standard.1)) {
             failures.push(format!("{anim:?} Standard: {got:?}, want {standard:?}"));
         }
-        let calm = painted(
+        let reduced = painted(
             anim,
-            Motion::Calm,
-            at_offset(anim, MotionLevel::Calm, offset),
+            Motion::Reduced,
+            at_offset(anim, MotionLevel::Reduced, offset),
         );
-        if !(close(calm.0, 100) && close(calm.1, 100)) {
-            failures.push(format!("{anim:?} Calm: {calm:?}, want (100, 100)"));
+        if !(close(reduced.0, 100) && close(reduced.1, 100)) {
+            failures.push(format!("{anim:?} Reduced: {reduced:?}, want (100, 100)"));
         }
     }
     assert!(failures.is_empty(), "{failures:#?}");
-}
-
-#[test]
-fn extra_keeps_the_standard_shape() {
-    // The amplitude is capped at Standard's: Extra's own spring curve already overshoots more.
-    let got = painted(
-        Anim::Bump,
-        Motion::Extra,
-        at_offset(Anim::Bump, MotionLevel::Extra, 400),
-    );
-    assert!(close(got.0, 125) && close(got.1, 125), "{got:?}");
 }

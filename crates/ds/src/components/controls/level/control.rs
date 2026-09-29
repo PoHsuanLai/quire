@@ -46,7 +46,7 @@ pub fn LevelControl(
     let (glyph, glyph_level) = glyph.drawn(value);
     let rubber = match use_scope().resolved.motion {
         MotionLevel::Reduced => Rubber::Off,
-        MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Rubber::On,
+        MotionLevel::Standard => Rubber::On,
     };
     let mut state = use_signal(|| LevelState::IDLE);
     let mut rail = use_signal(|| None::<Rc<MountedData>>);

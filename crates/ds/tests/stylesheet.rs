@@ -138,8 +138,6 @@ fn the_cascade_is_in_the_documented_order() {
     let tokens = [
         ".ds{--paper:",
         ".ds[*|data-theme=dark]{--paper:",
-        ".ds[*|data-motion=calm]{",
-        ".ds[*|data-motion=extra]{",
         ".ds[*|data-motion=reduced]{",
     ];
     let at: Vec<usize> = tokens

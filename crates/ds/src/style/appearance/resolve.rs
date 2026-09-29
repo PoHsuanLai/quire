@@ -36,7 +36,7 @@ impl Resolved {
 /// Resolve `app`'s choices against the Space's own theme and the desktop's preferences.
 ///
 /// `look_theme` is the active [`crate::SpaceLook`]'s theme; `System` in either place defers to
-/// `system`, and `Motion::System` becomes `Reduced` when the desktop asks for reduced motion.
+/// `system`, and `Motion::Standard` becomes `Reduced` when the desktop asks for reduced motion.
 ///
 /// A Space that names its own theme wins over the app's: a Space's mode is `S`'s per-Space
 /// rule and `system` there means "the viewer's scheme" (`S:1157-1159`), which is the app's
@@ -46,15 +46,9 @@ pub fn resolve(app: Appearance, look_theme: Theme, system: SystemPrefs) -> Resol
     let scheme = explicit(look_theme)
         .or_else(|| explicit(app.theme))
         .unwrap_or(system.scheme);
-    let motion = match app.motion {
-        Motion::System => match system.motion {
-            ReducedMotion::NoPreference => MotionLevel::Standard,
-            ReducedMotion::Reduce => MotionLevel::Reduced,
-        },
-        Motion::Calm => MotionLevel::Calm,
-        Motion::Standard => MotionLevel::Standard,
-        Motion::Extra => MotionLevel::Extra,
-        Motion::Reduced => MotionLevel::Reduced,
+    let motion = match (app.motion, system.motion) {
+        (Motion::Reduced, _) | (Motion::Standard, ReducedMotion::Reduce) => MotionLevel::Reduced,
+        (Motion::Standard, ReducedMotion::NoPreference) => MotionLevel::Standard,
     };
     Resolved {
         scheme,
@@ -96,13 +90,13 @@ mod tests {
         use ReducedMotion::{NoPreference, Reduce};
         #[rustfmt::skip]
         const CASES: &[(&str, Theme, Motion, Theme, SystemPrefs, Scheme, MotionLevel)] = &[
-            ("all follow: desktop dark", Theme::System, Motion::System, Theme::System, prefs(Scheme::Dark, NoPreference), Scheme::Dark, MotionLevel::Standard),
-            ("app light over a dark desktop", Theme::Light, Motion::System, Theme::System, prefs(Scheme::Dark, NoPreference), Scheme::Light, MotionLevel::Standard),
-            ("space dark over an app light", Theme::Light, Motion::Calm, Theme::Dark, prefs(Scheme::Light, NoPreference), Scheme::Dark, MotionLevel::Calm),
-            ("space light over a dark desktop", Theme::System, Motion::Extra, Theme::Light, prefs(Scheme::Dark, Reduce), Scheme::Light, MotionLevel::Extra),
-            ("system motion under reduce", Theme::System, Motion::System, Theme::System, prefs(Scheme::Light, Reduce), Scheme::Light, MotionLevel::Reduced),
-            ("explicit standard ignores reduce", Theme::Dark, Motion::Standard, Theme::System, prefs(Scheme::Light, Reduce), Scheme::Dark, MotionLevel::Standard),
-            ("explicit reduced", Theme::System, Motion::Reduced, Theme::System, prefs(Scheme::Light, NoPreference), Scheme::Light, MotionLevel::Reduced),
+            ("all follow: desktop dark", Theme::System, Motion::Standard, Theme::System, prefs(Scheme::Dark, NoPreference), Scheme::Dark, MotionLevel::Standard),
+            ("app light over a dark desktop", Theme::Light, Motion::Standard, Theme::System, prefs(Scheme::Dark, NoPreference), Scheme::Light, MotionLevel::Standard),
+            ("space dark over an app light", Theme::Light, Motion::Standard, Theme::Dark, prefs(Scheme::Light, NoPreference), Scheme::Dark, MotionLevel::Standard),
+            ("space light over a dark desktop", Theme::System, Motion::Standard, Theme::Light, prefs(Scheme::Dark, Reduce), Scheme::Light, MotionLevel::Reduced),
+            ("standard under the desktop's reduce", Theme::System, Motion::Standard, Theme::System, prefs(Scheme::Light, Reduce), Scheme::Light, MotionLevel::Reduced),
+            ("explicit reduced over a desktop with no preference", Theme::Dark, Motion::Reduced, Theme::System, prefs(Scheme::Light, NoPreference), Scheme::Dark, MotionLevel::Reduced),
+            ("explicit reduced under reduce", Theme::System, Motion::Reduced, Theme::System, prefs(Scheme::Light, Reduce), Scheme::Light, MotionLevel::Reduced),
         ];
         for &(name, theme, motion, look, system, scheme, level) in CASES {
             let app = Appearance {

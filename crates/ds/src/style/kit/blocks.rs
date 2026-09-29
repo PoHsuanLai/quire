@@ -36,12 +36,13 @@ pub(super) fn token_blocks(sets: &[TokenSet]) -> String {
             declared(TokenScope::BASE.in_typeface(Typeface::Editorial)),
         ),
     ));
-    for level in [MotionLevel::Calm, MotionLevel::Extra, MotionLevel::Reduced] {
-        css.push_str(&rule(
-            &format!(".ds{}", attr_selector("data-motion", level.slug())),
-            &changed(&base, declared(TokenScope::BASE.at(level))),
-        ));
-    }
+    css.push_str(&rule(
+        &format!(
+            ".ds{}",
+            attr_selector("data-motion", MotionLevel::Reduced.slug())
+        ),
+        &changed(&base, declared(TokenScope::BASE.at(MotionLevel::Reduced))),
+    ));
     css
 }
 

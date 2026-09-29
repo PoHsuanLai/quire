@@ -13,7 +13,7 @@ enum Fixture {
     Flat,
     #[token(light = "#fff", dark = "#000")]
     Themed,
-    #[token(standard = "300ms", calm = "200ms", reduced = "60ms")]
+    #[token(standard = "300ms", reduced = "60ms")]
     Timed,
     #[token(system = "Inter", editorial = "Karla")]
     Voiced,
@@ -76,22 +76,10 @@ fn a_value_follows_the_dimension_its_attributes_name() {
         ),
         ("timed standard", Fixture::Timed, base, "300ms"),
         (
-            "timed calm",
-            Fixture::Timed,
-            base.at(MotionLevel::Calm),
-            "200ms",
-        ),
-        (
             "timed reduced",
             Fixture::Timed,
             base.at(MotionLevel::Reduced),
             "60ms",
-        ),
-        (
-            "timed extra falls back to standard",
-            Fixture::Timed,
-            base.at(MotionLevel::Extra),
-            "300ms",
         ),
         ("voiced system", Fixture::Voiced, base, "Inter"),
         (

@@ -93,9 +93,9 @@ mod tests {
             ),
             (
                 "unknown theme keeps the motion",
-                r#"{"theme":"sepia","motion":"calm"}"#,
+                r#"{"theme":"sepia","motion":"reduced"}"#,
                 Appearance {
-                    motion: Motion::Calm,
+                    motion: Motion::Reduced,
                     ..Appearance::default()
                 },
             ),
@@ -109,9 +109,9 @@ mod tests {
             ),
             (
                 "an accent that is not a word keeps the motion",
-                r#"{"accent":7,"motion":"extra"}"#,
+                r#"{"accent":7,"motion":"reduced"}"#,
                 Appearance {
-                    motion: Motion::Extra,
+                    motion: Motion::Reduced,
                     ..Appearance::default()
                 },
             ),

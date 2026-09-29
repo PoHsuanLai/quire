@@ -40,27 +40,21 @@ pub enum ScalarValue {
 }
 
 impl ScalarToken {
-    /// The value at `level` (Post, design/05-MOTION.md sections 3.1-3.2). Reduced is neutral;
-    /// its `--lift` of 0px is proposed (open decision 2).
+    /// The value at `level` (design/05-MOTION.md sections 3.1-3.2). Reduced is neutral.
     pub fn value(self, level: MotionLevel) -> ScalarValue {
-        use MotionLevel::{Calm, Extra, Reduced, Standard};
+        use MotionLevel::{Reduced, Standard};
         match (self, level) {
             (ScalarToken::Overshoot, Standard) => ScalarValue::Factor(1040),
-            (ScalarToken::Overshoot, Extra) => ScalarValue::Factor(1140),
-            (ScalarToken::Overshoot, Calm | Reduced) => ScalarValue::Factor(1000),
+            (ScalarToken::Overshoot, Reduced) => ScalarValue::Factor(1000),
             (ScalarToken::Squish, Standard) => ScalarValue::Factor(955),
-            (ScalarToken::Squish, Extra) => ScalarValue::Factor(860),
-            (ScalarToken::Squish, Calm | Reduced) => ScalarValue::Factor(1000),
-            (ScalarToken::Lift, Calm | Standard | Extra) => ScalarValue::Length(-2000),
+            (ScalarToken::Squish, Reduced) => ScalarValue::Factor(1000),
+            (ScalarToken::Lift, Standard) => ScalarValue::Length(-2000),
             (ScalarToken::Lift, Reduced) => ScalarValue::Length(0),
             (ScalarToken::Tilt, Standard) => ScalarValue::Angle(2200),
-            (ScalarToken::Tilt, Extra) => ScalarValue::Angle(5000),
-            (ScalarToken::Tilt, Calm | Reduced) => ScalarValue::Angle(0),
+            (ScalarToken::Tilt, Reduced) => ScalarValue::Angle(0),
             (ScalarToken::Stagger, Standard) => ScalarValue::Time(Duration::from_millis(26)),
-            (ScalarToken::Stagger, Extra) => ScalarValue::Time(Duration::from_millis(34)),
-            (ScalarToken::Stagger, Calm | Reduced) => ScalarValue::Time(Duration::ZERO),
-            (ScalarToken::Pickup, Standard | Extra) => ScalarValue::Factor(1040),
-            (ScalarToken::Pickup, Calm) => ScalarValue::Factor(1020),
+            (ScalarToken::Stagger, Reduced) => ScalarValue::Time(Duration::ZERO),
+            (ScalarToken::Pickup, Standard) => ScalarValue::Factor(1040),
             (ScalarToken::Pickup, Reduced) => ScalarValue::Factor(1000),
         }
     }

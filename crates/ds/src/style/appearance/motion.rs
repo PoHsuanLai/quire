@@ -1,44 +1,34 @@
 //! How much a surface moves: the preference a person picks ([`Motion`]) and the level the
 //! token table is written against ([`MotionLevel`]).
 //!
-//! [`Motion`] is design/22-SETTINGS.md section 3.1 `appearance.motion_level`, default `System`.
-//! [`MotionLevel`] is design/05-MOTION.md section 3.2: one attribute that rescales the whole
-//! system, `Reduced` = 60 ms everywhere.
+//! Motion is an accessibility preference, not a style (design/30-CATALOGUE.md section 1.1):
+//! [`Motion`] is `appearance.motion`, [`MotionLevel`] is what a root is drawn at, and `Reduced`
+//! is macOS's "Reduce motion" with cross-fade transitions on.
 
 use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// How much the window moves, as a person chooses it.
 ///
-/// One setting that rescales the whole motion system rather than a switch per animation.
-/// `System` follows the desktop's reduced-motion preference; the other four name a level.
+/// The desktop's own reduced-motion preference always wins over `Standard`
+/// (`resolve`), so a person who asked the desktop to reduce motion is never moved.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Motion {
-    /// Standard, unless the desktop asks for reduced motion.
+    /// The macOS defaults, unless the desktop asks for reduced motion.
     #[default]
-    System,
-    /// No overshoot, no stagger, no tilt.
-    Calm,
-    /// The design as drawn.
     Standard,
-    /// More spring, more stagger, more tilt.
-    Extra,
-    /// Every animation runs once, at 60 ms.
+    /// Slides, scales and springs become a cross-fade; nothing overshoots.
     Reduced,
 }
 
-/// The motion level a `.ds` root is drawn at: a [`Motion`] with `System` answered.
+/// The motion level a `.ds` root is drawn at: a [`Motion`] with the desktop's answer applied.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum MotionLevel {
-    /// `--t-big` 300 ms, no spring, no overshoot, no stagger.
-    Calm,
-    /// The look's own values.
+    /// The tables of design/30 section 1.2 as written.
     #[default]
     Standard,
-    /// `--t-big` 560 ms, a stronger spring, more stagger.
-    Extra,
-    /// Every duration 60 ms, iteration forced to one, scalars neutral.
+    /// Every moving duration is `--t-quick`, springs are critically damped, drags track 1:1.
     Reduced,
 }

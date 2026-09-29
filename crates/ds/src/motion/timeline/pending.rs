@@ -121,7 +121,6 @@ mod tests {
             (9_999, MotionLevel::Standard, PendingFrame::Step(31)),
             (10_000, MotionLevel::Standard, PendingFrame::Stalled),
             (60_000, MotionLevel::Standard, PendingFrame::Stalled),
-            (760, MotionLevel::Calm, PendingFrame::Step(1)),
             (399, MotionLevel::Reduced, PendingFrame::Idle),
             (400, MotionLevel::Reduced, PendingFrame::Stalled),
         ];
