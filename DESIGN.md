@@ -22,7 +22,7 @@ public surface, one path per item.
 | `style/appearance/theme.rs` | 07-LOOKS §2 (Theme axis); 03-COLOR §3 (two schemes) | `Theme` (the choice); `Scheme` is the resolved light/dark |
 | `style/appearance/accent.rs` | 03-COLOR §5, open decision 6; 22-SETTINGS §3.1 `appearance.accent` | Postmark plus the five Candy hues (FINDINGS) |
 | `style/appearance/motion.rs` | 05-MOTION §3.2; 22-SETTINGS §3.1-3.2 `motion_level` | `Motion` (the preference) and `MotionLevel` (resolved) |
-| `style/appearance/look.rs` | 07-LOOKS §2, §7, §11 | `Look`, `Warmth` |
+| `style/look/mod.rs` | 30-CATALOGUE part 3; 07-LOOKS §2 | `Look` (values per Look live in `style/tokens`) |
 | `style/appearance/appearance.rs` | 04-COMPONENTS §26 (O-16: Theme, Accent, Motion) | lenient read |
 | `style/appearance/system.rs` | plan "ds-settings" portal mapping | `SystemPrefs{scheme, motion, contrast}` |
 | `style/appearance/resolve.rs` | 05-MOTION §9 rule 11 (explicit `data-motion`); 03-COLOR open decision 13 | `resolve()`, `Resolved::attrs()` |
