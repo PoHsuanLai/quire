@@ -6,15 +6,15 @@ use dioxus::prelude::*;
 use ds::{Align, Availability, Button, ButtonVariant};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
-    BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, Filter,
-    FlagTone, Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage,
-    HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
-    Menu, MenuEntrance, MenuEntry, MenuKind, PaletteEntrance, Peek, PeekMode, PersonHue, Placement,
-    Point, Popover, Px, Rect, Scrim, ScrimStrength, SelectionBubble, SendPhase, SendPill, Sheet,
-    SheetPlacement, Shown, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub,
-    use_toasts,
+    BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, FlagTone,
+    Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverStat,
+    HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget, Menu,
+    MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, PaletteEntrance, Peek,
+    PeekMode, PersonHue, Placement, Point, Popover, Px, Rect, Scrim, ScrimStrength,
+    SelectionBubble, SendPhase, SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip,
+    TooltipKind, UndoToken, use_hover_hub, use_toasts,
 };
-use ds::{Check, Fraction, Key, Shortcut, Switch};
+use ds::{Check, Fraction, Shortcut, ShortcutKey, Switch};
 use std::time::Duration;
 
 /// One component in one state.
@@ -61,7 +61,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
     }
 }
@@ -91,8 +91,8 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             value: 1,
             title: "Later today".to_string(),
             detail: Some("18:00".to_string()),
-            tile: Some(Tile::Icon(Icon::Clock)),
-            trail: Trail::Shortcut(Shortcut(vec![Key::Ctrl, Key::Char('l')])),
+            tile: Some(MenuTile::Icon(Icon::Clock)),
+            trail: MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('l')])),
             check: None,
         },
         MenuEntry::Item {
@@ -100,8 +100,8 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             value: 2,
             title: "Tomorrow".to_string(),
             detail: Some("08:00".to_string()),
-            tile: Some(Tile::Text("T".to_string())),
-            trail: Trail::Note("Thu".to_string()),
+            tile: Some(MenuTile::Text("T".to_string())),
+            trail: MenuTrail::Note("Thu".to_string()),
             check: Some(Check::Checked),
         },
         MenuEntry::Item {
@@ -109,8 +109,8 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             value: 3,
             title: "Dana Okafor".to_string(),
             detail: None,
-            tile: Some(Tile::Avatar(DANA)),
-            trail: Trail::None,
+            tile: Some(MenuTile::Avatar(DANA)),
+            trail: MenuTrail::None,
             check: Some(Check::Unchecked),
         },
         MenuEntry::Separator,
@@ -126,7 +126,7 @@ fn group_by() -> Vec<MenuEntry<u8>> {
             title: "Date".to_string(),
             detail: None,
             tile: None,
-            trail: Trail::Note("D".to_string()),
+            trail: MenuTrail::Note("D".to_string()),
             check: Some(Check::Checked),
         },
         MenuEntry::Item {
@@ -135,7 +135,7 @@ fn group_by() -> Vec<MenuEntry<u8>> {
             title: "Sender".to_string(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: Some(Check::Unchecked),
         },
     ]
@@ -149,7 +149,7 @@ fn nested() -> Vec<MenuEntry<u8>> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
     };
     vec![
@@ -157,7 +157,7 @@ fn nested() -> Vec<MenuEntry<u8>> {
         off(2, "Pause"),
         MenuEntry::Submenu {
             title: "More".to_string(),
-            tile: Some(Tile::Icon(Icon::Settings)),
+            tile: Some(MenuTile::Icon(Icon::Settings)),
             availability: Availability::Enabled,
             children: vec![item(10, "About")],
         },
@@ -176,8 +176,8 @@ fn app_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
         value,
         title: title.to_string(),
         detail: None,
-        tile: Some(Tile::Source(tile)),
-        trail: Trail::None,
+        tile: Some(MenuTile::Source(tile)),
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     };
@@ -213,11 +213,14 @@ fn palette_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
                 value: 1,
                 title: "Re: UIDL stability".to_string(),
                 detail: Some("Treat UIDL as a hint, not an identity".to_string()),
-                tile: Some(Tile::Avatar(AvatarFace {
+                tile: Some(MenuTile::Avatar(AvatarFace {
                     size: AvatarSize::Size34,
                     ..DANA
                 })),
-                trail: Trail::Shortcut(Shortcut(vec![Key::Ctrl, Key::Char('1')])),
+                trail: MenuTrail::Shortcut(Shortcut(vec![
+                    ShortcutKey::Ctrl,
+                    ShortcutKey::Char('1'),
+                ])),
                 check: None,
             }],
         ),
@@ -229,8 +232,8 @@ fn palette_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
                 value: 2,
                 title: "Sync now".to_string(),
                 detail: None,
-                tile: Some(Tile::Icon(Icon::Refresh)),
-                trail: Trail::None,
+                tile: Some(MenuTile::Icon(Icon::Refresh)),
+                trail: MenuTrail::None,
                 check: None,
             }],
         ),
@@ -268,7 +271,7 @@ fn SenderCard(kind: HoverKind) -> Element {
                 }
                 div { class: "ds-hovercard-foot",
                     "stays unread while you look"
-                    span { class: "ds-hovercard-keys", ds::Kbd { shortcut: Shortcut(vec![Key::Space]) } " peek" }
+                    span { class: "ds-hovercard-keys", ds::Kbd { shortcut: Shortcut(vec![ShortcutKey::Space]) } " peek" }
                 }
                 div { class: "ds-hovercard-actions",
                     Button { variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
@@ -330,7 +333,7 @@ fn foot() -> HoverCardPart {
     HoverCardPart::Foot {
         text: "stays unread while you look".to_string(),
         keys: Some(KeyHint {
-            shortcut: Shortcut(vec![Key::Space]),
+            shortcut: Shortcut(vec![ShortcutKey::Space]),
             label: "peek".to_string(),
         }),
     }
@@ -430,7 +433,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "menu",
         state: "slim-typing",
-        make: || rsx! { Menu { kind: MenuKind::Slim, anchor: Anchor::Rect(button_rect()), entries: snooze(), filter: Filter::Typing, onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { Menu { kind: MenuKind::Slim, anchor: Anchor::Rect(button_rect()), entries: snooze(), filter: MenuFilter::Typing, onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     Case {

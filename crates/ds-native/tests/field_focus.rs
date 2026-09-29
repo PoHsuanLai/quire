@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Focus, InputVariant, Material, TextInput, TextInputKind,
-    use_focus_request,
+    Appearance, Button, ButtonVariant, Ds, FieldFocus, InputVariant, Material, TextInput,
+    TextInputKind, use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -44,7 +44,7 @@ fn Fields() -> Element {
                 }
                 div { id: "c", style: "display:flex",
                     TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Password, label: "C", value: "secret",
-                        focus: Focus::Controlled(request), oninput: |_| {},
+                        focus: FieldFocus::Controlled(request), oninput: |_| {},
                         onfocus: move |()| note("focus:c"), onblur: move |()| note("blur:c") }
                 }
                 div { style: "display:flex",

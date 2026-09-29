@@ -12,7 +12,7 @@ use crate::core::time::clock::sleep;
 use crate::motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::Mood;
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::{Env, use_env_signal};
+use crate::style::scope::{Scope, use_scope_signal};
 use crate::style::tokens::timing::DurationToken;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
@@ -24,7 +24,7 @@ type Seen = (EmojiId, Mood, WakeStamp, EmojiPlayback);
 struct Player {
     shown: Signal<Shown>,
     task: Signal<Option<Task>>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     scope: ScopeId,
 }
 
@@ -38,7 +38,7 @@ pub(crate) fn use_frames(
     let player = Player {
         shown: use_signal(|| resting(user, mood)),
         task: use_signal(|| None),
-        env: use_env_signal(),
+        env: use_scope_signal(),
         scope: use_hook(current_scope_id),
     };
     // The last wake seen lives in a plain value, not a signal written while rendering (as

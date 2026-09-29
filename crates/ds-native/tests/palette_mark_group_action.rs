@@ -11,7 +11,7 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
-    PaletteGroup, PaletteGroups, PaletteHandle, Trail, use_palette_handle,
+    MenuTrail, PaletteGroup, PaletteGroups, PaletteHandle, use_palette_handle,
 };
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -37,7 +37,7 @@ fn item(value: u8, title: String) -> MenuEntry<u8> {
         title,
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }

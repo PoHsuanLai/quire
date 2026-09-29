@@ -13,9 +13,9 @@ use crate::core::geometry::units::Px;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::overlay::pull_tab::{Pull, PullPhase, PullTab};
 use crate::overlay::toast_hub::{ToastHub, ToastState, use_toast_hub};
-use crate::style::env::use_env_signal;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
+use crate::style::scope::use_scope_signal;
 use crate::style::tokens::timing::DurationToken;
 use dioxus::prelude::*;
 
@@ -95,7 +95,7 @@ impl Stage {
 /// The stage the host is at, moved by the hub and by the timers each move starts.
 fn use_stage(hub: ToastHub) -> Stage {
     let mut stage = use_signal(|| Stage::Gone);
-    let env = use_env_signal();
+    let env = use_scope_signal();
     use_effect(move || {
         let showing = match hub.state() {
             ToastState::Shown { .. } => Showing::Yes,

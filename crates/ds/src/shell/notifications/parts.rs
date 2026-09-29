@@ -3,7 +3,7 @@
 //! pointer is over it.
 
 use crate::components::content::icon_source::IconSource;
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::core::press::Press;
 use dioxus::prelude::*;
 
@@ -14,16 +14,16 @@ pub struct AppMark {
     /// The app's icon.
     pub icon: IconSource,
     /// The app's name.
-    pub name: Text,
+    pub name: TextLine,
 }
 
 /// How many layers show behind a grouped card, each `--notifications-group-offset` (4) lower
 /// than the one above it and a little narrower (design/13 section 13.3.6 draws two). Held to
-/// [`Layers::MAX`]: more would read as a pile, not a group.
+/// [`StackLayers::MAX`]: more would read as a pile, not a group.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct Layers(pub u8);
+pub struct StackLayers(pub u8);
 
-impl Layers {
+impl StackLayers {
     /// The most layers drawn.
     pub const MAX: u8 = 3;
 
@@ -39,7 +39,7 @@ pub struct GroupCount {
     /// How many notifications the group holds; the chip shows it from 2.
     pub count: u32,
     /// The layers behind the card.
-    pub layers: Layers,
+    pub layers: StackLayers,
 }
 
 /// One action a notification offers, drawn as a Mini button in the row that opens on hover.
@@ -47,7 +47,7 @@ pub struct GroupCount {
 #[derive(Debug, Clone, PartialEq)]
 pub struct CardAction {
     /// The button's words.
-    pub label: Text,
+    pub label: TextLine,
     /// What the press does (the server sends `ActionInvoked` with the action's key).
     pub on_press: EventHandler<Press>,
 }

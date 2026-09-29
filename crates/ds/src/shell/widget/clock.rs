@@ -4,7 +4,7 @@
 //! are analog; in the notification center's tile the time is digits. The card follows the
 //! scheme (settled 2026-09-27): a light card in the light scheme, a dark one in the dark.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::shell::clock::face::ClockFace;
 use crate::shell::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use crate::shell::widget::contract::{NoIntent, Widget, WidgetContext, WidgetKind};
@@ -76,16 +76,16 @@ impl Widget for WorldClockWidget {
         WidgetKind::fixed("quire.world-clock")
     }
 
-    fn name() -> Text {
-        Text::from("World Clock")
+    fn name() -> TextLine {
+        TextLine::from("World Clock")
     }
 
     fn sizes() -> &'static [WidgetSize] {
         &[WidgetSize::Medium, WidgetSize::Small]
     }
 
-    fn description() -> Text {
-        Text::from("See the time in cities around the world.")
+    fn description() -> TextLine {
+        TextLine::from("See the time in cities around the world.")
     }
 
     fn placeholder(_size: WidgetSize) -> ClockEntry {

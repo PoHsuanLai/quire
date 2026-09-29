@@ -16,7 +16,7 @@ use crate::spell::lang::{Lang, Spell};
 use crate::spell::marks::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
 use crate::spell::words::words;
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{ScopeId, Task, current_scope_id};
 use dioxus::prelude::*;
@@ -61,7 +61,7 @@ impl SpellCtx {
             host: use_hook(try_consume_context::<HostSpell>),
             edit,
             boxes: use_signal(Vec::new),
-            level: try_use_context::<Signal<Env>>()
+            level: try_use_context::<Signal<Scope>>()
                 .map_or(MotionLevel::Standard, |env| env.peek().resolved.motion),
             scope: current_scope_id(),
         }

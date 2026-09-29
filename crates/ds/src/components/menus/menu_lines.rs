@@ -6,7 +6,7 @@
 //! not. A header, a status line and a rule are not choices. Choices are numbered in order; the selection, a click and the menu tracker's item path
 //! all name a choice by that number. Up and Down skip disabled choices.
 
-use crate::components::menus::menu_filter::Filter;
+use crate::components::menus::menu_filter::MenuFilter;
 use crate::components::menus::menu_filter::Typed;
 use crate::components::menus::{menu_entry::MenuEntry, menu_match::fuzzy};
 use crate::core::vocab::Availability;
@@ -101,7 +101,7 @@ pub(crate) enum KeyAct {
 /// A panel's reading of `key` (design/06-INTERACTIONS.md section 2.4, design/13 section
 /// 13.3.2); `None` for a key it leaves alone. Typing only counts under a filter that types
 /// ([`Filter::Typing`] or [`Filter::Field`]) and with no Ctrl, Alt or Super.
-pub(crate) fn key_act(key: &Key, modifiers: Modifiers, filter: &Filter) -> Option<KeyAct> {
+pub(crate) fn key_act(key: &Key, modifiers: Modifiers, filter: &MenuFilter) -> Option<KeyAct> {
     let chord = modifiers.intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
     match key {
         Key::ArrowDown => Some(KeyAct::Move(Step::Down)),
@@ -223,7 +223,7 @@ pub(crate) fn liveness<T>(choices: &[Choice<T>]) -> Vec<Availability> {
 #[cfg(test)]
 mod tests {
     use super::{KeyAct, Nav, Step, key_act, moved, moved_live, settled};
-    use crate::components::menus::menu_filter::Filter;
+    use crate::components::menus::menu_filter::MenuFilter;
     use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
     use dioxus::prelude::{Key, Modifiers};
 
@@ -298,26 +298,26 @@ mod tests {
         let none = Modifiers::empty();
         let a = Key::Character("a".to_string());
         #[rustfmt::skip]
-        let cases: Vec<(Key, Modifiers, Filter, Option<KeyAct>)> = vec![
-            (Key::ArrowDown, none, Filter::None, Some(KeyAct::Move(Step::Down))),
-            (Key::ArrowUp, none, Filter::None, Some(KeyAct::Move(Step::Up))),
-            (Key::ArrowRight, none, Filter::None, Some(KeyAct::Open)),
-            (Key::ArrowLeft, none, Filter::Typing, Some(KeyAct::Back)),
-            (Key::Enter, none, Filter::None, Some(KeyAct::Pick)),
-            (Key::Tab, none, Filter::None, Some(KeyAct::Pick)),
-            (Key::Escape, none, Filter::None, Some(KeyAct::Close)),
-            (a.clone(), none, Filter::Typing, Some(KeyAct::Type("a".to_string()))),
-            (a.clone(), Modifiers::SHIFT, Filter::Typing, Some(KeyAct::Type("a".to_string()))),
-            (a.clone(), Modifiers::CONTROL, Filter::Typing, None),
-            (a, none, Filter::None, None),
-            (Key::Backspace, none, Filter::Typing, Some(KeyAct::Erase)),
-            (Key::Backspace, none, Filter::None, None),
+        let cases: Vec<(Key, Modifiers, MenuFilter, Option<KeyAct>)> = vec![
+            (Key::ArrowDown, none, MenuFilter::None, Some(KeyAct::Move(Step::Down))),
+            (Key::ArrowUp, none, MenuFilter::None, Some(KeyAct::Move(Step::Up))),
+            (Key::ArrowRight, none, MenuFilter::None, Some(KeyAct::Open)),
+            (Key::ArrowLeft, none, MenuFilter::Typing, Some(KeyAct::Back)),
+            (Key::Enter, none, MenuFilter::None, Some(KeyAct::Pick)),
+            (Key::Tab, none, MenuFilter::None, Some(KeyAct::Pick)),
+            (Key::Escape, none, MenuFilter::None, Some(KeyAct::Close)),
+            (a.clone(), none, MenuFilter::Typing, Some(KeyAct::Type("a".to_string()))),
+            (a.clone(), Modifiers::SHIFT, MenuFilter::Typing, Some(KeyAct::Type("a".to_string()))),
+            (a.clone(), Modifiers::CONTROL, MenuFilter::Typing, None),
+            (a, none, MenuFilter::None, None),
+            (Key::Backspace, none, MenuFilter::Typing, Some(KeyAct::Erase)),
+            (Key::Backspace, none, MenuFilter::None, None),
             (Key::Character("b".to_string()), none, field(), Some(KeyAct::Type("b".to_string()))),
             (Key::Backspace, none, field(), Some(KeyAct::Erase)),
             (Key::ArrowDown, none, field(), Some(KeyAct::Move(Step::Down))),
         ];
-        fn field() -> Filter {
-            Filter::Field {
+        fn field() -> MenuFilter {
+            MenuFilter::Field {
                 placeholder: "Filter…".to_string(),
             }
         }

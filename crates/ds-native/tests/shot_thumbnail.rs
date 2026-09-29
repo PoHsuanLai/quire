@@ -7,7 +7,7 @@
 //! `settle(BannerOut)`, never a drag out), while a drag to the left still starts a drag out.
 
 use dioxus::prelude::*;
-use ds::Swipe;
+use ds::NotificationSwipe;
 use ds::{
     Anim, Appearance, DRAG_THRESHOLD, DragStart, Ds, Hover, Icon, ImageSize, ImageSource, Material,
     MotionLevel, Point, Px, ShotThumbnail, Shown, StaggerIndex, ThumbAction, settle,
@@ -75,7 +75,7 @@ fn Swipeable() -> Element {
                     on_hidden: move |()| *HIDDEN.write() += 1,
                     onopen: move |()| *OPENED.write() += 1,
                     ondrag: move |start| DRAGS.write().push(start),
-                    swipe: Swipe::Dismiss(EventHandler::new(|()| *SWIPED.write() += 1)),
+                    swipe: NotificationSwipe::Dismiss(EventHandler::new(|()| *SWIPED.write() += 1)),
                 }
             }
         }

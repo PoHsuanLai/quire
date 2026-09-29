@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::detail::{
-    Deadline, Detailed, EventStamp, FirstShow, Layers, Moment, Operation, PendingSpec,
+    Deadline, Detailed, EventStamp, FirstShow, Moment, Operation, PendingLayers, PendingSpec,
     PendingStyle, PendingToken, SettleStyle, Settling, Touch, use_detail, use_nudge, use_pending,
     use_settle, use_shake,
 };
@@ -57,7 +57,7 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 
 const WIFI: PendingSpec = PendingSpec {
     style: PendingStyle::Iterate,
-    layers: Layers(4),
+    layers: PendingLayers(4),
 };
 
 #[allow(non_snake_case)]

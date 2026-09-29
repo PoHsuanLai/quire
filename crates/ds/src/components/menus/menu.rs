@@ -10,7 +10,7 @@
 
 use crate::components::controls::press::{button_of, press_of};
 use crate::components::menus::menu_active::{asks, follow_active};
-use crate::components::menus::menu_cursor::Cursor;
+use crate::components::menus::menu_cursor::MenuCursor;
 use crate::components::menus::menu_entry::MenuEntry;
 use crate::components::menus::menu_filter::filter_row;
 use crate::components::menus::menu_keys::{Decision, Level};
@@ -21,7 +21,7 @@ use crate::components::menus::menu_return::hand_back;
 use crate::components::menus::menu_surface::{Surface, stacking};
 use crate::components::menus::menu_tracker::{Tracker, Via, use_tracker};
 use crate::components::menus::{
-    menu_filter::Filter,
+    menu_filter::MenuFilter,
     menu_lines::{Act, Choice, KeyAct, choices, key_act, lines},
 };
 use crate::components::overlays::flow::Flow;
@@ -74,7 +74,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     kind: MenuKind,
     anchor: Anchor,
     entries: Vec<MenuEntry<T>>,
-    #[props(default)] filter: Filter,
+    #[props(default)] filter: MenuFilter,
     onpick: EventHandler<T>,
     onclose: EventHandler<()>,
     #[props(default)] timing: MenuTiming,
@@ -82,7 +82,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     #[props(default)] on_hover: Option<EventHandler<Option<usize>>>,
     #[props(default)] on_release: Option<EventHandler<Press>>,
     #[props(default)] entrance: MenuEntrance,
-    #[props(default)] active: Cursor,
+    #[props(default)] active: MenuCursor,
     #[props(default)] on_active: Option<EventHandler<Option<usize>>>,
     #[props(default)] onquery: Option<EventHandler<String>>,
     #[props(default)] dismiss: PickDismiss,
@@ -270,7 +270,7 @@ fn released<T: Clone + 'static>(
 /// the highlight goes back to the first match.
 fn typed_query(
     event: &KeyboardEvent,
-    filter: &Filter,
+    filter: &MenuFilter,
     query: Signal<String>,
     onquery: Option<EventHandler<String>>,
     tracker: Tracker,

@@ -5,7 +5,7 @@
 //! surface's own focus wins inside it.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, EditSurface, InputVariant, Key, Material, TextInput};
+use ds::{Appearance, Ds, EditSurface, InputVariant, Material, ShortcutKey, TextInput};
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -77,7 +77,7 @@ fn a_click_on_plain_text_leaves_the_shell_focused_and_it_hears_the_next_key() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
     assert!(harness.is_focused(".app"));
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "key:j");
 }
 
@@ -86,7 +86,7 @@ fn with_blitz_default_the_click_clears_the_focus() {
     let mut harness = harness(FocusFallback::BlitzDefault);
     click(&mut harness, ".plain");
     assert!(!harness.is_focused(".app"));
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "");
 }
 

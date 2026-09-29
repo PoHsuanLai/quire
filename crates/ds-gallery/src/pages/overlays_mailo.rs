@@ -6,9 +6,9 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Cursor, Focus, Icon,
-    InputVariant, Material, Menu, MenuEntry, MenuKind, MenuRow, PaletteEntrance, Radius, RowAction,
-    Run, RunTone, Surface, Text, TextInput, Tile, use_rect,
+    Anchor, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon,
+    InputVariant, Material, Menu, MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile,
+    PaletteEntrance, Radius, RowAction, RunTone, Surface, TextInput, TextLine, TextRun, use_rect,
 };
 
 /// The recent searches a panel starts with.
@@ -22,11 +22,11 @@ const RECENT: [(&str, &str); 3] = [
 fn recent_row(index: usize, mut kept: Signal<Vec<usize>>) -> MenuEntry<u8> {
     let (operator, words) = RECENT[index];
     MenuEntry::Row(MenuRow {
-        detail: Some(Text::Runs(vec![
-            Run::new("searched ", RunTone::Faint),
-            Run::new("today", RunTone::Plain),
+        detail: Some(TextLine::Runs(vec![
+            TextRun::new("searched ", RunTone::Faint),
+            TextRun::new("today", RunTone::Plain),
         ])),
-        tile: Some(Tile::Icon(Icon::Clock)),
+        tile: Some(MenuTile::Icon(Icon::Clock)),
         trailing: Some(RowAction {
             icon: Icon::X,
             label: "Remove from recent".to_string(),
@@ -36,9 +36,9 @@ fn recent_row(index: usize, mut kept: Signal<Vec<usize>>) -> MenuEntry<u8> {
         }),
         ..MenuRow::new(
             u8::try_from(index).unwrap_or_default(),
-            Text::Runs(vec![
-                Run::new(format!("{operator} "), RunTone::Strong),
-                Run::new(words, RunTone::Mark),
+            TextLine::Runs(vec![
+                TextRun::new(format!("{operator} "), RunTone::Strong),
+                TextRun::new(words, RunTone::Mark),
             ]),
         )
     })
@@ -128,7 +128,7 @@ pub fn FieldMenu() -> Element {
                         value: String::new(),
                         placeholder: "Type a name, then Up and Down",
                         oninput: move |_| {},
-                        focus: Focus::Manual,
+                        focus: FieldFocus::Manual,
                         onkey: move |event: KeyboardEvent| match event.key() {
                             Key::ArrowDown => at.set((at() + 1).min(last)),
                             Key::ArrowUp => at.set(at().saturating_sub(1)),
@@ -147,7 +147,7 @@ pub fn FieldMenu() -> Element {
                     entries: rows,
                     onpick: move |_| open.set(false),
                     onclose: move |()| open.set(false),
-                    active: Cursor::Controlled(Some(at())),
+                    active: MenuCursor::Controlled(Some(at())),
                     on_active: move |index: Option<usize>| {
                         if let Some(index) = index {
                             at.set(index);

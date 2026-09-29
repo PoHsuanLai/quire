@@ -5,9 +5,9 @@
 
 use dioxus::prelude::*;
 use ds::detail::{
-    CheckMark, Detailed, EventStamp, FirstShow, LayerGlyph, Layering, Layers, Moment, MorphGlyph,
-    MorphStyle, PendingSpec, PendingStyle, SettleStyle, Settling, Touch, use_detail, use_operation,
-    use_pending, use_settle,
+    CheckMark, Detailed, EventStamp, FirstShow, LayerGlyph, Layering, Moment, MorphGlyph,
+    MorphStyle, PendingLayers, PendingSpec, PendingStyle, SettleStyle, Settling, Touch, use_detail,
+    use_operation, use_pending, use_settle,
 };
 use ds::{Appearance, Ds, Icon, IconSize, Material};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
@@ -68,7 +68,7 @@ impl Detailed for Seal {
 
 const SEARCHING: PendingSpec = PendingSpec {
     style: PendingStyle::Iterate,
-    layers: Layers(4),
+    layers: PendingLayers(4),
 };
 
 static NET: GlobalSignal<Net> = Signal::global(|| Net::Off);
@@ -93,7 +93,7 @@ fn Page() -> Element {
 fn Wifi() -> Element {
     let detail = use_detail(NET(), FirstShow::Still, Touch::Remote);
     let frame = use_pending(use_operation(detail.cue()), SEARCHING);
-    let layering = match use_settle(detail.cue(), SettleStyle::Fill(Layers(4))) {
+    let layering = match use_settle(detail.cue(), SettleStyle::Fill(PendingLayers(4))) {
         Settling::Filling(upto) => Layering::Filling(upto),
         Settling::Rest | Settling::Drawing(_) | Settling::Sealing(_) => {
             Layering::Pending(frame, SEARCHING)

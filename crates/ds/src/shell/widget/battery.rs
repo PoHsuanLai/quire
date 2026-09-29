@@ -5,7 +5,7 @@
 //! to four rings, the percentage under each. Each ring holds the device's filled glyph
 //! ([`crate::DeviceGlyph`]) and fills on the host's wake stamp.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
 use crate::motion::wake::WakeStamp;
 use crate::shell::battery::device_glyph::{Device, DeviceGlyph};
@@ -88,8 +88,8 @@ impl Widget for BatteryWidget {
         WidgetKind::fixed("quire.battery")
     }
 
-    fn name() -> Text {
-        Text::from("Batteries")
+    fn name() -> TextLine {
+        TextLine::from("Batteries")
     }
 
     fn sizes() -> &'static [WidgetSize] {
@@ -105,8 +105,8 @@ impl Widget for BatteryWidget {
         }
     }
 
-    fn description() -> Text {
-        Text::from("See the charge of this computer and your devices.")
+    fn description() -> TextLine {
+        TextLine::from("See the charge of this computer and your devices.")
     }
 
     fn placeholder(_size: WidgetSize) -> BatteryEntry {

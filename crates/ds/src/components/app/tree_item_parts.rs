@@ -2,7 +2,7 @@
 //! fenced trailing slot. Apart from the component so each stays short.
 
 use crate::components::app::tree_item::Disclosure;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::focus::click::kept_click;
@@ -26,7 +26,7 @@ pub(crate) struct Row {
 /// that selects the place and keeps its press (so the folder does not also open or close) when
 /// there is `onselect`, else words that toggle with the row.
 pub(crate) fn label_part(
-    label: Text,
+    label: TextLine,
     onselect: Option<EventHandler<Press>>,
     editing: Option<Element>,
 ) -> Element {

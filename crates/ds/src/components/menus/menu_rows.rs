@@ -2,7 +2,7 @@
 //! a pointer move and its mount by its choice number (`menu_lines`).
 
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::components::menus::menu_entry::{MenuEntry, Trail};
+use crate::components::menus::menu_entry::{MenuEntry, MenuTrail};
 use crate::components::menus::menu_item::{
     Branch, ItemView, Row, RowEvents, RowMotion, Words, info, item,
 };
@@ -141,7 +141,7 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         title: Words::Str(title),
                         detail: None,
                         tile: tile.as_ref(),
-                        trail: &Trail::None,
+                        trail: &MenuTrail::None,
                         chord: NO_CHORD,
                         check: None,
                         marks: &line.marks,

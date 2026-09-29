@@ -11,7 +11,7 @@ use std::time::Duration;
 pub enum PendingStyle {
     /// One layer at a time: the Wi-Fi bars searching.
     Iterate,
-    /// Layers fill in turn and stay, then clear: a level being found.
+    /// PendingLayers fill in turn and stay, then clear: a level being found.
     Cumulate,
     /// A disc's opacity between .45 and 1, one step per half.
     Breathe,
@@ -21,7 +21,7 @@ pub enum PendingStyle {
 
 /// How many layers a style steps through (the Wi-Fi glyph: the dot and three arcs = 4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Layers(pub u8);
+pub struct PendingLayers(pub u8);
 
 /// A pending loop's look.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -29,7 +29,7 @@ pub struct PendingSpec {
     /// How it moves.
     pub style: PendingStyle,
     /// Over how many layers (1 for a ring or a disc).
-    pub layers: Layers,
+    pub layers: PendingLayers,
 }
 
 impl PendingSpec {
@@ -134,7 +134,7 @@ pub(crate) fn next_due(
 
 #[cfg(test)]
 mod tests {
-    use super::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle, frame_at, next_due};
+    use super::{Lit, PendingFrame, PendingLayers, PendingSpec, PendingStyle, frame_at, next_due};
     use crate::motion::detail::operation::Deadline;
     use crate::style::appearance::motion::MotionLevel;
     use std::time::Duration;
@@ -194,7 +194,7 @@ mod tests {
     fn each_style_lights_its_own_layers() {
         let wifi = |style| PendingSpec {
             style,
-            layers: Layers(4),
+            layers: PendingLayers(4),
         };
         let lit =
             |frame: PendingFrame, spec| (0..4).map(|l| frame.lit(spec, l)).collect::<Vec<_>>();
@@ -225,7 +225,7 @@ mod tests {
         );
         let disc = PendingSpec {
             style: PendingStyle::Breathe,
-            layers: Layers(1),
+            layers: PendingLayers(1),
         };
         assert_eq!(PendingFrame::Step(0).lit(disc, 0), On);
         assert_eq!(PendingFrame::Step(1).lit(disc, 0), Off);

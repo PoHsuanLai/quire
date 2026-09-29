@@ -4,7 +4,7 @@
 //! under Reduced motion (R7).
 
 use dioxus::prelude::*;
-use ds::{Appearance, DiscMotion, Ds, Icon, Material, ModuleState, ModuleTile, Motion, Text};
+use ds::{Appearance, DiscMotion, Ds, Icon, Material, ModuleState, ModuleTile, Motion, TextLine};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -40,7 +40,7 @@ fn Tiles() -> Element {
         Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "display:flex; gap:8px; width:340px",
                 div { id: "wifi", style: "flex:1",
-                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: Some(Text::from("On")), state: WIFI(), disc: DiscMotion::Fill, onclick: move |_| *WIFI.write() = flip(WIFI()) }
+                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: Some(TextLine::from("On")), state: WIFI(), disc: DiscMotion::Fill, onclick: move |_| *WIFI.write() = flip(WIFI()) }
                 }
                 div { id: "focus", style: "flex:1",
                     ModuleTile { glyph: Icon::Moon, title: "Focus", status: None, state: FOCUS(), disc: DiscMotion::Morph(Icon::MoonFilled), onclick: move |_| *FOCUS.write() = flip(FOCUS()) }

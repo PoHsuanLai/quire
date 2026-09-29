@@ -4,7 +4,7 @@
 use crate::components::controls::chip::{Chip, ChipVariant};
 use crate::components::fields::{
     text_input::{InputVariant, TextInput},
-    text_input_focus::Focus,
+    text_input_focus::FieldFocus,
 };
 use crate::focus::field::FieldHandle;
 use crate::style::icon::Icon;
@@ -22,7 +22,7 @@ pub fn SearchField(
     tokens: Vec<String>,
     oninput: EventHandler<String>,
     onkey: EventHandler<KeyboardEvent>,
-    #[props(default)] focus: Focus,
+    #[props(default)] focus: FieldFocus,
     #[props(default)] handle: Option<FieldHandle>,
 ) -> Element {
     // The icon keeps the base 16: S's `.cmdk-in` does not size it (C draws 18).

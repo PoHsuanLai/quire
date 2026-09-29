@@ -7,9 +7,9 @@ use super::level_tile::{Ground, LevelTile, STATES, theme, work};
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BlurState, Button, ButtonVariant, Ds, Fraction, Inject, Level, LevelControl,
-    LevelGlyph, LevelLook, Material, Muting, Osd, OsdMetrics, OsdPosition, RootChrome, Scheme,
-    Shown, Tick, use_env,
+    Appearance, BlurState, Button, ButtonVariant, Ds, Fraction, Inject, LevelControl, LevelGlyph,
+    LevelLook, Material, Muting, Osd, OsdLevel, OsdMetrics, OsdPosition, RootChrome, Scheme, Shown,
+    Tick, use_scope,
 };
 
 /// The Level page.
@@ -39,7 +39,7 @@ fn describe(look: LevelLook) -> &'static str {
 
 #[component]
 fn LiveSection() -> Element {
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let mut volume = use_signal(|| Fraction(400));
     let mut brightness = use_signal(|| Fraction(300));
     let mut muting = use_signal(|| Muting::Audible);
@@ -98,7 +98,7 @@ fn OsdCard(scheme: Scheme, title: String, children: Element) -> Element {
 
 #[component]
 fn LooksSection() -> Element {
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     rsx! {
         Section { title: "Looks", note: "Each look at volume 0, 40 and 100 %, muted, and brightness 30 %, on the OSD card over the Work Space's frame and over a light ground. The speaker shows a wave per third of the range and a slash when muted; the sun's rays grow with the level.",
             for look in LevelLook::ALL {
@@ -120,7 +120,7 @@ fn LooksSection() -> Element {
 
 #[component]
 fn OsdSection() -> Element {
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let theme = theme(scheme);
     let mut shown = use_signal(|| Shown::Visible);
     let mut hidden_at = use_signal(|| 0u32);
@@ -155,7 +155,7 @@ fn OsdSection() -> Element {
                                         Osd {
                                             shown: shown(),
                                             label: title,
-                                            level: Level { value, glyph },
+                                            level: OsdLevel { value, glyph },
                                             on_hidden: move |()| hidden_at += 1,
                                         }
                                     }

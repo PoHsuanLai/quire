@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Focus, InputVariant, Key, Material, TextInput,
-    focus_soon, use_focus_request,
+    Appearance, Button, ButtonVariant, Ds, FieldFocus, InputVariant, Material, ShortcutKey,
+    TextInput, focus_soon, use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::rc::Rc;
@@ -32,7 +32,7 @@ fn Rename() -> Element {
             div { style: "display:flex; flex-direction:column; gap:12px; width:300px; padding:12px",
                 div { id: "name", style: "display:flex",
                     TextInput { variant: InputVariant::Boxed, label: "Name", value: name(),
-                        focus: Focus::Controlled(request), oninput: move |value| name.set(value) }
+                        focus: FieldFocus::Controlled(request), oninput: move |value| name.set(value) }
                 }
                 div { id: "other", style: "display:flex",
                     TextInput { variant: InputVariant::Boxed, label: "Other", value: "", oninput: |_| {} }
@@ -55,7 +55,7 @@ fn Plain() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { id: "name", style: "display:flex; width:300px; padding:12px",
                 TextInput { variant: InputVariant::Boxed, label: "Name", value: "Archive",
-                    focus: Focus::Controlled(request), oninput: |_| {} }
+                    focus: FieldFocus::Controlled(request), oninput: |_| {} }
             }
         }
     }
@@ -70,7 +70,7 @@ fn a_controlled_focus_with_select_all_selects_the_whole_value() {
         harness.selected_text("#name input").as_deref(),
         Some("Archive")
     );
-    harness.key(Key::Char('X'));
+    harness.key(ShortcutKey::Char('X'));
     harness.advance(ms(20));
     assert_eq!(
         harness.text_of(".name").as_deref(),

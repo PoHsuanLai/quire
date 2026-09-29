@@ -12,7 +12,7 @@ use crate::components::app::sidebar_item::PlaceId;
 use crate::components::app::tree_item_parts::{
     Row, label_part, leaf_chevron, open_attribute, trailing_slot,
 };
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::core::press::Press;
@@ -93,7 +93,7 @@ pub enum TreeShape {
 /// (`role=group`), indented one `--s-12` step per level.
 #[component]
 pub fn TreeItem(
-    #[props(into)] label: Text,
+    #[props(into)] label: TextLine,
     open: Disclosure,
     on_toggle: EventHandler<Disclosure>,
     #[props(default)] shape: TreeShape,

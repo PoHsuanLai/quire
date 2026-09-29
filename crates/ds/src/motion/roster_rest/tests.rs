@@ -7,8 +7,8 @@ use crate::style::appearance::{
     accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
 };
 use crate::style::appearance::{blur::BlurState, material::Material};
-use crate::style::env::Env;
-use crate::style::env::InputModality;
+use crate::style::scope::InputModality;
+use crate::style::scope::Scope;
 use dioxus::core::{NoOpMutations, VirtualDom};
 use dioxus::prelude::*;
 use std::cell::Cell;
@@ -28,7 +28,7 @@ fn List() -> Element {
             accent: Accent::Postmark,
             motion: MotionLevel::Standard,
         };
-        Signal::new(Env {
+        Signal::new(Scope {
             resolved,
             scheme: resolved.scheme,
             material: Material::Window,

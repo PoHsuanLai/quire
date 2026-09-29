@@ -3,9 +3,9 @@
 use dioxus::prelude::*;
 use ds::{
     AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerPosition, BannerStack, CardAction,
-    Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Layers, Material,
-    NotificationCard, Panel, PanelScrim, Px, Rich, RichRun, RichText, RootExtent, Run, RunTone,
-    ScrimStrength, Shown, Theme,
+    Ds, Expanded, GroupCount, GroupHeader, Icon, IconSource, Inject, Material, NotificationCard,
+    Panel, PanelScrim, Px, Rich, RichRun, RichText, RootExtent, RunTone, ScrimStrength, Shown,
+    StackLayers, TextRun, Theme,
 };
 
 /// A specimen: its golden name and how it is made.
@@ -39,15 +39,15 @@ fn toast(theme: Theme, body: Element) -> Element {
 /// A body with every tone and a link.
 pub fn rich_runs() -> Element {
     let body = Rich(vec![
-        RichRun::Run(Run::new("Build ", RunTone::Plain)),
-        RichRun::Run(Run::new("#42", RunTone::Strong)),
-        RichRun::Run(Run::new(" passed ", RunTone::Plain)),
-        RichRun::Run(Run::new("again", RunTone::Italic)),
-        RichRun::Run(Run::new(", ", RunTone::Plain)),
-        RichRun::Run(Run::new("no flakes", RunTone::Underline)),
-        RichRun::Run(Run::new(". See ", RunTone::Faint)),
+        RichRun::Run(TextRun::new("Build ", RunTone::Plain)),
+        RichRun::Run(TextRun::new("#42", RunTone::Strong)),
+        RichRun::Run(TextRun::new(" passed ", RunTone::Plain)),
+        RichRun::Run(TextRun::new("again", RunTone::Italic)),
+        RichRun::Run(TextRun::new(", ", RunTone::Plain)),
+        RichRun::Run(TextRun::new("no flakes", RunTone::Underline)),
+        RichRun::Run(TextRun::new(". See ", RunTone::Faint)),
         RichRun::link("the run", "https://ci.example/runs/42"),
-        RichRun::Run(Run::new(".", RunTone::Plain)),
+        RichRun::Run(TextRun::new(".", RunTone::Plain)),
     ]);
     toast(
         Theme::Light,
@@ -113,9 +113,9 @@ pub fn card_dark() -> Element {
 /// A group of three with two layers behind it, two actions and a link in the body.
 pub fn card_group() -> Element {
     let body = Rich(vec![
-        RichRun::Run(Run::new("Build ", RunTone::Plain)),
-        RichRun::Run(Run::new("#42", RunTone::Strong)),
-        RichRun::Run(Run::new(" passed. ", RunTone::Plain)),
+        RichRun::Run(TextRun::new("Build ", RunTone::Plain)),
+        RichRun::Run(TextRun::new("#42", RunTone::Strong)),
+        RichRun::Run(TextRun::new(" passed. ", RunTone::Plain)),
         RichRun::link("Open the run", "https://ci.example/runs/42"),
     ]);
     toast(
@@ -126,7 +126,7 @@ pub fn card_group() -> Element {
                 age: "2m",
                 summary: "main is green",
                 body,
-                count: GroupCount { count: 3, layers: Layers(2) },
+                count: GroupCount { count: 3, layers: StackLayers(2) },
                 actions: vec![
                     CardAction { label: "Rerun".into(), on_press: EventHandler::new(|_| {}) },
                     CardAction { label: "Mute".into(), on_press: EventHandler::new(|_| {}) },

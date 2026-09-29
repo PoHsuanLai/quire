@@ -26,7 +26,7 @@ use dioxus::prelude::*;
 
 /// The level an OSD shows: the value and the glyph that follows it.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Level {
+pub struct OsdLevel {
     /// The level, 0 to 1000.
     pub value: Fraction,
     /// The speaker (heard or muted) or the sun.
@@ -60,7 +60,7 @@ impl OsdPosition {
 #[component]
 pub fn Osd(
     shown: Shown,
-    #[props(default)] level: Option<Level>,
+    #[props(default)] level: Option<OsdLevel>,
     #[props(default)] label: Option<String>,
     #[props(default)] on_hidden: EventHandler<()>,
     #[props(default)] position: OsdPosition,
@@ -70,7 +70,7 @@ pub fn Osd(
 ) -> Element {
     let phase = use_shown_phase(shown, on_hidden, Anim::OsdIn, Anim::OsdOut);
     let (now, alias) = phase;
-    let level_label = label.clone().unwrap_or_else(|| "Level".to_owned());
+    let level_label = label.clone().unwrap_or_else(|| "OsdLevel".to_owned());
     let named = label.clone();
     rsx! {
         div {
@@ -88,7 +88,7 @@ pub fn Osd(
             if let Some(title) = label {
                 div { class: "ds-osd-title", "{title}" }
             }
-            if let Some(Level { value, glyph }) = level {
+            if let Some(OsdLevel { value, glyph }) = level {
                 LevelControl { label: level_label, value, glyph, mode: LevelMode::ReadOnly, look }
             }
             {children}

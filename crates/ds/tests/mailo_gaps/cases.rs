@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 use ds::Switch;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Expanded, Fraction,
-    Hex, ImageSource, InputVariant, MarkStyle, PillAction, Provider, SendMood, SendPhase, SendPill,
-    SendRing, TextInput, TextInputKind,
+    Hex, ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, SendMood, SendPhase,
+    SendPill, SendRing, TextInput, TextInputKind,
 };
 use ds::{
     Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Here, ItemKind, PersonHue, Presence,
@@ -51,7 +51,7 @@ fn poh() -> AccountFace {
     AccountFace::One {
         initial: 'P',
         colour: VIOLET,
-        provider: Provider::Google,
+        provider: MarkProvider::Google,
         address: Some("poh@acme.example".to_string()),
     }
 }

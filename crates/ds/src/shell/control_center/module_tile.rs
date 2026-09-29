@@ -10,7 +10,7 @@
 //! run the same press twice.
 
 use crate::components::content::icon_source::IconSource;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Expanded};
@@ -38,8 +38,8 @@ use dioxus::prelude::*;
 #[component]
 pub fn ModuleTile(
     #[props(into)] glyph: IconSource,
-    #[props(into)] title: Text,
-    status: Option<Text>,
+    #[props(into)] title: TextLine,
+    status: Option<TextLine>,
     state: ModuleState,
     #[props(default)] chevron: Chevron,
     #[props(default)] span: TileSpan,
@@ -104,7 +104,7 @@ fn opens(key: &Key) -> bool {
 
 /// The chevron: its own hit target, named for the module, keeping every press it takes.
 fn chevron_button(
-    title: &Text,
+    title: &TextLine,
     on_detail: Option<EventHandler<Press>>,
     expanded: Expanded,
     availability: Availability,

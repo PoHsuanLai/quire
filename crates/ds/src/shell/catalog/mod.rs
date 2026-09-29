@@ -3,7 +3,7 @@
 //! categories, the control center's modules, the menu bar's items) can reuse its data half. A
 //! surface names what can be placed (its registry of kinds), draws each kind through one trait,
 //! offers a picker over the registry, and keeps what the person placed as data, a list of
-//! [`Placement`]s the host stores in its settings, never in code.
+//! [`Placed`]s the host stores in its settings, never in code.
 //!
 //! Only the data half is generic: a placement is a kind, a size and a position, and the list's
 //! edits (add, remove, resize, move) are pure. Where a position is legal (a free grid cell, an

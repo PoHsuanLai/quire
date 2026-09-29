@@ -3,7 +3,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Emphasis, ListRow, Presence, PulseKey, Run, RunTone, Selection, StaggerIndex, Text,
+    Anim, Emphasis, ListRow, Presence, PulseKey, RunTone, Selection, StaggerIndex, TextLine,
+    TextRun,
 };
 
 /// A `ListRow` with everything fixed but its snippet, written as the expression given.
@@ -38,10 +39,10 @@ fn forms() -> Element {
     rsx! {
         {row!("a str")}
         {row!(owned)}
-        {row!(Text::Runs(vec![Run::new("runs", RunTone::Mark)]))}
-        {row!(Some(Text::from("Some(Text)")))}
+        {row!(TextLine::Runs(vec![TextRun::new("runs", RunTone::Mark)]))}
+        {row!(Some(TextLine::from("Some(Text)")))}
         {row!(Some("Some(string.into())".to_string().into()))}
-        {row!(held.map(Text::from))}
+        {row!(held.map(TextLine::from))}
         {row!(None)}
         ListRow {
             selection: Selection::Unselected,

@@ -5,7 +5,7 @@ use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, HoverStrip, Icon, ListPresence, ListRow,
-    MarkSize, MarkStyle, Presence, Provider, ProviderMark, Px, StripAction,
+    MarkProvider, MarkSize, MarkStyle, Presence, ProviderMark, Px, StripAction,
 };
 use ds::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
 
@@ -85,7 +85,7 @@ fn row_in_drag(
             presence,
             name: "Dana Okafor",
             via: rsx! {
-                ProviderMark { provider: Provider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
+                ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
                 "gmail"
             },
             subject: "Re: UIDL stability across servers",

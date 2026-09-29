@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{
-    Appearance, Ds, Material, Motion, NowPlayingTrack, PlayPauseButton, Playback, Text,
+    Appearance, Ds, Material, Motion, NowPlayingTrack, PlayPauseButton, Playback, TextLine,
     TrackPosition,
 };
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
@@ -38,7 +38,7 @@ fn Player() -> Element {
     rsx! {
         Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "width:340px",
-                div { id: "track", NowPlayingTrack { title: Text::from(TITLE()), by: Some(Text::from("Claude Debussy")), playback: PLAYBACK() } }
+                div { id: "track", NowPlayingTrack { title: TextLine::from(TITLE()), by: Some(TextLine::from("Claude Debussy")), playback: PLAYBACK() } }
                 div { id: "toggle",
                     PlayPauseButton {
                         playback: PLAYBACK(),

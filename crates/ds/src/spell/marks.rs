@@ -6,7 +6,7 @@
 //! being typed is not marked until the caret leaves it ([`Typing`]); a mark after the edit point
 //! moves with its word until the next check replaces it.
 
-use super::words::{Span, joined_at, word_at};
+use super::words::{WordSpan, joined_at, word_at};
 use crate::edit::position::{EditNode, TextPosition, TextRange};
 use std::collections::HashSet;
 
@@ -16,7 +16,7 @@ pub struct Misspelt {
     /// The paragraph.
     pub node: EditNode,
     /// The word's bytes in the paragraph's text.
-    pub span: Span,
+    pub span: WordSpan,
     /// The word as checked.
     pub word: String,
 }
@@ -52,7 +52,7 @@ pub struct Typing {
     /// The paragraph.
     pub node: EditNode,
     /// The word's bytes, as of the last read of the text.
-    pub span: Span,
+    pub span: WordSpan,
 }
 
 /// Whether a paragraph's text changed since the surface last read it.
@@ -68,7 +68,7 @@ pub enum Edit {
 pub fn marks_for(
     node: &EditNode,
     text: &str,
-    words: &[Span],
+    words: &[WordSpan],
     wrong: &HashSet<String>,
 ) -> Vec<Misspelt> {
     words
@@ -92,7 +92,7 @@ pub fn reconcile(marks: Vec<Misspelt>, before: &str, after: &str) -> Vec<Misspel
     marks
         .into_iter()
         .filter_map(|mark| {
-            let moved = Span::new(
+            let moved = WordSpan::new(
                 mark.span.start.checked_add_signed(delta)?,
                 mark.span.end.checked_add_signed(delta)?,
             );
@@ -105,7 +105,7 @@ pub fn reconcile(marks: Vec<Misspelt>, before: &str, after: &str) -> Vec<Misspel
 }
 
 /// Whether `word` sits at `span` in `text` as a whole word.
-fn whole_at(text: &str, span: Span, word: &str) -> bool {
+fn whole_at(text: &str, span: WordSpan, word: &str) -> bool {
     text.get(span.start..span.end) == Some(word)
         && !joined_at(text, span.start)
         && !joined_at(text, span.end)

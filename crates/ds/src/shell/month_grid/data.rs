@@ -3,7 +3,7 @@
 //! calendar library gives them (`i16` year, `i8` month and day), so its mapping is a plain
 //! `From` and quire needs no calendar of its own.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use serde::{Deserialize, Serialize};
 
 /// A calendar month: which month a grid shows. Ordered, so a change of month knows its way.
@@ -125,9 +125,9 @@ pub struct MonthGridData {
     /// Which month: the grid's identity, and the order a change slides by.
     pub month: MonthKey,
     /// The header's words: "September 2026".
-    pub title: Text,
+    pub title: TextLine,
     /// The column heads, starting at the first weekday: weekday initials.
-    pub heads: [Text; 7],
+    pub heads: [TextLine; 7],
     /// As many rows as the month touches (four to six), padded with the neighbours' days.
     pub weeks: Vec<MonthWeek>,
 }
@@ -155,19 +155,19 @@ impl WeekNumbers {
 
 /// Which way the header's buttons step the month.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum Step {
+pub enum MonthStep {
     /// The month before.
     Previous,
     /// The month after.
     Next,
 }
 
-impl Step {
+impl MonthStep {
     /// The button's name.
     pub(crate) fn label(self) -> &'static str {
         match self {
-            Step::Previous => "Previous month",
-            Step::Next => "Next month",
+            MonthStep::Previous => "Previous month",
+            MonthStep::Next => "Next month",
         }
     }
 }

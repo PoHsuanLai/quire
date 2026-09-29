@@ -10,8 +10,8 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, Level, LevelControl, LevelGlyph, LevelLook,
-    Material, ModulePanel, Muting, Osd, PRESETS, RootChrome, Shown, SpaceLook, Theme,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook, Material,
+    ModulePanel, Muting, Osd, OsdLevel, PRESETS, RootChrome, Shown, SpaceLook, Theme,
 };
 use ds_native::{Harness, Viewport};
 use probe::rect;
@@ -75,7 +75,7 @@ fn Specimen() -> Element {
                 Ds { appearance, look: work(theme), material: Material::Osd, chrome: Some(RootChrome::Transparent),
                      blur: BlurState::Available, stylesheet: Inject::Host,
                     Osd { shown: Shown::Visible, label: "Sound", look: LevelLook::Capsule,
-                          level: Level { value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible) } }
+                          level: OsdLevel { value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible) } }
                 }
             }
         },

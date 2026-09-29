@@ -4,7 +4,7 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, Filter, Flow, Menu, MenuEntry, MenuKind, MenuRow, Scrim, Trailing,
+    Button, ButtonVariant, Flow, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow, Scrim, Trailing,
     use_rect,
 };
 
@@ -28,8 +28,8 @@ fn folders() -> Vec<MenuEntry<usize>> {
 }
 
 /// The field filter the pickers use.
-fn field() -> Filter {
-    Filter::Field {
+fn field() -> MenuFilter {
+    MenuFilter::Field {
         placeholder: "Filter folders…".to_string(),
     }
 }

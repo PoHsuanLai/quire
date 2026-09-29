@@ -3,7 +3,7 @@
 
 use super::grounds::{card_grounds, card_ink, contrast, least};
 use super::roles::AccentRoles;
-use super::text_grounds::{Ground, GroundKind, TextOn, text_grounds};
+use super::text_grounds::{GroundKind, TextGround, TextOn, text_grounds};
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::hex::Hex;
 
@@ -64,7 +64,7 @@ pub fn legibility(roles: &AccentRoles, scheme: Scheme) -> Legibility {
 }
 
 /// The least ratio `text` reaches on the grounds of `kind` among `grounds`.
-fn least_on(text: Hex, kind: GroundKind, grounds: &[Ground]) -> f64 {
+fn least_on(text: Hex, kind: GroundKind, grounds: &[TextGround]) -> f64 {
     grounds
         .iter()
         .filter(|ground| ground.kind == kind)

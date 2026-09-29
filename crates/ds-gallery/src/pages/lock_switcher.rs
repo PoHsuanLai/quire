@@ -10,8 +10,8 @@ use dioxus::prelude::*;
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
     EmojiId, Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen,
-    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp, Text,
-    UserPicture, person_hue, use_env,
+    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
+    TextLine, UserPicture, person_hue, use_scope,
 };
 
 /// The person's letter disc.
@@ -146,7 +146,7 @@ fn LockStage(pose: Pose) -> Element {
         let axes = axes.read();
         (axes.theme, axes.accent, axes.motion)
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let wallpaper = ImageSource(wallpaper::calm_uri(scheme).to_owned());
     let pose_class = match pose.shaking {
         Shaking::Posed => Some("g-shake-pose"),
@@ -169,7 +169,7 @@ fn LockStage(pose: Pose) -> Element {
                                 state: pose.state.clone(),
                                 caps: pose.caps,
                                 look: pose.look,
-                                hint: pose.hint.map(Text::from),
+                                hint: pose.hint.map(TextLine::from),
                                 oninput: |_| {},
                                 onsubmit: |_| {},
                             }
@@ -190,7 +190,7 @@ fn PictureStage(picture: UserPicture) -> Element {
         let axes = axes.read();
         (axes.theme, axes.accent, axes.motion)
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     rsx! {
         div { class: "g-lock-picture", style: "background-image:url(\"{wallpaper::calm_uri(scheme)}\")",
             Ds {
@@ -200,7 +200,7 @@ fn PictureStage(picture: UserPicture) -> Element {
                 chrome: Some(RootChrome::Transparent),
                 LockPrompt {
                     user: LockUser { picture, ..user() },
-                    hint: Some(Text::from("Press Enter to unlock")),
+                    hint: Some(TextLine::from("Press Enter to unlock")),
                     oninput: |_| {},
                     onsubmit: |_| {},
                 }
@@ -217,7 +217,7 @@ fn PolkitStage(state: PromptState) -> Element {
         let axes = axes.read();
         (axes.theme, axes.accent, axes.motion)
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     rsx! {
         div { class: "g-modal g-polkit", style: "background-image:url(\"{wallpaper::calm_uri(scheme)}\")",
             Ds {
@@ -227,7 +227,7 @@ fn PolkitStage(state: PromptState) -> Element {
                 div { class: "g-polkit-stage" }
                 PolkitPrompt {
                     action: "Authentication is required to change the system's time zone.",
-                    detail: Some(Text::from("org.freedesktop.timedate1.set-timezone")),
+                    detail: Some(TextLine::from("org.freedesktop.timedate1.set-timezone")),
                     user: user(),
                     state,
                     oninput: |_| {},
@@ -266,7 +266,7 @@ fn SwitcherStage(count: usize, selected: usize, output: f32) -> Element {
         let axes = axes.read();
         (axes.theme, axes.accent, axes.motion, axes.blur)
     };
-    let scheme = use_env().scheme;
+    let scheme = use_scope().scheme;
     let apps: Vec<SwitcherApp> = APPS
         .iter()
         .take(count)

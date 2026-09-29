@@ -7,7 +7,7 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::Propagation;
 use crate::core::press::Press;
@@ -31,7 +31,7 @@ fn toggle_label(expanded: Expanded, count: u32) -> Option<String> {
 #[component]
 pub fn GroupHeader(
     icon: IconSource,
-    #[props(into)] name: Text,
+    #[props(into)] name: TextLine,
     count: u32,
     #[props(default)] expanded: Expanded,
     on_toggle: EventHandler<Press>,

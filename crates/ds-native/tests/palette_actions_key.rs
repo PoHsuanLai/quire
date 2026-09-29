@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Key, Material, Menu,
-    MenuEntry, MenuKind, Rect, Trail, use_focus_request,
+    Anchor, Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, Menu,
+    MenuEntry, MenuKind, MenuTrail, Rect, ShortcutKey, use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -27,7 +27,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }
@@ -101,7 +101,7 @@ fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() 
     let mut harness = Harness::new(Launcher, VIEW);
     harness.advance(ms(300));
     assert!(harness.is_focused("#card .ds-input"));
-    harness.chord(&[Key::Ctrl], Key::Char('k'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'));
     harness.advance(ms(200));
     assert_eq!(
         harness.count(".ds-popover.ds-menu"),
@@ -112,7 +112,7 @@ fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() 
         harness.is_focused(".ds-popover.ds-menu"),
         "the menu has the keyboard"
     );
-    harness.chord(&[Key::Ctrl], Key::Char('k'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'));
     harness.advance(ms(200));
     assert_eq!(
         harness.count(".ds-popover.ds-menu"),

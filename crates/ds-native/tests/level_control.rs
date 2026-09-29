@@ -9,8 +9,8 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, DurationToken, EasingToken, Fraction, Key, LevelControl, LevelGlyph, Material,
-    Motion, MotionLevel, Muting, Point, Px, Theme,
+    Appearance, Ds, DurationToken, EasingToken, Fraction, LevelControl, LevelGlyph, Material,
+    Motion, MotionLevel, Muting, Point, Px, ShortcutKey, Theme,
 };
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
@@ -253,11 +253,11 @@ fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
         harness.is_focused(".ds-level"),
         "the press focuses the control"
     );
-    harness.key(Key::Right);
+    harness.key(ShortcutKey::Right);
     assert_eq!(level(&mut harness), 563);
-    harness.key(Key::Left);
-    harness.key(Key::Left);
+    harness.key(ShortcutKey::Left);
+    harness.key(ShortcutKey::Left);
     assert_eq!(level(&mut harness), 438);
-    harness.chord(&[Key::Shift], Key::Up);
+    harness.chord(&[ShortcutKey::Shift], ShortcutKey::Up);
     assert_eq!(level(&mut harness), 453);
 }

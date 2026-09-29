@@ -4,7 +4,7 @@
 use crate::details_states::{Bell, Charge, Net, Seal};
 use dioxus::prelude::*;
 use ds::detail::{
-    CheckMark, CountPace, FirstShow, LayerGlyph, Layering, Layers, MorphGlyph, MorphStyle,
+    CheckMark, CountPace, FirstShow, LayerGlyph, Layering, MorphGlyph, MorphStyle, PendingLayers,
     PendingSpec, PendingStyle, SettleStyle, Settling, Slashed, Touch, use_count_up, use_detail,
     use_nudge, use_operation, use_pending, use_settle, use_shake, use_sweep,
 };
@@ -13,7 +13,7 @@ use ds::{Fraction, Icon, IconSize};
 /// The Wi-Fi glyph's pending loop: the dot and three arcs, one at a time.
 const SEARCHING: PendingSpec = PendingSpec {
     style: PendingStyle::Iterate,
-    layers: Layers(4),
+    layers: PendingLayers(4),
 };
 
 /// `class` with a pulse's class and alias when it plays.
@@ -55,7 +55,7 @@ pub fn SweepCountView(charge: Charge, first: FirstShow) -> Element {
 pub fn NetView(net: Net) -> Element {
     let detail = use_detail(net, FirstShow::Still, Touch::Remote);
     let frame = use_pending(use_operation(detail.cue()), SEARCHING);
-    let settling = use_settle(detail.cue(), SettleStyle::Fill(Layers(4)));
+    let settling = use_settle(detail.cue(), SettleStyle::Fill(PendingLayers(4)));
     let layering = match settling {
         Settling::Filling(upto) => Layering::Filling(upto),
         Settling::Rest | Settling::Drawing(_) | Settling::Sealing(_) => {

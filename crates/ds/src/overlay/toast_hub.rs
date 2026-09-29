@@ -6,7 +6,7 @@
 
 use crate::core::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
-use crate::style::env::Env;
+use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
@@ -37,7 +37,7 @@ pub struct ToastHub {
     undone: Signal<Option<UndoToken>>,
     on_undo: Signal<Option<EventHandler<UndoToken>>>,
     hold: Signal<Option<Task>>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     scope: ScopeId,
 }
 
@@ -136,7 +136,7 @@ impl ToastHub {
 }
 
 /// A new hub for `Ds` to provide, timing its hold at the root's motion level.
-pub(crate) fn use_toast_hub_provider(env: Signal<Env>) -> ToastHub {
+pub(crate) fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
     let scope = use_hook(current_scope_id);
     use_context_provider(|| ToastHub {
         state: Signal::new(ToastState::Hidden),
@@ -160,7 +160,7 @@ mod tests {
         accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
     };
     use crate::style::appearance::{blur::BlurState, material::Material};
-    use crate::style::env::{Env, InputModality};
+    use crate::style::scope::{InputModality, Scope};
     use dioxus::prelude::*;
     use std::cell::RefCell;
     use std::rc::Rc;
@@ -183,7 +183,7 @@ mod tests {
 
     #[component]
     fn Script(log: Log) -> Element {
-        let env = use_signal(|| Env {
+        let env = use_signal(|| Scope {
             resolved: Resolved {
                 scheme: Scheme::Light,
                 accent: Accent::Postmark,

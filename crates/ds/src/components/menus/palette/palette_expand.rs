@@ -83,7 +83,7 @@ fn choice_count<T>(entries: &[MenuEntry<T>]) -> usize {
 mod tests {
     use super::{GroupResize, Resize, resized};
     use crate::components::content::emoji_grid::{EMOJI_CELL, EmojiCells};
-    use crate::components::menus::menu_entry::{MenuEntry, Trail};
+    use crate::components::menus::menu_entry::{MenuEntry, MenuTrail};
     use crate::components::menus::palette::palette_group::{GroupEntries, GroupsKey};
     use crate::core::vocab::Availability;
 
@@ -93,7 +93,7 @@ mod tests {
             title: format!("row {value}"),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
             availability: Availability::Enabled,
         }

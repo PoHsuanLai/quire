@@ -6,8 +6,8 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, Availability, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL,
-    EmojiCell, EmojiCells, FieldKey, Key, Material, MenuEntry, PaletteGroup, PaletteGroups,
-    PaneContent, PreviewPane, Trail,
+    EmojiCell, EmojiCells, FieldKey, Material, MenuEntry, MenuTrail, PaletteGroup, PaletteGroups,
+    PaneContent, PreviewPane, ShortcutKey,
 };
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -28,7 +28,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }
@@ -105,22 +105,22 @@ fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
     );
     assert_eq!(selected(&harness), "One");
     // (key, the stop it lands on)
-    let walk: &[(Key, &str)] = &[
-        (Key::Down, "Two"),
-        (Key::Down, "cell 0"),
-        (Key::Right, "cell 1"),
-        (Key::Right, "cell 2"),
-        (Key::Right, "cell 3"),
-        (Key::Right, "cell 4"),
-        (Key::Left, "cell 3"),
-        (Key::Down, "cell 7"),
-        (Key::Down, "cell 9"),
-        (Key::Down, "Fifty"),
-        (Key::Up, "cell 9"),
-        (Key::Up, "cell 5"),
-        (Key::Up, "cell 1"),
-        (Key::Up, "Two"),
-        (Key::Down, "cell 0"),
+    let walk: &[(ShortcutKey, &str)] = &[
+        (ShortcutKey::Down, "Two"),
+        (ShortcutKey::Down, "cell 0"),
+        (ShortcutKey::Right, "cell 1"),
+        (ShortcutKey::Right, "cell 2"),
+        (ShortcutKey::Right, "cell 3"),
+        (ShortcutKey::Right, "cell 4"),
+        (ShortcutKey::Left, "cell 3"),
+        (ShortcutKey::Down, "cell 7"),
+        (ShortcutKey::Down, "cell 9"),
+        (ShortcutKey::Down, "Fifty"),
+        (ShortcutKey::Up, "cell 9"),
+        (ShortcutKey::Up, "cell 5"),
+        (ShortcutKey::Up, "cell 1"),
+        (ShortcutKey::Up, "Two"),
+        (ShortcutKey::Down, "cell 0"),
     ];
     for (step, (key, want)) in walk.iter().enumerate() {
         harness.key(*key);
@@ -132,7 +132,7 @@ fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
         harness.has_class("#card .ds-emoji-grid", "ds-emoji-text"),
         "the grid paints in the colour face"
     );
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(20));
     assert_eq!(log(&harness), "close,pick:20");
 }
@@ -189,8 +189,8 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
         harness.count(".ds-section-header-action[*|data-selected=true]"),
         0
     );
-    harness.key(Key::Down);
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(20));
     assert_eq!(harness.count(".ds-menu-item[*|aria-selected=true]"), 0);
     assert_eq!(
@@ -201,7 +201,7 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
         "the cursor rests on the header's action"
     );
     let rows_before = harness.count("#card .ds-menu-item");
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(20));
     assert_eq!(log(&harness), "more", "the action ran and nothing closed");
     assert_eq!(harness.count("#card .ds-menu-item"), rows_before + 1);
@@ -216,8 +216,8 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
             .as_deref(),
         Some("Terminal")
     );
-    harness.key(Key::Down);
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(20));
     assert_eq!(
         harness
@@ -304,27 +304,31 @@ fn query(harness: &Harness) -> String {
 fn a_claim_takes_space_only_while_browsing_and_right_only_at_the_end() {
     let mut harness = Harness::new(ClaimPalette, VIEW);
     harness.advance(ms(200));
-    for key in [Key::Char('a'), Key::Char('b'), Key::Space] {
+    for key in [
+        ShortcutKey::Char('a'),
+        ShortcutKey::Char('b'),
+        ShortcutKey::Space,
+    ] {
         harness.key(key);
         harness.advance(ms(20));
     }
     assert_eq!(query(&harness), "[ab ]", "typing, Space is typed");
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(20));
-    harness.key(Key::Space);
+    harness.key(ShortcutKey::Space);
     harness.advance(ms(20));
     assert_eq!(query(&harness), "[ab ]", "browsing, Space is the caller's");
     assert!(log(&harness).ends_with(" @end,pane"), "{}", log(&harness));
-    harness.key(Key::Left);
+    harness.key(ShortcutKey::Left);
     harness.advance(ms(20));
-    harness.key(Key::Right);
+    harness.key(ShortcutKey::Right);
     harness.advance(ms(20));
     assert!(
         log(&harness).ends_with("ArrowLeft@end,ArrowRight@inside"),
         "Right inside the text is the field's: {}",
         log(&harness)
     );
-    harness.key(Key::Right);
+    harness.key(ShortcutKey::Right);
     harness.advance(ms(20));
     assert!(
         log(&harness).ends_with("ArrowRight@end,show"),
@@ -397,7 +401,7 @@ fn width(harness: &Harness, selector: &str) -> f32 {
 }
 
 fn toggle(harness: &mut Harness) {
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     harness.advance(ms(60));
 }
 
@@ -490,20 +494,20 @@ fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
             .attr(".ds-emoji-cell[*|aria-selected=true]", "aria-label")
             .unwrap_or_default()
     };
-    let walk: &[(Key, &str)] = &[
-        (Key::Up, "cell 0"),
-        (Key::Right, "cell 1"),
-        (Key::Down, "cell 5"),
-        (Key::Down, "cell 9"),
-        (Key::Down, "cell 9"),
-        (Key::Left, "cell 8"),
+    let walk: &[(ShortcutKey, &str)] = &[
+        (ShortcutKey::Up, "cell 0"),
+        (ShortcutKey::Right, "cell 1"),
+        (ShortcutKey::Down, "cell 5"),
+        (ShortcutKey::Down, "cell 9"),
+        (ShortcutKey::Down, "cell 9"),
+        (ShortcutKey::Left, "cell 8"),
     ];
     for (step, (key, want)) in walk.iter().enumerate() {
         harness.key(*key);
         harness.advance(ms(20));
         assert_eq!(at(&harness), *want, "step {step}: {key:?}");
     }
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(20));
     assert_eq!(harness.text_of(".picked").as_deref(), Some("Some(28)"));
 }

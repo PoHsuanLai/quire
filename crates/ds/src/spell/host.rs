@@ -5,7 +5,7 @@
 //! draws nothing.
 
 use super::lang::Lang;
-use super::words::Span;
+use super::words::WordSpan;
 use crate::edit::host::Probe;
 use crate::edit::position::EditNode;
 use dioxus::prelude::MountedData;
@@ -24,7 +24,7 @@ pub struct Paragraph {
     /// Its own text: the text nodes whose nearest addressable ancestor it is, in order.
     pub text: String,
     /// Stretches never checked: text inside a `code`, `pre`, `kbd` or `samp` element.
-    pub skips: Vec<Span>,
+    pub skips: Vec<WordSpan>,
 }
 
 /// What became of a learned word.

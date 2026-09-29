@@ -9,7 +9,7 @@ use crate::core::time::clock::sleep;
 use crate::core::vocab::StaggerIndex;
 use crate::motion::anim::Anim;
 use crate::motion::settle::settle;
-use crate::style::env::{Env, use_env_signal};
+use crate::style::scope::{Scope, use_scope_signal};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -30,7 +30,7 @@ pub enum TimerPhase {
 pub struct MotionTimer {
     anim: Anim,
     phase: Signal<TimerPhase>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     task: Signal<Option<Task>>,
     scope: ScopeId,
 }
@@ -106,7 +106,7 @@ pub fn use_motion_timer(anim: Anim) -> MotionTimer {
     MotionTimer {
         anim,
         phase: use_signal(TimerPhase::default),
-        env: use_env_signal(),
+        env: use_scope_signal(),
         task: use_signal(|| None),
         scope: use_hook(current_scope_id),
     }

@@ -157,7 +157,7 @@ impl StaggerIndex {
 
 /// One key in a shortcut.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Key {
+pub enum ShortcutKey {
     /// Control, drawn `⌃`.
     Ctrl,
     /// Shift, drawn `⇧`.
@@ -225,7 +225,7 @@ impl GlyphKind {
 /// (design/04-COMPONENTS.md O-2). Bind a standard one with [`Shortcut::standard`] and an app's
 /// own with [`Shortcut::custom`], which refuses a reserved combination (design/27 section 6.2).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
-pub struct Shortcut(pub Vec<Key>);
+pub struct Shortcut(pub Vec<ShortcutKey>);
 
 impl Shortcut {
     /// The glyph text, modifiers in the Mac's order whatever order they were given in: `⌃⌥⇧⌘`,
@@ -236,20 +236,20 @@ impl Shortcut {
 
     /// The keys in the order they are drawn: modifiers first in the Mac's order (⌃⌥⇧⌘),
     /// deduplicated, then the rest as given.
-    pub fn keys(&self) -> Vec<Key> {
+    pub fn keys(&self) -> Vec<ShortcutKey> {
         crate::core::standard_action::normalized(self.0.iter().copied())
     }
 }
 
-impl Key {
+impl ShortcutKey {
     /// A modifier's place in the Mac's order (Control, Option, Shift, Command), or `None` for a
     /// key that is not a modifier.
     pub(crate) fn modifier_rank(self) -> Option<u8> {
         match self {
-            Key::Ctrl => Some(0),
-            Key::Alt => Some(1),
-            Key::Shift => Some(2),
-            Key::Super => Some(3),
+            ShortcutKey::Ctrl => Some(0),
+            ShortcutKey::Alt => Some(1),
+            ShortcutKey::Shift => Some(2),
+            ShortcutKey::Super => Some(3),
             _ => None,
         }
     }
@@ -260,27 +260,27 @@ impl Key {
     /// PageDown, Insert and ContextMenu need sign-off.
     pub(crate) fn glyph(self) -> String {
         match self {
-            Key::Ctrl => "⌃".to_string(),
-            Key::Shift => "⇧".to_string(),
-            Key::Alt => "⌥".to_string(),
-            Key::Super => "⌘".to_string(),
-            Key::Char(c) => c.to_uppercase().collect(),
-            Key::Space => "Space".to_string(),
-            Key::Enter => "↵".to_string(),
-            Key::Escape => "Esc".to_string(),
-            Key::Tab => "⇥".to_string(),
-            Key::Backspace => "⌫".to_string(),
-            Key::Up => "↑".to_string(),
-            Key::Down => "↓".to_string(),
-            Key::Left => "←".to_string(),
-            Key::Right => "→".to_string(),
-            Key::Home => "↖".to_string(),
-            Key::End => "↘".to_string(),
-            Key::Delete => "⌦".to_string(),
-            Key::PageUp => "⇞".to_string(),
-            Key::PageDown => "⇟".to_string(),
-            Key::Insert => "Ins".to_string(),
-            Key::ContextMenu => "Menu".to_string(),
+            ShortcutKey::Ctrl => "⌃".to_string(),
+            ShortcutKey::Shift => "⇧".to_string(),
+            ShortcutKey::Alt => "⌥".to_string(),
+            ShortcutKey::Super => "⌘".to_string(),
+            ShortcutKey::Char(c) => c.to_uppercase().collect(),
+            ShortcutKey::Space => "Space".to_string(),
+            ShortcutKey::Enter => "↵".to_string(),
+            ShortcutKey::Escape => "Esc".to_string(),
+            ShortcutKey::Tab => "⇥".to_string(),
+            ShortcutKey::Backspace => "⌫".to_string(),
+            ShortcutKey::Up => "↑".to_string(),
+            ShortcutKey::Down => "↓".to_string(),
+            ShortcutKey::Left => "←".to_string(),
+            ShortcutKey::Right => "→".to_string(),
+            ShortcutKey::Home => "↖".to_string(),
+            ShortcutKey::End => "↘".to_string(),
+            ShortcutKey::Delete => "⌦".to_string(),
+            ShortcutKey::PageUp => "⇞".to_string(),
+            ShortcutKey::PageDown => "⇟".to_string(),
+            ShortcutKey::Insert => "Ins".to_string(),
+            ShortcutKey::ContextMenu => "Menu".to_string(),
         }
     }
 
@@ -288,7 +288,9 @@ impl Key {
     /// needs no face rule of its own.
     pub(crate) fn glyph_kind(self) -> Option<GlyphKind> {
         match self {
-            Key::Up | Key::Down | Key::Left | Key::Right => Some(GlyphKind::Arrow),
+            ShortcutKey::Up | ShortcutKey::Down | ShortcutKey::Left | ShortcutKey::Right => {
+                Some(GlyphKind::Arrow)
+            }
             _ => None,
         }
     }

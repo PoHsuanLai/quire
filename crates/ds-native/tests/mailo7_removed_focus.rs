@@ -8,8 +8,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Button, ButtonVariant, Ds, InputVariant, Key, Material, Menu, MenuEntry,
-    MenuKind, MenuRow, MountedRef, Point, Press, Px, TextInput,
+    Anchor, Appearance, Button, ButtonVariant, Ds, InputVariant, Material, Menu, MenuEntry,
+    MenuKind, MenuRow, MountedRef, Point, Press, Px, ShortcutKey, TextInput,
 };
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
@@ -146,7 +146,7 @@ fn log(harness: &Harness) -> String {
 fn open_and_escape(harness: &mut Harness, open: impl FnOnce(&mut Harness)) {
     open(harness);
     settle_until(harness, |harness| harness.is_focused(".ds-menu"));
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     settle_until(harness, |harness| harness.count(".ds-menu") == 0);
 }
 
@@ -157,7 +157,7 @@ fn a_menu_opened_from_a_button_and_closed_with_escape_leaves_the_keyboard_in_the
     settle_until(&mut harness, |harness| {
         harness.is_focused(".bar .ds-button") || harness.is_focused(".app")
     });
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "key:j");
 }
 
@@ -166,9 +166,9 @@ fn a_menu_opened_by_a_key_on_the_app_gives_the_keyboard_back_to_the_app() {
     let mut harness = harness(at_point, FocusFallback::Ancestor);
     click(&mut harness, ".log");
     settle_until(&mut harness, |harness| harness.is_focused(".app"));
-    open_and_escape(&mut harness, |harness| harness.key(Key::Char('m')));
+    open_and_escape(&mut harness, |harness| harness.key(ShortcutKey::Char('m')));
     settle_until(&mut harness, |harness| harness.is_focused(".app"));
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "key:m,key:j");
 }
 
@@ -179,11 +179,11 @@ fn a_menu_anchored_to_an_element_gives_the_keyboard_back_to_it() {
     let mut harness = harness(to_button, FocusFallback::Ancestor);
     click(&mut harness, ".log");
     settle_until(&mut harness, |harness| harness.is_focused(".app"));
-    open_and_escape(&mut harness, |harness| harness.key(Key::Char('m')));
+    open_and_escape(&mut harness, |harness| harness.key(ShortcutKey::Char('m')));
     settle_until(&mut harness, |harness| {
         harness.is_focused(".bar .ds-button")
     });
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "key:m,key:j");
 }
 
@@ -194,7 +194,7 @@ fn with_blitz_default_the_focus_stays_nowhere_after_escape() {
     harness.advance(ms(100));
     assert!(!harness.is_focused(".app"));
     assert!(!harness.is_focused(".bar .ds-button"));
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "");
 }
 
@@ -203,10 +203,10 @@ fn a_field_removed_by_its_own_handler_leaves_the_keyboard_on_its_nearest_focusab
     let mut harness = harness(FieldPage, FocusFallback::Ancestor);
     click(&mut harness, ".wrap input");
     settle_until(&mut harness, |harness| harness.is_focused(".wrap input"));
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     settle_until(&mut harness, |harness| harness.is_focused(".pane"));
     assert_eq!(harness.count(".wrap input"), 0, "the field left");
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "key:Enter,key:j");
 }
 
@@ -215,10 +215,10 @@ fn with_blitz_default_a_removed_field_leaves_the_focus_nowhere() {
     let mut harness = harness(FieldPage, FocusFallback::BlitzDefault);
     click(&mut harness, ".wrap input");
     settle_until(&mut harness, |harness| harness.is_focused(".wrap input"));
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(100));
     assert_eq!(harness.count(".wrap input"), 0, "the field left");
     assert!(!harness.is_focused(".pane"));
-    harness.key(Key::Char('j'));
+    harness.key(ShortcutKey::Char('j'));
     assert_eq!(log(&harness), "key:Enter");
 }

@@ -8,8 +8,8 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Key, Material, MenuEntry,
-    PaletteEntrance, Rect, Retain, Shown, Trail,
+    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
+    MenuTrail, PaletteEntrance, Rect, Retain, ShortcutKey, Shown,
 };
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
@@ -32,7 +32,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }
@@ -117,7 +117,7 @@ fn a_palette_on_a_fresh_surface_reports_its_first_row_once_laid_out() {
     let first = rect(&harness, &nth_row(1));
     assert!(first.size.width.0 > 0.0 && first.size.height.0 > 0.0);
     assert_eq!(log(&harness), format!("select:0,rect:{}", show(first)));
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(100));
     let second = rect(&harness, &nth_row(2));
     assert!(
@@ -129,9 +129,9 @@ fn a_palette_on_a_fresh_surface_reports_its_first_row_once_laid_out() {
         "{}",
         log(&harness)
     );
-    harness.key(Key::Up);
+    harness.key(ShortcutKey::Up);
     harness.advance(ms(100));
-    harness.key(Key::Char('f'));
+    harness.key(ShortcutKey::Char('f'));
     harness.advance(ms(100));
     let moved = rect(&harness, &nth_row(1));
     assert!(
@@ -206,7 +206,7 @@ fn tab_keeps_the_field(page: fn() -> Element) -> bool {
         harness.is_focused("#card .ds-input"),
         "the field starts focused"
     );
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     harness.advance(ms(50));
     assert_eq!(
         harness.text_of(".tabs").as_deref(),
@@ -337,7 +337,7 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
         harness.is_focused("#card .ds-input"),
         "shown, it takes the keyboard"
     );
-    harness.key(Key::Char('f'));
+    harness.key(ShortcutKey::Char('f'));
     harness.advance(ms(110));
     assert_eq!(harness.text_of(".query").as_deref(), Some("[f]"));
     toggle(&mut harness);
@@ -403,7 +403,7 @@ fn a_kept_palette_can_retain_its_query() {
     harness.advance(ms(100));
     toggle(&mut harness);
     harness.advance(ms(100));
-    harness.key(Key::Char('f'));
+    harness.key(ShortcutKey::Char('f'));
     harness.advance(ms(50));
     toggle(&mut harness);
     harness.advance(ms(100));

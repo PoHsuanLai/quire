@@ -994,8 +994,8 @@ mod hook {
     use dioxus::core::{NoOpMutations, VirtualDom};
     use dioxus::prelude::*;
     use ds::{
-        Accent, BlurState, Emphasis, Env, Exit, InputModality, Material, MotionLevel, Presence,
-        Resolved, Roster, Scheme, use_roster,
+        Accent, BlurState, Emphasis, Exit, InputModality, Material, MotionLevel, Presence,
+        Resolved, Roster, Scheme, Scope, use_roster,
     };
     use std::cell::Cell;
     use std::future::Future;
@@ -1017,7 +1017,7 @@ mod hook {
                 accent: Accent::Postmark,
                 motion: MotionLevel::Standard,
             };
-            Signal::new(Env {
+            Signal::new(Scope {
                 resolved,
                 scheme: resolved.scheme,
                 material: Material::Window,

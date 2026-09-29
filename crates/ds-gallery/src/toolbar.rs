@@ -8,8 +8,8 @@ use crate::registry;
 use dioxus::prelude::*;
 use ds::{
     Accent, Anchor, Availability, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu,
-    MenuEntry, MenuKind, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch, Tabs, Theme,
-    Toggle, Trail, Typeface,
+    MenuEntry, MenuKind, MenuTrail, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch,
+    Tabs, Theme, Toggle, Typeface,
 };
 
 /// The toolbar.
@@ -138,7 +138,7 @@ fn Choice<T: Clone + PartialEq + 'static>(
             title: name.clone(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: Some(if *option == value {
                 Check::Checked
             } else {

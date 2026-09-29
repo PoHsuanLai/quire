@@ -4,12 +4,12 @@ use dioxus::prelude::*;
 use ds::detail::{Deadline, Operation, PendingToken};
 use ds::{
     Anim, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize,
-    ButtonVariant, Chip, ChipVariant, Colour, Count, CountPlace, ExternalIcon, Focus, HeaderKind,
-    Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView,
-    InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
+    ButtonVariant, Chip, ChipVariant, Colour, Count, CountPlace, ExternalIcon, FieldFocus,
+    HeaderKind, Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl,
+    IconView, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
     SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
-use ds::{Availability, Fraction, Key, PulseKey, Shortcut, Switch};
+use ds::{Availability, Fraction, PulseKey, Shortcut, ShortcutKey, Switch};
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {
@@ -282,7 +282,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "text_input",
         state: "focus-on-mount",
-        make: || rsx! { TextInput { variant: InputVariant::Inline, label: "Link", value: "", placeholder: "Paste a link", focus: Focus::OnMount, oninput: |_| {} } },
+        make: || rsx! { TextInput { variant: InputVariant::Inline, label: "Link", value: "", placeholder: "Paste a link", focus: FieldFocus::OnMount, oninput: |_| {} } },
     },
     // SearchField: empty, and typed with tokens.
     Case {
@@ -299,17 +299,17 @@ pub const CASES: &[Case] = &[
     Case {
         component: "kbd",
         state: "regular",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Super, Key::Char('k')]) } },
+        make: || rsx! { Kbd { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]) } },
     },
     Case {
         component: "kbd",
         state: "small",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Ctrl, Key::Super, Key::Char('s')]), size: KbdSize::Small } },
+        make: || rsx! { Kbd { shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Super, ShortcutKey::Char('s')]), size: KbdSize::Small } },
     },
     Case {
         component: "kbd",
         state: "modifiers",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![Key::Super, Key::Shift, Key::Alt, Key::Ctrl, Key::Enter]) } },
+        make: || rsx! { Kbd { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Shift, ShortcutKey::Alt, ShortcutKey::Ctrl, ShortcutKey::Enter]) } },
     },
     // Chip: every variant, the removable person, a pulse at rest.
     Case {

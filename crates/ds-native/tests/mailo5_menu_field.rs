@@ -5,7 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Ds, Filter, Key, Material, Menu, MenuEntry, MenuKind, MenuRow, Point, Px,
+    Anchor, Appearance, Ds, Material, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow, Point, Px,
+    ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -38,7 +39,7 @@ fn Page() -> Element {
                         .enumerate()
                         .map(|(value, name)| MenuEntry::Row(MenuRow::new(value, name)))
                         .collect::<Vec<_>>(),
-                    filter: Filter::Field { placeholder: "Filter labels…".to_string() },
+                    filter: MenuFilter::Field { placeholder: "Filter labels…".to_string() },
                     onquery: move |query: String| log.with_mut(|log| log.push(format!("query:{query}"))),
                     onpick: move |value: usize| log.with_mut(|log| log.push(format!("pick:{}", LABELS[value]))),
                     onclose: move |_| open.set(false),
@@ -80,8 +81,8 @@ fn the_typed_query_shows_in_the_field_and_filters_the_rows() {
         "the field sits above the rows: {field:?} {first:?}"
     );
 
-    harness.key(Key::Char('r'));
-    harness.key(Key::Char('e'));
+    harness.key(ShortcutKey::Char('r'));
+    harness.key(ShortcutKey::Char('e'));
     harness.advance(ms(50));
     assert_eq!(
         harness.text_of(".ds-menu-filter-text").as_deref(),
@@ -101,8 +102,8 @@ fn the_typed_query_shows_in_the_field_and_filters_the_rows() {
     );
     assert_eq!(harness.attr(".ds-menu-filter", "aria-selected"), None);
 
-    harness.key(Key::Backspace);
-    harness.key(Key::Char('c'));
+    harness.key(ShortcutKey::Backspace);
+    harness.key(ShortcutKey::Char('c'));
     harness.advance(ms(50));
     assert_eq!(
         harness.text_of(".ds-menu-filter-text").as_deref(),
@@ -113,7 +114,7 @@ fn the_typed_query_shows_in_the_field_and_filters_the_rows() {
         harness.text_of(".ds-menu-item .ds-menu-title").as_deref(),
         Some("Receipts")
     );
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(300));
     assert_eq!(
         log(&harness),

@@ -10,7 +10,7 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Appearance, Button, ButtonVariant, Ds, Icon, ImageSize, ImageSource, Inject, Material,
-    ShotGhost, ShotThumbnail, Shown, Swipe, Theme, ThumbAction,
+    NotificationSwipe, ShotGhost, ShotThumbnail, Shown, Theme, ThumbAction,
 };
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
@@ -96,7 +96,7 @@ fn ShotScene(theme: Theme) -> Element {
                         shown: shown(),
                         actions,
                         id: "thumb",
-                        swipe: Swipe::Dismiss(EventHandler::new(move |()| shown.set(Shown::Hidden))),
+                        swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| shown.set(Shown::Hidden))),
                     }
                     ShotThumbnail { image: tall, size: PORTRAIT, shown: Shown::Visible }
                     ShotGhost { image: wide, size: DESKTOP }

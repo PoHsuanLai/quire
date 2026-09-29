@@ -13,9 +13,9 @@ use ds::{
     AccountFace, AccountTile, AddAccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape,
     AvatarSize, AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count,
     Expanded, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource, Kbd,
-    KbdSize, Key, LabelHue, MarkSize, MarkStyle, PersonHue, Provider, ProviderMark, SectionHeader,
-    SegSize, SegmentedControl, Shortcut, Slider, Spinner, SpinnerKind, Switch, SyncHalo, SyncState,
-    Tabs, Toggle, Verdict, use_pulse,
+    KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, ProviderMark, SectionHeader,
+    SegSize, SegmentedControl, Shortcut, ShortcutKey, Slider, Spinner, SpinnerKind, Switch,
+    SyncHalo, SyncState, Tabs, Toggle, Verdict, use_pulse,
 };
 
 const BUTTONS: [(ButtonVariant, &str); 5] = [
@@ -41,14 +41,14 @@ const BUTTON_STATES: [(&str, Option<Switch>, Availability); 4] = [
     ("disabled", None, Availability::Disabled),
 ];
 
-const PROVIDERS: [Provider; 7] = [
-    Provider::Google,
-    Provider::Microsoft,
-    Provider::Fastmail,
-    Provider::ICloud,
-    Provider::Yahoo,
-    Provider::Imap,
-    Provider::Local,
+const PROVIDERS: [MarkProvider; 7] = [
+    MarkProvider::Google,
+    MarkProvider::Microsoft,
+    MarkProvider::Fastmail,
+    MarkProvider::ICloud,
+    MarkProvider::Yahoo,
+    MarkProvider::Imap,
+    MarkProvider::Local,
 ];
 
 const AVATAR_SIZES: [AvatarSize; 8] = [
@@ -121,10 +121,10 @@ fn Buttons() -> Element {
         }
         Section { title: "CommandPill and Kbd",
             div { class: "g-row",
-                CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![Key::Super, Key::Char('k')]), onclick: |_| {} }
-                Kbd { shortcut: Shortcut(vec![Key::Shift, Key::Super, Key::Char('p')]) }
-                Kbd { shortcut: Shortcut(vec![Key::Super, Key::Enter]), size: KbdSize::Small }
-                Kbd { shortcut: Shortcut(vec![Key::Escape, Key::Tab, Key::Backspace, Key::Up, Key::Down, Key::Left, Key::Right, Key::Space]), size: KbdSize::Small }
+                CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]), onclick: |_| {} }
+                Kbd { shortcut: Shortcut(vec![ShortcutKey::Shift, ShortcutKey::Super, ShortcutKey::Char('p')]) }
+                Kbd { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Enter]), size: KbdSize::Small }
+                Kbd { shortcut: Shortcut(vec![ShortcutKey::Escape, ShortcutKey::Tab, ShortcutKey::Backspace, ShortcutKey::Up, ShortcutKey::Down, ShortcutKey::Left, ShortcutKey::Right, ShortcutKey::Space]), size: KbdSize::Small }
             }
         }
     }
@@ -301,10 +301,10 @@ fn Marks() -> Element {
             }
             div { class: "g-row",
                 AccountTile { account: AccountFace::All, pressed: Switch::On, unread: 12, onclick: |_| {} }
-                AccountTile { account: one('P', Provider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(match pressed() { Switch::On => Switch::Off, Switch::Off => Switch::On }) }
-                AccountTile { account: one('W', Provider::Microsoft), pressed: Switch::Off, unread: 0, onclick: |_| {} }
-                AccountTile { account: one('G', Provider::Google), pressed: Switch::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
-                AccountTile { account: one('L', Provider::Local), pressed: Switch::On, unread: 1, onclick: |_| {} }
+                AccountTile { account: one('P', MarkProvider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(match pressed() { Switch::On => Switch::Off, Switch::Off => Switch::On }) }
+                AccountTile { account: one('W', MarkProvider::Microsoft), pressed: Switch::Off, unread: 0, onclick: |_| {} }
+                AccountTile { account: one('G', MarkProvider::Google), pressed: Switch::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
+                AccountTile { account: one('L', MarkProvider::Local), pressed: Switch::On, unread: 1, onclick: |_| {} }
                 AddAccountTile { title: "Add account…", onclick: |_| {} }
             }
         }

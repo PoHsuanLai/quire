@@ -22,7 +22,7 @@
 
 use crate::components::content::icon_view::IconView;
 use crate::components::content::rich_text::Rich;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
@@ -31,7 +31,7 @@ use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::notifications::body::NotificationBody;
 use crate::shell::notifications::parts::{AppMark, CardAction, GroupCount, Hover};
-use crate::shell::notifications::swipe::{Swipe, use_card_swipe};
+use crate::shell::notifications::swipe::{NotificationSwipe, use_card_swipe};
 use crate::style::appearance::material::Material;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconPx, IconSize};
@@ -47,8 +47,8 @@ use dioxus::prelude::*;
 #[component]
 pub fn NotificationCard(
     app: AppMark,
-    #[props(into)] age: Text,
-    #[props(into)] summary: Text,
+    #[props(into)] age: TextLine,
+    #[props(into)] summary: TextLine,
     #[props(default)] body: Option<Rich>,
     #[props(default)] count: Option<GroupCount>,
     #[props(default)] actions: Vec<CardAction>,
@@ -59,7 +59,7 @@ pub fn NotificationCard(
     #[props(default = Material::Toast)] material: Material,
     #[props(default = IconPx(32))] icon_size: IconPx,
     #[props(default)] id: Option<String>,
-    #[props(default)] swipe: Swipe,
+    #[props(default)] swipe: NotificationSwipe,
     #[props(default)] swipe_metrics: SwipeMetrics,
 ) -> Element {
     let swiper = use_card_swipe(&swipe, swipe_metrics);
@@ -144,7 +144,7 @@ fn opens(key: &Key) -> bool {
 }
 
 /// The first line: the summary, the group's count from two, and the age.
-fn head(summary: &Text, age: &Text, count: Option<GroupCount>) -> Element {
+fn head(summary: &TextLine, age: &TextLine, count: Option<GroupCount>) -> Element {
     let shown = count.map(|group| group.count).filter(|&count| count > 1);
     rsx! {
         div { class: "ds-notification-head",

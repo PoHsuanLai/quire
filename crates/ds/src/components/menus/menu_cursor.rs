@@ -8,7 +8,7 @@ use crate::core::vocab::Availability;
 
 /// Whose highlight a menu shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Cursor {
+pub enum MenuCursor {
     /// The menu's own: Up and Down, the pointer and a submenu's rest move it, and the menu takes
     /// the keyboard when it opens.
     #[default]
@@ -22,14 +22,14 @@ pub enum Cursor {
 /// The highlighted choice among `live`: the menu's own `selection` settled onto an enabled
 /// choice, or the caller's, clamped to the last choice. `None` when nothing is highlighted.
 pub(crate) fn highlighted(
-    cursor: Cursor,
+    cursor: MenuCursor,
     selection: usize,
     live: &[Availability],
 ) -> Option<usize> {
     let last = live.len().checked_sub(1)?;
     match cursor {
-        Cursor::Auto => Some(settled(selection, live)),
-        Cursor::Controlled(index) => index.map(|index| index.min(last)),
+        MenuCursor::Auto => Some(settled(selection, live)),
+        MenuCursor::Controlled(index) => index.map(|index| index.min(last)),
     }
 }
 
@@ -49,16 +49,16 @@ pub(crate) fn seed(act: &KeyAct, count: usize) -> Option<usize> {
     }
 }
 
-impl Cursor {
+impl MenuCursor {
     /// Whether the menu takes the keyboard as it opens: not while a field beside it drives it.
     pub(crate) fn takes_focus(self) -> bool {
-        matches!(self, Cursor::Auto)
+        matches!(self, MenuCursor::Auto)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Cursor, highlighted, seed};
+    use super::{MenuCursor, highlighted, seed};
     use crate::components::menus::menu_lines::{KeyAct, Step};
     use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
 
@@ -66,16 +66,16 @@ mod tests {
     fn the_highlight_is_the_menus_own_or_the_callers() {
         // (cursor, own selection, live, want)
         #[rustfmt::skip]
-        let cases: &[(Cursor, usize, &[_], Option<usize>)] = &[
-            (Cursor::Auto, 0, &[D, E], Some(1)),
-            (Cursor::Auto, 1, &[E, E], Some(1)),
-            (Cursor::Controlled(Some(0)), 1, &[E, E], Some(0)),
+        let cases: &[(MenuCursor, usize, &[_], Option<usize>)] = &[
+            (MenuCursor::Auto, 0, &[D, E], Some(1)),
+            (MenuCursor::Auto, 1, &[E, E], Some(1)),
+            (MenuCursor::Controlled(Some(0)), 1, &[E, E], Some(0)),
             // The caller's is shown as asked, disabled or not, clamped to the list.
-            (Cursor::Controlled(Some(0)), 1, &[D, E], Some(0)),
-            (Cursor::Controlled(Some(9)), 0, &[E, E, E], Some(2)),
-            (Cursor::Controlled(None), 1, &[E, E], None),
-            (Cursor::Auto, 0, &[], None),
-            (Cursor::Controlled(Some(0)), 0, &[], None),
+            (MenuCursor::Controlled(Some(0)), 1, &[D, E], Some(0)),
+            (MenuCursor::Controlled(Some(9)), 0, &[E, E, E], Some(2)),
+            (MenuCursor::Controlled(None), 1, &[E, E], None),
+            (MenuCursor::Auto, 0, &[], None),
+            (MenuCursor::Controlled(Some(0)), 0, &[], None),
         ];
         for &(cursor, selection, live, want) in cases {
             assert_eq!(
@@ -92,7 +92,7 @@ mod tests {
         assert_eq!(seed(&KeyAct::Move(Step::Up), 3), Some(0));
         assert_eq!(seed(&KeyAct::Pick, 3), None);
         assert_eq!(seed(&KeyAct::Move(Step::Down), 0), None);
-        assert!(Cursor::Auto.takes_focus());
-        assert!(!Cursor::Controlled(None).takes_focus());
+        assert!(MenuCursor::Auto.takes_focus());
+        assert!(!MenuCursor::Controlled(None).takes_focus());
     }
 }

@@ -20,7 +20,7 @@
 
 use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::shot_frame::{picture_style, shot_frame};
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::controls::press::Propagation;
 use crate::components::overlays::osd_phase::OsdPhase;
@@ -33,7 +33,7 @@ use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::notifications::parts::Hover;
-use crate::shell::notifications::swipe::{CardSwipe, Swipe, use_card_swipe};
+use crate::shell::notifications::swipe::{CardSwipe, NotificationSwipe, use_card_swipe};
 use crate::shell::thumbs::shot_press::{DragLane, DragStart, PressInput, ShotPress};
 use crate::style::appearance::material::Material;
 use crate::style::icon::Icon;
@@ -46,7 +46,7 @@ pub struct ThumbAction {
     /// Its glyph.
     pub icon: Icon,
     /// Its name, read as the button's label.
-    pub label: Text,
+    pub label: TextLine,
     /// What a press does.
     pub onpress: EventHandler<()>,
 }
@@ -67,7 +67,7 @@ pub fn ShotThumbnail(
     #[props(default)] ondrag: Option<EventHandler<DragStart>>,
     #[props(default)] onhover: Option<EventHandler<Hover>>,
     #[props(default)] id: Option<String>,
-    #[props(default)] swipe: Swipe,
+    #[props(default)] swipe: NotificationSwipe,
     #[props(default)] swipe_metrics: SwipeMetrics,
 ) -> Element {
     let (phase, alias) = use_shown_phase(shown, on_hidden, Anim::ShotIn, Anim::ShotOut);
@@ -108,12 +108,12 @@ fn ShotCard(
     ondrag: Option<EventHandler<DragStart>>,
     onhover: Option<EventHandler<Hover>>,
     id: Option<String>,
-    swipe: Swipe,
+    swipe: NotificationSwipe,
     swipe_metrics: SwipeMetrics,
 ) -> Element {
     let lane = match swipe {
-        Swipe::Dismiss(_) => DragLane::NotRight,
-        Swipe::Off => DragLane::Any,
+        NotificationSwipe::Dismiss(_) => DragLane::NotRight,
+        NotificationSwipe::Off => DragLane::Any,
     };
     let swiper = use_card_swipe(&swipe, swipe_metrics);
     let press = use_signal(ShotPress::default);

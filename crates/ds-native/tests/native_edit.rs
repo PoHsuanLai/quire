@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, Composition, Ds, EditFocus, EditHandle, EditInput, EditPointer, EditSurface,
-    ImeSwitch, Key, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect, Size,
+    ImeSwitch, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect, ShortcutKey, Size,
     TextPosition, TextRange, use_edit_handle,
 };
 use ds_native::{Harness, Viewport};
@@ -129,10 +129,10 @@ fn a_click_focuses_the_surface_and_switches_the_ime_on() {
 #[test]
 fn typed_keys_arrive_as_text_and_keys_in_order() {
     let mut harness = focused();
-    harness.key(Key::Char('h'));
-    harness.key(Key::Char('i'));
-    harness.key(Key::Enter);
-    harness.chord(&[Key::Ctrl], Key::Char('b'));
+    harness.key(ShortcutKey::Char('h'));
+    harness.key(ShortcutKey::Char('i'));
+    harness.key(ShortcutKey::Enter);
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('b'));
     assert_eq!(
         heard(),
         vec![
@@ -175,7 +175,7 @@ fn a_composition_arrives_as_start_updates_and_end_in_order() {
             }),
         ]
     );
-    harness.key(Key::Char('x'));
+    harness.key(ShortcutKey::Char('x'));
     assert_eq!(
         heard(),
         vec![EditInput::Text("x".to_owned())],
@@ -188,7 +188,7 @@ fn keys_while_composing_belong_to_the_ime() {
     let mut harness = focused();
     harness.ime_update("ka", 2);
     heard();
-    harness.key(Key::Char('n'));
+    harness.key(ShortcutKey::Char('n'));
     assert_eq!(heard(), Vec::new());
 }
 
@@ -204,13 +204,13 @@ fn a_paste_carries_the_clipboards_html_and_its_text() {
         })]
     );
     harness.set_clipboard_text("plain");
-    harness.chord(&[Key::Ctrl], Key::Char('v'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v'));
     assert_eq!(
         heard(),
         vec![EditInput::Paste(Pasted::Text("plain".to_owned()))]
     );
-    harness.chord(&[Key::Ctrl], Key::Char('c'));
-    harness.chord(&[Key::Ctrl], Key::Char('x'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('x'));
     assert_eq!(heard(), vec![EditInput::Copy, EditInput::Cut]);
 }
 
@@ -436,7 +436,7 @@ fn the_ime_cursor_area_follows_what_the_app_sets() {
     harness.click(into);
     harness.advance(ms(50));
     assert_eq!(harness.ime_cursor_area(), Some(rect(10.0, 12.0)));
-    harness.key(Key::Char('a'));
+    harness.key(ShortcutKey::Char('a'));
     harness.advance(ms(50));
     assert_eq!(harness.ime_cursor_area(), Some(rect(40.0, 32.0)));
 }

@@ -3,7 +3,7 @@
 
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::fields::text_input::InputVariant;
-use crate::components::fields::text_input_focus::{FieldFocus, Focus};
+use crate::components::fields::text_input_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_input_kind::{Rows, TextInputKind};
 use crate::components::fields::text_input_mask::{CaretMark, MaskCaret, MaskParts};
 use crate::core::vocab::Availability;
@@ -27,8 +27,8 @@ pub(crate) struct Field {
     pub label: String,
     pub placeholder: String,
     pub availability: Availability,
-    pub focus: Focus,
-    pub focuser: FieldFocus,
+    pub focus: FieldFocus,
+    pub focuser: FieldFocuser,
     /// A masked field's own caret over its dots.
     pub caret: MaskCaret,
     pub handlers: Handlers,

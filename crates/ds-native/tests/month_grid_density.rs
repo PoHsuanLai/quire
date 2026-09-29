@@ -11,7 +11,7 @@ mod month_sample;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Material, MonthGrid, Rect, RootChrome, Step, WeekNumbers, WidgetFrame,
+    Appearance, Ds, Material, MonthGrid, MonthStep, Rect, RootChrome, WeekNumbers, WidgetFrame,
     WidgetMetrics, WidgetSize,
 };
 use ds_native::{Harness, Viewport};
@@ -34,7 +34,7 @@ fn SmallCalendar() -> Element {
                     MonthGrid {
                         data: sample(AUGUST, First::Monday),
                         weeks: WeekNumbers::Show,
-                        onstep: move |_: Step| {},
+                        onstep: move |_: MonthStep| {},
                     }
                 }
             }
@@ -188,7 +188,7 @@ fn SmallSeptember() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: WidgetMetrics::default().style_attr(),
                 WidgetFrame { size: WidgetSize::Small,
-                    MonthGrid { data: sample(SEPTEMBER, First::Monday), onstep: move |_: Step| {} }
+                    MonthGrid { data: sample(SEPTEMBER, First::Monday), onstep: move |_: MonthStep| {} }
                 }
             }
         }
@@ -235,7 +235,7 @@ fn WrappedSmallCalendar() -> Element {
                         MonthGrid {
                             data: sample(AUGUST, First::Monday),
                             weeks: WeekNumbers::Show,
-                            onstep: move |_: Step| {},
+                            onstep: move |_: MonthStep| {},
                         }
                     }
                 }

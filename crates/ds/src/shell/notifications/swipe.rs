@@ -18,7 +18,7 @@ use crate::motion::anim::Anim;
 use crate::motion::detail::touch::{Contact, Touch};
 use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
 use crate::motion::timer::use_motion_timer;
-use crate::motion::use_swipe::{Held, Swiper, use_swipe};
+use crate::motion::use_swipe::{SwipeHold, Swiper, use_swipe};
 use crate::motion::{
     spring_spec::SpringSpec,
     use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
@@ -31,7 +31,7 @@ use dioxus::prelude::*;
 
 /// Whether a card can be swiped away, and who hears it.
 #[derive(Debug, Clone, PartialEq, Default)]
-pub enum Swipe {
+pub enum NotificationSwipe {
     /// It cannot (a row of the center that the caller dismisses otherwise).
     #[default]
     Off,
@@ -41,7 +41,7 @@ pub enum Swipe {
 }
 
 /// Marks a card as carried by a `BannerStack` row, whose own exit flies it out; the card marks
-/// the row's flight `Swipe` when it goes, so the row leaves along the swipe rather than by the
+/// the row's flight `NotificationSwipe` when it goes, so the row leaves along the swipe rather than by the
 /// stack's entry edge.
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) struct Carried(pub(crate) Signal<Flight>);
@@ -52,7 +52,7 @@ pub(crate) enum Flight {
     /// Back past the edge it entered by (the caller dropped it: a timeout, a close).
     Edge,
     /// To the right, the way its card was swiped.
-    Swipe,
+    NotificationSwipe,
 }
 
 impl Flight {
@@ -60,7 +60,7 @@ impl Flight {
     pub(crate) fn slug(self) -> Option<&'static str> {
         match self {
             Flight::Edge => None,
-            Flight::Swipe => Some("swipe"),
+            Flight::NotificationSwipe => Some("swipe"),
         }
     }
 }
@@ -124,18 +124,18 @@ enum SwipeOn {
 
 /// The card's swipe. Hooks run whether or not the swipe is on, so the card's hook order never
 /// changes with its props.
-pub(crate) fn use_card_swipe(swipe: &Swipe, metrics: SwipeMetrics) -> CardSwipe {
+pub(crate) fn use_card_swipe(swipe: &NotificationSwipe, metrics: SwipeMetrics) -> CardSwipe {
     let flight = use_motion_timer(Anim::BannerOut);
     let carried = try_use_context::<Carried>();
     let heard = match swipe {
-        Swipe::Dismiss(handler) => Some(*handler),
-        Swipe::Off => None,
+        NotificationSwipe::Dismiss(handler) => Some(*handler),
+        NotificationSwipe::Off => None,
     };
     let on_dismiss = EventHandler::new(move |()| {
         let Some(heard) = heard else { return };
         match carried {
             Some(Carried(mut flight)) => {
-                flight.set(Flight::Swipe);
+                flight.set(Flight::NotificationSwipe);
                 heard.call(());
             }
             None => flight.start(EventHandler::new(move |()| heard.call(()))),
@@ -193,9 +193,9 @@ impl CardSwipe {
     pub(crate) fn moved(&self, event: &PointerEvent) {
         if let Some(swiper) = self.live() {
             let held = if event.held_buttons().contains(MouseButton::Primary) {
-                Held::Primary
+                SwipeHold::Primary
             } else {
-                Held::Nothing
+                SwipeHold::Nothing
             };
             let x = Px(event.client_coordinates().x as f32);
             let mut meter = self.back.meter;

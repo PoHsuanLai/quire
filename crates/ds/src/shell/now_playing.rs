@@ -9,11 +9,11 @@ pub(crate) mod track_position;
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::motion::detail::level::use_level;
 use crate::motion::detail::{
     first_show::FirstShow,
-    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     touch::Touch,
     use_detail::use_detail,
     use_operation::use_operation,
@@ -34,8 +34,8 @@ use dioxus::prelude::*;
 #[derive(Debug, Clone, PartialEq)]
 struct Face {
     art: Option<IconSource>,
-    title: Text,
-    by: Option<Text>,
+    title: TextLine,
+    by: Option<TextLine>,
 }
 
 /// The face shown, the one it replaced while the cross-fade plays, and which change it is.
@@ -49,7 +49,7 @@ struct Faces {
 /// The art's breath: one step a half, as the Spinner's Breathe.
 const BREATHE: PendingSpec = PendingSpec {
     style: PendingStyle::Breathe,
-    layers: Layers(1),
+    layers: PendingLayers(1),
 };
 
 /// The track's art (48 px, or the Now Playing glyph on a plain well when there is none), its
@@ -57,8 +57,8 @@ const BREATHE: PendingSpec = PendingSpec {
 #[component]
 pub fn NowPlayingTrack(
     #[props(default)] art: Option<IconSource>,
-    #[props(into)] title: Text,
-    #[props(default)] by: Option<Text>,
+    #[props(into)] title: TextLine,
+    #[props(default)] by: Option<TextLine>,
     #[props(default)] playback: Playback,
 ) -> Element {
     let face = Face { art, title, by };

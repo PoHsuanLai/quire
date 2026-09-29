@@ -6,8 +6,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Key, Material, MenuEntry,
-    Rect, Trail, use_focus_request,
+    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
+    MenuTrail, Rect, ShortcutKey, use_focus_request,
 };
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::RefCell;
@@ -107,7 +107,7 @@ fn Mounting() -> Element {
                 ds::focus_soon(event.data());
                 mounts += 1;
             },
-            "Key target"
+            "ShortcutKey target"
         }
     }
 }
@@ -188,7 +188,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }
@@ -236,7 +236,7 @@ fn the_palette_reports_the_newly_selected_row_in_the_frame_it_was_selected() {
     harness.advance(ms(300));
     let first = harness.rect(&nth_row(1)).expect("the first row");
     assert_eq!(reported(&mut harness), Some(first));
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     let second = harness.rect(&nth_row(2)).expect("the second row");
     assert!(second.origin.y.0 > first.origin.y.0);
     assert_eq!(

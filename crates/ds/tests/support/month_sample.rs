@@ -6,8 +6,8 @@
 #![allow(dead_code)]
 
 use ds::{
-    DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
-    Step, Text,
+    DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthStep,
+    MonthWeek, TextLine,
 };
 
 /// Which weekday the rows start on.
@@ -78,11 +78,11 @@ fn iso_week(thursday: i64) -> IsoWeek {
 }
 
 /// The month after or before `month`.
-pub fn shift(month: MonthKey, step: Step) -> MonthKey {
+pub fn shift(month: MonthKey, step: MonthStep) -> MonthKey {
     let index = i32::from(month.year) * 12 + i32::from(month.month) - 1;
     let index = match step {
-        Step::Previous => index - 1,
-        Step::Next => index + 1,
+        MonthStep::Previous => index - 1,
+        MonthStep::Next => index + 1,
     };
     MonthKey {
         year: i16::try_from(index.div_euclid(12)).expect("a sample year fits"),
@@ -97,7 +97,7 @@ pub fn month(month: MonthKey, first: First, today: DayKey, busy: &[DayKey]) -> M
         month: month.month,
         day: 1,
     });
-    let end = days(shift(month, Step::Next).first()) - 1;
+    let end = days(shift(month, MonthStep::Next).first()) - 1;
     let lead = match first {
         First::Monday => weekday(start),
         First::Sunday => (weekday(start) + 1) % 7,
@@ -122,7 +122,7 @@ pub fn month(month: MonthKey, first: First, today: DayKey, busy: &[DayKey]) -> M
         .collect();
     MonthGridData {
         month,
-        title: Text::from(format!(
+        title: TextLine::from(format!(
             "{} {}",
             NAMES[usize::try_from(month.month - 1).expect("1-12")],
             month.year
@@ -154,14 +154,14 @@ fn cell(z: i64, start: i64, end: i64, today: DayKey, busy: &[DayKey]) -> MonthDa
     }
 }
 
-fn heads(first: First) -> [Text; 7] {
+fn heads(first: First) -> [TextLine; 7] {
     let monday = ["M", "T", "W", "T", "F", "S", "S"];
     std::array::from_fn(|at| {
         let at = match first {
             First::Monday => at,
             First::Sunday => (at + 6) % 7,
         };
-        Text::from(monday[at])
+        TextLine::from(monday[at])
     })
 }
 

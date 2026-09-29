@@ -9,8 +9,9 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds,
-    EmojiId, Icon, IconSource, Key, LockPrompt, LockUser, Material, MotionLevel, PlateFamily,
-    PolkitPrompt, PromptState, Px, RootChrome, StaggerIndex, SwitcherApp, person_hue, settle,
+    EmojiId, Icon, IconSource, LockPrompt, LockUser, Material, MotionLevel, PlateFamily,
+    PolkitPrompt, PromptState, Px, RootChrome, ShortcutKey, StaggerIndex, SwitcherApp, person_hue,
+    settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -95,7 +96,7 @@ fn Polkit() -> Element {
 /// Type `text` into the focused field, one key at a time, letting each render land.
 fn type_text(harness: &mut Harness, text: &str) {
     for c in text.chars() {
-        harness.key(Key::Char(c));
+        harness.key(ShortcutKey::Char(c));
         harness.advance(ms(20));
     }
 }
@@ -325,7 +326,7 @@ fn enter_hands_the_secret_to_onsubmit_and_never_writes_it() {
         "the secret is not in the markup"
     );
     let before = harness.within(|| SUBMITTED.peek().len());
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| SUBMITTED.peek().clone()),
@@ -359,7 +360,7 @@ fn escape_empties_the_field() {
     let mut harness = mounted(Lock);
     type_text(&mut harness, "abc");
     assert_eq!(dots(&harness, ".ds-lock-field").as_deref(), Some("•••"));
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     harness.advance(ms(40));
     assert_eq!(dots(&harness, ".ds-lock-field"), None);
     assert_eq!(
@@ -389,7 +390,7 @@ fn checking_closes_the_field() {
         heard,
         "no input while checking"
     );
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(20));
     assert!(
         harness.within(|| SUBMITTED.peek().is_empty()),
@@ -410,7 +411,7 @@ fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
         harness.advance(ms(30));
     }
     type_text(&mut harness, "pw");
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| SUBMITTED.peek().clone()),
@@ -441,7 +442,7 @@ fn escape_in_the_polkit_field_cancels() {
     }
     type_text(&mut harness, "pw");
     let before = harness.within(|| *CANCELLED.peek());
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     harness.advance(ms(30));
     assert_eq!(harness.within(|| *CANCELLED.peek()), before + 1);
     assert!(harness.within(|| SUBMITTED.peek().is_empty()));

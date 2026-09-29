@@ -9,7 +9,7 @@
 //! sun or a moon beside the city. The hand angles are `clock_angles.rs`; the parts
 //! `clock_dial.rs`.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::bump_on::{bump_attrs, use_bump_on};
 use crate::shell::clock::angles::hands;
 use crate::shell::clock::dial::{hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg};
@@ -23,7 +23,7 @@ pub fn ClockFace(
     time: ClockTime,
     #[props(default)] phase: DayPhase,
     #[props(default)] look: ClockLook,
-    #[props(into)] label: Text,
+    #[props(into)] label: TextLine,
 ) -> Element {
     let (face, mark) = match look {
         ClockLook::Analog => (rsx! { AnalogDial { time } }, None),

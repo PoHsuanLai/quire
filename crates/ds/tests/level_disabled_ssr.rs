@@ -41,7 +41,7 @@ fn rooted(body: Element) -> Element {
 
 fn panel(availability: Availability) -> Element {
     rooted(rsx! {
-        ModulePanel { glyph: Some(Icon::Sun), title: Some(ds::Text::from("Display")), trailing: rsx! { "40%" }, availability,
+        ModulePanel { glyph: Some(Icon::Sun), title: Some(ds::TextLine::from("Display")), trailing: rsx! { "40%" }, availability,
             LevelControl {
                 label: "Brightness",
                 value: Fraction(0),

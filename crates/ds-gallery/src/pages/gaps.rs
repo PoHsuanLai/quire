@@ -7,7 +7,8 @@ use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    BlurState, Glyph, Icon, IconSize, InputModality, Material, clip_chars, sleep, use_env, use_rect,
+    BlurState, Glyph, Icon, IconSize, InputModality, Material, clip_chars, sleep, use_rect,
+    use_scope,
 };
 use std::time::Duration;
 
@@ -179,7 +180,7 @@ fn Grain() -> Element {
 /// S15: nothing behind a panel is blurred; `data-blur=off` paints the solid fallback.
 #[component]
 fn BlurOff() -> Element {
-    let env = use_env();
+    let env = use_scope();
     let accent = env.resolved.accent;
     let scheme = env.scheme;
     rsx! {
@@ -240,7 +241,7 @@ fn Live() -> Element {
             }
         });
     });
-    let modality = match use_env().modality {
+    let modality = match use_scope().modality {
         InputModality::Pointer => "pointer: no focus rings",
         InputModality::Keyboard => "keyboard: focus rings show",
     };

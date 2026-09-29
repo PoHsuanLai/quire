@@ -5,16 +5,18 @@
 use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::{ActionId, Anim, HoverStrip, ListRow, Presence, Run, RunTone, Shown, Text, Titles};
+use ds::{
+    ActionId, Anim, HoverStrip, ListRow, Presence, RunTone, Shown, TextLine, TextRun, Titles,
+};
 use ds::{Emphasis, Expanded, PulseKey, Selection, StaggerIndex};
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
-fn marked_subject() -> Text {
-    Text::Runs(vec![
-        Run::new("Re: ", RunTone::Faint),
-        Run::new("UIDL", RunTone::Mark),
-        Run::new(" stability across ", RunTone::Plain),
-        Run::new("servers", RunTone::Strong),
+fn marked_subject() -> TextLine {
+    TextLine::Runs(vec![
+        TextRun::new("Re: ", RunTone::Faint),
+        TextRun::new("UIDL", RunTone::Mark),
+        TextRun::new(" stability across ", RunTone::Plain),
+        TextRun::new("servers", RunTone::Strong),
     ])
 }
 
@@ -29,10 +31,10 @@ fn row_with(strip: Option<Element>) -> Element {
             name: "Dana Okafor",
             via: None,
             subject: marked_subject(),
-            snippet: Text::Runs(vec![
-                Run::new("Treat ", RunTone::Plain),
-                Run::new("UIDL", RunTone::Mark),
-                Run::new(" as stable only while UIDVALIDITY holds.", RunTone::Plain),
+            snippet: TextLine::Runs(vec![
+                TextRun::new("Treat ", RunTone::Plain),
+                TextRun::new("UIDL", RunTone::Mark),
+                TextRun::new(" as stable only while UIDVALIDITY holds.", RunTone::Plain),
             ]),
             time: "09:41",
             tags: rsx! {},

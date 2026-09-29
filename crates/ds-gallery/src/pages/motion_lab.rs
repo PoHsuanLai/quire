@@ -6,14 +6,14 @@ use super::Section;
 use super::motion::{millis, recipe_text};
 use dioxus::prelude::*;
 use ds::{
-    Anim, Button, ButtonVariant, StaggerIndex, TimerPhase, settle, use_env, use_motion_timer,
-    use_pulse,
+    Anim, Button, ButtonVariant, StaggerIndex, TimerPhase, settle, use_motion_timer, use_pulse,
+    use_scope,
 };
 
 /// The motion lab page.
 #[component]
 pub fn MotionLabPage() -> Element {
-    let level = use_env().resolved.motion;
+    let level = use_scope().resolved.motion;
     rsx! {
         Section {
             title: format!("Every animation at {}", level.slug()),
@@ -30,7 +30,7 @@ pub fn MotionLabPage() -> Element {
 /// One animation: its sample, its button, its numbers.
 #[component]
 fn LabCell(anim: Anim) -> Element {
-    let level = use_env().resolved.motion;
+    let level = use_scope().resolved.motion;
     let pulse = use_pulse(anim);
     let timer = use_motion_timer(anim);
     let (class, alias) = match pulse.attrs() {

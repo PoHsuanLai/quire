@@ -3,7 +3,7 @@
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::muted::muted;
-use crate::components::content::provider_mark::{MarkSize, MarkStyle, Provider, ProviderMark};
+use crate::components::content::provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark};
 use crate::components::controls::count::{Count, CountPlace};
 use crate::core::vocab::Switch;
 use crate::style::icon::Icon;
@@ -23,7 +23,7 @@ pub enum AccountFace {
         /// Its colour.
         colour: Colour,
         /// Its provider's mark.
-        provider: Provider,
+        provider: MarkProvider,
         /// Its address, which names the tile to assistive technology (`S:1236`); without one
         /// the tile is named by its letter and provider.
         address: Option<String>,

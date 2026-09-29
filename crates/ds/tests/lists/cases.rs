@@ -10,10 +10,10 @@ use ds::{
 use ds::{
     AccountFace, AccountTile, Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Colour,
     CommandPill, DragGhost, DropLine, EdgeStrip, Exit, Grip, Hex, HoverStrip, Icon, ImageSource,
-    ItemKind, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, Provider, ProviderMark, Px,
-    SidebarItem, SyncHalo, SyncState,
+    ItemKind, MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark,
+    Px, SidebarItem, SyncHalo, SyncState,
 };
-use ds::{DropState, Here, Key, PulseKey, Shortcut, Switch};
+use ds::{DropState, Here, PulseKey, Shortcut, ShortcutKey, Switch};
 
 /// One component in one state.
 pub struct Case {
@@ -83,7 +83,7 @@ fn dropped_item(drop: DropState) -> Element {
 }
 const GULP: fn() -> PulseKey = || PulseKey::rest(Anim::Gulp);
 
-fn mark(provider: Provider, size: MarkSize) -> Element {
+fn mark(provider: MarkProvider, size: MarkSize) -> Element {
     rsx! { ProviderMark { provider, size, style: MarkStyle::Letter } }
 }
 
@@ -92,43 +92,43 @@ pub const CASES: &[Case] = &[
     Case {
         component: "command_pill",
         state: "default",
-        make: || rsx! { CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![Key::Super, Key::Char('k')]), onclick: |_| {} } },
+        make: || rsx! { CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]), onclick: |_| {} } },
     },
     // ProviderMark: every provider's letter across the three sizes, and a favicon.
     Case {
         component: "provider_mark",
         state: "google-tile",
-        make: || mark(Provider::Google, MarkSize::Tile),
+        make: || mark(MarkProvider::Google, MarkSize::Tile),
     },
     Case {
         component: "provider_mark",
         state: "microsoft-row",
-        make: || mark(Provider::Microsoft, MarkSize::Row),
+        make: || mark(MarkProvider::Microsoft, MarkSize::Row),
     },
     Case {
         component: "provider_mark",
         state: "fastmail-inline",
-        make: || mark(Provider::Fastmail, MarkSize::Inline),
+        make: || mark(MarkProvider::Fastmail, MarkSize::Inline),
     },
     Case {
         component: "provider_mark",
         state: "icloud-inline",
-        make: || mark(Provider::ICloud, MarkSize::Inline),
+        make: || mark(MarkProvider::ICloud, MarkSize::Inline),
     },
     Case {
         component: "provider_mark",
         state: "yahoo-row",
-        make: || mark(Provider::Yahoo, MarkSize::Row),
+        make: || mark(MarkProvider::Yahoo, MarkSize::Row),
     },
     Case {
         component: "provider_mark",
         state: "imap-tile",
-        make: || mark(Provider::Imap, MarkSize::Tile),
+        make: || mark(MarkProvider::Imap, MarkSize::Tile),
     },
     Case {
         component: "provider_mark",
         state: "image",
-        make: || rsx! { ProviderMark { provider: Provider::Google, size: MarkSize::Tile, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Google, size: MarkSize::Tile, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
     },
     // AccountTile: All, one pressed, one unpressed (desaturated), nothing unread.
     Case {
@@ -139,12 +139,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "account_tile",
         state: "one-pressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: Provider::Google, address: Some("poh@acme.example".to_string()) }, pressed: Switch::On, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Google, address: Some("poh@acme.example".to_string()) }, pressed: Switch::On, unread: 2, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
         state: "one-unpressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: Provider::Fastmail, address: None }, pressed: Switch::Off, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Fastmail, address: None }, pressed: Switch::Off, unread: 2, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
@@ -375,12 +375,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "space_editor",
         state: "space-dot-current",
-        make: || rsx! { SpaceDot { name: "Work", frame: FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), here: Here::Current, shortcut: Shortcut(vec![Key::Ctrl, Key::Char('1')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Work", frame: FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), here: Here::Current, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
     },
     Case {
         component: "space_editor",
         state: "space-dot-elsewhere",
-        make: || rsx! { SpaceDot { name: "Home", frame: FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), here: Here::Elsewhere, shortcut: Shortcut(vec![Key::Ctrl, Key::Char('2')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Home", frame: FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), here: Here::Elsewhere, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
     },
 ];
 

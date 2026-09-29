@@ -10,7 +10,7 @@
 //! pending, the glyph breathes or a spinner takes the trailing slot ([`RowWork`]); a success
 //! seals the glyph's disc once or draws the check on; a failure shakes the row once.
 
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::PressListeners;
 use crate::components::controls::spinner::{SpinnerKind, ring};
 use crate::components::lists::settings_row_phase::{RowDisc, RowPhase, RowWork};
@@ -44,8 +44,8 @@ use dioxus::prelude::*;
 #[component]
 pub fn SettingsRow(
     #[props(default)] glyph: Option<Icon>,
-    #[props(into)] title: Text,
-    detail: Option<Text>,
+    #[props(into)] title: TextLine,
+    detail: Option<TextLine>,
     #[props(default)] trailing: RowTrailing,
     #[props(default)] availability: Availability,
     onclick: EventHandler<Press>,

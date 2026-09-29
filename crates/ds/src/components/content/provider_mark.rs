@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 
 /// A mail provider.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Provider {
+pub enum MarkProvider {
     /// `G` #1A73E8.
     Google,
     /// `M` #0F6CBD.
@@ -47,16 +47,16 @@ pub enum MarkStyle {
     Image(ImageSource),
 }
 
-impl Provider {
+impl MarkProvider {
     /// The letter the mark shows (`S:1130-1136`).
     fn letter(self) -> char {
         match self {
-            Provider::Google => 'G',
-            Provider::Microsoft => 'M',
-            Provider::Fastmail => 'F',
-            Provider::ICloud => 'i',
-            Provider::Yahoo => 'Y',
-            Provider::Imap | Provider::Local => '@',
+            MarkProvider::Google => 'G',
+            MarkProvider::Microsoft => 'M',
+            MarkProvider::Fastmail => 'F',
+            MarkProvider::ICloud => 'i',
+            MarkProvider::Yahoo => 'Y',
+            MarkProvider::Imap | MarkProvider::Local => '@',
         }
     }
 
@@ -64,25 +64,25 @@ impl Provider {
     /// inline `--pc` (design/04-COMPONENTS.md section 28 Blitz notes, O-3).
     fn colour(self) -> &'static str {
         match self {
-            Provider::Google => "#1A73E8",
-            Provider::Microsoft => "#0F6CBD",
-            Provider::Fastmail => "#2A5DB0",
-            Provider::ICloud => "#3A82F7",
-            Provider::Yahoo => "#6001D2",
-            Provider::Imap | Provider::Local => "#5D6660",
+            MarkProvider::Google => "#1A73E8",
+            MarkProvider::Microsoft => "#0F6CBD",
+            MarkProvider::Fastmail => "#2A5DB0",
+            MarkProvider::ICloud => "#3A82F7",
+            MarkProvider::Yahoo => "#6001D2",
+            MarkProvider::Imap | MarkProvider::Local => "#5D6660",
         }
     }
 
     /// The name in the mark's `title`.
     pub(crate) fn name(self) -> &'static str {
         match self {
-            Provider::Google => "Google",
-            Provider::Microsoft => "Microsoft 365",
-            Provider::Fastmail => "Fastmail",
-            Provider::ICloud => "iCloud",
-            Provider::Yahoo => "Yahoo",
-            Provider::Imap => "IMAP",
-            Provider::Local => "Local folders",
+            MarkProvider::Google => "Google",
+            MarkProvider::Microsoft => "Microsoft 365",
+            MarkProvider::Fastmail => "Fastmail",
+            MarkProvider::ICloud => "iCloud",
+            MarkProvider::Yahoo => "Yahoo",
+            MarkProvider::Imap => "IMAP",
+            MarkProvider::Local => "Local folders",
         }
     }
 }
@@ -110,8 +110,8 @@ impl MarkSize {
 /// A local account's mark: the folder in the neutral grey, whatever `style` asks for, since
 /// there is no provider whose favicon an app could hold.
 fn local_mark(size: MarkSize) -> Element {
-    let colour = Provider::Local.colour();
-    let title = Provider::Local.name();
+    let colour = MarkProvider::Local.colour();
+    let title = MarkProvider::Local.name();
     rsx! {
         span {
             class: "ds-provider",
@@ -126,8 +126,8 @@ fn local_mark(size: MarkSize) -> Element {
 
 /// A provider mark. Static: no hover, focus or motion.
 #[component]
-pub fn ProviderMark(provider: Provider, size: MarkSize, style: MarkStyle) -> Element {
-    if provider == Provider::Local {
+pub fn ProviderMark(provider: MarkProvider, size: MarkSize, style: MarkStyle) -> Element {
+    if provider == MarkProvider::Local {
         return local_mark(size);
     }
     let title = provider.name();

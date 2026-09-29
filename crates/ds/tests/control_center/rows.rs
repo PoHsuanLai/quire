@@ -3,8 +3,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Ds, Icon, Inject, Material, RowTrailing, Run, RunTone, SettingsRow,
-    Switch, Text, Theme,
+    Appearance, Availability, Ds, Icon, Inject, Material, RowTrailing, RunTone, SettingsRow,
+    Switch, TextLine, TextRun, Theme,
 };
 
 /// Which specimen.
@@ -51,7 +51,7 @@ fn mark(case: RowCase) -> RowTrailing {
             on_toggle: EventHandler::new(|_| {}),
         },
         RowCase::Chevron => RowTrailing::Chevron,
-        RowCase::Value => RowTrailing::Text(Text::from("84%")),
+        RowCase::Value => RowTrailing::Text(TextLine::from("84%")),
         RowCase::Glyph => RowTrailing::Glyph(Icon::Lock),
         RowCase::None | RowCase::Bare | RowCase::Disabled | RowCase::Networks(_) => {
             RowTrailing::None
@@ -66,7 +66,7 @@ fn networks() -> Element {
         SettingsRow { glyph: Icon::WifiHigh, title: "Studio 5G", trailing: RowTrailing::Glyph(Icon::Lock), onclick: |_| {} }
         SettingsRow {
             glyph: Icon::WifiLow,
-            title: Text::Runs(vec![Run::new("Café ", RunTone::Plain), Run::new("Guest", RunTone::Faint)]),
+            title: TextLine::Runs(vec![TextRun::new("Café ", RunTone::Plain), TextRun::new("Guest", RunTone::Faint)]),
             trailing: RowTrailing::Check(Switch::Off),
             onclick: |_| {},
         }

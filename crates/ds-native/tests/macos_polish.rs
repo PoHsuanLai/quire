@@ -10,7 +10,7 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
-    MenuBarItem, MenuEntry, PlateFamily, Px, Scheme, Surface, Switch, Tile, Trail,
+    MenuBarItem, MenuEntry, MenuTile, MenuTrail, PlateFamily, Px, Scheme, Surface, Switch,
 };
 use ds_native::{Harness, Viewport};
 use image::{Rgba, RgbaImage};
@@ -229,7 +229,7 @@ fn SlimMenu() -> Element {
             title: "New Window".to_owned(),
             detail: None,
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
             availability: ds::Availability::Enabled,
         },
@@ -238,8 +238,8 @@ fn SlimMenu() -> Element {
             value: 2,
             title: "Quit".to_owned(),
             detail: None,
-            tile: Some(Tile::Icon(Icon::Power)),
-            trail: Trail::None,
+            tile: Some(MenuTile::Icon(Icon::Power)),
+            trail: MenuTrail::None,
             check: None,
             availability: ds::Availability::Enabled,
         },
@@ -335,7 +335,7 @@ fn Launcher() -> Element {
             title: "Files".to_owned(),
             detail: Some("File manager".to_owned()),
             tile: None,
-            trail: Trail::None,
+            trail: MenuTrail::None,
             check: None,
             availability: ds::Availability::Enabled,
         }],

@@ -13,7 +13,7 @@ use crate::motion::{
     timer::{TimerPhase, use_motion_timer},
 };
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::use_env_signal;
+use crate::style::scope::use_scope_signal;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -23,7 +23,7 @@ pub(crate) fn use_accept(mood: Mood) -> PulseKey {
     let pulse = use_pulse(Anim::PictureAccept);
     let timer = use_motion_timer(Anim::PictureAccept);
     let settled = use_hook(|| EventHandler::new(|()| {}));
-    let env = use_env_signal();
+    let env = use_scope_signal();
     // As `use_bump_on`: the last mood lives in a plain value, not a signal written in render.
     let mut seen = use_hook(|| CopyValue::new(mood));
     if *seen.peek() != mood {

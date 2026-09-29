@@ -6,11 +6,11 @@
 //! the day's events. The header's step buttons are the widget's one control: they send
 //! [`MonthIntent::Step`], and the provider answers with the next month's timeline.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::shell::month_grid::MonthGrid;
 use crate::shell::month_grid::data::{
-    DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
-    Step, WeekNumbers,
+    DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthStep,
+    MonthWeek, WeekNumbers,
 };
 use crate::shell::widget::contract::{Widget, WidgetContext, WidgetKind};
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
@@ -90,7 +90,7 @@ pub struct EventLine {
 #[serde(rename_all = "snake_case")]
 pub enum MonthIntent {
     /// Show the month before or after.
-    Step(Step),
+    Step(MonthStep),
 }
 
 impl Widget for MonthWidget {
@@ -101,8 +101,8 @@ impl Widget for MonthWidget {
         WidgetKind::fixed("quire.month")
     }
 
-    fn name() -> Text {
-        Text::from("Calendar")
+    fn name() -> TextLine {
+        TextLine::from("Calendar")
     }
 
     fn sizes() -> &'static [WidgetSize] {
@@ -118,8 +118,8 @@ impl Widget for MonthWidget {
         }
     }
 
-    fn description() -> Text {
-        Text::from("See the month at a glance, today marked.")
+    fn description() -> TextLine {
+        TextLine::from("See the month at a glance, today marked.")
     }
 
     fn placeholder(_size: WidgetSize) -> MonthEntry {
@@ -154,7 +154,7 @@ impl Widget for MonthWidget {
         };
         let onstep = cx
             .act
-            .map(|act| EventHandler::new(move |step: Step| act.call(MonthIntent::Step(step))));
+            .map(|act| EventHandler::new(move |step: MonthStep| act.call(MonthIntent::Step(step))));
         let month = rsx! {
             MonthGrid { data: face.grid.clone(), weeks: face.weeks, onstep }
         };
@@ -269,8 +269,8 @@ fn sample_month() -> MonthGridData {
         .collect();
     MonthGridData {
         month: MONTH,
-        title: Text::from("September"),
-        heads: ["M", "T", "W", "T", "F", "S", "S"].map(Text::from),
+        title: TextLine::from("September"),
+        heads: ["M", "T", "W", "T", "F", "S", "S"].map(TextLine::from),
         weeks,
     }
 }

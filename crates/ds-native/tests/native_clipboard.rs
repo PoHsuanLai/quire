@@ -3,7 +3,9 @@
 //! `ds_native::clipboard::{write_text, read_text}` reach the same clipboard.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Ds, InputVariant, Key, Material, Point, TextInput};
+use ds::{
+    Appearance, Button, ButtonVariant, Ds, InputVariant, Material, Point, ShortcutKey, TextInput,
+};
 use ds_native::clipboard::{ClipboardError, read_text, write_text};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -62,17 +64,17 @@ fn ctrl_c_on_a_selection_then_ctrl_v_into_a_second_field() {
     let mut harness = Harness::new(Fields, VIEW);
     let from = centre(&harness, "#from input");
     harness.click(from);
-    harness.chord(&[Key::Ctrl], Key::Char('a'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('a'));
     assert_eq!(
         harness.selected_text("#from input").as_deref(),
         Some("hello quire")
     );
-    harness.chord(&[Key::Ctrl], Key::Char('c'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c'));
     assert_eq!(harness.clipboard_text().as_deref(), Some("hello quire"));
 
     let to = centre(&harness, "#to input");
     harness.click(to);
-    harness.chord(&[Key::Ctrl], Key::Char('v'));
+    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v'));
     harness.advance(ms(20));
     assert_eq!(harness.text_of(".to").as_deref(), Some("hello quire"));
 }

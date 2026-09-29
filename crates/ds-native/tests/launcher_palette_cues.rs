@@ -8,8 +8,8 @@
 use dioxus::prelude::*;
 use ds::detail::{Detailed, FirstShow, Moment, Touch, use_detail};
 use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Key, Material, MenuEntry,
-    Motion, PaletteGroup, PaletteGroups, Trail,
+    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
+    MenuTrail, Motion, PaletteGroup, PaletteGroups, ShortcutKey,
 };
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Harness, Viewport};
@@ -64,7 +64,7 @@ fn item(value: u8, title: String) -> MenuEntry<u8> {
         title,
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }
@@ -147,10 +147,10 @@ fn run_action(harness: &mut Harness) {
         if harness.count(".ds-section-header-action[*|data-selected=true]") == 1 {
             break;
         }
-        harness.key(Key::Down);
+        harness.key(ShortcutKey::Down);
         harness.advance(ms(10));
     }
-    harness.key(Key::Enter);
+    harness.key(ShortcutKey::Enter);
     harness.advance(ms(20));
 }
 

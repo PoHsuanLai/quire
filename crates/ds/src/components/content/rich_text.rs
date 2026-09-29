@@ -9,7 +9,7 @@
 //! A [`Text`], a `String` or a `&str` converts into a `Rich`, so a body that has no links is
 //! written as before.
 
-use crate::components::content::text_runs::{OptionalText, Run, RunTone, Text, edges, run};
+use crate::components::content::text_runs::{OptionalText, RunTone, TextLine, TextRun, edges, run};
 use crate::focus::click::kept_click;
 use dioxus::core::SuperFrom;
 use dioxus::prelude::*;
@@ -18,7 +18,7 @@ use dioxus::prelude::*;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RichRun {
     /// Characters in a tone, as in a [`Text`].
-    Run(Run),
+    Run(TextRun),
     /// A link: its words, and where it goes, handed to the caller's `on_link` on a press.
     Link {
         /// The words drawn.
@@ -57,18 +57,18 @@ impl Rich {
     }
 }
 
-impl From<Text> for Rich {
-    fn from(text: Text) -> Self {
+impl From<TextLine> for Rich {
+    fn from(text: TextLine) -> Self {
         match text {
-            Text::Plain(plain) => Rich(vec![RichRun::Run(Run::new(plain, RunTone::Plain))]),
-            Text::Runs(runs) => Rich(runs.into_iter().map(RichRun::Run).collect()),
+            TextLine::Plain(plain) => Rich(vec![RichRun::Run(TextRun::new(plain, RunTone::Plain))]),
+            TextLine::Runs(runs) => Rich(runs.into_iter().map(RichRun::Run).collect()),
         }
     }
 }
 
 impl From<String> for Rich {
     fn from(text: String) -> Self {
-        Rich::from(Text::Plain(text))
+        Rich::from(TextLine::Plain(text))
     }
 }
 
@@ -99,8 +99,8 @@ impl<'a> SuperFrom<&'a str, OptionalText> for Option<Rich> {
 }
 
 /// An optional `Rich` prop takes a `Text` as `Some`.
-impl SuperFrom<Text, OptionalText> for Option<Rich> {
-    fn super_from(text: Text) -> Self {
+impl SuperFrom<TextLine, OptionalText> for Option<Rich> {
+    fn super_from(text: TextLine) -> Self {
         Some(Rich::from(text))
     }
 }
@@ -178,7 +178,7 @@ fn link(text: &str, href: &str, on_link: Option<EventHandler<String>>) -> Elemen
 #[cfg(test)]
 mod tests {
     use super::{Rich, RichRun};
-    use crate::components::content::text_runs::{Run, RunTone, Text};
+    use crate::components::content::text_runs::{RunTone, TextLine, TextRun};
 
     #[test]
     fn a_rich_body_reads_as_its_characters() {
@@ -186,14 +186,14 @@ mod tests {
             (Rich::from("Build finished"), "Build finished"),
             (
                 Rich(vec![
-                    RichRun::Run(Run::new("See ", RunTone::Plain)),
+                    RichRun::Run(TextRun::new("See ", RunTone::Plain)),
                     RichRun::link("the log", "https://ci.example/42"),
-                    RichRun::Run(Run::new(" now", RunTone::Italic)),
+                    RichRun::Run(TextRun::new(" now", RunTone::Italic)),
                 ]),
                 "See the log now",
             ),
             (
-                Rich::from(Text::Runs(vec![Run::new("a", RunTone::Strong)])),
+                Rich::from(TextLine::Runs(vec![TextRun::new("a", RunTone::Strong)])),
                 "a",
             ),
             (Rich::default(), ""),

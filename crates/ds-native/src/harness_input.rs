@@ -4,7 +4,7 @@
 use blitz_traits::events::{
     BlitzPointerEvent, BlitzPointerId, MouseEventButton, MouseEventButtons, PointerCoords,
 };
-use ds::{Key, Point, PointerButton};
+use ds::{Point, PointerButton, ShortcutKey};
 use keyboard_types::{Code, Key as DomKey, Modifiers};
 
 /// The Blitz button, and the held-buttons set while it is down, for a quire pointer button.
@@ -77,46 +77,46 @@ pub(crate) fn pointer(
 }
 
 /// The DOM key and physical code for a quire key.
-pub(crate) fn keyboard(key: Key) -> (DomKey, Code) {
+pub(crate) fn keyboard(key: ShortcutKey) -> (DomKey, Code) {
     match key {
-        Key::Ctrl => (DomKey::Control, Code::ControlLeft),
-        Key::Shift => (DomKey::Shift, Code::ShiftLeft),
-        Key::Alt => (DomKey::Alt, Code::AltLeft),
-        Key::Super => (DomKey::Meta, Code::MetaLeft),
-        Key::Char(c) => (DomKey::Character(c.to_string()), letter(c)),
-        Key::Space => (DomKey::Character(" ".into()), Code::Space),
-        Key::Enter => (DomKey::Enter, Code::Enter),
-        Key::Escape => (DomKey::Escape, Code::Escape),
-        Key::Tab => (DomKey::Tab, Code::Tab),
-        Key::Backspace => (DomKey::Backspace, Code::Backspace),
-        Key::Up => (DomKey::ArrowUp, Code::ArrowUp),
-        Key::Down => (DomKey::ArrowDown, Code::ArrowDown),
-        Key::Left => (DomKey::ArrowLeft, Code::ArrowLeft),
-        Key::Right => (DomKey::ArrowRight, Code::ArrowRight),
-        Key::Home => (DomKey::Home, Code::Home),
-        Key::End => (DomKey::End, Code::End),
-        Key::Delete => (DomKey::Delete, Code::Delete),
-        Key::PageUp => (DomKey::PageUp, Code::PageUp),
-        Key::PageDown => (DomKey::PageDown, Code::PageDown),
-        Key::Insert => (DomKey::Insert, Code::Insert),
-        Key::ContextMenu => (DomKey::ContextMenu, Code::ContextMenu),
+        ShortcutKey::Ctrl => (DomKey::Control, Code::ControlLeft),
+        ShortcutKey::Shift => (DomKey::Shift, Code::ShiftLeft),
+        ShortcutKey::Alt => (DomKey::Alt, Code::AltLeft),
+        ShortcutKey::Super => (DomKey::Meta, Code::MetaLeft),
+        ShortcutKey::Char(c) => (DomKey::Character(c.to_string()), letter(c)),
+        ShortcutKey::Space => (DomKey::Character(" ".into()), Code::Space),
+        ShortcutKey::Enter => (DomKey::Enter, Code::Enter),
+        ShortcutKey::Escape => (DomKey::Escape, Code::Escape),
+        ShortcutKey::Tab => (DomKey::Tab, Code::Tab),
+        ShortcutKey::Backspace => (DomKey::Backspace, Code::Backspace),
+        ShortcutKey::Up => (DomKey::ArrowUp, Code::ArrowUp),
+        ShortcutKey::Down => (DomKey::ArrowDown, Code::ArrowDown),
+        ShortcutKey::Left => (DomKey::ArrowLeft, Code::ArrowLeft),
+        ShortcutKey::Right => (DomKey::ArrowRight, Code::ArrowRight),
+        ShortcutKey::Home => (DomKey::Home, Code::Home),
+        ShortcutKey::End => (DomKey::End, Code::End),
+        ShortcutKey::Delete => (DomKey::Delete, Code::Delete),
+        ShortcutKey::PageUp => (DomKey::PageUp, Code::PageUp),
+        ShortcutKey::PageDown => (DomKey::PageDown, Code::PageDown),
+        ShortcutKey::Insert => (DomKey::Insert, Code::Insert),
+        ShortcutKey::ContextMenu => (DomKey::ContextMenu, Code::ContextMenu),
     }
 }
 
 /// The modifier flag a held quire key sets; any other key sets none.
-pub(crate) fn modifier(key: Key) -> Modifiers {
+pub(crate) fn modifier(key: ShortcutKey) -> Modifiers {
     match key {
-        Key::Ctrl => Modifiers::CONTROL,
-        Key::Shift => Modifiers::SHIFT,
-        Key::Alt => Modifiers::ALT,
-        Key::Super => Modifiers::META,
+        ShortcutKey::Ctrl => Modifiers::CONTROL,
+        ShortcutKey::Shift => Modifiers::SHIFT,
+        ShortcutKey::Alt => Modifiers::ALT,
+        ShortcutKey::Super => Modifiers::META,
         _ => Modifiers::empty(),
     }
 }
 
 /// The physical key a US layout types `c` with, where it is a letter or a digit.
 fn letter(c: char) -> Code {
-    format!("Key{}", c.to_ascii_uppercase())
+    format!("ShortcutKey{}", c.to_ascii_uppercase())
         .parse()
         .or_else(|_| format!("Digit{c}").parse())
         .unwrap_or(Code::Unidentified)
@@ -125,7 +125,7 @@ fn letter(c: char) -> Code {
 #[cfg(test)]
 mod tests {
     use super::{keyboard, letter, modifier};
-    use ds::Key;
+    use ds::ShortcutKey;
     use keyboard_types::Code;
 
     const LETTERS: &[(char, Code)] = &[
@@ -145,9 +145,9 @@ mod tests {
     #[test]
     fn held_keys_are_modifier_flags() {
         let cases = [
-            (Key::Ctrl, keyboard_types::Modifiers::CONTROL),
-            (Key::Alt, keyboard_types::Modifiers::ALT),
-            (Key::Char('k'), keyboard_types::Modifiers::empty()),
+            (ShortcutKey::Ctrl, keyboard_types::Modifiers::CONTROL),
+            (ShortcutKey::Alt, keyboard_types::Modifiers::ALT),
+            (ShortcutKey::Char('k'), keyboard_types::Modifiers::empty()),
         ];
         for (key, want) in cases {
             assert_eq!(modifier(key), want, "{key:?}");
@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn escape_is_the_named_key() {
         assert_eq!(
-            keyboard(Key::Escape),
+            keyboard(ShortcutKey::Escape),
             (keyboard_types::Key::Escape, Code::Escape)
         );
     }

@@ -73,7 +73,7 @@ Every quire component must be drawn inside one `Ds` (`root/ds.rs`; design/03-COL
 section 17.1; `crates/ds/src/root/ds.rs`). It resolves your appearance to a scheme, an accent
 and a motion level; stamps `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
 `data-material`, `data-blur`, `data-modality` and `data-hover` on its own `div.ds`; injects the stylesheet
-(unless you ask it not to); and provides the `Env`, `HoverHub`, `ToastHub`, `LayerStack` and
+(unless you ask it not to); and provides the `Scope`, `HoverHub`, `ToastHub`, `LayerStack` and
 `Overlays` contexts every component reads. It also renders `OverlayHost` and `ToastHost` after
 your children, so menus, popovers and toasts always have somewhere to mount. `ToastHost` lays
 out nothing while the hub is empty: a pushed toast mounts hidden for one frame and rises from
@@ -242,11 +242,11 @@ it works — `examples/consumer::App` does exactly this
 (`examples/consumer/src/lib.rs::App`), and `crates/ds-native/tests/harness.rs::
 use_environment_does_not_panic_under_the_harness` is the regression test.
 
-### `use_env` — reading the resolved scope
+### `use_scope` — reading the resolved scope
 
-Inside any component under a `Ds`, `ds::use_env() -> Env` gives you what that scope resolved to:
+Inside any component under a `Ds`, `ds::use_scope() -> Scope` gives you what that scope resolved to:
 `resolved: Resolved{scheme, accent, motion}`, `scheme`, `material`, `blur`, `modality`
-(`root/env.rs`). Components use this to size icons, choose overlay placement and read the motion
+(`style/scope.rs`). Components use this to size icons, choose overlay placement and read the motion
 level for their own timers (section 6); you will rarely need it directly unless you are building
 your own component.
 
@@ -257,7 +257,7 @@ root's (a popover over a dark card, an always-light preview pane, a specimen in 
 is a `Surface`, not a second `Ds`: no stylesheet, no frame layers, just a nested `div.ds` that
 re-stamps `data-theme`/`data-typeface`/`data-accent`/`data-motion`/`data-material`/`data-blur`
 (the typeface is always the root's) and updates the
-`Env` every component under it reads.
+`Scope` every component under it reads.
 
 ```rust
 use ds::{Accent, BlurState, Material, Scheme, Surface};

@@ -1,11 +1,11 @@
 //! The standard shortcut table (design/27-HIG-PARITY.md section 6.2): every combination is
 //! reserved once, drawn in the Mac's order, and refused to `Shortcut::custom`.
 
-use ds::{Key, Reserved, Shortcut, SpaceNumber, StandardAction};
+use ds::{Reserved, Shortcut, ShortcutKey, SpaceNumber, StandardAction};
 
 #[test]
 fn no_two_actions_share_a_combination() {
-    let mut seen: Vec<(Vec<Key>, StandardAction)> = Vec::new();
+    let mut seen: Vec<(Vec<ShortcutKey>, StandardAction)> = Vec::new();
     for action in StandardAction::ALL {
         let keys = Shortcut::standard(action).keys();
         if let Some((_, owner)) = seen.iter().find(|(other, _)| *other == keys) {
@@ -39,30 +39,44 @@ fn every_action_is_written_in_the_macs_order_and_owns_its_keys() {
 
 #[test]
 fn custom_refuses_a_reserved_combination_in_any_order_or_case() {
-    let cases: Vec<(Vec<Key>, Option<StandardAction>)> = vec![
-        (vec![Key::Super, Key::Char('S')], Some(StandardAction::Save)),
+    let cases: Vec<(Vec<ShortcutKey>, Option<StandardAction>)> = vec![
         (
-            vec![Key::Char('z'), Key::Super, Key::Shift],
+            vec![ShortcutKey::Super, ShortcutKey::Char('S')],
+            Some(StandardAction::Save),
+        ),
+        (
+            vec![
+                ShortcutKey::Char('z'),
+                ShortcutKey::Super,
+                ShortcutKey::Shift,
+            ],
             Some(StandardAction::Redo),
         ),
         (
-            vec![Key::Super, Key::Ctrl, Key::Char('s')],
+            vec![
+                ShortcutKey::Super,
+                ShortcutKey::Ctrl,
+                ShortcutKey::Char('s'),
+            ],
             Some(StandardAction::ToggleSidebar),
         ),
         (
-            vec![Key::Super, Key::Char('t')],
+            vec![ShortcutKey::Super, ShortcutKey::Char('t')],
             Some(StandardAction::ShowFonts),
         ),
-        (vec![Key::Super, Key::Space], Some(StandardAction::Launcher)),
         (
-            vec![Key::Ctrl, Key::Char('3')],
+            vec![ShortcutKey::Super, ShortcutKey::Space],
+            Some(StandardAction::Launcher),
+        ),
+        (
+            vec![ShortcutKey::Ctrl, ShortcutKey::Char('3')],
             SpaceNumber::new(3).map(StandardAction::SwitchToSpace),
         ),
         // The command menu's key, the launcher's actions menu and an app's own: free.
-        (vec![Key::Super, Key::Char('k')], None),
-        (vec![Key::Super, Key::Char('1')], None),
-        (vec![Key::Enter], None),
-        (vec![Key::Super, Key::Backspace], None),
+        (vec![ShortcutKey::Super, ShortcutKey::Char('k')], None),
+        (vec![ShortcutKey::Super, ShortcutKey::Char('1')], None),
+        (vec![ShortcutKey::Enter], None),
+        (vec![ShortcutKey::Super, ShortcutKey::Backspace], None),
     ];
     for (keys, owner) in cases {
         let got = Shortcut::custom(keys.clone());
@@ -99,15 +113,16 @@ fn modifiers_draw_control_option_shift_command() {
         assert_eq!(Shortcut::standard(action).glyphs(), glyphs, "{action:?}");
     }
     let given_backwards = Shortcut(vec![
-        Key::Super,
-        Key::Shift,
-        Key::Alt,
-        Key::Ctrl,
-        Key::Char('x'),
+        ShortcutKey::Super,
+        ShortcutKey::Shift,
+        ShortcutKey::Alt,
+        ShortcutKey::Ctrl,
+        ShortcutKey::Char('x'),
     ]);
     assert_eq!(given_backwards.glyphs(), "⌃⌥⇧⌘X");
     assert_eq!(
-        Shortcut::custom([Key::Char('k'), Key::Super]).map(|shortcut| shortcut.glyphs()),
+        Shortcut::custom([ShortcutKey::Char('k'), ShortcutKey::Super])
+            .map(|shortcut| shortcut.glyphs()),
         Ok("⌘K".to_owned())
     );
 }

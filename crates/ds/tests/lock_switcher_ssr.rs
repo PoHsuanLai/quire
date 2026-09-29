@@ -14,8 +14,8 @@ use ds::lint::{LintConfig, markup};
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
     EmojiId, Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen,
-    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp, Text,
-    Theme, TilePresence, person_hue,
+    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
+    TextLine, Theme, TilePresence, person_hue,
 };
 
 fn user() -> LockUser {
@@ -62,7 +62,7 @@ fn prompt(state: PromptState, caps: CapsLock, look: LockLook) -> Element {
     root(
         Material::Window,
         rsx! {
-            LockPrompt { user: user(), state, caps, look, hint: Some(Text::from("Press Enter to unlock")),
+            LockPrompt { user: user(), state, caps, look, hint: Some(TextLine::from("Press Enter to unlock")),
                 oninput: |_| {}, onsubmit: |_| {} }
         },
     )
@@ -72,7 +72,7 @@ fn prompt_for(user: LockUser, state: PromptState) -> Element {
     root(
         Material::Window,
         rsx! {
-            LockPrompt { user, state, hint: Some(Text::from("Press Enter to unlock")),
+            LockPrompt { user, state, hint: Some(TextLine::from("Press Enter to unlock")),
                 oninput: |_| {}, onsubmit: |_| {} }
         },
     )
@@ -105,7 +105,7 @@ fn polkit_with(user: LockUser, state: PromptState, caps: CapsLock) -> Element {
         rsx! {
             PolkitPrompt {
                 action: "Authentication is required to change the system's time zone.",
-                detail: Some(Text::from("org.freedesktop.timedate1.set-timezone")),
+                detail: Some(TextLine::from("org.freedesktop.timedate1.set-timezone")),
                 user,
                 state,
                 caps,

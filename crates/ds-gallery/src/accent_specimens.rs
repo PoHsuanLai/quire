@@ -6,9 +6,10 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
     Accent, Appearance, Availability, Button, ButtonVariant, Chip, ChipVariant, CommandPalette,
-    CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, ModuleGrid, ModuleState,
-    ModuleTile, MonthGrid, PaletteEntrance, Radius, RootChrome, Scheme, SegmentedControl, Surface,
-    Switch, Theme, Tile, Toggle, Trail, WidgetFrame, WidgetMetrics, WidgetSize, accent_of,
+    CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile, MenuTrail,
+    ModuleGrid, ModuleState, ModuleTile, MonthGrid, PaletteEntrance, Radius, RootChrome, Scheme,
+    SegmentedControl, Surface, Switch, Theme, Toggle, WidgetFrame, WidgetMetrics, WidgetSize,
+    accent_of,
 };
 
 /// The colours an accent lends its surfaces, as CSS.
@@ -210,8 +211,8 @@ fn entry(value: u8, title: &str, icon: Icon) -> MenuEntry<u8> {
         value,
         title: title.to_string(),
         detail: None,
-        tile: Some(Tile::Icon(icon)),
-        trail: Trail::None,
+        tile: Some(MenuTile::Icon(icon)),
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }

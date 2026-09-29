@@ -8,7 +8,7 @@ use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, LockPrompt, LockUser,
     Material, ModuleState, PromptState, person_hue,
 };
-use ds::{ModuleTile, Text};
+use ds::{ModuleTile, TextLine};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
@@ -30,7 +30,7 @@ fn Tile() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:300px;padding:12px",
-                ModuleTile { glyph: Icon::Wifi, title: Text::from("Wi-Fi"), status: None, state: MODULE(), onclick: |_| {} }
+                ModuleTile { glyph: Icon::Wifi, title: TextLine::from("Wi-Fi"), status: None, state: MODULE(), onclick: |_| {} }
             }
         }
     }

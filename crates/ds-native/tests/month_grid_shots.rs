@@ -10,7 +10,7 @@ mod month_sample;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DayKey, Ds, Material, MonthGrid, MonthKey, RootChrome, Step, Text, Theme,
+    Appearance, DayKey, Ds, Material, MonthGrid, MonthKey, MonthStep, RootChrome, TextLine, Theme,
     WidgetFrame, WidgetMetrics, WidgetSize,
 };
 use ds_native::{Harness, Viewport};
@@ -52,7 +52,7 @@ fn Shot<const DARK: bool, const SIX: bool>() -> Element {
         )
     };
     let mut data = month(key, First::Monday, today, &busy);
-    data.title = Text::from(name);
+    data.title = TextLine::from(name);
     let wash = if DARK {
         "linear-gradient(135deg,#2a3b5c,#5a3a58 55%,#7a4a3a)"
     } else {
@@ -63,7 +63,7 @@ fn Shot<const DARK: bool, const SIX: bool>() -> Element {
             div { style: "box-sizing:border-box;padding:12px;width:188px;height:188px;background:{wash}",
                 div { style: WidgetMetrics::default().style_attr(),
                     WidgetFrame { size: WidgetSize::Small,
-                        MonthGrid { data, onstep: move |_: Step| {} }
+                        MonthGrid { data, onstep: move |_: MonthStep| {} }
                     }
                 }
             }

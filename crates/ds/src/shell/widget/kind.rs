@@ -1,7 +1,7 @@
 //! The words a `WidgetFrame` is described in (design/22-SETTINGS.md section 3.20):
 //! its footprint on the grid, where it is drawn, and its title row.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::style::icon::Icon;
 use serde::{Deserialize, Serialize};
 
@@ -114,12 +114,12 @@ pub struct WidgetTitle {
     /// The glyph before the name.
     pub glyph: Icon,
     /// The name.
-    pub text: Text,
+    pub text: TextLine,
 }
 
 impl WidgetTitle {
     /// A title of `glyph` and `text`.
-    pub fn new(glyph: Icon, text: impl Into<Text>) -> Self {
+    pub fn new(glyph: Icon, text: impl Into<TextLine>) -> Self {
         WidgetTitle {
             glyph,
             text: text.into(),

@@ -4,7 +4,7 @@
 //! inset, the material, the Space's tint and the title row are quire's ([`crate::WidgetCard`]),
 //! so every widget, ours and other apps', sits on the same card.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::motion::wake::WakeStamp;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize, WidgetTitle};
 use dioxus::prelude::*;
@@ -74,11 +74,11 @@ pub trait Widget: Clone + PartialEq + Default + 'static {
     fn kind() -> WidgetKind;
 
     /// The widget's name in a picker ("Batteries").
-    fn name() -> Text;
+    fn name() -> TextLine;
 
     /// One line under the name in a picker ("See the charge of this computer and your
     /// devices").
-    fn description() -> Text;
+    fn description() -> TextLine;
 
     /// The sizes it draws, the first the one it is added at.
     fn sizes() -> &'static [WidgetSize];

@@ -15,21 +15,21 @@ use super::script::{is_apostrophe, is_word_char};
 /// A stretch of a paragraph's text, as UTF-8 byte offsets (the same offsets as a
 /// [`TextPosition`](crate::TextPosition)).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Span {
+pub struct WordSpan {
     /// Where it starts.
     pub start: usize,
     /// Where it ends, exclusive.
     pub end: usize,
 }
 
-impl Span {
+impl WordSpan {
     /// The stretch from `start` to `end`.
-    pub fn new(start: usize, end: usize) -> Span {
-        Span { start, end }
+    pub fn new(start: usize, end: usize) -> WordSpan {
+        WordSpan { start, end }
     }
 
     /// Whether the two share a byte.
-    pub fn overlaps(self, other: Span) -> bool {
+    pub fn overlaps(self, other: WordSpan) -> bool {
         self.start < other.end && other.start < self.end
     }
 
@@ -41,7 +41,7 @@ impl Span {
 
 /// The words of `text` a dictionary should check, in order, less any that overlap `skips` (the
 /// host's code stretches).
-pub fn words(text: &str, skips: &[Span]) -> Vec<Span> {
+pub fn words(text: &str, skips: &[WordSpan]) -> Vec<WordSpan> {
     let code = code_spans(text);
     chunks(text)
         .filter(|chunk| !is_link(&text[chunk.start..chunk.end]))
@@ -52,7 +52,7 @@ pub fn words(text: &str, skips: &[Span]) -> Vec<Span> {
 }
 
 /// The word of `text` the caret at `offset` touches, if any: the one being typed.
-pub fn word_at(text: &str, offset: usize) -> Option<Span> {
+pub fn word_at(text: &str, offset: usize) -> Option<WordSpan> {
     chunks(text)
         .flat_map(|chunk| runs(text, chunk))
         .find(|word| word.touches(offset))
@@ -67,23 +67,23 @@ pub(crate) fn joined_at(text: &str, at: usize) -> bool {
 }
 
 /// The whitespace-separated chunks of `text`.
-fn chunks(text: &str) -> impl Iterator<Item = Span> + '_ {
+fn chunks(text: &str) -> impl Iterator<Item = WordSpan> + '_ {
     let mut start = None;
     text.char_indices()
         .map(Some)
         .chain(std::iter::once(None))
         .filter_map(move |step| match step {
-            Some((at, c)) if c.is_whitespace() => start.take().map(|s| Span::new(s, at)),
+            Some((at, c)) if c.is_whitespace() => start.take().map(|s| WordSpan::new(s, at)),
             Some((at, _)) => {
                 start.get_or_insert(at);
                 None
             }
-            None => start.take().map(|s| Span::new(s, text.len())),
+            None => start.take().map(|s| WordSpan::new(s, text.len())),
         })
 }
 
 /// The runs of word characters in `chunk`, an apostrophe joining two letters.
-fn runs(text: &str, chunk: Span) -> Vec<Span> {
+fn runs(text: &str, chunk: WordSpan) -> Vec<WordSpan> {
     let chars: Vec<(usize, char)> = text[chunk.start..chunk.end]
         .char_indices()
         .map(|(at, c)| (chunk.start + at, c))
@@ -99,11 +99,11 @@ fn runs(text: &str, chunk: Span) -> Vec<Span> {
         if is_word_char(c) || joins {
             start.get_or_insert(at);
         } else if let Some(begun) = start.take() {
-            found.push(Span::new(begun, at));
+            found.push(WordSpan::new(begun, at));
         }
     }
     if let Some(begun) = start {
-        found.push(Span::new(begun, chunk.end));
+        found.push(WordSpan::new(begun, chunk.end));
     }
     found
 }
@@ -151,12 +151,12 @@ fn is_email(chunk: &str) -> bool {
 }
 
 /// The stretches between paired backticks, the ticks included; an unpaired tick opens nothing.
-fn code_spans(text: &str) -> Vec<Span> {
+fn code_spans(text: &str) -> Vec<WordSpan> {
     let ticks: Vec<usize> = text.match_indices('`').map(|(at, _)| at).collect();
     let (pairs, _) = ticks.as_chunks::<2>();
     pairs
         .iter()
-        .map(|[open, close]| Span::new(*open, close + 1))
+        .map(|[open, close]| WordSpan::new(*open, close + 1))
         .collect()
 }
 

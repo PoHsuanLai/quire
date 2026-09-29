@@ -6,8 +6,8 @@ use super::rows::Row;
 use dioxus::prelude::*;
 use ds::Emphasis;
 use ds::{
-    Accent, AnimatedList, BlurState, Env, Exit, InputModality, ListPresence, Material, MotionLevel,
-    Px, Resolved, Roster, RowPitch, Scheme, use_roster,
+    Accent, AnimatedList, BlurState, Exit, InputModality, ListPresence, Material, MotionLevel, Px,
+    Resolved, Roster, RowPitch, Scheme, Scope, use_roster,
 };
 use std::future::Future;
 use std::pin::pin;
@@ -58,8 +58,8 @@ fn pump(dom: &mut VirtualDom, length: Duration) {
     }
 }
 
-fn env() -> Env {
-    Env {
+fn env() -> Scope {
+    Scope {
         resolved: Resolved {
             scheme: Scheme::Light,
             accent: Accent::Postmark,

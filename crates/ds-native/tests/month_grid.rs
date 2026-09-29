@@ -8,7 +8,7 @@
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, DayKey, Ds, Material, MonthGrid, MotionLevel, StaggerIndex, Step};
+use ds::{Anim, Appearance, DayKey, Ds, Material, MonthGrid, MonthStep, MotionLevel, StaggerIndex};
 use ds::{WeekNumbers, settle};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -35,7 +35,7 @@ fn MonthApp() -> Element {
             MonthGrid {
                 data: sample(month(), First::Monday),
                 weeks: WeekNumbers::Show,
-                onstep: move |step: Step| {
+                onstep: move |step: MonthStep| {
                     log.with_mut(|log| log.push(format!("{step:?}")));
                     month.set(shift(month(), step));
                 },

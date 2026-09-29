@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Cursor, Ds, Filter, Focus, Icon, InputVariant, Key, Material, Menu,
-    MenuEntry, MenuKind, MenuRow, Point, Px, RowAction, TextInput,
+    Anchor, Appearance, Ds, FieldFocus, Icon, InputVariant, Material, Menu, MenuCursor, MenuEntry,
+    MenuFilter, MenuKind, MenuRow, Point, Px, RowAction, ShortcutKey, TextInput,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -56,12 +56,12 @@ fn Page(drive: Drive) -> Element {
     let mut at = use_signal(|| 0usize);
     let mut open = use_signal(|| true);
     let active = match drive {
-        Drive::Field => Cursor::Controlled(Some(at())),
-        Drive::Own => Cursor::Auto,
+        Drive::Field => MenuCursor::Controlled(Some(at())),
+        Drive::Own => MenuCursor::Auto,
     };
     let filter = match drive {
-        Drive::Field => Filter::None,
-        Drive::Own => Filter::Typing,
+        Drive::Field => MenuFilter::None,
+        Drive::Own => MenuFilter::Typing,
     };
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
@@ -72,7 +72,7 @@ fn Page(drive: Drive) -> Element {
                         label: "To",
                         value: String::new(),
                         oninput: move |_| {},
-                        focus: Focus::OnMount,
+                        focus: FieldFocus::OnMount,
                         onkey: move |event: KeyboardEvent| match event.key() {
                             dioxus::prelude::Key::ArrowDown => at.set((at() + 1).min(NAMES.len() - 1)),
                             dioxus::prelude::Key::ArrowUp => at.set(at().saturating_sub(1)),
@@ -126,12 +126,12 @@ fn a_field_drives_the_highlight_and_keeps_the_keyboard() {
         harness.is_focused(".field .ds-input"),
         "the field kept the keyboard"
     );
-    harness.key(Key::Down);
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(50));
     assert_eq!(highlighted(&harness).as_deref(), Some("Priya Raman"));
     assert!(harness.is_focused(".field .ds-input"));
-    harness.key(Key::Up);
+    harness.key(ShortcutKey::Up);
     harness.advance(ms(50));
     assert_eq!(highlighted(&harness).as_deref(), Some("Sam Lindqvist"));
     // The pointer over the last row asks for it; the page does not follow, so it stays.
@@ -152,11 +152,11 @@ fn the_typed_filter_is_heard_and_the_own_cursor_reported() {
         harness.is_focused(".ds-menu"),
         "an own cursor takes the keyboard"
     );
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     harness.advance(ms(50));
-    harness.key(Key::Char('m'));
-    harness.key(Key::Char('e'));
-    harness.key(Key::Backspace);
+    harness.key(ShortcutKey::Char('m'));
+    harness.key(ShortcutKey::Char('e'));
+    harness.key(ShortcutKey::Backspace);
     harness.advance(ms(50));
     assert_eq!(
         log(&harness),

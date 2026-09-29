@@ -12,7 +12,7 @@ use dioxus::prelude::*;
 use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, Banner, BannerKey, BannerPosition, BannerStack, Ds, Icon, ImageSize, ImageSource,
-    Inject, Material, Px, ShotGhost, ShotThumbnail, Shown, Swipe, Theme, ThumbAction,
+    Inject, Material, NotificationSwipe, Px, ShotGhost, ShotThumbnail, Shown, Theme, ThumbAction,
 };
 
 /// A picture's source: a stand-in URI, since only the markup is compared.
@@ -80,7 +80,7 @@ fn in_stack() -> Element {
             image: picture(),
             size: WIDE,
             shown: Shown::Visible,
-            swipe: Swipe::Dismiss(EventHandler::new(|()| {})),
+            swipe: NotificationSwipe::Dismiss(EventHandler::new(|()| {})),
         }
     };
     root(

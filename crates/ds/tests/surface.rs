@@ -1,5 +1,5 @@
 //! `Surface` as markup: a nested scope re-stamps the attributes it overrides and inherits the
-//! rest, and the `Env` its children read agrees with what it stamped. One golden per override,
+//! rest, and the `Scope` its children read agrees with what it stamped. One golden per override,
 //! the corner (`radius`) included.
 
 #[path = "support/golden.rs"]
@@ -8,7 +8,7 @@ mod golden;
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::{Accent, Appearance, BlurState, Corner, Ds, Material, Radius, Scheme, Surface, use_env};
+use ds::{Accent, Appearance, BlurState, Corner, Ds, Material, Radius, Scheme, Surface, use_scope};
 
 #[derive(Props, Clone, PartialEq)]
 struct Setup {
@@ -21,7 +21,7 @@ struct Setup {
 /// What the scope says to a component inside it.
 #[component]
 fn Reads() -> Element {
-    let env = use_env();
+    let env = use_scope();
     rsx! {
         p {
             "{env.scheme.slug()} {env.resolved.accent.slug()} {env.material.slug()} {env.blur.slug()}"

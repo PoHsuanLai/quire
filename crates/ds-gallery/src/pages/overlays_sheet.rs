@@ -8,8 +8,8 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Button, ButtonSize, ButtonVariant, Ds, Inject, Kbd, KbdSize, Key,
-    Material, ScrimStrength, Sheet, SheetPlacement, Shortcut, Theme,
+    Appearance, Availability, Button, ButtonSize, ButtonVariant, Ds, Inject, Kbd, KbdSize,
+    Material, ScrimStrength, Sheet, SheetPlacement, Shortcut, ShortcutKey, Theme,
 };
 
 /// The power menu section.
@@ -56,12 +56,12 @@ fn Dialog(theme: Theme) -> Element {
                             Button { variant: ButtonVariant::Primary, label: "Shut Down", onclick: |_| {} }
                         }
                         div { class: "g-row g-note",
-                            Kbd { shortcut: Shortcut(vec![Key::Left]), size: KbdSize::Small }
-                            Kbd { shortcut: Shortcut(vec![Key::Right]), size: KbdSize::Small }
+                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Left]), size: KbdSize::Small }
+                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Right]), size: KbdSize::Small }
                             span { "move" }
-                            Kbd { shortcut: Shortcut(vec![Key::Enter]), size: KbdSize::Small }
+                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Enter]), size: KbdSize::Small }
                             span { "confirm" }
-                            Kbd { shortcut: Shortcut(vec![Key::Escape]), size: KbdSize::Small }
+                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Escape]), size: KbdSize::Small }
                             span { "close" }
                         }
                     }

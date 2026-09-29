@@ -3,7 +3,7 @@
 //! picker, mailo's Labels and page Properties) toggles and stays open (`C:1762-1767`,
 //! `C:1987-2002`). Split from `menu`, with the menu's closing and gesture states.
 
-use crate::components::menus::menu_cursor::Cursor;
+use crate::components::menus::menu_cursor::MenuCursor;
 use crate::components::menus::menu_tracker::Tracker;
 use crate::components::overlays::flow::Flow;
 use dioxus::prelude::*;
@@ -74,15 +74,17 @@ pub(crate) fn picker<T: 'static>(
 pub(crate) fn kept_focus<T: 'static>(
     pick: EventHandler<T>,
     tracker: Tracker,
-    (dismiss, flow, active): (PickDismiss, Flow, Cursor),
+    (dismiss, flow, active): (PickDismiss, Flow, MenuCursor),
 ) -> EventHandler<T> {
     match (dismiss, flow, active) {
-        (PickDismiss::Stay, Flow::Floating, Cursor::Auto) => EventHandler::new(move |value: T| {
-            pick.call(value);
-            tracker.refocus();
-        }),
+        (PickDismiss::Stay, Flow::Floating, MenuCursor::Auto) => {
+            EventHandler::new(move |value: T| {
+                pick.call(value);
+                tracker.refocus();
+            })
+        }
         (PickDismiss::Close, _, _)
         | (PickDismiss::Stay, Flow::Inline, _)
-        | (PickDismiss::Stay, Flow::Floating, Cursor::Controlled(_)) => pick,
+        | (PickDismiss::Stay, Flow::Floating, MenuCursor::Controlled(_)) => pick,
     }
 }

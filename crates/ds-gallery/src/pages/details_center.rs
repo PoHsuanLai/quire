@@ -11,7 +11,7 @@ use ds::detail::{EventStamp, FirstShow};
 use ds::{
     DeviceBattery, DiscMotion, Fraction, Glyph, Icon, IconButton, IconButtonVariant, IconSize,
     LevelControl, LevelGlyph, LevelLook, LevelMode, ModuleGrid, ModulePanel, ModuleState,
-    ModuleTile, NowPlayingTrack, PlayPauseButton, Playback, Px, RingMark, Text, Tick,
+    ModuleTile, NowPlayingTrack, PlayPauseButton, Playback, Px, RingMark, TextLine, Tick,
     TrackPosition,
 };
 use std::time::Duration;
@@ -59,7 +59,7 @@ fn TilesCell() -> Element {
                     ModuleTile {
                         glyph: Icon::Wifi,
                         title: "Wi-Fi",
-                        status: Some(Text::from(words(wifi()))),
+                        status: Some(TextLine::from(words(wifi()))),
                         state: wifi(),
                         disc: DiscMotion::Fill,
                         onclick: move |_| wifi.set(flip(wifi())),
@@ -67,7 +67,7 @@ fn TilesCell() -> Element {
                     ModuleTile {
                         glyph: Icon::Moon,
                         title: "Focus",
-                        status: Some(Text::from(words(focus()))),
+                        status: Some(TextLine::from(words(focus()))),
                         state: focus(),
                         disc: DiscMotion::Morph(Icon::MoonFilled),
                         onclick: move |_| focus.set(flip(focus())),
@@ -110,7 +110,7 @@ fn PlayerCell() -> Element {
             div { class: "g-detail g-detail-list",
                 div { class: "g-center-player",
                     div { class: "g-center-track",
-                        NowPlayingTrack { title: Text::from(title), by: Some(Text::from(by)), playback: playback() }
+                        NowPlayingTrack { title: TextLine::from(title), by: Some(TextLine::from(by)), playback: playback() }
                     }
                     IconButton { variant: IconButtonVariant::Tool, icon: Icon::SkipBack, label: "Previous".to_owned(), onclick: move |_| *track.write() += 1 }
                     PlayPauseButton {
@@ -170,7 +170,7 @@ fn KeyboardCell() -> Element {
                 {mini("Bright", move |_| level.set(Fraction(1000)))}
             },
             div { class: "g-detail g-detail-list",
-                ModulePanel { glyph: Some(Icon::Keyboard), title: Some(Text::from("Keyboard Brightness")), trailing: rsx! { "{(level().0 + 5) / 10}%" },
+                ModulePanel { glyph: Some(Icon::Keyboard), title: Some(TextLine::from("Keyboard Brightness")), trailing: rsx! { "{(level().0 + 5) / 10}%" },
                     LevelControl {
                         label: "Keyboard Brightness".to_owned(),
                         value: level(),

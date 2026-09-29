@@ -13,7 +13,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::icon::stroke_device_pixels;
-use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuEntry, Point, Px, Scale, Trail};
+use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuEntry, MenuTrail, Point, Px, Scale};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{keep, rect};
@@ -38,7 +38,7 @@ fn Fixture() -> Element {
         title: title.to_owned(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: ds::Availability::Enabled,
     };

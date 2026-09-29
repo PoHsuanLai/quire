@@ -5,7 +5,7 @@
 //! spring only when the person's own press added it (design/05 principle 2, design/26 R5).
 //! Under Reduced the whole check shows for its hold, with no draw and no growth.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::button_face::Leading;
 use crate::core::press::Press;
@@ -69,8 +69,8 @@ fn growth(touch: Touch) -> Anim {
 #[component]
 pub(crate) fn AddButton(
     variant: ButtonVariant,
-    label: Text,
-    added: Text,
+    label: TextLine,
+    added: TextLine,
     landing: Landing,
     onclick: EventHandler<Press>,
 ) -> Element {

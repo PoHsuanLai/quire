@@ -11,7 +11,7 @@ use crate::motion::detail::{
     first_show::FirstShow,
     morph::Slashed,
     once::use_shake,
-    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     settle::{SettleStyle, Settling},
     touch::Touch,
     use_detail::use_detail,
@@ -28,7 +28,7 @@ use dioxus::prelude::*;
 /// The searching loop: the dot and the three arcs, one at a time (1200 ms a cycle).
 pub(crate) const SEARCHING: PendingSpec = PendingSpec {
     style: PendingStyle::Iterate,
-    layers: Layers(4),
+    layers: PendingLayers(4),
 };
 
 /// Lucide `wifi`'s parts, from the inside out, and the badge.
@@ -102,11 +102,11 @@ fn slashed(state: WifiState) -> Slashed {
 }
 
 /// How many layers a success fills: up to the real bars.
-fn fill_layers(state: WifiState) -> Layers {
+fn fill_layers(state: WifiState) -> PendingLayers {
     match state {
-        WifiState::Joined { bars, .. } => Layers(bars.top() + 1),
+        WifiState::Joined { bars, .. } => PendingLayers(bars.top() + 1),
         WifiState::Off | WifiState::Idle | WifiState::Joining(_) | WifiState::Failed(_) => {
-            Layers(4)
+            PendingLayers(4)
         }
     }
 }

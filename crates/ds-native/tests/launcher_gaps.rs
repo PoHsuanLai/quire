@@ -8,8 +8,8 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, ExternalIcon,
-    FocusRequest, IconSize, IconSource, IconUrl, Key, Material, Menu, MenuEntry, MenuKind,
-    PaletteEntrance, Px, Rect, Tile, Trail, use_focus_request,
+    FocusRequest, IconSize, IconSource, IconUrl, Material, Menu, MenuEntry, MenuKind, MenuTile,
+    MenuTrail, PaletteEntrance, Px, Rect, ShortcutKey, use_focus_request,
 };
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use probe::rect;
@@ -31,7 +31,7 @@ fn item(value: u8, title: &str) -> MenuEntry<u8> {
         title: title.to_string(),
         detail: None,
         tile: None,
-        trail: Trail::None,
+        trail: MenuTrail::None,
         check: None,
         availability: Availability::Enabled,
     }
@@ -215,7 +215,7 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
     settle_in(&mut harness);
     let first = show(rect(&harness, &nth_row(1)));
     assert_eq!(log(&harness), format!("select:0,rect:{first}"));
-    harness.key(Key::Down);
+    harness.key(ShortcutKey::Down);
     settle_in(&mut harness);
     let second = show(rect(&harness, &nth_row(2)));
     assert_eq!(
@@ -244,7 +244,7 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
 fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
     let mut followed = Harness::new(FollowedSelection, VIEW);
     settle_in(&mut followed);
-    followed.key(Key::Down);
+    followed.key(ShortcutKey::Down);
     settle_in(&mut followed);
     assert!(log(&followed).starts_with("rect:"), "{}", log(&followed));
     assert!(log(&followed).contains(",select:1,"), "{}", log(&followed));
@@ -254,7 +254,7 @@ fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
     );
     let mut pinned = Harness::new(PinnedSelection, VIEW);
     settle_in(&mut pinned);
-    pinned.key(Key::Down);
+    pinned.key(ShortcutKey::Down);
     settle_in(&mut pinned);
     assert!(log(&pinned).ends_with(",select:1"), "{}", log(&pinned));
     assert_eq!(
@@ -271,7 +271,7 @@ fn open_and_close_actions(harness: &mut Harness) {
         harness.is_focused("#launcher-card .ds-input"),
         "the field starts focused"
     );
-    harness.key(Key::Tab);
+    harness.key(ShortcutKey::Tab);
     settle_in(harness);
     assert!(log(harness).contains("key:Tab"), "{}", log(harness));
     assert!(
@@ -284,7 +284,7 @@ fn open_and_close_actions(harness: &mut Harness) {
         (menu.origin.y.0 - (row.origin.y.0 + row.size.height.0 + 6.0)).abs() < 1.0,
         "the menu hangs 6 px under the selected row: {menu:?} {row:?}"
     );
-    harness.key(Key::Escape);
+    harness.key(ShortcutKey::Escape);
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-popover.ds-menu"), 0, "the menu closed");
 }
@@ -361,8 +361,8 @@ fn AppIconRow() -> Element {
                             value: 1,
                             title: "Firefox".to_string(),
                             detail: None,
-                            tile: Some(Tile::Source(icon)),
-                            trail: Trail::None,
+                            tile: Some(MenuTile::Source(icon)),
+                            trail: MenuTrail::None,
                             check: None,
                             availability: Availability::Enabled,
                         }],

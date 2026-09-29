@@ -5,7 +5,7 @@ use crate::core::geometry::units::{Point, Px};
 use crate::overlay::menu_track::{
     triangle::{inside, shielded},
     types::{
-        Branch, Held, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget,
+        Branch, ItemPath, MenuAnim, MenuDirection, MenuHold, MenuKey, MenuPhase, MenuTarget,
         MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
         Submenu,
     },
@@ -92,11 +92,11 @@ fn open_on_press_click_mode_and_toggle() {
     // Section 13.8 test 1.
     let (phase, effects) = run(vec![(0, Event::PressTitle(A))]);
     assert_eq!(effects, vec![Effect::Open(A, MenuAnim::Pop)]);
-    assert_eq!(session(&phase).held, Held::Held);
+    assert_eq!(session(&phase).held, MenuHold::MenuHold);
     let (phase, _) = run(click_open());
     assert_eq!(
         session(&phase).held,
-        Held::Released,
+        MenuHold::Released,
         "release on the title leaves it open"
     );
     let (phase, effects) = run([click_open(), vec![(500, Event::PressTitle(A))]].concat());
@@ -184,7 +184,7 @@ fn hover_switch_swaps_menus_in_one_step_without_animation() {
         vec![Effect::Open(A, MenuAnim::Pop), Effect::Switch(B)]
     );
     let session = session(&phase);
-    assert_eq!((session.menu, session.held), (B, Held::Released));
+    assert_eq!((session.menu, session.held), (B, MenuHold::Released));
 }
 
 #[test]

@@ -5,22 +5,22 @@
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, Expanded, Icon, Leading, MarkSize, MarkStyle, Provider, ProviderMark,
-    Run, RunTone, Text, Trailing,
+    Button, ButtonVariant, Expanded, Icon, Leading, MarkProvider, MarkSize, MarkStyle,
+    ProviderMark, RunTone, TextLine, TextRun, Trailing,
 };
 
 /// A provider's inline mark, for a From value.
-fn mark(provider: Provider) -> Leading {
+fn mark(provider: MarkProvider) -> Leading {
     Leading::Mark(rsx! {
         ProviderMark { provider, size: MarkSize::Inline, style: MarkStyle::Letter }
     })
 }
 
 /// The quoted message's head: who, strong; when, faint.
-fn quoted_head() -> Text {
-    Text::Runs(vec![
-        Run::new("Dana Okafor", RunTone::Strong),
-        Run::new(" wrote on Tue 22 Sep, 09:41", RunTone::Faint),
+fn quoted_head() -> TextLine {
+    TextLine::Runs(vec![
+        TextRun::new("Dana Okafor", RunTone::Strong),
+        TextRun::new(" wrote on Tue 22 Sep, 09:41", RunTone::Faint),
     ])
 }
 
@@ -32,8 +32,8 @@ pub fn ButtonsMailo5() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "mark",
                     div { class: "g-row",
-                        Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", leading: mark(Provider::Google), trailing: Trailing::Caret, onclick: |_| {} }
-                        Button { variant: ButtonVariant::Frame, label: "Local folders", leading: mark(Provider::Local), trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { variant: ButtonVariant::Frame, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Caret, onclick: |_| {} }
                         Button { variant: ButtonVariant::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} }
                     }
                 }

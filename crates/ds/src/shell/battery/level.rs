@@ -12,14 +12,14 @@
 //! and never at rest; a charging bolt fades in once the sweep has arrived. The low red and
 //! `aria-valuenow` follow the true level from the first frame.
 
-use crate::components::content::text_runs::Text;
+use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
 use crate::motion::{
     level_run::{RunFrame, RunTokens},
     use_level_run::use_level_run,
     wake::WakeStamp,
 };
-use crate::shell::battery::ring::{Span, arc_path};
+use crate::shell::battery::ring::{RingSpan, arc_path};
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -103,7 +103,7 @@ impl RingTone {
 pub fn BatteryLevel(
     level: Fraction,
     #[props(default)] mark: RingMark,
-    #[props(into)] label: Text,
+    #[props(into)] label: TextLine,
     #[props(default)] wake: WakeStamp,
     children: Element,
 ) -> Element {
@@ -112,8 +112,8 @@ pub fn BatteryLevel(
     let frame = use_battery_fill(level, wake);
     let alias = moving(frame, level);
     let span = match mark {
-        RingMark::Plain => Span::FULL,
-        RingMark::Charging => Span::GAPPED,
+        RingMark::Plain => RingSpan::FULL,
+        RingMark::Charging => RingSpan::GAPPED,
     };
     rsx! {
         div {

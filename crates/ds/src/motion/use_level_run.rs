@@ -20,7 +20,7 @@ use crate::motion::level_run::{
 };
 use crate::motion::wake::WakeStamp;
 use crate::style::appearance::motion::MotionLevel;
-use crate::style::env::{Env, use_env_signal};
+use crate::style::scope::{Scope, use_scope_signal};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use std::time::Duration;
@@ -39,7 +39,7 @@ enum Origin {
 struct Runner {
     frame: Signal<RunFrame>,
     task: Signal<Option<Task>>,
-    env: Signal<Env>,
+    env: Signal<Scope>,
     scope: ScopeId,
 }
 
@@ -47,7 +47,7 @@ struct Runner {
 /// `wake`, from the level drawn last on each new `level`. Re-renders its owner once per
 /// changed frame while it sweeps and never at rest. Needs an enclosing `Ds`.
 pub fn use_level_run(level: Fraction, wake: WakeStamp, tokens: RunTokens) -> RunFrame {
-    let env = use_env_signal();
+    let env = use_scope_signal();
     let runner = Runner {
         frame: use_signal(|| first_frame(env.peek().resolved.motion, level)),
         task: use_signal(|| None),

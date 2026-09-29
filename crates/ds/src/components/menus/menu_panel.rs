@@ -2,7 +2,7 @@
 //! pointer and key handling, and the submenu it opens (design/13-BEHAVIOUR-menus-windows.md
 //! section 13.3.4). `Menu` is the root panel; [`SubMenu`] is every panel below it.
 
-use crate::components::menus::menu_cursor::{Cursor, highlighted, seed};
+use crate::components::menus::menu_cursor::{MenuCursor, highlighted, seed};
 use crate::components::menus::menu_entry::MenuEntry;
 use crate::components::menus::menu_item::client_point;
 use crate::components::menus::menu_keys::{Child, Decision, Level, decide};
@@ -10,7 +10,7 @@ use crate::components::menus::menu_kind::MenuKind;
 use crate::components::menus::menu_rows::{Drawn, RowsMotion, render_lines};
 use crate::components::menus::menu_tracker::{Tracker, Via, target, use_tracker};
 use crate::components::menus::{
-    menu_filter::Filter,
+    menu_filter::MenuFilter,
     menu_lines::{Act, Choice, KeyAct, Line, choices, key_act, lines, liveness},
 };
 use crate::components::overlays::popover::{Stacking, layer_slug, position_style, use_float};
@@ -46,7 +46,7 @@ pub(crate) struct Panel<T: 'static> {
     /// The root panel hears a button released over a choice (press-drag-release).
     pub onrelease: Option<EventHandler<(usize, Press)>>,
     /// Whose highlight the panel shows: a submenu's is always its own.
-    pub cursor: Cursor,
+    pub cursor: MenuCursor,
     /// Under a caller's cursor, where a key asked the highlight to go.
     pub on_active: Option<EventHandler<Option<usize>>>,
 }
@@ -132,7 +132,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
 
     /// What `event` means here; the caller acts on `Query`, `CloseMenu` and `Back`, which
     /// belong to the root or the parent.
-    pub(crate) fn key(&self, event: &KeyboardEvent, filter: &Filter) -> Decision<T> {
+    pub(crate) fn key(&self, event: &KeyboardEvent, filter: &MenuFilter) -> Decision<T> {
         let Some(act) = key_act(&event.key(), event.modifiers(), filter) else {
             return Decision::Nothing;
         };
@@ -175,9 +175,9 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
     /// Move the highlight to `index`: the panel's own moves, the caller's is asked for.
     fn select(&self, index: usize) {
         match (self.cursor, self.on_active) {
-            (Cursor::Auto, _) => self.tracker.select(index),
-            (Cursor::Controlled(_), Some(on_active)) => on_active.call(Some(index)),
-            (Cursor::Controlled(_), None) => {}
+            (MenuCursor::Auto, _) => self.tracker.select(index),
+            (MenuCursor::Controlled(_), Some(on_active)) => on_active.call(Some(index)),
+            (MenuCursor::Controlled(_), None) => {}
         }
     }
 
@@ -244,7 +244,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
         onhover: Some(onhover),
         onitem: None,
         onrelease: None,
-        cursor: Cursor::Auto,
+        cursor: MenuCursor::Auto,
         on_active: None,
     };
     let want = Placement::new(Side::Right, Align::Start);
@@ -287,7 +287,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
                 },
                 onmousemove: move |event| hover.hovered(&event),
                 onkeydown: move |event| {
-                    if keys.key(&event, &Filter::None) == Decision::Back {
+                    if keys.key(&event, &MenuFilter::None) == Decision::Back {
                         onback.call(());
                     }
                 },

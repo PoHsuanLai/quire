@@ -19,7 +19,7 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::{Text, text};
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::button_size::ButtonSize;
 use crate::components::overlays::alert_vocab::{AlertButton, AlertEmphasis};
@@ -41,7 +41,7 @@ use std::rc::Rc;
 #[derive(Debug, Clone, PartialEq)]
 struct Words {
     title: String,
-    message: Option<Text>,
+    message: Option<TextLine>,
     action: String,
     cancel: String,
     emphasis: AlertEmphasis,
@@ -67,7 +67,7 @@ struct Words {
 #[component]
 pub fn Alert(
     #[props(into)] title: String,
-    #[props(default)] message: Option<Text>,
+    #[props(default)] message: Option<TextLine>,
     #[props(into)] action: String,
     #[props(default = "Cancel".to_owned(), into)] cancel: String,
     #[props(default)] emphasis: AlertEmphasis,

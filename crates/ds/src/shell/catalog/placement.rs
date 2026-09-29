@@ -9,7 +9,7 @@ pub struct PlacementId(pub u32);
 
 /// One placed item: which kind, at which size, where.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Placement<K, S, A> {
+pub struct Placed<K, S, A> {
     /// Its identity.
     pub id: PlacementId,
     /// What is placed.
@@ -24,7 +24,7 @@ pub struct Placement<K, S, A> {
 /// hand out. Serialises as `{"items":[…],"next":n}`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Placements<K, S, A> {
-    items: Vec<Placement<K, S, A>>,
+    items: Vec<Placed<K, S, A>>,
     next: PlacementId,
 }
 
@@ -39,12 +39,12 @@ impl<K, S, A> Default for Placements<K, S, A> {
 
 impl<K, S, A> Placements<K, S, A> {
     /// Every placement.
-    pub fn items(&self) -> &[Placement<K, S, A>] {
+    pub fn items(&self) -> &[Placed<K, S, A>] {
         &self.items
     }
 
     /// The placement `id`.
-    pub fn get(&self, id: PlacementId) -> Option<&Placement<K, S, A>> {
+    pub fn get(&self, id: PlacementId) -> Option<&Placed<K, S, A>> {
         self.items.iter().find(|item| item.id == id)
     }
 
@@ -52,7 +52,7 @@ impl<K, S, A> Placements<K, S, A> {
     pub fn added(self, kind: K, size: S, at: A) -> (Self, PlacementId) {
         let id = self.next;
         let mut items = self.items;
-        items.push(Placement { id, kind, size, at });
+        items.push(Placed { id, kind, size, at });
         let next = PlacementId(id.0.saturating_add(1));
         (Placements { items, next }, id)
     }
@@ -71,7 +71,7 @@ impl<K, S, A> Placements<K, S, A> {
     pub fn changed(
         self,
         id: PlacementId,
-        change: impl FnOnce(Placement<K, S, A>) -> Placement<K, S, A>,
+        change: impl FnOnce(Placed<K, S, A>) -> Placed<K, S, A>,
     ) -> Self {
         let mut change = Some(change);
         let items = self
@@ -96,7 +96,7 @@ mod tests {
         let (list, a) = list.added("clock", 1, 0);
         let (list, b) = list.added("battery", 2, 1);
         assert_eq!((a, b), (PlacementId(1), PlacementId(2)));
-        let list = list.changed(a, |item| super::Placement { size: 3, ..item });
+        let list = list.changed(a, |item| super::Placed { size: 3, ..item });
         assert_eq!(list.get(a).map(|item| item.size), Some(3));
         let list = list.removed(a);
         assert_eq!(list.items().len(), 1);

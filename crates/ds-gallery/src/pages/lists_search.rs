@@ -6,25 +6,25 @@ use super::Section;
 use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, Button, ButtonVariant, Emphasis, Expanded, HoverStrip, Icon, ListRow, Presence,
-    Run, RunTone, Selection, Shown, StaggerIndex, StripAction, Text, Titles,
+    RunTone, Selection, Shown, StaggerIndex, StripAction, TextLine, TextRun, Titles,
 };
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
-fn hits() -> [(&'static str, Text, Text, &'static str); 2] {
+fn hits() -> [(&'static str, TextLine, TextLine, &'static str); 2] {
     let hit = |before: &str, word: &str, after: &str| {
-        Text::Runs(vec![
-            Run::new(before, RunTone::Plain),
-            Run::new(word, RunTone::Mark),
-            Run::new(after, RunTone::Plain),
+        TextLine::Runs(vec![
+            TextRun::new(before, RunTone::Plain),
+            TextRun::new(word, RunTone::Mark),
+            TextRun::new(after, RunTone::Plain),
         ])
     };
     [
         (
             "Dana Okafor",
-            Text::Runs(vec![
-                Run::new("Re: ", RunTone::Faint),
-                Run::new("UIDL", RunTone::Mark),
-                Run::new(" stability across servers", RunTone::Plain),
+            TextLine::Runs(vec![
+                TextRun::new("Re: ", RunTone::Faint),
+                TextRun::new("UIDL", RunTone::Mark),
+                TextRun::new(" stability across servers", RunTone::Plain),
             ]),
             hit("Treat ", "UIDL", " as stable only while UIDVALIDITY holds."),
             "09:41",

@@ -1,6 +1,6 @@
 //! The band's gates, swept: mailo's `every_pick_is_legible` for the card accent.
 
-use super::band::{AccentPick, Hue, InkRule, Weight};
+use super::band::{AccentPick, BandWeight, Hue, InkRule};
 use super::derive::accent_roles;
 use super::floors;
 use super::legibility::legibility;
@@ -11,7 +11,7 @@ use crate::core::colour::{oklab::Oklab, srgb::Srgb};
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::tokens::hex::{Alpha, Hex};
 
-fn roles(hue: u16, weight: Weight, scheme: Scheme) -> AccentRoles {
+fn roles(hue: u16, weight: BandWeight, scheme: Scheme) -> AccentRoles {
     accent_roles(
         &BAND,
         AccentPick {
@@ -32,7 +32,7 @@ fn every_hue_in_the_band_is_legible() {
         for hue in (0..360).step_by(5) {
             for tenth in 0..=10 {
                 cases += 1;
-                let roles = roles(hue, Weight(tenth * 100), scheme);
+                let roles = roles(hue, BandWeight(tenth * 100), scheme);
                 let case = format!("{scheme:?} h={hue} w=.{tenth}");
                 failures.extend(gate_failures(&case, &roles, scheme));
             }
@@ -89,7 +89,7 @@ fn gate_failures(case: &str, roles: &AccentRoles, scheme: Scheme) -> Vec<String>
 fn the_wash_stays_translucent() {
     for scheme in Scheme::ALL {
         for hue in (0..360).step_by(5) {
-            let roles = roles(hue, Weight::FULL, scheme);
+            let roles = roles(hue, BandWeight::FULL, scheme);
             assert!(
                 roles.wash <= floors::WASH_MOST,
                 "{scheme:?} h={hue}: wash {:?}",
@@ -104,7 +104,7 @@ fn the_wash_stays_translucent() {
 fn the_ink_is_deep() {
     for scheme in Scheme::ALL {
         for hue in (0..360).step_by(5) {
-            let roles = roles(hue, Weight::FULL, scheme);
+            let roles = roles(hue, BandWeight::FULL, scheme);
             assert_ne!(roles.ink, Hex([0xFF, 0xFF, 0xFF]), "{scheme:?} h={hue}");
             assert_eq!(BAND.scheme(scheme).ink, InkRule::Deep);
         }
@@ -121,7 +121,7 @@ fn every_built_in_swatch_is_distinct() {
             .map(|accent| {
                 let pick = AccentPick {
                     hue: hue_of(accent),
-                    weight: Weight::FULL,
+                    weight: BandWeight::FULL,
                 };
                 (accent, accent_roles(&BAND, pick, scheme).fill)
             })
@@ -147,7 +147,7 @@ fn every_built_in_swatch_is_distinct() {
 fn postmark_is_the_settled_airy_blue() {
     let pick = AccentPick {
         hue: hue_of(Accent::Postmark),
-        weight: Weight::FULL,
+        weight: BandWeight::FULL,
     };
     let light = accent_roles(&BAND, pick, Scheme::Light);
     let dark = accent_roles(&BAND, pick, Scheme::Dark);
@@ -203,7 +203,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
     for scheme in Scheme::ALL {
         for hue in (0..360).step_by(5) {
             for tenth in 0..=10 {
-                let roles = roles(hue, Weight(tenth * 100), scheme);
+                let roles = roles(hue, BandWeight(tenth * 100), scheme);
                 let kept = text_grounds(TextOn::Material, scheme, roles.fill, roles.wash);
                 let missed = match scheme {
                     Scheme::Light => 0,
@@ -218,7 +218,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
             }
         }
     }
-    let roles = roles(257, Weight::FULL, Scheme::Dark);
+    let roles = roles(257, BandWeight::FULL, Scheme::Dark);
     let (hex, alpha) = tint(Material::Popover, Scheme::Dark).expect("a tint");
     let ground = roles.fill.over(roles.wash, hex.over(alpha, BACKDROPS[1]));
     let kept = text_grounds(TextOn::Material, Scheme::Dark, roles.fill, roles.wash);
