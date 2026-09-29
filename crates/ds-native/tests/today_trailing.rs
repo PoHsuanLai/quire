@@ -1,4 +1,4 @@
-//! mailo gaps 2, step 4: a scheduled Today row on a real Blitz document. Its cancel button
+//! A scheduled Today row on a real Blitz document. Its cancel button
 //! cancels without opening the row, the row still opens from its label, and its close button
 //! says whose it is.
 

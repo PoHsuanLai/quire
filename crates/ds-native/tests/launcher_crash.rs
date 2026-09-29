@@ -1,7 +1,7 @@
-//! The two launcher crashes (sill FINDINGS Q43, Q45), reproduced on a real Blitz document.
+//! The two launcher crashes, reproduced on a real Blitz document.
 //!
-//! Q45: a motion hook's settle task outlived its component, so unmounting a palette or a menu
-//! before its entrance settled set a dropped signal ("ValueDroppedError"). Q43: a field's
+//! A motion hook's settle task outlived its component, so unmounting a palette or a menu
+//! before its entrance settled set a dropped signal ("ValueDroppedError"). A field's
 //! `Focus::OnMount` set the focus from a task polled inside the render pass, where the renderer
 //! holds the document ("RefCell already borrowed"). Each test drives mounts and unmounts from a
 //! script inside the page, on the harness's clock, and passes only if nothing panics.
@@ -66,7 +66,7 @@ fn Churn(n: u32) -> Element {
 
 /// A page that mounts `subject` and unmounts it on `script`'s schedule, counting mounts, while
 /// the palette's results change under it every 16 ms (a re-render in the same turn as the
-/// mount, which is when Q43 fired most) and small components come and go beside it.
+/// mount, which is when that crash fired most) and small components come and go beside it.
 #[component]
 fn Scripted(subject: Subject, script: Vec<Step>, motion: Motion) -> Element {
     let mut shown = use_signal(|| Shown::No);

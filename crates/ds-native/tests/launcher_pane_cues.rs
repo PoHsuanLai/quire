@@ -1,4 +1,4 @@
-//! sill Q370 and Q371 on a real Blitz document: the preview pane takes the launcher's cue. A
+//! On a real Blitz document: the preview pane takes the launcher's cue. A
 //! showing the person caused springs in and one a service caused eases in (design/26 R5);
 //! another kind while shown, a load landing and a load failing cross-fade the media in place and
 //! never replay the entrance; a load past its grace shows the pending look (a ring over
@@ -154,7 +154,7 @@ fn a_remote_showing_eases_in_and_a_contact_springs() {
     assert_eq!(attr(&harness, ".ds-preview", "data-presence"), "entering");
     assert_eq!(attr(&harness, ".ds-preview", "data-touch"), "contact");
     assert_settles_to_zero_frames(&mut harness);
-    // Present keeps the entrance declared as it played (sill G295): a later remote change does
+    // Present keeps the entrance declared as it played: a later remote change does
     // not swap its easing, which would restart or drop it.
     remote(&mut harness, Pane::Showing(Kind::Emoji));
     assert_eq!(attr(&harness, ".ds-preview", "data-presence"), "present");

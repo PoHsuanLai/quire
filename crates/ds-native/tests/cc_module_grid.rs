@@ -1,4 +1,4 @@
-//! ModuleGrid on a real Blitz document (sill FINDINGS Q102): its columns, gap and padding are
+//! ModuleGrid on a real Blitz document: its columns, gap and padding are
 //! props (`control_center.grid_*`), the columns share the width, and a Full tile spans them all.
 
 use dioxus::prelude::*;

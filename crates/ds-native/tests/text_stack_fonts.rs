@@ -1,4 +1,4 @@
-//! Why sill drew digits and spaces from Noto Color Emoji (sill Q342, FINDINGS "Colour emoji"):
+//! Why sill drew digits and spaces from Noto Color Emoji (FINDINGS "Colour emoji"):
 //! the stack `"Inter","Noto Color Emoji",system-ui,sans-serif` is laid out here through the font
 //! context shell-host builds for every surface (`shell_host::dom::fonts::SharedFonts::system`:
 //! `FontContext::new()` and Blitz's bullet face, nothing else) and through quire's own

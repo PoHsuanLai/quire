@@ -1,4 +1,4 @@
-//! mailo gaps 5, a menu whose filter is a drawn field, on a real Blitz document:
+//! A menu whose filter is a drawn field, on a real Blitz document:
 //! `filter: Filter::Field { placeholder }` shows the placeholder in a row at the top of the
 //! menu, then each typed character there as it filters the rows and `onquery` hears it; the
 //! cursor stays on the rows below the field, and Enter picks the highlighted match.

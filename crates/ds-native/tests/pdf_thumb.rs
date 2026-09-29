@@ -327,7 +327,7 @@ fn a_broken_file_lands_on_the_plate() {
     assert_eq!(harness.count(".ds-pdf-thumb-sheet"), 0);
 }
 
-/// The preview pane's pattern (sill Q292): a component that calls `use_pdf_page` on every
+/// The preview pane's pattern: a component that calls `use_pdf_page` on every
 /// render, with the path only while its content is a PDF, and hands the page to
 /// `PaneContent::Pdf`. Starts on a web row, then turns to the PDF.
 #[allow(non_snake_case)]

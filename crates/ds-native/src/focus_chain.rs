@@ -1,4 +1,4 @@
-//! Where the keyboard may land when the element meant to have it is gone (mailo gaps 7): a run
+//! Where the keyboard may land when the element meant to have it is gone: a run
 //! of focusable elements, nearest first, remembered while they were in the document.
 //!
 //! Remembered, not read at the moment of focusing, because Blitz severs a removed node from its

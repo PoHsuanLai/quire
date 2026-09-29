@@ -1,13 +1,13 @@
 //! The host's focus writes: keyboard focus moved into (`ds::HostFocus`) and out of
 //! (`ds::HostBlur`) an element straight in the Blitz document, answering "busy" instead of
 //! panicking when the renderer holds the document; its select-all write (`ds::HostSelect`),
-//! which selects a field's value once the caret is in it (mailo Phase B, G6); and its selector
-//! lookup (`ds::HostFind`, G8), so an app focuses an element it holds no handle for.
+//! which selects a field's value once the caret is in it; and its selector
+//! lookup (`ds::HostFind`), so an app focuses an element it holds no handle for.
 //!
 //! dioxus-native-dom's own `set_focus` borrows the document mutably when it is called. A task
 //! that dioxus polls inside `render_immediate` (it does, when the task woke in the same turn as
 //! a dirty scope) runs while the mutation writer holds that borrow, and the call panicked with
-//! "RefCell already borrowed" (sill FINDINGS Q43: a palette's field focusing on mount while its
+//! "RefCell already borrowed" (a palette's field focusing on mount while its
 //! results re-rendered). Probing the document first turns that into `Focused::Busy`, and quire
 //! tries again a frame later.
 //!
@@ -39,20 +39,20 @@ pub const BLUR: HostBlur = HostBlur(blur);
 pub const SELECT: HostSelect = HostSelect(select_all);
 
 /// The Blitz caret read, as the `ds::HostCaret` a root provides beside [`FOCUS`]: where the
-/// caret sits in a field when a key reaches it (a command palette's `claim`, sill Q299).
+/// caret sits in a field when a key reaches it (a command palette's `claim`).
 pub const CARET: HostCaret = HostCaret(caret);
 
 /// The Blitz caret write, as the `ds::HostPlaceCaret` a root provides beside [`CARET`]: a field
 /// focused by a request `with_caret` has its caret put at the end, the start, or over the whole
-/// value (a command palette opened on a query, sill Q341).
+/// value (a command palette opened on a query).
 pub const PLACE_CARET: HostPlaceCaret = HostPlaceCaret(place_caret);
 
 /// The Blitz selection read, as the `ds::HostSelection` a root provides beside [`CARET`]: a
-/// masked field draws its own caret and selection over its dots (sill Q360b).
+/// masked field draws its own caret and selection over its dots.
 pub const SELECTION: HostSelection = HostSelection(selection);
 
 /// Provide [`FOCUS`], [`BLUR`], [`SELECT`], [`CARET`], [`SELECTION`], [`PLACE_CARET`] and the list scroll
-/// ([`REVEAL`](crate::reveal::REVEAL), sill Q340) to the calling component's subtree. Call it at the
+/// ([`REVEAL`](crate::reveal::REVEAL)) to the calling component's subtree. Call it at the
 /// top of a root that `ds_native::launch` did not start, before any quire field or menu mounts.
 /// The click-focus fallback is separate: provide [`CLICK_FOCUS`](crate::CLICK_FOCUS) and
 /// [`PRESS_FOCUS`](crate::PRESS_FOCUS) as well to keep the focus on a `tabindex` ancestor after a

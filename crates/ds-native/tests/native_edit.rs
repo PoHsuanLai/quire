@@ -1,4 +1,4 @@
-//! The edit surface (mailo Phase B, G2; FINDINGS "Edit surface"): typing, an IME composition,
+//! The edit surface (FINDINGS "Edit surface"): typing, an IME composition,
 //! a paste with HTML, and the geometry an app draws its own caret and selection from, all
 //! through a real Blitz document.
 

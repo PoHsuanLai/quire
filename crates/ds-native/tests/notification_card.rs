@@ -1,4 +1,4 @@
-//! NotificationCard on a real Blitz document (sill Q120, Q124): a press on the close button,
+//! NotificationCard on a real Blitz document: a press on the close button,
 //! an action or a link in the body stays there and never opens the notification, while a press
 //! on the card does; under the pointer the card says so (`data-hover`, `on_hover`) and its body
 //! opens from two lines to six, measured, and closes again when the pointer leaves.

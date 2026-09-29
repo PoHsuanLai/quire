@@ -1,4 +1,4 @@
-//! The screenshot thumbnail on a real Blitz document (sill Q181): shown, the card rises in
+//! The screenshot thumbnail on a real Blitz document: shown, the card rises in
 //! (`data-presence="entering"`, `rise` at `--t-big`) and comes to rest; hidden, it slides out and
 //! `on_hidden` runs only once `settle(ShotOut)` has passed. A press on the picture that travels
 //! the drag threshold calls `ondrag` once and does not open; one that stays under it opens on its

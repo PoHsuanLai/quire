@@ -1,4 +1,4 @@
-//! mailo gaps 5, a scrim drawn inline, on a real Blitz document: `Scrim { flow: Flow::Inline }`
+//! A scrim drawn inline, on a real Blitz document: `Scrim { flow: Flow::Inline }`
 //! stands in the pane that renders it (not in the overlay), covers exactly that pane's
 //! positioned box, lies under the reader the pane draws after it (a press on the reader is the
 //! reader's), and a press on the veil itself dismisses.

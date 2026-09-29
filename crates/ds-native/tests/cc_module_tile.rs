@@ -1,4 +1,4 @@
-//! ModuleTile on a real Blitz document (sill FINDINGS Q78): a press on the tile toggles the
+//! ModuleTile on a real Blitz document: a press on the tile toggles the
 //! module, a press on its chevron opens the detail and does not toggle, and the keys do the same
 //! (Enter or Space on the tile toggles; Enter or Right on the chevron opens the detail).
 

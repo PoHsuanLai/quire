@@ -1,4 +1,4 @@
-//! Swipe to dismiss on a real Blitz document (sill Q122): a drag released under the threshold
+//! Swipe to dismiss on a real Blitz document: a drag released under the threshold
 //! springs the card back and dismisses nothing; one released past it flies the card out and
 //! reports `on_dismiss` at `settle(BannerOut)`, not before; a horizontal scroll is summed into
 //! the same offset and decided once the deltas stop; the click that ends a drag never opens the

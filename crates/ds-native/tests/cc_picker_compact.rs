@@ -1,4 +1,4 @@
-//! AppearancePicker at the control center's width (sill FINDINGS Q101): in a 300 px
+//! AppearancePicker at the control center's width: in a 300 px
 //! `ModulePanel` (a 320 px panel's grid, padding 10, design/29-SIZING.md) `PickerLayout::Compact` keeps every row
 //! inside the panel's content box, and no segment is narrower than its words. The picker has no
 //! Motion row in either layout (the user's decision, 2026-09-28). Measured on the laid-out rects.

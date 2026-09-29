@@ -4,13 +4,13 @@
 //! dioxus-native-dom's own `get_client_rect` borrows the document mutably. A task that dioxus
 //! polls inside `render_immediate` (it does, when the task woke in the same turn as a dirty
 //! scope) runs while the mutation writer holds that borrow, and the read panics with "RefCell
-//! already borrowed" (wave 2 integration: the hover card's anchor read, 450 ms after the pointer
+//! already borrowed" (the hover card's anchor read, 450 ms after the pointer
 //! came to rest). Reading through `NodeHandle::try_doc` turns that into `Measured::Busy`, and
 //! quire's reader waits a frame.
 //!
 //! Any host that runs a Blitz document provides it: `launch` and the harness do, and a host
 //! that is not `ds_native::launch` (shell-host's surfaces, sill's bar and its popups) calls
-//! [`provide`] at the top of its root component (sill FINDINGS Q10).
+//! [`provide`] at the top of its root component.
 
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;

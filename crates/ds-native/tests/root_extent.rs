@@ -1,4 +1,4 @@
-//! Sheet and modal parts, Q94: a root holding only a Sheet is 0 px tall unless it asks for the
+//! A root holding only a Sheet is 0 px tall unless it asks for the
 //! viewport. `RootExtent::Viewport` makes it the viewport's size, measured on a real Blitz
 //! document, and the sheet it hosts has that area to be placed in.
 

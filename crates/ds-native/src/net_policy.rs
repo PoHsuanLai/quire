@@ -1,4 +1,4 @@
-//! What the app decides about the network (mailo Phase B, G3): whether ds-native serves only
+//! What the app decides about the network: whether ds-native serves only
 //! local resources, nothing but inline ones, or hands the rest to the app's own fetcher (mail's
 //! consented remote images). Frames never get `file:` from ds-native: a frame's markup is not
 //! the app's, so a sanitiser miss must not turn into a read of the disk.

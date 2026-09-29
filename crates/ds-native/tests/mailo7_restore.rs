@@ -1,4 +1,4 @@
-//! mailo gaps 7, item 2: a click's focus restore skips an element the click removed. mailo's
+//! A click's focus restore skips an element the click removed. mailo's
 //! "Show images" button removes itself on press; the click's fallback had found that button (a
 //! `button` is focusable) and focused it a frame later, after it had left the document, so the
 //! keys that followed reached nothing. The restore now checks each remembered candidate when it

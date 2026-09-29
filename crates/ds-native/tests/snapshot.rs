@@ -79,8 +79,8 @@ fn SpinApp() -> Element {
 fn the_spinner_turns() {
     // Two steps apart the dashed ring has turned a further 180 degrees (a quarter per
     // `--t-pending-step`), so its dashes sit elsewhere. With a base `transform:scale(1)` a turn
-    // interpolated between two identity matrices and the ring never moved (the wave 2 ds-native
-    // finding); the ring's angle only grows while it steps.
+    // interpolated between two identity matrices and the ring never moved; the ring's angle only
+    // grows while it steps.
     let mut harness = Harness::new(SpinApp, VIEW);
     let step = |h: &Harness| {
         h.attr(".ds-spinner", "style").and_then(|style| {

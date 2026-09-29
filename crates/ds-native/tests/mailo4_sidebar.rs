@@ -1,4 +1,4 @@
-//! mailo gaps 4, sidebar places as drop targets, on a real Blitz document: each place names
+//! Sidebar places as drop targets, on a real Blitz document: each place names
 //! itself in `data-place`, hands the caller its pointer's entry, moves, exit and release, and
 //! lights as the target (`data-drop=target`) while the caller says it is (design/06 section
 //! 6.1).

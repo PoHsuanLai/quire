@@ -1,4 +1,4 @@
-//! mailo gaps 6, a folder tree on a real Blitz document: `TreeItem` is a `details`/`summary`
+//! A folder tree on a real Blitz document: `TreeItem` is a `details`/`summary`
 //! whose state is the app's. A press on the row asks for the other state through `on_toggle`
 //! (and the details follows the app, not the summary's own toggle); a press on the trailing ⋯
 //! is the button's alone, with `Propagation::Stop` and without it (the slot fences it); a press

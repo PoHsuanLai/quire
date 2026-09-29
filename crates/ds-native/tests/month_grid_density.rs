@@ -1,10 +1,10 @@
-//! The compact MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39; sill
-//! Q190): at `MonthDensity::Auto` inside a small desktop `WidgetFrame`, the month fills the
+//! The compact MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39):
+//! at `MonthDensity::Auto` inside a small desktop `WidgetFrame`, the month fills the
 //! frame's content box (164 less 12 padding a side, 140 x 140, the widgets' measured inset,
 //! design/23 section 1.1), where the regular grid (224 x 254) overflowed it: seven even 20 px
 //! columns, and the weeks sharing the height left under the header and heads, so a five-week
 //! month's rows are taller than a six-week one's (the compact-spacing pass, 2026-09-27); today's
-//! disc is round and roomy enough for two digits (Q361). A layout, not a timing, so one look.
+//! disc is round and roomy enough for two digits. A layout, not a timing, so one look.
 
 #[path = "../../ds/tests/support/month_sample.rs"]
 mod month_sample;
@@ -195,7 +195,7 @@ fn SmallSeptember() -> Element {
     }
 }
 
-/// Q361: the 16 px disc left two tabular digits (about 12 px at 700) touching its rim. Today's
+/// The 16 px disc left two tabular digits (about 12 px at 700) touching its rim. Today's
 /// disc is a circle twice the number's size (`--fs-caption` 10), so two digits keep about 4 px
 /// a side, as the regular grid's 24 px disc does round its 11.5 px number.
 #[test]

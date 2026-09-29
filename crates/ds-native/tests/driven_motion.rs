@@ -1,4 +1,4 @@
-//! Driven motion (design/05 section 14, wave H1), on `Clock::Virtual` so every frame falls at an
+//! Driven motion (design/05 section 14), on `Clock::Virtual` so every frame falls at an
 //! exact instant: a spring redirected mid-flight keeps its position and velocity; a slider thrown
 //! from 30 % lands where the throw projects; a swiped card let go springs home; each of them
 //! stops asking for frames once it rests.
@@ -226,7 +226,7 @@ fn a_toggle_clicked_again_mid_slide_turns_back_from_where_it_is() {
     assert_eq!(knob(&harness), 0.0);
 }
 
-// ---- A point glide (sill Q432): a widget into its cell, redirected, thrown -----------------
+// ---- A point glide: a widget into its cell, redirected, thrown -----------------
 
 static CELL: GlobalSignal<(f32, f32)> = Signal::global(|| (0.0, 0.0));
 

@@ -1,5 +1,5 @@
 //! The contact keyframes (`gulp`, `bump`, `seal-pop`) follow the motion level like `pop-in`
-//! does (mailo gaps 3, item 4): their squash and overshoot scale by `--overshoot`, so Calm
+//! does: their squash and overshoot scale by `--overshoot`, so Calm
 //! (and Reduced), where `--overshoot` is 1, flattens them to no change of shape, while Standard
 //! and Extra keep the catalogue's shape. Measured on the painted pixels of a 100 px ink square
 //! at the keyframe's own offset, where the animation sits exactly on that keyframe.

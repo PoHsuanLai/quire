@@ -1,4 +1,4 @@
-//! mailo gaps 7, item 3: a folder renamed in place. `TreeItem { editing }` draws the caller's
+//! A folder renamed in place. `TreeItem { editing }` draws the caller's
 //! field where the label is, at the label's metrics, so nothing on the row moves; a press or
 //! typing in it neither toggles nor selects the row; and Enter and Escape reach the field's own
 //! handler.

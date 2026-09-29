@@ -1,7 +1,7 @@
-//! design/26 D2 on a real Blitz document, on the virtual clock: the Battery module's device ring
+//! design/26 on a real Blitz document, on the virtual clock: the Battery module's device ring
 //! sweeping in from empty over `--t-sweep` on a center just opened, its percentage counting in
 //! step and landing on the true value, a later level sweeping from where it is, the bolt waiting
-//! for the sweep (G27); and the keyboard-brightness level's glyph (G25). Each ends at 0 frames;
+//! for the sweep; and the keyboard-brightness level's glyph. Each ends at 0 frames;
 //! Reduced shows the level at once.
 
 use dioxus::prelude::*;

@@ -1,6 +1,6 @@
-//! sill Q390-Q392 on a real Blitz document, on the virtual clock: a status glyph in the bar's
+//! On a real Blitz document, on the virtual clock: a status glyph in the bar's
 //! status item (same box, ink, pill and label as an icon, sized by the setting), the low-battery
-//! nudge inside the item lifting the glyph alone (design/26 G11), the control center's panel
+//! nudge inside the item lifting the glyph alone (design/26), the control center's panel
 //! header and tile disc holding a status glyph (the battery's fill sweeping in on a surface just
 //! opened), and the Sound module's level reading the bar's `VolumeState`. Each motion ends at 0
 //! frames.
@@ -46,7 +46,7 @@ const METRICS: StatusMetrics = StatusMetrics {
     glyph: Px(18.0),
 };
 
-// ---- Q390: a status glyph in the bar's status item -------------------------------------------
+// ---- a status glyph in the bar's status item -------------------------------------------
 
 static ITEM: GlobalSignal<StatusState> = Signal::global(|| {
     StatusState::Wifi(WifiState::Joined {
@@ -139,7 +139,7 @@ fn the_status_item_plays_the_glyphs_own_moments() {
     assert_settles_to_zero_frames(&mut harness);
 }
 
-// ---- G11: the nudge inside the item ----------------------------------------------------------
+// ---- the nudge inside the item ----------------------------------------------------------
 
 /// A test's own low-battery watch: crossing into Low is the Attention (sill's `LowWatch`).
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -231,7 +231,7 @@ fn a_new_attention_cue_lifts_the_glyph_once_and_never_the_pill() {
     assert_settles_to_zero_frames(&mut harness);
 }
 
-// ---- Q391: the control center's slots ------------------------------------------------------
+// ---- the control center's slots ------------------------------------------------------
 
 #[allow(non_snake_case)]
 fn Center() -> Element {
@@ -312,7 +312,7 @@ fn the_panel_header_sweeps_the_battery_in_and_the_disc_holds_the_wifi_glyph() {
     assert_settles_to_zero_frames(&mut harness);
 }
 
-// ---- Q392: the Sound module reads the bar's VolumeState ------------------------------------
+// ---- the Sound module reads the bar's VolumeState ------------------------------------
 
 static VOLUME: GlobalSignal<VolumeState> = Signal::global(|| VolumeState::Muted);
 

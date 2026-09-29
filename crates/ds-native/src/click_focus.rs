@@ -11,7 +11,7 @@
 //! The click's handler may remove the very element found (mailo's "Show images" button removes
 //! itself on press), so the fallback remembers every focusable element from the target up
 //! (`crate::focus_chain`), and `restore` focuses the first of them still in the document when it
-//! runs (mailo gaps 7).
+//! runs.
 //!
 //! A click a quire control keeps to itself never reaches the root, and quire's control hands it
 //! over itself (`ds::focus::click::kept_click`): through [`CLICK_FOCUS`] when the click's default

@@ -1,6 +1,6 @@
 //! Three launcher fixes on a real Blitz document: the palette keeps its selected stop in view
-//! whoever moved it (sill Q340), puts the caret after an initial query (Q341), and keeps a gap
-//! between a shaped row's time and its shortcut (Q343).
+//! whoever moved it, puts the caret after an initial query, and keeps a gap
+//! between a shaped row's time and its shortcut.
 
 use dioxus::prelude::*;
 use ds::{
@@ -114,7 +114,7 @@ fn inside(inner: Rect, outer: Rect) -> bool {
     top(inner) >= top(outer) - 0.5 && bottom(inner) <= bottom(outer) + 0.5
 }
 
-/// Q340: the caller moves `selected` (through a claimed key) to a row below the fold, back up to
+/// The caller moves `selected` (through a claimed key) to a row below the fold, back up to
 /// a row above the view, to the "Show More" action in the group's header, then to the first row:
 /// each time the list scrolls the least that shows it, the stop against the nearer edge, never
 /// centred, and not at all when it is in view.
@@ -189,7 +189,7 @@ fn rows_24() -> PaletteGroups<u8> {
     PaletteGroups(vec![PaletteGroup::list("Many", rows)])
 }
 
-/// Q340 under the palette's own keys (sill's real-input run): Down pressed eleven times in a
+/// The same under the palette's own keys (sill's real-input run): Down pressed eleven times in a
 /// 24-row group, with no caller holding the selection, brings row 11 (below the fold at rest)
 /// into view against the bottom edge; Up back to row 3 brings it in against the top edge. The
 /// palette is on a surface 420 px tall, as sill's launcher panel bounds it.
@@ -346,7 +346,7 @@ fn first_caret(app: fn() -> Element) -> String {
     harness.text_of(".log").unwrap_or_default()
 }
 
-/// Q341: opened on a query, the caret is after it by default (Right reads `AtEnd` at once); with
+/// Opened on a query, the caret is after it by default (Right reads `AtEnd` at once); with
 /// `Start` it is before it; with `SelectAll` the query is selected and a typed key replaces it.
 #[test]
 fn a_palette_opened_on_a_query_puts_the_caret_where_it_is_asked() {
@@ -401,7 +401,7 @@ fn KeyedRow() -> Element {
     }
 }
 
-/// Q343: a file row's time and its shortcut sit apart by `--s-6` (6 px), not run together.
+/// A file row's time and its shortcut sit apart by `--s-6` (6 px), not run together.
 #[test]
 fn a_rows_time_and_its_shortcut_keep_their_gap() {
     let mut harness = Harness::new(KeyedRow, VIEW);

@@ -1,4 +1,4 @@
-//! The Batteries widget's Medium row on a real Blitz layout (sill Q522; design/23 section 4.1,
+//! The Batteries widget's Medium row on a real Blitz layout (design/23 section 4.1,
 //! M15): four places on the reference's fixed 80 pitch from 20 in, whatever the number of
 //! batteries. One, two, three or four batteries take the first places and a bare track fills
 //! each place left over, so two batteries never spread to the card's ends with the middle empty.

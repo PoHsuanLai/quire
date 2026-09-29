@@ -1,4 +1,4 @@
-//! LeavingList on a real Blitz document, on the virtual clock (sill Q510): rows of different
+//! LeavingList on a real Blitz document, on the virtual clock: rows of different
 //! heights that the caller stops listing fold out and stay drawn until exactly their batch's
 //! settle; a Clear folds its rows staggered and drops them together; the rows below then heal
 //! by the heights the dropped rows above each one measured, starting where they stood and

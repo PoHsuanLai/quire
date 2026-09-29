@@ -1,9 +1,9 @@
-//! design/26 D2 on a real Blitz document, on the virtual clock: a settings row through an
+//! design/26 on a real Blitz document, on the virtual clock: a settings row through an
 //! operation on its item. A network joining shows a spinner where its lock was after
-//! `PendingGrace`, held still at `PendingCap` (G16); the success seals the glyph's disc, springing
-//! only when the row's own press started it (G17); a failure shakes the row once per stamp (G18);
-//! a device connecting breathes its glyph and its battery sweeps in with the count in step (G20,
-//! G21); an output switched draws its check on (G26). Each moment ends at 0 frames (R3); Reduced
+//! `PendingGrace`, held still at `PendingCap`; the success seals the glyph's disc, springing
+//! only when the row's own press started it; a failure shakes the row once per stamp;
+//! a device connecting breathes its glyph and its battery sweeps in with the count in step;
+//! an output switched draws its check on. Each moment ends at 0 frames (R3); Reduced
 //! (R7).
 
 use dioxus::prelude::*;

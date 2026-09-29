@@ -1,5 +1,5 @@
-//! The actions key toggling an actions menu over the palette (design/06 §20.2, sill FINDINGS
-//! Q62): the first Ctrl+K reaches the palette's `onkey` and opens the menu; the second arrives
+//! The actions key toggling an actions menu over the palette (design/06 §20.2):
+//! the first Ctrl+K reaches the palette's `onkey` and opens the menu; the second arrives
 //! while the menu has the keyboard, so the caller reads it where the menu's keydown bubbles, at
 //! its own root, as CONSUMING.md "palette follow-ups" says.
 

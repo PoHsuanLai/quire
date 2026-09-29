@@ -1,8 +1,8 @@
-//! sill G310-G312 on the virtual clock. An ask made between two advances runs at the instant it
-//! was made, not at the end of the next advance (G311); a focus asked while the renderer holds
-//! the document lands in that same frame every run, never a `FRAME_SLACK` later in some (G312);
+//! Asks on the virtual clock. An ask made between two advances runs at the instant it
+//! was made, not at the end of the next advance; a focus asked while the renderer holds
+//! the document lands in that same frame every run, never a `FRAME_SLACK` later in some;
 //! and a palette reports its newly selected row in the frame of the selection, so an actions key
-//! at once anchors to that row (G310).
+//! at once anchors to that row.
 
 use dioxus::prelude::*;
 use ds::{
@@ -28,7 +28,7 @@ fn virtual_harness(app: fn() -> Element) -> Harness {
     Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
-// ---- G311: a feed's wake runs at the instant of the ask --------------------------------------
+// ---- a feed's wake runs at the instant of the ask --------------------------------------
 
 thread_local! {
     /// The feed the page listens to; each test thread makes its own.
@@ -90,7 +90,7 @@ fn an_ask_between_advances_runs_at_the_instant_it_was_asked() {
     assert_eq!(harness.now() - asked, ANSWER_AFTER);
 }
 
-// ---- G312: a focus asked while the document is borrowed ---------------------------------------
+// ---- a focus asked while the document is borrowed ---------------------------------------
 
 /// A page whose field asks for the keyboard as it mounts while the same mount re-renders the
 /// page (the switcher's key target): the ask's task is woken in the turn the page is dirty, so
@@ -180,7 +180,7 @@ fn a_focus_asked_from_a_press_lands_in_the_same_frame_every_run() {
     );
 }
 
-// ---- G310: the palette's selected row, reported in the frame of the selection ---------------
+// ---- the palette's selected row, reported in the frame of the selection ---------------
 
 fn item(value: u8, title: &str) -> MenuEntry<u8> {
     MenuEntry::Item {

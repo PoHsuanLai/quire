@@ -3,7 +3,7 @@
 //! The four overlay and list cases are the plan's (a menu opens on click and closes on Escape; a
 //! hover card appears after 450 ms and not before; a toast hides after 5200 ms; a row leaves and
 //! the rows below heal), beside the control cases, the same timings driven through the hubs the
-//! root provides, and the wave 2 integration props (a field focused on mount takes typing; the
+//! root provides, and the overlay and list props (a field focused on mount takes typing; the
 //! Space editor reports the dot picked inside it).
 
 use dioxus::prelude::*;
@@ -258,7 +258,7 @@ fn the_hover_hub_opens_after_450_ms_and_not_before() {
     );
 }
 
-// ---- The plan's component cases (wave 2 overlays and lists) ------------------------------
+// ---- Component cases (overlays and lists) ---------------------------------------------------
 
 #[allow(non_snake_case)]
 fn MenuApp() -> Element {

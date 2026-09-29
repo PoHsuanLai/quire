@@ -1,5 +1,5 @@
-//! The level control on a real Blitz document (the user's brief of 2026-09-25; sill FINDINGS
-//! Q74): a level set from outside slides over `--t-quick --e-out`, while under the pointer the
+//! The level control on a real Blitz document (the user's brief of 2026-09-25):
+//! a level set from outside slides over `--t-quick --e-out`, while under the pointer the
 //! fill follows it with no easing; a press swells the track; a drag past the end stretches the
 //! capsule and it springs back on release (not under Reduced); keys step by sixteenths, Shift by
 //! sixty-fourths. Measured on the painted pixels and the laid-out rects.

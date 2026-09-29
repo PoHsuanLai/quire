@@ -1,4 +1,4 @@
-//! An exit taken back (mailo gaps 3, item 1): a row whose fold is playing is restored in place
+//! An exit taken back: a row whose fold is playing is restored in place
 //! by `Roster::stay` before the fold settles. The row is present again with no exit, and the
 //! rows below never heal, even after the fold's settle time has long passed.
 

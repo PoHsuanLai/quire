@@ -1,10 +1,10 @@
-//! Q360: a secret typed into the polkit prompt draws its dots from the field's leading edge,
+//! A secret typed into the polkit prompt draws its dots from the field's leading edge,
 //! where Blitz puts the caret. The prompt's card centres its text, and the mask (a span across
 //! the field) used to inherit that, so the dots began mid-field with the caret before them while
 //! Blitz laid the hidden text and its caret out from the start. Read from the painted pixels:
 //! every ink pixel in the field (the dots and the caret) lies in its leading third.
 //!
-//! Q360b: Blitz measures the hidden text in its editor's own face, untracked, so its caret fell
+//! Blitz measures the hidden text in its editor's own face, untracked, so its caret fell
 //! short of the Inter dots tracked .1em (two dots short at eleven). The field draws its own caret
 //! among the dots, centred in the gap: after N characters the painted caret sits half a gap after
 //! the N-th dot, after Left x3 clear of both the eighth and the ninth dot, and an unfocused field

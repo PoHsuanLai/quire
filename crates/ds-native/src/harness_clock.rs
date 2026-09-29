@@ -1,4 +1,4 @@
-//! Which clock a [`Harness`](crate::Harness) runs on (sill Q380).
+//! Which clock a [`Harness`](crate::Harness) runs on.
 //!
 //! On the [`Clock::Wall`] (the default) quire's timers are real `futures-timer` sleeps and
 //! `Harness::advance` really lets the time pass; only CSS animation time is the harness's own.
@@ -94,8 +94,8 @@ impl HarnessClock {
 /// the end, moving the clock and resolving `harness` at every stop, so each timer sees the
 /// renders the one before it caused and the CSS resolves at the instant the timer fired.
 ///
-/// The first stop is what keeps an ask between two advances at the instant it was made (sill
-/// G311): without it the woken task ran only at the next timer or at the end of the advance, and
+/// The first stop is what keeps an ask between two advances at the instant it was made:
+/// without it the woken task ran only at the next timer or at the end of the advance, and
 /// every time measured from it slid by the whole advance.
 pub(crate) fn advance(harness: &mut Harness, clock: &VirtualClock, time: Duration) {
     let end = clock.elapsed().saturating_add(time);

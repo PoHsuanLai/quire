@@ -1,4 +1,4 @@
-//! G7 (mailo Phase B): a link clicked inside a frame never navigates the frame. With
+//! A link clicked inside a frame never navigates the frame. With
 //! `FrameLinks::Intercept` the app hears the click (mailo opens it in the browser); with the
 //! default `Inert` nothing happens. Either way no request is made for the link's target.
 

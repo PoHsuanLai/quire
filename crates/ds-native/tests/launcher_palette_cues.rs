@@ -1,4 +1,4 @@
-//! sill Q372 and Q373 on a real Blitz document: the command palette plays its rows' first-show
+//! On a real Blitz document: the command palette plays its rows' first-show
 //! rise from the launcher's cue (the first result set after an opening rises with a stagger; a
 //! later set replaces in place), and a group's Show More rises the added rows in downward while
 //! its Show Less heals what follows up by their height (design/26 section 5.6, section 5.4's

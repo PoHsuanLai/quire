@@ -1,4 +1,4 @@
-//! A tinted plate on a real Blitz document (sill FINDINGS Q72): a Neutral plate with
+//! A tinted plate on a real Blitz document: a Neutral plate with
 //! `plate_tint: PlateTint::of(Monochrome, Tint::space(..))` paints its gradient in the tint's hue
 //! in the dark scheme and the light one, read back from the pixels, and a plate without a tint
 //! paints the family's stops exactly as before.

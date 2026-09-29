@@ -1,4 +1,4 @@
-//! mailo gaps 2, step 5: the Space editor's consumer rows on a real Blitz document. Typing in
+//! The Space editor's consumer rows on a real Blitz document. Typing in
 //! the name field renames the Space, the Motion row reports a pick, and a System Space is
 //! measured in both schemes.
 

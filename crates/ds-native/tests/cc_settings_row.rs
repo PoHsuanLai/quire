@@ -1,4 +1,4 @@
-//! SettingsRow on a real Blitz document (sill FINDINGS Q79): a toggle row's switch flips the
+//! SettingsRow on a real Blitz document: a toggle row's switch flips the
 //! device and never runs the row; a press on the row's words runs the row and leaves the switch
 //! alone; Enter on the focused row runs it (a press leaves the focus on the row); a disabled row does neither.
 

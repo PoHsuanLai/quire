@@ -1,12 +1,12 @@
-//! sill Q400: not every run of a command palette group's action goes through the palette's own
+//! Not every run of a command palette group's action goes through the palette's own
 //! Enter or click — `sill debug launcher-key enter` steps the keyboard machine directly, a demo
 //! may run the action from its own button — and hands the palette the next `groups` with no
 //! Enter or click of its own for the palette to have seen. `ds::PaletteHandle::mark_group_action`
 //! (from `use_palette_handle`) lets that caller book the change first: the palette then plays
-//! that group's Show More or Show Less exactly as it would its own (design/26 section 5.6, Q373).
+//! that group's Show More or Show Less exactly as it would its own (design/26 section 5.6).
 //! Unmarked, the same caller-driven change plays nothing, as any other new result set does.
 //!
-//! Run on the virtual clock (sill Q380) for exact timing. Every moment ends at 0 frames.
+//! Run on the virtual clock for exact timing. Every moment ends at 0 frames.
 
 use dioxus::prelude::*;
 use ds::{

@@ -1,4 +1,4 @@
-//! The launcher gaps on a real Blitz document (sill FINDINGS Q40-Q42, Q44): the palette
+//! The launcher gaps on a real Blitz document: the palette
 //! embedded in a surface of its own, its selection and the selected row's rect reported to the
 //! caller, a field given the keyboard back after a menu took it, and an app icon in a row.
 
@@ -177,7 +177,7 @@ fn settle_in(harness: &mut Harness) {
     harness.advance(ms(120));
 }
 
-/// Q40: embedded, the palette draws no scrim, its card spans the container's width from its top
+/// Embedded, the palette draws no scrim, its card spans the container's width from its top
 /// and, since the macOS polish pass, is only as tall as its content (at most the container's),
 /// carries the id a blur region names, and enters with the entrance asked for.
 #[test]
@@ -207,7 +207,7 @@ fn an_embedded_palette_fills_its_container_with_no_scrim() {
     );
 }
 
-/// Q41: an uncontrolled palette reports its first selection and the selected row's rect, then
+/// An uncontrolled palette reports its first selection and the selected row's rect, then
 /// every move, by key or by pointer, with the rect of the row it moved to.
 #[test]
 fn the_palette_reports_its_selection_and_the_rows_rect() {
@@ -239,7 +239,7 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
     );
 }
 
-/// Q41: controlled, the palette shows the caller's selection and only asks to move it.
+/// Controlled, the palette shows the caller's selection and only asks to move it.
 #[test]
 fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
     let mut followed = Harness::new(FollowedSelection, VIEW);
@@ -289,11 +289,11 @@ fn open_and_close_actions(harness: &mut Harness) {
     assert_eq!(harness.count(".ds-popover.ds-menu"), 0, "the menu closed");
 }
 
-/// Q44: the field gets the keyboard back when the menu closes and asks for it, without a
+/// The field gets the keyboard back when the menu closes and asks for it, without a
 /// remount (the card is still at rest, not replaying its entrance); without the request, under
 /// Blitz's own focus behaviour, it does not. Under the default `FocusFallback::Ancestor` it does
 /// without the request too: the host hands the keyboard of a removed panel to the element
-/// focused before it (mailo gaps 7).
+/// focused before it.
 #[test]
 fn a_focus_request_gives_the_field_the_keyboard_back() {
     let mut harness = Harness::new(OwnSelection, VIEW);
@@ -378,7 +378,7 @@ fn AppIconRow() -> Element {
     }
 }
 
-/// Q42: an app icon in a row fills the row's tile, drawn as it is (red), on no plate.
+/// An app icon in a row fills the row's tile, drawn as it is (red), on no plate.
 #[test]
 fn an_app_icon_fills_its_rows_tile() {
     let mut harness = Harness::new(AppIconRow, VIEW);

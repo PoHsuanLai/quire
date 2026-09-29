@@ -79,7 +79,7 @@ impl Harness {
 
     /// Build `app` at `viewport` as a shell surface is built before it is mapped: its renders
     /// run and its tasks are polled, but nothing is styled or laid out until [`Harness::map`]
-    /// (every rect reads 0 x 0 until then, sill FINDINGS Q60).
+    /// (every rect reads 0 x 0 until then).
     pub fn unmapped(app: fn() -> Element, viewport: Viewport) -> Self {
         Harness::start(app, HarnessConfig::new(viewport), Layout::Held)
     }

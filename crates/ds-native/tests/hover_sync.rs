@@ -1,4 +1,4 @@
-//! Hover under a resting pointer (sill Q170): Blitz's resolve re-hit-tests the last pointer
+//! Hover under a resting pointer: Blitz's resolve re-hit-tests the last pointer
 //! position against the new layout and records the new hovered element without events, so an
 //! element that slides in under a pointer that is not moving never heard `pointerenter`, and
 //! what the pointer left never heard `pointerleave`, until the pointer went out and back. The

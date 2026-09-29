@@ -1,4 +1,4 @@
-//! design/26 D0 on a real Blitz document, for the primitives the other details tests leave out:
+//! design/26 on a real Blitz document, for the primitives the other details tests leave out:
 //! a `LayerGlyph` searching then filling once (Pending, Settle(Fill)), a `CheckMark` drawing on,
 //! a seal that springs only on contact (Settle(LockIn), R5), and the OffUp and CrossFade morphs.
 //! Each ends at 0 frames (R3).

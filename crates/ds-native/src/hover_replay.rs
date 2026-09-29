@@ -1,4 +1,4 @@
-//! Carrying out `crate::hover_sync` against a document after a resolve (sill Q170): put Blitz's
+//! Carrying out `crate::hover_sync` against a document after a resolve: put Blitz's
 //! hover back where it was without events, then replay the last pointer event as a move, so
 //! Blitz's own driver dispatches `pointerout`/`pointerleave` for what the pointer left and
 //! `pointerover`/`pointerenter` for what came under it, with Dioxus delivery, exactly as for a

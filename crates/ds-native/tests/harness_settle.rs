@@ -2,7 +2,7 @@
 //! while a `ds` timer is still pending, only stepped over one quiet window. On `Clock::Virtual`
 //! it drains `VirtualClock::next_due` — advances straight to each pending sleep in turn — so a
 //! sleep longer than `QUIET` (500 ms) is still caught, and the caller sees its effects: the found
-//! shape (FINDINGS "Details D2"), a 900 ms `SettleHold`-sized sleep started right before the
+//! shape, a 900 ms `SettleHold`-sized sleep started right before the
 //! check, reproduced directly against a minimal component instead of a whole check mark.
 
 use dioxus::prelude::*;

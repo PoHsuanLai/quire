@@ -1,4 +1,4 @@
-//! Edit Widgets' bottom sheet on a real Blitz document (sill Q521): `PanelEdge::Bottom` stands
+//! Edit Widgets' bottom sheet on a real Blitz document: `PanelEdge::Bottom` stands
 //! centred `--s-8` above the root's bottom, as wide as asked, never taller than half the root, so
 //! the desktop's top rows, where the widgets gather and a new one lands (top right, column by
 //! column), stay uncovered. It arrives as a sheet does and comes to rest at zero frames; hidden,

@@ -1,4 +1,4 @@
-//! G8 (Native focus): a field reached by its `FieldHandle` or by selector takes the keyboard,
+//! A field reached by its `FieldHandle` or by selector takes the keyboard,
 //! selects its value, and hears `onfocus` once, though Blitz's focus write dispatches no event;
 //! a handle's blur is heard once too; an unknown or unreadable selector is a typed error.
 

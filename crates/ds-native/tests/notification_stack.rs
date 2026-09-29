@@ -1,4 +1,4 @@
-//! BannerStack on a real Blitz document (sill Q121): a banner the caller lists slides in and
+//! BannerStack on a real Blitz document: a banner the caller lists slides in and
 //! comes to rest; one it stops listing slides out and stays drawn until `settle(BannerOut)`,
 //! then the banners after it heal into its place by the height it measured, and `on_hidden`
 //! hears its key; the banners before it never move; an empty stack reports every key.

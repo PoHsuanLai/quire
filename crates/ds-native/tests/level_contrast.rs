@@ -1,4 +1,4 @@
-//! The capsule's fill against its well on the light scheme (sill FINDINGS Q105): measured on the
+//! The capsule's fill against its well on the light scheme: measured on the
 //! painted pixels, the fill and the well at the middle of the track, away from the glyph, as the
 //! WCAG contrast ratio of the two colours. Light holds at 1.6:1 or more on every ground the level
 //! is drawn on: the paper (a Window root), the control center's module plate (a `ModulePanel`
