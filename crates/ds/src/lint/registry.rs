@@ -148,12 +148,25 @@ pub fn is_known_anim(name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{declared_vars, is_known_anim};
+    use crate::css::{
+        accents_css::accents_css, ground_css::ground_css, materials_css::materials_css,
+        shape_css::shape_css, tokens_css::tokens_css,
+    };
     use crate::lint::{tokenize, walk};
 
-    /// Every custom property the generated stylesheet declares on a `.ds` root block (the token,
-    /// accent and material sections), asked of the stylesheet itself.
+    /// Every custom property the generated sections declare on a `.ds` root block (the token,
+    /// accent and material sections), asked of the generated CSS itself.
     fn root_declarations() -> Vec<String> {
-        let (rules, _) = walk::walk(&tokenize::tokens(crate::css::stylesheet::stylesheet()));
+        let sections = [
+            crate::css::RESET.to_owned(),
+            tokens_css(),
+            accents_css(),
+            materials_css(),
+            shape_css(),
+            ground_css(),
+        ]
+        .join("\n");
+        let (rules, _) = walk::walk(&tokenize::tokens(&sections));
         rules
             .into_iter()
             .filter(|rule| {

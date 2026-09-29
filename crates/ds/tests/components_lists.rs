@@ -158,7 +158,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
 
 /// The stylesheet of the component called `name`.
 fn sheet(name: &str) -> Option<&'static str> {
-    ds::components::CSS
+    ds::component_sheets()
         .iter()
         .find(|(n, _)| *n == name)
         .map(|(_, css)| *css)
@@ -219,7 +219,7 @@ const OWN: &[&str] = &[
 fn list_stylesheets_use_tokens_only() {
     let mut failures = Vec::new();
     for name in OWN {
-        let Some((_, css)) = ds::components::CSS.iter().find(|(n, _)| n == name) else {
+        let Some((_, css)) = ds::component_sheets().iter().find(|(n, _)| n == name) else {
             failures.push(format!("{name}: not in the component list"));
             continue;
         };
