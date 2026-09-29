@@ -62,7 +62,7 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Pill width | `W_0` | `n T + (n-1) g + 2 pad` (+ separator block, 10.3.9) | derived | |
 | Pill corner radius | `--m-radius` of `Material::Dock` | 22; the shell draws it as `Corner::Squircle(Px(dock.pill_radius_px))`, recommended 18 | squircle settled 2026-09-24, value proposed (L) | `03-COLOR.md` materials table (Dock radius 22) and §17.4; a squircle of 18 reaches 36 along each edge, capped at half the 60 px pill |
 | Pill material | `Material::Dock` | tint + edge + shadow tokens from `03-COLOR.md`; compositor blur behind | settled | plan "Design: quire", Material enum |
-| Pill tint with Spaces | `--f-*` frame tokens of the current workspace's SpaceLook, cross-fade 380 ms on workspace switch | settled | plan settled decisions (Spaces on the desktop) |
+| Pill tint with Spaces | Mac Look: the Space colour sits in the backdrop layer behind `Material::Dock`, which picks it up through its blur; Arc Look: `--f-*` frame tokens of the current workspace's SpaceLook (design/30 §3.3). Cross-fade `--t-big` on workspace switch | settled | plan settled decisions (Spaces on the desktop) |
 | Surface height | `H_s` | 160 = `gut + pad + S + T` (room for a magnified tile plus one bounce) | proposed | derived; transparent area outside the input region |
 | Exclusive zone | | `Reserve(gut + H_p)` = 72 when auto-hide is off; `0` when on | settled | plan: `Reserve(base+margin)`; R4 |
 | Horizontal placement | | pill centred on the output; clamped so it keeps 8 px from both output edges | proposed | L |
@@ -75,11 +75,11 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Running dot | circle 4 px diameter (`--dock-dot`), centred under the tile, centre 3 px below the tile bottom edge (`--dock-dot-gap`; inside the 6 px bottom padding); colour the dock scope's ink; shown iff the app has at least one toplevel (any workspace); fades in over `--t-quick`; ds `RunningDot` | settled 2026-09-24 (the macOS polish pass; R26 "4-5 pt below", L) |
 | Reflective floor | a light band rising from the pill's floor under the tiles (white .26 to 0 over 40 % of the pill), off by default; ds `DockFloor`, `--dock-floor` | settled 2026-09-24 as an option, off (`dock.floor`, proposed key; macOS dropped its 3D floor after 10.9) |
 | Placeholder tile | until the generated icons arrive, an app with no icon is `IconView { plate: Some(family) }`: the 08-ICONS plate in one of the six families with the glyph at 56 % | settled 2026-09-24 |
-| Badge capsule | anchored to the tile's top-right: right edge at tile right + 2, top edge at tile top - 2; height 18, min width 18, horizontal padding 5, radius 9; fill `--danger`, text `--accent-ink`-equivalent white token, ui font 11/700 tabular; text = count; `> 999` renders `999+`; scales with the tile (it is part of the tile's transform); appears with `pop-in --t-move --e-spring`, count changes use `bump` | proposed (R21 H for meaning, geometry L) |
+| Badge capsule | anchored to the tile's top-right: right edge at tile right + 2, top edge at tile top - 2; height 18, min width 18, horizontal padding 5, radius 9; fill `--danger`, text `--accent-ink`-equivalent white token, ui font 11/700 tabular; text = count; `> 999` renders `999+`; scales with the tile (it is part of the tile's transform); appears and disappears with the tile (no pop, no bump; a count change swaps the text at once, design/30 §1.3) | proposed (R21 H for meaning, geometry L) |
 | Badge source | `com.canonical.Unity.LauncherEntry.Update`: `count` + `count-visible` | settled (plan COSMIC findings) |
-| Progress ring | circle 20 px outer diameter centred at (tile right - 8, tile bottom - 8), on a 22 px `--raise` disc; stroke 3, track `--ink` at the design's faint alpha, arc `--accent`, starts at 12 o'clock, clockwise, `progress` 0..1 from LauncherEntry `progress` + `progress-visible`; arc length changes are not animated faster than `--t-quick` | proposed (L; macOS draws a bar, the plan names a ring) |
+| Progress | a `ProgressIndicator{Bar}` under the icon, as macOS draws it (design/30 §2.9; the ring and `dock.progress_style` are removed); `progress` 0..1 from LauncherEntry `progress` + `progress-visible`; a changed value tweens linearly over `--t-move` | settled (design/30); bar geometry not yet specified |
 | Urgent | LauncherEntry `urgent = true` starts a Critical bounce (10.3.5) | proposed (M) |
-| Separator | 1 px wide, 36 px tall (0.75 T), `--f-line`, 6 px margin each side; present only when the Trash tile is present (10.3.9) | proposed (R26 L) |
+| Separator | 1 px wide, 36 px tall (0.75 T), `--line`, 6 px margin each side; present only when the Trash tile is present (10.3.9) | proposed (R26 L) |
 | Pressed tile | a `--scrim` overlay clipped to the plate while the primary button is down | proposed (L: macOS darkens the pressed icon) |
 
 ### 10.3.3 Magnification
@@ -105,9 +105,9 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 
 | Value | Number | Status | Basis |
 | --- | --- | --- | --- |
-| Component | ds `Tooltip{Fly}` (ink on paper, data font 10, padding 3/7, radius 6) | settled (brief: fly from the design) | A4 fly |
+| Component | ds `DockLabel` (`HoverIntent` profile Label, design/30 §2.5; Fade `--t-quick` in and out) | settled (design/30) | A4 fly |
 | Position | horizontally centred on the tile, bottom edge 7 px above the tile's current (magnified, not bouncing) top | proposed | A4 fly: `bottom: calc(100% + 7px)` |
-| First delay | `--d-fly` = 350 ms from the pointer settling on a tile | settled (brief) | A4 fly, plan delay tokens |
+| First delay | the Label profile's open delay, `hover.label_open_ms` (100 ms), from the pointer settling on a tile | settled (design/30 §1.2, §1.8) | A4 fly |
 | Warm | after a label has shown, moving to another tile shows its label with 0 ms delay; warm lasts until the pointer has been outside the hit region for 400 ms (`HoverWarm`) | proposed | A6 hover card warm rule |
 | Follow | the label moves with its tile every frame (no easing), like the tile | proposed |
 | Hidden | on primary press, while a context menu is open, while dragging, while auto-hide is hidden or sliding | proposed |
@@ -146,7 +146,7 @@ an app_id the arriving modifier is unverified (plan shell risks), so the dock ac
 | Option-click | any | activate as primary click, then minimize every toplevel of the previously active app | proposed (R17 H) |
 | Option-Cmd-click | any | activate as primary click, then minimize every toplevel of every other app on the current workspace | proposed (R18 H) |
 | Middle click | any | launch a new instance / the desktop action `new-window` if present | proposed (Linux convention; macOS has none) |
-| Secondary press, or primary press held 600 ms without moving 8 px | any | open the context menu (10.3.7) | proposed (press-and-hold duration L) |
+| Secondary press, or primary press held for the `LongPress` delay (500 ms, `dock.hold_to_menu_ms` defaulting to `input.long_press_ms`) without moving 8 px | any | open the context menu (10.3.7) | proposed (press-and-hold duration L) |
 | Scroll over dock | any | ignored (no rubber band on the dock, `11-BEHAVIOUR-scroll.md` §11.3.7) | settled (C-B H/M) |
 
 Activation happens on **release** inside the same tile. Release outside the tile after a press
@@ -180,12 +180,12 @@ are omitted in v1. While the menu is open the dock is Frozen (10.3.3).
 | --- | --- | --- | --- |
 | Drag start | primary press on a tile, then pointer moves more than 8 px Manhattan | settled for the design (A6 drag "live after 8 px Manhattan") |
 | Ghost | the tile image at its current size follows the pointer at the press offset; drawn in a dedicated Overlay layer surface (input region Empty, kept warm with `set_visibility`), because the pointer leaves the dock surface; motion keeps arriving through the implicit pointer grab of the press | proposed |
-| Reorder | while the pointer is within the pill rect inflated by 64 px, the insertion index is the slot whose midpoint is nearest; tiles slide apart with `transform --t-move --e-spring`; magnification keeps tracking with the gap counted as a tile | proposed |
+| Reorder | while the pointer is within the pill rect inflated by 64 px, the insertion index is the slot whose midpoint is nearest; tiles slide apart with a `Spring` (response Move); magnification keeps tracking with the gap counted as a tile | proposed |
 | Remove threshold | pointer outside the pill rect inflated by 64 px | proposed (R20 H behaviour, distance UNKNOWN) |
-| Remove label | a `Tooltip{Fly}` reading "Remove" 7 px above the ghost, shown while beyond the threshold; no poof animation | settled (brief) |
-| Release beyond threshold | pinned: unpin; the ghost fades with `fade --t-quick`; the gap heals `--t-move --e-spring`; UI sound `item-deleted` (§13.3.10). Running app: unpinned, its tile animates back into the running section | R20 (H) |
+| Remove label | a `DockLabel` reading "Remove" 7 px above the ghost, shown while beyond the threshold; no poof animation | settled (brief) |
+| Release beyond threshold | pinned: unpin; the ghost fades with a Fade `--t-quick`; the gap closes with a `Spring` (response Move); UI sound `item-deleted` (§13.3.10). Running app: unpinned, its tile animates back into the running section | R20 (H) |
 | Release inside | commit the new order to `~/.config/sill/dock.json` | proposed |
-| Esc during drag | cancel, ghost returns to the origin slot `--t-move --e-spring` | proposed |
+| Esc during drag | cancel, ghost returns to the origin slot by `use_drag_return` (a `Spring`) | proposed |
 | File drop onto a tile | accepted iff the drag offers `text/uri-list` and at least one URI's MIME type is in the app's `MimeType=` (directories: `inode/directory`); the tile shows an `--accent` 2 px ring; drop launches via `expand_exec` (`%f %F %u %U`) or D-Bus `Open` | R19 (H) |
 | Spring-loading | a DnD pointer resting on a running app's tile for 500 ms activates that app's most recent toplevel; the drag continues | R24 (M) |
 | Drop between tiles | a `.desktop` file or a launcher item dropped between tiles pins it at that index | proposed |
@@ -311,14 +311,14 @@ Hover transitions (P = progress):
 | any | OpenMenu / drag leaves the dock / Reveal sliding | Frozen{cause} | |
 | Frozen | MenuClosed, drag ends, slide ends | Tracking if the pointer is inside, else Leaving | |
 
-Label: Idle -> Pending on hover of a tile (`d_fly` 350 ms) -> Shown on Frame after the delay;
+Label (the `HoverIntent` Label profile; sill keeps no machine of its own): Idle -> Pending on hover of a tile (`hover.label_open_ms`, 100 ms) -> Shown on Frame after the delay;
 Shown -> Shown{other} immediately on tile change; Shown -> Warm{until: now + 400 ms} on leave;
 Warm -> Shown{tile} with 0 ms on hover; Warm -> Idle when `now >= until`. Press, drag, menu:
 -> Idle.
 
 Press: Up -> Down on Press over a tile; Down -> Dragging when moved > 8 px Manhattan (primary
 only); Down -> Up on Release inside the same tile (Launch/Activate by 10.3.6); Down -> Up +
-OpenMenu when held 600 ms (checked on Frame or a timer effect); Dragging -> Up on Release (Unpin
+OpenMenu when held for the `LongPress` delay (500 ms; checked on Frame or a timer effect); Dragging -> Up on Release (Unpin
 or Reorder), on Esc (cancel).
 
 Reveal (auto-hide ON): Hidden -> Armed on PointerEnter of the strip; Armed -> Showing when
@@ -400,14 +400,14 @@ hiding:  y_off(t) = D * e_exit(t / 500 ms)
 
 ## 10.6 Configuration
 
-Settings app keys, stored in `~/.config/sill/settings.json` under `dock` (pinned items stay in
+Settings app keys, stored in `~/.config/sill/settings.toml` under `dock` (`22-SETTINGS.md` is the full list) (pinned items stay in
 `~/.config/sill/dock.json`, plan). Two-state values are enums, not bools (CONVENTIONS §4).
 
 | Key | Type | Default | Range | Status |
 | --- | --- | --- | --- | --- |
 | `dock.magnification` | `On | Off` | `On` | | settled |
-| `dock.tile_size` | px | 48 | 32..80 | settled default, range proposed |
-| `dock.magnified_size` | px | 96 | `tile_size`..128 | settled default, range proposed |
+| `dock.tile_size_px` | px | 48 | 32..80 | settled default, range proposed |
+| `dock.magnified_size_px` | px | 96 | `tile_size_px`..128 | settled default, range proposed |
 | `dock.autohide` | `On | Off` | `Off` | | settled |
 | `dock.autohide_delay_ms` | ms | 200 | 0..1000 | settled default |
 | `dock.autohide_slide_ms` | ms | 500 | 0..1500 | settled default |
@@ -419,7 +419,7 @@ Settings app keys, stored in `~/.config/sill/settings.json` under `dock` (pinned
 | `dock.trash` | `On | Off` | `On` | | proposed |
 
 Gallery-only knobs (not in Settings): `R` (96), `g` (4), `--m-radius` (22, owned by 03-COLOR), enter 120 ms,
-leave 200 ms, bounce `P` 500 ms, hold-to-menu 600 ms, remove threshold 64 px.
+leave 200 ms, bounce `P` 500 ms, hold-to-menu (the `LongPress` delay), remove threshold 64 px.
 
 ## 10.7 Integration
 
@@ -431,8 +431,8 @@ leave 200 ms, bounce `P` 500 ms, hold-to-menu 600 ms, remove threshold 64 px.
 | Items, `match_app`, launch | `sill-services` apps + launch services | plan "Design: sill" |
 | Badges, progress, urgent | `use_launcher_entry` (zbus match on LauncherEntry) | |
 | Menu component | ds `Menu{Context}` | §13.3.2-13.3.4 behaviour |
-| Label | ds `Tooltip{Fly}` + ds delay tokens | |
-| Tint | `21-SPACES.md` SpaceLook of the active workspace | cross-fade 380 ms |
+| Label | ds `DockLabel` over `HoverIntent` (Label profile) | |
+| Tint | `21-SPACES.md` SpaceLook of the active workspace; layer per Look (design/30 §3.3) | cross-fade `--t-big` |
 | Sounds | §13.3.10 | |
 
 Platform limits:
@@ -470,9 +470,9 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
    returns to `W_0`; input and blur regions equal the rest rects in the same frame.
 6. **Idle**: 5 s with the pointer still inside, and 5 s with it outside: 0 frames, 0 commits,
    <= 5 context switches (plan M0 c).
-7. **Label**: hover a tile and hold still: label appears at 350 ms +- 1 frame, not before;
+7. **Label**: hover a tile and hold still: label appears at the Label profile's open delay (100 ms) +- 1 frame, not before;
    move to the neighbour: its label appears within 1 frame; leave for 300 ms and return: 0 ms
-   delay; leave for 500 ms and return: 350 ms.
+   delay; leave for 500 ms and return: the open delay again.
 8. **Bounce**: Informational: the tile's lift follows 10.5.3 within 1 px per frame and ends at
    1000 ms +- 1 frame; Critical: continues until a toplevel of that app is activated, then
    finishes the current period; Launch with a test app that maps a window at 1.3 s: stops at
@@ -493,16 +493,16 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
 14. **Regions**: during a sweep, input region always contains every magnified tile's rect;
     blur region never extends above the pill's top edge.
 15. **Headless snapshots**: rest, magnified at 3 pointer positions, badge 7 / 1234, progress
-    0.4, label shown, dragging with Remove, in light and dark and two SpaceLooks.
+    0.4, label shown, dragging with Remove, in light and dark, in both Looks and two SpaceLooks.
 
 ## 10.9 Open decisions
 
 1. Influence radius `R`: 96 (Plank, one magnified width) affects only one neighbour each side
    at 48/96; macOS appears to affect about two. Alternative: 144. Tune in the gallery.
-2. Progress indicator: ring (plan) vs bar under the icon (macOS). Ring specified.
+2. Progress indicator: the bar is settled (design/30 §2.9); its size and offset under the icon are open.
 3. Trash tile and separator in v1 (proposed) or deferred with stacks.
-4. Hover label font: the design's Fly uses Space Mono 10; macOS labels are ~13 pt. Keep Fly
-   (coherence) or add a `size=dock` variant to ds.
+4. Hover label font: macOS labels are ~13 pt in the system font (R11); design/30 does not fix the
+   `DockLabel` type size.
 5. `click_active_app`: Cycle (plan) vs Nothing (macOS).
 6. Informational attention source on Linux: only our IPC today; map app notifications to
    Informational bounce or not.
