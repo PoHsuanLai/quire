@@ -38,11 +38,20 @@ fn every_listed_class_is_in_the_stylesheet() {
 fn the_table_has_no_duplicates_and_every_root_is_a_ds_class() {
     let roots: Vec<&str> = COMPONENTS.iter().map(|c| c.root).collect();
     let unique: HashSet<&str> = roots.iter().copied().collect();
-    assert_eq!(roots.len(), unique.len(), "a root is listed twice: {roots:?}");
+    assert_eq!(
+        roots.len(),
+        unique.len(),
+        "a root is listed twice: {roots:?}"
+    );
     for component in COMPONENTS {
         assert!(component.root.starts_with("ds-"), "{}", component.root);
         let parts: HashSet<&str> = component.parts.iter().copied().collect();
-        assert_eq!(parts.len(), component.parts.len(), "{}", component.component);
+        assert_eq!(
+            parts.len(),
+            component.parts.len(),
+            "{}",
+            component.component
+        );
     }
     let axes: HashSet<&str> = AXES.iter().map(|axis| axis.attribute).collect();
     assert_eq!(axes.len(), AXES.len(), "an attribute is listed twice");
@@ -58,5 +67,8 @@ fn the_doc_page_is_the_table() {
     }
     let have = std::fs::read_to_string(&path)
         .unwrap_or_else(|e| panic!("{}: {e} (DS_BLESS=1 writes it)", path.display()));
-    assert_eq!(have, want, "docs/selectors.md is stale (DS_BLESS=1 rewrites it)");
+    assert_eq!(
+        have, want,
+        "docs/selectors.md is stale (DS_BLESS=1 rewrites it)"
+    );
 }
