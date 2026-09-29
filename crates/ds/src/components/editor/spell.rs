@@ -15,8 +15,6 @@ use crate::spell::host::{HostSpell, Paragraph};
 use crate::spell::lang::{Lang, Spell};
 use crate::spell::marks::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
 use crate::spell::words::words;
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{ScopeId, Task, current_scope_id};
 use dioxus::prelude::*;
@@ -47,7 +45,6 @@ pub(crate) struct SpellCtx {
     pub(crate) edit: Option<HostEdit>,
     /// The marks' boxes, from the layer's corner.
     pub(crate) boxes: Signal<Vec<Rect>>,
-    pub(crate) level: MotionLevel,
     /// The surface's scope: every task the checker starts is the surface's, so a menu that
     /// closes (its handler started the work) cannot cancel it.
     pub(crate) scope: ScopeId,
@@ -61,8 +58,6 @@ impl SpellCtx {
             host: use_hook(try_consume_context::<HostSpell>),
             edit,
             boxes: use_signal(Vec::new),
-            level: try_use_context::<Signal<Scope>>()
-                .map_or(MotionLevel::Standard, |env| env.peek().resolved.motion),
             scope: current_scope_id(),
         }
     }
@@ -113,7 +108,7 @@ pub(crate) fn touch(ctx: &SpellCtx) {
         }
         sleep(
             DelayToken::SpellDebounce
-                .delay(round.level)
+                .delay()
                 .saturating_sub(FRAME_SLACK),
         )
         .await;

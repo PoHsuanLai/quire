@@ -8,167 +8,115 @@
 //! section's other odd values (40, 46, 50, 56) belong to mail surfaces quire does not draw; the
 //! floating clamp margin and the card inset are both `--s-8`.
 
-use super::name::VarName;
+use crate::core::word::Word;
+use crate::style::tokens::token::{Token, TokenScope};
 
 /// One step of the spacing scale.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Word, Token)]
+#[token(prefix = "s-", kind = fixed)]
 pub enum SpacingToken {
     /// `--s-1`: 1 px.
+    #[token(name = "1", value = "1px")]
     S1,
     /// `--s-1-5`: 1.5 px, the chip's and the image mark's padding (04-COMPONENTS sections 10, 28).
+    #[token(name = "1-5", value = "1.5px")]
     S1Half,
     /// `--s-2`: 2 px.
+    #[token(name = "2", value = "2px")]
     S2,
     /// `--s-3`: 3 px.
+    #[token(name = "3", value = "3px")]
     S3,
     /// `--s-4`: 4 px.
+    #[token(name = "4", value = "4px")]
     S4,
     /// `--s-5`: 5 px.
+    #[token(name = "5", value = "5px")]
     S5,
     /// `--s-6`: 6 px.
+    #[token(name = "6", value = "6px")]
     S6,
     /// `--s-7`: 7 px.
+    #[token(name = "7", value = "7px")]
     S7,
     /// `--s-8`: 8 px.
+    #[token(name = "8", value = "8px")]
     S8,
     /// `--s-9`: 9 px.
+    #[token(name = "9", value = "9px")]
     S9,
     /// `--s-10`: 10 px.
+    #[token(name = "10", value = "10px")]
     S10,
     /// `--s-11`: 11 px.
+    #[token(name = "11", value = "11px")]
     S11,
     /// `--s-12`: 12 px.
+    #[token(name = "12", value = "12px")]
     S12,
     /// `--s-13`: 13 px, the hover card's inline padding (04-COMPONENTS section 22).
+    #[token(name = "13", value = "13px")]
     S13,
     /// `--s-14`: 14 px.
+    #[token(name = "14", value = "14px")]
     S14,
     /// `--s-15`: 15 px, the toast's leading padding (04-COMPONENTS section 23).
+    #[token(name = "15", value = "15px")]
     S15,
     /// `--s-16`: 16 px.
+    #[token(name = "16", value = "16px")]
     S16,
     /// `--s-18`: 18 px.
+    #[token(name = "18", value = "18px")]
     S18,
     /// `--s-22`: 22 px.
+    #[token(name = "22", value = "22px")]
     S22,
     /// `--s-26`: 26 px.
+    #[token(name = "26", value = "26px")]
     S26,
     /// `--s-36`: 36 px.
+    #[token(name = "36", value = "36px")]
     S36,
 }
 
 impl SpacingToken {
-    /// Every step, smallest first, in stylesheet order.
-    pub const ALL: [SpacingToken; 21] = [
-        SpacingToken::S1,
-        SpacingToken::S1Half,
-        SpacingToken::S2,
-        SpacingToken::S3,
-        SpacingToken::S4,
-        SpacingToken::S5,
-        SpacingToken::S6,
-        SpacingToken::S7,
-        SpacingToken::S8,
-        SpacingToken::S9,
-        SpacingToken::S10,
-        SpacingToken::S11,
-        SpacingToken::S12,
-        SpacingToken::S13,
-        SpacingToken::S14,
-        SpacingToken::S15,
-        SpacingToken::S16,
-        SpacingToken::S18,
-        SpacingToken::S22,
-        SpacingToken::S26,
-        SpacingToken::S36,
-    ];
-
-    /// The custom property: `--s-1`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            SpacingToken::S1 => "--s-1",
-            SpacingToken::S1Half => "--s-1-5",
-            SpacingToken::S2 => "--s-2",
-            SpacingToken::S3 => "--s-3",
-            SpacingToken::S4 => "--s-4",
-            SpacingToken::S5 => "--s-5",
-            SpacingToken::S6 => "--s-6",
-            SpacingToken::S7 => "--s-7",
-            SpacingToken::S8 => "--s-8",
-            SpacingToken::S9 => "--s-9",
-            SpacingToken::S10 => "--s-10",
-            SpacingToken::S11 => "--s-11",
-            SpacingToken::S12 => "--s-12",
-            SpacingToken::S13 => "--s-13",
-            SpacingToken::S14 => "--s-14",
-            SpacingToken::S15 => "--s-15",
-            SpacingToken::S16 => "--s-16",
-            SpacingToken::S18 => "--s-18",
-            SpacingToken::S22 => "--s-22",
-            SpacingToken::S26 => "--s-26",
-            SpacingToken::S36 => "--s-36",
-        })
-    }
-
-    /// The step in tenths of a logical pixel: 15 is 1.5 px, 80 is 8 px.
+    /// The step in tenths of a pixel: `15` is `1.5px`, read from the token's own value.
     pub fn tenths(self) -> u16 {
-        match self {
-            SpacingToken::S1 => 10,
-            SpacingToken::S1Half => 15,
-            SpacingToken::S2 => 20,
-            SpacingToken::S3 => 30,
-            SpacingToken::S4 => 40,
-            SpacingToken::S5 => 50,
-            SpacingToken::S6 => 60,
-            SpacingToken::S7 => 70,
-            SpacingToken::S8 => 80,
-            SpacingToken::S9 => 90,
-            SpacingToken::S10 => 100,
-            SpacingToken::S11 => 110,
-            SpacingToken::S12 => 120,
-            SpacingToken::S13 => 130,
-            SpacingToken::S14 => 140,
-            SpacingToken::S15 => 150,
-            SpacingToken::S16 => 160,
-            SpacingToken::S18 => 180,
-            SpacingToken::S22 => 220,
-            SpacingToken::S26 => 260,
-            SpacingToken::S36 => 360,
-        }
-    }
-
-    /// The step as written in CSS and in its name: `8`, `1.5`.
-    fn number(self) -> String {
-        let tenths = self.tenths();
-        match tenths % 10 {
-            0 => (tenths / 10).to_string(),
-            part => format!("{}.{part}", tenths / 10),
-        }
-    }
-
-    /// The CSS value: `8px`, `1.5px`.
-    pub fn css(self) -> String {
-        format!("{}px", self.number())
+        let value = self.css_value(TokenScope::BASE);
+        let pixels: f32 = value.as_str().trim_end_matches("px").parse().unwrap_or(0.0);
+        (pixels * 10.0).round() as u16
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::SpacingToken;
+    use crate::core::word::Word;
+    use crate::style::tokens::token::{Token, TokenScope};
 
     #[test]
     fn each_name_is_its_own_value() {
-        for token in SpacingToken::ALL {
-            let name = format!("--s-{}", token.number().replace('.', "-"));
-            assert_eq!(token.var().as_str(), name);
-            assert_eq!(token.css(), format!("{}px", token.number()));
+        for token in SpacingToken::ALL.iter().copied() {
+            let value = token.css_value(TokenScope::BASE);
+            let number = value.as_str().trim_end_matches("px");
+            assert_eq!(
+                token.var().as_str(),
+                format!("--s-{}", number.replace('.', "-"))
+            );
         }
-        assert_eq!(SpacingToken::S1Half.css(), "1.5px");
+        assert_eq!(
+            SpacingToken::S1Half.css_value(TokenScope::BASE).as_str(),
+            "1.5px"
+        );
     }
 
     #[test]
     fn the_scale_ascends() {
-        let tenths = SpacingToken::ALL.map(SpacingToken::tenths);
+        let tenths: Vec<u16> = SpacingToken::ALL
+            .iter()
+            .map(|token| token.tenths())
+            .collect();
         assert!(
             tenths.windows(2).all(|pair| pair[0] < pair[1]),
             "{tenths:?}"

@@ -1,5 +1,6 @@
 //! The overlay registry and the host that renders it at the end of `.ds`.
 
+use crate::core::word::Word;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 

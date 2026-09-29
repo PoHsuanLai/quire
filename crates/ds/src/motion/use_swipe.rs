@@ -76,8 +76,8 @@ impl Swiper {
         if let Some(pending) = try_get(self.quiet)? {
             pending.cancel();
         }
-        let level = try_get(self.env)?.resolved.motion;
-        let wait = DelayToken::SwipeQuiet.delay(level);
+        try_get(self.env)?;
+        let wait = DelayToken::SwipeQuiet.delay();
         let swiper = *self;
         let task = spawn_in(self.scope, async move {
             sleep(wait).await;

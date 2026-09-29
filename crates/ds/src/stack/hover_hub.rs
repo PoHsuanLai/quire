@@ -134,7 +134,7 @@ impl HoverHub {
                 let _ = try_set(leaving, None);
             }
         });
-        let warm = DelayToken::HoverWarm.delay(level);
+        let warm = DelayToken::HoverWarm.delay();
         let tick = self.warm_tick;
         spawn_in(self.scope, async move {
             sleep(warm).await;

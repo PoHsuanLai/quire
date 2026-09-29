@@ -4,9 +4,10 @@
 //! a 16 header, a 6 gap and a Regular capsule. sill sizes its popup from these (R9) rather than
 //! from its own copies.
 
-use super::control_size::ControlSize;
-use super::name::VarName;
-use super::size_scale::WholePx;
+use crate::core::word::Word;
+use crate::style::tokens::control_size::ControlSize;
+use crate::style::tokens::size_scale::WholePx;
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
 /// The control center's sizes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -53,19 +54,54 @@ impl ControlCenterScale {
                 + ControlSize::Regular.scale().height.0,
         )
     }
+}
 
-    /// Every token and its value: `(--cc-width, 320px)`, …
-    pub fn tokens(self) -> [(VarName, String); 9] {
-        [
-            (VarName("--cc-width"), self.width.css()),
-            (VarName("--cc-pad"), self.padding.css()),
-            (VarName("--cc-gap"), self.gap.css()),
-            (VarName("--cc-module-r"), self.module_radius.css()),
-            (VarName("--cc-panel-r"), self.panel_radius().css()),
-            (VarName("--cc-tile-h"), self.tile.css()),
-            (VarName("--cc-head"), self.head.css()),
-            (VarName("--cc-head-gap"), self.head_gap.css()),
-            (VarName("--cc-level-h"), self.level_module().css()),
-        ]
-    }
+/// One of the control center's sizes, as a token.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "cc-", kind = fixed, css = control_center_css)]
+pub enum ControlCenterSize {
+    /// `--cc-width`: the panel's width.
+    #[token(name = "width")]
+    Width,
+    /// `--cc-pad`: the padding inside the panel and a module.
+    #[token(name = "pad")]
+    Padding,
+    /// `--cc-gap`: between modules.
+    #[token(name = "gap")]
+    Gap,
+    /// `--cc-module-r`: a module's radius.
+    #[token(name = "module-r")]
+    ModuleRadius,
+    /// `--cc-panel-r`: the panel's radius.
+    #[token(name = "panel-r")]
+    PanelRadius,
+    /// `--cc-tile-h`: a toggle tile's height.
+    #[token(name = "tile-h")]
+    Tile,
+    /// `--cc-head`: a module header's line.
+    #[token(name = "head")]
+    Head,
+    /// `--cc-head-gap`: between a module's header and its control.
+    #[token(name = "head-gap")]
+    HeadGap,
+    /// `--cc-level-h`: a level module's height.
+    #[token(name = "level-h")]
+    LevelModule,
+}
+
+/// The size a control center token holds, as the stylesheet writes it.
+fn control_center_css(token: ControlCenterSize, _scope: TokenScope) -> CssValue {
+    let scale = CONTROL_CENTER;
+    let size = match token {
+        ControlCenterSize::Width => scale.width,
+        ControlCenterSize::Padding => scale.padding,
+        ControlCenterSize::Gap => scale.gap,
+        ControlCenterSize::ModuleRadius => scale.module_radius,
+        ControlCenterSize::PanelRadius => scale.panel_radius(),
+        ControlCenterSize::Tile => scale.tile,
+        ControlCenterSize::Head => scale.head,
+        ControlCenterSize::HeadGap => scale.head_gap,
+        ControlCenterSize::LevelModule => scale.level_module(),
+    };
+    CssValue::computed(size.css())
 }

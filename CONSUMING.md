@@ -307,7 +307,7 @@ fn our_css_is_clean() {
     assert_clean(OUR_CSS, &LintConfig {
         profile: Profile::Strict,   // Standard also allows raw font-size/radius/z-index; use Strict
         exceptions: EXCEPTIONS,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     });
 }
 ```
@@ -316,8 +316,9 @@ Every exception needs a `reason`, and `assert_clean` panics listing which except
 zero offences, so a stale one cannot hide silently (mailo gaps 3: before it, it only printed
 them). A consumer mid-migration that must keep an exception for code another branch is about to
 land sets `stale: Stale::Report` (`ds::lint::Stale`): the stale exception is printed and the
-test passes. `Stale::Fail` is the default. A `LintConfig` written with every field named needs
-the new `stale` field, or `..LintConfig::default()`. Prefer `Profile::Strict` even though
+test passes. `Stale::Fail` is the default. A `LintConfig` is made from the kits it lints against (`LintConfig::new(&ds::kits())`), which
+give it the variables, keyframes and timing tokens it accepts; name only the fields you change
+and end with `..LintConfig::new(&ds::kits())`. Prefer `Profile::Strict` even though
 `Profile::Standard` is the default: quire's own `self_lint` test runs Strict, and a raw
 `border-radius`/`font-size`/`z-index` your CSS writes is exactly the kind of drift the token
 table exists to prevent.
@@ -364,13 +365,13 @@ fn full_css() -> String {
 
 #[test]
 fn markup_lint_is_clean() {
-    let offences = markup(&render_ssr(), &full_css(), &LintConfig::default());
+    let offences = markup(&render_ssr(), &full_css(), &LintConfig::new(&ds::kits()));
     assert!(offences.is_empty(), "{offences:#?}");
 }
 
 #[test]
 fn no_raw_button_is_rendered() {
-    let offences = markup(&render_ssr(), &full_css(), &LintConfig::default());
+    let offences = markup(&render_ssr(), &full_css(), &LintConfig::new(&ds::kits()));
     assert!(offences.iter().all(|o| o.rule != Rule::RawMarkup), "{offences:#?}");
 }
 ```

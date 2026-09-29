@@ -323,7 +323,7 @@ fn a_window_roots_markup_lints_clean_of_unstyled_classes() {
         stylesheet: Inject::Inline,
         ..Setup::default()
     });
-    let offences = markup(&rendered, ds::stylesheet(), &LintConfig::default());
+    let offences = markup(&rendered, ds::stylesheet(), &LintConfig::new(&ds::kits()));
     let unstyled: Vec<_> = offences
         .iter()
         .filter(|offence| offence.rule == Rule::UnstyledClass)

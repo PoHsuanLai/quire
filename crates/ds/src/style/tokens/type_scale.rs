@@ -3,155 +3,151 @@
 //! The plan names the ends, `--fs-micro` 9.5 and `--fs-display` 26; the steps between are named
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
 
-use super::name::VarName;
+use crate::core::word::Word;
 use crate::style::appearance::typeface::Typeface;
+use crate::style::tokens::token::{Token, TokenScope};
 
 /// A type family, by job. Which face does each job depends on the root's [`Typeface`]
 /// (design/02-TYPE.md section 2): the `.ds` block names the System faces and the
 /// `.ds[data-typeface=editorial]` block the Editorial ones.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "font-", kind = fixed)]
 pub enum Family {
     /// `--font-display`: Inter Display (System) or Bricolage Grotesque (Editorial). Headings,
     /// names, initials, big numbers.
+    #[token(
+        system = "\"Inter Display\",\"Inter\",system-ui,sans-serif",
+        editorial = "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif"
+    )]
     Display,
     /// `--font-ui`: Inter (System) or Karla (Editorial). Body text and every control.
+    #[token(
+        system = "\"Inter\",system-ui,sans-serif",
+        editorial = "\"Karla\",\"Segoe UI\",system-ui,sans-serif"
+    )]
     Ui,
     /// `--font-data`: Inter, always tabular (System), or Space Mono (Editorial). Anything
     /// machine-shaped: times, counts, chips, eyebrows, section headers.
+    #[token(
+        system = "\"Inter\",system-ui,sans-serif",
+        editorial = "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
+    )]
     Data,
     /// `--font-serif`: Noto Serif. A message a person writes in a serif, and the control that
     /// offers it; never the interface's own text.
+    #[token(value = "\"Noto Serif\",Georgia,\"Times New Roman\",serif")]
     Serif,
     /// `--font-code`: Space Mono in either typeface. Only where a fixed pitch carries meaning:
     /// code, `Kbd`, aligned logs.
+    #[token(value = "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace")]
     Code,
 }
 
 impl Family {
-    /// Every face, in the order the stylesheet declares them.
-    pub const ALL: [Family; 5] = [
-        Family::Display,
-        Family::Ui,
-        Family::Data,
-        Family::Serif,
-        Family::Code,
-    ];
-
-    /// The custom property: `--font-display`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            Family::Display => "--font-display",
-            Family::Ui => "--font-ui",
-            Family::Data => "--font-data",
-            Family::Serif => "--font-serif",
-            Family::Code => "--font-code",
-        })
-    }
-
-    /// The `font-family` stack under the default typeface ([`Typeface::System`]).
-    pub fn stack(self) -> &'static str {
-        self.stack_in(Typeface::System)
-    }
-
-    /// The `font-family` stack under `typeface`, face first, then its fallbacks.
-    pub fn stack_in(self, typeface: Typeface) -> &'static str {
-        match (self, typeface) {
-            (Family::Display, Typeface::System) => {
-                "\"Inter Display\",\"Inter\",system-ui,sans-serif"
-            }
-            (Family::Ui | Family::Data, Typeface::System) => "\"Inter\",system-ui,sans-serif",
-            (Family::Display, Typeface::Editorial) => {
-                "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif"
-            }
-            (Family::Ui, Typeface::Editorial) => "\"Karla\",\"Segoe UI\",system-ui,sans-serif",
-            (Family::Data, Typeface::Editorial) | (Family::Code, _) => {
-                "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
-            }
-            (Family::Serif, _) => "\"Noto Serif\",Georgia,\"Times New Roman\",serif",
-        }
-    }
-
     /// The family name the stack leads with under `typeface`: the name its face registers as.
-    pub fn face_name(self, typeface: Typeface) -> &'static str {
-        let stack = self.stack_in(typeface);
+    pub fn face_name(self, typeface: Typeface) -> String {
+        let value = self.css_value(TokenScope::BASE.in_typeface(typeface));
+        let stack = value.as_str();
         stack
             .strip_prefix('"')
             .and_then(|rest| rest.split('"').next())
             .unwrap_or(stack)
+            .to_owned()
     }
 }
 
-/// Whether a size step is the same under both typefaces.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Voiced {
-    /// One value, declared once on `.ds`.
-    Fixed,
-    /// A value per typeface, declared on each typeface's block.
-    PerTypeface,
-}
-
 /// One step of the size ramp.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "fs-", kind = fixed)]
 pub enum FontSize {
     /// `--fs-pico` 7.5: in-row provider mark.
+    #[token(value = "7.5px")]
     Pico,
     /// `--fs-dial` 9 (10 under System, the floor): a medium world clock dial's numerals
     /// (design/23-WIDGETS.md section 4.2).
+    #[token(system = "10px", editorial = "9px")]
     Dial,
     /// `--fs-nano` 9 (10 under System): pin count, favicon letter.
+    #[token(system = "10px", editorial = "9px")]
     Nano,
     /// `--fs-micro` 9.5 (10 under System): chip, via, group header.
+    #[token(system = "10px", editorial = "9.5px")]
     Micro,
     /// `--fs-caption` 10: row time, section header, shortcut.
+    #[token(value = "10px")]
     Caption,
     /// `--fs-note` 10.5: kbd, count, hover-card sub.
+    #[token(value = "10.5px")]
     Note,
     /// `--fs-eyebrow` 11: eyebrow, link pill.
+    #[token(value = "11px")]
     Eyebrow,
     /// `--fs-help` 11.5: menu help, command snippet, view switch.
+    #[token(value = "11.5px")]
     Help,
     /// `--fs-small` 12: mini, segmented, tooltip.
+    #[token(value = "12px")]
     Small,
     /// `--fs-meta` 12.5: snippet, toast, chip person.
+    #[token(value = "12.5px")]
     Meta,
     /// `--fs-control` 13: command pill, menu item, button.
+    #[token(value = "13px")]
     Control,
     /// `--fs-body` 13.5: row name and subject, sidebar item, input.
+    #[token(value = "13.5px")]
     Body,
     /// `--fs-reading` 14: reader body, hover-card title.
+    #[token(value = "14px")]
     Reading,
     /// `--fs-compose` 14.5: composer body.
+    #[token(value = "14.5px")]
     Compose,
     /// `--fs-base` 15: the base text.
+    #[token(value = "15px")]
     Base,
     /// `--fs-subhead` 15.5: parsed-body subheading.
+    #[token(value = "15.5px")]
     Subhead,
     /// `--fs-title` 16: list title, command input.
+    #[token(value = "16px")]
     Title,
     /// `--fs-heading-3` 16.5: composer `h3`.
+    #[token(name = "heading-3", value = "16.5px")]
     Heading3,
     /// `--fs-dial-large` 18: a small clock widget's dial numerals (design/23 section 4.2).
+    #[token(system = "16.5px", editorial = "18px")]
     DialLarge,
     /// `--fs-widget-figure` 20: a battery's percentage under its ring (design/23 section 4.1).
+    #[token(system = "18px", editorial = "20px")]
     WidgetFigure,
     /// `--fs-subject` 20: reader subject.
+    #[token(value = "20px")]
     Subject,
     /// `--fs-heading` 21: parsed-body and composer headings.
+    #[token(value = "21px")]
     Heading,
     /// `--fs-amount` 22: receipt amount.
+    #[token(value = "22px")]
     Amount,
     /// `--fs-day` 24: event day number.
+    #[token(value = "24px")]
     Day,
     /// `--fs-display` 26: composer subject.
+    #[token(value = "26px")]
     Display,
     /// `--fs-emoji-cell` 30: an emoji in an emoji grid's 56 px cell.
+    #[token(value = "30px")]
     EmojiCell,
     /// `--fs-widget-hero` 47: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
+    #[token(system = "42.5px", editorial = "47px")]
     WidgetHero,
     /// `--fs-emoji-preview` 96: one emoji in a preview pane.
+    #[token(value = "96px")]
     EmojiPreview,
     /// `--fs-lock-clock` 140: the lock screen's time, the largest type the shell draws
     /// (design/20-SURFACES.md section 1.9; design/04-COMPONENTS.md section 42).
+    #[token(system = "127px", editorial = "140px")]
     LockClock,
 }
 
@@ -173,94 +169,10 @@ impl FontSize {
         FontSize::LockClock,
     ];
 
-    /// Every step, smallest first.
-    pub const ALL: [FontSize; 29] = [
-        FontSize::Pico,
-        FontSize::Dial,
-        FontSize::Nano,
-        FontSize::Micro,
-        FontSize::Caption,
-        FontSize::Note,
-        FontSize::Eyebrow,
-        FontSize::Help,
-        FontSize::Small,
-        FontSize::Meta,
-        FontSize::Control,
-        FontSize::Body,
-        FontSize::Reading,
-        FontSize::Compose,
-        FontSize::Base,
-        FontSize::Subhead,
-        FontSize::Title,
-        FontSize::Heading3,
-        FontSize::DialLarge,
-        FontSize::WidgetFigure,
-        FontSize::Subject,
-        FontSize::Heading,
-        FontSize::Amount,
-        FontSize::Day,
-        FontSize::Display,
-        FontSize::EmojiCell,
-        FontSize::WidgetHero,
-        FontSize::EmojiPreview,
-        FontSize::LockClock,
-    ];
-
-    /// The custom property: `--fs-micro`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            FontSize::Pico => "--fs-pico",
-            FontSize::Dial => "--fs-dial",
-            FontSize::Nano => "--fs-nano",
-            FontSize::Micro => "--fs-micro",
-            FontSize::Caption => "--fs-caption",
-            FontSize::Note => "--fs-note",
-            FontSize::Eyebrow => "--fs-eyebrow",
-            FontSize::Help => "--fs-help",
-            FontSize::Small => "--fs-small",
-            FontSize::Meta => "--fs-meta",
-            FontSize::Control => "--fs-control",
-            FontSize::Body => "--fs-body",
-            FontSize::Reading => "--fs-reading",
-            FontSize::Compose => "--fs-compose",
-            FontSize::Base => "--fs-base",
-            FontSize::Subhead => "--fs-subhead",
-            FontSize::Title => "--fs-title",
-            FontSize::Heading3 => "--fs-heading-3",
-            FontSize::DialLarge => "--fs-dial-large",
-            FontSize::WidgetFigure => "--fs-widget-figure",
-            FontSize::Subject => "--fs-subject",
-            FontSize::Heading => "--fs-heading",
-            FontSize::Amount => "--fs-amount",
-            FontSize::Day => "--fs-day",
-            FontSize::Display => "--fs-display",
-            FontSize::EmojiCell => "--fs-emoji-cell",
-            FontSize::EmojiPreview => "--fs-emoji-preview",
-            FontSize::WidgetHero => "--fs-widget-hero",
-            FontSize::LockClock => "--fs-lock-clock",
-        })
-    }
-
-    /// The size in CSS under the default typeface ([`Typeface::System`]): `9.5px`.
-    pub fn css(self) -> &'static str {
-        self.css_in(Typeface::System)
-    }
-
-    /// The size in CSS under `typeface`. Every step is the same in both but the five fitted to a
-    /// measured cap height (design/23 section 1.1, the display face's cap at .66 em): under
-    /// System those are the Editorial size x .66 / .7275 (Inter Display's cap height), rounded
-    /// to .5 px, so the drawn caps keep the measured heights (design/02 open decision 8); and
-    /// the [`Self::FLOORED`] steps, which System raises to the 10 px floor (design/27 section
-    /// 3.16; the dial's fitted 8 px included).
-    pub fn css_in(self, typeface: Typeface) -> &'static str {
-        match (self, typeface) {
-            (FontSize::Dial | FontSize::Nano | FontSize::Micro, Typeface::System) => "10px",
-            (FontSize::DialLarge, Typeface::System) => "16.5px",
-            (FontSize::WidgetFigure, Typeface::System) => "18px",
-            (FontSize::WidgetHero, Typeface::System) => "42.5px",
-            (FontSize::LockClock, Typeface::System) => "127px",
-            _ => self.editorial_css(),
-        }
+    /// The size as CSS under `typeface`: `13px`.
+    pub fn css_in(self, typeface: Typeface) -> String {
+        self.css_value(TokenScope::BASE.in_typeface(typeface))
+            .to_string()
     }
 
     /// The size in px under `typeface`, for a check against [`Self::MIN_PX`].
@@ -269,50 +181,5 @@ impl FontSize {
             .trim_end_matches("px")
             .parse()
             .unwrap_or(f32::NAN)
-    }
-
-    /// Whether the size differs between the typefaces: declared on each typeface's block
-    /// rather than once.
-    pub fn follows_typeface(self) -> Voiced {
-        if self.css_in(Typeface::System) == self.css_in(Typeface::Editorial) {
-            Voiced::Fixed
-        } else {
-            Voiced::PerTypeface
-        }
-    }
-
-    /// The size under Editorial: the ramp as design/02 section 4.2 gives it.
-    fn editorial_css(self) -> &'static str {
-        match self {
-            FontSize::Pico => "7.5px",
-            FontSize::Dial => "9px",
-            FontSize::Nano => "9px",
-            FontSize::Micro => "9.5px",
-            FontSize::Caption => "10px",
-            FontSize::Note => "10.5px",
-            FontSize::Eyebrow => "11px",
-            FontSize::Help => "11.5px",
-            FontSize::Small => "12px",
-            FontSize::Meta => "12.5px",
-            FontSize::Control => "13px",
-            FontSize::Body => "13.5px",
-            FontSize::Reading => "14px",
-            FontSize::Compose => "14.5px",
-            FontSize::Base => "15px",
-            FontSize::Subhead => "15.5px",
-            FontSize::Title => "16px",
-            FontSize::Heading3 => "16.5px",
-            FontSize::DialLarge => "18px",
-            FontSize::WidgetFigure => "20px",
-            FontSize::Subject => "20px",
-            FontSize::Heading => "21px",
-            FontSize::Amount => "22px",
-            FontSize::Day => "24px",
-            FontSize::Display => "26px",
-            FontSize::EmojiCell => "30px",
-            FontSize::EmojiPreview => "96px",
-            FontSize::WidgetHero => "47px",
-            FontSize::LockClock => "140px",
-        }
     }
 }

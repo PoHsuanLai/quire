@@ -4,7 +4,6 @@ use std::collections::HashSet;
 
 use super::declaration;
 use super::hig;
-use super::registry;
 use super::rule::{LintConfig, Offence};
 use super::selector;
 use super::severity;
@@ -40,7 +39,7 @@ pub(super) fn every_offence(css: &str, config: &LintConfig) -> Vec<Offence> {
         offences.extend(selector::offences(&rule.selector_tokens));
     }
 
-    let mut known_vars: HashSet<String> = registry::declared_vars().clone();
+    let mut known_vars: HashSet<String> = config.known.vars.clone();
     known_vars.extend(config.own_vars.iter().cloned());
     for rule in &rules {
         for decl in &rule.declarations {
@@ -58,6 +57,7 @@ pub(super) fn every_offence(css: &str, config: &LintConfig) -> Vec<Offence> {
                 targets_svg,
                 decl,
                 &known_vars,
+                &config.known,
                 config.profile,
             ));
         }

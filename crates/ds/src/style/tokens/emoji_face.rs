@@ -12,9 +12,17 @@
 //! the faces quire ships; this one is the system's.
 
 use super::name::VarName;
+use super::token::Token;
+use crate::core::word::Word;
 
-/// The emoji stack's custom property.
-pub const FONT_EMOJI: VarName = VarName("--font-emoji");
+/// The emoji face's custom property: the one member of its family.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "font-", kind = fixed)]
+pub enum EmojiFace {
+    /// `--font-emoji`: the text face, then the colour emoji face.
+    #[token(value = "\"Inter\",\"Noto Color Emoji\",system-ui,sans-serif")]
+    Emoji,
+}
 
-/// Its value: Inter, then the COLRv1 colour emoji face, then the generic fallbacks.
-pub const FONT_EMOJI_STACK: &str = "\"Inter\",\"Noto Color Emoji\",system-ui,sans-serif";
+/// The custom property the emoji stack is declared as.
+pub const FONT_EMOJI: VarName = EmojiFace::Emoji.var();

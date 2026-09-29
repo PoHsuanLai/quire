@@ -5,8 +5,8 @@ use super::{Caption, Scope, Section, Specimen};
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, ColourToken, HueMember, LabelHue, Material, Radius, Scheme, Shadow, Surface, ZLayer,
-    accent_of,
+    Accent, ColourToken, HueMember, LabelHue, Material, Radius, Scheme, Shadow, Surface, Token,
+    TokenScope, ZLayer, accent_of,
 };
 
 /// design/01-LAYOUT.md section 2's common steps. The design names these values and quire has no
@@ -49,8 +49,8 @@ pub fn TokensPage() -> Element {
             div { class: "g-grid6",
                 for hue in LabelHue::ALL.iter().copied() {
                     for member in [HueMember::Base, HueMember::Deep, HueMember::Soft] {
-                        Specimen { name: hue.var(member), code: None,
-                            div { class: "g-swatch", style: "background:var({hue.var(member)})" }
+                        Specimen { name: hue.colour(member).var().as_str().to_owned(), code: None,
+                            div { class: "g-swatch", style: "background:{hue.colour(member).var().reference()}" }
                         }
                     }
                 }
@@ -70,8 +70,8 @@ pub fn TokensPage() -> Element {
         }
         Section { title: "Radii",
             div { class: "g-row g-row-top",
-                for radius in Radius::ALL {
-                    Specimen { name: radius.var().as_str(), code: radius.css(),
+                for radius in Radius::ALL.iter().copied() {
+                    Specimen { name: radius.var().as_str(), code: Some(radius.css_value(TokenScope::BASE).to_string()),
                         div { class: "g-radius", style: "border-radius:{radius.var().reference()}" }
                     }
                 }
@@ -79,7 +79,7 @@ pub fn TokensPage() -> Element {
         }
         Section { title: "Shadows",
             div { class: "g-row g-row-top",
-                for shadow in Shadow::ALL {
+                for shadow in Shadow::ALL.iter().copied() {
                     Specimen { name: shadow.var().as_str(), code: None,
                         div { class: "g-shadow", style: "box-shadow:{shadow.var().reference()}" }
                     }
@@ -88,8 +88,8 @@ pub fn TokensPage() -> Element {
         }
         Section { title: "Layers",
             div { class: "g-grid8",
-                for layer in ZLayer::ALL {
-                    Caption { name: layer.var().as_str(), code: format!("z-index {}", layer.z()) }
+                for layer in ZLayer::ALL.iter().copied() {
+                    Caption { name: layer.var().as_str(), code: format!("z-index {}", layer.css_value(TokenScope::BASE)) }
                 }
             }
         }

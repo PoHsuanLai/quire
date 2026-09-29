@@ -14,7 +14,7 @@
 //!     reason: "a mask's alpha, never painted",
 //! }];
 //!
-//! assert_clean(OUR_CSS, &LintConfig { exceptions: EXCEPTIONS, ..LintConfig::default() });
+//! assert_clean(OUR_CSS, &LintConfig { exceptions: EXCEPTIONS, ..LintConfig::new(&ds::kits()) });
 //! ```
 
 pub(crate) mod animation;
@@ -30,7 +30,6 @@ pub(crate) mod inline_style;
 pub(crate) mod kind;
 pub(crate) mod markup;
 pub(crate) mod markup_hig;
-pub(crate) mod registry;
 pub(crate) mod rule;
 pub(crate) mod selector;
 pub(crate) mod severity;

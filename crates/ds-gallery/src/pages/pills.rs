@@ -10,7 +10,7 @@ use ds::{
     DelayToken, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
     LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
     ShortcutKey, Switch, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
-    use_scope, use_toast_hub,
+    use_toast_hub,
 };
 
 /// The hover targets, one per card kind.
@@ -216,7 +216,6 @@ pub fn Pills(showcase: Showcase) -> Element {
 /// Undo send: five one-second ticks, then Sent.
 #[component]
 fn Countdown(showcase: Showcase) -> Element {
-    let level = use_scope().resolved.motion;
     let mut elapsed = use_signal(|| match showcase {
         Showcase::Posed => Fraction(400),
         Showcase::Live => Fraction(0),
@@ -229,11 +228,11 @@ fn Countdown(showcase: Showcase) -> Element {
         run += 1;
         let this = run();
         spawn(async move {
-            let ticks = DelayToken::SendCountdown.delay(level).as_millis()
-                / DelayToken::SendTick.delay(level).as_millis().max(1);
+            let ticks = DelayToken::SendCountdown.delay().as_millis()
+                / DelayToken::SendTick.delay().as_millis().max(1);
             let ticks = u16::try_from(ticks).unwrap_or(5).max(1);
             for tick in 1..=ticks {
-                sleep(DelayToken::SendTick.delay(level)).await;
+                sleep(DelayToken::SendTick.delay()).await;
                 if run() != this || phase() == SendPhase::Done {
                     return;
                 }

@@ -9,10 +9,10 @@
 
 use super::declaration::push;
 use super::kind;
-use super::registry;
 use super::rule::{Offence, Rule};
 use super::tokenize::Located;
 use super::walk::Decl;
+use crate::style::kit::KnownNames;
 
 /// Every keyword the `animation` shorthand accepts that is not a keyframes name. `none` is here
 /// too: as a name it means no animation, which is always known.
@@ -67,6 +67,7 @@ pub(super) fn unknown_animation(
     naming: Naming,
     selector: &str,
     decl: &Decl,
+    known: &KnownNames,
     out: &mut Vec<Offence>,
 ) {
     for segment in top_level(&decl.value) {
@@ -77,10 +78,16 @@ pub(super) fn unknown_animation(
         let Some(name) = name.filter(|name| kind::is_ident(&name.text)) else {
             continue;
         };
-        if !registry::is_known_anim(&name.text) {
+        if !is_known_anim(&name.text, known) {
             push(out, Rule::UnknownAnimation, name, selector, &name.text);
         }
     }
+}
+
+/// Whether `name` (an `animation-name` value, its `X--b` restart alias included) is a keyframes
+/// name some kit's animations play, or `none` (design/05-MOTION.md section 9 rule 2, spike S5).
+fn is_known_anim(name: &str, known: &KnownNames) -> bool {
+    name.eq_ignore_ascii_case("none") || known.keyframes.contains(&name.to_ascii_lowercase())
 }
 
 /// `value` split at its top-level commas: the one inside `cubic-bezier(…)` does not split it.

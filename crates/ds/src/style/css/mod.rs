@@ -10,7 +10,6 @@ pub(crate) mod grain;
 pub(crate) mod ground_css;
 pub(crate) mod materials_css;
 pub(crate) mod shape_css;
-pub(crate) mod tokens_css;
 
 /// `html, body` transparent; `.ds` carries paper, ink and the UI font.
 pub const RESET: &str = include_str!("reset.css");

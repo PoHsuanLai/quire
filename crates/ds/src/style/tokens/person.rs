@@ -4,54 +4,44 @@
 //! person with no stored colour is `PersonHue` (`person_hue`).
 
 use super::hex::{Colour, Hex};
+use super::token::{CssValue, Token, TokenScope};
+use crate::core::word::Word;
 
 /// One of the eight person swatches.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "c-person-", kind = fixed, css = person_css)]
 pub enum PersonSwatch {
     /// `--c-person-1` `#5B4FC4`, indigo.
+    #[token(name = "1")]
     Indigo,
     /// `--c-person-2` `#2F7F6E`, teal.
+    #[token(name = "2")]
     Teal,
     /// `--c-person-3` `#B0662E`, rust.
+    #[token(name = "3")]
     Rust,
     /// `--c-person-4` `#3C8A5B`, green.
+    #[token(name = "4")]
     Green,
     /// `--c-person-5` `#7A4A9E`, plum.
+    #[token(name = "5")]
     Plum,
     /// `--c-person-6` `#C0782E`, ochre.
+    #[token(name = "6")]
     Ochre,
     /// `--c-person-7` `#2E7F8C`, sea.
+    #[token(name = "7")]
     Sea,
     /// `--c-person-8` `#6D7A3A`, olive.
+    #[token(name = "8")]
     Olive,
 }
 
 impl PersonSwatch {
-    /// Every swatch, in the order a consumer hands them out (mailo's `AVATAR`).
-    pub const ALL: [PersonSwatch; 8] = [
-        PersonSwatch::Indigo,
-        PersonSwatch::Teal,
-        PersonSwatch::Rust,
-        PersonSwatch::Green,
-        PersonSwatch::Plum,
-        PersonSwatch::Ochre,
-        PersonSwatch::Sea,
-        PersonSwatch::Olive,
-    ];
-
     /// The swatch at `index`, wrapping: the first account takes the first swatch, the ninth
     /// the first again.
     pub fn nth(index: usize) -> Self {
         Self::ALL[index % Self::ALL.len()]
-    }
-
-    /// The custom property: `--c-person-1` … `--c-person-8`.
-    pub fn var(self) -> String {
-        let number = Self::ALL
-            .iter()
-            .position(|swatch| *swatch == self)
-            .map_or(0, |index| index + 1);
-        format!("--c-person-{number}")
     }
 
     /// The colour (design/03-COLOR.md section 13's accounts and pins).
@@ -74,6 +64,11 @@ impl PersonSwatch {
     }
 }
 
+/// A swatch as the stylesheet writes it: the same in both schemes (identity is data, not theme).
+fn person_css(token: PersonSwatch, _scope: TokenScope) -> CssValue {
+    CssValue::computed(token.hex().css())
+}
+
 #[cfg(test)]
 mod tests {
     use super::PersonSwatch;
@@ -86,7 +81,7 @@ mod tests {
         for (index, want) in AVATAR.iter().enumerate() {
             let swatch = PersonSwatch::nth(index);
             assert_eq!(swatch.hex().css().to_uppercase(), *want, "{swatch:?}");
-            assert_eq!(swatch.var(), format!("--c-person-{}", index + 1));
+            assert_eq!(swatch.var().as_str(), format!("--c-person-{}", index + 1));
             assert_eq!(PersonSwatch::nth(index + 8), swatch, "wraps");
         }
     }

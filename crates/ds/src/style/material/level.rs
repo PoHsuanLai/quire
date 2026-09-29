@@ -28,7 +28,6 @@ pub(crate) const KNOB: VarName = VarName("--m-level-knob");
 pub(crate) const TICK: VarName = VarName("--m-level-tick");
 
 /// Every level variable, for the lint's registry.
-#[cfg_attr(not(feature = "lint"), allow(dead_code))] // Read by the lint's registry.
 pub(crate) const LEVEL_VARS: [VarName; 7] = [FILL, WELL, SHADE, GLYPH, GLYPH_FILL, KNOB, TICK];
 
 const WHITE: Hex = Hex([255, 255, 255]);

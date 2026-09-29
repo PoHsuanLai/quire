@@ -1,5 +1,7 @@
 //! What the linter rejects, and how strictly.
 
+use crate::style::kit::{Kits, KnownNames};
+
 /// One thing a consumer stylesheet or markup may not do.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Rule {
@@ -171,7 +173,7 @@ impl Exception {
 }
 
 /// A lint run's settings.
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LintConfig {
     /// How strict.
     pub profile: Profile,
@@ -179,9 +181,23 @@ pub struct LintConfig {
     pub own_vars: Vec<String>,
     /// Offences to suppress, each with its reason.
     pub exceptions: &'static [Exception],
+    /// What the kits in play let a stylesheet name: custom properties, keyframes, the details
+    /// grammar's timing tokens.
+    pub known: KnownNames,
 }
 
 impl LintConfig {
+    /// The default profile with no exceptions and no consumer variables, over the vocabulary of
+    /// `kits`.
+    pub fn new(kits: &Kits) -> LintConfig {
+        LintConfig {
+            profile: Profile::default(),
+            own_vars: Vec::new(),
+            exceptions: &[],
+            known: kits.vocabulary(),
+        }
+    }
+
     /// Splits `offences` into those no exception covers and those one does.
     pub fn partition(&self, offences: Vec<Offence>) -> (Vec<Offence>, Vec<Offence>) {
         offences.into_iter().partition(|offence| {

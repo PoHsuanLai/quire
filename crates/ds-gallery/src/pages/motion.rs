@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     Anim, DelayToken, DurationToken, EasingToken, Fill, Iteration, MotionLevel, ScalarToken,
-    StaggerIndex, settle,
+    StaggerIndex, StyleDelay, settle,
 };
 use std::time::Duration;
 
@@ -32,10 +32,11 @@ pub fn MotionPage() -> Element {
         }
         Section { title: "Delays and holds", note: "Rust-timed delays; the two the stylesheet also reads carry their --d name.",
             LevelTable {
-                rows: DelayToken::ALL.iter().map(|token| {
-                    let name = token.var().map_or(format!("{token:?}"), |var| var.as_str().to_string());
-                    (name, MotionLevel::ALL.iter().copied().map(|level| millis(token.delay(level))).collect::<Vec<_>>())
-                }).collect::<Vec<_>>(),
+                rows: StyleDelay::ALL.iter().map(|token| {
+                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| millis(token.delay(level))).collect::<Vec<_>>())
+                }).chain(DelayToken::ALL.iter().map(|token| {
+                    (format!("{token:?}"), MotionLevel::ALL.iter().map(|_| millis(token.delay())).collect::<Vec<_>>())
+                })).collect::<Vec<_>>(),
             }
         }
         Section { title: "Easings", note: "Only the spring follows the level.",

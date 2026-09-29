@@ -10,7 +10,7 @@ use ds::lint::{
 fn strict() -> LintConfig {
     LintConfig {
         profile: Profile::Strict,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     }
 }
 
@@ -328,9 +328,10 @@ fn quires_own_sheet_warns_only_where_reviewed() {
 /// below it is a drawing.
 #[test]
 fn the_system_ramp_starts_at_the_floor() {
-    use ds::Typeface;
+    use ds::{Typeface, Word};
     let under: Vec<ds::FontSize> = ds::FontSize::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .filter(|size| size.px_in(Typeface::System) < ds::FontSize::MIN_PX)
         .collect();
     assert_eq!(under, [ds::FontSize::Pico]);

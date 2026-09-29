@@ -75,7 +75,7 @@ fn sheets() -> Vec<(&'static str, String)> {
 fn details() -> LintConfig {
     LintConfig {
         profile: Profile::Details,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     }
 }
 

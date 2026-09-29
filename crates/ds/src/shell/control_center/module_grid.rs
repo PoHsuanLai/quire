@@ -5,7 +5,7 @@
 //! column.
 
 use crate::core::geometry::units::Px;
-use crate::style::tokens::control_center::CONTROL_CENTER;
+use crate::shell::tokens::control_center::CONTROL_CENTER;
 use dioxus::prelude::*;
 
 /// How many equal columns the grid has; at least one (a zero is read as one).

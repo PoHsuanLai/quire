@@ -37,7 +37,7 @@ fn every_page_renders_quire_markup_only() {
     let config = LintConfig {
         profile: Profile::Strict,
         exceptions: EXCEPTIONS,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let mut failures = Vec::new();
     for page in Page::ALL.iter().copied() {
@@ -65,7 +65,7 @@ fn the_space_page_is_clean_under_strict() {
     let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
     let strict = LintConfig {
         profile: Profile::Strict,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let html = rendered(Page::Space);
     assert!(
@@ -82,7 +82,7 @@ fn every_exception_still_suppresses_something() {
     let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
     let bare = LintConfig {
         profile: Profile::Strict,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let offences: Vec<_> = Page::ALL
         .iter()

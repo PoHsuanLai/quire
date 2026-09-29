@@ -146,7 +146,7 @@ fn an_add_that_lands_settles_to_a_check_and_its_row_rises_into_view() {
         "the rise is taken off at settle(RowIn)"
     );
 
-    let hold = DelayToken::SettleHold.delay(level);
+    let hold = DelayToken::SettleHold.delay();
     let draw = DurationToken::Move.duration(level);
     assert_eq!(
         harness.text_of(CENTER_ADD).as_deref(),

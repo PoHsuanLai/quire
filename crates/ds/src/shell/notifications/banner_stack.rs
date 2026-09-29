@@ -22,7 +22,7 @@ use crate::motion::presence::Exit;
 use crate::motion::roster::RowPitch;
 use crate::motion::roster_exits::{Leaving, use_leaving_roster, use_pitches};
 use crate::shell::notifications::banner_row::BannerRow;
-use crate::style::tokens::notifications::STACK_GAP;
+use crate::shell::tokens::notifications::NotificationToken;
 use dioxus::prelude::*;
 
 /// A banner's identity: the notification's id, which the server gives.
@@ -103,7 +103,7 @@ pub fn BannerStack(
             }),
         },
     );
-    let style = gap.map(|gap| STACK_GAP.write(&format!("{}px", gap.0)));
+    let style = gap.map(|gap| NotificationToken::StackGap.write(&format!("{}px", gap.0)));
     rsx! {
         div {
             class: "ds-banner-stack",

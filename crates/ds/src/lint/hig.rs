@@ -9,6 +9,7 @@ use super::kind;
 use super::rule::{Offence, Rule};
 use super::tokenize::Located;
 use super::walk::{CollectedRule, Decl};
+use crate::core::word::Word;
 use crate::style::appearance::typeface::Typeface;
 use crate::style::tokens::type_scale::FontSize;
 
@@ -128,7 +129,8 @@ fn literal_px(text: &str) -> Option<f32> {
 /// The size step `name` names, when it is under the floor under System.
 fn small_token(name: &str) -> Option<FontSize> {
     FontSize::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .find(|size| size.var().as_str() == name && size.px_in(Typeface::System) < FontSize::MIN_PX)
 }
 

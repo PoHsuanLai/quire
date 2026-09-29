@@ -8,7 +8,8 @@ use super::declaration::push;
 use super::kind;
 use super::rule::{Offence, Profile, Rule};
 use super::walk::Decl;
-use crate::motion::detail::grammar::{is_grammar_duration, is_grammar_easing};
+use crate::core::word::Word;
+use crate::style::kit::KnownNames;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// The properties whose `var()`s time an animation or a transition.
@@ -26,12 +27,13 @@ pub(super) fn offences(
     selector: &str,
     property: &str,
     decl: &Decl,
+    known: &KnownNames,
     profile: Profile,
     out: &mut Vec<Offence>,
 ) {
     infinite(selector, property, decl, out);
     if profile == Profile::Details && TIMING_PROPERTIES.contains(&property) {
-        off_grammar(selector, decl, out);
+        off_grammar(selector, decl, known, out);
     }
 }
 
@@ -61,7 +63,7 @@ fn infinite(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offence>)
 }
 
 /// A `var(--t-*)` or `var(--e-*)` naming a token outside the grammar.
-fn off_grammar(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
+fn off_grammar(selector: &str, decl: &Decl, known: &KnownNames, out: &mut Vec<Offence>) {
     for (index, token) in decl.value.iter().enumerate() {
         if !token.text.eq_ignore_ascii_case("var(") {
             continue;
@@ -69,7 +71,7 @@ fn off_grammar(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
         let Some(name) = kind::next_significant(&decl.value, index + 1) else {
             continue;
         };
-        if outside_grammar(&name.text) {
+        if outside_grammar(&name.text, known) {
             push(
                 out,
                 Rule::OffGrammarTiming,
@@ -82,14 +84,14 @@ fn off_grammar(selector: &str, decl: &Decl, out: &mut Vec<Offence>) {
 }
 
 /// Whether `var_name` is a duration or easing token the grammar does not play.
-fn outside_grammar(var_name: &str) -> bool {
+fn outside_grammar(var_name: &str, known: &KnownNames) -> bool {
     let duration = DurationToken::ALL
-        .into_iter()
+        .iter()
         .find(|token| token.var().as_str() == var_name)
-        .is_some_and(|token| !is_grammar_duration(token));
+        .is_some_and(|token| !known.grammar_durations.contains(token));
     let easing = EasingToken::ALL
-        .into_iter()
+        .iter()
         .find(|token| token.var().as_str() == var_name)
-        .is_some_and(|token| !is_grammar_easing(token));
+        .is_some_and(|token| !known.grammar_easings.contains(token));
     duration || easing
 }

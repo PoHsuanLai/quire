@@ -14,8 +14,9 @@
 
 use super::accent_table::accent_of;
 use super::hex::{Alpha, Colour, Hex};
-use super::name::VarName;
+use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
 const fn solid(rgb: u32) -> Colour {
     Colour::Solid(rgb_hex(rgb))
@@ -31,13 +32,15 @@ const fn rgb_hex(rgb: u32) -> Hex {
 }
 
 /// One card colour token.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = fixed, css = colour_css)]
 pub enum ColourToken {
     /// `--paper`: page ground; inverse text on ink pills.
     Paper,
     /// `--surface`: card, list, rows.
     Surface,
     /// `--surface-2`: reader, composer, peek, mini, kbd.
+    #[token(name = "surface-2")]
     Surface2,
     /// `--raise`: selected row, popovers, menus.
     Raise,
@@ -137,6 +140,7 @@ pub enum ColourToken {
     ScrimIdle,
     /// `--knob-fill`: a switch's and a slider's knob, a plain white disc in either scheme (the
     /// reference's; design/29-SIZING.md section 4 rows 4 and 15), set off by its shadow.
+    #[token(name = "knob-fill")]
     Knob,
     /// `--orb-bg`: the voice orb's ground, the ring it fades to at its rim and the dots over
     /// it (design/30 section 2.9). Values per Look: Mac is the reference's oklch(95% .02 264.695)
@@ -151,104 +155,6 @@ pub enum ColourToken {
 }
 
 impl ColourToken {
-    /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 44] = [
-        ColourToken::Paper,
-        ColourToken::Surface,
-        ColourToken::Surface2,
-        ColourToken::Raise,
-        ColourToken::Ink,
-        ColourToken::InkSoft,
-        ColourToken::InkFaint,
-        ColourToken::Line,
-        ColourToken::LineSoft,
-        ColourToken::Accent,
-        ColourToken::AccentInk,
-        ColourToken::AccentSoft,
-        ColourToken::AccentText,
-        ColourToken::AccentTextMaterial,
-        ColourToken::Seal,
-        ColourToken::Ok,
-        ColourToken::Warn,
-        ColourToken::Danger,
-        ColourToken::Scrim,
-        ColourToken::ForeignGround,
-        ColourToken::OkWash,
-        ColourToken::WarnWash,
-        ColourToken::DangerWash,
-        ColourToken::AccentRing,
-        ColourToken::DangerInk,
-        ColourToken::MarkGround,
-        ColourToken::HandleRing,
-        ColourToken::OnHue,
-        ColourToken::OkInk,
-        ColourToken::WarnInk,
-        ColourToken::ScrimModal,
-        ColourToken::ScrollThumb,
-        ColourToken::LockInk,
-        ColourToken::LockInkSoft,
-        ColourToken::LockGlass,
-        ColourToken::LockGlassStrong,
-        ColourToken::LockVeil,
-        ColourToken::SpellMark,
-        ColourToken::ScrimIdle,
-        ColourToken::Knob,
-        ColourToken::OrbBg,
-        ColourToken::OrbC1,
-        ColourToken::OrbC2,
-        ColourToken::OrbC3,
-    ];
-
-    /// The custom property: `--paper`, `--surface-2`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            ColourToken::Paper => "--paper",
-            ColourToken::Surface => "--surface",
-            ColourToken::Surface2 => "--surface-2",
-            ColourToken::Raise => "--raise",
-            ColourToken::Ink => "--ink",
-            ColourToken::InkSoft => "--ink-soft",
-            ColourToken::InkFaint => "--ink-faint",
-            ColourToken::Line => "--line",
-            ColourToken::LineSoft => "--line-soft",
-            ColourToken::Accent => "--accent",
-            ColourToken::AccentInk => "--accent-ink",
-            ColourToken::AccentSoft => "--accent-soft",
-            ColourToken::AccentText => "--accent-text",
-            ColourToken::AccentTextMaterial => "--accent-text-material",
-            ColourToken::Seal => "--seal",
-            ColourToken::Ok => "--ok",
-            ColourToken::Warn => "--warn",
-            ColourToken::Danger => "--danger",
-            ColourToken::Scrim => "--scrim",
-            ColourToken::ForeignGround => "--foreign-ground",
-            ColourToken::OkWash => "--ok-wash",
-            ColourToken::WarnWash => "--warn-wash",
-            ColourToken::DangerWash => "--danger-wash",
-            ColourToken::AccentRing => "--accent-ring",
-            ColourToken::DangerInk => "--danger-ink",
-            ColourToken::MarkGround => "--mark-ground",
-            ColourToken::HandleRing => "--handle-ring",
-            ColourToken::OnHue => "--on-hue",
-            ColourToken::OkInk => "--ok-ink",
-            ColourToken::WarnInk => "--warn-ink",
-            ColourToken::ScrimModal => "--scrim-modal",
-            ColourToken::ScrollThumb => "--scroll-thumb",
-            ColourToken::LockInk => "--lock-ink",
-            ColourToken::LockInkSoft => "--lock-ink-soft",
-            ColourToken::LockGlass => "--lock-glass",
-            ColourToken::LockGlassStrong => "--lock-glass-strong",
-            ColourToken::LockVeil => "--lock-veil",
-            ColourToken::SpellMark => "--spell-mark",
-            ColourToken::ScrimIdle => "--scrim-idle",
-            ColourToken::Knob => "--knob-fill",
-            ColourToken::OrbBg => "--orb-bg",
-            ColourToken::OrbC1 => "--orb-c1",
-            ColourToken::OrbC2 => "--orb-c2",
-            ColourToken::OrbC3 => "--orb-c3",
-        })
-    }
-
     /// The value in `scheme`, with Postmark as the accent (the band's roles, section 20).
     pub fn value(self, scheme: Scheme) -> Colour {
         // Only the accent family asks the band: the band measures against the card's grounds,
@@ -348,6 +254,11 @@ impl ColourToken {
             }
         }
     }
+}
+
+/// A colour token as the stylesheet writes it: the table's value in the scope's scheme.
+fn colour_css(token: ColourToken, scope: TokenScope) -> CssValue {
+    CssValue::computed(token.value(scope.scheme).css())
 }
 
 #[cfg(test)]

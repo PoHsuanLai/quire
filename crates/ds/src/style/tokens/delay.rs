@@ -1,18 +1,44 @@
-//! Delays and holds: the one CSS delay (`--d-fly`) and the Rust-only timer lengths
+//! Delays and holds: the two CSS delays (`--d-fly`, `--d-heal`) and the Rust-only timer lengths
 //! (design/05-MOTION.md sections 3.4 and 7.2).
 //!
 //! These measure intent or reading time, not motion, so they do not scale with the level
 //! (design/05-MOTION.md open decision 2, proposed: hover-intent delays unchanged under Reduced).
 
-use super::name::VarName;
+use super::token::{CssValue, Token, TokenScope};
+use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
 use std::time::Duration;
 
-/// One delay or hold.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum DelayToken {
+/// A delay the stylesheet reads.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "d-", kind = fixed, css = delay_css)]
+pub enum StyleDelay {
     /// `--d-fly` 350 ms: before a strip button's preview label shows.
     Fly,
+    /// 18 ms per row: the heal ripple (also a CSS delay step).
+    #[token(name = "heal")]
+    HealStep,
+}
+
+impl StyleDelay {
+    /// How long it lasts at `level`.
+    pub fn delay(self, level: MotionLevel) -> Duration {
+        Duration::from_millis(match self {
+            StyleDelay::Fly => 350,
+            StyleDelay::HealStep if level == MotionLevel::Reduced => 0,
+            StyleDelay::HealStep => 18,
+        })
+    }
+}
+
+/// A delay as the stylesheet writes it, at the scope's motion level.
+fn delay_css(token: StyleDelay, scope: TokenScope) -> CssValue {
+    CssValue::computed(format!("{}ms", token.delay(scope.motion).as_millis()))
+}
+
+/// A timer length only Rust reads: intent and reading time, never scaled by the level.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+pub enum DelayToken {
     /// 450 ms: a hover card opens after the pointer rests.
     HoverOpen,
     /// 150 ms: a hover card closes after the pointer leaves.
@@ -21,8 +47,6 @@ pub enum DelayToken {
     HoverWarm,
     /// 5200 ms: the undo toast stays up.
     ToastHold,
-    /// 18 ms per row: the heal ripple (also a CSS delay step).
-    HealStep,
     /// 1600 ms: the "Sent" pill stays up.
     SentHold,
     /// 260 ms: the list re-renders after a read toggle (proposed).
@@ -58,66 +82,13 @@ pub enum DelayToken {
 }
 
 impl DelayToken {
-    /// Every delay, in table order.
-    pub const ALL: [DelayToken; 18] = [
-        DelayToken::Fly,
-        DelayToken::HoverOpen,
-        DelayToken::HoverClose,
-        DelayToken::HoverWarm,
-        DelayToken::ToastHold,
-        DelayToken::HealStep,
-        DelayToken::SentHold,
-        DelayToken::ReadReflow,
-        DelayToken::SendCountdown,
-        DelayToken::SendTick,
-        DelayToken::AutosaveDebounce,
-        DelayToken::FocusAfterMount,
-        DelayToken::FlashHold,
-        DelayToken::SwipeQuiet,
-        DelayToken::SpellDebounce,
-        DelayToken::PendingGrace,
-        DelayToken::PendingCap,
-        DelayToken::SettleHold,
-    ];
-
-    /// The custom property, for the delays the stylesheet also reads (`--d-fly`, the heal step).
-    pub fn var(self) -> Option<VarName> {
-        match self {
-            DelayToken::Fly => Some(VarName("--d-fly")),
-            DelayToken::HealStep => Some(VarName("--d-heal")),
-            DelayToken::HoverOpen
-            | DelayToken::HoverClose
-            | DelayToken::HoverWarm
-            | DelayToken::ToastHold
-            | DelayToken::SentHold
-            | DelayToken::ReadReflow
-            | DelayToken::SendCountdown
-            | DelayToken::SendTick
-            | DelayToken::AutosaveDebounce
-            | DelayToken::FocusAfterMount
-            | DelayToken::FlashHold
-            | DelayToken::SwipeQuiet
-            | DelayToken::SpellDebounce
-            | DelayToken::PendingGrace
-            | DelayToken::PendingCap
-            | DelayToken::SettleHold => None,
-        }
-    }
-
-    /// How long it lasts at `level`.
-    ///
-    /// The one delay that follows the level is the heal step, which is a stagger: 0 under
-    /// `Reduced` (proposed, design/05-MOTION.md open decision 2), so every Reduced settle is
-    /// the 94 ms section 7.1 names.
-    pub fn delay(self, level: MotionLevel) -> Duration {
+    /// How long it lasts.
+    pub fn delay(self) -> Duration {
         Duration::from_millis(match self {
-            DelayToken::Fly => 350,
             DelayToken::HoverOpen => 450,
             DelayToken::HoverClose => 150,
             DelayToken::HoverWarm => 400,
             DelayToken::ToastHold => 5200,
-            DelayToken::HealStep if level == MotionLevel::Reduced => 0,
-            DelayToken::HealStep => 18,
             DelayToken::SentHold => 1600,
             DelayToken::ReadReflow => 260,
             DelayToken::SendCountdown => 5000,
@@ -128,7 +99,7 @@ impl DelayToken {
             DelayToken::SwipeQuiet => 120,
             DelayToken::SpellDebounce => 300,
             DelayToken::PendingGrace => 400,
-            DelayToken::PendingCap => 10_000,
+            DelayToken::PendingCap => 10000,
             DelayToken::SettleHold => 900,
         })
     }

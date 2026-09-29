@@ -27,8 +27,11 @@ use super::stack::{
 use crate::style::appearance::material::Material;
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::hex::{Alpha, Colour, Hex};
-use crate::style::tokens::shape::Radius;
 use crate::style::tokens::tint::tint;
+use crate::style::tokens::{
+    shape::Radius,
+    token::{Token, TokenScope},
+};
 
 /// The settings key's default, `appearance.material_tint_alpha = 80` (design/22-SETTINGS.md
 /// section 3.1, proposed): the alpha at which every tint is section 17.2's own.
@@ -209,15 +212,15 @@ pub(crate) fn layers(material: Material, scheme: Scheme) -> Layers {
     }
 }
 
-fn radius(material: Material) -> &'static str {
+fn radius(material: Material) -> String {
     match material {
         // The card inside a window keeps its own 12/12/12/4.
-        Material::Window | Material::Bar => "0",
-        Material::Dock => "22px",
-        Material::Popover => Radius::Panel.css(),
-        Material::Sheet | Material::Osd => "18px",
-        Material::Toast => "16px",
-        Material::Widget => "20px",
+        Material::Window | Material::Bar => "0".to_owned(),
+        Material::Dock => "22px".to_owned(),
+        Material::Popover => Radius::Panel.css_value(TokenScope::BASE).to_string(),
+        Material::Sheet | Material::Osd => "18px".to_owned(),
+        Material::Toast => "16px".to_owned(),
+        Material::Widget => "20px".to_owned(),
     }
 }
 

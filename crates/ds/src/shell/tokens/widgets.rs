@@ -1,30 +1,26 @@
 //! The widget grid's unit (design/22-SETTINGS.md section 3.20,
 //! design/20-SURFACES.md section 1.14): a cell's side and the gap between cells, each a
-//! [`Tuned`] token its `widgets.*` key moves through one inline write
+//! tuned token its `widgets.*` key moves through one inline write
 //! ([`WidgetMetrics::style_attr`]) on any element around the widgets. A `WidgetFrame` sizes
 //! itself from both, so the setting reaches the card and not only sill's layout.
 
-use super::name::VarName;
-use super::tuned::{Tuned, px};
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
+use crate::style::tokens::token::Token;
+use crate::style::tokens::tuned::px;
 
-/// `--widget-cell` (`widgets.desktop_cell_px`, 164): a small widget's side.
-pub const CELL: Tuned = Tuned {
-    token: VarName("--widget-cell"),
-    input: VarName("--widget-cell-px"),
-    default: "164px",
-};
-
-/// `--widget-gap` (`widgets.desktop_gap_px`, 16): between two cells, so a medium widget is two
-/// cells and one gap wide.
-pub const GAP: Tuned = Tuned {
-    token: VarName("--widget-gap"),
-    input: VarName("--widget-gap-px"),
-    default: "16px",
-};
-
-/// Every widget token, in stylesheet order.
-pub const WIDGET_TOKENS: [Tuned; 2] = [CELL, GAP];
+/// One widget grid token, each a tuned token its `widgets.*` key moves.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = tuned)]
+pub enum WidgetGrid {
+    /// `--widget-cell` (`widgets.desktop_cell_px`, 164): a small widget's side.
+    #[token(name = "widget-cell", input = "--widget-cell-px", value = "164px")]
+    Cell,
+    /// `--widget-gap` (`widgets.desktop_gap_px`, 16): between two cells, so a medium widget is two
+    /// cells and one gap wide.
+    #[token(name = "widget-gap", input = "--widget-gap-px", value = "16px")]
+    Gap,
+}
 
 /// The widget grid from the settings, written as the tokens' inputs on any element around the
 /// widgets.
@@ -52,8 +48,8 @@ impl WidgetMetrics {
     pub fn style_attr(&self) -> String {
         let held = |value: Px, low: f32, high: f32| px(value.0.round().clamp(low, high) as u16);
         [
-            CELL.write(&held(self.cell, 120.0, 240.0)),
-            GAP.write(&held(self.gap, 0.0, 48.0)),
+            WidgetGrid::Cell.write(&held(self.cell, 120.0, 240.0)),
+            WidgetGrid::Gap.write(&held(self.gap, 0.0, 48.0)),
         ]
         .concat()
     }
@@ -61,15 +57,17 @@ impl WidgetMetrics {
 
 #[cfg(test)]
 mod tests {
-    use super::{WIDGET_TOKENS, WidgetMetrics};
+    use super::{WidgetGrid, WidgetMetrics};
     use crate::core::geometry::units::Px;
+    use crate::core::word::Word;
+    use crate::style::tokens::token::TokenScope;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {
         let written = WidgetMetrics::default().style_attr();
-        let want: String = WIDGET_TOKENS
+        let want: String = WidgetGrid::ALL
             .iter()
-            .map(|token| token.write(token.default))
+            .map(|token| token.write(token.fallback(TokenScope::BASE)))
             .collect();
         assert_eq!(written, want);
     }

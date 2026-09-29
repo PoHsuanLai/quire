@@ -4,12 +4,12 @@
 //! restate a number. The values come from `SizeScale`, so the rules hold in CSS as in Rust.
 
 use super::control_size::ControlSize;
-use super::name::VarName;
 use super::size_scale::{KNOB_INSET, SizeScale};
+use super::token::{CssValue, Token, TokenScope};
 use crate::core::word::Word;
 
 /// One quantity every size has.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum SizeVar {
     /// `--ctl-h-*`: the control's height.
     Height,
@@ -48,59 +48,6 @@ pub enum SizeVar {
 }
 
 impl SizeVar {
-    /// Every quantity, in stylesheet order.
-    pub const ALL: [SizeVar; 17] = [
-        SizeVar::Height,
-        SizeVar::Radius,
-        SizeVar::CapsuleRadius,
-        SizeVar::Glyph,
-        SizeVar::PadX,
-        SizeVar::Font,
-        SizeVar::Weight,
-        SizeVar::Knob,
-        SizeVar::SwitchWidth,
-        SizeVar::SwitchHeight,
-        SizeVar::SwitchRadius,
-        SizeVar::SwitchKnob,
-        SizeVar::SliderTrack,
-        SizeVar::SliderKnob,
-        SizeVar::WellRadius,
-        SizeVar::Segment,
-        SizeVar::SegmentRadius,
-    ];
-
-    /// The custom property at `size`: `--ctl-h-m`.
-    pub fn var(self, size: ControlSize) -> VarName {
-        let [small, regular, large] = self.names();
-        VarName(match size {
-            ControlSize::Small => small,
-            ControlSize::Regular => regular,
-            ControlSize::Large => large,
-        })
-    }
-
-    fn names(self) -> [&'static str; 3] {
-        match self {
-            SizeVar::Height => ["--ctl-h-s", "--ctl-h-m", "--ctl-h-l"],
-            SizeVar::Radius => ["--ctl-r-s", "--ctl-r-m", "--ctl-r-l"],
-            SizeVar::CapsuleRadius => ["--ctl-cap-r-s", "--ctl-cap-r-m", "--ctl-cap-r-l"],
-            SizeVar::Glyph => ["--ctl-glyph-s", "--ctl-glyph-m", "--ctl-glyph-l"],
-            SizeVar::PadX => ["--ctl-pad-s", "--ctl-pad-m", "--ctl-pad-l"],
-            SizeVar::Font => ["--ctl-fs-s", "--ctl-fs-m", "--ctl-fs-l"],
-            SizeVar::Weight => ["--ctl-fw-s", "--ctl-fw-m", "--ctl-fw-l"],
-            SizeVar::Knob => ["--knob-s", "--knob-m", "--knob-l"],
-            SizeVar::SwitchWidth => ["--switch-w-s", "--switch-w-m", "--switch-w-l"],
-            SizeVar::SwitchHeight => ["--switch-h-s", "--switch-h-m", "--switch-h-l"],
-            SizeVar::SwitchRadius => ["--switch-r-s", "--switch-r-m", "--switch-r-l"],
-            SizeVar::SwitchKnob => ["--switch-knob-s", "--switch-knob-m", "--switch-knob-l"],
-            SizeVar::SliderTrack => ["--slider-track-s", "--slider-track-m", "--slider-track-l"],
-            SizeVar::SliderKnob => ["--slider-knob-s", "--slider-knob-m", "--slider-knob-l"],
-            SizeVar::WellRadius => ["--seg-well-r-s", "--seg-well-r-m", "--seg-well-r-l"],
-            SizeVar::Segment => ["--seg-h-s", "--seg-h-m", "--seg-h-l"],
-            SizeVar::SegmentRadius => ["--seg-r-s", "--seg-r-m", "--seg-r-l"],
-        }
-    }
-
     /// Its CSS value in `scale`: `22px`, `7.5px`, `500`.
     pub fn css(self, scale: SizeScale) -> String {
         match self {
@@ -125,19 +72,185 @@ impl SizeVar {
     }
 }
 
-/// `--knob-inset`: the inset every knob and selected segment keeps (R3).
-pub const KNOB_INSET_VAR: VarName = VarName("--knob-inset");
+/// One control size's geometry as a token, in the ladder's order (each size's whole set, small to
+/// large), then the knob inset every size shares.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = fixed, css = size_css)]
+pub enum SizeToken {
+    /// `--ctl-h-s`: Height at Small.
+    #[token(name = "ctl-h-s")]
+    SmallHeight,
+    /// `--ctl-r-s`: Radius at Small.
+    #[token(name = "ctl-r-s")]
+    SmallRadius,
+    /// `--ctl-cap-r-s`: CapsuleRadius at Small.
+    #[token(name = "ctl-cap-r-s")]
+    SmallCapsuleRadius,
+    /// `--ctl-glyph-s`: Glyph at Small.
+    #[token(name = "ctl-glyph-s")]
+    SmallGlyph,
+    /// `--ctl-pad-s`: PadX at Small.
+    #[token(name = "ctl-pad-s")]
+    SmallPadX,
+    /// `--ctl-fs-s`: Font at Small.
+    #[token(name = "ctl-fs-s")]
+    SmallFont,
+    /// `--ctl-fw-s`: Weight at Small.
+    #[token(name = "ctl-fw-s")]
+    SmallWeight,
+    /// `--knob-s`: Knob at Small.
+    #[token(name = "knob-s")]
+    SmallKnob,
+    /// `--switch-w-s`: SwitchWidth at Small.
+    #[token(name = "switch-w-s")]
+    SmallSwitchWidth,
+    /// `--switch-h-s`: SwitchHeight at Small.
+    #[token(name = "switch-h-s")]
+    SmallSwitchHeight,
+    /// `--switch-r-s`: SwitchRadius at Small.
+    #[token(name = "switch-r-s")]
+    SmallSwitchRadius,
+    /// `--switch-knob-s`: SwitchKnob at Small.
+    #[token(name = "switch-knob-s")]
+    SmallSwitchKnob,
+    /// `--slider-track-s`: SliderTrack at Small.
+    #[token(name = "slider-track-s")]
+    SmallSliderTrack,
+    /// `--slider-knob-s`: SliderKnob at Small.
+    #[token(name = "slider-knob-s")]
+    SmallSliderKnob,
+    /// `--seg-well-r-s`: WellRadius at Small.
+    #[token(name = "seg-well-r-s")]
+    SmallWellRadius,
+    /// `--seg-h-s`: Segment at Small.
+    #[token(name = "seg-h-s")]
+    SmallSegment,
+    /// `--seg-r-s`: SegmentRadius at Small.
+    #[token(name = "seg-r-s")]
+    SmallSegmentRadius,
+    /// `--ctl-h-m`: Height at Regular.
+    #[token(name = "ctl-h-m")]
+    RegularHeight,
+    /// `--ctl-r-m`: Radius at Regular.
+    #[token(name = "ctl-r-m")]
+    RegularRadius,
+    /// `--ctl-cap-r-m`: CapsuleRadius at Regular.
+    #[token(name = "ctl-cap-r-m")]
+    RegularCapsuleRadius,
+    /// `--ctl-glyph-m`: Glyph at Regular.
+    #[token(name = "ctl-glyph-m")]
+    RegularGlyph,
+    /// `--ctl-pad-m`: PadX at Regular.
+    #[token(name = "ctl-pad-m")]
+    RegularPadX,
+    /// `--ctl-fs-m`: Font at Regular.
+    #[token(name = "ctl-fs-m")]
+    RegularFont,
+    /// `--ctl-fw-m`: Weight at Regular.
+    #[token(name = "ctl-fw-m")]
+    RegularWeight,
+    /// `--knob-m`: Knob at Regular.
+    #[token(name = "knob-m")]
+    RegularKnob,
+    /// `--switch-w-m`: SwitchWidth at Regular.
+    #[token(name = "switch-w-m")]
+    RegularSwitchWidth,
+    /// `--switch-h-m`: SwitchHeight at Regular.
+    #[token(name = "switch-h-m")]
+    RegularSwitchHeight,
+    /// `--switch-r-m`: SwitchRadius at Regular.
+    #[token(name = "switch-r-m")]
+    RegularSwitchRadius,
+    /// `--switch-knob-m`: SwitchKnob at Regular.
+    #[token(name = "switch-knob-m")]
+    RegularSwitchKnob,
+    /// `--slider-track-m`: SliderTrack at Regular.
+    #[token(name = "slider-track-m")]
+    RegularSliderTrack,
+    /// `--slider-knob-m`: SliderKnob at Regular.
+    #[token(name = "slider-knob-m")]
+    RegularSliderKnob,
+    /// `--seg-well-r-m`: WellRadius at Regular.
+    #[token(name = "seg-well-r-m")]
+    RegularWellRadius,
+    /// `--seg-h-m`: Segment at Regular.
+    #[token(name = "seg-h-m")]
+    RegularSegment,
+    /// `--seg-r-m`: SegmentRadius at Regular.
+    #[token(name = "seg-r-m")]
+    RegularSegmentRadius,
+    /// `--ctl-h-l`: Height at Large.
+    #[token(name = "ctl-h-l")]
+    LargeHeight,
+    /// `--ctl-r-l`: Radius at Large.
+    #[token(name = "ctl-r-l")]
+    LargeRadius,
+    /// `--ctl-cap-r-l`: CapsuleRadius at Large.
+    #[token(name = "ctl-cap-r-l")]
+    LargeCapsuleRadius,
+    /// `--ctl-glyph-l`: Glyph at Large.
+    #[token(name = "ctl-glyph-l")]
+    LargeGlyph,
+    /// `--ctl-pad-l`: PadX at Large.
+    #[token(name = "ctl-pad-l")]
+    LargePadX,
+    /// `--ctl-fs-l`: Font at Large.
+    #[token(name = "ctl-fs-l")]
+    LargeFont,
+    /// `--ctl-fw-l`: Weight at Large.
+    #[token(name = "ctl-fw-l")]
+    LargeWeight,
+    /// `--knob-l`: Knob at Large.
+    #[token(name = "knob-l")]
+    LargeKnob,
+    /// `--switch-w-l`: SwitchWidth at Large.
+    #[token(name = "switch-w-l")]
+    LargeSwitchWidth,
+    /// `--switch-h-l`: SwitchHeight at Large.
+    #[token(name = "switch-h-l")]
+    LargeSwitchHeight,
+    /// `--switch-r-l`: SwitchRadius at Large.
+    #[token(name = "switch-r-l")]
+    LargeSwitchRadius,
+    /// `--switch-knob-l`: SwitchKnob at Large.
+    #[token(name = "switch-knob-l")]
+    LargeSwitchKnob,
+    /// `--slider-track-l`: SliderTrack at Large.
+    #[token(name = "slider-track-l")]
+    LargeSliderTrack,
+    /// `--slider-knob-l`: SliderKnob at Large.
+    #[token(name = "slider-knob-l")]
+    LargeSliderKnob,
+    /// `--seg-well-r-l`: WellRadius at Large.
+    #[token(name = "seg-well-r-l")]
+    LargeWellRadius,
+    /// `--seg-h-l`: Segment at Large.
+    #[token(name = "seg-h-l")]
+    LargeSegment,
+    /// `--seg-r-l`: SegmentRadius at Large.
+    #[token(name = "seg-r-l")]
+    LargeSegmentRadius,
+    /// `--knob-inset`: what a knob or a selected segment keeps from its track's edge.
+    #[token(name = "knob-inset")]
+    KnobInset,
+}
 
-/// Every size token and its value, size by size: `(--ctl-h-s, 16px)`, …, then the knob inset.
-pub fn size_tokens() -> Vec<(VarName, String)> {
-    ControlSize::ALL
-        .iter()
-        .copied()
-        .flat_map(|size| {
-            SizeVar::ALL
-                .into_iter()
-                .map(move |var| (var.var(size), var.css(size.scale())))
-        })
-        .chain([(KNOB_INSET_VAR, KNOB_INSET.css())])
-        .collect()
+impl SizeToken {
+    /// The variable and control size this token is, or `None` for the shared knob inset.
+    fn parts(self) -> Option<(SizeVar, ControlSize)> {
+        let index = Self::ALL.iter().position(|token| *token == self)?;
+        let vars = SizeVar::ALL.len();
+        Some((
+            *SizeVar::ALL.get(index % vars)?,
+            *ControlSize::ALL.get(index / vars)?,
+        ))
+    }
+}
+
+/// A ladder token as the stylesheet writes it.
+fn size_css(token: SizeToken, _scope: TokenScope) -> CssValue {
+    CssValue::computed(match token.parts() {
+        Some((var, size)) => var.css(size.scale()),
+        None => KNOB_INSET.css(),
+    })
 }

@@ -3,7 +3,6 @@
 //! deadline no later than `PendingCap`, and the loop holds its still frame at that deadline. There
 //! is no way to write a pending loop without one.
 
-use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::delay::DelayToken;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
@@ -16,7 +15,7 @@ pub struct Deadline(Duration);
 impl Deadline {
     /// `PendingCap`: the longest a loop plays.
     pub fn cap() -> Deadline {
-        Deadline(DelayToken::PendingCap.delay(MotionLevel::Standard))
+        Deadline(DelayToken::PendingCap.delay())
     }
 
     /// `length`, or the cap if it is longer: a deadline past `PendingCap` cannot be made.

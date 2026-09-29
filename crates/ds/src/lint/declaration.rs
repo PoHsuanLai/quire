@@ -12,6 +12,8 @@ use super::rule::{Offence, Profile, Rule};
 use super::text::render;
 use super::tokenize::Located;
 use super::walk::Decl;
+use crate::core::word::Word;
+use crate::style::kit::KnownNames;
 use crate::style::tokens::type_scale::Family;
 
 /// Colour functions: `rgb()`, `rgba()`, `hsl()`, `hwb()`, `oklch()`, `color-mix()`, ...
@@ -55,13 +57,14 @@ const EASING_FUNCTIONS: &[&str] = &["cubic-bezier", "steps", "linear"];
 
 /// Every declaration-level offence `decl` causes, given the rule's rendered `selector`, whether
 /// that selector [`super::selector::targets_svg_children`], the full set of var names the
-/// stylesheet may reference without triggering [`Rule::UndeclaredVar`], and how strict the run
-/// is.
+/// stylesheet may reference without triggering [`Rule::UndeclaredVar`], the vocabulary the kits
+/// in play add (keyframes, the details grammar), and how strict the run is.
 pub fn offences(
     selector: &str,
     targets_svg: bool,
     decl: &Decl,
     known_vars: &HashSet<String>,
+    known: &KnownNames,
     profile: Profile,
 ) -> Vec<Offence> {
     let mut out = Vec::new();
@@ -88,10 +91,10 @@ pub fn offences(
         );
     }
     if let Some(naming) = Naming::of(&property) {
-        unknown_animation(naming, selector, decl, &mut out);
+        unknown_animation(naming, selector, decl, known, &mut out);
     }
 
-    super::details::offences(selector, &property, decl, profile, &mut out);
+    super::details::offences(selector, &property, decl, known, profile, &mut out);
 
     if !is_custom_property {
         raw_geometry(selector, &property, decl, &mut out);

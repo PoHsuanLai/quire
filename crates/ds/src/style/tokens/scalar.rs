@@ -2,12 +2,14 @@
 //! (design/05-MOTION.md sections 3.1-3.2).
 
 use super::hex::thousandths;
-use super::name::VarName;
+use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 use std::time::Duration;
 
 /// One motion scalar.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = fixed, css = scalar_css)]
 pub enum ScalarToken {
     /// `--overshoot`: the peak scale inside pop-in, row-in, compose-rise, chip-in, cmdk-in.
     Overshoot,
@@ -38,28 +40,6 @@ pub enum ScalarValue {
 }
 
 impl ScalarToken {
-    /// Every scalar, in stylesheet order.
-    pub const ALL: [ScalarToken; 6] = [
-        ScalarToken::Overshoot,
-        ScalarToken::Squish,
-        ScalarToken::Lift,
-        ScalarToken::Tilt,
-        ScalarToken::Stagger,
-        ScalarToken::Pickup,
-    ];
-
-    /// The custom property: `--overshoot`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            ScalarToken::Overshoot => "--overshoot",
-            ScalarToken::Squish => "--squish",
-            ScalarToken::Lift => "--lift",
-            ScalarToken::Tilt => "--tilt",
-            ScalarToken::Stagger => "--stagger",
-            ScalarToken::Pickup => "--pickup",
-        })
-    }
-
     /// The value at `level` (Post, design/05-MOTION.md sections 3.1-3.2). Reduced is neutral;
     /// its `--lift` of 0px is proposed (open decision 2).
     pub fn value(self, level: MotionLevel) -> ScalarValue {
@@ -84,6 +64,11 @@ impl ScalarToken {
             (ScalarToken::Pickup, Reduced) => ScalarValue::Factor(1000),
         }
     }
+}
+
+/// A scalar as the stylesheet writes it, at the scope's motion level.
+fn scalar_css(token: ScalarToken, scope: TokenScope) -> CssValue {
+    CssValue::computed(token.value(scope.motion).css())
 }
 
 impl ScalarValue {

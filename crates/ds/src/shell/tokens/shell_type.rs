@@ -1,77 +1,83 @@
 //! The shell type scale (the macOS polish pass, 2026-09-24): the bar's items, text menus, the
-//! launcher and tooltips, each size a [`Tuned`] token a settings key can move. The defaults are
+//! launcher and tooltips, each size a tuned token a settings key can move. The defaults are
 //! the macOS numbers design/13-BEHAVIOUR-menus-windows.md section 13.2 records (menu bar text
 //! 13 pt, menu rows about 22 pt, 13 pt menu text) and the launcher's Spotlight-like scale
 //! (design/13 section 13.3.9); `IconButton { Status }`, `MenuBarItem`, `Menu`, `CommandPalette`
 //! in a surface and `Tooltip` read them, so a consumer gets them with no prop.
 
-use super::name::VarName;
-use super::tuned::{Tuned, px};
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
+use crate::style::tokens::token::Token;
+use crate::style::tokens::tuned::px;
+
+/// One token of the shell type scale, each a tuned token a settings key can move.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = tuned)]
+pub enum ShellType {
+    /// `--fs-shell-bar`: a bar item's text (`bar.item_font_px`, 13).
+    #[token(name = "fs-shell-bar", input = "--shell-bar-font", value = "13px")]
+    BarFont,
+    /// `--fw-shell-bar`: its weight (`bar.item_font_weight`, 500).
+    #[token(name = "fw-shell-bar", input = "--shell-bar-weight", value = "500")]
+    BarWeight,
+    /// `--shell-bar-item`: the hover and open pill's height (`bar.open_title_pill_height_px`, 22: a
+    /// Regular control, design/29-SIZING.md).
+    #[token(name = "shell-bar-item", input = "--shell-bar-item-h", value = "22px")]
+    BarItem,
+    /// `--shell-bar-pad`: the pill's side padding around a text item (`bar.title_padding_px`, 8).
+    #[token(name = "shell-bar-pad", input = "--shell-bar-pad-x", value = "8px")]
+    BarPad,
+    /// `--r-shell-bar-item`: the pill's radius (`bar.item_radius_px`, 5: a Regular control's).
+    #[token(name = "r-shell-bar-item", input = "--shell-bar-radius", value = "5px")]
+    BarRadius,
+    /// `--fs-shell-menu`: a text menu's items (`menus.font_px`, 13).
+    #[token(name = "fs-shell-menu", input = "--shell-menu-font", value = "13px")]
+    MenuFont,
+    /// `--shell-menu-row`: a text menu row's height (`menus.item_height_px`, 22).
+    #[token(name = "shell-menu-row", input = "--shell-menu-row-h", value = "22px")]
+    MenuRow,
+    /// `--shell-menu-sep`: the margin above and below a separator (`menus.separator_margin_px`, 5).
+    #[token(name = "shell-menu-sep", input = "--shell-menu-sep-m", value = "5px")]
+    MenuSeparator,
+    /// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 5: the
+    /// reference's, design/29-SIZING.md section 5.4).
+    #[token(
+        name = "r-shell-highlight",
+        input = "--shell-highlight-radius",
+        value = "5px"
+    )]
+    HighlightRadius,
+    /// `--fs-shell-field`: the launcher's query (`launcher.field_font_px`, 22).
+    #[token(name = "fs-shell-field", input = "--shell-field-font", value = "22px")]
+    FieldFont,
+    /// `--fw-shell-field`: its weight (`launcher.field_font_weight`, 500).
+    #[token(name = "fw-shell-field", input = "--shell-field-weight", value = "500")]
+    FieldWeight,
+    /// `--shell-field-glyph`: the search glyph beside it (`launcher.field_glyph_px`, 20).
+    #[token(
+        name = "shell-field-glyph",
+        input = "--shell-field-glyph-px",
+        value = "20px"
+    )]
+    FieldGlyph,
+    /// `--fs-shell-row`: a launcher row's title (`launcher.row_title_px`, 14).
+    #[token(name = "fs-shell-row", input = "--shell-row-font", value = "14px")]
+    RowTitle,
+    /// `--fs-shell-detail`: a launcher row's detail (`launcher.row_detail_px`, 12).
+    #[token(
+        name = "fs-shell-detail",
+        input = "--shell-detail-font",
+        value = "12px"
+    )]
+    RowDetail,
+    /// `--fs-shell-tip`: a tooltip's label (`menus.tooltip_font_px`, 12).
+    #[token(name = "fs-shell-tip", input = "--shell-tip-font", value = "12px")]
+    TipFont,
+}
 
 /// A CSS font weight: 400, 500, 700.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct FontWeight(pub u16);
-
-const fn tuned(token: &'static str, input: &'static str, default: &'static str) -> Tuned {
-    Tuned {
-        token: VarName(token),
-        input: VarName(input),
-        default,
-    }
-}
-
-/// `--fs-shell-bar`: a bar item's text (`bar.item_font_px`, 13).
-pub const BAR_FONT: Tuned = tuned("--fs-shell-bar", "--shell-bar-font", "13px");
-/// `--fw-shell-bar`: its weight (`bar.item_font_weight`, 500).
-pub const BAR_WEIGHT: Tuned = tuned("--fw-shell-bar", "--shell-bar-weight", "500");
-/// `--shell-bar-item`: the hover and open pill's height (`bar.open_title_pill_height_px`, 22: a
-/// Regular control, design/29-SIZING.md).
-pub const BAR_ITEM: Tuned = tuned("--shell-bar-item", "--shell-bar-item-h", "22px");
-/// `--shell-bar-pad`: the pill's side padding around a text item (`bar.title_padding_px`, 8).
-pub const BAR_PAD: Tuned = tuned("--shell-bar-pad", "--shell-bar-pad-x", "8px");
-/// `--r-shell-bar-item`: the pill's radius (`bar.item_radius_px`, 5: a Regular control's).
-pub const BAR_RADIUS: Tuned = tuned("--r-shell-bar-item", "--shell-bar-radius", "5px");
-/// `--fs-shell-menu`: a text menu's items (`menus.font_px`, 13).
-pub const MENU_FONT: Tuned = tuned("--fs-shell-menu", "--shell-menu-font", "13px");
-/// `--shell-menu-row`: a text menu row's height (`menus.item_height_px`, 22).
-pub const MENU_ROW: Tuned = tuned("--shell-menu-row", "--shell-menu-row-h", "22px");
-/// `--shell-menu-sep`: the margin above and below a separator (`menus.separator_margin_px`, 5).
-pub const MENU_SEPARATOR: Tuned = tuned("--shell-menu-sep", "--shell-menu-sep-m", "5px");
-/// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 5: the
-/// reference's, design/29-SIZING.md section 5.4).
-pub const HIGHLIGHT_RADIUS: Tuned = tuned("--r-shell-highlight", "--shell-highlight-radius", "5px");
-/// `--fs-shell-field`: the launcher's query (`launcher.field_font_px`, 22).
-pub const FIELD_FONT: Tuned = tuned("--fs-shell-field", "--shell-field-font", "22px");
-/// `--fw-shell-field`: its weight (`launcher.field_font_weight`, 500).
-pub const FIELD_WEIGHT: Tuned = tuned("--fw-shell-field", "--shell-field-weight", "500");
-/// `--shell-field-glyph`: the search glyph beside it (`launcher.field_glyph_px`, 20).
-pub const FIELD_GLYPH: Tuned = tuned("--shell-field-glyph", "--shell-field-glyph-px", "20px");
-/// `--fs-shell-row`: a launcher row's title (`launcher.row_title_px`, 14).
-pub const ROW_TITLE: Tuned = tuned("--fs-shell-row", "--shell-row-font", "14px");
-/// `--fs-shell-detail`: a launcher row's detail (`launcher.row_detail_px`, 12).
-pub const ROW_DETAIL: Tuned = tuned("--fs-shell-detail", "--shell-detail-font", "12px");
-/// `--fs-shell-tip`: a tooltip's label (`menus.tooltip_font_px`, 12).
-pub const TIP_FONT: Tuned = tuned("--fs-shell-tip", "--shell-tip-font", "12px");
-
-/// Every shell token, in stylesheet order.
-pub const SHELL_TOKENS: [Tuned; 15] = [
-    BAR_FONT,
-    BAR_WEIGHT,
-    BAR_ITEM,
-    BAR_PAD,
-    BAR_RADIUS,
-    MENU_FONT,
-    MENU_ROW,
-    MENU_SEPARATOR,
-    HIGHLIGHT_RADIUS,
-    FIELD_FONT,
-    FIELD_WEIGHT,
-    FIELD_GLYPH,
-    ROW_TITLE,
-    ROW_DETAIL,
-    TIP_FONT,
-];
 
 /// The bar's text items and their pill.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -172,21 +178,21 @@ impl ShellMetrics {
             tip,
         } = *self;
         [
-            BAR_FONT.write(&length(bar.font)),
-            BAR_WEIGHT.write(&weight(bar.weight)),
-            BAR_ITEM.write(&length(bar.item_height)),
-            BAR_PAD.write(&length(bar.item_padding)),
-            BAR_RADIUS.write(&length(bar.item_radius)),
-            MENU_FONT.write(&length(menu.font)),
-            MENU_ROW.write(&length(menu.row)),
-            MENU_SEPARATOR.write(&length(menu.separator_margin)),
-            HIGHLIGHT_RADIUS.write(&length(menu.highlight_radius)),
-            FIELD_FONT.write(&length(launcher.field_font)),
-            FIELD_WEIGHT.write(&weight(launcher.field_weight)),
-            FIELD_GLYPH.write(&length(launcher.field_glyph)),
-            ROW_TITLE.write(&length(launcher.row_title)),
-            ROW_DETAIL.write(&length(launcher.row_detail)),
-            TIP_FONT.write(&length(tip)),
+            ShellType::BarFont.write(&length(bar.font)),
+            ShellType::BarWeight.write(&weight(bar.weight)),
+            ShellType::BarItem.write(&length(bar.item_height)),
+            ShellType::BarPad.write(&length(bar.item_padding)),
+            ShellType::BarRadius.write(&length(bar.item_radius)),
+            ShellType::MenuFont.write(&length(menu.font)),
+            ShellType::MenuRow.write(&length(menu.row)),
+            ShellType::MenuSeparator.write(&length(menu.separator_margin)),
+            ShellType::HighlightRadius.write(&length(menu.highlight_radius)),
+            ShellType::FieldFont.write(&length(launcher.field_font)),
+            ShellType::FieldWeight.write(&weight(launcher.field_weight)),
+            ShellType::FieldGlyph.write(&length(launcher.field_glyph)),
+            ShellType::RowTitle.write(&length(launcher.row_title)),
+            ShellType::RowDetail.write(&length(launcher.row_detail)),
+            ShellType::TipFont.write(&length(tip)),
         ]
         .concat()
     }
@@ -194,13 +200,15 @@ impl ShellMetrics {
 
 #[cfg(test)]
 mod tests {
-    use super::{SHELL_TOKENS, ShellMetrics};
+    use super::{ShellMetrics, ShellType};
+    use crate::core::word::Word;
+    use crate::style::tokens::token::TokenScope;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {
         let written = ShellMetrics::default().style_attr();
-        for token in SHELL_TOKENS {
-            let want = token.write(token.default);
+        for token in ShellType::ALL.iter().copied() {
+            let want = token.write(token.fallback(TokenScope::BASE));
             assert!(written.contains(&want), "{want} not in {written}");
         }
     }

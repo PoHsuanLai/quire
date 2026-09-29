@@ -1,8 +1,9 @@
 //! Easing curves per motion level (design/05-MOTION.md sections 3.1-3.4).
 
 use super::hex::thousandths;
-use super::name::VarName;
+use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
+use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
 /// A `cubic-bezier()`, control points in thousandths: `(.34,1.42,.52,1)` is
 /// `[340, 1420, 520, 1000]`. Integers, so a curve is `Eq`.
@@ -19,7 +20,8 @@ pub enum Easing {
 }
 
 /// One easing token.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "e-", kind = fixed, css = easing_css)]
 pub enum EasingToken {
     /// `--e-out`: entrances that decelerate.
     Out,
@@ -36,28 +38,6 @@ pub enum EasingToken {
 }
 
 impl EasingToken {
-    /// Every easing token, in stylesheet order.
-    pub const ALL: [EasingToken; 6] = [
-        EasingToken::Out,
-        EasingToken::Spring,
-        EasingToken::Exit,
-        EasingToken::Shake,
-        EasingToken::Linear,
-        EasingToken::InOut,
-    ];
-
-    /// The custom property: `--e-out`, …
-    pub fn var(self) -> VarName {
-        VarName(match self {
-            EasingToken::Out => "--e-out",
-            EasingToken::Spring => "--e-spring",
-            EasingToken::Exit => "--e-exit",
-            EasingToken::Shake => "--e-shake",
-            EasingToken::Linear => "--e-linear",
-            EasingToken::InOut => "--e-in-out",
-        })
-    }
-
     /// The curve at `level`.
     ///
     /// Only the spring follows the level (section 3.2): Calm uses `--e-out`, Extra
@@ -76,6 +56,11 @@ impl EasingToken {
             (EasingToken::InOut, _) => CubicBezier([420, 0, 580, 1000]),
         })
     }
+}
+
+/// An easing as the stylesheet writes it, at the scope's motion level.
+fn easing_css(token: EasingToken, scope: TokenScope) -> CssValue {
+    CssValue::computed(token.easing(scope.motion).css())
 }
 
 impl Easing {

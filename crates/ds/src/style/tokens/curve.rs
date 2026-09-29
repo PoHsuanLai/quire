@@ -75,6 +75,7 @@ fn solve_x(x1: i128, x2: i128, t: i128) -> i128 {
 #[cfg(test)]
 mod tests {
     use crate::core::vocab::Fraction;
+    use crate::core::word::Word;
     use crate::style::appearance::motion::MotionLevel;
     use crate::style::tokens::easing::{CubicBezier, Easing, EasingToken};
 
@@ -144,7 +145,7 @@ mod tests {
 
     #[test]
     fn a_curve_whose_y_stays_in_range_never_goes_back() {
-        for token in EasingToken::ALL {
+        for token in EasingToken::ALL.iter().copied() {
             for level in [MotionLevel::Calm, MotionLevel::Standard, MotionLevel::Extra] {
                 let curve = token.easing(level).curve();
                 let [_, y1, _, y2] = curve.0;

@@ -38,7 +38,7 @@ fn glyph(icon: Icon) -> String {
 fn every_control_glyph_renders_and_lints_clean() {
     let strict = LintConfig {
         profile: Profile::Strict,
-        ..LintConfig::default()
+        ..LintConfig::new(&ds::kits())
     };
     let mut failures = Vec::new();
     for icon in Icon::CONTROL.iter().copied() {
@@ -117,7 +117,7 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
     let sheet = ds::stylesheet();
     let mut failures = Vec::new();
     for (name, html) in specimens() {
-        for offence in markup(&html, sheet, &LintConfig::default()) {
+        for offence in markup(&html, sheet, &LintConfig::new(&ds::kits())) {
             failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
         }
         for class in html
