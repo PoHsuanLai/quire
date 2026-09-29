@@ -1,17 +1,119 @@
-//! The roster as a hook: [`RosterState`] in a signal, with the settle timers started for it.
+//! The roster as one hook: [`RosterState`] in a signal, with the settle timers started for it.
 //! The timers belong to the hook's owner and drop with it; a timer that finds the roster gone
 //! stops (`crate::core::task`).
+//!
+//! Rows leave in batches: every key that starts leaving in one go plays the exit together, and
+//! when the exit has settled they are dropped at once and the rows below heal by the heights the
+//! dropped rows measured. A key listed again while it leaves stays where it is.
 
 use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 use super::roster_rest::{RestQueue, RestTimer};
 use super::settle::settle;
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::core::task::{Gone, spawn_in, try_get};
 use crate::core::time::clock::sleep;
-use crate::core::vocab::{Emphasis, StaggerIndex};
 use crate::style::scope::{Scope, use_scope_signal};
-use dioxus::core::{Task, current_scope_id};
+use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+
+/// How a row leaves the roster.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum LeaveBy {
+    /// The consumer asks: [`Roster::leave`] plays the exit, and a key the consumer stops listing
+    /// without asking is dropped at once.
+    Action,
+    /// The consumer stops listing the row: it plays the exit and stays drawn until it settles.
+    Delist,
+}
+
+/// What a roster does with its rows.
+#[derive(Debug)]
+pub struct RosterSpec<K: 'static> {
+    /// How a row leaves.
+    pub leave: LeaveBy,
+    /// The exit its rows play, read when a batch starts.
+    pub exit: Exit,
+    /// How far the rows below heal for a row that measured nothing.
+    pub pitch: RowPitch,
+    /// Hears each dropped key once its batch has settled.
+    pub on_settled: Option<EventHandler<K>>,
+}
+
+impl<K: 'static> Clone for RosterSpec<K> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<K: 'static> Copy for RosterSpec<K> {}
+
+/// The heights rows measured, by key: how far the rows below heal when one leaves.
+#[derive(Debug, PartialEq)]
+pub struct Pitches<K: 'static>(CopyValue<Vec<(K, RowPitch)>>);
+
+impl<K: 'static> Clone for Pitches<K> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<K: 'static> Copy for Pitches<K> {}
+
+impl<K: Clone + PartialEq + 'static> Pitches<K> {
+    /// Record `key`'s pitch.
+    pub fn set(&self, key: K, pitch: RowPitch) {
+        let mut book = self.0;
+        let _ = book.try_write().map(|mut book| {
+            book.retain(|(held, _)| *held != key);
+            book.push((key, pitch));
+        });
+    }
+
+    fn of(&self, key: &K) -> Option<RowPitch> {
+        self.0.try_peek().ok().and_then(|book| {
+            book.iter()
+                .find(|(held, _)| held == key)
+                .map(|(_, pitch)| *pitch)
+        })
+    }
+
+    fn forget(&self, key: &K) {
+        let mut book = self.0;
+        let _ = book
+            .try_write()
+            .map(|mut book| book.retain(|(held, _)| held != key));
+    }
+}
+
+/// One batch's number, so a key that left again later is not dropped by an earlier batch.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct BatchId(u64);
+
+/// Which batch each leaving key belongs to, and the next batch's number.
+#[derive(Debug, Clone, PartialEq)]
+struct Claims<K> {
+    held: Vec<(K, BatchId)>,
+    next: BatchId,
+}
+
+impl<K: Clone + PartialEq> Claims<K> {
+    /// Claim `keys` for a new batch, taking them from any earlier one.
+    fn claim(&mut self, keys: &[K]) -> BatchId {
+        let batch = self.next;
+        self.next = BatchId(batch.0 + 1);
+        self.held.retain(|(key, _)| !keys.contains(key));
+        self.held
+            .extend(keys.iter().map(|key| (key.clone(), batch)));
+        batch
+    }
+
+    /// The keys `batch` still holds, released.
+    fn release(&mut self, batch: BatchId) -> Vec<K> {
+        let (mine, rest): (Vec<_>, Vec<_>) = self.held.drain(..).partition(|(_, b)| *b == batch);
+        self.held = rest;
+        mine.into_iter().map(|(key, _)| key).collect()
+    }
+}
 
 /// A live roster: read its entries in render, start exits from handlers.
 #[derive(Debug, PartialEq)]
@@ -21,14 +123,9 @@ pub struct Roster<K: 'static> {
     pub(super) scope: ScopeId,
     pub(super) rest: Signal<Option<RestTimer>>,
     pub(super) rest_queue: CopyValue<RestQueue>,
-    pub(super) exits: Signal<Vec<ExitTimer<K>>>,
-}
-
-/// The settle timer of one leaving row, kept so a stay (or a second leave) can cancel it.
-#[derive(Debug, Clone, PartialEq)]
-pub(super) struct ExitTimer<K> {
-    pub(super) key: K,
-    pub(super) task: Task,
+    spec: CopyValue<RosterSpec<K>>,
+    claims: CopyValue<Claims<K>>,
+    pitches: Pitches<K>,
 }
 
 impl<K: 'static> Clone for Roster<K> {
@@ -45,34 +142,18 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         self.state.read().entries().to_vec()
     }
 
-    /// Start `key`'s exit; it is dropped, and the rows below heal, when the exit settles. An
-    /// unread (`Emphasis::Strong`) row exits at `--t-big-heavy`.
-    pub fn leave(&self, key: K, exit: Exit, emphasis: Emphasis) {
-        let _ = self.try_leave(key, exit, emphasis);
+    /// The book rows record their measured heights in, for the rows below to heal by.
+    pub fn pitches(&self) -> Pitches<K> {
+        self.pitches
     }
 
-    fn try_leave(&self, key: K, exit: Exit, emphasis: Emphasis) -> Result<(), Gone> {
-        let (next, anim) = try_get(self.state)?.leave(&key, exit, emphasis);
-        try_set(self.state, next)?;
-        let length = settle(anim, self.level()?, StaggerIndex::default());
-        self.cancel_exit(&key)?;
-        let roster = *self;
-        let settling = key.clone();
-        let task = spawn_in(self.scope, async move {
-            sleep(length).await;
-            let _ = roster.forget_exit(&settling);
-            if roster.update(|state| state.settled(&settling)).is_ok() {
-                // A task, not a render: it may start the rest timer itself.
-                roster.schedule_rest();
-            }
-        });
-        let mut exits = try_get(self.exits)?;
-        exits.push(ExitTimer { key, task });
-        try_set(self.exits, exits)
+    /// Start `key`'s exit; it is dropped, and the rows below heal, when the exit settles.
+    pub fn leave(&self, key: K) {
+        let _ = self.start_batch(&[key]);
     }
 
-    /// Take `key`'s exit back while it plays: the row is present again where it was, its
-    /// settle timer is cancelled, and so nothing below it heals (an undo before the row was
+    /// Take `key`'s exit back while it plays: the row is present again where it was and is not
+    /// dropped when its batch settles, so nothing below it heals (an undo before the row was
     /// dropped). The consumer lists the key again in the same handler, so the next reconcile
     /// keeps the row. A row that is not leaving is unchanged; a key the roster no longer holds
     /// is [`StayError::UnknownKey`] (its exit settled: list it again and it enters).
@@ -80,31 +161,63 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         let (next, stayed) = try_get(self.state)
             .map_err(|Gone| StayError::Unmounted)?
             .stay(&key);
-        try_set(self.state, next).map_err(|Gone| StayError::Unmounted)?;
-        if stayed == Ok(Stayed::Restored) {
-            self.cancel_exit(&key)
-                .map_err(|Gone| StayError::Unmounted)?;
-        }
+        crate::core::task::try_set(self.state, next).map_err(|Gone| StayError::Unmounted)?;
         stayed
     }
 
-    /// Cancel `key`'s pending exit timer, if it has one.
-    pub(super) fn cancel_exit(&self, key: &K) -> Result<(), Gone> {
-        if let Some(timer) = self.forget_exit(key)? {
-            timer.task.cancel();
+    /// Start the exits of `keys` as one batch and time it.
+    fn start_batch(&self, keys: &[K]) -> Result<(), Gone> {
+        let spec = self.spec.try_peek().map(|held| *held).map_err(|_| Gone)?;
+        let mut started = Vec::new();
+        self.update(|state| {
+            let (state, keys) = state.leave_batch(keys, spec.exit);
+            started = keys;
+            state
+        })?;
+        if started.is_empty() {
+            return Ok(());
         }
+        let mut claims = self.claims;
+        let batch = claims.try_write().map_err(|_| Gone)?.claim(&started);
+        let roster = *self;
+        queue_effect(move || {
+            let _ = roster.time_batch(batch);
+        });
         Ok(())
     }
 
-    /// Drop `key`'s exit timer from the list, handing it back.
-    pub(super) fn forget_exit(&self, key: &K) -> Result<Option<ExitTimer<K>>, Gone> {
-        let mut exits = try_get(self.exits)?;
-        let Some(at) = exits.iter().position(|timer| &timer.key == key) else {
-            return Ok(None);
-        };
-        let timer = exits.remove(at);
-        try_set(self.exits, exits)?;
-        Ok(Some(timer))
+    /// Start a batch's timer: once its exit has settled, its rows still leaving are dropped
+    /// together and the rows below heal by their measured heights.
+    fn time_batch(&self, batch: BatchId) -> Result<(), Gone> {
+        let spec = self.spec.try_peek().map(|held| *held).map_err(|_| Gone)?;
+        let length = settle(spec.exit.anim(), self.level()?);
+        let roster = *self;
+        spawn_in(self.scope, async move {
+            sleep(length).await;
+            let mut claims = roster.claims;
+            let Ok(claimed) = claims.try_write().map(|mut held| held.release(batch)) else {
+                return;
+            };
+            // A key taken back meanwhile is present again: not dropped, not reported.
+            let Ok(keys) = try_get(roster.state).map(|state| still_leaving(&state, claimed)) else {
+                return;
+            };
+            let (pitches, fallback) = (roster.pitches, spec.pitch);
+            let settled = roster.update(|state| {
+                state.settled_batch(&keys, |key| pitches.of(key).unwrap_or(fallback))
+            });
+            if settled.is_err() {
+                return;
+            }
+            roster.schedule_rest();
+            for key in keys {
+                pitches.forget(&key);
+                if let Some(on_settled) = spec.on_settled {
+                    on_settled.call(key);
+                }
+            }
+        });
+        Ok(())
     }
 
     pub(super) fn update(
@@ -112,7 +225,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         step: impl FnOnce(RosterState<K>) -> RosterState<K>,
     ) -> Result<(), Gone> {
         let next = step(try_get(self.state)?);
-        try_set(self.state, next)
+        crate::core::task::try_set(self.state, next)
     }
 
     pub(super) fn level(&self) -> Result<crate::style::appearance::motion::MotionLevel, Gone> {
@@ -120,37 +233,62 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
     }
 }
 
-/// A roster over `keys`, which the consumer passes on every render. Stagger is capped at 12.
-///
-/// The first render shows every key entering; after that, a change in `keys` reconciles
-/// (new keys enter, keys removed without an exit drop at once). `pitch` is read on the first
-/// render only. Reconciling is pure and happens in the render; the rest timer it needs is
-/// started after the render, by an effect ([`Roster::queue_rest`]), never from the body.
-pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, pitch: RowPitch) -> Roster<K> {
-    let roster = use_roster_parts(&keys, pitch);
-    let mut seen = use_hook(|| {
-        roster.queue_rest();
-        CopyValue::new(keys.clone())
-    });
-    if *seen.peek() != keys {
-        let _ = roster.update(|state| state.reconcile(&keys));
-        roster.queue_rest();
-        seen.set(keys);
-    }
-    roster
+/// The keys among `keys` that `state` still shows leaving.
+fn still_leaving<K: Clone + PartialEq>(state: &RosterState<K>, keys: Vec<K>) -> Vec<K> {
+    keys.into_iter()
+        .filter(|key| {
+            state.entries().iter().any(|entry| {
+                &entry.key == key && matches!(entry.presence, super::presence::Presence::Leaving(_))
+            })
+        })
+        .collect()
 }
 
-/// The roster's hooks, first showing `keys`: the state and the timers' signals.
-pub(super) fn use_roster_parts<K: Clone + PartialEq + 'static>(
-    keys: &[K],
-    pitch: RowPitch,
-) -> Roster<K> {
-    Roster {
-        state: use_signal(|| RosterState::first_show(keys, pitch)),
+/// A roster over `keys`, which the consumer passes on every render. The first render shows
+/// every key present; after that a change in `keys` reconciles: new keys enter, and a key that
+/// goes missing leaves as `spec.leave` says (keys missing at once are one batch). Reconciling is
+/// pure and happens in the render; the timers it needs are started after the render, by an
+/// effect, never from the body.
+pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, spec: RosterSpec<K>) -> Roster<K> {
+    let roster = Roster {
+        state: use_signal(|| RosterState::first_show(&keys)),
         env: use_scope_signal(),
-        scope: use_hook(current_scope_id),
+        scope: use_hook(dioxus::core::current_scope_id),
         rest: use_signal(|| None),
         rest_queue: use_hook(|| CopyValue::new(RestQueue::Idle)),
-        exits: use_signal(Vec::new),
+        spec: use_hook(|| CopyValue::new(spec)),
+        claims: use_hook(|| {
+            CopyValue::new(Claims {
+                held: Vec::new(),
+                next: BatchId(0),
+            })
+        }),
+        pitches: Pitches(use_hook(|| CopyValue::new(Vec::new()))),
+    };
+    let mut held = roster.spec;
+    held.set(spec);
+    let mut seen = use_hook(|| CopyValue::new(keys.clone()));
+    if *seen.peek() == keys {
+        return roster;
     }
+    let before = seen.peek().clone();
+    let gone: Vec<K> = before
+        .iter()
+        .filter(|key| !keys.contains(key))
+        .cloned()
+        .collect();
+    for key in keys.iter().filter(|key| !before.contains(key)) {
+        // Listed again while it leaves: it stays where it is (a no-op for a new key).
+        let _ = roster.stay(key.clone());
+    }
+    match spec.leave {
+        LeaveBy::Delist => {
+            let _ = roster.start_batch(&gone);
+        }
+        LeaveBy::Action => {}
+    }
+    let _ = roster.update(|state| state.reconcile(&keys));
+    roster.queue_rest();
+    seen.set(keys);
+    roster
 }

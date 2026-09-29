@@ -68,7 +68,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         let Some(length) = try_get(self.state)?
             .running()
             .into_iter()
-            .map(|(anim, index)| settle(anim, level, index))
+            .map(|anim| settle(anim, level))
             .max()
         else {
             return Ok(());

@@ -7,8 +7,8 @@ use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
     Anchor, CommandPalette, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Icon, Menu,
-    MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, PaletteEntrance, Point, Px, RowAction,
-    RunTone, TargetElement, TextLine, TextRun, use_hover_hub,
+    MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Point, Px, RowAction, RunTone,
+    TargetElement, TextLine, TextRun, use_hover_hub,
 };
 use std::time::Duration;
 
@@ -58,12 +58,6 @@ fn groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
 }
 
 pub const MAILO_CASES: &[Case] = &[
-    Case {
-        component: "command_palette",
-        state: "opaque-entrance",
-        make: || rsx! { CommandPalette { label: "Search and commands", placeholder: "Search mail, people, actions", query: "", tokens: Vec::new(), groups: groups(), empty: "Nothing matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {}, entrance: PaletteEntrance::Opaque } },
-        wait: NOW,
-    },
     Case {
         component: "command_palette",
         state: "runs-and-trailing",

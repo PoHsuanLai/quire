@@ -15,10 +15,10 @@
 .ds-preview[*|data-shown=hidden]{ display:none; }
 .ds-preview[*|data-presence=entering],.ds-preview[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-out); }
 .ds-preview[*|data-presence=entering][*|data-pulse=b],.ds-preview[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
-.ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-preview[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-preview[*|data-presence=leaving]{ animation:pane-out-r var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
-.ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; animation:hold var(--t-tap) var(--e-linear); }
+.ds-preview-media{ position:relative; flex:none; display:flex; align-items:center; justify-content:center; height:220px; overflow:hidden; animation:hold var(--t-quick) var(--e-linear); }
 .ds-preview-image{ position:absolute; display:block; object-fit:contain; border-radius:var(--r-tiny); }
 .ds-preview-text{ align-self:stretch; width:100%; box-sizing:border-box; padding:var(--s-10); overflow:hidden; white-space:pre-wrap; font-size:var(--fs-meta); line-height:1.45;
   background:var(--surface); border:var(--hair) solid var(--line-soft); border-radius:var(--r-small); color:var(--ink-soft); }

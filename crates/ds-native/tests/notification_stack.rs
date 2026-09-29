@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AppMark, Appearance, Banner, BannerKey, BannerStack, Ds, Icon, IconSource, Material,
-    MotionLevel, NotificationCard, NotificationSwipe, Point, Px, StaggerIndex, settle,
+    MotionLevel, NotificationCard, NotificationSwipe, Point, Px, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -102,11 +102,7 @@ fn a_banner_listed_slides_in_and_comes_to_rest() {
 fn one_removed_from_the_middle_leaves_and_those_after_it_heal() {
     let mut harness = start_on(&[3, 2, 1], Clock::Virtual);
     let pitch = harness.rect(&row(2)).expect("row 2").size.height.0;
-    let out = settle(
-        Anim::BannerOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let out = settle(Anim::BannerOut, MotionLevel::Standard);
     let removed = harness.now();
     show(&mut harness, &[3, 1]);
     assert_eq!(presence(&harness, 2).as_deref(), Some("leaving"));

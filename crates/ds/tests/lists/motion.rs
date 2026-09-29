@@ -5,26 +5,24 @@ use super::*;
 use ds::Word;
 
 const KEYS: [&str; 4] = ["a", "b", "c", "d"];
-const PITCH: RowPitch = RowPitch(Px(79.0));
 
 #[derive(Props, Clone, PartialEq)]
 struct Moment {
     state: RosterState<&'static str>,
-    list: Presence,
 }
 
 /// A roster drawn the way a consumer draws one: a keyed `ListRow` per entry, in its presence.
 fn drawn(moment: Moment) -> Element {
     rsx! {
-        AnimatedList { label: "Threads", presence: moment.list,
+        AnimatedList { label: "Threads",
             for entry in moment.state.entries().iter().cloned() {
-                Row { key: "{entry.key}", presence: entry.presence, heal: entry.heal, emphasis: emphasis(entry.key), index: entry.index }
+                Row { key: "{entry.key}", presence: entry.presence, heal: entry.heal, emphasis: emphasis(entry.key) }
             }
         }
     }
 }
 
-/// Row `b` is unread, so it leaves with the heavy fold.
+/// Row `b` is unread.
 fn emphasis(key: &str) -> Emphasis {
     if key == "b" {
         Emphasis::Strong
@@ -33,8 +31,8 @@ fn emphasis(key: &str) -> Emphasis {
     }
 }
 
-fn render_moment(state: RosterState<&'static str>, list: Presence) -> String {
-    let mut dom = VirtualDom::new_with_props(drawn, Moment { state, list });
+fn render_moment(state: RosterState<&'static str>) -> String {
+    let mut dom = VirtualDom::new_with_props(drawn, Moment { state });
     dom.rebuild_in_place();
     dioxus_ssr::render(&dom)
 }
@@ -51,36 +49,34 @@ fn presences(html: &str) -> Vec<String> {
 
 #[test]
 fn a_roster_renders_each_moment_of_an_exit() {
-    let first = RosterState::first_show(&KEYS, PITCH);
-    let rested = first.clone().rest();
-    let (leaving, anim) = rested.clone().leave(&"b", Exit::Fold, Emphasis::Strong);
-    assert_eq!(anim, Anim::FoldHeavy, "an unread fold is the heavy one");
-    let healing = leaving.clone().settled(&"b");
+    let arrived = RosterState::first_show(&KEYS).reconcile(&["a", "b", "c", "d", "e"]);
+    let rested = arrived.clone().rest();
+    let (leaving, _) = rested.clone().leave_batch(&["b"], Exit::Row);
+    let healing = leaving
+        .clone()
+        .settled_batch(&["b"], |_| RowPitch(Px(79.0)));
     let healed = healing.clone().rest();
     let moments = [
         (
             "entering",
-            first,
-            Presence::Entering,
-            ["entering"; 4].to_vec(),
+            arrived,
+            vec!["present", "present", "present", "present", "entering"],
         ),
         (
             "leaving",
             leaving,
-            Presence::Present,
-            vec!["present", "leaving", "present", "present"],
+            vec!["present", "leaving", "present", "present", "present"],
         ),
         (
             "healing",
             healing,
-            Presence::Present,
-            vec!["present", "healing", "healing"],
+            vec!["present", "healing", "healing", "healing"],
         ),
-        ("healed", healed, Presence::Present, vec!["present"; 3]),
+        ("healed", healed, vec!["present"; 4]),
     ];
     let mut failures = Vec::new();
-    for (name, state, list, want) in moments {
-        let html = render_moment(state, list);
+    for (name, state, want) in moments {
+        let html = render_moment(state);
         if presences(&html) != want {
             failures.push(format!("{name}: {:?}, not {want:?}", presences(&html)));
         }
@@ -91,81 +87,38 @@ fn a_roster_renders_each_moment_of_an_exit() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// The row stylesheet and the roster agree on every exit: the rule a leaving row of each
-/// emphasis matches plays exactly the animation `RosterState::leave` settles, the heavy curl and
-/// crumple included.
+/// The row stylesheet and the roster agree on the exit: the rule a leaving row matches plays
+/// exactly the animation the roster settles.
 #[test]
 fn the_row_stylesheet_plays_what_the_roster_settles() {
-    const CASES: &[(Exit, Emphasis)] = &[
-        (Exit::Fold, Emphasis::Plain),
-        (Exit::Fold, Emphasis::Strong),
-        (Exit::Curl, Emphasis::Plain),
-        (Exit::Curl, Emphasis::Strong),
-        (Exit::Crumple, Emphasis::Plain),
-        (Exit::Crumple, Emphasis::Strong),
-    ];
     let css = include_str!("../../src/components/lists/list_row.css");
-    let mut failures = Vec::new();
-    for &(exit, emphasis) in CASES {
-        let (_, anim) = RosterState::first_show(&KEYS, PITCH)
-            .rest()
-            .leave(&"a", exit, emphasis);
-        let recipe = anim.recipe();
-        let want = format!(
-            "animation:{} {} {} forwards;",
-            recipe.keyframes,
-            recipe.duration.var().reference(),
-            recipe.easing.var().reference()
-        );
-        let strong = match emphasis {
-            Emphasis::Strong => "[*|data-emphasis=strong]",
-            Emphasis::Plain => "",
-        };
-        let selector = format!(
-            ".ds-row[*|data-presence=leaving][*|data-exit={}]{strong}{{",
-            exit.slug()
-        );
-        let rule = css
-            .lines()
-            .find(|line| line.starts_with(&selector))
-            .map(|line| line[selector.len()..].trim().to_owned());
-        if rule.as_deref().map(|r| r.starts_with(&want)) != Some(true) {
-            failures.push(format!(
-                "{exit:?} {emphasis:?}: {rule:?}, roster settles {want}"
-            ));
-        }
-    }
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
+    let recipe = Anim::RowOut.recipe();
+    let want = format!(
+        "animation:{} {} {} forwards;",
+        recipe.keyframes,
+        recipe.duration.var().reference(),
+        recipe.easing.var().reference()
+    );
+    let selector = format!(
+        ".ds-row[*|data-presence=leaving][*|data-exit={}]{{",
+        Exit::Row.slug()
+    );
+    let rule = css
+        .lines()
+        .find(|line| line.starts_with(&selector))
+        .map(|line| line[selector.len()..].trim().to_owned());
+    assert!(
+        rule.as_deref().is_some_and(|rule| rule.starts_with(&want)),
+        "{rule:?}, roster settles {want}"
+    );
 }
 
 #[test]
-fn a_healing_row_starts_one_pitch_down_by_heal_step() {
-    let (leaving, _) =
-        RosterState::first_show(&KEYS, PITCH)
-            .rest()
-            .leave(&"a", Exit::Curl, Emphasis::Plain);
-    let html = render_moment(leaving.settled(&"a"), Presence::Present);
-    for d in 0..3 {
-        let want = format!("--dy:79px;--d:{d}");
-        assert!(html.contains(&want), "no {want} in {html}");
-    }
+fn a_healing_row_starts_the_dropped_pitch_down() {
+    let (leaving, _) = RosterState::first_show(&KEYS).leave_batch(&["a"], Exit::Row);
+    let html = render_moment(leaving.settled_batch(&["a"], |_| RowPitch(Px(79.0))));
+    assert_eq!(html.matches("--dy:79px").count(), 3, "{html}");
     assert!(!html.contains("data-exit"), "nothing is leaving any more");
-}
-
-#[test]
-fn entering_rows_stagger_up_to_the_cap() {
-    let keys: Vec<&'static str> = (0..16)
-        .map(|n| &*Box::leak(format!("k{n}").into_boxed_str()))
-        .collect();
-    let html = render_moment(RosterState::first_show(&keys, PITCH), Presence::Entering);
-    let indices: Vec<u8> = html
-        .split("style=\"--i:")
-        .skip(1)
-        .filter_map(|rest| rest.split(['"', ';']).next())
-        .filter_map(|n| n.parse().ok())
-        .collect();
-    let want: Vec<u8> = (0..16u8).map(|n| n.min(12)).collect();
-    assert_eq!(indices, want);
 }
 
 #[test]

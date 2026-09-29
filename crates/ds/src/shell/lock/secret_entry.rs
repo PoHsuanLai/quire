@@ -5,7 +5,6 @@
 //! ("Errors shake once and hold still", design/05 principle 7).
 
 use crate::core::time::clock::sleep;
-use crate::core::vocab::StaggerIndex;
 use crate::core::word::Word;
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
@@ -177,7 +176,7 @@ fn settle_later(
     empty: impl FnOnce() + 'static,
 ) {
     spawn(async move {
-        sleep(settle(Anim::ShakeX, level, StaggerIndex::new(0))).await;
+        sleep(settle(Anim::ShakeX, level)).await;
         // Only forward: an older firing's timer must not cut a newer shake short. A prompt that
         // unmounted meanwhile has nothing left to empty.
         if crate::core::task::try_get(settled).is_ok_and(|done| done < round) {

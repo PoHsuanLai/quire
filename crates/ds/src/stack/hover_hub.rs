@@ -8,7 +8,6 @@
 
 use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use crate::core::time::clock::sleep;
-use crate::core::vocab::StaggerIndex;
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::{
     HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase,
@@ -126,7 +125,7 @@ impl HoverHub {
         stop(self.close_timer)?;
         try_set_if_changed(self.leaving, Some(card.clone()))?;
         let level = try_get(self.env)?.resolved.motion;
-        let out = settle(Anim::HcOut, level, StaggerIndex::default());
+        let out = settle(Anim::HcOut, level);
         let leaving = self.leaving;
         spawn_in(self.scope, async move {
             sleep(out).await;

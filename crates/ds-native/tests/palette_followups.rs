@@ -9,7 +9,7 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
-    MenuTrail, PaletteEntrance, Rect, Retain, ShortcutKey, Shown,
+    MenuTrail, Rect, Retain, ShortcutKey, Shown,
 };
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
@@ -262,7 +262,6 @@ fn KeptPage(retain: Retain) -> Element {
                     onpick: move |_| {},
                     onclose: move |()| shown.set(Shown::Hidden),
                     host: CommandPaletteHost::Surface,
-                    entrance: PaletteEntrance::CmdkIn,
                     id: "card".to_string(),
                     shown: shown(),
                     retain,

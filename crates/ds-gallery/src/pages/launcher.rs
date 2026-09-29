@@ -9,8 +9,8 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Availability, Button, ButtonVariant, Check, CommandPalette, CommandPaletteHost, Corner, Icon,
-    IconSize, Material, MenuEntry, MenuTile, MenuTrail, PaletteEntrance, Radius, Retain, Shortcut,
-    ShortcutKey, Shown, Surface,
+    IconSize, Material, MenuEntry, MenuTile, MenuTrail, Radius, Retain, Shortcut, ShortcutKey,
+    Shown, Surface,
 };
 
 fn row(
@@ -71,11 +71,7 @@ fn actions() -> Vec<MenuEntry<u8>> {
 
 /// One embedded palette in a Sheet surface of the launcher's panel shape.
 #[component]
-fn Panel(
-    query: String,
-    groups: Vec<(String, Vec<MenuEntry<u8>>)>,
-    entrance: PaletteEntrance,
-) -> Element {
+fn Panel(query: String, groups: Vec<(String, Vec<MenuEntry<u8>>)>) -> Element {
     rsx! {
         div { class: "g-launcher",
             Surface { material: Material::Sheet, radius: Some(Corner::Token(Radius::Panel)),
@@ -90,7 +86,6 @@ fn Panel(
                     onpick: |_| {},
                     onclose: |_| {},
                     host: CommandPaletteHost::Surface,
-                    entrance,
                     id: "gallery-launcher",
                 }
             }
@@ -105,13 +100,12 @@ pub fn EmbeddedPalette() -> Element {
         Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card spans its container's width, is as tall as its content (up to the container), carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (Tile::Source), drawn as it is, filling the tile.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Typed \"f\": app icons, cmdk-in",
-                    Panel { query: "f", groups: vec![("Applications".to_string(), apps("f"))], entrance: PaletteEntrance::CmdkIn }
+                    Panel { query: "f", groups: vec![("Applications".to_string(), apps("f"))] }
                 }
                 Specimen { name: "Empty query: actions and recent apps, peek-in",
                     Panel {
                         query: "",
                         groups: vec![("Actions".to_string(), actions()), ("Recent".to_string(), apps(""))],
-                        entrance: PaletteEntrance::PeekIn,
                     }
                 }
             }
@@ -168,7 +162,6 @@ fn WarmPalette() -> Element {
                         onpick: move |_| shown.set(Shown::Hidden),
                         onclose: move |_| shown.set(Shown::Hidden),
                         host: CommandPaletteHost::Surface,
-                        entrance: PaletteEntrance::CmdkIn,
                         id: "gallery-warm-launcher",
                         shown: shown(),
                         retain: Retain::Nothing,

@@ -5,7 +5,7 @@ use crate::components::lists::row_click::snapshot;
 use crate::components::lists::row_hooks::{PartHooks, relay, use_back};
 use crate::components::lists::row_star::star_button;
 use crate::core::text::clip::clip_chars;
-use crate::core::vocab::{Availability, Check, Emphasis, RowState, StaggerIndex};
+use crate::core::vocab::{Availability, Check, Emphasis, RowState};
 use crate::core::word::Word;
 use crate::motion::presence::Presence;
 use crate::motion::roster::{Heal, presence_slug};
@@ -57,14 +57,9 @@ fn emphasis_slug(emphasis: Emphasis) -> &'static str {
     }
 }
 
-/// The row's inline custom properties: the stagger `--i` always, and while healing the
-/// distance `--dy` and the heal index `--d`.
-fn row_style(index: StaggerIndex, heal: Option<Heal>) -> String {
-    let i = index.get();
-    match heal {
-        Some(Heal { dy, d }) => format!("--i:{i};--dy:{}px;--d:{}", dy.0, d.get()),
-        None => format!("--i:{i}"),
-    }
+/// The row's inline custom property while healing: the distance `--dy`.
+fn row_style(heal: Option<Heal>) -> Option<String> {
+    heal.map(|Heal { dy }| format!("--dy:{}px", dy.0))
 }
 
 /// `data-exit`, on a leaving row only.
@@ -77,10 +72,8 @@ fn exit(presence: Presence) -> Option<&'static str> {
 
 /// One row: dot, name and via, subject, snippet, tail, star, and a hover-strip slot.
 ///
-/// `presence` comes from `use_roster`: an entering row rises staggered by `index` when its
-/// list is first shown and plays `row-in` when it arrives later; a leaving row plays its exit
-/// (an unread fold is the heavy one, as the roster settles it); a healing row (`heal`, present
-/// meanwhile) slides up from `dy`, delayed by `d` heal steps. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
+/// `presence` comes from `use_roster`: an entering row plays `row-in`; a leaving row plays
+/// `row-out`; a healing row (`heal`, present meanwhile) slides up from `dy`. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
 /// `state` is the row's [`RowState`]: whether it is selected, unread, working or disabled, and
 /// its part in a drag (`drop`: `Source` while it is the thread being dragged (dimmed), `Target`
 /// while something dragged over it would land on it).
@@ -96,7 +89,6 @@ fn exit(presence: Presence) -> Option<&'static str> {
 #[component]
 pub fn ListRow(
     #[props(default)] state: RowState,
-    index: StaggerIndex,
     presence: Presence,
     #[props(default)] heal: Option<Heal>,
     name: String,
@@ -137,7 +129,7 @@ pub fn ListRow(
             "data-exit": exit(presence),
             "data-drop": drop.drop_attr(),
             "data-drag": drop.drag_attr(),
-            style: row_style(index, heal),
+            style: row_style(heal),
             onclick: move |event| {
                 if live {
                     onclick.call(snapshot(&event.data()));
@@ -189,21 +181,14 @@ pub fn ListRow(
 mod tests {
     use super::{NAME_BUDGET, NameFit, exit, row_style};
     use crate::core::geometry::units::Px;
-    use crate::core::vocab::StaggerIndex;
     use crate::motion::presence::{Exit, Presence};
     use crate::motion::roster::Heal;
 
     #[test]
-    fn a_healing_row_carries_its_distance_and_delay() {
-        let healing = Heal {
-            dy: Px(79.0),
-            d: StaggerIndex::new(2),
-        };
-        assert_eq!(
-            row_style(StaggerIndex::new(4), Some(healing)),
-            "--i:4;--dy:79px;--d:2"
-        );
-        assert_eq!(row_style(StaggerIndex::new(40), None), "--i:12");
+    fn a_healing_row_carries_its_distance() {
+        let healing = Heal { dy: Px(79.0) };
+        assert_eq!(row_style(Some(healing)).as_deref(), Some("--dy:79px"));
+        assert_eq!(row_style(None), None);
     }
 
     #[test]
@@ -231,15 +216,12 @@ mod tests {
     #[test]
     fn only_a_leaving_row_names_its_exit() {
         const CASES: &[(Presence, Option<&str>)] = &[
-            (Presence::Leaving(Exit::Fold), Some("fold")),
-            (Presence::Leaving(Exit::Curl), Some("curl")),
-            (Presence::Leaving(Exit::Crumple), Some("crumple")),
-            (Presence::Leaving(Exit::TabOut), Some("tab-out")),
-            (Presence::Entering, None),
+            (Presence::Leaving(Exit::Row), Some("row")),
             (Presence::Present, None),
+            (Presence::Entering, None),
         ];
-        for (presence, want) in CASES {
-            assert_eq!(exit(*presence), *want, "{presence:?}");
+        for &(presence, want) in CASES {
+            assert_eq!(exit(presence), want, "{presence:?}");
         }
     }
 }

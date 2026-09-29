@@ -7,7 +7,7 @@ use ds::{
     ActionId, Appearance, DocumentHost, Ds, HoverStrip, Icon, ListRow, Material, NoHost,
     Presence, RowState, Shown, StripAction,
 };
-use ds::{Emphasis, Selection, StaggerIndex};
+use ds::{Emphasis, Selection};
 use ds_native::{Harness, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
@@ -46,7 +46,6 @@ fn Page(layout: Layout) -> Element {
         ul { class: "list", style: "width:600px; padding:20px; margin:0",
             ListRow {
                 state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
-                index: StaggerIndex::new(0),
                 presence: Presence::Present,
                 name: "Dana Okafor",
                 via: None,

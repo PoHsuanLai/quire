@@ -11,7 +11,7 @@
    it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
    nothing, so the entrance it drops leaves no value behind. Leaving, it is no longer
    a target for the pointer. Under Reduced it only fades. */
-.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-quick) var(--e-linear); opacity:var(--present-p);
   transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
 .ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
 .ds-sheet[*|data-presence=leaving]{ pointer-events:none; }

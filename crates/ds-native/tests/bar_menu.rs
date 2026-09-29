@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Anim, Appearance, Availability, Ds, Icon, IconButton, IconButtonVariant, Material,
     Menu, MenuEntrance, MenuEntry, MenuKind, MenuTrail, MotionLevel, Point, PointerButton, Press,
-    Px, ShortcutKey, StaggerIndex, settle,
+    Px, ShortcutKey, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -223,11 +223,7 @@ fn a_click_picks_before_it_closes() {
 
 /// How long the exit fade runs, asked of the motion table.
 fn fade() -> Duration {
-    settle(
-        Anim::MenuOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    )
+    settle(Anim::MenuOut, MotionLevel::Standard)
 }
 
 /// Escape fades the menu out (`data-presence="leaving"`) and calls `onclose` when the fade has

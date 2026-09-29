@@ -7,12 +7,12 @@ use super::{Section, Specimen};
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    AccountFace, AccountTile, ActionId, Anim, AnimatedList, AppearancePicker, AvatarFace,
-    AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour,
-    DragGhost, DropLine, Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, ListRow,
+    AccountFace, AccountTile, ActionId, AnimatedList, AppearancePicker, AvatarFace, AvatarShape,
+    AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour, DragGhost,
+    DropLine, Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, LeaveBy, ListRow,
     MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
-    RowPitch, RowState, Selection, SidebarItem, StaggerIndex, StripAction, SystemPrefs, TimerPhase,
-    UndoToken, use_motion_timer, use_roster, use_toast_hub,
+    RosterSpec, RowPitch, RowState, Selection, SidebarItem, StripAction, SystemPrefs, UndoToken,
+    use_roster, use_toast_hub,
 };
 
 /// One sample thread: sender, subject, snippet, time.
@@ -118,20 +118,20 @@ fn LiveList() -> Element {
     let mut selected = use_signal(|| None::<ThreadId>);
     let mut starred = use_signal(Vec::<ThreadId>::new);
     let toasts = use_toast_hub();
-    let roster = use_roster(keys(), PITCH);
-    let entrance = use_motion_timer(Anim::RowIn);
-    use_hook(|| entrance.start(EventHandler::new(|()| {})));
-    let list = match entrance.phase() {
-        TimerPhase::Settled => Presence::Present,
-        TimerPhase::Idle | TimerPhase::Running => Presence::Entering,
+    let spec = RosterSpec {
+        leave: LeaveBy::Action,
+        exit: Exit::Row,
+        pitch: PITCH,
+        on_settled: None,
     };
-    let mut remove = move |exit: Exit, text: &str| {
+    let roster = use_roster(keys(), spec);
+    let mut remove = move |text: &str| {
         let target = selected().or_else(|| keys.peek().first().copied());
         let Some(key) = target else { return };
         let Some(at) = keys.peek().iter().position(|shown| *shown == key) else {
             return;
         };
-        roster.leave(key, exit, key.emphasis());
+        roster.leave(key);
         keys.with_mut(|keys| keys.retain(|shown| *shown != key));
         let token = UndoToken(u64::from(key.0));
         removed.with_mut(|removed| removed.push((at, key, token)));
@@ -161,7 +161,7 @@ fn LiveList() -> Element {
     rsx! {
         Section {
             title: "AnimatedList",
-            note: "Remove the selected row (or the first) by each exit: unread rows exit heavier. The rows below heal into the gap; Undo, or pull the toast's tab, brings the row back.",
+            note: "Remove the selected row (or the first) The row fades and slides up. The rows below close into the gap; Undo, or pull the toast's tab, brings the row back.",
             div { class: "g-row",
                 Button { variant: ButtonVariant::Secondary, label: "Add a row", icon: Some(Icon::Plus),
                     onclick: move |_| {
@@ -170,20 +170,17 @@ fn LiveList() -> Element {
                         keys.with_mut(|keys| keys.insert(0, id));
                     },
                 }
-                Button { variant: ButtonVariant::Secondary, label: "Archive (fold)", icon: Some(Icon::Archive), onclick: move |_| remove(Exit::Fold, "Archived") }
-                Button { variant: ButtonVariant::Secondary, label: "Snooze (curl)", icon: Some(Icon::Clock), onclick: move |_| remove(Exit::Curl, "Snoozed") }
-                Button { variant: ButtonVariant::Danger, label: "Trash (crumple)", icon: Some(Icon::Trash), onclick: move |_| remove(Exit::Crumple, "Trashed") }
+                Button { variant: ButtonVariant::Secondary, label: "Archive", icon: Some(Icon::Archive), onclick: move |_| remove("Archived") }
                 Button { variant: ButtonVariant::Quiet, label: "Undo", icon: Some(Icon::Undo), onclick: move |_| restore(None) }
             }
             div { class: "g-list",
-                AnimatedList { label: "Threads", presence: list,
+                AnimatedList { label: "Threads",
                     for entry in roster.entries() {
                         ThreadRow {
                             key: "{entry.key.0}",
                             id: entry.key,
                             presence: entry.presence,
                             heal: entry.heal,
-                            index: entry.index,
                             selection: if selected() == Some(entry.key) { Selection::Selected } else { Selection::Unselected },
                             star: if starred().contains(&entry.key) { Check::On } else { Check::Off },
                             onselect: move |id| selected.set(Some(id)),
@@ -208,7 +205,6 @@ fn ThreadRow(
     id: ThreadId,
     presence: Presence,
     heal: Option<Heal>,
-    index: StaggerIndex,
     selection: Selection,
     star: Check,
     onselect: EventHandler<ThreadId>,
@@ -218,7 +214,6 @@ fn ThreadRow(
     rsx! {
         ListRow {
             state: RowState { selection, emphasis: id.emphasis(), ..RowState::default() },
-            index,
             presence,
             heal,
             name,

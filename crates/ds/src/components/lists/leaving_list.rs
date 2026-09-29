@@ -1,20 +1,20 @@
 //! LeavingList: a column of the consumer's rows that come and go with motion (the
 //! notification center). The consumer lists its rows; a row it stops listing plays its exit
-//! (`Fold` by default) and stays drawn until the exit settles; every row dropped in the same
-//! render leaves as one batch, staggered in list order (a Clear folds the rows one after
-//! another); once the batch has settled the rows are dropped together and the rows below heal
-//! by the heights the dropped rows measured, so each starts exactly where it stood. A row that
-//! arrives plays `row-in`. Under Reduced motion a leaving row fades out (`menu-out`), an
-//! arriving one fades in (`fade`), and the rows below move into place without sliding.
+//! (`row-out` by default) and stays drawn until the exit settles; every row dropped in the same
+//! render leaves as one batch; once the batch has settled the rows are dropped together and the
+//! rows below heal by the heights the dropped rows measured, so each starts exactly where it
+//! stood. A row that arrives plays `row-in`. Under Reduced motion a leaving row fades out
+//! (`menu-out`), an arriving one fades in (`fade`), and the rows below move into place without
+//! sliding.
 //!
 //! Each row is measured as it mounts and again as it starts to leave (its content may have
 //! grown since), in a `div.ds-leaving-row` that contains its content's margins, so the measured
 //! height is the whole distance the rows below it move.
 
 use crate::components::lists::leaving_row::LeavingRow;
-use crate::motion::batch_roster::{Departures, use_batch_roster};
-use crate::motion::presence::{Exit, Presence};
-use crate::motion::roster_exits::use_pitches;
+use crate::motion::presence::Exit;
+use crate::motion::roster::RowPitch;
+use crate::motion::use_roster::{LeaveBy, RosterSpec, use_roster};
 use dioxus::prelude::*;
 use std::hash::Hash;
 
@@ -31,12 +31,11 @@ pub struct LeavingItem<K> {
 /// heights the leaving ones measured.
 ///
 /// `items` is the whole list on every render; a key missing from it leaves. All the keys that
-/// go missing in one render are one batch: a Clear drops a whole group's keys at once and its
-/// rows fold with the stagger, then the rows below heal by the group's summed height. `exit` is
-/// read on the render that starts a batch, so a consumer may pass another exit for another kind
-/// of departure. `first` says whether the rows listed on the first render rise in, staggered
-/// (`Presence::Entering`), or are simply there (`Present`, the default: a panel that slides
-/// in carries its rows). A key listed again while it leaves stays where it is. `on_settled`
+/// go missing in one render are one batch: a Clear drops a whole group's keys at once, then the
+/// rows below heal by the group's summed height. `exit` is read on the render that starts a
+/// batch, so a consumer may pass another exit for another kind of departure. The rows listed on
+/// the first render are simply there. A key listed again while it leaves stays where it is.
+/// `on_settled`
 /// hears each dropped key once its batch has settled. `label` names the list
 /// (`role=list`); each row is a `listitem`.
 ///
@@ -45,19 +44,17 @@ pub struct LeavingItem<K> {
 pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(
     label: String,
     items: Vec<LeavingItem<K>>,
-    #[props(default = Exit::Fold)] exit: Exit,
-    #[props(default = Presence::Present)] first: Presence,
+    #[props(default = Exit::Row)] exit: Exit,
     #[props(default)] on_settled: Option<EventHandler<K>>,
 ) -> Element {
-    let pitches = use_pitches();
     let rows = use_rows(&items);
     let keys: Vec<K> = items.iter().map(|item| item.key.clone()).collect();
-    let (roster, presence) = use_batch_roster(
+    let roster = use_roster(
         keys,
-        Departures {
+        RosterSpec {
+            leave: LeaveBy::Delist,
             exit,
-            first,
-            pitches,
+            pitch: RowPitch::default(),
             on_settled: Some(EventHandler::new(move |key: K| {
                 rows.forget(&key);
                 if let Some(on_settled) = on_settled {
@@ -66,12 +63,12 @@ pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(
             })),
         },
     );
+    let pitches = roster.pitches();
     rsx! {
         div {
             class: "ds-leaving-list",
             role: "list",
             "aria-label": "{label}",
-            "data-presence": presence.slug(),
             for entry in roster.entries() {
                 LeavingRow::<K> {
                     key: "{node_key(&entry.key)}",

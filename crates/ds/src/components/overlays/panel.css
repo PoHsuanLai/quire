@@ -20,7 +20,7 @@
    Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
    leaves no value behind; a show while it leaves turns it back from where it is.
    Under Reduced it fades in place instead. */
-.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-tap) var(--e-linear);
+.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-quick) var(--e-linear);
   transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
 .ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
 .ds-panel[*|data-presence=leaving]{ pointer-events:none; }
@@ -34,6 +34,6 @@
 .ds-panel-stage[*|data-edge=bottom] > .ds-panel{ top:auto; left:0; right:0; margin:0 auto; max-height:calc(50% - var(--s-8)); }
 .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=entering],
 .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }
-.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-tap) var(--e-linear); opacity:var(--present-p);
+.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-quick) var(--e-linear); opacity:var(--present-p);
   transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
 .ds[*|data-motion=reduced] .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ transform:none; }

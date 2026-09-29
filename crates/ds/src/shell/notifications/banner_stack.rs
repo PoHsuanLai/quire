@@ -20,7 +20,7 @@ use crate::core::geometry::units::Px;
 use crate::core::word::Word;
 use crate::motion::presence::Exit;
 use crate::motion::roster::RowPitch;
-use crate::motion::roster_exits::{Leaving, use_leaving_roster, use_pitches};
+use crate::motion::use_roster::{LeaveBy, RosterSpec, use_roster};
 use crate::shell::notifications::banner_row::BannerRow;
 use crate::shell::tokens::notifications::NotificationToken;
 use dioxus::prelude::*;
@@ -86,23 +86,23 @@ pub fn BannerStack(
     #[props(default)] gap: Option<Px>,
     #[props(default)] on_hidden: Option<EventHandler<BannerKey>>,
 ) -> Element {
-    let pitches = use_pitches();
     let keys: Vec<BannerKey> = banners.iter().map(|banner| banner.key).collect();
     let cards = use_cards(&banners);
-    let roster = use_leaving_roster(
+    let roster = use_roster(
         keys,
-        Leaving {
+        RosterSpec {
+            leave: LeaveBy::Delist,
             exit: Exit::BannerOut,
             pitch: FALLBACK_PITCH,
-            pitches,
-            on_settled: EventHandler::new(move |key| {
+            on_settled: Some(EventHandler::new(move |key| {
                 cards.forget(key);
                 if let Some(on_hidden) = on_hidden {
                     on_hidden.call(key);
                 }
-            }),
+            })),
         },
     );
+    let pitches = roster.pitches();
     let style = gap.map(|gap| NotificationToken::StackGap.write(&format!("{}px", gap.0)));
     rsx! {
         div {

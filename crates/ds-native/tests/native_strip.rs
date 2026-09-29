@@ -9,7 +9,7 @@ use ds::{
     ActionId, Appearance, Ds, HoverStrip, Icon, ListRow, Material, Point, Presence, Px, Rect,
     RowState, Shown, StripAction,
 };
-use ds::{Emphasis, Selection, StaggerIndex};
+use ds::{Emphasis, Selection};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -64,7 +64,6 @@ fn Page(shown: Option<Shown>, width: Width) -> Element {
             ul { class: "list", style: list,
                 ListRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
-                    index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",
                     via: None,

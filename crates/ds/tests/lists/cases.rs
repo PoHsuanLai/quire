@@ -237,7 +237,7 @@ pub const CASES: &[Case] = &[
             item(
                 ItemKind::Today { avatar: DANA },
                 Selection::Unselected,
-                Presence::Leaving(Exit::TabOut),
+                Presence::Leaving(Exit::Row),
                 None,
             )
         },

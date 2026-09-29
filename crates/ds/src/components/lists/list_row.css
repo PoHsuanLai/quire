@@ -1,23 +1,16 @@
-/* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`, `S:326-333`, C's
-   crumple (`C:714`) and arrival (`C:373`). Attribute selectors carry `*|` (spike S2).
-   Motion state is the roster's: `data-presence=entering|present|leaving|healing` with
-   `data-exit=fold|curl|crumple`. An entering row rises (staggered by `--i`) when its list is
-   first shown and plays `row-in` when it arrives into a list at rest. An unread leaving row
-   plays the heavy variant of its exit (`--t-big-heavy`, `--t-curl-heavy`, `--t-crumple-heavy`),
-   the one `Roster::leave` settles. `tab-out` is a Today entry's exit, not a row's. A healing
-   row slides from `--dy`, delayed by `--d` heal steps (`--d-heal`). `curl` has no saturate
-   filter (05-MOTION rule 4). Subject and snippet truncate with `.ds-truncate`; the name only
-   when `ListRow` finds it longer than its column's character budget (`NameFit`), since a fade
-   on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The star's fill is an SVG attribute
-   (spike S6), so this file colours it with `color`.
-   Not specified: the row's active state, disabled. The undo restore (`rise --t-big
-   --e-spring`, `S:1560`) has no Presence of its own; a restored row arrives with `row-in`.
-   The snooze floater "zZ" is the consumer's, through OverlayHost. `drop: DropState` writes the
-   dragged source `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]`
-   (section 34's drop-target look, `C:320-323`). */
+/* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`. Attribute selectors
+   carry `*|` (spike S2). Motion state is the roster's: `data-presence=entering|present|leaving|
+   healing` with `data-exit=row`. An entering row plays `row-in` (fades and slides down over
+   `--t-move`), a leaving row `row-out` (fades and slides up over `--t-quick`), and a healing row
+   slides from `--dy` over `--t-move`. Subject and snippet truncate with `.ds-truncate`; the name
+   only when `ListRow` finds it longer than its column's character budget (`NameFit`), since a
+   fade on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The
+   star's fill is an SVG attribute (spike S6), so this file colours it with `color`.
+   Not specified: the row's active state, disabled. `drop: DropState` writes the dragged source
+   `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]` (section 34's
+   drop-target look, `C:320-323`). */
 
 .ds-row{
-  --i:0; --d:0;
   position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
   padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
   border:var(--hair) solid transparent; cursor:default; user-select:none; list-style:none;
@@ -25,45 +18,33 @@
              background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
   animation:none;
 }
-.ds-row:hover{ transform:translateY(var(--lift)); box-shadow:var(--shadow-2); border-color:var(--line); }
+.ds-row:hover{ box-shadow:var(--shadow-2); border-color:var(--line); }
 .ds-row[*|aria-selected=true]{ background:var(--raise); border-color:var(--accent-text); box-shadow:var(--shadow-1); }
 
-/* Entering: first show (`S:294`) or an arrival (`C:373`). */
-.ds-list[*|data-presence=entering] .ds-row[*|data-presence=entering]{
-  animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger));
-}
-.ds-list[*|data-presence=present] .ds-row[*|data-presence=entering]{
-  animation:row-in var(--t-big) var(--e-spring) backwards; animation-delay:calc(var(--i) * var(--stagger));
-}
+/* Entering: an arrival. */
+.ds-row[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
 
 /* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
    rest timer (wall clock) that turns a row present never drops a running animation without
    starting another; Blitz at the pinned rev keeps a dropped animation's last value. */
-.ds-row[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-row[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 
-/* Leaving (`S:326-329`, `C:714`). */
+/* Leaving. */
 .ds-row[*|data-presence=leaving]{ pointer-events:none; }
-.ds-row[*|data-presence=leaving][*|data-exit=fold]{ animation:fold var(--t-big) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=fold][*|data-emphasis=strong]{ animation:fold var(--t-big-heavy) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=curl]{ animation:curl var(--t-curl) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=curl][*|data-emphasis=strong]{ animation:curl var(--t-curl-heavy) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=crumple]{ animation:crumple var(--t-big) var(--e-exit) forwards; }
-.ds-row[*|data-presence=leaving][*|data-exit=crumple][*|data-emphasis=strong]{ animation:crumple var(--t-crumple-heavy) var(--e-exit) forwards; }
+.ds-row[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
 
 /* Drag (section 34). */
 .ds-row[*|data-drag=source]{ opacity:.35; }
 .ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 
 /* Healing (`S:330`). */
-.ds-row[*|data-presence=healing]{
-  animation:heal var(--t-move) var(--e-spring) backwards; animation-delay:calc(var(--d) * var(--d-heal));
-}
+.ds-row[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 
 /* Dot (`S:185-187`, `S:295-296`). */
 .ds-row-dot{ padding-top:var(--s-6); }
 .ds-dot{
   display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
-  transition:transform var(--t-quick) var(--e-spring), opacity var(--t-quick) var(--e-out);
+  transition:transform var(--t-quick) var(--e-out), opacity var(--t-quick) var(--e-out);
 }
 .ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
 

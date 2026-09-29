@@ -34,13 +34,13 @@ use crate::components::menus::palette::palette_stops::{
 };
 use crate::core::vocab::Dismiss;
 use crate::core::word::Word;
+use crate::motion::anim::Anim;
 
 use crate::components::fields::search_field::SearchField;
 use crate::components::fields::text_input_focus::FieldFocus;
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
 use crate::components::menus::palette::{
-    palette_host::{CommandPaletteHost, PaletteEntrance},
-    palette_motion::PaletteHandle,
+    palette_host::CommandPaletteHost, palette_motion::PaletteHandle,
 };
 use crate::components::overlays::popover::{Float, Stacking, use_float};
 use crate::core::geometry::units::{Px, Rect};
@@ -59,7 +59,7 @@ use dioxus::prelude::*;
 /// is when not given.
 pub const ASIDE_WIDTH: Px = Px(360.0);
 
-/// Search and commands. `host` says where it draws and `entrance` how its card enters; `id`
+/// Search and commands. `host` says where it draws; `id`
 /// goes on the card (a shell's blur region names it). `focus` hands the field the keyboard
 /// again after something else took it (a menu that closed); the field always takes it as it
 /// mounts.
@@ -128,7 +128,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     onpick: EventHandler<T>,
     onclose: EventHandler<()>,
     #[props(default)] host: CommandPaletteHost,
-    #[props(default)] entrance: PaletteEntrance,
     #[props(default)] id: Option<String>,
     #[props(default)] focus: Option<FocusRequest>,
     #[props(default)] selected: Option<usize>,
@@ -145,7 +144,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] handle: Option<PaletteHandle>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::Semitransient));
-    let showing = use_showing(shown, entrance.anim());
+    let showing = use_showing(shown, Anim::PeekIn);
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);
     let in_view = use_reveal();
@@ -293,7 +292,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             role: "dialog",
             "aria-label": "{label}",
             "data-host": host.slug(),
-            "data-entrance": entrance.slug(),
             "data-presence": showing.presence().slug(),
             "data-shown": showing.shown.slug(),
             "data-pulse": showing.alias(),
@@ -324,7 +322,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             {side}
         }
     };
-    hosted(host, entrance, float, card, showing.shown, onclose)
+    hosted(host, float, card, showing.shown, onclose)
 }
 
 /// A stop's element mounted: book it, report it if it is the selected one, and keep it in view.

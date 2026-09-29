@@ -373,7 +373,7 @@ fn the_markup_carries_the_props() {
     );
     let leaving = render(SPECIMENS[15].1);
     assert!(
-        leaving.contains("class=\"ds-switcher-cell a-fold\""),
+        leaving.contains("class=\"ds-switcher-cell a-row-out\""),
         "{leaving}"
     );
     assert!(leaving.contains("data-presence=\"leaving\""), "{leaving}");

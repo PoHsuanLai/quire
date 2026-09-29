@@ -8,7 +8,7 @@
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, DayKey, Ds, Material, MonthGrid, MonthStep, MotionLevel, StaggerIndex};
+use ds::{Anim, Appearance, DayKey, Ds, Material, MonthGrid, MonthStep, MotionLevel};
 use ds::{WeekNumbers, settle};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -65,7 +65,7 @@ fn log(harness: &Harness) -> String {
 
 /// How long the month's slide takes to settle at the Standard level.
 fn slide() -> Duration {
-    settle(Anim::SlideR, MotionLevel::Standard, StaggerIndex::default())
+    settle(Anim::SlideR, MotionLevel::Standard)
 }
 
 fn sliding(harness: &Harness, class: &str) -> bool {

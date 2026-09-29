@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, Ds, Fraction, LevelGlyph, Material, MotionLevel, Muting, Osd, OsdLevel,
-    RootChrome, Shown, StaggerIndex, settle,
+    RootChrome, Shown, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -59,7 +59,7 @@ fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
     harness.advance(ms(300));
     assert_eq!(presence(&harness).as_deref(), Some("present"));
-    let out = settle(Anim::OsdOut, MotionLevel::Standard, StaggerIndex::default());
+    let out = settle(Anim::OsdOut, MotionLevel::Standard);
     // Marked on the harness's own (virtual) clock, so the comparison against `out`
     // below is exact, not merely a true lower bound.
     let hiding = harness.now();

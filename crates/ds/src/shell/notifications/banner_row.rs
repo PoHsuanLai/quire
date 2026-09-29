@@ -18,7 +18,7 @@ use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
 use crate::motion::roster::{Heal, RowPitch, presence_slug};
-use crate::motion::roster_exits::Pitches;
+use crate::motion::use_roster::Pitches;
 use crate::shell::notifications::banner_stack::{BannerKey, BannerPosition};
 use crate::shell::notifications::swipe::{Carried, Flight};
 use dioxus::core::current_scope_id;
@@ -87,42 +87,27 @@ fn exit_slug(presence: Presence) -> Option<&'static str> {
     }
 }
 
-/// A healing row's distance and delay: `--dy` signed for the stack's direction, `--d` heal
-/// steps.
+/// A healing row's distance: `--dy` signed for the stack's direction.
 fn heal_style(heal: Option<Heal>, position: BannerPosition) -> Option<String> {
-    heal.map(|Heal { dy, d }| {
-        format!(
-            "--dy:{}px;--d:{}",
-            Px(dy.0 * position.heal_sign()).0,
-            d.get()
-        )
-    })
+    heal.map(|Heal { dy }| format!("--dy:{}px", Px(dy.0 * position.heal_sign()).0))
 }
 
 #[cfg(test)]
 mod tests {
     use super::heal_style;
     use crate::core::geometry::units::Px;
-    use crate::core::vocab::StaggerIndex;
     use crate::motion::roster::Heal;
     use crate::shell::notifications::banner_stack::BannerPosition;
 
     #[test]
     fn a_healing_row_moves_towards_the_gap() {
-        let healing = Heal {
-            dy: Px(96.0),
-            d: StaggerIndex::new(1),
-        };
+        let healing = Heal { dy: Px(96.0) };
         let cases = [
-            (
-                Some(healing),
-                BannerPosition::TopRight,
-                Some("--dy:96px;--d:1"),
-            ),
+            (Some(healing), BannerPosition::TopRight, Some("--dy:96px")),
             (
                 Some(healing),
                 BannerPosition::BottomRight,
-                Some("--dy:-96px;--d:1"),
+                Some("--dy:-96px"),
             ),
             (None, BannerPosition::TopRight, None),
         ];

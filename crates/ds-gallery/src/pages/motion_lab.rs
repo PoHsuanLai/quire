@@ -6,10 +6,7 @@ use super::Section;
 use super::motion::{millis, recipe_text};
 use dioxus::prelude::*;
 use ds::Word;
-use ds::{
-    Anim, Button, ButtonVariant, PulseKey, StaggerIndex, TimerPhase, settle, use_motion_timer,
-    use_scope,
-};
+use ds::{Anim, Button, ButtonVariant, PulseKey, TimerPhase, settle, use_motion_timer, use_scope};
 
 /// The motion lab page.
 #[component]
@@ -40,7 +37,7 @@ fn LabCell(anim: Anim) -> Element {
     };
     let recipe = anim.recipe();
     let css = millis(recipe.duration.duration(level));
-    let settles = millis(settle(anim, level, StaggerIndex::default()));
+    let settles = millis(settle(anim, level));
     let phase = match timer.phase() {
         TimerPhase::Idle => "idle",
         TimerPhase::Running => "running",

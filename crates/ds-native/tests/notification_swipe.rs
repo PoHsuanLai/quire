@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AppMark, Appearance, Ds, Icon, IconSource, Material, Motion, MotionLevel,
-    NotificationCard, NotificationSwipe, Point, Px, StaggerIndex, settle,
+    NotificationCard, NotificationSwipe, Point, Px, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -139,11 +139,7 @@ fn a_drag_released_under_the_threshold_springs_back() {
 #[test]
 fn a_drag_released_past_the_threshold_flies_out_and_reports_at_settle() {
     let (mut harness, at) = start_on(Motion::Standard, Clock::Virtual);
-    let flight = settle(
-        Anim::BannerOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let flight = settle(Anim::BannerOut, MotionLevel::Standard);
     let released = drag(&mut harness, at, 100.0);
     assert_eq!(swipe(&harness).as_deref(), Some("gone"));
     assert!(
@@ -196,16 +192,8 @@ fn a_horizontal_scroll_is_summed_and_decided_when_it_stops() {
 #[test]
 fn under_reduced_the_flight_settles_at_reduceds_length() {
     let (mut harness, at) = start_on(Motion::Reduced, Clock::Virtual);
-    let reduced = settle(
-        Anim::BannerOut,
-        MotionLevel::Reduced,
-        StaggerIndex::default(),
-    );
-    let standard = settle(
-        Anim::BannerOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let reduced = settle(Anim::BannerOut, MotionLevel::Reduced);
+    let standard = settle(Anim::BannerOut, MotionLevel::Standard);
     let released = drag(&mut harness, at, 100.0);
     let heard = settle_until(&mut harness, dismissed);
     let took = heard.duration_since(released);

@@ -136,7 +136,7 @@ pub use crate::components::{
             command_palette::CommandPalette,
             palette_claim::{Claim, FieldKey},
             palette_group::{GroupEntries, PaletteGroup, PaletteGroups},
-            palette_host::{CommandPaletteHost, PaletteEntrance},
+            palette_host::CommandPaletteHost,
             palette_motion::{PaletteHandle, use_palette_handle},
             palette_shown::Retain,
         },
@@ -184,7 +184,7 @@ pub use crate::core::{
     vocab::{
         Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, Fraction,
         InputModality, Muting, Percent, PressPhase, RowState, Selection, Shortcut, ShortcutKey,
-        Shown, StaggerIndex,
+        Shown,
     },
 };
 pub use crate::edit::{
@@ -235,7 +235,7 @@ pub use crate::motion::{
     settle::settle,
     swipe::{Speed, SwipeMetrics},
     timer::{TimerPhase, use_motion_timer},
-    use_roster::{Roster, use_roster},
+    use_roster::{LeaveBy, Pitches, Roster, RosterSpec, use_roster},
     wake::WakeStamp,
 };
 pub use crate::root::{

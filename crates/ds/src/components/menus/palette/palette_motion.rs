@@ -20,7 +20,6 @@ use crate::components::menus::palette::palette_stops::ShownGroup;
 use crate::core::geometry::units::Px;
 use crate::core::task::spawn_in;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::core::vocab::StaggerIndex;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
 use crate::motion::{
     anim::Anim,
@@ -203,7 +202,7 @@ fn use_group_motion<T>(
     shown: &[ShownGroup<'_, T>],
     stops: Stops,
 ) -> Option<GroupMotion> {
-    let rise = use_motion_timer(Anim::Rise);
+    let rise = use_motion_timer(Anim::RowIn);
     let heal = use_motion_timer(Anim::Heal);
     let mut playing = use_hook(|| CopyValue::new(None::<GroupMotion>));
     let spans = use_hook(|| CopyValue::new(None::<Span>));
@@ -256,13 +255,13 @@ fn start(resize: GroupResize, first: Option<usize>, timers: Timers) -> Option<Gr
     match resize.resize {
         Resize::Grew { kept, added } if added > 0 => {
             let rise = timers.rise;
-            queue_effect(move || rise.start_staggered(StaggerIndex::new(added - 1)));
+            queue_effect(move || rise.start_quiet());
             if let Some(first) = first {
                 measure(&resize.title, first + kept, added, timers);
             }
             Some(GroupMotion {
                 title: resize.title,
-                rows: RowsMotion::Rise { from: kept },
+                rows: RowsMotion::Enter { from: kept },
                 dy: None,
             })
         }

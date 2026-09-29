@@ -8,9 +8,8 @@ use ds::Word;
 use ds::{
     Accent, Appearance, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
     CommandPalette, CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile,
-    MenuTrail, ModuleGrid, ModuleState, ModuleTile, MonthGrid, PaletteEntrance, Radius, RootChrome,
-    Scheme, SegmentedControl, Surface, Theme, Toggle, WidgetFrame, WidgetMetrics, WidgetSize,
-    accent_of,
+    MenuTrail, ModuleGrid, ModuleState, ModuleTile, MonthGrid, Radius, RootChrome, Scheme,
+    SegmentedControl, Surface, Theme, Toggle, WidgetFrame, WidgetMetrics, WidgetSize, accent_of,
 };
 
 /// The colours an accent lends its surfaces, as CSS.
@@ -241,7 +240,6 @@ fn Launcher(vars: String) -> Element {
                 onpick: |_| {},
                 onclose: |_| {},
                 host: CommandPaletteHost::Surface,
-                entrance: PaletteEntrance::CmdkIn,
                 selected: Some(1),
             }
             }

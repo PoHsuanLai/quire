@@ -7,7 +7,7 @@ use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
 use crate::motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
-use crate::motion::roster_exits::Pitches;
+use crate::motion::use_roster::Pitches;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -78,42 +78,30 @@ fn exit_slug(presence: Presence) -> Option<&'static str> {
     }
 }
 
-/// The row's motion variables: its stagger while it enters or leaves, its heal distance and
-/// delay while it heals.
+/// The row's motion variable while it heals: the distance `--dy`.
 fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
-    match (entry.heal, entry.presence) {
-        (Some(Heal { dy, d }), _) => Some(format!("--dy:{}px;--d:{}", dy.0, d.get())),
-        (None, Presence::Entering | Presence::Leaving(_)) => {
-            Some(format!("--i:{}", entry.index.get()))
-        }
-        (None, Presence::Hidden | Presence::Present) => None,
-    }
+    entry.heal.map(|Heal { dy }| format!("--dy:{}px", dy.0))
 }
 
 #[cfg(test)]
 mod tests {
     use super::motion_style;
     use crate::core::geometry::units::Px;
-    use crate::core::vocab::StaggerIndex;
     use crate::motion::presence::{Exit, Presence};
     use crate::motion::roster::{Heal, RosterEntry};
 
     #[test]
-    fn each_state_writes_its_own_variables() {
+    fn only_a_healing_row_writes_its_distance() {
         let entry = |presence, heal| RosterEntry {
             key: 1u8,
             presence,
             heal,
-            index: StaggerIndex::new(3),
         };
-        let healing = Heal {
-            dy: Px(96.5),
-            d: StaggerIndex::new(2),
-        };
+        let healing = Heal { dy: Px(96.5) };
         let cases = [
-            (Presence::Entering, None, Some("--i:3")),
-            (Presence::Leaving(Exit::Fold), None, Some("--i:3")),
-            (Presence::Present, Some(healing), Some("--dy:96.5px;--d:2")),
+            (Presence::Entering, None, None),
+            (Presence::Leaving(Exit::Row), None, None),
+            (Presence::Present, Some(healing), Some("--dy:96.5px")),
             (Presence::Present, None, None),
         ];
         for (presence, heal, want) in cases {

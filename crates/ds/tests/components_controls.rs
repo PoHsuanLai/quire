@@ -16,7 +16,7 @@ use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::{Glyph, Icon, IconSize};
-use ds::{Shortcut, ShortcutKey, StaggerIndex};
+use ds::{Shortcut, ShortcutKey};
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -197,14 +197,6 @@ fn a_shortcut_is_glyphs_without_separators() {
         "the Mac's order, whatever order the keys were given in"
     );
     assert_eq!(Shortcut::default().glyphs(), "");
-}
-
-#[test]
-fn a_stagger_index_saturates_at_the_cap() {
-    const CASES: &[(usize, u8)] = &[(0, 0), (5, 5), (12, 12), (13, 12), (usize::MAX, 12)];
-    for (n, want) in CASES {
-        assert_eq!(StaggerIndex::new(*n).get(), *want, "n {n}");
-    }
 }
 
 /// The slider consumes wheel input itself (11-BEHAVIOUR-scroll.md section 11.3.1 item 2:

@@ -8,8 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Material, MotionLevel, Panel, Point, Px, RootExtent, Shown, StaggerIndex,
-    settle,
+    Anim, Appearance, Ds, Material, MotionLevel, Panel, Point, Px, RootExtent, Shown, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -104,7 +103,7 @@ fn inside_resting_panel(h: &Harness) -> Point {
 }
 
 fn standard(anim: Anim) -> Duration {
-    settle(anim, MotionLevel::Standard, StaggerIndex::default())
+    settle(anim, MotionLevel::Standard)
 }
 
 /// The entrance's timer settles on the wall clock while the frame clock has not moved (a first

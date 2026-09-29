@@ -34,7 +34,7 @@ pub enum TilePresence {
     #[default]
     Present,
     /// Quitting (Q): the tile plays `fold` once (`--t-big --e-exit`, held); the shell drops it
-    /// from `apps` at `settle(Anim::Fold)`.
+    /// from `apps` at `settle(Anim::RowOut)`.
     Leaving,
 }
 
@@ -131,7 +131,7 @@ fn tile(
 ) -> Element {
     let leaving = match app.presence {
         TilePresence::Present => None,
-        TilePresence::Leaving => PulseKey::rest(Anim::Fold).fired().attrs(),
+        TilePresence::Leaving => PulseKey::rest(Anim::RowOut).fired().attrs(),
     };
     let class = match &leaving {
         Some((anim, _)) => format!("ds-switcher-cell {anim}"),

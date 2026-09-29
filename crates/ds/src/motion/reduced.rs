@@ -45,8 +45,6 @@ impl Anim {
         use FadeWay::{In, Out};
         match self {
             Anim::RowIn
-            | Anim::Rise
-            | Anim::TabIn
             | Anim::SlideR
             | Anim::SlideL
             | Anim::MenuIn
@@ -72,14 +70,7 @@ impl Anim {
             | Anim::MorphIn
             | Anim::MorphInSpring
             | Anim::RollIn => CrossFade(In),
-            Anim::Fold
-            | Anim::FoldHeavy
-            | Anim::Crumple
-            | Anim::CrumpleHeavy
-            | Anim::Curl
-            | Anim::CurlHeavy
-            | Anim::TabOut
-            | Anim::HcOut
+            Anim::HcOut
             | Anim::Park
             | Anim::ComposeSend
             | Anim::Floatup
@@ -93,6 +84,7 @@ impl Anim {
             | Anim::ShotOut
             | Anim::MorphOut
             | Anim::RollOut
+            | Anim::RowOut
             | Anim::WidgetOut => CrossFade(Out),
             Anim::Heal | Anim::ShakeX | Anim::Nudge | Anim::Shake | Anim::Breathe | Anim::Spin => {
                 Still

@@ -190,7 +190,11 @@ mod tests {
                 "--b",
                 "menu-out--b var(--t-quick) var(--e-exit) forwards",
             ),
-            (Anim::Rise, "", "rise var(--t-move) var(--e-out) backwards"),
+            (
+                Anim::RowIn,
+                "",
+                "row-in var(--t-move) var(--e-out) backwards",
+            ),
         ];
         for &(anim, suffix, want) in CASES {
             assert_eq!(animation(anim.recipe(), suffix), want, "{anim:?}");

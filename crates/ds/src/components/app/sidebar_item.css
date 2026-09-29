@@ -55,9 +55,9 @@
 /* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
    (drop_place.css). */
 
-/* Today presence (`S:350-351`). */
-.ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:tab-in var(--t-big) var(--e-spring); }
-/* At rest, `hold` (moves nothing), so turning present never drops `tab-in` without starting
-   another animation; an item wearing a pulse plays the pulse instead. */
-.ds-sidebar-item[*|data-kind=today][*|data-presence=present]:not([*|data-pulse]){ animation:hold var(--t-tap) var(--e-linear); }
-.ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:tab-out var(--t-move) var(--e-exit) forwards; overflow:hidden; }
+/* Today presence (`S:350-351`): a roster row. It enters with `row-in` and leaves with `row-out`;
+   at rest, `hold` (moves nothing), so turning present never drops `row-in` without starting
+   another animation. */
+.ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out); }
+.ds-sidebar-item[*|data-kind=today][*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }

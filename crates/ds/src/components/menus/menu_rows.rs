@@ -11,7 +11,7 @@ use crate::components::menus::menu_shape::PLAIN;
 use crate::components::menus::row_chord::NO_CHORD;
 use crate::core::geometry::units::Point;
 use crate::core::press::Press;
-use crate::core::vocab::{Selection, Shown, StaggerIndex};
+use crate::core::vocab::{Selection, Shown};
 use dioxus::prelude::*;
 
 /// What a panel draws around its choices: the selection, the choice whose submenu is open,
@@ -40,8 +40,8 @@ pub(crate) struct Drawn {
 pub(crate) enum RowsMotion {
     /// None.
     Still,
-    /// The choices from `from` on rise in turn.
-    Rise {
+    /// The choices from `from` on come in as inserted rows do.
+    Enter {
         /// The first added choice.
         from: usize,
     },
@@ -56,11 +56,9 @@ impl RowsMotion {
     /// Choice `index`'s part.
     fn of(self, index: usize) -> RowMotion {
         match self {
-            RowsMotion::Rise { from } if index >= from => {
-                RowMotion::Rise(StaggerIndex::new(index - from))
-            }
+            RowsMotion::Enter { from } if index >= from => RowMotion::In,
             RowsMotion::HealAfter { at } if index == at => RowMotion::HealFrom,
-            RowsMotion::Still | RowsMotion::Rise { .. } | RowsMotion::HealAfter { .. } => {
+            RowsMotion::Still | RowsMotion::Enter { .. } | RowsMotion::HealAfter { .. } => {
                 RowMotion::Still
             }
         }

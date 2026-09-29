@@ -9,7 +9,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, Anim, Appearance, Availability, CommandPalette, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, Motion, MotionLevel, Point, Px, StaggerIndex, settle, sleep,
+    MenuKind, MenuTrail, Motion, MotionLevel, Point, Px, settle, sleep,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -188,7 +188,7 @@ fn run_script(harness: &mut Harness, time: Duration, want: &str, subject: &str) 
 
 /// How long `anim`'s entrance runs, asked of the motion table: the early unmount is inside it.
 fn entrance(anim: Anim) -> Duration {
-    settle(anim, MotionLevel::Standard, StaggerIndex::default())
+    settle(anim, MotionLevel::Standard)
 }
 
 // The harness's time is the wall clock (its module documentation says why), so a test reads
@@ -224,7 +224,7 @@ fn a_menu_unmounted_before_its_entrance_settles_does_not_panic() {
 
 #[test]
 fn a_palette_toggled_twice_within_its_entrance_does_not_panic() {
-    assert!(settle(Anim::PeekIn, MotionLevel::Standard, StaggerIndex::default()) > ms(210));
+    assert!(settle(Anim::PeekIn, MotionLevel::Standard) > ms(210));
     let mut harness = Harness::new(PaletteToggledTwice, VIEW);
     run_script(&mut harness, ms(2200), "2", ".ds-palette");
     assert_eq!(mounts(&harness), "2");

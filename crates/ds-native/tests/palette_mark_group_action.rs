@@ -144,7 +144,7 @@ fn a_caller_marked_show_more_rises_the_added_rows_like_the_palettes_own_enter() 
     mark_and_set(&mut harness, "Applications", Rows::Grown);
     assert_eq!(harness.count("#card .ds-menu-item"), 7);
     assert_eq!(
-        harness.count("[*|data-row-motion=rise]"),
+        harness.count("[*|data-row-motion=in]"),
         4,
         "the four added rows rise, marked or not"
     );

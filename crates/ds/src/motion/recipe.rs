@@ -52,92 +52,28 @@ impl Anim {
     /// The canonical declaration.
     pub fn recipe(self) -> Recipe {
         match self {
-            // `C:373`.
+            // design/30 section 1.3: an inserted row fades and slides down over `--t-move`.
             Anim::RowIn => recipe(
                 "row-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::Backwards,
-                Iteration::Once,
-            ),
-            // `S:294`.
-            Anim::Rise => recipe(
-                "rise",
                 DurationToken::Move,
                 EasingToken::Out,
                 Fill::Backwards,
                 Iteration::Once,
             ),
-            // `S:327`.
-            Anim::Fold => recipe(
-                "fold",
-                DurationToken::Big,
+            // A removed row fades and slides up over `--t-quick`, accelerating.
+            Anim::RowOut => recipe(
+                "row-out",
+                DurationToken::Quick,
                 EasingToken::Exit,
                 Fill::Forwards,
                 Iteration::Once,
             ),
-            // `S:329`.
-            Anim::FoldHeavy => recipe(
-                "fold",
-                DurationToken::BigHeavy,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:714`, at t-big x 1.15 as `S:329` weights an unread fold.
-            Anim::CrumpleHeavy => recipe(
-                "crumple",
-                DurationToken::CrumpleHeavy,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:714`.
-            Anim::Crumple => recipe(
-                "crumple",
-                DurationToken::Big,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:328` at 560 x 1.15 (design/05-MOTION.md open decision 3, proposed).
-            Anim::CurlHeavy => recipe(
-                "curl",
-                DurationToken::CurlHeavy,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:328`.
-            Anim::Curl => recipe(
-                "curl",
-                DurationToken::Curl,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:330`.
+            // The rows below close the gap over `--t-move`.
             Anim::Heal => recipe(
                 "heal",
                 DurationToken::Move,
-                EasingToken::Spring,
+                EasingToken::InOut,
                 Fill::Backwards,
-                Iteration::Once,
-            ),
-            // `S:350`.
-            Anim::TabIn => recipe(
-                "tab-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:351`.
-            Anim::TabOut => recipe(
-                "tab-out",
-                DurationToken::Move,
-                EasingToken::Exit,
-                Fill::Forwards,
                 Iteration::Once,
             ),
             // `S:102`.

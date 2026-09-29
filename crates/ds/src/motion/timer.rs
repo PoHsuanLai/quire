@@ -6,7 +6,6 @@
 
 use crate::core::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
-use crate::core::vocab::StaggerIndex;
 use crate::motion::anim::Anim;
 use crate::motion::settle::settle;
 use crate::style::scope::{Scope, use_scope_signal};
@@ -36,27 +35,22 @@ pub struct MotionTimer {
 }
 
 impl MotionTimer {
-    /// Start (or restart) the timer; `on_settled` runs once, at `settle(anim, level, 0)`. A
+    /// Start (or restart) the timer; `on_settled` runs once, at `settle(anim, level)`. A
     /// timer whose owner has unmounted does nothing, and one running when its owner unmounts is
     /// dropped with it: `on_settled` never runs for a component that is gone.
     pub fn start(&self, on_settled: EventHandler<()>) {
-        let _ = self.try_start(Some(on_settled), StaggerIndex::default());
+        let _ = self.try_start(Some(on_settled));
     }
 
-    /// Start (or restart) the timer for a stagger whose last member is at `index`: it settles at
-    /// `settle(anim, level, index)` (a `Reveal`'s twelfth row, design/26 R13). It calls nothing
-    /// when it settles, so it may be started from an effect, outside any scope.
-    pub fn start_staggered(&self, index: StaggerIndex) {
-        let _ = self.try_start(None, index);
+    /// Start (or restart) the timer, calling nothing when it settles, so it may be started from
+    /// an effect, outside any scope.
+    pub fn start_quiet(&self) {
+        let _ = self.try_start(None);
     }
 
-    fn try_start(
-        &self,
-        on_settled: Option<EventHandler<()>>,
-        index: StaggerIndex,
-    ) -> Result<(), Gone> {
+    fn try_start(&self, on_settled: Option<EventHandler<()>>) -> Result<(), Gone> {
         let level = try_get(self.env)?.resolved.motion;
-        let length = settle(self.anim, level, index);
+        let length = settle(self.anim, level);
         if let Some(running) = try_get(self.task)? {
             running.cancel();
         }
