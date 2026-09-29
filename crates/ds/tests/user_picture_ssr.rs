@@ -10,6 +10,7 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, EmojiId, FaceFile,
@@ -205,7 +206,7 @@ fn the_choice_is_stored_by_stable_names() {
         let back: PictureChoice = serde_json::from_str(json).expect("deserialise");
         assert_eq!(back, choice, "{json}");
     }
-    for emoji in EmojiId::ALL {
+    for emoji in EmojiId::ALL.iter().copied() {
         let choice = PictureChoice::Emoji(emoji);
         let json = serde_json::to_string(&choice).expect("serialise");
         assert!(json.contains(emoji.slug()), "{json}");

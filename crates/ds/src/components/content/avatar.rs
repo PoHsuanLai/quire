@@ -108,7 +108,7 @@ pub enum AvatarTone {
 /// not the one in view keeps its hue at .55 of its chroma, so it is still that account but
 /// states nothing about the list (S's `saturate(.55)`, as an unpressed `AccountTile` shows it).
 /// The greyscale tones (`Ink`, `Stack`) are unchanged; the letter stays `--on-hue`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum AvatarMuting {
     /// The colour as given.
     #[default]
@@ -184,11 +184,8 @@ impl AvatarMuting {
     }
 
     /// `data-muting`, written only when muted so a plain avatar's markup is as it was.
-    fn slug(self) -> Option<&'static str> {
-        match self {
-            AvatarMuting::Plain => None,
-            AvatarMuting::Muted => Some("muted"),
-        }
+    fn attr(self) -> Option<&'static str> {
+        (self != AvatarMuting::Plain).then(|| self.slug())
     }
 }
 
@@ -221,7 +218,7 @@ pub fn Avatar(
             "data-size": "{px}",
             "data-shape": shape.slug(),
             "data-tone": tone.slug(),
-            "data-muting": muting.slug(),
+            "data-muting": muting.attr(),
             style: tone.style(muting),
             "{initial}"
         }

@@ -6,6 +6,7 @@
 //! document fetches nothing.
 
 use super::id::EmojiId;
+use crate::core::word::Word;
 use crate::shell::user_picture::mood::PictureSize;
 use crate::style::icon::url::IconUrl;
 use serde::Deserialize;

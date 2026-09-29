@@ -6,6 +6,7 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Chip, ChipVariant, EditHandle, EditInput, EditKind, EditPointer, EditSurface, FRAME_SLACK,
     PointerPhase, Probe, Rect, Spell, TextPosition, sleep, use_edit_handle,

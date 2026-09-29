@@ -9,12 +9,13 @@
 //! `TextLine` (`Some(string)` must be written `Some(string.into())`: `None` could not be inferred if
 //! both `Option<String>` and `Option<TextLine>` were accepted).
 
+use crate::core::word::Word;
 use dioxus::core::SuperFrom;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
 /// How one run is set.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 pub enum RunTone {
     /// The line's own tone.
     #[default]
@@ -34,14 +35,8 @@ pub enum RunTone {
 
 impl RunTone {
     /// The `data-tone` word of a span run; `None` for the tones drawn another way.
-    fn slug(self) -> Option<&'static str> {
-        match self {
-            RunTone::Strong => Some("strong"),
-            RunTone::Faint => Some("faint"),
-            RunTone::Italic => Some("italic"),
-            RunTone::Underline => Some("underline"),
-            RunTone::Plain | RunTone::Mark => None,
-        }
+    fn attr(self) -> Option<&'static str> {
+        (!matches!(self, RunTone::Plain | RunTone::Mark)).then(|| self.slug())
     }
 }
 
@@ -153,7 +148,7 @@ pub(crate) fn text(text: &TextLine) -> Element {
 pub(crate) fn run(run: &TextRun) -> Element {
     let (lead, core, trail) = edges(&run.text);
     let core = core.to_owned();
-    let body = match (run.tone, run.tone.slug()) {
+    let body = match (run.tone, run.tone.attr()) {
         (RunTone::Plain, _) => return rsx! { "{run.text}" },
         (RunTone::Mark, _) => rsx! {
             mark { class: "ds-mark", "{core}" }

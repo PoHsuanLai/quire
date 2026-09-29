@@ -78,7 +78,7 @@ pub fn DeviceBattery(
             div {
                 class: "ds-battery",
                 "data-tone": RingTone::of(level, mark).slug(),
-                "data-mark": mark.slug(),
+                "data-mark": mark.attr(),
                 role: "progressbar",
                 "aria-label": "{label.plain_text()}",
                 "aria-valuemin": "0",

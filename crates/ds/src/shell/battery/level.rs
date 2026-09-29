@@ -45,7 +45,7 @@ pub fn use_battery_fill(level: Fraction, wake: WakeStamp) -> RunFrame {
 pub(crate) const BOLT: &str = "M7 0 0 9.6h4.6L3.2 16 10 6.4H5.4L7 0Z";
 
 /// Whether the battery is filling.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 pub enum RingMark {
     /// Just the level.
     #[default]
@@ -56,11 +56,8 @@ pub enum RingMark {
 
 impl RingMark {
     /// `data-mark`: written only while charging.
-    pub(crate) fn slug(self) -> Option<&'static str> {
-        match self {
-            RingMark::Plain => None,
-            RingMark::Charging => Some("charging"),
-        }
+    pub(crate) fn attr(self) -> Option<&'static str> {
+        (self != RingMark::Plain).then(|| self.slug())
     }
 }
 
@@ -112,7 +109,7 @@ pub fn BatteryLevel(
             class: "ds-battery",
             "data-pulse": alias,
             "data-tone": RingTone::of(level, mark).slug(),
-            "data-mark": mark.slug(),
+            "data-mark": mark.attr(),
             role: "progressbar",
             "aria-label": "{label.plain_text()}",
             "aria-valuemin": "0",

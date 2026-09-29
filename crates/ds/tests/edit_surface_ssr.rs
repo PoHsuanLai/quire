@@ -8,6 +8,7 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass, Point,
     Px, Rect, Size, Spell, SpellMarks,
