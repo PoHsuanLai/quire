@@ -117,7 +117,8 @@ fn the_root_stamps_exactly_its_attributes() {
         material: &'static str,
         blur: &'static str,
         modality: &'static str,
-        activity: &'static str,
+        /// `data-activity`, written only while the window is inactive.
+        activity: Option<&'static str>,
         scheme: Scheme,
         /// The root chrome's attributes: `data-chrome`, `data-frame`, `data-ground`.
         chrome: &'static [(&'static str, &'static str)],
@@ -141,7 +142,7 @@ fn the_root_stamps_exactly_its_attributes() {
             material: "popover",
             blur: "on",
             modality: "pointer",
-            activity: "active",
+            activity: None,
             scheme: Scheme::Dark,
             chrome: &[("data-chrome", "transparent")],
         },
@@ -163,7 +164,7 @@ fn the_root_stamps_exactly_its_attributes() {
             material: "bar",
             blur: "off",
             modality: "pointer",
-            activity: "active",
+            activity: None,
             scheme: Scheme::Light,
             chrome: &[("data-frame", "tinted"), ("data-ground", "frame")],
         },
@@ -184,7 +185,7 @@ fn the_root_stamps_exactly_its_attributes() {
             material: "popover",
             blur: "off",
             modality: "keyboard",
-            activity: "inactive",
+            activity: Some("inactive"),
             scheme: Scheme::Dark,
             chrome: &[("data-chrome", "transparent")],
         },
@@ -212,10 +213,12 @@ fn the_root_stamps_exactly_its_attributes() {
             ("data-material", case.material.to_owned()),
             ("data-blur", case.blur.to_owned()),
             ("data-modality", case.modality.to_owned()),
-            ("data-activity", case.activity.to_owned()),
             ("data-hover", "cold".to_owned()),
             ("style", style),
         ]);
+        if let Some(activity) = case.activity {
+            want.insert("data-activity".to_owned(), activity.to_owned());
+        }
         want.extend(expected(
             &case
                 .chrome

@@ -154,7 +154,7 @@ pub fn Ds(
             "data-material": material.slug(),
             "data-blur": blur.slug(),
             "data-modality": modality.slug(),
-            "data-activity": activity.slug(),
+            "data-activity": (activity == Activity::Inactive).then(|| activity.slug()),
             "data-hover": hover,
             "data-chrome": chrome.attribute(),
             "data-frame": frame_tint.attribute(),
