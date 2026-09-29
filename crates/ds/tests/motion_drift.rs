@@ -4,9 +4,7 @@
 //! the Rust table gives `settle()` (design/05-MOTION.md section 7.1).
 
 use ds::Word;
-use ds::{
-    Anim, DurationToken, EasingToken, MotionLevel, ScalarToken, StaggerIndex, settle, stylesheet,
-};
+use ds::{Anim, DurationToken, EasingToken, MotionLevel, ScalarToken, settle, stylesheet};
 use std::collections::BTreeMap;
 use std::time::Duration;
 
@@ -208,21 +206,14 @@ fn the_settle_table() {
     // design/05-MOTION.md section 7.1's worked values, index 0.
     #[rustfmt::skip]
     const CASES: &[(Anim, MotionLevel, u64)] = &[
-        (Anim::Fold, MotionLevel::Standard, 434),
-        (Anim::FoldHeavy, MotionLevel::Standard, 494),
-        (Anim::Curl, MotionLevel::Standard, 594),
         (Anim::Heal, MotionLevel::Standard, 284),
-        (Anim::Rise, MotionLevel::Standard, 284),
         (Anim::HcOut, MotionLevel::Standard, 184),
-        (Anim::TabOut, MotionLevel::Standard, 284),
         (Anim::Floatup, MotionLevel::Standard, 934),
         (Anim::ComposeSend, MotionLevel::Standard, 654),
         (Anim::Park, MotionLevel::Standard, 454),
-        (Anim::RowIn, MotionLevel::Standard, 434),
+        (Anim::RowIn, MotionLevel::Standard, 284),
         (Anim::Nudge, MotionLevel::Standard, 554),
         (Anim::Shake, MotionLevel::Standard, 454),
-        (Anim::CrumpleHeavy, MotionLevel::Standard, 494),
-        (Anim::CurlHeavy, MotionLevel::Standard, 678),
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
         // 37 and 64).
         (Anim::PaletteFade, MotionLevel::Standard, 184),
@@ -251,13 +242,13 @@ fn the_settle_table() {
         // The center's edge panel, in and out at --t-move.
         (Anim::PanelIn, MotionLevel::Standard, 284),
         (Anim::PanelOut, MotionLevel::Standard, 284),
-        // The screenshot thumbnail rises in at --t-big and slides out at --t-move.
-        (Anim::ShotIn, MotionLevel::Standard, 434),
+        // The screenshot thumbnail slides in and out at --t-move.
+        (Anim::ShotIn, MotionLevel::Standard, 284),
         (Anim::ShotOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(
-            settle(anim, level, StaggerIndex::default()),
+            settle(anim, level),
             Duration::from_millis(ms),
             "{anim:?} {level:?}"
         );
@@ -269,18 +260,14 @@ fn the_settle_table() {
         .filter(|anim| !matches!(anim, Anim::RingDrain))
     {
         assert_eq!(
-            settle(anim, MotionLevel::Reduced, StaggerIndex::default()),
+            settle(anim, MotionLevel::Reduced),
             Duration::from_millis(184),
             "{anim:?} Reduced"
         );
     }
     // The send ring is the undo window: a hold too.
     assert_eq!(
-        settle(
-            Anim::RingDrain,
-            MotionLevel::Reduced,
-            StaggerIndex::default()
-        ),
+        settle(Anim::RingDrain, MotionLevel::Reduced),
         Duration::from_millis(5034),
         "RingDrain Reduced (a hold, unaffected by Reduced)"
     );

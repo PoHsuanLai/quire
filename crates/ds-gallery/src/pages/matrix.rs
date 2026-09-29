@@ -8,8 +8,8 @@ use ds::Word;
 use ds::{
     Accent, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant, Emphasis,
     Fraction, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, RowState,
-    Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex, Surface, Tabs,
-    TextInput, Toggle, Verdict,
+    Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, Surface, Tabs, TextInput,
+    Toggle, Verdict,
 };
 
 /// What the matrix can show.
@@ -90,10 +90,9 @@ fn Cell(subject: Subject) -> Element {
             Slider { label: "Level", value: Fraction(600), onchange: |_| {} }
         },
         Subject::Row => rsx! {
-            AnimatedList { label: "Row", presence: Presence::Present,
+            AnimatedList { label: "Row",
                 ListRow {
                     state: RowState { selection: Selection::Selected, emphasis: Emphasis::Strong, ..RowState::default() },
-                    index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",
                     via: None,

@@ -2,7 +2,6 @@
 //! state machines that decide what moves (design/05-MOTION.md, design/06-INTERACTIONS.md).
 
 pub mod anim;
-pub mod batch_roster;
 pub(crate) mod css;
 pub mod detail;
 pub mod drag;
@@ -20,7 +19,6 @@ pub(crate) mod recipe_detail;
 pub(crate) mod recipe_own;
 pub(crate) mod reduced;
 pub mod roster;
-pub mod roster_exits;
 pub(crate) mod roster_rest;
 pub mod settle;
 pub mod spring;

@@ -5,7 +5,7 @@ use super::Section;
 use dioxus::prelude::*;
 use ds::{
     ActionId, DropState, Emphasis, HoverStrip, Icon, ItemKind, ListRow, PlaceId, Presence,
-    RowState, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
+    RowState, Selection, Shown, SidebarItem, StripAction,
 };
 
 /// Archive and snooze, each doing nothing on its measured click: the press says what happened.
@@ -43,7 +43,6 @@ pub fn StripPress() -> Element {
             ul { class: "g-list g-stage-pad",
                 ListRow {
                     state: RowState { selection: Selection::Selected, emphasis: Emphasis::Strong, ..RowState::default() },
-                    index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",
                     via: None,

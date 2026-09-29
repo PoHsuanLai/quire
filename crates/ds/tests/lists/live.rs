@@ -6,8 +6,8 @@ use super::rows::Row;
 use dioxus::prelude::*;
 use ds::Emphasis;
 use ds::{
-    Accent, Activity, AnimatedList, BlurState, Exit, InputModality, Material, MotionLevel,
-    Presence, Px, Resolved, Roster, RowPitch, Scheme, Scope, use_roster,
+    Accent, Activity, AnimatedList, BlurState, Exit, InputModality, LeaveBy, Material, MotionLevel,
+    Px, Resolved, Roster, RosterSpec, RowPitch, Scheme, Scope, use_roster,
 };
 use std::future::Future;
 use std::pin::pin;
@@ -75,12 +75,18 @@ fn env() -> Scope {
 
 fn app() -> Element {
     use_context_provider(|| Signal::new(env()));
-    let roster = use_roster(vec!["a", "b", "c"], RowPitch(Px(79.0)));
+    let spec = RosterSpec {
+        leave: LeaveBy::Action,
+        exit: Exit::Row,
+        pitch: RowPitch(Px(79.0)),
+        on_settled: None,
+    };
+    let roster = use_roster(vec!["a", "b", "c"], spec);
     use_context_provider(|| roster);
     rsx! {
-        AnimatedList { label: "Threads", presence: Presence::Present,
+        AnimatedList { label: "Threads",
             for entry in roster.entries() {
-                Row { key: "{entry.key}", presence: entry.presence, heal: entry.heal, emphasis: Emphasis::Strong, index: entry.index }
+                Row { key: "{entry.key}", presence: entry.presence, heal: entry.heal, emphasis: Emphasis::Strong }
             }
         }
     }
@@ -104,15 +110,12 @@ pub fn exit_plays_through() {
     dom.rebuild_in_place();
     assert_eq!(
         rows(&dioxus_ssr::render(&dom)),
-        ["entering"; 3],
+        ["present"; 3],
         "first show"
     );
 
-    pump(&mut dom, SETTLED);
-    assert_eq!(rows(&dioxus_ssr::render(&dom)), ["present"; 3], "rested");
-
     dom.in_scope(ScopeId::APP, || {
-        consume_context::<Roster<&'static str>>().leave("a", Exit::Fold, Emphasis::Strong)
+        consume_context::<Roster<&'static str>>().leave("a")
     });
     dom.render_immediate_to_vec();
     let leaving = dioxus_ssr::render(&dom);
@@ -121,7 +124,7 @@ pub fn exit_plays_through() {
         ["leaving", "present", "present"],
         "{leaving}"
     );
-    assert!(leaving.contains("data-exit=\"fold\""), "{leaving}");
+    assert!(leaving.contains("data-exit=\"row\""), "{leaving}");
 
     // After the fold settles the row is dropped and the two below heal; the heal then rests.
     let healing_seen = {

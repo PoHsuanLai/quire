@@ -21,6 +21,6 @@
 .ds-osd[*|data-shown=hidden]{ display:none; }
 .ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:osd-in var(--t-quick) var(--e-out); }
 .ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:osd-in--b; }
-.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }

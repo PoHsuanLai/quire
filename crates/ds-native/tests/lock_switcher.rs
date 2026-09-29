@@ -10,8 +10,7 @@ use dioxus::prelude::*;
 use ds::{
     Anim, AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds,
     EmojiId, Icon, IconSource, LockPrompt, LockUser, Material, MotionLevel, PlateFamily,
-    PolkitPrompt, PromptState, Px, RootChrome, ShortcutKey, StaggerIndex, SwitcherApp, person_hue,
-    settle,
+    PolkitPrompt, PromptState, Px, RootChrome, ShortcutKey, SwitcherApp, person_hue, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -144,7 +143,7 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     assert_eq!(dots(&harness, ".ds-lock-field").as_deref(), Some("•••"));
     assert!(!shaking(&harness), "nothing shakes before it was wrong");
 
-    let shake = settle(Anim::ShakeX, MotionLevel::Standard, StaggerIndex::new(0));
+    let shake = settle(Anim::ShakeX, MotionLevel::Standard);
     // Marked before the state write that starts the settle timer, so the comparison below is a
     // true lower bound.
     let wrong = harness.now();

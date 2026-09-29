@@ -227,26 +227,6 @@ impl From<Percent> for u8 {
     }
 }
 
-/// A row's place in a staggered entrance, saturating at [`StaggerIndex::CAP`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
-pub struct StaggerIndex(u8);
-
-impl StaggerIndex {
-    /// The highest index a stagger reaches: transforms on more nodes lag in Blitz
-    /// (design/05-MOTION.md section 9 rule 3).
-    pub const CAP: u8 = 12;
-
-    /// The index for position `n`, saturating at [`Self::CAP`].
-    pub fn new(n: usize) -> Self {
-        StaggerIndex(u8::try_from(n).map_or(Self::CAP, |n| n.min(Self::CAP)))
-    }
-
-    /// The index, 0 to [`Self::CAP`].
-    pub fn get(self) -> u8 {
-        self.0
-    }
-}
-
 /// One key in a shortcut.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ShortcutKey {

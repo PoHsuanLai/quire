@@ -6,7 +6,7 @@ use super::Section;
 use dioxus::prelude::*;
 use ds::{
     ActionId, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState,
-    RunTone, Selection, Shown, StaggerIndex, StripAction, TextLine, TextRun, Titles,
+    RunTone, Selection, Shown, StripAction, TextLine, TextRun, Titles,
 };
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
@@ -77,7 +77,6 @@ pub fn SearchRows() -> Element {
                     ListRow {
                         state: RowState { selection: if at() == index { Selection::Selected } else { Selection::Unselected }, emphasis: Emphasis::Plain, ..RowState::default() },
                         key: "{name}",
-                        index: StaggerIndex::new(index),
                         presence: Presence::Present,
                         name,
                         via: None,

@@ -398,13 +398,7 @@ fn escape_in_a_keyboard_submenu_closes_one_level() {
         Some("leaving"),
         "a second Escape starts the menu's exit"
     );
-    harness.advance(
-        ds::settle(
-            ds::Anim::MenuOut,
-            ds::MotionLevel::Standard,
-            ds::StaggerIndex::default(),
-        ) + ms(40),
-    );
+    harness.advance(ds::settle(ds::Anim::MenuOut, ds::MotionLevel::Standard) + ms(40));
     assert_eq!(
         harness.count(".ds-menu"),
         0,

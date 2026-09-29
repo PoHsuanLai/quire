@@ -6,8 +6,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Material, MotionLevel, RootExtent, Sheet, SheetPlacement, Shown,
-    StaggerIndex, settle,
+    Anim, Appearance, Ds, Material, MotionLevel, RootExtent, Sheet, SheetPlacement, Shown, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -47,11 +46,7 @@ fn set(harness: &mut Harness, to: Shown) {
 }
 
 fn exit() -> Duration {
-    settle(
-        Anim::SheetOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    )
+    settle(Anim::SheetOut, MotionLevel::Standard)
 }
 
 fn page() -> Harness {

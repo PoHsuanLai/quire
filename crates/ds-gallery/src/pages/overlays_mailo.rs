@@ -7,8 +7,8 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Anchor, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon,
-    InputVariant, Material, Menu, MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile,
-    PaletteEntrance, Radius, RowAction, RunTone, Surface, TextInput, TextLine, TextRun, use_rect,
+    InputVariant, Material, Menu, MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Radius,
+    RowAction, RunTone, Surface, TextInput, TextLine, TextRun, use_rect,
 };
 
 /// The recent searches a panel starts with.
@@ -54,8 +54,8 @@ pub fn RecentPalette() -> Element {
         .collect();
     rsx! {
         Section {
-            title: "Command panel: opaque entrance, runs, trailing actions",
-            note: "PaletteEntrance::Opaque springs with cmdk-rise, which has no fade: the first frame is already opaque. A MenuRow's title and detail are Text runs (the operator strong, the words marked); its trailing RowAction removes the search without running it or moving the selection.",
+            title: "Command panel: runs, trailing actions",
+            note: "A MenuRow's title and detail are Text runs (the operator strong, the words marked); its trailing RowAction removes the search without running it or moving the selection.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Recent searches", code: "MenuEntry::Row(MenuRow { trailing: Some(RowAction { .. }), .. })".to_string(),
                     div { class: "g-launcher",
@@ -71,7 +71,6 @@ pub fn RecentPalette() -> Element {
                                 onpick: |_| {},
                                 onclose: |_| {},
                                 host: CommandPaletteHost::Surface,
-                                entrance: PaletteEntrance::Opaque,
                             }
                         }
                     }

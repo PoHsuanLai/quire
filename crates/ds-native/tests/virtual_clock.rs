@@ -7,8 +7,8 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, Button, ButtonVariant, Ds, HoverCard, HoverKey, HoverKind, HoverTarget,
-    Material, MotionLevel, Panel, Point, Px, Rect, RootExtent, Shown, StaggerIndex, settle,
-    use_hover_hub, use_toasts,
+    Material, MotionLevel, Panel, Point, Px, Rect, RootExtent, Shown, settle, use_hover_hub,
+    use_toasts,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -28,7 +28,7 @@ fn ms(n: u64) -> Duration {
 }
 
 fn standard(anim: Anim) -> Duration {
-    settle(anim, MotionLevel::Standard, StaggerIndex::default())
+    settle(anim, MotionLevel::Standard)
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {

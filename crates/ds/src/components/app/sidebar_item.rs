@@ -76,10 +76,9 @@ const CLASS: &str = "ds-sidebar-item ds-drop-place";
 ///
 /// Place and Pinned are buttons; Today is a `div[role=button]` because it holds its own close
 /// button (a button cannot contain a button). A current Place wears the seal, a real span
-/// rather than `::before` (O-22's fallback). `presence` animates a Today entry in (`tab-in`) and
-/// out (`Presence::Leaving(Exit::TabOut)` plays `tab-out`; the consumer drops it at
-/// `settle(Anim::TabOut)`, which is what `RosterState::leave` returns for that exit); the other
-/// kinds do not move.
+/// rather than `::before` (O-22's fallback). `presence` animates a Today entry in (`row-in`) and
+/// out (`Presence::Leaving(Exit::Row)` plays `row-out`, the roster's exit; the consumer drops it
+/// at `settle(Anim::RowOut)`); the other kinds do not move.
 /// `state` is the item's [`RowState`]: it reads `selection` (`aria-current`) and `drop`, the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
 /// `Source` while the item itself is dragged. A Today item's close button is named "Close
 /// {label}", so each row's close says whose it is; `trailing` puts a scheduled row's time and

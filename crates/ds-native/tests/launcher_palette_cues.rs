@@ -171,19 +171,15 @@ fn a_result_set_replaces_the_last_in_place() {
 }
 
 #[test]
-fn show_more_rises_the_added_rows_and_show_less_heals_by_their_height() {
+fn show_more_enters_the_added_rows_and_show_less_heals_by_their_height() {
     let mut harness = Harness::new(Launcher, VIEW);
     open_quietly(&mut harness);
     run_action(&mut harness);
     assert_eq!(harness.count("#card .ds-menu-item"), 7);
     assert_eq!(
-        harness.count("[*|data-row-motion=rise]"),
+        harness.count("[*|data-row-motion=in]"),
         4,
         "the four added rows"
-    );
-    assert_eq!(
-        harness.attr("[*|data-row-motion=rise]", "style").as_deref(),
-        Some("--i:0")
     );
     settle_until(&mut harness, |h| h.count("[*|data-row-motion]") == 0);
     assert_settles_to_zero_frames(&mut harness);
@@ -219,7 +215,7 @@ fn a_click_on_show_more_plays_the_same_expand() {
         .expect("the action");
     harness.click(at);
     harness.advance(ms(20));
-    assert_eq!(harness.count("[*|data-row-motion=rise]"), 4);
+    assert_eq!(harness.count("[*|data-row-motion=in]"), 4);
     assert_settles_to_zero_frames(&mut harness);
 }
 

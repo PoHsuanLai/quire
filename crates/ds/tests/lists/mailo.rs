@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::{
     ActionId, HoverStrip, ListRow, Presence, RowState, RunTone, Shown, TextLine, TextRun, Titles,
 };
-use ds::{Emphasis, Selection, StaggerIndex};
+use ds::{Emphasis, Selection};
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
 fn marked_subject() -> TextLine {
@@ -25,7 +25,6 @@ fn row_with(strip: Option<Element>) -> Element {
     rsx! {
         ListRow {
             state: RowState { selection: Selection::Selected, emphasis: Emphasis::Plain, ..RowState::default() },
-            index: StaggerIndex::new(0),
             presence: Presence::Present,
             name: "Dana Okafor",
             via: None,

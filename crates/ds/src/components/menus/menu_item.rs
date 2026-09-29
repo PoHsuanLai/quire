@@ -15,7 +15,7 @@ use crate::components::menus::row_chord::{RowChord, shown_chord};
 use crate::components::menus::row_shape::RowShape;
 use crate::core::geometry::units::{Point, Px};
 use crate::core::press::{PointerButton, Press};
-use crate::core::vocab::{Availability, Check, Selection, Shortcut, Shown, StaggerIndex};
+use crate::core::vocab::{Availability, Check, Selection, Shortcut, Shown};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -60,25 +60,25 @@ pub(crate) enum Branch {
 }
 
 /// A row's own part in a motion of its list's rows (the command palette's Show More and Show
-/// Less, design/26-DETAILS.md section 5.6): rising in as an added row, at its place in the
-/// stagger, or the last row kept, after which everything heals up.
+/// Less, design/26-DETAILS.md section 5.6): coming in as an added row, or the last row kept,
+/// after which everything heals up.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum RowMotion {
     /// No part.
     Still,
-    /// An added row rising, `--i` its place among the added (capped at 12).
-    Rise(StaggerIndex),
+    /// An added row coming in (`row-in`).
+    In,
     /// The row everything after heals up to.
     HealFrom,
 }
 
 impl RowMotion {
-    /// The `data-row-motion` word, and the row's inline `--i`.
-    fn attrs(self) -> (Option<&'static str>, Option<String>) {
+    /// The `data-row-motion` word.
+    fn attr(self) -> Option<&'static str> {
         match self {
-            RowMotion::Still => (None, None),
-            RowMotion::Rise(index) => (Some("rise"), Some(format!("--i:{}", index.get()))),
-            RowMotion::HealFrom => (Some("heal-from"), None),
+            RowMotion::Still => None,
+            RowMotion::In => Some("in"),
+            RowMotion::HealFrom => Some("heal-from"),
         }
     }
 }
@@ -159,7 +159,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
         Row::Checked => None,
     };
     let words = menu_shape::words(view.shape, title, detail);
-    let (moving, place) = view.motion.attrs();
+    let moving = view.motion.attr();
     rsx! {
         div {
             class: "ds-menu-item",
@@ -173,7 +173,6 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
             "data-trailing": view.trailing.map(|_| "action"),
             "data-shape": menu_shape::slug(view.shape),
             "data-row-motion": moving,
-            style: place,
             onmousedown: move |event| event.prevent_default(),
             onmousemove: move |event| {
                 event.stop_propagation();

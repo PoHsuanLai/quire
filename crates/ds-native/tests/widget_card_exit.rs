@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, BatteryWidget, CardPresence, Ds, Material, Motion, MotionLevel, RootChrome,
-    StaggerIndex, Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize, settle,
+    Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize, settle,
 };
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -84,11 +84,7 @@ fn a_removed_card_plays_its_exit_and_is_gone_at_settle() {
         Some("leaving")
     );
     assert!(harness.is_animating(), "the exit is playing");
-    let out = settle(
-        Anim::WidgetOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let out = settle(Anim::WidgetOut, MotionLevel::Standard);
     harness.advance(out - Duration::from_millis(1));
     assert_eq!(gone(&mut harness), 0, "not before settle(WidgetOut)");
     assert_eq!(harness.count(".ds-widget"), 1, "the host keeps it drawn");
@@ -111,16 +107,8 @@ fn under_reduced_the_exit_is_a_short_fade() {
         ),
         "Reduced plays the fade, not the shrink"
     );
-    let out = settle(
-        Anim::WidgetOut,
-        MotionLevel::Reduced,
-        StaggerIndex::default(),
-    );
-    let standard = settle(
-        Anim::WidgetOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let out = settle(Anim::WidgetOut, MotionLevel::Reduced);
+    let standard = settle(Anim::WidgetOut, MotionLevel::Standard);
     assert!(out < standard, "{out:?} {standard:?}");
     harness.advance(out);
     assert_eq!(gone(&mut harness), 1);
@@ -131,11 +119,7 @@ fn under_reduced_the_exit_is_a_short_fade() {
 fn a_leave_taken_back_never_reports_gone() {
     let mut harness = harness(Standard);
     leave(&mut harness, CardPresence::Leaving);
-    let out = settle(
-        Anim::WidgetOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let out = settle(Anim::WidgetOut, MotionLevel::Standard);
     harness.advance(out / 2);
     leave(&mut harness, CardPresence::Placed);
     assert!(!harness.has_class(".ds-widget", "a-widget-out"));

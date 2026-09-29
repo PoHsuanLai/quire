@@ -9,8 +9,8 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Ds, Emphasis,
-    Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListRow, Material, Menu,
-    MenuEntry, MenuKind, MenuTrail, Point, Presence, Px, RowPitch, RowState, Selection,
+    Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, LeaveBy, ListRow, Material,
+    Menu, MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState, Selection,
     ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
@@ -380,14 +380,21 @@ fn ListApp() -> Element {
 #[allow(non_snake_case)]
 fn ListDemo() -> Element {
     let mut keys = use_signal(|| vec![1u32, 2, 3]);
-    let roster = use_roster(keys(), RowPitch(Px(79.0)));
+    let roster = use_roster(
+        keys(),
+        RosterSpec {
+            leave: LeaveBy::Action,
+            exit: Exit::Row,
+            pitch: RowPitch(Px(79.0)),
+            on_settled: None,
+        },
+    );
     rsx! {
-        AnimatedList { label: "Threads", presence: Presence::Present,
+        AnimatedList { label: "Threads",
             for entry in roster.entries() {
                 ListRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                     key: "{entry.key}",
-                    index: entry.index,
                     presence: entry.presence,
                     heal: entry.heal,
                     name: format!("Sender {}", entry.key),
@@ -400,7 +407,7 @@ fn ListDemo() -> Element {
 
                     strip: None,
                     onclick: move |_| {
-                        roster.leave(entry.key, Exit::Fold, Emphasis::Plain);
+                        roster.leave(entry.key);
                         keys.retain(|key| *key != entry.key);
                     },
                 }
@@ -430,9 +437,9 @@ fn a_row_leaves_and_the_rows_below_heal() {
         "dropped before its exit played"
     );
 
-    // The fold settles at 454 ms (Standard, `settle(Anim::Fold)`): the row is gone and the rows
-    // below slide up into its place, healing for another 284 ms and more.
-    harness.advance(ms(500));
+    // The exit settles at `settle(Anim::RowOut)`: the row is gone and the rows below slide up
+    // into its place, healing for `settle(Anim::Heal)` more.
+    harness.advance(ds::settle(ds::Anim::RowOut, ds::MotionLevel::Standard) + ms(20));
     assert_eq!(harness.count(".ds-row"), 2, "{}", harness.html());
     assert_eq!(presence(&harness, 1).as_deref(), Some("healing"));
     assert_eq!(presence(&harness, 2).as_deref(), Some("healing"));

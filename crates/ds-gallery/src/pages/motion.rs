@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     Anim, DelayToken, DurationToken, EasingToken, Fill, Iteration, MotionLevel, ScalarToken,
-    StaggerIndex, StyleDelay, settle,
+    StyleDelay, settle,
 };
 use std::time::Duration;
 
@@ -64,7 +64,7 @@ pub fn MotionPage() -> Element {
                     span { class: "g-code", "{anim:?}" }
                     span { class: "g-code", "{recipe_text(anim)}" }
                     for level in MotionLevel::ALL.iter().copied() {
-                        span { class: "g-code", "{millis(settle(anim, level, StaggerIndex::default()))}" }
+                        span { class: "g-code", "{millis(settle(anim, level))}" }
                     }
                 }
             }

@@ -7,7 +7,7 @@ use ds::{
     ActionId, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow, MarkProvider,
     MarkSize, MarkStyle, Presence, ProviderMark, Px, RowState, StripAction,
 };
-use ds::{Check, DropState, Emphasis, Selection, StaggerIndex};
+use ds::{Check, DropState, Emphasis, Selection};
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -35,14 +35,8 @@ pub fn strip_actions() -> Vec<StripAction> {
 }
 
 /// A thread row in `presence`, unread or read, with the via, tags and strip filled.
-pub fn row(
-    presence: Presence,
-    emphasis: Emphasis,
-    selection: Selection,
-    star: Check,
-    index: usize,
-) -> Element {
-    row_in_drag(presence, emphasis, selection, star, index, DropState::Idle)
+pub fn row(presence: Presence, emphasis: Emphasis, selection: Selection, star: Check) -> Element {
+    row_in_drag(presence, emphasis, selection, star, DropState::Idle)
 }
 
 /// A present read row playing `drop` in a drag.
@@ -52,7 +46,6 @@ fn dragged_row(drop: DropState) -> Element {
         Emphasis::Plain,
         Selection::Unselected,
         Check::Off,
-        3,
         drop,
     )
 }
@@ -63,13 +56,11 @@ fn row_in_drag(
     emphasis: Emphasis,
     selection: Selection,
     star: Check,
-    index: usize,
     drop: DropState,
 ) -> Element {
     rsx! {
         ListRow {
             state: RowState { selection, emphasis, drop, ..RowState::default() },
-            index: StaggerIndex::new(index),
             presence,
             name: "Dana Okafor",
             via: rsx! {
@@ -89,29 +80,22 @@ fn row_in_drag(
 
 /// A read, unselected, unstarred row: what a roster draws per entry, keyed by the consumer.
 #[component]
-pub fn Row(
-    presence: Presence,
-    heal: Option<Heal>,
-    emphasis: Emphasis,
-    index: StaggerIndex,
-) -> Element {
-    let index = usize::from(index.get());
+pub fn Row(presence: Presence, heal: Option<Heal>, emphasis: Emphasis) -> Element {
     match heal {
-        Some(heal) => healed_row(heal, emphasis, index),
-        None => row(presence, emphasis, Selection::Unselected, Check::Off, index),
+        Some(heal) => healed_row(heal, emphasis),
+        None => row(presence, emphasis, Selection::Unselected, Check::Off),
     }
 }
 
 fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
-    row(presence, emphasis, Selection::Unselected, Check::Off, 3)
+    row(presence, emphasis, Selection::Unselected, Check::Off)
 }
 
 /// A read row sliding into a gap by `heal`.
-fn healed_row(heal: Heal, emphasis: Emphasis, index: usize) -> Element {
+fn healed_row(heal: Heal, emphasis: Emphasis) -> Element {
     rsx! {
         ListRow {
             state: RowState { selection: Selection::Unselected, emphasis, ..RowState::default() },
-            index: StaggerIndex::new(index),
             presence: Presence::Present,
             heal: Some(heal),
             name: "Dana Okafor",
@@ -130,16 +114,9 @@ fn healed_row(heal: Heal, emphasis: Emphasis, index: usize) -> Element {
     }
 }
 
-/// A row 79 px below its place, one heal step in.
+/// A row 79 px below its place.
 fn healing_row() -> Element {
-    healed_row(
-        Heal {
-            dy: Px(79.0),
-            d: StaggerIndex::new(1),
-        },
-        Emphasis::Plain,
-        3,
-    )
+    healed_row(Heal { dy: Px(79.0) }, Emphasis::Plain)
 }
 
 pub const ROW_CASES: &[Case] = &[
@@ -163,7 +140,6 @@ pub const ROW_CASES: &[Case] = &[
                 Emphasis::Plain,
                 Selection::Selected,
                 Check::Off,
-                0,
             )
         },
     },
@@ -176,7 +152,6 @@ pub const ROW_CASES: &[Case] = &[
                 Emphasis::Plain,
                 Selection::Unselected,
                 Check::On,
-                0,
             )
         },
     },
@@ -187,33 +162,13 @@ pub const ROW_CASES: &[Case] = &[
     },
     Case {
         component: "list_row",
-        state: "leaving-fold",
-        make: || plain_row(Presence::Leaving(Exit::Fold), Emphasis::Plain),
+        state: "leaving-row",
+        make: || plain_row(Presence::Leaving(Exit::Row), Emphasis::Plain),
     },
     Case {
         component: "list_row",
-        state: "leaving-fold-unread",
-        make: || plain_row(Presence::Leaving(Exit::Fold), Emphasis::Strong),
-    },
-    Case {
-        component: "list_row",
-        state: "leaving-curl",
-        make: || plain_row(Presence::Leaving(Exit::Curl), Emphasis::Plain),
-    },
-    Case {
-        component: "list_row",
-        state: "leaving-curl-unread",
-        make: || plain_row(Presence::Leaving(Exit::Curl), Emphasis::Strong),
-    },
-    Case {
-        component: "list_row",
-        state: "leaving-crumple",
-        make: || plain_row(Presence::Leaving(Exit::Crumple), Emphasis::Plain),
-    },
-    Case {
-        component: "list_row",
-        state: "leaving-crumple-unread",
-        make: || plain_row(Presence::Leaving(Exit::Crumple), Emphasis::Strong),
+        state: "leaving-row-unread",
+        make: || plain_row(Presence::Leaving(Exit::Row), Emphasis::Strong),
     },
     Case {
         component: "list_row",
@@ -237,7 +192,6 @@ pub const ROW_CASES: &[Case] = &[
             rsx! {
                 ListRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                    index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Sam Lindqvist",
                     via: None,
@@ -261,7 +215,6 @@ pub const ROW_CASES: &[Case] = &[
             rsx! {
                 ListRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                    index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Maximilian Alexander von Hohenberg-Wittelsbach",
                     via: None,
@@ -280,11 +233,11 @@ pub const ROW_CASES: &[Case] = &[
     Case {
         component: "animated_list",
         state: "entering",
-        make: || rsx! { AnimatedList { label: "Threads", presence: Presence::Entering, {plain_row(Presence::Entering, Emphasis::Strong)} } },
+        make: || rsx! { AnimatedList { label: "Threads", {plain_row(Presence::Entering, Emphasis::Strong)} } },
     },
     Case {
         component: "animated_list",
         state: "present",
-        make: || rsx! { AnimatedList { label: "Threads", presence: Presence::Present, {plain_row(Presence::Present, Emphasis::Plain)} } },
+        make: || rsx! { AnimatedList { label: "Threads", {plain_row(Presence::Present, Emphasis::Plain)} } },
     },
 ];

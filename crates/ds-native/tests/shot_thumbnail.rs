@@ -10,7 +10,7 @@ use dioxus::prelude::*;
 use ds::NotificationSwipe;
 use ds::{
     Anim, Appearance, DRAG_THRESHOLD, DragStart, Ds, Hover, Icon, ImageSize, ImageSource, Material,
-    MotionLevel, Point, Px, ShotThumbnail, Shown, StaggerIndex, ThumbAction, settle,
+    MotionLevel, Point, Px, ShotThumbnail, Shown, ThumbAction, settle,
 };
 use ds_native::harness::{SETTLE_BOUND, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -118,11 +118,7 @@ fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
     let card = harness.rect(".ds-shot").expect("the card is laid out");
     assert!((card.size.width.0 - 240.0).abs() < 0.5, "{card:?}");
     let before = read(&mut harness, &HIDDEN);
-    let out = settle(
-        Anim::ShotOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let out = settle(Anim::ShotOut, MotionLevel::Standard);
     let hiding = harness.now();
     harness.within(|| *SHOWN.write() = Shown::Hidden);
     harness.advance(Duration::from_millis(1));
@@ -236,11 +232,7 @@ fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
     );
     assert_eq!(read(&mut harness, &SWIPED), 0);
     // Right, past the dismiss distance: the swipe's.
-    let flight = settle(
-        Anim::BannerOut,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let flight = settle(Anim::BannerOut, MotionLevel::Standard);
     let released = slow_drag(&mut harness, from, 100.0);
     assert_eq!(
         harness.attr(".ds-shot", "data-swipe").as_deref(),

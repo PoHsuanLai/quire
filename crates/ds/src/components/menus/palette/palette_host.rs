@@ -5,7 +5,6 @@
 use crate::components::overlays::popover::Float;
 use crate::core::vocab::Shown;
 use crate::core::word::Word;
-use crate::motion::anim::Anim;
 use crate::style::tokens::shape::Corner;
 use dioxus::prelude::*;
 
@@ -20,31 +19,6 @@ pub enum CommandPaletteHost {
     Surface,
 }
 
-/// How the palette's card enters.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum PaletteEntrance {
-    /// `peek-in`, S's palette.
-    #[default]
-    PeekIn,
-    /// `cmdk-in`, C's command menu.
-    CmdkIn,
-    /// `cmdk-rise`: `cmdk-in`'s spring with no fade, so the card is opaque from its first
-    /// frame; over a window the scrim then appears at once too, since a fading
-    /// scrim would hold the card inside it at its own opacity.
-    #[word(slug = "cmdk-rise")]
-    Opaque,
-}
-
-impl PaletteEntrance {
-    pub(crate) fn anim(self) -> Anim {
-        match self {
-            PaletteEntrance::PeekIn => Anim::PeekIn,
-            PaletteEntrance::CmdkIn => Anim::CmdkIn,
-            PaletteEntrance::Opaque => Anim::CmdkRise,
-        }
-    }
-}
-
 /// The card's own corner: its radius, and a squircle's extent and shadow circle.
 pub(crate) fn card_corner(corner: Corner) -> String {
     match corner {
@@ -57,14 +31,11 @@ pub(crate) fn card_corner(corner: Corner) -> String {
 /// closes the palette on a pointer down outside the card while it is the topmost layer.
 pub(crate) fn hosted(
     host: CommandPaletteHost,
-    entrance: PaletteEntrance,
     float: Float,
     card: Element,
     shown: Shown,
     onclose: EventHandler<()>,
 ) -> Element {
-    // Only an opaque entrance marks the wrap: the scrim must not fade the card with it.
-    let still = (entrance == PaletteEntrance::Opaque).then_some(entrance.slug());
     match host {
         CommandPaletteHost::Surface => card,
         CommandPaletteHost::Overlay => {
@@ -73,7 +44,6 @@ pub(crate) fn hosted(
                     div {
                         class: "ds-palette-wrap",
                         "data-shown": shown.slug(),
-                        "data-entrance": still,
                         onpointerdown: move |_| {
                             if float.is_top() {
                                 onclose.call(());

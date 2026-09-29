@@ -10,7 +10,7 @@ use ds::{
     Anim, Appearance, Button, ButtonVariant, Check, Common, Ds, Icon, Material, Pane, PaneSwitcher,
     RowTrailing, SettingsRow,
 };
-use ds::{MotionLevel, StaggerIndex, settle};
+use ds::{MotionLevel, settle};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -72,11 +72,7 @@ fn ask(harness: &mut Harness, id: &str) {
 
 /// How long a pane switch takes to settle at the Standard level (both panes play `--t-move`).
 fn slide() -> Duration {
-    settle(
-        Anim::PaneInR,
-        MotionLevel::Standard,
-        StaggerIndex::default(),
-    )
+    settle(Anim::PaneInR, MotionLevel::Standard)
 }
 
 /// The switcher has come to rest: one pane drawn, nothing moving.

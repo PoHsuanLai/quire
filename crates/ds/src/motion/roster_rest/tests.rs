@@ -3,7 +3,11 @@
 
 use crate::core::geometry::units::Px;
 use crate::core::vocab::{Activity, InputModality};
-use crate::motion::{presence::Presence, roster::RowPitch, use_roster::use_roster};
+use crate::motion::{
+    presence::{Exit, Presence},
+    roster::RowPitch,
+    use_roster::{LeaveBy, RosterSpec, use_roster},
+};
 use crate::style::appearance::{
     accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
 };
@@ -39,7 +43,13 @@ fn List() -> Element {
     });
     let keys = use_signal(|| vec!["a", "b"]);
     KEYS.set(Some(keys));
-    let roster = use_roster(keys(), RowPitch(Px(79.0)));
+    let spec = RosterSpec {
+        leave: LeaveBy::Action,
+        exit: Exit::Row,
+        pitch: RowPitch(Px(79.0)),
+        on_settled: None,
+    };
+    let roster = use_roster(keys(), spec);
     let mut seen = use_signal(Vec::new);
     PRESENCES.set(Some(seen));
     seen.set(
@@ -66,16 +76,11 @@ fn set_keys(dom: &mut VirtualDom, next: Vec<&'static str>) {
 }
 
 #[test]
-fn the_rest_timer_is_spawned_after_the_render_not_from_it() {
+fn the_first_show_starts_no_timer() {
     let mut dom = VirtualDom::new(List);
     dom.rebuild_in_place();
-    assert_eq!(spawned(), 0, "the first render spawned nothing");
     dom.process_events();
-    assert_eq!(
-        spawned(),
-        1,
-        "the effect after it started the first-show rest"
-    );
+    assert_eq!(spawned(), 0, "rows shown first are simply there");
 }
 
 #[test]
@@ -83,22 +88,27 @@ fn two_reconciles_before_the_effect_runs_start_one_timer() {
     let mut dom = VirtualDom::new(List);
     dom.rebuild_in_place();
     dom.process_events();
-    assert_eq!(spawned(), 1);
+    assert_eq!(spawned(), 0);
 
     set_keys(&mut dom, vec!["a", "b", "x"]);
     dom.render_immediate(&mut NoOpMutations);
     set_keys(&mut dom, vec!["a", "b", "x", "y"]);
     dom.render_immediate(&mut NoOpMutations);
-    assert_eq!(spawned(), 1, "a reconcile in a render spawns nothing");
+    assert_eq!(spawned(), 0, "a reconcile in a render spawns nothing");
     let presences = PRESENCES.get().expect("rendered");
     assert_eq!(
         dom.in_runtime(|| presences.peek().clone()),
-        vec![Presence::Entering; 4],
+        vec![
+            Presence::Present,
+            Presence::Present,
+            Presence::Entering,
+            Presence::Entering
+        ],
         "both reconciles happened in their renders"
     );
 
     dom.process_events();
-    assert_eq!(spawned(), 2, "one effect, one timer, for both reconciles");
+    assert_eq!(spawned(), 1, "one effect, one timer, for both reconciles");
     dom.process_events();
-    assert_eq!(spawned(), 2, "and nothing more once it ran");
+    assert_eq!(spawned(), 1, "and nothing more once it ran");
 }

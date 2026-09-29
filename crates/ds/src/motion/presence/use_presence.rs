@@ -8,7 +8,7 @@
 use super::Presence;
 use super::spec::PresenceSpec;
 use super::step::{PresenceEffect, PresenceInput, input, step};
-use crate::core::vocab::{Emphasis, Shown};
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::timer::{MotionTimer, use_motion_timer};
 use dioxus::core::queue_effect;
@@ -53,7 +53,7 @@ pub fn use_presence(
     on_hidden: Option<EventHandler<()>>,
 ) -> Presented {
     let fade_in = use_motion_timer(spec.enter);
-    let fade_out = use_motion_timer(spec.exit.anim(Emphasis::Plain));
+    let fade_out = use_motion_timer(spec.exit.anim());
     let mut presence = use_hook(|| CopyValue::new(Presence::Hidden));
     let mut alias = use_hook(|| CopyValue::new(EntranceAlias::A));
     let mut last = use_hook(|| CopyValue::new(None::<Shown>));

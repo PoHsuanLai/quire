@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AnimatedList, Appearance, Button, ButtonVariant, Ds, Emphasis, Exit, ListRow, Material,
-    Point, Presence, Px, RowPitch, RowState, Selection, StaggerIndex, Stayed, settle, use_roster,
+    Anim, AnimatedList, Appearance, Button, ButtonVariant, Ds, Emphasis, Exit, LeaveBy, ListRow,
+    Material, Point, Px, RosterSpec, RowPitch, RowState, Selection, Stayed, settle, use_roster,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -33,7 +33,15 @@ fn StayApp() -> Element {
 fn StayList() -> Element {
     let mut keys = use_signal(|| vec![1u32, 2, 3]);
     let mut last = use_signal(|| None::<u32>);
-    let roster = use_roster(keys(), RowPitch(Px(79.0)));
+    let roster = use_roster(
+        keys(),
+        RosterSpec {
+            leave: LeaveBy::Action,
+            exit: Exit::Row,
+            pitch: RowPitch(Px(79.0)),
+            on_settled: None,
+        },
+    );
     rsx! {
         Button {
             variant: ButtonVariant::Secondary,
@@ -46,12 +54,11 @@ fn StayList() -> Element {
                 }
             },
         }
-        AnimatedList { label: "Threads", presence: Presence::Present,
+        AnimatedList { label: "Threads",
             for entry in roster.entries() {
                 ListRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                     key: "{entry.key}",
-                    index: entry.index,
                     presence: entry.presence,
                     heal: entry.heal,
                     name: format!("Sender {}", entry.key),
@@ -64,7 +71,7 @@ fn StayList() -> Element {
 
                     strip: None,
                     onclick: move |_| {
-                        roster.leave(entry.key, Exit::Fold, Emphasis::Plain);
+                        roster.leave(entry.key);
                         keys.retain(|key| *key != entry.key);
                         last.set(Some(entry.key));
                     },
@@ -98,15 +105,11 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
         harness.attr(&row(1), "data-presence").as_deref(),
         Some("leaving")
     );
-    assert_eq!(harness.attr(&row(1), "data-exit").as_deref(), Some("fold"));
+    assert_eq!(harness.attr(&row(1), "data-exit").as_deref(), Some("row"));
 
-    // Undo well inside the fold: 200 ms of `settle(Fold)`'s 454 ms at Standard.
-    let fold = settle(
-        Anim::Fold,
-        ds::MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
-    harness.advance(ms(200));
+    // Undo well inside the exit: 100 ms of `settle(RowOut)`.
+    let fold = settle(Anim::RowOut, ds::MotionLevel::Standard);
+    harness.advance(ms(100));
     harness.click(centre(&harness, ".ds-button"));
     assert_eq!(
         harness.attr(&row(1), "data-presence").as_deref(),
@@ -138,7 +141,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
         Harness::with_config(StayApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(1500));
     harness.click(centre(&harness, &row(2)));
-    harness.advance(ms(200));
+    harness.advance(ms(100));
     harness.click(centre(&harness, ".ds-button"));
     // Fold it again 150 ms later: the first fold's timer, had it survived the stay, would drop
     // the row about 100 ms into the second fold.
@@ -149,7 +152,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
     // ~104 ms mark where the first fold's stale timer would have dropped the row had it
     // survived (fixed 2026-09-25, FINDINGS "Timing tests"): the old 250 ms check was 55 % of
     // the window, over the margin a loaded machine's overshoot on `advance` can eat into.
-    harness.advance(ms(200));
+    harness.advance(ms(100));
     assert_eq!(
         harness.count(".ds-row"),
         3,
@@ -159,11 +162,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
         harness.attr(&row(2), "data-presence").as_deref(),
         Some("leaving")
     );
-    let fold = settle(
-        Anim::Fold,
-        ds::MotionLevel::Standard,
-        StaggerIndex::default(),
-    );
+    let fold = settle(Anim::RowOut, ds::MotionLevel::Standard);
     let dropped = settle_until(&mut harness, |h| h.count(".ds-row") == 2);
     assert!(
         dropped.duration_since(refolded) >= fold,

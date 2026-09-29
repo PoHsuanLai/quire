@@ -2,9 +2,7 @@
 //! form draws the snippet it was given, or none.
 
 use dioxus::prelude::*;
-use ds::{
-    Emphasis, ListRow, Presence, RowState, RunTone, Selection, StaggerIndex, TextLine, TextRun,
-};
+use ds::{Emphasis, ListRow, Presence, RowState, RunTone, Selection, TextLine, TextRun};
 
 /// A `ListRow` with everything fixed but its snippet, written as the expression given.
 macro_rules! row {
@@ -12,7 +10,6 @@ macro_rules! row {
         rsx! {
             ListRow {
                 state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                index: StaggerIndex::new(0),
                 presence: Presence::Present,
                 name: "Dana",
                 via: None,
@@ -43,7 +40,6 @@ fn forms() -> Element {
         {row!(None)}
         ListRow {
             state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-            index: StaggerIndex::new(0),
             presence: Presence::Present,
             name: "Dana",
             via: None,

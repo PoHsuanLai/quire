@@ -7,10 +7,7 @@
 //! Reduced's length.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, Ds, LeavingItem, LeavingList, Material, Motion, MotionLevel, StaggerIndex,
-    settle,
-};
+use ds::{Anim, Appearance, Ds, LeavingItem, LeavingList, Material, Motion, MotionLevel, settle};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
@@ -108,12 +105,12 @@ fn start(keys: &[u32], motion: Motion) -> Harness {
     harness
 }
 
-fn fold(level: MotionLevel, index: usize) -> Duration {
-    settle(Anim::Fold, level, StaggerIndex::new(index))
+fn fold(level: MotionLevel) -> Duration {
+    settle(Anim::RowOut, level)
 }
 
-fn heal(level: MotionLevel, index: usize) -> Duration {
-    settle(Anim::Heal, level, StaggerIndex::new(index))
+fn heal(level: MotionLevel) -> Duration {
+    settle(Anim::Heal, level)
 }
 
 fn ms(n: u64) -> Duration {
@@ -138,8 +135,8 @@ fn one_row_leaves_and_the_rows_below_heal_by_its_height() {
     show(&mut harness, &[1, 3, 4]);
     let removed = ms(1);
     assert_eq!(presence(&harness, 2).as_deref(), Some("leaving"));
-    assert_eq!(harness.attr(&nth(2), "data-exit").as_deref(), Some("fold"));
-    let out = fold(MotionLevel::Standard, 0);
+    assert_eq!(harness.attr(&nth(2), "data-exit").as_deref(), Some("row"));
+    let out = fold(MotionLevel::Standard);
     harness.advance(out - removed - ms(1));
     assert_eq!(
         harness.count(".ds-leaving-row"),
@@ -163,7 +160,7 @@ fn one_row_leaves_and_the_rows_below_heal_by_its_height() {
     }
     // It starts where it stood: its new place plus the heal distance.
     assert_eq!(top(&harness, 3) + height(2), before3);
-    harness.advance(heal(MotionLevel::Standard, 1));
+    harness.advance(heal(MotionLevel::Standard));
     assert_eq!(presence(&harness, 3).as_deref(), Some("present"));
     assert_eq!(top(&harness, 3), before3 - height(2));
     assert_eq!(top(&harness, 4), before4 - height(2));
@@ -172,18 +169,15 @@ fn one_row_leaves_and_the_rows_below_heal_by_its_height() {
 }
 
 #[test]
-fn a_clear_folds_its_rows_staggered_and_heals_by_their_summed_heights() {
+fn a_clear_removes_its_rows_together_and_heals_by_their_summed_heights() {
     let mut harness = start(&[1, 2, 3, 4, 5], Motion::Standard);
     let (first, before4, before5) = (top(&harness, 1), top(&harness, 4), top(&harness, 5));
-    // Rows 1 and 3 go in one render: one batch, staggered in list order.
+    // Rows 1 and 3 go in one render: one batch.
     show(&mut harness, &[2, 4, 5]);
     assert_eq!(presence(&harness, 1).as_deref(), Some("leaving"));
     assert_eq!(presence(&harness, 3).as_deref(), Some("leaving"));
-    assert_eq!(harness.attr(&nth(1), "style").as_deref(), Some("--i:0"));
-    assert_eq!(harness.attr(&nth(3), "style").as_deref(), Some("--i:1"));
     // The batch waits for its last row: the first has folded, and still nothing moves.
-    let batch = fold(MotionLevel::Standard, 1);
-    assert!(batch > fold(MotionLevel::Standard, 0));
+    let batch = fold(MotionLevel::Standard);
     harness.advance(batch - ms(2));
     assert_eq!(harness.count(".ds-leaving-row"), 5);
     assert_eq!(presence(&harness, 2).as_deref(), Some("present"));
@@ -193,7 +187,7 @@ fn a_clear_folds_its_rows_staggered_and_heals_by_their_summed_heights() {
     let both = height(1) + height(3);
     assert_eq!(dy(&harness, 2), Some(both), "row 4 heals by rows 1 and 3");
     assert_eq!(dy(&harness, 3), Some(both));
-    harness.advance(heal(MotionLevel::Standard, 2));
+    harness.advance(heal(MotionLevel::Standard));
     for position in 1..=3 {
         assert_eq!(presence(&harness, position).as_deref(), Some("present"));
     }
@@ -211,11 +205,10 @@ fn a_clear_folds_its_rows_staggered_and_heals_by_their_summed_heights() {
 }
 
 #[test]
-fn clearing_everything_settles_at_the_last_rows_stagger() {
+fn clearing_everything_settles_at_one_rows_length() {
     let mut harness = start(&[1, 2, 3, 4], Motion::Standard);
     show(&mut harness, &[]);
-    assert_eq!(harness.attr(&nth(4), "style").as_deref(), Some("--i:3"));
-    let batch = fold(MotionLevel::Standard, 3);
+    let batch = fold(MotionLevel::Standard);
     harness.advance(batch - ms(2));
     assert_eq!(harness.count(".ds-leaving-row"), 4);
     harness.advance(ms(1));
@@ -231,12 +224,7 @@ fn an_arrival_enters_and_comes_to_rest() {
     let mut harness = start(&[1, 2], Motion::Standard);
     show(&mut harness, &[5, 1, 2]);
     assert_eq!(presence(&harness, 1).as_deref(), Some("entering"));
-    assert_eq!(
-        harness.attr(".ds-leaving-list", "data-presence").as_deref(),
-        Some("present"),
-        "an arrival into a list at rest plays row-in"
-    );
-    let enter = settle(Anim::RowIn, MotionLevel::Standard, StaggerIndex::new(0));
+    let enter = settle(Anim::RowIn, MotionLevel::Standard);
     harness.advance(enter - ms(2));
     assert_eq!(presence(&harness, 1).as_deref(), Some("entering"));
     harness.advance(ms(1));
@@ -251,7 +239,7 @@ fn a_row_listed_again_while_it_leaves_stays() {
     assert_eq!(presence(&harness, 2).as_deref(), Some("leaving"));
     show(&mut harness, &[1, 2, 3]);
     assert_eq!(presence(&harness, 2).as_deref(), Some("present"));
-    harness.advance(fold(MotionLevel::Standard, 0) * 2);
+    harness.advance(fold(MotionLevel::Standard) * 2);
     assert_eq!(harness.count(".ds-leaving-row"), 3);
     assert_eq!(
         presence(&harness, 3).as_deref(),
@@ -266,15 +254,13 @@ fn under_reduced_a_clear_settles_at_reduceds_length_and_rows_snap_into_place() {
     let mut harness = start(&[1, 2, 3], Motion::Reduced);
     let before3 = top(&harness, 3);
     show(&mut harness, &[3]);
-    // No stagger under Reduced: the batch is one fade's settle.
-    let batch = fold(MotionLevel::Reduced, 1);
-    assert_eq!(batch, fold(MotionLevel::Reduced, 0));
+    let batch = fold(MotionLevel::Reduced);
     harness.advance(batch - ms(2));
     assert_eq!(harness.count(".ds-leaving-row"), 3);
     harness.advance(ms(1));
     assert_eq!(harness.count(".ds-leaving-row"), 1);
     assert_eq!(dy(&harness, 1), Some(height(1) + height(2)));
-    harness.advance(heal(MotionLevel::Reduced, 0));
+    harness.advance(heal(MotionLevel::Reduced));
     assert_eq!(presence(&harness, 1).as_deref(), Some("present"));
     assert_eq!(top(&harness, 3), before3 - height(1) - height(2));
 }

@@ -36,26 +36,10 @@
 pub enum Anim {
     /// `row-in`: an arriving or restored row (C).
     RowIn,
-    /// `rise`: rows when a list is first shown; reader blocks.
-    Rise,
-    /// `fold`: archive.
-    Fold,
-    /// `fold` at `--t-big-heavy`: an unread row's archive.
-    FoldHeavy,
-    /// `crumple`: trash and delete (C).
-    Crumple,
-    /// `crumple` at `--t-crumple-heavy`: an unread row's trash.
-    CrumpleHeavy,
-    /// `curl`: snooze.
-    Curl,
-    /// `curl` at `--t-curl-heavy`: an unread row's snooze.
-    CurlHeavy,
+    /// `row-out`: a row leaving a roster fades and slides up.
+    RowOut,
     /// `heal`: rows below a removed row close the gap.
     Heal,
-    /// `tab-in`: a Today entry opens.
-    TabIn,
-    /// `tab-out`: a Today entry closes.
-    TabOut,
     /// `slide-r`: Space switch forward, side peek.
     SlideR,
     /// `slide-l`: Space switch back.
@@ -202,18 +186,10 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 66] = [
+    pub const ALL: [Anim; 58] = [
         Anim::RowIn,
-        Anim::Rise,
-        Anim::Fold,
-        Anim::FoldHeavy,
-        Anim::Crumple,
-        Anim::CrumpleHeavy,
-        Anim::Curl,
-        Anim::CurlHeavy,
+        Anim::RowOut,
         Anim::Heal,
-        Anim::TabIn,
-        Anim::TabOut,
         Anim::SlideR,
         Anim::SlideL,
         Anim::MenuIn,
@@ -275,16 +251,8 @@ impl Anim {
     pub fn class(self) -> &'static str {
         match self {
             Anim::RowIn => "a-row-in",
-            Anim::Rise => "a-rise",
-            Anim::Fold => "a-fold",
-            Anim::FoldHeavy => "a-fold-heavy",
-            Anim::Crumple => "a-crumple",
-            Anim::CrumpleHeavy => "a-crumple-heavy",
-            Anim::Curl => "a-curl",
-            Anim::CurlHeavy => "a-curl-heavy",
+            Anim::RowOut => "a-row-out",
             Anim::Heal => "a-heal",
-            Anim::TabIn => "a-tab-in",
-            Anim::TabOut => "a-tab-out",
             Anim::SlideR => "a-slide-r",
             Anim::SlideL => "a-slide-l",
             Anim::MenuIn => "a-menu-in",

@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, ExternalIcon,
     FocusRequest, IconSize, IconSource, IconUrl, Material, Menu, MenuEntry, MenuKind, MenuTile,
-    MenuTrail, PaletteEntrance, Px, Rect, ShortcutKey, use_focus_request,
+    MenuTrail, Px, Rect, ShortcutKey, use_focus_request,
 };
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use probe::rect;
@@ -102,7 +102,6 @@ fn Panel(selection: Selection, give_back: GiveBack) -> Element {
                     onpick: move |value: u8| note(format!("pick:{value}")),
                     onclose: move |()| note("close".to_string()),
                     host: CommandPaletteHost::Surface,
-                    entrance: PaletteEntrance::CmdkIn,
                     id: "launcher-card".to_string(),
                     focus,
                     selected,
@@ -179,7 +178,7 @@ fn settle_in(harness: &mut Harness) {
 
 /// Embedded, the palette draws no scrim, its card spans the container's width from its top
 /// and, since the macOS polish pass, is only as tall as its content (at most the container's),
-/// carries the id a blur region names, and enters with the entrance asked for.
+/// carries the id a blur region names.
 #[test]
 fn an_embedded_palette_fills_its_container_with_no_scrim() {
     let mut harness = Harness::new(OwnSelection, VIEW);
@@ -196,10 +195,6 @@ fn an_embedded_palette_fills_its_container_with_no_scrim() {
     assert!(
         card.size.height.0 < panel.size.height.0,
         "and is as tall as its content: {card:?}"
-    );
-    assert_eq!(
-        harness.attr("#launcher-card", "data-entrance").as_deref(),
-        Some("cmdk-in")
     );
     assert_eq!(
         harness.attr("#launcher-card", "data-host").as_deref(),

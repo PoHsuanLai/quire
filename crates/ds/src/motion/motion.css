@@ -13,7 +13,6 @@
    ds::css::motion_css adds the identical `X--b` alias of each (rule 2). */
 
 /* 4.2.1 rise */
-@keyframes rise{ from{ transform:translateY(7px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* 4.2.2 star-pop */
 
@@ -22,10 +21,8 @@
 /* 4.2.4 pop-in */
 
 /* 4.2.5 fold */
-@keyframes fold{ 0%{ transform:scaleY(1) translateX(0); opacity:1; } 30%{ transform:scaleY(1) translateX(10px) rotate(.6deg); } 100%{ transform:scaleY(.02) translateX(-26px) rotate(-2deg); opacity:0; } }
 
 /* 4.2.6 curl */
-@keyframes curl{ 0%{ transform:translateY(0) scale(1); opacity:1; } 35%{ transform:translateY(2px) scale(.985); } 100%{ transform:translateY(22px) scale(.93); opacity:0; } }
 
 /* 4.2.7 floatup */
 @keyframes floatup{ 0%{ opacity:0; transform:translateY(0) scale(.6); } 20%{ opacity:1; } 100%{ opacity:0; transform:translateY(-38px) scale(1.25) rotate(8deg); } }
@@ -59,15 +56,12 @@
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
 
 /* 4.3.4 heal */
-@keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
 
 /* 4.3.5 bump */
 
 /* 4.3.6 tab-in */
-@keyframes tab-in{ 0%{ transform:translateX(-14px) scale(.96); opacity:0; max-height:0; } 60%{ opacity:1; max-height:40px; } 100%{ transform:none; opacity:1; max-height:40px; } }
 
 /* 4.3.7 tab-out */
-@keyframes tab-out{ 0%{ opacity:1; max-height:40px; } 100%{ opacity:0; max-height:0; padding-block:0; transform:translateX(-10px); } }
 
 /* 4.3.8 hc-in */
 @keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
@@ -107,11 +101,6 @@
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
 /* 4.4.3 row-in */
-@keyframes row-in{
-  0%{ transform:translateY(-14px) scale(.94); opacity:0; }
-  58%{ transform:translateY(3px) scale(var(--overshoot)); opacity:1; }
-  100%{ transform:translateY(0) scale(1); opacity:1; }
-}
 
 /* 4.4.5 chip-land */
 
@@ -137,11 +126,6 @@
 @keyframes shake{ 0%,100%{ transform:translateX(-50%); } 20%{ transform:translateX(calc(-50% - 7px)); } 40%{ transform:translateX(calc(-50% + 6px)); } 60%{ transform:translateX(calc(-50% - 4px)); } 80%{ transform:translateX(calc(-50% + 2px)); } }
 
 /* 4.4.10 crumple */
-@keyframes crumple{
-  0%{ transform:scale(1) rotate(0) skewX(0); opacity:1; }
-  40%{ transform:scale(.88) rotate(-4deg) skewX(-6deg); }
-  100%{ transform:scale(.12) rotate(16deg) skewX(10deg) translateY(16px); opacity:0; }
-}
 
 /* 4.4.11 menu-in */
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
@@ -263,3 +247,10 @@
    another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until
    something restyles it again; a starting animation is that restyle, in the same frame. */
 @keyframes hold{ from{ } to{ } }
+
+/* row-in, row-out and heal (design/30 section 1.3, macOS `NSTableView` `effectFade` + `slideUp`):
+   an inserted row fades and slides down into place, a removed one fades and slides up, and the
+   rows below close the gap. */
+@keyframes row-in{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
+@keyframes row-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
+@keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }

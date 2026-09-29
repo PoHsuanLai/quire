@@ -192,13 +192,12 @@ pub(super) const PANEL_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `rise` at `--t-big --e-spring`: the screenshot thumbnail's entrance. A surface
-/// arriving, so it springs at the toast's length (design/20 section 1.13) where a row's `rise`
-/// decelerates at `--t-move`. An entrance; it holds nothing.
+/// `slide-r` at `--t-move --e-out`: the screenshot thumbnail's entrance, as a notification
+/// banner's (design/30 section 1.3). An entrance; it holds nothing.
 pub(super) const SHOT_IN: Recipe = recipe(
-    "rise",
-    DurationToken::Big,
-    EasingToken::Spring,
+    "slide-r",
+    DurationToken::Move,
+    EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );
@@ -219,7 +218,7 @@ pub(super) const SHOT_OUT: Recipe = recipe(
 /// the element is restyled from its resting style, not left at the dropped animation's value.
 pub(super) const HOLD: Recipe = recipe(
     "hold",
-    DurationToken::Tap,
+    DurationToken::Quick,
     EasingToken::Linear,
     Fill::None,
     Iteration::Once,

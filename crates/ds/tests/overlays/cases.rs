@@ -9,10 +9,10 @@ use ds::{
     BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, FlagTone,
     Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverStat,
     HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget, Menu,
-    MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, PaletteEntrance, Peek,
-    PeekMode, PersonHue, Placement, Point, Popover, Px, Rect, Scrim, ScrimStrength,
-    SelectionBubble, SendPhase, SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip,
-    TooltipKind, UndoToken, use_hover_hub, use_toasts,
+    MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, Peek, PeekMode, PersonHue,
+    Placement, Point, Popover, Px, Rect, Scrim, ScrimStrength, SelectionBubble, SendPhase,
+    SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip, TooltipKind, UndoToken,
+    use_hover_hub, use_toasts,
 };
 use ds::{Check, Fraction, Shortcut, ShortcutKey};
 use std::time::Duration;
@@ -703,7 +703,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "command_palette",
         state: "surface-cmdk",
-        make: || rsx! { CommandPalette { label: "Launch", placeholder: "Search apps, windows, actions", query: "", tokens: Vec::new(), groups: palette_groups(), empty: "Nothing matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {}, host: CommandPaletteHost::Surface, entrance: PaletteEntrance::CmdkIn, id: "launcher-card" } },
+        make: || rsx! { CommandPalette { label: "Launch", placeholder: "Search apps, windows, actions", query: "", tokens: Vec::new(), groups: palette_groups(), empty: "Nothing matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {}, host: CommandPaletteHost::Surface, id: "launcher-card" } },
         wait: NOW,
     },
     Case {

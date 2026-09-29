@@ -1,22 +1,18 @@
-//! AnimatedList: the `ul.ds-list` rows live in; its `data-presence` plays the first-show
-//! entrance (design/04-COMPONENTS.md section 16 markup, the plan's wave-2 "animated_list").
+//! AnimatedList: the `ul.ds-list` rows live in (design/04-COMPONENTS.md section 16 markup).
 
-use crate::motion::presence::Presence;
 use dioxus::prelude::*;
 
-/// A list of rows whose entrance plays only when first shown.
+/// A list of rows.
 ///
 /// The rows are the consumer's `ListRow`s, one per `use_roster` entry, keyed by the roster key
-/// so a leaving row keeps its node until it settles. While `presence` is `Entering` an entering
-/// row rises staggered; once it is `Present` an entering row is an arrival and plays `row-in`.
+/// so a leaving row keeps its node until it settles.
 #[component]
-pub fn AnimatedList(label: String, presence: Presence, children: Element) -> Element {
+pub fn AnimatedList(label: String, children: Element) -> Element {
     rsx! {
         ul {
             class: "ds-list",
             role: "listbox",
             "aria-label": "{label}",
-            "data-presence": presence.slug(),
             {children}
         }
     }

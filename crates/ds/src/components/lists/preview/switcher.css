@@ -10,7 +10,7 @@
 
 .ds-panes{ --pane-p:0; position:relative; overflow:hidden; }
 .ds-pane[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
-.ds-pane[*|data-presence=present]{ animation:hold var(--t-tap) var(--e-linear); }
+.ds-pane[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-pane[*|data-pane=detail][*|data-presence=entering],.ds-pane[*|data-pane=detail][*|data-presence=leaving]{
   transform:translateX(calc((1 - var(--pane-p)) * var(--s-26))); opacity:var(--pane-p); }
 .ds-pane[*|data-pane=root][*|data-presence=entering],.ds-pane[*|data-pane=root][*|data-presence=leaving]{

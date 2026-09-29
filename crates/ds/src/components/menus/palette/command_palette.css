@@ -35,13 +35,6 @@
    rule 2), so the animation starts over even where the engine kept the element's styles. */
 .ds-palette[*|data-shown=hidden], .ds-palette-wrap[*|data-shown=hidden]{ display:none; }
 .ds-palette[*|data-pulse=b]{ animation-name:peek-in--b; }
-.ds-palette[*|data-entrance=cmdk-in][*|data-pulse=b]{ animation-name:cmdk-in--b; }
-/* An opaque entrance: `cmdk-rise` springs the card's scale and lift with no fade,
-   so its first frame is already opaque; over a window its scrim does not fade either, since the
-   wrap's opacity would hold the card at its own. */
-.ds-palette[*|data-entrance=cmdk-rise]{ animation:cmdk-rise var(--t-big) var(--e-spring); }
-.ds-palette[*|data-entrance=cmdk-rise][*|data-pulse=b]{ animation-name:cmdk-rise--b; }
-.ds-palette-wrap[*|data-entrance=cmdk-rise]{ animation:none; }
 /* A pane beside the results (`aside`): the card turns into a grid, the field (and
    its tokens) across the top, the results under it on the left, the pane on the right past a
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
@@ -53,14 +46,12 @@
 .ds-palette[*|data-aside=shown] > .ds-search-tokens{ grid-row:2; grid-column:1 / -1; }
 .ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
 .ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
-/* The results' motions (design/26-DETAILS.md section 5.6): the first-show rise is
-   `[data-reveal=play]` on the list (detail/reveal.css). A group's Show More rises
-   the rows it added in downward, each `--stagger` after the one before (`--i`, capped at 12);
-   its Show Less heals everything after the last row kept up from `--dy`, the height the removed
-   rows took, set on the list while it plays. At rest the list's children play `hold` (moves
-   nothing), below every motion here and the reveal's (which come later in the cascade): a rise
-   or heal whose settle timer (wall clock) ends it before the frame clock does is replaced by
-   another animation, never dropped midway. */
-.ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-tap) var(--e-linear); }
-.ds-menu-item[*|data-row-motion=rise]{ animation:rise var(--t-move) var(--e-out) backwards; animation-delay:calc(var(--i) * var(--stagger)); }
-.ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-spring) backwards; }
+/* The results' motions (design/26-DETAILS.md section 5.4): a group's Show More brings the rows
+   it added in as inserted rows come (`row-in`); its Show Less heals everything after the last
+   row kept up from `--dy`, the height the removed rows took, set on the list while it plays. At
+   rest the list's children play `hold` (moves nothing), below every motion here (which come
+   later in the cascade): an entrance or heal whose settle timer (wall clock) ends it before the
+   frame clock does is replaced by another animation, never dropped midway. */
+.ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-menu-item[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+.ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-in-out) backwards; }
