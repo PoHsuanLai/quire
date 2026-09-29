@@ -11,8 +11,8 @@ use image::{Rgba, Rgba32FImage};
 use serde::Deserialize;
 
 use crate::{
-    Bevel, ChromaCap, Dialect, Look, Plane, PlateGrid, Spec, Template, Tint, apply_grain,
-    drop_shadow, finish, grid_for, render_icon, retint, roles,
+    ChromaCap, Dialect, Look, Plane, PlateGrid, Spec, Template, Tint, apply_grain, drop_shadow,
+    finish, grid_for, render_icon, retint, roles,
 };
 
 /// Every pixel size the set exports, each drawn directly: the freedesktop sizes 16, 22, 24, 32,
@@ -124,7 +124,7 @@ pub fn face_icon(face: &Rgba32FImage, size: u32, t: &Template, tile: &Plane) -> 
         true => apply_grain(&placed, crate::Grain(20), tile),
         false => placed,
     };
-    let flat = finish(grid, &placed, t, Bevel::Ours);
+    let flat = finish(grid, &placed, t);
     match size >= 48 {
         true => drop_shadow(&flat, grid, t),
         false => flat,

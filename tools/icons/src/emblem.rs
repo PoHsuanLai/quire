@@ -7,9 +7,8 @@
 use image::{Rgba, Rgba32FImage};
 
 use crate::{
-    Bevel, ChromaCap, Dialect, Layer, Oklab, Plane, PlateGrid, Pt, Relief, Role, Roles, Spec,
-    Srgb8, Template, Tint, apply_grain, compose::over, finish, mark::distance, plate_face, roles,
-    srgb,
+    ChromaCap, Dialect, Layer, Oklab, Plane, PlateGrid, Pt, Relief, Role, Roles, Spec, Srgb8,
+    Template, Tint, apply_grain, compose::over, finish, mark::distance, plate_face, roles, srgb,
 };
 
 /// What an icon is drawn as: a dialect under a tint and a chroma cap (the spec's own dialect
@@ -157,7 +156,7 @@ pub fn emblem(spec: &Spec, look: Look, canvas: u32, t: &Template, tile: &Plane) 
     let face = Rgba32FImage::from_fn(canvas, canvas, |x, y| {
         Rgba(over(object.get_pixel(x, y).0, face.get_pixel(x, y).0))
     });
-    finish(grid, &face, t, Bevel::Ours)
+    finish(grid, &face, t)
 }
 
 #[cfg(test)]

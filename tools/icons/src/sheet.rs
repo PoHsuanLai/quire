@@ -1,6 +1,6 @@
 use image::{Rgba, Rgba32FImage, imageops::FilterType, imageops::resize};
 
-use crate::{Srgb8, Template, compose::Shadow, compose::over, draw_text, export, text_width};
+use crate::{Srgb8, compose::over, draw_text, text_width};
 
 /// One tile on a contact sheet: an image, an optional strip under it, a caption.
 #[derive(Debug, Clone, PartialEq)]
@@ -128,14 +128,6 @@ pub fn build_sheet(sheet: &Sheet, style: &SheetStyle) -> Rgba32FImage {
     img
 }
 
-/// The 16, 32 and 48 px exports at 1:1 on a light and on a dark ground (08 3.4 item 4), from
-/// a 1024 `flat` master; 48 carries its baked shadow like the hicolor file does.
-pub fn size_strip(flat: &Rgba32FImage, t: &Template) -> Rgba32FImage {
-    strip(&[16, 32, 48], |size| {
-        export(flat, t, size, Shadow::Baked).image
-    })
-}
-
 /// Each size's render at 1:1, bottom-aligned, on the light (`#F1F3EE`) and then the dark
 /// (`#1D211B`) ground. `render(size)` returns a `size` x `size` image.
 pub fn strip(sizes: &[u32], render: impl Fn(u32) -> Rgba32FImage) -> Rgba32FImage {
@@ -158,54 +150,6 @@ pub fn strip(sizes: &[u32], render: impl Fn(u32) -> Rgba32FImage) -> Rgba32FImag
             paste(&mut img, one, (x, PAD + tallest - size));
             x += size + PAD;
         }
-    }
-    img
-}
-
-/// A sheet of named strips stacked top to bottom, each at 1:1 (no resizing).
-pub fn strip_sheet(
-    title: &str,
-    rows: &[(String, Rgba32FImage)],
-    style: &SheetStyle,
-) -> Rgba32FImage {
-    let text_h = DOT_ROWS * style.text_scale;
-    let label_w = rows
-        .iter()
-        .map(|(name, _)| text_width(name, style.text_scale))
-        .max()
-        .unwrap_or(0)
-        + style.gap;
-    let width = rows
-        .iter()
-        .map(|(_, s)| style.gap * 2 + label_w + s.width())
-        .max()
-        .unwrap_or(0)
-        .max(text_width(title, style.text_scale) + 2 * style.gap);
-    let top = style.gap * 2 + text_h;
-    let height = top
-        + rows
-            .iter()
-            .map(|(_, s)| s.height() + style.gap)
-            .sum::<u32>();
-    let mut img = Rgba32FImage::from_pixel(width, height, Rgba(rgba(style.ground)));
-    draw_text(
-        &mut img,
-        title,
-        (style.gap, style.gap),
-        style.text_scale,
-        rgba(style.ink),
-    );
-    let mut y = top;
-    for (name, one) in rows {
-        draw_text(
-            &mut img,
-            name,
-            (style.gap, y + one.height() / 2 - text_h / 2),
-            style.text_scale,
-            rgba(style.ink),
-        );
-        paste(&mut img, one, (style.gap + label_w, y));
-        y += one.height() + style.gap;
     }
     img
 }

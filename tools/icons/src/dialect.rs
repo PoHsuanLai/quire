@@ -50,16 +50,6 @@ impl Lch {
             b: c * h.sin(),
         }
     }
-
-    /// The OKLCh form of an sRGB colour (chroma not capped: this is a reading, not a paint).
-    pub fn of(c: Srgb8) -> Lch {
-        let p = oklab(c.unit());
-        Lch {
-            l: p.l,
-            c: p.a.hypot(p.b),
-            h: p.b.atan2(p.a).to_degrees().rem_euclid(360.0),
-        }
-    }
 }
 
 /// The hue a dialect is tinted with, and how much of the cap it may use (0..=1).
@@ -279,9 +269,7 @@ mod tests {
     }
 
     #[test]
-    fn lch_reads_back() {
-        let l = Lch::of(Srgb8::hex(0x2B7CFF));
-        assert!(l.c > 0.15 && (l.h - 260.0).abs() < 8.0, "{l:?}");
+    fn tint_words_parse() {
         assert!("teal".parse::<Tint>().is_ok() && "cyan".parse::<Tint>().is_err());
     }
 }

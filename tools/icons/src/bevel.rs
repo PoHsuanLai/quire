@@ -20,13 +20,6 @@ const RIM_ALPHA: f32 = 0.06;
 /// The specular point and the soft bevel are drawn from this export size up.
 const DETAIL_FROM: u32 = 48;
 
-/// Whether the finish draws our bevel or only masks (a model-drawn tile brings its own).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Bevel {
-    Ours,
-    Theirs,
-}
-
 /// The plate's face over the whole canvas: one colour, the tonal shift across the plate at
 /// 135deg and the matte diffusion from above. Opaque; [`finish`] masks it.
 pub fn plate_face(grid: PlateGrid, colour: Oklab, shift: Shift) -> Rgba32FImage {
@@ -63,7 +56,7 @@ fn tint(coverage: &Plane, colour: [f32; 3], alpha: f32) -> impl Fn(u32, u32) -> 
 
 /// The finished `flat` icon: `face` (ground plus symbol) with the bevel and rim, clipped to the
 /// squircle.
-pub fn finish(grid: PlateGrid, face: &Rgba32FImage, t: &Template, bevel: Bevel) -> Rgba32FImage {
+pub fn finish(grid: PlateGrid, face: &Rgba32FImage, t: &Template) -> Rgba32FImage {
     let (c, a) = (grid.centre(), grid.half());
     let mask = superellipse(grid.canvas, (c, c), a, t.exponent);
     let s = (grid.side as f32 / 48.0).max(1.0);
@@ -110,12 +103,9 @@ pub fn finish(grid: PlateGrid, face: &Rgba32FImage, t: &Template, bevel: Bevel) 
     let rim_px = tint(&rim, dark, RIM_ALPHA);
     Rgba32FImage::from_fn(grid.canvas, grid.canvas, |x, y| {
         let base = face.get_pixel(x, y).0;
-        let p = match bevel {
-            Bevel::Ours => [shade_px(x, y), rim_px(x, y), arc_px(x, y), point_px(x, y)]
-                .into_iter()
-                .fold(base, |under, top| over(top, under)),
-            Bevel::Theirs => over(rim_px(x, y), base),
-        };
+        let p = [shade_px(x, y), rim_px(x, y), arc_px(x, y), point_px(x, y)]
+            .into_iter()
+            .fold(base, |under, top| over(top, under));
         Rgba([p[0], p[1], p[2], p[3] * mask.at(i64::from(x), i64::from(y))])
     })
 }
@@ -161,7 +151,7 @@ mod tests {
         let t = Template::default();
         let g = PlateGrid::for_canvas(512, &t);
         let face = plate_face(g, SLATE, Shift::Tonal);
-        let flat = finish(g, &face, &t, Bevel::Ours);
+        let flat = finish(g, &face, &t);
         let cx = g.origin + g.side / 2;
         assert!(
             l_at(&flat, cx, g.origin + 2) > l_at(&face, cx, g.origin + 2) + 0.02,
@@ -173,10 +163,5 @@ mod tests {
             "shade"
         );
         assert_eq!(flat.get_pixel(0, 0).0[3], 0.0, "outside the squircle");
-        let theirs = finish(g, &face, &t, Bevel::Theirs);
-        assert!(
-            l_at(&theirs, cx, g.origin + 2) <= l_at(&face, cx, g.origin + 2),
-            "no arc"
-        );
     }
 }

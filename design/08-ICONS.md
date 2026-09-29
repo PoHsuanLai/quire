@@ -349,7 +349,7 @@ keeps 2.3-2.5 unchanged (gradient, highlight, rim, baked shadow).
 
 Two routes produce icons in this language; the user picks (docs/icons-bakeoff.md, round two):
 
-- **Procedural** (`tools/icons abstract`): an icon is a TOML spec in `tools/icons/specs/`: the
+- **Procedural** (the `icons` crate in `tools/icons`): an icon is a TOML spec in `tools/icons/specs/`: the
   family, the grain and a list of layers from a five-shape vocabulary: `rect` (per-corner radii),
   `circle`, `chevron`, `bar` (a round-capped stroke), `fold` (a turned-down corner) plus a
   general `polygon` (rounded by `round`). Each layer has an optional `fill` and `stroke` from
@@ -378,14 +378,12 @@ symbol crafted into the plate rather than drawn on it. For **app icons only**, t
 Pairs used for the first five (proposed): Mail blue to violet, Files amber to green, Terminal
 violet `#6B3FCC` to amber, Notes green to blue, Photos red to amber.
 
-Routes, both implemented:
-- **Procedural**: `tools/icons abstract` renders these rules from the specs in
+Routes:
+- **Procedural**: the `icons` crate renders these rules from the specs in
   `tools/icons/specs/` (fields: `ground`, `grain`, and per layer `kind`, `fill` = `paper | ink |
   start | end | <colour>`, `opacity`, `relief` = `raised | recessed | flush`).
-- **Generated**: 3.3's round-three brief, then `tools/icons face`: `--mode ground` takes the
-  model's full-bleed embossed surface as the plate face (centre 78 % crop) and adds our bevel;
-  `--mode tile` keys a model-drawn tile off its ground and re-masks it with our squircle, keeping
-  the model's own bevel.
+- **Generated**: 3.3's round-three brief; the model's full-bleed embossed surface becomes the
+  plate face (a centre crop, `icons::klein_face`) and gets our bevel.
 
 ### 2.10 Dialects (proposed, round four, 2026-09-25)
 
@@ -429,9 +427,8 @@ Every dialect keeps the symbol at least 0.26 L away from its plate (test
 `symbol_and_plate_differ_in_lightness`), which is what keeps 16 px legible.
 
 **Specs.** `tools/icons/specs/<app>.toml` names the recommended `dialect`, the `tint` (a palette
-name) and the layers with their `fill` role and `relief`; any dialect can render any spec
-(`tools/icons abstract --dialect`, `tools/icons dialects`). A model-drawn face (the round-three
-Klein picks) is brought into a dialect by `tools/icons face --retint <dialect> --tint <hue>`: a
+name) and the layers with their `fill` role and `relief`; any dialect can render any spec.
+A model-drawn face (the round-three Klein picks) is brought into a dialect by `icons::retint`: a
 lightness plane fitted to its border is taken as the ground, the relief above it is kept (scaled
 so the symbol reaches the dialect's symbol lightness), and hue and chroma come from the roles.
 
