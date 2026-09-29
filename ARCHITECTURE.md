@@ -750,7 +750,7 @@ path each, until step 12 replaces them with the prelude.
 6. **`ds-settings`** (done): `SettingsDoc`, `Store`, `ConfigRoot`, `SystemPrefsSource`, `Spawner` in
    `ds-core::spawner`, `dioxus` as a feature, delete `diff.rs` and `test_dir.rs`; sill's settings
    follow (unknown keys are reported).
-7. **`DocumentHost`**: the part traits and `NoHost` in `ds::host`, `ds_native::provide_host`
+7. **`DocumentHost`** (done): the part traits and `NoHost` in `ds::host`, `ds_native::provide_host`
    installing them all, `HostSignals`, delete every `Host*` newtype and the partial `provide`
    sets, `Clipboard` trait; sill roots call `provide_host` (this fixes the partial seam).
 8. **Split bottom-up**, one crate per commit series, each with `ds` re-exporting: `ds-core`,

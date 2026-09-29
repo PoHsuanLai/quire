@@ -751,7 +751,7 @@ Verbatim, `S:781-786`:
 `S:1661`). `Focus::Controlled(FocusRequest)` (settled 2026-09-24, FINDINGS "Launcher gaps", sill
 Q44) focuses on mount and again at every `request()`: a menu that took the keyboard hands it
 back when it closes, without remounting the field. Every focus change waits out a document the
-renderer holds (`ds::HostFocus`, Q43). Recipient inputs: Enter or `,` adds, Backspace on empty removes the last chip
+renderer holds (`ds::FocusHost`, Q43). Recipient inputs: Enter or `,` adds, Backspace on empty removes the last chip
 (`S:2265-2266`).
 
 **Blitz notes.** `::placeholder` must be verified in the spike; if unsupported, render the
@@ -770,7 +770,7 @@ is required so the global focus ring does not double the accent ring.
   field is `Secret`.
 - A masked field's caret (sill Q360b, 2026-09-27). Blitz measures a `Password` or `Secret`
   field's hidden text in its editor's face, untracked, so its caret drifts off the Inter dots.
-  Where the host reads the selection (`ds::HostSelection`, ds-native's `focus::SELECTION`), the
+  Where the host reads the selection (`ds::CaretHost::selection`, ds-native's), the
   input carries `data-caret=drawn` (`caret-color: transparent`) and `.ds-input-mask` draws the
   caret itself: `span.ds-input-caret` centred in the gap between the dots at the caret's
   character (half the tracking back; half a gap after the last dot at the end), Blitz's caret
@@ -3988,8 +3988,8 @@ first, with where the caret is:
 ```rust
 pub struct FieldKey { pub event: KeyboardEvent, pub caret: Caret }
 pub enum Claim { Take, Pass }
-pub enum Caret { AtEnd, Inside, Unknown }   // ds::focus::caret; Unknown: no host, no field
-pub struct HostCaret(pub fn(&MountedData) -> Caret);   // ds-native: ds_native::focus::CARET
+pub enum Caret { AtEnd, Inside, Unknown }   // ds::host::caret; Unknown: no host, no field
+// the host's read: ds::CaretHost::caret, on ds_native's Blitz host
 ```
 
 `Claim::Take` keeps the key from everything else: the palette does not read it, its default is
@@ -3997,7 +3997,7 @@ prevented (the field types no Space, moves no caret) and `onkey` does not hear i
 as before. The caret is read from the field's editor when the key arrives: `AtEnd` for a bare
 caret after the last character (an empty field too), `Inside` for any other place or any
 selection. Blitz holds no borrow of the document while a handler runs, so the read is exact;
-without ds-native's `HostCaret` (a webview) it is `Unknown`. A verdict-returning callback was
+without ds-native's `CaretHost` (a webview) it is `Unknown`. A verdict-returning callback was
 chosen over a declarative `KeyPolicy`: whether Space is the pane's depends on the caller's own
 state (browsing or typing, sill F654), which a policy would have to mirror into props every
 render; the callback asks at the moment with the caret in hand. It is a new prop beside
@@ -4019,7 +4019,7 @@ so a surface that says nothing draws exactly what it drew before.
 
 **Split.** `ds` holds the vocabulary and the pure rules: `Spell`, `Lang`, the tokeniser and its
 skip rules (`spell::words`), the CJK test (`spell::script`), how marks follow an edit and which
-word is being typed (`spell::marks`), and the seam `HostSpell(Rc<dyn SpellService>)`.
+word is being typed (`spell::marks`), and the seam `Rc<dyn SpellService>`, a root context.
 `ds_native::spell` (cargo feature `spellcheck`) implements the seam: the system's Hunspell
 dictionaries, checked and suggested by `spellbook` (MPL-2.0, used unmodified) on one worker
 thread per configuration; nothing is bundled. `ds_native::launch` provides it under the
@@ -4053,11 +4053,10 @@ pub trait SpellService { fn languages(&self) -> Vec<Lang>;
     fn check(&self, Vec<Lang>, Vec<String>) -> SpellFuture<Vec<String>>;
     fn suggest(&self, Vec<Lang>, String) -> SpellFuture<Vec<String>>;
     fn ignore(&self, String); fn learn(&self, Lang, String) -> SpellFuture<Learned>; }
-pub struct HostSpell(pub Rc<dyn SpellService>);
 pub const SPELL_SUGGESTIONS: usize;      // 5
 // ds-native, feature `spellcheck`:
-pub fn provide() -> HostSpell;           // system dictionaries, the locale's language
-pub fn provide_with(SpellConfig, Vec<Lang>) -> HostSpell;
+pub fn provide() -> Rc<dyn SpellService>;   // system dictionaries, the locale's language
+pub fn provide_with(SpellConfig, Vec<Lang>) -> Rc<dyn SpellService>;
 pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
 ```
 
@@ -4094,7 +4093,7 @@ pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
   one `SpellReplace` (one undoable edit); Ignore accepts the word everywhere until the process
   ends; Learn writes it to the user's dictionary and accepts it at once. The menu takes the
   keyboard (`on_focus` hears `Out`) and the surface takes it back when it closes (`In`).
-- No `HostSpell`, no dictionary for the language, or `Spell::Off`: nothing is marked.
+- No spell service, no dictionary for the language, or `Spell::Off`: nothing is marked.
 
 **Motion.** None: a mark appears and goes with the check, as the reference's does.
 
