@@ -58,13 +58,13 @@ pub use crate::components::{
     },
     content::{
         avatar::{
-            Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue,
+            Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue, muting_colour,
             person_hue,
         },
         icon_source::{ExternalIcon, IconSource},
         icon_view::IconView,
         image_source::{ImageSize, ImageSource},
-        level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick},
+        level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Tick},
         pdf_thumb::{PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble},
         provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark},
         rich_text::{Rich, RichRun, RichText},
@@ -183,8 +183,8 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Activity, Availability, Check, DropState, Emphasis, Fraction, Percent, Selection, Shortcut,
-        ShortcutKey, Shown, StaggerIndex,
+        Activity, Availability, Check, DropState, Emphasis, Fraction, Muting, Percent, Selection,
+        Shortcut, ShortcutKey, Shown, StaggerIndex,
     },
 };
 pub use crate::edit::{

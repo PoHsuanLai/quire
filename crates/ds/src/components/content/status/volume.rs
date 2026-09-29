@@ -3,8 +3,9 @@
 //! waves out as the slash comes in. A held volume key moves nothing else (R12): no count, no bump.
 
 use crate::components::content::level_glyph::glyph::{LevelGlyphView, waves};
-use crate::components::content::level_glyph::vocab::{LevelGlyph, Muting};
+use crate::components::content::level_glyph::vocab::LevelGlyph;
 use crate::core::vocab::Fraction;
+use crate::core::vocab::Muting;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;

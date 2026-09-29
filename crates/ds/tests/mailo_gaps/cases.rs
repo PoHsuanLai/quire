@@ -11,7 +11,7 @@ use ds::{
     Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, PulseKey,
     Selection, SidebarItem, TodayTrailing,
 };
-use ds::{Avatar, AvatarMuting};
+use ds::{Avatar, Muting};
 use ds::{
     CardAccent, DotIndex, MeasuredIn, Motion, MotionChoice, PRESETS, Scheme, SpaceEditor,
     SpaceLook, Theme,
@@ -161,14 +161,14 @@ pub const CASES: &[Case] = &[
     // and a person's; a muted ink avatar is greyscale already and keeps its colours.
     Case {
         golden: "controls/avatar/account-28-muted.html",
-        make: || rsx! { Avatar { initial: 'P', size: AvatarSize::Size28, tone: AvatarTone::Account(VIOLET), muting: AvatarMuting::Muted } },
+        make: || rsx! { Avatar { initial: 'P', size: AvatarSize::Size28, tone: AvatarTone::Account(VIOLET), muting: Muting::Muted } },
     },
     Case {
         golden: "controls/avatar/person-18-muted.html",
-        make: || rsx! { Avatar { initial: 'D', size: AvatarSize::Size18, tone: AvatarTone::Person(PersonHue(212)), muting: AvatarMuting::Muted } },
+        make: || rsx! { Avatar { initial: 'D', size: AvatarSize::Size18, tone: AvatarTone::Person(PersonHue(212)), muting: Muting::Muted } },
     },
     Case {
         golden: "controls/avatar/ink-28-muted.html",
-        make: || rsx! { Avatar { initial: 'A', size: AvatarSize::Size28, tone: AvatarTone::Ink, muting: AvatarMuting::Muted } },
+        make: || rsx! { Avatar { initial: 'A', size: AvatarSize::Size28, tone: AvatarTone::Ink, muting: Muting::Muted } },
     },
 ];

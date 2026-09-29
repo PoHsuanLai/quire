@@ -2,7 +2,7 @@
 //! glyph it carries. Every choice is a named variant (no `bool`, CONVENTIONS section 4).
 
 use crate::components::content::status::volume::VolumeState;
-use crate::core::vocab::Fraction;
+use crate::core::vocab::{Fraction, Muting};
 use crate::core::word::Word;
 
 /// Whether the control takes input.
@@ -38,16 +38,6 @@ pub enum Tick {
     /// A quiet mark at the fill's edge (`Anim::LevelTick`) each time the level crosses one of
     /// the sixteen steps. The sound, where there is one, is the shell's.
     Quiet,
-}
-
-/// Whether a volume is heard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Muting {
-    /// Heard: the speaker's waves follow the level.
-    #[default]
-    Audible,
-    /// Muted: the waves go and a slash comes in.
-    Muted,
 }
 
 /// The glyph a level carries, which follows the level.

@@ -89,6 +89,19 @@ pub enum Check {
     Mixed,
 }
 
+/// Whether a thing is heard, or shown at full strength (design/30 section 1.5): a volume's
+/// speaker glyph, an avatar's colour (an account not in view keeps its hue at .55 of its
+/// chroma; `data-muting`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Muting {
+    /// Heard, or the colour as given.
+    #[default]
+    Audible,
+    /// Muted: a speaker's waves go and a slash comes in; a colour keeps its lightness and hue
+    /// at .55 of its chroma.
+    Muted,
+}
+
 /// Whether a thing is taking part right now (`data-activity`, design/30 section 1.5): an
 /// `Active` orb listens and turns; an `Inactive` one is held still, and nothing runs for it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
