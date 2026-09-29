@@ -61,8 +61,7 @@ owned by this doc). If you also run on Blitz (`ds-native`), your own crate that 
 
 **If your own crate sits inside a Cargo workspace tree it does not own** (as `examples/consumer`
 does, under quire's own directory), give it an empty `[workspace]` table so Cargo does not treat
-it as an orphaned member of the workspace above it (`spike/blitz-probe/Cargo.toml` is the other
-example of this in this repo).
+it as an orphaned member of the workspace above it.
 
 ## 2. The `Ds` root
 
