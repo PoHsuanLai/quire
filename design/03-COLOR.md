@@ -404,7 +404,7 @@ People, accounts and providers get a fixed colour each; these are data, not them
 | Draft favicon | `--ink` | `S:724` |
 | Unselected account tile | avatar at `saturate(.55)` and opacity 0.85 | `S:551` |
 
-No backend paints `saturate()`; it becomes opacity (`P:75`, `P:421`). The lint warns on every `filter` function a backend drops (FINDINGS "CSS `filter`").
+Both backends paint `saturate()` now (FINDINGS "CSS `filter`"), so the unselected tile's `saturate(.55)` needs no precomputed stand-in beyond the opacity it already has (`P:75`, `P:421`).
 
 **As tokens (settled, 2026-09-24).** The person hash is `ds::person_hue(address) -> PersonHue`
 (painted by `AvatarTone::Person`, or `PersonHue::colour()`). The eight stored-colour swatches a
