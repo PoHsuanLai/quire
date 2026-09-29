@@ -13,9 +13,9 @@ use std::time::Duration;
 
 /// `duration(anim, level) + index x stagger(level) + FRAME_SLACK`.
 ///
-/// Heal steps by `HealStep` (18 ms) rather than `--stagger`. Worked values, Post Standard:
-/// `settle(Fold)` 454 ms, `settle(FoldHeavy)` 517 ms, `settle(Curl)` 594 ms; Reduced: every
-/// settle is 94 ms.
+/// Heal steps by `HealStep` (18 ms) rather than `--stagger`. Worked values, Standard:
+/// `settle(Fold)` 434 ms, `settle(FoldHeavy)` 494 ms, `settle(Curl)` 594 ms; Reduced: every
+/// settle is 184 ms.
 pub fn settle(anim: Anim, level: MotionLevel, index: StaggerIndex) -> Duration {
     let duration = anim.recipe().duration.duration(level);
     duration + step(anim, level) * u32::from(index.get()) + FRAME_SLACK

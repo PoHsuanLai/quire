@@ -12,8 +12,8 @@ use ds::{
 };
 use std::time::Duration;
 
-/// Past the 450 ms hover intent.
-const INTENT: Duration = Duration::from_millis(520);
+/// Past the 500 ms hover intent.
+const INTENT: Duration = Duration::from_millis(570);
 
 const NOW: Duration = Duration::ZERO;
 

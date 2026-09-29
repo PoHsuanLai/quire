@@ -4,6 +4,7 @@
 //! `Hash`.
 
 use super::swipe::Speed;
+use crate::style::tokens::delay::DelayToken;
 
 /// A release velocity in logical pixels per second.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -24,9 +25,6 @@ impl Velocity {
         f64::from(self.0)
     }
 }
-
-/// A move older than this at the release says the pointer had stopped: no throw.
-const THROW_WINDOW: std::time::Duration = std::time::Duration::from_millis(100);
 
 /// One pointer position along a drag axis, and when.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -61,12 +59,12 @@ impl VelocityMeter {
     }
 
     /// The velocity at a release at `when`: nothing when the pointer had stopped (its last move
-    /// was more than 100 ms before) or moved only once.
+    /// was more than `DelayToken::ReleaseWindow` before) or moved only once.
     pub fn released(self, when: std::time::Instant) -> Velocity {
         let (Some(last), Some(before)) = (self.last, self.before) else {
             return Velocity::ZERO;
         };
-        if when.saturating_duration_since(last.when) > THROW_WINDOW {
+        if when.saturating_duration_since(last.when) > DelayToken::ReleaseWindow.delay() {
             return Velocity::ZERO;
         }
         let seconds = last

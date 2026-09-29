@@ -198,8 +198,8 @@ mod tests {
             (400, 882, 0),
             (799, 930, 0),
             (800, 930, 0),
-            (885, 930, 500),
-            (970, 930, 1000),
+            (885, 930, 566),
+            (950, 930, 1000),
             (5000, 930, 1000),
         ];
         for (ms, shown, tail) in cases {
@@ -225,10 +225,10 @@ mod tests {
     #[test]
     fn a_sweep_is_settled_only_after_its_tail() {
         let timing = TOKENS.timing(MotionLevel::Standard);
-        assert_eq!(timing.total(), Duration::from_millis(970));
+        assert_eq!(timing.total(), Duration::from_millis(950));
         let cases = [
-            (RunTail::Follows, 969, false),
-            (RunTail::Follows, 970, true),
+            (RunTail::Follows, 949, false),
+            (RunTail::Follows, 950, true),
             (RunTail::Stays, 799, false),
             (RunTail::Stays, 800, true),
         ];
@@ -255,7 +255,7 @@ mod tests {
         };
         assert_eq!(sweep.at(Duration::ZERO), empty);
         let half = sweep.at(total / 2);
-        assert_eq!(half.tail, Fraction(0), "half of 970 ms is inside the sweep");
+        assert_eq!(half.tail, Fraction(0), "half of 950 ms is inside the sweep");
         assert!((1..800).contains(&half.shown.0), "{half:?}");
         assert_eq!(sweep.at(total), RunFrame::rest(Fraction(800)));
     }

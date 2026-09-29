@@ -11,8 +11,8 @@ use ds::{
 use std::time::Duration;
 
 const NOW: Duration = Duration::ZERO;
-/// Past the 450 ms hover intent.
-const INTENT: Duration = Duration::from_millis(520);
+/// Past the 500 ms hover intent.
+const INTENT: Duration = Duration::from_millis(570);
 
 /// The spoof warning: the brand and the domain in the strong tone.
 fn spoof(tone: FlagTone) -> HoverCardPart {

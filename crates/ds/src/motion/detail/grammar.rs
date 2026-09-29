@@ -10,7 +10,7 @@ use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 /// `--t-boat-return`), the holds that are not motion (`--t-send-ring`, `--t-flash`), the Rust-only
 /// repaint floor (`--t-count-step`) and the battery ring's Rust-driven fill (`--t-fill`, which
 /// predates `--t-sweep`; design/05 section 4.12).
-pub const GRAMMAR_DURATIONS: [DurationToken; 18] = [
+pub const GRAMMAR_DURATIONS: [DurationToken; 15] = [
     DurationToken::Tap,
     DurationToken::Quick,
     DurationToken::Move,
@@ -21,12 +21,9 @@ pub const GRAMMAR_DURATIONS: [DurationToken; 18] = [
     DurationToken::CurlHeavy,
     DurationToken::CrumpleHeavy,
     DurationToken::Send,
-    DurationToken::HcOut,
-    DurationToken::Scene,
     DurationToken::Shake,
     DurationToken::Park,
     DurationToken::Nudge,
-    DurationToken::ShakeLong,
     DurationToken::Sweep,
     DurationToken::PendingStep,
 ];

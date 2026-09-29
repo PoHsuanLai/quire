@@ -210,5 +210,5 @@ fn under_reduced_the_flight_settles_at_reduceds_length() {
     let heard = settle_until(&mut harness, dismissed);
     let took = heard.duration_since(released);
     assert!(took >= reduced, "{took:?}");
-    assert!(reduced < standard / 2, "{reduced:?} against {standard:?}");
+    assert!(reduced < standard, "{reduced:?} against {standard:?}");
 }

@@ -15,7 +15,7 @@ pub struct FrameTiming {
     /// (`window.tile_menu_press_ms`, default 500).
     pub menu_press: Duration,
     /// How long the pointer rests on the green light before the tiling menu opens
-    /// (`window.tile_menu_hover_ms`, default 800: the 450 ms hover intent and a further 350 ms,
+    /// (`window.tile_menu_hover_ms`, default 800: the hover intent and a further wait,
     /// so passing over the light on the way to the close button does not open it).
     pub menu_hover: Duration,
 }

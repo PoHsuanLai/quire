@@ -204,8 +204,8 @@ fn the_same_scenario_gives_the_same_frames_idle_or_under_load() {
     assert_eq!(loaded, again, "two loaded runs differ");
 
     // And the timings are the tokens', exactly: the panel is present at the first step on or
-    // after settle(PanelIn); the hover card at the first step 450 ms after the pointer rested;
-    // the toast hidden at the first step 5200 ms after the push.
+    // after settle(PanelIn); the hover card at the first step 500 ms after the pointer rested;
+    // the toast hidden at the first step 5000 ms after the push.
     let first = |pick: &dyn Fn(&Sample) -> bool| {
         idle.iter()
             .find(|s| pick(s))
@@ -219,10 +219,10 @@ fn the_same_scenario_gives_the_same_frames_idle_or_under_load() {
         "{present:?}"
     );
     let opened = first(&|s| s.hover_cards == 1);
-    assert!(opened >= ms(650) && opened < ms(670), "{opened:?}");
+    assert!(opened >= ms(700) && opened < ms(720), "{opened:?}");
     // (It mounts hidden for a frame so its spring rises from below the edge.)
     let hidden = first(&|s| s.at > ms(1000) && s.toast.as_deref() == Some("hidden"));
-    assert!(hidden >= ms(6000) && hidden < ms(6020), "{hidden:?}");
+    assert!(hidden >= ms(5800) && hidden < ms(5820), "{hidden:?}");
 }
 
 // ---- an entrance timer against a stalled first frame -------------------------
@@ -301,5 +301,5 @@ fn settle_until_reports_virtual_instants() {
     let target = h.centre(".ds-hover-target").expect("hover target");
     h.pointer_move(target);
     let opened = settle_until(&mut h, |h| h.count(".ds-hovercard") == 1);
-    assert_eq!(opened.duration_since(rested), ms(450));
+    assert_eq!(opened.duration_since(rested), ms(500));
 }

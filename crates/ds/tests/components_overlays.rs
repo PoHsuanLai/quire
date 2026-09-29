@@ -274,11 +274,11 @@ fn a_toast_mounts_below_the_edge_and_is_dropped_after_it_sinks() {
     run_for(&mut dom, Duration::from_millis(80));
     let up = inside_root(&dom);
     assert!(up.contains("data-shown=\"shown\""), "{up}");
-    // The hub hides it after its 5200 ms hold (ToastHold): it sinks, still drawn below the
+    // The hub hides it after its 5000 ms hold (ToastHold): it sinks, still drawn below the
     // edge, then is gone once `--t-big` and a frame have passed (420 + 34 ms at Standard).
     // (The hold, not `hide()`: `ToastHub::stop_hold` writes the hold signal while its own
     // `if let` still borrows it, which panics.)
-    run_for(&mut dom, Duration::from_millis(5200));
+    run_for(&mut dom, Duration::from_millis(5000));
     let sinking = inside_root(&dom);
     assert!(sinking.contains("data-shown=\"hidden\""), "{sinking}");
     run_for(&mut dom, Duration::from_millis(520));

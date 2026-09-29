@@ -3,7 +3,8 @@
 //! the renderer's click count and keeps its own: within 500 ms and 4 px of the last press.
 
 use crate::core::geometry::units::Point;
-use std::time::{Duration, Instant};
+use crate::style::tokens::delay::DelayToken;
+use std::time::Instant;
 
 /// Which press of a quick run this is: 1, 2, 3, then 1 again.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -17,8 +18,6 @@ pub(crate) struct LastPress {
     pub(crate) clicks: Clicks,
 }
 
-/// Longest gap between presses of one run.
-const RUN_GAP: Duration = Duration::from_millis(500);
 /// Farthest a press may land from the last one and still continue the run, in logical pixels.
 const RUN_SLOP: f32 = 4.0;
 
@@ -26,7 +25,7 @@ const RUN_SLOP: f32 = 4.0;
 pub(crate) fn clicks_after(last: Option<LastPress>, at: Point, when: Instant) -> Clicks {
     match last {
         Some(last)
-            if when.saturating_duration_since(last.when) <= RUN_GAP
+            if when.saturating_duration_since(last.when) <= DelayToken::MultiClick.delay()
                 && (at.x.0 - last.at.x.0).abs() <= RUN_SLOP
                 && (at.y.0 - last.at.y.0).abs() <= RUN_SLOP =>
         {
