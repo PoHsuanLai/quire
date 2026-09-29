@@ -178,7 +178,9 @@ pub enum Muting {
 }
 
 /// Whether a thing is taking part right now (`data-activity`, design/30 section 1.5): an
-/// `Active` orb listens and turns; an `Inactive` one is held still, and nothing runs for it.
+/// `Active` orb listens and turns; an `Inactive` one is held still, and nothing runs for it. A
+/// window is `Active` while it is the one the person works in (`.ds[data-activity]`); a prop of
+/// a component that has no window to ask defaults to `Inactive`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Activity {
     /// Taking part.

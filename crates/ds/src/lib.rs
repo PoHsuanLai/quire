@@ -383,7 +383,7 @@ pub use crate::style::{
     look::Look,
     material::{recipe::recipe, stack::MaterialStack},
     scale::{HostScale, use_scale},
-    scope::{HostModality, Scope, use_scope},
+    scope::{HostActivity, HostModality, Scope, use_scope},
     space::{
         frame_vars::FrameVars,
         look::{CardAccent, Grain, SpaceLook},

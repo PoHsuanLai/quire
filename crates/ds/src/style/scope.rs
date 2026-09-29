@@ -1,7 +1,7 @@
 //! What every component under a `Ds` can read: the resolved appearance, the material and the
 //! blur state of the scope it is in.
 
-use crate::core::vocab::InputModality;
+use crate::core::vocab::{Activity, InputModality};
 use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::appearance::{resolve::Resolved, theme::Scheme};
 use dioxus::prelude::*;
@@ -10,6 +10,11 @@ use dioxus::prelude::*;
 /// stamps it on `.ds`. Without one, `Ds` stamps `pointer`.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct HostModality(pub Signal<InputModality>);
+
+/// The host's window activity, provided as root context by `ds-native` (which sees the window's
+/// focus); `Ds` stamps it on `.ds` as `data-activity`. Without one, `Ds` stamps `active`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct HostActivity(pub Signal<Activity>);
 
 /// The enclosing scope, as `Ds` and `Surface` provide it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -24,6 +29,8 @@ pub struct Scope {
     pub blur: BlurState,
     /// How the person last drove the surface.
     pub modality: InputModality,
+    /// Whether the window is the one the person is working in.
+    pub activity: Activity,
 }
 
 /// The enclosing scope. Panics outside a `Ds`: every quire component is drawn inside one.

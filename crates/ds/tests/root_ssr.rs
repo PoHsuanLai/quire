@@ -6,8 +6,8 @@ use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, Rule, markup};
 use ds::{
-    Accent, Appearance, BlurState, Ds, FrameVars, HostModality, Inject, InputModality, Material,
-    Motion, ReducedMotion, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
+    Accent, Activity, Appearance, BlurState, Ds, FrameVars, HostActivity, HostModality, Inject,
+    InputModality, Material, Motion, ReducedMotion, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
 };
 use std::collections::BTreeMap;
 
@@ -20,6 +20,7 @@ struct Setup {
     blur: BlurState,
     stylesheet: Inject,
     modality: Option<InputModality>,
+    activity: Option<Activity>,
     surface: Option<(Material, Option<Scheme>)>,
 }
 
@@ -33,6 +34,7 @@ impl Default for Setup {
             blur: BlurState::default(),
             stylesheet: Inject::Host,
             modality: None,
+            activity: None,
             surface: None,
         }
     }
@@ -42,6 +44,9 @@ impl Default for Setup {
 fn Root(setup: Setup) -> Element {
     if let Some(modality) = setup.modality {
         use_context_provider(|| HostModality(Signal::new(modality)));
+    }
+    if let Some(activity) = setup.activity {
+        use_context_provider(|| HostActivity(Signal::new(activity)));
     }
     rsx! {
         Ds {
@@ -112,6 +117,7 @@ fn the_root_stamps_exactly_its_attributes() {
         material: &'static str,
         blur: &'static str,
         modality: &'static str,
+        activity: &'static str,
         scheme: Scheme,
         /// The root chrome's attributes: `data-chrome`, `data-frame`, `data-ground`.
         chrome: &'static [(&'static str, &'static str)],
@@ -135,6 +141,7 @@ fn the_root_stamps_exactly_its_attributes() {
             material: "popover",
             blur: "on",
             modality: "pointer",
+            activity: "active",
             scheme: Scheme::Dark,
             chrome: &[("data-chrome", "transparent")],
         },
@@ -156,6 +163,7 @@ fn the_root_stamps_exactly_its_attributes() {
             material: "bar",
             blur: "off",
             modality: "pointer",
+            activity: "active",
             scheme: Scheme::Light,
             chrome: &[("data-frame", "tinted"), ("data-ground", "frame")],
         },
@@ -167,6 +175,7 @@ fn the_root_stamps_exactly_its_attributes() {
                     ..SpaceLook::default()
                 },
                 modality: Some(InputModality::Keyboard),
+                activity: Some(Activity::Inactive),
                 ..Setup::default()
             },
             theme: "dark",
@@ -175,6 +184,7 @@ fn the_root_stamps_exactly_its_attributes() {
             material: "popover",
             blur: "off",
             modality: "keyboard",
+            activity: "inactive",
             scheme: Scheme::Dark,
             chrome: &[("data-chrome", "transparent")],
         },
@@ -202,6 +212,7 @@ fn the_root_stamps_exactly_its_attributes() {
             ("data-material", case.material.to_owned()),
             ("data-blur", case.blur.to_owned()),
             ("data-modality", case.modality.to_owned()),
+            ("data-activity", case.activity.to_owned()),
             ("data-hover", "cold".to_owned()),
             ("style", style),
         ]);

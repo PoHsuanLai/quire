@@ -1011,8 +1011,8 @@ mod hook {
     use dioxus::core::{NoOpMutations, VirtualDom};
     use dioxus::prelude::*;
     use ds::{
-        Accent, BlurState, Emphasis, Exit, InputModality, Material, MotionLevel, Resolved, Roster,
-        Scheme, Scope, use_roster,
+        Accent, Activity, BlurState, Emphasis, Exit, InputModality, Material, MotionLevel,
+        Resolved, Roster, Scheme, Scope, use_roster,
     };
     use std::cell::Cell;
     use std::future::Future;
@@ -1040,6 +1040,7 @@ mod hook {
                 material: Material::Window,
                 blur: BlurState::Unavailable,
                 modality: InputModality::Pointer,
+                activity: Activity::Active,
             })
         });
         let roster = use_roster(vec!["a", "b", "c", "d"], PITCH);

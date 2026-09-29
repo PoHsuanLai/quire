@@ -6,8 +6,8 @@ use super::rows::Row;
 use dioxus::prelude::*;
 use ds::Emphasis;
 use ds::{
-    Accent, AnimatedList, BlurState, Exit, InputModality, Material, MotionLevel, Presence, Px,
-    Resolved, Roster, RowPitch, Scheme, Scope, use_roster,
+    Accent, Activity, AnimatedList, BlurState, Exit, InputModality, Material, MotionLevel,
+    Presence, Px, Resolved, Roster, RowPitch, Scheme, Scope, use_roster,
 };
 use std::future::Future;
 use std::pin::pin;
@@ -69,6 +69,7 @@ fn env() -> Scope {
         material: Material::Window,
         blur: BlurState::default(),
         modality: InputModality::Pointer,
+        activity: Activity::Active,
     }
 }
 

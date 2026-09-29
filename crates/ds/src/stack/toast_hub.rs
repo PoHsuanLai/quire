@@ -156,7 +156,7 @@ pub fn use_toast_hub() -> ToastHub {
 #[cfg(test)]
 mod tests {
     use super::{ToastHub, UndoToken, use_toast_hub_provider};
-    use crate::core::vocab::InputModality;
+    use crate::core::vocab::{Activity, InputModality};
     use crate::style::appearance::{
         accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
     };
@@ -194,6 +194,7 @@ mod tests {
             material: Material::Window,
             blur: BlurState::Unavailable,
             modality: InputModality::Pointer,
+            activity: Activity::Active,
         });
         let hub: ToastHub = use_toast_hub_provider(env);
         use_hook(move || {
