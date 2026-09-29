@@ -1,5 +1,5 @@
-//! Where quire's app-icon files are, and which file draws an app at a size and a style (sill
-//! FINDINGS Q71; design/08-ICONS.md 2.11).
+//! Where quire's app-icon files are, and which file draws an app at a size and a style
+//! (design/08-ICONS.md 2.11).
 //!
 //! quire ships `assets/icons/apps/<app>/[muted|monochrome/]<px>.png`; every consumer used to
 //! guess where that directory lands (sill searched its own variable, then the data dirs, then a

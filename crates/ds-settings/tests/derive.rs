@@ -1,5 +1,5 @@
-//! `#[derive(SettingsSchema)]` on the shapes sill needed and the derive used to refuse (sill
-//! FINDINGS Q5): text by type (`String`, `PathBuf`, `Cow<str>`), a text newtype through
+//! `#[derive(SettingsSchema)]` on the shapes sill needed and the derive used to refuse:
+//! text by type (`String`, `PathBuf`, `Cow<str>`), a text newtype through
 //! `#[settings(text)]`, and a one-variant enum. The refusals (`MissingRange`, an empty enum)
 //! are compile errors, tested on the expansion in `crates/ds-settings-derive/src`.
 

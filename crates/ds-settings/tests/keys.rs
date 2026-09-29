@@ -12,7 +12,7 @@ use std::path::Path;
 const DOC_PATH: &str = "../../design/22-SETTINGS.md";
 
 /// `appearance.*` keys the doc assigns to `sill`, not `AppearanceSettings`
-/// (FINDINGS.md F15: "Material keys for banners, control center and launcher live in sill's
+/// ("Material keys for banners, control center and launcher live in sill's
 /// settings, not `AppearanceSettings`"). Named explicitly, per section 6's "noted inline in the
 /// test, not silently skipped", rather than filtered by a shape nobody can see at a glance.
 const SILL_OWNED: &[&str] = &[
