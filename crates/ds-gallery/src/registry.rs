@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 19] = [
+pub const REGISTRY: [Entry; 20] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -154,6 +154,13 @@ pub const REGISTRY: [Entry; 19] = [
         lede: "The grammar of small state details (design/26-DETAILS.md): Sweep with CountUp in step, Reveal, the bounded pending loop on a layered Wi-Fi glyph and on the Spinner, Settle's fill, check and seal, Shake, Nudge, every MorphGlyph style and RollDigits, each with a button that plays its moment again, the bar's layered status glyphs (Wi-Fi, battery, Bluetooth, volume) in every state they draw, and the control center's modules (the tile disc's fill and morph, the rows' pending, success and failure, Now Playing, the Battery module's rings, keyboard brightness). Nothing here loops: each settles to 0 frames.",
         height: 3760,
         body: pages::details::DetailsPage,
+    },
+    Entry {
+        page: Page::VoiceOrb,
+        title: "Voice orb",
+        lede: "The voice orb: the default at 192 px, a small one at 96 px and one with its own colours at 128 px on a 15 s period, all turning while active and at rest when not, and a ladder of sizes that crosses every threshold of its size-derived look.",
+        height: 900,
+        body: pages::voice_orb::VoiceOrbPage,
     },
 ];
 

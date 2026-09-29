@@ -45,4 +45,6 @@ pub enum Page {
     Emoji,
     /// The small-state details: every primitive of design/26 with a replay button.
     Details,
+    /// The voice orb: the three demo variants and a size ladder over every metric threshold.
+    VoiceOrb,
 }
