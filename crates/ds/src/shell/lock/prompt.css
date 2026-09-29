@@ -33,10 +33,9 @@
 
 .ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
   background:var(--lock-glass-strong); color:var(--lock-ink); cursor:default;
-  transition:opacity var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-spring); }
+  transition:opacity var(--t-quick) var(--e-out); }
 .ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
 .ds-lock-go[*|aria-busy=true]{ opacity:1; }
-.ds-lock-go:active{ transform:scale(var(--squish)); }
 .ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
 .ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
 

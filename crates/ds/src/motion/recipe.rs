@@ -80,7 +80,7 @@ impl Anim {
             Anim::SlideR => recipe(
                 "slide-r",
                 DurationToken::Big,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -88,7 +88,7 @@ impl Anim {
             Anim::SlideL => recipe(
                 "slide-l",
                 DurationToken::Big,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -96,7 +96,7 @@ impl Anim {
             Anim::MenuIn => recipe(
                 "menu-in",
                 DurationToken::Move,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -104,7 +104,7 @@ impl Anim {
             Anim::MenuPop => recipe(
                 "menu-pop",
                 DurationToken::Move,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -113,24 +113,15 @@ impl Anim {
             Anim::BubblePop => recipe(
                 "menu-pop",
                 DurationToken::Quick,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
-            // `C:1064`.
-            Anim::CmdkIn => recipe(
-                "cmdk-in",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            Anim::CmdkRise => own::CMDK_RISE,
             // `S:225`.
             Anim::PeekIn => recipe(
                 "peek-in",
                 DurationToken::Big,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -162,7 +153,7 @@ impl Anim {
             Anim::HcIn => recipe(
                 "hc-in",
                 DurationToken::Move,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -186,16 +177,8 @@ impl Anim {
             Anim::PageIn => recipe(
                 "page-in",
                 DurationToken::Big,
-                EasingToken::Spring,
+                EasingToken::Out,
                 Fill::None,
-                Iteration::Once,
-            ),
-            // `S:570`.
-            Anim::Park => recipe(
-                "park",
-                DurationToken::Park,
-                EasingToken::Exit,
-                Fill::Forwards,
                 Iteration::Once,
             ),
             // `S:590`.
@@ -203,14 +186,6 @@ impl Anim {
                 "shake-x",
                 DurationToken::Shake,
                 EasingToken::Shake,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `C:545`.
-            Anim::Nudge => recipe(
-                "nudge",
-                DurationToken::Nudge,
-                EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
             ),
@@ -222,74 +197,9 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `C:506`.
-            Anim::ComposeRise => recipe(
-                "compose-rise",
-                DurationToken::Big,
-                EasingToken::Spring,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:572`.
-            Anim::ComposeSend => recipe(
-                "compose-send",
-                DurationToken::Send,
-                EasingToken::Exit,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:335`.
-            Anim::Floatup => recipe(
-                "floatup",
-                DurationToken::Float,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:535`.
-            Anim::Sail => recipe(
-                "sail",
-                DurationToken::Sail,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `C:536`.
-            Anim::BoatReturn => recipe(
-                "boat-return",
-                DurationToken::BoatReturn,
-                EasingToken::Out,
-                Fill::Forwards,
-                Iteration::Once,
-            ),
-            // `S:447`.
-            Anim::Dest => recipe(
-                "dest",
-                DurationToken::Float,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::InfiniteAlternate,
-            ),
-            // `C:288`.
-            Anim::Breathe => recipe(
-                "breathe",
-                DurationToken::Ambient,
-                EasingToken::InOut,
-                Fill::None,
-                Iteration::Infinite,
-            ),
-            // `C:291`.
-            Anim::Spin => recipe(
-                "spin",
-                DurationToken::Spin,
-                EasingToken::Linear,
-                Fill::None,
-                Iteration::Infinite,
-            ),
             Anim::PillUp => own::PILL_UP,
             Anim::RingDrain => own::RING_DRAIN,
             Anim::FadeIn => own::FADE_IN,
-            Anim::Busy => own::BUSY,
             Anim::PaneInR => own::PANE_IN_R,
             Anim::PaneInL => own::PANE_IN_L,
             Anim::PaneOutL => own::PANE_OUT_L,

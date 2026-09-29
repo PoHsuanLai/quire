@@ -11,7 +11,7 @@
 .ds-hover-target[*|data-as=div], .ds-hover-target[*|data-as=li]{ display:block; }
 
 .ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
-  animation:hc-in var(--t-move) var(--e-spring); }
+  animation:hc-in var(--t-move) var(--e-out); }
 .ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-quick) var(--e-out) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }

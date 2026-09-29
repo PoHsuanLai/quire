@@ -663,7 +663,7 @@ fn a_lifted_card_swaps_its_shadow_and_the_guide_is_a_footprint() {
         sheet.contains(".ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }"),
         "the lifted shadow wins over the card's --m-box"
     );
-    assert!(sheet.contains("--pickup"), "the pickup scale is a token");
+
     let guide = html("slot-guide");
     assert!(guide.contains("class=\"ds-widget-slot a-fade\""), "{guide}");
     assert!(guide.contains("data-size=\"medium\""), "{guide}");

@@ -13,21 +13,12 @@ pub(super) const MENU_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `cmdk-rise`: `cmdk-in`'s row with its fade taken out.
-pub(super) const CMDK_RISE: Recipe = recipe(
-    "cmdk-rise",
-    DurationToken::Big,
-    EasingToken::Spring,
-    Fill::None,
-    Iteration::Once,
-);
-
 /// `pill-up`: a pill centred by `translateX(-50%)` springs up from below the
-/// edge, at the send pill's own `--t-big --e-spring` (`S:706`). An entrance, so it holds nothing.
+/// edge, at `--t-big --e-out` (`S:706`). An entrance, so it holds nothing.
 pub(super) const PILL_UP: Recipe = recipe(
     "pill-up",
     DurationToken::Big,
-    EasingToken::Spring,
+    EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );
@@ -53,32 +44,21 @@ pub(super) const FADE_IN: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `busy`: a busy word pulses at `--t-ambient --e-in-out` and never drops below
-/// .45, so it stays legible where `breathe` fades the sync halo to nothing. It loops for as long
-/// as the work does; Reduced plays it once, as every loop.
-pub(super) const BUSY: Recipe = recipe(
-    "busy",
-    DurationToken::Ambient,
-    EasingToken::InOut,
-    Fill::None,
-    Iteration::Infinite,
-);
-
-/// `slide-r` at the detail pane's `--t-move --e-spring` (design/13 section 13.3.7):
+/// `slide-r` at the detail pane's `--t-move --e-out` (design/13 section 13.3.7):
 /// the catalogue's row plays it at `--t-big` for a Space switch, too slow inside a popover.
 pub(super) const PANE_IN_R: Recipe = recipe(
     "slide-r",
     DurationToken::Move,
-    EasingToken::Spring,
+    EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );
 
-/// `slide-l` at the same `--t-move --e-spring`: the root pane coming back.
+/// `slide-l` at the same `--t-move --e-out`: the root pane coming back.
 pub(super) const PANE_IN_L: Recipe = recipe(
     "slide-l",
     DurationToken::Move,
-    EasingToken::Spring,
+    EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );
@@ -158,14 +138,14 @@ pub(super) const BANNER_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `banner-in`: a banner's entrance at `--t-move --e-spring`. design/13 section
+/// `banner-in`: a banner's entrance at `--t-move --e-out`. design/13 section
 /// 13.3.6 proposed `--t-big` (the design toast's); the stack plays it at `--t-move`, the length
 /// of the exit and the heal it may arrive beside, so the stack moves as one. An entrance, so it
 /// holds nothing.
 pub(super) const BANNER_IN: Recipe = recipe(
     "banner-in",
     DurationToken::Move,
-    EasingToken::Spring,
+    EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );
@@ -213,7 +193,7 @@ pub(super) const SHOT_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `hold`: moves nothing, at `--t-tap --e-linear`. A resting state that follows an
+/// `hold`: moves nothing, at `--t-quick --e-linear`. A resting state that follows an
 /// animated one plays it, so the restyle that drops the running animation starts another and
 /// the element is restyled from its resting style, not left at the dropped animation's value.
 pub(super) const HOLD: Recipe = recipe(

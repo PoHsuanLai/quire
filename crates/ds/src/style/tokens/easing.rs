@@ -5,8 +5,8 @@ use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
 
-/// A `cubic-bezier()`, control points in thousandths: `(.34,1.42,.52,1)` is
-/// `[340, 1420, 520, 1000]`. Integers, so a curve is `Eq`.
+/// A `cubic-bezier()`, control points in thousandths: `(.22,.9,.3,1)` is
+/// `[220, 900, 300, 1000]`. Integers, so a curve is `Eq`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CubicBezier(pub [i16; 4]);
 
@@ -25,33 +25,29 @@ pub enum Easing {
 pub enum EasingToken {
     /// `--e-out`: entrances that decelerate.
     Out,
-    /// `--e-spring`: overshoot, spent only on contact.
-    Spring,
     /// `--e-exit`: exits that accelerate.
     Exit,
     /// `--e-shake`: `shake-x` and C's `shake`.
     Shake,
-    /// `--e-linear`: spin, the send ring.
+    /// `--e-linear`: a determinate value, the send ring.
     Linear,
-    /// `--e-in-out`: the breathing halo's `ease-in-out` (04-COMPONENTS O-3).
+    /// `--e-in-out`: CSS's `ease-in-out`, the default for a state change or a slide.
     InOut,
 }
 
 impl EasingToken {
     /// The curve at `level`.
     ///
-    /// Only the spring follows the level: Reduced uses `--e-out`, so nothing overshoots.
-    pub fn easing(self, level: MotionLevel) -> Easing {
+    /// No easing follows the level: Reduced changes durations, never curves. A spring is a
+    /// Rust `Spring`, not an easing.
+    pub fn easing(self, _level: MotionLevel) -> Easing {
         const OUT: CubicBezier = CubicBezier([220, 900, 300, 1000]);
-        Easing::Cubic(match (self, level) {
-            (EasingToken::Out, _) => OUT,
-            (EasingToken::Spring, MotionLevel::Reduced) => OUT,
-            (EasingToken::Spring, MotionLevel::Standard) => CubicBezier([340, 1420, 520, 1000]),
-            (EasingToken::Exit, _) => CubicBezier([550, 0, 750, 200]),
-            (EasingToken::Shake, _) => CubicBezier([360, 70, 190, 970]),
-            (EasingToken::Linear, _) => return Easing::Linear,
-            // CSS's `ease-in-out`, the halo's curve (`C:288`).
-            (EasingToken::InOut, _) => CubicBezier([420, 0, 580, 1000]),
+        Easing::Cubic(match self {
+            EasingToken::Out => OUT,
+            EasingToken::Exit => CubicBezier([550, 0, 750, 200]),
+            EasingToken::Shake => CubicBezier([360, 70, 190, 970]),
+            EasingToken::Linear => return Easing::Linear,
+            EasingToken::InOut => CubicBezier([420, 0, 580, 1000]),
         })
     }
 }
@@ -62,7 +58,7 @@ fn easing_css(token: EasingToken, scope: TokenScope) -> CssValue {
 }
 
 impl Easing {
-    /// The CSS text: `linear` or `cubic-bezier(.34,1.42,.52,1)`.
+    /// The CSS text: `linear` or `cubic-bezier(.22,.9,.3,1)`.
     pub fn css(self) -> String {
         match self {
             Easing::Linear => "linear".to_owned(),

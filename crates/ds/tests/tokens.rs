@@ -7,9 +7,9 @@ use ds::Look;
 use ds::Word;
 use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
-    ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of, stylesheet,
+    Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of, stylesheet,
 };
-use ds::{HueMember, StyleDelay, Token, TokenScope};
+use ds::{HueMember, Token, TokenScope};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Every rule outside `@keyframes`, as its selector and its declarations in order.
@@ -251,9 +251,7 @@ fn every_table_name_is_declared_on_the_root() {
         .iter()
         .map(|t| t.var())
         .chain(DurationToken::ALL.iter().map(|t| t.var()))
-        .chain(StyleDelay::ALL.iter().map(|t| t.var()))
         .chain(EasingToken::ALL.iter().map(|t| t.var()))
-        .chain(ScalarToken::ALL.iter().map(|t| t.var()))
         .chain(Radius::ALL.iter().map(|t| t.var()))
         .chain(SpacingToken::ALL.iter().map(|t| t.var()))
         .chain(Shadow::ALL.iter().map(|t| t.var()))

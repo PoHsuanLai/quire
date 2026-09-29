@@ -14,5 +14,5 @@
 .ds-side[*|data-side=peek]{
   visibility:visible; position:absolute; left:8px; top:8px; bottom:8px; width:226px; z-index:var(--z-side-peek);
   background:var(--f-solid); border-radius:var(--r-panel); box-shadow:var(--shadow-pop);
-  animation:slide-r var(--t-big) var(--e-spring);
+  animation:slide-r var(--t-big) var(--e-out);
 }

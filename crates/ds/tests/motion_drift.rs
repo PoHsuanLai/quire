@@ -4,7 +4,7 @@
 //! the Rust table gives `settle()` (design/05-MOTION.md section 7.1).
 
 use ds::Word;
-use ds::{Anim, DurationToken, EasingToken, MotionLevel, ScalarToken, settle, stylesheet};
+use ds::{Anim, DurationToken, EasingToken, MotionLevel, settle, stylesheet};
 use std::collections::BTreeMap;
 use std::time::Duration;
 
@@ -164,7 +164,9 @@ fn resolved(level: MotionLevel) -> BTreeMap<String, String> {
     let (rules, _) = parse(stylesheet());
     let mut values: BTreeMap<String, String> = rules
         .iter()
-        .filter(|(selector, decls)| selector == ".ds" && decls.iter().any(|(n, _)| n == "--t-tap"))
+        .filter(|(selector, decls)| {
+            selector == ".ds" && decls.iter().any(|(n, _)| n == "--t-quick")
+        })
         .flat_map(|(_, decls)| decls.iter().cloned())
         .collect();
     let selector = format!(".ds[*|data-motion={}]", level.slug());
@@ -194,9 +196,6 @@ fn every_level_resolves_to_the_rust_table() {
         for token in EasingToken::ALL {
             expect(token.var().as_str(), token.easing(level).css());
         }
-        for token in ScalarToken::ALL {
-            expect(token.var().as_str(), token.value(level).css());
-        }
     }
     assert!(failures.is_empty(), "{failures:#?}");
 }
@@ -208,11 +207,7 @@ fn the_settle_table() {
     const CASES: &[(Anim, MotionLevel, u64)] = &[
         (Anim::Heal, MotionLevel::Standard, 284),
         (Anim::HcOut, MotionLevel::Standard, 184),
-        (Anim::Floatup, MotionLevel::Standard, 934),
-        (Anim::ComposeSend, MotionLevel::Standard, 654),
-        (Anim::Park, MotionLevel::Standard, 454),
         (Anim::RowIn, MotionLevel::Standard, 284),
-        (Anim::Nudge, MotionLevel::Standard, 554),
         (Anim::Shake, MotionLevel::Standard, 454),
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
         // 37 and 64).
@@ -224,7 +219,6 @@ fn the_settle_table() {
         (Anim::PillUp, MotionLevel::Standard, 434),
         (Anim::RingDrain, MotionLevel::Standard, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
-        (Anim::Busy, MotionLevel::Standard, 5034),
         // The pane switch, both panes at `--t-move`, so one timer settles the pair.
         (Anim::PaneInR, MotionLevel::Standard, 284),
         (Anim::PaneInL, MotionLevel::Standard, 284),

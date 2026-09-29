@@ -19,7 +19,7 @@ pub(super) const MORPH_IN: Recipe = recipe(
 pub(super) const MORPH_IN_SPRING: Recipe = recipe(
     "morph-in",
     DurationToken::Quick,
-    EasingToken::Spring,
+    EasingToken::Out,
     Fill::Backwards,
     Iteration::Once,
 );

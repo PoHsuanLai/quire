@@ -104,16 +104,4 @@ mod tests {
         assert_eq!(down.at(MS(100)).value, 200);
         assert_eq!(Glide::still(42).at(Duration::ZERO).value, 42);
     }
-
-    #[test]
-    fn a_spring_curve_overshoots_on_the_way() {
-        let spring = Glide::between(
-            0,
-            1000,
-            MS(250),
-            EasingToken::Spring.easing(MotionLevel::Standard),
-        );
-        let peak = (0..250).map(|ms| spring.at(MS(ms)).value).max();
-        assert!(peak.is_some_and(|p| p > 1000), "{peak:?}");
-    }
 }

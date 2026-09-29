@@ -50,15 +50,11 @@ impl Anim {
             | Anim::MenuIn
             | Anim::MenuPop
             | Anim::BubblePop
-            | Anim::CmdkIn
-            | Anim::CmdkRise
             | Anim::PeekIn
             | Anim::PeekFullIn
             | Anim::HcIn
             | Anim::LinkPillIn
             | Anim::PageIn
-            | Anim::ComposeRise
-            | Anim::BoatReturn
             | Anim::PillUp
             | Anim::PaneInR
             | Anim::PaneInL
@@ -71,10 +67,6 @@ impl Anim {
             | Anim::MorphInSpring
             | Anim::RollIn => CrossFade(In),
             Anim::HcOut
-            | Anim::Park
-            | Anim::ComposeSend
-            | Anim::Floatup
-            | Anim::Sail
             | Anim::PaneOutL
             | Anim::PaneOutR
             | Anim::OsdOut
@@ -86,16 +78,12 @@ impl Anim {
             | Anim::RollOut
             | Anim::RowOut
             | Anim::WidgetOut => CrossFade(Out),
-            Anim::Heal | Anim::ShakeX | Anim::Nudge | Anim::Shake | Anim::Breathe | Anim::Spin => {
-                Still
-            }
+            Anim::Heal | Anim::ShakeX | Anim::Shake => Still,
             Anim::MenuOut
             | Anim::Fade
             | Anim::PaletteFade
-            | Anim::Dest
             | Anim::RingDrain
             | Anim::FadeIn
-            | Anim::Busy
             | Anim::MorphFadeIn
             | Anim::MorphFadeOut
             | Anim::Hold => Same,

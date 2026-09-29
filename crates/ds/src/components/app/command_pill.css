@@ -6,10 +6,9 @@
   display:flex; align-items:center; gap:var(--s-8); width:100%; border:0; cursor:default; text-align:left;
   padding:var(--s-8) var(--s-10); border-radius:var(--r-field); background:var(--f-pill); color:var(--f-ink-soft);
   font:inherit; font-size:var(--fs-control); box-shadow:var(--shadow-pill-inset);
-  transition:background-color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-command-pill:hover{ color:var(--f-ink); }
-.ds-command-pill:active{ transform:scale(var(--squish)); }
 .ds-command-pill-label{ min-width:0; }
 .ds-command-pill-keys{
   margin-left:auto; white-space:nowrap; flex:none;

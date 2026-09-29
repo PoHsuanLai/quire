@@ -8,7 +8,7 @@
 
 .ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); margin-top:var(--s-12); }
 
-.ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-spring); }
+.ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-out); }
 .ds-account-tile:hover .ds-avatar{ transform:rotate(-6deg) scale(1.08); }
 .ds-account-tile .ds-avatar[*|data-tone=all]{ background:transparent; color:var(--f-ink); }
 .ds-account-tile[*|aria-pressed=false] .ds-avatar[*|data-tone=account]{ opacity:.85; }
@@ -21,6 +21,6 @@
 .ds-icon-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
 .ds-account-tile .ds-avatar[*|data-tone=add]{
   box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
-  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-spring);
+  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
 .ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }

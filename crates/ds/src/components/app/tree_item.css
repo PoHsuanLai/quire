@@ -13,7 +13,7 @@
   display:flex; align-items:center; justify-content:flex-start; gap:var(--s-6); width:100%; box-sizing:border-box; min-width:0;
   list-style:none; cursor:default; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
   font:inherit; font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft); position:relative;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), transform var(--t-tap) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-tree-item[*|data-shape=leaf] > .ds-tree-item-row{ cursor:default; }
 .ds-tree-item-row:hover{ background:var(--f-pill-hover); color:var(--f-ink); }

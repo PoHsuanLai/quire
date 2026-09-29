@@ -243,7 +243,7 @@ mod hook {
             lives(&dom, roster).iter().all(|(_, life)| *life == Present),
             "a first show is simply there"
         );
-        dom.in_runtime(|| roster.leave("b"));
+        dom.in_scope(ScopeId::APP, || roster.leave("b"));
         assert_eq!(lives(&dom, roster)[1], ("b", Leaving), "leaving at once");
         run_for(&mut dom, ms(90));
         assert_eq!(lives(&dom, roster).len(), 4, "still there mid-exit");

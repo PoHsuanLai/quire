@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, DocumentHost, Ds, HoverStrip, Icon, ListRow, Material, NoHost,
-    Presence, RowState, Shown, StripAction,
+    ActionId, Appearance, DocumentHost, Ds, HoverStrip, Icon, ListRow, Material, NoHost, Presence,
+    RowState, Shown, StripAction,
 };
 use ds::{Emphasis, Selection};
 use ds_native::{Harness, Viewport};

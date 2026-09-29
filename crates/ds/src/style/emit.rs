@@ -10,7 +10,7 @@
 
 use crate::style::tokens::name::VarName;
 
-/// A custom property declaration: `--t-tap:90ms;`.
+/// A custom property declaration: `--t-quick:150ms;`.
 pub fn declaration(var: VarName, value: &str) -> String {
     format!("{}:{value};", var.as_str())
 }
@@ -48,12 +48,12 @@ mod tests {
             &selector,
             &[
                 declaration(VarName("--paper"), "#151814"),
-                declaration(VarName("--t-tap"), "90ms"),
+                declaration(VarName("--t-quick"), "150ms"),
             ],
         );
         assert_eq!(
             css,
-            ".ds[*|data-theme=dark]{--paper:#151814;--t-tap:90ms;}\n"
+            ".ds[*|data-theme=dark]{--paper:#151814;--t-quick:150ms;}\n"
         );
     }
 }
