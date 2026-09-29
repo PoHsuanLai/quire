@@ -1,5 +1,5 @@
 //! Time, the one way the design system reads it: [`now`] for "when is it", [`sleep`] for "wait
-//! this long", never `Instant::now()` or an ad-hoc thread sleep (ORCHESTRATION coherence rule 4).
+//! this long", never `Instant::now()` or an ad-hoc thread sleep (CONVENTIONS §11 coherence rules).
 //! Spawning the task that waits is `crate::task`.
 //!
 //! Both read the clock installed on this thread: the wall clock by default, or a
