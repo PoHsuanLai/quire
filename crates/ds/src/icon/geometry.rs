@@ -1,5 +1,5 @@
 //! Lucide geometry, one constant per glyph, transcribed exactly from the design's `ICON`
-//! table. ISC licence; see `super`. Moved verbatim from mailo (`mail-app/src/ui/icon/geometry.rs`).
+//! table. ISC licence; see `super`.
 
 use super::shape::Shape;
 

@@ -1,8 +1,7 @@
 //! Drawing a glyph: `svg.ds-ic` with the stroke as attributes and `currentColor`, so the glyph
 //! takes its parent's text colour (design/08-ICONS.md sections 1.3-1.5).
 //!
-//! Moved from mailo's `Glyph` (`mail-app/src/ui/icon/mod.rs`): `class` became `size`, and the
-//! stroke moved from CSS `.ic` onto the element.
+//! The stroke is written on the element, not by CSS.
 
 use super::Icon;
 use super::shape::Shape;

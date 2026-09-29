@@ -1,8 +1,7 @@
 //! The user's picture (design/25-EMOJI.md section 7): a letter disc, an animated emoji or their
 //! own photo ([`UserPicture`]), drawn by [`UserPortrait`] or by the lock and polkit prompts; the
 //! stored choice ([`PictureChoice`]) and the rule that resolves it ([`resolve_picture`]); and
-//! [`UserPicturePicker`], where a person picks one. The persona this replaced was dropped on
-//! 2026-09-26 (design/24-PERSONA.md).
+//! [`UserPicturePicker`], where a person picks one.
 
 mod accept;
 mod choice;

@@ -1,8 +1,7 @@
 //! Where settings, state and caches live, per program: `$XDG_CONFIG_HOME/<app>` and friends.
 //!
-//! Moved from mailo (`mail-app/src/appearance.rs`), parameterised by [`AppName`] instead of
-//! hard-coding `mailo`. Config, not data: a cosmetic choice is never a write to the file that
-//! holds someone's mail.
+//! Parameterised by [`AppName`]. Config, not data: a cosmetic choice is never a write to the
+//! file that holds someone's mail.
 
 use std::ffi::OsString;
 use std::path::PathBuf;

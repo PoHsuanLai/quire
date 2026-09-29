@@ -2,11 +2,8 @@
 //!
 //! Pure: dots and a scheme in, hex and the occasional `rgba(...)` out. No file
 //! and no clock. The arithmetic is the approved mockup's, including the steps
-//! it takes when a colour would leave sRGB or fail its contrast floor.
-//!
-//! Moved from mailo (`mail-app/src/palette.rs`, design/03-COLOR.md section 4). The one change
-//! is the signature: a `dark: bool` became a [`Scheme`] and `capped: bool` became [`Capping`]
-//! (CONVENTIONS section 11, no `bool` in a public signature).
+//! it takes when a colour would leave sRGB or fail its contrast floor
+//! (design/03-COLOR.md section 4).
 
 use super::contrast::ratio;
 use crate::appearance::Scheme;

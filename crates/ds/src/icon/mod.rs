@@ -3,8 +3,8 @@
 //! The geometry is Lucide (<https://lucide.dev>), ISC licence, notice in
 //! `crates/ds/assets/icons/LICENSE-lucide.txt`.
 //!
-//! The style is a 24 grid, 2px stroke, round caps and joins, one colour, no fills. Unlike
-//! mailo, the stroke is written as SVG attributes by [`render::Glyph`], because usvg in Blitz
+//! The style is a 24 grid, 2px stroke, round caps and joins, one colour, no fills. The
+//! stroke is written as SVG attributes by [`render::Glyph`], because usvg in Blitz
 //! may not resolve CSS on SVG (design/08-ICONS.md section 1.3, spike S6).
 //!
 //! The icons are data and not markup strings, so nothing here needs a raw HTML sink.
@@ -12,8 +12,6 @@
 //! shell set's is in `geometry_shell` (design/08-ICONS.md section 1.6), the control center's in
 //! `geometry_control` (sill FINDINGS Q81), quire's own marks on Lucide's grid in `geometry_own`
 //! (sill FINDINGS Q103); the named sets are in `sets`.
-//!
-//! Moved from mailo (`mail-app/src/ui/icon/mod.rs`) and made `pub`.
 //!
 //! No serde: an icon is never stored, and a derive would make it a persisted schema
 //! (`CONVENTIONS.md` section 3).
