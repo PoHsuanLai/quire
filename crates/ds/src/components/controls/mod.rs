@@ -11,7 +11,6 @@ pub(crate) mod count;
 pub mod icon_button;
 pub(crate) mod kbd;
 pub mod level;
-pub(crate) mod pass_through;
 pub mod press;
 pub mod segmented;
 pub mod slider;

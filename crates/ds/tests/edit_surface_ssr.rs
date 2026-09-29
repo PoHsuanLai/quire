@@ -10,8 +10,8 @@ mod golden;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass, Point,
-    Px, Rect, Size, Spell, SpellMarks,
+    Common, DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass,
+    Point, Px, Rect, Size, Spell, SpellMarks,
 };
 
 #[derive(Props, Clone)]
@@ -45,7 +45,7 @@ const CASES: &[Case] = &[
         "controls/edit_surface/two-paragraphs-and-a-chip.html",
         || {
             rsx! {
-                EditSurface { id: "body", label: "Message", on_input: |_| {},
+                EditSurface { common: Common { id: Some("body".to_string()), aria_label: Some("Message".to_string()), ..Common::default() }, on_input: |_| {},
                     p { "data-edit-node": "0", "Dear Ada," }
                     p { "data-edit-node": "1",
                         "Lunch with "
@@ -61,7 +61,7 @@ const CASES: &[Case] = &[
             .map(|name| vec![DataAttr::new(name, "42")])
             .unwrap_or_default();
         rsx! {
-            EditSurface { extra_class: ExtraClass::parse("c-body").ok(), data, on_input: |_| {},
+            EditSurface { common: Common { extra_class: ExtraClass::parse("c-body").ok(), data: data, ..Common::default() }, on_input: |_| {},
                 p { "data-edit-node": "0", "Hi" }
             }
         }

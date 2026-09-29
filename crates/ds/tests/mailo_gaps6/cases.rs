@@ -2,7 +2,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, DataAttr, DataName, DropState, ExtraClass, Icon, IconButton,
+    Button, ButtonVariant, Common, DataAttr, DataName, DropState, ExtraClass, Icon, IconButton,
     IconButtonVariant, PlaceId, Propagation, RowState, Selection, Shown, TreeItem, TreeShape,
 };
 
@@ -56,15 +56,15 @@ fn projects(open: Shown, drop: DropState) -> Element {
 pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/data-attr.html",
-        make: || rsx! { Button { variant: ButtonVariant::Frame, label: "Receipts", data: folder("INBOX/Receipts"), onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, variant: ButtonVariant::Frame, label: "Receipts", onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/extra-class.html",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Reply", extra_class: class("row-reveal  quiet-until-hover"), onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { extra_class: class("row-reveal  quiet-until-hover"), ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} } },
     },
     Case {
         golden: "controls/icon_button/data-attr-extra-class.html",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Receipts", data: folder("INBOX/Receipts"), extra_class: class("fold-more"), propagation: Propagation::Stop, onclick: |_| {} } },
+        make: || rsx! { IconButton { common: Common { data: folder("INBOX/Receipts"), extra_class: class("fold-more"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} } },
     },
     Case {
         golden: "lists/tree_item/open-idle.html",

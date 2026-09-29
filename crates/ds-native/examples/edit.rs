@@ -7,8 +7,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, EditInput, EditPointer, EditSurface, Material, PointerPhase, Probe, Rect,
-    use_edit_handle,
+    Appearance, Common, Ds, EditInput, EditPointer, EditSurface, Material, PointerPhase, Probe,
+    Rect, use_edit_handle,
 };
 use ds_native::{AppConfig, AppId, launch};
 use std::time::Duration;
@@ -36,8 +36,8 @@ fn App() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "padding:24px; position:relative",
                 EditSurface {
+                    common: Common { aria_label: Some("Message".to_string()), ..Common::default() },
                     handle,
-                    label: "Message",
                     ime_area: caret(),
                     on_input: |input: EditInput| println!("{input:?}"),
                     on_pointer: move |pointer: EditPointer| {

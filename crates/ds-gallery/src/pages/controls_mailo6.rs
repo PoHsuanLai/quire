@@ -5,7 +5,7 @@
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    Button, ButtonVariant, DataAttr, DataName, ExtraClass, Glyph, Icon, IconButton,
+    Button, ButtonVariant, Common, DataAttr, DataName, ExtraClass, Glyph, Icon, IconButton,
     IconButtonVariant, IconSize, Propagation,
 };
 
@@ -50,15 +50,15 @@ pub fn PassThrough() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "data-folder", code: "data-folder=\"INBOX/Receipts\"",
                     div { class: "g-row",
-                        Button { variant: ButtonVariant::Frame, label: "Receipts", data: folder("INBOX/Receipts"), onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Receipts", data: folder("INBOX/Receipts"), propagation: Propagation::Stop, onclick: |_| {} }
+                        Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, variant: ButtonVariant::Frame, label: "Receipts", onclick: |_| {} }
+                        IconButton { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} }
                     }
                 }
                 Specimen { name: "extra_class", code: "class=\"ds-button g-reveal\"",
                     div { class: "g-row g-reveal-row",
                         span { "Hover this row" }
-                        Button { variant: ButtonVariant::Mini, label: "Reply", extra_class: reveal.clone(), onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Tool, icon: Icon::EllipsisVertical, label: "More", extra_class: reveal, onclick: |_| {} }
+                        Button { common: Common { extra_class: reveal.clone(), ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
+                        IconButton { common: Common { extra_class: reveal, ..Common::default() }, variant: IconButtonVariant::Tool, icon: Icon::EllipsisVertical, label: "More", onclick: |_| {} }
                     }
                 }
             }

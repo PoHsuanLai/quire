@@ -7,8 +7,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DataAttr, DataName, DropState, Ds, Icon, IconButton, IconButtonVariant, Material,
-    PlaceId, Point, Propagation, Px, RowState, Shown, TreeItem, TreeShape,
+    Appearance, Common, DataAttr, DataName, DropState, Ds, Icon, IconButton, IconButtonVariant,
+    Material, PlaceId, Point, Propagation, Px, RowState, Shown, TreeItem, TreeShape,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -49,8 +49,8 @@ fn Page() -> Element {
                     place: PlaceId("projects".to_string()),
                     onselect: move |_| note("select:projects".to_string()),
                     trailing: rsx! {
-                        IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Projects",
-                            propagation: Propagation::Stop, data: folder("INBOX/Projects"),
+                        IconButton { common: Common { data: folder("INBOX/Projects"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Projects",
+                            propagation: Propagation::Stop,
                             onclick: move |_| note("more:projects".to_string()) }
                     },
                     TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("quire".to_string()) }
@@ -66,8 +66,7 @@ fn Page() -> Element {
                     glyph: Icon::Archive,
                     place: PlaceId("archive".to_string()),
                     trailing: rsx! {
-                        IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Archive",
-                            data: folder("Archive"), onclick: move |_| note("more:archive".to_string()) }
+                        IconButton { common: Common { data: folder("Archive"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Archive", onclick: move |_| note("more:archive".to_string()) }
                     },
                     TreeItem { label: "2025", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("2025".to_string()) }
                 }

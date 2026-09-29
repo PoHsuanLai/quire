@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Anim, Appearance, Button, ButtonVariant, Check, Ds, Icon, Material, Pane, PaneSwitcher,
+    Anim, Appearance, Button, ButtonVariant, Check, Common, Ds, Icon, Material, Pane, PaneSwitcher,
     RowTrailing, SettingsRow,
 };
 use ds::{MotionLevel, StaggerIndex, settle};
@@ -37,8 +37,8 @@ fn PanesApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Popover,
             div { class: "asks",
-                Button { variant: ButtonVariant::Mini, label: "Root", id: "to-root", onclick: move |_| shown.set(Pane::Root) }
-                Button { variant: ButtonVariant::Mini, label: "Detail", id: "to-detail", onclick: move |_| shown.set(Pane::Detail) }
+                Button { common: Common { id: Some("to-root".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Root", onclick: move |_| shown.set(Pane::Root) }
+                Button { common: Common { id: Some("to-detail".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Detail", onclick: move |_| shown.set(Pane::Detail) }
             }
             div { style: "width:320px",
                 PaneSwitcher {

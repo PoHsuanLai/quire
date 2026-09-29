@@ -7,7 +7,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Button, ButtonVariant, Ds, Fraction, Material, MotionLevel, SendMood,
+    Anim, Appearance, Button, ButtonVariant, Common, Ds, Fraction, Material, MotionLevel, SendMood,
     SendPhase, SendPill, SendRing, StaggerIndex, settle,
 };
 use ds_native::harness::settle_until;
@@ -32,8 +32,8 @@ fn Moods() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "display:flex; gap:8px; padding:8px",
-                Button { id: "calm", variant: ButtonVariant::Mini, label: "Calm", onclick: move |_| mood.set(SendMood::Calm) }
-                Button { id: "nudge", variant: ButtonVariant::Mini, label: "Nudge", onclick: move |_| mood.set(SendMood::Nudge) }
+                Button { common: Common { id: Some("calm".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Calm", onclick: move |_| mood.set(SendMood::Calm) }
+                Button { common: Common { id: Some("nudge".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Nudge", onclick: move |_| mood.set(SendMood::Nudge) }
             }
             div { style: "position:relative; width:460px; height:160px",
                 SendPill { text: "Not sent yet · will try again", progress: Fraction(400), phase: SendPhase::Counting, mood: mood(), onundo: |_| {} }

@@ -5,7 +5,7 @@
 //! is not positioned is painted in step 3/7, under every positioned box.
 
 use dioxus::prelude::*;
-use ds::{EditSurface, ExtraClass};
+use ds::{Common, EditSurface, ExtraClass};
 use ds_native::{Harness, Viewport};
 
 const VIEW: Viewport = Viewport {
@@ -102,7 +102,7 @@ fn SurfaceAfterLayer() -> Element {
         style { ".c-body{{position:relative;color:rgb(0,0,0);font-size:60px;line-height:80px}}" }
         div { style: "position:relative; width:180px; height:100px; background:white",
             div { style: "position:absolute; left:0; top:0; width:180px; height:100px; background:rgb(255,0,0)" }
-            EditSurface { extra_class: ExtraClass::parse("c-body").ok(), on_input: |_| {},
+            EditSurface { common: Common { extra_class: ExtraClass::parse("c-body").ok(), ..Common::default() }, on_input: |_| {},
                 p { "data-edit-node": "0", style: "margin:0", "WW" }
             }
         }
@@ -116,7 +116,7 @@ fn StaticSurfaceAfterLayer() -> Element {
         style { ".c-body{{color:rgb(0,0,0);font-size:60px;line-height:80px}}" }
         div { style: "position:relative; width:180px; height:100px; background:white",
             div { style: "position:absolute; left:0; top:0; width:180px; height:100px; background:rgb(255,0,0)" }
-            EditSurface { extra_class: ExtraClass::parse("c-body").ok(), on_input: |_| {},
+            EditSurface { common: Common { extra_class: ExtraClass::parse("c-body").ok(), ..Common::default() }, on_input: |_| {},
                 p { "data-edit-node": "0", style: "margin:0", "WW" }
             }
         }

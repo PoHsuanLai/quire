@@ -8,7 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Button, ButtonVariant, Ds, InputVariant, Material, Menu, MenuEntry,
+    Anchor, Appearance, Button, ButtonVariant, Common, Ds, InputVariant, Material, Menu, MenuEntry,
     MenuKind, MenuRow, MountedRef, Point, Press, Px, ShortcutKey, TextInput,
 };
 use ds_native::harness::settle_until;
@@ -56,8 +56,7 @@ fn MenuPage(anchored: Anchored) -> Element {
                     }
                 },
                 div { class: "bar", style: "display:flex; height:32px",
-                    Button { variant: ButtonVariant::Secondary, label: "More",
-                        mounted: move |event: MountedEvent| button.set(Some(MountedRef(event.data()))),
+                    Button { common: Common { mounted: Some(EventHandler::new(move |event: MountedEvent| button.set(Some(MountedRef(event.data()))))), ..Common::default() }, variant: ButtonVariant::Secondary, label: "More",
                         onclick: move |_: Press| open.set(true),
                     }
                 }

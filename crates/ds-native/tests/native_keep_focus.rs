@@ -5,7 +5,7 @@
 //! surface's own focus wins inside it.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, EditSurface, InputVariant, Material, ShortcutKey, TextInput};
+use ds::{Appearance, Common, Ds, EditSurface, InputVariant, Material, ShortcutKey, TextInput};
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -40,7 +40,7 @@ fn Shell() -> Element {
                     }
                 }
                 div { style: "margin-top:12px; height:40px",
-                    EditSurface { id: "editor", on_input: |_| {},
+                    EditSurface { common: Common { id: Some("editor".to_string()), ..Common::default() }, on_input: |_| {},
                         p { class: "inside", style: "margin:0", "Editable text" }
                     }
                 }

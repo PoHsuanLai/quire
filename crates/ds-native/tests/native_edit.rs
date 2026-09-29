@@ -4,9 +4,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Composition, Ds, EditFocus, EditHandle, EditInput, EditPointer, EditSurface,
-    ImeSwitch, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect, ShortcutKey, Size,
-    TextPosition, TextRange, use_edit_handle,
+    Appearance, Common, Composition, Ds, EditFocus, EditHandle, EditInput, EditPointer,
+    EditSurface, ImeSwitch, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect,
+    ShortcutKey, Size, TextPosition, TextRange, use_edit_handle,
 };
 use ds_native::{Harness, Viewport};
 use std::cell::RefCell;
@@ -53,8 +53,7 @@ fn Editor() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "padding:20px; width:300px; font-size:16px; line-height:20px",
                 EditSurface {
-                    id: "editor",
-                    label: "Message",
+                    common: Common { id: Some("editor".to_string()), aria_label: Some("Message".to_string()), ..Common::default() },
                     handle,
                     on_input: |input| INPUT.with(|log| log.borrow_mut().push(input)),
                     on_pointer: |pointer| POINTER.with(|log| log.borrow_mut().push(pointer)),
@@ -405,7 +404,7 @@ fn Area() -> Element {
     let mut area = use_signal(|| rect(10.0, 12.0));
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
-            EditSurface { id: "editor", ime_area: Some(area()),
+            EditSurface { common: Common { id: Some("editor".to_string()), ..Common::default() }, ime_area: Some(area()),
                 on_input: move |_| area.set(rect(40.0, 32.0)),
                 p { "data-edit-node": "0", "Hello" }
             }

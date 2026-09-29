@@ -13,6 +13,7 @@ use crate::components::controls::press::Propagation;
 use crate::core::press::Press;
 use crate::core::vocab::Shown;
 use crate::core::word::Word;
+use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
@@ -59,9 +60,9 @@ pub fn GroupHeader(
                     }
                 }
                 Button {
+                    common: Common { aria_label: Some(clear), ..Common::default() },
                     variant: ButtonVariant::Quiet,
                     label: "Clear",
-                    aria_label: clear,
                     propagation: Propagation::Stop,
                     onclick: move |press| on_clear.call(press),
                 }
