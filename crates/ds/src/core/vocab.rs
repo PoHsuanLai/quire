@@ -28,8 +28,9 @@ pub enum Shown {
     Hidden,
 }
 
-/// Whether an option is the selected one: `aria-selected`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+/// Whether an option is the selected one (`aria-selected`), or the place the person is
+/// (`aria-current`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Selection {
     /// The selected option.
     Selected,
@@ -46,16 +47,6 @@ pub enum Emphasis {
     /// Lighter: read.
     #[default]
     Plain,
-}
-
-/// Whether this is the place the person is: `aria-current`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Here {
-    /// The current place.
-    Current,
-    /// Somewhere else.
-    #[default]
-    Elsewhere,
 }
 
 /// Where an item stands in a drag (design/04-COMPONENTS.md section 34): the place under the
@@ -342,16 +333,6 @@ impl Check {
     }
 }
 
-impl Here {
-    /// The `aria-current` word.
-    pub fn aria_current(self) -> &'static str {
-        match self {
-            Here::Current => "true",
-            Here::Elsewhere => "false",
-        }
-    }
-}
-
 impl Shown {
     /// The other state: what a press on a trigger asks for.
     pub fn flipped(self) -> Self {
@@ -371,6 +352,11 @@ impl Shown {
 }
 
 impl Selection {
+    /// The `aria-current` word, where the selected one is the place the person is.
+    pub fn aria_current(self) -> &'static str {
+        self.aria()
+    }
+
     /// The `aria-selected` word.
     pub fn aria(self) -> &'static str {
         match self {

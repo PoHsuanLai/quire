@@ -6,7 +6,7 @@ use crate::cases::{Case, DANA};
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{ActionId, Anim, HoverStrip, Icon, ItemKind, PlaceId, Presence, Shown, SidebarItem};
-use ds::{DropState, Here, PulseKey};
+use ds::{DropState, PulseKey, Selection};
 
 /// A place named `place`, in `drop` state, with every pointer hook attached.
 fn place(kind: ItemKind, label: &str, place: &str, drop: DropState) -> Element {
@@ -14,7 +14,7 @@ fn place(kind: ItemKind, label: &str, place: &str, drop: DropState) -> Element {
         SidebarItem {
             kind,
             label,
-            here: Here::Elsewhere,
+            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,

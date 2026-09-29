@@ -7,7 +7,7 @@
 
 use crate::components::controls::press::PressListeners;
 use crate::core::press::Press;
-use crate::core::vocab::Here;
+use crate::core::vocab::Selection;
 use dioxus::prelude::*;
 
 /// The group: `children` are its `WorkspacePill`s (or the caller's wrappers around them).
@@ -22,7 +22,7 @@ pub fn WorkspacePills(label: String, children: Element) -> Element {
 #[component]
 pub fn WorkspacePill(
     label: String,
-    #[props(default)] current: Here,
+    #[props(default)] current: Selection,
     onclick: EventHandler<Press>,
     #[props(default)] id: Option<String>,
 ) -> Element {
@@ -33,8 +33,8 @@ pub fn WorkspacePill(
             class: "ds-ws-pill",
             id,
             "aria-current": match current {
-                Here::Current => "true",
-                Here::Elsewhere => "false",
+                Selection::Selected => "true",
+                Selection::Unselected => "false",
             },
             onclick: move |event| listen.click(&event),
             oncontextmenu: move |event| listen.context_menu(&event),

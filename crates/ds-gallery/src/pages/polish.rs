@@ -12,10 +12,10 @@ use dioxus::prelude::*;
 use ds::Alpha;
 use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, DockFloor,
-    DockFloorSetting, DockMetrics, Ds, Emphasis, Here, Icon, IconButton, IconButtonVariant,
-    IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuBarItem, MenuEntrance,
-    MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, RunningDot,
-    Scheme, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, Tooltip, TooltipKind,
+    DockFloorSetting, DockMetrics, Ds, Emphasis, Icon, IconButton, IconButtonVariant, IconSize,
+    IconSource, IconView, Inject, Material, MaterialStack, MenuBarItem, MenuEntrance, MenuEntry,
+    MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, RunningDot, Scheme,
+    Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, Tooltip, TooltipKind,
     WorkspacePill, WorkspacePills, use_scope,
 };
 
@@ -149,7 +149,7 @@ fn MenuBarSection() -> Element {
                 Root { material: Material::Bar, style: "width:100%",
                     div { class: "g-polish-bar",
                         WorkspacePills { label: "Workspaces",
-                            WorkspacePill { label: "1", current: Here::Current, onclick: |_| {} }
+                            WorkspacePill { label: "1", current: Selection::Selected, onclick: |_| {} }
                             WorkspacePill { label: "2", onclick: |_| {} }
                             WorkspacePill { label: "3", onclick: |_| {} }
                         }

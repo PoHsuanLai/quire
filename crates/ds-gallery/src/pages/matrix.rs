@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
-    Emphasis, Fraction, Here, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence,
+    Emphasis, Fraction, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence,
     PulseKey, Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex,
     Surface, Tabs, TextInput, Toggle, Verdict,
 };
@@ -113,7 +113,7 @@ fn Cell(subject: Subject) -> Element {
             SidebarItem {
                 kind: ItemKind::Place { icon: Icon::Inbox },
                 label: "Inbox",
-                here: Here::Current,
+                here: Selection::Selected,
                 count: Some(12),
                 presence: Presence::Present,
                 preview: None,
@@ -124,7 +124,7 @@ fn Cell(subject: Subject) -> Element {
             SidebarItem {
                 kind: ItemKind::Place { icon: Icon::Star },
                 label: "Starred",
-                here: Here::Elsewhere,
+                here: Selection::Unselected,
                 count: None,
                 presence: Presence::Present,
                 preview: None,

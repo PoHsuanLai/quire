@@ -183,8 +183,8 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Activity, Availability, Check, DropState, Emphasis, Fraction, Here, Percent, Selection,
-        Shortcut, ShortcutKey, Shown, StaggerIndex,
+        Activity, Availability, Check, DropState, Emphasis, Fraction, Percent, Selection, Shortcut,
+        ShortcutKey, Shown, StaggerIndex,
     },
 };
 pub use crate::edit::{

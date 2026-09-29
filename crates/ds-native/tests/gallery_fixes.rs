@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DotIndex, Ds, Fraction, Grain, HeaderKind, Here, Icon, InputVariant, ItemKind,
-    Material, PRESETS, Presence, PulseKey, Rect, Scheme, SearchField, SectionHeader, SendPhase,
+    Appearance, DotIndex, Ds, Fraction, Grain, HeaderKind, Icon, InputVariant, ItemKind, Material,
+    PRESETS, Presence, PulseKey, Rect, Scheme, SearchField, SectionHeader, Selection, SendPhase,
     SendPill, SidebarItem, SpaceEditor, SpaceLook, TextInput, Theme, use_toasts,
 };
 use ds_native::{Harness, Viewport};
@@ -234,10 +234,10 @@ fn ItemsApp() -> Element {
         Root {
             div { style: "width:220px",
                 div { class: "probe-counted",
-                    SidebarItem { kind: ItemKind::Place { icon: Icon::Inbox }, label: "Inbox", here: Here::Elsewhere, count: Some(12), presence: Presence::Present, preview: None, pulse: PulseKey::rest(ds::Anim::Gulp), onclick: |_| {}, onclose: None }
+                    SidebarItem { kind: ItemKind::Place { icon: Icon::Inbox }, label: "Inbox", here: Selection::Unselected, count: Some(12), presence: Presence::Present, preview: None, pulse: PulseKey::rest(ds::Anim::Gulp), onclick: |_| {}, onclose: None }
                 }
                 div { class: "probe-bare",
-                    SidebarItem { kind: ItemKind::Place { icon: Icon::Star }, label: "Starred", here: Here::Elsewhere, count: None, presence: Presence::Present, preview: None, pulse: PulseKey::rest(ds::Anim::Gulp), onclick: |_| {}, onclose: None }
+                    SidebarItem { kind: ItemKind::Place { icon: Icon::Star }, label: "Starred", here: Selection::Unselected, count: None, presence: Presence::Present, preview: None, pulse: PulseKey::rest(ds::Anim::Gulp), onclick: |_| {}, onclose: None }
                 }
             }
         }

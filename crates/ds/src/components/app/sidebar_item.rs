@@ -4,7 +4,7 @@
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
-use crate::core::vocab::{DropState, Here};
+use crate::core::vocab::{DropState, Selection};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::presence::Presence;
@@ -105,7 +105,7 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 pub fn SidebarItem(
     kind: ItemKind,
     label: String,
-    here: Here,
+    here: Selection,
     count: Option<u32>,
     presence: Presence,
     preview: Option<Preview>,
@@ -143,7 +143,7 @@ pub fn SidebarItem(
                 onpointermove: relay(onpointermove),
                 onpointerup: relay(onpointerup),
                 onclick: move |_| onclick.call(()),
-                if here == Here::Current {
+                if here == Selection::Selected {
                     span { class: "ds-sidebar-item-seal" }
                 }
                 Glyph { icon, size: IconSize::Base }
