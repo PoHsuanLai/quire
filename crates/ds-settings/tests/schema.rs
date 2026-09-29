@@ -81,10 +81,6 @@ const SILL_OWNED: &[&str] = &[
     "launcher.material",
 ];
 
-/// `appearance.motion_level` is also addressable as `motion.level` (section 3.2): a doc row,
-/// not a second Rust field.
-const DOC_ALIASES: &[&str] = &["motion.level"];
-
 fn keys_in_section(doc: &str, heading: &str, next_heading: &str) -> Vec<String> {
     let start = doc
         .find(heading)
@@ -121,7 +117,7 @@ fn every_key_in_catalogue_has_a_spec() {
 
     let mut seen = Vec::new();
     for doc_key in &doc_keys {
-        if SILL_OWNED.contains(&doc_key.as_str()) || DOC_ALIASES.contains(&doc_key.as_str()) {
+        if SILL_OWNED.contains(&doc_key.as_str()) {
             continue;
         }
         assert!(
@@ -139,15 +135,15 @@ fn every_key_in_catalogue_has_a_spec() {
 }
 
 #[test]
-fn every_sill_owned_and_alias_row_named_here_is_still_in_the_doc() {
+fn every_sill_owned_row_named_here_is_still_in_the_doc() {
     let doc =
         std::fs::read_to_string(Path::new(DOC_PATH)).unwrap_or_else(|e| panic!("{DOC_PATH}: {e}"));
     let mut doc_keys = keys_in_section(&doc, "### 3.1 `appearance`", "### 3.2 `motion`");
     doc_keys.extend(keys_in_section(&doc, "### 3.2 `motion`", "### 3.3 `icons`"));
-    for key in SILL_OWNED.iter().chain(DOC_ALIASES) {
+    for key in SILL_OWNED {
         assert!(
             doc_keys.iter().any(|k| k == key),
-            "{key} listed in SILL_OWNED/DOC_ALIASES but not found in the doc"
+            "{key} listed in SILL_OWNED but not found in the doc"
         );
     }
 }
