@@ -39,7 +39,7 @@ fn main() {
     let dir = PathBuf::from(
         std::env::args()
             .nth(1)
-            .unwrap_or_else(|| "audit/current".into()),
+            .unwrap_or_else(|| "target/sizing_audit".into()),
     );
     std::fs::create_dir_all(&dir).expect("out dir");
     for (theme, app) in [("light", Light as fn() -> Element), ("dark", Dark)] {

@@ -1,7 +1,7 @@
 # 29 Sizing: control heights, spacing and radii from rules
 
 Status: **settled and built** (2026-09-28; decisions in section 13, what landed in section 15).
-It began as a research and proposal pass. The audit material is in `audit/` (section 2). Confidence
+It began as a research and proposal pass (section 2). Confidence
 legend as in `23-WIDGETS.md`: **H** primary source (Apple's own design templates, HIG or
 Support pages), **M** reliable secondary source or a careful measurement, **L** estimate. The
 reference is the pre-Liquid-Glass Mac (macOS 14 Sonoma and 15 Sequoia;
@@ -28,21 +28,11 @@ This document:
 
 ## 2. How the audit was made
 
-Everything is under `audit/` in this worktree (branch `sizing-audit`).
-
-| What | Where | How |
-| --- | --- | --- |
-| Every literal `px` size in quire's component sheets | `audit/hardcoded-px.tsv` (250 rows: file, selector, declaration) | a CSS parse of `crates/ds/src/components/*.css`, comments stripped, shadows and transforms left out |
-| Measured boxes of the shell controls | `audit/current/measured.txt` | `cargo run --release -p ds-native --example sizing_audit -- audit/current`: the laid-out rect of each part (`Harness::rect`) at 1x |
-| Specimen sheets of the controls as they stand, light and dark, 1x and 2x | `audit/current/specimens-{light,dark}-{1,2}x.png` | the same example: a 32 px bar, toggle, slider, segmented, buttons, module tiles and panel, tinted plates |
-| Gallery crops at 1x and 2x | `audit/gallery/gallery-{buttons,status-items,matrix,control-center}-{light,dark}-{1,2}x.png` | `ds-gallery --page P --snapshot DIR --scale 100\|200`, cropped |
-| sill's bar and control center, live | `audit/current/{bar,bar-cosmic,bar-cosmic-menu,control-center-cosmic,control-center-wifi-cosmic}.png` | copied from sill's `dev/out/` (the 2026-09-27 acceptance runs on nested cosmic-comp at scale 1). sill has no stand-alone headless PNG path: `dev/shot.sh --surface NAME` goes through a running daemon (`sill debug capture`), and its render tests check HTML only |
-| Dock icons in each style | `audit/icons/dock-icons-*.png`, `audit/icons/dock-strip.png`, `audit/icons/shipped-styles-light-dark.png` | sill's `dev/out/` captures; the shipped PNG sets composited on light and dark grounds |
-| Mockups of the options | `audit/mockups/{bar,cc,controls}-{light,dark}-{1,2}x.png`, `audit/mockups/plates-dark-{1,2}x.png` | `python3 audit/mockups/build.py && audit/mockups/render.sh` (headless Chrome, Inter). Every number drawn comes from the `OPTIONS` table in `build.py` |
-
-Gotcha found on the way: `ds-gallery --snapshot DIR` at scale 100 also writes into
-`tools/progress/shots/gallery/` (`snapshot::progress_dir`), overwriting tracked PNGs. They were
-restored with `git checkout`. Worth a flag (`--no-progress`) or a note in the gallery's usage.
+The audit's working files (a CSS parse of every literal `px` in quire's component sheets,
+specimen sheets, gallery crops, sill captures and HTML mockups of the options) were removed once
+the decisions settled; the numbers below are what they measured. The measured boxes come from
+`cargo run --release -p ds-native --example sizing_audit -- DIR`: the laid-out rect of each part
+(`Harness::rect`) at 1x.
 
 ## 3. Inventory
 
@@ -57,7 +47,7 @@ restored with `git checkout`. Worth a flag (`--no-progress`) or a note in the ga
 | Status metrics | box 22, glyph 16 | `IconButton { Status }` fallbacks | From `bar.status_icon_box_px`, `bar.status_glyph_px` |
 | Type | control 13, small 12, help 11.5, body 13.5, base 15; inherited `line-height:1.55` | `tokens/type_scale.rs`, `css/reset.css:10` | The 1.55 line is the reading line; controls inherit it |
 
-### 3.2 Control geometry, measured (1x, light, `audit/current/measured.txt`)
+### 3.2 Control geometry, measured (1x, light)
 
 | Part | Box (w x h) | Where the height comes from |
 | --- | --- | --- |
@@ -79,7 +69,7 @@ restored with `git checkout`. Worth a flag (`--no-progress`) or a note in the ga
 | Settings row | min 44 | literal |
 | Menu row, slim/dropdown | 22 | `--shell-menu-row` |
 
-The literal sizes in `audit/hardcoded-px.tsv` fall into these groups: avatar sizes 16, 18, 20,
+The literal sizes in quire's component sheets fall into these groups: avatar sizes 16, 18, 20,
 22, 26, 28, 30, 34, 48, 64; glyph boxes 11, 13, 14, 16, 17, 18, 20, 22; control boxes 22, 24,
 26, 28, 34, 38; widths of floating surfaces 220, 226, 250, 260, 280, 296, 300, 540.
 
@@ -258,9 +248,6 @@ Shell composition:
 | Toggle in a settings row | 38 x 26 | S: 26 x 15 (the reference's mini in form rows) |
 | Buttons | Regular 38 r9, Mini 24 r9 | M 22 r5, S 16 r4, L 28 r6 |
 
-Mockups: `audit/mockups/bar-{light,dark}-{1,2}x.png` (row A),
-`audit/mockups/cc-{light,dark}-{1,2}x.png` (column A), `audit/mockups/controls-{light,dark}-{1,2}x.png`.
-
 For: exact parity with the target (27's aim), the smallest and densest shell, every number
 cited. Against: a big step down from today (a 24 bar is 8 px shorter; buttons lose 16 px), which
 also moves mailo if the app components share the ladder; 16 px S controls are small on a 1x
@@ -342,14 +329,13 @@ The bar height is the one number worth a separate decision (section 13): A says 
 **What happens.** A tinted plate keeps each stop's OKLCh lightness and replaces hue and chroma
 (`icon/retint.rs::recolour`, `icon/plate_tint.rs`). In dark, the neutral plate is `#2A2E28` to
 `#1D211B` (L .30 and .24, `icon/family.rs:74`), so a Monochrome neutral plate is a dark navy
-about `#222C42`: **1.00:1** against a dark dock of `#2A2C30` (`audit/mockups/plates-dark.txt`).
+about `#222C42`: **1.00:1** against a dark dock of `#2A2C30`.
 A third-party raster keeps its own lightness too, so Chrome's ring or a black logo stays near
-black on it. The shipped quire icon sets are fine (their Monochrome sets sit at L .55-.64,
-`audit/icons/shipped-styles-light-dark.png`); the trouble is the neutral plate, and the
-third-party raster on it (`audit/icons/dock-strip.png`, bottom row). Muted keeps the same dark
+black on it. The shipped quire icon sets are fine (their Monochrome sets sit at L .55-.64); the
+trouble is the neutral plate, and the third-party raster on it. Muted keeps the same dark
 neutral plate, so it fails the same way.
 
-Three fixes (`audit/mockups/plates-dark-{1,2}x.png`):
+Three fixes:
 
 | Fix | Rule | Plate on the dark dock | Glyph on plate | Raster's dark ink |
 | --- | --- | --- | --- | --- |

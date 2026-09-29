@@ -9,7 +9,7 @@ use crate::appearance::Scheme;
 use crate::space::{PRESETS, ratio};
 use crate::tokens::Hex;
 
-/// The dark dock the mockups measured against (`audit/mockups/build.py`).
+/// The dark dock the sizing mockups measured against (design/29-SIZING.md section 11).
 const DOCK_DARK: &str = "#2A2C30";
 /// A third-party raster's darkest ink: Chrome's ring, a black logo.
 const RASTER_DARK: [u8; 4] = [0x20, 0x21, 0x24, 255];
