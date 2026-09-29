@@ -89,6 +89,18 @@ pub enum Check {
     Mixed,
 }
 
+/// What closes a floating layer (`NSPopover.Behavior`, design/30 section 1.5).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Dismiss {
+    /// Escape, or a click outside.
+    #[default]
+    Transient,
+    /// Escape only.
+    Semitransient,
+    /// Neither: only its owner closes it.
+    Manual,
+}
+
 /// Whether a thing is heard, or shown at full strength (design/30 section 1.5): a volume's
 /// speaker glyph, an avatar's colour (an account not in view keeps its hue at .55 of its
 /// chroma; `data-muting`).

@@ -13,13 +13,14 @@ use crate::core::geometry::{
     units::{Point, Px, Rect, Size},
 };
 use crate::core::time::{FRAME_SLACK, clock::sleep};
+use crate::core::vocab::Dismiss;
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
 use crate::motion::anim::Anim;
 use crate::motion::timer::use_motion_timer;
 use crate::stack::host::{OverlayId, Overlays, use_overlays};
-use crate::stack::layer_stack::{Dismiss, Dismissal, LayerId, LayerStack};
+use crate::stack::layer_stack::{Dismissal, LayerId, LayerStack};
 use crate::style::tokens::layer::ZLayer;
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
@@ -228,7 +229,7 @@ impl Float {
     /// that click.
     pub(crate) fn show(&self, surface: Element, onclose: EventHandler<()>) {
         let float = *self;
-        let catches = matches!(self.stacking, Stacking::Layer(Dismiss::EscAndOutside));
+        let catches = matches!(self.stacking, Stacking::Layer(Dismiss::Transient));
         let bounds = self.bounds;
         let content = rsx! {
             div {

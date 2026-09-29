@@ -10,10 +10,10 @@ use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
 use crate::components::overlays::scrim_strength::ScrimStrength;
 use crate::components::overlays::{sheet_placement::SheetPlacement, sheet_width::SheetWidth};
+use crate::core::vocab::Dismiss;
 use crate::core::vocab::Shown;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spring::{SpringPresence, Step, use_spring_presence};
-use crate::stack::layer_stack::Dismiss;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
@@ -49,7 +49,7 @@ pub fn Sheet(
     #[props(default)] id: Option<String>,
     children: Element,
 ) -> Element {
-    let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
+    let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::Semitransient));
     let showing = use_spring_presence(shown, on_hidden, Anim::PeekIn);
     // Mounted hidden: off the stack (after `use_float`'s own push) until first shown.
     use_hook(move || {

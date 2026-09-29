@@ -32,8 +32,8 @@ use crate::components::menus::palette::palette_shown::{
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
+use crate::core::vocab::Dismiss;
 use crate::core::word::Word;
-use crate::stack::layer_stack::Dismiss;
 
 use crate::components::fields::search_field::SearchField;
 use crate::components::fields::text_input_focus::FieldFocus;
@@ -149,7 +149,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(into, default)] reveal: RevealCue,
     #[props(default)] handle: Option<PaletteHandle>,
 ) -> Element {
-    let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::EscOnly));
+    let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::Semitransient));
     let showing = use_showing(shown, entrance.anim());
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);

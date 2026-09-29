@@ -8,9 +8,9 @@
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
 use crate::components::overlays::scrim::scrim_button;
+use crate::core::vocab::Dismiss;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::stack::layer_stack::Dismiss;
 use crate::style::appearance::peek::PeekMode;
 use crate::style::icon::Icon;
 use crate::style::tokens::layer::ZLayer;
@@ -40,7 +40,7 @@ pub fn Peek(
     onclose: EventHandler<()>,
     children: Element,
 ) -> Element {
-    let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::EscOnly));
+    let float = use_float(ZLayer::Peek, Stacking::Layer(Dismiss::Semitransient));
     let presence = use_entrance(entrance(mode));
     // Both close controls say "Close peek" (`S:1579`); the dialog is labelled by its thread.
     let close = "Close peek".to_string();
