@@ -139,9 +139,9 @@ pub(crate) fn use_playback<T: Timeline>(timeline: T) -> Playback<T> {
     }
 }
 
-/// Hand `emit` each frame of `timeline` from a frame `FRAME_TICK` after `started`, and the last
-/// one, at exactly [`Timeline::total`], when it settles. Ends early with [`Gone`] when `emit`
-/// says its target has.
+/// Hand `emit` the frame of `timeline` now (`started` ago), then one each `FRAME_TICK`, the last
+/// at exactly [`Timeline::total`] when it settles. Ends early with [`Gone`] when `emit` says its
+/// target has.
 pub(crate) async fn tick<T: Timeline>(
     timeline: &T,
     started: Instant,
@@ -149,15 +149,15 @@ pub(crate) async fn tick<T: Timeline>(
 ) -> Result<(), Gone> {
     let total = timeline.total();
     loop {
-        let wait = match total.saturating_sub(clock::since(started)) {
-            left if left.is_zero() => FRAME_TICK,
-            left => FRAME_TICK.min(left),
-        };
-        clock::sleep(wait).await;
         let elapsed = clock::since(started);
         emit(timeline.at(elapsed))?;
         if timeline.settled(elapsed) {
             return Ok(());
         }
+        let wait = match total.saturating_sub(elapsed) {
+            left if left.is_zero() => FRAME_TICK,
+            left => FRAME_TICK.min(left),
+        };
+        clock::sleep(wait).await;
     }
 }
