@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 /// Three states and not a bool: "follow the desktop" is a different choice from "light",
 /// and a client that cannot express it either ignores the desktop or cannot be overridden
 /// when the desktop is wrong.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Theme {
     /// Follow the desktop.
@@ -23,30 +23,6 @@ pub enum Theme {
     Light,
     /// The dark palette, even when the desktop is light.
     Dark,
-}
-
-impl Theme {
-    /// Every choice, in the order a picker offers them.
-    pub const ALL: [Theme; 3] = [Theme::System, Theme::Light, Theme::Dark];
-
-    /// What a picker calls it.
-    pub fn label(self) -> &'static str {
-        match self {
-            Theme::System => "System",
-            Theme::Light => "Light",
-            Theme::Dark => "Dark",
-        }
-    }
-
-    /// The palette a stored word names, or [`None`] for a word that is not one.
-    pub fn parse(word: &str) -> Option<Theme> {
-        match word {
-            "system" => Some(Theme::System),
-            "light" => Some(Theme::Light),
-            "dark" => Some(Theme::Dark),
-            _ => None,
-        }
-    }
 }
 
 /// The palette a surface actually paints: a [`Theme`] with "follow the desktop" answered.

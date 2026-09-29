@@ -40,7 +40,7 @@ pub enum Zoom {
 
 /// A placement the tiling menu offers (macOS Sequoia's Window > Move & Resize). Named
 /// `WindowTile` because `ds::MenuTile` is a menu row's leading tile.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum WindowTile {
     /// The whole work area: the same as `Zoom::Maximize`.
     Fill,
@@ -50,26 +50,6 @@ pub enum WindowTile {
     RightHalf,
     /// The current size, centred on the output.
     Centre,
-}
-
-impl WindowTile {
-    /// Every placement, in the menu's order.
-    pub const ALL: [WindowTile; 4] = [
-        WindowTile::Fill,
-        WindowTile::LeftHalf,
-        WindowTile::RightHalf,
-        WindowTile::Centre,
-    ];
-
-    /// The menu row's title.
-    pub fn title(self) -> &'static str {
-        match self {
-            WindowTile::Fill => "Fill",
-            WindowTile::LeftHalf => "Left half",
-            WindowTile::RightHalf => "Right half",
-            WindowTile::Centre => "Centre",
-        }
-    }
 }
 
 /// Why a host did not place its window.

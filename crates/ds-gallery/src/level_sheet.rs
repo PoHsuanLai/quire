@@ -84,7 +84,12 @@ fn variants_at(scale_percent: u16) -> Result<RgbaImage, GalleryError> {
         .map(|look| {
             let rows = [Scheme::Light, Scheme::Dark]
                 .into_iter()
-                .flat_map(|scheme| Ground::ALL.map(|ground| (look, scheme, ground)))
+                .flat_map(|scheme| {
+                    Ground::ALL
+                        .iter()
+                        .copied()
+                        .map(move |ground| (look, scheme, ground))
+                })
                 .map(|row| row_at(row, scale_percent))
                 .collect::<Result<Vec<_>, _>>()?;
             Ok(stacked(&rows, 0))

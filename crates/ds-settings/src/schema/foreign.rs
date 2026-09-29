@@ -27,7 +27,7 @@ fn variants_of<T: Copy + Serialize>(all: &[T]) -> Vec<String> {
 
 impl SchemaVariants for ds::Theme {
     fn variants() -> Vec<String> {
-        variants_of(&ds::Theme::ALL)
+        variants_of(ds::Theme::ALL)
     }
 }
 

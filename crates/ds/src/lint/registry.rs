@@ -85,10 +85,12 @@ fn collect() -> HashSet<String> {
         .chain(SHAPE_VARS)
         .chain(ladder_vars())
         .collect();
-    let hues = LabelHue::ALL
-        .iter()
-        .copied()
-        .flat_map(|hue| HueMember::ALL.map(|member| hue.var(member)));
+    let hues = LabelHue::ALL.iter().copied().flat_map(|hue| {
+        HueMember::ALL
+            .iter()
+            .copied()
+            .map(move |member| hue.var(member))
+    });
     let swatches = Accent::ALL.iter().copied().map(swatch_var);
     let people = PersonSwatch::ALL.into_iter().map(PersonSwatch::var);
     // Ask the frame for its names rather than restating them; a Space that lends its hue

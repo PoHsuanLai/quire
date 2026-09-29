@@ -5,3 +5,6 @@
 pub(crate) mod ds;
 pub(crate) mod sheets;
 pub(crate) mod stylesheet;
+
+#[cfg(test)]
+mod stored_words;

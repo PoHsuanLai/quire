@@ -87,7 +87,8 @@ fn scheme_tokens(scheme: Scheme) -> Vec<String> {
         .map(|token| declaration(token.var(), &colour_value(token, scheme)));
     let hues = LabelHue::ALL.iter().copied().flat_map(|hue| {
         HueMember::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .map(move |member| format!("{}:{};", hue.var(member), hue.value(member, scheme).css()))
     });
     let shadows = Shadow::ALL

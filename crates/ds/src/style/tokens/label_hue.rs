@@ -25,13 +25,8 @@ pub enum LabelHue {
     Violet,
 }
 
-impl HueMember {
-    /// Every member, in the order the stylesheet writes them.
-    pub(crate) const ALL: [HueMember; 3] = [HueMember::Base, HueMember::Deep, HueMember::Soft];
-}
-
 /// Which member of a hue's family: the base, the text-safe deep, or the soft tint.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum HueMember {
     /// `--c-<hue>`.
     Base,

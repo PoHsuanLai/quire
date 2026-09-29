@@ -70,7 +70,8 @@ pub fn AppearancePicker(
 ) -> Element {
     let size = layout.seg_size();
     let themes: Vec<(Theme, String)> = Theme::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|theme| (theme, theme.label().to_string()))
         .collect();
     rsx! {

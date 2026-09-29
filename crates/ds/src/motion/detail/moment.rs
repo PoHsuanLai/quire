@@ -1,9 +1,11 @@
 //! What a state change means to the person looking (design/26-DETAILS.md section 3.1).
 
+use crate::core::word::Word;
+
 /// The meaning of one state change. A component's [`crate::motion::detail::detailed::Detailed`]
 /// table names one for
 /// every transition of its own state; the primitives play what it names and nothing else.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum Moment {
     /// Nothing changed as drawn: 0 frames (R2, R3).
     Rest,
@@ -29,22 +31,4 @@ pub enum Moment {
     Preview,
     /// The element leaves.
     Dismiss,
-}
-
-impl Moment {
-    /// Every moment, in section 3.1's order.
-    pub const ALL: [Moment; 12] = [
-        Moment::Rest,
-        Moment::Appear,
-        Moment::Pending,
-        Moment::Progress,
-        Moment::Success,
-        Moment::Failure,
-        Moment::Change,
-        Moment::Select,
-        Moment::Attention,
-        Moment::Unavailable,
-        Moment::Preview,
-        Moment::Dismiss,
-    ];
 }
