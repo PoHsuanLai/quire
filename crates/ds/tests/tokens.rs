@@ -305,6 +305,14 @@ const PER_ELEMENT: &[&str] = &[
     "--em-disc",
     // A stepping spinner's angle (`Spinner`, design/26 R4).
     "--turn",
+    // The voice orb's size, size-derived look values and turn (`VoiceOrb`, design/30 section 2.9).
+    "--orb-size",
+    "--orb-blur",
+    "--orb-contrast",
+    "--orb-dot",
+    "--orb-shadow",
+    "--orb-mask",
+    "--orb-turn",
 ];
 
 #[test]

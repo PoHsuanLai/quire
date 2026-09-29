@@ -138,11 +138,21 @@ pub enum ColourToken {
     /// `--knob-fill`: a switch's and a slider's knob, a plain white disc in either scheme (the
     /// reference's; design/29-SIZING.md section 4 rows 4 and 15), set off by its shadow.
     Knob,
+    /// `--orb-bg`: the voice orb's ground, the ring it fades to at its rim and the dots over
+    /// it (design/30 section 2.9). Values per Look: Mac is the reference's oklch(95% .02 264.695)
+    /// light, darkened to oklch(24% .02 264.695) in dark.
+    OrbBg,
+    /// `--orb-c1`: the orb's first glow, oklch(75% .15 350) in the Mac Look (dark: 68%).
+    OrbC1,
+    /// `--orb-c2`: the orb's second glow, oklch(80% .12 200) in the Mac Look (dark: 72%).
+    OrbC2,
+    /// `--orb-c3`: the orb's third glow, oklch(78% .14 280) in the Mac Look (dark: 70%).
+    OrbC3,
 }
 
 impl ColourToken {
     /// Every colour token, in stylesheet order.
-    pub const ALL: [ColourToken; 40] = [
+    pub const ALL: [ColourToken; 44] = [
         ColourToken::Paper,
         ColourToken::Surface,
         ColourToken::Surface2,
@@ -183,6 +193,10 @@ impl ColourToken {
         ColourToken::SpellMark,
         ColourToken::ScrimIdle,
         ColourToken::Knob,
+        ColourToken::OrbBg,
+        ColourToken::OrbC1,
+        ColourToken::OrbC2,
+        ColourToken::OrbC3,
     ];
 
     /// The custom property: `--paper`, `--surface-2`, …
@@ -228,6 +242,10 @@ impl ColourToken {
             ColourToken::SpellMark => "--spell-mark",
             ColourToken::ScrimIdle => "--scrim-idle",
             ColourToken::Knob => "--knob-fill",
+            ColourToken::OrbBg => "--orb-bg",
+            ColourToken::OrbC1 => "--orb-c1",
+            ColourToken::OrbC2 => "--orb-c2",
+            ColourToken::OrbC3 => "--orb-c3",
         })
     }
 
@@ -278,6 +296,13 @@ impl ColourToken {
             // section 17.3.3).
             ColourToken::ScrimIdle => (solid(0x000000), solid(0x000000)),
             ColourToken::Knob => (WHITE, WHITE),
+            // The voice orb's four colours, the oklch values of the reference converted to
+            // sRGB (`orb_colours_are_the_oklch_values_they_name` proves them); dark is the same
+            // hues at a lower lightness so the glows do not dazzle on a dark ground.
+            ColourToken::OrbBg => (solid(0xE8EFFC), solid(0x1B1F29)),
+            ColourToken::OrbC1 => (solid(0xF383BB), solid(0xDF6AA6)),
+            ColourToken::OrbC2 => (solid(0x43D5DC), solid(0x04BBC3)),
+            ColourToken::OrbC3 => (solid(0xA9AFFE), solid(0x8D92F9)),
             // The sender's page stays white in a dark window (section 12).
             ColourToken::ForeignGround => (WHITE, WHITE),
             ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),
@@ -321,6 +346,33 @@ impl ColourToken {
                 let dark = accent_of(Accent::Postmark, Scheme::Dark);
                 (Colour::Solid(light.fill), Colour::Solid(dark.fill))
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Colour, ColourToken, Hex};
+    use crate::core::colour::fit::oklch_bytes;
+    use crate::style::appearance::theme::Scheme;
+
+    /// `(token, scheme, oklch lightness, chroma, hue)`: what each orb colour names.
+    const ORB: &[(ColourToken, Scheme, f64, f64, f64)] = &[
+        (ColourToken::OrbBg, Scheme::Light, 0.95, 0.02, 264.695),
+        (ColourToken::OrbC1, Scheme::Light, 0.75, 0.15, 350.0),
+        (ColourToken::OrbC2, Scheme::Light, 0.80, 0.12, 200.0),
+        (ColourToken::OrbC3, Scheme::Light, 0.78, 0.14, 280.0),
+        (ColourToken::OrbBg, Scheme::Dark, 0.24, 0.02, 264.695),
+        (ColourToken::OrbC1, Scheme::Dark, 0.68, 0.16, 350.0),
+        (ColourToken::OrbC2, Scheme::Dark, 0.72, 0.13, 200.0),
+        (ColourToken::OrbC3, Scheme::Dark, 0.70, 0.15, 280.0),
+    ];
+
+    #[test]
+    fn orb_colours_are_the_oklch_values_they_name() {
+        for (token, scheme, l, c, h) in ORB {
+            let want = Colour::Solid(Hex(oklch_bytes(*l, *c, *h)));
+            assert_eq!(token.value(*scheme), want, "{token:?} {scheme:?}");
         }
     }
 }

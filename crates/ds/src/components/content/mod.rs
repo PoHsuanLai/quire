@@ -1,5 +1,5 @@
-//! Content: text runs, rich text, icons and pictures, avatars, the status glyphs, the level glyph and
-//! the thumbnails a component shows.
+//! Content: text runs, rich text, icons and pictures, avatars, the status glyphs, the level glyph,
+//! the voice orb and the thumbnails a component shows.
 
 pub(crate) mod avatar;
 pub(crate) mod icon_source;
@@ -14,3 +14,4 @@ pub(crate) mod rich_text;
 pub(crate) mod shot_frame;
 pub(crate) mod status;
 pub(crate) mod text_runs;
+pub(crate) mod voice_orb;

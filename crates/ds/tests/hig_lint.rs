@@ -297,6 +297,11 @@ fn an_exception_covers_a_warning() {
 fn quires_own_sheet_warns_only_where_reviewed() {
     const REVIEWED: &[(Rule, &str, &str)] = &[
         (
+            Rule::FilterNotPainted,
+            ".ds-voice-orb-glow",
+            "the orb's blur softens its glows on the GPU renderer; vello_cpu and the contrast() step draw them sharp (FINDINGS \"CSS filter\")",
+        ),
+        (
             Rule::MinFontSize,
             ".ds-provider[*|data-size=row]",
             "the in-row provider mark's letter is a drawing in an 11 px mark, not text",

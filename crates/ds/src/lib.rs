@@ -78,6 +78,10 @@ pub use crate::components::{
             wifi_state::{WifiBars, WifiReach, WifiState},
         },
         text_runs::{RunTone, TextLine, TextRun},
+        voice_orb::{
+            model::{OrbColour, OrbColours},
+            view::{ORB_PERIOD, ORB_SIZE, VoiceOrb},
+        },
     },
     controls::{
         bump_on::Bumped,
@@ -178,8 +182,8 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Percent, Selection,
-        Shortcut, ShortcutKey, StaggerIndex, Switch,
+        Activity, Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Percent,
+        Selection, Shortcut, ShortcutKey, StaggerIndex, Switch,
     },
 };
 pub use crate::edit::{
