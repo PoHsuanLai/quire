@@ -1,7 +1,7 @@
 //! HoverCard: a preview that opens after the pointer rests, never marks read, never fetches
 //! (design/04-COMPONENTS.md section 22, design/06-INTERACTIONS.md section 3).
 //!
-//! A `HoverTarget` feeds the `HoverHub` (450 ms to open, 0 when warm; 150 ms to close; warm for
+//! A `HoverTarget` feeds the `HoverHub` (500 ms to open, 0 when warm; 150 ms to close; warm for
 //! 400 ms after) and records its rect when the pointer comes over it. The consumer renders a
 //! `HoverCard` for `hub.open().or(hub.leaving())`, keyed by the hover key so a replacement
 //! plays its own `hc-in`; the card places itself against that target by kind, with no flip

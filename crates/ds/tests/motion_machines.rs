@@ -485,8 +485,8 @@ fn stay_takes_an_exit_back_in_place() {
 fn roster_timings_follow_settle() {
     // design/05-MOTION.md section 7.1, Post Standard.
     let cases = [
-        ("fold", Anim::Fold, 0, 454),
-        ("unread fold", Anim::FoldHeavy, 0, 517),
+        ("fold", Anim::Fold, 0, 434),
+        ("unread fold", Anim::FoldHeavy, 0, 494),
         ("curl", Anim::Curl, 0, 594),
         ("heal, first row below", Anim::Heal, 0, 284),
         ("heal, third row below", Anim::Heal, 2, 320),
@@ -502,7 +502,7 @@ fn roster_timings_follow_settle() {
     }
     assert_eq!(
         settle(Anim::Fold, MotionLevel::Reduced, StaggerIndex::new(0)),
-        ms(94),
+        ms(184),
         "reduced"
     );
 }
@@ -543,11 +543,11 @@ fn close_after(n: u64) -> IntentEffect<u8> {
     IntentEffect::StartClose { after: ms(n) }
 }
 
-/// Opens card 1 cold: over at 0, the timer fires at 450.
+/// Opens card 1 cold: over at 0, the timer fires at 500.
 fn opened() -> Vec<Step> {
     vec![
-        (0, HoverEvent::Over(1), Ph::Pending(1, 450), open_after(450)),
-        (450, HoverEvent::OpenDue, Ph::Open(1), IntentEffect::Open(1)),
+        (0, HoverEvent::Over(1), Ph::Pending(1, 500), open_after(500)),
+        (500, HoverEvent::OpenDue, Ph::Open(1), IntentEffect::Open(1)),
     ]
 }
 
@@ -570,35 +570,35 @@ fn then(mut steps: Vec<Step>, more: impl IntoIterator<Item = Step>) -> Vec<Step>
 fn hover_intent_sequences() {
     use HoverEvent::*;
     let cases: Vec<(&str, Vec<Step>)> = vec![
-        ("cold: waits 450 ms, then opens", opened()),
+        ("cold: waits 500 ms, then opens", opened()),
         (
             "an early open timer is stale and ignored",
             vec![
-                (0, Over(1), Ph::Pending(1, 450), open_after(450)),
-                (449, OpenDue, Ph::Pending(1, 450), IntentEffect::None),
+                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
+                (499, OpenDue, Ph::Pending(1, 500), IntentEffect::None),
             ],
         ),
         (
             "moving within the pending target does not restart the wait",
             vec![
-                (0, Over(1), Ph::Pending(1, 450), open_after(450)),
-                (100, Over(1), Ph::Pending(1, 450), IntentEffect::None),
+                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
+                (100, Over(1), Ph::Pending(1, 500), IntentEffect::None),
             ],
         ),
         (
             "leaving before the card opens cancels it",
             vec![
-                (0, Over(1), Ph::Pending(1, 450), open_after(450)),
+                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
                 (200, Out, Ph::Idle, IntentEffect::CancelOpen),
-                (450, OpenDue, Ph::Idle, IntentEffect::None),
+                (500, OpenDue, Ph::Idle, IntentEffect::None),
             ],
         ),
         (
             "a suppressed target changes nothing",
             vec![
                 (0, OverSuppressed, Ph::Idle, IntentEffect::None),
-                (10, Over(1), Ph::Pending(1, 460), open_after(450)),
-                (100, OverSuppressed, Ph::Pending(1, 460), IntentEffect::None),
+                (10, Over(1), Ph::Pending(1, 510), open_after(500)),
+                (100, OverSuppressed, Ph::Pending(1, 510), IntentEffect::None),
             ],
         ),
         ("out closes after 150 ms and the hub is warm", closed()),
@@ -616,7 +616,7 @@ fn hover_intent_sequences() {
             "warm ends 400 ms after the close",
             then(
                 closed(),
-                [(1050, Over(2), Ph::Pending(2, 1500), open_after(450))],
+                [(1050, Over(2), Ph::Pending(2, 1550), open_after(500))],
             ),
         ),
         (
@@ -686,7 +686,7 @@ fn hover_intent_sequences() {
                 opened(),
                 [
                     (600, ClickInList, Ph::Idle, IntentEffect::Remove(1)),
-                    (700, Over(2), Ph::Pending(2, 1150), open_after(450)),
+                    (700, Over(2), Ph::Pending(2, 1200), open_after(500)),
                 ],
             ),
         ),
@@ -703,7 +703,7 @@ fn hover_intent_sequences() {
         (
             "a click in the list cancels a pending card",
             vec![
-                (0, Over(1), Ph::Pending(1, 450), open_after(450)),
+                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
                 (100, ClickInList, Ph::Idle, IntentEffect::CancelOpen),
             ],
         ),
@@ -748,7 +748,7 @@ fn warmth_follows_the_card_and_the_warm_window() {
     let mut warmth = Vec::new();
     for (at, event) in [
         (0, HoverEvent::Over(1)),
-        (450, HoverEvent::OpenDue),
+        (500, HoverEvent::OpenDue),
         (500, HoverEvent::Out),
         (650, HoverEvent::CloseDue),
     ] {

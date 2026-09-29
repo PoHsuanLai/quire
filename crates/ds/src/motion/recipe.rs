@@ -306,7 +306,7 @@ impl Anim {
             // `S:402`.
             Anim::HcOut => recipe(
                 "hc-out",
-                DurationToken::HcOut,
+                DurationToken::Quick,
                 EasingToken::Out,
                 Fill::Forwards,
                 Iteration::Once,
@@ -346,7 +346,7 @@ impl Anim {
             // `C:546`.
             Anim::Shake => recipe(
                 "shake",
-                DurationToken::ShakeLong,
+                DurationToken::Shake,
                 EasingToken::Shake,
                 Fill::None,
                 Iteration::Once,

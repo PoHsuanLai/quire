@@ -17,5 +17,5 @@
 
 .ds-popover.ds-tip{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip); border-radius:var(--r-item);
   animation:hc-in var(--t-move) var(--e-spring); }
-.ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-hc-out) var(--e-out) forwards; }
+.ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-quick) var(--e-out) forwards; }
 .ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-note); color:var(--ink-faint); }

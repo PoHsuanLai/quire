@@ -4,7 +4,7 @@
 //! that already has the pointer (a row's `PartHooks`, a pin, a Today item) keys the card on its
 //! own events instead: [`use_hover_intent`] hands it the same hub and anchor book the target
 //! uses, and [`HoverDriver::over`] files the anchor and feeds the machine in one call, so the
-//! 450 ms wait, the 150 ms close and the 400 ms warm window are the hub's, not re-implemented.
+//! 500 ms wait, the 150 ms close and the 400 ms warm window are the hub's, not re-implemented.
 //! The anchor may be [`HoverAnchor::Unplaced`]: with no layout (a server render, a host that
 //! cannot measure) the card still opens, at the overlay's corner, or in place with
 //! `flow: Flow::Inline`.

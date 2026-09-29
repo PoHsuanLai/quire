@@ -5,7 +5,7 @@
 //! elapsed share as `progress`; the ring drains by it, drawn as SVG attributes because a CSS
 //! transition on `stroke-dashoffset` does not run in Blitz (O-20, spike S6). The pill springs up
 //! on the frame after it mounts. Undo is offered while counting; once done it hides Undo and
-//! slides away after `SentHold` (1600 ms).
+//! slides away after `ToastHold`.
 //!
 //! C's outbox states ride on the same pill: a failed [`SendMood`] plays its one-shot, the ring
 //! can spin while the send waits on the outbox ([`SendRing::Spin`]), the button can say Cancel
@@ -138,11 +138,11 @@ pub fn SendPill(
             shown.set(Shown::Shown);
         })
     });
-    // Done: "Sent" stays up for SentHold, then the pill slides away (S:2342).
+    // Done: "Sent" stays up for ToastHold, then the pill slides away (S:2342).
     let mut held = use_hook(|| CopyValue::new(SendPhase::Counting));
     if phase == SendPhase::Done && *held.peek() == SendPhase::Counting {
         held.set(SendPhase::Done);
-        let hold = DelayToken::SentHold.delay();
+        let hold = DelayToken::ToastHold.delay();
         spawn(async move {
             sleep(hold).await;
             shown.set(Shown::Hidden);

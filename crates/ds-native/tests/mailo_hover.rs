@@ -102,7 +102,7 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
     );
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
     assert!(
-        opened.duration_since(entered) >= Duration::from_millis(450),
+        opened.duration_since(entered) >= Duration::from_millis(500),
         "the card opened only once the intent wait had fully run: {:?}",
         opened.duration_since(entered)
     );

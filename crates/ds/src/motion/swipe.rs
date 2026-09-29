@@ -11,6 +11,7 @@
 use crate::core::geometry::units::Px;
 use crate::core::vocab::Fraction;
 use crate::core::word::Word;
+use crate::style::tokens::delay::DelayToken;
 use std::time::Duration;
 
 /// A speed in logical pixels per second.
@@ -46,9 +47,6 @@ impl Default for SwipeMetrics {
 
 /// How far a press may move and still be a press, not a drag (the pull tab's 3 px).
 const TAP_SLOP: f32 = 3.0;
-
-/// A move older than this at the release says the pointer had stopped: no fling.
-const FLING_WINDOW: Duration = Duration::from_millis(100);
 
 /// One pointer position along the swipe, and when.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -264,12 +262,12 @@ fn shaped(raw: Px, metrics: SwipeMetrics) -> Px {
 }
 
 /// The pointer's speed at a release at `at`, from its last two positions; nothing when it had
-/// stopped (its last move was more than [`FLING_WINDOW`] before the release) or moved once.
+/// stopped (its last move was more than [`DelayToken::ReleaseWindow`] before the release) or moved once.
 fn release_speed(last: Sample, before: Option<Sample>, at: Stamp) -> Speed {
     let Some(before) = before else {
         return Speed(0.0);
     };
-    if at.0.saturating_sub(last.at.0) > FLING_WINDOW {
+    if at.0.saturating_sub(last.at.0) > DelayToken::ReleaseWindow.delay() {
         return Speed(0.0);
     }
     let seconds = last.at.0.saturating_sub(before.at.0).as_secs_f32();

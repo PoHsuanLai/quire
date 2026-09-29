@@ -1,4 +1,4 @@
-//! The undo toast's state: one visible at a time, each push restarting the 5200 ms hold
+//! The undo toast's state: one visible at a time, each push restarting the 5000 ms hold
 //! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
 //!
 //! The hold is a task of the root that provides the hub and drops with it; it writes through

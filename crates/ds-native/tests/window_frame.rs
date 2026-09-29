@@ -153,9 +153,9 @@ fn Switching() -> Element {
     }
 }
 
-/// The moment the `--t-scene` / `--e-out` curve reaches a quarter (bar_frame.rs has the same).
+/// The moment the `--t-big` / `--e-out` curve reaches a quarter (bar_frame.rs has the same).
 fn quarter_of_the_curve() -> Duration {
-    let length = DurationToken::Scene.duration(MotionLevel::Standard);
+    let length = DurationToken::Big.duration(MotionLevel::Standard);
     let curve = EasingToken::Out.easing(MotionLevel::Standard);
     let whole = length.as_millis() as u64;
     let at = (1..=whole)

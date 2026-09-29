@@ -111,7 +111,7 @@ impl<K> Default for HoverIntent<K> {
 }
 
 impl<K: Clone + PartialEq> HoverIntent<K> {
-    /// Apply `event` at `now` (450 ms open, 150 ms close, 400 ms warm).
+    /// Apply `event` at `now` (500 ms open, 150 ms close, 400 ms warm).
     ///
     /// Timer events carry no key, so a stale timer is recognised by its time: `OpenDue` and
     /// `CloseDue` act only once `now` has reached the phase's own `due`.
@@ -126,7 +126,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
                 to(IntentPhase::Idle, warm_until, IntentEffect::CancelOpen)
             }
             (IntentPhase::Open { key }, HoverEvent::Out | HoverEvent::LeaveCard) => {
-                let after = DelayToken::HoverClose.delay();
+                let after = DelayToken::CardClose.delay();
                 let due = now + after;
                 to(
                     IntentPhase::Closing { key, due },
@@ -213,7 +213,7 @@ fn over<K: Clone + PartialEq>(
         _ => {
             let after = match warm {
                 HoverWarmth::Warm => Duration::ZERO,
-                HoverWarmth::Cold => DelayToken::HoverOpen.delay(),
+                HoverWarmth::Cold => DelayToken::CardOpen.delay(),
             };
             to(
                 IntentPhase::Pending {

@@ -143,12 +143,12 @@ fn SwitchingBar() -> Element {
     }
 }
 
-/// When the cross-fade (`--t-scene` with `--e-out`, design/21 section 5) shows the two Spaces
+/// When the cross-fade (`--t-big` with `--e-out`, design/21 section 5) shows the two Spaces
 /// about equally: the first moment the curve reaches a quarter, asked of the token table. The
 /// incoming layer is then at .25 over the outgoing one at .75, over the new gradient beneath
 /// both, so the old Space weighs (1 - .25)^2 = .56 and the new one .44.
 fn half_of_the_fade() -> Duration {
-    let length = DurationToken::Scene.duration(MotionLevel::Standard);
+    let length = DurationToken::Big.duration(MotionLevel::Standard);
     let curve = EasingToken::Out.easing(MotionLevel::Standard);
     let whole = length.as_millis() as u64;
     let half = (1..=whole)
@@ -157,7 +157,7 @@ fn half_of_the_fade() -> Duration {
     ms(half)
 }
 
-/// A look change cross-fades the tint over `--t-scene` (380 ms at the standard level): partway,
+/// A look change cross-fades the tint over `--t-big` (400 ms at the standard level): partway,
 /// the corner is between the two Spaces' colours and is neither (design/21 section 5).
 #[test]
 fn a_look_change_cross_fades_the_tint() {

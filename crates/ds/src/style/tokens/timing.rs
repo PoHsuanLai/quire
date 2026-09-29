@@ -1,28 +1,23 @@
-//! Durations per motion level (design/05-MOTION.md sections 3.1-3.4).
+//! Durations per motion level (design/30-CATALOGUE.md section 1.2).
 //!
-//! The four base durations and `--t-ambient` follow the level; the named durations are
-//! literals that change only under `Reduced` (60 ms). Durations the prototypes wrote without a
-//! name (park, nudge, C's shake, sail, boat-return, spin, the send ring, the chip flash) are named here so an
-//! `Anim` can point at them.
-//!
-//! `Reduced` is 60 ms for every token of [`DurationKind::Motion`], the named ones included
-//! (design/05-MOTION.md section 3.2, "named durations (3.4) ... 60ms each"); a
-//! [`DurationKind::Hold`] token keeps its Standard value instead (a held
-//! state, not something that moves, so shortening it to 60 ms would make it unreadable rather
-//! than calmer). `--t-big-heavy` is `--t-big` x 1.15 at each level.
+//! The durations are literals that change only under `Reduced`, where every moving one is
+//! `--t-quick`: what still moves is a cross-fade (section 1.1). A [`DurationKind::Hold`] token
+//! keeps its Standard value instead (a held state, or the spinner's step, is not something that
+//! moves, so shortening it would make it unreadable rather than calmer). `--t-big-heavy` is
+//! `--t-big` x 1.15 at each level.
 
 use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
 use std::time::Duration;
 
-/// Whether Reduced motion shortens a [`DurationToken`] to 60 ms, or the token times a held
+/// Whether Reduced motion shortens a [`DurationToken`] to `--t-quick`, or the token times a held
 /// state a person must still be able to register regardless of motion level. Data on the
 /// token (`DurationToken::kind`) rather than a special case in its duration table, so a new
 /// hold is one match arm, not a second code path.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DurationKind {
-    /// Shortened to 60 ms under Reduced, like every other transition.
+    /// Shortened to `--t-quick` under Reduced, like every other transition.
     Motion,
     /// Keeps its Standard value under Reduced.
     Hold,
@@ -34,11 +29,12 @@ pub enum DurationKind {
 pub enum DurationToken {
     /// `--t-tap` 90 ms: press feedback.
     Tap,
-    /// `--t-quick` 170 ms: colour and opacity.
+    /// `--t-quick` 150 ms: colour and opacity, closes, cross-fades, and every moving duration
+    /// under Reduced.
     Quick,
     /// `--t-move` 250 ms: small movement.
     Move,
-    /// `--t-big` 420 ms: entrances and exits.
+    /// `--t-big` 400 ms: entrances and exits, and the Space colour cross-fade.
     Big,
     /// `--t-ambient` 5 s: the breathing halo.
     Ambient,
@@ -56,18 +52,15 @@ pub enum DurationToken {
     Send,
     /// `--t-float` 900 ms: the zZ floater, the destination pulse period.
     Float,
-    /// `--t-hc-out` 120 ms: the hover card leaving.
-    HcOut,
-    /// `--t-scene` 380 ms: the Space layer cross-fade.
-    Scene,
+    /// `--t-spin-step` 83 ms: one of the spinner's twelve spokes, a turn a second.
+    /// [`DurationKind::Hold`]: the spinner keeps turning under Reduced.
+    SpinStep,
     /// `--t-shake` 420 ms: `shake-x`.
     Shake,
     /// `--t-park` 420 ms: the composer page parking.
     Park,
     /// `--t-nudge` 520 ms: outbox retry.
     Nudge,
-    /// `--t-shake-long` 560 ms: C's outbox `shake`.
-    ShakeLong,
     /// `--t-sail` 1150 ms: the orphaned boat.
     Sail,
     /// `--t-boat-return` 900 ms: the orphaned boat's return.
@@ -125,15 +118,16 @@ impl DurationToken {
             DurationToken::Flash | DurationToken::SendRing => DurationKind::Hold,
             // A repaint floor for a counting number: it paces text, it does not move anything.
             DurationToken::CountStep => DurationKind::Hold,
+            // The spinner keeps turning under Reduced, as macOS's does.
+            DurationToken::SpinStep => DurationKind::Hold,
             _ => DurationKind::Motion,
         }
     }
 
     /// The table, in milliseconds.
     fn millis(self, level: MotionLevel) -> u64 {
-        const REDUCED: u64 = 60;
         if level == MotionLevel::Reduced && self.kind() == DurationKind::Motion {
-            return REDUCED;
+            return DurationToken::Quick.millis(MotionLevel::Standard);
         }
         match (self, level) {
             // `calc(var(--t-big) * 1.15)`. Crumple runs at `--t-big`, so its heavy form is the
@@ -142,9 +136,9 @@ impl DurationToken {
                 (DurationToken::Big.millis(level) * 115).div_ceil(100)
             }
             (DurationToken::Tap, _) => 90,
-            (DurationToken::Quick, _) => 170,
+            (DurationToken::Quick, _) => 150,
             (DurationToken::Move, _) => 250,
-            (DurationToken::Big, _) => 420,
+            (DurationToken::Big, _) => 400,
             (DurationToken::Ambient, _) => 5000,
             (DurationToken::Spark, _) => 520,
             (DurationToken::Curl, _) => 560,
@@ -152,12 +146,10 @@ impl DurationToken {
             (DurationToken::CurlHeavy, _) => 644,
             (DurationToken::Send, _) => 620,
             (DurationToken::Float, _) => 900,
-            (DurationToken::HcOut, _) => 120,
-            (DurationToken::Scene, _) => 380,
+            (DurationToken::SpinStep, _) => 83,
             (DurationToken::Shake, _) => 420,
             (DurationToken::Park, _) => 420,
             (DurationToken::Nudge, _) => 520,
-            (DurationToken::ShakeLong, _) => 560,
             (DurationToken::Sail, _) => 1150,
             (DurationToken::BoatReturn, _) => 900,
             (DurationToken::Spin, _) => 1100,

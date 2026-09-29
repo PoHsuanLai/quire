@@ -208,31 +208,31 @@ fn the_settle_table() {
     // design/05-MOTION.md section 7.1's worked values, index 0.
     #[rustfmt::skip]
     const CASES: &[(Anim, MotionLevel, u64)] = &[
-        (Anim::Fold, MotionLevel::Standard, 454),
-        (Anim::FoldHeavy, MotionLevel::Standard, 517),
+        (Anim::Fold, MotionLevel::Standard, 434),
+        (Anim::FoldHeavy, MotionLevel::Standard, 494),
         (Anim::Curl, MotionLevel::Standard, 594),
         (Anim::Heal, MotionLevel::Standard, 284),
         (Anim::Rise, MotionLevel::Standard, 284),
-        (Anim::HcOut, MotionLevel::Standard, 154),
+        (Anim::HcOut, MotionLevel::Standard, 184),
         (Anim::TabOut, MotionLevel::Standard, 284),
-        (Anim::Gulp, MotionLevel::Standard, 454),
+        (Anim::Gulp, MotionLevel::Standard, 434),
         (Anim::Floatup, MotionLevel::Standard, 934),
         (Anim::ComposeSend, MotionLevel::Standard, 654),
         (Anim::Park, MotionLevel::Standard, 454),
         (Anim::Spark, MotionLevel::Standard, 554),
-        (Anim::RowIn, MotionLevel::Standard, 454),
+        (Anim::RowIn, MotionLevel::Standard, 434),
         (Anim::Nudge, MotionLevel::Standard, 554),
-        (Anim::Shake, MotionLevel::Standard, 594),
-        (Anim::CrumpleHeavy, MotionLevel::Standard, 517),
+        (Anim::Shake, MotionLevel::Standard, 454),
+        (Anim::CrumpleHeavy, MotionLevel::Standard, 494),
         (Anim::CurlHeavy, MotionLevel::Standard, 678),
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
         // 37 and 64).
-        (Anim::PaletteFade, MotionLevel::Standard, 204),
-        (Anim::LinkPillIn, MotionLevel::Standard, 204),
-        (Anim::BubblePop, MotionLevel::Standard, 204),
+        (Anim::PaletteFade, MotionLevel::Standard, 184),
+        (Anim::LinkPillIn, MotionLevel::Standard, 184),
+        (Anim::BubblePop, MotionLevel::Standard, 184),
         (Anim::PeekFullIn, MotionLevel::Standard, 284),
         // The four keyframes the catalogue had no motion for.
-        (Anim::PillUp, MotionLevel::Standard, 454),
+        (Anim::PillUp, MotionLevel::Standard, 434),
         (Anim::RingDrain, MotionLevel::Standard, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         (Anim::Busy, MotionLevel::Standard, 5034),
@@ -243,7 +243,7 @@ fn the_settle_table() {
         (Anim::PaneOutR, MotionLevel::Standard, 284),
         // The OSD's entrance at --t-quick, its exit at --t-move (neither token moves
         // with the look's level but under Reduced).
-        (Anim::OsdIn, MotionLevel::Standard, 204),
+        (Anim::OsdIn, MotionLevel::Standard, 184),
         (Anim::OsdOut, MotionLevel::Standard, 284),
         // The level control's step mark, at --t-tap.
         (Anim::LevelTick, MotionLevel::Standard, 124),
@@ -256,7 +256,7 @@ fn the_settle_table() {
         (Anim::PanelIn, MotionLevel::Standard, 284),
         (Anim::PanelOut, MotionLevel::Standard, 284),
         // The screenshot thumbnail rises in at --t-big and slides out at --t-move.
-        (Anim::ShotIn, MotionLevel::Standard, 454),
+        (Anim::ShotIn, MotionLevel::Standard, 434),
         (Anim::ShotOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
@@ -266,7 +266,7 @@ fn the_settle_table() {
             "{anim:?} {level:?}"
         );
     }
-    // Every anim settles to 94 ms under Reduced, except a hold (`DurationToken::kind`):
+    // Every anim settles to 184 ms (`--t-quick` and a frame's slack) under Reduced, except a hold (`DurationToken::kind`):
     // `ChipFlash` times `--t-flash`, which keeps its Standard 1200 ms so the mentioned-person
     // ring is still visible under Reduced.
     for anim in Anim::ALL
@@ -275,7 +275,7 @@ fn the_settle_table() {
     {
         assert_eq!(
             settle(anim, MotionLevel::Reduced, StaggerIndex::default()),
-            Duration::from_millis(94),
+            Duration::from_millis(184),
             "{anim:?} Reduced"
         );
     }

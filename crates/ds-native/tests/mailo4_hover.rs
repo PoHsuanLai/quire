@@ -180,7 +180,7 @@ fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
     );
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
     assert!(
-        opened.duration_since(entered) >= Duration::from_millis(450),
+        opened.duration_since(entered) >= Duration::from_millis(500),
         "the card opened only once the intent wait had fully run: {:?}",
         opened.duration_since(entered)
     );
@@ -235,7 +235,7 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     );
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
     assert!(
-        opened.duration_since(entered) >= Duration::from_millis(450),
+        opened.duration_since(entered) >= Duration::from_millis(500),
         "the card opened only once the intent wait had fully run: {:?}",
         opened.duration_since(entered)
     );
