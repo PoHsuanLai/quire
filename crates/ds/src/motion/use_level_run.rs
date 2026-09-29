@@ -3,10 +3,10 @@
 //!
 //! Blitz's stylesheet cannot reach inside an SVG, so a ring whose arc must grow cannot be
 //! animated by a keyframe: the path itself has to change. As an animated emoji moves its frames from
-//! Rust timers, this hook runs a task that wakes every [`FRAME_TICK`], computes the frame
-//! ([`crate::motion::level_run::frame_at`]) and writes it only when it differs, and ends when the
-//! sweep and its tail are done: a sweep at rest runs no task and paints 0 frames (the
-//! idle-frame rule). The task belongs to the hook's owner and is dropped with it.
+//! Rust timers, this hook plays a [`Sweep`] on a playback, whose task wakes every `FRAME_TICK`,
+//! computes the frame and writes it only when it differs, and ends when the sweep and its tail
+//! are done: a sweep at rest runs no task and paints 0 frames (the idle-frame rule). The task
+//! belongs to the hook's owner and is dropped with it.
 //!
 //! On mount and on each new [`WakeStamp`] the level sweeps from empty; on a new level it sweeps
 //! from what it drew last (the old level, or wherever a running sweep had reached). Under
