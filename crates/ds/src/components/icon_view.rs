@@ -127,14 +127,14 @@ fn external_icon(external: &ExternalIcon, paint: Paint) -> Element {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct GlyphSlot;
 
-/// `Button { icon: Icon::Send }` keeps compiling now that the slot takes an [`IconSource`].
+/// `Button { icon: Icon::Send }`: a bare glyph fills a slot that takes an [`IconSource`].
 impl dioxus::core::SuperFrom<crate::icon::Icon, GlyphSlot> for Option<IconSource> {
     fn super_from(icon: crate::icon::Icon) -> Self {
         Some(IconSource::Glyph(icon))
     }
 }
 
-/// `Button { icon: Some(Icon::Archive) }` keeps compiling too.
+/// `Button { icon: Some(Icon::Archive) }` too.
 impl dioxus::core::SuperFrom<Option<crate::icon::Icon>, GlyphSlot> for Option<IconSource> {
     fn super_from(icon: Option<crate::icon::Icon>) -> Self {
         icon.map(IconSource::Glyph)
