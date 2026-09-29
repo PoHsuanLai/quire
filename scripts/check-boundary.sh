@@ -44,4 +44,40 @@ for rule in "${RULES[@]}"; do
   fi
 done
 
+# Layers inside ds, the crates it will split into (core, style, motion, lint, ds, shell), with
+# assembly on top. A file in a layer may name (`crate::<module>`) only its own layer and the
+# ones below it; mail's own components (components::app) are named by nothing but themselves
+# and the layers above the components. Doc links count: they would break at the split too.
+DS=crates/ds/src
+LAYERS=(
+  "core: style motion lint host focus edit file_drop spell window overlay root components shell assembly"
+  "style: motion lint host focus edit file_drop spell window overlay root components shell assembly"
+  "motion: lint host focus edit file_drop spell window overlay root components shell assembly"
+  "lint: host focus edit file_drop spell window overlay root components shell assembly"
+  "host focus edit file_drop spell window overlay root components: lint shell assembly components::app"
+  "shell: lint assembly"
+)
+layered=0
+for rule in "${LAYERS[@]}"; do
+  read -r -a dirs <<<"${rule%%:*}"
+  read -r -a above <<<"${rule#*:}"
+  pattern="crate::($(IFS='|'; echo "${above[*]}"))\\b"
+  for dir in "${dirs[@]}"; do
+    [ -d "$DS/$dir" ] || { echo "ERROR: $DS/$dir is missing; the layer was not checked"; fail=1; continue; }
+    hits=$(grep -rnE "$pattern" "$DS/$dir" | grep -v "^$DS/components/app/" || true)
+    if [ "$dir" = components ]; then
+      hits=$(grep -rnE "$pattern" "$DS/$dir" --exclude-dir=app || true)
+    fi
+    if [ -n "$hits" ]; then
+      echo "LAYER: $dir names a layer above it:"
+      echo "$hits" | head -20
+      layered=1
+      fail=1
+    fi
+  done
+done
+if [ "$layered" -eq 0 ]; then
+  echo "layers hold: core < style < motion < lint, ds < shell < assembly"
+fi
+
 exit "$fail"
