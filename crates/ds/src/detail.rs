@@ -7,7 +7,6 @@ pub use crate::motion::detail::{
     cue::Cue,
     detailed::{Detailed, first_table, moment_table},
     first_show::FirstShow,
-    idle_dim::{IdleDimPhase, use_idle_dim},
     layer_glyph::{LayerGlyph, Layering},
     moment::Moment,
     morph::{MorphStyle, Slashed},

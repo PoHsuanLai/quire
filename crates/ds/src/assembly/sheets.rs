@@ -81,7 +81,7 @@ pub(crate) const SHEETS: [(&str, &str); 87] = [
         "icon_view",
         include_str!("../components/content/icon_view.css"),
     ),
-    ("idle_dim", include_str!("../shell/idle_dim.css")),
+    ("idle_dim", include_str!("../shell/idle_dim/style.css")),
     ("kbd", include_str!("../components/controls/kbd.css")),
     ("chord", include_str!("../components/controls/chord.css")),
     ("level", include_str!("../components/controls/level.css")),

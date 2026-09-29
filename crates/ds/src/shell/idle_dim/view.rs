@@ -4,7 +4,7 @@
 //! display, this draws the dim and nothing else. It fades in over `--t-idle-dim --e-out`
 //! towards `level` and snaps to nothing the instant `phase` goes back to
 //! [`IdleDimPhase::Awake`] — there is no exit animation to wait for
-//! (`ds::detail::use_idle_dim`; CONSUMING.md "Idle dim").
+//! (`drive::use_idle_dim`; CONSUMING.md "Idle dim").
 //!
 //! **Where it goes.** Its own root, above every other surface: `Ds { extent:
 //! RootExtent::Viewport, chrome: Some(RootChrome::Transparent), .. }`, with `IdleDim` as the
@@ -12,7 +12,8 @@
 //! gives an all-positioned root one).
 
 use crate::core::vocab::Percent;
-use crate::motion::detail::idle_dim::{IdleDimPhase, use_idle_dim};
+use crate::shell::idle_dim::drive::use_idle_dim;
+use crate::shell::idle_dim::model::IdleDimPhase;
 use dioxus::prelude::*;
 
 /// The idle dim overlay. `level` is `idle.dim_level_pct` (10..90); `phase` is the caller's own
