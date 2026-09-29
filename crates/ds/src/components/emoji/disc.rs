@@ -3,7 +3,7 @@
 //! and deep on dark.
 
 use crate::appearance::theme::Scheme;
-use crate::space::palette::oklch_hex;
+use crate::core::colour::fit::oklch_hex;
 use serde::{Deserialize, Serialize};
 
 /// One of the icon palette's eight hues, for a tinted disc. Stored by its name (`"teal"`).

@@ -2,9 +2,9 @@
 
 use crate::components::avatar::{AvatarFace, face};
 use crate::components::vocab::PulseKey;
+use crate::core::colour::contrast::Verdict;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
-use crate::space::contrast::Verdict;
 use crate::tokens::label_hue::LabelHue;
 use dioxus::prelude::*;
 

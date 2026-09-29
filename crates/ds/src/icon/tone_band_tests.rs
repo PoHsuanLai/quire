@@ -4,9 +4,11 @@
 
 use super::family::PlateFamily;
 use super::plate_tint::{PlateStops, PlateTint};
-use super::retint::{IconStyle, Tint, oklab, retint_in};
+use super::retint::{IconStyle, Tint, retint_in};
 use crate::appearance::theme::Scheme;
-use crate::space::{contrast::ratio, presets::PRESETS};
+use crate::core::colour::contrast::ratio;
+use crate::core::colour::{oklab::Oklab, srgb::Srgb};
+use crate::space::presets::PRESETS;
 use crate::tokens::hex::Hex;
 
 /// The dark dock the sizing mockups measured against (design/29-SIZING.md section 11).
@@ -15,7 +17,7 @@ const DOCK_DARK: &str = "#2A2C30";
 const RASTER_DARK: [u8; 4] = [0x20, 0x21, 0x24, 255];
 
 fn lightness(colour: Hex) -> f64 {
-    oklab(colour.0)[0]
+    Oklab::from(Srgb(colour.0)).l
 }
 
 #[test]

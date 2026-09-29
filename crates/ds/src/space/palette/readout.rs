@@ -7,7 +7,7 @@
 
 use super::derive;
 use crate::appearance::{accent::Accent, theme::Scheme};
-use crate::space::contrast::{Verdict, ratio};
+use crate::core::colour::contrast::{Verdict, ratio};
 use crate::space::look::{CardAccent, SpaceLook};
 use crate::space::palette::card::card;
 use crate::tokens::accent_band::grounds::over;

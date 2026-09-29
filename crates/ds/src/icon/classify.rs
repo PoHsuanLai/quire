@@ -9,6 +9,8 @@
 //! one built with [`ChromaLimit::try_from`]. `sill` still has to register the key in its own
 //! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
 
+use crate::core::colour::oklab::{Oklab, Oklch};
+use crate::core::colour::srgb::Srgb;
 use crate::error::DsError;
 
 /// How an external icon should be drawn: the `IconSource` variant it belongs in.
@@ -86,25 +88,9 @@ pub fn classify_with(png: &[u8], limit: ChromaLimit) -> Result<IconKind, DsError
     })
 }
 
-/// The OKLCH chroma of an sRGB colour (Björn Ottosson's OKLab, 2020).
-pub(crate) fn chroma([r, g, b]: [u8; 3]) -> f64 {
-    let [r, g, b] = [r, g, b].map(linear);
-    let l = (0.412_221_470_8 * r + 0.536_332_536_3 * g + 0.051_445_992_9 * b).cbrt();
-    let m = (0.211_903_498_2 * r + 0.680_699_545_1 * g + 0.107_396_956_6 * b).cbrt();
-    let s = (0.088_302_461_9 * r + 0.281_718_837_6 * g + 0.629_978_700_5 * b).cbrt();
-    let a = 1.977_998_495_1 * l - 2.428_592_205_0 * m + 0.450_593_709_9 * s;
-    let b = 0.025_904_037_1 * l + 0.782_771_766_2 * m - 0.808_675_766_0 * s;
-    a.hypot(b)
-}
-
-/// An sRGB byte as linear light.
-fn linear(channel: u8) -> f64 {
-    let c = f64::from(channel) / 255.0;
-    if c <= 0.040_45 {
-        c / 12.92
-    } else {
-        ((c + 0.055) / 1.055).powf(2.4)
-    }
+/// The OKLCH chroma of an sRGB colour.
+pub(crate) fn chroma(rgb: [u8; 3]) -> f64 {
+    Oklch::from(Oklab::from(Srgb(rgb))).c
 }
 
 #[cfg(test)]

@@ -8,12 +8,12 @@ use crate::components::chip::{Chip, ChipVariant};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::slider::Slider;
 use crate::components::vocab::Fraction;
+use crate::core::colour::contrast::Verdict;
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::space::dot_paint::DotPaint;
 use crate::space::{
-    contrast::Verdict,
     look::{Grain, SpaceLook},
     palette::{Capping, derive, readout::readout},
     presets::PRESETS,

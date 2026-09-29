@@ -8,6 +8,7 @@ pub mod appearance;
 pub(crate) mod busy;
 pub mod catalog;
 pub mod components;
+pub(crate) mod core;
 pub mod css;
 pub mod detail;
 pub mod edit;
@@ -44,6 +45,7 @@ pub use crate::appearance::{
     theme::{Scheme, Theme},
     typeface::Typeface,
 };
+pub use crate::core::colour::contrast::{Verdict, ratio};
 pub use crate::css::stylesheet::stylesheet;
 pub use crate::edit::{
     clicks::Clicks,
@@ -135,7 +137,6 @@ pub use crate::root::{
     typeface::use_typeface,
 };
 pub use crate::space::{
-    contrast::{Verdict, ratio},
     frame_vars::FrameVars,
     look::{CardAccent, Grain, SpaceLook},
     palette::{

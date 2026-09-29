@@ -2,9 +2,23 @@
 //!
 //! No floats, so every colour is `Eq` and a token table can be compared in a test.
 
+use crate::core::colour::srgb::Srgb;
+
 /// An 8-bit sRGB colour, written `#rrggbb`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Hex(pub [u8; 3]);
+
+impl From<Hex> for Srgb {
+    fn from(Hex(channels): Hex) -> Self {
+        Srgb(channels)
+    }
+}
+
+impl From<Srgb> for Hex {
+    fn from(Srgb(channels): Srgb) -> Self {
+        Hex(channels)
+    }
+}
 
 impl Hex {
     /// Parse `#rgb` or `#rrggbb`, any case; `None` for anything else.
