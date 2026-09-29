@@ -92,7 +92,7 @@ fn open_on_press_click_mode_and_toggle() {
     // Section 13.8 test 1.
     let (phase, effects) = run(vec![(0, Event::PressTitle(A))]);
     assert_eq!(effects, vec![Effect::Open(A, MenuAnim::Pop)]);
-    assert_eq!(session(&phase).held, MenuHold::MenuHold);
+    assert_eq!(session(&phase).held, MenuHold::Held);
     let (phase, _) = run(click_open());
     assert_eq!(
         session(&phase).held,

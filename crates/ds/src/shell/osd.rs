@@ -68,7 +68,7 @@ pub fn Osd(
 ) -> Element {
     let phase = use_shown_phase(shown, on_hidden, Anim::OsdIn, Anim::OsdOut);
     let (now, alias) = phase;
-    let level_label = label.clone().unwrap_or_else(|| "OsdLevel".to_owned());
+    let level_label = label.clone().unwrap_or_else(|| "Level".to_owned());
     let named = label.clone();
     rsx! {
         div {

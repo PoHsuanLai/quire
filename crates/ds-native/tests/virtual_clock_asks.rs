@@ -107,7 +107,7 @@ fn Mounting() -> Element {
                 ds::focus_soon(event.data());
                 mounts += 1;
             },
-            "ShortcutKey target"
+            "Key target"
         }
     }
 }

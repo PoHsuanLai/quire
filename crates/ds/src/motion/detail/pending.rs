@@ -11,7 +11,7 @@ use std::time::Duration;
 pub enum PendingStyle {
     /// One layer at a time: the Wi-Fi bars searching.
     Iterate,
-    /// PendingLayers fill in turn and stay, then clear: a level being found.
+    /// Layers fill in turn and stay, then clear: a level being found.
     Cumulate,
     /// A disc's opacity between .45 and 1, one step per half.
     Breathe,

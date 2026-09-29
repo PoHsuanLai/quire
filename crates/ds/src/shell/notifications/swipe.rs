@@ -41,7 +41,7 @@ pub enum NotificationSwipe {
 }
 
 /// Marks a card as carried by a `BannerStack` row, whose own exit flies it out; the card marks
-/// the row's flight `NotificationSwipe` when it goes, so the row leaves along the swipe rather than by the
+/// the row's flight `Swipe` when it goes, so the row leaves along the swipe rather than by the
 /// stack's entry edge.
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) struct Carried(pub(crate) Signal<Flight>);
@@ -52,7 +52,7 @@ pub(crate) enum Flight {
     /// Back past the edge it entered by (the caller dropped it: a timeout, a close).
     Edge,
     /// To the right, the way its card was swiped.
-    NotificationSwipe,
+    Swipe,
 }
 
 impl Flight {
@@ -60,7 +60,7 @@ impl Flight {
     pub(crate) fn slug(self) -> Option<&'static str> {
         match self {
             Flight::Edge => None,
-            Flight::NotificationSwipe => Some("swipe"),
+            Flight::Swipe => Some("swipe"),
         }
     }
 }
@@ -135,7 +135,7 @@ pub(crate) fn use_card_swipe(swipe: &NotificationSwipe, metrics: SwipeMetrics) -
         let Some(heard) = heard else { return };
         match carried {
             Some(Carried(mut flight)) => {
-                flight.set(Flight::NotificationSwipe);
+                flight.set(Flight::Swipe);
                 heard.call(());
             }
             None => flight.start(EventHandler::new(move |()| heard.call(()))),
