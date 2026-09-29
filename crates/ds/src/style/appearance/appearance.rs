@@ -4,6 +4,7 @@
 //! Loading is lenient: a missing field is the first-run value and an unknown word for one field
 //! is that field's default, never a failure of the whole value.
 
+use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, motion::Motion, theme::Theme};
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};

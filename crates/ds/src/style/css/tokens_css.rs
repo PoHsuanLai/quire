@@ -5,6 +5,7 @@
 //! The dark block, the typeface block and each level block write only the tokens whose value differs from `.ds`'s,
 //! so every name a dark or level block sets is also declared on `.ds` (tests/tokens.rs).
 
+use crate::core::word::Word;
 use crate::style::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::icon::family::{PLATE_GLYPH, PLATE_INSET};
@@ -84,7 +85,7 @@ fn scheme_tokens(scheme: Scheme) -> Vec<String> {
     let colours = ColourToken::ALL
         .into_iter()
         .map(|token| declaration(token.var(), &colour_value(token, scheme)));
-    let hues = LabelHue::ALL.into_iter().flat_map(|hue| {
+    let hues = LabelHue::ALL.iter().copied().flat_map(|hue| {
         HueMember::ALL
             .into_iter()
             .map(move |member| format!("{}:{};", hue.var(member), hue.value(member, scheme).css()))

@@ -4,6 +4,7 @@
 use crate::pages::calendar::month_sample::{AUGUST, First, month as lay_out};
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Accent, Appearance, Availability, Button, ButtonVariant, Chip, ChipVariant, CommandPalette,
     CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile, MenuTrail,
@@ -134,7 +135,7 @@ pub fn Specimens(scheme: Scheme) -> Element {
                 }
             }
             div { class: "g-acc-hues",
-                for accent in Accent::ALL {
+                for accent in Accent::ALL.iter().copied() {
                     Hue { accent, scheme }
                 }
             }

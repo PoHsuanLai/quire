@@ -9,6 +9,7 @@ use super::plate_tints::PlateTints;
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape,
     AvatarSize, AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count,
@@ -239,7 +240,7 @@ fn Chips() -> Element {
                 Chip { variant: ChipVariant::Token, text: "from:dana" }
                 Chip { variant: ChipVariant::Status(Verdict::Pass), text: "4.8 : 1" }
                 Chip { variant: ChipVariant::Status(Verdict::Fail), text: "2.1 : 1" }
-                for hue in LabelHue::ALL {
+                for hue in LabelHue::ALL.iter().copied() {
                     Chip { variant: ChipVariant::Label(hue), text: hue.slug() }
                 }
             }

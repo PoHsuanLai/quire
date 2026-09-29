@@ -3,9 +3,10 @@
 //! [`SizeScale`], computed from its height by the section 6 rules.
 
 use super::size_scale::{SizeScale, WholePx};
+use crate::core::word::Word;
 
 /// How big a control is drawn: its height and everything derived from it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum ControlSize {
     /// 16 tall: a settings row's switch, a dense toolbar.
     Small,
@@ -17,19 +18,6 @@ pub enum ControlSize {
 }
 
 impl ControlSize {
-    /// Every size, smallest first.
-    pub const ALL: [ControlSize; 3] =
-        [ControlSize::Small, ControlSize::Regular, ControlSize::Large];
-
-    /// The `data-size` word: `small`, `regular`, `large`.
-    pub fn slug(self) -> &'static str {
-        match self {
-            ControlSize::Small => "small",
-            ControlSize::Regular => "regular",
-            ControlSize::Large => "large",
-        }
-    }
-
     /// This size's geometry.
     pub fn scale(self) -> SizeScale {
         match self {

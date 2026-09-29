@@ -9,6 +9,7 @@ use crate::page::Page;
 use crate::progress_copy::ProgressCopy;
 use crate::registry;
 use crate::sheet;
+use ds::Word;
 use ds::{Accent, Motion, Scheme, Theme, Typeface};
 use ds_native::{Viewport, snapshot_at};
 use std::path::{Path, PathBuf};

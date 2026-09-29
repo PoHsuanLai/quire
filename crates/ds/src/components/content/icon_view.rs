@@ -5,6 +5,7 @@
 
 use crate::components::content::icon_source::{ExternalIcon, IconSource};
 use crate::components::content::status::family::StatusGlyph;
+use crate::core::word::Word;
 use crate::motion::detail::first_show::FirstShow;
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::plate_tint::{PlateTint, tint_style};

@@ -3,6 +3,7 @@
 //! exactly its four, each picker swatch is its accent's own colour, and every variable the
 //! stylesheet reads is declared by it or written inline by the root.
 
+use ds::Word;
 use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
     ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of, stylesheet,
@@ -134,12 +135,12 @@ fn each_accent_block_sets_exactly_the_seven() {
 
 #[test]
 fn each_accent_block_is_the_bands_roles() {
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let theme = match scheme {
             Scheme::Light => "",
             Scheme::Dark => "[*|data-theme=dark]",
         };
-        for accent in Accent::ALL {
+        for accent in Accent::ALL.iter().copied() {
             let selector = format!(".ds{theme}[*|data-accent={}]", accent.slug());
             let decls = block(&selector);
             let want = accent_of(accent, scheme);
@@ -160,7 +161,7 @@ fn each_accent_block_is_the_bands_roles() {
 
 #[test]
 fn each_swatch_is_its_accents_own_colour() {
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let (swatches, theme) = match scheme {
             Scheme::Light => (
                 rules(stylesheet())
@@ -184,7 +185,7 @@ fn each_swatch_is_its_accents_own_colour() {
                 (dark, "[*|data-theme=dark]")
             }
         };
-        for accent in Accent::ALL {
+        for accent in Accent::ALL.iter().copied() {
             let swatch = swatches.get(&format!("--swatch-{}", accent.slug()));
             let accent_block = block(&format!(".ds{theme}[*|data-accent={}]", accent.slug()));
             assert_eq!(
@@ -213,7 +214,7 @@ fn the_token_block_holds_the_rust_table() {
             assert_eq!(got, Some(&token.value(scheme).css()), "{name} {scheme:?}");
         }
     }
-    for hue in LabelHue::ALL {
+    for hue in LabelHue::ALL.iter().copied() {
         for member in [HueMember::Base, HueMember::Deep, HueMember::Soft] {
             let name = hue.var(member);
             assert_eq!(

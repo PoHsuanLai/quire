@@ -1,6 +1,7 @@
 //! What every component under a `Ds` can read: the resolved appearance, the material and the
 //! blur state of the scope it is in.
 
+use crate::core::word::Word;
 use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::appearance::{resolve::Resolved, theme::Scheme};
 use dioxus::prelude::*;
@@ -10,23 +11,13 @@ use dioxus::prelude::*;
 /// blitz-dom hard-codes `:focus-visible` and `:focus-within` to false and a click does not focus
 /// a button (spike S12), so the focus ring is `.ds[*|data-modality=keyboard] :focus` and the host
 /// says which modality is current.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum InputModality {
     /// The last input was a pointer: no focus rings.
     #[default]
     Pointer,
     /// The last input was a key: focus rings show.
     Keyboard,
-}
-
-impl InputModality {
-    /// The `data-modality` value.
-    pub fn slug(self) -> &'static str {
-        match self {
-            InputModality::Pointer => "pointer",
-            InputModality::Keyboard => "keyboard",
-        }
-    }
 }
 
 /// The host's modality, provided as root context by `ds-native` (which sees raw input); `Ds`

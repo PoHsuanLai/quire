@@ -7,6 +7,7 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::icon::{IconStyle, Tint};
 use ds::{
     Appearance, Ds, Icon, IconSize, IconSource, IconView, Material, PRESETS, PlateFamily,
@@ -36,7 +37,7 @@ fn tint(space: usize) -> Tint {
 fn Plates() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            for scheme in Scheme::ALL {
+            for scheme in Scheme::ALL.iter().copied() {
                 div { class: "{scheme.slug()}", style: "display:flex; gap:24px; padding:20px",
                     Surface { material: Material::Popover, theme: Some(scheme),
                         div { style: "display:flex; gap:24px; padding:8px",
@@ -106,7 +107,7 @@ fn a_tinted_neutral_plate_takes_the_spaces_hue_in_both_schemes() {
     harness.advance(Duration::from_millis(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "plate_tint");
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let (hue_tolerance, least_chroma) = tolerance(scheme);
         for space in SPACES {
             let want = tint(space);

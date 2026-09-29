@@ -3,6 +3,7 @@
 //! `transition` uses table tokens, and the token blocks resolve, level by level, to the values
 //! the Rust table gives `settle()` (design/05-MOTION.md section 7.1).
 
+use ds::Word;
 use ds::{
     Anim, DurationToken, EasingToken, MotionLevel, ScalarToken, StaggerIndex, settle, stylesheet,
 };
@@ -178,7 +179,7 @@ fn resolved(level: MotionLevel) -> BTreeMap<String, String> {
 #[test]
 fn every_level_resolves_to_the_rust_table() {
     let mut failures = Vec::new();
-    for level in MotionLevel::ALL {
+    for level in MotionLevel::ALL.iter().copied() {
         let values = resolved(level);
         let mut expect = |name: &str, want: String| {
             if values.get(name) != Some(&want) {

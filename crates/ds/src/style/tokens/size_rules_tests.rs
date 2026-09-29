@@ -6,6 +6,7 @@ use super::control_size::ControlSize;
 use super::shell_scale::SHELL_SCALE;
 use super::size_scale::{HalfPx, KNOB_INSET, SizeScale, WholePx};
 use super::size_vars::{SizeVar, size_tokens};
+use crate::core::word::Word;
 
 /// The spacing steps new sizes are drawn from (R7): a 4 px grid with a 2 px half step.
 const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];
@@ -111,8 +112,14 @@ fn every_size_obeys_the_rules() {
 
 #[test]
 fn the_ladder_ascends() {
-    let heights = ControlSize::ALL.map(|size| size.scale().height.0);
-    let glyphs = ControlSize::ALL.map(|size| size.scale().glyph.0);
+    let heights: Vec<_> = ControlSize::ALL
+        .iter()
+        .map(|size| size.scale().height.0)
+        .collect();
+    let glyphs: Vec<_> = ControlSize::ALL
+        .iter()
+        .map(|size| size.scale().glyph.0)
+        .collect();
     assert!(
         heights.windows(2).all(|pair| pair[0] < pair[1]),
         "{heights:?}"
@@ -134,7 +141,7 @@ fn every_height_token_is_whole() {
         SizeVar::SliderKnob,
         SizeVar::Segment,
     ];
-    for size in ControlSize::ALL {
+    for size in ControlSize::ALL.iter().copied() {
         for var in heights {
             let css = var.css(size.scale());
             assert!(

@@ -5,6 +5,7 @@
 use super::Section;
 use super::motion::{millis, recipe_text};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Anim, Button, ButtonVariant, StaggerIndex, TimerPhase, settle, use_motion_timer, use_pulse,
     use_scope,

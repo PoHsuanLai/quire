@@ -3,12 +3,13 @@
 //! (`plate.rs`) filled with its family's gradient, with the section 2.5 inner highlight and rim
 //! and a drop shadow; until the generated app icons arrive, a placeholder tile is a glyph on one.
 
+use crate::core::word::Word;
 use crate::style::tokens::hex::Hex;
 use crate::style::tokens::name::VarName;
 use crate::style::tokens::tuned::Tuned;
 
 /// One plate gradient family.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum PlateFamily {
     /// `#E8483C` to `#B7352B`, white glyph.
     Red,
@@ -26,28 +27,6 @@ pub enum PlateFamily {
 }
 
 impl PlateFamily {
-    /// Every family, in section 2.3's order.
-    pub const ALL: [PlateFamily; 6] = [
-        PlateFamily::Red,
-        PlateFamily::Amber,
-        PlateFamily::Green,
-        PlateFamily::Blue,
-        PlateFamily::Violet,
-        PlateFamily::Neutral,
-    ];
-
-    /// The `data-family` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            PlateFamily::Red => "red",
-            PlateFamily::Amber => "amber",
-            PlateFamily::Green => "green",
-            PlateFamily::Blue => "blue",
-            PlateFamily::Violet => "violet",
-            PlateFamily::Neutral => "neutral",
-        }
-    }
-
     /// The light stop and the deep stop.
     pub fn stops(self) -> (Hex, Hex) {
         match self {
@@ -94,11 +73,12 @@ pub const PLATE_INSET: Tuned = Tuned {
 #[cfg(test)]
 mod tests {
     use super::PlateFamily;
+    use crate::core::word::Word;
 
     #[test]
     fn white_glyphs_sit_on_red_blue_and_violet_and_ink_on_the_rest() {
         let white = [PlateFamily::Red, PlateFamily::Blue, PlateFamily::Violet];
-        for family in PlateFamily::ALL {
+        for family in PlateFamily::ALL.iter().copied() {
             assert_eq!(
                 family.glyph().0 == [255, 255, 255],
                 white.contains(&family),

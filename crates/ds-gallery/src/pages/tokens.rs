@@ -3,6 +3,7 @@
 
 use super::{Caption, Scope, Section, Specimen};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Accent, ColourToken, HueMember, LabelHue, Material, Radius, Scheme, Shadow, Surface, ZLayer,
     accent_of,
@@ -18,7 +19,7 @@ const SPACING: [u16; 18] = [
 #[component]
 pub fn TokensPage() -> Element {
     rsx! {
-        for scheme in Scheme::ALL {
+        for scheme in Scheme::ALL.iter().copied() {
             Section { title: format!("Colour, {}", scheme.slug()),
                 Surface { material: Material::Window, theme: Some(scheme),
                     div { class: "g-card",
@@ -39,14 +40,14 @@ pub fn TokensPage() -> Element {
             title: "Accents",
             note: "The four properties of each accent, light then dark. The card's own accent follows the toolbar.",
             div { class: "g-grid6",
-                for accent in Accent::ALL {
+                for accent in Accent::ALL.iter().copied() {
                     AccentRoles { accent }
                 }
             }
         }
         Section { title: "Label hues", note: "--c-<hue>, -deep and -soft, as the root's scheme paints them.",
             div { class: "g-grid6",
-                for hue in LabelHue::ALL {
+                for hue in LabelHue::ALL.iter().copied() {
                     for member in [HueMember::Base, HueMember::Deep, HueMember::Soft] {
                         Specimen { name: hue.var(member), code: None,
                             div { class: "g-swatch", style: "background:var({hue.var(member)})" }
@@ -101,7 +102,7 @@ fn AccentRoles(accent: Accent) -> Element {
     rsx! {
         div { class: "g-col",
             span { class: "g-name", "{accent.label()}" }
-            for scheme in Scheme::ALL {
+            for scheme in Scheme::ALL.iter().copied() {
                 Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),
                     div { class: "g-cell",
                         div { class: "g-row",

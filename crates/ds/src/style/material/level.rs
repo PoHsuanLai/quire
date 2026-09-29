@@ -4,6 +4,7 @@
 //! an inner shade, and the glyph inside is two-toned: the well's ink on the well, a dark ink on
 //! the fill. Declared per scheme on `.ds`, so a `Surface` forcing a scheme gets its own.
 
+use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::tokens::{
@@ -79,7 +80,8 @@ pub(crate) fn inks(scheme: Scheme) -> LevelInks {
 /// The two blocks: the light inks on `.ds`, the dark on `.ds[data-theme=dark]`.
 pub(crate) fn level_css() -> String {
     Scheme::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|scheme| {
             let selector = match scheme {
                 Scheme::Light => ".ds".to_owned(),

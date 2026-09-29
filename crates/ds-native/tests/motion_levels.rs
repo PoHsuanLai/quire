@@ -2,6 +2,7 @@
 //! three levels a Space sets, and a pick among them is reported.
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, DotIndex, Ds, Material, Motion, MotionChoice, MotionLevels, Scheme, SpaceEditor,
     SpaceLook,

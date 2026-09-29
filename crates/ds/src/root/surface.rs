@@ -3,6 +3,7 @@
 
 use super::chrome::{Ground, RootChrome};
 use super::typeface::use_typeface;
+use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, resolve::Resolved, theme::Scheme};
 use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::scope::{Scope, use_scope, use_scope_provider};

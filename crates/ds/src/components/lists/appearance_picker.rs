@@ -6,6 +6,7 @@
 use crate::components::controls::segmented::{SegSize, SegmentedControl};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
 use crate::core::vocab::Switch;
+use crate::core::word::Word;
 use crate::style::appearance::{
     accent::Accent,
     appearance::Appearance,
@@ -95,7 +96,7 @@ pub fn AppearancePicker(
             div { class: "ds-appearance-row",
                 SectionHeader { kind: HeaderKind::Field, text: "Accent" }
                 div { class: "ds-appearance-swatches", role: "group", "aria-label": "Accent",
-                    for accent in Accent::ALL {
+                    for accent in Accent::ALL.iter().copied() {
                         button {
                             r#type: "button",
                             class: "ds-space-dot",

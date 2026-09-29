@@ -7,6 +7,7 @@
 //! it over (spike S5). Each class's declaration is the [`Anim`]'s recipe, written from the same
 //! table [`crate::settle`] times.
 
+use crate::core::word::Word;
 use crate::motion::{
     anim::Anim,
     recipe::{Fill, Iteration, Recipe},

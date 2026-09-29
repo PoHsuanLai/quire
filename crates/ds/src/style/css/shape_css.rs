@@ -10,6 +10,7 @@
 //! `.ds-frame`; the palette's card does as a surface does. Colours live in custom properties
 //! declared here, as the materials' do.
 
+use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, presence_selector, property, rule};
 use crate::style::icon::family::{NEUTRAL_DARK, PlateFamily};
@@ -226,7 +227,7 @@ fn plate_css() -> String {
             property("height", "var(--plate-inset)"),
         ],
     ));
-    for family in PlateFamily::ALL {
+    for family in PlateFamily::ALL.iter().copied() {
         let (base, deep) = family.stops();
         css.push_str(&rule(
             &format!("{plate}{}", attr_selector("data-family", family.slug())),

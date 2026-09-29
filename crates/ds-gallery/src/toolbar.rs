@@ -6,6 +6,7 @@ use crate::axes::{Axes, PresetIndex, material_label, motion_of};
 use crate::page::Page;
 use crate::registry;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Accent, Anchor, Availability, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu,
     MenuEntry, MenuKind, MenuTrail, MotionLevel, MountedRef, SegSize, SegmentedControl, Switch,
@@ -26,19 +27,23 @@ pub fn Toolbar() -> Element {
         .map(|theme| (theme, theme.label().to_string()))
         .collect::<Vec<_>>();
     let typefaces = Typeface::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|typeface| (typeface, typeface.label().to_string()))
         .collect::<Vec<_>>();
     let accents = Accent::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|accent| (accent, accent.label().to_string()))
         .collect::<Vec<_>>();
     let levels = MotionLevel::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|level| (motion_of(level), capitalised(level.slug())))
         .collect::<Vec<_>>();
     let materials = Material::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|material| (material, material_label(material).to_string()))
         .collect::<Vec<_>>();
     let presets = PresetIndex::all()

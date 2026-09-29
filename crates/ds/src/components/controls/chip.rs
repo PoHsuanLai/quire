@@ -2,6 +2,7 @@
 
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::core::colour::contrast::Verdict;
+use crate::core::word::Word;
 use crate::motion::pulse_key::PulseKey;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};

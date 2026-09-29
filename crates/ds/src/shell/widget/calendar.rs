@@ -7,6 +7,7 @@
 //! [`MonthIntent::Step`], and the provider answers with the next month's timeline.
 
 use crate::components::content::text_runs::TextLine;
+use crate::core::word::Word;
 use crate::shell::month_grid::MonthGrid;
 use crate::shell::month_grid::data::{
     DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthStep,

@@ -78,6 +78,7 @@ impl WidgetPaint {
 #[cfg(test)]
 mod tests {
     use super::WidgetPaint;
+    use crate::core::word::Word;
     use crate::style::appearance::theme::Scheme;
     use std::collections::HashSet;
 
@@ -86,7 +87,7 @@ mod tests {
         let names: HashSet<&str> = WidgetPaint::ALL.iter().map(|p| p.var().0).collect();
         assert_eq!(names.len(), WidgetPaint::ALL.len());
         for paint in WidgetPaint::ALL {
-            for scheme in Scheme::ALL {
+            for scheme in Scheme::ALL.iter().copied() {
                 assert!(!paint.css(scheme).is_empty(), "{paint:?} {scheme:?}");
             }
         }

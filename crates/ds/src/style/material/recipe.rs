@@ -224,6 +224,7 @@ fn radius(material: Material) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{DEFAULT_TINT_ALPHA, recipe};
+    use crate::core::word::Word;
     use crate::style::appearance::material::Material;
     use crate::style::appearance::theme::Scheme;
     use crate::style::tokens::hex::{Alpha, Hex};
@@ -334,7 +335,7 @@ mod tests {
             Material::Osd,
             Material::Widget,
         ] {
-            for scheme in Scheme::ALL {
+            for scheme in Scheme::ALL.iter().copied() {
                 let got = recipe(material, scheme, DEFAULT_TINT_ALPHA);
                 for layer in [
                     &got.highlight,

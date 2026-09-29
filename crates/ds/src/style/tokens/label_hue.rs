@@ -5,11 +5,12 @@
 //! (design/07-LOOKS.md section 11).
 
 use super::hex::Hex;
+use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use serde::{Deserialize, Serialize};
 
 /// One label hue.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum LabelHue {
     /// Red.
@@ -41,26 +42,6 @@ pub enum HueMember {
 }
 
 impl LabelHue {
-    /// Every hue, in the shelf's order.
-    pub const ALL: [LabelHue; 5] = [
-        LabelHue::Red,
-        LabelHue::Amber,
-        LabelHue::Green,
-        LabelHue::Blue,
-        LabelHue::Violet,
-    ];
-
-    /// The `data-hue` word: `red`, `amber`, …
-    pub fn slug(self) -> &'static str {
-        match self {
-            LabelHue::Red => "red",
-            LabelHue::Amber => "amber",
-            LabelHue::Green => "green",
-            LabelHue::Blue => "blue",
-            LabelHue::Violet => "violet",
-        }
-    }
-
     /// The custom property for one member: `--c-red-deep`.
     pub fn var(self, member: HueMember) -> String {
         let suffix = match member {

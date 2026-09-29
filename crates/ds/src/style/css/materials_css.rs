@@ -16,6 +16,7 @@
 //! transparent root (`data-chrome=transparent`) paints nothing, and its `.ds-popover` and
 //! `.ds-sheet` cards paint the material's tint, edge and drop instead.
 
+use crate::core::word::Word;
 use crate::style::appearance::material::Material;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, declaration, presence_selector, property, rule};
@@ -53,8 +54,8 @@ pub(crate) const MATERIAL_VARS: [VarName; 12] = [
 /// writes inline rather than baking in `.80`.
 pub fn materials_css() -> String {
     let mut css = String::new();
-    for scheme in Scheme::ALL {
-        for material in Material::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
+        for material in Material::ALL.iter().copied() {
             css.push_str(&rule(
                 &selector(material, scheme),
                 &declarations(material, scheme),

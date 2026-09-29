@@ -267,6 +267,7 @@ pub static FACES: &[Face] = &[
 #[cfg(test)]
 mod tests {
     use super::{FACES, FaceStyle, Subset};
+    use crate::core::word::Word;
     use crate::style::appearance::typeface::Typeface;
     use crate::style::tokens::type_scale::Family;
 
@@ -295,7 +296,7 @@ mod tests {
             assert!(twins.contains(&Subset::Latin) && twins.contains(&Subset::LatinExt));
         }
         // Every stack, in either typeface, leads with a face that ships upright.
-        for typeface in Typeface::ALL {
+        for typeface in Typeface::ALL.iter().copied() {
             for family in Family::ALL {
                 let name = family.face_name(typeface);
                 assert!(

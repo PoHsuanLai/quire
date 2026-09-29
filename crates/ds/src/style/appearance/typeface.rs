@@ -4,10 +4,11 @@
 //! The root writes it as `data-typeface` on `.ds`, like the theme; the stylesheet's
 //! `.ds[data-typeface=editorial]` block maps the family tokens back to the editorial faces.
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Which faces `--font-display`, `--font-ui` and `--font-data` name.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Typeface {
     /// The desktop's face: Inter for reading, controls and data (tabular), Inter Display for
@@ -18,41 +19,14 @@ pub enum Typeface {
     Editorial,
 }
 
-impl Typeface {
-    /// Every choice, in the order a picker offers them.
-    pub const ALL: [Typeface; 2] = [Typeface::System, Typeface::Editorial];
-
-    /// The `data-typeface` value on a `.ds` root, and the word `appearance.toml` stores.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Typeface::System => "system",
-            Typeface::Editorial => "editorial",
-        }
-    }
-
-    /// What a picker calls it.
-    pub fn label(self) -> &'static str {
-        match self {
-            Typeface::System => "System",
-            Typeface::Editorial => "Editorial",
-        }
-    }
-
-    /// The typeface a stored word names, or [`None`] for a word that is not one.
-    pub fn parse(word: &str) -> Option<Typeface> {
-        Typeface::ALL
-            .into_iter()
-            .find(|typeface| typeface.slug() == word)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::Typeface;
+    use crate::core::word::Word;
 
     #[test]
     fn the_slug_is_the_stored_word() {
-        for typeface in Typeface::ALL {
+        for typeface in Typeface::ALL.iter().copied() {
             let json = serde_json::to_string(&typeface).unwrap_or_default();
             assert_eq!(json, format!("\"{}\"", typeface.slug()));
             assert_eq!(Typeface::parse(typeface.slug()), Some(typeface));

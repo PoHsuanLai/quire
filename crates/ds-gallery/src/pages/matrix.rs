@@ -4,6 +4,7 @@
 use super::{Scope, Section};
 use crate::axes::Axes;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Chip, ChipVariant, Emphasis,
     Fraction, Here, Icon, InputVariant, ItemKind, LabelHue, ListPresence, ListRow, Material,
@@ -46,10 +47,10 @@ pub fn MatrixPage() -> Element {
         Section { title: "Component",
             SegmentedControl::<Subject> { label: "Component", options, value: subject(), size: SegSize::Small, onchange: move |next| subject.set(next) }
         }
-        for scheme in Scheme::ALL {
+        for scheme in Scheme::ALL.iter().copied() {
             Section { title: format!("{} scheme", scheme.slug()),
                 div { class: "g-matrix",
-                    for accent in Accent::ALL {
+                    for accent in Accent::ALL.iter().copied() {
                         div { class: "g-col",
                             span { class: "g-code", "{accent.label()}" }
                             Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),

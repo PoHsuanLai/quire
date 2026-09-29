@@ -2,6 +2,7 @@
 //! its contrast pills compared with `space::readout`.
 
 use super::*;
+use ds::Word;
 
 #[derive(Props, Clone, PartialEq)]
 struct Editing {
@@ -51,7 +52,7 @@ fn plane(scheme: Scheme) -> (png::Image, png::Image) {
 #[test]
 fn the_field_colours_are_the_prototypes_hue_by_chroma_plane() {
     // `S:1399-1405`: hue across and chroma down, one sample per 18 px cell of S's 540 x 352.
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let (image, _) = plane(scheme);
         assert_eq!((image.width, image.height), (60, 39), "{scheme:?}");
         assert_eq!((image.depth, image.colour_type), (8, 2), "8-bit RGB");
@@ -76,7 +77,7 @@ fn the_field_colours_are_the_prototypes_hue_by_chroma_plane() {
 #[test]
 fn the_dot_tile_is_the_ground_with_a_round_hole() {
     // One 18 px cell: the ground, opaque, with the dot of radius 5.2 at its centre (`S:1404`).
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let (_, tile) = plane(scheme);
         assert_eq!((tile.width, tile.height), (18, 18), "{scheme:?}");
         assert_eq!((tile.depth, tile.colour_type), (8, 6), "8-bit RGBA");

@@ -7,6 +7,7 @@ use crate::legibility::floors;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::Alpha;
+use ds::Word;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BlurState, Button, ButtonVariant, Chip, ChipVariant, Fraction,
     Glyph, Icon, IconButton, IconButtonVariant, IconSize, Material, Slider, StatusMetrics, Surface,
@@ -56,7 +57,7 @@ pub fn MaterialsPage() -> Element {
             }
         }
         div { class: "g-grid2",
-            for material in Material::ALL {
+            for material in Material::ALL.iter().copied() {
                 Chrome { material }
             }
         }
