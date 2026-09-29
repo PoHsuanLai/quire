@@ -19,5 +19,5 @@ pub(crate) fn use_slash(slashed: Slashed) -> Fraction {
         Slashed::On => Fraction(1000),
         Slashed::Off => Fraction(0),
     };
-    use_tween(target, DRAW).now()
+    use_tween(target, DRAW)
 }

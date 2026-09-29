@@ -1,15 +1,15 @@
 //! A share driven frame by frame from Rust, for what the stylesheet cannot reach inside an SVG
-//! (design/26-DETAILS.md section 4.1): the frame driver under Sweep, CountUp and the success
-//! check, on the easing tokens' own curves (`CubicBezier::at`).
+//! (design/26-DETAILS.md section 4.1): a follower of a target, and the frame a sweep or a count
+//! reads, on the easing tokens' own curves (`CubicBezier::at`).
 
 use super::level::use_level;
 use crate::core::vocab::Fraction;
 use crate::motion::timeline::ease::Ease;
 use crate::motion::timeline::glide::{Glide, Pose};
-use crate::motion::timeline::playback::{Playback, use_playback};
+use crate::motion::timeline::playback::Playback;
+use crate::motion::timeline::use_timeline::use_timeline;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
-use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use std::time::Duration;
 
@@ -67,30 +67,29 @@ impl Tween {
     }
 }
 
-/// A tween that follows `target`: it stands there on mount, and each time `target` changes it
-/// moves there from wherever it is now, over `spec`. Under Reduced it jumps (R7). Asks for frames
-/// only while it moves (R3).
-pub fn use_tween(target: Fraction, spec: TweenSpec) -> Tween {
-    let playback = use_playback(Glide::still(i64::from(target.0)));
+/// The share of a tween that follows `target`: it stands there on mount, and each time `target`
+/// changes it moves there from wherever it is now, over `spec`. Under Reduced it jumps (R7). Asks
+/// for frames only while it moves (R3).
+pub fn use_tween(target: Fraction, spec: TweenSpec) -> Fraction {
     let env = use_level();
-    let mut seen = use_hook(|| CopyValue::new(target));
-    if *seen.peek() != target {
-        seen.set(target);
-        queue_effect(move || {
-            let level = env.now();
-            let to = i64::from(target.0);
-            match level {
-                MotionLevel::Reduced => playback.play(Glide::still(to)),
-                MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => {
-                    playback.play(Glide::between(
-                        playback.peek().map_or(to, |pose| pose.value),
-                        to,
-                        spec.duration.duration(level),
-                        EasingToken::Out.easing(level),
-                    ))
-                }
-            }
-        });
+    // The share drawn last, where a retarget starts from (R10).
+    let mut drawn = use_hook(|| CopyValue::new(i64::from(target.0)));
+    let mut plan = use_hook(|| CopyValue::new((target, Glide::still(i64::from(target.0)))));
+    if plan.peek().0 != target {
+        let level = env.now();
+        let to = i64::from(target.0);
+        let glide = match level {
+            MotionLevel::Reduced => Glide::still(to),
+            MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Glide::between(
+                *drawn.peek(),
+                to,
+                spec.duration.duration(level),
+                EasingToken::Out.easing(level),
+            ),
+        };
+        plan.set((target, glide));
     }
-    Tween::of(playback)
+    let pose = use_timeline(plan.peek().1);
+    drawn.set(pose.value);
+    Fraction(u16::try_from(pose.value.max(0)).unwrap_or(u16::MAX))
 }

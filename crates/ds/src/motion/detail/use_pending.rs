@@ -1,76 +1,66 @@
 //! The bounded pending loop as a hook (design/26-DETAILS.md R4): a Rust step timer that runs only
 //! while an operation's token is live, from its grace to its deadline, then stops.
 
-use super::level::{Level, use_level};
-use super::operation::{Operation, PendingToken};
-use super::pending::{PendingFrame, PendingSpec, frame_at, next_due};
-use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::core::time::clock::sleep;
-use dioxus::core::{Task, current_scope_id, queue_effect};
+use super::level::use_level;
+use super::operation::Operation;
+use super::pending::{PendingFrame, PendingSpec};
+use crate::motion::timeline::pending::Pending;
+use crate::motion::timeline::playback::{Playback, use_playback};
+use crate::style::appearance::motion::MotionLevel;
+use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
+/// What the loop last followed: the operation, the motion level and the frame it drew.
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct Followed {
+    op: Operation,
+    level: MotionLevel,
+    frame: PendingFrame,
+}
+
 /// The frame `op`'s loop shows now. `Idle` until the operation has run for `PendingGrace`, then a
-/// step every `--t-pending-step`, then `Stalled` from the token's deadline (or at once under
-/// Reduced) for as long as the operation still runs; `Idle` again the moment it ends. The timer
-/// stops at the deadline, so a stuck operation costs 0 frames. `spec` is the look the caller
-/// draws the frame with ([`PendingFrame::lit`]); the timing does not depend on it.
+/// step every `--t-pending-step`, then `Stalled` from the token's deadline (or at once after the
+/// grace under Reduced) for as long as the operation still runs; `Idle` again the moment it ends.
+/// The timer stops at the deadline, so a stuck operation costs 0 frames. `spec` is the look the
+/// caller draws the frame with ([`PendingFrame::lit`]); the timing does not depend on it.
+///
+/// Each run is one frame long: it ends at the instant the next frame is due, and the render that
+/// frame causes starts the run from there, at the operation's own age.
 pub fn use_pending(op: Operation, spec: PendingSpec) -> PendingFrame {
     let _ = spec;
-    let clock = Clock {
-        frame: use_signal(|| PendingFrame::Idle),
-        task: use_signal(|| None),
-        env: use_level(),
-        scope: use_hook(current_scope_id),
+    let env = use_level();
+    let playback = use_playback(Pending::Idle);
+    let frame = playback.frame();
+    let mut followed = use_hook(|| {
+        CopyValue::new(Followed {
+            op: Operation::Idle,
+            level: MotionLevel::Standard,
+            frame: PendingFrame::Idle,
+        })
+    });
+    let now = Followed {
+        op,
+        level: env.now(),
+        frame,
     };
-    let mut seen = use_hook(|| CopyValue::new(Operation::Idle));
-    if *seen.peek() != op {
-        seen.set(op);
-        queue_effect(move || {
-            let _ = clock.follow(op);
-        });
+    if *followed.peek() != now {
+        followed.set(now);
+        queue_effect(move || follow(playback, op, now.level));
     }
     match op {
         Operation::Idle => PendingFrame::Idle,
-        Operation::Running(_) => (clock.frame)(),
+        Operation::Running(_) => frame,
     }
 }
 
-/// The loop's timer and the frame it last set.
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct Clock {
-    frame: Signal<PendingFrame>,
-    task: Signal<Option<Task>>,
-    env: Level,
-    scope: ScopeId,
-}
-
-impl Clock {
-    /// Stop the old operation's timer and start `op`'s.
-    fn follow(self, op: Operation) -> Result<(), Gone> {
-        if let Some(running) = try_get(self.task)? {
-            running.cancel();
-        }
-        try_set(self.task, None)?;
-        try_set_if_changed(self.frame, PendingFrame::Idle)?;
-        let Operation::Running(token) = op else {
-            return Ok(());
-        };
-        let started = spawn_in(self.scope, async move {
-            let _ = self.run(token).await;
-        });
-        try_set(self.task, Some(started))
-    }
-
-    /// Set each frame when it is due, until the loop holds still.
-    async fn run(self, token: PendingToken) -> Result<(), Gone> {
-        loop {
-            let level = self.env.now();
-            let elapsed = token.elapsed();
-            try_set_if_changed(self.frame, frame_at(elapsed, token.deadline(), level))?;
-            match next_due(elapsed, token.deadline(), level) {
-                Some(wait) => sleep(wait).await,
-                None => return try_set(self.task, None),
-            }
-        }
-    }
+/// Play the run that follows `op`'s loop from its age now.
+fn follow(playback: Playback<Pending>, op: Operation, level: MotionLevel) {
+    playback.play(match op {
+        Operation::Idle => Pending::Idle,
+        Operation::Running(token) => Pending::Running {
+            deadline: token.deadline(),
+            level,
+            from: token.elapsed(),
+        },
+    });
 }
