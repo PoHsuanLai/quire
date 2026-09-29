@@ -66,7 +66,7 @@ mod tests {
             with(|f| {
                 f.appearance.theme = Theme::Dark;
                 f.appearance.accent = Accent::Violet;
-                f.appearance.motion_level = Motion::Calm;
+                f.appearance.motion_level = Motion::Reduced;
             }),
             with(|f| {
                 f.appearance.look = Look::Candy;
@@ -113,8 +113,8 @@ mod tests {
         let cases: &[(&str, &str, AppearanceFile)] = &[
             (
                 "unknown theme keeps the motion",
-                "[appearance]\ntheme = \"sepia\"\nmotion_level = \"calm\"\n",
-                with(|f| f.appearance.motion_level = Motion::Calm),
+                "[appearance]\ntheme = \"sepia\"\nmotion_level = \"reduced\"\n",
+                with(|f| f.appearance.motion_level = Motion::Reduced),
             ),
             (
                 "unknown motion keeps the theme",

@@ -177,10 +177,7 @@ enum Pick {
 /// Which dimension the variant's attributes name, or why they name none.
 fn resolve(values: &Values, ident: &Ident) -> syn::Result<Pick> {
     let scheme = values.light.is_some() || values.dark.is_some();
-    let level = values.calm.is_some()
-        || values.standard.is_some()
-        || values.extra.is_some()
-        || values.reduced.is_some();
+    let level = values.standard.is_some() || values.reduced.is_some();
     let typeface = values.system.is_some() || values.editorial.is_some();
     let named = [values.value.is_some(), scheme, level, typeface]
         .into_iter()
@@ -189,8 +186,7 @@ fn resolve(values: &Values, ident: &Ident) -> syn::Result<Pick> {
     if named != 1 {
         return Err(syn::Error::new_spanned(
             ident,
-            "a variant names one of `value`, `light`+`dark`, `standard` (+ `calm`, `extra`, \
-             `reduced`) or `system`+`editorial`",
+            "a variant names one of `value`, `light`+`dark`, `standard` (+ `reduced`) or `system`+`editorial`",
         ));
     }
     let both = |first: &Option<String>, second: &Option<String>| match (first, second) {
@@ -217,14 +213,10 @@ fn resolve(values: &Values, ident: &Ident) -> syn::Result<Pick> {
             "a level value needs `standard`",
         ));
     };
-    let others = [
-        ("Calm", &values.calm),
-        ("Extra", &values.extra),
-        ("Reduced", &values.reduced),
-    ]
-    .into_iter()
-    .filter_map(|(level, text)| Some((level, text.clone()?)))
-    .collect();
+    let others = [("Reduced", &values.reduced)]
+        .into_iter()
+        .filter_map(|(level, text)| Some((level, text.clone()?)))
+        .collect();
     Ok(Pick::Level { standard, others })
 }
 

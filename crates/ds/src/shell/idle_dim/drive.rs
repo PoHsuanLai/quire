@@ -46,11 +46,7 @@ fn plan(change: IdleDimChange, phase: IdleDimPhase, level: MotionLevel) -> IdleD
         (IdleDimChange::Level, ..) => IdleDimPlan::Snap,
         (IdleDimChange::Phase, IdleDimPhase::Awake, _) => IdleDimPlan::Snap,
         (IdleDimChange::Phase, IdleDimPhase::Dimmed, MotionLevel::Reduced) => IdleDimPlan::Snap,
-        (
-            IdleDimChange::Phase,
-            IdleDimPhase::Dimmed,
-            MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra,
-        ) => IdleDimPlan::Fade,
+        (IdleDimChange::Phase, IdleDimPhase::Dimmed, MotionLevel::Standard) => IdleDimPlan::Fade,
     }
 }
 
@@ -105,12 +101,7 @@ mod tests {
 
     #[test]
     fn waking_always_snaps() {
-        for level in [
-            MotionLevel::Calm,
-            MotionLevel::Standard,
-            MotionLevel::Extra,
-            MotionLevel::Reduced,
-        ] {
+        for level in [MotionLevel::Standard, MotionLevel::Reduced] {
             assert_eq!(
                 plan(IdleDimChange::Phase, IdleDimPhase::Awake, level),
                 IdleDimPlan::Snap,
@@ -122,9 +113,7 @@ mod tests {
     #[test]
     fn dimming_fades_except_under_reduced() {
         const CASES: &[(MotionLevel, IdleDimPlan)] = &[
-            (MotionLevel::Calm, IdleDimPlan::Fade),
             (MotionLevel::Standard, IdleDimPlan::Fade),
-            (MotionLevel::Extra, IdleDimPlan::Fade),
             (MotionLevel::Reduced, IdleDimPlan::Snap),
         ];
         for &(level, want) in CASES {

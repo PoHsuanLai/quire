@@ -118,12 +118,12 @@ fn the_root_stamps_exactly_its_attributes() {
     }
     let cases = [
         Case {
-            name: "system everything resolves against a dark, reduced desktop",
+            name: "standard motion and a system theme resolve against a dark, reduced desktop",
             setup: Setup {
                 appearance: Appearance {
                     theme: Theme::System,
                     accent: Accent::Violet,
-                    motion: Motion::System,
+                    motion: Motion::Standard,
                 },
                 system: dark_reduced,
                 blur: BlurState::Available,
@@ -139,12 +139,12 @@ fn the_root_stamps_exactly_its_attributes() {
             chrome: &[("data-chrome", "transparent")],
         },
         Case {
-            name: "an explicit light theme and calm motion win over the desktop",
+            name: "an explicit light theme wins over the desktop, whose reduce-motion still applies",
             setup: Setup {
                 appearance: Appearance {
                     theme: Theme::Light,
                     accent: Accent::Postmark,
-                    motion: Motion::Calm,
+                    motion: Motion::Standard,
                 },
                 system: dark_reduced,
                 material: Material::Bar,
@@ -152,7 +152,7 @@ fn the_root_stamps_exactly_its_attributes() {
             },
             theme: "light",
             accent: "postmark",
-            motion: "calm",
+            motion: "reduced",
             material: "bar",
             blur: "off",
             modality: "pointer",

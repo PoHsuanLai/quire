@@ -23,7 +23,7 @@ pub fn millis(duration: Duration) -> String {
 pub fn MotionPage() -> Element {
     rsx! {
         super::motion_driven::DrivenSection {}
-        Section { title: "Durations", note: "Every --t token at Calm, Standard, Extra and Reduced (60 ms everywhere).",
+        Section { title: "Durations", note: "Every --t token at Standard and Reduced (60 ms everywhere).",
             LevelTable {
                 rows: DurationToken::ALL.iter().map(|token| {
                     (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| millis(token.duration(level))).collect::<Vec<_>>())

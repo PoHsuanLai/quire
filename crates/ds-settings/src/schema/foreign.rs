@@ -80,16 +80,10 @@ mod tests {
     }
 
     #[test]
-    fn motion_is_five_words() {
+    fn motion_is_two_words() {
         assert_eq!(
             ds::Motion::variants(),
-            vec![
-                "system".to_owned(),
-                "calm".to_owned(),
-                "standard".to_owned(),
-                "extra".to_owned(),
-                "reduced".to_owned(),
-            ]
+            vec!["standard".to_owned(), "reduced".to_owned()]
         );
     }
 

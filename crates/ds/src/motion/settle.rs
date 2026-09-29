@@ -47,10 +47,8 @@ mod tests {
         // (section 7.1): `settle(Rise, 12)` = 250 + 12 x 26 + 34 = 596 ms.
         const CASES: &[(Anim, MotionLevel, u64)] = &[
             (Anim::Rise, MotionLevel::Standard, 26),
-            (Anim::Rise, MotionLevel::Extra, 34),
-            (Anim::Rise, MotionLevel::Calm, 0),
+            (Anim::Rise, MotionLevel::Reduced, 0),
             (Anim::Heal, MotionLevel::Standard, 18),
-            (Anim::Heal, MotionLevel::Calm, 18),
             (Anim::Heal, MotionLevel::Reduced, 0),
             (Anim::PopIn, MotionLevel::Reduced, 0),
         ];

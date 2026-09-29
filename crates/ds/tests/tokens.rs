@@ -92,12 +92,7 @@ fn token_block() -> BTreeMap<String, String> {
 #[test]
 fn every_dark_and_level_name_has_a_light_value() {
     let light = token_block();
-    for selector in [
-        ".ds[*|data-theme=dark]",
-        ".ds[*|data-motion=calm]",
-        ".ds[*|data-motion=extra]",
-        ".ds[*|data-motion=reduced]",
-    ] {
+    for selector in [".ds[*|data-theme=dark]", ".ds[*|data-motion=reduced]"] {
         let overrides = block(selector);
         assert!(!overrides.is_empty(), "{selector} is empty");
         for name in overrides.keys().filter(|name| name.starts_with("--")) {
@@ -375,11 +370,7 @@ fn the_spacing_scale_is_the_layout_docs() {
         let name = format!("--s-{}", step.replace('.', "-"));
         assert_eq!(light.get(&name), Some(&format!("{step}px")), "{name}");
     }
-    for selector in [
-        ".ds[*|data-theme=dark]",
-        ".ds[*|data-motion=calm]",
-        ".ds[*|data-motion=reduced]",
-    ] {
+    for selector in [".ds[*|data-theme=dark]", ".ds[*|data-motion=reduced]"] {
         assert!(
             !block(selector).keys().any(|name| name.starts_with("--s-")),
             "{selector} overrides a spacing step"

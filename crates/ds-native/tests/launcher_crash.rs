@@ -142,15 +142,15 @@ fn MenuGoneEarly() -> Element {
     rsx! { Scripted { subject: Subject::Menu, script: early_unmount(), motion: Motion::Standard } }
 }
 
-/// `sill launcher toggle` pairs 500 ms apart: open, close, open, close. At Extra motion the
-/// palette's entrance runs past the first close, so each close lands mid `peek-in`.
+/// `sill launcher toggle` pairs 200 ms apart: open, close, open, close. The palette's entrance
+/// runs past each close, so each close lands mid `peek-in`.
 #[allow(non_snake_case)]
 fn PaletteToggledTwice() -> Element {
     rsx! {
         Scripted {
             subject: Subject::Palette,
-            script: vec![(10, Shown::Yes), (500, Shown::No), (500, Shown::Yes), (500, Shown::No)],
-            motion: Motion::Extra,
+            script: vec![(10, Shown::Yes), (200, Shown::No), (200, Shown::Yes), (200, Shown::No)],
+            motion: Motion::Standard,
         }
     }
 }
@@ -223,8 +223,8 @@ fn a_menu_unmounted_before_its_entrance_settles_does_not_panic() {
 }
 
 #[test]
-fn a_palette_toggled_twice_half_a_second_apart_does_not_panic() {
-    assert!(settle(Anim::PeekIn, MotionLevel::Extra, StaggerIndex::default()) > ms(510));
+fn a_palette_toggled_twice_within_its_entrance_does_not_panic() {
+    assert!(settle(Anim::PeekIn, MotionLevel::Standard, StaggerIndex::default()) > ms(210));
     let mut harness = Harness::new(PaletteToggledTwice, VIEW);
     run_script(&mut harness, ms(2200), "2", ".ds-palette");
     assert_eq!(mounts(&harness), "2");

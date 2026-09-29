@@ -76,7 +76,7 @@ fn editor_rows(theme: Theme) -> Element {
             onchange: |_| {},
             name: "Work".to_string(),
             on_rename: EventHandler::new(|_: String| {}),
-            motion: MotionChoice { level: Motion::Calm, on_motion: EventHandler::new(|_: Motion| {}) },
+            motion: MotionChoice { level: Motion::Reduced, on_motion: EventHandler::new(|_: Motion| {}) },
             measured: MeasuredIn::EachScheme,
         }
     }

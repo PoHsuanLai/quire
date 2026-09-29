@@ -97,15 +97,9 @@ mod tests {
             [0, 793, 1051, 1031, 1000],
         ),
         (
-            "spring extra",
+            "spring reduced is out",
             EasingToken::Spring,
-            MotionLevel::Extra,
-            [0, 1051, 1238, 1080, 1000],
-        ),
-        (
-            "spring calm is out",
-            EasingToken::Spring,
-            MotionLevel::Calm,
+            MotionLevel::Reduced,
             [0, 748, 949, 993, 1000],
         ),
         (
@@ -146,7 +140,7 @@ mod tests {
     #[test]
     fn a_curve_whose_y_stays_in_range_never_goes_back() {
         for token in EasingToken::ALL.iter().copied() {
-            for level in [MotionLevel::Calm, MotionLevel::Standard, MotionLevel::Extra] {
+            for level in [MotionLevel::Standard, MotionLevel::Reduced] {
                 let curve = token.easing(level).curve();
                 let [_, y1, _, y2] = curve.0;
                 if !(0..=1000).contains(&y1) || !(0..=1000).contains(&y2) {

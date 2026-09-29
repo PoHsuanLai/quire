@@ -58,7 +58,7 @@ pub fn use_level_run(level: Fraction, wake: WakeStamp, tokens: RunTokens) -> Run
 fn from_empty(motion: MotionLevel, level: Fraction, tokens: RunTokens) -> Sweep {
     match motion {
         MotionLevel::Reduced => Sweep::at_rest(level),
-        MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Sweep {
+        MotionLevel::Standard => Sweep {
             from: Fraction(0),
             to: level,
             tail: RunTail::Follows,
@@ -91,7 +91,7 @@ fn start(
         Origin::Empty => from_empty(motion, level, tokens),
         Origin::Drawn => match motion {
             MotionLevel::Reduced => Sweep::at_rest(level),
-            MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra => Sweep {
+            MotionLevel::Standard => Sweep {
                 from: drawn.shown,
                 to: level,
                 tail: tail_after(drawn),

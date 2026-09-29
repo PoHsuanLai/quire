@@ -18,35 +18,13 @@ use crate::style::space::{
 use dioxus::prelude::*;
 
 /// The Motion row's value and where a pick goes. The Space's own motion is the person's
-/// choice, `System` included, which the consumer passes on as its root's `appearance.motion`.
+/// choice, which the consumer passes on as its root's `appearance.motion`.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct MotionChoice {
     /// The Space's motion now.
     pub level: Motion,
     /// The person picked another.
     pub on_motion: EventHandler<Motion>,
-}
-
-/// Which motion levels the Motion row offers.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum MotionLevels {
-    /// All five choices a person has: System, Calm, Standard, Extra, Reduced.
-    #[default]
-    All,
-    /// The three a Space itself sets: Calm, Standard, Extra. Following the
-    /// desktop and reducing motion are the person's, not a Space's, so they are not offered;
-    /// a `level` outside the three shows no segment pressed.
-    Contact,
-}
-
-impl MotionLevels {
-    /// The levels offered, in the row's order.
-    pub fn levels(self) -> &'static [Motion] {
-        match self {
-            MotionLevels::All => Motion::ALL,
-            MotionLevels::Contact => &[Motion::Calm, Motion::Standard, Motion::Extra],
-        }
-    }
 }
 
 /// Which schemes the contrast readout measures.
@@ -100,15 +78,15 @@ pub(super) fn Title(
     }
 }
 
-/// The Motion row: a segmented control over the `levels` offered.
+/// The Motion row: a segmented control over the two motion levels.
 #[component]
-pub(super) fn MotionRow(choice: MotionChoice, levels: MotionLevels) -> Element {
+pub(super) fn MotionRow(choice: MotionChoice) -> Element {
     rsx! {
         div {
             SectionHeader { kind: HeaderKind::Field, text: "Motion" }
             SegmentedControl::<Motion> {
                 label: "Motion",
-                options: levels.levels().iter().map(|&level| (level, level.label().to_string())).collect::<Vec<_>>(),
+                options: Motion::ALL.iter().map(|&level| (level, level.label().to_string())).collect::<Vec<_>>(),
                 value: choice.level,
                 onchange: move |level| choice.on_motion.call(level),
             }
@@ -134,21 +112,8 @@ pub(super) fn EachScheme(look: SpaceLook) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::{MotionLevels, schemes_of};
-    use crate::core::word::Word;
-    use crate::style::appearance::{
-        motion::Motion,
-        theme::{Scheme, Theme},
-    };
-
-    #[test]
-    fn the_contact_levels_are_the_three_a_space_sets() {
-        assert_eq!(MotionLevels::default().levels(), Motion::ALL);
-        assert_eq!(
-            MotionLevels::Contact.levels(),
-            &[Motion::Calm, Motion::Standard, Motion::Extra]
-        );
-    }
+    use super::schemes_of;
+    use crate::style::appearance::theme::{Scheme, Theme};
 
     #[test]
     fn a_system_space_is_measured_in_both_schemes_and_a_fixed_one_in_its_own() {

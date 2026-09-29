@@ -329,7 +329,7 @@ pub const CASES: &[Case] = &[
         make: || {
             rsx! {
                 AppearancePicker {
-                    value: Appearance { theme: Theme::Dark, accent: Accent::Red, motion: Motion::Calm },
+                    value: Appearance { theme: Theme::Dark, accent: Accent::Red, motion: Motion::Reduced },
                     system: SystemPrefs::default(),
                     onchange: |_| {},
                 }

@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn an_unknown_enum_word_falls_back_to_that_fields_default_and_keeps_its_siblings() {
         let file: AppearanceFile =
-            lenient("[appearance]\ntheme = \"sepia\"\nmotion_level = \"calm\"\n");
+            lenient("[appearance]\ntheme = \"sepia\"\nmotion_level = \"reduced\"\n");
         assert_eq!(
             file.appearance.theme,
             Theme::default(),
@@ -168,7 +168,7 @@ mod tests {
         );
         assert_eq!(
             file.appearance.motion_level,
-            Motion::Calm,
+            Motion::Reduced,
             "sibling field is kept"
         );
     }

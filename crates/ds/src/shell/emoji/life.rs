@@ -66,9 +66,7 @@ fn woken(player: Player, user: EmojiId, mood: Mood, change: MoodChange, playback
     let level = env.resolved.motion;
     let playing = match (level, playback) {
         (MotionLevel::Reduced, _) | (_, EmojiPlayback::Still) => Playing::Stills,
-        (MotionLevel::Calm | MotionLevel::Standard | MotionLevel::Extra, EmojiPlayback::Awake) => {
-            Playing::Frames
-        }
+        (MotionLevel::Standard, EmojiPlayback::Awake) => Playing::Frames,
     };
     let window = DurationToken::Awake.duration(MotionLevel::Standard);
     let steps = script(user, mood, change, playing, window);
