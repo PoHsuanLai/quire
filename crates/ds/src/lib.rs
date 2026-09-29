@@ -213,16 +213,21 @@ pub use crate::focus::{
 pub use crate::host::{
     captured::{CapturedPointer, PointerPhase},
     caret::{Caret, Collapsed, FieldSelection, InitialCaret, caret_at},
+    document::{DocumentHost, use_document_host},
     drop_hit::DropHit,
     fallback::Fallback,
     focused::Focused,
-    found::Found,
+    found::{Found, SameNode},
+    hand_back::{HandBack, Record},
     ime::{ImeEvent, ImeListener, ImeSwitch},
     measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect},
+    no_host::NoHost,
+    parts::{CaretHost, ClickFocusHost, EditHost, FileDropHost, FocusHost, GeometryHost, ImeHost},
     pasted::Pasted,
     position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextPosition, TextRange},
     probe::Probe,
     reveal::{HostReveal, ScrollSpan, Scrolled, nearest_scroll},
+    signals::HostSignals,
 };
 pub use crate::motion::{
     anim::Anim,

@@ -14,6 +14,8 @@ pub enum Found {
     Busy,
     /// Not a selector the host's document can read.
     BadSelector,
+    /// The host has no document to search by selector.
+    Unreachable,
 }
 
 impl std::fmt::Debug for Found {
@@ -23,6 +25,17 @@ impl std::fmt::Debug for Found {
             Found::Missing => "Missing",
             Found::Busy => "Busy",
             Found::BadSelector => "BadSelector",
+            Found::Unreachable => "Unreachable",
         })
     }
+}
+
+/// Whether two handles name the same node of the host's document: an element found by selector
+/// is a different handle on the same node as the one a component mounted.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SameNode {
+    /// One node.
+    Same,
+    /// Two nodes, or a handle the host cannot read.
+    Different,
 }

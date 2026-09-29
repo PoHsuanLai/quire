@@ -3,13 +3,18 @@
 
 pub mod captured;
 pub mod caret;
+pub mod document;
 pub mod drop_hit;
 pub mod fallback;
 pub mod focused;
 pub mod found;
+pub mod hand_back;
 pub mod ime;
 pub mod measure;
+pub mod no_host;
+pub mod parts;
 pub mod pasted;
 pub mod position;
 pub mod probe;
 pub mod reveal;
+pub mod signals;
