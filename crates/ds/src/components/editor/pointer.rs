@@ -6,8 +6,9 @@
 
 use crate::components::editor::ctx::SurfaceCtx;
 use crate::components::editor::focus::focus_surface;
-use crate::components::editor::state::{Capture, Pressing};
+use crate::components::editor::state::Capture;
 use crate::core::geometry::units::{Point, Px};
+use crate::core::vocab::PressPhase;
 use crate::edit::clicks::Clicks;
 use crate::edit::host::Probe;
 use crate::edit::pointer::{CapturedPointer, EditPointer, Extend, PointerPhase};
@@ -41,11 +42,11 @@ pub(crate) fn press(
 
 /// A move over the surface, when no capture carries it.
 pub(crate) fn moved(ctx: &SurfaceCtx, event: &PointerEvent) {
-    if ctx.state.pressing.get() == Pressing::Up || ctx.state.capture.get() == Capture::Held {
+    if ctx.state.pressing.get() == PressPhase::Idle || ctx.state.capture.get() == Capture::Held {
         return;
     }
     if !event.held_buttons().contains(MouseButton::Primary) {
-        ctx.state.pressing.set(Pressing::Up);
+        ctx.state.pressing.set(PressPhase::Idle);
         return;
     }
     let clicks = ctx.state.last_clicks();
@@ -63,7 +64,7 @@ pub(crate) fn released(ctx: &SurfaceCtx, event: &PointerEvent) {
     if ctx.state.capture.get() == Capture::Held {
         return;
     }
-    if ctx.state.pressing.replace(Pressing::Up) == Pressing::Down {
+    if ctx.state.pressing.replace(PressPhase::Idle) == PressPhase::Pressed {
         let clicks = ctx.state.last_clicks();
         report(
             ctx,
@@ -77,11 +78,11 @@ pub(crate) fn released(ctx: &SurfaceCtx, event: &PointerEvent) {
 
 /// A move or the release the host routed to the surface while it holds the capture.
 pub(crate) fn captured(ctx: &SurfaceCtx, pointer: CapturedPointer) {
-    if ctx.state.pressing.get() == Pressing::Up {
+    if ctx.state.pressing.get() == PressPhase::Idle {
         return;
     }
     if pointer.phase == PointerPhase::Release {
-        ctx.state.pressing.set(Pressing::Up);
+        ctx.state.pressing.set(PressPhase::Idle);
         ctx.state.capture.set(Capture::Free);
     }
     let clicks = ctx.state.last_clicks();

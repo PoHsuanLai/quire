@@ -4,7 +4,7 @@
 
 use crate::components::controls::track::fraction_at;
 use crate::core::geometry::units::{Px, Rect};
-use crate::core::vocab::Fraction;
+use crate::core::vocab::{Fraction, PressPhase};
 
 /// How far the capsule stretches at most past an end, however far the pointer goes.
 const STRETCH_MAX: Px = Px(6.0);
@@ -24,6 +24,16 @@ pub(crate) enum Hold {
     Pressing { x: Px },
     /// Pressed on the track measured at `track`: the fill follows the pointer with no easing.
     Held { track: Rect },
+}
+
+impl Hold {
+    /// The press this holds, as the shared vocabulary says it: down on the track, measured or not.
+    pub(crate) fn phase(self) -> PressPhase {
+        match self {
+            Hold::Idle => PressPhase::Idle,
+            Hold::Pressing { .. } | Hold::Held { .. } => PressPhase::Pressed,
+        }
+    }
 }
 
 /// The rubber band: how far the capsule stretches past an end.

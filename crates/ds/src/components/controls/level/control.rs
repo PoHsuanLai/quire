@@ -9,11 +9,11 @@
 //! a sixteenth, Shift by a sixty-fourth. The machine is `machine.rs`; the drawing `look.rs`.
 
 use super::look::{Drawn, body};
-use super::machine::{Hold, KeyStep, LevelInput, LevelState, Nudge, Rubber, step};
+use super::machine::{KeyStep, LevelInput, LevelState, Nudge, Rubber, step};
 use crate::components::content::level_glyph::glyph::LevelGlyphView;
 use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource, Tick};
 use crate::core::geometry::units::{Px, Rect, Size};
-use crate::core::vocab::{Availability, Fraction};
+use crate::core::vocab::{Availability, Fraction, PressPhase};
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::{anim::Anim, pulse::use_pulse};
@@ -80,9 +80,9 @@ pub fn LevelControl(
         LevelLook::CapsuleKnob | LevelLook::Segments => Some(glyph),
     };
     let (over, stretch) = now.stretch.attrs().unzip();
-    let live = match now.hold {
-        Hold::Idle => "idle",
-        Hold::Pressing { .. } | Hold::Held { .. } => "live",
+    let live = match now.hold.phase() {
+        PressPhase::Idle => "idle",
+        PressPhase::Pressed | PressPhase::Held => "live",
     };
     // A disabled level is not a stop in the tab order: it takes no key and no press.
     let (role, tabindex) = match (mode, availability) {
