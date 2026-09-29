@@ -43,12 +43,12 @@ behaviour and numbers.
 | Exclusive zone | `Reserve(32)` | settled (plan Bar surface) |
 | Title / status item hit height | 24, vertically centred | proposed |
 | Title padding | 0 / 10 px; app name ui 13/700, other titles ui 13/500 | proposed (R5 13 pt, A2 menu items 13) |
-| Open-title highlight | pill 24 high (`--shell-bar-item`), radius 4 (`--r-shell-bar-item`), `--f-pill` while its menu is open and `--f-pill-hover` under the pointer; no transition; ds `MenuBarItem` for text items, `IconButton{Status}` draws the same pill | settled 2026-09-24 (the macOS polish pass) |
+| Open-title highlight | pill 24 high (`--shell-bar-item`), radius 4 (`--r-shell-bar-item`), `--f-pill` while its menu is open and `--f-pill-hover` under the pointer; no transition; ds `MenuBarItem` draws the same pill for text and glyph items | settled 2026-09-24 (the macOS polish pass) |
 | Title text | 13 px (`--fs-shell-bar`) at 500 (`--fw-shell-bar`), the app name 700 | settled 2026-09-24 (R5 13 pt) |
 | Workspace indicator | one segmented group on the frame (ds `WorkspacePills`): a `--f-pill-hover` track 24 high, radius 4, the current workspace on `--f-pill` with `--shadow-current` | settled 2026-09-24 |
-| Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed values (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8. Mechanism settled (bar gaps): ds `IconButton{Status}` reads `--bar-status-box`/`--bar-status-glyph`, written by `ds::StatusMetrics` from the three settings keys |
+| Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed values (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8. Mechanism settled (bar gaps): ds `MenuBarItem` reads `--bar-status-box`/`--bar-status-glyph`, written by `ds::StatusMetrics` from the three settings keys |
 | Disabled | opacity .35 | R2 (H) |
-| Material / tint | `Material::Bar` over compositor blur, `--f-*` tokens of the workspace SpaceLook, cross-fade 380 ms | settled (plan Spaces); drawn by `Ds` (bar gaps: `data-frame="tinted"`, the gradient at the bar's tint alpha, `data-ground="frame"`) |
+| Material / tint | `Material::Bar` over compositor blur; the workspace SpaceLook's colour goes where the Look puts it (Mac: the backdrop layer behind the material; Arc: `--f-*` frame tokens; design/30 §3.3), cross-fade `--t-big` | settled (plan Spaces); drawn by `Ds` (bar gaps: `data-frame="tinted"`, the gradient at the bar's tint alpha, `data-ground="frame"`) |
 
 ### 13.3.2 Menu tracking (bar menus; the same machine drives every ds `Menu`)
 
@@ -58,12 +58,12 @@ behaviour and numbers.
 | Release on the originating title | menu stays open (click mode) | R3 |
 | Press-drag-release | while the button is held, items highlight under the pointer; release on an enabled item picks it; release on a separator, header, disabled item or outside after the pointer entered the menu closes without picking | R3 (L); settled in ds `Menu` (bar gaps: a release after a press that began outside picks; `on_hover` and `on_release` report to an external tracker) |
 | Click toggles | in click mode, a press on the open menu's title closes it | R3 |
-| Hover switch | while any bar menu is open, the pointer entering another bar title or status item opens that menu and closes the current one in the **same frame**, 0 ms delay, no open or close animation | settled delay (R3); no animation settled in ds `Menu` (`entrance: MenuEntrance::Instant`; the owner removing a menu is immediate) |
+| Hover switch | while any bar menu is open, the pointer entering another bar title or status item opens that menu and closes the current one in the **same frame**, 0 ms delay, no open or close animation | settled delay (R3); no animation settled in ds `Menu` (a bar menu opens Instant, design/30 §1.3; the owner removing a menu is immediate) |
 | Outside press | closes (xdg_popup `popup_done`); the press is not delivered to the other client | proposed (compositor grab semantics) |
-| Pick | the menu closes, then the action runs (A6 "Click .it closes then picks") | settled (design); ds `Menu` calls `onpick` then `onclose` in the same handler, so both land before the next frame (bar gaps, sill Q11) |
-| First open animation | `menu-pop --t-move --e-spring` (A5: y -4, s .97, fade -> 0) | settled for ds menus (A5) |
-| Close animation | `fade` over `--t-quick` with `--e-exit` | settled for Escape and outside click (bar gaps: `Anim::MenuOut`, `data-presence="leaving"`, `onclose` after it settles); a ds `Popover` does the same since 2026-09-24 |
-| Highlight | selected item background `--accent-soft` (A3), no transition, follows the pointer and the keyboard | settled (design colour), timing proposed |
+| Pick | the chosen row blinks twice (two flashes of 70 ms), then the menu closes and the action runs | settled (design/30 §1.3, §2.4) |
+| Open animation | none: a menu opens Instant (design/30 §1.3, 27 §5.1) | settled |
+| Close animation | Fade over `--t-quick` (`Exit::Fade`); the owner's `onclose` runs after it ends | settled for Escape and outside click; a ds `Popover` does the same |
+| Highlight | a `Highlight` fill (accent `--sel-bg` with `--sel-ink` text and glyphs), snapping with no transition, follows the pointer and the keyboard | settled (design/30 §2.4, 27 §5.1) |
 | Keyboard | Up/Down move with **wrap** (A6); Left/Right switch to the adjacent bar menu or close/open a submenu; Enter, Space or Tab pick; Esc closes one level; typing filters (A6) | settled (A6) |
 | Position (bar menus) | design `placeFloat`: `x = title.left - 8`, `y = title.bottom + 6`; flip and clamp 8 px from output edges; status menus right-aligned to `item.right + 8` | settled (A6) |
 | Implementation | one reusable `xdg_popup` per bar; hover switch = `xdg_popup.reposition` + content swap, so no new grab (and no new input serial) is needed | proposed |
@@ -72,22 +72,21 @@ behaviour and numbers.
 
 | Value | Number | Status | Basis |
 | --- | --- | --- | --- |
-| Variant | ds `Menu{Dropdown}` for bar menus (`20-SURFACES.md` §1.1), `Menu{Context}` for dock and context menus, `Menu{Slim}`; all text menus share the item metrics below | settled (coherence rule: one menu component) |
+| Placement | ds `Menu` with `Placement::Bar` for bar menus (`20-SURFACES.md` §1.1), `Placement::Context` for dock and context menus, `Placement::Popup` for pop-up, pull-down and status-item menus; every placement shares the item metrics below (one density) | settled (design/30 §2.4) |
 | Menu padding | 5 px | settled (A4 `.fmenu` pad 5) |
-| Menu radius | `--r-menu` 12 | settled (plan tokens) |
-| Material | `Material::Popover` over blur for bar, dock and tray menus (`03-COLOR.md`) | settled by name |
+| Menu radius | `--r-menu` (8 in the Mac Look, 12 in Arc; design/30 §3.2) | settled |
+| Material | `Material::Menu` over blur for bar, dock and tray menus (design/30 §3.2) | settled by name |
 | Menu width | min 220 (A4 `.slim` 220), max 420, sized to content | settled min, max proposed |
 | Item height | 22 px (`--shell-menu-row`, `menus.item_height_px`) | settled 2026-09-24 (the macOS polish pass; R5 ~22 pt L; was 24 proposed) |
 | Item text | 13 px (`--fs-shell-menu`) at 400 | settled 2026-09-24 (R5 13 pt) |
-| Selected-row highlight | inset by the 5 px panel padding, radius 6 (`--r-shell-highlight`), `--accent-soft` (Dropdown `--surface-2`) | settled 2026-09-24 |
+| Selected-row highlight | inset by the 5 px panel padding, radius 6 (`--r-shell-highlight`), the `Highlight` fill (`--sel-bg`, text `--sel-ink`) | settled 2026-09-24 |
 | Item radius | `--r-item` 9 | settled token |
-| Columns | check 22 px (A4 `.slim` `22px 1fr auto`); optional glyph 16 + gap 6; label `1fr`, ui 13/400, single-line truncate; shortcut `auto`, data 10 `--ink-faint` (A4 `.sc`), rendered with the ds `Shortcut` vocabulary (⌘⇧⌥⌃); submenu chevron 12 px | settled columns (A4), sizes R5 13 pt |
+| Columns | check 22 px (A4 `.slim` `22px 1fr auto`); optional glyph 16 + gap 6; label `1fr`, ui 13/400, single-line truncate; shortcut `auto`, data 10 `--ink-faint` (A4 `.sc`), rendered by `KeyEquivalent{Text}` (symbols in the order Control, Option, Shift, Command); submenu chevron 12 px | settled columns (A4), sizes R5 13 pt |
 | Checkmark | 14 px accent check in the 22 px column (A4 "checked = 14 accent check") | settled |
-| Separator | 1 px `--line-soft` hairline, 5 px margin above and below (11 px row, `--shell-menu-sep`, `menus.separator_margin_px`), inset 8 px to the text | settled 2026-09-24 (the macOS polish pass; was 4 proposed) |
+| Separator | 1 px `--line-soft` hairline in a 9 px row (design/30 §2.4; `--shell-menu-sep`, `menus.separator_margin_px`), inset 8 px to the text | settled (design/30) |
 | Section header | data 9.5, .14em, upper (A4 `.g`), 22 px row, not selectable | settled style, height proposed |
-| Status line | an item's row (padding 6 / 8), title ui 13 / 600 `--ink`, detail 11.5 `--ink-faint`, no eyebrow, not selectable, skipped by keys | settled (bar gaps: `MenuEntry::Info`), sizes proposed |
-| Disabled item | opacity .35, not selectable, skipped by arrow keys | R2 (H); settled in ds `Menu` (`MenuEntry::Item { availability }`, tray gaps Q7) |
-| Rich menus | `Menu{Rich}` keeps the design's 34 px tile rows (A4 `.fmenu .it`) | settled |
+| Status line | an item's row (padding 6 / 8), title ui 13 / 600 `--ink`, detail 11.5 `--ink-faint`, no eyebrow, not selectable, skipped by keys | settled (a `MenuItem` row), sizes proposed |
+| Disabled item | opacity .35, not selectable, skipped by arrow keys | R2 (H); settled in ds `MenuItem` (availability) |
 
 ### 13.3.4 Submenus
 
@@ -116,7 +115,7 @@ is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pat
 | Tab / Shift+Tab | next / previous, wrap | R6 |
 | ` (grave) | previous | R6 (L) |
 | Left / Right | previous / next | proposed |
-| Q | quit the selected app (close its toplevels); its tile leaves with `fold` | R6 |
+| Q | quit the selected app (close its toplevels); its tile leaves through `Roster` (fade, the row closes up) | R6 |
 | H | hide the selected app (minimize its toplevels) | R6 |
 | Esc | cancel: close, no switch | R6 |
 | Release | activate the selected app's most recent toplevel (unminimize if needed), close | R6 |
@@ -134,27 +133,26 @@ is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pat
 | Position | top-right: right 8, top `--bar-h + 8` | R8 (M) |
 | Banner | width 360, min height 64, padding 12; `Material::Toast` over blur, radius 16 (`03-COLOR.md` materials table: notification banners = Toast) | proposed (L) |
 | Content | app icon 32 left; title ui 13/700; body ui 13, 2 lines clamped (`clip_chars`); time data 10 top-right | proposed |
-| Enter | slide from `translateX(calc(100% + 8px))` to 0, `--t-big --e-spring` (as the design toast) | proposed (A4 toast) |
+| Enter | Slide(Right) from `translateX(calc(100% + 8px))` to 0, `--t-move` `--e-out` (design/30 §1.3) | settled |
 | Banner lifetime | 5000 ms; the app's `expire_timeout` is ignored except 0 (persist) | R8 (M: fixed ~5 s) |
 | Alert (persistent) | urgency Critical, `resident` hint, or `expire_timeout == 0`: stays until acted on or closed | R8 (M) |
-| Hover | pauses the timer (resumes with max(remaining, 1500 ms)); expands: body up to 6 lines, action buttons (ds `Button{Mini}`) appear, a close button (18 px circle) at the top-left corner; height animates `--t-move --e-out` | R8 hover expand (M), numbers proposed |
+| Hover | pauses the timer (resumes with max(remaining, 1500 ms)); expands: body up to 6 lines, action buttons (ds `Button` at `ControlSize::Mini`) appear, a close button (18 px circle) at the top-left corner; height animates `--t-move --e-out` | R8 hover expand (M), numbers proposed |
 | Click | body: `ActionInvoked("default")` + close; action button: that action + close | proposed |
-| Swipe right to dismiss | pointer drag: follows 1:1 to the right, left motion damped x 0.25; release dismisses if `dx >= 80 px` or velocity `>= 600 px/s`, else springs back `--t-move --e-spring`. Horizontal scroll over the banner (Magic Mouse, touchpad): same thresholds on the summed px at Ended | R8 (M), thresholds proposed |
-| Exit | timeout and dismiss both slide right, `--t-move --e-exit`; banners below move up `--t-move --e-spring` | proposed |
+| Swipe right to dismiss | pointer drag: follows 1:1 to the right, left motion damped x 0.25; release dismisses if `dx >= 80 px` or velocity `>= 600 px/s`, else springs back by a `Spring` (response Move). Horizontal scroll over the banner (Magic Mouse, touchpad): same thresholds on the summed px at Ended | R8 (M), thresholds proposed |
+| Exit | timeout slides right, `--t-quick` `--e-exit`; a swipe dismiss continues with the release velocity; banners below close the gap over `--t-move` (`Roster`) | settled (design/30 §1.3) |
 | Stack | at most 3 banners visible, newest on top, gap 8; older ones queue | proposed |
 | Grouping by app | a banner from an app whose banner is visible replaces its content and shows a count chip; two offset layers (4 px each) beneath indicate the group; the history groups by app, newest first, collapsed to the newest with "N more" | R8 grouping (M), geometry proposed |
 | Do Not Disturb | no banners and no sounds except urgency Critical; everything still enters the history | proposed |
 | Sound | the `sound-name` or `sound-file` hint, else `message-new-instant`; `suppress-sound` honoured | proposed |
 
-Built in quire (2026-09-25, sill Q120-Q125; CONSUMING.md "Notification parts"): the banner is
-`NotificationCard` (the hover row as written: body two lines to six over `--t-move --e-out`,
-actions and the 18 px top-left close button on hover, `on_hover` for the caller's timer), the
-stack `BannerStack` (enter from the right at `--t-move --e-spring`; exit right at `--t-move
---e-exit`; the banners below heal by the leaving one's measured height), swipe to dismiss
-`Swipe::Dismiss` with the thresholds above as `SwipeMetrics` (a horizontal scroll is decided
-after a 120 ms quiet spell, `DelayToken::SwipeQuiet`, since Blitz forwards no scroll phase), the
-grouped layers `GroupCount { layers }` at `--notifications-group-offset`, the history's group
-head `GroupHeader`, and the notification center, as on macOS a panel at the right edge, `Panel`.
+Built from these quire parts (CONSUMING.md "Notification parts"): the banner is `NotificationCard`
+(the hover row as written: body two lines to six over `--t-move --e-out`, actions and the 18 px
+top-left close button on hover, `on_hover` for the caller's timer), the stack `BannerStack` (enter
+and exit as the two rows above; the banners below close the gap by `Roster`), swipe to dismiss
+`use_swipe` with the thresholds above as `SwipeMetrics` (a horizontal scroll is decided after a
+120 ms quiet spell, `DelayToken::SwipeQuiet`, since Blitz forwards no scroll phase), the grouped
+layers `GroupCount { layers }` at `--notifications-group-offset`, the history's group head
+`GroupHeader`, and the notification center, as on macOS a panel at the right edge, `SidePanel`.
 Whether a swiped banner stays in the center is `notifications.swipe`, the caller's.
 
 ### 13.3.7 Control center
@@ -163,11 +161,11 @@ Whether a swiped banner stays in the center is `notifications.swipe`, the caller
 | --- | --- | --- | --- |
 | Anchor | a popover from its bar status item, which sits at the right end of the status area just left of the clock (as on macOS); participates in bar hover-switch (13.3.2) | settled (user, 2026-09-25) |
 | Module bar items | any module can also be shown as its own bar status item (macOS "Show in Menu Bar"): a click on that item opens the module's detail pane as a popover directly, not the whole control center; the setting is per module (M5 freeze names the keys) | proposed (user direction, 2026-09-25) |
-| Open / close | `menu-pop --t-move --e-spring` / `fade --t-quick --e-exit` | settled open (brief), close proposed |
+| Open / close | Fade `--t-quick` in and out (a shell popover, design/30 §1.3) | settled |
 | Size | width 320, height fits content, max `output_h - --bar-h - 16` then scrolls (no rubber band) | proposed (R9 UNKNOWN) |
-| Grid | 2 columns, gap 8, padding 12; module tiles `--r-tile` 12; sliders span both columns | proposed; built 2026-09-25 as `ModuleGrid` of `ModuleTile` (`TileSpan::Full` spans both columns), sill Q78; the columns, gap and padding are `ModuleGrid`'s props from `control_center.grid_*` (2/8/12 by default, the grid pads itself), full-width modules with content are `ModulePanel`s on the tile's frame, the Appearance module is `AppearancePicker { layout: Compact }` (fits 296), and the bar item's glyph is `Icon::Switches`, sill Q100-Q103 (2026-09-25) |
-| Modules (order) | Wi-Fi (network service), Bluetooth (bluez), Focus / Do Not Disturb, Display brightness slider, Sound volume slider + output device, Now Playing (MPRIS), Appearance (`AppearancePicker`, the one picker, plan), Battery (UPower) | proposed; derived from the plan's service and crate list, the Claude Doc spec's list wins where it differs |
-| Detail | a tile's chevron opens its detail pane in place: `slide-l` / `slide-r` `--t-move --e-spring` (A5) | proposed; built 2026-09-25: the chevron is `ModuleTile`'s own hit target (`Chevron::Detail`, Enter or Right), the pane switch is `PaneSwitcher` (the outgoing pane leaves the other way over the same `--t-move`, at `--e-exit`; the height follows the arriving pane; a switch mid-slide reverses), the detail's lists are `SettingsRow`s, sill Q78-Q80 |
+| Grid | 2 columns, gap 8, padding 12; module tiles `--r-tile` 12; sliders span both columns | proposed; built as `ModuleGrid` of `ModuleTile` (`TileSpan::Full` spans both columns); the columns, gap and padding are `ModuleGrid`'s props from `control_center.grid_*` (2/8/12 by default, the grid pads itself), full-width modules with content are `ModulePanel`s on the tile's frame, the Appearance module is a `RadioGroup` with image labels (fits 296), and the bar item's glyph is `Icon::Switches` |
+| Modules (order) | Wi-Fi (network service), Bluetooth (bluez), Focus / Do Not Disturb, Display brightness slider, Sound volume slider + output device, Now Playing (MPRIS), Appearance (`RadioGroup`), Battery (UPower) | proposed; derived from the plan's service and crate list, the Claude Doc spec's list wins where it differs |
+| Detail | a tile's chevron opens its detail pane in place, a slide on a `Spring` (`--pane-p`, design/30 §1.3) | proposed; the chevron is `ModuleTile`'s own hit target (`Chevron::Detail`, Enter or Right), the pane switch is `PaneSwitcher` (the height follows the arriving pane; a switch mid-slide reverses), the detail's lists are `Row`s in a `List` |
 
 ### 13.3.8 Focus and raise rules
 
@@ -194,9 +192,9 @@ Whether a swiped banner stays in the center is `notifications.swipe`, the caller
 | Card height | as tall as its content up to the panel (no empty box under the last row); the shell's blur region follows the card's measured rect | settled 2026-09-24 |
 | Corner and shadow | `Corner::Squircle(14)`; the Sheet material's stack v2 (hairline, highlight, contact and ambient shadows, 03-COLOR §17.4) | settled 2026-09-24 |
 | Section header | data 9.5 .14em upper, 24 px | settled style |
-| Selection | `--accent-soft`, moves instantly with keys and hover | settled (A3) |
+| Selection | the `Highlight` fill (`--sel-bg`, `--sel-ink`), moves instantly with keys and hover | settled (design/30 §1.4) |
 | Visible rows | `floor((460 - 56 - 10) / 44)` = 8 | derived |
-| Open | `peek-in --t-big --e-spring` (s .95, y 12 -> 1, A5) | settled (brief, A5) |
+| Open | `peek-in --t-big --e-spring` (s .95, y 12 -> 1, A5) | see 13.9 item 9 |
 | Close | `fade --t-quick --e-exit`; the catcher is never animated or dimmed (plan) | settled catcher, fade proposed |
 | Open latency | p95 < 100 ms over 20 toggles (`accept-launcher.sh`) | settled (plan) |
 | Sections | provider groups with a `SectionHeader`; a group longer than its share shows "Show More" as the header's trailing action, reachable by keyboard | proposed (sill M9, Q302) |
@@ -234,7 +232,7 @@ The frame quire draws for a window that asks for no server decorations
 | Double-click the titlebar | `zoom(Toggle)`: maximized restores, anything else maximizes (macOS's "double-click a window's title bar to zoom", its default) | settled |
 | Resize | a primary press on an edge zone (4 px sides, 12 px corners): `begin_resize(edge)` at once. No zones while maximized or fullscreen | settled |
 | Green light | a click is `zoom(Toggle)`; its mark is "restore" while maximized | settled |
-| Tiling menu | held `window.tile_menu_press_ms` (500), rested on `window.tile_menu_hover_ms` (800 = the 450 ms hover intent + 350), right-click, or ArrowDown on the focused light: Move & Resize with Fill (= maximize), Left half, Right half, Centre; a placement the host reports `Support::No` for is unavailable. The hold that opened it does not also zoom | settled shape (macOS Sequoia), delays proposed |
+| Tiling menu | held for the `LongPress` delay (500 ms, `input.long_press_ms`), rested on `window.tile_menu_hover_ms` (800 = the 450 ms hover intent + 350), right-click, or ArrowDown on the focused light: Move & Resize with Fill (= maximize), Left half, Right half, Centre; a placement the host reports `Support::No` for is unavailable. The hold that opened it does not also zoom | settled shape (macOS Sequoia), delays proposed |
 | First click | the titlebar, the lights and the edge zones carry `data-first-mouse` (13.3.8) | settled |
 | Keyboard | Tab reaches close, minimize, zoom; Enter or Space presses; Escape closes the menu | settled |
 | Placement on Wayland | Left half, Right half and Centre are unavailable: a toplevel can neither read nor set its position (FINDINGS "Window frame") | limit |
@@ -304,7 +302,7 @@ pub enum Submenu {
 pub struct SafeTriangle { from: Point, top: Point, bottom: Point, still_since: Instant }
 pub enum MenuTrackEvent<K> { PressTitle(K), Release(MenuTarget<K>), Move(Point, MenuTarget<K>),
                              Key(MenuKey), OutsidePress, SubPlaced { top: Point, bottom: Point }, Tick }
-pub enum MenuTrackEffect<K> { Open(K, MenuAnim), Switch(K), Close(MenuAnim), OpenSub(ItemPath),
+pub enum MenuTrackEffect<K> { Open(K), Switch(K), Close, OpenSub(ItemPath),
                               CloseSub, Highlight(Option<ItemPath>), Pick(ItemPath),
                               Adjacent(MenuDirection), RequestTick(Instant) }
 impl<K: Clone + PartialEq> MenuTrack<K> {
@@ -314,20 +312,20 @@ impl<K: Clone + PartialEq> MenuTrack<K> {
 
 | From | Event | To | Effects |
 | --- | --- | --- | --- |
-| Closed | PressTitle(a) | Tracking{a, Held, NotYet} | Open(a, MenuPop) |
+| Closed | PressTitle(a) | Tracking{a, Held, NotYet} | Open(a) |
 | Tracking{held: Held} | Release on title a | Tracking{Released} (click mode) | |
-| Tracking{held: Held} | Release on enabled item | Closed | Close(Fade), Pick |
-| Tracking{held: Held, entered: Entered} | Release elsewhere | Closed | Close(Fade) |
-| Tracking{held: Held, entered: NotYet} | Release outside menu and title | Closed | Close(Fade) |
-| Tracking{Released} | PressTitle(a) (same) | Closed | Close(Fade) |
-| Tracking{Released} | Release on enabled item | Closed | Close(Fade), Pick |
+| Tracking{held: Held} | Release on enabled item | Closed | Close, Pick |
+| Tracking{held: Held, entered: Entered} | Release elsewhere | Closed | Close |
+| Tracking{held: Held, entered: NotYet} | Release outside menu and title | Closed | Close |
+| Tracking{Released} | PressTitle(a) (same) | Closed | Close |
+| Tracking{Released} | Release on enabled item | Closed | Close, Pick |
 | Tracking | Move onto title b != a | Tracking{b, same held} | Switch(b) (no animation) |
 | Tracking | Move onto item i (outside any Guard) | hot = i; if i has a submenu: Sub::Pending{i, now} | Highlight(i) |
 | Tracking{sub: Open{guard}} | Move inside the triangle | unchanged, `guard.from` = this point | |
 | Sub::Pending | Tick, `now - since >= 200 ms` | Sub::Open | OpenSub |
 | Sub::Open{guard} | Tick, `now - still_since >= 300 ms` | re-evaluate hot under pointer | |
-| Tracking | Key Esc | one level up / Closed | CloseSub / Close(Fade) |
-| Tracking | OutsidePress | Closed | Close(Fade) |
+| Tracking | Key Esc | one level up / Closed | CloseSub / Close |
+| Tracking | OutsidePress | Closed | Close |
 
 ```rust
 // sill: surfaces/switcher/machine.rs
@@ -373,7 +371,6 @@ first mouse        activating iff (t_press - t_activated) <= 100 ms
 | `menus.submenu_delay_ms` | ms | 200 (0..1000) | proposed |
 | `switcher.show_delay_ms` | ms | 150 (0..500) | proposed |
 | `window.move_threshold_px` | px | 4 (1..16) | proposed |
-| `window.tile_menu_press_ms` | ms | 500 (200..2000) | proposed |
 | `window.tile_menu_hover_ms` | ms | 800 (450..3000) | proposed |
 | `notifications.dnd` | `On | Off` | `Off` | proposed |
 | `notifications.banner_style` per app | `Banner | Alert | None` | `Banner` | R8 (M: macOS per-app style) |
@@ -423,7 +420,7 @@ Driven by `ds-native::Harness` (pure menus) and `sill debug` in nested cosmic-co
 2. **Press-drag-release**: press title, move to item 3, release: item 3's action runs once and
    the menu closes; release on a separator: nothing runs, the menu closes.
 3. **Hover switch**: with menu A open, moving onto title B shows B and hides A in the same
-   frame (0 frames where both or neither are visible), no `menu-pop` on B.
+   frame (0 frames where both or neither are visible), no open animation on B.
 4. **Submenu delay**: resting on a submenu item opens the submenu at 200 ms +- 1 frame, not at
    190 ms; Right arrow opens it immediately.
 5. **Safe triangle**: with a submenu open, a diagonal path from the parent item toward the
@@ -432,7 +429,7 @@ Driven by `ds-native::Harness` (pure menus) and `sill debug` in nested cosmic-co
 6. **Keyboard**: Down from the last item wraps to the first; disabled items are skipped; Esc
    closes a submenu then the menu; typing filters.
 7. **Geometry snapshot**: headless render of a bar menu with check, glyph, shortcut, separator,
-   header, disabled and submenu items: item height 24, separator row 9, width >= 220, disabled
+   header, disabled and submenu items: item height 22, separator row 9, width >= 220, disabled
    opacity .35.
 8. **Switcher quick tap**: chord and modifier release within 100 ms: the previous app is
    activated and no switcher frame is ever presented. Held 300 ms: the panel appears at 150 ms
@@ -448,7 +445,7 @@ Driven by `ds-native::Harness` (pure menus) and `sill debug` in nested cosmic-co
 12. **First mouse**: clicking a button in an inactive ds-native window activates the window and
     the button's handler does not run; a second click runs it; a `data-first-mouse` element
     runs on the first click.
-13. **Launcher**: opens with `peek-in` settling at 420 ms (`settle(PeekIn)`), rows 44 px, 8
+13. **Launcher**: rows 44 px, 8
     rows visible, p95 open < 100 ms over 20 toggles.
 14. **Sounds**: screenshot, Empty Trash, volume key, dock remove each trigger exactly one
     `play_sample` of the mapped name; none when `sound.ui_sounds = Off` (volume feedback follows
@@ -456,23 +453,24 @@ Driven by `ds-native::Harness` (pure menus) and `sill debug` in nested cosmic-co
 
 ## 13.9 Open decisions
 
-1. Menu item height: 24 (macOS-like, proposed) vs the design's Slim 30. Whichever wins applies
-   to every text menu (coherence rule).
+1. Menu item height: settled at 22 for every placement (design/30 §2.4); the design's Slim 30 is gone.
 2. Bar height: 32 (plan spike) vs 24-28 (macOS 24).
-3. Pick feedback: macOS blinks the chosen item once before closing; the design closes then
-   picks with no blink.
+3. Pick feedback: settled, the chosen row blinks twice (70 ms flashes) before the menu closes
+   (design/30 §1.3).
 4. Control center module list against the Claude Doc spec (rev 31) list.
 5. Launcher vertical position formula (Spotlight sits high; the plan says centred).
 6. Switcher icon size 96 vs macOS ~128.
 7. Notification banner material: `Toast` (03-COLOR proposal, used here) vs inverse ink/paper like the mail toast (03-COLOR open decision 12).
 8. Bar glyph size: 16 (macOS status icons, used here) vs `IconSize::Bar` 22 (`20-SURFACES.md` §1.1).
+9. Launcher open motion: design/30 §1.3 has no row for it and the `peek-in` spring pop is a
+   dropped flourish; the entrance is undecided.
 
 ## 13.10 Sources
 
 - Plan Appendix C-D (all R rows), "Design: sill" (Bar, Launcher, notifications server,
   shortcuts), "Design: shell-host" (popups, keyboard modes), "Findings: COSMIC" (shortcuts,
   cosmic-notifications, cosmic-comp #2230, #9), M0 spike item a.
-- Sibling docs: `03-COLOR.md` materials, `05-MOTION.md` (`menu-pop`, `peek-in`, `--d-fly`),
+- Sibling docs: `03-COLOR.md` materials, `05-MOTION.md`, `30-CATALOGUE.md` §1 and §2.4-2.5,
   `20-SURFACES.md` §1.1, `01-LAYOUT.md` §13.1 (bar height open decision).
 - Plan Appendix A: A0 (principles, S:792), A2 (type sizes), A3 (colour usage), A4 (`.fmenu`,
   `.slim`, cmdk, toast), A5 (keyframes and assignments), A6 (menus, keys, Esc).
