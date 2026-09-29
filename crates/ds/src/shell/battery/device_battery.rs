@@ -18,7 +18,7 @@ use crate::motion::detail::{
     touch::Touch,
     use_detail::use_detail,
 };
-use crate::shell::battery::level::{BOLT, RingLayer, RingMark, RingTone, given, percent_of, ring};
+use crate::shell::battery::level::{BOLT, RingLayer, RingMark, RingTone, given, ring};
 use crate::shell::battery::ring::{RingSpan, arc_path};
 use dioxus::prelude::*;
 
@@ -57,7 +57,7 @@ pub fn DeviceBattery(
 ) -> Element {
     let level = level.clamped();
     let reading = Reading {
-        percent: percent_of(level),
+        percent: level.whole_percent(),
         mark,
     };
     let detail = use_detail(reading, first, Touch::Remote);

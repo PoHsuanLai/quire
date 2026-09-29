@@ -9,13 +9,13 @@
 
 use crate::core::vocab::Fraction;
 use crate::motion::wake::WakeStamp;
-use crate::shell::battery::level::{percent_of, use_battery_fill};
+use crate::shell::battery::level::use_battery_fill;
 use dioxus::prelude::*;
 
 /// The percentage a battery at `level` shows this frame: counting from 0 on mount and on each
 /// new `wake`, from the old percentage on each new `level`, at once under Reduced motion.
 pub fn use_battery_figure(level: Fraction, wake: WakeStamp) -> u16 {
-    percent_of(use_battery_fill(level, wake).shown)
+    use_battery_fill(level, wake).shown.whole_percent()
 }
 
 /// `span.ds-battery-figure`: the counting percentage, `{n}%`, in tabular figures so the width

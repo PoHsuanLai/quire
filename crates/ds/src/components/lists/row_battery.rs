@@ -23,13 +23,6 @@ use dioxus::prelude::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct Percent(pub(crate) u16);
 
-impl Percent {
-    /// The whole percent of `level`, rounded.
-    pub(crate) fn of(level: Fraction) -> Percent {
-        Percent((level.clamped().0 + 5) / 10)
-    }
-}
-
 impl Detailed for Percent {
     fn moment(from: &Self, to: &Self) -> Moment {
         if from == to {
@@ -49,7 +42,7 @@ impl Detailed for Percent {
 /// the battery arrives with a surface just opened or after the row was already showing.
 #[component]
 pub(crate) fn RowBattery(level: Fraction, first: FirstShow) -> Element {
-    let percent = Percent::of(level);
+    let percent = Percent(level.whole_percent());
     let detail = use_detail(percent, first, Touch::Remote);
     // The glyph's own fill runs the same sweep; this one only paces the count, so it lands with it.
     let sweep = use_sweep(level.clamped(), detail.cue());
@@ -67,7 +60,6 @@ pub(crate) fn RowBattery(level: Fraction, first: FirstShow) -> Element {
 #[cfg(test)]
 mod tests {
     use super::Percent;
-    use crate::core::vocab::Fraction;
     use crate::motion::detail::{
         detailed::{first_table, moment_table},
         moment::Moment,
@@ -75,8 +67,6 @@ mod tests {
 
     #[test]
     fn the_battery_counts_what_it_prints() {
-        assert_eq!(Percent::of(Fraction(844)), Percent(84));
-        assert_eq!(Percent::of(Fraction(845)), Percent(85));
         moment_table(&[
             (Percent(84), Percent(84), Moment::Rest),
             (Percent(84), Percent(60), Moment::Change),
