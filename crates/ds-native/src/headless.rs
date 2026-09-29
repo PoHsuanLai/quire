@@ -6,7 +6,7 @@
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
 use crate::click_focus::FocusFallback;
-use crate::clipboard::HostClipboard;
+use crate::clipboard::{Clipboard, Memory};
 use crate::edit_ime::EditListeners;
 use crate::error::NativeError;
 use crate::focus_keep::{FocusKeeper, Kept, hand_back_seam, keep};
@@ -145,7 +145,7 @@ impl Headless {
             }
             FocusFallback::BlitzDefault => Keeper::Off,
         };
-        vdom.provide_root_context(HostClipboard::memory(Arc::clone(&shell)));
+        vdom.provide_root_context(Rc::new(Memory(Arc::clone(&shell))) as Rc<dyn Clipboard>);
         vdom.provide_root_context(crate::edit::EDIT);
         vdom.provide_root_context(listeners.clone());
         vdom.provide_root_context(crate::drop_hit::drop_seam());

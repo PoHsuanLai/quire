@@ -2,13 +2,13 @@
 //! `read_text` behind a paste. Copy and paste inside a text field need nothing from the app:
 //! Blitz handles Ctrl+C/X/V there through the same shell provider.
 //!
-//! The clipboard is the document's shell provider's, reached through a context every ds-native
-//! document provides: the window's winit shell (blitz-shell's `clipboard` feature, over
-//! `arboard`), or the harness's in-memory one, so a test copies and pastes without touching the
+//! The clipboard is a [`Clipboard`], reached through a context every ds-native document
+//! provides: [`System`], the window's winit shell (blitz-shell's `clipboard` feature, over
+//! `arboard`), or [`Memory`], the harness's, so a test copies and pastes without touching the
 //! desktop's clipboard.
 //!
-//! `text/html` (an edit surface's paste, `read_html`) is not in blitz's `ShellProvider`, so the
-//! window reads it from `arboard` itself and the harness from its memory clipboard's HTML slot.
+//! `text/html` (an edit surface's paste) is not in blitz's `ShellProvider`, so the window reads it
+//! from `arboard` itself and the harness from its memory clipboard's HTML slot.
 
 use crate::memory_shell::MemoryShell;
 use blitz_traits::shell::ShellProvider;
@@ -22,8 +22,8 @@ use std::sync::Arc;
 /// Why the clipboard was not read or written.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
 pub enum ClipboardError {
-    /// Not called inside a ds-native document (`launch`, the harness), or before the window's
-    /// document exists: there is no clipboard to reach. Call it from a handler.
+    /// Not called inside a ds-native document (`launch`, the harness): there is no clipboard to
+    /// reach. Call it from a handler.
     #[error("no ds-native document to reach a clipboard through")]
     NoHost,
     /// The system clipboard refused, or holds no text.
@@ -31,88 +31,104 @@ pub enum ClipboardError {
     Unavailable,
 }
 
-/// The shell whose clipboard a document's app uses: set when the window's document exists
-/// (`crate::install`), at once in a headless one; and where its HTML is read.
-#[derive(Clone, Default)]
-pub(crate) struct HostClipboard {
-    shell: Rc<RefCell<Option<Arc<dyn ShellProvider>>>>,
-    html: HtmlSource,
+/// A clipboard a document's app and its edit surfaces read and write.
+pub trait Clipboard {
+    /// The text on the clipboard.
+    fn read_text(&self) -> Option<String>;
+    /// What a paste inserts: the HTML with its plain text when the clipboard has HTML, else the
+    /// text.
+    fn read_html(&self) -> Option<Pasted>;
+    /// Put `text` on the clipboard.
+    fn write_text(&self, text: &str);
 }
 
-/// Where a document's clipboard HTML comes from.
-#[derive(Clone, Default)]
-enum HtmlSource {
-    /// The desktop's clipboard, through arboard: the window.
-    #[default]
-    System,
-    /// The harness's memory clipboard.
-    Memory(Arc<MemoryShell>),
+/// The desktop's clipboard, through the window's shell: the shell is reached once the window's
+/// document exists (`crate::install`).
+#[derive(Default)]
+pub struct System {
+    shell: RefCell<Option<Arc<dyn ShellProvider>>>,
 }
 
-impl HostClipboard {
-    /// The harness's clipboard: text and HTML in `shell`'s memory.
-    pub(crate) fn memory(shell: Arc<MemoryShell>) -> Self {
-        let clipboard = HostClipboard {
-            shell: Rc::default(),
-            html: HtmlSource::Memory(Arc::clone(&shell)),
-        };
-        clipboard.set(shell);
-        clipboard
+impl std::fmt::Debug for System {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("System")
     }
+}
 
+impl System {
     /// Reach the clipboard through `shell` from now on.
-    pub(crate) fn set(&self, shell: Arc<dyn ShellProvider>) {
+    pub(crate) fn reach(&self, shell: Arc<dyn ShellProvider>) {
         self.shell.replace(Some(shell));
     }
 
-    fn shell(&self) -> Result<Arc<dyn ShellProvider>, ClipboardError> {
-        self.shell.borrow().clone().ok_or(ClipboardError::NoHost)
+    fn shell(&self) -> Option<Arc<dyn ShellProvider>> {
+        self.shell.borrow().clone()
+    }
+}
+
+impl Clipboard for System {
+    fn read_text(&self) -> Option<String> {
+        let shell = self.shell()?;
+        guarded(|| shell.get_clipboard_text().ok())
     }
 
-    fn html(&self) -> Result<String, ClipboardError> {
-        match &self.html {
-            HtmlSource::Memory(shell) => shell.html().ok_or(ClipboardError::Unavailable),
-            HtmlSource::System => {
-                let mut read = None;
-                guarded(|| {
-                    read = arboard::Clipboard::new()
-                        .and_then(|mut clipboard| clipboard.get().html())
-                        .ok();
-                    read.is_some()
-                })?;
-                read.ok_or(ClipboardError::Unavailable)
-            }
+    fn read_html(&self) -> Option<Pasted> {
+        let html = guarded(|| {
+            arboard::Clipboard::new()
+                .and_then(|mut clipboard| clipboard.get().html())
+                .ok()
+        });
+        pasted(html, self.read_text())
+    }
+
+    fn write_text(&self, text: &str) {
+        if let Some(shell) = self.shell() {
+            let text = text.to_owned();
+            guarded(move || shell.set_clipboard_text(text).ok());
         }
+    }
+}
+
+/// The harness's clipboard: text and HTML in a shell's memory.
+#[derive(Debug)]
+pub(crate) struct Memory(pub(crate) Arc<MemoryShell>);
+
+impl Clipboard for Memory {
+    fn read_text(&self) -> Option<String> {
+        self.0.text()
+    }
+
+    fn read_html(&self) -> Option<Pasted> {
+        pasted(self.0.html(), self.0.text())
+    }
+
+    fn write_text(&self, text: &str) {
+        self.0.put(text.to_owned());
     }
 }
 
 /// Put `text` on the clipboard. Call it from a handler inside a ds-native document.
 pub fn write_text(text: &str) -> Result<(), ClipboardError> {
-    let shell = host()?.shell()?;
-    let text = text.to_owned();
-    guarded(move || shell.set_clipboard_text(text).is_ok())
+    host()?.write_text(text);
+    Ok(())
 }
 
 /// The text on the clipboard. Call it from a handler inside a ds-native document.
 pub fn read_text() -> Result<String, ClipboardError> {
-    let shell = host()?.shell()?;
-    let mut read = None;
-    guarded(|| {
-        read = shell.get_clipboard_text().ok();
-        read.is_some()
-    })?;
-    read.ok_or(ClipboardError::Unavailable)
+    host()?.read_text().ok_or(ClipboardError::Unavailable)
 }
 
 /// The clipboard's `text/html`. Call it from a handler inside a ds-native document.
 pub fn read_html() -> Result<String, ClipboardError> {
-    host()?.html()
+    match host()?.read_html() {
+        Some(Pasted::Html { html, .. }) => Ok(html),
+        Some(Pasted::Text(_)) | None => Err(ClipboardError::Unavailable),
+    }
 }
 
-/// What a paste inserts: the HTML with its plain text when the clipboard has HTML, else the text.
-pub(crate) fn read_pasted() -> Option<Pasted> {
-    let text = read_text().ok();
-    match (read_html().ok().filter(|html| !html.is_empty()), text) {
+/// What a paste inserts: the HTML with its plain text when there is HTML, else the text.
+fn pasted(html: Option<String>, text: Option<String>) -> Option<Pasted> {
+    match (html.filter(|html| !html.is_empty()), text) {
         (Some(html), text) => Some(Pasted::Html {
             html,
             text: text.unwrap_or_default(),
@@ -124,17 +140,14 @@ pub(crate) fn read_pasted() -> Option<Pasted> {
 
 /// The calling document's clipboard; outside any Dioxus runtime there is none (asking would
 /// panic).
-fn host() -> Result<HostClipboard, ClipboardError> {
+fn host() -> Result<Rc<dyn Clipboard>, ClipboardError> {
     dioxus::core::Runtime::try_current()
-        .and_then(|_| try_consume_context::<HostClipboard>())
+        .and_then(|_| try_consume_context::<Rc<dyn Clipboard>>())
         .ok_or(ClipboardError::NoHost)
 }
 
-/// Run a clipboard call, reading a refusal or a panic as `Unavailable`: blitz-shell unwraps
+/// Run a clipboard call, reading a panic as no answer: blitz-shell unwraps
 /// `arboard::Clipboard::new()`, which fails on a session with no clipboard at all.
-fn guarded(call: impl FnOnce() -> bool) -> Result<(), ClipboardError> {
-    match catch_unwind(AssertUnwindSafe(call)) {
-        Ok(true) => Ok(()),
-        Ok(false) | Err(_) => Err(ClipboardError::Unavailable),
-    }
+fn guarded<T>(call: impl FnOnce() -> Option<T>) -> Option<T> {
+    catch_unwind(AssertUnwindSafe(call)).ok().flatten()
 }

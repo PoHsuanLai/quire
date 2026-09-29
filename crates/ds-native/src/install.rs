@@ -3,7 +3,7 @@
 //! through a hidden element's `onmounted` handle and calls [`install`] there, before the app's
 //! first render.
 
-use crate::clipboard::HostClipboard;
+use crate::clipboard::System;
 use crate::frame_book::FrameBook;
 use crate::frames::FrameParser;
 use crate::net::DsNet;
@@ -19,12 +19,12 @@ use std::sync::Arc;
 pub(crate) fn install(
     handle: &NodeHandle,
     setup: &Setup,
-    clipboard: &HostClipboard,
+    clipboard: &System,
     frames: (Arc<dyn NavigationProvider>, FrameBook),
 ) {
     let (frame_nav, book) = frames;
     let mut doc = handle.doc_mut();
-    clipboard.set(Arc::clone(&doc.shell_provider));
+    clipboard.reach(Arc::clone(&doc.shell_provider));
     let shell = Arc::clone(&doc.shell_provider);
     let waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| shell.request_redraw());
     let fallback = Arc::clone(&doc.net_provider);

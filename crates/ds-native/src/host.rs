@@ -37,7 +37,7 @@
 //! the document itself and hands the app nothing else that can see it.
 
 use crate::click_focus::FocusFallback;
-use crate::clipboard::HostClipboard;
+use crate::clipboard::{Clipboard, System};
 use crate::edit_ime::{EditListeners, ime_of};
 use crate::edit_window::{captured_of, modifiers_of};
 use crate::focus_keep::{FocusKeeper, hand_back_seam, keep};
@@ -140,7 +140,8 @@ pub(crate) fn Host(props: HostProps) -> Element {
     #[cfg(feature = "spellcheck")]
     crate::spell::provide();
     let listeners = use_context_provider(EditListeners::default);
-    let clipboard = use_context_provider(HostClipboard::default);
+    let clipboard = use_hook(|| Rc::new(System::default()));
+    use_context_provider(|| Rc::clone(&clipboard) as Rc<dyn Clipboard>);
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
     let found = Rc::clone(&document);
     use_context_provider(move || {
