@@ -1,7 +1,8 @@
 //! What the command palette lists and how its keys read: pure, beside `command_palette`.
 
-use crate::components::menus::menu_lines::{Line, Step};
+use crate::components::menus::menu_lines::Line;
 use crate::components::menus::{menu_entry::MenuEntry, menu_match::fuzzy};
+use crate::stack::roving::Step;
 use dioxus::prelude::Key;
 
 /// What a key in the search field does to the palette.
@@ -49,7 +50,7 @@ pub(crate) fn marked<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Lin
 #[cfg(test)]
 mod tests {
     use super::{PaletteKey, palette_key};
-    use crate::components::menus::menu_lines::Step;
+    use crate::stack::roving::Step;
     use dioxus::prelude::Key;
 
     #[test]

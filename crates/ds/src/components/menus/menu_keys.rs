@@ -2,8 +2,9 @@
 //! submenu is open: pure, so the whole keyboard contract is one table (design/06-INTERACTIONS.md
 //! section 2.4; design/13-BEHAVIOUR-menus-windows.md sections 13.3.2-13.3.4).
 
-use crate::components::menus::menu_lines::{Act, Choice, KeyAct, Nav, liveness, moved_live};
+use crate::components::menus::menu_lines::{Act, Choice, KeyAct, liveness};
 use crate::core::vocab::Availability;
+use crate::stack::roving::{Wrap, edge_live, moved_live};
 
 /// Which panel: the menu itself, or a submenu (whose Escape and Left go back one level).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,8 +58,9 @@ pub(crate) fn decide<T: Clone>(
         .filter(|choice| choice.availability == Availability::Enabled);
     match act {
         KeyAct::Move(step) => {
-            Decision::Select(moved_live(Nav::Wrap, selected, &liveness(choices), *step))
+            Decision::Select(moved_live(Wrap::Wraps, selected, &liveness(choices), *step))
         }
+        KeyAct::Edge(edge) => Decision::Select(edge_live(*edge, selected, &liveness(choices))),
         KeyAct::Pick => match live.map(|choice| &choice.act) {
             Some(Act::Pick(value)) => Decision::Pick(value.clone()),
             Some(Act::Open(_)) => Decision::Expand(selected),
@@ -72,6 +74,7 @@ pub(crate) fn decide<T: Clone>(
         KeyAct::Back | KeyAct::Close if level == Level::Sub => Decision::Back,
         KeyAct::Back => Decision::Nothing,
         KeyAct::Close => Decision::CloseMenu,
+        KeyAct::Jump(_) => Decision::Nothing,
         KeyAct::Type(_) | KeyAct::Erase => match level {
             Level::Root => Decision::Query,
             Level::Sub => Decision::Nothing,
@@ -82,13 +85,15 @@ pub(crate) fn decide<T: Clone>(
 #[cfg(test)]
 mod tests {
     use super::{Child, Decision, Level, decide};
-    use crate::components::menus::menu_lines::{Act, Choice, KeyAct, Step};
+    use crate::components::menus::menu_lines::{Act, Choice, KeyAct};
     use crate::core::vocab::Availability;
+    use crate::stack::roving::Step;
 
     fn pick(value: u8) -> Choice<u8> {
         Choice {
             act: Act::Pick(value),
             availability: Availability::Enabled,
+            title: String::new(),
         }
     }
 
@@ -96,6 +101,7 @@ mod tests {
         Choice {
             act: Act::Pick(value),
             availability: Availability::Disabled,
+            title: String::new(),
         }
     }
 
@@ -103,6 +109,7 @@ mod tests {
         Choice {
             act: Act::Open(Vec::new()),
             availability: Availability::Enabled,
+            title: String::new(),
         }
     }
 

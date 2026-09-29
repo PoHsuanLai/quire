@@ -363,7 +363,9 @@ pub use crate::stack::{
         MenuTrackEffect, MenuTrackEvent, ShownBy,
     },
     pull_tab::{Pull, PullTab, TabArm},
+    roving::{Rove, Roving, Wrap},
     toast_hub::{ToastState, UndoToken, use_toast_hub},
+    typeahead::Typeahead,
 };
 pub use crate::style::{
     appearance::{

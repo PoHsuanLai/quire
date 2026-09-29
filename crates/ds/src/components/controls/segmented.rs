@@ -9,7 +9,7 @@
 //! to. A label is drawn in the thumb's ink while the thumb is over it (`data-thumb`), not on a
 //! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
 
-use crate::core::vocab::{Check, Selection};
+use crate::core::vocab::{Availability, Check, Selection};
 use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
@@ -17,6 +17,7 @@ use crate::motion::{
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
 };
+use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::*;
 
 /// About how wide a segment draws, in pixels: what one of the thumb's units is when a hand's
@@ -99,6 +100,7 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
     };
     let spec = SpringSpec::for_touch(touch).response(SpringResponse::Quick);
     let thumb = use_spring(at as f32, spec, PxPerUnit(SEGMENT_PX));
+    let values: Vec<T> = options.iter().map(|(option, _)| option.clone()).collect();
     rsx! {
         div {
             class: "ds-segmented",
@@ -106,6 +108,16 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
             role: "group",
             "aria-label": "{label}",
             style: group_style(count, at, thumb.position()),
+            onkeydown: move |event| {
+                let Some(rove) = Rove::of(&event.key()) else { return };
+                let set = Roving::new((0..values.len()).map(|index| (index, Availability::Enabled)).collect(), Wrap::Stops);
+                let to = set.focus(&at).rove(rove).focused().copied();
+                if let Some(to) = to.filter(|to| *to != at) {
+                    event.prevent_default();
+                    asked.set(Some((to, Touch::from_event(&event))));
+                    onchange.call(values[to].clone());
+                }
+            },
             for (index , (option , text)) in options.into_iter().enumerate() {
                 button {
                     r#type: "button",

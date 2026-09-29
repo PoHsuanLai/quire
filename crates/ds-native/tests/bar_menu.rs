@@ -363,3 +363,40 @@ fn the_exported_measurer_reads_a_rect() {
     harness.advance(ms(80));
     assert_eq!(harness.text_of(".width").as_deref(), Some("123"));
 }
+
+/// The title of the selected choice.
+fn selected(harness: &Harness) -> Option<String> {
+    harness.text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
+}
+
+#[test]
+fn home_and_end_go_to_the_first_and_last_enabled_choice() {
+    let mut harness = Harness::new(OpenMenu, VIEW);
+    settle_in(&mut harness);
+    harness.key(ShortcutKey::End);
+    assert_eq!(selected(&harness).as_deref(), Some("Quit"));
+    harness.key(ShortcutKey::Home);
+    assert_eq!(selected(&harness).as_deref(), Some("Open"));
+}
+
+#[test]
+fn typing_a_letter_selects_the_choice_that_starts_with_it() {
+    let mut harness = Harness::new(OpenMenu, VIEW);
+    settle_in(&mut harness);
+    harness.key(ShortcutKey::Char('q'));
+    assert_eq!(selected(&harness).as_deref(), Some("Quit"));
+    harness.advance(ms(1200));
+    harness.key(ShortcutKey::Char('o'));
+    assert_eq!(
+        selected(&harness).as_deref(),
+        Some("Open"),
+        "the buffer was forgotten"
+    );
+    harness.advance(ms(1200));
+    harness.key(ShortcutKey::Char('p'));
+    assert_eq!(
+        selected(&harness).as_deref(),
+        Some("Open"),
+        "a disabled choice is not typed onto"
+    );
+}

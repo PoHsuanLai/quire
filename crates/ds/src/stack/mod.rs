@@ -6,4 +6,6 @@ pub mod hover_hub;
 pub mod layer_stack;
 pub(crate) mod menu_track;
 pub(crate) mod pull_tab;
+pub mod roving;
 pub mod toast_hub;
+pub mod typeahead;

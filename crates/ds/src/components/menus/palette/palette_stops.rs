@@ -11,12 +11,11 @@
 
 use crate::components::lists::emoji_grid::grid::EmojiCells;
 use crate::components::lists::emoji_grid::nav::{GridEdge, GridMove, GridStep, grid_step};
-use crate::components::menus::menu_lines::{
-    Act, Choice, Line, Nav, Step, choices, choices_len, moved_live,
-};
+use crate::components::menus::menu_lines::{Act, Choice, Line, choices, choices_len};
 use crate::components::menus::palette::palette_group::{GroupEntries, PaletteGroup};
 use crate::components::menus::palette::palette_lines::marked;
 use crate::core::vocab::Availability;
+use crate::stack::roving::{Step, Wrap, moved_live};
 use dioxus::prelude::EventHandler;
 
 /// A group as drawn: its rows marked for the query, or its grid, and its first stop.
@@ -156,7 +155,7 @@ pub(crate) fn travel(
         .find(|span| (span.first..span.first + span.count).contains(&current));
     match (grid, travel) {
         (None, Travel::Side(_)) => None,
-        (None, Travel::Vertical(step)) => Some(moved_live(Nav::Clamp, current, live, step)),
+        (None, Travel::Vertical(step)) => Some(moved_live(Wrap::Stops, current, live, step)),
         (Some(span), travel) => Some(in_grid(*span, current, travel, live)),
     }
 }
@@ -177,7 +176,7 @@ fn in_grid(span: GridSpan, current: usize, travel: Travel, live: &[Availability]
                 GridEdge::Top => (span.first, Step::Up),
                 GridEdge::Bottom => (span.first + span.count - 1, Step::Down),
             };
-            match moved_live(Nav::Clamp, from, live, step) {
+            match moved_live(Wrap::Stops, from, live, step) {
                 next if next == from => current,
                 next => next,
             }
@@ -201,6 +200,7 @@ pub(crate) fn run_of<T: Clone>(stop: Option<&Stop<T>>) -> Run<T> {
         Some(Stop::Row(Choice {
             act: Act::Pick(value),
             availability: Availability::Enabled,
+            ..
         })) => Run::Pick(value.clone()),
         Some(Stop::Cell(value)) => Run::Pick(value.clone()),
         Some(Stop::Action(run)) => Run::Action(*run),
@@ -211,8 +211,8 @@ pub(crate) fn run_of<T: Clone>(stop: Option<&Stop<T>>) -> Run<T> {
 #[cfg(test)]
 mod tests {
     use super::{GridSpan, Travel, travel};
-    use crate::components::menus::menu_lines::Step::{Down, Up};
     use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
+    use crate::stack::roving::Step::{Down, Up};
 
     #[test]
     fn the_cursor_walks_rows_enters_a_grid_and_leaves_it() {

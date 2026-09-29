@@ -10,7 +10,10 @@
 
 use crate::components::menus::menu_lines::{Act, Choice};
 use crate::core::geometry::units::{Point, Px, Rect, Size};
-use crate::core::time::{FRAME_SLACK, clock::sleep};
+use crate::core::time::{
+    FRAME_SLACK,
+    clock::{now, sleep},
+};
 use crate::core::vocab::Availability;
 use crate::host::measure::MountedRef;
 use crate::host::measure::client_rect;
@@ -18,6 +21,7 @@ use crate::stack::menu_track::types::{
     Branch, ItemPath, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
     MenuTrackEvent, Pickable, Submenu,
 };
+use crate::stack::typeahead::Typeahead;
 use dioxus::prelude::*;
 
 /// How a submenu was asked for: by the keyboard it takes the focus, by the pointer it leaves
@@ -57,6 +61,7 @@ pub(crate) struct Tracker {
     via: CopyValue<Via>,
     rows: CopyValue<Vec<Option<MountedRef>>>,
     panel: CopyValue<Option<MountedRef>>,
+    typeahead: CopyValue<Typeahead>,
     pad: Px,
 }
 
@@ -69,6 +74,7 @@ pub(crate) fn use_tracker(timing: MenuTiming, pad: Px) -> Tracker {
         via: use_hook(|| CopyValue::new(Via::Pointer)),
         rows: use_hook(|| CopyValue::new(Vec::new())),
         panel: use_hook(|| CopyValue::new(None)),
+        typeahead: use_hook(|| CopyValue::new(Typeahead::default())),
         pad,
     }
 }
@@ -94,6 +100,18 @@ fn path(index: usize) -> ItemPath {
 }
 
 impl Tracker {
+    /// Type `text`: the choice, among those labelled `labels`, the selection jumps to.
+    pub(crate) fn typed(&self, text: &str, labels: &[&str], from: usize) -> Option<usize> {
+        let (next, found) = self
+            .typeahead
+            .peek()
+            .clone()
+            .typed(text, now(), labels, from);
+        let mut held = self.typeahead;
+        held.set(next);
+        found
+    }
+
     /// The selected choice (not yet settled onto an enabled one).
     pub(crate) fn selected(&self) -> usize {
         (self.selected)()
