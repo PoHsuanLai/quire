@@ -14,7 +14,7 @@ macOS number that could not be confirmed, shipped as the default and tuned again
 | # | Rule |
 | --- | --- |
 | R1 | Target: macOS Sonoma / Sequoia, pre-Liquid-Glass. Every component's look, sizes, states and behaviour follow the macOS default; the contract names its AppKit counterpart. Every open question takes the macOS default. |
-| R2 | One motion model: the macOS one. quire's own flourishes are gone: press squish, hover lift, overshoot and spring pops, tilt, stagger, first-show sweeps, mailo-era keyframes, infinite loops (the spinner is the one exception). Motion levels are an accessibility preference only. |
+| R2 | One motion model: the macOS one. quire's own flourishes are gone: press squish, hover lift, overshoot and spring pops, tilt, stagger, first-show sweeps, mailo-era keyframes, infinite loops (the spinner is the one exception, and the voice orb's turn while it is `Active`). Motion levels are an accessibility preference only. |
 | R3 | One implementation per concept. Every MERGE names one survivor; the absorbed names are deleted, not aliased. |
 | R4 | A Look is values only (Part 3). The library is a strict superset of the Mac Look. |
 | R5 | Kept although macOS lacks them: skeleton, toast, busy state on buttons and rows, hover card, key-cap. They move the macOS way (section 2.9 and 2.5). |
@@ -316,6 +316,7 @@ hover appearance. Every entry inherits `Common` (R8).
 | LevelIndicator | `NSLevelIndicator` | `Style {Continuous, Discrete}` with warning and critical bands (volume/brightness OSD bar, battery/storage rows) | Z3 | none | track, fill | read-only `LevelControl`, `LevelLook::Segments` | MERGE | P1 |
 | EmptyState | `ContentUnavailableView` | glyph, title, description, optional action; forms Empty, No Results, Failure (with Retry); one shake per new failure stamp only for Secure entry (1.3), otherwise static | Z- | none | icon, title, body, action | `.sill-cc-empty`, `.sill-nc-empty`, palette `empty`, `ErrorState`, `RowPhase::Failed` | ADD | P1 |
 | Skeleton | SwiftUI `redacted` placeholder | kept: grey placeholder shapes (`Shape {Line, Block, Circle}`) with a static fill, no shimmer; cross-fades `--t-quick` to content; shown while an `Operation` without a value runs | Z- | none | shape | none | ADD | P1 |
+| VoiceOrb | none public (the system voice orb is private) | a round field of drifting colour that shows a voice assistant is listening: six conic glows behind a dot grid, sized by `size: Px` (the whole look follows from it: `OrbMetrics::of`, a pure table-tested function), coloured by `OrbColours` (the `--orb-bg`, `--orb-c1..3` tokens unless the caller brings its own), `period: Duration` (default 20 s), and `activity: Activity {Active, Inactive}` (1.5). The glows turn once per period only while `Active`: a Rust frame timer (`FRAME_TICK`) writes `--orb-turn` inline, exists only while `Active`, and stops where it stands on `Inactive` (an idle orb wakes nothing). It is the second infinite loop after the spinner and no other. Blitz cannot animate a registered custom property, so the angle is not a CSS `@property`; layer-by-layer transform keyframes are not used because each gradient turns about its own centre, not the box's, and the lint bans an infinite CSS animation. The dot layer is a reduced-opacity plain layer under the mask where a browser overlay-blends and backdrop-blurs it (Blitz has neither); `filter: blur()` paints on the GPU renderer only and `contrast()` on none. Decorative unless `aria_label` names it. Becomes a `Timeline` implementor when `use_timeline` lands (step 4) | any `Px` | `Activity` | glow, dots | none | ADD | P2 |
 | Toast | notification banner | kept: `ToastHost`, one at a time, `ToastHold`; Slide(Right) in, Slide(Right) out; swipe right dismisses; hover pauses the hold; an optional action button (Undo); the pull tab is deleted | Z- | `Shown` | body, action | `ToastHost` pull tab, `pill-up`, `SentHold` | MERGE | P1 |
 | Badge | Dock / app badge | `Tone {Alert, Quiet}`; red capsule with `999+` rule (Alert), neutral capsule (Quiet, list trailing counts); dot form when no number; no bump | Z3 | none | label | `Count`, `CountPlace`, sill `.sill-dock-badge` (L1) | MERGE | P1 |
 
@@ -382,7 +383,7 @@ Mail-only (`ds::app`; mailo keeps its own look for now):
 Build order (ARCHITECTURE section 10, step 4a): 1 tokens and vocabulary; 2 motion and interaction
 primitives; 3 `Label`, `Button` (+ `IconButton` merge), `Toggle`, `Checkbox`, `RadioGroup`,
 `SegmentedControl`, `Slider`, `TextField`; 4 `ProgressIndicator`, `LevelIndicator`, `Badge`,
-`KeyEquivalent`; 5 `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`; 6 `List`, `Row`, `SectionHeader`;
+`KeyEquivalent`, `VoiceOrb`; 5 `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`; 6 `List`, `Row`, `SectionHeader`;
 7 overlays (`Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`, `Toast`,
 `DockLabel`), `EmptyState`, `Skeleton`; 8 shell-only and app features; 9 P2 (Stepper, DatePicker,
 Table, Toolbar, SplitView, Sidebar, TabView, FieldRow, MenuBar model); 10 sill switch-over
@@ -399,7 +400,7 @@ superset of Mac.
 
 | # | Varies | Token family |
 | --- | --- | --- |
-| 1 | Colour tokens, light and dark | `--paper --surface --surface-2 --raise --ink --ink-soft --ink-faint --line --line-soft --accent --accent-ink --accent-soft --ok --warn --danger --sel-bg --sel-bg-quiet --sel-ink --scrim` |
+| 1 | Colour tokens, light and dark | `--paper --surface --surface-2 --raise --ink --ink-soft --ink-faint --line --line-soft --accent --accent-ink --accent-soft --ok --warn --danger --sel-bg --sel-bg-quiet --sel-ink --scrim --orb-bg --orb-c1 --orb-c2 --orb-c3` |
 | 2 | Radius tokens | `--r-ctl --r-field --r-seg --r-menu --r-pop --r-sheet --r-card --r-pill --r-panel` |
 | 3 | Font family | `--font-ui --font-display --font-mono` |
 | 4 | Grain | `--grain` (0..100 scale) and the grain overlay opacity |
@@ -431,6 +432,7 @@ either Look.
 | Shadows | window `0 10px 30px -10px rgba(0,0,0,.35)`; menu and popover a hairline plus soft drop | inset white highlight over a soft drop (`--shadow-1`, `--shadow-2` from 07 §3.2) |
 | Materials | translucent vibrancy tints; Menu, Popover, Sheet, Sidebar, Bar, Dock, Osd, Toast, Widget, Window (Window = flat `--paper`) | today's 03 §17 table (Window carries the Space gradient) |
 | Icon plate | abstract embossed plate, matte, per-app gradient, tone band in dark | same recipe, Arc tones |
+| Orb colours (`--orb-bg --orb-c1 --orb-c2 --orb-c3`, light / dark) | oklch(95% .02 264.695), (75% .15 350), (80% .12 200), (78% .14 280) / the same hues at 24%, 68%, 72%, 70% lightness (dark conf L) | proposed: bg the Arc paper, glows the Postmark hue and two neighbours at the same lightness (conf L) |
 | Backdrop | the wallpaper and the Space colour sit behind the material; each material picks the tint up through its blur | the Space colour is painted on the chrome (frame tokens `--f-*`, gradient, grain); apps stay on paper |
 
 Materials (`Material`): Window, Bar, Dock, Menu, Popover, Sheet, Sidebar, Toast, Osd, Widget

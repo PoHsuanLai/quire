@@ -995,7 +995,7 @@ authority; this table is a pointer. `ds::lint::Rule::BlitzUnsupported`
 | --- | --- | --- |
 | `[data-x=v]` attribute selectors (unprefixed) | S2 | write `[*|data-x=v]` — quire's own component CSS does this everywhere; `Rule::UnprefixedAttributeSelector` |
 | `backdrop-filter: blur()` | S15 | ask the compositor to blur behind the surface (`Material`/`BlurState`), not CSS |
-| `filter: saturate()`/any colour-matrix filter | S16 | precompute the effect into a colour token instead of a runtime filter |
+| `filter: saturate()` and every colour function; `blur()`, `drop-shadow()` on vello_cpu | S16, FINDINGS "CSS `filter`" | `Rule::FilterNotPainted` warns: precompute a colour function into a colour token; `blur()` and `drop-shadow()` paint on the GPU renderer only |
 | CSS `stroke`/`fill` reaching `<svg>` children | S6 | `ds::Glyph` (renders `.ds-ic` with `stroke="currentColor"` as an attribute, not a rule); `Rule::SvgPaintInCss` |
 | `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::clip_chars` for a real character-count ellipsis |
 | `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_native::launch` track modality for you; `Rule::FocusPseudoClass` |

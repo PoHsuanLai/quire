@@ -194,7 +194,7 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 | S13 | `text-overflow: ellipsis`; a `mask-image` end fade | NO for ellipsis, YES for the fade |
 | S14 | `color-mix()` in a background | YES |
 | S15 | `backdrop-filter: blur()` | NO on cpu and on hybrid |
-| S16 | `filter: saturate()` / `blur()` | NO on cpu as pinned; hybrid does `blur()` but not `saturate()` |
+| S16 | `filter: saturate()` / `blur()` | NO on cpu as pinned; hybrid does `blur()` but not `saturate()` (see "CSS `filter`") |
 
 - **S1.** A `style` element under `<main>` applies; `Ds { stylesheet: Inject::Inline }` works.
 - **S2.** Custom properties, `var()`, inheritance and nested scopes all work; attribute selectors
@@ -246,12 +246,49 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
   Behind-surface blur comes from the compositor (ext-background-effect-v1); a material uses
   `data-blur=on` with `--m-tint` or `data-blur=off` with `--m-tint-solid`.
 - **S16.** anyrender_vello_cpu 0.17 drops every filter when `multithreading` is on (the pinned
-  feature). anyrender_vello_hybrid 0.10 applies `blur()` but returns `None` for every
-  `ColorMatrix` filter (saturate, grayscale, sepia, hue-rotate, brightness, contrast, invert), one
-  filter node at most. `filter` stays banned by the lint; the vibrancy saturation boost is
-  precomputed into the tint colours, and no design may depend on `filter: blur()`.
+  feature). anyrender_vello_hybrid 0.10 applies `blur()` and `drop-shadow()` and returns `None` for
+  every colour function, one filter node at most. `filter` is no longer banned: the lint warns per
+  function and backend (`Rule::FilterNotPainted`), and the table under "CSS `filter`" says what
+  paints. The vibrancy saturation boost stays precomputed into the tint colours.
 - **Offscreen GPU rendering works**: `wgpu_context::BufferRenderer`, `vello_hybrid::Renderer::
   render` to its texture view, then `copy_texture_to_buffer` ("Hybrid harness backend").
+
+## CSS `filter`
+
+Measured by `ds-native/tests/css_filter.rs`: one swatch per function beside an unfiltered control,
+read back from the pixels of each backend (the hybrid cases skip where no GPU adapter opens).
+
+| function | vello_cpu as pinned (`multithreading`) | vello_hybrid |
+|----------|-----------------------------------------|--------------|
+| `blur()` | dropped | paints |
+| `drop-shadow()` | dropped | paints |
+| `brightness()`, `contrast()`, `invert()`, `opacity()` | dropped | dropped (a component transfer; converts to nothing) |
+| `grayscale()`, `hue-rotate()`, `saturate()`, `sepia()` | dropped | dropped (a colour matrix; converts to nothing) |
+
+- **Why.** anyrender hands a backend only the first node of a filter list, so `blur() contrast()`
+  paints the blur alone on hybrid and `contrast() blur()` paints nothing. vello_cpu 0.1 and
+  vello_hybrid 0.1 implement four primitives (flood, gaussian blur, offset, drop shadow); a colour
+  matrix panics vello_common (`unimplemented!`), which is why anyrender_vello_hybrid converts it to
+  `None`. vello_cpu's multi-threaded dispatcher has no filter support at all, so anyrender_vello_cpu
+  hands it none.
+- **Configuration cannot fix it.** `anyrender_vello_cpu`'s `filters` feature with `multithreading`
+  off paints `blur()` and `drop-shadow()` on the CPU, but forwards `grayscale()`, `hue-rotate()`,
+  `saturate()` and `sepia()` into the panic above, and costs the snapshot tests 2.7 times their wall
+  time (nine pixel-heavy test binaries: 12.2 s with, 33.2 s without, debug profile). shell-host's
+  `wl_shm` fallback runs on vello_cpu, so a user stylesheet with `filter: sepia(1)` would take the
+  shell down. The pin stays as it is.
+- **The lint** (`Rule::FilterNotPainted`, a warning) names each function and backend that drops
+  it; `Rule::BlitzUnsupported` no longer covers `filter`. `backdrop-filter` and `mix-blend-mode`
+  stay banned.
+
+## Conic gradients, masks and registered properties
+
+- `conic-gradient(from calc(var(--a) * 2) at 25% 70%, ...)` with transparent stops paints and
+  turns with the variable; `mask-image: radial-gradient(...)` masks; several layered conics under
+  `border-radius` clip to the circle (`ds-native/tests/voice_orb.rs`).
+- `@property --angle` with `@keyframes { to { --angle: 360deg } }` animates a conic gradient on the
+  headless harness exactly as a `rotate()` keyframe does (`registered_property_animation.rs`); not
+  measured in a window. The voice orb drives its turn from Rust regardless (design/30 `VoiceOrb`).
 
 ## Selectors and cascade
 

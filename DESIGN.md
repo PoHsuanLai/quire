@@ -85,6 +85,7 @@ public surface, one path per item.
 | `core/text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `style/icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (stroke as attributes) |
 | `style/icon/geometry_shell.rs` | 08-ICONS §1.6 |
+| `components/content/voice_orb/`, `style/tokens/orb.rs`, `--orb-*` in `style/tokens/colour.rs` | 30-CATALOGUE §2.9 (`VoiceOrb`, ADD), §3.2 (orb colours per Look): `OrbMetrics::of` (size-derived look), `Turn` and its frame timer (only while `Activity::Active`), `OrbColours` |
 | `components/content/icon_source.rs`, `style/icon/url.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`; `IconUrl` (`data:`/`file:` only) |
 | `style/icon/classify.rs` | 08-ICONS §1.5 step 2: `classify_with(png, limit) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
 | `core/error.rs` | CONVENTIONS §7: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
