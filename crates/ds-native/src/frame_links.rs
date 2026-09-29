@@ -1,4 +1,4 @@
-//! What a link clicked inside a frame does (mailo Phase B, G7). Blitz reloads the frame with the
+//! What a link clicked inside a frame does. Blitz reloads the frame with the
 //! link's target (its `IframeNavigationProvider` sends the parent a `NavigateIframe`), which for
 //! a mail body means fetching a stranger's page into the reader. ds-native gives every frame
 //! document its own navigation provider instead (through `crate::frames`, as the document is
@@ -6,7 +6,7 @@
 //!
 //! A click is delivered through a channel, not called from the provider: Blitz calls it while
 //! the document is held, and the app's handler must be free to touch the document (focus,
-//! measure) without a "RefCell already borrowed" (sill FINDINGS Q43). The link's text and title
+//! measure) without a "RefCell already borrowed". The link's text and title
 //! are read as it is delivered, from the frame's document, then free: the provider hears only the
 //! URL.
 

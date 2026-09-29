@@ -1,4 +1,4 @@
-//! Pictures of Edit Widgets as the person meets it (sill Q520-Q523, G423), for the progress
+//! Pictures of Edit Widgets as the person meets it, for the progress
 //! page: a 1280 x 800 desktop over a wallpaper-like wash, its widgets at their cells from the
 //! right, and the gallery in the bottom sheet. Posed on the virtual clock: opened; a moment after
 //! Add to Desktop (the new widget on the desktop, the button's check drawing, the new row

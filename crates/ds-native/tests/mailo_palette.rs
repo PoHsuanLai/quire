@@ -1,4 +1,4 @@
-//! mailo gaps 2, the command panel, on a real Blitz document: `PaletteEntrance::Opaque` paints
+//! The command panel, on a real Blitz document: `PaletteEntrance::Opaque` paints
 //! the card on its first frame where `cmdk-in` paints nothing yet, and a row's trailing action
 //! fires without running, closing or selecting its row.
 

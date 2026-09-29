@@ -1,4 +1,4 @@
-//! The launcher v2 parts on a real Blitz document (sill Q291, Q292, Q294, Q299): the palette's
+//! The launcher v2 parts on a real Blitz document: the palette's
 //! cursor entering, crossing and leaving an emoji grid; a group's "Show More" reached with Down
 //! and run with Enter; a key claimed before the field types it, with the caret's place; and a
 //! pane beside the results widening the card.
@@ -92,7 +92,7 @@ fn selected(harness: &Harness) -> String {
         .unwrap_or_default()
 }
 
-/// Q291: Down enters the grid at its first cell; Left and Right walk cells in reading order,
+/// Down enters the grid at its first cell; Left and Right walk cells in reading order,
 /// wrapping rows; Down moves a row in the same column, onto the short last row's last cell, then
 /// out to the next group; Up comes back in; Enter on a cell picks it and closes.
 #[test]
@@ -179,7 +179,7 @@ fn MorePalette() -> Element {
     }
 }
 
-/// Q294: Down past a group's last row rests on its header's "Show More" (drawn selected); Enter
+/// Down past a group's last row rests on its header's "Show More" (drawn selected); Enter
 /// runs it and the palette stays open, the group now longer; Down goes on to the next group.
 #[test]
 fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
@@ -240,7 +240,7 @@ fn caret_word(caret: Caret) -> &'static str {
 fn ClaimPalette() -> Element {
     let mut log = use_signal(Vec::<String>::new);
     let mut query = use_signal(String::new);
-    // Browsing: the selection last moved by Up or Down and nothing typed since (sill F654).
+    // Browsing: the selection last moved by Up or Down and nothing typed since.
     let mut browsing = use_signal(|| false);
     let claim = move |key: FieldKey| -> Claim {
         let name = key.event.key();
@@ -296,7 +296,7 @@ fn query(harness: &Harness) -> String {
     harness.text_of(".query").unwrap_or_default()
 }
 
-/// Q299: a claim hears each key first with the caret's place. Space while typing is passed and
+/// A claim hears each key first with the caret's place. Space while typing is passed and
 /// the field types it; after Down (browsing) Space is taken and the field types nothing. Right
 /// with the caret inside the text is passed (the caret moves); with the caret at the end it is
 /// taken.
@@ -401,7 +401,7 @@ fn toggle(harness: &mut Harness) {
     harness.advance(ms(60));
 }
 
-/// Q292: over a window the card widens by exactly the pane's width, the results keeping theirs,
+/// Over a window the card widens by exactly the pane's width, the results keeping theirs,
 /// and the pane sits right of them under the field; without it the card is as it was.
 #[test]
 fn a_pane_beside_the_results_widens_the_card_by_its_width() {
@@ -435,7 +435,7 @@ fn a_pane_beside_the_results_widens_the_card_by_its_width() {
     );
 }
 
-/// Q292: in a surface the card still fills its container, and the results give the pane its
+/// In a surface the card still fills its container, and the results give the pane its
 /// width.
 #[test]
 fn in_a_surface_the_results_narrow_by_the_pane() {
@@ -472,7 +472,7 @@ fn LoneGrid() -> Element {
     }
 }
 
-/// Q291: a grid on its own takes the keyboard when clicked into; the arrows move in two
+/// A grid on its own takes the keyboard when clicked into; the arrows move in two
 /// dimensions and stop at its edges (nowhere to leave to), and Enter picks.
 #[test]
 fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
@@ -526,7 +526,7 @@ fn LeavingPane() -> Element {
     }
 }
 
-/// Q292: a pane turned hidden plays its exit (`pane-out-r`) and calls `on_hidden` only once
+/// A pane turned hidden plays its exit (`pane-out-r`) and calls `on_hidden` only once
 /// that has settled (`settle(PaneOutR)`, 284 ms at Standard), so the caller drops it then.
 #[test]
 fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {

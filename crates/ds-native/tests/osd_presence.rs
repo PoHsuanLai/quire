@@ -1,4 +1,4 @@
-//! The OSD card's presence on a real Blitz document (sill FINDINGS Q76): shown, it enters
+//! The OSD card's presence on a real Blitz document: shown, it enters
 //! (`data-presence="entering"`, `osd-in`) and comes to rest; hidden, it leaves (`osd-out`) and
 //! `on_hidden` runs when `settle(OsdOut)` is up and not before, with the card no longer drawn;
 //! shown again while it fades, the hide is taken back and `on_hidden` never runs for it.
@@ -60,7 +60,7 @@ fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
     harness.advance(ms(300));
     assert_eq!(presence(&harness).as_deref(), Some("present"));
     let out = settle(Anim::OsdOut, MotionLevel::Standard, StaggerIndex::default());
-    // Marked on the harness's own (virtual) clock, sill Q380, so the comparison against `out`
+    // Marked on the harness's own (virtual) clock, so the comparison against `out`
     // below is exact, not merely a true lower bound.
     let hiding = harness.now();
     show(&mut harness, Shown::Hidden);

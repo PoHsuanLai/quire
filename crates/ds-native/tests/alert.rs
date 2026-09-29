@@ -1,4 +1,4 @@
-//! The alert on a real Blitz document (sill Q490): it opens with the keyboard on the default
+//! The alert on a real Blitz document: it opens with the keyboard on the default
 //! button (the action, or Cancel when the action is destructive); Return presses the default
 //! wherever the keyboard is; Escape and a press on the scrim cancel; Space presses the button
 //! that has the keyboard, and Tab moves it; inline it stands inside a 320 px popover and fits,

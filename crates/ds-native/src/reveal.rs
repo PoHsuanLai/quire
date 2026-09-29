@@ -1,4 +1,4 @@
-//! The host's reveal write (`ds::HostReveal`, sill Q340): scroll a list's own content the least
+//! The host's reveal write (`ds::HostReveal`): scroll a list's own content the least
 //! that shows one of its items. Blitz's `scroll_into_view` only ever scrolls the document's
 //! viewport, so a palette row below a 360 px list stayed below it; this reads the item's place in
 //! the list's content from the layout and sets the list's offset, nearest edge first

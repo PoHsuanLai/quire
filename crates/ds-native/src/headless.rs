@@ -49,7 +49,7 @@ pub(crate) enum Layout {
     #[default]
     Running,
     /// Rendered (components run, tasks are polled) but never styled or laid out: a surface
-    /// whose document was built before the compositor mapped it (sill FINDINGS Q60).
+    /// whose document was built before the compositor mapped it.
     Held,
 }
 

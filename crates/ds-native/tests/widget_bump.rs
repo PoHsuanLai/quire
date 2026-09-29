@@ -1,4 +1,4 @@
-//! sill Q182 on a real Blitz document: a widget's text bumps once when it changes, and is at
+//! On a real Blitz document: a widget's text bumps once when it changes, and is at
 //! rest again once the bump has settled. Nothing plays on mount and nothing loops. The battery
 //! ring beside it no longer bumps: it sweeps to the new level (design/23 section 4.1,
 //! `battery_fill.rs`), wearing `data-pulse` while it moves.

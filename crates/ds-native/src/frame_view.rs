@@ -1,4 +1,4 @@
-//! Reading a frame's sub-document from a test (G4): a `srcdoc` frame is a separate Blitz
+//! Reading a frame's sub-document from a test: a `srcdoc` frame is a separate Blitz
 //! document, so the harness's own queries never see into it (the isolation mailo's reader relies
 //! on) and a test that wants its contents asks the frame.
 

@@ -1,4 +1,4 @@
-//! A Space dot paints its gradient from `--dot-c*` in the stylesheet (mailo gaps 3, item 5), and
+//! A Space dot paints its gradient from `--dot-c*` in the stylesheet, and
 //! the picture is the one its old inline `background:linear-gradient(…)` drew: on Blitz, each
 //! dot is compared pixel by pixel with a reference box painted with `space::gradient`'s text,
 //! for a two-stop and a three-stop preset.

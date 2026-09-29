@@ -1,4 +1,4 @@
-//! mailo gaps 4, the strip's press, on a real Blitz document: a strip button's `on_press` fires
+//! The strip's press, on a real Blitz document: a strip button's `on_press` fires
 //! inside the click, before any measurement, so a host that cannot measure (no layout) still
 //! acts; where the rect resolves, the measured `onclick` follows it.
 

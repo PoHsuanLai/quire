@@ -1,4 +1,4 @@
-//! mailo gaps 4, item 4: the Space editor's Motion row with `MotionLevels::Contact` offers the
+//! The Space editor's Motion row with `MotionLevels::Contact` offers the
 //! three levels a Space sets, and a pick among them is reported.
 
 use dioxus::prelude::*;

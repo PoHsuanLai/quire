@@ -1,4 +1,4 @@
-//! G295 (sill's G130 root cause): Blitz at the pinned rev keeps a CSS animation's last value on an
+//! Blitz at the pinned rev keeps a CSS animation's last value on an
 //! element whose `animation-name` goes away before the animation ends, in paint and in the hit
 //! test, while `Harness::rect` (layout, no transform) reads the resting box. The raw case is
 //! sill's repro, ported; it passes only with Blitz patched to restyle such an element. The
@@ -111,7 +111,7 @@ fn standard(anim: Anim) -> Duration {
 /// frame that stalls): the panel turns present about a millisecond into its slide.
 #[test]
 fn a_panel_present_before_its_slide_has_played_still_comes_to_rest() {
-    // Kept on Wall: this reproduces G295's split clock on purpose (a real futures-timer
+    // Kept on Wall: this reproduces the split clock on purpose (a real futures-timer
     // settling while the harness's frame clock has barely advanced past the first frame),
     // which Virtual's unified clock cannot produce (its `advance` only fires a timer once the
     // frame clock reaches it, so this same scenario is proven inert there in

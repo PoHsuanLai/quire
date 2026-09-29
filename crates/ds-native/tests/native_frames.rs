@@ -1,4 +1,4 @@
-//! G4 (mailo Phase B): an `<iframe srcdoc>` is a real, separate sub-document under the harness,
+//! An `<iframe srcdoc>` is a real, separate sub-document under the harness,
 //! as in the window: its text renders, its selectors are found through the frame and never
 //! through the app's document, and a `<script>` in it does nothing (Blitz runs no scripts).
 

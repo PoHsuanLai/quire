@@ -1,5 +1,5 @@
-//! Sheet and modal parts, Q95: a Small key cap's Left and Right arrows are arrows, not dashes.
-//! Extended for sill Q111: the arrows the font subset now draws are real arrows but only ~4 px
+//! A Small key cap's Left and Right arrows are arrows, not dashes.
+//! The arrows the font subset now draws are real arrows but only ~4 px
 //! of ink, still close to a dash. `data-glyph="arrow"` (`Key::glyph_kind`) draws Up, Down, Left
 //! and Right at `--fs-control` with a tighter line-height, so the ink is at least 7 px wide
 //! while the cap's own box (padding and border drive its height, not the glyph) stays the
@@ -90,7 +90,7 @@ fn a_small_caps_left_and_right_arrows_have_heads() {
     assert!(up_h >= 5, "the up arrow is drawn: {up_w} x {up_h}");
     for side in [".left .ds-kbd", ".right .ds-kbd"] {
         let (width, height) = ink_box(&harness, &frame, side);
-        // Q111: 5 px still read as a dash; the arrow face (`--fs-control`) asks for at least 7.
+        // 5 px still read as a dash; the arrow face (`--fs-control`) asks for at least 7.
         assert!(width >= 7, "{side}: the arrow is {width} px long");
         assert!(
             height >= 3 && height * 3 >= width,
@@ -105,7 +105,7 @@ fn a_small_caps_left_and_right_arrows_have_heads() {
     }
 }
 
-/// Q111: the bigger arrow face's tighter line-height keeps the cap's own box the height every
+/// The bigger arrow face's tighter line-height keeps the cap's own box the height every
 /// other Small cap already has (`plain`, an unstyled Small letter cap) — only the glyph inside
 /// grows, not the rim around it.
 #[test]

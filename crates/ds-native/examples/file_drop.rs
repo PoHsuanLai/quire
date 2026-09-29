@@ -1,4 +1,4 @@
-//! Files dropped into a window from a file manager (mailo item 21: attachments dropped onto the
+//! Files dropped into a window from a file manager (attachments dropped onto the
 //! composer).
 //!
 //! `cargo run -p ds-native --example file_drop`

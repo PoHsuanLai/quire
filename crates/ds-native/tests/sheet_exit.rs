@@ -1,4 +1,4 @@
-//! Sheet and modal parts, Q90 and Q91, on a real Blitz document: a sheet its host hides springs
+//! On a real Blitz document: a sheet its host hides springs
 //! out (H1, design/05 section 14) and reports `on_hidden` once the spring rests, never before
 //! `settle(SheetOut)`; shown again while
 //! leaving, it enters again and never reports; and a centred sheet in a viewport root stands in

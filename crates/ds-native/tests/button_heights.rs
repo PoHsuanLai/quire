@@ -1,4 +1,4 @@
-//! Sheet and modal parts, Q110: `ButtonVariant::Primary` drew with `border:0` while Secondary
+//! `ButtonVariant::Primary` drew with `border:0` while Secondary
 //! and Danger carry a `--hair` border, so a Primary stood one `--hair` short top and bottom of
 //! a Secondary or a Danger beside it — 36 px against 38 px at `ButtonSize::Regular`. Primary
 //! (and Secondary, which shares its rule) now carries `border:var(--hair) solid transparent`

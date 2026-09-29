@@ -1,4 +1,4 @@
-//! "Added" in Edit Widgets on a real Blitz document and the virtual clock (sill Q523): when the
+//! "Added" in Edit Widgets on a real Blitz document and the virtual clock: when the
 //! layout the host hands back holds the widget an Add asked for, the button settles to a check
 //! (the check grows in on the spring, the person pressed it) and says "Added" for the check's
 //! draw and hold, then is itself again; the new row rises in (`row-in`) and is scrolled into view

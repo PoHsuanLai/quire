@@ -1,4 +1,4 @@
-//! mailo gaps 4, item 3: the new `TextInput` kinds on a real Blitz document. A secret is typed
+//! The new `TextInput` kinds on a real Blitz document. A secret is typed
 //! and read back through its callbacks while its markup never holds it; a growing multiline
 //! field gains a row per line typed (a fixed one does not); a file field asks the host to pick.
 

@@ -102,7 +102,7 @@ fn type_text(harness: &mut Harness, text: &str) {
 
 // On `Clock::Virtual` so `set_state`'s 1 ms advances between successive state writes cannot
 // drift: on `Clock::Wall` a loaded machine's overshoot on such a short `advance` could let a
-// mood or shake timer settle inside a step meant to hold it (sill Q380; the emoji glances test
+// mood or shake timer settle inside a step meant to hold it (the emoji glances test
 // flaked this way).
 fn mounted(app: fn() -> Element) -> Harness {
     let mut harness =

@@ -1,4 +1,4 @@
-//! The window's frame on a real Blitz document (FINDINGS "mailo gaps", gap 1): the root paints
+//! The window's frame on a real Blitz document: the root paints
 //! its two gradient layers and the grain over its own background, not under it. Before the fix
 //! a `Material::Window` root was no stacking context, so `.ds-layer` (z -2) and `.ds-grain`
 //! (z -1) painted beneath the root's own `background: var(--m-tint-solid)`: a Space switch was

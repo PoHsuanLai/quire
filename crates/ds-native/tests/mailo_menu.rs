@@ -1,4 +1,4 @@
-//! mailo gaps 2, menus, on a real Blitz document: a field beside a menu drives its highlight
+//! Menus, on a real Blitz document: a field beside a menu drives its highlight
 //! and keeps the keyboard, the pointer only asks; a typed filter is heard as it changes; a row's
 //! trailing action fires without picking it or closing the menu.
 

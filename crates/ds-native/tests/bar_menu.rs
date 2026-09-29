@@ -1,4 +1,4 @@
-//! The bar gaps' menu controls on a real Blitz document (FINDINGS "Bar gaps", sill Q11): the
+//! The bar gaps' menu controls on a real Blitz document (FINDINGS "Bar gaps"): the
 //! menu reports the choice under the pointer and every release over it; a press that began
 //! outside and is released on an item picks it; a pick calls `onpick` before `onclose`; Escape
 //! and an outside click fade the menu out before `onclose`; a bar menu opens with no entrance;
@@ -211,7 +211,7 @@ fn a_drag_released_on_a_disabled_item_closes_picking_nothing() {
 }
 
 /// A click that starts and ends on an item is a click: it picks, and a release after a press
-/// inside the menu picks nothing by itself. `onpick` runs before `onclose` (sill Q11).
+/// inside the menu picks nothing by itself. `onpick` runs before `onclose`.
 #[test]
 fn a_click_picks_before_it_closes() {
     let mut harness = Harness::new(OpenMenu, VIEW);

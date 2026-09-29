@@ -1,8 +1,8 @@
-//! sill Q380: a harness on `Clock::Virtual` runs every ds timer (presence, hover intent, toast
+//! A harness on `Clock::Virtual` runs every ds timer (presence, hover intent, toast
 //! hold) on the same clock its CSS resolves at, and `advance` steps that one clock. The same
 //! scenario then produces the same frames, rects and state whether the machine is idle or
 //! saturated, and an entrance timer can never end before the frame clock has played the
-//! entrance (the G295 shape: a stalled first frame).
+//! entrance (a stalled first frame).
 
 use dioxus::prelude::*;
 use ds::{
@@ -225,7 +225,7 @@ fn the_same_scenario_gives_the_same_frames_idle_or_under_load() {
     assert!(hidden >= ms(6000) && hidden < ms(6020), "{hidden:?}");
 }
 
-// ---- G295's shape: an entrance timer against a stalled first frame -------------------------
+// ---- an entrance timer against a stalled first frame -------------------------
 
 #[allow(non_snake_case)]
 fn Center() -> Element {
@@ -246,7 +246,7 @@ fn inside(rest: Rect) -> Point {
 }
 
 /// On the wall clock a stall longer than the entrance lets the settle timer turn the panel
-/// present one millisecond into its slide (sill G130). On the virtual clock the stall is
+/// present one millisecond into its slide. On the virtual clock the stall is
 /// invisible: the timer fires only when `advance` reaches settle(PanelIn), after the slide has
 /// played, and the panel is where it rests, every run.
 #[test]

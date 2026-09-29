@@ -1,4 +1,4 @@
-//! G5 (mailo Phase B): copy and paste. Ctrl+C on a selection in one field and Ctrl+V into
+//! Copy and paste. Ctrl+C on a selection in one field and Ctrl+V into
 //! another move the text through the harness's in-memory clipboard, and the app's own
 //! `ds_native::clipboard::{write_text, read_text}` reach the same clipboard.
 

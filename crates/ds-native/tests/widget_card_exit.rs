@@ -1,4 +1,4 @@
-//! A desktop widget's exit on a real Blitz document and the virtual clock (sill G423): the host
+//! A desktop widget's exit on a real Blitz document and the virtual clock: the host
 //! says the card is leaving and keeps it drawn; the card plays `widget-out` (shrinks and fades,
 //! `--t-move --e-exit`), takes no pointer, and calls `on_gone` exactly at `settle(WidgetOut)`,
 //! not a millisecond before; the host drops it and nothing asks for a frame. Under Reduced the

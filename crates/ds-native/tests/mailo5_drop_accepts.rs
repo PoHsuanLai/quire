@@ -1,4 +1,4 @@
-//! mailo gaps 5, places that can take a drag, on a real Blitz document: `DropState::Accepts`
+//! Places that can take a drag, on a real Blitz document: `DropState::Accepts`
 //! writes `data-drop="accepts"` and draws its dashed hairline inside the item's own box, so an
 //! item keeps its size and its label stays where it was as a drag starts.
 

@@ -1,4 +1,4 @@
-//! mailo gaps 6, an inline scrim's own layer, on a real Blitz document: a pane draws the scrim
+//! An inline scrim's own layer, on a real Blitz document: a pane draws the scrim
 //! and then its positioned rows (`position:relative`, as a row with a hover strip is). With no
 //! layer the rows paint over the scrim and a press on a row is the row's; with
 //! `layer: ZLayer::Raise` the scrim is above them, a press on the same spot is the scrim's, and

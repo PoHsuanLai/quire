@@ -1,7 +1,7 @@
-//! design/26 D2 on a real Blitz document, on the virtual clock: Now Playing. Play/pause offers
-//! the next action off-up, springing only under its own press (G28); the position steps once a
-//! second while playing and costs 0 frames paused (G29); buffering breathes the art, bounded
-//! (G29); a new track cross-fades its art and titles, a restated one plays nothing (G30); Reduced
+//! design/26 on a real Blitz document, on the virtual clock: Now Playing. Play/pause offers
+//! the next action off-up, springing only under its own press; the position steps once a
+//! second while playing and costs 0 frames paused; buffering breathes the art, bounded
+//!; a new track cross-fades its art and titles, a restated one plays nothing; Reduced
 //! (R7).
 
 use dioxus::prelude::*;

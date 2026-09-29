@@ -1,4 +1,4 @@
-//! mailo gaps 7, item 1: the keyboard after the element that had it leaves the document. Blitz
+//! The keyboard after the element that had it leaves the document. Blitz
 //! resets the focus to nowhere when the focused node is removed, so after a quire Menu closed on
 //! Escape (its panel had the keyboard) or a field removed itself on Enter, keys reached nothing
 //! and mailo's `.app[tabindex]` stopped hearing them. Under `FocusFallback::Ancestor` the host

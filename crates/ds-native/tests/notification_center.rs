@@ -1,4 +1,4 @@
-//! The notification center's edge panel on a real Blitz document (sill Q123): shown, it slides in
+//! The notification center's edge panel on a real Blitz document: shown, it slides in
 //! (`data-presence="entering"`) and comes to rest at the right edge, `width` wide; hidden, it
 //! slides out and `on_hidden` runs at `settle(PanelOut)`, not before, after which nothing is laid
 //! out; shown again while it leaves, the hide is taken back.

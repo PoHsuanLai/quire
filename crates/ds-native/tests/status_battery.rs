@@ -1,4 +1,4 @@
-//! design/26 D1 on a real Blitz document: the battery status glyph (G8-G10). The fill sweeps
+//! design/26 on a real Blitz document: the battery status glyph. The fill sweeps
 //! from where it is only when its drawn step changes, the bolt and the plug grow in, the low
 //! tone is a colour claim, an Appear sweeps from empty, and Reduced jumps; each ends at 0 frames.
 

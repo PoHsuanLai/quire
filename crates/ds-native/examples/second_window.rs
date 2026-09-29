@@ -1,4 +1,4 @@
-//! A second window from a running app (mailo item 8: a message in its own window).
+//! A second window from a running app (a message in its own window).
 //!
 //! `cargo run -p ds-native --example second_window`
 //!

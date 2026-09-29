@@ -1,4 +1,4 @@
-//! G3 (mailo Phase B): the app's network policy. The app's document gets `file:` under `Local`
+//! The app's network policy. The app's document gets `file:` under `Local`
 //! and nothing but `data:` under `Sealed`; under `Custom` every other request is put to the
 //! app's handler, which sees where it came from and decides. A frame is never served `file:` by
 //! ds-native, whatever the policy.

@@ -1,4 +1,4 @@
-//! The dock gaps on a real Blitz document (sill FINDINGS Q15-Q17): a material's corner set by
+//! The dock gaps on a real Blitz document: a material's corner set by
 //! the caller, icons at the dock's sizes, and a Fly tooltip shown and hidden by the caller.
 
 #[path = "support/probe.rs"]
@@ -59,7 +59,7 @@ fn luma(pixel: Rgba<u8>) -> u32 {
     (u32::from(pixel[0]) * 3 + u32::from(pixel[1]) * 6 + u32::from(pixel[2])) / 10
 }
 
-/// Q15: `radius` reaches the material's paint: the square pill paints its corner, the pill with
+/// `radius` reaches the material's paint: the square pill paints its corner, the pill with
 /// the material's own 22 px leaves it to the ground.
 #[test]
 fn a_surfaces_radius_overrides_its_materials_corner() {
@@ -89,7 +89,7 @@ fn DockIcons() -> Element {
     }
 }
 
-/// Q16: a dock icon is drawn at the dock's size, not scaled up from 22.
+/// A dock icon is drawn at the dock's size, not scaled up from 22.
 #[test]
 fn icons_take_the_docks_sizes() {
     let mut harness = Harness::new(DockIcons, VIEW);
@@ -145,7 +145,7 @@ fn label(frame: &RgbaImage, harness: &Harness, tile: &str) -> u32 {
     ))
 }
 
-/// Q17: `Shown::Visible` shows the label with no pointer on it; `Shown::Hidden` keeps it down
+/// `Shown::Visible` shows the label with no pointer on it; `Shown::Hidden` keeps it down
 /// under the pointer, where an uncontrolled label shows after its delay.
 #[test]
 fn a_caller_shows_and_hides_a_fly_label() {

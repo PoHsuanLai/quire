@@ -1,4 +1,4 @@
-//! mailo gaps 2, step 2: the Add account tile on a real Blitz document. It presses like any
+//! The Add account tile on a real Blitz document. It presses like any
 //! tile, is never pressed itself, and sits on no plate at rest where an account tile has one.
 
 #[path = "support/probe.rs"]

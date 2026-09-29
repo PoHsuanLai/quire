@@ -1,4 +1,4 @@
-//! mailo gaps 4, hook-keyed hover cards, on a real Blitz document: a caller drives the intent
+//! Hook-keyed hover cards, on a real Blitz document: a caller drives the intent
 //! machine from its own pointer hooks through `use_hover_intent`, placing the card against an
 //! element it measured or a rect it already has; with no layout (a measurer that answers
 //! nothing) the card still opens, in place, and the 450 ms open, 150 ms close and 400 ms warm

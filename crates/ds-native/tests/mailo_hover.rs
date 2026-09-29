@@ -1,4 +1,4 @@
-//! mailo gaps 2, hover cards, on a real Blitz document: a hover target drawn as the list's own
+//! Hover cards, on a real Blitz document: a hover target drawn as the list's own
 //! `li` opens its card after the intent wait and places it against the item, moving between
 //! items switches the card, and a row time's tip opens small and on one line below its time.
 

@@ -1,4 +1,4 @@
-//! G1 (mailo Phase B): the app's own root contexts reach a component under the harness and in a
+//! The app's own root contexts reach a component under the harness and in a
 //! snapshot, as `AppConfig::with_context` gives them to the window.
 
 use dioxus::prelude::*;

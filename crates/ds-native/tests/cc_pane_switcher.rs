@@ -1,4 +1,4 @@
-//! PaneSwitcher on a real Blitz document (sill FINDINGS Q80): a switch plays both panes at once,
+//! PaneSwitcher on a real Blitz document: a switch plays both panes at once,
 //! the arriving one entering and the outgoing one leaving out of the flow, the height following
 //! the arriving pane; it settles on the new pane after `settle(PaneInR)` and reports it; and a
 //! switch asked for mid-slide reverses: the panes trade animations, the reversed round's settle
@@ -17,7 +17,7 @@ use std::time::Duration;
 // `Harness::advance` on `Clock::Wall` lets real time pass: quire's settle timers are
 // `futures-timer` sleeps, which such a harness cannot fake. Under a loaded parallel
 // `cargo test --workspace` an `advance(ms(170))` can stretch past a settle it meant to stop short
-// of, so a test racing an instant against a bound (sill Q380) runs on `Clock::Virtual` instead,
+// of, so a test racing an instant against a bound runs on `Clock::Virtual` instead,
 // whose `advance` fires every ds timer at its exact due instant; a test that only polls with
 // `ds_native::harness::settle_until` up to a bound and asserts order stays on the default `Wall`.
 

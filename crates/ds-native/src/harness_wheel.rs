@@ -1,5 +1,5 @@
 //! The harness's scroll wheel: a touchpad or a mouse wheel delta delivered where the pointer
-//! is, as the window delivers winit's `MouseWheel` (sill Q122: a horizontal scroll swipes a
+//! is, as the window delivers winit's `MouseWheel` (a horizontal scroll swipes a
 //! notification away).
 
 use crate::harness::Harness;

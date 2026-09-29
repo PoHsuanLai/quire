@@ -1,4 +1,4 @@
-//! Sheet and modal parts, Q92 and Q93, on a real Blitz document: a Danger at
+//! On a real Blitz document: a Danger at
 //! `ButtonSize::Regular` stands as tall as the Secondary beside it (a Danger with no size keeps
 //! its Mini height), and a press on a disabled button, or on a disabled icon button, fires
 //! nothing, while the same press on its enabled neighbour does, and it is drawn faded: its

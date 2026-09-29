@@ -55,7 +55,7 @@ fn a_down_up_morph_stacks_two_layers_only_while_it_plays() {
 
 #[test]
 fn a_slash_draws_on_and_off() {
-    // On `Clock::Virtual` (sill Q380): a known flaker under load, since the CSS stroke-dashoffset
+    // On `Clock::Virtual`: a known flaker under load, since the CSS stroke-dashoffset
     // resolved at the harness's frame clock could drift from the settle timer's real wall clock,
     // so `settle_until`'s poll for a mid-draw offset (`> 0.0`) could land after the draw had
     // already settled to 0.

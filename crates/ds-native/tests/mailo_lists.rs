@@ -1,4 +1,4 @@
-//! mailo gaps 2, lists, on a real Blitz document: a strip button's click does not open its row,
+//! Lists, on a real Blitz document: a strip button's click does not open its row,
 //! the name and the time hand the pointer's entry and exit to the caller, the row hands over its
 //! own entry and press, and the strip shows on the caller's say with no pointer on the row.
 

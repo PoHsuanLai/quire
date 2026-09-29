@@ -1,4 +1,4 @@
-//! Files dragged in from outside the window (mailo item 21: attachments dropped onto the
+//! Files dragged in from outside the window (attachments dropped onto the
 //! composer), through the same `ds::HostFileDrop` and hit test the window's hook feeds: a target
 //! lights with `data-drop="target"` under the pointer and `accepts` elsewhere, the innermost
 //! target under a release hears its `ondrop` with the paths, and a URL lights nothing.

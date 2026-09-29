@@ -1,4 +1,4 @@
-//! G6 (mailo Phase B): a controlled focus that selects the field's whole value once the caret
+//! A controlled focus that selects the field's whole value once the caret
 //! lands (a rename field opened on the old name), and the public `focus_soon` an app uses for
 //! its own element.
 

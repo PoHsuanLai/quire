@@ -1,4 +1,4 @@
-//! MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39; sill Q180): the
+//! MonthGrid on a real Blitz document (design/04-COMPONENTS.md section 39): the
 //! header's next button hands `Step::Next` to `onstep`; the new month's weeks carry the slide
 //! class (`a-slide-r` for a later month, `a-slide-l` for an earlier one) right after the change
 //! and drop it once the slide settles, never before `settle(Anim::SlideR)`; and a pressable day
@@ -15,7 +15,7 @@ use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use month_sample::{First, SEPTEMBER, sample, shift};
 use std::time::Duration;
 
-// `a_step_slides_the_new_month_in_once` runs on `Clock::Virtual` (sill Q380), so the "still
+// `a_step_slides_the_new_month_in_once` runs on `Clock::Virtual`, so the "still
 // sliding" check within a millisecond of the press and the settle bound below (via
 // `settle_until`) hold exactly, not merely well under half the slide.
 

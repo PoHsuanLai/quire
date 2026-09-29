@@ -1,4 +1,4 @@
-//! The bar gaps' paint on a real Blitz document (FINDINGS "Bar gaps", sill Q9, Q12, Q13): a bar
+//! The bar gaps' paint on a real Blitz document (FINDINGS "Bar gaps"): a bar
 //! root tints itself with the Space gradient at its material alpha and cross-fades it on a look
 //! change; a popover root paints nothing outside its card; the frame ground turns the paper inks
 //! into the frame's, and overlays opened from it are paper again; a status item takes its box
@@ -117,7 +117,7 @@ fn the_bar_at_rest_is_the_first_stop_at_the_material_alpha() {
             distance(got, want) <= 3,
             "{name}: the corner is {got:?}, the first stop {stop:?} at .{alpha} over white is {want:?}"
         );
-        // And it is not the old flat surface tint the bar painted before (sill F48).
+        // And it is not the old flat surface tint the bar painted before.
         let surface = over_white(Hex([248, 249, 246]), alpha);
         assert!(distance(got, surface) > 6, "{name}: still the surface tint");
     }
@@ -245,7 +245,7 @@ fn PaintedPopupRoot() -> Element {
 }
 
 /// A Popover root paints nothing on its own box: over a clear backdrop, its corner outside the
-/// card has alpha 0, while the card paints (sill Q13). The same root told to paint does paint
+/// card has alpha 0, while the card paints. The same root told to paint does paint
 /// there, so the probe is not vacuous.
 #[test]
 fn a_popover_roots_corner_outside_its_card_is_transparent() {

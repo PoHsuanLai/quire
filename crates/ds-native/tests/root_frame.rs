@@ -1,4 +1,4 @@
-//! A document's frame must have a height (sill F172, F225, Q104; CONSUMING section 2 "A
+//! A document's frame must have a height (CONSUMING section 2 "A
 //! document's frame"). Blitz lays out `#main` at `height:auto`, so a frame placed with
 //! `position:absolute; inset:0` whose content is out of flow (a card hung from its anchor) is
 //! 0 px tall, and so is the `Ds` root in it. The floor (`display:grid; min-width:100vw;
@@ -7,7 +7,7 @@
 //! flow at the viewport's size with the same grid does too. Measured on a real Blitz document.
 //!
 //! Whether a press lands in a 0 px box is Blitz's hit test's business: in sill's bar popup
-//! (F225) none did; in this harness the card's button still takes one. So the tests hold the
+//! none did; in this harness the card's button still takes one. So the tests hold the
 //! heights, which are what the rule is about, and check the press only where the frame is sound.
 
 use dioxus::prelude::*;
@@ -23,7 +23,7 @@ enum Frame {
     Absolute,
     /// Out of flow with insets, and the floor.
     AbsoluteWithFloor,
-    /// In flow at the viewport's size, a one-cell grid (sill's popup frame after F225).
+    /// In flow at the viewport's size, a one-cell grid (sill's popup frame).
     InFlow,
 }
 

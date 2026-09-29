@@ -1,4 +1,4 @@
-//! The palette follow-ups on a real Blitz document (sill FINDINGS Q60, Q61, Q63): the selected
+//! The palette follow-ups on a real Blitz document: the selected
 //! row's rect on a surface that is laid out only after the palette mounted, a key the caller
 //! takes and keeps from the document, and a palette kept mounted while hidden that replays its
 //! entrance each time it is shown.
@@ -100,7 +100,7 @@ fn Rows() -> Element {
     }
 }
 
-/// Q60: built before its surface is laid out, the palette reports no rect while every read is
+/// Built before its surface is laid out, the palette reports no rect while every read is
 /// 0 x 0, then its first row's real rect a few frames after the surface is laid out; the rect
 /// follows the selection, and follows the row when the results above it move it.
 #[test]
@@ -216,7 +216,7 @@ fn tab_keeps_the_field(page: fn() -> Element) -> bool {
     harness.is_focused("#card .ds-input")
 }
 
-/// Q61: a Tab the caller takes (`prevent_default` on the event `onkey` hands it) leaves the
+/// A Tab the caller takes (`prevent_default` on the event `onkey` hands it) leaves the
 /// field focused; one it only listens to still moves the focus, as the document's default.
 #[test]
 fn a_key_the_caller_takes_does_not_move_the_focus() {
@@ -310,7 +310,7 @@ const CARD: Rect = Rect {
     },
 };
 
-/// Q63: hidden, the palette lays out and paints nothing; two shows 300 ms apart each play the
+/// Hidden, the palette lays out and paints nothing; two shows 300 ms apart each play the
 /// entrance (a frame 40 ms into it differs from the settled card), each gives the field the
 /// keyboard, and a hide leaves the frame as it was before the first show.
 #[test]
@@ -396,7 +396,7 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
     );
 }
 
-/// Q63 with `Retain::Query`: shown again, the palette keeps the query it had.
+/// With `Retain::Query`: shown again, the palette keeps the query it had.
 #[test]
 fn a_kept_palette_can_retain_its_query() {
     let mut harness = Harness::new(KeptQuery, VIEW);

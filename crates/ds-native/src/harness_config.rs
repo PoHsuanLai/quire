@@ -84,7 +84,7 @@ impl HarnessConfig {
 
     /// The clock the harness's timers run on (default [`Clock::Wall`]). [`Clock::Virtual`]
     /// makes `advance` move one clock for CSS animations and every ds timer, so a test sees the
-    /// same frames however loaded the machine is (sill Q380).
+    /// same frames however loaded the machine is.
     pub fn with_clock(mut self, clock: Clock) -> Self {
         self.clock = clock;
         self

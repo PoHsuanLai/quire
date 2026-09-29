@@ -1,4 +1,4 @@
-//! The harness's vello_hybrid backend (sill Q330): the same document painted on the GPU reads
+//! The harness's vello_hybrid backend: the same document painted on the GPU reads
 //! back as vello_cpu paints it, and the on-demand benchmark times a 300-cell COLRv1 emoji grid
 //! scrolling for 180 frames on both backends (FINDINGS "Hybrid harness backend"). Every GPU case
 //! skips, with a note, where no adapter opens (CI).

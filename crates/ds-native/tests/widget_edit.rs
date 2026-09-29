@@ -1,7 +1,7 @@
 //! Moving and choosing widgets on a real Blitz document and the virtual clock (design/23
-//! section 9.7-9.8; sill Q430, Q431): a card picked up says so and settles to zero frames, lifted
+//! section 9.7-9.8): a card picked up says so and settles to zero frames, lifted
 //! and put down; the drop-slot guide fades in and then asks for nothing; the Edit Widgets gallery
-//! draws each widget once at the one size it takes (sill Q520), hands the host an edit for each
+//! draws each widget once at the one size it takes, hands the host an edit for each
 //! button, and shows the layout the host hands back.
 
 use dioxus::prelude::*;
@@ -147,7 +147,7 @@ fn the_gallery_draws_one_size_and_edits_the_layout() {
         0,
         "a placed row has no size control"
     );
-    // The new row rises in (sill Q523); press Remove once it has landed.
+    // The new row rises in; press Remove once it has landed.
     harness.advance(Duration::from_millis(600));
     let remove = harness
         .centre(".ds-widget-gallery-row .ds-button")

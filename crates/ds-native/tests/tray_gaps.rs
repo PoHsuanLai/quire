@@ -1,4 +1,4 @@
-//! The tray gaps (FINDINGS "Tray gaps", sill Q6-Q8) on a real Blitz document: an external
+//! The tray gaps (FINDINGS "Tray gaps") on a real Blitz document: an external
 //! symbolic icon takes the text colour and an external image keeps its own; a submenu opens on
 //! a rest after the delay and closes on Left; a disabled item is skipped by Down; a right-click
 //! on an icon button reports a secondary press.

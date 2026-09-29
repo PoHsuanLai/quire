@@ -1,4 +1,4 @@
-//! What the host does when a resolve moved the hover by itself (sill Q170).
+//! What the host does when a resolve moved the hover by itself.
 //!
 //! Blitz ends every `resolve` by hit-testing the last pointer position against the fresh layout
 //! and storing the result as the hovered node, with no events (its `refresh_hover` carries a TODO

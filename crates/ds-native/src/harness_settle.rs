@@ -68,7 +68,7 @@ pub fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) -> I
 /// [`SETTLE_BOUND`] and returns as soon as *one* window shows no wake and no animation. That
 /// window can pass quiet while a later timer is still asleep (e.g. a 900 ms hold started at the
 /// top of a 500 ms window: the first window sees no wake yet and the check returns, even though
-/// the hold is still pending) — found in the check mark's `SettleHold` (FINDINGS "Details D2").
+/// the hold is still pending) — found in the check mark's `SettleHold`.
 /// Use `Clock::Virtual` (CONSUMING Rule 4) whenever the check must be strict about "nothing is
 /// pending", not just "nothing fired in the window that happened to run".
 pub fn assert_settles_to_zero_frames(harness: &mut Harness) {

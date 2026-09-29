@@ -1,4 +1,4 @@
-//! mailo gaps 2, step 3: the send pill's failed moods and busy ring on a real Blitz document.
+//! The send pill's failed moods and busy ring on a real Blitz document.
 //! A mood's one-shot plays once and settles at `ds::settle` while the pill stays up; a spinning
 //! ring turns where a draining one holds still.
 
@@ -59,7 +59,7 @@ fn a_nudge_plays_once_settles_and_the_pill_stays() {
     );
     assert!(!pulsing(&harness), "no one-shot on mount");
 
-    // Marked on the harness's own (virtual) clock, sill Q380, so the comparison against
+    // Marked on the harness's own (virtual) clock, so the comparison against
     // `settles` below is exact.
     let pulsed = harness.now();
     harness.click(harness.centre("#nudge").expect("the nudge button"));

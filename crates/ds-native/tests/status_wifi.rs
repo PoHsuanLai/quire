@@ -1,5 +1,5 @@
-//! design/26 D1 on a real Blitz document: the Wi-Fi status glyph through every moment of its
-//! table (G1-G5), each ending at 0 frames (R3), and under Reduced motion (R7).
+//! design/26 on a real Blitz document: the Wi-Fi status glyph through every moment of its
+//! table, each ending at 0 frames (R3), and under Reduced motion (R7).
 
 use dioxus::prelude::*;
 use ds::detail::EventStamp;

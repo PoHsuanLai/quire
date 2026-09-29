@@ -1,4 +1,4 @@
-//! The keyboard after the element that had it leaves the document (mailo gaps 7).
+//! The keyboard after the element that had it leaves the document.
 //!
 //! Blitz resets the focus to nowhere when the focused node is removed
 //! (`clear_interaction_state_for_removed_node`), so a menu that closed on Escape, or a field

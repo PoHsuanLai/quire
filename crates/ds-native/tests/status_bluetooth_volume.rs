@@ -1,6 +1,6 @@
-//! design/26 D1 on a real Blitz document: the Bluetooth status glyph (G6, G7: the slash, the
+//! design/26 on a real Blitz document: the Bluetooth status glyph (the slash, the
 //! bounded breath while connecting, the seal and dots on connecting, the shake) and the volume
-//! glyph on `LevelGlyph` (G12); each ends at 0 frames (R3).
+//! glyph on `LevelGlyph`; each ends at 0 frames (R3).
 
 use dioxus::prelude::*;
 use ds::detail::EventStamp;

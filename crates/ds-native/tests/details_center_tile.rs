@@ -1,5 +1,5 @@
-//! design/26 D2 on a real Blitz document, on the virtual clock: a module tile's disc answering the
-//! module coming on (G14: the glyph's layers fill once; G23: the Focus moon morphs into the filled
+//! design/26 on a real Blitz document, on the virtual clock: a module tile's disc answering the
+//! module coming on (the glyph's layers fill once; the Focus moon morphs into the filled
 //! moon, springing only under the tile's own press), every moment ending at 0 frames (R3), and
 //! under Reduced motion (R7).
 

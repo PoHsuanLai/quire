@@ -1,4 +1,4 @@
-//! A second window from a running app (mailo item 8: a message in its own window).
+//! A second window from a running app (a message in its own window).
 //!
 //! [`open_window`] asks the event loop `launch` runs for a new window with its own VirtualDom.
 //! The new document gets exactly what `launch` gives the first one: the same `Host` around the

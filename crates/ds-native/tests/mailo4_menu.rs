@@ -1,4 +1,4 @@
-//! mailo gaps 4, menus, on a real Blitz document: a toggle checklist whose picks keep it open
+//! Menus, on a real Blitz document: a toggle checklist whose picks keep it open
 //! (`dismiss: PickDismiss::Stay`) toggles each row's check with the cursor staying on it, and
 //! still closes on Escape and an outside press; a menu drawn inline in a card sits in the
 //! card, off the overlay and the layer stack, and picks as a menu does.
