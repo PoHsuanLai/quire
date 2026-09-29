@@ -1605,7 +1605,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
 
-/* The nudge's wrapper (design/26 G11): the glyph alone lifts once on a new attention
+/* The nudge's wrapper (design/26): the glyph alone lifts once on a new attention
    cue, the pill stays; the keyframe is the motion sheet's `nudge-up`. */
 .ds-icon-nudge{ display:inline-grid; place-items:center; }
 
@@ -2665,7 +2665,7 @@ html,body{margin:0;padding:0;background:transparent}
    caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
    ancestor. It sets no z-index: content the caller renders after it in that container paints
    over it, and every overlay layer stays above it. */
-/* An inline scrim's own layer (mailo gaps 6, `layer: Some(ZLayer)`) is written on the element as
+/* An inline scrim's own layer (`layer: Some(ZLayer)`) is written on the element as
    `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
    below its floating surfaces. With none it stays at z-index auto, as above. */
 
@@ -3122,7 +3122,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
 
-/* mailo gaps 2. The title as a name field (`on_rename`): the inline TextInput takes the title's
+/* The title as a name field (`on_rename`): the inline TextInput takes the title's
    display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
    scheme's rows under a heading in the data face, upper case, as the field headers are. */
 .ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
@@ -3130,7 +3130,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
 .ds-checks-heading{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; color:var(--ink-faint); }
 
-/* mailo gaps 3. A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
+/* A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
    `data-stops` counting them) and are painted here, never inline: the same 135deg gradient
    `space::gradient` writes for the frame, flat for one stop, 0/100 % for two, 0/50/100 % for
    three. A handle and a stop disc are one picked colour. */
@@ -3192,7 +3192,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-account-ring{ position:relative; width:30px; height:30px; flex:none; }
 .ds-account-ring .ds-avatar{ position:absolute; inset:0; border-radius:var(--r-pill); font-size:var(--fs-control); }
 
-/* The halo's two rings, which loop (mail's, unchanged by design/26 D0: the Spinner component is a
+/* The halo's two rings, which loop (mail's, unchanged by design/26: the Spinner component is a
    bounded pending loop now, and this is the one place the old loops remain, TODO(O-9, O-25)). */
 .ds-account-ring > .ds-spinner[*|data-kind=breathe]{ animation:breathe var(--t-ambient) var(--e-in-out) infinite; }
 .ds-account-ring > .ds-spinner[*|data-kind=spin]{
@@ -3738,7 +3738,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-month-event-time{ font-family:var(--font-ui); font-size:var(--fs-nano); line-height:1.25; color:var(--ink-soft); }
 .ds-month-quiet{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 
-/* The month's title on a desktop card (sill Q412, option (b), the branch default pending the
+/* The month's title on a desktop card (option (b), the default pending the
    user's pick, design/23 section 4.3): `--ink-soft`, not the accent as text, which the
    see-through card cannot hold at 4.5:1 over the wallpaper. Today's disc and the busy dots keep
    the accent. */
