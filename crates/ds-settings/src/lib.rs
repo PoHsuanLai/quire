@@ -12,7 +12,6 @@
 extern crate self as ds_settings;
 
 pub mod appearance_file;
-pub mod dbus;
 pub mod diff;
 pub mod dirs;
 pub mod environment;
@@ -23,7 +22,6 @@ pub mod lenient;
 pub mod portal;
 pub mod schema;
 pub mod settings;
-pub mod spaces;
 #[cfg(test)]
 mod test_dir;
 pub mod units;
@@ -46,6 +44,5 @@ pub use settings::{
     AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
     PlateGlyphPolicy,
 };
-pub use spaces::{SPACES, SpacesWatch};
 pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{AppearanceWatch, DEBOUNCE, FileWatch, watch, watch_file};

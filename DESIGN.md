@@ -129,7 +129,7 @@ PaletteEntrance{PeekIn, CmdkIn}`, `id`, `focus`, `selected`, `on_select`, `on_se
 | `ds-settings/src/{file,dirs}.rs` | 22-SETTINGS §2 (TOML, atomic write, one-time mailo JSON import); moved from mailo `appearance.rs` with its tests |
 | `ds-settings/src/{settings,units,lenient}.rs` | 22-SETTINGS §3.1-3.3, §4 (`AppearanceFile`, `AppearanceSettings`, `IconsSettings`, the unit newtypes, lenient read) |
 | `ds-settings/src/watch.rs` | 22-SETTINGS §2 "Live reload", §6.3 |
-| `ds-settings/src/{portal,environment,dbus}.rs` | the plan's `ds-settings` design (portal, `use_environment`, `org.quire.Appearance1` stub); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
+| `ds-settings/src/{portal,environment}.rs` | the plan's `ds-settings` design (portal, `use_environment`); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
 | `ds-native` | the plan's `ds-native` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `measure.rs` is the `HostMeasure` the host root and the harness provide, exported as `ds_native::measure::{MEASURE, provide}` for any other Blitz host; `focus.rs` is the `HostFocus` beside it (`ds_native::focus::{FOCUS, provide}`); `Harness::is_focused`; `Harness::render_over(Backdrop::Clear)` paints a document's own coverage |
 | `ds-gallery` | the plan's gallery (axes, pages, `--snapshot`) |
 

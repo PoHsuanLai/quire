@@ -2,9 +2,8 @@
 //! which a bad value costs only its own key, and an atomic temp-and-rename write.
 //!
 //! A file is named by a typed [`Settings<T>`] constant: `appearance.toml` is
-//! [`crate::appearance_file::APPEARANCE`], `spaces.json` is [`crate::spaces::SPACES`], and a
-//! consumer declares its own (sill's `settings.toml`) the same way. [`crate::watch`] watches
-//! any of them.
+//! [`crate::appearance_file::APPEARANCE`], and a consumer declares its own (sill's
+//! `settings.toml`) the same way. [`crate::watch`] watches any of them.
 
 use crate::error::SettingsError;
 use crate::lenient::{lenient, lenient_json};

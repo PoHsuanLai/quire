@@ -1,8 +1,8 @@
 //! Which look each workspace wears: the `spaces.json` store (design/21-SPACES.md section 10)
 //! and the lookup that falls back to the preset table (section 4).
 //!
-//! Data and a pure lookup only; reading, writing and watching the file is
-//! `ds_settings::spaces` (ds stays effect-free).
+//! Data and a pure lookup only; a consumer reads, writes and watches the file through
+//! `ds_settings`'s generic settings file API (ds stays effect-free).
 
 use super::look::{CardAccent, Grain, SpaceLook};
 use super::presets::default_look;
