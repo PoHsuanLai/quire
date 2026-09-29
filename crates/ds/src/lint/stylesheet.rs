@@ -7,7 +7,7 @@ use super::hig;
 use super::registry;
 use super::rule::{LintConfig, Offence};
 use super::selector;
-use super::severity::{self, WarningsRun};
+use super::severity;
 use super::tokenize;
 use super::walk;
 
@@ -23,8 +23,7 @@ pub fn stylesheet(css: &str, config: &LintConfig) -> Vec<Offence> {
 }
 
 /// Every warning in `css` under `config` that none of `config.exceptions` covers: the rules
-/// that report without failing (the HIG guardrails, design/27 section 7), under
-/// [`super::Profile::Strict`] and [`super::Profile::Details`] only.
+/// that report without failing (the HIG guardrails, design/27 section 7).
 pub fn warnings(css: &str, config: &LintConfig) -> Vec<Offence> {
     severity::split(config.partition(every_offence(css, config)).0).1
 }
@@ -64,9 +63,7 @@ pub(super) fn every_offence(css: &str, config: &LintConfig) -> Vec<Offence> {
         }
     }
 
-    if severity::warnings_run(config.profile) == WarningsRun::On {
-        offences.extend(rules.iter().flat_map(hig::offences));
-    }
+    offences.extend(rules.iter().flat_map(hig::offences));
 
     offences.sort_by_key(|a| (a.line, a.column));
     offences

@@ -34,7 +34,7 @@ fn rendered(page: Page) -> String {
 fn every_page_renders_quire_markup_only() {
     let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
     let config = LintConfig {
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         exceptions: EXCEPTIONS,
         ..LintConfig::default()
     };
@@ -80,7 +80,7 @@ fn the_space_page_is_clean_under_strict() {
 fn every_exception_still_suppresses_something() {
     let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
     let bare = LintConfig {
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         ..LintConfig::default()
     };
     let offences: Vec<_> = Page::ALL

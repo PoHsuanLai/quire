@@ -22,7 +22,6 @@ use super::inline_style::{self, Owner};
 use super::kind;
 use super::markup_hig;
 use super::rule::{LintConfig, Offence, Rule};
-use super::severity::{self, WarningsRun};
 use super::tokenize::{self, Located};
 
 /// Form controls quire's components render; one without a `ds-` class was written by hand.
@@ -35,14 +34,10 @@ pub fn markup(html: &str, consumer_css: &str, config: &LintConfig) -> Vec<Offenc
 }
 
 /// Every warning in `html` that none of `config.exceptions` covers: [`Rule::UnnamedControl`]
-/// and [`Rule::ThreeDots`] (design/27 section 7, H0), under [`super::Profile::Strict`] and
-/// [`super::Profile::Details`] only. [`markup`] never returns these, so a consumer asserting
-/// `markup(..).is_empty()` is unmoved until a rule turns Strict.
+/// and [`Rule::ThreeDots`] (design/27 section 7, H0). [`markup`] never returns these, so a
+/// consumer asserting `markup(..).is_empty()` is unmoved until a rule turns Strict.
 pub fn markup_warnings(html: &str, config: &LintConfig) -> Vec<Offence> {
-    match severity::warnings_run(config.profile) {
-        WarningsRun::Off => Vec::new(),
-        WarningsRun::On => config.partition(markup_hig::offences(html)).0,
-    }
+    config.partition(markup_hig::offences(html)).0
 }
 
 /// Every offence in `html`, exceptions not applied.

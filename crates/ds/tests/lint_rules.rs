@@ -35,14 +35,14 @@ const CASES: &[Case] = &[
     Case {
         name: "hex colour: literal fails",
         css: ".chip { color: #fff; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::HexColour,
         expect: true,
     },
     Case {
         name: "hex colour: token passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::HexColour,
         expect: false,
     },
@@ -50,14 +50,14 @@ const CASES: &[Case] = &[
     Case {
         name: "colour function: rgb() fails",
         css: ".chip { background: rgb(1, 2, 3); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::ColourFunction,
         expect: true,
     },
     Case {
         name: "colour function: token passes",
         css: ".chip { background: var(--surface); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::ColourFunction,
         expect: false,
     },
@@ -65,21 +65,21 @@ const CASES: &[Case] = &[
     Case {
         name: "named colour: red fails",
         css: ".chip { color: red; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::NamedColour,
         expect: true,
     },
     Case {
         name: "named colour: token passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::NamedColour,
         expect: false,
     },
     Case {
         name: "named colour: transparent passes",
         css: ".chip { background: transparent; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::NamedColour,
         expect: false,
     },
@@ -87,14 +87,14 @@ const CASES: &[Case] = &[
     Case {
         name: "currentColor on color: fails",
         css: ".label { color: currentColor; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::CurrentColourOutsideStrokeFill,
         expect: true,
     },
     Case {
         name: "currentColor on stroke alone: passes",
         css: ".ic { stroke: currentColor; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::CurrentColourOutsideStrokeFill,
         expect: false,
     },
@@ -102,14 +102,14 @@ const CASES: &[Case] = &[
     Case {
         name: "raw duration: 200ms fails",
         css: ".chip { transition: color 200ms; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RawDuration,
         expect: true,
     },
     Case {
         name: "raw duration: token passes",
         css: ".chip { transition: color var(--t-quick); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RawDuration,
         expect: false,
     },
@@ -117,14 +117,14 @@ const CASES: &[Case] = &[
     Case {
         name: "raw easing: ease-in-out fails",
         css: ".chip { transition-timing-function: ease-in-out; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RawEasing,
         expect: true,
     },
     Case {
         name: "raw easing: token passes",
         css: ".chip { transition-timing-function: var(--e-in-out); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RawEasing,
         expect: false,
     },
@@ -132,14 +132,14 @@ const CASES: &[Case] = &[
     Case {
         name: "keyframes: @keyframes fails",
         css: "@keyframes wiggle { from { opacity: 0; } to { opacity: 1; } }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::Keyframes,
         expect: true,
     },
     Case {
         name: "keyframes: none passes",
         css: ".chip { animation-name: gulp; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::Keyframes,
         expect: false,
     },
@@ -147,14 +147,14 @@ const CASES: &[Case] = &[
     Case {
         name: "unknown animation: made-up name fails",
         css: ".chip { animation-name: sparkle-explosion; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: true,
     },
     Case {
         name: "unknown animation: a real Anim passes",
         css: ".chip { animation-name: gulp; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
     },
@@ -162,56 +162,56 @@ const CASES: &[Case] = &[
     Case {
         name: "unknown animation: a made-up name in the shorthand fails",
         css: ".chip { animation: sparkle-explosion var(--t-big) var(--e-spring); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: true,
     },
     Case {
         name: "unknown animation: a made-up name after the shorthand's keywords fails",
         css: ".chip { animation: infinite alternate both paused sparkle var(--t-big); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: true,
     },
     Case {
         name: "unknown animation: the second of two shorthand animations is read too",
         css: ".chip { animation: gulp var(--t-big) var(--e-spring), sparkle var(--t-move) var(--e-out); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: true,
     },
     Case {
         name: "unknown animation: a real Anim in the shorthand passes",
         css: ".chip { animation: pill-up var(--t-big) var(--e-spring); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
     },
     Case {
         name: "unknown animation: keywords, a count and its --b alias pass",
         css: ".chip { animation: var(--t-ambient) var(--e-in-out) infinite alternate backwards busy--b; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
     },
     Case {
         name: "unknown animation: a raw easing's own words are not names",
         css: ".chip { animation: ease-in-out 1s steps(4, jump-end) spin; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
     },
     Case {
         name: "unknown animation: none passes",
         css: ".chip { animation: none; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
     },
     Case {
         name: "unknown animation: a name only a var() knows is not judged",
         css: ".chip { animation: var(--my-anim) var(--t-big); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,
     },
@@ -219,21 +219,21 @@ const CASES: &[Case] = &[
     Case {
         name: "font-family: literal fails",
         css: ".chip { font-family: Arial, sans-serif; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::FontFamily,
         expect: true,
     },
     Case {
         name: "font-family: absent passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::FontFamily,
         expect: false,
     },
     Case {
         name: "font-family: a face token passes",
         css: ".chip { font-family: var(--font-data); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::FontFamily,
         expect: false,
     },
@@ -275,7 +275,7 @@ const CASES: &[Case] = &[
     Case {
         name: "font-family: a token with a literal fallback fails",
         css: ".chip { font-family: var(--font-data), monospace; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::FontFamily,
         expect: true,
     },
@@ -377,7 +377,7 @@ const CASES: &[Case] = &[
     Case {
         name: "raw spacing: standard allows a px padding",
         css: ".chip { padding: 4px; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RawSpacing,
         expect: false,
     },
@@ -422,7 +422,7 @@ const CASES: &[Case] = &[
     Case {
         name: "raw hairline: standard allows a 1px border",
         css: ".card { border: 1px solid var(--line); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RawHairline,
         expect: false,
     },
@@ -430,14 +430,14 @@ const CASES: &[Case] = &[
     Case {
         name: "root selector: :root fails",
         css: ":root { color: red; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RootSelector,
         expect: true,
     },
     Case {
         name: "root selector: a class passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::RootSelector,
         expect: false,
     },
@@ -445,42 +445,42 @@ const CASES: &[Case] = &[
     Case {
         name: "ds internals: .ds- class fails",
         css: ".ds-icon { color: red; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::DsInternals,
         expect: true,
     },
     Case {
         name: "ds internals: a consumer class passes",
         css: ".icon { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::DsInternals,
         expect: false,
     },
     Case {
         name: "ds internals: the root's warm-hover attribute fails",
         css: ".card[*|data-hover=warm] .fly { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::DsInternals,
         expect: true,
     },
     Case {
         name: "ds internals: a hover target's own key passes",
         css: ".card[*|data-hover-key] { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::DsInternals,
         expect: false,
     },
     Case {
         name: "ds internals: a consumer class inside the trailing slot seam passes",
         css: "[*|data-slot=trailing] .fold-more { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::DsInternals,
         expect: false,
     },
     Case {
         name: "ds internals: the same class reached through the slot's own class fails",
         css: ".ds-tree-item-trail .fold-more { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::DsInternals,
         expect: true,
     },
@@ -488,14 +488,14 @@ const CASES: &[Case] = &[
     Case {
         name: "undeclared var: a typo fails",
         css: ".chip { color: var(--totally-not-real); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UndeclaredVar,
         expect: true,
     },
     Case {
         name: "undeclared var: a real token passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UndeclaredVar,
         expect: false,
     },
@@ -503,14 +503,14 @@ const CASES: &[Case] = &[
     Case {
         name: "important: !important fails",
         css: ".chip { color: var(--ink) !important; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::Important,
         expect: true,
     },
     Case {
         name: "important: absent passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::Important,
         expect: false,
     },
@@ -518,28 +518,28 @@ const CASES: &[Case] = &[
     Case {
         name: "blitz unsupported: backdrop-filter fails",
         css: ".chip { backdrop-filter: blur(10px); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::BlitzUnsupported,
         expect: true,
     },
     Case {
         name: "blitz unsupported: absent passes",
         css: ".chip { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::BlitzUnsupported,
         expect: false,
     },
     Case {
         name: "blitz unsupported: scroll-behavior: smooth fails",
         css: ".ds-scroller { scroll-behavior: smooth; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::BlitzUnsupported,
         expect: true,
     },
     Case {
         name: "blitz unsupported: scroll-behavior: auto passes",
         css: ".ds-scroller { scroll-behavior: auto; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::BlitzUnsupported,
         expect: false,
     },
@@ -547,14 +547,14 @@ const CASES: &[Case] = &[
     Case {
         name: "unprefixed attribute: [data-open] fails",
         css: "[data-open] { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnprefixedAttributeSelector,
         expect: true,
     },
     Case {
         name: "unprefixed attribute: [*|data-open] passes",
         css: "[*|data-open] { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::UnprefixedAttributeSelector,
         expect: false,
     },
@@ -562,14 +562,14 @@ const CASES: &[Case] = &[
     Case {
         name: "focus pseudo-class: :focus-visible fails",
         css: ".btn:focus-visible { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::FocusPseudoClass,
         expect: true,
     },
     Case {
         name: "focus pseudo-class: :focus passes",
         css: ".btn:focus { color: var(--ink); }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::FocusPseudoClass,
         expect: false,
     },
@@ -577,14 +577,14 @@ const CASES: &[Case] = &[
     Case {
         name: "svg paint in css: svg descendant fails",
         css: ".icon svg { stroke: red; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::SvgPaintInCss,
         expect: true,
     },
     Case {
         name: "svg paint in css: a non-svg selector passes",
         css: ".ic { stroke: currentColor; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::SvgPaintInCss,
         expect: false,
     },
@@ -592,14 +592,14 @@ const CASES: &[Case] = &[
     Case {
         name: "infinite loop: the longhand fails",
         css: ".chip { animation-iteration-count: infinite; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::InfiniteLoop,
         expect: true,
     },
     Case {
         name: "infinite loop: infinite in the shorthand fails",
         css: ".chip { animation: busy var(--t-ambient) var(--e-in-out) infinite; }",
-        profile: Profile::Standard,
+        profile: Profile::Strict,
         rule: Rule::InfiniteLoop,
         expect: true,
     },
@@ -852,7 +852,7 @@ mod mailo_cases {
         let mut failures = Vec::new();
         for &(selector, body, expect) in CASES {
             let css = format!("{selector} {{ {body} }}");
-            let got: Vec<String> = lint(&css, Profile::Standard)
+            let got: Vec<String> = lint(&css, Profile::Strict)
                 .into_iter()
                 .filter(|offence| offence.rule == Rule::CurrentColourOutsideStrokeFill)
                 .map(|offence| offence.text)
@@ -873,14 +873,14 @@ mod mailo_cases {
     fn every_var_is_declared() {
         let clean = lint(
             ".row { color: var(--ink); background: var(--surface); transition: color var(--t-quick) var(--e-out); }",
-            Profile::Standard,
+            Profile::Strict,
         );
         assert!(
             !has(&clean, Rule::UndeclaredVar),
             "real tokens flagged as undeclared: {clean:?}"
         );
 
-        let typo = lint(".row { color: var(--line-sfot); }", Profile::Standard);
+        let typo = lint(".row { color: var(--line-sfot); }", Profile::Strict);
         let missing: Vec<&str> = typo
             .iter()
             .filter(|offence| offence.rule == Rule::UndeclaredVar)
@@ -902,7 +902,7 @@ mod mailo_cases {
             ".a { color: CanvasText; }",
         ];
         for css in RAW_COLOURS {
-            let offences = lint(css, Profile::Standard);
+            let offences = lint(css, Profile::Strict);
             let flagged = offences.iter().any(|offence| {
                 matches!(
                     offence.rule,
@@ -913,7 +913,7 @@ mod mailo_cases {
         }
         let clean = lint(
             ".a { color: var(--ink); background: var(--surface); }",
-            Profile::Standard,
+            Profile::Strict,
         );
         assert!(
             !clean.iter().any(|offence| matches!(

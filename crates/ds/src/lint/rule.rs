@@ -132,12 +132,9 @@ impl Rule {
 /// How strict a run is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Profile {
-    /// Every rule except the raw-geometry ones (`RawFontSize`, `RawRadius`, `RawZIndex`,
-    /// `RawSpacing`, `RawHairline`).
-    #[default]
-    Standard,
     /// Every rule but [`Rule::OffGrammarTiming`]; the HIG guardrails
     /// ([`super::Severity::Warning`] rules) report without failing.
+    #[default]
     Strict,
     /// Every rule: `Strict` and the details grammar's timing (design/26-DETAILS.md). Off by
     /// default so a consumer opts in once its own sheets pass.
