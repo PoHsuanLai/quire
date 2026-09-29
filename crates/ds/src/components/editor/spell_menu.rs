@@ -11,8 +11,8 @@ use crate::core::geometry::units::{Point, Rect};
 use crate::core::task::{spawn_in, try_set};
 use crate::host::measure::Anchor;
 use crate::host::probe::Probe;
-use crate::spell::host::{HostSpell, Learned};
 use crate::spell::marks::{Misspelt, SpellReplace};
+use crate::spell::service::Learned;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -51,10 +51,10 @@ pub(crate) fn at_pointer(ctx: &SpellCtx, menu: Signal<Option<Opened>>, at: Point
     if ctx.live().is_none() {
         return Asked::Passed;
     }
-    let (Some(edit), Some(surface)) = (ctx.edit, ctx.state.surface.borrow().clone()) else {
+    let (Some(edit), Some(surface)) = (ctx.host.edit(), ctx.state.surface.borrow().clone()) else {
         return Asked::Passed;
     };
-    match (edit.hit_test)(&surface, at) {
+    match edit.hit_test(&surface, at) {
         Probe::Found(position) => open(ctx, menu, |mark| mark.holds(&position), |_| Some(at)),
         Probe::Busy | Probe::Unknown => Asked::Passed,
     }
@@ -65,10 +65,10 @@ pub(crate) fn at_caret(ctx: &SpellCtx, menu: Signal<Option<Opened>>) -> Asked {
     let Some(caret) = ctx.state.caret.borrow().clone() else {
         return Asked::Passed;
     };
-    let (Some(edit), Some(surface)) = (ctx.edit, ctx.state.surface.borrow().clone()) else {
+    let (Some(edit), Some(surface)) = (ctx.host.edit(), ctx.state.surface.borrow().clone()) else {
         return Asked::Passed;
     };
-    let below = |_: &Misspelt| match (edit.caret_rect)(&surface, &caret) {
+    let below = |_: &Misspelt| match edit.caret_rect(&surface, &caret) {
         Probe::Found(rect) => Some(bottom_left(rect)),
         Probe::Busy | Probe::Unknown => None,
     };
@@ -90,7 +90,7 @@ fn open(
     on: impl Fn(&Misspelt) -> bool,
     place: impl FnOnce(&Misspelt) -> Option<Point>,
 ) -> Asked {
-    let Some(HostSpell(service)) = ctx.live().cloned() else {
+    let Some(service) = ctx.live().cloned() else {
         return Asked::Passed;
     };
     let Some(mark) = ctx
@@ -157,7 +157,7 @@ fn picked(
     pick: SpellPick,
     on_replace: Option<EventHandler<SpellReplace>>,
 ) {
-    let Some(HostSpell(service)) = ctx.live().cloned() else {
+    let Some(service) = ctx.live().cloned() else {
         return;
     };
     match pick {

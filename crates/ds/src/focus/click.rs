@@ -5,7 +5,8 @@
 //! click on a row. Blitz instead clears the focus (`events/pointer.rs`, `handle_click`'s
 //! "nothing matched"), and every later key goes to the document's root. The host owns the fix:
 //! the root's click handler, which runs after every handler inside it, hands the click to
-//! [`HostClickFocus`], which ds-native provides unless the app asked for Blitz's own behaviour.
+//! the host's [`ClickFocusHost`](crate::ClickFocusHost), which a host has unless the app asked
+//! for Blitz's own behaviour.
 //! A click whose default a component already took (an `EditSurface` focusing itself) is left to
 //! that component.
 //!
@@ -15,107 +16,87 @@
 //! pass it by. Every such control calls [`kept_click`] last in its click handler, so the root's
 //! rule still holds: the pressed control, or its nearest focusable ancestor, has the keyboard
 //! afterwards, as a pressed button does in a browser. With the default left to run, Blitz clears
-//! the focus after the handlers, so the click goes through [`HostClickFocus`] exactly as the
-//! root's does. With the default prevented, Blitz leaves the focus where it was, so the host's
-//! [`HostPressFocus`] moves it now, inside the click, and a handler's own later focus (a
+//! the focus after the handlers, so the click goes through the host exactly as the root's does.
+//! With the default prevented, Blitz leaves the focus where it was, so the host's
+//! [`ClickFocusHost::press`](crate::ClickFocusHost::press) moves it now, inside the click, and a handler's own later focus (a
 //! `focus_soon`) still wins.
 
-use crate::focus::host::retry_busy;
+use crate::focus::soon::retry_busy;
+use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::fallback::Fallback;
 use crate::host::focused::Focused;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
-/// The host's click-focus seam, provided as root context by ds-native under
-/// `FocusFallback::Ancestor` (its default): `fallback` reads the click from the document through
-/// any element of it (the root's), and `restore` gives the ancestor the keyboard once the click's
-/// default has run, only if the click left the focus nowhere (a handler that moved it wins).
-#[derive(Debug, Clone, Copy)]
-pub struct HostClickFocus {
-    /// Called from the root's click handler, before the renderer's default action.
-    pub fallback: fn(&MountedData) -> Fallback,
-    /// Called a frame later with the ancestor `fallback` found. It checks that the ancestor is
-    /// still in the document when it focuses, not when the click asked: a click whose handler
-    /// removed it (a "Show images" button that goes once pressed) sends the keyboard to the
-    /// next focusable ancestor instead.
-    pub restore: fn(&MountedData) -> Focused,
-}
-
-/// The host's focus write for a press whose click a quire control kept with its default
-/// prevented, provided as root context by ds-native beside [`HostClickFocus`] (under
-/// `FocusFallback::Ancestor`). It reads the press from the document through any element of it
-/// (the root's) and gives the keyboard to the nearest focusable element from the pressed one up,
-/// now. It leaves the focus alone when a text field or editable surface has it (the click
-/// cannot send that field a `blur`), and when the press landed in a field or on a disabled
-/// control.
-#[derive(Debug, Clone, Copy)]
-pub struct HostPressFocus(pub fn(&MountedData) -> Focused);
-
-/// What a `Ds` root gives the controls inside it for a click they keep: the host's seams, if the
-/// host provided them, and the root's own element, through which they read the document.
-#[derive(Clone, Copy)]
+/// What a `Ds` root gives the controls inside it for a click they keep: the host, and the root's
+/// own element, through which they read the document.
+#[derive(Clone)]
 pub struct ClickRoot {
-    host: Option<HostClickFocus>,
-    press: Option<HostPressFocus>,
+    host: Rc<dyn DocumentHost>,
     element: CopyValue<Option<Rc<MountedData>>>,
 }
 
 impl ClickRoot {
-    /// The root's seams, read from the host's context, and its element, once mounted.
+    /// The document's host, and the root's element, once mounted.
     pub fn of(element: CopyValue<Option<Rc<MountedData>>>) -> ClickRoot {
         ClickRoot {
-            host: try_consume_context::<HostClickFocus>(),
-            press: try_consume_context::<HostPressFocus>(),
+            host: use_document_host(),
             element,
         }
     }
 
     /// The root's own click handler: hand a click nothing inside has taken to the host.
     pub fn clicked(&self, event: &MouseEvent) {
-        after_click(self.host, self.element.peek().clone(), event);
+        after_click(&self.host, self.element.peek().clone(), event);
     }
 }
 
 /// A click a quire control keeps from the root (it stopped the click's propagation, or
 /// prevented its default): the control hands it to the host itself, as the root would have.
 /// Call it last in the click handler, after the control's own work, as the root is the last to
-/// hear a click. Outside a `Ds` root, or without the host's seams (`FocusFallback::BlitzDefault`,
-/// a server render, the web), it does nothing.
+/// hear a click. Outside a `Ds` root, or with a host that has no click-focus part
+/// (`FocusFallback::BlitzDefault`, a server render, a shell's surface), it does nothing.
 pub fn kept_click(event: &MouseEvent) {
     let Some(root) = try_consume_context::<ClickRoot>() else {
         return;
     };
     let element = root.element.peek().clone();
     if event.default_action_enabled() {
-        after_click(root.host, element, event);
+        after_click(&root.host, element, event);
     } else {
-        press_focus(root.press, element);
+        press_focus(&root.host, element);
     }
 }
 
 /// Give the pressed control the keyboard now, a frame later while the document is busy.
-fn press_focus(press: Option<HostPressFocus>, root: Option<Rc<MountedData>>) {
-    let (Some(HostPressFocus(take)), Some(root)) = (press, root) else {
+fn press_focus(host: &Rc<dyn DocumentHost>, root: Option<Rc<MountedData>>) {
+    let (Some(click), Some(root)) = (host.click_focus(), root) else {
         return;
     };
-    if take(&root) == Focused::Busy {
+    if click.press(&root) == Focused::Busy {
+        let host = Rc::clone(host);
         spawn(async move {
-            let _ = retry_busy(|| take(&root)).await;
+            if let Some(click) = host.click_focus() {
+                let _ = retry_busy(|| click.press(&root)).await;
+            }
         });
     }
 }
 
 /// The root's click handler: hand a click nothing inside has taken to the host.
-fn after_click(host: Option<HostClickFocus>, root: Option<Rc<MountedData>>, event: &MouseEvent) {
-    let (Some(host), Some(root)) = (host, root) else {
+fn after_click(host: &Rc<dyn DocumentHost>, root: Option<Rc<MountedData>>, event: &MouseEvent) {
+    let (Some(click), Some(root)) = (host.click_focus(), root) else {
         return;
     };
     if !event.default_action_enabled() {
         return;
     }
-    if let Fallback::Ancestor(ancestor) = (host.fallback)(&root) {
+    if let Fallback::Ancestor(ancestor) = click.fallback(&root) {
+        let host = Rc::clone(host);
         spawn(async move {
-            let _ = retry_busy(|| (host.restore)(&ancestor)).await;
+            if let Some(click) = host.click_focus() {
+                let _ = retry_busy(|| click.restore(&ancestor)).await;
+            }
         });
     }
 }

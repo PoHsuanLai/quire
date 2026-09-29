@@ -1,12 +1,9 @@
 //! What a focus change does with a field's text once the caret is in it: a
 //! rename field opened on a folder's name selects it, so typing replaces the name. Blitz has no
-//! script to call `input.select()` with, so the host does it: ds-native's [`HostSelect`] selects
-//! the field's whole value in the document, after its `HostFocus` write has landed.
-
-use dioxus::prelude::MountedData;
+//! script to call `input.select()` with, so the host does it
+//! ([`FocusHost::select`](crate::FocusHost::select)), after its focus write has landed.
 
 use crate::host::caret::InitialCaret;
-use crate::host::focused::Focused;
 
 /// The field's text after the focus lands in it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -36,9 +33,3 @@ impl From<Select> for Landing {
         }
     }
 }
-
-/// The host's select-all write, provided as root context by `ds-native` beside `HostFocus`
-/// (`ds_native::launch`, its harness, `ds_native::focus::provide`). Without one, [`Select::All`]
-/// does nothing.
-#[derive(Debug, Clone, Copy)]
-pub struct HostSelect(pub fn(&MountedData) -> Focused);

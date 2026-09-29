@@ -8,10 +8,11 @@ use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::core::vocab::PressPhase;
 use crate::edit::clicks::{Clicks, LastPress, clicks_after};
 use crate::edit::composition::Composing;
-use crate::edit::host::HostEdit;
 use crate::edit::pointer::EditFocus;
+use crate::host::document::DocumentHost;
 use crate::host::ime::ImeListener;
 use crate::host::measure::BUSY_ATTEMPTS;
+use crate::host::parts::EditHost;
 use crate::host::probe::Probe;
 use dioxus::prelude::*;
 use std::cell::{Cell, RefCell};
@@ -82,13 +83,16 @@ impl SurfaceState {
 /// Run a host write against `element` from a task of the calling scope, a frame later whenever
 /// the document is busy (the same wait `ds::focus_soon` makes).
 pub(crate) fn write_soon(
-    host: HostEdit,
+    host: Rc<dyn DocumentHost>,
     element: Rc<MountedData>,
-    write: impl Fn(&HostEdit, &MountedData) -> Probe<()> + 'static,
+    write: impl Fn(&dyn EditHost, &MountedData) -> Probe<()> + 'static,
 ) {
     spawn(async move {
         for _ in 0..BUSY_ATTEMPTS {
-            match write(&host, &element) {
+            let Some(edit) = host.edit() else {
+                return;
+            };
+            match write(edit, &element) {
                 Probe::Busy => sleep(FRAME_SLACK).await,
                 Probe::Found(()) | Probe::Unknown => return,
             }

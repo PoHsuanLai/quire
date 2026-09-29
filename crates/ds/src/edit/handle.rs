@@ -2,9 +2,10 @@
 //! selection, and to place its `/` and `@` menus at the caret.
 
 use crate::core::geometry::units::{Point, Rect};
-use crate::edit::host::HostEdit;
-use crate::focus::host::focus_soon;
-use crate::host::measure::{HostMeasure, Measured};
+use crate::focus::soon::focus_soon;
+use crate::host::document::{DocumentHost, use_document_host};
+use crate::host::measure::Measured;
+use crate::host::parts::EditHost;
 use crate::host::position::{TextPosition, TextRange};
 use crate::host::probe::Probe;
 use dioxus::prelude::*;
@@ -22,9 +23,17 @@ pub struct EditHandle {
     /// press does.
     hooks: Signal<Option<SurfaceHooks>>,
     /// The host, read once where the handle is made, so a read needs no scope of its own.
-    host: Option<HostEdit>,
-    /// The host's rect read, for [`EditHandle::bounds`].
-    measure: Option<HostMeasure>,
+    host: HostSlot,
+}
+
+/// The document's host, held where a handle can copy it.
+#[derive(Clone, Copy)]
+struct HostSlot(CopyValue<Rc<dyn DocumentHost>>);
+
+impl std::fmt::Debug for HostSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("HostSlot")
+    }
 }
 
 /// What the surface does to take or give up the keyboard: the same as a press or a blur.
@@ -48,8 +57,7 @@ pub fn use_edit_handle() -> EditHandle {
     EditHandle {
         element: use_signal(|| None),
         hooks: use_signal(|| None),
-        host: use_hook(try_consume_context::<HostEdit>),
-        measure: use_hook(try_consume_context::<HostMeasure>),
+        host: HostSlot(use_hook(|| CopyValue::new(use_document_host()))),
     }
 }
 
@@ -64,33 +72,31 @@ impl EditHandle {
 
     /// The text position under `at`.
     pub fn hit_test(&self, at: Point) -> Probe<TextPosition> {
-        self.with(|host, element| (host.hit_test)(element, at))
+        self.with(|edit, element| edit.hit_test(element, at))
     }
 
     /// The caret's box at `position`: `--caret-w` wide from the insertion point, its line's
     /// height.
     pub fn caret_rect(&self, position: &TextPosition) -> Probe<Rect> {
-        self.with(|host, element| (host.caret_rect)(element, position))
+        self.with(|edit, element| edit.caret_rect(element, position))
     }
 
     /// The boxes `range` covers: one per line of text, one per whole atom.
     pub fn selection_rects(&self, range: &TextRange) -> Probe<Vec<Rect>> {
-        self.with(|host, element| (host.selection_rects)(element, range))
+        self.with(|edit, element| edit.selection_rects(element, range))
     }
 
     /// The surface's own border box, in the same coordinates as the other reads: an app draws
     /// its caret layer inside the surface's container at `caret_rect - bounds`.
     pub fn bounds(&self) -> Probe<Rect> {
-        let Some(HostMeasure(measure)) = self.measure else {
-            return Probe::Unknown;
-        };
+        let host = self.host.0.peek().clone();
         match self
             .element
             .try_peek()
             .ok()
             .and_then(|element| element.clone())
         {
-            Some(element) => match measure(&element) {
+            Some(element) => match host.geometry().measure(&element) {
                 Measured::At(rect) => Probe::Found(rect),
                 Measured::Busy => Probe::Busy,
                 Measured::Unknown => Probe::Unknown,
@@ -122,8 +128,9 @@ impl EditHandle {
         }
     }
 
-    fn with<T>(&self, read: impl FnOnce(&HostEdit, &MountedData) -> Probe<T>) -> Probe<T> {
-        let Some(host) = self.host else {
+    fn with<T>(&self, read: impl FnOnce(&dyn EditHost, &MountedData) -> Probe<T>) -> Probe<T> {
+        let host = self.host.0.peek().clone();
+        let Some(edit) = host.edit() else {
             return Probe::Unknown;
         };
         match self
@@ -132,7 +139,7 @@ impl EditHandle {
             .ok()
             .and_then(|element| element.clone())
         {
-            Some(element) => read(&host, &element),
+            Some(element) => read(edit, &element),
             None => Probe::Unknown,
         }
     }

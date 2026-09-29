@@ -68,7 +68,7 @@ use dioxus::prelude::*;
 ///
 /// A floating menu that took the keyboard gives it back when it closes: to the
 /// anchor's element when `anchor` is [`Anchor::Mounted`] (or its nearest focusable ancestor),
-/// if it is still there, through the host's `HostHandBack`; anchored at a point or a rect,
+/// if it is still there, through the host's `FocusHost::hand_back`; anchored at a point or a rect,
 /// ds-native gives it to the element focused before the menu opened.
 #[component]
 pub fn Menu<T: Clone + PartialEq + 'static>(
@@ -200,7 +200,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                 // inline menu leaves it with its caller.
                 if active.takes_focus() && flow == Flow::Floating {
                     hand_back(&element, &opener, flow, active);
-                    crate::focus::host::focus_soon(element);
+                    crate::focus::soon::focus_soon(element);
                 }
             },
             onmousemove: move |event| hover.hovered(&event),

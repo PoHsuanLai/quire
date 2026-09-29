@@ -1,9 +1,9 @@
 //! When a `TextInput` takes the caret, and the bookkeeping that serves a focus request once.
 
 use crate::focus::field::FieldHandle;
-use crate::focus::host::focus_soon_told;
 use crate::focus::request::{FocusRequest, FocusTicket};
 use crate::focus::select::Landing;
+use crate::focus::soon::focus_soon_told;
 use crate::focus::targets::{FocusTarget, FocusTargets, Told};
 use dioxus::prelude::*;
 use std::rc::Rc;

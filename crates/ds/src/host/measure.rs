@@ -6,16 +6,14 @@
 //!
 //! Every read goes through [`client_rect`]. On dioxus-native, `get_client_rect` borrows the
 //! document mutably, and a task woken in the same turn as a dirty scope is polled inside
-//! `render_immediate` while the renderer already holds that borrow: the read panics ("RefCell
-//! already borrowed"). A host that knows its document provides
-//! [`HostMeasure`], which answers [`Measured::Busy`] instead, and the read waits a frame. With
-//! no host measurer the read is guarded so the same collision is `Busy` too, never a panic.
+//! `render_immediate` while the renderer already holds that borrow: the read would panic
+//! ("RefCell already borrowed"). The host's [`GeometryHost::measure`](crate::GeometryHost::measure)
+//! answers [`Measured::Busy`] instead, and the read waits a frame.
 
 use crate::core::busy::{after_render, wait_out_busy};
-use crate::core::geometry::units::{Point, Px, Rect, Size};
-use crate::core::guarded::Guarded;
+use crate::core::geometry::units::{Point, Rect};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use dioxus::html::geometry::PixelsRect;
+use crate::host::document::use_document_host;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -30,47 +28,21 @@ pub enum Measured {
     Unknown,
 }
 
-/// The host's own rect read, provided as root context by `ds-native` (`ds_native::launch`, its
-/// harness, and `ds_native::measure::provide` for any other Blitz host); without one, reads use
-/// `MountedData::get_client_rect`, guarded so a renderer that holds its document answers [`Measured::Busy`] instead of panicking.
-#[derive(Debug, Clone, Copy)]
-pub struct HostMeasure(pub fn(&MountedData) -> Measured);
-
 /// How many frames a read waits for a busy document before giving up.
 pub(crate) const BUSY_ATTEMPTS: usize = 8;
 
-/// `element`'s rect now, through the host's [`HostMeasure`] when there is one. `None` when the
-/// renderer cannot measure it. Call it from a task, never from inside a handler or render.
+/// `element`'s rect now, through the host. `None` when the host cannot measure it. Call it from a
+/// task, never from inside a handler or render.
 pub async fn client_rect(element: &MountedData) -> Option<Rect> {
-    let host = try_consume_context::<HostMeasure>();
+    let host = use_document_host();
     for attempt in 0..BUSY_ATTEMPTS {
-        let read = match host {
-            Some(HostMeasure(read)) => read(element),
-            None => unhosted(element).await,
-        };
-        match read {
+        match host.geometry().measure(element) {
             Measured::At(rect) => return Some(rect),
             Measured::Busy => wait_out_busy(attempt).await,
             Measured::Unknown => return None,
         }
     }
     None
-}
-
-/// A read with no host measurer. dioxus-native-dom's rect read borrows its document when the
-/// read is first polled, and panics ("RefCell already borrowed") when a task polled inside the
-/// renderer's own pass makes it (a shell-host root with no measurer). `ds`
-/// cannot name the Blitz node to `try_borrow` it, so the poll is guarded instead: a panic there
-/// left nothing half-written (the borrow failed before anything was read) and reads as
-/// [`Measured::Busy`], and the caller asks again next frame. The default panic hook still
-/// prints the message; a Blitz host provides `ds_native::measure::provide()` so the collision
-/// never happens.
-async fn unhosted(element: &MountedData) -> Measured {
-    match Guarded(Box::pin(element.get_client_rect())).await {
-        Some(Ok(rect)) => Measured::At(from_pixels(rect)),
-        Some(Err(_)) => Measured::Unknown,
-        None => Measured::Busy,
-    }
 }
 
 /// A mounted element, kept so its rect can be read again when the surface moves.
@@ -204,20 +176,6 @@ pub(crate) async fn laid_out_rect(element: &MountedData) -> Option<Rect> {
 pub(crate) async fn laid_out_now(element: &MountedData) -> Option<Rect> {
     after_render().await;
     client_rect(element).await.filter(|read| laid_out(*read))
-}
-
-/// A renderer rect in logical pixels.
-pub(crate) fn from_pixels(rect: PixelsRect) -> Rect {
-    Rect {
-        origin: Point {
-            x: Px(rect.origin.x as f32),
-            y: Px(rect.origin.y as f32),
-        },
-        size: Size {
-            width: Px(rect.size.width as f32),
-            height: Px(rect.size.height as f32),
-        },
-    }
 }
 
 #[cfg(test)]

@@ -11,7 +11,6 @@
 pub(crate) mod clicks;
 pub(crate) mod composition;
 pub(crate) mod handle;
-pub(crate) mod host;
 pub(crate) mod input;
 pub(crate) mod keys;
 pub(crate) mod pointer;

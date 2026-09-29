@@ -1,5 +1,5 @@
 //! Running a quire app on Blitz: the document, the font registration, the input modality
-//! (`ds::HostModality`), a `data:` net provider for mask and background images (spike S7/S8),
+//! (`ds::HostSignals`), a `data:` net provider for mask and background images (spike S7/S8),
 //! and a redraw when a timer or an image lands.
 //!
 //! The window is blitz's portable `dioxus-native` shell (winit), so an app runs the same on any

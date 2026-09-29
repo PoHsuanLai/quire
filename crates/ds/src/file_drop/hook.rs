@@ -1,8 +1,8 @@
 //! A drop target in the app: an element that takes files dragged in from outside the window.
 
 use crate::core::vocab::DropState;
+use crate::file_drop::board::{DropTarget, FileDropBoard};
 use crate::file_drop::drag::{FileDrag, FileDrop};
-use crate::file_drop::host::{DropTarget, HostFileDrop};
 use crate::file_drop::track::TargetView;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
@@ -14,7 +14,7 @@ use dioxus::prelude::*;
 pub struct FileDropHandle {
     view: Signal<TargetView>,
     owner: ScopeId,
-    host: CopyValue<Option<HostFileDrop>>,
+    host: CopyValue<Option<FileDropBoard>>,
     ondrop: Callback<FileDrop>,
 }
 
@@ -41,13 +41,12 @@ impl std::fmt::Debug for FileDropHandle {
 /// }
 /// ```
 ///
-/// Without a host seam (a webview, a server render) the target never lights and never hears a
-/// drop.
+/// Without a board (a webview, a server render) the target never lights and never hears a drop.
 pub fn use_file_drop(ondrop: impl FnMut(FileDrop) + 'static) -> FileDropHandle {
     let ondrop = use_callback(ondrop);
     let view = use_signal(TargetView::default);
     let owner = use_hook(current_scope_id);
-    let host = use_hook(|| CopyValue::new(try_consume_context::<HostFileDrop>()));
+    let host = use_hook(|| CopyValue::new(try_consume_context::<FileDropBoard>()));
     use_drop(move || {
         if let Some(host) = host.peek().as_ref() {
             host.leave(owner);

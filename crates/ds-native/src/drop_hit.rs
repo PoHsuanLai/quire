@@ -1,4 +1,4 @@
-//! The host's hit test for a file drag (`ds::HostFileDrop`): the element under the pointer, as
+//! The host's hit test for a file drag (`ds::FileDropHost`): the element under the pointer, as
 //! Blitz finds it for a press (`element_from_point`: transforms and `pointer-events` applied),
 //! and the innermost registered drop target on its ancestor chain.
 
@@ -8,13 +8,8 @@ use dioxus::prelude::MountedData;
 use ds::{DropHit, Point};
 use std::rc::Rc;
 
-/// The seam `launch` and the harness provide: `ds::HostFileDrop::new(drop_seam())`.
-pub(crate) fn drop_seam() -> ds::HostFileDrop {
-    ds::HostFileDrop::new(drop_hit)
-}
-
 /// The innermost of `targets` whose element is under `at` or an ancestor of what is.
-fn drop_hit(targets: &[Rc<MountedData>], at: Point) -> DropHit {
+pub(crate) fn drop_hit(targets: &[Rc<MountedData>], at: Point) -> DropHit {
     let nodes: Vec<Option<NodeRef>> = targets.iter().map(|target| NodeRef::of(target)).collect();
     let Some(any) = nodes.iter().flatten().next() else {
         return DropHit::Nothing;

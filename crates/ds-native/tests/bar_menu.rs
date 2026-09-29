@@ -347,7 +347,7 @@ fn a_press_reports_where_it_happened() {
 #[allow(non_snake_case)]
 fn MeasuredRoot() -> Element {
     // What a shell-host surface's root does, where `ds_native::launch` did not provide it.
-    ds_native::measure::provide();
+    ds_native::provide_host();
     let probe = ds::use_rect();
     let width = probe.rect().map_or(0.0, |rect| rect.size.width.0);
     rsx! {
@@ -360,7 +360,7 @@ fn MeasuredRoot() -> Element {
     }
 }
 
-/// `ds_native::measure::provide()` gives a root the Blitz rect read `use_rect` goes through.
+/// `ds_native::provide_host()` gives a root the Blitz rect read `use_rect` goes through.
 #[test]
 fn the_exported_measurer_reads_a_rect() {
     let mut harness = Harness::new(MeasuredRoot, VIEW);

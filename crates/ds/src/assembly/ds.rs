@@ -3,7 +3,7 @@
 //! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
 //! overlay host and the toast host. It provides `Scope`, `HoverHub`, `ToastHub`, `LayerStack`
 //! and `Overlays` as context. Its click handler, the last to hear a click, hands a click that
-//! landed on nothing focusable to the host's `HostClickFocus` (FINDINGS "Native focus"), and it
+//! landed on nothing focusable to the host's `ClickFocusHost` (FINDINGS "Native focus"), and it
 //! provides the same seams to the controls inside it, which hand over a click they keep to
 //! themselves (`focus::click::kept_click`).
 //!
@@ -26,7 +26,7 @@
 //! highlight, hairline, shadow strength and vibrancy keys) the same way.
 //!
 //! The root also writes the pixel tokens' inputs for its device scale (`scale`, else the host's
-//! `HostScale`, else 1x; `tokens/pixel.rs`), so every hairline is whole device pixels at 1.25,
+//! `HostSignals`, else 1x; `tokens/pixel.rs`), so every hairline is whole device pixels at 1.25,
 //! 1.5 or 1.75 (design/01-LAYOUT.md section 2.1). At 1x it writes nothing.
 //!
 //! A client-decorated window passes `window: WindowFrame::Titlebar { .. }`: the root stamps
@@ -47,6 +47,7 @@ use crate::core::geometry::scale::Scale;
 use crate::core::vocab::{Activity, InputModality};
 use crate::core::word::Word;
 use crate::focus::click::ClickRoot;
+use crate::host::signals::HostSignals;
 use crate::motion::hover_intent::HoverWarmth;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
@@ -62,7 +63,7 @@ use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::style::material::stack::MaterialStack;
 use crate::style::scale::use_root_scale;
-use crate::style::scope::{HostActivity, HostModality, Scope, use_scope_provider};
+use crate::style::scope::{Scope, use_scope_provider};
 use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::style::tokens::hex::Alpha;
 use crate::style::tokens::{pixel::PixelToken, shape::Corner};
@@ -107,12 +108,11 @@ pub fn Ds(
     let frame_tint = frame.unwrap_or(FrameTint::of(material, chrome));
     let ground = ground.unwrap_or(Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
-    let host = use_hook(try_consume_context::<HostModality>);
-    let host_activity = use_hook(try_consume_context::<HostActivity>);
+    let signals = use_hook(try_consume_context::<HostSignals>);
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let click_root = use_context_provider(|| ClickRoot::of(element));
-    let modality = host.map_or(InputModality::default(), |HostModality(current)| current());
-    let activity = host_activity.map_or(Activity::Active, |HostActivity(current)| current());
+    let modality = signals.map_or(InputModality::default(), |signals| (signals.modality)());
+    let activity = signals.map_or(Activity::Active, |signals| (signals.activity)());
     let env = use_scope_provider(Scope {
         resolved,
         scheme: resolved.scheme,

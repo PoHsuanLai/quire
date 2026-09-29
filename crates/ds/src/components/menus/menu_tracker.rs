@@ -169,7 +169,7 @@ impl Tracker {
         if let Some(panel) = self.panel.peek().clone() {
             spawn(async move {
                 sleep(FRAME_SLACK).await;
-                let _ = crate::focus::host::focus_element(&panel.0).await;
+                let _ = crate::focus::soon::focus_element(&panel.0).await;
             });
         }
     }

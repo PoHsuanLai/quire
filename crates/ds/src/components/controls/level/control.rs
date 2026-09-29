@@ -122,7 +122,7 @@ pub fn LevelControl(
                 // two are separate tasks, so the measurement never waits for the focus.
                 if let Some(focus) = root() {
                     spawn(async move {
-                        let _ = crate::focus::host::focus_element(&focus).await;
+                        let _ = crate::focus::soon::focus_element(&focus).await;
                     });
                 }
                 if let Some(mounted) = rail() {

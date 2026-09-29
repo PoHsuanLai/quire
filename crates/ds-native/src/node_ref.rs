@@ -7,6 +7,7 @@ use blitz_dom::{BaseDocument, NodeId};
 use dioxus::html::RenderedElementBacking;
 use dioxus::prelude::MountedData;
 use dioxus_native_dom::NodeHandle;
+use ds::SameNode;
 use std::cell::RefCell;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::rc::Rc;
@@ -106,10 +107,10 @@ impl RenderedElementBacking for FoundNode {
     }
 }
 
-/// Whether two handles name the same node (`ds::HostFind::same`).
-pub(crate) fn same(a: &MountedData, b: &MountedData) -> bool {
+/// Whether two handles name the same node (`ds::GeometryHost::same`).
+pub(crate) fn same(a: &MountedData, b: &MountedData) -> SameNode {
     match (NodeRef::of(a), NodeRef::of(b)) {
-        (Some(a), Some(b)) => a.node == b.node,
-        _ => false,
+        (Some(a), Some(b)) if a.node == b.node => SameNode::Same,
+        _ => SameNode::Different,
     }
 }

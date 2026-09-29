@@ -1,16 +1,18 @@
 //! Focusing an element named by a CSS selector: an app's panel opens and its
 //! field, or the window's own `.app`, should have the keyboard, and the caller holds no mounted
-//! handle for it. The host finds the element in its document ([`HostFind`], ds-native's), the
-//! focus and the select-all go through the same `HostFocus`/`HostSelect` writes a field's own
-//! focus does, and a `TextInput` found this way hears its `onfocus` once, as through
+//! handle for it. The host finds the element in its document
+//! ([`GeometryHost::find`](crate::GeometryHost::find)), the focus and the select-all go through the
+//! same writes a field's own focus does, and a `TextInput` found this way hears its `onfocus` once, as through
 //! `Focus::OnMount`.
 
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::focus::host::focus_selecting;
 use crate::focus::select::Select;
+use crate::focus::soon::focus_selecting;
 use crate::focus::targets::FocusTargets;
+use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
 use crate::host::found::Found;
+use crate::host::parts::GeometryHost;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -18,27 +20,10 @@ use std::rc::Rc;
 /// opens its panel mounts a frame or two later.
 const FIND_FRAMES: usize = 20;
 
-/// The host's selector lookup, provided as root context by `ds-native` (`ds_native::launch` and
-/// its harness). `same` says whether two handles are the same node, since an element found by
-/// selector is a different handle from the one its component mounted with.
-#[derive(Clone)]
-pub struct HostFind {
-    /// The first element in the document matching a selector.
-    pub find: Rc<dyn Fn(&str) -> Found>,
-    /// Whether two mounted handles name the same node.
-    pub same: fn(&MountedData, &MountedData) -> bool,
-}
-
-impl std::fmt::Debug for HostFind {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("HostFind").finish_non_exhaustive()
-    }
-}
-
 /// Why [`focus_by_selector`] did not move the focus.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum FocusError {
-    /// No host can find elements here: no [`HostFind`] was provided.
+    /// The host has no document to search by selector.
     #[error("no host finds elements by selector here")]
     NoHost,
     /// The host's document cannot parse the selector.
@@ -76,10 +61,10 @@ pub async fn focus_by_selector(
     select: Select,
 ) -> Result<(), FocusError> {
     let selector = selector.into();
-    let host = try_consume_context::<HostFind>().ok_or(FocusError::NoHost)?;
-    let element = find(&host, &selector).await?;
+    let host = use_document_host();
+    let element = find(host.geometry(), &selector).await?;
     let told = try_consume_context::<FocusTargets>()
-        .and_then(|targets| targets.told_at(&element, host.same));
+        .and_then(|targets| targets.told_at(&element, host.geometry()));
     match focus_selecting(&element, select.into()).await {
         Focused::Done => {
             if let Some(told) = told {
@@ -93,12 +78,12 @@ pub async fn focus_by_selector(
 }
 
 /// The first element matching `selector`, once it is drawn and the document is free.
-async fn find(host: &HostFind, selector: &str) -> Result<Rc<MountedData>, FocusError> {
+async fn find(host: &dyn GeometryHost, selector: &str) -> Result<Rc<MountedData>, FocusError> {
     let mut last = FocusError::NoSuchElement {
         selector: selector.to_owned(),
     };
     for _ in 0..FIND_FRAMES {
-        match (host.find)(selector) {
+        match host.find(selector) {
             Found::Element(element) => return Ok(element),
             Found::BadSelector => {
                 return Err(FocusError::BadSelector {

@@ -1,5 +1,5 @@
 //! The window's side of a file drag: winit 0.31's data-transfer events become
-//! `ds::FileDragInput`s, and `ds::HostFileDrop`'s answer goes back to the platform so the cursor
+//! `ds::FileDragInput`s, and `ds::FileDropBoard`'s answer goes back to the platform so the cursor
 //! shows a copy over a target and a refusal elsewhere.
 //!
 //! winit reports a drag in four events plus the data (`DragEntered`, `DragPosition`,

@@ -6,8 +6,8 @@ use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
 use ds::lint::{LintConfig, Rule, markup};
 use ds::{
-    Accent, Activity, Appearance, BlurState, Ds, FrameVars, HostActivity, HostModality, Inject,
-    InputModality, Material, Motion, ReducedMotion, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
+    Accent, Activity, Appearance, BlurState, Ds, FrameVars, HostSignals, Inject, InputModality,
+    Material, Motion, ReducedMotion, Scale, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
 };
 use std::collections::BTreeMap;
 
@@ -42,11 +42,12 @@ impl Default for Setup {
 
 #[allow(non_snake_case)]
 fn Root(setup: Setup) -> Element {
-    if let Some(modality) = setup.modality {
-        use_context_provider(|| HostModality(Signal::new(modality)));
-    }
-    if let Some(activity) = setup.activity {
-        use_context_provider(|| HostActivity(Signal::new(activity)));
+    if setup.modality.is_some() || setup.activity.is_some() {
+        use_context_provider(|| HostSignals {
+            modality: Signal::new(setup.modality.unwrap_or_default()),
+            scale: Signal::new(Scale::ONE),
+            activity: Signal::new(setup.activity.unwrap_or(Activity::Active)),
+        });
     }
     rsx! {
         Ds {

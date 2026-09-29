@@ -30,7 +30,7 @@ use crate::components::overlays::{
     sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
 };
 use crate::core::vocab::Shown;
-use crate::focus::host::focus_soon;
+use crate::focus::soon::focus_soon;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spring::use_spring_presence;
 use crate::root::common::Common;

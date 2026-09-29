@@ -6,7 +6,6 @@ pub mod busy;
 pub mod colour;
 pub mod error;
 pub mod geometry;
-pub mod guarded;
 pub mod png;
 pub mod press;
 pub mod spawner;

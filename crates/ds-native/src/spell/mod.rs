@@ -1,5 +1,5 @@
 //! Spellchecking for `ds::EditSurface` (the `spellcheck` feature; design/04-COMPONENTS.md
-//! section 50): `ds::HostSpell` on Blitz. The system's Hunspell dictionaries
+//! section 50): `ds::SpellService` on Blitz. The system's Hunspell dictionaries
 //! (`/usr/share/hunspell`; nothing is bundled) are read and checked by `spellbook`, unmodified
 //! (MPL-2.0), on a worker thread; learned words go to `~/.local/share/quire/spelling/<lang>.dic`.
 //!
@@ -18,15 +18,17 @@ pub use config::{SYSTEM_DICTIONARIES, SpellConfig};
 pub use service::NativeSpell;
 
 use dioxus::prelude::*;
-use ds::{HostSpell, Lang};
+use ds::{Lang, SpellService};
 use std::rc::Rc;
 
 /// Provide the system's spellchecker to the calling component's subtree.
-pub fn provide() -> HostSpell {
-    use_context_provider(|| HostSpell(Rc::new(NativeSpell::system())))
+pub fn provide() -> Rc<dyn SpellService> {
+    use_context_provider(|| Rc::new(NativeSpell::system()) as Rc<dyn SpellService>)
 }
 
 /// Provide a spellchecker over `config`'s dictionaries, in `languages` by default.
-pub fn provide_with(config: SpellConfig, languages: Vec<Lang>) -> HostSpell {
-    use_context_provider(|| HostSpell(Rc::new(NativeSpell::with_config(config, languages))))
+pub fn provide_with(config: SpellConfig, languages: Vec<Lang>) -> Rc<dyn SpellService> {
+    use_context_provider(|| {
+        Rc::new(NativeSpell::with_config(config, languages)) as Rc<dyn SpellService>
+    })
 }

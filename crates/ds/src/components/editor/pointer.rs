@@ -33,8 +33,8 @@ pub(crate) fn press(
     let at = point_of(event);
     let clicks = ctx.state.press(at);
     report(ctx, at, event.modifiers(), PointerPhase::Press, clicks);
-    if let (Some(host), Some(element)) = (ctx.host, ctx.state.element())
-        && (host.capture)(&element, captured) == Probe::Found(())
+    if let (Some(edit), Some(element)) = (ctx.host.edit(), ctx.state.element())
+        && edit.capture(&element, captured) == Probe::Found(())
     {
         ctx.state.capture.set(Capture::Held);
     }
@@ -95,8 +95,8 @@ fn report(ctx: &SurfaceCtx, at: Point, modifiers: Modifiers, phase: PointerPhase
     let Some(on_pointer) = ctx.on_pointer else {
         return;
     };
-    let position = match (ctx.host, ctx.state.element()) {
-        (Some(host), Some(element)) => (host.hit_test)(&element, at).found(),
+    let position = match (ctx.host.edit(), ctx.state.element()) {
+        (Some(edit), Some(element)) => edit.hit_test(&element, at).found(),
         _ => None,
     };
     let extend = if modifiers.contains(Modifiers::SHIFT) {

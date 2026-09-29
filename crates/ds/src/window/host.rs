@@ -2,8 +2,7 @@
 //! names what a client-decorated window asks of its platform, and each host fills it in —
 //! ds-native over the winit window `launch` opens (`ds_native::window`), sill over shell-host's
 //! `SurfaceHandle` (`begin_move`, `begin_resize(edge)`, `set_maximized`, `use_toplevel_state`).
-//! A trait, not a table of `fn`s like `HostEdit`: each host holds its own window handle, and a
-//! test's stub records what it was asked.
+//! A trait: each host holds its own window handle, and a test's stub records what it was asked.
 //!
 //! The host is provided as [`WindowHost`] context, which also carries the last [`WindowState`]
 //! as a signal, so the frame redraws when the window is zoomed or loses the keyboard. The host

@@ -3,9 +3,8 @@
 //! `TextInput`'s own `Focus::Controlled` asks for the focus by re-rendering; a handle acts at
 //! once, and hands out the element, which a request never did.
 
-use crate::focus::host::HostFocus;
-use crate::focus::host::{blur_element, focus_selecting};
 use crate::focus::select::Select;
+use crate::focus::soon::{blur_element, focus_selecting};
 use crate::focus::targets::FocusTarget;
 use crate::host::focused::Focused;
 use dioxus::core::Runtime;
@@ -15,9 +14,8 @@ use std::rc::Rc;
 /// A handle on one field: pass it as `TextInput { handle: Some(handle) }`, which fills it as the
 /// field mounts. Before that (or after the field unmounts) every call does nothing.
 ///
-/// A focus or blur through a host (Blitz) dispatches no event, so the handle calls the field's
-/// `onfocus` or `onblur` itself once the write lands; without a host the renderer's own event
-/// fires and the handle stays quiet, so the caller hears each once.
+/// A focus or blur through the host (Blitz) dispatches no event, so the handle calls the field's
+/// `onfocus` or `onblur` itself once the write lands, and the caller hears each once.
 #[derive(Clone, Copy)]
 pub struct FieldHandle {
     field: Signal<Option<FocusTarget>>,
@@ -71,9 +69,8 @@ impl FieldHandle {
         let Some(target) = self.target() else {
             return;
         };
-        let hosted = self.hosted();
         self.run(async move {
-            if focus_selecting(&target.element, select.into()).await == Focused::Done && hosted {
+            if focus_selecting(&target.element, select.into()).await == Focused::Done {
                 target.told.focus.call(());
             }
         });
@@ -85,9 +82,8 @@ impl FieldHandle {
         let Some(target) = self.target() else {
             return;
         };
-        let hosted = self.hosted();
         self.run(async move {
-            if blur_element(&target.element).await == Focused::Done && hosted {
+            if blur_element(&target.element).await == Focused::Done {
                 target.told.blur.call(());
             }
         });
@@ -95,13 +91,6 @@ impl FieldHandle {
 
     fn target(&self) -> Option<FocusTarget> {
         self.field.try_peek().ok().and_then(|slot| slot.clone())
-    }
-
-    /// Whether a host does the writes, so no renderer event will tell the field.
-    fn hosted(&self) -> bool {
-        Runtime::try_current().is_some_and(|runtime| {
-            runtime.in_scope(self.owner, || try_consume_context::<HostFocus>().is_some())
-        })
     }
 
     /// Spawn `work` in the handle's own scope.

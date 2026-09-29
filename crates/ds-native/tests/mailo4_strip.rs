@@ -4,11 +4,12 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, Appearance, Ds, HostMeasure, HoverStrip, Icon, ListRow, Material, Measured,
+    ActionId, Anim, Appearance, DocumentHost, Ds, HoverStrip, Icon, ListRow, Material, NoHost,
     Presence, RowState, Shown, StripAction,
 };
 use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds_native::{Harness, Viewport};
+use std::rc::Rc;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -22,20 +23,15 @@ const VIEW: Viewport = Viewport {
 enum Layout {
     /// The harness's own measurer: rects resolve.
     Measured,
-    /// A measurer that answers `Unknown` for every element, as a host without layout does.
+    /// A host with no layout to read: every measurement answers `Unknown`.
     Absent,
-}
-
-/// A measurer with no layout to read.
-fn unknown(_: &MountedData) -> Measured {
-    Measured::Unknown
 }
 
 /// One row whose strip the caller shows, logging the press and the measured click.
 #[component]
 fn Page(layout: Layout) -> Element {
     if layout == Layout::Absent {
-        use_context_provider(|| HostMeasure(unknown));
+        use_context_provider(|| Rc::new(NoHost::default()) as Rc<dyn DocumentHost>);
     }
     let mut log = use_signal(Vec::<String>::new);
     let actions = vec![StripAction {
