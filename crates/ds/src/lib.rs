@@ -164,7 +164,7 @@ pub use crate::components::{
         sheet::Sheet,
         sheet_placement::SheetPlacement,
         toast::use_toasts,
-        tooltip::{Shown, Tooltip, TooltipKind},
+        tooltip::{Tooltip, TooltipKind},
     },
 };
 pub use crate::core::word::Word;
@@ -184,7 +184,7 @@ pub use crate::core::{
     },
     vocab::{
         Activity, Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Percent,
-        Selection, Shortcut, ShortcutKey, StaggerIndex, Switch,
+        Selection, Shortcut, ShortcutKey, Shown, StaggerIndex, Switch,
     },
 };
 pub use crate::edit::{

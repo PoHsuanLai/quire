@@ -3,7 +3,7 @@
 //! (`osd.rs`) owns the timers and runs the effects; everything that decides is here, so the rules
 //! are a table.
 
-use crate::components::overlays::tooltip::Shown;
+use crate::core::vocab::Shown;
 
 /// Where the card is in its life: `data-presence` while it is drawn, `data-shown="hidden"` once it
 /// has gone.
@@ -102,7 +102,7 @@ pub(crate) fn step(phase: OsdPhase, input: OsdInput) -> (OsdPhase, OsdEffect) {
 #[cfg(test)]
 mod tests {
     use super::{OsdEffect as E, OsdInput as I, OsdPhase as P, input, step};
-    use crate::components::overlays::tooltip::Shown;
+    use crate::core::vocab::Shown;
 
     #[test]
     fn each_input_moves_the_card() {

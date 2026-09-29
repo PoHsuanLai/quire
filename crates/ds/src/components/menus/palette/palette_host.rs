@@ -3,7 +3,7 @@
 //! `peek-in`, C's `cmdk-in`, or an opaque spring. Split from `command_palette`.
 
 use crate::components::overlays::popover::Float;
-use crate::components::overlays::tooltip::Shown;
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::style::tokens::shape::Corner;

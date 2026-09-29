@@ -43,9 +43,9 @@ use crate::components::menus::palette::{
     palette_motion::PaletteHandle,
 };
 use crate::components::overlays::popover::{Float, Stacking, use_float};
-use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::{Px, Rect};
 use crate::core::vocab::Availability;
+use crate::core::vocab::Shown;
 use crate::focus::caret::{Caret, HostCaret, InitialCaret};
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
