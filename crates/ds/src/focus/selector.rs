@@ -105,6 +105,7 @@ async fn find(host: &HostFind, selector: &str) -> Result<Rc<MountedData>, FocusE
                     selector: selector.to_owned(),
                 });
             }
+            Found::Unreachable => return Err(FocusError::NoHost),
             Found::Busy => last = FocusError::Busy,
             Found::Missing => {
                 last = FocusError::NoSuchElement {
