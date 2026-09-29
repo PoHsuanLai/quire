@@ -164,6 +164,7 @@ pub fn Slider(
             "aria-valuemax": "100",
             "aria-valuenow": "{now}",
             "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             style: "--f:{fill}",
             onmounted: move |event| element.set(Some(event.data())),
             onpointerdown: move |event| {

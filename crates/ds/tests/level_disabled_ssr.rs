@@ -81,6 +81,7 @@ const CASES: &[Case] = &[
         },
         Availability::Disabled,
     ),
+    ("busy", || panel(Availability::Busy), Availability::Busy),
 ];
 
 #[test]
@@ -100,6 +101,11 @@ fn a_disabled_level_says_so_and_leaves_the_tab_order() {
             }
             Availability::Disabled => {
                 assert!(level.contains("aria-disabled=\"true\""), "{name}: {level}");
+                assert!(!level.contains("tabindex"), "{name}: {level}");
+            }
+            Availability::Busy => {
+                assert!(level.contains("aria-busy=\"true\""), "{name}: {level}");
+                assert!(!level.contains("aria-disabled"), "{name}: {level}");
                 assert!(!level.contains("tabindex"), "{name}: {level}");
             }
         }

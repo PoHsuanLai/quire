@@ -28,7 +28,7 @@ pub enum ButtonSize {
 /// `<details>`).
 pub fn disabled(availability: Availability) -> Option<&'static str> {
     match availability {
-        Availability::Enabled => None,
+        Availability::Enabled | Availability::Busy => None,
         Availability::Disabled => Some("true"),
     }
 }
@@ -50,5 +50,6 @@ mod tests {
     fn only_a_disabled_button_is_disabled() {
         assert_eq!(disabled(Availability::Disabled), Some("true"));
         assert_eq!(disabled(Availability::Enabled), None);
+        assert_eq!(disabled(Availability::Busy), None);
     }
 }
