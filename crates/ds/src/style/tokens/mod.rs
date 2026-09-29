@@ -20,6 +20,7 @@ pub(crate) mod layer;
 pub(crate) mod name;
 pub(crate) mod notifications;
 pub(crate) mod opacity;
+pub(crate) mod orb;
 pub(crate) mod osd;
 pub(crate) mod person;
 pub(crate) mod pixel;

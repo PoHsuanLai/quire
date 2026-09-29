@@ -104,3 +104,7 @@ required-features = ["lint"]
 [[test]]
 name = "pdf_thumb_ssr"
 required-features = ["lint"]
+
+[[test]]
+name = "voice_orb_ssr"
+required-features = ["lint"]

@@ -21,6 +21,7 @@ use crate::style::space::{
 };
 use crate::style::tokens::dock::DOCK_TOKENS;
 use crate::style::tokens::notifications::NOTIFICATION_TOKENS;
+use crate::style::tokens::orb::ORB_VARS;
 use crate::style::tokens::osd::OSD_TOKENS;
 use crate::style::tokens::shell::SHELL_TOKENS;
 use crate::style::tokens::size_vars::size_tokens;
@@ -81,6 +82,7 @@ fn collect() -> HashSet<String> {
         .chain(tuned_vars())
         .chain(STACK_INPUTS)
         .chain(LEVEL_VARS)
+        .chain(ORB_VARS)
         .chain(SQUIRCLE_VARS)
         .chain(SHAPE_VARS)
         .chain(ladder_vars())

@@ -1,0 +1,31 @@
+/* The voice orb (design/30 section 2.9). Three glows, six conic gradients turning at different
+   speeds and directions about their own centres, behind a fine dot grid. The turn `--orb-turn`
+   is written inline by the component while it is active; every other custom property is the
+   size-derived metrics or a colour token. */
+.ds-voice-orb {
+  --orb-dots-alpha:.35;
+  display:grid; grid-template-areas:"stack"; flex:none;
+  width:var(--orb-size); height:var(--orb-size);
+  border-radius:var(--r-pill); overflow:hidden;
+}
+.ds-voice-orb-glow, .ds-voice-orb-dots {
+  grid-area:stack; display:block; width:100%; height:100%; border-radius:var(--r-pill);
+}
+.ds-voice-orb-glow {
+  background:
+    conic-gradient(from calc(var(--orb-turn) * 2) at 25% 70%, var(--orb-c3), transparent 20% 80%, var(--orb-c3)),
+    conic-gradient(from calc(var(--orb-turn) * 2) at 45% 75%, var(--orb-c2), transparent 30% 60%, var(--orb-c2)),
+    conic-gradient(from calc(var(--orb-turn) * -3) at 80% 20%, var(--orb-c1), transparent 40% 60%, var(--orb-c1)),
+    conic-gradient(from calc(var(--orb-turn) * 2) at 15% 5%, var(--orb-c2), transparent 10% 90%, var(--orb-c2)),
+    conic-gradient(from calc(var(--orb-turn) * 1) at 20% 80%, var(--orb-c1), transparent 10% 90%, var(--orb-c1)),
+    conic-gradient(from calc(var(--orb-turn) * -2) at 85% 10%, var(--orb-c3), transparent 20% 80%, var(--orb-c3));
+  box-shadow:inset 0 0 var(--orb-shadow) calc(var(--orb-shadow) * .2) var(--orb-bg);
+  filter:blur(var(--orb-blur)) contrast(var(--orb-contrast));
+}
+.ds-voice-orb-dots {
+  background-image:radial-gradient(circle at center, var(--orb-bg) var(--orb-dot), transparent var(--orb-dot));
+  background-size:calc(var(--orb-dot) * 2) calc(var(--orb-dot) * 2);
+  opacity:var(--orb-dots-alpha);
+  mask-image:radial-gradient(var(--ink) var(--orb-mask), transparent 75%);
+}
+.ds-voice-orb[*|data-mask=off] .ds-voice-orb-dots { mask-image:none; }
