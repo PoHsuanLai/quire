@@ -413,19 +413,19 @@ fn the_tinted_chrome_holds_its_ink_over_blur() {
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
-/// A muted avatar (`AvatarMuting::Muted`) keeps its letter legible and stands off
+/// A muted avatar (`Muting::Muted`) keeps its letter legible and stands off
 /// its ground no worse than the plain discs do, in both schemes: muting keeps lightness and
 /// takes chroma, so it withdraws the claim without dimming the account. Every stored swatch and
 /// a person hue every 5 degrees; the letter is `--on-hue`, the grounds a tile or chip sits on.
 #[test]
 fn a_muted_avatar_is_as_legible_as_a_plain_one() {
-    use ds::{AvatarMuting, PersonHue, PersonSwatch};
+    use ds::{Muting, PersonHue, PersonSwatch};
     let discs: Vec<ds::Colour> = PersonSwatch::ALL
         .iter()
         .map(|swatch| swatch.colour())
         .chain((0..360).step_by(5).map(|hue| PersonHue(hue).colour()))
         .collect();
-    let muted = |disc: &ds::Colour| AvatarMuting::Muted.apply(*disc).css();
+    let muted = |disc: &ds::Colour| ds::muting_colour(Muting::Muted, *disc).css();
     let mut failures = Vec::new();
     for scheme in [Scheme::Light, Scheme::Dark] {
         let letter = colour(ColourToken::OnHue, scheme);

@@ -8,8 +8,9 @@
 //! the slash `volume-off`'s. Lucide draws at most two waves; the three here are arcs on one
 //! centre (10, 12) at radii 5, 8.25 and 11.5, spaced so a 2-unit stroke leaves a gap between them.
 
-use super::vocab::{LevelGlyph, Muting};
+use super::vocab::LevelGlyph;
 use crate::core::vocab::Fraction;
+use crate::core::vocab::Muting;
 use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::IconSize;
@@ -189,8 +190,9 @@ fn shape_child(shape: &Shape) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{Part, Showing, showing, waves};
-    use crate::components::content::level_glyph::vocab::{LevelGlyph, Muting};
+    use crate::components::content::level_glyph::vocab::LevelGlyph;
     use crate::core::vocab::Fraction;
+    use crate::core::vocab::Muting;
 
     #[test]
     fn the_waves_follow_the_level_and_mute_brings_the_slash() {

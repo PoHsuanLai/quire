@@ -31,7 +31,7 @@ pub enum AccountFace {
 }
 
 /// The avatar colour a tile shows: the account's own when pressed, muted when not (S's
-/// `saturate(.55)`, the same as `Avatar { muting: AvatarMuting::Muted }`).
+/// `saturate(.55)`, the same as `Avatar { muting: Muting::Muted }`).
 fn tile_colour(colour: Colour, pressed: Check) -> Colour {
     match pressed {
         Check::On => colour,
