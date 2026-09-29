@@ -18,8 +18,8 @@ use crate::components::lists::preview::cue::{
     PaneCue, pane_pending_spec, pending_look, touch_slug, use_entrance_touch,
 };
 use crate::components::overlays::shown_phase::use_shown_phase;
-use crate::components::overlays::tooltip::Shown;
 use crate::core::vocab::Shortcut;
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::detail::{

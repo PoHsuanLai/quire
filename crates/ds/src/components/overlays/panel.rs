@@ -20,8 +20,8 @@
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
 use crate::components::overlays::scrim_strength::ScrimStrength;
 use crate::components::overlays::spring_presence::use_spring_presence;
-use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::Px;
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::root::surface::ClassedScope;

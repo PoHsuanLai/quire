@@ -10,7 +10,7 @@
 //! `shown`, and the entrance timer's phase and the spring's frames are what re-render the
 //! surface.
 
-use crate::components::overlays::tooltip::Shown;
+use crate::core::vocab::Shown;
 use crate::motion::anim::Anim;
 use crate::motion::detail::touch::Touch;
 use crate::motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
@@ -187,7 +187,7 @@ pub(crate) fn use_spring_presence(
 #[cfg(test)]
 mod tests {
     use super::{Stage, Step, step};
-    use crate::components::overlays::tooltip::Shown;
+    use crate::core::vocab::Shown;
 
     #[test]
     fn each_stage_steps_by_what_the_host_asks() {

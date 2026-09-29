@@ -7,7 +7,7 @@
 //! the settle timer, starts over from an empty query and the first choice unless [`Retain`]
 //! says otherwise, and takes the keyboard.
 
-use crate::components::overlays::tooltip::Shown;
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
@@ -144,7 +144,7 @@ impl Showing {
 #[cfg(test)]
 mod tests {
     use super::{Change, change};
-    use crate::components::overlays::tooltip::Shown;
+    use crate::core::vocab::Shown;
 
     #[test]
     fn only_a_hidden_palette_shown_again_replays() {

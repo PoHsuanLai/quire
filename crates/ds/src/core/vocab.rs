@@ -16,6 +16,15 @@ pub enum Availability {
     Disabled,
 }
 
+/// Whether a surface or a tooltip its caller drives is up: `data-shown`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+pub enum Shown {
+    /// Up, at once.
+    Visible,
+    /// Down, even under the pointer.
+    Hidden,
+}
+
 /// Whether an option is the selected one: `aria-selected`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Selection {

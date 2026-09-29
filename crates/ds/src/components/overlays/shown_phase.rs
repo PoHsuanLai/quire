@@ -8,7 +8,7 @@
 //! value).
 
 use crate::components::overlays::osd_phase::{OsdEffect, OsdInput, OsdPhase, input, step};
-use crate::components::overlays::tooltip::Shown;
+use crate::core::vocab::Shown;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::timer::{MotionTimer, use_motion_timer};

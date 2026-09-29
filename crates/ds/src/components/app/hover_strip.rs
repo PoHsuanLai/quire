@@ -1,8 +1,8 @@
 //! HoverStrip: a pill of icon buttons that appears on a hovered row, each previewing its
 //! result through a Fly tooltip (design/04-COMPONENTS.md section 17).
 
-use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::Rect;
+use crate::core::vocab::Shown;
 use crate::core::vocab::{Expanded, Here, StaggerIndex};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;

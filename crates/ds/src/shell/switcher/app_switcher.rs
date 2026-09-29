@@ -6,9 +6,10 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::overlays::tooltip::{Shown, Tooltip, TooltipKind};
+use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
 use crate::core::geometry::units::Px;
 use crate::core::vocab::Selection;
+use crate::core::vocab::Shown;
 use crate::motion::anim::Anim;
 use crate::motion::detail::touch::Touch;
 use crate::motion::pulse_key::PulseKey;
