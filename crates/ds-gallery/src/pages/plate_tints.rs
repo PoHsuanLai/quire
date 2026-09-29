@@ -7,6 +7,7 @@
 use super::app_icons::{APPS, app_icon_in};
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::icon::{IconStyle, Tint};
 use ds::{
     Icon, IconSize, IconSource, IconView, Material, PRESETS, PlateFamily, PlateTint, Scheme,
@@ -50,7 +51,7 @@ fn columns() -> [Column; 4] {
 pub fn PlateTints() -> Element {
     rsx! {
         Section { title: "Tinted plates", note: "IconView {{ plate: Some(PlateFamily::Neutral), plate_tint: PlateTint::of(style, tint) }}: the plate's stops and ink re-coloured by retint's rule for both schemes, the root's data-theme picking one. Each tile's raster went through retint with the same pair; the glyph tile is the symbolic fallback.",
-            for scheme in Scheme::ALL {
+            for scheme in Scheme::ALL.iter().copied() {
                 Surface { material: Material::Popover, theme: Some(scheme),
                     div { class: "g-row g-row-top",
                         for column in columns() {

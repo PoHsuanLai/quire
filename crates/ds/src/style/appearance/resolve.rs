@@ -2,6 +2,7 @@
 //! carries. Always explicit: a root never says "system" and never leans on a media query
 //! (design/05-MOTION.md section 9 rule 11).
 
+use crate::core::word::Word;
 use crate::style::appearance::{
     accent::Accent,
     appearance::Appearance,

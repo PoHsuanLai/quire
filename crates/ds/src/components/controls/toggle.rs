@@ -7,6 +7,7 @@
 //! critically damped, no bounce.
 
 use crate::core::vocab::{Availability, Switch};
+use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
     spring_spec::{SpringResponse, SpringSpec},

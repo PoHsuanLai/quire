@@ -11,6 +11,7 @@ use crate::progress_copy::ProgressCopy;
 use crate::snapshot::progress_dir;
 use crate::style;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{Appearance, Ds, LevelLook, Material, Scheme, Theme};
 use ds_native::{Harness, Viewport};
 use image::{Rgba, RgbaImage, imageops};

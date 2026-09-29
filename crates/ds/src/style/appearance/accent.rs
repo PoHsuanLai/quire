@@ -5,10 +5,11 @@
 //! section 15). The five hue names are this freeze's reading of "Accent(6)" and are recorded
 //! in FINDINGS.md; the token values live in `tokens::accent_table`.
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// The card's accent, one of six.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Accent {
     /// Postmark blue, the design as drawn.
@@ -24,45 +25,4 @@ pub enum Accent {
     Blue,
     /// The Candy violet family.
     Violet,
-}
-
-impl Accent {
-    /// Every accent, in the order the picker offers them.
-    pub const ALL: [Accent; 6] = [
-        Accent::Postmark,
-        Accent::Red,
-        Accent::Amber,
-        Accent::Green,
-        Accent::Blue,
-        Accent::Violet,
-    ];
-
-    /// The `data-accent` value on a `.ds` root.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Accent::Postmark => "postmark",
-            Accent::Red => "red",
-            Accent::Amber => "amber",
-            Accent::Green => "green",
-            Accent::Blue => "blue",
-            Accent::Violet => "violet",
-        }
-    }
-
-    /// What a picker calls it.
-    pub fn label(self) -> &'static str {
-        match self {
-            Accent::Postmark => "Postmark",
-            Accent::Red => "Red",
-            Accent::Amber => "Amber",
-            Accent::Green => "Green",
-            Accent::Blue => "Blue",
-            Accent::Violet => "Violet",
-        }
-    }
-
-    /// The accent a stored word names, or [`None`] for a word that is not one.
-    pub fn parse(word: &str) -> Option<Accent> {
-        Self::ALL.into_iter().find(|accent| accent.slug() == word)
-    }
 }

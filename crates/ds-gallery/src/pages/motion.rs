@@ -3,6 +3,7 @@
 
 use super::Section;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Anim, DelayToken, DurationToken, EasingToken, Fill, Iteration, MotionLevel, ScalarToken,
     StaggerIndex, settle,
@@ -25,7 +26,7 @@ pub fn MotionPage() -> Element {
         Section { title: "Durations", note: "Every --t token at Calm, Standard, Extra and Reduced (60 ms everywhere).",
             LevelTable {
                 rows: DurationToken::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.map(|level| millis(token.duration(level))))
+                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| millis(token.duration(level))).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }
@@ -33,21 +34,21 @@ pub fn MotionPage() -> Element {
             LevelTable {
                 rows: DelayToken::ALL.iter().map(|token| {
                     let name = token.var().map_or(format!("{token:?}"), |var| var.as_str().to_string());
-                    (name, MotionLevel::ALL.map(|level| millis(token.delay(level))))
+                    (name, MotionLevel::ALL.iter().copied().map(|level| millis(token.delay(level))).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }
         Section { title: "Easings", note: "Only the spring follows the level.",
             LevelTable {
                 rows: EasingToken::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.map(|level| token.easing(level).css()))
+                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| token.easing(level).css()).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }
         Section { title: "Scalars",
             LevelTable {
                 rows: ScalarToken::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.map(|level| token.value(level).css()))
+                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| token.value(level).css()).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }
@@ -55,13 +56,13 @@ pub fn MotionPage() -> Element {
             div { class: "g-table g-cols6",
                 span { class: "g-head", "anim" }
                 span { class: "g-head", "recipe" }
-                for level in MotionLevel::ALL {
+                for level in MotionLevel::ALL.iter().copied() {
                     span { class: "g-head", "settle {level.slug()}" }
                 }
                 for anim in Anim::ALL {
                     span { class: "g-code", "{anim:?}" }
                     span { class: "g-code", "{recipe_text(anim)}" }
-                    for level in MotionLevel::ALL {
+                    for level in MotionLevel::ALL.iter().copied() {
                         span { class: "g-code", "{millis(settle(anim, level, StaggerIndex::default()))}" }
                     }
                 }
@@ -93,11 +94,11 @@ pub fn recipe_text(anim: Anim) -> String {
 
 /// One row per token, one column per level.
 #[component]
-fn LevelTable(rows: Vec<(String, [String; 4])>) -> Element {
+fn LevelTable(rows: Vec<(String, Vec<String>)>) -> Element {
     rsx! {
         div { class: "g-table g-cols5",
             span { class: "g-head", "token" }
-            for level in MotionLevel::ALL {
+            for level in MotionLevel::ALL.iter().copied() {
                 span { class: "g-head", "{level.slug()}" }
             }
             for (name , values) in rows {

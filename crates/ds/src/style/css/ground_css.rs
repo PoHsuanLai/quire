@@ -6,6 +6,7 @@
 //! Overlays opened from the frame (`.ds-overlay`, rendered at the end of the root) are paper
 //! cards, so they take the paper values back, per scheme, from the token table.
 
+use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::tokens::{colour::ColourToken, name::VarName};
@@ -34,7 +35,7 @@ pub fn ground_css() -> String {
             .map(|(token, frame)| declaration(token.var(), &frame.reference()))
             .collect::<Vec<_>>(),
     );
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let theme = match scheme {
             Scheme::Light => String::new(),
             Scheme::Dark => attr_selector("data-theme", scheme.slug()),

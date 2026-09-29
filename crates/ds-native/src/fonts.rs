@@ -54,13 +54,15 @@ fn base_context() -> FontContext {
 #[cfg(test)]
 mod tests {
     use super::{font_context, register_fonts};
+    use ds::Word;
     use ds::{Family, Typeface};
 
     /// Every family name a token's `font-family` stack leads with, in either typeface: Inter,
     /// Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.
     fn names() -> Vec<(Family, &'static str)> {
         let mut names: Vec<(Family, &'static str)> = Typeface::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .flat_map(|typeface| {
                 Family::ALL
                     .into_iter()

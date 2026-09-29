@@ -44,6 +44,7 @@
 use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
 use crate::core::geometry::scale::Scale;
+use crate::core::word::Word;
 use crate::focus::click::ClickRoot;
 use crate::motion::hover_intent::HoverWarmth;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};

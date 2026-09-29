@@ -11,6 +11,7 @@ use crate::error::GalleryError;
 use crate::progress_copy::ProgressCopy;
 use crate::style;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{Appearance, Ds, Material, Scheme, Theme};
 use ds_native::{Harness, Viewport};
 use image::{RgbaImage, imageops};
@@ -96,7 +97,7 @@ fn keep(
 
 /// Render both schemes into `dir` (and the progress page's shots when `progress` asks).
 pub fn run(dir: &Path, progress: ProgressCopy) -> Result<(), GalleryError> {
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let picture = sheet_at(scheme)?;
         keep(
             &picture,

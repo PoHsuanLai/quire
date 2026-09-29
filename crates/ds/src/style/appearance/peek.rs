@@ -2,33 +2,18 @@
 //!
 //! A peek is Center or Full; a place in an app's own grid is not an overlay and stays the app's.
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Where an open peek sits.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum PeekMode {
     /// A panel over the middle of the card.
     #[default]
+    #[word(label = "Centre peek")]
     Center,
     /// The whole card.
+    #[word(label = "Full page")]
     Full,
-}
-
-impl PeekMode {
-    /// `center` or `full`, written as `data-mode`.
-    pub fn slug(self) -> &'static str {
-        match self {
-            PeekMode::Center => "center",
-            PeekMode::Full => "full",
-        }
-    }
-
-    /// What the peek button names itself: "Centre peek", "Full page".
-    pub fn label(self) -> &'static str {
-        match self {
-            PeekMode::Center => "Centre peek",
-            PeekMode::Full => "Full page",
-        }
-    }
 }

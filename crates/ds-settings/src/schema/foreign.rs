@@ -8,6 +8,7 @@
 //! lower-case word `appearance.toml` itself stores — rather than duplicating the slug spelling
 //! by hand.
 
+use ds::Word;
 use serde::Serialize;
 
 use super::traits::SchemaVariants;
@@ -32,31 +33,31 @@ impl SchemaVariants for ds::Theme {
 
 impl SchemaVariants for ds::Look {
     fn variants() -> Vec<String> {
-        variants_of(&ds::Look::ALL)
+        variants_of(ds::Look::ALL)
     }
 }
 
 impl SchemaVariants for ds::Warmth {
     fn variants() -> Vec<String> {
-        variants_of(&ds::Warmth::ALL)
+        variants_of(ds::Warmth::ALL)
     }
 }
 
 impl SchemaVariants for ds::Accent {
     fn variants() -> Vec<String> {
-        variants_of(&ds::Accent::ALL)
+        variants_of(ds::Accent::ALL)
     }
 }
 
 impl SchemaVariants for ds::Motion {
     fn variants() -> Vec<String> {
-        variants_of(&ds::Motion::ALL)
+        variants_of(ds::Motion::ALL)
     }
 }
 
 impl SchemaVariants for ds::Typeface {
     fn variants() -> Vec<String> {
-        variants_of(&ds::Typeface::ALL)
+        variants_of(ds::Typeface::ALL)
     }
 }
 

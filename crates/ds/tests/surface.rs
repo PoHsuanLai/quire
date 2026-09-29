@@ -8,6 +8,7 @@ mod golden;
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{Accent, Appearance, BlurState, Corner, Ds, Material, Radius, Scheme, Surface, use_scope};
 
 #[derive(Props, Clone, PartialEq)]

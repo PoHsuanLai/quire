@@ -21,6 +21,7 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Accent, Appearance, AppearancePicker, Ds, Material, ModuleGrid, ModulePanel, PickerLayout,
     Rect, SegSize, SegmentedControl, SystemPrefs, Theme,
@@ -231,7 +232,7 @@ fn exercise(harness: &mut Harness, group: &str, case: &str) {
 }
 
 fn run(scale_percent: u16, theme: Theme) {
-    for accent in Accent::ALL {
+    for accent in Accent::ALL.iter().copied() {
         for group in GROUPS {
             let mut harness = desk(scale_percent, theme, accent);
             let case = format!("{scale_percent}% {theme:?} {accent:?}");

@@ -8,6 +8,7 @@ use super::picked::{BAND, hue_of};
 use super::roles::AccentRoles;
 use super::text_grounds::{BACKDROPS, TEXT_MATERIALS, TextOn, text_grounds, text_on};
 use crate::core::colour::{oklab::Oklab, srgb::Srgb};
+use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::tokens::hex::{Alpha, Hex};
 
@@ -28,7 +29,7 @@ fn roles(hue: u16, weight: BandWeight, scheme: Scheme) -> AccentRoles {
 fn every_hue_in_the_band_is_legible() {
     let mut failures = Vec::new();
     let mut cases = 0_u32;
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         for hue in (0..360).step_by(5) {
             for tenth in 0..=10 {
                 cases += 1;
@@ -87,7 +88,7 @@ fn gate_failures(case: &str, roles: &AccentRoles, scheme: Scheme) -> Vec<String>
 /// The wash is translucent at every hue: the material beneath shows through.
 #[test]
 fn the_wash_stays_translucent() {
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         for hue in (0..360).step_by(5) {
             let roles = roles(hue, BandWeight::FULL, scheme);
             assert!(
@@ -102,7 +103,7 @@ fn the_wash_stays_translucent() {
 /// Band B puts a deep ink of the hue on every fill, never white.
 #[test]
 fn the_ink_is_deep() {
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         for hue in (0..360).step_by(5) {
             let roles = roles(hue, BandWeight::FULL, scheme);
             assert_ne!(roles.ink, Hex([0xFF, 0xFF, 0xFF]), "{scheme:?} h={hue}");
@@ -115,9 +116,10 @@ fn the_ink_is_deep() {
 /// 0.06 apart in OKLab in both schemes (the narrowest gap, Violet to Postmark, is 0.064).
 #[test]
 fn every_built_in_swatch_is_distinct() {
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let fills: Vec<(Accent, Hex)> = Accent::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .map(|accent| {
                 let pick = AccentPick {
                     hue: hue_of(accent),
@@ -200,7 +202,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
     use crate::style::appearance::material::Material;
     use crate::style::tokens::tint::tint;
     let all = 4 + 4 + 2 * TEXT_MATERIALS.len() * 2;
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         for hue in (0..360).step_by(5) {
             for tenth in 0..=10 {
                 let roles = roles(hue, BandWeight(tenth * 100), scheme);
@@ -233,7 +235,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
 #[test]
 fn the_text_carrying_materials_take_the_material_text() {
     use crate::style::appearance::material::Material;
-    for material in Material::ALL {
+    for material in Material::ALL.iter().copied() {
         let want = match material {
             Material::Popover | Material::Sheet | Material::Toast => TextOn::Material,
             Material::Window

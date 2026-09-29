@@ -5,6 +5,7 @@
 //! `System` to a `prefers-color-scheme` media guard (design/05-MOTION.md section 9 rule 11,
 //! [`crate::resolve`]).
 
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Which palette the window resolves to.
@@ -49,7 +50,7 @@ impl Theme {
 }
 
 /// The palette a surface actually paints: a [`Theme`] with "follow the desktop" answered.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Scheme {
     /// The light Post palette.
@@ -57,17 +58,4 @@ pub enum Scheme {
     Light,
     /// The dark Post palette.
     Dark,
-}
-
-impl Scheme {
-    /// Both schemes, light first: the order every legibility test sweeps them in.
-    pub const ALL: [Scheme; 2] = [Scheme::Light, Scheme::Dark];
-
-    /// The `data-theme` value on a `.ds` root.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Scheme::Light => "light",
-            Scheme::Dark => "dark",
-        }
-    }
 }

@@ -156,6 +156,7 @@ fn over((rgb, alpha): ([u8; 3], f64), backdrop: [u8; 3]) -> String {
 mod tests {
     use super::{Backdrop, Tint, floors, over, rgba};
     use ds::Alpha;
+    use ds::Word;
     use ds::{Material, Scheme, Verdict};
 
     /// A colour's CSS, and its channels and alpha when it is one.
@@ -184,8 +185,8 @@ mod tests {
 
     #[test]
     fn every_tinted_material_has_four_floors_and_the_window_none() {
-        for scheme in Scheme::ALL {
-            for material in Material::ALL {
+        for scheme in Scheme::ALL.iter().copied() {
+            for material in Material::ALL.iter().copied() {
                 let got = floors(material, scheme, Alpha(800));
                 let want = if material == Material::Window { 0 } else { 4 };
                 assert_eq!(got.len(), want, "{material:?} {scheme:?}");
@@ -195,8 +196,8 @@ mod tests {
 
     #[test]
     fn the_default_tints_hold_the_floor_and_a_thin_one_does_not() {
-        for scheme in Scheme::ALL {
-            for material in Material::ALL {
+        for scheme in Scheme::ALL.iter().copied() {
+            for material in Material::ALL.iter().copied() {
                 for floor in floors(material, scheme, Alpha(800)) {
                     assert_eq!(
                         floor.verdict(),

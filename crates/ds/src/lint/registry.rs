@@ -3,6 +3,7 @@
 //! name an [`Anim`] plays. Nothing here is a hand list, so a token added to a table is known to
 //! the lint the moment it exists (the tests below check it against the generated stylesheet).
 
+use crate::core::word::Word;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
@@ -85,9 +86,10 @@ fn collect() -> HashSet<String> {
         .chain(ladder_vars())
         .collect();
     let hues = LabelHue::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .flat_map(|hue| HueMember::ALL.map(|member| hue.var(member)));
-    let swatches = Accent::ALL.into_iter().map(swatch_var);
+    let swatches = Accent::ALL.iter().copied().map(swatch_var);
     let people = PersonSwatch::ALL.into_iter().map(PersonSwatch::var);
     // Ask the frame for its names rather than restating them; a Space that lends its hue
     // writes the most.

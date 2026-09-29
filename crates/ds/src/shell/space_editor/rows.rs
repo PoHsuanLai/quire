@@ -5,6 +5,7 @@ use super::parts::CheckRows;
 use crate::components::controls::segmented::SegmentedControl;
 use crate::components::fields::text_input::{InputVariant, TextInput};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
+use crate::core::word::Word;
 use crate::style::appearance::{
     motion::Motion,
     theme::{Scheme, Theme},
@@ -42,7 +43,7 @@ impl MotionLevels {
     /// The levels offered, in the row's order.
     pub fn levels(self) -> &'static [Motion] {
         match self {
-            MotionLevels::All => &Motion::ALL,
+            MotionLevels::All => Motion::ALL,
             MotionLevels::Contact => &[Motion::Calm, Motion::Standard, Motion::Extra],
         }
     }
@@ -134,6 +135,7 @@ pub(super) fn EachScheme(look: SpaceLook) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{MotionLevels, schemes_of};
+    use crate::core::word::Word;
     use crate::style::appearance::{
         motion::Motion,
         theme::{Scheme, Theme},
@@ -141,7 +143,7 @@ mod tests {
 
     #[test]
     fn the_contact_levels_are_the_three_a_space_sets() {
-        assert_eq!(MotionLevels::default().levels(), &Motion::ALL);
+        assert_eq!(MotionLevels::default().levels(), Motion::ALL);
         assert_eq!(
             MotionLevels::Contact.levels(),
             &[Motion::Calm, Motion::Standard, Motion::Extra]

@@ -9,6 +9,7 @@ mod golden;
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, BlurState, Corner, Ds, Grain, Ground, Inject, Material, PRESETS, Px, RootChrome,
     SpaceLook, Surface, Theme,
@@ -70,7 +71,7 @@ fn setup(material: Material) -> Setup {
 #[test]
 fn each_materials_root_matches_its_golden() {
     let mut failures = Vec::new();
-    for material in Material::ALL {
+    for material in Material::ALL.iter().copied() {
         let name = format!("root/chrome/{}.html", material.slug());
         if let Err(failure) = golden::check(&name, &render(setup(material))) {
             failures.push(failure);

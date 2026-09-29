@@ -6,6 +6,7 @@ use super::{Scope, Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     BlurState, Glyph, Icon, IconSize, InputModality, Material, clip_chars, sleep, use_rect,
     use_scope,

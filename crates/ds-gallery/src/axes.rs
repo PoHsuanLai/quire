@@ -161,6 +161,7 @@ pub fn starting() -> Axes {
 mod tests {
     use super::{Axes, PresetIndex, motion_of, start_with, starting};
     use crate::page::Page;
+    use ds::Word;
     use ds::{MotionLevel, PRESETS};
 
     #[test]
@@ -180,7 +181,7 @@ mod tests {
 
     #[test]
     fn each_level_is_named_outright() {
-        for level in MotionLevel::ALL {
+        for level in MotionLevel::ALL.iter().copied() {
             let appearance = Axes {
                 motion: motion_of(level),
                 ..Axes::default()

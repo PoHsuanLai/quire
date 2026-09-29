@@ -5,6 +5,7 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, Ds, Family, Inject, Material, Surface, Typeface, VoiceToken, stylesheet,
     use_typeface,

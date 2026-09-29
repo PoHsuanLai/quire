@@ -10,6 +10,7 @@
 //! that has to paint all six at once: a swatch written `var(--accent)` would show the selected
 //! hue on every button.
 
+use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::tokens::{
@@ -19,11 +20,11 @@ use crate::style::tokens::{
 /// The accent quads, light and dark.
 pub fn accents_css() -> String {
     let mut css = String::new();
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         css.push_str(&rule(&swatch_selector(scheme), &swatches(scheme)));
     }
-    for scheme in Scheme::ALL {
-        for accent in Accent::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
+        for accent in Accent::ALL.iter().copied() {
             css.push_str(&rule(
                 &selector(accent, scheme),
                 &seven(accent_of(accent, scheme)),
@@ -42,7 +43,8 @@ fn swatch_selector(scheme: Scheme) -> String {
 
 fn swatches(scheme: Scheme) -> Vec<String> {
     Accent::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|accent| {
             format!(
                 "{}:{};",

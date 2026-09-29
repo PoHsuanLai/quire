@@ -12,6 +12,7 @@
 use super::family::{NEUTRAL_DARK, PlateFamily};
 use super::retint::{IconStyle, Tint, recolour};
 use super::tone_band::Tone;
+use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::{hex::Hex, name::VarName};
 
@@ -114,7 +115,8 @@ pub(crate) const PLATE_TINT_VARS: [[VarName; 3]; 2] = [
 /// `--plate-base-l:#…;…;--plate-ink-d:#…;`.
 pub(crate) fn tint_style(family: PlateFamily, tint: PlateTint) -> String {
     Scheme::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .zip(PLATE_TINT_VARS)
         .flat_map(|(scheme, names)| {
             let stops = PlateStops::of(family, scheme).tinted_in(tint, scheme);

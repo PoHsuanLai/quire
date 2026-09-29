@@ -4,6 +4,7 @@
 
 use ds::Alpha;
 use ds::Hex;
+use ds::Word;
 use ds::{
     Accent, CardAccent, ColourToken, Dot, FrameVars, Grain, Material, PRESETS, Scheme, SpaceLook,
     Theme, accent_of, derive, ratio, recipe,
@@ -23,10 +24,10 @@ fn colour(token: ColourToken, scheme: Scheme) -> String {
 #[test]
 fn every_accent_is_legible_in_both_schemes() {
     let mut failures = Vec::new();
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let surface = colour(ColourToken::Surface, scheme);
         let ink = colour(ColourToken::Ink, scheme);
-        for accent in Accent::ALL {
+        for accent in Accent::ALL.iter().copied() {
             let roles = accent_of(accent, scheme);
             let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
             let wash = roles.fill.over(roles.wash, ground).css();
@@ -65,7 +66,7 @@ fn every_ink_on_its_colour_is_legible_in_both_schemes() {
         (ColourToken::DangerInk, ColourToken::Danger),
     ];
     let mut failures = Vec::new();
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         for (ink, ground) in PAIRS {
             let (fore, back) = (colour(ink, scheme), colour(ground, scheme));
             let got = measured(&fore, &back);
@@ -143,7 +144,7 @@ fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
 fn every_preset_frame_is_legible() {
     let mut failures = Vec::new();
     for (index, preset) in PRESETS.iter().enumerate() {
-        for scheme in Scheme::ALL {
+        for scheme in Scheme::ALL.iter().copied() {
             for card_accent in [CardAccent::Postmark, CardAccent::SpaceHue] {
                 let look = SpaceLook {
                     dots: preset.dots.to_vec(),
@@ -174,7 +175,7 @@ fn every_one_dot_space_on_the_sweep_is_legible() {
                 card_accent: CardAccent::SpaceHue,
                 ..SpaceLook::default()
             };
-            for scheme in Scheme::ALL {
+            for scheme in Scheme::ALL.iter().copied() {
                 for failure in gates(&look, scheme) {
                     failures.push(format!("hue {hue} chroma {chroma} {scheme:?}: {failure}"));
                 }
@@ -212,8 +213,12 @@ const WHITE: [u8; 3] = [255, 255, 255];
 #[test]
 fn the_solid_tints_hold_text_over_black_and_white() {
     let mut failures = Vec::new();
-    for material in Material::ALL.into_iter().filter(|m| *m != Material::Window) {
-        for scheme in Scheme::ALL {
+    for material in Material::ALL
+        .iter()
+        .copied()
+        .filter(|m| *m != Material::Window)
+    {
+        for scheme in Scheme::ALL.iter().copied() {
             let ink = colour(ColourToken::Ink, scheme);
             let solid = recipe(material, scheme, DEFAULT_TINT_ALPHA).tint_solid;
             for (name, backdrop) in [("black", BLACK), ("white", WHITE)] {
@@ -245,8 +250,12 @@ fn the_solid_tints_hold_text_over_black_and_white() {
 #[test]
 fn the_translucent_tints_hold_text_over_black_and_white() {
     let mut failures = Vec::new();
-    for material in Material::ALL.into_iter().filter(|m| *m != Material::Window) {
-        for scheme in Scheme::ALL {
+    for material in Material::ALL
+        .iter()
+        .copied()
+        .filter(|m| *m != Material::Window)
+    {
+        for scheme in Scheme::ALL.iter().copied() {
             let ink = colour(ColourToken::Ink, scheme);
             let tint = recipe(material, scheme, DEFAULT_TINT_ALPHA).tint;
             let floor = if material == Material::Widget {
@@ -283,7 +292,7 @@ fn fill_over(fill: &str, stop: &str) -> String {
 #[test]
 fn frame_ink_holds_on_the_hover_and_pressed_fills() {
     let mut failures = Vec::new();
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         for (index, preset) in PRESETS.iter().enumerate() {
             let look = SpaceLook {
                 dots: preset.dots.to_vec(),
@@ -348,7 +357,7 @@ fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<Str
         Material::Widget,
     ];
     for material in tinted {
-        for scheme in Scheme::ALL {
+        for scheme in Scheme::ALL.iter().copied() {
             let alpha = alpha_of(material, scheme);
             let floor = if material == Material::Widget {
                 3.0
@@ -471,7 +480,7 @@ fn modal_grounds(scrim: ColourToken, scheme: Scheme) -> (String, String) {
 #[test]
 fn the_modal_scrim_sets_the_sheet_apart_and_keeps_its_ink() {
     let mut failures = Vec::new();
-    for scheme in Scheme::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
         let (standard_paper, standard_sheet) = modal_grounds(ColourToken::Scrim, scheme);
         let (modal_paper, modal_sheet) = modal_grounds(ColourToken::ScrimModal, scheme);
         let standard = measured(&standard_sheet, &standard_paper);
@@ -577,8 +586,8 @@ fn the_desktop_month_title_holds_its_floor_on_the_card() {
 #[test]
 fn the_busy_dots_keep_the_accent_on_the_card() {
     let mut failures = Vec::new();
-    for scheme in Scheme::ALL {
-        for accent in Accent::ALL {
+    for scheme in Scheme::ALL.iter().copied() {
+        for accent in Accent::ALL.iter().copied() {
             let dot = accent_of(accent, scheme).text.css();
             for (name, ground) in widget_grounds_of_every_space(scheme) {
                 let got = measured(&dot, &ground.css());

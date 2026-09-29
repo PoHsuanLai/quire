@@ -6,6 +6,7 @@
 use super::control_size::ControlSize;
 use super::name::VarName;
 use super::size_scale::{KNOB_INSET, SizeScale};
+use crate::core::word::Word;
 
 /// One quantity every size has.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -130,7 +131,8 @@ pub const KNOB_INSET_VAR: VarName = VarName("--knob-inset");
 /// Every size token and its value, size by size: `(--ctl-h-s, 16px)`, …, then the knob inset.
 pub fn size_tokens() -> Vec<(VarName, String)> {
     ControlSize::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .flat_map(|size| {
             SizeVar::ALL
                 .into_iter()

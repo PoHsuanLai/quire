@@ -6,6 +6,7 @@
 use crate::page::Page;
 use crate::progress_copy::ProgressCopy;
 use ds::Typeface;
+use ds::Word;
 use std::path::PathBuf;
 
 /// What the gallery was asked to do.

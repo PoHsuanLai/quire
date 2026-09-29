@@ -3,6 +3,7 @@
 //! measured in both schemes.
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, DotIndex, Ds, Material, MeasuredIn, Motion, MotionChoice, Scheme, ShortcutKey,
     SpaceEditor, SpaceLook,
