@@ -14,6 +14,7 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Expanded};
+use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::detail::{armed::use_armed, first_show::FirstShow, touch::Touch};
 use crate::shell::control_center::module_disc::ModuleDisc;

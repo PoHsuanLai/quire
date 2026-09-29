@@ -3,6 +3,7 @@
 //! `--fs-lock-clock`, heavy, in white over the wallpaper: the reference lock screen's order,
 //! where the day sits above a very large time.
 
+use crate::core::word::Word;
 use crate::shell::lock::vocab::LockLook;
 use dioxus::prelude::*;
 

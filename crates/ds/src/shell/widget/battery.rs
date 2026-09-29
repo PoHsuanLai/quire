@@ -7,6 +7,7 @@
 
 use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::motion::wake::WakeStamp;
 use crate::shell::battery::device_glyph::{Device, DeviceGlyph};
 use crate::shell::battery::figure::BatteryFigure;
@@ -51,7 +52,7 @@ pub enum BatteryEntry {
 pub const MAX_RINGS: usize = 4;
 
 /// How the widget lays out its rings.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum BatteryLayout {
     /// Small, one battery: the ring and the hero figure.
     Solo,
@@ -68,14 +69,6 @@ impl BatteryLayout {
             (WidgetSize::Small, 1) => BatteryLayout::Solo,
             (WidgetSize::Small, _) => BatteryLayout::Grid,
             (WidgetSize::Medium | WidgetSize::Large, _) => BatteryLayout::Row,
-        }
-    }
-
-    fn slug(self) -> &'static str {
-        match self {
-            BatteryLayout::Solo => "solo",
-            BatteryLayout::Grid => "grid",
-            BatteryLayout::Row => "row",
         }
     }
 }

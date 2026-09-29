@@ -3,12 +3,13 @@
 //! is, how the asking is going, whether caps lock is on, and where the Space's colour reaches.
 
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
 use crate::shell::user_picture::picture::UserPicture;
 
 /// Where the current Space's colour reaches on the lock screen. The reference lock screen is
 /// white type and a white glass field over the wallpaper; Arc's colour may take the field.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum LockLook {
     /// White type, a flat white glass field (`--lock-ink`, `--lock-glass`).
     #[default]
@@ -17,16 +18,6 @@ pub enum LockLook {
     /// field is painted with the Space gradient, in the Space's frame ink (`--f-grad`,
     /// `--f-ink`). The time stays white.
     Space,
-}
-
-impl LockLook {
-    /// The `data-look` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            LockLook::Clear => "clear",
-            LockLook::Space => "space",
-        }
-    }
 }
 
 /// How the asking is going. The caller moves it: `Checking` while the password is tried,

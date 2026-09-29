@@ -4,6 +4,7 @@
 //! `From` and quire needs no calendar of its own.
 
 use crate::components::content::text_runs::TextLine;
+use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// A calendar month: which month a grid shows. Ordered, so a change of month knows its way.
@@ -38,25 +39,15 @@ pub struct DayKey {
 pub struct IsoWeek(pub i8);
 
 /// Whether a cell's day is in the month shown or pads the first or last week.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Word)]
 pub enum DayPlace {
     /// The previous month's, before the first: drawn quieter.
     Before,
     /// The month shown.
+    #[word(slug = "in")]
     InMonth,
     /// The next month's, after the last: drawn quieter.
     After,
-}
-
-impl DayPlace {
-    /// The `data-place` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            DayPlace::Before => "before",
-            DayPlace::InMonth => "in",
-            DayPlace::After => "after",
-        }
-    }
 }
 
 /// Whether a cell is today: today sits on the accent disc.
@@ -79,22 +70,12 @@ impl DayMark {
 }
 
 /// Whether a day has an event: a busy day carries a dot.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Word)]
 pub enum Eventful {
     /// At least one event.
     Busy,
     /// None.
     Free,
-}
-
-impl Eventful {
-    /// The `data-events` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Eventful::Busy => "busy",
-            Eventful::Free => "free",
-        }
-    }
 }
 
 /// One cell.
@@ -134,23 +115,13 @@ pub struct MonthGridData {
 
 /// Whether the grid leads each row with its ISO week (`calendar.week_numbers`, design/22
 /// section 3.21).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 pub enum WeekNumbers {
     /// Seven columns only.
     #[default]
     Hide,
     /// A quieter column of week numbers first.
     Show,
-}
-
-impl WeekNumbers {
-    /// The `data-weeks` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            WeekNumbers::Hide => "hide",
-            WeekNumbers::Show => "show",
-        }
-    }
 }
 
 /// Which way the header's buttons step the month.

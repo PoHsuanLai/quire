@@ -89,7 +89,7 @@ impl Shot {
 
 /// Every picture, page by page.
 pub fn shots() -> Vec<Shot> {
-    shots_of(&Page::ALL)
+    shots_of(Page::ALL)
 }
 
 /// The pictures of `pages`, page by page.
@@ -182,6 +182,7 @@ pub fn run(
 mod tests {
     use super::{ACCENTS, SCHEMES, shots};
     use crate::page::Page;
+    use ds::Word;
     use std::collections::HashSet;
 
     #[test]

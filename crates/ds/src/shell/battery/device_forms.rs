@@ -5,6 +5,7 @@
 //! merge (an earbud's head and stem). No outline and no stroke anywhere: the reference's device
 //! symbols are filled, and ours are drawn in our own geometry, not traced from its.
 
+use crate::core::word::Word;
 use crate::shell::battery::device_glyph::Device;
 
 /// A rounded rectangle on the 24 grid.
@@ -29,22 +30,14 @@ pub(crate) enum Piece {
 }
 
 /// How overlapping pieces combine.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum FillRule {
     /// A piece inside another cuts a hole.
+    #[word(slug = "evenodd")]
     EvenOdd,
     /// Pieces merge wherever they overlap.
+    #[word(slug = "nonzero")]
     NonZero,
-}
-
-impl FillRule {
-    /// The `fill-rule` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            FillRule::EvenOdd => "evenodd",
-            FillRule::NonZero => "nonzero",
-        }
-    }
 }
 
 /// A device's form: its pieces and how they combine.
@@ -256,6 +249,7 @@ pub(crate) fn path_of(form: Form) -> String {
 #[cfg(test)]
 mod tests {
     use super::{Piece, Slab, form_of, num, path_of, slab_path};
+    use crate::core::word::Word;
     use crate::shell::battery::device_glyph::Device;
 
     /// A piece's bounds on the grid: (left, top, right, bottom); a free path reports none.
@@ -294,7 +288,7 @@ mod tests {
     /// as Lucide keeps its own glyphs (design/08-ICONS.md section 1.3).
     #[test]
     fn every_form_is_on_the_grid() {
-        for device in Device::ALL {
+        for device in Device::ALL.iter().copied() {
             let form = form_of(device);
             assert!(!form.pieces.is_empty(), "{device:?}");
             assert!(path_of(form).ends_with('z'), "{device:?}");

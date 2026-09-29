@@ -6,6 +6,7 @@
 
 use super::{Caption, Section};
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     AnimatedEmoji, AvatarFace, AvatarShape, AvatarSize, AvatarTone, DiscHue, EMOJI_ATTRIBUTION,
     EmojiDisc, EmojiId, EmojiPlayback, Mood, PictureChoice, PictureSize, UserPicturePicker,
@@ -62,7 +63,7 @@ pub fn EmojiPage() -> Element {
         }
         Section { title: "Moods at rest", note: "Wink in Idle, Attentive, Wince, Happy and Asleep, as the lock screen would leave each once its window has closed: the pick, except Asleep's sleeping face.",
             div { class: "g-row g-emoji-reactions",
-                for mood in Mood::ALL {
+                for mood in Mood::ALL.iter().copied() {
                     div { key: "{mood.slug()}", class: "g-col g-emoji-cell",
                         AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood, playback: STILL }
                         Caption { name: mood.slug().to_string() }

@@ -26,6 +26,7 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
+use crate::core::word::Word;
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;

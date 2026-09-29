@@ -2,11 +2,12 @@
 //! its footprint on the grid, where it is drawn, and its title row.
 
 use crate::components::content::text_runs::TextLine;
+use crate::core::word::Word;
 use crate::style::icon::Icon;
 use serde::{Deserialize, Serialize};
 
 /// A widget's footprint on the grid unit (`widgets.desktop_cell_px`, `desktop_gap_px`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum WidgetSize {
     /// One cell.
@@ -18,19 +19,8 @@ pub enum WidgetSize {
     Large,
 }
 
-impl WidgetSize {
-    /// The `data-size` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            WidgetSize::Small => "small",
-            WidgetSize::Medium => "medium",
-            WidgetSize::Large => "large",
-        }
-    }
-}
-
 /// Where a widget is drawn, which decides what its card is made of.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum WidgetHost {
     /// On the desktop layer: a card of the `Widget` material, over the wallpaper.
@@ -40,16 +30,6 @@ pub enum WidgetHost {
     /// with no material of its own (a second material inside the center would draw a second
     /// edge and drop).
     Tile,
-}
-
-impl WidgetHost {
-    /// The `data-host` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            WidgetHost::Desktop => "desktop",
-            WidgetHost::Tile => "tile",
-        }
-    }
 }
 
 /// What a desktop widget's card is tinted with (design/23-WIDGETS.md section 4.3). Every card

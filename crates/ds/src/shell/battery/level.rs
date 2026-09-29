@@ -14,6 +14,7 @@
 
 use crate::components::content::text_runs::TextLine;
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::motion::{
     level_run::{RunFrame, RunTokens},
     use_level_run::use_level_run,
@@ -64,7 +65,7 @@ impl RingMark {
 }
 
 /// How full a battery reads, which picks its fill's colour.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum RingTone {
     /// Above a fifth, or charging: `--battery-fill`.
     Ok,
@@ -82,15 +83,6 @@ impl RingTone {
             (RingMark::Plain, 0..=100) => RingTone::Critical,
             (RingMark::Plain, 101..=200) => RingTone::Low,
             (RingMark::Plain, _) => RingTone::Ok,
-        }
-    }
-
-    /// The `data-tone` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            RingTone::Ok => "ok",
-            RingTone::Low => "low",
-            RingTone::Critical => "critical",
         }
     }
 }

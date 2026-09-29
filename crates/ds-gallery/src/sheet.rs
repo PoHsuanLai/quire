@@ -3,6 +3,7 @@
 use crate::data_uri;
 use crate::registry;
 use crate::snapshot::Shot;
+use ds::Word;
 use std::path::Path;
 
 /// The sheet for `shots`, read back from `dir`.

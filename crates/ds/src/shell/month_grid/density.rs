@@ -4,6 +4,7 @@
 //! restyle the grid (its classes are quire's), so the density is a prop, and by default it
 //! follows the `WidgetFrame` the grid sits in.
 
+use crate::core::word::Word;
 use crate::shell::widget::kind::WidgetSize;
 
 /// The density a caller asks for.
@@ -22,7 +23,7 @@ pub enum MonthDensity {
 }
 
 /// The density drawn, once `Auto` is resolved: what `data-density` says.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Drawn {
     /// The regular grid.
     Regular,
@@ -38,16 +39,6 @@ impl MonthDensity {
             (MonthDensity::Compact, _)
             | (MonthDensity::Auto, Some(WidgetSize::Small | WidgetSize::Medium)) => Drawn::Compact,
             (MonthDensity::Auto, Some(WidgetSize::Large) | None) => Drawn::Regular,
-        }
-    }
-}
-
-impl Drawn {
-    /// The `data-density` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Drawn::Regular => "regular",
-            Drawn::Compact => "compact",
         }
     }
 }

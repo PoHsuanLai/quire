@@ -10,13 +10,14 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 use crate::motion::detail::first_show::FirstShow;
 use crate::shell::control_center::module_tile_kind::TileSpan;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 
 /// Whether the panel paints the tile's plate.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum PanelPlate {
     /// The tile's plate: `--surface-2`, a hairline, `--r-tile`, the module's padding.
     #[default]
@@ -24,16 +25,6 @@ pub enum PanelPlate {
     /// No plate and no padding: the module where something else already is its plate (a bar
     /// item's dropdown, whose popover card is the module's).
     Bare,
-}
-
-impl PanelPlate {
-    /// The `data-plate` word.
-    fn slug(self) -> &'static str {
-        match self {
-            PanelPlate::Tile => "tile",
-            PanelPlate::Bare => "bare",
-        }
-    }
 }
 
 /// A module with content: an optional header row (`glyph`, `title`, then `trailing` at the far

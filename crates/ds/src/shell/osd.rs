@@ -33,7 +33,7 @@ pub struct OsdLevel {
 }
 
 /// Where the card sits (`osd.position`, design/22 section 3.16).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum OsdPosition {
     /// Top right, under the bar's reserve, as current macOS shows its volume and brightness
     /// panel: the card drops in from above and lifts away (user, 2026-09-25).
@@ -41,16 +41,6 @@ pub enum OsdPosition {
     TopRight,
     /// Bottom centre, above the dock's reserve: it rises in and drops away.
     BottomCentre,
-}
-
-impl OsdPosition {
-    /// The `data-position` value.
-    pub fn slug(self) -> &'static str {
-        match self {
-            OsdPosition::TopRight => "top-right",
-            OsdPosition::BottomCentre => "bottom-centre",
-        }
-    }
 }
 
 /// The on-screen display. `shown` is the caller's, and `on_hidden` runs once the card has faded

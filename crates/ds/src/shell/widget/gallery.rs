@@ -12,6 +12,7 @@
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::ButtonVariant;
 use crate::core::press::Press;
+use crate::core::word::Word;
 use crate::host::measure::MountedRef;
 use crate::motion::detail::touch::{Contact, Touch};
 use crate::shell::widget::contract::WidgetKind;

@@ -5,6 +5,7 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::TextLine;
 use crate::core::press::Press;
+use crate::core::word::Word;
 use dioxus::prelude::*;
 
 /// The app a notification came from: its icon (drawn at `--notifications-icon`, 32) and its
@@ -55,23 +56,15 @@ pub struct CardAction {
 /// Whether the pointer is over a card: `data-hover`. Handed to the caller as it changes, so its
 /// hold timer can pause while the card is read (design/13 section 13.3.6: hover pauses the
 /// timer).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Hover {
     /// The pointer is elsewhere: the body is clamped to two lines, the close button and the
     /// actions are hidden.
     #[default]
+    #[word(slug = "off")]
     Away,
     /// The pointer is over the card: the body opens to six lines, the close button and the
     /// actions show.
+    #[word(slug = "on")]
     Over,
-}
-
-impl Hover {
-    /// The `data-hover` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Hover::Away => "off",
-            Hover::Over => "on",
-        }
-    }
 }

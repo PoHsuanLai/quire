@@ -11,6 +11,7 @@
 
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::bump_on::{bump_attrs, use_bump_on};
+use crate::core::word::Word;
 use crate::shell::clock::angles::hands;
 use crate::shell::clock::dial::{hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg};
 use crate::shell::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};

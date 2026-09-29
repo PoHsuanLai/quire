@@ -3,6 +3,7 @@
 //! and deep on dark.
 
 use crate::core::colour::fit::oklch_hex;
+use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use serde::{Deserialize, Serialize};
 
@@ -72,21 +73,11 @@ pub(crate) fn tint(disc: DiscHue, scheme: Scheme) -> String {
 
 /// Whether a picture plays at all (`data-playback`). A picker showing the whole set passes
 /// `Still`: 42 loops at once is motion nobody asked for.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum EmojiPlayback {
     /// Plays inside the awake window after each wake.
     #[default]
     Awake,
     /// Rest frames only, as under Reduced motion; a mood's reaction is still shown, still.
     Still,
-}
-
-impl EmojiPlayback {
-    /// The `data-playback` value.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            EmojiPlayback::Awake => "awake",
-            EmojiPlayback::Still => "still",
-        }
-    }
 }

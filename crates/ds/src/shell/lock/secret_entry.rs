@@ -6,6 +6,7 @@
 
 use crate::core::time::clock::sleep;
 use crate::core::vocab::StaggerIndex;
+use crate::core::word::Word;
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::shell::lock::vocab::PromptState;
@@ -14,7 +15,7 @@ use crate::style::scope::Scope;
 use dioxus::prelude::*;
 
 /// Whether the field holds anything: the enter button shows only once it does.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub(crate) enum Filled {
     /// Nothing typed.
     #[default]
@@ -24,14 +25,6 @@ pub(crate) enum Filled {
 }
 
 impl Filled {
-    /// The `data-filled` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Filled::Empty => "empty",
-            Filled::Typed => "typed",
-        }
-    }
-
     fn of(text: &str) -> Self {
         if text.is_empty() {
             Filled::Empty
@@ -197,6 +190,7 @@ fn settle_later(
 #[cfg(test)]
 mod tests {
     use super::Filled;
+    use crate::core::word::Word;
 
     #[test]
     fn filled_follows_emptiness_only() {

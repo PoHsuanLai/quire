@@ -11,6 +11,7 @@ mod golden;
 
 use dioxus::prelude::*;
 use ds::LabelHue;
+use ds::Word;
 use ds::lint::{LintConfig, markup};
 use ds::widget::{WidgetEdit, WidgetLayout};
 use ds::widget::{WireRefresh, WireTimeline};
@@ -347,7 +348,7 @@ const CASES: &[Case] = &[
         desktop(
             Theme::Light,
             rsx! {
-                for device in Device::ALL {
+                for device in Device::ALL.iter().copied() {
                     DeviceGlyph { device, size: IconSize::Base }
                 }
             },

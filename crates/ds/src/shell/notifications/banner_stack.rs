@@ -17,6 +17,7 @@
 //! since it leaves along the swipe (`NotificationCard`'s swipe, the row's `data-flight`).
 
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
 use crate::motion::presence::Exit;
 use crate::motion::roster::RowPitch;
 use crate::motion::roster_exits::{Leaving, use_leaving_roster, use_pitches};
@@ -38,7 +39,7 @@ pub struct Banner {
 }
 
 /// Where the stack stands (`notifications.banner_position`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum BannerPosition {
     /// Under the bar at the right, newest on top; a banner leaving lets the ones below it rise.
     #[default]
@@ -49,14 +50,6 @@ pub enum BannerPosition {
 }
 
 impl BannerPosition {
-    /// The `data-position` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            BannerPosition::TopRight => "top-right",
-            BannerPosition::BottomRight => "bottom-right",
-        }
-    }
-
     /// Which way the rows after a leaving one heal: up into its place at the top right (they
     /// start below it), down at the bottom right (they start above it).
     pub(crate) fn heal_sign(self) -> f32 {
@@ -68,23 +61,15 @@ impl BannerPosition {
 }
 
 /// Which edge a banner enters from and leaves by (`notifications.banner_entry_direction`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum BannerEntry {
     /// From past the surface's right edge, the edge the stack stands at.
     #[default]
+    #[word(slug = "right")]
     FromRight,
     /// Rising from below its place, and sinking back down as it fades out.
+    #[word(slug = "below")]
     FromBelow,
-}
-
-impl BannerEntry {
-    /// The `data-entry` word, which picks the `--banner-dx`/`--banner-dy` the keyframes read.
-    pub fn slug(self) -> &'static str {
-        match self {
-            BannerEntry::FromRight => "right",
-            BannerEntry::FromBelow => "below",
-        }
-    }
 }
 
 /// The pitch a banner that measured nothing heals by: the least banner and the gap.

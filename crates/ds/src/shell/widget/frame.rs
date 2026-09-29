@@ -10,6 +10,7 @@
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
 use crate::components::content::text_runs::text;
+use crate::core::word::Word;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::widget::contract::WidgetKind;

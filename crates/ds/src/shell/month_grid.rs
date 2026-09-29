@@ -15,6 +15,7 @@ pub(crate) mod header;
 pub(crate) mod weeks;
 
 use crate::components::content::text_runs::{TextLine, text};
+use crate::core::word::Word;
 use crate::shell::month_grid::data::{DayKey, MonthGridData, MonthKey, MonthStep, WeekNumbers};
 use crate::shell::month_grid::density::{Drawn, MonthDensity};
 use crate::shell::month_grid::header::header;
