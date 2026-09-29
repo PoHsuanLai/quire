@@ -1,7 +1,7 @@
 //! The gallery's own stylesheet passes quire's lint at the strict profile: layout only, every
-//! colour, size, radius, shadow and duration a token (CONVENTIONS §11 coherence rules).
-//! Every margin, padding and gap is a `--s-*` step (`Rule::RawSpacing`); the three lengths the
-//! scale lacked (20, 28, 40) took the step below (18, 26, 36) in the polish pass.
+//! colour, size, radius, shadow and duration a token (the coherence rules, ARCHITECTURE.md "Repo
+//! rules"). Every margin, padding and gap is a `--s-*` step (`Rule::RawSpacing`); the three lengths
+//! the scale lacked (20, 28, 40) took the step below (18, 26, 36) in the polish pass.
 
 use ds::lint::{LintConfig, Profile, stylesheet};
 

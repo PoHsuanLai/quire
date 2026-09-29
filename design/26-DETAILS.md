@@ -204,7 +204,7 @@ operation timeouts are the services' (sill), not motion tokens.
 
 ### 4.1 API sketch (quire, `ds::detail`; built in D0 with the changes CONSUMING.md "Details" lists)
 
-Typed, no `bool` (CONVENTIONS §11), small structs, every effect started from a handler or an
+Typed, no `bool` (CONVENTIONS §4), small structs, every effect started from a handler or an
 effect hook, never from render (design/05 §7.1). Each primitive is a hook returning what the
 component renders, plus, where it helps, a thin component. Names avoid the existing `ds::Count`
 (the count badge): the counting primitive is `CountUp`.

@@ -147,7 +147,7 @@ pub(crate) fn attributes(data: &[DataAttr]) -> Vec<Attribute> {
 
 /// A consumer's own class or classes on a quire control (`ExtraClass::parse("fold-more")`),
 /// appended after quire's. For the consumer's own layout and reveal rules; it can never be a
-/// `ds-` class, so it cannot reach into quire's rules (CONVENTIONS section 11).
+/// `ds-` class, so it cannot reach into quire's rules (ARCHITECTURE.md "Repo rules").
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExtraClass(String);
 

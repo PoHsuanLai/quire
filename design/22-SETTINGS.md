@@ -57,9 +57,9 @@ Rules, all three files:
 - **Atomic write**: temp file + `rename` (`ds-settings`'s `file::save`).
 - **`version = 1`** top-level field. A future incompatible change bumps it and ships a
   migrator; today nothing reads it but its absence.
-- **Unknown keys preserved**: a round-trip through a newer binary must not drop a key an older
-  or newer version wrote (mirrors `CONVENTIONS.md#3-serde` "never `deny_unknown_fields` on a
-  persisted type"; `#[serde(flatten)]` extra: `Table` catches the rest per struct).
+- **Unknown keys preserved**: a round-trip through a newer binary must not drop a key an older or
+  newer version wrote (mirrors `CONVENTIONS.md#12-derives-and-serde` "never `deny_unknown_fields` on
+  a stored type"; `#[serde(flatten)]` extra: `Table` catches the rest per struct).
 - **Unknown *values* fall back to the field's default**, lenient, matching mailo's `Appearance`
   loader (PLAN "moves verbatim from mailo... `appearance.rs` load/save/dirs"): a bad enum
   string or an out-of-range number logs once and uses `Default::default()` for that field only,
@@ -81,7 +81,7 @@ of its own and used `Count` with a unit label in prose; `Ms` is milliseconds and
 the tens-of-seconds to hours range idle timeouts need), `Scalar(f32)` a dimensionless physics
 constant that does not fit the above (momentum model exponents), `Units` a signed raw
 touchpad/report unit (device space, not px). Every enum is named; **no key is a `bool`**
-(`CONVENTIONS.md#11-quire-addenda-2026-09-24`).
+(`CONVENTIONS.md#4-types`).
 
 Status column values: **proposed** = doc marks the value proposed, this is the "make it a key"
 case; **settled (preference)** = doc marks it settled but it is a user-facing choice, so it is
@@ -553,8 +553,8 @@ Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings`
 `palm_rejection` live in `palmrest`'s own crate but follow the identical shape so the three
 loaders share one macro/derive story.
 
-Shared newtypes (beyond the four the catalogue names, added per `CONVENTIONS.md#0-design-style`
-"newtype every identifier and every unit"):
+Shared newtypes (beyond the four the catalogue names, added per `CONVENTIONS.md#4-types`
+"newtype every unit and identifier"):
 
 ```rust
 pub struct Px(pub u16);
@@ -777,7 +777,7 @@ impl Default for ScrollSettings {
 `IconsSettings`, `BarSettings`, `LauncherSettings`, `GesturesSettings` (palmrest crate:
 `scroll_speed`/`lock_*`/`swipe_*`/`tap_*`/`foreign_output`/`g4_*`/`live_workspace_*`/
 `gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` as the nested
-struct `SwitcherSettings` per `CONVENTIONS.md#0-design-style`
+struct `SwitcherSettings` per `CONVENTIONS.md#4-types`
 "if half a struct's methods never touch half its fields, it is two types" — switcher and menus
 are genuinely separate concerns, nested rather than flattened), `NotificationsSettings`,
 `ControlCenterSettings`, `SpacesSettings`.
@@ -838,7 +838,8 @@ impl SettingsWatch {
 }
 
 /// One variant per domain, so a surface subscribes to only the domains it draws.
-/// Pure: no I/O, no clock (`CONVENTIONS.md#6-time` — this is comparison, not a timed effect).
+/// Pure: no I/O, no clock (`CONVENTIONS.md#6-state-effects-and-dependencies` — this is
+/// comparison, not a timed effect).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SettingsChange {
     Appearance, Icons, Bar, Dock, Launcher, Scroll, Scrollbar, Menus, Notifications,
@@ -892,7 +893,8 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 1. **Round-trip test per domain**: `Domain::default()` -> `toml::to_string` -> `toml::from_str`
    -> `assert_eq!` back to `Domain::default()`, for every domain struct in section 4 (13 tests,
-   one per domain; `CONVENTIONS.md#3-serde` "every persisted type has a round-trip test").
+   one per domain; `CONVENTIONS.md#12-derives-and-serde` "every stored or wire type has a
+   round-trip test").
 2. **Lenient-parse table**: one test per type family feeding a bad value and asserting the
    field falls back to default, file otherwise intact —
 
@@ -1027,8 +1029,8 @@ contacts register their account pages this way (`20-SURFACES.md`).
    that must start and apply its own config before `sill` or any compositor exists
    (`12-BEHAVIOUR-gestures.md#12-3-12-daemon-architecture`), and because `12.6`'s own doc text
    already assumes a `palmrest/config.toml`. A merged file would need `palmrest` to depend on
-   `sill`'s schema or vice versa, which `CONVENTIONS.md#11-quire-addenda-2026-09-24`'s boundary
-   rules (`sill-launcher`/`sill-ipc` must not reach several crates) argue against generalizing.
+   `sill`'s schema or vice versa, which sill's crate boundaries (its ARCHITECTURE.md, "Crates":
+   `sill-launcher`/`sill-ipc` must not reach several crates) argue against generalizing.
    Kept separate; revisit only if the two are shown to drift out of sync in practice.
 2. **`appearance.accent`'s other five variants are unnamed** (`03-COLOR.md#open-decisions` item
    6) — no doc gives a set of 6 accent names beyond `Postmark`. Cannot default what is not
@@ -1053,9 +1055,9 @@ contacts register their account pages this way (`20-SURFACES.md`).
 - `README.md#3-citation-convention`, `README.md#4-canonical-source` (the 2026-09-24 decision
   this whole document exists to satisfy), `README.md#5-proposing-a-change`.
 - `CHECKLIST.md#14-settings`.
-- `CONVENTIONS.md#0-design-style` (pure functions, make illegal states unrepresentable, no
-  bool), `CONVENTIONS.md#3-serde` (default, lenient, round-trip, never `deny_unknown_fields`),
-  `CONVENTIONS.md#11-quire-addenda-2026-09-24` (no bool in a settings key; "every value the
+- `CONVENTIONS.md#4-types` (illegal states unrepresentable, no bool in a settings key),
+  `CONVENTIONS.md#12-derives-and-serde` (round-trip, never `deny_unknown_fields`),
+  `CONVENTIONS.md#6-state-effects-and-dependencies` (pure functions; "every value the
   design docs mark proposed is read from a settings key... never hard-coded").
 - PLAN `~/.claude/plans/vast-toasting-peach.md` "Design: `<ds>` design-system repo" (`ds-settings`
   I/O: `appearance.json` atomic write, `notify` watch, 30 ms debounce, settings portal), "Design:

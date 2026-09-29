@@ -50,7 +50,7 @@ a path dependency does not inherit your workspace's `[workspace.dependencies]`, 
 does (quire's root, not yours). You only need to pin the lines **you** name directly: at minimum
 `dioxus` (to write `rsx!`), plus `dioxus-ssr` as a dev-dependency if you lint an SSR render
 (section 5). Copy those lines **verbatim** from `quire/docs/workspace-deps.toml`
-(`CONVENTIONS.md#11-quire-addenda-2026-09-24`: "the pinned block... is copied verbatim into
+(`CONVENTIONS.md#10-change-discipline`: "the pinned block ... is copied verbatim into
 every workspace"; `docs/workspace-deps.toml` is quire's own copy of the source of truth, not
 owned by this doc). If you also run on Blitz (`ds-native`), your own crate that calls
 `dioxus_native::*` directly (rare — most consumers only call `ds_native::launch`) needs the
@@ -97,7 +97,7 @@ fn App() -> Element {
 }
 ```
 
-`Ds`'s props, all named, none a `bool` (`CONVENTIONS.md#11-quire-addenda-2026-09-24`):
+`Ds`'s props, all named, none a `bool` (`CONVENTIONS.md#4-types`):
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -286,7 +286,7 @@ has a golden per override).
 
 ## 5. The four coherence rules
 
-`CONVENTIONS.md#11-quire-addenda-2026-09-24` states the coherence rules every downstream crate
+`ARCHITECTURE.md#repo-rules` states the coherence rules every downstream crate
 enforces on itself. Each one below is the exact test a consumer adds — `examples/consumer/
 tests/coherence.rs` is these four, verbatim, run against a real app.
 

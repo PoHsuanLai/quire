@@ -807,8 +807,8 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **The split clock.** On `Clock::Wall`, CSS resolves at the harness's own time (the sum of
   `advance`s) while ds timers and `Instant::now()` run on the wall clock, and `advance` only
   guarantees *at least* the time asked. Under load a check near a boundary lands on either side.
-- **The rule** (CONVENTIONS section 11): never assert a state at one fixed instant near a timer
-  boundary. Poll with `ds_native::harness::settle_until` (10 ms steps, `SETTLE_BOUND` 3 s,
+- **The rule** (ARCHITECTURE.md "Repo rules"): never assert a state at one fixed instant near a
+  timer boundary. Poll with `ds_native::harness::settle_until` (10 ms steps, `SETTLE_BOUND` 3 s,
   returns the instant the condition first held, panics with the document's HTML on timeout) and
   assert order, or that it landed at least the window after it was asked
   (`landed.duration_since(asked) >= window`, safe because real time only overshoots). A "not yet"

@@ -106,7 +106,7 @@ fn appear_sweeps_from_zero_and_the_count_lands_with_it() {
         "the count went past its target: {samples:?}"
     );
     // `--e-out` reads the last thousandth late in the sweep; half of `--t-sweep` is a bound a
-    // loaded machine cannot cross early (CONVENTIONS section 11).
+    // loaded machine cannot cross early (ARCHITECTURE.md "Repo rules").
     assert!(
         landed >= Duration::from_millis(350),
         "landed well before --t-sweep: {landed:?}"

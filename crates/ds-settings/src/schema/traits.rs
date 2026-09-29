@@ -46,8 +46,9 @@ pub fn kind_of<T: SchemaVariants>() -> KeyKind {
 ///
 /// # Panics
 /// Only if `T`'s `Serialize` cannot reach TOML at all (a map with non-string keys, `NaN`, ...),
-/// which none of this workspace's settings types can produce (`CONVENTIONS.md#2-derives`:
-/// "floats are not allowed in domain types" keeps `Scalar`'s `f32` finite by construction).
+/// which none of this workspace's settings types can produce
+/// (`CONVENTIONS.md#12-derives-and-serde`: floats stay out of data, and `Scalar`'s `f32` is finite
+/// by construction).
 pub fn to_value<T: Serialize>(value: &T) -> toml::Value {
     toml::Value::try_from(value)
         .expect("a settings field's value always serialises to a TOML value")

@@ -1,5 +1,5 @@
 //! The level control's vocabulary: what it is for, how it looks, whether it ticks, and which
-//! glyph it carries. Every choice is a named variant (no `bool`, CONVENTIONS section 11).
+//! glyph it carries. Every choice is a named variant (no `bool`, CONVENTIONS section 4).
 
 use crate::components::content::status::volume::VolumeState;
 use crate::core::vocab::Fraction;

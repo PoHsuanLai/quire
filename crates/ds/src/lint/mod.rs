@@ -1,6 +1,6 @@
-//! The stylesheet and markup linter every consumer runs in one test (CONVENTIONS §11
-//! coherence rules). It tokenizes with `cssparser`, never with substrings (CONVENTIONS
-//! "Substrings are not tokens").
+//! The stylesheet and markup linter every consumer runs in one test (the
+//! coherence rules, ARCHITECTURE.md "Repo rules"). It tokenizes with `cssparser`, never with
+//! substrings (CONVENTIONS §14 "Substrings are not tokens").
 //!
 //! A consumer's test, with one reviewed exception:
 //!

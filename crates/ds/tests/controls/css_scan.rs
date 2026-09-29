@@ -130,7 +130,8 @@ fn without_comments(css: &str) -> String {
     out
 }
 
-/// What a control stylesheet may not contain (the coherence rules, CONVENTIONS §11; spike S2, S12).
+/// What a control stylesheet may not contain (the coherence rules, ARCHITECTURE.md "Repo rules";
+/// spike S2, S12).
 pub fn token_violations(css: &str) -> Vec<String> {
     let css = without_comments(css);
     let mut found = Vec::new();

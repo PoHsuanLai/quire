@@ -45,7 +45,7 @@ pub enum Page {
 }
 
 /// File-only in v1 (section 5: "Advanced" = no Settings UI control) versus rendered on its
-/// page. Not a `bool`: `CONVENTIONS.md#11-quire-addenda-2026-09-24`.
+/// page. Not a `bool`: `CONVENTIONS.md#4-types`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Exposure {

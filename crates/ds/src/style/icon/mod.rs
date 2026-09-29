@@ -14,7 +14,7 @@
 //!; the named sets are in `sets`.
 //!
 //! No serde: an icon is never stored, and a derive would make it a persisted schema
-//! (`CONVENTIONS.md` section 3).
+//! (`CONVENTIONS.md` section 12).
 
 use shape::Shape;
 
