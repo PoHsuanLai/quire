@@ -154,7 +154,7 @@ without a drag cancels.
 
 ### 10.3.7 Context menu
 
-Opens on secondary **press** (press-drag-release selects, §13.3.2). ds `Menu{Context}` in an
+Opens on secondary **press** (press-drag-release selects, §13.3.2). ds `Menu` (`Placement::Context`) in an
 `xdg_popup` anchored to the tile's rest rect, placement Top, gap 8, grab Seat. Items in order
 (sections separated by `MenuEntry::Separator`):
 
@@ -430,7 +430,7 @@ leave 200 ms, bounce `P` 500 ms, hold-to-menu (the `LongPress` delay), remove th
 | Toplevels, activation, minimize rects, workspaces | `sill-services` `cosmic_wl` thread (cctk `ToplevelInfoState`, `ToplevelManagerState`) | second Wayland connection (plan: orphan rule) |
 | Items, `match_app`, launch | `sill-services` apps + launch services | plan "Design: sill" |
 | Badges, progress, urgent | `use_launcher_entry` (zbus match on LauncherEntry) | |
-| Menu component | ds `Menu{Context}` | §13.3.2-13.3.4 behaviour |
+| Menu component | ds `Menu` (`Placement::Context`) | §13.3.2-13.3.4 behaviour |
 | Label | ds `DockLabel` over `HoverIntent` (Label profile) | |
 | Tint | `21-SPACES.md` SpaceLook of the active workspace; layer per Look (design/30 §3.3) | cross-fade `--t-big` |
 | Sounds | §13.3.10 | |
