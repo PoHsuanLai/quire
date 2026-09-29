@@ -1,6 +1,6 @@
-//! A virtual timeline: an origin, how far it has been advanced, and the sleeps waiting on it.
+//! A virtual queue: an origin, how far it has been advanced, and the sleeps waiting on it.
 //! Nothing here reads the wall clock after the origin; time moves only when
-//! [`Timeline::advance_to`] is called.
+//! [`VirtualQueue::advance_to`] is called.
 
 use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
@@ -20,7 +20,7 @@ pub(super) struct TimerKey {
 
 /// The shared state of one virtual clock.
 #[derive(Debug)]
-pub(super) struct Timeline {
+pub(super) struct VirtualQueue {
     origin: Instant,
     elapsed: Cell<Duration>,
     issued: Cell<u64>,
@@ -28,9 +28,9 @@ pub(super) struct Timeline {
     waiting: RefCell<BTreeMap<TimerKey, Option<Waker>>>,
 }
 
-impl Timeline {
+impl VirtualQueue {
     pub(super) fn new(origin: Instant) -> Self {
-        Timeline {
+        VirtualQueue {
             origin,
             elapsed: Cell::new(Duration::ZERO),
             issued: Cell::new(0),
@@ -108,18 +108,18 @@ impl Timeline {
     }
 }
 
-/// A sleep on a virtual timeline: ready once the timeline reaches its due instant. Dropping it
+/// A sleep on a virtual queue: ready once the queue reaches its due instant. Dropping it
 /// unfinished (a cancelled task) takes it out of the queue.
 #[derive(Debug)]
 pub(super) struct VirtualSleep {
-    timeline: Rc<Timeline>,
+    queue: Rc<VirtualQueue>,
     key: TimerKey,
 }
 
 impl VirtualSleep {
-    pub(super) fn new(timeline: Rc<Timeline>, length: Duration) -> Self {
-        let key = timeline.enqueue(length);
-        VirtualSleep { timeline, key }
+    pub(super) fn new(queue: Rc<VirtualQueue>, length: Duration) -> Self {
+        let key = queue.enqueue(length);
+        VirtualSleep { queue, key }
     }
 }
 
@@ -127,12 +127,12 @@ impl Future for VirtualSleep {
     type Output = ();
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
-        self.timeline.poll_key(self.key, cx.waker())
+        self.queue.poll_key(self.key, cx.waker())
     }
 }
 
 impl Drop for VirtualSleep {
     fn drop(&mut self) {
-        self.timeline.forget(self.key);
+        self.queue.forget(self.key);
     }
 }
