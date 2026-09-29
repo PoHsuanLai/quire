@@ -42,9 +42,3 @@ pub use registry::{
 pub use timeline::{Dated, EntryDate, REFRESH_FLOOR, Refresh, RefreshAsk, Timeline, Wake};
 pub use use_widget::use_widget;
 pub use wire::{WireEntry, WireRefresh, WireTimeline};
-
-/// The widgets' stylesheet, appended to the components' in cascade order.
-pub const CSS: &[(&str, &str)] = &[
-    ("widget_views", include_str!("views.css")),
-    ("widget_gallery", include_str!("gallery.css")),
-];

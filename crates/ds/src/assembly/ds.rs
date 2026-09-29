@@ -41,11 +41,6 @@
 //! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
 //! positioned content (a centred sheet) is otherwise 0 px tall.
 
-use super::chrome::{FrameTint, Ground, RootChrome};
-use super::env::{Env, HostModality, InputModality, use_env_provider};
-use super::extent::RootExtent;
-use super::scale::use_root_scale;
-use super::typeface::{use_typeface, use_typeface_provider};
 use crate::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
@@ -61,6 +56,11 @@ use crate::overlay::host::{OverlayHost, use_overlays_provider};
 use crate::overlay::hover_hub::use_hover_hub_provider;
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
+use crate::root::chrome::{FrameTint, Ground, RootChrome};
+use crate::root::env::{Env, HostModality, InputModality, use_env_provider};
+use crate::root::extent::RootExtent;
+use crate::root::scale::use_root_scale;
+use crate::root::typeface::{use_typeface, use_typeface_provider};
 use crate::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::tokens::hex::Alpha;
 use crate::tokens::{pixel::PixelToken, shape::Corner};
@@ -123,13 +123,15 @@ pub fn Ds(
     let frame = FrameVars::of(&look, resolved.scheme);
     let layers = use_frame_layers(&frame.gradient);
     let tint = tint_alpha.unwrap_or(DEFAULT_TINT_ALPHA);
-    let corner = radius.map(super::surface::radius_style).unwrap_or_default();
+    let corner = radius
+        .map(crate::root::surface::radius_style)
+        .unwrap_or_default();
     let stack = stack.map(|stack| stack.style_attr()).unwrap_or_default();
     let pixels = PixelToken::style_attr(scale);
     let style = format!(
         "{}{}--m-tint-alpha:{};{corner}{stack}{pixels}",
         frame.style_attr(),
-        super::surface::accent_text_style(material),
+        crate::root::surface::accent_text_style(material),
         tint.css()
     );
     let framing = window.attribute();
@@ -159,7 +161,7 @@ pub fn Ds(
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
             onclick: move |event: MouseEvent| click_root.clicked(&event),
             if stylesheet == Inject::Inline {
-                style { {crate::css::stylesheet::stylesheet()} }
+                style { {crate::assembly::stylesheet::stylesheet()} }
             }
             match frame_tint {
                 FrameTint::Opaque => frame_layers(layers),

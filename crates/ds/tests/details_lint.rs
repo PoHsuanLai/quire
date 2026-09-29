@@ -55,12 +55,20 @@ const ALLOWED: &[(&str, Rule, &str)] = &[
 ];
 
 fn sheets() -> Vec<(&'static str, String)> {
-    let mut all: Vec<(&str, String)> = ds::components::CSS
+    // The components' and the details' own sheets (the widgets' are linted with the widgets),
+    // then the keyframes section, cut from the stylesheet.
+    let mut all: Vec<(&str, String)> = ds::component_sheets()
         .iter()
-        .chain(ds::detail::CSS)
+        .filter(|(name, _)| !name.starts_with("widget_"))
         .map(|(name, css)| (*name, (*css).to_owned()))
         .collect();
-    all.push(("motion", ds::css::motion_css::motion_css()));
+    let sheet = ds::stylesheet();
+    let motion = sheet
+        .split_once("/* == motion == */\n")
+        .and_then(|(_, rest)| rest.split_once("/* == utilities == */"))
+        .map(|(motion, _)| motion.to_owned())
+        .unwrap_or_else(|| panic!("the stylesheet has no motion section"));
+    all.push(("motion", motion));
     all
 }
 

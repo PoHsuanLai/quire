@@ -152,7 +152,7 @@ fn the_cascade_is_in_the_documented_order() {
         .collect();
     assert!(at.windows(2).all(|pair| pair[0] < pair[1]), "{at:?}");
     // The components, in the fixed list's order, all of them.
-    let components: Vec<usize> = ds::components::CSS
+    let components: Vec<usize> = ds::component_sheets()
         .iter()
         .map(|(name, _)| {
             let marker = format!("/* -- {name} -- */");

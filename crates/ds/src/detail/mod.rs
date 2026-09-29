@@ -62,11 +62,3 @@ pub use use_detail::{Detail, use_detail};
 pub use use_operation::use_operation;
 pub use use_pending::use_pending;
 pub use use_settle::use_settle;
-
-/// The details' stylesheets, appended to the components' in cascade order.
-pub const CSS: &[(&str, &str)] = &[
-    ("detail_reveal", include_str!("reveal.css")),
-    ("detail_layer", include_str!("layer.css")),
-    ("detail_morph", include_str!("morph.css")),
-    ("detail_roll", include_str!("roll.css")),
-];

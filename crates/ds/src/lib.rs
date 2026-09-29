@@ -5,6 +5,7 @@
 //! module to the design doc section it implements.
 
 pub mod appearance;
+pub(crate) mod assembly;
 pub(crate) mod busy;
 pub mod catalog;
 pub mod components;
@@ -49,8 +50,9 @@ pub use crate::appearance::{
     blur::{Blur, BlurState},
     material::Material,
 };
+pub use crate::assembly::ds::{Ds, Inject};
+pub use crate::assembly::stylesheet::{component_sheets, stylesheet};
 pub use crate::core::colour::contrast::{Verdict, ratio};
-pub use crate::css::stylesheet::stylesheet;
 pub use crate::edit::{
     clicks::Clicks,
     handle::{EditHandle, use_edit_handle},
@@ -132,7 +134,6 @@ pub use crate::overlay::{
 };
 pub use crate::root::{
     chrome::{FrameTint, Ground, RootChrome},
-    ds::{Ds, Inject},
     env::{Env, HostModality, InputModality, use_env},
     extent::RootExtent,
     scale::{HostScale, use_scale},

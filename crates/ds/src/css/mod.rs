@@ -4,16 +4,14 @@
 //! registered with the renderer (`crate::fonts`).
 
 pub mod accents_css;
+pub(crate) mod document;
 pub mod emit;
 pub(crate) mod grain;
 pub mod ground_css;
 pub mod materials_css;
 pub mod motion_css;
 pub mod shape_css;
-pub mod stylesheet;
 pub mod tokens_css;
-
-pub use stylesheet::stylesheet;
 
 /// `html, body` transparent; `.ds` carries paper, ink and the UI font.
 pub const RESET: &str = include_str!("reset.css");
