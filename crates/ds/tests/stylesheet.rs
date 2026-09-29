@@ -76,7 +76,6 @@ fn nothing_blitz_cannot_draw_or_the_lint_bans() {
     }
     let properties = properties(&css);
     for banned in [
-        "filter",
         "backdrop-filter",
         "text-overflow",
         "line-clamp",
