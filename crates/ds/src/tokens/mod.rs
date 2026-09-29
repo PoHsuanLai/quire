@@ -22,6 +22,7 @@ pub mod opacity;
 pub mod osd;
 pub mod person;
 pub mod pixel;
+pub(crate) mod plate;
 pub mod scalar;
 pub mod shape;
 pub mod shell;
@@ -29,7 +30,9 @@ pub mod shell_scale;
 pub mod size_scale;
 pub mod size_vars;
 pub mod spacing;
+pub(crate) mod status;
 pub mod timing;
+pub(crate) mod tint;
 pub mod tuned;
 pub mod type_scale;
 pub mod type_voice;
@@ -38,6 +41,7 @@ pub mod widgets;
 
 #[cfg(test)]
 mod size_rules_tests;
+pub(crate) mod vibrancy;
 
 pub use crate::tokens::accent_band::roles::AccentRoles;
 pub use accent_table::accent_of;

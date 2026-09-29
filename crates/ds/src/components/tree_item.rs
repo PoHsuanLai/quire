@@ -9,7 +9,6 @@
 //! button that never toggles the folder.
 
 use crate::components::count::{Count, CountPlace};
-use crate::components::press::Press;
 use crate::components::row_hooks::relay;
 use crate::components::sidebar_item::PlaceId;
 use crate::components::text_runs::Text;
@@ -17,6 +16,7 @@ use crate::components::tree_item_parts::{
     Row, label_part, leaf_chevron, open_attribute, trailing_slot,
 };
 use crate::components::vocab::{DropState, Expanded, Here};
+use crate::core::press::Press;
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use dioxus::prelude::*;

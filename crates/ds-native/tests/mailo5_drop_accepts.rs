@@ -3,8 +3,8 @@
 //! item keeps its size and its label stays where it was as a drag starts.
 
 use dioxus::prelude::*;
-use ds::components::vocab::{DropState, Here, PulseKey};
 use ds::{Anim, Appearance, Ds, Icon, ItemKind, Material, PlaceId, Presence, SidebarItem};
+use ds::{DropState, Here, PulseKey};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 

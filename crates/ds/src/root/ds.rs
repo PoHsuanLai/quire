@@ -49,14 +49,16 @@ use super::typeface::{use_typeface, use_typeface_provider};
 use crate::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
+use crate::appearance::{blur::BlurState, material::Material};
 use crate::components::toast::ToastHost;
 use crate::components::window_frame::{WindowFrame, framed};
 use crate::focus::click::ClickRoot;
 use crate::geometry::scale::Scale;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
-use crate::material::{blur::BlurState, material::Material, stack::MaterialStack};
+use crate::material::stack::MaterialStack;
+use crate::motion::hover_intent::HoverWarmth;
 use crate::overlay::host::{OverlayHost, use_overlays_provider};
-use crate::overlay::hover_hub::{HoverWarmth, use_hover_hub_provider};
+use crate::overlay::hover_hub::use_hover_hub_provider;
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
 use crate::space::{frame_vars::FrameVars, look::SpaceLook};

@@ -1,7 +1,7 @@
 //! Settle: how a success lands (design/26-DETAILS.md section 3.2).
 
 use crate::components::vocab::Fraction;
-use crate::components::vocab::PulseKey;
+use crate::motion::pulse_key::PulseKey;
 
 /// How a success lands.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -5,7 +5,7 @@ use super::chrome::{Ground, RootChrome};
 use super::env::{Env, use_env, use_env_provider};
 use super::typeface::use_typeface;
 use crate::appearance::{accent::Accent, resolve::Resolved, theme::Scheme};
-use crate::material::{blur::BlurState, material::Material};
+use crate::appearance::{blur::BlurState, material::Material};
 use crate::tokens::accent_band::text_grounds::{TextOn, text_on};
 use crate::tokens::shape::Corner;
 use dioxus::prelude::*;

@@ -1,8 +1,8 @@
 //! Count: an unread or item count, empty at zero, bumping when it changes
 //! (design/04-COMPONENTS.md section 14).
 
-use crate::components::vocab::PulseKey;
 use crate::motion::anim::Anim;
+use crate::motion::pulse_key::PulseKey;
 use dioxus::prelude::*;
 use std::cell::Cell;
 use std::rc::Rc;
@@ -91,7 +91,7 @@ pub fn Count(value: u32, #[props(default)] place: CountPlace) -> Element {
 #[cfg(test)]
 mod tests {
     use super::Seen;
-    use crate::components::vocab::PulsePhase;
+    use crate::motion::pulse_key::PulsePhase;
 
     #[test]
     fn a_change_fires_the_bump_and_a_repeat_does_not() {

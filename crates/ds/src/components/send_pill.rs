@@ -113,7 +113,7 @@ fn run_dash(ring: SendRing, progress: Fraction) -> (String, String) {
 }
 
 /// The class list and `data-pulse` for a pill playing `pulse` (a failed mood's one-shot).
-fn pulse_attrs(pulse: crate::components::vocab::PulseKey) -> (String, Option<&'static str>) {
+fn pulse_attrs(pulse: crate::motion::pulse_key::PulseKey) -> (String, Option<&'static str>) {
     match pulse.attrs() {
         Some((anim, alias)) => (format!("ds-send-pill {anim}"), Some(alias)),
         None => ("ds-send-pill".to_string(), None),

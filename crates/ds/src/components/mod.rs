@@ -234,7 +234,10 @@ pub use crate::components::{
     text_input_focus::Focus,
     text_input_kind::{Grow, Rows, TextInputKind},
 };
+pub use crate::core::press::{PointerButton, Press};
+pub use crate::motion::pulse_key::{PulseKey, PulsePhase};
 pub use crate::motion::wake::WakeStamp;
+pub use crate::tokens::status::StatusMetrics;
 pub use account_tile::{AccountFace, AccountTile, AddAccountTile};
 pub use alert::Alert;
 pub use alert_vocab::{AlertButton, AlertEmphasis};
@@ -273,7 +276,7 @@ pub use flow::Flow;
 pub use group_header::GroupHeader;
 pub use hover_card::HoverCard;
 pub use hover_strip::{ActionId, HoverStrip, StripAction, Titles};
-pub use icon_button::{IconButton, IconButtonVariant, StatusMetrics};
+pub use icon_button::{IconButton, IconButtonVariant};
 pub use icon_view::IconView;
 pub use idle_dim::IdleDim;
 pub use image_source::ImageSize;
@@ -320,7 +323,7 @@ pub use peek::Peek;
 pub use play_pause::PlayPauseButton;
 pub use polkit_prompt::PolkitPrompt;
 pub use popover::{Dismiss, Elevation, Popover};
-pub use press::{PointerButton, Press, Propagation};
+pub use press::Propagation;
 pub use preview_content::{Mono, PANE_MEDIA, PaneContent};
 pub use preview_cue::PaneCue;
 pub use preview_pane::{PaneAction, PreviewPane};
@@ -364,8 +367,8 @@ pub use track_position::TrackPosition;
 pub use traffic_lights::TilePose;
 pub use tree_item::{Disclosure, TreeItem, TreeShape};
 pub use vocab::{
-    Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent, PulseKey,
-    PulsePhase, Selection, Shortcut, StaggerIndex, Switch,
+    Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent, Selection,
+    Shortcut, StaggerIndex, Switch,
 };
 pub use widget_exit::CardPresence;
 pub use widget_frame::WidgetFrame;

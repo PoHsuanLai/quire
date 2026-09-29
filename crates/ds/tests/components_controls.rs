@@ -15,8 +15,8 @@ mod golden;
 use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
-use ds::components::vocab::{Key, PulseKey, Shortcut, StaggerIndex};
 use ds::{Anim, Count, CountPlace, Glyph, Icon, IconSize};
+use ds::{Key, PulseKey, Shortcut, StaggerIndex};
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -241,7 +241,7 @@ fn a_stagger_index_saturates_at_the_cap() {
 
 #[test]
 fn a_pulse_alternates_its_alias() {
-    use ds::components::vocab::PulsePhase;
+    use ds::PulsePhase;
     let rest = PulseKey::rest(Anim::Bump);
     assert_eq!(rest.attrs(), None, "at rest nothing is rendered");
     const STEPS: &[PulsePhase] = &[PulsePhase::A, PulsePhase::B, PulsePhase::A];

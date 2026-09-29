@@ -3,7 +3,6 @@
 
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::components::vocab::{DropState, Here, Key, PulseKey, Shortcut, Switch};
 use ds::{
     Accent, Appearance, AppearancePicker, CardAccent, DotIndex, FrameVars, Grain, Motion, PRESETS,
     ReducedMotion, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
@@ -14,6 +13,7 @@ use ds::{
     ItemKind, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, Provider, ProviderMark, Px,
     SidebarItem, SyncHalo, SyncState,
 };
+use ds::{DropState, Here, Key, PulseKey, Shortcut, Switch};
 
 /// One component in one state.
 pub struct Case {

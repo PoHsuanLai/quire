@@ -5,7 +5,9 @@
 pub mod accent;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
 pub mod appearance;
+pub(crate) mod blur;
 pub mod look;
+pub(crate) mod material;
 pub mod motion;
 pub mod peek;
 pub mod resolve;

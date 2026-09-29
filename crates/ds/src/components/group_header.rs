@@ -7,9 +7,10 @@
 
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::icon_view::IconView;
-use crate::components::press::{Press, Propagation};
+use crate::components::press::Propagation;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::Expanded;
+use crate::core::press::Press;
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;

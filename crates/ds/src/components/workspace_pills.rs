@@ -5,8 +5,9 @@
 //! (a click activates, a right-click opens the Space menu); a caller that drags pills to
 //! reorder them wraps each `WorkspacePill` in its own element and listens there.
 
-use crate::components::press::{Press, PressListeners};
+use crate::components::press::PressListeners;
 use crate::components::vocab::Here;
+use crate::core::press::Press;
 use dioxus::prelude::*;
 
 /// The group: `children` are its `WorkspacePill`s (or the caller's wrappers around them).

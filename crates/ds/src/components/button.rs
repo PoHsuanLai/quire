@@ -10,9 +10,10 @@ use crate::components::button_face::{
 use crate::components::button_size::{ButtonSize, disabled};
 use crate::components::icon_view::IconView;
 use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
-use crate::components::press::{Press, PressListeners, Propagation};
+use crate::components::press::{PressListeners, Propagation};
 use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Expanded, Switch};
+use crate::core::press::Press;
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;

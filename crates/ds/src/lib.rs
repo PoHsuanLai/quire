@@ -45,6 +45,10 @@ pub use crate::appearance::{
     theme::{Scheme, Theme},
     typeface::Typeface,
 };
+pub use crate::appearance::{
+    blur::{Blur, BlurState},
+    material::Material,
+};
 pub use crate::core::colour::contrast::{Verdict, ratio};
 pub use crate::css::stylesheet::stylesheet;
 pub use crate::edit::{
@@ -90,11 +94,10 @@ pub use crate::icon::{
     shape::Shape,
 };
 pub use crate::material::{
-    blur::{Blur, BlurState},
-    material::Material,
     recipe::{MaterialRecipe, recipe},
     stack::MaterialStack,
 };
+pub use crate::motion::hover_intent::HoverWarmth;
 pub use crate::motion::{
     anim::Anim,
     drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag},
@@ -119,7 +122,7 @@ pub use crate::motion::{
 };
 pub use crate::overlay::{
     host::{OverlayHost, OverlayId, Overlays, use_overlays},
-    hover_hub::{HoverHub, HoverKey, HoverKind, HoverWarmth, use_hover_hub},
+    hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub},
     menu_track::types::{
         ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
         MenuTrackEffect, MenuTrackEvent,

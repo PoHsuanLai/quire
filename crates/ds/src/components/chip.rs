@@ -1,10 +1,10 @@
 //! Chip: a small label that states a fact (design/04-COMPONENTS.md section 10).
 
 use crate::components::avatar::{AvatarFace, face};
-use crate::components::vocab::PulseKey;
 use crate::core::colour::contrast::Verdict;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
+use crate::motion::pulse_key::PulseKey;
 use crate::tokens::label_hue::LabelHue;
 use dioxus::prelude::*;
 

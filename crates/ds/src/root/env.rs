@@ -1,8 +1,8 @@
 //! What every component under a `Ds` can read: the resolved appearance, the material and the
 //! blur state of the scope it is in.
 
+use crate::appearance::{blur::BlurState, material::Material};
 use crate::appearance::{resolve::Resolved, theme::Scheme};
-use crate::material::{blur::BlurState, material::Material};
 use dioxus::prelude::*;
 
 /// How the person last drove the surface: `data-modality` on `.ds`.

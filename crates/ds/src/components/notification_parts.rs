@@ -2,8 +2,8 @@
 //! group holds and how many layers show behind it, the actions it offers, and whether the
 //! pointer is over it.
 
-use crate::components::press::Press;
 use crate::components::text_runs::Text;
+use crate::core::press::Press;
 use crate::icon::external::IconSource;
 use dioxus::prelude::*;
 

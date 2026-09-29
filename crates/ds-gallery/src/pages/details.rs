@@ -7,7 +7,7 @@ use crate::details_views::{
     CheckView, NetView, NudgeView, SealView, ShakeView, SlashView, SweepCountView,
 };
 use dioxus::prelude::*;
-use ds::components::press::Press;
+use ds::Press;
 use ds::detail::{
     Deadline, EventStamp, FirstShow, MorphGlyph, MorphStyle, Operation, PendingToken, Reveal,
     RollDigits, Slashed, Touch,

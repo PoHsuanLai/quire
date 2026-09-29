@@ -22,12 +22,13 @@ use crate::components::menu_return::hand_back;
 use crate::components::menu_surface::{Surface, stacking};
 use crate::components::menu_tracker::{Tracker, Via, use_tracker};
 use crate::components::popover::{escape_closes, use_float};
-use crate::components::press::{PointerButton, Press, button_of};
+use crate::components::press::{button_of, press_of};
 use crate::components::vocab::Availability;
 use crate::components::{
     menu_filter::Filter,
     menu_lines::{Act, Choice, KeyAct, choices, key_act, lines},
 };
+use crate::core::press::{PointerButton, Press};
 use crate::geometry::measure::{Anchor, MountedRef};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
@@ -208,7 +209,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
             onmouseup: move |event| {
                 if let Some(on_release) = on_release {
                     let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
-                    on_release.call(Press::of(&event, button));
+                    on_release.call(press_of(&event, button));
                 }
                 // A drag that came in and let go over no choice closes, picking nothing
                 // (design/13 section 13.3.2).

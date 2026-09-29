@@ -9,12 +9,12 @@
 //! tile on the center's own Popover, as a `ModuleTile` is. Both take their footprint from
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
+use crate::appearance::material::Material;
 use crate::components::text_runs::text;
 use crate::components::widget_exit::{CardPresence, use_card_exit};
 use crate::components::widget_kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 use crate::components::widget_scope::use_frame_provider;
 use crate::icon::render::{Glyph, IconSize};
-use crate::material::material::Material;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::widget::contract::WidgetKind;

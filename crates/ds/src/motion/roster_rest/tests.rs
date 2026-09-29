@@ -2,8 +2,8 @@
 //! runs start one timer.
 
 use crate::appearance::{accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme};
+use crate::appearance::{blur::BlurState, material::Material};
 use crate::geometry::units::Px;
-use crate::material::{blur::BlurState, material::Material};
 use crate::motion::{presence::Presence, roster::RowPitch, use_roster::use_roster};
 use crate::root::env::Env;
 use crate::root::env::InputModality;

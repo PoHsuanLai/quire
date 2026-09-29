@@ -159,7 +159,7 @@ mod tests {
     use crate::appearance::{
         accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
     };
-    use crate::material::{blur::BlurState, material::Material};
+    use crate::appearance::{blur::BlurState, material::Material};
     use crate::root::env::{Env, InputModality};
     use dioxus::prelude::*;
     use std::cell::RefCell;

@@ -192,8 +192,8 @@ fn over_blends_per_channel() {
 /// accent's; design/03-COLOR.md section 20.6). A new ground the ink misses fails here first.
 #[test]
 fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
-    use crate::material::material::Material;
-    use crate::material::recipe::tint;
+    use crate::appearance::material::Material;
+    use crate::tokens::tint::tint;
     let all = 4 + 4 + 2 * TEXT_MATERIALS.len() * 2;
     for scheme in Scheme::ALL {
         for hue in (0..360).step_by(5) {
@@ -227,7 +227,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
 /// Only the Popover, the Sheet and the Toast point `--accent-text` at the material's text.
 #[test]
 fn the_text_carrying_materials_take_the_material_text() {
-    use crate::material::material::Material;
+    use crate::appearance::material::Material;
     for material in Material::ALL {
         let want = match material {
             Material::Popover | Material::Sheet | Material::Toast => TextOn::Material,

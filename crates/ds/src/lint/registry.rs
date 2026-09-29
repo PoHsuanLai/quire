@@ -7,7 +7,6 @@ use std::collections::HashSet;
 use std::sync::LazyLock;
 
 use crate::appearance::{accent::Accent, theme::Scheme};
-use crate::components::icon_button::StatusMetrics;
 use crate::css::accents_css::swatch_var;
 use crate::css::materials_css::{MATERIAL_VARS, TINT_ALPHA};
 use crate::css::shape_css::{SHAPE_VARS, SQUIRCLE_VARS};
@@ -24,6 +23,7 @@ use crate::tokens::notifications::NOTIFICATION_TOKENS;
 use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::size_vars::size_tokens;
+use crate::tokens::status::StatusMetrics;
 use crate::tokens::type_voice::VoiceToken;
 use crate::tokens::widget_paint::WidgetPaint;
 use crate::tokens::widgets::WIDGET_TOKENS;

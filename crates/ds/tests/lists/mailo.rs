@@ -5,8 +5,8 @@
 use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::components::vocab::{Emphasis, Expanded, PulseKey, Selection, StaggerIndex};
 use ds::{ActionId, Anim, HoverStrip, ListRow, Presence, Run, RunTone, Shown, Text, Titles};
+use ds::{Emphasis, Expanded, PulseKey, Selection, StaggerIndex};
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
 fn marked_subject() -> Text {

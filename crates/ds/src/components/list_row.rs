@@ -4,8 +4,9 @@ use crate::components::row_click::snapshot;
 use crate::components::row_hooks::{PartHooks, relay, use_back};
 use crate::components::row_star::star_button;
 use crate::components::text_runs::{Text, text};
-use crate::components::vocab::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
+use crate::components::vocab::{DropState, Emphasis, Selection, StaggerIndex, Switch};
 use crate::motion::presence::Presence;
+use crate::motion::pulse_key::PulseKey;
 use crate::text::clip::clip_chars;
 use dioxus::prelude::*;
 

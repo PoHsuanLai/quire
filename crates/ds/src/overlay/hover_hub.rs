@@ -8,7 +8,9 @@
 
 use crate::components::vocab::StaggerIndex;
 use crate::motion::anim::Anim;
-use crate::motion::hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};
+use crate::motion::hover_intent::{
+    HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase,
+};
 use crate::motion::settle::settle;
 use crate::root::env::Env;
 use crate::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
@@ -39,16 +41,6 @@ pub enum HoverKind {
     /// A value's small tip (a row's time, design/06-INTERACTIONS.md section 3 `time`): one line,
     /// tooltip-sized, placed below like a sender card, on the same intent timing as every card.
     Tip,
-}
-
-/// Whether cards and fly labels open at once.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum HoverWarmth {
-    /// A card is open or closed less than HoverWarm ago: no wait.
-    Warm,
-    /// Wait for intent.
-    #[default]
-    Cold,
 }
 
 /// The hover manager, provided as context by `Ds`.

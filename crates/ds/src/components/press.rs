@@ -3,57 +3,22 @@
 //! tray icon's right-click has to reach the app as a secondary press, its middle click as a
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 
+use crate::core::press::{PointerButton, Press};
 use crate::focus::click::kept_click;
 use crate::geometry::units::{Point, Px};
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 
-/// Which button pressed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PointerButton {
-    /// The primary button, or the keyboard (Enter or Space on the focused control).
-    Primary,
-    /// The secondary button: a right-click, which the page reads as a context-menu request.
-    Secondary,
-    /// The middle button.
-    Middle,
-}
-
-/// One activation of a control. `PartialEq` without `Eq`: the point is fractional pixels.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Press {
-    /// Which button.
-    pub button: PointerButton,
-    /// The modifiers held when it happened.
-    pub modifiers: Modifiers,
-    /// Where, in the surface's own coordinates (the event's client point: on a shell surface,
-    /// surface-local logical pixels). A keyboard activation reports the point its event
-    /// carries, which on Blitz is the origin.
-    pub at: Point,
-}
-
-impl Press {
-    /// A primary press with no modifiers at the origin: what a keyboard activation or a test
-    /// reports.
-    pub fn primary() -> Self {
-        Press {
-            button: PointerButton::Primary,
-            modifiers: Modifiers::empty(),
-            at: Point::default(),
-        }
-    }
-
-    /// The press a mouse event describes, as `button`.
-    pub(crate) fn of(event: &MouseEvent, button: PointerButton) -> Self {
-        let at = event.client_coordinates();
-        Press {
-            button,
-            modifiers: event.modifiers(),
-            at: Point {
-                x: Px(at.x as f32),
-                y: Px(at.y as f32),
-            },
-        }
+/// The press a mouse event describes, as `button`.
+pub(crate) fn press_of(event: &MouseEvent, button: PointerButton) -> Press {
+    let at = event.client_coordinates();
+    Press {
+        button,
+        modifiers: event.modifiers(),
+        at: Point {
+            x: Px(at.x as f32),
+            y: Px(at.y as f32),
+        },
     }
 }
 
@@ -133,7 +98,7 @@ impl PressListeners {
     pub(crate) fn click(&self, event: &MouseEvent) {
         self.propagation.apply(event);
         if let Some(button) = button_of(event.trigger_button()) {
-            self.press.call(Press::of(event, button));
+            self.press.call(press_of(event, button));
         }
         if self.propagation == Propagation::Stop {
             kept_click(event);
@@ -144,21 +109,22 @@ impl PressListeners {
     pub(crate) fn context_menu(&self, event: &MouseEvent) {
         event.prevent_default();
         self.propagation.apply(event);
-        self.press.call(Press::of(event, PointerButton::Secondary));
+        self.press.call(press_of(event, PointerButton::Secondary));
     }
 
     /// A `mouseup`: only the middle button counts (the primary one arrives as `click`).
     pub(crate) fn mouse_up(&self, event: &MouseEvent) {
         if event.trigger_button() == Some(MouseButton::Auxiliary) {
             self.propagation.apply(event);
-            self.press.call(Press::of(event, PointerButton::Middle));
+            self.press.call(press_of(event, PointerButton::Middle));
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{PointerButton, button_of};
+    use super::button_of;
+    use crate::core::press::PointerButton;
     use dioxus::html::input_data::MouseButton;
 
     #[test]

@@ -10,23 +10,8 @@
 //! corners and two rectangles for the cross between them. The shapes are sampled here, as data.
 
 use super::external::IconUrl;
+use crate::tokens::plate::EXPONENT;
 use std::f64::consts::FRAC_PI_2;
-
-/// The superellipse exponent (design/08 section 2.1, proposed; settled for the shell
-/// 2026-09-24).
-pub const EXPONENT: f64 = 5.0;
-
-/// How far a squircle corner of nominal radius `r` reaches along each edge: `2 r`.
-pub const EXTENT_PER_RADIUS: f64 = 2.0;
-
-/// The circular radius that touches the squircle corner at its 45 degree point, as a share of the
-/// nominal radius: `2 (1 - 2^(-1/5)) / (1 - 1/sqrt 2)`, about .884. The squircle lies inside this
-/// circle everywhere and at most .03 r from it, so a squircle element's shadows and hairlines
-/// are drawn from it (Blitz draws a `box-shadow` from the `border-radius`, never the mask).
-pub fn shadow_radius_share() -> f64 {
-    let diagonal = EXTENT_PER_RADIUS * (1.0 - 2f64.powf(-1.0 / EXPONENT));
-    diagonal / (1.0 - std::f64::consts::FRAC_1_SQRT_2)
-}
 
 /// Samples per quadrant for a corner mask, and for each quadrant of the plate.
 const SAMPLES: u32 = 48;
@@ -152,10 +137,8 @@ pub fn inside_corner(k: f64, x: f64, y: f64) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        EXPONENT, Quadrant, fill_mask, inside_corner, plate_mask, point, quadrant_mask,
-        shadow_radius_share,
-    };
+    use super::{Quadrant, fill_mask, inside_corner, plate_mask, point, quadrant_mask};
+    use crate::tokens::plate::{EXPONENT, shadow_radius_share};
 
     #[test]
     fn every_sample_lies_on_the_superellipse() {

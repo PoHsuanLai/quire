@@ -7,13 +7,14 @@
 use crate::components::icon_view::IconView;
 use crate::components::switcher_fit::{SwitcherMetrics, fit};
 use crate::components::tooltip::{Shown, Tooltip, TooltipKind};
-use crate::components::vocab::{PulseKey, Selection};
+use crate::components::vocab::Selection;
 use crate::detail::touch::Touch;
 use crate::geometry::units::Px;
 use crate::icon::external::IconSource;
 use crate::icon::family::PlateFamily;
 use crate::icon::render::{IconPx, IconSize};
 use crate::motion::anim::Anim;
+use crate::motion::pulse_key::PulseKey;
 use crate::motion::{
     spring_spec::{SpringResponse, SpringSpec},
     use_spring::{PxPerUnit, use_spring},

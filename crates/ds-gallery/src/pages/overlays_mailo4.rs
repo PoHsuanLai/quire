@@ -4,7 +4,7 @@
 
 use super::Section;
 use dioxus::prelude::*;
-use ds::components::vocab::Check;
+use ds::Check;
 use ds::{
     Button, ButtonVariant, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon,
     Menu, MenuEntry, MenuKind, MenuRow, MountedRef, PickDismiss, Tile, use_hover_intent, use_rect,

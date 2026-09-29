@@ -17,12 +17,12 @@
 //! in may be any; the scope fills the root, since Blitz places an absolutely positioned box
 //! against its parent. It needs a root with a height (`Ds { extent: RootExtent::Viewport }`).
 
+use crate::appearance::material::Material;
 use crate::components::scrim::{ScrimLook, scrim_button_as};
 use crate::components::scrim_strength::ScrimStrength;
 use crate::components::spring_presence::use_spring_presence;
 use crate::components::tooltip::Shown;
 use crate::geometry::units::Px;
-use crate::material::material::Material;
 use crate::motion::anim::Anim;
 use crate::root::surface::ClassedScope;
 use dioxus::prelude::*;

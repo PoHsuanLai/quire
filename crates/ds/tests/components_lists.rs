@@ -32,7 +32,7 @@ mod space_editor;
 use cases::{CASES, Case, editor, preset_look};
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
-use ds::components::vocab::Emphasis;
+use ds::Emphasis;
 use ds::{
     Anim, AnimatedList, Capping, Dot, DragGhost, DragPhase, DragTracker, Exit, Grain, ListPresence,
     Point, Px, Rect, RosterState, RowPitch, Scheme, Size, SpaceLook, Verdict, derive, readout,

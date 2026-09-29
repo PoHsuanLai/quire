@@ -18,6 +18,7 @@
 //! then the swipe's and never a drag out. The card places nothing itself (no margin, no
 //! anchor), so a `BannerStack` or the caller's surface decides where it sits.
 
+use crate::appearance::material::Material;
 use crate::components::icon_button::{IconButton, IconButtonVariant};
 use crate::components::image_source::{ImageSize, ImageSource};
 use crate::components::notification_parts::Hover;
@@ -32,7 +33,6 @@ use crate::components::tooltip::Shown;
 use crate::components::vocab::StaggerIndex;
 use crate::geometry::units::{Point, Px};
 use crate::icon::Icon;
-use crate::material::material::Material;
 use crate::motion::anim::Anim;
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;

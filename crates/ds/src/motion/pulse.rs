@@ -2,8 +2,8 @@
 //! rule 2). The stylesheet emits every keyframe as `X` and `X--b`; firing toggles
 //! `data-pulse` so the animation name changes and the engine restarts it.
 
-use crate::components::vocab::PulseKey;
 use crate::motion::anim::Anim;
+use crate::motion::pulse_key::PulseKey;
 use dioxus::prelude::*;
 
 /// A restartable animation on one element.

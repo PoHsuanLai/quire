@@ -10,9 +10,9 @@
 //! settings ([`crate::widget::layout::apply`]) and passes the new layout back.
 
 use crate::components::button::ButtonVariant;
-use crate::components::press::Press;
 use crate::components::text_runs::{Text, text};
 use crate::components::widget_kind::{Lift, WidgetHost, WidgetSize};
+use crate::core::press::Press;
 use crate::detail::touch::{Contact, Touch};
 use crate::geometry::measure::MountedRef;
 use crate::widget::contract::WidgetKind;

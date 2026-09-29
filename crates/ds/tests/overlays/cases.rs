@@ -3,7 +3,6 @@
 //! case's timers run first (a hover card's 450 ms intent, an entrance settling).
 
 use dioxus::prelude::*;
-use ds::components::vocab::{Check, Fraction, Key, Shortcut, Switch};
 use ds::{Align, Availability, Button, ButtonVariant};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
@@ -15,6 +14,7 @@ use ds::{
     SheetPlacement, Shown, Side, Size, Tile, Tooltip, TooltipKind, Trail, UndoToken, use_hover_hub,
     use_toasts,
 };
+use ds::{Check, Fraction, Key, Shortcut, Switch};
 use std::time::Duration;
 
 /// One component in one state.

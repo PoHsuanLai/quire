@@ -4,16 +4,13 @@
 //! The blur region's geometry belongs to shell-host, which owns the surface; ds exposes only
 //! [`Material::blur`], the intent. (The plan's `blur_region()` was dropped from ds.)
 
-pub mod blur;
 pub(crate) mod layer;
 pub(crate) mod level;
-#[allow(clippy::module_inception)] // The layout names the file for its one concept.
-pub mod material;
+
 pub mod recipe;
 pub mod stack;
-pub mod vibrancy;
 
-pub use blur::{Blur, BlurState};
-pub use material::Material;
+pub use crate::appearance::blur::{Blur, BlurState};
+pub use crate::appearance::material::Material;
 pub use recipe::{MaterialRecipe, recipe};
 pub use stack::MaterialStack;

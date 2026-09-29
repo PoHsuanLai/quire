@@ -13,6 +13,7 @@ pub mod pane_slide;
 pub mod presence;
 pub mod projection;
 pub mod pulse;
+pub(crate) mod pulse_key;
 pub mod recipe;
 pub(crate) mod recipe_detail;
 pub(crate) mod recipe_own;

@@ -5,11 +5,11 @@
 //! reaches the row unless a shown strip is wider than half the row.
 
 use dioxus::prelude::*;
-use ds::components::vocab::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds::{
     ActionId, Anim, Appearance, Ds, HoverStrip, Icon, ListRow, Material, Point, Presence, Px, Rect,
     Shown, StripAction,
 };
+use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 

@@ -4,11 +4,12 @@
 use crate::components::avatar::{AvatarFace, face};
 use crate::components::count::{Count, CountPlace};
 use crate::components::row_hooks::relay;
-use crate::components::vocab::{DropState, Here, PulseKey};
+use crate::components::vocab::{DropState, Here};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::motion::presence::Presence;
+use crate::motion::pulse_key::PulseKey;
 use dioxus::prelude::*;
 
 /// What kind of place.

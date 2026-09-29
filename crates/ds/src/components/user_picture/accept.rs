@@ -6,7 +6,7 @@
 
 use super::mood::Mood;
 use crate::appearance::motion::MotionLevel;
-use crate::components::vocab::PulseKey;
+use crate::motion::pulse_key::PulseKey;
 use crate::motion::{
     anim::Anim,
     pulse::use_pulse,

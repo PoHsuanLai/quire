@@ -13,10 +13,10 @@
 
 use super::floors;
 use super::grounds::{card_grounds, card_ink, contrast, over};
+use crate::appearance::material::Material;
 use crate::appearance::theme::Scheme;
-use crate::material::material::Material;
-use crate::material::recipe::tint;
 use crate::tokens::hex::{Alpha, Hex};
+use crate::tokens::tint::tint;
 
 /// The two worst backdrops a blur can show, the same two `tests/legibility.rs` holds the
 /// materials' own ink over (design/21-SPACES.md section 7).

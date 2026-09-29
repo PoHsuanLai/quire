@@ -2,7 +2,7 @@
 //! between `--m-tint` and `--m-tint-solid`.
 //!
 //! The paint rules come last: a root or [`crate::root::surface::Surface`] with a material paints the solid tint
-//! unless it says `data-blur=on`, which is the safe default of [`crate::material::blur::BlurState`]. The
+//! unless it says `data-blur=on`, which is the safe default of [`crate::appearance::blur::BlurState`]. The
 //! material's edge and drop are painted as one `box-shadow` naming only the layers that are not
 //! `none` (a `var(--m-edge),var(--m-shadow)` list would be invalid whenever either is), so the
 //! colours stay in the `--m-*` declarations. That list is `--m-box`, so a card inside a
@@ -17,12 +17,14 @@
 //! `.ds-sheet` cards paint the material's tint, edge and drop instead.
 
 use super::emit::{attr_selector, declaration, presence_selector, property, rule};
+use crate::appearance::material::Material;
 use crate::appearance::theme::Scheme;
 use crate::material::layer::{Layer, joined};
 use crate::material::level::level_css;
-use crate::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, flat_tint, layers, tint};
+use crate::material::recipe::recipe;
+use crate::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, layers};
 use crate::material::stack::VIBRANCY;
-use crate::material::{material::Material, recipe::recipe};
+use crate::tokens::tint::{flat_tint, tint};
 use crate::tokens::{hex::Hex, layer::ZLayer, name::VarName};
 
 /// The variable a root writes inline with `appearance.material_tint_alpha` as a fraction

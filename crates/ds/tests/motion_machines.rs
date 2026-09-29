@@ -2,7 +2,7 @@
 //! hover intent machine (design/06-INTERACTIONS.md section 3), drag and the pull tab
 //! (sections 6 and 9.2), and the pulse's A/B alternation (design/05-MOTION.md section 9).
 
-use ds::components::vocab::StaggerIndex;
+use ds::StaggerIndex;
 use ds::motion::drag::fraction_along;
 use ds::overlay::{Pull, PullTab, TabArm};
 use ds::{
