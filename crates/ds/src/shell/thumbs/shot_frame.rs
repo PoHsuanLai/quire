@@ -1,8 +1,8 @@
-//! Where a screenshot thumbnail's picture sits (design/04-COMPONENTS.md section 39): the card
-//! is `width` across, the picture box inside a 4 px mat takes the picture's own ratio held
-//! between 2:1 and 16:10, and the picture is fitted into that box, centred, so a picture outside
-//! those ratios is letterboxed on the material. Computed here rather than left to
-//! `object-fit`, so the box the host sizes its surface for is a number a test can read.
+//! The shape of a screenshot thumbnail's card (design/04-COMPONENTS.md section 39): the card is
+//! `width` across, the picture box inside a 4 px mat takes the picture's own ratio held between
+//! 2:1 and 16:10, and the picture is fitted into that box, centred, so a picture outside those
+//! ratios is letterboxed on the material. Computed here rather than left to `object-fit`, so the
+//! box the host sizes its surface for is a number a test can read.
 
 use crate::components::content::image_source::ImageSize;
 use crate::core::geometry::units::{Point, Px, Rect, Size};
@@ -82,45 +82,43 @@ fn fit(room: Size, ratio: Option<f32>) -> Rect {
     }
 }
 
-/// The picture's inline placement, in whole hundredths of a pixel.
-pub(crate) fn picture_style(picture: Rect) -> String {
-    format!(
-        "left:{}px;top:{}px;width:{}px;height:{}px",
-        round(picture.left()),
-        round(picture.top()),
-        round(picture.size.width),
-        round(picture.size.height)
-    )
-}
-
-fn round(px: Px) -> f32 {
-    (px.0 * 100.0).round() / 100.0
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{MAT, picture_style, shot_frame};
+    use super::{MAT, shot_frame};
     use crate::components::content::image_source::ImageSize;
-    use crate::core::geometry::units::Px;
+    use crate::core::geometry::units::{Point, Px, Rect, Size};
     use crate::style::tokens::spacing::SpacingToken;
+
+    fn rect(left: f32, top: f32, width: f32, height: f32) -> Rect {
+        Rect {
+            origin: Point {
+                x: Px(left),
+                y: Px(top),
+            },
+            size: Size {
+                width: Px(width),
+                height: Px(height),
+            },
+        }
+    }
 
     #[test]
     fn the_box_follows_the_picture_between_two_to_one_and_sixteen_to_ten() {
-        // (width, picture, card height, picture's placement)
+        // (width, picture, card height, the picture's rect in the card)
         #[rustfmt::skip]
         let cases = [
             // 16:9, inside the range: the box is the picture, no bars.
-            (240.0, (1920, 1080), 138.5, "left:4px;top:4px;width:232px;height:130.5px"),
+            (240.0, (1920, 1080), 138.5, rect(4.0, 4.0, 232.0, 130.5)),
             // 16:10 exactly.
-            (240.0, (1440, 900), 153.0, "left:4px;top:4px;width:232px;height:145px"),
+            (240.0, (1440, 900), 153.0, rect(4.0, 4.0, 232.0, 145.0)),
             // Portrait: the box stops at 16:10 and the picture is pillarboxed.
-            (240.0, (900, 1800), 153.0, "left:83.75px;top:4px;width:72.5px;height:145px"),
+            (240.0, (900, 1800), 153.0, rect(83.75, 4.0, 72.5, 145.0)),
             // A panorama: the box stops at 2:1 and the picture is letterboxed.
-            (240.0, (4000, 1000), 124.0, "left:4px;top:33px;width:232px;height:58px"),
+            (240.0, (4000, 1000), 124.0, rect(4.0, 33.0, 232.0, 58.0)),
             // No pixels: the picture fills a 16:10 box.
-            (240.0, (0, 0), 153.0, "left:4px;top:4px;width:232px;height:145px"),
+            (240.0, (0, 0), 153.0, rect(4.0, 4.0, 232.0, 145.0)),
             // Another width scales the same way.
-            (320.0, (1920, 1200), 203.0, "left:4px;top:4px;width:312px;height:195px"),
+            (320.0, (1920, 1200), 203.0, rect(4.0, 4.0, 312.0, 195.0)),
         ];
         for (width, (w, h), card, want) in cases {
             let frame = shot_frame(
@@ -135,7 +133,15 @@ mod tests {
                 (frame.card.height.0 - card).abs() < 0.01,
                 "{w}x{h}: {frame:?}"
             );
-            assert_eq!(picture_style(frame.picture), want, "{w}x{h}");
+            let close = |got: Px, want: Px| (got.0 - want.0).abs() < 0.01;
+            assert!(
+                close(frame.picture.left(), want.left())
+                    && close(frame.picture.top(), want.top())
+                    && close(frame.picture.size.width, want.size.width)
+                    && close(frame.picture.size.height, want.size.height),
+                "{w}x{h}: {:?}",
+                frame.picture
+            );
         }
     }
 

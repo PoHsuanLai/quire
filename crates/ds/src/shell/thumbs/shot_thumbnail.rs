@@ -19,7 +19,7 @@
 //! anchor), so a `BannerStack` or the caller's surface decides where it sits.
 
 use crate::components::content::image_source::{ImageSize, ImageSource};
-use crate::components::content::shot_frame::{picture_style, shot_frame};
+use crate::components::content::picture_fit::picture_style;
 use crate::components::content::text_runs::TextLine;
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::controls::press::Propagation;
@@ -36,6 +36,7 @@ use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::notifications::parts::Hover;
 use crate::shell::notifications::swipe::{CardSwipe, NotificationSwipe, use_card_swipe};
+use crate::shell::thumbs::shot_frame::shot_frame;
 use crate::shell::thumbs::shot_press::{DragLane, DragStart, PressInput, ShotPress};
 use crate::style::appearance::material::Material;
 use crate::style::icon::Icon;

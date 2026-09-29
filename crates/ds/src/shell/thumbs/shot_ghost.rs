@@ -5,10 +5,11 @@
 //! motion: a drag icon follows the pointer, it does not arrive.
 
 use crate::components::content::image_source::{ImageSize, ImageSource};
-use crate::components::content::shot_frame::{picture_style, shot_frame};
+use crate::components::content::picture_fit::picture_style;
 use crate::core::geometry::units::Px;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
+use crate::shell::thumbs::shot_frame::shot_frame;
 use crate::style::appearance::material::Material;
 use dioxus::prelude::*;
 
