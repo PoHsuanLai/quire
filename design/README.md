@@ -31,6 +31,7 @@ against them.
 | `27-HIG-PARITY.md` | Audit against the pre-2025 (macOS 14/15) HIG: archived snapshots, gaps ranked, a verdict and rule per HIG page, proposed waves H0-H7. |
 | `28-CUSTOMIZATION.md` | What the person chooses and places: every surface where the reference lets people pick items, order and place (widgets, launcher categories, control center and bar, dock, toolbars, share, previewers, actions, sidebars, notifications), the shared Registry/Placement/Picker pattern, D-Bus registration, order of work. |
 | `29-SIZING.md` | Draft: an audit of control heights, spacing and radii (quire and sill's bar and control center), the reference numbers with confidence, three principled systems with mockups, a recommendation, and the dark Monochrome/Muted plate fix. |
+| `30-CATALOGUE.md` | The settled inventory: foundations (timing, motion and interaction primitives, state vocabulary, size ladder), every component with its AppKit counterpart, the Mac and Arc Looks, the drop list, the deferred items. Wins over 04, 05, 07 and 21 where they disagree. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
 ## 2. Reading order
@@ -41,7 +42,8 @@ against them.
 4. `07-LOOKS.md`, `08-ICONS.md`, `09-ARC-HEURISTICS.md`, `21-SPACES.md` (the look and the workflow around them).
 5. The BEHAVIOUR doc for what you build (`10`-`13`).
 6. `20-SURFACES.md` for your surface's row; `26-DETAILS.md` for its elements' state details.
-7. `CHECKLIST.md` before asking for review.
+7. `30-CATALOGUE.md` before building or changing any component, primitive or Look.
+8. `CHECKLIST.md` before asking for review.
 
 An agent brief names the sections to read; it does not replace this order for new readers.
 

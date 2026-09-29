@@ -1,5 +1,8 @@
 # 05 Motion
 
+> **Superseded in part by `30-CATALOGUE.md`.** 30 section 1.1-1.3 replace: section 2 principles on springs and overshoot, section 3 (all timing tokens, motion levels Calm and Extra, per-Look tables), section 4 (the keyframe catalogue: only keyframes 30 names survive), section 5 assignments, section 8 exits, section 10 shell motion, section 12 (open decisions on levels and looks), and section 14.2 and 14.5 (spring tokens, Reduced). One motion model, the macOS one; levels are Standard and Reduced only. Where this file and 30 disagree, 30 wins.
+
+
 Status: draft for review, 2026-09-23. Extracted from the two prototypes; nothing here is new
 design except where a row says **proposed**. `S` = `~/mailo-design/mailo-spaces.html`
 (newest; wins every conflict), `C` = `~/mailo-design/mailo-charm.html`, `B` =
