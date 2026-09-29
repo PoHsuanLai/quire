@@ -6,12 +6,12 @@
 //! check on each new landing, and the new row rises in.
 
 use crate::components::widget_kind::WidgetHost;
-use crate::detail::Touch;
+use crate::detail::touch::Touch;
 use crate::widget::contract::WidgetKind;
 use crate::widget::layout::WidgetLayout;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use crate::catalog::PlacementId;
+use crate::catalog::placement::PlacementId;
 
 /// The Add the person pressed, waiting for its placement to appear.
 #[derive(Debug, Clone, PartialEq)]
@@ -94,9 +94,9 @@ impl Book {
 mod tests {
     use super::{Asked, Book, Landing};
     use crate::components::widget_kind::{WidgetHost, WidgetSize};
-    use crate::detail::{Contact, Touch};
+    use crate::detail::touch::{Contact, Touch};
     use crate::widget::layout::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-    use crate::widget::{BatteryWidget, MonthWidget, Widget};
+    use crate::widget::{battery::BatteryWidget, calendar::MonthWidget, contract::Widget};
 
     const GRID: DesktopGrid = DesktopGrid {
         columns: 4,
@@ -105,7 +105,7 @@ mod tests {
 
     fn add(
         layout: &WidgetLayout,
-        kind: crate::widget::WidgetKind,
+        kind: crate::widget::contract::WidgetKind,
         host: WidgetHost,
     ) -> WidgetLayout {
         let edit = WidgetEdit::Add {

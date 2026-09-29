@@ -1,6 +1,6 @@
 //! Chord: a shortcut as plain text, the way Spotlight hints at an action's keys ("Reveal in
 //! Files ⌘R"): the glyphs in a row, no key caps, no border, in the secondary ink at the size of
-//! the words beside it. [`Kbd`](crate::Kbd) stays the boxed key caps for a keyboard legend.
+//! the words beside it. [`Kbd`](crate::components::kbd::Kbd) stays the boxed key caps for a keyboard legend.
 
 use crate::components::vocab::Shortcut;
 use dioxus::prelude::*;

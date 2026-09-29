@@ -9,9 +9,8 @@ use crate::components::row_chord::RowChord;
 use crate::components::row_shape::RowShape;
 use crate::components::text_runs::Text;
 use crate::components::vocab::{Availability, Check, Shortcut};
-use crate::icon::{Icon, IconSource};
+use crate::icon::{Icon, external::IconSource};
 
-pub(crate) use crate::components::menu_match::fuzzy;
 
 /// The tile at an item's start.
 #[derive(Debug, Clone, PartialEq)]

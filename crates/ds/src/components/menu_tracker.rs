@@ -11,12 +11,15 @@
 use crate::components::menu_lines::{Act, Choice};
 use crate::components::vocab::Availability;
 use crate::geometry::measure::client_rect;
-use crate::geometry::{MountedRef, Point, Px, Rect, Size};
-use crate::overlay::menu_track::{
+use crate::geometry::{
+    measure::MountedRef,
+    units::{Point, Px, Rect, Size},
+};
+use crate::overlay::menu_track::types::{
     Branch, ItemPath, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
     MenuTrackEvent, Pickable, Submenu,
 };
-use crate::time::{FRAME_SLACK, sleep};
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::prelude::*;
 
 /// How a submenu was asked for: by the keyboard it takes the focus, by the pointer it leaves
@@ -193,7 +196,7 @@ impl Tracker {
     fn feed(&self, event: MenuTrackEvent<()>) {
         let mut track = self.track;
         let current = track.peek().clone();
-        let (next, effects) = current.step(event, crate::time::now());
+        let (next, effects) = current.step(event, crate::time::clock::now());
         track.set(next);
         for effect in effects {
             self.apply(effect);
@@ -223,7 +226,7 @@ impl Tracker {
             MenuTrackEffect::RequestTick(at) => {
                 let tracker = *self;
                 spawn(async move {
-                    sleep(at.saturating_duration_since(crate::time::now())).await;
+                    sleep(at.saturating_duration_since(crate::time::clock::now())).await;
                     tracker.feed(MenuTrackEvent::Tick);
                 });
             }

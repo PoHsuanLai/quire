@@ -1,14 +1,14 @@
 //! One `.ds[data-material=…]` block per material and scheme, and the `data-blur` switch
 //! between `--m-tint` and `--m-tint-solid`.
 //!
-//! The paint rules come last: a root or [`crate::Surface`] with a material paints the solid tint
-//! unless it says `data-blur=on`, which is the safe default of [`crate::BlurState`]. The
+//! The paint rules come last: a root or [`crate::root::surface::Surface`] with a material paints the solid tint
+//! unless it says `data-blur=on`, which is the safe default of [`crate::material::blur::BlurState`]. The
 //! material's edge and drop are painted as one `box-shadow` naming only the layers that are not
 //! `none` (a `var(--m-edge),var(--m-shadow)` list would be invalid whenever either is), so the
 //! colours stay in the `--m-*` declarations. That list is `--m-box`, so a card inside a
 //! transparent root paints the same edge and drop.
 //!
-//! Then the root chrome (`crate::RootChrome`, `crate::FrameTint`): a window's root
+//! Then the root chrome (`crate::root::chrome::RootChrome`, `crate::root::chrome::FrameTint`): a window's root
 //! (`data-frame=opaque`) is its own stacking context, so its frame layers and grain paint over
 //! its background; a root drawing the tinted
 //! frame (`data-frame=tinted`) paints no tint of its own, and its `.ds-frame` group shows the
@@ -17,13 +17,13 @@
 //! `.ds-sheet` cards paint the material's tint, edge and drop instead.
 
 use super::emit::{attr_selector, declaration, presence_selector, property, rule};
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::material::layer::{Layer, joined};
 use crate::material::level::level_css;
 use crate::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, flat_tint, layers, tint};
 use crate::material::stack::VIBRANCY;
-use crate::material::{Material, recipe};
-use crate::tokens::{Hex, VarName, ZLayer};
+use crate::material::{material::Material, recipe::recipe};
+use crate::tokens::{hex::Hex, layer::ZLayer, name::VarName};
 
 /// The variable a root writes inline with `appearance.material_tint_alpha` as a fraction
 /// (`.8` at the default). Absent, every tint is section 17.2's own.
@@ -76,7 +76,7 @@ pub fn materials_css() -> String {
     css
 }
 
-/// The OSD card (`crate::Osd`): a card inside a transparent Osd root that
+/// The OSD card (`crate::components::osd::Osd`): a card inside a transparent Osd root that
 /// paints what a tinted root paints on its own box (its `.ds-frame` group at the frame alpha, the
 /// solid floor without blur, the inner pair redrawn over it), so one root serves both the fade and
 /// the card's tokens.
@@ -200,7 +200,7 @@ fn selector(material: Material, scheme: Scheme) -> String {
 fn declarations(material: Material, scheme: Scheme) -> Vec<String> {
     let recipe = recipe(material, scheme, DEFAULT_TINT_ALPHA);
     // `base x key / default`: the key's default reproduces the recipe's own value.
-    let scaled = |base: crate::tokens::Alpha| {
+    let scaled = |base: crate::tokens::hex::Alpha| {
         format!(
             "calc({}*var({},{default})/{default})",
             base.css(),

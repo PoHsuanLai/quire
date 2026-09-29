@@ -6,7 +6,7 @@
 //! pointer and select that one in turn.
 
 use crate::components::palette_rows::Revision;
-use crate::geometry::MountedRef;
+use crate::geometry::measure::MountedRef;
 use crate::geometry::reveal::reveal;
 use crate::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};

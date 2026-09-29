@@ -5,7 +5,7 @@
 
 use super::name::VarName;
 use super::tuned::{Tuned, px};
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 
 /// `--osd-margin`: the card's gap from the edge it is anchored to (`osd.margin_px`, 24).
 pub const MARGIN: Tuned = Tuned {
@@ -43,7 +43,7 @@ impl OsdMetrics {
 #[cfg(test)]
 mod tests {
     use super::{OSD_TOKENS, OsdMetrics};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     #[test]
     fn the_default_writes_what_the_stylesheet_falls_back_to() {

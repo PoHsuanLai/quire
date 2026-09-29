@@ -2,21 +2,26 @@
 //! pointer and key handling, and the submenu it opens (design/13-BEHAVIOUR-menus-windows.md
 //! section 13.3.4). `Menu` is the root panel; [`SubMenu`] is every panel below it.
 
-use crate::components::menu::MenuKind;
 use crate::components::menu_cursor::{Cursor, highlighted, seed};
 use crate::components::menu_entry::MenuEntry;
 use crate::components::menu_item::client_point;
 use crate::components::menu_keys::{Child, Decision, Level, decide};
-use crate::components::menu_lines::{
-    Act, Choice, Filter, KeyAct, Line, choices, key_act, lines, liveness,
-};
+use crate::components::menu_kind::MenuKind;
 use crate::components::menu_rows::{Drawn, RowsMotion, render_lines};
 use crate::components::menu_tracker::{Tracker, Via, target, use_tracker};
 use crate::components::popover::{Stacking, layer_slug, position_style, use_float};
 use crate::components::press::Press;
-use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
-use crate::overlay::menu_track::{MenuTarget, MenuTiming};
-use crate::tokens::ZLayer;
+use crate::components::{
+    menu_filter::Filter,
+    menu_lines::{Act, Choice, KeyAct, Line, choices, key_act, lines, liveness},
+};
+use crate::geometry::{
+    measure::MountedRef,
+    placement::{Align, Placement, Side},
+    units::{Point, Px, Rect},
+};
+use crate::overlay::menu_track::types::{MenuTarget, MenuTiming};
+use crate::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
 /// How far a submenu sits from its parent panel (design/13 section 13.3.4: "gap 2").

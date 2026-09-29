@@ -5,11 +5,11 @@ use crate::components::icon_view::IconView;
 use crate::components::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::press::{Press, PressListeners, Propagation};
 use crate::components::vocab::{Availability, Switch};
-use crate::detail::{Cue, FirstShow, use_nudge};
-use crate::geometry::Px;
+use crate::detail::{cue::Cue, first_show::FirstShow, once::use_nudge};
+use crate::geometry::units::Px;
 use crate::icon::external::IconSource;
 use crate::icon::render::IconSize;
-use crate::tokens::VarName;
+use crate::tokens::name::VarName;
 use dioxus::prelude::*;
 
 /// Which icon button.
@@ -82,8 +82,8 @@ impl IconButtonVariant {
 /// new Attention cue lifts the glyph once (`nudge-up`, `use_nudge`), never the pill, and nothing
 /// under Reduced. Pass it for the button's whole life (`None` to `Some` remounts the glyph).
 ///
-/// [`DataName::parse`]: crate::DataName::parse
-/// [`ExtraClass::parse`]: crate::ExtraClass::parse
+/// [`DataName::parse`]: crate::components::pass_through::DataName::parse
+/// [`ExtraClass::parse`]: crate::components::pass_through::ExtraClass::parse
 #[component]
 pub fn IconButton(
     variant: IconButtonVariant,
@@ -221,7 +221,7 @@ impl Default for StatusMetrics {
 #[cfg(test)]
 mod tests {
     use super::StatusMetrics;
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     #[test]
     fn the_metrics_write_both_properties() {

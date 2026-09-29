@@ -21,12 +21,15 @@ use crate::components::palette_reveal::Reveal as Stops;
 use crate::components::palette_shown::Change;
 use crate::components::palette_stops::ShownGroup;
 use crate::components::vocab::StaggerIndex;
-use crate::detail::{RevealCue, Revealing, use_rise_on};
-use crate::geometry::Px;
+use crate::detail::reveal::{RevealCue, Revealing, use_rise_on};
 use crate::geometry::measure::{BUSY_ATTEMPTS, laid_out_rect};
-use crate::motion::{Anim, MotionTimer, TimerPhase, use_motion_timer};
+use crate::geometry::units::Px;
+use crate::motion::{
+    anim::Anim,
+    timer::{MotionTimer, TimerPhase, use_motion_timer},
+};
 use crate::task::spawn_in;
-use crate::time::{FRAME_SLACK, sleep};
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 
@@ -91,7 +94,7 @@ impl std::fmt::Debug for PaletteHandle {
     }
 }
 
-/// A handle a caller keeps across renders, like [`use_field_handle`](crate::use_field_handle)'s.
+/// A handle a caller keeps across renders, like [`use_field_handle`](crate::focus::field::use_field_handle)'s.
 pub fn use_palette_handle() -> PaletteHandle {
     PaletteHandle(use_action_book())
 }
@@ -352,7 +355,7 @@ async fn span(stops: Stops, first: usize, last: usize) -> Option<Px> {
 #[cfg(test)]
 mod tests {
     use super::{Span, healed_by};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     #[test]
     fn show_less_heals_by_the_share_of_the_span_it_removes() {

@@ -12,8 +12,8 @@
 use super::family::{NEUTRAL_DARK, PlateFamily};
 use super::retint::{IconStyle, Tint, recolour};
 use super::tone_band::Tone;
-use crate::appearance::Scheme;
-use crate::tokens::{Hex, VarName};
+use crate::appearance::theme::Scheme;
+use crate::tokens::{hex::Hex, name::VarName};
 
 /// How a plate is re-coloured: `icons.style` when it is not Colour.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -132,11 +132,11 @@ pub(crate) fn tint_style(family: PlateFamily, tint: PlateTint) -> String {
 #[cfg(test)]
 mod tests {
     use super::{PlateStops, PlateTint, tint_style};
-    use crate::appearance::Scheme;
+    use crate::appearance::theme::Scheme;
     use crate::icon::family::PlateFamily;
     use crate::icon::retint::{IconStyle, Tint};
-    use crate::space::PRESETS;
-    use crate::tokens::Hex;
+    use crate::space::presets::PRESETS;
+    use crate::tokens::hex::Hex;
 
     fn hue_and_chroma(colour: Hex) -> Tint {
         Tint::from_hex(&colour.css()).expect("a hex colour")

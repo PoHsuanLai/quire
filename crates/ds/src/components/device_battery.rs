@@ -13,7 +13,13 @@ use crate::components::battery_ring::{Span, arc_path};
 use crate::components::text_runs::Text;
 use crate::components::vocab::Fraction;
 use crate::detail::{
-    CountPace, Detailed, FirstShow, Moment, Touch, use_count_up, use_detail, use_sweep,
+    count_up::{CountPace, use_count_up},
+    detailed::Detailed,
+    first_show::FirstShow,
+    moment::Moment,
+    sweep::use_sweep,
+    touch::Touch,
+    use_detail::use_detail,
 };
 use dioxus::prelude::*;
 
@@ -104,7 +110,10 @@ pub fn DeviceBattery(
 mod tests {
     use super::Reading;
     use crate::components::battery_level::RingMark;
-    use crate::detail::{Moment, first_table, moment_table};
+    use crate::detail::{
+        detailed::{first_table, moment_table},
+        moment::Moment,
+    };
 
     #[test]
     fn a_ring_moves_only_for_what_it_prints() {

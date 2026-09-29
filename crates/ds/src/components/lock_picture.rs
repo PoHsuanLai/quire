@@ -3,7 +3,11 @@
 //! the prompt's mood. Every kind plays the accept beat when the mood turns Happy.
 
 use crate::components::avatar::AvatarSize;
-use crate::components::user_picture::{Drawn, FaceAt, Liveliness, PictureSize, Sizes, UserPicture};
+use crate::components::user_picture::{
+    mood::PictureSize,
+    picture::UserPicture,
+    portrait::{Drawn, FaceAt, Liveliness, Sizes},
+};
 use dioxus::prelude::*;
 
 /// The lock screen's: 64 for all three.

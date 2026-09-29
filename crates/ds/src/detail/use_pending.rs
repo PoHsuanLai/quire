@@ -5,7 +5,7 @@ use super::level::{Level, use_level};
 use super::operation::{Operation, PendingToken};
 use super::pending::{PendingFrame, PendingSpec, frame_at, next_due};
 use crate::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 

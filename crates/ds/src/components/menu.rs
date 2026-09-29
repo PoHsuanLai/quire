@@ -16,7 +16,6 @@ use crate::components::menu_cursor::Cursor;
 use crate::components::menu_entry::MenuEntry;
 use crate::components::menu_filter::filter_row;
 use crate::components::menu_keys::{Decision, Level};
-use crate::components::menu_lines::{Act, Choice, Filter, KeyAct, choices, key_act, lines};
 use crate::components::menu_panel::Panel;
 use crate::components::menu_pick::{Closing, Gesture, PickDismiss, kept_focus, picker};
 use crate::components::menu_return::hand_back;
@@ -25,13 +24,17 @@ use crate::components::menu_tracker::{Tracker, Via, use_tracker};
 use crate::components::popover::{escape_closes, use_float};
 use crate::components::press::{PointerButton, Press, button_of};
 use crate::components::vocab::Availability;
-use crate::geometry::{Anchor, MountedRef};
+use crate::components::{
+    menu_filter::Filter,
+    menu_lines::{Act, Choice, KeyAct, choices, key_act, lines},
+};
+use crate::geometry::measure::{Anchor, MountedRef};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::motion::presence::Presence;
 use crate::motion::timer::use_motion_timer;
-use crate::overlay::menu_track::MenuTiming;
-use crate::tokens::ZLayer;
+use crate::overlay::menu_track::types::MenuTiming;
+use crate::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
 /// A floating list of choices. `timing` is the submenu delay and safe-triangle timeout, read

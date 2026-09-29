@@ -4,7 +4,7 @@
 use crate::components::vocab::DropState;
 use crate::file_drop::drag::{DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop};
 use crate::file_drop::track::{DragTrack, Over, Step, TargetView, acceptance, step, target_view};
-use crate::geometry::Point;
+use crate::geometry::units::Point;
 use dioxus::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -14,7 +14,7 @@ use std::rc::Rc;
 pub type DropHitTest = fn(targets: &[Rc<MountedData>], point: Point) -> DropHit;
 
 /// The host's file-drag seam, provided as root context by ds-native (`launch`'s window and the
-/// harness): every mounted [`use_file_drop`](crate::use_file_drop) target enters it, and the host
+/// harness): every mounted [`use_file_drop`](crate::file_drop::hook::use_file_drop) target enters it, and the host
 /// feeds it the drag as the platform reports it.
 #[derive(Clone)]
 pub struct HostFileDrop {

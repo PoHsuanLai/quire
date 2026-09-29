@@ -43,7 +43,7 @@ impl Armed {
         match touch {
             Touch::Contact(contact) => self
                 .press
-                .set(Some((contact, Hold::Since(crate::time::now())))),
+                .set(Some((contact, Hold::Since(crate::time::clock::now())))),
             Touch::Remote => {}
         }
     }
@@ -53,7 +53,7 @@ impl Armed {
         match *self.press.peek() {
             Some((contact, Hold::Operation)) => Touch::Contact(contact),
             Some((contact, Hold::Since(at)))
-                if crate::time::since(at) <= Deadline::cap().length() =>
+                if crate::time::clock::since(at) <= Deadline::cap().length() =>
             {
                 Touch::Contact(contact)
             }

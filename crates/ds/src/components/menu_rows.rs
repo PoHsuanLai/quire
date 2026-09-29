@@ -11,7 +11,7 @@ use crate::components::press::Press;
 use crate::components::row_chord::NO_CHORD;
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::{Selection, StaggerIndex, Switch};
-use crate::geometry::Point;
+use crate::geometry::units::Point;
 use dioxus::prelude::*;
 
 /// What a panel draws around its choices: the selection, the choice whose submenu is open,

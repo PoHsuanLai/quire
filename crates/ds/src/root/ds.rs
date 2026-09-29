@@ -46,20 +46,22 @@ use super::env::{Env, HostModality, InputModality, use_env_provider};
 use super::extent::RootExtent;
 use super::scale::use_root_scale;
 use super::typeface::{use_typeface, use_typeface_provider};
-use crate::appearance::{Appearance, SystemPrefs, Typeface, resolve};
+use crate::appearance::{
+    appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
+};
 use crate::components::toast::ToastHost;
 use crate::components::window_frame::{WindowFrame, framed};
 use crate::focus::click::ClickRoot;
-use crate::geometry::Scale;
+use crate::geometry::scale::Scale;
 use crate::material::recipe::DEFAULT_TINT_ALPHA;
-use crate::material::{BlurState, Material, MaterialStack};
+use crate::material::{blur::BlurState, material::Material, stack::MaterialStack};
 use crate::overlay::host::{OverlayHost, use_overlays_provider};
 use crate::overlay::hover_hub::{HoverWarmth, use_hover_hub_provider};
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
-use crate::space::{FrameVars, SpaceLook};
+use crate::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::tokens::hex::Alpha;
-use crate::tokens::{Corner, PixelToken};
+use crate::tokens::{pixel::PixelToken, shape::Corner};
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -155,7 +157,7 @@ pub fn Ds(
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
             onclick: move |event: MouseEvent| click_root.clicked(&event),
             if stylesheet == Inject::Inline {
-                style { {crate::css::stylesheet()} }
+                style { {crate::css::stylesheet::stylesheet()} }
             }
             match frame_tint {
                 FrameTint::Opaque => frame_layers(layers),

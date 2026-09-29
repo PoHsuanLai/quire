@@ -6,7 +6,10 @@ use super::cue::Cue;
 use super::first_show::FirstShow;
 use super::moment::Moment;
 use crate::components::vocab::StaggerIndex;
-use crate::motion::{Anim, TimerPhase, use_motion_timer};
+use crate::motion::{
+    anim::Anim,
+    timer::{TimerPhase, use_motion_timer},
+};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -107,7 +110,7 @@ pub fn Reveal(first: FirstShow, children: Element) -> Element {
 #[cfg(test)]
 mod tests {
     use super::RevealCue;
-    use crate::detail::{Cue, FirstShow, Moment, Touch};
+    use crate::detail::{cue::Cue, first_show::FirstShow, moment::Moment, touch::Touch};
 
     #[test]
     fn only_an_appear_or_an_opening_is_a_rise() {

@@ -4,9 +4,12 @@
 //! an inner shade, and the glyph inside is two-toned: the well's ink on the well, a dark ink on
 //! the fill. Declared per scheme on `.ds`, so a `Surface` forcing a scheme gets its own.
 
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::css::emit::{attr_selector, declaration, rule};
-use crate::tokens::{Alpha, Colour, Hex, VarName};
+use crate::tokens::{
+    hex::{Alpha, Colour, Hex},
+    name::VarName,
+};
 
 /// `--m-level-fill`: the filled part and the knob.
 pub(crate) const FILL: VarName = VarName("--m-level-fill");

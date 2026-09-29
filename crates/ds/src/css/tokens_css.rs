@@ -6,7 +6,7 @@
 //! so every name a dark or level block sets is also declared on `.ds` (tests/tokens.rs).
 
 use super::emit::{attr_selector, declaration, rule};
-use crate::appearance::{MotionLevel, Scheme, Typeface};
+use crate::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
 use crate::icon::family::{PLATE_GLYPH, PLATE_INSET};
 use crate::tokens::dock::DOCK_TOKENS;
 use crate::tokens::emoji_face::{FONT_EMOJI, FONT_EMOJI_STACK};
@@ -15,12 +15,26 @@ use crate::tokens::osd::OSD_TOKENS;
 use crate::tokens::shell::SHELL_TOKENS;
 use crate::tokens::size_vars::size_tokens;
 use crate::tokens::widgets::WIDGET_TOKENS;
-use crate::tokens::{CONTROL_CENTER, SHELL_SCALE};
 use crate::tokens::{
-    ColourToken, DelayToken, DurationToken, EasingToken, Family, FontSize, HueMember, LabelHue,
-    OpacityToken, PersonSwatch, PixelToken, Radius, ScalarToken, Shadow, SpacingToken, VarName,
-    VoiceToken, Voiced, WidgetPaint, ZLayer,
+    colour::ColourToken,
+    delay::DelayToken,
+    easing::EasingToken,
+    elevation::Shadow,
+    label_hue::{HueMember, LabelHue},
+    layer::ZLayer,
+    name::VarName,
+    opacity::OpacityToken,
+    person::PersonSwatch,
+    pixel::PixelToken,
+    scalar::ScalarToken,
+    shape::Radius,
+    spacing::SpacingToken,
+    timing::DurationToken,
+    type_scale::{Family, FontSize, Voiced},
+    type_voice::VoiceToken,
+    widget_paint::WidgetPaint,
 };
+use crate::tokens::{control_center::CONTROL_CENTER, shell_scale::SHELL_SCALE};
 
 /// Colours, radii, spacing, shadows, type, z and Standard motion on `.ds`; the dark colours under
 /// `.ds[data-theme=dark]`; the level overrides under `.ds[data-motion]`.

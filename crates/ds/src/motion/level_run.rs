@@ -1,13 +1,16 @@
 //! A level swept from one value to another as pure arithmetic: what a frame `elapsed` into the
 //! sweep draws (design/23-WIDGETS.md section 4.1, the battery ring's fill). The hook that owns
-//! the clock is [`crate::motion::use_level_run`]; everything it decides is here, so a table pins it.
+//! the clock is [`crate::motion::use_level_run::use_level_run`]; everything it decides is here, so a table pins it.
 //!
 //! A sweep's time is the sweep itself, eased, then a tail in which what waits for the level to
 //! arrive (the charging bolt) fades in, linearly.
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::Fraction;
-use crate::tokens::{DurationToken, Easing, EasingToken};
+use crate::tokens::{
+    easing::{Easing, EasingToken},
+    timing::DurationToken,
+};
 use std::time::Duration;
 
 /// Whole, in the thousandths [`Fraction`] counts.
@@ -163,9 +166,9 @@ pub fn level_at(run: LevelRun, progress: Fraction) -> Fraction {
 #[cfg(test)]
 mod tests {
     use super::{LevelRun, RunFrame, RunPhase, RunTail, RunTokens, frame_at, phase_at};
-    use crate::appearance::MotionLevel;
+    use crate::appearance::motion::MotionLevel;
     use crate::components::vocab::Fraction;
-    use crate::tokens::{DurationToken, EasingToken};
+    use crate::tokens::{easing::EasingToken, timing::DurationToken};
     use std::time::Duration;
 
     const TOKENS: RunTokens = RunTokens {

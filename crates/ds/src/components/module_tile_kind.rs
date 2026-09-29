@@ -1,7 +1,7 @@
 //! The words a `ModuleTile` is described in: whether the module is on, whether it has a detail
 //! pane, and how many grid columns it takes.
 
-use crate::detail::{Detailed, Moment};
+use crate::detail::{detailed::Detailed, moment::Moment};
 use crate::icon::Icon;
 
 /// Where a module is: off, on, or on its way (connecting, scanning).

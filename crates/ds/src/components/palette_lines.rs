@@ -1,7 +1,7 @@
 //! What the command palette lists and how its keys read: pure, beside `command_palette`.
 
-use crate::components::menu_entry::{MenuEntry, fuzzy};
 use crate::components::menu_lines::{Line, Step};
+use crate::components::{menu_entry::MenuEntry, menu_match::fuzzy};
 use dioxus::prelude::Key;
 
 /// What a key in the search field does to the palette.

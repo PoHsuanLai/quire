@@ -4,12 +4,12 @@
 //! empties it, and a `Wrong` arrival plays `shake-x` once and empties it when the shake settles
 //! ("Errors shake once and hold still", design/05 principle 7).
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::lock_vocab::PromptState;
 use crate::components::vocab::{PulseKey, StaggerIndex};
-use crate::motion::{Anim, settle};
+use crate::motion::{anim::Anim, settle::settle};
 use crate::root::env::Env;
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::prelude::*;
 
 /// Whether the field holds anything: the enter button shows only once it does.

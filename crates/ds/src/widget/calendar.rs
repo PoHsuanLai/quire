@@ -13,7 +13,7 @@ use crate::components::month_grid_data::{
 };
 use crate::components::text_runs::Text;
 use crate::components::widget_kind::{WidgetHost, WidgetSize};
-use crate::tokens::LabelHue;
+use crate::tokens::label_hue::LabelHue;
 use crate::widget::contract::{Widget, WidgetContext, WidgetKind};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};

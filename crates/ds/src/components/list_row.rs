@@ -6,7 +6,7 @@ use crate::components::row_star::star_button;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
 use crate::motion::presence::Presence;
-use crate::text::clip_chars;
+use crate::text::clip::clip_chars;
 use dioxus::prelude::*;
 
 /// How many characters of a name the name column holds before it must fade: the column at
@@ -176,7 +176,7 @@ pub fn ListRow(
 mod tests {
     use super::{NAME_BUDGET, NameFit, exit, row_style};
     use crate::components::vocab::StaggerIndex;
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
     use crate::motion::presence::{Exit, Presence};
 
     #[test]

@@ -2,15 +2,15 @@
 //! (design/04-COMPONENTS.md section 34).
 
 use crate::geometry::measure::client_rect;
-use crate::geometry::{Point, Rect};
-use crate::motion::DragReturn;
+use crate::geometry::units::{Point, Rect};
+use crate::motion::drag_return::DragReturn;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
 /// Where the ghost's corner sits relative to the pointer: `(x - 40, y - 18)` (`C:2053-2054`).
 const GHOST_OFFSET: Point = Point {
-    x: crate::geometry::Px(-40.0),
-    y: crate::geometry::Px(-18.0),
+    x: crate::geometry::units::Px(-40.0),
+    y: crate::geometry::units::Px(-18.0),
 };
 
 /// The ghost's `left` and `top` for a pointer at `at`.
@@ -87,7 +87,7 @@ pub fn Grip(label: String, onclick: EventHandler<Rect>) -> Element {
 #[cfg(test)]
 mod tests {
     use super::ghost_style;
-    use crate::geometry::{Point, Px};
+    use crate::geometry::units::{Point, Px};
 
     #[test]
     fn the_ghost_sits_up_and_left_of_the_pointer() {

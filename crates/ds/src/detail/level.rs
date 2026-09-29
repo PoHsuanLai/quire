@@ -1,6 +1,6 @@
 //! The motion level a detail plays at, read when it starts (R7 lives inside every primitive).
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::root::env::Env;
 use dioxus::prelude::*;
 

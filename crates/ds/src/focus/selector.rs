@@ -8,7 +8,7 @@
 use crate::focus::host::{Focused, focus_selecting};
 use crate::focus::select::Select;
 use crate::focus::targets::FocusTargets;
-use crate::time::{FRAME_SLACK, sleep};
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::prelude::*;
 use std::rc::Rc;
 

@@ -6,7 +6,7 @@ use super::types::{
     MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
     Submenu,
 };
-use crate::geometry::Point;
+use crate::geometry::units::Point;
 use std::time::Instant;
 
 /// The effects of one step, in order.

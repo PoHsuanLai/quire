@@ -5,14 +5,14 @@
 //! peek is the topmost layer) closes it, at once. Center plays `peek-in` over `--t-big
 //! --e-spring`; Full covers the card and plays it over `--t-move --e-out` (`Anim::PeekFullIn`).
 
-use crate::appearance::PeekMode;
+use crate::appearance::peek::PeekMode;
 use crate::components::icon_button::{IconButton, IconButtonVariant};
 use crate::components::popover::{Dismiss, Stacking, escape_closes, use_float};
 use crate::components::scrim::scrim_button;
 use crate::icon::Icon;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::tokens::ZLayer;
+use crate::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
 /// The `data-mode` word.

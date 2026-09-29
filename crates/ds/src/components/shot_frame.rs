@@ -5,7 +5,7 @@
 //! `object-fit`, so the box the host sizes its surface for is a number a test can read.
 
 use crate::components::image_source::ImageSize;
-use crate::geometry::{Point, Px, Rect, Size};
+use crate::geometry::units::{Point, Px, Rect, Size};
 
 /// The mat between the card's edge and the picture box: `--s-4`, which the stylesheet's picture
 /// radius subtracts from the card's.
@@ -101,8 +101,8 @@ fn round(px: Px) -> f32 {
 mod tests {
     use super::{MAT, picture_style, shot_frame};
     use crate::components::image_source::ImageSize;
-    use crate::geometry::Px;
-    use crate::tokens::SpacingToken;
+    use crate::geometry::units::Px;
+    use crate::tokens::spacing::SpacingToken;
 
     #[test]
     fn the_box_follows_the_picture_between_two_to_one_and_sixteen_to_ten() {

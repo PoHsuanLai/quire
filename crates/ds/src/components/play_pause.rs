@@ -7,8 +7,11 @@ use crate::components::button_size::disabled;
 use crate::components::now_playing_kind::Playback;
 use crate::components::press::{Press, PressListeners};
 use crate::components::vocab::Availability;
-use crate::detail::Touch;
-use crate::detail::{FirstShow, MorphGlyph, MorphStyle, use_armed, use_detail};
+use crate::detail::touch::Touch;
+use crate::detail::{
+    armed::use_armed, first_show::FirstShow, morph::MorphStyle, morph_glyph::MorphGlyph,
+    use_detail::use_detail,
+};
 use crate::icon::render::IconSize;
 use dioxus::prelude::*;
 

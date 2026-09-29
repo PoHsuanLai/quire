@@ -1,11 +1,12 @@
 //! The rest timer starts after the render, never from it, and two reconciles before the effect
 //! runs start one timer.
 
-use crate::appearance::{Accent, MotionLevel, Resolved, Scheme};
-use crate::material::{BlurState, Material};
-use crate::motion::{Presence, RowPitch, use_roster};
+use crate::appearance::{accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme};
+use crate::geometry::units::Px;
+use crate::material::{blur::BlurState, material::Material};
+use crate::motion::{presence::Presence, roster::RowPitch, use_roster::use_roster};
 use crate::root::env::Env;
-use crate::{InputModality, Px};
+use crate::root::env::InputModality;
 use dioxus::core::{NoOpMutations, VirtualDom};
 use dioxus::prelude::*;
 use std::cell::Cell;

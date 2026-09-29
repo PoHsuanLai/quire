@@ -9,7 +9,7 @@
 //! The machine decides; `use_swipe` owns the clock and the timers and draws the offset.
 
 use crate::components::vocab::Fraction;
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 use std::time::Duration;
 
 /// A speed in logical pixels per second.

@@ -1,6 +1,6 @@
 //! Settle: how a success lands (design/26-DETAILS.md section 3.2).
 
-use crate::components::Fraction;
+use crate::components::vocab::Fraction;
 use crate::components::vocab::PulseKey;
 
 /// How a success lands.

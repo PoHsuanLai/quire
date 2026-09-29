@@ -3,14 +3,14 @@
 //! its stop number (`palette_stops`). Split from `command_palette`.
 
 use crate::components::emoji_grid::{CellEvents, draw_cells, grid_style};
-use crate::components::menu::MenuKind;
+use crate::components::menu_kind::MenuKind;
 use crate::components::menu_lines::choices_len;
 use crate::components::menu_rows::{Drawn, render_lines};
 use crate::components::palette_motion::ListMotion;
 use crate::components::palette_stops::{Body, ShownGroup};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::vocab::Selection;
-use crate::geometry::Point;
+use crate::geometry::units::Point;
 use dioxus::prelude::*;
 
 /// What the drawn stops report, by stop number.

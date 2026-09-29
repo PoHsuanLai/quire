@@ -1,4 +1,4 @@
-//! An [`EditSurface`](crate::EditSurface) taking and giving up the keyboard. A press, Tab and
+//! An [`EditSurface`](crate::components::edit_surface::EditSurface) taking and giving up the keyboard. A press, Tab and
 //! `EditHandle::focus` all end in [`focused_in`]; a blur event and `EditHandle::blur` in
 //! [`focused_out`]: the app hears `on_focus`, the IME is switched and pointed, and the surface
 //! is the IME's target while it has the keyboard (FINDINGS "Edit surface").
@@ -8,11 +8,11 @@ use crate::components::edit_surface_state::write_soon;
 use crate::edit::composition::settle;
 use crate::edit::host::{HostEdit, ImeEvent, ImeSwitch, Probe};
 use crate::edit::pointer::EditFocus;
-use crate::focus::Select;
 use crate::focus::host::{blur_element, focus_soon_told};
-use crate::geometry::Rect;
+use crate::focus::select::Select;
 use crate::geometry::measure::BUSY_ATTEMPTS;
-use crate::time::{FRAME_SLACK, sleep};
+use crate::geometry::units::Rect;
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::prelude::*;
 use std::rc::Rc;
 

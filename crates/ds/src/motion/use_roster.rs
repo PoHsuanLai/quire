@@ -9,7 +9,7 @@ use super::settle::settle;
 use crate::components::vocab::{Emphasis, StaggerIndex};
 use crate::root::env::{Env, use_env_signal};
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -115,7 +115,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         try_set(self.state, next)
     }
 
-    pub(super) fn level(&self) -> Result<crate::appearance::MotionLevel, Gone> {
+    pub(super) fn level(&self) -> Result<crate::appearance::motion::MotionLevel, Gone> {
         Ok(try_get(self.env)?.resolved.motion)
     }
 }

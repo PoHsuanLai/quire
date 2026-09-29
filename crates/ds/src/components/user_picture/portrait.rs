@@ -3,12 +3,13 @@
 //! polkit prompts draw through [`Drawn`] at their own sizes.
 
 use super::accept::use_accept;
-use super::mood::{Mood, PictureSize, WakeStamp};
+use super::mood::{Mood, PictureSize};
 use super::picture::UserPicture;
 use crate::components::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::bump_on::bump_attrs;
 use crate::components::emoji::AnimatedEmoji;
 use crate::components::image_source::ImageSource;
+use crate::motion::wake::WakeStamp;
 use dioxus::prelude::*;
 
 /// The size a letter disc is drawn at.

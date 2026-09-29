@@ -6,7 +6,7 @@
 
 use crate::components::now_playing_kind::{Playback, PositionClock};
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use std::time::{Duration, Instant};
@@ -34,7 +34,7 @@ impl Ticker {
         if let Some(running) = try_get(self.task)? {
             running.cancel();
         }
-        try_set(self.origin, (report, crate::time::now()))?;
+        try_set(self.origin, (report, crate::time::clock::now()))?;
         try_set(self.task, None)?;
         if report.clock == PositionClock::Held {
             return Ok(());
@@ -49,7 +49,7 @@ impl Ticker {
     async fn run(self) -> Result<(), Gone> {
         loop {
             let (report, since) = try_get(self.origin)?;
-            let now = position(report, crate::time::since(since));
+            let now = position(report, crate::time::clock::since(since));
             if now >= report.length {
                 return Ok(());
             }
@@ -100,7 +100,7 @@ pub fn TrackPosition(
         clock: playback.clock(),
     };
     let ticker = Ticker {
-        origin: use_signal(|| (report, crate::time::now())),
+        origin: use_signal(|| (report, crate::time::clock::now())),
         beats: use_signal(|| 0),
         task: use_signal(|| None),
         scope: use_hook(current_scope_id),
@@ -116,7 +116,7 @@ pub fn TrackPosition(
     let _ = (ticker.beats)();
     let (anchored, since) = *ticker.origin.peek();
     let shown = if anchored == report {
-        position(report, crate::time::since(since))
+        position(report, crate::time::clock::since(since))
     } else {
         report.at
     };
@@ -149,7 +149,8 @@ pub fn TrackPosition(
 
 #[cfg(test)]
 mod tests {
-    use super::{PositionClock, Report, clock_text, position, to_next_second};
+    use super::{Report, clock_text, position, to_next_second};
+    use crate::components::now_playing_kind::PositionClock;
     use std::time::Duration;
 
     fn ms(n: u64) -> Duration {

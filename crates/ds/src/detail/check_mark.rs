@@ -4,7 +4,7 @@
 use super::settle::Settling;
 use crate::icon::render::IconSize;
 use crate::icon::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 /// The check's length on the 24-unit grid (`M20 6 9 17l-5-5`), for its dash.

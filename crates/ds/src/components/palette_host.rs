@@ -5,7 +5,7 @@
 use crate::components::popover::Float;
 use crate::components::tooltip::Shown;
 use crate::motion::anim::Anim;
-use crate::tokens::Corner;
+use crate::tokens::shape::Corner;
 use dioxus::prelude::*;
 
 /// Where the palette draws.

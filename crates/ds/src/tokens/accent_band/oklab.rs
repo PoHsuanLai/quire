@@ -1,7 +1,7 @@
 //! How far apart two swatches look: Euclidean distance in OKLab, for the picker's distinctness
 //! gate.
 
-use crate::tokens::Hex;
+use crate::tokens::hex::Hex;
 
 /// The OKLab distance between two colours (0 is identical; about 0.02 is a just-noticeable step).
 pub fn distance(one: Hex, other: Hex) -> f64 {

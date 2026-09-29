@@ -9,8 +9,8 @@ use super::spring::SpringPhase;
 use super::spring_spec::{SpringResponse, SpringSpec};
 use super::use_spring::{PxPerUnit, SpringMotion, use_spring_motion};
 use super::velocity::Velocity;
-use crate::detail::Touch;
-use crate::geometry::{Point, Px};
+use crate::detail::touch::Touch;
+use crate::geometry::units::{Point, Px};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -154,8 +154,9 @@ pub fn use_spring_point(target: Point, spec: SpringSpec) -> PointFrame {
 
 #[cfg(test)]
 mod tests {
-    use super::{PointThrow, Release, Velocity};
-    use crate::geometry::{Point, Px};
+    use super::{PointThrow, Release};
+    use crate::geometry::units::{Point, Px};
+    use crate::motion::velocity::Velocity;
 
     fn pt(x: f32, y: f32) -> Point {
         Point { x: Px(x), y: Px(y) }

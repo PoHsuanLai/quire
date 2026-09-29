@@ -10,8 +10,11 @@
 //! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
 
 use crate::components::vocab::{Selection, Switch};
-use crate::detail::Touch;
-use crate::motion::{PxPerUnit, SpringResponse, SpringSpec, use_spring};
+use crate::detail::touch::Touch;
+use crate::motion::{
+    spring_spec::{SpringResponse, SpringSpec},
+    use_spring::{PxPerUnit, use_spring},
+};
 use dioxus::prelude::*;
 
 /// About how wide a segment draws, in pixels: what one of the thumb's units is when a hand's

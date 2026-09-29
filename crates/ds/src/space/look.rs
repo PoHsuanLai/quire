@@ -2,7 +2,7 @@
 //! (design/21-SPACES.md section 1, design/03-COLOR.md section 18).
 
 use super::palette::{Dot, NEUTRAL_DOT};
-use crate::appearance::Theme;
+use crate::appearance::theme::Theme;
 use serde::{Deserialize, Serialize};
 
 /// How loud the frame's grain is, 0 to 100.

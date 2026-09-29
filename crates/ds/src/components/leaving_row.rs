@@ -91,7 +91,7 @@ fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
 mod tests {
     use super::motion_style;
     use crate::components::vocab::StaggerIndex;
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
     use crate::motion::presence::{Exit, Presence};
     use crate::motion::roster::RosterEntry;
 

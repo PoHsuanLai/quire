@@ -7,7 +7,7 @@
 //! Inter caps at that size need 600 to hold the line).
 
 use super::name::VarName;
-use crate::appearance::Typeface;
+use crate::appearance::typeface::Typeface;
 
 /// One typeface-dependent value.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

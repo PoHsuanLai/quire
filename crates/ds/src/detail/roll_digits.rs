@@ -2,8 +2,11 @@
 //! A7, section 8 item 3).
 
 use super::level::use_level;
-use crate::appearance::MotionLevel;
-use crate::motion::{Anim, TimerPhase, use_motion_timer};
+use crate::appearance::motion::MotionLevel;
+use crate::motion::{
+    anim::Anim,
+    timer::{TimerPhase, use_motion_timer},
+};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

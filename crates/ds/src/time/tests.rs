@@ -1,4 +1,4 @@
-use super::{VirtualClock, now, sleep};
+use crate::time::clock::{VirtualClock, now, sleep};
 use std::future::Future;
 use std::pin::pin;
 use std::sync::Arc;

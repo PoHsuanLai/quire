@@ -4,7 +4,7 @@
 //! person from one kind to another changes data, not markup.
 
 use crate::components::avatar::AvatarFace;
-use crate::components::emoji::EmojiId;
+use crate::components::emoji::id::EmojiId;
 use crate::components::image_source::ImageSource;
 
 /// What stands for a user: a letter disc, an animated emoji or a photo.

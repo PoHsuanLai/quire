@@ -5,9 +5,13 @@
 //! rule). Under Reduced motion nothing is fired.
 
 use super::mood::Mood;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::PulseKey;
-use crate::motion::{Anim, TimerPhase, use_motion_timer, use_pulse};
+use crate::motion::{
+    anim::Anim,
+    pulse::use_pulse,
+    timer::{TimerPhase, use_motion_timer},
+};
 use crate::root::env::use_env_signal;
 use crate::task::try_get;
 use dioxus::core::queue_effect;

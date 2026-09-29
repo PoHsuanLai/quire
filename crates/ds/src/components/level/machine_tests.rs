@@ -31,7 +31,7 @@ fn held() -> LevelState {
 
 #[test]
 fn press_drag_release() {
-    use LevelInput as I;
+    use crate::components::level::machine::LevelInput as I;
     #[rustfmt::skip]
     let cases = [
         // The press holds at once; its measurement jumps the level to the pointer.
@@ -93,8 +93,8 @@ fn past_either_end_the_capsule_stretches_and_springs_back() {
 
 #[test]
 fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
-    use KeyStep::{Coarse, Fine};
-    use Nudge::{Down, Up};
+    use crate::components::level::machine::KeyStep::{Coarse, Fine};
+    use crate::components::level::machine::Nudge::{Down, Up};
     #[rustfmt::skip]
     let cases = [
         (500, Up, Coarse, 563),

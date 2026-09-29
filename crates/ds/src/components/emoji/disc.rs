@@ -2,7 +2,7 @@
 //! tinted circle on one of the icon palette's eight hues (design/08 section 2.10), pale on light
 //! and deep on dark.
 
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::space::palette::oklch_hex;
 use serde::{Deserialize, Serialize};
 

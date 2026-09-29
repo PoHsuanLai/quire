@@ -11,11 +11,13 @@
 //! surface.
 
 use crate::components::tooltip::Shown;
-use crate::detail::Touch;
+use crate::detail::touch::Touch;
 use crate::motion::anim::Anim;
 use crate::motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
 use crate::motion::{
-    PxPerUnit, SpringMotion, SpringPhase, SpringResponse, SpringSpec, use_spring_motion,
+    spring::SpringPhase,
+    spring_spec::{SpringResponse, SpringSpec},
+    use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
 };
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;

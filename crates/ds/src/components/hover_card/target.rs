@@ -9,7 +9,7 @@
 
 use super::intent::{HoverAnchor, HoverDriver, use_hover_intent};
 use super::kind_slug;
-use crate::geometry::MountedRef;
+use crate::geometry::measure::MountedRef;
 use crate::overlay::hover_hub::{HoverKey, HoverKind};
 use dioxus::prelude::*;
 

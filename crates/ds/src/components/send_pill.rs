@@ -14,8 +14,8 @@
 use crate::components::send_mood::{SendMood, use_mood_pulse};
 use crate::components::vocab::Fraction;
 use crate::root::env::Env;
-use crate::time::{FRAME_SLACK, sleep};
-use crate::tokens::DelayToken;
+use crate::time::{FRAME_SLACK, clock::sleep};
+use crate::tokens::delay::DelayToken;
 use dioxus::prelude::*;
 
 /// The ring's circumference as S rounds it: `stroke-dasharray:57` for r = 9 (`S:713`).

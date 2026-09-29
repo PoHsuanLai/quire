@@ -10,9 +10,9 @@
 //!
 //! Ported from sill's `bar/menu_track`, with its tests.
 
-mod machine;
-mod triangle;
-mod types;
+pub(crate) mod machine;
+pub(crate) mod triangle;
+pub(crate) mod types;
 
 pub use triangle::{inside, shielded};
 pub use types::{

@@ -1,8 +1,8 @@
 //! A value moving from one number to another along an easing curve, as data: what a Rust-driven
 //! detail draws at a given time (design/26-DETAILS.md section 3.2, "Why Rust tweens").
 
-use crate::components::Fraction;
-use crate::tokens::Easing;
+use crate::components::vocab::Fraction;
+use crate::tokens::easing::Easing;
 use std::time::Duration;
 
 /// One frame at 60 Hz: how often a moving glide asks for a frame, and never at rest (R3).
@@ -77,8 +77,8 @@ fn through(elapsed: Duration, length: Duration) -> Fraction {
 #[cfg(test)]
 mod tests {
     use super::Glide;
-    use crate::appearance::MotionLevel;
-    use crate::tokens::{Easing, EasingToken};
+    use crate::appearance::motion::MotionLevel;
+    use crate::tokens::easing::{Easing, EasingToken};
     use std::time::Duration;
 
     const MS: fn(u64) -> Duration = Duration::from_millis;

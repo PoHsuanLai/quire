@@ -4,7 +4,7 @@
 
 use super::glide::{FRAME, Glide, Pose};
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use std::time::Instant;
@@ -44,7 +44,7 @@ impl Motor {
             running.cancel();
         }
         try_set(self.task, None)?;
-        let started = crate::time::now();
+        let started = crate::time::clock::now();
         let run = try_get(self.pose)?.run.wrapping_add(1);
         let posed = move |elapsed| Pose {
             run,
@@ -68,7 +68,7 @@ impl Motor {
     ) -> Result<(), Gone> {
         loop {
             sleep(FRAME).await;
-            let elapsed = crate::time::since(started);
+            let elapsed = crate::time::clock::since(started);
             try_set(self.pose, posed(elapsed))?;
             if glide.done(elapsed) {
                 return try_set(self.task, None);

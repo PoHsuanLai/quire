@@ -4,8 +4,8 @@
 //!. A `ModuleTile { span: TileSpan::Full }` or a `ModulePanel` spans every
 //! column.
 
-use crate::geometry::Px;
-use crate::tokens::CONTROL_CENTER;
+use crate::geometry::units::Px;
+use crate::tokens::control_center::CONTROL_CENTER;
 use dioxus::prelude::*;
 
 /// How many equal columns the grid has; at least one (a zero is read as one).
@@ -68,7 +68,7 @@ pub fn ModuleGrid(
 #[cfg(test)]
 mod tests {
     use super::{GridColumns, GridMetrics};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     #[test]
     fn the_metrics_are_written_whole_and_never_below_one_column() {

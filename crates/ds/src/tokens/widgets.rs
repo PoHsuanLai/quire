@@ -6,7 +6,7 @@
 
 use super::name::VarName;
 use super::tuned::{Tuned, px};
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 
 /// `--widget-cell` (`widgets.desktop_cell_px`, 164): a small widget's side.
 pub const CELL: Tuned = Tuned {
@@ -62,7 +62,7 @@ impl WidgetMetrics {
 #[cfg(test)]
 mod tests {
     use super::{WIDGET_TOKENS, WidgetMetrics};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {

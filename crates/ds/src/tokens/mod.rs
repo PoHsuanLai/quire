@@ -39,7 +39,7 @@ pub mod widgets;
 #[cfg(test)]
 mod size_rules_tests;
 
-pub use accent_band::AccentRoles;
+pub use crate::tokens::accent_band::roles::AccentRoles;
 pub use accent_table::accent_of;
 pub use colour::ColourToken;
 pub use control_center::{CONTROL_CENTER, ControlCenterScale};

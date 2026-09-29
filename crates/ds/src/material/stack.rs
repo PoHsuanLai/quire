@@ -3,11 +3,11 @@
 //! them. From the outside in: a 0.5 px dark outer hairline (`--m-hairline`), the tight contact
 //! shadow (`--m-shadow-contact`) and the wide ambient one (`--m-shadow-ambient`), then inside
 //! the 1 px top highlight (`--m-highlight`) over the tint, whose colour carries the vibrancy
-//! boost (`vibrancy.rs`). Each is written as an input on the root ([`crate::Ds`]'s `stack`) or
+//! boost (`vibrancy.rs`). Each is written as an input on the root ([`crate::root::ds::Ds`]'s `stack`) or
 //! on any element around a surface.
 
 use super::layer::fraction;
-use crate::tokens::{Alpha, VarName};
+use crate::tokens::{hex::Alpha, name::VarName};
 
 /// `--m-highlight-light`: the top highlight's white alpha in the light scheme.
 pub(crate) const HIGHLIGHT_LIGHT: VarName = VarName("--m-highlight-light");
@@ -84,7 +84,7 @@ impl MaterialStack {
 #[cfg(test)]
 mod tests {
     use super::MaterialStack;
-    use crate::tokens::Alpha;
+    use crate::tokens::hex::Alpha;
 
     #[test]
     fn the_stack_writes_every_input() {

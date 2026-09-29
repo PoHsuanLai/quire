@@ -4,7 +4,7 @@
 //! recomputed per frame only while they move (design/26-DETAILS.md section 3.2).
 
 use crate::components::vocab::Fraction;
-use crate::detail::Lit;
+use crate::detail::pending::Lit;
 use crate::icon::shape::Shape;
 use dioxus::prelude::*;
 

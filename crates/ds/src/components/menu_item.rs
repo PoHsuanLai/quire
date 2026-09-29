@@ -13,9 +13,9 @@ use crate::components::row_chord::{RowChord, shown_chord};
 use crate::components::row_shape::RowShape;
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Check, Selection, Shortcut, StaggerIndex, Switch};
-use crate::geometry::{Point, Px};
+use crate::geometry::units::{Point, Px};
 use crate::icon::Icon;
-use crate::icon::IconSource;
+use crate::icon::external::IconSource;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 

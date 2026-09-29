@@ -4,8 +4,8 @@
 use crate::components::tooltip::Shown;
 use crate::components::vocab::{Expanded, Here, StaggerIndex};
 use crate::focus::click::kept_click;
-use crate::geometry::Rect;
 use crate::geometry::measure::client_rect;
+use crate::geometry::units::Rect;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;

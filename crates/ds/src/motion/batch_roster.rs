@@ -18,7 +18,7 @@ use super::use_roster::{Roster, use_roster_parts};
 use crate::components::vocab::{Emphasis, StaggerIndex};
 use crate::motion::anim::Anim;
 use crate::task::{Gone, spawn_in, try_get};
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

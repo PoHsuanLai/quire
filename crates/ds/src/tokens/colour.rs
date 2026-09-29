@@ -1,7 +1,7 @@
 //! The card's colour tokens, light and dark (design/03-COLOR.md sections 3, 10-12).
 //!
 //! `color-mix()` is replaced by precomputed washes. The frame's `--f-*` are not here: they are
-//! derived per Space ([`crate::FrameVars`]).
+//! derived per Space ([`crate::space::frame_vars::FrameVars`]).
 //!
 //! Precomputed washes (section 11 and open decisions 3-4; every value here is proposed):
 //! `--ok-wash` is `--ok` at .16 over transparent, exactly what `color-mix(in oklab, var(--ok)
@@ -15,7 +15,7 @@
 use super::accent_table::accent_of;
 use super::hex::{Alpha, Colour, Hex};
 use super::name::VarName;
-use crate::appearance::{Accent, Scheme};
+use crate::appearance::{accent::Accent, theme::Scheme};
 
 const fn solid(rgb: u32) -> Colour {
     Colour::Solid(rgb_hex(rgb))

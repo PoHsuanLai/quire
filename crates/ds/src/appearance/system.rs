@@ -1,7 +1,7 @@
 //! What the desktop says, read from the settings portal by `ds-settings`
 //! (`org.freedesktop.appearance`: color-scheme, reduced motion, contrast).
 
-use super::Scheme;
+use crate::appearance::theme::Scheme;
 use serde::{Deserialize, Serialize};
 
 /// The desktop's reduced-motion preference.
@@ -26,7 +26,7 @@ pub enum Contrast {
     High,
 }
 
-/// Everything the desktop contributes to resolving an [`crate::Appearance`].
+/// Everything the desktop contributes to resolving an [`crate::appearance::appearance::Appearance`].
 ///
 /// The default is what a desktop with no portal answers: light, no motion preference, normal
 /// contrast.

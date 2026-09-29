@@ -6,11 +6,13 @@
 
 use super::battery_state::{BatteryPower, BatteryState, Tone};
 use super::part::{Paint, Part, Pen, Show, part_svg};
-use crate::detail::{FirstShow, Touch, use_detail, use_sweep};
+use crate::detail::{
+    first_show::FirstShow, sweep::use_sweep, touch::Touch, use_detail::use_detail,
+};
 use crate::icon::render::IconSize;
 use crate::icon::shape::Shape;
 use crate::icon::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 /// Lucide `battery`'s outline: the body and the terminal.

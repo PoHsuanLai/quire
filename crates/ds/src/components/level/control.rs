@@ -1,5 +1,5 @@
 //! `LevelControl`: a level with a glyph that follows it, in one of three looks (the user's brief
-//! of 2026-09-25). The form [`crate::Slider`] stays for settings rows; this is
+//! of 2026-09-25). The form [`crate::components::slider::Slider`] stays for settings rows; this is
 //! the shell's volume and brightness control and the OSD's level.
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set
@@ -12,13 +12,13 @@ use super::glyph::LevelGlyphView;
 use super::look::{Drawn, body};
 use super::machine::{Hold, KeyStep, LevelInput, LevelState, Nudge, Rubber, step};
 use super::vocab::{LevelLook, LevelMode, LevelSource, Tick};
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::{Availability, Fraction};
 use crate::geometry::measure::client_rect;
 use crate::geometry::units::{Px, Rect, Size};
 use crate::icon::render::IconSize;
-use crate::motion::{Anim, use_pulse};
-use crate::root::use_env;
+use crate::motion::{anim::Anim, pulse::use_pulse};
+use crate::root::env::use_env;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use std::rc::Rc;

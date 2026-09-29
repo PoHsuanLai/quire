@@ -3,13 +3,13 @@
 //! (design/04-COMPONENTS.md section 32 behaviour).
 
 use super::{Picker, dot_index, edit, field};
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::components::vocab::Switch;
 use crate::geometry::measure::client_rect;
-use crate::geometry::{Point, Px, Rect};
+use crate::geometry::units::{Point, Px, Rect};
 use crate::motion::drag::{DragPhase, use_drag};
 use crate::space::dot_paint::DotPaint;
-use crate::space::{SpaceLook, derive};
+use crate::space::{look::SpaceLook, palette::derive};
 use dioxus::prelude::*;
 use edit::Nudge;
 use std::rc::Rc;

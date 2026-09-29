@@ -7,7 +7,7 @@ use crate::icon::Icon;
 use crate::icon::render::IconSize;
 use crate::icon::shape::Shape;
 use crate::icon::stroke::stroke_width;
-use crate::root::use_scale;
+use crate::root::scale::use_scale;
 use dioxus::prelude::*;
 
 /// Which layers a `LayerGlyph` lights.
@@ -105,7 +105,7 @@ fn shape_child(shape: &Shape) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{Layering, layer_of};
-    use crate::detail::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle};
+    use crate::detail::pending::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle};
     use crate::icon::Icon;
 
     #[test]

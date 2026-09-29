@@ -5,9 +5,9 @@ use super::floors;
 use super::grounds::{card_grounds, contrast, least, over};
 use super::roles::AccentRoles;
 use super::text_grounds::{Ground, TextOn, text_grounds};
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::space::palette::oklch_bytes;
-use crate::tokens::{Alpha, Hex};
+use crate::tokens::hex::{Alpha, Hex};
 
 const WHITE: Hex = Hex([0xFF, 0xFF, 0xFF]);
 

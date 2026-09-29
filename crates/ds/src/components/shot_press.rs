@@ -6,7 +6,7 @@
 //! ([`DragLane::NotRight`]), a press that crosses the threshold heading mostly right is the
 //! swipe's, not a drag: it starts none and does not open either.
 
-use crate::geometry::Point;
+use crate::geometry::units::Point;
 use crate::motion::drag::{DRAG_THRESHOLD, Drag, DragPhase};
 
 /// A drag out of the thumbnail began: the press point, and where the pointer crossed the
@@ -133,7 +133,7 @@ impl ShotPress {
 #[cfg(test)]
 mod tests {
     use super::{DragLane, DragStart, PressInput, ShotPress};
-    use crate::geometry::{Point, Px};
+    use crate::geometry::units::{Point, Px};
 
     fn at(x: f32, y: f32) -> Point {
         Point { x: Px(x), y: Px(y) }

@@ -9,12 +9,16 @@ use crate::components::lock_picture::{AT_POLKIT, prompt_picture};
 use crate::components::lock_vocab::{CapsLock, LockUser, PromptState};
 use crate::components::scrim_strength::ScrimStrength;
 use crate::components::secret_entry::{SecretEntry, use_secret_entry};
-use crate::components::sheet::{Sheet, SheetPlacement, SheetWidth};
-use crate::components::text_input::{Focus, InputVariant, TextInput, TextInputKind};
 use crate::components::text_runs::{Text, text};
 use crate::components::tooltip::{Shown, Tooltip, TooltipKind};
-use crate::components::user_picture::{Liveliness, Mood};
+use crate::components::user_picture::{mood::Mood, portrait::Liveliness};
 use crate::components::vocab::Availability;
+use crate::components::{sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth};
+use crate::components::{
+    text_input::{InputVariant, TextInput},
+    text_input_focus::Focus,
+    text_input_kind::TextInputKind,
+};
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -27,7 +31,7 @@ const AUTHENTICATE: &str = "Authentication Required";
 /// shows as a hover card on "Details". The password is a `Secret` field (no `value` prop, its
 /// text never in the markup): `oninput` hears it, Enter or Authenticate hands it to `onsubmit`,
 /// and Cancel, Escape or a click on the scrim call `oncancel`. `state` is the caller's, as for
-/// [`crate::LockPrompt`]: `Checking` closes the field and the buttons but Cancel, `Wrong` shakes
+/// [`crate::components::lock_prompt::LockPrompt`]: `Checking` closes the field and the buttons but Cancel, `Wrong` shakes
 /// the field once and empties it, `LockedOut` says when it opens again. `shown` and `on_hidden`
 /// are the sheet's own, for a host that unmaps its surface after the exit. `panel_id` names the
 /// sheet's panel, for a host whose blur region resolves an element id.

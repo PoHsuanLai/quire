@@ -3,10 +3,10 @@
 //! `TextInput`'s own `Focus::Controlled` asks for the focus by re-rendering; a handle acts at
 //! once, and hands out the element, which a request never did.
 
+use crate::focus::host::{Focused, HostFocus};
 use crate::focus::host::{blur_element, focus_selecting};
 use crate::focus::select::Select;
 use crate::focus::targets::FocusTarget;
-use crate::focus::{Focused, HostFocus};
 use dioxus::core::Runtime;
 use dioxus::prelude::*;
 use std::rc::Rc;

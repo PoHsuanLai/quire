@@ -2,8 +2,8 @@
 //! operation that has run for a given time shows, and when the next one is due.
 
 use super::operation::Deadline;
-use crate::appearance::MotionLevel;
-use crate::tokens::{DelayToken, DurationToken};
+use crate::appearance::motion::MotionLevel;
+use crate::tokens::{delay::DelayToken, timing::DurationToken};
 use std::time::Duration;
 
 /// How a pending loop moves.
@@ -135,8 +135,8 @@ pub(crate) fn next_due(
 #[cfg(test)]
 mod tests {
     use super::{Layers, Lit, PendingFrame, PendingSpec, PendingStyle, frame_at, next_due};
-    use crate::appearance::MotionLevel;
-    use crate::detail::Deadline;
+    use crate::appearance::motion::MotionLevel;
+    use crate::detail::operation::Deadline;
     use std::time::Duration;
 
     const MS: fn(u64) -> Duration = Duration::from_millis;

@@ -6,8 +6,19 @@ use crate::components::icon_view::IconView;
 use crate::components::module_tile_kind::{DiscMotion, ModuleState};
 use crate::components::spinner::{Spinner, SpinnerKind};
 use crate::detail::{
-    Armed, Cue, Detailed, FirstShow, LayerGlyph, Layering, Layers, Moment, MorphGlyph, MorphStyle,
-    SettleStyle, Settling, use_detail, use_operation, use_settle,
+    armed::Armed,
+    cue::Cue,
+    detailed::Detailed,
+    first_show::FirstShow,
+    layer_glyph::{LayerGlyph, Layering},
+    moment::Moment,
+    morph::MorphStyle,
+    morph_glyph::MorphGlyph,
+    pending::Layers,
+    settle::{SettleStyle, Settling},
+    use_detail::use_detail,
+    use_operation::use_operation,
+    use_settle::use_settle,
 };
 use crate::icon::Icon;
 use crate::icon::external::IconSource;
@@ -127,7 +138,10 @@ fn shown(off: Icon, on: Icon, state: ModuleState) -> Icon {
 mod tests {
     use super::{Lighting, shown};
     use crate::components::module_tile_kind::ModuleState::{Busy, Off, On};
-    use crate::detail::{Moment, first_table, moment_table};
+    use crate::detail::{
+        detailed::{first_table, moment_table},
+        moment::Moment,
+    };
     use crate::icon::Icon;
 
     #[test]

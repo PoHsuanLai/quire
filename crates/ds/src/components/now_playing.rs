@@ -3,19 +3,26 @@
 //! new, which fade in); the same track restated plays nothing (R2); Reduced snaps (R7). While the
 //! player buffers, the art breathes after `PendingGrace` and holds still at `PendingCap` (R4).
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::icon_view::IconView;
 use crate::components::now_playing_kind::Playback;
 use crate::components::text_runs::{Text, text};
-use crate::detail::use_level;
+use crate::detail::level::use_level;
 use crate::detail::{
-    FirstShow, Layers, PendingFrame, PendingSpec, PendingStyle, Touch, use_detail, use_operation,
-    use_pending,
+    first_show::FirstShow,
+    pending::{Layers, PendingFrame, PendingSpec, PendingStyle},
+    touch::Touch,
+    use_detail::use_detail,
+    use_operation::use_operation,
+    use_pending::use_pending,
 };
 use crate::icon::Icon;
 use crate::icon::external::IconSource;
 use crate::icon::render::{Glyph, IconSize};
-use crate::motion::{Anim, TimerPhase, use_motion_timer};
+use crate::motion::{
+    anim::Anim,
+    timer::{TimerPhase, use_motion_timer},
+};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

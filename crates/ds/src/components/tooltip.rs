@@ -9,7 +9,7 @@
 //! open, while dragging) passes `shown`, and the tooltip shows or hides on
 //! its say alone, at once, with no hover and no delay of its own.
 
-use crate::components::hover_card::{HoverTarget, use_card};
+use crate::components::hover_card::{target::HoverTarget, use_card};
 use crate::overlay::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use dioxus::prelude::*;
 

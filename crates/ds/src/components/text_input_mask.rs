@@ -12,7 +12,7 @@
 use crate::components::text_input_kind::MASK_DOT;
 use crate::focus::caret::{FieldSelection, HostSelection};
 use crate::task::{spawn_in, try_set_if_changed};
-use crate::time::{FRAME_SLACK, sleep};
+use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::core::ScopeId;
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -154,7 +154,8 @@ impl MaskCaret {
 
 #[cfg(test)]
 mod tests {
-    use super::{CaretMark, CaretOwner, FieldSelection, MaskParts};
+    use super::{CaretMark, CaretOwner, MaskParts};
+    use crate::focus::caret::FieldSelection;
 
     fn at(anchor: usize, focus: usize) -> FieldSelection {
         FieldSelection::Focused { anchor, focus }

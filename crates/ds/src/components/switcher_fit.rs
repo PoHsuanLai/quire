@@ -4,7 +4,7 @@
 //! with the selection centred where it can be and the row's ends never pulled inside the view.
 //! Pure: the numbers only, in whole logical pixels.
 
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 
 /// The panel's padding on each side (design/13 section 13.3.5, "padding 16").
 pub const SWITCHER_PADDING: Px = Px(16.0);
@@ -100,7 +100,7 @@ fn row(cells: f32, cell: f32, gaps: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::{SwitcherFit, SwitcherMetrics, fit};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     fn at(count: usize, selected: usize, output: Option<f32>) -> SwitcherFit {
         fit(count, selected, SwitcherMetrics::default(), output.map(Px))

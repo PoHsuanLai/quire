@@ -6,7 +6,7 @@
 //! text: the card's ink must read on it at 4.5:1, and it must show at all, 1.15:1 off its
 //! ground (a selection nobody can see is not one).
 
-use crate::tokens::Alpha;
+use crate::tokens::hex::Alpha;
 
 /// Ink on the solid fill, the text accent on every card ground, the card's ink on the wash.
 pub const TEXT: f64 = 4.5;

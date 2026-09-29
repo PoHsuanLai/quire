@@ -5,12 +5,18 @@
 //! Enter applies the link, Escape hides the bubble.
 
 use crate::components::popover::{Dismiss, Stacking, escape_closes, position_style, use_float};
-use crate::components::text_input::{Focus, InputVariant, TextInput};
 use crate::components::vocab::Switch;
-use crate::geometry::{Align, Placement, Px, Rect, Side};
+use crate::components::{
+    text_input::{InputVariant, TextInput},
+    text_input_focus::Focus,
+};
+use crate::geometry::{
+    placement::{Align, Placement, Side},
+    units::{Px, Rect},
+};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::tokens::ZLayer;
+use crate::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 
 /// One bubble button.

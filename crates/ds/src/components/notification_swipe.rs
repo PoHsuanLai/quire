@@ -12,13 +12,17 @@
 //! transition; a new drag mid-return picks it up where it is.
 
 use crate::components::press::{PointerButton, button_of};
-use crate::detail::{Contact, Touch};
-use crate::geometry::Px;
+use crate::detail::touch::{Contact, Touch};
+use crate::geometry::units::Px;
 use crate::motion::anim::Anim;
 use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
 use crate::motion::timer::use_motion_timer;
 use crate::motion::use_swipe::{Held, Swiper, use_swipe};
-use crate::motion::{PxPerUnit, SpringMotion, SpringSpec, VelocityMeter, use_spring_motion};
+use crate::motion::{
+    spring_spec::SpringSpec,
+    use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
+    velocity::VelocityMeter,
+};
 use dioxus::core::queue_effect;
 use dioxus::html::geometry::WheelDelta;
 use dioxus::html::input_data::MouseButton;
@@ -176,7 +180,7 @@ impl CardSwipe {
         if let (Some(swiper), true) = (self.live(), primary) {
             let x = Px(event.client_coordinates().x as f32);
             let mut meter = self.back.meter;
-            meter.set(VelocityMeter::default().moved(x, crate::time::now()));
+            meter.set(VelocityMeter::default().moved(x, crate::time::clock::now()));
             swiper.feed(SwipeInput::Down {
                 x,
                 at: swiper.now(),
@@ -194,7 +198,7 @@ impl CardSwipe {
             };
             let x = Px(event.client_coordinates().x as f32);
             let mut meter = self.back.meter;
-            let measured = meter.peek().moved(x, crate::time::now());
+            let measured = meter.peek().moved(x, crate::time::clock::now());
             meter.set(measured);
             swiper.pointer_moved(x, held);
         }
@@ -211,7 +215,7 @@ impl CardSwipe {
     /// pointer's velocity into the return (design/27 section 3.12).
     pub(crate) fn released(&self, event: &PointerEvent) {
         if let Some(swiper) = self.live() {
-            let velocity = self.back.meter.peek().released(crate::time::now());
+            let velocity = self.back.meter.peek().released(crate::time::clock::now());
             let mut released = self.back.released;
             released.set(Touch::Contact(
                 Contact::from_event(event).with_velocity(velocity),

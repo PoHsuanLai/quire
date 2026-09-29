@@ -13,9 +13,9 @@
 use super::glide::Glide;
 use super::level::use_level;
 use super::motor::use_motor;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::{Fraction, Percent};
-use crate::tokens::{DurationToken, EasingToken};
+use crate::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -111,7 +111,7 @@ pub fn use_idle_dim(level: Percent, phase: IdleDimPhase) -> Fraction {
 #[cfg(test)]
 mod tests {
     use super::{IdleDimChange, IdleDimPhase, IdleDimPlan, plan, target};
-    use crate::appearance::MotionLevel;
+    use crate::appearance::motion::MotionLevel;
     use crate::components::vocab::Percent;
 
     #[test]

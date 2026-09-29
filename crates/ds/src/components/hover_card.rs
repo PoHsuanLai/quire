@@ -8,9 +8,9 @@
 //! (section 3 "Positioning"), and plays `hc-out` while the hub reports it leaving. Its content
 //! is a list of [`HoverCardPart`]s (the section's blocks as data), then any children.
 
-mod intent;
-mod parts;
-mod target;
+pub(crate) mod intent;
+pub(crate) mod parts;
+pub(crate) mod target;
 
 pub use intent::{HoverAnchor, HoverDriver, use_hover_intent};
 pub use parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint};
@@ -19,13 +19,17 @@ pub use target::{HoverTarget, TargetElement};
 use crate::components::flow::Flow;
 use crate::components::popover::{Float, Stacking, position_style, use_float};
 use crate::geometry::measure::client_rect;
-use crate::geometry::{Align, MountedRef, Placement, Point, Px, Rect, Side};
+use crate::geometry::{
+    measure::MountedRef,
+    placement::{Align, Placement, Side},
+    units::{Point, Px, Rect},
+};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::motion::hover_intent::HoverEvent;
 use crate::overlay::hover_hub::{HoverKey, HoverKind, use_hover_hub};
-use crate::time::{FRAME_SLACK, sleep};
-use crate::tokens::ZLayer;
+use crate::time::{FRAME_SLACK, clock::sleep};
+use crate::tokens::layer::ZLayer;
 use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
 use std::collections::BTreeMap;
@@ -198,7 +202,10 @@ pub fn HoverCard(
 #[cfg(test)]
 mod tests {
     use super::card_placement;
-    use crate::geometry::{Point, Px, Rect, Size, place};
+    use crate::geometry::{
+        placement::place,
+        units::{Point, Px, Rect, Size},
+    };
     use crate::overlay::hover_hub::HoverKind;
 
     fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {

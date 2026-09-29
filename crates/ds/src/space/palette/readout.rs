@@ -5,12 +5,13 @@
 //!
 //! A pass or fail is a [`Verdict`] (design/03-COLOR.md section 6).
 
-use super::{card, derive};
-use crate::appearance::{Accent, Scheme};
+use super::derive;
+use crate::appearance::{accent::Accent, theme::Scheme};
 use crate::space::contrast::{Verdict, ratio};
 use crate::space::look::{CardAccent, SpaceLook};
-use crate::tokens::accent_band::over;
-use crate::tokens::{Hex, accent_of};
+use crate::space::palette::card::card;
+use crate::tokens::accent_band::grounds::over;
+use crate::tokens::{accent_table::accent_of, hex::Hex};
 
 /// One measured pair, and the floor it has to clear.
 #[derive(Debug, Clone, PartialEq)]

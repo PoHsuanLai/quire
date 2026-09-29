@@ -19,16 +19,16 @@
 pub mod classify;
 pub mod external;
 pub mod family;
-mod geometry;
-mod geometry_actions;
-mod geometry_control;
-mod geometry_own;
-mod geometry_shell;
+pub(crate) mod geometry;
+pub(crate) mod geometry_actions;
+pub(crate) mod geometry_control;
+pub(crate) mod geometry_own;
+pub(crate) mod geometry_shell;
 pub mod plate;
 pub mod plate_tint;
 pub mod render;
 pub mod retint;
-mod sets;
+pub(crate) mod sets;
 pub mod shape;
 pub mod stroke;
 #[cfg(test)]

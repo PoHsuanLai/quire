@@ -6,9 +6,9 @@ use super::level::use_level;
 use super::moment::Moment;
 use super::motor::{Motor, use_motor};
 use super::tween::Tween;
-use crate::appearance::MotionLevel;
-use crate::components::Fraction;
-use crate::tokens::{DurationToken, EasingToken};
+use crate::appearance::motion::MotionLevel;
+use crate::components::vocab::Fraction;
+use crate::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -108,8 +108,8 @@ fn sweep(motor: Motor, plan: SweepPlan, level: Fraction, motion: MotionLevel) {
 #[cfg(test)]
 mod tests {
     use super::{SweepPlan, plan};
-    use crate::appearance::MotionLevel;
-    use crate::detail::Moment;
+    use crate::appearance::motion::MotionLevel;
+    use crate::detail::moment::Moment;
 
     #[test]
     fn each_moment_sweeps_its_own_way_and_reduced_stands() {

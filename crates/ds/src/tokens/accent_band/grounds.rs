@@ -1,9 +1,12 @@
 //! What an accent is measured against: the card's grounds, and compositing a translucent role
 //! over one.
 
-use crate::appearance::Scheme;
-use crate::space::ratio;
-use crate::tokens::{Alpha, Colour, ColourToken, Hex};
+use crate::appearance::theme::Scheme;
+use crate::space::contrast::ratio;
+use crate::tokens::{
+    colour::ColourToken,
+    hex::{Alpha, Colour, Hex},
+};
 
 /// The card's grounds an accent may lie on: `--paper`, `--surface`, `--surface-2`, `--raise`.
 pub fn card_grounds(scheme: Scheme) -> [Hex; 4] {

@@ -6,7 +6,6 @@
 
 use crate::components::widget_kind::WidgetSize;
 use crate::task::{spawn_in, try_get, try_set};
-use crate::time;
 use crate::widget::contract::{Widget, fit};
 use crate::widget::timeline::{RefreshAsk, Timeline, Wake};
 use dioxus::core::{Task, current_scope_id};
@@ -37,7 +36,7 @@ pub fn use_widget<W: Widget>(
         }
         let task = spawn_in(
             scope,
-            follow(timeline.clone(), time::now(), tick, onrefresh),
+            follow(timeline.clone(), crate::time::clock::now(), tick, onrefresh),
         );
         armed.set(Some(Armed {
             timeline: timeline.clone(),
@@ -45,7 +44,7 @@ pub fn use_widget<W: Widget>(
         }));
     }
     timeline
-        .current(time::now())
+        .current(crate::time::clock::now())
         .cloned()
         .unwrap_or_else(|| W::placeholder(fit::<W>(size)))
 }
@@ -65,11 +64,11 @@ async fn follow<E: 'static>(
     onrefresh: Option<EventHandler<RefreshAsk>>,
 ) {
     loop {
-        let now = time::now();
+        let now = crate::time::clock::now();
         let Some(wake) = timeline.next_wake(now, arrived) else {
             return;
         };
-        time::sleep(wake.at().saturating_duration_since(now)).await;
+        crate::time::clock::sleep(wake.at().saturating_duration_since(now)).await;
         let Ok(count) = try_get(tick) else {
             return;
         };

@@ -4,7 +4,7 @@
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
 
 use super::name::VarName;
-use crate::appearance::Typeface;
+use crate::appearance::typeface::Typeface;
 
 /// A type family, by job. Which face does each job depends on the root's [`Typeface`]
 /// (design/02-TYPE.md section 2): the `.ds` block names the System faces and the

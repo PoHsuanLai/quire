@@ -5,7 +5,7 @@
 use crate::components::vocab::{PulseKey, PulsePhase, Switch};
 use crate::focus::click::kept_click;
 use crate::icon::Icon;
-use crate::icon::Shape;
+use crate::icon::shape::Shape;
 use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 

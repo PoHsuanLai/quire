@@ -2,7 +2,7 @@
 
 use super::hex::thousandths;
 use super::name::VarName;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 
 /// A `cubic-bezier()`, control points in thousandths: `(.34,1.42,.52,1)` is
 /// `[340, 1420, 520, 1000]`. Integers, so a curve is `Eq`.

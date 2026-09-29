@@ -9,7 +9,11 @@
 //! alias; nothing loops.
 
 use crate::components::vocab::PulseKey;
-use crate::motion::{Anim, TimerPhase, use_motion_timer, use_pulse};
+use crate::motion::{
+    anim::Anim,
+    pulse::use_pulse,
+    timer::{TimerPhase, use_motion_timer},
+};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 
@@ -68,7 +72,7 @@ pub fn Bumped<T: PartialEq + Clone + 'static>(on: T, children: Element) -> Eleme
 mod tests {
     use super::{bump_attrs, worn};
     use crate::components::vocab::{PulseKey, PulsePhase};
-    use crate::motion::{Anim, TimerPhase};
+    use crate::motion::{anim::Anim, timer::TimerPhase};
 
     #[test]
     fn only_a_running_timer_wears_the_fired_key() {

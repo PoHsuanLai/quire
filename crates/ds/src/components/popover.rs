@@ -9,13 +9,17 @@
 //! sections 5 and 18).
 
 use crate::geometry::measure::client_rect;
-use crate::geometry::{Anchor, MountedRef, Placement, Point, Px, Rect, RectProbe, Size, place};
+use crate::geometry::{
+    measure::{Anchor, MountedRef, RectProbe},
+    placement::{Placement, place},
+    units::{Point, Px, Rect, Size},
+};
 use crate::motion::anim::Anim;
 use crate::motion::timer::use_motion_timer;
 use crate::overlay::host::{OverlayId, Overlays, use_overlays};
 use crate::overlay::stack::{Dismissal, LayerId, LayerStack};
-use crate::time::{FRAME_SLACK, sleep};
-use crate::tokens::ZLayer;
+use crate::time::{FRAME_SLACK, clock::sleep};
+use crate::tokens::layer::ZLayer;
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 
@@ -138,8 +142,8 @@ pub(crate) fn use_float(layer: ZLayer, stacking: Stacking) -> Float {
         layer,
         stacking,
         stack,
-        bounds: crate::geometry::use_rect(),
-        surface: crate::geometry::use_rect(),
+        bounds: crate::geometry::measure::use_rect(),
+        surface: crate::geometry::measure::use_rect(),
         anchor: use_signal(|| None),
         asked: use_hook(|| CopyValue::new(None)),
     };

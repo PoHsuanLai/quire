@@ -2,7 +2,7 @@
 //! contrast checks (design/04-COMPONENTS.md section 32).
 
 use super::{DotIndex, Picker, dot_index, edit};
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use crate::components::button::{Button, ButtonVariant};
 use crate::components::chip::{Chip, ChipVariant};
 use crate::components::section_header::{HeaderKind, SectionHeader};
@@ -12,7 +12,12 @@ use crate::focus::click::kept_click;
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
 use crate::space::dot_paint::DotPaint;
-use crate::space::{Capping, Grain, PRESETS, SpaceLook, Verdict, derive, readout};
+use crate::space::{
+    contrast::Verdict,
+    look::{Grain, SpaceLook},
+    palette::{Capping, derive, readout::readout},
+    presets::PRESETS,
+};
 use dioxus::prelude::*;
 
 /// The stop chips under the field and the "+ Colour" button.

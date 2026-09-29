@@ -4,7 +4,7 @@
 //! Loading is lenient: a missing field is the first-run value and an unknown word for one field
 //! is that field's default, never a failure of the whole value.
 
-use super::{Accent, Motion, Theme};
+use crate::appearance::{accent::Accent, motion::Motion, theme::Theme};
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
 
@@ -77,7 +77,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::Appearance;
-    use crate::appearance::{Accent, Motion, Theme};
+    use crate::appearance::{accent::Accent, motion::Motion, theme::Theme};
 
     #[test]
     fn a_partial_value_keeps_the_fields_it_has() {

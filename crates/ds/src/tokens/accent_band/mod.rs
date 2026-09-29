@@ -14,16 +14,16 @@
 //! (`space::palette::derive`) both call [`accent_roles`] with [`BAND`]; there is no other
 //! derivation of an accent colour.
 
-mod band;
-mod derive;
+pub(crate) mod band;
+pub(crate) mod derive;
 pub mod floors;
-mod grounds;
-mod legibility;
-mod oklab;
-mod picked;
-mod roles;
-mod text_grounds;
-mod widget_grounds;
+pub(crate) mod grounds;
+pub(crate) mod legibility;
+pub(crate) mod oklab;
+pub(crate) mod picked;
+pub(crate) mod roles;
+pub(crate) mod text_grounds;
+pub(crate) mod widget_grounds;
 
 pub use band::{AccentBand, AccentPick, ChromaSpan, Hue, InkRule, Milli, SchemeBand, Weight};
 pub use derive::accent_roles;

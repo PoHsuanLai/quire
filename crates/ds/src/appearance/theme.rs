@@ -3,7 +3,7 @@
 //!
 //! quire resolves the scheme in Rust and always writes an explicit `data-theme`, never leaving
 //! `System` to a `prefers-color-scheme` media guard (design/05-MOTION.md section 9 rule 11,
-//! [`crate::resolve`]).
+//! [`crate::appearance::resolve::resolve`]).
 
 use serde::{Deserialize, Serialize};
 

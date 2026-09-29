@@ -20,8 +20,8 @@
 //! icon is re-coloured the same way, so a Monochrome dock is one hue.
 
 use super::tone_band::Tone;
-use crate::Scheme;
-use crate::space::{Dot, derive};
+use crate::appearance::theme::Scheme;
+use crate::space::palette::{Dot, derive};
 
 /// The style an app icon is drawn in: `icons.style`, which `sill` maps onto this.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -191,7 +191,7 @@ fn linear_rgb([l, a, b]: [f64; 3]) -> [f64; 3] {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::space::PRESETS;
+    use crate::space::presets::PRESETS;
 
     fn lch(px: &[u8]) -> (f64, f64, f64) {
         let [l, a, b] = oklab([px[0], px[1], px[2]]);

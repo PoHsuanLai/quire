@@ -2,12 +2,18 @@
 //! Motion row, and the contrast measured in each scheme under its own heading.
 
 use super::parts::CheckRows;
-use crate::appearance::{Motion, Scheme, Theme};
+use crate::appearance::{
+    motion::Motion,
+    theme::{Scheme, Theme},
+};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::segmented::SegmentedControl;
 use crate::components::text_input::{InputVariant, TextInput};
 use crate::space::dot_paint::DotPaint;
-use crate::space::{Dot, SpaceLook, derive};
+use crate::space::{
+    look::SpaceLook,
+    palette::{Dot, derive},
+};
 use dioxus::prelude::*;
 
 /// The Motion row's value and where a pick goes. The Space's own motion is the person's
@@ -128,7 +134,10 @@ pub(super) fn EachScheme(look: SpaceLook) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{MotionLevels, schemes_of};
-    use crate::appearance::{Motion, Scheme, Theme};
+    use crate::appearance::{
+        motion::Motion,
+        theme::{Scheme, Theme},
+    };
 
     #[test]
     fn the_contact_levels_are_the_three_a_space_sets() {

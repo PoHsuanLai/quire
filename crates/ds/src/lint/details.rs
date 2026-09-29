@@ -9,7 +9,7 @@ use super::kind;
 use super::rule::{Offence, Profile, Rule};
 use super::walk::Decl;
 use crate::detail::grammar::{is_grammar_duration, is_grammar_easing};
-use crate::tokens::{DurationToken, EasingToken};
+use crate::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// The properties whose `var()`s time an animation or a transition.
 const TIMING_PROPERTIES: &[&str] = &[

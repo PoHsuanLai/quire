@@ -5,9 +5,9 @@
 use super::family::PlateFamily;
 use super::plate_tint::{PlateStops, PlateTint};
 use super::retint::{IconStyle, Tint, oklab, retint_in};
-use crate::appearance::Scheme;
-use crate::space::{PRESETS, ratio};
-use crate::tokens::Hex;
+use crate::appearance::theme::Scheme;
+use crate::space::{contrast::ratio, presets::PRESETS};
+use crate::tokens::hex::Hex;
 
 /// The dark dock the sizing mockups measured against (design/29-SIZING.md section 11).
 const DOCK_DARK: &str = "#2A2C30";
@@ -66,7 +66,7 @@ fn the_light_scheme_is_unchanged() {
     assert_eq!(light.tinted_in(tint, Scheme::Light), light.tinted(tint));
     let mut before = RASTER_DARK.to_vec();
     let mut after = RASTER_DARK.to_vec();
-    super::retint(&mut before, IconStyle::Muted, Tint::NEUTRAL);
+    crate::icon::retint::retint(&mut before, IconStyle::Muted, Tint::NEUTRAL);
     retint_in(&mut after, IconStyle::Muted, Tint::NEUTRAL, Scheme::Light);
     assert_eq!(before, after);
 }

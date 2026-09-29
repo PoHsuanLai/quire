@@ -3,11 +3,11 @@
 //! through the pulse machinery and cleared at `settle()`, never looped ("Errors shake once and
 //! hold still", design/05 principle 7).
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::{PulseKey, StaggerIndex};
-use crate::motion::{Anim, settle};
+use crate::motion::{anim::Anim, settle::settle};
 use crate::root::env::Env;
-use crate::time::sleep;
+use crate::time::clock::sleep;
 use dioxus::prelude::*;
 
 /// How a send is going, as the pill wears it.
@@ -122,7 +122,7 @@ fn settle_later(settled: Signal<u32>, anim: Anim, level: MotionLevel, round: u32
 mod tests {
     use super::{SendMood, next_pulse};
     use crate::components::vocab::{PulseKey, PulsePhase};
-    use crate::motion::Anim;
+    use crate::motion::anim::Anim;
 
     #[test]
     fn each_failed_mood_plays_its_one_shot() {

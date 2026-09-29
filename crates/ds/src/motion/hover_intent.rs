@@ -2,9 +2,9 @@
 //! (design/06-INTERACTIONS.md section 3). Pure: an event and the time in, the next state and
 //! one effect out.
 
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::overlay::hover_hub::HoverWarmth;
-use crate::tokens::DelayToken;
+use crate::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
 
 /// Where the machine is.

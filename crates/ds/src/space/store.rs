@@ -141,7 +141,7 @@ fn each_or_none<'de, D: Deserializer<'de>>(
 #[cfg(test)]
 mod tests {
     use super::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex};
-    use crate::appearance::Theme;
+    use crate::appearance::theme::Theme;
     use crate::space::look::{CardAccent, Grain, SpaceLook};
     use crate::space::palette::Dot;
     use crate::space::presets::PRESETS;

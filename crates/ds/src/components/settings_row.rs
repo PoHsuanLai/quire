@@ -16,10 +16,17 @@ use crate::components::settings_row_trailing::{RowTrailing, trailing as trailing
 use crate::components::spinner::{SpinnerKind, ring};
 use crate::components::text_runs::{Text, text};
 use crate::components::vocab::{Availability, Switch};
-use crate::detail::FirstShow;
+use crate::detail::first_show::FirstShow;
 use crate::detail::{
-    PendingFrame, SettleStyle, Settling, Touch, use_armed, use_detail, use_operation, use_pending,
-    use_settle, use_shake,
+    armed::use_armed,
+    once::use_shake,
+    pending::PendingFrame,
+    settle::{SettleStyle, Settling},
+    touch::Touch,
+    use_detail::use_detail,
+    use_operation::use_operation,
+    use_pending::use_pending,
+    use_settle::use_settle,
 };
 use crate::icon::Icon;
 use crate::icon::render::{Glyph, IconSize};
@@ -230,7 +237,7 @@ mod tests {
     use crate::components::settings_row_phase::RowWork;
     use crate::components::settings_row_trailing::RowTrailing;
     use crate::components::vocab::Switch;
-    use crate::detail::{PendingFrame, SettleStyle};
+    use crate::detail::{pending::PendingFrame, settle::SettleStyle};
     use crate::icon::Icon;
 
     #[test]

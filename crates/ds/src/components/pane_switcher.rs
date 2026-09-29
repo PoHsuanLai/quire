@@ -10,9 +10,13 @@
 //! the panes turn back without a jump, and the switcher rests (and `on_settled` hears the pane)
 //! when the spring does. Under Reduced the spring is critically damped and the panes only
 //! cross-fade.
-use crate::detail::Touch;
+use crate::detail::touch::Touch;
 use crate::motion::pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
-use crate::motion::{PxPerUnit, SpringFrame, SpringPhase, SpringSpec, use_spring};
+use crate::motion::{
+    spring::SpringPhase,
+    spring_spec::SpringSpec,
+    use_spring::{PxPerUnit, SpringFrame, use_spring},
+};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

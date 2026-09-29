@@ -1,5 +1,6 @@
+use super::Icon;
 use super::render::{Glyph, GlyphProps, IconSize};
-use super::{Icon, Shape};
+use crate::icon::shape::Shape;
 use dioxus::prelude::*;
 
 fn markup(icon: Icon) -> String {

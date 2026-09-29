@@ -10,8 +10,8 @@
 
 use super::look::{CardAccent, Grain, SpaceLook};
 use super::palette::{derive, gradient};
-use crate::appearance::Scheme;
-use crate::tokens::AccentRoles;
+use crate::appearance::theme::Scheme;
+use crate::tokens::accent_band::roles::AccentRoles;
 
 /// Every frame variable one Space paints in one scheme, as CSS values.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub struct FrameVars {
     pub solid: String,
     /// `--f-grad`: the frame's `linear-gradient`.
     pub gradient: String,
-    /// The gradient's stops, one colour per dot, left to right: what a [`crate::SpaceDot`]
+    /// The gradient's stops, one colour per dot, left to right: what a [`crate::components::space_editor::dot::SpaceDot`]
     /// hands its stylesheet as `--dot-c1..3`. Not written on the root.
     pub stops: Vec<String>,
     /// `--f-grain`: the grain tile's opacity, `grain / 100 x .20` light, `x .16` dark.
@@ -141,7 +141,7 @@ fn grain_opacity(grain: Grain, scheme: Scheme) -> String {
 #[cfg(test)]
 mod tests {
     use super::{FrameVars, grain_opacity};
-    use crate::appearance::{Scheme, Theme};
+    use crate::appearance::theme::{Scheme, Theme};
     use crate::space::look::{CardAccent, Grain, SpaceLook};
     use crate::space::palette::NEUTRAL_DOT;
     use crate::space::presets::PRESETS;
@@ -171,7 +171,7 @@ mod tests {
         let look = SpaceLook {
             dots: vec![NEUTRAL_DOT],
             grain: Grain(35),
-            theme: crate::appearance::Theme::System,
+            theme: crate::appearance::theme::Theme::System,
             card_accent: CardAccent::SpaceHue,
         };
         let vars = FrameVars::of(&look, Scheme::Light);

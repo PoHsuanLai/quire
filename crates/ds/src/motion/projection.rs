@@ -5,7 +5,7 @@
 //! where the finger let go, so a flick carries it even from 30 % of the way.
 
 use super::velocity::Velocity;
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 
 /// The deceleration rate per millisecond: 0.998, the scroll view's normal rate.
 pub const DECELERATION_PER_MS: f64 = 0.998;
@@ -38,8 +38,9 @@ impl Throw {
 
 #[cfg(test)]
 mod tests {
-    use super::{Throw, Velocity};
-    use crate::geometry::Px;
+    use super::Throw;
+    use crate::geometry::units::Px;
+    use crate::motion::velocity::Velocity;
 
     #[test]
     fn a_throw_projects_about_half_a_second_of_its_speed() {

@@ -5,7 +5,7 @@
 //! (design/07-LOOKS.md section 11).
 
 use super::hex::Hex;
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 use serde::{Deserialize, Serialize};
 
 /// One label hue.

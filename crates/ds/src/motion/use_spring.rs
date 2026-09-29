@@ -8,7 +8,7 @@ use super::spring::{Leg, Spring, SpringPhase, State};
 use super::spring_spec::SpringSpec;
 use crate::root::env::Env;
 use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::{FRAME_TICK, sleep};
+use crate::time::{FRAME_TICK, clock::sleep};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use std::time::Instant;
@@ -103,7 +103,7 @@ impl SpringMotion {
     /// Where the spring is this instant on the frame clock, exactly (between frames too).
     pub fn state(self) -> State {
         self.run.try_peek().map_or(State::default(), |run| {
-            run.leg.at(crate::time::since(run.started))
+            run.leg.at(crate::time::clock::since(run.started))
         })
     }
 
@@ -124,10 +124,10 @@ impl SpringMotion {
         self.track(at);
     }
 
-    fn level(self) -> crate::appearance::MotionLevel {
+    fn level(self) -> crate::appearance::motion::MotionLevel {
         self.env
             .and_then(|env| env.try_peek().ok().map(|env| env.resolved.motion))
-            .unwrap_or(crate::appearance::MotionLevel::Standard)
+            .unwrap_or(crate::appearance::motion::MotionLevel::Standard)
     }
 
     fn try_still(self, at: f64) -> Result<(), Gone> {
@@ -138,7 +138,7 @@ impl SpringMotion {
             self.run,
             Run {
                 leg,
-                started: crate::time::now(),
+                started: crate::time::clock::now(),
             },
         )?;
         try_set(self.frame, SpringFrame::of(leg.start, SpringPhase::Rest))
@@ -160,7 +160,7 @@ impl SpringMotion {
             target,
             spring,
         };
-        let started = crate::time::now();
+        let started = crate::time::clock::now();
         try_set(self.run, Run { leg, started })?;
         let phase = leg.phase(std::time::Duration::ZERO, scale);
         let first = match phase {
@@ -194,7 +194,7 @@ impl SpringMotion {
         let scale = self.scale.get();
         loop {
             sleep(FRAME_TICK).await;
-            let elapsed = crate::time::since(started);
+            let elapsed = crate::time::clock::since(started);
             match leg.phase(elapsed, scale) {
                 SpringPhase::Moving => {
                     try_set(
@@ -220,13 +220,13 @@ impl SpringMotion {
 pub fn use_spring_motion(at: f32, scale: PxPerUnit) -> SpringMotion {
     let resting = Leg::still(
         f64::from(at),
-        SpringSpec::for_touch(crate::detail::Touch::Remote)
-            .spring(0.0, crate::appearance::MotionLevel::Standard),
+        SpringSpec::for_touch(crate::detail::touch::Touch::Remote)
+            .spring(0.0, crate::appearance::motion::MotionLevel::Standard),
     );
     SpringMotion {
         run: use_signal(|| Run {
             leg: resting,
-            started: crate::time::now(),
+            started: crate::time::clock::now(),
         }),
         frame: use_signal(|| SpringFrame::of(resting.start, SpringPhase::Rest)),
         task: use_signal(|| None),

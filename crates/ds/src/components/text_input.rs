@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use crate::components::text_input_focus::FieldFocus;
 pub use crate::components::text_input_focus::Focus;
 pub use crate::components::text_input_kind::{Grow, Rows, TextInputKind};
-use crate::focus::FieldHandle;
+use crate::focus::field::FieldHandle;
 use crate::focus::targets::Told;
 
 /// The field's face: Boxed for a standalone field, Inline inside another container, Bare in
@@ -52,11 +52,11 @@ fn held(kind: TextInputKind, value: String, typed: Signal<String>) -> String {
 /// typing in a field" from "a key for the window". They fire for a click or Tab (the renderer's
 /// own events) and for the focus seam: when `Focus::OnMount` or `Focus::Controlled` puts the
 /// caret in the field through a host that dispatches no event (Blitz), the field calls `onfocus`
-/// itself. A range is [`Slider`](crate::Slider).
+/// itself. A range is [`Slider`](crate::components::slider::Slider).
 ///
-/// `handle` ([`use_field_handle`](crate::use_field_handle)) is the caller's grip on the field
+/// `handle` ([`use_field_handle`](crate::focus::field::use_field_handle)) is the caller's grip on the field
 /// from any handler: `focus(Select)`, `blur()` and the mounted element. A focus or blur through
-/// it (or through [`focus_by_selector`](crate::focus_by_selector)) calls `onfocus`/`onblur` once
+/// it (or through [`focus_by_selector`](crate::focus::selector::focus_by_selector)) calls `onfocus`/`onblur` once
 /// on Blitz too.
 ///
 /// `kind` picks what it holds ([`TextInputKind`]): `Secret` keeps its text out of the markup,

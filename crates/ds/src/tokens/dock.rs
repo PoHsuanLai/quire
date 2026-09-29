@@ -6,7 +6,7 @@
 
 use super::name::VarName;
 use super::tuned::{Tuned, px};
-use crate::geometry::Px;
+use crate::geometry::units::Px;
 
 const fn tuned(token: &'static str, input: &'static str, default: &'static str) -> Tuned {
     Tuned {
@@ -112,7 +112,7 @@ impl DockMetrics {
 #[cfg(test)]
 mod tests {
     use super::{DOCK_TOKENS, DockFloorSetting, DockMetrics};
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {

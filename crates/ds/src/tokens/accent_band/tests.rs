@@ -2,8 +2,8 @@
 
 use super::floors;
 use super::*;
-use crate::appearance::{Accent, Scheme};
-use crate::tokens::{Alpha, Hex};
+use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::tokens::hex::{Alpha, Hex};
 
 fn roles(hue: u16, weight: Weight, scheme: Scheme) -> AccentRoles {
     accent_roles(
@@ -190,7 +190,7 @@ fn over_blends_per_channel() {
 /// accent's; design/03-COLOR.md section 20.6). A new ground the ink misses fails here first.
 #[test]
 fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
-    use crate::material::Material;
+    use crate::material::material::Material;
     use crate::material::recipe::tint;
     let all = 4 + 4 + 2 * TEXT_MATERIALS.len() * 2;
     for scheme in Scheme::ALL {
@@ -225,7 +225,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
 /// Only the Popover, the Sheet and the Toast point `--accent-text` at the material's text.
 #[test]
 fn the_text_carrying_materials_take_the_material_text() {
-    use crate::material::Material;
+    use crate::material::material::Material;
     for material in Material::ALL {
         let want = match material {
             Material::Popover | Material::Sheet | Material::Toast => TextOn::Material,

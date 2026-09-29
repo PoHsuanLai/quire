@@ -8,7 +8,7 @@
 //! The output is one rule per line and no space inside a rule, so the golden stylesheet diffs
 //! by rule.
 
-use crate::tokens::VarName;
+use crate::tokens::name::VarName;
 
 /// A custom property declaration: `--t-tap:90ms;`.
 pub fn declaration(var: VarName, value: &str) -> String {
@@ -39,7 +39,7 @@ pub(crate) fn property(name: &str, value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{attr_selector, declaration, rule};
-    use crate::tokens::VarName;
+    use crate::tokens::name::VarName;
 
     #[test]
     fn the_pieces_compose_into_one_line_per_rule() {

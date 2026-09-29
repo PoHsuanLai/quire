@@ -2,10 +2,13 @@
 //! `animationend` (design/05-MOTION.md section 7.1).
 
 use super::anim::Anim;
-use crate::appearance::MotionLevel;
+use crate::appearance::motion::MotionLevel;
 use crate::components::vocab::StaggerIndex;
 use crate::time::FRAME_SLACK;
-use crate::tokens::{DelayToken, ScalarToken, ScalarValue};
+use crate::tokens::{
+    delay::DelayToken,
+    scalar::{ScalarToken, ScalarValue},
+};
 use std::time::Duration;
 
 /// `duration(anim, level) + index x stagger(level) + FRAME_SLACK`.
@@ -33,8 +36,8 @@ fn step(anim: Anim, level: MotionLevel) -> Duration {
 #[cfg(test)]
 mod tests {
     use super::step;
-    use crate::appearance::MotionLevel;
-    use crate::motion::Anim;
+    use crate::appearance::motion::MotionLevel;
+    use crate::motion::anim::Anim;
     use std::time::Duration;
 
     #[test]

@@ -3,8 +3,8 @@
 //! (`plate.rs`) filled with its family's gradient, with the section 2.5 inner highlight and rim
 //! and a drop shadow; until the generated app icons arrive, a placeholder tile is a glyph on one.
 
-use crate::tokens::Hex;
-use crate::tokens::VarName;
+use crate::tokens::hex::Hex;
+use crate::tokens::name::VarName;
 use crate::tokens::tuned::Tuned;
 
 /// One plate gradient family.

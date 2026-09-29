@@ -5,7 +5,7 @@
 //! module to the design doc section it implements.
 
 pub mod appearance;
-mod busy;
+pub(crate) mod busy;
 pub mod catalog;
 pub mod components;
 pub mod css;
@@ -16,7 +16,7 @@ pub mod file_drop;
 pub mod focus;
 pub mod fonts;
 pub mod geometry;
-mod guarded;
+pub(crate) mod guarded;
 pub mod icon;
 #[cfg(feature = "lint")]
 pub mod lint;
@@ -26,100 +26,196 @@ pub mod overlay;
 pub mod root;
 pub mod space;
 pub mod spell;
-mod task;
+pub(crate) mod task;
 pub mod text;
 pub mod time;
 pub mod tokens;
 pub mod widget;
 pub mod window;
 
-pub use appearance::{
-    Accent, Appearance, Contrast, Look, Motion, MotionLevel, PeekMode, ReducedMotion, Resolved,
-    Scheme, SystemPrefs, Theme, Typeface, Warmth, resolve,
+pub use crate::appearance::{
+    accent::Accent,
+    appearance::Appearance,
+    look::{Look, Warmth},
+    motion::{Motion, MotionLevel},
+    peek::PeekMode,
+    resolve::{Resolved, resolve},
+    system::{Contrast, ReducedMotion, SystemPrefs},
+    theme::{Scheme, Theme},
+    typeface::Typeface,
+};
+pub use crate::css::stylesheet::stylesheet;
+pub use crate::edit::{
+    clicks::Clicks,
+    handle::{EditHandle, use_edit_handle},
+    host::{HostEdit, ImeEvent, ImeListener, ImeSwitch, Probe},
+    input::{Composition, EditInput, KeyInput, Pasted, PreeditCursor},
+    pointer::{CapturedPointer, EditFocus, EditPointer, Extend, PointerPhase},
+    position::{
+        EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextOffset, TextPosition, TextRange,
+    },
+};
+pub use crate::file_drop::{
+    drag::{DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop, Offer},
+    hook::{FileDropHandle, use_file_drop},
+    host::HostFileDrop,
+};
+pub use crate::focus::{
+    caret::{
+        Caret, Collapsed, FieldSelection, HostCaret, HostPlaceCaret, HostSelection, InitialCaret,
+        caret_at,
+    },
+    click::{Fallback, HostClickFocus, HostPressFocus},
+    field::{FieldHandle, use_field_handle},
+    hand_back::HostHandBack,
+    host::{Focused, HostBlur, HostFocus, focus_soon, focus_soon_selecting},
+    request::{FocusRequest, FocusTicket, use_focus_request},
+    select::{HostSelect, Select},
+    selector::{FocusError, Found, HostFind, focus_by_selector},
+};
+pub use crate::geometry::{
+    measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect},
+    placement::{Align, Flip, Placed, Placement, PopoverRequest, Side, place},
+    reveal::{HostReveal, ScrollSpan, Scrolled, nearest_scroll},
+    scale::{Grid, Scale},
+    units::{Point, Px, Rect, Size},
+};
+pub use crate::icon::{
+    classify::{ChromaLimit, IconKind},
+    external::{ExternalIcon, IconSource, IconUrl},
+    family::PlateFamily,
+    plate_tint::PlateTint,
+    shape::Shape,
+};
+pub use crate::material::{
+    blur::{Blur, BlurState},
+    material::Material,
+    recipe::{MaterialRecipe, recipe},
+    stack::MaterialStack,
+};
+pub use crate::motion::{
+    anim::Anim,
+    drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag},
+    entrance::use_entrance,
+    hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase},
+    pane_slide::{Pane, PaneRole, PaneRound, PaneSlide},
+    presence::{Exit, ListPresence, Presence},
+    pulse::{Pulse, use_pulse},
+    recipe::{Fill, Iteration, Recipe},
+    roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed},
+    settle::settle,
+    timer::{MotionTimer, TimerPhase, use_motion_timer},
+    use_roster::{Roster, use_roster},
+};
+pub use crate::motion::{
+    level_run::{LevelRun, RunFrame, RunPhase, RunTail, RunTiming, RunTokens},
+    use_level_run::use_level_run,
+};
+pub use crate::motion::{
+    swipe::{Click, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState},
+    use_swipe::{Held, Swiper, use_swipe},
+};
+pub use crate::overlay::{
+    host::{OverlayHost, OverlayId, Overlays, use_overlays},
+    hover_hub::{HoverHub, HoverKey, HoverKind, HoverWarmth, use_hover_hub},
+    menu_track::types::{
+        ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
+        MenuTrackEffect, MenuTrackEvent,
+    },
+    stack::{Dismissal, LayerId, LayerStack},
+    toast_hub::{ToastHub, ToastState, UndoToken, use_toast_hub},
+};
+pub use crate::root::{
+    chrome::{FrameTint, Ground, RootChrome},
+    ds::{Ds, Inject},
+    env::{Env, HostModality, InputModality, use_env},
+    extent::RootExtent,
+    scale::{HostScale, use_scale},
+    surface::Surface,
+    typeface::use_typeface,
+};
+pub use crate::space::{
+    contrast::{Verdict, ratio},
+    frame_vars::FrameVars,
+    look::{CardAccent, Grain, SpaceLook},
+    palette::{
+        Capping, Dot, NEUTRAL_DOT, Palette,
+        card::{Card, POST_DARK, POST_LIGHT, card},
+        derive, gradient,
+        readout::{ContrastCheck, readout},
+        swatch,
+    },
+    presets::{PRESETS, Preset, default_look},
+    store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex},
+};
+pub use crate::spell::{
+    host::{HostSpell, Learned, Paragraph, SpellFuture, SpellService},
+    lang::{Lang, Spell},
+    marks::{Misspelt, SpellReplace, Typing},
+    script::is_cjk,
+    words::Span,
+};
+pub use crate::text::clip::clip_chars;
+pub use crate::time::clock::{ClockGuard, VirtualClock, sleep};
+pub use crate::tokens::{
+    accent_band::roles::AccentRoles,
+    accent_table::accent_of,
+    colour::ColourToken,
+    control_center::{CONTROL_CENTER, ControlCenterScale},
+    control_size::ControlSize,
+    delay::DelayToken,
+    dock::{DockFloorSetting, DockMetrics},
+    easing::{CubicBezier, Easing, EasingToken},
+    elevation::Shadow,
+    hex::{Alpha, Colour, Hex},
+    label_hue::{HueMember, LabelHue},
+    layer::ZLayer,
+    name::VarName,
+    notifications::NotificationMetrics,
+    opacity::OpacityToken,
+    osd::OsdMetrics,
+    person::PersonSwatch,
+    pixel::PixelToken,
+    scalar::{ScalarToken, ScalarValue},
+    shape::{Corner, Radius},
+    shell::{BarType, FontWeight, LauncherType, MenuType, ShellMetrics},
+    shell_scale::{SHELL_SCALE, ShellScale},
+    size_scale::{HalfPx, SizeScale, WholePx},
+    size_vars::SizeVar,
+    spacing::SpacingToken,
+    timing::{DurationKind, DurationToken},
+    tuned::Tuned,
+    type_scale::{Family, FontSize, Voiced},
+    type_voice::VoiceToken,
+    widgets::WidgetMetrics,
+};
+pub use crate::widget::{
+    battery::{BatteryCell, BatteryEntry, BatteryWidget},
+    calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
+    card::WidgetCard,
+    clock::{ClockCity, ClockEntry, WorldClockWidget},
+    contract::{NoIntent, Widget, WidgetContext, WidgetKind},
+    gallery::{GalleryWords, WidgetGallery},
+    layout::{DesktopGrid, GridCell, WidgetAt, WidgetEdit, WidgetLayout},
+    registry::{WidgetInfo, WidgetRegistry, provide_widget_registry, use_widget_registry},
+    timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
+    use_widget::use_widget,
+    wire::WireTimeline,
+};
+pub use crate::window::{
+    host::{HostWindow, WindowHost, use_window_host, use_window_host_provider, use_window_state},
+    timing::FrameTiming,
+    vocab::{
+        Activation, Fullscreen, Maximized, ResizeEdge, Support, TileError, WindowState, WindowTile,
+        Zoom,
+    },
 };
 pub use components::*;
-pub use css::stylesheet;
-pub use edit::{
-    CapturedPointer, Clicks, Composition, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditFocus, EditHandle,
-    EditInput, EditKind, EditNode, EditPointer, Extend, HostEdit, ImeEvent, ImeListener, ImeSwitch,
-    KeyInput, Pasted, PointerPhase, PreeditCursor, Probe, TextOffset, TextPosition, TextRange,
-    use_edit_handle,
-};
 pub use error::DsError;
-pub use file_drop::{
-    DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop, FileDropHandle, HostFileDrop,
-    Offer, use_file_drop,
-};
-pub use focus::{
-    Caret, Collapsed, Fallback, FieldHandle, FieldSelection, FocusError, FocusRequest, FocusTicket,
-    Focused, Found, HostBlur, HostCaret, HostClickFocus, HostFind, HostFocus, HostHandBack,
-    HostPlaceCaret, HostPressFocus, HostSelect, HostSelection, InitialCaret, Select, caret_at,
-    focus_by_selector, focus_soon, focus_soon_selecting, use_field_handle, use_focus_request,
-};
 pub use fonts::{FACES, Face, FaceStyle, Subset, Weight};
-pub use geometry::{
-    Align, Anchor, Flip, Grid, HostMeasure, HostReveal, Measured, MountedRef, Placed, Placement,
-    Point, PopoverRequest, Px, Rect, RectProbe, Scale, ScrollSpan, Scrolled, Side, Size,
-    nearest_scroll, place, use_rect,
-};
+pub use icon::Icon;
 pub use icon::render::{Glyph, IconPx, IconSize};
-pub use icon::{
-    ChromaLimit, ExternalIcon, Icon, IconKind, IconSource, IconUrl, PlateFamily, PlateTint, Shape,
-};
-pub use material::{Blur, BlurState, Material, MaterialRecipe, MaterialStack, recipe};
-pub use motion::{
-    Anim, DRAG_THRESHOLD, Drag, DragPhase, DragTracker, Exit, Fill, HoverEvent, HoverIntent,
-    IntentEffect, IntentPhase, Iteration, ListPresence, MotionTimer, Pane, PaneRole, PaneRound,
-    PaneSlide, Presence, Pulse, Recipe, Roster, RosterEntry, RosterState, RowPitch, StayError,
-    Stayed, TimerPhase, settle, use_drag, use_entrance, use_motion_timer, use_pulse, use_roster,
-};
-pub use motion::{
-    Click, Held, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState,
-    Swiper, use_swipe,
-};
-pub use motion::{LevelRun, RunFrame, RunPhase, RunTail, RunTiming, RunTokens, use_level_run};
-pub use overlay::{
-    Dismissal, HoverHub, HoverKey, HoverKind, HoverWarmth, ItemPath, LayerId, LayerStack, MenuAnim,
-    MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
-    MenuTrackEvent, OverlayHost, OverlayId, Overlays, ToastHub, ToastState, UndoToken,
-    use_hover_hub, use_overlays, use_toast_hub,
-};
-pub use root::{
-    Ds, Env, FrameTint, Ground, HostModality, HostScale, Inject, InputModality, RootChrome,
-    RootExtent, Surface, use_env, use_scale, use_typeface,
-};
-pub use space::{
-    Capping, Card, CardAccent, ContrastCheck, Dot, FrameVars, Grain, NEUTRAL_DOT, POST_DARK,
-    POST_LIGHT, PRESETS, Palette, Preset, SpaceDefaults, SpaceLook, SpaceStore, Verdict, Workspace,
-    WorkspaceId, WorkspaceIndex, card, default_look, derive, gradient, ratio, readout, swatch,
-};
-pub use spell::{
-    HostSpell, Lang, Learned, Misspelt, Paragraph, Span, Spell, SpellFuture, SpellReplace,
-    SpellService, Typing, is_cjk,
-};
-pub use text::clip_chars;
-pub use time::{ClockGuard, FRAME_SLACK, FRAME_TICK, VirtualClock, sleep};
-pub use tokens::{
-    AccentRoles, Alpha, BarType, CONTROL_CENTER, Colour, ColourToken, ControlCenterScale,
-    ControlSize, Corner, CubicBezier, DelayToken, DockFloorSetting, DockMetrics, DurationKind,
-    DurationToken, Easing, EasingToken, Family, FontSize, FontWeight, HalfPx, Hex, HueMember,
-    LabelHue, LauncherType, MenuType, NotificationMetrics, OpacityToken, OsdMetrics, PersonSwatch,
-    PixelToken, Radius, SHELL_SCALE, ScalarToken, ScalarValue, Shadow, ShellMetrics, ShellScale,
-    SizeScale, SizeVar, SpacingToken, Tuned, VarName, VoiceToken, Voiced, WholePx, WidgetMetrics,
-    ZLayer, accent_of,
-};
-pub use widget::{
-    BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, Dated, DesktopGrid, EntryDate,
-    EventLine, GalleryWords, GridCell, MonthEntry, MonthFace, MonthIntent, MonthWidget, NoIntent,
-    Refresh, RefreshAsk, Timeline, TodayLine, Widget, WidgetAt, WidgetCard, WidgetContext,
-    WidgetEdit, WidgetGallery, WidgetInfo, WidgetKind, WidgetLayout, WidgetRegistry, WireTimeline,
-    WorldClockWidget, provide_widget_registry, use_widget, use_widget_registry,
-};
-pub use window::{
-    Activation, FrameTiming, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError,
-    WindowHost, WindowState, WindowTile, Zoom, use_window_host, use_window_host_provider,
-    use_window_state,
-};
+pub use time::{FRAME_SLACK, FRAME_TICK};
 
 use futures_timer as _;
 use serde_json as _;

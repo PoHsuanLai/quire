@@ -3,8 +3,8 @@
 //! `mask-image` over `currentColor` when symbolic (spike S7), `background-image` when an image
 //! (spike S8). Both URLs load through the document's net provider, one frame late.
 
-use crate::components::status::StatusGlyph;
-use crate::detail::FirstShow;
+use crate::components::status::family::StatusGlyph;
+use crate::detail::first_show::FirstShow;
 use crate::icon::external::{ExternalIcon, IconSource};
 use crate::icon::family::PlateFamily;
 use crate::icon::plate_tint::{PlateTint, tint_style};

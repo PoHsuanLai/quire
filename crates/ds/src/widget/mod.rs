@@ -8,20 +8,20 @@
 //! A trait and not an enum, unlike the closed vocabularies elsewhere: the set of widgets is
 //! open (every app may bring its own), and each kind has its own entry type.
 
-mod battery;
-mod calendar;
-mod card;
-mod clock;
-mod contract;
-mod gallery;
-mod gallery_add;
-mod gallery_book;
-mod gallery_rows;
-mod layout;
-mod registry;
-mod timeline;
-mod use_widget;
-mod wire;
+pub(crate) mod battery;
+pub(crate) mod calendar;
+pub(crate) mod card;
+pub(crate) mod clock;
+pub(crate) mod contract;
+pub(crate) mod gallery;
+pub(crate) mod gallery_add;
+pub(crate) mod gallery_book;
+pub(crate) mod gallery_rows;
+pub(crate) mod layout;
+pub(crate) mod registry;
+pub(crate) mod timeline;
+pub(crate) mod use_widget;
+pub(crate) mod wire;
 
 pub use battery::{BatteryCell, BatteryEntry, BatteryWidget, MAX_RINGS};
 pub use calendar::{

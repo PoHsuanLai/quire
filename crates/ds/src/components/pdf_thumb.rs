@@ -15,7 +15,7 @@ use crate::components::icon_view::IconView;
 use crate::components::image_source::{ImageSize, ImageSource};
 use crate::components::pdf_thumb_grace::{Grace, Reading, use_grace};
 use crate::components::shot_frame::picture_style;
-use crate::geometry::{Point, Px, Rect, Size};
+use crate::geometry::units::{Point, Px, Rect, Size};
 use crate::icon::Icon;
 use crate::icon::external::IconSource;
 use crate::icon::family::PlateFamily;
@@ -202,7 +202,7 @@ pub fn sheet_rect(room: Size, shape: ImageSize) -> Rect {
 mod tests {
     use super::{PDF_DEFAULT_SHEET, sheet_rect};
     use crate::components::image_source::ImageSize;
-    use crate::geometry::{Px, Size};
+    use crate::geometry::units::{Px, Size};
 
     #[test]
     fn the_sheet_keeps_the_page_aspect_centred_in_the_room() {

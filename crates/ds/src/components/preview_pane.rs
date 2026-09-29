@@ -20,7 +20,10 @@ use crate::components::preview_cue::{
 use crate::components::shown_phase::use_shown_phase;
 use crate::components::tooltip::Shown;
 use crate::components::vocab::Shortcut;
-use crate::detail::{Operation, PendingFrame, Touch, use_cross_fade, use_pending};
+use crate::detail::{
+    once::use_cross_fade, operation::Operation, pending::PendingFrame, touch::Touch,
+    use_pending::use_pending,
+};
 use crate::motion::anim::Anim;
 use dioxus::prelude::*;
 

@@ -2,7 +2,13 @@
 //! carries. Always explicit: a root never says "system" and never leans on a media query
 //! (design/05-MOTION.md section 9 rule 11).
 
-use super::{Accent, Appearance, Motion, MotionLevel, ReducedMotion, Scheme, SystemPrefs, Theme};
+use crate::appearance::{
+    accent::Accent,
+    appearance::Appearance,
+    motion::{Motion, MotionLevel},
+    system::{ReducedMotion, SystemPrefs},
+    theme::{Scheme, Theme},
+};
 
 /// What a `.ds` root is drawn as.
 #[derive(Debug, Clone, PartialEq, Eq, Copy, Hash)]
@@ -28,7 +34,7 @@ impl Resolved {
 
 /// Resolve `app`'s choices against the Space's own theme and the desktop's preferences.
 ///
-/// `look_theme` is the active [`crate::SpaceLook`]'s theme; `System` in either place defers to
+/// `look_theme` is the active [`crate::space::look::SpaceLook`]'s theme; `System` in either place defers to
 /// `system`, and `Motion::System` becomes `Reduced` when the desktop asks for reduced motion.
 ///
 /// A Space that names its own theme wins over the app's: a Space's mode is `S`'s per-Space
@@ -69,8 +75,11 @@ fn explicit(theme: Theme) -> Option<Scheme> {
 mod tests {
     use super::{Resolved, resolve};
     use crate::appearance::{
-        Accent, Appearance, Contrast, Motion, MotionLevel, ReducedMotion, Scheme, SystemPrefs,
-        Theme,
+        accent::Accent,
+        appearance::Appearance,
+        motion::{Motion, MotionLevel},
+        system::{Contrast, ReducedMotion, SystemPrefs},
+        theme::{Scheme, Theme},
     };
 
     const fn prefs(scheme: Scheme, motion: ReducedMotion) -> SystemPrefs {

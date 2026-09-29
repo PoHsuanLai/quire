@@ -5,7 +5,7 @@
 //! ring when low, white day dials and dark night dials with an orange seconds hand.
 
 use super::name::VarName;
-use crate::appearance::Scheme;
+use crate::appearance::theme::Scheme;
 
 /// One widget paint token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -78,7 +78,7 @@ impl WidgetPaint {
 #[cfg(test)]
 mod tests {
     use super::WidgetPaint;
-    use crate::appearance::Scheme;
+    use crate::appearance::theme::Scheme;
     use std::collections::HashSet;
 
     #[test]

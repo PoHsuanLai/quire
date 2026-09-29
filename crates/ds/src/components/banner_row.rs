@@ -14,8 +14,8 @@
 
 use crate::components::banner_stack::{BannerKey, BannerPosition};
 use crate::components::notification_swipe::{Carried, Flight};
-use crate::geometry::Px;
 use crate::geometry::measure::client_rect;
+use crate::geometry::units::Px;
 use crate::motion::presence::Presence;
 use crate::motion::roster::RowPitch;
 use crate::motion::roster_exits::Pitches;
@@ -103,7 +103,7 @@ mod tests {
     use super::heal_style;
     use crate::components::banner_stack::BannerPosition;
     use crate::components::vocab::StaggerIndex;
-    use crate::geometry::Px;
+    use crate::geometry::units::Px;
     use crate::motion::presence::Presence;
 
     #[test]

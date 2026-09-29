@@ -3,7 +3,12 @@
 //! motion level need not be a choice (2026-09-28), so [`Appearance::motion`] rides through a
 //! change untouched and the system's reduced-motion preference still maps into it.
 
-use crate::appearance::{Accent, Appearance, Scheme, SystemPrefs, Theme};
+use crate::appearance::{
+    accent::Accent,
+    appearance::Appearance,
+    system::SystemPrefs,
+    theme::{Scheme, Theme},
+};
 use crate::components::section_header::{HeaderKind, SectionHeader};
 use crate::components::segmented::{SegSize, SegmentedControl};
 use crate::components::vocab::Switch;
@@ -109,7 +114,10 @@ pub fn AppearancePicker(
 #[cfg(test)]
 mod tests {
     use super::theme_hint;
-    use crate::appearance::{ReducedMotion, Scheme, SystemPrefs, Theme};
+    use crate::appearance::{
+        system::{ReducedMotion, SystemPrefs},
+        theme::{Scheme, Theme},
+    };
 
     #[test]
     fn system_names_what_it_follows() {
