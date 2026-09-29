@@ -103,12 +103,12 @@ pub fn Ds(
 ) -> Element {
     let typeface = typeface.unwrap_or(use_typeface());
     use_typeface_provider(typeface);
-    let scale = use_root_scale(scale);
+    let signals = use_hook(try_consume_context::<HostSignals>);
+    let scale = use_root_scale(scale, signals.map(|signals| (signals.scale)()));
     let chrome = chrome.unwrap_or(RootChrome::of(material));
     let frame_tint = frame.unwrap_or(FrameTint::of(material, chrome));
     let ground = ground.unwrap_or(Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
-    let signals = use_hook(try_consume_context::<HostSignals>);
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let click_root = use_context_provider(|| ClickRoot::of(element));
     let modality = signals.map_or(InputModality::default(), |signals| (signals.modality)());

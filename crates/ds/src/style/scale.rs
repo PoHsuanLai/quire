@@ -1,24 +1,20 @@
 //! Which device scale a root draws for: the `Ds { scale }` prop, else the host's, else 1x.
 //!
 //! `ds-native` knows the scale it renders at (a snapshot's viewport, a window's scale factor)
-//! and provides it in [`HostSignals`] root context, beside the input modality; a
+//! and provides it in `HostSignals` root context, beside the input modality; a
 //! host that is not `ds-native` (shell-host) passes `scale` to `Ds` itself. The root resolves
 //! it once and provides it to its subtree, so a `Glyph` can snap its stroke.
 
 use crate::core::geometry::scale::Scale;
-use crate::host::signals::HostSignals;
 use dioxus::prelude::*;
 
 /// The scale the enclosing root resolved, as its subtree reads it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct DeviceScale(Scale);
 
-/// The scale a root draws for: `given`, else the host's, else [`Scale::ONE`].
-pub fn use_root_scale(given: Option<Scale>) -> Scale {
-    let host = use_hook(try_consume_context::<HostSignals>);
-    let scale = given
-        .or(host.map(|signals| (signals.scale)()))
-        .unwrap_or(Scale::ONE);
+/// The scale a root draws for: `given`, else `host`'s, else [`Scale::ONE`].
+pub fn use_root_scale(given: Option<Scale>, host: Option<Scale>) -> Scale {
+    let scale = given.or(host).unwrap_or(Scale::ONE);
     let mut provided = use_context_provider(|| Signal::new(DeviceScale(scale)));
     if *provided.peek() != DeviceScale(scale) {
         provided.set(DeviceScale(scale));
