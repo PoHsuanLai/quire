@@ -66,10 +66,7 @@ fn laid_out(app: fn() -> Element) -> Harness {
 #[test]
 fn a_popup_root_is_the_size_of_its_card_at_the_origin() {
     let harness = laid_out(Fitted);
-    assert_eq!(
-        harness.attr(".ds", "data-extent").as_deref(),
-        Some("popup")
-    );
+    assert_eq!(harness.attr(".ds", "data-extent").as_deref(), Some("popup"));
     let card = harness.rect(".ds-popover").expect("the card");
     let root = harness.rect(".ds").expect("the root");
     assert!(card.size.height.0 > 20.0, "{card:?}");
