@@ -5,7 +5,7 @@
 
 use crate::components::controls::segmented::{SegSize, SegmentedControl};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::core::vocab::Switch;
+use crate::core::vocab::Check;
 use crate::core::word::Word;
 use crate::style::appearance::{
     accent::Accent,
@@ -49,11 +49,11 @@ impl PickerLayout {
 }
 
 /// `aria-pressed` for a swatch.
-fn pressed(accent: Accent, value: Accent) -> Switch {
+fn pressed(accent: Accent, value: Accent) -> Check {
     if accent == value {
-        Switch::On
+        Check::On
     } else {
-        Switch::Off
+        Check::Off
     }
 }
 

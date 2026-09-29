@@ -13,7 +13,7 @@ use ds::{
     ItemKind, MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark,
     Px, SidebarItem, SyncHalo, SyncState,
 };
-use ds::{DropState, Here, PulseKey, Shortcut, ShortcutKey, Switch};
+use ds::{Check, DropState, Here, PulseKey, Shortcut, ShortcutKey};
 
 /// One component in one state.
 pub struct Case {
@@ -134,22 +134,22 @@ pub const CASES: &[Case] = &[
     Case {
         component: "account_tile",
         state: "all-pressed",
-        make: || rsx! { AccountTile { account: AccountFace::All, pressed: Switch::On, unread: 4, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::All, pressed: Check::On, unread: 4, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
         state: "one-pressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Google, address: Some("poh@acme.example".to_string()) }, pressed: Switch::On, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Google, address: Some("poh@acme.example".to_string()) }, pressed: Check::On, unread: 2, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
         state: "one-unpressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Fastmail, address: None }, pressed: Switch::Off, unread: 2, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Fastmail, address: None }, pressed: Check::Off, unread: 2, onclick: |_| {} } },
     },
     Case {
         component: "account_tile",
         state: "none-unread",
-        make: || rsx! { AccountTile { account: AccountFace::All, pressed: Switch::Off, unread: 0, onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: AccountFace::All, pressed: Check::Off, unread: 0, onclick: |_| {} } },
     },
     // SyncHalo.
     Case {

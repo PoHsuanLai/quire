@@ -14,7 +14,7 @@ use ds::{
     SelectionBubble, SendPhase, SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip,
     TooltipKind, UndoToken, use_hover_hub, use_toasts,
 };
-use ds::{Check, Fraction, Shortcut, ShortcutKey, Switch};
+use ds::{Check, Fraction, Shortcut, ShortcutKey};
 use std::time::Duration;
 
 /// One component in one state.
@@ -102,7 +102,7 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             detail: Some("08:00".to_string()),
             tile: Some(MenuTile::Text("T".to_string())),
             trail: MenuTrail::Note("Thu".to_string()),
-            check: Some(Check::Checked),
+            check: Some(Check::On),
         },
         MenuEntry::Item {
             availability: Availability::Enabled,
@@ -111,7 +111,7 @@ fn snooze() -> Vec<MenuEntry<u8>> {
             detail: None,
             tile: Some(MenuTile::Avatar(DANA)),
             trail: MenuTrail::None,
-            check: Some(Check::Unchecked),
+            check: Some(Check::Off),
         },
         MenuEntry::Separator,
         item(4, "Pick a date…"),
@@ -127,7 +127,7 @@ fn group_by() -> Vec<MenuEntry<u8>> {
             detail: None,
             tile: None,
             trail: MenuTrail::Note("D".to_string()),
-            check: Some(Check::Checked),
+            check: Some(Check::On),
         },
         MenuEntry::Item {
             availability: Availability::Enabled,
@@ -136,7 +136,7 @@ fn group_by() -> Vec<MenuEntry<u8>> {
             detail: None,
             tile: None,
             trail: MenuTrail::None,
-            check: Some(Check::Unchecked),
+            check: Some(Check::Off),
         },
     ]
 }
@@ -375,13 +375,13 @@ fn bubble_actions() -> Vec<BubbleAction> {
         BubbleAction::Button(BubbleButton {
             label: rsx! { b { "B" } },
             title: "Bold (Ctrl B)".to_string(),
-            pressed: Some(Switch::On),
+            pressed: Some(Check::On),
             onclick: EventHandler::new(|()| {}),
         }),
         BubbleAction::Button(BubbleButton {
             label: rsx! { i { "i" } },
             title: "Italic (Ctrl I)".to_string(),
-            pressed: Some(Switch::Off),
+            pressed: Some(Check::Off),
             onclick: EventHandler::new(|()| {}),
         }),
         BubbleAction::Button(BubbleButton {

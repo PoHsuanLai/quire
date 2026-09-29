@@ -5,7 +5,7 @@ use crate::components::lists::row_click::snapshot;
 use crate::components::lists::row_hooks::{PartHooks, relay, use_back};
 use crate::components::lists::row_star::star_button;
 use crate::core::text::clip::clip_chars;
-use crate::core::vocab::{DropState, Emphasis, Selection, StaggerIndex, Switch};
+use crate::core::vocab::{Check, DropState, Emphasis, Selection, StaggerIndex};
 use crate::core::word::Word;
 use crate::motion::presence::Presence;
 use crate::motion::pulse_key::PulseKey;
@@ -107,7 +107,7 @@ pub fn ListRow(
     snippet: Option<TextLine>,
     time: String,
     tags: Element,
-    star: Option<(Switch, EventHandler<Switch>)>,
+    star: Option<(Check, EventHandler<Check>)>,
     star_pulse: PulseKey,
     strip: Option<Element>,
     onclick: EventHandler<MouseData>,

@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Disclosure, Ds, FieldFocus, Icon, InputVariant, Material, PlaceId, ShortcutKey,
+    Appearance, Ds, FieldFocus, Icon, InputVariant, Material, PlaceId, ShortcutKey, Shown,
     TextInput, TreeItem, TreeShape, use_focus_request,
 };
 use ds_native::harness::settle_until;
@@ -35,7 +35,7 @@ enum Start {
 fn Page(start: Start) -> Element {
     let mut log = use_signal(Vec::<String>::new);
     let mut note = move |entry: String| log.with_mut(|log| log.push(entry));
-    let mut open = use_signal(|| Disclosure::Open);
+    let mut open = use_signal(|| Shown::Visible);
     let mut renaming = use_signal(|| start == Start::Renaming);
     let mut name = use_signal(|| "Projects".to_string());
     let request = use_focus_request().with_select_all();
@@ -64,7 +64,7 @@ fn Page(start: Start) -> Element {
                 TreeItem {
                     label: name(),
                     open: open(),
-                    on_toggle: move |to: Disclosure| {
+                    on_toggle: move |to: Shown| {
                         note(format!("toggle:{to:?}"));
                         open.set(to);
                     },
@@ -73,7 +73,7 @@ fn Page(start: Start) -> Element {
                     place: PlaceId("projects".to_string()),
                     onselect: move |_| note("select".to_string()),
                     editing,
-                    TreeItem { label: "Quire", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("quire".to_string()) }
+                    TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("quire".to_string()) }
                 }
             }
             p { class: "log", {log().join(",")} }

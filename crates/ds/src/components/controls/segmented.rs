@@ -9,7 +9,7 @@
 //! to. A label is drawn in the thumb's ink while the thumb is over it (`data-thumb`), not on a
 //! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
 
-use crate::core::vocab::{Selection, Switch};
+use crate::core::vocab::{Check, Selection};
 use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
@@ -34,10 +34,10 @@ pub enum SegSize {
 }
 
 /// `aria-pressed` for a segment: the pressed fill marks the current choice.
-fn pressed(selection: Selection) -> Switch {
+fn pressed(selection: Selection) -> Check {
     match selection {
-        Selection::Selected => Switch::On,
-        Selection::Unselected => Switch::Off,
+        Selection::Selected => Check::On,
+        Selection::Unselected => Check::Off,
     }
 }
 

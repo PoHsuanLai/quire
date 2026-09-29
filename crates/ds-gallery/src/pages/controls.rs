@@ -12,10 +12,10 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Anim, Availability, Avatar, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour, CommandPill, Count,
-    Expanded, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource, Kbd,
+    AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour, CommandPill,
+    Count, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource, Kbd,
     KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, ProviderMark, SectionHeader,
-    SegSize, SegmentedControl, Shortcut, ShortcutKey, Slider, Spinner, SpinnerKind, Switch,
+    SegSize, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, Spinner, SpinnerKind,
     SyncHalo, SyncState, Tabs, Toggle, Verdict, use_pulse,
 };
 
@@ -35,10 +35,10 @@ const ICON_BUTTONS: [(IconButtonVariant, &str); 4] = [
 ];
 
 /// The states a button's props can put it in.
-const BUTTON_STATES: [(&str, Option<Switch>, Availability); 4] = [
+const BUTTON_STATES: [(&str, Option<Check>, Availability); 4] = [
     ("rest", None, Availability::Enabled),
-    ("pressed off", Some(Switch::Off), Availability::Enabled),
-    ("pressed on", Some(Switch::On), Availability::Enabled),
+    ("pressed off", Some(Check::Off), Availability::Enabled),
+    ("pressed on", Some(Check::On), Availability::Enabled),
     ("disabled", None, Availability::Disabled),
 ];
 
@@ -102,8 +102,8 @@ fn Buttons() -> Element {
             div { class: "g-row",
                 span { class: "g-name g-type-name", "Named" }
                 Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", onclick: |_| {} }
-                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Expanded::Open, onclick: |_| {} }
-                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Expanded::Closed, onclick: |_| {} }
+                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Shown::Visible, onclick: |_| {} }
+                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Shown::Hidden, onclick: |_| {} }
             }
         }
         Section { title: "IconButton", note: "Four variants; rest, pressed on, expanded, disabled.",
@@ -112,8 +112,8 @@ fn Buttons() -> Element {
                     Specimen { name,
                         div { class: "g-row",
                             IconButton { variant, icon: Icon::Star, label: "{name} rest", onclick: |_| {} }
-                            IconButton { variant, icon: Icon::Star, label: "{name} pressed", pressed: Some(Switch::On), onclick: |_| {} }
-                            IconButton { variant, icon: Icon::ChevronDown, label: "{name} expanded", expanded: Some(Switch::On), onclick: |_| {} }
+                            IconButton { variant, icon: Icon::Star, label: "{name} pressed", pressed: Some(Check::On), onclick: |_| {} }
+                            IconButton { variant, icon: Icon::ChevronDown, label: "{name} expanded", expanded: Some(Shown::Visible), onclick: |_| {} }
                             IconButton { variant, icon: Icon::Trash, label: "{name} disabled", availability: Availability::Disabled, onclick: |_| {} }
                         }
                     }
@@ -134,7 +134,7 @@ fn Buttons() -> Element {
 #[component]
 fn Choosers() -> Element {
     let mut view = use_signal(|| 1u8);
-    let mut on = use_signal(|| Switch::On);
+    let mut on = use_signal(|| Check::On);
     let mut level = use_signal(|| Fraction(350));
     let mut tab = use_signal(|| 0u8);
     let mut count = use_signal(|| 3u32);
@@ -167,22 +167,22 @@ fn Choosers() -> Element {
                     Toggle { label: "Live toggle", value: on(), onchange: move |next| on.set(next) }
                 }
                 Specimen { name: "off",
-                    Toggle { label: "Off", value: Switch::Off, onchange: |_| {} }
+                    Toggle { label: "Off", value: Check::Off, onchange: |_| {} }
                 }
                 Specimen { name: "on, disabled",
-                    Toggle { label: "On, disabled", value: Switch::On, availability: Availability::Disabled, onchange: |_| {} }
+                    Toggle { label: "On, disabled", value: Check::On, availability: Availability::Disabled, onchange: |_| {} }
                 }
                 Specimen { name: "off, disabled",
-                    Toggle { label: "Off, disabled", value: Switch::Off, availability: Availability::Disabled, onchange: |_| {} }
+                    Toggle { label: "Off, disabled", value: Check::Off, availability: Availability::Disabled, onchange: |_| {} }
                 }
                 Specimen { name: "Mini (settings row), on", code: "26 x 15, knob 13".to_string(),
-                    Toggle { label: "Mini on", value: Switch::On, size: ds::ControlSize::Mini, onchange: |_| {} }
+                    Toggle { label: "Mini on", value: Check::On, size: ds::ControlSize::Mini, onchange: |_| {} }
                 }
                 Specimen { name: "Small, on", code: "32 x 18, knob 16".to_string(),
-                    Toggle { label: "Small on", value: Switch::On, size: ds::ControlSize::Small, onchange: |_| {} }
+                    Toggle { label: "Small on", value: Check::On, size: ds::ControlSize::Small, onchange: |_| {} }
                 }
                 Specimen { name: "Large, on", code: "38 x 22, knob 20".to_string(),
-                    Toggle { label: "Large on", value: Switch::On, size: ds::ControlSize::Large, onchange: |_| {} }
+                    Toggle { label: "Large on", value: Check::On, size: ds::ControlSize::Large, onchange: |_| {} }
                 }
             }
             div { class: "g-grid4",
@@ -287,7 +287,7 @@ fn Faces() -> Element {
 
 #[component]
 fn Marks() -> Element {
-    let mut pressed = use_signal(|| Switch::On);
+    let mut pressed = use_signal(|| Check::On);
     let one = |initial, provider| AccountFace::One {
         initial,
         colour: Colour::Solid(Hex([0x1a, 0x73, 0xe8])),
@@ -304,11 +304,11 @@ fn Marks() -> Element {
                 }
             }
             div { class: "g-row",
-                AccountTile { account: AccountFace::All, pressed: Switch::On, unread: 12, onclick: |_| {} }
-                AccountTile { account: one('P', MarkProvider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(match pressed() { Switch::On => Switch::Off, Switch::Off => Switch::On }) }
-                AccountTile { account: one('W', MarkProvider::Microsoft), pressed: Switch::Off, unread: 0, onclick: |_| {} }
-                AccountTile { account: one('G', MarkProvider::Google), pressed: Switch::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
-                AccountTile { account: one('L', MarkProvider::Local), pressed: Switch::On, unread: 1, onclick: |_| {} }
+                AccountTile { account: AccountFace::All, pressed: Check::On, unread: 12, onclick: |_| {} }
+                AccountTile { account: one('P', MarkProvider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(pressed().flipped()) }
+                AccountTile { account: one('W', MarkProvider::Microsoft), pressed: Check::Off, unread: 0, onclick: |_| {} }
+                AccountTile { account: one('G', MarkProvider::Google), pressed: Check::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
+                AccountTile { account: one('L', MarkProvider::Local), pressed: Check::On, unread: 1, onclick: |_| {} }
                 AddAccountTile { title: "Add account…", onclick: |_| {} }
             }
         }

@@ -16,40 +16,10 @@ use crate::components::content::text_runs::TextLine;
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::core::press::Press;
-use crate::core::vocab::{DropState, Expanded, Here};
+use crate::core::vocab::{DropState, Here, Shown};
 use crate::focus::click::kept_click;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
-
-/// Whether a tree item's children are showing. Controlled: the item draws what it is given and
-/// reports a toggle through `on_toggle`, so the app's own state (a folder the person closed
-/// stays closed across a re-render) is the only state.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Disclosure {
-    /// The children show; the chevron points down.
-    #[default]
-    Open,
-    /// Only the row shows; the chevron points right.
-    Closed,
-}
-
-impl Disclosure {
-    /// The other state: what a press on the row asks for.
-    pub fn flip(self) -> Self {
-        match self {
-            Disclosure::Open => Disclosure::Closed,
-            Disclosure::Closed => Disclosure::Open,
-        }
-    }
-
-    /// The same fact as a trigger's `aria-expanded`.
-    fn expanded(self) -> Expanded {
-        match self {
-            Disclosure::Open => Expanded::Open,
-            Disclosure::Closed => Expanded::Closed,
-        }
-    }
-}
 
 /// Whether an item can hold others. A leaf has no `details` to open: it is drawn as a plain
 /// row with the chevron's space kept, so its label lines up with its siblings'.
@@ -94,8 +64,8 @@ pub enum TreeShape {
 #[component]
 pub fn TreeItem(
     #[props(into)] label: TextLine,
-    open: Disclosure,
-    on_toggle: EventHandler<Disclosure>,
+    open: Shown,
+    on_toggle: EventHandler<Shown>,
     #[props(default)] shape: TreeShape,
     #[props(default)] glyph: Option<Icon>,
     #[props(default)] count: Option<u32>,
@@ -150,7 +120,7 @@ pub fn TreeItem(
             details { class: "ds-tree-item", ..open_attribute(open),
                 summary {
                     class: "ds-tree-item-row ds-drop-place",
-                    "aria-expanded": open.expanded().aria(),
+                    "aria-expanded": open.aria(),
                     "aria-current": row.current,
                     "data-drop": row.drop_attr,
                     "data-drag": row.drag_attr,
@@ -163,7 +133,7 @@ pub fn TreeItem(
                         // The summary's own toggle would change the `details` behind the app's
                         // back; the app's state decides, through `open`.
                         event.prevent_default();
-                        on_toggle.call(open.flip());
+                        on_toggle.call(open.flipped());
                         // The root passes a prevented click by: the row takes the keyboard here.
                         kept_click(&event);
                     },

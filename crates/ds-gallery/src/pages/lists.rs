@@ -8,10 +8,10 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
     AccountFace, AccountTile, ActionId, Anim, AnimatedList, AppearancePicker, AvatarFace,
-    AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour,
+    AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour,
     DragGhost, DropLine, Emphasis, Exit, Heal, Here, Hex, HoverStrip, Icon, ItemKind, ListRow,
     MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
-    RowPitch, Selection, SidebarItem, StaggerIndex, StripAction, Switch, SystemPrefs, TimerPhase,
+    RowPitch, Selection, SidebarItem, StaggerIndex, StripAction, SystemPrefs, TimerPhase,
     UndoToken, use_motion_timer, use_pulse, use_roster, use_toast_hub,
 };
 
@@ -186,13 +186,13 @@ fn LiveList() -> Element {
                             heal: entry.heal,
                             index: entry.index,
                             selection: if selected() == Some(entry.key) { Selection::Selected } else { Selection::Unselected },
-                            star: if starred().contains(&entry.key) { Switch::On } else { Switch::Off },
+                            star: if starred().contains(&entry.key) { Check::On } else { Check::Off },
                             star_pulse: star_pulse.key(),
                             onselect: move |id| selected.set(Some(id)),
                             onstar: move |(id, state)| {
                                 starred.with_mut(|starred| {
                                     starred.retain(|seen| *seen != id);
-                                    if state == Switch::On {
+                                    if state == Check::On {
                                         starred.push(id);
                                     }
                                 });
@@ -213,10 +213,10 @@ fn ThreadRow(
     heal: Option<Heal>,
     index: StaggerIndex,
     selection: Selection,
-    star: Switch,
+    star: Check,
     star_pulse: ds::PulseKey,
     onselect: EventHandler<ThreadId>,
-    onstar: EventHandler<(ThreadId, Switch)>,
+    onstar: EventHandler<(ThreadId, Check)>,
 ) -> Element {
     let (name, subject, snippet, time) = id.thread();
     rsx! {
@@ -356,14 +356,14 @@ fn Sidebar() -> Element {
 
 #[component]
 fn Tiles() -> Element {
-    let mut ghost = use_signal(|| Switch::Off);
+    let mut ghost = use_signal(|| Check::Off);
     let colour = Colour::Solid(Hex([0x2a, 0x5d, 0xb0]));
     rsx! {
         Section { title: "Tiles, strip and drag ghost",
             div { class: "g-row",
-                AccountTile { account: AccountFace::All, pressed: Switch::On, unread: 7, onclick: |_| {} }
-                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, pressed: Switch::On, unread: 0, onclick: |_| {} }
-                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, pressed: Switch::Off, unread: 4, onclick: |_| {} }
+                AccountTile { account: AccountFace::All, pressed: Check::On, unread: 7, onclick: |_| {} }
+                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, pressed: Check::On, unread: 0, onclick: |_| {} }
+                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, pressed: Check::Off, unread: 4, onclick: |_| {} }
             }
             p { class: "g-note", "The hover strip shows on row hover in the list above. The drag ghost is fixed to the window: it follows the pointer while a row is dragged; here it is pinned near the top right." }
             div { class: "g-row",
@@ -371,10 +371,10 @@ fn Tiles() -> Element {
                     variant: ButtonVariant::Mini,
                     label: "Show the drag ghost",
                     pressed: Some(ghost()),
-                    onclick: move |_| ghost.set(match ghost() { Switch::On => Switch::Off, Switch::Off => Switch::On }),
+                    onclick: move |_| ghost.set(ghost().flipped()),
                 }
             }
-            if ghost() == Switch::On {
+            if ghost() == Check::On {
                 DragGhost { title: "Re: UIDL stability across servers", sub: "Dana Okafor · 09:41", at: Point { x: Px(760.0), y: Px(140.0) } }
             }
         }

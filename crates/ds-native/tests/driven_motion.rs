@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::detail::Touch;
 use ds::motion::{PxPerUnit, SpringPhase, SpringResponse, SpringSpec, Throw, Velocity, use_spring};
-use ds::{Appearance, Ds, Fraction, Material, Point, Px, RootExtent, Slider, Switch, Toggle};
+use ds::{Appearance, Check, Ds, Fraction, Material, Point, Px, RootExtent, Slider, Toggle};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -185,7 +185,7 @@ fn a_slider_let_go_while_still_keeps_its_value() {
 
 // ---- The toggle: a second click mid-slide turns the knob back from where it is ----------
 
-static WIFI: GlobalSignal<Switch> = Signal::global(|| Switch::Off);
+static WIFI: GlobalSignal<Check> = Signal::global(|| Check::Off);
 
 #[allow(non_snake_case)]
 fn Wifi() -> Element {
@@ -221,7 +221,7 @@ fn a_toggle_clicked_again_mid_slide_turns_back_from_where_it_is() {
         (turned - mid).abs() < 0.01,
         "no jump at the turn: {mid} -> {turned}"
     );
-    assert_eq!(harness.within(|| *WIFI.read()), Switch::Off);
+    assert_eq!(harness.within(|| *WIFI.read()), Check::Off);
     assert_settles_to_zero_frames(&mut harness);
     assert_eq!(knob(&harness), 0.0);
 }

@@ -7,7 +7,7 @@ use ds::{
     ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow,
     MarkProvider, MarkSize, MarkStyle, Presence, ProviderMark, Px, StripAction,
 };
-use ds::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
+use ds::{Check, DropState, Emphasis, PulseKey, Selection, StaggerIndex};
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -39,7 +39,7 @@ pub fn row(
     presence: Presence,
     emphasis: Emphasis,
     selection: Selection,
-    star: Switch,
+    star: Check,
     pulse: PulseKey,
     index: usize,
 ) -> Element {
@@ -60,7 +60,7 @@ fn dragged_row(drop: DropState) -> Element {
         Presence::Present,
         Emphasis::Plain,
         Selection::Unselected,
-        Switch::Off,
+        Check::Off,
         PulseKey::rest(Anim::StarPop),
         3,
         drop,
@@ -72,7 +72,7 @@ fn row_in_drag(
     presence: Presence,
     emphasis: Emphasis,
     selection: Selection,
-    star: Switch,
+    star: Check,
     pulse: PulseKey,
     index: usize,
     drop: DropState,
@@ -116,7 +116,7 @@ pub fn Row(
             presence,
             emphasis,
             Selection::Unselected,
-            Switch::Off,
+            Check::Off,
             PulseKey::rest(Anim::StarPop),
             index,
         ),
@@ -128,7 +128,7 @@ fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
         presence,
         emphasis,
         Selection::Unselected,
-        Switch::Off,
+        Check::Off,
         PulseKey::rest(Anim::StarPop),
         3,
     )
@@ -152,7 +152,7 @@ fn healed_row(heal: Heal, emphasis: Emphasis, index: usize) -> Element {
             snippet: "Treat UIDL as stable only while UIDVALIDITY holds.".to_string(),
             time: "09:41",
             tags: rsx! { Chip { variant: ChipVariant::Accent, text: "spec" } },
-            star: (Switch::Off, EventHandler::new(|_| {})),
+            star: (Check::Off, EventHandler::new(|_| {})),
             star_pulse: PulseKey::rest(Anim::StarPop),
             strip: rsx! { HoverStrip { actions: strip_actions() } },
             onclick: |_| {},
@@ -192,7 +192,7 @@ pub const ROW_CASES: &[Case] = &[
                 Presence::Present,
                 Emphasis::Plain,
                 Selection::Selected,
-                Switch::Off,
+                Check::Off,
                 PulseKey::rest(Anim::StarPop),
                 0,
             )
@@ -206,7 +206,7 @@ pub const ROW_CASES: &[Case] = &[
                 Presence::Present,
                 Emphasis::Plain,
                 Selection::Unselected,
-                Switch::On,
+                Check::On,
                 PulseKey::rest(Anim::StarPop),
                 0,
             )
@@ -220,7 +220,7 @@ pub const ROW_CASES: &[Case] = &[
                 Presence::Present,
                 Emphasis::Plain,
                 Selection::Unselected,
-                Switch::On,
+                Check::On,
                 PulseKey::rest(Anim::StarPop).fired(),
                 0,
             )
@@ -234,7 +234,7 @@ pub const ROW_CASES: &[Case] = &[
                 Presence::Present,
                 Emphasis::Plain,
                 Selection::Unselected,
-                Switch::On,
+                Check::On,
                 PulseKey::rest(Anim::StarPop).fired().fired(),
                 0,
             )
@@ -248,7 +248,7 @@ pub const ROW_CASES: &[Case] = &[
                 Presence::Present,
                 Emphasis::Plain,
                 Selection::Unselected,
-                Switch::Off,
+                Check::Off,
                 PulseKey::rest(Anim::StarPop).fired(),
                 0,
             )

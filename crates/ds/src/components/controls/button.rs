@@ -14,7 +14,7 @@ use crate::components::controls::button_size::{ButtonSize, disabled};
 use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes, class_list};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
-use crate::core::vocab::{Availability, Expanded, Switch};
+use crate::core::vocab::{Availability, Check, Shown};
 use crate::core::word::Word;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
@@ -96,14 +96,14 @@ pub fn Button(
     #[props(default)] size: Option<ButtonSize>,
     #[props(into)] label: TextLine,
     #[props(default)] icon: Option<IconSource>,
-    #[props(default)] pressed: Option<Switch>,
+    #[props(default)] pressed: Option<Check>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<Press>,
     #[props(default)] id: Option<String>,
     #[props(default)] mounted: Option<EventHandler<MountedEvent>>,
     #[props(default)] title: Option<String>,
     #[props(default)] aria_label: Option<String>,
-    #[props(default)] expanded: Option<Expanded>,
+    #[props(default)] expanded: Option<Shown>,
     #[props(default)] trailing: Option<Trailing>,
     #[props(default)] leading: Option<Leading>,
     #[props(default)] face: ButtonFace,
@@ -115,7 +115,7 @@ pub fn Button(
     let data = attributes(&data);
     let aria_label = aria_label.or_else(|| spoken_label(face, &label));
     let pressed = pressed.map(|state| state.aria());
-    let expanded = expanded.map(Expanded::aria);
+    let expanded = expanded.map(Shown::aria);
     let listen = PressListeners::new(onclick).with_propagation(propagation);
     let live = availability == Availability::Enabled;
     rsx! {

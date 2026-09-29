@@ -9,8 +9,8 @@ use super::Section;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    AppMark, Appearance, Button, ButtonVariant, Ds, Expanded, GroupHeader, Icon, IconSource,
-    Inject, LeavingItem, LeavingList, Material, NotificationCard,
+    AppMark, Appearance, Button, ButtonVariant, Ds, GroupHeader, Icon, IconSource, Inject,
+    LeavingItem, LeavingList, Material, NotificationCard, Shown,
 };
 
 /// An app's group.
@@ -191,8 +191,8 @@ fn draw(
         Row::Head(app) => {
             let count = notes.iter().filter(|note| note.app == app).count();
             let expanded = match folded.contains(&app) {
-                true => Expanded::Closed,
-                false => Expanded::Open,
+                true => Shown::Hidden,
+                false => Shown::Visible,
             };
             rsx! {
                 div { class: "g-leave-row",

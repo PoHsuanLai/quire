@@ -16,7 +16,7 @@ use crate::components::controls::spinner::{SpinnerKind, ring};
 use crate::components::lists::settings_row_phase::{RowDisc, RowPhase, RowWork};
 use crate::components::lists::settings_row_trailing::{RowTrailing, trailing as trailing_mark};
 use crate::core::press::Press;
-use crate::core::vocab::{Availability, Switch};
+use crate::core::vocab::{Availability, Check};
 use crate::motion::detail::first_show::FirstShow;
 use crate::motion::detail::{
     armed::use_armed,
@@ -141,9 +141,9 @@ fn arrival(mount: Mount, first: FirstShow) -> FirstShow {
 /// glyph (its disc) seals.
 fn success_style(trailing: &RowTrailing) -> SettleStyle {
     match trailing {
-        RowTrailing::Check(Switch::On) => SettleStyle::Check,
+        RowTrailing::Check(Check::On) => SettleStyle::Check,
         RowTrailing::None
-        | RowTrailing::Check(Switch::Off)
+        | RowTrailing::Check(Check::Off | Check::Mixed)
         | RowTrailing::Toggle { .. }
         | RowTrailing::Chevron
         | RowTrailing::Text(_)
@@ -237,14 +237,14 @@ mod tests {
     use super::{glyph_frame, spinner_frame, success_style};
     use crate::components::lists::settings_row_phase::RowWork;
     use crate::components::lists::settings_row_trailing::RowTrailing;
-    use crate::core::vocab::Switch;
+    use crate::core::vocab::Check;
     use crate::motion::detail::{pending::PendingFrame, settle::SettleStyle};
     use crate::style::icon::Icon;
 
     #[test]
     fn a_success_draws_the_check_where_there_is_one_and_seals_the_glyph_else() {
         assert_eq!(
-            success_style(&RowTrailing::Check(Switch::On)),
+            success_style(&RowTrailing::Check(Check::On)),
             SettleStyle::Check
         );
         assert_eq!(

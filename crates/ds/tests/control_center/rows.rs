@@ -3,8 +3,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Ds, Icon, Inject, Material, RowTrailing, RunTone, SettingsRow,
-    Switch, TextLine, TextRun, Theme,
+    Appearance, Availability, Check, Ds, Icon, Inject, Material, RowTrailing, RunTone, SettingsRow,
+    TextLine, TextRun, Theme,
 };
 
 /// Which specimen.
@@ -44,10 +44,10 @@ pub const CASES: [(RowCase, &str); 11] = [
 /// The trailing mark a single-row case ends in.
 fn mark(case: RowCase) -> RowTrailing {
     match case {
-        RowCase::CheckOn => RowTrailing::Check(Switch::On),
-        RowCase::CheckOff => RowTrailing::Check(Switch::Off),
+        RowCase::CheckOn => RowTrailing::Check(Check::On),
+        RowCase::CheckOff => RowTrailing::Check(Check::Off),
         RowCase::Toggle => RowTrailing::Toggle {
-            value: Switch::On,
+            value: Check::On,
             on_toggle: EventHandler::new(|_| {}),
         },
         RowCase::Chevron => RowTrailing::Chevron,
@@ -62,12 +62,12 @@ fn mark(case: RowCase) -> RowTrailing {
 /// The three networks a Wi-Fi detail lists: the one in use checked, a secured one, an open one.
 fn networks() -> Element {
     rsx! {
-        SettingsRow { glyph: Icon::Wifi, title: "Home", detail: "Connected", trailing: RowTrailing::Check(Switch::On), onclick: |_| {} }
+        SettingsRow { glyph: Icon::Wifi, title: "Home", detail: "Connected", trailing: RowTrailing::Check(Check::On), onclick: |_| {} }
         SettingsRow { glyph: Icon::WifiHigh, title: "Studio 5G", trailing: RowTrailing::Glyph(Icon::Lock), onclick: |_| {} }
         SettingsRow {
             glyph: Icon::WifiLow,
             title: TextLine::Runs(vec![TextRun::new("Café ", RunTone::Plain), TextRun::new("Guest", RunTone::Faint)]),
-            trailing: RowTrailing::Check(Switch::Off),
+            trailing: RowTrailing::Check(Check::Off),
             onclick: |_| {},
         }
     }

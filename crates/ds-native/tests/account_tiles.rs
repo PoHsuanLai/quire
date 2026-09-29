@@ -6,8 +6,8 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Appearance, Colour, Ds, Grain, Hex, MarkProvider,
-    Material, SpaceLook, Switch,
+    AccountFace, AccountTile, AddAccountTile, Appearance, Check, Colour, Ds, Grain, Hex,
+    MarkProvider, Material, SpaceLook,
 };
 use ds_native::{Harness, Viewport};
 use probe::rect;
@@ -42,7 +42,7 @@ fn Tiles() -> Element {
                         provider: MarkProvider::Fastmail,
                         address: None,
                     },
-                    pressed: Switch::Off,
+                    pressed: Check::Off,
                     unread: 0,
                     onclick: move |()| log.with_mut(|log| log.push("account")),
                 }

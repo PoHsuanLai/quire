@@ -10,7 +10,7 @@ use crate::components::chrome::light_mark::{LightMark, Mark};
 use crate::components::menus::menu_entry::{MenuEntry, MenuTile, MenuTrail};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
 use crate::core::time::clock::sleep;
-use crate::core::vocab::{Availability, Expanded};
+use crate::core::vocab::{Availability, Shown};
 use crate::core::word::Word;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::style::icon::Icon;
@@ -62,8 +62,8 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
         Maximized::Off => Mark::Zoom,
     };
     let expanded = match menu() {
-        TileMenu::Open(_) => Expanded::Open,
-        TileMenu::Closed => Expanded::Closed,
+        TileMenu::Open(_) => Shown::Visible,
+        TileMenu::Closed => Shown::Hidden,
     };
     rsx! {
         div { class: "ds-lights", role: "group", "aria-label": "Window",

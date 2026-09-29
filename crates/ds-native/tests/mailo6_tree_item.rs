@@ -7,8 +7,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DataAttr, DataName, Disclosure, DropState, Ds, Icon, IconButton, IconButtonVariant,
-    Material, PlaceId, Point, Propagation, Px, TreeItem, TreeShape,
+    Appearance, DataAttr, DataName, DropState, Ds, Icon, IconButton, IconButtonVariant, Material,
+    PlaceId, Point, Propagation, Px, Shown, TreeItem, TreeShape,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -32,15 +32,15 @@ fn folder(path: &str) -> Vec<DataAttr> {
 fn Page() -> Element {
     let mut log = use_signal(Vec::<String>::new);
     let mut note = move |entry: String| log.with_mut(|log| log.push(entry));
-    let mut projects = use_signal(|| Disclosure::Open);
-    let mut archive = use_signal(|| Disclosure::Closed);
+    let mut projects = use_signal(|| Shown::Visible);
+    let mut archive = use_signal(|| Shown::Hidden);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { class: "tree", style: "width:240px; padding:20px",
                 TreeItem {
                     label: "Projects",
                     open: projects(),
-                    on_toggle: move |to: Disclosure| {
+                    on_toggle: move |to: Shown| {
                         note(format!("toggle:projects:{to:?}"));
                         projects.set(to);
                     },
@@ -53,12 +53,12 @@ fn Page() -> Element {
                             propagation: Propagation::Stop, data: folder("INBOX/Projects"),
                             onclick: move |_| note("more:projects".to_string()) }
                     },
-                    TreeItem { label: "Quire", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("quire".to_string()) }
+                    TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("quire".to_string()) }
                 }
                 TreeItem {
                     label: "Archive",
                     open: archive(),
-                    on_toggle: move |to: Disclosure| {
+                    on_toggle: move |to: Shown| {
                         note(format!("toggle:archive:{to:?}"));
                         archive.set(to);
                     },
@@ -69,9 +69,9 @@ fn Page() -> Element {
                         IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Archive",
                             data: folder("Archive"), onclick: move |_| note("more:archive".to_string()) }
                     },
-                    TreeItem { label: "2025", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("2025".to_string()) }
+                    TreeItem { label: "2025", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("2025".to_string()) }
                 }
-                TreeItem { label: "Receipts", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, place: PlaceId("receipts".to_string()) }
+                TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, place: PlaceId("receipts".to_string()) }
             }
             p { class: "log", {log().join(",")} }
         }

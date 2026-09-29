@@ -9,7 +9,7 @@ use ds::{
     IconView, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
     SegmentedControl, Slider, Spinner, SpinnerKind, Tabs, TextInput, Toggle, Verdict,
 };
-use ds::{Availability, Fraction, PulseKey, Shortcut, ShortcutKey, Switch};
+use ds::{Availability, Check, Fraction, PulseKey, Shortcut, ShortcutKey, Shown};
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {
@@ -76,12 +76,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "button",
         state: "mini-pressed",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Yes", pressed: Switch::On, onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Yes", pressed: Check::On, onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "mini-unpressed",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "No", pressed: Switch::Off, onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "No", pressed: Check::Off, onclick: |_| {} } },
     },
     Case {
         component: "button",
@@ -124,12 +124,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "icon_button",
         state: "tool-expanded",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Tag, label: "Labels", expanded: Switch::On, onclick: |_| {} } },
+        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Tag, label: "Labels", expanded: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         component: "icon_button",
         state: "tool-collapsed",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Tag, label: "Labels", expanded: Switch::Off, onclick: |_| {} } },
+        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Tag, label: "Labels", expanded: Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         component: "icon_button",
@@ -144,12 +144,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "icon_button",
         state: "pin",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Pin, icon: Icon::Inbox, label: "Inbox", pressed: Switch::Off, onclick: |_| {} } },
+        make: || rsx! { IconButton { variant: IconButtonVariant::Pin, icon: Icon::Inbox, label: "Inbox", pressed: Check::Off, onclick: |_| {} } },
     },
     Case {
         component: "icon_button",
         state: "pin-pressed",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Pin, icon: Icon::Inbox, label: "Inbox", pressed: Switch::On, onclick: |_| {} } },
+        make: || rsx! { IconButton { variant: IconButtonVariant::Pin, icon: Icon::Inbox, label: "Inbox", pressed: Check::On, onclick: |_| {} } },
     },
     Case {
         component: "icon_button",
@@ -159,7 +159,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "icon_button",
         state: "status-open",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryCharging, label: "Battery", expanded: Switch::On, onclick: |_| {} } },
+        make: || rsx! { IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryCharging, label: "Battery", expanded: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         component: "icon_button",
@@ -241,17 +241,17 @@ pub const CASES: &[Case] = &[
     Case {
         component: "toggle",
         state: "off",
-        make: || rsx! { Toggle { label: "Wi-Fi", value: Switch::Off, onchange: |_| {} } },
+        make: || rsx! { Toggle { label: "Wi-Fi", value: Check::Off, onchange: |_| {} } },
     },
     Case {
         component: "toggle",
         state: "on",
-        make: || rsx! { Toggle { label: "Wi-Fi", value: Switch::On, onchange: |_| {} } },
+        make: || rsx! { Toggle { label: "Wi-Fi", value: Check::On, onchange: |_| {} } },
     },
     Case {
         component: "toggle",
         state: "disabled",
-        make: || rsx! { Toggle { label: "Bluetooth", value: Switch::Off, availability: Availability::Disabled, onchange: |_| {} } },
+        make: || rsx! { Toggle { label: "Bluetooth", value: Check::Off, availability: Availability::Disabled, onchange: |_| {} } },
     },
     // TextInput: both variants, placeholder shown and hidden, disabled.
     Case {

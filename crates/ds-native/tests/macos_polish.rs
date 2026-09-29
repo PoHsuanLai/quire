@@ -10,7 +10,7 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
-    MenuBarItem, MenuEntry, MenuTile, MenuTrail, PlateFamily, Px, Scheme, Surface, Switch,
+    MenuBarItem, MenuEntry, MenuTile, MenuTrail, PlateFamily, Px, Scheme, Shown, Surface,
 };
 use ds_native::{Harness, Viewport};
 use image::{Rgba, RgbaImage};
@@ -187,7 +187,7 @@ fn Bar() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Bar,
             div { style: "display:flex; gap:8px; padding:4px 8px",
-                MenuBarItem { id: "open", open: Switch::On, span { "Files" } }
+                MenuBarItem { id: "open", open: Shown::Visible, span { "Files" } }
                 MenuBarItem { id: "shut", span { "Edit" } }
             }
         }

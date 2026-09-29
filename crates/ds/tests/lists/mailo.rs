@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, HoverStrip, ListRow, Presence, RunTone, Shown, TextLine, TextRun, Titles,
 };
-use ds::{Emphasis, Expanded, PulseKey, Selection, StaggerIndex};
+use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
 fn marked_subject() -> TextLine {
@@ -55,8 +55,8 @@ fn caller_strip(shown: Shown) -> Element {
             shown,
             titles: Titles::FromLabel,
             expanded: vec![
-                (ActionId("snooze".to_string()), Expanded::Closed),
-                (ActionId("label".to_string()), Expanded::Open),
+                (ActionId("snooze".to_string()), Shown::Hidden),
+                (ActionId("label".to_string()), Shown::Visible),
             ],
         }
     }

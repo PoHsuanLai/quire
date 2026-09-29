@@ -9,9 +9,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Disclosure, Ds, FieldFocus, HoverStrip, Icon, IconButton,
-    IconButtonVariant, InputVariant, Material, Press, ShortcutKey, Shown, StripAction, TextInput,
-    TreeItem, TreeShape, use_focus_request,
+    ActionId, Appearance, Ds, FieldFocus, HoverStrip, Icon, IconButton, IconButtonVariant,
+    InputVariant, Material, Press, ShortcutKey, Shown, StripAction, TextInput, TreeItem, TreeShape,
+    use_focus_request,
 };
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
@@ -50,7 +50,7 @@ fn Page() -> Element {
                 div { class: "tree", style: "width:260px",
                     TreeItem {
                         label: "Projects",
-                        open: Disclosure::Open,
+                        open: Shown::Visible,
                         on_toggle: move |_| note("toggle:projects"),
                         glyph: Icon::Folder,
                         onselect: move |_: Press| note("select"),
@@ -62,11 +62,11 @@ fn Page() -> Element {
                                 onclick: move |_: Press| note("more"),
                             }
                         },
-                        TreeItem { label: "Quire", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf }
+                        TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf }
                     }
                     TreeItem {
                         label: "Archive",
-                        open: Disclosure::Closed,
+                        open: Shown::Hidden,
                         on_toggle: move |_| note("toggle:archive"),
                         span { "inside" }
                     }
@@ -177,7 +177,7 @@ fn Renaming() -> Element {
                 div { class: "tree", style: "width:260px",
                     TreeItem {
                         label: "Projects",
-                        open: Disclosure::Closed,
+                        open: Shown::Hidden,
                         on_toggle: move |_| note("toggle:projects"),
                         editing: rsx! {
                             TextInput { variant: InputVariant::Bare, label: "Rename folder", value: "Projects",
@@ -189,7 +189,7 @@ fn Renaming() -> Element {
                     }
                     TreeItem {
                         label: "Archive",
-                        open: Disclosure::Closed,
+                        open: Shown::Hidden,
                         on_toggle: move |_| note("toggle:archive"),
                         onselect: move |_: Press| note("select"),
                         span { "inside" }

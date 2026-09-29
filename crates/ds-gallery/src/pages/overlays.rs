@@ -9,7 +9,7 @@ use ds::{
     Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant,
     Check, CommandPalette, Elevation, Icon, Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind,
     MenuTile, MenuTrail, MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px,
-    Scrim, Sheet, Shortcut, ShortcutKey, Side, Switch, use_toast_hub,
+    Scrim, Sheet, Shortcut, ShortcutKey, Side, use_toast_hub,
 };
 
 /// Everything the page can open, one at a time.
@@ -89,7 +89,7 @@ pub fn OverlaysPage() -> Element {
             Button {
                 variant: ButtonVariant::Secondary,
                 label,
-                pressed: Some(if opened() == Some(what) { Switch::On } else { Switch::Off }),
+                pressed: Some(if opened() == Some(what) { Check::On } else { Check::Off }),
                 onclick: move |_| opened.set(Some(what)),
             }
         }
@@ -273,11 +273,7 @@ fn entries(kind: MenuKind) -> Vec<MenuEntry<u8>> {
                 tile,
                 trail,
                 check: match kind {
-                    MenuKind::Dropdown => Some(if value == 1 {
-                        Check::Checked
-                    } else {
-                        Check::Unchecked
-                    }),
+                    MenuKind::Dropdown => Some(if value == 1 { Check::On } else { Check::Off }),
                     MenuKind::Rich | MenuKind::Slim | MenuKind::Context => None,
                 },
             }

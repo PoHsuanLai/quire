@@ -7,8 +7,8 @@
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Anim, Appearance, Button, ButtonVariant, Ds, Icon, Material, Pane, PaneSwitcher, RowTrailing,
-    SettingsRow, Switch,
+    Anim, Appearance, Button, ButtonVariant, Check, Ds, Icon, Material, Pane, PaneSwitcher,
+    RowTrailing, SettingsRow,
 };
 use ds::{MotionLevel, StaggerIndex, settle};
 use ds_native::harness::settle_until;
@@ -50,7 +50,7 @@ fn PanesApp() -> Element {
                         }
                     },
                     detail: rsx! {
-                        SettingsRow { glyph: Icon::Wifi, title: "Home", trailing: RowTrailing::Check(Switch::On), onclick: |_| {} }
+                        SettingsRow { glyph: Icon::Wifi, title: "Home", trailing: RowTrailing::Check(Check::On), onclick: |_| {} }
                     },
                 }
             }

@@ -15,7 +15,7 @@ use ds::{
     DockFloorSetting, DockMetrics, Ds, Emphasis, Here, Icon, IconButton, IconButtonVariant,
     IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuBarItem, MenuEntrance,
     MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, RunningDot,
-    Scheme, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Switch, Theme, Tooltip, TooltipKind,
+    Scheme, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, Tooltip, TooltipKind,
     WorkspacePill, WorkspacePills, use_scope,
 };
 
@@ -118,14 +118,14 @@ fn menu_entries() -> Vec<MenuEntry<u8>> {
         item(
             4,
             "Show Sidebar",
-            Some(Check::Checked),
+            Some(Check::On),
             MenuTrail::None,
             Availability::Enabled,
         ),
         item(
             5,
             "Show Path Bar",
-            Some(Check::Unchecked),
+            Some(Check::Off),
             MenuTrail::None,
             Availability::Enabled,
         ),
@@ -154,12 +154,12 @@ fn MenuBarSection() -> Element {
                             WorkspacePill { label: "3", onclick: |_| {} }
                         }
                         MenuBarItem { emphasis: Emphasis::Strong, span { "Files" } }
-                        MenuBarItem { open: Switch::On, span { "File" } }
+                        MenuBarItem { open: Shown::Visible, span { "File" } }
                         MenuBarItem { span { "Edit" } }
                         MenuBarItem { span { "View" } }
                         span { class: "g-spacer" }
                         IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", expanded: Some(Switch::On), onclick: |_| {} }
+                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", expanded: Some(Shown::Visible), onclick: |_| {} }
                         IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryFull, label: "Battery", onclick: |_| {} }
                         MenuBarItem { span { class: "ds-tabular", "Thu 24 Sep 09:41" } }
                     }
@@ -282,17 +282,12 @@ fn CornerSection() -> Element {
 #[component]
 fn DockSection() -> Element {
     let families = [
-        (PlateFamily::Blue, Icon::Folder, "Files", Switch::On),
-        (PlateFamily::Red, Icon::Camera, "Camera", Switch::Off),
-        (PlateFamily::Amber, Icon::StickyNote, "Notes", Switch::On),
-        (PlateFamily::Green, Icon::Terminal, "Terminal", Switch::On),
-        (PlateFamily::Violet, Icon::Sparkles, "Studio", Switch::Off),
-        (
-            PlateFamily::Neutral,
-            Icon::Settings,
-            "Settings",
-            Switch::Off,
-        ),
+        (PlateFamily::Blue, Icon::Folder, "Files", Check::On),
+        (PlateFamily::Red, Icon::Camera, "Camera", Check::Off),
+        (PlateFamily::Amber, Icon::StickyNote, "Notes", Check::On),
+        (PlateFamily::Green, Icon::Terminal, "Terminal", Check::On),
+        (PlateFamily::Violet, Icon::Sparkles, "Studio", Check::Off),
+        (PlateFamily::Neutral, Icon::Settings, "Settings", Check::Off),
     ];
     let pills = [
         ("Floor off (default)", DockMetrics::default()),
@@ -321,7 +316,7 @@ fn DockSection() -> Element {
                                                 shown: Some(if index == 1 { Shown::Visible } else { Shown::Hidden }),
                                                 IconView { source: IconSource::Glyph(icon), size: IconSize::Tile48, plate: Some(family) }
                                             }
-                                            if running == Switch::On {
+                                            if running == Check::On {
                                                 RunningDot {}
                                             }
                                         }

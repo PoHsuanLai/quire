@@ -11,7 +11,7 @@ use crate::components::menus::menu_shape::PLAIN;
 use crate::components::menus::row_chord::NO_CHORD;
 use crate::core::geometry::units::Point;
 use crate::core::press::Press;
-use crate::core::vocab::{Selection, StaggerIndex, Switch};
+use crate::core::vocab::{Selection, Shown, StaggerIndex};
 use dioxus::prelude::*;
 
 /// What a panel draws around its choices: the selection, the choice whose submenu is open,
@@ -148,9 +148,9 @@ pub(crate) fn render_lines<T>(lines: &[Line<'_, T>], row: Row, drawn: Drawn) -> 
                         selection: Selection::of(&Some(index), &drawn.selected),
                         availability: *availability,
                         branch: Branch::Parent(if drawn.open == Some(index) {
-                            Switch::On
+                            Shown::Visible
                         } else {
-                            Switch::Off
+                            Shown::Hidden
                         }),
                         trailing: None,
                         shape: PLAIN,

@@ -10,9 +10,9 @@ use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, CardAccent, Chevron, Ds, FrameTint, Grain, Icon, Inject,
-    Material, ModuleGrid, ModuleState, ModuleTile, Pane, PaneSwitcher, RootChrome, RowTrailing,
-    SettingsRow, Switch, TextLine, Theme, TileSpan, default_look,
+    Appearance, Button, ButtonVariant, CardAccent, Check, Chevron, Ds, FrameTint, Grain, Icon,
+    Inject, Material, ModuleGrid, ModuleState, ModuleTile, Pane, PaneSwitcher, RootChrome,
+    RowTrailing, SettingsRow, TextLine, Theme, TileSpan, default_look,
 };
 use ds::{
     AppearancePicker, Fraction, LevelControl, LevelGlyph, LevelLook, ModulePanel, Muting,
@@ -137,12 +137,12 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
 #[component]
 fn Detail(module: Module, on_back: EventHandler<ds::Press>) -> Element {
     let mut chosen = use_signal(|| 0usize);
-    let mut headphones = use_signal(|| Switch::On);
+    let mut headphones = use_signal(|| Check::On);
     let check = move |index: usize| {
         RowTrailing::Check(if chosen() == index {
-            Switch::On
+            Check::On
         } else {
-            Switch::Off
+            Check::Off
         })
     };
     let list = match module {

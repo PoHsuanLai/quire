@@ -1,11 +1,11 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::Switch;
+use ds::Check;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Expanded, Fraction,
-    Hex, ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, SendMood, SendPhase,
-    SendPill, SendRing, TextInput, TextInputKind,
+    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Fraction, Hex,
+    ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, SendMood, SendPhase, SendPill,
+    SendRing, Shown, TextInput, TextInputKind,
 };
 use ds::{
     Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Here, ItemKind, PersonHue, Presence,
@@ -92,11 +92,11 @@ pub const CASES: &[Case] = &[
     // Button: a hint, a name for assistive technology, and the open state of what it opens.
     Case {
         golden: "controls/button/mini-titled-open.html",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", expanded: Expanded::Open, onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "+", title: "Add account…", aria_label: "Add account", expanded: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/quiet-closed.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "More", expanded: Expanded::Closed, onclick: |_| {} } },
+        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "More", expanded: Shown::Hidden, onclick: |_| {} } },
     },
     // TextInput: a password, empty (the placeholder) and filled (the dots).
     Case {
@@ -110,7 +110,7 @@ pub const CASES: &[Case] = &[
     // AccountTile: the favicon mark, and the Add account tile, with and without a hint.
     Case {
         golden: "lists/account_tile/one-image-mark.html",
-        make: || rsx! { AccountTile { account: poh(), pressed: Switch::On, unread: 2, mark: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())), onclick: |_| {} } },
+        make: || rsx! { AccountTile { account: poh(), pressed: Check::On, unread: 2, mark: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())), onclick: |_| {} } },
     },
     Case {
         golden: "lists/account_tile/add.html",

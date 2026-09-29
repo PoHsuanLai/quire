@@ -7,14 +7,14 @@
 //! inside it gives up its own look and takes the item's; an `IconButton { Status }` draws the
 //! same pill itself and needs no wrapper.
 
-use crate::core::vocab::{Emphasis, Switch};
+use crate::core::vocab::{Emphasis, Shown};
 use dioxus::prelude::*;
 
 /// One bar item: `children` is the control (a `Button { Quiet }`, a clock, the app name); `open`
 /// is whether its menu is showing.
 #[component]
 pub fn MenuBarItem(
-    #[props(default)] open: Switch,
+    #[props(default)] open: Shown,
     #[props(default)] emphasis: Emphasis,
     #[props(default)] id: Option<String>,
     children: Element,

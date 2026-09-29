@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Ds, Icon, Material, Point, RowTrailing, SettingsRow, ShortcutKey,
-    Switch,
+    Appearance, Availability, Check, Ds, Icon, Material, Point, RowTrailing, SettingsRow,
+    ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -19,7 +19,7 @@ const VIEW: Viewport = Viewport {
 /// Two device rows with switches, the second disabled; the page logs what each heard.
 #[allow(non_snake_case)]
 fn RowsApp() -> Element {
-    let mut on = use_signal(|| Switch::Off);
+    let mut on = use_signal(|| Check::Off);
     let mut log = use_signal(Vec::<String>::new);
     let mut note = move |entry: String| log.with_mut(|log| log.push(entry));
     rsx! {
@@ -31,7 +31,7 @@ fn RowsApp() -> Element {
                     detail: "Battery 84%",
                     trailing: RowTrailing::Toggle {
                         value: on(),
-                        on_toggle: EventHandler::new(move |next: Switch| {
+                        on_toggle: EventHandler::new(move |next: Check| {
                             on.set(next);
                             note(format!("toggle:{next:?}"));
                         }),
@@ -42,7 +42,7 @@ fn RowsApp() -> Element {
                     glyph: Icon::Mouse,
                     title: "Mouse",
                     trailing: RowTrailing::Toggle {
-                        value: Switch::Off,
+                        value: Check::Off,
                         on_toggle: EventHandler::new(move |_| note("toggle:mouse".to_owned())),
                     },
                     availability: Availability::Disabled,

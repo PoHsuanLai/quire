@@ -5,7 +5,7 @@ use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
     Button, ButtonVariant, ExternalIcon, Icon, IconButton, IconButtonVariant, IconSize, IconSource,
-    IconUrl, IconView, Switch,
+    IconUrl, IconView, Shown,
 };
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
@@ -63,7 +63,7 @@ pub fn ExternalIcons() -> Element {
                 Specimen { name: "Tool, symbolic data: SVG",
                     div { class: "g-row",
                         IconButton { variant: IconButtonVariant::Tool, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications", onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Tool, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications expanded", expanded: Some(Switch::On), onclick: |_| {} }
+                        IconButton { variant: IconButtonVariant::Tool, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications expanded", expanded: Some(Shown::Visible), onclick: |_| {} }
                     }
                 }
                 Specimen { name: "Tool, symbolic file: SVG",

@@ -2,8 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Disclosure, FieldFocus, Icon, IconButton, IconButtonVariant, InputVariant, PlaceId,
-    Propagation, TextInput, TreeItem, TreeShape,
+    FieldFocus, Icon, IconButton, IconButtonVariant, InputVariant, PlaceId, Propagation, Shown,
+    TextInput, TreeItem, TreeShape,
 };
 
 /// One state and its golden.
@@ -33,7 +33,7 @@ pub const CASES: &[Case] = &[
             rsx! {
                 TreeItem {
                     label: "Projects",
-                    open: Disclosure::Open,
+                    open: Shown::Visible,
                     on_toggle: |_| {},
                     glyph: Icon::Folder,
                     count: 3,
@@ -41,7 +41,7 @@ pub const CASES: &[Case] = &[
                     editing: rename("Projects"),
                     trailing: more("Projects"),
                     place: PlaceId("INBOX/Projects".to_string()),
-                    TreeItem { label: "Quire", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder }
+                    TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder }
                 }
             }
         },
@@ -50,7 +50,7 @@ pub const CASES: &[Case] = &[
         golden: "lists/tree_item/editing-leaf.html",
         make: || {
             rsx! {
-                TreeItem { label: "Receipts", open: Disclosure::Closed, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, editing: rename("Receipts") }
+                TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, editing: rename("Receipts") }
             }
         },
     },

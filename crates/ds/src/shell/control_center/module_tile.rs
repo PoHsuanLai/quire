@@ -13,7 +13,7 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{PressListeners, Propagation};
 use crate::core::press::Press;
-use crate::core::vocab::{Availability, Expanded};
+use crate::core::vocab::{Availability, Shown};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::detail::{armed::use_armed, first_show::FirstShow, touch::Touch};
@@ -46,7 +46,7 @@ pub fn ModuleTile(
     #[props(default)] span: TileSpan,
     onclick: EventHandler<Press>,
     #[props(default)] on_detail: Option<EventHandler<Press>>,
-    #[props(default)] expanded: Expanded,
+    #[props(default)] expanded: Shown,
     #[props(default)] availability: Availability,
     #[props(default)] first: FirstShow,
     #[props(default)] disc: DiscMotion,
@@ -107,7 +107,7 @@ fn opens(key: &Key) -> bool {
 fn chevron_button(
     title: &TextLine,
     on_detail: Option<EventHandler<Press>>,
-    expanded: Expanded,
+    expanded: Shown,
     availability: Availability,
 ) -> Element {
     let name = format!("{} details", title.plain_text());

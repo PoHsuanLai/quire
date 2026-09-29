@@ -6,10 +6,10 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Appearance, Availability, Button, ButtonVariant, Chip, ChipVariant, CommandPalette,
-    CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile, MenuTrail,
-    ModuleGrid, ModuleState, ModuleTile, MonthGrid, PaletteEntrance, Radius, RootChrome, Scheme,
-    SegmentedControl, Surface, Switch, Theme, Toggle, WidgetFrame, WidgetMetrics, WidgetSize,
+    Accent, Appearance, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
+    CommandPalette, CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile,
+    MenuTrail, ModuleGrid, ModuleState, ModuleTile, MonthGrid, PaletteEntrance, Radius, RootChrome,
+    Scheme, SegmentedControl, Surface, Theme, Toggle, WidgetFrame, WidgetMetrics, WidgetSize,
     accent_of,
 };
 
@@ -173,7 +173,7 @@ fn Controls() -> Element {
         div { class: "g-acc-line",
             Button { variant: ButtonVariant::Primary, label: "Done", onclick: |_| {} }
             Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: |_| {} }
-            Toggle { label: "Wi-Fi", value: Switch::On, onchange: |_| {} }
+            Toggle { label: "Wi-Fi", value: Check::On, onchange: |_| {} }
         }
         div { class: "g-acc-line",
             SegmentedControl::<u8> { label: "View", options: views, value: 1, onchange: |_| {} }

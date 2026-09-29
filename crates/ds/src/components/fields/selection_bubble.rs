@@ -13,7 +13,7 @@ use crate::core::geometry::{
     placement::{Align, Placement, Side},
     units::{Px, Rect},
 };
-use crate::core::vocab::Switch;
+use crate::core::vocab::Check;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::stack::layer_stack::Dismiss;
@@ -28,7 +28,7 @@ pub struct BubbleButton {
     /// Its title, with the shortcut.
     pub title: String,
     /// Whether the mark is active.
-    pub pressed: Option<Switch>,
+    pub pressed: Option<Check>,
     /// Pressed.
     pub onclick: EventHandler<()>,
 }
@@ -60,7 +60,7 @@ fn bubble_entry(index: usize, action: BubbleAction) -> Element {
                 r#type: "button",
                 class: "ds-bubble-button",
                 title: "{button.title}",
-                "aria-pressed": button.pressed.map(Switch::aria),
+                "aria-pressed": button.pressed.map(Check::aria),
                 // The selection survives a click on the bubble (`S:2135`).
                 onmousedown: move |event| event.prevent_default(),
                 onclick: move |_| button.onclick.call(()),

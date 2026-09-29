@@ -15,7 +15,7 @@ use crate::components::menus::row_chord::{RowChord, shown_chord};
 use crate::components::menus::row_shape::RowShape;
 use crate::core::geometry::units::{Point, Px};
 use crate::core::press::{PointerButton, Press};
-use crate::core::vocab::{Availability, Check, Selection, Shortcut, StaggerIndex, Switch};
+use crate::core::vocab::{Availability, Check, Selection, Shortcut, Shown, StaggerIndex};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -56,7 +56,7 @@ pub(crate) enum Branch {
     /// It picks a value.
     Leaf,
     /// It opens a submenu, open or not.
-    Parent(Switch),
+    Parent(Shown),
 }
 
 /// A row's own part in a motion of its list's rows (the command palette's Show More and Show
@@ -138,10 +138,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
         mounted: onmounted,
         release: onrelease,
     } = events;
-    let checked = view.check.map(|check| match check {
-        Check::Checked => "true",
-        Check::Unchecked => "false",
-    });
+    let checked = view.check.map(Check::aria);
     let title = view.title.draw(view.marks);
     let detail = view.detail.map(|detail| detail.draw(&[]));
     let action = view.trailing.map(trailing);
@@ -273,7 +270,7 @@ fn trail(
     shape: &RowShape,
     chord: Option<Shortcut>,
 ) -> Element {
-    if row == Row::Tiled && check == Some(Check::Checked) {
+    if row == Row::Tiled && check == Some(Check::On) {
         return rsx! {
             span { class: "ds-menu-trail",
                 Glyph { icon: Icon::Check, size: IconSize::Compact }

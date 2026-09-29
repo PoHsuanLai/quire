@@ -6,10 +6,10 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Chip, ChipVariant, Emphasis,
-    Fraction, Here, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, PulseKey,
-    Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex, Surface,
-    Switch, Tabs, TextInput, Toggle, Verdict,
+    Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
+    Emphasis, Fraction, Here, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence,
+    PulseKey, Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex,
+    Surface, Tabs, TextInput, Toggle, Verdict,
 };
 
 /// What the matrix can show.
@@ -74,7 +74,7 @@ fn Cell(subject: Subject) -> Element {
     match subject {
         Subject::Buttons => rsx! {
             Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
-            Button { variant: ButtonVariant::Secondary, label: "Pressed", pressed: Some(Switch::On), onclick: |_| {} }
+            Button { variant: ButtonVariant::Secondary, label: "Pressed", pressed: Some(Check::On), onclick: |_| {} }
             Button { variant: ButtonVariant::Quiet, label: "Quiet", icon: Some(Icon::Archive), onclick: |_| {} }
             Button { variant: ButtonVariant::Danger, label: "Off", availability: Availability::Disabled, onclick: |_| {} }
         },
@@ -85,8 +85,8 @@ fn Cell(subject: Subject) -> Element {
             Chip { variant: ChipVariant::Status(Verdict::Fail), text: "2.1 : 1" }
         },
         Subject::Switches => rsx! {
-            Toggle { label: "On", value: Switch::On, onchange: |_| {} }
-            Toggle { label: "Off", value: Switch::Off, onchange: |_| {} }
+            Toggle { label: "On", value: Check::On, onchange: |_| {} }
+            Toggle { label: "Off", value: Check::Off, onchange: |_| {} }
             Slider { label: "Level", value: Fraction(600), onchange: |_| {} }
         },
         Subject::Row => rsx! {

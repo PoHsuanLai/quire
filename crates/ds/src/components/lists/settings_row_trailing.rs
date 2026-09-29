@@ -6,7 +6,7 @@
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::toggle::Toggle;
 use crate::components::lists::row_battery::RowBattery;
-use crate::core::vocab::{Availability, Fraction, Switch};
+use crate::core::vocab::{Availability, Check, Fraction};
 use crate::focus::click::kept_click;
 use crate::motion::detail::{check_mark::CheckMark, first_show::FirstShow, settle::Settling};
 use crate::style::icon::Icon;
@@ -21,13 +21,13 @@ pub enum RowTrailing {
     #[default]
     None,
     /// A check when `On`: the network in use, the output chosen. `Off` keeps the column empty.
-    Check(Switch),
+    Check(Check),
     /// A switch of its own: `value` shown, `on_toggle` hearing the flipped value.
     Toggle {
         /// Whether it is on.
-        value: Switch,
+        value: Check,
         /// The switch was flipped; the row's own `onclick` does not run.
-        on_toggle: EventHandler<Switch>,
+        on_toggle: EventHandler<Check>,
     },
     /// A chevron: the row opens something further.
     Chevron,
@@ -57,8 +57,7 @@ impl RowTrailing {
     /// `aria-pressed` for a check row: whether it is the chosen one.
     pub(crate) fn pressed(&self) -> Option<&'static str> {
         match self {
-            RowTrailing::Check(Switch::On) => Some("true"),
-            RowTrailing::Check(Switch::Off) => Some("false"),
+            RowTrailing::Check(check) => Some(check.aria()),
             _ => None,
         }
     }
@@ -75,7 +74,7 @@ pub(crate) fn trailing(
 ) -> Element {
     match mark.clone() {
         RowTrailing::None => rsx! {},
-        RowTrailing::Check(Switch::On) => rsx! {
+        RowTrailing::Check(Check::On) => rsx! {
             span { class: "ds-settings-row-trail", "data-mark": "check",
                 if let Settling::Drawing(_) = settling {
                     CheckMark { settling, size: IconSize::Compact }
@@ -84,7 +83,7 @@ pub(crate) fn trailing(
                 }
             }
         },
-        RowTrailing::Check(Switch::Off) => rsx! {
+        RowTrailing::Check(Check::Off | Check::Mixed) => rsx! {
             span { class: "ds-settings-row-trail", "data-mark": "check" }
         },
         RowTrailing::Toggle { value, on_toggle } => toggle(value, on_toggle, title, availability),
@@ -112,8 +111,8 @@ pub(crate) fn trailing(
 /// The row's switch, fenced so its click and keys are its own: the Small switch (26 x 15), the
 /// reference's mini switch in form rows (design/29-SIZING.md section 13 decision 4).
 fn toggle(
-    value: Switch,
-    on_toggle: EventHandler<Switch>,
+    value: Check,
+    on_toggle: EventHandler<Check>,
     title: &TextLine,
     availability: Availability,
 ) -> Element {

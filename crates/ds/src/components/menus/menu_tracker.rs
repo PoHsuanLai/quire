@@ -230,7 +230,7 @@ impl Tracker {
             }
             MenuTrackEffect::Highlight(None)
             | MenuTrackEffect::Open(..)
-            | MenuTrackEffect::Switch(_)
+            | MenuTrackEffect::Check(_)
             | MenuTrackEffect::Close(_)
             | MenuTrackEffect::Pick(_)
             | MenuTrackEffect::Adjacent(_) => {}

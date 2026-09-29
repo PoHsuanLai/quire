@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Chevron, Ds, Expanded, Icon, Inject, Material, ModuleState, ModuleTile, Theme,
+    Appearance, Chevron, Ds, Icon, Inject, Material, ModuleState, ModuleTile, Shown, Theme,
     TileSpan,
 };
 
@@ -14,7 +14,7 @@ pub struct TileCase {
     pub state: ModuleState,
     pub span: TileSpan,
     pub chevron: Chevron,
-    pub detail: Expanded,
+    pub detail: Shown,
     pub live: Live,
 }
 
@@ -48,7 +48,7 @@ pub fn grid() -> Vec<(String, TileCase)> {
                         state,
                         span,
                         chevron: Chevron::Detail,
-                        detail: Expanded::Closed,
+                        detail: Shown::Hidden,
                         live: Live::Handled,
                     },
                 ));
@@ -65,7 +65,7 @@ pub fn chevrons() -> Vec<(String, TileCase)> {
         state: ModuleState::Off,
         span: TileSpan::Half,
         chevron: Chevron::Detail,
-        detail: Expanded::Closed,
+        detail: Shown::Hidden,
         live: Live::Handled,
     };
     vec![
@@ -86,7 +86,7 @@ pub fn chevrons() -> Vec<(String, TileCase)> {
         (
             "tile-open-chevron".to_owned(),
             TileCase {
-                detail: Expanded::Open,
+                detail: Shown::Visible,
                 ..base
             },
         ),
