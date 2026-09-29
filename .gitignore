@@ -2,7 +2,6 @@
 /target-*
 tools/progress/out/
 crates/ds-gallery/out/
-tools/icongen/.venv/
 __pycache__/
 tools/emoji/.venv/
 tools/emoji/.cache/

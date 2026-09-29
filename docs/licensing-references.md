@@ -35,15 +35,14 @@ Not used: `HiDream-ai/HiDream-O1-Image` (MIT), design/08's third candidate.
 
 | Tool | Licence | How it is used |
 | --- | --- | --- |
-| ComfyUI (`~/comfy/ComfyUI`, rev `b5cc8830279eae909a59de030af1e50761c36751`) | GPL-3.0 | local tool only, driven over HTTP by `tools/icongen`; never shipped, linked or copied from |
+| ComfyUI (`~/comfy/ComfyUI`, rev `b5cc8830279eae909a59de030af1e50761c36751`) | GPL-3.0 | local tool only, driven over HTTP by a Python client (formerly `tools/icongen`, since removed); never shipped, linked or copied from |
 | ComfyUI-GGUF (city96, rev `6ea2651e7df66d7585f6ffee804b20e92fb38b8a`) | Apache-2.0 | custom node inside ComfyUI, tool only |
-| `tools/icongen` | this workspace (MIT OR Apache-2.0) | stdlib-only Python client of ComfyUI's HTTP API; the graphs it builds were written from ComfyUI's bundled workflow templates' node lists (node names and parameter values are facts about the API, not copied code) |
 | `tools/icons` | this workspace | pure-Rust post-process, `image` 0.25 and `clap` 4 from the pinned block |
 
 ## Outputs
 
 Bake-off renders are not assets: they stay under `~/comfy/out/bakeoff/` (and `round2..5/`) and
-are not committed; only the contact sheets under `tools/progress/shots/icons/` are.
+are not committed, and neither are the contact sheets under `tools/progress/shots/icons/`.
 
 **The shipped app icons** (`assets/icons/apps/`, design/08-ICONS.md 2.11) are our own icons,
 under the repository's licence (MIT OR Apache-2.0). Three (files, terminal, notes) are drawn by
