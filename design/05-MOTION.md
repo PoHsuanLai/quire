@@ -653,7 +653,7 @@ Settled for the port; the catalogue above is unchanged except where named.
 ### 4.11 Added by quire (the user's picture, 2026-09-26)
 
 The persona's five keyframes (`persona-blink`, `-breathe`, `-wince`, `-hop`, `-drift`) and its
-`--t-drift` token were removed with the persona (design/24). What remains:
+`--t-drift` token were removed with the persona. What remains:
 
 - `picture-accept`: `0%{ transform:none } 35%{ transform:translateY(-8%) scale(1.03) }
   100%{ transform:none }` at `--t-big --e-spring` (`Anim::PictureAccept`), on
