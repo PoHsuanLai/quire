@@ -130,7 +130,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         heal: Heal<K>,
         settled: EventHandler<K>,
     ) -> Result<(), Gone> {
-        let anim = super::roster::exit_anim(exit, Emphasis::Plain);
+        let anim = exit.anim(Emphasis::Plain);
         let length = settle(anim, self.level()?, StaggerIndex::default());
         self.cancel_exit(&key)?;
         let roster = *self;
