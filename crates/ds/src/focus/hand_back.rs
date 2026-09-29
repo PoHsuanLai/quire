@@ -15,7 +15,7 @@ use std::rc::Rc;
 /// The host's hand-back seam, provided by ds-native under `FocusFallback::Ancestor` (its
 /// default): `(surface, opener)` records that when `surface` is removed while it has the
 /// keyboard, `opener` (or its nearest focusable ancestor) should have it next, if `opener` is
-/// still in the document. A webview has none: the browser's own focus handling stands.
+/// still in the document. Without it the renderer's own focus handling stands.
 #[derive(Clone)]
 pub struct HostHandBack(pub Rc<Record>);
 

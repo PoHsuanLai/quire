@@ -39,6 +39,6 @@ impl From<Select> for Landing {
 
 /// The host's select-all write, provided as root context by `ds-native` beside `HostFocus`
 /// (`ds_native::launch`, its harness, `ds_native::focus::provide`). Without one, [`Select::All`]
-/// does nothing: a webview has no seam for it.
+/// does nothing.
 #[derive(Debug, Clone, Copy)]
 pub struct HostSelect(pub fn(&MountedData) -> Focused);

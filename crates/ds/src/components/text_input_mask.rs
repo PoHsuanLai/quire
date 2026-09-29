@@ -6,8 +6,8 @@
 //! Where the host reads the field's selection ([`HostSelection`], ds-native), the field hides
 //! Blitz's caret (`caret-color: transparent`) and the mask draws its own: a 1.5 px bar the height
 //! of the line, as Blitz's is, placed between the dots at the caret's character. A selected
-//! range is a highlight over its dots and shows no caret. Without the host (a webview) the
-//! renderer's caret stays.
+//! range is a highlight over its dots and shows no caret. Without the host the renderer's
+//! caret stays.
 
 use crate::components::text_input_kind::MASK_DOT;
 use crate::focus::caret::{FieldSelection, HostSelection};

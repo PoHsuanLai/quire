@@ -32,8 +32,8 @@ pub struct StripAction {
     pub onclick: EventHandler<Rect>,
 }
 
-/// Whether each strip button carries a `title` naming it: the webview's own tooltip, which a
-/// caller that also relies on it (mailo's rows did) asks for. Off by default, so a strip's
+/// Whether each strip button carries a `title` naming it, for a caller that
+/// relies on the renderer's own tooltip. Off by default, so a strip's
 /// markup is what it was.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Titles {

@@ -32,8 +32,7 @@ pub enum Measured {
 
 /// The host's own rect read, provided as root context by `ds-native` (`ds_native::launch`, its
 /// harness, and `ds_native::measure::provide` for any other Blitz host); without one, reads use
-/// `MountedData::get_client_rect` (the webview answers it from JavaScript, with no borrow),
-/// guarded so a renderer that holds its document answers [`Measured::Busy`] instead of panicking.
+/// `MountedData::get_client_rect`, guarded so a renderer that holds its document answers [`Measured::Busy`] instead of panicking.
 #[derive(Debug, Clone, Copy)]
 pub struct HostMeasure(pub fn(&MountedData) -> Measured);
 

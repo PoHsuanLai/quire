@@ -4,7 +4,7 @@
 //!
 //! Blitz's own `scroll_into_view` scrolls the document's viewport only, never the list, so the
 //! host does it: ds-native provides [`HostReveal`], which reads the item's place in the list's
-//! layout and sets the list's scroll offset. Without one (a webview) the item's own
+//! layout and sets the list's scroll offset. Without one the item's own
 //! `scrollIntoView` with the nearest block is used, which is the same rule.
 
 use crate::busy::wait_out_busy;
