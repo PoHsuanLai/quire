@@ -96,7 +96,7 @@ control in v1.
 | `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `07-LOOKS.md#2-the-look-model` | settled (preference) |
 | `appearance.look` | `Look::{Mac}` (Arc joins with the second Look) | `Mac` | a Look is values only | `30-CATALOGUE.md` part 3 | settled (user, 2026-09-29) |
 | `appearance.accent` | `Accent` (6 variants) | `Postmark` | other 5 not named in any doc (03-COLOR open decision 6) — **could not find full default set**, see handback | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
-| `appearance.motion_level` | `MotionLevel::{System,Calm,Standard,Extra,Reduced}` | `System` | `System` follows the portal's `prefers-reduced-motion` | `07-LOOKS.md#11-desktop-default` ("Motion levels ... apply on top of whichever look is active | proposed") | proposed |
+| `appearance.motion_level` | `Motion::{Standard,Reduced}` | `Standard` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
 | `appearance.typeface` | `Typeface::{System,Editorial}` | `System` | `System`: Inter for UI and data (tabular), Inter Display for display; `Editorial`: Bricolage Grotesque, Karla and Space Mono, mail's voice, as an opt-in for an app. Written as `data-typeface` on `.ds`. Code and `Kbd` stay in Space Mono (`--font-code`) either way | `02-TYPE.md#2-the-faces` | settled (user, 2026-09-26: "make this desktop use mostly inter") |
 | `appearance.material_tint_alpha` | `Percent` | `80` | | `21-SPACES.md#3-where-the-tokens-apply` ("`--m-tint` = ... alpha .80 (proposed)") | proposed |
 | `appearance.material_highlight_light` | `Percent` | `30` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
