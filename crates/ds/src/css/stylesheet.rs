@@ -1,11 +1,12 @@
 //! The whole stylesheet, generated once.
 
 use super::{
-    GRAIN_PNG, RESET, UTILITIES, accents_css::accents_css, emit::property, emit::rule,
-    ground_css::ground_css, materials_css::materials_css, motion_css::motion_css,
-    shape_css::shape_css, tokens_css::tokens_css,
+    RESET, UTILITIES, accents_css::accents_css, emit::property, emit::rule, ground_css::ground_css,
+    materials_css::materials_css, motion_css::motion_css, shape_css::shape_css,
+    tokens_css::tokens_css,
 };
 use crate::components::CSS;
+use crate::css::grain::grain_uri;
 use std::sync::LazyLock;
 
 /// Every rule the design system draws with, in cascade order. Built once, on first use.
@@ -22,7 +23,7 @@ fn build() -> String {
         ".ds-grain",
         &[property(
             "background-image",
-            &format!("url(\"{GRAIN_PNG}\")"),
+            &format!("url(\"{}\")", grain_uri()),
         )],
     );
     let sections: [(&str, String); 9] = [

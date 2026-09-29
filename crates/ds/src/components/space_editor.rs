@@ -7,7 +7,7 @@ pub(crate) mod edit;
 pub(crate) mod field;
 pub(crate) mod handles;
 pub(crate) mod parts;
-pub(crate) mod png;
+
 pub(crate) mod rows;
 
 use crate::appearance::theme::{Scheme, Theme};

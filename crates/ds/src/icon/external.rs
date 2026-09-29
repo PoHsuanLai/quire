@@ -4,8 +4,8 @@
 
 use super::Icon;
 use super::render::IconSize;
-use crate::components::space_editor::png::base64;
 use crate::components::status::family::StatusState;
+use crate::core::base64;
 use crate::error::DsError;
 use std::path::Path;
 
@@ -34,7 +34,7 @@ impl IconUrl {
     /// A PNG's bytes as a `data:image/png;base64,…` URL (a status item's `IconPixmap`, once the
     /// caller has encoded it).
     pub fn png(bytes: &[u8]) -> Self {
-        IconUrl(format!("data:image/png;base64,{}", base64(bytes)))
+        IconUrl(format!("data:image/png;base64,{}", base64::encode(bytes)))
     }
 
     /// An SVG document as a `data:image/svg+xml,…` URL, percent-encoded (spike S7's form).
