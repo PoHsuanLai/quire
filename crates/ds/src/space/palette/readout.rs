@@ -3,8 +3,7 @@
 //! Every number here is `contrast::ratio` of a colour [`derive`] produced, or of the Post
 //! card's own literals. The editor shows these and computes nothing of its own.
 //!
-//! Moved from mailo (`mail-app/src/palette/readout.rs`); `Space` became [`SpaceLook`] and the
-//! `bool` predicate became a [`Verdict`] (design/03-COLOR.md section 6).
+//! A pass or fail is a [`Verdict`] (design/03-COLOR.md section 6).
 
 use super::{card, derive};
 use crate::appearance::{Accent, Scheme};

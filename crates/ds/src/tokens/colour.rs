@@ -1,7 +1,7 @@
 //! The card's colour tokens, light and dark (design/03-COLOR.md sections 3, 10-12).
 //!
-//! `--frame` is renamed `--foreign-ground`; `color-mix()` is replaced by precomputed washes.
-//! The frame's `--f-*` are not here: they are derived per Space ([`crate::FrameVars`]).
+//! `color-mix()` is replaced by precomputed washes. The frame's `--f-*` are not here: they are
+//! derived per Space ([`crate::FrameVars`]).
 //!
 //! Precomputed washes (section 11 and open decisions 3-4; every value here is proposed):
 //! `--ok-wash` is `--ok` at .16 over transparent, exactly what `color-mix(in oklab, var(--ok)
@@ -75,7 +75,7 @@ pub enum ColourToken {
     Danger,
     /// `--scrim`: behind peek and the command menu.
     Scrim,
-    /// `--foreign-ground`: the sender's page behind an original message (was `--frame`).
+    /// `--foreign-ground`: the sender's page behind an original message.
     ForeignGround,
     /// `--ok-wash`: `--ok` at 16% over transparent.
     OkWash,
@@ -278,7 +278,7 @@ impl ColourToken {
             // section 17.3.3).
             ColourToken::ScrimIdle => (solid(0x000000), solid(0x000000)),
             ColourToken::Knob => (WHITE, WHITE),
-            // The sender's page stays white in a dark window (section 12, mailo's `--frame`).
+            // The sender's page stays white in a dark window (section 12).
             ColourToken::ForeignGround => (WHITE, WHITE),
             ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),
             ColourToken::WarnWash => (solid(0xEDE6D9), solid(0x333123)),

@@ -234,7 +234,7 @@ pub(super) const SHOT_OUT: Recipe = recipe(
 );
 
 /// `picture-accept` (design/25-EMOJI.md section 7): the user's picture lifts once and lands at
-/// `--t-big --e-spring`, as the dropped persona's hop did; the unlock answers the user's own
+/// `--t-big --e-spring`; the unlock answers the user's own
 /// contact (principle 2). A lock screen unlocks at its settle.
 pub(super) const PICTURE_ACCEPT: Recipe = recipe(
     "picture-accept",

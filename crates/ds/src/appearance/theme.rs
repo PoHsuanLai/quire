@@ -1,10 +1,9 @@
 //! Which palette a surface resolves to: the three-way choice a person makes ([`Theme`]) and
 //! the two-way answer the stylesheet needs ([`Scheme`]).
 //!
-//! [`Theme`] moved from mailo (`mail-app/src/view.rs`). mailo's `Theme::attribute`, which
-//! returned `None` for `System` so a `prefers-color-scheme` media guard could decide, is gone:
-//! quire resolves the scheme in Rust and always writes an explicit `data-theme`
-//! (design/05-MOTION.md section 9 rule 11, [`crate::resolve`]).
+//! quire resolves the scheme in Rust and always writes an explicit `data-theme`, never leaving
+//! `System` to a `prefers-color-scheme` media guard (design/05-MOTION.md section 9 rule 11,
+//! [`crate::resolve`]).
 
 use serde::{Deserialize, Serialize};
 

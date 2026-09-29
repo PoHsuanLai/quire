@@ -1,7 +1,6 @@
 //! How a peek floats over the card (design/04-COMPONENTS.md section 24, `PeekMode`).
 //!
-//! Moved from mailo's `view::Peek`. mailo's `Side` variant is the reader's place in mailo's own
-//! grid, not an overlay, so it stays in mailo; quire's peek is Center or Full.
+//! A peek is Center or Full; a place in an app's own grid is not an overlay and stays the app's.
 
 use serde::{Deserialize, Serialize};
 

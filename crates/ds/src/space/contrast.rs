@@ -1,7 +1,7 @@
 //! WCAG contrast between two hex colours.
 //!
 //! Palette derivation needs this at runtime, and the legibility tests measure every token pair
-//! with it. Moved verbatim from mailo (`mail-app/src/contrast.rs`), tests included.
+//! with it.
 
 /// Whether a measured pair clears its floor: the answer a contrast check gives, and what a
 /// status chip shows (`data-status="ok|bad"`, design/04-COMPONENTS.md section 10).

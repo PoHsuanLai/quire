@@ -1,8 +1,7 @@
 //! How much a surface moves: the preference a person picks ([`Motion`]) and the level the
 //! token table is written against ([`MotionLevel`]).
 //!
-//! [`Motion`] moved from mailo (`mail-app/src/view.rs`) and gained `System` and `Reduced`
-//! (design/22-SETTINGS.md section 3.1 `appearance.motion_level`, default `System`).
+//! [`Motion`] is design/22-SETTINGS.md section 3.1 `appearance.motion_level`, default `System`.
 //! [`MotionLevel`] is design/05-MOTION.md section 3.2: one attribute that rescales the whole
 //! system, `Reduced` = 60 ms everywhere.
 
