@@ -4,8 +4,16 @@
 use super::control_center::CONTROL_CENTER;
 use super::control_size::ControlSize;
 use super::shell_scale::SHELL_SCALE;
-use super::size_scale::{HalfPx, KNOB_INSET, SizeScale, WholePx, on_grid};
+use super::size_scale::{HalfPx, KNOB_INSET, SizeScale, WholePx};
 use super::size_vars::{SizeVar, size_tokens};
+
+/// The spacing steps new sizes are drawn from (R7): a 4 px grid with a 2 px half step.
+const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];
+
+/// Whether `px` is a step of [`SPACING_GRID`].
+fn on_grid(px: u16) -> bool {
+    SPACING_GRID.contains(&px)
+}
 
 /// Per size: height, radius, capsule radius (half px), knob, switch w x h, switch knob, slider
 /// track and knob, segment and its radius, glyph.

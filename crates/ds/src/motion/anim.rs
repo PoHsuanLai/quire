@@ -31,8 +31,6 @@
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
 
-pub use super::recipe::{Fill, Iteration, Recipe};
-
 /// One animation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Anim {

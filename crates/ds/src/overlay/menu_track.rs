@@ -14,13 +14,6 @@ pub(crate) mod machine;
 pub(crate) mod triangle;
 pub(crate) mod types;
 
-pub use triangle::{inside, shielded};
-pub use types::{
-    Branch, Entered, Held, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget,
-    MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
-    Submenu,
-};
-
 #[cfg(test)]
 mod keyboard_tests;
 #[cfg(test)]

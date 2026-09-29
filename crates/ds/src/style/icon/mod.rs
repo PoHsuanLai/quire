@@ -16,35 +16,31 @@
 //! No serde: an icon is never stored, and a derive would make it a persisted schema
 //! (`CONVENTIONS.md` section 3).
 
-pub mod classify;
+use shape::Shape;
 
-pub mod family;
+pub(crate) mod classify;
+
+pub(crate) mod family;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;
 pub(crate) mod geometry_control;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
-pub mod plate;
-pub mod plate_tint;
-pub mod render;
-pub mod retint;
+pub(crate) mod plate;
+pub(crate) mod plate_tint;
+pub(crate) mod render;
+pub(crate) mod retint;
 pub(crate) mod sets;
-pub mod shape;
-pub mod stroke;
+pub(crate) mod shape;
+pub(crate) mod stroke;
 #[cfg(test)]
 mod tests;
-pub mod tone_band;
+pub(crate) mod tone_band;
 #[cfg(test)]
 mod tone_band_tests;
+pub(crate) mod url;
 
-pub use crate::components::content::icon_source::{ExternalIcon, IconSource, IconUrl};
-pub use classify::{ChromaLimit, IconKind, classify, classify_with};
-pub use family::PlateFamily;
 use geometry::*;
-pub use plate_tint::{PlateStops, PlateTint};
-pub use retint::{IconStyle, Tint, retint, retint_in};
-pub use shape::Shape;
-pub use stroke::stroke_device_pixels;
 
 /// One glyph: the mailo set, named for its key in the design's `ICON` table, then the shell
 /// set, named for its Lucide glyph.

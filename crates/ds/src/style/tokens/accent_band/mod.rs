@@ -16,25 +16,14 @@
 
 pub(crate) mod band;
 pub(crate) mod derive;
-pub mod floors;
+pub(crate) mod floors;
 pub(crate) mod grounds;
-pub(crate) mod legibility;
+#[cfg(test)]
+mod legibility;
 
 pub(crate) mod picked;
 pub(crate) mod roles;
 pub(crate) mod text_grounds;
-
-pub use band::{AccentBand, AccentPick, ChromaSpan, Hue, InkRule, Milli, SchemeBand, Weight};
-pub use derive::accent_roles;
-pub use grounds::{card_grounds, card_ink};
-pub use legibility::{Legibility, legibility};
-
-pub use picked::{BAND, hue_of};
-pub use roles::AccentRoles;
-pub use text_grounds::{
-    BACKDROPS, Ground, GroundKind, TEXT_MATERIALS, TextOn, least_on, material_grounds,
-    text_grounds, text_on,
-};
 
 #[cfg(test)]
 mod tests;

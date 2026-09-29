@@ -6,8 +6,7 @@ use crate::core::vocab::Availability;
 use dioxus::prelude::*;
 
 use crate::components::fields::text_input_focus::FieldFocus;
-pub use crate::components::fields::text_input_focus::Focus;
-pub use crate::components::fields::text_input_kind::{Grow, Rows, TextInputKind};
+use crate::components::fields::{text_input_focus::Focus, text_input_kind::TextInputKind};
 use crate::focus::field::FieldHandle;
 use crate::focus::targets::Told;
 

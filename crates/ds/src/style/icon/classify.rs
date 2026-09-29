@@ -5,8 +5,8 @@
 //!
 //! Near-grey is OKLCH chroma below a threshold (design/08 section 1.5 proposes 0.04). The
 //! settings key is `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3, default
-//! 0.04, range 0.0..=0.2); `classify` uses [`ChromaLimit::default`] and [`classify_with`] takes
-//! one built with [`ChromaLimit::try_from`]. `sill` still has to register the key in its own
+//! 0.04, range 0.0..=0.2); [`classify_with`] takes the default
+//! ([`ChromaLimit::default`]) or one built with [`ChromaLimit::try_from`]. `sill` still has to register the key in its own
 //! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
 
 use crate::core::colour::oklab::{Oklab, Oklch};
@@ -62,12 +62,6 @@ impl TryFrom<f32> for ChromaLimit {
 /// too little of their colour to say anything about it.
 const OPAQUE_FROM: u8 = 128;
 
-/// Whether the PNG `png` is a symbolic or an image icon, at the default threshold
-/// (`icons.symbolic_chroma_max`'s default, 0.04).
-pub fn classify(png: &[u8]) -> Result<IconKind, DsError> {
-    classify_with(png, ChromaLimit::default())
-}
-
 /// Whether the PNG `png` is a symbolic or an image icon: symbolic when every pixel with at
 /// least half coverage has OKLCH chroma below `limit` (a fully transparent icon is symbolic).
 pub fn classify_with(png: &[u8], limit: ChromaLimit) -> Result<IconKind, DsError> {
@@ -95,7 +89,7 @@ pub(crate) fn chroma(rgb: [u8; 3]) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{ChromaLimit, IconKind, chroma, classify, classify_with};
+    use super::{ChromaLimit, IconKind, chroma, classify_with};
     use image::{ImageFormat, Rgba, RgbaImage};
     use std::io::Cursor;
 
@@ -131,7 +125,11 @@ mod tests {
             ("nothing opaque at all", CLEAR, CLEAR, IconKind::Symbolic),
         ];
         for &(name, middle, edge, want) in CASES {
-            assert_eq!(classify(&png(middle, edge)), Ok(want), "{name}");
+            assert_eq!(
+                classify_with(&png(middle, edge), ChromaLimit::default()),
+                Ok(want),
+                "{name}"
+            );
         }
     }
 
@@ -140,7 +138,10 @@ mod tests {
         let tinted = png([120, 122, 140, 255], CLEAR);
         let measured = chroma([120, 122, 140]);
         assert!((0.02..0.04).contains(&measured), "{measured}");
-        assert_eq!(classify(&tinted), Ok(IconKind::Symbolic));
+        assert_eq!(
+            classify_with(&tinted, ChromaLimit::default()),
+            Ok(IconKind::Symbolic)
+        );
         assert_eq!(classify_with(&tinted, ChromaLimit(20)), Ok(IconKind::Image));
     }
 
@@ -179,6 +180,6 @@ mod tests {
 
     #[test]
     fn bytes_that_are_not_a_png_are_refused() {
-        assert!(classify(b"not a png").is_err());
+        assert!(classify_with(b"not a png", ChromaLimit::default()).is_err());
     }
 }

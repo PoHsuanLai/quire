@@ -21,10 +21,8 @@
 use crate::components::menus::palette::palette_body::{StopEvents, draw_groups};
 use crate::components::menus::palette::palette_claim::{Claim, FieldKey};
 use crate::components::menus::palette::palette_group::PaletteGroups;
-pub use crate::components::menus::palette::palette_host::{CommandPaletteHost, PaletteEntrance};
 use crate::components::menus::palette::palette_lines::{PaletteKey, palette_key};
 use crate::components::menus::palette::palette_motion::{Book, use_action_book, use_list_motion};
-pub use crate::components::menus::palette::palette_motion::{PaletteHandle, use_palette_handle};
 use crate::components::menus::palette::palette_reveal::{Reveal, use_reveal};
 use crate::components::menus::palette::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::menus::palette::palette_select::{PaletteSelection, use_palette_selection};
@@ -38,6 +36,10 @@ use crate::components::menus::palette::palette_stops::{
 use crate::components::fields::search_field::SearchField;
 use crate::components::fields::text_input_focus::Focus;
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
+use crate::components::menus::palette::{
+    palette_host::{CommandPaletteHost, PaletteEntrance},
+    palette_motion::PaletteHandle,
+};
 use crate::components::overlays::popover::{Dismiss, Float, Stacking, use_float};
 use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::{Px, Rect};

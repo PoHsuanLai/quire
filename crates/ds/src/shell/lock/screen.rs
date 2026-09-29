@@ -3,8 +3,8 @@
 //! clock stands near the top and the prompt near the bottom, centred across: the reference lock
 //! screen's layout, so a shell draws it without layout rules of its own.
 
-use crate::components::content::icon_source::IconUrl;
 use crate::components::content::image_source::ImageSource;
+use crate::style::icon::url::IconUrl;
 use dioxus::prelude::*;
 
 /// The lock screen's stage. Put it in a root that fills its surface (`Ds { material:

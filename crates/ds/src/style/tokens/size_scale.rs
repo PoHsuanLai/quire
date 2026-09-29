@@ -9,7 +9,7 @@
 //! - R4 a switch is `round_even(1.73 h)` wide;
 //! - R5 a rounded rectangle's radius comes from its size;
 //! - R6 an element inset `p` in a frame of radius `R` has radius `R - p`;
-//! - R7 spacing is on a 4 px grid with a 2 px half step ([`SPACING_GRID`]);
+//! - R7 spacing is on a 4 px grid with a 2 px half step (`size_rules_tests`);
 //! - R8 the glyph follows the size.
 
 /// A length in whole logical pixels (R1).
@@ -43,14 +43,6 @@ pub const KNOB_INSET: WholePx = WholePx(1);
 
 /// The switch's width over its height, in hundredths (R4): the reference's 26/15 and 38/22.
 pub const SWITCH_RATIO: u16 = 173;
-
-/// The spacing steps new sizes are drawn from (R7): a 4 px grid with a 2 px half step.
-pub const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];
-
-/// Whether `px` is a step of [`SPACING_GRID`].
-pub fn on_grid(px: u16) -> bool {
-    SPACING_GRID.contains(&px)
-}
 
 /// The numbers one control size is built from; everything else is a method.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

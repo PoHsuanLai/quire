@@ -72,7 +72,3 @@ impl Mood {
         }
     }
 }
-
-/// A wake counter, shared with the other components that replay an entrance (the battery
-/// ring's fill); it lives in [`crate::motion`] and is re-exported here for picture callers.
-pub use crate::motion::wake::WakeStamp;

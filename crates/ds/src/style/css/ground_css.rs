@@ -1,4 +1,4 @@
-//! The frame ground (`data-ground="frame"`, `crate::root::chrome::Ground::Frame`): under it the paper inks and
+//! The frame ground (`data-ground="frame"`, `Ground::Frame`): under it the paper inks and
 //! fills are the frame's, so every component (Button, IconButton, Chip, Count, a menu's
 //! trigger, plain text) draws in the `--f-*` inks without a variant of its own
 //! (design/03-COLOR.md section 4, design/04-COMPONENTS.md's sidebar item).

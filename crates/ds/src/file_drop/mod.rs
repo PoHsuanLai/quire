@@ -10,11 +10,7 @@
 //! Paths only: a drag that carries no `file:` URI (a link or text dragged out of a browser) is
 //! refused, and no target lights for it.
 
-pub mod drag;
-pub mod hook;
-pub mod host;
+pub(crate) mod drag;
+pub(crate) mod hook;
+pub(crate) mod host;
 pub(crate) mod track;
-
-pub use drag::{DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop, Offer};
-pub use hook::{FileDropHandle, use_file_drop};
-pub use host::HostFileDrop;

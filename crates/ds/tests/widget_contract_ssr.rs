@@ -12,15 +12,15 @@ mod golden;
 use dioxus::prelude::*;
 use ds::LabelHue;
 use ds::lint::{LintConfig, markup};
+use ds::widget::{WidgetEdit, WidgetLayout};
 use ds::widget::{WireRefresh, WireTimeline};
 use ds::{
     Appearance, BatteryCell, BatteryEntry, BatteryWidget, CardPresence, ClockCity, ClockEntry,
     ClockTime, DayKey, DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Ds, Eventful, Fraction,
     IconSize, Inject, IsoWeek, Lift, Material, MonthDay, MonthEntry, MonthGridData, MonthKey,
     MonthWeek, MonthWidget, Motion, Panel, PanelEdge, Px, RingMark, RootChrome, RootExtent,
-    Seconds, Shown, Theme, Timeline, WeekNumbers, Widget, WidgetCard, WidgetEdit, WidgetGallery,
-    WidgetHost, WidgetLayout, WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide,
-    WorldClockWidget,
+    Seconds, Shown, Theme, Timeline, WeekNumbers, Widget, WidgetCard, WidgetGallery, WidgetHost,
+    WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide, WorldClockWidget,
 };
 use ds::{EventLine, MonthFace, TodayLine};
 use std::time::{Duration, Instant};

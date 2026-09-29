@@ -1,7 +1,7 @@
 //! Identity colours as tokens (design/03-COLOR.md section 13): the eight person swatches
 //! `--c-person-1..8`, the account and pin colours a consumer takes in order when it has stored
 //! none. They are data, not theme, so they are the same in both schemes. The hashed hue of a
-//! person with no stored colour is [`crate::components::content::avatar::PersonHue`] (`crate::components::content::avatar::person_hue`).
+//! person with no stored colour is `PersonHue` (`person_hue`).
 
 use super::hex::{Colour, Hex};
 

@@ -54,8 +54,6 @@ pub struct AccentPick {
 /// Which ink sits on the solid fill; the fill's lightness steps until that ink reads on it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum InkRule {
-    /// White ink; the fill steps darker until white reaches the text floor.
-    White,
     /// A near-black of the accent's own hue (OKLCH 0.22, 0.03); the fill steps lighter.
     Deep,
 }

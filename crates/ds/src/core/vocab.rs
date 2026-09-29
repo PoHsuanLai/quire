@@ -237,7 +237,7 @@ impl Shortcut {
     /// The keys in the order they are drawn: modifiers first in the Mac's order (⌃⌥⇧⌘),
     /// deduplicated, then the rest as given.
     pub fn keys(&self) -> Vec<Key> {
-        crate::components::menus::standard_action::normalized(self.0.iter().copied())
+        crate::core::standard_action::normalized(self.0.iter().copied())
     }
 }
 

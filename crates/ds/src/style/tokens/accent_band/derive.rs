@@ -9,8 +9,6 @@ use crate::core::colour::fit::oklch_bytes;
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::hex::{Alpha, Hex};
 
-const WHITE: Hex = Hex([0xFF, 0xFF, 0xFF]);
-
 /// The hue and chroma one accent is drawn in; only lightness moves from here.
 #[derive(Debug, Clone, Copy)]
 struct Tone {
@@ -57,7 +55,6 @@ pub fn accent_roles(band: &AccentBand, pick: AccentPick, scheme: Scheme) -> Acce
 /// The fill and its ink.
 fn solid_fill(bounds: &SchemeBand, tone: Tone) -> (Hex, Hex) {
     let (ink, step) = match bounds.ink {
-        InkRule::White => (WHITE, -floors::LIGHTNESS_STEP),
         InkRule::Deep => (tone_ink(tone), floors::LIGHTNESS_STEP),
     };
     let lightness = walk(bounds.fill.fraction(), step, |lightness| {

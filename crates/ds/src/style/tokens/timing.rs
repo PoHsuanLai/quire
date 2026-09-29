@@ -3,7 +3,7 @@
 //! The four base durations and `--t-ambient` follow the level; the named durations are
 //! literals that change only under `Reduced` (60 ms). Durations the prototypes wrote without a
 //! name (park, nudge, C's shake, sail, boat-return, spin, the send ring, the chip flash) are named here so an
-//! [`crate::motion::anim::Anim`] can point at them.
+//! `Anim` can point at them.
 //!
 //! `Reduced` is 60 ms for every token of [`DurationKind::Motion`], the named ones included
 //! (design/05-MOTION.md section 3.2, "named durations (3.4) ... 60ms each"); a

@@ -1,14 +1,14 @@
 //! One `.ds[data-material=…]` block per material and scheme, and the `data-blur` switch
 //! between `--m-tint` and `--m-tint-solid`.
 //!
-//! The paint rules come last: a root or [`crate::root::surface::Surface`] with a material paints the solid tint
+//! The paint rules come last: a root or `Surface` with a material paints the solid tint
 //! unless it says `data-blur=on`, which is the safe default of [`crate::style::appearance::blur::BlurState`]. The
 //! material's edge and drop are painted as one `box-shadow` naming only the layers that are not
 //! `none` (a `var(--m-edge),var(--m-shadow)` list would be invalid whenever either is), so the
 //! colours stay in the `--m-*` declarations. That list is `--m-box`, so a card inside a
 //! transparent root paints the same edge and drop.
 //!
-//! Then the root chrome (`crate::root::chrome::RootChrome`, `crate::root::chrome::FrameTint`): a window's root
+//! Then the root chrome (`RootChrome`, `FrameTint`): a window's root
 //! (`data-frame=opaque`) is its own stacking context, so its frame layers and grain paint over
 //! its background; a root drawing the tinted
 //! frame (`data-frame=tinted`) paints no tint of its own, and its `.ds-frame` group shows the
@@ -78,7 +78,7 @@ pub fn materials_css() -> String {
     css
 }
 
-/// The OSD card (`crate::shell::osd::Osd`): a card inside a transparent Osd root that
+/// The OSD card (`Osd`): a card inside a transparent Osd root that
 /// paints what a tinted root paints on its own box (its `.ds-frame` group at the frame alpha, the
 /// solid floor without blur, the inner pair redrawn over it), so one root serves both the fade and
 /// the card's tokens.

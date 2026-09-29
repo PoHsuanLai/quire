@@ -63,9 +63,6 @@ fn a_dark_tinted_plate_clears_the_dock_and_its_art_clears_the_plate() {
 
 #[test]
 fn the_light_scheme_is_unchanged() {
-    let tint = PlateTint::Monochrome(Tint::space(PRESETS[0].dots));
-    let light = PlateStops::of(PlateFamily::Neutral, Scheme::Light);
-    assert_eq!(light.tinted_in(tint, Scheme::Light), light.tinted(tint));
     let mut before = RASTER_DARK.to_vec();
     let mut after = RASTER_DARK.to_vec();
     crate::style::icon::retint::retint(&mut before, IconStyle::Muted, Tint::NEUTRAL);

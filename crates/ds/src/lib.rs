@@ -1,68 +1,259 @@
 //! quire's renderer-free design system: tokens, palette, icons, components and motion.
 //!
-//! Every module is one concept; this file declares them and re-exports the flat public surface.
-//! The linter stays a module (`ds::lint`), behind the `lint` feature. DESIGN.md maps each
-//! module to the design doc section it implements.
+//! The crate is layered as the crates it will split into: `core` (vocabulary, geometry, time,
+//! tasks, colour), `style` (appearance, tokens, materials, palettes, fonts, icons, the
+//! stylesheet's sections), `motion` (animation data, timers, machines and the details), the
+//! linter, then the components with the host seams under them, `shell` for the shell's own
+//! parts, and `assembly` on top. A layer names only the layers below it
+//! (`scripts/check-boundary.sh`). Every public item has one path: a root name, or a name in one
+//! of the modules below. DESIGN.md maps each module to the design doc section it implements.
 
-pub(crate) mod assembly;
-pub mod components;
-pub(crate) mod core;
-pub mod edit;
-pub mod file_drop;
-pub mod focus;
-pub(crate) mod host;
+mod assembly;
+mod components;
+mod core;
+mod edit;
+mod file_drop;
+mod focus;
+mod host;
 #[cfg(feature = "lint")]
 pub mod lint;
 pub mod motion;
-pub mod overlay;
-pub mod root;
-pub(crate) mod shell;
-pub mod spell;
-pub(crate) mod style;
-pub mod window;
+mod overlay;
+mod root;
+mod shell;
+mod spell;
+mod style;
+mod window;
 
+/// The small-state details (design/26-DETAILS.md): moments, their grammar and the hooks that
+/// play them.
 pub mod detail {
-    pub use crate::motion::detail::*;
-}
-pub mod icon {
-    pub use crate::style::icon::*;
-}
-pub mod time {
-    pub use crate::core::time::*;
-}
-pub mod widget {
-    pub use crate::shell::widget::*;
-}
-pub mod catalog {
-    pub use crate::shell::catalog::*;
+    pub use crate::motion::detail::{
+        check_mark::CheckMark,
+        count_up::{CountPace, use_count_up},
+        cue::Cue,
+        detailed::{Detailed, first_table, moment_table},
+        first_show::FirstShow,
+        idle_dim::{IdleDimPhase, use_idle_dim},
+        layer_glyph::{LayerGlyph, Layering},
+        moment::Moment,
+        morph::{MorphStyle, Slashed},
+        morph_glyph::MorphGlyph,
+        once::{use_nudge, use_shake},
+        operation::{Deadline, Operation, PendingToken},
+        pending::{Layers, PendingSpec, PendingStyle},
+        reveal::{Reveal, RevealCue},
+        roll_digits::RollDigits,
+        settle::{SettleStyle, Settling},
+        stamp::EventStamp,
+        sweep::use_sweep,
+        touch::{Contact, Handled, Touch},
+        use_detail::{Detail, use_detail},
+        use_operation::use_operation,
+        use_pending::use_pending,
+        use_settle::use_settle,
+    };
 }
 
-pub use crate::assembly::ds::{Ds, Inject};
-pub use crate::assembly::stylesheet::{component_sheets, stylesheet};
-pub use crate::components::content::icon_source::{ExternalIcon, IconSource, IconUrl};
-pub use crate::core::colour::contrast::{Verdict, ratio};
-pub use crate::core::error::DsError;
-pub use crate::core::geometry::{
-    placement::{Align, Flip, Placed, Placement, PopoverRequest, Side, place},
-    scale::{Grid, Scale},
-    units::{Point, Px, Rect, Size},
+/// What a host needs to decide how an icon it did not draw is shown, and to recolour one.
+pub mod icon {
+    pub use crate::style::icon::{
+        classify::{IconKind, classify_with},
+        retint::{IconStyle, Tint, retint, retint_in},
+        stroke::stroke_device_pixels,
+    };
+
+    /// The squircle plate's geometry a host sizes its own shadows from.
+    pub mod plate {
+        pub use crate::style::tokens::plate::shadow_radius_share;
+    }
+}
+
+/// The clock every timer reads, virtual under a test's `VirtualClock`.
+pub mod time {
+    pub use crate::core::time::clock::{now, since};
+}
+
+/// The desktop widgets' layout: the grid, placing and moving a widget, and the wire form of a
+/// widget's timeline.
+pub mod widget {
+    pub use crate::shell::widget::{
+        calendar::LARGE_EVENTS,
+        contract::fit,
+        layout::{
+            DesktopGrid, GridCell, LayoutError, Order, WidgetAt, WidgetEdit, WidgetLayout,
+            WidgetPlacement, apply, cells,
+        },
+        registry::{TakenKind, UnsizedKind},
+        timeline::REFRESH_FLOOR,
+        wire::{WireRefresh, WireTimeline},
+    };
+}
+
+/// Where a widget sits in the catalog.
+pub mod catalog {
+    pub use crate::shell::catalog::placement::PlacementId;
+}
+
+pub use crate::assembly::{
+    ds::{Ds, Inject},
+    stylesheet::{component_sheets, stylesheet},
 };
-pub use crate::core::text::clip::clip_chars;
-pub use crate::core::time::clock::{ClockGuard, VirtualClock, sleep};
-pub use crate::core::time::{FRAME_SLACK, FRAME_TICK};
+pub use crate::components::{
+    app::{
+        account_tile::{AccountFace, AccountTile, AddAccountTile},
+        command_pill::CommandPill,
+        edge_strip::EdgeStrip,
+        hover_strip::{ActionId, HoverStrip, StripAction, Titles},
+        link_pill::{LinkPill, LinkTarget},
+        peek::Peek,
+        send_mood::SendMood,
+        send_pill::{PillAction, SendPhase, SendPill, SendRing},
+        sidebar_item::{ItemKind, PlaceId, Preview, SidebarItem, TodayTrailing},
+        sync_halo::{SyncHalo, SyncState},
+        tree_item::{Disclosure, TreeItem, TreeShape},
+    },
+    chrome::{
+        traffic_lights::TilePose,
+        window_frame::{TrafficLights, WindowFrame, WindowTitlebar},
+    },
+    content::{
+        avatar::{
+            Avatar, AvatarFace, AvatarMuting, AvatarShape, AvatarSize, AvatarTone, PersonHue,
+            person_hue,
+        },
+        emoji_grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid},
+        icon_source::{ExternalIcon, IconSource},
+        icon_view::IconView,
+        image_source::{ImageSize, ImageSource},
+        pane_switcher::PaneSwitcher,
+        pdf_thumb::{PDF_THUMB_GRACE, PdfPage, PdfThumb, PdfTrouble},
+        preview_content::{Mono, PANE_MEDIA, PaneContent},
+        preview_pane::{PaneAction, PreviewPane},
+        provider_mark::{MarkSize, MarkStyle, Provider, ProviderMark},
+        rich_text::{Rich, RichRun, RichText},
+        status::{
+            battery::BatteryGlyph,
+            battery_state::{BatteryPower, BatteryState, LowAt},
+            bluetooth::BluetoothGlyph,
+            bluetooth_state::BluetoothState,
+            family::StatusState,
+            volume::{VolumeGlyph, VolumeState, VolumeWaves},
+            wifi::WifiGlyph,
+            wifi_state::{WifiBars, WifiReach, WifiState},
+        },
+        text_runs::{Run, RunTone, Text},
+    },
+    controls::{
+        appearance_picker::{AppearancePicker, PickerLayout},
+        bump_on::Bumped,
+        button::{Button, ButtonVariant},
+        button_face::{ButtonFace, Leading, Trailing},
+        button_size::ButtonSize,
+        chip::{Chip, ChipVariant},
+        count::{Count, CountPlace},
+        icon_button::{IconButton, IconButtonVariant},
+        kbd::{Kbd, KbdSize},
+        level::{
+            control::LevelControl,
+            vocab::{LevelGlyph, LevelLook, LevelMode, LevelSource, Muting, Tick},
+        },
+        pass_through::{DataAttr, DataName, ExtraClass, PassThroughError},
+        press::Propagation,
+        segmented::{SegSize, SegmentedControl},
+        slider::Slider,
+        spinner::{Spinner, SpinnerKind},
+        tabs::Tabs,
+        toggle::Toggle,
+    },
+    fields::{
+        edit_surface::EditSurface,
+        edit_surface_spell_menu::SpellMarks,
+        search_field::SearchField,
+        selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble},
+        text_input::{InputVariant, TextInput},
+        text_input_focus::Focus,
+        text_input_kind::{Grow, Rows, TextInputKind},
+    },
+    lists::{
+        animated_list::AnimatedList,
+        leaving_list::{LeavingItem, LeavingList},
+        list_row::ListRow,
+        row_hooks::PartHooks,
+        section_header::{HeaderKind, SectionHeader},
+        settings_row::SettingsRow,
+        settings_row_phase::{RowDisc, RowPhase, RowWork},
+        settings_row_trailing::RowTrailing,
+    },
+    menus::{
+        menu::Menu,
+        menu_cursor::Cursor,
+        menu_entry::{MenuEntry, MenuRow, Tile, Trail},
+        menu_filter::Filter,
+        menu_kind::{MenuEntrance, MenuKind},
+        menu_pick::PickDismiss,
+        palette::{
+            command_palette::CommandPalette,
+            palette_claim::{Claim, FieldKey},
+            palette_group::{GroupEntries, PaletteGroup, PaletteGroups},
+            palette_host::{CommandPaletteHost, PaletteEntrance},
+            palette_motion::{PaletteHandle, use_palette_handle},
+            palette_shown::Retain,
+        },
+        row_action::RowAction,
+        row_chord::{ChordShown, RowChord},
+        row_shape::{ClipBody, RowShape},
+    },
+    overlays::{
+        alert::Alert,
+        alert_vocab::AlertEmphasis,
+        drag_ghost::{DragGhost, DragReturnFrame, DropLine, Grip},
+        flow::Flow,
+        hover_card::{
+            HoverCard,
+            intent::{HoverAnchor, use_hover_intent},
+            parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint},
+            target::{HoverTarget, TargetElement},
+        },
+        panel::{Panel, PanelEdge, PanelScrim},
+        popover::{Dismiss, Elevation, Popover},
+        scrim::Scrim,
+        scrim_strength::ScrimStrength,
+        sheet::Sheet,
+        sheet_placement::SheetPlacement,
+        toast::use_toasts,
+        tooltip::{Shown, Tooltip, TooltipKind},
+    },
+};
+pub use crate::core::{
+    colour::contrast::{Verdict, ratio},
+    geometry::{
+        placement::{Align, Flip, Placed, Placement, Side, place},
+        scale::Scale,
+        units::{Point, Px, Rect, Size},
+    },
+    press::{PointerButton, Press},
+    standard_action::{Reserved, SpaceNumber, StandardAction},
+    text::clip::clip_chars,
+    time::{
+        FRAME_SLACK, FRAME_TICK,
+        clock::{ClockGuard, VirtualClock, sleep},
+    },
+    vocab::{
+        Availability, Check, DropState, Emphasis, Expanded, Fraction, Here, Key, Percent,
+        Selection, Shortcut, StaggerIndex, Switch,
+    },
+};
 pub use crate::edit::{
-    clicks::Clicks,
     handle::{EditHandle, use_edit_handle},
     host::{HostEdit, ImeEvent, ImeListener, ImeSwitch, Probe},
     input::{Composition, EditInput, KeyInput, Pasted, PreeditCursor},
     pointer::{CapturedPointer, EditFocus, EditPointer, Extend, PointerPhase},
-    position::{
-        EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextOffset, TextPosition, TextRange,
-    },
+    position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode, TextPosition, TextRange},
 };
 pub use crate::file_drop::{
     drag::{DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop, Offer},
-    hook::{FileDropHandle, use_file_drop},
+    hook::use_file_drop,
     host::HostFileDrop,
 };
 pub use crate::focus::{
@@ -73,8 +264,8 @@ pub use crate::focus::{
     click::{Fallback, HostClickFocus, HostPressFocus},
     field::{FieldHandle, use_field_handle},
     hand_back::HostHandBack,
-    host::{Focused, HostBlur, HostFocus, focus_soon, focus_soon_selecting},
-    request::{FocusRequest, FocusTicket, use_focus_request},
+    host::{Focused, HostBlur, HostFocus, focus_soon},
+    request::{FocusRequest, use_focus_request},
     select::{HostSelect, Select},
     selector::{FocusError, Found, HostFind, focus_by_selector},
 };
@@ -82,38 +273,32 @@ pub use crate::host::{
     measure::{Anchor, HostMeasure, Measured, MountedRef, RectProbe, use_rect},
     reveal::{HostReveal, ScrollSpan, Scrolled, nearest_scroll},
 };
-pub use crate::motion::hover_intent::HoverWarmth;
 pub use crate::motion::{
     anim::Anim,
     drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag},
-    entrance::use_entrance,
-    hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase},
-    pane_slide::{Pane, PaneRole, PaneRound, PaneSlide},
+    hover_intent::{HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase},
+    pane_slide::Pane,
     presence::{Exit, ListPresence, Presence},
     pulse::{Pulse, use_pulse},
-    recipe::{Fill, Iteration, Recipe},
-    roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed},
+    pulse_key::{PulseKey, PulsePhase},
+    recipe::{Fill, Iteration},
+    roster::{RosterState, RowPitch, StayError, Stayed},
     settle::settle,
-    timer::{MotionTimer, TimerPhase, use_motion_timer},
+    swipe::{Speed, SwipeMetrics},
+    timer::{TimerPhase, use_motion_timer},
     use_roster::{Roster, use_roster},
-};
-pub use crate::motion::{
-    level_run::{LevelRun, RunFrame, RunPhase, RunTail, RunTiming, RunTokens},
-    use_level_run::use_level_run,
-};
-pub use crate::motion::{
-    swipe::{Click, Speed, Stamp, SwipeEffect, SwipeInput, SwipeLook, SwipeMetrics, SwipeState},
-    use_swipe::{Held, Swiper, use_swipe},
+    wake::WakeStamp,
 };
 pub use crate::overlay::{
-    host::{OverlayHost, OverlayId, Overlays, use_overlays},
-    hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub},
+    host::{OverlayId, use_overlays},
+    hover_hub::{HoverKey, HoverKind, use_hover_hub},
     menu_track::types::{
         ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
         MenuTrackEffect, MenuTrackEvent,
     },
+    pull_tab::{Pull, PullTab, TabArm},
     stack::{Dismissal, LayerId, LayerStack},
-    toast_hub::{ToastHub, ToastState, UndoToken, use_toast_hub},
+    toast_hub::{ToastState, UndoToken, use_toast_hub},
 };
 pub use crate::root::{
     chrome::{FrameTint, Ground, RootChrome},
@@ -121,119 +306,177 @@ pub use crate::root::{
     surface::Surface,
     typeface::use_typeface,
 };
-pub use crate::shell::widget::{
-    battery::{BatteryCell, BatteryEntry, BatteryWidget},
-    calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
-    card::WidgetCard,
-    clock::{ClockCity, ClockEntry, WorldClockWidget},
-    contract::{NoIntent, Widget, WidgetContext, WidgetKind},
-    gallery::{GalleryWords, WidgetGallery},
-    layout::{DesktopGrid, GridCell, WidgetAt, WidgetEdit, WidgetLayout},
-    registry::{WidgetInfo, WidgetRegistry, provide_widget_registry, use_widget_registry},
-    timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
-    use_widget::use_widget,
-    wire::WireTimeline,
+pub use crate::shell::{
+    bar::{
+        menu_bar_item::MenuBarItem,
+        workspace_pills::{WorkspacePill, WorkspacePills},
+    },
+    battery::{
+        device_battery::DeviceBattery,
+        device_glyph::{Device, DeviceGlyph},
+        figure::BatteryFigure,
+        level::{BatteryLevel, RingMark},
+    },
+    clock::{
+        face::ClockFace,
+        kind::{ClockLook, ClockTime, DayPhase, Seconds},
+    },
+    control_center::{
+        module_grid::{GridColumns, ModuleGrid},
+        module_panel::{ModulePanel, PanelPlate},
+        module_tile::ModuleTile,
+        module_tile_kind::{Chevron, DiscMotion, ModuleState, TileSpan},
+    },
+    dock_parts::{DockFloor, RunningDot},
+    emoji::{
+        AnimatedEmoji, EMOJI_ATTRIBUTION,
+        disc::{DiscHue, EmojiDisc, EmojiPlayback},
+        id::EmojiId,
+    },
+    idle_dim::IdleDim,
+    lock::{
+        clock::LockClock,
+        polkit_prompt::PolkitPrompt,
+        prompt::LockPrompt,
+        screen::LockScreen,
+        vocab::{CapsLock, LockLook, LockUser, PromptState},
+    },
+    month_grid::{
+        MonthGrid,
+        data::{
+            DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey,
+            MonthWeek, Step, WeekNumbers,
+        },
+        density::MonthDensity,
+    },
+    notifications::{
+        banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack},
+        card::NotificationCard,
+        group_header::GroupHeader,
+        parts::{AppMark, CardAction, GroupCount, Hover, Layers},
+        swipe::Swipe,
+    },
+    now_playing::{
+        NowPlayingTrack, kind::Playback, play_pause::PlayPauseButton, track_position::TrackPosition,
+    },
+    osd::{Level, Osd, OsdPosition},
+    space_editor::{
+        DotIndex, SpaceEditor,
+        dot::SpaceDot,
+        rows::{MeasuredIn, MotionChoice, MotionLevels},
+    },
+    switcher::{
+        app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence},
+        switcher_fit::SwitcherMetrics,
+    },
+    thumbs::{
+        shot_ghost::ShotGhost,
+        shot_press::DragStart,
+        shot_thumbnail::{ShotThumbnail, ThumbAction},
+    },
+    user_picture::{
+        choice::{FaceFile, PictureChoice, resolve_picture},
+        mood::{Mood, PictureSize},
+        picker::UserPicturePicker,
+        picture::UserPicture,
+        portrait::UserPortrait,
+    },
+    widget::{
+        battery::{BatteryCell, BatteryEntry, BatteryWidget},
+        calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
+        card::WidgetCard,
+        clock::{ClockCity, ClockEntry, WorldClockWidget},
+        contract::{NoIntent, Widget, WidgetContext, WidgetKind},
+        exit::CardPresence,
+        frame::WidgetFrame,
+        gallery::WidgetGallery,
+        kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle},
+        registry::{WidgetRegistry, provide_widget_registry},
+        slot::WidgetSlotGuide,
+        timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
+    },
 };
 pub use crate::spell::{
     host::{HostSpell, Learned, Paragraph, SpellFuture, SpellService},
     lang::{Lang, Spell},
-    marks::{Misspelt, SpellReplace, Typing},
-    script::is_cjk,
+    marks::SpellReplace,
     words::Span,
 };
-pub use crate::style::appearance::{
-    accent::Accent,
-    appearance::Appearance,
-    look::{Look, Warmth},
-    motion::{Motion, MotionLevel},
-    peek::PeekMode,
-    resolve::{Resolved, resolve},
-    system::{Contrast, ReducedMotion, SystemPrefs},
-    theme::{Scheme, Theme},
-    typeface::Typeface,
-};
-pub use crate::style::appearance::{
-    blur::{Blur, BlurState},
-    material::Material,
-};
-pub use crate::style::fonts::{FACES, Face, FaceStyle, Subset, Weight};
-pub use crate::style::icon::Icon;
-pub use crate::style::icon::render::{Glyph, IconPx, IconSize};
-pub use crate::style::icon::{
-    classify::{ChromaLimit, IconKind},
-    family::PlateFamily,
-    plate_tint::PlateTint,
-    shape::Shape,
-};
-pub use crate::style::material::{
-    recipe::{MaterialRecipe, recipe},
-    stack::MaterialStack,
-};
-pub use crate::style::space::{
-    frame_vars::FrameVars,
-    look::{CardAccent, Grain, SpaceLook},
-    palette::{
-        Capping, Dot, NEUTRAL_DOT, Palette,
-        card::{Card, POST_DARK, POST_LIGHT, card},
-        derive, gradient,
-        readout::{ContrastCheck, readout},
-        swatch,
-    },
-    presets::{PRESETS, Preset, default_look},
-    store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex},
-};
-pub use crate::style::tokens::{
-    accent_band::roles::AccentRoles,
-    accent_table::accent_of,
-    colour::ColourToken,
-    control_center::{CONTROL_CENTER, ControlCenterScale},
-    control_size::ControlSize,
-    delay::DelayToken,
-    dock::{DockFloorSetting, DockMetrics},
-    easing::{CubicBezier, Easing, EasingToken},
-    elevation::Shadow,
-    hex::{Alpha, Colour, Hex},
-    label_hue::{HueMember, LabelHue},
-    layer::ZLayer,
-    name::VarName,
-    notifications::NotificationMetrics,
-    opacity::OpacityToken,
-    osd::OsdMetrics,
-    person::PersonSwatch,
-    pixel::PixelToken,
-    scalar::{ScalarToken, ScalarValue},
-    shape::{Corner, Radius},
-    shell::{BarType, FontWeight, LauncherType, MenuType, ShellMetrics},
-    shell_scale::{SHELL_SCALE, ShellScale},
-    size_scale::{HalfPx, SizeScale, WholePx},
-    size_vars::SizeVar,
-    spacing::SpacingToken,
-    timing::{DurationKind, DurationToken},
-    tuned::Tuned,
-    type_scale::{Family, FontSize, Voiced},
-    type_voice::VoiceToken,
-    widgets::WidgetMetrics,
-};
 pub use crate::style::{
+    appearance::{
+        accent::Accent,
+        appearance::Appearance,
+        blur::BlurState,
+        look::{Look, Warmth},
+        material::Material,
+        motion::{Motion, MotionLevel},
+        peek::PeekMode,
+        resolve::{Resolved, resolve},
+        system::{Contrast, ReducedMotion, SystemPrefs},
+        theme::{Scheme, Theme},
+        typeface::Typeface,
+    },
     env::{Env, HostModality, InputModality, use_env},
+    fonts::{FACES, Face, FaceStyle, Subset},
+    icon::{
+        Icon,
+        classify::ChromaLimit,
+        family::PlateFamily,
+        plate_tint::PlateTint,
+        render::{Glyph, GlyphProps, IconPx, IconSize},
+        shape::Shape,
+        url::IconUrl,
+    },
+    material::{recipe::recipe, stack::MaterialStack},
     scale::{HostScale, use_scale},
+    space::{
+        frame_vars::FrameVars,
+        look::{CardAccent, Grain, SpaceLook},
+        palette::{Capping, Dot, derive, readout::readout, swatch},
+        presets::{PRESETS, default_look},
+        store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex},
+    },
+    tokens::{
+        accent_table::accent_of,
+        colour::ColourToken,
+        control_center::CONTROL_CENTER,
+        control_size::ControlSize,
+        delay::DelayToken,
+        dock::{DockFloorSetting, DockMetrics},
+        easing::{Easing, EasingToken},
+        elevation::Shadow,
+        hex::{Alpha, Colour, Hex},
+        label_hue::{HueMember, LabelHue},
+        layer::ZLayer,
+        notifications::NotificationMetrics,
+        osd::OsdMetrics,
+        person::PersonSwatch,
+        pixel::PixelToken,
+        scalar::ScalarToken,
+        shape::{Corner, Radius},
+        shell::{FontWeight, ShellMetrics},
+        shell_scale::SHELL_SCALE,
+        size_scale::WholePx,
+        spacing::SpacingToken,
+        status::StatusMetrics,
+        timing::DurationToken,
+        type_scale::{Family, FontSize},
+        type_voice::VoiceToken,
+        widget_paint::WidgetPaint,
+        widgets::WidgetMetrics,
+    },
 };
 pub use crate::window::{
-    host::{HostWindow, WindowHost, use_window_host, use_window_host_provider, use_window_state},
-    timing::FrameTiming,
+    host::{HostWindow, WindowHost, use_window_host_provider},
     vocab::{
         Activation, Fullscreen, Maximized, ResizeEdge, Support, TileError, WindowState, WindowTile,
         Zoom,
     },
 };
-pub use components::*;
 
 use futures_timer as _;
 use serde_json as _;
 use thiserror as _;
 
-pub use crate::overlay::pull_tab::{Pull, PullTab, TabArm};
-pub use crate::style::icon::render::GlyphProps;
-pub use crate::style::tokens::widget_paint::WidgetPaint;
 #[cfg(feature = "lint")]
 use cssparser as _;

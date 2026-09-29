@@ -10,5 +10,3 @@
 //! order in a column) is each surface's own rule, applied before an edit reaches the list.
 
 pub(crate) mod placement;
-
-pub use placement::{Placement, PlacementId, Placements};

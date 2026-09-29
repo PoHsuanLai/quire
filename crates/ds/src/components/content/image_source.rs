@@ -3,8 +3,8 @@
 //! schemes a quire document's net provider answers. ProviderMark's favicon and the screenshot
 //! thumbnail both take one.
 
-use crate::components::content::icon_source::IconUrl;
 use crate::core::error::DsError;
+use crate::style::icon::url::IconUrl;
 use std::path::Path;
 
 /// An image the app supplies, as a `data:` URI or a `file:` URL, written as an `<img>`'s `src`.
