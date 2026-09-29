@@ -1,10 +1,12 @@
-//! CSS `filter` on a real Blitz document, one swatch per filter function, read back from the
-//! pixels of each backend: vello_cpu (the harness default) and vello_hybrid (skipped, with a
-//! note, where no GPU adapter opens). Every case compares the filtered swatch with a control of
-//! the same paint and no filter, so a function that paints nothing reads as the control.
+//! CSS `filter` on a real Blitz document, one swatch per filter function and per filter list,
+//! read back from the pixels of each backend: vello_cpu (the harness default, with the pinned
+//! `multithreading`) and vello_hybrid (skipped, with a note, where no GPU adapter opens). Every
+//! case compares the filtered swatch with a control of the same paint and no filter, so a
+//! function that paints nothing reads as the control.
 //!
-//! The cases at the bottom say what each backend paints today; when a fork makes another
-//! function render, its case fails and flips (FINDINGS "CSS filter").
+//! Both backends must paint every function and every list (FINDINGS "CSS filter"): the pinned
+//! renderers are the local vello and anyrender forks that add the colour matrix pass and
+//! multi-threaded filters, so a case that reads `Ignored` means a fork regressed.
 
 use dioxus::prelude::*;
 use ds::Px;
@@ -118,6 +120,34 @@ const SWATCHES: &[Swatch] = &[
         filtered: [173, 154, 120],
         plain: [128, 128, 128],
     },
+    // Filter lists: one filter layer per function, the first function innermost.
+    Swatch {
+        name: "list-order",
+        // (200,100,50) -> brightness(0.5) (100,50,25) -> invert (155,205,230); the other order
+        // would read (28,78,103).
+        filter: "brightness(0.5) invert(1)",
+        paint: "background:rgb(200,100,50)",
+        probe: (30, 30),
+        filtered: [155, 205, 230],
+        plain: [200, 100, 50],
+    },
+    Swatch {
+        name: "list-blur",
+        // Far from the edge a blur leaves the colour alone; the brightness before it still shows.
+        filter: "brightness(0.5) blur(4px)",
+        paint: "background:rgb(200,100,50)",
+        probe: (30, 30),
+        filtered: [100, 50, 25],
+        plain: [200, 100, 50],
+    },
+    Swatch {
+        name: "list-colour-after-blur",
+        filter: "blur(4px) contrast(2)",
+        paint: "background:rgb(153,153,153)",
+        probe: (30, 30),
+        filtered: [179, 179, 179],
+        plain: [153, 153, 153],
+    },
 ];
 
 /// The pixel a hard-edged black square gives the two shape swatches (blur, drop-shadow): a
@@ -165,9 +195,12 @@ pages!(
     opacity_page = 7,
     saturate_page = 8,
     sepia_page = 9,
+    list_order_page = 10,
+    list_blur_page = 11,
+    list_colour_after_blur_page = 12,
 );
 
-const PAGES: [fn() -> Element; 10] = [
+const PAGES: [fn() -> Element; 13] = [
     blur_page,
     brightness_page,
     contrast_page,
@@ -178,6 +211,9 @@ const PAGES: [fn() -> Element; 10] = [
     opacity_page,
     saturate_page,
     sepia_page,
+    list_order_page,
+    list_blur_page,
+    list_colour_after_blur_page,
 ];
 
 /// The pixel of `swatch`'s filtered box or its control (`row` 0 or 1).
@@ -253,32 +289,34 @@ macro_rules! filter_case {
     };
 }
 
-// vello_cpu as pinned (`multithreading`): the multi-threaded dispatcher has no filter support,
-// so anyrender_vello_cpu hands it none and every filter is dropped.
 filter_case! {
-    vello_cpu_drops_blur: Cpu, 0 => Ignored;
-    vello_cpu_drops_brightness: Cpu, 1 => Ignored;
-    vello_cpu_drops_contrast: Cpu, 2 => Ignored;
-    vello_cpu_drops_drop_shadow: Cpu, 3 => Ignored;
-    vello_cpu_drops_grayscale: Cpu, 4 => Ignored;
-    vello_cpu_drops_hue_rotate: Cpu, 5 => Ignored;
-    vello_cpu_drops_invert: Cpu, 6 => Ignored;
-    vello_cpu_drops_opacity: Cpu, 7 => Ignored;
-    vello_cpu_drops_saturate: Cpu, 8 => Ignored;
-    vello_cpu_drops_sepia: Cpu, 9 => Ignored;
+    vello_cpu_blurs: Cpu, 0 => Rendered;
+    vello_cpu_brightens: Cpu, 1 => Rendered;
+    vello_cpu_contrasts: Cpu, 2 => Rendered;
+    vello_cpu_casts_a_drop_shadow: Cpu, 3 => Rendered;
+    vello_cpu_grays: Cpu, 4 => Rendered;
+    vello_cpu_rotates_the_hue: Cpu, 5 => Rendered;
+    vello_cpu_inverts: Cpu, 6 => Rendered;
+    vello_cpu_fades: Cpu, 7 => Rendered;
+    vello_cpu_saturates: Cpu, 8 => Rendered;
+    vello_cpu_sepias: Cpu, 9 => Rendered;
+    vello_cpu_lists_in_order: Cpu, 10 => Rendered;
+    vello_cpu_lists_a_colour_and_a_blur: Cpu, 11 => Rendered;
+    vello_cpu_lists_a_blur_and_a_colour: Cpu, 12 => Rendered;
 }
 
-// vello_hybrid: blur and drop-shadow are GPU passes; every colour function (a colour matrix or a
-// component transfer) converts to nothing in anyrender_vello_hybrid.
 filter_case! {
     vello_hybrid_blurs: Hybrid, 0 => Rendered;
-    vello_hybrid_drops_brightness: Hybrid, 1 => Ignored;
-    vello_hybrid_drops_contrast: Hybrid, 2 => Ignored;
+    vello_hybrid_brightens: Hybrid, 1 => Rendered;
+    vello_hybrid_contrasts: Hybrid, 2 => Rendered;
     vello_hybrid_casts_a_drop_shadow: Hybrid, 3 => Rendered;
-    vello_hybrid_drops_grayscale: Hybrid, 4 => Ignored;
-    vello_hybrid_drops_hue_rotate: Hybrid, 5 => Ignored;
-    vello_hybrid_drops_invert: Hybrid, 6 => Ignored;
-    vello_hybrid_drops_opacity: Hybrid, 7 => Ignored;
-    vello_hybrid_drops_saturate: Hybrid, 8 => Ignored;
-    vello_hybrid_drops_sepia: Hybrid, 9 => Ignored;
+    vello_hybrid_grays: Hybrid, 4 => Rendered;
+    vello_hybrid_rotates_the_hue: Hybrid, 5 => Rendered;
+    vello_hybrid_inverts: Hybrid, 6 => Rendered;
+    vello_hybrid_fades: Hybrid, 7 => Rendered;
+    vello_hybrid_saturates: Hybrid, 8 => Rendered;
+    vello_hybrid_sepias: Hybrid, 9 => Rendered;
+    vello_hybrid_lists_in_order: Hybrid, 10 => Rendered;
+    vello_hybrid_lists_a_colour_and_a_blur: Hybrid, 11 => Rendered;
+    vello_hybrid_lists_a_blur_and_a_colour: Hybrid, 12 => Rendered;
 }
