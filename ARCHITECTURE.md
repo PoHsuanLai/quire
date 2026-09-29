@@ -707,10 +707,10 @@ Each step lands through the gate worktree, keeps master green, and compiles sill
 never leaves a re-export "for callers" except the one named: `ds` keeps today's root names, one
 path each, until step 12 replaces them with the prelude.
 
-1. **Rename collisions** (section 6) and the group order of section 2 inside `ds` (moves of
+1. **Rename collisions** (done) (section 6) and the group order of section 2 inside `ds` (moves of
    `emoji_grid`, `preview_*`, `level glyph`, `appearance_picker`, `edit_surface*`; `overlay` ->
    `stack`); `check-boundary.sh` encodes the layers. sill is told the renames.
-2. **`Word`**: `ds-core-derive`, `ds_core::word` in-crate, then convert the 111 hand-written
+2. **`Word`** (done): `ds-core-derive`, `ds_core::word` in-crate, then convert the 111 hand-written
    `slug`s in batches by module; `SchemaVariants` and `schema/foreign.rs` go with the settings
    derive (step 6).
 3. **`Token`, `TokenSet`, `Kit`, `Kits`**: `#[derive(Token)]` in `ds-core-derive`; every token
