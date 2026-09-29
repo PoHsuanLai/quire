@@ -18,7 +18,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | Crate | Purpose |
 | --- | --- |
 | `ds-core-derive` | proc macro: `#[derive(Word)]` |
-| `ds-core` | pure base: vocabulary, geometry units, colour, time, tasks, errors, text clip, PNG/base64, the `Word` trait |
+| `ds-core` | pure base: vocabulary, geometry units, colour, time, the `Spawner` trait, errors, text clip, PNG/base64, the `Word` trait |
 | `ds-style` | appearance, tokens and the `Token` trait, material, Space palettes, fonts (bytes), icons, CSS emission, the `Kit` seam |
 | `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar |
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
@@ -64,7 +64,7 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | Crate | Never reaches |
 | --- | --- |
 | `ds-core`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `pdfrum*`, `arboard` |
-| `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (the linter reads strings; the derives generate paths) |
+| `ds-core`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
 | `anyrender_pdfrum` | `blitz*`, `parley`, `stylo_taffy`, `dioxus*` |
@@ -81,7 +81,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 
 | Crate | Modules, lowest first |
 | --- | --- |
-| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock), `task` (scope-owned tasks, `Spawner`), `busy`, `guarded`, `error`, `text` (clip), `codec` (png, base64) |
+| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
 | `ds-style` | `appearance` (theme, accent, motion, look, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
@@ -115,9 +115,11 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 | `ds/core/geometry/{units,scale,placement}.rs` | `ds-core::geometry::{units, scale, placement}` |
 | `ds/core/colour/*` | `ds-core::colour::*` (the one copy) |
 | `ds/core/time/*` | `ds-core::time::*`; the private `Timeline` struct in `clock/timeline.rs` becomes `VirtualQueue` |
-| `ds/core/{task,busy,guarded,error}.rs`, `ds/core/text/clip.rs` | `ds-core::{task, busy, guarded, error, text::clip}` |
+| `ds/core/error.rs`, `ds/core/text/clip.rs`, the `Spawner` half of `ds/core/task.rs` | `ds-core::{error, text::clip, spawner}` |
+| `ds/core/{task,busy,guarded}.rs` (the Dioxus halves: scope-owned tasks, busy and guarded hooks) | `ds-style::task` (the lowest crate that uses Dioxus) |
+| the Dioxus event conversion in `ds/core/press.rs` | `ds::controls::press` (`ds-core::press` keeps the plain `Press`/`PointerButton` data) |
 | `ds/core/{png,base64}.rs` | `ds-core::codec::{png, base64}` |
-| new | `ds-core::word` (`Word`), `ds-core::task::Spawner` |
+| new | `ds-core::word` (`Word`), `ds-core::spawner::Spawner` |
 
 ### `ds` -> `ds-style`
 
@@ -199,7 +201,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Colour maths (sRGB, linear, OKLab, OKLCH, contrast, gamut fit) | `ds-core::colour` |
 | Pixel units, points, rects, device scale | `ds-core::geometry` |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
-| Scope-owned tasks, spawning | `ds-core::task` (`spawn_in`, `Spawner`) |
+| Scope-owned tasks, spawning | `ds-style::task` (`spawn_in`); the `Spawner` trait in `ds-core::spawner` |
 | Base vocabulary (`Availability`, `Switch`, `Shown`, `Fraction`) | `ds-core::vocab` |
 | PNG, base64 | `ds-core::codec` |
 | The crate error | `ds-core::error::DsError`; settings: `ds-settings::error::SettingsError` |
@@ -404,7 +406,7 @@ pub trait HostWindow { fn begin_move(&self); fn begin_resize(&self, edge: Resize
 // (HostWindow is 8 methods today and splits into `WindowMove { begin_move, begin_resize, state }`
 //  and `WindowPlace { zoom, minimize, close, tile, supports }` at the crate split.)
 
-// ds-core::task
+// ds-core::spawner
 pub trait Spawner: Send + Sync {
     fn spawn(&self, task: std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send>>);
 }
@@ -715,7 +717,7 @@ path each, until step 12 replaces them with the prelude.
    `pub` at its home module or moves to its only consumer; the boundary script keeps the list
    empty.
 6. **`ds-settings`**: `SettingsDoc`, `Store`, `ConfigRoot`, `SystemPrefsSource`, `Spawner` in
-   `ds-core::task`, `dioxus` as a feature, delete `diff.rs` and `test_dir.rs`; sill's settings
+   `ds-core::spawner`, `dioxus` as a feature, delete `diff.rs` and `test_dir.rs`; sill's settings
    follow (unknown keys are reported).
 7. **`DocumentHost`**: the part traits and `NoHost` in `ds::host`, `ds_native::provide_host`
    installing them all, `HostSignals`, delete every `Host*` newtype and the partial `provide`
