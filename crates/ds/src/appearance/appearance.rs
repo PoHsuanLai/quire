@@ -1,10 +1,8 @@
 //! How a surface looks, as data: the three choices a `.ds` root resolves (design/04-COMPONENTS.md
 //! section 26, O-16: Theme, Accent, Motion).
 //!
-//! Moved from mailo (`mail-app/src/view.rs`). mailo's `marks` (provider icons or letters) is a
-//! mail preference and stays in mailo; `accent` came back as one of six. Loading is lenient
-//! exactly as mailo's was: a missing field is the first-run value and an unknown word for one
-//! field is that field's default, never a failure of the whole value.
+//! Loading is lenient: a missing field is the first-run value and an unknown word for one field
+//! is that field's default, never a failure of the whole value.
 
 use super::{Accent, Motion, Theme};
 use serde::de::Deserializer;
@@ -58,10 +56,8 @@ where
         .unwrap_or_default())
 }
 
-/// The stored value as a word, or `None` when it is some other shape (a number, a table).
-///
-/// mailo read `String::deserialize` here, which failed the whole file on `"accent": 7`; its
-/// own migration test only passed because the retired field was skipped before this ran.
+/// The stored value as a word, or `None` when it is some other shape (a number, a table), so
+/// `"accent": 7` costs only the accent.
 fn word<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
 where
     D: Deserializer<'de>,
@@ -107,14 +103,6 @@ mod tests {
                 r#"{"theme":"dark","motion":"wild"}"#,
                 Appearance {
                     theme: Theme::Dark,
-                    ..Appearance::default()
-                },
-            ),
-            (
-                "a retired accent word keeps the theme",
-                r#"{"accent":"pine","theme":"light"}"#,
-                Appearance {
-                    theme: Theme::Light,
                     ..Appearance::default()
                 },
             ),
