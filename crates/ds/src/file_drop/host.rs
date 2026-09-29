@@ -1,10 +1,10 @@
 //! The host's side of a file drag: the targets the app registered, the drag the host feeds in,
 //! and the host's own hit test through the document.
 
-use crate::components::vocab::DropState;
+use crate::core::geometry::units::Point;
+use crate::core::vocab::DropState;
 use crate::file_drop::drag::{DropAcceptance, DropHit, FileDrag, FileDragInput, FileDrop};
 use crate::file_drop::track::{DragTrack, Over, Step, TargetView, acceptance, step, target_view};
-use crate::geometry::units::Point;
 use dioxus::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;

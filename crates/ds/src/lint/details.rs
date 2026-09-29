@@ -8,8 +8,8 @@ use super::declaration::push;
 use super::kind;
 use super::rule::{Offence, Profile, Rule};
 use super::walk::Decl;
-use crate::detail::grammar::{is_grammar_duration, is_grammar_easing};
-use crate::tokens::{easing::EasingToken, timing::DurationToken};
+use crate::motion::detail::grammar::{is_grammar_duration, is_grammar_easing};
+use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// The properties whose `var()`s time an animation or a transition.
 const TIMING_PROPERTIES: &[&str] = &[

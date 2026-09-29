@@ -2,9 +2,9 @@
 //! and the palette's field should have it back without being remounted (which replays the
 //! palette's entrance).
 
+use crate::core::task::{try_get, try_set};
 use crate::focus::caret::InitialCaret;
 use crate::focus::select::{Landing, Select};
-use crate::task::{try_get, try_set};
 use dioxus::prelude::*;
 
 /// How many times focus has been asked for: a field serves each new ticket once.

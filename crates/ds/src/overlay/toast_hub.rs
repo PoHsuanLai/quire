@@ -2,12 +2,12 @@
 //! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
 //!
 //! The hold is a task of the root that provides the hub and drops with it; it writes through
-//! `try_set`, so a hold that finds the hub gone stops (`crate::task`).
+//! `try_set`, so a hold that finds the hub gone stops (`crate::core::task`).
 
-use crate::root::env::Env;
-use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::clock::sleep;
-use crate::tokens::delay::DelayToken;
+use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::core::time::clock::sleep;
+use crate::style::env::Env;
+use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 
@@ -120,7 +120,7 @@ impl ToastHub {
     /// Hide at once.
     pub fn hide(&self) {
         if self.stop_hold().is_ok() {
-            let _ = crate::task::try_set_if_changed(self.state, ToastState::Hidden);
+            let _ = crate::core::task::try_set_if_changed(self.state, ToastState::Hidden);
         }
     }
 
@@ -156,11 +156,11 @@ pub fn use_toast_hub() -> ToastHub {
 #[cfg(test)]
 mod tests {
     use super::{ToastHub, UndoToken, use_toast_hub_provider};
-    use crate::appearance::{
+    use crate::style::appearance::{
         accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
     };
-    use crate::appearance::{blur::BlurState, material::Material};
-    use crate::root::env::{Env, InputModality};
+    use crate::style::appearance::{blur::BlurState, material::Material};
+    use crate::style::env::{Env, InputModality};
     use dioxus::prelude::*;
     use std::cell::RefCell;
     use std::rc::Rc;

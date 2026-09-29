@@ -1,10 +1,10 @@
-//! What a press and drag over an [`EditSurface`](crate::components::edit_surface::EditSurface) tell the app: where, and the
+//! What a press and drag over an [`EditSurface`](crate::components::fields::edit_surface::EditSurface) tell the app: where, and the
 //! text position the host resolved there, so the app moves its own caret or extends its own
 //! selection.
 
+use crate::core::geometry::units::Point;
 use crate::edit::clicks::Clicks;
 use crate::edit::position::TextPosition;
-use crate::geometry::units::Point;
 use dioxus::prelude::Modifiers;
 
 /// A pointer event over the surface.

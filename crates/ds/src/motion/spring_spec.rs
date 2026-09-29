@@ -5,8 +5,8 @@
 
 use super::spring::{Millis, Ratio, Spring};
 use super::velocity::Velocity;
-use crate::appearance::motion::MotionLevel;
-use crate::detail::touch::Touch;
+use crate::motion::detail::touch::Touch;
+use crate::style::appearance::motion::MotionLevel;
 
 /// A release slower than this, in pixels per second, carries no momentum: a press that barely
 /// moved, not a flick.
@@ -103,12 +103,12 @@ impl SpringSpec {
 #[cfg(test)]
 mod tests {
     use super::{SpringResponse, SpringSpec};
-    use crate::appearance::motion::MotionLevel;
-    use crate::detail::touch::{Contact, Touch};
+    use crate::motion::detail::touch::{Contact, Touch};
     use crate::motion::{
         spring::{Millis, Ratio},
         velocity::Velocity,
     };
+    use crate::style::appearance::motion::MotionLevel;
 
     fn thrown(v: i32) -> Touch {
         Touch::Contact(Contact::for_tests().with_velocity(Velocity(v)))

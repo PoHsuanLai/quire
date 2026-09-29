@@ -1,8 +1,8 @@
 //! Where an item is in its life: entering, present, leaving by some exit, or healing a gap
 //! (design/04-COMPONENTS.md "Motion states", design/05-MOTION.md section 8).
 
-use crate::components::vocab::StaggerIndex;
-use crate::geometry::units::Px;
+use crate::core::geometry::units::Px;
+use crate::core::vocab::StaggerIndex;
 
 /// How a row leaves: `data-exit`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -4,8 +4,8 @@
 
 use super::anim::Anim;
 use super::presence::{Exit, Presence};
-use crate::components::vocab::{Emphasis, StaggerIndex};
-use crate::geometry::units::Px;
+use crate::core::geometry::units::Px;
+use crate::core::vocab::{Emphasis, StaggerIndex};
 
 /// A row's height plus the gap below it: how far the rows below heal (`dy = height + 5`).
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]

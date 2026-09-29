@@ -1,7 +1,7 @@
 //! Which floating layer Escape and an outside click close: the topmost only
 //! (design/04-COMPONENTS.md section 21, design/06-INTERACTIONS.md sections 5 and 18).
 
-use crate::components::popover::Dismiss;
+use crate::components::overlays::popover::Dismiss;
 
 /// One open layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

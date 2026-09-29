@@ -2,7 +2,7 @@
 //! `(from, top - (0, 4), bottom + (0, 4))`; a barycentric sign test.
 
 use super::types::SafeTriangle;
-use crate::geometry::units::{Point, Px};
+use crate::core::geometry::units::{Point, Px};
 
 /// How far the submenu's corners are pushed out vertically: the triangle's hysteresis.
 const INFLATE: Px = Px(4.0);

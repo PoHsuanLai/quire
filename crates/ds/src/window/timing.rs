@@ -2,7 +2,7 @@
 //! design/13-BEHAVIOUR-menus-windows.md section 13.3.11). The caller reads them from its settings
 //! and passes them in; the default is each key's default.
 
-use crate::geometry::units::Px;
+use crate::core::geometry::units::Px;
 use std::time::Duration;
 
 /// When the titlebar starts a move and when the green light opens the tiling menu.

@@ -2,7 +2,7 @@
 //! default action from running (it would start Blitz's own text selection), so it cannot use
 //! the renderer's click count and keeps its own: within 500 ms and 4 px of the last press.
 
-use crate::geometry::units::Point;
+use crate::core::geometry::units::Point;
 use std::time::{Duration, Instant};
 
 /// Which press of a quick run this is: 1, 2, 3, then 1 again.
@@ -39,7 +39,7 @@ pub(crate) fn clicks_after(last: Option<LastPress>, at: Point, when: Instant) ->
 #[cfg(test)]
 mod tests {
     use super::{Clicks, LastPress, clicks_after};
-    use crate::geometry::units::{Point, Px};
+    use crate::core::geometry::units::{Point, Px};
     use std::time::{Duration, Instant};
 
     fn at(x: f32, y: f32) -> Point {

@@ -5,10 +5,10 @@
 //! focus does, and a `TextInput` found this way hears its `onfocus` once, as through
 //! `Focus::OnMount`.
 
+use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::focus::host::{Focused, focus_selecting};
 use crate::focus::select::Select;
 use crate::focus::targets::FocusTargets;
-use crate::time::{FRAME_SLACK, clock::sleep};
 use dioxus::prelude::*;
 use std::rc::Rc;
 

@@ -2,7 +2,7 @@
 //! state the catalogue has no motion for. The catalogue's own rows are in `recipe.rs`.
 
 use super::recipe::{Fill, Iteration, Recipe, recipe};
-use crate::tokens::{easing::EasingToken, timing::DurationToken};
+use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// `chip-flash` (`S:2119`): the flash is a hold, so it runs linear and leaves nothing behind.
 pub(super) const CHIP_FLASH: Recipe = recipe(

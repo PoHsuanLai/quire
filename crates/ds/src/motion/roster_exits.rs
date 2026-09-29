@@ -10,9 +10,9 @@ use super::presence::Exit;
 use super::roster::{RosterState, RowPitch};
 use super::settle::settle;
 use super::use_roster::{ExitTimer, Roster, use_roster_parts};
-use crate::components::vocab::{Emphasis, StaggerIndex};
-use crate::task::{Gone, spawn_in, try_get, try_set};
-use crate::time::clock::sleep;
+use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::core::time::clock::sleep;
+use crate::core::vocab::{Emphasis, StaggerIndex};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 

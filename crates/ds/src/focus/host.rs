@@ -6,14 +6,14 @@
 //! ("RefCell already borrowed", a palette's field focusing on mount while
 //! its results re-rendered). Every focus change goes through [`focus_soon`]: the host's
 //! [`HostFocus`] answers [`Focused::Busy`] instead, and with no host the call is guarded
-//! (`crate::guarded`) so the collision is `Busy` too; the change is tried again once that render
-//! has ended (`crate::busy`), then a frame later.
+//! (`crate::core::guarded`) so the collision is `Busy` too; the change is tried again once that render
+//! has ended (`crate::core::busy`), then a frame later.
 
-use crate::busy::wait_out_busy;
+use crate::core::busy::wait_out_busy;
+use crate::core::guarded::guarded_call;
 use crate::focus::caret::{HostPlaceCaret, InitialCaret};
 use crate::focus::select::{HostSelect, Landing, Select};
-use crate::geometry::measure::BUSY_ATTEMPTS;
-use crate::guarded::guarded_call;
+use crate::host::measure::BUSY_ATTEMPTS;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -147,7 +147,7 @@ async fn write(
 
 /// Try a host write until the document is free, for up to `BUSY_ATTEMPTS` tries: the first few
 /// as soon as the render that holds it ends, so the write lands in the frame it was asked in
-/// (`crate::busy`), the rest a frame apart.
+/// (`crate::core::busy`), the rest a frame apart.
 pub(crate) async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
     for attempt in 0..BUSY_ATTEMPTS {
         match write() {

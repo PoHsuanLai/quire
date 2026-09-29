@@ -12,15 +12,15 @@
 //! from what it drew last (the old level, or wherever a running sweep had reached). Under
 //! Reduced motion nothing sweeps: every frame is the final one.
 
-use crate::appearance::motion::MotionLevel;
-use crate::components::vocab::Fraction;
+use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
+use crate::core::time::{FRAME_TICK, clock::sleep};
+use crate::core::vocab::Fraction;
 use crate::motion::level_run::{
     LevelRun, RunFrame, RunPhase, RunTail, RunTokens, frame_at, phase_at,
 };
 use crate::motion::wake::WakeStamp;
-use crate::root::env::{Env, use_env_signal};
-use crate::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::time::{FRAME_TICK, clock::sleep};
+use crate::style::appearance::motion::MotionLevel;
+use crate::style::env::{Env, use_env_signal};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use std::time::Duration;
@@ -120,12 +120,12 @@ fn start(runner: Runner, level: Fraction, origin: Origin, tokens: RunTokens) -> 
     };
     let timing = tokens.timing(motion);
     try_set_if_changed(runner.frame, frame_at(run, timing, Duration::ZERO))?;
-    let started = crate::time::clock::now();
+    let started = crate::core::time::clock::now();
     let (frame, task) = (runner.frame, runner.task);
     let running = spawn_in(runner.scope, async move {
         loop {
             sleep(FRAME_TICK).await;
-            let elapsed = crate::time::clock::since(started);
+            let elapsed = crate::core::time::clock::since(started);
             if try_set_if_changed(frame, frame_at(run, timing, elapsed)).is_err() {
                 return;
             }

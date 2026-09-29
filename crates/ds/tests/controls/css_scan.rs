@@ -5,75 +5,95 @@ pub const STYLES: &[(&str, &[&str])] = &[
     (
         "button",
         &[
-            include_str!("../../src/components/button.css"),
-            include_str!("../../src/components/icon_view.css"),
-            include_str!("../../src/components/text_runs.css"),
-            include_str!("../../src/components/provider_mark.css"),
+            include_str!("../../src/components/controls/button.css"),
+            include_str!("../../src/components/content/icon_view.css"),
+            include_str!("../../src/components/content/text_runs.css"),
+            include_str!("../../src/components/content/provider_mark.css"),
         ],
     ),
     (
         "icon_button",
         &[
-            include_str!("../../src/components/icon_button.css"),
-            include_str!("../../src/components/icon_view.css"),
+            include_str!("../../src/components/controls/icon_button.css"),
+            include_str!("../../src/components/content/icon_view.css"),
         ],
     ),
     (
         "icon_view",
-        &[include_str!("../../src/components/icon_view.css")],
+        &[include_str!("../../src/components/content/icon_view.css")],
     ),
     (
         "segmented",
-        &[include_str!("../../src/components/segmented.css")],
+        &[include_str!("../../src/components/controls/segmented.css")],
     ),
-    ("toggle", &[include_str!("../../src/components/toggle.css")]),
-    ("slider", &[include_str!("../../src/components/slider.css")]),
+    (
+        "toggle",
+        &[include_str!("../../src/components/controls/toggle.css")],
+    ),
+    (
+        "slider",
+        &[include_str!("../../src/components/controls/slider.css")],
+    ),
     (
         "text_input",
         &[
-            include_str!("../../src/components/text_input.css"),
-            include_str!("../../src/components/icon_button.css"),
-            include_str!("../../src/components/icon_view.css"),
+            include_str!("../../src/components/fields/text_input.css"),
+            include_str!("../../src/components/controls/icon_button.css"),
+            include_str!("../../src/components/content/icon_view.css"),
         ],
     ),
     (
         "search_field",
         &[
-            include_str!("../../src/components/search_field.css"),
-            include_str!("../../src/components/text_input.css"),
-            include_str!("../../src/components/chip.css"),
+            include_str!("../../src/components/fields/search_field.css"),
+            include_str!("../../src/components/fields/text_input.css"),
+            include_str!("../../src/components/controls/chip.css"),
         ],
     ),
-    ("kbd", &[include_str!("../../src/components/kbd.css")]),
+    (
+        "kbd",
+        &[include_str!("../../src/components/controls/kbd.css")],
+    ),
     (
         "chip",
         &[
-            include_str!("../../src/components/chip.css"),
-            include_str!("../../src/components/avatar.css"),
+            include_str!("../../src/components/controls/chip.css"),
+            include_str!("../../src/components/content/avatar.css"),
         ],
     ),
-    ("avatar", &[include_str!("../../src/components/avatar.css")]),
-    ("tabs", &[include_str!("../../src/components/tabs.css")]),
+    (
+        "avatar",
+        &[include_str!("../../src/components/content/avatar.css")],
+    ),
+    (
+        "tabs",
+        &[include_str!("../../src/components/controls/tabs.css")],
+    ),
     (
         "section_header",
-        &[include_str!("../../src/components/section_header.css")],
+        &[include_str!(
+            "../../src/components/lists/section_header.css"
+        )],
     ),
-    ("count", &[include_str!("../../src/components/count.css")]),
+    (
+        "count",
+        &[include_str!("../../src/components/controls/count.css")],
+    ),
     (
         "edit_surface",
-        &[include_str!("../../src/components/edit_surface.css")],
+        &[include_str!("../../src/components/fields/edit_surface.css")],
     ),
     (
         "spinner",
-        &[include_str!("../../src/components/spinner.css")],
+        &[include_str!("../../src/components/controls/spinner.css")],
     ),
     // The frame's own sheet, and the utilities its root and title take (`ds-layer`,
     // `ds-grain`, `ds-truncate`).
     (
         "window_frame",
         &[
-            include_str!("../../src/components/window_frame.css"),
-            include_str!("../../src/css/utilities.css"),
+            include_str!("../../src/components/chrome/window_frame.css"),
+            include_str!("../../src/style/css/utilities.css"),
         ],
     ),
 ];

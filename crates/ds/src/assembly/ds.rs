@@ -41,29 +41,29 @@
 //! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
 //! positioned content (a centred sheet) is otherwise 0 px tall.
 
-use crate::appearance::{
-    appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
-};
-use crate::appearance::{blur::BlurState, material::Material};
-use crate::components::toast::ToastHost;
-use crate::components::window_frame::{WindowFrame, framed};
+use crate::components::chrome::window_frame::{WindowFrame, framed};
+use crate::components::overlays::toast::ToastHost;
+use crate::core::geometry::scale::Scale;
 use crate::focus::click::ClickRoot;
-use crate::geometry::scale::Scale;
-use crate::material::recipe::DEFAULT_TINT_ALPHA;
-use crate::material::stack::MaterialStack;
 use crate::motion::hover_intent::HoverWarmth;
 use crate::overlay::host::{OverlayHost, use_overlays_provider};
 use crate::overlay::hover_hub::use_hover_hub_provider;
 use crate::overlay::stack::LayerStack;
 use crate::overlay::toast_hub::use_toast_hub_provider;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
-use crate::root::env::{Env, HostModality, InputModality, use_env_provider};
 use crate::root::extent::RootExtent;
-use crate::root::scale::use_root_scale;
 use crate::root::typeface::{use_typeface, use_typeface_provider};
-use crate::space::{frame_vars::FrameVars, look::SpaceLook};
-use crate::tokens::hex::Alpha;
-use crate::tokens::{pixel::PixelToken, shape::Corner};
+use crate::style::appearance::{
+    appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
+};
+use crate::style::appearance::{blur::BlurState, material::Material};
+use crate::style::env::{Env, HostModality, InputModality, use_env_provider};
+use crate::style::material::recipe::DEFAULT_TINT_ALPHA;
+use crate::style::material::stack::MaterialStack;
+use crate::style::scale::use_root_scale;
+use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
+use crate::style::tokens::hex::Alpha;
+use crate::style::tokens::{pixel::PixelToken, shape::Corner};
 use dioxus::prelude::*;
 use std::rc::Rc;
 

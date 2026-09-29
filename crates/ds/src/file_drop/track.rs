@@ -2,9 +2,9 @@
 //! the files land. The host feeds it through [`HostFileDrop`](crate::file_drop::host::HostFileDrop); a target's
 //! view and the window's acceptance follow from it and from the target under the pointer.
 
-use crate::components::vocab::DropState;
+use crate::core::geometry::units::Point;
+use crate::core::vocab::DropState;
 use crate::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer};
-use crate::geometry::units::Point;
 use std::path::PathBuf;
 
 /// What the drag carries, as far as the host knows.
@@ -182,7 +182,7 @@ pub(crate) struct TargetView {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::geometry::units::Px;
+    use crate::core::geometry::units::Px;
 
     fn at(x: f32, y: f32) -> Point {
         Point { x: Px(x), y: Px(y) }

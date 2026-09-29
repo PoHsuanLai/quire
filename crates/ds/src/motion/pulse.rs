@@ -16,8 +16,8 @@ impl Pulse {
     /// Play the animation again from its first frame. Call from an event handler.
     pub fn fire(&self) {
         // A pulse whose owner has unmounted has nothing left to play.
-        if let Ok(key) = crate::task::try_get(self.key) {
-            let _ = crate::task::try_set(self.key, key.fired());
+        if let Ok(key) = crate::core::task::try_get(self.key) {
+            let _ = crate::core::task::try_set(self.key, key.fired());
         }
     }
 

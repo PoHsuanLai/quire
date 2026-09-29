@@ -5,9 +5,9 @@
 //! A sweep's time is the sweep itself, eased, then a tail in which what waits for the level to
 //! arrive (the charging bolt) fades in, linearly.
 
-use crate::appearance::motion::MotionLevel;
-use crate::components::vocab::Fraction;
-use crate::tokens::{
+use crate::core::vocab::Fraction;
+use crate::style::appearance::motion::MotionLevel;
+use crate::style::tokens::{
     easing::{Easing, EasingToken},
     timing::DurationToken,
 };
@@ -166,9 +166,9 @@ pub fn level_at(run: LevelRun, progress: Fraction) -> Fraction {
 #[cfg(test)]
 mod tests {
     use super::{LevelRun, RunFrame, RunPhase, RunTail, RunTokens, frame_at, phase_at};
-    use crate::appearance::motion::MotionLevel;
-    use crate::components::vocab::Fraction;
-    use crate::tokens::{easing::EasingToken, timing::DurationToken};
+    use crate::core::vocab::Fraction;
+    use crate::style::appearance::motion::MotionLevel;
+    use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
     use std::time::Duration;
 
     const TOKENS: RunTokens = RunTokens {

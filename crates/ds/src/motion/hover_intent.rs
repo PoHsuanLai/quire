@@ -2,8 +2,8 @@
 //! (design/06-INTERACTIONS.md section 3). Pure: an event and the time in, the next state and
 //! one effect out.
 
-use crate::appearance::motion::MotionLevel;
-use crate::tokens::delay::DelayToken;
+use crate::style::appearance::motion::MotionLevel;
+use crate::style::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
 
 /// Whether cards and fly labels open at once.
