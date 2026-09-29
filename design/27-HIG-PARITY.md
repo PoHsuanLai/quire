@@ -114,7 +114,7 @@ data test), **Doc** (a reviewer's CHECKLIST line).
 | 2 | No app menus in the bar: no App, File, Edit, View, Window, Help, no standard items | the top of every screen | Type + Test | 5.2 |
 | 3 | Standard shortcuts are not reserved; prototype keys collide (Mod+S, Mod+T, Mod+K); no Cmd+Q/W/M/H/, map; modifier order unspecified | every app | Type + Test | 6.2 |
 | 4 | Focus and selection read as web: one fixed ring (2.5 px, radius 4) on every control, lists ringed instead of highlighted, no emphasized/unemphasized selection, menus highlight in a pale wash | every keyboard user; every list and menu | Lint + Type | 6.4 |
-| 5 | Accessibility settings are mostly unwired: high contrast is read and ignored; no reduced transparency; reduced motion still slides (at 60 ms); no "differentiate without colour"; no text size | anyone who sets them | Type + Test | 3.1 |
+| 5 | Accessibility settings are mostly unwired: high contrast is read and ignored; no reduced transparency; reduced motion must be a cross-fade, not a short slide; no "differentiate without colour"; no text size | anyone who sets them | Type + Test | 3.1 |
 | 6 | CJK text has no specified face, fallback or line breaking; the shipped faces are Latin subsets | every Traditional Chinese string | Test + Doc | 3.14 |
 | 7 | Pointer is the web's: `cursor:pointer` on every control; no copy, not-allowed or resize cursors from the drag rules | every hover | Lint | 6.3 |
 | 8 | Type ramp is the prototype's: 15 px body (Mac 13), sizes under the 10 pt floor (9.5, 8), uppercase tracked section headers | every text-dense surface | Lint | 3.16 |
@@ -122,7 +122,7 @@ data test), **Doc** (a reviewer's CHECKLIST line).
 | 10 | Undo and redo exist only as mail's undo toast; no Cmd+Z / Shift+Cmd+Z in fields and lists, no Edit menu | every edit | Type + Test | 4.18 |
 | 11 | No written style: title case for buttons and menus, the ellipsis rule, "Cancel" always, tooltip length | every label | Lint + Doc | 3.17 |
 | 12 | Label hierarchy stops at three inks; text on a material uses card or frame inks instead of per-material vibrant inks | menus, bar, control center | Type (tokens) + Test | 3.11 |
-| 13 | Menus: first open pops with a spring; context menus dim unavailable items and show shortcuts; titles and help lines in text menus | every menu | Type + Test | 5.1, 5.4 |
+| 13 | Menus: text menus must open with no animation; context menus must hide unavailable items and show no shortcuts; no titles or help lines in text menus | every menu | Type + Test | 5.1, 5.4 |
 | 14 | No state restoration: windows, panes, sidebar expansion, the last settings pane | every relaunch | Type + Test | 4.6 |
 | 15 | Sidebar metrics and icon colour: no Small/Medium/Large; icons in ink, not accent | every app sidebar | Type | 5.12 |
 | 16 | Glyph weight does not follow the adjacent text's weight; no symbol scales | every icon beside text | Type | 3.15 |
@@ -142,8 +142,8 @@ Most of this audit's motion and state rules fit that machinery without a second 
 | --- | --- | --- |
 | Contact carries the release velocity; springs retarget from position and velocity | `Touch::Contact(Velocity)` (extends 26 §4.1's `Touch`); `use_spring` next to 26's `use_tween` | `ds::detail`, `ds::motion` |
 | Damping 1.0 unless the driving gesture had momentum; 0.8 then | `SpringSpec::for_touch(Touch)`; no public constructor takes a raw damping | `ds::motion` |
-| Reduced motion swaps movement for a cross-fade | every keyframe declares a `ReducedForm` in the recipe table; a data test fails a moving keyframe without a still form | `ds::motion::recipe`, 05 §3.2 |
-| A context menu never shows shortcuts and hides unavailable items | `MenuKind::Context` drops `shortcut` and filters `Availability::Disabled` at the type level | `ds::components::menu` |
+| Reduced motion swaps movement for a cross-fade | every motion primitive declares its Reduced form (design/30 §1.3); a data test fails a primitive without one | `ds::motion`, design/30 §1.1 |
+| A context menu never shows shortcuts and hides unavailable items | `Menu` with `Placement::Context` takes items without `shortcut` and filters `Availability::Disabled` at the type level | `ds::components::menu` |
 | A default button is never destructive | `AlertButtons { default: Action<Safe>, cancel, other }`; `Action<Destructive>` cannot be the default | `ds::components::alert` |
 | Reserved shortcuts | `Shortcut::custom(..)` returns an error for a combination in the standard table; `Shortcut::standard(StandardAction)` is the only way to bind one | `ds::components::vocab`, test |
 | Inner radius follows outer radius | `Radius::inner(outer, inset)`; the CSS lint rejects a raw radius on an element the markup marks as nested | `ds::geometry`, `ds::lint` |
@@ -152,7 +152,7 @@ New CSS lint rules proposed (land as warnings first and tell the sill session: s
 Strict rule breaks sill's master at once): `PointerCursor` (no `cursor:pointer` outside link and
 drag-handle rules), `MinFontSize` (no size token below `--fs-min` 10 px in UI text),
 `FocusRingShape` (a `:focus-visible` outline radius must be `calc(var(--r-*) + var(--focus-gap))`),
-`ReducedFormMissing` (data test, not CSS). New markup lint rules: `UnnamedControl` (every
+`ReducedFormMissing` (data test over the motion primitives, not CSS). New markup lint rules: `UnnamedControl` (every
 interactive element has an accessible name), `ThreeDots` (a label contains "..." instead of
 "…").
 
@@ -176,7 +176,7 @@ The page covers several settings; each has its own row.
 | --- | --- | --- | --- | --- |
 | Contrast | Text contrast floors: 4.5:1 up to 17 pt, 3:1 at 18 pt and up or bold. Standard controls follow Increase Contrast; system colours ship an "Accessible" variant for it (color page: e.g. blue light `0,122,255` becomes `0,64,221`; dark `10,132,255` becomes `64,156,255`) | Gates at 4.5:1 (03 §6, legibility tests); `SystemPrefs.contrast: Contrast::High` is read from the portal and resolved to nothing (`appearance/resolve.rs`) | Adopt | A `High` token set: `--ink-soft`/`--ink-faint` pulled toward `--ink`, hairlines doubled in alpha, accent and status colours swapped for darker (light) or lighter (dark) variants, material tints at their solid alpha. Gate: body text 7:1 under High (dark-mode page asks for 7:1 on custom colours). 03 new §19; `ds::tokens`; test `every_pair_legible_under_high_contrast` |
 | Reduce Transparency | "Make areas of blurred content and translucency mostly opaque", with a colour that differs from the translucent one | Nothing; `BlurState::Unavailable` already paints `--m-tint-solid` (alpha ≥ .94) | Adopt | `appearance.transparency = System \| Reduced` (the portal has no key for it, so ours is a setting); Reduced forces the solid path on every material and drops the vibrancy boost. 03 §17.1; `ds::material`; test over every `Material` |
-| Reduce Motion | "Tighten springs … or track 1:1", no z-axis depth animation, no animating into or out of blurs, "replace a slide with a fade" | Reduced = every duration 60 ms, iteration count 1 (05 §3.2): slides still slide, scales still scale | Adapt | Keep 60 ms (settle timers depend on it) but each moving keyframe's Reduced form is a cross-fade with no transform; springs under Reduced are critically damped with no overshoot and track 1:1 while touched. 05 §3.2; `ds::motion::recipe`; data test `every_moving_keyframe_has_a_still_reduced_form` |
+| Reduce Motion | "Tighten springs … or track 1:1", no z-axis depth animation, no animating into or out of blurs, "replace a slide with a fade" | Motion level `Reduced` (`appearance.motion`; the system preference resolves to it): slides, scales and springs become a cross-fade at `--t-quick`, springs critically damped with no overshoot, drags 1:1, the spinner keeps turning (design/30 §1.1) | Adopt | Every motion primitive declares its Reduced form (design/30 §1.3); a data test fails a primitive without one. Levels are Standard and Reduced only; a Look never sets the level. `ds::motion`; data test `every_primitive_has_a_reduced_form` |
 | Colour alone | "Avoid relying solely on color"; problem pairs: blue/orange, red/green, red/black, red or green with gray; example: red square for offline, green circle for online. Links may add an underline | 00 §3 "colour is a claim" says what a hue means, not that a second cue exists | Adopt | Every status carried by hue also carries a shape or a word: `StatusMark { hue, shape: Shape }` with no hue-only constructor; `appearance.differentiate_without_color = Off \| On` adds link underlines and the shapes in dots (unread dot, online dot). 03 §14; `ds::components::vocab`; type |
 | Text size | macOS has no Dynamic Type (typography page). The sidebar size setting (Small/Medium/Large, see 5.12) is the Mac's text-size lever; use Regular through Bold, avoid Light and thinner | `display.scale` only (22 §3.15); weights 400-800 already | Adapt | `appearance.sidebar_size = Small \| Medium \| Large` drives the 5.12 metrics; no free text scale (the Mac has none). 22 §3.1; `ds::tokens` |
 | VoiceOver (screen reader) | Every element reachable, labelled, grouped; decorative images hidden; announce layout and content changes; each page a unique title and headings | Components emit `role` and `aria-*` (04 shared vocabulary); Blitz's `accessibility` feature is on in the workspace; how shell surfaces (layer-shell through shell-host) reach AT-SPI is not specified | Adopt | Markup lint `UnnamedControl`; a live-region contract for toasts, banners, OSD and progress (`aria-live="polite"`, critical banners `assertive`); shell-host exports each surface's AccessKit tree over AT-SPI. 04 global rules; `ds::lint::markup`; shell-host; test: Orca reads the launcher and a banner (manual check, queued in sill/docs/manual-checks.md) |
@@ -205,7 +205,7 @@ The page covers several settings; each has its own row.
 | | |
 | --- | --- |
 | **Apple** | Use colour sparingly; never one colour for two meanings; supply light and dark variants; semantic dynamic colours by purpose (35 on macOS: label, secondary/tertiary/quaternary label, control accent, keyboard focus indicator, selected content background, unemphasized selected content background, find highlight, separator, window background, under-page background …). Every macOS system colour has Default, Accessible, and Vibrant (on materials) variants; e.g. red `255,59,48` / dark `255,69,58` / accessible `215,0,21` |
-| **quire today** | 03: Post palette, status inks, Space frame tokens, contrast gates; roles by token (03 §14) |
+| **quire today** | 03: the Look's palette (Mac default, Arc a second value set), status inks, the Space colour (backdrop in Mac, `--f-*` frame tokens in Arc), contrast gates; roles by token (03 §14) |
 | **Verdict** | Adapt: keep our palette (the Space look is ours); take the missing semantic roles and the three variants per colour |
 | **Rule** | Add roles `--ink-quaternary`, `--sel-bg` / `--sel-ink` (emphasized), `--sel-bg-quiet` (unemphasized), `--find-highlight`, `--focus-ring`, `--under-page`; each colour token carries `{normal, high, vibrant}` values (3.1, 3.11). 03 §3, §14; `ds::tokens`; test `every_role_has_three_variants` |
 
@@ -216,7 +216,7 @@ The page covers several settings; each has its own row.
 | **Apple** | "Avoid offering an app-specific appearance setting"; test with Increase Contrast and Reduce Transparency on; 4.5:1 minimum, strive for 7:1 on custom colours; label colours at four levels adapt; soften white content backgrounds; desktop tinting under the graphite accent |
 | **quire today** | `Theme::{System, Light, Dark}` per app and per Space (22 §3.1; `resolve` lets the Space, then the app, then the desktop decide) |
 | **Verdict** | Adapt: the Space's theme is ours and stays; the per-app override leaves the app's settings |
-| **Rule** | Apps never show their own appearance picker; `AppearancePicker` appears only in Settings and the control center (plan: "THE one picker"). A Space may still pin a theme. 22 §3.1; doc line in CHECKLIST §3 |
+| **Rule** | Apps never show their own appearance picker; the appearance `RadioGroup` appears only in Settings and the control center (plan: "THE one picker"). A Space may still pin a theme. 22 §3.1; doc line in CHECKLIST §3 |
 
 ### 3.6 Icons (interface icons) (2025-04-22)
 
@@ -261,7 +261,7 @@ Folded into 3.1 (colour alone) and 5.25 (charts).
 | | |
 | --- | --- |
 | **Apple** | Materials blur and modify what is behind; **vibrancy** pulls colour from behind into foreground text, symbols and fills; "avoid using nonvibrant colors on top of" a material; choose by meaning (window, menu, popover, sidebar, title bar …), not by look; behind-window blending for menus, sheets, sidebars; within-window for toolbars over scrolling content. Menus are vibrant by default. Dark-mode page: primary, secondary, tertiary, quaternary label colours |
-| **quire today** | 03 §17: eight materials, tint over compositor blur, stack v2, vibrancy baked into the tint (Blitz cannot blend what is behind, 03 §17.4). Inks: `--ink`, `--ink-soft`, `--ink-faint` on the card; `--f-ink*` on the frame (02 §8) |
+| **quire today** | 03 §17: eight materials, tint over compositor blur, stack v2, vibrancy baked into the tint (Blitz cannot blend what is behind, 03 §17.4). Inks: `--ink`, `--ink-soft`, `--ink-faint` on the card; the frame inks `--f-ink*` under the Arc Look, the material's own ink under Mac (design/30 §3.3; 02 §8) |
 | **Verdict** | Adapt: true vibrancy is out of reach; approximate it per material |
 | **Rule** | `Surface(material)` redefines `--ink`, `--ink-soft`, `--ink-faint`, `--ink-quaternary` and the separator inside its scope to values fitted to that material's tint (the "vibrant" variant of 3.4), so components never pick inks per material. Four label levels everywhere: primary, secondary, tertiary, quaternary (watermarks, disabled glyphs). 03 §17.4 and 02 §8; `ds::material`; test: every ink on every material over black and white passes its level's floor |
 
@@ -270,15 +270,16 @@ Folded into 3.1 (colour alone) and 5.25 (charts).
 | | |
 | --- | --- |
 | **Apple** | "Add motion purposefully"; "make motion optional" (never the only carrier); feedback motion "follows people's gestures"; "brevity and precision"; avoid motion on frequent interactions; **"Let people cancel motion … don't make people wait for an animation to complete"**. [FLUID]: interruption and redirection at any moment; describe springs by damping and response, not duration; 100 % damping by default, 80 % when the gesture has momentum; carry the gesture's velocity into the animation; throw to the endpoint nearest the projected position (`p + v·r/(1-r)` with the scroll rate r = .998 per ms, about `p + 0.5 s × v`); track 1:1; rubber-band at limits |
-| **quire today** | 05: CSS keyframes and transitions with duration tokens; Rust `settle()` timers; `use_pulse` restarts by alias swap. Built exceptions: scroll physics (11, velocity and momentum), dock magnification (10, no easing), swipe-to-dismiss (`motion/swipe.rs`: speed threshold 600 px/s, flies out "from where it is"), `PaneSwitcher` ("a switch mid-slide reverses"). 26 R10: a Sweep retargets from its current share; springs are `cubic-bezier` overshoots (`--e-spring`) of fixed length, e.g. 420 ms |
-| **Verdict** | Adapt: keep keyframes for state moments no hand touches (Appear, Dismiss by timeout, bump, gulp); every motion a hand drives or can interrupt becomes a Rust spring |
-| **Rule** | (1) `Spring { damping: Ratio, response: Millis }` integrated per frame in Rust, writing a `--x`/`--f` custom property on an HTML wrapper; retargeting keeps position and velocity (no jump, no restart). (2) `Touch::Contact(Velocity)`: a release hands its velocity to the spring; `SpringSpec::for_touch` gives damping 1.0 for a tap or key, 0.8 for a gesture with momentum toward the target ([FLUID]); response `--spring-quick` 300 ms and `--spring-move` 450 ms (proposed; to be tuned beside macOS). (3) Throws pick the endpoint nearest `p + 0.5 s × v`, not nearest `p`: notification swipe, dock drag-out return, sheet and panel drag, workspace swipe (12 §12.3.7), the slider knob released with speed. (4) Any new target mid-motion retargets; nothing blocks input (26 R10 generalised). (5) Under Reduced: damping 1.0, no projection overshoot, 1:1 tracking kept. Where: 05 new §14 "Driven motion"; `ds::motion::spring`; 26 §4.1 `Touch`. Tests: interrupt at 40 % toward a new target, assert position continuous and velocity continuous within 5 %; a throw at 1500 px/s from 30 % lands on the far endpoint; idle after settle paints 0 frames (26 R3) |
+| **quire today** | design/30 §1.3: a motion a hand can touch or interrupt is a Rust `Spring` or tween, an arrival nobody touches a CSS transition or one keyframe; built exceptions: scroll physics (11, velocity and momentum), dock magnification (10, no easing), swipe-to-dismiss (`motion/swipe.rs`: speed threshold 600 px/s, flies out "from where it is"), `PaneSwitcher` ("a switch mid-slide reverses"); `--e-spring` is deleted |
+| **Verdict** | Adapt: keep CSS transitions and one keyframe for state moments no hand touches (Appear, Dismiss by timeout, a failed-entry shake); every motion a hand drives or can interrupt becomes a Rust spring |
+| **Rule** | (1) `Spring { damping: Ratio, response: Millis }` integrated per frame in Rust, writing a `--x`/`--f` custom property on an HTML wrapper; retargeting keeps position and velocity (no jump, no restart). (2) `Touch::Contact(Velocity)`: a release hands its velocity to the spring; `SpringSpec::for_touch` gives damping 1.0 for a tap or key, 0.8 for a gesture with momentum toward the target ([FLUID]); response Quick 300 ms and Move 450 ms (conf L; to be tuned beside macOS). (3) Throws pick the endpoint nearest `p + 0.5 s × v`, not nearest `p`: notification swipe, dock drag-out return, sheet and panel drag, workspace swipe (12 §12.3.7), the slider knob released with speed. (4) Any new target mid-motion retargets; nothing blocks input (26 R10 generalised). (5) Under Reduced: damping 1.0, no projection overshoot, 1:1 tracking kept. Where: 05 new §14 "Driven motion"; `ds::motion::spring`; 26 §4.1 `Touch`. Tests: interrupt at 40 % toward a new target, assert position continuous and velocity continuous within 5 %; a throw at 1500 px/s from 30 % lands on the far endpoint; idle after settle paints 0 frames (26 R3) |
 
 What converts, in order: sheet and panel present/dismiss, notification banner swipe and return,
 control-center pane slide (`PaneSwitcher`), toggle knob, segmented and switcher selection
 indicator, slider knob on release, dock icon drag return, launcher open/close. What stays
-keyframes: `rise`, `fold`, `curl`, `gulp`, `bump`, `seal-pop`, `shake-x`, `pop-in` for arrivals
-no one touched.
+transitions or one keyframe: Fade and Slide presence, cross-fades, and `use_shake` for a failed secure
+entry; the emphasis keyframes (bump, gulp, seal-pop, pop-in, rise, fold, curl) are deleted
+(design/30 Part 4).
 
 ### 3.13 Privacy (2024-12-30)
 
@@ -312,9 +313,9 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Minimum size **10 pt on macOS**; avoid Light and thinner; few typefaces; macOS text styles (size/line height, weight): Large Title 26/32 Regular, Title 1 22/26, Title 2 17/22, Title 3 15/20, Headline 13/16 **Bold**, **Body 13/16 Regular**, Callout 12/15, Subheadline 11/14, Footnote 10/13, Caption 1 10/13, Caption 2 10/13 Medium; emphasized weights one step up (Bold, Semibold, Heavy for Headline). Tracking tightens with size: +12/1000 em at 10 pt, +6 at 11, 0 at 12, −6 at 13, −11 at 14, −16 at 15, −20 at 16, −26 at 17, then easing back to +14 at 28-30 and 0 by 80. Standard control fonts by role: control content, label, menu, menu bar, message, palette, tooltips |
-| **quire today** | 02: Inter System typeface (settled 2026-09-26); base 15 px / 1.55 (`S`); sizes down to 9.5 (eyebrow `--fs-micro`) and 8 (`--fs-dial`); tracking 0 at body; uppercase tracked caps for section headers (0.06em under System); menus 13 (13.3.3) |
-| **Verdict** | Adapt: take the Mac ramp for the System typeface's UI roles; keep the Editorial ramp for mail's opt-in voice |
-| **Rule** | (a) `--fs-min` = 10: lint `MinFontSize` rejects a UI text size below it (widget dial numerals, which are drawings, carry an exemption marker). (b) Under System, the UI roles map to the Mac styles: body and controls 13/16, secondary lines 11/14, section headers 11 Bold in `--ink-soft` in **title case, no uppercase, no tracking** (Mac sidebar headers, L), window titles 13/600 (built), menu 13 (built). (c) Tracking under System follows the table above by size (Inter's own metrics are close; the token table records the size-to-tracking map, not per-role guesses). Open decision 1: this moves the desktop's density from the prototype's 15 px to the Mac's 13 px. 02 §4.1, §5; `ds::tokens::type`; lint |
+| **quire today** | 02: Inter as the Mac Look's UI face (a Look value, design/30 §3.2); base 15 px / 1.55 (`S`); sizes down to 9.5 (eyebrow `--fs-micro`) and 8 (`--fs-dial`); tracking 0 at body; uppercase tracked caps for section headers (0.06em); menus 13 (13.3.3) |
+| **Verdict** | Adapt: take the Mac ramp for the Mac Look's UI roles; mailo keeps its own ramp (design/30 Deferred 3) |
+| **Rule** | (a) `--fs-min` = 10: lint `MinFontSize` rejects a UI text size below it (widget dial numerals, which are drawings, carry an exemption marker). (b) In the Mac Look, the UI roles map to the Mac styles: body and controls 13/16, secondary lines 11/14, section headers 11 Bold in `--ink-soft` in **title case, no uppercase, no tracking** (Mac sidebar headers, L), window titles 13/600 (built), menu 13 (built). (c) Tracking in the Mac Look follows the table above by size (Inter's own metrics are close; the token table records the size-to-tracking map, not per-role guesses). Open decision 1: this moves the desktop's density from the prototype's 15 px to the Mac's 13 px. 02 §4.1, §5; `ds::tokens::type`; lint |
 
 ### 3.17 Writing (2024-11-06), with alerts, menus, buttons, help
 
@@ -334,16 +335,16 @@ no one touched.
 | **Apple** | Show the drag image once the pointer moves **about three points**; translucent drag image; highlight a destination only if it accepts; on a failed drop the item returns to its source or "evaporates"; a count badge for multi-item drags; Option at drop time copies; auto-scroll near edges; keep the dropped content selected; drag from an inactive window without activating it; drag cursors (copy, link, not allowed, disappearing item); offer a menu alternative; undo a drop |
 | **quire today** | `DRAG_THRESHOLD` 8 px Manhattan (`motion/drag.rs`, 04 §34); `DragGhost`, `DropLine`; dock drag-out (10 §10.3.8) |
 | **Verdict** | Adapt |
-| **Rule** | Threshold 3 px Euclidean for content drags (keep 4 px for window move, 13.3.11); a failed drop springs the ghost back to its source with the release velocity (3.12); `DragGhost { count: Option<Count> }` shows the badge; drop outcome sets the cursor (6.3); Option held at release copies. 06 §6; `ds::motion::drag`; test: 3 px starts a drag, 2 px does not; a failed drop settles at the source rect |
+| **Rule** | Threshold 3 px Euclidean for content drags (keep 4 px for window move, 13.3.11); a failed drop springs the ghost back to its source with the release velocity (3.12); `DragGhost` shows a `Badge` with the count for a multi-item drag; drop outcome sets the cursor (6.3); Option held at release copies. 06 §6; `ds::motion::drag`; test: 3 px starts a drag, 2 px does not; a failed drop settles at the source rect |
 
 ### 4.2 Entering data (2023-11-02)
 
 | | |
 | --- | --- |
 | **Apple** | Gather from the system instead of asking; clear hints; secure fields for secrets; never prefill passwords; choices over typing; validate as people type; disable Next until required data exists; macOS: an **expansion tooltip** shows a truncated field's full text on hover |
-| **quire today** | `TextInput`, `SearchField`, `LockPrompt`; 26 G53 proposes `FieldState::Invalid` |
+| **quire today** | `TextField` (Plain, Secure, Search), `LockPrompt`; 26 G53 proposes `FieldState::Invalid` |
 | **Verdict** | Adopt the expansion tooltip; the rest Covered |
-| **Rule** | A truncated `.ds-truncate` field or cell gets a `Tooltip{Fly}` with its full text after the hover intent (06 §3). 04 §6, §18; test |
+| **Rule** | A truncated `.ds-truncate` field or cell gets a `Tooltip` with its full text after the `HoverIntent` Tip delay (design/30 §1.2). 04 §6, §18; test |
 
 ### 4.3 Feedback (2023-10-07)
 
@@ -401,7 +402,7 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Interruption levels: Passive, Active (default), Time Sensitive, Critical; only Time Sensitive and Critical break through a Focus; Critical also through silence. Content: short title, sentence case, full punctuation, no app name (the icon is shown), no truncation by the app; up to **four** actions, title case, no "Open" action, prefer non-destructive; badges count unread notifications only; macOS notification sounds mix with other audio |
-| **quire today** | 13.3.6: banners, 5 s, hover expand, actions as `Button{Mini}`, swipe, grouping, Do Not Disturb passes only urgency Critical |
+| **quire today** | 13.3.6: banners, 5 s, hover expand, actions as `Button` at `ControlSize::Mini`, swipe, grouping, Do Not Disturb passes only urgency Critical |
 | **Verdict** | Adapt |
 | **Rule** | Map freedesktop urgency and hints to levels: `low` → Passive (history only, no banner), `normal` → Active, `critical` → Critical; an `x-quire-time-sensitive` hint → Time Sensitive, which passes a Focus. Cap actions at 4. 13.3.6; sill; test per level against DND on and off |
 
@@ -410,7 +411,7 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Modal only with a clear benefit; short and simple; title the task; always an obvious dismissal; confirm before losing content; one modal at a time; alerts are the one thing that may appear over a popover |
-| **quire today** | `Scrim`, `Sheet`, `Peek` (04 §24); `LayerStack` Escape order (06 §18); O-15: Peek and Sheet neither move nor trap focus |
+| **quire today** | `Sheet` (dims nothing), `EdgePeek` (04 §24); `LayerStack` Escape order (06 §18); O-15: the peek and the sheet neither move nor trap focus |
 | **Verdict** | Adopt |
 | **Rule** | `ModalScope` owns focus: on open, focus the first field or the default button; Tab cycles inside; on close, focus returns (the existing `Focus::Controlled` hand-back); a second modal request while one is open is refused (`Result`), except an alert. 04 §24 (closes O-15); `ds::focus`; type + test |
 
@@ -435,7 +436,7 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Tips for simple features only (≤ 3 steps), one or two sentences; macOS help tags describe only the control under the pointer, start with a verb, 60-75 characters, do not repeat the label |
-| **quire today** | `Tooltip{Fly, Card}` (04 §18), hover intent 450 ms |
+| **quire today** | `Tooltip` and `HoverCard` over `HoverIntent` (Tip 1000 ms, Card 500 ms; design/30 §1.2) |
 | **Verdict** | Adopt the text rules (3.17) |
 
 ### 4.14 Playing audio, and UI sounds (2024-01-18)
@@ -477,9 +478,9 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Undo many times, no needless limit; show what an undo changed, scrolling to it if needed; name the target ("Undo Paste and Match Style", "Undo Typing"); batch related micro-changes; undo and redo at the top of the Edit menu with **Cmd+Z** and **Shift+Cmd+Z**; buttons only where needed |
-| **quire today** | Mail's undo toast and pull tab for list operations (06 §9); `ds::edit` fields have no undo stack specified |
+| **quire today** | Mail's undo toast for list operations (06 §9); `ds::edit` fields have no undo stack specified |
 | **Verdict** | Adopt |
-| **Rule** | `UndoStack<Op>` in `ds::edit` for every `TextInput` and editable list, typing coalesced per word or 1 s pause; `Op::title()` names it for the Edit menu; Cmd+Z / Shift+Cmd+Z bound through the reserved table (6.2); the toast stays as the visible affordance for list operations and uses the same stack. 06 §9, new §24; test: type, undo, redo round-trips; titles match |
+| **Rule** | `UndoStack<Op>` in `ds::edit` for every `TextField` and editable list, typing coalesced per word or 1 s pause; `Op::title()` names it for the Edit menu; Cmd+Z / Shift+Cmd+Z bound through the reserved table (6.2); the toast stays as the visible affordance for list operations and uses the same stack. 06 §9, new §24; test: type, undo, redo round-trips; titles match |
 
 ### 4.19 Collaboration and sharing (2023-11-02)
 
@@ -496,9 +497,9 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Items are verbs, title case, no articles; "…" when more input follows; toggles by changing title (Show/Hide), by a checkmark, or by a pair; dim unavailable items but keep the menu openable; group with separators, most-used first; submenus one level, about five items, marked with a chevron |
-| **quire today** | 04 §20 `Menu` (Rich, Slim, Dropdown, Context); 13.3.2-13.3.4 tracking, geometry (22 px rows, 13 px text, 22 px check column, separators, safe triangle, 200 ms submenu delay); first open `menu-pop` spring; highlight `--accent-soft`; menus radius 12 |
+| **quire today** | design/30 §2.4 `Menu` with `Placement {Bar, Popup, Context}` (04 §20); 13.3.2-13.3.4 tracking, geometry (22 px rows, 13 px text, 22 px check column, 9 px separators, safe triangle, 200 ms submenu delay); opens Instant, closes with a `--t-quick` fade; highlight a `Highlight` fill; radius 8 (Mac) |
 | **Verdict** | Adapt |
-| **Rule** | (a) Text menus (Dropdown, Context, bar) open with **no animation** and close with the `--t-quick` fade (macOS R3; closes 05 §12 item 6 and 06 open decision 16 in favour of the Mac); Rich keeps `menu-pop`. (b) Highlight: accent fill with `--accent-ink` text and glyphs (L; `selectedMenuItemTextColor`), not `--accent-soft`. (c) Pick blink: the chosen item flashes once (off 60 ms, on 60 ms) before the menu closes (L; 13.9 item 3). (d) Radius: highlight 4-5, menu about 6 on the Mac (L, measure against [KIT]); ours follows 3.9 from whatever outer radius is settled. 13.3.2-13.3.3; `ds::components::menu`; test per kind |
+| **Rule** | (a) Every menu opens with **no animation** and closes with the `--t-quick` fade (macOS R3; closes 05 §12 item 6 and 06 open decision 16 in favour of the Mac). (b) Highlight: accent fill with `--accent-ink` text and glyphs (L; `selectedMenuItemTextColor`), not `--accent-soft`. (c) Pick blink: the chosen item flashes twice (70 ms each, design/30 §1.3) before the menu closes (13.9 item 3). (d) Radius: highlight 4-5, menu 8 in the Mac Look (design/30 §3.2); ours follows 3.9 from the settled outer radius. 13.3.2-13.3.3; `ds::components::menu`; test per placement |
 
 ### 5.2 The menu bar (2024-12-14)
 
@@ -522,17 +523,17 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Relevant items only, few, at most about three groups; available elsewhere too; **hide** unavailable items (not dim); **no keyboard shortcuts** in context menus; rarely a title; one submenu level |
-| **quire today** | `Menu{Context}` shares the text menu metrics; 09 H5 "every menu item shows its shortcut" |
+| **quire today** | `Menu` with `Placement::Context` shares the text menu metrics; 09 H5 "every menu item shows its shortcut" |
 | **Verdict** | Adopt; this overrides H5 for context menus only |
-| **Rule** | `MenuKind::Context` takes items without a `shortcut` field and filters `Availability::Disabled` out when built. 04 §20; 09 H5 note; type |
+| **Rule** | `Placement::Context` takes items without a `shortcut` field and filters `Availability::Disabled` out when built. 04 §20; 09 H5 note; type |
 
 ### 5.5 Edit menus (2024-04-01)
 
 | | |
 | --- | --- |
 | **Apple** | On macOS the Edit menu in the bar plus a context menu on selected content; offer only applicable commands; selectable static text; support undo |
-| **quire today** | `SelectionBubble` in the composer (mail) |
-| **Verdict** | Adopt: a right click in any `TextInput` opens a Context menu with Cut, Copy, Paste, Select All (and Undo); labels and static text are selectable where useful (error text, addresses). 04 §6; test |
+| **quire today** | none: `SelectionBubble` is retired because macOS uses the context menu (design/30 Part 4) |
+| **Verdict** | Adopt: a right click in any `TextField` opens a Context menu with Cut, Copy, Paste, Select All (and Undo); labels and static text are selectable where useful (error text, addresses). 04 §6; test |
 
 ### 5.6 Popovers (2024-09-04)
 
@@ -548,16 +549,16 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Always modal on macOS; a card with rounded corners floating on its parent window, which dims; people may still use other windows of the app; reasonable default size, resizable when useful; dismiss buttons (Done, OK, Cancel) at the bottom, trailing corner; one sheet at a time; use a panel for repeated input |
-| **quire today** | `Sheet` derived from `Peek`: centred over a scrim across the surface (04 §24; 20 §1.8 power menu, 1.10 polkit) |
+| **quire today** | `Sheet` with `Attach {Window, Centre}` (design/30 §2.5): `Centre` over the output for the power menu and polkit (20 §1.8, 1.10), dimming nothing |
 | **Verdict** | Adapt |
-| **Rule** | Two kinds: `SheetKind::Window` (attached to its parent window's top edge below the titlebar, only that window dimmed, other windows usable; for app dialogs) and `SheetKind::Session` (centred over the output, for power and polkit where no parent window exists). Buttons bottom-trailing, default rightmost (5.8). Present and dismiss by the spring (3.12). 04 §24; type |
+| **Rule** | Two attachments: `Attach::Window` (at its parent window's top edge below the titlebar, other windows usable; for app dialogs) and `Attach::Centre` (centred over the output, for power and polkit where no parent window exists); neither dims (design/30 §2.5; click-outside is a shell-host concern). Buttons bottom-trailing, default rightmost (5.8). Enter by the spring, exit Slide(Top) `--t-move` (3.12, design/30 §1.3). 04 §24; type |
 
 ### 5.8 Alerts (2024-03-25)
 
 | | |
 | --- | --- |
 | **Apple** | Sparingly; not merely informational; not for common undoable actions; not at launch. Title says what happened; informative text only if it adds value, sentence case; up to **three** buttons; one- or two-word verbs; **"Cancel"** always titles cancel; avoid "OK" unless informational; default button on the **trailing** side of a row (top of a stack); Cancel leading; **destructive style only for an action people did not deliberately choose** (Empty Trash's own confirmation does not style Empty Trash as destructive); never make Cancel the default; Esc and **Cmd+.** cancel; macOS: app icon, optional suppression checkbox, help button, accessory view; caution symbol sparingly |
-| **quire today** | No alert component; power menu (20 §1.8) uses `Button{Danger}` for Restart and `Primary` for Shut Down |
+| **quire today** | No alert component; power menu (20 §1.8) styles Restart as a destructive `Button` role and Shut Down as the default button |
 | **Verdict** | Adopt |
 | **Rule** | `Alert { icon: AppIcon, title, informative: Option<Text>, buttons: AlertButtons, suppression: Option<Suppress> }`, `AlertButtons { default: Action<Safe>, cancel: Cancel, other: Option<Action<Any>> }` (at most three; `Cancel`'s label is fixed "Cancel"; a destructive action cannot be the default). Keys: Return = default, Esc and Cmd+. = cancel. Power menu: Restart and Shut Down are deliberate choices, so neither is styled destructive. 04 new §45; 20 §1.8; type + test |
 
@@ -576,25 +577,25 @@ no one touched.
 | **Apple** | Frame (title bar, toolbar, tab bar, rare bottom bar) and body; states **main**, **key**, **inactive** each look different: the key window's lights are coloured, others grey; a title unless content makes it obvious; document name or "Untitled", numeric suffixes from 2; no paths in titles; unsaved dot only without autosave; bottom bars for small status, never critical |
 | **quire today** | 04 window frame and 13.3.11: 28 px titlebar, 12 px lights, reveal rule, zoom menu, first-click rules (13.3.8) |
 | **Verdict** | Covered, one addition |
-| **Rule** | Inactive windows also dim their body's accent: selections go to the unemphasized colour (6.4), the titlebar text to `--f-ink-faint` (built). 04 window frame |
+| **Rule** | Inactive windows also dim their body's accent: selections go to the unemphasized colour (6.4), the titlebar text to its faint ink (`--f-ink-faint` under Arc; built). 04 window frame |
 
 ### 5.11 Toolbars (2024-03-02)
 
 | | |
 | --- | --- |
 | **Apple** | Top of the window, integrated with or below the title bar; frequent commands only; grouped; symbols without bezels, a hover background appears only on hover or press; no persistent selected look (exceptions: view toggles); every toolbar item is also a menu command; customizable and hideable (Opt+Cmd+T); custom icons 19×19 px (38 @2x); search collapses to a button when narrow |
-| **quire today** | `IconButton{Tool}` (04 §2); 09 H5 caps toolbar item counts per surface |
+| **quire today** | `Button{Toolbar}` (design/30 §2.1); 09 H5 caps toolbar item counts per surface |
 | **Verdict** | Adapt |
-| **Rule** | `Toolbar` component: unified with the 28 px titlebar into a 52 px frame (L) when an app has one; items are `IconButton{Tool}` with no rest background; each item names the `MenuModel` command it mirrors (type: `ToolbarItem { command: CommandId }`, so no toolbar-only action exists). 04 new §46; type |
+| **Rule** | `Toolbar` component: unified with the 28 px titlebar into a 52 px frame (L) when an app has one; items are `Button{Toolbar}` with no rest background; each item names the `MenuModel` command it mirrors (type: `ToolbarItem { command: CommandId }`, so no toolbar-only action exists). 04 new §46; type |
 
 ### 5.12 Sidebars (2025-02-28)
 
 | | |
 | --- | --- |
 | **Apple** | Full window height on macOS; rounded selection highlight; three sizes from the General setting: **Small** row 24 pt, 16 px icon, 11 pt text; **Medium** row 28, 20 px icon, 13 pt text; **Large** row 32, 24 px icon, 15 pt text; 17 pt horizontal spacing between cells, 0 vertical; **icons use the accent colour** by default (fixed colours only where the colour means something); at most two levels; hide it by a known command; auto-collapse when the window narrows; no edit buttons at the bottom edge |
-| **quire today** | 01 §4 sidebar and 04 §19 `SidebarItem` from `S` (the Arc lineage: drawn on the Space colour, pinned tiles, Today); icons in `--f-ink-soft`; Mod+S hides it |
+| **quire today** | 01 §4 sidebar and 04 §19 `Row` in a `List{SourceList}` from `S` (the Arc lineage: drawn on the Space colour, pinned tiles, Today); icons in the frame's soft ink (`--f-ink-soft` under Arc); Mod+S hides it |
 | **Verdict** | Adapt: the Arc sidebar stays (00 §6); take the size setting and the auto-collapse |
-| **Rule** | `appearance.sidebar_size` (3.1) selects row 24/28/32, icon 16/20/24, text 11/13/15 for every sidebar; default Medium. Icon colour stays ink on the Space frame (the frame carries the hue; accent-coloured icons would put two hues on it), recorded as a deliberate difference. Auto-collapse below a width set per app. Hide/Show Sidebar moves to the View menu with Ctrl+Cmd+S (the Mac's), freeing Mod+S (6.2). 01 §4; `ds::components::sidebar_item`; type |
+| **Rule** | `appearance.sidebar_size` (3.1) selects row 24/28/32, icon 16/20/24, text 11/13/15 for every sidebar; default Medium. Icon colour stays ink on the Space frame (the frame carries the hue; accent-coloured icons would put two hues on it), recorded as a deliberate difference. Auto-collapse below a width set per app. Hide/Show Sidebar moves to the View menu with Ctrl+Cmd+S (the Mac's), freeing Mod+S (6.2). 01 §4; `ds::components::list`; type |
 
 ### 5.13 Split views (2023-11-24)
 
@@ -609,7 +610,7 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Closely related panes; nouns as labels; at most six tabs; control on any side; inset from the window edge |
-| **quire today** | `Tabs` (04 §12); 09 H2 prefers vertical lists to tab strips |
+| **quire today** | `TabView`, whose strip is a `SegmentedControl` (design/30 §2.7); 09 H2 prefers vertical lists to tab strips |
 | **Verdict** | Covered (H2 already limits tabs to settings-like panes); add the six-tab cap as a debug assertion |
 
 ### 5.15 Segmented controls (2025-04-16)
@@ -643,7 +644,7 @@ no one touched.
 | --- | --- |
 | **Apple** | Page not retrieved. Observed (L): paired up/down arrows beside a numeric field |
 | **quire today** | Nothing |
-| **Verdict** | Adopt when Settings needs numeric keys (22 has many): `Stepper` bound to a `TextInput{numeric}` |
+| **Verdict** | Adopt when Settings needs numeric keys (22 has many): `Stepper` bound to a numeric `TextField` |
 
 ### 5.19 Pickers, date pickers (2024-07-31)
 
@@ -658,18 +659,18 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Placeholder as a hint, not a label; size matches expected text; logical Tab order; validate at the right time; number formatters; expansion tooltip; combo box for text plus choices. Search: descriptive placeholder (not "Search"), clear button, search while typing or on Return, no label needed in content areas, toolbar placement usual. Text views: selectable useful text |
-| **quire today** | `TextInput`, `SearchField`, `Chip{Token}` (04 §6, §7, §10) |
+| **quire today** | `TextField` (Plain, Secure, Search), `Chip{Removable}` (04 §6, §7, §10) |
 | **Verdict** | Covered, plus the clear button and the combo box |
-| **Rule** | `SearchField` shows a clear button when non-empty (Esc also clears, then a second Esc leaves); `ComboBox` = `TextInput` + `Menu{Slim}` with typing filter (06 §2.4 already filters). 04 §7 |
+| **Rule** | `TextField{Search}` shows a clear button when non-empty (Esc also clears, then a second Esc leaves). A `ComboBox` is not built (design/30 Part 4: no consumer). 04 §7 |
 
 ### 5.21 Buttons, pop-up and pull-down buttons (2025-02-24; 2023-11-13; 2023-11-02)
 
 | | |
 | --- | --- |
 | **Apple** | One or two prominent buttons per view; style, not size, marks the preferred choice; roles Normal, Primary (answers Return), Cancel, Destructive (red; never primary); title-case verbs; "…" when a view opens. macOS: push buttons; gradient buttons (symbols only) under tables; help button (circle with "?", one per window, bottom corner opposite the dismiss buttons); image buttons with about 10 px padding. Pop-up: mutually exclusive choices, shows the current one. Pull-down: commands, at least three, no title unless useful |
-| **quire today** | 04 §1 Button (Primary, Secondary, Mini, Quiet, Danger); `Menu{Dropdown}` |
+| **quire today** | design/30 §2.1 `Button` (bezels Push, Toolbar, Inline, Help; role Normal or Destructive; `ControlSize`); `Menu` |
 | **Verdict** | Adapt |
-| **Rule** | `ButtonRole::{Normal, Primary, Cancel, Destructive}` separate from visual variant; Primary answers Return in its window or sheet; a `Destructive` role cannot be `Primary` (type). `PopUpButton<T>` (shows the choice, `Menu{Dropdown}` with a check) and `PullDownButton` (commands). 04 §1, new §49; type |
+| **Rule** | `ButtonRole::{Normal, Primary, Cancel, Destructive}` separate from the bezel; Primary answers Return in its window or sheet; a `Destructive` role cannot be `Primary` (type). `PopUpButton<T>` (shows the choice, a `Menu` with a check) and `PullDownButton` (commands). 04 §1, new §49; type |
 
 ### 5.22 Disclosure controls, boxes (2024-09-06; 2025-04-07)
 
@@ -684,7 +685,7 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Determinate when possible; switch indeterminate to determinate when the length becomes known; **never switch circular to bar**; keep moving; context text, not "Loading"; cancel when safe; macOS: spinners for background work, unlabeled; bar indeterminate style exists. Gauges and level indicators: capacity (continuous or discrete, green by default), rating, relevance |
-| **quire today** | `Spinner` (loops, 26 G15/G45), `SendPill`, `BatteryLevel`; 26 R9 determinate first |
+| **quire today** | `ProgressIndicator` (Bar, Spinner, Ring styles), `SendPill`, `BatteryGlyph`; 26 R9 determinate first |
 | **Verdict** | Covered by 26 (R4 bounds the loop, R9 the switch rule); add `LevelIndicator{Continuous, Discrete}` for storage and battery lists |
 
 ### 5.24 Lists and tables, outline views, column views, collections (2023-09-20; 2023-09-22; 2024-03-31; 2024-09-06)
@@ -692,7 +693,7 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Text in rows; sortable column headings (click again reverses), title-case nouns without colons; resizable columns; alternating row colours in wide multi-column tables; outline views: hierarchy only in the first column, Option-click expands all, remember expansion, **centred ellipsis** for long cell text, single click to edit a name; column views: root in the first column, a preview when a leaf is selected; collections: standard grid, animate insert, delete, reorder |
-| **quire today** | `ListRow` (mail rows), `.ds-truncate` fades the end |
+| **quire today** | `Row` in a `List` (mail rows), `.ds-truncate` fades the end |
 | **Verdict** | Adopt when Files lands |
 | **Rule** | `Table<Row>` with `Column { title, sort: Sort, width: Resizable }`, alternating rows via `--row-alt`, `Truncate::{End, Middle}` (middle for file names). 04 new §50; `ds::text::clip` gains middle clipping; test |
 
@@ -744,9 +745,9 @@ no one touched.
 | | |
 | --- | --- |
 | **Apple** | Gestures behave the same everywhere; never redefine system gestures; modifier-drag gives the same result by any input. Pointers: **arrow** for selecting and interacting with interface elements; **pointing hand** only when the content is a link; I-beam for text; open and closed hand for dragging content within a view; crosshair; resize (up, down, left, right, both); drag copy (Option), drag link, disappearing item, operation not allowed, contextual menu (Control held) |
-| **quire today** | 12 gestures (Magic Mouse set, covered); CSS uses `cursor:pointer` on every button, row, item, scrim and segment (04, 14 rules in `components/*.css`) |
+| **quire today** | 12 gestures (Magic Mouse set, covered); CSS used `cursor:pointer` on every button, row, item and segment (04, 14 rules in `components/*.css`) |
 | **Verdict** | Adopt |
-| **Rule** | Controls use the arrow (`cursor:default`); `pointer` only on `a[href]` and the link pill; `text` on editable text; `grab`/`grabbing` on drag handles and the toast pull tab; resize cursors on split dividers and window edges (built); during a drag the drop outcome sets copy, not-allowed or disappearing. CSS lint `PointerCursor` rejects `cursor:pointer` in any rule whose selector is not a link. 04 global rules; `ds::lint`; lint |
+| **Rule** | Controls use the arrow (`cursor:default`); `pointer` only on `a[href]` and the link pill; `text` on editable text; `grab`/`grabbing` on drag handles; resize cursors on split dividers and window edges (built); during a drag the drop outcome sets copy, not-allowed or disappearing. CSS lint `PointerCursor` rejects `cursor:pointer` in any rule whose selector is not a link. 04 global rules; `ds::lint`; lint |
 
 ### 6.4 Focus and selection (2023-11-02)
 
@@ -755,7 +756,7 @@ no one touched.
 | **Apple** | Use the system focus effects; never move focus without the person's action (except directional keyboard moves); **by default Tab reaches content elements (text fields, lists, search fields), not buttons, sliders and toggles; Full Keyboard Access adds those**; a focus ring for a text or search field, a **row highlight** for a list or collection; focused list: white text on an accent-coloured highlight; unfocused list: standard text on a grey highlight. Color page: `keyboardFocusIndicatorColor`, `selectedContentBackgroundColor`, `unemphasizedSelectedContentBackgroundColor` |
 | **quire today** | 04 global rules: `:focus-visible{ outline:2.5px solid var(--accent); outline-offset:2px; border-radius:4px }` on everything; list rows show focus with the ring; selected rows `--raise` with an accent border (`S`); menus and launcher `--accent-soft`; every control in the Tab order |
 | **Verdict** | Adapt |
-| **Rule** | (a) Ring: `--focus-ring` = the accent at .55 alpha (L; the Mac's ring is translucent accent), width 3 px, gap 1 px, radius = the element's radius + gap (3.9), so a pill gets a pill ring; it appears with a `--t-quick` fade (the Mac's ring settles in, L). Lint `FocusRingShape`. (b) `FocusStyle::{Ring, Highlight}` per component: `ListRow`, `SidebarItem`, menu and launcher results use `Highlight` (never a ring). (c) Selection colours: `--sel-bg` (accent) with `--sel-ink` (accent ink) when the list has focus in the active window; `--sel-bg-quiet` (neutral grey) and `--ink` otherwise. The mail list's raised selected card stays in mailo (its own look); shell lists and menus use the Mac colours. (d) `appearance.keyboard_navigation = TextAndLists \| All`, default `All` (open decision 3): `TextAndLists` removes buttons, toggles, sliders and segments from Tab. 04 global rules, 06 §17; `ds::focus`; lint + type |
+| **Rule** | (a) Ring: `--focus-ring` = the accent at .55 alpha (L; the Mac's ring is translucent accent), width 3 px, gap 1 px, radius = the element's radius + gap (3.9), so a pill gets a pill ring; it appears with a `--t-quick` fade (the Mac's ring settles in, L). Lint `FocusRingShape`. (b) `FocusStyle::{Ring, Highlight}` per component: `Row`, menu and launcher results use `Highlight` (never a ring). (c) Selection colours: `--sel-bg` (accent) with `--sel-ink` (accent ink) when the list has focus in the active window; `--sel-bg-quiet` (neutral grey) and `--ink` otherwise. The mail list's raised selected card stays in mailo (its own look); shell lists and menus use the Mac colours. (d) `appearance.keyboard_navigation = TextAndLists \| All`, default `All` (open decision 3): `TextAndLists` removes buttons, toggles, sliders and segments from Tab. 04 global rules, 06 §17; `ds::focus`; lint + type |
 
 ## 7. Proposed waves
 
@@ -765,7 +766,7 @@ H0 and H1 can run in parallel; H2 needs H0's lint rules; H4 needs H1's springs f
 **H0: Guardrails (quire; small). Built on `hig-h0` (2026-09-27): the five rules as
 `Severity::Warning` under Strict (`ds::lint::warnings`, `ds::lint::markup_warnings`;
 `stylesheet` and `markup` return errors only, so no consumer test moves), `--fs-nano`,
-`--fs-micro` and `--fs-dial` at 10 px under System, `--focus-gap`, `StandardAction` with
+`--fs-micro` and `--fs-dial` at 10 px, `--focus-gap`, `StandardAction` with
 `Shortcut::{standard, custom}` and the ⌃⌥⇧⌘ order, quire's cursors on the arrow, docs 02 §12-13,
 06 §2.0, CHECKLIST.** The cheap, mechanical rules that stop new drift before the
 larger waves: the CSS lint rules `PointerCursor`, `MinFontSize` and `FocusRingShape` (landing as
@@ -776,17 +777,17 @@ Mod+S/Mod+T). Doc: 02 §13 writing rules, 06 §2 re-mapped keys, CHECKLIST lines
 pointer and shortcuts.
 sill's side (Whopper, 2026-09-26): 0 `cursor:pointer`, no literal font sizes (all `var(--fs-*)`),
 real ellipses already, no Mod+S/Mod+T bindings. So `MinFontSize` is a **token** rule in quire:
-`--fs-micro`, `--fs-nano`, `--fs-help` and `--fs-dial` must resolve to >= 10 px under System (fix in
+`--fs-micro`, `--fs-nano`, `--fs-help` and `--fs-dial` must resolve to >= 10 px (fix in
 the token table, not in sill); the lint also rejects literal sizes below 10 in any stylesheet.
 `FocusRingShape` and `UnnamedControl` run as warnings over sill's surface markup tests and the
 list goes to sill before they turn Strict.
 
-**H1: Driven motion (quire). Built on `hig-h1` (2026-09-27): design/05 section 14; `ds::motion::{Spring, SpringSpec, use_spring, use_spring_motion, Throw, VelocityMeter, DragReturn, ReducedForm}`, the velocity inside `Contact`; converted as 05 section 14.6 lists.** `Spring { damping, response }`, `use_spring`, `Touch::Contact(Velocity)`
+**H1: Driven motion (quire). Built on `hig-h1` (2026-09-27): design/05 section 14; `ds::motion::{Spring, SpringSpec, use_spring, Throw, VelocityMeter, DragReturn, ReducedForm}`, the velocity inside `Contact`; converted as 05 section 14.6 lists.** `Spring { damping, response }`, `use_spring`, `Touch::Contact(Velocity)`
 extending 26's `Touch`, `SpringSpec::for_touch`, projection with the .998 rate, retargeting;
-Reduced forms per keyframe (cross-fade) and critically damped springs under Reduced. Convert the
+a Reduced form per motion primitive (cross-fade) and critically damped springs under Reduced. Convert the
 contact motions listed in 3.12 (sheet, panel slide, notification swipe return, toggle knob,
 segmented and switcher indicator, slider release, dock drag return). Tests: interruption
-continuity, throw endpoint, idle 0 frames, every moving keyframe has a still Reduced form.
+continuity, throw endpoint, idle 0 frames, every motion primitive declares a Reduced form.
 Doc: 05 new §14.
 
 **H2: Accessibility settings (quire + sill).** High-contrast token set (with the colour page's
@@ -806,13 +807,12 @@ but links. Gallery contact sheet reviewed beside macOS screenshots.
 ds-native apps export it; sill's bar renders the active app's menus (App, File, Edit, View,
 Window, Help) and the App menu for foreign apps; toolbar items bound to commands; `UndoStack`
 in `ds::edit` with titled Undo/Redo and Cmd+Z / Shift+Cmd+Z; `ModalScope` focus trap;
-`SheetKind::{Window, Session}`; the `Alert` component and its button types; power menu buttons
+`Attach::{Window, Centre}` on `Sheet`; the `Alert` component and its button types; power menu buttons
 restyled (no destructive style on deliberate actions).
 
-**H5: Type ramp and writing (quire; needs the user's decision on density).** Under the System
-typeface, UI roles on the Mac text styles (body 13/16, secondary 11/14, section headers 11 Bold
+**H5: Type ramp and writing (quire; needs the user's decision on density).** In the Mac Look, UI roles on the Mac text styles (body 13/16, secondary 11/14, section headers 11 Bold
 title case), the 10 px floor, size-based tracking, glyph weight following text weight and
-`SymbolScale`. Editorial keeps the prototype's ramp. Gallery before and after, side by side with
+`SymbolScale`. mailo keeps its own ramp. Gallery before and after, side by side with
 macOS.
 
 **H6: CJK and restoration (quire + sill).** CJK faces and fallback order per locale, CJK
@@ -829,8 +829,8 @@ levels.
 
 ## 8. Decisions (settled by the user 2026-09-26)
 
-1. **Density.** SETTLED: 13 px body for shell surfaces and system apps under System (H5); mailo
-   keeps 15 px under Editorial.
+1. **Density.** SETTLED: 13 px body for shell surfaces and system apps in the Mac Look (H5); mailo
+   keeps its own 15 px density.
 2. **Sidebar icon colour.** SETTLED: keep ink on the Space colour (5.12).
 3. **Keyboard navigation default.** SETTLED: `All` by default (Tab reaches every control, 09 H5);
    the Mac's `TextAndLists` is a setting.
