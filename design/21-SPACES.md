@@ -215,9 +215,9 @@ repaint on every switch and would compete with the tint as the Space's colour cl
 
 `$XDG_CONFIG_HOME/quire/spaces.json`, atomic write (the `ds-settings` writer), watched with
 `notify` (rename replaces inode; debounce 30 ms). **Settled** (2026-09-24, sill gap Q3):
-`ds::SpaceStore` is this schema (`crates/ds/src/space/store.rs`), and `ds_settings::SPACES`
-reads, writes and watches it through the generic settings file API
-(`crates/ds-settings/src/spaces.rs`). A `null` in `by_index` means "no look stored at this
+`ds::SpaceStore` is this schema (`crates/ds/src/space/store.rs`); a consumer reads, writes and
+watches it through `ds-settings`'s generic settings file API (`Settings<SpaceStore>` with
+`Format::Json`). A `null` in `by_index` means "no look stored at this
 position".
 
 ```json
