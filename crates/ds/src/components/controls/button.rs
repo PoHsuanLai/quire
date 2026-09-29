@@ -129,6 +129,7 @@ pub fn Button(
             "aria-pressed": pressed,
             "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             disabled: disabled(availability),
             "data-size": size.map(ButtonSize::slug),
             onclick: move |event| {

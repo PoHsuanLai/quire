@@ -80,7 +80,7 @@ pub(crate) fn target<T>(index: usize, choice: &Choice<T>) -> MenuTarget<()> {
         path: path(index),
         pick: match choice.availability {
             Availability::Enabled => Pickable::Enabled,
-            Availability::Disabled => Pickable::Inert,
+            Availability::Disabled | Availability::Busy => Pickable::Inert,
         },
         branch: match choice.act {
             Act::Pick(_) => Branch::Leaf,

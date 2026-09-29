@@ -109,6 +109,7 @@ pub fn IconButton(
             "aria-pressed": pressed,
             "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             disabled: disabled(availability),
             onclick: move |event| {
                 if live {

@@ -87,7 +87,7 @@ pub fn LevelControl(
     // A disabled level is not a stop in the tab order: it takes no key and no press.
     let (role, tabindex) = match (mode, availability) {
         (LevelMode::Interactive, Availability::Enabled) => ("slider", Some("0")),
-        (LevelMode::Interactive, Availability::Disabled) => ("slider", None),
+        (LevelMode::Interactive, Availability::Disabled | Availability::Busy) => ("slider", None),
         (LevelMode::ReadOnly, _) => ("progressbar", None),
     };
     let fill = value.css();
@@ -108,6 +108,7 @@ pub fn LevelControl(
             "aria-valuemax": "100",
             "aria-valuenow": "{percent(value)}",
             "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             style: "--f:{fill}{rb}",
             onmounted: move |event| root.set(Some(event.data())),
             onpointerdown: move |event| {

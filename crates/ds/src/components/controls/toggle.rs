@@ -54,6 +54,7 @@ pub fn Toggle(
             "data-size": size.slug(),
             "aria-label": "{label}",
             "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             style: "--knob-x:{knob.css()}",
             onclick: move |event| {
                 if availability == Availability::Enabled {

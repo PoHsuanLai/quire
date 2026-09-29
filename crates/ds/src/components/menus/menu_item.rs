@@ -167,6 +167,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
             "aria-selected": view.selection.aria(),
             "aria-checked": checked,
             "aria-disabled": view.availability.aria_disabled(),
+            "aria-busy": view.availability.aria_busy(),
             "aria-haspopup": popup,
             "aria-expanded": expanded,
             "data-trailing": view.trailing.map(|_| "action"),

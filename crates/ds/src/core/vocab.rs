@@ -6,14 +6,18 @@
 use crate::core::word::Word;
 use serde::{Deserialize, Serialize};
 
-/// Whether a control takes input. `Disabled` adds `aria-disabled="true"` and drops the handler.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+/// Whether a control takes input (design/30 section 1.5). `Disabled` adds `aria-disabled="true"`
+/// and drops the handler; `Busy` adds `aria-busy="true"`, drops the handler as well, and is
+/// where a control's busy accessory shows.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Availability {
     /// Takes input.
     #[default]
     Enabled,
     /// Shown, but takes no input.
     Disabled,
+    /// Working: takes no input until the work ends.
+    Busy,
 }
 
 /// Whether what a control shows or opens is up (design/30 section 1.5): a surface or a tooltip
@@ -289,8 +293,16 @@ impl Availability {
     /// `aria-disabled`: present only when disabled.
     pub fn aria_disabled(self) -> Option<&'static str> {
         match self {
-            Availability::Enabled => None,
+            Availability::Enabled | Availability::Busy => None,
             Availability::Disabled => Some("true"),
+        }
+    }
+
+    /// `aria-busy`: present only while busy.
+    pub(crate) fn aria_busy(self) -> Option<&'static str> {
+        match self {
+            Availability::Enabled | Availability::Disabled => None,
+            Availability::Busy => Some("true"),
         }
     }
 }
@@ -429,6 +441,24 @@ mod fraction_tests {
         ];
         for &(given, want) in CASES {
             assert_eq!(Fraction(given).whole_percent(), want, "{given}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod availability_tests {
+    use super::Availability;
+
+    #[test]
+    fn availability_writes_its_own_aria_attribute() {
+        const CASES: &[(Availability, Option<&str>, Option<&str>)] = &[
+            (Availability::Enabled, None, None),
+            (Availability::Disabled, Some("true"), None),
+            (Availability::Busy, None, Some("true")),
+        ];
+        for &(availability, disabled, busy) in CASES {
+            assert_eq!(availability.aria_disabled(), disabled, "{availability:?}");
+            assert_eq!(availability.aria_busy(), busy, "{availability:?}");
         }
     }
 }
