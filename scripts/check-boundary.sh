@@ -10,12 +10,13 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-# ds is renderer-free and effect-free; ds-settings does I/O but never renders.
+# ds is renderer-free and effect-free; ds-settings does I/O but never renders, and takes a Spawner
+# instead of naming a runtime.
 # ds-native reaches D-Bus only through its opt-in `print` feature, so an app that never prints
 # builds no D-Bus client for it; anyrender_pdfrum stays Blitz-free so it can go upstream.
 RULES=(
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
-  "ds-settings: blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
+  "ds-settings: tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-native: zbus memfd"
   "ds-core-derive: dioxus zbus tokio"
   "ds-settings-derive: dioxus zbus tokio"

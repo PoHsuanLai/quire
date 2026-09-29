@@ -1,14 +1,16 @@
 //! Everything a surface resolves its look from, as one live signal: the settings file and the
 //! desktop's preferences, both watched.
 
-use crate::appearance_file as file;
-use crate::dirs::{self, AppName};
-use crate::portal::{self, SystemPrefsWatch};
-use crate::settings::AppearanceFile;
+use crate::appearance::AppearanceFile;
+use crate::doc::SettingsDoc;
+use crate::lenient::Loaded;
+use crate::portal::{SystemPrefsSource, SystemPrefsWatch};
+use crate::store::Store;
 use crate::units::Percent;
-use crate::watch::{self, AppearanceWatch};
+use crate::watch::Watch;
 use dioxus::prelude::*;
-use ds::SystemPrefs;
+use ds::{Spawner, SystemPrefs};
+use std::sync::Arc;
 
 /// The inputs to [`ds::resolve`], as they are now.
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -25,12 +27,15 @@ impl Environment {
     ///
     /// ```no_run
     /// use dioxus::prelude::*;
-    /// use ds::{Ds, Material};
-    /// use ds_settings::{AppName, use_environment};
+    /// use ds::{Ds, Material, Spawner};
+    /// use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
+    /// use std::sync::Arc;
     ///
     /// #[component]
     /// fn Root(children: Element) -> Element {
-    ///     let env = use_environment(AppName::MAILO);
+    ///     let spawn = use_context::<Arc<dyn Spawner>>();
+    ///     let store = Store::new(ConfigRoot::Xdg, AppName::MAILO);
+    ///     let env = use_environment(store, SystemPrefsSource::Portal, spawn);
     ///     let now = env();
     ///     rsx! {
     ///         Ds {
@@ -65,67 +70,53 @@ impl Environment {
     }
 }
 
-/// `app`'s settings, or the defaults for a program with no config directory at all.
-fn load_initial(app: AppName) -> AppearanceFile {
-    dirs::config_dir(app)
-        .map(|dir| file::load(&dir))
-        .unwrap_or_default()
+/// Print what the file held that did not become a setting, once per read.
+fn report(loaded: &Loaded<AppearanceFile>) {
+    for line in loaded.diagnostics(AppearanceFile::FILE) {
+        eprintln!("ds-settings: {line}");
+    }
 }
 
-/// Load `app`'s settings, read the portal, and keep both live.
-pub fn use_environment(app: AppName) -> ReadSignal<Environment> {
+/// Load the settings `store` holds, read the desktop's preferences from `system`, and keep both
+/// live, their watches running on `spawner`. Unknown and invalid keys in the file are printed to
+/// stderr as they are read.
+pub fn use_environment(
+    store: Store,
+    system: SystemPrefsSource,
+    spawner: Arc<dyn Spawner>,
+) -> ReadSignal<Environment> {
     let mut env = use_signal(Environment::default);
 
-    use_future(move || async move {
-        env.set(Environment {
-            settings: load_initial(app),
-            system: portal::read_system_prefs().await.unwrap_or_default(),
-        });
-
-        let file_watch = dirs::config_dir(app).and_then(|dir| watch::watch(&dir).ok());
-        let portal_watch = SystemPrefsWatch::start().await.ok();
-
-        match (file_watch, portal_watch) {
-            (Some(files), Some(portal)) => watch_both(env, files, portal).await,
-            (Some(files), None) => watch_files(env, files).await,
-            (None, Some(portal)) => watch_portal(env, portal).await,
-            (None, None) => {}
+    use_future(move || {
+        let (store, system, spawner) = (store.clone(), system.clone(), spawner.clone());
+        async move {
+            let loaded = store.load::<AppearanceFile>();
+            report(&loaded);
+            let prefs = SystemPrefsWatch::start(&system, &*spawner).await;
+            env.set(Environment {
+                settings: loaded.value,
+                system: prefs.current(),
+            });
+            let files = store.watch::<AppearanceFile>(&*spawner);
+            spawn(follow_files(env, files));
+            follow_prefs(env, prefs).await;
         }
     });
 
     ReadSignal::new(env)
 }
 
-/// Apply both watches to `env` until either stops.
-async fn watch_both(
-    mut env: Signal<Environment>,
-    mut files: AppearanceWatch,
-    mut portal: SystemPrefsWatch,
-) {
-    loop {
-        tokio::select! {
-            settings = files.changed() => {
-                let Some(settings) = settings else { return; };
-                env.with_mut(|e| e.settings = settings);
-            }
-            system = portal.changed() => {
-                let Some(system) = system else { return; };
-                env.with_mut(|e| e.system = system);
-            }
-        }
+/// Apply every settled change of the settings file to `env` until the watch stops.
+async fn follow_files(mut env: Signal<Environment>, mut files: Watch<AppearanceFile>) {
+    while let Some(loaded) = files.changed().await {
+        report(&loaded);
+        env.with_mut(|e| e.settings = loaded.value);
     }
 }
 
-/// Apply the file watch alone (the portal could not be reached).
-async fn watch_files(mut env: Signal<Environment>, mut files: AppearanceWatch) {
-    while let Some(settings) = files.changed().await {
-        env.with_mut(|e| e.settings = settings);
-    }
-}
-
-/// Apply the portal watch alone (the config directory could not be watched).
-async fn watch_portal(mut env: Signal<Environment>, mut portal: SystemPrefsWatch) {
-    while let Some(system) = portal.changed().await {
+/// Apply every change of the desktop's preferences to `env` until the watch stops.
+async fn follow_prefs(mut env: Signal<Environment>, mut prefs: SystemPrefsWatch) {
+    while let Some(system) = prefs.changed().await {
         env.with_mut(|e| e.system = system);
     }
 }

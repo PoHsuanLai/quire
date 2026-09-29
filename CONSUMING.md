@@ -189,22 +189,25 @@ value.
 
 ### `ds_settings::use_environment`
 
-`ds_settings::use_environment(app: AppName) -> ReadSignal<Environment>` (`ds-settings/src/
-environment.rs`) is the one hook that gives you a live `Environment { settings: AppearanceFile,
-system: SystemPrefs }`: it loads `appearance.toml` (importing mailo's `appearance.json` once
-when the app's own `appearance.toml` does not exist yet, for every app, mailo included;
-design/22-SETTINGS.md section 2 "Mailo migration"), watches the directory for edits (30 ms
-debounce), reads the freedesktop settings portal, and watches it for changes — merging both into
-one signal.
+`ds_settings::use_environment(store, system, spawner) -> ReadSignal<Environment>` (feature
+`dioxus` of `ds-settings`; `ds-settings/src/environment.rs`) is the one hook that gives you a live
+`Environment { settings: AppearanceFile, system: SystemPrefs }`: it loads `appearance.toml` from
+the `Store`, watches the directory for edits (30 ms debounce), reads the freedesktop settings
+portal (`SystemPrefsSource::Portal`), and watches it for changes, merging both into one signal.
+Unknown and invalid keys in the file are printed to stderr as they are read and dropped on the
+next save.
 
 ```rust
-use ds_settings::{AppName, use_environment};
+use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use ds::{Ds, Material};
+use ds_native::TokioSpawner;
 use dioxus::prelude::*;
+use std::sync::Arc;
 
 #[component]
 fn App() -> Element {
-    let env = use_environment(AppName("your-app-id"));
+    let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
+    let env = use_environment(store, SystemPrefsSource::Portal, Arc::new(TokioSpawner::current()));
     let environment = env();
     rsx! {
         Ds {
@@ -217,30 +220,17 @@ fn App() -> Element {
 }
 ```
 
-**`use_environment` needs an entered Tokio runtime, in both halves, not only the obviously
-networked one** — and on Blitz, `ds_native::launch` and `ds_native::Harness` provide it, so
-there is nothing for you to do:
-
-- the desktop-portal half (`SystemPrefsWatch`, `ds-settings/src/portal.rs`) goes over D-Bus
-  through `zbus`'s `tokio` feature and calls `tokio::spawn` directly (`portal.rs`'s
-  `linux::spawn_watch`);
-- the file-watch half is not exempt either: `ds_settings::watch` (`ds-settings/src/watch.rs`)
-  calls `tokio::spawn` directly too, to debounce and coalesce `notify` events
-  (`tokio::time::timeout(DEBOUNCE, ...)` inside that spawned task), so it needs a runtime just
-  as much as the portal does — only the plain, one-shot `ds_settings::load`/`load_or_import`
-  (a synchronous `std::fs::read`) needs none.
-
-Neither `ds` nor `ds-settings` may depend on a renderer or a windowing stack
-(`scripts/check-boundary.sh`), so neither can own a *host thread* to enter a runtime on — only a
-host crate can, and `ds-native` is quire's one host crate. `ds-native` owns a process-wide,
-lazily built Tokio runtime (multi-thread, two workers; `crates/ds-native/src/runtime.rs`):
-`ds_native::launch` enters it and holds the guard for the rest of the call, i.e. for the
-process's life, and `ds_native::Harness` enters it in `Harness::new` and holds the guard as a
-field, for the harness's own life. Call `use_environment` (or `ds_settings::watch` on its own)
-from anything launched with `ds_native::launch`, or rendered inside a `ds_native::Harness`, and
-it works — `examples/consumer::App` does exactly this
-(`examples/consumer/src/lib.rs::App`), and `crates/ds-native/tests/harness.rs::
-use_environment_does_not_panic_under_the_harness` is the regression test.
+**Nothing here names a runtime.** The file watch and the portal watch are tasks handed to the
+`ds::Spawner` you pass (`ds-settings` may not depend on `tokio`, `scripts/check-boundary.sh`).
+On Blitz, `ds_native::TokioSpawner::current()` is the implementor: `ds_native::launch` enters a
+process-wide, lazily built Tokio runtime (multi-thread, two workers;
+`crates/ds-native/src/runtime.rs`) and holds the guard for the process's life, and
+`ds_native::Harness` enters it in `Harness::new` for the harness's own life, so `current()` works
+in anything launched with `launch` or rendered inside a `Harness`. A test never reaches the real
+config or the session bus: it passes `ConfigRoot::Scratch(dir)` and
+`SystemPrefsSource::Fixed(prefs)` (`crates/ds-native/tests/harness.rs::
+use_environment_does_not_panic_under_the_harness`). `examples/consumer::App` shows the real
+wiring.
 
 ### `use_scope` — reading the resolved scope
 
@@ -928,21 +918,23 @@ If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings
 already derives), give it a schema the same way so the Settings app can render it
 (design/22-SETTINGS.md section 9):
 
-Both the struct and every enum one of its fields holds need the derive — the struct gets
-`SettingsSchema` (a `KeySpec` per field, from `#[settings(...)]`), a fieldless enum gets
-`SchemaVariants` (its variant words, so the struct's own derive can pick a widget by arity:
-`ds_settings::schema::kind_from_variants`, section 9.1). The trait `.schema()` calls through is
+The struct takes the derive (a `KeySpec` per field, from `#[settings(...)]`); every enum one of
+its fields holds derives `ds::Word` with `#[word(case = snake)]`, whose `ALL` gives the derive
+the variant words to pick a widget by arity (`ds_settings::schema::kind_from_variants`, section
+9.1). The trait `.schema()` calls through is
 `ds_settings::schema::SettingsSchema` — a different item from the `SettingsSchema` the derive
 macro re-exports at the crate root (`crates/ds-settings/tests/schema.rs` is quire's own worked
 example of both imports together):
 
 ```rust
+use ds::Word;
 use ds_settings::SettingsSchema;               // the derive macro (macro namespace)
 use ds_settings::schema::{Page, SettingsSchema};   // the trait `.schema()` needs (type namespace)
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, SettingsSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
+#[word(case = snake)]
 pub enum OpenLinks {
     #[default]
     InApp,
@@ -955,14 +947,11 @@ pub enum OpenLinks {
 pub struct ReaderSettings {
     #[settings(label = "Open links", help = "Where a link in a message opens.", section = "Reader")]
     pub open_links: OpenLinks,   // a two-variant enum -> a Toggle widget
-    #[serde(flatten)]
-    #[settings(skip)]            // a catch-all field is never a key — every other field needs
-    pub extra: toml::Table,      // its own #[settings(label = "...")] or the derive refuses to build
-}
+}                                // every field needs its own #[settings(label = "...")]
 
 impl Default for ReaderSettings {
     fn default() -> Self {
-        ReaderSettings { open_links: OpenLinks::default(), extra: toml::Table::new() }
+        ReaderSettings { open_links: OpenLinks::default() }
     }
 }
 ```
@@ -1077,23 +1066,28 @@ up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `spaces.default_grain` and `spaces.default_card_accent`. `store.with_look(&workspace, look)`
 records a look under the id (when there is one) and always under the position.
 
-**Settings files** (`ds_settings::file`, `ds_settings::watch`). Declare a file once and load,
-save and watch it:
+**Settings files** (`ds_settings::{SettingsDoc, Store}`). A file is a serde type that names
+its file and format; a `Store` is one program's config directory, and the only way to load, save
+and watch it:
 
 ```rust
-use ds::SpaceStore;
-use ds_settings::{AppName, FileName, Format, Settings, config_dir};
+use ds_settings::{AppName, ConfigRoot, FileName, Format, SettingsDoc, Store};
 
-const SPACES: Settings<SpaceStore> = Settings::new(FileName("spaces.json"), Format::Json);
-let dir = config_dir(AppName::QUIRE).expect("a config dir");
-let store = SPACES.load(&dir);            // lenient: a bad key costs only itself
-SPACES.save(&dir, &store)?;               // atomic temp-and-rename
-let mut watch = SPACES.watch(&dir)?;      // 30 ms debounce; needs a Tokio runtime
+impl SettingsDoc for YourFile {
+    const FILE: FileName = FileName("your-file.toml");
+    const FORMAT: Format = Format::Toml;
+}
+let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
+let loaded = store.load::<YourFile>();   // lenient: a bad key costs only itself; never fails
+store.save(&loaded.value)?;              // atomic temp-and-rename; drops unknown keys
+let mut watch = store.watch::<YourFile>(&spawner);   // 30 ms debounce, a task on `spawner`
 ```
 
-`ds_settings::{load, save, watch}` keep meaning `appearance.toml` (`APPEARANCE`); the generic
-functions are `file::load(&SettingsFile)`, `file::save(&SettingsFile, &T)` and
-`watch_file(SettingsFile)`.
+`Loaded { value, unknown, invalid }` carries what the file held that did not become part of the
+value; `loaded.diagnostics(YourFile::FILE)` is one printable line per entry. A key nobody reads
+is reported and not preserved. `watch.changed().await` yields the whole re-read file as a
+`Loaded`, and keeps the last good value when the file is not valid text. Tests use
+`ConfigRoot::Scratch(dir)`, never real XDG.
 
 **Settings derive, three more shapes.** Text is recognised by type (`String`, `PathBuf`,
 `Cow<str>`) or by `#[settings(text)]` on a newtype. A one-variant enum is a key

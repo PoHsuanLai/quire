@@ -1,12 +1,11 @@
 //! The keys `appearance.toml` holds (design/22-SETTINGS.md sections 3.1-3.3 and 4.3-4.4).
 //!
-//! Every struct is `#[serde(default)]` and read through [`crate::lenient`], so a bad value costs
-//! only its own key; every struct keeps the keys it does not know in `extra`, so a round trip
-//! through an older or newer binary drops nothing.
+//! Every struct is `#[serde(default)]` and read through [`crate::Store`], so a bad value costs
+//! only its own key; a key a struct does not read is reported on load and dropped on save.
 
 use crate::schema::Page;
 use crate::units::{Fraction, Percent};
-use ds::{Accent, Appearance, Look, Motion, Theme, Typeface};
+use ds::{Accent, Appearance, Look, Motion, Theme, Typeface, Word};
 use serde::{Deserialize, Serialize};
 
 /// `appearance.*`: what every surface resolves its look from.
@@ -121,10 +120,6 @@ pub struct AppearanceSettings {
         advanced
     )]
     pub material_vibrancy: Percent,
-    /// Keys this build does not know, kept for the next write.
-    #[serde(flatten)]
-    #[settings(skip)]
-    pub extra: toml::Table,
 }
 
 impl Default for AppearanceSettings {
@@ -142,7 +137,6 @@ impl Default for AppearanceSettings {
             material_hairline_dark: Percent(60),
             material_shadow_strength: Percent(100),
             material_vibrancy: Percent(100),
-            extra: toml::Table::new(),
         }
     }
 }
@@ -164,10 +158,9 @@ impl AppearanceSettings {
 }
 
 /// How a plate's glyph is coloured (`icons.plate_glyph_colour_policy`).
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, crate::SettingsSchema,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
+#[word(case = snake)]
 pub enum PlateGlyphPolicy {
     /// WCAG-driven per family: red, blue, violet white; amber, green ink.
     #[default]
@@ -179,10 +172,9 @@ pub enum PlateGlyphPolicy {
 }
 
 /// Whether third-party icons get a dark variant (`icons.dark_mode_variant`).
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, crate::SettingsSchema,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
+#[word(case = snake)]
 pub enum IconDarkVariant {
     /// The freedesktop convention: the same icon in both schemes.
     #[default]
@@ -192,10 +184,9 @@ pub enum IconDarkVariant {
 }
 
 /// Which dialect our app icons are drawn in (`icons.style`, design/08-ICONS.md section 2.10).
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, crate::SettingsSchema,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
+#[word(case = snake)]
 pub enum IconStyle {
     /// Each app in the dialect its icon was designed in.
     #[default]
@@ -207,10 +198,9 @@ pub enum IconStyle {
 }
 
 /// Where a Monochrome icon takes its hue from (`icons.monochrome_tint`).
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, crate::SettingsSchema,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
+#[word(case = snake)]
 pub enum MonochromeTint {
     /// The current workspace's Space: the accent `ds` derives from its first dot.
     #[default]
@@ -304,10 +294,6 @@ pub struct IconsSettings {
         advanced
     )]
     pub dark_mode_variant: IconDarkVariant,
-    /// Keys this build does not know, kept for the next write.
-    #[serde(flatten)]
-    #[settings(skip)]
-    pub extra: toml::Table,
 }
 
 impl Default for IconsSettings {
@@ -321,7 +307,6 @@ impl Default for IconsSettings {
             symbolic_chroma_max: Fraction(40),
             plate_glyph_colour_policy: PlateGlyphPolicy::Auto,
             dark_mode_variant: IconDarkVariant::SameAsLight,
-            extra: toml::Table::new(),
         }
     }
 }
@@ -336,9 +321,6 @@ pub struct AppearanceFile {
     pub appearance: AppearanceSettings,
     /// `[icons]`.
     pub icons: IconsSettings,
-    /// Tables this build does not know, kept for the next write.
-    #[serde(flatten)]
-    pub extra: toml::Table,
 }
 
 impl Default for AppearanceFile {
@@ -347,7 +329,6 @@ impl Default for AppearanceFile {
             version: 1,
             appearance: AppearanceSettings::default(),
             icons: IconsSettings::default(),
-            extra: toml::Table::new(),
         }
     }
 }
@@ -359,7 +340,7 @@ mod tests {
     use serde::de::DeserializeOwned;
 
     /// `CONVENTIONS.md#12-derives-and-serde`: "every stored or wire type has a round-trip test."
-    /// Raw `toml::to_string`/`from_str`, not through [`crate::file`] or [`crate::lenient`], so this
+    /// Raw `toml::to_string`/`from_str`, not through [`crate::Store`], so this
     /// exercises the struct's own `Serialize`/`Deserialize` in isolation.
     fn round_trips<T: Serialize + DeserializeOwned + PartialEq + std::fmt::Debug + Default>() {
         let default = T::default();

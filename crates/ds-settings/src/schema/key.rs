@@ -145,10 +145,10 @@ pub struct KeySpec {
 /// read-only [`KeyKind::Fixed`]).
 ///
 /// Pure: takes the words, returns the kind. The derive's `kind_of::<T>()` (`crate::schema`)
-/// is the only caller that reaches for `SchemaVariants` to get them.
+/// is the only caller that reaches for a `Word`'s variants to get them.
 pub fn kind_from_variants(mut words: Vec<String>) -> KeyKind {
     match words.len() {
-        0 => panic!("SchemaVariants: a settings enum needs at least one variant, got none"),
+        0 => panic!("a settings enum needs at least one variant, got none"),
         1 => KeyKind::Fixed {
             variant: words.remove(0),
         },

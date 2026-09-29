@@ -16,7 +16,7 @@ publish = false
 # quire, by path: this is what a consumer's own Cargo.toml looks like today, before quire has
 # a published version (CONSUMING.md "Adding quire").
 ds = { path = "../../crates/ds", features = ["lint"] }
-ds-settings = { path = "../../crates/ds-settings" }
+ds-settings = { path = "../../crates/ds-settings", features = ["dioxus"] }
 ds-native = { path = "../../crates/ds-native" }
 
 # ---- lines copied from quire/docs/workspace-deps.toml (pinned block, CONVENTIONS.md §10) ----

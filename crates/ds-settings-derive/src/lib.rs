@@ -4,15 +4,13 @@
 //! On a settings struct it emits `impl SettingsSchema for X { fn schema() -> Schema }`, one
 //! `KeySpec` per field, built from `#[settings(...)]` and the field's own type
 //! (`crate::gen_struct`): text by type (`String`, `PathBuf`, `Cow<str>`) or `#[settings(text)]`,
-//! a number only with `range` (without one, a `MissingRange { field }` error). On a fieldless
-//! enum of one or more variants it emits `impl SchemaVariants for X`, so a struct whose field is
-//! that enum can ask it for its variant words at run time (`crate::gen_enum`).
+//! a number only with `range` (without one, a `MissingRange { field }` error). A field whose type
+//! is a closed enum reads its variant words from the enum's own `Word` (`ds::Word`), so an
+//! enum needs no derive of this crate's.
 //! Every malformed `#[settings(...)]` is caught in `crate::attrs`, which is unit-tested
 //! directly — there is no `trybuild` in this workspace's lockfile to drive a UI test instead.
 
 mod attrs;
-mod case;
-mod gen_enum;
 mod gen_struct;
 mod shape;
 
@@ -24,10 +22,13 @@ pub fn derive_settings_schema(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let expanded = match &input.data {
         syn::Data::Struct(data) => gen_struct::expand(&input, data),
-        syn::Data::Enum(data) => gen_enum::expand(&input, data),
+        syn::Data::Enum(data) => Err(syn::Error::new(
+            syn::spanned::Spanned::span(&data.enum_token),
+            "#[derive(SettingsSchema)] is for a settings struct; a settings enum derives `Word`",
+        )),
         syn::Data::Union(data) => Err(syn::Error::new(
             syn::spanned::Spanned::span(&data.union_token),
-            "#[derive(SettingsSchema)] supports structs and fieldless enums, not unions",
+            "#[derive(SettingsSchema)] supports structs, not unions",
         )),
     };
     match expanded {

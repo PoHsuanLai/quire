@@ -1,12 +1,12 @@
 //! The desktop's preferences from the settings portal:
 //! `org.freedesktop.portal.Settings.ReadAll(["org.freedesktop.appearance"])` and
 //! `SettingChanged`, mapped to [`ds::SystemPrefs`]. The mappings are pure tables, tested
-//! against a fake `ReadAll`/`SettingChanged` payload with no bus involved; only [`read_system_prefs`]
-//! and [`SystemPrefsWatch`] touch `zbus`, and only on Linux — a desktop without the portal, or a
+//! against a fake `ReadAll`/`SettingChanged` payload with no bus involved; only
+//! [`SystemPrefsSource::Portal`] touches `zbus`, and only on Linux — a desktop without the portal, or a
 //! build for a platform that has none, simply answers [`ds::SystemPrefs::default`].
 
-use crate::error::SettingsError;
-use ds::{Contrast, ReducedMotion, Scheme, SystemPrefs};
+use crate::latest::{self, Receiver};
+use ds::{Contrast, ReducedMotion, Scheme, Spawner, SystemPrefs};
 use std::collections::HashMap;
 use zbus::zvariant::OwnedValue;
 
@@ -102,44 +102,68 @@ fn apply_setting_changed(
     }
 }
 
-/// Read every appearance preference once. A desktop without the portal, or a non-Linux build,
-/// answers the defaults; this never surfaces as an error the caller has to handle.
-pub async fn read_system_prefs() -> Result<SystemPrefs, SettingsError> {
-    #[cfg(target_os = "linux")]
-    {
-        Ok(bus::read_all().await.unwrap_or_default())
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        Ok(SystemPrefs::default())
+/// Where the desktop's preferences come from.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SystemPrefsSource {
+    /// The settings portal on the session bus. A desktop without it, or a non-Linux build, answers
+    /// the defaults and never changes.
+    Portal,
+    /// These preferences, forever: a test, a headless render or a pinned appearance.
+    Fixed(SystemPrefs),
+}
+
+impl SystemPrefsSource {
+    /// Every appearance preference, once. Never fails: a missing bus, portal or namespace is the
+    /// defaults.
+    pub async fn read(&self) -> SystemPrefs {
+        match self {
+            SystemPrefsSource::Fixed(prefs) => *prefs,
+            SystemPrefsSource::Portal => {
+                #[cfg(target_os = "linux")]
+                {
+                    bus::read_all().await.unwrap_or_default()
+                }
+                #[cfg(not(target_os = "linux"))]
+                {
+                    SystemPrefs::default()
+                }
+            }
+        }
     }
 }
 
-/// A subscription to `SettingChanged` for the appearance namespace.
+/// A subscription to the desktop's appearance preferences.
 #[derive(Debug)]
 pub struct SystemPrefsWatch {
-    changes: tokio::sync::watch::Receiver<SystemPrefs>,
+    changes: Receiver<SystemPrefs>,
 }
 
 impl SystemPrefsWatch {
-    /// Subscribe. A desktop without the portal, or a non-Linux build, yields a watch that never
-    /// fires again after its (default) initial value — never an error.
-    pub async fn start() -> Result<Self, SettingsError> {
-        let initial = read_system_prefs().await?;
-        let (tx, rx) = tokio::sync::watch::channel(initial);
-        #[cfg(target_os = "linux")]
-        bus::spawn_watch(tx);
-        #[cfg(not(target_os = "linux"))]
-        drop(tx);
-        Ok(SystemPrefsWatch { changes: rx })
+    /// Read `source` and subscribe to it, the subscription's task running on `spawn`. A
+    /// [`SystemPrefsSource::Fixed`] watch, a desktop without the portal and a non-Linux build
+    /// never fire after their first answer.
+    pub async fn start(source: &SystemPrefsSource, spawn: &dyn Spawner) -> Self {
+        let (tx, changes) = latest::channel(source.read().await);
+        match source {
+            SystemPrefsSource::Fixed(_) => drop(tx),
+            SystemPrefsSource::Portal => {
+                #[cfg(target_os = "linux")]
+                spawn.spawn(Box::pin(bus::follow(tx)));
+                #[cfg(not(target_os = "linux"))]
+                drop((tx, spawn));
+            }
+        }
+        SystemPrefsWatch { changes }
+    }
+
+    /// The preferences as last read.
+    pub fn current(&self) -> SystemPrefs {
+        self.changes.latest()
     }
 
     /// Wait for the next change. `None` once the bus connection is gone.
     pub async fn changed(&mut self) -> Option<SystemPrefs> {
-        if self.changes.changed().await.is_err() {
-            return None;
-        }
-        Some(*self.changes.borrow_and_update())
+        self.changes.changed().await
     }
 }
 
@@ -148,6 +172,7 @@ impl SystemPrefsWatch {
 #[cfg(target_os = "linux")]
 mod bus {
     use super::{NAMESPACE, SystemPrefs, apply_setting_changed, prefs_from_namespace};
+    use crate::latest::Sender;
     use std::collections::HashMap;
     use zbus::export::ordered_stream::OrderedStreamExt;
     use zbus::proxy;
@@ -188,31 +213,28 @@ mod bus {
     }
 
     /// Subscribe to `SettingChanged` and fold every appearance-namespace change onto `tx`. A
-    /// desktop without the portal simply never sends anything; `tx` (and so the watch's
-    /// receiver) is left at its initial value when the connection or subscription cannot be
-    /// made.
-    pub(super) fn spawn_watch(tx: tokio::sync::watch::Sender<SystemPrefs>) {
-        tokio::spawn(async move {
-            let Ok(connection) = zbus::Connection::session().await else {
-                return;
+    /// desktop without the portal simply never sends anything: `tx` (and so the watch's
+    /// receiver) is left at its initial value when the connection or subscription cannot be made.
+    pub(super) async fn follow(tx: Sender<SystemPrefs>) {
+        let Ok(connection) = zbus::Connection::session().await else {
+            return;
+        };
+        let Ok(proxy) = SettingsProxy::new(&connection).await else {
+            return;
+        };
+        let Ok(mut changes) = proxy.receive_setting_changed().await else {
+            return;
+        };
+        while let Some(signal) = changes.next().await {
+            let Ok(args) = signal.args() else {
+                continue;
             };
-            let Ok(proxy) = SettingsProxy::new(&connection).await else {
+            let next =
+                apply_setting_changed(tx.latest(), args.namespace(), args.key(), args.value());
+            if tx.send(next).is_err() {
                 return;
-            };
-            let Ok(mut changes) = proxy.receive_setting_changed().await else {
-                return;
-            };
-            while let Some(signal) = changes.next().await {
-                let Ok(args) = signal.args() else {
-                    continue;
-                };
-                let next =
-                    apply_setting_changed(*tx.borrow(), args.namespace(), args.key(), args.value());
-                if tx.send(next).is_err() {
-                    return;
-                }
             }
-        });
+        }
     }
 }
 
@@ -220,19 +242,10 @@ mod bus {
 mod tests {
     use super::{
         NAMESPACE, apply_setting_changed, contrast_from_portal, prefs_from_namespace,
-        read_system_prefs, reduced_motion_from_portal, scheme_from_portal,
+        reduced_motion_from_portal, scheme_from_portal,
     };
 
-    /// The real thing, against whatever settings portal this machine has (or does not).
-    /// `read_system_prefs` never errors — a missing bus or portal is the defaults — so this
-    /// mostly exists to be run by hand and its answer read: `cargo test -p ds-settings --
-    /// --ignored --nocapture`.
-    #[tokio::test]
-    #[ignore = "needs a session bus with the settings portal"]
-    async fn the_live_portal_answers_something() {
-        let prefs = read_system_prefs().await.unwrap_or_else(|e| panic!("{e}"));
-        eprintln!("live settings portal answered: {prefs:?}");
-    }
+    use super::SystemPrefsSource;
     use ds::{Contrast, ReducedMotion, Scheme, SystemPrefs};
     use std::collections::HashMap;
     use zbus::zvariant::OwnedValue;
@@ -359,5 +372,15 @@ mod tests {
             let got = apply_setting_changed(start, namespace, key, &OwnedValue::from(*raw));
             assert_eq!(&got, want, "{name}");
         }
+    }
+
+    #[tokio::test]
+    async fn a_fixed_source_answers_its_own_preferences_and_never_touches_the_bus() {
+        let fixed = SystemPrefs {
+            scheme: Scheme::Dark,
+            motion: ReducedMotion::Reduce,
+            contrast: Contrast::High,
+        };
+        assert_eq!(SystemPrefsSource::Fixed(fixed).read().await, fixed);
     }
 }

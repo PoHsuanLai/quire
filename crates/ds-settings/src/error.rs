@@ -1,9 +1,9 @@
 //! What can go wrong reading or writing settings. Reading never fails the caller (a damaged
-//! file is the defaults); writing and watching can.
+//! file is reported in [`crate::Loaded`]); writing can.
 
 use std::path::PathBuf;
 
-/// A settings write, watch or portal read that did not happen.
+/// A settings write that did not happen.
 #[derive(Debug, thiserror::Error)]
 pub enum SettingsError {
     /// A file or directory could not be read, written or renamed.
@@ -23,7 +23,10 @@ pub enum SettingsError {
     /// The directory watch could not be started.
     #[error("watching settings: {0}")]
     Watch(#[from] notify::Error),
-    /// The settings portal could not be reached or answered something unexpected.
-    #[error("settings portal: {0}")]
-    Portal(#[from] zbus::Error),
+    /// The config root has no directory for the program (no `$XDG_CONFIG_HOME` and no `$HOME`).
+    #[error("no config directory for {app}")]
+    NoConfigDir {
+        /// The program's directory name.
+        app: &'static str,
+    },
 }

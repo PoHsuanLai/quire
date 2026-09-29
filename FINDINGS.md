@@ -34,10 +34,6 @@ that rev.
   (`accent_band::grounds`, `css::ground_css`, which read `Look::default()`) are not yet a
   Look's values; the second Look (step 4a.8) threads `TokenScope::look` to them and adds
   `Look::Arc` from the Post values recorded in design/30 section 3.2.
-- **ds-settings still keeps unknown keys** (design/22 section 2 and the `extra` tables). The
-  rule is to report and drop them, as sill does; the settings step of the restructure changes
-  both.
-
 Upstream (pinned around; re-check at every toolchain bump):
 
 - **Blitz fork patch.** The restyle-on-cancelled-animation patch (`bf588142`) is not upstream.
@@ -615,10 +611,12 @@ own caret and selection. The route needs no Blitz fork.
   `HostFocus`, `HostBlur`, `HostSelect`, `HostSelection`, `HostPlaceCaret`, `HostFind`,
   `HostClickFocus`, `HostPressFocus`, `HostHandBack`, `HostReveal`, `HostEdit`, `HostFileDrop`,
   `HostClipboard`, `HostScale`, `HostModality`, `WindowHost`. `ds` names none of Blitz's types.
-- **`use_environment` needs a Tokio runtime** (the portal watch and the file-watch debounce use
-  `tokio::spawn`). `ds_native::launch` and `Harness` enter a process-wide two-worker runtime;
+- **`use_environment` runs its watches on a `Spawner`** (`ds::Spawner`; the portal watch and
+  the file watch are tasks it hands over). `ds_native::TokioSpawner::current` is the one
+  implementor; `ds_native::launch` and `Harness` enter a process-wide two-worker runtime for it.
   `ds` and `ds-settings` may not depend on a renderer, and `scripts/check-boundary.sh` forbids
-  `tokio` in `ds`.
+  `tokio` in both. The file watch's debounce is a `futures_timer` wait on the spawner's own thread:
+  `ds::sleep` follows the clock installed on its caller's thread and is not `Send`.
 - **A `Signal` read guard lives through an `if let` body** (edition 2024): copy a peeked value out
   before writing the same signal.
 - **Contexts on the window path** (`AppConfig::with_context`) must be `Clone + Send + Sync`:
@@ -1074,12 +1072,16 @@ What Blitz at the pinned rev paints (48 px, headless):
 
 ## Settings and schema
 
-- **Settings files** are `quire/appearance.toml` (design/22) and `spaces.json`, read by
-  `ds_settings::file::{load, save}` and watched by `watch_file`. The read is lenient key by key:
-  each key is laid over the struct's default and kept only if it deserialises (a per-field
-  `deserialize_with` would turn a bad key into the type's zero, not the key's default). A number
-  that does not fit its type falls back to the field's default. A malformed `by_index` entry in
-  the Spaces store costs only its own position.
+- **Settings files** are `quire/appearance.toml` (design/22) and `spaces.json`, each a
+  `SettingsDoc` read, saved and watched through `ds_settings::Store`. The read is lenient key by
+  key: each key is laid over the struct's default and kept only if it deserialises (a
+  per-field `deserialize_with` would turn a bad key into the type's zero, not the key's default).
+  A number that does not fit its type falls back to the field's default. A malformed `by_index`
+  entry in the Spaces store costs only its own position. A key the file sets and the struct does
+  not store back is reported in `Loaded::unknown` (cut at the first unknown table) and is gone
+  after the next save; a value the struct refuses is in `Loaded::invalid`, and text that is not
+  the format at all is one invalid key with an empty path. A watch keeps the last good value
+  when the file is not valid text.
 - **The portal's colour scheme** has three values (0 no preference, 1 dark, 2 light); no
   preference maps to Light.
 - **Types.** `Motion` is the preference (Standard or Reduced, default Standard, with a `label()`; the
@@ -1092,9 +1094,9 @@ What Blitz at the pinned rev paints (48 px, headless):
   `#[settings(text)]` (`text` with `range` is an error); a one-variant enum is `KeyKind::Fixed`
   (drawn as `Widget::Readout`) and zero variants an error; a known numeric type without `range`
   is a compile error starting `MissingRange { field: <name> }`. A caller's own numeric newtype
-  cannot be recognised from tokens, so `SchemaVariants` carries a
-  `#[diagnostic::on_unimplemented]` message naming the fix. There is no `trybuild`; refusals are
-  unit-tested on the expansion.
+  cannot be recognised from tokens, so it is taken for a closed enum and `kind_of` asks it for a
+  `Word`: the compile error says `Word` is not implemented for it. There is no `trybuild`;
+  refusals are unit-tested on the expansion.
 - **Material tint alpha is a settings key**, so `recipe()` takes it as a parameter and the root
   writes it (`Ds { tint_alpha }`, thousandths) rather than the stylesheet baking it in.
 - **Material keys** for banners, the control center and the launcher live in sill's settings, not

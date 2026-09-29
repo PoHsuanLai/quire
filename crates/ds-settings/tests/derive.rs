@@ -6,6 +6,7 @@
 use std::borrow::Cow;
 use std::path::PathBuf;
 
+use ds::Word;
 use ds_settings::schema::{KeyKind, Page, SettingsSchema, Widget};
 use ds_settings::{Ms, SettingsSchema};
 use serde::{Deserialize, Serialize};
@@ -16,8 +17,9 @@ use serde::{Deserialize, Serialize};
 struct SoundTheme(String);
 
 /// The one material a panel offers in v1.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, SettingsSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
+#[word(case = snake)]
 enum PanelMaterial {
     #[default]
     Sheet,

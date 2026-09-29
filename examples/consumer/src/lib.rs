@@ -12,7 +12,9 @@ use ds::{
     Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput,
     use_focus_request, use_motion_timer, use_toasts,
 };
-use ds_settings::{AppName, use_environment};
+use ds_native::TokioSpawner;
+use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
+use std::sync::Arc;
 
 /// This example's own stylesheet, quire tokens only (`tests/coherence.rs::our_stylesheet_lints_clean`).
 pub const STYLE: &str = include_str!("style.css");
@@ -20,14 +22,12 @@ pub const STYLE: &str = include_str!("style.css");
 /// The example's one page, wrapped in the root every quire surface draws inside.
 ///
 /// Reads its settings through `ds_settings::use_environment` (`../../CONSUMING.md` "Reading
-/// appearance"), live file and portal watches included. This used to need an entered Tokio
-/// runtime that neither `ds_native::launch` nor `ds_native::Harness` provided (a real gap,
-/// documented rather than worked around); both now enter one for the whole of their own life
-/// (`ds-native`'s `crate::runtime`), so this app no longer has to fall back to a one-shot,
-/// synchronous load.
+/// appearance"), live file and portal watches included. Its watches run on the Tokio runtime
+/// that `ds_native::launch` enters, through `ds_native::TokioSpawner`.
 #[component]
 pub fn App() -> Element {
-    let env = use_environment(AppName("consumer"));
+    let store = Store::new(ConfigRoot::Xdg, AppName("consumer"));
+    let env = use_environment(store, SystemPrefsSource::Portal, Arc::new(TokioSpawner::current()));
     let now = env();
     rsx! {
         Ds {
