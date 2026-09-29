@@ -14,6 +14,7 @@
 
 use crate::core::geometry::units::Px;
 use crate::core::task::spawn_in;
+use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
 use crate::motion::roster::RowPitch;

@@ -2,9 +2,11 @@
 //! `WindowTile`) and what the host reports back (`WindowState`, `Support`, `TileError`). Closed
 //! sets, so a host that is not ds-native (shell-host's `SurfaceHandle`) maps each one exhaustively.
 
+use crate::core::word::Word;
+
 /// The edge or corner an interactive resize grabs (the xdg-shell `resize_edge` set, winit's
 /// `ResizeDirection`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum ResizeEdge {
     /// The top edge.
     Top,
@@ -22,35 +24,6 @@ pub enum ResizeEdge {
     BottomLeft,
     /// The bottom-right corner.
     BottomRight,
-}
-
-impl ResizeEdge {
-    /// Every edge, sides first, in the order the frame draws its grab zones (corners last, so
-    /// they sit over the sides where they meet).
-    pub const ALL: [ResizeEdge; 8] = [
-        ResizeEdge::Top,
-        ResizeEdge::Bottom,
-        ResizeEdge::Left,
-        ResizeEdge::Right,
-        ResizeEdge::TopLeft,
-        ResizeEdge::TopRight,
-        ResizeEdge::BottomLeft,
-        ResizeEdge::BottomRight,
-    ];
-
-    /// The `data-edge` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            ResizeEdge::Top => "top",
-            ResizeEdge::Bottom => "bottom",
-            ResizeEdge::Left => "left",
-            ResizeEdge::Right => "right",
-            ResizeEdge::TopLeft => "top-left",
-            ResizeEdge::TopRight => "top-right",
-            ResizeEdge::BottomLeft => "bottom-left",
-            ResizeEdge::BottomRight => "bottom-right",
-        }
-    }
 }
 
 /// What the zoom control asks for (design/13-BEHAVIOUR-menus-windows.md section 13.3.11).

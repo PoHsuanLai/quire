@@ -10,6 +10,7 @@
 //! the panes turn back without a jump, and the switcher rests (and `on_settled` hears the pane)
 //! when the spring does. Under Reduced the spring is critically damped and the panes only
 //! cross-fade.
+use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
 use crate::motion::{

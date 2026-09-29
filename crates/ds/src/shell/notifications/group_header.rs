@@ -12,6 +12,7 @@ use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::Propagation;
 use crate::core::press::Press;
 use crate::core::vocab::Expanded;
+use crate::core::word::Word;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 

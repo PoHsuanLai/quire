@@ -7,6 +7,7 @@
 //! and Escape closes it.
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Appearance, Ds, HostWindow, Material, Maximized, Point, Px, ResizeEdge, ShortcutKey, Support,
     TileError, TrafficLights, WindowFrame, WindowState, WindowTile, Zoom, use_window_host_provider,

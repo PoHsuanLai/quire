@@ -2,11 +2,12 @@
 //! a switch plays, which one is arriving. The component feeds it the pane its caller asks for
 //! and the settle of each round; every decision about what is drawn and what plays is here.
 
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 
 /// One of a switcher's two panes: the root (a control center's grid) or its detail (a module's
 /// list).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum Pane {
     /// The pane the switcher starts from.
     #[default]
@@ -21,14 +22,6 @@ impl Pane {
         match self {
             Pane::Root => Pane::Detail,
             Pane::Detail => Pane::Root,
-        }
-    }
-
-    /// The `data-pane` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            Pane::Root => "root",
-            Pane::Detail => "detail",
         }
     }
 

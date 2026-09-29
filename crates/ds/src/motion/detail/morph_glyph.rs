@@ -6,6 +6,7 @@ use super::level::use_level;
 use super::morph::{MorphStyle, Slashed};
 use super::motor::use_motor;
 use super::touch::Touch;
+use crate::core::word::Word;
 use crate::motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},

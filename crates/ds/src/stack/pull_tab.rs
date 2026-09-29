@@ -3,6 +3,7 @@
 //! section 23).
 
 use crate::core::geometry::units::Px;
+use crate::core::word::Word;
 
 /// How far left the tab may be pulled.
 const PULL_MIN: Px = Px(-6.0);
@@ -14,23 +15,13 @@ const ARM_AT: Px = Px(46.0);
 const TAP_SLOP: Px = Px(3.0);
 
 /// Whether a release would undo: `data-armed`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum TabArm {
     /// Pulled past the arm point: the accent fill, and a release undoes.
     Armed,
     /// Not far enough.
     #[default]
     Disarmed,
-}
-
-impl TabArm {
-    /// The `data-armed` value.
-    pub fn slug(self) -> &'static str {
-        match self {
-            TabArm::Armed => "armed",
-            TabArm::Disarmed => "disarmed",
-        }
-    }
 }
 
 /// What a release or a click on the tab asks for.

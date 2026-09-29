@@ -11,6 +11,7 @@
 
 use crate::core::geometry::units::Px;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
+use crate::core::word::Word;
 use crate::stack::pull_tab::{Pull, PullPhase, PullTab};
 use crate::stack::toast_hub::{ToastHub, ToastState, use_toast_hub};
 use crate::style::icon::Icon;

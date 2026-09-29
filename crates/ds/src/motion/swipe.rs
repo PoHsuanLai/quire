@@ -10,6 +10,7 @@
 
 use crate::core::geometry::units::Px;
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use std::time::Duration;
 
 /// A speed in logical pixels per second.
@@ -130,7 +131,7 @@ pub enum SwipeEffect {
 }
 
 /// How the offset is drawn: following the input with no transition, or easing to where it is.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum SwipeLook {
     /// At rest or springing back to rest: the offset eases (`--t-move --e-spring`).
     Rest,
@@ -138,17 +139,6 @@ pub enum SwipeLook {
     Live,
     /// Dismissed: flying out.
     Gone,
-}
-
-impl SwipeLook {
-    /// The `data-swipe` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            SwipeLook::Rest => "rest",
-            SwipeLook::Live => "live",
-            SwipeLook::Gone => "gone",
-        }
-    }
 }
 
 impl SwipeState {

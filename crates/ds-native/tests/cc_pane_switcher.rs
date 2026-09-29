@@ -5,6 +5,7 @@
 //! never lands, and the switcher rests on the last pane asked for.
 
 use dioxus::prelude::*;
+use ds::Word;
 use ds::{
     Anim, Appearance, Button, ButtonVariant, Ds, Icon, Material, Pane, PaneSwitcher, RowTrailing,
     SettingsRow, Switch,

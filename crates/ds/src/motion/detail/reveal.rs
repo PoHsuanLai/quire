@@ -6,6 +6,7 @@ use super::cue::Cue;
 use super::first_show::FirstShow;
 use super::moment::Moment;
 use crate::core::vocab::StaggerIndex;
+use crate::core::word::Word;
 use crate::motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
@@ -57,22 +58,12 @@ impl RevealCue {
 }
 
 /// Whether a list's rise is playing.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Revealing {
     /// Its children rise (`data-reveal=play`).
     Play,
     /// They sit still.
     Still,
-}
-
-impl Revealing {
-    /// The `data-reveal` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Revealing::Play => "play",
-            Revealing::Still => "still",
-        }
-    }
 }
 
 /// `Play` from the render that first sees a new `key` until the twelfth child's rise settles
