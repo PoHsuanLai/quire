@@ -1,15 +1,10 @@
 //! Reading and writing `appearance.toml` (design/22-SETTINGS.md section 2): one instance of
-//! the generic [`crate::file`] API, plus the one-time import of mailo's `appearance.json`.
-//!
-//! Moved from mailo (`mail-app/src/appearance.rs`): the same atomic temp-and-rename write and
-//! the same "a damaged preference is the first run" read, with TOML in place of JSON. mailo's
-//! `appearance.json` is imported once, the first time `appearance.toml` does not exist, and left
-//! in place so a downgrade loses nothing.
+//! the generic [`crate::file`] API, with an atomic temp-and-rename write and a read in which a
+//! damaged preference is the first run.
 
 use crate::error::SettingsError;
 use crate::file::{FileName, Format, Settings};
 use crate::settings::AppearanceFile;
-use ds::Appearance;
 use std::path::Path;
 
 /// The file's name inside the program's config directory.
@@ -32,28 +27,9 @@ pub fn save(dir: &Path, file: &AppearanceFile) -> Result<(), SettingsError> {
     APPEARANCE.save(dir, file)
 }
 
-/// [`load`], except that when `dir` has no `appearance.toml` yet and `legacy_json` (mailo's
-/// `appearance.json`) exists, its theme, accent and motion are imported and written out as
-/// `appearance.toml` first. The JSON file is never modified or removed.
-pub fn load_or_import(dir: &Path, legacy_json: &Path) -> Result<AppearanceFile, SettingsError> {
-    if dir.join(FILE_NAME).exists() {
-        return Ok(load(dir));
-    }
-    let Ok(bytes) = std::fs::read(legacy_json) else {
-        return Ok(AppearanceFile::default());
-    };
-    let old: Appearance = serde_json::from_slice(&bytes).unwrap_or_default();
-    let mut file = AppearanceFile::default();
-    file.appearance.theme = old.theme;
-    file.appearance.accent = old.accent;
-    file.appearance.motion_level = old.motion;
-    save(dir, &file)?;
-    Ok(file)
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{FILE_NAME, load, load_or_import, save};
+    use super::{FILE_NAME, load, save};
     use crate::settings::{AppearanceFile, IconDarkVariant, PlateGlyphPolicy};
     use crate::test_dir::TempDir;
     use crate::units::Percent;
@@ -205,44 +181,5 @@ mod tests {
             Some(&toml::Value::String("kept".to_owned())),
             "{written}"
         );
-    }
-
-    #[test]
-    fn mailos_json_is_imported_once_and_left_in_place() {
-        let dir = TempDir::new();
-        let quire = dir.path().join("quire");
-        let legacy = dir.path().join("mailo").join("appearance.json");
-        std::fs::create_dir_all(dir.path().join("mailo")).unwrap_or_else(|e| panic!("{e}"));
-        // An old file with a retired accent word: theme and motion must survive it.
-        let json = r#"{"theme":"dark","accent":"pine","motion":"calm","marks":"letters"}"#;
-        std::fs::write(&legacy, json).unwrap_or_else(|e| panic!("{e}"));
-
-        let first = load_or_import(&quire, &legacy).unwrap_or_else(|e| panic!("{e}"));
-        let want = with(|f| {
-            f.appearance.theme = Theme::Dark;
-            f.appearance.motion_level = Motion::Calm;
-        });
-        assert_eq!(first, want);
-        assert_eq!(load(&quire), want, "the import was written as TOML");
-        assert_eq!(
-            std::fs::read_to_string(&legacy).unwrap_or_else(|e| panic!("{e}")),
-            json,
-            "the JSON is left as it was"
-        );
-
-        // Once appearance.toml exists the JSON is never read again.
-        std::fs::write(&legacy, r#"{"theme":"light"}"#).unwrap_or_else(|e| panic!("{e}"));
-        let second = load_or_import(&quire, &legacy).unwrap_or_else(|e| panic!("{e}"));
-        assert_eq!(second, want);
-    }
-
-    #[test]
-    fn no_json_and_no_toml_is_the_first_run_and_writes_nothing() {
-        let dir = TempDir::new();
-        let quire = dir.path().join("quire");
-        let got = load_or_import(&quire, &dir.path().join("absent.json"))
-            .unwrap_or_else(|e| panic!("{e}"));
-        assert_eq!(got, AppearanceFile::default());
-        assert!(!quire.exists(), "nothing to import, nothing written");
     }
 }

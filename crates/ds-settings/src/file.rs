@@ -14,10 +14,6 @@ use std::fmt;
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 
-/// `appearance.toml`'s mailo import, where it has always been reachable
-/// (`ds_settings::file::load_or_import`).
-pub use crate::appearance_file::load_or_import;
-
 /// A settings file's name inside its program's config directory: `appearance.toml`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct FileName(pub &'static str);
