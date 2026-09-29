@@ -5,7 +5,7 @@
 use ds::StaggerIndex;
 use ds::motion::fraction_along;
 use ds::{
-    Anim, Drag, DragPhase, Emphasis, Exit, Fraction, HoverEvent, HoverIntent, HoverWarmth,
+    Anim, Drag, DragPhase, Emphasis, Exit, Fraction, Heal, HoverEvent, HoverIntent, HoverWarmth,
     IntentEffect, IntentPhase, MotionLevel, Point, Presence, Px, Rect, RosterState, RowPitch, Size,
     StayError, Stayed, settle, use_pulse,
 };
@@ -20,14 +20,34 @@ fn ms(n: u64) -> Duration {
 
 // ---- roster --------------------------------------------------------------------------------
 
-/// A row as a test writes it: key and presence.
-type Row = (&'static str, Presence);
+/// A row's whole visible life: its presence, or its heal while it slides into a gap.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Life {
+    Entering,
+    Present,
+    Leaving(Exit),
+    Healing { dy: Px, d: StaggerIndex },
+}
+
+impl Life {
+    fn of(presence: Presence, heal: Option<Heal>) -> Life {
+        match (heal, presence) {
+            (Some(Heal { dy, d }), _) => Life::Healing { dy, d },
+            (None, Presence::Entering) => Life::Entering,
+            (None, Presence::Leaving(exit)) => Life::Leaving(exit),
+            (None, Presence::Hidden | Presence::Present) => Life::Present,
+        }
+    }
+}
+
+/// A row as a test writes it: key and life.
+type Row = (&'static str, Life);
 
 fn rows(state: &RosterState<&'static str>) -> Vec<Row> {
     state
         .entries()
         .iter()
-        .map(|e| (e.key, e.presence))
+        .map(|e| (e.key, Life::of(e.presence, e.heal)))
         .collect()
 }
 
@@ -35,8 +55,8 @@ fn indices(state: &RosterState<&'static str>) -> Vec<u8> {
     state.entries().iter().map(|e| e.index.get()).collect()
 }
 
-fn healing(d: usize) -> Presence {
-    Presence::Healing {
+fn healing(d: usize) -> Life {
+    Life::Healing {
         dy: PITCH.0,
         d: StaggerIndex::new(d),
     }
@@ -76,7 +96,7 @@ fn first_show_enters_every_row_staggered_and_capped_at_12() {
 
 #[test]
 fn reconcile_orders_and_states() {
-    use Presence::{Entering, Leaving, Present};
+    use Life::{Entering, Leaving, Present};
     struct Case {
         name: &'static str,
         state: RosterState<&'static str>,
@@ -188,7 +208,7 @@ fn leave_names_the_animation_to_settle() {
         assert_eq!(anim, want, "{exit:?} {emphasis:?}");
         assert_eq!(
             rows(&state),
-            vec![("a", Presence::Leaving(exit)), ("b", Presence::Present)],
+            vec![("a", Life::Leaving(exit)), ("b", Life::Present)],
             "{exit:?} {emphasis:?}: only the key leaves"
         );
     }
@@ -196,7 +216,7 @@ fn leave_names_the_animation_to_settle() {
 
 #[test]
 fn settling_an_exit_heals_the_rows_below_in_order() {
-    use Presence::{Leaving, Present};
+    use Life::{Leaving, Present};
     struct Case {
         name: &'static str,
         state: RosterState<&'static str>,
@@ -260,10 +280,7 @@ fn settling_an_exit_heals_the_rows_below_in_order() {
         assert_eq!(rows(&got), case.expect, "{}", case.name);
         let rested = got.rest();
         assert!(
-            rested
-                .entries()
-                .iter()
-                .all(|e| !matches!(e.presence, Presence::Healing { .. })),
+            rested.entries().iter().all(|e| e.heal.is_none()),
             "{}: rest ends every heal",
             case.name
         );
@@ -282,9 +299,9 @@ fn heal_index_saturates_at_12() {
     let ds: Vec<u8> = state
         .entries()
         .iter()
-        .map(|e| match e.presence {
-            Presence::Healing { d, .. } => d.get(),
-            other => panic!("{}: {other:?}", e.key),
+        .map(|e| match e.heal {
+            Some(Heal { d, .. }) => d.get(),
+            None => panic!("{}: {:?}", e.key, e.presence),
         })
         .collect();
     assert_eq!(ds, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12]);
@@ -309,7 +326,7 @@ fn a_batch_leaves_staggered_and_heals_by_the_heights_above() {
         ]
     );
     assert_eq!(indices(&leaving), vec![0, 1, 1, 3], "b and d keep theirs");
-    let heal = |dy: f32, d: usize| Presence::Healing {
+    let heal = |dy: f32, d: usize| Life::Healing {
         dy: Px(dy),
         d: StaggerIndex::new(d),
     };
@@ -333,7 +350,7 @@ fn a_batch_leaves_staggered_and_heals_by_the_heights_above() {
 
 #[test]
 fn stay_takes_an_exit_back_in_place() {
-    use Presence::{Entering, Leaving, Present};
+    use Life::{Entering, Leaving, Present};
     struct Case {
         name: &'static str,
         state: RosterState<&'static str>,
@@ -990,12 +1007,12 @@ fn pulse_alternates_aliases() {
 // ---- the roster hook's timers --------------------------------------------------------------
 
 mod hook {
-    use super::{PITCH, ms};
+    use super::{Life, PITCH, ms};
     use dioxus::core::{NoOpMutations, VirtualDom};
     use dioxus::prelude::*;
     use ds::{
-        Accent, BlurState, Emphasis, Exit, InputModality, Material, MotionLevel, Presence,
-        Resolved, Roster, Scheme, Scope, use_roster,
+        Accent, BlurState, Emphasis, Exit, InputModality, Material, MotionLevel, Resolved, Roster,
+        Scheme, Scope, use_roster,
     };
     use std::cell::Cell;
     use std::future::Future;
@@ -1067,19 +1084,19 @@ mod hook {
         }
     }
 
-    fn presences(dom: &VirtualDom, roster: Roster<&'static str>) -> Vec<(&'static str, Presence)> {
+    fn presences(dom: &VirtualDom, roster: Roster<&'static str>) -> Vec<(&'static str, Life)> {
         dom.in_runtime(|| {
             roster
                 .entries()
                 .into_iter()
-                .map(|e| (e.key, e.presence))
+                .map(|e| (e.key, Life::of(e.presence, e.heal)))
                 .collect()
         })
     }
 
     #[test]
     fn roster_hook_drops_the_row_and_heals_on_settle() {
-        use Presence::{Entering, Healing, Leaving, Present};
+        use Life::{Entering, Healing, Leaving, Present};
         let mut dom = VirtualDom::new(List);
         dom.rebuild_in_place();
         let roster = ROSTER.get().expect("the list rendered");

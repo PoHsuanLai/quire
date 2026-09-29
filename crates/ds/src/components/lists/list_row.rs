@@ -9,6 +9,7 @@ use crate::core::vocab::{DropState, Emphasis, Selection, StaggerIndex, Switch};
 use crate::core::word::Word;
 use crate::motion::presence::Presence;
 use crate::motion::pulse_key::PulseKey;
+use crate::motion::roster::{Heal, presence_slug};
 use dioxus::prelude::*;
 
 /// How many characters of a name the name column holds before it must fade: the column at
@@ -59,11 +60,11 @@ fn emphasis_slug(emphasis: Emphasis) -> &'static str {
 
 /// The row's inline custom properties: the stagger `--i` always, and while healing the
 /// distance `--dy` and the heal index `--d`.
-fn row_style(index: StaggerIndex, presence: Presence) -> String {
+fn row_style(index: StaggerIndex, heal: Option<Heal>) -> String {
     let i = index.get();
-    match presence {
-        Presence::Healing { dy, d } => format!("--i:{i};--dy:{}px;--d:{}", dy.0, d.get()),
-        Presence::Entering | Presence::Present | Presence::Leaving(_) => format!("--i:{i}"),
+    match heal {
+        Some(Heal { dy, d }) => format!("--i:{i};--dy:{}px;--d:{}", dy.0, d.get()),
+        None => format!("--i:{i}"),
     }
 }
 
@@ -71,7 +72,7 @@ fn row_style(index: StaggerIndex, presence: Presence) -> String {
 fn exit(presence: Presence) -> Option<&'static str> {
     match presence {
         Presence::Leaving(exit) => Some(exit.slug()),
-        Presence::Entering | Presence::Present | Presence::Healing { .. } => None,
+        Presence::Hidden | Presence::Entering | Presence::Present => None,
     }
 }
 
@@ -79,8 +80,8 @@ fn exit(presence: Presence) -> Option<&'static str> {
 ///
 /// `presence` comes from `use_roster`: an entering row rises staggered by `index` when its
 /// list is first shown and plays `row-in` when it arrives later; a leaving row plays its exit
-/// (an unread fold is the heavy one, as the roster settles it); a healing row slides up from
-/// `dy`, delayed by `d` heal steps. `star_pulse` is a `use_pulse(Anim::StarPop)` key, fired on
+/// (an unread fold is the heavy one, as the roster settles it); a healing row (`heal`, present
+/// meanwhile) slides up from `dy`, delayed by `d` heal steps. `star_pulse` is a `use_pulse(Anim::StarPop)` key, fired on
 /// every toggle. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
 /// `drop` is the row's part in a drag: `Source` while it is the thread being dragged (dimmed),
 /// `Target` while something dragged over it would land on it.
@@ -99,6 +100,7 @@ pub fn ListRow(
     emphasis: Emphasis,
     index: StaggerIndex,
     presence: Presence,
+    #[props(default)] heal: Option<Heal>,
     name: String,
     via: Option<Element>,
     #[props(into)] subject: TextLine,
@@ -126,11 +128,11 @@ pub fn ListRow(
             "aria-selected": selection.aria(),
             "aria-label": aria_label,
             "data-emphasis": emphasis_slug(emphasis),
-            "data-presence": presence.slug(),
+            "data-presence": presence_slug(presence, heal),
             "data-exit": exit(presence),
             "data-drop": drop.drop_attr(),
             "data-drag": drop.drag_attr(),
-            style: row_style(index, presence),
+            style: row_style(index, heal),
             onclick: move |event| onclick.call(snapshot(&event.data())),
             onpointerenter: back.enter(onpointerenter),
             onpointerleave: back.leave(onpointerleave),
@@ -180,21 +182,19 @@ mod tests {
     use crate::core::geometry::units::Px;
     use crate::core::vocab::StaggerIndex;
     use crate::motion::presence::{Exit, Presence};
+    use crate::motion::roster::Heal;
 
     #[test]
     fn a_healing_row_carries_its_distance_and_delay() {
-        let healing = Presence::Healing {
+        let healing = Heal {
             dy: Px(79.0),
             d: StaggerIndex::new(2),
         };
         assert_eq!(
-            row_style(StaggerIndex::new(4), healing),
+            row_style(StaggerIndex::new(4), Some(healing)),
             "--i:4;--dy:79px;--d:2"
         );
-        assert_eq!(
-            row_style(StaggerIndex::new(40), Presence::Present),
-            "--i:12"
-        );
+        assert_eq!(row_style(StaggerIndex::new(40), None), "--i:12");
     }
 
     #[test]

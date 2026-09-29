@@ -11,6 +11,23 @@ use crate::core::vocab::{Emphasis, StaggerIndex};
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
 pub struct RowPitch(pub Px);
 
+/// A row sliding up into the gap a removed row left: `data-presence="healing"`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Heal {
+    /// How far it starts below its resting place.
+    pub dy: Px,
+    /// Rows counted from the removed one: the heal delay's multiplier.
+    pub d: StaggerIndex,
+}
+
+/// The `data-presence` word of a row: `healing` while it heals, else its presence's.
+pub fn presence_slug(presence: Presence, heal: Option<Heal>) -> &'static str {
+    match heal {
+        Some(_) => "healing",
+        None => presence.slug(),
+    }
+}
+
 /// One row the roster is drawing.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RosterEntry<K> {
@@ -18,6 +35,8 @@ pub struct RosterEntry<K> {
     pub key: K,
     /// Its motion state.
     pub presence: Presence,
+    /// Its heal, while it slides into a gap; only a present row heals.
+    pub heal: Option<Heal>,
     /// Its entrance stagger.
     pub index: StaggerIndex,
 }
@@ -38,6 +57,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
             .map(|(n, key)| RosterEntry {
                 key: key.clone(),
                 presence: Presence::Entering,
+                heal: None,
                 index: StaggerIndex::new(n),
             })
             .collect();
@@ -87,6 +107,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
                     entries.push(RosterEntry {
                         key: key.clone(),
                         presence: Presence::Entering,
+                        heal: None,
                         index: StaggerIndex::new(arrivals),
                     });
                     arrivals += 1;
@@ -106,6 +127,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 if &entry.key == key {
                     RosterEntry {
                         presence: Presence::Leaving(exit),
+                        heal: None,
                         ..entry
                     }
                 } else {
@@ -180,7 +202,8 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 let d = StaggerIndex::new(below);
                 below += 1;
                 RosterEntry {
-                    presence: Presence::Healing { dy: pitch.0, d },
+                    presence: Presence::Present,
+                    heal: Some(Heal { dy: pitch.0, d }),
                     ..entry
                 }
             })
@@ -216,6 +239,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 running.push((anim, index));
                 RosterEntry {
                     presence: Presence::Leaving(exit),
+                    heal: None,
                     index,
                     ..entry
                 }
@@ -249,7 +273,8 @@ impl<K: Clone + PartialEq> RosterState<K> {
                     let d = StaggerIndex::new(below);
                     below += 1;
                     kept.push(RosterEntry {
-                        presence: Presence::Healing { dy, d },
+                        presence: Presence::Present,
+                        heal: Some(Heal { dy, d }),
                         ..entry
                     });
                 }
@@ -267,12 +292,13 @@ impl<K: Clone + PartialEq> RosterState<K> {
         let entries = self
             .entries
             .into_iter()
-            .map(|entry| match entry.presence {
-                Presence::Entering | Presence::Healing { .. } => RosterEntry {
-                    presence: Presence::Present,
-                    ..entry
+            .map(|entry| RosterEntry {
+                presence: match entry.presence {
+                    Presence::Entering => Presence::Present,
+                    Presence::Hidden | Presence::Present | Presence::Leaving(_) => entry.presence,
                 },
-                Presence::Present | Presence::Leaving(_) => entry,
+                heal: None,
+                ..entry
             })
             .collect();
         RosterState {
@@ -288,10 +314,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
         let heal = self
             .entries
             .iter()
-            .filter_map(|e| match e.presence {
-                Presence::Healing { d, .. } => Some(d),
-                _ => None,
-            })
+            .filter_map(|e| e.heal.map(|heal| heal.d))
             .max()
             .map(|d| (Anim::Heal, d));
         let enter = self

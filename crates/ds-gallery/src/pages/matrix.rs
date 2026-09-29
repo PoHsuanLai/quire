@@ -7,9 +7,9 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Chip, ChipVariant, Emphasis,
-    Fraction, Here, Icon, InputVariant, ItemKind, LabelHue, ListPresence, ListRow, Material,
-    Presence, PulseKey, Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider,
-    StaggerIndex, Surface, Switch, Tabs, TextInput, Toggle, Verdict,
+    Fraction, Here, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, PulseKey,
+    Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex, Surface,
+    Switch, Tabs, TextInput, Toggle, Verdict,
 };
 
 /// What the matrix can show.
@@ -90,7 +90,7 @@ fn Cell(subject: Subject) -> Element {
             Slider { label: "Level", value: Fraction(600), onchange: |_| {} }
         },
         Subject::Row => rsx! {
-            AnimatedList { label: "Row", presence: ListPresence::Present,
+            AnimatedList { label: "Row", presence: Presence::Present,
                 ListRow {
                     selection: Selection::Selected,
                     emphasis: Emphasis::Strong,

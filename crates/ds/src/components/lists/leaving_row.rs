@@ -6,7 +6,7 @@ use crate::core::task::spawn_in;
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
-use crate::motion::roster::{RosterEntry, RowPitch};
+use crate::motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
 use crate::motion::roster_exits::Pitches;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
@@ -49,7 +49,7 @@ pub(crate) fn LeavingRow<K: Clone + PartialEq + 'static>(
         div {
             class: "ds-leaving-row",
             role: "listitem",
-            "data-presence": entry.presence.slug(),
+            "data-presence": presence_slug(entry.presence, entry.heal),
             "data-exit": exit_slug(entry.presence),
             style: motion_style(&entry),
             onmounted: move |event| {
@@ -74,17 +74,19 @@ enum Measured {
 fn exit_slug(presence: Presence) -> Option<&'static str> {
     match presence {
         Presence::Leaving(exit) => Some(exit.slug()),
-        Presence::Entering | Presence::Present | Presence::Healing { .. } => None,
+        Presence::Hidden | Presence::Entering | Presence::Present => None,
     }
 }
 
 /// The row's motion variables: its stagger while it enters or leaves, its heal distance and
 /// delay while it heals.
 fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
-    match entry.presence {
-        Presence::Entering | Presence::Leaving(_) => Some(format!("--i:{}", entry.index.get())),
-        Presence::Healing { dy, d } => Some(format!("--dy:{}px;--d:{}", dy.0, d.get())),
-        Presence::Present => None,
+    match (entry.heal, entry.presence) {
+        (Some(Heal { dy, d }), _) => Some(format!("--dy:{}px;--d:{}", dy.0, d.get())),
+        (None, Presence::Entering | Presence::Leaving(_)) => {
+            Some(format!("--i:{}", entry.index.get()))
+        }
+        (None, Presence::Hidden | Presence::Present) => None,
     }
 }
 
@@ -94,32 +96,31 @@ mod tests {
     use crate::core::geometry::units::Px;
     use crate::core::vocab::StaggerIndex;
     use crate::motion::presence::{Exit, Presence};
-    use crate::motion::roster::RosterEntry;
+    use crate::motion::roster::{Heal, RosterEntry};
 
     #[test]
     fn each_state_writes_its_own_variables() {
-        let entry = |presence| RosterEntry {
+        let entry = |presence, heal| RosterEntry {
             key: 1u8,
             presence,
+            heal,
             index: StaggerIndex::new(3),
         };
+        let healing = Heal {
+            dy: Px(96.5),
+            d: StaggerIndex::new(2),
+        };
         let cases = [
-            (Presence::Entering, Some("--i:3")),
-            (Presence::Leaving(Exit::Fold), Some("--i:3")),
-            (
-                Presence::Healing {
-                    dy: Px(96.5),
-                    d: StaggerIndex::new(2),
-                },
-                Some("--dy:96.5px;--d:2"),
-            ),
-            (Presence::Present, None),
+            (Presence::Entering, None, Some("--i:3")),
+            (Presence::Leaving(Exit::Fold), None, Some("--i:3")),
+            (Presence::Present, Some(healing), Some("--dy:96.5px;--d:2")),
+            (Presence::Present, None, None),
         ];
-        for (presence, want) in cases {
+        for (presence, heal, want) in cases {
             assert_eq!(
-                motion_style(&entry(presence)).as_deref(),
+                motion_style(&entry(presence, heal)).as_deref(),
                 want,
-                "{presence:?}"
+                "{presence:?} {heal:?}"
             );
         }
     }
