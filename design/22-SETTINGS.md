@@ -190,7 +190,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.trash` | `TrashTile::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
 | `dock.pill_radius_px` | `Px` | `22` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.edge_clamp_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
-| `dock.overflow_min_tile_px` | `Px` | `24` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.running_dot_diameter_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
 | `dock.badge_size_px` | `Px` | `18` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
 | `dock.badge_radius_px` | `Px` | `9` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
@@ -199,7 +198,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.separator_height_px` | `Px` | `36` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
 | `dock.magnify_enter_ms` | `Ms` | `120` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | proposed |
 | `dock.magnify_leave_ms` | `Ms` | `200` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | settled (~200ms), easing proposed |
-| `dock.hover_label_offset_px` | `Px` | `7` | | `10-BEHAVIOUR-dock.md#10-3-4-hover-label` | proposed |
 | `dock.hover_label_warm_ms` | `Ms` | `400` | | `10-BEHAVIOUR-dock.md#10-3-4-hover-label` | proposed |
 | `dock.bounce_period_ms` | `Ms` | `500` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
 | `dock.bounce_launch_cap_ms` | `Ms` | `10000` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
@@ -207,7 +205,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.hold_to_menu_move_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
 | `dock.remove_threshold_px` | `Px` | `64` | | `10-BEHAVIOUR-dock.md#10-3-8-drag-inside-drag-out-drops`; `06-INTERACTIONS.md#20-desktop-interactions-settled` | proposed |
 | `dock.spring_load_ms` | `Ms` | `500` | | `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.1) | proposed |
-| `dock.minimize_debounce_ms` | `Ms` | `100` | | `10-BEHAVIOUR-dock.md#10-3-10-minimize-target` | proposed |
 | `dock.context_menu_order` | `DockMenuOrder::{WindowsFirst,AppleOrder}` | `WindowsFirst` | plan order: windows, desktop actions, Keep in Dock, Quit | `10-BEHAVIOUR-dock.md#10-3-7-context-menu`; `06-INTERACTIONS.md#20-desktop-interactions-settled` | proposed |
 | `dock.modifier_clicks` | `DockModifierClicks::{AppleMapping,Off}` | `AppleMapping` | Ctrl-click Show in Files, Alt-click switch+hide, Ctrl+Alt-click hide others | `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.1) | proposed |
 | `dock.pill_padding_px` | `Px` | `6` | `0..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
@@ -221,9 +218,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `launcher.top_bar_gap_px` | `Px` | `24` | from `max(bar_h + 24, ...)` | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
 | `launcher.top_centre_bias_px` | `Px` | `230` | from `round(0.4 x output_h - 230)` | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
 | `launcher.top_vertical_fraction` | `Fraction` | `400` (0.4) | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
-| `launcher.input_row_height_px` | `Px` | `56` | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | settled font, height proposed |
-| `launcher.result_row_height_px` | `Px` | `44` | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
-| `launcher.open_latency_budget_ms` | `Ms` | `100` (p95) | | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like`; `05-MOTION.md#10-shell-motion` | settled (plan), not a preference but kept visible for `dev/accept-launcher.sh` tuning |
 | `launcher.field_font_px` | `Px` | `22` | `12..=40` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.field_font_weight` | `Count` | `500` | `100..=900` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `launcher.field_glyph_px` | `Px` | `20` | `12..=40` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
@@ -343,17 +337,14 @@ found elsewhere in the file that are not yet in that table.
 | `palm_rejection.mouse_moving_window_ms` | `Ms` | `100` | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
 | `palm_rejection.mouse_moving_lock_multiplier` | `Fraction` | `2000` (2.0x, 40->80) | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
 
-### 3.11 `menus` (sill/settings.toml; also carries `switcher.*`, `sound.*` and `window.*` per `13.6`'s own grouping)
+### 3.11 `menus` (sill/settings.toml; also carries `switcher.*` and `window.*` per `13.6`'s own grouping)
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `menus.submenu_delay_ms` | `Ms` | `200` | `0..1000` | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `menus.item_height_px` | `Px` | `22` | was 24 before the polish pass; alt `30` (design's Slim padding 6/8) | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 1 | proposed — **flagged for review** |
-| `menus.max_width_px` | `Px` | `420` | min 220 settled | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
 | `menus.separator_margin_px` | `Px` | `5` | was 4 before the polish pass | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | proposed |
-| `menus.section_header_height_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-3-menu-item-geometry-text-menus-bar-context-dock` | settled style, height proposed |
 | `menus.submenu_triangle_timeout_ms` | `Ms` | `300` | | `13-BEHAVIOUR-menus-windows.md#13-3-4-submenus` | proposed |
-| `menus.pick_feedback` | `PickFeedback::{None,BlinkOnce}` | `None` | alt `BlinkOnce` (macOS blinks the chosen item once before closing) | `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 3 | proposed |
 | `menus.first_mouse_window_ms` | `Ms` | `100` | activation-vs-click window on an inactive window's first click | `13-BEHAVIOUR-menus-windows.md#13-3-8-focus-and-raise-rules`; `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.4) | proposed |
 | `menus.font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `menus.highlight_radius_px` | `Px` | `5` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
@@ -363,16 +354,6 @@ found elsewhere in the file that are not yet in that table.
 | `switcher.cell_size_px` | `Px` | `112` | | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
 | `switcher.cell_gap_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
 | `switcher.overflow_min_icon_px` | `Px` | `48` | | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab` | proposed |
-| `sound.theme` | `SoundTheme(String)` | `"freedesktop"` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
-| `sound.ui_sounds` | `UiSounds::{On,Off}` | `On` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
-| `sound.volume_feedback` | `VolumeFeedback::{On,Off}` | `On` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
-| `sound.event_screenshot` | `SoundName(String)` | `"screen-capture"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
-| `sound.event_trash_empty` | `SoundName(String)` | `"trash-empty"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
-| `sound.event_volume_step` | `SoundName(String)` | `"audio-volume-change"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
-| `sound.event_dock_remove` | `SoundName(String)` | `"item-deleted"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
-| `sound.event_notification` | `SoundName(String)` | `"message-new-instant"` | app hint wins if present | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
-| `sound.event_critical_alert` | `SoundName(String)` | `"dialog-warning"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
-| `sound.event_invalid_key` | `SoundName(String)` | `"bell"` | | `13-BEHAVIOUR-menus-windows.md#13-3-10-ui-sounds` | proposed |
 
 ### 3.12 `notifications` (sill/settings.toml)
 
@@ -434,13 +415,8 @@ data, not a key.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `spaces.material_tint_alpha` | `Percent` | `80` | alias of `appearance.material_tint_alpha` (3.1) kept in this domain's table for discoverability | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
 | `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
 | `spaces.default_card_accent` | `CardAccent::{Postmark,SpaceHue}` | `Postmark` | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
-| `spaces.overlay_tint` | `OverlayTint::{Off,On}` | `Off` | applies to notifications, power menu, lock and polkit (doc answers them as one "no"); the OSD is settled "yes" as of 2026-09-24 and always tints, so this key no longer covers it | `21-SPACES.md#3-where-the-tokens-apply` | proposed |
-| `spaces.mail_frame_policy` | `MailSpacePolicy::{Own,Workspace,OwnFallbackWorkspace}` | `OwnFallbackWorkspace` | poles are `Own` / `Workspace`; doc's actual proposal is the fallback hybrid | `21-SPACES.md#11-open-decisions` item 1 | proposed — **flagged for review** ("mail-spaces policy Own vs Workspace") |
-| `spaces.wallpaper_follows_space` | `WallpaperPolicy::{Independent,PerWorkspace}` | `Independent` | | `21-SPACES.md#8-wallpaper-proposed` | proposed |
-| `spaces.dock_look_source` | `DockLookSource::{OwnOutput,FocusedWindow}` | `OwnOutput` | multi-output only | `21-SPACES.md#11-open-decisions` item 5 | proposed |
 | `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | proposed |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
 
@@ -459,7 +435,6 @@ All Advanced (§5). The display service reads the EDID, classifies the panel's g
 | `display.night_warmth` | `NightWarmth::{Off,Hardware}` | `Off` | warmth through the monitor's own DDC/CI controls | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.night_warmth_strength` | `Percent` | `50` | `0..=100` | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.font_rendering` | `FontRendering::{Auto,Off}` | `Auto` | `Auto` sets hinting and subpixel positioning from the output's ppi | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
-| `display.color_management` | `ColorManagement::{Auto,Off}` | `Auto` | stored only: cosmic-comp 1.8.0 has no `wp_color_manager_v1`, so the palette fits sRGB there; KWin 6.7.5 offers parametric Display P3 | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 
 ### 3.16 `osd` (sill/settings.toml)
 
@@ -490,8 +465,6 @@ The client-decorated window frame (design/13 §13.3.11, design/04 "Window frame"
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `window.move_threshold_px` | `Px` | `4` | `1..=16` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
-| `window.tile_menu_press_ms` | `Ms` | `500` | `200..=2000` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
-| `window.tile_menu_hover_ms` | `Ms` | `800` | `450..=3000`; the 450 ms hover intent plus a further hold | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 
 ### 3.19 `session` (sill/settings.toml)
 
@@ -499,8 +472,6 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `session.locker` | `String` | `"sill"` | `sill` (the shell's own lock screen, M11; the default, the user's pick 2026-09-27), `auto` (cosmic-greeter, else swaylock, else hyprlock, whichever is installed; under cosmic-session, COSMIC's resident locker), `off`, `cosmic-greeter`, `swaylock`, `hyprlock`, or a command line run by `/bin/sh -c` | 20-SURFACES §1.9; sill FINDINGS M7, F544, F861 | changed (2026-09-27) |
-| `session.polkit_agent` | `String` | `"auto"` | `auto` (polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, then cosmic-osd last: running cosmic-osd only for polkit would add its own volume popup beside sill's OSD), `sill` (the shell's own agent and prompt, M11), `off`, one of those names, or a command line run by `/bin/sh -c` | `20-SURFACES.md#1-10-polkit-prompt-spec-tier-1`; sill FINDINGS "M7" | proposed (2026-09-26) |
 | `session.lock_clock` | `LockClock::{H24,H12}` | `H24` | `14:05`, or `2:05` without AM/PM as the reference lock screen shows it | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS F553 | proposed (M11 freeze, 2026-09-26) |
 | `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | proposed (2026-09-27) |
 | `session.lock_grace_s` | `Secs` | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
@@ -635,7 +606,6 @@ pub struct DockSettings {
     pub trash: TrashTile,
     pub pill_radius_px: Px,
     pub edge_clamp_px: Px,
-    pub overflow_min_tile_px: Px,
     pub running_dot_diameter_px: Px,
     pub badge_size_px: Px,
     pub badge_radius_px: Px,
@@ -644,7 +614,6 @@ pub struct DockSettings {
     pub separator_height_px: Px,
     pub magnify_enter_ms: Ms,
     pub magnify_leave_ms: Ms,
-    pub hover_label_offset_px: Px,
     pub hover_label_warm_ms: Ms,
     pub bounce_period_ms: Ms,
     pub bounce_launch_cap_ms: Ms,
@@ -652,7 +621,6 @@ pub struct DockSettings {
     pub hold_to_menu_move_px: Px,
     pub remove_threshold_px: Px,
     pub spring_load_ms: Ms,
-    pub minimize_debounce_ms: Ms,
     pub context_menu_order: DockMenuOrder,
     pub modifier_clicks: DockModifierClicks,
 }
@@ -712,7 +680,6 @@ impl Default for DockSettings {
             trash: TrashTile::On,
             pill_radius_px: Px(22),
             edge_clamp_px: Px(8),
-            overflow_min_tile_px: Px(24),
             running_dot_diameter_px: Px(4),
             badge_size_px: Px(18),
             badge_radius_px: Px(9),
@@ -721,7 +688,6 @@ impl Default for DockSettings {
             separator_height_px: Px(36),
             magnify_enter_ms: Ms(120),
             magnify_leave_ms: Ms(200),
-            hover_label_offset_px: Px(7),
             hover_label_warm_ms: Ms(400),
             bounce_period_ms: Ms(500),
             bounce_launch_cap_ms: Ms(10_000),
@@ -729,7 +695,6 @@ impl Default for DockSettings {
             hold_to_menu_move_px: Px(8),
             remove_threshold_px: Px(64),
             spring_load_ms: Ms(500),
-            minimize_debounce_ms: Ms(100),
             context_menu_order: DockMenuOrder::WindowsFirst,
             modifier_clicks: DockModifierClicks::AppleMapping,
         }
@@ -811,9 +776,9 @@ impl Default for ScrollSettings {
 `AppearanceSettings` (theme, look, warmth, accent, motion_level, material_tint_alpha),
 `IconsSettings`, `BarSettings`, `LauncherSettings`, `GesturesSettings` (palmrest crate:
 `scroll_speed`/`lock_*`/`swipe_*`/`tap_*`/`foreign_output`/`g4_*`/`live_workspace_*`/
-`gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` and
-`sound_*` as nested structs `SwitcherSettings`, `SoundSettings` per `CONVENTIONS.md#0-design-style`
-"if half a struct's methods never touch half its fields, it is two types" — switcher and sound
+`gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` as the nested
+struct `SwitcherSettings` per `CONVENTIONS.md#0-design-style`
+"if half a struct's methods never touch half its fields, it is two types" — switcher and menus
 are genuinely separate concerns, nested rather than flattened), `NotificationsSettings`,
 `ControlCenterSettings`, `SpacesSettings`.
 
@@ -918,11 +883,10 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.position`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into COSMIC's `system_actions` and `custom` shortcut files, and the chord COSMIC already holds wins a clash, shown on the row (28 §7 decision 10) |
-| **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app), `sound.ui_sounds`, `sound.volume_feedback` |
+| **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
-| **Spaces** | `spaces.mail_frame_policy`, `spaces.wallpaper_follows_space`; the per-workspace dots/grain/theme/accent editor writes `spaces.json` (state), not these defaults |
 | **Power** (added Q445; sill's own idle service, section 3.24) | `idle.times`, `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Cosmic` they still render, disabled, so the row explains itself) |
-| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`/`overlay_tint`/`dock_look_source`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
+| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
 ## 6. Acceptance
 
@@ -953,7 +917,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
    `Domain::default()` struct has a field of that name reachable by splitting on `.` and
    stripping the domain prefix — catches a key added here and forgotten in code, or a Rust
    field with no doc entry, in either direction. (`gestures.gesture_action_map`,
-   `control_center.modules`, `sound.event_*` and the `appearance.*`-owned-but-notifications-read
+   `control_center.modules` and the `appearance.*`-owned-but-notifications-read
    `notifications.banner_material` need an explicit allow-list in the test for the handful of
    keys whose dotted prefix does not match their owning Rust struct's module path 1:1 — noted
    inline in the test, not silently skipped.)

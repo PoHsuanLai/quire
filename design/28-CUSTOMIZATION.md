@@ -568,7 +568,7 @@ chord.
 | `shortcuts.app_shortcuts` | `Vec<AppShortcut { app: AppId, menu_path: Text, chord: Shortcut }>` | `[]` | the menu path in `File->Export as PDF…` form | mchlp2271 | proposed (design/28), nice |
 
 Both are behaviour, not placement: they are `sill/settings.toml` keys (a new §3 domain in design/22,
-added after sill registers them or lists them in `AWAITING_ROWS`, section 6.0), and they need the
+added together with sill's specs, section 6.0), and they need the
 record list kind of P5.
 
 **Priority.** must for the system list (before the app pass), nice for App Shortcuts (during,
@@ -921,15 +921,8 @@ running it (the widget gallery shows apps that are closed), and a **live interfa
 sill's `sill-settings/tests/keys.rs` checks design/22 against sill's registered `KeySpec`s in
 both directions over §3.4-3.8 and §3.11 through `## 4. Rust shape` (that is, §3.4-3.23 less
 palmrest's §3.9-3.10), reading quire's doc by path from sill's own checkout. A row with no spec,
-or a spec with no row, fails sill master at once. So every change to those sections goes in this
-order:
-
-1. **sill first.** A new key: sill registers it and lists its path in `AWAITING_ROWS`. A retired
-   key (`widgets.center`, `widgets.desktop_widgets`, `widgets.world_clocks`,
-   `control_center.modules`): sill drops it (keeping the old value readable for the one-time
-   migration, as `extra`).
-2. **Then quire** adds, changes or removes the design/22 row, and tells sill.
-3. **Then sill** removes the `AWAITING_ROWS` entry once the row has landed.
+or a spec with no row, fails sill master at once, so a key is added, changed or retired in one change to both repos: the `KeySpec` and
+the design/22 row land together.
 
 This document's own tables are proposals, not design/22 rows; nothing in sill reads them. Layout
 entries (`layout.*`) never enter §3: they go to design/22's new `## 10. Layouts (layout.toml)`
@@ -958,7 +951,7 @@ Shell; each a quire lane plus a sill lane where named.
    the three retired `widgets.*` keys.
 4. **P3 Launcher categories** (sill + Settings page): `ProviderInfo`,
    `layout.launcher_categories` with Web pinned last and Web/Files/Clipboard reading their keys,
-   `launcher.excluded_folders` (AWAITING first).
+   `launcher.excluded_folders`.
 5. **P4 Control center and bar** (sill): `layout.control_center` (Other modules; the order leaves
    the person's hands), `InMenuBar::WhenActive`, the new `control_center.menu_bar_focus` key;
    the tray service reads the SNI `Id` property (`TrayItem.sni_id`), and `layout.bar_items` /
@@ -966,7 +959,7 @@ Shell; each a quire lane plus a sill lane where named.
 6. **P5 Notifications per app** (quire + sill): quire adds a record kind to ds-settings'
    `KeyKind` (`Record { fields: Vec<FieldSpec> }`, so `List(Box<Record>)` describes a
    `Vec<struct>` key and the Settings app draws it as a table editor; today `List` holds only
-   scalar kinds); sill adds `notifications.apps` and `notifications.previews` (AWAITING first),
+   scalar kinds); sill adds `notifications.apps` and `notifications.previews`,
    the `notifying-apps.json` state file written by the notifications task, and the Settings page.
 7. **P6 Actions** (sill, palmrest): the `ShellAction` registry; hot corners, gestures and the
    system shortcuts list read ids; `shortcuts.bindings` written to COSMIC's `custom` and
