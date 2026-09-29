@@ -27,7 +27,7 @@ fn theme_hint(theme: Theme, system: SystemPrefs) -> Option<String> {
 }
 
 /// How the picker lays its rows out for the width it has.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum PickerLayout {
     /// Each segmented row as wide as its words at the regular size: a settings page or a sheet.
     #[default]
@@ -39,14 +39,6 @@ pub enum PickerLayout {
 }
 
 impl PickerLayout {
-    /// The `data-layout` word.
-    fn slug(self) -> &'static str {
-        match self {
-            PickerLayout::Full => "full",
-            PickerLayout::Compact => "compact",
-        }
-    }
-
     /// The segmented rows' size.
     fn seg_size(self) -> SegSize {
         match self {

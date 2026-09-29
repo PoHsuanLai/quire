@@ -4,12 +4,13 @@
 
 use crate::components::overlays::popover::Float;
 use crate::components::overlays::tooltip::Shown;
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::style::tokens::shape::Corner;
 use dioxus::prelude::*;
 
 /// Where the palette draws.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum CommandPaletteHost {
     /// Over the window, on the palette layer: a scrim, and the card 11 % down.
     #[default]
@@ -19,17 +20,8 @@ pub enum CommandPaletteHost {
     Surface,
 }
 
-impl CommandPaletteHost {
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            CommandPaletteHost::Overlay => "overlay",
-            CommandPaletteHost::Surface => "surface",
-        }
-    }
-}
-
 /// How the palette's card enters.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum PaletteEntrance {
     /// `peek-in`, S's palette.
     #[default]
@@ -39,6 +31,7 @@ pub enum PaletteEntrance {
     /// `cmdk-rise`: `cmdk-in`'s spring with no fade, so the card is opaque from its first
     /// frame; over a window the scrim then appears at once too, since a fading
     /// scrim would hold the card inside it at its own opacity.
+    #[word(slug = "cmdk-rise")]
     Opaque,
 }
 
@@ -48,14 +41,6 @@ impl PaletteEntrance {
             PaletteEntrance::PeekIn => Anim::PeekIn,
             PaletteEntrance::CmdkIn => Anim::CmdkIn,
             PaletteEntrance::Opaque => Anim::CmdkRise,
-        }
-    }
-
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            PaletteEntrance::PeekIn => "peek-in",
-            PaletteEntrance::CmdkIn => "cmdk-in",
-            PaletteEntrance::Opaque => "cmdk-rise",
         }
     }
 }

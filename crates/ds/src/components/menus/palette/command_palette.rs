@@ -32,6 +32,7 @@ use crate::components::menus::palette::palette_shown::{
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
+use crate::core::word::Word;
 use crate::stack::layer_stack::Dismiss;
 
 use crate::components::fields::search_field::SearchField;

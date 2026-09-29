@@ -28,6 +28,7 @@ use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{escape_closes, use_float};
 use crate::core::press::{PointerButton, Press};
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;

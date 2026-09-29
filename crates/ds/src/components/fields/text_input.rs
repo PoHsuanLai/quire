@@ -3,6 +3,7 @@
 use crate::components::fields::text_input_mask::MaskCaret;
 use crate::components::fields::text_input_parts::{Field, Handlers, area, file, line};
 use crate::core::vocab::Availability;
+use crate::core::word::Word;
 use dioxus::prelude::*;
 
 use crate::components::fields::text_input_focus::FieldFocuser;
@@ -12,7 +13,7 @@ use crate::focus::targets::Told;
 
 /// The field's face: Boxed for a standalone field, Inline inside another container, Bare in
 /// the text it edits.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum InputVariant {
     /// `.inp`: bordered, its own focus ring.
     Boxed,
@@ -22,17 +23,6 @@ pub enum InputVariant {
     /// and colour are the parent's, so a property row's value or a title is edited where it
     /// reads. Only the caret (`--accent`) and the selection are styled.
     Bare,
-}
-
-impl InputVariant {
-    /// The `data-variant` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            InputVariant::Boxed => "boxed",
-            InputVariant::Inline => "inline",
-            InputVariant::Bare => "bare",
-        }
-    }
 }
 
 /// The text a masked or plain field shows: a `Secret`'s own state, else the caller's `value`.

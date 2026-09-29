@@ -1,10 +1,11 @@
 //! SectionHeader: a small-caps label that names a group (design/04-COMPONENTS.md section 13).
 
 use crate::core::vocab::Selection;
+use crate::core::word::Word;
 use dioxus::prelude::*;
 
 /// Where the header sits.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum HeaderKind {
     /// Sidebar groups on the frame, with a trailing rule and an optional action.
     Frame,
@@ -17,16 +18,6 @@ pub enum HeaderKind {
 }
 
 impl HeaderKind {
-    /// The `data-kind` word.
-    fn slug(self) -> &'static str {
-        match self {
-            HeaderKind::Frame => "frame",
-            HeaderKind::Group => "group",
-            HeaderKind::Field => "field",
-            HeaderKind::Menu => "menu",
-        }
-    }
-
     /// Whether a trailing rule follows the text: Frame and Group draw one.
     fn rule(self) -> Rule {
         match self {
