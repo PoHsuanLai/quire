@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Disclosure, Ds, FieldFace, Focus, Icon, Key, Material, PlaceId, TextInput,
+    Appearance, Disclosure, Ds, Focus, Icon, InputVariant, Key, Material, PlaceId, TextInput,
     TreeItem, TreeShape, use_focus_request,
 };
 use ds_native::harness::settle_until;
@@ -41,7 +41,7 @@ fn Page(start: Start) -> Element {
     let request = use_focus_request().with_select_all();
     let editing = renaming().then(|| {
         rsx! {
-            TextInput { variant: FieldFace::Bare, label: "Rename folder", value: name(),
+            TextInput { variant: InputVariant::Bare, label: "Rename folder", value: name(),
                 focus: Focus::Controlled(request),
                 oninput: move |next: String| name.set(next),
                 onkey: move |event: KeyboardEvent| match event.key() {

@@ -219,10 +219,10 @@ digital time 800, tabular, tracked -.02em. Labels are the UI face 700 at `--fs-s
 
 ## 4. Specification per widget
 
-### 4.1 Battery (`BatteryLevel`; `LevelRing` is its old name)
+### 4.1 Battery (`BatteryLevel`)
 
 `BatteryLevel { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, children }`,
-every earlier prop kept (`LevelRing` stays an alias; `wake` defaults). Markup: `div.ds-battery[data-tone][data-mark]
+`wake` defaults. Markup: `div.ds-battery[data-tone][data-mark]
 [role=progressbar][aria-valuenow][data-pulse]`, 64 x 64, holding `svg.ds-battery-track`, `svg.ds-battery-arc`
 (absent while it draws 0), `span.ds-battery-device` around `children` when given, and `svg.ds-battery-bolt`
 while charging, once the fill has arrived. The percentage the widget draws is

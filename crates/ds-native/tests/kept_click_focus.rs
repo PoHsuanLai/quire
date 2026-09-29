@@ -9,8 +9,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Disclosure, Ds, FieldFace, Focus, HoverStrip, Icon, IconButton,
-    IconButtonVariant, Key, Material, Press, Shown, StripAction, TextInput, TreeItem, TreeShape,
+    ActionId, Appearance, Disclosure, Ds, Focus, HoverStrip, Icon, IconButton, IconButtonVariant,
+    InputVariant, Key, Material, Press, Shown, StripAction, TextInput, TreeItem, TreeShape,
     use_focus_request,
 };
 use ds_native::harness::settle_until;
@@ -180,7 +180,7 @@ fn Renaming() -> Element {
                         open: Disclosure::Closed,
                         on_toggle: move |_| note("toggle:projects"),
                         editing: rsx! {
-                            TextInput { variant: FieldFace::Bare, label: "Rename folder", value: "Projects",
+                            TextInput { variant: InputVariant::Bare, label: "Rename folder", value: "Projects",
                                 focus: Focus::Controlled(request),
                                 oninput: |_: String| {},
                             }

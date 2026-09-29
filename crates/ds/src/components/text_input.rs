@@ -25,10 +25,6 @@ pub enum InputVariant {
     Bare,
 }
 
-/// The name mailo gaps 4 asked for: a field's face is its variant, so `variant:
-/// FieldFace::Bare` reads as it means. One type, so a face and a variant cannot disagree.
-pub type FieldFace = InputVariant;
-
 impl InputVariant {
     /// The `data-variant` word.
     pub(crate) fn slug(self) -> &'static str {

@@ -2,7 +2,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Disclosure, FieldFace, Focus, Icon, IconButton, IconButtonVariant, PlaceId, Propagation,
+    Disclosure, Focus, Icon, IconButton, IconButtonVariant, InputVariant, PlaceId, Propagation,
     TextInput, TreeItem, TreeShape,
 };
 
@@ -15,7 +15,7 @@ pub struct Case {
 /// The rename field mailo draws in a row's label place.
 fn rename(value: &str) -> Element {
     rsx! {
-        TextInput { variant: FieldFace::Bare, label: "Rename folder", value: value.to_string(), oninput: |_| {}, focus: Focus::OnMount }
+        TextInput { variant: InputVariant::Bare, label: "Rename folder", value: value.to_string(), oninput: |_| {}, focus: Focus::OnMount }
     }
 }
 

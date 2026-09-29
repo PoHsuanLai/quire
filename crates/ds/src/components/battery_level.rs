@@ -206,10 +206,6 @@ pub(crate) fn given(children: Element) -> Option<Element> {
     }
 }
 
-/// The old name of [`BatteryLevel`], kept for callers written against the level ring: the
-/// props are the same.
-pub use BatteryLevel as LevelRing;
-
 #[cfg(test)]
 mod tests {
     use super::{RingMark, RingTone};

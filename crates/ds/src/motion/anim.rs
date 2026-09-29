@@ -234,12 +234,6 @@ pub enum Anim {
 }
 
 impl Anim {
-    /// The persona's hop, which sill's lock screen timed its unlock by; the persona was dropped
-    /// on 2026-09-26 and its hop is now every picture's accept beat.
-    #[deprecated(note = "the persona was dropped; use Anim::PictureAccept")]
-    #[allow(non_upper_case_globals)]
-    pub const PersonaHop: Anim = Anim::PictureAccept;
-
     /// Every animation, in the catalogue's order.
     pub const ALL: [Anim; 79] = [
         Anim::SealPop,
