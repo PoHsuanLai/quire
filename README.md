@@ -81,8 +81,6 @@ quire is pinned to). See `CONSUMING.md` section 10 for what to look for.
 - `crates/` — the five crates above.
 - `design/` — the canonical UX specification (`design/README.md` has the reading order and the
   citation convention every doc in this repository follows).
-- `spike/` — the throwaway W0 Blitz probe that produced `FINDINGS.md`'s S1-S16; its own separate
-  Cargo workspace, excluded from this one.
 - `examples/consumer/` — the minimal external consumer (also its own Cargo workspace).
 - `docs/workspace-deps.toml` — the pinned dependency block, copied verbatim into this workspace's
   `Cargo.toml` and into `shell-host`'s and `sill`'s; changes only in a dedicated toolchain-bump

@@ -9,7 +9,7 @@ publish = false
 
 # Its own workspace: quire's root Cargo.toml does not (and must not) list this package in
 # `members`, so this manifest marks itself a workspace root or cargo treats it as an orphaned
-# member of the quire workspace it happens to sit under (mirrors `spike/blitz-probe/Cargo.toml`).
+# member of the quire workspace it happens to sit under.
 [workspace]
 
 [dependencies]

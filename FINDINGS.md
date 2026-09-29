@@ -2,13 +2,10 @@
 
 ## Blitz spike S1-S16 (W0 `spike`, blitz @ e99fbdbd, dioxus 0.7.10)
 
-How to reproduce: `cd spike/blitz-probe && cargo run -- all` renders every probe headlessly at
-400x300 with anyrender_vello_cpu (the S15/S16 probes also go through anyrender_vello_hybrid,
-offscreen on the first wgpu adapter) into `spike/out/*.png` and prints the table below. PNGs are
-gitignored. `cargo run --features cpu-filters -- s15 s16` repeats S15/S16 with
-`anyrender_vello_cpu/filters` on. The probe is its own Cargo workspace, excluded from quire's,
-and uses the pinned lines from `docs/workspace-deps.toml` unchanged. Documents are
-`DioxusDocument`s driven with `resolve(t)`, `poll`, `handle_ui_event`.
+The probe (since removed) rendered each case headlessly at 400x300 with anyrender_vello_cpu (S15/S16
+also through anyrender_vello_hybrid) at the pinned lines of `docs/workspace-deps.toml`; the
+evidence PNGs were never tracked. Documents were `DioxusDocument`s driven with `resolve(t)`,
+`poll`, `handle_ui_event`.
 
 | id | result | evidence |
 |----|--------|----------|
