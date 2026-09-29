@@ -14,3 +14,4 @@ pub(crate) mod task;
 pub(crate) mod text;
 pub(crate) mod time;
 pub(crate) mod vocab;
+pub(crate) mod word;

@@ -8,6 +8,9 @@
 //! (`scripts/check-boundary.sh`). Every public item has one path: a root name, or a name in one
 //! of the modules below. DESIGN.md maps each module to the design doc section it implements.
 
+// The derive names the trait `::ds::Word`, so inside this crate `ds` is the crate itself.
+extern crate self as ds;
+
 mod assembly;
 pub mod catalog;
 mod components;
@@ -159,6 +162,7 @@ pub use crate::components::{
         tooltip::{Shown, Tooltip, TooltipKind},
     },
 };
+pub use crate::core::word::Word;
 pub use crate::core::{
     colour::contrast::{Verdict, ratio},
     geometry::{
