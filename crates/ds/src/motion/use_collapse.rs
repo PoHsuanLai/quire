@@ -6,7 +6,6 @@ use crate::core::geometry::units::Px;
 use crate::core::vocab::{Fraction, Shown};
 use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
-use dioxus::prelude::*;
 
 /// How open the content is, thousandths: 0 closed, 1000 open.
 const OPEN: Fraction = Fraction(1000);
