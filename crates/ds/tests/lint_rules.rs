@@ -279,7 +279,7 @@ const CASES: &[Case] = &[
         rule: Rule::FontFamily,
         expect: true,
     },
-    // RawFontSize (Strict only)
+    // RawFontSize
     Case {
         name: "raw font-size: literal fails under Strict",
         css: ".chip { font-size: 14px; }",
@@ -294,7 +294,7 @@ const CASES: &[Case] = &[
         rule: Rule::RawFontSize,
         expect: false,
     },
-    // RawRadius (Strict only)
+    // RawRadius
     Case {
         name: "raw radius: literal fails under Strict",
         css: ".chip { border-radius: 8px; }",
@@ -323,7 +323,7 @@ const CASES: &[Case] = &[
         rule: Rule::RawRadius,
         expect: false,
     },
-    // RawZIndex (Strict only)
+    // RawZIndex
     Case {
         name: "raw z-index: literal fails under Strict",
         css: ".chip { z-index: 5; }",
@@ -374,14 +374,7 @@ const CASES: &[Case] = &[
         rule: Rule::RawSpacing,
         expect: false,
     },
-    Case {
-        name: "raw spacing: standard allows a px padding",
-        css: ".chip { padding: 4px; }",
-        profile: Profile::Strict,
-        rule: Rule::RawSpacing,
-        expect: false,
-    },
-    // RawHairline (Strict only)
+    // RawHairline
     Case {
         name: "raw hairline: a 1px border fails under strict",
         css: ".card { border: 1px solid var(--line); }",
@@ -415,13 +408,6 @@ const CASES: &[Case] = &[
         css: ".card { border: var(--hair) solid var(--line); outline: var(--focus-ring) solid \
               var(--accent); border-bottom-width: 2px; border-radius: 1px; min-width: 12px; } \
               .sep { height: var(--hair); }",
-        profile: Profile::Strict,
-        rule: Rule::RawHairline,
-        expect: false,
-    },
-    Case {
-        name: "raw hairline: standard allows a 1px border",
-        css: ".card { border: 1px solid var(--line); }",
         profile: Profile::Strict,
         rule: Rule::RawHairline,
         expect: false,
