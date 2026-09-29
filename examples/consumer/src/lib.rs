@@ -4,7 +4,7 @@
 //! driven only by `ds::motion` timers, never an ad-hoc sleep.
 //!
 //! `tests/coherence.rs` is the point of this crate: it runs the four coherence rules from
-//! `ORCHESTRATION.md` against `App`'s own output, the way a real consumer's tests would.
+//! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
 use dioxus::prelude::*;
 use ds::{

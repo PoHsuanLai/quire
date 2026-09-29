@@ -1,5 +1,5 @@
-//! quire's own generated stylesheet, linted under the strictest profile (ORCHESTRATION
-//! coherence rule 1: every downstream crate runs this same check on its own CSS, and quire's
+//! quire's own generated stylesheet, linted under the strictest profile (the coherence
+//! rules, CONVENTIONS §11: every downstream crate runs this same check on its own CSS, and quire's
 //! own output has to pass it too).
 //!
 //! The details grammar's two rules are judged per sheet in `details_lint.rs`, which names the

@@ -1,5 +1,5 @@
 /* This example's own stylesheet: quire tokens only, no literal colour, duration, easing,
-   radius, font-size or font-family (ORCHESTRATION coherence rule 1). Attribute selectors carry
+   radius, font-size or font-family (CONSUMING.md section 5, rule 1). Attribute selectors carry
    the `*|` namespace prefix a Blitz consumer needs (FINDINGS spike S2), which also matches in a
    browser, so this file works unchanged on the webview and on Blitz.
 
