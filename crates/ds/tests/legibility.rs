@@ -2,9 +2,8 @@
 //! preset frame; and the materials' text over the two worst backdrops, black and white
 //! (design/21-SPACES.md section 7, the plan's `material-legible-over-black-and-white`).
 
+use ds::Alpha;
 use ds::Hex;
-use ds::tokens::Alpha;
-use ds::tokens::accent_band::over as wash_over;
 use ds::{
     Accent, CardAccent, ColourToken, Dot, FrameVars, Grain, Material, PRESETS, Scheme, SpaceLook,
     Theme, accent_of, derive, ratio, recipe,
@@ -30,7 +29,7 @@ fn every_accent_is_legible_in_both_schemes() {
         for accent in Accent::ALL {
             let roles = accent_of(accent, scheme);
             let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
-            let wash = wash_over(roles.fill, roles.wash, ground).css();
+            let wash = roles.fill.over(roles.wash, ground).css();
             let pairs = [
                 (
                     "accent text on the card",
@@ -96,7 +95,7 @@ fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
     let accent = roles.text.css();
     // The wash is translucent: laid over the card before the card's ink is measured on it.
     let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
-    let soft = wash_over(roles.fill, roles.wash, ground).css();
+    let soft = roles.fill.over(roles.wash, ground).css();
     let worst = |fore: &str| {
         stops
             .iter()
@@ -506,11 +505,26 @@ fn widget_card_over(wallpaper: Hex, scheme: Scheme, stop: Option<&str>) -> Hex {
     match stop {
         Some(stop) => {
             let stop = Hex::parse(stop).expect("hex stop");
-            wash_over(stop, Alpha(700), plate)
+            stop.over(Alpha(700), plate)
         }
         None => plate,
     }
 }
+
+/// The wallpaper backdrops a desktop widget is gated over: the default wallpaper's colours as
+/// sill's desktop capture shows them (2026-09-27, `widgets-desktop-cosmic.png`: a light warm
+/// sand, a warm coral, a deep teal, a blue, a dark violet) and a near-black night wallpaper.
+/// Pure black and white are the material gates', where the relaxed 3:1 large-text floor
+/// applies to the widget's own text.
+const WALLPAPERS: [Hex; 7] = [
+    Hex([226, 193, 139]),
+    Hex([225, 182, 133]),
+    Hex([223, 129, 105]),
+    Hex([38, 138, 150]),
+    Hex([45, 83, 141]),
+    Hex([104, 64, 128]),
+    Hex([28, 26, 38]),
+];
 
 /// The Space-tinted desktop card over every reference wallpaper, under every preset's
 /// gradient stops, in `scheme`.
@@ -518,7 +532,7 @@ fn widget_grounds_of_every_space(scheme: Scheme) -> Vec<(String, Hex)> {
     let mut grounds = Vec::new();
     for (index, preset) in PRESETS.iter().enumerate() {
         for stop in derive(preset.dots, scheme).stops {
-            for &wallpaper in ds::tokens::accent_band::WALLPAPERS.iter() {
+            for &wallpaper in WALLPAPERS.iter() {
                 let ground = widget_card_over(wallpaper, scheme, Some(&stop));
                 grounds.push((
                     format!("preset {} stop {stop} over {}", index + 1, wallpaper.css()),

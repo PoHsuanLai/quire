@@ -3,13 +3,13 @@
 //! (sections 6 and 9.2), and the pulse's A/B alternation (design/05-MOTION.md section 9).
 
 use ds::StaggerIndex;
-use ds::motion::drag::fraction_along;
-use ds::overlay::{Pull, PullTab, TabArm};
+use ds::motion::fraction_along;
 use ds::{
     Anim, Drag, DragPhase, Emphasis, Exit, Fraction, HoverEvent, HoverIntent, HoverWarmth,
     IntentEffect, IntentPhase, MotionLevel, Point, Presence, Px, Rect, RosterState, RowPitch, Size,
     StayError, Stayed, settle, use_pulse,
 };
+use ds::{Pull, PullTab, TabArm};
 use std::time::{Duration, Instant};
 
 const PITCH: RowPitch = RowPitch(Px(79.0));

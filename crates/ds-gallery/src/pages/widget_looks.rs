@@ -11,7 +11,7 @@ use super::widget_reference::cell;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::tokens::LabelHue;
+use ds::LabelHue;
 use ds::{
     Appearance, BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase,
     Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry, MonthIntent,

@@ -5,9 +5,9 @@
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Material, MenuEntry,
-    MenuRow, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, Radius, RowChord,
-    RowShape, Shortcut, Surface, Tile, components::vocab::Key,
+    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Key, Material,
+    MenuEntry, MenuRow, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, Radius,
+    RowChord, RowShape, Shortcut, Surface, Tile,
 };
 
 fn reveal() -> Shortcut {

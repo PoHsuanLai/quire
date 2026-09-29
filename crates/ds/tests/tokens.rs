@@ -3,11 +3,11 @@
 //! exactly its four, each picker swatch is its accent's own colour, and every variable the
 //! stylesheet reads is declared by it or written inline by the root.
 
-use ds::tokens::{DelayToken, HueMember};
 use ds::{
     Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
     ScalarToken, Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of, stylesheet,
 };
+use ds::{DelayToken, HueMember};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Every rule outside `@keyframes`, as its selector and its declarations in order.
@@ -256,7 +256,7 @@ fn every_table_name_is_declared_on_the_root() {
         .chain(Radius::ALL.map(|t| t.var()))
         .chain(SpacingToken::ALL.map(|t| t.var()))
         .chain(Shadow::ALL.map(|t| t.var()))
-        .chain(ds::tokens::WidgetPaint::ALL.map(|t| t.var()))
+        .chain(ds::WidgetPaint::ALL.map(|t| t.var()))
         .chain(FontSize::ALL.map(|t| t.var()))
         .chain(ZLayer::ALL.map(|t| t.var()))
         .chain(Family::ALL.map(|t| t.var()));

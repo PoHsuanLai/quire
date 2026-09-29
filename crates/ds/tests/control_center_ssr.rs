@@ -16,7 +16,7 @@ mod rows;
 mod tiles;
 
 use dioxus::prelude::*;
-use ds::icon::render::GlyphProps;
+use ds::GlyphProps;
 use ds::lint::{LintConfig, Profile, markup};
 use ds::{Glyph, Icon, IconSize};
 

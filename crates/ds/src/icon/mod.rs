@@ -44,6 +44,7 @@ use geometry::*;
 pub use plate_tint::{PlateStops, PlateTint};
 pub use retint::{IconStyle, Tint, retint, retint_in};
 pub use shape::Shape;
+pub use stroke::stroke_device_pixels;
 
 /// One glyph: the mailo set, named for its key in the design's `ICON` table, then the shell
 /// set, named for its Lucide glyph.

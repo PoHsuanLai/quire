@@ -36,7 +36,7 @@ pub mod wake;
 
 pub use crate::motion::recipe::{Fill, Iteration, Recipe};
 pub use anim::Anim;
-pub use drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag};
+pub use drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, fraction_along, use_drag};
 pub use drag_return::{DragReturn, use_drag_return};
 pub use entrance::use_entrance;
 pub use hover_intent::{HoverEvent, HoverIntent, IntentEffect, IntentPhase};

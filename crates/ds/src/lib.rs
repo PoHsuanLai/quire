@@ -226,5 +226,8 @@ use futures_timer as _;
 use serde_json as _;
 use thiserror as _;
 
+pub use crate::icon::render::GlyphProps;
+pub use crate::overlay::pull_tab::{Pull, PullTab, TabArm};
+pub use crate::tokens::widget_paint::WidgetPaint;
 #[cfg(feature = "lint")]
 use cssparser as _;

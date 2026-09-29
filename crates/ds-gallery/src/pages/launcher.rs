@@ -9,8 +9,8 @@ use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
     Availability, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, Icon,
-    IconSize, Material, MenuEntry, PaletteEntrance, Radius, Retain, Shortcut, Shown, Surface,
-    Switch, Tile, Trail, components::vocab::Key,
+    IconSize, Key, Material, MenuEntry, PaletteEntrance, Radius, Retain, Shortcut, Shown, Surface,
+    Switch, Tile, Trail,
 };
 
 fn row(value: u8, title: &str, detail: Option<&str>, tile: Tile, trail: Trail) -> MenuEntry<u8> {

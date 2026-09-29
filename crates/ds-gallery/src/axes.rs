@@ -6,7 +6,7 @@
 //! reads its first state from this thread rather than from props.
 
 use crate::page::Page;
-use ds::tokens::Alpha;
+use ds::Alpha;
 use ds::{
     Accent, Appearance, BlurState, CardAccent, Grain, Material, Motion, MotionLevel, SpaceLook,
     Theme, Typeface, default_look,

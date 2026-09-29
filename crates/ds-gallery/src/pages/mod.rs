@@ -60,7 +60,7 @@ pub mod widgets;
 
 use crate::axes::Axes;
 use dioxus::prelude::*;
-use ds::tokens::Alpha;
+use ds::Alpha;
 use ds::{
     Accent, Appearance, BlurState, Ds, FrameTint, HeaderKind, Inject, Material, RootChrome, Scheme,
     SectionHeader, SpaceLook, Theme,

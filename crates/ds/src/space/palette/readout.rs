@@ -10,7 +10,6 @@ use crate::appearance::{accent::Accent, theme::Scheme};
 use crate::core::colour::contrast::{Verdict, ratio};
 use crate::space::look::{CardAccent, SpaceLook};
 use crate::space::palette::card::card;
-use crate::tokens::accent_band::grounds::over;
 use crate::tokens::{accent_table::accent_of, hex::Hex};
 
 /// One measured pair, and the floor it has to clear.
@@ -57,7 +56,7 @@ pub fn readout(space: &SpaceLook, scheme: Scheme) -> Vec<ContrastCheck> {
         CardAccent::Postmark => accent_of(Accent::Postmark, scheme),
     };
     let wash = Hex::parse(post.surface)
-        .map(|surface| over(roles.fill, roles.wash, surface).css())
+        .map(|surface| roles.fill.over(roles.wash, surface).css())
         .unwrap_or_default();
     vec![
         ContrastCheck {

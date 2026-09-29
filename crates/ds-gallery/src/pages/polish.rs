@@ -9,14 +9,14 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::tokens::Alpha;
+use ds::Alpha;
 use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, DockFloor,
     DockFloorSetting, DockMetrics, Ds, Emphasis, Here, Icon, IconButton, IconButtonVariant,
-    IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuBarItem, MenuEntrance,
-    MenuEntry, MenuKind, PlateFamily, Point, Px, RootChrome, RunningDot, Scheme, Shortcut, Shown,
-    SpaceLook, Surface, Switch, Theme, Tile, Tooltip, TooltipKind, Trail, WorkspacePill,
-    WorkspacePills, components::vocab::Key, use_env,
+    IconSize, IconSource, IconView, Inject, Key, Material, MaterialStack, MenuBarItem,
+    MenuEntrance, MenuEntry, MenuKind, PlateFamily, Point, Px, RootChrome, RunningDot, Scheme,
+    Shortcut, Shown, SpaceLook, Surface, Switch, Theme, Tile, Tooltip, TooltipKind, Trail,
+    WorkspacePill, WorkspacePills, use_env,
 };
 
 /// A nested root in `material` with the page's look and blur state, as a shell surface's root: its chrome is

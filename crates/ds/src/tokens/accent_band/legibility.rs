@@ -1,7 +1,7 @@
 //! What an accent measures against the gates in [`super::floors`]: the numbers the sweep test
 //! asserts and the proposal quotes.
 
-use super::grounds::{card_grounds, card_ink, contrast, least, over};
+use super::grounds::{card_grounds, card_ink, contrast, least};
 use super::roles::AccentRoles;
 use super::text_grounds::{GroundKind, TextOn, least_on, text_grounds};
 use crate::appearance::theme::Scheme;
@@ -45,7 +45,7 @@ pub fn legibility(roles: &AccentRoles, scheme: Scheme) -> Legibility {
     let ink = card_ink(scheme);
     let ink_on_wash = grounds
         .iter()
-        .map(|&ground| contrast(ink, over(roles.fill, roles.wash, ground)))
+        .map(|&ground| contrast(ink, roles.fill.over(roles.wash, ground)))
         .fold(f64::INFINITY, f64::min);
     Legibility {
         ink_on_fill: contrast(roles.ink, roles.fill),
@@ -56,8 +56,8 @@ pub fn legibility(roles: &AccentRoles, scheme: Scheme) -> Legibility {
         text_on_material: material_on(GroundKind::Material),
         text_on_washed_material: material_on(GroundKind::WashOnMaterial),
         ink_on_wash,
-        wash_shows: least(|ground| over(roles.fill, roles.wash, ground), &grounds),
-        ring: least(|ground| over(roles.text, roles.ring, ground), &grounds),
+        wash_shows: least(|ground| roles.fill.over(roles.wash, ground), &grounds),
+        ring: least(|ground| roles.text.over(roles.ring, ground), &grounds),
         fill_on_card: least(|_| roles.fill, &grounds),
     }
 }

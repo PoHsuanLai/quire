@@ -6,7 +6,7 @@ use crate::axes::{Axes, material_label};
 use crate::legibility::floors;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::tokens::Alpha;
+use ds::Alpha;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BlurState, Button, ButtonVariant, Chip, ChipVariant, Fraction,
     Glyph, Icon, IconButton, IconButtonVariant, IconSize, Material, Slider, StatusMetrics, Surface,

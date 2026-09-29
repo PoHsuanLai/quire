@@ -1,7 +1,6 @@
 use super::{Capping, Dot, derive, gradient};
 use crate::appearance::theme::Scheme;
 use crate::core::colour::fit::js_round;
-use crate::tokens::accent_band::grounds::over;
 use crate::tokens::hex::Hex;
 
 const WORK: &[Dot] = &[
@@ -238,7 +237,7 @@ fn every_pick_is_legible() {
                     }
                     let roles = palette.accent_roles;
                     let wash = Hex::parse(surface)
-                        .map(|ground| over(roles.fill, roles.wash, ground).css())
+                        .map(|ground| roles.fill.over(roles.wash, ground).css())
                         .unwrap_or_default();
                     match ratio(card_ink, &wash) {
                         Some(measured) if measured < 4.5 => {
@@ -348,7 +347,7 @@ fn the_readout_is_the_ratio_of_the_derived_tokens() {
                 ),
             };
             let ground = Hex::parse(post.surface).expect("hex");
-            let tint = over(roles.fill, roles.wash, ground).css();
+            let tint = roles.fill.over(roles.wash, ground).css();
             let want = [
                 worst(&palette.ink),
                 worst(&palette.faint),

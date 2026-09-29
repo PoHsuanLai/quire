@@ -4,7 +4,7 @@
 //! `Material::Widget` alone is held to [`WIDGET_FLOOR`] rather than [`FLOOR`] (the contrast-relax
 //! pass, 2026-09-26; see [`floor_for`]).
 
-use ds::tokens::Alpha;
+use ds::Alpha;
 use ds::{ColourToken, Material, Scheme, Verdict, ratio, recipe};
 
 /// WCAG AA for body text: what every floor has to clear.
@@ -155,7 +155,7 @@ fn over((rgb, alpha): ([u8; 3], f64), backdrop: [u8; 3]) -> String {
 #[cfg(test)]
 mod tests {
     use super::{Backdrop, Tint, floors, over, rgba};
-    use ds::tokens::Alpha;
+    use ds::Alpha;
     use ds::{Material, Scheme, Verdict};
 
     /// A colour's CSS, and its channels and alpha when it is one.

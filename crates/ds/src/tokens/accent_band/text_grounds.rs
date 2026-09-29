@@ -12,7 +12,7 @@
 //! grounds and the wash over them, and [`TextOn::Material`], gated on every ground here.
 
 use super::floors;
-use super::grounds::{card_grounds, card_ink, contrast, over};
+use super::grounds::{card_grounds, card_ink, contrast};
 use crate::appearance::material::Material;
 use crate::appearance::theme::Scheme;
 use crate::tokens::hex::{Alpha, Hex};
@@ -67,7 +67,7 @@ pub fn material_grounds(scheme: Scheme) -> Vec<Hex> {
     TEXT_MATERIALS
         .into_iter()
         .filter_map(|material| tint(material, scheme))
-        .flat_map(|(hex, alpha)| BACKDROPS.map(|backdrop| over(hex, alpha, backdrop)))
+        .flat_map(|(hex, alpha)| BACKDROPS.map(|backdrop| hex.over(alpha, backdrop)))
         .collect()
 }
 
@@ -85,7 +85,7 @@ pub fn text_grounds(on: TextOn, scheme: Scheme, fill: Hex, wash: Alpha) -> Vec<G
     let washed = |kind: GroundKind, hexes: Vec<Hex>| {
         hexes.into_iter().map(move |hex| Ground {
             kind,
-            hex: over(fill, wash, hex),
+            hex: fill.over(wash, hex),
         })
     };
     let card = card_grounds(scheme).to_vec();
