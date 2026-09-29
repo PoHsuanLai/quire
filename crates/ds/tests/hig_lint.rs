@@ -37,6 +37,18 @@ struct CssCase {
 
 const CSS_CASES: &[CssCase] = &[
     CssCase {
+        name: "a blur, which vello_cpu drops",
+        css: ".orb { filter: blur(4px); }",
+        rule: Rule::FilterNotPainted,
+        expect: Fired::Yes,
+    },
+    CssCase {
+        name: "a filter of none",
+        css: ".orb { filter: none; }",
+        rule: Rule::FilterNotPainted,
+        expect: Fired::No,
+    },
+    CssCase {
         name: "pointer on a control",
         css: ".row { cursor: pointer; }",
         rule: Rule::PointerCursor,

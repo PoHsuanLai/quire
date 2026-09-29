@@ -10,11 +10,6 @@ pub fn unsupported(property: &str, value: &str) -> Option<&'static str> {
             "backdrop-filter is not painted on anyrender_vello_cpu or _hybrid (FINDINGS S15); \
              ask the compositor to blur behind the surface through a Material instead",
         ),
-        "filter" => Some(
-            "filter (saturate/blur/...) is dropped by the pinned anyrender backends when \
-             multithreading is on, and saturate() is unimplemented even on hybrid (FINDINGS \
-             S16); precompute the effect into a colour token instead",
-        ),
         "mix-blend-mode" => Some(
             "mix-blend-mode is not exercised by the Blitz spike; use a PNG grain layer or a precomputed blend instead",
         ),
@@ -58,10 +53,10 @@ mod tests {
             expect: true,
         },
         Case {
-            name: "filter fires",
+            name: "filter passes here (its functions are FilterNotPainted's)",
             property: "filter",
             value: "saturate(2)",
-            expect: true,
+            expect: false,
         },
         Case {
             name: "mix-blend-mode fires",
