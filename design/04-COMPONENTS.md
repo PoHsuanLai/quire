@@ -757,7 +757,7 @@ is required so the global focus ring does not double the accent ring.
 
 **Settled (mailo gaps 4, 2026-09-25).**
 
-- `Bare` face (`InputVariant::Bare`, also named `FieldFace`): no border, padding, ground or radius;
+- `Bare` face (`InputVariant::Bare`): no border, padding, ground or radius;
   font, size, weight, tracking, line height and colour inherited, so a title or a property row's
   value is edited where it reads. The caret is `--accent`, the selection `--accent-soft`; the
   placeholder is the parent's colour at .45.
@@ -3368,7 +3368,7 @@ frame and `--fs-subject` elsewhere, bumping on each new minute; a sun (`svg.ds-c
 (`clock_angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120` degrees, minute `6 x m + s / 10`,
 second `6 x s`.
 
-**BatteryLevel** (renamed from `LevelRing`, which stays as an alias). `BatteryLevel { level:
+**BatteryLevel**. `BatteryLevel { level:
 Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, children }`: a ring 64 across
 (`div.ds-battery`, `role=progressbar` with `aria-valuenow` in percent): `svg.ds-battery-track`, a
 full circle in `--battery-track`; `svg.ds-battery-arc`, clockwise from twelve as far as the level

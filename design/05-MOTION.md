@@ -660,8 +660,7 @@ The persona's five keyframes (`persona-blink`, `-breathe`, `-wince`, `-hop`, `-d
   `div.ds-user-picture`, from its base: when the password was right, the user's picture, whatever
   its kind, lifts once and lands (the unlock answers the user's contact, principle 2). Played
   once through a pulse and taken off at its `settle`; a lock screen unlocks at that settle. Not
-  fired on mount or under Reduced. `Anim::PersonaHop` is a deprecated alias of it for one
-  release.
+  fired on mount or under Reduced.
 - `--t-awake` (20 s) stays: an animated emoji's awake window (design/25 section 6).
 
 **Exception to principle 7 (nothing loops).** An animated emoji plays its loop with no state

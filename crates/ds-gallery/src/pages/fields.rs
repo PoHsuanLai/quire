@@ -4,9 +4,7 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Availability, FieldFace, Grow, InputVariant, Rows, SearchField, TextInput, TextInputKind,
-};
+use ds::{Availability, Grow, InputVariant, Rows, SearchField, TextInput, TextInputKind};
 
 #[component]
 pub fn Fields() -> Element {
@@ -90,12 +88,12 @@ pub fn FieldKinds() -> Element {
                         oninput: move |text| fixed.set(text) }
                 }
                 Specimen { name: "bare, in a title",
-                    h3 { class: "g-bare-title", TextInput { variant: FieldFace::Bare, label: "Space name", value: title(), placeholder: "Name this Space", oninput: move |text| title.set(text) } }
+                    h3 { class: "g-bare-title", TextInput { variant: InputVariant::Bare, label: "Space name", value: title(), placeholder: "Name this Space", oninput: move |text| title.set(text) } }
                 }
                 Specimen { name: "bare, in a property row",
                     div { class: "g-row",
                         span { class: "g-name", "Folder" }
-                        TextInput { variant: FieldFace::Bare, label: "Folder", value: "Receipts/2026", oninput: |_| {} }
+                        TextInput { variant: InputVariant::Bare, label: "Folder", value: "Receipts/2026", oninput: |_| {} }
                     }
                 }
             }

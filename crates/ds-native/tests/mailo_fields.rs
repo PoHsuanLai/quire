@@ -170,7 +170,7 @@ fn Titled() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { id: "title", style: "display:flex; width:300px; font-size:24px; line-height:1.25",
-                TextInput { variant: ds::FieldFace::Bare, label: "Name", value: "Work", oninput: |_| {} }
+                TextInput { variant: ds::InputVariant::Bare, label: "Name", value: "Work", oninput: |_| {} }
             }
             div { id: "boxed", style: "display:flex; width:300px; font-size:24px; line-height:1.25",
                 TextInput { variant: InputVariant::Boxed, label: "Name", value: "Work", oninput: |_| {} }

@@ -200,9 +200,7 @@ pub use avatar::{
 };
 pub use banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack};
 pub use battery_figure::{BatteryFigure, use_battery_figure};
-pub use battery_level::{
-    BatteryLevel, FILL as BATTERY_FILL, LevelRing, RingMark, use_battery_fill,
-};
+pub use battery_level::{BatteryLevel, FILL as BATTERY_FILL, RingMark, use_battery_fill};
 pub use bump_on::{Bumped, use_bump_on};
 pub use button::{Button, ButtonVariant};
 pub use button_face::{ButtonFace, FaceMark, Leading, Trailing};
@@ -324,7 +322,7 @@ pub use switcher_fit::{
 };
 pub use sync_halo::{SyncHalo, SyncState};
 pub use tabs::Tabs;
-pub use text_input::{FieldFace, Focus, Grow, InputVariant, Rows, TextInput, TextInputKind};
+pub use text_input::{Focus, Grow, InputVariant, Rows, TextInput, TextInputKind};
 pub use text_runs::{Run, RunTone, Text};
 pub use toast::{ToastHost, use_toasts};
 pub use toggle::Toggle;

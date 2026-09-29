@@ -168,8 +168,7 @@ pub enum UserPicture {
   the mood changes to Happy, the whole picture, of any kind, lifts 8 % and lands once; the pulse
   is taken off at its settle. A lock screen unlocks at `settle(Anim::PictureAccept, level, StaggerIndex::default())`
   (sill times it with `use_motion_timer(Anim::PictureAccept)`). Not played on mount, and not
-  played at all under Reduced motion. `Anim::PersonaHop` remains one release as a deprecated
-  alias.
+  played at all under Reduced motion.
 - **Reduced motion.** The emoji shows still frames only (a reaction's rest frame for its
   length); the beat is not fired; the 20 s window and the idle rule are unchanged.
 

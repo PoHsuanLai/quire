@@ -76,7 +76,7 @@ pub enum TreeShape {
 /// `editing` is an in-place rename (mailo gaps 7): given, it is drawn in the label's place (in
 /// `span.ds-tree-item-edit[data-slot=editing]`, at the label's metrics, so nothing on the row
 /// moves) instead of the label and its select button. Give it a `TextInput` with
-/// `variant: FieldFace::Bare` (it takes the row's face) and `focus: Focus::Controlled(request)`
+/// `variant: InputVariant::Bare` (it takes the row's face) and `focus: Focus::Controlled(request)`
 /// from `use_focus_request().with_select_all()` (or `Focus::OnMount`), and handle Enter and
 /// Escape in its `onkey`; take the slot away to end the rename. A press in it never toggles or
 /// selects the row; keys are the field's (they start there), and bubble on as any key does.

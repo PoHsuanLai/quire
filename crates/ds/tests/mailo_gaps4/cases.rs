@@ -7,7 +7,7 @@ use ds::{
     MarkStyle, Provider, ProviderMark, Trailing,
 };
 use ds::{DotIndex, Motion, MotionChoice, MotionLevels, Scheme, SpaceEditor, SpaceLook};
-use ds::{FieldFace, Grow, InputVariant, Rows, TextInput, TextInputKind};
+use ds::{Grow, InputVariant, Rows, TextInput, TextInputKind};
 
 /// An account colour.
 const SLATE: Colour = Colour::Solid(Hex([0x2f, 0x7f, 0x6e]));
@@ -95,7 +95,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/text_input/bare.html",
-        make: || rsx! { TextInput { variant: FieldFace::Bare, label: "Name", value: "Work", placeholder: "Name this Space", oninput: |_| {} } },
+        make: || rsx! { TextInput { variant: InputVariant::Bare, label: "Name", value: "Work", placeholder: "Name this Space", oninput: |_| {} } },
     },
     Case {
         golden: "lists/space_editor/motion-contact.html",
