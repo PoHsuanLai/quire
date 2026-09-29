@@ -38,14 +38,14 @@ impl Millis {
 /// the period it would swing at undamped, which reads as how quick it feels. Only
 /// [`crate::motion::spring_spec::SpringSpec`] makes one, so no caller picks a raw damping.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Spring {
+pub struct SpringTuning {
     damping: Ratio,
     response: Millis,
 }
 
-impl Spring {
-    pub(crate) const fn new(damping: Ratio, response: Millis) -> Spring {
-        Spring { damping, response }
+impl SpringTuning {
+    pub(crate) const fn new(damping: Ratio, response: Millis) -> SpringTuning {
+        SpringTuning { damping, response }
     }
 
     /// Its damping ratio.
@@ -84,7 +84,7 @@ pub struct Leg {
     /// Where it is going.
     pub target: f64,
     /// Under what spring.
-    pub spring: Spring,
+    pub spring: SpringTuning,
 }
 
 /// How close to its target, in pixels, a spring must be to rest.
@@ -104,7 +104,7 @@ pub enum SpringPhase {
 
 impl Leg {
     /// A leg standing still at `at`.
-    pub fn still(at: f64, spring: Spring) -> Leg {
+    pub fn still(at: f64, spring: SpringTuning) -> Leg {
         Leg {
             start: State {
                 position: at,

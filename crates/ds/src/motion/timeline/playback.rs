@@ -33,6 +33,21 @@ impl<T: Timeline> Clone for Playback<T> {
 
 impl<T: Timeline> Copy for Playback<T> {}
 
+impl<T: Timeline> PartialEq for Playback<T> {
+    fn eq(&self, other: &Self) -> bool {
+        (self.run, self.frame, self.task, self.scope)
+            == (other.run, other.frame, other.task, other.scope)
+    }
+}
+
+impl<T: Timeline> std::fmt::Debug for Playback<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Playback")
+            .field("scope", &self.scope)
+            .finish_non_exhaustive()
+    }
+}
+
 impl<T: Timeline> Playback<T> {
     /// The frame now, subscribing the caller's render to the run's frames.
     pub(crate) fn frame(self) -> T::Frame {
@@ -48,6 +63,13 @@ impl<T: Timeline> Playback<T> {
     /// gone.
     pub(crate) fn timeline(self) -> Option<T> {
         self.run.try_peek().ok().map(|run| run.timeline.clone())
+    }
+
+    /// Time since the current run started on the frame clock, exactly (between frames too).
+    pub(crate) fn elapsed(self) -> Duration {
+        self.run
+            .try_peek()
+            .map_or(Duration::ZERO, |run| clock::since(run.started))
     }
 
     /// Which run this is: every [`Self::play`] is a new one, so a reader can tell a move it

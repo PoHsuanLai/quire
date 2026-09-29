@@ -17,7 +17,8 @@ use crate::motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
 use crate::motion::{
     spring::SpringPhase,
     spring_spec::{SpringResponse, SpringSpec},
-    use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
+    timeline::spring::PxPerUnit,
+    use_spring::{SpringMotion, use_spring_motion},
 };
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;

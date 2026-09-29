@@ -7,7 +7,8 @@
 use super::projection::Throw;
 use super::spring::SpringPhase;
 use super::spring_spec::{SpringResponse, SpringSpec};
-use super::use_spring::{PxPerUnit, SpringMotion, use_spring_motion};
+use super::timeline::spring::PxPerUnit;
+use super::use_spring::{SpringMotion, use_spring_motion};
 use super::velocity::Velocity;
 use crate::core::geometry::units::{Point, Px};
 use crate::motion::detail::touch::Touch;

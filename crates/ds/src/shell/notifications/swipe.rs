@@ -22,7 +22,8 @@ use crate::motion::timer::use_motion_timer;
 use crate::motion::use_swipe::{SwipeHold, Swiper, use_swipe};
 use crate::motion::{
     spring_spec::SpringSpec,
-    use_spring::{PxPerUnit, SpringMotion, use_spring_motion},
+    timeline::spring::PxPerUnit,
+    use_spring::{SpringMotion, use_spring_motion},
     velocity::VelocityMeter,
 };
 use dioxus::core::queue_effect;

@@ -1,4 +1,4 @@
-use super::{Leg, Millis, Ratio, Spring, SpringPhase, State};
+use super::{Leg, Millis, Ratio, SpringPhase, SpringTuning, State};
 use std::time::Duration;
 
 fn ms(n: u64) -> Duration {
@@ -12,7 +12,7 @@ fn leg(damping: Ratio, from: f64, velocity: f64, to: f64) -> Leg {
             velocity,
         },
         target: to,
-        spring: Spring::new(damping, Millis(450)),
+        spring: SpringTuning::new(damping, Millis(450)),
     }
 }
 
@@ -47,7 +47,7 @@ fn a_momentum_spring_overshoots_a_little_and_still_rests() {
 
 #[test]
 fn a_standing_leg_rests_at_once_and_a_moving_one_starts_where_it_is() {
-    let still = Leg::still(42.0, Spring::new(Ratio::CRITICAL, Millis(300)));
+    let still = Leg::still(42.0, SpringTuning::new(Ratio::CRITICAL, Millis(300)));
     assert_eq!(still.phase(Duration::ZERO, 1.0), SpringPhase::Rest);
     let thrown = leg(Ratio::CRITICAL, 10.0, 800.0, 10.0);
     assert_eq!(
@@ -113,7 +113,7 @@ fn every_spring_rests_within_a_second_and_a_half() {
                         velocity: v,
                     },
                     target: to,
-                    spring: Spring::new(damping, response),
+                    spring: SpringTuning::new(damping, response),
                 };
                 let rest = rests_at(leg);
                 assert!(
