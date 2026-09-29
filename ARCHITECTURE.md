@@ -64,7 +64,7 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | Crate | Never reaches |
 | --- | --- |
 | `ds-core`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `pdfrum*`, `arboard` |
-| `ds-core`, `ds-style`, `ds-lint`, `ds-motion` | `dioxus` in `ds-lint` and `ds-style`'s CSS half: `ds-lint` names no `dioxus`; `ds-style`'s `css/`, `tokens/` name none |
+| `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (the linter reads strings; the derives generate paths) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
 | `anyrender_pdfrum` | `blitz*`, `parley`, `stylo_taffy`, `dioxus*` |
