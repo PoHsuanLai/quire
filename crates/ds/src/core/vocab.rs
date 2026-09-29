@@ -101,6 +101,29 @@ pub enum Dismiss {
     Manual,
 }
 
+/// Where a press on a control stands (design/30 section 1.5): from a pointer or a key going
+/// down until it is released. `data-pressed` is written for `Pressed` and `Held`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum PressPhase {
+    /// No press under way.
+    #[default]
+    Idle,
+    /// Down, by pointer or key; released inside, it activates.
+    Pressed,
+    /// Down for the long-press delay: the press has become a long press.
+    Held,
+}
+
+impl PressPhase {
+    /// `data-pressed`: present while a press is under way.
+    pub fn attr(self) -> Option<&'static str> {
+        match self {
+            PressPhase::Idle => None,
+            PressPhase::Pressed | PressPhase::Held => Some("true"),
+        }
+    }
+}
+
 /// Whether a thing is heard, or shown at full strength (design/30 section 1.5): a volume's
 /// speaker glyph, an avatar's colour (an account not in view keeps its hue at .55 of its
 /// chroma; `data-muting`).
@@ -472,7 +495,7 @@ mod fraction_tests {
 
 #[cfg(test)]
 mod availability_tests {
-    use super::Availability;
+    use super::{Availability, PressPhase};
 
     #[test]
     fn availability_writes_its_own_aria_attribute() {
@@ -484,6 +507,18 @@ mod availability_tests {
         for &(availability, disabled, busy) in CASES {
             assert_eq!(availability.aria_disabled(), disabled, "{availability:?}");
             assert_eq!(availability.aria_busy(), busy, "{availability:?}");
+        }
+    }
+
+    #[test]
+    fn data_pressed_is_written_from_the_press_going_down_until_release() {
+        const CASES: &[(PressPhase, Option<&str>)] = &[
+            (PressPhase::Idle, None),
+            (PressPhase::Pressed, Some("true")),
+            (PressPhase::Held, Some("true")),
+        ];
+        for &(phase, want) in CASES {
+            assert_eq!(phase.attr(), want, "{phase:?}");
         }
     }
 }

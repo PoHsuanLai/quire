@@ -5,6 +5,7 @@
 
 use crate::core::geometry::units::{Point, Rect};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
+use crate::core::vocab::PressPhase;
 use crate::edit::clicks::{Clicks, LastPress, clicks_after};
 use crate::edit::composition::Composing;
 use crate::edit::host::{HostEdit, ImeListener, Probe};
@@ -13,16 +14,6 @@ use crate::host::measure::BUSY_ATTEMPTS;
 use dioxus::prelude::*;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-
-/// Whether the primary button went down on the surface and is still down.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) enum Pressing {
-    /// No press of ours is under way.
-    #[default]
-    Up,
-    /// A press began on the surface.
-    Down,
-}
 
 /// Whether the host routes the pointer to the surface (a press captured it, until release).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -37,7 +28,7 @@ pub(crate) enum Capture {
 /// The surface's memory.
 pub(crate) struct SurfaceState {
     pub(crate) composing: Cell<Composing>,
-    pub(crate) pressing: Cell<Pressing>,
+    pub(crate) pressing: Cell<PressPhase>,
     pub(crate) capture: Cell<Capture>,
     last_press: Cell<Option<LastPress>>,
     pub(crate) focus: Cell<EditFocus>,
@@ -51,7 +42,7 @@ impl Default for SurfaceState {
     fn default() -> Self {
         SurfaceState {
             composing: Cell::new(Composing::Idle),
-            pressing: Cell::new(Pressing::Up),
+            pressing: Cell::new(PressPhase::Idle),
             capture: Cell::new(Capture::Free),
             last_press: Cell::new(None),
             focus: Cell::new(EditFocus::Out),
@@ -68,7 +59,7 @@ impl SurfaceState {
         let when = crate::core::time::clock::now();
         let clicks = clicks_after(self.last_press.get(), at, when);
         self.last_press.set(Some(LastPress { at, when, clicks }));
-        self.pressing.set(Pressing::Down);
+        self.pressing.set(PressPhase::Pressed);
         self.capture.set(Capture::Free);
         clicks
     }

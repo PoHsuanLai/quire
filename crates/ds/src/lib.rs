@@ -184,7 +184,7 @@ pub use crate::core::{
     },
     vocab::{
         Activity, Availability, Check, Dismiss, DropState, Emphasis, Fraction, Muting, Percent,
-        Selection, Shortcut, ShortcutKey, Shown, StaggerIndex,
+        PressPhase, Selection, Shortcut, ShortcutKey, Shown, StaggerIndex,
     },
 };
 pub use crate::edit::{
