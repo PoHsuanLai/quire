@@ -1,5 +1,5 @@
 //! Where Blitz paints an absolutely positioned layer placed before a positioned block
-//! (FINDINGS "Edit surface 2"): mailo's selection layer before its positioned `.c-body` was
+//! (FINDINGS "Edit surface"): mailo's selection layer before its positioned `.c-body` was
 //! painted over the text. CSS 2.1 Appendix E paints positioned descendants with `z-index: auto`
 //! in tree order (step 8), so the later block belongs on top of the earlier layer; a block that
 //! is not positioned is painted in step 3/7, under every positioned box.

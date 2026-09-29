@@ -97,16 +97,15 @@ const LIMITS: [(&str, &str, &str); 16] = [
 
 /// What the gallery could not show with quire as it is, and is still open: each a component
 /// that cannot express a documented state, a missing token, or a contract the code breaks,
-/// with the FINDINGS.md section that owns it. The items the gallery fix branches and the
-/// polish pass closed are gone from this list; FINDINGS records each.
+/// with the FINDINGS.md section that owns it.
 const DS_GAPS: [(&str, &str); 3] = [
     (
         "No token or component for a wallpaper, a stage or a specimen grid: the gallery's own layout CSS covers them.",
-        "Polish pass",
+        "Open items",
     ),
     (
         "An overlay's bounds are its .ds root's box, as tall as its content: in a content-high root a menu under a button flips and clamps to the top.",
-        "Gallery fixes B",
+        "Open items",
     ),
     (
         "A click never reaches a Button whose parent holds only inline content (the Button alone, beside an if placeholder or inline text): blitz-dom hits the parent. A flex row or a block after it makes it land (ds-native tests/click.rs).",

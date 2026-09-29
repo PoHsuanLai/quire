@@ -7,7 +7,7 @@
 //! settings key is `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3, default
 //! 0.04, range 0.0..=0.2); `classify` uses [`ChromaLimit::default`] and [`classify_with`] takes
 //! one built with [`ChromaLimit::try_from`]. `sill` still has to register the key in its own
-//! settings crate and pass the parsed value through (FINDINGS "Tune wave").
+//! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
 
 use crate::error::DsError;
 

@@ -1,4 +1,4 @@
-//! The tray gaps (FINDINGS "Tray gaps") on a real Blitz document: an external
+//! The tray gaps (FINDINGS "Pointer events") on a real Blitz document: an external
 //! symbolic icon takes the text colour and an external image keeps its own; a submenu opens on
 //! a rest after the delay and closes on Left; a disabled item is skipped by Down; a right-click
 //! on an icon button reports a secondary press.
@@ -238,7 +238,7 @@ fn MenuApp() -> Element {
     rsx! {
         Root {
             // The overlay bounds are the root's content box: make it the viewport's height, so
-            // the pointer can reach a menu anywhere on it (FINDINGS "Gallery fixes B").
+            // the pointer can reach a menu anywhere on it.
             div { style: "height:340px",
                 p { class: "picked", "{picked}" }
             }

@@ -1,4 +1,4 @@
-//! The edit surface's second round (FINDINGS "Edit surface 2"): a programmatic focus and blur
+//! The edit surface's second round (FINDINGS "Edit surface"): a programmatic focus and blur
 //! that do what a press and a blur do, Shift+click and a drag driven through the harness, the
 //! pointer captured past the surface's box until the release, the navigation keys, the caret's
 //! width, and the app's own class and data on the surface.

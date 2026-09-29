@@ -18,7 +18,7 @@ pub struct PartHooks {
     /// The pointer left the part, for the row or anywhere else: a card over the rows, another
     /// row, outside the window. Which one is not known yet when this runs; a caller that opens
     /// the row's own card when the pointer is back on the row does that from `ListRow`'s
-    /// `onpointerback`, not from here (FINDINGS "A part's leave is not the row's enter").
+    /// `onpointerback`, not from here (FINDINGS "Pointer events").
     pub onpointerleave: EventHandler<PointerEvent>,
 }
 

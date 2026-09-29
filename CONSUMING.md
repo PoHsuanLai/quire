@@ -66,7 +66,7 @@ it as an orphaned member of the workspace above it.
 surface) still carries Blitz's user-agent stylesheet, which sets `body { margin: 8px }`: its
 content never reaches the true (0, 0) corner, and `position: absolute`/`fixed` with `inset: 0`
 paints nothing on it (sill hot corners, 2026-09-26). shell-host injects `body { margin: 0 }`
-into every document it hosts (shell-host F62); a bare document elsewhere (`ds_native::launch`,
+into every document it hosts; a bare document elsewhere (`ds_native::launch`,
 a test) must cancel the margin itself or draw inside a `Ds`.
 
 Every quire component must be drawn inside one `Ds` (`root/ds.rs`; design/03-COLOR.md
@@ -77,7 +77,7 @@ and a motion level; stamps `data-theme`, `data-typeface`, `data-accent`, `data-m
 `Overlays` contexts every component reads. It also renders `OverlayHost` and `ToastHost` after
 your children, so menus, popovers and toasts always have somewhere to mount. `ToastHost` lays
 out nothing while the hub is empty: a pushed toast mounts hidden for one frame and rises from
-there, and is dropped again once it has sunk (FINDINGS "Gallery fixes A"), so an idle root has
+there, and is dropped again once it has sunk, so an idle root has
 no toast element in its markup or its picture.
 
 ```rust
@@ -113,7 +113,7 @@ fn App() -> Element {
 | `radius` | `Option<Corner>` | `None`: the material's own corner | `Corner::Token(Radius::…)` or `Corner::Px(Px(n))`: overrides `--m-radius` inline, for a root whose corner is a setting (the dock's `dock.pill_radius_px`) |
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 | `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
-| `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (sill F172; FINDINGS "Sheet and modal parts") |
+| `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (FINDINGS "Root height") |
 | `scale` | `Option<Scale>` | `None`: the host's `ds::HostScale`, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostScale` themselves; a host that is not `ds-native` passes `scale` |
 | `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::HostWindow` — section 6, "Window frame" |
 
@@ -155,18 +155,17 @@ that is an even number of device pixels (design/08-ICONS.md §1.4.1).
 ### A document's frame must have a height (2026-09-25)
 
 One rule for every surface whose document is a frame around a `Ds` root: a popup's frame, an
-overlay root, a wallpaper, the launcher's catcher (sill F172, F225, Q104). **The frame (the
+overlay root, a wallpaper, the launcher's catcher. **The frame (the
 document's first box, the one around the `Ds`) is in normal flow and has a height; it is never
 absolutely or fixed positioned, and never left to be sized by content that is itself out of
 flow.** Blitz lays out `#main` and `.ds` at `height:auto`: a frame with `position:absolute;
 inset:0` or `position:fixed` resolves against that 0 px box (Taffy places a fixed box against
 its parent, not the viewport), a `height:100%` resolves against it too, and a frame whose only
 content is a card hung from its anchor is 0 px tall. Then every box from `html` down is 0 px,
-nothing paints (sill's wallpaper, F172) and in the shell no press lands (the bar popup, F225).
+nothing paints and in the shell no press lands.
 
-- **The surface fills its surface** (popup frame, overlay, wallpaper, catcher): if your quire
-  has `Ds { extent: RootExtent::Viewport }` (the sheet-parts branch, sill Q94), pass it. Until
-  then the floor is on your frame: `display:grid; width:100vw; min-height:100vh` in flow, the
+- **The surface fills its surface** (popup frame, overlay, wallpaper, catcher): pass
+  `Ds { extent: RootExtent::Viewport }`, or put the floor on your frame: `display:grid; width:100vw; min-height:100vh` in flow, the
   room around the card as the frame's padding; the grid's one cell stretches the `Ds` root to
   fill it, so the root has the viewport's height too. The same floor holds even if the frame is
   absolutely placed (`crates/ds-native/tests/root_frame.rs` measures all three).
@@ -283,7 +282,7 @@ rsx! {
 | `radius` | `Option<Corner>` | `None` | the material's corner (`--m-radius`), overridden: `Corner::Px(Px(f32::from(dock.pill_radius_px.0)))` or `Corner::Token(Radius::Panel)` |
 
 Each `None` inherits, so the common case is the material alone (`crates/ds/tests/surface.rs`
-has a golden per override; FINDINGS "Gallery fixes B").
+has a golden per override).
 
 ## 5. The four coherence rules
 
@@ -436,7 +435,7 @@ this a real test of rule 4: a `Duration::from_millis(1200)` literal would still 
 Fade`'s token were retuned tomorrow, which is exactly the drift `ds::motion` is supposed to make
 impossible.
 
-**Exact timing on a loaded machine: the virtual clock (sill Q380).** The harness above runs
+**Exact timing on a loaded machine: the virtual clock.** The harness above runs
 quire's timers on the wall clock, so `advance(hold - 10ms)` can overshoot the boundary under
 load. Build it on the virtual clock instead and `advance` moves one clock that drives both the
 CSS animations and every ds timer (motion timers, presence and roster rests, hover intent, toast
@@ -598,7 +597,7 @@ A few props worth knowing about before you read the signatures:
   bare list of buttons — insert `BubbleAction::Separator` between groups instead of styling a
   gap yourself.
 
-And in Gallery fixes B (FINDINGS "Gallery fixes B"):
+Anchors, hover-card parts and undo:
 
 - `Button` and `IconButton` take `mounted: Option<EventHandler<MountedEvent>>`: the element
   itself, for `Anchor::Mounted` (the Overlays example above). It writes no attribute.
@@ -610,7 +609,7 @@ And in Gallery fixes B (FINDINGS "Gallery fixes B"):
   so that scope must outlive the toast. `last_undo()` still reports the last undo.
 - `Surface` takes `accent` and `blur` beside `theme` (section 4).
 
-And in the tray gaps (FINDINGS "Tray gaps", sill Q6-Q8):
+External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
 
 - **External icons.** An icon slot takes `ds::IconSource`: `Glyph(Icon)`, `Symbolic(ExternalIcon)`
   or `Image(ExternalIcon)`. `ExternalIcon { url: IconUrl, size: IconSize }` is a `data:` or
@@ -661,7 +660,7 @@ And in the tray gaps (FINDINGS "Tray gaps", sill Q6-Q8):
   parents, not headers or rules). A submenu is placed in the same document as its menu, so on a
   shell surface whose popup is sized to the menu, the popup must leave room for it.
 
-And in the bar gaps (FINDINGS "Bar gaps", sill Q9-Q13, G7):
+For a bar (FINDINGS "Bar gaps"):
 
 - **A Blitz host that is not `ds_native::launch`** (shell-host's surfaces, a popup's document)
   calls `ds_native::measure::provide()` at the top of its root component, before any quire
@@ -743,7 +742,7 @@ And in the bar gaps (FINDINGS "Bar gaps", sill Q9-Q13, G7):
   side.
 - **New glyph**: `Icon::Ethernet` (Lucide `ethernet-port`) for a wired network.
 
-And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's Q15-Q17):
+For a launcher and a dock (FINDINGS "Launcher gaps"):
 
 - **Unmounting early is safe.** Every task quire spawns (a motion timer's settle, a roster's
   exit and rest, the hover hub's and the toast hub's timers, a focus retry) is a task of the
@@ -823,7 +822,7 @@ And in the launcher gaps (FINDINGS "Launcher gaps", sill Q40-Q45, and the dock's
   dock's label machine: hide on press, while a menu is open, while dragging). `None` is the
   hover behaviour as before. A Card tooltip follows `shown` the same way.
 
-And in the palette follow-ups (FINDINGS "Palette follow-ups", sill Q60-Q63):
+Palette behaviour:
 
 - **The selected row's rect waits for layout.** A palette mounted on a surface that has not been
   laid out yet (a launcher surface mapped again) reads its selected row as 0 x 0; quire now

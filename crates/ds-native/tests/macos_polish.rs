@@ -1,4 +1,4 @@
-//! The macOS polish pass (FINDINGS "macOS polish"), proved on a real Blitz document: a squircle
+//! The macOS polish pass (FINDINGS "Materials, blur and colour"), proved on a real Blitz document: a squircle
 //! corner differs from a circle of the same radius at 45 degrees, a card stacks its hairline,
 //! highlight and two shadows, a plate paints its gradient inside the superellipse, the launcher
 //! card is as tall as its content, text menu rows are 22 px, a bar item draws its pill while

@@ -32,7 +32,7 @@ thread_local! {
 }
 
 /// One row of the sheet: its label, then a tile per state. A row is rendered on its own: Blitz's
-/// CPU renderer loses layers when one document holds every tile (FINDINGS "Level control").
+/// CPU renderer loses layers when one document holds every tile (FINDINGS "Design facts the code relies on").
 #[allow(non_snake_case)] // A component: the harness names it like a type.
 fn Row() -> Element {
     let (look, scheme, ground) = ROW.get();
