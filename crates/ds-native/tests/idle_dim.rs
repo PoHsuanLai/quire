@@ -4,8 +4,7 @@
 //! Reduced motion shows the level at once. Every case ends at 0 frames (R3).
 
 use dioxus::prelude::*;
-use ds::detail::{IdleDimPhase, use_idle_dim};
-use ds::{Appearance, Ds, Material, Motion, Percent};
+use ds::{Appearance, Ds, IdleDim, IdleDimPhase, Material, Motion, Percent};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -32,17 +31,17 @@ fn Overlay() -> Element {
 #[allow(non_snake_case)]
 #[component]
 fn OverlayBody() -> Element {
-    let share = use_idle_dim(LEVEL(), PHASE());
     rsx! {
-        div { id: "share", "{share.0}" }
+        IdleDim { level: LEVEL(), phase: PHASE() }
     }
 }
 
-fn read(harness: &Harness, id: &str) -> i64 {
+/// The overlay's opacity in permille, read from the style the component draws.
+fn read(harness: &Harness, selector: &str) -> i64 {
     harness
-        .text_of(id)
-        .and_then(|text| text.trim().parse().ok())
-        .unwrap_or(-1)
+        .attr(selector, "style")
+        .and_then(|style| style.strip_prefix("opacity:")?.trim().parse::<f32>().ok())
+        .map_or(-1, |opacity| (opacity * 1000.0).round() as i64)
 }
 
 fn virtual_harness() -> Harness {
@@ -52,16 +51,16 @@ fn virtual_harness() -> Harness {
 #[test]
 fn dimming_fades_in_over_t_idle_dim_and_lands_on_the_level() {
     let mut harness = virtual_harness();
-    assert_eq!(read(&harness, "#share"), 0);
+    assert_eq!(read(&harness, ".ds-idle-dim"), 0);
     harness.within(|| *PHASE.write() = IdleDimPhase::Dimmed);
     // 600 permille (Percent(60)) is the target; --t-idle-dim is 2000ms. On the virtual clock
     // `advance` is exact (CONSUMING.md "the virtual clock"), so a fixed instant well short of
     // the fade's length is a real assertion, not a wall-clock race.
     harness.advance(Duration::from_millis(900));
-    let mid = read(&harness, "#share");
+    let mid = read(&harness, ".ds-idle-dim");
     assert!((1..600).contains(&mid), "expected a mid-fade value: {mid}");
     harness.advance(Duration::from_secs(2));
-    assert_eq!(read(&harness, "#share"), 600);
+    assert_eq!(read(&harness, ".ds-idle-dim"), 600);
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -70,12 +69,12 @@ fn waking_snaps_to_zero_even_mid_fade() {
     let mut harness = virtual_harness();
     harness.within(|| *PHASE.write() = IdleDimPhase::Dimmed);
     harness.advance(Duration::from_millis(900));
-    let mid = read(&harness, "#share");
+    let mid = read(&harness, ".ds-idle-dim");
     assert!((1..600).contains(&mid), "expected a mid-fade value: {mid}");
     harness.within(|| *PHASE.write() = IdleDimPhase::Awake);
     // No advance at all: the very next frame already reads zero.
     harness.advance(Duration::ZERO);
-    assert_eq!(read(&harness, "#share"), 0);
+    assert_eq!(read(&harness, ".ds-idle-dim"), 0);
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -84,12 +83,12 @@ fn a_settings_edit_while_dimmed_never_animates() {
     let mut harness = virtual_harness();
     harness.within(|| *PHASE.write() = IdleDimPhase::Dimmed);
     harness.advance(Duration::from_secs(3));
-    assert_eq!(read(&harness, "#share"), 600);
+    assert_eq!(read(&harness, ".ds-idle-dim"), 600);
     harness.within(|| *LEVEL.write() = Percent(80));
     // A settings change repaints with the new value on its next frame; it does not fade
     // (design/22-SETTINGS.md section 2).
     harness.advance(Duration::ZERO);
-    assert_eq!(read(&harness, "#share"), 800);
+    assert_eq!(read(&harness, ".ds-idle-dim"), 800);
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -99,6 +98,6 @@ fn reduced_motion_shows_the_level_at_once_with_no_fade() {
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.within(|| *PHASE.write() = IdleDimPhase::Dimmed);
     harness.advance(Duration::ZERO);
-    assert_eq!(read(&harness, "#share"), 600);
+    assert_eq!(read(&harness, ".ds-idle-dim"), 600);
     assert_settles_to_zero_frames(&mut harness);
 }

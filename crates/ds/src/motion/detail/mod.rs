@@ -15,7 +15,6 @@ pub(crate) mod cue;
 pub(crate) mod detailed;
 pub(crate) mod first_show;
 pub(crate) mod grammar;
-pub(crate) mod idle_dim;
 pub(crate) mod layer_glyph;
 pub(crate) mod level;
 pub(crate) mod moment;

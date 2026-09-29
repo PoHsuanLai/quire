@@ -265,7 +265,7 @@ pub use crate::shell::{
         disc::{DiscHue, EmojiDisc, EmojiPlayback},
         id::EmojiId,
     },
-    idle_dim::IdleDim,
+    idle_dim::{IdleDim, IdleDimPhase},
     lock::{
         clock::LockClock,
         polkit_prompt::PolkitPrompt,

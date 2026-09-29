@@ -1,34 +1,23 @@
-//! `IdleDim`'s share: the pre-screen-off dim overlay's opacity, driven from Rust like [`super::
-//! Sweep`] (design/26-DETAILS.md section 4.1, "Why Rust tweens") rather than a CSS keyframe,
-//! because waking must snap the share to zero on input even mid-fade, and a CSS `animation`
+//! `IdleDim`'s share: the pre-screen-off dim overlay's opacity, driven from Rust like a sweep
+//! (design/26-DETAILS.md section 4.1, "Why Rust tweens") rather than a CSS keyframe, because waking must snap the share to zero on input even mid-fade, and a CSS `animation`
 //! cannot retarget without a restyle. sill's own idle service owns the phase this plays
 //! (dim before screen-off, never real brightness; design/22-SETTINGS.md section 3.24
 //! `idle.dim_s`/`idle.dim_level_pct`; sill FINDINGS "sill idle").
 //!
-//! Not built on [`super::Detailed`]/[`super::Cue`]: those classify an arbitrary state change into
+//! Not built on `Detailed`/`Cue`: those classify an arbitrary state change into
 //! one of the grammar's moments, but this primitive already knows exactly what a phase change
 //! means (dim, or wake), so the extra layer would only translate one two-state enum into
-//! another. [`plan`] plays the same role [`super::sweep::plan`] does for `Sweep`.
+//! another. [`plan`] plays the same role `crate::motion::detail::sweep::plan` does for a sweep.
 
-use super::level::use_level;
+use super::model::IdleDimPhase;
 use crate::core::vocab::{Fraction, Percent};
+use crate::motion::detail::level::use_level;
 use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::playback::use_playback;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-
-/// What the caller wants: the full-brightness screen, or the overlay dimmed to its level. Two
-/// states, not a `bool` (`CONVENTIONS.md#4-types`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum IdleDimPhase {
-    /// Nothing drawn: full brightness.
-    #[default]
-    Awake,
-    /// Dimmed to `level`.
-    Dimmed,
-}
 
 /// What changed since the last render: a request the caller made, or a settings edit that moved
 /// `level` while the phase stayed the same.
@@ -77,7 +66,7 @@ fn target(phase: IdleDimPhase, level: Percent) -> i64 {
 /// [`IdleDimPhase::Dimmed`], fading in over `--t-idle-dim --e-out` and snapping the other way.
 /// Retargets from where it is if asked again mid-fade (R10); asks for frames only while it moves
 /// (R3).
-pub fn use_idle_dim(level: Percent, phase: IdleDimPhase) -> Fraction {
+pub(crate) fn use_idle_dim(level: Percent, phase: IdleDimPhase) -> Fraction {
     let env = use_level();
     let playback = use_playback(Glide::still(target(phase, level)));
     let mut seen = use_hook(|| CopyValue::new((IdleDimPhase::Awake, level)));
