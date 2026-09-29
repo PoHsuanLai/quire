@@ -1,6 +1,7 @@
 //! Count: an unread or item count, empty at zero, bumping when it changes
 //! (design/04-COMPONENTS.md section 14).
 
+use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::pulse_key::PulseKey;
 use dioxus::prelude::*;
@@ -8,23 +9,13 @@ use std::cell::Cell;
 use std::rc::Rc;
 
 /// Where a count sits.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum CountPlace {
     /// Trailing a sidebar item.
     #[default]
     Item,
     /// In an account tile's corner.
     Tile,
-}
-
-impl CountPlace {
-    /// The `data-place` word.
-    fn slug(self) -> &'static str {
-        match self {
-            CountPlace::Item => "item",
-            CountPlace::Tile => "tile",
-        }
-    }
 }
 
 /// The text a count shows: nothing at zero, so the layout does not shift (`S:1247`).

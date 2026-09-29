@@ -79,7 +79,8 @@ fn row_at(row: (LevelLook, Scheme, Ground), scale_percent: u16) -> Result<RgbaIm
 /// Every row at `scale_percent`, look by look.
 fn variants_at(scale_percent: u16) -> Result<RgbaImage, GalleryError> {
     let looks = LevelLook::ALL
-        .into_iter()
+        .iter()
+        .copied()
         .map(|look| {
             let rows = [Scheme::Light, Scheme::Dark]
                 .into_iter()

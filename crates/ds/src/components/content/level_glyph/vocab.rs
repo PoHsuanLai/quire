@@ -3,9 +3,10 @@
 
 use crate::components::content::status::volume::VolumeState;
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 
 /// Whether the control takes input.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum LevelMode {
     /// A control: pointer and keys move it (`role="slider"`, focusable).
     #[default]
@@ -14,19 +15,9 @@ pub enum LevelMode {
     ReadOnly,
 }
 
-impl LevelMode {
-    /// The `data-mode` value.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            LevelMode::Interactive => "interactive",
-            LevelMode::ReadOnly => "read-only",
-        }
-    }
-}
-
 /// How the level is drawn: three looks for the user to choose between (FINDINGS "Level control
 /// (2026-09-25)" has the references each follows).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum LevelLook {
     /// A thick capsule whose fill is the material's bright ink, with the glyph inside at its left
     /// end, two-toned where the fill covers it (recommended).
@@ -36,24 +27,6 @@ pub enum LevelLook {
     CapsuleKnob,
     /// Sixteen rounded squares that fill in one by one, the glyph before them.
     Segments,
-}
-
-impl LevelLook {
-    /// Every look, in the gallery's order.
-    pub const ALL: [LevelLook; 3] = [
-        LevelLook::Capsule,
-        LevelLook::CapsuleKnob,
-        LevelLook::Segments,
-    ];
-
-    /// The `data-look` value.
-    pub fn slug(self) -> &'static str {
-        match self {
-            LevelLook::Capsule => "capsule",
-            LevelLook::CapsuleKnob => "capsule-knob",
-            LevelLook::Segments => "segments",
-        }
-    }
 }
 
 /// Whether the fill's edge marks each step it crosses.

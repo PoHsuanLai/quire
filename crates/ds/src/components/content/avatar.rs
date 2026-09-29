@@ -6,6 +6,7 @@
 //! is [`AvatarFace`].
 
 use crate::components::content::muted::muted;
+use crate::core::word::Word;
 use crate::style::tokens::hex::{Colour, Hex};
 use dioxus::prelude::*;
 
@@ -35,7 +36,7 @@ pub enum AvatarSize {
 }
 
 /// Round, or the favicon's rounded square.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum AvatarShape {
     /// A disc.
     #[default]
@@ -143,16 +144,6 @@ impl AvatarSize {
             AvatarSize::Size34 => 34,
             AvatarSize::Size48 => 48,
             AvatarSize::Size64 => 64,
-        }
-    }
-}
-
-impl AvatarShape {
-    /// The `data-shape` word.
-    fn slug(self) -> &'static str {
-        match self {
-            AvatarShape::Round => "round",
-            AvatarShape::Square => "square",
         }
     }
 }

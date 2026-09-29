@@ -17,6 +17,7 @@ use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::pdf_thumb_grace::{Grace, Reading, use_grace};
 use crate::components::content::shot_frame::picture_style;
 use crate::core::geometry::units::{Point, Px, Rect, Size};
+use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::render::{IconPx, IconSize};
@@ -55,34 +56,21 @@ pub enum PdfPage {
 }
 
 /// Why a page could not be drawn.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum PdfTrouble {
     /// Not a PDF, damaged past recovery, unreadable, or a page the rasteriser refused.
+    #[word(label = "PDF, no preview")]
     Unreadable,
     /// Encrypted with a password that is not the empty one.
+    #[word(label = "Locked PDF")]
     Locked,
 }
 
 impl PdfTrouble {
-    /// The `data-trouble` word.
-    pub fn slug(self) -> &'static str {
-        match self {
-            PdfTrouble::Unreadable => "unreadable",
-            PdfTrouble::Locked => "locked",
-        }
-    }
-
     fn glyph(self) -> Icon {
         match self {
             PdfTrouble::Unreadable => Icon::File,
             PdfTrouble::Locked => Icon::Lock,
-        }
-    }
-
-    fn label(self) -> &'static str {
-        match self {
-            PdfTrouble::Unreadable => "PDF, no preview",
-            PdfTrouble::Locked => "Locked PDF",
         }
     }
 }

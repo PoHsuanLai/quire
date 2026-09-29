@@ -6,6 +6,7 @@
 
 use super::battery_state::{BatteryPower, BatteryState, Tone};
 use super::part::{Paint, Part, Pen, Show, part_svg};
+use crate::core::word::Word;
 use crate::motion::detail::{
     first_show::FirstShow, sweep::use_sweep, touch::Touch, use_detail::use_detail,
 };

@@ -14,6 +14,7 @@ use crate::components::content::level_glyph::glyph::LevelGlyphView;
 use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource, Tick};
 use crate::core::geometry::units::{Px, Rect, Size};
 use crate::core::vocab::{Availability, Fraction};
+use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::{anim::Anim, pulse::use_pulse};
 use crate::style::appearance::motion::MotionLevel;

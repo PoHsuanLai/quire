@@ -4,12 +4,13 @@
 //! recomputed per frame only while they move (design/26-DETAILS.md section 3.2).
 
 use crate::core::vocab::Fraction;
+use crate::core::word::Word;
 use crate::motion::detail::pending::Lit;
 use crate::style::icon::shape::Shape;
 use dioxus::prelude::*;
 
 /// How much of a part shows.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub(crate) enum Show {
     /// Drawn in full ink.
     Lit,
@@ -20,15 +21,6 @@ pub(crate) enum Show {
 }
 
 impl Show {
-    /// The `data-show` word.
-    pub(crate) fn slug(self) -> &'static str {
-        match self {
-            Show::Lit => "lit",
-            Show::Faint => "faint",
-            Show::Hidden => "hidden",
-        }
-    }
-
     /// A pending loop's lit layer is `Lit`, an unlit one `Faint`.
     pub(crate) fn of(lit: Lit) -> Show {
         match lit {

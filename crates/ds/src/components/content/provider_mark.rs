@@ -3,6 +3,7 @@
 //! account, which has no provider, shows a neutral folder instead of a letter.
 
 use crate::components::content::image_source::ImageSource;
+use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconPx, IconSize};
 use dioxus::prelude::*;
@@ -28,7 +29,7 @@ pub enum MarkProvider {
 }
 
 /// Where a mark sits.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum MarkSize {
     /// 14, on an account tile.
     Tile,
@@ -88,15 +89,6 @@ impl MarkProvider {
 }
 
 impl MarkSize {
-    /// The `data-size` word.
-    fn slug(self) -> &'static str {
-        match self {
-            MarkSize::Tile => "tile",
-            MarkSize::Row => "row",
-            MarkSize::Inline => "inline",
-        }
-    }
-
     /// The folder glyph inside a local mark: the chip less its padding (14, 11, 13 → 10, 8, 9).
     fn glyph(self) -> IconSize {
         match self {
