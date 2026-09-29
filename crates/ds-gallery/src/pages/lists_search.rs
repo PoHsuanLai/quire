@@ -5,8 +5,8 @@
 use super::Section;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, RunTone,
-    Selection, Shown, StaggerIndex, StripAction, TextLine, TextRun, Titles,
+    ActionId, Anim, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState,
+    RunTone, Selection, Shown, StaggerIndex, StripAction, TextLine, TextRun, Titles,
 };
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
@@ -75,9 +75,8 @@ pub fn SearchRows() -> Element {
             ul { class: "g-list g-stage-pad",
                 for (index , (name , subject , snippet , time)) in hits().into_iter().enumerate() {
                     ListRow {
+                        state: RowState { selection: if at() == index { Selection::Selected } else { Selection::Unselected }, emphasis: Emphasis::Plain, ..RowState::default() },
                         key: "{name}",
-                        selection: if at() == index { Selection::Selected } else { Selection::Unselected },
-                        emphasis: Emphasis::Plain,
                         index: StaggerIndex::new(index),
                         presence: Presence::Present,
                         name,

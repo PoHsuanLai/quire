@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, DataAttr, DataName, DropState, Ds, Icon, IconButton, IconButtonVariant, Material,
-    PlaceId, Point, Propagation, Px, Shown, TreeItem, TreeShape,
+    PlaceId, Point, Propagation, Px, RowState, Shown, TreeItem, TreeShape,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -38,6 +38,7 @@ fn Page() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { class: "tree", style: "width:240px; padding:20px",
                 TreeItem {
+                    state: RowState { drop: DropState::Accepts, ..RowState::default() },
                     label: "Projects",
                     open: projects(),
                     on_toggle: move |to: Shown| {
@@ -45,7 +46,6 @@ fn Page() -> Element {
                         projects.set(to);
                     },
                     glyph: Icon::Folder,
-                    drop: DropState::Accepts,
                     place: PlaceId("projects".to_string()),
                     onselect: move |_| note("select:projects".to_string()),
                     trailing: rsx! {
@@ -56,6 +56,7 @@ fn Page() -> Element {
                     TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("quire".to_string()) }
                 }
                 TreeItem {
+                    state: RowState { drop: DropState::Target, ..RowState::default() },
                     label: "Archive",
                     open: archive(),
                     on_toggle: move |to: Shown| {
@@ -63,7 +64,6 @@ fn Page() -> Element {
                         archive.set(to);
                     },
                     glyph: Icon::Archive,
-                    drop: DropState::Target,
                     place: PlaceId("archive".to_string()),
                     trailing: rsx! {
                         IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Archive",

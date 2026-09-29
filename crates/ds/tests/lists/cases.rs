@@ -5,7 +5,7 @@ use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{
     Accent, Appearance, AppearancePicker, CardAccent, DotIndex, FrameVars, Grain, Motion, PRESETS,
-    ReducedMotion, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
+    ReducedMotion, RowState, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
 };
 use ds::{
     AccountFace, AccountTile, Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Colour,
@@ -49,9 +49,9 @@ fn item(
     };
     rsx! {
         SidebarItem {
+            state: RowState { selection: here, ..RowState::default() },
             kind,
             label,
-            here,
             count: Some(4),
             presence,
             preview,
@@ -68,16 +68,15 @@ const INBOX: ItemKind = ItemKind::Place { icon: Icon::Inbox };
 fn dropped_item(drop: DropState) -> Element {
     rsx! {
         SidebarItem {
+            state: RowState { selection: Selection::Unselected, drop, ..RowState::default() },
             kind: INBOX,
             label: "Inbox",
-            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,
             pulse: GULP(),
             onclick: |_| {},
             onclose: None,
-            drop,
         }
     }
 }

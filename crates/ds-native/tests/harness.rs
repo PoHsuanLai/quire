@@ -10,8 +10,8 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Count, Ds,
     Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListRow, Material,
-    Menu, MenuEntry, MenuKind, MenuTrail, Point, Presence, PulseKey, Px, RowPitch, Selection,
-    ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Menu, MenuEntry, MenuKind, MenuTrail, Point, Presence, PulseKey, Px, RowPitch, RowState,
+    Selection, ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
     DotIndex, FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput,
@@ -421,9 +421,8 @@ fn ListDemo() -> Element {
         AnimatedList { label: "Threads", presence: Presence::Present,
             for entry in roster.entries() {
                 ListRow {
+                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                     key: "{entry.key}",
-                    selection: Selection::Unselected,
-                    emphasis: Emphasis::Plain,
                     index: entry.index,
                     presence: entry.presence,
                     heal: entry.heal,

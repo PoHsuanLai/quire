@@ -5,23 +5,24 @@
 use crate::cases::{Case, DANA};
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::{ActionId, Anim, HoverStrip, Icon, ItemKind, PlaceId, Presence, Shown, SidebarItem};
+use ds::{
+    ActionId, Anim, HoverStrip, Icon, ItemKind, PlaceId, Presence, RowState, Shown, SidebarItem,
+};
 use ds::{DropState, PulseKey, Selection};
 
 /// A place named `place`, in `drop` state, with every pointer hook attached.
 fn place(kind: ItemKind, label: &str, place: &str, drop: DropState) -> Element {
     rsx! {
         SidebarItem {
+            state: RowState { selection: Selection::Unselected, drop, ..RowState::default() },
             kind,
             label,
-            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,
             pulse: PulseKey::rest(Anim::Gulp),
             onclick: |_| {},
             onclose: None,
-            drop,
             place: PlaceId(place.to_string()),
             onpointerenter: |_| {},
             onpointerleave: |_| {},

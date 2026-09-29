@@ -44,6 +44,7 @@
 use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
 use crate::core::geometry::scale::Scale;
+use crate::core::vocab::InputModality;
 use crate::core::word::Word;
 use crate::focus::click::ClickRoot;
 use crate::motion::hover_intent::HoverWarmth;
@@ -61,7 +62,7 @@ use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::material::recipe::DEFAULT_TINT_ALPHA;
 use crate::style::material::stack::MaterialStack;
 use crate::style::scale::use_root_scale;
-use crate::style::scope::{HostModality, InputModality, Scope, use_scope_provider};
+use crate::style::scope::{HostModality, Scope, use_scope_provider};
 use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::style::tokens::hex::Alpha;
 use crate::style::tokens::{pixel::PixelToken, shape::Corner};

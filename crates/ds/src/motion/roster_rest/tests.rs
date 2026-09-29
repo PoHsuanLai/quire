@@ -2,12 +2,12 @@
 //! runs start one timer.
 
 use crate::core::geometry::units::Px;
+use crate::core::vocab::InputModality;
 use crate::motion::{presence::Presence, roster::RowPitch, use_roster::use_roster};
 use crate::style::appearance::{
     accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
 };
 use crate::style::appearance::{blur::BlurState, material::Material};
-use crate::style::scope::InputModality;
 use crate::style::scope::Scope;
 use dioxus::core::{NoOpMutations, VirtualDom};
 use dioxus::prelude::*;

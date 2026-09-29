@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, Appearance, Ds, HoverStrip, Icon, ListRow, Material, PartHooks, Point,
-    Presence, Px, Shown, StripAction,
+    Presence, Px, RowState, Shown, StripAction,
 };
 use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds_native::{Harness, Viewport};
@@ -58,8 +58,7 @@ fn Page(strip: Strip) -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             ul { class: "list", style: "width:600px; padding:20px; margin:0",
                 ListRow {
-                    selection: Selection::Unselected,
-                    emphasis: Emphasis::Strong,
+                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
                     index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",

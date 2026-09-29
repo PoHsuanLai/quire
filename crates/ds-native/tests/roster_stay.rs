@@ -5,7 +5,8 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AnimatedList, Appearance, Button, ButtonVariant, Ds, Emphasis, Exit, ListRow, Material,
-    Point, Presence, PulseKey, Px, RowPitch, Selection, StaggerIndex, Stayed, settle, use_roster,
+    Point, Presence, PulseKey, Px, RowPitch, RowState, Selection, StaggerIndex, Stayed, settle,
+    use_roster,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -49,9 +50,8 @@ fn StayList() -> Element {
         AnimatedList { label: "Threads", presence: Presence::Present,
             for entry in roster.entries() {
                 ListRow {
+                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                     key: "{entry.key}",
-                    selection: Selection::Unselected,
-                    emphasis: Emphasis::Plain,
                     index: entry.index,
                     presence: entry.presence,
                     heal: entry.heal,

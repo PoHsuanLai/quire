@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Fraction, Hex,
-    ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, SendMood, SendPhase, SendPill,
-    SendRing, Shown, TextInput, TextInputKind,
+    ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase,
+    SendPill, SendRing, Shown, TextInput, TextInputKind,
 };
 use ds::{
     Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, PulseKey,
@@ -29,9 +29,9 @@ const CLOCKED: AvatarFace = AvatarFace {
 fn scheduled() -> Element {
     rsx! {
         SidebarItem {
+            state: RowState { selection: Selection::Unselected, ..RowState::default() },
             kind: ItemKind::Today { avatar: CLOCKED },
             label: "Q3 notes",
-            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,

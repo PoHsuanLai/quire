@@ -124,6 +124,46 @@ impl PressPhase {
     }
 }
 
+/// How the person last drove the surface: `data-modality` on `.ds` (design/30 section 1.5).
+///
+/// blitz-dom hard-codes `:focus-visible` and `:focus-within` to false and a click does not focus
+/// a button (spike S12), so the focus ring is `.ds[*|data-modality=keyboard] :focus` and the host
+/// says which modality is current.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum InputModality {
+    /// The last input was a pointer: no focus rings.
+    #[default]
+    Pointer,
+    /// The last input was a key: focus rings show.
+    Keyboard,
+}
+
+/// How focus is drawn on an element (design/30 section 1.4, `data-focus`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum FocusStyle {
+    /// A translucent accent ring around the element, for keyboard modality only: controls and
+    /// fields.
+    #[default]
+    Ring,
+    /// The element's own fill: accent with accent ink while its list is focused in the active
+    /// window, grey otherwise. List rows, menu rows and launcher rows.
+    Highlight,
+}
+
+/// The state every row shares (design/30 section 1.5): list, menu, palette, sidebar and
+/// settings rows are drawn from the same four facts, so a row takes one prop, not four.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub struct RowState {
+    /// Whether the row is the selected one, or the place the person is.
+    pub selection: Selection,
+    /// Whether the row is unread or read weight.
+    pub emphasis: Emphasis,
+    /// Whether the row takes input, and whether it is working.
+    pub availability: Availability,
+    /// The row's part in a drag.
+    pub drop: DropState,
+}
+
 /// Whether a thing is heard, or shown at full strength (design/30 section 1.5): a volume's
 /// speaker glyph, an avatar's colour (an account not in view keeps its hue at .55 of its
 /// chroma; `data-muting`).

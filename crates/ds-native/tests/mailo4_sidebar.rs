@@ -5,7 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Icon, ItemKind, Material, PlaceId, Point, Presence, Px, SidebarItem,
+    Anim, Appearance, Ds, Icon, ItemKind, Material, PlaceId, Point, Presence, Px, RowState,
+    SidebarItem,
 };
 use ds::{DropState, PulseKey, Selection};
 use ds_native::{Harness, Viewport};
@@ -34,17 +35,16 @@ fn Page() -> Element {
             div { class: "side", style: "width:200px; padding:20px",
                 for (id , label , icon) in PLACES {
                     SidebarItem {
+                        state: RowState { selection: Selection::Unselected, drop: if over() == Some(id) { DropState::Target } else { DropState::Idle }, ..RowState::default() },
                         key: "{id}",
                         kind: ItemKind::Place { icon },
                         label,
-                        here: Selection::Unselected,
                         count: None,
                         presence: Presence::Present,
                         preview: None,
                         pulse: PulseKey::rest(Anim::Gulp),
                         onclick: |_| {},
                         onclose: None,
-                        drop: if over() == Some(id) { DropState::Target } else { DropState::Idle },
                         place: PlaceId(id.to_string()),
                         onpointerenter: move |_| {
                             over.set(Some(id));

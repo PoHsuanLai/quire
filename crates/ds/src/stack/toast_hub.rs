@@ -156,11 +156,12 @@ pub fn use_toast_hub() -> ToastHub {
 #[cfg(test)]
 mod tests {
     use super::{ToastHub, UndoToken, use_toast_hub_provider};
+    use crate::core::vocab::InputModality;
     use crate::style::appearance::{
         accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
     };
     use crate::style::appearance::{blur::BlurState, material::Material};
-    use crate::style::scope::{InputModality, Scope};
+    use crate::style::scope::Scope;
     use dioxus::prelude::*;
     use std::cell::RefCell;
     use std::rc::Rc;

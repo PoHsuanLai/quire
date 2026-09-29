@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Check, ItemKind, PersonHue, Presence,
-    PulseKey, Selection, SidebarItem, TodayTrailing,
+    PulseKey, RowState, Selection, SidebarItem, TodayTrailing,
 };
 
 /// A draft waiting for Monday morning, cancelled with its trailing button.
@@ -20,9 +20,9 @@ pub fn Scheduled() -> Element {
     rsx! {
         if shown() == Check::On {
             SidebarItem {
+                state: RowState { selection: Selection::Unselected, ..RowState::default() },
                 kind: ItemKind::Today { avatar },
                 label: "Q3 notes",
-                here: Selection::Unselected,
                 count: None,
                 presence: Presence::Present,
                 preview: None,

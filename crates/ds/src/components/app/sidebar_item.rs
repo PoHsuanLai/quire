@@ -4,7 +4,7 @@
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
-use crate::core::vocab::{DropState, Selection};
+use crate::core::vocab::{RowState, Selection};
 use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::presence::Presence;
@@ -89,8 +89,8 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// out (`Presence::Leaving(Exit::TabOut)` plays `tab-out`; the consumer drops it at
 /// `settle(Anim::TabOut)`, which is what `RosterState::leave` returns for that exit); the other
 /// kinds do not move.
-/// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something. `drop` is
-/// the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
+/// `pulse` is a `use_pulse(Anim::Gulp)` key, fired when the place receives something. `state` is the
+/// item's [`RowState`]: it reads `selection` (`aria-current`) and `drop`, the item's part in a drag: `Target` while a dragged thread is over a place that accepts it,
 /// `Source` while the item itself is dragged. A Today item's close button is named "Close
 /// {label}", so each row's close says whose it is; `trailing` puts a scheduled row's time and
 /// its cancel button after the label (Today only; other kinds ignore it).
@@ -98,21 +98,20 @@ fn pulse_attrs(pulse: PulseKey) -> (String, Option<&'static str>) {
 /// A drag over the sidebar (design/06 section 6.1) needs each place to say which
 /// it is and to hear the pointer: `place` is written as `data-place`, and `onpointerenter`,
 /// `onpointerleave`, `onpointermove` and `onpointerup` hand the item's pointer events to the
-/// caller, who sets `drop: DropState::Target` on the place under a dragged thread (lit with
+/// caller, who sets `state.drop` to `DropState::Target` on the place under a dragged thread (lit with
 /// `--accent-soft` and grown to 1.045) and applies the drop on the release. The listeners are
 /// always attached and call nothing without a handler, so a server render's markup is unchanged.
 #[component]
 pub fn SidebarItem(
     kind: ItemKind,
     label: String,
-    here: Selection,
+    #[props(default)] state: RowState,
     count: Option<u32>,
     presence: Presence,
     preview: Option<Preview>,
     pulse: PulseKey,
     onclick: EventHandler<()>,
     onclose: Option<EventHandler<()>>,
-    #[props(default)] drop: DropState,
     #[props(default)] trailing: Option<TodayTrailing>,
     #[props(default)] place: Option<PlaceId>,
     #[props(default)] onpointerenter: Option<EventHandler<PointerEvent>>,
@@ -120,6 +119,11 @@ pub fn SidebarItem(
     #[props(default)] onpointermove: Option<EventHandler<PointerEvent>>,
     #[props(default)] onpointerup: Option<EventHandler<PointerEvent>>,
 ) -> Element {
+    let RowState {
+        selection: here,
+        drop,
+        ..
+    } = state;
     let (class, alias) = pulse_attrs(pulse);
     let place = place.map(|PlaceId(name)| name);
     let slug = kind.slug();

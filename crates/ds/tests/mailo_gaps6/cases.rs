@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 use ds::{
     Button, ButtonVariant, DataAttr, DataName, DropState, ExtraClass, Icon, IconButton,
-    IconButtonVariant, PlaceId, Propagation, Selection, Shown, TreeItem, TreeShape,
+    IconButtonVariant, PlaceId, Propagation, RowState, Selection, Shown, TreeItem, TreeShape,
 };
 
 /// One state and its golden.
@@ -39,13 +39,13 @@ fn more(name: &str) -> Element {
 fn projects(open: Shown, drop: DropState) -> Element {
     rsx! {
         TreeItem {
+            state: RowState { drop, ..RowState::default() },
             label: "Projects",
             open,
             on_toggle: |_| {},
             glyph: Icon::Folder,
             count: 3,
             trailing: more("Projects"),
-            drop,
             place: PlaceId("INBOX/Projects".to_string()),
             onselect: |_| {},
             TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, place: PlaceId("INBOX/Projects/Quire".to_string()) }
@@ -100,6 +100,6 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/tree_item/leaf-current.html",
-        make: || rsx! { TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, here: Selection::Selected, count: 0, trailing: more("Receipts") } },
+        make: || rsx! { TreeItem { state: RowState { selection: Selection::Selected, ..RowState::default() }, label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, count: 0, trailing: more("Receipts") } },
     },
 ];

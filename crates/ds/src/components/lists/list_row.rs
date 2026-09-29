@@ -5,7 +5,7 @@ use crate::components::lists::row_click::snapshot;
 use crate::components::lists::row_hooks::{PartHooks, relay, use_back};
 use crate::components::lists::row_star::star_button;
 use crate::core::text::clip::clip_chars;
-use crate::core::vocab::{Check, DropState, Emphasis, Selection, StaggerIndex};
+use crate::core::vocab::{Availability, Check, Emphasis, RowState, StaggerIndex};
 use crate::core::word::Word;
 use crate::motion::presence::Presence;
 use crate::motion::pulse_key::PulseKey;
@@ -83,8 +83,9 @@ fn exit(presence: Presence) -> Option<&'static str> {
 /// (an unread fold is the heavy one, as the roster settles it); a healing row (`heal`, present
 /// meanwhile) slides up from `dy`, delayed by `d` heal steps. `star_pulse` is a `use_pulse(Anim::StarPop)` key, fired on
 /// every toggle. `onclick` receives the pointer's data, so the consumer can read Shift to peek.
-/// `drop` is the row's part in a drag: `Source` while it is the thread being dragged (dimmed),
-/// `Target` while something dragged over it would land on it.
+/// `state` is the row's [`RowState`]: whether it is selected, unread, working or disabled, and
+/// its part in a drag (`drop`: `Source` while it is the thread being dragged (dimmed), `Target`
+/// while something dragged over it would land on it).
 ///
 /// `subject` and `snippet` are [`Text`]: a string as before, or the runs a search hit marked.
 /// `on_sender` and `on_time` hear the pointer entering and leaving the name and the time (their
@@ -96,8 +97,7 @@ fn exit(presence: Presence) -> Option<&'static str> {
 /// Re: UIDL stability"); absent, the row is named by its contents as before.
 #[component]
 pub fn ListRow(
-    selection: Selection,
-    emphasis: Emphasis,
+    #[props(default)] state: RowState,
     index: StaggerIndex,
     presence: Presence,
     #[props(default)] heal: Option<Heal>,
@@ -111,7 +111,6 @@ pub fn ListRow(
     star_pulse: PulseKey,
     strip: Option<Element>,
     onclick: EventHandler<MouseData>,
-    #[props(default)] drop: DropState,
     #[props(default)] on_sender: Option<PartHooks>,
     #[props(default)] on_time: Option<PartHooks>,
     #[props(default)] onpointerenter: Option<EventHandler<PointerEvent>>,
@@ -121,19 +120,32 @@ pub fn ListRow(
     #[props(default)] aria_label: Option<String>,
 ) -> Element {
     let back = use_back(onpointerback);
+    let RowState {
+        selection,
+        emphasis,
+        availability,
+        drop,
+    } = state;
+    let live = availability == Availability::Enabled;
     rsx! {
         li {
             class: "ds-row",
             role: "option",
             "aria-selected": selection.aria(),
             "aria-label": aria_label,
+            "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             "data-emphasis": emphasis_slug(emphasis),
             "data-presence": presence_slug(presence, heal),
             "data-exit": exit(presence),
             "data-drop": drop.drop_attr(),
             "data-drag": drop.drag_attr(),
             style: row_style(index, heal),
-            onclick: move |event| onclick.call(snapshot(&event.data())),
+            onclick: move |event| {
+                if live {
+                    onclick.call(snapshot(&event.data()));
+                }
+            },
             onpointerenter: back.enter(onpointerenter),
             onpointerleave: back.leave(onpointerleave),
             onpointerdown: relay(onpointerdown),
