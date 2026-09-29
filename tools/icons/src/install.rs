@@ -1,5 +1,5 @@
-//! `icons install`: copy the shipped app-icon set to where `ds_settings::apps_dir` looks
-//! (sill FINDINGS Q71): by default from this repository's `assets/icons/apps` to
+//! `icons install`: copy the shipped app-icon set to where `ds_settings::apps_dir` looks:
+//! by default from this repository's `assets/icons/apps` to
 //! `$XDG_DATA_HOME/quire/icons/apps`, the lookup's second step, so an installed shell finds the
 //! icons without a checkout beside it.
 

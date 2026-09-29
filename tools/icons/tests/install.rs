@@ -1,4 +1,4 @@
-//! `icons install` run as a user runs it (sill FINDINGS Q71): the repository's set lands under
+//! `icons install` run as a user runs it: the repository's set lands under
 //! `--to`, every app in every style and size, and `ds_settings`'s lookup finds a file there.
 
 use ds::icon::IconStyle;
