@@ -179,7 +179,8 @@ fn a_failed_join_shakes_once_per_stamp() {
 
 #[test]
 fn the_radio_off_draws_the_slash_on_and_back_off() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness =
+        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Off);
     settle_until(&mut harness, |h| slash_offset(h).is_some_and(|o| o > 0.0));
     settle_until(&mut harness, |h| slash_offset(h) == Some(0.0));
