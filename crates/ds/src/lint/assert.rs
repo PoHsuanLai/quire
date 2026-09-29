@@ -3,14 +3,13 @@
 use std::collections::BTreeMap;
 
 use super::Offence;
-use super::rule::{Exception, LintConfig, Rule, Stale};
+use super::rule::{Exception, LintConfig, Rule};
 use super::severity;
 use super::stylesheet::every_offence;
 
 /// Panic, listing every offence with its line and column, unless `css` is clean once
 /// `config.exceptions` are applied and every exception suppressed at least one offence. An
-/// exception that suppressed nothing is stale, and a stale exception is a failure unless
-/// `config.stale` is [`Stale::Report`], which prints it and passes. Either way it prints what
+/// exception that suppressed nothing is stale, and a stale exception is a failure. It prints what
 /// each exception suppressed (to stderr on success, in the panic otherwise).
 ///
 /// Warnings ([`super::Severity::Warning`]) never fail it: they are printed to stderr, and an
@@ -21,12 +20,10 @@ pub fn assert_clean(css: &str, config: &LintConfig) {
     let stale = stale(config, &suppressed);
     let counts = suppressed_counts(config, &suppressed);
     eprint!("{}", warning_text(&warnings));
-    match (offences.is_empty(), stale.is_empty(), config.stale) {
-        (true, true, _) | (true, false, Stale::Report) => {
-            eprint!("{counts}{}", stale_text(&stale));
-        }
-        (true, false, Stale::Fail) => panic!("{}{counts}", stale_text(&stale)),
-        (false, _, _) => panic!("{}{counts}{}", offence_text(&offences), stale_text(&stale)),
+    match (offences.is_empty(), stale.is_empty()) {
+        (true, true) => eprint!("{counts}"),
+        (true, false) => panic!("{}{counts}", stale_text(&stale)),
+        (false, _) => panic!("{}{counts}{}", offence_text(&offences), stale_text(&stale)),
     }
 }
 
