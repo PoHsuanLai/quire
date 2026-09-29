@@ -46,13 +46,13 @@ use crate::components::overlays::toast::ToastHost;
 use crate::core::geometry::scale::Scale;
 use crate::focus::click::ClickRoot;
 use crate::motion::hover_intent::HoverWarmth;
-use crate::overlay::host::{OverlayHost, use_overlays_provider};
-use crate::overlay::hover_hub::use_hover_hub_provider;
-use crate::overlay::stack::LayerStack;
-use crate::overlay::toast_hub::use_toast_hub_provider;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
 use crate::root::typeface::{use_typeface, use_typeface_provider};
+use crate::stack::host::{OverlayHost, use_overlays_provider};
+use crate::stack::hover_hub::use_hover_hub_provider;
+use crate::stack::layer_stack::LayerStack;
+use crate::stack::toast_hub::use_toast_hub_provider;
 use crate::style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };

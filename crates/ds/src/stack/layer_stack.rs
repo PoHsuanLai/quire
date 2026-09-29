@@ -1,7 +1,17 @@
 //! Which floating layer Escape and an outside click close: the topmost only
 //! (design/04-COMPONENTS.md section 21, design/06-INTERACTIONS.md sections 5 and 18).
 
-use crate::components::overlays::popover::Dismiss;
+/// What closes a floating layer.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Dismiss {
+    /// Escape, or a click outside.
+    #[default]
+    EscAndOutside,
+    /// Escape only.
+    EscOnly,
+    /// Only its owner.
+    None,
+}
 
 /// One open layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

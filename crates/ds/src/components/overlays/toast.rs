@@ -11,8 +11,8 @@
 
 use crate::core::geometry::units::Px;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::overlay::pull_tab::{Pull, PullPhase, PullTab};
-use crate::overlay::toast_hub::{ToastHub, ToastState, use_toast_hub};
+use crate::stack::pull_tab::{Pull, PullPhase, PullTab};
+use crate::stack::toast_hub::{ToastHub, ToastState, use_toast_hub};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use crate::style::scope::use_scope_signal;

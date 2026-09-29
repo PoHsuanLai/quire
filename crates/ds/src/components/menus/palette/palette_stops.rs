@@ -9,8 +9,8 @@
 //! a grid they move a row in two dimensions and leave it past its top and bottom rows; Left and
 //! Right move only inside a grid (elsewhere they are the field's).
 
-use crate::components::content::emoji_grid::EmojiCells;
-use crate::components::content::emoji_grid_nav::{GridEdge, GridMove, GridStep, grid_step};
+use crate::components::lists::emoji_grid::grid::EmojiCells;
+use crate::components::lists::emoji_grid::nav::{GridEdge, GridMove, GridStep, grid_step};
 use crate::components::menus::menu_lines::{
     Act, Choice, Line, Nav, Step, choices, choices_len, moved_live,
 };

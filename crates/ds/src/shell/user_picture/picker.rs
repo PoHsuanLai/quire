@@ -8,8 +8,8 @@
 
 use super::choice::PictureChoice;
 use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
-use crate::components::content::emoji_grid::grid_style;
-use crate::components::content::emoji_grid_nav::{GridMove, GridStep, grid_step};
+use crate::components::lists::emoji_grid::grid::grid_style;
+use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
 use crate::core::geometry::units::Px;
 use crate::shell::emoji::{AnimatedEmoji, disc::EmojiPlayback, id::EmojiId};
 use crate::shell::user_picture::mood::PictureSize;

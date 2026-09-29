@@ -11,12 +11,12 @@
 //! springs only on contact, an in-place change cross-fades the media, and a load past its grace
 //! shows the pending look in the media box.
 
-use crate::components::content::preview_content::{PaneContent, caption, media};
-use crate::components::content::preview_cue::{
-    PaneCue, pane_pending_spec, pending_look, touch_slug, use_entrance_touch,
-};
 use crate::components::controls::bump_on::bump_attrs;
 use crate::components::controls::chord::Chord;
+use crate::components::lists::preview::content::{PaneContent, caption, media};
+use crate::components::lists::preview::cue::{
+    PaneCue, pane_pending_spec, pending_look, touch_slug, use_entrance_touch,
+};
 use crate::components::overlays::shown_phase::use_shown_phase;
 use crate::components::overlays::tooltip::Shown;
 use crate::core::vocab::Shortcut;

@@ -32,6 +32,7 @@ use crate::components::menus::palette::palette_shown::{
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
+use crate::stack::layer_stack::Dismiss;
 
 use crate::components::fields::search_field::SearchField;
 use crate::components::fields::text_input_focus::FieldFocus;
@@ -40,7 +41,7 @@ use crate::components::menus::palette::{
     palette_host::{CommandPaletteHost, PaletteEntrance},
     palette_motion::PaletteHandle,
 };
-use crate::components::overlays::popover::{Dismiss, Float, Stacking, use_float};
+use crate::components::overlays::popover::{Float, Stacking, use_float};
 use crate::components::overlays::tooltip::Shown;
 use crate::core::geometry::units::{Px, Rect};
 use crate::core::vocab::Availability;

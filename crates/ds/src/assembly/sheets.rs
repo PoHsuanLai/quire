@@ -15,7 +15,7 @@ pub(crate) const SHEETS: [(&str, &str); 86] = [
     ),
     (
         "appearance_picker",
-        include_str!("../components/controls/appearance_picker.css"),
+        include_str!("../components/lists/appearance_picker.css"),
     ),
     (
         "app_switcher",
@@ -54,12 +54,12 @@ pub(crate) const SHEETS: [(&str, &str); 86] = [
     ),
     (
         "edit_surface",
-        include_str!("../components/fields/edit_surface.css"),
+        include_str!("../components/editor/surface.css"),
     ),
     ("emoji", include_str!("../shell/emoji.css")),
     (
         "emoji_grid",
-        include_str!("../components/content/emoji_grid.css"),
+        include_str!("../components/lists/emoji_grid/grid.css"),
     ),
     (
         "group_header",
@@ -119,7 +119,7 @@ pub(crate) const SHEETS: [(&str, &str); 86] = [
     ("month_grid", include_str!("../shell/month_grid.css")),
     (
         "pane_switcher",
-        include_str!("../components/content/pane_switcher.css"),
+        include_str!("../components/lists/preview/switcher.css"),
     ),
     ("panel", include_str!("../components/overlays/panel.css")),
     ("peek", include_str!("../components/app/peek.css")),
@@ -138,7 +138,7 @@ pub(crate) const SHEETS: [(&str, &str); 86] = [
     ),
     (
         "preview_pane",
-        include_str!("../components/content/preview_pane.css"),
+        include_str!("../components/lists/preview/pane.css"),
     ),
     (
         "provider_mark",

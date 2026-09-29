@@ -6,19 +6,17 @@
 //! selection: the app does, from its [`EditHandle`]'s rects.
 
 use crate::components::controls::pass_through::{DataAttr, ExtraClass, attributes, class_list};
-use crate::components::fields::edit_surface_ctx::SurfaceCtx;
-use crate::components::fields::edit_surface_focus::{
+use crate::components::editor::ctx::SurfaceCtx;
+use crate::components::editor::focus::{
     blur_surface, focus_surface, focused_in, focused_out, listen_soon,
 };
-use crate::components::fields::edit_surface_keys::key_down;
-use crate::components::fields::edit_surface_pointer::{
-    captured, moved, point_of_mouse, press, released,
-};
-use crate::components::fields::edit_surface_spell::{SpellCtx, respell, touch};
-use crate::components::fields::edit_surface_spell_menu::{
+use crate::components::editor::keys::key_down;
+use crate::components::editor::pointer::{captured, moved, point_of_mouse, press, released};
+use crate::components::editor::spell::{SpellCtx, respell, touch};
+use crate::components::editor::spell_menu::{
     Asked, Opened, SpellLayer, SpellLink, at_caret, at_pointer,
 };
-use crate::components::fields::edit_surface_state::{SurfaceState, write_soon};
+use crate::components::editor::state::{SurfaceState, write_soon};
 use crate::core::geometry::units::Rect;
 use crate::edit::composition::on_ime;
 use crate::edit::handle::{EditHandle, SurfaceHooks};

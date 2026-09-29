@@ -2,8 +2,8 @@
 //! the waves cross-fade by thirds over `--t-quick` as the level moves, and muting fades the
 //! waves out as the slash comes in. A held volume key moves nothing else (R12): no count, no bump.
 
-use crate::components::controls::level::glyph::{LevelGlyphView, waves};
-use crate::components::controls::level::vocab::{LevelGlyph, Muting};
+use crate::components::content::level_glyph::glyph::{LevelGlyphView, waves};
+use crate::components::content::level_glyph::vocab::{LevelGlyph, Muting};
 use crate::core::vocab::Fraction;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
 use crate::style::icon::render::IconSize;

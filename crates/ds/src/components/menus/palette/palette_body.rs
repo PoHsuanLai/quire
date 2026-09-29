@@ -2,7 +2,7 @@
 //! action, then its rows as menu rows or its emoji grid, every row, cell and action reporting by
 //! its stop number (`palette_stops`). Split from `command_palette`.
 
-use crate::components::content::emoji_grid::{CellEvents, draw_cells, grid_style};
+use crate::components::lists::emoji_grid::grid::{CellEvents, draw_cells, grid_style};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
 use crate::components::menus::menu_kind::MenuKind;
 use crate::components::menus::menu_lines::choices_len;

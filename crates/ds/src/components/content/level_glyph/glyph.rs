@@ -209,7 +209,7 @@ fn shape_child(shape: &Shape) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{Part, Showing, showing, waves};
-    use crate::components::controls::level::vocab::{LevelGlyph, Muting};
+    use crate::components::content::level_glyph::vocab::{LevelGlyph, Muting};
     use crate::core::vocab::Fraction;
 
     #[test]

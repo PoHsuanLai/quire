@@ -24,7 +24,7 @@ use crate::host::measure::client_rect;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::motion::hover_intent::HoverEvent;
-use crate::overlay::hover_hub::{HoverKey, HoverKind, use_hover_hub};
+use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use crate::style::tokens::layer::ZLayer;
 use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
@@ -203,7 +203,7 @@ mod tests {
         placement::place,
         units::{Point, Px, Rect, Size},
     };
-    use crate::overlay::hover_hub::HoverKind;
+    use crate::stack::hover_hub::HoverKind;
 
     fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
         Rect {

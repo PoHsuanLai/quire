@@ -4,7 +4,7 @@
 //! Spelling" (this session) and "Learn Spelling" (the user's dictionary). A suggestion reaches
 //! the app as one [`SpellReplace`], which it applies as one undoable edit.
 
-use crate::components::fields::edit_surface_spell::{SpellCtx, draw, touch};
+use crate::components::editor::spell::{SpellCtx, draw, touch};
 use crate::components::menus::menu_entry::{MenuEntry, MenuRow};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
 use crate::core::geometry::units::{Point, Rect};

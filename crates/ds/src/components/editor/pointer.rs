@@ -4,9 +4,9 @@
 //! the surface's box (FINDINGS "Edit surface"). With no host (or before the capture lands) the
 //! surface's own `pointermove` and `pointerup` serve instead.
 
-use crate::components::fields::edit_surface_ctx::SurfaceCtx;
-use crate::components::fields::edit_surface_focus::focus_surface;
-use crate::components::fields::edit_surface_state::{Capture, Pressing};
+use crate::components::editor::ctx::SurfaceCtx;
+use crate::components::editor::focus::focus_surface;
+use crate::components::editor::state::{Capture, Pressing};
 use crate::core::geometry::units::{Point, Px};
 use crate::edit::clicks::Clicks;
 use crate::edit::host::Probe;
