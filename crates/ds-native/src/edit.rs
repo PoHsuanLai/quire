@@ -7,6 +7,7 @@
 //! [`provide`] at the top of its root component, beside `ds_native::focus::provide`, and hands
 //! its IME events to the surface itself (it has no `launch` window to hear them in).
 
+use crate::clipboard::Clipboard;
 use crate::edit_geometry::{caret, selection};
 use crate::edit_hit::hit;
 use crate::edit_ime::EditListeners;
@@ -19,6 +20,7 @@ use ds::{
     CapturedPointer, HostEdit, ImeEvent, ImeListener, ImeSwitch, Pasted, Point, Probe, Rect,
     TextPosition, TextRange,
 };
+use std::rc::Rc;
 
 /// The Blitz edit seam, as the `ds::HostEdit` a root provides as context.
 pub const EDIT: HostEdit = HostEdit {
@@ -98,7 +100,7 @@ fn set_ime_cursor_area(element: &MountedData, area: Rect) -> Probe<()> {
 }
 
 fn read_clipboard_html() -> Option<Pasted> {
-    crate::clipboard::read_pasted()
+    try_consume_context::<Rc<dyn Clipboard>>().and_then(|clipboard| clipboard.read_html())
 }
 
 fn listen(element: &MountedData, sink: EventHandler<ImeEvent>) -> Probe<ImeListener> {
