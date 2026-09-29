@@ -1,10 +1,5 @@
-//! A bounded pending loop as data (design/26-DETAILS.md section 3.2, R4): which frame an
-//! operation that has run for a given time shows, and when the next one is due.
-
-use super::operation::Deadline;
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::tokens::{delay::DelayToken, timing::DurationToken};
-use std::time::Duration;
+//! A bounded pending loop's look as data (design/26-DETAILS.md section 3.2, R4): how it moves and
+//! what it draws in a frame. The frame at a time is [`crate::motion::timeline::pending::Pending`].
 
 /// How a pending loop moves.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -94,101 +89,9 @@ impl PendingFrame {
     }
 }
 
-/// The frame an operation `elapsed` into its run shows at `level`, stopping at `deadline`.
-pub(crate) fn frame_at(elapsed: Duration, deadline: Deadline, level: MotionLevel) -> PendingFrame {
-    let grace = DelayToken::PendingGrace.delay();
-    if elapsed < grace {
-        return PendingFrame::Idle;
-    }
-    if level == MotionLevel::Reduced || elapsed >= deadline.length() {
-        return PendingFrame::Stalled;
-    }
-    let step = DurationToken::PendingStep
-        .duration(level)
-        .as_millis()
-        .max(1);
-    let n = (elapsed - grace).as_millis() / step;
-    PendingFrame::Step(u8::try_from(n).unwrap_or(u8::MAX))
-}
-
-/// How long until the frame after the one at `elapsed` is due, or `None` once the loop holds
-/// still for good.
-pub(crate) fn next_due(
-    elapsed: Duration,
-    deadline: Deadline,
-    level: MotionLevel,
-) -> Option<Duration> {
-    let grace = DelayToken::PendingGrace.delay();
-    if elapsed < grace {
-        return Some(grace - elapsed);
-    }
-    if level == MotionLevel::Reduced || elapsed >= deadline.length() {
-        return None;
-    }
-    let step = DurationToken::PendingStep.duration(level);
-    let into = Duration::from_millis(
-        u64::try_from((elapsed - grace).as_millis() % step.as_millis().max(1)).unwrap_or(0),
-    );
-    Some((step - into).min(deadline.length() - elapsed))
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{Lit, PendingFrame, PendingLayers, PendingSpec, PendingStyle, frame_at, next_due};
-    use crate::motion::detail::operation::Deadline;
-    use crate::style::appearance::motion::MotionLevel;
-    use std::time::Duration;
-
-    const MS: fn(u64) -> Duration = Duration::from_millis;
-
-    #[test]
-    fn a_loop_waits_for_its_grace_steps_and_holds_at_its_deadline() {
-        let cap = Deadline::cap();
-        const CASES: &[(u64, MotionLevel, PendingFrame)] = &[
-            (0, MotionLevel::Standard, PendingFrame::Idle),
-            (399, MotionLevel::Standard, PendingFrame::Idle),
-            (400, MotionLevel::Standard, PendingFrame::Step(0)),
-            (699, MotionLevel::Standard, PendingFrame::Step(0)),
-            (700, MotionLevel::Standard, PendingFrame::Step(1)),
-            (9_999, MotionLevel::Standard, PendingFrame::Step(31)),
-            (10_000, MotionLevel::Standard, PendingFrame::Stalled),
-            (60_000, MotionLevel::Standard, PendingFrame::Stalled),
-            (760, MotionLevel::Calm, PendingFrame::Step(1)),
-            (399, MotionLevel::Reduced, PendingFrame::Idle),
-            (400, MotionLevel::Reduced, PendingFrame::Stalled),
-        ];
-        for &(ms, level, want) in CASES {
-            assert_eq!(frame_at(MS(ms), cap, level), want, "{ms} ms {level:?}");
-        }
-        assert_eq!(
-            frame_at(
-                MS(2_000),
-                Deadline::within(MS(1_500)),
-                MotionLevel::Standard
-            ),
-            PendingFrame::Stalled
-        );
-    }
-
-    #[test]
-    fn the_next_frame_is_due_at_the_next_step_and_never_after_the_deadline() {
-        let cap = Deadline::cap();
-        const CASES: &[(u64, MotionLevel, Option<u64>)] = &[
-            (0, MotionLevel::Standard, Some(400)),
-            (400, MotionLevel::Standard, Some(300)),
-            (550, MotionLevel::Standard, Some(150)),
-            (9_900, MotionLevel::Standard, Some(100)),
-            (10_000, MotionLevel::Standard, None),
-            (400, MotionLevel::Reduced, None),
-        ];
-        for &(ms, level, want) in CASES {
-            assert_eq!(
-                next_due(MS(ms), cap, level),
-                want.map(MS),
-                "{ms} ms {level:?}"
-            );
-        }
-    }
+    use super::{Lit, PendingFrame, PendingLayers, PendingSpec, PendingStyle};
 
     #[test]
     fn each_style_lights_its_own_layers() {

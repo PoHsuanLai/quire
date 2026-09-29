@@ -1,15 +1,18 @@
 //! Rust-driven animation as data. What the stylesheet cannot reach (an SVG arc, a count, a
 //! spring's position, a pending loop's step) is a [`Timeline`]: a value that says how long it
 //! runs and what a frame `elapsed` into it draws, as pure arithmetic a table pins. One driver,
-//! [`playback::Playback`], owns the
+//! [`playback::Playback`] (and [`use_timeline::use_timeline`], which follows a timeline its
+//! caller recomputes), owns the
 //! frame clock: it asks for a frame every `FRAME_TICK` while a timeline runs and never at rest
 //! (design/26 R3).
 
 pub(crate) mod ease;
 pub(crate) mod glide;
+pub(crate) mod pending;
 pub(crate) mod playback;
 pub(crate) mod spring;
 pub(crate) mod sweep;
+pub(crate) mod use_timeline;
 
 use std::time::Duration;
 
