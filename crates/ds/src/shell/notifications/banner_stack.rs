@@ -117,6 +117,7 @@ pub fn BannerStack(
                     key: "{entry.key.0}",
                     banner: entry.key,
                     presence: entry.presence,
+                    heal: entry.heal,
                     position,
                     pitches,
                     card: cards.of(entry.key),

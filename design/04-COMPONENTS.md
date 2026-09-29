@@ -1391,7 +1391,8 @@ The hover-card hooks (`data-hc` on row, name, time) become `HoverTarget` wrapper
 ```rust
 #[component] pub fn ListRow(
     selection: Selection, emphasis: Emphasis, index: StaggerIndex,
-    presence: Presence,                        // from use_roster: Entering | Present | Leaving(Exit) | Healing{dy, d}
+    presence: Presence,                        // from use_roster: Entering | Present | Leaving(Exit)
+    #[props(default)] heal: Option<Heal>,      // from use_roster: a present row sliding into a gap
     name: String, via: Option<Element>, subject: String, snippet: Option<String>,
     time: String, tags: Element,               // chips + clip
     star: Option<(Switch, EventHandler<Switch>)>, star_pulse: PulseKey,
@@ -4293,7 +4294,7 @@ and `--d` while healing.
 ```rust
 pub struct LeavingItem<K> { pub key: K, pub row: Element }
 #[component] pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(label: String,
-    items: Vec<LeavingItem<K>>, exit: Exit /* Fold */, first: ListPresence /* Present */,
+    items: Vec<LeavingItem<K>>, exit: Exit /* Fold */, first: Presence /* Present */,
     on_settled: Option<EventHandler<K>>) -> Element
 ```
 

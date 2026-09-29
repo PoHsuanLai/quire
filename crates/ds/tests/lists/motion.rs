@@ -10,7 +10,7 @@ const PITCH: RowPitch = RowPitch(Px(79.0));
 #[derive(Props, Clone, PartialEq)]
 struct Moment {
     state: RosterState<&'static str>,
-    list: ListPresence,
+    list: Presence,
 }
 
 /// A roster drawn the way a consumer draws one: a keyed `ListRow` per entry, in its presence.
@@ -18,7 +18,7 @@ fn drawn(moment: Moment) -> Element {
     rsx! {
         AnimatedList { label: "Threads", presence: moment.list,
             for entry in moment.state.entries().iter().cloned() {
-                Row { key: "{entry.key}", presence: entry.presence, emphasis: emphasis(entry.key), index: entry.index }
+                Row { key: "{entry.key}", presence: entry.presence, heal: entry.heal, emphasis: emphasis(entry.key), index: entry.index }
             }
         }
     }
@@ -33,7 +33,7 @@ fn emphasis(key: &str) -> Emphasis {
     }
 }
 
-fn render_moment(state: RosterState<&'static str>, list: ListPresence) -> String {
+fn render_moment(state: RosterState<&'static str>, list: Presence) -> String {
     let mut dom = VirtualDom::new_with_props(drawn, Moment { state, list });
     dom.rebuild_in_place();
     dioxus_ssr::render(&dom)
@@ -61,22 +61,22 @@ fn a_roster_renders_each_moment_of_an_exit() {
         (
             "entering",
             first,
-            ListPresence::Entering,
+            Presence::Entering,
             ["entering"; 4].to_vec(),
         ),
         (
             "leaving",
             leaving,
-            ListPresence::Present,
+            Presence::Present,
             vec!["present", "leaving", "present", "present"],
         ),
         (
             "healing",
             healing,
-            ListPresence::Present,
+            Presence::Present,
             vec!["present", "healing", "healing"],
         ),
-        ("healed", healed, ListPresence::Present, vec!["present"; 3]),
+        ("healed", healed, Presence::Present, vec!["present"; 3]),
     ];
     let mut failures = Vec::new();
     for (name, state, list, want) in moments {
@@ -144,7 +144,7 @@ fn a_healing_row_starts_one_pitch_down_by_heal_step() {
         RosterState::first_show(&KEYS, PITCH)
             .rest()
             .leave(&"a", Exit::Curl, Emphasis::Plain);
-    let html = render_moment(leaving.settled(&"a"), ListPresence::Present);
+    let html = render_moment(leaving.settled(&"a"), Presence::Present);
     for d in 0..3 {
         let want = format!("--dy:79px;--d:{d}");
         assert!(html.contains(&want), "no {want} in {html}");
@@ -157,10 +157,7 @@ fn entering_rows_stagger_up_to_the_cap() {
     let keys: Vec<&'static str> = (0..16)
         .map(|n| &*Box::leak(format!("k{n}").into_boxed_str()))
         .collect();
-    let html = render_moment(
-        RosterState::first_show(&keys, PITCH),
-        ListPresence::Entering,
-    );
+    let html = render_moment(RosterState::first_show(&keys, PITCH), Presence::Entering);
     let indices: Vec<u8> = html
         .split("style=\"--i:")
         .skip(1)

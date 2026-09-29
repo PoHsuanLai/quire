@@ -9,8 +9,8 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, Anim, AnimatedList, Appearance, Availability, Button, ButtonVariant, Count, Ds,
-    Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListPresence, ListRow,
-    Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, PulseKey, Px, RowPitch, Selection,
+    Emphasis, Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, ListRow, Material,
+    Menu, MenuEntry, MenuKind, MenuTrail, Point, Presence, PulseKey, Px, RowPitch, Selection,
     ShortcutKey, Switch, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
@@ -423,7 +423,7 @@ fn ListDemo() -> Element {
     let mut keys = use_signal(|| vec![1u32, 2, 3]);
     let roster = use_roster(keys(), RowPitch(Px(79.0)));
     rsx! {
-        AnimatedList { label: "Threads", presence: ListPresence::Present,
+        AnimatedList { label: "Threads", presence: Presence::Present,
             for entry in roster.entries() {
                 ListRow {
                     key: "{entry.key}",
@@ -431,6 +431,7 @@ fn ListDemo() -> Element {
                     emphasis: Emphasis::Plain,
                     index: entry.index,
                     presence: entry.presence,
+                    heal: entry.heal,
                     name: format!("Sender {}", entry.key),
                     via: None,
                     subject: format!("Subject {}", entry.key),

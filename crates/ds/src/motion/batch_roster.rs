@@ -10,7 +10,7 @@
 //! keeping one row of a batch must not cancel the others. So a batch remembers which keys it
 //! claimed, and a key that has left again since, in a later batch, is that batch's to drop.
 
-use super::presence::{Exit, ListPresence, Presence};
+use super::presence::{Exit, Presence};
 use super::roster::{RosterState, RowPitch};
 use super::roster_exits::Pitches;
 use super::settle::settle;
@@ -27,7 +27,7 @@ pub(crate) struct Departures<K: 'static> {
     /// The exit a batch plays, read on the render that starts it.
     pub(crate) exit: Exit,
     /// Whether the rows listed on the first render rise in (`Entering`) or are simply there.
-    pub(crate) first: ListPresence,
+    pub(crate) first: Presence,
     /// The heights the rows measured.
     pub(crate) pitches: Pitches<K>,
     /// Hears each dropped key once its batch has settled.
@@ -65,11 +65,11 @@ impl<K: Clone + PartialEq> Claims<K> {
 }
 
 /// A roster over `keys` whose missing keys leave in batches, and whether the list is still
-/// playing its first show (`ListPresence::Entering` until the keys first change).
+/// playing its first show (`Presence::Entering` until the keys first change).
 pub(crate) fn use_batch_roster<K: Clone + PartialEq + 'static>(
     keys: Vec<K>,
     departures: Departures<K>,
-) -> (Roster<K>, ListPresence) {
+) -> (Roster<K>, Presence) {
     let roster = use_roster_parts(&keys, RowPitch::default());
     let mut claims = use_hook(|| {
         CopyValue::new(Claims {
@@ -80,8 +80,8 @@ pub(crate) fn use_batch_roster<K: Clone + PartialEq + 'static>(
     let first = departures.first;
     let mut shown = use_hook(|| {
         match first {
-            ListPresence::Entering => roster.queue_rest(),
-            ListPresence::Present => {
+            Presence::Entering => roster.queue_rest(),
+            Presence::Hidden | Presence::Present | Presence::Leaving(_) => {
                 let _ = roster.update(RosterState::rest);
             }
         }
@@ -91,7 +91,7 @@ pub(crate) fn use_batch_roster<K: Clone + PartialEq + 'static>(
     if *seen.peek() == keys {
         return (roster, *shown.peek());
     }
-    shown.set(ListPresence::Present);
+    shown.set(Presence::Present);
     let before = seen.peek().clone();
     let gone: Vec<K> = before
         .iter()
@@ -123,7 +123,7 @@ pub(crate) fn use_batch_roster<K: Clone + PartialEq + 'static>(
     }
     roster.queue_rest();
     seen.set(keys);
-    (roster, ListPresence::Present)
+    (roster, Presence::Present)
 }
 
 /// What a batch's timer needs: which batch, the animations it waits for, and where the heights

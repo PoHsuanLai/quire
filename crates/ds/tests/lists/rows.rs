@@ -4,7 +4,7 @@
 use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, HoverStrip, Icon, ListPresence, ListRow,
+    ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow,
     MarkProvider, MarkSize, MarkStyle, Presence, ProviderMark, Px, StripAction,
 };
 use ds::{DropState, Emphasis, PulseKey, Selection, StaggerIndex, Switch};
@@ -103,15 +103,24 @@ fn row_in_drag(
 
 /// A read, unselected, unstarred row: what a roster draws per entry, keyed by the consumer.
 #[component]
-pub fn Row(presence: Presence, emphasis: Emphasis, index: StaggerIndex) -> Element {
-    row(
-        presence,
-        emphasis,
-        Selection::Unselected,
-        Switch::Off,
-        PulseKey::rest(Anim::StarPop),
-        usize::from(index.get()),
-    )
+pub fn Row(
+    presence: Presence,
+    heal: Option<Heal>,
+    emphasis: Emphasis,
+    index: StaggerIndex,
+) -> Element {
+    let index = usize::from(index.get());
+    match heal {
+        Some(heal) => healed_row(heal, emphasis, index),
+        None => row(
+            presence,
+            emphasis,
+            Selection::Unselected,
+            Switch::Off,
+            PulseKey::rest(Anim::StarPop),
+            index,
+        ),
+    }
 }
 
 fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
@@ -121,6 +130,44 @@ fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
         Selection::Unselected,
         Switch::Off,
         PulseKey::rest(Anim::StarPop),
+        3,
+    )
+}
+
+/// A read row sliding into a gap by `heal`.
+fn healed_row(heal: Heal, emphasis: Emphasis, index: usize) -> Element {
+    rsx! {
+        ListRow {
+            selection: Selection::Unselected,
+            emphasis,
+            index: StaggerIndex::new(index),
+            presence: Presence::Present,
+            heal: Some(heal),
+            name: "Dana Okafor",
+            via: rsx! {
+                ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
+                "gmail"
+            },
+            subject: "Re: UIDL stability across servers",
+            snippet: "Treat UIDL as stable only while UIDVALIDITY holds.".to_string(),
+            time: "09:41",
+            tags: rsx! { Chip { variant: ChipVariant::Accent, text: "spec" } },
+            star: (Switch::Off, EventHandler::new(|_| {})),
+            star_pulse: PulseKey::rest(Anim::StarPop),
+            strip: rsx! { HoverStrip { actions: strip_actions() } },
+            onclick: |_| {},
+        }
+    }
+}
+
+/// A row 79 px below its place, one heal step in.
+fn healing_row() -> Element {
+    healed_row(
+        Heal {
+            dy: Px(79.0),
+            d: StaggerIndex::new(1),
+        },
+        Emphasis::Plain,
         3,
     )
 }
@@ -255,15 +302,7 @@ pub const ROW_CASES: &[Case] = &[
     Case {
         component: "list_row",
         state: "healing",
-        make: || {
-            plain_row(
-                Presence::Healing {
-                    dy: Px(79.0),
-                    d: StaggerIndex::new(1),
-                },
-                Emphasis::Plain,
-            )
-        },
+        make: healing_row,
     },
     Case {
         component: "list_row",
@@ -319,11 +358,11 @@ pub const ROW_CASES: &[Case] = &[
     Case {
         component: "animated_list",
         state: "entering",
-        make: || rsx! { AnimatedList { label: "Threads", presence: ListPresence::Entering, {plain_row(Presence::Entering, Emphasis::Strong)} } },
+        make: || rsx! { AnimatedList { label: "Threads", presence: Presence::Entering, {plain_row(Presence::Entering, Emphasis::Strong)} } },
     },
     Case {
         component: "animated_list",
         state: "present",
-        make: || rsx! { AnimatedList { label: "Threads", presence: ListPresence::Present, {plain_row(Presence::Present, Emphasis::Plain)} } },
+        make: || rsx! { AnimatedList { label: "Threads", presence: Presence::Present, {plain_row(Presence::Present, Emphasis::Plain)} } },
     },
 ];

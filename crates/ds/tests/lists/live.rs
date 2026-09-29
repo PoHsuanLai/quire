@@ -6,7 +6,7 @@ use super::rows::Row;
 use dioxus::prelude::*;
 use ds::Emphasis;
 use ds::{
-    Accent, AnimatedList, BlurState, Exit, InputModality, ListPresence, Material, MotionLevel, Px,
+    Accent, AnimatedList, BlurState, Exit, InputModality, Material, MotionLevel, Presence, Px,
     Resolved, Roster, RowPitch, Scheme, Scope, use_roster,
 };
 use std::future::Future;
@@ -77,9 +77,9 @@ fn app() -> Element {
     let roster = use_roster(vec!["a", "b", "c"], RowPitch(Px(79.0)));
     use_context_provider(|| roster);
     rsx! {
-        AnimatedList { label: "Threads", presence: ListPresence::Present,
+        AnimatedList { label: "Threads", presence: Presence::Present,
             for entry in roster.entries() {
-                Row { key: "{entry.key}", presence: entry.presence, emphasis: Emphasis::Strong, index: entry.index }
+                Row { key: "{entry.key}", presence: entry.presence, heal: entry.heal, emphasis: Emphasis::Strong, index: entry.index }
             }
         }
     }

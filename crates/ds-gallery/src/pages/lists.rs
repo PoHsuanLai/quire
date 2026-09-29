@@ -9,10 +9,10 @@ use dioxus::prelude::*;
 use ds::{
     AccountFace, AccountTile, ActionId, Anim, AnimatedList, AppearancePicker, AvatarFace,
     AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Chip, ChipVariant, Colour,
-    DragGhost, DropLine, Emphasis, Exit, Here, Hex, HoverStrip, Icon, ItemKind, ListPresence,
-    ListRow, MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark,
-    Px, RowPitch, Selection, SidebarItem, StaggerIndex, StripAction, Switch, SystemPrefs,
-    TimerPhase, UndoToken, use_motion_timer, use_pulse, use_roster, use_toast_hub,
+    DragGhost, DropLine, Emphasis, Exit, Heal, Here, Hex, HoverStrip, Icon, ItemKind, ListRow,
+    MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
+    RowPitch, Selection, SidebarItem, StaggerIndex, StripAction, Switch, SystemPrefs, TimerPhase,
+    UndoToken, use_motion_timer, use_pulse, use_roster, use_toast_hub,
 };
 
 /// One sample thread: sender, subject, snippet, time.
@@ -123,8 +123,8 @@ fn LiveList() -> Element {
     let entrance = use_motion_timer(Anim::RowIn);
     use_hook(|| entrance.start(EventHandler::new(|()| {})));
     let list = match entrance.phase() {
-        TimerPhase::Settled => ListPresence::Present,
-        TimerPhase::Idle | TimerPhase::Running => ListPresence::Entering,
+        TimerPhase::Settled => Presence::Present,
+        TimerPhase::Idle | TimerPhase::Running => Presence::Entering,
     };
     let mut remove = move |exit: Exit, text: &str| {
         let target = selected().or_else(|| keys.peek().first().copied());
@@ -183,6 +183,7 @@ fn LiveList() -> Element {
                             key: "{entry.key.0}",
                             id: entry.key,
                             presence: entry.presence,
+                            heal: entry.heal,
                             index: entry.index,
                             selection: if selected() == Some(entry.key) { Selection::Selected } else { Selection::Unselected },
                             star: if starred().contains(&entry.key) { Switch::On } else { Switch::Off },
@@ -209,6 +210,7 @@ fn LiveList() -> Element {
 fn ThreadRow(
     id: ThreadId,
     presence: Presence,
+    heal: Option<Heal>,
     index: StaggerIndex,
     selection: Selection,
     star: Switch,
@@ -223,6 +225,7 @@ fn ThreadRow(
             emphasis: id.emphasis(),
             index,
             presence,
+            heal,
             name,
             via: rsx! {
                 ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }

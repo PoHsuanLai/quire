@@ -17,7 +17,7 @@ use crate::core::task::spawn_in;
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
-use crate::motion::roster::RowPitch;
+use crate::motion::roster::{Heal, RowPitch, presence_slug};
 use crate::motion::roster_exits::Pitches;
 use crate::shell::notifications::banner_stack::{BannerKey, BannerPosition};
 use crate::shell::notifications::swipe::{Carried, Flight};
@@ -30,6 +30,7 @@ use std::rc::Rc;
 pub(crate) fn BannerRow(
     banner: BannerKey,
     presence: Presence,
+    heal: Option<Heal>,
     position: BannerPosition,
     pitches: Pitches<BannerKey>,
     card: Element,
@@ -58,10 +59,10 @@ pub(crate) fn BannerRow(
         div {
             class: "ds-banner",
             "data-banner": "{banner.0}",
-            "data-presence": presence.slug(),
+            "data-presence": presence_slug(presence, heal),
             "data-exit": exit_slug(presence),
             "data-flight": flight().attr(),
-            style: heal_style(presence, position),
+            style: heal_style(heal, position),
             onmounted: move |event| {
                 element.set(Some(event.data()));
                 measure();
@@ -82,21 +83,20 @@ enum Seen {
 fn exit_slug(presence: Presence) -> Option<&'static str> {
     match presence {
         Presence::Leaving(exit) => Some(exit.slug()),
-        Presence::Entering | Presence::Present | Presence::Healing { .. } => None,
+        Presence::Hidden | Presence::Entering | Presence::Present => None,
     }
 }
 
 /// A healing row's distance and delay: `--dy` signed for the stack's direction, `--d` heal
 /// steps.
-fn heal_style(presence: Presence, position: BannerPosition) -> Option<String> {
-    match presence {
-        Presence::Healing { dy, d } => Some(format!(
+fn heal_style(heal: Option<Heal>, position: BannerPosition) -> Option<String> {
+    heal.map(|Heal { dy, d }| {
+        format!(
             "--dy:{}px;--d:{}",
             Px(dy.0 * position.heal_sign()).0,
             d.get()
-        )),
-        Presence::Entering | Presence::Present | Presence::Leaving(_) => None,
-    }
+        )
+    })
 }
 
 #[cfg(test)]
@@ -104,29 +104,33 @@ mod tests {
     use super::heal_style;
     use crate::core::geometry::units::Px;
     use crate::core::vocab::StaggerIndex;
-    use crate::motion::presence::Presence;
+    use crate::motion::roster::Heal;
     use crate::shell::notifications::banner_stack::BannerPosition;
 
     #[test]
     fn a_healing_row_moves_towards_the_gap() {
-        let healing = Presence::Healing {
+        let healing = Heal {
             dy: Px(96.0),
             d: StaggerIndex::new(1),
         };
         let cases = [
-            (healing, BannerPosition::TopRight, Some("--dy:96px;--d:1")),
             (
-                healing,
+                Some(healing),
+                BannerPosition::TopRight,
+                Some("--dy:96px;--d:1"),
+            ),
+            (
+                Some(healing),
                 BannerPosition::BottomRight,
                 Some("--dy:-96px;--d:1"),
             ),
-            (Presence::Present, BannerPosition::TopRight, None),
+            (None, BannerPosition::TopRight, None),
         ];
-        for (presence, position, want) in cases {
+        for (heal, position, want) in cases {
             assert_eq!(
-                heal_style(presence, position).as_deref(),
+                heal_style(heal, position).as_deref(),
                 want,
-                "{presence:?} {position:?}"
+                "{heal:?} {position:?}"
             );
         }
     }

@@ -13,7 +13,7 @@
 
 use crate::components::lists::leaving_row::LeavingRow;
 use crate::motion::batch_roster::{Departures, use_batch_roster};
-use crate::motion::presence::{Exit, ListPresence};
+use crate::motion::presence::{Exit, Presence};
 use crate::motion::roster_exits::use_pitches;
 use dioxus::prelude::*;
 use std::hash::Hash;
@@ -35,7 +35,7 @@ pub struct LeavingItem<K> {
 /// rows fold with the stagger, then the rows below heal by the group's summed height. `exit` is
 /// read on the render that starts a batch, so a consumer may pass another exit for another kind
 /// of departure. `first` says whether the rows listed on the first render rise in, staggered
-/// (`ListPresence::Entering`), or are simply there (`Present`, the default: a panel that slides
+/// (`Presence::Entering`), or are simply there (`Present`, the default: a panel that slides
 /// in carries its rows). A key listed again while it leaves stays where it is. `on_settled`
 /// hears each dropped key once its batch has settled. `label` names the list
 /// (`role=list`); each row is a `listitem`.
@@ -46,7 +46,7 @@ pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(
     label: String,
     items: Vec<LeavingItem<K>>,
     #[props(default = Exit::Fold)] exit: Exit,
-    #[props(default)] first: ListPresence,
+    #[props(default = Presence::Present)] first: Presence,
     #[props(default)] on_settled: Option<EventHandler<K>>,
 ) -> Element {
     let pitches = use_pitches();
@@ -71,7 +71,7 @@ pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(
             class: "ds-leaving-list",
             role: "list",
             "aria-label": "{label}",
-            "data-presence": presence_slug(presence),
+            "data-presence": presence.slug(),
             for entry in roster.entries() {
                 LeavingRow::<K> {
                     key: "{node_key(&entry.key)}",
@@ -81,14 +81,6 @@ pub fn LeavingList<K: Clone + PartialEq + Hash + 'static>(
                 }
             }
         }
-    }
-}
-
-/// The list's `data-presence` word: which entrance an entering row plays.
-fn presence_slug(presence: ListPresence) -> &'static str {
-    match presence {
-        ListPresence::Entering => "entering",
-        ListPresence::Present => "present",
     }
 }
 
