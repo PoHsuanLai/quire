@@ -10,8 +10,9 @@
 //! ground with a round hole at its centre, tiled, so every dot stays round at any width and
 //! shows the colour of its own place on the field.
 
-use super::png;
 use crate::appearance::theme::Scheme;
+use crate::core::base64;
+use crate::core::png::{self, Channels, Deflate, Raster};
 use crate::space::palette::{Dot, swatch};
 use crate::tokens::hex::Hex;
 use std::sync::LazyLock;
@@ -119,13 +120,29 @@ pub(super) fn plane(scheme: Scheme) -> Plane {
 }
 
 fn uris(scheme: Scheme) -> (String, String) {
-    let colours = png::rgb(COLUMNS, ROWS, &colours(scheme));
-    let dots = png::rgba(STEP, STEP, &tile(scheme));
+    let colours = png::encode(
+        Raster {
+            width: COLUMNS,
+            height: ROWS,
+            channels: Channels::Rgb,
+            bytes: colours(scheme).as_flattened(),
+        },
+        Deflate::Fixed,
+    );
+    let dots = png::encode(
+        Raster {
+            width: STEP,
+            height: STEP,
+            channels: Channels::Rgba,
+            bytes: tile(scheme).as_flattened(),
+        },
+        Deflate::Fixed,
+    );
     (uri(&colours), uri(&dots))
 }
 
 fn uri(png: &[u8]) -> String {
-    format!("data:image/png;base64,{}", png::base64(png))
+    format!("data:image/png;base64,{}", base64::encode(png))
 }
 
 #[cfg(test)]

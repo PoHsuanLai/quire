@@ -4,7 +4,6 @@
 //!
 //! `DS_BLESS=1 cargo test -p ds --test stylesheet` rewrites the golden file.
 
-use ds::css::GRAIN_PNG;
 use ds::stylesheet;
 use std::path::PathBuf;
 
@@ -166,58 +165,6 @@ fn the_cascade_is_in_the_documented_order() {
         components
             .first()
             .is_some_and(|first| *first > positions[6])
-    );
-}
-
-/// Standard base64 (RFC 4648 section 4) back to bytes.
-fn unbase64(text: &str) -> Vec<u8> {
-    const ALPHABET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let values: Vec<u32> = text
-        .bytes()
-        .filter(|byte| *byte != b'=')
-        .map(|byte| {
-            ALPHABET
-                .iter()
-                .position(|a| *a == byte)
-                .unwrap_or_else(|| panic!("{byte} is not base64")) as u32
-        })
-        .collect();
-    values
-        .chunks(4)
-        .flat_map(|chunk| {
-            let n = chunk
-                .iter()
-                .enumerate()
-                .fold(0u32, |n, (i, v)| n | v << (18 - 6 * i));
-            (0..chunk.len() - 1).map(move |i| (n >> (16 - 8 * i)) as u8)
-        })
-        .collect()
-}
-
-#[test]
-fn the_grain_is_the_prototypes_tile_as_alpha_noise() {
-    let data = GRAIN_PNG
-        .strip_prefix("data:image/png;base64,")
-        .unwrap_or_else(|| panic!("not a PNG data URI: {:.40}", GRAIN_PNG));
-    let png = unbase64(data);
-    assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
-    assert_eq!(&png[12..16], b"IHDR");
-    assert_eq!(&png[16..20], 128u32.to_be_bytes());
-    assert_eq!(&png[20..24], 128u32.to_be_bytes());
-    assert_eq!(&png[24..26], [8, 4], "8-bit grey with alpha");
-    // The first scanline, from the stored deflate block after the zlib header: filter 0, then
-    // the prototype's first draws. Seed 7: 7 x 16807 = 117649, floor(117649 / (2^31 - 1) x 255)
-    // = 0, a full black; the second draw, 117649 x 16807 mod (2^31 - 1) = 1977326743, is
-    // grey 234, white at alpha 2 x 234 - 255 = 213.
-    let idat = png
-        .windows(4)
-        .position(|w| w == b"IDAT")
-        .unwrap_or_else(|| panic!("no IDAT"));
-    let raw = &png[idat + 4 + 2 + 5..];
-    assert_eq!(&raw[..5], [0, 0, 255, 255, 213]);
-    assert!(
-        stylesheet().contains(GRAIN_PNG),
-        "the stylesheet does not paint the grain"
     );
 }
 

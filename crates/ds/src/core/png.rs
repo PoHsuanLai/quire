@@ -1,21 +1,31 @@
-//! A small PNG writer for the editor's field: 8-bit RGB or RGBA, one IDAT, compressed with
-//! fixed-Huffman DEFLATE (RFC 1951 section 3.2.6) inside zlib (RFC 1950). Both images are
-//! small, so a greedy matcher that only tries "one pixel back" and "one scanline back" is
+//! A small PNG writer: 8-bit grey with alpha, RGB or RGBA, one IDAT, inside zlib (RFC 1950).
+//! The DEFLATE body (RFC 1951) is either stored blocks, for noise that would not compress, or
+//! one fixed-Huffman block (section 3.2.6) from a greedy matcher that only tries "one pixel
+//! back" and "one scanline back": the images quire draws are small and regular, so that is
 //! enough, and needs no dependency.
 
-/// The PNG of `width` x `height` RGB `pixels`, rows top to bottom.
-pub(super) fn rgb(width: usize, height: usize, pixels: &[[u8; 3]]) -> Vec<u8> {
-    encode(width, height, Channels::Rgb, pixels.as_flattened())
-}
-
-/// The PNG of `width` x `height` RGBA `pixels` (straight alpha), rows top to bottom.
-pub(super) fn rgba(width: usize, height: usize, pixels: &[[u8; 4]]) -> Vec<u8> {
-    encode(width, height, Channels::Rgba, pixels.as_flattened())
-}
-
-/// A pixel's layout: PNG colour type 2 or 6.
+/// An image's size and pixels, rows top to bottom, `channels` bytes per pixel.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Channels {
+pub struct Raster<'a> {
+    pub width: usize,
+    pub height: usize,
+    pub channels: Channels,
+    pub bytes: &'a [u8],
+}
+
+/// How the DEFLATE body is written.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Deflate {
+    /// Stored blocks (RFC 1951 section 3.2.4), no compression.
+    Stored,
+    /// One fixed-Huffman block, greedy matches one pixel or one scanline back.
+    Fixed,
+}
+
+/// A pixel's layout: PNG colour type 4, 2 or 6.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Channels {
+    GreyAlpha,
     Rgb,
     Rgba,
 }
@@ -23,6 +33,7 @@ enum Channels {
 impl Channels {
     fn bytes(self) -> usize {
         match self {
+            Channels::GreyAlpha => 2,
             Channels::Rgb => 3,
             Channels::Rgba => 4,
         }
@@ -30,13 +41,21 @@ impl Channels {
 
     fn colour_type(self) -> u8 {
         match self {
+            Channels::GreyAlpha => 4,
             Channels::Rgb => 2,
             Channels::Rgba => 6,
         }
     }
 }
 
-fn encode(width: usize, height: usize, channels: Channels, bytes: &[u8]) -> Vec<u8> {
+/// The PNG of `raster`, every scanline unfiltered, its DEFLATE body written as `deflate` says.
+pub fn encode(raster: Raster<'_>, deflate: Deflate) -> Vec<u8> {
+    let Raster {
+        width,
+        height,
+        channels,
+        bytes,
+    } = raster;
     let row = width * channels.bytes();
     let stride = 1 + row;
     let raw: Vec<u8> = bytes
@@ -45,7 +64,10 @@ fn encode(width: usize, height: usize, channels: Channels, bytes: &[u8]) -> Vec<
         .flat_map(|line| std::iter::once(0u8).chain(line.iter().copied()))
         .collect();
     let mut idat = vec![0x78, 0x01];
-    idat.extend(deflate(&raw, &[channels.bytes(), stride]));
+    match deflate {
+        Deflate::Stored => idat.extend(stored(&raw)),
+        Deflate::Fixed => idat.extend(fixed(&raw, &[channels.bytes(), stride])),
+    }
     idat.extend(adler32(&raw).to_be_bytes());
 
     let mut header = Vec::with_capacity(13);
@@ -59,26 +81,6 @@ fn encode(width: usize, height: usize, channels: Channels, bytes: &[u8]) -> Vec<
     chunk(&mut png, *b"IDAT", &idat);
     chunk(&mut png, *b"IEND", &[]);
     png
-}
-
-/// Standard base64 with padding (RFC 4648 section 4).
-pub(crate) fn base64(bytes: &[u8]) -> String {
-    const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
-    for group in bytes.chunks(3) {
-        let n = group
-            .iter()
-            .enumerate()
-            .fold(0u32, |n, (i, byte)| n | u32::from(*byte) << (16 - 8 * i));
-        for i in 0..4 {
-            if i <= group.len() {
-                out.push(char::from(ALPHABET[(n >> (18 - 6 * i) & 63) as usize]));
-            } else {
-                out.push('=');
-            }
-        }
-    }
-    out
 }
 
 fn chunk(png: &mut Vec<u8>, kind: [u8; 4], data: &[u8]) {
@@ -116,8 +118,23 @@ fn adler32(bytes: &[u8]) -> u32 {
 const MAX_MATCH: usize = 258;
 const MIN_MATCH: usize = 3;
 
+/// `data` as stored blocks of at most 65535 bytes, the last one marked final.
+fn stored(data: &[u8]) -> Vec<u8> {
+    let blocks = data.chunks(65_535).collect::<Vec<_>>();
+    let mut out = Vec::with_capacity(data.len() + 5 * blocks.len());
+    for (index, block) in blocks.iter().enumerate() {
+        let last = u8::from(index + 1 == blocks.len());
+        let len = u16::try_from(block.len()).unwrap_or(u16::MAX);
+        out.push(last);
+        out.extend(len.to_le_bytes());
+        out.extend((!len).to_le_bytes());
+        out.extend(*block);
+    }
+    out
+}
+
 /// `data` as one final fixed-Huffman block, matching greedily at the given back distances.
-fn deflate(data: &[u8], distances: &[usize]) -> Vec<u8> {
+fn fixed(data: &[u8], distances: &[usize]) -> Vec<u8> {
     let mut bits = Bits::default();
     bits.push(1, 1); // BFINAL
     bits.push(1, 2); // BTYPE = 01, fixed Huffman
@@ -242,7 +259,7 @@ impl Bits {
 
 #[cfg(test)]
 mod tests {
-    use super::{adler32, base64, crc32};
+    use super::{adler32, crc32};
 
     #[test]
     fn the_checksums_match_their_references() {
@@ -250,19 +267,5 @@ mod tests {
         assert_eq!(crc32(b"123456789"), 0xCBF4_3926);
         assert_eq!(adler32(b"123456789"), 0x091E_01DE);
         assert_eq!(adler32(b""), 1);
-    }
-
-    #[test]
-    fn base64_pads_like_rfc_4648() {
-        const CASES: &[(&str, &str)] = &[
-            ("", ""),
-            ("f", "Zg=="),
-            ("fo", "Zm8="),
-            ("foo", "Zm9v"),
-            ("foobar", "Zm9vYmFy"),
-        ];
-        for (plain, want) in CASES {
-            assert_eq!(base64(plain.as_bytes()), *want, "{plain}");
-        }
     }
 }
