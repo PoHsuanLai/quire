@@ -56,9 +56,9 @@ back. Paths are under `crates/ds/src/` unless another crate is named.
 | `motion/anim.rs`, `motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 47 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10) and `MenuOut` (13 §13.3.2's close fade), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
 | `motion/settle.rs`, `time.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
 | `motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
-| `task.rs` | every task quire spawns belongs to its owner's scope and drops with it (`spawn_in` registers it through the scope's own `spawn`); its writes are `try_set`, so a timer that finds its owner gone stops (FINDINGS "Launcher gaps", sill Q45) |
+| `task.rs` | every task quire spawns belongs to its owner's scope and drops with it (`spawn_in` registers it through the scope's own `spawn`); its writes are `try_set`, so a timer that finds its owner gone stops (FINDINGS "Launcher gaps") |
 | `guarded.rs` | the guard around a call or poll into a document the renderer may hold: a panic there is "busy" (`Guarded`, `guarded_call`; FINDINGS "Bar gaps", "Launcher gaps") |
-| `focus/{host,request}.rs` | 06-INTERACTIONS §17: `HostFocus`/`Focused` (every focus change waits out a busy document, sill Q43) and `FocusRequest`/`use_focus_request` (`Focus::Controlled`, giving a field the keyboard back, Q44) |
+| `focus/{host,request}.rs` | 06-INTERACTIONS §17: `HostFocus`/`Focused` (every focus change waits out a busy document) and `FocusRequest`/`use_focus_request` (`Focus::Controlled`, giving a field the keyboard back) |
 | `motion/pulse.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
 | `motion/presence.rs`, `roster.rs`, `use_roster.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Exit::{Fold, Curl, Crumple, TabOut}`; an unread (`Emphasis::Strong`) row plays each row exit's heavy variant |
 | `motion/hover_intent.rs` | 06-INTERACTIONS §3 |
@@ -92,7 +92,7 @@ fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s s
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `account_tile` §27,
 `provider_mark` §28, `palette_lines`, `palette_select` and `palette_rows` (§25's pure lines, the
 selection, its own or the caller's, and the selected row's rect; FINDINGS "Launcher gaps"), `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
-`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Tray gaps", "Bar gaps"), `icon_button`'s `Status` variant and `StatusMetrics` (13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
+`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` and `IconButton` report, FINDINGS "Pointer events", "Bar gaps"), `icon_button`'s `Status` variant and `StatusMetrics` (13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1), `workspace_pills` §37 and `dock_parts` §38 (`RunningDot`, `DockFloor`; 10 §10.3.2).
 `user_picture` is a directory and 25-EMOJI section 7: `UserPicture`/`UserPortrait`, `Mood`,
@@ -149,4 +149,4 @@ The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`,
 | `catalog/placement.rs` | 23-WIDGETS §9.1 | `Placement`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
 | `components/device_glyph.rs`, `components/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
 | `components/widget_slot.rs`, `components/widget_frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |
-| `tokens/accent_band/widget_grounds.rs` | 23-WIDGETS §4.3 (sill Q412) | `WALLPAPERS`, `widget_grounds`: the see-through card's grounds the widget legibility gates use |
+| `tokens/accent_band/widget_grounds.rs` | 23-WIDGETS §4.3 | `WALLPAPERS`, `widget_grounds`: the see-through card's grounds the widget legibility gates use |
