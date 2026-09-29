@@ -12,7 +12,7 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::icon::stroke::stroke_device_pixels;
+use ds::icon::stroke_device_pixels;
 use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuEntry, Point, Px, Scale, Trail};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;

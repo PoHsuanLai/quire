@@ -2,7 +2,7 @@
 
 use super::band::{AccentBand, AccentPick, InkRule, SchemeBand};
 use super::floors;
-use super::grounds::{card_grounds, contrast, least, over};
+use super::grounds::{card_grounds, contrast, least};
 use super::roles::AccentRoles;
 use super::text_grounds::{Ground, TextOn, text_grounds};
 use crate::appearance::theme::Scheme;
@@ -100,14 +100,14 @@ fn walk(start: f64, step: f64, passes: impl Fn(f64) -> bool) -> f64 {
 /// The wash's alpha: the band's, raised until the wash shows on every ground.
 fn wash_alpha(start: Alpha, fill: Hex, grounds: &[Hex]) -> Alpha {
     rise(start, floors::WASH_STEP, floors::WASH_MOST, |alpha| {
-        least(|ground| over(fill, alpha, ground), grounds) >= floors::WASH_SHOWS
+        least(|ground| fill.over(alpha, ground), grounds) >= floors::WASH_SHOWS
     })
 }
 
 /// The ring's alpha: the band's, raised until the ring stands off every ground.
 fn ring_alpha(start: Alpha, text: Hex, grounds: &[Hex]) -> Alpha {
     rise(start, floors::RING_STEP, Alpha(1000), |alpha| {
-        least(|ground| over(text, alpha, ground), grounds) >= floors::RING
+        least(|ground| text.over(alpha, ground), grounds) >= floors::RING
     })
 }
 

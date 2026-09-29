@@ -311,7 +311,7 @@ fn quires_own_sheet_warns_only_where_reviewed() {
 /// below it is a drawing.
 #[test]
 fn the_system_ramp_starts_at_the_floor() {
-    use ds::appearance::Typeface;
+    use ds::Typeface;
     let under: Vec<ds::FontSize> = ds::FontSize::ALL
         .into_iter()
         .filter(|size| size.px_in(Typeface::System) < ds::FontSize::MIN_PX)

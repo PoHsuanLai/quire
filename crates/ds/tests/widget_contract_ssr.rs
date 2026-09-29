@@ -10,8 +10,8 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::LabelHue;
 use ds::lint::{LintConfig, markup};
-use ds::tokens::LabelHue;
 use ds::widget::{WireRefresh, WireTimeline};
 use ds::{
     Appearance, BatteryCell, BatteryEntry, BatteryWidget, CardPresence, ClockCity, ClockEntry,

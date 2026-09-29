@@ -10,6 +10,7 @@
 //! corners and two rectangles for the cross between them. The shapes are sampled here, as data.
 
 use super::external::IconUrl;
+pub use crate::tokens::plate::shadow_radius_share;
 use crate::tokens::plate::EXPONENT;
 use std::f64::consts::FRAC_PI_2;
 

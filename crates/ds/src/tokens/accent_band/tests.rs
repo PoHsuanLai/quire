@@ -182,9 +182,9 @@ fn postmark_is_the_settled_airy_blue() {
 fn over_blends_per_channel() {
     let red = Hex([255, 0, 0]);
     let white = Hex([255, 255, 255]);
-    assert_eq!(over(red, Alpha(1000), white), red);
-    assert_eq!(over(red, Alpha(0), white), white);
-    assert_eq!(over(red, Alpha(500), white), Hex([255, 128, 128]));
+    assert_eq!(red.over(Alpha(1000), white), red);
+    assert_eq!(red.over(Alpha(0), white), white);
+    assert_eq!(red.over(Alpha(500), white), Hex([255, 128, 128]));
 }
 
 /// Every ground the material's text is measured on is kept but one: the dark Popover's wash over
@@ -215,7 +215,7 @@ fn the_only_ground_the_ink_misses_is_the_dark_popover_wash() {
     }
     let roles = roles(257, Weight::FULL, Scheme::Dark);
     let (hex, alpha) = tint(Material::Popover, Scheme::Dark).expect("a tint");
-    let ground = over(roles.fill, roles.wash, over(hex, alpha, BACKDROPS[1]));
+    let ground = roles.fill.over(roles.wash, hex.over(alpha, BACKDROPS[1]));
     let kept = text_grounds(TextOn::Material, Scheme::Dark, roles.fill, roles.wash);
     assert!(
         kept.iter().all(|kept| kept.hex != ground),

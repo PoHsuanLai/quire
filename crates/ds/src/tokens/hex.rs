@@ -21,6 +21,18 @@ impl From<Srgb> for Hex {
 }
 
 impl Hex {
+    /// `self` at `alpha` over the opaque `back`, blended per 8-bit channel as a browser does.
+    pub fn over(self, alpha: Alpha, back: Hex) -> Hex {
+        let weight = f64::from(alpha.0.min(1000)) / 1000.0;
+        let mut out = [0u8; 3];
+        for ((slot, front), behind) in out.iter_mut().zip(self.0).zip(back.0) {
+            let mixed = f64::from(front) * weight + f64::from(behind) * (1.0 - weight);
+            // A blend of two bytes stays within 0..=255.
+            *slot = mixed.round().clamp(0.0, 255.0) as u8;
+        }
+        Hex(out)
+    }
+
     /// Parse `#rgb` or `#rrggbb`, any case; `None` for anything else.
     pub fn parse(text: &str) -> Option<Hex> {
         let digits = text.strip_prefix('#')?;
