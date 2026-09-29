@@ -5,7 +5,7 @@ use super::Section;
 use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, DropState, Emphasis, HoverStrip, Icon, ItemKind, ListRow, PlaceId, Presence,
-    PulseKey, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
+    PulseKey, RowState, Selection, Shown, SidebarItem, StaggerIndex, StripAction,
 };
 
 /// Archive and snooze, each doing nothing on its measured click: the press says what happened.
@@ -42,8 +42,7 @@ pub fn StripPress() -> Element {
             note: "on_press hears the button inside the click, before the rect read; the measured onclick follows only where layout answers.",
             ul { class: "g-list g-stage-pad",
                 ListRow {
-                    selection: Selection::Selected,
-                    emphasis: Emphasis::Strong,
+                    state: RowState { selection: Selection::Selected, emphasis: Emphasis::Strong, ..RowState::default() },
                     index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",
@@ -89,17 +88,16 @@ pub fn DropPlaces() -> Element {
             div { class: "g-col g-stage-pad", style: "width:220px",
                 for (id , label , icon) in PLACES {
                     SidebarItem {
+                        state: RowState { selection: Selection::Unselected, drop: if over() == Some(id) { DropState::Target } else { DropState::Idle }, ..RowState::default() },
                         key: "{id}",
                         kind: ItemKind::Place { icon },
                         label,
-                        here: Selection::Unselected,
                         count: None,
                         presence: Presence::Present,
                         preview: None,
                         pulse: PulseKey::rest(Anim::Gulp),
                         onclick: |_| {},
                         onclose: None,
-                        drop: if over() == Some(id) { DropState::Target } else { DropState::Idle },
                         place: PlaceId(id.to_string()),
                         onpointerenter: move |_| over.set(Some(id)),
                         onpointerleave: move |_| over.set(None),

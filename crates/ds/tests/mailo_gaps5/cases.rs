@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Button, ButtonVariant, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle,
-    PlaceId, Presence, ProviderMark, RunTone, SidebarItem, TextLine, TextRun, Trailing,
+    PlaceId, Presence, ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun, Trailing,
 };
 use ds::{DropState, PulseKey, Selection};
 
@@ -25,16 +25,15 @@ fn quoted_head() -> TextLine {
 fn archive(drop: DropState) -> Element {
     rsx! {
         SidebarItem {
+            state: RowState { selection: Selection::Unselected, drop, ..RowState::default() },
             kind: ItemKind::Place { icon: Icon::Archive },
             label: "Archive",
-            here: Selection::Unselected,
             count: None,
             presence: Presence::Present,
             preview: None,
             pulse: PulseKey::rest(Anim::Gulp),
             onclick: |_| {},
             onclose: None,
-            drop,
             place: PlaceId("archive".to_string()),
         }
     }

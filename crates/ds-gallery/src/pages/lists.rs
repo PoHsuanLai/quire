@@ -11,7 +11,7 @@ use ds::{
     AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour,
     DragGhost, DropLine, Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, ListRow,
     MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
-    RowPitch, Selection, SidebarItem, StaggerIndex, StripAction, SystemPrefs, TimerPhase,
+    RowPitch, RowState, Selection, SidebarItem, StaggerIndex, StripAction, SystemPrefs, TimerPhase,
     UndoToken, use_motion_timer, use_pulse, use_roster, use_toast_hub,
 };
 
@@ -221,8 +221,7 @@ fn ThreadRow(
     let (name, subject, snippet, time) = id.thread();
     rsx! {
         ListRow {
-            selection,
-            emphasis: id.emphasis(),
+            state: RowState { selection, emphasis: id.emphasis(), ..RowState::default() },
             index,
             presence,
             heal,
@@ -300,10 +299,10 @@ fn Sidebar() -> Element {
                 div { class: "g-side",
                     for (index , (icon , label , count)) in PLACES.into_iter().enumerate() {
                         SidebarItem {
+                            state: RowState { selection: if here() == index { Selection::Selected } else { Selection::Unselected }, ..RowState::default() },
                             key: "{label}",
                             kind: ItemKind::Place { icon },
                             label,
-                            here: if here() == index { Selection::Selected } else { Selection::Unselected },
                             count,
                             presence: Presence::Present,
                             preview: None,
@@ -316,9 +315,9 @@ fn Sidebar() -> Element {
                         }
                     }
                     SidebarItem {
+                        state: RowState { selection: Selection::Unselected, ..RowState::default() },
                         kind: ItemKind::Pinned { avatar: person("Mei Chen") },
                         label: "Mei Chen",
-                        here: Selection::Unselected,
                         count: Some(1),
                         presence: Presence::Present,
                         preview: Some(Preview::Destination),
@@ -328,10 +327,10 @@ fn Sidebar() -> Element {
                     }
                     for name in today() {
                         SidebarItem {
+                            state: RowState { selection: Selection::Unselected, ..RowState::default() },
                             key: "{name}",
                             kind: ItemKind::Today { avatar: person(name) },
                             label: name,
-                            here: Selection::Unselected,
                             count: None,
                             presence: Presence::Present,
                             preview: None,

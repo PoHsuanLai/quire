@@ -5,7 +5,7 @@ use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow,
-    MarkProvider, MarkSize, MarkStyle, Presence, ProviderMark, Px, StripAction,
+    MarkProvider, MarkSize, MarkStyle, Presence, ProviderMark, Px, RowState, StripAction,
 };
 use ds::{Check, DropState, Emphasis, PulseKey, Selection, StaggerIndex};
 
@@ -79,8 +79,7 @@ fn row_in_drag(
 ) -> Element {
     rsx! {
         ListRow {
-            selection,
-            emphasis,
+            state: RowState { selection, emphasis, drop, ..RowState::default() },
             index: StaggerIndex::new(index),
             presence,
             name: "Dana Okafor",
@@ -96,7 +95,6 @@ fn row_in_drag(
             star_pulse: pulse,
             strip: rsx! { HoverStrip { actions: strip_actions() } },
             onclick: |_| {},
-            drop,
         }
     }
 }
@@ -138,8 +136,7 @@ fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
 fn healed_row(heal: Heal, emphasis: Emphasis, index: usize) -> Element {
     rsx! {
         ListRow {
-            selection: Selection::Unselected,
-            emphasis,
+            state: RowState { selection: Selection::Unselected, emphasis, ..RowState::default() },
             index: StaggerIndex::new(index),
             presence: Presence::Present,
             heal: Some(heal),
@@ -310,8 +307,7 @@ pub const ROW_CASES: &[Case] = &[
         make: || {
             rsx! {
                 ListRow {
-                    selection: Selection::Unselected,
-                    emphasis: Emphasis::Plain,
+                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                     index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Sam Lindqvist",
@@ -336,8 +332,7 @@ pub const ROW_CASES: &[Case] = &[
         make: || {
             rsx! {
                 ListRow {
-                    selection: Selection::Unselected,
-                    emphasis: Emphasis::Plain,
+                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                     index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Maximilian Alexander von Hohenberg-Wittelsbach",

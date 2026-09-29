@@ -6,7 +6,8 @@ use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Anim, HoverStrip, ListRow, Presence, RunTone, Shown, TextLine, TextRun, Titles,
+    ActionId, Anim, HoverStrip, ListRow, Presence, RowState, RunTone, Shown, TextLine, TextRun,
+    Titles,
 };
 use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 
@@ -24,8 +25,7 @@ fn marked_subject() -> TextLine {
 fn row_with(strip: Option<Element>) -> Element {
     rsx! {
         ListRow {
-            selection: Selection::Selected,
-            emphasis: Emphasis::Plain,
+            state: RowState { selection: Selection::Selected, emphasis: Emphasis::Plain, ..RowState::default() },
             index: StaggerIndex::new(0),
             presence: Presence::Present,
             name: "Dana Okafor",

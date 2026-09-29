@@ -8,8 +8,8 @@ use ds::Word;
 use ds::{
     Accent, Anim, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
     Emphasis, Fraction, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence,
-    PulseKey, Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, StaggerIndex,
-    Surface, Tabs, TextInput, Toggle, Verdict,
+    PulseKey, RowState, Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider,
+    StaggerIndex, Surface, Tabs, TextInput, Toggle, Verdict,
 };
 
 /// What the matrix can show.
@@ -92,8 +92,7 @@ fn Cell(subject: Subject) -> Element {
         Subject::Row => rsx! {
             AnimatedList { label: "Row", presence: Presence::Present,
                 ListRow {
-                    selection: Selection::Selected,
-                    emphasis: Emphasis::Strong,
+                    state: RowState { selection: Selection::Selected, emphasis: Emphasis::Strong, ..RowState::default() },
                     index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",
@@ -111,9 +110,9 @@ fn Cell(subject: Subject) -> Element {
         },
         Subject::Sidebar => rsx! {
             SidebarItem {
+                state: RowState { selection: Selection::Selected, ..RowState::default() },
                 kind: ItemKind::Place { icon: Icon::Inbox },
                 label: "Inbox",
-                here: Selection::Selected,
                 count: Some(12),
                 presence: Presence::Present,
                 preview: None,
@@ -122,9 +121,9 @@ fn Cell(subject: Subject) -> Element {
                 onclose: None,
             }
             SidebarItem {
+                state: RowState { selection: Selection::Unselected, ..RowState::default() },
                 kind: ItemKind::Place { icon: Icon::Star },
                 label: "Starred",
-                here: Selection::Unselected,
                 count: None,
                 presence: Presence::Present,
                 preview: None,

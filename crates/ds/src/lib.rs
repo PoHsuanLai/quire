@@ -183,8 +183,9 @@ pub use crate::core::{
         clock::{ClockGuard, VirtualClock, sleep},
     },
     vocab::{
-        Activity, Availability, Check, Dismiss, DropState, Emphasis, Fraction, Muting, Percent,
-        PressPhase, Selection, Shortcut, ShortcutKey, Shown, StaggerIndex,
+        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, Fraction,
+        InputModality, Muting, Percent, PressPhase, RowState, Selection, Shortcut, ShortcutKey,
+        Shown, StaggerIndex,
     },
 };
 pub use crate::edit::{
@@ -382,7 +383,7 @@ pub use crate::style::{
     look::Look,
     material::{recipe::recipe, stack::MaterialStack},
     scale::{HostScale, use_scale},
-    scope::{HostModality, InputModality, Scope, use_scope},
+    scope::{HostModality, Scope, use_scope},
     space::{
         frame_vars::FrameVars,
         look::{CardAccent, Grain, SpaceLook},

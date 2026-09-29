@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, ItemKind, Material,
-    PersonHue, Presence, PulseKey, Selection, SidebarItem, TodayTrailing,
+    PersonHue, Presence, PulseKey, RowState, Selection, SidebarItem, TodayTrailing,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -31,9 +31,9 @@ fn Row() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "width:260px; padding:8px",
                 SidebarItem {
+                    state: RowState { selection: Selection::Unselected, ..RowState::default() },
                     kind: ItemKind::Today { avatar: FACE },
                     label: "Q3 notes",
-                    here: Selection::Unselected,
                     count: None,
                     presence: Presence::Present,
                     preview: None,

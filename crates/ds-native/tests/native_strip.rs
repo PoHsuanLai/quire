@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{
     ActionId, Anim, Appearance, Ds, HoverStrip, Icon, ListRow, Material, Point, Presence, Px, Rect,
-    Shown, StripAction,
+    RowState, Shown, StripAction,
 };
 use ds::{Emphasis, PulseKey, Selection, StaggerIndex};
 use ds_native::{Harness, Viewport};
@@ -63,8 +63,7 @@ fn Page(shown: Option<Shown>, width: Width) -> Element {
             style { {ROW} }
             ul { class: "list", style: list,
                 ListRow {
-                    selection: Selection::Unselected,
-                    emphasis: Emphasis::Strong,
+                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
                     index: StaggerIndex::new(0),
                     presence: Presence::Present,
                     name: "Dana Okafor",

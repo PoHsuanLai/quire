@@ -3,8 +3,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Emphasis, ListRow, Presence, PulseKey, RunTone, Selection, StaggerIndex, TextLine,
-    TextRun,
+    Anim, Emphasis, ListRow, Presence, PulseKey, RowState, RunTone, Selection, StaggerIndex,
+    TextLine, TextRun,
 };
 
 /// A `ListRow` with everything fixed but its snippet, written as the expression given.
@@ -12,8 +12,7 @@ macro_rules! row {
     ($snippet:expr) => {
         rsx! {
             ListRow {
-                selection: Selection::Unselected,
-                emphasis: Emphasis::Plain,
+                state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
                 index: StaggerIndex::new(0),
                 presence: Presence::Present,
                 name: "Dana",
@@ -45,8 +44,7 @@ fn forms() -> Element {
         {row!(held.map(TextLine::from))}
         {row!(None)}
         ListRow {
-            selection: Selection::Unselected,
-            emphasis: Emphasis::Plain,
+            state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
             index: StaggerIndex::new(0),
             presence: Presence::Present,
             name: "Dana",

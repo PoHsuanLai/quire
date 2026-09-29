@@ -5,7 +5,7 @@ use super::Section;
 use dioxus::prelude::*;
 use ds::{
     DataAttr, DataName, DropState, Icon, IconButton, IconButtonVariant, PlaceId, Propagation,
-    Selection, Shown, TreeItem, TreeShape,
+    RowState, Selection, Shown, TreeItem, TreeShape,
 };
 
 /// `data-folder="<path>"`.
@@ -48,8 +48,8 @@ pub fn FolderTree() -> Element {
     };
     let leaf = move |path: &'static str, label: &'static str| {
         rsx! {
-            TreeItem { label, open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf,
-                glyph: Icon::Folder, here: here(path), drop: drop_on(over(), path), place: PlaceId(path.to_string()),
+            TreeItem { state: RowState { selection: here(path), drop: drop_on(over(), path), ..RowState::default() }, label, open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf,
+                glyph: Icon::Folder, place: PlaceId(path.to_string()),
                 onselect: move |_| current.set(path),
                 onpointerenter: move |_| over.set(Some(path)),
                 onpointerleave: move |_| over.set(None),
@@ -63,13 +63,12 @@ pub fn FolderTree() -> Element {
             note: "A details/summary row in the sidebar item's chrome. open is the app's (the chevron turns over --t-quick); the label selects without toggling; the ⋯ in the trailing slot carries data-folder and never toggles. During a drag every folder is DropState::Accepts and the one under the pointer Target, drawn by the same .ds-drop-place rules as SidebarItem.",
             div { class: "g-side",
                 TreeItem {
+                    state: RowState { selection: here("INBOX/Projects"), drop: drop_on(over(), "INBOX/Projects"), ..RowState::default() },
                     label: "Projects",
                     open: projects(),
                     on_toggle: move |to| projects.set(to),
                     glyph: Icon::Folder,
                     count: 4,
-                    here: here("INBOX/Projects"),
-                    drop: drop_on(over(), "INBOX/Projects"),
                     place: PlaceId("INBOX/Projects".to_string()),
                     onselect: move |_| current.set("INBOX/Projects"),
                     onpointerenter: move |_| over.set(Some("INBOX/Projects")),
@@ -80,12 +79,11 @@ pub fn FolderTree() -> Element {
                     {leaf("INBOX/Projects/Sill", "Sill")}
                 }
                 TreeItem {
+                    state: RowState { selection: here("Archive"), drop: drop_on(over(), "Archive"), ..RowState::default() },
                     label: "Archive",
                     open: archive(),
                     on_toggle: move |to| archive.set(to),
                     glyph: Icon::Archive,
-                    here: here("Archive"),
-                    drop: drop_on(over(), "Archive"),
                     place: PlaceId("Archive".to_string()),
                     onselect: move |_| current.set("Archive"),
                     onpointerenter: move |_| over.set(Some("Archive")),

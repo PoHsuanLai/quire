@@ -8,8 +8,8 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, ListRow, Material,
-    OverlayId, PartHooks, Point, Presence, PulseKey, Px, Rect, Selection, Size, StaggerIndex,
-    ZLayer, use_hover_intent, use_overlays,
+    OverlayId, PartHooks, Point, Presence, PulseKey, Px, Rect, RowState, Selection, Size,
+    StaggerIndex, ZLayer, use_hover_intent, use_overlays,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -232,8 +232,7 @@ fn MailRow(i: usize, log: Signal<Vec<String>>) -> Element {
     rsx! {
         div { class: "mrow m{i}",
             ListRow {
-                selection: Selection::Unselected,
-                emphasis: Emphasis::Strong,
+                state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
                 index: StaggerIndex::new(0),
                 presence: Presence::Present,
                 name: "Sender {i}",

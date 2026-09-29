@@ -16,7 +16,7 @@ use crate::components::content::text_runs::TextLine;
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::core::press::Press;
-use crate::core::vocab::{DropState, Selection, Shown};
+use crate::core::vocab::{RowState, Shown};
 use crate::focus::click::kept_click;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
@@ -40,8 +40,9 @@ pub enum TreeShape {
 /// does not toggle (mailo's folder name), without it a span, and a press on it toggles like the
 /// rest of the row. `glyph` is drawn before the label, `count` after it, then `trailing`: a slot
 /// for the ⋯ `IconButton`, fenced so no press in it reaches the summary (give the button
-/// `Propagation::Stop` as well; it costs nothing). `here` marks the current place
-/// (`aria-current`, the sidebar item's current look).
+/// `Propagation::Stop` as well; it costs nothing). `state` is the item's [`RowState`]: its
+/// `selection` marks the current place (`aria-current`, the sidebar item's current look) and its
+/// `drop` its part in a drag.
 ///
 /// `editing` is an in-place rename: given, it is drawn in the label's place (in
 /// `span.ds-tree-item-edit[data-slot=editing]`, at the label's metrics, so nothing on the row
@@ -69,11 +70,10 @@ pub fn TreeItem(
     #[props(default)] shape: TreeShape,
     #[props(default)] glyph: Option<Icon>,
     #[props(default)] count: Option<u32>,
-    #[props(default)] here: Selection,
+    #[props(default)] state: RowState,
     #[props(default)] onselect: Option<EventHandler<Press>>,
     #[props(default)] trailing: Option<Element>,
     #[props(default)] editing: Option<Element>,
-    #[props(default)] drop: DropState,
     #[props(default)] place: Option<PlaceId>,
     #[props(default)] onpointerenter: Option<EventHandler<PointerEvent>>,
     #[props(default)] onpointerleave: Option<EventHandler<PointerEvent>>,
@@ -81,6 +81,11 @@ pub fn TreeItem(
     #[props(default)] onpointerup: Option<EventHandler<PointerEvent>>,
     #[props(default)] children: Element,
 ) -> Element {
+    let RowState {
+        selection: here,
+        drop,
+        ..
+    } = state;
     let row = Row {
         current: here.aria_current(),
         drop_attr: drop.drop_attr(),
