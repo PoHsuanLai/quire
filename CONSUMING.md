@@ -114,7 +114,7 @@ fn App() -> Element {
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 | `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
 | `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (FINDINGS "Root height") |
-| `scale` | `Option<Scale>` | `None`: the host's `ds::HostScale`, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostScale` themselves; a host that is not `ds-native` passes `scale` |
+| `scale` | `Option<Scale>` | `None`: the host's `ds::HostSignals` scale, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostSignals` themselves; a host that is not `ds-native` passes `scale` |
 | `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::HostWindow` — section 6, "Window frame" |
 
 ### Pixel snapping: `scale`, the pixel tokens and `snap_to_device` (2026-09-25)
@@ -123,7 +123,7 @@ At 1.25, 1.5 or 1.75 a `1px` line covers a fractional number of device pixels an
 full row and one half row. Three pieces keep every line whole device pixels (design/01-LAYOUT.md
 §2.1; FINDINGS "Pixel snapping"):
 
-1. **The root knows the scale.** `Ds { scale: Some(Scale(180)) }` (or the `ds::HostScale`
+1. **The root knows the scale.** `Ds { scale: Some(Scale(180)) }` (or the scale in the `ds::HostSignals`
    ds-native provides) makes the root write the pixel tokens' inputs inline. With no scale, or
    at `Scale::ONE`, it writes nothing and every token is its 1x value, so nothing changes.
 2. **Lines read the pixel tokens** (`ds::PixelToken`, on `.ds`):
@@ -657,16 +657,17 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
 For a bar (FINDINGS "Bar gaps"):
 
 - **A Blitz host that is not `ds_native::launch`** (shell-host's surfaces, a popup's document)
-  calls `ds_native::measure::provide()` at the top of its root component, before any quire
-  component reads a rect; `ds_native::measure::MEASURE` is the same value for
-  `use_context_provider`. Drop your own copy of the twelve-line measurer. Without one, a rect
-  read no longer panics: `ds::use_rect` and every anchor treat a held document as busy and try
-  again next frame (the default panic hook still prints the collision, so provide it).
+  calls `ds_native::provide_host()` at the top of its root component, before any quire
+  component reads the document. It installs every part of `ds::DocumentHost` at once (rects,
+  focus, caret, scroll, edit, drop), so a root can never hold a subset; a root under a window's
+  or the harness's host keeps that one. Drop your own copy of the twelve-line measurer. With no
+  host at all (`ds::NoHost`, a server render) a rect read answers unknown and the anchor is not
+  placed.
 
   ```rust
   #[component]
   fn BarRoot() -> Element {
-      ds_native::measure::provide();
+      ds_native::provide_host();
       rsx! { Ds { appearance, material: Material::Bar, look, /* … */ } }
   }
   ```
@@ -745,16 +746,14 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
   keep-mounted guard you added for it. `MotionTimer::start`'s `on_settled` never runs for a
   component that is gone.
 - **Focus waits out a busy document.** `Focus::OnMount`, a menu taking the keyboard and every
-  other focus change go through `ds::HostFocus` (`Focused::{Done, Busy, Unknown}`), tried again
-  a frame later while the renderer holds the document; with no host seam the call is guarded
-  and a collision is busy too, never a panic. A Blitz host that is not `ds_native::launch`
-  provides it beside the measurer:
+  other focus change go through the host's `ds::FocusHost` (`Focused::{Done, Busy, Unknown}`),
+  tried again a frame later while the renderer holds the document. A Blitz host that is not
+  `ds_native::launch` provides it with the rest of the host:
 
   ```rust
   #[component]
   fn LauncherRoot() -> Element {
-      ds_native::measure::provide();
-      ds_native::focus::provide();
+      ds_native::provide_host();
       rsx! { Ds { appearance, material: Material::Sheet, look, /* … */ } }
   }
   ```

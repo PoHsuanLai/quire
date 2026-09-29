@@ -77,11 +77,13 @@ Upstream (pinned around; re-check at every toolchain bump):
 
 Not built, or limited, in quire:
 
-- **Other Blitz hosts get less than `launch` and the harness.** shell-host and sill do not
-  forward IME events or pointer capture to an `EditSurface`, and do not provide `HostClipboard`,
-  `CLICK_FOCUS`/`PRESS_FOCUS`, a spell checker (`ds_native::spell::provide()`) or the
-  resting-pointer hover replay; they must call `ds_native::snap_to_device` after each resolve
-  themselves. Each needs a ds-native entry point or a `provide` the host calls.
+- **Other Blitz hosts get less than `launch` and the harness.** shell-host and sill call
+  `ds_native::provide_host()`, which installs every part of the document host, but do not
+  forward IME events or pointer capture to an `EditSurface`, have no click-focus fallback or
+  hand-back, find no element by selector, and provide no spell checker
+  (`ds_native::spell::provide()`) or resting-pointer hover replay; they must call
+  `ds_native::snap_to_device` after each resolve themselves. Each needs a ds-native entry point
+  the host calls.
 - **shell-host does not register quire's faces.** `SharedFonts::system()` never calls
   `SharedFonts::register`, and Inter is not installed system-wide, so sill draws system-ui
   wherever it asks for Inter, Inter Display, Bricolage, Karla, Space Mono or Noto Serif (its
@@ -450,7 +452,7 @@ adapter opens).
   (no masking in blitz-dom or blitz-paint). The field paints its own text transparent and lays
   `.ds-input-mask` (one `•` per character) over it. The hidden text is measured untracked in the
   editor's default face while the dots are Inter tracked .1em (.14em in the lock pill), so
-  Blitz's caret drifts from the dots; with the `HostSelection` seam the input carries
+  Blitz's caret drifts from the dots; with the `CaretHost::selection` seam the input carries
   `data-caret=drawn` (`caret-color: transparent`, which Blitz honours) and the mask draws the
   caret and the selection itself, re-read in a task after each key, input, press, focus and blur
   (Blitz moves its caret after the handlers run). Blitz's caret is `cursor_geometry(1.5)`: 1.5
@@ -470,7 +472,7 @@ adapter opens).
   inserts a newline. `Grow::ToContent` raises `rows` to the hard line count; soft wraps cannot
   be counted before layout, so a long wrapped line scrolls.
 - **The caret starts at byte 0** when a field's value is set, and a focus write does not move it;
-  `FocusRequest::with_caret(InitialCaret::End)` asks the host's `HostPlaceCaret` (parley's
+  `FocusRequest::with_caret(InitialCaret::End)` asks the host's `CaretHost::place_caret` (parley's
   `move_to_text_end`).
 - **A field focused on mount has no editor yet**: Blitz builds it with the document's first
   layout, so select-all and caret writes answer `Busy` and retry a frame later.
@@ -512,10 +514,10 @@ own caret and selection. The route needs no Blitz fork.
   character by character, so a layout offset maps to (text node, byte) and back. A caret between
   two text nodes that an inline atom separates resolves to the later node's start.
 - **Focus.** A press would start Blitz's own document text selection and the click after it would
-  clear the focus, so the surface prevents both defaults, focuses itself through `HostFocus`, and
+  clear the focus, so the surface prevents both defaults, focuses itself through `FocusHost::focus`, and
   treats the write's success as its focus-in (a host write dispatches no `focus` event). It keeps
   its own click count. `EditHandle::focus()`/`blur()` run the same focus-in/focus-out as a press.
-- **Pointer capture** is quire's: a press registers the surface's sink (`HostEdit::capture`), and
+- **Pointer capture** is quire's: a press registers the surface's sink (`EditHost::capture`), and
   until the primary release every move and the release go to it wherever the pointer is. The
   window's hook hears winit's pointer events before the document (logical = physical / scale
   factor); while captured the surface ignores its own `pointermove`/`pointerup`.
@@ -539,13 +541,13 @@ own caret and selection. The route needs no Blitz fork.
 - **Programmatic focus dispatches no event** (Open items). Every host focus write that lands
   calls the target field's `onfocus` itself (`focus_soon_told`); `FieldHandle::blur()` calls
   `onblur` itself; a node found by selector is matched to a mounted `TextInput` through
-  `HostFind::same` so it is told too.
+  `GeometryHost::same` so it is told too.
 - **No `MountedData` can be built for a node found by selector**: `NodeHandle` has crate-private
   fields and no constructor. ds-native wraps a found node in its own `RenderedElementBacking`
   (`FoundNode`), which answers focus, blur and select only. `focus_by_selector` waits up to
   twenty frames for the element to be drawn.
 - **Keep-focus.** Under `FocusFallback::Ancestor` (the default), `Ds`'s root click handler asks
-  `HostClickFocus` what the click will do: when Blitz would clear the focus and the target or an
+  `ClickFocusHost` what the click will do: when Blitz would clear the focus and the target or an
   ancestor is focusable (`tabindex >= 0` or natively focusable), that element takes the keyboard
   after the click if the click left it nowhere. The default is not prevented; when the ancestor
   already has the focus it is cleared first without events and refocused by a task, so a handler
@@ -553,8 +555,8 @@ own caret and selection. The route needs no Blitz fork.
 - **The kept-click rule.** dioxus 0.7 has no capture phase and Blitz dispatches bottom-up only
   (`events/driver.rs`), so a control that stops a click keeps it from the root. Every quire click
   handler that stops a click or prevents its default calls `focus::click::kept_click` last: with
-  the default left to run it goes through `HostClickFocus`; with the default prevented,
-  `HostPressFocus` gives the nearest focusable element from the pressed one up the keyboard at
+  the default left to run it goes through `ClickFocusHost`; with the default prevented,
+  `ClickFocusHost::press` gives the nearest focusable element from the pressed one up the keyboard at
   once, as a pressed button has it in a browser. `crates/ds/tests/kept_click_rule.rs` fails on a
   component `onclick` that stops a click without it.
 - **Removal sends the focus nowhere.** `process_removed_subtree` blurs a removed focused node and
@@ -563,7 +565,7 @@ own caret and selection. The route needs no Blitz fork.
   processing, and the id may be reused in the same batch), so `FocusKeeper` remembers the
   focusable ancestors (id and tag) while an element has the keyboard, and when that element is
   gone and the focus is nowhere it focuses the first live candidate among: the opener a surface
-  registered (`HostHandBack`, which a floating `Menu` anchored to an element uses), the removed
+  registered (`FocusHost::hand_back`, which a floating `Menu` anchored to an element uses), the removed
   element's focusable ancestors, the element focused before it, and the element under the
   pointer when the focus moved. A focus that went nowhere while its element stayed is left
   alone. It runs after each settled harness frame and before each window event reaches the
@@ -584,7 +586,7 @@ own caret and selection. The route needs no Blitz fork.
 - **`NodeHandle::set_focus` borrows the document when called, not when polled.** dioxus polls a
   task woken in the same turn as a dirty scope inside `render_immediate`, while the mutation
   writer holds the document, so a focus from such a task panics "RefCell already borrowed". Every
-  focus change goes through `HostFocus` (ds-native's probes with `NodeHandle::try_doc` first and
+  focus change goes through `FocusHost` (ds-native's probes with `NodeHandle::try_doc` first and
   answers `Busy`); `Busy` retries. Without a host the call is guarded and a panic reads as busy.
 - **An `EventHandler` made inside `queue_effect` has no scope** and panics when called; timer
   handlers are made in render and started from an effect.
@@ -593,7 +595,7 @@ own caret and selection. The route needs no Blitz fork.
 
 - **Rect reads can collide with the renderer** the same way: dioxus-native-dom's
   `get_client_rect` borrows the document mutably on its first poll. Every rect read goes through
-  `geometry::measure::client_rect`, which asks the host's `HostMeasure` (ds-native's answers
+  `geometry::measure::client_rect`, which asks the host's `GeometryHost::measure` (ds-native's answers
   `Measured::Busy` and the reader waits a frame); without a measurer the poll is guarded.
 - **Busy retries land in the same frame.** The first four `Busy` retries of a focus write, a rect
   read and a list scroll wait for `ds::busy::after_render` (an effect, which dioxus runs outside
@@ -606,11 +608,11 @@ own caret and selection. The route needs no Blitz fork.
 
 ### Other seams
 
-- **Every host seam is a context of fn pointers or a trait**, provided by `ds_native::launch`, the
-  harness and `ds_native::focus::provide()` where it needs no document: `HostMeasure`,
-  `HostFocus`, `HostBlur`, `HostSelect`, `HostSelection`, `HostPlaceCaret`, `HostFind`,
-  `HostClickFocus`, `HostPressFocus`, `HostHandBack`, `HostReveal`, `HostEdit`, `HostFileDrop`,
-  `HostClipboard`, `HostScale`, `HostModality`, `WindowHost`. `ds` names none of Blitz's types.
+- **Every host seam is a part of `ds::DocumentHost`, `ds::HostSignals` or a trait**, provided by
+  `ds_native::launch`, the harness and `ds_native::provide_host()`: the host's `FocusHost`,
+  `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost` (with `ImeHost`) and `FileDropHost`;
+  the `FileDropBoard` and `Rc<dyn Clipboard>` beside it; `HostSignals` (modality, scale,
+  activity); `WindowHost`. `ds` names none of Blitz's types.
 - **`use_environment` runs its watches on a `Spawner`** (`ds::Spawner`; the portal watch and
   the file watch are tasks it hands over). `ds_native::TokioSpawner::current` is the one
   implementor; `ds_native::launch` and `Harness` enter a process-wide two-worker runtime for it.
@@ -780,7 +782,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **Hoisted boxes' hit offsets trail a layout change by one resolve** (`flush_styles_to_layout`
   runs before `resolve_layout`). The overlay host covers the root, so its offsets never move.
 - **Transforms**: Blitz applies a transform when painting and when hit-testing (`hit_inner`
-  inverts it), but `get_client_bounding_rect` (what `HostMeasure` reads) leaves transforms out.
+  inverts it), but `get_client_bounding_rect` (what `GeometryHost::measure` reads) leaves transforms out.
   Anything whose rect anchors something is centred without a transform (the hover strip is
   `top: 0; bottom: 0; margin: auto 0; height: max-content`; the centred sheet uses a flex stage).
 - **`pointer-events: none` is honoured and inherited.**
@@ -789,7 +791,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **A hidden node keeps its last layout box**; read a following element to measure a collapse.
 - **An element's own client rect is offset by its own scroll offset** (`absolute_position`
   subtracts it), so a scrolled list's rect moves with its content.
-- **`scroll_into_view` scrolls the document viewport only.** ds-native's `HostReveal` sets a
+- **`scroll_into_view` scrolls the document viewport only.** ds-native's `GeometryHost::reveal` sets a
   nested list's own offset (instant, clamped) by CSSOM's `block: nearest`
   (`ds::nearest_scroll`).
 
@@ -1115,7 +1117,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   `ds` needs no executor; `ds_native::spell` (feature `spellcheck`) owns file access and the
   worker thread.
 - **Marks are decoration**: a layer, last in the surface and absolutely positioned, holds a
-  `border-bottom: dotted` box per line of each marked word from `HostEdit::selection_rects`. It
+  `border-bottom: dotted` box per line of each marked word from `EditHost::selection_rects`. It
   is out of flow and last so an app's child-margin and first-child rules do not move the text.
 - **Tasks belong to the surface** (`task::spawn_in`): a task spawned in the menu's handler is
   cancelled when the menu closes. A paragraph edited since the last read is dropped from the
