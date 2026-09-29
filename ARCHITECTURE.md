@@ -211,7 +211,8 @@ The single place a concept lives. Extend it; never write a second one.
 | Appearance choice and resolution (theme, accent, motion, system prefs) | `ds-style::appearance` |
 | The enclosing scope a component reads | `ds-style::scope::Scope` |
 | Material, blur, frame ground | `ds-style::material`; `ds::root::chrome` |
-| Space palettes and looks | `ds-style::space` |
+| Space palettes and `SpaceLook` | `ds-style::space` |
+| Looks (Mac, Arc: values only) | `ds-style::look::Look`; token values per Look in `ds-style::tokens` |
 | Glyphs (the `Icon` enum), plate, retint, classify | `ds-style::icon` |
 | Font faces as bytes | `ds-style::fonts`; registration with the renderer: `blitz-kit::fonts` |
 | Keyframes and recipes | `ds-motion::{anim, recipe, keyframes}` |
@@ -670,6 +671,9 @@ implements it (the traits build with `ds-harness` default features off).
   ```
 
 - **No `unsafe`** anywhere in the workspace; `unsafe_code = "deny"`.
+- **A Look is values only.** A Look supplies tokens (colour, radius, font family, grain, shadow), the
+  material recipe and the backdrop (`design/30` section 3). It never swaps a component, adds a code
+  path or changes a size, duration or behaviour; no component stylesheet selects on the Look.
 - **Design-system rules:** every class is prefixed `ds-`; variants go in `data-variant` and
   `data-size`, state in `aria-*`; every colour, duration, easing, keyframe and font comes from
   the token table. A missing component or token is added here, never patched in a consumer.
@@ -720,6 +724,26 @@ path each, until step 12 replaces them with the prelude.
 4. **`Presence`, `Timeline`, `Shown`**: one `Presence` and `use_presence`, delete `osd_phase`,
    `shown_phase`, `ListPresence`; one `use_timeline` with the six implementors; `Shown` to core;
    `idle_dim` driver into `shell/`; `shot_frame` split; one battery drawing.
+4a. **Catalogue**: build design/30's merges and additions, foundations first, each sub-step through
+    the gate worktree:
+    1. tokens: the pruned duration, delay and easing tables (30 section 1.2), `ControlSize {Mini,
+       Small, Regular, Large}` and `SizeScale` (1.6), `ds-style::look::Look` with the Mac values,
+       Motion levels reduced to Standard and Reduced;
+    2. vocabulary (1.5): `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
+       `RowState`, `Activity`, `FocusStyle`; the `Common` props; `ds::selectors`;
+    3. motion primitives (1.3): `Roster` (one hook), `use_collapse`, `rubber`, spring only, drop the
+       deleted keyframes, scalars and tokens; then interaction primitives (1.4): `LongPress`,
+       `Roving` + `Typeahead`, `HoverIntent` profiles, focus ring and `Highlight`, drag threshold;
+    4. P1 controls and fields: `Label`, `Button` (+ `IconButton`), `Toggle`, `Checkbox`,
+       `RadioGroup`, `SegmentedControl`, `Slider`, `TextField`, `ProgressIndicator`,
+       `LevelIndicator`, `Badge`, `KeyEquivalent`;
+    5. menus and lists: `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`, `List`, `Row`,
+       `SectionHeader`;
+    6. overlays and feedback: `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
+       `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
+    7. shell-only pieces and app features (30 sections 2.10 and 2.11), then the P2 components;
+    8. sill's switch-over (the local pieces L1-L16 of the component inventory) and the Arc Look;
+       the gallery and goldens per component; delete every name in 30 Part 4.
 5. **Crate-private crossers**: every `pub(crate)` item that crosses a layer (33 today) becomes
    `pub` at its home module or moves to its only consumer; the boundary script keeps the list
    empty.

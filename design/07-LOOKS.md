@@ -1,5 +1,8 @@
 # 07 Looks
 
+> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3 replaces sections 2 to 7 (the look model, Post, Riso, Tide, Candy, warmth), section 10 (Mochi) and section 11 (desktop default): the Looks are Mac (default) and Arc, and a Look is values only. Post's and S's values here are the source of the Arc Look's values. Where this file and 30 disagree, 30 wins.
+
+
 Status: draft for review, 2026-09-23. `S` = `~/mailo-design/mailo-spaces.html` (newest; wins
 every conflict), `C` = `~/mailo-design/mailo-charm.html`, `B` =
 `~/mailo-design/mailo-charm.bak.html`. `S:123` means line 123 of S. "The plan" means

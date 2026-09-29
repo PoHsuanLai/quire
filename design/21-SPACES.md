@@ -1,5 +1,8 @@
 # 21 Spaces on the desktop
 
+> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3.3 replaces where the Space colour goes: in the Mac Look it sits behind the material (backdrop), in the Arc Look it is painted on the chrome as `--f-*` frame tokens; section 1's frame-token model and section 3 apply to the Arc Look. The 380 ms cross-fade is `--t-big` (400 ms). The palette derivation (section 2), presets, storage and the editor stand. Where this file and 30 disagree, 30 wins.
+
+
 "A Space colours the frame; the mail stays on paper." (S:816). On the desktop, a Space is a
 COSMIC workspace's look: its colour tints the shell chrome around the apps, never the apps.
 
