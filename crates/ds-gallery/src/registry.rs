@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 23] = [
+pub const REGISTRY: [Entry; 25] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -63,6 +63,20 @@ pub const REGISTRY: [Entry; 23] = [
         lede: "Open each menu placement, the submenus and the status lines; every item state with its highlight posed; the pop-up button at each size. A pick blinks its item twice.",
         height: 3400,
         body: pages::menus::MenusPage,
+    },
+    Entry {
+        page: Page::Structure,
+        title: "Structure",
+        lede: "Stepper with its field and bare, DatePicker textual and graphical, a sortable resizable Table, Toolbar with its overflow chevron, SplitView dragged and folded, Sidebar at each size, TabView, FieldRow and FieldGroup, the MenuBar model's menus, the drag image with its count badge and the window titlebar with its subtitle, proxy icon and edited dot.",
+        height: 5600,
+        body: pages::structure::StructurePage,
+    },
+    Entry {
+        page: Page::SettingsWindow,
+        title: "Settings window",
+        lede: "A System-Settings-like window from the catalogue's own parts: a titlebar over a SplitView of a Sidebar and the content, the content's Toolbar over FieldGroups of FieldRows holding a Toggle, PopUpButton, SegmentedControl, RadioGroup, Slider, Stepper, Checkbox, TextField, DatePicker and a TabView.",
+        height: 1100,
+        body: pages::settings_window::SettingsWindowPage,
     },
     Entry {
         page: Page::Overlays,

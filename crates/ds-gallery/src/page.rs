@@ -19,6 +19,13 @@ pub enum Page {
     Lists,
     /// Menus, menu items and pop-up buttons.
     Menus,
+    /// Stepper, DatePicker, Table, Toolbar, SplitView, Sidebar, TabView, FieldRow and FieldGroup,
+    /// the MenuBar model, the drag image and the window titlebar, in every state (design/30
+    /// sections 2.1 to 2.7).
+    Structure,
+    /// A System-Settings-like window built from those parts, with real controls.
+    #[word(slug = "settings-window")]
+    SettingsWindow,
     /// Popovers, hover cards, tooltips, toast, scrim, sheet, peek, palette.
     Overlays,
     /// Popover, sheet, alert, side panel, tooltip, dock label, hover card, toast, empty state and

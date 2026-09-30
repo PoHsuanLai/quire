@@ -204,3 +204,13 @@
 
 .g-stage-caption{position:absolute;left:0;bottom:0;margin:0}
 .g-stage[*|data-wide=true]{width:520px}
+.g-split-stage{height:220px;width:640px}
+.g-split-side{box-sizing:border-box;height:100%;padding:var(--s-12);background:var(--aside);color:var(--ink-soft)}
+.g-split-main{box-sizing:border-box;height:100%;padding:var(--s-12);color:var(--ink-soft)}
+.g-side-frame{display:flex;flex-direction:column;width:232px;height:330px;border-radius:var(--r-panel);overflow:hidden}
+.g-titlebar{position:relative;width:520px;border-radius:var(--r-panel);background:var(--f-solid);overflow:hidden}
+.g-window{display:flex;flex-direction:column;width:980px;height:640px;border-radius:var(--r-window);background:var(--paper);box-shadow:var(--shadow-window);overflow:hidden}
+.g-window-bar{position:relative;flex:none;background:var(--aside)}
+.g-window-body{flex:1 1 0;min-height:0}
+.g-window-content{display:flex;flex-direction:column;height:100%;min-width:0}
+.g-window-scroll{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:var(--s-14);padding:var(--s-4) var(--s-22) var(--s-22)}
